@@ -8,5 +8,6 @@
 (input file "dk-grass.dai")
 (input file "dk-maize.dai")
 (input file "dk-pea.dai")
+(input file "dk-wrape.dai")
 
 ;;; dk-crop.dai ends here

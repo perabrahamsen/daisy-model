@@ -2531,25 +2531,102 @@ To use, set \"$am\" to the name of the AOM, e.g. (set \"$am\" pig_slurry)."
              (hour 23))))
 
 
+(defsummary "Crop Carbon Balance" simple
+  "Carbon balance for the crops.
+
+Warning: This balance is not finished.
+
+Note that negative deltas means the amount of water increases."
+  (precision 3)
+  (fetch (Seed_C  (name "Seed"))
+         (CLeaf (name "Leaves") (factor -1))
+         (CDead (name "Dead leaves still on crop") (factor -1))
+         (CStem (name "Stem") (factor -1))
+         (CSOrg (name "Storage organ") (factor -1))
+         (CRoot (name "Roots") (factor -1))
+         (CH2OPool (name "Assimilate") (factor -1))
+         ;; (C_Loss (name "Lost leaves and roots") (factor -1))
+         (NetPhotosynthesis (name "Netto photosynthesis"))
+         ;;(GrowthRespiration (name "Crop growth respiration") (factor -1))
+         ;;(MaintRespiration (name "Crop maintenance respiration")(factor -1))
+         (Harvest_C (name "Removed by harvest") (factor -1))
+         ("Residuals_C_root" (name "Root residuals") (factor -1))
+         ("Residuals_C_top" (name "Surface residuals") (factor -1)))
+  (sum_name "Balance"))
+
+(defsummary "Litter Carbon Balance" simple
+  "Carbon balance for the litter system.
+
+Note that negative deltas means the amount of carbon increases."
+  (precision 3)
+  (fetch ("Residuals_C_top" (name "Surface residuals"))
+         ("Bioinc_C-Surface" (name "Bioincorporated from surface") (factor -1))
+         ("Fertilizer_C" (name "Fertilization"))
+         (tillage_C_top (name "Removed from surface by tillage"))
+         (Surface_C (name "Litter") (factor -1)))
+  (sum_name "Balance"))
+
+(defsummary "Soil Carbon Balance" simple
+  "Carbon balance for the soil.
+
+Note that negative deltas means the amount of carbon increases."
+  (precision 3)
+  (fetch ("Bioinc_C-Soil" (name "Bioincorporated to soil"))
+         ("Residuals_C_soil" (name "Dead roots added to soil"))
+         (tillage_C_soil (name "Added to soil by tillage"))
+         ("SMB-CO2-total" (name "Soil biomass respiration") (factor -1))
+         (Soil_C (name "Soil content") (factor -1)))
+  (sum_name "Balance"))
+
+(defsummary "Total Carbon Balance" simple
+  "Carbon balance for the complete system.
+
+Warning: This balance is not finished.
+
+Note that negative deltas means the amount of carbon increases."
+  (precision 3)
+  (fetch (Soil_C (name "Soil content") (factor -1))
+         (Surface_C (name "Litter") (factor -1))
+         ("SMB-CO2-total" (name "Soil biomass respiration") (factor -1))
+         ("Bioinc_C-Surface" (name "Bioincorporated from surface") (factor -1))
+         ("Bioinc_C-Soil" (name "Bioincorporated to soil"))
+         ;; ("Bioinc_CO2" (name "Bioincorporation respiration") (factor -1))
+         (Seed_C (name "Seed"))
+         (CLeaf (name "Leaves") (factor -1))
+         (CDead (name "Dead leaves still on crop") (factor -1))
+         (CStem (name "Stem") (factor -1))
+         (CSOrg (name "Storage organ") (factor -1))
+         (CRoot (name "Roots") (factor -1))
+         (CH2OPool (name "Assimilate") (factor -1))
+         (NetPhotosynthesis (name "Netto photosynthesis"))
+         ;;(GrowthRespiration (name "Crop growth respiration") (factor -1))
+         ;;(MaintRespiration (name "Crop maintenance respiration") (factor -1))
+         (Harvest_C (name "Removed by harvest") (factor -1))
+         ("Residuals_C_root" (name "Dead roots lost by crop") (factor -1))
+         ("Residuals_C_soil" (name "Dead roots added to soil"))
+         ("Fertilizer_C" (name "Fertilization"))
+         (tillage_C_top (name "Removed from surface by tillage"))
+         (tillage_C_soil (name "Added to soil by tillage")))
+  (sum_name "Balance"))
+
+(defsummary "C Input" simple
+  "This summary provides the information needed by the OrganicMatter init
+submodel.  The amount printed under 'Total C Input' corresponds to the
+'input' parameter, and the amount under 'Roots' corresponds to the
+'root' parameter."
+  (fetch ("Fertilizer_C" (name "Fertilizer"))
+         ("Residuals_C_top" (name "Residuals"))
+         ("Residuals_C_root" (name "Roots"))
+         ("Bioinc_CO2" (factor -1.0)))
+  (sum_name "Total C input")
+  (period "y")
+  (precision 0))
+
 (deflog "Carbon Balance" table
   (where "C_Bal.dlf")
   (when hourly)
-  (summary (simple (title "C Input")
-		   (description "\
-This summary provides the information needed by the OrganicMatter init
-submodel.  The amount printed under 'Total C Input' corresponds to the
-'input' parameter, and the amount under 'Roots' corresponds to the
-'root' parameter.")
-		   (fetch ("Fertilizer_C"
-			   (name "Fertilizer"))
-			  ("Residuals_C_top"
-			   (name "Residuals"))
-			  ("Residuals_C_root"
-			   (name "Roots"))
-                          ("Bioinc_CO2" (factor -1.0)))
-		   (sum_name "Total C input")
-		   (period "y")
-		   (precision 0)))
+  (summary ;; "Crop Carbon Balance" "Total Carbon Balance" 
+           "Litter Carbon Balance" "Soil Carbon Balance" "C Input")
   (entries ;; Year Month MDay Hour
            (interval (path column "$col" OrganicMatter total_C)
                      (tag "Soil_C")
@@ -2573,7 +2650,7 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
                      (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter CO2)
                      (tag "SMB-CO2-total") 
-                     (dimension "kg CO2-C/ha/&")
+                     (dimension "kg C/ha/&")
                        (flux true)
                      (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
            (number (path column "$col" OrganicMatter am "*" om "*" top_C)
@@ -2597,6 +2674,10 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
                        (flux true)
                    (dimension "kg C/ha/&")
                    (factor 10))         ;g/m^2 -> kg/ha
+           (number (path column "$col" seed_C)
+                   (flux true)
+                   (tag "Seed_C")
+                   (dimension "kg C/ha/&"))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod CLeaf)
                    (dimension "kg C/ha")
@@ -2620,7 +2701,7 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod CH2OPool)
                    (dimension "kg C/ha")
-                   (factor 4))
+                   (factor 4))          ;g CH2O/m^2 -> kg C/ha
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod C_Loss)
                    (dimension "kg C/ha/&")
@@ -2630,7 +2711,7 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
                          Prod NetPhotosynthesis)
                    (dimension "kg C/ha/&")
                    (flux true)
-                   (factor 4.0))
+                   (factor 2.727272727))        ;g CO2/m^2 -> kg C/ha
            (number (path column "$col" OrganicMatter fertilized_C)
                    (flux true)
                    (tag "Fertilizer_C")
@@ -2638,14 +2719,14 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
                    (dimension "kg C/ha/&"))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod GrowthRespiration)
-                   (dimension "g CH2O/m^2/&")
+                   (dimension "kg C/ha/&")
                    (flux true)
-                   (factor 1.0))
+                   (factor 4))        ;g CH2O/m^2 -> kg C/ha
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod MaintRespiration)
-                   (dimension "g CH2O/m^2/&")
+                   (dimension "kg C/ha/&")
                    (flux true)
-                   (factor 1.0))
+                   (factor 4))        ;g CH2O/m^2 -> kg C/ha
            (number (path column "$col" harvest_C)
                    (flux true)
                    (tag "Harvest_C")
@@ -2668,12 +2749,10 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
                      (dimension "kg C/ha/&"))
            (number (path column "$col" OrganicMatter tillage_C_top)
                    (flux true)
-                   (tag "Tillage_Org_C_top")
                    (factor 10); g/m^2 -> kg/ha
                    (dimension "kg C/ha/&"))
            (interval (path column "$col" OrganicMatter tillage_C_soil)
                      (flux true)
-                     (tag "Tillage_Org_C_soil")
                      (factor 1e5)      ;g/cm^2 -> kg/ha
                      (dimension "kg C/ha/&"))
            ))
