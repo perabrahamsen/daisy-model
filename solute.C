@@ -253,8 +253,17 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("mactrans", mactrans);
   syntax.add ("adsorption", Librarian<Adsorption>::library (), 
 	      "Soil adsorption properties.");
-  Geometry::add_layer (syntax, "C", "g/cm^3", "Concentration in water.");
-  Geometry::add_layer (syntax, "M", "g/cm^3", "Mass in water and soil.");
+  Geometry::add_layer (syntax, Syntax::OptionalState, "C", Syntax::Fraction (),
+                       "Concentration in water.\n\
+This number does not include adsorped matter.");
+  Geometry::add_layer (syntax, Syntax::OptionalState, "M", "g/cm^3", 
+                       "Total mass per volume water, soil and air.\n\
+This number include both adsorped and dissolved matter.");
+  Geometry::add_layer (syntax, Syntax::OptionalConst,
+                       "Ms", Syntax::Fraction (), "Mass in dry soil.\n\
+This include all matter in both soil and water, relative to the\n\
+dry matter weight.\n\
+Only for initialization of the 'M' parameter.");
   syntax.add ("S", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term.");
   syntax.add ("S_p", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
@@ -273,10 +282,6 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Transportation in matrix (positive up).");
   syntax.add ("J_p", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Transportation in macropores (positive up).");
-  Geometry::add_layer (syntax, "soil_ppm", "ppm", "Concentration in water.\n\
-Only for initialization of the 'M' parameter.");
-  Geometry::add_layer (syntax, "solute_ppm", "ppm", "Mass in water and soil.\n\
-Only used for initialization of the 'C' parameter.");
   syntax.add ("tillage", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Changes during tillage.");
 }
@@ -357,12 +362,10 @@ Solute::initialize (const AttributeList& al,
 		    const Soil& soil, const SoilWater& soil_water, 
 		    Treelog& out)
 {
-  vector<double> soil_ppm;
-  vector<double> solute_ppm;
+  vector<double> Ms;
   soil.initialize_layer (C_, al, "C", out);
   soil.initialize_layer (M_, al, "M", out);
-  soil.initialize_layer (soil_ppm, al, "soil_ppm", out);
-  soil.initialize_layer (solute_ppm, al, "solute_ppm", out);
+  soil.initialize_layer (Ms, al, "Ms", out);
 
   if (C_.size () > 0)
     {
@@ -380,39 +383,22 @@ Solute::initialize (const AttributeList& al,
       if (M_.size () > soil.size ())
 	throw ("To many members of M sequence");
     }
-  if (soil_ppm.size () > 0)
+  if (Ms.size () > 0)
     {
       // Fill it up.
-      while (soil_ppm.size () < soil.size ())
-	soil_ppm.push_back ( soil_ppm[soil_ppm.size () - 1]);
-      if (soil_ppm.size () > soil.size ())
-	throw ("To many members of M sequence");
-    }
-  if (solute_ppm.size () > 0)
-    {
-      // Fill it up.
-      while (solute_ppm.size () < soil.size ())
-	solute_ppm.push_back ( solute_ppm[solute_ppm.size () - 1]);
-      if (solute_ppm.size () > soil.size ())
-	throw ("To many members of M sequence");
+      while (Ms.size () < soil.size ())
+	Ms.push_back ( Ms[Ms.size () - 1]);
+      if (Ms.size () > soil.size ())
+	throw ("To many members of Ms sequence");
     }
   if (M_.size () == 0 && C_.size () == 0)
     {
-      if (soil_ppm.size () != 0)
+      if (Ms.size () != 0)
 	{
-	  daisy_assert (soil_ppm.size () == soil.size ());
+	  daisy_assert (Ms.size () == soil.size ());
 
-	  for (unsigned int i = M_.size (); i < soil_ppm.size (); i++)
-	    // ppm -> g / cm^3.
-	    M_.push_back (1.0e-6 * soil_ppm[i] * soil.dry_bulk_density (i));
-	}
-      if (solute_ppm.size () != 0)
-	{
-	  daisy_assert (solute_ppm.size () == solute_ppm.size ());
-
-	  for (unsigned int i = M_.size (); i < solute_ppm.size (); i++)
-	    // ppm -> g / cm^3.
-	    C_.push_back (1.0e-6 * solute_ppm[i]);
+	  for (unsigned int i = M_.size (); i < Ms.size (); i++)
+	    M_.push_back (Ms[i] * soil.dry_bulk_density (i));
 	}
       if (M_.size () == 0 && C_.size () == 0)
 	{

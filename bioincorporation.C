@@ -280,7 +280,7 @@ Bioincorporation::output (Log& log) const
 void 
 Bioincorporation::add (const Geometry& geometry, vector<double>& input,
 		       const double amount) const
-{ add (geometry, input, amount); }
+{ impl.add (geometry, input, amount); }
 
 void 
 Bioincorporation::initialize (const Soil& soil)

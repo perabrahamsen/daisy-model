@@ -790,7 +790,7 @@ SoilWater::put_h (const Soil& soil, const vector<double>& v) // [cm]
 { impl.put_h (soil, v); }
 
 void 
-SoilWater::get_sink (vector<double>& v) const // [cm^3/cm^3/h]
+SoilWater::get_sink (vector<double>& v) const // [h^-1]
 { v = impl.S_sum; }
 
 void
@@ -825,25 +825,28 @@ will be used from there to the bottom.");
   lr.add ("h_fc", -100.0);
   lr.add ("z_top", -10.0);
   alist.add ("UZreserve", lr);
-  syntax.add ("S_sum", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_sum", "h^-1", Syntax::LogOnly, Syntax::Sequence,
 	      "Total water sink (due to root uptake and macropores).");
-  syntax.add ("S_root", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_root", "h^-1", Syntax::LogOnly, Syntax::Sequence,
 	      "Water sink due to root uptake.");
-  syntax.add ("S_drain", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_drain", "h^-1", Syntax::LogOnly, Syntax::Sequence,
 	      "Water sink due to soil drainage.");
-  syntax.add ("S_p", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_p", "h^-1", Syntax::LogOnly, Syntax::Sequence,
 	      "Water sink (due to macropores).");
-  syntax.add ("S_incorp", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_incorp", "h^-1", Syntax::LogOnly, Syntax::Sequence,
 	      "Incorporated water sink, typically from subsoil irrigation.");
-  syntax.add ("tillage", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("tillage", "h^-1", Syntax::LogOnly, Syntax::Sequence,
 	      "Changes in water content due to tillage operations.");
-  syntax.add ("S_permanent", "cm^3/cm^3/h", Syntax::State, Syntax::Sequence,
+  syntax.add ("S_permanent", "h^-1", Syntax::State, Syntax::Sequence,
 	      "Permanent water sink, e.g. subsoil irrigation.");
   vector<double> empty;
   alist.add ("S_permanent", empty);
-  Geometry::add_layer (syntax, "Theta", "cm^3/cm^3", "Soil water content.");
-  Geometry::add_layer (syntax, "h", "cm", "Soil water pressure.");
-  syntax.add ("S_ice", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  Geometry::add_layer (syntax, Syntax::OptionalState,
+                       "Theta", Syntax::Fraction (),
+                       "Soil water content.");
+  Geometry::add_layer (syntax, Syntax::OptionalState, 
+                       "h", "cm", "Soil water pressure.");
+  syntax.add ("S_ice", "h^-1", Syntax::LogOnly, Syntax::Sequence,
 	      "Ice sink (due to thawing or freezing).");
   syntax.add_fraction ("X_ice", Syntax::OptionalState, Syntax::Sequence,
 		       "Ice volume fraction in soil.");

@@ -738,7 +738,8 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   alist.add ("submodel", "SoilHeat");
   alist.add ("description", "Temperature and heat flux in soil.");
-  Geometry::add_layer (syntax, "T", "dg C", "Soil temperature.");
+  Geometry::add_layer (syntax, Syntax::OptionalState, "T", "dg C",
+                       "Soil temperature.");
   syntax.add ("h_frozen", "cm^-1", Syntax::Const,
 	      "Pressure below which no more water will freeze.");
   alist.add ("h_frozen", -15000.0);

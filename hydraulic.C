@@ -118,19 +118,14 @@ check_Theta_res (const AttributeList& al, Treelog& err)
 
 void
 Hydraulic::load_Theta_sat (Syntax& syntax, AttributeList&)
-{ 
-  static RangeEI Theta_sat_range (0.0, 0.9);
-  syntax.add ("Theta_sat", "cm^3 H2O/cm^3", Theta_sat_range, Syntax::State,
-	      "Saturation point.");
-}
+{ syntax.add_fraction ("Theta_sat",  Syntax::State, "Saturation point."); }
 
 void
 Hydraulic::load_Theta_res (Syntax& syntax, AttributeList& alist)
 { 
   load_Theta_sat (syntax, alist);
   syntax.add_check (check_Theta_res);
-  syntax.add ("Theta_res", "cm^3 H2O/cm^3", Check::fraction (), Syntax::Const,
-	      "Soil residual water.");
+  syntax.add_fraction ("Theta_res", Syntax::Const, "Soil residual water.");
   alist.add ("Theta_res", 0.0);
 }
 

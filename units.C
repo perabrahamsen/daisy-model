@@ -163,11 +163,11 @@ Units::Content::get_convertion (const string& from, const string& to) const
 		return *(*j_c).second;
 	    }
 	}
-      throw string ("'") + from + "' unknown dimension, expected '" + to + "'";
+      throw string ("[") + from + "] unknown dimension, expected [" + to + "]";
     }
   to_type::const_iterator j = (*i).second.find (to);
   if (j == (*i).second.end ())
-    throw string ("Cannot convert '") + from + "' to '" + to + "'";
+    throw string ("Cannot convert [") + from + "] to [" + to + "]";
 
   return *(*j).second;
 }
@@ -217,7 +217,17 @@ void
 Units::add (const string& from, const string& to, double factor, double offset)
 { 
   daisy_assert (content);
-  content->table[from][to] = new ConvertLinear (factor, offset);
+  if (!(content->table[from].find (to) == content->table[from].end ()))
+    daisy_warning ("convert from [" + from + "] to [" + to + "] duplicate\n");
+  else
+    content->table[from][to] = new ConvertLinear (factor, offset);
+  // Reverse conversion.
+  daisy_assert (isnormal (factor));
+  if (!(content->table[to].find (from) == content->table[to].end ()))
+    daisy_warning ("convert from [" + from + "] to [" + to + "] reverse\n");
+  else
+    content->table[to][from] = new ConvertLinear (1.0 / factor, 
+                                                  -offset / factor);
 }
 
 void 
@@ -310,6 +320,9 @@ Units::standard_conversions ()
   add ("m", "cm", 100.0);
   add ("pF", "cm", Convert_pF_cm);
   add ("cm", "pF", Convert_cm_pF);
+  add ("cm", "hPa", 1.0);
+  add ("cm", "kPa", 0.1);
+  add ("cm", "Pa", 100.0);
   add ("d^-1", "h^-1", 1.0/24.0);
   add ("d", "h", 24.0);
   add ("mm/d", "mm/h", 1.0/24.0);
@@ -322,9 +335,14 @@ Units::standard_conversions ()
   add ("L/kg", "cm^3/g", 1.0);
   add ("l/kg", "cm^3/g", 1.0);
   add ("g/cm^3", "kg/m^3", (100.0 * 100.0 * 100.0) / 1000.0);
-  add ("%", Syntax::Fraction (), 0.01);
+  add (Syntax::Fraction (), "ppm", 1000000.0);
   add (Syntax::Fraction (), "%", 100.0);
   add (Syntax::Fraction (), "", 1.0);
+  add ("", "ppm", 1000000.0);
+  add ("", "%", 100.0);
+  add ("cm^3 H2O/cm^3", Syntax::Fraction (), 1.0);
+  add ("cm^3 H2O/cm^3", "", 1.0);
+  add ("g/cm^3", Syntax::Fraction (), 1.0);
 
   // Weather.
   add ("dgWest", "dgEast", -1.0);

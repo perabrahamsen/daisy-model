@@ -515,7 +515,7 @@ VegetationCrops::harvest (const symbol column_name,
     if (all || (*crop)->name == crop_name)
       {
         const double old_crop_C = (*crop)->total_C ();
-        const double old_residulas_C_top = residuals_C_top;
+        const double old_residuals_C_top = residuals_C_top;
         const double old_residuals_C_soil
           = geometry.total (residuals_C_soil) * 10000;
         const double sorg_height = (*crop)->sorg_height ();
@@ -541,15 +541,15 @@ VegetationCrops::harvest (const symbol column_name,
           : (*crop)->total_C ();
         const double balance = (new_crop_C - old_crop_C)
           + ((residuals_C_top + geometry.total (residuals_C_soil) * 10000)
-             - (old_residulas_C_top + old_residuals_C_soil)) * 10
+             - (old_residuals_C_top + old_residuals_C_soil)) * 10
           + mine.total_C () * 10;
         if (fabs (balance) > 0.001 /* 1 [g/ha] */)
           {
             TmpStream tmp;
             tmp () << "delta Crop = " << new_crop_C - old_crop_C;
-            tmp () << "\ntop residulas = "
-                   << (residuals_C_top - old_residulas_C_top) * 10
-                   << "\nsoil residulas = "
+            tmp () << "\ntop residuals = "
+                   << (residuals_C_top - old_residuals_C_top) * 10
+                   << "\nsoil residuals = "
                    << (geometry.total (residuals_C_soil) * 10000
                        - old_residuals_C_soil) * 10
                    << "\nharvest = " << mine.total_C () * 10

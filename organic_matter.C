@@ -140,6 +140,7 @@ struct OrganicMatter::Implementation
   public:
     static void load_syntax (Syntax&, AttributeList&);
     Initialization (const AttributeList&, const Soil& soil, 
+                    const Bioincorporation& bioincorporation, 
 		    const vector<SOM*>& som, double T_avg);
     ~Initialization ();
   };

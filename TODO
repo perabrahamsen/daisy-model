@@ -1,14 +1,16 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Organic Matter Article
+* jose
 
-** Find ud af hvorfor eq ikke finder rette humus for ler!
-
-Kør med end = -18 cm og bioinc
-
-husk om det skal være med eller uden bioinc CO2.
+** skal kunne initialise NO3 NH4 Theta og hydraulic properties
 
 * Udviklinsplan
+
+* Organic Matter Article
+
+** Giver jb1_high2 og jb6_low2 rette humusmængde?
+
+I så falde er det rødderne der er problemet.
 
 *** check input.
 
@@ -57,8 +59,6 @@ Vi skal have en måde at ændre log options globalt.  Det gælder også
 udskrivning af tid i excel format.
 
 * Gør det muligt at skifte enhed i en log fil.
-
-* Tillad [%] for Theta_sat
 
 * Agronomy for Daisy Users  / Model overview
 

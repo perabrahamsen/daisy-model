@@ -28,7 +28,7 @@ The 'pF' and the (obsolete) date related models do not obey the new
 The 'max', 'min' and 'average' select models have been removed, use
 'number' instead with the relevant handle.
 
-** The 'select' can now log as "fraction of bulk mass".
+** The interval select model can now log as "fraction of bulk mass".
 
 You need to specify both the 'spec' parameter and the 'dimension'.  If
 Daisy knows how to convert the units of the variable found with 'spec'
@@ -37,8 +37,31 @@ specified by 'dimension' (e.g. [%]), it will do so.
 
 ** New abiotic_factor log variable in OrganicMatter.
 
-This log the product of the water and heat factors, but ignore the
+This log the product of the water and heat factors, but ignores the
 clay factor. 
+
+** Name of SoilWater Theta and sink terms dimension changed.
+
+From [cm^3/cm^3] to [].  The values are the same, so this should only
+affect you if you have initialized Theta explicitly and supplied a
+dimension.  You can now use both fractions [], percents [%] and parts
+per million [ppm] for initialization.
+
+** You can now specify the Theta_sat and Theta_res hydraulic parameters as %.
+
+** You can now specify C in SoilNO3, SoilNH4 and SoilChemical as [ppm].
+
+The old `solute_ppm' parameter has been removed.
+
+** New Ms parameter in SoilNO3, SoilNH4 and SoilChemical.
+
+This allows you to specify the content as ppm.  The old 'soil_ppm' 
+
+** You can now specify pressure in Pa, hPa, and kPa.
+
+** There is a new 'init-soil.dai' file in daisy-sample.zip.
+
+This illustrates how to initialize soil content.
 
 * 3.63
 

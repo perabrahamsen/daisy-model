@@ -282,21 +282,12 @@ ParserFile::Implementation::check_dimension (const string& syntax,
 	  if (read.length () == 0 || read[0] != '?')
 	    warning ("you must use [?<dim>] for entries with unknown syntax");
 	}
-      else if (syntax == Syntax::Fraction () && read == "%")
-	return true;
-      else if (syntax == Syntax::None ()
-	  || syntax == Syntax::Fraction ())
-	{
-	  if (read != "")
-	    {
-	      error (string ("expected [] got [") + read + "]");
-	      return false;
-	    }
-	}
       else if (!Units::can_convert (read, syntax))
 	{
-	  error (string ("expected [") + syntax + "] got ["
-		 + read + "]");
+	  error (string ("expected [") 
+                 + ((syntax == Syntax::Fraction ()
+                     || syntax == Syntax::None ())
+                    ? "" : syntax) + "] got [" + read + "]");
 	  return false; 
 	}
     }

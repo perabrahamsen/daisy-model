@@ -23,11 +23,11 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+#include "syntax.h"
 #include <vector>
 #include <string>
 
 class AttributeList;
-class Syntax;
 class Treelog;
 class Groundwater;
 
@@ -70,7 +70,8 @@ public:
   double total (const std::vector<double>& v, double from, double to) const;
 
   // Layers -- Support initializing soil arrays layer by layer.
-  static void add_layer (Syntax& syntax, const std::string& name,
+  static void add_layer (Syntax& syntax, Syntax::category, 
+                         const std::string& name,
 			 const std::string& dimension,
                          const std::string& description);
   void initialize_layer (std::vector<double>& value, 

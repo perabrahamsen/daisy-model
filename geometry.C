@@ -286,13 +286,16 @@ static struct CheckLayers : public VCheck
 } check_layers;
 
 void 
-Geometry::add_layer (Syntax& syntax, const string& name,
+Geometry::add_layer (Syntax& syntax, Syntax::category cat, const string& name,
 		     const string& dimension, const string& description)
 {
   Syntax& layer = *new Syntax ();
   layer.add ("end", "cm", Check::negative (), Syntax::Const, 
 	     "End point of this layer (a negative number).");
-  layer.add ("value", dimension, Syntax::Const, description);
+  if (dimension == Syntax::Fraction ())
+    layer.add_fraction ("value", Syntax::Const, description);
+  else
+    layer.add ("value", dimension, Syntax::Const, description);
   layer.order ("end", "value");
 
   const string iname = "initial_" + name;
@@ -303,8 +306,12 @@ The initial value is given as a sequence of (END VALUE) pairs, starting\n\
 from the top and going down.  The parameter will be initialized to\n\
 VALUE from the END of the previous layer, to the END of the current layer.");
   syntax.add_check (iname, check_layers);
-  syntax.add (name, dimension, Syntax::OptionalState, Syntax::Sequence, 
-	      description);
+  if (dimension == Syntax::Fraction ())
+    syntax.add_fraction (name, cat, Syntax::Sequence, 
+                         description);
+  else
+    syntax.add (name, dimension, cat, Syntax::Sequence, 
+                description);
 }
 
 void 

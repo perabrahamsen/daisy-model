@@ -1,3 +1,30 @@
+2004-12-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.64 released.
+
+2004-12-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/init-soil.dai: New file.
+	* sample/Makefile (LIBS): Add it.
+
+	* parser_file.C (check_dimension): Allow conversions with
+	`Syntax::Fraction ()' and `Syntax::None ()'.
+
+	* units.C (standard_conversions): [g/cm^3] -> [].
+	* geometry.C (add_layer): Handle fractions.
+	* solute.C (C): Use it.
+	(solute_ppm, soil_ppm): Removed.
+	(Ms): New parameter.
+
+2004-12-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (add): Automatically add reverse conversion.
+
+	* hydraulic.C (load_Theta_sat, load_Theta_res): Use fraction
+	instead of [cm^3 H2O/cm^3].
+	* units.C (standard_conversions): Support [cm^3 H2O/cm^3] as
+	synonym for [].
+
 2004-11-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* printer_file.h, printer_file.C (print_parameterization): New
