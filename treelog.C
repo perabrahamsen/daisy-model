@@ -55,7 +55,8 @@ public:
   { }
 
   // Use.
-  void flush ();
+  void flush ()
+  { }
 
   // Create and Destroy.
 public:
