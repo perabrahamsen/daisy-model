@@ -27,6 +27,7 @@ public:
   { return dz_[i]; }
   unsigned int interval_plus (double z) const;
   unsigned int interval (double z) const;
+  unsigned int interval_border (double z) const;
 
   // Vector operations.
   void mix (vector<double>& v, double from, double to) const;

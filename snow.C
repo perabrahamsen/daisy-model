@@ -272,25 +272,25 @@ Snow::output (Log& log, Filter& filter) const
 }
 
 double 
-Snow::percolation ()
+Snow::percolation () const
 {
   return impl.q_s;
 }
 
 double 
-Snow::temperature ()
+Snow::temperature () const
 {
   return impl.temperature;
 }
 
 double 
-Snow::evaporation ()
+Snow::evaporation () const
 {
   return impl.EvapSnowPack;
 }
 
 double 
-Snow::get_storage () const
+Snow::storage () const
 {
   return impl.Ssnow;
 }

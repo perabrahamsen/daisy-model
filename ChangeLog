@@ -1,4 +1,39 @@
+1998-12-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.49 released.
+
+1998-12-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* nrutil.C, nrutil.h: New files.
+
+	* Makefile (INTERFACES): Add them.
+	* pt_pmsw.C: New model.
+	* Makefile (COMPONENTS): Add it.
+
+	* chemicals.C, chemicals.h: New files.
+	* Makefile (INTERFACES): Add them.
+	* bioclimate_std.C: Use them.
+	* action_spray.C: New file.
+	* Makefile (COMPONENTS): Add it.
+	* column.h (Column::spray): New pure virtual member.
+	* column_std.C (ColumnStandard::spray): Implement it.
+	* bioclimate.h (Bioclimate::spray): New pure virtual member.
+	* bioclimate_std.C (BioclimateStandard::spray): Implement it.
+
+	* log.h (output_submodule): Allow `log_only' argument.
+
 1998-12-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* snow.C, snow.h (storage): Renamed from `get_storage'.
+	* bioclimate_std.C (get_snow_storage): Update caller.
+	* snow.C, snow.h (evaporation, temperature, precipitation): Made
+	const. 
+
+	* bioclimate_std.C: Renamed `crops' to `vegetation'.
+
+	* geometry.C, geometry.h (interval_border): New member function.
+	* log_table.C (LogEntry::flux_at): New parameter.
+	* log_table.C (LogEntry::content_at): Renamed from `at'.
 
 	* Version 0.48 released.
 

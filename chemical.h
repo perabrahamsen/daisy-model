@@ -21,6 +21,8 @@ public:
   // Queries.
 public:
   virtual double crop_uptake_reflection_factor () const	= 0; // [0-1]
+  virtual double canopy_dissipation_rate_coefficient () const = 0; // [h^-1]
+  virtual double canopy_washoff_coefficient () const = 0; // [mm]
 
   // Create and Destroy.
 protected:

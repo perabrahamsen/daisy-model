@@ -24,12 +24,13 @@ public:
 	     double Si, double q_h, double Prain,
 	     double Psnow, double T, double Epot);
   void output (Log&, Filter&) const;
-  double percolation ();
-  double temperature ();
-  double evaporation ();
 
-  // Communication with external model.
-  double get_storage () const;
+  // Queries.
+public:
+  double percolation () const;
+  double temperature () const;
+  double evaporation () const;
+  double storage () const;
 
   // Create & Destroy.
 public:

@@ -75,9 +75,10 @@ static Librarian<Log> Log_init ("log");
 
 template <class T> void
 output_submodule (const T& submodule,
-                  const char* name, Log& log, Filter& filter)
+                  const char* name, Log& log, Filter& filter, 
+		  bool log_only = false)
 {
-  if (filter.check (name))
+  if (filter.check (name, log_only))
     {
       log.open (name);
       submodule.output (log, filter.lookup (name));

@@ -10,6 +10,8 @@ struct PT_standard : public PT
 {
   // State.
   double potential_transpiration_;
+
+  // Log variable.
   double potential_crop_transpiration;
   double potential_soil_transpiration;
 

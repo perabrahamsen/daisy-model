@@ -60,6 +60,8 @@ public:
 				 stem_harvest, leaf_harvest, sorg_harvest); }
   void mix (const Time&, double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
+  void spray (const string& chemical, double amount) // [g/ha]
+    { bioclimate.spray (chemical, amount / (100.0 * 100.0) /* ha->m^2 */); }
 
   // Conditions.
   double soil_temperature (double height) const; // [ cm -> dg C]

@@ -1,30 +1,24 @@
-* PT model til PvdK.
-
 * Indfør stof på overfladen.
 
-* Indfør Geometry::flux og en log.table.entry.flux for log af flux værdier.
+** Høst stof fra canopy.
+
+** Kør test.
+
+* Indfør stof i jorden.
+
+* Tilføj "Field" abstraction i stil med "Vegetation".
+
+** Lad evt. field kunne "huske" hvilke søjler der er valgt med "with-column".
 
 ======================================================================
 
 * Plot retentionskurve fra gdaisy.
 
 ======================================================================
-* Log of flux at specific depth gives problems, since flux only
-happens at numeric intervals.  Find a solution.
-
-* Dynamic N partitioning in crop.
 
 * GodeGuard errors
 
-* Daisy: Create an alist::default_alist entry for alist sequences.
-
 ======================================================================
-
-* Chemical (+ API udvidelse og hjælpefunktioner)
-
-* log.dai
-
-Date: 
 
 * Clone og Merge column til Nick
 
@@ -34,16 +28,8 @@ Date: Møde med Nich i august.
 
 Date: vent på SH
 
-* Overflademodul for pesticider (SMP96)
-
-Date: vent på SH
-
-* Omsætning og trasport af pestidider i jorden.
-
 ======================================================================
 
-
-* Bioclimate::Irrigation bliver aldrig nulstillet!
 
 * Standard filtre
 
@@ -56,15 +42,6 @@ Date: vent på SH
 *** Flyt `column' query til global funktion i column.h eller daisy.h
 
 ** OrganicMatter output Total C/N of AM, SOM, and SMB respectively.
-
-** Implementer minidaisy filtre
-
-** Implementer HS filtre.
-
-* Implementer Partit::RSR (RootShootRatio) 
-
-Den skal forhindre at alt assimilatet går til respiration af røderne
-efter et slet af græs.
 
 * Døde blade skal tælle med i lysfordelingen.
 

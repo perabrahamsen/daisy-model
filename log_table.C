@@ -26,7 +26,8 @@ struct LogEntry
   const double offset;		// - || -
   /* const */ double from;	// Restrict interval of array.
   /* const */ double to;
-  const double at;		// Specific position in array.
+  const double content_at;	// Specific position in array for content.
+  const double flux_at;		// Specific position in array for fluxes.
   const bool accumulate;	// Accumulate numbers over time.
   const bool full;		// Print out total array.
 
@@ -159,8 +160,10 @@ struct LogEntry
 	    }
 	  else if (geometry)
 	    {
-	      if (at <= 0)
-		value += array[geometry->interval_plus (at)];
+	      if (content_at <= 0)
+		value += array[geometry->interval_plus (content_at)];
+	      else if (flux_at <= 0)
+		value += array[geometry->interval_border (flux_at)];
 	      else if (to > from)
 		value += geometry->total (array);
 	      else
@@ -172,7 +175,7 @@ struct LogEntry
 	      for (unsigned int i = 0; i < array.size (); i++)
 		value += array[i];
 #else
-	      // Bug: Stupid Filer::accumulate hides this.
+	      // Bug: Stupid Filter::accumulate hides this.
 	      value += ::accumulate (array.begin (), array.end (), 0.0);
 #endif
 	    }
@@ -238,7 +241,8 @@ struct LogEntry
       offset (al.number ("offset")),
       from (al.number ("from")),
       to (al.number ("to")),
-      at (al.number ("at")),
+      content_at (al.number ("content_at")),
+      flux_at (al.number ("flux_at")),
       accumulate (al.flag ("accumulate")),
       full (al.flag ("full")),
       value (al.number ("value")),
@@ -472,6 +476,28 @@ static struct LogTableSyntax
   static Log& make (const AttributeList& al)
     { return *new LogTable (al); }
 
+  static bool check_alist (const AttributeList& al)
+    {
+      bool ok = true;
+
+      bool specify_content = (al.number ("content_at") <= 0.0);
+      bool specify_flux = (al.number ("flux_at") <= 0.0);
+      bool specify_interval = !(al.number ("to") > al.number ("from"));
+      
+
+      if (specify_content && specify_flux)
+	{
+	  CERR << "You cannot specify both `content_at' and `flux_at'\n";
+	  ok = false;
+	}
+      if ((specify_content || specify_flux) && specify_interval)
+	{
+	  CERR << "You cannot specify both position and interval\n";
+	  ok = false;
+	}
+      return ok;
+    }
+
   LogTableSyntax ()
     { 
       Syntax& syntax = *new Syntax ();
@@ -481,7 +507,7 @@ static struct LogTableSyntax
       syntax.add ("where", Syntax::String, Syntax::Const);
       syntax.add ("when", Librarian<Condition>::library (), Syntax::Const);
       
-      Syntax& entry_syntax = *new Syntax ();
+      Syntax& entry_syntax = *new Syntax (check_alist);
       AttributeList& entry_alist = *new AttributeList ();
       entry_syntax.add ("tag", Syntax::String, Syntax::Optional);
       entry_syntax.add ("dimension", Syntax::String, Syntax::Const);
@@ -504,8 +530,12 @@ static struct LogTableSyntax
       entry_alist.add ("from", 0.0);
       entry_syntax.add ("to", Syntax::Number, Syntax::Const);
       entry_alist.add ("to", 1.0);
-      entry_syntax.add ("at", Syntax::Number, Syntax::Const);
-      entry_alist.add ("at", 1.0);
+      entry_syntax.add ("content_at", Syntax::Number, Syntax::Const);
+      entry_alist.add ("content_at", 1.0);
+      entry_syntax.add ("flux_at", "cm", Syntax::Const,
+			"Specify position to measure flux.  \
+The closest interval border will be used.");
+      entry_alist.add ("flux_at", 1.0);
       entry_syntax.add ("accumulate", Syntax::Boolean, Syntax::Const);
       entry_alist.add ("accumulate", false);
       entry_syntax.add ("full", Syntax::Boolean, Syntax::Const);

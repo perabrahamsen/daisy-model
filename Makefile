@@ -183,7 +183,8 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	condition_soil.C log_table.C log_checkpoint.C weather_hourly.C \
 	uznone.C condition_daisy.C chemical_std.C \
 	hydraulic_M_BaC_Bimodal.C hydraulic_B_BaC_Bimodal.C \
-	pet_makkink.C pet_weather.C pet_PM.C pt_std.C
+	pet_makkink.C pet_weather.C pet_PM.C pt_std.C action_spray.C \
+	pt_pmsw.C
 
 # Select the C files with a corresponding header file from the library.
 #
@@ -196,7 +197,7 @@ INTERFACES = daisy.C parser.C log.C weather.C column.C crop.C \
 	am.C im.C om.C harvest.C geometry.C transport.C \
 	librarian.C cdaisy.C adsorption.C tortuosity.C event.C eventqueue.C \
 	minimanager.C printer.C printer_file.C frame.C chemical.C common.C \
-	pet.C net_radiation.C pt.C vegetation.C
+	pet.C net_radiation.C pt.C vegetation.C chemicals.C nrutil.C
 
 # Select the C files that are not part of the library.
 #
@@ -561,7 +562,7 @@ filter_checkpoint${OBJ}: filter_checkpoint.C filter.h librarian.h \
 bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h library.h \
  common.h alist.h syntax.h column.h surface.h uzmodel.h im.h weather.h \
  csmp.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h snow.h \
- log.h filter.h mathlib.h pet.h pt.h vegetation.h
+ log.h filter.h mathlib.h pet.h pt.h vegetation.h chemicals.h
 condition_crop${OBJ}: condition_crop.C condition.h librarian.h library.h \
  common.h alist.h syntax.h crop.h column.h daisy.h frame.h
 condition_soil${OBJ}: condition_soil.C condition.h librarian.h library.h \
@@ -594,6 +595,8 @@ pet_PM${OBJ}: pet_PM.C pet.h librarian.h library.h common.h alist.h \
  net_radiation.h vegetation.h log.h filter.h
 pt_std${OBJ}: pt_std.C pt.h librarian.h library.h common.h alist.h \
  syntax.h pet.h vegetation.h surface.h uzmodel.h im.h log.h filter.h
+action_spray${OBJ}: action_spray.C action.h librarian.h library.h common.h \
+ alist.h syntax.h daisy.h frame.h column.h chemical.h
 daisy${OBJ}: daisy.C daisy.h frame.h time.h weather.h librarian.h \
  library.h common.h alist.h syntax.h im.h groundwater.h uzmodel.h \
  horizon.h log.h filter.h parser.h am.h nitrification.h bioclimate.h \
@@ -713,6 +716,8 @@ pt${OBJ}: pt.C pt.h librarian.h library.h common.h alist.h syntax.h log.h \
  filter.h
 vegetation${OBJ}: vegetation.C vegetation.h common.h crop.h librarian.h \
  library.h alist.h syntax.h csmp.h mathlib.h harvest.h log.h filter.h
+chemicals${OBJ}: chemicals.C chemicals.h syntax.h common.h log.h filter.h \
+ librarian.h library.h alist.h chemical.h
 set_exceptions${OBJ}: set_exceptions.S
 main${OBJ}: main.C daisy.h frame.h time.h syntax.h common.h alist.h \
  library.h

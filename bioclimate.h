@@ -54,6 +54,7 @@ public:
 public:
   virtual void irrigate_top (double flux, double temp) = 0;
   virtual void irrigate_surface (double flux, double temp) = 0;
+  virtual void spray (const string& chemical, double amount) = 0; // [g/m^2]
 
   // Communication with external model.
   virtual double get_evap_interception () const; // [mm/h]

@@ -41,11 +41,8 @@ struct Syntax::Implementation
   { }
   ~Implementation ()
   { 
-#if 0
-    // BUG: Memory leak.  Need to delete alists we have allocated.
-    for (alist_map::iterator i = alists.begin (); i < alists.end (); i++)
+    for (alist_map::iterator i = alists.begin (); i != alists.end (); i++)
       delete (*i).second;
-#endif
   }
 };    
 

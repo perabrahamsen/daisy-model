@@ -32,6 +32,21 @@ Geometry::interval (double z) const
   return i;
 }
 
+unsigned int
+Geometry::interval_border (double z) const
+{
+  double best = fabs (z - zplus_[0]);
+  
+  for (unsigned int i = 1; i < size_; i++)
+    {
+      double dist = fabs (z - zplus_[0]);
+      if (dist > best)
+	return i - 1;
+      best = dist;
+    }
+  return size_;
+}
+
 bool 
 Geometry::check () const
 {
