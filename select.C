@@ -5,7 +5,6 @@
 #include "geometry.h"
 #include <numeric>
 #include <set>
-#include <stack>
 
 Librarian<Select>::Content* Librarian<Select>::content = NULL;
 
