@@ -652,7 +652,7 @@ which is often enough for drained soil.  A full specification would be
                  (L 18 [m])
                  (x  9 [m])
                  (pipe_position -1.1 [m])
-                 (K_aquitard 1.0e-5 [cm/h])
+                 (K_aquitard 1e-4 [cm/h])
                  (Z_aquitard 2 [m])
                  (h_aquifer  2 [m]))
 \end{verbatim}
@@ -701,7 +701,7 @@ corresponding to the thickness of your new aquitard horizon.
        (alpha 0.069 [cm^-1])
        (n 1.527)
        ;; Note: same as K_aquitard
-       (K_sat 1.0e-5 [cm/h])))
+       (K_sat 1e-4 [cm/h])))
 
   (defcolumn Andeby default
     (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C) 
@@ -710,7 +710,7 @@ corresponding to the thickness of your new aquitard horizon.
           (MaxRootingDepth 60.0 [cm]))
     (Groundwater pipe
                  ;; Use same K_sat as the aquitard horizon.
-                 (K_aquitard 1.0e-5 [cm/h])
+                 (K_aquitard 1e-4 [cm/h])
                  ;; Decrease thickness with 50 cm from default 
                  ;; of 2.0 m to compensate for aquitard horizon.
                  (Z_aquitard 1.5 [m]))) 
