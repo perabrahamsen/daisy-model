@@ -8,6 +8,10 @@
 
 \input{macro}
 
+% External references.
+\usepackage{xr}
+\externaldocument[ref-]{reference}
+
 \begin{document}
 
 \section*{\Daisy{} Tutorial}
@@ -173,23 +177,28 @@ horizons.
 
 \begin{verbatim}
   ;; We have some very sandy soil.
-  (defhorizon Ap default
-    "Andeby top soil."
-    (clay 8.0 [])
-    (silt 10.5 [])
-    (sand 79.9 [])
-    (humus 1.12 [])
-    (C_per_N 11.0 [g C/g N])
-    (dry_bulk_density 1.5 [g/cm^3]))
+(defhorizon Ap FAO3
+  "Andeby top soil."
+  (clay 8.0 [%])
+  (silt 10.5 [%])
+  (sand 81.5 [%])
+  (humus 1.12 [%])
+  (C_per_N 11.0 [g C/g N])
+  (dry_bulk_density 1.5 [g/cm^3]))
 \end{verbatim}
 
 Here, we define a horizon named \texttt{Ap} (\texttt{defhorizon} is
 short for ``define horizon'').  Like the place where we specified the
-weather, the \texttt{default} keyword means that we use the default
-model for specifying horizons.  At this point it is our only choice,
-but that will soon change.  The string \texttt{"Andeby top soil."} is
-a description of the horizon, and is a good place to put information
-about the source of data.
+weather, the \texttt{FAO3} keyword means that we use that model for
+specifying horizons.  The build-in horizon models are named after
+texture classification systems\footnote{A texture classification
+  system specifies how to determine whether a particle is clay, silt
+  or sand.}, \texttt{FAO3} is the \textsc{fao} approved classification
+system, see~\ref{ref-component:horizon} in the reference manual for a
+full list of horizon models. At this point, we can only choose one of
+the build-in models, but that will soon change.  The string
+\texttt{"Andeby top soil."} is a description of the horizon, and is a
+good place to put information about the source of data.
 
 The first three parameters, \texttt{clay}, \texttt{silt},
 \texttt{sand} together define the soil texture.  The texture affects
@@ -240,12 +249,12 @@ is simpler.
   (humus 0.12 []))
 \end{verbatim}
 
-Here, instead of \texttt{default}, we write \texttt{Ap}.  This is the
+Here, instead of \texttt{FAO3}, we write \texttt{Ap}.  This is the
 name of the horizon we just defined, and will cause \daisy{} to reuse
-the parameter values in the new horizon named \texttt{C} we
-define here.  In particular, we give it the same texture as the
-\texttt{Ap} horizon.  However, since the horizon is intended to
-describe lower soil, we specify less humus.
+the parameter values in the new horizon named \texttt{C} we define
+here.  In particular, we give it the same texture as the \texttt{Ap}
+horizon.  However, since the horizon is intended to describe lower
+soil, we specify less humus.
 
 \subsection{Column}
 \label{ex:column}
@@ -814,8 +823,8 @@ found in the reference manual~\cite{dina81}.
 Here is an example where we specify the van Genuchten retention curve
 model with Mualem theory
 \begin{verbatim}
-  (defhorizon B default
-    (clay 8.0) (silt 10.5) (coarse_sand 63.4) (fine_sand 16.5)
+  (defhorizon B ISSS4
+    (clay 8.0) (silt 10.5) (coarse_sand 65) (fine_sand 16.5)
     (humus 1.12)
     (hydraulic M_vG
                (K_sat 10 [cm/h])
@@ -2260,81 +2269,84 @@ to log a particular crop alone as below:
 \label{app:test}
 
 \begin{verbatim}
-  ;;; test.dai -- Sample file using the Daisy libraries.
-  
-  (description "Simulation for use in tutorial.")
-  
-  ;; Use standard parameterizations.
-  (input file "tillage.dai")
-  (input file "crop.dai")
-  (input file "log.dai")
-  
-  ;; Weather data.
-  (weather default "weather.dwf")
-  
-  ;; We have some very sandy soil.
-  (defhorizon Ap default
-    "Andeby top soil."
-    (clay 8.0 [])
-    (silt 10.5 [])
-    (sand 79.9 [])
-    (humus 1.12 [])
-    (C_per_N 11.0 [g C/g N])
-    (dry_bulk_density 1.5 [g/cm^3]))
-  
-  (defhorizon C Ap
-    "Andeby C horizon."
-    (humus 0.12 []))
-  
-  ;; We build the column from the horizons.
-  (defcolumn Andeby default
-    "The B.And farm, Andeby, 2002."
-    (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
-          (MaxRootingDepth 60.0 [cm]))
-    (OrganicMatter (init (input 1400 [kg C/ha/y])
-                         (root 480 [kg C/ha/y])
-                         (end -20 [cm])))
-    (Groundwater deep))
-  
-  ;; Use it.
-  (column Andeby)
-  
-  ;; Simulation start date.
-  (time 1986 12 1 1)
-  
-  (manager activity
-    (wait (at 1987 3 20 1))
-    (plowing)
-    (wait (at 1987 4 4 1))
-    (fertilize (mineral (weight 100.0 [kg N/ha])
-                        (NH4_fraction 0.5 [])))
-    (wait (at 1987 4 5 1))
-    (progn
-      (sow "Grass")
-      (sow "Spring Barley"))
-    (wait (or (crop_ds_after "Spring Barley" 2.0)
-              (at 1987 9 5 1)))
-    (harvest "Spring Barley")
-    (wait (at 1987 9 8 1))
-    (fertilize (mineral (weight 80.0 [kg N/ha])
-                        (NH4_fraction 0.5 [])))
-    (wait (at 1987 10 10 1))
-    (harvest "Grass"
-             (stub 8.0 [cm])              ;Leave 8 cm stub.
-             (stem 1.00 []))             ;Harvest everything above stub.
-    (wait (at 1988 4 1 1))
-    (stop))
-  
-  ;; Create these log files.
-  (output harvest
-          ("N Balance" (when monthly)
-                       (from 0 [m]) (to -1 [m]))
-          ("Crop Production"
-           (set "$crop" "Spring Barley")
-           (where "sbarley.dlf"))
-          (checkpoint (when (at 1987 8 7 6))))
-  
-  ;;; test.dai ends here.
+;;; test.dai -- Sample file using the Daisy libraries.
+
+(description "Simulation for use in tutorial.")
+
+;; Use standard parameterizations.
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "log.dai")
+
+;; Weather data.
+(weather default "weather.dwf")
+
+;; We have some very sandy soil.
+(defhorizon Ap FAO3
+  "Andeby top soil."
+  (clay 8.0 [%])
+  (silt 10.5 [%])
+  (sand 81.5 [%])
+  (humus 1.12 [%])
+  (C_per_N 11.0 [g C/g N])
+  (dry_bulk_density 1.5 [g/cm^3]))
+
+(defhorizon C Ap
+  "Andeby C horizon."
+  (humus 0.12 [%]))
+
+;; We build the column from the horizons.
+(defcolumn Andeby default
+  "The B.And farm, Andeby, 2002."
+  (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+        (MaxRootingDepth 60.0 [cm]))
+  (OrganicMatter (init (input 1400 [kg C/ha/y])
+                       (root 480 [kg C/ha/y])
+                       (end -20 [cm])))
+  ;; Measured numbers for groundwater table can be read from a file, like this:
+  ;; (Groundwater file "example.gwt")
+  ;; But here we assume free drainage.
+  (Groundwater deep))
+
+;; Use it.
+(column Andeby)
+
+;; Simulation start date.
+(time 1986 12 1 1)
+
+(manager activity
+  (wait (at 1987 3 20 1))
+  (plowing)
+  (wait (at 1987 4 4 1))
+  (fertilize (mineral (weight 100.0 [kg N/ha])
+                      (NH4_fraction 0.5 [])))
+  (wait (at 1987 4 5 1))
+  (progn
+    (sow "Grass")
+    (sow "Spring Barley"))
+  (wait (or (crop_ds_after "Spring Barley" 2.0)
+            (at 1987 9 5 1)))
+  (harvest "Spring Barley")
+  (wait (at 1987 9 8 1))
+  (fertilize (mineral (weight 80.0 [kg N/ha])
+                      (NH4_fraction 0.5 [])))
+  (wait (at 1987 10 10 1))
+  (harvest "Grass"
+           (stub 8.0 [cm])              ;Leave 8 cm stub.
+           (stem 1.00 []))             ;Harvest everything above stub.
+  (wait (at 1988 4 1 1))
+  (stop))
+
+;; Create these log files.
+(output harvest
+        ("N Balance" (when monthly)
+                     (from 0 [m]) (to -1 [m]))
+        ("Crop Production"
+         (set "$crop" "Spring Barley")
+         (where "sbarley.dlf"))
+        (checkpoint (when (at 1987 8 7 6))))
+
+;;; test.dai ends here.
 \end{verbatim}
 %$
 

@@ -1,28 +1,14 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* X40
+
 -adobe-courier-medium-r-normal--*-180-*-*-m-*-iso8859-1
 
 * Udviklinsplan
 
-* Birgittes fejl
-
 * Fertorganic status (hjemmeside)
 
 * Fertorganic brev 
-
-* Organic Matter Article
-
-** Giver jb1_high2 og jb6_low2 rette humusmængde?
-
-I så falde er det rødderne der er problemet.
-
-*** check input.
-
-** Plot initialisering med background_mineralization = 0.
-
-** Find referencer.
-
-** Publicer.
 
 * Fertorganic
 
@@ -39,6 +25,37 @@ Hjemmeside.
 ** PT: Brev til joao når jose kommer tilbage
 
 ** CZ: ?
+
+* Organic Matter Article
+
+** Status
+
+Tilsyneladende er input nu rigtigt 
+
+(med aom -> som2 = 0 
+ & bioinc + root + tillage målt i zone 
+ & numerisk lag ved zone)
+
+Gennemsnitlig abiotic (vand + temp) er målt
+
+høj input giver for høj humus på både ler og sand
+
+lav input giver for lav humus på både ler og sand
+
+** næste ting
+
+prøv at køre med "rigeligt mineralsk kvælstof", så der aldrig er
+kvælstofbegrænsning (måske en "disable N om stress")
+
+prøv at disable abitioc factors...
+
+prøv at køre ler med sandsædskifte, og sand med lersædskift.
+
+** Plot initialisering med background_mineralization = 0.
+
+** Find referencer.
+
+** Publicer.
 
 * ny vandstressmodel.
 

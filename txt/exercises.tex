@@ -97,39 +97,39 @@ However, it is always possible to overwrite the default
 parameterisation. Information on soil horizons is stored in the
 internal database by the \texttt{horizon}--component:
 \begin{verbatim}
-  (defhorizon "Ap JB6" default 
+  (defhorizon "Ap JB6" FAO3
     "An optional description."
     ;; More parameters
-    (clay 0.155 []))
+    (clay 15.5 [%]))
 \end{verbatim}
 where \texttt{defhorizon} is short for define horizon. Other similar
 expressions are \texttt{defcolumn} (defining a soil column including
 the soil surface and the bioclimate above it), \texttt{defcrop}
 (defining crop growth parameters), \texttt{defam} (defining added
-matter, e.g.\ fertilizers), \texttt{defaction} (defining an action list
-of management actions), and \texttt{deflog} (defining
+matter, e.g.\ fertilizers), \texttt{defaction} (defining an action
+list of management actions), and \texttt{deflog} (defining
 output-variables). \texttt{"\textit{Ap JB6}"} is the name which the
 parameterisation will have in the internal database and which later
 can be referred to when one wants to retrieve the stored information.
-The default keyword retrieves the structure of the internal database
-and, hence, it specifies the type of information that now can be
-expected and it also includes default values given to any of the
+The \texttt{FAO3} keyword retrieves the structure of the internal
+database and, hence, it specifies the type of information that now can
+be expected and it also includes default values given to any of the
 parameters of the horizon. Alternatively, the name of an existing
 element in the database (a previously defined horizon) could be stated
 instead of the expression default\footnote{\texttt{(defhorizon "Ap
-    Askov" "Ap JB6" (humus 0.015))} this statement overwrites the
+    Askov" "Ap JB6" (humus 1.5 [\%]))} this statement overwrites the
   humus content but retains all other information stored in ``Ap
-  JP6''.}.  The expression ``\texttt{(clay 0.155 [])}\ldots'' refers
+  JP6''.}.  The expression ``\texttt{(clay 15.5 [\%])}\ldots'' refers
 to an attribute list (an attribute list is an unordered set of
 (\textit{name, value}) pairs), which contains the parameters to be
 added or changed as compared to the selected database element (default
 or a previously defined horizon). In the present example the component
 ``horizon'' has a member ``clay'' of type ``number'' and furthermore
-the value 0.155 is assigned to this member.  The square brackets after
-the number (0.155) is used to give the dimension of the number. In the
-present example the clay content is given as a fraction and hence
-dimensionless. If the brackets are left out \daisy{} will assume that
-the dimension the has default input dimension.
+the value 15.5 is assigned to this member.  The square brackets after
+the number (15.5) is used to give the dimension of the number. In the
+present example the clay content is given as percent. If the brackets
+are left out, \daisy{} will use a default dimension, which may not be
+what you think.  So don't leave out the dimension.
 
 It is noted that parentheses are used to group information e.g.
 \texttt{(clay 0.155 [])}. Similarly all the information defined by the
@@ -232,13 +232,13 @@ defhorizon as shown in box~\ref{box:horizon}.
     \label{box:horizon}
 \begin{verbatim}
 ;;  Defining a soil horizon
-(defhorizon "Ap F.S.L." default 
+(defhorizon "Ap F.S.L." FAO3
   "Data from Jacobsen, 1989"
   (dry_bulk_density 1.53 [g/cm^3])
-  (clay 0.113 [])
-  (silt 0.277 [])
-  (sand 0.584 [])
-  (humus 0.026 [])
+  (clay 11.3 [%])
+  (silt 27.7 [%])
+  (sand 58.4 [%])
+  (humus 2.6 [%])
   (C_per_N 11.0 [g C/g N]))
 \end{verbatim}
   \end{boxedminipage}
@@ -476,12 +476,12 @@ properties parameters are written to the \daisy{}-setup-file in the
     \caption{Hydraulic parameters}
     \label{box:hydraulic}
 \begin{verbatim}
-(defhorizon "Ap F.S.L." default
+(defhorizon "Ap F.S.L." FAO3
   (description "Data from O.H. Jacobsen (1989)")
   ;; Insert other parameters here.
   (hydraulic M_vG 
-             (Theta_res 0.000 [cm^3 H2O/cm^3])
-             (Theta_sat 0.403 [cm^3 H2O/cm^3])
+             (Theta_res 0.0 [%])
+             (Theta_sat 40.3 [%])
              (alpha 0.0385 [cm^-1])
              (n 1.211 [])
              (K_sat 7.52 [cm/h])))

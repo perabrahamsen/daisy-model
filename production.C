@@ -406,12 +406,8 @@ Production::tick (const double AirT, const double SoilT,
   WStem += IncWStem;
   WSOrg += IncWSOrg;
   WRoot += IncWRoot;
-  CLeaf = WLeaf * DM_to_C_factor (E_Leaf);
-  CStem = WStem * DM_to_C_factor (E_Stem);
-  CSOrg = WSOrg * DM_to_C_factor (E_SOrg);
-  CRoot = WRoot * DM_to_C_factor (E_Root);
-  CDead = WDead * DM_to_C_factor (E_Leaf);
   const double old_CCrop = CCrop;
+  update_carbon ();
   CCrop = CLeaf + CStem + CSOrg + CRoot + CDead + CH2OPool * 12./30.;
   const double error 
     = (old_CCrop + NetPhotosynthesis *  12./44. - C_Loss - CCrop) * 10;
@@ -433,6 +429,16 @@ Production::tick (const double AirT, const double SoilT,
     }
 }
 
+void 
+Production::update_carbon ()
+{
+  CLeaf = WLeaf * DM_to_C_factor (E_Leaf);
+  CStem = WStem * DM_to_C_factor (E_Stem);
+  CSOrg = WSOrg * DM_to_C_factor (E_SOrg);
+  CRoot = WRoot * DM_to_C_factor (E_Root);
+  CDead = WDead * DM_to_C_factor (E_Leaf);
+  CCrop = CLeaf + CStem + CSOrg + CRoot + CDead + CH2OPool * 12./30.;
+}
 void
 Production::none ()
 {

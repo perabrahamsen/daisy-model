@@ -145,6 +145,7 @@ public:
 	     std::vector<double>& residuals_N_soil,
 	     std::vector<double>& residuals_C_soil,
 	     Treelog&);
+  void update_carbon ();
   void none ();
   void output (Log& log) const;
 

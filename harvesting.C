@@ -435,7 +435,10 @@ Harvesting::operator() (const symbol column_name,
   residuals_DM += Crop_W_Loss;
   residuals_N_top += Crop_N_Loss - Root_N_Loss;	// Root already added.
   residuals_C_top += Crop_C_Loss - Root_C_Loss;
-  
+
+  // We need to update the crop carbon values for production mass balance.
+  production.update_carbon ();
+
   // Return harvest.
   return *new Harvest (column_name, time, crop_name,
 		       Stem_W_Yield, Stem_N_Yield, Stem_C_Yield,

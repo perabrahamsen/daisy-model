@@ -3,7 +3,7 @@
 ;; Get out sample management, irrigation, and soil.
 (input file "dk-management.dai")
 (input file "irrigation.dai")
-(input file "pedo-soil.dai")
+(input file "init-soil.dai")
 
 ;; Use them.
 (weather default "taastrup.dwf")
@@ -11,7 +11,7 @@
 (time 1990 3 1 1)
 (stop 1994 4 1 1)
 
-(column "JB1_Cosby")
+(column "JB1_init_Cosby")
 
 (manager activity 
   ;; A spring barley with mineral fertilizer and unlimited irrigation.
