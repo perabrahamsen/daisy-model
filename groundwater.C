@@ -10,9 +10,10 @@ Groundwater::flux_bottom () const
 }
 
 double 
-Groundwater::q_bottom () const
+Groundwater::table () const
 {
-  return 0.0;
+  assert (!flux_bottom ());
+  return -10.0;
 }
 
 bool  

@@ -25,6 +25,7 @@ public:
   { return z_[i]; }
   inline double dz (int i) const
   { return dz_[i]; }
+  int interval_plus (double z) const;
   int interval (double z) const;
 
   // Horizons.

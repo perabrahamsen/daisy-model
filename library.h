@@ -1,5 +1,8 @@
 // library.h
 
+#ifndef LIBRARY_H
+#define LIBRARY_H
+
 #include <std/string.h>
 
 struct Syntax;
@@ -18,3 +21,5 @@ public:
     Library ();
     ~Library ();
 };
+
+#endif LIBRARY_H

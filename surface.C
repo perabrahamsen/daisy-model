@@ -5,12 +5,13 @@
 bool 
 Surface::flux_top () const
 {
-  return true;
+  return false;
 }
 
 double 
-Surface::q_top () const
+Surface::q () const
 {
+  assert (flux_top ());
   return 0.0;
 }
   
@@ -26,6 +27,13 @@ bool
 Surface::accept_top (double) const
 {
   return true;
+}
+
+double
+Surface::ponding () const
+{
+  assert (!flux_top ());
+  return 0.0;
 }
 
 Surface::Surface (const AttributeList& /* par */, 

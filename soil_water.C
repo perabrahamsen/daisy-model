@@ -15,18 +15,42 @@ SoilWater::tick (Surface& surface, const Groundwater& groundwater,
 {
   Theta_old = Theta;
   h_old = h;
-  
+
+  // Limit for groundwater table.
+  int last  = soil.size () - 1;
+  if (!groundwater.flux_bottom ())
+    {
+      if (groundwater.table () < soil.z (last))
+	THROW (Runtime ("Groundwater table below lowest node."));
+      last = soil.interval (groundwater.table ());
+      // Presure at the last + 1 node is equal to the water above it.
+      for (int i = last + 1; i < soil.size (); i++)
+	{
+	  h_old[i] = groundwater.table () - soil.z (i);
+	  h[i] = groundwater.table () - soil.z (i);
+	}
+    }
+
+  // Limit for ponding.
+  int first = 0;
+  if (!surface.flux_top ())
+    {
+      first = 1;
+      h_old[0] = surface.ponding ();
+      h[0] = surface.ponding ();
+    }
+
   if (bottom)
     {
       // We have two UZ models.
       top->tick (soil, 
-		 0, surface, 
+		 first, surface, 
 		 bottom_start - 1, *bottom, 
 		 S, h_old, Theta_old,
 		 h, Theta, q);
       bottom->tick (soil,
 		    bottom_start, *top,
-		    soil.size () - 1, groundwater,
+		    last, groundwater,
 		    S, h_old, Theta_old,
 		    h, Theta, q);
     }
@@ -34,8 +58,8 @@ SoilWater::tick (Surface& surface, const Groundwater& groundwater,
     {
       // We have only one UZ model.
       top->tick (soil, 
-		 0, surface, 
-		 soil.size () - 1, groundwater,
+		 first, surface, 
+		 last, groundwater,
 		 S, h_old, Theta_old,
 		 h, Theta, q);
     }
@@ -78,12 +102,12 @@ SoilWater::output (Log& log, const Filter* filter) const
 }
 
 SoilWater::SoilWater (const Soil& soil, 
-		      const AttributeList& /* par */, 
+		      const AttributeList& par, 
 		      const AttributeList& var)
-  : top (new UZRichard ()),
-    bottom (0),
-    bottom_start (  var.check ("UZborder") 
-		  ? var.integer ("UZborder")
+  : top (UZmodel::create (par.list ("UZtop"))),
+    bottom (par.check ("UZbottom") ? UZmodel::create (par.list ("UZbottom")) : 0),
+    bottom_start (  par.check ("UZborder") 
+		  ? par.integer ("UZborder")
 		  : -1)
 { 
   int size = 0;
@@ -112,7 +136,7 @@ SoilWater::SoilWater (const Soil& soil,
     Xi.insert (Xi.begin (), size, 0.0);
 
   S.insert (S.begin (), size, 0.0);
-  q.insert (q.begin (), size, 0.0);
+  q.insert (q.begin (), size + 1, 0.0);
 }
 
 SoilWater::~SoilWater ()

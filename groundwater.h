@@ -12,10 +12,13 @@ class Groundwater : public UZbottom
   // UZbottom.
 public:
   bool flux_bottom () const;
-  double q_bottom () const;
   bool accept_bottom (double) const;
 
   // Simulation.
+public:
+  double table () const;
+
+  // Create & Destroy.
 public:
   Groundwater (const AttributeList& al);
 };

@@ -641,7 +641,11 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax* syntax)
 	  }
 	case Syntax::UZmodel:
 	  {
-	    atts->add (name, get_id ());
+	    const string type = get_id ();
+	    AttributeList* list = new AttributeList (UZmodel::library().lookup (type));
+	    list->add ("type", type);
+	    load_list (list, UZmodel::library().syntax (type));
+	    atts->add (name, list);
 	    break;
 	  }
 	case Syntax::Error:

@@ -7,10 +7,11 @@ OBJ = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	crop_impl.o filter.o csmp.o rules.o time.o column_std.o uzmodel.o \
 	soil.o mathlib.o template.o bioclimate.o surface.o soil_water.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
-	denitrification.o soil_heat.o groundwater.o
+	denitrification.o soil_heat.o groundwater.o uzrichard.o 
 SRC = $(OBJ:.o=.C)
 HEAD = $(OBJ:.o=.h)
-TEST = crop.dai old_crop.chp old_crop.log water.dai old_water.log
+TEST = crop.dai old_crop.chp old_crop.log \
+	water.dai old_water.log water.gen water.plot
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 .SUFFIXES:	.C .o .h
@@ -36,13 +37,24 @@ TAGS: $(SRC) $(HEAD)
 print:
 	mp -p /home/user_13/fischer/bin/mp.pro.none -a4 $(TEXT) | parr -s | up -n pup | lpr -Pduplex
 
-crop-test:	daisy
+water-print:	water.log
+	water.gen water.log
+	gnuplot water.plot
+
+water.log:	daisy water.dai
+	daisy water.dai
+
+crop.log:	daisy crop.dai
 	daisy crop.dai
+
+crop.chp:	daisy crop.dai
+	daisy crop.dai
+
+crop-test:	crop.log crop.chp
 	diff old_crop.chp crop.chp
 	diff old_crop.log crop.log
 
-water-test:	daisy
-	daisy water.dai
+water-test:	water.log
 	diff old_water.log water.log
 
 # diff old_water.chp water.chp
@@ -62,6 +74,7 @@ cvs: $(TEXT) $(TEST)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-cvs add $(TEXT) $(TEST)
 	cvs commit -m "$(TAG)" # "Version $(TAG)"
+
 .C.o:
 	$(CC) -c $<
 
@@ -111,8 +124,8 @@ column_std.o: column_std.C column_std.h daisy.h time.h column.h \
  bioclimate.h surface.h uzmodel.h soil.h horizon.h soil_water.h \
  soil_heat.h soil_NH4.h soil_NO3.h organic_matter.h nitrification.h \
  denitrification.h alist.h syntax.h library.h log.h filter.h crop.h
-uzmodel.o: uzmodel.C uzmodel.h soil.h horizon.h daisy.h time.h \
- mathlib.h
+uzmodel.o: uzmodel.C uzmodel.h library.h syntax.h alist.h daisy.h \
+ time.h
 soil.o: soil.C soil.h horizon.h daisy.h time.h alist.h
 mathlib.o: mathlib.C mathlib.h
 template.o: template.C ftable.h crop_impl.h crop.h daisy.h time.h \
@@ -130,3 +143,5 @@ denitrification.o: denitrification.C denitrification.h
 soil_heat.o: soil_heat.C soil_heat.h daisy.h time.h alist.h \
  bioclimate.h
 groundwater.o: groundwater.C groundwater.h uzmodel.h syntax.h
+uzrichard.o: uzrichard.C uzrichard.h uzmodel.h soil.h horizon.h \
+ daisy.h time.h mathlib.h alist.h syntax.h

@@ -94,7 +94,7 @@ ColumnStandard::output_crops (Log& log, const Filter* filter) const
 double 
 ColumnStandard::SoilTemperature (double depth) const
 {
-  return soil_heat.temperature (soil.interval (depth));
+  return soil_heat.temperature (soil.interval_plus (depth));
 }
 
 double 

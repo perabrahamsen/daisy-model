@@ -5,12 +5,25 @@
 #include <assert.h>
 
 int 
-Soil::interval (double z) const
+Soil::interval_plus (double z) const
 {
   int i;
   for (i = 0; i < size_; i++)
     {
       if (zplus_[i] < z)
+	return i;
+    }
+  assert (0);
+  return i;
+}
+
+int 
+Soil::interval (double z) const
+{
+  int i;
+  for (i = 0; i < size_; i++)
+    {
+      if (z_[i] < z)
 	return i;
     }
   assert (0);
@@ -36,7 +49,7 @@ Soil::check (Log& /* log */) const
   for (int i = 0; i < size_; i++)
     if (zplus_[i] > last)
       {
-	cerr << "Intervals should be monotcnically decreasing, but "
+	cerr << "Intervals should be monotonically decreasing, but "
 	     << zplus_[i] << " > " << last << "\n";
 	ok = false;
 	break;
