@@ -31,7 +31,7 @@ struct Field::Implementation
 					  double leaf_harvest, 
 					  double sorg_harvest);
   void mix (const Time&,
-		    double from, double to, double penetration = 1.0);
+		    double from, double to, double penetration);
   void swap (const Time&, double from, double middle, double to);
   void spray (const string& chemical, double amount); // [g/ha]
 
@@ -187,7 +187,7 @@ Field::Implementation::harvest (const Time& time, const string& name,
 
 void 
 Field::Implementation::mix (const Time& time,
-	    double from, double to, double penetration = 1.0)
+	    double from, double to, double penetration)
 {
   if (selected)
     selected->mix (time, from, to, penetration);
@@ -410,7 +410,7 @@ Field::harvest (const Time& time, const string& name,
 
 void 
 Field::mix (const Time& time,
-	    double from, double to, double penetration = 1.0)
+	    double from, double to, double penetration)
 { impl.mix (time, from, to, penetration); }
 
 void 
@@ -439,7 +439,7 @@ Field::crop_dm (const string& crop) const
 
 void
 Field::tick (const Time& time, const Weather& weather)
-{ return impl.tick (time, weather); }
+{ impl.tick (time, weather); }
 
 void 
 Field::output (Log& log, Filter& filter) const
