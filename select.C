@@ -431,7 +431,7 @@ Select::document (Format& format) const
   format.text ("]");
   if (impl.description != "")
     {
-      format.soft_linebreak ();
+      format.hard_linebreak ();
       format.text (impl.description);
       format.soft_linebreak ();
     }
@@ -443,7 +443,7 @@ Select::document (Format& format) const
 	  format.text ("(reversed)");
 	}
       impl.spec->refer (format);
-      format.soft_linebreak ();
+      format.hard_linebreak ();
       format.text (impl.spec->description ());
       format.soft_linebreak ();
     }
