@@ -26,7 +26,7 @@
 #include "treelog.h"
 
 #if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
-struct ostream;
+namespace std { struct ostream; }
 #else
 #include <iosfwd>
 #endif
@@ -50,7 +50,7 @@ public:
 
   // Create and Destroy.
 public:
-  TreelogStream (ostream&);
+  TreelogStream (std::ostream&);
   ~TreelogStream ();
 };
 

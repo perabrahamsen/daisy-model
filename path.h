@@ -39,7 +39,7 @@ namespace Path
     ~Input ();
   };
 
-  istream& open_file (const std::string& name);
+  std::istream& open_file (const std::string& name);
   bool set_directory (const std::string& directory);
   void set_path (const std::vector<std::string>& path);
   void get_path (std::vector<std::string>& path);

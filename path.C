@@ -41,7 +41,7 @@ Path::Output::~Output ()
     delete &out;
 }
 
-istream& 
+std::istream& 
 Path::Input::stream () const
 { return in; }
 
@@ -74,7 +74,7 @@ namespace Path
   } handle_path;
 }
 
-istream& 
+std::istream& 
 Path::open_file (const string& name)
 {
   // Absolute filename.
