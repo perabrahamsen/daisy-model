@@ -1,5 +1,17 @@
 2004-09-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.51 released.
+
+2004-09-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Total Water Balance"): Treat subsoil irrigation
+	seperately. 
+	("Root Zone Water Balance"): Fix sign of subsoil irrigation.
+
+	* am.C, am.h (get_DM, get_water): New functions.
+	* column_std.C (fertilize): Use them.
+	* action_fertilize.C (doIt): Use them.
+
 	* Version 3.50 released.
 
 2004-09-07  Per Abrahamsen  <abraham@dina.kvl.dk>

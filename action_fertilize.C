@@ -151,14 +151,24 @@ ActionFertilize::doIt (Daisy& daisy, Treelog& out)
       return;
     }
 
+  double water = 0.0;
+
   const string syntax = am.name ("syntax");
   TmpStream tmp;
   if (syntax == "mineral")
     tmp () << "Fertilizing " << am.number ("weight") 
 	   << " kg "<< am.name ("type") << "-N/ha";
   else if (syntax == "organic")
-    tmp () << "Fertilizing " << am.number ("weight") 
-	   << " ton "<< am.name ("type") << " ww/ha";
+    {
+      tmp () << "Fertilizing " << am.number ("weight") 
+             << " ton "<< am.name ("type") << " ww/ha";
+      const double utilized_weight = AM::utilized_weight (am);
+      if (utilized_weight > 0.0)
+        tmp () << "; utilized " << utilized_weight << " kg N/ha";
+      water = AM::get_water (am);
+      if (water > 0.0)
+        tmp () << "; water " << water << " mm";
+    }
   else
     tmp () << "Fertilizing " << am.name ("type");
   out.message (tmp.str ());
@@ -173,9 +183,17 @@ ActionFertilize::doIt (Daisy& daisy, Treelog& out)
     }
 
   if (to < from)
-    daisy.field.fertilize (am, from, to);
+    {
+      daisy.field.fertilize (am, from, to);
+      if (water > 0.0)
+        daisy.field.irrigate_subsoil (water, IM (), from, to);
+    }
   else
-    daisy.field.fertilize (am);
+    {
+      daisy.field.fertilize (am);
+      if (water > 0.0)
+        daisy.field.irrigate_surface (water, IM ());
+    }
 }
 
 bool 

@@ -303,14 +303,11 @@ ColumnStandard::fertilize (const AttributeList& al)
   fertilized_NH4_total += im.NH4 / conv + lost_NH4;
   fertilized_NO3_surface += im.NO3 / conv; 
   fertilized_NH4_surface += im.NH4 / conv + lost_NH4;
+  fertilized_DM += AM::get_DM (al);
 
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")
-    {
-      if (al.check ("weight"))
-	fertilized_DM += al.number ("weight");
-      organic_matter.fertilize (al, soil);
-    }
+    organic_matter.fertilize (al, soil);
 }
 
 void 
@@ -336,14 +333,11 @@ ColumnStandard::fertilize (const AttributeList& al, double from, double to)
   soil_NH4.incorporate (soil, im.NH4, from, to);
   fertilized_NO3_total += im.NO3 / conv; 
   fertilized_NH4_total += im.NH4 / conv + lost_NH4;
+  fertilized_DM += AM::get_DM (al);
 
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")
-    {
-      if (al.check ("weight"))
-	fertilized_DM += al.number ("weight");
-      organic_matter.fertilize (al, soil, from, to);
-    }
+    organic_matter.fertilize (al, soil, from, to);
 }
 
 void 

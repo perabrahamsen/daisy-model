@@ -845,6 +845,26 @@ AM::get_volatilization (const AttributeList& al)
   return 0.0;
 }
 
+double
+AM::get_DM (const AttributeList& al)	// [Mg DM/ha]
+{
+  if (al.check ("weight") && al.name ("syntax") == "organic")
+    return al.number ("weight") * al.number ("dry_matter_fraction");
+
+  return 0.0;
+}
+
+double
+AM::get_water (const AttributeList& al)	// [mm]
+{
+  if (al.check ("weight") && al.name ("syntax") == "organic")
+    return al.number ("weight")
+      * (1.0  - al.number ("dry_matter_fraction"))
+      * 0.1;                    // t/ha -> mm
+
+  return 0.0;
+}
+
 void
 AM::set_utilized_weight (AttributeList& am, const double weight)
 {

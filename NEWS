@@ -12,13 +12,20 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.51
+
+** Organic fertilizer water no longer ignored.
+
+The water content of organic fertilizer is no longer discared, but
+counted as irrigation, either surface or subsoil.
+
 * 3.50
 
 ** All crops give lower yields!
 
 A bug in the code caused an underestimation of the leaf respiration.
 You can expect 1 to 5 percent reduction of yields for all existing
-crop parameterizations.
+parameterizations of the default crop model.
 
 ** The file groundwater model give better error message.
 
