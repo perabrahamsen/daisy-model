@@ -86,7 +86,7 @@ endif
 # Create the right compile command.
 #
 ifeq ($(COMPILER),egcs)
-	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -DEGCS -g -pipe -frepo
+	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -DEGCS -g -pipe -frepo
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),gnu)
@@ -181,7 +181,8 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	adsorption_freundlich.C adsorption_linear.C adsorption_langmuir.C \
 	filter_checkpoint.C bioclimate_std.C condition_crop.C \
 	condition_soil.C log_table.C log_checkpoint.C weather_hourly.C \
-	bioclimate_PM.C uznone.C condition_daisy.C chemical_std.C
+	bioclimate_PM.C uznone.C condition_daisy.C chemical_std.C \
+	hydraulic_M_BaC_Bimodal.C hydraulic_B_BaC_Bimodal.C bioclimate_new.C
 
 # Select the C files with a corresponding header file from the library.
 #
@@ -359,6 +360,7 @@ dist:	cvs
 	cp cdaisy.h cmain.c $(HOME)/.public_ftp/daisy/
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(HOME)/.public_ftp/daisy/
+	(cd lib; $(MAKE) dist);
 
 # Update the CVS repository.
 #

@@ -648,7 +648,7 @@ OrganicMatter::output (Log& log, Filter& filter, const Soil& soil) const
 }
 
 bool
-OrganicMatter::check (const AttributeList& al)
+OrganicMatter::check_alist (const AttributeList& al)
 {
   bool ok = true;
 

@@ -1,4 +1,30 @@
+1998-11-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.33 released.
+
+1998-11-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (Parameters::CrpNPar::fixate_factor): New parameter.
+	(NitrogenUptake): Use it.
+
+	* pmain.C (redraw): No labels outside axis.
+
+	* bioclimate_std.C (WaterDistribution): Don't whine about small
+	negative throughfall.
+
 1998-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_std.C (check): Deleted.
+	(ColumnStandardSyntax): Add OrganicMatter::check to its syntax.
+
+	* Makefile (COMPILE): Don't warn about uninitialized.
+
+	* uzrichard.C (richard): Allow cw2 to be zero (undo 1998-10-30
+	change). 
+
+	* hydraulic_M_BaC_Bimodal.C: New file.
+	* hydraulic_B_BaC_Bimodal.C: New file.
+	* Makefile (COMPONENTS): Add them.
 
 	* Version 0.32 released.
 

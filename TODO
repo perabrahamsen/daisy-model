@@ -1,14 +1,8 @@
-* Hvorfor kaldes OrganicMatter::check (const AttributeList&) ikke directe 
-  af syntax::check?
-
-* Implementer UZreserve.
-
 * Ændr bioclimate så PM bliver et separat energi-modul.
 
+* Fix `alist sequence default element'.
 
 ======================================================================
-* PDaisy: limits
-
 * Log of flux at specific depth gives problems, since flux only
 happens at numeric intervals.  Find a solution.
 
@@ -29,14 +23,6 @@ Date:
 * Clone og Merge column til Nick
 
 Date: Møde med Nich i august.
-
-* Artikel til Env. Soft. & Mod.
-
-Date: draft September (workshop oktober)
-
-* DayLength for planter
-
-Date: vent på SH
 
 * organisk stof på overfladen (nick og os)
 

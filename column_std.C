@@ -71,7 +71,6 @@ public:
   void tick (const Time&, const Weather&);
 
   bool check () const;
-  static bool check (const AttributeList&);
   bool check_am (const AttributeList& am) const 
   { return organic_matter.check_am (am); }
   void output (Log&, Filter&) const;
@@ -324,21 +323,6 @@ ColumnStandard::check () const
   return ok;
 }
 
-bool
-ColumnStandard::check (const AttributeList& al)
-{
-  bool ok = true;
-
-  const AttributeList& om = al.alist ("OrganicMatter");
-  if (!OrganicMatter::check (om))
-    ok = false;
-
-  if (!ok)
-    cerr << "in column[" << al.name ("type") << "]\n";
-  
-  return ok;
-}
-
 void
 ColumnStandard::tick (const Time& time, const Weather& weather)
 {
@@ -476,7 +460,6 @@ static struct ColumnStandardSyntax
 
   ColumnStandardSyntax ()
   { 
-
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
 
@@ -492,7 +475,14 @@ static struct ColumnStandardSyntax
     add_submodule<SoilHeat> ("SoilHeat", syntax, alist);
     add_submodule<SoilNH4> ("SoilNH4", syntax, alist);
     add_submodule<SoilNO3> ("SoilNO3", syntax, alist);
-    add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist);
+    {
+      Syntax& s = *new Syntax (&OrganicMatter::check_alist);
+      AttributeList& a = *new AttributeList ();
+      OrganicMatter::load_syntax (s, a);
+      syntax.add ("OrganicMatter", s, Syntax::State, Syntax::Singleton, 
+		  "The soil organic matter.");
+      alist.add ("OrganicMatter", a);
+    }
     syntax.add ("Nitrification", Librarian<Nitrification>::library (),
 		Syntax::State);
     add_submodule<Denitrification> ("Denitrification", syntax, alist);

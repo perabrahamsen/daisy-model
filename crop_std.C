@@ -217,6 +217,7 @@ struct CropStandard::Parameters
     double SeedN;		// N-content in seed [ g N/m² ]
     double DS_fixate;		// Fixation of atmospheric N. after this DS
     double DS_cut_fixate;	// Restore fixation this DS after cut. 
+    double fixate_factor;	// Fraction of N need covered by fixation.
     const CSMP& PtLeafCnc;	// Upper limit for N-conc in leaves
     const CSMP& CrLeafCnc;	// Critical lim f. N-conc in leaves
     const CSMP& NfLeafCnc;	// Non-func lim f. N-conc in leaves
@@ -468,6 +469,7 @@ CropStandard::Parameters::CrpNPar::CrpNPar (const AttributeList& vl)
   : SeedN (vl.number ("SeedN")),
     DS_fixate (vl.number ("DS_fixate")),
     DS_cut_fixate (vl.number ("DS_cut_fixate")),
+    fixate_factor (vl.number ("fixate_factor")),
     PtLeafCnc (vl.csmp ("PtLeafCnc")),
     CrLeafCnc (vl.csmp ("CrLeafCnc")),
     NfLeafCnc (vl.csmp ("NfLeafCnc")),
@@ -850,6 +852,9 @@ CropStandardSyntax::CropStandardSyntax ()
   CrpNList.add ("DS_fixate", 42000.0);
   CrpN.add ("DS_cut_fixate", Syntax::Number, Syntax::Const);
   CrpNList.add ("DS_cut_fixate", 0.0);
+  CrpN.add ("fixate_factor", Syntax::None (), Syntax::Const,
+	    "Fraction of needed N fixated by day.");
+  CrpNList.add ("fixate_factor", 0.8);
   CrpN.add ("PtLeafCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("CrLeafCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("NfLeafCnc", Syntax::CSMP, Syntax::Const);
@@ -1672,7 +1677,7 @@ CropStandard::NitrogenUptake (int Hour,
 
   if (PotNUpt > 0 && var.Phenology.DS > var.CrpAux.DS_start_fixate)
     {
-      CrpAux.Fixated = 0.8 * PotNUpt;
+      CrpAux.Fixated = par.CrpN.fixate_factor * PotNUpt;
       NCrop += CrpAux.Fixated;
       PotNUpt -= CrpAux.Fixated;
     }

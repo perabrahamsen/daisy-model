@@ -207,7 +207,8 @@ UZRichard::richard (const Soil& soil,
 	  for (unsigned int i = 0; i < size; i++)
 	    {
 	      const double Cw1 = soil.Cw1 (first + i, h[i]);
-	      const double Cw2 = max (1e-5, soil.Cw2 (first + i, h[i]));
+	      // const double Cw2 = max (1e-5, soil.Cw2 (first + i, h[i]));
+	      const double Cw2 = soil.Cw2 (first + i, h[i]);
 	      const double dz = soil.dz (first + i);
 	      const double z = soil.z (first + i);
 

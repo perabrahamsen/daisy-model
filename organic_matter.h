@@ -36,7 +36,7 @@ public:
   double get_smb_c_at (unsigned int i) const; // [g C/cm³]
 
   // Create and Destroy.
-  static bool check (const AttributeList&);
+  static bool check_alist (const AttributeList&);
   bool check () const;
   bool check_am (const AttributeList& am) const;
   void add (AM&);

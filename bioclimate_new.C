@@ -1,4 +1,4 @@
-// bioclimate_std.C
+// bioclimate_new.C
 
 #include "bioclimate.h"
 #include "surface.h"
@@ -14,10 +14,9 @@
 #include "filter.h"
 #include "mathlib.h"
 
-class BioclimateStandard : public Bioclimate
+class BioclimateNew : public Bioclimate
 { 
   // Canopy.
-public:
   const long No;		// No of intervals in canopy discretation.
   double LAI_;			// Total LAI of all crops on this column.
   vector<double> Height;	// Height in cm of each endpoint in c.d.
@@ -96,12 +95,12 @@ public:
 
   // Create.
 public:
-  BioclimateStandard (const AttributeList&);
-  ~BioclimateStandard ()
+  BioclimateNew (const AttributeList&);
+  ~BioclimateNew ()
     { }
 };
 
-BioclimateStandard::BioclimateStandard (const AttributeList& al)
+BioclimateNew::BioclimateNew (const AttributeList& al)
   : Bioclimate (al.name ("type")),
     No (al.integer ("NoOfIntervals")),
     Height (al.integer ("NoOfIntervals") + 1),
@@ -117,7 +116,7 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
 { }
 
 void 
-BioclimateStandard::RadiationDistribution (const Weather& weather, 
+BioclimateNew::RadiationDistribution (const Weather& weather, 
 					   const CropList& crops)
 {
   // Fraction of Photosynthetically Active Radiation in Shortware
@@ -196,7 +195,7 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
 }
 
 void
-BioclimateStandard::IntensityDistribution (const double Rad0,
+BioclimateNew::IntensityDistribution (const double Rad0,
 					   const double Ext,
 					   vector <double>& Rad) const
 {
@@ -208,7 +207,7 @@ BioclimateStandard::IntensityDistribution (const double Rad0,
 }
 
 void
-BioclimateStandard::WaterDistribution (Surface& surface,
+BioclimateNew::WaterDistribution (Surface& surface,
 				       const Weather& weather, 
 				       const CropList& crops,
 				       const Soil& soil, 
@@ -333,7 +332,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 }
 
 void 
-BioclimateStandard::tick (Surface& surface, const Weather& weather, 
+BioclimateNew::tick (Surface& surface, const Weather& weather, 
 			  const Time&,
 			  const CropList& crops, const Soil& soil, 
 			  SoilWater& soil_water, const SoilHeat& soil_heat)
@@ -357,7 +356,7 @@ BioclimateStandard::tick (Surface& surface, const Weather& weather,
 }
 
 void 
-BioclimateStandard::output (Log& log, Filter& filter) const
+BioclimateNew::output (Log& log, Filter& filter) const
 {
   log.output ("intercepted_water", filter, intercepted_water);
   log.output ("EvapInterception", filter, EvapInterception, true);
@@ -371,7 +370,7 @@ BioclimateStandard::output (Log& log, Filter& filter) const
 }
 
 void
-BioclimateStandard::irrigate (double flux, double temp, 
+BioclimateNew::irrigate (double flux, double temp, 
 		      Column::irrigation_from type)
 {
   irrigation = flux;
@@ -383,12 +382,12 @@ BioclimateStandard::irrigate (double flux, double temp,
 template class add_submodule<Snow>;
 #endif
 
-static struct BioclimateStandardSyntax
+static struct BioclimateNewSyntax
 {
   static Bioclimate& make (const AttributeList& al)
-    { return *new BioclimateStandard (al); }
+    { return *new BioclimateNew (al); }
   
-  BioclimateStandardSyntax ()
+  BioclimateNewSyntax ()
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
@@ -404,7 +403,7 @@ static struct BioclimateStandardSyntax
       alist.add ("intercepted_water", 0.0);
       add_submodule<Snow> ("Snow", syntax, alist);
 
-      Librarian<Bioclimate>::add_type ("default", alist, syntax, &make);
+      Librarian<Bioclimate>::add_type ("new", alist, syntax, &make);
     }
-} BioclimateStandard_syntax;
+} BioclimateNew_syntax;
 

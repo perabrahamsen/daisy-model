@@ -1,0 +1,133 @@
+// hydraulic_B_BaC_Bimodal.C
+//
+// Brooks and Corey retention curve model with Burdine theory.
+// Bimodal hydraulic conductivity curve
+
+#include "hydraulic.h"
+
+class HydraulicB_BaC_Bimodal : public Hydraulic
+{
+  // Content.
+  const double lambda;
+  const double h_b;
+  const double Theta_b;
+  const double K_b;
+  const double K_sat;
+
+  // Use.
+public:
+  double Theta (double h) const;
+  double K (double h) const;
+  double Cw2 (double h) const;
+  double h (double Theta) const;
+  double M (double h) const;
+private:
+  double Se (double h) const;
+
+  // Create and Destroy.
+private:
+  friend class HydraulicB_BaC_BimodalSyntax;
+  static Hydraulic& make (const AttributeList& al);
+  HydraulicB_BaC_Bimodal (const AttributeList&);
+public:
+  ~HydraulicB_BaC_Bimodal ();
+};
+
+double
+HydraulicB_BaC_Bimodal::Theta (const double h) const
+{
+  if (h < h_b)
+    return Se (h) * (Theta_b - Theta_res) + Theta_res;
+  else
+    return (Theta_sat - Theta_b) / (-h_b) * (h - h_b) + Theta_b;
+}
+
+double
+HydraulicB_BaC_Bimodal::K (const double h) const
+{
+  if (h < h_b)
+    return K_b * pow (Se (h), (2 + 3 * lambda) / lambda);
+  else
+    return (K_sat - K_b) / (-h_b) * (h - h_b) + K_b;
+}
+
+double
+HydraulicB_BaC_Bimodal::Cw2 (const double h) const
+{
+  if (h < h_b)
+    return (Theta_b - Theta_res)
+      * lambda * pow (h_b / h, lambda + 1) / -h_b;
+  else if (h < 0)
+    return (Theta_sat - Theta_b) / (-h_b);
+  else
+    return 0.0;
+}
+
+double
+HydraulicB_BaC_Bimodal::h (const double Theta) const
+{
+  if (Theta < Theta_b)
+    return h_b / pow((Theta_res - Theta) / (Theta_res - Theta_b), 1 / lambda);
+  else if (Theta < Theta_sat)
+    return h_b * ( 1 - (Theta - Theta_b) / (Theta_sat - Theta_b));
+  else
+    return 0;
+}
+
+double
+HydraulicB_BaC_Bimodal::M (double h) const
+{
+  if (h <= h_b)
+    return K_b * (-h_b / (1 + 3*lambda)) * pow (h_b / h, 1 + 3*lambda);
+  else
+    return M (h_b) + K_b * (h - h_b);
+}
+
+double
+HydraulicB_BaC_Bimodal::Se (double h) const
+{
+  if (h < h_b)
+    return pow (h_b / h, lambda);
+  else
+    return 1;
+}
+
+HydraulicB_BaC_Bimodal::HydraulicB_BaC_Bimodal (const AttributeList& al)
+  : Hydraulic (al),
+    lambda (al.number ("lambda")),
+    h_b (al.number ("h_b")),
+    Theta_b (al.number ("Theta_b")),
+    K_b (al.number ("K_b")),
+    K_sat (al.number ("K_sat"))
+{ }
+
+HydraulicB_BaC_Bimodal::~HydraulicB_BaC_Bimodal ()
+{ }
+
+// Add the HydraulicB_BaC_Bimodal syntax to the syntax table.
+
+Hydraulic&
+HydraulicB_BaC_Bimodal::make (const AttributeList& al)
+{
+  return *new HydraulicB_BaC_Bimodal (al);
+}
+
+static struct HydraulicB_BaC_BimodalSyntax
+{
+  HydraulicB_BaC_BimodalSyntax ();
+} HydraulicB_BaC_Bimodal_syntax;
+
+HydraulicB_BaC_BimodalSyntax::HydraulicB_BaC_BimodalSyntax ()
+{
+  Syntax& syntax = *new Syntax ();
+  AttributeList& alist = *new AttributeList ();
+  Hydraulic::load_syntax (syntax, alist);
+  syntax.add ("lambda", Syntax::Number, Syntax::Const);
+  syntax.add ("h_b", Syntax::Number, Syntax::Const);
+  syntax.add ("Theta_b", Syntax::Number, Syntax::Const);
+  syntax.add ("K_b", Syntax::Number, Syntax::Const);
+  syntax.add ("K_sat", Syntax::Number, Syntax::Const);
+
+  Librarian<Hydraulic>::add_type ("B_BaC_Bimodal", alist, syntax,
+				  &HydraulicB_BaC_Bimodal::make);
+}
