@@ -1,7 +1,8 @@
 ;;; chemestry.dai --- standard pesticides
 
 (defchemical Atrazine default
-  (crop_uptake_reflection_factor 1.0)
+  ;;(crop_uptake_reflection_factor 1.0)
+  (crop_uptake_reflection_factor 0.8)
   (canopy_dissipation_rate_coefficient 8e-3)
   (canopy_washoff_coefficient 100.0)
   (diffusion_coefficient 8e-6)

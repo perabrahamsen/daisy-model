@@ -1,7 +1,7 @@
 ;; fertilizer.dai -*- lisp -*-
 
 (defam slurry organic
-  (im (NH4_evaporation 0.15))
+  (NH4_evaporation 0.15)
   (om ((initial_fraction 0.72)
        (C_per_N 100)
        (turnover_rate 2.0e-4)
@@ -20,10 +20,10 @@
   (dry_matter_fraction 0.073)
   (total_N_fraction 0.0863)
   (total_C_fraction 0.323)
-  (im (NH4 0.7)))
+  (NH4_fraction 0.7))
 
 (defam cattle_slurry slurry
   (dry_matter_fraction 0.093)
   (total_N_fraction 0.0495)
   (total_C_fraction 0.445)
-  (im (NH4 0.58)))
+  (NH4_fraction 0.58))

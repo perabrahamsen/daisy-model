@@ -89,8 +89,8 @@
         (plowing))
        ((at 1987 4 4 1)
         (fertilize mineral 
-                   (NO3 50.0e-5)        ;[g/cm2] = 50 kg/ha
-                   (NH4 50.0e-5)))      ;[g/cm2] = 50 kg/ha
+		   (weight 100.0)	;kg N/ha
+                   (NH4_fraction 0.5)))
        ((at 1987 4 5 1)
         (progn (sow "Cut Grass")
                (sow "Spring Barley")))
@@ -102,8 +102,8 @@
 		))         ;Harvest everything above stub.
        ((at 1987 9 8 1)
         (fertilize mineral
-                   (NO3 40.0e-5)        ;[g/cm2] = 40 kg/ha
-                   (NH4 40.0e-5)))      ;[g/cm2] = 40 kg/ha
+		   (weight 80.0)
+		   (NH4_fraction 0.5)))
        ((at 1987 10 10 1)
         (harvest "Cut Grass"
                  (stub 8.)              ;Leave 08 cm stub.
