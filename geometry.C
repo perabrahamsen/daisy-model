@@ -159,7 +159,7 @@ Geometry::mix (vector<double>& v, double from, double to) const
 }
 
 void
-Geometry::mix (vector<double>& v, double from, double to, 
+Geometry::mix (vector<double>& v, const double from, const double to, 
                vector<double>& change) const
 {
   const double old_change = total (change);
@@ -175,14 +175,15 @@ Geometry::mix (vector<double>& v, double from, double to,
     {
       TmpStream tmp;
       tmp () << "old_change = " << old_change
-             << "total_change = " << total_change
-             << ", total_v = " << total_v;
+             << "; total_change = " << total_change
+             << "; total_v = " << total_v
+             << "; from = " << from << "; to = " << to;
       daisy_warning (tmp.str ());
     }
 }
 
 double
-Geometry::extract (vector<double>& v, double from, double to) const
+Geometry::extract (vector<double>& v, const double from, const double to) const
 {
   const double old_total = total (v);
   const unsigned int last = interval_plus (to);
