@@ -26,6 +26,7 @@
 #include "treelog.h"
 #include "tmpstream.h"
 #include <map>
+#include <set>
 
 struct Library::Implementation
 {
@@ -195,8 +196,27 @@ Library::Implementation::Implementation (const char* n, derive_fun d,
 
 Library::Implementation::~Implementation ()
 { 
+  // Delete alists.
+  map_delete (alists.begin (), alists.end ());
+
+  // Delete unique syntaxen.
+  set<const Syntax*, less<const Syntax*>/**/> unique;
+  for (syntax_map::iterator i = syntaxen.begin ();
+       i != syntaxen.end ();
+       i++)
+    {
+      assert ((*i).second);
+      unique.insert ((*i).second);
+      (*i).second = NULL;
+    }
+  sequence_delete (unique.begin (), unique.end ());
+  
+  // Remove from list of libraries.
   all->erase (all->find (name)); 
+
+  // Delete list of libraries if empty.
   all_count--;
+  assert (all->size () == all_count);
   if (all_count == 0)
     delete all;
   else
@@ -336,6 +356,7 @@ Library::Library (const char* name, derive_fun derive,
   : impl (*new Implementation (name, derive, description))
 { 
   (*Implementation::all)[name] = this; 
+  assert (Implementation::all->size () == Implementation::all_count);
 }
 
 Library::~Library ()

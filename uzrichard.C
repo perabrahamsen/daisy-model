@@ -44,7 +44,7 @@ private:
   int max_iterations;
   double max_absolute_difference;
   double max_relative_difference;
-  const Average* K_average;
+  /* const */ Average* K_average;
 
   // UZmodel.
 public:

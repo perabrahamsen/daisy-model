@@ -58,7 +58,9 @@ LogExternSource::~LogExternSource ()
   log_extern_count--;
   if (log_extern_count == 0)
     {
-      // BUG: map_delete (log_extern_map->begin (), log_extern_map->end ());
+#ifndef BORLAND_TEMPLATES
+      map_delete (log_extern_map->begin (), log_extern_map->end ());
+#endif
       delete log_extern_map;
     }
 }

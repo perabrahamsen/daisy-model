@@ -485,7 +485,7 @@ ColumnStandard::initialize (const Time& time, Treelog& err,
   ColumnBase::initialize (time, err, global_weather);
   soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water);
   soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water);
-  organic_matter.initialize (alist.alist ("OrganicMatter"), soil);
+  organic_matter.initialize (alist.alist ("OrganicMatter"), soil, err);
   vegetation.initialize (soil, organic_matter);
 }
 

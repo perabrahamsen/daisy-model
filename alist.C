@@ -636,6 +636,24 @@ AttributeList::flag (const char* key) const
   return value.flag;
 }
 
+const Time&
+AttributeList::time (const char* key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Date);
+  assert (!value.is_sequence);
+  return *value.time;
+}
+
+const Time&
+AttributeList::time (const string& key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Date);
+  assert (!value.is_sequence);
+  return *value.time;
+}
+
 int
 AttributeList::integer (const string& key) const
 {

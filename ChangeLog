@@ -1,5 +1,13 @@
 2002-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* library.C (~Implementation): More agressive cleanup.
+
+	* organic_matter.C, organic_matter.h (initialize): New 'Treelog'
+	argument. Use it.
+	Fix SMB from SOM substraction.
+
+	* lib/*.dai (LAIDist0): Fixed for new crops.
+
 	* library.C (Implementation::all_count): New variable.
 	(Implementation) Increment.
 	(~Implementation) Decrement and delete all when zero.

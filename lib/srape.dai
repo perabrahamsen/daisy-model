@@ -26,7 +26,7 @@
          (SpSOrgAI 0.005)
          (SOrgAIMod (0.0 1.0) (1.4 1.0) (2.0 0.0))
          (SOrgPhotEff 0.25)
-         (LAIDist0 0.00 1.00 1.00)
+         (LAIDist0 0.00 0.00 1.00)
          (LAIDist1 0.10 0.80 1.00)
          (PARref   0.06)
          (PARext   0.70)

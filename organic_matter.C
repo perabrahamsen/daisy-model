@@ -1,7 +1,7 @@
 // organic_matter.C
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2002 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2002 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -37,9 +37,10 @@
 #include "plf.h"
 #include "tmpstream.h"
 #include "submodel.h"
+#include "message.h"
+#include "treelog.h"
 #include <algorithm>
 #include <numeric>
-#include "message.h"
 
 struct OrganicMatter::Implementation
 {
@@ -117,7 +118,7 @@ struct OrganicMatter::Implementation
     }
   // Create & Destroy.
   AM* find_am (const string& sort, const string& part) const;
-  void initialize (const AttributeList&, const Soil&);
+  void initialize (const AttributeList&, const Soil&, Treelog& err);
   Implementation (const AttributeList&);
   ~Implementation ();
 };
@@ -630,8 +631,10 @@ OrganicMatter::Implementation::find_am (const string& sort,
 
 void
 OrganicMatter::Implementation::initialize (const AttributeList& al,
-					   const Soil& soil)
+					   const Soil& soil, Treelog& err)
 { 
+  Treelog::Open nest (err, "OrganicMatter");
+
   // Sizes.
   const unsigned int smb_size = smb.size ();
   const unsigned int som_size = som.size ();
@@ -653,6 +656,10 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   for (unsigned int pool = 0; pool < som_size; pool++)
     {
       assert (smb[pool]->C_per_N.size () > 0);
+      if (smb[pool]->C_per_N.size () > 1 
+	  && smb[pool]->C_per_N.size () < soil.size ())
+	err.entry ("smb C_per_N partially initialized.\n\
+Filling out array with last value");
       while (smb[pool]->C_per_N.size () < soil.size ())
 	smb[pool]->C_per_N.push_back 
 	  (smb[pool]->C_per_N[smb[pool]->C_per_N.size () - 1]);
@@ -682,8 +689,8 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 	  assert (end < last);
 	  if (end < soil_end)
 	    {
-	      CERR << "WARNING: initial_SOM layer in OrganicMatter ends below "
-		   << "the last node\n";
+	      err.entry ("\
+initial_SOM layer in OrganicMatter ends below the last node");
 	      weight *= (last - soil_end) / (last - end);
 	      end = soil_end;
 	      i = layers.size ();
@@ -693,18 +700,6 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 	  last = end;
 	}
 
-#if 0      
-      // Use last value to the bottom.
-      last = total[0];
-      assert (last > 0.0);
-      for (unsigned int lay = 0; lay < soil.size (); lay++)
-	{
-	  if (total[lay] == 0.0)
-	    total[lay] = last;
-	  else 
-	    last = total[lay];
-	}
-#endif
       // Distribute C in pools.
       for (unsigned int lay = 0; lay < soil.size (); lay++)
 	{
@@ -726,6 +721,11 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
     }
   else
     {
+      for (unsigned int pool = 0; pool < som_size; pool++)
+	if (som[pool]->C.size () > 0 && som[pool]->C.size () < soil.size ())
+	  err.entry ("som C partially initialized.\n\
+Using humus for remaining entries");
+	  
       // Initialize SOM from humus in horizons.
       for (unsigned int lay = 0; lay < soil.size (); lay++)
 	{
@@ -738,6 +738,11 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 	    }
 	}
     }
+  for (unsigned int pool = 0; pool < smb_size; pool++)
+    if (smb[pool]->C.size () > 0 && smb[pool]->C.size () < soil.size ())
+      err.entry ("smb C partially initialized.\n\
+Using equilibrium for remaining entries");
+
   for (unsigned int lay = 0; lay < soil.size (); lay++)
     {
       double stolen = 0.0; // How much C was stolen by the SMB pools?
@@ -793,11 +798,11 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 	      // content * out_rate = in  =>  content = in / out_rate;
 	      smb[pool]->C.push_back (in / out_rate);
 	      
-	      stolen += in;
+	      stolen += in / out_rate;
 	    }
-	  som[0]->C[lay] -= stolen;
-	  assert (som[0]->C[lay] >= 0.0);
 	}
+      som[0]->C[lay] -= stolen;
+      assert (som[0]->C[lay] >= 0.0);
     }
   buffer.initialize (soil);
   
@@ -950,8 +955,9 @@ OrganicMatter::find_am (const string& sort, const string& part) const
 { return impl.find_am (sort, part); }
 
 void
-OrganicMatter::initialize (const AttributeList& al, const Soil& soil)
-{ impl.initialize (al, soil); }
+OrganicMatter::initialize (const AttributeList& al, const Soil& soil, 
+			   Treelog& err)
+{ impl.initialize (al, soil, err); }
 
 OrganicMatter::OrganicMatter (const AttributeList& al)
   : impl (*new Implementation (al))
