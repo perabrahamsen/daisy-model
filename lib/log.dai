@@ -118,13 +118,21 @@ This include only nitrogen atoms of the nitrate."
                   (dimension "dg C"))))
 
 (deflog "Soil Water Potential" table
-  "Water potential in all numeric soil layers."
+  "Water potential in all numeric soil layers, in cm."
   (where "soil_water_potential.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
            (array (path column "$col" SoilWater h)
                   (spec column default SoilWater h)
                   (dimension "cm"))))
+
+(deflog "Soil Water Potential (pF)" table
+  "Water potential in all numeric soil layers, in pF."
+  (where "soil_water_pF.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (pF (path column "$col" SoilWater h)
+               (spec column default SoilWater h))))
 
 (deflog "Soil Water Sink" table
   "The water sink in all numeric soil layers.
@@ -508,6 +516,21 @@ Note that a negative delta content means that the amount increases."
          ("Residuals_N_soil")
          ("Crop-N" (factor -1.0))))
 
+(defsummary "Crop Nitrogen Balance" simple
+  "Total system mass balance for nitrogen i crops.
+
+Note that a negative delta content means that the amount increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch (Fixated)
+         ("NO3-Crop")
+	 ("NH4-Crop")
+         ("Seed_N")
+         ("Harvest_N" (factor -1.0))
+         ("Residuals_N_root" (factor -1.0))
+         ("Residuals_N_top" (factor -1.0))
+         ("Crop-N" (factor -1.0))))
+
 (defsummary "Nitrogen Balance" simple
   "Total system mass balance for nitrogen.
 
@@ -561,7 +584,7 @@ Note that a negative delta content means that the amount increases."
   "Enough information to create a balance for the soil nitrogen."
   (where "N_balance.dlf")
   (summary "NH4 Soil Balance" "NO3 Soil Balance" "Organic Nitrogen Balance"
-           "Nitrogen Balance")
+           "Crop Nitrogen Balance" "Nitrogen Balance")
   (when hourly)
   (entries ;; Year Month MDay Hour
            (number (path column "$col" fertilized_NH4)

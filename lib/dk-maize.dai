@@ -1,14 +1,14 @@
-(defcrop "Majs" default
+(defcrop "Silomajs" default
   "Majs med årsudbytter der svarer til gennemsnittet for dansk landbrug.
 Skabt af Christian Thirup for Daisy standardiseringsprojektet.
 Baseret på Roskilde 74-76 ukendt varietet."
   (Devel default
       (EmrTSum  300)
       (DS_Emr   0.01)
-      (DSRate1  0.0240)
-     (TempEff1 (0. 0.00) (6. 0.0) (10. 0.30) (15. 0.75) (25. 1.00) (35.  1.20))
+      (DSRate1  0.0160)
+     (TempEff1 (0. 0.30) (10. 0.30) (15. 0.75) (25. 1.00) (35.  1.20))
      (PhotEff1 (0. 0.90) (12. 1.00) (14. 0.95) (16. 0.90) (24.  0.90))
-      (DSRate2  0.015)
+      (DSRate2  0.021)
       (TempEff2 (0. 0.30) (10. 0.30) (15. 0.75) (25. 1.00) (35.  1.20)))
 
   (LeafPhot
@@ -61,7 +61,7 @@ Baseret på Roskilde 74-76 ukendt varietet."
        (r_Leaf     0.025)
        (r_Stem     0.010)
        (r_SOrg     0.030)
-       (ShldResC   0.35)
+       (ShldResC   0.00)
        (ReMobilDS  1.40)
        (ReMobilRt  0.02)
        (Large_RtDR 0.05)
