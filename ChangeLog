@@ -1,5 +1,16 @@
 2001-11-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.91 released.
+
+2001-11-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/fertilizer.dai: Added descriptions.
+	(NPK): Removed.
+	* am.C (AM_Syntax): Added `description' to organic and mineral
+	fertilizer types.
+
+	* rootdens_G_P.C (Rootdens_G_PSyntax): Added missing "\n\".
+
 	* Version 1.90 released.
 
 2001-11-05  Per Abrahamsen  <abraham@dina.kvl.dk>

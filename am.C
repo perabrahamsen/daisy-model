@@ -1091,6 +1091,8 @@ This AM belongs to a still living plant");
 	Syntax& syntax = *new Syntax ();
 	syntax.add_check (check_organic);
 	AttributeList& alist = *new AttributeList ();
+	syntax.add ("description", Syntax::String, Syntax::OptionalConst,
+		    "Description of this fertilizer type."); 
 	alist.add ("description", "\
 Organic fertilizer, typically slurry or manure from animals.");
 	syntax.add ("creation", Syntax::Date, Syntax::State, 
@@ -1136,6 +1138,8 @@ The remaining nitrogen is assumed to be nitrate or organic.");
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
+	syntax.add ("description", Syntax::String, Syntax::OptionalConst,
+		    "Description of this fertilizer type."); 
 	alist.add ("description", "Mineral fertilizer.");
 	syntax.add ("creation", Syntax::Date, Syntax::State, 
 		    "Time of application.");
