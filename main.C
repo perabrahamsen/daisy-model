@@ -3,7 +3,6 @@
 #include "daisy.h"
 #include "input.h"
 #include "syntax.h"
-#include "log.h"
 #include "alist.h"
 #include <iostream.h>
 
@@ -19,8 +18,7 @@ main (int argc, char* argv[])
       const AttributeList& alist = parse (syntax, argc, argv);
       if (syntax.check (alist, "daisy"))
 	{
-	  Log log (alist.list_sequence ("log"));
-	  Daisy daisy (log, alist);
+	  Daisy daisy (alist);
 	  daisy.run ();
 	}
       delete &alist;

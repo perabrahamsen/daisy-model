@@ -5,7 +5,6 @@
 #include "alist.h"
 #include "action.h"
 #include "condition.h"
-#include "daisy.h"
 
 class Rules
 {

@@ -17,8 +17,6 @@ class AttributeList;
 class Daisy
 {
   // Content.
-  struct Implementation;
-  Implementation& impl;
 public:
   Log& log;
   Time time;
@@ -35,7 +33,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Syntax&);
-  Daisy (Log&, const AttributeList&);
+  Daisy (const AttributeList&);
   ~Daisy ();
 };
 

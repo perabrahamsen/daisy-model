@@ -91,11 +91,9 @@ cvs: $(TEXT)
 .C.o:
 	$(CC) -c $<
 
-$(OBJ):	daisy.h
-
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
-main.o: main.C daisy.h time.h input.h syntax.h log.h alist.h common.h
+main.o: main.C daisy.h time.h input.h syntax.h alist.h common.h
 daisy.o: daisy.C daisy.h time.h input.h manager.h weather.h \
  groundwater.h uzmodel.h common.h horizon.h log.h crop.h column.h \
  action.h filter.h library.h syntax.h condition.h alist.h
@@ -147,7 +145,7 @@ column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
  soil_NH4.h solute.h soil_NO3.h organic_matter.h nitrification.h \
  denitrification.h alist.h syntax.h library.h log.h filter.h
 manager_rule.o: manager_rule.C manager.h syntax.h alist.h common.h \
- action.h condition.h daisy.h time.h
+ action.h condition.h
 weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
  common.h log.h filter.h
 uzrichard.o: uzrichard.C uzmodel.h common.h soil.h horizon.h mathlib.h \

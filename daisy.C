@@ -18,14 +18,8 @@
 #include "common.h"
 #include <iostream.h>
 
-struct Daisy::Implementation
-{   
-  Implementation () { };
-};
-
-Daisy::Daisy (Log& l, const AttributeList& al)
-  : impl (*new Implementation ()), 
-    log (l), 
+Daisy::Daisy (const AttributeList& al)
+  : log (*new Log(al.list_sequence ("log"))), 
     time (al.time ("time")),
     manager (Manager::create (al.list ("chief"))),
     weather (Weather::create (time, al.list ("weather"))), 
@@ -129,7 +123,7 @@ Daisy::load_syntax (Syntax& syntax)
 
 Daisy::~Daisy ()
 {
-  delete &impl;
+  delete &log;
   delete &manager;
   delete &weather;
   delete &groundwater;
