@@ -479,53 +479,65 @@ plus one modulo 'step' is 0.");
     Librarian<Condition>::add_type ("yearly", alist_year, syntax,
 				    &ConditionYearly::make);
   }
-  // At a specific hour/mday/yday/year.
+  // Specific hour.
   {
-    Syntax& syntax_hour = *new Syntax ();
-    AttributeList& alist_hour = *new AttributeList ();
-    alist_hour.add ("description", "True, at the specified hour.");
-    syntax_hour.add ("at", Syntax::Integer, Syntax::Const,
-		     "Hour when the condition is true [0-23].");
-    syntax_hour.add_check ("at", VCheck::valid_hour ());
-    syntax_hour.order ("at");
-    Syntax& syntax_mday = *new Syntax ();
-    AttributeList& alist_mday = *new AttributeList ();
-    alist_mday.add ("description", "True, at the specified day in the month.");
-    syntax_mday.add ("at", Syntax::Integer, Syntax::Const,
-		" when the condition is true [1-31].");
-    syntax_mday.add_check ("at", VCheck::valid_mday ());
-    syntax_mday.order ("at");
-    Syntax& syntax_yday = *new Syntax ();
-    AttributeList& alist_yday = *new AttributeList ();
-    alist_yday.add ("description", "True, at the specified julian day.");
-    syntax_yday.add ("at", Syntax::Integer, Syntax::Const,
-		"Julian day when the condition is true [1-366].");
-    static VCheck::IRange valid_jday (1, 366);
-    syntax_hour.add_check ("at", valid_jday);
-    syntax_yday.order ("at");
-    Syntax& syntax_month = *new Syntax ();
-    AttributeList& alist_month = *new AttributeList ();
-    alist_month.add ("description", "True, at the specified month.");
-    syntax_month.add ("at", Syntax::Integer, Syntax::Const,
-		      "Month when the condition is true [1-12].");
-    syntax_mday.add_check ("at", VCheck::valid_mday ());
-    syntax_month.order ("at");
-    Syntax& syntax_year = *new Syntax ();
-    AttributeList& alist_year = *new AttributeList ();
-    alist_year.add ("description", "True, at the specified year.");
-    syntax_year.add ("at", Syntax::Integer, Syntax::Const,
-		"Year when the condition is true.");
-    syntax_year.add_check ("at", VCheck::valid_year ());
-    syntax_year.order ("at");
-    Librarian<Condition>::add_type ("hour", alist_hour, syntax_hour,
-				    &ConditionHour::make);
-    Librarian<Condition>::add_type ("mday", alist_mday, syntax_mday,
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True, at the specified hour.");
+    syntax.add ("at", Syntax::Integer, Syntax::Const,
+                "Hour when the condition is true [0-23].");
+    syntax.add_check ("at", VCheck::valid_hour ());
+    syntax.order ("at");
+    Librarian<Condition>::add_type ("hour", alist, syntax,
+                                    &ConditionHour::make);
+  }
+  // Every specific day in the month.
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True, at the specified day in the month.");
+    syntax.add ("at", Syntax::Integer, Syntax::Const,
+		"Day in the month when the condition is true [1-31].");
+    syntax.add_check ("at", VCheck::valid_mday ());
+    syntax.order ("at");
+    Librarian<Condition>::add_type ("mday", alist, syntax,
 				    &ConditionMDay::make);
-    Librarian<Condition>::add_type ("yday", alist_yday, syntax_yday,
+  }
+  // Every specific day in the year.
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True, at the specified julian day.");
+    syntax.add ("at", Syntax::Integer, Syntax::Const,
+                "Julian day when the condition is true [1-366].");
+    static VCheck::IRange valid_jday (1, 366);
+    syntax.add_check ("at", valid_jday);
+    syntax.order ("at");
+    Librarian<Condition>::add_type ("yday", alist, syntax,
 				    &ConditionYDay::make);
-    Librarian<Condition>::add_type ("month", alist_month, syntax_month,
-				    &ConditionMonth::make);
-    Librarian<Condition>::add_type ("year", alist_year, syntax_year,
+  }
+  // Every specific month.
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True, at the specified month.");
+    syntax.add ("at", Syntax::Integer, Syntax::Const,
+                "Month when the condition is true [1-12].");
+    syntax.add_check ("at", VCheck::valid_month ());
+    syntax.order ("at");
+    Librarian<Condition>::add_type ("month", alist, syntax, 
+                                    &ConditionMonth::make);
+  }
+  // A specific year.
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True, at the specified year.");
+    syntax.add ("at", Syntax::Integer, Syntax::Const,
+		"Year when the condition is true.");
+    syntax.add_check ("at", VCheck::valid_year ());
+    syntax.order ("at");
+    Librarian<Condition>::add_type ("year", alist, syntax,
 				    &ConditionYear::make);
   }
 }
