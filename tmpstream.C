@@ -51,7 +51,7 @@ struct TmpStream::Implementation
   }
 };
 
-ostream& 
+std::ostream& 
 TmpStream::operator () ()
 {
   daisy_assert (!impl.done);
