@@ -190,11 +190,27 @@ relative, that is they are weighted to the total.  So you can specify
 them as fractions or percentage or whatever, as you wish.
 
 The last parameter, \texttt{SOM\_fractions}, divides the humus into a
-slow and a fast pool.  This affects background mineralization.  In
-general, the longer time the soil have been used for agriculture, the
-larger a fraction is in the slow pool.  Use of organic fertilizer
-increases the amount in the fast pool, and the top horizon tend to have
-more humus in the fast pool than the lower horizons.
+slow and a fast pool.  This affects background mineralization.  For a
+system in perfect equilibrium (input of organic matter equal
+tuinover), the value will be
+
+\begin{verbatim}
+  (SOM_fractions 0.49 0.51)
+\end{verbatim}
+
+For farms with a long term humus build-up, more of the humus will be
+in the second (fast) pool.  For farms where the amount of humus is
+decreasing, slow first (slow) fraction will be larger.  New farmland
+and farmland using mineral fertilizer tend to have decreasing humus,
+and thus a larger fraction of humus in the slow pool.  Note that we
+are talking changes over decades and centuries, if you switched to
+organic fertilizer five years ago, that is unlikely to have a
+measurable effect on the SOM partitioning.
+
+For horizons below the root zone, if there is any significant amount
+of humus may be leftover from old tree roots, and slowly decreasing.
+In that case, the vast majority (maybe 95\%) is in the first, slow
+pool.
 
 Note that all the parameters end with a \verb|[]|.  This is the
 dimension surrounded by square brackets.  Since fractions are
