@@ -102,7 +102,7 @@
 )
 ;------------------------------------------------------------------------------
 ;; Growing of Winter Rape; straw is left in the field
-(defaction "WRape w. OF" activity
+(defaction "WRape w. MF" activity
   (wait_mm_dd 8 15)(plowing)
   (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
   (seed_bed_preparation)(sow "Winter Rape")
@@ -167,16 +167,16 @@
   (harvest "Grass" (stub 8 [cm])(stem 0.00)(leaf 0.00))
 )
 (defaction "Grass - 4 cuts" activity
-  (wait_mm_dd 03 15)(fertilize (AmmoniaNitrate (weight 100 [kg N/ha])))
+  (wait_mm_dd 03 15)(fertilize (AmmoniumNitrate (weight 100 [kg N/ha])))
   (wait_mm_dd 05 25)
   (harvest "Grass" (stub 8 [cm])(stem 0.90)(leaf 0.90))
-  (wait_days 1)(fertilize (AmmoniaNitrate (weight 100 [kg N/ha])))
+  (wait_days 1)(fertilize (AmmoniumNitrate (weight 100 [kg N/ha])))
   (wait_mm_dd 07 01)
   (harvest "Grass" (stub 8 [cm])(stem 0.80)(leaf 0.80))
-  (wait_days 1)(fertilize (AmmoniaNitrate (weight 75 [kg N/ha])))
+  (wait_days 1)(fertilize (AmmoniumNitrate (weight 75 [kg N/ha])))
   (wait_mm_dd 08 10)
   (harvest "Grass" (stub 8 [cm])(stem 0.80)(leaf 0.80))
-  (wait_days 1)(fertilize (AmmoniaNitrate (weight 50 [kg N/ha])))
+  (wait_days 1)(fertilize (AmmoniumNitrate (weight 50 [kg N/ha])))
   (wait_mm_dd 10 10)
   (harvest "Grass" (stub 8 [cm])(stem 0.80)(leaf 0.80))
 )

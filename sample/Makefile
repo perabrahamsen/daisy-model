@@ -1,4 +1,4 @@
-DAISY 	= dk-management
+DAISY 	= dk-management.dai
 TEXT	= Makefile README
 REMOVE 	=  NOTHING
 
