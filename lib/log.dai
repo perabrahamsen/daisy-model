@@ -494,7 +494,7 @@
 		     (when hourly)
 		     (dimension "kg N/ha/d")
 		     (factor 1e5))		;g/cm²/d -> kg N/ha/d
-	   (interval (tag "Total-NO3")
+	   (interval (tag "NO3-Total")
 		     (path column "$col" SoilNO3 M)
 		     (dimension "kg N/ha")
 		     (factor 1e5))		;g/cm² -> kg/ha

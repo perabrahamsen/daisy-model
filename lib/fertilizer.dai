@@ -1,7 +1,7 @@
 ;; fertilizer.dai -*- lisp -*-
 
 (defam slurry organic
-  (NH4_evaporation 0.15)
+  (volatilization 0.15)
   (om ((initial_fraction 0.72)
        (C_per_N 100)
        (turnover_rate 2.0e-4)
