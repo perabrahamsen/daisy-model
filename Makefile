@@ -149,7 +149,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all components of some library.
 #
-COMPONENTS = log_extern.C select_content.C select_interval.C select_flux.C \
+COMPONENTS = select_content.C select_interval.C select_flux.C \
 	select_number.C select_date.C select_array.C log_table.C \
 	log_harvest.C action_while.C action_wait.C action_activity.C \
 	average_arithmetic.C average_harmonic.C average_geometric.C \
@@ -176,7 +176,7 @@ COMPONENTS = log_extern.C select_content.C select_interval.C select_flux.C \
 
 # Select the C files with a corresponding header file from the library.
 #
-INTERFACES = log_select.C select.C average.C mactrans.C macro.C \
+INTERFACES = log_extern.C log_select.C select.C average.C mactrans.C macro.C \
 	document.C daisy.C parser.C log.C weather.C column.C crop.C \
 	alist.C syntax.C library.C action.C condition.C horizon.C \
 	csmp.C time.C uzmodel.C parser_file.C hydraulic.C \
