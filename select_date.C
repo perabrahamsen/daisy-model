@@ -151,7 +151,7 @@ static struct SelectDateSyntax
   SelectDateSyntax ()
     { 
       Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
+      AttributeList alist;
       Select::load_syntax (syntax, alist);
 
       AttributeList& alist_year = *new AttributeList (alist);

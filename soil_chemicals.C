@@ -279,7 +279,7 @@ SoilChemicals::Implementation::Implementation (const
 }
   
 SoilChemicals::Implementation::~Implementation ()
-{ }
+{ map_delete (solutes.begin (), solutes.end ()); }
 
 SoilChemical& 
 SoilChemicals::find (const Soil& soil, 

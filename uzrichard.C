@@ -563,10 +563,10 @@ UZRichard::q_darcy (const Soil& soil,
   const double start_pos = (soil.z (first) + soil.z (last) * 3.0) / 4.0;
   int start = soil.interval_plus (start_pos) - 1;
   if (!(start < last - 2))
-    throw ("We need at least 2 numeric nodess below 3/4 depth for\n\
+    throw ("We need at least 2 numeric nodes below 3/4 depth for \
 calculating flow with pressure top.");
   if (!(start > first + 1))
-    throw ("We need at least 1 numeric node above 3/4 depth for\n\
+    throw ("We need at least 1 numeric node above 3/4 depth for \
 calculating flow with pressure top.");
 
   for (; start > 0; start--)
@@ -669,7 +669,10 @@ UZRichard::UZRichard (const AttributeList& al)
 { }
 
 UZRichard::~UZRichard ()
-{ }
+{ 
+  if (K_average)
+    delete K_average;
+}
 
 // Add the UZRichard syntax to the syntax table.
 static struct UZRichardSyntax

@@ -47,7 +47,7 @@ struct AM::Implementation
   // Content.
   const Time creation;		// When it was created.
   const string name;		// What is was.
-  vector<OM*> om;		// Organic matter pool.
+  const vector<OM*> om;		// Organic matter pool.
 
   // Use this if a living crop is adding to this AM.
   struct Lock;
@@ -84,14 +84,8 @@ struct AM::Implementation
 
 
   // Create and Destroy.
-  Implementation (const Time& c, const string& n, vector<OM*>& o)
-    : creation (c),
-      name (n),
-      om (o),
-      lock (NULL)
-  { }
-  ~Implementation ()
-  { sequence_delete (om.begin (), om.end ()); }
+  Implementation (const Time& c, const string& n, const vector<OM*>& o);
+  ~Implementation ();
 };
 
 struct AM::Implementation::Lock
@@ -506,6 +500,21 @@ AM::Implementation::pour (vector<double>& cc, vector<double>& nn)
     om[i]->pour (cc, nn);
 }
 
+AM::Implementation::Implementation (const Time& c, const string& n,
+				    const vector<OM*>& o)
+  : creation (c),
+    name (n),
+    om (o),
+    lock (NULL)
+{ }
+
+AM::Implementation::~Implementation ()
+{ 
+  if (lock)
+    delete lock;
+  sequence_delete (om.begin (), om.end ()); 
+}
+
 void
 AM::output (Log& log) const
 { impl.output (log); }
@@ -619,10 +628,6 @@ AM::create (const Geometry& /*geometry*/, const Time& time,
     am.impl.lock = new AM::Implementation::Lock (sort, part);
   return am;
 }
-
-#ifdef BORLAND_TEMPLATES
-template class map_construct<OM>;
-#endif
 
 const vector<AttributeList*>&
 AM::default_AOM ()
@@ -836,7 +841,7 @@ AM::AM (const AttributeList& al)
   : impl (*new Implementation 
 	  (al.time ("creation"),
 	   al.name ("name"),
-	   (vector<OM*>&) map_construct<OM> (al.alist_sequence ("om")))),
+	   map_construct<OM> (al.alist_sequence ("om")))),
     alist (al),
     name ("state")
 {
@@ -953,10 +958,7 @@ AM::initialize (const Soil& soil)
 }
 
 AM::~AM ()
-{ 
-  assert (!locked ());
-  delete &impl;
-}
+{ delete &impl; }
 
 static bool check_organic (const AttributeList& al, Treelog& err)
 { 

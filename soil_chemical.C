@@ -128,7 +128,7 @@ SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("decomposed", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Amount decomposed in this time step.");
   // Use "none" adsorption by default.
-  AttributeList& none = *new AttributeList ();
+  AttributeList none;
   none.add ("type", "none");
 
   syntax.add ("lag_increment", "g/cm^3", Syntax::Fraction (), Syntax::Const,

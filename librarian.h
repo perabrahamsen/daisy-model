@@ -104,10 +104,10 @@ public:
 // This cutie will create a vector of objects from a vector of alists.
 #ifndef BORLAND_TEMPLATES
 template <class T> 
-vector<T*>&
+vector<T*>
 map_create (const vector<AttributeList*>& f)
 { 
-  vector<T*>& t = *new vector<T*> ();
+  vector<T*> t;
   for (vector<AttributeList*>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
@@ -116,10 +116,10 @@ map_create (const vector<AttributeList*>& f)
 }
 
 template <class T> 
-vector<const T*>&
+vector<const T*>
 map_create_const (const vector<AttributeList*>& f)
 { 
-  vector<const T*>& t = *new vector<const T*> ();
+  vector<const T*> t;
   for (vector<AttributeList*>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
@@ -128,10 +128,10 @@ map_create_const (const vector<AttributeList*>& f)
 }
 
 template <class T> 
-vector<T*>& 
+vector<T*>
 map_construct (const vector<AttributeList*>& f)
 { 
-  vector<T*>& t = *new vector<T*> ();
+  vector<T*> t;
   for (vector<AttributeList*>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
@@ -140,10 +140,10 @@ map_construct (const vector<AttributeList*>& f)
 }
 
 template <class T> 
-vector<const T*>&
+vector<const T*>
 map_construct_const (const vector<AttributeList*>& f)
 { 
-  vector<const T*>& t = *new vector<const T*> ();
+  vector<const T*> t;
   for (vector<AttributeList*>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
@@ -156,64 +156,60 @@ map_construct_const (const vector<AttributeList*>& f)
 template <class T> 
 struct map_create
 {
-  vector<T*>& t;
+  vector<T*> t;
   map_create (const vector<AttributeList*>& f)
-    : t (*new vector<T*> ())
   { 
     for (vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
       t.push_back (&Librarian<T>::create (**i));
   }
-  operator vector<T*>& ()
+  operator vector<T*> ()
   { return t; }
 };
 
 template <class T> 
 struct map_create_const
 {
-  vector<const T*>& t;
+  vector<const T*> t;
   map_create_const (const vector<AttributeList*>& f)
-    : t (*new vector<const T*> ())
   { 
     for (vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
       t.push_back (&Librarian<T>::create (**i));
   }
-  operator vector<const T*>& ()
+  operator vector<const T*> ()
   { return t; }
 };
 
 template <class T> 
 struct map_construct
 {
-  vector<T*>& t;
+  vector<T*> t;
   map_construct (const vector<AttributeList*>& f)
-    : t (*new vector<T*> ())
   { 
     for (vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
       t.push_back (new T (**i));
   }
-  operator vector<T*>& ()
+  operator vector<T*> ()
   { return t; }
 };
 
 template <class T> 
 struct map_construct_const
 {
-  vector<const T*>& t;
+  vector<const T*> t;
   map_construct_const (const vector<AttributeList*>& f)
-    : t (*new vector<const T*> ())
   { 
     for (vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
       t.push_back (new T (**i));
   }
-  operator vector<const T*>& ()
+  operator vector<const T*> ()
   { return t; }
 };
 #endif

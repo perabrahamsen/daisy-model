@@ -417,6 +417,7 @@ ColumnBase::~ColumnBase ()
     delete weather;
   delete &vegetation;
   delete &bioclimate;
+  sequence_delete (transformations.begin (), transformations.end ());
   delete &groundwater;
 }
 

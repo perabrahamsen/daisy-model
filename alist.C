@@ -71,6 +71,12 @@ struct Value
       is_sequence (false),
       ref_count (new int (1))
     { }
+  Value (const char* v)
+    : name (new string (v)),
+      type (Syntax::String),
+      is_sequence (false),
+      ref_count (new int (1))
+    { }
   Value (bool v)
     : flag (v),
       type (Syntax::Boolean),
@@ -577,7 +583,7 @@ AttributeList::size (const string& key)	const
 }
 
 double 
-AttributeList::number (string key) const
+AttributeList::number (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::Number);
@@ -586,7 +592,7 @@ AttributeList::number (string key) const
 }
 
 const string& 
-AttributeList::name (string key) const
+AttributeList::name (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::String);
@@ -595,7 +601,7 @@ AttributeList::name (string key) const
 }
 
 bool 
-AttributeList::flag (string key) const
+AttributeList::flag (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::Boolean);
@@ -604,7 +610,7 @@ AttributeList::flag (string key) const
 }
 
 int
-AttributeList::integer (string key) const
+AttributeList::integer (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::Integer);
@@ -613,7 +619,7 @@ AttributeList::integer (string key) const
 }
 
 const Time&
-AttributeList::time (string key) const
+AttributeList::time (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::Date);
@@ -622,7 +628,7 @@ AttributeList::time (string key) const
 }
 
 const PLF& 
-AttributeList::plf (string key) const
+AttributeList::plf (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::PLF);
@@ -631,7 +637,7 @@ AttributeList::plf (string key) const
 }
 
 AttributeList& 
-AttributeList::alist (string key) const
+AttributeList::alist (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::AList);
@@ -640,7 +646,7 @@ AttributeList::alist (string key) const
 }
 
 const vector<double>& 
-AttributeList::number_sequence (string key) const
+AttributeList::number_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::Number);
@@ -649,7 +655,7 @@ AttributeList::number_sequence (string key) const
 }
 
 const vector<string>& 
-AttributeList::name_sequence (string key) const
+AttributeList::name_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::String);
@@ -658,7 +664,7 @@ AttributeList::name_sequence (string key) const
 }
 
 const vector<bool>& 
-AttributeList::flag_sequence (string key) const
+AttributeList::flag_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::Boolean);
@@ -667,7 +673,7 @@ AttributeList::flag_sequence (string key) const
 }
 
 const vector<int>& 
-AttributeList::integer_sequence (string key) const
+AttributeList::integer_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::Integer);
@@ -676,7 +682,7 @@ AttributeList::integer_sequence (string key) const
 }
 
 const vector<const Time*>& 
-AttributeList::time_sequence (string key) const
+AttributeList::time_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::Date);
@@ -685,7 +691,7 @@ AttributeList::time_sequence (string key) const
 }
 
 const vector<const PLF*>& 
-AttributeList::plf_sequence (string key) const
+AttributeList::plf_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::PLF);
@@ -694,7 +700,7 @@ AttributeList::plf_sequence (string key) const
 }
 
 const vector<AttributeList*>& 
-AttributeList::alist_sequence (string key) const
+AttributeList::alist_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::AList);
@@ -708,7 +714,9 @@ AttributeList::add (const string& key, double v)
 
 void 
 AttributeList::add (const string& key, const char* v)
-{ add (key, string (v)); }
+{ 
+  impl.add (key, Value (v)); 
+}
 
 void 
 AttributeList::add (const string& key, const string& v)

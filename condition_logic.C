@@ -56,7 +56,7 @@ struct ConditionTrue : public Condition
 
 struct ConditionOr : public Condition
 {
-  const vector<Condition*>& conditions;
+  const vector<Condition*> conditions;
 
   void tick (const Daisy& daisy)
   {
@@ -87,17 +87,12 @@ struct ConditionOr : public Condition
   { }
 
   ~ConditionOr ()
-  {
-#ifdef CONST_DELETE
-    sequence_delete (conditions.begin (), conditions.end ());
-#endif
-    delete &conditions;
-  }
+  { sequence_delete (conditions.begin (), conditions.end ()); }
 };
 
 struct ConditionAnd : public Condition
 {
-  const vector<Condition*>& conditions;
+  const vector<Condition*> conditions;
 
   void tick (const Daisy& daisy)
   {
@@ -128,12 +123,7 @@ struct ConditionAnd : public Condition
   { }
 
   ~ConditionAnd ()
-  {
-#ifdef CONST_DELETE
-    sequence_delete (conditions.begin (), conditions.end ());
-#endif
-    delete &conditions;
-  }
+  { sequence_delete (conditions.begin (), conditions.end ()); }
 };
 
 struct ConditionNot : public Condition

@@ -1,31 +1,48 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Få Søren til at se på groundwater pipe fejl.
+
+* Test at Library::~Library virker med BCC.
+
+* TestJyndevad.dai
+
+Fortæl Birgitte hvordan C skal initialiseres.
 
 * User Manual
 
 ** Tillage
 
-*** Raunsø: Ridge description
-
-Tillage actio, + log model
-
 *** Soil Compaction
 
-** SH: Pesticides
+Mail til HSV.
 
-To partielle parameteriseringer, "canopy" og "soil"?
+** Pesticides
+
+*** To partielle parameteriseringer, "canopy" og "soil"?
+
+SH: Streiby.
+
+*** New pesticides.
+
+*** SH: file name change?
+
+*** Transform
 
 ** Log parameterizations.
 
 Udbyg.
 
-*** SH: "Soil Nitrate Concentration" vs. "Soil Water NO3 Concentration".
+** Appendix listing features not mentioned otherwise.
+
+*** divide and merge,
+
+*** Gennemgå referencemanualen og kig efter ting der bør listes.
 
 * Irrigation
 
 ** Deficit
 
-SH: Check om vi skal starte ved fremspiring, som i Daisy V1.
+Start ved specifik dato.
 
 * Parser & Printer.
 

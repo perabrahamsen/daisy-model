@@ -419,7 +419,7 @@ Chemicals::add_syntax (const char* name,
   // KLUDGE: Ugly hack to be able to use the standard 'load_syntax' form.
   chemicals_default_category = cat;
   Syntax& entry_syntax = *new Syntax ();
-  AttributeList& entry_alist = *new AttributeList ();
+  AttributeList entry_alist;
   chemicals_load_syntax (entry_syntax, entry_alist);
   syntax.add (name, entry_syntax, entry_alist,
 	      cat, Syntax::Sequence, description);

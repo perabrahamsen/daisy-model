@@ -53,20 +53,20 @@ public:
   int size (const string& key) const;
 
   // Extract values.
-  double number (string) const;
-  const string& name (string) const;
-  bool flag (string) const;
-  const PLF& plf (string) const;
-  AttributeList& alist (string) const;
-  int integer (string) const;
-  const Time& time (string) const;
-  const vector<double>& number_sequence (string) const;
-  const vector<string>& name_sequence (string key) const;
-  const vector<bool>& flag_sequence (string key) const;
-  const vector<int>& integer_sequence (string key) const;
-  const vector<const Time*>& time_sequence (string key) const;
-  const vector<const PLF*>& plf_sequence (string key) const;
-  const vector<AttributeList*>& alist_sequence (string key) const;
+  double number (const string&) const;
+  const string& name (const string&) const;
+  bool flag (const string&) const;
+  const PLF& plf (const string&) const;
+  AttributeList& alist (const string&) const;
+  int integer (const string&) const;
+  const Time& time (const string&) const;
+  const vector<double>& number_sequence (const string&) const;
+  const vector<string>& name_sequence (const string& key) const;
+  const vector<bool>& flag_sequence (const string& key) const;
+  const vector<int>& integer_sequence (const string& key) const;
+  const vector<const Time*>& time_sequence (const string& key) const;
+  const vector<const PLF*>& plf_sequence (const string& key) const;
+  const vector<AttributeList*>& alist_sequence (const string& key) const;
 
   // Create and Destroy.
   void add (const string&, double);

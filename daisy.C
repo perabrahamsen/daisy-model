@@ -218,13 +218,12 @@ the simulation.  Can be overwritten by column specific weather.");
 Daisy::~Daisy ()
 {
   sequence_delete (logs.begin (), logs.end ());
-  delete &logs;
   delete &activate_output;
   delete &action;
   if (weather)
     delete weather;
   delete &field;
-  delete &harvest;
+  sequence_delete (harvest.begin (), harvest.end ());
 }
 
 static Submodel::Register 

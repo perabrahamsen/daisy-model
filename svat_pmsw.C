@@ -1,7 +1,7 @@
 // svat_PMSW.C --- Advanced SVAT model using hourly weatherdata.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2002 Peter van der Keur, Per Abrahamsen and Søren Hansen.
+// Copyright 2000-2002 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -636,7 +636,7 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
 // **************************************************************************
 
 
-// convert vapor pressure from Pa to kg/m**3: 0.001*e_a [Pa]=e_a [kg/m**3]*Rv*T
+// convert vapor pressure from Pa to kg/m^3: 0.001*e_a [Pa]=e_a [kg/m^3]*Rv*T
 int EPA2ABS(double e_pa, double tair, double &re_abs)
 {   // for air pressure at 2 m height only
   const double Rv=461.5; // J/kg/K, Oke p.63
@@ -644,7 +644,7 @@ int EPA2ABS(double e_pa, double tair, double &re_abs)
   return 0;
 }
 
-// convert from absolute vapor pressure in kg/m**3 to Pa
+// convert from absolute vapor pressure in kg/m^3 to Pa
 int EABS2PA(double eabs, double tempc, double &re_pa)
 {   // for various conversions
   const double Rv=461.5; // J/kg/K, Oke p.63
@@ -771,7 +771,7 @@ int VAPOR(double tair, double &resta, double &resta_abs,
   resta=611*exp((17.27*tair)/(tair+237.3));  // [Pa]
   rdesta=resta*4098.2/pow(237.3+tair,2); // [Pa/C]
   resta_abs=(exp(31.3716-6014.79/tairk-0.00792495*tairk))/(1000.0*tairk);
-  rdesta_abs=(resta_abs/tairk)*(lambda*M/(R*tairk)-1); //[kg/m**3/K]
+  rdesta_abs=(resta_abs/tairk)*(lambda*M/(R*tairk)-1); //[kg/m^3/K]
 
   return 0;
 }
@@ -815,6 +815,8 @@ void gaussj(float **a, int n, float **b, int m)
   int *indxc,*indxr,*ipiv;
   int i,icol,irow,j,k,l,ll;
   float big,dum,pivinv,temp;
+  
+  icol = irow = -42000000;	// abraham: supress initialization warning.
 
   indxc=ivector(1,n);
   indxr=ivector(1,n);
@@ -1195,7 +1197,7 @@ public:
   double tskin,tcan,tleaf,e_c,e_sl; // elements to be solved by gaussj
   double tcan_prev; // tcan from previous timestep
   double tcan_init; // initial value for tcan
-  double e_c_abs,e_sl_abs; // in kg/m**3: e_c and e_sl in Pa
+  double e_c_abs,e_sl_abs; // in kg/m^3: e_c and e_sl in Pa
   double rcmin_star;
   double pstress; // to be returned from svat_pmsw
 
@@ -1209,7 +1211,7 @@ public:
   double tcan_prev_star; // tcan from previous timestep
   double tcan_init_star; // initial value for tcan
   double e_abs_star;
-  double e_c_abs_star,e_sl_abs_star; // in kg/m**3: e_c and e_sl in Pa
+  double e_c_abs_star,e_sl_abs_star; // in kg/m^3: e_c and e_sl in Pa
 
 // energy fluxes etc using the SW/SG sparse crop approach:
   double ha,hl,hs,lea,lel; // sensible and latent heat fluxes in LEHFLUX()
@@ -1239,7 +1241,7 @@ public:
   double epotc,epots; // PotET from canopy / soil surface
   double evaps,evaps_w;
   double eact; // actual evapotranspiration from tick()
-  double epotc_w,epots_w,eact_w; // fluxes from cm/hr to W/m**2
+  double epotc_w,epots_w,eact_w; // fluxes from cm/hr to W/m^2
   double pond_ea_w,soil_ea_w,pond_ep_w,canopy_ep_w,canopy_ea_w;// in tick
   double crop_ea_w,crop_ep_w; // actual & potential transpiration (f_etep)
   double lat_s; // latent heat at soil surface , e.g. Nichols eq.7
@@ -1286,7 +1288,7 @@ public:
 }; // end class SVAT_PMSW
 
 
-// return Lel in mm/hr, i.e. (1/680) 1 W/m**2 = 0.001471 mm/hr
+// return Lel in mm/hr, i.e. (1/680) 1 W/m^2 = 0.001471 mm/hr
 double
 SVAT_PMSW::production_stress () const
 { return pstress; }
@@ -1345,7 +1347,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
   // actual evapotranspiration, from soil and canopy, from tick()
   eact=0.1*soil_ea;
 
-  // convert epotc, epots and eact etc. from cm/hr to W/m**2
+  // convert epotc, epots and eact etc. from cm/hr to W/m^2
   epotc_w=6800.0*epotc;
   epots_w=6800.0*epots;
   eact_w =6800.0*eact;
@@ -1379,7 +1381,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       // communication with weather_hourly.C
       e_pa = weather.vapor_pressure (); // [Pa]
       tair = weather.hourly_air_temperature (); // [C]
-      srad = weather.hourly_global_radiation (); // [W/m**2]
+      srad = weather.hourly_global_radiation (); // [W/m^2]
       u_ref = weather.wind (); // u_ref from reference plane [m/s]
       relsun_day = weather.hourly_cloudiness ();  // [-]
       prec = 1.10*weather.rain(); // [mm] corrected by 10 %
@@ -1442,15 +1444,15 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 
       // communication with soil_water.h
       // water flow positive to soil surface (LEs)
-      les_q=6800.0*soil_water.q(0); // in W/m**2
+      les_q=6800.0*soil_water.q(0); // in W/m^2
       // cout << "past les_q\n";
 
       // soil evap. is min[abs(-q0),epots]
       // when water infiltrates, i.e. les_q < 0, soil evaporation equals E_PM_wet
-      // convert [cm/hr] to [W/m**2]: 1 cm/hr = 6800 W/m**2
+      // convert [cm/hr] to [W/m^2]: 1 cm/hr = 6800 W/m^2
       if (les_q < 0.0) les=evaps_w;
-      else if (les_q <= evaps_w) les=les_q;  // [W/m**2]
-      else les=evaps_w;  // [W/m**2]
+      else if (les_q <= evaps_w) les=les_q;  // [W/m^2]
+      else les=evaps_w;  // [W/m^2]
 
       // communication with soil.h
       kh=soil.heat_conductivity(0, theta_0, soil_water.X_ice (0))
@@ -1568,8 +1570,8 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       tcan=x[1][1]-273.15;  // in degrees C
       tskin=x[2][1]-273.15; // in degrees C
       tleaf=x[3][1]-273.15; // in degrees C
-      e_c_abs=x[4][1];  // e_c in kg/m**3
-      e_sl_abs=x[5][1]; // e_sl in kg/m**3
+      e_c_abs=x[4][1];  // e_c in kg/m^3
+      e_sl_abs=x[5][1]; // e_sl in kg/m^3
 
       tcan_prev=tcan; // save tcan for use in RAASTAB()
 */
@@ -1653,8 +1655,8 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       tcan=x[1][1]-273.15;  // in degrees C
       tskin=x[2][1]-273.15; // in degrees C
       tleaf=x[3][1]-273.15; // in degrees C
-      e_c_abs=x[4][1];  // e_c in kg/m**3
-      e_sl_abs=x[5][1]; // e_sl in kg/m**3
+      e_c_abs=x[4][1];  // e_c in kg/m^3
+      e_sl_abs=x[5][1]; // e_sl in kg/m^3
 
       tcan_prev=tcan; // save tcan for use in RAASTAB()
 
@@ -1667,11 +1669,14 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
                canopy_ea,r_sc,lel,f1_dolman,f_def,f_3,env_lai_factor,f_etep,
                rcmin_star,pstress,r_sc_js);
 
-      // convert vapor pressure from kg/m**3 to Pa
+      // convert vapor pressure from kg/m^3 to Pa
       EABS2PA(e_c_abs,tcan,e_c);  // at canopy temperature
       EABS2PA(e_sl_abs,tleaf,e_sl); // at leaf temperature
+#if 0
+      // abraham 11-03-2002:  BUG: uninitialised and unused variables.
       EABS2PA(e_c_abs_star,tcan_star,e_c_star);  // at canopy temperature
       EABS2PA(e_sl_abs_star,tleaf_star,e_sl_star); // at leaf temperature
+#endif
 
       // solve directly for dt by closure(dt)=netrad-le(dt)-h(dt)-g(dt)
       // One layer model: use r_a from RASTAB ()
@@ -1745,42 +1750,44 @@ SVAT_PMSW::output (Log& log) const
 }
 
 SVAT_PMSW::SVAT_PMSW (const AttributeList& al)
-  : SVAT (al)
-#if 1
-  ,
-  r_sc (100.0),    // arbitrary (dummy) initial value
-  lel (100.0),     // arbitrary (dummy) initial value
-  albedo (al.number ("albedo")),
-  b1 (al.number ("b1")),
-  b2 (al.number ("b2")),
-  b3 (al.number ("b3")),
-  b4 (al.number ("b4")),
-  alpha_r (al.number ("alpha_r")),
-  ndif (al.number ("ndif")),
-  c_d (al.number ("c_d")),
-  z_0s (al.number ("z_0s")),
-  z0_def (al.number ("z0_def")),
-  w (al.number ("w")),
-  alpha_u (al.number ("alpha_u")),
-  arac (al.number ("arac")),
-  alpha_k (al.number ("alpha_k")),
-  theta_w (al.number ("theta_w")),
-  theta_c (al.number ("theta_c")),
-  tmin (al.number ("tmin")),
-  tmax (al.number ("tmax")),
-  nu_1 (al.number ("nu_1")),
-  nu_2 (al.number ("nu_2")),
-  nu_3 (al.number ("nu_3")),
-  rcmin_const (al.number ("rcmin_const")),
-  rcmax (al.number ("rcmax")),
-  tref (al.number ("tref")),
-  zeta (al.number ("zeta")),
-  f3const (al.number ("f3const")),
-  spar (al.number ("spar")),
-  dt1 (al.number ("dt1")),
-  dt2 (al.number ("dt2")),
-  acc (al.number ("acc"))
-#endif
+  : SVAT (al),
+    rcmin (1.0),		// BUG!  Totally bogus.  
+    // We use rcmin in RSCSTAR without ever setting it. abraham 11-03-2002.
+    albedo (al.number ("albedo")),
+    b1 (al.number ("b1")),
+    b2 (al.number ("b2")),
+    b3 (al.number ("b3")),
+    b4 (al.number ("b4")),
+    alpha_r (al.number ("alpha_r")),
+    ndif (al.number ("ndif")),
+    c_d (al.number ("c_d")),
+    z_0s (al.number ("z_0s")),
+    z0_def (al.number ("z0_def")),
+    w (al.number ("w")),
+    alpha_u (al.number ("alpha_u")),
+    arac (al.number ("arac")),
+    alpha_k (al.number ("alpha_k")),
+    theta_w (al.number ("theta_w")),
+    theta_c (al.number ("theta_c")),
+    tmin (al.number ("tmin")),
+    tmax (al.number ("tmax")),
+    nu_1 (al.number ("nu_1")),
+    nu_2 (al.number ("nu_2")),
+    nu_3 (al.number ("nu_3")),
+    rcmin_const (al.number ("rcmin_const")),
+    rcmax (al.number ("rcmax")),
+    tref (al.number ("tref")),
+    zeta (al.number ("zeta")),
+    f3const (al.number ("f3const")),
+    spar (al.number ("spar")),
+    r_sc_min (0.0),		// BUG: Init by abraham, 2002.
+    r_sc (100.0),    // arbitrary (dummy) initial value
+    tskin (0.0),		// BUG: Init by abraham, 2002.
+    pstress (0.0),		// BUG: Init by abraham, 2002.
+    lel (100.0),     // arbitrary (dummy) initial value
+    dt1 (al.number ("dt1")),
+    dt2 (al.number ("dt2")),
+    acc (al.number ("acc"))
 {
   // matrix definitions for stressed conditions
   a=matrix(1,NP,1,NP); // a=A in Ax=b
@@ -1872,10 +1879,9 @@ static struct SVAT_PMSWSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     SVAT::load_syntax (syntax, alist);
-#if 1
-    syntax.add ("netrad_brunt", "W/m**2", Syntax::LogOnly,
+    syntax.add ("netrad_brunt", "W/m^2", Syntax::LogOnly,
                 "Net radiation by Brunt");
-    syntax.add ("netlong_brunt", "W/m**2", Syntax::LogOnly,
+    syntax.add ("netlong_brunt", "W/m^2", Syntax::LogOnly,
                 "Net long radiation by Brunt");
     syntax.add ("r_a", "s/m", Syntax::LogOnly,
                 "bulk aerodynamic resistance, neutral conditions");
@@ -1905,17 +1911,17 @@ static struct SVAT_PMSWSyntax
                 "vapor pressure at mean source height");
     syntax.add ("e_sl_abs", "Pa", Syntax::LogOnly,
                 "saturated vapor pressure at leaf surface");
-    syntax.add ("ha", "W/m**2", Syntax::LogOnly,
+    syntax.add ("ha", "W/m^2", Syntax::LogOnly,
                 "Sensible heat flux from source- to screen height");
-    syntax.add ("hl", "W/m**2", Syntax::LogOnly,
+    syntax.add ("hl", "W/m^2", Syntax::LogOnly,
                 "Sensible heat flux from leaf to mean source");
-    syntax.add ("hs", "W/m**2", Syntax::LogOnly,
+    syntax.add ("hs", "W/m^2", Syntax::LogOnly,
                 "Sensible heat flux from soil to mean source");
-    syntax.add ("lea", "W/m**2", Syntax::LogOnly,
+    syntax.add ("lea", "W/m^2", Syntax::LogOnly,
                 "Latent heat flux from source- to screen height");
-    syntax.add ("lel", "W/m**2", Syntax::LogOnly,
+    syntax.add ("lel", "W/m^2", Syntax::LogOnly,
                 "Latent heat flux from leaf to mean source");
-    syntax.add ("gflux", "W/m**2", Syntax::LogOnly,
+    syntax.add ("gflux", "W/m^2", Syntax::LogOnly,
                 "Ground heat flux");
     syntax.add ("dtcta", "dg C", Syntax::LogOnly,
                 "Temperature gradient between mean source og screen height");
@@ -1929,11 +1935,11 @@ static struct SVAT_PMSWSyntax
                 "corrected temperature gradient between leaf and mean source");
     syntax.add ("dtstc_star", "dg C", Syntax::LogOnly,
                 "corrected temperature gradient between soil and mean source");
-    syntax.add ("theta_0_20", "cm3/cm3", Syntax::LogOnly,
+    syntax.add ("theta_0_20", "cm^3/cm^3", Syntax::LogOnly,
                 "Averaged soil water content in upper 20 cm");
-    syntax.add ("theta_0_50", "cm3/cm3", Syntax::LogOnly,
+    syntax.add ("theta_0_50", "cm^3/cm^3", Syntax::LogOnly,
                 "Averaged soil water content in upper 50 cm");
-    syntax.add ("theta_0_100", "cm3/cm3", Syntax::LogOnly,
+    syntax.add ("theta_0_100", "cm^3/cm^3", Syntax::LogOnly,
                 "Averaged soil water content in upper 100 cm");
     syntax.add ("f_1", Syntax::None (), Syntax::LogOnly,
                 "Constraint function (Noilhan) related to solar radiation");
@@ -1971,11 +1977,11 @@ static struct SVAT_PMSWSyntax
                 "LAI*F_i");
     syntax.add ("e_pa","Pa", Syntax::LogOnly,
                 "vapor pressure at 2 m");
-    syntax.add ("e_abs", "kg/m**3", Syntax::LogOnly,
+    syntax.add ("e_abs", "kg/m^3", Syntax::LogOnly,
                 "absolute vapor pressure");
     syntax.add ("tair", "degr.C", Syntax::LogOnly,
                 "air temperature");
-    syntax.add ("srad", "W/m**2", Syntax::LogOnly,
+    syntax.add ("srad", "W/m^2", Syntax::LogOnly,
                 "global radiation");
     syntax.add ("u_ref", "m/s", Syntax::LogOnly,
                 "friction velocity from ??");
@@ -2024,10 +2030,10 @@ static struct SVAT_PMSWSyntax
     syntax.add ("alpha_r", Syntax::None (), Syntax::Const,
                 "Att. coefficient for vegetation in ACOEFF()");
     alist.add ("alpha_r", 0.5);
-    syntax.add ("theta_w", "cm3/cm3", Syntax::Const,
+    syntax.add ("theta_w", "cm^3/cm^3", Syntax::Const,
                 "Soil water content at 'wilting point'");
     alist.add ("theta_w", 0.05);
-    syntax.add ("theta_c", "cm3/cm3", Syntax::Const,
+    syntax.add ("theta_c", "cm^3/cm^3", Syntax::Const,
                 "Soil water content at 'field capacity'");
     alist.add ("theta_c", 0.25);
     syntax.add ("rcmin_const", "s/m", Syntax::Const,
@@ -2073,7 +2079,6 @@ static struct SVAT_PMSWSyntax
     syntax.add ("acc", Syntax::None (), Syntax::Const,
                 "iteration accuracy in Newton-Raphson method");
     alist.add ("acc", 0.01);
-#endif
     Librarian<SVAT>::add_type ("PMSW", alist, syntax, &make);
   }
 } SVAT_PMSW_syntax;

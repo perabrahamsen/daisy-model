@@ -104,7 +104,9 @@ A location and content of a soil layer.");
       dispersivity (al.number ("dispersivity"))
   { }
   ~Implementation ()
-  { sequence_delete (layers.begin (), layers.end ()); }
+  { 
+    sequence_delete (layers.begin (), layers.end ()); 
+  }
 };
 
 double 

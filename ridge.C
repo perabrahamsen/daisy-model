@@ -352,7 +352,11 @@ Ridge::Implementation::update_water (const Soil& soil,
 	- q_p[i+1];
       Theta_[i] = Theta;
       h_[i] = h;
-      assert (approximate (soil.h (i, Theta), h));
+      if (!approximate (soil.h (i, Theta), h))
+	{
+	  assert (i > 0);
+	  throw ("Soil hydraulic paramteres change in ridge area");
+	}
     }
   assert (approximate (E, -(q[last_node + 1] + q_p[last_node + 1])));
 }

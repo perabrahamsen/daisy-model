@@ -263,6 +263,7 @@ Solute::~Solute ()
 { 
   delete &transport; 
   delete &reserve; 
+  delete &last_resort;
   delete &mactrans;
   delete &adsorption; 
 }

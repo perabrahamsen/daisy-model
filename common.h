@@ -144,5 +144,15 @@ void sequence_delete (ForwardIterator first, ForwardIterator last) {
     delete *first++;
 }
 
+template <class ForwardIterator>
+void map_delete (ForwardIterator first, ForwardIterator last) 
+{
+  while (first != last)
+    {
+      delete (*first).second;
+      (*first).second = NULL;
+      first++;
+    }
+}
 
 #endif // COMMON_H

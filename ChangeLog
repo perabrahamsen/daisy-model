@@ -1,4 +1,86 @@
+2002-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C (~RootSystem): Delete rootdens.
+
+	* svat_pmsw.C (tick): Commented out some code that used unused
+	variables, and set variables not used afterwards.
+	(SVAT_PMSW): Gave dummy values to some variables that are used,
+	but not set.
+
+2002-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (RaisingGWT): Added assertions.
+
+	* snow.C (Snow): Delete impl.
+	* transform_equil.C (~TransformEquilibrium): New function.
+	* equil_langmuir.C (~EquilibriumLangmuir): New function.
+	* am.C (~AM): Remove bogus assertion.
+	(~Implementation): Delete lock.
+	* select.C (Select): Delete impl.
+	(~Implementation): Delete spec.
+	* field.C (Field): Delete impl.
+	* soil_water.C (SoilWater): Delete reserve and bottom.
+	* solute.C (Solute): Delete last_resort.
+
+	* svat_pmsw.C (SVAT_PMSW): Initialise pstress.
+	Reorder initializations.
+
+	* librarian.h (map_create): Return value, not reference.
+	(map_create_const, map_construct, map_construct_const): Ditto.
+	* action_activity.C: Fix caller.
+	* action_lisp.C (ActionProgn::action): Ditto.
+	* action_while.C (ActionWhile::actions): Ditto.
+	* action_with.C: Ditto.
+	* condition_logic.C (ConditionOr::conditions): Ditto.
+	(ConditionAnd::conditions): Ditto.
+	* daisy.h, daisy.C (Daisy::logs): Ditto.
+	(Daisy::harvest): Ditto.
+
+	* action_lisp.C (~ActionCond, ~ActionIf): Remove CONST_DELETE
+	condition. 
+	* condition_logic.C (~ConditionOr, ~ConditionAnd): Ditto.
+
+	* action_lisp.C (~ActionCond): Delete actions.
+	* action_with.C (~ActionWithColumn): Delete actions.
+	* column_base.C (ColumnBase): Delete transformations.
+	* organic_matter.C (~Implementation): Delete am, smb, and som.
+	
+2002-03-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-old.dai, lib/log.dai ("N Balance 0-100 cm"): Moved. 
+	("Monthly N Balance 100 cm"): Ditto.
+	("Soil Chemicals 0-100 cm"): Ditto.
+	("Soil Chemical 0-100 cm"): Ditto.
+
+	* lib/log.dai ("Soil Chemicals"): Made hourly.
+	("Soil Chemical"): Ditto.
+
+	* select_date.C (SelectDateSyntax): Fix memory leak.
+	* chemicals.C (add_syntax): Ditto.
+	* library.C (Library): Ditto.
+	* soil_chemical.C (load_syntax): Ditto.
+	* action_lisp.C (ActionLispSyntax): Ditto.
+	* crop_old.C (CropOldSyntax): Ditto.
+	* crop_sold.C (CropSoldSyntax): Ditto.
+	* horizon.C (load_syntax): Ditto.
+	* soil_NH4.C (load_syntax): Ditto.
+	* soil_NO3.C (load_syntax): Ditto.
+	* bioclimate_std.C (BioclimateStandardSyntax): Ditto.
+	* alist.C (add): Ditto.
+
 2002-03-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai, lib/log-old.dai ("Soil Nitrate Concentration",
+	"Soil Water NO3 Concentration", "Root Zone Water Balance 0-100
+	cm"): Moved. 
+	* lib/log.dai ("Soil NO3 Concentration", "Soil NO3-N
+	Concentration"): New parameterizations.
+	("Root Zone Water Balance", "N Balance"): Made it hourly.
+
+	* uzrichard.C (q_darcy): Cleanup error messages.
+
+	* ridge.C (update_water): Better error message if hydraulic
+	properties are not uniform within ridge.
 
 	* Version 2.16 released.
 

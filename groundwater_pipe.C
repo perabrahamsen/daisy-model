@@ -368,7 +368,11 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
            def = dw;
            for (int j = i; j >= i_Eql; j--)
              {
+	       assert (j >= 0);
+	       assert (j < WaterDef.size ());
                def -= WaterDef[j];
+	       assert (j > 0);
+	       assert (j <= Percolation.size ());
                Percolation[j-1] = Percolation[j-1] - def / dt;
                if (def<=0.0) break;
              }
@@ -388,7 +392,11 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
            dw -= def;
            for (int j = i; j >= i_Eql; j--)
              {
+	       assert (j >= 0);
+	       assert (j < WaterDef.size ());
                def -= WaterDef[j];
+	       assert (j > 0);
+	       assert (j <= Percolation.size ());
                Percolation[j-1] -= def / dt;
                if (def<=0.0) break;
              }

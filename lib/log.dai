@@ -63,8 +63,10 @@
                      (factor 1e5))      ;g/cm^2 -> kg/ha
            ))
 
-(deflog "Soil Nitrate Concentration" table
-  (where "soil_nitrate_conc.dlf")
+(deflog "Soil NO3 Concentration" table
+  "Amount of nitrate in all numeric soil layers.
+This include both the nitrogen and oxygen atoms of the nitrate."
+  (where "soil_NO3.dlf")
   (when daily)
   (entries (year (path time))
            (month (path time))
@@ -73,8 +75,10 @@
                   (dimension "mg/l")
                   (factor 1.0e6))))     ;g/cm³ -> mg/l
 
-(deflog "Soil Water NO3 Concentration" table
-  (where "soil_NO3_conc.dlf")
+(deflog "Soil NO3-N Concentration" table
+  "Amount of nitrate nitrogen in all numeric soil layers.
+This include only nitrogen atoms of the nitrate."
+  (where "soil_NO3-N.dlf")
   (when daily)
   (entries (year (path time))
            (month (path time))
@@ -236,6 +240,7 @@ flow to drain pipes, and subsoil irrigation."
                    (dimension "mm"))))
 
 (deflog "Ridge" table
+  "All information about the Ridge subsystem."
   (where "ridge.dlf")
   (when hourly)
   (entries (year (path time))
@@ -268,11 +273,13 @@ flow to drain pipes, and subsoil irrigation."
                    (dimension "cm/&"))))
 
 (deflog "Root Zone Water Balance" table
+  "Enough information to create a water balance for the root zone."
   (where "root_zone_water_balance.dlf")
-  (when daily)
+  (when hourly)
   (entries (year (path time))
            (month (path time))
            (mday (path time))
+	   (hour (path time))
            (number (path weather "*" rain)
                    (when hourly)
                    (dimension "mm/&"))
@@ -354,17 +361,14 @@ flow to drain pipes, and subsoil irrigation."
                      (dimension "mm")
                      (factor 10))))     ;cm -> mm
 
-(deflog "Root Zone Water Balance 0-100 cm" "Root Zone Water Balance"
-  (where "root_zone_water_balance_000-100.dlf")
-  (from   0)
-  (to   -100))
-
 (deflog "N Balance" table
+  "Enough information to create a balance for the soil nitrogen."
   (where "N_balance.dlf")
-  (when daily)
+  (when hourly)
   (entries (year (path time))
            (month (path time))
            (mday (path time))
+	   (hour (path time))
            (number (path column "$col" fertilized_NH4)
                    (when hourly)
                    (tag "NH4-Fertilizer")
@@ -526,16 +530,8 @@ flow to drain pipes, and subsoil irrigation."
 		     (factor 1e5))      ;g/cm^2 -> kg/ha
            ))
 
-(deflog "N Balance 0-100 cm" "N Balance"
-  (where "N_balance_000-100.dlf")
-  (from   0)
-  (to   -100))
-
-(deflog "Monthly N Balance 100 cm" "N Balance 0-100 cm" 
-  (where "Monthly_N_balance_100cm.dlf")
-  (when monthly))
-
 (deflog "Soil Heat Balance" table
+  "All available information about the soil heat subsystem."
   (where "soil_heat_balance.dlf")
   (when hourly)
   (entries (year (path time))
@@ -690,6 +686,7 @@ flow to drain pipes, and subsoil irrigation."
                   (factor 2.7777777777777776e-07))))
 
 (deflog "Snow" table
+  "All available information about the snow subsystem."
   (where "snow.dlf")
   (when hourly)
   (entries (year (path time))
@@ -711,11 +708,14 @@ flow to drain pipes, and subsoil irrigation."
                    (factor 1000))))
 
 (deflog "Soil Chemicals" table
+  "Summary information about all soil chemicals.
+You cannot log individual chemicals with this model."
   (where "soil_chemicals.dlf")
-  (when daily)
+  (when hourly)
   (entries (year (path time))
            (month (path time))
            (mday (path time))
+	   (hour (path time))
            (flux_top (path column "$col" SoilChemicals solutes
 			   solute J)
                      (tag "In")
@@ -764,17 +764,16 @@ flow to drain pipes, and subsoil irrigation."
                      (dimension "g/ha")
                      (factor 1e8))))    ;g/cm^2 -> g/ha
 
-(deflog "Soil Chemicals 0-100 cm" "Soil Chemicals"
-  (where "soil_chemicals_000-100.dlf")
-  (from   0)
-  (to   -100))
-
 (deflog "Soil Chemical" table
+  "Information about a specific chemical in the soil.
+Use like (\"Soil Chemical\" (set \"$chem\" Atrazine)) to log the content of
+'Atrazine' in the soil."
   (where "soil_chemical.dlf")
-  (when daily)
+  (when hourly)
   (entries (year (path time))
            (month (path time))
            (mday (path time))
+	   (hour (path time))
            (flux_top (path column "$col" SoilChemicals solutes "$chem" 
 			   solute J)
                      (tag "In")
@@ -822,11 +821,6 @@ flow to drain pipes, and subsoil irrigation."
                      (tag "Content")
                      (dimension "g/ha")
                      (factor 1e8))))    ;g/cm^2 -> g/ha
-
-(deflog "Soil Chemical 0-100 cm" "Soil Chemical"
-  (where "soil_chemical_000-100.dlf")
-  (from    0 [cm])
-  (to   -100 [cm]))
 
 (deflog "Chemical" table
   (where "chemical.dlf")

@@ -735,4 +735,4 @@ Field::Field (const vector<AttributeList*>& sequence)
 { }
 
 Field::~Field ()
-{ }
+{ delete &impl; }

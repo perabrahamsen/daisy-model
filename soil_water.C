@@ -564,7 +564,12 @@ SoilWater::initialize (const AttributeList& al,
 
 SoilWater::~SoilWater ()
 {
+  assert (top);
   delete top;
+  if (bottom)
+    delete bottom;
+  assert (reserve);
+  delete reserve;
   delete &macro;
 }
 

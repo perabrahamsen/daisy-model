@@ -25,7 +25,7 @@
 
 struct ActionWhile : public Action
 {
-  const vector<Action*>& actions;
+  const vector<Action*> actions;
 
   void tick (const Daisy& daisy)
   { 
@@ -73,7 +73,6 @@ struct ActionWhile : public Action
   ~ActionWhile ()
   { 
     sequence_delete (actions.begin (), actions.end ());
-    delete &actions;
   }
 };
 

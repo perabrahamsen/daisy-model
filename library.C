@@ -56,9 +56,9 @@ struct Library::Implementation
     : name (n),
       derive (d),
       description (des)
-    { }
+  { }
   ~Implementation ()
-    { all->erase (all->find (name)); }
+  { all->erase (all->find (name)); }
 };
 
 map<string, Library*, less<string> >* Library::Implementation::all;
@@ -321,7 +321,7 @@ Library::Library (const char* name, derive_fun derive,
 
 Library::~Library ()
 { 
-#if 0
+#if 1
   // BCC doesn't like this.
   delete &impl; 
 #endif

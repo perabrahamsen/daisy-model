@@ -30,7 +30,7 @@
 struct ActionWithColumn : public Action
 {
   const string column;
-  vector<Action*>& actions;
+  vector<Action*> actions;
 
 public:
   void tick (const Daisy& daisy)
@@ -86,7 +86,7 @@ public:
   { }
 public:
   ~ActionWithColumn ()
-  { }
+  { sequence_delete (actions.begin (), actions.end ()); }
 };
 
 static struct ActionWithColumnSyntax

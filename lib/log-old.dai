@@ -71,4 +71,48 @@
                   (when hourly)
                   (dimension "mm/&"))))
 
+(deflog "Soil Nitrate Concentration" table
+  (where "soil_nitrate_conc.dlf")
+  (when daily)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+           (array (path column "$col" SoilNO3 C)
+                  (dimension "mg/l")
+                  (factor 1.0e6))))     ;g/cm³ -> mg/l
+
+(deflog "Soil Water NO3 Concentration" table
+  (where "soil_NO3_conc.dlf")
+  (when daily)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+           (array (path column "$col" SoilNO3 C)
+                  (dimension "mg/l")
+                  (factor 4.43e6))))     ;g NO3-N/cm³ -> mg NO3/l
+
+(deflog "Root Zone Water Balance 0-100 cm" "Root Zone Water Balance"
+  (where "root_zone_water_balance_000-100.dlf")
+  (from   0)
+  (to   -100))
+
+(deflog "N Balance 0-100 cm" "N Balance"
+  (where "N_balance_000-100.dlf")
+  (from   0)
+  (to   -100))
+
+(deflog "Monthly N Balance 100 cm" "N Balance 0-100 cm" 
+  (where "Monthly_N_balance_100cm.dlf")
+  (when monthly))
+
+(deflog "Soil Chemicals 0-100 cm" "Soil Chemicals"
+  (where "soil_chemicals_000-100.dlf")
+  (from   0)
+  (to   -100))
+
+(deflog "Soil Chemical 0-100 cm" "Soil Chemical"
+  (where "soil_chemical_000-100.dlf")
+  (from    0 [cm])
+  (to   -100 [cm]))
+
 ;;; log-old.dai ends here.

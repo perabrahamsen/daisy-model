@@ -480,7 +480,7 @@ RootSystem::RootSystem (const AttributeList& al)
 { }
 
 RootSystem::~RootSystem ()
-{ }
+{ delete &rootdens; }
 
 static Submodel::Register 
 root_system_submodel ("RootSystem", RootSystem::load_syntax);

@@ -465,7 +465,7 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("hydraulic", hydraulic_alist);
   syntax.add ("tortuosity", Librarian<Tortuosity>::library (), 
 	      "The soil tortuosity.");
-  AttributeList& tortuosity = *new AttributeList ();
+  AttributeList tortuosity;
   tortuosity.add ("type", "M_Q");
   alist.add ("tortuosity", tortuosity);
   syntax.add ("clay", Syntax::None (), Check::non_negative (), Syntax::Const,

@@ -48,7 +48,7 @@ SoilNO3::load_syntax (Syntax& syntax, AttributeList& alist)
 If unspecified, initial value will be 50 mg NO3/l.");
   Solute::load_syntax (syntax, alist);
   // Use "none" adsorption by default.
-  AttributeList& none = *new AttributeList ();
+  AttributeList none;
   none.add ("type", "none");
   alist.add ("adsorption", none);
 }

@@ -46,6 +46,7 @@ public:
   void initialize (const Soil&);
 public:
   EquilibriumLangmuir (const AttributeList& al);
+  ~EquilibriumLangmuir ();
 };
 
 void
@@ -138,6 +139,14 @@ EquilibriumLangmuir::EquilibriumLangmuir (const AttributeList& al)
     K = al.number_sequence ("K");
   if (al.check ("my_max"))
     my_max = al.number_sequence ("my_max");
+}
+
+EquilibriumLangmuir::~EquilibriumLangmuir ()
+{ 
+  if (pedo_K)
+    delete pedo_K;
+  if (pedo_my_max)
+    delete pedo_my_max;
 }
 
 static struct EquilibriumLangmuirSyntax

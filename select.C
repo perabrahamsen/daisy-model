@@ -293,7 +293,12 @@ Select::Implementation::Implementation (const AttributeList& al)
 { }
   
 Select::Implementation::~Implementation ()
-{ delete &condition; }
+{ 
+  if (spec)
+    delete spec;
+  if (condition)
+    delete condition; 
+}
 
 
 const Geometry* 
@@ -491,4 +496,4 @@ Select::Select (const AttributeList& al)
 { }
 
 Select::~Select ()
-{ }
+{ delete &impl; }

@@ -26,7 +26,7 @@ Use it like this
 The will stop root death when soil soil freeze, and let it gradually
 grow to full power when the soil temeprature reached 10 dg C.
 
-** New Precipitation-Correction keuword for the default weather model.
+** New PrecipCorrect keyword for the default weather model.
 
 Add a 
 

@@ -33,8 +33,8 @@
 struct TransformEquilibrium : public Transform
 {
   // Parameters.
-  const string& name_A;
-  const string& name_B;
+  const string name_A;
+  const string name_B;
   /* const */ Equilibrium& equilibrium;
   vector<double> k_AB;
   vector<double> k_BA;
@@ -52,6 +52,7 @@ struct TransformEquilibrium : public Transform
   bool check (const Soil&, Treelog& err) const;
   void initialize (const Soil&);
   TransformEquilibrium (const AttributeList& al);
+  ~TransformEquilibrium ();
 };
 
 void
@@ -157,6 +158,15 @@ TransformEquilibrium::TransformEquilibrium (const AttributeList& al)
     k_AB = al.number_sequence ("k_AB");
   if (al.check ("k_BA"))
     k_BA = al.number_sequence ("k_BA");
+}
+
+TransformEquilibrium::~TransformEquilibrium ()
+{
+  delete &equilibrium;
+  if (pedo_AB)
+    delete pedo_AB;
+  if (pedo_BA)
+    delete pedo_BA;
 }
 
 static struct TransformEquilibriumSyntax

@@ -713,7 +713,7 @@ Number of vertical intervals in which we partition the canopy.");
       // Water going through soil surface.
       syntax.add ("svat", Librarian<SVAT>::library (), 
 		  "Soil Vegetation Atmosphere component.");
-      AttributeList& svat_alist = *new AttributeList;
+      AttributeList svat_alist;
       svat_alist.add ("type", "none");
       alist.add ("svat", svat_alist);
       syntax.add ("soil_ep", "mm/h", Syntax::LogOnly,

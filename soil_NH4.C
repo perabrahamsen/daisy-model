@@ -51,7 +51,7 @@ SoilNH4::load_syntax (Syntax& syntax, AttributeList& alist)
 If unspecified, initial value will be 5 mg NH4/l (including adsorbed).");
   Solute::load_syntax (syntax, alist); 
   // Use linear adsorption by default.
-  AttributeList& linear = *new AttributeList ();
+  AttributeList linear;
   linear.add ("type", "linear");
   linear.add ("K_clay", 117.116);
   alist.add ("adsorption", linear);

@@ -51,7 +51,7 @@ struct ActionT : public Action
 
 struct ActionProgn : public Action
 {
-  vector<Action*>& actions;
+  vector<Action*> actions;
 
   void tick (const Daisy& daisy)
   { 
@@ -98,10 +98,7 @@ struct ActionProgn : public Action
   { }
 
   ~ActionProgn ()
-  { 
-    sequence_delete (actions.begin (), actions.end ());
-    delete &actions;
-  }
+  { sequence_delete (actions.begin (), actions.end ()); }
 };
 
 struct clause
@@ -217,10 +214,9 @@ struct ActionCond : public Action
     for (vector<clause>::const_iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
-      {
-#ifdef CONST_DELETE
-	delete (*i).condition;
-#endif
+      { 
+	delete (*i).condition; 
+	sequence_delete ((*i).actions.begin (), (*i).actions.end ());
       }
     delete &clauses;
   }
@@ -273,9 +269,7 @@ struct ActionIf : public Action
 
   ~ActionIf ()
   { 
-#ifdef CONST_DELETE
     delete &if_c;
-#endif
     delete &then_a;
     delete &else_a;
   }
@@ -359,7 +353,7 @@ otherwise perform the second action.");
     syntax.add ("else", Librarian<Action>::library (), 
 		"Action to perform if the condition is false.");
     syntax.order ("if", "then", "else");
-    AttributeList& nilAlist = *new AttributeList ();
+    AttributeList nilAlist;
     nilAlist.add ("type", "nil");
     alist.add ("else", nilAlist);
     Librarian<Action>::add_type ("if", alist, syntax, &make_if);

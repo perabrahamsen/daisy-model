@@ -641,7 +641,7 @@ CropSoldSyntax::CropSoldSyntax ()
 
   // Submodels.
   Syntax& Canopy = *new Syntax ();
-  AttributeList& vCanopy = *new AttributeList ();
+  AttributeList vCanopy;
   Syntax& Devel = *new Syntax ();
   Syntax& Vernal = *new Syntax ();
   Syntax& LeafPhot = *new Syntax ();
@@ -649,17 +649,17 @@ CropSoldSyntax::CropSoldSyntax ()
   Syntax& Partit = *new Syntax ();
   Syntax& Resp = *new Syntax ();
   Syntax& CrpN = *new Syntax ();
-  AttributeList& CrpNList = *new AttributeList ();
+  AttributeList CrpNList;
   Syntax& Harvest = *new Syntax ();
-  AttributeList& HarvestList = *new AttributeList ();
+  AttributeList HarvestList;
   Syntax& Phenology = *new Syntax ();
-  AttributeList& vPhenology = *new AttributeList ();
+  AttributeList vPhenology;
   Syntax& RootSys = *new Syntax ();
-  AttributeList& vRootSys = *new AttributeList ();
+  AttributeList vRootSys;
   Syntax& Prod = *new Syntax ();
-  AttributeList& vProd = *new AttributeList ();
+  AttributeList vProd;
   Syntax& CrpAux = *new Syntax ();
-  AttributeList& vCrpAux = *new AttributeList ();
+  AttributeList vCrpAux;
 
   // DevelPar
   Devel.add ("EmrTSum", "dg C d", Syntax::Const,

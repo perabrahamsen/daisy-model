@@ -25,7 +25,7 @@
 
 struct ActionActivity : public Action
 {
-  vector<Action*>& actions;
+  vector<Action*> actions;
 
   void tick (const Daisy& daisy)
   { 
@@ -78,10 +78,7 @@ struct ActionActivity : public Action
   { }
 
   ~ActionActivity ()
-  { 
-    sequence_delete (actions.begin (), actions.end ());
-    delete &actions;
-  }
+  { sequence_delete (actions.begin (), actions.end ()); }
 };
 
 static struct ActionActivitySyntax

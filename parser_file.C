@@ -919,9 +919,7 @@ ParserFile::ParserFile (const AttributeList& al)
 {  }
 
 ParserFile::~ParserFile ()
-{ 
-  delete &impl; 
-}
+{ delete &impl; }
 
 static struct ParserFileSyntax
 {

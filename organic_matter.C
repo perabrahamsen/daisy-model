@@ -119,6 +119,7 @@ struct OrganicMatter::Implementation
   AM* find_am (const string& sort, const string& part) const;
   void initialize (const AttributeList&, const Soil&);
   Implementation (const AttributeList&);
+  ~Implementation ();
 };
 
 void
@@ -436,12 +437,9 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   sort (added.begin (), added.end (), om_compare);
   
   // Clear logs.
-  for (unsigned int i = 0; i < soil.size (); i++)
-    {
-      CO2[i] = 0.0;		
-      NO3_source[i] = 0.0;
-      NH4_source[i] = 0.0;
-    }
+  fill (CO2.begin (), CO2.end (), 0.0);
+  fill (NO3_source.begin (), NO3_source.end (), 0.0);
+  fill (NH4_source.begin (), NH4_source.end (), 0.0);
   top_CO2 = 0.0;
 
   // Setup arrays.
@@ -518,11 +516,14 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 
       const double NH4 = (soil_NH4.M_left (i) < 1e-9) // 1 mg/l
 	? 0.0 : soil_NH4.M_left (i) * K_NH4;
+      assert (NH4 >= 0.0);
 
       if (N_used[i] > NH4)
 	{
 	  NH4_source[i] = -NH4 / dt;
 	  NO3_source[i] = (NH4 - N_used[i]) / dt;
+	  assert (NH4_source[i] <= 0.0);
+	  assert (NO3_source[i] <= 0.0);
 	}
       else
 	{
@@ -830,6 +831,13 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
 { 
   if (al.check ("tillage_age"))
     tillage_age = al.number_sequence ("tillage_age");
+}
+
+OrganicMatter::Implementation::~Implementation ()
+{
+  sequence_delete (am.begin (), am.end ());
+  sequence_delete (smb.begin (), smb.end ());
+  sequence_delete (som.begin (), som.end ());
 }
 
 void 

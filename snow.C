@@ -416,6 +416,6 @@ Snow::Snow (const AttributeList& al)
 { }
 
 Snow::~Snow ()
-{ }
+{ delete &impl; }
 
 static Submodel::Register snow_submodel ("Snow", Snow::load_syntax);
