@@ -70,6 +70,9 @@ inline double safe_pow (double x, double y, const char* file, int line)
   Assertion::failure (file, line, "pow", "x >= 0");
 }
 
+inline double safe_pow (double x, int y, const char*, int)
+{ return (pow)(x, y); }
+
 inline double safe_sqrt (double x, const char* file, int line)
 {
   if (x >= 0)

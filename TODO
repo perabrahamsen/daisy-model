@@ -2,8 +2,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * OrganicMatter
 
-** Max og min somfractions i initialisering.
-
 ** Ny horizon->turnover_factor singleton parameter
 
 Påvirker alle puljer.

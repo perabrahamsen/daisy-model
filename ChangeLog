@@ -1,3 +1,11 @@
+2003-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.69 released.
+
+2003-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* mathlib.h (safe_pow): Added integer version.
+
 2003-04-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.68 released.
