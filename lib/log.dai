@@ -123,7 +123,6 @@
 (deflog "Soil Temperature" table
   (where "soil_temperature.tab")
   (when (hour 0))
-  (array_separator " ")
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -1170,12 +1169,32 @@
 		   (tag "SOIL_C")
 		   (dimension "kg C/ha")
 		   (factor 10))		;g/m^2 -> kg/ha
+	   (interval (path column "$col" OrganicMatter am "*"
+			   "?bio/incorporation" om C)
+		     (tag "SOIL2_N")
+		     (dimension "kg N/ha")
+		     (factor 42e5))		;g/cm^2 -> kg/ha
+	   (interval (path column "$col" OrganicMatter am "*"
+			   "?bio/incorporation" om N) 
+		     (tag "SOIL2_C")
+		     (dimension "kg C/ha")
+		     (factor 42e5))		;g/cm^2 -> kg/ha
 	   (number (path column "$col" OrganicMatter am "*" om top_N)
 		   (tag "TOP_N")
 		   (dimension "kg N/ha")
 		   (factor 1e5))	;g/cm^2 -> kg/ha
 	   (number (path column "$col" OrganicMatter am "*" om top_C)
 		   (tag "TOP_C")
+		   (dimension "kg C/ha")
+		   (factor 1e5))	;g/cm^2 -> kg/ha
+	   (number (path column "$col" OrganicMatter am "*"
+			 "?bio/incorporation" om top_N)
+		   (tag "TOP2_N")
+		   (dimension "kg N/ha")
+		   (factor 1e5))	;g/cm^2 -> kg/ha
+	   (number (path column "$col" OrganicMatter am "*"
+			 "?bio/incorporation" om top_C)
+		   (tag "TOP2_C")
 		   (dimension "kg C/ha")
 		   (factor 1e5))	;g/cm^2 -> kg/ha
 	   (number (path column "$col" OrganicMatter Bioincorporation N)
