@@ -9,32 +9,6 @@
 
 (defcolumn "mini" default
   (description "MiniDaisy default column parameters.")
-  (SoilWater (UZtop richards))
-  (OrganicMatter (som ((turnover_rate 1.125e-7)
-		       (efficiency 0.60 0.60)
-		       (fractions 1.0 0.0 0.0 0.0))
-		      ((turnover_rate 5.83333333333e-6)
-		       (efficiency 0.60 0.60)
-		       (fractions 0.9 0.0 0.1 0.0)))
-		 (smb ((C_per_N 6)
-		       (turnover_rate 4.16666666667e-5)
-		       (efficiency 0.60 0.60)
-		       (maintenance 4.16666666667e-4) ;0.01/24h
-		       (fractions 0.0 0.4 0.0 0.6))
-		      ((C_per_N 10)
-		       (turnover_rate 4.16666666667e-4)
-		       (efficiency 0.60 0.60)
-		       (maintenance 4.16666666667e-4) ;0.01/24h
-		       (fractions 0.0 0.4 0.0 0.6)))
-		 (K_NH4 0.020833)	;0.5 / 24.
-		 (K_NO3 0.020833)	;0.5 / 24.
-		 (am))
-  (Nitrification soil
-  		 (k_10 2.08333333333e-7) ; 5e-5/24 [1/h]
-  		 (k 5.0e-5))		 ; [gN/cm³]
-
-  (Denitrification (K 0.0417)
-		   (alpha 0.1))
   (Bioclimate default))
 
 (defweather "mini" file)
