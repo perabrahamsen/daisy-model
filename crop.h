@@ -6,6 +6,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include "time.h"
 
 struct Log;
 struct Filter;
@@ -22,6 +23,34 @@ struct SoilNH4;
 struct SoilNO3;
 struct Column;
 struct AM;
+
+struct harvest_type 
+{
+  Time time;
+  string name;
+  double stem_C;
+  double stem_N;
+  double leaf_C;
+  double leaf_N;
+  double sorg_C;
+  double sorg_N;
+  double dead_C;
+  double dead_N;
+  harvest_type (Time t, string n, 
+		double sC, double sN, double lC, double lN, 
+		double oC, double oN, double dC, double dN)
+    : time (t),
+      name (n),
+      stem_C (sC),
+      stem_N (sN),
+      leaf_C (lC),
+      leaf_N (lN),
+      sorg_C (oC),
+      sorg_N (oN),
+      dead_C (dC),
+      dead_N (dN)
+  { }
+};      
 
 class Crop 
 {
@@ -48,10 +77,12 @@ public:
   virtual void tick (const Time& time, const Bioclimate&, const Soil&,
 		     const SoilHeat&, const SoilWater&,
 		     SoilNH4&, SoilNO3&) = 0;
-  virtual vector<AM*> harvest (const Time&, Column&, 
-				double stub_length,
-				double stem_harvest, double leaf_harvest, 
-				double sorg_harvest, double dead_harvest) = 0;
+  virtual const harvest_type& harvest (const Time&, Column&, 
+				       double stub_length,
+				       double stem_harvest,
+				       double leaf_harvest, 
+				       double sorg_harvest,
+				       double dead_harvest) = 0;
   void kill (const Time&, Column&);
   virtual void output (Log&, const Filter&) const = 0;
   

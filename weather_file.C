@@ -143,7 +143,7 @@ WeatherFile::GlobalRadiation () const	// [W/m^2]
 double
 WeatherFile::ReferenceEvapotranspiration () const // [mm/h]
 {
-  if (reference_evapotranspiration < 0)
+  if (reference_evapotranspiration < -10e10)
     {
       const double T = 273.16 + AirTemperature ();
       const double Delta = 5362.7 / pow (T, 2) * exp (26.042 - 5362.7 / T);
@@ -154,7 +154,7 @@ WeatherFile::ReferenceEvapotranspiration () const // [mm/h]
   return reference_evapotranspiration 
     * (1.0
        + A[m] * cos (2.0 * M_PI / 24.0 * h)
-       + B[m] * sin (2.0 * M_PI / 24.0 * h));
+       + B[m] * sin (2.0 * M_PI / 24.0 * h)) / 24.0;
 }
 
 double

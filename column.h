@@ -19,6 +19,7 @@ class OrganicMatter;
 class IM;
 class AM;
 class Crop;
+class harvest_type;
 
 class Column
 {
@@ -31,15 +32,25 @@ public:
   virtual void sow (const AttributeList& crop) = 0;
   virtual void irrigate (double flux, double temp, 
 			 const IM&, irrigation_from) = 0;
-  virtual void fertilize (AM&, double from, double to) = 0;
-  virtual void fertilize (AM&) = 0;
-  virtual void fertilize (const IM&, double from, double to) = 0;
+  virtual void fertilize (const AttributeList&, const Time&, // Organic.
+			  double from, double to) = 0;
+  virtual void fertilize (const AttributeList&, const Time&) = 0;
+  virtual void fertilize (const IM&, double from, double to) = 0; // Mineral.
   virtual void fertilize (const IM&) = 0;
-
-  virtual vector<AM*> harvest (const Time&, const string name,
-				double stub_length,
-				double stem_harvest, double leaf_harvest, 
-				double sorg_harvest, double dead_harvest) = 0;
+  virtual void fertilize (const Time&,  // Remains from harvest.
+			  const vector<const AttributeList*>& om,
+			  string name, string part, 
+			  double C, double N) = 0;
+  virtual void fertilize (const Time&, // // Root from harvest.
+			  const vector<const AttributeList*>& om, 
+			  string name, const vector<double>& density, 
+			  double C, double N) = 0;
+  virtual vector<const harvest_type*> harvest (const Time&, const string name,
+					       double stub_length,
+					       double stem_harvest,
+					       double leaf_harvest, 
+					       double sorg_harvest,
+					       double dead_harvest) = 0;
   virtual void mix (const Time&,
 		    double from, double to, double penetration = 1.0) = 0;
   virtual void swap (const Time&, double from, double middle, double to) = 0;

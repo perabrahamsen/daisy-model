@@ -89,10 +89,10 @@ public:
 	     const SoilWater&, 
 	     SoilNH4&,
 	     SoilNO3&);
-  vector<AM*> harvest (const Time&, Column&, 
-			double stub_length,
-			double stem_harvest, double leaf_harvest, 
-			double sorg_harvest, double dead_harvest);
+  const harvest_type& harvest (const Time&, Column&, 
+			       double stub_length,
+			       double stem_harvest, double leaf_harvest, 
+			       double sorg_harvest, double dead_harvest);
   void output (Log&, const Filter&) const;
 
   double DS () const;
@@ -230,11 +230,11 @@ struct CropStandard::Parameters
     const double CStraw;	// Normal straw concentration
     const double CSOrg;		// Sorg conc. at the end of the normal range
     const double alpha;		// Rel. inc. in straw conc. above normal range
-    const AttributeList& Stem;	// Stem AM parameters.
-    const AttributeList& Leaf;	// Leaf AM parameters.
-    const AttributeList& Dead;	// Dead AM parameters.
-    const AttributeList& SOrg;	// SOrg AM parameters.
-    const AttributeList& Root;	// Root AM parameters.
+    const vector<const AttributeList*>& Stem; // Stem AM parameters.
+    const vector<const AttributeList*>& Leaf; // Leaf AM parameters.
+    const vector<const AttributeList*>& Dead; // Dead AM parameters.
+    const vector<const AttributeList*>& SOrg; // SOrg AM parameters.
+    const vector<const AttributeList*>& Root; // Root AM parameters.
     const double C_Stem;	// C fraction of total weight.
     const double C_Leaf;	// C fraction of total weight.
     const double C_Dead;	// C fraction of total weight.
@@ -514,11 +514,11 @@ CropStandard::Parameters::HarvestPar::HarvestPar (const AttributeList& vl)
     CStraw (vl.number ("CStraw")),
     CSOrg (vl.number ("CSOrg")),
     alpha (vl.number ("alpha")),
-    Stem (vl.list ("Stem")),
-    Leaf (vl.list ("Leaf")),
-    Dead (vl.list ("Dead")),
-    SOrg (vl.list ("SOrg")),
-    Root (vl.list ("Root")),
+    Stem (vl.list_sequence ("Stem")),
+    Leaf (vl.list_sequence ("Leaf")),
+    Dead (vl.list_sequence ("Dead")),
+    SOrg (vl.list_sequence ("SOrg")),
+    Root (vl.list_sequence ("Root")),
     C_Stem (vl.number ("C_Stem")),
     C_Leaf (vl.number ("C_Leaf")),
     C_Dead (vl.number ("C_Dead")),
@@ -844,17 +844,20 @@ CropStandardSyntax::CropStandardSyntax ()
 
   // HarvestPar
   Syntax& Harvest = *new Syntax ();
+  AttributeList& HarvestList = *new AttributeList ();
+
   syntax.add ("Harvest", Harvest, Syntax::Const);
+  alist.add ("Harvest", HarvestList);
 
   Harvest.add ("beta", Syntax::Number, Syntax::Const);
   Harvest.add ("CStraw", Syntax::Number, Syntax::Const);
   Harvest.add ("CSOrg", Syntax::Number, Syntax::Const);
   Harvest.add ("alpha", Syntax::Number, Syntax::Const);
-  Harvest.add ("Stem", AM::library (), Syntax::Const);
-  Harvest.add ("Leaf", AM::library (), Syntax::Const);
-  Harvest.add ("Dead", AM::library (), Syntax::Const);
-  Harvest.add ("SOrg", AM::library (), Syntax::Const);
-  Harvest.add ("Root", AM::library (), Syntax::Const);
+  add_sequence<OM> ("Stem", Harvest, HarvestList);
+  add_sequence<OM> ("Leaf", Harvest, HarvestList);
+  add_sequence<OM> ("Dead", Harvest, HarvestList);
+  add_sequence<OM> ("SOrg", Harvest, HarvestList);
+  add_sequence<OM> ("Root", Harvest, HarvestList);
   Harvest.add ("C_Stem", Syntax::Number, Syntax::Const);
   Harvest.add ("C_Leaf", Syntax::Number, Syntax::Const);
   Harvest.add ("C_Dead", Syntax::Number, Syntax::Const);
@@ -1776,7 +1779,7 @@ CropStandard::tick (const Time& time,
   var.CrpAux.CanopyAss = 0.0;
 }
 
-vector<AM*> 
+const harvest_type&
 CropStandard::harvest (const Time& time, Column& column, 
 		       double stub_length,
 		       double stem_harvest, double leaf_harvest, 
@@ -1799,8 +1802,9 @@ CropStandard::harvest (const Time& time, Column& column,
   const double WRoot = Prod.WRoot;
   const double NCrop = Prod.NCrop;
 
-  const double WShoot = WSOrg + WLeaf + WStem;
   const double NDead = CrpN.NfLeafCnc (DS) * WDead;
+  const double WShoot = WSOrg + WLeaf + WStem;
+
   const double WAlive = WShoot + WRoot;
   const double C = (NCrop - NDead) / WAlive;
   const double B = WRoot / WAlive;
@@ -1813,10 +1817,10 @@ CropStandard::harvest (const Time& time, Column& column,
   const double WStraw = WLeaf + WStem;
   const double Climit = (CStraw * WStraw + CSOrg * WSOrg);
   
-  if (CShoot <= Climit)
-    {
-      CSOrg = (NShoot - CStraw * WStraw) / WSOrg;
-    }
+  if (WSOrg == 0)
+    CStraw = 1.0;
+  else if (CShoot <= Climit)
+    CSOrg = (NShoot - CStraw * WStraw) / WSOrg;
   else
     {
       CStraw = ((CStraw * WSOrg + alpha * (NShoot - CSOrg * WSOrg))
@@ -1826,10 +1830,11 @@ CropStandard::harvest (const Time& time, Column& column,
   const double NStraw = WStraw * CStraw;
   const double NSOrg = WSOrg * CSOrg;
 
-  assert (abs (NShoot / (NStraw + NSOrg) - 1.0) < 0.0001);
+  if (NShoot > 0.0)
+    assert (abs (NShoot / (NStraw + NSOrg) - 1.0) < 0.0001);
   
-  const double NStem = NStraw * (WStem / WStraw);
-  const double NLeaf = NStraw * (WLeaf / WStraw);
+  const double NStem = WStraw ? NStraw * (WStem / WStraw) : 0.0;
+  const double NLeaf = WStraw ? NStraw * (WLeaf / WStraw) : 0.0;
 
   const double C_Stem = Harvest.C_Stem;
   const double C_Leaf = Harvest.C_Leaf;
@@ -1837,36 +1842,17 @@ CropStandard::harvest (const Time& time, Column& column,
   const double C_Dead = Harvest.C_Dead;
   const double C_Root = Harvest.C_Root;
 
-  const AttributeList& Stem = Harvest.Stem;
-  const AttributeList& Leaf = Harvest.Leaf;
-  const AttributeList& SOrg = Harvest.SOrg;
-  const AttributeList& Dead = Harvest.Dead;
-  const AttributeList& Root = Harvest.Root;
+  const vector<const AttributeList*>& Stem = Harvest.Stem;
+  const vector<const AttributeList*>& Leaf = Harvest.Leaf;
+  const vector<const AttributeList*>& SOrg = Harvest.SOrg;
+  const vector<const AttributeList*>& Dead = Harvest.Dead;
+  const vector<const AttributeList*>& Root = Harvest.Root;
 
   const vector<double>& density = var.RootSys.Density;
   const double length = height ();
 
   if (stub_length < length)
     stem_harvest *= (1.0 - stub_length / length);
-
-  vector<AM*> harvest;
-
-  if (stem_harvest > 0.0)
-    harvest.push_back (&AM::create (time, Stem, name, "stem", 
-				     WStem * C_Stem * stem_harvest, 
-				     NStem * stem_harvest));
-  if (leaf_harvest > 0.0)
-    harvest.push_back (&AM::create (time, Leaf, name, "leaf", 
-				     WLeaf * C_Leaf * leaf_harvest, 
-				     NLeaf * leaf_harvest));
-  if (sorg_harvest > 0.0)
-    harvest.push_back (&AM::create (time, SOrg, name, "SOrg", 
-				     WSOrg * C_SOrg *  sorg_harvest,
-				     NSOrg * sorg_harvest));
-  if (dead_harvest > 0.0)
-    harvest.push_back (&AM::create (time, Dead, name, "dead", 
-				     WDead * C_Dead * dead_harvest,
-				     NDead * dead_harvest));
 
   const double DSmax = Harvest.DSmax;
 
@@ -1893,25 +1879,34 @@ CropStandard::harvest (const Time& time, Column& column,
 
       // Add crop remains to the soil.
       if (stem_harvest < 1.0)
-	column.fertilize (AM::create (time, Stem, name, "stem", 
-				       WStem * C_Stem * (1.0 - stem_harvest), 
-				       NStem * (1.0 - stem_harvest)));
+	column.fertilize (time, Stem, name, "stem", 
+			  WStem * C_Stem * (1.0 - stem_harvest), 
+			  NStem * (1.0 - stem_harvest));
       if (leaf_harvest < 1.0)
-	column.fertilize (AM::create (time, Leaf, name, "leaf", 
-				       WLeaf * C_Leaf * (1.0 - leaf_harvest), 
-				       NLeaf * (1.0 - leaf_harvest)));
+	column.fertilize (time, Leaf, name, "leaf", 
+			  WLeaf * C_Leaf * (1.0 - leaf_harvest), 
+			  NLeaf * (1.0 - leaf_harvest));
       if (sorg_harvest < 1.0)
-	column.fertilize (AM::create (time, SOrg, name, "SOrg", 
-				       WSOrg * C_SOrg * (1.0 - sorg_harvest),
-				       NSOrg * (1.0 - sorg_harvest)));
+	column.fertilize (time, SOrg, name, "SOrg", 
+			  WSOrg * C_SOrg * (1.0 - sorg_harvest),
+			  NSOrg * (1.0 - sorg_harvest));
       if (dead_harvest < 1.0)
-	column.fertilize (AM::create (time, Dead, name, "dead", 
-				       WDead * C_Dead * (1.0 - dead_harvest),
-				       NDead * (1.0 - dead_harvest)));
-      column.fertilize (AM::create (time, Root, name, "root", 
-				     WRoot * C_Root, NRoot, density));
+	column.fertilize (time, Dead, name, "dead", 
+			  WDead * C_Dead * (1.0 - dead_harvest),
+			  NDead * (1.0 - dead_harvest));
+      column.fertilize (time, Root, name, density, 
+			WRoot * C_Root, NRoot);
     }
-  return harvest;
+
+  return *new harvest_type (time, name, 
+			    WStem * C_Stem * stem_harvest, 
+			    NStem * stem_harvest,
+			    WLeaf * C_Leaf * leaf_harvest, 
+			    NLeaf * leaf_harvest,
+			    WSOrg * C_SOrg *  sorg_harvest, 
+			    NSOrg * sorg_harvest,
+			    WDead * C_Dead * dead_harvest,
+			    NDead * dead_harvest);
 }
 
 void

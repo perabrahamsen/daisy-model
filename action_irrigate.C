@@ -38,6 +38,7 @@ const double ActionIrrigate::at_air_temperature;
 void 
 ActionIrrigate::doIt (Daisy& daisy)
 {
+  cout << " [Irrigating]";
   double t = temp;
 
   if (temp == at_air_temperature) 

@@ -89,7 +89,7 @@ Soil::add (vector<double>& v, double from, double to, double amount) const
   for (unsigned i = 0; i < v.size () && old > to ; i++)
     {
       if (zplus_[i] < from)
-	v[i] += density * (min (old, from) - max (zplus_[i], to));
+	v[i] += density * (min (old, from) - max (zplus_[i], to)) / dz_[i];
       old = zplus_[i];
     }
 }

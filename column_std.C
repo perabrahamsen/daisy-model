@@ -45,14 +45,22 @@ public:
   void sow (const AttributeList& crop);
   void irrigate (double flux, double temp, 
 		 const IM&, irrigation_from);
-  void fertilize (AM&);
-  void fertilize (AM&, double from, double to);
+  void fertilize (const AttributeList&, const Time&);
+  void fertilize (const AttributeList&, const Time&, double from, double to);
   void fertilize (const IM&);
   void fertilize (const IM&, double from, double to);
-  vector<AM*> harvest (const Time&, const string name,
-			double stub_length,
-			double stem_harvest, double leaf_harvest, 
-			double sorg_harvest, double dead_harvest);
+  void fertilize (const Time&, const vector<const AttributeList*>&,
+		  string name, string part, 
+		  double C, double N);
+  void fertilize (const Time&, const vector<const AttributeList*>&,
+		  string name, const vector<double>& density, 
+		  double C, double N);
+  vector<const harvest_type*> harvest (const Time&, const string name,
+				       double stub_length,
+				       double stem_harvest,
+				       double leaf_harvest, 
+				       double sorg_harvest,
+				       double dead_harvest);
   void mix (const Time&, double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
 
@@ -96,17 +104,38 @@ ColumnStandard::irrigate (double flux, double temp,
 }
 
 void 
-ColumnStandard::fertilize (AM& am)
+ColumnStandard::fertilize (const Time& time, 
+			   const vector<const AttributeList*>& om, 
+			   string name, string part, 
+			   double C, double N)
 {
-  am.initialize (soil);
-  organic_matter.add (am);
+  vector<double> density;
+  organic_matter.add (AM::create (soil, time, om, name, part,
+				  C, N, density));
 }
 
 void 
-ColumnStandard::fertilize (AM& am, double from, double to)
+ColumnStandard::fertilize (const Time& time,
+			   const vector<const AttributeList*>& om, 
+			   string name, const vector<double>& density, 
+			   double C, double N)
+{
+  organic_matter.add (AM::create (soil, time, om, name, "root",
+				  C, N, density));
+}
+
+void 
+ColumnStandard::fertilize (const AttributeList& al, const Time& time)
+{
+  organic_matter.add (AM::create (al, soil, time));
+}
+
+void 
+ColumnStandard::fertilize (const AttributeList& al, const Time& time,
+			   double from, double to)
 {
   assert (to < from);
-  am.initialize (soil);
+  AM& am = AM::create (al, soil, time);
   am.mix (soil, from, to);
   organic_matter.add (am);
 }
@@ -121,27 +150,25 @@ void
 ColumnStandard::fertilize (const IM& im, 
 			   double from, double to)
 {
-  assert (to < from );
+  assert (to < from);
   soil_NO3.add (soil, soil_water, im.NO3, from, to);
   soil_NH4.add (soil, soil_water, im.NH4, from, to);
 }
 
-vector<AM*>
+vector<const harvest_type*>
 ColumnStandard::harvest (const Time& time, const string name,
 			 double stub_length,
 			 double stem_harvest, double leaf_harvest, 
 			 double sorg_harvest, double dead_harvest)
 {
-  vector<AM*> harvest;
+  vector<const harvest_type*> harvest;
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
     if ((*crop)->name == name)
       {
-	const vector<AM*> entry
-	  = (*crop)->harvest (time, *this, 
-			      stub_length, 
-			      stem_harvest, leaf_harvest,
-			      sorg_harvest, dead_harvest);
-	harvest.insert (harvest.end (), entry.begin (), entry.end ());
+	harvest.push_back (&(*crop)->harvest (time, *this, 
+					      stub_length, 
+					      stem_harvest, leaf_harvest,
+					      sorg_harvest, dead_harvest));
       }
   remove_if (crops.begin (), crops.end (), Crop::ds_remove);
 

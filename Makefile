@@ -2,7 +2,7 @@
 
 SHELL = /bin/sh
 MAKEFLAGS =
-CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -frepo -pipe #-O2 # -fhandle-exceptions -pipe -fno-implicit-templates
+CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -frepo -pipe # -O2 # -fhandle-exceptions -pipe -fno-implicit-templates
 SRCONLY = column_std.o  weather_simple.o uzrichard.o \
 	hydraulic_yolo.o hydraulic_M_vG.o hydraulic_B_vG.o hydraulic_M_C.o \
 	hydraulic_B_C.o hydraulic_M_BaC.o hydraulic_B_BaC.o \

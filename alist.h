@@ -117,6 +117,22 @@ struct map_create
   { return t; }
 };
 
+template <class T, class U> 
+struct map_create1
+{
+  vector<T*>& t;
+  map_create1 (const vector<const AttributeList*>& f, U u)
+    : t (*new vector<T*> ())
+  { 
+    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+	 i != f.end ();
+	 i++)
+      t.push_back (&T::create (**i, u));
+  }
+  operator vector<T*>& ()
+  { return t; }
+};
+
 template <class T> 
 struct map_construct
 {
@@ -128,6 +144,22 @@ struct map_construct
 	 i != f.end ();
 	 i++)
       t.push_back (new T (**i));
+  }
+  operator vector<T*>& ()
+  { return t; }
+};
+
+template <class T, class U> 
+struct map_construct1
+{
+  vector<T*>& t;
+  map_construct1 (const vector<const AttributeList*>& f, U u)
+    : t (*new vector<T*> ())
+  { 
+    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+	 i != f.end ();
+	 i++)
+      t.push_back (new T (**i, u));
   }
   operator vector<T*>& ()
   { return t; }

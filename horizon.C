@@ -310,7 +310,8 @@ double
 Horizon::heat_conductivity (double Theta, double Ice) const
 {
   const int entry = int (Theta * impl.intervals);
-  return (impl.K_ice[entry] * Ice + impl.K_water[entry] * (1.0 - Ice));
+  return (impl.K_ice[entry] * Ice + impl.K_water[entry] * (1.0 - Ice))
+    * 3600;			// W / cm / K -> J/h / cm / K
 }
 
 double

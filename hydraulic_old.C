@@ -35,7 +35,10 @@ public:
 double 
 HydraulicOld::Theta (const double h) const
 {
-  return -Thetam_ (-h);
+  if (h >= -1.0e-20)
+    return Theta_sat;
+  else
+    return -Thetam_ (-h);
 }
 
 double 
@@ -53,6 +56,7 @@ HydraulicOld::Cw2 (const double h) const
 double 
 HydraulicOld::h (const double Theta) const
 {
+  assert (Theta <= Theta_sat);
   return -hm_ (-Theta);
 }
 
@@ -90,11 +94,11 @@ HydraulicOld::HydraulicOld (const AttributeList& al)
       if (Theta_sat < 0.0)
 	const_cast<double&> (Theta_sat) = Theta;
       
-      const double h_minus = exp (pF);
+      const double h_minus = (pF < 1.0e-10) ? 0.0 : pow (10.0, pF);
 
       Thetam_.add (h_minus, -Theta);
-      Cw2_.add (h_minus, Cw2);
-      K_.add (h_minus, K);
+      Cw2_.add (h_minus, Cw2 * 1.0e-2);
+      K_.add (h_minus, K * 3.6e5);
     }
   
   if (!file.eof ())

@@ -406,7 +406,8 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 		{
 		  const string obj = al.name ("type");
 		  if (!lib.syntax (obj).check (al, obj))
-		    error (string ("Syntax error in `") + name + "'");
+		    error (string ("Error for member `") + obj 
+			   + "' in library `" + name + "'");
 		  atts.add (name, al);
 		}
 	    }

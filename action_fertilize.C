@@ -20,10 +20,9 @@ private:
 
 public:
   void doIt (Daisy&);
+  bool check (Daisy&) const;
 
   // Create and Destroy.
-public:
-  bool check (Daisy&) const;
 private:
   friend class ActionFertilizeSyntax;
   static Action& make (const AttributeList&);
@@ -35,54 +34,37 @@ public:
 void 
 ActionFertilize::doIt (Daisy& daisy)
 {
+  cout << " [Fertilizing " << am.name ("type") << "]";
   ColumnList& cl = daisy.columns;
   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
     {
       // Add inorganic matter.
-      (*i)->fertilize (IM (am), from, to);
+      if (to < from)
+	(*i)->fertilize (IM (am), from, to);
+      else 
+	(*i)->fertilize (IM (am));
+      
       // Add organic matter, if any.
-      if (am.number ("total_C_fraction") > 0.0)
+      if (am.name ("syntax") != "mineral")
 	{
-	  if ((*i)->check_am (am))
-	    {
-	      AM& aom =  AM::create (daisy.time, am);
-	      if (aom.check ())
-		{
-		  if (to < from)
-		    (*i)->fertilize (aom, from, to);
-		  else
-		    (*i)->fertilize (aom);
-		}
-	      else
-		cerr << "Not fertilizing.\n";
-	    }
+	  if (to < from)
+	    (*i)->fertilize (am, daisy.time, from, to);
 	  else
-	    cerr << "Ignoring malformed fertilizer\n";
+	    (*i)->fertilize (am, daisy.time);
 	}
     }
 }
 
 bool
-ActionFertilize::check (Daisy&) const
-{ 
-  bool ok = true;
-
-  if (!AM::check (am))
-    ok = false;
-  if (from > 0.0 || to > 0.0)
+ActionFertilize::check (Daisy& daisy) const
+{
+  ColumnList& cl = daisy.columns;
+  for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
     {
-      cerr << "You can only fertilize on or below the ground.\n";
-      ok = false;
+      if (am.name ("syntax") != "mineral" && !(*i)->check_am (am))
+	return false;
     }
-  if (from < to)
-    {
-      cerr << "from must be higher than to in the fertilization area.\n";
-      ok = false;
-    }
-  if (!ok)
-    cerr << "in fertilize action\n";
-
-  return ok;
+  return true;
 }
 
 ActionFertilize::ActionFertilize (const AttributeList& al)
@@ -103,18 +85,34 @@ ActionFertilize::make (const AttributeList& al)
 
 static struct ActionFertilizeSyntax
 {
-  ActionFertilizeSyntax ();
-} ActionFertilize_syntax;
+  static bool check (const AttributeList& al)
+  { 
+    bool ok = true;
+    const double from = al.number ("from");
+    const double to = al.number ("to");
 
-ActionFertilizeSyntax::ActionFertilizeSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  syntax.add ("am", AM::library ());
-  syntax.add ("from", Syntax::Number, Syntax::Const);
-  alist.add ("from", 0.0);
-  syntax.add ("to", Syntax::Number, Syntax::Const);
-  alist.add ("to", 0.0);
-  syntax.order ("am");
-  Action::add_type ("fertilize", alist, syntax, &ActionFertilize::make);
-}
+    if (from > 0.0 || to > 0.0)
+      {
+	cerr << "You can only fertilize on or below the ground.\n";
+	ok = false;
+      }
+    if (from < to)
+      {
+	cerr << "from must be higher than to in the fertilization area.\n";
+	ok = false;
+      }
+    return ok;
+  }
+  ActionFertilizeSyntax ()
+  { 
+    Syntax& syntax = *new Syntax (check);
+    AttributeList& alist = *new AttributeList ();
+    syntax.add ("am", AM::library ());
+    syntax.add ("from", Syntax::Number, Syntax::Const);
+    alist.add ("from", 0.0);
+    syntax.add ("to", Syntax::Number, Syntax::Const);
+    alist.add ("to", 0.0);
+    syntax.order ("am");
+    Action::add_type ("fertilize", alist, syntax, &ActionFertilize::make);
+  }
+} ActionFertilize_syntax;

@@ -7,6 +7,7 @@
 
 struct Syntax::Implementation
 {
+  check_fun checker;
   list<string> order;
   typedef map<string, type, less<string> > type_map;
   typedef map<string, category, less<string> > status_map;
@@ -25,6 +26,9 @@ struct Syntax::Implementation
   bool check (const AttributeList& vl, string name);
   Syntax::type lookup (string key) const;
   void dump (int indent) const;
+  Implementation (check_fun c)
+    : checker (c)
+  { }
 };    
 
 bool 
@@ -91,6 +95,9 @@ Syntax::Implementation::check (const AttributeList& vl, string name)
 	else if (!syntax[key]->check (vl.list (key), key))
 	  error = true;
     }
+  if (!error && checker && !checker (vl))
+    error = true;
+
   if (error)
     cerr << "in " << name << "\n";
 
@@ -359,7 +366,7 @@ Syntax::dump (int indent) const
   impl.dump (indent);
 }
 
-Syntax::Syntax () : impl (*new Implementation ())
+Syntax::Syntax (check_fun c) : impl (*new Implementation (c))
 { }
 
 Syntax::~Syntax ()
@@ -383,6 +390,19 @@ non_negative (double v, string s, bool& ok, int index)
   if (v < 0.0)
     {
       cerr << "Negative " << s;
+      if (index >= 0)
+	cerr << "[" << index << "]";
+      cerr << "\n";
+      ok = false;
+    }
+}
+
+void
+non_positive (double v, string s, bool& ok, int index)
+{
+  if (v > 0.0)
+    {
+      cerr << "Positive " << s;
       if (index >= 0)
 	cerr << "[" << index << "]";
       cerr << "\n";

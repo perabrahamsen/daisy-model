@@ -90,8 +90,14 @@ public:
   // Create and Destroy.
   void dump (int indent = 0) const;
 
-  Syntax ();
+  // A check_fun is a function used for extra syntax checking.
+  typedef bool (*check_fun)(const AttributeList&);
+
+  Syntax (check_fun = 0);
   ~Syntax ();
+private:
+  Syntax (Syntax&);
+  Syntax& operator= (Syntax&);
 };
 
 template <class T> 
@@ -122,6 +128,7 @@ struct add_sequence
 
 void check (const AttributeList& al, string s, bool& ok);
 void non_negative (double v, string s, bool& ok, int index = -1);
+void non_positive (double v, string s, bool& ok, int index = -1);
 void is_fraction (double v, string s, bool& ok, int index = -1);
 
 #endif SYNTAX_H

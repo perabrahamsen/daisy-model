@@ -42,9 +42,9 @@ private:
   // Create & Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  void initialize (const Soil& soil);
   OM (const AttributeList& al);
-  OM (const AttributeList& al, double C, double N);
+  OM (const AttributeList& al, const Soil& soil);
+  OM (const AttributeList& al, const Soil& soil, double C, double N);
 };
 
 #endif OM_H

@@ -14,12 +14,13 @@
 #include "mathlib.h"
 #include "csmp.h"
 #include <algorithm>
+#include <ieeefp.h>
 
 struct OrganicMatter::Implementation
 {
   // Content.
-  const double K_NH4;		// Absorption rate of NH4 from soil.
-  const double K_NO3;		// Absorption rate of NO3 from soil.
+  const double K_NH4;		// Immobilization rate of NH4.
+  const double K_NO3;		// Immobilization rate of NO3.
   vector<double> CO2;		// CO2 produced per time step.
   vector <AM*> am;		// Added Organic Matter.
   const vector<OM*> smb;	// Living Organic Matter.
@@ -31,7 +32,7 @@ struct OrganicMatter::Implementation
     const double turnover_rate;	// Absorption.
     const int where;		// Which SOM dk:pulje does it end in?
     void output (Log& log, const Filter& filter) const;
-    void tick (int i, double turnover_factor, double N_soil, double& N_used,
+    void tick (int i, double abiotic_factor, double N_soil, double& N_used,
 	       const vector<OM*>&);
     void mix (const Soil&, double from, double to);
     void swap (const Soil&, double from, double middle, double to);
@@ -71,22 +72,24 @@ OrganicMatter::Implementation::Buffer::output (Log& log,
 } 
 
 void
-OrganicMatter::Implementation::Buffer::tick (int i, double turnover_factor,
+OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
 					     double N_soil, double& N_used,
 					     const vector<OM*>& som)
 {
+  // assert (N_soil * 1.001 >= N_used);
   // How much can we process?
-  double rate = turnover_rate * turnover_factor;
+  double rate = turnover_rate * abiotic_factor;
   double N_need = C[i] * rate / som[where]->C_per_N[i]  - N[i] * rate;
 
-  // Check for NaN.
-  assert (N_need >= 0.0 || N_need <= 0.0);
-  assert (rate >= 0.0 || rate <= 1.0);
+  assert (finite (rate));
+  assert (finite (N_need));
   
-  if (N_need > N_soil - N_used)
+  if (N_need > N_soil - N_used && N[i] > 0.0)
     {
       rate = (N_soil - N_used) / (N[i] - C[i] / som[where]->C_per_N[i]);
+      assert (finite (rate));
       N_need = C[i] * rate / som[where]->C_per_N[i]  - N[i] * rate;
+      assert (finite (N_need));
       // Check that we calculated the right rate.
       assert ((N_soil == N_used)
 	      ? (abs (N_need) < 1e-10)
@@ -229,7 +232,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   for (int i = 0; i < soil.size (); i++)
     {
       CO2[i] = 0.0;		// Initialize for this time step.
-
+      
       const double NH4 = soil_NH4.M_left (i) * K_NH4;
       const double NO3 = soil_NO3.M_left (i) * K_NO3;
       const double N_soil = NH4	+ NO3;
@@ -238,24 +241,35 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 
       double N_used = 0.0;
 
-      const double turnover_factor 
+      const double abiotic_factor 
 	= heat_turnover_factor (soil_heat.T (i)) 
 	* water_turnover_factor (soil_water.pF (i));
 
-      const double clay_factor = turnover_factor * clay_turnover_factor [i];
+      const double clay_factor = abiotic_factor * clay_turnover_factor [i];
 
       // Handle all the OM dk:puljer
+      // assert (N_soil * 1.001 >= N_used);
       smb[0]->tick (i, clay_factor, N_soil, N_used, CO2[i], smb, som);
+      // assert (N_soil * 1.001 >= N_used);
       for (unsigned int j = 1; j < smb.size (); j++)
-	smb[j]->tick (i, turnover_factor, N_soil, N_used, CO2[i], smb, som);
+	smb[j]->tick (i, abiotic_factor, N_soil, N_used, CO2[i], smb, som);
       for (unsigned int j = 0; j < som.size (); j++)
 	som[j]->tick (i, clay_factor, N_soil, N_used, CO2[i], smb, som);
       for (unsigned int j = 0; j < added.size (); j++)
-	added[j]->tick (i, turnover_factor, N_soil, N_used, CO2[i],
+	added[j]->tick (i, abiotic_factor, N_soil, N_used, CO2[i],
 			smb, buffer.C[i], buffer.N[i]);
+      // assert (N_soil * 1.001 >= N_used);
 
       // Handle the buffer.
-      buffer.tick (i, turnover_factor, N_soil, N_used, som);
+      buffer.tick (i, abiotic_factor, N_soil, N_used, som);
+
+#if 0      
+      if (N_used > N_soil)
+	{
+	  cerr << "\nBUG: Adding " << N_used - N_soil << " mystery N\n";
+	  N_used = N_soil;
+	}
+#endif
 
       // Update soil solutes.
       if (N_used > NH4)
@@ -328,17 +342,21 @@ OrganicMatter::Implementation::create_som (const
 	missing_fraction = i;
 
       if (al[i]->check ("C_per_N"))
-	om[i]->initialize (soil);
+	{
+	  while (om[i]->C_per_N.size () < soil.size () +0U)
+	    om[i]->C_per_N.push_back 
+	      (om[i]->C_per_N[om[i]->C_per_N.size () - 1]);
+	}
       else
 	missing_C_per_N = i;
+      
+      assert (om[i]->C.size () == 0U);
     }
   
   if (!found_fraction)
     {
       // This is a checkpoint, no special intialization needed.
       assert (missing_C_per_N < 0);
-      for (int i = 0; i < size; i++)
-	om[i]->initialize (soil);
       return om;
     }
 
@@ -356,16 +374,11 @@ OrganicMatter::Implementation::create_som (const
   
       for (int i = 0; i < size; i++)
 	{
-	  if (i == missing_C_per_N)
+	  assert (om[i]->C.size () == l + 0U);
+	  om[i]->C.push_back (C * om_fraction[i]);
+	  if (i != missing_C_per_N)
 	    {
-	      assert (om[i]->C.size () == l + 0U);
-	      om[i]->C.push_back (C * om_fraction[i]);
-	    }
-	  else
-	    {
-	      om[i]->C[l] = C * om_fraction[i];
 	      assert (om[i]->C_per_N.size () == soil.size () +0U);
-	      assert (om[i]->C.size () == soil.size () + 0U);
 	      N -= om[i]->C[l] / om[i]->C_per_N[l];
 	    }
 	}
@@ -380,24 +393,92 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
 					       const AttributeList& al)
   : K_NH4 (al.number ("K_NH4")),
     K_NO3 (al.number ("K_NO3")),
-    am (map_create <AM> (al.list_sequence ("am"))),
-    smb (map_construct <OM> (al.list_sequence ("smb"))),
-    som (create_som (al.list_sequence ("som"), soil)),
+    am (map_create1 <AM, const Soil&> (al.list_sequence ("am"), soil)),
+    smb (map_construct1 <OM, const Soil&> (al.list_sequence ("smb"), soil)),
+    som (map_construct1 <OM, const Soil&> (al.list_sequence ("som"), soil)),
     buffer (soil, al.list ("buffer"))
 { 
-  for (int i = 0; i +0U < am.size (); i++)
-    am[i]->initialize (soil);
-  for (int i = 0; i +0U < smb.size (); i++)
-    smb[i]->initialize (soil);
-
+  // CO2.
   CO2.insert (CO2.end(), soil.size(), 0.0);
   
+  // Clay.
   for (int i = 0; i < soil.size (); i++)
     {
       const double a = 2.0;
       const double X_c_prime = 0.025;
       const double X_c = soil.clay (i);
       clay_turnover_factor.push_back (1.0 - a * (min (X_c, X_c_prime)));
+    }
+  
+  // Humus.
+  const vector<const AttributeList*>& som_al = al.list_sequence ("som");
+  const vector<const AttributeList*>& smb_al = al.list_sequence ("smb");
+
+  // Find total of fractions and missing C per N.
+  double total = 0.0;
+  int missing_C_per_N = -1;
+
+  for (unsigned int i = 0; i < som.size (); i++)
+    {
+      if (som_al[i]->check ("initial_fraction"))
+	total += som_al[i]->number ("initial_fraction");
+      if (som[i]->C_per_N.size () == 0)
+	{
+	  assert (missing_C_per_N == -1);
+	  missing_C_per_N = i;
+	}
+      else
+	assert (som[i]->C_per_N.size () == soil.size () + 0U);
+      assert (som[i]->C.size () == soil.size () + 0U);
+    }
+  for (unsigned int i = 0; i < smb.size (); i++)
+    {
+      if (smb_al[i]->check ("initial_fraction"))
+	total += smb_al[i]->number ("initial_fraction");
+
+      assert (smb[i]->C_per_N.size () == soil.size () + 0U);
+      assert (som[i]->C.size () == soil.size () + 0U);
+    }
+
+  // If any fractions were specified, distribute soil humus.
+  if (total > 0.0)
+    {
+      if (missing_C_per_N == -1)
+	THROW ("At least one C per N must be left unspecified in OM");
+
+      for (int l = 0; l < soil.size (); l++)
+	{
+	  const double C = soil.initial_C (l);
+	  double N = soil.initial_N (l);
+
+	  for (int i = 0; i +0U < som.size (); i++)
+	    {
+	      const double fraction 
+		= som_al[i]->check ("initial_fraction")
+		? som_al[i]->number ("initial_fraction")
+		: 0.0;
+
+	      som[i]->C[l] = C * fraction / total;
+	      if (missing_C_per_N != i)
+		N -= som[i]->C[l] / som[i]->C_per_N[l];
+	    }
+	  for (int i = 0; i +0U < smb.size (); i++)
+	    {
+	      const double fraction 
+		= smb_al[i]->check ("initial_fraction")
+		? smb_al[i]->number ("initial_fraction")
+		: 0.0;
+
+	      smb[i]->C[l] = C * fraction / total;
+	      N -= smb[i]->C[l] / smb[i]->C_per_N[l];
+	    }
+	  assert (som[missing_C_per_N]->C_per_N.size () == l + 0U);
+	  if (N <= 0.0)
+	    THROW ("Used up all N in OrganicMatter initialization");
+	  const double missing = som[missing_C_per_N]->C[l] / N;
+	  som[missing_C_per_N]->C_per_N.push_back (missing);
+	  assert (som[missing_C_per_N]->C_per_N[l] >= 0.0);
+	}
     }
 }
 

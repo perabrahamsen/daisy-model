@@ -25,17 +25,6 @@ class ActionMix : public Action
       }
   }
 
-  bool check (Daisy&) const
-  {
-    bool ok = true;
-    is_fraction (penetration, "penetration", ok);
-    non_negative (depth, "depth", ok);
-    if (!ok)
-      cerr << "in mix action\n";
-    return ok;
-  }
-
-
   // Create and Destroy.
   friend class ActionMixSyntax;
   static Action& make (const AttributeList& al)
@@ -51,19 +40,28 @@ public:
 
 static struct ActionMixSyntax
 {
-  ActionMixSyntax ();
+  static bool check (const AttributeList& al)
+  {
+    const double penetration (al.number ("penetration"));
+    const double depth (al.number ("depth"));
+    bool ok = true;
+    is_fraction (penetration, "penetration", ok);
+    non_positive (depth, "depth", ok);
+    if (!ok)
+      cerr << "in mix action\n";
+    return ok;
+  }
+  ActionMixSyntax ()
+  { 
+    Syntax& syntax = *new Syntax (check);
+    AttributeList& alist = *new AttributeList ();
+    syntax.add ("depth", Syntax::Number, Syntax::Const);
+    syntax.order ("depth");
+    syntax.add ("penetration", Syntax::Number, Syntax::Const);
+    alist.add ("penetration", 0.0);
+    Action::add_type ("mix", alist, syntax, &ActionMix::make);
+  }
 } ActionMix_syntax;
-
-ActionMixSyntax::ActionMixSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  syntax.add ("depth", Syntax::Number, Syntax::Const);
-  syntax.order ("depth");
-  syntax.add ("penetration", Syntax::Number, Syntax::Const);
-  alist.add ("penetration", 0.0);
-  Action::add_type ("mix", alist, syntax, &ActionMix::make);
-}
 
 class ActionSwap : public Action
 {
@@ -74,26 +72,13 @@ class ActionSwap : public Action
   // Simulation.
   void doIt (Daisy& daisy)
   {
+    cout << " [Tillage]";
+
     ColumnList& cl = daisy.columns;
     for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
       {
 	(*i)->swap (daisy.time, 0.0, middle, depth);
       }
-  }
-
-  bool check (Daisy&) const
-  {
-    bool ok = true;
-    non_negative (middle, "middle", ok);
-    non_negative (depth, "depth", ok);
-    if (middle <= depth)
-      {
-	cerr << "swap middle should be above the depth\n";
-	ok = false;
-      }
-    if (!ok)
-      cerr << "in swap action\n";
-    return ok;
   }
 
   // Create and Destroy.
@@ -111,14 +96,29 @@ public:
 
 static struct ActionSwapSyntax
 {
-  ActionSwapSyntax ();
+  static bool check (const AttributeList& al)
+  {
+    const double middle (al.number ("middle"));
+    const double depth (al.number ("depth"));
+    bool ok = true;
+    non_positive (middle, "middle", ok);
+    non_positive (depth, "depth", ok);
+    if (middle <= depth)
+      {
+	cerr << "swap middle should be above the depth\n";
+	ok = false;
+      }
+    if (!ok)
+      cerr << "in swap action\n";
+    return ok;
+  }
+  ActionSwapSyntax ()
+  {
+    Syntax& syntax = *new Syntax (check);
+    AttributeList& alist = *new AttributeList ();
+    syntax.add ("middle", Syntax::Number, Syntax::Const);
+    syntax.add ("depth", Syntax::Number, Syntax::Const);
+    Action::add_type ("swap", alist, syntax, &ActionSwap::make);
+  }
 } ActionSwap_syntax;
 
-ActionSwapSyntax::ActionSwapSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  syntax.add ("middle", Syntax::Number, Syntax::Const);
-  syntax.add ("depth", Syntax::Number, Syntax::Const);
-  Action::add_type ("swap", alist, syntax, &ActionSwap::make);
-}

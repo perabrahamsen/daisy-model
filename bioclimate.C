@@ -176,13 +176,17 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
   else
     EpFactor = soil.EpFactor ();
 
-  PotEvapotranspiration = EpFactor * weather.ReferenceEvapotranspiration ();
+  double ref_evapo = weather.ReferenceEvapotranspiration ();
+  if (ref_evapo < 0.0)
+    ref_evapo = 0.0;
+  
+  PotEvapotranspiration = EpFactor * ref_evapo;
 
   double PotSoilEvaporation = PotEvapotranspiration
     * exp (- EpExtinction * LAI);
   
   double PotCanopyEvapotranspiration =
-    EpFactor * weather.ReferenceEvapotranspiration () - PotSoilEvaporation;
+    EpFactor * ref_evapo - PotSoilEvaporation;
   
   double WaterFromAbove = weather.Rain ();
   if (irrigation_type == Column::top_irrigation)

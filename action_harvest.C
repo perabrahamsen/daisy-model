@@ -18,7 +18,7 @@ private:
   const double leaf;
   const double sorg;
   const double dead;
-  vector <AM*> harvest;
+  vector <const harvest_type*> harvest;
 
 public:
   void doIt (Daisy&);
@@ -35,10 +35,11 @@ public:
 void 
 ActionHarvest::doIt (Daisy& daisy)
 {
+  cout << " [Harvesting " << name << "]";
   ColumnList& cl = daisy.columns;
   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
     { 
-      vector<AM*> entry
+      vector<const harvest_type*> entry
 	= (*i)->harvest (daisy.time, name, stub, stem, leaf, sorg, dead);
       harvest.insert (harvest.end (), entry.begin (), entry.end ());
     }

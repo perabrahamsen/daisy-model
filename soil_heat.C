@@ -250,7 +250,7 @@ SoilHeat::Implementation::Implementation (const Soil& soil,
       C += soil.dz (i) * soil.heat_capacity (i, Theta_pF_2_0);
     }
   const double a = k / C;
-  const double d = sqrt (2.0 * a / omega);
+  const double d = sqrt (24.0 * 2.0 * a / omega);
   
   // Delay heating.
   omega_offset -= depth / d;

@@ -28,7 +28,6 @@ public:
   // Simulation.
 public:
   void output (Log&, const Filter&) const;
-  static bool check (const AttributeList&);
   bool check () const;
   void mix (const Soil&, double from, double to, double penetration = 1.0);
   void swap (const Soil&, double from, double middle, double to);
@@ -37,31 +36,20 @@ public:
 public:
   static const Library& library ();
   static void derive_type (const string, const AttributeList&, string super);
-  static AM& create (const AttributeList&);
-  static AM& create (const Time&, const AttributeList&);
-  static AM& create (const Time&, const AttributeList&, 
-		      const string name, const string part,
-		      double C, double N);
-  static AM& create (const Time&, const AttributeList&, 
-		      const string name, const string part,
-		      double C, double N, const vector<double>& density);
-
-  // Create and Destroy.
-private: 
-  static vector<OM*>& create_om (const AttributeList&);
-  static vector<OM*>& create_om (const AttributeList& al, 
-				 double crop_C, double crop_N,
-				 const vector<double>& density);
-  static vector<OM*>& create_om (const AttributeList& al, 
-				 double crop_C, double crop_N);
-public:
-  void initialize (const Soil& soil);
+  // Initialization.
+  static AM& create (const AttributeList&, const Soil&);
+  // Fertilizer.
+  static AM& create (const AttributeList&, const Soil&, const Time&);
+  // Crop part.
+  static AM& create (const Soil&, const Time&, vector<const AttributeList*>,
+		     const string name, const string part, 
+		     double C, double N, const vector<double>& density);
+  
 private:
-  AM (const Time&, const AttributeList&, 
-       const string name, const string part,
-       double C, double N, const vector<double>& density);
-  AM (const Time&, const AttributeList&);
-  AM (const AttributeList&);
+  AM (const Soil&, const Time&, vector<const AttributeList*>,
+      const string name, const string part, 
+      double C, double N, const vector<double>& density);
+  AM (const AttributeList&, const Soil&, const Time&);
 public:
   virtual ~AM ();
 };
