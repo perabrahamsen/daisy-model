@@ -20,6 +20,7 @@
 
 
 #include "check_std.h"
+#include "common.h"
 
 class CheckManager::Content
 {
