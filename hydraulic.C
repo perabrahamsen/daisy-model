@@ -42,13 +42,11 @@ Hydraulic::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("Theta_sat", Syntax::Number, Syntax::Const);
   syntax.add ("Theta_res", Syntax::Number, Syntax::Const);
   alist.add ("Theta_res", 0.0);
-  syntax.add ("lambda", Syntax::Number, Syntax::Const);
 }
 
 Hydraulic::Hydraulic (const AttributeList& al)
   : Theta_sat (al.number ("Theta_sat")),
-    Theta_res (al.number ("Theta_res")),
-    lambda (al.number ("lambda"))
+    Theta_res (al.number ("Theta_res"))
 { }
 
 Hydraulic::~Hydraulic ()

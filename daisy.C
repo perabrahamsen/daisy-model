@@ -21,10 +21,6 @@
 #include "common.h"
 #include <iostream.h>
 
-#ifdef MIKE_SHE
-#include "mike_she.h"
-#endif
-
 Daisy::Daisy (const AttributeList& al)
   : running (false),
     logs (map_create<Log> (al.alist_sequence ("output"))),
@@ -35,10 +31,8 @@ Daisy::Daisy (const AttributeList& al)
     columns (*new ColumnList (al.alist_sequence ("column"))),
     harvest (*new vector<const Harvest*>)
 { 
-#ifdef MIKE_SHE
-  assert (!mike_she);
-  mike_she = new MikeSHE (al.alist ("MikeSHE"), time);
-#endif
+  for (unsigned int i = 0; i < columns.size (); i++)
+    columns[i]->initialize (time, groundwater);
 }
 
 bool
@@ -130,23 +124,11 @@ Daisy::run ()
 
   while (running)
     {
-      switch (time.hour ())
-	{
-	case 0:
-	  cout << "Tick " << time.year () << "-" << time.month () << "-"
-	       << time.mday ();
-	default:
-	  cout << " " << time.hour ();
-	  cout.flush ();
-	  break;
-	case 23:
-	  cout << " " << time.hour () << "\n";
-	  break;
-	}
+      if (time.hour () == 0)
+	cout << time.year () << "-" << time.month () << "-" 
+	     << time.mday () << "\n";
       tick ();
     }
-  if (time.hour () != 0)
-    cout << "\n";
 }
 
 #ifdef BORLAND_TEMPLATES
@@ -188,18 +170,10 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 	      Syntax::Const);
   add_submodule<Harvest> ("harvest", syntax, alist,
 			  Syntax::LogOnly, Syntax::Sequence);
-#ifdef MIKE_SHE
-  add_submodule<MikeSHE> ("MikeSHE", syntax, alist);
-#endif
 }
 
 Daisy::~Daisy ()
 {
-#ifdef MIKE_SHE
-  assert (mike_she);
-  delete mike_she;
-  mike_she = NULL;
-#endif
   sequence_delete (logs.begin (), logs.end ());
   delete &logs;
   delete &action;

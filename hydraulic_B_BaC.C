@@ -7,6 +7,7 @@
 class HydraulicB_BaC : public Hydraulic
 {
   // Content.
+  const double lambda;
   const double h_b;
   const double K_sat;
 
@@ -79,6 +80,7 @@ HydraulicB_BaC::Se (double h) const
 
 HydraulicB_BaC::HydraulicB_BaC (const AttributeList& al)
   : Hydraulic (al),
+    lambda (al.number ("lambda")),
     h_b (al.number ("h_b")),
     K_sat (al.number ("K_sat"))
 { }
@@ -104,6 +106,7 @@ HydraulicB_BaCSyntax::HydraulicB_BaCSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
   Hydraulic::load_syntax (syntax, alist);
+  syntax.add ("lambda", Syntax::Number, Syntax::Const);
   syntax.add ("h_b", Syntax::Number, Syntax::Const);
   syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 

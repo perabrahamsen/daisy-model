@@ -15,7 +15,8 @@ class Value
 {
 public:
   // Utilities.
-  virtual void dump (const Syntax&, const string& key, int indent) = 0;
+  virtual void dump (ostream&, const Syntax&, 
+		     const string& key, int indent) = 0;
 
   // Retrieve data (Singletons).
   virtual operator double () const
@@ -77,8 +78,9 @@ class dValue : public Value
 {
   const T& value;
 public:
-  void dump (const Syntax& syntax, const string& key, int indent)
-    { cout << "<" << Syntax::type_name (syntax.lookup (key)) << ">"; }
+  void dump (ostream& out, const Syntax& syntax,
+	     const string& key, int indent)
+    { out << "<" << Syntax::type_name (syntax.lookup (key)) << ">"; }
   operator const T& () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (const T& v)
@@ -91,8 +93,9 @@ class dValue<double> : public Value
 {
   double value;
 public:
-  void dump (const Syntax& syntax, const string& key, int indent)
-    { cout << value; }
+  void dump (ostream& out, const Syntax& syntax,
+	     const string& key, int indent)
+    { out << value; }
   operator double () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (double v)
@@ -104,8 +107,9 @@ class dValue<int> : public Value
 {
   int value;
 public:
-  void dump (const Syntax& syntax, const string& key, int indent)
-    { cout << value; }
+  void dump (ostream& out, const Syntax& syntax,
+	     const string& key, int indent)
+    { out << value; }
   operator int () const
     throw1 (AttributeList::Invalid)
   { return value; }
@@ -118,8 +122,9 @@ class dValue<bool> : public Value
 {
   bool value;
 public:
-  void dump (const Syntax& syntax, const string& key, int indent)
-    { cout << (value ? "true" : "false"); }
+  void dump (ostream& out, const Syntax& syntax,
+	     const string& key, int indent)
+    { out << (value ? "true" : "false"); }
   operator bool () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (bool v)
@@ -131,8 +136,9 @@ class dValue<string> : public Value
 {
   string value;
 public:
-  void dump (const Syntax& syntax, const string& key, int indent)
-    { cout << value; }
+  void dump (ostream& out, const Syntax& syntax,
+	     const string& key, int indent)
+    { out << value; }
   operator const string& () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (const string& v)
@@ -144,8 +150,9 @@ class dValue<Time> : public Value
 {
   const Time& value;
 public:
-  void dump (const Syntax& syntax, const string& key, int indent)
-    { cout << "<" << Syntax::type_name (syntax.lookup (key)) << ">"; }
+  void dump (ostream& out, const Syntax& syntax,
+	     const string& key, int indent)
+    { out << "<" << Syntax::type_name (syntax.lookup (key)) << ">"; }
   operator const Time& () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (const Time& v)
@@ -157,13 +164,14 @@ class dValue<AttributeList> : public Value
 {
   AttributeList& value;
 public:
-  void dump (const Syntax& syntax, const string& key, int indent)
+  void dump (ostream& out, const Syntax& syntax,
+	     const string& key, int indent)
     { 
       const Syntax::type type = syntax.lookup (key);
       if (type == Syntax::AList)
-	value.dump (syntax.syntax (key), indent); 
+	value.dump (out, syntax.syntax (key), indent); 
       else 
-	cout << "<obj " << Syntax::type_name (type) << ">";
+	out << "<obj " << Syntax::type_name (type) << ">";
     }
   operator AttributeList& () const throw1 (AttributeList::Invalid)
   { return value; }
@@ -181,7 +189,7 @@ struct AttributeList::Implementation
   value_map values;
   bool check (const string& key) const throw0 ();
   Value* lookup (const string& key) const throw1 (Uninitialized);
-  void dump (const Syntax& syntax, int indent) const;
+  void dump (ostream& out, const Syntax& syntax, int indent) const;
   void add (const string& key, Value* value);
 };    
 
@@ -203,7 +211,7 @@ AttributeList::Implementation::lookup (const string& key) const throw1 (Attribut
 }
 
 void
-AttributeList::Implementation::dump (const Syntax& syntax, 
+AttributeList::Implementation::dump (ostream& out, const Syntax& syntax, 
 				     int indent) const
 {
   vector<string> entries;
@@ -217,9 +225,9 @@ AttributeList::Implementation::dump (const Syntax& syntax,
       const string& key = order[i];
 
       if (check (key))
-	lookup (key)->dump (syntax, key, indent);
+	lookup (key)->dump (out, syntax, key, indent);
       else
-	cout << " <missing " << key << ">";
+	out << " <missing " << key << ">";
     }
   
   for (value_map::const_iterator i = values.begin (); i != values.end (); i++)
@@ -231,11 +239,11 @@ AttributeList::Implementation::dump (const Syntax& syntax,
 	  if (first)
 	    first = false;
 	  else
-	    cout << "\n" << string (indent, ' ');
+	    out << "\n" << string (indent, ' ');
 
-	  cout << "(" << key << " ";
-	  (*i).second->dump (syntax, key, indent + key.length () + 2);
-	  cout << ")";
+	  out << "(" << key << " ";
+	  (*i).second->dump (out, syntax, key, indent + key.length () + 2);
+	  out << ")";
 	}
     }
 }
@@ -265,9 +273,9 @@ AttributeList::check (const string& key) const throw0 ()
 }
 
 void
-AttributeList::dump (const Syntax& syntax, int indent) const
+AttributeList::dump (ostream& out, const Syntax& syntax, int indent) const
 {
-  impl.dump (syntax, indent);
+  impl.dump (out, syntax, indent);
 }
 
 double 

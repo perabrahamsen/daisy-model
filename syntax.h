@@ -30,6 +30,7 @@ public:
   { Number, AList, CSMP, Boolean, String,
     Date, Integer, Object, Library, Error };
   static const char* type_name (type);
+  static type type_number (const char* name);
     
   // The requirements with regard to input and output varies with each
   // syntax entry.
@@ -50,6 +51,7 @@ public:
     LogOnly
   };
   static const char* category_name (category);
+  static int category_number (const char* name);
 
   // These functions will check that an alist conform to the syntax.
   bool check (const AttributeList&, const string& = "<unknown>") const;

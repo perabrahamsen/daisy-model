@@ -21,6 +21,7 @@ class SoilHeat
 {
   struct Implementation;
   Implementation& impl;
+
 public:
   void tick (const Time&, const Soil&, const SoilWater&, 
 	     const Surface&, const Groundwater&);
@@ -32,7 +33,8 @@ public:
   void output (Log&, Filter&) const;
   bool check (unsigned n) const;
   static void load_syntax (Syntax&, AttributeList&);
-  SoilHeat (const Soil&, const SoilWater&, const AttributeList&);
+  SoilHeat (const Soil&, const AttributeList&);
+  void initialize (const Soil& soil, const Time& time);
   ~SoilHeat ();
 };
 

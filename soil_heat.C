@@ -20,9 +20,13 @@ struct SoilHeat::Implementation
   // BUG:  These should move to groundwater module.
   // Parameters.
   const double average;		// Average temperature at bottom [C]
-  double amplitude;		// Variation in bottom temperature [C]
+  const double amplitude;	// Variation in bottom temperature [C]
   const double omega;		// Period length for above [ rad / day]
-  double omega_offset;		// Period start for above [rad]
+  const double omega_offset;	// Period start for above [rad]
+  const double delay;		// Period delay [ cm/rad ??? ]
+
+  // Calculate season delay [C/cm] at pF 2.
+  static double calculate_delay (const Soil& soil, double omega);
 
   // Simulation.
   void tick (const Time&, const Soil&, const SoilWater&, 
@@ -30,11 +34,12 @@ struct SoilHeat::Implementation
   double energy (const Soil&, const SoilWater&, double from, double to) const;
   void set_energy (const Soil&, const SoilWater&, 
 		   double from, double to, double energy);
-  double bottom (const Time&) const;
+  double bottom (const Time&, const double depth) const;
 
   // Create & Destroy.
   bool check (unsigned n) const;
-  Implementation (const Soil&, const SoilWater&, const AttributeList&);
+  void initialize (const Soil& soil, const Time& time);
+  Implementation (const Soil&, const AttributeList&);
 };
 
 void
@@ -49,7 +54,8 @@ SoilHeat::Implementation::tick (const Time& time,
 #endif
 
   // Border conditions.
-  const double T_bottom = bottom (time);// BUGLET: Should be time - 1 hour.
+  const double T_bottom = bottom (time, // BUGLET: Should be time - 1 hour.
+				  -soil.zplus (soil.size () - 1));
   const double T_top_new = surface.temperature ();
   
   if (T_top < -400.0)
@@ -211,17 +217,43 @@ SoilHeat::Implementation::set_energy (const Soil& soil,
     }
 }
 
-double 
-SoilHeat::Implementation::bottom (const Time& time) const 
+double
+SoilHeat::Implementation::calculate_delay (const Soil& soil, double omega)
 {
-  return average + amplitude * cos (omega * time.yday () + omega_offset);
+  // BUG: When this is calculated it gives an average delay for the
+  // whole profile.  The numbers are thus only correct at the bottom
+  // of the profile.
+
+  const double pF_2_0 = -100.0;
+  double k = 0;
+  double C = 0;
+  
+  for (unsigned int i = 0; i < soil.size (); i++)
+    {
+      const double Theta_pF_2_0 = soil.Theta (i, pF_2_0);
+      k += soil.dz (i) * soil.heat_conductivity (i, Theta_pF_2_0);
+      C += soil.dz (i) * soil.heat_capacity (i, Theta_pF_2_0);
+    }
+  const double a = k / C;
+  return sqrt (24.0 * 2.0 * a / omega);
+}
+
+double 
+SoilHeat::Implementation::bottom (const Time& time, double depth) const 
+{
+  return average 
+    + amplitude 
+    * exp (-depth / delay)
+    * cos (omega * time.yday () 
+	   + omega_offset 
+	   - depth / delay);
 }
 
 bool
 SoilHeat::Implementation::check (unsigned n) const
 {
   bool ok = true;
-  if (T.size () != n)
+  if (T.size () > n)
     {
       cerr << "You have " << n << " intervals but " 
 	   << T.size () << " T values\n";
@@ -230,39 +262,30 @@ SoilHeat::Implementation::check (unsigned n) const
   return ok;
 }
 
-SoilHeat::Implementation::Implementation (const Soil& soil,
-					  const SoilWater&,
+SoilHeat::Implementation::Implementation (const Soil& soil, 
 					  const AttributeList& al)
-  : T (al.number_sequence ("T")),
-    T_top (al.number ("T_top")),
+  : T_top (al.number ("T_top")),
     average (al.number ("average")),
     amplitude (al.number ("amplitude")),
     omega (al.number ("omega")),
-    omega_offset (al.number ("omega_offset"))
+    omega_offset (al.number ("omega_offset")),
+    delay (calculate_delay (soil, omega))
 { 
-  const double depth = - soil.zplus (soil.size () - 1);
-  const double pF_2_0 = -100.0;
-  double k = 0;
-  double C = 0;
-  
-  assert (T.size () > 0);
-  while (T.size () < soil.size ())
-    T.push_back (T[T.size () - 1]);
-
-  for (unsigned int i = 0; i < soil.size (); i++)
-    {
-      const double Theta_pF_2_0 = soil.Theta (i, pF_2_0);
-      k += soil.dz (i) * soil.heat_conductivity (i, Theta_pF_2_0);
-      C += soil.dz (i) * soil.heat_capacity (i, Theta_pF_2_0);
-    }
-  const double a = k / C;
-  const double d = sqrt (24.0 * 2.0 * a / omega);
-  
-  // Delay heating.
-  omega_offset -= depth / d;
-  // Decrease(?) amplitude.
-  amplitude *= exp (-depth / d);
+  // Initialize T.  Use specified numbers, if any.
+  if (al.check ("T"))
+    T = al.number_sequence ("T");
 }
+
+void
+SoilHeat::Implementation::initialize (const Soil& soil, const Time& time)
+{
+  // Fill out with T calculated numbers if necessary.
+  for (unsigned int i = T.size (); i < soil.size (); i++)
+    T.push_back (bottom (time, -soil.zplus (i)));
+
+  assert (T.size () == soil.size ());
+}
+
 
 void 
 SoilHeat::tick (const Time& time, 
@@ -321,7 +344,7 @@ SoilHeat::check (unsigned n) const
 void
 SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add ("T", Syntax::Number, Syntax::State, Syntax::Sequence);
+  syntax.add ("T", Syntax::Number, Syntax::Optional, Syntax::Sequence);
   syntax.add ("T_top", Syntax::Number, Syntax::State);
   alist.add ("T_top", -500.0);	// Use surface temperature.
   syntax.add ("average", Syntax::Number, Syntax::Const);
@@ -334,10 +357,14 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("omega_offset", -209.0);
 }
 
-SoilHeat::SoilHeat (const Soil& soil, const SoilWater& soil_water,
-		    const AttributeList& al)
-  : impl (*new Implementation (soil, soil_water, al))
+SoilHeat::SoilHeat (const Soil& soil, const AttributeList& al)
+  : impl (*new Implementation (soil, al))
 { }
+
+
+void
+SoilHeat::initialize (const Soil& soil, const Time& time)
+{ impl.initialize (soil, time); }
 
 SoilHeat::~SoilHeat ()
 {

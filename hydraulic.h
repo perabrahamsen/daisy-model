@@ -13,7 +13,6 @@ class Hydraulic
 public:
   const double Theta_sat;
   const double Theta_res;
-  const double lambda;
   inline double porosity () const
   { return Theta_sat; }
 

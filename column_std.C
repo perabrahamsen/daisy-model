@@ -75,15 +75,14 @@ public:
   // Create and Destroy.
 public:
   ColumnStandard (const AttributeList&);
+  void initialize (const Time& time, const Groundwater&);
   ~ColumnStandard ();
 };
 
 void
 ColumnStandard::sow (const AttributeList& crop)
 {
-  assert (crops.size () == 0); // Multiple crops not implemented.
   crops.push_back (Crop::create (crop, soil.size ()));
-  assert (crops.size () == 1); // Multiple crops not implemented.
 }
 
 void 
@@ -260,7 +259,7 @@ ColumnStandard::tick (const Time& time,
 {
   // Remove old source sink terms. 
   soil_water.clear (soil);
-  soil_NO3.clear (soil, soil_water);
+  soil_NO3.clear ();
   soil_NH4.clear ();
   surface.clear ();
   
@@ -320,14 +319,23 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     surface (al.alist ("Surface")),
     soil (al.alist ("Soil")),
     soil_water (soil, al.alist ("SoilWater")),
-    soil_heat (soil, soil_water, al.alist ("SoilHeat")),
-    soil_NH4 (soil, soil_water, al.alist ("SoilNH4")),
-    soil_NO3 (soil, soil_water, al.alist ("SoilNO3")),
+    soil_heat (soil, al.alist ("SoilHeat")),
+    soil_NH4 (al.alist ("SoilNH4")),
+    soil_NO3 (al.alist ("SoilNO3")),
     organic_matter (soil, al.alist ("OrganicMatter")),
     nitrification (Librarian<Nitrification>::create 
 		   (al.alist ("Nitrification"))),
     denitrification (al.alist ("Denitrification"))
 { }
+
+void ColumnStandard::initialize (const Time& time, 
+				 const Groundwater& groundwater)
+{
+  soil_heat.initialize (soil, time);
+  soil_water.initialize (soil, groundwater);
+  soil_NH4.initialize (soil, soil_water);
+  soil_NO3.initialize (soil, soil_water);
+}
 
 ColumnStandard::~ColumnStandard ()
 { 
@@ -359,9 +367,9 @@ static struct ColumnStandardSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
 
+    syntax.add ("description", Syntax::String, Syntax::Optional); 
     syntax.add ("crops", Crop::library (), Syntax::State, Syntax::Sequence);
     alist.add ("crops", *new vector<AttributeList*>);
-
     add_submodule<Bioclimate> ("Bioclimate", syntax, alist);
     add_submodule<Surface> ("Surface", syntax, alist);
     add_submodule<Soil> ("Soil", syntax, alist);

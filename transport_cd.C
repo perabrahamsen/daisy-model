@@ -75,7 +75,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
   for (unsigned int j = 1; j < size; j++)
     {
       // Dispersion length [cm]
-      const double lambda = soil.lambda (j);
+      const double lambda = soil.dispersivity (j);
 
       // Water flux [cm³ /cm² / h]
       const double q = soil_water.q (j);
@@ -96,7 +96,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
   // Lower boundary.
   {
     // Dispersion length [cm]
-    const double lambda = soil.lambda (size-1);
+    const double lambda = soil.dispersivity (size-1);
 
     // Water flux [cm³ /cm² / h]
     const double q = soil_water.q (size);

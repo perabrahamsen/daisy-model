@@ -12,7 +12,6 @@
 #include "snow.h"
 #include "log.h"
 #include "filter.h"
-#include "mike_she.h"
 
 class Bioclimate::Implementation
 {
@@ -262,12 +261,6 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
     }
   ActualEvapotranspiration = TotalCropUptake + EvapInterception 
     + EvapSoilSurface + snow.evaporation ();
-
-#ifdef MIKE_SHE
-  mike_she->put_evap_interception (EvapInterception);
-  mike_she->put_intercepted_water (intercepted_water);
-  mike_she->put_net_precipitation (Total_through_fall);
-#endif
 }
 
 void 

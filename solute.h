@@ -3,9 +3,7 @@
 #ifndef SOLUTE_H
 #define SOLUTE_H
 
-#include <string>
-#include <vector>
-#include "common.h"
+#include "adsorbtion.h"
 
 struct Log;
 struct Filter;
@@ -26,11 +24,14 @@ protected:
 protected:
   vector<double> S;		// Sink-source term.
   Transport& transport;		// Solute transport.
+  Adsorbtion& adsorbtion;	// Solute adsorbtion.
 
 public:
-  virtual double diffusion_coefficient () const = 0; // in free solu. 
-  virtual double C_to_M (const Soil&, double Theta, int i, double C) const = 0;
-  virtual double M_to_C (const Soil&, double Theta, int i, double M) const = 0;
+  virtual double diffusion_coefficient () const = 0; // in free solute. 
+  double C_to_M (const Soil& soil, double Theta, int i, double C) const
+    { return adsorbtion.C_to_M (soil, Theta, i, C); }
+  double M_to_C (const Soil& soil, double Theta, int i, double M) const
+    { return adsorbtion.M_to_C (soil, Theta, i, M); }
 
 public:
   double M (int i) const
@@ -50,7 +51,7 @@ public:
 protected:
   
 public:
-  virtual void tick (const Soil&, const SoilWater&, double J_in);
+  void tick (const Soil&, const SoilWater&, double J_in);
   bool check (unsigned n) const;
   void output (Log&, Filter&) const;
   void add (const Soil&, const SoilWater&,
@@ -62,7 +63,8 @@ public:
 protected:
   static void load_syntax (Syntax&, AttributeList&);
   Solute (const AttributeList& al);
-  void initialize (const Soil&, const SoilWater&, const AttributeList&);
+public:
+  void initialize (const Soil&, const SoilWater&);
 public:
   virtual ~Solute ();
 };

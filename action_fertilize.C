@@ -34,7 +34,7 @@ public:
 void 
 ActionFertilize::doIt (Daisy& daisy)
 {
-  cout << " [Fertilizing " << am.name ("type") << "]";
+  cout << " [Fertilizing " << am.name ("type") << "]\n";
   ColumnList& cl = daisy.columns;
   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
     {

@@ -214,22 +214,40 @@ Syntax::Implementation::entries (vector<string>& result) const
 }
 
 // Each syntax entry should have an associated type.
+
+static const char * const type_names[] = 
+{ "Number", "AList", "CSMP", "Boolean", "String",
+  "Date", "Integer", "Object", "Library", "Error", NULL };
+
 const char* 
 Syntax::type_name (type t)
 {
-  static const char * const names[] = 
-  { "Number", "AList", "CSMP", "Boolean", "String",
-    "Date", "Integer", "Object", "Library", "Error" };
-
-  assert (sizeof (names) / sizeof  (const char*) == Error + 1);
-  return names[t];
+  assert (sizeof (type_names) / sizeof  (const char*) == Error);
+  return type_names[t];
 }
     
+Syntax::type
+Syntax::type_number (const char* name)
+{ 
+  for (int i = 0; type_names[i]; i++)
+    if (strcmp (name, type_names[i]) == 0)
+      return static_cast<type> (i);
+  return Error;
+}
+
+static const char * const category_names[] = 
+{ "Const", "State", "Optional", "LogOnly", NULL };
+
 const char* Syntax::category_name (category c)
-{
-  static const char * const names[] = 
-  { "Const", "State", "Optional", "LogOnly" };
-  return names[c];
+{ return category_names[c]; }
+
+int
+Syntax::category_number (const char* name)
+{ 
+  for (int i = 0; category_names[i]; i++)
+    if (strcmp (name, category_names[i]) == 0)
+      return i;
+  return -1;
 }
 
 bool

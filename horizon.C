@@ -9,8 +9,10 @@
 #include "mathlib.h"
 #include <vector>
 #include <map>
-
-static const double rho_particle = 2.65;	// Weigth of soil. [g / cm³]
+// G++ 2.7.2 has `accumulate' here.
+#include <algorithm>
+// Borland 5.01 has `accumulate' here.
+#include <numeric>
 
 struct Horizon::Implementation
 {
@@ -23,7 +25,12 @@ struct Horizon::Implementation
   const double quarts_in_clay;
   const double quarts_in_silt;
   const double quarts_in_sand;
-  const double C_per_N;
+  double dry_bulk_density;
+
+  // Organic matter.
+  const vector<double> SOM_C_per_N;
+  const vector<double> SOM_fractions;
+  double C_factor;
 
   // Strange things.
   const double quarts_form_factor;
@@ -50,6 +57,7 @@ struct Horizon::Implementation
   double DepolationsFactor (const constituents medium, const double alfa);
   double ThermalConductivity (constituents medium);
   const int intervals;
+  double rho_soil_particles ();
 
   static const double heat_capacity[Constituents_End];
   
@@ -192,10 +200,6 @@ Horizon::Implementation::DepolationsFactor (const constituents medium,
 double 
 Horizon::Implementation::ThermalConductivity (constituents medium)
 {
-#if 0
-  static const double density [Constituents_End] =
-  { 1.0e6, 0.92e6, 1.25e3, 2.66e6, 2.65e6, 1.3e6 }; // [g / m³]
-#endif
   // Thermal conductivity of each medium.
   double thermal_conductivity[Constituents_End] = 
   { 0.57e-2, 2.2e-2, 0.025e-2, 8.8e-2, 2.9e-2, 0.25e-2 };
@@ -254,6 +258,13 @@ Horizon::Implementation::ThermalConductivity (constituents medium)
   return S1 / S2;
 }
 
+double
+Horizon::Implementation::rho_soil_particles ()
+{ 
+  return (clay + silt + fine_sand + coarse_sand) * rho_mineral
+    + humus * rho_humus; 
+}
+
 double 
 Horizon::Implementation::weight (const AttributeList& al, string name)
 {
@@ -273,7 +284,8 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     quarts_in_clay (al.number ("quarts_in_clay")),
     quarts_in_silt (al.number ("quarts_in_silt")),
     quarts_in_sand (al.number ("quarts_in_sand")),
-    C_per_N (al.number ("C_per_N")),
+    SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
+    SOM_fractions (al.number_sequence ("SOM_fractions")),
     quarts_form_factor (al.number ("quarts_form_factor")),
     mineral_form_factor (al.number ("mineral_form_factor")),
     intervals (al.integer ("intervals"))
@@ -284,24 +296,51 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     K_water = al.number_sequence ("K_water");
   if (al.check ("K_ice"))
     K_ice = al.number_sequence ("K_ice");
+  if (al.check ("dry_bulk_density"))
+    dry_bulk_density = al.number ("dry_bulk_density");
+  else 
+    dry_bulk_density = rho_soil_particles ();
+
+  const double C_divisor 
+    = accumulate (SOM_fractions.begin (), SOM_fractions.end (), 0.0);
+  
+  C_factor = dry_bulk_density * humus * c_fraction_in_humus;
+  if (C_divisor > 0.0)
+    C_factor /= C_divisor;
+  else
+    cerr << "Horizon: No C fractions given.\n";
 }
 
 double 
 Horizon::clay () const 
 { return impl.clay; }
 
-double
-Horizon::C () const
-{ return rho_particle * impl.humus * (1 - hydraulic.porosity ()) * 0.587; }
+double 
+Horizon::SOM_C (unsigned int pool) const
+{
+  if (pool < impl.SOM_fractions.size ())
+    // Specified, cool.
+    return impl.SOM_fractions[pool] * impl.C_factor;
+  else if (pool == 0)
+    // Else, everything in the first (slow) pool.
+    return  impl.C_factor;
+    
+  return 0.0;
+}
 
-double
-Horizon::N () const
-{ return C () / C_per_N (); }
-
-double
-Horizon::C_per_N () const
-{ return impl.C_per_N; }
-
+double 
+Horizon::SOM_C_per_N (unsigned int pool) const
+{
+  if (pool < impl.SOM_C_per_N.size ())
+    // Specied, fine.
+    return impl.SOM_C_per_N[pool];
+  else if (impl.SOM_C_per_N.size () > 0)
+    // Used last specified number.
+    return impl.SOM_C_per_N[impl.SOM_C_per_N.size () - 1];
+  // Give up.  Guess.
+  cerr << "Horizon: SOM: no C_per_N\n";
+  return 11.0;
+}
 
 double
 Horizon::heat_conductivity (double Theta, double Ice) const
@@ -319,43 +358,15 @@ Horizon::heat_capacity (double Theta, double Ice) const
     + impl.heat_capacity[Implementation::Ice] * Ice;
 }
 
-double 
-Horizon::tortuosity_factor (double Water) const
-{
-  const double n = hydraulic.porosity ();
-  return pow (Water, 7.0 / 3.0) / (n * n); // Tortuosity factor []
-}
-
-double 
-Horizon::K_planar () const
-{
-  return 6.3e-4;
-}
-
-double 
-Horizon::K_edge () const
-{
-  return 1.372e-5;
-}
-
-double 
-Horizon::v_planar () const
-{ 
-  const double S_planar = 5.964e-3; // Maximum specific absorbtion [g / g clay]
-  return S_planar * impl.clay * rho_particle * (1 - hydraulic.porosity ()); 
-}
-
-double 
-Horizon::v_edge () const
-{
-  const double S_edge = 0.308e-3;	// Same for edges.
-  return S_edge * impl.clay * rho_particle * (1 - hydraulic.porosity ()); 
-}
-
 void
 Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add ("description", Syntax::String, Syntax::Optional);
   syntax.add ("hydraulic", Librarian<Hydraulic>::library (), Syntax::Const);
+  syntax.add ("tortuosity", Librarian<Tortuosity>::library (), Syntax::Const);
+  AttributeList& tortuosity = *new AttributeList ();
+  tortuosity.add ("type", "M_Q");
+  alist.add ("tortuosity", tortuosity);
   syntax.add ("clay", Syntax::Number, Syntax::Const);
   syntax.add ("silt", Syntax::Number, Syntax::Const);
   syntax.add ("fine_sand", Syntax::Number, Syntax::Const);
@@ -367,7 +378,10 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("quarts_in_silt", 0.20);
   syntax.add ("quarts_in_sand", Syntax::Number, Syntax::Const);
   alist.add ("quarts_in_sand", 0.60);
-  syntax.add ("C_per_N", Syntax::Number, Syntax::Const);
+  syntax.add ("dry_bulk_density", Syntax::Number, Syntax::Optional);
+  syntax.add ("SOM_C_per_N", Syntax::Number, Syntax::Const, Syntax::Sequence);
+  syntax.add ("SOM_fractions",
+	      Syntax::Number, Syntax::Const, Syntax::Sequence);
   syntax.add ("quarts_form_factor", Syntax::Number, Syntax::Const);
   alist.add ("quarts_form_factor", 3.5);
   syntax.add ("mineral_form_factor", Syntax::Number, Syntax::Const);
@@ -381,7 +395,8 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 
 Horizon::Horizon (const AttributeList& al)
   : impl (*new Implementation (al)),
-    hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic")))
+    hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic"))),
+    tortuosity (Librarian<Tortuosity>::create (al.alist ("tortuosity")))
 { 
   if (impl.K_water.size () == 0)
     {

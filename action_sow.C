@@ -27,7 +27,7 @@ public:
 	    cout << " " << (*i)->name;
 	  }
       }
-    cout << "]";
+    cout << "]\n";
   }
   // Create and Destroy.
 private:

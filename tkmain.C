@@ -81,7 +81,12 @@ Syntax::type
 TkDaisyEntry::type () const
 {
   if (syntax)
-    return syntax->lookup (name);
+    {
+      assert (!library);
+      return syntax->lookup (name);
+    }
+  else if (library && library->check (name))
+    return Syntax::AList;
   else
     return Syntax::Error;
 }
@@ -101,16 +106,22 @@ TkDaisyEntry::list (vector<string>& list) const
   switch (type ())
     {
     case Syntax::AList:
-      assert (syntax);
-      syntax->syntax (name).entries (list);
+      if (library)
+	{
+	  assert (!syntax);
+	  library->syntax (name).entries (list);
+	}
+      else
+	{
+	  assert (syntax);
+	  syntax->syntax (name).entries (list);
+	}
       break;
     case Syntax::Library:
     case Syntax::Object:
-      if (!library)
-	{
-	  assert (syntax);
-	  syntax->library (name).entries (list);
-	}
+      assert (!library);
+      assert (syntax);
+      syntax->library (name).entries (list);
       break;
     default:
       // Do nothing.
@@ -149,73 +160,66 @@ TkDaisyEntry::traverse (const string& path)
 void
 TkDaisyEntry::step (const string& element)
 {
-  if (syntax)
+  switch (type ())
     {
-      switch (type ())
+    case Syntax::AList:
+      // Directly nested objects.  Just do it.
+      if (library)
 	{
-	case Syntax::AList:
-	  // Directly nested objects.  Just do it.
-	  step_alist ();
-	  syntax = &syntax->syntax (name);
-	  break;
-	case Syntax::Object:
-	  // Reference to an object in a library.
-	  if (library)
-	    {
-	      // Second step.  Lookup the object in the library.
-	      if (library->check (name))
-		{
-		  syntax = &library->syntax (name);
-		  // We keep the alist from the first step.
-		}
-	      else
-		{
-		  syntax = NULL;
-		  alist = NULL;
-		  alist_sequence = NULL;
-		}
-	      library = NULL;
-	    }
-	  else
-	    {
-	      // First step.  Get the library.
-	      step_alist ();
-	      library = &syntax->library (name);
-	    }
-	  break;
-	case Syntax::Library:
-	  // A definition of an object in a library.
-	  if (library)
-	    {
-	      // Second step.  Lookup the object in the library.
-	      if (library->check (name))
-		{
-		  syntax = &library->syntax (name);
-		  alist = &library->lookup (name);
-		}
-	      else
-		{
-		  syntax = NULL;
-		  alist = NULL;
-		}
-	      alist_sequence = NULL;
-	      library = NULL;
-	    }
-	  else
-	    {
-	      // First step.  Get the library.
-	      library = &syntax->library (name);
-	    }
-	  break;
-	default:
-	  // We cannot traverse other types.
-	  syntax = NULL;
-	  alist = NULL;
-	  alist_sequence = NULL;
+	  assert (!syntax);
+	  syntax = &library->syntax (name);
 	  library = NULL;
 	}
+      else
+	{
+	  assert (syntax);
+	  step_alist ();
+	  syntax = &syntax->syntax (name);
+	}
+      break;
+    case Syntax::Object:
+      // Reference to an object in a library.
+      if (library)
+	{
+	  assert (!syntax);
+	  // Second step.  Lookup the object in the library.
+	  if (library->check (name))
+	    {
+	      syntax = &library->syntax (name);
+	      // We keep the alist from the first step.
+	    }
+	  else
+	    {
+	      syntax = NULL;
+	      alist = NULL;
+	      alist_sequence = NULL;
+	    }
+	  library = NULL;
+	}
+      else
+	{
+	  assert (!library);
+	  // First step.  Get the library.
+	  step_alist ();
+	  library = &syntax->library (name);
+	  syntax = NULL;
+	}
+      break;
+    case Syntax::Library:
+      // A definition of an object in a library.
+      library = &syntax->library (name);
+      syntax = NULL;
+      break;
+    default:
+      // We cannot traverse other types.
+      syntax = NULL;
+      alist = NULL;
+      alist_sequence = NULL;
+      library = NULL;
     }
   name = element;
+  // Only syntax of library should be defined.  Never both.
+  assert (!library || !syntax);
 }
 
 void

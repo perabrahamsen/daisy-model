@@ -255,7 +255,7 @@ ParserFile::Implementation::load_library (Library& lib)
 void
 ParserFile::Implementation::add_derived (const Library& lib, derive_fun derive)
 {
-
+  // Get the name of the class and the existing superclass to derive from.
   const string name = get_string ();
   const string super = get_string ();
   if (!lib.check (super))
@@ -264,9 +264,14 @@ ParserFile::Implementation::add_derived (const Library& lib, derive_fun derive)
       skip_to_end ();
       return;
     }
+  // Create new attribute derived from its superclass.
   const AttributeList& sl = lib.lookup (super);
   AttributeList& atts = *new AttributeList (sl);
+  // Remember where we god this object.
+  atts.add ("parsed_from_file", file);
+  // Add separate attributes for this object.
   load_list (atts, lib.syntax (super));
+  // Add new object to library.
   derive (name, atts, super);
 }
 

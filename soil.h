@@ -5,6 +5,7 @@
 
 #include "horizon.h"
 #include "hydraulic.h"
+#include "tortuosity.h"
 #include "geometry.h"
 
 struct AttributeList;
@@ -15,6 +16,8 @@ class Soil : public Geometry
   const double EpFactor_;
   const double EpInterchange_;
   const double MaxRootingDepth_;
+  double dispersivity_;
+
 public:
   // Water.
   inline double K (int i, double h) const
@@ -33,20 +36,12 @@ public:
   { return horizon_[i]->hydraulic.M (h); }
   inline bool compact (int i) const
   { return horizon_[i]->hydraulic.compact (); }
-  inline double lambda (int i) const
-  { return horizon_[i]->hydraulic.lambda; }
+  inline double dispersivity (int i) const
+  { return dispersivity_; }
   
-  // Absorbtion.
-  inline double v_planar (int i) const
-  { return horizon_[i]->v_planar (); }
-  inline double v_edge (int i) const
-  { return horizon_[i]->v_edge (); }
-  inline double K_planar (int i) const
-  { return horizon_[i]->v_planar (); }
-  inline double K_edge (int i) const
-  { return horizon_[i]->v_edge (); }
+  // Texture.
   double tortuosity_factor (int i, double Theta) const
-  { return horizon_[i]->tortuosity_factor (Theta); }
+    { return horizon_[i]->tortuosity.factor (horizon_[i]->hydraulic, Theta); }
 
   // Thermic.
   double heat_conductivity (int i, double Theta, double Ice = 0.0) const
@@ -57,10 +52,10 @@ public:
   // Content.
   inline double clay (int i) const
   { return horizon_[i]->clay (); }
-  inline double initial_C (int i) const
-  { return horizon_[i]->C (); }
-  inline double initial_N (int i) const
-  { return horizon_[i]->N (); }
+  inline double SOM_C (int i, unsigned int pool) const
+  { return horizon_[i]->SOM_C (pool); }
+  inline double SOM_C_per_N (int i, unsigned int pool) const
+  { return horizon_[i]->SOM_C_per_N (pool); }
   
   // Calculations.
   double MaxRootingDepth () const;

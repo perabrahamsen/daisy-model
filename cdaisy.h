@@ -11,8 +11,17 @@
  * member functions in C++. 
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if 0
+	   }
+#endif
+
 typedef struct daisy_syntax daisy_syntax;
 typedef struct daisy_alist daisy_alist;
+typedef struct daisy_library daisy_library;
 typedef struct daisy_daisy daisy_daisy;
 typedef struct daisy_parser daisy_parser;
 typedef struct daisy_time daisy_time;
@@ -51,6 +60,55 @@ daisy_syntax_check (const daisy_syntax* syntax,
 		    const daisy_alist* alist,
 		    const char* name);
 
+/* Elements in the syntax table have the following properties.
+   
+   NAME: A string giving the name of the entry.
+   CATEGORY: Specifies whether it is a constant parameter, a state
+   variable, a log variable, or an optional parameter. 
+   TYPE: What kind of values this element will hold in the alist.
+   SIZE: Specifies whether it is an array, and if so its size.
+*/
+
+void				/* Add element to syntax table. */
+daisy_syntax_add (daisy_syntax* syntax, const char* name,
+		  int cat, int type, int size);
+
+/* The following functions return "magic" values used by the `cat',
+   `type', and `size' arguments to `daisy_syntax_add'.
+
+   These will not change within a simulation, so you can safely cache
+   the values.  The values may change in future versions of the daisy
+   library, so don't hardcode them. */
+
+/* The currently valid categories are "Const", "State", "Optional",
+   and "LogOnly".  Each have an associated number.  Use the following
+   functions to switch between number and name. */
+
+int				/* Number used for specific category. */
+daisy_category_number (const char* name);
+
+const char*			/* Name used for specific category. */
+daisy_category_name (int number);
+
+/* Some negative sizes have "magic" meanings for the `size'
+   parameter. Positive numbers indicate a fixed size array. */
+
+int				/* An array of unknown size. */
+daisy_size_sequence ();
+
+int				/* Not an array. */
+daisy_size_singleton ();
+
+/* The following types are currently supported: "Number", "AList",
+   "CSMP", "Boolean", "String", "Date", "Integer", "Object",
+   "Library", and "Error". */
+
+int				/* Number used for specific type. */
+daisy_type_number (const char* name);
+
+const char*			/* Name used for a specific type. */
+daisy_type_name (int number);
+
 /* @ The daisy_alist Type.
  * 
  * An alist contains the attribute values read by the parser.
@@ -61,6 +119,160 @@ daisy_alist_create (void);
 
 void				/* Delete alist object. */
 daisy_alist_delete (daisy_alist* alist);
+
+/* Pretty-print alist to file. Return -1 on errors. */
+int
+daisy_alist_save (const daisy_alist* alist, const daisy_syntax* syntax,
+		  const char* file);
+
+daisy_bool			/* Check that NAME is defined in ALIST. */
+daisy_alist_check (const daisy_alist* alist, const char* name);
+
+/* The following functions are for manipulating individual members of
+   an array.   It is an error to call them if the member is an
+   array. */
+
+int				/* Get integer NAME from ALIST. */
+daisy_alist_get_integer (const daisy_alist* alist, const char* name);
+
+double				/* Get double NAME from ALIST. */
+daisy_alist_get_number (const daisy_alist* alist, const char* name);
+
+const char*			/* Get char* NAME from ALIST. */
+daisy_alist_get_string (const daisy_alist* alist, const char* name);
+
+daisy_bool			/* Get bool NAME from ALIST. */
+daisy_alist_get_flag (const daisy_alist* alist, const char* name);
+
+const daisy_alist*		/* Get alist NAME from ALIST. */
+daisy_alist_get_alist (const daisy_alist* alist, const char* name);
+
+int				/* Set integer NAME from ALIST to VALUE. */
+daisy_alist_set_integer (daisy_alist* alist, const char* name,
+			 int value);
+
+double				/* Set double NAME from ALIST to VALUE. */
+daisy_alist_set_number (daisy_alist* alist, const char* name,
+			double value);
+
+const char*			/* Set char* NAME from ALIST to VALUE. */
+daisy_alist_set_string (daisy_alist* alist, const char* name,
+			const char* value);
+
+daisy_bool			/* Set bool NAME from ALIST to VALUE. */
+daisy_alist_set_flag (daisy_alist* alist, const char* name,
+		      daisy_bool value);
+
+daisy_alist*			/* Set alist NAME from ALIST to VALUE. */
+daisy_alist_set_alist (daisy_alist* alist, const char* name,
+		       daisy_alist* value);
+
+/* The following functions are for manipulating array members of an alist.
+   It is an error to call them if the member is not an array.  The
+   array will grow automatically if you `set' values outside its upper
+   bound. The lower array bound is zero. */
+
+unsigned int			/* Size of integer array. */
+daisy_alist_size_integer (const daisy_alist* alist, const char* name);
+
+unsigned int			/* Size of number array. */
+daisy_alist_size_number (const daisy_alist* alist, const char* name);
+
+unsigned int			/* Size of string array. */
+daisy_alist_size_string (const daisy_alist* alist, const char* name);
+
+unsigned int			/* Size of flag array. */
+daisy_alist_size_flag (const daisy_alist* alist, const char* name);
+
+unsigned int			/* Size of alist array. */
+daisy_alist_size_alist (const daisy_alist* alist, const char* name);
+
+unsigned int			/* Get integer NAME[INDEX] from ALIST. */
+daisy_alist_get_integer_at (const daisy_alist* alist, const char* name,
+			    unsigned int index);
+
+double				/* Get double NAME[INDEX] from ALIST. */
+daisy_alist_get_number_at (const daisy_alist* alist, const char* name,
+			   unsigned int index);
+
+const char*			/* Get char* NAME[INDEX] from ALIST. */
+daisy_alist_get_string_at (const daisy_alist* alist, const char* name,
+			   unsigned int index);
+
+daisy_bool			/* Get bool NAME[INDEX] from ALIST. */
+daisy_alist_get_flag_at (const daisy_alist* alist, const char* name,
+			 unsigned int index);
+
+daisy_alist*			/* Get alist NAME[INDEX] from ALIST. */
+daisy_alist_get_alist_at (const daisy_alist* alist, const char* name,
+			  unsigned int index);
+
+int		    	/* Set integer NAME[INDEX] from ALIST to VALUE. */
+daisy_alist_set_integer_at (daisy_alist* alist, const char* name,
+			    int value, unsigned int index);
+
+double			/* Set double NAME[INDEX] from ALIST to VALUE. */
+daisy_alist_set_number_at (daisy_alist* alist, const char* name,
+			   double value, unsigned int index);
+
+const char*		/* Set char* NAME[INDEX] from ALIST to VALUE. */
+daisy_alist_set_string_at (daisy_alist* alist, const char* name,
+			   const char* value, unsigned int index);
+
+daisy_bool		/* Set bool NAME[INDEX] from ALIST to VALUE. */
+daisy_alist_set_flag_at (daisy_alist* alist, const char* name,
+			 daisy_bool value, unsigned int index);
+
+daisy_alist*		/* Set alist NAME[INDEX] from ALIST to VALUE. */
+daisy_alist_set_alist_at (daisy_alist* alist, const char* name,
+			  daisy_alist* value, unsigned int index);
+
+/* @ The daisy_library Type.
+ * 
+ * A library contains a collection of objects, each containing a
+ * constructor, a syntax, an alist, an origin, and a name.
+ */
+
+daisy_library*			/* Return the library named NAME. */
+daisy_library_find (const char* name);
+
+int				/* Number of objects in LIBRARY. */
+daisy_library_size (const daisy_library* library);
+
+const char*			/* Name of object number INDEX in LIBRARY. */
+daisy_library_name (const daisy_library* library, const unsigned int index);
+
+const daisy_syntax*		/* Syntax for object NAME in LIBRARY. */
+daisy_library_syntax (const daisy_library* library, const char* name);
+
+const daisy_alist*		/* Alist for object NAME in LIBRARY. */
+daisy_library_alist (const daisy_library* library, const char* name);
+
+const char*			/* File associated with object NAME in 
+				   LIBRARY, or NULL if none. */
+daisy_library_file (const daisy_library* library, const char* name);
+
+/* Add new element to library.  SUPER is the name of an existing
+   element, from which to inherit the constructor and syntax.  ALIST
+   is the default attributes for the new object.  NAME is the name of
+   the new object in the library.  FILENAME is the name of the file to
+   eventually save the object. 
+
+   Currently, only the Horizon and Column libraries are supported.
+*/
+void
+daisy_library_derive (daisy_library* library, 
+		      const char* super, const daisy_alist* alist, 
+		      const char* name, const char* filename);
+
+void				/* Remove object NAME from LIBRARY */
+daisy_library_remove (daisy_library* library, const char* name);
+
+/* Save all elements in all libraries that are associated with FILE.
+   Return -1 on errors. */
+int
+daisy_library_save_file (const char* file);
+
 
 /* @ The daisy_parser Type.
  *
@@ -304,6 +516,14 @@ daisy_load (daisy_syntax* syntax, daisy_alist* alist);
 
 void				/* Initialize the Daisy subsystem. */
 daisy_initialize (void);
+
+#if 0
+{
+#endif
+
+#ifdef __cplusplus
+}
+#endif
 
 /* @ Emacs Information.
  *

@@ -169,80 +169,53 @@ CSMP::add (double x, double y)
 void
 CSMP::operator += (const CSMP& csmp)
 {
+  // We can't calculate with empty CSMPs.  They don't have a defined
+  // value in any points.  Check for those first.
   if (impl.x.size () == 0)
     {
-      impl.x = csmp.impl.x;
-      impl.y = csmp.impl.y;
+      // If this is empty, use the other.
+      impl = csmp.impl;
       return;
     }
   if (csmp.impl.x.size () == 0)
-    return;
-  
-  // This does not work yet.
-  assert (false);
-
-#if 0
-  // Loop variables.
-  Implementation::PairVector::iterator i = impl.points.begin ();
-  Implementation::PairVector::iterator i_end = impl.points.end ();
-  Implementation::PairVector::iterator j = csmp.impl.points.begin ();
-  Implementation::PairVector::iterator j_end = csmp.impl.points.end ();
-
-  // This is out first point on the new CSMP.
-  Implementation::pair last (min (i->x, j->x), i->y + j->y);
-
-  // We start with a 
-  double di = 0.0;		// Slope between present and next i.
-  double dj = 0.0;		// Slope between present and next j.
-
-  CSMP out;
-
-  // We now add points by looping over both CSMPs simultaneously.
-  while (i != i_end || j != j_end)
     {
-      // Add points from i until we pass the next point from j.
-      while (i != i_end && i->x <= j->x)
-	{
-	  // Calculate new point by using the slope from both CSMPs.
-	  last.y = last.y + (i->x - last.x) * (di + dj);
-	  last.x = i->x;
-	  out.add (last.x, last.y);
-
-	  // Calculate new i slope.
-	  if (i + 1 == i_end)
-	    // Zero slope after last point.
-	    di = 0.0;
-	  else if (i[0].x < i[1].x)
-	    di = (i[1].y - i[0].y) / (i[1].x - i[0].x);
-	  else
-	    // It doesn't matter what the slope is when the distanse is zero.
-	    assert (i[0].x == i[1].x);
-	  
-	  i++;
-	}
-      // Add points from j until we pass the next point from i.
-      while (j != j_end && j->x <= i->x)
-	{
-	  // Calculate new point by using the slope from both CSMPs.
-	  last.y = last.y + (j->x - last.x) * (dj + di);
-	  last.x = j->x;
-	  out.add (last.x, last.y);
-
-	  // Calculate new j slope.
-	  if (j + 1 == j_end)
-	    // Zero slope after last point.
-	    dj = 0.0;
-	  else if (j[0].x < j[1].x)
-	    dj = (j[1].y - j[0].y) / (j[1].x - j[0].x);
-	  else
-	    // It doesn't matter what the slope is when the distanse is zero.
-	    assert (j[0].x == j[1].x);
-	  
-	  j++;
-	}
+      // If theother is empty, use this one.
+      return;
     }
-  impl.points = out.impl.points; 
+
+  // I want a vector with all the x points.
+  // First I create two lists containing the x points from each csmp.
+  list<double> combined (impl.x.begin (), impl.x.end ());
+  list<double> other (csmp.impl.x.begin (), csmp.impl.x.end ());
+  // Then I merge them and remove duplicates.
+  combined.merge (other);
+  combined.unique ();
+  // Finally, I convert it to a vector.
+#ifdef HAS_TEMPLATE_MEMBERS
+  vector<double> points (combined.begin (), combined.end ());
+#else
+  vector<double> points;
+  for (list<double>::iterator i = combined.begin ();
+       i != combined.end ();
+       i++)
+    points.push_back (*i);
 #endif
+
+  // I then add the points to a temporary CSMP.
+  CSMP result;
+
+  for (unsigned int i = 0; i < points.size (); i++)
+    {
+      //  The y value of the combined csmp is at all points the
+      // combined y value of the individual csmps.  And the function
+      // is piecewise linear between the x points.
+      const double x = points[i];
+      const double y = impl (x) + csmp (x);
+      result.add (x, y);
+    }
+
+  // We now store the result in this csmp.
+  impl = result.impl;
 }
 
 void 

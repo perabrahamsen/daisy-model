@@ -362,7 +362,7 @@ OM::tick (unsigned int end, const double* abiotic_factor,
       // assert (N_soil * 1.001 >= N_used);
     }
   assert (fractions.size () == smb.size () + som.size ());
-  // Distribute to all biological dk:puljer.
+  // Distribute to all biological pools.
   const unsigned int smb_size = smb.size ();
   for (unsigned int j = 0; j < smb_size; j++)
     {
@@ -371,7 +371,7 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	tock (size, abiotic_factor, turnover_rate * fraction, efficiency[j],
 	      N_soil, N_used, CO2, *smb[j]);
     }
-  // Distribute to all soil dk:puljer.
+  // Distribute to all soil pools.
   const unsigned int som_size = som.size ();
   for (unsigned int j = 0; j < som_size; j++)
     {
@@ -406,7 +406,7 @@ OM::tick (unsigned int end, const double* abiotic_factor,
     }
   assert (fractions.size () == smb.size () + 1);
   
-  // Distribute to all biological dk:puljer.
+  // Distribute to all biological pools.
   const unsigned int smb_size = smb.size ();
   for (unsigned int j = 0; j < smb_size; j++)
     {

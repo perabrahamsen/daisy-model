@@ -6,6 +6,13 @@
 #include "librarian.h"
 
 struct Hydraulic;
+struct Tortuosity;
+
+// Weigth of mineral particles. [g / cm³]
+const double rho_mineral = 2.65;	
+// Weight of humus. [g / cm³]
+const double rho_humus = 1.3; 
+const double c_fraction_in_humus = 0.587;
 
 class Horizon 
 {
@@ -15,9 +22,8 @@ private:
   Implementation& impl;
 public:
   double clay () const;
-  double C () const;
-  double N () const;
-  double C_per_N () const;
+  double SOM_C (unsigned int pool) const;
+  double SOM_C_per_N (unsigned int pool) const;
 
   // Water.
 public:
@@ -27,14 +33,7 @@ public:
   
   // Texture.
 public:
-  virtual double tortuosity_factor (double Theta) const;
-  
-  // Absorbtion.
-public:
-  double K_planar () const;	// Half saturation constant [ g / cm³ ]
-  double K_edge () const;	// Same for edges.
-  double v_planar () const;
-  double v_edge () const;
+  const Tortuosity& tortuosity;
 
   // Create and Destroy.
 public:

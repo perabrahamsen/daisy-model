@@ -22,8 +22,7 @@ Solute::add_to_source (const vector<double>& v)
   for (unsigned i = 0; i < v.size (); i++)
     {
       S[i] += v[i];
-      // Check for NaN.
-      assert (S[i] >= 0.0 || S[i] <= 0.0);
+      assert (finite (S[i]));
     }
 }
 
@@ -34,8 +33,7 @@ Solute::add_to_sink (const vector<double>& v)
   for (unsigned i = 0; i < v.size (); i++)
     {
       S[i] -= v[i];
-      // Check for NaN.
-      assert (S[i] >= 0.0 || S[i] <= 0.0);
+      assert (finite (S[i]));
     }
 }
 
@@ -66,18 +64,27 @@ void
 Solute::load_syntax (Syntax& syntax, AttributeList&)
 { 
   syntax.add ("transport", Librarian<Transport>::library (), Syntax::State);
+  syntax.add ("adsorbtion", Librarian<Adsorbtion>::library (), Syntax::Const);
   syntax.add ("C", Syntax::Number, Syntax::Optional, Syntax::Sequence);
   syntax.add ("M", Syntax::Number, Syntax::Optional, Syntax::Sequence);
   syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
 }
 
 Solute::Solute (const AttributeList& al)
-  : transport (Librarian<Transport>::create 
-	       (al.alist ("transport")))
-{ }
+  : transport (Librarian<Transport>::create (al.alist ("transport"))),
+    adsorbtion (Librarian<Adsorbtion>::create (al.alist ("adsorbtion")))
+{ 
+  if (al.check ("C"))
+    C_ = al.number_sequence ("C");
+  if (al.check ("M"))
+    M_ = al.number_sequence ("M");
+}
 
 Solute::~Solute ()
-{ delete &transport; }
+{ 
+  delete &transport; 
+  delete &adsorbtion; 
+}
 
 void 
 Solute::add (const Soil& soil, const SoilWater& soil_water, 
@@ -107,42 +114,36 @@ Solute::swap (const Soil& soil, const SoilWater& soil_water,
 }
 
 void
-Solute::initialize (const Soil& soil, const SoilWater& soil_water,
-		    const AttributeList& al)
+Solute::initialize (const Soil& soil, const SoilWater& soil_water)
 {
-  if (al.check ("C"))
+  if (C_.size () > 0)
     {
-      C_ = al.number_sequence ("C");
-      if (C_.size () == 0U)
-	C_.push_back (0.0);
       // Fill it up.
       if (C_.size () < soil.size ())
 	C_.insert (C_.end (), soil.size () - C_.size (), C_[C_.size () - 1]);
       else if (C_.size () > soil.size ())
 	THROW ("To many members of C sequence");
     }
-  if (al.check ("M"))
+  if (M_.size () > 0)
     {
-      M_ = al.number_sequence ("M");
-      if (M_.size () == 0U)
-	M_.push_back (0.0);
       // Fill it up.
       if (M_.size () < soil.size () + 0U)
 	M_.insert (M_.end (), soil.size () - M_.size (), M_[M_.size () - 1]);
       else if (M_.size () > soil.size ())
 	THROW ("To many members of M sequence");
     }
-  if (!al.check ("C") && !al.check ("M"))
+  if (M_.size () == 0 && C_.size () == 0)
     {
       C_.insert (C_.begin (), soil.size (), 0.0);
       M_.insert (M_.begin (), soil.size (), 0.0);
     }
-  else if (!al.check ("C"))
-    for (unsigned int i = 0; i < soil.size (); i++)
-      C_.push_back (M_to_C (soil, soil_water.Theta (i), i, M_[i]));
-  else if (!al.check ("M"))
-    for (unsigned int i = 0; i < soil.size (); i++)
-      M_.push_back (C_to_M (soil, soil_water.Theta (i), i, C_[i]));
+  for (unsigned int i = C_.size (); i < M_.size (); i++)
+    C_.push_back (M_to_C (soil, soil_water.Theta (i), i, M_[i]));
+  for (unsigned int i = M_.size (); i < C_.size (); i++)
+    M_.push_back (C_to_M (soil, soil_water.Theta (i), i, C_[i]));
+
+  assert (C_.size () == M_.size ());
+  assert (C_.size () == soil.size ());
 
   for (unsigned int i = 0; i < soil.size (); i++)
     {

@@ -10,23 +10,12 @@
 #include "groundwater.h"
 #include "syntax.h"
 #include "mathlib.h"
-#include "mike_she.h"
 
-#ifdef MIKE_SHE
-void
-SoilWater::clear (const Geometry& geometry)
-{
-  mike_she->put_water_sink (geometry, S);
-
-  fill (S.begin (), S.end (), 0.0);
-}
-#else
 void
 SoilWater::clear (const Geometry&)
 {
   fill (S.begin (), S.end (), 0.0);
 }
-#endif
 
 void
 SoilWater::add_to_sink (const vector<double>& v)
@@ -61,17 +50,6 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   Theta_old_ = Theta_;
   h_old = h_;
 
-#ifdef MIKE_SHE
-  mike_she->get_water_pressure (h_);
-  
-  // Update Theta.
-  for(unsigned int i = 0; i < Theta_.size (); i++)
-    Theta_[i] = soil.Theta (i, h_[i]);
-
-  // Flux is unknown.
-  for (unsigned int i = 0; i <= q_.size (); i++)
-    q_[i] = -42.42e42;
-#else
   // Limit for groundwater table.
   int last  = soil.size () - 1;
   if (!groundwater.flux_bottom ())
@@ -122,7 +100,6 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
       Theta_[i] = soil.Theta (i, 0.0);
       q_[i] = q_[i-1];
     }
-#endif
 }
 
 void 
@@ -228,6 +205,9 @@ SoilWater::SoilWater (const Soil& soil,
       assert (Theta_.size () > 0);
       while (Theta_.size () < size)
 	Theta_.push_back (Theta_[Theta_.size () - 1]);
+      if (!al.check ("h"))
+	for (unsigned int i = 0; i < size; i++)
+	  h_.push_back (soil.h (i, Theta_[i]));
     }
   if (al.check ("h"))
     {
@@ -235,19 +215,9 @@ SoilWater::SoilWater (const Soil& soil,
       assert (h_.size () > 0);
       while (h_.size () < size)
 	h_.push_back (h_[h_.size () - 1]);
-    }
-  if (!al.check ("Theta"))
-    {
-      assert (h_.size () == size);
-      for (unsigned int i = 0; i < size; i++)
-	Theta_.push_back (soil.Theta (i, h_[i]));
-    }
-
-  if (!al.check ("h"))
-    {
-      assert (Theta_.size () == size);
-      for (unsigned int i = 0; i < size; i++)
-	h_.push_back (soil.h (i, Theta_[i]));
+      if (!al.check ("Theta"))
+	for (unsigned int i = 0; i < size; i++)
+	  Theta_.push_back (soil.Theta (i, h_[i]));
     }
   if (al.check ("Xi"))
     {
@@ -262,6 +232,35 @@ SoilWater::SoilWater (const Soil& soil,
 
   S.insert (S.begin (), size, 0.0);
   q_.insert (q_.begin (), size + 1, 0.0);
+}
+
+void
+SoilWater::initialize (const Soil& soil, const Groundwater& groundwater)
+{
+  assert (h_.size () == Theta_.size ());
+  if (h_.size () == 0)
+    {
+      if (groundwater.flux_bottom ())
+	{
+	  const double h = -100.0; // pF 2.0;
+	  for (unsigned int i = 0; i < soil.size (); i++)
+	    {
+	      h_.push_back (h);
+	      Theta_.push_back (soil.Theta (i, h));
+	    }
+	}
+      else
+	{
+	  const double table = groundwater.table ();
+	  
+	  for (unsigned int i = 0; i < soil.size (); i++)
+	    {
+	      h_.push_back (table - soil.z (i));
+	      Theta_.push_back (soil.Theta (i, h_[i]));
+	    }
+	}
+    }
+  assert (h_.size () == soil.size ());
 }
 
 SoilWater::~SoilWater ()

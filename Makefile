@@ -36,15 +36,6 @@ USE_OPTIMIZE = false
 #USE_PROFILE = true
 USE_PROFILE = false
 
-# Set USE_MIKESHE to `true' to enable coupling with Mike/SHE.
-#
-ifeq ($(USER),jaj0kvl)
-	USE_MIKESHE	= true
-else
-	USE_MIKESHE	= false
-#	USE_MIKESHE	= true
-endif
-
 # Set COMPILER according to which compiler you use.
 #	sun		Use the unbundled sun compiler.
 #	gnu		Use the standard GNU compiler.
@@ -60,19 +51,6 @@ ifeq ($(HOSTTYPE),hp)
 endif
 ifeq ($(HOSTTYPE),i386)
 	COMPILER = borland
-endif
-
-# Check use of Mike/SHE.
-#
-ifeq ($(USE_MIKESHE),true)
-	ifeq ($(USER),jaj0kvl)
-		FORHOME = /usr1/jaj0kvl
-	else
-		FORHOME = /pack/f2c
-	endif
-	FORLIB = mshe/mshe.a -L$(FORHOME)/lib -lI77 -lF77 
-	MIKESHE=mike_she.C
-	MIKEFLAGS=-I$(FORHOME)/include -DMIKE_SHE
 endif
 
 # On SPARC platforms we trap mathematical exception with some assembler code.
@@ -113,6 +91,8 @@ endif
 #
 ifeq ($(COMPILER),egcs)
 	COMPILE = /pack/egcs/bin/c++ -Wall -fno-exceptions -DEGCS -g -pipe -frepo
+	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
+
 endif
 ifeq ($(COMPILER),gnu)
 	ifeq ($(HOSTTYPE),hp)
@@ -120,17 +100,20 @@ ifeq ($(COMPILER),gnu)
 	else
 		COMPILE = c++ -Wall -g -frepo -pipe
 	endif
+	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)
 	COMPILE = /pack/devpro/SUNWspro/bin/CC
+	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),borland)
-	COMPILE = /bc5/bin/bcc32 -P -v -WC -wdef -wnod -wamb -w-par -w-hid
+	COMPILE = /bc5/bin/bcc32 -P -v -wdef -wnod -wamb -w-par -w-hid
+	CCOMPILE = /bc5/bin/bcc32 -P- -v -wdef -wnod -wamb -w-par -w-hid
 endif
 
 # Construct the compile command.
 #
-CC = $(COMPILE) $(MIKEFLAGS) $(OPTIMIZE) $(PROFILE)
+CC = $(COMPILE) $(OPTIMIZE) $(PROFILE)
 
 # Find the rigth math library.
 #
@@ -163,8 +146,10 @@ endif
 # Figure out how to link.
 #
 ifeq ($(COMPILER),borland)
-	LINK = /bc5/bin/bcc32 -P- -v -WC -e
+	LINK =    /bc5/bin/tlink32 /v -Tpe -ap -c -x -e
+	DLLLINK = /bc5/bin/bcc32 -P- -v -lw-dup -WDE -lTpd -lv -e
 	NOLINK = -c
+	CRTLIB = C:\BC5\LIB\c0x32.obj
 else
 	LINK = $(CC) -o
 	NOLINK = -c
@@ -181,10 +166,11 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	crop_std.C action_sow.C action_stop.C condition_time.C \
 	condition_logic.C log_file.C action_irrigate.C action_lisp.C \
 	weather_none.C action_fertilize.C weather_file.C action_tillage.C \
-	action_harvest.C hydraulic_old.C $(MIKEONLY) crop_old.C crop_sold.C \
+	action_harvest.C hydraulic_old.C crop_old.C crop_sold.C \
 	action_with.C hydraulic_old2.C nitrification_soil.C \
 	nitrification_solute.C hydraulic_mod_C.C uzlr.C transport_cd.C \
-	transport_none.C transport_convection.C
+	transport_none.C transport_convection.C adsorbtion_vS_S.C \
+	adsorbtion_none.C tortuosity_M_Q.C tortuosity_linear.C
 
 # Select the C files with a corresponding header file from the library.
 #
@@ -194,8 +180,8 @@ INTERFACES = daisy.C parser.C log.C weather.C column.C crop.C \
 	soil.C mathlib.C bioclimate.C surface.C soil_water.C \
 	soil_NH4.C soil_NO3.C organic_matter.C nitrification.C \
 	denitrification.C soil_heat.C groundwater.C snow.C solute.C \
-	am.C im.C om.C harvest.C $(MIKESHE) options.C geometry.C transport.C \
-	librarian.C cdaisy.C
+	am.C im.C om.C harvest.C options.C geometry.C transport.C \
+	librarian.C cdaisy.C adsorbtion.C tortuosity.C
 
 # Select the C files that are not part of the library.
 #
@@ -221,7 +207,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = main.h 
+REMOVE = mike_she.h mike_she.C
 
 # These are the file extensions we deal with.
 # 
@@ -234,7 +220,7 @@ all:	$(EXECUTABLES)
 # Create the main executable.
 #
 daisy${EXT}:	main${OBJ} $(FORLIB) $(LIBOBJ)
-	$(LINK)daisy $^ $(MATHLIB)
+	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create executable with embedded tcl/tk.
 #
@@ -245,6 +231,17 @@ tkdaisy${EXT}:	tkmain${OBJ} $(FORLIB) $(LIBOBJ)
 #
 cdaisy${EXT}:  cmain${OBJ} $(FORLIB) $(LIBOBJ)
 	$(LINK)cdaisy $^ $(MATHLIB)
+
+# Create a DLL.
+#
+daisy.dll:	$(LIBOBJ)
+#	/bc5/bin/tlink32 /Tpd /v $^, daisy.dll,, cw32i.lib
+	$(DLLLINK)daisy.dll $^ $(MATHLIB)
+
+
+dlldaisy${EXT}:	cmain${OBJ} daisy.dll
+	$(LINK)dlldaisy $^ $(MATHLIB)
+
 
 # Count the size of daisy.
 #
@@ -313,7 +310,7 @@ depend: $(SOURCES)
 	rm -f Makefile.old
 	mv Makefile Makefile.old
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
-	c++ -DMIKE_SHE -I. $(TKINCLUDE) -MM $(SOURCES) \
+	c++ -I. $(TKINCLUDE) -MM $(SOURCES) \
 		| sed -e 's/\.o:/$${OBJ}:/' >> Makefile
 
 # Create a ZIP file with all the sources.
@@ -331,11 +328,6 @@ cvs: $(TEXT)
 	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"
 
-# Create the Mike/SHE FORTRAN library.
-#
-mshe/mshe.a:
-	(cd mshe; $(MAKE) mshe.a) 
-
 # How to compile the assembler file.
 #
 set_exceptions${OBJ}: set_exceptions.S
@@ -349,7 +341,7 @@ set_exceptions${OBJ}: set_exceptions.S
 # How to compile a C file.
 #
 .c${OBJ}:
-	gcc -I/pack/f2c/include -g -Wall $(OPTIMIZE) $(PROFILE) $(NOLINK) $<
+	$(CCOMPILE) $(OPTIMIZE) $(PROFILE) $(NOLINK) $<
 
 # There is a bug when egcs compile snow.C with optimization.
 #
@@ -357,7 +349,7 @@ ifeq ($(COMPILER),egcs)
 ifeq ($(USE_OPTIMIZE),true)
 
 snow.o: snow.C
-	$(COMPILE) $(MIKEFLAGS) $(PROFILE) $(NOLINK) $<
+	$(COMPILE) $(PROFILE) $(NOLINK) $<
 
 endif
 endif
@@ -379,14 +371,15 @@ filter_some${OBJ}: filter_some.C filter.h librarian.h library.h common.h \
  alist.h syntax.h
 column_std${OBJ}: column_std.C column.h librarian.h library.h common.h \
  alist.h syntax.h crop.h bioclimate.h surface.h uzmodel.h im.h soil.h \
- horizon.h hydraulic.h geometry.h soil_water.h soil_heat.h soil_NH4.h \
- solute.h soil_NO3.h organic_matter.h nitrification.h \
- denitrification.h log.h filter.h am.h
+ horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h \
+ soil_heat.h soil_NH4.h solute.h adsorbtion.h soil_NO3.h \
+ organic_matter.h nitrification.h denitrification.h log.h filter.h \
+ am.h
 weather_simple${OBJ}: weather_simple.C weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h log.h filter.h
 uzrichard${OBJ}: uzrichard.C uzmodel.h librarian.h library.h common.h \
- alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h mathlib.h \
- filter.h log.h
+ alist.h syntax.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
+ mathlib.h filter.h log.h
 hydraulic_yolo${OBJ}: hydraulic_yolo.C hydraulic.h librarian.h library.h \
  common.h alist.h syntax.h csmp.h
 hydraulic_M_vG${OBJ}: hydraulic_M_vG.C hydraulic.h librarian.h library.h \
@@ -407,9 +400,9 @@ horizon_std${OBJ}: horizon_std.C horizon.h librarian.h library.h common.h \
  alist.h syntax.h
 crop_std${OBJ}: crop_std.C crop.h time.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h csmp.h bioclimate.h column.h \
- soil_water.h soil.h horizon.h hydraulic.h geometry.h om.h \
- organic_matter.h soil_heat.h soil_NH4.h solute.h soil_NO3.h am.h \
- harvest.h mathlib.h
+ soil_water.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
+ om.h organic_matter.h soil_heat.h soil_NH4.h solute.h adsorbtion.h \
+ soil_NO3.h am.h harvest.h mathlib.h
 action_sow${OBJ}: action_sow.C action.h common.h daisy.h column.h \
  librarian.h library.h alist.h syntax.h crop.h
 action_stop${OBJ}: action_stop.C action.h common.h syntax.h alist.h \
@@ -438,44 +431,56 @@ hydraulic_old${OBJ}: hydraulic_old.C hydraulic.h librarian.h library.h \
  common.h alist.h syntax.h options.h mathlib.h csmp.h
 crop_old${OBJ}: crop_old.C crop.h time.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h csmp.h bioclimate.h column.h \
- soil_water.h soil.h horizon.h hydraulic.h geometry.h om.h \
- organic_matter.h soil_heat.h soil_NH4.h solute.h soil_NO3.h am.h \
- harvest.h mathlib.h
+ soil_water.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
+ om.h organic_matter.h soil_heat.h soil_NH4.h solute.h adsorbtion.h \
+ soil_NO3.h am.h harvest.h mathlib.h
 crop_sold${OBJ}: crop_sold.C crop.h time.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h csmp.h bioclimate.h column.h \
- soil_water.h soil.h horizon.h hydraulic.h geometry.h organic_matter.h \
- om.h soil_heat.h soil_NH4.h solute.h soil_NO3.h am.h harvest.h \
- mathlib.h
+ soil_water.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
+ organic_matter.h om.h soil_heat.h soil_NH4.h solute.h adsorbtion.h \
+ soil_NO3.h am.h harvest.h mathlib.h
 action_with${OBJ}: action_with.C action.h common.h daisy.h syntax.h \
  alist.h column.h librarian.h library.h
 hydraulic_old2${OBJ}: hydraulic_old2.C hydraulic.h librarian.h library.h \
  common.h alist.h syntax.h options.h mathlib.h csmp.h
 nitrification_soil${OBJ}: nitrification_soil.C nitrification.h librarian.h \
  library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
- geometry.h soil_water.h soil_heat.h soil_NH4.h solute.h soil_NO3.h \
- csmp.h mathlib.h log.h filter.h groundwater.h uzmodel.h
+ tortuosity.h geometry.h soil_water.h soil_heat.h soil_NH4.h solute.h \
+ adsorbtion.h soil_NO3.h csmp.h mathlib.h log.h filter.h groundwater.h \
+ uzmodel.h
 nitrification_solute${OBJ}: nitrification_solute.C nitrification.h \
  librarian.h library.h common.h alist.h syntax.h soil.h horizon.h \
- hydraulic.h geometry.h soil_water.h soil_heat.h soil_NH4.h solute.h \
- soil_NO3.h csmp.h log.h filter.h mathlib.h groundwater.h uzmodel.h
+ hydraulic.h tortuosity.h geometry.h soil_water.h soil_heat.h \
+ soil_NH4.h solute.h adsorbtion.h soil_NO3.h csmp.h log.h filter.h \
+ mathlib.h groundwater.h uzmodel.h
 hydraulic_mod_C${OBJ}: hydraulic_mod_C.C hydraulic.h librarian.h library.h \
  common.h alist.h syntax.h
 uzlr${OBJ}: uzlr.C uzmodel.h librarian.h library.h common.h alist.h \
- syntax.h soil.h horizon.h hydraulic.h geometry.h log.h filter.h \
- mathlib.h
+ syntax.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h log.h \
+ filter.h mathlib.h
 transport_cd${OBJ}: transport_cd.C transport.h librarian.h library.h \
- common.h alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h \
- soil_water.h solute.h log.h filter.h mathlib.h
+ common.h alist.h syntax.h soil.h horizon.h hydraulic.h tortuosity.h \
+ geometry.h soil_water.h solute.h adsorbtion.h log.h filter.h \
+ mathlib.h
 transport_none${OBJ}: transport_none.C transport.h librarian.h library.h \
- common.h alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h \
- soil_water.h solute.h log.h filter.h mathlib.h
+ common.h alist.h syntax.h soil.h horizon.h hydraulic.h tortuosity.h \
+ geometry.h soil_water.h solute.h adsorbtion.h log.h filter.h \
+ mathlib.h
 transport_convection${OBJ}: transport_convection.C transport.h librarian.h \
  library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
- geometry.h soil_water.h solute.h log.h filter.h mathlib.h
+ tortuosity.h geometry.h soil_water.h solute.h adsorbtion.h log.h \
+ filter.h mathlib.h
+adsorbtion_vS_S${OBJ}: adsorbtion_vS_S.C adsorbtion.h librarian.h \
+ library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h mathlib.h
+adsorbtion_none${OBJ}: adsorbtion_none.C adsorbtion.h librarian.h \
+ library.h common.h alist.h syntax.h
+tortuosity_M_Q${OBJ}: tortuosity_M_Q.C tortuosity.h librarian.h library.h \
+ common.h alist.h syntax.h hydraulic.h
 daisy${OBJ}: daisy.C daisy.h common.h weather.h librarian.h library.h \
  alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h log.h \
  filter.h parser.h am.h nitrification.h hydraulic.h crop.h column.h \
- harvest.h action.h condition.h mike_she.h
+ harvest.h action.h condition.h
 parser${OBJ}: parser.C parser.h common.h syntax.h alist.h library.h
 log${OBJ}: log.C log.h filter.h librarian.h library.h common.h alist.h \
  syntax.h
@@ -484,7 +489,7 @@ weather${OBJ}: weather.C weather.h librarian.h library.h common.h alist.h \
 column${OBJ}: column.C column.h librarian.h library.h common.h alist.h \
  syntax.h
 crop${OBJ}: crop.C crop.h time.h common.h syntax.h alist.h library.h
-alist${OBJ}: alist.C alist.h common.h
+alist${OBJ}: alist.C alist.h common.h syntax.h
 syntax${OBJ}: syntax.C syntax.h common.h alist.h library.h
 library${OBJ}: library.C library.h common.h alist.h syntax.h
 action${OBJ}: action.C action.h common.h syntax.h alist.h library.h
@@ -504,47 +509,49 @@ parser_file${OBJ}: parser_file.C parser_file.h parser.h common.h options.h \
 hydraulic${OBJ}: hydraulic.C hydraulic.h librarian.h library.h common.h \
  alist.h syntax.h csmp.h
 soil${OBJ}: soil.C soil.h horizon.h librarian.h library.h common.h alist.h \
- syntax.h hydraulic.h geometry.h mathlib.h
+ syntax.h hydraulic.h tortuosity.h geometry.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h common.h
 bioclimate${OBJ}: bioclimate.C bioclimate.h column.h librarian.h library.h \
  common.h alist.h syntax.h surface.h uzmodel.h im.h weather.h crop.h \
- csmp.h soil.h horizon.h hydraulic.h geometry.h snow.h log.h filter.h \
- mike_she.h
+ csmp.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h snow.h \
+ log.h filter.h
 surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h \
  common.h alist.h syntax.h im.h soil_water.h log.h filter.h am.h \
- mathlib.h mike_she.h
+ mathlib.h
 soil_water${OBJ}: soil_water.C soil_water.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h uzmodel.h soil.h horizon.h \
- hydraulic.h geometry.h surface.h im.h groundwater.h mathlib.h \
- mike_she.h
-soil_NH4${OBJ}: soil_NH4.C soil_NH4.h solute.h common.h soil_water.h \
- soil.h horizon.h librarian.h library.h alist.h syntax.h hydraulic.h \
- geometry.h mathlib.h
-soil_NO3${OBJ}: soil_NO3.C soil_NO3.h solute.h common.h soil_water.h \
- soil.h horizon.h librarian.h library.h alist.h syntax.h hydraulic.h \
- geometry.h mike_she.h
+ hydraulic.h tortuosity.h geometry.h surface.h im.h groundwater.h \
+ mathlib.h
+soil_NH4${OBJ}: soil_NH4.C soil_NH4.h solute.h adsorbtion.h librarian.h \
+ library.h common.h alist.h syntax.h soil_water.h soil.h horizon.h \
+ hydraulic.h tortuosity.h geometry.h mathlib.h
+soil_NO3${OBJ}: soil_NO3.C soil_NO3.h solute.h adsorbtion.h librarian.h \
+ library.h common.h alist.h syntax.h soil_water.h soil.h horizon.h \
+ hydraulic.h tortuosity.h geometry.h
 organic_matter${OBJ}: organic_matter.C organic_matter.h syntax.h common.h \
  alist.h log.h filter.h librarian.h library.h am.h om.h soil.h \
- horizon.h hydraulic.h geometry.h soil_water.h soil_NH4.h solute.h \
- soil_NO3.h soil_heat.h groundwater.h uzmodel.h mathlib.h csmp.h
+ horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h soil_NH4.h \
+ solute.h adsorbtion.h soil_NO3.h soil_heat.h groundwater.h uzmodel.h \
+ mathlib.h csmp.h
 nitrification${OBJ}: nitrification.C nitrification.h librarian.h library.h \
  common.h alist.h syntax.h
 denitrification${OBJ}: denitrification.C denitrification.h common.h \
  alist.h syntax.h soil.h horizon.h librarian.h library.h hydraulic.h \
- geometry.h soil_water.h soil_heat.h organic_matter.h soil_NO3.h \
- solute.h groundwater.h uzmodel.h csmp.h log.h filter.h
+ tortuosity.h geometry.h soil_water.h soil_heat.h organic_matter.h \
+ soil_NO3.h solute.h adsorbtion.h groundwater.h uzmodel.h csmp.h log.h \
+ filter.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h alist.h common.h surface.h \
  uzmodel.h librarian.h library.h syntax.h im.h groundwater.h \
- soil_water.h soil.h horizon.h hydraulic.h geometry.h mathlib.h log.h \
- filter.h
+ soil_water.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
+ mathlib.h log.h filter.h
 groundwater${OBJ}: groundwater.C groundwater.h uzmodel.h librarian.h \
  library.h common.h alist.h syntax.h
 snow${OBJ}: snow.C snow.h alist.h common.h syntax.h log.h filter.h \
- librarian.h library.h soil.h horizon.h hydraulic.h geometry.h \
- soil_water.h soil_heat.h mathlib.h mike_she.h
-solute${OBJ}: solute.C solute.h common.h log.h filter.h librarian.h \
- library.h alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h \
- soil_water.h mathlib.h transport.h
+ librarian.h library.h soil.h horizon.h hydraulic.h tortuosity.h \
+ geometry.h soil_water.h soil_heat.h mathlib.h
+solute${OBJ}: solute.C solute.h adsorbtion.h librarian.h library.h \
+ common.h alist.h syntax.h log.h filter.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h soil_water.h mathlib.h transport.h
 am${OBJ}: am.C am.h common.h om.h im.h syntax.h alist.h log.h filter.h \
  librarian.h library.h geometry.h mathlib.h
 im${OBJ}: im.C im.h log.h filter.h librarian.h library.h common.h alist.h \
@@ -561,7 +568,11 @@ librarian${OBJ}: librarian.C librarian.h library.h common.h alist.h \
  syntax.h
 cdaisy${OBJ}: cdaisy.C syntax.h common.h alist.h daisy.h parser_file.h \
  parser.h column.h librarian.h library.h weather.h im.h action.h \
- groundwater.h uzmodel.h
+ groundwater.h uzmodel.h horizon.h
+adsorbtion${OBJ}: adsorbtion.C adsorbtion.h librarian.h library.h common.h \
+ alist.h syntax.h
+tortuosity${OBJ}: tortuosity.C tortuosity.h librarian.h library.h common.h \
+ alist.h syntax.h
 set_exceptions${OBJ}: set_exceptions.S
 main${OBJ}: main.C daisy.h common.h parser_file.h parser.h syntax.h \
  alist.h

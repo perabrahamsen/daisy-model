@@ -43,7 +43,7 @@ public:
   // Use.
   bool check (const string&) const 
        throw0 ();
-  void dump (const Syntax&, int indent = 0) const;
+  void dump (ostream&, const Syntax&, int indent = 0) const;
 
   double number (string) const
        throw2 (Invalid, Uninitialized);

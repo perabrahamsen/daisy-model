@@ -277,8 +277,6 @@ OrganicMatter::Implementation::monthly (const Soil& soil)
   const int am_size = am.size ();
   vector<AM*> new_am;
   
-  cerr << "\nThere are " << am_size << " AM dk:puljer.\n";
-  
   for (int i = 0; i < am_size; i++)
     {
       bool keep;
@@ -449,6 +447,11 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
     min_AM_N (al.number ("min_AM_N"))
 
 { 
+  // Sizes.
+  const unsigned int smb_size = smb.size ();
+  const unsigned int som_size = smb.size ();
+  
+
   // Production.
   CO2.insert (CO2.end(), soil.size(), 0.0);
   NO3_source.insert (NO3_source.end (), soil.size(), 0.0);
@@ -463,96 +466,64 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
       clay_turnover_factor.push_back (1.0 - a * (min (X_c, X_c_prime)));
     }
   
-  // Humus.
-  const vector<AttributeList*>& som_al = al.alist_sequence ("som");
-  const vector<AttributeList*>& smb_al = al.alist_sequence ("smb");
-
-  // Find total of fractions and missing C per N.
-  double total = 0.0;
-  int missing_C_per_N = -1;
-
-  for (unsigned int i = 0; i < som.size (); i++)
+  // Fill SMB C_per_N array with last value.
+  for (unsigned int pool = 0; pool < som_size; pool++)
     {
-      if (som_al[i]->check ("initial_fraction"))
-	total += som_al[i]->number ("initial_fraction");
-      
-      const unsigned int C_per_N_size = som[i]->C_per_N.size ();
-      if (C_per_N_size == 0)
-	{
-	  assert (missing_C_per_N == -1);
-	  missing_C_per_N = i;
-	}
-      else 
-	{
-	  if (C_per_N_size < soil.size ())
-	    som[i]->C_per_N.insert (som[i]->C_per_N.begin (),
-				    soil.size () - 	C_per_N_size,
-				    som[i]->C_per_N[C_per_N_size - 1]);
-	  assert (som[i]->C_per_N.size () == soil.size ());
-	}
-
-      const unsigned int C_size = som[i]->C.size ();
-      if (C_size < soil.size ())
-	som[i]->C.insert (som[i]->C.begin (), soil.size () - C_size, 0.0);
-      assert (som[i]->C.size () == soil.size ());
-    }
-  for (unsigned int i = 0; i < smb.size (); i++)
-    {
-      if (smb_al[i]->check ("initial_fraction"))
-	total += smb_al[i]->number ("initial_fraction");
-      
-      const unsigned int C_per_N_size = smb[i]->C_per_N.size ();
+      const unsigned int C_per_N_size = smb[pool]->C_per_N.size ();
       assert (C_per_N_size > 0);
       if (C_per_N_size < soil.size ())
-	smb[i]->C_per_N.insert (smb[i]->C_per_N.begin (),
-				soil.size () - 	C_per_N_size,
-				smb[i]->C_per_N[C_per_N_size - 1]);
-      assert (smb[i]->C_per_N.size () == soil.size ());
-
-      const unsigned int C_size = smb[i]->C.size ();
-      if (C_size < soil.size ())
-	smb[i]->C.insert (smb[i]->C.begin (), soil.size () - C_size, 0.0);
-      assert (smb[i]->C.size () == soil.size ());
+	smb[pool]->C_per_N.insert (smb[pool]->C_per_N.begin (),
+				   soil.size () - 	C_per_N_size,
+				   smb[pool]->C_per_N[C_per_N_size - 1]);
+      assert (smb[pool]->C_per_N.size () == soil.size ());
     }
 
-  // If any fractions were specified, distribute soil humus.
-  if (total > 0.0)
+  for (unsigned int lay = 0; lay < soil.size (); lay++)
     {
-      if (missing_C_per_N == -1)
-	THROW ("At least one C per N must be left unspecified in OM");
-
-      for (unsigned int l = 0; l < soil.size (); l++)
+      // Initialize SOM from horizons.
+      for (unsigned int pool = 0; pool < som_size; pool++)
 	{
-	  const double C = soil.initial_C (l);
-	  double N = soil.initial_N (l);
-
-	  for (unsigned int i = 0; i < som.size (); i++)
+	  if (som[pool]->C.size () == lay)
+	    som[pool]->C.push_back (soil.SOM_C (lay, pool));
+	  if (som[pool]->C_per_N.size () == lay)
+	    som[pool]->C_per_N.push_back (soil.SOM_C_per_N (lay, pool));
+	}
+      // SMB C should be calculated from equilibrium.
+      for (unsigned int pool = 0; pool < smb_size; pool++)
+	{
+	  double stolen = 0.0; // How much C was stolen by the SMB pools?
+ 
+	  if (smb[pool]->C.size () == lay)
 	    {
-	      const double fraction 
-		= som_al[i]->check ("initial_fraction")
-		? som_al[i]->number ("initial_fraction")
-		: 0.0;
+	      double in = 0.0;	      // Incomming C.
 
-	      som[i]->C[l] = C * fraction / total;
-	      if (missing_C_per_N + 0U != i)
-		N -= som[i]->C[l] / som[i]->C_per_N[l];
-	    }
-	  for (unsigned int i = 0; i < smb.size (); i++)
-	    {
-	      const double fraction 
-		= smb_al[i]->check ("initial_fraction")
-		? smb_al[i]->number ("initial_fraction")
-		: 0.0;
+	      // Add contributions from SMB pools.
+	      // We ignore contributions from higher numbered SMB pools.
+	      // We can do that, because that is the typical direction
+	      // of the flow.
+	      for (unsigned int i = 0; i < pool; i++)
+		in += smb[i]->C[lay] 
+		  * smb[i]->turnover_rate 
+		  * smb[i]->fractions[pool]
+		  * smb[i]->efficiency[pool];
 
-	      smb[i]->C[l] = C * fraction / total;
-	      N -= smb[i]->C[l] / smb[i]->C_per_N[l];
+	      // Add contributions from SOM pools
+	      for (unsigned int i = 0; i < som_size; i++)
+		in += som[i]->C[lay] 
+		  * som[i]->turnover_rate 
+		  * som[i]->fractions[pool]
+		  * som[i]->efficiency[pool];
+	      
+	      // Rate of outgoing C. 
+	      const double out_rate = smb[pool]->turnover_rate 
+		+ smb[pool]->maintenance;
+
+	      // content * out_rate = in  =>  content = in / out_rate;
+	      smb[pool]->C.push_back (in / out_rate);
+	      
+	      stolen += in;
 	    }
-	  assert (som[missing_C_per_N]->C_per_N.size () == l);
-	  if (N <= 0.0)
-	    THROW ("Used up all N in OrganicMatter initialization");
-	  const double missing = som[missing_C_per_N]->C[l] / N;
-	  som[missing_C_per_N]->C_per_N.push_back (missing);
-	  assert (som[missing_C_per_N]->C_per_N[l] >= 0.0);
+	  // TODO: Take the stolen C from the SOM pools.
 	}
     }
 }

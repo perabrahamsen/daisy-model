@@ -7,27 +7,38 @@
 
 struct Library::Implementation
 {
+  static map<string, Library*, less<string>/**/>* all;
+
   const string name;
   typedef map<string, AttributeList*, less<string> > alist_map;
   typedef map<string, const Syntax*, less<string> > syntax_map;
   alist_map alists;
   syntax_map syntaxen;
+  static void all_entries (vector<string>& libraries);
   AttributeList& lookup (string) const;
   bool check (string) const;
   void add (string, AttributeList&, const Syntax&);
+  void remove (string);
   const Syntax& syntax (string) const;
   void dump (int indent) const;
   void entries (vector<string>&) const;
   Implementation (const char* n) 
     : name (n)
-    { 
-      cerr << "Creating library `" << name << "'.\n";
-    }
+    { }
   ~Implementation ()
-    {
-      cerr << "Deleting library `" << name << "'.\n";
-    }
+    { all->erase (all->find (name)); }
 };
+
+map<string, Library*, less<string> >* Library::Implementation::all;
+
+void
+Library::Implementation::all_entries (vector<string>& libraries)
+{ 
+  for (map<string, Library*, less<string> >::const_iterator i = all->begin (); 
+       i != all->end ();
+       i++)
+    libraries.push_back ((*i).first); 
+}
 
 AttributeList&
 Library::Implementation::lookup (string key) const
@@ -37,22 +48,12 @@ Library::Implementation::lookup (string key) const
   if (i == alists.end ())
     THROW (AttributeList::Uninitialized ());
 
-  if (true || name == "crop")
-    {
-      cout << "(get " << name << " " << key << "\n  ";
-      (*i).second->dump (syntax (key), 2);
-      cout << ")\n";
-    }
-  else
-    cerr << "Lookup alist for `" << key << "' in library `" << name << "'.\n";
-
   return *(*i).second;
 }
 
 bool
 Library::Implementation::check (string key) const
 { 
-  cerr << "Check `" << key << "' in library `" << name << "'.\n";
   alist_map::const_iterator i = alists.find (key);
 
   if (i == alists.end ())
@@ -62,22 +63,23 @@ Library::Implementation::check (string key) const
 }
 
 void
-Library::Implementation::add (string key, AttributeList& value, const Syntax& syntax)
+Library::Implementation::add (string key, AttributeList& value,
+			      const Syntax& syntax)
 {
-  if (true || name == "crop")
-    {
-      cout << "(def" << name << " " << key << "\n  ";
-      value.dump (syntax, 2);
-      cerr << ")\n";
-    }
   alists[key] = &value;
   syntaxen[key] = &syntax;
+}
+
+void
+Library::Implementation::remove (string key)
+{
+  alists.erase (alists.find (key));
+  syntaxen.erase (syntaxen.find (key));
 }
 
 const Syntax& 
 Library::Implementation::syntax (string key) const
 { 
-  cerr << "Lookup syntax for `" << key << "' in library `" << name << "'.\n";
   syntax_map::const_iterator i = syntaxen.find (key);
 
   if (i == syntaxen.end ())
@@ -118,50 +120,55 @@ Library::Implementation::entries (vector<string>& result) const
     }
 }
 
+Library& 
+Library::find (string name)
+{ return *(*Implementation::all)[name]; }
+
+void
+Library::all (vector<string>& libraries)
+{ 
+  Implementation::all_entries (libraries);
+}
+
 const string&
 Library:: name () const
-{
-  return impl.name;
-}
+{ return impl.name; }
 
 AttributeList&
 Library::lookup (string key) const
-{ 
-  return impl.lookup (key);
-}
+{ return impl.lookup (key); }
 
 bool
 Library::check (string key) const
-{ 
-  return impl.check (key);
-}
+{ return impl.check (key); }
 
 void
 Library::add (string key, AttributeList& value, const Syntax& syntax)
-{
-  impl.add (key, value, syntax);
-}
+{ impl.add (key, value, syntax); }
+
+void
+Library::remove (string key)
+{ impl.remove (key); }
 
 const Syntax& 
 Library::syntax (string key) const
-{ 
-  return impl.syntax (key);
-}
+{ return impl.syntax (key); }
 
 void
 Library::dump (int indent) const
-{
-  impl.dump (indent);
-}
+{ impl.dump (indent); }
 
 void
 Library::entries (vector<string>& result) const
-{
-  impl.entries (result);
-}
+{ impl.entries (result); }
 
 Library::Library (const char *const name) : impl (*new Implementation (name))
-{ }
+{ 
+  if (Implementation::all == NULL)
+    // Buglet: we never delete this.
+    Implementation::all = new map<string, Library*, less<string> >;
+  (*Implementation::all)[name] = this; 
+}
 
 Library::~Library ()
 { delete &impl; }

@@ -29,10 +29,17 @@
 
 #ifdef __unix
 
+// Unix doesn't have DLL keywords.
+#define EXPORT
+#define IMPORT
+
 // If you can delete const objects.
 #define CONST_DELETE
 
-#ifndef EGCS
+#ifdef EGCS
+// Egcs can initialize a vector from two list iterators.
+#define HAS_TEMPLATE_MEMBERS
+#else
 // The g++ 2.7.2 find template doesn't work.
 #define BUGGY_FIND
 #endif
@@ -41,6 +48,11 @@
 #include <strstream.h>
 
 #else
+
+// WIN32 DLL keywords.
+#define EXPORT _export
+#define IMPORT _import
+
 // Define these for Borland C++ 5.0.1
 #define HANDLE_NAMESPACES
 #define BORLAND_TEMPLATES
@@ -79,7 +91,7 @@ using namespace std;
 
 // Shared code.
 
-static const double dt = 1.0;	// time step.
+const double dt = 1.0;	// time step.
 
 // From Mumit's STL newbie guide.
 template <class ForwardIterator>

@@ -55,21 +55,12 @@ public:
   virtual bool check_am (const AttributeList& am) const = 0;
   virtual void output (Log&, Filter&) const = 0;
 
-  // Library.
-public:
-  static const Library& library ();
-  typedef Column* (*constructor) (const AttributeList&);
-  static void add_type (const string& name, 
-			const AttributeList&, const Syntax&,
-			constructor);
-  static void derive_type (const string& name, const AttributeList&, 
-			   const string& super);
-  static Column* create (const AttributeList& al);
-
   // Create and Destroy.
 protected:
   Column (string name);
 public:
+  virtual void initialize (const Time& time, const Groundwater&) = 0;
+
   virtual ~Column ();
 };
 

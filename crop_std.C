@@ -933,14 +933,6 @@ CropStandardSyntax::CropStandardSyntax ()
   alist.add ("CrpAux", vCrpAux);
 
   Crop::add_type ("default", alist, syntax, &CropStandard::make);
-
-  cout << "(define aux1\n  ";
-  vCrpAux.dump (CrpAux, 2);
-  cerr << ")\n";
-
-  cout << "(define aux2\n  ";
-  alist.alist ("CrpAux").dump (syntax.syntax ("CrpAux"), 2);
-  cerr << ")\n";
 }
 
 double

@@ -68,13 +68,15 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("EpInterchange", 0.6);
   syntax.add ("MaxRootingDepth", Syntax::Number, Syntax::Const);
   alist.add ("MaxRootingDepth", 100.0);
+  syntax.add ("dispersivity", Syntax::Number, Syntax::Const);
 }
   
 Soil::Soil (const AttributeList& al)
   : Geometry (al),
     EpFactor_ (al.number ("EpFactor")),
     EpInterchange_ (al.number ("EpInterchange")),
-    MaxRootingDepth_ (al.number ("MaxRootingDepth"))
+    MaxRootingDepth_ (al.number ("MaxRootingDepth")),
+    dispersivity_ (al.number ("dispersivity"))
 {
   vector<const AttributeList*>::const_iterator layer
     = al.alist_sequence ("horizons").begin ();

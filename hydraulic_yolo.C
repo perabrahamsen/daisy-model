@@ -103,7 +103,6 @@ HydraulicYoloSyntax::HydraulicYoloSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
   Hydraulic::load_syntax (syntax, alist);
-  alist.add ("lambda", 4.0);
   alist.add ("Theta_sat", 0.495);
   syntax.add ("M_intervals", Syntax::Integer, Syntax::Const);
   alist.add ("M_intervals", 500);

@@ -46,7 +46,7 @@ ActionHarvest::doIt (Daisy& daisy)
       cout << " " << (*i)->name;
 
     }
-    cout << "]";
+    cout << "]\n";
 }
 
 ActionHarvest::ActionHarvest (const AttributeList& al, const Action *const p)
