@@ -22,7 +22,8 @@
   (Canopy 
       (DSLAI05   0.15)
       (SpLAI     0.033)
-      (LeafAIMod (0.0 1.0) (1.1 1.0) (1.50 0.90) (1.8 0.0))
+      ;; LeafAIMod may never be 0.0 -pa
+      ;; (LeafAIMod (0.0 1.0) (1.1 1.0) (1.50 0.90) (1.8 0.0))
       (SpStemAI 0.005)
       (StemAIMod (0.0 1.0) (1.2 0.0) (2.0 0.0))
       (StemPhotEff 0.20)
