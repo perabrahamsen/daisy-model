@@ -22,13 +22,13 @@
 
 #include "uzmodel.h"
 
-struct IM;
-struct AttributeList;
-struct Log;
-struct SoilWater;
-struct Soil;
-struct Chemicals;
-struct SoilChemicals;
+class IM;
+class AttributeList;
+class Log;
+class SoilWater;
+class Soil;
+class Chemicals;
+class SoilChemicals;
 
 class Surface : public UZtop
 {

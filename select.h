@@ -30,9 +30,9 @@
 #include <map>
 #include <vector>
 
-struct Geometry;
-struct Daisy;
-struct Time;
+class Geometry;
+class Daisy;
+class Time;
 
 class Select
 {

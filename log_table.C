@@ -74,8 +74,8 @@ struct LogTable : public LogSelect, public Destination
   void error ();
   void missing ();
   void add (const vector<double>& value);
-  void add (double value);
-  void add (symbol value);
+  void add (const double value);
+  void add (const symbol value);
 
   // Create and destroy.
   bool check (const Syntax&, Treelog& msg) const;

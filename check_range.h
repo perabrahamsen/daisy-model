@@ -33,7 +33,7 @@ private:
 
   // Use.
 private:
-  void check (double value) const throw (string);
+  void check (const double value) const throw (string);
 
   // Create and Destroy.
 public:
@@ -49,7 +49,7 @@ private:
 
   // Use.
 private:
-  void check (double value) const throw (string);
+  void check (const double value) const throw (string);
 
   // Create and Destroy.
 public:
@@ -65,7 +65,7 @@ private:
 
   // Use.
 private:
-  void check (double value) const throw (string);
+  void check (const double value) const throw (string);
 
   // Create and Destroy.
 public:
@@ -81,7 +81,7 @@ private:
 
   // Use.
 private:
-  void check (double value) const throw (string);
+  void check (const double value) const throw (string);
 
   // Create and Destroy.
 public:
@@ -96,7 +96,7 @@ private:
 
   // Use.
 private:
-  void check (double value) const throw (string);
+  void check (const double value) const throw (string);
 
   // Create and Destroy.
 public:
@@ -111,7 +111,7 @@ private:
 
   // Use.
 private:
-  void check (double value) const throw (string);
+  void check (const double value) const throw (string);
 
   // Create and Destroy.
 public:
@@ -126,7 +126,7 @@ private:
 
   // Use.
 private:
-  void check (double value) const throw (string);
+  void check (const double value) const throw (string);
 
   // Create and Destroy.
 public:
@@ -141,7 +141,7 @@ private:
 
   // Use.
 private:
-  void check (double value) const throw (string);
+  void check (const double value) const throw (string);
 
   // Create and Destroy.
 public:

@@ -46,8 +46,8 @@ struct Units::Content
 bool				// True iff FROM and TO have same time unit.
 Units::Content::time_match (const string& from, const string& to)
 {
-  const int from_size = from.size ();
-  const int to_size = to.size ();
+  const size_t from_size = from.size ();
+  const size_t to_size = to.size ();
 
   for (int i = 1; true; i++)
     {
@@ -69,7 +69,7 @@ const string			// Return DIM without time.
 Units::Content::crop_time (const string& dim)
 {
   daisy_assert (dim.size () > 0);
-  int end;
+  size_t end;
   for (end = dim.size () - 1; dim[end] != '/'; end--)
     daisy_assert (end > 0);
   string result;

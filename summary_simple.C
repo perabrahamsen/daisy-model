@@ -136,7 +136,7 @@ Name to use for this line.  By default use the tag.");
       if (type != Flux)
 	return select_dimension;
 
-      const int size = select_dimension.size ();
+      const size_t size = select_dimension.size ();
       if (size > 1)
 	{
 	  const char last = select_dimension[size - 1];
@@ -159,7 +159,7 @@ Name to use for this line.  By default use the tag.");
       else
 	return select_dimension + "h/" + period;
     }
-    int name_size ()
+    size_t name_size ()
     { 
       if (type == Content)
 	return name.name ().size () + 6;
@@ -320,7 +320,7 @@ SummarySimple::summarize (const int hours, Treelog& msg)
 
   double total = 0.0;
   const int sum_size = sum_name.name ().size ();
-  int max_size = print_sum ? sum_size : 0;
+  size_t max_size = print_sum ? sum_size : 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
     max_size = max (max_size, fetch[i]->name_size ());
   int max_digits = 0;

@@ -89,8 +89,8 @@ struct LogExtern : public LogSelect,
   void error ();
   void missing ();
   void add (const vector<double>& value);
-  void add (double value);
-  void add (symbol value);
+  void add (const double value);
+  void add (const symbol value);
 
   // LogExternSource
   type lookup (symbol tag) const;

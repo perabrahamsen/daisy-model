@@ -40,7 +40,7 @@ private:
   // Simulation.
 public:
   void tick (Treelog&, const Soil&, const SoilWater&, const Adsorption&,
-	     const double diffusion_coefficient,
+	     double diffusion_coefficient,
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,

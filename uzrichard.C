@@ -79,7 +79,7 @@ private:
 		vector<double>& q);
   bool converges (const vector<double>& previous,
 		  const vector<double>& current) const;
-  void internode (const Soil& Soil, const SoilHeat& soil_heat,
+  void internode (const Soil&, const SoilHeat&,
 		  int first, int last,
 		  const vector<double>& h_ice,
 		  const vector<double>& K,
@@ -551,7 +551,7 @@ bool
 UZRichard::converges (const vector<double>& previous,
 		      const vector<double>& current) const
 {
-  unsigned int size = previous.size ();
+  size_t size = previous.size ();
   daisy_assert (current.size () == size);
 
   for (unsigned int i = 0; i < size; i++)

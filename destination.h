@@ -33,8 +33,8 @@ public:
   virtual void error () = 0;
   virtual void missing () = 0;
   virtual void add (const std::vector<double>& value) = 0;
-  virtual void add (double value) = 0;
-  virtual void add (symbol value) = 0;
+  virtual void add (const double value) = 0;
+  virtual void add (const symbol value) = 0;
   
   // Create and Destroy
 public:
@@ -51,8 +51,8 @@ public:
   void error ();
   void missing ();
   void add (const std::vector<double>& value);
-  void add (double value);
-  void add (symbol value);
+  void add (const double value);
+  void add (const symbol value);
   
   // Create and Destroy
 public:

@@ -147,13 +147,13 @@ struct LogHarvest : public Log
 
   void output (symbol, const Time&)
   { }
-  void output (symbol, const bool)
+  void output (symbol, bool)
   { }
-  void output (symbol, const double)
+  void output (symbol, double)
   { }
-  void output (symbol, const int)
+  void output (symbol, int)
   { }
-  void output (symbol, const symbol)
+  void output (symbol, symbol)
   { }
   void output (symbol, const vector<double>&)
   { }

@@ -27,23 +27,23 @@
 #include "librarian.h"
 #include <vector>
 
-struct Log;
-struct Time;
-struct AttributeList;
-struct Bioclimate;
-struct PLF;
-struct Library;
-struct Syntax;
-struct SoilWater;
-struct Soil;
-struct Geometry;
-struct OrganicMatter;
-struct SoilHeat;
-struct SoilNH4;
-struct SoilNO3;
-struct Column;
-struct Harvest;
-struct AM;
+class Log;
+class Time;
+class AttributeList;
+class Bioclimate;
+class PLF;
+class Library;
+class Syntax;
+class SoilWater;
+class Soil;
+class Geometry;
+class OrganicMatter;
+class SoilHeat;
+class SoilNH4;
+class SoilNO3;
+class Column;
+class Harvest;
+class AM;
 
 class Crop 
 {

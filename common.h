@@ -51,12 +51,20 @@
 // MS Visual C++.
 
 // #pragma warning (disable: 4786 4503)
-#pragma warning (3: 4019 4032 4057 4061 4125 4130 4152 4189 4201 4706)
-#pragma warning (disable: 4099 4290 4018)
+// #pragma warning (3: 4019 4032 4057 4061 4125 4130 4152 4189 4201 4706)
+// #pragma warning (disable: 4099 4290 4018)
 #define GLOBAL_CONSTANT
 
+#if 0
 double max (double, double);
 double min (double, double);
+int max (int, int);
+int min (int, int);
+size_t max (size_t, size_t);
+size_t min (size_t, size_t);
+unsigned long max (unsigned long, unsigned long);
+unsigned long min (unsigned long, unsigned long);
+#endif
 
 // Work around broken for-scoping
 // #define for if(0);else for

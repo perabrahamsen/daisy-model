@@ -734,7 +734,7 @@ Syntax::entries (vector<string>& result) const
 
 unsigned int
 Syntax::entries () const
-{ return impl.types.size (); }
+{ return impl.types.size () + 0U; }
 
 void 
 Syntax::add_check (check_fun fun)

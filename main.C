@@ -90,7 +90,7 @@ main (int argc, char* argv[])
       const string when = string ("Simulation started ") + ctime (&start_time);
       TmpStream start_msg;
       start_msg () << when.substr (0, when.size () - 1);
-      const int time_ago = time (NULL) - start_time;
+      const time_t time_ago = time (NULL) - start_time;
       if (time_ago == 0)
 	start_msg () << ".";
       if (time_ago == 1)
@@ -101,7 +101,7 @@ main (int argc, char* argv[])
 
       daisy.run (treelog);
 
-      const int time_used = time (NULL) - start_time;
+      const time_t time_used = time (NULL) - start_time;
       const int hours = time_used / 3600;
       const int minutes = (time_used % 3600) / 60;
       const int seconds = time_used % 60;

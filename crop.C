@@ -3,6 +3,7 @@
 #include "crop.h"
 #include "chemicals.h"
 #include "om.h"
+// #include "harvest.h"
 
 const double Crop::DSremove = -5001.0;
 
@@ -50,10 +51,11 @@ Crop::kill (const symbol name, const Time& time, const Geometry& geometry,
 	    vector<double>& residuals_N_soil, vector<double>& residuals_C_soil,
 	    Treelog& out)
 { 
-  harvest (name, time, geometry, bioclimate,
-	   0.0, 0.0, 0.0, 0.0, true, residuals, 
-	   residuals_DM, residuals_N_top, residuals_C_top, 
-	   residuals_N_soil, residuals_C_soil, out); 
+  const Harvest& dummy // MS Visual C++ 2003 sucks.
+        = harvest (name, time, geometry, bioclimate,
+	          0.0, 0.0, 0.0, 0.0, true, residuals, 
+	          residuals_DM, residuals_N_top, residuals_C_top, 
+	          residuals_N_soil, residuals_C_soil, out); 
 }
 
 void 

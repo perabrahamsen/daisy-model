@@ -7,7 +7,7 @@
 // Get chdir.
 #if defined (__unix)
 #include <unistd.h>
-#elif defined (__MINGW32__)
+#elif defined (__MINGW32__) || defined (_MSC_VER)
 extern "C" int chdir (const char* dir);
 #else
 #include <dir.h>

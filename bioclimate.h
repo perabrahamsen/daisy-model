@@ -26,17 +26,17 @@
 #include "librarian.h"
 #include "symbol.h"
 
-struct Surface;
-struct Weather;
-struct AttributeList;
-struct Vegetation;
-struct Soil;
-struct Syntax;
-struct SoilWater;
-struct SoilHeat;
-struct Log;
-struct Chemicals;
-struct Time;
+class Surface;
+class Weather;
+class AttributeList;
+class Vegetation;
+class Soil;
+class Syntax;
+class SoilWater;
+class SoilHeat;
+class Log;
+class Chemicals;
+class Time;
 
 class Bioclimate
 { 

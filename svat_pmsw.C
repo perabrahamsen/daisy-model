@@ -662,7 +662,7 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
 
   // calculate rcmin_star from r_sc_star
   // it follows that no stress means rrcmin_star=r_sc, i.e. LAI*Fi=1.0
-  renv_lai_factor=LAI*/*rf1_dolman*rf_def*rf_3*/rf_etep;
+  renv_lai_factor=LAI* /*rf1_dolman*rf_def*rf_3*/ rf_etep;
   rrcmin_star=r_sc*renv_lai_factor;
 
   if (rrcmin_star > r_sc) rrcmin_star=r_sc;

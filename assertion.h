@@ -31,6 +31,8 @@ class Treelog;
 
 #ifdef __GNUC__
 #define NORETURN __attribute__ ((noreturn))
+#elif defined (_MSC_VER)
+#define NORETURN __declspec(noreturn)
 #else
 #define NORETURN
 #endif
@@ -41,14 +43,14 @@ namespace Assertion
   void warning (const std::string&);
   void error (const std::string&);
   void debug (const std::string&);
-  void failure (const char* file, int line, const char* fun,
-		const char* test) NORETURN;
+  NORETURN void failure (const char* file, int line, const char* fun,
+		         const char* test);
   void bug (const char* file, int line, const char* fun, 
 	    const std::string& msg);
   void warning (const char* file, int line, const char* fun, 
 		const std::string& msg);
-  void panic (const char* file, int line, const char* fun,
-	      const std::string& msg) NORETURN;
+  NORETURN void panic (const char* file, int line, const char* fun,
+	               const std::string& msg);
   void non_negative (const char* file, int line, const char* fun,
 		     const std::vector<double>& v);
 

@@ -29,7 +29,7 @@
 // GCC 2.95.2 need a ".h".
 #if defined (__unix)
 #include <unistd.h>
-#elif defined (__MINGW32__)
+#elif defined (__MINGW32__) || defined (_MSC_VER)
 extern "C" char* getcwd (char*, int);
 #else
 #include <dir.h>

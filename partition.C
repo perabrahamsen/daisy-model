@@ -27,6 +27,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "tmpstream.h"
+#include "common.h"
 
 void
 Partition::operator() (double DS, double current_RSR,

@@ -29,7 +29,7 @@ class Check
 { 
   // Use.
 public:
-  virtual void check (double value) const throw (string) = 0;
+  virtual void check (const double value) const throw (string) = 0;
 
   // Utilities.
 public:
