@@ -104,10 +104,10 @@ Crop development and phenology in the default crop model.");
   syntax.add ("EmrSMF", "cm", "d", Syntax::Const,
 	      "Soil moisture (h-function) effect on emergense.");
   PLF SMF;
-  SMF.add (-1000.0, 0.00);
+  SMF.add (-1000.0, 1.00);
   SMF.add (-150.0, 1.00);
   SMF.add (-50.00, 1.00);
-  SMF.add (-30.00, 0.00);
+  SMF.add (-30.00, 1.00);
   alist.add("EmrSMF",SMF);
   syntax.add ("DS_Emr", Syntax::None (), Syntax::Const,
 	      "Development stage at emergence.");
