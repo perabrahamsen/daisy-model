@@ -1,8 +1,11 @@
 1999-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 0.96 released.
+	* Version 0.97 released.
 
 1999-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.C, weather.h, weather_std.C (check): New function.
+	* daisy.C (check): Call it.
 
 	* Version 0.96 released.
 

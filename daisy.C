@@ -42,6 +42,19 @@ Daisy::check ()
   assert (syntax);
   bool all_ok = true;
 
+  // Check weather.
+  {
+    bool ok = true;
+    if (!weather.check (time, time))
+      ok = false;
+
+    if (!ok)
+      {
+	CERR << "Weather problems\n";
+	all_ok = false;
+      }
+  }
+
   // Check field.
   {
     bool ok = true;

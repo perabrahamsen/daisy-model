@@ -294,6 +294,10 @@ Weather::Weather (const AttributeList& al)
 Weather::~Weather ()
 { }
 
+bool
+Weather::check (const Time&, const Time&) const
+{ return true; }
+
 void
 Weather::load_syntax (Syntax& syntax, AttributeList&)
 {

@@ -1,7 +1,6 @@
 * Ny klimafil.
 
--- data dreven keyword parsing.
--- check af fejl og range før start
+-- Lav LaTeX beskrivelse af format til manualen.
 
 * Nyt `utils' katalog med de to dhi scripts.
 

@@ -7,18 +7,10 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <set>
 
 struct WeatherStandard : public Weather
 {
-  // Snow Model.
-  const double T_rain;
-  const double T_snow;
-
-  // Parameters.
-  int timestep;
-  Time begin;
-  Time end;
-
   // Units.
   struct unit_type
   {
@@ -28,8 +20,28 @@ struct WeatherStandard : public Weather
   };
   static const unit_type unit_table[];
   static const int unit_table_size;
-  bool has_unit (const string& from, const string& to);
+  bool has_conversion (const string& from, const string& to);
   double convert_unit (const string& from, const string& to);
+
+  // Snow Model.
+  const double T_rain;
+  const double T_snow;
+
+  // Keywords
+  struct keyword_description_type
+  {
+    string name;
+    string dim;
+    double WeatherStandard::* value;
+    double min;
+    double max;
+    bool required;
+  };
+  static const keyword_description_type keyword_description[];
+  static const int keyword_description_size;
+  int timestep;
+  Time begin;
+  Time end;
 
   // Data.
   struct data_description_type
@@ -147,16 +159,16 @@ struct WeatherStandard : public Weather
     }
 
   // Create and Destroy.
-  void dim_check (const string& got, const string& expected);
-  void check_interval (const string& name, double val,
-		       double from, double to, bool& ok);
   WeatherStandard (const AttributeList&);
   ~WeatherStandard ();
+  bool check (const Time& from, const Time& to) const;
 };
 
 const WeatherStandard::unit_type 
 WeatherStandard::unit_table[] = 
-{ { "mm/d", "mm/h", 0.0416666667 } };
+{ { "mm/d", "mm/h", 0.0416666667 },
+  { "dgWest", "dgEast", -1},
+  { "dgSouth", "dgNorth", -1} };
   
 const int 
 WeatherStandard::unit_table_size = 
@@ -164,7 +176,7 @@ WeatherStandard::unit_table_size =
   /**/ / sizeof (WeatherStandard::unit_type); 
 
 bool
-WeatherStandard::has_unit (const string& from, const string& to)
+WeatherStandard::has_conversion (const string& from, const string& to)
 {
   if (from == to)
     return true;
@@ -188,8 +200,22 @@ WeatherStandard::convert_unit (const string& from, const string& to)
   assert (false);
 }
 
+const WeatherStandard::keyword_description_type 
+WeatherStandard::keyword_description[] =
+{ { "Latitude", "dgNorth", &WeatherStandard::latitude, -360, 360, true },
+  { "Longitude", "dgEast", &WeatherStandard::longitude, -360, 360, true },
+  { "Elevation", "m", &WeatherStandard::elevation, 0, 10000, true },
+  { "TimeZone", "dgEast", &WeatherStandard::timezone, -360, 360, true },
+  { "ScreenHeight", "m", &WeatherStandard::screen_height, 0, 100, true },
+  { "TAverage", "dgC", &WeatherStandard::T_average, -10, 40, true },
+  { "TAmplitude", "dgC", &WeatherStandard::T_amplitude, 0, 100, true },
+  { "MaxTDay", "yday", &WeatherStandard::max_Ta_yday, 1, 365, true } };
 
-    
+const int 
+WeatherStandard::keyword_description_size 
+/**/ = sizeof (WeatherStandard::keyword_description) 
+  /**/ / sizeof (keyword_description_type);
+
 const WeatherStandard::data_description_type 
 WeatherStandard::data_description[] =
 { { "Year", "year", &WeatherStandard::next_year, NULL,
@@ -397,26 +423,6 @@ WeatherStandard::read_new_day (const Time& time)
     }
 }
 
-void 
-WeatherStandard::dim_check (const string& got, const string& expected)
-{
-  static const string intro = "Expected dimension `";
-  if (got != expected)
-    lex.error (intro + expected + "' got `" + got + "'");
-}
-
-void 
-WeatherStandard::check_interval (const string& name, double val,
-		double from, double to, bool& ok)
-{
-  if (val < from || val > to)
-    { 
-      lex.error (string ("Keyword ") + name 
-		 + ": value out of range or missing.\n");
-      ok = false;
-    }
-}
-
 WeatherStandard::WeatherStandard (const AttributeList& al)
   : Weather (al),
     T_rain (al.number ("T_rain")),
@@ -471,23 +477,40 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
   set<string> keywords;
 
   // Read keywords.
+  bool last_was_note = false;
   while (lex.good () && lex.peek () != '-')
     {
-      const string key = lex.get_word ();
+      string key = lex.get_word ();
 
-      if (keywords.member (key))
-	lex.error (string ("Duplicate keyword `") + key + "'");
-      else
-	keywords.add (key);
-
-      lex.skip_space ();
-
-      if (key == "Station:")
-	lex.skip_line ();
-      else if (key == "Note:")
-	lex.skip_line ();
-      else if (key == "Surface:")
+      assert (key.size () > 0);
+      if (key[key.size () - 1] != ':')
 	{
+	  lex.error ("Keywords should end in :");
+	  lex.skip_line ();
+	  lex.next_line ();
+	  continue;
+	}
+      key.erase (key.size () - 1);
+
+      if (keywords.find (key) == keywords.end ())
+	keywords.insert (key);
+      else if (key != "Note")
+	lex.error (string ("Duplicate keyword `") + key + "'");
+      else if (!last_was_note)
+	lex.error ("Only one Note: block allowed");
+      
+      last_was_note = false;
+		   
+      if (key == "Station")
+	lex.skip_line ();
+      else if (key == "Note")
+	{
+	  lex.skip_line ();
+	  last_was_note = true;
+	}
+      else if (key == "Surface")
+	{
+	  lex.skip_space ();
 	  const string type = lex.get_word ();
 	  if (type == "reference")
 	    surface = Surface::reference;
@@ -496,116 +519,113 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
 	  else
 	    lex.error ("Uknown surface type");
 	}
-      else if (key == "Begin:")
-	lex.read_date (begin);
-      else if (key == "End:")
-	lex.read_date (end);
+      else if (key == "Begin")
+	{
+	  lex.skip_space ();
+	  lex.read_date (begin);
+	}
+      else if (key == "End")
+	{
+	  lex.skip_space ();
+	  lex.read_date (end);
+	}
       else
 	{
+	  lex.skip_space ();
 	  double val = lex.get_number ();
 	  lex.skip_space ();
 	  string dim = lex.get_word ();
 	      
-	  if (key == "Elevation:")
+	  if (key == "NH4WetDep")
 	    {
-	      dim_check (dim, "m");
-	      elevation = val;
-	    }
-	  else if (key == "Longitude:")
-	    {
-	      if (dim == "dgWest")
-		longitude = -val;
-	      else if (dim == "dgEast")
-		longitude = val;
+	      if (has_conversion (dim, "ppm"))
+		val *= convert_unit (dim, "ppm");
 	      else
-		lex.error ("expected dgWest or dgEast");
-	    }
-	  else if (key == "Latitude:")
-	    {
-	      if (dim == "dgSouth")
-		latitude = -val;
-	      else if (dim == "dgNorth")
-		latitude = val;
-	      else
-		lex.error ("expected dgSouth or dgNorth");
-	    }
-	  else if (key == "TimeZone:")
-	    {
-	      if (dim == "dgWest")
-		timezone = -val;
-	      else if (dim == "dgEast")
-		timezone = val;
-	      else
-		lex.error ("expected dgWest or dgEast");
-	    }
-	  else if (key == "ScreenHeight:")
-	    {
-	      dim_check (dim, "m");
-	      screen_height = val;
-	    }
-	  else if (key == "Timestep:")
-	    {
-	      dim_check (dim, "hours");
-	      timestep = static_cast<int> (val);
-	      if (timestep != val)
-		lex.error ("Timestep should be integral");
-	    }
-	  else if (key == "NH4WetDep:")
-	    {
-	      dim_check (dim, "ppm");
+		lex.error ("Unknown dimension");
+	      if (val < 0.0 || val > 100.0)
+		lex.error ("Unreasonable value");
 	      WetDeposit.NH4 = val;
 	    }
-	  else if (key == "NH4DryDep:")
+	  else if (key == "NH4DryDep")
 	    {
-	      dim_check (dim, "kgN/year");
+	      if (has_conversion (dim, "kgN/year"))
+		val *= convert_unit (dim, "kgN/year");
+	      else
+		lex.error ("Unknown dimension");
+	      if (val < 0.0 || val > 100.0)
+		lex.error ("Unreasonable value");
 	      DryDeposit.NH4 = val;
 	    }
-	  else if (key == "NO3WetDep:")
+	  else if (key == "NO3WetDep")
 	    {
-	      dim_check (dim, "ppm");
+	      if (has_conversion (dim, "ppm"))
+		val *= convert_unit (dim, "ppm");
+	      else
+		lex.error ("Unknown dimension");
+	      if (val < 0.0 || val > 100.0)
+		lex.error ("Unreasonable value");
 	      WetDeposit.NO3 = val;
 	    }
-	  else if (key == "NO3DryDep:")
+	  else if (key == "NO3DryDep")
 	    {
-	      dim_check (dim, "kgN/year");
+	      if (has_conversion (dim, "kgN/year"))
+		val *= convert_unit (dim, "kgN/year");
+	      else
+		lex.error ("Unknown dimension");
+	      if (val < 0.0 || val > 100.0)
+		lex.error ("Unreasonable value");
 	      DryDeposit.NO3 = val;
 	    }
-	  else if (key == "TAverage:")
+	  else if (key == "Timestep")
 	    {
-	      dim_check (dim, "dgC");
-	      T_average = val;
-	    }
-	  else if (key == "TAmplitude:")
-	    {
-	      dim_check (dim, "dgC");
-	      T_amplitude = val;
-	    }
-	  else if (key == "MaxTDay:")
-	    {
-	      dim_check (dim, "yday");
-	      max_Ta_yday = val;
+	      if (has_conversion (dim, "hours"))
+		val *= convert_unit (dim, "hours");
+	      else
+		lex.error ("Unknown dimension");
+	      timestep = static_cast<int> (val);
+	      if (timestep != val || timestep < 0.0)
+		lex.error ("Timestep should be a cardinal number");
 	    }
 	  else
-	    lex.error ("Unknown keyword");
+	    {
+	      bool found = false;
+	      for (unsigned int i = 0; i < keyword_description_size; i++)
+		{
+		  if (key == keyword_description[i].name)
+		    {
+		      if (has_conversion (dim, keyword_description[i].dim))
+			val *= convert_unit (dim, keyword_description[i].dim);
+		      else
+			lex.error ("Unknown dimension");
+		      if (val < keyword_description[i].min)
+			lex.error (key + " value too low");
+		      else if (val > keyword_description[i].max)
+			lex.error (key + " value too high");
+		      this->*(keyword_description[i].value) = val;
+		      found = true;
+		    }
+		}
+	      if (!found)
+		lex.error (string ("Unknown keyword: `") + key + "'");
+	    }
 	}
       lex.next_line ();
     }
 
   // Check keywords.
-  bool ok = true;
-  check_interval ("Latitude", latitude, -360, 360, ok);
-  check_interval ("Longitude", longitude, -360, 360, ok);
-  check_interval ("Elevation", elevation, 0, 10000, ok);
-  check_interval ("TimeZone", timezone, -360, 360, ok);
-  check_interval ("ScreenHeight", screen_height, 0, 100, ok);
-  check_interval ("Timestep", timestep, 0, 24*7, ok);
-  check_interval ("TAverage", T_average, -100, 100, ok);
-  check_interval ("TAmplitude", T_amplitude, 0, 100, ok);
-  check_interval ("MaxTDay", max_Ta_yday, 1, 365, ok);
-  check_interval ("NH4WetDep", WetDeposit.NH4, 0, 100, ok);
-  check_interval ("NO3WetDep", WetDeposit.NO3, 0, 100, ok);
-  check_interval ("NH4DryDep", DryDeposit.NH4, 0, 100, ok);
-  check_interval ("NO3DryDep", DryDeposit.NO3, 0, 100, ok);
+  for (unsigned int i = 0; i < keyword_description_size; i++)
+    if (keyword_description[i].required 
+	&& keywords.find (keyword_description[i].name) == keywords.end ())
+      lex.error (keyword_description[i].name + " missing");
+
+  static const string required[] = 
+  { "NH4WetDep", "NO3WetDep", "NH4DryDep", "NO3DryDep", "Station",
+    "Surface", "Begin", "End" };
+  static const int required_size = sizeof (required) / sizeof (string);
+  
+  for (unsigned int i = 0; i < required_size; i++)
+    if (keywords.find (required[i]) == keywords.end ())
+      lex.error (string ("Missing keyword `") + required[i] + "'");
 
   if (begin >= end)
     lex.error ("Weather data ends before they begin");
@@ -652,7 +672,7 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     {
       const string dimension = lex.get_word ();
       const int index = data_index[i];
-      if (has_unit (dimension, data_description[index].dim))
+      if (has_conversion (dimension, data_description[index].dim))
 	{
 	  if (data_description[index].factor)
 	    this->*(data_description[index].factor) 
@@ -672,6 +692,29 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
 
 WeatherStandard::~WeatherStandard ()
 { }
+
+bool
+WeatherStandard::check (const Time& from, const Time& to) const
+{ 
+  bool ok = true;
+  if (lex.error_count > 0)
+    {
+      CERR << lex.error_count << " parser errors encountered\n";
+      ok = false;
+    }
+  if (from < begin)
+    {
+      CERR << "Simulation starts before weather data\n";
+      ok = false;
+    }
+  if (to > end)
+    {
+      CERR << "Simulation ends after weather data\n";
+      ok = false;
+    }
+  return ok;
+}
+
 
 static struct WeatherStandardSyntax
 {
