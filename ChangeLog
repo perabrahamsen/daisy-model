@@ -2,6 +2,10 @@
 
 	* Version 2.44 released.
 
+2003-02-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.44 released.
+
 2003-02-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lib/log.dai ("Forced LAI"): New log model.
