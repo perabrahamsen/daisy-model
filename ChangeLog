@@ -1,13 +1,14 @@
 2002-02-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* groundwater_pipe.C (initialize): Fix 'Treelog::Open' nesting
-	bug. 
+	bug.  Added some assertions.
 
 	* vernalization.C (output): Don't output if not required (need for
 	checkpoints).
+	* crop_std.C (output): Ditto.
 
 	* hydraulic_Cosby.C (check_alist): Don't complain if 'Theta_sat'
-	is speciefied, it will be after a checkpoint.
+	is specified, it will be after a checkpoint.
 
 2002-02-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 

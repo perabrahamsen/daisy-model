@@ -352,7 +352,8 @@ CropStandard::output (Log& log) const
   output_submodule (harvesting, "Harvest", log);
   output_submodule (production, "Prod", log);
   output_submodule (development, "Devel", log);
-  output_submodule (vernalization, "Vernal", log);
+  if (vernalization.required)	// Test needed for checkpoint.
+    output_submodule (vernalization, "Vernal", log);
   output_submodule (nitrogen, "CrpN", log);
 }
 

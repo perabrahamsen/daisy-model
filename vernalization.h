@@ -30,10 +30,11 @@ class PLF;
 class Vernalization 
 {
   // Parameters.
+public:
+  const bool required;
 private:
-  bool required;
-  double DSLim;		// Max DS without vernalization
-  double TaLim;		// Vernalization temp threshold
+  const double DSLim;		// Max DS without vernalization
+  const double TaLim;		// Vernalization temp threshold
 
   // State.
 private:
