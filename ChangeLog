@@ -1,4 +1,25 @@
+2004-06-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.43 released.
+
+2004-06-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* production.C (nitrogen_stress_limit) New parameter.
+	(tick): Use it.
+	* crop_std.C (tick): Update caller.
+
+2004-06-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/ryegrass.dai ("Ryegrass"): Changed DSlim from 0.9.
+	* lib/wclover.dai (Wclover): Ditto.
+
+	* lib/wclover.dai, lib/ryegrass.dai: New files.
+	* lib/crop.dai, lib/Makefile (NEWCROPS): Added them
+
 2004-06-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (initialize): Use 'end' instead of 'begin'. 
+	* geometry.C (mix, swap): Added const. Added check.
 
 	* Version 3.42 released.
 

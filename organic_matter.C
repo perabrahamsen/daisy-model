@@ -2507,8 +2507,8 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
     am.push_back (bioincorporation.create_am (soil)); 
 
   // Log variable.
-  tillage_N_soil.insert (tillage_N_soil.begin (), soil.size (), 0.0);
-  tillage_C_soil.insert (tillage_C_soil.begin (), soil.size (), 0.0);
+  tillage_N_soil.insert (tillage_N_soil.end (), soil.size (), 0.0);
+  tillage_C_soil.insert (tillage_C_soil.end (), soil.size (), 0.0);
 }
 
 OrganicMatter::Implementation::Implementation (const AttributeList& al)

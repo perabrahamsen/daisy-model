@@ -162,11 +162,23 @@ void
 Geometry::mix (vector<double>& v, double from, double to, 
                vector<double>& change) const
 {
-  vector<double> old = v;
+  const double old_change = total (change);
+  const vector<double> old = v;
   mix (v, from, to);
   daisy_assert (v.size () <= change.size ());
   for (unsigned int i = 0; i < v.size (); i++)
     change[i] += v[i] - old[i];
+
+  const double total_v = fabs (total (v));
+  const double total_change = fabs (total (change) - old_change);
+  if (total_change > 1e-100 && total_change > total_v * 1e-5)
+    {
+      TmpStream tmp;
+      tmp () << "old_change = " << old_change
+             << "total_change = " << total_change
+             << ", total_v = " << total_v;
+      daisy_warning (tmp.str ());
+    }
 }
 
 double
@@ -244,11 +256,23 @@ void
 Geometry::swap (vector<double>& v, double from, double middle, double to, 
                 vector<double>& change) const
 {
-  vector<double> old = v;
+  const vector<double> old = v;
   swap (v, from, middle, to);
+  const double old_change = total (change);
   daisy_assert (v.size () <= change.size ());
   for (unsigned int i = 0; i < v.size (); i++)
     change[i] += v[i] - old[i];
+
+  const double total_v = fabs (total (v));
+  const double total_change = fabs (total (change) - old_change);
+  if (total_change > 1e-100 && total_change > total_v * 1e-5)
+    {
+      TmpStream tmp;
+      tmp () << "old_change = " << old_change
+             << "total_change = " << total_change
+             << ", total_v = " << total_v;
+      daisy_warning (tmp.str ());
+    }
 }
 
 static struct CheckLayers : public VCheck

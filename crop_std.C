@@ -347,7 +347,7 @@ CropStandard::tick (const Time& time,
   production.tick (bioclimate.daily_air_temperature (),
 		   soil_heat.T (soil.interval_plus (-root_system.Depth / 3.0)),
 		   root_system.Density, soil, development.DS, 
-		   canopy.CAImRat, nitrogen, partition, 
+		   canopy.CAImRat, nitrogen, nitrogen_stress, partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, msg);
   nitrogen.content (development.DS, production);
