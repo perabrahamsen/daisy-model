@@ -413,6 +413,13 @@ static struct ColumnStandardSyntax
 				  "The soil organic matter");
     syntax.add ("Nitrification", Librarian<Nitrification>::library (),
 		Syntax::State);
+    AttributeList nitrification_alist;
+    nitrification_alist.add ("type", "soil");
+    nitrification_alist.add ("k_10", 2.08333333333e-7); // 5e-5/24 [1/h]
+    nitrification_alist.add ("k", 5.0e-5); // [gN/cm³]
+    nitrification_alist.add ("active_underground", false);
+    nitrification_alist.add ("active_groundwater", false);
+    alist.add ("Nitrification", nitrification_alist);
     add_submodule<Denitrification> ("Denitrification", syntax, alist);
     syntax.add ("Groundwater", Librarian<Groundwater>::library (),
 		Syntax::State);

@@ -205,13 +205,24 @@ void
 SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add ("UZtop", Librarian<UZmodel>::library ());
+  AttributeList richard;
+  richard.add ("type", "richard");
+  richard.add ("max_time_step_reductions", 4);
+  richard.add ("time_step_reduction", 4);
+  richard.add ("max_iterations", 25);
+  richard.add ("max_absolute_difference", 0.02);
+  richard.add ("max_relative_difference", 0.001);
+  alist.add ("UZtop", richard);
+
   syntax.add ("UZbottom", Librarian<UZmodel>::library (),
 	      Syntax::OptionalState);
   syntax.add ("UZborder", Syntax::Integer, Syntax::OptionalConst);
   syntax.add ("UZreserve", Librarian<UZmodel>::library ());
   // Use lr as UZreserve by default.
-  AttributeList lr (Librarian<UZmodel>::library ().lookup ("lr"));
+  AttributeList lr;
   lr.add ("type", "lr");
+  lr.add ("h_fc", -100.0);
+  lr.add ("z_top", -10.0);
   alist.add ("UZreserve", lr);
   syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   Geometry::add_layer (syntax, "Theta");

@@ -79,7 +79,9 @@ Denitrification::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("active_groundwater", true);
   syntax.add ("converted", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("K", Syntax::Number, Syntax::Const);
+  alist.add ("K", 0.020833);
   syntax.add ("alpha", Syntax::Number, Syntax::Const);
+  alist.add ("alpha", 0.1);
 }
 
 Denitrification::Denitrification (const AttributeList& al)

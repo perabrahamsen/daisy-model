@@ -890,7 +890,9 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const);
   alist.add ("active_groundwater", true);
   syntax.add ("K_NH4", Syntax::Number, Syntax::Const);
+  alist.add ("K_NH4", 0.020833); // 0.5 / 24.
   syntax.add ("K_NO3", Syntax::Number, Syntax::Const);
+  alist.add ("K_NO3", 0.020833); // 0.5 / 24.
   syntax.add ("NO3_source", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("NH4_source", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("total_C", Syntax::Number, Syntax::LogOnly);
@@ -898,9 +900,83 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("CO2", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("am", Librarian<AM>::library (),
 	      Syntax::State, Syntax::Sequence);
+  vector<AttributeList*> am_sequence;
+  alist.add ("am", am_sequence);
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist);
+
+  // Create defaults for som and smb.
+  Syntax om_syntax;
+  AttributeList om_alist;
+  OM::load_syntax (om_syntax, om_alist);
+
   add_submodule_sequence<OM> ("smb", syntax, Syntax::State);
+  vector<AttributeList*> SMB;
+  AttributeList& SMB1 = *new AttributeList (om_alist);
+  vector<double> SMB1_C_per_N;
+  SMB1_C_per_N.push_back (6.0);
+  SMB1.add ("C_per_N", SMB1_C_per_N);
+  SMB1.add ("turnover_rate", 4.16666666667e-5);
+  vector<double> SMB1_efficiency;
+  SMB1_efficiency.push_back (0.60);
+  SMB1_efficiency.push_back (0.60);
+  SMB1.add ("efficiency", SMB1_efficiency);
+  SMB1.add ("maintenance", 4.16666666667e-4);
+  vector<double> SMB1_fractions;
+  SMB1_fractions.push_back (0.0);
+  SMB1_fractions.push_back (0.6);
+  SMB1_fractions.push_back (0.0);
+  SMB1_fractions.push_back (0.4);
+  SMB1.add ("fractions", SMB1_fractions);
+  SMB.push_back (&SMB1);
+  AttributeList& SMB2 = *new AttributeList (om_alist);
+  vector<double> SMB2_C_per_N;
+  SMB2_C_per_N.push_back (10.0);
+  SMB2.add ("C_per_N", SMB2_C_per_N);
+  SMB2.add ("turnover_rate", 4.16666666667e-4);
+  vector<double> SMB2_efficiency;
+  SMB2_efficiency.push_back (0.60);
+  SMB2_efficiency.push_back (0.60);
+  SMB2.add ("efficiency", SMB2_efficiency);
+  SMB2.add ("maintenance", 4.16666666667e-4);
+  vector<double> SMB2_fractions;
+  SMB2_fractions.push_back (0.0);
+  SMB2_fractions.push_back (0.4);
+  SMB2_fractions.push_back (0.0);
+  SMB2_fractions.push_back (0.6);
+  SMB2.add ("fractions", SMB2_fractions);
+  SMB.push_back (&SMB2);
+  alist.add ("smb", SMB);
+
   add_submodule_sequence<OM> ("som", syntax, Syntax::State);
+  vector<AttributeList*> SOM;
+  AttributeList& SOM1 = *new AttributeList (om_alist);
+  SOM1.add ("turnover_rate", 1.125e-7);
+  vector<double> SOM1_efficiency;
+  SOM1_efficiency.push_back (0.60);
+  SOM1_efficiency.push_back (0.60);
+  SOM1.add ("efficiency", SOM1_efficiency);
+  vector<double> SOM1_fractions;
+  SOM1_fractions.push_back (1.0);
+  SOM1_fractions.push_back (0.0);
+  SOM1_fractions.push_back (0.0);
+  SOM1_fractions.push_back (0.0);
+  SOM1.add ("fractions", SOM1_fractions);
+  SOM.push_back (&SOM1);
+  AttributeList& SOM2 = *new AttributeList (om_alist);
+  SOM2.add ("turnover_rate", 5.83333333333e-6);
+  vector<double> SOM2_efficiency;
+  SOM2_efficiency.push_back (0.60);
+  SOM2_efficiency.push_back (0.60);
+  SOM2.add ("efficiency", SOM2_efficiency);
+  vector<double> SOM2_fractions;
+  SOM2_fractions.push_back (0.9);
+  SOM2_fractions.push_back (0.0);
+  SOM2_fractions.push_back (0.1);
+  SOM2_fractions.push_back (0.0);
+  SOM2.add ("fractions", SOM2_fractions);
+  SOM.push_back (&SOM2);
+  alist.add ("som", SOM);
+  
   Syntax& layer_syntax = *new Syntax ();
   AttributeList& layer_alist = *new AttributeList ();
   layer_syntax.add ("end", Syntax::Number, Syntax::Const);

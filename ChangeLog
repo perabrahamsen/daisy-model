@@ -1,5 +1,13 @@
 1999-01-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 0.59 released.
+
+1999-01-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_std.C (ColumnStandardSyntax): Added more default values.
+	* organic_matter.C (load_syntax): Ditto.
+	* denitrification.C (load_syntax): Ditto.
+
 	* Version 0.58 released.
 
 1999-01-05  Per Abrahamsen  <abraham@dina.kvl.dk>
