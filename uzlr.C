@@ -43,6 +43,7 @@ public:
 	     const vector<double>& S,
 	     const vector<double>& h_old,
 	     const vector<double>& Theta_old,
+	     const vector<double>& h_ice,
 	     vector<double>& h,
 	     vector<double>& Theta,
 	     vector<double>& q);
@@ -60,12 +61,13 @@ UZlr::tick (const Soil& soil,
 	    const vector<double>& S,
 	    const vector<double>& h_old,
 	    const vector<double>& Theta_old,
+	    const vector<double>& h_ice,
 	    vector<double>& h,
 	    vector<double>& Theta,
 	    vector<double>& q)
 {
   // Upper border.
-  const double K_sat = soil.K (0, 0.0);
+  const double K_sat = soil.K (0, 0.0, h_ice[0]);
   assert (K_sat > 0.0);
   q_up = q[first] = max (top.q (), -K_sat);
 
@@ -79,7 +81,7 @@ UZlr::tick (const Soil& soil,
       const double dz = soil.dz (i);
       const double Theta_new = Theta_old[i] - q[i] * dt / dz - S[i] * dt;
       const double h_new = soil.h (i, Theta_new);
-      const double K_new = soil.K (i, h_new);
+      const double K_new = soil.K (i, h_new, h_ice[i]);
 
       if (use_darcy && i < to_darcy)
 	// Dry earth, near top.  Use darcy to move water up.
@@ -100,8 +102,8 @@ UZlr::tick (const Soil& soil,
 	// Gravitational water movement.
 	{
 	  assert (finite (h_new));
-	  const double Theta_sat = soil.Theta (i, 0.0);
-	  const double Theta_fc = soil.Theta (i, h_fc);
+	  const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
+	  const double Theta_fc = soil.Theta (i, h_fc, h_ice[i]);
 	  const double Theta_next = Theta_new - K_new * dt / dz;
 	  
 	  if (Theta_next < Theta_fc)

@@ -1410,13 +1410,15 @@ CropSold::PotentialWaterUptake (const double h_x,
 	  continue;
 	}
       const double h = h_x - (1 + Rxylem) * soil.z (i);
-      const double uptake = max (2 * M_PI * L[i] * (soil.Theta (i, h) / soil.Theta (i, 0.0))
-				      * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
-                                      / (- 0.5 * log (area * L[i])),
-                                 0.0);
+      const double uptake
+	= max (2 * M_PI * L[i] * (soil_water.Theta (soil, i, h) 
+				  / soil_water.Theta (soil, i, 0.0))
+	       * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
+	       / (- 0.5 * log (area * L[i])),
+	       0.0);
       assert (L[i] >= 0.0);
-      assert (soil.Theta (i, h) > 0.0);
-      assert (soil.Theta (i, 0.0) > 0.0);
+      assert (soil_water.Theta (soil, i, h) > 0.0);
+      assert (soil_water.Theta (soil, i, 0.0) > 0.0);
       assert (soil.M (i, soil_water.h (i)) >= 0.0);
       assert (soil.M (i, h) >= 0.0);
       assert (area * L[i] > 0.0);

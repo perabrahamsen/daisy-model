@@ -637,10 +637,10 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
 	double tmin, double tmax, double nu_1, double nu_2, double nu_3,
         double crop_ea_w, double crop_ep_w, double &rfpar, double &rf_1,
         double &rf_2, double &rf_3, double &rf_4, double &rr_sc_1,
-        double &rr_tot_1,double &rbf_temp, double &rf_temp, double &rf_def,
-        double &rf_theta, double &rf1_dolman, double &rr_sc_2, double &rr_tot_2,
-        double &rf_etep, double &rr_sc_3, double &rr_tot_3, double &rr_sc_4,
-        double &rr_tot_4, double &rr_sc_5, double &rr_tot_5, double &rr_sc_min,
+	 double &/*rr_tot_1*/,double &rbf_temp, double &rf_temp, double &rf_def,
+	 double &rf_theta, double &rf1_dolman, double &rr_sc_2, double &/*rr_tot_2*/,
+	 double &rf_etep, double &rr_sc_3, double &/*rr_tot_3*/, double &rr_sc_4,
+	 double &/*rr_tot_4*/, double &rr_sc_5, double &/*rr_tot_5*/, double &rr_sc_min,
 	double &rr_sc_js)
 	{
    	double tairk,def;
@@ -1432,28 +1432,28 @@ public:
        b2 (al.number ("b2")),
        b3 (al.number ("b3")),
        b4 (al.number ("b4")),
+       alpha_r (al.number ("alpha_r")),
        ndif (al.number ("ndif")),
        c_d (al.number ("c_d")),
        z_0s (al.number ("z_0s")),
        z0_def (al.number ("z0_def")),
        w (al.number ("w")),
        alpha_u (al.number ("alpha_u")),
+       arac (al.number ("arac")),
        alpha_k (al.number ("alpha_k")),
-       alpha_r (al.number ("alpha_r")),
        theta_w (al.number ("theta_w")),
        theta_c (al.number ("theta_c")),
-       rcmin_const (al.number ("rcmin_const")),
-       rcmax (al.number ("rcmax")),
-       tref (al.number ("tref")),
-       zeta (al.number ("zeta")),
-       arac (al.number ("arac")),
-       f3const (al.number ("f3const")),
-       spar (al.number ("spar")),
        tmin (al.number ("tmin")),
        tmax (al.number ("tmax")),
        nu_1 (al.number ("nu_1")),
        nu_2 (al.number ("nu_2")),
        nu_3 (al.number ("nu_3")),
+       rcmin_const (al.number ("rcmin_const")),
+       rcmax (al.number ("rcmax")),
+       tref (al.number ("tref")),
+       zeta (al.number ("zeta")),
+       f3const (al.number ("f3const")),
+       spar (al.number ("spar")),
        dt1 (al.number ("dt1")),
        dt2 (al.number ("dt2")),
        acc (al.number ("acc"))
@@ -1670,7 +1670,8 @@ void tick (const Weather& weather, const Vegetation& crops,
    			      	else les=evaps_w;  // [W/m**2]
 
 // communication with soil.h
-	kh=0.01*soil.heat_conductivity(0,theta_0); // should be around 1 W/m/C
+	kh=soil.heat_conductivity(0, theta_0, soil_water.X_ice (0))
+	  * 1e-7 * 3600.0 / 100.0; // [erg/cm/h/dg C] -> [W/m/dg C] 
 
 // convert from e_pa to e_abs
  	EPA2ABS(e_pa,tair,e_abs);

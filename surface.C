@@ -214,14 +214,16 @@ double
 Surface::Implementation::albedo (const Soil& soil,
 				 const SoilWater& soil_water) const
 { 
-  const double Theta_pf_3 = soil.Theta (0, pF2h (3.0));
-  const double Theta_pf_1_7 = soil.Theta (0, pF2h (1.7));
+  const double Theta_pf_3 = soil_water.Theta (soil, 0, pF2h (3.0));
+  const double Theta_pf_1_7 = soil_water.Theta (soil, 0, pF2h (1.7));
   const double Theta = soil_water.Theta (0);
 
   if (Theta < Theta_pf_3)
     return albedo_dry;
   if (Theta > Theta_pf_1_7)
     return albedo_wet;
+
+  assert (Theta_pf_1_7 > Theta_pf_3);
 
   return albedo_dry + (albedo_wet - albedo_dry)
     * (Theta - Theta_pf_3) / (Theta_pf_1_7 - Theta_pf_3);

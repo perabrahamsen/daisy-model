@@ -149,7 +149,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all components of some library.
 #
-COMPONENTS = select_content.C select_interval.C select_flux.C \
+COMPONENTS = select_index.C select_content.C select_interval.C select_flux.C \
 	select_number.C select_date.C select_array.C log_table.C \
 	log_harvest.C action_while.C action_wait.C action_activity.C \
 	average_arithmetic.C average_harmonic.C average_geometric.C \
@@ -412,6 +412,8 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+log_extern${OBJ}: log_extern.C log_select.h log.h librarian.h library.h \
+ common.h alist.h syntax.h select.h condition.h log_extern.h
 log_select${OBJ}: log_select.C log_select.h log.h librarian.h library.h \
  common.h alist.h syntax.h select.h condition.h
 select${OBJ}: select.C select.h librarian.h library.h common.h alist.h \
@@ -512,7 +514,8 @@ librarian${OBJ}: librarian.C librarian.h library.h common.h alist.h \
  syntax.h
 cdaisy${OBJ}: cdaisy.C syntax.h common.h alist.h daisy.h parser_file.h \
  parser.h librarian.h library.h field.h column.h weather.h im.h \
- action.h horizon.h printer_file.h printer.h version.h chemical.h
+ action.h horizon.h printer_file.h printer.h version.h chemical.h \
+ log_extern.h
 adsorption${OBJ}: adsorption.C adsorption.h librarian.h library.h common.h \
  alist.h syntax.h
 tortuosity${OBJ}: tortuosity.C tortuosity.h librarian.h library.h common.h \
@@ -573,7 +576,7 @@ select_date${OBJ}: select_date.C select.h librarian.h library.h common.h \
 select_array${OBJ}: select_array.C select.h librarian.h library.h common.h \
  alist.h syntax.h
 log_table${OBJ}: log_table.C log_select.h log.h librarian.h library.h \
- common.h alist.h syntax.h select.h
+ common.h alist.h syntax.h select.h condition.h
 log_harvest${OBJ}: log_harvest.C log.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h harvest.h chemicals.h
 action_while${OBJ}: action_while.C action.h librarian.h library.h common.h \

@@ -60,6 +60,7 @@ public:
 		     const vector<double>& S,
 		     const vector<double>& h_old,
 		     const vector<double>& Theta_old,
+		     const vector<double>& h_ice,
 		     vector<double>& h,
 		     vector<double>& Theta,
 		     vector<double>& q) = 0;

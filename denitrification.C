@@ -63,7 +63,7 @@ void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
       const double CO2 = organic_matter.CO2 (i);
       const double Theta = soil_water.Theta (i);
       const double T = soil_heat.T (i);
-      const double rate = f_Theta (Theta / soil.Theta (i, 0.0)) 
+      const double rate = f_Theta (Theta / soil_water.Theta (soil, i, 0.0)) 
 	* f_T (T) * alpha * CO2 ;
       const double M = min (rate, K * soil_NO3.M_left (i) / dt);
       converted.push_back (M);

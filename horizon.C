@@ -68,9 +68,9 @@ struct Horizon::Implementation
 };
 
 const double 
-Horizon::Implementation::heat_capacity[Constituents_End] = // [J / cm³ / °C]
+Horizon::Implementation::heat_capacity[Constituents_End] = // [erg / cm³ / °C]
 // Ice is given as equivalent amount of water.
-{ 4.2, 1.9 * (1.0 / 0.92), 1.25e-3, 2.0, 2.0, 2.5 }; 
+{ 4.2e7, 1.9e7 * (1.0 / 0.92), 1.25e4, 2.0e7, 2.0e7, 2.5e7 }; 
 
 void 
 Horizon::Implementation::initialize (const Hydraulic& hydro)
@@ -226,11 +226,11 @@ double
 Horizon::Implementation::ThermalConductivity (constituents medium)
 {
   // Thermal conductivity of each medium.
-  double thermal_conductivity[Constituents_End] = 
-  { 0.57e-2, 2.2e-2, 0.025e-2, 8.8e-2, 2.9e-2, 0.25e-2 };
+  double thermal_conductivity[Constituents_End] =
+  { 0.57e5, 2.2e5, 0.025e5, 8.8e5, 2.9e5, 0.25e5 }; // [erg/s/cm/dg C]
 
   // Air conductivity is modified by water vapour.
-  const double vapour_conductivity = 0.040e-2;
+  const double vapour_conductivity = 0.040e5;
   thermal_conductivity[Air] 
     += vapour_conductivity * min (1.0, (content[Water] / Theta_pF_high));
   
@@ -369,11 +369,12 @@ Horizon::SOM_C_per_N (unsigned int pool) const
 double
 Horizon::heat_conductivity (double Theta, double Ice) const
 {
-  const int entry = int (Theta * impl.intervals);
+  const int entry = int ((Theta + Ice) * impl.intervals);
   assert (entry >= 0);
   assert (entry < impl.intervals);
-  return (impl.K_ice[entry] * Ice + impl.K_water[entry] * (1.0 - Ice))
-    * 3600;			// W / cm / K -> J/h / cm / K
+  return ((impl.K_ice[entry] * Ice + impl.K_water[entry] * Theta) 
+	  / (Theta + Ice))
+    * 3600;			// erg/s / cm / K -> erg/h / cm / K
 }
 
 double
@@ -448,15 +449,15 @@ By default, this is calculated from the soil constituents.");
   syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\
 Number of numeric intervals to use in the heat coductivity table.");
   alist.add ("intervals", 100);
-  syntax.add ("C_soil", "J/cm^3/K", Syntax::OptionalConst,
+  syntax.add ("C_soil", "erg/cm^3/dg C", Syntax::OptionalConst,
 	      "The soils heat capacity.\n\
 By default, this is calculated from the soil constituents.");
   syntax.add ("K_water",
-	      "W/cm/K", Syntax::OptionalConst, Syntax::Sequence,
+	      "erg/s/cm/dg C", Syntax::OptionalConst, Syntax::Sequence,
 	      "Heat conductivity table for water in soil.\n\
 By default, this is calculated from the soil constituents.");
   syntax.add ("K_ice",
-	      "W/cm/K", Syntax::OptionalConst, Syntax::Sequence,
+	      "erg/s/cm/dg C", Syntax::OptionalConst, Syntax::Sequence,
 	      "Heat conductivity table for solid frozen soil.\n\
 By default, this is calculated from the soil constituents.");
 }

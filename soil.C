@@ -8,6 +8,23 @@
 #include <assert.h>
 #include <iomanip.h>
 
+double 
+Soil::K (int i, double h, double h_ice) const
+{ 
+  if (h < h_ice)
+    return horizon_[i]->hydraulic.K (h); 
+  else
+    return horizon_[i]->hydraulic.K (h_ice); 
+}
+
+double Soil::Theta (int i, double h, double h_ice) const
+{ 
+  if (h < h_ice)
+    return horizon_[i]->hydraulic.Theta (h);
+  else
+    return horizon_[i]->hydraulic.Theta (h_ice);
+}
+
 double
 Soil::Cw2 (int i, double h) const
 { 
@@ -81,9 +98,9 @@ Soil::make_table (int i)
     {
       const double h = pF2h (pF);
       COUT << setw (4) << setprecision (3) << pF << " "
-	   << setw (6) << setprecision (5) << Theta (i, h) << " "
+	   << setw (6) << setprecision (5) << Theta (i, h, 0.0) << " "
 	   << setw (12) << setprecision (11) << Cw2 (i, h) * 100.0 << " "
-	   << setw (12) << setprecision (11) << K (i, h) / 3.6e5 << "\n";
+	   << setw (12) << setprecision (11) << K (i, h, 0.0) / 3.6e5 << "\n";
     }
 }
 

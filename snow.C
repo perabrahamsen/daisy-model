@@ -241,8 +241,10 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   else if (dZs > 0.01)
     {
       // Information about soil.
-      const double Theta = soil_water.Theta (0);
-      const double K_soil = soil.K (0, Theta);
+      const double K_soil 
+	= soil.heat_conductivity (0, soil_water.Theta (0),
+				  soil_water.X_ice (0)) 
+	* 1e-7 * 3600.0 / 100.0; // [erg/cm/h/dg C] -> [W/m/dg C]
       const double Z = soil.z (0);
       const double T_soil = soil_heat.T (0);
 

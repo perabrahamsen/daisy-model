@@ -21,14 +21,14 @@ public:
     { 
       // Maximum specific absorbtion [g / g clay]
       const double S_planar = 5.964e-3;
-      const double porosity = soil.Theta (i, 0.0);
+      const double porosity = soil.Theta (i, 0.0, 0.0);
       const double clay = soil.clay (i);
       return S_planar * clay * soil.dry_bulk_density (i) * (1.0 - porosity); 
     }
   double v_edge (const Soil& soil, int i) const
     {
       const double S_edge = 0.308e-3;	// Same for edges. [g / g clay]
-      const double porosity = soil.Theta (i, 0.0);
+      const double porosity = soil.Theta (i, 0.0, 0.0);
       const double clay = soil.clay (i);
       
       return S_edge * clay * soil.dry_bulk_density (i) * (1.0 - porosity); 

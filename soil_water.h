@@ -25,7 +25,9 @@ class SoilWater
   vector<double> h_old;
   vector<double> Theta_;
   vector<double> h_;
-  vector<double> Xi;
+  vector<double> S_ice;
+  vector<double> X_ice_;
+  vector<double> h_ice_;
   vector<double> q_;
   vector<double> q_p_;
   UZmodel *const top;
@@ -38,8 +40,9 @@ class SoilWater
 public:
   void clear (const Geometry&);
   void add_to_sink (const vector<double>&);
-  void add_to_sink (const vector<double>&, const Soil&);
-
+  void add_to_sink (const vector<double>&, const Geometry&);
+  void freeze (const Soil&, const vector<double>&);
+  
   // Queries
 public:
   double h (int i) const
@@ -59,7 +62,14 @@ public:
   { return S_[i]; }
   double S_p (int i) const
   { return S_p_[i]; }
+  double h_ice (int i) const
+  { return h_ice_[i]; }
+  double X_ice (int i) const
+  { return X_ice_[i]; }
 
+  // Ice modified lookups.
+  double Theta (const Soil&, int i, double h) const;
+ 
   // Simulation.
 public:
   void tick (Surface&, Groundwater&, const Soil&);

@@ -1,11 +1,17 @@
+* LogTable bug
+
+"from" ser ikke ud til at blive respekteret.
+
+* Is
+
+- Jeg har disabled darcy check.  Spørg Søren om det er ok.
+- Skal vi checke om der er plads til at fryse vandet?
+
 * LogExtern
 
-lav log_extern.C
-lav cdaisy API
-skriv til Jesper
-
-konverter log.dai til ny table log model.
-opdater manual.
+- test api
+- konverter log.dai til ny table log model.
+- opdater manual.
 
 * En `forever' aktivitet.  Eller en `until CONDITION activity'.
 

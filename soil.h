@@ -18,13 +18,11 @@ class Soil : public Geometry
 
 public:
   // Water.
-  inline double K (int i, double h) const
-  { return horizon_[i]->hydraulic.K (h); }
-  inline double Cw1 (int i, double h) const
-  { return Theta (i, h) - Cw2 (i, h) * h; }
+  double K (int i, double h, double h_ice) const;
+  inline double Cw1 (int i, double h, double h_ice) const
+  { return Theta (i, h, h_ice) - Cw2 (i, h) * h; }
   double Cw2 (int i, double h) const;
-  inline double Theta (int i, double h) const
-  { return horizon_[i]->hydraulic.Theta (h); }
+  double Theta (int i, double h, double h_ice) const;
   inline double Theta_res (int i) const
   { return horizon_[i]->hydraulic.Theta_res; }
   inline double h (int i, double Theta) const
@@ -38,9 +36,9 @@ public:
   
   // Texture.
   inline double tortuosity_factor (int i, double Theta) const
-    { return horizon_[i]->tortuosity.factor (horizon_[i]->hydraulic, Theta); }
+  { return horizon_[i]->tortuosity.factor (horizon_[i]->hydraulic, Theta); }
   inline double dry_bulk_density (int i) const
-    { return horizon_[i]->dry_bulk_density (); }
+  { return horizon_[i]->dry_bulk_density (); }
   inline double clay (int i) const
   { return horizon_[i]->clay (); }
   inline double humus (int i) const
@@ -51,9 +49,9 @@ public:
   { return horizon_[i]->SOM_C_per_N (pool); }
 
   // Thermic.
-  double heat_conductivity (int i, double Theta, double Ice = 0.0) const
-    { return horizon_[i]->heat_conductivity (Theta, Ice); }
-  double heat_capacity (int i, double Theta, double Ice = 0.0) const
+  double heat_conductivity (int i, double Theta, double Ice) const
+  { return horizon_[i]->heat_conductivity (Theta, Ice); }
+  double heat_capacity (int i, double Theta, double Ice) const
   { return horizon_[i]->heat_capacity (Theta, Ice); }
   
   // Calculations.

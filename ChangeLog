@@ -1,8 +1,70 @@
+1999-06-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.81 released.
+
+1999-06-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Soil Heat Balance"): New log paramterization.
+	("Soil Temperature"): Use `table' instead of `table1'.
+	("N Balance"): Ditto.
+
+	* select_index.C: New model.
+	* Makefile (COMPONENTS): Add it.
+
+1999-06-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat.C: Implemented freezing ans thawing.
+
+	* column_std.C (tick): Tick heat before water.
+
+	* soil.h (heat_conductivity, heat_capacity): Change dimension.
+	* horizon.C: Update provider.
+	* soil_heat.C (tick): Update caller.
+	* snow.C (tick): Update caller.
+	* pt_pmsw.C (tick): Update caller.
+	
+	* soil.h (heat_conductivity, heat_capacity): Remove default value.
+
+	* horizon.C (heat_conductivity): Fix formula.
+
+1999-06-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C, soil_water.h (add_to_sink): Use `Geometry' instead
+	of `Soil'.
+	(X_ice_): Renamed from `Xi'.
+	(h_ice_, S_ice): New data member.
+	(freeze, Theta, K, K, h_ice, X_ice): New member funciton. 	
+	* soil_water.C (clear, tick, mix, swap, check, output,
+	MaxExfiltration, put_h, load_syntax, initialize): Use them.
+	* soil.h, soil.C (K, Theta): Take extra `h_ice' parameter.  Outline.
+	* soil.h: (Cw1): Updated caller.
+	* surface.C (albedo): Update caller.  
+	* denitrification.C (tick): Update caller.
+	* snow.C (tick): Update caller.  Also call K with h instead of Theta.
+	* macro.h, macro_std.C, macro_none.C (tick): Update caller.
+	* uzmodel.h, uznone.C, uzlr.C (tick): Update caller.
+	* uzricard.C: (tick, richards): Update caller.
+	* crop_sold.C, crop_old.C, crop_std.C (PotentialWaterUptake):
+	Updated caller.
+
+1999-06-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pt_std.C (tick): Outcommented new arguments.
+
+	* pt_pmsw.C (PT_PMSW::PT_PMSW): Reordered some initializations to
+	match declaration order.
+
+	* pt_pmsw.C, pt_std.C, pt.h, bioclimate_std.C: Merged in pvdk changes.
+	
 1999-06-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.80 released.
 
 1999-06-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_select.h, log_select.C (select.h, condition.h): Moved to
+	header file in order to ensure proper initialization order in
+	derived classes. 
 
 	* Version 0.79 released.
 

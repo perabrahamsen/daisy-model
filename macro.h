@@ -21,6 +21,7 @@ public:
 public:
   virtual void tick (const Soil& soil, unsigned int first, unsigned int last,
 		     UZtop& surface,
+		     const vector<double>& h_ice,
 		     const vector<double>& h,
 		     const vector<double>& Theta,
 		     vector<double>& S,

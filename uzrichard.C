@@ -51,12 +51,14 @@ private:
 		const vector<double>& S,
 		const vector<double>& h_old,
 		const vector<double>& Theta_old,
+		const vector<double>& h_ice,
 		vector<double>& h,
 		vector<double>& Theta,
 		vector<double>& q);
   bool converges (const vector<double>& previous,
 		  const vector<double>& current) const;
   void internode (const Soil& Soil, int first, int last,
+		  const vector<double>& h_ice,
 		  const vector<double>& K,
 		  vector<double>& Kplus) const;
   void q_darcy (const Soil& soil,
@@ -76,6 +78,7 @@ public:
 	     const vector<double>& S,
 	     const vector<double>& h_old,
 	     const vector<double>& Theta_old,
+	     const vector<double>& h_ice,
 	     vector<double>& h,
 	     vector<double>& Theta,
 	     vector<double>& q);
@@ -94,6 +97,7 @@ UZRichard::richard (const Soil& soil,
 		    const vector<double>& S,
 		    const vector<double>& h_old,
 		    const vector<double>& Theta_old,
+		    const vector<double>& h_ice,
 		    vector<double>& h_new,
 		    vector<double>& Theta_new,
 		    vector<double>& q)
@@ -117,7 +121,7 @@ UZRichard::richard (const Soil& soil,
   vector<double> Kplus (size);
 
   // For h bottom.
-  K[size] = soil.K (last + 1, 0.0);
+  K[size] = soil.K (last + 1, 0.0, h_ice[last + 1]);
 
   // Check if we have already switched top once.
   bool switched_top = false;
@@ -127,8 +131,8 @@ UZRichard::richard (const Soil& soil,
   double available_water = top.h ();
 
   if (available_water
-      > soil.K (first, 0.0) * dt
-      + (soil.Theta (first, 0.0) - Theta_old[first]) * soil.dz (first))
+      > soil.K (first, 0.0, h_ice[first]) * dt
+      + (soil.Theta (first, 0.0, h_ice[first]) - Theta_old[first]) * soil.dz (first))
     top.flux_top_off ();
 
   // First guess is the old value.
@@ -151,7 +155,7 @@ UZRichard::richard (const Soil& soil,
       for (unsigned int i = 0; i < size; i++)
 	{
 	  Ksum[i] = 0.0;
-	  Kold[i] = soil.K (first + i, h[i]);
+	  Kold[i] = soil.K (first + i, h[i], h_ice[first + i]);
 	}
       h_previous = h;
       Theta_previous = Theta;
@@ -169,18 +173,18 @@ UZRichard::richard (const Soil& soil,
 	  for (unsigned int i = 0; i < size; i++)
 	    {
 
-	      Ksum[i] += soil.K (first + i, h[i]);
+	      Ksum[i] += soil.K (first + i, h[i], h_ice[first + i]);
 	      K[i] = (Ksum[i] / iterations_used + Kold[i]) / 2;
 	    }
 	  if (bottom.flux_bottom ())
 	    K[size] = K[size - 1];
 
-	  internode (soil, first, last, K, Kplus);
+	  internode (soil, first, last, h_ice, K, Kplus);
 
 	  // Calcualte nodes.
 	  for (unsigned int i = 0; i < size; i++)
 	    {
-	      const double Cw1 = soil.Cw1 (first + i, h[i]);
+	      const double Cw1 = soil.Cw1 (first + i, h[i], h_ice[first + i]);
 	      // const double Cw2 = max (1e-5, soil.Cw2 (first + i, h[i]));
 	      const double Cw2 = soil.Cw2 (first + i, h[i]);
 	      const double dz = soil.dz (first + i);
@@ -287,7 +291,7 @@ UZRichard::richard (const Soil& soil,
 	{
 	  // Calculate new water content.
 	  for (unsigned int i = 0; i < size; i++)
-	    Theta[i] = soil.Theta(first + i, h[i]);
+	    Theta[i] = soil.Theta(first + i, h[i], h_ice[first + i]);
 
 	  bool accepted = true;	// Could the top accept the results?
 	  // Amount of water we put into the top this small time step.
@@ -328,7 +332,7 @@ UZRichard::richard (const Soil& soil,
 	  if (accepted)
 	    {
 
-#if 1
+#if 0
 	      // This code checks that darcy and the mass preservation
 	      // code gives the same results.
 	      {
@@ -431,6 +435,7 @@ UZRichard::converges (const vector<double>& previous,
 
 void 
 UZRichard::internode (const Soil& soil, int first, int last,
+		      const vector<double>& h_ice,
 		      const vector<double>& K, 
 		      vector<double>& Kplus) const
 {
@@ -442,7 +447,7 @@ UZRichard::internode (const Soil& soil, int first, int last,
   for (int i = 0; i < size; i++)
     if (!soil.compact (first + i))
       {
-	double Ksat = soil.K (first + i, 0.0);
+	double Ksat = soil.K (first + i, 0.0, h_ice[first + i]);
 	Kplus[i] = min (Ksat, Kplus[i]);
 	if (i > 0)
 	  Kplus[i - 1] = min (Ksat, Kplus[i - 1]);
@@ -504,13 +509,14 @@ UZRichard::tick (const Soil& soil,
 		 const vector<double>& S,
 		 const vector<double>& h_old,
 		 const vector<double>& Theta_old,
+		 const vector<double>& h_ice,
 		 vector<double>& h,
 		 vector<double>& Theta,
 		 vector<double>& q)
 {
   iterations = 0;
   if (!richard (soil, first, top, last, bottom, 
-		S, h_old, Theta_old, h, Theta, q))
+		S, h_old, Theta_old, h_ice, h, Theta, q))
     throw ("Richard's Equation doesn't converge.");
     
   q_up = q[first];

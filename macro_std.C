@@ -19,6 +19,7 @@ struct MacroStandard : public Macro
   // Simulation.
  void tick (const Soil& soil, unsigned int first, unsigned int last,
 	    UZtop& surface,
+	    const vector<double>& h_ice,
 	    const vector<double>& h,
 	    const vector<double>& Theta,
 	    vector<double>& S_m,
@@ -44,6 +45,7 @@ void
 MacroStandard::tick (const Soil& soil, 
 		     const unsigned int first, const unsigned int last,
 		     UZtop& surface,
+		     const vector<double>& h_ice,
 		     const vector<double>& h,
 		     const vector<double>& Theta,
 		     vector<double>& S_m,
@@ -96,7 +98,8 @@ MacroStandard::tick (const Soil& soil,
 	// Do we activate a macropore here?
 	{
 	  // Add change in water to macropore flow.
-	  flow += (Theta[i] - soil.Theta (i, pressure_end)) * dz / dt;
+	  flow += (Theta[i] - soil.Theta (i, pressure_end, h_ice[i]))
+	    * dz / dt;
 	}
       else if (flow > 0.0)
 	// We might end a macropore here.
@@ -141,7 +144,7 @@ MacroStandard::tick (const Soil& soil,
       // The size of the layer.
       const double dz = soil.dz (i); // [cm]
       // Saturated water.
-      const double Theta_sat = soil.Theta (i, 0.0);
+      const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
       // Expected water content.
       const double Theta_new = Theta[i] - (S_m[i] + S_p[i]) * dt;
 

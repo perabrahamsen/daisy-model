@@ -12,6 +12,8 @@ struct Tortuosity;
 GLOBAL_CONSTANT const double rho_mineral = 2.65;	
 // Weight of humus. [g / cm³]
 GLOBAL_CONSTANT const double rho_humus = 1.3; 
+GLOBAL_CONSTANT const double rho_water = 1.0; // [g/cm^3]
+GLOBAL_CONSTANT const double rho_ice = 0.917; // [g/cm^3]
 GLOBAL_CONSTANT const double c_fraction_in_humus = 0.587;
 
 class Horizon 
@@ -26,8 +28,8 @@ public:
   // Water.
 public:
   const Hydraulic& hydraulic;
-  double heat_conductivity (double Theta, double Ice) const;
-  double heat_capacity (double Theta, double Ice) const;
+  double heat_conductivity (double Theta, double Ice) const; // [erg/cm/h/dg C]
+  double heat_capacity (double Theta, double Ice) const; // [erg/cm^3/dg C]
   
   // Texture.
 public:

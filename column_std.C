@@ -301,8 +301,8 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
   groundwater.tick (time);
 
   // Transport.
-  soil_water.tick (surface, groundwater, soil);
   soil_heat.tick (time, soil, soil_water, surface, groundwater, weather);
+  soil_water.tick (surface, groundwater, soil);
   soil_chemicals.tick (soil, soil_water, soil_heat, organic_matter,
 		       bioclimate.chemicals_down ());
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3);
