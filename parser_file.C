@@ -9,6 +9,9 @@
 
 struct ParserFile::Implementation
 {
+  // Inputs.
+  vector<AttributeList*> inputs;
+
   // Lexer.
   string file;
   Lexer* lexer;
@@ -246,7 +249,7 @@ ParserFile::Implementation::add_derived (Library& lib)
 AttributeList&
 ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
 {
-  AttributeList* alist /* = NULL */;
+  AttributeList* alist = NULL;
   bool skipped = false;
   if (looking_at ('('))
     {
@@ -383,10 +386,10 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		{
 		  Parser& parser = Librarian<Parser>::create (al);
 		  parser.initialize (*global_syntax_table, lexer->err);
-		  delete &al;
-		  parser.load (atts);
+		  parser.load_nested (atts);
 		  lexer->error_count += parser.error_count ();
 		  delete &parser;
+		  inputs.push_back (&al);
 		}
 	      else
 		{
@@ -397,6 +400,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    error (string ("Error for member `") + obj 
 				+ "' in library `" + name + "'");
 		  atts.add (name, al);
+		  delete &al;
 		}
 	    }
 	    break;
@@ -443,6 +447,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    sequence.push_back (&al);
 		  }
 		atts.add (name, sequence);
+		sequence_delete (sequence.begin (), sequence.end ());
 		break;
 	      }
 	    case Syntax::AList:
@@ -492,6 +497,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    delete [] s;
 		  }
 		atts.add (name, sequence);
+		sequence_delete (sequence.begin (), sequence.end ());
 		break;
 	      }
 	    case Syntax::Number:
@@ -611,15 +617,36 @@ ParserFile::Implementation::Implementation (const string& name)
 { }
 
 ParserFile::Implementation::~Implementation ()
-{ delete lexer; }
+{ 
+  sequence_delete (inputs.begin (), inputs.end ());
+  delete lexer; 
+}
 
 void
-ParserFile::load (AttributeList& alist)
+ParserFile::load_nested (AttributeList& alist)
 {
   impl.skip ();
   impl.load_list (alist, *impl.global_syntax_table);
   impl.skip ();
   impl.eof ();
+}
+
+void
+ParserFile::load (AttributeList& alist)
+{
+  load_nested (alist);
+  
+  // Add inputs.
+  alist.add ("parser_inputs", impl.inputs);
+  sequence_delete (impl.inputs.begin (), impl.inputs.end ());
+  impl.inputs.erase (impl.inputs.begin (), impl.inputs.end ());
+
+  // Remember filename.
+  vector<string> files;
+  if (alist.check ("parser_files"))
+    files = alist.name_sequence ("parser_files");
+  files.push_back (impl.file);
+  alist.add ("parser_files", files);
 }
 
 int

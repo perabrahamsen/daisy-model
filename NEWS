@@ -12,9 +12,18 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.51
+
+** Checkpoints now include input statements and definitions automatically.
+
+The `libraries' attribute has been removed.
+Checkpoints still doesn't work, though.
+
 * 1.50
 
-** Reference manual enhancements.
+** Minor reference manual enhancements.
+
+It will now state if submodel as a full or partial value.
 
 * 1.48
 

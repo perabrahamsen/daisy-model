@@ -28,7 +28,7 @@ struct LogHarvest : public Log
     {
       if (print_header)
 	{
-	  out << "--------------------\n";
+	  print_dlf_header (out, daisy.alist);
 	  print_header = false;
 	}
       if (print_tags)
@@ -111,19 +111,6 @@ struct LogHarvest : public Log
   bool check (const Syntax&, ostream&) const
     { return true; }
 
-  void initialize (const string& description)
-  {
-    if (print_header)
-      {
-	out << "\nSIM: ";
-	for (unsigned int i = 0; i < description.size (); i++)
-	  if (description[i] != '\n')
-	    out << description[i];
-	  else
-	    out << "\nSIM: ";
-	out << "\n";
-      }
-  }
   LogHarvest (const AttributeList& al)
     : Log (al),
       last_size (0),
@@ -144,7 +131,7 @@ struct LogHarvest : public Log
 	  out << "VERSION: " << version  << "\n";
 	  out << "FILE: " << file  << "\n";
 	  time_t now = time (NULL);
-	  out << "RUN: " << ctime (&now);
+	  out << "RUN: " << ctime (&now) << "\n";
 	}
       out.flush ();
     }

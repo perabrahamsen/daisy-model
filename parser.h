@@ -14,6 +14,7 @@ public:
 
   // Interface.
 public:
+  virtual void load_nested (AttributeList&) = 0;
   virtual void load (AttributeList&) = 0;
   virtual int error_count () const = 0;
  

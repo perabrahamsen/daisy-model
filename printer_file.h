@@ -20,6 +20,8 @@ public:
   void print_alist (const AttributeList& alist, const Syntax&);
   // Print all elements in all libraries associated with `filename'.
   void print_library_file (const string& filename);
+  // Print a parser input.
+  void print_input (const AttributeList& alist);
 
   // True iff no errors have occured.
   bool good ();

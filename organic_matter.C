@@ -985,8 +985,7 @@ Mineralization this time step (negative numbers mean immobilization).");
 	      "CO2 evolution at surface.");
   syntax.add ("am", Librarian<AM>::library (), Syntax::Sequence, 
 	      "Added organic matter pools.");
-  vector<AttributeList*> am_sequence;
-  alist.add ("am", am_sequence);
+  alist.add ("am", vector<AttributeList*> ());
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist,
 					 Syntax::State,
 					 "Buffer between AOM pools and SOM.");
@@ -999,7 +998,7 @@ Mineralization this time step (negative numbers mean immobilization).");
   add_submodule_sequence<OM> ("smb", syntax, Syntax::State,
 			      "Soil MicroBiomass pools.");
   vector<AttributeList*> SMB;
-  AttributeList& SMB1 = *new AttributeList (om_alist);
+  AttributeList SMB1 (om_alist);
   vector<double> SMB1_C_per_N;
   SMB1_C_per_N.push_back (6.7);
   SMB1.add ("C_per_N", SMB1_C_per_N);
@@ -1016,7 +1015,7 @@ Mineralization this time step (negative numbers mean immobilization).");
   SMB1_fractions.push_back (0.4);
   SMB1.add ("fractions", SMB1_fractions);
   SMB.push_back (&SMB1);
-  AttributeList& SMB2 = *new AttributeList (om_alist);
+  AttributeList SMB2 (om_alist);
   vector<double> SMB2_C_per_N;
   SMB2_C_per_N.push_back (6.7);
   SMB2.add ("C_per_N", SMB2_C_per_N);
@@ -1038,7 +1037,7 @@ Mineralization this time step (negative numbers mean immobilization).");
   add_submodule_sequence<OM> ("som", syntax, Syntax::State, 
 			      "Soil Organic Matter pools.");
   vector<AttributeList*> SOM;
-  AttributeList& SOM1 = *new AttributeList (om_alist);
+  AttributeList SOM1 (om_alist);
   SOM1.add ("turnover_rate", 1.125e-7);
   vector<double> SOM1_efficiency;
   SOM1_efficiency.push_back (0.40);
@@ -1051,7 +1050,7 @@ Mineralization this time step (negative numbers mean immobilization).");
   SOM1_fractions.push_back (0.0);
   SOM1.add ("fractions", SOM1_fractions);
   SOM.push_back (&SOM1);
-  AttributeList& SOM2 = *new AttributeList (om_alist);
+  AttributeList SOM2 (om_alist);
   SOM2.add ("turnover_rate", 5.83333333333e-6);
   vector<double> SOM2_efficiency;
   SOM2_efficiency.push_back (0.50);

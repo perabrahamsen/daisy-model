@@ -1,10 +1,7 @@
 // log.C
 
 #include "log.h"
-#include "alist.h"
-#include "library.h"
-#include "syntax.h"
-#include "common.h"
+#include "daisy.h"
 
 Librarian<Log>::Content* Librarian<Log>::content = NULL;
 
@@ -81,8 +78,28 @@ Log::done ()
 { }
 
 void
-Log::initialize (const string&)
-{ }
+Log::print_dlf_header (ostream& out, const AttributeList& al)
+{
+  if (al.check ("parser_files"))
+  {
+    const vector<string>& files = al.name_sequence ("parser_files");
+    for (unsigned int i = 0; i < files.size (); i++)
+      out << "SIMFILE: " << files[i] << "\n";
+  }
+
+  const string sim_description = al.name ("description");
+  if (sim_description != Daisy::default_description)
+    {
+      out << "SIM: ";
+      for (unsigned int i = 0; i < sim_description.size (); i++)
+	if (sim_description[i] != '\n')
+	  out << sim_description[i];
+	else
+	  out << "\nSIM: ";
+      out << "\n";
+    }
+  out << "\n--------------------\n";
+}
 
 Log::Log (const AttributeList& al)
   : impl (*new Implementation ()),

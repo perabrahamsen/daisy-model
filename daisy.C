@@ -38,13 +38,7 @@ Daisy::Daisy (const AttributeList& al)
 	     : NULL), 
     field (*new Field (al.alist_sequence ("column"))),
     harvest (map_construct_const<Harvest> (al.alist_sequence ("harvest")))
-{
-  const string description = al.name ("description");
-  
-  if (description != default_description)
-    for (unsigned int i = 0; i < logs.size (); i++)
-      logs[i]->initialize (description);
-}
+{ }
 
 bool
 Daisy::check (ostream& err)
@@ -203,10 +197,9 @@ the simulation.");
 	      Syntax::OptionalState, Syntax::Singleton,
 	      "Weather model for providing climate information during\n\
 the simulation.  Can be overwritten by column specific weather.");
-  vector<AttributeList*> empty_alist_sequence;
   add_submodule_sequence<Harvest> ("harvest", syntax, Syntax::State, 
 				   "Total list of all crop yields.");
-  alist.add ("harvest", empty_alist_sequence);
+  alist.add ("harvest", vector<AttributeList*> ());
 }
 
 Daisy::~Daisy ()

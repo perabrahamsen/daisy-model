@@ -4,6 +4,7 @@
 #include "select.h"
 #include "geometry.h"
 #include "version.h"
+#include "daisy.h"
 #include <fstream.h>
 #include <time.h>
 
@@ -31,6 +32,7 @@ struct LogTable : public LogSelect, public Select::Destination
   const vector<double>* dest_array;
   
   // Log.
+  bool match (const Daisy& daisy);
   void done ();
 
   // Select::Destination
@@ -41,7 +43,6 @@ struct LogTable : public LogSelect, public Select::Destination
   void add (const string& tag, const string& value);
 
   // Create and destroy.
-  void initialize (const string& description);
   LogTable (const AttributeList& al);
   ~LogTable ();
 };
@@ -49,17 +50,21 @@ struct LogTable : public LogSelect, public Select::Destination
 const char *const LogTable::default_description = "\
 Each selected variable is represented by a column in the specified log file.";
 
+bool 
+LogTable::match (const Daisy& daisy)
+{
+  if (print_header)
+    {
+      print_dlf_header (out, daisy.alist);
+      print_header = false;
+    }
+  return LogSelect::match (daisy);
+}
 void 
 LogTable::done ()
 { 
   if (!is_printing)
     return;
-
-  if (print_header)
-    {
-      out << "--------------------\n";
-      print_header = false;
-    }
 
   if (print_tags)
     {
@@ -222,21 +227,6 @@ LogTable::add (const string&, const string& value)
   dest_name = value;
 }
 
-void 
-LogTable::initialize (const string& description)
-{
-  if (print_header)
-    {
-      out << "\nSIM: ";
-      for (unsigned int i = 0; i < description.size (); i++)
-	if (description[i] != '\n')
-	  out << description[i];
-	else
-	  out << "\nSIM: ";
-      out << "\n";
-    }
-}
-
 LogTable::LogTable (const AttributeList& al)
   : LogSelect (al),
     file (al.name ("where")),
@@ -264,7 +254,7 @@ LogTable::LogTable (const AttributeList& al)
       out << "\n";
       out << "\n";
       out << "VERSION: " << version  << "\n";
-      out << "FILE: " << file  << "\n";
+      out << "LOGFILE: " << file  << "\n";
       time_t now = time (NULL);
       out << "RUN: " << ctime (&now);
       const double from  = al.number ("from");
@@ -284,6 +274,7 @@ LogTable::LogTable (const AttributeList& al)
 	      out << "\nLOG: ";
 	  out << "\n";
 	}
+      out << "\n";
     }
   out.flush ();
 }

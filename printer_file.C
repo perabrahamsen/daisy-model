@@ -3,6 +3,7 @@
 #include "printer_file.h"
 #include "plf.h"
 #include "time.h"
+#include "parser.h"
 #include <fstream.h>
 #include <algorithm>
 #include <numeric>
@@ -64,16 +65,6 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
       // or not the last element in the order.
       if (syntax.order (key) + 1U != syntax.order ().size ())
 	return true;
-#if 0
-      // KLUDGE: However, if it is an `Object' or `AList' and the
-      // actual value is a Singleton, then it acts as the default for
-      // the individual members of the list.  Execpt that there aren't
-      // any members, so the value hasn't been initialized.
-      if ((syntax.lookup (key) == Syntax::AList 
-	   || syntax.lookup (key) == Syntax::Object)
-	  && alist.size (key) == Syntax::Singleton)
-	return false;
-#endif
       return false;
     }
   // We know it is a singleton here.
@@ -87,7 +78,8 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
     case Syntax::Date:
       return false;
     case Syntax::Object:
-      return is_complex_object (alist.alist (key), syntax.library (key));
+      return syntax.order (key) >= 0
+	|| is_complex_object (alist.alist (key), syntax.library (key));
     case Syntax::AList:
     case Syntax::PLF:
       return true;
@@ -381,9 +373,9 @@ PrinterFile::Implementation::print_plf (const PLF& plf, int indent)
 
 void 
 PrinterFile::Implementation::print_alist (const AttributeList& alist, 
-					 const Syntax& syntax,
-					 const AttributeList& super,
-					 int indent, bool skip)
+					  const Syntax& syntax,
+					  const AttributeList& super,
+					  int indent, bool skip)
 {
   // Always print ordered items.
   const vector<string>& order = syntax.order ();
@@ -620,6 +612,18 @@ void
 PrinterFile::print_library_file (const string& filename)
 {
   impl.print_library_file (filename);
+}
+
+void
+PrinterFile::print_input (const AttributeList& alist)
+{
+  assert (alist.check ("type"));
+  const string type = alist.name ("type");
+  const Syntax& syntax = Librarian<Parser>::library ().syntax (type);
+
+  impl.out << "(input " << type << " ";
+  impl.print_alist (alist, syntax, AttributeList (), 7, false);
+  impl.out << ")\n";
 }
 
 bool

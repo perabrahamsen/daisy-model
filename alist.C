@@ -104,20 +104,41 @@ struct Value
       is_sequence (true),
       ref_count (new int (1))
     { }
+  vector<const Time*>* copy_times (const vector<const Time*>& org)
+  {
+    vector<const Time*>* copy = new vector<const Time*> ();
+    for (unsigned int i = 0; i < org.size (); i++)
+      copy->push_back (new Time (*org[i]));
+    return copy;
+  }
   Value (const vector<const Time*>& v)
-    : time_sequence (new vector<const Time*> (v)),
+    : time_sequence (copy_times (v)),
       type (Syntax::Date),
       is_sequence (true),
       ref_count (new int (1))
     { }
+  vector<const PLF*>* copy_plfs (const vector<const PLF*>& org)
+  {
+    vector<const PLF*>* copy = new vector<const PLF*> ();
+    for (unsigned int i = 0; i < org.size (); i++)
+      copy->push_back (new PLF (*org[i]));
+    return copy;
+  }
   Value (const vector<const PLF*>& v)
-    : plf_sequence (new vector<const PLF*> (v)),
-      type (Syntax::PLF),
+    : plf_sequence (copy_plfs (v)),
+      type (Syntax::Date),
       is_sequence (true),
       ref_count (new int (1))
     { }
+  vector<AttributeList*>* copy_alists (const vector<AttributeList*>& org)
+  {
+    vector<AttributeList*>* copy = new vector<AttributeList*> ();
+    for (unsigned int i = 0; i < org.size (); i++)
+      copy->push_back (new AttributeList (*org[i]));
+    return copy;
+  }
   Value (const vector<AttributeList*>& v)
-    : alist_sequence (new vector<AttributeList*> (v)),
+    : alist_sequence (copy_alists (v)),
       type (Syntax::AList),
       is_sequence (true),
       ref_count (new int (1))
@@ -296,16 +317,18 @@ Value::cleanup ()
 	    delete number_sequence;
 	    break;
 	  case Syntax::AList:
-	    // BUG: Should delete elements also.
+	    sequence_delete (alist_sequence->begin (), alist_sequence->end ());
 	    delete alist_sequence;
 	    break;
 	  case Syntax::PLF:
+	    sequence_delete (plf_sequence->begin (), plf_sequence->end ());
 	    delete plf_sequence;
 	    break;
 	  case Syntax::String:
 	    delete name_sequence;
 	    break;
 	  case Syntax::Date:
+	    sequence_delete (time_sequence->begin (), time_sequence->end ());
 	    delete time_sequence;
 	    break;
 	  case Syntax::Object:

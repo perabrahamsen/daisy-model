@@ -982,7 +982,6 @@ static struct ActionCropSyntax
 
   ActionCropSyntax ()
   { 
-    static const vector<AttributeList*> empty_alist_sequence;
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     syntax.add_check (check_alist);
@@ -1002,7 +1001,7 @@ Harvest conditions for perennial crops.");
     add_submodule_sequence<ActionCrop::Fertilize>("fertilize_at", syntax, 
 						  Syntax::Const, "\
 Fertilizer application by date.");
-    alist.add ("fertilize_at", empty_alist_sequence);
+    alist.add ("fertilize_at", vector<AttributeList*> ());
     syntax.add ("fertilize_at_index", Syntax::Integer, Syntax::State,
 		"Next entry in `fertilize_at' to execute.");
     alist.add ("fertilize_at_index", 0);
@@ -1012,14 +1011,14 @@ Fertilizer application by date.");
     add_submodule_sequence<ActionCrop::Tillage> ("tillage", syntax, 
 						 Syntax::State, "\
 List of tillage operations to apply.");
-    alist.add ("tillage", empty_alist_sequence);
+    alist.add ("tillage", vector<AttributeList*> ());
     syntax.add ("tillage_index", Syntax::Integer, Syntax::State,
 		"Next entry in `tillage' to execute.");
     alist.add ("tillage_index", 0);
     add_submodule_sequence<ActionCrop::Spray> ("spray", syntax, 
 						 Syntax::State, "\
 List of chemicals to apply.");
-    alist.add ("spray", empty_alist_sequence);
+    alist.add ("spray", vector<AttributeList*> ());
     syntax.add ("spray_index", Syntax::Integer, Syntax::State,
 		"Next entry in `spray' to execute.");
     alist.add ("spray_index", 0);

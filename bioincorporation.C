@@ -301,8 +301,8 @@ the whole profile.");
   Syntax om_syntax;
   AttributeList om_alist;
   OM::load_syntax (om_syntax, om_alist);
-  AttributeList& AOM1 = *new AttributeList (om_alist);
-  AttributeList& AOM2 = *new AttributeList (om_alist);
+  AttributeList AOM1 (om_alist);
+  AttributeList AOM2 (om_alist);
   AOM1.add ("initial_fraction", 0.80);
   vector<double> CN;
   CN.push_back (60.0);
@@ -340,7 +340,7 @@ Bioincorporation::Bioincorporation (const AttributeList& al)
 { }
 
 Bioincorporation::~Bioincorporation ()
-{ }
+{ delete &impl; }
 
 static Submodel::Register bioincorporation_submodel
 /**/ ("Bioincorporation", Bioincorporation::load_syntax);

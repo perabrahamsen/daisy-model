@@ -1,4 +1,35 @@
+2000-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.51 released.
+
+2000-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* qmain.C (save_file, file_save): New functions.
+
+	* printer_file.C (is_complex): Ordered objects are always complex.
+
+	* log.C, log.h, log_harvest.C, log_table.C (initialize): Removed.
+	* daisy.C (Daisy): Update caller.
+	* log.C, log.h (print_dlf_header): New static member function.
+	* log_harvest.C, log_table.C (match): Call it.
+	* parser_file.C (load): Save input in "parser_inputs" attribute.
+	(~Implementation): Clear inputs.
+	(load): Save file in "parser_files" attribute.
+	* log_checkpoint.C (done): Use these daisy alist attributes.
+	(libraries): Removed attribute.
+	
+	* alist.C (Value): Copy members of incomming alist, plf or time
+	sequence. 
+	* all: Update callers.
+
+	* bioincorporation.C (&Bioincorporation): Delete impl.
+
 2000-09-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (inputs): New data member.
+	(load_list): Update it.
+
+	* parser_file.C (load_list): Fix memory leak.
 
 	* Version 1.50 released.
 

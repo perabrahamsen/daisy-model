@@ -473,7 +473,7 @@ VegetationCropsSyntax
     syntax.add ("crops", Librarian<Crop>::library (), 
 		Syntax::Sequence,
 		"List of crops growing in the field");
-    alist.add ("crops", *new vector<AttributeList*>);
+    alist.add ("crops", vector<AttributeList*> ());
     Librarian<Vegetation>::add_type ("crops", alist, syntax, &make);
   }
 } VegetationCrops_syntax;

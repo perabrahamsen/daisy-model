@@ -1,24 +1,21 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Use "parsed_sequence" for dependency tracking.
-
-* Redirect error messages
-
-for weather std, file, hourly, and for hydraulic old, old2
-
-* Test Qt.
-
-** Menu -> View -> Check (Model)
-
-Vis resultatet af syntax check i vindue.
-
-** Menu -> File -> Load
-
-** Menu -> Edit -> Raw (Parameter)
-
-** Menu -> File -> Save
+* QDaisy.
 
 ** Menu -> File -> Save as
+
+libraries.rename (old, new)
+if (!save_as.good ())
+{
+  libraries.rename (new, old)
+  QMessageBox.critical ("brok brok brok");
+}
+else
+  tree.repopulate ()
+
+** Feedback during menu -> file -> new/open/save/save_as ...
+
+** Menu -> Edit -> Raw (Parameter)
 
 ** Menu -> View -> *
 
@@ -38,6 +35,8 @@ Vis resultatet af syntax check i vindue.
 
 ** Menu -> File -> Run
 
+Maybe show events in tree, like BCC?
+
 ** Alle andre views.
 
 ** Interest groups
@@ -50,6 +49,18 @@ number of "interest groups", which can be use by QDaisy for filtering.
 Avoid losing all open/close/selected information when changing tree
 view og loading files.
 
+** Make drag and drop and "qdaisy file" work.
+
+** Use "parsed_sequence" for dependency tracking.
+
+** Redirect error messages
+
+for weather std, file, hourly, and for hydraulic old, old2
+
+* Checkpoint
+
+Få det til at virke.
+
 * crop_std: RSR
 
 * Test Cygwin compile, specielt høst resultat.
@@ -59,8 +70,6 @@ view og loading files.
 * CVS
 
 ** Nyt `misc' katalog med de to dhi scripts.
-
-* CheckPoint: Sørg for at inkludere `def*' og `input' automatisk.
 
 * Cloning.
 

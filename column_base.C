@@ -320,7 +320,7 @@ the simulation.  If unspecified, used global weather.");
 	      "The crops on the field.");
   AttributeList vegetation_alist;
   vegetation_alist.add ("type", "crops");
-  vegetation_alist.add ("crops", *new vector<AttributeList*>);
+  vegetation_alist.add ("crops", vector<AttributeList*> ());
   alist.add ("Vegetation", vegetation_alist);
 
   syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 

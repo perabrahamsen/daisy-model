@@ -85,10 +85,12 @@ public:
   void close_geometry ();
   const Geometry* geometry ();
 
+  // Utilities
+  static void print_dlf_header (ostream& out, const AttributeList& al);
+
   // Create and Destroy.
 public:
   virtual bool check (const Syntax&, ostream& err) const = 0;
-  virtual void initialize (const string& description);
 protected:
   Log (const AttributeList& al);
 public:

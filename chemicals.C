@@ -406,9 +406,8 @@ Chemicals::add_syntax (const char* name,
   chemicals_load_syntax (entry_syntax, entry_alist);
   syntax.add (name, entry_syntax, entry_alist,
 	      cat, Syntax::Sequence, description);
-  vector<AttributeList*> alist_sequence;
-  alist.add (name, alist_sequence);
-// KLUDGE: Ugly hack to be able to use the standard `load_syntax' form.
+  alist.add (name, vector<AttributeList*> ());
+  // KLUDGE: Ugly hack to be able to use the standard `load_syntax' form.
   chemicals_default_category = Syntax::State;
 }
   

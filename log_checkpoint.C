@@ -10,7 +10,6 @@ struct LogCheckpoint : public LogAList
   // Content.
   const string file;		// Name of file to write checkpoint in.
   const string description;	// Comment to go to the start of the file.
-  const vector<string> libraries; // Extra library files to include in dump.
   Condition& condition;		// Should we print a log now?
   Time time;			// Time of current checkpoint.
 
@@ -65,15 +64,29 @@ LogCheckpoint::done ()
       // Open log file.
       PrinterFile printer (filename);
       printer.print_comment (description);
-	  
-      // Print libraries.
-      const string lib_start = "From file `";
-      const string lib_end = "':";
-      for (unsigned int i = 0; i < libraries.size (); i++)
+
+      // Print input files.
+      if (alist ().check ("parser_inputs"))
 	{
-	  const string library = libraries[i];
-	  printer.print_comment (lib_start + library + lib_end);
-	  printer.print_library_file (library);
+	  const vector<AttributeList*> inputs 
+	    (alist ().alist_sequence ("parser_inputs"));
+	  printer.print_comment ("Input files.");
+	  for (unsigned int i = 0; i < inputs.size (); i++)
+	    printer.print_input (*inputs[i]);
+	}
+
+      // Print included files.
+      if (alist ().check ("parser_files"))
+	{
+	  const vector<string> files (alist ().name_sequence ("parser_files"));
+	  const string lib_start = "From file `";
+	  const string lib_end = "':";
+	  for (unsigned int i = 0; i < files.size (); i++)
+	    {
+	      const string library = files[i];
+	      printer.print_comment (lib_start + library + lib_end);
+	      printer.print_library_file (library);
+	    }
 	}
 
       // Print cloned objects.
@@ -95,7 +108,6 @@ LogCheckpoint::LogCheckpoint (const AttributeList& al)
   : LogAList (al),
     file (al.name ("where")),
     description (al.name ("description")),
-    libraries (al.name_sequence ("libraries")),
     condition (Librarian<Condition>::create (al.alist ("when"))),
     time (1, 1, 1, 1)
 { }
@@ -125,12 +137,6 @@ The time will be appended, together with the `.dai' suffix.");
       alist.add ("description", "\
 Create a checkpoint of the entire simulation state, suitable for later\n\
 hot start.");
-      syntax.add ("libraries", Syntax::String, 
-		  Syntax::Const, Syntax::Sequence, "\
-List of loaded files with parameterizations to dump together with the\n\
-checkpoint.");
-      const vector<string> empty_string_vector;
-      alist.add ("libraries", empty_string_vector);
       syntax.add ("when", Librarian<Condition>::library (),
 		  "Make a checkpoint every time this condition is true.");
       AttributeList finished_alist;

@@ -20,6 +20,8 @@ public:
   virtual void print_alist (const AttributeList& alist, const Syntax&) = 0;
   // Print all elements in all libraries associated with `filename'.
   virtual void print_library_file (const string& filename) = 0;
+  // Print a parser input.
+  virtual void print_input (const AttributeList& alist) = 0;
 
   // True iff no errors have occured.
   virtual bool good () = 0;

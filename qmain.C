@@ -9,6 +9,7 @@
 #include "version.h"
 #include "plf.h"
 #include "parser_file.h"
+#include "printer_file.h"
 
 #include <qapplication.h>
 #include <qmenubar.h>
@@ -26,7 +27,7 @@ main (int argc, char** argv)
   MainWindow main_window;
   
   // Initialize it.
-  main_window.setCaption ("QDaisy: untitled");
+  main_window.set_nofile ();
   main_window.populate_tree ();
   main_window.set_description ("No selection", NULL);
   main_window.set_selection_editable (false);
@@ -68,11 +69,12 @@ MainWindow::MainWindow ()
   QMenuBar* menu = new QMenuBar (this);
 
   // - File menu.
-  QPopupMenu* menu_file = new QPopupMenu (this);
+  menu_file = new QPopupMenu (this);
   menu->insertItem ("&File", menu_file);
   menu_file->insertItem ("&New", this, SLOT (file_new ()));
   menu_file->insertItem ("&Open...", this, SLOT (file_open ()));
-  menu_file->insertItem ("&Save", this, SLOT (menu_action ()));
+  menu_file_save_id 
+    = menu_file->insertItem ("&Save", this, SLOT (file_save ()));
   menu_file->insertItem ("S&ave as...", this, SLOT (menu_action ()));
   menu_file->insertSeparator ();
   menu_file->insertItem ("&Run", this, SLOT (menu_action ()));
@@ -148,14 +150,29 @@ MainWindow::daisy_clear ()
 }
 
 void
+MainWindow::set_nofile ()
+{ 
+  file_name = "";
+  setCaption ("QDaisy: untitled");
+  menu_file->setItemEnabled (menu_file_save_id, false);
+}
+  
+void
+MainWindow::set_filename (QString name)
+{ 
+  file_name = name;
+  setCaption (QString ("QDaisy: " + name));
+  menu_file->setItemEnabled (menu_file_save_id, true);
+}
+
+void
 MainWindow::new_file ()
 { 
   // Delete old content.
   daisy_clear ();
 
   // Make it official.
-  file_name = "";
-  setCaption (QString ("QDaisy: untitled"));
+  set_nofile ();
   tree->clear ();
   populate_tree ();
 }
@@ -178,10 +195,38 @@ MainWindow::open_file (QString name)
   delete [] s;
 
   // In any case:  Make it official.
-  file_name = name;
-  setCaption (QString ("QDaisy: " + name));
+  set_filename (name);
   tree->clear ();
   populate_tree ();
+}
+
+void
+MainWindow::save_file ()
+{ 
+  // Open log file.
+  PrinterFile printer (file_name.ascii ());
+  printer.print_comment ("Created by QDaisy");
+
+  // Print input files.
+  if (daisy_alist.check ("parser_inputs"))
+    {
+      const vector<AttributeList*> inputs 
+	(daisy_alist.alist_sequence ("parser_inputs"));
+      printer.print_comment ("Input files.");
+      for (unsigned int i = 0; i < inputs.size (); i++)
+	printer.print_input (*inputs[i]);
+    }
+
+  // Print included files.
+  printer.print_comment ("Parameterizations");
+  printer.print_library_file (file_name.ascii ());
+
+  // Print content.
+  printer.print_comment ("Content");
+  printer.print_alist (daisy_alist, daisy_syntax);
+
+  if (!printer.good ())
+    QMessageBox::critical (this, "QDaisy: Save errors", "Save failed.");   
 }
 
 void
@@ -491,7 +536,7 @@ MainWindow::menu_action ()
 void 
 MainWindow::file_new ()
 { 
-  // TODO: Warning if changed...
+  new_file ();
 }
 
 void 
@@ -504,6 +549,11 @@ MainWindow::file_open ()
     open_file (file);
 }
 
+void 
+MainWindow::file_save ()
+{
+  save_file ();
+}
 void 
 MainWindow::view_check ()
 { 

@@ -17,11 +17,9 @@ class Condition;
 
 class Daisy
 {
-private:
-  static const char *const default_description;
-
   // Initial content.
 public:
+  static const char *const default_description;
   const Syntax* syntax;
   const AttributeList& alist;
 

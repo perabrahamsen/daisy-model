@@ -14,6 +14,7 @@ private:
 
   // Use.
 public:
+  void load_nested (AttributeList&);
   void load (AttributeList&);
   int error_count () const;
 
