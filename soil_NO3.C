@@ -12,7 +12,7 @@ SoilNO3::beta (const Soil&, const SoilWater&, int, double) const
 double 
 SoilNO3::diffusion_coefficient () const
 {
-  return 3600 * 2.0e-5; // [cm^2/h]
+  return 3600 * 2.0e-5; // [cm²/h]
 }
 
 double 

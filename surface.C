@@ -96,6 +96,7 @@ Surface::evaporation (double PotSoilEvaporation, double water, double temp,
   static const double dt = 1.0; // Time step [h].
   const double MaxExfiltration
     = soil_water.MaxExfiltration (soil) * 10.0; // cm -> mm.
+
   Eps = PotSoilEvaporation;
 
   if (pond + water * dt < Eps * dt)
@@ -111,6 +112,7 @@ Surface::evaporation (double PotSoilEvaporation, double water, double temp,
   else
     T = (T * pond + temp * water * dt) / (pond + water * dt);
 
+  assert (T > -100.0 && T < 50.0);
   pond = pond - EvapSoilSurface * dt + water * dt;
   return EvapSoilSurface;
 }

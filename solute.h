@@ -19,8 +19,8 @@ class Solute
   // Content.
   // State variables.
 private:
-  vector<double> M_;		// Concentration in soil [g / cm^3]
-  vector<double> C_;		// Concentration in soil solution [g / cm^3]
+  vector<double> M_;		// Concentration in soil [g / cm³]
+  vector<double> C_;		// Concentration in soil solution [g / cm³]
 
   // Flux variables.
 protected:

@@ -78,7 +78,7 @@ WeatherSimple::AirTemperature (void) const // [C]
 }
 
 double
-WeatherSimple::GlobalRadiation () const	// [W/m^2]
+WeatherSimple::GlobalRadiation () const	// [W/m²]
 {
   /*a function of the weather*/
   static const double A0[] =

@@ -9,6 +9,8 @@
 #include "organic_matter.h"
 #include "soil_NO3.h"
 #include "csmp.h"
+#include "log.h"
+#include "filter.h"
 
 static double f_Theta (double Theta)
 {
@@ -35,12 +37,18 @@ static double f_T (double T)
   assert (0);
 }
 
+void
+Denitrification::output (Log& log, const Filter& filter) const
+{
+  log.output ("converted", filter, converted, true);
+}
+
 void Denitrification::tick (Soil& soil, SoilWater& soil_water,
 			  SoilHeat& soil_heat,
 			  SoilNO3& soil_NO3, OrganicMatter& organic_matter)
 {
-  vector<double> converted;
-  
+  converted.erase (converted.begin (), converted.end ());
+
   for (int i = 0; i < soil.size (); i++)
     {
       const double CO2 = organic_matter.CO2 (i);
@@ -56,6 +64,7 @@ void Denitrification::tick (Soil& soil, SoilWater& soil_water,
 void
 Denitrification::load_syntax (Syntax& syntax, AttributeList&)
 {
+  syntax.add ("converted", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("K", Syntax::Number, Syntax::Const);
   syntax.add ("alpha", Syntax::Number, Syntax::Const);
 }

@@ -53,13 +53,20 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
       if (C_[i] == 0.0)
 	assert (M_[i] == 0.0);
       else
+#if 0
 	assert (abs (M_[i] / C_to_M (soil, soil_water.Theta_old (i), i, C_[i])
 		     - 1.0) < 0.001);
+#else
+      if (!(abs (M_[i] / C_to_M (soil, soil_water.Theta_old (i), i, C_[i])
+		     - 1.0) < 0.001))
+	cerr << i << ":M [" << M_[i] << "] != C_to_M (C) [" 
+	     << C_to_M (soil, soil_water.Theta_old (i), i, C_[i]) << "]\n";
+#endif
     }
 
-  // Note: q, D, and alpha depth indexes are all [j-1/2].
+  // Note: q, D, and alpha depth indexes are all [j-½].
 
-  // Dispersion coefficient [cm^2 /s]
+  // Dispersion coefficient [cm²/s]
   vector<double> D (size + 1);
 
 #ifdef CALCULATE_FLUX_FLOW
@@ -73,7 +80,7 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
       // Dispersion length [cm]
       const double lambda = soil.lambda (j);
 
-      // Water flux [cm^3 /cm^2 / h]
+      // Water flux [cm³ /cm² / h]
       const double q = soil_water.q (j);
       
       // Theta middled in time and space.

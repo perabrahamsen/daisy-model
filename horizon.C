@@ -9,7 +9,7 @@
 #include <vector>
 #include <map>
 
-static const double rho_soil = 2.65;	// Weigth of soil. [g / cm^3]
+static const double rho_soil = 2.65;	// Weigth of soil. [g / cm³]
 
 static Library* Horizon_library = NULL;
 typedef map<string, Horizon::constructor, less<string> > Horizon_map_type;
@@ -62,7 +62,7 @@ struct Horizon::Implementation
 };
 
 const double 
-Horizon::Implementation::heat_capacity[Constituents_End] = // [J / cm^3 / °C]
+Horizon::Implementation::heat_capacity[Constituents_End] = // [J / cm³ / °C]
 // Ice is given as equivalent amount of water.
 { 4.2, 1.9 * (1.0 / 0.92), 1.25e-3, 2.0, 2.0, 2.5 }; 
 
@@ -197,7 +197,7 @@ Horizon::Implementation::ThermalConductivity (constituents medium)
 {
 #if 0
   static const double density [Constituents_End] =
-  { 1.0e6, 0.92e6, 1.25e3, 2.66e6, 2.65e6, 1.3e6 }; // [g / m^3]
+  { 1.0e6, 0.92e6, 1.25e3, 2.66e6, 2.65e6, 1.3e6 }; // [g / m³]
 #endif
   // Thermal conductivity of each medium.
   double thermal_conductivity[Constituents_End] = 

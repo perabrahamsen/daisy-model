@@ -16,7 +16,7 @@ SoilNH4::beta (const Soil& soil, const SoilWater&, int i, double C) const
 double 
 SoilNH4::diffusion_coefficient () const
 {
-  return 3600 * 1.8e-5; // [cm^2/h]
+  return 3600 * 1.8e-5; // [cm²/h]
 }
 
 double

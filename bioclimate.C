@@ -18,9 +18,9 @@ class Bioclimate::Implementation
   // Canopy.
 public:
   const long No;		// No of intervals in canopy discretation.
+  double LAI;			// Total LAI of all crops on this column.
   vector<double> Height;	// Height in cm of each endpoint in c.d.
   vector<double> PAR;		// PAR of each interval of c.d.
-  double LAI;			// Total LAI of all crops on this column.
   void RadiationDistribution (const Weather&, const CropList&);
 private:
   void IntensityDistribution (double Rad0, double Ext, 
@@ -176,9 +176,7 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
   else
     EpFactor = soil.EpFactor ();
 
-  double ref_evapo = weather.ReferenceEvapotranspiration ();
-  if (ref_evapo < 0.0)
-    ref_evapo = 0.0;
+  const double ref_evapo = max (0.0, weather.ReferenceEvapotranspiration ());
   
   PotEvapotranspiration = EpFactor * ref_evapo;
 
@@ -278,7 +276,9 @@ Bioclimate::output (Log& log, const Filter& filter) const
 {
   log.output ("intercepted_water", filter, impl.intercepted_water);
   log.output ("EvapInterception", filter, impl.EvapInterception, true);
-  log.output ("PotEvapotranspiration", filter, impl.PotEvapotranspiration);
+  log.output ("LAI", filter, impl.LAI, true);
+  log.output ("PotEvapotranspiration", filter,
+	      impl.PotEvapotranspiration, true);
   output_submodule (impl.snow, "Snow", log, filter);
 }
 
@@ -329,6 +329,7 @@ Bioclimate::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("NoOfIntervals", 30);
   syntax.add ("intercepted_water", Syntax::Number, Syntax::State);
   syntax.add ("EvapInterception", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("LAI", Syntax::Number, Syntax::LogOnly);
   syntax.add ("PotEvapotranspiration", Syntax::Number, Syntax::LogOnly);
   alist.add ("intercepted_water", 0.0);
   add_submodule<Snow> ("Snow", syntax, alist);

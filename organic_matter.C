@@ -39,6 +39,10 @@ struct OrganicMatter::Implementation
     static void load_syntax (Syntax& syntax, AttributeList& alist);
     Buffer (const Soil&, const AttributeList& al);
   } buffer;
+  
+  // Log.
+  vector<double> NO3_source;
+  vector<double> NH4_source;
 
   // Simulation.
   void add (AM& om)
@@ -55,10 +59,6 @@ struct OrganicMatter::Implementation
   vector<double> clay_turnover_factor;
 
   // Create & Destroy.
-  static vector<OM*>&
-  OrganicMatter::Implementation::create_som (const
-					     vector<const AttributeList*>& al,
-					     const Soil& soil);
   Implementation (const Soil&, const AttributeList& al);
 };
 
@@ -153,14 +153,16 @@ OrganicMatter::Implementation::heat_turnover_factor (double T) const
 double
 OrganicMatter::Implementation::water_turnover_factor (double h) const
 {
-  if (h > -10e-2)
+  const double pF = log (-h);
+
+  if (pF <= 0.0)
     return 0.6;
-  if (h > -pow (10.0, -0.5))
-    return 0.6 + 0.4 * log10 (-100.0 * h) / 1.5;
-  if (h > -pow (10.0, 0.5))
+  if (pF <= 1.5)
+    return 0.6 + (1.0 - 0.6) * pF / 1.5;
+  if (pF <= 2.5)
     return 1.0;
-  if (h > -pow (10, 4.5))
-    return 1.0 - log10 (-100.0 * h) / 4.0;
+  if (pF <= 6.5)
+    return 1.0 - (pF - 2.5) / (6.5 - 2.5);
 
   return 0;
 }
@@ -187,6 +189,8 @@ OrganicMatter::Implementation::output (Log& log, const Filter& filter) const
   output_vector (smb, "smb", log, filter);
   output_vector (som, "som", log, filter);
   output_submodule (buffer, "buffer", log, filter);
+  log.output ("NO3_source", filter, NO3_source);
+  log.output ("NH4_source", filter, NH4_source);
 }
 
 bool
@@ -225,8 +229,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   sort (added.begin (), added.end (), om_compare);
   
   // Soil solutes.
-  vector<double> NO3_source;
-  vector<double> NH4_source;
+  NO3_source.erase (NO3_source.begin (), NO3_source.end ());
+  NH4_source.erase (NH4_source.begin (), NH4_source.end ());
 
   // Main processing,
   for (int i = 0; i < soil.size (); i++)
@@ -243,7 +247,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 
       const double abiotic_factor 
 	= heat_turnover_factor (soil_heat.T (i)) 
-	* water_turnover_factor (soil_water.pF (i));
+	* water_turnover_factor (soil_water.h (i));
 
       const double clay_factor = abiotic_factor * clay_turnover_factor [i];
 
@@ -315,78 +319,6 @@ OrganicMatter::Implementation::swap (const Soil& soil,
   for (unsigned int i = 0; i < som.size (); i++)
     som[i]->swap (soil, from, middle, to);
   // Leave CO2 alone.
-}
-
-vector<OM*>&
-OrganicMatter::Implementation::create_som (const
-					   vector<const AttributeList*>& al,
-					   const Soil& soil)
-{
-  vector<OM*>& om = map_construct<OM> (al);
-  const int size = al.size();
-
-  // Find the missing kids!
-  bool found_fraction = false;
-  bool missing_fraction = -1;
-  vector<double> om_fraction (size, 0.0);
-  int missing_C_per_N = -1;
-
-  for (int i = 0; i < size; i++)
-    {
-      if (al[i]->check ("initial_fraction"))
-	{
-	  om_fraction[i] = al[i]->number ("initial_fraction");
-	  found_fraction = true;
-	}
-      else
-	missing_fraction = i;
-
-      if (al[i]->check ("C_per_N"))
-	{
-	  while (om[i]->C_per_N.size () < soil.size () +0U)
-	    om[i]->C_per_N.push_back 
-	      (om[i]->C_per_N[om[i]->C_per_N.size () - 1]);
-	}
-      else
-	missing_C_per_N = i;
-      
-      assert (om[i]->C.size () == 0U);
-    }
-  
-  if (!found_fraction)
-    {
-      // This is a checkpoint, no special intialization needed.
-      assert (missing_C_per_N < 0);
-      return om;
-    }
-
-  // Find the C's and the N's
-  om_fraction[missing_fraction] = 1.0 - accumulate (om_fraction.begin (),
-						    om_fraction.end (),
-						    0.0);
-  for (int l = 0; l < soil.size (); l++)
-    {
-      const double C = soil.initial_C (l);
-      double N = soil.initial_N (l);
-
-      // Fill out the blanks.
-      vector<double> om_N (size, 0.0);
-  
-      for (int i = 0; i < size; i++)
-	{
-	  assert (om[i]->C.size () == l + 0U);
-	  om[i]->C.push_back (C * om_fraction[i]);
-	  if (i != missing_C_per_N)
-	    {
-	      assert (om[i]->C_per_N.size () == soil.size () +0U);
-	      N -= om[i]->C[l] / om[i]->C_per_N[l];
-	    }
-	}
-      assert (om[missing_C_per_N]->C_per_N.size () == l + 0U);
-      om[missing_C_per_N]->C_per_N.push_back (om[missing_C_per_N]->C[l] / N);
-      assert (om[missing_C_per_N]->C_per_N[l] >= 0.0);
-    }
-  return om;  
 }
 
 OrganicMatter::Implementation::Implementation (const Soil& soil, 
@@ -720,6 +652,8 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add ("K_NH4", Syntax::Number, Syntax::Const);
   syntax.add ("K_NO3", Syntax::Number, Syntax::Const);
+  syntax.add ("NO3_source", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
+  syntax.add ("NH4_source", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("CO2", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("am", AM::library (), Syntax::State, Syntax::Sequence);
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist);

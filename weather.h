@@ -32,6 +32,7 @@ public:
   virtual double Snow () const = 0;
   
   double DayLength () const;
+  double DayCycle () const;
 
   // Utility.
 public:

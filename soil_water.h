@@ -33,6 +33,7 @@ class SoilWater
 public:
   void clear ();
   void add_to_sink (const vector<double>&);
+  void add_to_sink (const vector<double>&, const Soil&);
 
   // Queries
 public:

@@ -109,9 +109,10 @@ ColumnStandard::fertilize (const Time& time,
 			   string name, string part, 
 			   double C, double N)
 {
-  vector<double> density;
+  vector<double> content;
   organic_matter.add (AM::create (soil, time, om, name, part,
-				  C, N, density));
+				  // g/m² -> g/cm²
+				  C * 1e-4, N * 1e-4, content));
 }
 
 void 
@@ -120,8 +121,13 @@ ColumnStandard::fertilize (const Time& time,
 			   string name, const vector<double>& density, 
 			   double C, double N)
 {
+  vector<double> content;
+  for (unsigned int i = 0; i < density.size (); i++)
+    content.push_back (density[i] * soil.z (i));
+		       
   organic_matter.add (AM::create (soil, time, om, name, "root",
-				  C, N, density));
+				  // g/m² -> g/cm²
+				  C * 1e-4, N * 1e-4, content));
 }
 
 void 
@@ -169,8 +175,14 @@ ColumnStandard::harvest (const Time& time, const string name,
 					      stub_length, 
 					      stem_harvest, leaf_harvest,
 					      sorg_harvest, dead_harvest));
+	if (Crop::ds_remove (*crop))
+	  {
+	    // BUG? I hope it is allowed to delete members of a list
+	    // while iterating over it.
+	    delete *crop;
+	    crops.erase (crop);
+	  }
       }
-  remove_if (crops.begin (), crops.end (), Crop::ds_remove);
 
   return harvest;
 }
@@ -180,11 +192,11 @@ ColumnStandard::mix (const Time& time,
 		     double from, double to, double penetration)
 {
   harvest (time, "all", 0.0, 0.0, 0.0, 0.0, 0.0);
-  soil_NO3.mix (soil, soil_water, from, to);
-  soil_NH4.mix (soil, soil_water, from, to);
   const double energy = soil_heat.energy (soil, soil_water, from, to);
   soil_water.mix (soil, from, to);
   soil_heat.set_energy (soil, soil_water, from, to, energy);
+  soil_NO3.mix (soil, soil_water, from, to);
+  soil_NH4.mix (soil, soil_water, from, to);
   organic_matter.mix (soil, from, to, penetration);
 }
 
@@ -194,9 +206,9 @@ ColumnStandard::swap (const Time& time, double from, double middle, double to)
   mix (time, from, middle, 1.0);
   mix (time, middle, to, 0.0);
   soil_water.swap (soil, from, middle, to);
+  soil_heat.swap (soil, from, middle, to);
   soil_NO3.swap (soil, soil_water, from, middle, to);
   soil_NH4.swap (soil, soil_water, from, middle, to);
-  soil_heat.swap (soil, from, middle, to);
   organic_matter.swap (soil, from, middle, to);
 }
 
@@ -279,10 +291,8 @@ ColumnStandard::output (Log& log, const Filter& filter) const
   output_submodule (soil_NH4, "SoilNH4", log, filter);
   output_submodule (soil_NO3, "SoilNO3", log, filter);
   output_submodule (organic_matter, "OrganicMatter", log, filter);
-#if 0
   output_submodule (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
-#endif
   output_list (crops, "crops", log, filter);
   log.close ();
 }

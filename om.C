@@ -51,26 +51,15 @@ OM::OM (const AttributeList& al, const Soil& soil,
     maintenance (al.number ("maintenance")),
     fractions (al.number_sequence ("fractions"))
 {
-  if (al.check ("C"))
-    C = al.number_sequence ("C");
-  if (al.check ("C_per_N"))
-    {
-      C_per_N = al.number_sequence ("C_per_N");
-      assert (0);
-    }
-  else
-    C_per_N.push_back (carbon / N);
-
   // Create initial C.
+  assert (!al.check ("C"));
   while (C.size () < soil.size () +0U)
     C.push_back (0.0);
 
-  assert (C_per_N.size () > 0U);
-  
+  // Initialize C/N.
+  assert (!al.check ("C_per_N"));
   while (C_per_N.size () < C.size ())
-    C_per_N.push_back (C_per_N[C_per_N.size () - 1]);
-
-  assert (C_per_N[C_per_N.size () - 1] > 0);
+    C_per_N.push_back (carbon / N);
 }
 
 void
@@ -184,7 +173,7 @@ OM::tock (int i, double rate, double efficiency,
 
   if (N_consume - N_produce > N_soil - N_used
       // && N_soil * 1.001 >= N_used
-      && (N_consume - N_produce) - (N_soil - N_used) > 1.0e-10 // Lose 1 g / m^3 / year
+      && (N_consume - N_produce) - (N_soil - N_used) > 1.0e-10 // Lose 1 g / m³ / year
       && rate > 0.0)
     {
       // Lower rate to force 

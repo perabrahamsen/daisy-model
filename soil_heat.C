@@ -44,7 +44,7 @@ SoilHeat::Implementation::tick (const Time& time,
 				const Surface& surface,
 				const Groundwater& groundwater)
 {
-  const double water_heat_capacity = 4.2; // [J/cm^3/K]
+  const double water_heat_capacity = 4.2; // [J/cm³/K]
 
   // Border conditions.
   const double T_bottom = bottom (time);// BUGLET: Should be time - 1 hour.
@@ -146,7 +146,7 @@ SoilHeat::Implementation::tick (const Time& time,
   d[size - 1] = d[size - 1] - c[size - 1] * T_bottom;
   tridia (0, size, a, b, c, d, T.begin ());
   T_top = T_top_new;
-  assert (T[0] < 21.0);
+  assert (T[0] < 50.0);
 
   // Temperature is constant in the groundwater.
   for (int i = size; i < soil.size (); i++)

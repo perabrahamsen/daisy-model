@@ -19,7 +19,7 @@ static Library* AM_library = NULL;
 static vector<OM*>&
 create_om (const vector<const AttributeList*>& om_alist,
 	   const Soil& soil, double C, double N,
-	   const vector<double>& density)
+	   const vector<double>& content)
 {
   // Get initialization parameters.
   const int size = om_alist.size();
@@ -69,11 +69,17 @@ create_om (const vector<const AttributeList*>& om_alist,
   // Create the OM's
   vector<OM*>& om = *new vector<OM*> ();
   for (int i = 0; i < size; i++)
-    om.push_back (new OM (*om_alist[i], soil, om_C[i], om_N[i]));
+    if (i == missing_C_per_N)
+      om.push_back (new OM (*om_alist[i], soil, om_C[i], om_N[i]));
+    else
+      {
+	om.push_back (new OM (*om_alist[i], soil));
+	om[i]->top_C = om_C[i];
+      }
 
-  if (density.size ())
+  if (content.size ())
     for (int i = 0; i < size; i++)
-      om[i]->distribute (density);
+      om[i]->distribute (content);
 
   return om;
 }
@@ -163,9 +169,9 @@ AM&
 AM::create (const Soil& soil, const Time& time,
 	    vector<const AttributeList*> ol,
 	    const string name, const string part,
-	    double C, double N, const vector<double>& density)
+	    double C, double N, const vector<double>& content)
 {
-  return *new AM (soil, time, ol, name, part, C, N, density);
+  return *new AM (soil, time, ol, name, part, C, N, content);
 }
 
 static vector<OM*>&
@@ -180,14 +186,14 @@ create_om (const AttributeList& al, const Soil& soil)
       // Get initialization parameters.
       const double weight = al.number ("weight") 
 	* al.number ("dry_matter_fraction") 
-	* 0.1;			// kg / m^2 --> g / cm^2
+	* 0.1;			// kg / m² --> g / cm²
       const double C = weight * al.number ("total_C_fraction");
       const double N = weight * IM::N_left (al);
       
       const vector<const AttributeList*>& oms = al.list_sequence ("om");
-      vector<double> density;
+      vector<double> content;
 	
-      return create_om (oms, soil, C, N, density);
+      return create_om (oms, soil, C, N, content);
     }
   else if (syntax == "mineral")
     assert (0);
@@ -204,8 +210,8 @@ create_om (const AttributeList& al, const Soil& soil)
       for (unsigned int i = 0; i < layers.size (); i++)
 	{
 	  const double end = layers[i]->number ("end");
-	  const double weight = layers[i]->number ("weight"); // Kg C/m^2
-	  const double C = weight * 1000.0 / (100.0 * 100.0); // g C / cm^2
+	  const double weight = layers[i]->number ("weight"); // Kg C/m²
+	  const double C = weight * 1000.0 / (100.0 * 100.0); // g C / cm²
 	  int missing_number = -1;
 	  double missing_fraction = 1.0;
 	  for (unsigned int j = 0; j < oms.size (); j++)
@@ -245,11 +251,11 @@ create_om (const AttributeList& al, const Soil& soil)
       vector<OM*>& om
 	= map_construct1<OM, const Soil&> (oms, soil);
 
-      const double weight = al.number ("weight"); // Kg DM /m^2
+      const double weight = al.number ("weight"); // Kg DM /m²
       const double total_C_fraction = al.number ("total_C_fraction");
       const double C = weight * 1000.0 / (100.0 * 100.0)
-	* total_C_fraction; // g C / cm^2;
-      const double k = al.number ("dist");
+	* total_C_fraction; // g C / cm²;
+      const double k = M_LN2 / al.number ("dist");
       const double depth = al.number ("depth");
 
       int missing_number = -1;
@@ -262,8 +268,8 @@ create_om (const AttributeList& al, const Soil& soil)
 	      const double fraction = oms[j]->number ("initial_fraction");
 	      missing_fraction -= fraction;
 	      
-	      for (int l = 0; l < soil.size (); l++)
-		om[j]->C[l] = C * fraction / k * exp (-k * soil.z (l));
+	      for (int l = 0; l < soil.size () && soil.z (l) > -depth; l++)
+		om[j]->C[l] = (C * fraction * k) * exp (k * soil.z (l));
 	    }
 	  else if (missing_number != -1)
 	    // Should be catched by syntax check.
@@ -276,9 +282,9 @@ create_om (const AttributeList& al, const Soil& soil)
 	  if (missing_fraction < -0.1e-10)
 	    cerr << "Specified over 100% C in om in initial am.\n";
 	  else if (missing_fraction > 0.0)
-	    for (int l = 0; l < soil.size (); l++)
+	    for (int l = 0; l < soil.size () && soil.z (l) > -depth; l++)
 	      om[missing_number]->C[l]
-		= C * missing_fraction / k * exp (-k * soil.z (l));
+		= (C * missing_fraction * k) * exp (k * soil.z (l));
 	}
       else if (missing_fraction < -0.1e-10)
 	cerr << "Specified more than all C in om in initial am.\n";
@@ -292,10 +298,10 @@ create_om (const AttributeList& al, const Soil& soil)
 
 AM::AM (const Soil& soil, const Time& t, vector<const AttributeList*> ol,
 	const string sort, const string part, 
-	double C, double N, const vector<double>& density)
+	double C, double N, const vector<double>& content)
   : creation (t),
     name (sort + "/" + part),
-    om (create_om (ol, soil, C, N, density))
+    om (create_om (ol, soil, C, N, content))
 { }
 
 AM::AM (const AttributeList& al, const Soil& soil, const Time& time)
@@ -418,7 +424,7 @@ AM_init::AM_init ()
 	Syntax& layer_syntax = *new Syntax ();
 	AttributeList& layer_alist = *new AttributeList ();
 	layer_syntax.add ("end", Syntax::Number, Syntax::Const);
-	layer_syntax.add ("weight", Syntax::Number, Syntax::Const); // Kg C/m^2
+	layer_syntax.add ("weight", Syntax::Number, Syntax::Const); // Kg C/m²
 	layer_syntax.order ("end", "weight");
 	syntax.add ("layers", layer_syntax, Syntax::Const, Syntax::Sequence);
 	alist.add ("layers", layer_alist);

@@ -43,12 +43,12 @@ public:
   // Crop part.
   static AM& create (const Soil&, const Time&, vector<const AttributeList*>,
 		     const string name, const string part, 
-		     double C, double N, const vector<double>& density);
+		     double C, double N, const vector<double>& content);
   
 private:
   AM (const Soil&, const Time&, vector<const AttributeList*>,
       const string name, const string part, 
-      double C, double N, const vector<double>& density);
+      double C, double N, const vector<double>& content);
   AM (const AttributeList&, const Soil&, const Time&);
 public:
   virtual ~AM ();

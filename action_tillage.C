@@ -18,6 +18,7 @@ class ActionMix : public Action
   // Simulation.
   void doIt (Daisy& daisy)
   {
+    cout << " [Tillage]";
     ColumnList& cl = daisy.columns;
     for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
       {
@@ -72,7 +73,7 @@ class ActionSwap : public Action
   // Simulation.
   void doIt (Daisy& daisy)
   {
-    cout << " [Tillage]";
+    cout << " [Plowing]";
 
     ColumnList& cl = daisy.columns;
     for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)

@@ -21,7 +21,9 @@ class WeatherFile : public Weather
 
   double precipitation;
   double reference_evapotranspiration;
+  mutable double hourly_reference_evapotranspiration;
   double global_radiation;
+  mutable double hourly_global_radiation;
   double air_temperature;
 
   double Prain;
@@ -74,6 +76,7 @@ WeatherFile::tick ()
 	reference_evapotranspiration = -42.42e42;
       else
 	{
+	  file.unget ();
 	  file >> reference_evapotranspiration;
 	  while (file.good () && file.get () != '\n')
 	    /* do nothing */;
@@ -103,6 +106,13 @@ WeatherFile::output (const string name, Log& log, const Filter& filter) const
 	  log.open (name, "file");
 	  log.output ("Prain", f2, Prain, true);	
 	  log.output ("Psnow", f2, Psnow, true);
+	  log.output ("global_radiation", f2, global_radiation, true);
+	  log.output ("hourly_global_radiation", f2, 
+		      hourly_global_radiation, true);
+	  log.output ("reference_evapotranspiration", f2, 
+		      reference_evapotranspiration, true);
+	  log.output ("hourly_reference_evapotranspiration", f2, 
+		      hourly_reference_evapotranspiration, true);
 	  log.close ();
 	}
     }
@@ -116,7 +126,7 @@ WeatherFile::AirTemperature (void) const // [C]
 }
 
 double
-WeatherFile::GlobalRadiation () const	// [W/m^2]
+WeatherFile::GlobalRadiation () const	// [W/m²]
 {
   /*a function of the weather*/
   static const double A0[] =
@@ -137,24 +147,24 @@ WeatherFile::GlobalRadiation () const	// [W/m^2]
   int m = time.month () - 1;
   double Si = (  A0[m] + A1[m] * cos (t) + B1[m] * sin (t)
 		 + A2[m] * cos (2 * t) + B2[m] * sin (2 * t));
-  return max (0.0, Si * (global_radiation / A0[m]));
+  hourly_global_radiation = max (0.0, Si * (global_radiation / A0[m]));
+  return hourly_global_radiation;
 }
 
 double
 WeatherFile::ReferenceEvapotranspiration () const // [mm/h]
 {
-  if (reference_evapotranspiration < -10e10)
+  if (reference_evapotranspiration < -1.0e11)
     {
       const double T = 273.16 + AirTemperature ();
       const double Delta = 5362.7 / pow (T, 2) * exp (26.042 - 5362.7 / T);
       return 1.05e-3 * Delta / (Delta + 66.7) * GlobalRadiation ();
     }
-  int m = time.month () - 1;
-  int h = time.hour ();
-  return reference_evapotranspiration 
-    * (1.0
-       + A[m] * cos (2.0 * M_PI / 24.0 * h)
-       + B[m] * sin (2.0 * M_PI / 24.0 * h)) / 24.0;
+
+  hourly_reference_evapotranspiration = 
+    reference_evapotranspiration * DayCycle ();
+
+  return hourly_reference_evapotranspiration;
 }
 
 double
@@ -261,6 +271,11 @@ WeatherFileSyntax::WeatherFileSyntax ()
   alist.add ("B", b);
   syntax.add ("Prain", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Psnow", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("global_radiation", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("hourly_global_radiation", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("reference_evapotranspiration", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("hourly_reference_evapotranspiration",
+	      Syntax::Number, Syntax::LogOnly);
   syntax.order ("file");
   Weather::add_type ("file", alist, syntax, &WeatherFile::make);
 }

@@ -3,6 +3,9 @@
 #ifndef NITRIFICATION_H
 #define NITRIFICATION_H
 
+#include <string>
+#include <vector>
+
 class AttributeList;
 class Syntax;
 class Soil;
@@ -11,6 +14,8 @@ class SoilHeat;
 class SoilNH4;
 class SoilNO3;
 class CSMP;
+class Log;
+class Filter;
 
 class Nitrification
 {
@@ -19,8 +24,13 @@ private:
   const double k;
   const double k_10;
 
+  // Log variable.
+private:
+  vector<double> converted;
+  
   // Simulation.
 public:
+  void output (Log&, const Filter&) const;
   void tick (Soil&, SoilWater&, SoilHeat&, SoilNO3&, SoilNH4&);
 
   // Create.

@@ -61,12 +61,21 @@ double
 Weather::DayLength (double Latitude, const Time& time)
 {
   double t = 2 * M_PI / 365 * time.yday ();
+  
   double Dec = (0.3964 - 22.97 * cos (t) + 3.631 * sin (t)
 		- 0.03885 * cos (2 * t) 
 		+ 0.03838 * sin (2 * t) - 0.15870 * cos (3 * t) 
 		+ 0.07659 * sin (3 * t) - 0.01021 * cos (4 * t));
-  return (24 / M_PI
-	  * acos (-tan (M_PI / 180 * Dec) * tan (M_PI / 180 * Latitude)));
+  t = (24 / M_PI
+       * acos (-tan (M_PI / 180 * Dec) * tan (M_PI / 180 * Latitude)));
+  return (t < 0) ? t + 24.0 : t;
+}
+
+double
+Weather::DayCycle () const
+{
+  return max (0.0, M_PI_2 / DayLength ()
+	      * cos (M_PI * (time.hour () - 12) / DayLength ()));
 }
 
 Weather::Weather (const Time& t, double l)

@@ -24,12 +24,20 @@ SoilWater::add_to_sink (const vector<double>& v)
     S[i] += v[i];
 }
 
+void
+SoilWater::add_to_sink (const vector<double>& v, const Soil& soil)
+{
+  assert (S.size () == v.size ());
+  for (unsigned i = 0; i < S.size (); i++)
+    S[i] += v[i] / soil.z (i);
+}
+
 
 double
 SoilWater::pF (int i) const
 {
   if (h (i) < 0.0)
-    return log (-100 * h (i));
+    return log (-h (i));
   else
     return 0.0;
 }

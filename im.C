@@ -75,7 +75,7 @@ static double IM_get_NO3 (const AttributeList& al)
 
       const double weight = al.number ("weight") 
 	* al.number ("dry_matter_fraction") 
-	* 0.1;			// kg / m^2 --> g / cm^2
+	* 0.1;			// kg / m² --> g / cm²
       const double N = weight * al.number ("total_N_fraction");
 
       IM im (al.list ("im"));
@@ -94,7 +94,7 @@ static double IM_get_NH4 (const AttributeList& al)
 
       const double weight = al.number ("weight") 
 	* al.number ("dry_matter_fraction") 
-	* 0.1;			// kg / m^2 --> g / cm^2
+	* 0.1;			// kg / m² --> g / cm²
       const double N = weight * al.number ("total_N_fraction");
 
       IM im (al.list ("im"));

@@ -34,7 +34,7 @@ public:
   
   // Absorbtion.
 public:
-  double K_planar () const;	// Half saturation constant [ g / cm^3 ]
+  double K_planar () const;	// Half saturation constant [ g / cm³ ]
   double K_edge () const;	// Same for edges.
   double v_planar () const;
   double v_edge () const;

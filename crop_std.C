@@ -156,7 +156,7 @@ struct CropStandard::Parameters
   const struct CanopyPar {
     double DSinit;		// DS at end of initial LAI-Development
     double WLfInit;		// WLeaf at end of initial LAI-Development
-    double SpLAI;		// Specific leaf weight
+    double SpLAI;		// Specific leaf weight [ (m²/m²) / (g/m²) ]
     const CSMP& HvsDS;	// Crop height as function of DS
     const vector<double>& LAIDist0; // Relative LAI distribution at DS=0
     const vector<double>& LAIDist1; // Relative LAI distribution at DS=1
@@ -1028,6 +1028,8 @@ CropStandard::SoluteUptake (const Soil& soil,
 			    vector<double>& uptake,
 			    double I_max, double r_root)
 {
+  return PotNUpt;
+
   const vector<double>& root_density = var.RootSys.Density;
   const vector<double>& S = var.RootSys.H2OExtraction;
   const int size = soil.size ();
@@ -1333,11 +1335,14 @@ CropStandard::ActualWaterUptake (const double Ept,
 	if (step <= min_step)
 	  {
 	    // We can't get any closer.
-	    if (next < total)
+	    assert (next <= total);
+	    if (next >= Ept)
 	      {
 		total = next;
 		h_x = h_next;
 	      }
+	    else 
+	      
 	    break;
 	  }
 	else
@@ -1352,10 +1357,14 @@ CropStandard::ActualWaterUptake (const double Ept,
       step *= 2;
     }
 
+  // We need this to make sure H2OExtraction corresponds to `h_x'.
+  const double total2 = PotentialWaterUptake (h_x, soil, soil_water);
+  assert (total == total2);
+
   vector<double>& H2OExtraction = var.RootSys.H2OExtraction;
   if (total > Ept)
     {
-      assert (h_x > -0.001);
+      assert (h_x < 0.001);
       assert (total > 0);
       const double factor = Ept / total;
       for (int i = 0; i < soil.size (); i++)
@@ -1389,12 +1398,11 @@ CropStandard::PotentialWaterUptake (const double h_x,
   double total = 0.0;
   for (int i = 0; i < soil.size () && L[i] > 0.0; i++)
     {
-      const double h = h_x + (1 + Rxylem) * soil.z (i);
+      const double h = h_x - (1 + Rxylem) * soil.z (i);
       const double uptake = max (L[i] * (soil.Theta (i, h) / soil.Theta (i, 0.0))
 				      * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
                                       / (- 0.5 * log (area * L[i])),
                                  0.0);
-      assert (h <= 0.0);
       assert (L[i] >= 0.0);
       assert (soil.Theta (i, h) > 0.0);
       assert (soil.Theta (i, 0.0) > 0.0);
@@ -1469,7 +1477,7 @@ CropStandard::RootDensDistPar (double a)
   x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
   y = exp (x);
   z = 1 + a * x;
-  while (fabs (2 * (z - y) / (z + y)) > 10e-6)
+  while (fabs (2 * (z - y) / (z + y)) > 1.0e-5)
     {
       if (z - y > 0)
 	{
