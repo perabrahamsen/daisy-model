@@ -84,7 +84,8 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 		: delta_water / water_in_above;
 	      if (water_fraction < 0.0 || water_fraction > 1.0)
 		{
-		  CERR << "BUG: water fraction from macropore = " 
+		  CERR << __FILE__ << ":" <<  __LINE__
+		       << ": BUG: water fraction from macropore = " 
 		       << water_fraction << "\n";
 		  set_bound (0.0, water_fraction, 1.0);
 		}
@@ -95,37 +96,41 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	    }
 	  else
 	    {
-	      // Water through macropores from below... too weird.
-	      if (-water_out_below * 10 > 1e-10)
-		{
-		  CERR << "Weirdness: Got " << -water_out_below * 10 
-		       << " mm water from below through macropores\n";
-		}
+	      // Water through macropores from below... 
 	      delta_matter = 0.0; // Just assume pure water.
 	    }
 	}
       else
 	delta_matter = 0.0;
 
-      // Update source with stuff entering the layer.
-      S_p[i] = delta_matter / soil.dz (i) / dt;
-      S_m[i] += S_p[i];
-
       // Find amount of stuff leaving the layer.
-      if (delta_matter == 0.0)
-	J_p[i+1] = J_p[i];
+      if (delta_matter < 1e-60)
+	{
+	  // Everything go to the bottom.
+	  J_p[i+1] = J_p[i];
+	  S_p[i] = 0.0;
+	}
       else if (approximate (matter_in_above, delta_matter))
-	J_p[i+1] = 0.0;
+	{
+	  // Everything go to the layer.
+	  J_p[i+1] = 0.0;
+	  S_p[i] = matter_in_above / soil.dz (i) / dt;
+	  S_m[i] += S_p[i];
+	}
       else
 	{
+	  // We split between layer and bottom.
 	  J_p[i+1] = -(matter_in_above - delta_matter);
 	  assert (J_p[i+1] < 0.0);
+	  S_p[i] = delta_matter / soil.dz (i) / dt;
+	  S_m[i] += S_p[i];
 	}
     }
   
     // Check that the sink terms add up.
-  if (fabs (soil.total (S_p) + J_p[0]) > 1.0e-11)
-    CERR << "BUG: Total S_p = '" << (soil.total (S_p) + J_p[0])
+  if (fabs (soil.total (S_p) + J_p[0] - J_p[soil.size ()]) > 1.0e-21)
+    CERR << __FILE__ << ":" <<  __LINE__
+	 << ": BUG: mactrans Total S_p = '" << (soil.total (S_p) + J_p[0])
 	 << "' solute\n";
 }
 

@@ -164,7 +164,8 @@ MacroStandard::tick (const Soil& soil,
 
   // Check that the sink terms add up.
   if (fabs (soil.total (S_p) - q_top) > 1.0e-11)
-    CERR << "BUG: Total S_p = '" << (soil.total (S_p) - q_top)
+    CERR << __FILE__ << ":" <<  __LINE__
+	 << ": BUG: Total S_p = '" << (soil.total (S_p) - q_top)
 	 << "' first pass\n";
 
   // Now check for saturated conditions.
@@ -236,7 +237,8 @@ MacroStandard::tick (const Soil& soil,
 
   // Check that the sink terms add up.
   if (fabs (soil.total (S_p) - q_top) > 1.0e-11)
-    CERR << "BUG: Total S_p = '" << (soil.total (S_p) - q_top) 
+    CERR << __FILE__ << ":" <<  __LINE__
+	 << ": BUG: Total S_p = '" << (soil.total (S_p) - q_top) 
 	 << "' second pass\n";
 }
 

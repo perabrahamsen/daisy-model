@@ -12,6 +12,18 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.12
+
+** Fixed error with extra CH2O in the default crop model.
+
+It should not have measurable effect on production, but could produce
+warnings during simulation.
+
+** Made the default mactrans model more numerically robust.
+
+This also removed some rare warnings during simulation, but has no
+effect on the results.
+
 * 2.11
 
 ** Fixed mass balance error in mineralization.

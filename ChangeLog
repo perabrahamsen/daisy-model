@@ -1,5 +1,13 @@
 2002-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.12 released.
+
+2002-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* mactrans_std.C (tick): Made it more robust.
+
+	* production.C (tick): Substract ReMobilResp from CH2OPool.
+
 	* Version 2.11 released.
 
 2002-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
