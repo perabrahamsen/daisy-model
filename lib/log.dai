@@ -1096,7 +1096,13 @@
 	    (dimension "cm/h"))
 	   ((path column "$col" Groundwater "*" DrainFlow)
 	    (dimension "cm/h"))
+	   ((path column "$col" Groundwater "*" EqDrnFlow)
+	    (dimension "cm/h"))
 	   ((path column "$col" Groundwater "*" deficit)
+	    (dimension "cm"))
+	   ((path column "$col" SoilWater Theta)
+          (from 0)
+          (to -190)  
 	    (dimension "cm"))))
 
 (deflog "Drain Sink" table
@@ -1110,16 +1116,18 @@
 	   (array (path column "$col" Groundwater pipe S)
  	          (dimension "cm3/cm3/h"))))
 
+(deflog "Soil Water Content" table
+  (where "soil_water_content.tab")
+  (when hourly)
+  (entries (year (path time))
+	     (month (path time))
+	     (mday (path time))
+	     (hour (path time))
+  	     (array (path column "$col" SoilWater Theta)
+	            (dimension "cm3/cm3"))))
+
+
 (deflog "Harvest" harvest)
 
 ;;; log.dai ends here
 
-;(deflog "Soil Water Potential" table
-;  (where "soil_water_potential.tab")
-;  (when hourly)
-;  (entries (year (path time))
-;	     (month (path time))
-;	     (mday (path time))
-;	     (hour (path time))
-;  	     (array (path column "$col" SoilWater h)
-;	            (dimension "cm"))))

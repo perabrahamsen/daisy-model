@@ -178,7 +178,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
                      h_, Theta_, q_);
     }
 
-  for (unsigned int i = last + 1; i <= soil.size (); i++)
+  for (unsigned int i = last + 2; i <= soil.size (); i++)
     {
       q_[i] = q_[i-1];
       q_p_[i] = q_p_[i-1];

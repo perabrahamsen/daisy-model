@@ -92,8 +92,8 @@ public:
 
 bool
 UZRichard::richard (const Soil& soil,
-		    int first, const UZtop& top,
-		    int last, const UZbottom& bottom,
+		    const int first, const UZtop& top,
+		    const int last, const UZbottom& bottom,
 		    const vector<double>& S,
 		    const vector<double>& h_old,
 		    const vector<double>& Theta_old,
