@@ -325,6 +325,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   // 1.1 Evapotranspiration
   pet.tick (weather, vegetation, surface, soil, soil_heat, soil_water);
   total_ep = pet.wet ();
+  assert (total_ep >= 0.0);
   total_ea = 0.0;		// To be calculated.
 
   // 1.2 Irrigation
@@ -338,7 +339,9 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   // 2 Snow Pack
 
   snow_ep = total_ep - total_ea;
+  assert (snow_ep >= 0.0);
   snow_water_in = rain + irrigation_top;
+  assert (snow_water_in >= 0.0);
   if (irrigation_top > 0.01)
     snow_water_in_temperature 
       = (irrigation_top * irrigation_top_temperature
@@ -351,14 +354,18 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 	     surface.ponding (),
 	     snow_water_in_temperature, snow_ep);
   snow_ea = snow.evaporation ();
+  assert (snow_ea >= 0.0);
   total_ea += snow_ea;
+  assert (total_ea >= 0.0);
   snow_water_out = snow.percolation ();
   snow_water_out_temperature = snow.temperature ();
 
   // 3 Water intercepted on canopy
 
   const double canopy_water_capacity = vegetation.interception_capacity ();
+  assert (canopy_water_capacity >= 0.0);
   canopy_ep = (total_ep - snow_ea) * vegetation.cover ();
+  assert (canopy_ep >= 0.0);
   if (snow_water_out < 0.0)
     {
       canopy_water_in = 0.0;
@@ -369,7 +376,8 @@ BioclimateStandard::WaterDistribution (Surface& surface,
       canopy_water_in = snow_water_out * vegetation.cover ();
       canopy_water_bypass = snow_water_out - canopy_water_in;
     }
-  
+  assert (canopy_water_in >= 0.0);
+
   if (canopy_water_in > 0.01)
     canopy_water_temperature 
       = (canopy_water_storage * air_temperature 
@@ -379,9 +387,16 @@ BioclimateStandard::WaterDistribution (Surface& surface,
     canopy_water_temperature = air_temperature;
 
   canopy_ea = min (canopy_ep, canopy_water_storage / dt + canopy_water_in);
+  assert (canopy_ea >= 0.0);
   total_ea += canopy_ea;
-
+  assert (total_ea >= 0.0);
+  
   canopy_water_storage += (canopy_water_in - canopy_ea) * dt;
+  if (canopy_water_storage < 0.0)
+    {
+      assert (canopy_water_storage > -1e-16);
+      canopy_water_storage = 0.0;
+    }
   
   if (canopy_water_storage > canopy_water_capacity + 1e-8)
     {
@@ -392,10 +407,12 @@ BioclimateStandard::WaterDistribution (Surface& surface,
     {
       canopy_water_out = 0.0;
     }
+  assert (canopy_water_out >= 0.0);
 
   // 4 Ponding
 
   pond_ep = (total_ep - snow_ea) * (1.0 - vegetation.cover ());
+  assert (pond_ep >= 0.0);
   pond_water_in = canopy_water_out + canopy_water_bypass;
   if (pond_water_in > 0.01)
     pond_water_in_temperature 
@@ -409,13 +426,18 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 		pond_water_in, pond_water_in_temperature, 
 		soil, soil_water);
   pond_ea = surface.evap_pond ();
+  assert (pond_ea >= 0.0);
   total_ea += pond_ea;
+  assert (total_ea >= 0.0);
 
   // 5 Soil
 
   soil_ep = pond_ep - pond_ea;
+  assert (soil_ep >= 0.0);
   soil_ea = surface.exfiltration ();
+  assert (soil_ea >= 0.0);
   total_ea += soil_ea;
+  assert (total_ea >= 0.0);
 
   // 6 Transpiration
 
@@ -425,10 +447,13 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 
   crop_ep = pt.potential_transpiration ();
   assert (crop_ep < total_ep - total_ea + 1e-8);
+  assert (crop_ep >= 0.0);
 
   // Actual transpiration
   crop_ea = vegetation.transpiration (crop_ep, canopy_ea, soil, soil_water) ;
+  assert (crop_ea >= 0.0);
   total_ea += crop_ea;
+  assert (total_ea >= 0.0);
 
   // 7 Reset irrigation
   irrigation_top_old = irrigation_top;

@@ -283,7 +283,14 @@ Surface::evap_soil_surface () const // [mm/h]
 
 double 
 Surface::evap_pond () const	// [mm/h]
-{ return evap_soil_surface () - exfiltration (); }
+{ 
+  const double ep = evap_soil_surface () - exfiltration (); 
+  if (ep >= 0.0)
+    return ep;
+  if (ep < -1e-13)
+    CERR << "BUG: evap_pond = " << ep << "\n";
+  return 0.0;
+}
 
 void
 Surface::put_ponding (double p)	// [mm]

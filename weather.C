@@ -102,8 +102,11 @@ Weather::tick (const Time& time)
   assert (impl.day_length >= 0.0);
   assert (impl.day_length <= 24.0);
 
-  impl.day_cycle = max (0.0, M_PI_2 / day_length ()
-			* cos (M_PI * (time.hour () - 12) / day_length ()));
+  if (time.hour () > 12 + day_length () || time.hour () < 12 - day_length ())
+    impl.day_cycle = 0.0;
+  else
+    impl.day_cycle = max (0.0, M_PI_2 / day_length ()
+			  * cos (M_PI * (time.hour () - 12) / day_length ()));
   assert (impl.day_cycle >= 0.0);
   assert (impl.day_cycle <= 1.0);
 

@@ -1,3 +1,30 @@
+1999-10-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.92 released.
+
+1999-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C (evap_pond): Avoid negative numbers.
+
+	* bioclimate_std.C (WaterDistribution): Added assertions.
+
+1999-09-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_interval.C (SelectIntervalSyntax): Make `from' optional.
+
+	* select_flux_bottom.C, select_flux_top.C: New select models.
+	* Makefile (COMPONENTS): Added them.
+
+1999-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.C (tick): Make daycycle work right when the day length
+	is less than 8 hours.
+
+	* lib/log.dai ("Drain Sink Water", "Drain Sink NO3", "Drain Sink
+	NH4"): New log models.
+	("Root Zone Water Balance", "N Balance", "Soil Chemicals"): Add
+	drainage. 
+
 1999-09-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.91 released.

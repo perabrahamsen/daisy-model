@@ -4,7 +4,6 @@
 #include "log.h"
 #include "soil.h"
 #include "mathlib.h"
-#include "time.h"
 
 class GroundwaterPipe : public Groundwater
 {
@@ -38,11 +37,13 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time& time)
+  void tick (const Time&)
     {
+#if 0
        if (time.year () == 1986 && time.month () == 12 && time.mday () == 18 &&
            time.hour () == 20)
            COUT << "it's time - Greetings from pipe drains" << "\n";
+#endif
     }
   void update_water (const Soil&,
   		     vector<double>& S_sum,
