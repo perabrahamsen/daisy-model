@@ -106,13 +106,14 @@ HorizonB_vG::Se (double h) const
 }
 
 HorizonB_vG::HorizonB_vG (const AttributeList& al)
-     : Theta_sat (al.number ("Theta_sat")),
-       Theta_res_ (al.number ("Theta_res")),
-       alpha (al.number ("alpha")),
-       a (-alpha),
-       n (al.number ("n")),
-       m (1 - 2 / n),
-       K_sat (al.number ("K_sat"))
+  : Horizon (al),
+    Theta_sat (al.number ("Theta_sat")),
+    Theta_res_ (al.number ("Theta_res")),
+    alpha (al.number ("alpha")),
+    a (-alpha),
+    n (al.number ("n")),
+    m (1 - 2 / n),
+    K_sat (al.number ("K_sat"))
 { }
 
 HorizonB_vG::~HorizonB_vG ()
@@ -135,6 +136,7 @@ HorizonB_vGSyntax::HorizonB_vGSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
+  Horizon::load_syntax (syntax, alist);
   syntax.add ("Theta_sat", Syntax::Number, Syntax::Const);
   syntax.add ("Theta_res", Syntax::Number, Syntax::Const);
   syntax.add ("alpha", Syntax::Number, Syntax::Const);

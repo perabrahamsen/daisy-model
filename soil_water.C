@@ -27,7 +27,7 @@ void
 SoilWater::tick (Surface& surface, Groundwater& groundwater,
 		 const Soil& soil)
 {
-  Theta_old = Theta;
+  Theta_old_ = Theta_;
   h_old = h_;
 
   // Limit for groundwater table.
@@ -54,13 +54,13 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
       top->tick (soil, 
 		 first, surface, 
 		 bottom_start - 1, *bottom, 
-		 S, h_old, Theta_old,
-		 h_, Theta, q);
+		 S, h_old, Theta_old_,
+		 h_, Theta_, q_);
       bottom->tick (soil,
 		    bottom_start, *top,
 		    last, groundwater,
-		    S, h_old, Theta_old,
-		    h_, Theta, q);
+		    S, h_old, Theta_old_,
+		    h_, Theta_, q_);
     }
   else
     {
@@ -68,8 +68,8 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
       top->tick (soil, 
 		 first, surface, 
 		 last, groundwater,
-		 S, h_old, Theta_old,
-		 h_, Theta, q);
+		 S, h_old, Theta_old_,
+		 h_, Theta_, q_);
     }
 }
 
@@ -78,10 +78,10 @@ SoilWater::check (Log&, unsigned n) const
 {
   bool ok = true;
 
-  if (Theta.size () != n)
+  if (Theta_.size () != n)
     {
       cerr << "You have " << n 
-	   << " intervals but " << Theta.size () << " Theta values\n";
+	   << " intervals but " << Theta_.size () << " Theta values\n";
       ok = false;
     }
   if (h_.size () != n)
@@ -103,10 +103,10 @@ void
 SoilWater::output (Log& log, const Filter* filter) const
 {
   log.output ("S", filter, S, true);
-  log.output ("Theta", filter, Theta);
+  log.output ("Theta", filter, Theta_);
   log.output ("h", filter, h_);
   log.output ("Xi", filter, Xi);
-  log.output ("q", filter, q, true);
+  log.output ("q", filter, q_, true);
   top->output ("UZtop", log, filter);
   if (bottom)
     bottom->output ("UZbottom", log, filter);
@@ -116,7 +116,7 @@ double
 SoilWater::MaxExfiltration (const Soil& soil) const
 {
   return - ((soil.K (0, h_[0]) / soil.Cw2 (0, h_[0])) 
-	    * ((Theta[0] - soil.Theta_res (0)) / soil.z(0)));
+	    * ((Theta_[0] - soil.Theta_res (0)) / soil.z(0)));
 }
 
 void
@@ -146,8 +146,8 @@ SoilWater::SoilWater (const Soil& soil,
   
   if (al.check ("Theta"))
     {
-      Theta = al.array ("Theta");
-      size = Theta.size ();
+      Theta_ = al.array ("Theta");
+      size = Theta_.size ();
     }
   if (al.check ("h"))
     {
@@ -156,11 +156,11 @@ SoilWater::SoilWater (const Soil& soil,
     }
   if (!al.check ("Theta"))
     for (int i = 0; i < size; i++)
-      Theta.push_back (soil.Theta (i, h_[i]));
+      Theta_.push_back (soil.Theta (i, h_[i]));
 
   if (!al.check ("h"))
     for (int i = 0; i < size; i++)
-      h_.push_back (soil.h (i, Theta[i]));
+      h_.push_back (soil.h (i, Theta_[i]));
 
   if (al.check ("Xi"))
     Xi = al.array ("Xi");
@@ -168,7 +168,7 @@ SoilWater::SoilWater (const Soil& soil,
     Xi.insert (Xi.begin (), size, 0.0);
 
   S.insert (S.begin (), size, 0.0);
-  q.insert (q.begin (), size + 1, 0.0);
+  q_.insert (q_.begin (), size + 1, 0.0);
 }
 
 SoilWater::~SoilWater ()

@@ -92,11 +92,12 @@ HorizonM_BaC::Se (double h) const
 }
 
 HorizonM_BaC::HorizonM_BaC (const AttributeList& al)
-     : Theta_sat (al.number ("Theta_sat")),
-       Theta_res_ (al.number ("Theta_res")),
-       lambda (al.number ("lambda")),
-       h_b (al.number ("h_b")),
-       K_sat (al.number ("K_sat"))
+  : Horizon (al),
+    Theta_sat (al.number ("Theta_sat")),
+    Theta_res_ (al.number ("Theta_res")),
+    lambda (al.number ("lambda")),
+    h_b (al.number ("h_b")),
+    K_sat (al.number ("K_sat"))
 { }
 
 HorizonM_BaC::~HorizonM_BaC ()
@@ -119,6 +120,7 @@ HorizonM_BaCSyntax::HorizonM_BaCSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
+  Horizon::load_syntax (syntax, alist);
   syntax.add ("Theta_sat", Syntax::Number, Syntax::Const);
   syntax.add ("Theta_res", Syntax::Number, Syntax::Const);
   syntax.add ("lambda", Syntax::Number, Syntax::Const);

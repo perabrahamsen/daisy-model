@@ -81,7 +81,14 @@ Horizon::create (const AttributeList& al)
   return (*Horizon_constructors)[name] (library ().lookup (name));
 }
 
-Horizon::Horizon ()
+void
+Horizon::load_syntax (Syntax& syntax, AttributeList&)
+{ 
+  syntax.add ("lambda", Syntax::Array, Syntax::Const);
+}
+
+Horizon::Horizon (const AttributeList& al)
+  : lambda (al.number ("lambda"))
 { }
 
 Horizon::~Horizon ()

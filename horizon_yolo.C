@@ -78,7 +78,8 @@ HorizonYolo::M (double h) const
 }
 
 HorizonYolo::HorizonYolo (const AttributeList& al)
-  : M_intervals (al.integer ("M_intervals"))
+  : Horizon (al),
+    M_intervals (al.integer ("M_intervals"))
 { }
 
 HorizonYolo::~HorizonYolo ()
@@ -101,6 +102,7 @@ HorizonYoloSyntax::HorizonYoloSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
+  Horizon::load_syntax (syntax, alist);
   syntax.add ("M_intervals", Syntax::Integer, Syntax::Const);
   alist.add ("M_intervals", 500);
   Horizon::add_type ("yolo", alist, syntax, &HorizonYolo::make);

@@ -11,7 +11,7 @@ OBJECTS = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	filter.o csmp.o rules.o time.o uzmodel.o \
 	soil.o mathlib.o bioclimate.o surface.o soil_water.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
-	denitrification.o soil_heat.o groundwater.o snow.o
+	denitrification.o soil_heat.o groundwater.o snow.o solute.o
 OBJ = $(OBJECTS) $(SRCONLY)
 SRC = $(OBJ:.o=.C)
 HEAD = $(OBJECTS:.o=.h) common.h
@@ -97,8 +97,8 @@ $(OBJ):	daisy.h
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
 main.o: main.C daisy.h time.h input.h syntax.h log.h alist.h common.h
 daisy.o: daisy.C daisy.h time.h input.h manager.h weather.h \
- groundwater.h uzmodel.h horizon.h log.h crop.h column.h action.h \
- filter.h library.h syntax.h condition.h alist.h common.h
+ groundwater.h uzmodel.h common.h horizon.h log.h crop.h column.h \
+ action.h filter.h library.h syntax.h condition.h alist.h
 input.o: input.C input.h log.h alist.h common.h csmp.h rules.h \
  library.h syntax.h action.h condition.h time.h filter.h crop.h
 log.o: log.C log.h condition.h time.h filter.h csmp.h daisy.h
@@ -119,13 +119,13 @@ filter.o: filter.C filter.h common.h
 csmp.o: csmp.C csmp.h log.h
 rules.o: rules.C rules.h daisy.h time.h action.h
 time.o: time.C time.h
-uzmodel.o: uzmodel.C uzmodel.h library.h alist.h common.h syntax.h
+uzmodel.o: uzmodel.C uzmodel.h common.h library.h alist.h syntax.h
 soil.o: soil.C soil.h horizon.h alist.h common.h syntax.h
 mathlib.o: mathlib.C mathlib.h
-bioclimate.o: bioclimate.C bioclimate.h surface.h uzmodel.h weather.h \
- time.h crop.h csmp.h alist.h common.h soil.h horizon.h syntax.h \
+bioclimate.o: bioclimate.C bioclimate.h surface.h uzmodel.h common.h \
+ weather.h time.h crop.h csmp.h alist.h soil.h horizon.h syntax.h \
  snow.h log.h filter.h
-surface.o: surface.C surface.h uzmodel.h syntax.h alist.h common.h \
+surface.o: surface.C surface.h uzmodel.h common.h syntax.h alist.h \
  soil_water.h log.h
 soil_water.o: soil_water.C soil_water.h log.h alist.h common.h \
  uzmodel.h soil.h horizon.h surface.h groundwater.h time.h syntax.h
@@ -136,19 +136,21 @@ nitrification.o: nitrification.C nitrification.h
 denitrification.o: denitrification.C denitrification.h
 soil_heat.o: soil_heat.C soil_heat.h alist.h common.h bioclimate.h \
  syntax.h
-groundwater.o: groundwater.C groundwater.h time.h uzmodel.h library.h \
- alist.h common.h syntax.h
+groundwater.o: groundwater.C groundwater.h time.h uzmodel.h common.h \
+ library.h alist.h syntax.h
 snow.o: snow.C snow.h alist.h common.h syntax.h log.h filter.h
+solute.o: solute.C solute.h log.h filter.h syntax.h alist.h common.h \
+ soil.h horizon.h soil_water.h mathlib.h
 column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
- uzmodel.h soil.h horizon.h soil_water.h soil_heat.h soil_NH4.h \
- soil_NO3.h organic_matter.h nitrification.h denitrification.h alist.h \
- common.h syntax.h library.h log.h filter.h
+ uzmodel.h common.h soil.h horizon.h soil_water.h soil_heat.h \
+ soil_NH4.h soil_NO3.h organic_matter.h nitrification.h \
+ denitrification.h alist.h syntax.h library.h log.h filter.h
 manager_rule.o: manager_rule.C manager.h syntax.h rules.h alist.h \
  common.h
 weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
- common.h
-uzrichard.o: uzrichard.C uzmodel.h soil.h horizon.h mathlib.h alist.h \
- common.h syntax.h filter.h log.h
+ common.h log.h filter.h
+uzrichard.o: uzrichard.C uzmodel.h common.h soil.h horizon.h mathlib.h \
+ alist.h syntax.h filter.h log.h
 horizon_yolo.o: horizon_yolo.C horizon.h syntax.h alist.h common.h \
  csmp.h
 horizon_M_vG.o: horizon_M_vG.C horizon.h syntax.h alist.h common.h \
@@ -160,7 +162,7 @@ horizon_B_C.o: horizon_B_C.C horizon.h syntax.h alist.h common.h
 horizon_M_BaC.o: horizon_M_BaC.C horizon.h syntax.h alist.h common.h
 horizon_B_BaC.o: horizon_B_BaC.C horizon.h syntax.h alist.h common.h
 groundwater_static.o: groundwater_static.C groundwater.h time.h \
- uzmodel.h syntax.h alist.h common.h
+ uzmodel.h common.h syntax.h alist.h
 crop_std.o: crop_std.C crop.h log.h time.h csmp.h bioclimate.h \
  common.h ftable.h ftable.t syntax.h alist.h filter.h soil_water.h \
  soil.h horizon.h soil_heat.h

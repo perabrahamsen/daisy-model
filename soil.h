@@ -48,6 +48,8 @@ public:
   { return horizon_[i]->M (h); }
   inline bool compact (int i) const
   { return horizon_[i]->compact (); }
+  inline double lambda (int i) const
+  { return horizon_[i]->lambda; }
   
   // Calculations.
   double MaxRootingDepth () const;

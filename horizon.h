@@ -12,6 +12,10 @@ struct CSMP;
 
 class Horizon 
 {
+  // Public parameters.
+public:
+  const double lambda;
+
   // Use.
 public:
   virtual double Theta (double h) const = 0;
@@ -35,8 +39,12 @@ public:
   static Horizon& create (const AttributeList&);
 
   // Create and Destroy.
+public:
+  static void load_syntax (Syntax&, AttributeList&);
 protected:
-  Horizon ();
+  Horizon (const AttributeList&);
+private:
+  Horizon () { };
 public:
   virtual ~Horizon ();
 };

@@ -83,10 +83,11 @@ HorizonM_C::Sr (double h) const
 }
 
 HorizonM_C::HorizonM_C (const AttributeList& al)
-     : Theta_sat (al.number ("Theta_sat")),
-       h_b (al.number ("h_b")),
-       b (al.number ("b")),
-       K_sat (al.number ("K_sat"))
+  : Horizon (al),
+    Theta_sat (al.number ("Theta_sat")),
+    h_b (al.number ("h_b")),
+    b (al.number ("b")),
+    K_sat (al.number ("K_sat"))
 { }
 
 HorizonM_C::~HorizonM_C ()
@@ -109,6 +110,7 @@ HorizonM_CSyntax::HorizonM_CSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
+  Horizon::load_syntax (syntax, alist);
   syntax.add ("Theta_sat", Syntax::Number, Syntax::Const);
   syntax.add ("h_b", Syntax::Number, Syntax::Const);
   syntax.add ("b", Syntax::Number, Syntax::Const);
