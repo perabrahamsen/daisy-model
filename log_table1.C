@@ -320,7 +320,7 @@ struct LogEntry
 	tag = "<none>";
     }
   ~LogEntry ()
-    { delete condition; }
+  { delete condition; }
 };
 
 struct LogTable1 : public Log
@@ -710,4 +710,3 @@ value to replace it with.  And so forth.");
       Librarian<Log>::add_type ("table1", alist, syntax, &make);
     }
 } LogTable1_syntax;
-

@@ -203,6 +203,7 @@ WeatherStandard::convert_unit (const string& from, const string& to)
       return unit_table[i].factor;
 
   assert (false);
+  return -42.42e42;
 }
 
 const WeatherStandard::keyword_description_type 
@@ -356,7 +357,7 @@ WeatherStandard::read_line ()
 	      lex.next_line ();
 	      continue;
 	    }
-	  if (timestep > 0 && next_time != Time (year, month, mday, hour))
+	  if (timestep > 0 && !(next_time == Time (year, month, mday, hour)))
 	    {
 	      lex.error ("Bad timestep");
 	      next_time = Time (year, month, mday, hour);
@@ -374,7 +375,8 @@ WeatherStandard::read_new_day (const Time& time)
   Time tomorrow = time;
   tomorrow.tick_day ();
 
-  while (next_time <= now)
+  // BC5 sucks // while (next_time <= now)
+  while (!(now < next_time))
     read_line ();
 
   while (true)
@@ -415,7 +417,8 @@ WeatherStandard::read_new_day (const Time& time)
 	      = Weather::Makkink (air_temperature_[hour],
 				  global_radiation_[hour]);
 	}
-      if (next_time >= tomorrow)
+      // BC5 sucks // if (next_time >= tomorrow)
+      if (!(next_time < tomorrow))
 	break;
       read_line ();
     }
@@ -493,7 +496,7 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
   lex.skip_line ();
   lex.next_line ();
 
-  set<string> keywords;
+  set<string, less<string>/**/> keywords;
 
   // Read keywords.
   bool last_was_note = false;
@@ -509,7 +512,7 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
 	  lex.next_line ();
 	  continue;
 	}
-      key.erase (key.size () - 1);
+      key = key.substr (0, key.size () - 1);
 
       if (keywords.find (key) == keywords.end ())
 	keywords.insert (key);
@@ -647,7 +650,8 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     if (keywords.find (required[i]) == keywords.end ())
       lex.error (string ("Missing keyword `") + required[i] + "'");
 
-  if (begin >= end)
+  // BC5 sucks // if (begin >= end)
+  if (!(begin < end))
     lex.error ("Weather data ends before they begin");
 
   lex.skip_hyphens ();

@@ -10,6 +10,84 @@
 #include <fcntl.h>
 #include <iostream>
 
+#ifdef CYGNUS_NO_CYGWIN
+
+extern "C" {
+
+#include <reent.h>
+
+/* Note that there is a copy of this in sys/reent.h.  */
+#ifndef __ATTRIBUTE_IMPURE_PTR__
+#define __ATTRIBUTE_IMPURE_PTR__
+#endif
+
+#ifndef __ATTRIBUTE_IMPURE_DATA__
+#define __ATTRIBUTE_IMPURE_DATA__
+#endif
+
+static struct _reent __ATTRIBUTE_IMPURE_DATA__ impure_data = _REENT_INIT (impure_data);
+struct _reent *__ATTRIBUTE_IMPURE_PTR__ _impure_ptr = &impure_data;
+
+#include <ctype.h>
+
+int __errno = 0;
+
+_CONST char _ctype_[1 + 256] = {
+	0,
+	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
+	_C,	_C|_S,	_C|_S,	_C|_S,	_C|_S,	_C|_S,	_C,	_C,
+	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
+	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
+	_S|_B,	_P,	_P,	_P,	_P,	_P,	_P,	_P,
+	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P,
+	_N,	_N,	_N,	_N,	_N,	_N,	_N,	_N,
+	_N,	_N,	_P,	_P,	_P,	_P,	_P,	_P,
+	_P,	_U|_X,	_U|_X,	_U|_X,	_U|_X,	_U|_X,	_U|_X,	_U,
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U,
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U,
+	_U,	_U,	_U,	_P,	_P,	_P,	_P,	_P,
+	_P,	_L|_X,	_L|_X,	_L|_X,	_L|_X,	_L|_X,	_L|_X,	_L,
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L,
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L,
+	_L,	_L,	_L,	_P,	_P,	_P,	_P,	_C
+};
+
+_CONST char _imp___ctype_ [1 + 256] = {
+	0,
+	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
+	_C,	_C|_S,	_C|_S,	_C|_S,	_C|_S,	_C|_S,	_C,	_C,
+	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
+	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
+	_S|_B,	_P,	_P,	_P,	_P,	_P,	_P,	_P,
+	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P,
+	_N,	_N,	_N,	_N,	_N,	_N,	_N,	_N,
+	_N,	_N,	_P,	_P,	_P,	_P,	_P,	_P,
+	_P,	_U|_X,	_U|_X,	_U|_X,	_U|_X,	_U|_X,	_U|_X,	_U,
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U,
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U,
+	_U,	_U,	_U,	_P,	_P,	_P,	_P,	_P,
+	_P,	_L|_X,	_L|_X,	_L|_X,	_L|_X,	_L|_X,	_L|_X,	_L,
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L,
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L,
+	_L,	_L,	_L,	_P,	_P,	_P,	_P,	_C
+};
+
+void
+_DEFUN (__assert, (file, line, failedexpr),
+	const char *file _AND
+	int line _AND
+	const char *failedexpr)
+{
+  cerr << "assertion \"" << failedexpr << "\" failed: file \""
+       <<file << "\", line " << line << "\n";
+  abort();
+  /* NOTREACHED */
+}
+
+}
+
+#endif
+
 extern "C" int chdir (const char *path);
 
 #ifdef BORLAND_ASSERT
@@ -84,7 +162,7 @@ Options::find_file (const string& name)
     }
   assert (path.size () > 0);
   if (name[0] == '.' || name[0] == '/'
-#ifndef __unix
+#ifndef __unix__
       || name[1] == ':'
 #endif
       )

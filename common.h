@@ -11,13 +11,16 @@
 #include <assert.h>
 #include <string>
 
+#ifndef __CYGWIN__
+// Doesn't work under cygwin
 #define pow(x, y) (assert (x > 0), (pow)(x, y))
 #define sqrt(x) (assert (x >= 0), (sqrt)(x))
 #define log(x) (assert (x > 0), (log)(x))
+#endif
 
 #define HANDLE_NAMESPACES
 
-#ifdef EGCS
+#ifdef __GNU__
 // Only egcs has a C++ safe <math.h>.
 #include <math.h>
 #else
@@ -34,7 +37,7 @@
 #define rint(x) ((int)x)
 #endif
 
-#ifdef __unix
+#ifdef __GNU__
 
 // Unix doesn't have DLL keywords.
 #define EXPORT
@@ -43,10 +46,7 @@
 // If you can delete const objects.
 #define CONST_DELETE
 
-#ifdef EGCS
-// Egcs can initialize a vector from two list iterators.
 #define HAS_TEMPLATE_MEMBERS
-#endif
 
 #include <unistd.h>
 #include <strstream.h>
@@ -84,6 +84,10 @@
 
 // BC++ 5.01 hasn't <ostream.h>
 #define MISSING_OSTREAM
+
+#endif
+
+#ifndef __unix
 
 // WinDOS doesn't have a useful stderr.
 #define USELESS_STDERR

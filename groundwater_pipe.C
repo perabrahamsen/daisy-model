@@ -151,8 +151,8 @@ GroundwaterPipe::update_water (const Soil& soil,
                          /soil.dz(i) -
                          S[i])*dt;
        if (fabs(w)>0.0001)
-         COUT << "GWT " << GWT_State
-              << " i_GWT = " << i_GWT << " i_GWT_old = " << i_GWT_old
+         COUT << "GWT " << int(GWT_State)
+              << " i_GWT = " << int(i_GWT) << " i_GWT_old = " << int(i_GWT_old)
               << " BUG: W = " << w << " i = " << i << "\n";
     }
   DrainFlow = 0.0;

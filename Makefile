@@ -23,19 +23,20 @@ ifeq ($(OS),Windows_NT)
 	ifeq ($(OSTYPE),cygwin)
 		HOSTTYPE = cygwin
 	else
-		HOSTTYPE = win32
+#		HOSTTYPE = win32
+		HOSTTYPE = cygwin
 	endif
 endif
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
-USE_OPTIMIZE = true
-#USE_OPTIMIZE = false
+#USE_OPTIMIZE = true
+USE_OPTIMIZE = false
 
 # Set USE_PROFILE if you want to profile the executable
 #
-#USE_PROFILE = true
-USE_PROFILE = false
+USE_PROFILE = true
+#USE_PROFILE = false
 
 # Set COMPILER according to which compiler you use.
 #	sun		Use the unbundled sun compiler.
@@ -79,15 +80,30 @@ ifeq ($(USE_OPTIMIZE),true)
 			OPTIMIZE = -O3 -ffast-math -fno-inline
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
 		else
-			OPTIMIZE = -O3 -ffast-math 
+		ifeq ($(HOSTTYPE),cygwin)
+		OPTIMIZE = -O3 -ffast-math -mcpu=pentiumpro -march=pentium
+		else
+		OPTIMIZE = -O3 -ffast-math 
+		endif
 		endif
 	endif
 endif
 
 # Create the right compile command.
 #
+
+ifeq ($(HOSTTYPE),sun4)
+	REPO = -frepo -pipe
+	DEBUG = -g
+else
+#	REPO = -mno-cygwin
+	REPO =
+#	DEBUG = -g
+	DEBUG = 
+endif
+
 ifeq ($(COMPILER),egcs)
-	COMPILE = c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -Wmissing-prototypes -DEGCS -g -pipe -frepo
+	COMPILE = c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -Wmissing-prototypes $(DEBUG) $(REPO)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)
@@ -143,7 +159,11 @@ ifeq ($(HOSTTYPE),win32)
 	EXT = .exe
 else
 	OBJ = .o
-	EXT =
+	ifeq ($(HOSTTYPE),cygwin)
+		EXT = .exe
+	else
+		EXT =
+	endif
 endif
 
 # Figure out how to link.
@@ -154,7 +174,7 @@ ifeq ($(COMPILER),borland)
 	NOLINK = -c
 	CRTLIB = C:\BC5\LIB\c0x32.obj
 else
-	LINK = $(CC) -o
+	LINK = $(CC) -g -o
 	NOLINK = -c
 endif
 
@@ -185,7 +205,7 @@ COMPONENTS = weather_std.C \
 	condition_soil.C log_table1.C log_checkpoint.C weather_hourly.C \
 	uznone.C condition_daisy.C chemical_std.C \
 	hydraulic_M_BaC_Bimodal.C hydraulic_B_BaC_Bimodal.C \
-	pet_makkink.C pet_weather.C pet_PM.C pt_std.C action_spray.C \
+	pet_makkink.C pet_weather.C pt_std.C action_spray.C pet_PM.C \
 	pt_pmsw.C action_merge.C action_divide.C groundwater_file.C
 
 # Select the C files with a corresponding header file from the library.
@@ -241,7 +261,7 @@ all:	$(EXECUTABLES)
 
 # Create the main executable.
 #
-daisy${EXT}:	main${OBJ} $(FORLIB) $(LIBOBJ)
+daisy${EXT}:	main${OBJ} $(FORLIB) $(LIBOBJ) # $(INTERFACES:.C=${OBJ})
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create manager test executable.
@@ -350,7 +370,7 @@ depend: $(SOURCES)
 	rm -f Makefile.old
 	mv Makefile Makefile.old
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
-	/pack/egcs/bin/c++ -DEGCS -I. $(TKINCLUDE) $(GTKMMINCLUDE) \
+	/pack/egcs/bin/c++ -I. $(TKINCLUDE) $(GTKMMINCLUDE) \
 	        -MM $(SOURCES) | sed -e 's/\.o:/$${OBJ}:/' >> Makefile
 
 # Create a ZIP file with all the sources.
