@@ -30,11 +30,11 @@ using namespace std;
 
 struct TreelogStream::Implementation
 {
-  ostream& out;
+  tmp::ostream& out;
   deque<string> path;
   deque<bool> touched;
 
-  Implementation (ostream& o)
+  Implementation (tmp::ostream& o)
     : out (o)
   { }
   ~Implementation ()
@@ -80,7 +80,7 @@ void
 TreelogStream::flush ()
 { impl.out.flush (); }
 
-TreelogStream::TreelogStream (ostream& out)
+TreelogStream::TreelogStream (tmp::ostream& out)
   : impl (*new Implementation (out))
 { }
 
