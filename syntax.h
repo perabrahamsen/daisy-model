@@ -28,7 +28,7 @@ public:
   // Each syntax entry should have an associated type.
   enum type 
   { Number, List, CSMP, Function, Boolean, String,
-    Date, Integer, Output, Class, Object, Error };
+    Date, Integer, Filter, Class, Object, Error };
 
   // The requirements with regard to input and output varies with each
   // syntax entry.
@@ -78,7 +78,7 @@ public:
   void add (string, const Syntax&, required = Mixed, int size = Singleton);
   void add (string, const FTable*, required, int size = Singleton);
   void add (string, const Library&, required = Mixed, int size = Singleton);
-  void add_output (string, const Syntax&, required);
+  void add_filter (string, const Syntax&, required);
   void add_class (string, const Library&, derive_fun);
 
   // It is possible to impose an order on the syntax entries, which

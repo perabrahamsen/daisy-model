@@ -401,7 +401,7 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	  case Syntax::Date:
 	    atts.add (name, get_time ());
 	    break;
-	  case Syntax::Output:
+	  case Syntax::Filter:
 	    atts.add (name, get_filter (syntax.syntax (name)));
 	    break;
 	  case Syntax::Class:

@@ -213,9 +213,9 @@ Syntax::add (string key, const Library& l, required req, int s)
 }
 
 void
-Syntax::add_output (string key, const Syntax& s, required req)
+Syntax::add_filter (string key, const Syntax& s, required req)
 {
-  add (key, Output, req);
+  add (key, Filter, req);
   impl.syntax[key] = &s;
 }  
 

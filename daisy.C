@@ -130,7 +130,7 @@ Daisy::load_syntax (Syntax& syntax)
   Syntax& log = *new Syntax ();
   log.add ("where", Syntax::String, Syntax::Const);
   log.add ("when", Condition::library (), Syntax::Const);
-  log.add_output ("what", syntax, Syntax::Sparse);
+  log.add_filter ("what", syntax, Syntax::Sparse);
   log.order ("where", "when", "what");
   syntax.add ("log", log, Syntax::Const, Syntax::Sequence);
   syntax.add ("weather", Weather::library ());
