@@ -1,3 +1,16 @@
+2003-05-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.88 released.
+
+2003-05-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_interval.C (output_arry): Use Geometry::total (array) if
+	possible. 
+
+	* hydraulic_M_vGp.C: New model.
+
+	* harvesting.C (DSnew): Clarified doumentation.
+
 2003-05-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.87 released.

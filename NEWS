@@ -12,9 +12,19 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
-* 2.87
+* 2.88
 
-** CO2_fast is no longr printed in "Carbon Balance".
+** New 'M_vGp' hudraulic model by Børgesen et.al..
+
+Compared to a straight Mualem + van Genuchten, it has two extra
+parameters, 'h_m' which indicated the transition point for macropores,
+and 'f' which is a shape parameter for the conductivity function.
+
+** Clarified documentation for the DSnew harvesting parameter.
+
+** Slight speedup in logging.
+
+* 2.87
 
 ** Denitrification can now be affected by fast OM pools.
 
@@ -43,6 +53,8 @@ denitrification.
 
 You can get detailed information about potential and actual
 denitrification with the new "Denitrification" log parameterization.
+
+** CO2_fast is no longer printed in "Carbon Balance".
 
 * 2.86
 

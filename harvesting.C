@@ -497,9 +497,10 @@ Maximal development stage for which the crop survives harvest.");
   alist.add ("DSmax", 0.80);
   static const RangeII range_new (0.0, 1.0);
   syntax.add ("DSnew", Syntax::None (), range_new, Syntax::OptionalConst,
-	       "New development stage after harvest.\n\
-If not specified, use the DS where the crop first reached the height\n\
-it now has after the cut.");
+	      "New development stage after harvest.\n\
+If not specified, use the DS where an uncut crop would first reach the\n\
+height it now has after the cut.  I.e. it uses the inverse function of\n\
+the HvsDS Canopy parameter to find the new DS.");
   syntax.add_submodule ("last_cut", alist, Syntax::OptionalState,
 			"Date of last cut.  Used for calculating cut delay.",
 			Time::load_syntax);

@@ -289,7 +289,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = summary_simple.C select_date.C \
+MODELS = hydraulic_M_vGp.C summary_simple.C select_date.C \
 	phenology_TSum.C phenology_std.C hydraulic_hypres.C clayom_biomod.C \
         clayom_old.C hydraulic_Cosby.C pedo_linear.C adsorption_full.C \
 	equil_langmuir.C transform_equil.C condition_weather.C \
@@ -966,9 +966,12 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h \
 common${OBJ}: common.C common.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h assertion.h
+hydraulic_M_vGp${OBJ}: hydraulic_M_vGp.C hydraulic.h librarian.h common.h \
+ library.h symbol.h alist.h syntax.h treelog.h assertion.h plf.h \
+ mathlib.h check.h
 summary_simple${OBJ}: summary_simple.C summary.h librarian.h common.h \
  library.h symbol.h alist.h syntax.h treelog.h assertion.h \
- destination.h select.h condition.h tmpstream.h
+ destination.h select.h condition.h tmpstream.h mathlib.h
 select_date${OBJ}: select_date.C select.h destination.h symbol.h \
  condition.h librarian.h common.h library.h alist.h syntax.h treelog.h \
  assertion.h
@@ -1095,7 +1098,7 @@ select_content${OBJ}: select_content.C select_value.h select.h \
  alist.h syntax.h treelog.h assertion.h geometry.h
 select_interval${OBJ}: select_interval.C select.h destination.h symbol.h \
  condition.h librarian.h common.h library.h alist.h syntax.h treelog.h \
- assertion.h geometry.h units.h
+ assertion.h geometry.h units.h mathlib.h
 select_number${OBJ}: select_number.C select_value.h select.h destination.h \
  symbol.h condition.h librarian.h common.h library.h alist.h syntax.h \
  treelog.h assertion.h

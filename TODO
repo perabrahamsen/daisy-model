@@ -1,14 +1,8 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* fast denitrification
-
-* M_vGp
-
 * FertOrgaNic
 
 ** Post excersizes and answers
-
-* Weather std:  make "end" two days before specified.
 
 * Opdater tutorial
 
@@ -28,7 +22,11 @@ Til referencemanual?
 
 * SH: Ny ref-evap model
 
-* Min & max T i klimafil, udregn average.
+* Weather
+
+**  make "end" two days before specified.
+
+** Min & max T i klimafil, udregn average.
 
 * Check let at bruge GUI version of CVS til Windows.
 
