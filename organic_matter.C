@@ -83,6 +83,7 @@ struct OrganicMatter::Implementation
       return total;
     }
   // Create & Destroy.
+  AM* find_am (const string& sort, const string& part) const;
   void initialize (const AttributeList&, const Soil&);
   Implementation (const AttributeList&);
 };
@@ -454,6 +455,18 @@ OrganicMatter::Implementation::swap (const Geometry& geometry,
   // Leave CO2 alone.
 }
 
+AM* 
+OrganicMatter::Implementation::find_am (const string& sort,
+					const string& part) const
+{
+  for (unsigned int i = 0; i < am.size (); i++)
+    if (am[i]->locked () 
+	&& am[i]->crop_name () == sort 
+	&& am[i]->crop_part_name () == part)
+      return am[i];
+  return NULL;
+}
+
 void
 OrganicMatter::Implementation::initialize (const AttributeList& al,
 					   const Soil& soil)
@@ -713,6 +726,10 @@ OrganicMatter::add (AM& am)
 {
   impl.add (am);
 }
+
+AM* 
+OrganicMatter::find_am (const string& sort, const string& part) const
+{ return impl.find_am (sort, part); }
 
 void
 OrganicMatter::initialize (const AttributeList& al, const Soil& soil)

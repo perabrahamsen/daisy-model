@@ -98,7 +98,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry);
+  void initialize (const Geometry& geometry, const OrganicMatter&);
   CropSold (const AttributeList& vl);
   ~CropSold ();
 };
@@ -603,7 +603,7 @@ CropSold::Variables::~Variables ()
 { }
 
 void
-CropSold::initialize (const Geometry& geometry)
+CropSold::initialize (const Geometry& geometry, const OrganicMatter&)
 {
   unsigned int size = geometry.size ();
 

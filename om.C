@@ -8,37 +8,38 @@
 #include "mathlib.h"
 #include <numeric>
 
+static double
+get_initial_C_per_N (const AttributeList& al)
+{
+  if (al.check ("initial_C_per_N"))
+    return al.number ("initial_C_per_N");
+  if (al.check ("C_per_N"))
+    {
+      const vector<double>& C_per_N = al.number_sequence ("C_per_N");
+      if (C_per_N.size () > 0U)
+	return C_per_N[0];
+    }
+  return OM::Unspecified;
+}
+
 OM::OM (const AttributeList& al)
   : initial_fraction (al.number ("initial_fraction")),
+    initial_C_per_N (get_initial_C_per_N (al)),
     top_C (al.number ("top_C")),
     top_N (al.number ("top_N")),
     turnover_rate (al.number ("turnover_rate")),
     efficiency (al.number_sequence ("efficiency")),
     maintenance (al.number ("maintenance")),
     fractions (al.number_sequence ("fractions"))
-{
-#if 0
-  // This one is only present at checkpoints.
-  assert (!al.check ("C"));
-#endif
-
+{ 
   if (al.check ("C_per_N"))
-    {
-      C_per_N = al.number_sequence ("C_per_N");
-      if (C_per_N.size () > 0U)
-	initial_C_per_N =  C_per_N[0];
-    }
-  else
-    initial_C_per_N = Unspecified;
+    C_per_N = al.number_sequence ("C_per_N");
 }
 
 void
 OM::output (Log& log, Filter& filter) const
 {
-#if 0
-  log.output ("initial_fraction", filter, initial_fraction);
-  log.output ("initial_C_per_N", filter, initial_C_per_N);
-#endif
+  log.output ("initial_C_per_N", filter, initial_C_per_N); // For checkpoint
   log.output ("top_C", filter, top_C);
   log.output ("top_N", filter, top_N);
   log.output ("C", filter, C);
@@ -505,6 +506,7 @@ OM::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("maintenance", 0.0);
   syntax.add ("fractions", Syntax::Number, Syntax::Const, 
 	       Syntax::Sequence);
+  syntax.add ("initial_C_per_N", Syntax::Number, Syntax::OptionalState);
   syntax.add ("initial_fraction", Syntax::Number, Syntax::Const);
   alist.add ("initial_fraction", Unspecified);
 }

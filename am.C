@@ -467,7 +467,10 @@ AM::AM (const AttributeList& al)
 	   map_construct<OM> (al.alist_sequence ("om")))),
     alist (al),
     name ("state")
-{ }
+{
+  if (al.check ("lock"))
+    impl.lock = new AM::Implementation::Lock (al.alist ("lock"));
+ }
 
 void
 AM::initialize (const Geometry& geometry)

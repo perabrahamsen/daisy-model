@@ -77,7 +77,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Geometry&) = 0;
+  virtual void initialize (const Geometry&, const OrganicMatter&) = 0;
 protected:
   Crop (const AttributeList& al);
 public:

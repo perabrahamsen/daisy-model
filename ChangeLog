@@ -1,9 +1,30 @@
+1998-12-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.55 released.
+
+1998-12-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (output, load_syntax, OM): Make `initial_fraction' a state
+	variable. 
+	(get_initial_C_per_N): New function.
+	(OM): Use it.
+
 1998-12-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C, crop_old.C, crop_sold.C, crop.h (initialize): Take
+	`organic_matter' parameter.
+	* vegetation.h, vegetation.C, column_std.C: Update callers.
+
+	* daisy.C (tick): Tick hour before logs.
 
 	* Version 0.54 released.
 
 1998-12-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* crop_std.C (initialize): Call `NitContent'.
+	* soil_water.C (initialize): Also initialize `h_old' and `Theta_old_'.
+	Fix error when `h' is specified.
+	
 	* field.C (Implementation): Use `map_create'.
 
 	* vegetation.C, vegetation.h (initialize): New function.

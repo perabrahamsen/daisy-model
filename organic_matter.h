@@ -3,6 +3,8 @@
 #ifndef ORGANIC_MATTER_H
 #define ORGANIC_MATTER_H
 
+#include "common.h"
+
 class AttributeList;
 class Syntax;
 class Log;
@@ -40,8 +42,7 @@ public:
   bool check () const;
   bool check_am (const AttributeList& am) const;
   void add (AM&);
-
-  // Create & Destroy.
+  AM* find_am (const string& sort, const string& part) const;
 public:
   void initialize (const AttributeList&, const Soil&);
   static void load_syntax (Syntax&, AttributeList&);

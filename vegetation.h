@@ -68,12 +68,12 @@ public:
 				  double stem_harvest,
 				  double leaf_harvest, 
 				  double sorg_harvest);
-  void sow (const AttributeList& al, const Geometry&);
+  void sow (const AttributeList& al, const Geometry&, const OrganicMatter&);
   void output (Log&, Filter&) const;
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry);
+  void initialize (const Geometry& geometry, const OrganicMatter&);
   static void load_syntax (Syntax&, AttributeList&);
   Vegetation (const AttributeList&);
   ~Vegetation ();

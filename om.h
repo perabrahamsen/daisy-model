@@ -17,8 +17,8 @@ class OM
   // Parameters
 public:
   static const double Unspecified;// No initial fraction specified.
-  double initial_fraction;	// Relative fraction for this om.
-  double initial_C_per_N;	// Initial value for C/N.
+  const double initial_fraction; // Relative fraction for this om.
+  const double initial_C_per_N;	// Initial value for C/N.
 
   // Content.
 public:

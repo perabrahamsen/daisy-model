@@ -104,8 +104,8 @@ Daisy::tick ()
   weather.tick (time);
 
   tick_columns ();
-  tick_logs ();
   time.tick_hour ();
+  tick_logs ();
 }
 
 void 

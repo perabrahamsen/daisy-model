@@ -111,7 +111,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry);
+  void initialize (const Geometry& geometry, const OrganicMatter&);
   CropStandard (const AttributeList& vl);
   ~CropStandard ();
 };
@@ -715,7 +715,8 @@ CropStandard::Variables::~Variables ()
 { }
 
 void
-CropStandard::initialize (const Geometry& geometry)
+CropStandard::initialize (const Geometry& geometry, 
+			  const OrganicMatter& organic_matter)
 {
   unsigned int size = geometry.size ();
 
@@ -733,8 +734,14 @@ CropStandard::initialize (const Geometry& geometry)
 				    size - var.RootSys.NO3Extraction.size (),
 				    0.0);
 
-  // Update nitrate state.
-  NitContent ();
+  if (var.Phenology.DS >= 0)
+    {
+      var.Prod.AM_leaf = organic_matter.find_am (name, "dead");
+      assert (var.Prod.AM_leaf);
+      var.Prod.AM_root = organic_matter.find_am (name, "root");
+      assert (var.Prod.AM_root);
+      NitContent ();
+    }
 }
 
 static struct CropStandardSyntax

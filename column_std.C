@@ -43,7 +43,7 @@ private:
   // Actions.
 public:
   void sow (const AttributeList& al)
-    { vegetation.sow (al, soil); }
+    { vegetation.sow (al, soil, organic_matter); }
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
   void fertilize (const AttributeList&);
@@ -335,12 +335,12 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
 
 void ColumnStandard::initialize (const Time& time, const Weather& weather)
 {
-  vegetation.initialize (soil);
   soil_heat.initialize (alist.alist ("SoilHeat"), soil, time, weather);
   soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater);
   soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water);
   soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water);
   organic_matter.initialize (alist.alist ("OrganicMatter"), soil);
+  vegetation.initialize (soil, organic_matter);
 }
 
 ColumnStandard::~ColumnStandard ()

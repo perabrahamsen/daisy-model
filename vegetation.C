@@ -69,11 +69,11 @@ struct Vegetation::Implementation
 				  double stem_harvest,
 				  double leaf_harvest, 
 				  double sorg_harvest);
-  void sow (const AttributeList& al, const Geometry&);
+  void sow (const AttributeList& al, const Geometry&, const OrganicMatter&);
   void output (Log&, Filter&) const;
 
   // Create and destroy.
-  void initialize (const Geometry& geometry);
+  void initialize (const Geometry& geometry, const OrganicMatter&);
   Implementation (const AttributeList&);
   ~Implementation ();
 };
@@ -315,10 +315,11 @@ Vegetation::Implementation::harvest (const string& column_name,
 
 void
 Vegetation::Implementation::sow (const AttributeList& al,
-				 const Geometry& geometry)
+				 const Geometry& geometry,
+				 const OrganicMatter& organic_matter)
 {
   Crop& crop = Librarian<Crop>::create (al);
-  crop.initialize (geometry);
+  crop.initialize (geometry, organic_matter);
   crops.push_back (&crop);
 }
 
@@ -341,10 +342,11 @@ Vegetation::Implementation::output (Log& log, Filter& filter) const
 }
 
 void
-Vegetation::Implementation::initialize (const Geometry& geometry)
+Vegetation::Implementation::initialize (const Geometry& geometry, 
+					const OrganicMatter& organic_matter)
 {
   for (unsigned int i = 0; i < crops.size (); i++)
-    crops[i]->initialize (geometry);
+    crops[i]->initialize (geometry, organic_matter);
   reset_canopy_structure ();
 }
 
@@ -468,16 +470,18 @@ Vegetation::harvest (const string& column_name,
 		       stem_harvest, leaf_harvest, sorg_harvest); }
 
 void
-Vegetation::sow (const AttributeList& al, const Geometry& geometry)
-{ impl.sow (al, geometry); }
+Vegetation::sow (const AttributeList& al, const Geometry& geometry,
+		 const OrganicMatter& organic_matter)
+{ impl.sow (al, geometry, organic_matter); }
 
 void
 Vegetation::output (Log& log, Filter& filter) const
 { impl.output (log, filter); }
 
 void
-Vegetation::initialize (const Geometry& geometry)
-{ impl.initialize (geometry); }
+Vegetation::initialize (const Geometry& geometry, 
+			const OrganicMatter& organic_matter)
+{ impl.initialize (geometry, organic_matter); }
 
 void
 Vegetation::load_syntax (Syntax& syntax, AttributeList& alist)

@@ -2,13 +2,7 @@
 
 ** LogCheckpoint
 
-*** log _efter_ tick.
-
 *** Sørg for at inkludere `def*' og `input' automatisk.
-
-*** Få AM_leaf og AM_root i CropStandard til at blive initializeret ordentligt
-
-*** Sørg for at harvest giver det samme med og uden checkpoint.
 
 ** Split LogCheckpoint i LogCheckpoint og LogAList.
     LogCheckpoint skal være implementeret ovenpå LogAList.  
