@@ -5,7 +5,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "common.h"
-#include <map.h>
+#include <map>
 #include <algobase.h>
 
 static Library* Weather_library = NULL;

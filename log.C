@@ -5,7 +5,7 @@
 #include "library.h"
 #include "syntax.h"
 #include "common.h"
-#include <map.h>
+#include <map>
 
 Syntax* Log::global_syntax_table = NULL;
 

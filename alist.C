@@ -3,7 +3,7 @@
 #include "alist.h"
 #include "time.h"
 #include <assert.h>
-#include <map.h>
+#include <map>
 
 // @ Value
 //
@@ -127,112 +127,96 @@ Value::operator double () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return -1.0; // SHUT UP.
 }
 
 Value::operator string () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return "BUG"; // SHUT UP.
 }
 
 Value::operator bool () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return false; // SHUT UP.
 }
 
 Value::operator int () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return 0; // SHUT UP.
 }
 
 Value::operator const Time& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((Time*) 0); // SHUT UP.
 }
 
 Value::operator const CSMP& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((CSMP*) 0); // SHUT UP.
 }
 
 Value::operator const Filter& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((Filter*) 0); // SHUT UP.
 }
 
 Value::operator const AttributeList& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((AttributeList*) 0); // SHUT UP.
 }
 
 Value::operator const vector<double>& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((vector<double>*) 0);
 }
 
 Value::operator const vector<string>& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((vector<string>*) 0);
 }
 
 Value::operator const vector<bool>& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((vector<bool>*) 0);
 }
 
 Value::operator const vector<int>& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((vector<int>*) 0);
 }
 
 Value::operator const vector<const CSMP*>& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((vector<const CSMP*>*) 0);
 }
 
 Value::operator const vector<const Filter*>& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((vector<const Filter*>*) 0);
 }
 
 Value::operator const vector<const AttributeList*>& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((vector<const AttributeList*>*) 0);
 }
 
 Value::operator const vector<const Time*>& () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return *((vector<const Time*>*) 0);
 }
 
 Value::Value ()

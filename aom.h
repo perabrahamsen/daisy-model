@@ -1,0 +1,68 @@
+// aom.h
+
+#ifndef AOM_H
+#define AOM_H
+
+#include <string>
+#include <vector>
+#include "time.h"
+
+class AttributeList;
+class Library;
+class Syntax;
+class Log;
+class Filter;
+
+class Time;
+class OrganicMatter;
+
+struct OM  { 
+  double top_C;			// Carbon on the ground.
+  vector<double> C;		// Carbon in each node.
+  const double C_per_N;	// Ratio of carbon per nitrogen.
+  const double turnover_rate;	// How fast this is it turned over?
+  const double efficiency;	// How digestible is this?
+  const double maintenance;	// How fast does it eat itself?
+  const vector<double> fractions;	// How much is turned into SMB and SOM?
+  void output (Log&, const Filter&) const;
+  static const Syntax& syntax ();
+  static const vector<const AttributeList*>& alists ();
+  OM (const AttributeList& al);
+};
+
+class AOM
+{
+  // Content.
+public:
+  const Time creation;		// When it was created.
+  const string name;		// Name of this kind of aom.
+  vector<OM*> om;		// Organic matter dk:puljer.
+
+  // Simulation.
+public:
+  void tick (const OrganicMatter&);
+  void output (Log&, const Filter&) const;
+
+  // Library.
+public:
+  static const Library& library ();
+  static void derive_type (const string, const AttributeList&, string super);
+
+  // Create and Destroy.
+public:
+  AOM (const Time&, const AttributeList& al);
+  AOM (const AttributeList& al);
+  virtual ~AOM ();
+};
+
+// Ensure the AOM library is initialized.
+// See TC++PL, 2ed, 10.5.1, for an explanation.
+static class AOM_init
+{
+  static int count;
+public:
+  AOM_init ();
+  ~AOM_init ();
+} AOM_init;
+
+#endif AOM_H

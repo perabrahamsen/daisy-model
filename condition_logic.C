@@ -6,7 +6,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
-#include <vector.h>
+#include <vector>
 
 class ConditionOr : public Condition
 {

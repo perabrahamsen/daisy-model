@@ -16,7 +16,7 @@
 #include "soil.h"
 #include "soil_heat.h"
 
-#include <list.h>
+#include <list>
 
 class CropStandard : public Crop
 {

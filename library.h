@@ -3,7 +3,7 @@
 #ifndef LIBRARY_H
 #define LIBRARY_H
 
-#include <std/string.h>
+#include <string>
 
 struct Syntax;
 struct AttributeList;

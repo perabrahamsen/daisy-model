@@ -3,8 +3,8 @@
 #ifndef SOIL_HEAT_H
 #define SOIL_HEAT_H
 
-#include <std/string.h>
-#include <vector.h>
+#include <string>
+#include <vector>
 
 class AttributeList;
 class Log;

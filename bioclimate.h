@@ -3,8 +3,8 @@
 #ifndef BIOCLIMATE_H
 #define BIOCLIMATE_H
 
-#include <std/string.h>
-#include <vector.h>
+#include <string>
+#include <vector>
 #include "column.h"
 
 struct Surface;

@@ -3,7 +3,7 @@
 #ifndef MATHLIB_H
 #define MATHLIB_H
 
-#include <vector.h>
+#include <vector>
 
 void
 tridia (int from,

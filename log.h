@@ -3,8 +3,8 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include <std/string.h>
-#include <vector.h>
+#include <string>
+#include <vector>
 
 class Filter;
 class Daisy;
@@ -34,6 +34,8 @@ public:
   virtual void output (string, const Filter&, const double,
 		       bool log_only = false) = 0;
   virtual void output (string, const Filter&, const int,
+		       bool log_only = false) = 0;
+  virtual void output (string, const Filter&, const string,
 		       bool log_only = false) = 0;
   virtual void output (string, const Filter&, const vector<double>&,
 		       bool log_only = false) = 0;
@@ -71,12 +73,49 @@ public:
 } Log_init;
 
 template <class T> void
-output_submodule (const T& submodule, const char* name, Log& log, const Filter& filter)
+output_submodule (const T& submodule,
+		  const char* name, Log& log, const Filter& filter)
 {
   if (filter.check (name))
     {
       log.open (name);
       submodule.output (log, filter.lookup (name));
+      log.close ();
+    }
+}
+
+template <class T> void
+output_list (const T items,
+	     const char* name, Log& log, const Filter& filter)
+{
+  if (filter.check (name))
+    {
+      const Filter& f = filter.lookup ("name");
+      log.open (name);
+      for (T::const_iterator item = items.begin(); 
+	   item != items.end();
+	   item++)
+	{
+	  if (f.check ((*item)->name))
+	    (*item)->output (log, f.lookup ((*item)->name));
+	}
+      log.close ();
+    }
+}
+
+template <class T> void
+output_vector (T items,
+	       const char* name, Log& log, const Filter& filter)
+{
+  if (filter.check (name))
+    {
+      log.open (name);
+      for (T::const_iterator item = items.begin();
+	   item != items.end();
+	   item++)
+	{
+	  (*item)->output (log, *Filter::all);
+	}
       log.close ();
     }
 }

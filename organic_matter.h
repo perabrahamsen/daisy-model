@@ -9,20 +9,14 @@ class Log;
 class Filter;
 
 class OrganicMatter
-{ 
+{
+  struct Implementation;
+  Implementation& impl;
 public:
   void output (Log& log, const Filter& filter) const;
-  void operator += (const OrganicMatter&);
+  static void load_syntax (Syntax&, AttributeList&);
   OrganicMatter (const AttributeList&);
   ~OrganicMatter ();
 };
-
-class SoilOrganicMatter
-{
-public:
-  static void load_syntax (Syntax&, AttributeList&);
-  SoilOrganicMatter (const AttributeList&);
-};
-
 
 #endif ORGANIC_MATTER_H

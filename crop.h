@@ -3,9 +3,9 @@
 #ifndef CROP_H
 #define CROP_H
 
-#include <std/string.h>
-#include <list.h>
-#include <vector.h>
+#include <string>
+#include <list>
+#include <vector>
 
 struct Log;
 struct Filter;

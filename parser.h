@@ -3,7 +3,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <std/string.h>
+#include <string>
 
 class AttributeList;
 class Library;

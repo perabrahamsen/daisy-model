@@ -3,7 +3,7 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#include <std/string.h>
+#include <string>
 
 class Daisy;
 class AttributeList;

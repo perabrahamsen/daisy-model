@@ -6,8 +6,8 @@
 #include "soil_water.h"
 #include "log.h"
 #include "common.h"
-#include "matter.h"
 #include "filter.h"
+#include "aom.h"
 
 extern double abs (double);
 
@@ -78,7 +78,6 @@ Surface::clear ()
 }
 
 const InorganicMatter& 
-
 Surface::matter_flux ()
 {
   return iom_flux;
@@ -106,9 +105,9 @@ Surface::evaporation (double PotSoilEvaporation, double water,
 }
 
 void
-Surface::fertilize (const OrganicMatter& n)
+Surface::fertilize (const AOM& om)
 { 
-  om += n;
+  aom.push_back (&om);
 }
 
 void 
@@ -124,7 +123,6 @@ Surface::output (Log& log, const Filter& filter) const
   log.output ("flux", filter, flux);
   log.output ("EvapSoilSurface", filter, EvapSoilSurface, true);
   log.output ("Eps", filter, Eps, true);
-  output_submodule (om, "OrganicMatter", log, filter);
   output_submodule (iom, "InorganicMatter", log, filter);
 }
 
@@ -141,10 +139,9 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("flux", true);
   syntax.add ("EvapSoilSurface", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Eps", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("OrganicMatter", OrganicMatterSyntax (), Syntax::State);
-  alist.add ("OrganicMatter", OrganicMatterAlist ());
-  syntax.add ("InorganicMatter", InorganicMatterSyntax (), Syntax::State);
-  alist.add ("InorganicMatter", InorganicMatterAlist ());
+  syntax.add ("aom", AOM::library (), Syntax::State, Syntax::Sequence);
+  alist.add ("aom", *new vector<const AttributeList*> ());
+  add_submodule<InorganicMatter> ("InorganicMatter", syntax, alist);
 }
 
 Surface::Surface (const AttributeList& al)
@@ -154,7 +151,7 @@ Surface::Surface (const AttributeList& al)
     flux (al.flag ("flux")),
     EvapSoilSurface (0.0),
     Eps (0.0),
-    om (al.list ("OrganicMatter")),
+    aom (map_construct_const <AOM> (al.list_sequence ("aom"))),
     iom (al.list ("InorganicMatter")),
     iom_flux ()
 { }

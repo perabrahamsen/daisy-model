@@ -18,6 +18,7 @@
 #include "log.h"
 #include "filter.h"
 #include "crop.h"
+#include "iom.h"
 
 class Groundwater;
 
@@ -33,7 +34,7 @@ private:
   SoilHeat soil_heat;
   SoilNH4 soil_NH4;
   SoilNO3 soil_NO3;
-  SoilOrganicMatter soil_organic_matter;
+  OrganicMatter organic_matter;
   Nitrification nitrification;
   Denitrification denitrification;
 
@@ -56,8 +57,6 @@ public:
 
   bool check () const;
   void output (Log&, const Filter&) const;
-private:
-  void output_crops (Log& log, const Filter& filter) const;
 
   // Create and Destroy.
 private:
@@ -155,7 +154,7 @@ ColumnStandard::tick (const Time& time,
   soil_water.tick (surface, groundwater, soil);
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
     (*crop)->tick (time, bioclimate, soil, soil_heat);
-  soil_NO3.tick (soil, soil_water, surface.matter_flux().NO3);
+  soil_NO3.tick (soil, soil_water, surface.matter_flux ().iom.NO3);
 }
 
 void
@@ -173,27 +172,12 @@ ColumnStandard::output (Log& log, const Filter& filter) const
   output_submodule (soil_NH4, "SoilNH4", log, filter);
 #endif
   output_submodule (soil_NO3, "SoilNO3", log, filter);
+  output_submodule (organic_matter, "OrganicMatter", log, filter);
 #if 0
-  output_submodule (soil_organic_matter, "SoilOrganicMatter", log, filter);
   output_submodule (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
 #endif
-  if (filter.check ("crops"))
-    output_crops (log, filter.lookup ("crops"));
-  log.close ();
-}
-
-void
-ColumnStandard::output_crops (Log& log, const Filter& filter) const
-{
-  log.open ("crops");
-  for (CropList::const_iterator crop = crops.begin(); 
-       crop != crops.end();
-       crop++)
-    {
-      if (filter.check ((*crop)->name))
-	(*crop)->output (log, filter.lookup ((*crop)->name));
-    }
+  output_list (crops, "crops", log, filter);
   log.close ();
 }
 
@@ -207,7 +191,7 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     soil_heat (al.list ("SoilHeat")),
     soil_NH4 (soil, soil_water, al.list ("SoilNH4")),
     soil_NO3 (soil, soil_water, al.list ("SoilNO3")),
-    soil_organic_matter (al.list ("SoilOrganicMatter")),
+    organic_matter (al.list ("OrganicMatter")),
     nitrification (al.list ("Nitrification")),
     denitrification (al.list ("Denitrification"))
 { }
@@ -241,7 +225,7 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
   add_submodule<SoilHeat> ("SoilHeat", syntax, alist);
   add_submodule<SoilNH4> ("SoilNH4", syntax, alist);
   add_submodule<SoilNO3> ("SoilNO3", syntax, alist);
-  add_submodule<SoilOrganicMatter> ("SoilOrganicMatter", syntax, alist);
+  add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist);
   add_submodule<Nitrification> ("Nitrification", syntax, alist);
   add_submodule<Denitrification> ("Denitrification", syntax, alist);
 

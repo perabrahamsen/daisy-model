@@ -4,7 +4,7 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
-#include <map.h>
+#include <map>
 
 static Library* Crop_library = NULL;
 typedef map<string, Crop::constructor, less<string> > Crop_map_type;

@@ -3,7 +3,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
-#include <map.h>
+#include <map>
 
 struct Syntax::Implementation
 {

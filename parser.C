@@ -5,7 +5,7 @@
 #include "library.h"
 #include "syntax.h"
 #include "common.h"
-#include <map.h>
+#include <map>
 
 static Library* Parser_library = NULL;
 typedef map<string, Parser::constructor, less<string> > Parser_map_type;

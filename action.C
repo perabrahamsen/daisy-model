@@ -5,7 +5,7 @@
 #include "library.h"
 #include "syntax.h"
 #include "common.h"
-#include <map.h>
+#include <map>
 
 static Library* Action_library = NULL;
 typedef map<string, Action::constructor, less<string> > Action_map_type;

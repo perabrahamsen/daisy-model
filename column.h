@@ -3,9 +3,9 @@
 #ifndef COLUMN_H
 #define COLUMN_H
 
-#include <std/string.h>
-#include <list.h>
-#include <vector.h>
+#include <string>
+#include <list>
+#include <vector>
 
 class Library;
 class Filter;

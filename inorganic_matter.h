@@ -7,13 +7,17 @@ struct AttributeList;
 struct SoluteMatter;
 struct Log;
 struct Filter;
+struct IOM;
+struct Syntax;
 
-struct InorganicMatter
+class InorganicMatter
 { 
   // Content.
-  double NO3;
+public:
+  IOM& iom;
 
   // Opertations.
+public:
   void output (Log& log, const Filter& filter) const;
   void clear ();
   void operator += (const InorganicMatter&);
@@ -22,6 +26,7 @@ struct InorganicMatter
   void operator /= (double);
 
   // Create & Destroy.
+  static void load_syntax (Syntax&, AttributeList&);
   InorganicMatter ();
   InorganicMatter (const AttributeList&);
   InorganicMatter (const InorganicMatter&, double flux);
@@ -31,6 +36,7 @@ struct InorganicMatter
 class SoluteMatter : private InorganicMatter
 { 
 public:
+  static void load_syntax (Syntax&, AttributeList&);
   friend class InorganicMatter;
   InorganicMatter operator* (double flux) const;
   SoluteMatter (const AttributeList&);

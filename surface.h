@@ -2,13 +2,13 @@
 
 #include "uzmodel.h"
 #include "inorganic_matter.h"
-#include "organic_matter.h"
 
 struct AttributeList;
 struct Log;
 struct Filter;
 struct SoilWater;
 struct Soil;
+struct AOM;
 
 class Surface : public UZtop
 {
@@ -18,7 +18,7 @@ class Surface : public UZtop
   bool flux;
   double EvapSoilSurface;
   double Eps;
-  OrganicMatter om;
+  vector <const AOM*> aom;
   InorganicMatter iom;
   InorganicMatter iom_flux;
 
@@ -37,7 +37,7 @@ public:
 
   void SoilSurfaceConditions (double Theta, double h);
 
-  void fertilize (const OrganicMatter&);
+  void fertilize (const AOM&);
   void fertilize (const InorganicMatter&);
 
   void output (Log&, const Filter&) const;

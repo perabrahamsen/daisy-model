@@ -17,7 +17,7 @@
 #define throw2(x, y) throw (x, y)
 #define throw0() throw ()
 #else HANDLE_EXCEPTIONS
-#define THROW(x) assert ("error" == #x)
+#define THROW(x) do { assert ("error" == #x); abort (); } while (0)
 #define throw(x)
 #define throw2(x, y)
 #define throw0()

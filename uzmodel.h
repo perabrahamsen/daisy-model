@@ -4,8 +4,8 @@
 #define UZMODEL_H
 
 
-#include <std/string.h>
-#include <vector.h>
+#include <string>
+#include <vector>
 #include "common.h"
 
 class Soil;

@@ -8,7 +8,7 @@ class AttributeList;
 class Library;
 class Syntax;
 
-#include <std/string.h>
+#include <string>
 
 class Condition
 {  

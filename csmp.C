@@ -2,7 +2,7 @@
 
 #include "csmp.h"
 #include "log.h"
-#include <vector.h>
+#include <vector>
 #include <algo.h>
 #include <assert.h>
 

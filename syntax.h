@@ -3,8 +3,8 @@
 #ifndef SYNTAX_H
 #define SYNTAX_H
 
-#include <std/string.h>
-#include <list.h>
+#include <string>
+#include <list>
 
 struct FTable;
 struct AttributeList;

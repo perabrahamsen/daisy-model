@@ -8,7 +8,8 @@
 #include "alist.h"
 #include "common.h"
 #include <iostream.h>
-#include "matter.h"
+#include "aom.h"
+#include "inorganic_matter.h"
 
 class ActionIrrigate : public Action
 {
@@ -50,7 +51,7 @@ ActionIrrigate::doIt (Daisy& daisy) const
 ActionIrrigate::ActionIrrigate (const AttributeList& al)
   : flux (al.number ("flux")),
     temp (al.number ("temperature")),
-    sm (MakeSoluteMatter (al.list ("solute")))
+    sm (*new SoluteMatter (al.list ("solute")))
 { }
 
 ActionIrrigate::~ActionIrrigate ()
@@ -76,7 +77,6 @@ ActionIrrigateSyntax::ActionIrrigateSyntax ()
   syntax.order ("flux", "solute");
   syntax.add ("temperature", Syntax::Number, Syntax::Const);
   alist.add ("temperature", ActionIrrigate::at_air_temperature);
-  syntax.add ("solute", SoluteMatterSyntax (), Syntax::Const);
-  alist.add ("solute", SoluteMatterAlist ());
+  add_submodule<SoluteMatter> ("solute", syntax, alist);
   Action::add_type ("irrigate", alist, syntax, &ActionIrrigate::make);
 }

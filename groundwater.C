@@ -4,7 +4,7 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
-#include <map.h>
+#include <map>
 
 static Library* Groundwater_library = NULL;
 typedef map<string, Groundwater::constructor, less<string> > Groundwater_map_type;

@@ -4,7 +4,7 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
-#include <map.h>
+#include <map>
 
 
 UZtop::~UZtop ()

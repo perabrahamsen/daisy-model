@@ -5,8 +5,8 @@
 #include "alist.h"
 #include "syntax.h"
 #include "csmp.h"
-#include <vector.h>
-#include <map.h>
+#include <vector>
+#include <map>
 
 static Library* Horizon_library = NULL;
 typedef map<string, Horizon::constructor, less<string> > Horizon_map_type;

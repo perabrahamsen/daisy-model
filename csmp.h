@@ -8,8 +8,8 @@
 #ifndef CSMP_H
 #define CSMP_H
 
-#include <std/string.h>
-#include <vector.h>
+#include <string>
+#include <vector>
 
 struct Log;
 struct Filter;

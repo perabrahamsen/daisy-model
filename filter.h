@@ -3,7 +3,7 @@
 #ifndef FILTER_H
 #define FILTER_H
 
-#include <std/string.h>
+#include <string>
 
 class FilterAll;
 class FilterNone;

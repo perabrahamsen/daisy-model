@@ -3,8 +3,8 @@
 #ifndef SOLUTE_H
 #define SOLUTE_H
 
-#include <std/string.h>
-#include <vector.h>
+#include <string>
+#include <vector>
 
 struct Log;
 struct Filter;

@@ -6,6 +6,7 @@
 #include "horizon.h"
 #include "log.h"
 #include "parser.h"
+#include "aom.h"
 #include "crop.h"
 #include "column.h"
 #include "action.h"
@@ -106,6 +107,7 @@ Daisy::load_syntax (Syntax& syntax)
   syntax.add_class ("column", Column::library (), &Column::derive_type);
   syntax.add_class ("log", Log::library (), &Log::derive_type);
   syntax.add_class ("parser", Parser::library (), &Parser::derive_type);
+  syntax.add_class ("aom", AOM::library (), &AOM::derive_type);
   syntax.add ("output", Log::library (), Syntax::Const, Syntax::Sequence);
   syntax.add ("input", Parser::library (), Syntax::Optional, 
 	      Syntax::Singleton);

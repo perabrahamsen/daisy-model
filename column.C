@@ -4,7 +4,7 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
-#include <map.h>
+#include <map>
 
 static Library* Column_library = NULL;
 typedef map<string, Column::constructor, less<string> > Column_map_type;

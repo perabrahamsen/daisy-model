@@ -5,7 +5,7 @@
 #include "library.h"
 #include "syntax.h"
 #include "common.h"
-#include <map.h>
+#include <map>
 
 static Library* Condition_library = NULL;
 typedef map<string, Condition::constructor, less<string> > Condition_map_type;

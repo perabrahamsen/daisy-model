@@ -3,8 +3,8 @@
 #ifndef SOIL_WATER_H
 #define SOIL_WATER_H
 
-#include <std/string.h>
-#include <vector.h>
+#include <string>
+#include <vector>
 
 class AttributeList;
 class UZmodel;

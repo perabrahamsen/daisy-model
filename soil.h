@@ -4,7 +4,7 @@
 #define SOIL_H
 
 #include "horizon.h"
-#include <vector.h>
+#include <vector>
 
 struct AttributeList;
 struct Log;

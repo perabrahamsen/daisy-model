@@ -4,7 +4,7 @@
 #define DAISY_H
 
 #include "time.h"
-#include <vector.h>
+#include <vector>
 
 class Action;
 class Weather;

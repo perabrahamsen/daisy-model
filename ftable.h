@@ -3,8 +3,8 @@
 #ifndef FTABLE_H
 #define FTABLE_H
 
-#include <std/string.h>
-#include <vector.h>
+#include <string>
+#include <vector>
 
 class FTable
 {

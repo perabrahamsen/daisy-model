@@ -6,9 +6,9 @@
 #include "common.h"
 
 #include <std/stdexcept.h>
-#include <std/string.h>
-#include <vector.h>
-#include <list.h>
+#include <string>
+#include <vector>
+#include <list>
 
 struct Time;
 struct CSMP;
@@ -114,6 +114,38 @@ struct map_create
       t.push_back (&T::create (**i));
   }
   operator vector<T*>& ()
+  { return t; }
+};
+
+template <class T> 
+struct map_construct
+{
+  vector<T*>& t;
+  map_construct (const vector<const AttributeList*>& f)
+    : t (*new vector<T*> ())
+  { 
+    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+	 i != f.end ();
+	 i++)
+      t.push_back (new T (**i));
+  }
+  operator vector<T*>& ()
+  { return t; }
+};
+
+template <class T> 
+struct map_construct_const
+{
+  vector<const T*>& t;
+  map_construct_const (const vector<const AttributeList*>& f)
+    : t (*new vector<const T*> ())
+  { 
+    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+	 i != f.end ();
+	 i++)
+      t.push_back (new T (**i));
+  }
+  operator vector<const T*>& ()
   { return t; }
 };
 

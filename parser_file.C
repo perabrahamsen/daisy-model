@@ -440,8 +440,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	    }
 	  case Syntax::List:
 	    {
-	      // We don't support fixed sized object arrays yet.
-	      assert (syntax.size (name) == Syntax::Sequence);
+	      int size = syntax.size (name);
 	      const Syntax& syn = syntax.syntax (name);
 	      vector<const AttributeList*>& sequence
 		= *new vector<const AttributeList*> ();
@@ -461,6 +460,13 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 		}
 	      if (skipped)
 		skip (")");
+	      if (size != Syntax::Sequence && sequence.size () != size + 0U)
+		  {
+		  ostrstream str;
+		  str << "Got " << sequence.size ()
+		      << " array members, expected " << size << '\0';
+		  error (str.str ());
+		}
 	      atts.add (name, sequence);
 	      break;
 	    }
@@ -494,7 +500,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 		{
 		  ostrstream str;
 		  str << "Got " << count 
-		      << " array members, expected " << size;
+		      << " array members, expected " << size << '\0';
 		  error (str.str ());
 
 		  for (;count < size; count++)

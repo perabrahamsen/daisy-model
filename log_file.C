@@ -8,7 +8,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "common.h"
-#include <list.h>
+#include <list>
 #include <fstream.h>
 #include <strstream.h>
 
@@ -54,6 +54,7 @@ public:
   void output (string, const Filter&, const bool, bool log_only = false);
   void output (string, const Filter&, const double, bool log_only = false);
   void output (string, const Filter&, const int, bool log_only = false);
+  void output (string, const Filter&, const string, bool log_only = false);
   void output (string, const Filter&, const vector<double>&, bool log_only = false);
   void output (string, const Filter&, const CSMP&, bool log_only = false);
   void output_point (double x, double y);
@@ -225,6 +226,19 @@ LogFile::output (string name, const Filter& filter, const int value, bool log_on
     {
       open (name);
       print (0.0 + value);
+      close ();
+    }
+}
+
+void
+LogFile::output (string name, const Filter& filter, const string value, bool log_only)
+{
+  if (filter.check (name, log_only))
+    {
+      open (name);
+      print ("\"");
+      print (value);		// BUG: We should escape " and \ here.
+      print ("\"");
       close ();
     }
 }
