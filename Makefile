@@ -8,7 +8,7 @@ SRCONLY = column_std.o manager_rule.o weather_simple.o uzrichard.o \
 	crop_std.o action_sow.o action_stop.o condition_time.o
 OBJECTS = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
-	filter.o csmp.o rules.o time.o uzmodel.o \
+	filter.o csmp.o time.o uzmodel.o \
 	soil.o mathlib.o bioclimate.o surface.o soil_water.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
 	denitrification.o soil_heat.o groundwater.o snow.o solute.o
@@ -18,7 +18,7 @@ HEAD = $(OBJECTS:.o=.h) common.h
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = template.C
+REMOVE = rules.C rules.h
 
 
 .SUFFIXES:	.C .o .h
@@ -99,8 +99,8 @@ main.o: main.C daisy.h time.h input.h syntax.h log.h alist.h common.h
 daisy.o: daisy.C daisy.h time.h input.h manager.h weather.h \
  groundwater.h uzmodel.h common.h horizon.h log.h crop.h column.h \
  action.h filter.h library.h syntax.h condition.h alist.h
-input.o: input.C input.h log.h alist.h common.h csmp.h rules.h \
- library.h syntax.h action.h condition.h filter.h crop.h time.h
+input.o: input.C input.h log.h alist.h common.h csmp.h library.h \
+ syntax.h action.h condition.h filter.h crop.h time.h
 log.o: log.C log.h condition.h filter.h csmp.h daisy.h time.h
 weather.o: weather.C weather.h time.h library.h alist.h common.h \
  syntax.h
@@ -118,7 +118,6 @@ horizon.o: horizon.C horizon.h library.h alist.h common.h syntax.h \
 ftable.o: ftable.C ftable.h
 filter.o: filter.C filter.h common.h
 csmp.o: csmp.C csmp.h log.h
-rules.o: rules.C rules.h daisy.h time.h action.h
 time.o: time.C time.h
 uzmodel.o: uzmodel.C uzmodel.h common.h library.h alist.h syntax.h
 soil.o: soil.C soil.h horizon.h alist.h common.h syntax.h
@@ -146,8 +145,8 @@ column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
  uzmodel.h common.h soil.h horizon.h soil_water.h soil_heat.h \
  soil_NH4.h solute.h soil_NO3.h organic_matter.h nitrification.h \
  denitrification.h alist.h syntax.h library.h log.h filter.h
-manager_rule.o: manager_rule.C manager.h syntax.h rules.h alist.h \
- common.h
+manager_rule.o: manager_rule.C manager.h syntax.h alist.h common.h \
+ action.h condition.h daisy.h time.h
 weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
  common.h log.h filter.h
 uzrichard.o: uzrichard.C uzmodel.h common.h soil.h horizon.h mathlib.h \

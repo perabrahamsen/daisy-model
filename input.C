@@ -4,7 +4,6 @@
 #include "log.h"
 #include "alist.h"
 #include "csmp.h"
-#include "rules.h"
 #include "library.h"
 #include "syntax.h"
 #include "action.h"
