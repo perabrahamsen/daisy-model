@@ -1,3 +1,40 @@
+1999-10-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.93 released.
+
+1999-10-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* common.h (sqrt): Check for negative numbers.
+
+1999-10-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Hourly Groundwater"): Changed to table.
+	("Total Soil Content"): Ditto.
+	("Soil Nitrate Concentration"): Ditto.
+	("Preferential Water Flux"): Ditto.
+	("Preferential NO3 Transport"): Ditto.
+	("Preferential NH4 Transport"): Ditto.
+	("Surface Water Balance"): Ditto.
+	("Soil Chemicals"): Ditto.
+	("Soil Chemicals 0-100 cm"): New model.
+	("Weather"): Changed to table.
+	("Crop Photosynthesis"): Ditto.
+	("Crop Production"): Ditto.
+	("Old Crop Production"): Ditto.
+	("Vegetation"): Ditto.
+	("Surface Chemicals"): Ditto.
+	("Bioclimate"): Ditto.
+
+	* printer_file.C (FoundEntry::operator<): Added return type.
+
+1999-10-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("N Balance"): Made interval parameterizable.
+	("N Balance 0-100 cm"): New parameterization.
+	("Root Zone Water Balance"): Use `table', made interval
+	parameterizable.
+	("Root Zone Water Balance 0-100 cm"): New parameterization.
+
 1999-10-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.92 released.
@@ -236,7 +273,7 @@
 
 1999-06-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* lib/log.dai ("Soil Heat Balance"): New log paramterization.
+	* lib/log.dai ("Soil Heat Balance"): New log parameterization.
 	("Soil Temperature"): Use `table' instead of `table1'.
 	("N Balance"): Ditto.
 

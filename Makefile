@@ -67,7 +67,7 @@ endif
 ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),egcs)
 		ifeq ($(HOSTTYPE),sun4)
-			OPTIMIZE = -O2 -ffast-math -fno-inline
+			OPTIMIZE = -O3 -ffast-math -fno-inline
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with egcs 1.1.
 		else
 			OPTIMIZE = -O3 -ffast-math 
@@ -78,7 +78,8 @@ endif
 # Create the right compile command.
 #
 ifeq ($(COMPILER),egcs)
-	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -DEGCS -g -pipe -frepo
+#	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -DEGCS -g -pipe -frepo
+	COMPILE = /pack.sol64/gcc-2.95.1/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -Wmissing-prototypes -DEGCS -g -pipe -frepo
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)
@@ -114,15 +115,15 @@ TKLIB	  	= -L/pack/tcl+tk-8/lib -L/usr/openwin/lib \
 
 # Locate the Gtk-- library.
 #
-GTKMMINCLUDE	= -I/home/user_32/abraham/gtk/lib/Gtk--/include \
-		  -I/home/user_32/abraham/gtk/lib/glib/include \
-		  -I/home/user_32/abraham/gtk/include -I/usr/openwin/include
-GTKMMLIB	= -L/home/user_32/abraham/gtk/lib -lgtkmm \
+GTKMMINCLUDE	= -I$(HOME)/gtk/lib/Gtk--/include \
+		  -I$(HOME)/gtk/lib/glib/include \
+		  -I$(HOME)/gtk/include -I/usr/openwin/include
+GTKMMLIB	= -L$(HOME)/gtk/lib -lgtkmm \
 		  -L/usr/openwin/lib -R/usr/openwin/lib \
 		  -lgtk -lgdk -lglib -lXext -lX11 -lsocket -lnsl -lm
-GTKMMDRAWINCLUDE = -I/home/user_32/abraham/gtk/include/gtk--draw \
+GTKMMDRAWINCLUDE = -I$(HOME)/gtk/include/gtk--draw \
 		   $(GTKMMINCLUDE)
-GTKMMDRAWLIB	= -L/home/user_32/abraham/gtk/lib -lgtkmmdraw ${GTKMMLIB}
+GTKMMDRAWLIB	= -L$(HOME)/gtk/lib -lgtkmmdraw ${GTKMMLIB}
 
 # Find the right file extension.
 #

@@ -1,19 +1,4 @@
-* top_flux og bottom_flux
-
-De skal bruge h.h.v. `from' (default 0.0) og `to' (default bottom).
-
-På den måde kan man lave balance på et vilkårligt interval, som
-default hele profilen.  
-
-* grundvand skal logge bund percolation af no3 og nh4.
-
-* Ny pesticidomsætning.
-
-* Check sinks vs stoffer.  Specielt crop reflection i soil_chemical.
-
-* Check adsorption vS_S.
-
-* ElectricFence (eller C++ udgave (www.andreasen.com?)
+* Ny klimafil.
 
 * LogExtern
 
@@ -21,8 +6,6 @@ default hele profilen.
 - konverter log.dai til ny table log model.
 
 * En `forever' aktivitet.  Eller en `until CONDITION activity'.
-
-* Ny klimafil.
 
 * Simulation:
 

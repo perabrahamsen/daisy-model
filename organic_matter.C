@@ -517,7 +517,7 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 	= al.alist_sequence ("initial_SOM");
       
       // Find total C in layers.
-      vector<double> total (soil.size(), 0.0);
+      vector<double> total (soil.size (), 0.0);
 
       double last = 0.0;
       for (unsigned int i = 0; i < layers.size (); i++)

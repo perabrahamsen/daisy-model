@@ -491,7 +491,7 @@ struct FoundEntry
   string element;
   int sequence;
 
-  operator < (const FoundEntry& e) const
+  bool operator < (const FoundEntry& e) const
     { return sequence < e.sequence; }
 
   FoundEntry ()
