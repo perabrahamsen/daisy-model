@@ -1,3 +1,21 @@
+2001-05-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.75 released.
+
+2001-05-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation.h, vegetation_crops.C, vegetation_permanent.C (sow):
+	Ditto. 
+
+	* vegetation_permanent.C, vegetation_crops.C, crop.C, crop_old.C,
+	vegetation.h, crop.h, crop_std.C (initialize): Support planting.
+
+2001-05-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioincorporation.C (speed): New member variable.
+	(tick): Update it.
+	(output): Log it.
+
 2001-05-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.74 released.

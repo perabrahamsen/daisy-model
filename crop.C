@@ -52,7 +52,7 @@ Crop::ds_remove (const Crop* crop)
 { return crop->DS () == Crop::DSremove; }
 
 void
-Crop::initialize (const Geometry& geometry, const OrganicMatter&)
+Crop::initialize (const Geometry& geometry, OrganicMatter&)
 { initialize (geometry); }
 
 Crop::Crop (const AttributeList& al)

@@ -97,12 +97,12 @@ struct VegetationCrops : public Vegetation
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
 		vector<const Harvest*>& harvest, vector<AM*>& residuals);
-  void sow (const AttributeList& al, const Geometry&, const OrganicMatter&);
+  void sow (const AttributeList& al, const Geometry&, OrganicMatter&);
   void sow (const AttributeList& al, const Geometry&);
   void output (Log&) const;
 
   // Create and destroy.
-  void initialize (const Soil& soil, const OrganicMatter&);
+  void initialize (const Soil& soil, OrganicMatter&);
   VegetationCrops (const AttributeList&);
   ~VegetationCrops ();
 };
@@ -395,7 +395,7 @@ VegetationCrops::harvest (const string& column_name,
 void
 VegetationCrops::sow (const AttributeList& al,
 		      const Geometry& geometry,
-		      const OrganicMatter& organic_matter)
+		      OrganicMatter& organic_matter)
 {
   Crop& crop = Librarian<Crop>::create (al);
   crop.initialize (geometry, organic_matter);
@@ -420,7 +420,7 @@ VegetationCrops::output (Log& log) const
 
 void
 VegetationCrops::initialize (const Soil& soil, 
-			     const OrganicMatter& organic_matter)
+			     OrganicMatter& organic_matter)
 {
   for (unsigned int i = 0; i < crops.size (); i++)
     crops[i]->initialize (soil, organic_matter);

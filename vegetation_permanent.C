@@ -95,14 +95,14 @@ struct VegetationPermanent : public Vegetation
 		vector<const Harvest*>&,
 		vector<AM*>&)
   { }
-  void sow (const AttributeList&, const Geometry&, const OrganicMatter&)
+  void sow (const AttributeList&, const Geometry&, OrganicMatter&)
   { throw "Can't sow on permanent vegetation"; }
   void sow (const AttributeList&, const Geometry&)
   { throw "Can't sow on permanent vegetation"; }
   void output (Log&) const;
 
   // Create and destroy.
-  void initialize (const Soil& soil, const OrganicMatter&);
+  void initialize (const Soil& soil, OrganicMatter&);
   VegetationPermanent (const AttributeList&);
   ~VegetationPermanent ();
 };
@@ -198,7 +198,7 @@ VegetationPermanent::output (Log& log) const
 
 void
 VegetationPermanent::initialize (const Soil& soil, 
-				 const OrganicMatter& organic_matter)
+				 OrganicMatter& organic_matter)
 {
   root_system.initialize (soil.size ());
   root_system.full_grown (soil, WRoot);

@@ -35,6 +35,7 @@ struct Bioincorporation::Implementation
   // Log.
   double C;
   double N;
+  double speed;
 
   // Utitlites.
   static bool am_compare (const AM* a, const AM* b);
@@ -116,8 +117,7 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
     if (C_per_N < last_C_per_N)
       CERR << "Bug: C/N (" << C_per_N << ") < last C/N ("
 	   << last_C_per_N <<")\n";
-    double speed
-      = R_total * C_per_N_factor (C_per_N) * top_C / (top_C + k_total);
+    speed = R_total * C_per_N_factor (C_per_N) * top_C / (top_C + k_total);
 
     // Don't take more than the bioincorporation can handle.
     if (speed * dt > available)
@@ -173,6 +173,7 @@ Bioincorporation::Implementation::output (Log& log) const
     log.output ("DM", C * C_to_DM);
   log.output ("C", C);
   log.output ("N", N);
+  log.output ("speed", speed);
 }
 
 void 

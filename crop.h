@@ -80,7 +80,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Geometry&, const OrganicMatter&);
+  virtual void initialize (const Geometry&, OrganicMatter&);
   virtual void initialize (const Geometry&) = 0;
 protected:
   Crop (const AttributeList& al);

@@ -70,14 +70,14 @@ public:
 			vector<const Harvest*>& harvest,
 			vector<AM*>& residuals) = 0;
   virtual void sow (const AttributeList& al,
-		    const Geometry&, const OrganicMatter&) = 0;
+		    const Geometry&, OrganicMatter&) = 0;
   virtual void sow (const AttributeList& al,
 		    const Geometry&) = 0;
   virtual void output (Log&) const;
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Soil& soil, const OrganicMatter&) = 0;
+  virtual void initialize (const Soil& soil, OrganicMatter&) = 0;
   static void load_syntax (Syntax&, AttributeList&);
   Vegetation (const AttributeList&);
   virtual ~Vegetation ();

@@ -114,7 +114,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry, const OrganicMatter&);
+  void initialize (const Geometry& geometry, OrganicMatter&);
   void initialize (const Geometry& geometry);
   CropStandard (const AttributeList& vl);
   ~CropStandard ();
@@ -570,16 +570,34 @@ CropStandard::Variables::~Variables ()
 
 void
 CropStandard::initialize (const Geometry& geometry,
-			  const OrganicMatter& organic_matter)
+			  OrganicMatter& organic_matter)
 {
   root_system.initialize (geometry.size ());
 
   if (var.Phenology.DS >= 0)
     {
-      var.Prod.AM_leaf = organic_matter.find_am (name, "dead");
-      assert (var.Prod.AM_leaf);
+      // Hotstart, find pool in organic matter.
       var.Prod.AM_root = organic_matter.find_am (name, "root");
-      assert (var.Prod.AM_root);
+      var.Prod.AM_leaf = organic_matter.find_am (name, "dead");
+
+      // If not found, we is planting emerged crops.  Create pools.
+      if (!var.Prod.AM_root)
+	{
+	  var.Prod.AM_root
+	    = &AM::create (geometry, Time (1, 1, 1, 1), par.Harvest.Root,
+			   name, "root", AM::Locked);
+	  organic_matter.add (*var.Prod.AM_root);
+	}
+	  
+      if (!var.Prod.AM_leaf)
+	{
+	  var.Prod.AM_leaf
+	    = &AM::create (geometry, Time (1, 1, 1, 1), par.Harvest.Dead,
+			   name, "dead", AM::Locked);
+	  organic_matter.add (*var.Prod.AM_leaf);
+	}
+      
+      // Update nitrogen content.
       NitContent ();
     }
 }

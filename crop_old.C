@@ -95,7 +95,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry, const OrganicMatter&);
+  void initialize (const Geometry& geometry, OrganicMatter&);
   void initialize (const Geometry& geometry);
   CropOld (const AttributeList& vl);
   ~CropOld ();
@@ -586,7 +586,7 @@ CropOld::Variables::~Variables ()
 { }
 
 void
-CropOld::initialize (const Geometry& geometry, const OrganicMatter&)
+CropOld::initialize (const Geometry& geometry, OrganicMatter&)
 { initialize (geometry); }
 
 void
