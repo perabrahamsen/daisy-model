@@ -21,18 +21,4 @@ extern AttributeList& OrganicMatterAlist ();
 extern AttributeList& InorganicMatterAlist ();
 extern AttributeList& SoluteMatterAlist ();
 
-class InorganicMatter
-{ 
-public:
-  InorganicMatter (const AttributeList&);
-  ~InorganicMatter ();
-};
-
-class SoluteMatter
-{ 
-public:
-  SoluteMatter (const AttributeList&);
-  ~SoluteMatter ();
-};
-
 #endif MATTER_H

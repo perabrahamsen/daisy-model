@@ -1,6 +1,6 @@
-// matter.C
+// matter_impl.C
 
-#include "matter.h"
+#include "matter_impl.h"
 #include "syntax.h"
 #include "alist.h"
 
