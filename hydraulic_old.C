@@ -7,8 +7,6 @@
 #include "common.h"
 #include "csmp.h"
 #include <fstream.h>
-// BCC
-#include <io.h>
 
 class HydraulicOld : public Hydraulic
 {

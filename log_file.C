@@ -10,8 +10,6 @@
 #include "common.h"
 #include <list>
 #include <fstream.h>
-// Missing m in BCC.
-#include <strstrea.h>
 
 class LogFile : public Log, public Filter
 {

@@ -15,9 +15,9 @@ FORLIB=
 MIKESRC=
 MIKEFLAGS= 
 
-CC = /bc5/bin/bcc32 -P -v -WC
+#CC = /bc5/bin/bcc32 -P -v -WC
 #CC = c++ -g $(MIKEFLAGS) -frepo
-#CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -pipe $(MIKEFLAGS) -frepo -O3 -ffast-math -msupersparc -mv8 #-pg
+CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -pipe $(MIKEFLAGS) -frepo -O3 -ffast-math -msupersparc -mv8 #-pg
 # CC = /pack/devpro/SUNWspro/bin/CC $(MIKEFLAGS)
 SRCONLY = column_std.C  weather_simple.C uzrichard.C \
 	hydraulic_yolo.C hydraulic_M_vG.C hydraulic_B_vG.C hydraulic_M_C.C \
@@ -36,7 +36,7 @@ OBJECTS = main.C daisy.C parser.C log.C weather.C column.C crop.C \
 	soil_NH4.C soil_NO3.C organic_matter.C nitrification.C \
 	denitrification.C soil_heat.C groundwater.C snow.C solute.C \
 	am.C im.C om.C harvest.C $(MIKESHE) options.C
-OBJ = $(OBJECTS:.C=.o) $(SRCONLY:.C=.o) # set_exceptions.o 
+OBJ = $(OBJECTS:.C=.o) $(SRCONLY:.C=.o) set_exceptions.o 
 SRC = $(OBJECTS) $(SRCONLY) set_exceptions.S
 HEAD = $(OBJECTS:.C=.h) common.h librarian.h
 TEXT =  Makefile $(HEAD) $(SRC) 
@@ -47,9 +47,11 @@ REMOVE = ftable.C ftable.t ftable.h
 .SUFFIXES:	.C .o .h .c
 
 daisy:	$(OBJ) $(FOROBJ)
-	/bc5/bin/bcc32 -v -WC -edaisy $(OBJ:.o=.OBJ) $(FOROBJ) $(FORLIB) 
+	$(CC) -o daisy $(OBJ) $(FOROBJ) $(FORLIB) -lm
 
-#$(CC) -o daisy $(OBJ) $(FOROBJ) $(FORLIB) -lm
+#	/bc5/bin/bcc32 -v -WC -edaisy $(OBJ:.o=.OBJ) $(FOROBJ) $(FORLIB) 
+
+
 
 mshe/mshe.a:
 	(cd mshe; $(MAKE) mshe.a) 
@@ -123,7 +125,8 @@ cvs: $(TEXT)
 
 .C.o:
 	$(CC) -c $<
-	touch ${<:.C=.o} 
+
+#	touch ${<:.C=.o} 
 
 .c.o:
 	gcc -I/pack/f2c/include -c $<

@@ -7,6 +7,8 @@
 #include <vector>
 #include <math.h>
 
+extern double abs (double);
+
 void
 tridia (int from,
 	unsigned int size,

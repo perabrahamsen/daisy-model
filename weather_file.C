@@ -12,9 +12,6 @@
 #include <fstream.h>
 #include "mike_she.h"
 
-// Needed in BCC for `close'.
-#include "io.h"
-
 class WeatherFile : public Weather
 {
   Time date;

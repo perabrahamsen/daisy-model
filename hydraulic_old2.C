@@ -8,9 +8,6 @@
 #include "csmp.h"
 #include <fstream.h>
 
-// Needed by BCC for `close'.
-#include "io.h"
-
 class HydraulicOld2 : public Hydraulic
 {
   // We cheat and use h_minus instead of h in all the CSMP except M_.

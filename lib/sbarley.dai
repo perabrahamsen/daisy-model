@@ -108,7 +108,7 @@
 		   (2.00 0.004)))
   (Harvest (beta 0.09)
 	   (CStraw 0.0065)
-	   (CSOrg 0.0215)
+	   (CSOrg 0.00215)
 	   (alpha 0.80)
 	   (Dead ((initial_fraction 0.8)
 		  (C_per_N 100.0)

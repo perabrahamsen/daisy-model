@@ -10,11 +10,6 @@
 #include "log.h"
 #include "filter.h"
 #include <fstream.h>
-// Borland C++ 5.01 doesn't spell stream with an m.
-#include <strstrea.h>
-
-// Borland C++ 5.01 gets `close' here.
-#include "io.h"
 
 struct ParserFile::Implementation
 {

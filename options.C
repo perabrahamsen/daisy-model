@@ -3,10 +3,6 @@
 #include "options.h"
 #include <vector>
 
-// BCC 5.01 needs this for `open'.
-#include <io.h>
-#include <fcntl.h>
-
 int
 Options::find_file (const string name)
 {

@@ -106,7 +106,7 @@
 		   (1.931 0.006)))
   (Harvest (index 0.55)
 	   (CStem 0.0085)
-	   (CSOrg 0.0380)
+	   (CSOrg 0.00380)
 	   (alpha 0.25)
 	   (beta 0.125)
 	   (Stem ((initial_fraction 0.8)

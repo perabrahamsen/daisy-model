@@ -25,15 +25,29 @@
 #include <math.h>
 #undef exception
 
+#ifdef __unix
+
+// If you can delete const objects.
+#define CONST_DELETE
+
+#include <fcntl.h>
+#include <osfcn.h>
+#include <strstream.h>
+
+#else
 // Define these for Borland C++ 5.0.1
 #define HANDLE_NAMESPACES
 #define BORLAND_TEMPLATES
-//#define HANDLE_EXCEPTIONS
+#define HANDLE_EXCEPTIONS
 #define BORLAND_C_STR
 #define BORLAND_EOF
 
-// If you can delete const objects.
-// #define CONST_DELETE
+// Needed in BCC for `close'.
+#include <io.h>
+// Borland C++ 5.01 doesn't spell stream with an m.
+#include <strstrea.h>
+
+#endif
 
 #ifdef HANDLE_EXCEPTIONS
 #include <stdexcept>
