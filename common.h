@@ -31,4 +31,11 @@
 
 static const double dt = 1.0;	// time step.
 
+// From Mumit's STL newbie guide.
+template <class ForwardIterator>
+void sequence_delete (ForwardIterator first, ForwardIterator last) {
+  while (first != last)
+    delete *first++;
+}
+
 #endif COMMON_H

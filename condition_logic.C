@@ -5,6 +5,7 @@
 #include "condition.h"
 #include "syntax.h"
 #include "alist.h"
+#include "common.h"
 #include <vector.h>
 
 class ConditionOr : public Condition
@@ -25,6 +26,11 @@ public:
   ConditionOr (const AttributeList& al)
     : conditions (map_create<const Condition> (al.list_sequence ("operands")))
   { }
+  ~ConditionOr ()
+  {
+    sequence_delete (conditions.begin (), conditions.end ());
+    delete &conditions;
+  }
   static Condition& make (const AttributeList& al)
   { return *new ConditionOr (al); }
 };
@@ -47,6 +53,11 @@ public:
   ConditionAnd (const AttributeList& al)
     : conditions (map_create<const Condition> (al.list_sequence ("operands")))
   { }
+  ~ConditionAnd ()
+  {
+    sequence_delete (conditions.begin (), conditions.end ());
+    delete &conditions;
+  }
   static Condition& make (const AttributeList& al)
   { return *new ConditionAnd (al); }
 };
@@ -60,6 +71,8 @@ public:
   ConditionNot (const AttributeList& al)
     : condition (Condition::create (al.list ("operand")))
   { }
+  ~ConditionNot ()
+  { delete &condition; }
   static Condition& make (const AttributeList& al)
   { return *new ConditionNot (al); }
 };
@@ -77,6 +90,12 @@ public:
       then_c (Condition::create (al.list ("then"))),
       else_c (Condition::create (al.list ("else")))
   { }
+  ~ConditionIf ()
+  {
+    delete &if_c;
+    delete &then_c;
+    delete &else_c;
+  }
   static Condition& make (const AttributeList& al)
   { return *new ConditionIf (al); }
 };
