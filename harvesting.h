@@ -22,22 +22,33 @@
 #ifndef HARVESTING_H
 #define HARVESTING_H
 
+#include <vector>
+#include <string>
+using namespace std;
+
 class AttributeList;
 class Syntax;
 class Log;
-
-#include <vector>
-using namespace std;
+class Time;
+class Geometry;
+class Production;
+class Chemicals;
+class AM;
+class Harvest;
 
 class Harvesting 
 {
   // Parameters.
-public:
+private:
   const vector<AttributeList*>& Stem; // Stem AM parameters.
   const vector<AttributeList*>& Leaf; // Leaf AM parameters.
+public:
   const vector<AttributeList*>& Dead; // Dead AM parameters.
+private:
   const vector<AttributeList*>& SOrg; // SOrg AM parameters.
+public:
   const vector<AttributeList*>& Root; // Root AM parameters.
+private:
   const double EconomicYield_W; // Frac. of economic yield (DM) in storage org.
   const double EconomicYield_N; // Frac. of economic yield (N) in storage org.
   const double DSmax;		// Maximal development stage for which
@@ -46,6 +57,21 @@ public:
 
   // Simulation.
 public:
+  const Harvest& operator() (const string& column_name,
+			     const string& crop_name,
+			     const vector<double>& density,
+			     const Time& time,
+			     const Geometry& geometry,
+			     Production& production,
+			     double& DS,
+			     const double stem_harvest,
+			     const double leaf_harvest,
+			     const Chemicals& chemicals,
+			     const double stem_harvest_frac,
+			     const double leaf_harvest_frac,
+			     const double sorg_harvest_frac,
+			     const bool kill_off,
+			     vector<AM*>& residuals);
   void output (Log& log) const;
 
   // Create and Destroy.

@@ -200,6 +200,13 @@ CanopyStandard::CanopyStructure (double DS)
 }
 
 void
+CanopyStandard::cut (double DS, double stub_length)
+{
+  Height = min (stub_length, Height);
+  Offset = Height - HvsDS (DS);
+}
+
+void
 CanopyStandard::tick (double WLeaf, double WSOrg, double WStem, double DS)
 {
   Height = CropHeight (WStem, DS);

@@ -1,5 +1,14 @@
 2001-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.95 released.
+
+2001-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (harvest): Moved most to `harvesting.C'.
+	* harvesting.C, harvesting.h (operator()): New function.
+
+	* organic_matter.C (tick): Don't apply negative rate.
+
 	* harvesting.C (load_syntax): Removed duplicate definition of
 	"Stem" syntax. 
 

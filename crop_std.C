@@ -20,6 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "crop.h"
+#include "chemicals.h"
 #include "root_system.h"
 #include "canopy_std.h"
 #include "harvesting.h"
@@ -36,27 +37,11 @@
 #include "plf.h"
 #include "soil_water.h"
 #include "soil.h"
-#include "om.h"
 #include "organic_matter.h"
 #include "soil_heat.h"
-#include "soil_NH4.h"
-#include "soil_NO3.h"
 #include "am.h"
-#include "harvest.h"
-#include "mathlib.h"
 #include "message.h"
-
-// Dimensional conversion.
-static const double m2_per_cm2 = 0.0001;
-// Based on Penning de Vries et al. 1989, page 63
-// E is the assimilate conversion effiency
-static double DM_to_C_factor (double E)
-{
-   return 12.0/30.0 * (1.0 - (0.5673 - 0.5327 * E)) / E;
-}
-// Chemical constants affecting the crop.
-const double molWeightCH2O = 30.0; // [gCH2O/mol]
-const double molWeightCO2 = 44.0; // [gCO2/mol]
+#include "mathlib.h"
 
 class CropStandard : public Crop
 {
@@ -298,64 +283,24 @@ CropStandard::harvest (const string& column_name,
 		       bool kill_off,
 		       vector<AM*>& residuals)
 {
+  // Update nitrogen content.
   nitrogen.content (development.DS, production);
-  const double DS = development.DS;
-  const double DSmax = harvesting.DSmax;
 
-  const double WStem = production.WStem;
-  const double WLeaf = production.WLeaf;
-  const double WSOrg = production.WSOrg;
-  const double WRoot = production.WRoot;
-  const double WDead = production.WDead;
-#if 0
-  const double WCrop = WStem + WLeaf + WSOrg + WDead + WRoot;
-#endif
-  const double NStem = production.NStem;
-  const double NLeaf = production.NLeaf;
-  const double NSOrg = production.NSOrg;
-  const double NRoot = production.NRoot;
-  const double NDead = production.NDead;
-#if 0
-  const double NCrop = production.NCrop;
-  const double Stem_Conc = (WStem > 0.0) ? (NStem / WStem) : 0.0;
-  const double Leaf_Conc = (WLeaf > 0.0) ? (NLeaf / WLeaf) : 0.0;
-  const double SOrg_Conc = (WSOrg > 0.0) ? (NSOrg / WSOrg) : 0.0;
-  const double Dead_Conc = (WDead > 0.0) ? (NDead / WDead) : 0.0;
-  const double Root_Conc = (WRoot > 0.0) ? (NRoot / WRoot) : 0.0;
-  const double Crop_Conc = (WCrop > 0.0) ? (NCrop / WCrop) : 0.0;
-#endif
-  const double C_C_Stem = DM_to_C_factor (production.E_Stem);
-  const double C_C_Leaf = DM_to_C_factor (production.E_Leaf);
-  const double C_C_Dead = C_C_Leaf;
-  const double C_C_SOrg = DM_to_C_factor (production.E_SOrg);
-  const double C_C_Root = DM_to_C_factor (production.E_Root);
-
-  const vector<AttributeList*>& Stem = harvesting.Stem;
-  const vector<AttributeList*>& Dead = harvesting.Dead;
-  const vector<AttributeList*>& Leaf = harvesting.Leaf;
-  const vector<AttributeList*>& SOrg = harvesting.SOrg;
-
-  const vector<double>& density = root_system.Density;
-  const double length = height ();
-  double stem_harvest = 1.0;
-  double dead_harvest = 1.0;
-  double leaf_harvest = 1.0;
-  double sorg_harvest = 1.0;
-
+  // Removed chemicals.
   Chemicals chemicals;
-
+  
   // Leave stem and leaf below stub alone.
-
-  if (stub_length < length)
+  double stem_harvest;
+  double leaf_harvest;
+  if (stub_length < canopy.Height)
     {
-      stem_harvest = (1.0 - stub_length / length);
+      stem_harvest = (1.0 - stub_length / canopy.Height);
 
-      const double total_CAI = LAI ();
-      if (total_CAI > 0.0)
+      if (canopy.CAI > 0.0)
 	{
-	  const double stub_CAI = LAIvsH ()(stub_length);
-	  leaf_harvest = (1.0 - stub_CAI / total_CAI);
-	  bioclimate.harvest_chemicals (chemicals, total_CAI - stub_CAI);
+	  const double stub_CAI = canopy.LAIvsH (stub_length);
+	  leaf_harvest = (1.0 - stub_CAI / canopy.CAI);
+	  bioclimate.harvest_chemicals (chemicals, canopy.CAI - stub_CAI);
 	}
     }
   else
@@ -363,246 +308,33 @@ CropStandard::harvest (const string& column_name,
       stem_harvest = 0.0;
       leaf_harvest = 0.0;
     }
-  // Harvested yield and losses left in the field at harvest
-  const double Stem_W_Yield = stem_harvest_frac * stem_harvest * WStem;
-  const double Dead_W_Yield = stem_harvest_frac * dead_harvest * WDead;
-  const double Leaf_W_Yield = leaf_harvest_frac * leaf_harvest * WLeaf;
-  const double SOrg_W_Yield = sorg_harvest_frac * sorg_harvest * WSOrg;
-  const double Stem_C_Yield = C_C_Stem * Stem_W_Yield;
-  const double Dead_C_Yield = C_C_Dead * Dead_W_Yield;
-  const double Leaf_C_Yield = C_C_Leaf * Leaf_W_Yield;
-  const double SOrg_C_Yield = C_C_SOrg * SOrg_W_Yield;
-  const double Stem_N_Yield = stem_harvest_frac * stem_harvest * NStem;
-  const double Dead_N_Yield = stem_harvest_frac * dead_harvest * NDead;
-  const double Leaf_N_Yield = leaf_harvest_frac * leaf_harvest * NLeaf;
-  const double SOrg_N_Yield = sorg_harvest_frac * sorg_harvest * NSOrg;
 
-  // Part of economic yield removed at harvest
-  const double WEYRm
-    = harvesting.EconomicYield_W * SOrg_W_Yield; // W is used for both
-  const double NEYRm
-    = harvesting.EconomicYield_N * SOrg_N_Yield; // DM and C.
-  const double CEYRm
-    = harvesting.EconomicYield_W * SOrg_C_Yield;
+  const Harvest& harvest 
+    = harvesting (column_name, name, 
+		  root_system.Density,
+		  time, geometry, production, development.DS,
+		  stem_harvest, leaf_harvest, chemicals,
+		  stem_harvest_frac, leaf_harvest_frac, sorg_harvest_frac,
+		  kill_off, residuals);
 
-  const double Crop_N_Yield
-    = Stem_N_Yield + Dead_N_Yield + Leaf_N_Yield + NEYRm;
-
-  double Stem_W_Loss = (1.0 - stem_harvest_frac) * stem_harvest * WStem;
-  double Dead_W_Loss = (1.0 - stem_harvest_frac) * dead_harvest * WDead;
-  double Leaf_W_Loss = (1.0 - leaf_harvest_frac) * leaf_harvest * WLeaf;
-  double SOrg_W_Loss = (1.0 - sorg_harvest_frac) * sorg_harvest * WSOrg +
-                       (1.0 - harvesting.EconomicYield_W) * SOrg_W_Yield;
-  double Stem_N_Loss = (1.0 - stem_harvest_frac) * stem_harvest * NStem;
-  double Dead_N_Loss = (1.0 - stem_harvest_frac) * dead_harvest * NDead;
-  double Leaf_N_Loss = (1.0 - leaf_harvest_frac) * leaf_harvest * NLeaf;
-  double SOrg_N_Loss = (1.0 - sorg_harvest_frac) * sorg_harvest * NSOrg +
-                       (1.0 - harvesting.EconomicYield_N) * SOrg_N_Yield;
-  const double Crop_N_Loss = Stem_N_Loss + Dead_N_Loss + Leaf_N_Loss + SOrg_N_Loss;
-
-  production.WStem -= (Stem_W_Yield + Stem_W_Loss);
-  production.WDead -= (Dead_W_Yield + Dead_W_Loss);
-  production.WLeaf -= (Leaf_W_Yield + Leaf_W_Loss);
-  production.WSOrg -= (WEYRm + SOrg_W_Loss);
-  production.NStem -= (Stem_N_Yield + Stem_N_Loss);
-  production.NDead -= (Dead_N_Yield + Dead_N_Loss);
-  production.NLeaf -= (Leaf_N_Yield + Leaf_N_Loss);
-  production.NSOrg -= (NEYRm + SOrg_N_Loss);
-  production.NCrop -= (Crop_N_Yield + Crop_N_Loss-(Dead_N_Yield + Dead_N_Loss));
-
-  production.WStem = max(0.0, production.WStem);
-  production.WDead = max(0.0, production.WDead);
-  production.WLeaf = max(0.0, production.WLeaf);
-  production.WSOrg = max(0.0, production.WSOrg);
-  production.NStem = max(0.0, production.NStem);
-  production.NDead = max(0.0, production.NDead);
-  production.NLeaf = max(0.0, production.NLeaf);
-  production.NSOrg = max(0.0, production.NSOrg);
-  production.NCrop = max(0.0, production.NCrop);
-
-  if (Dead_W_Loss < 0.1)
+  if (development.DS != DSremove)
     {
-      Stem_W_Loss += Dead_W_Loss;
-      Stem_N_Loss += Dead_N_Loss;
-      Dead_W_Loss = 0.0;
-      Dead_N_Loss = 0.0;
-    }
-  if (Leaf_W_Loss < 0.1)
-    {
-      Stem_W_Loss += Leaf_W_Loss;
-      Stem_N_Loss += Leaf_N_Loss;
-      Leaf_W_Loss = 0.0;
-      Leaf_N_Loss = 0.0;
-    }
-  if (SOrg_W_Loss < 0.1)
-    {
-      Stem_W_Loss += SOrg_W_Loss;
-      Stem_N_Loss += SOrg_N_Loss;
-      SOrg_W_Loss = 0.0;
-      SOrg_N_Loss = 0.0;
-    }
- 
-#if 0
-  const double WBal = WCrop - (production.WStem+production.WLeaf+production.WDead+production.WSOrg+production.WRoot)
-                     - (Stem_W_Yield+Leaf_W_Yield+WEYRm+Dead_W_Yield)
-                     - (Stem_W_Loss+Leaf_W_Loss+SOrg_W_Loss+Dead_W_Loss );
-  const double NBal = NCrop - (production.NStem+production.NLeaf+production.NDead+production.NSOrg+production.NRoot)
-                     - (Stem_N_Yield+Leaf_N_Yield+NEYRm+Dead_N_Yield)
-                     - (Stem_N_Loss +Leaf_N_Loss +SOrg_N_Loss +Dead_N_Loss );
-  double New_Crop_Conc;
-  double New_Stem_Conc = (production.WStem > 0.0) 
-    ? (production.NStem / production.WStem) : 0.0;
-  double New_Leaf_Conc = (production.WLeaf > 0.0) 
-    ? (production.NLeaf / production.WLeaf) : 0.0;
-  double New_SOrg_Conc = (production.WSOrg > 0.0) 
-    ? (production.NSOrg / production.WSOrg) : 0.0;
-  double New_Dead_Conc = (production.WDead > 0.0) 
-    ? (production.NDead / production.WDead) : 0.0;
-  double New_Root_Conc = (production.WRoot > 0.0) 
-    ? (production.NRoot / production.WRoot) : 0.0;
-#endif
+      nitrogen.cut (development.DS); // Stop fixation.
 
-#if 0
-  // Part of economic yield left in the field at harvest
-  const double WEYLf = harvesting.EconomicYield_W
-    * (1 - sorg_harvest_frac) * WSOrg;
-  // Part of non economic yield removed from the field at harvest
-  const double WRsRm = (1 - harvesting.EconomicYield_W)
-    * sorg_harvest_frac * WSOrg;
-  // Part of non economic yield left in the field at harvest
-  const double WRsLf = (1 - harvesting.EconomicYield_W) 
-    * (1 - sorg_harvest_frac) * WSOrg;
-  // Part of economic yield removed at harvest
-  // Part of economic yield left in the field at harvest
-  const double NEYLf = harvesting.EconomicYield_N
-    * (1 - sorg_harvest_frac) * NSOrg;
-  // Part of non economic yield removed from the field at harvest
-  const double NRsRm = (1 - harvesting.EconomicYield_N)
-    * sorg_harvest_frac * NSOrg;
-  // Part of non economic yield left in the field at harvest
-  const double NRsLf = (1 - harvesting.EconomicYield_N)
-    * (1 - sorg_harvest_frac) * NSOrg;
-#endif
-
-  if (!kill_off && DS < DSmax && stub_length > 0.0)
-    {
-      // Cut back development stage and production.
-      const double DSnew = harvesting.DSnew;
-
-      if (DS > DSnew)
-	development.DS = DSnew;
-
-      // Stop fixation after cut.
-      nitrogen.cut (DS);
-
-      if (DS > 0.0)
+      if (development.DS > 0.0)
 	{
-	  // Adjust canopy for the sake of bioclimate.
-	  canopy.Height = min (stub_length, canopy.Height);
-	  canopy.Offset
-	    = canopy.Height
-	    - canopy.HvsDS (development.DS) ;
+	  // Cut canopy.
+	  canopy.cut (development.DS, stub_length);
 	  assert (approximate (canopy.CropHeight (production.WStem,
-                               development.DS), canopy.Height));
+						  development.DS), 
+			       canopy.Height));
 	  canopy.CropCAI (production.WLeaf, production.WSOrg,
 			  production.WStem, development.DS);
 	  CanopyStructure ();
-
-	  // Residuals left in the field
-	  const double C = C_C_SOrg * SOrg_W_Loss;
-	  const double N = SOrg_N_Loss;
-	  AM& am = AM::create (geometry, time, SOrg, name, "sorg");
-	  assert (C == 0.0 || N > 0.0);
-	  am.add ( C * m2_per_cm2, N * m2_per_cm2);
-	  residuals.push_back (&am);
-	  production.C_AM += C;
-	  production.N_AM += N;
 	}
     }
-  else
-    {
-      development.DS = DSremove;
-
-     // Update and unlock locked AMs.
-      if (!production.AM_root)
-	production.AM_root = &AM::create (geometry, time, harvesting.Root,
-					name, "root", AM::Unlocked);
-      if (geometry.total (density) > 0.0)
-	production.AM_root->add (geometry,
-			       WRoot * C_C_Root * m2_per_cm2,
-			       NRoot * m2_per_cm2,
-			       density);
-      else
-	production.AM_root->add (WRoot * C_C_Root * m2_per_cm2,
-			       NRoot * m2_per_cm2);
-      assert (WRoot == 0.0 || NRoot > 0.0);
-      if (production.AM_root->locked ())
-	production.AM_root->unlock (); // Stored in organic matter.
-      else
-	residuals.push_back (production.AM_root);	// No organic matter.
-      production.AM_root = NULL;
-
-      if (production.AM_leaf)
-	{
-	  if (production.AM_leaf->locked ())
-	    production.AM_leaf->unlock (); // Stored in organic matter.
-	  else
-	    residuals.push_back (production.AM_leaf);// No organic matter.
-	  production.AM_leaf = NULL;
-	}
-    }
-
-  // Add crop remains to the soil.
-  if (Stem_W_Loss > 0.0)
-    {
-      const double C = C_C_Stem * Stem_W_Loss;
-      const double N = Stem_N_Loss;
-      AM& am = AM::create (geometry, time, Stem, name, "stem");
-      am.add (C * m2_per_cm2, N * m2_per_cm2);
-      assert (C == 0.0 || N > 0.0);
-      residuals.push_back (&am);
-      production.C_AM += C;
-      production.N_AM += N;
-    }
- if (Dead_W_Loss > 0.0)
-   {
-     const double C = C_C_Dead * Dead_W_Loss;
-     const double N = Dead_N_Loss;
-     if (!production.AM_leaf)
-        production.AM_leaf
-           = &AM::create (geometry, time, Dead, name, "dead", AM::Unlocked);
-        production.AM_leaf->add (C * m2_per_cm2, N * m2_per_cm2);
-        assert (C == 0.0 || N > 0.0);
-        production.C_AM += C;
-        production.N_AM += N;
-   }
- if (Leaf_W_Loss > 0.0)
-   {
-     const double C = C_C_Leaf * Leaf_W_Loss;
-     const double N = Leaf_N_Loss;
-     AM& am = AM::create (geometry, time, Leaf, name, "leaf");
-     assert (C == 0.0 || N > 0.0);
-     am.add ( C * m2_per_cm2, N * m2_per_cm2);
-     residuals.push_back (&am);
-     production.C_AM += C;
-     production.N_AM += N;
-   }
- if (SOrg_W_Loss > 0.0)
-   {
-     const double C = C_C_SOrg * SOrg_W_Loss;
-     const double N = SOrg_N_Loss;
-     AM& am = AM::create (geometry, time, SOrg, name, "sorg");
-     assert (C == 0.0 || N > 0.0);
-     am.add ( C * m2_per_cm2, N * m2_per_cm2);
-     residuals.push_back (&am);
-     production.C_AM += C;
-     production.N_AM += N;
-   }
-  return *new Harvest (column_name, time, name,
-		       Stem_W_Yield, Stem_N_Yield, Stem_C_Yield,
-		       Dead_W_Yield, Dead_N_Yield, Dead_C_Yield,
-		       Leaf_W_Yield, Leaf_N_Yield, Leaf_C_Yield,
-		       WEYRm, NEYRm, CEYRm, chemicals);
+      
+  return harvest;
 }
 
 void

@@ -658,8 +658,9 @@ development${OBJ}: development.C development.h production.h \
 production${OBJ}: production.C production.h crpn.h partition.h \
  organic_matter.h common.h am.h librarian.h library.h alist.h syntax.h \
  treelog.h log.h plf.h message.h submodel.h
-harvesting${OBJ}: harvesting.C harvesting.h am.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h om.h submodel.h
+harvesting${OBJ}: harvesting.C harvesting.h production.h am.h librarian.h \
+ library.h common.h alist.h syntax.h treelog.h om.h crop.h harvest.h \
+ chemicals.h submodel.h
 canopy_simple${OBJ}: canopy_simple.C canopy_simple.h plf.h submodel.h \
  log.h librarian.h library.h common.h alist.h syntax.h treelog.h
 canopy_std${OBJ}: canopy_std.C canopy_std.h canopy_simple.h plf.h \
@@ -943,13 +944,12 @@ groundwater_static${OBJ}: groundwater_static.C groundwater.h uzmodel.h \
 horizon_std${OBJ}: horizon_std.C horizon.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h
 crop_std${OBJ}: crop_std.C crop.h time.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h root_system.h rootdens.h canopy_std.h \
- canopy_simple.h plf.h harvesting.h production.h development.h \
- partition.h vernalization.h photosynthesis.h crpn.h log.h \
- bioclimate.h soil_water.h macro.h soil.h horizon.h hydraulic.h \
- tortuosity.h geometry.h om.h organic_matter.h soil_heat.h soil_NH4.h \
- solute.h adsorption.h transport.h mactrans.h soil_NO3.h am.h \
- harvest.h chemicals.h mathlib.h message.h
+ alist.h syntax.h treelog.h chemicals.h root_system.h rootdens.h \
+ canopy_std.h canopy_simple.h plf.h harvesting.h production.h \
+ development.h partition.h vernalization.h photosynthesis.h crpn.h \
+ log.h bioclimate.h soil_water.h macro.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h organic_matter.h soil_heat.h am.h message.h \
+ mathlib.h
 action_sow${OBJ}: action_sow.C action.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h daisy.h field.h crop.h message.h
 action_stop${OBJ}: action_stop.C action.h librarian.h library.h common.h \

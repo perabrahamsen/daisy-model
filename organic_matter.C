@@ -159,16 +159,19 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
 	      ? (fabs (N_need) < 1e-10)
 	      : (fabs (1.0 - N_need / (N_soil - N_used)) < 0.01));
     }
-  N_used += N_need;
-
   // Check for NaN.
-  assert (N_need >= 0.0 || N_need <= 0.0);
-  assert (rate >= 0.0 || rate <= 1.0);
+  assert (finite (rate));
+  assert (finite (N_need));
 
-  // Update it.
-  som[where]->C[i] += C[i] * rate;
-  C[i] *= (1.0 - rate);
-  N[i] *= (1.0 - rate);
+  if (rate > 0.0)
+    {
+      N_used += N_need;
+
+      // Update it.
+      som[where]->C[i] += C[i] * rate;
+      C[i] *= (1.0 - rate);
+      N[i] *= (1.0 - rate);
+    }
 
   if (som[where]->C[i] < 0.0)
     {
