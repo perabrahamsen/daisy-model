@@ -228,10 +228,6 @@ Now we have described two horizons, we can describe a column.
   (defcolumn Andeby default
     "Data collected by F.Guf at the B.And farm, Andeby, 2002."
     (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
-          (zplus -2.5 -5 -10 -15 -20
-                 -25 -30 -40 -50 -60 -70
-                 -80 -90 -100 -125 -150 -175
-                 -200 -225 -250 [cm])
           (MaxRootingDepth 60.0 [cm]))
     (Groundwater deep))
 \end{verbatim}
@@ -274,25 +270,7 @@ idea always to specify the dimension, as this will allow \daisy{} to
 check that dimension really is what you think it is.
 Misunderstandings about dimensions are a very common source of errors.
 
-Next we specify the a numeric discretization of the soil with the
-\texttt{zplus}, used by \daisy{} for storing and calculating the state
-of the soil at various depth.  Like for the horizons, we list the
-endpoints of each numeric layer (or \emph{node}) from the top to the
-bottom.  The \verb|[cm]| at the end of the list indicates that all the
-previous numbers are given in cm.
-
-Choosing a discretization is an art.  A fine discretization causes more
-exact results, but slows down the simulation, and very fine
-discretization may cause numeric problems.  A good rule of thump is to
-use small intervals at the top (one or two cm) where most of the
-action is, and use larger steps (dozens of cm) near the bottom, where
-things are more quiet, at least with a fixed groundwater level.
-
-A hard rule is that numeric layers may not cross horizon boundaries,
-which mean the end points in the horizon list must also be somewhere
-in the zplus list.
-
-The final mandatory soil parameter is \texttt{MaxRootingDepth}.  This
+The other mandatory soil parameter is \texttt{MaxRootingDepth}.  This
 is a soil imposed barrier for the roots, they will not penetrate below
 that depth.  To make writing \daisy{} setup files fun, as well as to
 keep you alert, this number is specified as positive depth, unlike the
@@ -804,6 +782,48 @@ it like
 Here, \texttt{EpFac} will be 1.0 at emergence (DS 0.0), gradually rise
 to 1.2 at flowering (DS 1.0), and then fall towards 1.0 at ripeness (DS
 2.0).
+
+\subsection{Discretization}
+
+Internally, \daisy{} divide the soil into a number of discrete layers.
+During the simulation, it will keep track of the content (water, heat,
+nitrogen, etc.) of each layer, and the flows between the layers.  A
+fine discretization causes more exact results, but slows down the
+simulation, and very fine discretization may cause numeric problems.
+The default discretion represents a balance between these concerns,
+but sometimes it will be advantageous to specify it manually.
+
+A specific example is when you need to log the content of specific
+intervals.  In that case it is best to be sure the intervals used by
+\daisy{} does not cross any of the intervals you are logging.  If they
+do, \daisy{} will attempt to interpolate, but the inexact values will
+mean you won't get an exact mass balance.
+
+We specify the a numeric discretization of the soil with the
+\texttt{zplus} parameter.  
+\begin{verbatim}
+  (defcolumn Andeby default
+    "Data collected by F.Guf at the B.And farm, Andeby, 2002."
+    (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+          (zplus -2.5 -5 -10 -15 -20
+                 -25 -30 -40 -50 -60 -70
+                 -80 -90 -100 -125 -150 -175
+                 -200 -225 -250 [cm])
+          (MaxRootingDepth 60.0 [cm]))
+    (Groundwater deep))
+\end{verbatim}
+Like for the horizons, we list the endpoints of each numeric layer (or
+\emph{node}) from the top to the bottom.  The \verb|[cm]| at the end
+of the list indicates that all the previous numbers are given in cm.
+
+A good rule of thump is to use small intervals at the top (one or two
+cm) where most of the action is, and use larger steps (dozens of cm)
+near the bottom, where things are more quiet, at least with a fixed
+groundwater level.
+
+A hard rule is that numeric layers may not cross horizon boundaries,
+which mean the end points in the horizon list must also be somewhere
+in the zplus list.
 
 \section{Management}
 \label{sec:management}
@@ -1851,10 +1871,6 @@ parameterization:
   (defcolumn Andeby default
     "The B.And farm, Andeby, 2002."
     (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
-          (zplus -2.5 -5 -10 -15 -20
-                 -25 -30 -40 -50 -60 -70
-                 -80 -90 -100 -125 -150 -175
-                 -200 -225 -250 [cm])
           (MaxRootingDepth 60.0 [cm]))
     (Groundwater deep))
 

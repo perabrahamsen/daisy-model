@@ -11,57 +11,55 @@
            (interval (path column "$col" SoilWater Theta)
 		     (spec column default SoilWater Theta)
                      (tag "Water")
-                     (dimension "mm")
-                     (factor 10))       ;cm -> mm
+                     (dimension "mm"))
            (interval (tag "NH4")
                      (path column "$col" SoilNH4 M)
-                     (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
+		     (spec column default SoilNH4 M)
+                     (dimension "kg N/ha"))
            (interval (tag "NO3")
                      (path column "$col" SoilNO3 M)
-                     (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter total_N)
-                     (tag "ORG_N")
-                     (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter total_C)
-                     (tag "ORG_C")
-                     (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter som "*" N)
-                     (tag "SOM_N")
-                     (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter som "*" C)
-                     (tag "SOM_C")
-                     (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter smb "*" N)
-                     (tag "SMB_N")
-                     (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter smb "*" C)
-                     (tag "SMB_C")
-                     (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter am "*" om "*" N)
-                     (tag "AOM_N")
-                     (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter am "*" om "*" C)
-                     (tag "AOM_C")
-                     (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter buffer N)
-                     (tag "BUFFER_N")
-                     (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter buffer C)
-                     (tag "BUFFER_C")
-                     (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           ))
+		     (spec column default SoilNO3 M)
+                     (dimension "kg N/ha"))
+           (interval (tag "ORG_N")
+		     (path column "$col" OrganicMatter total_N)
+		     (spec column default OrganicMatter total_N)
+		     (dimension "kg N/ha"))
+           (interval (tag "ORG_C")
+                     (path column "$col" OrganicMatter total_C)
+		     (spec column default OrganicMatter total_C)
+                     (dimension "kg C/ha"))
+           (interval (tag "SOM_N")
+                     (path column "$col" OrganicMatter som "*" N)
+		     (spec column default OrganicMatter som N)
+                     (dimension "kg N/ha"))
+           (interval (tag "SOM_C")
+                     (path column "$col" OrganicMatter som "*" C)
+		     (spec column default OrganicMatter som C)
+                     (dimension "kg C/ha"))
+           (interval (tag "SMB_N")
+                     (path column "$col" OrganicMatter smb "*" N)
+		     (spec column default OrganicMatter smb N)
+                     (dimension "kg N/ha"))
+           (interval (tag "SMB_C")
+                     (path column "$col" OrganicMatter smb "*" C)
+		     (spec column default OrganicMatter smb C)
+                     (dimension "kg C/ha"))
+           (interval (tag "AOM_N")
+                     (path column "$col" OrganicMatter am "*" om "*" N)
+		     (spec am state om N)
+                     (dimension "kg N/ha"))
+           (interval (tag "AOM_C")
+                     (path column "$col" OrganicMatter am "*" om "*" C)
+		     (spec am state om C)
+                     (dimension "kg C/ha"))
+           (interval (tag "BUFFER_N")
+                     (path column "$col" OrganicMatter buffer N)
+		     (spec column default OrganicMatter buffer N)
+                     (dimension "kg N/ha"))
+           (interval (tag "BUFFER_C")
+                     (path column "$col" OrganicMatter buffer C)
+		     (spec column default OrganicMatter buffer C)
+                     (dimension "kg C/ha"))))
 
 (deflog "Soil NO3 Concentration" table
   "Amount of nitrate in all numeric soil layers.
@@ -73,7 +71,8 @@ This include both the nitrogen and oxygen atoms of the nitrate."
            (mday (path time))
            (array (path column "$col" SoilNO3 C)
                   (dimension "mg/l")
-                  (factor 1.0e6))))     ;g/cm³ -> mg/l
+		  (factor 4.43e6))))     ;g NO3-N/cm³ -> mg NO3/l
+
 
 (deflog "Soil NO3-N Concentration" table
   "Amount of nitrate nitrogen in all numeric soil layers.
@@ -84,8 +83,8 @@ This include only nitrogen atoms of the nitrate."
            (month (path time))
            (mday (path time))
            (array (path column "$col" SoilNO3 C)
-                  (dimension "mg/l")
-                  (factor 4.43e6))))     ;g NO3-N/cm³ -> mg NO3/l
+                  (spec column default SoilNO3 C)
+                  (dimension "mg/l"))))
 
 (deflog "Soil Temperature" table
   "Temperature in all numeric soil layers."
@@ -96,6 +95,7 @@ This include only nitrogen atoms of the nitrate."
            (mday (path time))
 	   (hour (path time))
            (array (path column "$col" SoilHeat T)
+		  (spec column default SoilHeat T)
                   (dimension "dg C"))))
 
 (deflog "Soil Water Potential" table
@@ -107,6 +107,7 @@ This include only nitrogen atoms of the nitrate."
            (mday (path time))
            (hour (path time))
            (array (path column "$col" SoilWater h)
+		  (spec column default SoilWater h)
                   (dimension "cm"))))
 
 (deflog "Soil Water Sink" table
@@ -120,6 +121,7 @@ flow to drain pipes, and subsoil irrigation."
            (mday (path time))
            (hour (path time))
            (array (path column "$col" SoilWater S_sum)
+		  (spec column default SoilWater S_sum)
 		  (when hourly)
                   (dimension "cm^3/cm^3/&"))))
 
