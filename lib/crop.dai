@@ -5,6 +5,7 @@
 (input file "rye.dai")
 (input file "sbarley.dai")
 (input file "sugarbeet.dai")
+(input file "fodderbeet.dai")
 (input file "srape.dai")
 (input file "swheat.dai")
 (input file "wbarley.dai")
