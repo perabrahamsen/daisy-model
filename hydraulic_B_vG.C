@@ -1,18 +1,16 @@
-// horizon_B_vG.C
+// hydraulic_B_vG.C
 //
 // van Gebuchten retention curve model with Burdine theory.
 
-#include "horizon.h"
+#include "hydraulic.h"
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
 #include "csmp.h"
 
-class HorizonB_vG : public Horizon
+class HydraulicB_vG : public Hydraulic
 {
   // Content.
-  const double Theta_sat;
-  const double Theta_res_;
   const double alpha;
   const double a;		// - alpha
   const double n;
@@ -22,7 +20,6 @@ class HorizonB_vG : public Horizon
   // Use.
 public:
   double Theta (double h) const;
-  double Theta_res () const;
   double K (double h) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
@@ -32,27 +29,21 @@ private:
   
   // Create and Destroy.
 private:
-  friend class HorizonB_vGSyntax;
-  static Horizon& make (AttributeList& al);
-  HorizonB_vG (const AttributeList&);
+  friend class HydraulicB_vGSyntax;
+  static Hydraulic& make (AttributeList& al);
+  HydraulicB_vG (const AttributeList&);
 public:
-  ~HorizonB_vG ();
+  ~HydraulicB_vG ();
 };
 
 double 
-HorizonB_vG::Theta (const double h) const
+HydraulicB_vG::Theta (const double h) const
 {
-  return Se (h) * (Theta_sat - Theta_res_) + Theta_res_;
+  return Se (h) * (Theta_sat - Theta_res) + Theta_res;
 }
 
 double 
-HorizonB_vG::Theta_res () const
-{
-  return Theta_res_;
-}
-
-double 
-HorizonB_vG::K (const double h) const
+HydraulicB_vG::K (const double h) const
 {
   if (h < 0)
     {
@@ -64,10 +55,10 @@ HorizonB_vG::K (const double h) const
 }
 
 double 
-HorizonB_vG::Cw2 (const double h) const
+HydraulicB_vG::Cw2 (const double h) const
 {
   if (h < 0)
-    return - (  (Theta_sat - Theta_res_)
+    return - (  (Theta_sat - Theta_res)
 	      * (m * (  pow (1 / (1 + pow (a * h, n)), m - 1)
 		      * (n * (pow (a * h, n - 1) * a))))
 	      / pow (1 + pow(a * h, n), 2));
@@ -76,17 +67,17 @@ HorizonB_vG::Cw2 (const double h) const
 }
 
 double 
-HorizonB_vG::h (const double Theta) const
+HydraulicB_vG::h (const double Theta) const
 {
   if (Theta < Theta_sat)
-    return pow(pow(Theta_res_ / (Theta_res_ - Theta_sat) 
-		   + Theta / (Theta_sat - Theta_res_), -1 / m) - 1, 1 / n) / a;
+    return pow(pow(Theta_res / (Theta_res - Theta_sat) 
+		   + Theta / (Theta_sat - Theta_res), -1 / m) - 1, 1 / n) / a;
   else
     return 0.0;
 }
 
 double 
-HorizonB_vG::M (double h) const
+HydraulicB_vG::M (double h) const
 {
   // Use.
   static CSMP csmp;
@@ -100,15 +91,13 @@ HorizonB_vG::M (double h) const
 }
 
 double 
-HorizonB_vG::Se (double h) const
+HydraulicB_vG::Se (double h) const
 {
   return pow (1 / (1 + pow (a * h, n)), m);
 }
 
-HorizonB_vG::HorizonB_vG (const AttributeList& al)
-  : Horizon (al),
-    Theta_sat (al.number ("Theta_sat")),
-    Theta_res_ (al.number ("Theta_res")),
+HydraulicB_vG::HydraulicB_vG (const AttributeList& al)
+  : Hydraulic (al),
     alpha (al.number ("alpha")),
     a (-alpha),
     n (al.number ("n")),
@@ -116,32 +105,30 @@ HorizonB_vG::HorizonB_vG (const AttributeList& al)
     K_sat (al.number ("K_sat"))
 { }
 
-HorizonB_vG::~HorizonB_vG ()
+HydraulicB_vG::~HydraulicB_vG ()
 { }
 
-// Add the HorizonB_vG syntax to the syntax table.
+// Add the HydraulicB_vG syntax to the syntax table.
 
-Horizon&
-HorizonB_vG::make (AttributeList& al)
+Hydraulic&
+HydraulicB_vG::make (AttributeList& al)
 {
-  return *new HorizonB_vG (al);
+  return *new HydraulicB_vG (al);
 }
 
-static struct HorizonB_vGSyntax
+static struct HydraulicB_vGSyntax
 {
-  HorizonB_vGSyntax ();
-} horizonB_vG_syntax;
+  HydraulicB_vGSyntax ();
+} hydraulicB_vG_syntax;
 
-HorizonB_vGSyntax::HorizonB_vGSyntax ()
+HydraulicB_vGSyntax::HydraulicB_vGSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  Horizon::load_syntax (syntax, alist);
-  syntax.add ("Theta_sat", Syntax::Number, Syntax::Const);
-  syntax.add ("Theta_res", Syntax::Number, Syntax::Const);
+  Hydraulic::load_syntax (syntax, alist);
   syntax.add ("alpha", Syntax::Number, Syntax::Const);
   syntax.add ("n", Syntax::Number, Syntax::Const);
   syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
-  Horizon::add_type ("B_vG", alist, syntax, &HorizonB_vG::make);
+  Hydraulic::add_type ("B_vG", alist, syntax, &HydraulicB_vG::make);
 }

@@ -1,18 +1,16 @@
-// horizon_M_vG.C
+// hydraulic_M_vG.C
 //
 // van Gebuchten retention curve model with Mualem theory.
 
-#include "horizon.h"
+#include "hydraulic.h"
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
 #include "csmp.h"
 
-class HorizonM_vG : public Horizon
+class HydraulicM_vG : public Hydraulic
 {
   // Content.
-  const double Theta_sat;
-  const double Theta_res_;
   const double alpha;
   const double a;		// - alpha
   const double n;
@@ -22,7 +20,6 @@ class HorizonM_vG : public Horizon
   // Use.
 public:
   double Theta (double h) const;
-  double Theta_res () const;
   double K (double h) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
@@ -32,27 +29,21 @@ private:
   
   // Create and Destroy.
 private:
-  friend class HorizonM_vGSyntax;
-  static Horizon& make (AttributeList& al);
-  HorizonM_vG (const AttributeList&);
+  friend class HydraulicM_vGSyntax;
+  static Hydraulic& make (AttributeList& al);
+  HydraulicM_vG (const AttributeList&);
 public:
-  ~HorizonM_vG ();
+  ~HydraulicM_vG ();
 };
 
 double 
-HorizonM_vG::Theta (const double h) const
+HydraulicM_vG::Theta (const double h) const
 {
-  return Se (h) * (Theta_sat - Theta_res_) + Theta_res_;
+  return Se (h) * (Theta_sat - Theta_res) + Theta_res;
 }
 
 double 
-HorizonM_vG::Theta_res () const
-{
-  return Theta_res_;
-}
-
-double 
-HorizonM_vG::K (const double h) const
+HydraulicM_vG::K (const double h) const
 {
   if (h < 0)
     {
@@ -64,10 +55,10 @@ HorizonM_vG::K (const double h) const
 }
 
 double 
-HorizonM_vG::Cw2 (const double h) const
+HydraulicM_vG::Cw2 (const double h) const
 {
   if (h < 0)
-    return - (  (Theta_sat - Theta_res_)
+    return - (  (Theta_sat - Theta_res)
 	      * (m * (  pow (1 / (1 + pow (a * h, n)), m - 1)
 		      * (n * (pow (a * h, n - 1) * a))))
 	      / pow (1 + pow(a * h, n), 2));
@@ -76,17 +67,17 @@ HorizonM_vG::Cw2 (const double h) const
 }
 
 double 
-HorizonM_vG::h (const double Theta) const
+HydraulicM_vG::h (const double Theta) const
 {
   if (Theta < Theta_sat)
-    return pow(pow(Theta_res_ / (Theta_res_ - Theta_sat) 
-		   + Theta / (Theta_sat - Theta_res_), -1 / m) - 1, 1 / n) / a;
+    return pow(pow(Theta_res / (Theta_res - Theta_sat) 
+		   + Theta / (Theta_sat - Theta_res), -1 / m) - 1, 1 / n) / a;
   else
     return 0.0;
 }
 
 double 
-HorizonM_vG::M (double h) const
+HydraulicM_vG::M (double h) const
 {
   // Use.
   static CSMP csmp;
@@ -100,7 +91,7 @@ HorizonM_vG::M (double h) const
 }
 
 double 
-HorizonM_vG::Se (double h) const
+HydraulicM_vG::Se (double h) const
 {
   if (h < 0)
     return pow (1 / (1 + pow (a * h, n)), m);
@@ -108,10 +99,8 @@ HorizonM_vG::Se (double h) const
     return 1.0;
 }
 
-HorizonM_vG::HorizonM_vG (const AttributeList& al)
-  : Horizon (al),
-    Theta_sat (al.number ("Theta_sat")),
-    Theta_res_ (al.number ("Theta_res")),
+HydraulicM_vG::HydraulicM_vG (const AttributeList& al)
+  : Hydraulic (al),
     alpha (al.number ("alpha")),
     a (-alpha),
     n (al.number ("n")),
@@ -119,32 +108,30 @@ HorizonM_vG::HorizonM_vG (const AttributeList& al)
     K_sat (al.number ("K_sat"))
 { }
 
-HorizonM_vG::~HorizonM_vG ()
+HydraulicM_vG::~HydraulicM_vG ()
 { }
 
-// Add the HorizonM_vG syntax to the syntax table.
+// Add the HydraulicM_vG syntax to the syntax table.
 
-Horizon&
-HorizonM_vG::make (AttributeList& al)
+Hydraulic&
+HydraulicM_vG::make (AttributeList& al)
 {
-  return *new HorizonM_vG (al);
+  return *new HydraulicM_vG (al);
 }
 
-static struct HorizonM_vGSyntax
+static struct HydraulicM_vGSyntax
 {
-  HorizonM_vGSyntax ();
-} horizonM_vG_syntax;
+  HydraulicM_vGSyntax ();
+} hydraulicM_vG_syntax;
 
-HorizonM_vGSyntax::HorizonM_vGSyntax ()
+HydraulicM_vGSyntax::HydraulicM_vGSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  Horizon::load_syntax (syntax, alist);
-  syntax.add ("Theta_sat", Syntax::Number, Syntax::Const);
-  syntax.add ("Theta_res", Syntax::Number, Syntax::Const);
+  Hydraulic::load_syntax (syntax, alist);
   syntax.add ("alpha", Syntax::Number, Syntax::Const);
   syntax.add ("n", Syntax::Number, Syntax::Const);
   syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
-  Horizon::add_type ("M_vG", alist, syntax, &HorizonM_vG::make);
+  Hydraulic::add_type ("M_vG", alist, syntax, &HydraulicM_vG::make);
 }

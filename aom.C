@@ -22,9 +22,9 @@ const Syntax& OM::syntax ()
 
 OM::OM (const AttributeList& al)
   : top_C (al.check ("top_C") ? al.number ("top_C") : 0.0),
-    C_per_N (al.number ("C_per_N")),
+    C_per_N (al.number_sequence ("C_per_N")),
     turnover_rate (al.number ("turnover_rate")),
-    efficiency (al.number ("efficiency")),
+    efficiency (al.number_sequence ("efficiency")),
     maintenance (al.check ("maintenance") ? al.number ("maintenance") : 0.0),
     fractions (al.number_sequence ("fractions"))
 {
@@ -34,14 +34,17 @@ OM::OM (const AttributeList& al)
 
 OM::OM (const AttributeList& al, const double carbon, const double N)
   : top_C (carbon),
-    C_per_N (carbon/N),
     turnover_rate (al.number ("turnover_rate")),
-    efficiency (al.number ("efficiency")),
+    efficiency (al.number_sequence ("efficiency")),
     maintenance (al.check ("maintenance") ? al.number ("maintenance") : 0.0),
     fractions (al.number_sequence ("fractions"))
 {
   if (al.check ("C"))
     C = al.number_sequence ("C");
+  if (al.check ("C_per_N"))
+    C_per_N = al.number_sequence ("C_per_N");
+  else
+    C_per_N.push_back (carbon / N);
 }
 
 void 
@@ -50,6 +53,13 @@ OM::initialize (const Soil& soil)
   // Create initial C.
   while (C.size () < soil.size () +0U)
     C.push_back (0.0);
+
+  assert (C_per_N.size () > 0U);
+  
+  while (C_per_N.size () < C.size ())
+    C_per_N.push_back (C_per_N[C_per_N.size () - 1]);
+
+  assert (C_per_N[C_per_N.size () - 1] > 0);
 }
 
 void
@@ -86,12 +96,12 @@ OM::tick (int i, double turnover_factor, double N_soil, double& N_used,
   // Distribute to all biological dk:puljer.
   const int smb_size = smb.size ();
   for (int j = 0; j < smb_size; j++)
-    tock (i, turnover_rate * turnover_factor * fractions[j],
+    tock (i, turnover_rate * turnover_factor * fractions[j], efficiency[j],
 	  N_soil, N_used, CO2, *smb[j]);
   // Distribute to all soil dk:puljer.
   const int som_size = som.size ();
   for (int j = 0; j < som_size; j++)
-    tock (i, turnover_rate * turnover_factor * fractions[smb_size + j],
+    tock (i, turnover_rate * turnover_factor * fractions[smb_size + j], 1.0,
 	  N_soil, N_used, CO2, *som[j]);
 }
 
@@ -108,22 +118,22 @@ OM::tick (int i, double turnover_factor, double N_soil, double& N_used,
   // Distribute to all biological dk:puljer.
   const int smb_size = smb.size ();
   for (int j = 0; j < smb_size; j++)
-    tock (i, turnover_rate * turnover_factor * fractions[j],
+    tock (i, turnover_rate * turnover_factor * fractions[j], efficiency[j],
 	  N_soil, N_used, CO2, *smb[j]);
   
   // Distribute to soil buffer.
   const double rate = turnover_rate * turnover_factor * fractions[smb_size];
-  CO2 += C[i] * rate * (1.0 - efficiency);
-  som_N += C[i] * rate / C_per_N;
-  som_C += C[i] * rate * efficiency;
+  som_N += C[i] * rate / C_per_N[i];
+  som_C += C[i] * rate;
+  C[i] *= (1.0 - rate);
 }
 
 void
-OM::tock (int i, double rate, 
+OM::tock (int i, double rate, double efficiency,
 	  double N_soil, double& N_used, double& CO2, OM& om)
 {
-  double N_produce = C[i] * rate / C_per_N;
-  double N_consume = C[i] * rate * efficiency / om.C_per_N;
+  double N_produce = C[i] * rate / C_per_N[i];
+  double N_consume = C[i] * rate * efficiency / om.C_per_N[i];
       
   if (N_consume - N_produce > N_soil - N_used)
     {
@@ -131,17 +141,17 @@ OM::tock (int i, double rate,
       //   N_consume - N_produce == N_soil - N_used 
       // This is what calc tell me:
       rate = (N_soil - N_used) 
-	/ (efficiency * C[i] / om.C_per_N - C[i] / C_per_N);
+	/ (efficiency * C[i] / om.C_per_N[i] - C[i] / C_per_N[i]);
       // 
       // Aside: We could also have solved the equation by decresing the 
       // efficiency.
-      //   efficiency = ((N_soil - N_used) + rate * C[i] / C_per_N)
+      //   efficiency = ((N_soil - N_used) + rate * C[i] / C_per_N[i])
       //     * om.C_per_N / rate * C[i];
       // But we don't
 
-	  // Update the N values.
-      N_produce = C[i] * rate / C_per_N;
-      N_consume = C[i] * rate * efficiency / om.C_per_N;
+      // Update the N values.
+      N_produce = C[i] * rate / C_per_N[i];
+      N_consume = C[i] * rate * efficiency / om.C_per_N[i];
       // Check that we calculated the right rate.
       assert ((N_soil == N_used)
 	      ? (abs (N_consume - N_produce) < 1e-10)
@@ -153,6 +163,11 @@ OM::tock (int i, double rate,
   N_used += (N_consume - N_produce);
   om.C[i] += C[i] * rate * efficiency;
   C[i] *= (1.0 - rate * efficiency);
+
+  // Check for NaN.
+  assert (N_used >= 0.0 || N_used <= 0.0);
+  assert (rate >= 0.0 || rate <= 1.0);
+  assert (efficiency >= 0.0 || efficiency <= 1.0);
 }
 
 bool 
@@ -217,10 +232,17 @@ AOM::check () const
       bool om_ok = true;
       
       non_negative (om[i]->top_C, "top_C", om_ok);
-      non_negative (om[i]->C_per_N, "C_per_N", om_ok);
+
+      for (unsigned int j = 0; j < om[i]->C_per_N.size (); j++)
+	non_negative (om[i]->C_per_N[j], "C_per_N", om_ok, j);
+
       non_negative (om[i]->turnover_rate, "turnover_rate", om_ok);
-      non_negative (om[i]->efficiency, "efficiency", om_ok);
+
+      for (unsigned int j = 0; j < om[i]->efficiency.size (); j++)
+	non_negative (om[i]->efficiency[j], "efficiency", om_ok, j);
+
       non_negative (om[i]->maintenance, "maintenance", om_ok);
+
       if (!om_ok)
 	{
 	  cerr << "in om[" << i << "]\n";
@@ -302,7 +324,9 @@ AOM::create_om (const AttributeList& al)
       
 	  if (om_alist[i]->check ("C_per_N"))
 	    {
-	      const double C_per_N = om_alist[i]->number("C_per_N");
+	      const vector<double> v = om_alist[i]->number_sequence("C_per_N");
+	      assert (v.size () == 1); // BUG: Should check before!
+	      const double C_per_N = v[0];
 	      om_N[i] = om_C[i] / C_per_N;
 	    }
 	  else
@@ -319,7 +343,10 @@ AOM::create_om (const AttributeList& al)
   
   if (missing_fraction != missing_C_per_N)
     {
-      const double C_per_N = om_alist[missing_fraction]->number("C_per_N");
+      const vector<double> v
+	= om_alist[missing_fraction]->number_sequence("C_per_N");
+      assert (v.size () == 1); // BUG: Should check before!
+      const double C_per_N = v[0];
       om_N[missing_fraction] = om_C[missing_fraction] / C_per_N;
     }
   om_N[missing_C_per_N] = N - accumulate (om_N.begin (), om_N.end (), 0.0);
@@ -364,9 +391,11 @@ AOM_init::AOM_init ()
       OM_syntax = new Syntax ();
       OM_syntax->add ("top_C", Syntax::Number, Syntax::Optional);
       OM_syntax->add ("C", Syntax::Number, Syntax::Optional, Syntax::Sequence);
-      OM_syntax->add ("C_per_N", Syntax::Number, Syntax::Optional);
+      OM_syntax->add ("C_per_N", Syntax::Number, Syntax::Optional,
+		      Syntax::Sequence);
       OM_syntax->add ("turnover_rate", Syntax::Number, Syntax::Optional);
-      OM_syntax->add ("efficiency", Syntax::Number, Syntax::Optional);
+      OM_syntax->add ("efficiency", Syntax::Number, Syntax::Optional,
+		      Syntax::Sequence);
       OM_syntax->add ("maintenance", Syntax::Number, Syntax::Optional);
       OM_syntax->add ("fractions", Syntax::Number, Syntax::Const, 
 		      Syntax::Sequence);

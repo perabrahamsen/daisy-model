@@ -21,24 +21,43 @@ Solute::add_to_source (const vector<double>& v)
 {
   assert (S.size () == v.size ());
   for (unsigned i = 0; i < S.size (); i++)
-    S[i] += v[i];
+    {
+      S[i] += v[i];
+      // Check for NaN.
+      assert (S[i] >= 0.0 || S[i] <= 0.0);
+    }
+}
+
+void
+Solute::add_to_sink (const vector<double>& v)
+{
+  assert (S.size () == v.size ());
+  for (unsigned i = 0; i < S.size (); i++)
+    {
+      S[i] -= v[i];
+      // Check for NaN.
+      assert (S[i] >= 0.0 || S[i] <= 0.0);
+    }
 }
 
 void 
 Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 {
-  for (unsigned int i = 0; i < C_.size(); i++)
-    {
-      if (C_[i] == 0.0)
-	assert (M[i] == 0.0);
-      else
-	assert (abs (M[i] / (C_[i] * soil_water.Theta_old (i)) - 1.0) < 0.001);
-    }
-  // Note: q, D, and alpha depth indexes are all [j-1/2].
-  
   // Constants.
   const int size = soil.size (); // Number of soil layers.
-  const double D_l = diffusion_coefficient (); // in free solution [cm^2 / h]
+
+  for (int i = 0; i < size; i++)
+    {
+      assert (C_[i] >= 0.0);
+      assert (M_[i] >= 0.0);
+      if (C_[i] == 0.0)
+	assert (M_[i] == 0.0);
+      else
+	assert (abs (M_[i] / C_to_M (soil, soil_water.Theta_old (i), i, C_[i])
+		     - 1.0) < 0.001);
+    }
+
+  // Note: q, D, and alpha depth indexes are all [j-1/2].
 
   // Dispersion coefficient [cm^2 /s]
   vector<double> D (size + 1);
@@ -57,19 +76,18 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
       // Water flux [cm^3 /cm^2 / h]
       const double q = soil_water.q (j);
       
-      // Porosity []
-      const double n = (soil.Theta (j, 0.0) + soil.Theta (prev, 0.0)) / 2.0;
-
       // Theta middled in time and space.
       const double Theta
 	= (soil_water.Theta (j) + soil_water.Theta (prev)
 	   + soil_water.Theta_old (j) + soil_water.Theta_old (prev)) / 4.0;
 
-      // Tortuosity factor []
-      const double f_l = pow (Theta, 10.0 / 3.0) / (n * n);
-
       // From equation 7-39:
-      D[j] = (lambda * abs (-q / Theta) + D_l * f_l) * Theta;
+      D[j] = (lambda * abs (-q / Theta)
+	      + soil.tortuosity_factor (j, Theta) * diffusion_coefficient ())
+	* Theta;
+      
+      // Check for NaN.
+      assert (D[j] >= 0.0 || D[j] <= 0.0);
     }
   D[size] = D[size-1];
 
@@ -151,6 +169,12 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 		     / (2.0 * dz))
 		  + (q_plus * (alpha_plus * C_[j] + (1.0 - alpha_plus) * C_plus)
 		     / (2.0 * dz)));
+
+	  // Check for NaN.
+	  assert (a[j] >= 0.0 || a[j] <= 0.0);
+	  assert (b[j] >= 0.0 || b[j] <= 0.0);
+	  assert (c[j] >= 0.0 || c[j] <= 0.0);
+	  assert (d[j] >= 0.0 || d[j] <= 0.0);
 	}
       // Adjust for upper boundary condition.
 #if 0
@@ -239,16 +263,17 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
   J[0] = J_in;
   for (int i = 0; i < size; i++)
     {
-      const double M_old = M[i];
-      assert (S[i] == 0.0);
-      M[i] = C_to_M (soil, soil_water, i, C_[i]);
-      J[i + 1] = (((M[i] - M_old) / dt) - S[i]) * soil.dz (i) + J[i];
+      const double M_old = M_[i];
+      assert (C_[i] >= 0.0);
+      M_[i] = C_to_M (soil, soil_water.Theta (i), i, C_[i]);
+      assert (M_[i] >= 0.0);
+      J[i + 1] = (((M_[i] - M_old) / dt) - S[i]) * soil.dz (i) + J[i];
     }
 #ifdef CALCULATE_FLUX_FLOW
   S = Jf;
 #endif
 
-#if 1
+#if 0
   static double t = 0;
 
   if (abs (J[0]) > 0.1e-7)
@@ -283,10 +308,10 @@ Solute::check (unsigned n) const
 	   << " intervals but " << C_.size () << " C values\n";
       ok = false;
     }
-  if (M.size () != n)
+  if (M_.size () != n)
     {
       cerr << "You have " << n 
-	   << " intervals but " << M.size () << " M values\n";
+	   << " intervals but " << M_.size () << " M values\n";
       ok = false;
     }
   return ok;
@@ -296,7 +321,7 @@ void
 Solute::output (Log& log, const Filter& filter) const
 {
   log.output ("C", filter, C_);
-  log.output ("M", filter, M);
+  log.output ("M", filter, M_);
   log.output ("S", filter, S, true);
   log.output ("J", filter, J, true);
   log.output ("ddt", filter, ddt, true);
@@ -320,9 +345,9 @@ void
 Solute::mix (const Soil& soil, const SoilWater& soil_water, 
 	     double amount, double from, double to)
 { 
-  soil.mix (M, amount, from, to);
+  soil.mix (M_, amount, from, to);
   for (unsigned int i = 0; i < C_.size (); i++)
-    C_[i] = M_to_C (soil, soil_water, i, M[i]);
+    C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
 
 void
@@ -338,8 +363,8 @@ Solute::initialize (const Soil& soil, const SoilWater& soil_water,
     }
   if (al.check ("M"))
     {
-      M = al.number_sequence ("M");
-      size = M.size ();
+      M_ = al.number_sequence ("M");
+      size = M_.size ();
     }
   if (size == 0)
     // This is an initialization error.  It will be catched when the
@@ -348,18 +373,19 @@ Solute::initialize (const Soil& soil, const SoilWater& soil_water,
 
   if (!al.check ("C"))
     for (int i = 0; i < size; i++)
-      C_.push_back (M_to_C (soil, soil_water, i, M[i]));
+      C_.push_back (M_to_C (soil, soil_water.Theta (i), i, M_[i]));
 
   if (!al.check ("M"))
     for (int i = 0; i < size; i++)
-      M.push_back (C_to_M (soil, soil_water, i, C_[i]));
+      M_.push_back (C_to_M (soil, soil_water.Theta (i), i, C_[i]));
 
   for (int i = 0; i < size; i++)
     {
       if (C_[i] == 0.0)
-	assert (M[i] == 0.0);
+	assert (M_[i] == 0.0);
       else
-	assert (abs (M[i] / (C_[i] * soil_water.Theta (i)) - 1.0) < 0.001);
+	assert (abs (M_[i] / C_to_M (soil, soil_water.Theta (i), i, C_[i]) 
+		     - 1.0) < 0.001);
     }
   S.insert (S.begin (), size, 0.0);
   J.insert (J.begin (), size + 1, 0.0);

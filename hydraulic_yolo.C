@@ -1,12 +1,12 @@
-// horizon_yolo.C
+// hydraulic_yolo.C
 
-#include "horizon.h"
+#include "hydraulic.h"
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
 #include "csmp.h"
 
-class HorizonYolo : public Horizon
+class HydraulicYolo : public Hydraulic
 {
   int M_intervals;
 
@@ -19,15 +19,15 @@ public:
 
   // Create and Destroy.
 private:
-  friend class HorizonYoloSyntax;
-  static Horizon& make (AttributeList& al);
-  HorizonYolo (const AttributeList&);
+  friend class HydraulicYoloSyntax;
+  static Hydraulic& make (AttributeList& al);
+  HydraulicYolo (const AttributeList&);
 public:
-  virtual ~HorizonYolo ();
+  virtual ~HydraulicYolo ();
 };
 
 double 
-HorizonYolo::Theta (const double h) const
+HydraulicYolo::Theta (const double h) const
 {
   if (h < -1.0)
     return min (0.495, 0.124 + 274.2 / (739.0 + pow (log (-h), 4)));
@@ -36,7 +36,7 @@ HorizonYolo::Theta (const double h) const
 }
 
 double 
-HorizonYolo::K (const double h) const
+HydraulicYolo::K (const double h) const
 {
   if (h < -1.0)
     return 3600 * 1.53e-3 / (124.6 + pow (-h, 1.77));
@@ -45,7 +45,7 @@ HorizonYolo::K (const double h) const
 }
 
 double 
-HorizonYolo::Cw2 (const double h) const
+HydraulicYolo::Cw2 (const double h) const
 {
   if (h < -1.0)
     return - (  (-4 * 274.2 * pow (log (-h), 3))
@@ -55,7 +55,7 @@ HorizonYolo::Cw2 (const double h) const
 }
 
 double 
-HorizonYolo::h (const double Theta) const
+HydraulicYolo::h (const double Theta) const
 {
   if (Theta < 0.495)
     return -exp(sqrt(sqrt(274.2 / (Theta - 0.124) - 739.)));
@@ -64,7 +64,7 @@ HorizonYolo::h (const double Theta) const
 }
 
 double 
-HorizonYolo::M (double h) const
+HydraulicYolo::M (double h) const
 {
   // Use.
   static CSMP csmp;
@@ -77,34 +77,33 @@ HorizonYolo::M (double h) const
   return csmp (h);
 }
 
-HorizonYolo::HorizonYolo (const AttributeList& al)
-  : Horizon (al),
+HydraulicYolo::HydraulicYolo (const AttributeList& al)
+  : Hydraulic (al),
     M_intervals (al.integer ("M_intervals"))
 { }
 
-HorizonYolo::~HorizonYolo ()
+HydraulicYolo::~HydraulicYolo ()
 { }
 
-// Add the HorizonYolo syntax to the syntax table.
+// Add the HydraulicYolo syntax to the syntax table.
 
-Horizon&
-HorizonYolo::make (AttributeList& al)
+Hydraulic&
+HydraulicYolo::make (AttributeList& al)
 {
-  return *new HorizonYolo (al);
+  return *new HydraulicYolo (al);
 }
 
-static struct HorizonYoloSyntax
+static struct HydraulicYoloSyntax
 {
-  HorizonYoloSyntax ();
-} horizonYolo_syntax;
+  HydraulicYoloSyntax ();
+} hydraulicYolo_syntax;
 
-HorizonYoloSyntax::HorizonYoloSyntax ()
+HydraulicYoloSyntax::HydraulicYoloSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  Horizon::load_syntax (syntax, alist);
+  Hydraulic::load_syntax (syntax, alist);
   syntax.add ("M_intervals", Syntax::Integer, Syntax::Const);
   alist.add ("M_intervals", 500);
-  Horizon::add_type ("yolo", alist, syntax, &HorizonYolo::make);
-  alist.add ("lambda", 4.0);
+  Hydraulic::add_type ("yolo", alist, syntax, &HydraulicYolo::make);
 }

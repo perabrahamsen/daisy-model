@@ -38,9 +38,11 @@ const double ActionIrrigate::at_air_temperature;
 void 
 ActionIrrigate::doIt (Daisy& daisy) const
 {
-  const double t = ((temp == at_air_temperature) 
-		    ? daisy.weather.AirTemperature ()
-		    : temp);
+  double t = temp;
+
+  if (temp == at_air_temperature) 
+    t = daisy.weather.AirTemperature ();
+  
   ColumnList& cl = daisy.columns;
   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
     {

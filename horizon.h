@@ -8,26 +8,33 @@
 struct AttributeList;
 struct Library;
 struct Syntax;
-struct CSMP;
+struct Hydraulic;
 
 class Horizon 
 {
-  // Public parameters.
+  // Content.
+private:
+  struct Implementation;
+  Implementation& impl;
 public:
-  const double lambda;
+  double clay () const;
 
-  // Use.
+  // Water.
 public:
-  virtual double Theta (double h) const = 0;
-  virtual double Theta_res () const;
-  virtual double K (double h) const = 0;
-  virtual double Cw2 (double h) const = 0;
-  virtual double h (double Theta) const = 0;
-  virtual double M (double h) const = 0;
-  virtual bool compact () const;
-
-  // Tools for derived classes.
-  void K_to_M (CSMP&, int) const;
+  const Hydraulic& hydraulic;
+  double heat_conductivity (double Theta, double Ice) const;
+  double heat_capacity (double Theta, double Ice) const;
+  
+  // Texture.
+public:
+  virtual double tortuosity_factor (double Theta) const;
+  
+  // Absorbtion.
+public:
+  double K_planar () const;	// Half saturation constant [ g / cm^3 ]
+  double K_edge () const;	// Same for edges.
+  double v_planar () const;
+  double v_edge () const;
 
   // Library.
 public:
@@ -41,11 +48,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-protected:
   Horizon (const AttributeList&);
-private:
-  Horizon () { };
-public:
   virtual ~Horizon ();
 };
 

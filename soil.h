@@ -4,6 +4,7 @@
 #define SOIL_H
 
 #include "horizon.h"
+#include "hydraulic.h"
 #include <vector>
 
 struct AttributeList;
@@ -31,26 +32,48 @@ public:
   int interval_plus (double z) const;
   int interval (double z) const;
 
-  // Horizons.
+  // Water.
   inline double K (int i, double h) const
-  { return horizon_[i]->K (h); }
+  { return horizon_[i]->hydraulic.K (h); }
   inline double Cw1 (int i, double h) const
   { return Theta (i, h) - Cw2 (i, h) * h; }
   inline double Cw2 (int i, double h) const
-  { return horizon_[i]->Cw2 (h); }
+  { return horizon_[i]->hydraulic.Cw2 (h); }
   inline double Theta (int i, double h) const
-  { return horizon_[i]->Theta (h); }
+  { return horizon_[i]->hydraulic.Theta (h); }
   inline double Theta_res (int i) const
-  { return horizon_[i]->Theta_res (); }
+  { return horizon_[i]->hydraulic.Theta_res; }
   inline double h (int i, double h) const
-  { return horizon_[i]->h (h); }
+  { return horizon_[i]->hydraulic.h (h); }
   inline double M (int i, double h) const
-  { return horizon_[i]->M (h); }
+  { return horizon_[i]->hydraulic.M (h); }
   inline bool compact (int i) const
-  { return horizon_[i]->compact (); }
+  { return horizon_[i]->hydraulic.compact (); }
   inline double lambda (int i) const
-  { return horizon_[i]->lambda; }
+  { return horizon_[i]->hydraulic.lambda; }
   
+  // Absorbtion.
+  inline double v_planar (int i) const
+  { return horizon_[i]->v_planar (); }
+  inline double v_edge (int i) const
+  { return horizon_[i]->v_edge (); }
+  inline double K_planar (int i) const
+  { return horizon_[i]->v_planar (); }
+  inline double K_edge (int i) const
+  { return horizon_[i]->v_edge (); }
+  double tortuosity_factor (int i, double Theta) const
+  { return horizon_[i]->tortuosity_factor (Theta); }
+
+  // Thermic.
+  double heat_conductivity (int i, double Theta, double Ice = 0.0) const
+  { return horizon_[i]->heat_conductivity (Theta, Ice); }
+  double heat_capacity (int i, double Theta, double Ice = 0.0) const
+  { return horizon_[i]->heat_capacity (Theta, Ice); }
+  
+  // Content.
+  inline double clay (int i) const
+  { return horizon_[i]->clay (); }
+
   // Calculations.
   double MaxRootingDepth () const;
   double EpFactor () const;

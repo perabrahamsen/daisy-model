@@ -97,11 +97,13 @@ Soil::mix (vector<double>& v, double amount, double from, double to) const
 void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  Syntax& layer = *new Syntax ();
-  layer.add ("end", Syntax::Number, Syntax::Const);
-  layer.add ("horizon", Horizon::library (), Syntax::State);
-  layer.order ("end", "horizon");
-  syntax.add ("horizons", layer, Syntax::State, Syntax::Sequence);
+  Syntax& layer_syntax = *new Syntax ();
+  AttributeList& layer_alist = *new AttributeList ();
+  layer_syntax.add ("end", Syntax::Number, Syntax::Const);
+  layer_syntax.add ("horizon", Horizon::library (), Syntax::State);
+  layer_syntax.order ("end", "horizon");
+  syntax.add ("horizons", layer_syntax, Syntax::State, Syntax::Sequence);
+  alist.add ("horizons", layer_alist);
   syntax.add ("zplus", Syntax::Number, Syntax::Const, Syntax::Sequence);
   syntax.add ("EpFactor", Syntax::Number, Syntax::Const);
   alist.add ("EpFactor", 0.8);

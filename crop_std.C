@@ -15,7 +15,8 @@
 #include "soil_water.h"
 #include "soil.h"
 #include "soil_heat.h"
-
+#include "soil_NH4.h"
+#include "soil_NO3.h"
 #include <list>
 
 class CropStandard : public Crop
@@ -45,7 +46,11 @@ public:
 protected:
   double PotentialWaterUptake (const double h, 
 			       const Soil& soil, const SoilWater& soil_water);
-  double SoluteUptake (string /* SoluteID */, double /* PotNUpt */,
+  double SoluteUptake (const Soil&,
+		       const SoilWater&,
+		       Solute&,
+		       double /* PotNUpt */,
+		       vector<double>& uptake,
 		       double /* I_Mx */, double /* Rad */);
 
 public:				// Used by external development models.
@@ -60,7 +65,11 @@ protected:
   double RootDensDistPar (double a);
   void RootDensity (const Soil& soil);
   void NitContent ();
-  void NitrogenUptake (int Hour);
+  void NitrogenUptake (int Hour, 
+		       const Soil& soil,
+		       const SoilWater& soil_water,
+		       SoilNH4& soil_NH4,
+		       SoilNO3& soil_NO3);
   // Sugar production [gCH2O/m2/h] by canopy photosynthesis.
   double CanopyPhotosynthesis (const Bioclimate&);
   void AssimilatePartitioning (double DS, 
@@ -72,7 +81,11 @@ protected:
 
   // Simulation.
 public:
-  void tick (const Time& time, const Bioclimate&, const Soil&, const SoilHeat&);
+  void tick (const Time& time, const Bioclimate&, const Soil&,
+	     const SoilHeat&,
+	     const SoilWater&, 
+	     SoilNH4&,
+	     SoilNO3&);
   void output (Log&, const Filter&) const;
 
   // Create and Destroy.
@@ -866,7 +879,7 @@ CropStandardSyntax::CropStandardSyntax ()
   CrpAux.add ("NO3Upt", Syntax::Number, Syntax::State);
   vCrpAux.add ("NO3Upt", 0.0);
 
-  Crop::add_type ("crop", alist, syntax, &CropStandard::make);
+  Crop::add_type ("default", alist, syntax, &CropStandard::make);
 }
 
 double
@@ -918,11 +931,69 @@ CropStandard::EpFac () const
 }
 
 double
-CropStandard::SoluteUptake (string /* SoluteID */, double PotNUpt,
-		    double /* I_Mx */, double /* Rad */)
+CropStandard::SoluteUptake (const Soil& soil,
+			    const SoilWater& soil_water,
+			    Solute& solute,
+			    double PotNUpt,
+			    vector<double>& uptake,
+			    double I_max, double r_root)
 {
-  // const Variables::RecRootSys& RootSys = var.RootSys;
+  const vector<double>& root_density = var.RootSys.Density;
+  const vector<double>& S = var.RootSys.H2OExtraction;
+  const int size = soil.size ();
+  vector<double> I_zero (size, 0.0);
+  vector<double> B_zero (size, 0.0);
+  double U_zero = 0.0;
+  double B = 0.0;
+  double c_root = 0.0;
 
+  for (int i = 0; i < size; i++)
+    {
+      const double C_l = solute.C (i);
+      const double Theta = soil_water.Theta_old (i);
+      const double L = root_density[i];
+      const double q_r = S[i] / L;
+      const double D = solute.diffusion_coefficient ()
+	* soil.tortuosity_factor (i, Theta)
+	* Theta;
+      const double alpha = q_r / ( 2 * M_PI * D);
+      const double beta = 1.0 / (r_root * sqrt (M_PI * L));
+      const double beta_squared = beta * beta;
+      if (alpha == 0.0)
+	{
+	  B_zero[i] = 4.0 * M_PI * D 
+	    / (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);
+	  I_zero[i] = B_zero[i] * C_l;
+	}
+      else if (alpha == 2.0)
+	{
+	  B_zero[i] = q_r * log (beta_squared) 
+	    / ((beta_squared - 1.0) - log (beta_squared));
+	  I_zero[i] = q_r * (beta_squared - 1.0) * C_l 
+	    / ((beta_squared - 1.0) - log (beta_squared));
+	}
+      else
+	{
+	  B_zero[i] = q_r * (pow (beta, 2.0 - alpha) - 1.0)
+	    / ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
+	       - (pow (beta, 2.0 - alpha) - 1.0));
+	  I_zero[i] = q_r * (beta_squared - 1.0) * (1.0 - 0.5 * alpha) * C_l
+	    / ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
+	       - (pow (beta, 2.0 - alpha) - 1.0));
+	}
+      B += B_zero[i];
+      U_zero += L * soil.dz (i) * min (I_zero[i], I_max);
+    }
+  if (U_zero > PotNUpt)
+    c_root = (U_zero - PotNUpt) / B;
+
+  for (int i = 0; i < size; i++)
+    {
+      const double L = root_density[i];
+      uptake[i] = min (L * (min (I_zero[i], I_max) - B_zero[i] * c_root),
+		       solute.M_left (i));
+    }
+  solute.add_to_sink (uptake);
   return PotNUpt;
 }
 
@@ -947,7 +1018,7 @@ CropStandard::Emergence (const Soil& soil, const SoilHeat& soil_heat)
   const double EmrDpt = par.Root.DptEmr;
   double& DS = var.Phenology.DS;
 
-  DS += soil_heat.temperature (soil.interval_plus (-EmrDpt)) / Devel.EmrTSum;
+  DS += soil_heat.T (soil.interval_plus (-EmrDpt)) / Devel.EmrTSum;
   if (DS > 0)
     DS = Devel.DS_Emr;
 }
@@ -1251,7 +1322,7 @@ CropStandard::RootPenetration (const Soil& soil, const SoilHeat& soil_heat)
   if (IncWRoot <= 0)
     return;
 
-  double Ts = soil_heat.temperature (soil.interval_plus (-Depth));
+  double Ts = soil_heat.T (soil.interval_plus (-Depth));
   double dp = Root.PenPar1 * max (0.0, Ts - Root.PenPar2);
   PotRtDpt = min (PotRtDpt + dp, Root.MaxPen);
   /*max depth determined by crop*/
@@ -1372,26 +1443,24 @@ CropStandard::NitContent ()
   CrNCnt = NLeaf + NStem + NSOrg + NRoot;
 }
 
-void 
-CropStandard::NitrogenUptake (int Hour)
+void
+CropStandard::NitrogenUptake (int Hour, 
+			      const Soil& soil,
+			      const SoilWater& soil_water,
+			      SoilNH4& soil_NH4,
+			      SoilNO3& soil_NO3)
 {
   const Parameters::RootPar& Root = par.Root;
-  Variables::RecRootSys& RootSys = var.RootSys;
   Variables::RecCrpAux& CrpAux = var.CrpAux;
   double& NCrop = var.Prod.NCrop;
+  Variables::RecRootSys& RootSys = var.RootSys;
 
   double PotNUpt = (CrpAux.PtNCnt - NCrop) / ((Hour == 0) ? 1 : (25 - Hour));
-  RootSys.NH4Extraction.reserve (20);
-  RootSys.NO3Extraction.reserve (20);
-  for (int i = 0; i <= 19; i++)
-    {
-      RootSys.NH4Extraction[i] = 0.0;
-      RootSys.NO3Extraction[i] = 0.0;
-    }
   if (PotNUpt > 0)
     {
       CrpAux.NH4Upt
-	= SoluteUptake ("NH4", PotNUpt, Root.MxNH4Up, Root.Rad);
+	= SoluteUptake (soil, soil_water, soil_NH4, PotNUpt, 
+			RootSys.NH4Extraction, Root.MxNH4Up, Root.Rad);
       NCrop += CrpAux.NH4Upt;
       PotNUpt -= CrpAux.NH4Upt;
     }
@@ -1400,7 +1469,8 @@ CropStandard::NitrogenUptake (int Hour)
   if (PotNUpt > 0)
     {
       CrpAux.NO3Upt
-	= SoluteUptake ("NO3", PotNUpt, Root.MxNO3Up, Root.Rad); 
+	= SoluteUptake (soil, soil_water, soil_NO3, PotNUpt,
+			RootSys.NO3Extraction, Root.MxNO3Up, Root.Rad); 
       NCrop += CrpAux.NO3Upt;
     }
   else
@@ -1489,7 +1559,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
     = MaintenanceRespiration (Resp.r_Stem, Resp.Q10, Prod.WStem, T);
   double RMSOrg
     = MaintenanceRespiration (Resp.r_SOrg, Resp.Q10, Prod.WSOrg, T);
-  T = soil_heat.temperature (soil.interval_plus (-Depth / 3));
+  T = soil_heat.T (soil.interval_plus (-Depth / 3));
   double RMRoot
     = MaintenanceRespiration (Resp.r_Root, Resp.Q10, Prod.WRoot, T);
   RMLeaf = max (0.0, RMLeaf - CrpAux.PotCanopyAss + CrpAux.CanopyAss);
@@ -1560,8 +1630,13 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 }
 
 void 
-CropStandard::tick (const Time& time, const Bioclimate& bioclimate,
-		    const Soil& soil, const SoilHeat& soil_heat)
+CropStandard::tick (const Time& time,
+		    const Bioclimate& bioclimate,
+		    const Soil& soil,
+		    const SoilHeat& soil_heat,
+		    const SoilWater& soil_water, 
+		    SoilNH4& soil_NH4,
+		    SoilNO3& soil_NO3)
 {
   if (time.hour () == 0 && var.Phenology.DS <= 0)
     {
@@ -1580,7 +1655,8 @@ CropStandard::tick (const Time& time, const Bioclimate& bioclimate,
   if (var.Phenology.DS <= 0 || var.Phenology.DS >= 2)
     return;
   const double water_stress = var.RootSys.water_stress;
-  NitrogenUptake (time.hour ());
+  NitrogenUptake (time.hour (), 
+		  soil, soil_water, soil_NH4,soil_NO3);
   if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
     {
       double Ass = CanopyPhotosynthesis (bioclimate);

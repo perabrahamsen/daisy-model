@@ -9,6 +9,9 @@ struct Bioclimate;
 struct Syntax;
 struct Log;
 struct Filter;
+struct Soil;
+struct SoilWater;
+struct SoilHeat;
 
 class Snow
 { 
@@ -17,8 +20,9 @@ class Snow
 
   // Simulation.
 public:
-  void tick (double Si, double q_h, double Prain,
-	     double Psnow, double Tair, double Epot);
+  void tick (const Soil&, const SoilWater&, const SoilHeat&,
+	     double Si, double q_h, double Prain,
+	     double Psnow, double& T, double Epot);
   void output (Log&, const Filter&) const;
   double percolation ();
   double temperature ();

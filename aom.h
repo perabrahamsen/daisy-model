@@ -17,13 +17,14 @@ class Soil;
 class Time;
 class OrganicMatter;
 
-struct OM  { 
+struct OM
+{ 
   // Content.
   double top_C;			// Carbon on the ground.
   vector<double> C;		// Carbon in each node.
-  const double C_per_N;	// Ratio of carbon per nitrogen.
+  /* const */ vector<double> C_per_N;	// Ratio of carbon per nitrogen.
   const double turnover_rate;	// How fast this is it turned over?
-  const double efficiency;	// How digestible is this?
+  const vector <double> efficiency;	// How digestible is this?
   const double maintenance;	// How fast does it eat itself?
   const vector<double> fractions;	// How much is turned into SMB and SOM?
 
@@ -35,7 +36,8 @@ struct OM  {
   void tick (int i, double turnover_factor, double N_soil, double& N_used,
 	     double& CO2, const vector<OM*>& smb, double& som_C,double& som_N);
 private:
-  void tock (int i, double rate, double N_soil, double& N_used,
+  void tock (int i, double rate, double efficiency, 
+	     double N_soil, double& N_used,
 	     double& CO2, OM& om);
   
   // Create & Destroy.

@@ -5,6 +5,9 @@
 #include "syntax.h"
 #include "log.h"
 #include "filter.h"
+#include "soil.h"
+#include "soil_water.h"
+#include "soil_heat.h"
 
 struct Snow::Implementation
 { 
@@ -17,7 +20,6 @@ struct Snow::Implementation
   double Swater;		// Water in snow storage [mm]
   double age;			// Age since last snow [h]
   double dZs;			// Depth of snow layer [m]
-  double T;			// Temperature [C]
 
   // Parameters.
   const double mf;		// Snow pack depth melting factor [1/m]
@@ -34,9 +36,13 @@ struct Snow::Implementation
 				// for snow to become new.
   const double fsa;		// Relative amount of snow required
 				// for snow to become new.
-  
-  void tick (double Si, double q_h, double Prain,
-	     double Psnow, double Tair, double Epot);
+  const double K_snow_factor;	// Factor related to termal conductivity
+				// for snow water mix [W m^4 / Kg^2]
+
+  void tick (const Soil& soil, const SoilWater& soil_water,
+	     const SoilHeat& soil_heat,
+	     double Si, double q_h, double Prain,
+	     double Psnow, double& T, double Epot);
   Implementation (const AttributeList& al);
 };
 
@@ -57,19 +63,22 @@ Snow::Implementation::Implementation (const AttributeList& al)
     rho_1 (al.number ("rho_1")),
     rho_2 (al.number ("rho_2")),
     Psa (al.number ("Psa")),
-    fsa (al.number ("fsa"))
+    fsa (al.number ("fsa")),
+    K_snow_factor (al.number ("K_snow_factor"))
 { }
 
 void
-Snow::Implementation::tick (const double Si, const double q_h,
+Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
+			    const SoilHeat& soil_heat,
+			    const double Si, const double q_h,
 			    const double Prain, const double Psnow,
-			    const double Tair, const double Epot)
+			    double& T, const double Epot)
 { 
   assert (Si >= 0.0);
   assert (Prain >= 0.0);
   assert (Psnow >= 0.0);
   assert (Epot >= 0.0);
-  assert (Tair > -374 && Tair <= 100);
+  assert (T > -374 && T <= 100);
 
   static const double dt = 1.0; // Time step [h].
   static const double f = 1.0;	// Melting factor. [mm H2O / (kg H2O / m^2)]
@@ -110,13 +119,13 @@ Snow::Implementation::tick (const double Si, const double q_h,
   assert (dZp >= 0.0);
 
   // Air temperature melting factor. [kg/J]
-  const double mt = mtprime * ((Tair < 0.0) ? min (1.0, (dZs + dZp) * mf) : 1);
+  const double mt = mtprime * ((T < 0.0) ? min (1.0, (dZs + dZp) * mf) : 1);
   
   // Radiation melting factor. [kg/J]
   const double mr = mrprime * (1 + m1 * (1 - exp (-m2 * age)));
 
   // Potential snow melting. [mm/h]
-  const double Mprime = (mt * Tair + mr * Si + q_h / Lm) * f;
+  const double Mprime = (mt * T + mr * Si + q_h / Lm) * f;
 
   // Minimal possible melting (all water freezes). [mm/h]
   const double M1 = - (Swater/dt + Prain);
@@ -189,20 +198,40 @@ Snow::Implementation::tick (const double Si, const double q_h,
     age++;
 
   // Update temperature.
-  T = Tair;			// BUG: This *must* be wrong. Ask SH.
+  if (q_s > 1e-20)
+    // There is water leaking through the snow pack.  
+    // Assume it is 0 degrees.
+    T = 0.0;
+  else
+    {
+      // Information about soil.
+      const double Theta = soil_water.Theta (0);
+      const double K_soil = soil.K (0, Theta);
+      const double Z = soil.z (0);
+      const double T_soil = soil_heat.T (0);
+
+      // dk.vægtfylde and conductivity of snowpack.
+      const double rho = rho_w * Ssnow / dZs; // Bug?
+      const double K_snow = K_snow_factor * rho * rho;
+      
+      T = min ((K_soil / Z * T_soil + K_snow / dZs * T) 
+	       / (K_soil / Z + K_snow / dZs),	       
+	       0.0);
+    } 
 }
   
 void 
-Snow::tick (double Si, double q_h, double Prain,
-	    double Psnow, double Tair, double Epot)
+Snow::tick (const Soil& soil, const SoilWater& soil_water,
+	    const SoilHeat& soil_heat,
+	    double Si, double q_h, double Prain,
+	    double Psnow, double& T, double Epot)
 {
   if (impl.Ssnow > 0.0 || Psnow > 0.0)
-    impl.tick (Si, q_h, Prain, Psnow, Tair, Epot);
+    impl.tick (soil, soil_water, soil_heat, Si, q_h, Prain, Psnow, T, Epot);
   else
     {
       impl.EvapSnowPack = 0.0;
       impl.q_s = Prain;
-      impl.T = Tair;
     }
 }
 
@@ -215,22 +244,12 @@ Snow::output (Log& log, const Filter& filter) const
   log.output ("Swater", filter, impl.Swater);
   log.output ("age", filter, impl.age);
   log.output ("dZs", filter, impl.dZs);
-  log.output ("T", filter, impl.T);
 }
 
 double 
 Snow::percolation ()
 {
   return impl.q_s;
-}
-
-double 
-Snow::temperature ()
-{
-  if (impl.Ssnow > 1.0e-6)
-    return 0.0;
-  else
-    return impl.T;
 }
 
 double 
@@ -276,6 +295,8 @@ Snow::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("Psa", 200.0);
   syntax.add ("fsa", Syntax::Number, Syntax::Const);
   alist.add ("fsa", 0.5);
+  syntax.add ("K_snow_factor", Syntax::Number, Syntax::Const);
+  alist.add ("K_snow_factor", 2.86e6);
 }
   
 Snow::Snow (const AttributeList& al)

@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include "common.h"
 
 struct Log;
 struct Filter;
@@ -16,14 +17,15 @@ struct SoilWater;
 class Solute
 {
   // Content.
-protected:
   // State variables.
-  vector<double> M;		// Concentration in soil [g / cm^3]
+private:
+  vector<double> M_;		// Concentration in soil [g / cm^3]
   vector<double> C_;		// Concentration in soil solution [g / cm^3]
 
   // Flux variables.
-  vector<double> S;		// Sink-source term [kg / m^3 / s]
-  vector<double> J;		// Flux density [kg / m^2 / s]
+protected:
+  vector<double> S;		// Sink-source term 
+  vector<double> J;		// Flux density 
 
   // FYI variables.
   double ddt;			// Calculated time step.
@@ -31,22 +33,29 @@ protected:
   // Substance specific constants.
   virtual double beta (const Soil&, const SoilWater&,
 		       int i, double C) const = 0; // dA/dC
-  virtual double diffusion_coefficient () const = 0; // in free solu. [m^2 / s]
-  virtual double C_to_M (const Soil&, const SoilWater&,
-			 int i, double C) const = 0;
-  virtual double M_to_C (const Soil&, const SoilWater&,
-			 int i, double M) const = 0;
+public:
+  virtual double diffusion_coefficient () const = 0; // in free solu. 
+protected:
+  virtual double C_to_M (const Soil&, double Theta, int i, double C) const = 0;
+  virtual double M_to_C (const Soil&, double Theta, int i, double M) const = 0;
 
 public:
-  double C (int i)
+  double M (int i) const
+  { return M_[i]; }
+  double C (int i) const
   { return C_[i]; }
+  double M_left (int i) const
+  { return M_[i] + S[i] * dt; }
 
   // Sink.
 public:
   void clear ();
   void add_to_source (const vector<double>&);
+  void add_to_sink (const vector<double>&);
 
   // Simulation.
+protected:
+  
 public:
   void tick (const Soil&, const SoilWater&, double J_in);
   bool check (unsigned n) const;

@@ -28,7 +28,7 @@ private:
 public:
   void WaterDistribution (Surface& surface, const Weather& weather, 
 			  const CropList& crops, const Soil& soil, 
-			  SoilWater& soil_water);
+			  SoilWater& soil_water, const SoilHeat&);
   // Weather.
 public:
   double temperature;		// Air temperature in canopy.
@@ -147,7 +147,8 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
 					       const Weather& weather, 
 					       const CropList& crops,
 					       const Soil& soil, 
-					       SoilWater& soil_water)
+					       SoilWater& soil_water,
+					       const SoilHeat& soil_heat)
 {
   static const double dt = 1.0;
 
@@ -206,11 +207,12 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
   if (Total_through_fall > 0.0)
     temperature 
       = (Through_fall * weather.AirTemperature ()
-	 + irrigation * irrigation_temperature) / Total_through_fall;
+	 + irrigation * irrigation_temperature) / (Through_fall + irrigation);
   else
     temperature = weather.AirTemperature ();
 
-  snow.tick (weather.GlobalRadiation (), 0.0,
+  snow.tick (soil, soil_water, soil_heat, 
+	     weather.GlobalRadiation (), 0.0,
 	     Total_through_fall, weather.Snow (),
 	     temperature, 
 	     PotSoilEvaporation + PotCanopyEvapotranspiration);
@@ -225,7 +227,8 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
     }
   PotSoilEvaporation -= 
     surface.evaporation (PotSoilEvaporation, 
-			 snow.percolation (),
+			 snow.percolation (), 
+			 temperature,
 			 soil, soil_water);
 
   PotCanopyEvapotranspiration += PotSoilEvaporation * soil.EpInterchange ();
@@ -251,7 +254,7 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
 void 
 Bioclimate::tick (Surface& surface, const Weather& weather, 
 		  const CropList& crops, const Soil& soil, 
-		  SoilWater& soil_water)
+		  SoilWater& soil_water, const SoilHeat& soil_heat)
 {
   // Keep weather information during time step.
   impl.temperature = weather.AirTemperature ();
@@ -261,7 +264,8 @@ Bioclimate::tick (Surface& surface, const Weather& weather,
   impl.RadiationDistribution (weather, crops);
 
   // Distribute water among canopy, snow, and soil.
-  impl.WaterDistribution (surface, weather, crops, soil, soil_water);
+  impl.WaterDistribution (surface, weather, crops,
+			  soil, soil_water, soil_heat);
 
 }
 

@@ -291,11 +291,14 @@ check (const AttributeList& al, string s, bool& ok)
 }
 
 void
-non_negative (double v, string s, bool& ok)
+non_negative (double v, string s, bool& ok, int index)
 {
   if (v < 0.0)
     {
-      cerr << "Negative " << s << "\n";
+      cerr << "Negative " << s;
+      if (index >= 0)
+	cerr << "[" << index << "]";
+      cerr << "\n";
       ok = false;
     }
 }

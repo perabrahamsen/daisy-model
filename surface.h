@@ -18,6 +18,7 @@ class Surface : public UZtop
   bool flux;
   double EvapSoilSurface;
   double Eps;
+  double T;
   vector <const AOM*> am;
   InorganicMatter im;
   InorganicMatter im_flux;
@@ -31,19 +32,22 @@ public:
   void flux_top_off ();
   bool accept_top (double);
   double ponding() const;
+  double temperature () const;
 
-  void clear ();
   const InorganicMatter& matter_flux ();
 
   void SoilSurfaceConditions (double Theta, double h);
 
+  void clear ();
+
+  // Manager.
   void fertilize (const AOM&);
   void fertilize (const InorganicMatter&);
 
   void output (Log&, const Filter&) const;
 
   // Communication with bioclimate.
-  double evaporation (double PotSoilEvaporation, double Water, 
+  double evaporation (double PotSoilEvaporation, double Water, double temp,
 		      const Soil&, const SoilWater&);
 
   // Create.

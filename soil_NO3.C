@@ -16,17 +16,15 @@ SoilNO3::diffusion_coefficient () const
 }
 
 double 
-SoilNO3::C_to_M (const Soil&, const SoilWater& soil_water,
-		 int i, double C) const
+SoilNO3::C_to_M (const Soil&, double Theta, int, double C) const
 {
-  return C * soil_water.Theta (i);
+  return C * Theta;
 }
 
 double 
-SoilNO3::M_to_C (const Soil&, const SoilWater& soil_water,
-		 int i, double M) const
+SoilNO3::M_to_C (const Soil&, double Theta, int, double M) const
 {
-  return M / soil_water.Theta (i);
+  return M / Theta;
 }
 
 void

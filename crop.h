@@ -18,6 +18,8 @@ struct Syntax;
 struct SoilWater;
 struct Soil;
 struct SoilHeat;
+struct SoilNH4;
+struct SoilNO3;
 
 class Crop 
 {
@@ -41,7 +43,9 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Time& time, const Bioclimate&, const Soil&, const SoilHeat&) = 0;
+  virtual void tick (const Time& time, const Bioclimate&, const Soil&,
+		     const SoilHeat&, const SoilWater&,
+		     SoilNH4&, SoilNO3&) = 0;
   virtual void output (Log&, const Filter&) const = 0;
 
   // Library.

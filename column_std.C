@@ -93,6 +93,7 @@ void
 ColumnStandard::fertilize (AOM& aom, 
 			   double from, double to)
 {
+  aom.initialize (soil);
   if (to < from)
     aom.mix (soil, from, to);
   organic_matter.add (aom);
@@ -169,18 +170,27 @@ void
 ColumnStandard::tick (const Time& time, 
 		      const Weather& weather, Groundwater& groundwater)
 {
+  // Remove old source sink terms. 
   soil_water.clear ();
   soil_NO3.clear ();
   soil_NH4.clear ();
   surface.clear ();
-  bioclimate.tick (surface, weather, crops, soil, soil_water);
-  soil_heat.tick (surface, bioclimate);
-  soil_water.tick (surface, groundwater, soil);
+  
+  bioclimate.tick (surface, weather, crops, soil, soil_water, soil_heat);
+
+  // Uptake and convertion of matter.
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
-    (*crop)->tick (time, bioclimate, soil, soil_heat);
+    (*crop)->tick (time, bioclimate, soil, soil_heat, soil_water, 
+		   soil_NH4, soil_NO3);
+  organic_matter.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
+  nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
+  denitrification.tick (soil, soil_water, soil_heat, soil_NO3, organic_matter);
+
+  // Transport.
+  soil_water.tick (surface, groundwater, soil);
+  soil_heat.tick (time, soil, soil_water, surface, groundwater);
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().im.NO3);
   soil_NH4.tick (soil, soil_water, surface.matter_flux ().im.NH4);
-  organic_matter.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
 }
 
 void
@@ -193,9 +203,7 @@ ColumnStandard::output (Log& log, const Filter& filter) const
   output_submodule (soil, "Soil", log, filter);
 #endif
   output_submodule (soil_water, "SoilWater", log, filter);
-#if 0
   output_submodule (soil_heat, "SoilHeat", log, filter);
-#endif
   output_submodule (soil_NH4, "SoilNH4", log, filter);
   output_submodule (soil_NO3, "SoilNO3", log, filter);
   output_submodule (organic_matter, "OrganicMatter", log, filter);
@@ -260,5 +268,5 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
   add_submodule<Nitrification> ("Nitrification", syntax, alist);
   add_submodule<Denitrification> ("Denitrification", syntax, alist);
 
-  Column::add_type ("column", alist, syntax, &ColumnStandard::make);
+  Column::add_type ("default", alist, syntax, &ColumnStandard::make);
 }

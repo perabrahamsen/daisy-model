@@ -48,6 +48,48 @@ tridia (int from,
     }
 }
 
+double
+single_positive_root_of_cubic_equation 
+(double a, double b, double c, double d)
+{
+  const double p = 1.0 / 3.0 * ( - 1.0/3.0 * pow (b / a, 2) + c / a);
+  const double q = 1.0 / 2.0 * ( 2.0 / 27.0 * pow (b / a, 3)
+				 - 1.0/3.0 * b * c / pow (a, 2)
+				 + d / a);
+  const double r = pow (q, 2) + pow (p, 3);
+  
+  if (r >= 0)
+    return cbrt (-q + sqrt (r)) + cbrt (-q - sqrt (r)) - b / (3 * a);
+  else
+    {
+      const double psi = acos ( -q  / sqrt (pow (-p, 3)));
+
+      const double y1 = 2 * sqrt (-p)
+	* cos (psi / 3.0) - b / (3 * a);
+      const double y2 = - 2 * sqrt (-p)
+	* cos (psi / 3.0 + M_PI / 3.0) - b / (3 * a);
+      const double y3 = - 2 * sqrt (-p)
+	* cos (psi / 3.0 - M_PI / 3.0) - b / (3 * a);
+      
+      if (y1 >= 0)
+	{
+	  assert (y2 < 0 && y3 < 0);
+	  return y1;
+	}
+      if (y2 >= 0)
+	{
+	  assert (y3 < 0);
+	  return y2;
+	}
+      if (y3 >= 0)
+	return y3;
+      
+      
+      assert (y3 >= 0);
+      return y3;
+    }
+}
+
 extern "C" int matherr () 
 {
   abort ();

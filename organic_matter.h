@@ -26,6 +26,8 @@ public:
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     SoilNO3&, SoilNH4&);
   void output (Log& log, const Filter& filter) const;
+  double CO2 (int i) const;
+
   static bool check (const AttributeList&);
   bool check () const;
   bool check_am (const AttributeList& am) const;

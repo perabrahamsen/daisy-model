@@ -71,6 +71,12 @@ Surface::ponding () const
     return lake;
 }
 
+double
+Surface::temperature () const
+{
+  return T;
+}
+
 void
 Surface::clear ()
 {
@@ -84,7 +90,7 @@ Surface::matter_flux ()
 }
 
 double
-Surface::evaporation (double PotSoilEvaporation, double water, 
+Surface::evaporation (double PotSoilEvaporation, double water, double temp,
 		      const Soil& soil, const SoilWater& soil_water)
 {
   static const double dt = 1.0; // Time step [h].
@@ -99,6 +105,11 @@ Surface::evaporation (double PotSoilEvaporation, double water,
     EvapSoilSurface = pond / dt + water + MaxExfiltration;
   else
     EvapSoilSurface = Eps;
+
+  if (pond < 1e-6)
+    T = temp;
+  else
+    T = (T * pond + temp * water * dt) / (pond + water * dt);
 
   pond = pond - EvapSoilSurface * dt + water * dt;
   return EvapSoilSurface;
@@ -139,6 +150,7 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("flux", true);
   syntax.add ("EvapSoilSurface", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Eps", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("T", Syntax::Number, Syntax::LogOnly);
   syntax.add ("am", AOM::library (), Syntax::State, Syntax::Sequence);
   alist.add ("am", *new vector<const AttributeList*> ());
   add_submodule<InorganicMatter> ("InorganicMatter", syntax, alist);
@@ -151,6 +163,7 @@ Surface::Surface (const AttributeList& al)
     flux (al.flag ("flux")),
     EvapSoilSurface (0.0),
     Eps (0.0),
+    T (0.0),
     am (map_construct_const <AOM> (al.list_sequence ("am"))),
     im (al.list ("InorganicMatter")),
     im_flux ()

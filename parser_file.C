@@ -363,7 +363,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	    break;
 	  case Syntax::Boolean:
 	    {
-	      string flag = get_id ();
+	      const string flag = get_id ();
 
 	      if (flag == "true")
 		atts.add (name, true);

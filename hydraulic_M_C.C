@@ -1,16 +1,15 @@
-// horizon_B_C.C
+// hydraulic_M_C.C
 //
-// Campbell retention curve model with Burdine theory.
+// Campbell retention curve model with Mualem theory.
 
-#include "horizon.h"
+#include "hydraulic.h"
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
 
-class HorizonB_C : public Horizon
+class HydraulicM_C : public Hydraulic
 {
   // Content.
-  const double Theta_sat;
   const double h_b;
   const double b;
   const double K_sat;
@@ -27,27 +26,27 @@ private:
   
   // Create and Destroy.
 private:
-  friend class HorizonB_CSyntax;
-  static Horizon& make (AttributeList& al);
-  HorizonB_C (const AttributeList&);
+  friend class HydraulicM_CSyntax;
+  static Hydraulic& make (AttributeList& al);
+  HydraulicM_C (const AttributeList&);
 public:
-  ~HorizonB_C ();
+  ~HydraulicM_C ();
 };
 
 double 
-HorizonB_C::Theta (const double h) const
+HydraulicM_C::Theta (const double h) const
 {
   return Sr (h) * Theta_sat;
 }
 
 double 
-HorizonB_C::K (const double h) const
+HydraulicM_C::K (const double h) const
 {
-  return K_sat * pow (Sr (h), (2 + 3/b) * b);
+  return K_sat * pow (Sr (h), (2 + 2.5/b) * b);
 }
 
 double 
-HorizonB_C::Cw2 (const double h) const
+HydraulicM_C::Cw2 (const double h) const
 {
   if (h < h_b)
     return -(Theta_sat*(pow(h_b / h, 1 / b - 1)*h_b) / (pow(h, 2)*b));
@@ -56,7 +55,7 @@ HorizonB_C::Cw2 (const double h) const
 }
 
 double 
-HorizonB_C::h (const double Theta) const
+HydraulicM_C::h (const double Theta) const
 {
   if (Theta < Theta_sat)
     return h_b / pow(Theta / Theta_sat, b);
@@ -65,16 +64,16 @@ HorizonB_C::h (const double Theta) const
 }
 
 double 
-HorizonB_C::M (double h) const
+HydraulicM_C::M (double h) const
 {
   if (h < h_b)
-    return K_sat * (-h_b / (1 + 3/b)) * pow (h_b / h, 1 + 3/b);
+    return K_sat * (-h_b / (1 + 2.5/b)) * pow (h_b / h, 1 + 2.5/b);
   else
     return K_sat * h;
 }
 
 double 
-HorizonB_C::Sr (double h) const
+HydraulicM_C::Sr (double h) const
 {
   if (h < h_b)
     return pow (h_b / h, 1 / b);
@@ -82,39 +81,37 @@ HorizonB_C::Sr (double h) const
     return 1;
 }
 
-HorizonB_C::HorizonB_C (const AttributeList& al)
-  : Horizon (al),
-    Theta_sat (al.number ("Theta_sat")),
+HydraulicM_C::HydraulicM_C (const AttributeList& al)
+  : Hydraulic (al),
     h_b (al.number ("h_b")),
     b (al.number ("b")),
     K_sat (al.number ("K_sat"))
 { }
 
-HorizonB_C::~HorizonB_C ()
+HydraulicM_C::~HydraulicM_C ()
 { }
 
-// Add the HorizonB_C syntax to the syntax table.
+// Add the HydraulicM_C syntax to the syntax table.
 
-Horizon&
-HorizonB_C::make (AttributeList& al)
+Hydraulic&
+HydraulicM_C::make (AttributeList& al)
 {
-  return *new HorizonB_C (al);
+  return *new HydraulicM_C (al);
 }
 
-static struct HorizonB_CSyntax
+static struct HydraulicM_CSyntax
 {
-  HorizonB_CSyntax ();
-} horizonB_C_syntax;
+  HydraulicM_CSyntax ();
+} hydraulicM_C_syntax;
 
-HorizonB_CSyntax::HorizonB_CSyntax ()
+HydraulicM_CSyntax::HydraulicM_CSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  Horizon::load_syntax (syntax, alist);
-  syntax.add ("Theta_sat", Syntax::Number, Syntax::Const);
+  Hydraulic::load_syntax (syntax, alist);
   syntax.add ("h_b", Syntax::Number, Syntax::Const);
   syntax.add ("b", Syntax::Number, Syntax::Const);
   syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
-  Horizon::add_type ("B_C", alist, syntax, &HorizonB_C::make);
+  Hydraulic::add_type ("M_C", alist, syntax, &HydraulicM_C::make);
 }
