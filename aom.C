@@ -53,8 +53,10 @@ AOM::penetrate (const Geometry& geometry, double from, double to,
   // Penetrate.
   geometry.add (C, from, to, top_C * penetration);
   top_C *= (1.0 - penetration);
+  daisy_assert (top_C >= 0.0);
   geometry.add (N, from, to, top_N * penetration);
   top_N *= (1.0 - penetration);
+  daisy_assert (top_N >= 0.0);
 }
 
 double 
@@ -100,11 +102,13 @@ AOM::pour (vector<double>& cc, vector<double>& nn)
 void 
 AOM::add (unsigned int at, double to_C, double to_N)
 {
+  daisy_assert (to_C >= 0.0);
+  daisy_assert (to_N >= 0.0);
   grow (at+1);
   C[at] += to_C;
   N[at] += to_N;
-  daisy_assert (finite (C[at]));
-  daisy_assert (finite (N[at]));
+  daisy_assert (C[at] >= 0.0);
+  daisy_assert (N[at] >= 0.0);
 }
 
 void 				// Add dead leafs.
@@ -135,9 +139,7 @@ AOM::add (const Geometry& geometry, // Add dead roots.
       daisy_assert (factor >= 0.0);
       N[i] += to_N * factor;
       C[i] += to_C * factor;
-      daisy_assert (finite (C[i]));
       daisy_assert (C[i] >= 0.0);
-      daisy_assert (finite (N[i]));
       daisy_assert (N[i] >= 0.0);
     }
 
@@ -186,6 +188,7 @@ AOM::tick (unsigned int end, const double* abiotic_factor,
       C[i] -= C_use;
       N[i] -= N_use;
       daisy_assert (C[i] >= 0.0);
+      daisy_assert (N[i] >= 0.0);
       daisy_assert (som_C[i] >= 0.0);
       daisy_assert (som_N[i] >= 0.0);
     }

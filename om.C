@@ -252,6 +252,7 @@ OM::tick (unsigned int end, const double* abiotic_factor,
     {
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (C[i] >= 0.0);
+      daisy_assert (N[i] >= 0.0);
     }
 }
 

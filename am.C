@@ -223,7 +223,8 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
       if (fraction != OM::Unspecified)
 	{
 	  om_C[i] = C * fraction;
-      
+	  daisy_assert (om_C[i] >= 0.0);
+
 	  if (C_per_N != OM::Unspecified)
 	    {
 	      om_N[i] = om_C[i] / C_per_N;
@@ -251,7 +252,8 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
 
   // Calculate C in missing fraction.
   om_C[missing_fraction] = C - accumulate (om_C.begin (), om_C.end (), 0.0);
-  
+  daisy_assert (om_C[missing_fraction] >= 0.0);
+
   // Calculate N in missing C/N.
   if (missing_fraction != missing_C_per_N)
     {
@@ -280,6 +282,7 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
 	= N - accumulate (om_N.begin (), om_N.end (), 0.0);
       daisy_assert (om_N[missing_fraction] >= 0.0);
     }
+  daisy_assert (om_N[missing_C_per_N] >= 0.0);
 
   daisy_assert (approximate (C, accumulate (om_C.begin (), om_C.end (), 0.0)));
   daisy_assert (approximate (N, accumulate (om_N.begin (), om_N.end (), 0.0)));

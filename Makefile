@@ -97,12 +97,13 @@ ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),gcc)
 		OPTIMIZE = -O2 -ffast-math 
 		ifeq ($(HOSTTYPE),sun4)
-			OPTIMIZE = -O2 -ffast-math -mcpu=v8 -mtune=ultrasparc
+		  OPTIMIZE = -O2 -ffast-math -mcpu=v8 -mtune=ultrasparc
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
 		endif
 		ifeq ($(HOSTTYPE),i386-linux)
-		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
-		endif
+		  OPTIMIZE = -O2 -mcpu=pentiumpro -march=pentium
+# -ffast-math 
+	        endif
 		ifeq ($(HOSTTYPE),cygwin)
 		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
 		endif
@@ -148,6 +149,9 @@ endif
 
 GCC = gcc
 CROSSGCC = "$(TARGETTYPE)-gcc"
+
+STRIP = strip
+CROSSSTRIP = "$(TARGETTYPE)-strip"
 
 ifeq ($(COMPILER),gcc)
 	ifeq ($(HOSTTYPE),sun4)
@@ -598,11 +602,20 @@ dist:	cvs
 	mv -f daisy-src.zip $(FTPDIR)
 	(cd lib; $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
 	(cd txt; $(MAKE) FTPDIR=$(FTPDIR) dist)
-	rm -f $(FTPDIR)/daisy.exe $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG)
-	rm -f $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe
-	strip -o $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG) $(OBJHOME)/$(HOSTTYPE)/daisy
-	strip -o $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe $(OBJHOME)/$(TARGETTYPE)/daisy
+	rm -f $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG)
+	$(STRIP) -o $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG) \
+		$(OBJHOME)/$(HOSTTYPE)/daisy
+	rm -f $(FTPDIR)/daisy.exe $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe
+	$(CROSSSTRIP) -o $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe \
+		$(OBJHOME)/$(TARGETTYPE)/daisy
 	(cd $(FTPDIR); ln -s $(TARGETTYPE)/daisy-$(TAG).exe daisy.exe)
+
+foo:
+	rm -f $(FTPDIR)/daisy.exe $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe
+	$(CROSSSTRIP) -o $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe \
+		$(OBJHOME)/$(TARGETTYPE)/daisy
+	(cd $(FTPDIR); ln -s $(TARGETTYPE)/daisy-$(TAG).exe daisy.exe)
+
 
 # Update the CVS repository.
 #

@@ -395,7 +395,6 @@ OrganicMatter::Implementation::Initialization::
   soil.add (per_lay, 0.0, end, top * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Add roots
-
   const double depth = soil.MaxRootingDepth ();
   const double k = M_LN2 / al.number ("dist");
   vector<double> density (soil.size (), 0.0);
@@ -406,6 +405,9 @@ OrganicMatter::Implementation::Initialization::
       density[i] = k * exp (k * soil.z (i));
     }
   soil.add (per_lay, density, root * kg_per_ha_per_y_to_g_per_cm2_per_h);
+
+  // Mix roots in top.
+  soil.mix (per_lay, 0.0, end);
 }
 
 OrganicMatter::Implementation::Initialization::~Initialization ()

@@ -1,4 +1,15 @@
+2003-03-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.58 released.
+
+2003-03-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (Initialization): Mix input from roots in
+	plowing layer. 
+
 2003-03-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* aom.C, om.C, smb.C: Added check.
 
 	* Version 2.57 released.
 
