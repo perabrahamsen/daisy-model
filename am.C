@@ -404,8 +404,12 @@ AM::Implementation::mix (const Geometry& geometry,
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
   
-  assert (approximate (new_C, old_C));
-  assert (approximate (new_N, old_N));
+  if (!approximate (new_C, old_C))
+    CERR << "BUG: AM::mix new C (" << new_C 
+	 << ") != old_C (" << old_C << ")\n";
+  if (!approximate (new_N, old_N))
+    CERR << "BUG: AM::mix new_N (" << new_N 
+	 << ") != old_N (" << old_N << ")\n";
 }
 
 void
@@ -421,8 +425,12 @@ AM::Implementation::swap (const Geometry& geometry,
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
   
-  assert (approximate (new_C, old_C));
-  assert (approximate (new_N, old_N));
+  if (!approximate (new_C, old_C))
+    CERR << "BUG: AM::swap new C (" << new_C 
+	 << ") != old_C (" << old_C << ")\n";
+  if (!approximate (new_N, old_N))
+    CERR << "BUG: AM::swap new_N (" << new_N 
+	 << ") != old_N (" << old_N << ")\n";
 }
 
 double 

@@ -1,3 +1,14 @@
+2000-02-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.15 released.
+
+2000-02-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/grass.dai: Merged SH changes.
+
+	* am.C (mix, swap): Give warning instead of error when mass
+	doesn't balance. 
+
 2000-02-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.14 released.
