@@ -505,9 +505,12 @@ daisy_daisy_tick_action (Daisy* daisy)
 extern "C" void EXPORT
 daisy_daisy_tick_weather (Daisy* daisy)
 {
+  if (!daisy->weather)
+    return;
+
   try
     {
-      daisy->weather.tick (daisy->time); 
+      daisy->weather->tick (daisy->time); 
     }
   catch (const char* error)
     {
@@ -605,7 +608,7 @@ daisy_daisy_get_time (Daisy* daisy)
 
 extern "C" Weather* EXPORT
 daisy_daisy_get_weather (Daisy* daisy)
-{ return &daisy->weather; }
+{ return daisy->weather; }
 
 extern "C" unsigned int EXPORT
 daisy_daisy_count_columns (const Daisy* daisy)

@@ -128,6 +128,8 @@ struct BioclimateStandard : public Bioclimate
   // Manager.
   void irrigate_top (double flux, double temp);
   void irrigate_surface (double flux, double temp);
+  void irrigate_top (double flux);
+  void irrigate_surface (double flux);
   void spray (const string& chemical, double amount) // [g/m^2]
     { spray_.add (chemical, amount); }
   void harvest_chemicals (Chemicals& chemicals, double LAI)
@@ -591,6 +593,14 @@ BioclimateStandard::irrigate_surface (double flux, double temp)
        + irrigation_surface * irrigation_surface_temperature) / new_surface;
   irrigation_surface = new_surface;
 }
+
+void
+BioclimateStandard::irrigate_top (double flux)
+{ irrigate_top (flux, daily_air_temperature ()); }
+
+void
+BioclimateStandard::irrigate_surface (double flux)
+{ irrigate_surface (flux, daily_air_temperature ()); }
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<Snow>;

@@ -1,4 +1,18 @@
+2000-05-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.27 released.
+
 2000-05-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C, bioclimate.h, column_std.C, column.h, field.C,
+	field.h (irrigate_surface, irrigate_top): Made
+	temperature optional.
+	* action_crop.C (doIt): Use it.
+	* action_irrigate.C: Ditto.
+
+	* column_std.C: Added column specific weather.
+	* daisy.C, daisy.h: Made global weather optional.
+	* field.h, field.C, column.h: Ditto.
 
 	* Version 1.26 released.
 

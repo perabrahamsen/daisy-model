@@ -9,7 +9,6 @@
 #include "log.h"
 #include "harvest.h"
 #include "im.h"
-#include "weather.h"
 
 struct ActionCrop : public Action
 {
@@ -708,8 +707,7 @@ ActionCrop::Irrigation::doIt (Daisy& daisy) const
     return false;
 
   COUT << " [Irrigating " << amount << " mm]\n";
-  daisy.field.irrigate_top (amount, daisy.weather.hourly_air_temperature (),
-			    IM ());
+  daisy.field.irrigate_top (amount, IM ());
   return true;
 }
 

@@ -38,6 +38,8 @@ public:
   void ridge (const AttributeList& ridge);
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
+  void irrigate_top (double flux, const IM&);
+  void irrigate_surface (double flux, const IM&);
   void fertilize (const AttributeList&, double from, double to); // Organic.
   void fertilize (const AttributeList&);
   void fertilize (const IM&, double from, double to); // Mineral.
@@ -66,7 +68,7 @@ public:
   double crop_dm (const string& crop) const; 
 
   // Simulation.
-  void tick (const Time&, const Weather&);
+  void tick (const Time&, const Weather*);
   void output (Log&) const;
 
   // Find a specific column.
@@ -78,11 +80,11 @@ public:
 
   // Create and destroy.
   void divide (const string& original, const string& copy, double copy_size,
-	       const Time&, const Weather&);
+	       const Time&, const Weather*);
   void merge (const string& combine, const string& remove);
-  bool check () const;
+  bool check (bool require_weather, const Time& from, const Time& to) const;
   bool check_am (const AttributeList& am) const;
-  void initialize (const Time&, const Weather&);
+  void initialize (const Time&, const Weather*);
   Field (const vector<AttributeList*>&);
   ~Field ();
 };

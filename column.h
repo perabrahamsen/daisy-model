@@ -26,6 +26,8 @@ public:
   virtual void ridge (const AttributeList& ridge) = 0;
   virtual void irrigate_top (double flux, double temp, const IM&) = 0;
   virtual void irrigate_surface (double flux, double temp, const IM&) = 0;
+  virtual void irrigate_top (double flux, const IM&) = 0;
+  virtual void irrigate_surface (double flux, const IM&) = 0;
   virtual void fertilize (const AttributeList&, double from, double to) = 0;
   virtual void fertilize (const AttributeList&) = 0;
   virtual void fertilize (const IM&, double from, double to) = 0; // Mineral.
@@ -54,9 +56,10 @@ public:
   virtual double crop_dm (const string& crop) const = 0; 
   
   // Simulation.
-  virtual void tick (const Time&, const Weather&) = 0;
+  virtual void tick (const Time&, const Weather*) = 0;
 
-  virtual bool check () const = 0;
+  virtual bool check (bool require_weather,
+		      const Time& from, const Time& to) const = 0;
   virtual bool check_am (const AttributeList& am) const = 0;
   virtual void output (Log&) const;
 
@@ -90,7 +93,7 @@ protected:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   virtual Column& clone (const string& name) const = 0;
-  virtual void initialize (const Time&, const Weather&) = 0;
+  virtual void initialize (const Time&, const Weather*) = 0;
 
   virtual ~Column ();
 };

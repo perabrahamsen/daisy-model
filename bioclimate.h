@@ -54,6 +54,8 @@ public:
 public:
   virtual void irrigate_top (double flux, double temp) = 0;
   virtual void irrigate_surface (double flux, double temp) = 0;
+  virtual void irrigate_top (double flux) = 0;
+  virtual void irrigate_surface (double flux) = 0;
   virtual void spray (const string& chemical, double amount) = 0; // [g/m^2]
   virtual void harvest_chemicals (Chemicals& chemicals, double LAI) = 0;
 		       

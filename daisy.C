@@ -33,7 +33,9 @@ Daisy::Daisy (const AttributeList& al)
 		     (al.alist ("activate_output"))),
     time (al.time ("time")),
     action (Librarian<Action>::create (al.alist ("manager"))),
-    weather (Librarian<Weather>::create (al.alist ("weather"))), 
+    weather (al.check ("weather") 
+	     ? &Librarian<Weather>::create (al.alist ("weather"))
+	     : NULL), 
     field (*new Field (al.alist_sequence ("column"))),
     harvest (map_construct_const<Harvest> (al.alist_sequence ("harvest")))
 {
@@ -53,7 +55,7 @@ Daisy::check ()
   // Check weather.
   {
     bool ok = true;
-    if (!weather.check (time, time))
+    if (weather && !weather->check (time, time))
       ok = false;
 
     if (!ok)
@@ -67,7 +69,7 @@ Daisy::check ()
   {
     bool ok = true;
     // This was ::const_iterator in g++
-    if (!field.check ())
+    if (!field.check (weather == NULL, time, time))
       ok = false;
 
     if (!ok)
@@ -118,7 +120,8 @@ Daisy::tick_logs ()
       if (log.match (*this))
 	{
 	  log.output ("time", time);
-	  output_derived (weather, "weather", log);
+	  if (weather)
+	    output_derived (*weather, "weather", log);
 	  output_submodule (field, "column", log);
 	  output_vector (harvest, "harvest", log);
 	  output_derived (action, "manager", log);
@@ -130,7 +133,8 @@ Daisy::tick_logs ()
 void
 Daisy::tick ()
 { 
-  weather.tick (time);
+  if (weather)
+    weather->tick (time);
   action.doIt (*this);
 
   tick_columns ();
@@ -196,9 +200,9 @@ the simulation.");
 	      Syntax::State, Syntax::Sequence,
 	      "List of columns to use in this simulation.");
   syntax.add ("weather", Librarian<Weather>::library (),
-	      Syntax::State, Syntax::Singleton,
+	      Syntax::OptionalState, Syntax::Singleton,
 	      "Weather model for providing climate information during \
-the simulation.");
+the simulation.  Can be overwritten by column specific weather.");
   vector<AttributeList*> empty_alist_sequence;
   add_submodule_sequence<Harvest> ("harvest", syntax, Syntax::State, 
 				   "Total list of all crop yields.");
@@ -211,7 +215,8 @@ Daisy::~Daisy ()
   delete &logs;
   delete &activate_output;
   delete &action;
-  delete &weather;
+  if (weather)
+    delete weather;
 #if 0
   delete &field;
 #endif

@@ -32,7 +32,7 @@ public:
   Condition& activate_output;
   Time time;
   Action& action;
-  Weather& weather;
+  Weather* weather;
   Field& field;
   vector<const Harvest*>& harvest;
 

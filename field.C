@@ -21,6 +21,8 @@ struct Field::Implementation
   void ridge (const AttributeList& ridge);
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
+  void irrigate_top (double flux, const IM&);
+  void irrigate_surface (double flux, const IM&);
   void fertilize (const AttributeList&, double from, double to);  // Organic.
   void fertilize (const AttributeList&);
   void fertilize (const IM&, double from, double to); // Mineral.
@@ -49,7 +51,7 @@ public:
   double crop_dm (const string& crop) const; 
 
   // Simulation.
-  void tick (const Time&, const Weather&);
+  void tick (const Time&, const Weather*);
   void output (Log&) const;
 
   // Find a specific column.
@@ -57,13 +59,13 @@ public:
 
   // Changing the field.
   void divide (const string& original, const string& copy, double copy_size, 
-	       const Time&, const Weather&);
+	       const Time&, const Weather*);
   void merge (const string& combine, const string& remove);
 
   // Create and destroy.
-  bool check () const;
+  bool check (bool require_weather, const Time& from, const Time& to) const;
   bool check_am (const AttributeList& am) const;
-  void initialize (const Time&, const Weather&);
+  void initialize (const Time&, const Weather*);
   Implementation (const vector<AttributeList*>&);
   ~Implementation ();
 };
@@ -137,6 +139,28 @@ Field::Implementation::irrigate_surface (double flux, double temp, const IM& im)
 	    i != columns.end ();
 	    i++)
     (*i)->irrigate_surface (flux, temp, im);
+}
+
+void 
+Field::Implementation::irrigate_top (double flux, const IM& im)
+{
+  if (selected)
+    selected->irrigate_top (flux, im);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+    (*i)->irrigate_top (flux, im);
+}
+
+void 
+Field::Implementation::irrigate_surface (double flux, const IM& im)
+{
+  if (selected)
+    selected->irrigate_surface (flux, im);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+    (*i)->irrigate_surface (flux, im);
 }
 
 void 
@@ -340,7 +364,7 @@ Field::Implementation::crop_dm (const string& crop) const
 }
   
 void 
-Field::Implementation::tick (const Time& time, const Weather& weather)
+Field::Implementation::tick (const Time& time, const Weather* weather)
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
@@ -382,7 +406,7 @@ Field::Implementation::find (const string& name) const
 void 
 Field::Implementation::divide (const string& original, const string& copy,
 			       double copy_size,
-			       const Time& time, const Weather& weather)
+			       const Time& time, const Weather* weather)
 { 
   Column* old = find (original);
   if (!old)
@@ -414,14 +438,15 @@ Field::Implementation::merge (const string& /*combine*/,
 { throw ("Merge is not yet implemented"); } 
 
 bool 
-Field::Implementation::check () const
+Field::Implementation::check (bool require_weather,
+			      const Time& from, const Time& to) const
 { 
   bool ok = true;
 
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    if ((*i) == NULL || !(*i)->check ())
+    if ((*i) == NULL || !(*i)->check (require_weather, from, to))
       ok = false;
 
   return ok;
@@ -442,7 +467,7 @@ Field::Implementation::check_am (const AttributeList& am) const
 }
 
 void 
-Field::Implementation::initialize (const Time& time, const Weather& weather)
+Field::Implementation::initialize (const Time& time, const Weather* weather)
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
@@ -485,6 +510,14 @@ Field::irrigate_top (double flux, double temp, const IM& im)
 void 
 Field::irrigate_surface (double flux, double temp, const IM& im)
 { impl.irrigate_surface (flux, temp, im); }
+
+void 
+Field::irrigate_top (double flux, const IM& im)
+{ impl.irrigate_top (flux, im); }
+
+void 
+Field::irrigate_surface (double flux, const IM& im)
+{ impl.irrigate_surface (flux, im); }
 
 void 
 Field::fertilize (const AttributeList& al, double from, double to)
@@ -554,7 +587,7 @@ Field::crop_dm (const string& crop) const
 { return impl.crop_dm (crop); } 
 
 void
-Field::tick (const Time& time, const Weather& weather)
+Field::tick (const Time& time, const Weather* weather)
 { impl.tick (time, weather); }
 
 void 
@@ -575,7 +608,7 @@ Field::size () const
 
 void 
 Field::divide (const string& original, const string& copy, double copy_size,
-	       const Time& time, const Weather& weather)
+	       const Time& time, const Weather* weather)
 { impl.divide (original, copy, copy_size, time, weather); }
 
 void 
@@ -583,15 +616,15 @@ Field::merge (const string& combine, const string& remove)
 { impl.merge (combine, remove); }
 
 bool 
-Field::check () const
-{ return impl.check (); }
+Field::check (bool require_weather, const Time& from, const Time& to) const
+{ return impl.check (require_weather, from, to); }
 
 bool 
 Field::check_am (const AttributeList& am) const
 { return impl.check_am (am); }
 
 void 
-Field::initialize (const Time& time, const Weather& weather)
+Field::initialize (const Time& time, const Weather* weather)
 { impl.initialize (time, weather); }
 
 Field::Field (const vector<AttributeList*>& sequence)

@@ -2,7 +2,6 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "weather.h"
 #include "field.h"
 #include "am.h"
 #include "im.h"
@@ -23,16 +22,15 @@ struct ActionIrrigate : public Action
     COUT << "[Irrigating]\n";      
     double t = temp;
 
-    if (temp == at_air_temperature) 
-      t = daisy.weather.hourly_air_temperature ();
-
     irrigate (daisy.field, flux, t, sm);
   }
 
   ActionIrrigate (const AttributeList& al)
     : Action (al),
       flux (al.number ("flux")),
-      temp (al.number ("temperature")),
+      temp (al.check ("temperature") 
+	    ? al.number ("temperature")
+	    : at_air_temperature),
       sm (*new IM (al.alist ("solute")))
   { }
 public:
@@ -43,7 +41,12 @@ public:
 struct ActionIrrigateTop : public ActionIrrigate
 {
   void irrigate (Field& f, double flux, double temp, const IM& im) const
-    { f.irrigate_top (flux, temp, im); }
+    { 
+      if (temp == at_air_temperature)
+	f.irrigate_top (flux, im); 
+      else
+	f.irrigate_top (flux, temp, im); 
+    }
   ActionIrrigateTop (const AttributeList& al)
     : ActionIrrigate (al)
     { }
@@ -52,7 +55,12 @@ struct ActionIrrigateTop : public ActionIrrigate
 struct ActionIrrigateSurface : public ActionIrrigate
 {
   void irrigate (Field& f, double flux, double temp, const IM& im) const
-    { f.irrigate_surface (flux, temp, im); }
+    {
+      if (temp == at_air_temperature)
+	f.irrigate_surface (flux, im);
+      else
+	f.irrigate_surface (flux, temp, im); 
+    }
   ActionIrrigateSurface (const AttributeList& al)
     : ActionIrrigate (al)
     { }
@@ -82,9 +90,8 @@ bypassing the canopy.");
       syntax.add ("flux", "mm/h", Syntax::Const, 
 		  "Amount of irrigation applied");
       syntax.order ("flux");
-      syntax.add ("temperature", "dg C", Syntax::Const,
+      syntax.add ("temperature", "dg C", Syntax::OptionalConst,
 		  "Temperature of irrigation (default: air temperature)");
-      alist.add ("temperature", ActionIrrigate::at_air_temperature);
       add_submodule<IM> ("solute", syntax, alist, Syntax::Const,
 			 "\
 Nitrogen content of irrigation water [g/mm] (default: none).");

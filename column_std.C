@@ -28,6 +28,7 @@ class ColumnStandard : public Column
 {
   // Content.
 private:
+  Weather* weather;
   Vegetation vegetation;
   Bioclimate& bioclimate;
   Surface surface;
@@ -50,6 +51,8 @@ public:
   { surface.ridge (soil, soil_water, al); }
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
+  void irrigate_top (double flux, const IM&);
+  void irrigate_surface (double flux, const IM&);
   void fertilize (const AttributeList&);
   void fertilize (const AttributeList&, double from, double to);
   void fertilize (const IM&);
@@ -81,9 +84,9 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time&, const Weather&);
+  void tick (const Time&, const Weather*);
 
-  bool check () const;
+  bool check (bool require_weather, const Time& from, const Time& to) const;
   bool check_am (const AttributeList& am) const 
   { return organic_matter.check_am (am); }
   void output (Log&) const;
@@ -155,7 +158,7 @@ public:
     return *new ColumnStandard (new_alist); 
   }
   ColumnStandard (const AttributeList&);
-  void initialize (const Time& time, const Weather& weather);
+  void initialize (const Time&, const Weather*);
   ~ColumnStandard ();
 };
 
@@ -177,6 +180,26 @@ ColumnStandard::irrigate_surface (double flux, double temp, const IM& sm)
   assert (sm.NO3 >= 0.0);
   surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
   bioclimate.irrigate_surface (flux, temp);
+}
+
+void 
+ColumnStandard::irrigate_top (double flux, const IM& sm)
+{
+  assert (flux >= 0.0);
+  assert (sm.NH4 >= 0.0);
+  assert (sm.NO3 >= 0.0);
+  surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
+  bioclimate.irrigate_top (flux);
+}
+
+void 
+ColumnStandard::irrigate_surface (double flux, const IM& sm)
+{
+  assert (flux >= 0.0);
+  assert (sm.NH4 >= 0.0);
+  assert (sm.NO3 >= 0.0);
+  surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
+  bioclimate.irrigate_surface (flux);
 }
 
 void
@@ -277,11 +300,19 @@ ColumnStandard::soil_water_potential (double height) const
 }
 
 bool
-ColumnStandard::check () const
+ColumnStandard::check (bool require_weather,
+		       const Time& from, const Time& to) const
 {
   int n = soil.size ();
   bool ok = true;
 
+  if (require_weather && !weather)
+    {
+      CERR << "Weather unspecified\n";
+      ok = false;
+    }
+  if (weather && !weather->check (from, to))
+    ok = false;
   if (!soil.check ())
     ok = false;
   if (!soil_heat.check (n))
@@ -302,8 +333,13 @@ ColumnStandard::check () const
 }
 
 void
-ColumnStandard::tick (const Time& time, const Weather& weather)
+ColumnStandard::tick (const Time& time, const Weather* global_weather)
 {
+  // Weather.
+  if (weather)
+    weather->tick (time);
+  const Weather& my_weather = *(weather ? weather : global_weather);
+
   // Remove old source sink terms. 
   soil_water.clear (soil);
   soil_chemicals.clear ();
@@ -317,7 +353,7 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
   surface.mixture (soil_top_conc, soil_chemicals);
   soil_water.macro_tick (soil, surface);
 
-  bioclimate.tick (surface, weather, 
+  bioclimate.tick (surface, my_weather, 
 		   vegetation, soil, soil_water, soil_heat);
   vegetation.tick (time, bioclimate, soil, organic_matter, 
 		   soil_heat, soil_water, soil_NH4, soil_NO3);
@@ -329,7 +365,7 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
   groundwater.tick (time);
 
   // Transport.
-  soil_heat.tick (time, soil, soil_water, surface, weather);
+  soil_heat.tick (time, soil, soil_water, surface, my_weather);
   soil_water.tick (soil, surface, groundwater);
   soil_chemicals.tick (soil, soil_water, soil_heat, organic_matter,
 		       surface.chemicals_down ());
@@ -346,6 +382,8 @@ ColumnStandard::output (Log& log) const
 {
   Column::output (log);
   log.open_geometry (soil);
+  if (weather)
+    output_derived (*weather, "weather", log);
   output_derived (bioclimate, "Bioclimate", log);
   output_submodule (surface, "Surface", log);
   output_submodule (soil, "Soil", log);
@@ -369,6 +407,9 @@ ColumnStandard::output (Log& log) const
 
 ColumnStandard::ColumnStandard (const AttributeList& al)
   : Column (al),
+    weather (al.check ("weather") 
+	     ? &Librarian<Weather>::create (al.alist ("weather"))
+	     : NULL), 
     vegetation (al.alist ("Vegetation")),
     bioclimate (Librarian<Bioclimate>::create (al.alist ("Bioclimate"))),
     surface (al.alist ("Surface")),
@@ -385,10 +426,14 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     groundwater (Librarian<Groundwater>::create (al.alist ("Groundwater")))
 { }
 
-void ColumnStandard::initialize (const Time& time, const Weather& weather)
+void ColumnStandard::initialize (const Time& time, 
+				 const Weather* global_weather)
 {
+  if (!global_weather && !weather)
+    return;
+  const Weather& my_weather = *(weather ? weather : global_weather);
   groundwater.initialize (time, soil);
-  soil_heat.initialize (alist.alist ("SoilHeat"), soil, time, weather);
+  soil_heat.initialize (alist.alist ("SoilHeat"), soil, time, my_weather);
   soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater);
   soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water);
   soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water);
@@ -400,6 +445,8 @@ void ColumnStandard::initialize (const Time& time, const Weather& weather)
 ColumnStandard::~ColumnStandard ()
 { 
   delete &nitrification;
+  if (weather)
+    delete weather;
 }
 
 #ifdef BORLAND_TEMPLATES
@@ -430,6 +477,10 @@ static struct ColumnStandardSyntax
     syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 		"Description of this column."); 
     alist.add ("description", "Hansen et.al. 1990.");
+    syntax.add ("weather", Librarian<Weather>::library (),
+		Syntax::OptionalState, Syntax::Singleton,
+		"Weather model for providing climate information during \
+the simulation.  If unspecified, used global weather.");
     add_submodule<Vegetation> ("Vegetation", syntax, alist, Syntax::State,
 			       "The crops on the field.");
     syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 
