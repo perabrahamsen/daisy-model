@@ -400,7 +400,7 @@ ps:	txt/reference/reference.ps
 
 txt/reference/reference.ps:	txt/reference/reference.dvi
 	(cd txt/reference \
-	 && dvips -f reference.dvi )
+	 && dvips -f reference.dvi > reference.ps)
 
 txt/reference/reference.dvi:	txt/reference/components.tex
 	(cd txt/reference \

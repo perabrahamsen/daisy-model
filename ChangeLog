@@ -1,3 +1,12 @@
+2000-08-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.32 released.
+
+2000-08-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_crop.C (ActionCropSyntax): Make optional submodules use
+	`dummy' attribute list.
+
 2000-08-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.31 released.
