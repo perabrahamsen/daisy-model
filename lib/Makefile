@@ -5,7 +5,7 @@ NEWCROPS = potato.dai \
 	maize.dai pea.dai rye.dai sbarley.dai sugarbeet.dai srape.dai \
 	swheat.dai wbarley.dai wrape.dai wwheat.dai grass.dai fodderbeet.dai
 
-DKCROPS = dk-grass.dai dk-maize.dai dk-pea.dai \
+DKCROPS = dk-wrape.dai dk-grass.dai dk-maize.dai dk-pea.dai \
 	dk-rye.dai dk-wwheat.dai dk-wbarley.dai dk-sbarley.dai
 
 DAISY 	= dk-fertilizer.dai \

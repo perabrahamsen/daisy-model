@@ -2625,7 +2625,7 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
 (deflog "Carbon Balance" table
   (where "C_Bal.dlf")
   (when hourly)
-  (summary ;; "Crop Carbon Balance" "Total Carbon Balance" 
+  (summary "Total Carbon Balance" "Crop Carbon Balance" 
            "Litter Carbon Balance" "Soil Carbon Balance" "C Input")
   (entries ;; Year Month MDay Hour
            (interval (path column "$col" OrganicMatter total_C)
