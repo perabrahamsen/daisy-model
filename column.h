@@ -50,8 +50,6 @@ public:
   virtual void irrigate_overhead (double flux, const IM&) = 0;
   virtual void irrigate_surface (double flux, const IM&) = 0;
   virtual void irrigate_subsoil (double flux, const IM&, double from, double to) = 0;
-  virtual void set_subsoil_irrigation (double flux, const IM& im, 
-				       double from, double to) = 0;
   virtual void fertilize (const AttributeList&, double from, double to) = 0;
   virtual void fertilize (const AttributeList&) = 0;
   virtual void clear_second_year_utilization () = 0;

@@ -47,8 +47,6 @@ struct Field::Implementation
   void irrigate_overhead (double flux, const IM&);
   void irrigate_surface (double flux, const IM&);
   void irrigate_subsoil (double flux, const IM&, double from, double to);
-  void set_subsoil_irrigation (double flux, const IM& sm, 
-			       double from, double to);
   void fertilize (const AttributeList&, double from, double to);  // Organic.
   void fertilize (const AttributeList&);
   void clear_second_year_utilization ();
@@ -208,18 +206,6 @@ Field::Implementation::irrigate_subsoil (double flux, const IM& im,
 	    i != columns.end ();
 	    i++)
     (*i)->irrigate_subsoil (flux, im, from, to);
-}
-
-void 
-Field::Implementation::set_subsoil_irrigation (double flux, const IM& im, 
-					       double from, double to)
-{
-  if (selected)
-    selected->set_subsoil_irrigation (flux, im, from, to);
-  else for (ColumnList::iterator i = columns.begin ();
-	    i != columns.end ();
-	    i++)
-    (*i)->set_subsoil_irrigation (flux, im, from, to);
 }
 
 void 
@@ -641,11 +627,6 @@ Field::irrigate_surface (double flux, const IM& im)
 void 
 Field::irrigate_subsoil (double flux, const IM& im, double from, double to)
 { impl.irrigate_subsoil (flux, im, from, to); }
-
-void 
-Field::set_subsoil_irrigation (double flux, const IM& im, 
-			       double from, double to)
-{ impl.set_subsoil_irrigation (flux, im, from, to); }
 
 void 
 Field::fertilize (const AttributeList& al, double from, double to)

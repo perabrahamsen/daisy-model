@@ -475,10 +475,57 @@ The total amount of water in the soil interval")
                    (spec crop default Prod NDead)
                    (dimension "kg N/ha"))))
 
+(defsummary "Soil nitrogen balance" balance
+  "Nitrogen balance for the complete system."
+  (precision 3)
+  (require_top true)
+  (input "NH4-Incorp" "NO3-Incorp" "NH4-In-Matrix" "NO3-In-Matrix"
+         "NH4-In-Macro" "NO3-In-Macro" 
+         "NH4-Tillage" "NO3-Tillage" "Tillage_Org_N" "Bioincorporation"
+         "Residuals_N")
+  (output "N2O-Nitrification" "Denitrification"
+          "NH4-Leak-Matrix" "NH4-Leak-Macro" "NO3-Leak-Matrix"
+          "NO3-Leak-Macro" "NH4-Drain" "NO3-Drain"
+          "NH4-Root" "NO3-Root")
+  (content "NH4-Content"  "NO3-Content"
+           "AOM" "SOM" "SMB" "Buffer"))
+
+(defsummary "Soil NH4 balance" balance
+  "NH4 balance for the complete system."
+  (precision 3)
+  (require_top true)
+  (input "NH4-Incorp" "NH4-In-Matrix" "NH4-In-Macro" "NH4-Tillage" 
+         "NH4-Mineralization")
+  (output "NH4-Nitrification"
+          "NH4-Leak-Matrix" "NH4-Leak-Macro" "NH4-Drain"
+          "NH4-Root")
+  (content "NH4-Content"))
+
+(defsummary "Soil NO3 balance" balance
+  "NO3 balance for the complete system."
+  (precision 3)
+  (require_top true)
+  (input "NO3-Incorp" "NO3-In-Matrix" "NO3-In-Macro" "NO3-Tillage"
+         "NO3-Nitrification")
+  (output "NO3-Immobilization" Denitrification
+          "NO3-Leak-Matrix" "NO3-Leak-Macro" "NO3-Drain"
+          "NO3-Root")
+  (content "NO3-Content"))
+
+(defsummary "Soil organic nitrogen balance" balance
+  "Organic nitrogen balance for the complete system."
+  (precision 3)
+  (require_top true)
+  (input "Residuals_N" "Tillage_Org_N" "NO3-Immobilization" "Bioincorporation")
+  (output "NH4-Mineralization")
+  (content "AOM" "SOM" "SMB" "Buffer"))
+
+
 (deflog "Soil nitrogen" table
   "Nitrogen input, output, transformation and content for the soil."
   (where "field_nitrogen.dlf")
-  (summary )
+  (summary "Soil nitrogen balance" "Soil NH4 balance" "Soil NO3 balance"
+           "Soil organic nitrogen balance")
   (when hourly)
   (entries (interval (path column "$col" SoilNH4 S_external)
 		     (spec column default SoilNH4 S_external)
@@ -488,20 +535,24 @@ The total amount of water in the soil interval")
            (flux_top (path column "$col" SoilNH4 J)
 		     (spec column default SoilNH4 J)
                      (tag "NH4-In-Matrix")
+                     (negate true)
                      (handle sum)
                      (dimension "kg N/ha/&"))
            (flux_top (path column "$col" SoilNH4 J_p)
                      (spec column default SoilNH4 J_p)
                      (tag "NH4-In-Macro")
+                     (negate true)
                      (handle sum)
                      (dimension "kg N/ha/&"))
            (flux_bottom (path column "$col" SoilNH4 J)
 			(spec column default SoilNH4 J)
+                        (negate true)
                         (handle sum)
                         (tag "NH4-Leak-Matrix")
                         (dimension "kg N/ha/&"))
            (flux_bottom (path column "$col" SoilNH4 J_p)
                         (spec column default SoilNH4 J_p)
+                        (negate true)
                         (handle sum)
                         (tag "NH4-Leak-Macro")
                         (dimension "kg N/ha/&"))
@@ -514,6 +565,7 @@ The total amount of water in the soil interval")
 		     (spec column default SoilNH4 S_root)
                      (tag "NH4-Root")
                      (handle sum)
+                     (negate true)
                      (dimension "kg N/ha/&"))
            (interval (path column "$col" Nitrification NH4)
                      (spec column default Nitrification NH4)
@@ -532,7 +584,7 @@ The total amount of water in the soil interval")
                      (dimension "kg N/ha/&"))
            (interval (path column "$col" OrganicMatter NH4_source)
                      (spec column default OrganicMatter NH4_source)
-                     (tag "NH4-mineralization")
+                     (tag "NH4-Mineralization")
                      (handle sum)
                      (dimension "kg N/ha/&"))
            (interval (path column "$col" SoilNH4 M)
@@ -547,10 +599,12 @@ The total amount of water in the soil interval")
            (flux_top (path column "$col" SoilNO3 J)
 		     (spec column default SoilNO3 J)
                      (handle sum)
+                     (negate true)
                      (tag "NO3-In-Matrix")
                      (dimension "kg N/ha/&"))
            (flux_top (path column "$col" SoilNO3 J_p)
-		     (path column default SoilNO3 J_p)
+		     (spec column default SoilNO3 J_p)
+                     (negate true)
                      (handle sum)
                      (tag "NO3-In-Macro")
                      (dimension "kg N/ha/&"))
@@ -581,9 +635,10 @@ The total amount of water in the soil interval")
                      (spec column default SoilNO3 S_root)
                      (tag "NO3-Root")
                      (handle sum)
+                     (negate true)
                      (dimension "kg N/ha/&"))
            (interval (path column "$col" Denitrification converted)
-		     (spec column "$col" Denitrification converted)
+		     (spec column default Denitrification converted)
                      (tag "Denitrification")
                      (handle sum)
                      (dimension "kg N/ha/&"))
@@ -627,14 +682,11 @@ The total amount of water in the soil interval")
                      (path column "$col" OrganicMatter som "*" N)
                      (spec column default OrganicMatter som N)
                      (dimension "kg N/ha"))
-
-
-
            (interval (tag "SMB")
                      (path column "$col" OrganicMatter smb "*" N)
-                     (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
+                     (spec column default OrganicMatter smb N)
+                     (dimension "kg N/ha"))
            (interval (tag "Buffer")
                      (path column "$col" OrganicMatter buffer N)
-                     (dimension "kg N/ha")
-                     (factor 1e5))))
+                     (spec column default OrganicMatter buffer N)
+                     (dimension "kg N/ha"))))

@@ -1,4 +1,21 @@
+2005-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_irrigate.C (ActionIrrigateSubsoilStart): Removed
+	(ActionIrrigateStop): Ditto.
+
+	* field.C, field.h (set_subsoil_irrigation): Removed.
+
+	* column_std.C (irrigate_subsoil): Add solute to fertilizer log.
+
+	* column.h, column_base.C, column_std.C (set_subsoil_irrigation):
+	Removed. 
+
+	* bioincorporation.C (N_added, C_added): Fixed dimension.
+
 2005-03-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (standard_conversions): Added a couple of convertions
+	for log variables.
 
 	* phenology_std.C, phenology.h, phenology.C (mature): New member
 	function. 

@@ -18,6 +18,10 @@ release.
 
 Also, minimal Jyndevad and Askov column parameterizations were added.
 
+** Removed the set_subsoil_irrigation and stop_subsoil_irrigation actions.
+
+Use irrigate_subsoil instead.
+
 * 3.70
 
 ** Solute in overhead and surface irrigation was wrong unit.
@@ -56,7 +60,7 @@ model will be written to 'daisy.log'.
 ** New log-sample.dai file in sample directory.
 
 This file contain additional log model parameterizations, serving as
-examples of how to create your owr, geared towards comparing simulated
+examples of how to create your own, geared towards comparing simulated
 and measured data.
 
 Since measured data tend to wary a lot, standardized files are less
@@ -71,7 +75,7 @@ Rather than just VapPres.
 ** h_aquifer for drained soil may now vary with time.
 
 There is a new 'pressure_table' parameter that is an alternative way
-to specify 'h_aquifer'.  The variable indicate the virtual grounwater
+to specify 'h_aquifer'.  The variable indicate the virtual groundwater
 table that corresponds to the pressure in the aquifer.  This table may
 be different from the actual table, because of the aquitard.  If you
 drilled a hole through the aquitart down to the aquifer,

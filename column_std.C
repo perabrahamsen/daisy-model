@@ -253,26 +253,13 @@ ColumnStandard::irrigate_subsoil (double flux, const IM& sm,
                                   double from, double to)
 {
   ColumnBase::irrigate_subsoil (flux, sm, from, to);
-  soil_NH4.incorporate (soil, sm.NH4 * (flux * irrigate_solute_factor), 
-                        from, to);
-  soil_NO3.incorporate (soil, sm.NO3 * (flux * irrigate_solute_factor),
-                        from, to);
-}
-
-void
-ColumnStandard::set_subsoil_irrigation (double flux, const IM& sm, 
-					double from, double to)
-{
-  ColumnBase::set_subsoil_irrigation (flux, sm, from, to);
-  daisy_assert (flux >= 0.0);
-  daisy_assert (from <= 0.0);
-  daisy_assert (to < from);
-  soil_NH4.set_external_source (soil, 
-				sm.NH4 * (flux * irrigate_solute_factor), 
-				from, to);
-  soil_NO3.set_external_source (soil, 
-				sm.NO3 * (flux * irrigate_solute_factor),
-				from, to);
+  const IM im (sm, flux * irrigate_solute_factor);
+  soil_NH4.incorporate (soil, im.NH4, from, to);
+  soil_NO3.incorporate (soil, im.NO3, from, to);
+  // kg/ha -> g/cm^2
+  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+  fertilized_NO3_total += im.NO3 / conv; 
+  fertilized_NH4_total += im.NH4 / conv;
 }
 
 void

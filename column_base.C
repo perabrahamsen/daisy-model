@@ -70,17 +70,6 @@ ColumnBase::irrigate_subsoil (double flux, const IM&,
 }
 
 void
-ColumnBase::set_subsoil_irrigation (double flux, const IM&, 
-				    double from, double to)
-{
-  daisy_assert (flux >= 0.0);
-  daisy_assert (from <= 0.0);
-  daisy_assert (to < from);
-  soil_water.set_external_source (soil, flux * 0.1 /* mm->cm */, from, to);
-  bioclimate->set_subsoil_irrigation (flux);
-}
-
-void
 ColumnBase::harvest (const Time& time, const symbol crop_name,
 		     double stub_length,
 		     double stem_harvest,

@@ -339,9 +339,9 @@ The formula is speed = (R_max * litter) / (k_half + litter).");
   syntax.add ("N_removed", "g N/m^2/h", Syntax::LogOnly, 
               "N removed from surface.");
   syntax.add ("CO2", "g C/m^2/h", Syntax::LogOnly, "C respirated.");
-  syntax.add ("C_added", "g C/m^2/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("C_added", "g C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
               "C added to soil.");
-  syntax.add ("N_added", "g N/m^2/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("N_added", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
               "N added to soil.");
 
   // Incorporation location.

@@ -62,8 +62,6 @@ public:
   void irrigate_overhead (double flux, const IM&);
   void irrigate_surface (double flux, const IM&);
   void irrigate_subsoil (double flux, const IM&, double from, double to);
-  void set_subsoil_irrigation (double flux, const IM& sm, 
-			       double from, double to);
   void fertilize (const AttributeList&, double from, double to); // Organic.
   void fertilize (const AttributeList&);
   void clear_second_year_utilization ();
