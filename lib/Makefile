@@ -36,7 +36,9 @@ daisy-lib.zip:	$(DAISY) $(CLIMATE) $(TEXT) $(MSHE)
 #
 dist:
 	$(MAKE) daisy-lib.zip
-	mv -f daisy-lib.zip $(FTPDIR)
+	mv -f daisy-lib.zip $(FTPDIR)/daisy-lib/daisy-lib-$(TAG).zip
+	rm -f $(FTPDIR)/daisy-lib.zip
+	(cd $(FTPDIR); ln -s daisy-lib/daisy-lib-$(TAG).zip daisy-lib.zip)
 
 # Update the CVS repository.
 #
