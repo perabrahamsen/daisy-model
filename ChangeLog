@@ -1,5 +1,9 @@
 2002-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.18 released.
+
+2002-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* Makefile (OTHER): Removed message.C
 
 2002-03-15  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -1,4 +1,4 @@
-// message.C -- console messages
+// treelog_dual.h -- Log hierarchical information in two ostreams.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -20,50 +20,32 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "options.h"
+#ifndef TREELOG_DUAL_H
+#define TREELOG_DUAL_H
 
-#include <iostream>
+#include "treelog.h"
+#include "common.h"
 
-#ifndef __unix
-#define MESSAGE_LOG
-#endif
-
-#ifdef MESSAGE_LOG
-#include <fstream>
-ofstream message_log (getenv (Options::log_name) 
-		      ? getenv (Options::log_name) 
-		      : "nul");
-#endif
-
-ostream& 
-DebugMessages::message ()
+class TreelogDual : public Treelog
 {
-#ifdef MESSAGE_LOG
-  if (getenv (Options::log_name))
-    return message_log;
-#endif
-  return cout; 
-}
+  // Content.
+private:
+  struct Implementation;
+  Implementation& impl;
 
-ostream& 
-DebugMessages::warning ()
-{ return error (); }
+  // Nesting.
+public:
+  void open (const string& name);
+  void close ();
 
-ostream& 
-DebugMessages::error ()
-{ 
-#ifdef MESSAGE_LOG
-  if (getenv (Options::log_name))
-    return message_log;
-#endif
+  // Use.
+public:
+  void entry (const string&);
+  
+  // Create and Destroy.
+public:
+  TreelogDual (const string& file, ostream&);
+  ~TreelogDual ();
+};
 
-#ifdef USELESS_STDERR
-  return cout;
-#else
-  return cerr; 
-#endif
-}
-
-DebugMessages::DebugMessages ()
-{ assert (false); }
-
+#endif // TREELOG_DUAL_H
