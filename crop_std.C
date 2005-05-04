@@ -225,6 +225,9 @@ CropStandard::tick (const Time& time,
   // Clear nitrogen.
   nitrogen.clear ();
 
+  // Update age.
+  development->DAP += 1.0/24.0;
+
   // Emergence.
   if (time.hour () == 0 && development->DS <= 0)
     {

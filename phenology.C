@@ -35,6 +35,7 @@ Phenology::light_hour ()
 void 
 Phenology::output (Log& log) const
 {
+  output_variable (DAP, log);
   output_variable (DS, log);
   output_variable (partial_day_length, log);
   output_variable (day_length, log);
@@ -48,6 +49,8 @@ void
 Phenology::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   // Variables.
+  syntax.add ("DAP", "d", Syntax::State, "Days after planting.");
+  alist.add ("DAP", 0.0);
   syntax.add ("DS", Syntax::None (), Syntax::State,
 	      "Development Stage.");
   alist.add ("DS", -1.0);
@@ -62,6 +65,7 @@ Phenology::load_syntax (Syntax& syntax, AttributeList& alist)
 Phenology::Phenology (const AttributeList& al)
   : name (al.identifier ("type")),
     // State.
+    DAP (al.number ("DAP")),
     DS (al.number ("DS")),
     partial_day_length (al.number ("partial_day_length")),
     day_length (al.number ("day_length"))

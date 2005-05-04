@@ -40,6 +40,7 @@ private:
     double Fm;		// Max assimilation rate
     const PLF& TempEff;	// Temperature effect, photosynthesis
     const PLF& DSEff;	// Development stage effect, photosynthesis
+    const PLF& DAPEff;	// Age effect, photosynthesis
 
   // Simulation.
 public:

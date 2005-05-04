@@ -12,6 +12,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.72
+
+** Assimilate production can now be affected by chronological age.
+
+    (sow ("Spring Barley" (LeafPhot (DAPEff (0.0 1.0) (100.0 0.5)))))
+
+Here, the Spring Barley will have full assimilate production right
+after planting, decreasing linearly to half assimilate production 100
+days after planting.
+
 * 3.71
 
 ** dk-soil.dai move from lib to sample.

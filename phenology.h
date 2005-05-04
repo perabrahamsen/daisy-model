@@ -39,6 +39,7 @@ public:
 
   // State.
 public:
+  double DAP;	        	// Dayes after planting [d]
   double DS;	        	// Development Stage
   double partial_day_length;	// Light hours this day until now [0-24 h]
   double day_length;		// Light hours previous day. [0-24 h]

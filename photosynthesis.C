@@ -48,9 +48,10 @@ Photosynthesis::operator () (double Ta,
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.
   const PLF& LAIvsH = canopy.LAIvsH;
   const double DS = development.DS;
+  const double DAP = development.DAP;
 
   // Temperature effect and development stage effect
-  const double Teff = TempEff (Ta) * DSEff (DS);
+  const double Teff = TempEff (Ta) * DSEff (DS) * DAPEff (DAP);
 
   // One crop: daisy_assert (approximate (canopy.CAI, bioclimate.CAI ()));
   if (!approximate (LAIvsH (canopy.Height), canopy.CAI))
@@ -131,17 +132,23 @@ Default leaf photosynthesis parameters.");
 	      "Maximum assimilation rate.");
   syntax.add ("TempEff", "dg C", Syntax::None (), Check::non_negative (),
 	      Syntax::Const,
-	      "Temperature effect, photosynthesis.");
+	      "Temperature factor for assimilate production.");
   syntax.add ("DSEff", "DS", Syntax::None (), Check::non_negative (),
-	      Syntax::Const, "Development Stage effect, photosynthesis.");
+	      Syntax::Const, "\
+Development stage factor for assimilate production.");
   alist.add ("DSEff",DS_null_eff);
+  syntax.add ("DAPEff", "d", Syntax::None (), Check::non_negative (),
+	      Syntax::Const, "Age factor for assimilate production.\n\
+Age is given as day after planting.");
+  alist.add ("DAPEff",DS_null_eff);
 }
 
 Photosynthesis::Photosynthesis (const AttributeList& al)
   : Qeff (al.number ("Qeff")),
     Fm (al.number ("Fm")),
     TempEff (al.plf ("TempEff")),
-    DSEff (al.plf ("DSEff"))
+    DSEff (al.plf ("DSEff")),
+    DAPEff (al.plf ("DAPEff"))
 { }
 
 Photosynthesis::~Photosynthesis ()
