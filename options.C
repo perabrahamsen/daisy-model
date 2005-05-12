@@ -80,10 +80,10 @@ Options::copyright (Treelog& out)
   if (has_printed_copyright)
     return;
   has_printed_copyright = true;
-  out.message (string ("Daisy crop/soil simulation version ")
-	       + version + ". (" + version_date + ")\n"
-	       "Copyright 1996 - 2004 Per Abrahamsen, "
-	       "Søren Hansen and KVL.");
+  out.lazy (string ("Daisy crop/soil simulation version ")
+	    + version + ". (" + version_date + ")\n"
+	    "Copyright 1996 - 2004 Per Abrahamsen, "
+	    "Søren Hansen and KVL.");
 }
 
 void 

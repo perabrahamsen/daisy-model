@@ -604,30 +604,24 @@ Select::initialize (const map<symbol, symbol>& conv, double, double,
 
   // Replace '&' with timestep.
   string new_dim;
+  string hour_dim;
   for (unsigned int i = 0; i < impl.dimension.length (); i++)
     if (impl.dimension[i] == '&')
-      new_dim += timestep;
+      {
+	new_dim += timestep;
+	hour_dim += "h";
+      }
     else
-      new_dim += impl.dimension[i];
+      {
+	new_dim += impl.dimension[i];
+	hour_dim += impl.dimension[i];
+      }
 
   // Attempt to find convertion with new dimension.
   if (impl.spec && !impl.spec_conv)
     {
-      if (Units::can_convert (spec_dim, new_dim))
-	impl.spec_conv = &Units::get_convertion (spec_dim, new_dim);
-      else
-	{
-	  // Try with 'h' for timestep.
-	  string hour_dim;
-	  for (unsigned int i = 0; i < impl.dimension.length (); i++)
-	    if (impl.dimension[i] == '&')
-	      hour_dim += "h";
-	    else
-	      hour_dim += impl.dimension[i];
-
-	  if (Units::can_convert (spec_dim, hour_dim))
-	    impl.spec_conv = &Units::get_convertion (spec_dim, hour_dim);
-	}
+      if (Units::can_convert (spec_dim, hour_dim))
+	impl.spec_conv = &Units::get_convertion (spec_dim, hour_dim);
     }
 
   // Use new dimension.

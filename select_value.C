@@ -58,8 +58,8 @@ SelectValue::done ()
     {
       double result = value;
       if (handle == Handle::average)
-        result /= count;
-      dest.add (convert (value));
+        result /= (count + 0.0);
+      dest.add (convert (result));
     }
   if (!accumulate)
     count = 0;

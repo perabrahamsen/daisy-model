@@ -56,6 +56,7 @@ public:
   virtual void error (const std::string&);
   virtual void touch () = 0;
   virtual void flush () = 0;
+  virtual void lazy (const std::string&);
   
   // Create and Destroy.
 public:
