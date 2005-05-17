@@ -243,12 +243,10 @@ UZRichard::richard (Treelog& msg,
         }
       else if (bottom.bottom_type () == UZbottom::forced_flux)
         q_bottom = bottom.q_bottom ();
+      else if (bottom.bottom_type () == UZbottom::free_drainage)
+        q_bottom = - Kold[size - 1];
       else
-        {
-          daisy_assert (bottom.bottom_type ()
-                        == UZbottom::free_drainage);
-          q_bottom = - Kold[size - 1];
-        }
+        daisy_assert (bottom.bottom_type () == UZbottom::pressure);
 
       do
 	{

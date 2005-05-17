@@ -1,3 +1,12 @@
+2005-05-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.74 released.
+
+2005-05-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrichard.C (richard): Removed bogus assertion that prevented
+	pressure bottom from working.
+
 2005-05-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.73 released.
@@ -6,6 +15,8 @@
 
 	* treelog.C, treelog.h (lazy): New virtual member function.
 	* options.C (copyright): Use it.
+	
+	* select.C (initialize): Don't convert accumulated timestep units.
 
 2005-05-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
