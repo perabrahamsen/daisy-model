@@ -124,7 +124,7 @@ struct SelectInterval : public SelectValue
       dest.missing ();
     else 
       {
-        double result = value * density_factor;
+        double result = value;
         switch (handle)
           {
           case Handle::average:
@@ -134,8 +134,13 @@ struct SelectInterval : public SelectValue
             result /= (count + 0.0);
             result = exp (result);
             break;
+	case Handle::min:
+	case Handle::max:
+	case Handle::sum:
+	case Handle::current:
+	  break;
           }            
-        dest.add (convert (result));
+        dest.add (convert (result * density_factor));
       }
     if (!accumulate)
       count = 0;

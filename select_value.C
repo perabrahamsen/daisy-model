@@ -70,6 +70,11 @@ SelectValue::done ()
           result /= (count + 0.0);
           result = exp (result);
           break;
+	case Handle::min:
+	case Handle::max:
+	case Handle::sum:
+	case Handle::current:
+	  break;
         }
       dest.add (convert (result));
     }

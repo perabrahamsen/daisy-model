@@ -8,7 +8,7 @@
 (input file "log.dai")
 
 ;; Weather data.
-(weather default "weather.dwf")
+(weather default "taastrup.dwf")
 
 ;; We have some very sandy soil.
 (defhorizon Ap FAO3
