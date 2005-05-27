@@ -866,7 +866,7 @@ presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
 	      Syntax::OptionalState, Syntax::Singleton,
 	      "Preferential flow model.\n\
 By default, preferential flow is enabled if and only if the combined\n\
-amount of humus and clay in the top horizon if above 5%.");
+amount of humus and clay in the top horizon is above 5%.");
 }
 
 SoilWater::SoilWater (const AttributeList& al)

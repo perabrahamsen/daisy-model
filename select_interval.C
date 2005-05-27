@@ -28,7 +28,7 @@
 struct SelectInterval : public SelectValue
 {
   // Content.
-  const bool density;
+  double density_factor;
   double from;
   double to;
 
@@ -95,7 +95,7 @@ struct SelectInterval : public SelectValue
     if (to > 0.0)
       {
 	if (!isnormal (from))
-	  result = soil->total (array);
+          result = soil->total (array);
 	else
 	  {
 	    to = soil->zplus (soil->size () - 1);
@@ -105,9 +105,15 @@ struct SelectInterval : public SelectValue
     else 
       result = soil->total (array, from, to);
 
-    if (count == 0 && bd_convert)
-      bd_convert->set_bulk (*soil, from, to);
-
+    if (count == 0)
+      {
+        if (bd_convert)
+          bd_convert->set_bulk (*soil, from, to);
+        if (density_factor < 0.0)
+          density_factor = 1.0 / (from - (to > 0 
+                                          ? soil->zplus (soil->size () - 1)
+                                          : to));
+      }
     add_result (result);
   }
 
@@ -118,11 +124,17 @@ struct SelectInterval : public SelectValue
       dest.missing ();
     else 
       {
-        double result = value;
-        if (density)
-          result /= (from - to);
-        if (handle == Handle::average)
-          result /= count;
+        double result = value * density_factor;
+        switch (handle)
+          {
+          case Handle::average:
+            result /= (count + 0.0);
+            break;
+          case Handle::geometric:
+            result /= (count + 0.0);
+            result = exp (result);
+            break;
+          }            
         dest.add (convert (result));
       }
     if (!accumulate)
@@ -132,7 +144,7 @@ struct SelectInterval : public SelectValue
   // Create and Destroy.
   const std::string default_dimension (const std::string& spec_dim) const
   { 
-    if (density)
+    if (density_factor < 0.0)
       return spec_dim;
     
     return Units::multiply (spec_dim, "cm");
@@ -155,7 +167,7 @@ struct SelectInterval : public SelectValue
   }
   SelectInterval (const AttributeList& al)
     : SelectValue (al),
-      density (al.flag ("density")),
+      density_factor (al.flag ("density") ? -1.0 : 1.0),
       from (al.number ("from", 1.0)),
       to (al.number ("to", 1.0)),
       bd_convert (NULL)

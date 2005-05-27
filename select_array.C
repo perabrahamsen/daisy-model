@@ -21,6 +21,7 @@
 
 
 #include "select.h"
+#include "mathlib.h"
 
 using namespace std;
 
@@ -65,6 +66,10 @@ struct SelectArray : public Select
         for (unsigned int i = 0; i < array.size (); i++)
           value[i] += array[i];
         break;
+      case Handle::geometric:
+        for (unsigned int i = 0; i < array.size (); i++)
+          value[i] += log (array[i]);
+        break;
       }
     count++;
   }
@@ -80,14 +85,19 @@ struct SelectArray : public Select
         if (result.size () != value.size ())
           result = value;
 
-        if (handle == Handle::average)
+        switch (handle)
           {
+          case Handle::average:
             for (size_t i = 0; i < value.size (); i++)
               result[i] = convert (value[i] / count);
             dest.add (result);
-          }
-        else
-          {
+            break;
+          case Handle::geometric:
+            for (size_t i = 0; i < value.size (); i++)
+              result[i] = convert (exp (value[i] / count));
+            dest.add (result);
+            break;
+          default:
             for (size_t i = 0; i < value.size (); i++)
               result[i] = convert (value[i]);
             dest.add (result);

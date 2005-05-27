@@ -45,6 +45,8 @@ Handle::symbol2handle (symbol s)
       insert (pair<symbol,handle_t> (max_symbol, max));
       static symbol average_symbol ("average");
       insert (pair<symbol,handle_t> (average_symbol, average));
+      static symbol geometric_symbol ("geometric");
+      insert (pair<symbol,handle_t> (geometric_symbol, geometric));
       static symbol sum_symbol ("sum");
       insert (pair<symbol,handle_t> (sum_symbol, sum));
       static symbol current_symbol ("current");
@@ -528,7 +530,12 @@ If 'accumulate' is true, use the smallest value ever.\n\
 max: Log the largest value seen since last time the variable was logged.\n\
 If 'accumulate' is true, use the largest value ever.\n\
 \n\
-average: Log the average value seen since last time the variable was logged.\n\
+average: Log the arithmetic average value seen since last time the\n\
+variable was logged.\n\
+If 'accumulate' is true, use the average of all values.\n\
+\n\
+geometric: Log the geometic average value seen since last time the\n\
+variable was logged.\n\
 If 'accumulate' is true, use the average of all values.\n\
 \n\
 sum: Accumulate value since last time the variable was logged.\n\
@@ -536,7 +543,8 @@ If 'accumulate' is true, accumulate since the start of the log.\n\
 \n\
 current: Log the current value for the variable.\n\
 If 'accumulate' is true, the printed values will be accumulated..");
-  static VCheck::Enum handle_check ("min", "max", "average", "sum", "current");
+  static VCheck::Enum handle_check ("min", "max", "average", "geometric", 
+                                    "sum", "current");
   syntax.add_check ("handle", handle_check);
   syntax.add ("interesting_content", Syntax::Boolean, Syntax::Const, "\
 True if the content of this column is interesting enough to warrent an\n\

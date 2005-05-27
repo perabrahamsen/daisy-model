@@ -1,3 +1,20 @@
+2005-05-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vcheck.C, vcheck.h (Enum::Enum): Handle up to six parameters.
+
+	* select.h (Handle::geometric): New handle type.
+	* select_interval.C, select.C, select_array.C, select_value.C: Use it.
+
+	* hydraulic_hypres.C (initialize): Fixed formula for alpha_star.
+	Reported by Charlotte Tofteng.
+
+2005-05-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_interval.C (density_factor): New variable.
+	(density): Removed.
+
+	* lib/dk-horizon.dai: Don't divide sand in fine and coarse.
+
 2005-05-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.74 released.

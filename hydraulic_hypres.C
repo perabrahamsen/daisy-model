@@ -206,7 +206,7 @@ pedotransfer function");
   double alpha_star 
     = -14.96 + 0.03135 * clay  + 0.0351 * silt + 0.646 * humus + 15.29 * rho_b
     - 4.671 * rho_b * rho_b - 0.000781 * clay * clay - 0.00687 * humus * humus
-    + 0.00449 / humus + 0.0663 * log (silt) + 0.1482 * log (humus)
+    + 0.0449 / humus + 0.0663 * log (silt) + 0.1482 * log (humus)
     - 0.04546 * rho_b * silt - 0.4852 * rho_b * humus;
     ;
   if (top_soil)

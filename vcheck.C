@@ -600,6 +600,17 @@ VCheck::Enum::Enum (const string& a, const string& b, const string& c,
   ids.insert (e);
 }
 
+VCheck::Enum::Enum (const string& a, const string& b, const string& c,
+		  const string& d, const string& e, const string& f)
+{
+  ids.insert (a);
+  ids.insert (b);
+  ids.insert (c);
+  ids.insert (d);
+  ids.insert (e);
+  ids.insert (f);
+}
+
 void
 VCheck::All::check (const Syntax& syntax, const AttributeList& alist, 
 		    const string& key) const throw (string)

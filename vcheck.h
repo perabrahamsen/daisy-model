@@ -237,6 +237,8 @@ public:
         const std::string& d);
   Enum (const std::string& a, const std::string& b, const std::string& c,
         const std::string& d, const std::string& e);
+  Enum (const std::string& a, const std::string& b, const std::string& c,
+        const std::string& d, const std::string& e, const std::string& f);
 };
 
 class VCheck::All : public VCheck

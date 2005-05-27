@@ -39,7 +39,7 @@ class Format;
 struct Handle 
 {
   // Enum in a namespace.
-  enum handle_t { min, max, average, sum, current };
+  enum handle_t { min, max, average, geometric, sum, current };
 private:
   handle_t value;
   static handle_t symbol2handle (symbol s);

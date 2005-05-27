@@ -21,6 +21,7 @@
 
 
 #include "select_value.h"
+#include "mathlib.h"
 
 void 
 SelectValue::add_result (double result)
@@ -43,6 +44,9 @@ SelectValue::add_result (double result)
       case Handle::sum:
         value += result;
         break;
+      case Handle::geometric:
+        value += log (result);
+        break;
       }
     count++;
 }
@@ -57,8 +61,16 @@ SelectValue::done ()
   else 
     {
       double result = value;
-      if (handle == Handle::average)
-        result /= (count + 0.0);
+      switch (handle)
+        {
+        case Handle::average:
+          result /= (count + 0.0);
+          break;
+        case Handle::geometric:
+          result /= (count + 0.0);
+          result = exp (result);
+          break;
+        }
       dest.add (convert (result));
     }
   if (!accumulate)
