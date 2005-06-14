@@ -22,6 +22,7 @@
 
 #include "select_value.h"
 #include "soil.h"
+#include "border.h"
 #include "units.h"
 #include "mathlib.h"
 
@@ -169,6 +170,21 @@ struct SelectInterval : public SelectValue
 
     if (from > 0.0)
       from = 0.0;
+  }
+  bool check_border (const Border& border, 
+                     const double default_from, const double default_to,
+                     Treelog& msg) const
+  { 
+    bool ok = true;
+    if (from < 0.0 
+        && !approximate (from, default_from)
+        && !border.check_border (from, msg))
+      ok = false;
+    if (to < 0.0 
+        && !approximate (to, default_to)
+        && !border.check_border (to, msg))
+      ok = false;
+    return ok; 
   }
   SelectInterval (const AttributeList& al)
     : SelectValue (al),

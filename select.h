@@ -35,6 +35,7 @@ class Soil;
 class Time;
 class Treelog;
 class Format;
+class Border;
 
 struct Handle 
 {
@@ -145,6 +146,9 @@ public:
                            const std::string& timestep);
   void add_dest (Destination* dest);
   virtual bool check (Treelog& err) const;
+  virtual bool check_border (const Border&, 
+                             double from, double to,
+                             Treelog&) const;
 protected:
   Select (const AttributeList& al);
 public:

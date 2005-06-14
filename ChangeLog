@@ -1,3 +1,34 @@
+2005-06-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.75 released.
+
+2005-06-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_harvest.C (doIt): Disable check for emergence when
+	harvesting "all". 
+
+2005-06-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_interval.C, select.h (check_border): New virtual member
+	function. 
+	* log_select.C (check): Call it.
+
+2005-06-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil.C (border): New parameter.
+
+2005-06-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.h, weather.C, weather_std.C (initialize): Made it return
+	true on success.
+	* column_base.C (initialize_common): Ditto.
+	* daisy.C, column_inorganic.C, column_std.C (initialize): Update
+
+2005-05-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_std.C (initialize): Fixed problem with initialization
+	order when using column specific weather.
+
 2005-05-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* vcheck.C, vcheck.h (Enum::Enum): Handle up to six parameters.

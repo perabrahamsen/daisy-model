@@ -201,7 +201,7 @@ Lexer::Lexer (const string& name, Treelog& out)
     file (name),
     error_count (0)
 {  
-  if (&impl.in == &cin || impl.in.bad ())
+  if (&impl.in == &cin || !impl.in.good ())
     err.entry (string ("Open '") + file + "' failed");
 }
 

@@ -34,7 +34,8 @@ struct ActionHarvest : public Action
 
   void doIt (Daisy& daisy, Treelog& out)
   {
-    if (daisy.field.crop_ds (crop) < 0.0)
+    static const symbol all_symbol ("all");
+    if (crop != all_symbol && daisy.field.crop_ds (crop) < 0.0)
       {
 	out.warning ("Attempting to harvest " + crop 
 		     + " which has not emerged on the field");

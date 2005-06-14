@@ -90,6 +90,7 @@ public:
 
   // Creation.
   bool check (int som_size, Treelog&) const;
+  bool check_border (const double border, Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);
   Soil (const AttributeList&);
   void initialize (Groundwater&, int som_size, Treelog&);

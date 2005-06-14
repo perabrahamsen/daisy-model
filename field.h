@@ -23,6 +23,7 @@
 #ifndef FIELD_H
 #define FIELD_H
 
+#include "border.h"
 #include "symbol.h"
 #include <vector>
 
@@ -32,10 +33,10 @@ class Time;
 class IM;
 class Harvest;
 class Weather;
-class Log;
 class Treelog;
+class Log;
 
-class Field
+class Field : public Border
 { 
   // Top secret internal state.
   struct Implementation;
@@ -111,9 +112,10 @@ public:
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
+  bool check_border (const double border, Treelog& err) const;
   void initialize (const Time&, Treelog& err, const Weather*);
   Field (const std::vector<AttributeList*>&);
-  ~Field ();
+  virtual ~Field ();
 };
 
 #endif // FIELD_H

@@ -104,7 +104,7 @@ struct LogSelect : public Log
   void output (symbol name, const Time&); // Obsolete.
 
   // Create and Destroy.
-  bool check (Treelog& err) const;
+  bool check (const Border&, Treelog& err) const;
   static void document_entries (Format& format, const AttributeList& alist);
   static void load_syntax (Syntax&, AttributeList&);
   LogSelect (const AttributeList& al);

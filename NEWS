@@ -14,11 +14,29 @@ release.
 
 * 3.75
 
+** New Soil border parameter.
+
+You can now force Daisy to have numerical borders at some specific
+depths, without specifying all such depth with zplus.  
+
+You can use it like this:
+
+  (defcolumn Andeby default 
+    (Soil (border -50 -110 [cm])))
+
+Here, there will be numerical borders at 50 and 110 cm depths.
+
+If you try to log at depths that are not specified as numerical
+borders (using the 'from' and 'to' parameters to the table log model),
+you will get a warning that the results may be inexact.
+
 ** Minor fix to hypres.
 
 ** No longer warn about use of dk-horizon.dai.
 
 ** You can now log geometric average, with (handle geometric).
+
+** Reenabled harvesting of "all".
 
 * 3.74
 

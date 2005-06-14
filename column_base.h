@@ -131,11 +131,12 @@ public:
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
   virtual bool check_inner (Treelog& err) const = 0;
+  bool check_border (const double border, Treelog& err) const;
 
   // Create and Destroy.
 public:
   ColumnBase (const AttributeList&);
-  void initialize_common (const Time&, Treelog&, const Weather*);
+  bool initialize_common (const Time&, Treelog&, const Weather*);
   ~ColumnBase ();
   static void load_syntax (Syntax&, AttributeList&);
 };

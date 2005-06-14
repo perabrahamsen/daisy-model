@@ -21,6 +21,7 @@
 
 
 #include "log_select.h"
+#include "field.h"
 #include "tmpstream.h"
 #include "format.h"
 
@@ -174,9 +175,15 @@ LogSelect::output (symbol, const Time&)
 { daisy_assert (false); }
 
 bool 
-LogSelect::check (Treelog& err) const
+LogSelect::check (const Border& border, Treelog& err) const
 {
   bool ok = true;
+  bool border_ok = true;
+  if (from < 0 && !border.check_border (from, err))
+    border_ok = false;
+  if (to < 0 && !border.check_border (to, err))
+    border_ok = false;
+
   for (unsigned int i = 0; i < entries.size (); i++)
     {
       TmpStream tmp;
@@ -184,6 +191,8 @@ LogSelect::check (Treelog& err) const
       Treelog::Open nest (err, tmp.str ());
       if (!entries[i]->check (err))
         ok = false;
+      if (!entries[i]->check_border (border, from, to, err))
+        /* border_ok = false */;
     }
   return ok; 
 }

@@ -1,6 +1,22 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* PT, CZ, SK, IT, DK, PL
+* Upload MMO og Jose arbejde på hjemmesiden.
+
+* Tilføj SK/IT/PT opsætninger til fon
+
+** Den slovakiske opsætning. (v 2)
+
+** Udine opsætning
+
+** Portugisiske opsætning
+
+* check border
+
+check også grænser i select_*.C
+
+check kun de søjler der matcher log'en.
+
+* OM artikel
 
 * PT data
 
@@ -55,9 +71,9 @@ prøv at køre ler med sandsædskifte, og sand med lersædskift.
 
 ** Publicer.
 
-* (Soil (borders -35 -45))
+* (Soil (border -35 -45))
 
-Fejl hvis log interval ikke er i border.
+Check kun søjler der matcher logen...
 
 * min_intensity parameter for default weather
 

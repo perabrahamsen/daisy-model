@@ -143,7 +143,7 @@ public:
 private:
   Weather (const Weather&);
 public:
-  virtual void initialize (const Time& time, Treelog& err);
+  virtual bool initialize (const Time& time, Treelog& err);
 protected:
   Weather (const AttributeList&);
 public:

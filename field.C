@@ -95,6 +95,7 @@ public:
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
+  bool check_border (const double border, Treelog& err) const;
   void initialize (const Time&, Treelog& err, const Weather*);
   Implementation (const vector<AttributeList*>&);
   ~Implementation ();
@@ -570,6 +571,23 @@ Field::Implementation::check_am (const AttributeList& am, Treelog& err) const
   return ok;
 }
 
+bool
+Field::Implementation::check_border (const double border, Treelog& err) const
+{ 
+  Treelog::Open nest (err, "column");
+
+  bool ok = true;
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    {
+      Treelog::Open nest (err, (*i)->name);
+      if (!(*i)->check_border (border, err))
+	ok = false;
+    }
+  return ok;
+}
+
 void 
 Field::Implementation::initialize (const Time& time, Treelog& err, 
 				   const Weather* weather)
@@ -750,6 +768,10 @@ Field::check (bool require_weather, const Time& from, const Time& to,
 bool 
 Field::check_am (const AttributeList& am, Treelog& err) const
 { return impl.check_am (am, err); }
+
+bool
+Field::check_border (const double border, Treelog& err) const
+{ return impl.check_border (border, err); }
 
 void 
 Field::initialize (const Time& time, Treelog& err, const Weather* weather)

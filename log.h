@@ -23,6 +23,7 @@
 #ifndef LOG_H
 #define LOG_H
 
+#include "border.h"
 #include "librarian.h"
 #include "symbol.h"
 #include <iosfwd>
@@ -268,7 +269,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual bool check (Treelog& err) const = 0;
+  virtual bool check (const Border&, Treelog& err) const = 0;
   virtual void initialize (Treelog& out) = 0;
 protected:
   Log (const AttributeList& al);

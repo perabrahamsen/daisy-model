@@ -647,6 +647,12 @@ Select::check (Treelog& err) const
   return impl.check (spec_dim, err); 
 }
 
+bool 
+Select::check_border (const Border&, 
+                      const double /*from*/, const double /*to*/,
+                      Treelog&) const
+{ return true; }
+
 Select::Select (const AttributeList& al)
   : name (al.name ("type")),
     impl (*new Implementation (al)),

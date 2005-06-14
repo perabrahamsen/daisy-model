@@ -30,6 +30,7 @@
 #include "submodel.h"
 #include "log.h"
 #include "check.h"
+#include "vcheck.h"
 #include "plf.h"
 #include "tmpstream.h"
 #include "mathlib.h"
@@ -78,6 +79,7 @@ A location and content of a soil layer.");
   const bool has_zplus;
   const double MaxRootingDepth;
   const double dispersivity;
+  const vector<double> border;
 
   bool has_attribute (const string& name) const
   { 
@@ -94,7 +96,8 @@ A location and content of a soil layer.");
       original_layer_size (layers.size ()),
       has_zplus (al.check ("zplus")),
       MaxRootingDepth (al.number ("MaxRootingDepth")),
-      dispersivity (al.number ("dispersivity"))
+      dispersivity (al.number ("dispersivity")),
+      border (al.number_sequence ("border"))
   { }
   ~Implementation ()
   { sequence_delete (layers.begin (), layers.end ()); }
@@ -307,6 +310,32 @@ Soil::check (int som_size, Treelog& err) const
   return ok;
 }
 
+bool
+Soil::check_border (const double border, Treelog& err) const
+{
+  bool ok = false;
+  if (impl.has_zplus)
+    {
+      for (size_t i = 0; i < size (); i++)
+        if (approximate (border, zplus (i)))
+          ok = true;
+    }
+  else
+    {
+      for (size_t i = 0; i < impl.border.size (); i++)
+        if (approximate (border, impl.border[i]))
+          ok = true;
+    }
+  if (!ok)
+    {
+      TmpStream tmp;
+      tmp () << "No soil border near " << border 
+             << " [cm], log results may be inexact";
+      err.warning (tmp.str ());
+    }
+  return ok;
+}
+
 static bool
 check_alist (const AttributeList& al, Treelog& err)
 {
@@ -383,6 +412,14 @@ be added below the one specified here if you do not also specify 'zplus'.",
   syntax.add ("dispersivity", "cm", Check::positive (), 
 	      Syntax::Const, "Dispersion length.");
   alist.add ("dispersivity", 5.0);
+  syntax.add ("border", "cm", Check::negative (), 
+              Syntax::Const, Syntax::Sequence, "\
+List of flux depths where a mass balance should be possible when logging.\n\
+This attribute is ignored if zplus is specified explicitly.");
+  syntax.add_check ("border", VCheck::decreasing ());
+  vector<double> default_borders;
+  default_borders.push_back (-100.0);
+  alist.add ("border", default_borders);
 }
   
 Soil::Soil (const AttributeList& al)
@@ -452,17 +489,22 @@ Soil::initialize (Groundwater& groundwater, const int som_size, Treelog& msg)
   {
     Treelog::Open nest (msg, "Horizons");
     double last = 0.0;
+    int next_border = 0;
     for (layer = begin; layer != end; layer++)
       {
-	double current = (*layer)->end;
+        const double current = (*layer)->end;
 	daisy_assert (current < last);
 
 	const bool top_soil = (layer == begin);
 	(*layer)->horizon->initialize (top_soil, som_size, msg);
 
-	// We always have a layer limit at 1 m.
-	if (last > -100.0 && current < -100.0)
-	  fixed.push_back (-100.0);
+        while (next_border < impl.border.size ()
+               && current < impl.border[next_border])
+          {
+            if (last > impl.border[next_border])
+              fixed.push_back (impl.border[next_border]);
+            next_border++;
+          }
       
 	last = current;
 	fixed.push_back (last);

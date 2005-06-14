@@ -326,6 +326,10 @@ ColumnBase::check (bool require_weather,
   return ok;
 }
 
+bool 
+ColumnBase::check_border (const double border, Treelog& err) const
+{ return soil.check_border (border, err); }
+
 void
 ColumnBase::tick_base (Treelog& msg)
 {
@@ -414,7 +418,7 @@ ColumnBase::ColumnBase (const AttributeList& al)
     residuals_C_top (0.0)
 { }
 
-void 
+bool
 ColumnBase::initialize_common (const Time& time, Treelog& err, 
 			       const Weather* global_weather)
 {
@@ -422,10 +426,10 @@ ColumnBase::initialize_common (const Time& time, Treelog& err,
   daisy_assert (residuals_N_soil.size () == soil.size ());
   residuals_C_soil.insert (residuals_C_soil.begin (), soil.size (), 0.0);
   daisy_assert (residuals_C_soil.size () == soil.size ());
-  if (weather)
-    weather->initialize (time, err);
+  if (weather && !weather->initialize (time, err))
+    return false;
   if (!global_weather && !weather)
-    return;
+    return false;
   const Weather& my_weather = *(weather ? weather : global_weather);
   bioclimate->initialize (my_weather, err);
   groundwater->initialize (soil, time, err);
@@ -437,6 +441,7 @@ ColumnBase::initialize_common (const Time& time, Treelog& err,
        i != chemistry.end ();
        i++)
     (*i)->initialize (soil, err);
+  return true;
 }
 
 ColumnBase::~ColumnBase ()

@@ -179,7 +179,7 @@ struct LogHarvest : public Log
     out.flush ();
   }
 
-  bool check (Treelog& msg) const
+  bool check (const Border&, Treelog& msg) const
   { 
     Treelog::Open nest (msg, name);
     bool ok = true;

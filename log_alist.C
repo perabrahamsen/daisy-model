@@ -468,7 +468,7 @@ LogAList::output (symbol, const Time&)
 { }
 
 bool
-LogAList::check (Treelog&) const
+LogAList::check (const Border&, Treelog&) const
 { return true; }
 
 void

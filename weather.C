@@ -197,6 +197,7 @@ Weather::T_normal (const Time& time, double delay) const
 {
   const double rad_per_day = 2.0 * M_PI / 365.0;
 
+  daisy_assert (T_average > -400);
   return T_average
     + T_amplitude
     * exp (delay)
@@ -205,7 +206,10 @@ Weather::T_normal (const Time& time, double delay) const
 
 double 
 Weather::average_temperature () const
-{ return T_average; }
+{ 
+  daisy_assert (T_average > -400);
+  return T_average; 
+}
 
 double
 Weather::SolarDeclination (const Time& time) // [rad]
@@ -257,9 +261,9 @@ Weather::HourlyExtraterrestrialRadiation (const Time& time) const // [W/m2]
             (sin(Lat)*sin(Dec) + cos(Lat)*cos(Dec)*cos(SunHourAngle)));
 }
 
-void
+bool
 Weather::initialize (const Time&, Treelog &)
-{ }
+{ return true; }
 
 Weather::Weather (const AttributeList& al)
   : name (al.identifier ("type")),
@@ -269,7 +273,7 @@ Weather::Weather (const AttributeList& al)
     timezone (-42.42e42),
     surface_ (reference),
     screen_height_ (2.0),
-    T_average (10.0),           // May be used before Weather::check.
+    T_average (-42.42e42),           // May be used before Weather::check.
     T_amplitude (-42.42e42),
     max_Ta_yday (-42.42e42),
     day_length_ (-42.42e42),

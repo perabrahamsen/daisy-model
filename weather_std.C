@@ -285,7 +285,7 @@ struct WeatherStandard : public Weather
   }
 
   // Create and Destroy.
-  void initialize (const Time& time, Treelog& err);
+  bool initialize (const Time& time, Treelog& err);
   WeatherStandard (const AttributeList&);
   ~WeatherStandard ();
   bool check (const Time& from, const Time& to, Treelog& err) const;
@@ -773,7 +773,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
     }
 }
 
-void
+bool
 WeatherStandard::initialize (const Time& time, Treelog& err)
 { 
   Treelog::Open nest (err, "Weather: " + name);
@@ -782,7 +782,7 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
   lex = new LexerData (where, err);
   // Open errors?
   if (!lex->good ())
-    return;
+    return false;
 
   // Read first line.
   const string type = lex->get_word ();
@@ -1168,6 +1168,7 @@ NO3DryDep: " << DryDeposit.NO3 << " kgN/ha/year";
   Time previous (time);
   previous.tick_hour (-1);
   tick (previous, err);
+  return true;
 }
 
 WeatherStandard::WeatherStandard (const AttributeList& al)

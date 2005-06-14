@@ -45,8 +45,14 @@ struct SelectArray : public Select
 		    array.size () - value.size (),
 		    0.0);
     if (count == 0)
-      for (unsigned int i = 0; i < array.size (); i++)
-	value[i] = array[i];
+      {
+        if (handle == Handle::geometric)
+          for (unsigned int i = 0; i < array.size (); i++)
+            value[i] = log (array[i]);
+        else
+          for (unsigned int i = 0; i < array.size (); i++)
+            value[i] = array[i];
+      }
     else switch (handle)
       {
       case Handle::min:

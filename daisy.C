@@ -108,7 +108,7 @@ Daisy::check (Treelog& err)
 	 i != logs.end ();
 	 i++)
       {
-	if (*i == NULL || !(*i)-> check (err))
+	if (*i == NULL || !(*i)-> check (field, err))
 	  ok = false;
       }
   }
@@ -254,8 +254,8 @@ Daisy::initialize (const Syntax* glob_syn, const AttributeList* glob_al,
 { 
   global_syntax = glob_syn; 
   global_alist = glob_al;
-  if (weather)
-    weather->initialize (time, err);
+  if (weather && !weather->initialize (time, err))
+    return;
   field.initialize (time, err, weather);
   {
     Treelog::Open nest (err, "output");

@@ -62,7 +62,8 @@ public:
   {
     soil.initialize (*groundwater, -1, err);
     Treelog::Open nest (err, name);
-    initialize_common (time, err, global_weather);
+    if (!initialize_common (time, err, global_weather))
+      return;
     vegetation->initialize (time, soil, NULL, err);
   }
   Column& clone (symbol name) const

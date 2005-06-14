@@ -27,7 +27,12 @@ void
 SelectValue::add_result (double result)
 {
     if (count == 0)
-      value = result;
+      {
+        if (handle == Handle::geometric)
+          value = log (result);
+        else
+          value = result;
+      }
     else switch (handle)
       {
       case Handle::min:
