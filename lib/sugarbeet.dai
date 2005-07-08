@@ -9,7 +9,7 @@
       (TempEff2 (0.0 1.00) (30. 1.00))
       (defined_until_ds 0.8)
    )
-  (LeafPhot
+  (LeafPhot original 
       (Fm 7.0)
 ;     (Fm 3.80)
       (Qeff   0.0560)

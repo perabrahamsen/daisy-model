@@ -15,7 +15,7 @@
   (Vernal (DSLim 0.33)
 	  (TaLim  5.0)
 	  (TaSum  -50.0))
-  (LeafPhot (Qeff 0.0600)	; change from 0.065 
+  (LeafPhot original (Qeff 0.0600)	; change from 0.065 
 	    (Fm   1.80)	  ; from 3.00
 	    (TempEff (-20 0.0001) (6.5 0.100) (8.0 0.30) (12 0.8) (16 1.00)
 		     (20 1.00) (33 1.00)(37 0.03) (50 0.0))) ;°C

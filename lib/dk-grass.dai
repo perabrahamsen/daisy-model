@@ -15,7 +15,7 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."
   (Vernal (DSLim 0.9)
 	  (TaLim  5.0)
 	  (TaSum  -50.0))
-  (LeafPhot (Qeff 0.050); (g/m²/h) / (W/m²)
+  (LeafPhot original (Qeff 0.050); (g/m²/h) / (W/m²)
             (DSEff (0.0 1.0) (0.3 1.0) (1.0 1.0)(2.0 1.0));N-udbytteniveau korrigeres ved forholdsmæssig op eller nedjustering af værdierne ved DS 1.0 og 2.0
 	    (Fm   2.5) ;oprindelig 2.16    		; g/m²/h
 	    (TempEff (-20 0.0001) (05 0.0001) (10 0.90)
@@ -147,7 +147,7 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."  (Devel original
 	 (PhotEff1 (00 0.10) (10 0.00) (11 0.00) (12 0.75) (13 0.89) (14 1.00)
 		   (15 1.08) (16 1.14) (17 1.18) (24 1.18)))
 		   
-(LeafPhot 
+(LeafPhot original 
             (DSEff (0.0 0.68) (0.3 0.68) (1.0 0.68)(2.0 0.68));N-udbytteniveau korrigeres ved forholdsmæssig op eller nedjustering af værdierne ved DS 1.0 og 2.0
 	    (Fm   2.0))	;oprindelig 2.16      		; g/m²/h
 	    		   

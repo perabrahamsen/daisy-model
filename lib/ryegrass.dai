@@ -15,8 +15,9 @@
   (Vernal (DSLim 0.33)
 	  (TaLim  5.0)
 	  (TaSum  -50.0))
-  (LeafPhot (Qeff 0.0650); 0.051		; (g/m²/h) / (W/m²) effectivity at low light
-	    (Fm   3.9)	  ;3.5   		; g/m²/h
+  (LeafPhot original 
+            (Qeff 0.0650) ; 0.051; (g/m²/h) / (W/m²) effectivity at low light
+	    (Fm   3.9)	  ;3.5   ; g/m²/h
 	    (TempEff (-20 0.0001) (01 0.01) (4.5 0.5) (7.5 0.875) (8 0.92) (10 0.97) (12 1.00)
 		     (16 1.00) (20 1.00) (23 0.97) (29 0.90) (33 0.8) (35 0.1) (37 0.01) (50 0.0)))      ;°C
   (Canopy (DSLAI05 0.3)

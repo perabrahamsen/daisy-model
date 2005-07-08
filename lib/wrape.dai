@@ -14,7 +14,7 @@
         (TaLim 5.00)
         (TaSum -50.0))
 
-  (LeafPhot
+  (LeafPhot original 
         (Fm 6.00)
         (Qeff   0.0500)
         (TempEff (-20. 0.00) (2. 0.00) (10. 1.00) (25. 1.00) (35. 0.01) (50. 0.0)))

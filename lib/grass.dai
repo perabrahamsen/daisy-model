@@ -13,7 +13,8 @@
   (Vernal (DSLim 0.9)
 	  (TaLim  5.0)
 	  (TaSum  -50.0))
-  (LeafPhot (Qeff 0.050)		; (g/m²/h) / (W/m²)
+  (LeafPhot original 
+            (Qeff 0.050)		; (g/m²/h) / (W/m²)
 	    (Fm   2.16)	      		; g/m²/h
 	    (TempEff (-20 0.0001) (05 0.0001) (10 0.90)
 		     (25 1.00) (35 0.01) (50 0.0))) ;°C

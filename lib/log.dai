@@ -1411,8 +1411,6 @@ the sum of all chemicals."
                    (dimension "dg C"))
            (number (path weather "*" daily_max_air_temperature)
                    (dimension "dg C"))
-           (number (path weather "*" hourly_max_air_temperature)
-                   (dimension "dg C"))
            (number (path weather "*" hourly_air_temperature)
                    (tag "Avg T")
                    (handle average)

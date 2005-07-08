@@ -16,7 +16,7 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet"
         (TaLim 5.00)
         (TaSum -50.0))
 
-  (LeafPhot
+  (LeafPhot original 
         (Fm 5.00)
 ;oprindelig(Fm 6.00)
         (DSEff (0.0 1.0) (0.3 1.0) (1.0 0.91)(2.0 0.87));N-udbytteniveau korrigeres ved forholdsmæssig op eller nedjustering af værdierne ved DS 1.0 og 2.0

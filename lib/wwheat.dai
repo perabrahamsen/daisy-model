@@ -11,7 +11,7 @@
           (TaLim 5.00)
           (TaSum -50.0))
 
-  (LeafPhot (Fm 5.00)
+  (LeafPhot original (Fm 5.00)
             (Qeff   0.0500)
             (TempEff (-20.0  0.00) (4.00  0.00) (10.0  1.00) (25.0  1.00) (35.0  0.01) (50.0  0.00)))
 
@@ -87,7 +87,7 @@
       (DSRate1  0.020)
       (DSRate2  0.027)
   )
-  (LeafPhot (Fm 4.00)
+  (LeafPhot original (Fm 4.00)
   )
   (Canopy
        (SpLAI     0.020)

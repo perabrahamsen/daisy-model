@@ -14,7 +14,7 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."
       (TempEff2 (0.0  0.0) (16.0  1.0) (30.0  1.0))
   )
 
-  (LeafPhot
+  (LeafPhot original 
       (Fm 4.40) ; (original Fm 3.50)
       (DSEff (0.0 1.0) (0.3 1.0) (1.0 1.0)(2.0 1.0));N-udbytteniveau korrigeres ved forholdsmæssig op eller nedjustering af værdierne ved DS 1.0 og 2.0
       (Qeff   0.04)

@@ -10,7 +10,7 @@
       (TempEff2 (0.00  0.000)    (16.00  1.000)    (30.00  1.000)   )
   )
 
-  (LeafPhot 
+  (LeafPhot original 
       (Fm 4.00)
       (Qeff   0.0400)
       (TempEff 

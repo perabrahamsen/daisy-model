@@ -7,7 +7,8 @@
          (PhotEff1 ( 1. 0.00) (12. 1.00) (16. 1.00) (24. 1.00))
          (DSRate2  0.007)
          (TempEff2 (0.0 1.00) (30. 1.00)))
-  (LeafPhot (Fm 3.80)
+  (LeafPhot original 
+            (Fm 3.80)
             (Qeff   0.0560)
             (TempEff (5. 0.0) (10. 0.75) (20. 1.00)
                      (30.  1.00) (40. 0.01) (50. 0.0)))
@@ -116,7 +117,7 @@ It is based on experimental data from SCRI from 1983 and 1984."
          (DSRate2  0.0090)
          (TempEff2 (02 0.00) (13 1.00) (19 1.00) (29 0.00)))
 
-  (LeafPhot                             ; Spitters et al 1989
+  (LeafPhot original                    ; Spitters et al 1989
    (Fm 3.0 [g CO2/m^2/h])  
    (DSEff (0.0 1.2) (0.3 1.2) (1.0 1.0) (1.60 0.75) (2.0 0.75))
    (Qeff   0.045)
