@@ -1,4 +1,4 @@
-// lexer_data.C --- Reda data from a file.
+// lexer_data.C --- Read data from a file.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.

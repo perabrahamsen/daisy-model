@@ -12,6 +12,31 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.76
+
+** Photosynthesis made a component.
+
+In practice, this means that when specifying the LeafPhot parameter in
+the default crop model, you need to insert the name of the model for
+leaf photosynthesis you want to use.  In practice, I suggest you
+specify "original" in order to get the default parameters and model.
+
+Instead of 
+
+  (LeafPhot (Fm 5.00) (Qeff   0.0500))
+
+write
+
+  (LeafPhot original (Fm 5.00) (Qeff   0.0500))
+
+The standard crop parameterizations in daisy-lib.zip have been
+updated.  
+
+Later, it will be possible to use other models for leaf
+photosynthesis, such as Farquhar.
+
+** Bug fixes.
+
 * 3.75
 
 ** New Soil border parameter.

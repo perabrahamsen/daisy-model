@@ -1,3 +1,28 @@
+2005-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.76 released.
+
+2005-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Weather"): Removed bogus column.
+
+	* weather_std.C (read_new_day): Fix calculation of time for
+	minimum temperature.
+
+2005-07-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (load_derived): Support default type for backward
+	compatibility. 
+
+	* photosynthesis.C, photosynthesis.h: Removed submodel.
+	* photo.C, photo.h: New component.
+	* photo_GL.C: New model.
+	* Makefile (MODELS, COMPONENTS, SUBMODELS): Updated.
+
+2005-07-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* program_gnuplot.C: New model.
+
 2005-06-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.75 released.

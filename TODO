@@ -1,10 +1,20 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* gnuplot program
+
+** Generelt fascilitet til at læse dwf/dlf/ddf filer?
+
+* Søren Marcus opsætning
+
+Opsætning skal helst være klar 5. sep, de næste to uger er Marcus der.
+
+* Farquhar photo
+
+* OM artikel
+
 * check border
 
 check kun de søjler der matcher log'en.
-
-* OM artikel
 
 * PT data
 
@@ -58,10 +68,6 @@ prøv at køre ler med sandsædskifte, og sand med lersædskift.
 ** Find referencer.
 
 ** Publicer.
-
-* (Soil (border -35 -45))
-
-Check kun søjler der matcher logen...
 
 * min_intensity parameter for default weather
 

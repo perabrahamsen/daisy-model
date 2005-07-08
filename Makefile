@@ -287,7 +287,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = program_document.C format_LaTeX.C program_batch.C summary_balance.C \
+MODELS = photo_GL.C program_gnuplot.C \
+	program_document.C format_LaTeX.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
 	domsorp_std.C chemistry_std.C equil_linear.C pedo_const.C \
 	horizon_numeric.C horizon_system.C select_pF.C pet_FAO_PM.C \
@@ -331,7 +332,8 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
+COMPONENTS = photo.C \
+	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
 	transform.C rootdens.C select.C average.C mactrans.C macro.C \
 	parser.C log.C weather.C column.C crop.C \
@@ -343,7 +345,7 @@ COMPONENTS = format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 # Submodels are combined models and components.
 #
 SUBMODELS = fetch.C horheat.C litter.C time.C \
-	som.C smb.C aom.C dom.C photosynthesis.C crpn.C vernalization.C \
+	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \
 	harvesting.C canopy_simple.C canopy_std.C root_system.C \
 	ridge.C soil.C surface.C soil_water.C soil_NH4.C soil_NO3.C \
@@ -390,7 +392,7 @@ LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SPARCOBJ)
 OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
 SOURCES = $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN) $(QTSOURCES) \
 	cmain.c bugmain.c $(DISABLED) $(MSSRC)
-HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h)
+HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) border.h
 
 # Find all printable files.
 #

@@ -694,7 +694,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
                     // First time.
                     yesterday_T_max = last_max_air_temperature;
 
-                  const double t_min = 12.0 - day_length ();
+                  const double t_min = 12.0 - day_length () / 2.0;
                   const double t_max = 15.0;
                   PLF T;
                   T.add (15 - 24.0, yesterday_T_max);

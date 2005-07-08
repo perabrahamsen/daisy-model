@@ -28,7 +28,7 @@
 #include "phenology.h"
 #include "partition.h"
 #include "vernalization.h"
-#include "photosynthesis.h"
+#include "photo.h"
 #include "crpn.h"
 #include "wse.h"
 #include "log.h"
@@ -56,7 +56,7 @@ public:
   auto_ptr<Phenology> development;
   const Partition partition;
   Vernalization vernalization;
-  const Photosynthesis photosynthesis;
+  auto_ptr<Photo> photo;
   CrpN nitrogen;
   const auto_ptr<WSE> water_stress_effect;
   const bool enable_N_stress;
@@ -306,10 +306,10 @@ CropStandard::tick (const Time& time,
           // Shared light.
           const vector<double>& PAR = bioclimate.PAR ();
           daisy_assert (PAR.size () > 1);
-          Ass += photosynthesis (bioclimate.daily_air_temperature (),
-                                 PAR, bioclimate.height (),
-                                 bioclimate.LAI (),
-                                 canopy, *development, msg)
+          Ass += photo->assimilate (bioclimate.daily_air_temperature (),
+                                    PAR, bioclimate.height (),
+                                    bioclimate.LAI (),
+                                    canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
         }
       if (min_light_fraction > 1e-10)
@@ -320,10 +320,10 @@ CropStandard::tick (const Time& time,
           Bioclimate::radiation_distribution 
             (No, LAI (), PARref (), bioclimate.hourly_global_radiation (),
              PARext (), PAR); 
-          Ass += photosynthesis (bioclimate.daily_air_temperature (),
-                                 PAR, bioclimate.height (),
-                                 bioclimate.LAI (),
-                                 canopy, *development, msg)
+          Ass += photo->assimilate (bioclimate.daily_air_temperature (),
+                                   PAR, bioclimate.height (),
+                                   bioclimate.LAI (),
+                                   canopy, *development, msg)
             * min_light_fraction;
         }
 
@@ -495,7 +495,7 @@ CropStandard::CropStandard (const AttributeList& al)
     vernalization (al.check ("Vernal")
                    ? al.alist ("Vernal")
                    : Vernalization::no_vernalization ()),
-    photosynthesis (al.alist ("LeafPhot")),
+    photo (Librarian<Photo>::create (al.alist ("LeafPhot"))),
     nitrogen (al.alist ("CrpN")),
     water_stress_effect (Librarian<WSE>::create 
                          (!al.flag ("enable_water_stress")
@@ -537,8 +537,10 @@ CropStandardSyntax::CropStandardSyntax ()
 			"Assimilate partitioning.", Partition::load_syntax);
   syntax.add_submodule ("Vernal", alist, Syntax::OptionalState, 
 			"Vernalization.", Vernalization::load_syntax);
-  syntax.add_submodule ("LeafPhot", alist, Syntax::Const,
-			"Leaf photosynthesis.", Photosynthesis::load_syntax);
+  syntax.add ("LeafPhot", Librarian<Photo>::library (),
+              Syntax::Const, Syntax::Singleton,
+              "Leaf photosynthesis.");
+  alist.add ("LeafPhot", Photo::default_model ());
   syntax.add_submodule ("CrpN", alist, Syntax::State,
 			"Nitrogen parameters.", CrpN::load_syntax);
 

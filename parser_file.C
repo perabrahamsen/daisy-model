@@ -457,15 +457,45 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
 {
   AttributeList* alist;
   bool skipped = false;
-  if (looking_at ('('))
+
+  static const symbol original_symbol ("original");
+  symbol type;
+
+  static const string compatibilty_symbol ("used_to_be_a_submodel");
+  if (original && original->check (compatibilty_symbol) && looking_at ('('))
     {
-      skip ("(");
-      skipped = true;
+      // Special hack to allow skipping the "original" keyword for
+      // models that used to be submodels.
+      daisy_assert (original->flag (compatibilty_symbol));
+      daisy_assert (original->check ("type"));
+      const symbol original_type = original->identifier ("type");
+      daisy_assert (lib.check (original_type));
+
+      type = original_symbol;
+#if 1
+      warning ("Model specified missing, assuming 'original'");
+#else
+      static bool has_warned = false;
+      if (!has_warned)
+        {
+          has_warned = true;
+          TmpStream tmp;
+          tmp () << "Assuming original type '" << original_type << "'";
+          warning (tmp.str ());
+        }
+#endif
     }
-  symbol type = get_symbol ();
+  else  
+    {
+      if (looking_at ('('))
+        {
+          skip ("(");
+          skipped = true;
+        }
+      type = get_symbol ();
+    }
   try
     {
-      static const symbol original_symbol ("original");
       if (type == original_symbol)
 	{
 	  if (!original)
