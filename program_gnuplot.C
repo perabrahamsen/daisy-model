@@ -24,6 +24,7 @@
 #include "treelog.h"
 #include "tmpstream.h"
 #include "lexer_data.h"
+#include "mathlib.h"
 #include <string>
 
 struct ProgramGnuplot : public Program
@@ -35,10 +36,14 @@ struct ProgramGnuplot : public Program
   // Source.
   struct Source
   {
+    const std::string field_sep;
     const std::string filename;
     const std::string tag;
     
     // Run.
+    static int find_tag (std::map<std::string,int>& tag_pos,
+                         const std::string& tag);
+    std::string get_entry (LexerData& lex) const;
     bool load (Treelog& msg);
 
     // Create and Destroy.
@@ -65,6 +70,31 @@ struct ProgramGnuplot : public Program
   ~ProgramGnuplot ()
   { sequence_delete (source.begin (), source.end ()); }
 };
+
+
+int
+ProgramGnuplot::Source::find_tag (std::map<std::string,int>& tag_pos,
+                                  const std::string& tag)
+{
+  if (tag_pos.find (tag) == tag_pos.end ())
+    return -1;
+  return tag_pos[tag];
+}
+
+std::string
+ProgramGnuplot::Source::get_entry (LexerData& lex) const
+{
+  std::string entry = "";
+  daisy_assert (field_sep.size () == 1);
+  while (lex.good ())
+    {
+      int c = lex.peek ();
+      if (c == field_sep[0] || c == '\n')
+        break;
+      entry += int2char (lex.get ());
+    }
+  return entry;
+}
 
 bool
 ProgramGnuplot::Source::load (Treelog& msg)
@@ -94,29 +124,52 @@ ProgramGnuplot::Source::load (Treelog& msg)
 
   // Read tags.
   std::map<std::string,int> tag_pos;
-  for (int count = 0; lex.good () && lex.peek () != '\n'; count++)
+  for (int count = 0; lex.good (); count++)
     {
-      const std::string candidate = lex.get_word ();
+      const std::string candidate = get_entry (lex);
       if (tag_pos.find (candidate) == tag_pos.end ())
         tag_pos[candidate] = count;
       else
         lex.warning ("Duplicate tag: " + candidate);
-      lex.skip_space ();
+      if (lex.peek () == '\n')
+        break;
+      lex.skip(field_sep.c_str ());
     }
+  lex.next_line ();
 
-  int column;
-  if (tag_pos.find (tag) == tag_pos.end ())
+  const int tag_c = find_tag (tag_pos, tag);
+  const int year_c = find_tag (tag_pos, "year");
+  const int month_c = find_tag (tag_pos, "month");
+  const int mday_c = find_tag (tag_pos, "mday");
+  const int hour_c = find_tag (tag_pos, "hour");
+  if (tag_c < 0)
     {
       lex.error ("Tag '" + tag + "' not found");
       return false;
     }
-  else
-    column = tag_pos[tag];
-  
-  lex.next_line ();
+
   // Read dimensions.
+  for (int count = 0; count < tag_c; count++)
+    { 
+      (void) get_entry (lex);
+      lex.skip (field_sep.c_str ());
+    }
+  const std::string dimension = get_entry (lex);
+  lex.skip_line ();
+  lex.next_line ();
 
   // Read data.
+#if 0
+  while (lex.good ())
+    {
+      double year = 1000;
+      double 
+      for (int count == 0; lex.good (); count ++)
+        {
+          double number = 
+        }
+    }
+#endif
 
   // Done.
   return true;
@@ -132,7 +185,8 @@ Name of column in Daisy log file where data is found.");
 }
 
 ProgramGnuplot::Source::Source (const AttributeList& al)
-  : filename (al.name ("file")),
+  : field_sep ("\t"), 
+    filename (al.name ("file")),
     tag (al.name ("tag"))
 { }
 

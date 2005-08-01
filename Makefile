@@ -99,13 +99,13 @@ ifeq ($(USE_OPTIMIZE),true)
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
 		endif
 		ifeq ($(HOSTTYPE),i386-linux)
-		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
+		  OPTIMIZE = -O2 -ffast-math -mtune=pentiumpro -march=pentium
 	        endif
 		ifeq ($(HOSTTYPE),cygwin)
-		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
+		  OPTIMIZE = -O2 -ffast-math -mtune=pentiumpro -march=pentium
 		endif
 		ifeq ($(HOSTTYPE),mingw)
-		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
+		  OPTIMIZE = -O2 -ffast-math -mtune=pentiumpro -march=pentium
 		endif
 	endif
 	ifeq ($(COMPILER),icc)
@@ -168,11 +168,12 @@ ifeq ($(COMPILER),gcc)
 #		          -I/home/mingw/include -L/home/mingw/lib
 		DEBUG =
 	endif
-	WARNING = -W -Wall -Wno-sign-compare -Wstrict-prototypes \
-		  -Wconversion -Wmissing-prototypes -Woverloaded-virtual \
+	WARNING = -W -Wall -Wno-sign-compare \
+		  -Wconversion -Woverloaded-virtual \
 		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings 
 #  -Wold-style-cast: triggered by header files for 2.95/woody
 #  -Wmissing-noreturn: triggered by some virtual functions.
+#  -Wmissing-prototypes -Wstrict-prototypes: Not C++ flags.
 	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 	CPPLIB = -lstdc++

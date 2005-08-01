@@ -19,7 +19,6 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #include "lexer_data.h"
 #include "time.h"
 #include "mathlib.h"

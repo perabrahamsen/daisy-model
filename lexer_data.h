@@ -47,4 +47,4 @@ public:
   ~LexerData ();
 };
 
-#endif // LEXER_H
+#endif // LEXER_DATA_H
