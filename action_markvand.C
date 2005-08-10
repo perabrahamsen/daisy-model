@@ -79,7 +79,7 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
   const double global_radiation = daisy.field.daily_global_radiation ();
   const double precipitation = daisy.field.daily_precipitation ();
   const double reference_evapotranspiration 
-    = FAO::Makkink (air_temperature, global_radiation);
+    = FAO::Makkink (air_temperature, global_radiation) * 24.0;
   const double potential_evapotranspiration = reference_evapotranspiration;
 
   // Temperature sum.
@@ -100,6 +100,17 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
       daisy.field.irrigate_overhead (amount, im);
       reservoir = max_reservoir;
     }
+#if 0
+  else
+    {
+      TmpStream tmp;
+      tmp () << "res = " << reservoir << " mm, P = " << precipitation
+             << " mm, Ep = " << potential_evapotranspiration 
+             << " mm, full = " << 100.0 * reservoir / max_reservoir << "%";
+      out.message (tmp.str ());
+    }
+#endif
+
 }
 
 static struct ActionMarkvandSyntax
@@ -168,3 +179,43 @@ static struct MV_SoilSyntax
     Librarian<MV_Soil>::add_type ("default", alist, syntax, &make);
   }
 } MV_Soil_syntax;
+
+// MV_Crop
+
+struct MV_Crop
+{
+  // Content.
+  const symbol name;
+  static const char *const description;
+
+  // Simulation.
+
+  // Create and Destroy.
+  MV_Crop (const AttributeList& al)
+    : name (al.identifier ("type"))
+  { }
+  ~MV_Crop ()
+  { }
+};
+
+EMPTY_TEMPLATE
+Librarian<MV_Crop>::Content* Librarian<MV_Crop>::content = NULL;
+
+static Librarian<MV_Crop> MV_Crop_init ("MV_Crop");
+
+const char *const MV_Crop::description = "\
+Description of a crop for use by the MARKVAND model.";
+
+static struct MV_CropSyntax
+{
+  static MV_Crop&
+  make (const AttributeList& al)
+  { return *new MV_Crop (al); }
+  MV_CropSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Standard MARKVAND crop model.");
+    Librarian<MV_Crop>::add_type ("default", alist, syntax, &make);
+  }
+} MV_Crop_syntax;

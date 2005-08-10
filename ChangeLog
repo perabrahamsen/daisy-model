@@ -1,3 +1,7 @@
+2005-08-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pet.C (reference_to_potential): Use cover instead of LAI.
+
 2005-08-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* weather_none.C, weather_std.C:

@@ -39,15 +39,9 @@ Pet::reference_to_potential (const Vegetation& crops,
 			     const Surface& surface,
 			     double ref)
 {
-  const double LAI = crops.LAI ();
-  double EpFactor;
-  if (LAI < 0.01)
-    EpFactor = surface.EpFactor ();
-  else if (LAI > 0.99)
-    EpFactor = crops.EpFactor ();
-  else
-    EpFactor = LAI * crops.EpFactor () + (1.0 - LAI) * surface.EpFactor ();
-
+  const double cover = crops.cover ();
+  const double EpFactor = cover * crops.EpFactor ()
+    + (1.0 - cover) * surface.EpFactor ();
   return EpFactor * max (0.0, ref);
 }
 
