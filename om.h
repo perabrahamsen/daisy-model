@@ -90,7 +90,8 @@ public:
 public:
   void grow (unsigned int size);
 protected:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Syntax&, AttributeList&, 
+                           const std::string& frac_desc);
   OM (const AttributeList& al);
   virtual ~OM ();
 };

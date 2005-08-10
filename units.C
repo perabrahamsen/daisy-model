@@ -363,12 +363,14 @@ Units::standard_conversions ()
   add ("g N/cm^2/h", "kg N/ha/h", 1e5); 
   add ("g N/m^2", "kg N/ha", 10.0); // Crop N.
   add ("g/m^2", "kg N/ha", 10.0);
+  add ("g/m^2/h", "kg N/ha/h", 10.0);
   add ("g/cm^2", "kg C/ha", 1e5); // DOM.
   add ("g N/cm^2", "kg N/ha", 1e5); // Organic N.
   add ("g C/cm^2", "kg C/ha", 1e5);
   add (Syntax::Fraction (), "mg/l", 1e6);
   add ("g C/cm^2", "g/cm^2", 1.0);	// For "per dry matter" logging.
   add ("g N/cm^2", "g/cm^2", 1.0);	// For "per dry matter" logging.
+  add ("g/m^2/h", "Mg DM/ha/h", 1.0e-2); // harvest DM.
 }
 
 Units::Units ()

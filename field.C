@@ -67,6 +67,8 @@ struct Field::Implementation
   // Conditions.
 public:
   double daily_air_temperature () const; // [ dg C]
+  double daily_precipitation () const; // [mm]
+  double daily_global_radiation () const; // [W/m^2]
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
   double soil_water_content (double from, double to) const; // [cm -> cm]
@@ -369,6 +371,28 @@ Field::Implementation::daily_air_temperature () const // [ dg C ]
     throw ("Cannot find daily air_temperatur for multiple columns");
 
   return columns[0]->daily_air_temperature ();
+}
+
+double 
+Field::Implementation::daily_precipitation () const // [ dg C ]
+{
+  if (selected)
+    return selected->daily_precipitation (); 
+  if (columns.size () != 1)
+    throw ("Cannot find daily precipitation for multiple columns");
+
+  return columns[0]->daily_precipitation ();
+}
+
+double 
+Field::Implementation::daily_global_radiation () const // [ dg C ]
+{
+  if (selected)
+    return selected->daily_global_radiation (); 
+  if (columns.size () != 1)
+    throw ("Cannot find daily global radiation for multiple columns");
+
+  return columns[0]->daily_global_radiation ();
 }
 
 double 
@@ -698,6 +722,14 @@ Field::set_surface_detention_capacity (double height) // [mm]
 double 
 Field::daily_air_temperature () const  // [dg C]
 { return impl.daily_air_temperature (); }
+
+double 
+Field::daily_precipitation () const  // [dg C]
+{ return impl.daily_precipitation (); }
+
+double 
+Field::daily_global_radiation () const  // [dg C]
+{ return impl.daily_global_radiation (); }
 
 double 
 Field::soil_temperature (double height) const  // [cm -> dg C]

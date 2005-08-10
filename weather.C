@@ -114,8 +114,9 @@ Weather::output (Log& log) const
                 "daily_max_air_temperature", log);
   output_value (hourly_global_radiation (), "hourly_global_radiation", log);
   output_value (daily_global_radiation (), "daily_global_radiation", log);
-  output_value (reference_evapotranspiration (), 
-		"reference_evapotranspiration", log);
+  if (has_reference_evapotranspiration ())
+    output_value (reference_evapotranspiration (), 
+                  "reference_evapotranspiration", log);
   output_value (rain (), "rain", log);
   output_value (snow (), "snow", log);
   output_value (rain () + snow (), "precipitation", log);

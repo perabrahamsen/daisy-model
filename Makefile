@@ -1,3 +1,4 @@
+
 # Makefile --- For maintaining the Daisy project.
 #
 # Automatic creation of daisy on multiple platforms.
@@ -99,7 +100,7 @@ ifeq ($(USE_OPTIMIZE),true)
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
 		endif
 		ifeq ($(HOSTTYPE),i386-linux)
-		  OPTIMIZE = -O2 -ffast-math -mtune=pentiumpro -march=pentium
+		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
 	        endif
 		ifeq ($(HOSTTYPE),cygwin)
 		  OPTIMIZE = -O2 -ffast-math -mtune=pentiumpro -march=pentium
@@ -288,7 +289,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = photo_GL.C program_gnuplot.C \
+MODELS = action_markvand.C photo_GL.C program_gnuplot.C \
 	program_document.C format_LaTeX.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
 	domsorp_std.C chemistry_std.C equil_linear.C pedo_const.C \
@@ -614,7 +615,7 @@ dist:	cvs
 	mv -f daisy-src.zip $(FTPDIR)
 	(cd lib && $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
 	(cd sample && $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
-#	(cd txt && $(MAKE) FTPDIR=$(FTPDIR) dist)
+	(cd txt && $(MAKE) FTPDIR=$(FTPDIR) dist)
 	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
 	rm -f $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG)
 	$(STRIP) -o $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG) \

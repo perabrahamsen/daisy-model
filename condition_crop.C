@@ -35,7 +35,7 @@ struct ConditionDSAfter : public Condition
 
   bool match (const Daisy& daisy) const
   { 
-    double crop_ds = daisy.field.crop_ds (crop); 
+    const double crop_ds = daisy.field.crop_ds (crop); 
     if (crop_ds != Crop::DSremove && crop_ds >= ds)
       return true;
     return false;

@@ -2693,7 +2693,7 @@ OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
 		  TmpStream tmp;
 		  tmp () << "You have " << fractions.size ()
 			 << " fractions but " << impl.smb.size ()
-			 << " smb, 1 buffer and " << impl.dom.size () 
+			 << " smb, 1 som buffer and " << impl.dom.size () 
 			 << " dom";
 		  err.entry (tmp.str ());
 		  ok = false;

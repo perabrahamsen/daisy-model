@@ -70,8 +70,10 @@ public:
 
   // Conditions.
 public:
-  virtual double daily_air_temperature () const = 0; // [ dg C]
-  virtual double soil_temperature (double height) const = 0; // [ cm -> dg C]
+  virtual double daily_air_temperature () const = 0; // [dg C]
+  virtual double daily_precipitation () const = 0; // [mm]
+  virtual double daily_global_radiation () const = 0; // [W/m^2]
+  virtual double soil_temperature (double height) const = 0; // [cm -> dg C]
   virtual double soil_water_potential (double height) const = 0; // [cm -> cm]
   virtual double soil_water_content (double from, double to) const = 0; // [cm]
   virtual double soil_inorganic_nitrogen (double from, // [kg N/ha]

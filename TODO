@@ -1,29 +1,52 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* IT wp1
+* markvand
 
-** Konvereter 2003 opsætning fra fertorganic til fon
+lai 
 
-** Tilføj 2004 rettelser
+cover
 
-** Send svar og rettelser til Adreano
+pot_evap
 
--> column zplus, jord, grundvand i ITCERcolumn.Dai
--> skudår i vejrdata ITCER04.dwf
--> fjernede log.dai
--> fjernede ekstra parantes i ITCER1.dai
+rodvækst
 
-** commit og send brev til cto
+reservour
 
-** upload på hjemmeside
+markvand crop
+
+markvand jord 
+
+markvand crop <-> daisy crop tabel.
 
 * Søren Marcus opsætning
 
 Opsætning skal helst være klar 5. sep, de næste to uger er Marcus der.
 
+** Lokal irrigation
+
+*** TD, TC
+
+** Daisy irrigation og gødning
+
+*** TB
+
+** FON irrigation og gødning
+
+*** Skaf FON spreadsheet
+
+*** Fodr FON spreadsheet
+
+*** TA
+
+** Installer hos Søren Marcus
+
+* Indsæt mmo grøntsager i lib (og sample?).
+
 * gnuplot program
 
 ** Generelt fascilitet til at læse dwf/dlf/ddf filer?
+
+* Support bibliography attribute...
 
 * Farquhar photo
 

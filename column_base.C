@@ -150,6 +150,14 @@ ColumnBase::daily_air_temperature () const
 { return bioclimate->daily_air_temperature (); }
 
 double 
+ColumnBase::daily_precipitation () const
+{ return bioclimate->daily_precipitation (); }
+
+double 
+ColumnBase::daily_global_radiation () const
+{ return bioclimate->daily_global_radiation (); }
+
+double 
 ColumnBase::soil_temperature (double height) const
 {
   daisy_assert (height < 0);

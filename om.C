@@ -361,7 +361,8 @@ You cannot specify 'C_per_N' for intervals where 'C' is unspecified.");
 }
 
 void
-OM::load_syntax (Syntax& syntax, AttributeList& alist)
+OM::load_syntax (Syntax& syntax, AttributeList& alist, 
+                 const std::string& frac_desc)
 {
   syntax.add_check (check_alist);
   alist.add ("submodel", "OM");
@@ -385,10 +386,7 @@ You must specify either this or 'turnover_rate'.");
   syntax.add_fraction ("efficiency", Syntax::Const, Syntax::Sequence, "\
 The efficiency this pool can be digested by each of the SMB pools.");
   syntax.add_fraction ("fractions", Syntax::Const, Syntax::Sequence, "\
-How this pool is divided into other pools.\n\
-The first numbers corresponds to each of the SMB pools, the remaining\n\
-numbers corresponds to the SOM pools.  The length of the sequence should\n\
-thus be the number of SMB pools plus the number of SOM pools.");
+How this pool is divided into other pools.\n" + frac_desc);
   syntax.add_check ("fractions", VCheck::sum_equal_1 ());
   syntax.add ("initial_C_per_N", "g C/g N", Syntax::OptionalState, "\
 The initial C/N ratio when this pool is created.\n\

@@ -48,6 +48,8 @@ public:
   { return global_radiation; }
   double reference_evapotranspiration () const
   { return reference_evapotranspiration_; }
+  double daily_precipitation () const 
+  { return (rain_ + snow_) * 24; }
   double rain () const
   { return rain_; }
   double snow () const

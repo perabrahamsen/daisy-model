@@ -63,6 +63,7 @@ public:
 
   // Weather.
   virtual double daily_air_temperature () const = 0;
+  virtual double daily_precipitation () const = 0;
   virtual double day_length () const = 0;
   virtual double daily_global_radiation () const = 0;
   virtual double hourly_global_radiation () const = 0;

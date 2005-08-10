@@ -26,7 +26,11 @@
 void 
 SOM::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  OM::load_syntax (syntax, alist); 
+  OM::load_syntax (syntax, alist, "\
+The first numbers corresponds to each of the SMB pools, the next\n\
+numbers corresponds to the SOM pools, and the last numbers to each of\n\
+the DOM pools.  The length of the sequence should thus be the number\n\
+of SMB pools plus the number of SOM pools plus the number of DOM pools."); 
   alist.add ("submodel", "SOM");
   alist.add ("description", "\
 A single Soil Organic Matter pool.");

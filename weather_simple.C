@@ -49,6 +49,7 @@ public:
   double hourly_global_radiation () const;
   double daily_global_radiation () const;
   double reference_evapotranspiration () const;
+  double daily_precipitation () const;
   double Precipitation () const;
 
   // Create and Destroy.
@@ -113,6 +114,17 @@ WeatherSimple::reference_evapotranspiration () const // [mm/h]
     return WeatherOld::reference_evapotranspiration ();
   else
     return reference_evapotranspiration_;
+}
+
+double
+WeatherSimple::daily_precipitation () const
+{
+  double p = 0.0;
+  const int yday_hours = time.yday () * 24;
+  for (int hour = 0; hour < 24; hour++)
+    if (((yday_hours + hour) % interval) == 0)
+      p += precipitation;
+  return p;
 }
 
 double

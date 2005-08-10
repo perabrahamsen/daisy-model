@@ -36,6 +36,7 @@
 #include "svat.h"
 #include "vegetation.h"
 #include "chemicals.h"
+#include "time.h"
 #include "tmpstream.h"
 
 using namespace std;
@@ -133,6 +134,7 @@ struct BioclimateStandard : public Bioclimate
 
   // Weather.
   double daily_air_temperature_; // Air temperature in canopy. [dg C]
+  double daily_precipitation_; // From weather. [mm]
   double day_length_;		// From weather (does not belong here) [h].
   double daily_global_radiation_; // From weather [W/m2].
   double hourly_global_radiation_; // From weather [W/m2].
@@ -155,6 +157,8 @@ struct BioclimateStandard : public Bioclimate
   // Weather.
   double daily_air_temperature () const
   { return daily_air_temperature_; }
+  double daily_precipitation () const
+  { return daily_precipitation_; }
   double day_length () const
   { return day_length_; }
   double daily_global_radiation () const
@@ -288,7 +292,9 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     canopy_chemicals_out (),
 
     surface_chemicals_in (),
+    // BUG: These should really be part of the state, for checkpoints.
     daily_air_temperature_ (0.0),
+    daily_precipitation_ (0.0),
     day_length_ (0.0),
     daily_global_radiation_ (0.0),
     hourly_global_radiation_ (0.0)
@@ -614,6 +620,7 @@ BioclimateStandard::tick (const Time& time,
   hourly_global_radiation_ = weather.hourly_global_radiation ();
   daily_global_radiation_ = weather.daily_global_radiation ();
   daily_air_temperature_ = weather.daily_air_temperature ();
+  daily_precipitation_ = weather.daily_precipitation ();
   day_length_ = weather.day_length ();
   
   // Add nitrogen deposit. 

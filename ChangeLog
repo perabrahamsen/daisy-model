@@ -1,3 +1,27 @@
+2005-08-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_none.C, weather_std.C:
+	* weather.h, weather_simple.C (daily_precipitation): New function.
+
+2005-08-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C, bioclimate.h (daily_precipitation): New
+	virtual member function.
+	* column_base.C, column_base.h, column.h (daily_precipitation,
+	daily_global_radiation):  Ditto.
+	* field.h, field.C (daily_precipitation, daily_global_radiation):
+	Ditto. 
+
+	* action_markvand.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* condition_crop.C (ConditionDSAfter::match): Added const
+
+2005-08-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (load_syntax): New 'frac_desc' parameter.
+	* aom.C, smb.C, som.C (load_syntax): Update caller.
+
 2005-07-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lexer_data.h: Fixed comment.

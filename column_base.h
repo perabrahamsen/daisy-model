@@ -97,6 +97,8 @@ public:
 
   // Conditions.
   double daily_air_temperature () const; // [ dg C]
+  double daily_precipitation () const; // [mm]
+  double daily_global_radiation () const; // [W/m^2]
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
   double soil_water_content (double from, double to) const; // [cm]

@@ -87,6 +87,7 @@ public:
   virtual double hourly_global_radiation () const = 0; // [W/m2]
   virtual double daily_global_radiation () const = 0; // [W/m2]
   virtual double reference_evapotranspiration () const = 0; // [mm/h]
+  virtual double daily_precipitation () const = 0; // [mm/d]
   virtual double rain () const = 0;	// [mm/h]
   virtual double snow () const = 0;	// [mm/h]
   IM deposit () const; // [g [stuff] /cm²/h]

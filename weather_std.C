@@ -187,7 +187,8 @@ struct WeatherStandard : public Weather
   double daily_max_air_temperature_;
   double daily_min_air_temperature_;
   double daily_global_radiation_;
-  
+  double daily_precipitation_;
+
   // Fractions this hour.
   double snow_fraction;
   double rain_fraction;
@@ -235,6 +236,11 @@ struct WeatherStandard : public Weather
     daisy_assert (initialized);
     return reference_evapotranspiration_[hour]; 
   }
+  double daily_precipitation () const // [mm/d]
+  {
+    daisy_assert (initialized);
+    return daily_precipitation_;
+  }
   double rain () const	// [mm/h]
   { 
     daisy_assert (initialized);
@@ -270,7 +276,10 @@ struct WeatherStandard : public Weather
 
   // Communication with external model.
   void put_precipitation (double prec) // [mm/d]
-  { precipitation_[hour] = prec / 24.0; }
+  { 
+    precipitation_[hour] = prec / 24.0; 
+    daily_precipitation_ = prec;
+  }
   void put_air_temperature (double T) // [°C]
   { 
     air_temperature_[hour] = T; 
@@ -745,6 +754,10 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
       read_line ();
     }
 
+  daily_precipitation_
+    = long_timestep
+    ? last_precipitation * 24
+    : accumulate (&precipitation_[0], &precipitation_[24], 0.0);
   daily_global_radiation_ 
     = long_timestep
     ? last_global_radiation
@@ -1226,6 +1239,7 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     daily_max_air_temperature_ (-42.42e42),
     daily_min_air_temperature_ (42.42e42),
     daily_global_radiation_ (-42.42e42),
+    daily_precipitation_ (-42.42e42),
     snow_fraction (-42.42e42),
     rain_fraction (-42.42e42)
 { }
