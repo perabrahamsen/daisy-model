@@ -49,11 +49,13 @@ struct ActionMarkvand : public Action
 void 
 ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
 {
+  // Daily occurence.
   if (daisy.time.hour () != 8)
     return;
-  const bool has_crop = daisy.field.crop_dm (crop, 0.1) > 0.0; 
+  
+  // Emergence and harvest.
   const double max_reservoir = 10;
-  const double trigger_deficit = 0.35;
+  const bool has_crop = daisy.field.crop_dm (crop, 0.1) > 0.0; 
   if (T_sum < 0.0)
     {
       if (has_crop)
@@ -72,14 +74,19 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
       return;
     }
   
-  // Update T_sum;
+  // Weather data.
   const double air_temperature = daisy.field.daily_air_temperature ();
   const double global_radiation = daisy.field.daily_global_radiation ();
   const double precipitation = daisy.field.daily_precipitation ();
   const double reference_evapotranspiration 
     = FAO::Makkink (air_temperature, global_radiation);
   const double potential_evapotranspiration = reference_evapotranspiration;
+
+  // Temperature sum.
   T_sum += air_temperature;
+
+  // Reservior.
+  const double trigger_deficit = 0.35;
   reservoir += precipitation - potential_evapotranspiration;
   if (reservoir > max_reservoir)
     reservoir = max_reservoir;
@@ -88,6 +95,7 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
       const double amount = max_reservoir - reservoir;
       TmpStream tmp;
       tmp () << "MARKVAND Irrigating " << amount << " mm";
+      out.message (tmp.str ());
       IM im;
       daisy.field.irrigate_overhead (amount, im);
       reservoir = max_reservoir;
@@ -121,3 +129,42 @@ Irrigate the field according to MARKVAND scheduling.");
   }
 } ActionIrrigateOverhead_syntax;
 
+// MV_Soil
+
+struct MV_Soil
+{
+  // Content.
+  const symbol name;
+  static const char *const description;
+
+  // Simulation.
+
+  // Create and Destroy.
+  MV_Soil (const AttributeList& al)
+    : name (al.identifier ("type"))
+  { }
+  ~MV_Soil ()
+  { }
+};
+
+EMPTY_TEMPLATE
+Librarian<MV_Soil>::Content* Librarian<MV_Soil>::content = NULL;
+
+static Librarian<MV_Soil> MV_Soil_init ("MV_Soil");
+
+const char *const MV_Soil::description = "\
+Description of a soil for use by the MARKVAND model.";
+
+static struct MV_SoilSyntax
+{
+  static MV_Soil&
+  make (const AttributeList& al)
+  { return *new MV_Soil (al); }
+  MV_SoilSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Standard MARKVAND soil model.");
+    Librarian<MV_Soil>::add_type ("default", alist, syntax, &make);
+  }
+} MV_Soil_syntax;

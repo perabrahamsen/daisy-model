@@ -36,10 +36,11 @@ struct ProgramGnuplot : public Program
   // Source.
   struct Source
   {
-    const std::string field_sep;
     const std::string filename;
     const std::string tag;
     
+    std::string field_sep;
+
     // Run.
     static int find_tag (std::map<std::string,int>& tag_pos,
                          const std::string& tag);
@@ -84,13 +85,32 @@ ProgramGnuplot::Source::find_tag (std::map<std::string,int>& tag_pos,
 std::string
 ProgramGnuplot::Source::get_entry (LexerData& lex) const
 {
+  std::string tmp_term;  // Data storage.
+  const char* field_term;
+
+  switch (field_sep.size ())
+    { 
+    case 0:
+      // Whitespace
+      field_term = " \t\n";
+      break;
+    case 1:
+      // Single character field seperator.
+      tmp_term = field_sep + "\n";
+      field_term = tmp_term.c_str ();
+      break;
+    default:
+      // Multi-character field seperator.
+      daisy_assert (false);
+    }
+
+  // Find it.
   std::string entry = "";
-  daisy_assert (field_sep.size () == 1);
   while (lex.good ())
     {
       int c = lex.peek ();
-      if (c == field_sep[0] || c == '\n')
-        break;
+      if (strchr (field_term, c))
+	break;
       entry += int2char (lex.get ());
     }
   return entry;
@@ -107,8 +127,16 @@ ProgramGnuplot::Source::load (Treelog& msg)
 
   // Read first line.
   const std::string type = lex.get_word ();
-  if (type != "dwf-0.0" && type != "dlf-0.0" && type != "ddf-0.0")
-    lex.error ("Wrong file type");
+  if (type == "dwf-0.0")
+    {
+      field_sep = "";
+    }
+  else if (type == "dlf-0.0" || type == "ddf-0.0")
+    {
+      field_sep = "\t";
+    }
+  else
+    lex.error ("Unknown file type '" + type + "'");
   lex.skip_line ();
   lex.next_line ();
 
@@ -130,10 +158,13 @@ ProgramGnuplot::Source::load (Treelog& msg)
       if (tag_pos.find (candidate) == tag_pos.end ())
         tag_pos[candidate] = count;
       else
-        lex.warning ("Duplicate tag: " + candidate);
+       lex.warning ("Duplicate tag: " + candidate);
       if (lex.peek () == '\n')
         break;
-      lex.skip(field_sep.c_str ());
+      if (field_sep == "")
+	lex.skip_space ();
+      else
+	lex.skip(field_sep.c_str ());
     }
   lex.next_line ();
 
@@ -185,9 +216,9 @@ Name of column in Daisy log file where data is found.");
 }
 
 ProgramGnuplot::Source::Source (const AttributeList& al)
-  : field_sep ("\t"), 
-    filename (al.name ("file")),
-    tag (al.name ("tag"))
+  : filename (al.name ("file")),
+    tag (al.name ("tag")),
+    field_sep ("\t")
 { }
 
 ProgramGnuplot::Source::~Source ()
