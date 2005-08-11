@@ -79,7 +79,8 @@ public:
   double crop_ds (symbol crop) const; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
   double crop_dm (symbol crop, double height) const; 
-
+  // All names of all crops on selected columns.
+  string crop_names () const;
   // Simulation.
   void clear ();
   void tick (Treelog&, const Time&, const Weather*);
@@ -478,6 +479,24 @@ Field::Implementation::crop_dm (const symbol crop, const double height) const
   return DM;
 }
   
+string
+Field::Implementation::crop_names () const
+{
+  if (selected)
+    return selected->crop_names ();
+  
+  string result = "";
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    {
+      if (result != "")
+	result += ",";
+      result += (*i)->crop_names ();
+    }
+  return result;
+}
+  
 void 
 Field::Implementation::clear ()
 {
@@ -758,6 +777,10 @@ Field::crop_ds (const symbol crop) const
 double 
 Field::crop_dm (const symbol crop, const double height) const
 { return impl.crop_dm (crop, height); } 
+
+string
+Field::crop_names () const
+{ return impl.crop_names (); } 
 
 void
 Field::clear ()

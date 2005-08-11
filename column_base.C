@@ -191,6 +191,10 @@ ColumnBase::crop_dm (const symbol name, const double height) const
   //[kg/ha], negative when no crop
 { return vegetation->DM_by_name (name, height); }
 
+std::string
+ColumnBase::crop_names () const
+{ return vegetation->crop_names (); }
+
 unsigned int 
 ColumnBase::count_layers () const // Number of num. layers.
 { return soil.size (); }

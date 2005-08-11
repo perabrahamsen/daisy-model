@@ -136,7 +136,28 @@ static struct MV_CropSyntax
 struct ActionMarkvand : public Action
 {
   const std::auto_ptr<MV_Soil> soil;
-  const std::auto_ptr<MV_Crop> crop;
+  const struct crop_map_t : public std::map<std::string, const MV_Crop*>
+  {
+    static void load_syntax (Syntax& syntax, AttributeList&)
+    { 
+      syntax.add ("Daisy", Syntax::String, Syntax::Const, 
+		  "Name of Daisy crop.");
+      syntax.add ("MARKVAND", Librarian<MV_Crop>::library (), 
+		  Syntax::Const, Syntax::Singleton,
+		  "MARKVAND crop description.");
+      syntax.order ("Daisy", "MARKVAND");
+    }
+    crop_map_t (const std::vector<AttributeList*> alists)
+    {
+      for (size_t i = 0; i < alists.size (); i++)
+	{
+	  (*this)[alists[i]->name ("Daisy")] 
+	    = Librarian<MV_Crop>::create (alists[i]->alist ("MARKVAND"));
+	}
+    }
+    ~crop_map_t ()
+    { map_delete (begin (), end ()); }
+  } crop_map;
   double T_sum;
   double reservoir;
 
@@ -147,7 +168,7 @@ struct ActionMarkvand : public Action
   ActionMarkvand (const AttributeList& al)
     : Action (al),
       soil (Librarian<MV_Soil>::create (al.alist ("soil"))),
-      crop (Librarian<MV_Crop>::create (al.alist ("crop"))),
+      crop_map (al.alist_sequence ("map")),
       T_sum (al.number ("T_sum", -1.0)),
       reservoir (al.number ("reservoir", -1.0))
   { }
@@ -211,17 +232,6 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
       daisy.field.irrigate_overhead (amount, im);
       reservoir = max_reservoir;
     }
-#if 0
-  else
-    {
-      TmpStream tmp;
-      tmp () << "res = " << reservoir << " mm, P = " << precipitation
-             << " mm, Ep = " << potential_evapotranspiration 
-             << " mm, full = " << 100.0 * reservoir / max_reservoir << "%";
-      out.message (tmp.str ());
-    }
-#endif
-
 }
 
 static struct ActionMarkvandSyntax
@@ -241,9 +251,9 @@ static struct ActionMarkvandSyntax
     syntax.add ("soil", Librarian<MV_Soil>::library (), Syntax::Const, 
                 Syntax::Singleton,
                 "Soil type to schedule irrigation on.");
-    syntax.add ("crop", Librarian<MV_Crop>::library (), Syntax::Const, 
-                Syntax::Singleton, 
-                "Crop type to schedule irrigation for.");
+    syntax.add_submodule_sequence ("map", Syntax::Const, "\
+Map of Daisy crop names into MARKVAND crop descriptions.",
+				   &ActionMarkvand::crop_map_t::load_syntax);
     syntax.add ("T_sum", "dg C d", Syntax::OptionalState, 
                 "Temperature sum since emergence.");
     syntax.add ("reservoir", "mm", Syntax::OptionalState, 

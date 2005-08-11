@@ -1,3 +1,9 @@
+2005-08-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation.h, vegetation_permanent.C, vegetation_crops.C:
+	* column.h, column_base.C, field.h, field.C (crop_names): new
+	member function.
+
 2005-08-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* pet.C (reference_to_potential): Use cover instead of LAI.

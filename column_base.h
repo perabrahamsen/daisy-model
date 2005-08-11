@@ -104,6 +104,8 @@ public:
   double soil_water_content (double from, double to) const; // [cm]
   double crop_ds (symbol name) const ;// {[-1:2], Crop::DSremove}
   double crop_dm (symbol name, double height) const; // [kg/ha], negative when no crop
+  std::string crop_names () const;   // All names of all crops on the column.
+
 
   // Communication with external model.
 public:

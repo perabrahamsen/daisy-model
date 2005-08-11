@@ -115,6 +115,8 @@ struct VegetationPermanent : public Vegetation
   {   return Crop::DSremove; }
   double DM_by_name (symbol, double) const
   { return 0.0; }
+  string crop_names () const
+  { return name.name (); }
 
   // Simulation.
   void reset_canopy_structure (const Time& time);

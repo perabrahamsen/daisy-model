@@ -114,6 +114,7 @@ struct VegetationCrops : public Vegetation
   // Individual crop queries.
   double DS_by_name (symbol name) const;
   double DM_by_name (symbol name, double height) const;
+  string crop_names () const;
 
   // Simulation.
   void tick (const Time& time,
@@ -269,6 +270,21 @@ VegetationCrops::DM_by_name (symbol name, double height) const
     if ((*crop)->name == name)
       return (*crop)->DM (height);
   return 0.0;
+}
+
+string
+VegetationCrops::crop_names () const
+{ 
+  string result;
+  for (CropList::const_iterator crop = crops.begin();
+       crop != crops.end();
+       crop++)
+    {
+      if (result != "")
+	result += ",";
+      result += name.name ();
+    }
+  return result;
 }
 
 void 

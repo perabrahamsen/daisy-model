@@ -95,6 +95,8 @@ public:
   double crop_ds (symbol crop) const; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
   double crop_dm (symbol crop, double height) const; 
+  // All names of all crops on selected columns.
+  std::string crop_names () const;
   // Simulation.
   void clear ();
   void tick (Treelog&, const Time&, const Weather*);
