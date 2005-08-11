@@ -24,11 +24,116 @@
 #include "crop.h"
 #include "im.h"
 #include "fao.h"
+#include "symbol.h"
 #include "tmpstream.h"
+
+// MV_Soil
+
+struct MV_Soil
+{
+  // Content.
+  const symbol name;
+  static const char *const description;
+
+  // Simulation.
+
+  // Create and Destroy.
+  MV_Soil (const AttributeList& al)
+    : name (al.identifier ("type"))
+  { }
+  ~MV_Soil ()
+  { }
+};
+
+EMPTY_TEMPLATE
+Librarian<MV_Soil>::Content* Librarian<MV_Soil>::content = NULL;
+
+static Librarian<MV_Soil> MV_Soil_init ("MV_Soil");
+
+const char *const MV_Soil::description = "\
+Description of a soil for use by the MARKVAND model.";
+
+static struct MV_SoilSyntax
+{
+  static MV_Soil&
+  make (const AttributeList& al)
+  { return *new MV_Soil (al); }
+  MV_SoilSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Standard MARKVAND soil model.");
+    Librarian<MV_Soil>::add_type ("default", alist, syntax, &make);
+  }
+} MV_Soil_syntax;
+
+// MV_Crop
+
+struct MV_Crop
+{
+  // Content.
+  const symbol name;
+  static const char *const description;
+
+  // Phases.
+  static vector<double> accumulated (const vector<double>& numbers)
+  {
+    vector<double> result;
+    double sum = 0.0;
+    for (size_t i = 0; i < numbers.size (); i++)
+      {
+	sum += numbers[i];
+	result.push_back (sum);
+      }
+    return result;
+  }
+  const vector<double> T_sum;
+  size_t phase (const double T)
+  { 
+    size_t i = 0; 
+    while (i < T_sum.size () && T < T_sum[i])
+      i++;
+  }
+
+  // Simulation.
+
+  // Create and Destroy.
+  MV_Crop (const AttributeList& al)
+    : name (al.identifier ("type")),
+      T_sum (accumulated (al.number_sequence ("S")))
+  { }
+  ~MV_Crop ()
+  { }
+};
+
+EMPTY_TEMPLATE
+Librarian<MV_Crop>::Content* Librarian<MV_Crop>::content = NULL;
+
+static Librarian<MV_Crop> MV_Crop_init ("MV_Crop");
+
+const char *const MV_Crop::description = "\
+Description of a crop for use by the MARKVAND model.";
+
+static struct MV_CropSyntax
+{
+  static MV_Crop&
+  make (const AttributeList& al)
+  { return *new MV_Crop (al); }
+  MV_CropSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Standard MARKVAND crop model.");
+    syntax.add ("S", "dg C d", Syntax::OptionalState, Syntax::Sequence,
+                "Temperature sum for each phase.");
+    Librarian<MV_Crop>::add_type ("default", alist, syntax, &make);
+  }
+} MV_Crop_syntax;
 
 struct ActionMarkvand : public Action
 {
-  const symbol crop;
+  const auto_ptr<MV_Soil> soil;
+  const auto_ptr<MV_Crop> crop;
   double T_sum;
   double reservoir;
 
@@ -38,7 +143,8 @@ struct ActionMarkvand : public Action
 
   ActionMarkvand (const AttributeList& al)
     : Action (al),
-      crop (al.identifier ("crop")),
+      soil (Librarian<MV_Soil>::create (al.alist ("soil"))),
+      crop (Librarian<MV_Crop>::create (al.alist ("crop"))),
       T_sum (al.number ("T_sum", -1.0)),
       reservoir (al.number ("reservoir", -1.0))
   { }
@@ -49,13 +155,15 @@ struct ActionMarkvand : public Action
 void 
 ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
 {
+
   // Daily occurence.
   if (daisy.time.hour () != 8)
     return;
   
   // Emergence and harvest.
   const double max_reservoir = 10;
-  const bool has_crop = daisy.field.crop_dm (crop, 0.1) > 0.0; 
+  static const symbol all_symbol ("all");
+  const bool has_crop = daisy.field.crop_dm (all_symbol, 0.1) > 0.0; 
   if (T_sum < 0.0)
     {
       if (has_crop)
@@ -127,8 +235,10 @@ static struct ActionMarkvandSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     syntax.add_check (check_alist);	
-    syntax.add ("crop", Syntax::String, Syntax::Const, 
-                "Name of crop to schedule irrigation for.");
+    syntax.add ("soil", Librarian<MV_Soil>::library (), Syntax::Const, 
+                "Soil type to schedule irrigation on.");
+    syntax.add ("crop", Librarian<MV_Crop>::library (), Syntax::Const, 
+                "Crop type to schedule irrigation for.");
     syntax.add ("T_sum", "dg C d", Syntax::OptionalState, 
                 "Temperature sum since emergence.");
     syntax.add ("reservoir", "mm", Syntax::OptionalState, 
@@ -138,84 +248,5 @@ By default, the reservoir will be full at plant emergence.");
 Irrigate the field according to MARKVAND scheduling.");
     Librarian<Action>::add_type ("markvand", alist, syntax, &make);
   }
-} ActionIrrigateOverhead_syntax;
+} ActionMarkvand_syntax;
 
-// MV_Soil
-
-struct MV_Soil
-{
-  // Content.
-  const symbol name;
-  static const char *const description;
-
-  // Simulation.
-
-  // Create and Destroy.
-  MV_Soil (const AttributeList& al)
-    : name (al.identifier ("type"))
-  { }
-  ~MV_Soil ()
-  { }
-};
-
-EMPTY_TEMPLATE
-Librarian<MV_Soil>::Content* Librarian<MV_Soil>::content = NULL;
-
-static Librarian<MV_Soil> MV_Soil_init ("MV_Soil");
-
-const char *const MV_Soil::description = "\
-Description of a soil for use by the MARKVAND model.";
-
-static struct MV_SoilSyntax
-{
-  static MV_Soil&
-  make (const AttributeList& al)
-  { return *new MV_Soil (al); }
-  MV_SoilSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Standard MARKVAND soil model.");
-    Librarian<MV_Soil>::add_type ("default", alist, syntax, &make);
-  }
-} MV_Soil_syntax;
-
-// MV_Crop
-
-struct MV_Crop
-{
-  // Content.
-  const symbol name;
-  static const char *const description;
-
-  // Simulation.
-
-  // Create and Destroy.
-  MV_Crop (const AttributeList& al)
-    : name (al.identifier ("type"))
-  { }
-  ~MV_Crop ()
-  { }
-};
-
-EMPTY_TEMPLATE
-Librarian<MV_Crop>::Content* Librarian<MV_Crop>::content = NULL;
-
-static Librarian<MV_Crop> MV_Crop_init ("MV_Crop");
-
-const char *const MV_Crop::description = "\
-Description of a crop for use by the MARKVAND model.";
-
-static struct MV_CropSyntax
-{
-  static MV_Crop&
-  make (const AttributeList& al)
-  { return *new MV_Crop (al); }
-  MV_CropSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Standard MARKVAND crop model.");
-    Librarian<MV_Crop>::add_type ("default", alist, syntax, &make);
-  }
-} MV_Crop_syntax;
