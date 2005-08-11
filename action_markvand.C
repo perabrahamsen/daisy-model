@@ -26,6 +26,8 @@
 #include "fao.h"
 #include "symbol.h"
 #include "tmpstream.h"
+#include <vector>
+#include <memory>
 
 // MV_Soil
 
@@ -76,9 +78,9 @@ struct MV_Crop
   static const char *const description;
 
   // Phases.
-  static vector<double> accumulated (const vector<double>& numbers)
+  static std::vector<double> accumulated (const std::vector<double>& numbers)
   {
-    vector<double> result;
+    std::vector<double> result;
     double sum = 0.0;
     for (size_t i = 0; i < numbers.size (); i++)
       {
@@ -87,12 +89,13 @@ struct MV_Crop
       }
     return result;
   }
-  const vector<double> T_sum;
+  const std::vector<double> T_sum;
   size_t phase (const double T)
   { 
     size_t i = 0; 
     while (i < T_sum.size () && T < T_sum[i])
       i++;
+    return i;
   }
 
   // Simulation.
@@ -132,8 +135,8 @@ static struct MV_CropSyntax
 
 struct ActionMarkvand : public Action
 {
-  const auto_ptr<MV_Soil> soil;
-  const auto_ptr<MV_Crop> crop;
+  const std::auto_ptr<MV_Soil> soil;
+  const std::auto_ptr<MV_Crop> crop;
   double T_sum;
   double reservoir;
 
@@ -236,8 +239,10 @@ static struct ActionMarkvandSyntax
     AttributeList& alist = *new AttributeList ();
     syntax.add_check (check_alist);	
     syntax.add ("soil", Librarian<MV_Soil>::library (), Syntax::Const, 
+                Syntax::Singleton,
                 "Soil type to schedule irrigation on.");
     syntax.add ("crop", Librarian<MV_Crop>::library (), Syntax::Const, 
+                Syntax::Singleton, 
                 "Crop type to schedule irrigation for.");
     syntax.add ("T_sum", "dg C d", Syntax::OptionalState, 
                 "Temperature sum since emergence.");
