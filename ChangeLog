@@ -1,7 +1,7 @@
 2005-08-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* vegetation.h, vegetation_permanent.C, vegetation_crops.C:
-	* column.h, column_base.C, field.h, field.C (crop_names): new
+	* column.h, column_base.C, field.h, field.C (crop_names): New
 	member function.
 
 2005-08-10  Per Abrahamsen  <abraham@dina.kvl.dk>

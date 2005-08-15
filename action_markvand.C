@@ -38,6 +38,8 @@ struct MV_Soil
   static const char *const description;
 
   // Simulation.
+  double max_reservoir (double root_depth) const
+  { return root_depth * 10 * 0.4; }
 
   // Create and Destroy.
   MV_Soil (const AttributeList& al)
@@ -99,6 +101,10 @@ struct MV_Crop
   }
 
   // Simulation.
+  double LAI (const double Ts) const
+  { return 3.0; }
+  double root_depth (const double Ts) const
+  { return 50.0; }
 
   // Create and Destroy.
   MV_Crop (const AttributeList& al)
@@ -161,6 +167,7 @@ struct ActionMarkvand : public Action
   double T_sum;
   double reservoir;
 
+  const MV_Crop* get_crop (Daisy& daisy) const;
   void doIt (Daisy& daisy, Treelog& out);
   bool done (const Daisy&) const
   { return false; }
@@ -176,25 +183,45 @@ struct ActionMarkvand : public Action
   { }
 };
 
+const MV_Crop*
+ActionMarkvand::get_crop (Daisy& daisy) const
+{
+  const std::string crop_name = daisy.field.crop_names ();
+  const crop_map_t::const_iterator entry = crop_map.find (crop_name);
+  return (entry != crop_map.end ()) ? entry->second : NULL;
+}
+
 void 
 ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
 {
+  // Default values.
+  const double default_root_depth = 10.0;
+  const double default_LAI = 3.0;
 
   // Daily occurence.
   if (daisy.time.hour () != 8)
     return;
   
   // Emergence and harvest.
-  const double max_reservoir = 10;
   static const symbol all_symbol ("all");
   const bool has_crop = daisy.field.crop_dm (all_symbol, 0.1) > 0.0; 
   if (T_sum < 0.0)
     {
       if (has_crop)
         {
+	  const MV_Crop *const crop = get_crop (daisy);
           T_sum = 0.0;
-          reservoir = max_reservoir;
-          out.message ("Starting MARKVAND irrigation.");
+	  if (crop)
+	    {
+	      out.message ("Starting MARKVAND irrigation for " 
+			   + crop->name.name () + ".");
+	      reservoir = soil->max_reservoir (crop->root_depth (T_sum));
+	    }
+	  else
+	    {
+	      out.message ("Starting MARKVAND irrigation for unknown crop.");
+	      reservoir = soil->max_reservoir (default_root_depth);
+	    }
         }
       return;
     }
@@ -205,7 +232,7 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
       out.message ("Stoping MARKVAND irrigation.");
       return;
     }
-  
+
   // Weather data.
   const double air_temperature = daisy.field.daily_air_temperature ();
   const double global_radiation = daisy.field.daily_global_radiation ();
@@ -216,6 +243,14 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
 
   // Temperature sum.
   T_sum += air_temperature;
+
+  // Crop and soil.
+  const MV_Crop *const crop = get_crop (daisy);
+  const double LAI = crop ? crop->LAI (T_sum) : default_LAI;
+  const double root_depth = crop
+    ? crop->root_depth (T_sum) 
+    : default_root_depth;
+  const double max_reservoir = soil->max_reservoir (root_depth);
 
   // Reservior.
   const double trigger_deficit = 0.35;
