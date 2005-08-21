@@ -1,3 +1,7 @@
+2005-08-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/markvand.dai: New parameter library.
+
 2005-08-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* vegetation.h, vegetation_permanent.C, vegetation_crops.C:
