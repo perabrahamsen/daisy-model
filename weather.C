@@ -157,18 +157,19 @@ Weather::day_cycle (const Time& time) const	// Sum over a day is 1.0.
   daisy_assert (dl >= 0.0);
   daisy_assert (dl <= 24.0);
   
+  // Day error sum
+  double sum = 0.0;
+  for (int i = 0; i < 24; i++)
+    sum += max (0.0, M_PI_2 / dl * cos (M_PI * (i + 0.5 - 12) / dl));
+
   const double hour = time.hour () + 0.5; // Value in the middle of time step.
 
   // Day cycle.
-  double dc;
-  if (hour > 12 + dl || hour < 12 - dl)
-    dc = 0.0;
-  else
-    dc = max (0.0, M_PI_2 / dl * cos (M_PI * (hour - 12) / dl));
+  const double dc = max (0.0, M_PI_2 / dl * cos (M_PI * (hour - 12) / dl));
   daisy_assert (dc >= 0.0);
   daisy_assert (dc <= 1.0);  
 
-  return dc;
+  return dc / sum;
 }
 
 double

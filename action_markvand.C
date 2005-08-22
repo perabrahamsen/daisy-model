@@ -389,7 +389,8 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
 	    out.message ("Starting MARKVAND irrigation for " 
 			 + crop->name.name () + ".");
 	  else
-	    out.message ("Starting MARKVAND irrigation for unknown crop.");
+	    out.message ("Starting MARKVAND irrigation for unknown crop "
+                         + daisy.field.crop_names () + ".");
 	  const double z_x = crop 
 	    ? std::min (crop->z_xA, soil->z_xJ)
 	    : soil->z_xJ;
@@ -446,7 +447,9 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
     }
 
   // Update temperature sum and time.
-  T_sum += air_temperature;
+  const double T_b = 0.0;       // Base temperature. [dg C]
+  if (air_temperature > T_b)
+    T_sum += air_temperature - T_b;
   dt += 1.0;
 
   // Leaves.
@@ -459,10 +462,10 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
 
   // Potential evapotranspiration.
   const double E_p = reference_evapotranspiration;
-  const double E_pe = E_p * cover; // Surface E_p. [mm]
+  const double E_pe = E_p * cover; // Soil surface E_p. [mm]
   const double E_pc = E_p - E_pe; // Crop E_p. [mm]
-  const double E_pcg = E_p - (1.0 - green_cover); // [mm]
-  const double E_pcy = E_pc - E_pcy; // [mm]
+  const double E_pcg = E_p - (1.0 - green_cover); // Green leaves E_p [mm]
+  const double E_pcy = E_pc - E_pcy; // Yellow leaves E_p [mm]
 
   // Root zone capacities.
   const double z_r = crop	// Effective rooting depth. [mm]
@@ -525,9 +528,13 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
     {
       daisy_assert (C_r > 0.0);
       const double E_aTr 
-	= E_pT * (1.0 - pow ((C_r - V_r) / C_r, soil->c_T / E_pT));
+        = E_pT * ((C_r > V_r + 1e-10) 
+                  ? (1.0 - pow ((C_r - V_r) / C_r, soil->c_T / E_pT))
+                  : 1.0);
       const double E_aTu = (C_u > 0.0)
-	? E_pT * (1.0 - pow ((C_u - V_u) / C_u, soil->c_T / E_pT))
+	? E_pT * ((C_u > V_u + 1e-10) 
+                  ? (1.0 - pow ((C_u - V_u) / C_u, soil->c_T / E_pT))
+                  : 1.0)
 	: 0.0;
       const double E_aT = std::min (V_r, std::max (E_aTr, E_aTu));
       E_a += E_aT;

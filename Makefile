@@ -1016,6 +1016,10 @@ common${OBJ}: common.C common.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+action_markvand${OBJ}: action_markvand.C action.h librarian.h common.h \
+  library.h symbol.h alist.h syntax.h treelog.h assertion.h daisy.h \
+  program.h field.h border.h crop.h im.h fao.h log.h tmpstream.h \
+  mathlib.h
 photo_GL${OBJ}: photo_GL.C photo.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h canopy_std.h canopy_simple.h \
   plf.h phenology.h submodel.h mathlib.h tmpstream.h check.h

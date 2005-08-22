@@ -282,7 +282,7 @@ VegetationCrops::crop_names () const
     {
       if (result != "")
 	result += ",";
-      result += name.name ();
+      result += (*crop)->name.name ();
     }
   return result;
 }
