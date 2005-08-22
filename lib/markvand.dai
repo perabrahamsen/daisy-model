@@ -2,7 +2,7 @@
 ;;
 ;; Parmeterizations from the Danish MARKVAND model.
 
-(defMV_crop roer default
+(defMV_Crop roer default
   (S_F 235 187 975 1197 [dg C d])
   (A_F [%])
   (L_gv 0.0 [])
@@ -14,13 +14,13 @@
   (S_Lx  907 [dg C d])
   (S_Lr 2594 [dg C d])
   (S_Lm 2594 [dg C d])
-  (z_0 0.0 mm])
+  (z_0 0.0 [mm])
   (z_v 15 [mm])
   (z_xA 900 [mm])
   (z_m 0.0 [mm])
   (c_r 15 [mm/d]))
 
-(defMV_crop aerter default
+(defMV_Crop aerter default
   (S_F 292 219 398 444 78 [dg C d])
   (A_F [%])
   (L_gv 0.0 [])
@@ -32,13 +32,13 @@
   (S_Lx  471 [dg C d])
   (S_Lr  720 [dg C d])
   (S_Lm 1431 [dg C d])
-  (z_0 0.0 mm])
+  (z_0 0.0[mm])
   (z_v 90 [mm])
   (z_xA 700 [mm])
   (z_m 0.0 [mm])
   (c_r 15 [mm/d]))
 
-(defMV_crop kartofler default
+(defMV_Crop kartofler default
   (A_F [%])
   (L_gv 0.0 [])
   (L_ge 0.0 [])
@@ -47,28 +47,28 @@
   (L_ym 2.0 [])
   (S_Le   0 [dg C d])
   (S_Lx 601 [dg C d])
-  (z_0 0.0 mm])
+  (z_0 0.0[mm])
   (z_v 80 [mm])
   (z_xA 750 [mm])
   (z_m 0.0 [mm])
   (c_r 15 [mm/d]))
 
-(defMV_crop "kartofler; tidlige" kartofler
+(defMV_Crop "kartofler; tidlige" kartofler
   (S_F 110 80 263 685 295 [dg C d])
   (S_Lr 1043 [dg C d])
   (S_Lm 1433 [dg C d]))
 
-(defMV_crop "kartofler; middeltidlige" kartofler
+(defMV_Crop "kartofler; middeltidlige" kartofler
   (S_F 136 54 421 779 271 [dg C d])
   (S_Lr 1314 [dg C d])
   (S_Lm 1661 [dg C d]))
 
-(defMV_crop "kartofler; sildige" kartofler
+(defMV_Crop "kartofler; sildige" kartofler
   (S_F 136 60 438 824 293 [dg C d])
   (S_Lr 1349 [dg C d])
   (S_Lm 1751 [dg C d]))
 
-(defMV_crop vaarbyg default
+(defMV_Crop vaarbyg default
   (S_F 294 449 113 461 162 [dg C d])
   (A_F [%])
   (L_gv 0.0 [])
@@ -80,13 +80,13 @@
   (S_Lx  400 [dg C d])
   (S_Lr 1070 [dg C d])
   (S_Lm 1479 [dg C d])
-  (z_0 0.0 mm])
+  (z_0 0.0[mm])
   (z_v 55 [mm])
   (z_xA 900 [mm])
   (z_m 0.0 [mm])
   (c_r 15 [mm/d]))
 
-(defMV_crop vaarraps default
+(defMV_Crop vaarraps default
   (S_F 190 365 207 575 248 [dg C d])
   (A_F [%])
   (L_gv 0.0 [])
@@ -98,13 +98,13 @@
   (S_Lx  393 [dg C d])
   (S_Lr 1355 [dg C d])
   (S_Lm 1585 [dg C d])
-  (z_0 0.0 mm])
+  (z_0 0.0[mm])
   (z_v 40 [mm])
   (z_xA 900 [mm])
   (z_m 0.0 [mm])
   (c_r 15 [mm/d]))
 
-(defMV_crop majs default
+(defMV_Crop majs default
   (S_F 397 691 476 247 761 [dg C d])
   (A_F [%])
   (L_gv 0.0 [])
@@ -116,13 +116,13 @@
   (S_Lx  740 [dg C d])
   (S_Lr 1808 [dg C d])
   (S_Lm 2572 [dg C d])
-  (z_0 0.0 mm])
+  (z_0 0.0[mm])
   (z_v 70 [mm])
   (z_xA 900 [mm])
   (z_m 0.0 [mm])
   (c_r 15 [mm/d]))
 
-(defMV_soil JB1 default
+(defMV_Soil JB1 default
   (z_o 300 [mm])
   (z_xJ 500 [mm])
   (Theta_fo 0.20 [])
@@ -135,7 +135,7 @@
   (k_qr 0.6 [])
   (k_qb 0.6 []))
 
-(defMV_soil JB2 default
+(defMV_Soil JB2 default
   (z_o 300 [mm])
   (z_xJ 600 [mm])
   (Theta_fo 0.28 [])
@@ -148,7 +148,7 @@
   (k_qr 0.3 [])
   (k_qb 0.3 []))
 
-(defMV_soil JB3 default
+(defMV_Soil JB3 default
   (z_o 300 [mm])
   (z_xJ 600 [mm])
   (Theta_fo 0.23 [])
@@ -161,7 +161,7 @@
   (k_qr 0.5 [])
   (k_qb 0.5 []))
 
-(defMV_soil JB4 default
+(defMV_Soil JB4 default
   (z_o 300 [mm])
   (z_xJ 600 [mm])
   (Theta_fo 0.28 [])
@@ -174,7 +174,7 @@
   (k_qr 0.3 [])
   (k_qb 0.3 []))
 
-(defMV_soil JB5 default
+(defMV_Soil JB5 default
   (z_o 300 [mm])
   (z_xJ 900 [mm])
   (Theta_fo 0.31 [])
@@ -187,7 +187,7 @@
   (k_qr 0.3 [])
   (k_qb 0.3 []))
 
-(defMV_soil JB6 default
+(defMV_Soil JB6 default
   (z_o 300 [mm])
   (z_xJ 900 [mm])
   (Theta_fo 0.34 [])
@@ -200,7 +200,7 @@
   (k_qr 0.3 [])
   (k_qb 0.3 []))
 
-(defMV_soil JB7 default
+(defMV_Soil JB7 default
   (z_o 300 [mm])
   (z_xJ 900 [mm])
   (Theta_fo 0.42 [])
@@ -213,7 +213,7 @@
   (k_qr 0.3 [])
   (k_qb 0.3 []))
 
-(defMV_soil JB8 default
+(defMV_Soil JB8 default
   (z_o 300 [mm])
   (z_xJ 900 [mm])
   (Theta_fo 0.45 [])
@@ -226,7 +226,7 @@
   (k_qr 0.3 [])
   (k_qb 0.3 []))
 
-(defMV_soil JB9 default
+(defMV_Soil JB9 default
   (z_o 300 [mm])
   (z_xJ 900 [mm])
   (Theta_fo 0.45 [])
@@ -239,7 +239,7 @@
   (k_qr 0.3 [])
   (k_qb 0.3 []))
 
-(defMV_soil JB10 default
+(defMV_Soil JB10 default
   (z_o 300 [mm])
   (z_xJ 900 [mm])
   (Theta_fo 0.45 [])
