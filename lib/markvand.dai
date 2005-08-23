@@ -4,7 +4,7 @@
 
 (defMV_Crop roer default
   (S_F 235 187 975 1197 [dg C d])
-  (A_F [%])
+  (A_F 100  70  45   55 [%])
   (L_gv 0.0 [])
   (L_ge 0.1 [])
   (L_gx 5.0 [])
@@ -21,8 +21,8 @@
   (c_r 15 [mm/d]))
 
 (defMV_Crop aerter default
-  (S_F 292 219 398 444 78 [dg C d])
-  (A_F [%])
+  (S_F 292 219 398 444  78 [dg C d])
+  (A_F 100  65  45  60 100[%])
   (L_gv 0.0 [])
   (L_ge 0.2 [])
   (L_gx 5.0 [])
@@ -39,7 +39,7 @@
   (c_r 15 [mm/d]))
 
 (defMV_Crop kartofler default
-  (A_F [%])
+  (A_F 100 65 45 55 100 [%])
   (L_gv 0.0 [])
   (L_ge 0.0 [])
   (L_gx 5.0 [])
@@ -70,7 +70,7 @@
 
 (defMV_Crop vaarbyg default
   (S_F 294 449 113 461 162 [dg C d])
-  (A_F [%])
+  (A_F 100 50 50 60 100 [%])
   (L_gv 0.0 [])
   (L_ge 0.0 [])
   (L_gx 5.0 [])
@@ -88,7 +88,7 @@
 
 (defMV_Crop vaarraps default
   (S_F 190 365 207 575 248 [dg C d])
-  (A_F [%])
+  (A_F 100  65  50 65  100 [%])
   (L_gv 0.0 [])
   (L_ge 0.0 [])
   (L_gx 5.0 [])
@@ -106,7 +106,7 @@
 
 (defMV_Crop majs default
   (S_F 397 691 476 247 761 [dg C d])
-  (A_F [%])
+  (A_F 100  60  50  60 100 [%])
   (L_gv 0.0 [])
   (L_ge 0.5 [])
   (L_gx 5.0 [])

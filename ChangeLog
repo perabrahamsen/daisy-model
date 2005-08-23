@@ -1,3 +1,7 @@
+2005-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_markvand.C: Added checks.
+
 2005-08-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.77 released.

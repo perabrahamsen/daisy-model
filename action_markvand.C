@@ -28,6 +28,8 @@
 #include "symbol.h"
 #include "tmpstream.h"
 #include "mathlib.h"
+#include "check.h"
+#include "vcheck.h"
 #include <vector>
 #include <memory>
 
@@ -107,21 +109,25 @@ static struct MV_SoilSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Standard MARKVAND soil model.");
-    syntax.add ("z_o", "mm", Syntax::Const,
+    syntax.add ("z_o", "mm", Check::positive (), Syntax::Const,
                 "Depth of top soil.");
-    syntax.add ("z_xJ", "mm", Syntax::Const,
+    syntax.add ("z_xJ", "mm", Check::positive (), Syntax::Const,
                 "Max rooting depth.");
-    syntax.add ("Theta_fo", Syntax::None (), Syntax::Const,
-                "Field capacity, topsoil.");
-    syntax.add ("Theta_wo", Syntax::None (), Syntax::Const,
+    syntax.add ("Theta_fo", Syntax::Fraction (), Check::positive (), 
+                Syntax::Const, "Field capacity, topsoil.");
+    syntax.add ("Theta_wo", Syntax::Fraction (), Check::positive (), 
+                Syntax::Const,
                 "Wielding point, topsoil.");
-    syntax.add ("Theta_fu", Syntax::None (), Syntax::Const,
+    syntax.add ("Theta_fu", Syntax::Fraction (), Check::positive (), 
+                Syntax::Const,
                 "Field capacity, subsoil.");
-    syntax.add ("Theta_wu", Syntax::None (), Syntax::Const,
+    syntax.add ("Theta_wu", Syntax::Fraction (), Check::positive (), 
+                Syntax::Const,
                 "Wielting point, subsoil.");
-    syntax.add ("C_e", "mm", Syntax::Const,
+    syntax.add ("C_e", "mm", Check::non_negative (), Syntax::Const,
                 "Capacity of evaporation reservoir.");
-    syntax.add ("c_e", Syntax::Fraction (), Syntax::Const,
+    syntax.add ("c_e", Syntax::Fraction (), Check::non_negative (), 
+                Syntax::Const,
                 "Basic evaporation factor.");
     syntax.add ("c_T", "mm", Syntax::Const,
                 "Transpiration constant.");
@@ -175,15 +181,14 @@ struct MV_Crop
   size_t phase (const double T_sum) const
   { 
     size_t i = 0; 
-    while (i < S_F.size () && T_sum < S_F[i])
+    while (i < S_F.size () && S_F[i] < T_sum)
       i++;
     return i;
   }
   const double A (const double T_sum) const
   {
     const size_t i = phase (T_sum);
-    daisy_assert (A_F.size () > i);
-    return A_F[i];
+    return (A_F.size () > i) ? A_F[i] : 1.0;
   }
 
   // Simulation.
@@ -253,45 +258,62 @@ Description of a crop for use by the MARKVAND model.";
 
 static struct MV_CropSyntax
 {
-  static MV_Crop&
-  make (const AttributeList& al)
+  static MV_Crop& make (const AttributeList& al)
   { return *new MV_Crop (al); }
+
+  static bool check_alist (const AttributeList& al, Treelog& msg)
+  {
+    bool ok = true;
+    if (al.number_sequence ("S_F").size ()
+        != al.number_sequence ("A_F").size ())
+      {
+        msg.error ("'S_F' and 'A_F' should be the same length");
+        ok = false;
+      }
+    return ok;
+  }
+
   MV_CropSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    syntax.add_check (check_alist);
     alist.add ("description", "Standard MARKVAND crop model.");
-    syntax.add ("S_F", "dg C d", Syntax::Const, Syntax::Sequence,
+    syntax.add ("S_F", "dg C d", Check::non_negative (), 
+                Syntax::Const, Syntax::Sequence,
                 "Temperature sum for each phase.");
+    syntax.add_check ("S_F", VCheck::min_size_1 ());
     syntax.add ("A_F", Syntax::Fraction (), Syntax::Const, Syntax::Sequence,
                 "Allowable water deficit for each phase before irrigation.");
-    syntax.add ("L_gv", Syntax::None (), Syntax::Const,
+    syntax.add_check ("A_F", VCheck::min_size_1 ());
+    syntax.add ("L_gv", Syntax::None (), Check::non_negative (), Syntax::Const,
                 "Green leaf area index at emergence / growth start.");
-    syntax.add ("L_ge", Syntax::None (), Syntax::Const, "\
+    syntax.add ("L_ge", Syntax::None (), Check::non_negative (),
+                Syntax::Const, "\
 Green leaf area index at the time where growth rate become exponential.");
-    syntax.add ("L_gx", Syntax::None (), Syntax::Const,
+    syntax.add ("L_gx", Syntax::None (), Check::non_negative (), Syntax::Const,
                 "Maximum green leaf area index.");
-    syntax.add ("L_gm", Syntax::None (), Syntax::Const,
+    syntax.add ("L_gm", Syntax::None (), Check::non_negative (), Syntax::Const,
                 "Green leaf area index at maturity.");
-    syntax.add ("L_ym", Syntax::None (), Syntax::Const,
+    syntax.add ("L_ym", Syntax::None (), Check::non_negative (), Syntax::Const,
                 "Yellow leaf area index at maturity.");
-    syntax.add ("S_Le", "dg C d", Syntax::Const,
+    syntax.add ("S_Le", "dg C d", Check::non_negative (), Syntax::Const,
                 "Temperature sum when green LAI growth turn exponential.");
-    syntax.add ("S_Lx", "dg C d", Syntax::Const,
+    syntax.add ("S_Lx", "dg C d", Check::non_negative (), Syntax::Const,
                 "Temperature sum maximum green LAI.");
-    syntax.add ("S_Lr", "dg C d", Syntax::Const,
+    syntax.add ("S_Lr", "dg C d", Check::non_negative (), Syntax::Const,
                 "Temperature sum for start of yellow leaves.");
-    syntax.add ("S_Lm", "dg C d", Syntax::Const,
+    syntax.add ("S_Lm", "dg C d", Check::non_negative (), Syntax::Const,
                 "Temperature sum at maturity.");
-    syntax.add ("z_0", "mm", Syntax::Const,
+    syntax.add ("z_0", "mm", Check::non_negative (), Syntax::Const,
                 "Root depth before emergence (growth start).");
-    syntax.add ("z_v", "mm", Syntax::Const,
+    syntax.add ("z_v", "mm", Check::non_negative (), Syntax::Const,
                 "Root depth at emergence (growth start).");
-    syntax.add ("z_xA", "mm", Syntax::Const,
+    syntax.add ("z_xA", "mm", Check::non_negative (), Syntax::Const,
                 "Maximum root depth for this crop.");
-    syntax.add ("z_m", "mm", Syntax::Const,
+    syntax.add ("z_m", "mm", Check::non_negative (), Syntax::Const,
                 "Root depth at maturity.");
-    syntax.add ("c_r", "mm/d", Syntax::Const,
+    syntax.add ("c_r", "mm/d", Check::non_negative (), Syntax::Const,
                 "Root penetration rate.");
     Librarian<MV_Crop>::add_type ("default", alist, syntax, &make);
   }
@@ -545,6 +567,8 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
 	V_u = 0.0;
       else
 	V_u -= E_aT;
+
+      V_r -= E_aT;
     }
 
   // Drainage.
@@ -556,6 +580,22 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
     : 0.0;
   V_r -= D_r;
   V_b += D_r - D_b;
+
+#if 0
+  TmpStream debug;
+  debug () << "T_sum = " << T_sum 
+           << ", phase = " << (crop ? crop->phase (T_sum) : 999)
+           << ", A = " << A << ", A_u = " << A_u 
+           << " and A_r = " << A_r << "\n";
+
+  debug () << "P_I = " << P_I << ", E_a = " << E_a << ", D_r = " << D_r
+           << ", V_r = " << V_r 
+           << ", V_e = " << V_e 
+           << ", V_u = " << V_u
+           << ", V_b = " << V_b 
+           << ", V_I = " << V_I;
+  out.message (debug.str ());
+#endif
 }
 
 void
