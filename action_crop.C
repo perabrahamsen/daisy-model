@@ -341,7 +341,7 @@ ActionCrop::Annual::doIt (Daisy& daisy, Treelog& out, symbol name)
       const double sorg = (1.0 - loss);
       static const symbol all_symbol ("all");
       daisy.field.harvest (daisy.time, all_symbol, stub, stem, leaf, sorg, 
-			   daisy.harvest, out);
+			   false, daisy.harvest, out);
       out.message ("Annual harvest of " + name);
       done = true;
       return true;
@@ -397,7 +397,7 @@ ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& out)
   const double sorg = 1.0;
   static const symbol all_symbol ("all");
   daisy.field.harvest (daisy.time, all_symbol, stub, stem, leaf, sorg, 
-		       daisy.harvest, out);
+		       false, daisy.harvest, out);
   out.message ("Perennial harvest");
 }
 

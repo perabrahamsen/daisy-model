@@ -75,6 +75,7 @@ ColumnBase::harvest (const Time& time, const symbol crop_name,
 		     double stem_harvest,
 		     double leaf_harvest, 
 		     double sorg_harvest,
+                     const bool combine,
 		     vector<const Harvest*>& harvest, Treelog& msg)
 { 
   vector<AM*> residuals;
@@ -86,7 +87,7 @@ ColumnBase::harvest (const Time& time, const symbol crop_name,
                        residuals, harvest_DM, harvest_N, harvest_C, 
                        residuals_DM, residuals_N_top, residuals_C_top,
                        residuals_N_soil, residuals_C_soil,
-                       msg); 
+                       combine, msg); 
   add_residuals (residuals);
   if (min_height < 0.0)
     mix (msg, time, 0.0, min_height, 0.0);

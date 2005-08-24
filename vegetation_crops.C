@@ -153,6 +153,7 @@ struct VegetationCrops : public Vegetation
 		double& residuals_N_top, double& residuals_C_top,
 		vector<double>& residuals_N_soil,
 		vector<double>& residuals_C_soil,
+                const bool combine,
 		Treelog&);
   void sow (Treelog& msg, 
             const AttributeList& al, const Geometry&, OrganicMatter&, 
@@ -519,6 +520,7 @@ VegetationCrops::harvest (const symbol column_name,
 			  double& residuals_N_top, double& residuals_C_top,
 			  vector<double>& residuals_N_soil,
 			  vector<double>& residuals_C_soil,
+                          const bool combine,
 			  Treelog& msg)
 {
   static const symbol all_symbol ("all");
@@ -545,7 +547,7 @@ VegetationCrops::harvest (const symbol column_name,
 			    leaf_harvest, sorg_harvest, 
 			    root_fruit, residuals, 
 			    residuals_DM, residuals_N_top, residuals_C_top,
-			    residuals_N_soil, residuals_C_soil, msg);
+			    residuals_N_soil, residuals_C_soil, combine, msg);
 	harvest_DM += mine.total_DM ();
 	harvest_N += mine.total_N ();
 	harvest_C += mine.total_C ();

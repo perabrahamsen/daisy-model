@@ -84,6 +84,7 @@ public:
 		double stem_harvest,
 		double leaf_harvest, 
 		double sorg_harvest,
+                const bool combine,
 		std::vector<const Harvest*>& harvest, Treelog&);
   virtual void add_residuals (std::vector<AM*>&) = 0;
   void mix (Treelog&, const Time&,

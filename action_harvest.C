@@ -31,6 +31,7 @@ struct ActionHarvest : public Action
   const double stem;
   const double leaf;
   const double sorg;
+  const bool combine;
 
   void doIt (Daisy& daisy, Treelog& out)
   {
@@ -41,7 +42,7 @@ struct ActionHarvest : public Action
 		     + " which has not emerged on the field");
 	return;
       }
-    daisy.field.harvest (daisy.time, crop, stub, stem, leaf, sorg,
+    daisy.field.harvest (daisy.time, crop, stub, stem, leaf, sorg, combine,
 			 daisy.harvest, out);
     if (daisy.field.crop_ds (crop) < 0.0)
       out.message ("Harvesting " + crop);
@@ -55,8 +56,9 @@ struct ActionHarvest : public Action
       stub (al.number ("stub")),
       stem (al.number ("stem")),
       leaf (al.number ("leaf")),
-      sorg (al.number ("sorg"))
-    { }
+      sorg (al.number ("sorg")),
+      combine (al.flag ("combine"))
+  { }
 };
 
 static struct ActionHarvestSyntax
@@ -89,6 +91,11 @@ Fraction of leafs (above stub) to harvest.");
   syntax.add_fraction ("sorg", Syntax::Const, "\
 Fraction of storage organ to harvest.");
   alist.add ("sorg", 1.0);
+  syntax.add ("combine", Syntax::Boolean, Syntax::Const, "\
+Set this to 'true' in order to combine all crop parts into stem\n\
+in the harvest log files.\n\
+This is mostly useful for silage.");
+  alist.add ("combine", false);
   syntax.order ("crop");
   Librarian<Action>::add_type ("harvest", alist, syntax, &make);
 }

@@ -55,6 +55,7 @@ struct Field::Implementation
 		double stem_harvest, 
 		double leaf_harvest, 
 		double sorg_harvest,
+                const bool combine,
 		vector<const Harvest*>&, Treelog&);
   void mix (Treelog&, const Time&,
 	    double from, double to, double penetration);
@@ -259,6 +260,7 @@ Field::Implementation::harvest (const Time& time, symbol name,
 				double stem_harvest, 
 				double leaf_harvest, 
 				double sorg_harvest,
+                                const bool combine,
 				vector<const Harvest*>& total,
 				Treelog& out)
 {
@@ -267,7 +269,8 @@ Field::Implementation::harvest (const Time& time, symbol name,
       Treelog::Open nest (out, selected->name);
       selected->harvest (time, name,
 			 stub_length,
-			 stem_harvest, leaf_harvest, sorg_harvest, total, out);
+			 stem_harvest, leaf_harvest, sorg_harvest, combine, 
+                         total, out);
     }
   else
     {
@@ -278,7 +281,8 @@ Field::Implementation::harvest (const Time& time, symbol name,
 	  Treelog::Open nest (out, (*i)->name);
 	  (*i)->harvest (time, name,
 			 stub_length,
-			 stem_harvest, leaf_harvest, sorg_harvest, total, out);
+			 stem_harvest, leaf_harvest, sorg_harvest, combine,
+                         total, out);
 	}
     }
 }
@@ -707,10 +711,12 @@ Field::harvest (const Time& time, symbol name,
 		double stem_harvest, 
 		double leaf_harvest, 
 		double sorg_harvest,
+                const bool combine,
 		vector<const Harvest*>& total, Treelog& out)
 { impl.harvest (time, name,
 		stub_length,
-		stem_harvest, leaf_harvest, sorg_harvest, total, out); }
+		stem_harvest, leaf_harvest, sorg_harvest, combine, 
+                total, out); }
 
 void 
 Field::mix (Treelog& out, const Time& time,

@@ -132,6 +132,7 @@ public:
 			  double& residuals_N_top, double& residuals_C_top,
 			  vector<double>& residuals_N_soil,
 			  vector<double>& residuals_C_soil,
+                          const bool combine,
 			  Treelog&);
   double sorg_height () const 
   { return harvesting.sorg_height; }
@@ -376,6 +377,7 @@ CropStandard::harvest (const symbol column_name,
 		       double& residuals_N_top, double& residuals_C_top,
 		       vector<double>& residuals_N_soil,
 		       vector<double>& residuals_C_soil,
+                       const bool combine,
 		       Treelog& msg)
 {
   Treelog::Open nest (msg, name + " harvest");
@@ -416,7 +418,10 @@ CropStandard::harvest (const symbol column_name,
 		  stem_harvest_frac, leaf_harvest_frac, sorg_harvest_frac,
 		  kill_off, residuals, residuals_DM,
 		  residuals_N_top, residuals_C_top, 
-		  residuals_N_soil, residuals_C_soil);
+		  residuals_N_soil, residuals_C_soil,
+                  combine,
+                  root_system.water_stress_days, 
+                  nitrogen.nitrogen_stress_days);
 
   if (development->DS != DSremove)
     {

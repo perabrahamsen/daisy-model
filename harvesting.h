@@ -89,7 +89,10 @@ public:
 			     double& residuals_DM,
 			     double& residuals_N_top, double& residuals_C_top,
 			     std::vector<double>& residuals_N_soil,
-			     std::vector<double>& residuals_C_soil);
+			     std::vector<double>& residuals_C_soil,
+                             const bool combine,
+                             double& water_stress_days,
+                             double& nitrogen_stress_days);
   void tick (const Time& time);
   void output (Log& log) const;
 

@@ -370,7 +370,6 @@ RootSystem::output (Log& log) const
   output_variable (soil_temperature, log);
   output_variable (water_stress, log);
   output_variable (water_stress_days, log);
-  output_variable (water_stress_days, log);
   output_variable (production_stress, log);
   output_variable (Ept, log);
   output_variable (H2OUpt, log);

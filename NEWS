@@ -12,6 +12,63 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.78
+
+** Water stress days estimate was twice as large as it should be.  Fixed.
+
+** harvest.dlf now contain water and nitrogen stress days
+
+These columns should help fast identify why harvest is less than
+expected.  
+
+** You can now ask Daisy to combine harvest details.
+
+If you set the 'combine' parameter to 'true', all DM, N, and C content
+of the crop will be placed in the "stem" fraction of the harvest.dlf
+file.  This is intended for silage, where you don't distriguish
+between the various crop parts.
+
+    (harvest "Grass"
+             (combine true)               ;Silage.
+             (stub 8.0 [cm])              ;Leave 8 cm stub.
+             (stem 1.00 []))              ;Harvest everything above stub.
+
+
+** 1991 version of MARKVAND irrigation implemented for spring crops.
+
+If you want to simulate irrigation of spring crop according to the
+MARKVAND decision support system, you need to input the file
+"markvand.dai".  
+
+  (input file "markvand.dai")
+
+If you then have an existing management strategy for the crop, say
+"maizeman", you can have an irrigated version with
+
+  (while "maizeman"
+    (MARKVAND (soil JB1)))
+
+Where "JB1" is soil category using the Danish system.
+
+Current limitations:
+
+*** The code is mostly untested at this point.
+
+*** No changes in MARKVAND since 1991 are implemented.
+
+*** Only spring crops supported.
+
+*** Simulated user input limited to emergence and harvest times.
+
+*** Can't simulate less than perfect weather data.
+
+The markvand submodel use the same weather data as the rest of the system.
+
+*** Only JB soils described conveniently.
+
+However, it is possible to create a description of a specific soil
+from the templates in markvand.dai.
+
 * 3.77
 
 ** doc fix

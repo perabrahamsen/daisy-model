@@ -50,6 +50,8 @@ public:
   const double sorg_DM;
   const double sorg_N;
   const double sorg_C;
+  const double water_stress_days;
+  const double nitrogen_stress_days;
   const Chemicals chemicals;
   double total_N () const;
   double total_C () const;
@@ -66,6 +68,7 @@ public:
   Harvest (symbol col, Time t, symbol crp, 
 	   double sDM, double sN, double sC, double dDM, double dN, double dC,
 	   double lDM, double lN, double lC, double oDM, double oN, double oC,
+           double wsd, double nsd,
 	   const Chemicals& chem);
 };      
 

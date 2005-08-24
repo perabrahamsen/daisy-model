@@ -112,6 +112,7 @@ public:
 			double& residuals_N_top, double& residuals_C_top,
 			std::vector<double>& residuals_N_soil,
 			std::vector<double>& residuals_C_soil,
+                        const bool combine,
 			Treelog&) = 0;
   virtual void sow (Treelog& msg, 
                     const AttributeList& al, 

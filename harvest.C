@@ -56,6 +56,8 @@ Harvest::output (Log& log) const
   output_variable (sorg_DM, log);
   output_variable (sorg_N, log);
   output_variable (sorg_C, log);
+  output_variable (water_stress_days, log);
+  output_variable (nitrogen_stress_days, log);
   output_submodule (chemicals, "chemicals", log);
 }
 
@@ -94,6 +96,10 @@ Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Total storage organ nitrogen in harvest.");
   syntax.add ("sorg_C", "g/m^2", Syntax::State,
 	      "Total storage organ carbon in harvest.");
+  syntax.add ("water_stress_days", "d", Syntax::State, 
+              "Production days lost due to water stress.");
+  syntax.add ("nitrogen_stress_days", "d", Syntax::State, 
+              "Production days lost due to water stress.");
   Chemicals::add_syntax  ("chemicals", syntax, alist, Syntax::State,
 			  "Chemicals in harvest.");
 }
@@ -114,6 +120,8 @@ Harvest::Harvest (const AttributeList& alist)
     sorg_DM (alist.number ("sorg_DM")),
     sorg_N (alist.number ("sorg_N")),
     sorg_C (alist.number ("sorg_C")),
+    water_stress_days (alist.number ("water_stress_days")),
+    nitrogen_stress_days (alist.number ("nitrogen_stress_days")),
     chemicals (alist.alist_sequence ("chemicals"))
 { }
   
@@ -122,7 +130,8 @@ Harvest::Harvest (const symbol col, Time t, const symbol crp,
 		  double sDM, double sN, double sC, 
 		  double dDM, double dN, double dC,
 		  double lDM, double lN, double lC, 
-		  double oDM, double oN, double oC, const Chemicals& chem)
+		  double oDM, double oN, double oC, 
+                  double wsd, double nsd, const Chemicals& chem)
   : column (col),
     time (t),
     crop (crp),
@@ -138,6 +147,8 @@ Harvest::Harvest (const symbol col, Time t, const symbol crp,
     sorg_DM (oDM),
     sorg_N (oN),
     sorg_C (oC),
+    water_stress_days (wsd),
+    nitrogen_stress_days (nsd),
     chemicals (chem)
 { }
 

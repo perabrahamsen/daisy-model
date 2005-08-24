@@ -103,6 +103,7 @@ public:
 				  double& residuals_C_top,
 				  std::vector<double>& residuals_N_soil,
 				  std::vector<double>& residuals_C_soil,
+                                  bool combine,
 				  Treelog&) = 0;
   void kill (symbol, const Time&, const Geometry&, Bioclimate&,
 	     std::vector<AM*>& residuals, 

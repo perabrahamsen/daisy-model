@@ -1,3 +1,30 @@
+2005-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.78 released.
+
+2005-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* harvesting.h, harvesting.C (operator ()): New 'combine' parameter.
+	* crop_old.C, crop_sold.C, crop_simple.C:
+	* crop.h, crop_crop_std.C (harvest): Update caller.
+	* crop.C (kill): Update caller.
+	* vegetation.h, vegetation_crops.C, vegetation_permanent.C
+	(harvest): Update caller. 
+	* column.h, column_base.h, column_base.C (harvest): Update caller.
+	* field.C, field.h (harvest): Update caller.
+	* action_harvest.C (combine): New parameter.
+	* action_crop.C, action_harvest.C (doIt): Update caller.
+
+	* crpn.h (nitrogen_stress_days): Made it public.
+	* harvest.h, harvest.C (water_stress_days, nitrogen_stress_days):
+	New harvest data. 
+	* harvesting.C, harvesting.h (operator ()): Update caller.
+	* crop_old.C, crop_sold.C, crop_simple.C, crop_std.C (harvest):
+	Update caller. 
+	* log_harvest.C (match): Log them.
+
+	* root_system.C (output): Don't output 'water_stress_days' twice!
+
 2005-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* action_markvand.C: Added checks.

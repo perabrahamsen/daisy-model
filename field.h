@@ -71,6 +71,7 @@ public:
 		double stem_harvest, 
 		double leaf_harvest, 
 		double sorg_harvest,
+                const bool combine,
 		std::vector<const Harvest*>&, Treelog&);
   void mix (Treelog&, const Time&,
 	    double from, double to, double penetration = 1.0);

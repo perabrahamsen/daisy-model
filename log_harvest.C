@@ -61,9 +61,9 @@ struct LogHarvest : public Log
     if (print_tags)
       {
 	out << "year\tmonth\tday\tcolumn\tcrop"
-	    << "\tstem_DM\tdead_DM\tleaf_DM\tsorg_DM";
+	    << "\tstem_DM\tdead_DM\tleaf_DM\tsorg_DM\tWStress";
 	if (print_N)
-	  out << "\tstem_N\tdead_N\tleaf_N\tsorg_N";
+	  out << "\tNStress\tstem_N\tdead_N\tleaf_N\tsorg_N";
 	if (print_C)
 	  out << "\tstem_C\tdead_C\tleaf_C\tsorg_C";
 	out << "\n";
@@ -72,9 +72,9 @@ struct LogHarvest : public Log
     if (print_dimension)
       {
 	out << "\t\t\t\t"
-	    << "\tt/ha\tt/ha\tt/ha\tt/ha";
+	    << "\tt/ha\tt/ha\tt/ha\tt/ha\td";
 	if (print_N)
-	  out << "\tkg/ha\tkg/ha\tkg/ha\tkg/ha";
+	  out << "\td\tkg/ha\tkg/ha\tkg/ha\tkg/ha";
 	if (print_C)
 	  out << "\tkg/ha\tkg/ha\tkg/ha\tkg/ha";
 	out << "\n";
@@ -91,9 +91,11 @@ struct LogHarvest : public Log
 	    << "\t" << harvest.stem_DM * 0.01
 	    << "\t" << harvest.dead_DM * 0.01
 	    << "\t" << harvest.leaf_DM * 0.01
-	    << "\t" << harvest.sorg_DM * 0.01;
+	    << "\t" << harvest.sorg_DM * 0.01
+            << "\t" << harvest.water_stress_days;
 	if (print_N)
-	  out << "\t" << harvest.stem_N * 10.0
+	  out << "\t" << harvest.nitrogen_stress_days
+              << "\t" << harvest.stem_N * 10.0
 	      << "\t" << harvest.dead_N * 10.0
 	      << "\t" << harvest.leaf_N * 10.0
 	      << "\t" << harvest.sorg_N * 10.0;

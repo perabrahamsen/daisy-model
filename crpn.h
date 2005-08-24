@@ -75,7 +75,6 @@ private:
   // Stress
 public:
   double nitrogen_stress;	// Fraction of requested nitrogen didn't got.
-private:
   double nitrogen_stress_days;	// Accumulated nitrogen stress.
 
   // Fixation.

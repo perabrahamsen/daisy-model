@@ -150,6 +150,7 @@ struct VegetationPermanent : public Vegetation
  		vector<AM*>&, 
 		double&, double&, double&,
 		double&, double&, double&, vector<double>&, vector<double>&,
+                const bool,
 		Treelog&)
   { }
   void sow (Treelog&, const AttributeList&, const Geometry&, OrganicMatter&, 

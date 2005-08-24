@@ -117,6 +117,7 @@ public:
 			  double& residuals_C_top,
 			  vector<double>& residuals_N_soil,
 			  vector<double>& residuals_C_soil,
+                          const bool,
 			  Treelog&);
   double sorg_height () const 
   { return 100.0; }
@@ -1845,6 +1846,7 @@ CropOld::harvest (const symbol column_name,
 		  double& residuals_C_top,
 		  vector<double>& residuals_N_soil,
 		  vector<double>& residuals_C_soil,
+                  const bool,
 		  Treelog& out)
 {
   const Parameters::HarvestPar& Hp = par.Harvest;
@@ -1987,12 +1989,14 @@ CropOld::harvest (const symbol column_name,
   out.message (tmp.str ());
 
   Chemicals chemicals;
+  double wsd = -1.0;
+  double nsd = -1.0;
   return *new Harvest (column_name, time, name, 
 		       WStraw * stem_harvest, NStraw * stem_harvest, 0.0,
 		       0.0, 0.0, 0.0,
 		       0.0, 0.0, 0.0,
 		       WSOrg * sorg_harvest, NSOrg * sorg_harvest, 0.0,
-		       chemicals);
+                       wsd, nsd, chemicals);
 }
 
 void

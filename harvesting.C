@@ -63,7 +63,10 @@ Harvesting::operator() (const symbol column_name,
 			double& residuals_DM,
 			double& residuals_N_top, double& residuals_C_top,
 			vector<double>& residuals_N_soil,
-			vector<double>& residuals_C_soil)
+			vector<double>& residuals_C_soil,
+                        const bool combine,
+                        double& water_stress_days,
+                        double& nitrogen_stress_days)
 {
   const double old_DM = production.DM ();
 
@@ -439,12 +442,28 @@ Harvesting::operator() (const symbol column_name,
   // We need to update the crop carbon values for production mass balance.
   production.update_carbon ();
 
+  // Reset stress.
+  const double wsd = water_stress_days;
+  const double nsd = nitrogen_stress_days;
+  water_stress_days = nitrogen_stress_days = 0.0;
+
   // Return harvest.
-  return *new Harvest (column_name, time, crop_name,
-		       Stem_W_Yield, Stem_N_Yield, Stem_C_Yield,
-		       Dead_W_Yield, Dead_N_Yield, Dead_C_Yield,
-		       Leaf_W_Yield, Leaf_N_Yield, Leaf_C_Yield,
-		       WEYRm, NEYRm, CEYRm, chemicals);
+  if (combine)
+    return *new Harvest (column_name, time, crop_name,
+                         Stem_W_Yield + Dead_W_Yield + Leaf_W_Yield + WEYRm,
+                         Stem_N_Yield + Dead_N_Yield + Leaf_N_Yield + NEYRm, 
+                         Stem_C_Yield + Dead_C_Yield + Leaf_C_Yield + CEYRm,
+                         0.0, 0.0, 0.0,
+                         0.0, 0.0, 0.0,
+                         0.0, 0.0, 0.0,
+                         wsd, nsd, chemicals);
+  else
+    return *new Harvest (column_name, time, crop_name,
+                         Stem_W_Yield, Stem_N_Yield, Stem_C_Yield,
+                         Dead_W_Yield, Dead_N_Yield, Dead_C_Yield,
+                         Leaf_W_Yield, Leaf_N_Yield, Leaf_C_Yield,
+                         WEYRm, NEYRm, CEYRm, wsd, nsd, chemicals);
+  
 }
 
 void

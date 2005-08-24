@@ -137,6 +137,7 @@ public:
 			  double& residuals_C_top,
 			  vector<double>& residuals_N_soil,
 			  vector<double>& residuals_C_soil,
+                          const bool,
 			  Treelog&);
   double sorg_height () const 
   { return 100.0; }
@@ -305,6 +306,7 @@ CropSimple::harvest (const symbol column_name,
 		     double& /* residuals_C_top */,
 		     vector<double>& residuals_N_soil,
 		     vector<double>& residuals_C_soil,
+                     const bool,
 		     Treelog&)
 {
   dead = true;
@@ -334,12 +336,17 @@ CropSimple::harvest (const symbol column_name,
   Chemicals chemicals;
   if (canopy.CAI > 0.0)
     bioclimate.harvest_chemicals (chemicals, canopy.CAI);
+  
+  // Water and nitrogen stress.
+  double wsd = -1.0;
+  double nsd = -1.0;
+
   return *new Harvest (column_name, time, name,
 		       0.0, 0.0, 0.0, 
 		       0.0, 0.0, 0.0, 
 		       0.0, 0.0, 0.0, 
 		       0.0, N_actual - NRoot, 0.0,
-		       chemicals);
+		       wsd, nsd, chemicals);
 }
 
 void
