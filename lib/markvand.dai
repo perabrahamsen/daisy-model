@@ -252,4 +252,28 @@
   (k_qr 0.3 [])
   (k_qb 0.3 []))
 
+(defaction MARKVAND markvand 
+  "Markvand map for standard crops."
+  (map ("Beet; V1" "roer")
+       ("Silomajs" "majs")
+       ("Aert" "aerter")
+       ("Vaarbyg" "vaarbyg")
+       ("Fodder Beet" "roer")
+       ("Maize" "majs")
+       ("Pioneer Maize" "majs")
+       ("Silage Maize" "majs")
+       ("Pea" "aerter")
+       ("Green Pea" "aerter")
+       ("Pea; V1" "aerter")
+       ("Potato; Koege" "kartofler; sildige")
+       ("Potato; SCRI" "kartofler; sildige")
+       ("Potato"  "kartofler; sildige")
+       ("Potato; V1" "kartofler; sildige")
+       ("Spring Barley" "vaarbyg")
+       ("Spring Barley; Foulum" "vaarbyg")
+       ("Spring Barley; V1" "vaarbyg")
+       ("Spring Rape" "vaarraps")
+       ("Spring Rape; V1" "vaarraps")
+       ("Sugar Beet" "roer")))
+ 
 ;;; markvand.dai ends here
