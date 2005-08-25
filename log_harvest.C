@@ -23,6 +23,7 @@
 #include "log.h"
 #include "daisy.h"
 #include "harvest.h"
+#include "dlf.h"
 #include "version.h"
 #include "tmpstream.h"
 #include <fstream>
