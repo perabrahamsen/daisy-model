@@ -174,7 +174,7 @@ struct LogHarvest : public Log
       {
 	out << "dlf-0.0 -- harvest\n\n";
 	out << "VERSION: " << version  << "\n";
-	out << "FILE: " << file  << "\n";
+	out << "LOGFILE: " << file  << "\n";
 	time_t now = time (NULL);
 	out << "RUN: " << ctime (&now) << "\n";
       }

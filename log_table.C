@@ -24,6 +24,7 @@
 #include "select.h"
 #include "summary.h"
 #include "soil.h"
+#include "dlf.h"
 #include "version.h"
 #include "daisy.h"
 #include "vcheck.h"
@@ -47,35 +48,7 @@ struct LogTable : public LogSelect, public Destination
   const string error_string;	// String to print on errors.
   const string missing_value;	// String to print for missing values.
   const string array_separator;	// String to print between array entries.
-  struct Header
-  {
-    enum type { 
-      None,                       // No dlf header used.
-      Full,                       // Futypell dlf header.
-      Terse                       // Fixed size dlf header.
-    } value;
-    operator type& ()
-    { return value; }
-    type string2type (const std::string& s)
-    { 
-      if (s == "true")
-        return Full;
-      if (s == "false")
-        return None;
-      daisy_assert (s == "fixed");
-      return Terse;
-    }
-    Header& operator= (const Header& other)
-    { value = other.value; return *this; }
-    type& operator= (const type v)
-    { value = v; return *this; }
-    Header (type v)
-      : value (v)
-    { }
-    Header (const std::string& name)
-      : value (string2type (name))
-    { }
-  } print_header;    // How much header should be printed?
+  DLF print_header;    // How much header should be printed?
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
   const bool print_initial;     // Set if initial values should be printed.
@@ -124,12 +97,12 @@ Each selected variable is represented by a column in the specified log file.";
 void
 LogTable::common_match (const Daisy& daisy, Treelog&)
 {
-  if (print_header == Header::Full)
+  if (print_header == DLF::Full)
     print_dlf_header (out, daisy.alist);
-  else if (print_header != Header::None)
+  else if (print_header != DLF::None)
     out << "--------------------\n";
 
-  print_header = Header::None;
+  print_header = DLF::None;
 }
 
 void 
@@ -395,7 +368,7 @@ LogTable::initialize (Treelog& msg)
 {
   out.open (file.c_str ());
 
-  if (print_header != Header::None)
+  if (print_header != DLF::None)
     {
       out << "dlf-0.0 -- " << name;
       if (parsed_from_file != "")
@@ -406,7 +379,7 @@ LogTable::initialize (Treelog& msg)
       out << "LOGFILE: " << file  << "\n";
       time_t now = time (NULL);
       out << "RUN: " << ctime (&now);
-      if (print_header == Header::Full)
+      if (print_header == DLF::Full)
         {
           if (to < from)
             out << "INTERVAL: [" << from << ";" << to << "]\n";

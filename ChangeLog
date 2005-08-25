@@ -1,5 +1,8 @@
 2005-08-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* dlf.C, dlf.h: New utility.
+	* Makefile (OTHER): Added it.
+
 	* lib/log-std.dai ("Soil nitrogen"): Fix "where" parameter.
 
 	* log_table.C (print_header): Support new "fixed" value.

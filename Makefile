@@ -364,7 +364,7 @@ SPECIALS = log_all.C om.C select_value.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = scope.C version.C texture.C destination.C symbol.C \
+OTHER = dlf.C scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
