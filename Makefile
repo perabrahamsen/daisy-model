@@ -956,6 +956,7 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h common.h \
   soil_heat.h soil_chemicals.h soil_chemical.h solute.h adsorption.h \
   transport.h mactrans.h plf.h chemistry.h groundwater.h log.h border.h \
   weather.h im.h vegetation.h
+dlf${OBJ}: dlf.C dlf.h assertion.h
 scope${OBJ}: scope.C scope.h assertion.h
 version${OBJ}: version.C
 texture${OBJ}: texture.C texture.h plf.h assertion.h mathlib.h
@@ -1019,7 +1020,7 @@ submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
 action_markvand${OBJ}: action_markvand.C action.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h daisy.h \
   program.h field.h border.h crop.h im.h fao.h log.h tmpstream.h \
-  mathlib.h
+  mathlib.h check.h vcheck.h
 photo_GL${OBJ}: photo_GL.C photo.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h canopy_std.h canopy_simple.h \
   plf.h phenology.h submodel.h mathlib.h tmpstream.h check.h
@@ -1211,10 +1212,10 @@ select_array${OBJ}: select_array.C select.h destination.h symbol.h \
 log_table${OBJ}: log_table.C log_select.h log.h border.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h select.h \
   destination.h condition.h units.h summary.h soil.h geometry.h horizon.h \
-  version.h daisy.h program.h tmpstream.h
+  dlf.h version.h daisy.h program.h vcheck.h tmpstream.h
 log_harvest${OBJ}: log_harvest.C log.h border.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h daisy.h \
-  program.h harvest.h chemicals.h version.h tmpstream.h
+  program.h harvest.h chemicals.h dlf.h version.h tmpstream.h
 action_while${OBJ}: action_while.C action.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h log.h border.h
 action_wait${OBJ}: action_wait.C action.h librarian.h common.h library.h \
