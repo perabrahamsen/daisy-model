@@ -523,7 +523,7 @@ The total amount of water in the soil interval")
 
 (deflog "Soil nitrogen" table
   "Nitrogen input, output, transformation and content for the soil."
-  (where "field_nitrogen.dlf")
+  (where "soil_nitrogen.dlf")
   (summary "Soil nitrogen balance" "Soil NH4 balance" "Soil NO3 balance"
            "Soil organic nitrogen balance")
   (when hourly)

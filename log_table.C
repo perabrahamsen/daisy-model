@@ -26,6 +26,7 @@
 #include "soil.h"
 #include "version.h"
 #include "daisy.h"
+#include "vcheck.h"
 #include "tmpstream.h"
 #include <fstream>
 #include <time.h>
@@ -46,7 +47,35 @@ struct LogTable : public LogSelect, public Destination
   const string error_string;	// String to print on errors.
   const string missing_value;	// String to print for missing values.
   const string array_separator;	// String to print between array entries.
-  bool print_header;		// Set if header should be printed.
+  struct Header
+  {
+    enum type { 
+      None,                       // No dlf header used.
+      Full,                       // Futypell dlf header.
+      Terse                       // Fixed size dlf header.
+    } value;
+    operator type& ()
+    { return value; }
+    type string2type (const std::string& s)
+    { 
+      if (s == "true")
+        return Full;
+      if (s == "false")
+        return None;
+      daisy_assert (s == "fixed");
+      return Terse;
+    }
+    Header& operator= (const Header& other)
+    { value = other.value; return *this; }
+    type& operator= (const type v)
+    { value = v; return *this; }
+    Header (type v)
+      : value (v)
+    { }
+    Header (const std::string& name)
+      : value (string2type (name))
+    { }
+  } print_header;    // How much header should be printed?
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
   const bool print_initial;     // Set if initial values should be printed.
@@ -95,11 +124,12 @@ Each selected variable is represented by a column in the specified log file.";
 void
 LogTable::common_match (const Daisy& daisy, Treelog&)
 {
-  if (print_header)
-    {
-      print_dlf_header (out, daisy.alist);
-      print_header = false;
-    }
+  if (print_header == Header::Full)
+    print_dlf_header (out, daisy.alist);
+  else if (print_header != Header::None)
+    out << "--------------------\n";
+
+  print_header = Header::None;
 }
 
 void 
@@ -365,7 +395,7 @@ LogTable::initialize (Treelog& msg)
 {
   out.open (file.c_str ());
 
-  if (print_header)
+  if (print_header != Header::None)
     {
       out << "dlf-0.0 -- " << name;
       if (parsed_from_file != "")
@@ -376,20 +406,24 @@ LogTable::initialize (Treelog& msg)
       out << "LOGFILE: " << file  << "\n";
       time_t now = time (NULL);
       out << "RUN: " << ctime (&now);
-      if (to < from)
-	out << "INTERVAL: [" << from << ";" << to << "]\n";
-      for (unsigned int i = 0; i < conv_vector.size (); i += 2)
-	out << "SET: " << conv_vector[i] << " = " << conv_vector[i+1] << "\n";
-      if (description != default_description)
-	{
-	  out << "\nLOG: ";
-	  for (unsigned int i = 0; i < description.size (); i++)
-	    if (description[i] != '\n')
-	      out << description[i];
-	    else
-	      out << "\nLOG: ";
-	  out << "\n";
-	}
+      if (print_header == Header::Full)
+        {
+          if (to < from)
+            out << "INTERVAL: [" << from << ";" << to << "]\n";
+      
+          for (unsigned int i = 0; i < conv_vector.size (); i += 2)
+            out << "SET: " << conv_vector[i] << " = " << conv_vector[i+1] << "\n";
+          if (description != default_description)
+            {
+              out << "\nLOG: ";
+              for (unsigned int i = 0; i < description.size (); i++)
+                if (description[i] != '\n')
+                  out << description[i];
+                else
+                  out << "\nLOG: ";
+              out << "\n";
+            }
+        }
       out << "\n";
     }
   out.flush ();
@@ -409,7 +443,7 @@ LogTable::LogTable (const AttributeList& al)
     error_string (al.name ("error_string")),
     missing_value (al.name ("missing_value")),
     array_separator (al.name ("array_separator")),
-    print_header (al.flag ("print_header")),
+    print_header (al.name ("print_header")),
     print_tags (al.flag ("print_tags")),
     print_dimension (al.flag ("print_dimension")),
     print_initial (al.flag ("print_initial")),
@@ -472,9 +506,13 @@ static struct LogTableSyntax
       alist.add ("description", LogTable::default_description);
       syntax.add ("where", Syntax::String, Syntax::Const,
 		  "Name of the log file to create.");
-      syntax.add ("print_header", Syntax::Boolean, Syntax::Const,
-		  "Print header section of the file.");
-      alist.add ("print_header", true);
+      syntax.add ("print_header", Syntax::String, Syntax::Const,
+		  "If this is set to 'false', no header is printed.\n\
+If this is set to 'true', a full header is printer.\n\
+If this is set to 'fixed', a small fixed size header is printed.");
+      static VCheck::Enum check_header ("false", "true", "fixed");
+      syntax.add_check ("print_header", check_header);
+      alist.add ("print_header", "true");
       syntax.add ("print_tags", Syntax::Boolean, Syntax::Const,
 		  "Print a tag line in the file.");
       alist.add ("print_tags", true);

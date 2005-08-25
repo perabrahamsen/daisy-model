@@ -1,3 +1,9 @@
+2005-08-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-std.dai ("Soil nitrogen"): Fix "where" parameter.
+
+	* log_table.C (print_header): Support new "fixed" value.
+
 2005-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.78 released.
