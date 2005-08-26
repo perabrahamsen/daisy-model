@@ -956,7 +956,7 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h common.h \
   soil_heat.h soil_chemicals.h soil_chemical.h solute.h adsorption.h \
   transport.h mactrans.h plf.h chemistry.h groundwater.h log.h border.h \
   weather.h im.h vegetation.h
-dlf${OBJ}: dlf.C dlf.h assertion.h
+dlf${OBJ}: dlf.C dlf.h symbol.h alist.h assertion.h version.h
 scope${OBJ}: scope.C scope.h assertion.h
 version${OBJ}: version.C
 texture${OBJ}: texture.C texture.h plf.h assertion.h mathlib.h
@@ -1212,7 +1212,7 @@ select_array${OBJ}: select_array.C select.h destination.h symbol.h \
 log_table${OBJ}: log_table.C log_select.h log.h border.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h select.h \
   destination.h condition.h units.h summary.h soil.h geometry.h horizon.h \
-  dlf.h version.h daisy.h program.h vcheck.h tmpstream.h
+  dlf.h daisy.h program.h vcheck.h tmpstream.h
 log_harvest${OBJ}: log_harvest.C log.h border.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h daisy.h \
   program.h harvest.h chemicals.h dlf.h version.h tmpstream.h

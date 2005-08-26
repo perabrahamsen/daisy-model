@@ -19,7 +19,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "dlf.h"
+#include "alist.h"
 #include "assertion.h"
+#include "version.h"
+#include "daisy.h"
+#include <time.h>
+#include <ostream>
 
 DLF::type 
 DLF::string2type (const std::string& s)
@@ -30,4 +35,113 @@ DLF::string2type (const std::string& s)
     return None;
   daisy_assert (s == "fixed");
   return Terse;
+}
+
+void
+DLF::start (std::ostream& out, const symbol name,
+            const std::string& file,
+            const std::string& parsed_from_file) const
+{
+  if (value == DLF::None)
+    return;
+
+  out << "dlf-0.0 -- " << name;
+  if (parsed_from_file != "")
+    out << " (defined in '" << parsed_from_file << "').";
+  out << "\n";
+  out << "\n";
+  out << "VERSION: " << version  << "\n";
+  out << "LOGFILE: " << file  << "\n";
+  time_t now = time (NULL);
+  out << "RUN: " << ctime (&now);
+  if (value != Terse)
+    out << "\n";
+}
+
+void
+DLF::interval (std::ostream& out, const double from, const double to) const
+{
+  if (value == DLF::None)
+    return;
+
+  if (to < from)
+    out << "INTERVAL: [" << from << ";" << to << "]\n";
+  else if (value == Terse)
+    out << "INTERVAL: full\n";
+}
+
+void
+DLF::convertions (std::ostream& out, 
+                  const std::vector<symbol>& conv_vector) const
+{
+  if (value != DLF::Full)
+    return;
+
+  for (unsigned int i = 0; i < conv_vector.size (); i += 2)
+    out << "SET: " << conv_vector[i] << " = " << conv_vector[i+1] << "\n";
+}
+
+void
+DLF::log_description (std::ostream& out, const std::string& description) const
+{
+  if (value != DLF::Full)
+    return;
+
+  out << "\nLOG: ";
+  for (unsigned int i = 0; i < description.size (); i++)
+    if (description[i] != '\n')
+      out << description[i];
+    else
+      out << "\nLOG: ";
+  out << "\n\n";
+}
+
+void
+DLF::finish (std::ostream& out, const Daisy& daisy)
+{
+  // No (additional) header.
+  if (value == None)
+    return;
+
+  const AttributeList& al = daisy.alist;
+
+  // SIMFILE:
+  if (al.check ("parser_files"))
+    {
+      const std::vector<symbol>& files 
+        = al.identifier_sequence ("parser_files");
+      if (value == Terse)
+        {
+          out << "SIMFILE:";
+          for (unsigned int i = 0; i < files.size (); i++)
+            out << " " << files[i];
+          out << "\n";
+        }
+      else
+        for (unsigned int i = 0; i < files.size (); i++)
+          out << "SIMFILE: " << files[i] << "\n";
+    }
+  else if (value == Terse)
+    out << "SIMFILE:\n";
+
+  // SIM:
+  const std::string sim_description = al.name ("description");
+  if (sim_description != Daisy::default_description || value == Terse)
+    {
+      out << "SIM: ";
+      for (unsigned int i = 0; i < sim_description.size (); i++)
+        if (sim_description[i] != '\n')
+          out << sim_description[i];
+        else if (value == Terse)
+          out << " ";
+        else
+          out << "\nSIM: ";
+      out << "\n";
+    }
+  
+  // End of header.
+  out << "\n--------------------\n";
+
+  // Only do this once.
+  value = None;
 }

@@ -25,12 +25,10 @@
 #include "summary.h"
 #include "soil.h"
 #include "dlf.h"
-#include "version.h"
 #include "daisy.h"
 #include "vcheck.h"
 #include "tmpstream.h"
 #include <fstream>
-#include <time.h>
 
 using namespace std;
 
@@ -48,7 +46,7 @@ struct LogTable : public LogSelect, public Destination
   const string error_string;	// String to print on errors.
   const string missing_value;	// String to print for missing values.
   const string array_separator;	// String to print between array entries.
-  DLF print_header;    // How much header should be printed?
+  DLF print_header;             // How much header should be printed?
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
   const bool print_initial;     // Set if initial values should be printed.
@@ -86,7 +84,7 @@ struct LogTable : public LogSelect, public Destination
   bool check (const Border&, Treelog& msg) const;
   static bool contain_time_columns (const vector<Select*>& entries);
   void initialize (Treelog&);
-  LogTable (const AttributeList& al);
+  explicit LogTable (const AttributeList& al);
   void summarize (Treelog&);
   ~LogTable ();
 };
@@ -96,14 +94,7 @@ Each selected variable is represented by a column in the specified log file.";
 
 void
 LogTable::common_match (const Daisy& daisy, Treelog&)
-{
-  if (print_header == DLF::Full)
-    print_dlf_header (out, daisy.alist);
-  else if (print_header != DLF::None)
-    out << "--------------------\n";
-
-  print_header = DLF::None;
-}
+{ print_header.finish (out, daisy); }
 
 void 
 LogTable::common_done (const Time& time)
@@ -368,37 +359,13 @@ LogTable::initialize (Treelog& msg)
 {
   out.open (file.c_str ());
 
-  if (print_header != DLF::None)
-    {
-      out << "dlf-0.0 -- " << name;
-      if (parsed_from_file != "")
-	out << " (defined in '" << parsed_from_file << "').";
-      out << "\n";
-      out << "\n";
-      out << "VERSION: " << version  << "\n";
-      out << "LOGFILE: " << file  << "\n";
-      time_t now = time (NULL);
-      out << "RUN: " << ctime (&now);
-      if (print_header == DLF::Full)
-        {
-          if (to < from)
-            out << "INTERVAL: [" << from << ";" << to << "]\n";
-      
-          for (unsigned int i = 0; i < conv_vector.size (); i += 2)
-            out << "SET: " << conv_vector[i] << " = " << conv_vector[i+1] << "\n";
-          if (description != default_description)
-            {
-              out << "\nLOG: ";
-              for (unsigned int i = 0; i < description.size (); i++)
-                if (description[i] != '\n')
-                  out << description[i];
-                else
-                  out << "\nLOG: ";
-              out << "\n";
-            }
-        }
-      out << "\n";
-    }
+  print_header.start (out, name, file, parsed_from_file);
+
+  print_header.interval (out, from, to);
+  print_header.convertions (out, conv_vector);
+  if (description != default_description)
+    print_header.log_description (out, description);
+
   out.flush ();
 
   Treelog::Open nest (msg, name);

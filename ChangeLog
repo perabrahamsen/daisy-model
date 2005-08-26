@@ -1,3 +1,7 @@
+2005-08-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* daisy.h (class Daisy): Made constructor explicit.
+
 2005-08-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* dlf.C, dlf.h: New utility.

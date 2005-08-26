@@ -12,6 +12,17 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.79
+
+** Fixed sized header for dlf files.
+
+You can now ask for Daisy to use a header with a fixed number of lines
+in ".dlf" files.  Just set the 'print_header' attribute to fixed.
+
+  ("Field nitrogen" (print_header fixed))
+
+This is useful for some post processing tools.
+
 * 3.78
 
 ** Water stress days estimate was twice as large as it should be.  Fixed.

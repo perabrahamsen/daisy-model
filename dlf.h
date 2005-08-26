@@ -22,27 +22,40 @@
 #ifndef DLF_H
 #define DLF_H
 
+#include "symbol.h"
 #include <string>
+#include <vector>
+
+class AttributeList;
+class Daisy;
 
 class DLF
 {
-public:
+  // Content.
+private:
   enum type { 
     None,                       // No dlf header used.
     Full,                       // Futypell dlf header.
     Terse                       // Fixed size dlf header.
   } value;
-  operator type& ()
-  { return value; }
-  DLF& operator= (const DLF& other)
-  { value = other.value; return *this; }
-  type& operator= (const type v)
-  { value = v; return *this; }
-  DLF (type v)
-    : value (v)
-  { }
+
+  // Simulation.
+public:
+  void start (std::ostream& out, const symbol name,
+              const std::string& file,
+              const std::string& parsed_from_file) const;
+  void interval (std::ostream& out, const double from, const double to) const;
+  void convertions (std::ostream& out, 
+                    const std::vector<symbol>& conv_vector) const;
+  void log_description (std::ostream& out, 
+                        const std::string& description) const;
+  void finish (std::ostream& out, const Daisy& daisy);
+
+  // Create and destroy.
+private:
   static type string2type (const std::string& s);
-  DLF (const std::string& name)
+public:
+  explicit DLF (const std::string& name)
     : value (string2type (name))
   { }
 }; 

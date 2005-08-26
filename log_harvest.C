@@ -24,6 +24,7 @@
 #include "daisy.h"
 #include "harvest.h"
 #include "dlf.h"
+#include "vcheck.h"
 #include "version.h"
 #include "tmpstream.h"
 #include <fstream>
@@ -45,7 +46,7 @@ struct LogHarvest : public Log
   unsigned int last_size;
   const string file;            // Filename.
   ofstream out;			// Output stream.
-  bool print_header;		// Set if header should be printed.
+  DLF print_header;		// How much header should be printed?
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
   const bool print_N;		// Set if nitrogen content should be printed.
@@ -54,11 +55,8 @@ struct LogHarvest : public Log
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog&)
   {
-    if (print_header)
-      {
-	print_dlf_header (out, daisy.alist);
-	print_header = false;
-      }
+    print_header.finish (out, daisy);
+
     if (print_tags)
       {
 	out << "year\tmonth\tday\tcolumn\tcrop"
@@ -171,14 +169,7 @@ struct LogHarvest : public Log
     out.open (file.c_str ()); 
 
     // Header.
-    if (print_header)
-      {
-	out << "dlf-0.0 -- harvest\n\n";
-	out << "VERSION: " << version  << "\n";
-	out << "LOGFILE: " << file  << "\n";
-	time_t now = time (NULL);
-	out << "RUN: " << ctime (&now) << "\n";
-      }
+    print_header.start (out, name, file, "");
     out.flush ();
   }
 
@@ -200,7 +191,7 @@ struct LogHarvest : public Log
     : Log (al),
       last_size (0),
       file (al.name ("where")),
-      print_header (al.flag ("print_header")),
+      print_header (al.name ("print_header")),
       print_tags (al.flag ("print_tags")),
       print_dimension (al.flag ("print_dimension")),
       print_N (al.flag ("print_N")),
@@ -227,9 +218,13 @@ static struct LogHarvestSyntax
     syntax.add ("where", Syntax::String, Syntax::Const,
 		"Name of the log file to create.");
     alist.add ("where", "harvest.dlf");
-    syntax.add ("print_header", Syntax::Boolean, Syntax::Const,
-		"Print header section of the file.");
-    alist.add ("print_header", true);
+    syntax.add ("print_header", Syntax::String, Syntax::Const,
+                "If this is set to 'false', no header is printed.\n\
+If this is set to 'true', a full header is printer.\n\
+If this is set to 'fixed', a small fixed size header is printed.");
+    static VCheck::Enum check_header ("false", "true", "fixed");
+    syntax.add_check ("print_header", check_header);
+    alist.add ("print_header", "true");
     syntax.add ("print_tags", Syntax::Boolean, Syntax::Const,
 		"Print a tag line in the file.");
     alist.add ("print_tags", true);
