@@ -1,3 +1,7 @@
+2005-08-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_soil.C (soil_inorganic_N_above): New condition.
+
 2005-08-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* daisy.h (class Daisy): Made constructor explicit.

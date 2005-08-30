@@ -81,6 +81,25 @@ struct ConditionSoilWater : public Condition
   { }
 };
 
+struct ConditionSoilN_min : public Condition
+{
+  const double amount;		// [mm]
+  const double from;		// [cm]
+  const double to;		// [cm]
+
+  bool match (const Daisy& daisy) const
+  { return (daisy.field.soil_inorganic_nitrogen_content (from, to)  > amount); }
+  void output (Log&) const
+  { }
+
+  ConditionSoilN_min (const AttributeList& al)
+    : Condition (al),
+      amount (al.number ("amount")),
+      from (al.number ("from")),
+      to (al.number ("to"))
+  { }
+};
+
 static struct ConditionSoilSyntax
 {
   static Condition& make_temperature (const AttributeList& al)
@@ -89,6 +108,8 @@ static struct ConditionSoilSyntax
   { return *new ConditionSoilPotential (al); }
   static Condition& make_water (const AttributeList& al)
   { return *new ConditionSoilWater (al); }
+  static Condition& make_N_min (const AttributeList& al)
+  { return *new ConditionSoilN_Min (al); }
 
   static bool check_water_content (const AttributeList& al, Treelog& err)
   {
@@ -147,6 +168,25 @@ Bottom of interval to measure soil water content in.");
       syntax.order ("water");
       Librarian<Condition>::add_type ("soil_water_content_above",
 				      alist, syntax, &make_water);
+    }
+    {
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      syntax.add_check (check_water_content);
+      alist.add ("description", "\
+Test if the soil contains more mineral nitrogen than the specified amount.");
+      syntax.add ("amount", "kg N/ha",
+		  Check::non_negative (), Syntax::Const, "\
+The soil should contain more inorganic nitrogen than this for\n\
+the condition to be true.");
+      syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
+Top of interval to measure soil content in.");
+      alist.add ("from", 0.0);
+      syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
+Bottom of interval to measure soil content in.");
+      syntax.order ("amount");
+      Librarian<Condition>::add_type ("soil_inorganic_N_above",
+				      alist, syntax, &make_N_min);
     }
   }
 } ConditionSoil_syntax;

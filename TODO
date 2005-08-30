@@ -3,27 +3,23 @@ TODO --- things that needs done with Daisy -*- outline -*-
 * action fertigate
 
 (irrigate (duration 12 [h])
-          (water flux 10 [mm/h])
+          (flux 10 [mm/h])
           (water amount 120 [mm])
           (water target_pressure 200 [cm])
-          (water target 100 [mm] (from 0 [cm]) (to 50 [cm]))) 
+          (water target_content 100 [mm] (from 0 [cm]) (to 50 [cm]))
           (type overhead)
           (type surface)
           (type subsoil (from -5 [cm]) (to -10 [cm]))
-          (NH4 concentration 1 [mg N/l])
-          (NH4 amount 20 [kg N/ha])
-          (NH4 target 80 [kg N/ha] (from 0 [cm]) (to 50 [cm])))
-          (NO3 concentration 1 [mg N/l])
-          (NO3 amount 20 [kg N/ha])
-          (NO3 target 80 [kg N/ha] (from 0 [cm]) (to 50 [cm]))))
+          (N concentration 1 [mg N/l])
+          (N amount 20 [kg N/ha])
+          (N target 80 [kg N/ha] (from 0 [cm]) (to 50 [cm]))
+          (NH4_fraction concentration 1 [mg N/l]))
 
 * Arbejdsplan:
 
 ** Tirsdag 
 
-*** WP5: Læs CT's FertOrgaNic arbejde
-
-*** WP6: Lokal gødning, Daisy gødning
+*** WP6: Daisy gødning
 
 ** Onsdag 
 
