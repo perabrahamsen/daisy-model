@@ -88,7 +88,7 @@ struct ConditionSoilN_min : public Condition
   const double to;		// [cm]
 
   bool match (const Daisy& daisy) const
-  { return (daisy.field.soil_inorganic_nitrogen_content (from, to)  > amount); }
+  { return (daisy.field.soil_inorganic_nitrogen (from, to)  > amount); }
   void output (Log&) const
   { }
 
@@ -109,7 +109,7 @@ static struct ConditionSoilSyntax
   static Condition& make_water (const AttributeList& al)
   { return *new ConditionSoilWater (al); }
   static Condition& make_N_min (const AttributeList& al)
-  { return *new ConditionSoilN_Min (al); }
+  { return *new ConditionSoilN_min (al); }
 
   static bool check_water_content (const AttributeList& al, Treelog& err)
   {
