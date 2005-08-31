@@ -1,27 +1,12 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* action fertigate
-
-(irrigate (duration 12 [h])
-          (flux 10 [mm/h])
-          (water amount 120 [mm])
-          (water target_pressure 200 [cm])
-          (water target_content 100 [mm] (from 0 [cm]) (to 50 [cm]))
-          (type overhead)
-          (type surface)
-          (type subsoil (from -5 [cm]) (to -10 [cm]))
-          (N concentration 1 [mg N/l])
-          (N amount 20 [kg N/ha])
-          (N target 80 [kg N/ha] (from 0 [cm]) (to 50 [cm]))
-          (NH4_fraction concentration 1 [mg N/l]))
-
 * Arbejdsplan:
 
-** Tirsdag 
-
-*** WP6: Daisy gødning
-
 ** Onsdag 
+
+*** WP6: Tilføj vanding og gødning i WP6 log
+
+*** WP6: Kalibrer Daisy gødning og vanding
 
 *** WP6: Få Søren til at forklare Adreanos spreadsheet
 
@@ -77,6 +62,20 @@ Opsætning skal helst være klar 5. sep, de næste to uger er Marcus der.
 
 check kun de søjler der matcher log'en.
 
+* action fertigate
+
+(irrigate (duration 12 [h])
+          (flux 10 [mm/h])
+          (water amount 120 [mm])
+          (water target_pressure 200 [cm])
+          (water target_content 100 [mm] (from 0 [cm]) (to 50 [cm]))
+          (type overhead)
+          (type surface)
+          (type subsoil (from -5 [cm]) (to -10 [cm]))
+          (N concentration 1 [mg N/l])
+          (N amount 20 [kg N/ha])
+          (N target 80 [kg N/ha] (from 0 [cm]) (to 50 [cm]))
+          (NH4_fraction concentration 1 [mg N/l]))
 * PT data
 
 ** Lav nye log filer (kvælstof) 
