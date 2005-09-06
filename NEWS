@@ -14,6 +14,11 @@ release.
 
 * 3.79
 
+** Made water and N stress the last entries of 'harvest.dlf'.
+
+This makes it easier to reuse old spreadsheets, but also means their
+position will be moved when you change the 'print_N' or 'print_C' flags.
+
 ** Fixed sized header for dlf files.
 
 You can now ask for Daisy to use a header with a fixed number of lines
@@ -23,7 +28,7 @@ in ".dlf" files.  Just set the 'print_header' attribute to fixed.
 
 This is useful for some post processing tools.
 
-* soil_inorganic_N_above: new condition
+** soil_inorganic_N_above: new condition
 
 You can use this new condition to test for the mineral nitrogen in the
 soil, useful for simulating precision farming.

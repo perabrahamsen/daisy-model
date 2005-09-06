@@ -1,3 +1,11 @@
+2005-09-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.79 released.
+
+2005-09-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_harvest.C: Moved water and N stress last.
+
 2005-08-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* condition_soil.C (soil_inorganic_N_above): New condition.

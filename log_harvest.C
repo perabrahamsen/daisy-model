@@ -60,23 +60,23 @@ struct LogHarvest : public Log
     if (print_tags)
       {
 	out << "year\tmonth\tday\tcolumn\tcrop"
-	    << "\tstem_DM\tdead_DM\tleaf_DM\tsorg_DM\tWStress";
+	    << "\tstem_DM\tdead_DM\tleaf_DM\tsorg_DM";
 	if (print_N)
-	  out << "\tNStress\tstem_N\tdead_N\tleaf_N\tsorg_N";
+	  out << "\tstem_N\tdead_N\tleaf_N\tsorg_N";
 	if (print_C)
 	  out << "\tstem_C\tdead_C\tleaf_C\tsorg_C";
-	out << "\n";
+	out << "\tWStress\tNStress\n";
 	print_tags = false;
       }
     if (print_dimension)
       {
 	out << "\t\t\t\t"
-	    << "\tt/ha\tt/ha\tt/ha\tt/ha\td";
+	    << "\tt/ha\tt/ha\tt/ha\tt/ha";
 	if (print_N)
-	  out << "\td\tkg/ha\tkg/ha\tkg/ha\tkg/ha";
+	  out << "\tkg/ha\tkg/ha\tkg/ha\tkg/ha";
 	if (print_C)
 	  out << "\tkg/ha\tkg/ha\tkg/ha\tkg/ha";
-	out << "\n";
+	out << "\td\td\n";
 	print_dimension = false;
       }
     for (; last_size < daisy.harvest.size (); last_size++)
@@ -90,11 +90,9 @@ struct LogHarvest : public Log
 	    << "\t" << harvest.stem_DM * 0.01
 	    << "\t" << harvest.dead_DM * 0.01
 	    << "\t" << harvest.leaf_DM * 0.01
-	    << "\t" << harvest.sorg_DM * 0.01
-            << "\t" << harvest.water_stress_days;
+	    << "\t" << harvest.sorg_DM * 0.01;
 	if (print_N)
-	  out << "\t" << harvest.nitrogen_stress_days
-              << "\t" << harvest.stem_N * 10.0
+	  out << "\t" << harvest.stem_N * 10.0
 	      << "\t" << harvest.dead_N * 10.0
 	      << "\t" << harvest.leaf_N * 10.0
 	      << "\t" << harvest.sorg_N * 10.0;
@@ -103,7 +101,9 @@ struct LogHarvest : public Log
 	      << "\t" << harvest.dead_C * 10.0
 	      << "\t" << harvest.leaf_C * 10.0
 	      << "\t" << harvest.sorg_C * 10.0;
-	out << "\n";
+	out << "\t" << harvest.water_stress_days
+            << "\t" << harvest.nitrogen_stress_days
+            << "\n";
 	out.flush ();
       }
     return false;
