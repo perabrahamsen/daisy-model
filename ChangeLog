@@ -1,5 +1,7 @@
 2005-09-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* txt/Makefile (exercises.pdf): Depfix.
+
 	* Version 3.79 released.
 
 2005-09-06  Per Abrahamsen  <abraham@dina.kvl.dk>

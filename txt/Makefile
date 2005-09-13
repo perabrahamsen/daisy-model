@@ -40,7 +40,7 @@ exercises.ps:	exercises.dvi
 exercises.dvi:	components.tex
 	latex exercises.tex < /dev/null
 
-exercises.pdf:	exercises.pdf
+exercises.pdf:	exercises.tex
 	pdflatex exercises.tex < /dev/null
 
 components.tex:	/usr/local/daisy/$(HOSTTYPE)/daisy
