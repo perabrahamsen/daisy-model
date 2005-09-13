@@ -183,27 +183,6 @@ Skal kunne være afhængig af kvælstof og temperatur.
 
 ** SH: forklaring
 
-* Make "daisy" a program model.
-
-** create a new "program" component.
-
-** made daisy a model instead of a submodel.
-
-** change top level to only contain definitions (and input, path, directory)
-
-Instead of "defhorizon" we would have 
-
-(horizon Ap default ...)
-
-** the main program is what is executed, unless something else is specified.
-
-(program main daisy ...)
-
-** a new "batch" program
-
-(program main batch
-   setup1 setup2 setup3)
-
 * DOM/SOM equilibrium (bgj)
 
 ** Brug i adsorbtion?
@@ -221,8 +200,6 @@ instead of
 (defaction fertiligation irrigate_subsoil 0.0 (from -5) (to -10))
 
 DOESN'T WORK FOR "defaction activity".
-
-* min, max og average log select models skal opføre sig som fluxe.
 
 * Ny (set foo 3.4) pseudo-attribut.
 

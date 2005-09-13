@@ -247,7 +247,8 @@ static struct ProgramGnuplotSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description",
-               "Generate plot from Daisy log files with gnuplot."); 
+               "Generate plot from Daisy log files with gnuplot.\n\
+UNDER CONSTRUCTION, DO NOT USE!"); 
     syntax.add ("program", Syntax::String, Syntax::Const, "\
 File name of the gnuplot executable.");
     syntax.add ("directory", Syntax::String, Syntax::Const, "\
