@@ -43,8 +43,10 @@ struct ProgramGnuplot : public Program
 
     // Run.
     static int find_tag (std::map<std::string,int>& tag_pos,
-                         const std::string& tag);
+                         const std::string& tag, 
+			 int default_value);
     std::string get_entry (LexerData& lex) const;
+    std::vector<std::string> get_entries (LexerData& lex) const;
     bool load (Treelog& msg);
 
     // Create and Destroy.
@@ -75,10 +77,11 @@ struct ProgramGnuplot : public Program
 
 int
 ProgramGnuplot::Source::find_tag (std::map<std::string,int>& tag_pos,
-                                  const std::string& tag)
+                                  const std::string& tag, 
+				  const int default_value)
 {
   if (tag_pos.find (tag) == tag_pos.end ())
-    return -1;
+    return default_value;
   return tag_pos[tag];
 }
 
@@ -114,6 +117,23 @@ ProgramGnuplot::Source::get_entry (LexerData& lex) const
       entry += int2char (lex.get ());
     }
   return entry;
+}
+
+std::vector<std::string>
+ProgramGnuplot::Source::get_entries (LexerData& lex) const
+{
+  std::vector<std::string> entries;
+
+  while (lex.good () && lex.peek () != '\n')
+    {
+      if (field_sep == "")
+	lex.skip_space ();
+      else
+	lex.skip(field_sep.c_str ());
+      entries.push_back (get_entry (lex));
+    }
+  lex.next_line ();
+  return entries;
 }
 
 bool
@@ -152,27 +172,21 @@ ProgramGnuplot::Source::load (Treelog& msg)
 
   // Read tags.
   std::map<std::string,int> tag_pos;
-  for (int count = 0; lex.good (); count++)
+  const std::vector<std::string> tag_names = get_entries ();
+  for (int count = 0; count < tag_names.size (); count++)
     {
-      const std::string candidate = get_entry (lex);
+      const std::string candidate = tag_names[count];
       if (tag_pos.find (candidate) == tag_pos.end ())
         tag_pos[candidate] = count;
       else
-       lex.warning ("Duplicate tag: " + candidate);
-      if (lex.peek () == '\n')
-        break;
-      if (field_sep == "")
-	lex.skip_space ();
-      else
-	lex.skip(field_sep.c_str ());
+	lex.warning ("Duplicate tag: " + candidate);
     }
-  lex.next_line ();
 
-  const int tag_c = find_tag (tag_pos, tag);
-  const int year_c = find_tag (tag_pos, "year");
-  const int month_c = find_tag (tag_pos, "month");
-  const int mday_c = find_tag (tag_pos, "mday");
-  const int hour_c = find_tag (tag_pos, "hour");
+  const int tag_c = find_tag (tag_pos, tag, -1);
+  const int year_c = find_tag (tag_pos, "year", -1);
+  const int month_c = find_tag (tag_pos, "month", -1);
+  const int mday_c = find_tag (tag_pos, "mday", -1);
+  const int hour_c = find_tag (tag_pos, "hour", -1);
   if (tag_c < 0)
     {
       lex.error ("Tag '" + tag + "' not found");
@@ -180,19 +194,22 @@ ProgramGnuplot::Source::load (Treelog& msg)
     }
 
   // Read dimensions.
-  for (int count = 0; count < tag_c; count++)
-    { 
-      (void) get_entry (lex);
-      lex.skip (field_sep.c_str ());
-    }
-  const std::string dimension = get_entry (lex);
-  lex.skip_line ();
-  lex.next_line ();
+  dim_names = get_entries (lex);
+  if (dim_names.size () != tag_names.size ())
+    if (dim_names.size () > tag_c)
+      lex.warning ("Number of dimensions does not match number of tags");
+    else
+      {
+	lex.error ("No dimension for '" + tag + "' found");
+	return false;
+      }
+
 
   // Read data.
 #if 0
   while (lex.good ())
     {
+      const std::string entries = 
       double year = 1000;
       double 
       for (int count == 0; lex.good (); count ++)

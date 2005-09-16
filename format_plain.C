@@ -1,0 +1,393 @@
+// format_plain.C --- Format as plain text formatting.
+// 
+// Copyright 2005 Per Abrahamsen and KVL.
+//
+// This file is part of Daisy.
+// 
+// Daisy is free software; you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation; either version 2.1 of the License, or
+// (at your option) any later version.
+// 
+// Daisy is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser Public License
+// along with Daisy; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+#include "format.h"
+#include "version.h"
+// GCC 2.95 lack ostream.
+#include <iostream>
+#include <map>
+#include <time.h>
+
+struct FormatPlain : public Format
+{
+  // Current entry.
+  std::string buf; 
+
+  // Lists.
+  int list_level;
+  void list_open ();
+  void list_close ();
+  void item_open (const std::string& name);
+  void item_close ();
+  
+  // Tables.
+  struct  Table 
+  {
+    const std::string format;
+
+    Table (const std::string& f)
+      : format (f)
+    { }
+  private:
+    Table(const Table&)
+    { daisy_assert (false); }
+  };
+  void table_open (const std::string& format);
+  void table_close ();
+  std::stack<Table> table;
+  void table_row_open ();
+  void table_row_close ();
+  std::stack<bool> table_first_column;
+  void table_cell_open ();
+  void table_cell_close ();
+  void table_multi_cell_open (const int cells, const std::string& format);
+  void table_multi_cell_close ();
+  void typewriter_open ();
+  void typewriter_close ();
+  void section_open (const std::string& type, const std::string& title,
+		     const std::string& scope, 
+		     const std::string& label);
+  void section_close ();
+  void document_open ();
+  void document_close ();
+
+  // Use.
+  void text (const std::string& text);
+  void bold (const std::string& text);
+  void italic (const std::string& text);
+  void verbatim (const std::string& text);
+  void raw (const std::string& format, const std::string& text);
+  bool formatp (const std::string& format);
+  void special (const std::string& name);
+  void soft_linebreak ();
+  void hard_linebreak ();
+  void new_paragraph ();
+  void index (const std::string& name);
+  void label (const std::string& scope, const std::string& id);
+  void pageref (const std::string& scope, const std::string& id);
+  void ref (const std::string& scope, const std::string& id);
+  void see (const std::string& type,
+	    const std::string& scope, const std::string& id);
+  void see_page (const std::string& scope, const std::string& id);
+
+  // Create and Destroy.
+  explicit FormatPlain (const AttributeList& al)
+    : Format (al),
+      list_level (0)
+  { }
+};
+
+void
+FormatPlain::list_open ()
+{ list_level++; }
+
+void
+FormatPlain::list_close ()
+{ list_level--; }
+
+void 
+FormatPlain::item_open (const std::string& name)
+{ buf += string ('*', list_level) + " " + name + ": "; }
+
+void 
+FormatPlain::item_close ()
+{ }
+
+void 
+FormatPlain::table_open (const std::string& format)
+{
+  table.push (Table (format));
+}
+
+void 
+FormatPlain::table_close ()
+{
+  Table& t table.top ();
+
+  for (size_t row = 0; row < t.rows (); row++)
+    
+  
+  
+  out () << "\n\\end{tabular}\n";
+  daisy_assert (!table_first_row.empty ());
+  table_first_row.pop ();
+}
+
+void 
+FormatPlain::table_row_open ()
+{ 
+  if (table_first_row.top ())
+    table_first_row.top () = false;
+  else
+    out () << "\\\\\n";
+
+  table_first_column.push (true);
+}
+
+void 
+FormatPlain::table_row_close ()
+{
+  daisy_assert (!table_first_column.empty ());
+  table_first_column.pop ();
+}
+
+void 
+FormatPlain::table_cell_open ()
+{
+  if (table_first_column.top ())
+    table_first_column.top () = false;
+  else
+    out () << "&";
+}
+
+void 
+FormatPlain::table_cell_close ()
+{ }
+
+void 
+FormatPlain::table_multi_cell_open (const int cells, const std::string& format)
+{ 
+  table_cell_open ();
+  out () << "\\multicolumn{" << cells << "}{" << format <<"}{"; 
+}
+
+void
+FormatPlain::table_multi_cell_close ()
+{ out () << "}"; }
+
+void
+FormatPlain::typewriter_open ()
+{ 
+  out () << "\\begin{tt}\n";
+}
+
+void
+FormatPlain::typewriter_close ()
+{ 
+  out () << "\\end{tt}\n";
+}
+
+void 
+FormatPlain::section_open (const std::string& type, const std::string& title,
+			   const std::string& scope, const std::string& label)
+{
+  out () << "\\" << type;
+  out () << "{";
+  text (title);
+  out () << "}\n\\label{" << scope << ":" << label << "}\n";
+}
+
+void 
+FormatPlain::section_close ()
+{ }
+
+void
+FormatPlain::document_open ()
+{ 
+  out () << "\
+%%% components.tex --- Description of Daisy components.\n\
+%%%\n\
+%%% This file is automatically generated, do not edit.\n"; 
+}
+
+void
+FormatPlain::document_close ()
+{ 
+  const time_t now = time (NULL);
+  out () << "\
+\n\
+\\chapter*{Version}\n\
+\\label{version}\n\
+\\addcontentsline{toc}{chapter}{\\numberline{}Version}\n\
+\n\
+Daisy version " << version << ".\\\\\n\
+LaTeX manual generated: " << ctime (&now) << "\n\
+\n\
+%%% Local Variables:\n\
+%%% mode: latex\n\
+%%% TeX-master: \"reference\"\n\
+%%% End:\n\
+\n\
+%%% components.tex ends here\n";
+}
+
+void
+FormatPlain::text (const std::string& text)
+{
+  for (unsigned int i = 0; i < text.length (); i++)
+    switch (text[i])
+      {
+      case '^':
+	if (i+1 < text.length () && (isalnum (text[i+1]) || text[i+1] == '-'))
+	  {
+	    out () << "$" << text[i] << "{";
+	    do
+	      {
+		out () << text[i+1];
+		i++;
+	      }
+	    while (i+1 < text.length () && isalnum (text[i+1]));
+	    out () << "}$";
+	  }
+	else
+	  out () << "\\" << text[i] << "{ }";
+	break;
+      case '~':
+	out () << "\\" << text[i] << "{ }";
+	break;
+      case '_':
+      case '#':
+      case '$':
+      case '%':
+      case '&':
+      case '{':
+      case '}':
+	out () << "\\" << text[i];
+	break;
+      case '\\':
+	out () << "$\\backslash$";
+	break;
+      case '[':
+      case ']':
+      case '+':
+      case '=':
+      case '<':
+      case '>':
+	out () << "$" << text[i] << "$";
+	break;
+      default:
+	out () << text[i];
+      }
+}
+
+void
+FormatPlain::bold (const std::string& text)
+{
+  out () << "\\textbf{";
+  this->text (text);
+  out () << "}";
+}
+
+void
+FormatPlain::italic (const std::string& text)
+{
+  out () << "\\textit{";
+  this->text (text);
+  out () << "}";
+}
+
+void
+FormatPlain::verbatim (const std::string& text)
+{
+  out () << "\\begin{verbatim}\n";
+  out () << text;
+  out () << "\\end{verbatim}\n";
+}
+
+bool
+FormatPlain::formatp (const std::string& format)
+{ return format == "LaTeX"; }
+
+void
+FormatPlain::raw (const std::string& format, const std::string& text)
+{
+  daisy_assert (format == "LaTeX");
+  out () << text;
+}
+
+void
+FormatPlain::special (const std::string& name)
+{
+  static struct SymTable : public std::map<std::string, std::string>
+  {
+    SymTable ()
+    {
+      typedef std::pair<std::string,std::string> p;
+      insert (p ("...", "\\ldots{}"));
+      insert (p ("->", "$\\rightarrow $"));
+      insert (p ("nbsp", "~"));
+      insert (p ("daisy", "\\daisy{}"));
+    }
+  } sym_table;
+  daisy_assert (sym_table.find (name) != sym_table.end ());
+  out () << sym_table[name];
+}
+
+void
+FormatPlain::soft_linebreak ()
+{ out () << "\n"; }
+
+void
+FormatPlain::hard_linebreak ()
+{ out () << "\\\\\n"; }
+
+void
+FormatPlain::new_paragraph ()
+{ out () << "\n\n"; }
+
+void
+FormatPlain::index (const std::string& name)
+{
+  out () << "\\index{";
+  text (name);
+  out () << "}";
+}
+
+void
+FormatPlain::label (const std::string& scope, const std::string& id)
+{ out () << "\\label{" << scope << ":" << id << "}"; }
+
+void
+FormatPlain::pageref (const std::string& scope, const std::string& id)
+{ out () << "\\pageref{" << scope << ":" << id << "}"; }
+
+void
+FormatPlain::ref (const std::string& scope, const std::string& id)
+{ out () << "\\ref{" << scope << ":" << id << "}"; }
+
+void
+FormatPlain::see (const std::string& type,
+		  const std::string& scope, const std::string& id)
+{ out () << "(see " << type << "~\\ref{" << scope << ":" << id << "})"; }
+
+void
+FormatPlain::see_page (const std::string& scope, const std::string& id)
+{
+  out () << "(see ";
+  ref (scope, id);
+  out () << ", page ";
+  pageref (scope, id);
+  out () << ")";
+}
+
+static struct FormatPlainSyntax
+{
+  static Format& make (const AttributeList& al)
+  { return *new FormatPlain (al); }
+  FormatPlainSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Format as plain text.\n\
+UNDER CONSTRUCTION! DO NOT USE!");
+    Librarian<Format>::add_type ("plain", alist, syntax, &make);
+  }
+} FormatPlain_syntax;
