@@ -34,12 +34,14 @@ struct ProgramGnuplot : public Program
   // Content.
   const std::string program;
   const std::string tmpdir;
-
+  
   // Source.
   struct Source
   {
     const std::string filename;
     const std::string tag;
+    const std::string title;
+    std::string dimension;
     const std::vector<std::string> missing;
 
     std::string field_sep;
@@ -58,9 +60,6 @@ struct ProgramGnuplot : public Program
                                    int default_value);
     static double convert_to_double (LexerData& lex, const std::string& value);
     bool load (Treelog& msg);
-    
-    // Write.
-    void plot (std::ostream&) const;
     
     // Create and Destroy.
     static void load_syntax (Syntax& syntax, AttributeList&);
@@ -255,6 +254,8 @@ ProgramGnuplot::Source::load (Treelog& msg)
 	lex.error ("No dimension for '" + tag + "' found");
 	return false;
       }
+  if (dimension == Syntax::Unknown ())
+    dimension = dim_names[tag_c];
 
   // Read data.
   while (lex.good ())
@@ -285,7 +286,7 @@ ProgramGnuplot::Source::load (Treelog& msg)
       // Extract value.
       const std::string value = entries[tag_c];
       if (std::find (missing.begin (), missing.end (), value) 
-          != missing.end ())
+          == missing.end ())
         {
           times.push_back (time);
           const double val = convert_to_double (lex, value);
@@ -300,27 +301,17 @@ ProgramGnuplot::Source::load (Treelog& msg)
 }
 
 void 
-ProgramGnuplot::Source::plot (std::ostream& out) const
-{
-  out << "plot '-' using 1:2\n";
-  const size_t size = times.size ();
-  daisy_assert (size == values.size ());
-  for (size_t i = 0; i < size; i++)
-    {
-      const Time time = times[i];
-      out << time.year () << "-" << time.month () << "-" << time.mday ()
-          << "T" << time.hour () << "\t" << values[i] << "\n";
-    }
-  out << "e\n";
-}
-
-void 
 ProgramGnuplot::Source::load_syntax (Syntax& syntax, AttributeList& al)
 {
   syntax.add ("file", Syntax::String, Syntax::Const, "\
 Name of Daisy log file where data is found.");
   syntax.add ("tag", Syntax::String, Syntax::Const, "\
 Name of column in Daisy log file where data is found.");
+  syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
+Name of data legend in plot, by default the same as 'tag'.");
+  syntax.add ("dimension", Syntax::String, Syntax::OptionalConst, "\
+Dimension of data for use by y-axis.\n\
+By default use the name specified in data file.");
   syntax.add ("missing", Syntax::String, Syntax::Const, Syntax::Sequence, "\
 List of strings indicating 'missing value'.");
   std::vector<symbol> misses;
@@ -341,6 +332,8 @@ ProgramGnuplot::Source::s2s (const std::vector<symbol>& v)
 ProgramGnuplot::Source::Source (const AttributeList& al)
   : filename (al.name ("file")),
     tag (al.name ("tag")),
+    title (al.name ("title", tag)),
+    dimension (al.name ("dimension", Syntax::Unknown ())),
     missing (s2s (al.identifier_sequence ("missing"))),
     field_sep ("UNINITIALIZED")
 { }
@@ -369,15 +362,56 @@ ProgramGnuplot::run (Treelog& msg)
   Path::Output output (tmpfile);
   std::ostream& out = output.stream ();
 
+  // Dimensions.
+  std::vector<std::string> dims;
+  std::vector<int> axis;
+  for (size_t i = 0; i < source.size (); i++)
+    {
+      const std::string dim = source[i]->dimension;
+      
+      for (size_t j = 0; j < dims.size (); j++)
+        if (dim == dims[j])
+          {
+            axis.push_back (j);
+            goto cont2;
+          }
+      axis.push_back (dims.size ());
+      dims.push_back (dim);
+    cont2: ;
+    }
+  if (dims.size () > 0)
+    out << "set ylabel \"" << dims[0] << "\"\n";
+
   // Header
   out << "\
 set xdata time\n\
 set timefmt \"%Y-%m-%d\"\n\
-";
+set style data lines\n\
+plot ";
+
   
   // Sources.
   for (size_t i = 0; i < source.size (); i++)
-    source[i]->plot (out);
+    {
+      if (i != 0)
+        out << ", ";
+      out << "'-' using 1:2 title \"" << source[i]->title << "\"";
+    }
+  out << "\n";
+  for (size_t i = 0; i < source.size (); i++)
+    {
+      const size_t size = source[i]->times.size ();
+      daisy_assert (size == source[i]->values.size ());
+      for (size_t j = 0; j < size; j++)
+        {
+          const Time time = source[i]->times[j];
+          out << time.year () << "-" << time.month () << "-" << time.mday ()
+              << "T" << time.hour () << "\t" << source[i]->values[j] << "\n";
+        }
+      out << "e\n";
+    }
+
+  out << "pause mouse\n";
 
   if (!output.good ())
     msg.error ("Problems writting to temporary file '" + tmpfile + "'");
