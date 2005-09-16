@@ -20,11 +20,13 @@
 
 
 #include "program.h"
+#include "time.h"
 #include "path.h"
 #include "treelog.h"
 #include "tmpstream.h"
 #include "lexer_data.h"
 #include "mathlib.h"
+#include "path.h"
 #include <string>
 
 struct ProgramGnuplot : public Program
@@ -38,19 +40,31 @@ struct ProgramGnuplot : public Program
   {
     const std::string filename;
     const std::string tag;
-    
+    const std::vector<std::string> missing;
+
     std::string field_sep;
 
-    // Run.
+    std::vector<Time> times;
+    std::vector<double> values;
+
+    // Read.
     static int find_tag (std::map<std::string,int>& tag_pos,
-                         const std::string& tag, 
-			 int default_value);
+                         const std::string& tag);
     std::string get_entry (LexerData& lex) const;
     std::vector<std::string> get_entries (LexerData& lex) const;
+    static int get_date_component (LexerData& lex,
+                                   const std::vector<std::string>& entries, 
+                                   int column, 
+                                   int default_value);
+    static double convert_to_double (LexerData& lex, const std::string& value);
     bool load (Treelog& msg);
-
+    
+    // Write.
+    void plot (std::ostream&) const;
+    
     // Create and Destroy.
     static void load_syntax (Syntax& syntax, AttributeList&);
+    static std::vector<std::string> s2s (const std::vector<symbol>&);
     Source (const AttributeList& al);
     ~Source ();
   };
@@ -77,11 +91,10 @@ struct ProgramGnuplot : public Program
 
 int
 ProgramGnuplot::Source::find_tag (std::map<std::string,int>& tag_pos,
-                                  const std::string& tag, 
-				  const int default_value)
+                                  const std::string& tag)
 {
   if (tag_pos.find (tag) == tag_pos.end ())
-    return default_value;
+    return -1;
   return tag_pos[tag];
 }
 
@@ -122,18 +135,55 @@ ProgramGnuplot::Source::get_entry (LexerData& lex) const
 std::vector<std::string>
 ProgramGnuplot::Source::get_entries (LexerData& lex) const
 {
+  lex.skip ("\n");
   std::vector<std::string> entries;
 
-  while (lex.good () && lex.peek () != '\n')
+  while (lex.good ())
     {
+      entries.push_back (get_entry (lex));
+
+      if (lex.peek () == '\n')
+        break;
+
       if (field_sep == "")
 	lex.skip_space ();
       else
 	lex.skip(field_sep.c_str ());
-      entries.push_back (get_entry (lex));
     }
-  lex.next_line ();
   return entries;
+}
+
+int
+ProgramGnuplot::Source::get_date_component (LexerData& lex,
+                                            const std::vector<std::string>&
+                                            /**/ entries, 
+                                            int column, 
+                                            int default_value)
+{
+  if (column < 0)
+    return default_value;
+  daisy_assert (column < entries.size ());
+  const char *const str = entries[column].c_str ();
+  const char* end_ptr = str;
+  const long lval = strtol (str, const_cast<char**> (&end_ptr), 10);
+  if (*end_ptr != '\0')
+    lex.error (std::string ("Junk at end of number '") + end_ptr + "'");
+  const int ival = lval;
+  if (ival != lval)
+    lex.error ("Number out of range");
+  return ival;
+}
+
+double
+ProgramGnuplot::Source::convert_to_double (LexerData& lex,
+                                           const std::string& value)
+{
+  const char *const str = value.c_str ();
+  const char* end_ptr = str;
+  const double val = strtod (str, const_cast<char**> (&end_ptr));
+  if (*end_ptr != '\0')
+    lex.error (std::string ("Junk at end of number '") + end_ptr + "'");
+  return val;
 }
 
 bool
@@ -168,11 +218,13 @@ ProgramGnuplot::Source::load (Treelog& msg)
     }
 
   // Skip hyphens.
-  lex.skip_hyphens ();
-
+  while (lex.good () && lex.peek () == '-')
+    lex.get ();
+  lex.skip_space ();
+  
   // Read tags.
   std::map<std::string,int> tag_pos;
-  const std::vector<std::string> tag_names = get_entries ();
+  const std::vector<std::string> tag_names = get_entries (lex);
   for (int count = 0; count < tag_names.size (); count++)
     {
       const std::string candidate = tag_names[count];
@@ -182,11 +234,11 @@ ProgramGnuplot::Source::load (Treelog& msg)
 	lex.warning ("Duplicate tag: " + candidate);
     }
 
-  const int tag_c = find_tag (tag_pos, tag, -1);
-  const int year_c = find_tag (tag_pos, "year", -1);
-  const int month_c = find_tag (tag_pos, "month", -1);
-  const int mday_c = find_tag (tag_pos, "mday", -1);
-  const int hour_c = find_tag (tag_pos, "hour", -1);
+  const int tag_c = find_tag (tag_pos, tag);
+  const int year_c = find_tag (tag_pos, "year");
+  const int month_c = find_tag (tag_pos, "month");
+  const int mday_c = find_tag (tag_pos, "mday");
+  const int hour_c = find_tag (tag_pos, "hour");
   if (tag_c < 0)
     {
       lex.error ("Tag '" + tag + "' not found");
@@ -194,7 +246,7 @@ ProgramGnuplot::Source::load (Treelog& msg)
     }
 
   // Read dimensions.
-  dim_names = get_entries (lex);
+  const std::vector<std::string> dim_names = get_entries (lex);
   if (dim_names.size () != tag_names.size ())
     if (dim_names.size () > tag_c)
       lex.warning ("Number of dimensions does not match number of tags");
@@ -204,38 +256,93 @@ ProgramGnuplot::Source::load (Treelog& msg)
 	return false;
       }
 
-
   // Read data.
-#if 0
   while (lex.good ())
     {
-      const std::string entries = 
-      double year = 1000;
-      double 
-      for (int count == 0; lex.good (); count ++)
+      // Read entries.
+      const std::vector<std::string> entries = get_entries (lex);
+
+      if (entries.size () != tag_names.size ())
         {
-          double number = 
+          if (entries.size () != 0 && lex.good ())
+            lex.warning ("Wrong number of entries on this line");
+          continue;
         }
+
+      // Extract date.
+      int year = get_date_component (lex, entries, year_c, 1000);
+      int month = get_date_component (lex, entries, month_c, 1);
+      int mday = get_date_component (lex, entries, mday_c, 1);
+      int hour = get_date_component (lex, entries, hour_c, 0);
+      
+      if (!Time::valid (year, month, mday, hour))
+        {
+          lex.warning ("Invalid date");
+          continue;
+        }
+      const Time time (year, month, mday, hour);
+
+      // Extract value.
+      const std::string value = entries[tag_c];
+      if (std::find (missing.begin (), missing.end (), value) 
+          != missing.end ())
+        {
+          times.push_back (time);
+          const double val = convert_to_double (lex, value);
+          values.push_back (val);
+        }
+      else 
+        msg.message ("Ignoring missing value '" + value + "'");
     }
-#endif
 
   // Done.
   return true;
 }
 
 void 
-ProgramGnuplot::Source::load_syntax (Syntax& syntax, AttributeList&)
+ProgramGnuplot::Source::plot (std::ostream& out) const
+{
+  out << "plot '-' using 1:2\n";
+  const size_t size = times.size ();
+  daisy_assert (size == values.size ());
+  for (size_t i = 0; i < size; i++)
+    {
+      const Time time = times[i];
+      out << time.year () << "-" << time.month () << "-" << time.mday ()
+          << "T" << time.hour () << "\t" << values[i] << "\n";
+    }
+  out << "e\n";
+}
+
+void 
+ProgramGnuplot::Source::load_syntax (Syntax& syntax, AttributeList& al)
 {
   syntax.add ("file", Syntax::String, Syntax::Const, "\
 Name of Daisy log file where data is found.");
   syntax.add ("tag", Syntax::String, Syntax::Const, "\
 Name of column in Daisy log file where data is found.");
+  syntax.add ("missing", Syntax::String, Syntax::Const, Syntax::Sequence, "\
+List of strings indicating 'missing value'.");
+  std::vector<symbol> misses;
+  misses.push_back (symbol (""));
+  misses.push_back (symbol ("00.00"));
+  al.add ("missing", misses);
+}
+
+std::vector<std::string> 
+ProgramGnuplot::Source::s2s (const std::vector<symbol>& v)
+{
+  std::vector<std::string> result;
+  for (size_t i = 0; i < v.size (); i++)
+    result.push_back (v[i].name ());
+  return result;
 }
 
 ProgramGnuplot::Source::Source (const AttributeList& al)
   : filename (al.name ("file")),
     tag (al.name ("tag")),
-    field_sep ("\t")
+    missing (s2s (al.identifier_sequence ("missing"))),
+    field_sep ("UNINITIALIZED")
 { }
 
 ProgramGnuplot::Source::~Source ()
@@ -252,6 +359,28 @@ ProgramGnuplot::run (Treelog& msg)
       if (!source[i]->load (msg))
         return;
     }
+  Path::InDirectory dir (tmpdir);
+  if (!dir.check ())
+    {
+      msg.error ("Could not cd to '" + tmpdir + "'");
+      return;
+    }
+  const std::string tmpfile = "daisy.gnuplot";
+  Path::Output output (tmpfile);
+  std::ostream& out = output.stream ();
+
+  // Header
+  out << "\
+set xdata time\n\
+set timefmt \"%Y-%m-%d\"\n\
+";
+  
+  // Sources.
+  for (size_t i = 0; i < source.size (); i++)
+    source[i]->plot (out);
+
+  if (!output.good ())
+    msg.error ("Problems writting to temporary file '" + tmpfile + "'");
 }
 
 static struct ProgramGnuplotSyntax
