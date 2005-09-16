@@ -20,13 +20,14 @@
 
 
 #include "program.h"
+#include "vcheck.h"
 #include "time.h"
 #include "path.h"
 #include "treelog.h"
 #include "tmpstream.h"
 #include "lexer_data.h"
-#include "mathlib.h"
 #include "path.h"
+#include "mathlib.h"
 #include <string>
 
 struct ProgramGnuplot : public Program
@@ -34,7 +35,9 @@ struct ProgramGnuplot : public Program
   // Content.
   const std::string program;
   const std::string tmpdir;
-  
+  const std::string file;
+  const std::string device;
+
   // Source.
   struct Source
   {
@@ -77,10 +80,13 @@ struct ProgramGnuplot : public Program
   { }
   bool check (Treelog&)
   { return true; }
+  static std::string file2device (const std::string& file);
   ProgramGnuplot (const AttributeList& al)
     : Program (al),
       program (al.name ("program")),
       tmpdir (al.name ("directory")),
+      file (al.name ("where", "")),
+      device (file2device (file)),
       source (map_construct<Source> (al.alist_sequence ("source")))
   { }
   ~ProgramGnuplot ()
@@ -379,25 +385,44 @@ ProgramGnuplot::run (Treelog& msg)
       dims.push_back (dim);
     cont2: ;
     }
-  if (dims.size () > 0)
-    out << "set ylabel \"" << dims[0] << "\"\n";
+  switch (dims.size ())
+    {
+    case 2:
+      out << "set y2label \"" << dims[1] << "\"\n";
+      // Fallthrough.
+    case 1:
+      out << "set ylabel \"" << dims[0] << "\"\n";
+      break;
+    default:
+      msg.error ("Can only plot one or two units at a time");
+      return;
+    }
 
   // Header
+  if (device != "default" && device != "unknown")
+    out << "set output \"" << file << "\"\n"
+	<< "set terminal " << device << "\n";
   out << "\
 set xdata time\n\
-set timefmt \"%Y-%m-%d\"\n\
+set timefmt \"%Y-%m-%dT%H\"\n\
 set style data lines\n\
 plot ";
 
   
   // Sources.
+  daisy_assert (axis.size () == source.size ());
   for (size_t i = 0; i < source.size (); i++)
     {
       if (i != 0)
         out << ", ";
       out << "'-' using 1:2 title \"" << source[i]->title << "\"";
+      if (axis[i] == 1)
+	out << " axes x1y2";
+      else
+	daisy_assert (axis[i] == 0);
     }
   out << "\n";
+  
   for (size_t i = 0; i < source.size (); i++)
     {
       const size_t size = source[i]->times.size ();
@@ -411,10 +436,40 @@ plot ";
       out << "e\n";
     }
 
-  out << "pause mouse\n";
+  if (device == "default" || device == "unknown")
+    out << "pause mouse\n";
 
   if (!output.good ())
-    msg.error ("Problems writting to temporary file '" + tmpfile + "'");
+    {
+      msg.error ("Problems writting to temporary file '" + tmpfile + "'");
+      return;
+    }
+
+  const std::string command = program + " " + tmpfile;
+  if (system (command.c_str ()) != 0)
+    msg.error ("There were trouble executing '" + command + "'");
+}
+
+std::string 
+ProgramGnuplot::file2device (const std::string& file)
+{
+  if (file == "")
+    return "default";
+  if (file.size () < 5 || file[file.size () - 4] != '.')
+    return "unknown";
+
+ std::string ext;
+ ext += file[file.size () - 3];
+ ext += file[file.size () - 2];
+ ext += file[file.size () - 1];
+ 
+ if (ext == "tex")
+   return "pslatex";
+ if (ext == "eps")
+   return "postscript";
+ if (ext == "pdf")
+   return "pdf";
+ return "unknown";
 }
 
 static struct ProgramGnuplotSyntax
@@ -433,6 +488,27 @@ UNDER CONSTRUCTION, DO NOT USE!");
 File name of the gnuplot executable.");
     syntax.add ("directory", Syntax::String, Syntax::Const, "\
 Temporary directory to run gnuplot in.");
+    syntax.add ("where", Syntax::String, Syntax::OptionalConst, "\
+File to store results in.  By default, show them on a window.\n\
+The format is determined from the file name extension:\n\
+*.tex: LaTeX code with PostScript specials.\n\
+*.eps: Encapsulated PostScript.\n\
+*.pdf: Adobe PDF files.");
+    static struct CheckWhere : public VCheck
+    {
+      void check (const Syntax& syntax, const AttributeList& alist, 
+		  const std::string& key) const throw (std::string)
+      {
+	daisy_assert (key == "where");
+	daisy_assert (syntax.lookup (key) == Syntax::String);
+	daisy_assert (syntax.size (key) == Syntax::Singleton);
+	const std::string file = alist.name (key);
+	if (ProgramGnuplot::file2device (file) == "unknown")
+	  throw std::string ("Unknown file extension '") + file + "'";
+      }
+    } check_where;
+    syntax.add_check ("where", check_where);
+
     syntax.add_submodule_sequence ("source", Syntax::State, "\
 Fertilizer application by date.", ProgramGnuplot::Source::load_syntax);
     Librarian<Program>::add_type ("gnuplot", alist, syntax, &make);
