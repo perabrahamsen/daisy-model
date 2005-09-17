@@ -481,7 +481,7 @@ ProgramGnuplot::file2device (const std::string& file)
  if (ext == "tex")
    return "pslatex";
  if (ext == "eps")
-   return "postscript";
+   return "postscript eps color";
  if (ext == "pdf")
    return "pdf";
  return "unknown";
