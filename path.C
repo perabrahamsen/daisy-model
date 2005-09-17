@@ -117,7 +117,7 @@ Path::get_directory ()
   char buffer[BUFFER_SIZE];
   char *wd = getcwd (buffer, BUFFER_SIZE);
   if (!wd)
-    return "Current directory path is too long";
+    throw "Current directory path is too long";
   return wd; 
 }
 

@@ -22,19 +22,21 @@
 #include "program.h"
 #include "vcheck.h"
 #include "time.h"
-#include "path.h"
 #include "treelog.h"
 #include "tmpstream.h"
 #include "lexer_data.h"
 #include "path.h"
 #include "mathlib.h"
 #include <string>
+#include <set>
+#include <fstream>
 
 struct ProgramGnuplot : public Program
 {
   // Content.
-  const std::string program;
-  const std::string tmpdir;
+  const std::string command_file;
+  const enum { append_yes, append_no, append_maybe } append;
+  const bool do_cd;
   const std::string file;
   const std::string device;
 
@@ -83,8 +85,11 @@ struct ProgramGnuplot : public Program
   static std::string file2device (const std::string& file);
   ProgramGnuplot (const AttributeList& al)
     : Program (al),
-      program (al.name ("program")),
-      tmpdir (al.name ("directory")),
+      command_file (al.name ("command_file")),
+      append (al.check ("append") 
+	      ? (al.flag ("append") ? append_yes : append_no)
+	      : append_maybe),
+      do_cd (al.flag ("cd")),
       file (al.name ("where", "")),
       device (file2device (file)),
       source (map_construct<Source> (al.alist_sequence ("source")))
@@ -358,15 +363,29 @@ ProgramGnuplot::run (Treelog& msg)
       if (!source[i]->load (msg))
         return;
     }
-  Path::InDirectory dir (tmpdir);
-  if (!dir.check ())
+
+  
+  // We open for append if we have used this file before.
+  const std::string dir = Path::get_directory ();
+  static std::set<std::string> already_opened;
+  const std::string me = dir + "/" + command_file;
+  std::ios::openmode  flags = std::ios::out;
+  if (append == append_yes
+      || (append == append_maybe 
+	  && already_opened.find (me) != already_opened.end ()))
+    flags |= std::ios::app;
+  already_opened.insert (me);
+  std::ofstream out (command_file.c_str (), flags);
+  if (do_cd)
     {
-      msg.error ("Could not cd to '" + tmpdir + "'");
-      return;
+      std::string escdir;
+      for (size_t i = 0; i < dir.size (); i++)
+	if (dir[i] == '\\')
+	  escdir += "\\\\";
+	else
+	  escdir += dir[i];
+      out << "cd \"" << escdir << "\"\n";
     }
-  const std::string tmpfile = "daisy.gnuplot";
-  Path::Output output (tmpfile);
-  std::ostream& out = output.stream ();
 
   // Dimensions.
   std::vector<std::string> dims;
@@ -439,15 +458,11 @@ plot ";
   if (device == "default" || device == "unknown")
     out << "pause mouse\n";
 
-  if (!output.good ())
+  if (!out.good ())
     {
-      msg.error ("Problems writting to temporary file '" + tmpfile + "'");
+      msg.error ("Problems writting to temporary file '" + command_file + "'");
       return;
     }
-
-  const std::string command = program + " " + tmpfile;
-  if (system (command.c_str ()) != 0)
-    msg.error ("There were trouble executing '" + command + "'");
 }
 
 std::string 
@@ -484,10 +499,16 @@ static struct ProgramGnuplotSyntax
     alist.add ("description",
                "Generate plot from Daisy log files with gnuplot.\n\
 UNDER CONSTRUCTION, DO NOT USE!"); 
-    syntax.add ("program", Syntax::String, Syntax::Const, "\
-File name of the gnuplot executable.");
-    syntax.add ("directory", Syntax::String, Syntax::Const, "\
-Temporary directory to run gnuplot in.");
+    syntax.add ("command_file", Syntax::String, Syntax::Const, "\
+File name for gnuplot commands.");
+    alist.add ("command_file", "daisy.gnuplot");
+    syntax.add ("append", Syntax::Boolean, Syntax::OptionalConst, "\
+Set this to true to append rather the rewrite the command file.\n\
+By default, do the right thing.");
+    syntax.add ("cd", Syntax::Boolean, Syntax::Const, "\
+Set this flag to add a 'cd' command to the current working directory.\n\
+This is useful under MS Windows when dragging the file to a gnuplot icon.");
+    alist.add ("cd", true);
     syntax.add ("where", Syntax::String, Syntax::OptionalConst, "\
 File to store results in.  By default, show them on a window.\n\
 The format is determined from the file name extension:\n\
