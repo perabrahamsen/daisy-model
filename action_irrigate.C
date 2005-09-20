@@ -25,7 +25,7 @@
 #include "field.h"
 #include "im.h"
 #include "check.h"
-#include "tmpstream.h"
+#include <sstream>
 
 struct ActionIrrigate : public Action
 {
@@ -51,11 +51,11 @@ struct ActionIrrigate : public Action
 	end_time = daisy.time;
 	end_time.tick_hour (hours - 1);
 	end_time.tick_day (days);
-        TmpStream tmp;
+        std::ostringstream tmp;
         if (daisy.time == end_time)
-          tmp () << "Irrigating " << flux << " mm";
+          tmp << "Irrigating " << flux << " mm";
         else
-          tmp () << "Irrigating " << flux << " mm/h for "
+          tmp << "Irrigating " << flux << " mm/h for "
                  << days * 24 + hours << " hours";
         // [kg/ha] -> [g/cm^2]
         const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
@@ -64,7 +64,7 @@ struct ActionIrrigate : public Action
         double N = (sm.NO3 + sm.NH4) * flux * (days * 24 + hours) 
           * irrigate_solute_factor / conv;
         if (N > 1e-10)
-          tmp () << "; " << N << " kg N/ha";
+          tmp << "; " << N << " kg N/ha";
         out.message (tmp.str ());      
       }
     else if (daisy.time == end_time)

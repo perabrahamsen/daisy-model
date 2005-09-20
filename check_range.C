@@ -20,18 +20,16 @@
 
 
 #include "check_range.h"
-#include "tmpstream.h"
-
-using namespace std;
+#include <sstream>
 
 void
-RangeII::check (const double value) const throw (string)
+RangeII::check (const double value) const throw (std::string)
 {
   if (value < lower || value > upper)
     {
-      TmpStream str;
-      str () << "Value not in interval [" << lower << "; " << upper << "]";
-      throw string (str.str ());
+      std::ostringstream str;
+      str << "Value not in interval [" << lower << "; " << upper << "]";
+      throw std::string (str.str ());
     }
 }
 
@@ -41,13 +39,13 @@ RangeII::RangeII (const double l, const double u)
 { }
 
 void
-RangeIE::check (const double value) const throw (string)
+RangeIE::check (const double value) const throw (std::string)
 {
   if (value < lower || value >= upper)
     {
-      TmpStream str;
-      str () << "Value not in interval [" << lower << "; " << upper << "[";
-      throw string (str.str ());
+      std::ostringstream str;
+      str << "Value not in interval [" << lower << "; " << upper << "[";
+      throw std::string (str.str ());
     }
 }
 
@@ -57,13 +55,13 @@ RangeIE::RangeIE (const double l, const double u)
 { }
 
 void
-RangeEI::check (const double value) const throw (string)
+RangeEI::check (const double value) const throw (std::string)
 {
   if (value <= lower || value > upper)
     {
-      TmpStream str;
-      str () << "Value not in interval ]" << lower << "; " << upper << "]";
-      throw string (str.str ());
+      std::ostringstream str;
+      str << "Value not in interval ]" << lower << "; " << upper << "]";
+      throw std::string (str.str ());
     }
 }
 
@@ -73,13 +71,13 @@ RangeEI::RangeEI (const double l, const double u)
 { }
 
 void
-RangeEE::check (const double value) const throw (string)
+RangeEE::check (const double value) const throw (std::string)
 {
   if (value <= lower || value >= upper)
     {
-      TmpStream str;
-      str () << "Value not in interval ]" << lower << "; " << upper << "[";
-      throw string (str.str ());
+      std::ostringstream str;
+      str << "Value not in interval ]" << lower << "; " << upper << "[";
+      throw std::string (str.str ());
     }
 }
 
@@ -89,13 +87,13 @@ RangeEE::RangeEE (const double l, const double u)
 { }
 
 void
-Below::check (const double value) const throw (string)
+Below::check (const double value) const throw (std::string)
 {
   if (value >= upper)
     {
-      TmpStream str;
-      str () << "Value should be < " << upper;
-      throw string (str.str ());
+      std::ostringstream str;
+      str << "Value should be < " << upper;
+      throw std::string (str.str ());
     }
 }
 
@@ -104,13 +102,13 @@ Below::Below (const double u)
 { }
 
 void
-BelowOrEqual::check (const double value) const throw (string)
+BelowOrEqual::check (const double value) const throw (std::string)
 {
   if (value > upper)
     {
-      TmpStream str;
-      str () << "Value should be <= " << upper;
-      throw string (str.str ());
+      std::ostringstream str;
+      str << "Value should be <= " << upper;
+      throw std::string (str.str ());
     }
 }
 
@@ -119,13 +117,13 @@ BelowOrEqual::BelowOrEqual (const double u)
 { }
 
 void
-Above::check (const double value) const throw (string)
+Above::check (const double value) const throw (std::string)
 {
   if (value <= lower)
     {
-      TmpStream str;
-      str () << "Value should be > " << lower;
-      throw string (str.str ());
+      std::ostringstream str;
+      str << "Value should be > " << lower;
+      throw std::string (str.str ());
     }
 }
 
@@ -134,13 +132,13 @@ Above::Above (const double l)
 { }
 
 void
-AboveOrEqual::check (const double value) const throw (string)
+AboveOrEqual::check (const double value) const throw (std::string)
 {
   if (value < lower)
     {
-      TmpStream str;
-      str () << "Value should be >= " << lower;
-      throw string (str.str ());
+      std::ostringstream str;
+      str << "Value should be >= " << lower;
+      throw std::string (str.str ());
     }
 }
 

@@ -25,8 +25,8 @@
 #include "field.h"
 #include "am.h"
 #include "im.h"
-#include "tmpstream.h"
 #include "check.h"
+#include <sstream>
 
 using namespace std;
 
@@ -156,23 +156,23 @@ ActionFertilize::doIt (Daisy& daisy, Treelog& out)
   double water = 0.0;
 
   const string syntax = am.name ("syntax");
-  TmpStream tmp;
+  ostringstream tmp;
   if (syntax == "mineral")
-    tmp () << "Fertilizing " << am.number ("weight") 
-	   << " kg "<< am.name ("type") << "-N/ha";
+    tmp << "Fertilizing " << am.number ("weight") 
+	<< " kg "<< am.name ("type") << "-N/ha";
   else if (syntax == "organic")
     {
-      tmp () << "Fertilizing " << am.number ("weight") 
-             << " ton "<< am.name ("type") << " ww/ha";
+      tmp  << "Fertilizing " << am.number ("weight") 
+	   << " ton "<< am.name ("type") << " ww/ha";
       const double utilized_weight = AM::utilized_weight (am);
       if (utilized_weight > 0.0)
-        tmp () << "; utilized " << utilized_weight << " kg N/ha";
+        tmp << "; utilized " << utilized_weight << " kg N/ha";
       water = AM::get_water (am);
       if (water > 0.0)
-        tmp () << "; water " << water << " mm";
+        tmp << "; water " << water << " mm";
     }
   else
-    tmp () << "Fertilizing " << am.name ("type");
+    tmp << "Fertilizing " << am.name ("type");
   out.message (tmp.str ());
   if (syntax != "mineral")
     {
@@ -284,9 +284,9 @@ static struct ActionFertilizeSyntax
 	      }
 	    if (!am.check ("weight") || !am.check ("total_N_fraction"))
 	      {
-		TmpStream tmp;
-		tmp () << "You cannot use 'equivalent_weight' with "
-		       << syntax << " fertilizer";
+		ostringstream tmp;
+		tmp  << "You cannot use 'equivalent_weight' with "
+		     << syntax << " fertilizer";
 		err.entry (tmp.str ());
 	      }
 	  }

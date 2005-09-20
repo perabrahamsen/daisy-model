@@ -1,5 +1,17 @@
 2005-09-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* action_crop.C: Use ostringstream instead of TmpStream.
+	* action_fertilize.C: Ditto.
+	* action_irrigate.C: Ditto.
+	* action_markvand.C: Ditto.
+	* action_wait.C: Ditto.
+	* am.C: Ditto.
+	* assertion.C: Ditto.
+	* bioclimate_std.C: Ditto.
+	* check_range.C: Ditto.
+
+	* check_range.C: Don't use namespace std.
+
 	* alist.h, alist.C (name_sequence): New accessor.
 
 2005-09-06  Per Abrahamsen  <abraham@dina.kvl.dk>

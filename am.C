@@ -30,10 +30,10 @@
 #include "soil.h"
 #include "check.h"
 #include "vcheck.h"
-#include "tmpstream.h"
 #include "mathlib.h"
 #include "program.h"
 #include <numeric>
+#include <sstream>
 
 using namespace std;
 
@@ -1062,8 +1062,8 @@ static struct AM_Syntax
     for (unsigned int i = 0; i < om.size (); i++)
       if (OM::get_initial_C_per_N (*om[i]) == OM::Unspecified)
 	{
-	  TmpStream tmp;
-	  tmp () << "om[" << i << "]";
+	  ostringstream tmp;
+	  tmp << "om[" << i << "]";
 	  Treelog::Open nest (err, tmp.str ());
 	  err.entry ("You must specify C/N for all pools.");
 	  ok = false;
@@ -1226,13 +1226,13 @@ struct ProgramAM_table : public Program
     const Library& library = Librarian<AM>::library ();
     vector<symbol> entries;
     library.entries (entries);
-    TmpStream tmp;
-    tmp () << "Name\tClass\tSuper\tFile\tNH4\tNO3\tvolatilization\tN\tC\tDM";
+    ostringstream tmp;
+    tmp << "Name\tClass\tSuper\tFile\tNH4\tNO3\tvolatilization\tN\tC\tDM";
     for (vector<symbol>::const_iterator i = entries.begin ();
          i != entries.end ();
          i++)
       {
-        tmp () << "\n";
+        tmp << "\n";
         const symbol name = *i;
         daisy_assert (library.check (name));
         const AttributeList& alist = library.lookup (name);
@@ -1243,27 +1243,27 @@ struct ProgramAM_table : public Program
         const symbol super = alist.check ("type") 
           ? alist.identifier ("type")
           : buildin;
-        tmp () << name << "\t" << type << "\t" << super << "\t";
+        tmp << name << "\t" << type << "\t" << super << "\t";
         if (alist.check ("parsed_from_file"))
-          tmp () << alist.identifier ("parsed_from_file");
-        tmp () << "\t";
+          tmp << alist.identifier ("parsed_from_file");
+        tmp << "\t";
         if (alist.check ("NH4_fraction"))
-          tmp () << alist.number ("NH4_fraction");
-        tmp () << "\t";
+          tmp << alist.number ("NH4_fraction");
+        tmp << "\t";
         if (alist.check ("NO3_fraction"))
-          tmp () << alist.number ("NO3_fraction");
-        tmp () << "\t";
+          tmp << alist.number ("NO3_fraction");
+        tmp << "\t";
         if (alist.check ("volatilization"))
-          tmp () << alist.number ("volatilization");
-        tmp () << "\t";
+          tmp << alist.number ("volatilization");
+        tmp << "\t";
         if (alist.check ("total_N_fraction"))
-          tmp () << alist.number ("total_N_fraction");
-        tmp () << "\t";
+          tmp << alist.number ("total_N_fraction");
+        tmp << "\t";
         if (alist.check ("total_C_fraction"))
-          tmp () << alist.number ("total_C_fraction");
-        tmp () << "\t";
+          tmp << alist.number ("total_C_fraction");
+        tmp << "\t";
         if (alist.check ("dry_matter_fraction"))
-          tmp () << alist.number ("dry_matter_fraction");
+          tmp << alist.number ("dry_matter_fraction");
       }
     msg.message (tmp.str ());
   }

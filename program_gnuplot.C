@@ -23,7 +23,6 @@
 #include "vcheck.h"
 #include "time.h"
 #include "treelog.h"
-#include "tmpstream.h"
 #include "lexer_data.h"
 #include "path.h"
 #include "mathlib.h"
@@ -41,6 +40,8 @@ struct ProgramGnuplot : public Program
   const std::string file;
   const std::string device;
   const std::vector<symbol> extra;
+
+  // Ranges.
   const Time* begin;
   const Time* end;
   const bool ymin_flag;
@@ -77,7 +78,7 @@ struct ProgramGnuplot::Source
   const std::string tag;
   const std::string title;
   std::string dimension;
-  const std::string with;
+  std::string with;
   const int style;
   const std::vector<std::string> missing;
   std::string field_sep;
@@ -239,10 +240,20 @@ ProgramGnuplot::Source::load (Treelog& msg)
   if (type == "dwf-0.0")
     {
       field_sep = "";
+      if (with == "")
+	with = "lines";
     }
-  else if (type == "dlf-0.0" || type == "ddf-0.0")
+  else if (type == "dlf-0.0")
     {
       field_sep = "\t";
+      if (with == "")
+	with = "lines";
+    }
+  else if (type == "ddf-0.0")
+    {
+      field_sep = "\t";
+      if (with == "")
+	with = "points";
     }
   else
     lex.error ("Unknown file type '" + type + "'");
@@ -392,7 +403,7 @@ ProgramGnuplot::Source::~Source ()
 std::string
 ProgramGnuplot::timerange (const Time& time)
 {
-  std::stringstream tmp;
+  std::ostringstream tmp;
   tmp << "\"" << time.year () << "-" << time.month () << "-" << time.mday ()
       << "T" << time.hour () << "\"";
   return tmp.str ();
@@ -403,8 +414,8 @@ ProgramGnuplot::run (Treelog& msg)
 { 
   for (size_t i = 0; i < source.size(); i++)
     {
-      TmpStream tmp;
-      tmp () << name << "[" << i << "]: " << source[i]->tag;
+      std::ostringstream tmp;
+      tmp << name << "[" << i << "]: " << source[i]->tag;
       Treelog::Open nest (msg, tmp.str ());
       if (!source[i]->load (msg))
         throw 1;
@@ -514,7 +525,8 @@ set style data lines\n";
 
   // Plot.
   out << "plot ";
-  
+  int points = 0;
+  int lines = 0;
   daisy_assert (axis.size () == source.size ());
   for (size_t i = 0; i < source.size (); i++)
     {
@@ -525,6 +537,19 @@ set style data lines\n";
 	out << " axes x1y2";
       else
 	daisy_assert (axis[i] == 0);
+      out << " with ";	
+      const std::string with = source[i]->with;
+      const int style = source[i]->style;
+      if (with == "points")
+	out << "points " << (style < 0 ? ++points : style);
+      else if (with == "lines")
+	out << "lines " << (style < 0 ? ++lines : style);
+      else 
+	{
+	  out << with;
+	  if (style >= 0)
+	    out << " " << style;
+	}
     }
   out << "\n";
   
@@ -615,8 +640,7 @@ static struct ProgramGnuplotSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description",
-               "Generate plot from Daisy log files with gnuplot.\n\
-UNDER CONSTRUCTION, DO NOT USE!"); 
+               "Generate a gnuplot command file."); 
     syntax.add ("command_file", Syntax::String, Syntax::Const, "\
 File name for gnuplot commands.");
     alist.add ("command_file", "daisy.gnuplot");

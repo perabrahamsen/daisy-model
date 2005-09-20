@@ -20,11 +20,12 @@
 
 #include "assertion.h"
 #include "treelog.h"
-#include "tmpstream.h"
 #include "mathlib.h"
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
+
 using namespace std;
 
 namespace Assertion
@@ -88,10 +89,10 @@ void
 Assertion::failure (const char* file, int line, const char* fun,
 		    const char* test)
 {
-  TmpStream tmp;
-  tmp () << file << ":" << line << ": assertion '" << test << "' failed";
+  ostringstream tmp;
+  tmp << file << ":" << line << ": assertion '" << test << "' failed";
   if (fun)
-    tmp () << " in " << fun;
+    tmp << " in " << fun;
   
   error (tmp.str ());
   throw 3;
@@ -101,10 +102,10 @@ void
 Assertion::bug (const char* file, int line, const char* fun,
 		const string& msg)
 {
-  TmpStream tmp;
-  tmp () << file << ":" << line << ": Daisy bug: '" << msg << "'";
+  ostringstream tmp;
+  tmp << file << ":" << line << ": Daisy bug: '" << msg << "'";
   if (fun)
-    tmp () << " in " << fun;
+    tmp << " in " << fun;
 
   error (tmp.str ());
 }
@@ -113,11 +114,11 @@ void
 Assertion::warning (const char* file, int line, const char* fun,
 		    const string& msg)
 {
-  TmpStream tmp;
-  tmp () << file << ":" << line << ": ";
+  ostringstream tmp;
+  tmp << file << ":" << line << ": ";
   if (fun)
-    tmp () << "(" << fun << ") ";
-  tmp () << "warning: " << msg;
+    tmp << "(" << fun << ") ";
+  tmp << "warning: " << msg;
 
   warning (tmp.str ());
 }
@@ -137,9 +138,9 @@ Assertion::non_negative (const char* file, int line, const char* fun,
   for (unsigned int i = 0; i < v.size (); i++)
     if (v[i] < 0 || !isfinite (v[i]))
       {
-	TmpStream tmp;
-	tmp () << "v[" << i << "] >= 0";
-	Assertion::failure (file, line, fun, tmp.str ());
+	ostringstream tmp;
+	tmp << "v[" << i << "] >= 0";
+	Assertion::failure (file, line, fun, tmp.str ().c_str ());
       }
 }
 

@@ -26,12 +26,12 @@
 #include "fao.h"
 #include "log.h"
 #include "symbol.h"
-#include "tmpstream.h"
 #include "mathlib.h"
 #include "check.h"
 #include "vcheck.h"
 #include <vector>
 #include <memory>
+#include <sstream>
 
 // MV_Soil
 
@@ -461,8 +461,8 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
     : 0.0;
   if (I > 0.0)
     {
-      TmpStream tmp;
-      tmp () << "MARKVAND Irrigating " << I << " mm";
+      std::ostringstream tmp;
+      tmp << "MARKVAND Irrigating " << I << " mm";
       out.message (tmp.str ());
       IM im;
       daisy.field.irrigate_overhead (I, im);
@@ -582,18 +582,18 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
   V_b += D_r - D_b;
 
 #if 0
-  TmpStream debug;
-  debug () << "T_sum = " << T_sum 
-           << ", phase = " << (crop ? crop->phase (T_sum) : 999)
-           << ", A = " << A << ", A_u = " << A_u 
-           << " and A_r = " << A_r << "\n";
+  std::ostringstream debug;
+  debug << "T_sum = " << T_sum 
+        << ", phase = " << (crop ? crop->phase (T_sum) : 999)
+        << ", A = " << A << ", A_u = " << A_u 
+        << " and A_r = " << A_r << "\n";
 
-  debug () << "P_I = " << P_I << ", E_a = " << E_a << ", D_r = " << D_r
-           << ", V_r = " << V_r 
-           << ", V_e = " << V_e 
-           << ", V_u = " << V_u
-           << ", V_b = " << V_b 
-           << ", V_I = " << V_I;
+  debug << "P_I = " << P_I << ", E_a = " << E_a << ", D_r = " << D_r
+        << ", V_r = " << V_r 
+        << ", V_e = " << V_e 
+        << ", V_u = " << V_u
+        << ", V_b = " << V_b 
+        << ", V_I = " << V_I;
   out.message (debug.str ());
 #endif
 }

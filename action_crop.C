@@ -30,8 +30,8 @@
 #include "harvest.h"
 #include "check_range.h"
 #include "im.h"
-#include "tmpstream.h"
 #include "vcheck.h"
+#include <sstream>
 
 using namespace std;
 
@@ -240,8 +240,8 @@ ActionCrop::MM_DD::check_alist (const AttributeList& alist, Treelog& err)
   // don't test for bad month.
   else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      TmpStream tmp;
-      tmp () << "day should be between 1 and " << Time::month_length (1, mm);
+      ostringstream tmp;
+      tmp << "day should be between 1 and " << Time::month_length (1, mm);
       err.entry (tmp.str ());
       ok = false;
     }
@@ -553,8 +553,8 @@ ActionCrop::Fertilize::check_alist (const AttributeList& al, Treelog& err)
   // don't test for bad month.
   else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      TmpStream tmp;
-      tmp () << "day should be between 1 and " << Time::month_length (1, mm);
+      ostringstream tmp;
+      tmp << "day should be between 1 and " << Time::month_length (1, mm);
       err.entry (tmp.str ());
       ok = false;
     }
@@ -617,8 +617,8 @@ ActionCrop::Tillage::check_alist (const AttributeList& al, Treelog& err)
 
   if (dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      TmpStream tmp;
-      tmp () << "day should be between 1 and " << Time::month_length (1, mm);
+      ostringstream tmp;
+      tmp << "day should be between 1 and " << Time::month_length (1, mm);
       err.entry (tmp.str ());
       ok = false;
     }
@@ -668,8 +668,8 @@ ActionCrop::Spray::check_alist (const AttributeList& al, Treelog& err)
   // don't test for bad month.
   else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      TmpStream tmp;
-      tmp ()<< "day should be between 1 and " << Time::month_length (1, mm);
+      ostringstream tmp;
+      tmp << "day should be between 1 and " << Time::month_length (1, mm);
       err.entry (tmp.str ());
       ok = false;
     }
@@ -721,8 +721,8 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, Treelog& out) const
   if (daisy.field.soil_water_potential (depth) >= potential)
     return false;
 
-  TmpStream tmp;
-  tmp () << "Irrigating " << amount << " mm";
+  ostringstream tmp;
+  tmp << "Irrigating " << amount << " mm";
   out.message (tmp.str ());
   daisy.field.irrigate_overhead (amount, IM ());
   return true;

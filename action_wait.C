@@ -24,8 +24,8 @@
 #include "condition.h"
 #include "log.h"
 #include "daisy.h"
-#include "tmpstream.h"
 #include <memory>
+#include <sstream>
 
 struct ActionWait : public Action
 {
@@ -149,8 +149,8 @@ static struct ActionWaitSyntax
     // don't test for bad month.
     else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
       {
-	TmpStream tmp;
-	tmp () << "day should be between 1 and " << Time::month_length (1, mm);
+	std::ostringstream tmp;
+	tmp << "day should be between 1 and " << Time::month_length (1, mm);
 	err.entry (tmp.str ());
 	ok = false;
       }

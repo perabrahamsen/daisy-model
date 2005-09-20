@@ -37,7 +37,7 @@
 #include "vegetation.h"
 #include "chemicals.h"
 #include "time.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -477,11 +477,11 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   daisy_assert (snow_ea <= total_ep);
   if (litter_ep < 0.0)
     {
-      TmpStream tmp;
-      tmp () << "BUG:\nlitter_ep = " << litter_ep << "\n"
-             << "total_ep = " << total_ep << "\n"
-             << "snow_ea = " << snow_ea << "\n"
-             << "cover  = " << vegetation.cover ();
+      ostringstream tmp;
+      tmp << "BUG:\nlitter_ep = " << litter_ep << "\n"
+          << "total_ep = " << total_ep << "\n"
+          << "snow_ea = " << snow_ea << "\n"
+          << "cover  = " << vegetation.cover ();
       msg.error (tmp.str ());
       litter_ep = 0.0;
     }
@@ -512,13 +512,13 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     {
       if (litter_water_storage < -1e-8)
         {
-          TmpStream tmp;
-          tmp () << "BUG:\n"
-                 << "litter_water_storage = " << litter_water_storage << "\n"
-                 << "litter_water_capacity = " << litter_water_capacity << "\n"
-                 << "litter_water_in = " << litter_water_in << "\n"
-                 << "litter_ea = " << litter_ea << "\n"
-                 << "litter_ep = " << litter_ep;
+          ostringstream tmp;
+          tmp << "BUG:\n"
+              << "litter_water_storage = " << litter_water_storage << "\n"
+              << "litter_water_capacity = " << litter_water_capacity << "\n"
+              << "litter_water_in = " << litter_water_in << "\n"
+              << "litter_ea = " << litter_ea << "\n"
+              << "litter_ep = " << litter_ep;
           msg.error (tmp.str ());
         }
       litter_water_out = litter_water_storage;
@@ -538,11 +538,11 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   daisy_assert (litter_ea <= litter_ep);
   if (pond_ep < 0.0)
     {
-      TmpStream tmp;
-      tmp () << "BUG:\npond_ep = " << pond_ep << "\n"
-             << "litter_ep = " << litter_ep << "\n"
-             << "litter_ea = " << litter_ea << "\n"
-             << "litter_factor = " << vegetation.litter_vapor_flux_factor ();
+      ostringstream tmp;
+      tmp << "BUG:\npond_ep = " << pond_ep << "\n"
+          << "litter_ep = " << litter_ep << "\n"
+          << "litter_ea = " << litter_ea << "\n"
+          << "litter_factor = " << vegetation.litter_vapor_flux_factor ();
       msg.error (tmp.str ());
       pond_ep = 0.0;
     }
