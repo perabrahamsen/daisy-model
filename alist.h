@@ -78,6 +78,8 @@ public:
   const std::vector<symbol>& 
   /**/ identifier_sequence (const std::string& key) const;
   const std::vector<symbol>& identifier_sequence (const char* key) const;
+  std::vector<std::string> name_sequence (const std::string& key) const;
+  std::vector<std::string> name_sequence (const char* key) const;
   const std::vector<bool>& flag_sequence (const std::string& key) const;
   const std::vector<bool>& flag_sequence (const char* key) const;
   const std::vector<int>& integer_sequence (const std::string& key) const;

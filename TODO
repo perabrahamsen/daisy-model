@@ -1,5 +1,30 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* gnuplot
+
+** Implementer "filter", "with" and "style".
+
+*** filter ((COLUMN VALUE...)...)
+
+Each COLUMN must be one of the listed VALUE in order to be considered.
+
+*** ddt filer skal vises som punkter
+
+*** eksplicit farvevalg
+
+** monochrome?
+
+** Automatisk find bedste hjørne til legend
+
+** automatisk find passende "ticks" på x-akse
+
+** symbolske filnavne?
+
+(defprogram test gnuplot
+   (input "harvest.dlf" "crop_prod.dlf")
+   (source ((file "$1") (tag "Stem DM"))
+           ((file "$2") (tag "LAI"))))
+
 * WP5 gnuplot
 
 ** Snak med CT
@@ -57,6 +82,11 @@ check kun de søjler der matcher log'en.
           (N amount 20 [kg N/ha])
           (N target 80 [kg N/ha] (from 0 [cm]) (to 50 [cm]))
           (NH4_fraction concentration 1 [mg N/l]))
+
+* strstream.[Ch], TmpStream
+
+Drop den, og brug stringstream i stedet.
+
 * PT data
 
 ** Lav nye log filer (kvælstof) 

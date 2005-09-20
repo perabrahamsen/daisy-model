@@ -763,6 +763,26 @@ AttributeList::identifier_sequence (const string& key) const
   return *value.name_sequence;
 }
 
+vector<string>
+AttributeList::name_sequence (const char *const key) const
+{
+  const vector<symbol>& v = identifier_sequence (key);
+  vector<string> result;
+  for (size_t i = 0; i < v.size (); i++)
+    result.push_back (v[i].name ());
+  return result;
+}
+
+vector<string>
+AttributeList::name_sequence (const string& key) const
+{
+  const vector<symbol>& v = identifier_sequence (key);
+  vector<string> result;
+  for (size_t i = 0; i < v.size (); i++)
+    result.push_back (v[i].name ());
+  return result;
+}
+
 const vector<symbol>&
 AttributeList::identifier_sequence (const char *const key) const
 {

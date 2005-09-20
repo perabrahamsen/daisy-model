@@ -30,6 +30,7 @@
 #include <string>
 #include <set>
 #include <fstream>
+#include <sstream>
 
 struct ProgramGnuplot : public Program
 {
@@ -39,42 +40,24 @@ struct ProgramGnuplot : public Program
   const bool do_cd;
   const std::string file;
   const std::string device;
+  const std::vector<symbol> extra;
+  const Time* begin;
+  const Time* end;
+  const bool ymin_flag;
+  const double ymin;
+  const bool ymax_flag;
+  const double ymax;
+  const bool y2min_flag;
+  const double y2min;
+  const bool y2max_flag;
+  const double y2max;
 
   // Source.
-  struct Source
-  {
-    const std::string filename;
-    const std::string tag;
-    const std::string title;
-    std::string dimension;
-    const std::vector<std::string> missing;
-
-    std::string field_sep;
-
-    std::vector<Time> times;
-    std::vector<double> values;
-
-    // Read.
-    static int find_tag (std::map<std::string,int>& tag_pos,
-                         const std::string& tag);
-    std::string get_entry (LexerData& lex) const;
-    std::vector<std::string> get_entries (LexerData& lex) const;
-    static int get_date_component (LexerData& lex,
-                                   const std::vector<std::string>& entries, 
-                                   int column, 
-                                   int default_value);
-    static double convert_to_double (LexerData& lex, const std::string& value);
-    bool load (Treelog& msg);
-    
-    // Create and Destroy.
-    static void load_syntax (Syntax& syntax, AttributeList&);
-    static std::vector<std::string> s2s (const std::vector<symbol>&);
-    Source (const AttributeList& al);
-    ~Source ();
-  };
-  /* const */ std::vector<Source*> source;
+  struct Source;
+  const std::vector<Source*> source;
 
   // Use.
+  static std::string timerange (const Time& time);
   void run (Treelog& msg);
   
   // Create and Destroy.
@@ -83,21 +66,67 @@ struct ProgramGnuplot : public Program
   bool check (Treelog&)
   { return true; }
   static std::string file2device (const std::string& file);
-  ProgramGnuplot (const AttributeList& al)
-    : Program (al),
-      command_file (al.name ("command_file")),
-      append (al.check ("append") 
-	      ? (al.flag ("append") ? append_yes : append_no)
-	      : append_maybe),
-      do_cd (al.flag ("cd")),
-      file (al.name ("where", "")),
-      device (file2device (file)),
-      source (map_construct<Source> (al.alist_sequence ("source")))
-  { }
-  ~ProgramGnuplot ()
-  { sequence_delete (source.begin (), source.end ()); }
+  ProgramGnuplot (const AttributeList& al);
+  ~ProgramGnuplot ();
 };
 
+
+struct ProgramGnuplot::Source
+{
+  const std::string filename;
+  const std::string tag;
+  const std::string title;
+  std::string dimension;
+  const std::string with;
+  const int style;
+  const std::vector<std::string> missing;
+  std::string field_sep;
+  std::vector<Time> times;
+  std::vector<double> values;
+  
+  // Filter.
+  struct Filter
+  {
+    const std::string tag;
+    const std::vector<std::string> allowed;
+    static void load_syntax (Syntax& syntax, AttributeList&);
+    Filter (const AttributeList&);
+  };
+  std::vector<const Filter*> filter;
+
+  // Read.
+  static int find_tag (std::map<std::string,int>& tag_pos,
+                       const std::string& tag);
+  std::string get_entry (LexerData& lex) const;
+  std::vector<std::string> get_entries (LexerData& lex) const;
+  static int get_date_component (LexerData& lex,
+                                 const std::vector<std::string>& entries, 
+                                 int column, 
+                                 int default_value);
+  static double convert_to_double (LexerData& lex, const std::string& value);
+  bool load (Treelog& msg);
+
+  // Create and Destroy.
+  static void load_syntax (Syntax& syntax, AttributeList&);
+  Source (const AttributeList& al);
+  ~Source ();
+};
+
+void 
+ProgramGnuplot::Source::Filter::load_syntax (Syntax& syntax, AttributeList&)
+{
+  syntax.add ("tag", Syntax::String, Syntax::Const, "\
+Name of column in Daisy log file to filter for.");
+  syntax.add ("allowed", Syntax::String, Syntax::Const, Syntax::Sequence, "\
+List of allowable values in filter.");
+  syntax.add_check ("allowed", VCheck::min_size_1 ());
+  syntax.order ("tag", "allowed");
+}
+
+ProgramGnuplot::Source::Filter::Filter (const AttributeList& al)
+  : tag (al.name ("tag")),
+    allowed (al.name_sequence ("allowed"))
+{ }
 
 int
 ProgramGnuplot::Source::find_tag (std::map<std::string,int>& tag_pos,
@@ -303,8 +332,6 @@ ProgramGnuplot::Source::load (Treelog& msg)
           const double val = convert_to_double (lex, value);
           values.push_back (val);
         }
-      else 
-        msg.message ("Ignoring missing value '" + value + "'");
     }
 
   // Done.
@@ -329,15 +356,22 @@ List of strings indicating 'missing value'.");
   misses.push_back (symbol (""));
   misses.push_back (symbol ("00.00"));
   al.add ("missing", misses);
-}
-
-std::vector<std::string> 
-ProgramGnuplot::Source::s2s (const std::vector<symbol>& v)
-{
-  std::vector<std::string> result;
-  for (size_t i = 0; i < v.size (); i++)
-    result.push_back (v[i].name ());
-  return result;
+  syntax.add_submodule_sequence ("filter", Syntax::Const, "\
+Only include data from rows that passes all these filters.",
+                                 ProgramGnuplot::Source::Filter::load_syntax);
+  al.add ("filter", std::vector<AttributeList*> ());
+  syntax.add ("with", Syntax::String, Syntax::OptionalConst, "\
+Specify 'points' to plot each point individually, or 'lines' to draw\n\
+lines between them.  By default, data from dwf and dlf files will be\n\
+drawn with lines, and data from ddf files will be drawn with points.");
+  static VCheck::Enum with ("lines", "points");
+  syntax.add_check ("with", with);
+  syntax.add ("style", Syntax::Integer, Syntax::OptionalConst, "\
+Style to use for this dataset.  By default, gnuplot will use style 1\n\
+for the first source to plot with lines, style 2 for the second, and\n\
+so forth until it runs out of styles and has to start over.  Points\n\
+work similar, but with its own style counter.  For color plots, points\n\
+and lines with the same style number also have the same color.");
 }
 
 ProgramGnuplot::Source::Source (const AttributeList& al)
@@ -345,12 +379,24 @@ ProgramGnuplot::Source::Source (const AttributeList& al)
     tag (al.name ("tag")),
     title (al.name ("title", tag)),
     dimension (al.name ("dimension", Syntax::Unknown ())),
-    missing (s2s (al.identifier_sequence ("missing"))),
-    field_sep ("UNINITIALIZED")
+    with (al.name ("with", "")),
+    style (al.integer ("style", -1)),
+    missing (al.name_sequence ("missing")),
+    field_sep ("UNINITIALIZED"),
+    filter (map_construct_const<Filter> (al.alist_sequence ("filter")))
 { }
 
 ProgramGnuplot::Source::~Source ()
-{ }
+{ sequence_delete (filter.begin (), filter.end ()); }
+
+std::string
+ProgramGnuplot::timerange (const Time& time)
+{
+  std::stringstream tmp;
+  tmp << "\"" << time.year () << "-" << time.month () << "-" << time.mday ()
+      << "T" << time.hour () << "\"";
+  return tmp.str ();
+}
 
 void 
 ProgramGnuplot::run (Treelog& msg)
@@ -361,9 +407,8 @@ ProgramGnuplot::run (Treelog& msg)
       tmp () << name << "[" << i << "]: " << source[i]->tag;
       Treelog::Open nest (msg, tmp.str ());
       if (!source[i]->load (msg))
-        return;
+        throw 1;
     }
-
   
   // We open for append if we have used this file before.
   const std::string dir = Path::get_directory ();
@@ -387,6 +432,25 @@ ProgramGnuplot::run (Treelog& msg)
       out << "cd \"" << escdir << "\"\n";
     }
 
+  // Header.
+  if (device != "default")
+    out << "set output \"" << file << "\"\n"
+	<< "set terminal " << device << "\n";
+  else if (getenv ("DISPLAY"))
+    out << "unset output\n"
+        << "set terminal x11\n";
+  else 
+    out << "unset output\n"
+        << "set terminal windows\n";
+  out << "\
+set xtics nomirror\n\
+set ytics nomirror\n\
+set y2tics\n\
+set xdata time\n\
+set format x \"%m-%y\"\n\
+set timefmt \"%Y-%m-%dT%H\"\n\
+set style data lines\n";
+
   // Dimensions.
   std::vector<std::string> dims;
   std::vector<int> axis;
@@ -408,27 +472,49 @@ ProgramGnuplot::run (Treelog& msg)
     {
     case 2:
       out << "set y2label \"" << dims[1] << "\"\n";
-      // Fallthrough.
+      out << "set ylabel \"" << dims[0] << "\"\n";
+      break;
     case 1:
+      out << "unset y2label\n";
       out << "set ylabel \"" << dims[0] << "\"\n";
       break;
     default:
       msg.error ("Can only plot one or two units at a time");
-      return;
+      throw 1;
     }
 
-  // Header
-  if (device != "default" && device != "unknown")
-    out << "set output \"" << file << "\"\n"
-	<< "set terminal " << device << "\n";
-  out << "\
-set xdata time\n\
-set timefmt \"%Y-%m-%dT%H\"\n\
-set style data lines\n\
-plot ";
+  // X Range
+  out << "set xrange [";
+  if (begin)
+    out << timerange (*begin);
+  out << ":";
+  if (end)
+    out << timerange (*end);
+  out << "]\n";
 
+  // Y range
+  out << "set yrange [";
+  if (ymin_flag)
+    out << ymin;
+  out << ":";
+  if (ymax_flag)
+    out << ymax;
+  out << "]\n";
+  out << "set y2range [";
+  if (y2min_flag)
+    out << y2min;
+  out << ":";
+  if (y2max_flag)
+    out << y2max;
+  out << "]\n";
+
+  // Extra.
+  for (size_t i = 0; i < extra.size (); i++)
+    out << extra[i].name () << "\n";
+
+  // Plot.
+  out << "plot ";
   
-  // Sources.
   daisy_assert (axis.size () == source.size ());
   for (size_t i = 0; i < source.size (); i++)
     {
@@ -442,6 +528,7 @@ plot ";
     }
   out << "\n";
   
+  // Data.
   for (size_t i = 0; i < source.size (); i++)
     {
       const size_t size = source[i]->times.size ();
@@ -455,13 +542,14 @@ plot ";
       out << "e\n";
     }
 
-  if (device == "default" || device == "unknown")
+  // The end.
+  if (device == "default")
     out << "pause mouse\n";
 
   if (!out.good ())
     {
       msg.error ("Problems writting to temporary file '" + command_file + "'");
-      return;
+      throw 1;
     }
 }
 
@@ -487,6 +575,36 @@ ProgramGnuplot::file2device (const std::string& file)
  return "unknown";
 }
 
+ProgramGnuplot::ProgramGnuplot (const AttributeList& al)
+  : Program (al),
+    command_file (al.name ("command_file")),
+    append (al.check ("append") 
+            ? (al.flag ("append") ? append_yes : append_no)
+            : append_maybe),
+    do_cd (al.flag ("cd")),
+    file (al.name ("where", "")),
+    device (file2device (file)),
+    extra (al.identifier_sequence ("extra")),
+    begin (al.check ("begin") ? new Time (al.alist ("begin")) : NULL),
+    end (al.check ("end") ? new Time (al.alist ("end")) : NULL),
+    ymin_flag (al.check ("ymin")),
+    ymin (al.number ("ymin", 42.42e42)),
+    ymax_flag (al.check ("ymax")),
+    ymax (al.number ("ymax", 42.42e42)),
+    y2min_flag (al.check ("y2min")),
+    y2min (al.number ("y2min", 42.42e42)),
+    y2max_flag (al.check ("y2max")),
+    y2max (al.number ("y2max", 42.42e42)),
+    source (map_construct<Source> (al.alist_sequence ("source")))
+{ }
+
+ProgramGnuplot::~ProgramGnuplot ()
+{ 
+  sequence_delete (source.begin (), source.end ()); 
+  delete begin;
+  delete end;
+}
+
 static struct ProgramGnuplotSyntax
 {
   static Program&
@@ -508,7 +626,11 @@ By default, do the right thing.");
     syntax.add ("cd", Syntax::Boolean, Syntax::Const, "\
 Set this flag to add a 'cd' command to the current working directory.\n\
 This is useful under MS Windows when dragging the file to a gnuplot icon.");
+#if defined(__unix)
+    alist.add ("cd", false);
+#else
     alist.add ("cd", true);
+#endif
     syntax.add ("where", Syntax::String, Syntax::OptionalConst, "\
 File to store results in.  By default, show them on a window.\n\
 The format is determined from the file name extension:\n\
@@ -529,9 +651,32 @@ The format is determined from the file name extension:\n\
       }
     } check_where;
     syntax.add_check ("where", check_where);
-
+    syntax.add ("extra", Syntax::String, Syntax::Const, 
+                Syntax::Sequence, "List of extra gnuplot commands.\n\
+The commands will be inserted right before the plot command.\n\
+Note that if you have multiple plots in the same command file,\n\
+The extra commands may affect the subsequence plots.");
+    alist.add ("extra", std::vector<symbol> ());
+    
+    syntax.add_submodule ("begin", alist, Syntax::OptionalConst,
+			  "First date at x-axis.", Time::load_syntax);
+    syntax.add_submodule ("end", alist, Syntax::OptionalConst,
+			  "Last date at x-axis.", Time::load_syntax);
+    syntax.add ("ymin", Syntax::Unknown (), Syntax::OptionalConst, "\
+Fixed lowest value on left y-axis.\n\
+By default determine this from the data.");
+    syntax.add ("ymax", Syntax::Unknown (), Syntax::OptionalConst, "\
+Fixed highest value on right y-axis.\n\
+By default determine this from the data.");
+    syntax.add ("y2min", Syntax::Unknown (), Syntax::OptionalConst, "\
+Fixed lowest value on left y-axis.\n\
+By default determine this from the data.");
+    syntax.add ("y2max", Syntax::Unknown (), Syntax::OptionalConst, "\
+Fixed highest value on right y-axis.\n\
+By default determine this from the data.");
+                
     syntax.add_submodule_sequence ("source", Syntax::State, "\
-Fertilizer application by date.", ProgramGnuplot::Source::load_syntax);
+Data sources to plot.", ProgramGnuplot::Source::load_syntax);
     Librarian<Program>::add_type ("gnuplot", alist, syntax, &make);
   }
 } ProgramGnuplot_syntax;
