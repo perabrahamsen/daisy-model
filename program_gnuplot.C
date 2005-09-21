@@ -104,6 +104,7 @@ struct ProgramGnuplot::Source
                                  const std::vector<std::string>& entries, 
                                  int column, 
                                  int default_value);
+  static Time get_time (const std::string& entry);
   static double convert_to_double (LexerData& lex, const std::string& value);
   bool load (Treelog& msg);
 
@@ -214,6 +215,25 @@ ProgramGnuplot::Source::get_date_component (LexerData& lex,
   return ival;
 }
 
+Time 
+ProgramGnuplot::Source::get_time (const std::string& entry)
+{
+  int year;
+  int month;
+  int mday;
+  int hour;
+  char dummy;
+
+  std::istringstream in (entry);
+  
+  in >> year >> dummy >> month >> dummy >> mday >> dummy >> hour;
+
+  if (Time::valid (year, month, mday, hour))
+    return Time (year, month, mday, hour);
+  
+  return Time (9999, 1, 1, 1);
+}
+
 double
 ProgramGnuplot::Source::convert_to_double (LexerData& lex,
                                            const std::string& value)
@@ -289,6 +309,8 @@ ProgramGnuplot::Source::load (Treelog& msg)
   const int month_c = find_tag (tag_pos, "month");
   const int mday_c = find_tag (tag_pos, "mday");
   const int hour_c = find_tag (tag_pos, "hour");
+  const int time_c = find_tag (tag_pos, "time");
+
   if (tag_c < 0)
     {
       lex.error ("Tag '" + tag + "' not found");
@@ -334,17 +356,29 @@ ProgramGnuplot::Source::load (Treelog& msg)
         }
 
       // Extract date.
-      int year = get_date_component (lex, entries, year_c, 1000);
-      int month = get_date_component (lex, entries, month_c, 1);
-      int mday = get_date_component (lex, entries, mday_c, 1);
-      int hour = get_date_component (lex, entries, hour_c, 0);
-      
-      if (!Time::valid (year, month, mday, hour))
-        {
-          lex.warning ("Invalid date");
-          continue;
-        }
-      const Time time (year, month, mday, hour);
+      Time time (9999, 1, 1, 0);
+      if (time_c < 0)
+	{
+	  int year = get_date_component (lex, entries, year_c, 1000);
+	  int month = get_date_component (lex, entries, month_c, 1);
+	  int mday = get_date_component (lex, entries, mday_c, 1);
+	  int hour = get_date_component (lex, entries, hour_c, 0);
+
+	  if (!Time::valid (year, month, mday, hour))
+	    {
+	      lex.warning ("Invalid date");
+	      continue;
+	    }
+	  time = Time (year, month, mday, hour);
+	}
+      else
+	time = get_time (entries[time_c]);
+
+      if (time.year () == 9999)
+	{
+	  lex.warning ("Invalid time");
+	  continue;
+	}
 
       // Extract value.
       const std::string value = entries[tag_c];
@@ -619,7 +653,7 @@ ProgramGnuplot::file2device (const std::string& file)
  ext += file[file.size () - 1];
  
  if (ext == "tex")
-   return "pslatex";
+   return "pstricks";
  if (ext == "eps")
    return "postscript eps color";
  if (ext == "pdf")

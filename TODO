@@ -2,19 +2,13 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * gnuplot
 
-** Implementer "time" tag.
-
-** Implementer "filter"
-
-*** filter ((COLUMN VALUE...)...)
-
-Each COLUMN must be one of the listed VALUE in order to be considered.
-
-** monochrome?
+** Manuelt vælg legend placement
 
 ** Automatisk find bedste hjørne til legend
 
 ** automatisk find passende "ticks" på x-akse
+
+** monochrome?
 
 ** symbolske filnavne?
 
@@ -22,6 +16,35 @@ Each COLUMN must be one of the listed VALUE in order to be considered.
    (input "harvest.dlf" "crop_prod.dlf")
    (source ((file "$1") (tag "Stem DM"))
            ((file "$2") (tag "LAI"))))
+
+** Escape string for tex output
+
+Use FormatLaTeX to escape dimensions and tags in plot when outputting
+LaTeX.
+
+* Skriv lille historie i tutorial om plot.
+
+** Spreadsheets 
+
+*** excel
+
+Skift instillinger
+
+** ShowDaisyOutput
+
+Hent på hjemmeside
+
+Overblik, profil, animation, zoom
+
+** gnuplot
+
+Hent på hjemmeside
+
+*** gnuplot manuelt
+
+*** gnuplot via Daisy
+
+* Installer TourtoiseCVS hos CT
 
 * WP5 gnuplot
 
