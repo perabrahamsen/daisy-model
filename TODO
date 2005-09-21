@@ -2,15 +2,13 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * gnuplot
 
-** Implementer "filter", "with" and "style".
+** Implementer "time" tag.
+
+** Implementer "filter"
 
 *** filter ((COLUMN VALUE...)...)
 
 Each COLUMN must be one of the listed VALUE in order to be considered.
-
-*** ddt filer skal vises som punkter
-
-*** eksplicit farvevalg
 
 ** monochrome?
 

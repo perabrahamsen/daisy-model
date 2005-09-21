@@ -1,4 +1,3 @@
-
 # Makefile --- For maintaining the Daisy project.
 #
 # Automatic creation of daisy on multiple platforms.
@@ -290,7 +289,7 @@ NOLINK = -c
 # These are all models of some componet.
 #
 MODELS = action_markvand.C photo_GL.C program_gnuplot.C \
-	program_document.C format_LaTeX.C program_batch.C summary_balance.C \
+	program_document.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
 	domsorp_std.C chemistry_std.C equil_linear.C pedo_const.C \
 	horizon_numeric.C horizon_system.C select_pF.C pet_FAO_PM.C \
@@ -358,11 +357,11 @@ SUBMODELS = fetch.C horheat.C litter.C time.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = log_all.C om.C select_value.C \
+SPECIALS = format_LaTeX.C log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 	geometry.C printer_file.C log_alist.C log_clone.C column_base.C
 
-# Various utility code that are neither a component or a (sub)model.
+# Various utility code that are neither a component nor a (sub)model.
 #
 OTHER = dlf.C scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \

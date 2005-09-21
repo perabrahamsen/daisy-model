@@ -295,6 +295,18 @@ ProgramGnuplot::Source::load (Treelog& msg)
       return false;
     }
 
+  std::vector<size_t> fil_col;
+  for (size_t i = 0; i < filter.size (); i++)
+    {
+      int c = find_tag (tag_pos, filter[i]->tag);
+      if (c < 0)
+	{
+	  lex.error ("Filter tag '" + filter[i]->tag + "' not found");
+	  return false;
+	}
+      fil_col.push_back (c);
+    }
+
   // Read dimensions.
   const std::vector<std::string> dim_names = get_entries (lex);
   if (dim_names.size () != tag_names.size ())
@@ -336,13 +348,28 @@ ProgramGnuplot::Source::load (Treelog& msg)
 
       // Extract value.
       const std::string value = entries[tag_c];
+
+      // Skip missing values.
       if (std::find (missing.begin (), missing.end (), value) 
-          == missing.end ())
-        {
-          times.push_back (time);
-          const double val = convert_to_double (lex, value);
-          values.push_back (val);
-        }
+          != missing.end ())
+	continue;
+
+      // Filter.
+      for (size_t i = 0; i < filter.size (); i++)
+	{
+	  const std::vector<std::string>& allowed = filter[i]->allowed;
+	  const std::string& v = entries[fil_col[i]];
+	  if (std::find (allowed.begin (), allowed.end (), v) 
+	      == allowed.end ())
+	    goto cont;
+	}
+
+      // Store it.
+      times.push_back (time);
+      values.push_back (convert_to_double (lex, value));
+
+      // Next line.
+    cont:;
     }
 
   // Done.

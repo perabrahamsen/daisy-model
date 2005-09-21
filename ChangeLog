@@ -1,3 +1,9 @@
+2005-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* format_LaTeX.h: New interface.
+	* Makefile (MODELS): Removed.
+	(SPECIALS): Added.
+
 2005-09-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* action_crop.C: Use ostringstream instead of TmpStream.
