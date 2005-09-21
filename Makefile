@@ -773,7 +773,7 @@ groundwater${OBJ}: groundwater.C groundwater.h uzmodel.h librarian.h common.h \
   border.h
 am${OBJ}: am.C am.h librarian.h common.h library.h symbol.h alist.h syntax.h \
   treelog.h assertion.h aom.h om.h plf.h im.h log.h border.h soil.h \
-  geometry.h horizon.h check.h vcheck.h tmpstream.h mathlib.h program.h
+  geometry.h horizon.h check.h vcheck.h mathlib.h program.h
 transport${OBJ}: transport.C transport.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h
 adsorption${OBJ}: adsorption.C adsorption.h librarian.h common.h library.h \
@@ -967,8 +967,7 @@ fao${OBJ}: fao.C fao.h net_radiation.h librarian.h common.h library.h \
 gaussj${OBJ}: gaussj.C gaussj.h mathlib.h assertion.h tmpstream.h
 vcheck${OBJ}: vcheck.C vcheck.h units.h syntax.h treelog.h symbol.h alist.h \
   plf.h tmpstream.h assertion.h mathlib.h
-assertion${OBJ}: assertion.C assertion.h treelog.h symbol.h tmpstream.h \
-  mathlib.h
+assertion${OBJ}: assertion.C assertion.h treelog.h symbol.h mathlib.h
 xref${OBJ}: xref.C xref.h symbol.h traverse.h library.h syntax.h treelog.h \
   alist.h submodel.h assertion.h
 treelog_dual${OBJ}: treelog_dual.C treelog_dual.h treelog.h symbol.h \
@@ -976,7 +975,7 @@ treelog_dual${OBJ}: treelog_dual.C treelog_dual.h treelog.h symbol.h \
 units${OBJ}: units.C units.h syntax.h treelog.h symbol.h mathlib.h \
   assertion.h common.h
 check${OBJ}: check.C check.h
-check_range${OBJ}: check_range.C check_range.h check.h tmpstream.h
+check_range${OBJ}: check_range.C check_range.h check.h
 path${OBJ}: path.C path.h common.h assertion.h
 options${OBJ}: options.C options.h parser_file.h parser.h librarian.h \
   common.h library.h symbol.h alist.h syntax.h treelog.h assertion.h \
@@ -1019,19 +1018,17 @@ submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 action_markvand${OBJ}: action_markvand.C action.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h daisy.h \
-  program.h field.h border.h crop.h im.h fao.h log.h tmpstream.h \
-  mathlib.h check.h vcheck.h
+  program.h field.h border.h crop.h im.h fao.h log.h mathlib.h check.h \
+  vcheck.h
 photo_GL${OBJ}: photo_GL.C photo.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h canopy_std.h canopy_simple.h \
   plf.h phenology.h submodel.h mathlib.h tmpstream.h check.h
 program_gnuplot${OBJ}: program_gnuplot.C program.h librarian.h common.h \
-  library.h symbol.h alist.h syntax.h treelog.h assertion.h path.h \
-  tmpstream.h lexer_data.h lexer.h mathlib.h
+  library.h symbol.h alist.h syntax.h treelog.h assertion.h vcheck.h \
+  lexer_data.h lexer.h path.h mathlib.h
 program_document${OBJ}: program_document.C program.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h submodel.h \
   printer_file.h printer.h xref.h plf.h format.h tmpstream.h
-format_LaTeX${OBJ}: format_LaTeX.C format.h librarian.h common.h library.h \
-  symbol.h alist.h syntax.h treelog.h assertion.h version.h
 program_batch${OBJ}: program_batch.C program.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h path.h
 summary_balance${OBJ}: summary_balance.C summary.h librarian.h common.h \
@@ -1128,7 +1125,7 @@ groundwater_file${OBJ}: groundwater_file.C groundwater.h uzmodel.h \
   assertion.h lexer_data.h lexer.h
 action_fertilize${OBJ}: action_fertilize.C action.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h daisy.h \
-  program.h field.h border.h am.h im.h tmpstream.h check.h
+  program.h field.h border.h am.h im.h check.h
 action_repeat${OBJ}: action_repeat.C action.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h log.h border.h
 column_inorganic${OBJ}: column_inorganic.C column_base.h column.h librarian.h \
@@ -1171,7 +1168,7 @@ hydraulic_M_vG_compact${OBJ}: hydraulic_M_vG_compact.C hydraulic.h \
 action_crop${OBJ}: action_crop.C action.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h daisy.h program.h \
   field.h border.h crop.h am.h log.h harvest.h chemicals.h check_range.h \
-  check.h im.h tmpstream.h vcheck.h
+  check.h im.h vcheck.h
 groundwater_lysimeter${OBJ}: groundwater_lysimeter.C groundwater.h uzmodel.h \
   librarian.h common.h library.h symbol.h alist.h syntax.h treelog.h \
   assertion.h soil.h geometry.h horizon.h
@@ -1220,7 +1217,7 @@ action_while${OBJ}: action_while.C action.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h log.h border.h
 action_wait${OBJ}: action_wait.C action.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h condition.h log.h \
-  border.h daisy.h program.h tmpstream.h
+  border.h daisy.h program.h
 action_activity${OBJ}: action_activity.C action.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h log.h \
   border.h
@@ -1289,7 +1286,7 @@ condition_logic${OBJ}: condition_logic.C condition.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h
 action_irrigate${OBJ}: action_irrigate.C action.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h daisy.h \
-  program.h field.h border.h im.h check.h tmpstream.h
+  program.h field.h border.h im.h check.h
 action_lisp${OBJ}: action_lisp.C action.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h daisy.h program.h log.h \
   border.h condition.h
@@ -1364,8 +1361,7 @@ adsorption_langmuir${OBJ}: adsorption_langmuir.C adsorption.h librarian.h \
 bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h surface.h \
   uzmodel.h weather.h im.h plf.h soil.h geometry.h horizon.h soil_heat.h \
-  snow.h log.h border.h mathlib.h pet.h svat.h vegetation.h chemicals.h \
-  tmpstream.h
+  snow.h log.h border.h mathlib.h pet.h svat.h vegetation.h chemicals.h
 condition_crop${OBJ}: condition_crop.C condition.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h crop.h \
   field.h border.h daisy.h program.h check_range.h check.h
