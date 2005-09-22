@@ -1,3 +1,7 @@
+2005-09-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.80 released.
+
 2005-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* format_LaTeX.h: New interface.
