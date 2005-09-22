@@ -18,15 +18,11 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #include "program.h"
+#include "source.h"
 #include "vcheck.h"
-#include "time.h"
 #include "treelog.h"
-#include "lexer_data.h"
-#include "units.h"
 #include "path.h"
-#include "mathlib.h"
 #include <string>
 #include <set>
 #include <fstream>
@@ -42,6 +38,21 @@ struct ProgramGnuplot : public Program
   const std::string device;
   const std::vector<symbol> extra;
 
+  // Legend placement.
+  static struct LegendTable : public std::map<std::string,std::string>
+  {
+    explicit LegendTable ()
+    {
+      (*this)["nw"] = "left Left reverse top";
+      (*this)["ne"] = "right Right top";
+      (*this)["sw"] = "left Left reverse bottom";
+      (*this)["se"] = "right Right bottom";
+      (*this)["below"] = "below";
+      (*this)["outside"] = "outside";
+    }
+  } legend_table;
+  const std::string legend;
+
   // Ranges.
   const Time* begin;
   const Time* end;
@@ -55,7 +66,6 @@ struct ProgramGnuplot : public Program
   const double y2max;
 
   // Source.
-  struct Source;
   const std::vector<Source*> source;
 
   // Use.
@@ -69,445 +79,11 @@ struct ProgramGnuplot : public Program
   bool check (Treelog&)
   { return true; }
   static std::string file2device (const std::string& file);
-  ProgramGnuplot (const AttributeList& al);
+  explicit ProgramGnuplot (const AttributeList& al);
   ~ProgramGnuplot ();
 };
 
-
-struct ProgramGnuplot::Source
-{
-  const std::string filename;
-  const std::string tag;
-  const std::string title;
-  std::string original;
-  std::string dimension;
-  const bool dim_line;
-  const bool has_factor;
-  const double factor;
-  std::string with;
-  const int style;
-  const std::vector<std::string> missing;
-  std::string field_sep;
-  std::vector<Time> times;
-  std::vector<double> values;
-  
-  // Filter.
-  struct Filter
-  {
-    const std::string tag;
-    const std::vector<std::string> allowed;
-    static void load_syntax (Syntax& syntax, AttributeList&);
-    Filter (const AttributeList&);
-  };
-  std::vector<const Filter*> filter;
-
-  // Read.
-  static int find_tag (std::map<std::string,int>& tag_pos,
-                       const std::string& tag);
-  std::string get_entry (LexerData& lex) const;
-  std::vector<std::string> get_entries (LexerData& lex) const;
-  static int get_date_component (LexerData& lex,
-                                 const std::vector<std::string>& entries, 
-                                 int column, 
-                                 int default_value);
-  static Time get_time (const std::string& entry);
-  static double convert_to_double (LexerData& lex, const std::string& value);
-  bool load (Treelog& msg);
-
-  // Create and Destroy.
-  static void load_syntax (Syntax& syntax, AttributeList&);
-  Source (const AttributeList& al);
-  ~Source ();
-};
-
-void 
-ProgramGnuplot::Source::Filter::load_syntax (Syntax& syntax, AttributeList&)
-{
-  syntax.add ("tag", Syntax::String, Syntax::Const, "\
-Name of column in Daisy log file to filter for.");
-  syntax.add ("allowed", Syntax::String, Syntax::Const, Syntax::Sequence, "\
-List of allowable values in filter.");
-  syntax.add_check ("allowed", VCheck::min_size_1 ());
-  syntax.order ("tag", "allowed");
-}
-
-ProgramGnuplot::Source::Filter::Filter (const AttributeList& al)
-  : tag (al.name ("tag")),
-    allowed (al.name_sequence ("allowed"))
-{ }
-
-int
-ProgramGnuplot::Source::find_tag (std::map<std::string,int>& tag_pos,
-                                  const std::string& tag)
-{
-  if (tag_pos.find (tag) == tag_pos.end ())
-    return -1;
-  return tag_pos[tag];
-}
-
-std::string
-ProgramGnuplot::Source::get_entry (LexerData& lex) const
-{
-  std::string tmp_term;  // Data storage.
-  const char* field_term;
-
-  switch (field_sep.size ())
-    { 
-    case 0:
-      // Whitespace
-      field_term = " \t\n";
-      break;
-    case 1:
-      // Single character field seperator.
-      tmp_term = field_sep + "\n";
-      field_term = tmp_term.c_str ();
-      break;
-    default:
-      // Multi-character field seperator.
-      daisy_assert (false);
-    }
-
-  // Find it.
-  std::string entry = "";
-  while (lex.good ())
-    {
-      int c = lex.peek ();
-      if (strchr (field_term, c))
-	break;
-      entry += int2char (lex.get ());
-    }
-  return entry;
-}
-
-std::vector<std::string>
-ProgramGnuplot::Source::get_entries (LexerData& lex) const
-{
-  lex.skip ("\n");
-  std::vector<std::string> entries;
-
-  while (lex.good ())
-    {
-      entries.push_back (get_entry (lex));
-
-      if (lex.peek () == '\n')
-        break;
-
-      if (field_sep == "")
-	lex.skip_space ();
-      else
-	lex.skip(field_sep.c_str ());
-    }
-  return entries;
-}
-
-int
-ProgramGnuplot::Source::get_date_component (LexerData& lex,
-                                            const std::vector<std::string>&
-                                            /**/ entries, 
-                                            int column, 
-                                            int default_value)
-{
-  if (column < 0)
-    return default_value;
-  daisy_assert (column < entries.size ());
-  const char *const str = entries[column].c_str ();
-  const char* end_ptr = str;
-  const long lval = strtol (str, const_cast<char**> (&end_ptr), 10);
-  if (*end_ptr != '\0')
-    lex.error (std::string ("Junk at end of number '") + end_ptr + "'");
-  const int ival = lval;
-  if (ival != lval)
-    lex.error ("Number out of range");
-  return ival;
-}
-
-Time 
-ProgramGnuplot::Source::get_time (const std::string& entry)
-{
-  int year;
-  int month;
-  int mday;
-  int hour;
-  char dummy;
-
-  std::istringstream in (entry);
-  
-  in >> year >> dummy >> month >> dummy >> mday >> dummy >> hour;
-
-  if (Time::valid (year, month, mday, hour))
-    return Time (year, month, mday, hour);
-  
-  return Time (9999, 1, 1, 1);
-}
-
-double
-ProgramGnuplot::Source::convert_to_double (LexerData& lex,
-                                           const std::string& value)
-{
-  const char *const str = value.c_str ();
-  const char* end_ptr = str;
-  const double val = strtod (str, const_cast<char**> (&end_ptr));
-  if (*end_ptr != '\0')
-    lex.error (std::string ("Junk at end of number '") + end_ptr + "'");
-  return val;
-}
-
-bool
-ProgramGnuplot::Source::load (Treelog& msg)
-{
-  LexerData lex (filename, msg);
-
-  // Open errors?
-  if (!lex.good ())
-    return false;
-
-  // Read first line.
-  const std::string type = lex.get_word ();
-  if (type == "dwf-0.0")
-    {
-      field_sep = "";
-      if (with == "")
-	with = "lines";
-    }
-  else if (type == "dlf-0.0")
-    {
-      field_sep = "\t";
-      if (with == "")
-	with = "lines";
-    }
-  else if (type == "ddf-0.0")
-    {
-      field_sep = "\t";
-      if (with == "")
-	with = "points";
-    }
-  else
-    lex.error ("Unknown file type '" + type + "'");
-  lex.skip_line ();
-  lex.next_line ();
-
-  // Skip keywords.
-  while (lex.good () && lex.peek () != '-')
-    {
-      lex.skip_line ();
-      lex.next_line ();
-    }
-
-  // Skip hyphens.
-  while (lex.good () && lex.peek () == '-')
-    lex.get ();
-  lex.skip_space ();
-  
-  // Read tags.
-  std::map<std::string,int> tag_pos;
-  const std::vector<std::string> tag_names = get_entries (lex);
-  for (int count = 0; count < tag_names.size (); count++)
-    {
-      const std::string candidate = tag_names[count];
-      if (tag_pos.find (candidate) == tag_pos.end ())
-        tag_pos[candidate] = count;
-      else
-	lex.warning ("Duplicate tag: " + candidate);
-    }
-
-  const int tag_c = find_tag (tag_pos, tag);
-  const int year_c = find_tag (tag_pos, "year");
-  const int month_c = find_tag (tag_pos, "month");
-  const int mday_c = find_tag (tag_pos, "mday");
-  const int hour_c = find_tag (tag_pos, "hour");
-  const int time_c = find_tag (tag_pos, "Date");
-
-  if (tag_c < 0)
-    {
-      lex.error ("Tag '" + tag + "' not found");
-      return false;
-    }
-
-  std::vector<size_t> fil_col;
-  for (size_t i = 0; i < filter.size (); i++)
-    {
-      int c = find_tag (tag_pos, filter[i]->tag);
-      if (c < 0)
-	{
-	  lex.error ("Filter tag '" + filter[i]->tag + "' not found");
-	  return false;
-	}
-      fil_col.push_back (c);
-    }
-
-  // Read dimensions.
-  if (dim_line)
-    {
-      const std::vector<std::string> dim_names = get_entries (lex);
-      if (dim_names.size () != tag_names.size ())
-        if (dim_names.size () > tag_c)
-          lex.warning ("Number of dimensions does not match number of tags");
-        else
-          {
-            lex.error ("No dimension for '" + tag + "' found");
-            return false;
-          }
-      if (original == Syntax::Unknown ())
-        original = dim_names[tag_c];
-      if (dimension == Syntax::Unknown ())
-        dimension = dim_names[tag_c];
-    }
-
-  if (!has_factor && !Units::can_convert (original, dimension))
-    {
-      std::ostringstream tmp;
-      tmp << "Cannot convert from " << original << " to " << dimension;
-      lex.error (tmp.str ());
-      return false;
-    }
-
-  // Read data.
-  while (lex.good ())
-    {
-      // Read entries.
-      const std::vector<std::string> entries = get_entries (lex);
-
-      if (entries.size () != tag_names.size ())
-        {
-          if (entries.size () != 0 && lex.good ())
-            lex.warning ("Wrong number of entries on this line");
-          continue;
-        }
-
-      // Extract date.
-      Time time (9999, 1, 1, 0);
-      if (time_c < 0)
-	{
-	  int year = get_date_component (lex, entries, year_c, 1000);
-	  int month = get_date_component (lex, entries, month_c, 1);
-	  int mday = get_date_component (lex, entries, mday_c, 1);
-	  int hour = get_date_component (lex, entries, hour_c, 0);
-
-	  if (!Time::valid (year, month, mday, hour))
-	    {
-	      lex.warning ("Invalid date");
-	      continue;
-	    }
-	  time = Time (year, month, mday, hour);
-	}
-      else
-	time = get_time (entries[time_c]);
-
-      if (time.year () == 9999)
-	{
-	  lex.warning ("Invalid time");
-	  continue;
-	}
-
-      // Filter.
-      for (size_t i = 0; i < filter.size (); i++)
-	{
-	  const std::vector<std::string>& allowed = filter[i]->allowed;
-	  const std::string& v = entries[fil_col[i]];
-	  if (std::find (allowed.begin (), allowed.end (), v) 
-	      == allowed.end ())
-	    goto cont;
-	}
-
-      // Extract value.
-      {
-        const std::string value = entries[tag_c];
-
-        // Skip missing values.
-        if (std::find (missing.begin (), missing.end (), value) 
-            != missing.end ())
-          continue;
-        
-        // Convert it.
-        double val = convert_to_double (lex, value);
-        if (has_factor)
-          val *= factor;
-        else if (Units::can_convert (original, dimension, val))
-          val = Units::convert (original, dimension, val);
-        else 
-          {
-            std::ostringstream tmp;
-            tmp << "Cannot convert " << val << " from " << original 
-                << " to " << dimension;
-            lex.warning (tmp.str ());
-          }
-
-        // Store it.
-        times.push_back (time);
-        values.push_back (val);
-      }
-      // Next line.
-    cont:;
-    }
-
-  // Done.
-  return true;
-}
-
-void 
-ProgramGnuplot::Source::load_syntax (Syntax& syntax, AttributeList& al)
-{
-  syntax.add ("file", Syntax::String, Syntax::Const, "\
-Name of Daisy log file where data is found.");
-  syntax.add ("tag", Syntax::String, Syntax::Const, "\
-Name of column in Daisy log file where data is found.");
-  syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
-Name of data legend in plot, by default the same as 'tag'.");
-  syntax.add ("original", Syntax::String, Syntax::OptionalConst, "\
-Dimension of the data in the data file.\n\
-By default use the name specified in data file.");
-  syntax.add ("dimension", Syntax::String, Syntax::OptionalConst, "\
-Dimension of data to plot.\n\
-By default this is the same as 'original'.\n\
-If 'factor' is not specified, Daisy will attempt to convert the data.");
-  syntax.add ("dim_line", Syntax::Boolean, Syntax::OptionalConst, "\
-If true, assume the line after the tags contain dimensions.\n\
-By default this will be true iff 'original' is not specified.");
-  syntax.add ("factor", Syntax::Unknown (), Syntax::OptionalConst, "\
-Multiply all data by this number.\n\
-By default will try to find a convertion from 'original' to 'dimension'.");
-  syntax.add ("missing", Syntax::String, Syntax::Const, Syntax::Sequence, "\
-List of strings indicating 'missing value'.");
-  std::vector<symbol> misses;
-  misses.push_back (symbol (""));
-  misses.push_back (symbol ("00.00"));
-  al.add ("missing", misses);
-  syntax.add_submodule_sequence ("filter", Syntax::Const, "\
-Only include data from rows that passes all these filters.",
-                                 ProgramGnuplot::Source::Filter::load_syntax);
-  al.add ("filter", std::vector<AttributeList*> ());
-  syntax.add ("with", Syntax::String, Syntax::OptionalConst, "\
-Specify 'points' to plot each point individually, or 'lines' to draw\n\
-lines between them.  By default, data from dwf and dlf files will be\n\
-drawn with lines, and data from ddf files will be drawn with points.");
-  static VCheck::Enum with ("lines", "points");
-  syntax.add_check ("with", with);
-  syntax.add ("style", Syntax::Integer, Syntax::OptionalConst, "\
-Style to use for this dataset.  By default, gnuplot will use style 1\n\
-for the first source to plot with lines, style 2 for the second, and\n\
-so forth until it runs out of styles and has to start over.  Points\n\
-work similar, but with its own style counter.  For color plots, points\n\
-and lines with the same style number also have the same color.");
-}
-
-ProgramGnuplot::Source::Source (const AttributeList& al)
-  : filename (al.name ("file")),
-    tag (al.name ("tag")),
-    title (al.name ("title", tag)),
-    original (al.name ("dimension", Syntax::Unknown ())),
-    dimension (al.name ("dimension", original)),
-    dim_line (al.flag ("dim_line", !al.check ("original"))),
-    has_factor (al.check ("factor")),
-    factor (al.number ("factor", 1.0)),
-    with (al.name ("with", "")),
-    style (al.integer ("style", -1)),
-    missing (al.name_sequence ("missing")),
-    field_sep ("UNINITIALIZED"),
-    filter (map_construct_const<Filter> (al.alist_sequence ("filter")))
-{ }
-
-ProgramGnuplot::Source::~Source ()
-{ sequence_delete (filter.begin (), filter.end ()); }
+ProgramGnuplot::LegendTable ProgramGnuplot::legend_table;
 
 std::string 
 ProgramGnuplot::quote (const std::string& value)
@@ -528,7 +104,7 @@ ProgramGnuplot::run (Treelog& msg)
   for (size_t i = 0; i < source.size(); i++)
     {
       std::ostringstream tmp;
-      tmp << name << "[" << i << "]: " << source[i]->tag;
+      tmp << name << "[" << i << "]: " << source[i]->title;
       Treelog::Open nest (msg, tmp.str ());
       if (!source[i]->load (msg))
         throw 1;
@@ -564,6 +140,9 @@ set ytics nomirror\n\
 set xdata time\n\
 set timefmt \"%Y-%m-%dT%H\"\n\
 set style data lines\n";
+  if (legend != "")
+    out << "set keys " << legend_table[legend];
+
   // Removed: set format x "%m-%y"
 
   // Dimensions.
@@ -715,6 +294,7 @@ ProgramGnuplot::ProgramGnuplot (const AttributeList& al)
     file (al.name ("where", "")),
     device (file2device (file)),
     extra (al.identifier_sequence ("extra")),
+    legend (al.name ("legend", "")),
     begin (al.check ("begin") ? new Time (al.alist ("begin")) : NULL),
     end (al.check ("end") ? new Time (al.alist ("end")) : NULL),
     ymin_flag (al.check ("ymin")),
@@ -786,6 +366,30 @@ The commands will be inserted right before the plot command.\n\
 Note that if you have multiple plots in the same command file,\n\
 The extra commands may affect the subsequence plots.");
     alist.add ("extra", std::vector<symbol> ());
+    syntax.add ("legend", Syntax::String, Syntax::OptionalConst, "\
+Placement of legend.  This can be one of the four corners, named by\n\
+compas locations (nw, ne, sw, se) to get the legend inside the graph\n\
+in that corner, 'below' to get the legend below the graph, 'outside'\n\
+to get the legend to the right of the graph, or 'none' to avoid\n\
+getting a legend at all.\n\
+\n\
+By default the legend will be places in the corner located farthest\n\
+away from any data points.");
+    static struct CheckLegend : public VCheck
+    {
+      void check (const Syntax& syntax, const AttributeList& alist, 
+		  const std::string& key) const throw (std::string)
+      {
+	daisy_assert (key == "legend");
+	daisy_assert (syntax.lookup (key) == Syntax::String);
+	daisy_assert (syntax.size (key) == Syntax::Singleton);
+	const std::string legend = alist.name (key);
+	if (ProgramGnuplot::legend_table.find (legend) 
+            == ProgramGnuplot::legend_table.end ())
+          throw std::string ("Unknown legend placement '") + legend + "'";
+      }
+    } check_legend;
+    syntax.add_check ("legend", check_legend);
     
     syntax.add_submodule ("begin", alist, Syntax::OptionalConst,
 			  "First date at x-axis.", Time::load_syntax);
@@ -805,7 +409,7 @@ Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
     syntax.add_submodule_sequence ("source", Syntax::State, "\
-Data sources to plot.", ProgramGnuplot::Source::load_syntax);
+Data sources to plot.", Source::load_syntax);
     Librarian<Program>::add_type ("gnuplot", alist, syntax, &make);
   }
 } ProgramGnuplot_syntax;

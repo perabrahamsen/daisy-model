@@ -1,5 +1,8 @@
 2005-09-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* source.C, source.h: New submodel.
+	* Makefile (SUBMODELS): Added it.
+
 	* Version 3.81 released.
 
 2005-09-22  Per Abrahamsen  <abraham@dina.kvl.dk>

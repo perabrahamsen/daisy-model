@@ -345,7 +345,7 @@ COMPONENTS = photo.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = fetch.C horheat.C litter.C time.C \
+SUBMODELS = source.C fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \
 	harvesting.C canopy_simple.C canopy_std.C root_system.C \
@@ -794,6 +794,9 @@ svat${OBJ}: svat.C svat.h librarian.h common.h library.h symbol.h alist.h \
   syntax.h treelog.h assertion.h log.h border.h
 vegetation${OBJ}: vegetation.C vegetation.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h log.h border.h
+source${OBJ}: source.C source.h time.h units.h librarian.h common.h library.h \
+  symbol.h alist.h syntax.h treelog.h assertion.h vcheck.h lexer_data.h \
+  lexer.h mathlib.h
 fetch${OBJ}: fetch.C fetch.h destination.h symbol.h select.h condition.h \
   librarian.h common.h library.h alist.h syntax.h treelog.h assertion.h \
   units.h mathlib.h
@@ -911,6 +914,9 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
   symbol.h syntax.h treelog.h log.h border.h librarian.h common.h \
   library.h assertion.h soil.h geometry.h horizon.h am.h submodel.h plf.h \
   aom.h om.h check.h vcheck.h mathlib.h
+format_LaTeX${OBJ}: format_LaTeX.C format_LaTeX.h format.h librarian.h \
+  common.h library.h symbol.h alist.h syntax.h treelog.h assertion.h \
+  version.h
 log_all${OBJ}: log_all.C log_all.h log_select.h log.h border.h librarian.h \
   common.h library.h symbol.h alist.h syntax.h treelog.h assertion.h \
   select.h destination.h condition.h units.h
@@ -1024,8 +1030,8 @@ photo_GL${OBJ}: photo_GL.C photo.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h canopy_std.h canopy_simple.h \
   plf.h phenology.h submodel.h mathlib.h tmpstream.h check.h
 program_gnuplot${OBJ}: program_gnuplot.C program.h librarian.h common.h \
-  library.h symbol.h alist.h syntax.h treelog.h assertion.h vcheck.h \
-  lexer_data.h lexer.h path.h mathlib.h
+  library.h symbol.h alist.h syntax.h treelog.h assertion.h source.h \
+  vcheck.h path.h
 program_document${OBJ}: program_document.C program.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h submodel.h \
   printer_file.h printer.h xref.h plf.h format.h tmpstream.h
