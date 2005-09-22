@@ -24,6 +24,7 @@
 #include "time.h"
 #include "treelog.h"
 #include "lexer_data.h"
+#include "units.h"
 #include "path.h"
 #include "mathlib.h"
 #include <string>
@@ -58,6 +59,7 @@ struct ProgramGnuplot : public Program
   const std::vector<Source*> source;
 
   // Use.
+  static std::string quote (const std::string& value);
   static std::string timerange (const Time& time);
   void run (Treelog& msg);
   
@@ -77,7 +79,11 @@ struct ProgramGnuplot::Source
   const std::string filename;
   const std::string tag;
   const std::string title;
+  std::string original;
   std::string dimension;
+  const bool dim_line;
+  const bool has_factor;
+  const double factor;
   std::string with;
   const int style;
   const std::vector<std::string> missing;
@@ -309,7 +315,7 @@ ProgramGnuplot::Source::load (Treelog& msg)
   const int month_c = find_tag (tag_pos, "month");
   const int mday_c = find_tag (tag_pos, "mday");
   const int hour_c = find_tag (tag_pos, "hour");
-  const int time_c = find_tag (tag_pos, "time");
+  const int time_c = find_tag (tag_pos, "Date");
 
   if (tag_c < 0)
     {
@@ -330,17 +336,30 @@ ProgramGnuplot::Source::load (Treelog& msg)
     }
 
   // Read dimensions.
-  const std::vector<std::string> dim_names = get_entries (lex);
-  if (dim_names.size () != tag_names.size ())
-    if (dim_names.size () > tag_c)
-      lex.warning ("Number of dimensions does not match number of tags");
-    else
-      {
-	lex.error ("No dimension for '" + tag + "' found");
-	return false;
-      }
-  if (dimension == Syntax::Unknown ())
-    dimension = dim_names[tag_c];
+  if (dim_line)
+    {
+      const std::vector<std::string> dim_names = get_entries (lex);
+      if (dim_names.size () != tag_names.size ())
+        if (dim_names.size () > tag_c)
+          lex.warning ("Number of dimensions does not match number of tags");
+        else
+          {
+            lex.error ("No dimension for '" + tag + "' found");
+            return false;
+          }
+      if (original == Syntax::Unknown ())
+        original = dim_names[tag_c];
+      if (dimension == Syntax::Unknown ())
+        dimension = dim_names[tag_c];
+    }
+
+  if (!has_factor && !Units::can_convert (original, dimension))
+    {
+      std::ostringstream tmp;
+      tmp << "Cannot convert from " << original << " to " << dimension;
+      lex.error (tmp.str ());
+      return false;
+    }
 
   // Read data.
   while (lex.good ())
@@ -380,14 +399,6 @@ ProgramGnuplot::Source::load (Treelog& msg)
 	  continue;
 	}
 
-      // Extract value.
-      const std::string value = entries[tag_c];
-
-      // Skip missing values.
-      if (std::find (missing.begin (), missing.end (), value) 
-          != missing.end ())
-	continue;
-
       // Filter.
       for (size_t i = 0; i < filter.size (); i++)
 	{
@@ -398,10 +409,33 @@ ProgramGnuplot::Source::load (Treelog& msg)
 	    goto cont;
 	}
 
-      // Store it.
-      times.push_back (time);
-      values.push_back (convert_to_double (lex, value));
+      // Extract value.
+      {
+        const std::string value = entries[tag_c];
 
+        // Skip missing values.
+        if (std::find (missing.begin (), missing.end (), value) 
+            != missing.end ())
+          continue;
+        
+        // Convert it.
+        double val = convert_to_double (lex, value);
+        if (has_factor)
+          val *= factor;
+        else if (Units::can_convert (original, dimension, val))
+          val = Units::convert (original, dimension, val);
+        else 
+          {
+            std::ostringstream tmp;
+            tmp << "Cannot convert " << val << " from " << original 
+                << " to " << dimension;
+            lex.warning (tmp.str ());
+          }
+
+        // Store it.
+        times.push_back (time);
+        values.push_back (val);
+      }
       // Next line.
     cont:;
     }
@@ -419,9 +453,19 @@ Name of Daisy log file where data is found.");
 Name of column in Daisy log file where data is found.");
   syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
 Name of data legend in plot, by default the same as 'tag'.");
-  syntax.add ("dimension", Syntax::String, Syntax::OptionalConst, "\
-Dimension of data for use by y-axis.\n\
+  syntax.add ("original", Syntax::String, Syntax::OptionalConst, "\
+Dimension of the data in the data file.\n\
 By default use the name specified in data file.");
+  syntax.add ("dimension", Syntax::String, Syntax::OptionalConst, "\
+Dimension of data to plot.\n\
+By default this is the same as 'original'.\n\
+If 'factor' is not specified, Daisy will attempt to convert the data.");
+  syntax.add ("dim_line", Syntax::Boolean, Syntax::OptionalConst, "\
+If true, assume the line after the tags contain dimensions.\n\
+By default this will be true iff 'original' is not specified.");
+  syntax.add ("factor", Syntax::Unknown (), Syntax::OptionalConst, "\
+Multiply all data by this number.\n\
+By default will try to find a convertion from 'original' to 'dimension'.");
   syntax.add ("missing", Syntax::String, Syntax::Const, Syntax::Sequence, "\
 List of strings indicating 'missing value'.");
   std::vector<symbol> misses;
@@ -450,7 +494,11 @@ ProgramGnuplot::Source::Source (const AttributeList& al)
   : filename (al.name ("file")),
     tag (al.name ("tag")),
     title (al.name ("title", tag)),
-    dimension (al.name ("dimension", Syntax::Unknown ())),
+    original (al.name ("dimension", Syntax::Unknown ())),
+    dimension (al.name ("dimension", original)),
+    dim_line (al.flag ("dim_line", !al.check ("original"))),
+    has_factor (al.check ("factor")),
+    factor (al.number ("factor", 1.0)),
     with (al.name ("with", "")),
     style (al.integer ("style", -1)),
     missing (al.name_sequence ("missing")),
@@ -460,6 +508,10 @@ ProgramGnuplot::Source::Source (const AttributeList& al)
 
 ProgramGnuplot::Source::~Source ()
 { sequence_delete (filter.begin (), filter.end ()); }
+
+std::string 
+ProgramGnuplot::quote (const std::string& value)
+{ return "'" + value + "'"; }
 
 std::string
 ProgramGnuplot::timerange (const Time& time)
@@ -494,19 +546,11 @@ ProgramGnuplot::run (Treelog& msg)
   already_opened.insert (me);
   std::ofstream out (command_file.c_str (), flags);
   if (do_cd)
-    {
-      std::string escdir;
-      for (size_t i = 0; i < dir.size (); i++)
-	if (dir[i] == '\\')
-	  escdir += "\\\\";
-	else
-	  escdir += dir[i];
-      out << "cd \"" << escdir << "\"\n";
-    }
+    out << "cd " << quote (dir) << "\n";
 
   // Header.
   if (device != "default")
-    out << "set output \"" << file << "\"\n"
+    out << "set output " << quote (file) << "\n"
 	<< "set terminal " << device << "\n";
   else if (getenv ("DISPLAY"))
     out << "unset output\n"
@@ -515,13 +559,12 @@ ProgramGnuplot::run (Treelog& msg)
     out << "unset output\n"
         << "set terminal windows\n";
   out << "\
-set xtics nomirror\n\
+set xtics nomirror autofreq\n\
 set ytics nomirror\n\
-set y2tics\n\
 set xdata time\n\
-set format x \"%m-%y\"\n\
 set timefmt \"%Y-%m-%dT%H\"\n\
 set style data lines\n";
+  // Removed: set format x "%m-%y"
 
   // Dimensions.
   std::vector<std::string> dims;
@@ -543,12 +586,13 @@ set style data lines\n";
   switch (dims.size ())
     {
     case 2:
-      out << "set y2label \"" << dims[1] << "\"\n";
-      out << "set ylabel \"" << dims[0] << "\"\n";
+      out << "set y2tics\n";
+      out << "set y2label " << quote (dims[1]) << "\n";
+      out << "set ylabel " << quote (dims[0]) << "\n";
       break;
     case 1:
       out << "unset y2label\n";
-      out << "set ylabel \"" << dims[0] << "\"\n";
+      out << "set ylabel " << quote (dims[0]) << "\n";
       break;
     default:
       msg.error ("Can only plot one or two units at a time");
@@ -593,7 +637,7 @@ set style data lines\n";
     {
       if (i != 0)
         out << ", ";
-      out << "'-' using 1:2 title \"" << source[i]->title << "\"";
+      out << "'-' using 1:2 title " << quote (source[i]->title);
       if (axis[i] == 1)
 	out << " axes x1y2";
       else

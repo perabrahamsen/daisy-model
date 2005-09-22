@@ -670,6 +670,18 @@ AttributeList::flag (const char *const key) const
   return value.flag;
 }
 
+bool
+AttributeList::flag (const string& key, const bool default_value) const
+{
+  if (!check (key))
+    return default_value;
+  return flag (key); 
+}
+
+bool
+AttributeList::flag (const char *const key, const bool default_value) const
+{ return flag (string (key), default_value); }
+
 int
 AttributeList::integer (const string& key) const
 {

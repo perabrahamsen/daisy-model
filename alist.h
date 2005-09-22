@@ -65,6 +65,8 @@ public:
   symbol identifier (const char*) const;
   bool flag (const std::string&) const;
   bool flag (const char*) const;
+  bool flag (const std::string&, bool default_value) const;
+  bool flag (const char*, bool default_value) const;
   const PLF& plf (const std::string&) const;
   const PLF& plf (const char*) const;
   AttributeList& alist (const std::string&) const;

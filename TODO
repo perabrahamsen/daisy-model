@@ -24,27 +24,9 @@ TODO --- things that needs done with Daisy -*- outline -*-
 Use FormatLaTeX to escape dimensions and tags in plot when outputting
 LaTeX.
 
+* Forbered præsentation i Udine
+
 * Skriv lille historie i tutorial om plot.
-
-** Spreadsheets 
-
-*** excel
-
-Skift instillinger
-
-** ShowDaisyOutput
-
-Hent på hjemmeside
-
-Overblik, profil, animation, zoom
-
-** gnuplot
-
-Hent på hjemmeside
-
-*** gnuplot manuelt
-
-*** gnuplot via Daisy
 
 * Installer TourtoiseCVS hos CT
 
