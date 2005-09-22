@@ -587,7 +587,8 @@ has been harvested during the simulation.  The \emph{D}aisy \emph{L}og
 \emph{F}ormat (\texttt{.dlf}) is understood by the
 \texttt{ShowDaisyOutput.exe} program, but you can also view it with an
 editor or load it into a spreadsheet.  The \texttt{harvest.dlf} file,
-in particular, is best viewed as plain text.
+in particular, is best viewed as plain text.  See
+section~\ref{sec:plot} for more information about how to view the results.
 
 Our next log model, \texttt{N~Balance}, will write enough information
 about the nitrogen content of the soil to calculate a balance, in a
@@ -2006,6 +2007,35 @@ Here are some useful log models, you can find more in the
   subsystem.  File: \texttt{snow.dlf}.
 % TODO: \item[\texttt{}]   File: \texttt{}.
 \end{description}
+
+\section{Plotting simulation results}
+\label{sec:plot}
+
+The \texttt{.dlf} files produced by \daisy{} are text files with (by
+default) tab seperated columns, and can be viewed by any text editor,
+or by most spreadsheets.
+
+\subsection{Excel}
+
+Change to American numbers.
+
+\subsection{ShowDaisyOutput}
+
+Can be fetched from the \daisy{} homepage.
+
+Good for overview.  Can plot a soil profile, and animate it.
+Allows zooming.  No printing.
+
+\subsection{gnuplot}
+\label{sec:gnuplot}
+
+There is a link to the binary on the \daisy{} homepage.
+
+\subsection{Using gnuplot manually}
+\label{gnuplot-man}
+
+\subsection{Generating gnuplot commands from Daisy}
+\label{sec:gnuplot-daisy}
 
 \section{Organizing Your Parameterizations}
 \label{sec:files}
