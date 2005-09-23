@@ -23,6 +23,7 @@
 #include "vcheck.h"
 #include "treelog.h"
 #include "path.h"
+#include "mathlib.h"
 #include <string>
 #include <set>
 #include <fstream>
@@ -51,7 +52,7 @@ struct ProgramGnuplot : public Program
       (*this)["outside"] = "outside";
     }
   } legend_table;
-  const std::string legend;
+  std::string legend;
 
   // Ranges.
   const Time* begin;
@@ -70,7 +71,7 @@ struct ProgramGnuplot : public Program
 
   // Use.
   static std::string quote (const std::string& value);
-  static std::string timerange (const Time& time);
+  static std::string timeform (const Time& time);
   void run (Treelog& msg);
   
   // Create and Destroy.
@@ -90,7 +91,7 @@ ProgramGnuplot::quote (const std::string& value)
 { return "'" + value + "'"; }
 
 std::string
-ProgramGnuplot::timerange (const Time& time)
+ProgramGnuplot::timeform (const Time& time)
 {
   std::ostringstream tmp;
   tmp << "\"" << time.year () << "-" << time.month () << "-" << time.mday ()
@@ -116,7 +117,7 @@ ProgramGnuplot::run (Treelog& msg)
   const std::string me = dir + "/" + command_file;
   std::ios::openmode  flags = std::ios::out;
   if (append == append_yes
-      || (append == append_maybe 
+      || (append == append_maybe
 	  && already_opened.find (me) != already_opened.end ()))
     flags |= std::ios::app;
   already_opened.insert (me);
@@ -125,7 +126,7 @@ ProgramGnuplot::run (Treelog& msg)
     out << "cd " << quote (dir) << "\n";
 
   // Header.
-  if (device != "default")
+  if (device != "screen")
     out << "set output " << quote (file) << "\n"
 	<< "set terminal " << device << "\n";
   else if (getenv ("DISPLAY"))
@@ -140,9 +141,6 @@ set ytics nomirror\n\
 set xdata time\n\
 set timefmt \"%Y-%m-%dT%H\"\n\
 set style data lines\n";
-  if (legend != "")
-    out << "set keys " << legend_table[legend];
-
   // Removed: set format x "%m-%y"
 
   // Dimensions.
@@ -178,13 +176,75 @@ set style data lines\n";
       throw 1;
     }
 
+  // Legend.
+  if (legend == "auto")
+    {
+      // Find ranges.
+      Time soft_begin (9999, 12, 31, 23);
+      Time soft_end (1,1,1,0);
+      double soft_ymin = 1e99;
+      double soft_ymax = -soft_ymin;
+      double soft_y2min = soft_ymin;
+      double soft_y2max = soft_ymax;
+
+      for (unsigned int i = 0; i < source.size (); i++)
+	if (axis[i] == 0)
+	  source[i]->limit (soft_begin, soft_end, soft_ymin, soft_ymax);
+	else
+	  source[i]->limit (soft_begin, soft_end, soft_y2min, soft_y2max);
+
+      if (begin)
+	soft_begin = *begin;
+      if (end)
+	soft_end = *end;
+      if (ymin_flag)
+	soft_ymin = ymin;
+      if (ymax_flag)
+	soft_ymax = ymax;
+      if (y2min_flag)
+	soft_y2min = y2min;
+      if (y2max_flag)
+	soft_y2max = y2max;
+
+      // Find distances.
+      double nw = 1.0;
+      double ne = 1.0;
+      double sw = 1.0;
+      double se = 1.0;
+      for (unsigned int i = 0; i < source.size (); i++)
+	if (axis[i] == 0)
+	  source[i]->distance (soft_begin, soft_end, soft_ymin, soft_ymax,
+			       nw, ne, sw, se);
+	else
+	  source[i]->distance (soft_begin, soft_end, soft_y2min, soft_y2max,
+			       nw, ne, sw, se);
+
+      // Choose closest.
+      const double max_distance = std::max (std::max (nw, ne), 
+					    std::max (sw, se));
+      if (max_distance < 0.05)
+	legend = "outside";
+      else if (approximate (max_distance, ne))
+	legend = "ne";
+      else if (approximate (max_distance, nw))
+	legend = "nw";
+      else if (approximate (max_distance, se))
+	legend = "se";
+      else
+	{
+	  daisy_assert (approximate (max_distance, sw));
+	  legend = "sw";
+	}
+    }
+  out << "set key " << legend_table[legend] << "\n";
+
   // X Range
   out << "set xrange [";
   if (begin)
-    out << timerange (*begin);
+    out << timeform (*begin);
   out << ":";
   if (end)
-    out << timerange (*end);
+    out << timeform (*end);
   out << "]\n";
 
   // Y range
@@ -252,7 +312,7 @@ set style data lines\n";
     }
 
   // The end.
-  if (device == "default")
+  if (device == "screen")
     out << "pause mouse\n";
 
   if (!out.good ())
@@ -265,8 +325,8 @@ set style data lines\n";
 std::string 
 ProgramGnuplot::file2device (const std::string& file)
 {
-  if (file == "")
-    return "default";
+  if (file == "screen")
+    return "screen";
   if (file.size () < 5 || file[file.size () - 4] != '.')
     return "unknown";
 
@@ -291,10 +351,10 @@ ProgramGnuplot::ProgramGnuplot (const AttributeList& al)
             ? (al.flag ("append") ? append_yes : append_no)
             : append_maybe),
     do_cd (al.flag ("cd")),
-    file (al.name ("where", "")),
+    file (al.name ("where")),
     device (file2device (file)),
     extra (al.identifier_sequence ("extra")),
-    legend (al.name ("legend", "")),
+    legend (al.name ("legend")),
     begin (al.check ("begin") ? new Time (al.alist ("begin")) : NULL),
     end (al.check ("end") ? new Time (al.alist ("end")) : NULL),
     ymin_flag (al.check ("ymin")),
@@ -343,9 +403,12 @@ This is useful under MS Windows when dragging the file to a gnuplot icon.");
     syntax.add ("where", Syntax::String, Syntax::OptionalConst, "\
 File to store results in.  By default, show them on a window.\n\
 The format is determined from the file name extension:\n\
-*.tex: LaTeX code with PostScript specials.\n\
-*.eps: Encapsulated PostScript.\n\
-*.pdf: Adobe PDF files.");
+  *.tex: LaTeX code with PostScript specials.\n\
+  *.eps: Encapsulated PostScript.\n\
+  *.pdf: Adobe PDF files.\n\
+\n\
+The special name 'screen' indicate that the data should be shown on\n\
+the screen instead of being stored in a file.");
     static struct CheckWhere : public VCheck
     {
       void check (const Syntax& syntax, const AttributeList& alist, 
@@ -355,11 +418,14 @@ The format is determined from the file name extension:\n\
 	daisy_assert (syntax.lookup (key) == Syntax::String);
 	daisy_assert (syntax.size (key) == Syntax::Singleton);
 	const std::string file = alist.name (key);
+	if (file == "screen")
+	  return;
 	if (ProgramGnuplot::file2device (file) == "unknown")
 	  throw std::string ("Unknown file extension '") + file + "'";
       }
     } check_where;
     syntax.add_check ("where", check_where);
+    alist.add ("where", "screen");
     syntax.add ("extra", Syntax::String, Syntax::Const, 
                 Syntax::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the plot command.\n\
@@ -373,8 +439,11 @@ in that corner, 'below' to get the legend below the graph, 'outside'\n\
 to get the legend to the right of the graph, or 'none' to avoid\n\
 getting a legend at all.\n\
 \n\
-By default the legend will be places in the corner located farthest\n\
-away from any data points.");
+The value 'auto' mean the legend will be places in the corner located\n\
+farthest away from any data points.  Note that datapoints outside the\n\
+graph are ignored, and so are the lines connecting the datapoints.  Thus,\n\
+a line conncting two datapoints, one of them outside the graph, may\n\
+cross the legend.");
     static struct CheckLegend : public VCheck
     {
       void check (const Syntax& syntax, const AttributeList& alist, 
@@ -384,13 +453,16 @@ away from any data points.");
 	daisy_assert (syntax.lookup (key) == Syntax::String);
 	daisy_assert (syntax.size (key) == Syntax::Singleton);
 	const std::string legend = alist.name (key);
+	if (legend == "auto")
+	  return;
 	if (ProgramGnuplot::legend_table.find (legend) 
             == ProgramGnuplot::legend_table.end ())
           throw std::string ("Unknown legend placement '") + legend + "'";
       }
     } check_legend;
     syntax.add_check ("legend", check_legend);
-    
+    alist.add ("legend", "auto");
+
     syntax.add_submodule ("begin", alist, Syntax::OptionalConst,
 			  "First date at x-axis.", Time::load_syntax);
     syntax.add_submodule ("end", alist, Syntax::OptionalConst,

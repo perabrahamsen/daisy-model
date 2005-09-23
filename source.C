@@ -43,12 +43,20 @@ Source::Filter::Filter (const AttributeList& al)
 { }
 
 int
-Source::find_tag (std::map<std::string,int>& tag_pos,
-                                  const std::string& tag)
+Source::find_tag (std::map<std::string,int>& tag_pos, const std::string& tag)
 {
   if (tag_pos.find (tag) == tag_pos.end ())
     return -1;
   return tag_pos[tag];
+}
+
+int
+Source::find_tag (std::map<std::string,int>& tag_pos, 
+		  const std::string& tag1,
+		  const std::string& tag2)
+{
+  int result = find_tag (tag_pos, tag1);
+  return result < 0 ? find_tag (tag_pos, tag2) : result;
 }
 
 std::string
@@ -217,11 +225,11 @@ Source::load (Treelog& msg)
     }
 
   const int tag_c = find_tag (tag_pos, tag);
-  const int year_c = find_tag (tag_pos, "year");
-  const int month_c = find_tag (tag_pos, "month");
-  const int mday_c = find_tag (tag_pos, "mday");
-  const int hour_c = find_tag (tag_pos, "hour");
-  const int time_c = find_tag (tag_pos, "Date");
+  const int year_c = find_tag (tag_pos, "year", "Year");
+  const int month_c = find_tag (tag_pos, "month", "Month");
+  const int mday_c = find_tag (tag_pos, "mday", "Day");
+  const int hour_c = find_tag (tag_pos, "hour", "Hour");
+  const int time_c = find_tag (tag_pos, "time", "Date");
 
   if (tag_c < 0)
     {
@@ -348,6 +356,58 @@ Source::load (Treelog& msg)
 
   // Done.
   return true;
+}
+
+void 
+Source::limit (Time& begin, Time& end, double& ymin, double& ymax) const
+{
+  for (size_t i = 0; i < times.size (); i++)
+    {
+      if (times[i] < begin)
+	begin = times[i];
+      if (times[i] > end)
+	end = times[i];
+      if (values[i] < ymin)
+	ymin = values[i];
+      if (values[i] > ymax)
+	ymax = values[i];
+    }
+}
+
+void 
+Source::distance (const Time begin, const Time end, 
+		  const double ymin, const double ymax,
+		  double& nw, double& ne, double& sw, double& se) const
+  // Find relative distances to each corner.
+{
+  if (begin >= end || ymin >= ymax)
+    // Null plot.
+    return;
+    
+  for (size_t i = 0; i < times.size (); i++)
+    {
+      const double xr = (Time::hours_between (begin, times[i]) + 0.0)
+	/ (Time::hours_between (begin, end) + 0.0);
+      if (xr < 0.0 || xr > 1.0)
+	// Outside graph.
+	continue;
+      const double yr = (values[i] - ymin) / (ymax - ymin);
+      if (yr < 0.0 || yr > 1.0)
+	// Outside graph.
+	continue;
+      
+      // Distance from borders.
+      const double  west = xr;
+      const double  east = 1.0 - xr;
+      const double north = 1.0 - yr;
+      const double south = yr;
+      
+      // Distance from corners.
+      nw = std::min (nw, std::max (north, west));
+      ne = std::min (ne, std::max (north, east));
+      sw = std::min (sw, std::max (south, west));
+      se = std::min (se, std::max (south, east));
+    }
 }
 
 void 

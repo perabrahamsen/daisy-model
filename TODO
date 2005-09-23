@@ -1,12 +1,6 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* commit format_LaTeX.h !!!!
-
 * gnuplot
-
-** Manuelt vælg legend placement
-
-** Automatisk find bedste hjørne til legend
 
 ** automatisk find passende "ticks" på x-akse
 
@@ -28,23 +22,7 @@ LaTeX.
 
 * Skriv lille historie i tutorial om plot.
 
-* Installer TourtoiseCVS hos CT
-
-* WP5 gnuplot
-
-** Snak med CT
-
-** Nogle eksempler fra portugal 
-
-*** Målte data
-
-**** Opret fil
-
-**** Lines vs. punkter
-
-*** Log fil
-
-*** begin end
+* Installer WinCVS hos CT
 
 * WP5 kalibrering
 

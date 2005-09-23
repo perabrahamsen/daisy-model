@@ -70,6 +70,9 @@ private:
 private:
   static int find_tag (std::map<std::string,int>& tag_pos,
                        const std::string& tag);
+  static int find_tag (std::map<std::string,int>& tag_pos,
+                       const std::string& tag1,
+                       const std::string& tag2);
   std::string get_entry (LexerData& lex) const;
   std::vector<std::string> get_entries (LexerData& lex) const;
   static int get_date_component (LexerData& lex,
@@ -80,6 +83,9 @@ private:
   static double convert_to_double (LexerData& lex, const std::string& value);
 public:
   bool load (Treelog& msg);
+  void limit (Time& begin, Time& end, double& ymin, double& ymax) const;
+  void distance (Time begin, Time end, double ymin, double ymax,
+		 double& nw, double& ne, double& sw, double& se) const;
 
   // Create and Destroy.
 public:
