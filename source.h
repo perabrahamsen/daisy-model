@@ -21,79 +21,45 @@
 #ifndef SOURCE_H
 #define SOURCE_H
 
+#include "librarian.h"
 #include "time.h"
-#include <string>
-#include <vector>
-#include <map>
-
-class AttributeList;
-class Syntax;
-class LexerData;
-class Treelog;
 
 class Source
 {
-  const std::string filename;
-  const std::string tag;
+  // Content.
 public:
-  const std::string title;
-private:
-  std::string original;
-public:
-  std::string dimension;
-private:
-  const bool dim_line;
-  const bool has_factor;
-  const double factor;
-public:
-  std::string with;
-  const int style;
-private:
-  const std::vector<std::string> missing;
-  std::string field_sep;
-public:
-  std::vector<Time> times;
-  std::vector<double> values;
-  
-  // Filter.
-private:
-  struct Filter
-  {
-    const std::string tag;
-    const std::vector<std::string> allowed;
-    static void load_syntax (Syntax& syntax, AttributeList&);
-    explicit Filter (const AttributeList&);
-  };
-  std::vector<const Filter*> filter;
+  const symbol name;
+  static const char *const description;
 
-  // Read.
-private:
-  static int find_tag (std::map<std::string,int>& tag_pos,
-                       const std::string& tag);
-  static int find_tag (std::map<std::string,int>& tag_pos,
-                       const std::string& tag1,
-                       const std::string& tag2);
-  std::string get_entry (LexerData& lex) const;
-  std::vector<std::string> get_entries (LexerData& lex) const;
-  static int get_date_component (LexerData& lex,
-                                 const std::vector<std::string>& entries, 
-                                 int column, 
-                                 int default_value);
-  static Time get_time (const std::string& entry);
-  static double convert_to_double (LexerData& lex, const std::string& value);
+  // Interface.
 public:
-  bool load (Treelog& msg);
+  virtual const std::string& title () const = 0;
+  virtual const std::string& dimension () const = 0;
+  virtual const std::string& with () const = 0;
+  virtual int style () const = 0;
+  virtual const std::vector<Time>& time () const = 0;
+  virtual const std::vector<double>& value () const = 0;
+  virtual bool load (Treelog& msg) = 0;
+
+  // Utilities.
+public:
   void limit (Time& begin, Time& end, double& ymin, double& ymax) const;
   void distance (Time begin, Time end, double ymin, double ymax,
 		 double& nw, double& ne, double& sw, double& se) const;
-
+  
   // Create and Destroy.
-public:
+protected:
   static void load_syntax (Syntax& syntax, AttributeList&);
   explicit Source (const AttributeList& al);
-  ~Source ();
+public:
+  virtual ~Source ();
 };
 
-#endif // SOURCE_H
+#ifdef FORWARD_TEMPLATES
+EMPTY_TEMPLATE
+Librarian<Source>::Content* Librarian<Source>::content;
+#endif
 
-// source.h ends here.
+static Librarian<Source> Source_init ("source");
+
+#endif // SOURCE_H

@@ -1,5 +1,14 @@
 2005-09-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* source_std.C: New model.
+	* source.C, source.h: Made it a component.
+	* Makefile (COMPONENTS, MODELS): Added it.
+	(SUBMODELS): Removed it.
+
+	* parser.h (class Parser): explicit.
+
+	* parser_file.C: Use ostringstream instead of TmpStream.
+
 	* Version 3.82 released.
 
 2005-09-22  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -26,13 +26,13 @@
 #include "number.h"
 #include "plf.h"
 #include "time.h"
-#include "tmpstream.h"
 #include "treelog_stream.h"
 #include "path.h"
 #include "units.h"
 #include "mathlib.h"
 #include <set>
 #include <memory>
+#include <sstream>
 
 using namespace std;
 
@@ -254,8 +254,8 @@ ParserFile::Implementation::get_number (const string& syntax_dim)
   if (obj == error_sym)
     return -42.42e42;
   // Check for completness.
-  TmpStream tmp;
-  TreelogStream treelog (tmp ());
+  ostringstream tmp;
+  TreelogStream treelog (tmp);
   Treelog::Open nest (treelog, obj);
   if (!lib.syntax (obj).check (*al, treelog))
     error ("Bogus number '" + obj + "'\n--- details:\n"
@@ -479,8 +479,8 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
       if (!has_warned)
         {
           has_warned = true;
-          TmpStream tmp;
-          tmp () << "Assuming original type '" << original_type << "'";
+          ostringstream tmp;
+          tmp << "Assuming original type '" << original_type << "'";
           warning (tmp.str ());
         }
 #endif
@@ -720,8 +720,8 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  // We can only use complete objects as attribute
 		  // values.
 		  // NO LONGER TRUE with the "original" type.
-		  TmpStream tmp;
-		  TreelogStream treelog (tmp ());
+		  ostringstream tmp;
+		  TreelogStream treelog (tmp);
 		  Treelog::Open nest (treelog, obj);
 		  if (!lib.syntax (obj).check (al, treelog))
 		    error (string ("Error for member '") + obj 
@@ -788,8 +788,8 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 #ifdef REQUIRE_COMPLETE_OBJECTS
 			// We can only use complete objects as attribute
 			// values.
-			TmpStream tmp;
-			TreelogStream treelog (tmp ());
+			ostringstream tmp;
+			TreelogStream treelog (tmp);
 			Treelog::Open nest (treelog, obj);
 			const bool ok = lib.syntax (obj).check (al, treelog);
 			if (!ok)
@@ -846,9 +846,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		if (size != Syntax::Sequence 
 		    && sequence.size () != size)
 		  {
-		    TmpStream str;
-		    str () << "Got " << sequence.size ()
-			   << " array members, expected " << size;
+		    ostringstream str;
+		    str << "Got " << sequence.size ()
+                        << " array members, expected " << size;
 		    error (str.str ());
 		  }
 		atts.add (name, sequence);
@@ -898,9 +898,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  }
 		if (size != Syntax::Sequence && total != size)
 		  {
-		    TmpStream str;
-		    str () << "Got " << total
-			   << " array members, expected " << size;
+		    ostringstream str;
+		    str << "Got " << total
+                        << " array members, expected " << size;
 		    error (str.str ());
 
 		    for (;total < size; total++)
@@ -971,16 +971,16 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 			}
 		      catch (const string& message)
 			{
-			  TmpStream str;
-			  str () << name << "[" << i << "]: " << message;
+			  ostringstream str;
+			  str << name << "[" << i << "]: " << message;
 			  error (str.str (), positions[i]);
 			}
 		  }
 		if (size != Syntax::Sequence && count != size)
 		  {
-		    TmpStream str;
-		    str () << "Got " << count 
-			   << " array members, expected " << size;
+		    ostringstream str;
+		    str << "Got " << count 
+                        << " array members, expected " << size;
 		    error (str.str ());
 
 		    for (;count < size; count++)
@@ -1002,9 +1002,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  }
 		if (size != Syntax::Sequence && count != size)
 		  {
-		    TmpStream str;
-		    str () << "Got " << count 
-			   << " array members, expected " << size;
+		    ostringstream str;
+		    str << "Got " << count 
+                        << " array members, expected " << size;
 		    error (str.str ());
 
 		    for (;count < size; count++)
@@ -1036,9 +1036,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  }
 		if (size != Syntax::Sequence && count != size)
 		  {
-		    TmpStream str;
-		    str () << "Got " << count 
-			   << " array members, expected " << size;
+		    ostringstream str;
+		    str << "Got " << count 
+                        << " array members, expected " << size;
 		    error (str.str ());
 
 		    for (;count < size; count++)
@@ -1061,8 +1061,8 @@ ParserFile::Implementation::load_list (AttributeList& atts,
       // Value check.
       if (atts.check (name))
 	{
-	  TmpStream tmp;
-	  TreelogStream treelog (tmp ());
+	  ostringstream tmp;
+	  TreelogStream treelog (tmp);
 	  Treelog::Open nest (treelog, name);
 	  if (!syntax.check (atts, name, treelog))
 	    error (tmp.str ());

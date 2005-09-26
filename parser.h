@@ -44,7 +44,7 @@ public:
 public:
   virtual void initialize (const Syntax&, Treelog&) = 0;
 protected:
-  Parser (const AttributeList&);
+  explicit Parser (const AttributeList&);
 public:
   virtual ~Parser ();
 };

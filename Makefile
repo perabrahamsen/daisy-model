@@ -288,7 +288,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = action_markvand.C photo_GL.C program_gnuplot.C \
+MODELS = source_std.C action_markvand.C photo_GL.C program_gnuplot.C \
 	program_document.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
 	domsorp_std.C chemistry_std.C equil_linear.C pedo_const.C \
@@ -333,7 +333,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = photo.C \
+COMPONENTS = source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
 	transform.C rootdens.C select.C average.C mactrans.C macro.C \
@@ -345,7 +345,7 @@ COMPONENTS = photo.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = source.C fetch.C horheat.C litter.C time.C \
+SUBMODELS = fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \
 	harvesting.C canopy_simple.C canopy_std.C root_system.C \

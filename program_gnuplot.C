@@ -105,7 +105,7 @@ ProgramGnuplot::run (Treelog& msg)
   for (size_t i = 0; i < source.size(); i++)
     {
       std::ostringstream tmp;
-      tmp << name << "[" << i << "]: " << source[i]->title;
+      tmp << name << "[" << i << "]: " << source[i]->title ();
       Treelog::Open nest (msg, tmp.str ());
       if (!source[i]->load (msg))
         throw 1;
@@ -148,7 +148,7 @@ set style data lines\n";
   std::vector<int> axis;
   for (size_t i = 0; i < source.size (); i++)
     {
-      const std::string dim = source[i]->dimension;
+      const std::string dim = source[i]->dimension ();
       
       for (size_t j = 0; j < dims.size (); j++)
         if (dim == dims[j])
@@ -276,14 +276,14 @@ set style data lines\n";
     {
       if (i != 0)
         out << ", ";
-      out << "'-' using 1:2 title " << quote (source[i]->title);
+      out << "'-' using 1:2 title " << quote (source[i]->title ());
       if (axis[i] == 1)
 	out << " axes x1y2";
       else
 	daisy_assert (axis[i] == 0);
       out << " with ";	
-      const std::string with = source[i]->with;
-      const int style = source[i]->style;
+      const std::string with = source[i]->with ();
+      const int style = source[i]->style ();
       if (with == "points")
 	out << "points " << (style < 0 ? ++points : style);
       else if (with == "lines")
@@ -300,13 +300,13 @@ set style data lines\n";
   // Data.
   for (size_t i = 0; i < source.size (); i++)
     {
-      const size_t size = source[i]->times.size ();
-      daisy_assert (size == source[i]->values.size ());
+      const size_t size = source[i]->time ().size ();
+      daisy_assert (size == source[i]->value ().size ());
       for (size_t j = 0; j < size; j++)
         {
-          const Time time = source[i]->times[j];
+          const Time time = source[i]->time ()[j];
           out << time.year () << "-" << time.month () << "-" << time.mday ()
-              << "T" << time.hour () << "\t" << source[i]->values[j] << "\n";
+              << "T" << time.hour () << "\t" << source[i]->value ()[j] << "\n";
         }
       out << "e\n";
     }
@@ -365,7 +365,7 @@ ProgramGnuplot::ProgramGnuplot (const AttributeList& al)
     y2min (al.number ("y2min", 42.42e42)),
     y2max_flag (al.check ("y2max")),
     y2max (al.number ("y2max", 42.42e42)),
-    source (map_construct<Source> (al.alist_sequence ("source")))
+    source (map_create<Source> (al.alist_sequence ("source")))
 { }
 
 ProgramGnuplot::~ProgramGnuplot ()
@@ -480,7 +480,7 @@ By default determine this from the data.");
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
-    syntax.add_submodule_sequence ("source", Syntax::State, "\
+    syntax.add ("source", Librarian<Source>::library (), Syntax::State, "\
 Data sources to plot.", Source::load_syntax);
     Librarian<Program>::add_type ("gnuplot", alist, syntax, &make);
   }
