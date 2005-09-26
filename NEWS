@@ -41,8 +41,8 @@ file, and LAI from the 'crop_prod.dlf' file.
     (command_file "kurt.gnuplot")
     (ymin -1) (ymax 6) (y2min 0) (y2max 10)
     (begin 1986 9 1 0) (end 1987 11 1 0)
-    
-    (extra "set key left Left reverse")
+    (extra "set title 'gnuplot demonstration'")
+    (legend se)   
     (source ((file "harvest.dlf")
              (tag "leaf_DM")
              (title "Leaf Harvest")
@@ -66,14 +66,75 @@ file, and LAI from the 'crop_prod.dlf' file.
             
   (defprogram main batch
     (run (test)
-         (test (where "where.eps"))))
+         (test (where "myplot.eps"))))
   
   (run main)
   
-This example chooses another commad file ('kurt.gnuplot' instead of
-'daisy.gnuplot').  It selects the range for the x-axis (begin and end)
-and both y-axes (ymin, ymax, y2min, y2max) manually, instead of
-letting gnuplot choose its own.  
+- This example chooses another command file ('kurt.gnuplot' instead of
+  'daisy.gnuplot').
+
+- It selects the range for the x-axis (begin and end) and both y-axes
+  (ymin, ymax, y2min, y2max) manually, instead of letting gnuplot
+  choose its own.
+
+- An uninterpreted gnuplot order is send via the 'extra' keyword.  In
+  this case in rder to give the plot a title.  You can also set fonts
+  and font sizes, ask for monochrome plots, and many other things.
+
+- We ask to get the legend in the South-East corner, instead of
+  letting Daisy find the corner farthest away from an data.  
+
+- We use different titles and different names for the dimensions for
+  the 'harvest.dlf' data, and we plot them with points instead of
+  lines.  By default Daisy use points for '*.ddf' files, and lines for
+  '*.dlf' and '*.dwf' files.
+
+- We only get WLeaf data from 'crop-prod.dlf' that are from days with
+  length 10 or 8, and from September or October.
+
+- We use the first and second style for plotting WLeaf and WSOrg from
+  'crop_prod.dlf', instead of letting Daisy find the next available
+  style.  This means they have the same style as the corresponding
+  data from 'harvest.dlf', except that they are plotted as lines
+  instead of points.  
+
+- We create a 'batch' program that run the plot twice.  Once to a
+  window, and once to a file name 'myplot.eps'.  Daisy deduce the
+  desired format from the file name.  Both are created from the same
+  'kurt.gnuplot' command file.  You can create as many plots as
+  desired from the same gnuplot command file.
+
+Th '*.ddf' files are intended for measured data.  The data are by
+default plotted as points, and with the same styles as data sources in
+the same sequence from '*.dlf' and '*.dwf' files.  The idea is that
+you want to compare measured and simulated numbers.
+
+The format is:
+
+  ddf-0.0 You can insert a description after the seven first letters.
+  # Here you can add comments, here.
+  # As long as they begin with a '#'.
+  # AFter a line of hyphens, tab seperated data should be listed.
+  # The two first lines are tags and dimensions, like for '*.dlf' files.
+  ------
+  Date           Height
+                 cm
+  2005-09-24T01  20
+  2005-09-24T07  21
+
+You can use both seperate year/month/mday/hour columns, as in the dlf
+and dwf files, or a single Date column, with the format
+'yyyy-mm-ddThh' (which happens to be an ISO standard).
+
+If you don't have a dimension line, you must specify the dimension
+with the "original" keyword for each source.
+
+The Daisy home page at <http://www.dina.kvl.dk/~daisy/> has a link to
+a windows binary for winplot.  You can execute the gnuplot commands by
+dragging the daisy.gnuplot file to the wgnuplot.exe binary.  The
+gnuplot homepage are at <http://www.gnuplot.info/> where you can find
+Unix and Mac versions of the program.  You need at least version 4.0
+of gnuplot.
 
 * 3.79
 
