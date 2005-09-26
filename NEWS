@@ -12,9 +12,68 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
-* 3.81
+* 3.82
 
-No news is good news.
+** gnuplot support
+
+The new 'gnuplot' program allows you to create command files for
+gnuplot to create plots in encapsulated postscript (*.eps), Acrobat
+Reader PDF (*.pdf), LaTeX (*.tex) format or be shown directly in a
+window.  The data to be plotted can be read from Daisy log files
+(*.dlf), Daisy weather files (*.dwf) or the new Daisy data files
+(*.ddf).
+
+Here is a small example:
+
+  (defprogram test gnuplot
+    (source ((file "harvest.dlf") (tag "leaf_DM"))
+            ((file "harvest.dlf") (tag "sorg_DM"))
+            ((file "crop_prod.dlf") (tag "Leaf AI"))))
+  
+  (run test)
+
+This will create a 'daisy.gnuplot' file that generates a window with a
+plot of leaf and storage organ yields taken from the 'harvest.dlf'
+file, and LAI from the 'crop_prod.dlf' file.
+
+  (defprogram test gnuplot
+    "Test of 'gnuplot' program."
+    (command_file "kurt.gnuplot")
+    (ymin -1) (ymax 6) (y2min 0) (y2max 10)
+    (begin 1986 9 1 0) (end 1987 11 1 0)
+    
+    (extra "set key left Left reverse")
+    (source ((file "harvest.dlf")
+             (tag "leaf_DM")
+             (title "Leaf Harvest")
+             (with points)
+             (dimension "Mg DM/ha"))
+            ((file "harvest.dlf")
+             (tag "sorg_DM")
+             (title "Grain Harvest")
+             (with points)
+             (dimension "Mg DM/ha"))
+            ((file "crop_prod.dlf")
+             (filter ("day_length" "10" "8")
+                     ("month" "9" "10"))
+             (style 1)
+             (tag "WLeaf"))
+            ((file "crop_prod.dlf")
+             (style 2)
+             (tag "WSOrg"))
+            ((file "crop_prod.dlf")
+             (tag "Leaf AI"))))
+            
+  (defprogram main batch
+    (run (test)
+         (test (where "where.eps"))))
+  
+  (run main)
+  
+This example chooses another commad file ('kurt.gnuplot' instead of
+'daisy.gnuplot').  It selects the range for the x-axis (begin and end)
+and both y-axes (ymin, ymax, y2min, y2max) manually, instead of
+letting gnuplot choose its own.  
 
 * 3.79
 
