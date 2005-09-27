@@ -1,6 +1,9 @@
 2005-09-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* weather_std.C: Handle missing timestep better (I hope).
+
 	* units.C (standard_conversions): [g CO2-C/cm^2] -> [CO2/m^2]
+	(multiply): [g CO_2-C/cm^3/h] * [cm] = [g CO_2-C/cm^2/h]
 	* lib/log.dai ("Crop Photosynthesis"): Use spec.
 	* production.C (RootRespiration): Fixed dimension.
 

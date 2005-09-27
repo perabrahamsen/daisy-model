@@ -1450,6 +1450,7 @@ the sum of all chemicals."
                    (handle sum)) 
            (interval (path column "$col" OrganicMatter CO2)
 		     (spec fixed OrganicMatter CO2)
+                     (tag "OM_CO2")
                      (dimension "g CO2/m^2/&")
                      (handle sum))
            ))

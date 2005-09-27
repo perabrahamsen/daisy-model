@@ -290,7 +290,8 @@ Units::multiply (const string& one, const string& two)
     { "g N/cm^3", "cm", "g N/cm^2" },
     { "g/cm^3/h", "cm", "g/cm^2/h" },
     { "g C/cm^3/h", "cm", "g C/cm^2/h" },
-    { "g N/cm^3/h", "cm", "g N/cm^2/h" },
+    { "g N/cm^3/h", "cm", "g N/cm^2/h" }, 
+    { "g CO_2-C/cm^3/h", "cm", "g CO_2-C/cm^2/h"},
   };
   
   for (unsigned int i = 0; i < sizeof (table) / sizeof (multiply_table); i++)

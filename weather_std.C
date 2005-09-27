@@ -572,9 +572,10 @@ WeatherStandard::read_line ()
 	      lex->next_line ();
 	      continue;
 	    }
-	  if (timestep > 0 && !(next_time == Time (year, month, mday, hour)))
+	  if (next_time != Time (year, month, mday, hour))
 	    {
-	      lex->error ("Bad timestep");
+              if (timestep > 0)
+                lex->error ("Bad timestep");
 	      next_time = Time (year, month, mday, hour);
 	    }
 	}
@@ -647,7 +648,10 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
       initialized = true;
       lex->seek (end_of_header);
       next_time = begin;
-      next_time.tick_hour (-timestep);
+      if (timestep > 0)
+        next_time.tick_hour (-timestep);
+      else
+        next_time.tick_hour (-24);
       read_line ();
     }
   

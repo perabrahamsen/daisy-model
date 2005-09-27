@@ -44,6 +44,8 @@ public:
   {
     if (tag_pos.find (tag) == tag_pos.end ())
       return false;
+    const std::string value = values
+    if (missing.
   }    
   double number (const std::string&) const = 0;
   const std::string& dimension (const std::string&) const = 0;
@@ -70,6 +72,7 @@ struct SourceExpr : public Source
   const std::string filename;  
   const std::auto_ptr<Number> expr;
   const std::string title_;
+  const std::string dimension_;
   const bool dim_line;
   std::string with_;
   const int style_;
@@ -92,7 +95,7 @@ struct SourceExpr : public Source
   const std::string& title () const
   { return title_; }
   const std::string& dimension () const 
-  { return expr->dimension (scope); }
+  { return dimension_; }
   const std::string& with () const
   { return with_; }
   int style () const 
@@ -347,8 +350,8 @@ SourceExpr::load (Treelog& msg)
   const std::vector<std::string> 
     dim_names (dim_line
 	       ? get_entries (lex)
-	       : std::vector<std::string> (Syntax::Unknown (), 
-					   tag_names.size ()));
+	       : std::vector<std::string> (tag_names.size (),
+                                           Syntax::Unknown ()));
   if (dim_names.size () != tag_names.size ())
     {
       lex.error ("Number of dimensions does not match number of tags");
