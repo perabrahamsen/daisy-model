@@ -443,7 +443,7 @@ SourceExpr::SourceExpr (const AttributeList& al)
   : Source (al),
     filename (al.name ("file")),
     expr (Librarian<Number>::create (al.alist ("expr"))),
-    title_ (al.name ("title", expr->name.name ())),
+    title_ (al.name ("title", expr->title ())),
     original (al.check ("original")
 	      ? al.name_sequence ("original")
 	      : std::vector<std::string> ()),

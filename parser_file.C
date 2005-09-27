@@ -96,6 +96,20 @@ struct ParserFile::Implementation
 string
 ParserFile::Implementation::get_string ()
 {
+  static const struct IdExtra : public std::set<int>
+  {
+    bool operator() (int c) const
+    { return find (c) != end (); }
+    IdExtra ()
+    { 
+      insert ('_');
+      insert ('+');
+      insert ('-');
+      insert ('*');
+      insert ('/');
+    }
+  } id_extra;
+
   skip ();
   int c = peek ();
   
@@ -132,7 +146,7 @@ ParserFile::Implementation::get_string ()
     }
   else if (c == '[')
     return get_dimension ();
-  else if (c != '_' && c != '-' && !isalpha (c))
+  else if (!id_extra (c) && !isalpha (c))
     {
       error ("Identifier or string expected");
       skip_to_end ();
@@ -148,7 +162,7 @@ ParserFile::Implementation::get_string ()
 	  get ();
 	  c = peek ();
 	}
-      while (good() && (c == '_' || c == '-' || isalnum (c)));
+      while (good() && (id_extra (c) || isalnum (c)));
     
       return str;
     }
@@ -258,12 +272,26 @@ ParserFile::Implementation::get_number (const string& syntax_dim)
   TreelogStream treelog (tmp);
   Treelog::Open nest (treelog, obj);
   if (!lib.syntax (obj).check (*al, treelog))
-    error ("Bogus number '" + obj + "'\n--- details:\n"
-           + tmp.str () + "---");
-  else if (treelog.count)
+    {
+      error ("Bogus number '" + obj + "'\n--- details:\n"
+             + tmp.str () + "---");
+      return -42.42e42;
+    }
+  auto_ptr<Number> number (Librarian<Number>::create (*al));
+  if (!number->check (Scope::null (), treelog))
+    {
+      error ("Bad number '" + obj + "'\n--- details:\n"
+             + tmp.str () + "---");
+      return -42.42e42;
+    }
+  if (treelog.count)
     warning ("Warning for number '" + obj + "'\n--- details:\n"
              + tmp.str () + "---");
-  auto_ptr<Number> number (Librarian<Number>::create (*al));
+  if (number->missing (Scope::null ()))
+    {
+      error ("Missing number '" + obj + "'");
+      return -42.42e42;
+    }
   double value = number->value (Scope::null ());
   const string read_dim = number->dimension (Scope::null ());
   if (check_dimension (syntax_dim, read_dim))
@@ -508,13 +536,25 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
       else
 	{ 
 	  if (!lib.check (type))
-	    throw (string ("Unknown '") + lib.name () + "' model '"
-		   + type + "'");
+            {
+              // Special hack to handle numbers in scopes.
+              if (&lib == &Librarian<Number>::library ())
+                {
+                  static const symbol fetch ("fetch");
+                  alist = new AttributeList (lib.lookup (fetch));
+                  alist->add ("type", fetch);
+                  alist->add ("name", type);
+                  goto skip_it;
+                }
+              throw (string ("Unknown '") + lib.name () + "' model '"
+                     + type + "'");
+            }
 	  alist = new AttributeList (lib.lookup (type));
 	  alist->add ("type", type);
 	}
       if (skipped || !in_sequence)
 	load_list (*alist, lib.syntax (type));
+    skip_it:;
     }
   catch (const string& msg)
     {

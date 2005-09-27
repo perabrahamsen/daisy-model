@@ -288,7 +288,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 #
-MODELS = source_expr.C \
+MODELS = number_arit.C source_expr.C \
 	source_std.C action_markvand.C photo_GL.C program_gnuplot.C \
 	program_document.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
@@ -696,6 +696,8 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+source${OBJ}: source.C source.h librarian.h common.h library.h symbol.h \
+  alist.h syntax.h treelog.h assertion.h
 photo${OBJ}: photo.C photo.h librarian.h common.h library.h symbol.h alist.h \
   syntax.h treelog.h assertion.h
 format${OBJ}: format.C format.h librarian.h common.h library.h symbol.h \
@@ -795,9 +797,6 @@ svat${OBJ}: svat.C svat.h librarian.h common.h library.h symbol.h alist.h \
   syntax.h treelog.h assertion.h log.h border.h
 vegetation${OBJ}: vegetation.C vegetation.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h log.h border.h
-source${OBJ}: source.C source.h time.h units.h librarian.h common.h library.h \
-  symbol.h alist.h syntax.h treelog.h assertion.h vcheck.h lexer_data.h \
-  lexer.h mathlib.h
 fetch${OBJ}: fetch.C fetch.h destination.h symbol.h select.h condition.h \
   librarian.h common.h library.h alist.h syntax.h treelog.h assertion.h \
   units.h mathlib.h
@@ -939,8 +938,7 @@ log_select${OBJ}: log_select.C log_select.h log.h border.h librarian.h \
   select.h destination.h condition.h units.h field.h tmpstream.h format.h
 parser_file${OBJ}: parser_file.C parser_file.h parser.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h lexer.h \
-  scope.h number.h plf.h tmpstream.h treelog_stream.h path.h units.h \
-  mathlib.h
+  scope.h number.h plf.h treelog_stream.h path.h units.h mathlib.h
 solute${OBJ}: solute.C solute.h adsorption.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h transport.h mactrans.h \
   log.h border.h soil.h geometry.h horizon.h soil_water.h macro.h \
@@ -1023,6 +1021,15 @@ common${OBJ}: common.C common.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+number_arit${OBJ}: number_arit.C number.h librarian.h common.h library.h \
+  symbol.h alist.h syntax.h treelog.h assertion.h units.h vcheck.h \
+  mathlib.h tmpstream.h
+source_expr${OBJ}: source_expr.C source.h librarian.h common.h library.h \
+  symbol.h alist.h syntax.h treelog.h assertion.h number.h scope.h \
+  units.h vcheck.h lexer_data.h lexer.h mathlib.h
+source_std${OBJ}: source_std.C source.h librarian.h common.h library.h \
+  symbol.h alist.h syntax.h treelog.h assertion.h units.h vcheck.h \
+  lexer_data.h lexer.h mathlib.h
 action_markvand${OBJ}: action_markvand.C action.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h daisy.h \
   program.h field.h border.h crop.h im.h fao.h log.h mathlib.h check.h \
@@ -1032,7 +1039,7 @@ photo_GL${OBJ}: photo_GL.C photo.h librarian.h common.h library.h symbol.h \
   plf.h phenology.h submodel.h mathlib.h tmpstream.h check.h
 program_gnuplot${OBJ}: program_gnuplot.C program.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h source.h \
-  vcheck.h path.h
+  vcheck.h path.h mathlib.h
 program_document${OBJ}: program_document.C program.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h submodel.h \
   printer_file.h printer.h xref.h plf.h format.h tmpstream.h

@@ -27,6 +27,14 @@ Librarian<Number>::Content* Librarian<Number>::content = NULL;
 const char *const Number::description = "\
 Generic representation of numbers.";
 
+const std::string& 
+Number::title () const
+{ return name.name (); }
+
+bool 
+Number::known (const std::string& dim)
+{ return dim != Syntax::Unknown (); }
+
 Number::Number (const AttributeList& al)
   : name (al.identifier ("type"))
 { }

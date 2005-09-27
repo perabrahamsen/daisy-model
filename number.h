@@ -33,8 +33,11 @@ class Number
 public:
   static const char *const description;
   const symbol name;
+  virtual const std::string& title () const;
 
   // Simulation.
+protected:
+  static bool known (const std::string&);
 public:
   virtual bool missing (const Scope& scope) const = 0;
   virtual double value (const Scope&) const = 0; 
@@ -43,7 +46,10 @@ public:
 
   // Create and Destroy.
 public:
-  Number (const AttributeList&);
+  virtual bool check (const Scope&, Treelog&) const = 0;
+protected:
+  explicit Number (const AttributeList&);
+public:
   virtual ~Number ();
 };
 

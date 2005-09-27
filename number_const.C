@@ -40,49 +40,12 @@ struct NumberConst : public Number
   { return dim; }
 
   // Create.
+  bool check (const Scope&, Treelog&) const
+  { return true; }
   NumberConst (const AttributeList& al)
     : Number (al),
       val (al.number ("value")),
       dim (al.name ("value"))
-  { }
-};
-
-struct NumberLeaf : public Number
-{
-  // Parameters.
-  const string dim;
-
-  // Simulation.
-  const string& dimension (const Scope&) const
-  { return dim; }
-
-  // Create.
-  NumberLeaf (const AttributeList& al)
-    : Number (al),
-      dim (al.name ("dimension"))
-  { }
-};
-
-struct NumberGet : public NumberLeaf
-{
-  // Parameters.
-  const string name;
-
-  // Simulation.
-  bool missing (const Scope& scope) const
-  { return !scope.has_number (name); }
-  double value (const Scope& scope) const
-  { 
-    daisy_assert (scope.has_number (name));
-    const double value = scope.number ( name);
-    const string got_dim = scope.dimension ( name);
-    return Units::convert (got_dim, dim, value);
-  }
-
-  // Create.
-  NumberGet (const AttributeList& al)
-    : NumberLeaf (al),
-      name (al.name ("name"))
   { }
 };
 
@@ -104,6 +67,60 @@ static struct NumberConstSyntax
   }
 } NumberConst_syntax;
 
+struct NumberLeaf : public Number
+{
+  // Parameters.
+  const string dim;
+
+  // Simulation.
+  const string& dimension (const Scope&) const
+  { return dim; }
+
+  // Create.
+  NumberLeaf (const AttributeList& al)
+    : Number (al),
+      dim (al.name ("dimension"))
+  { }
+};
+
+struct NumberGet : public NumberLeaf
+{
+  // Parameters.
+  const string name;
+  const std::string& title () const
+  { return name; }
+
+  // Simulation.
+  bool missing (const Scope& scope) const
+  { return !scope.has_number (name); }
+  double value (const Scope& scope) const
+  { 
+    daisy_assert (scope.has_number (name));
+    const double value = scope.number ( name);
+    const string got_dim = scope.dimension ( name);
+    return Units::convert (got_dim, dim, value);
+  }
+
+  // Create.
+  bool check (const Scope& scope, Treelog& err) const
+  {
+    Treelog::Open nest (err, name);
+
+    bool ok = true;
+    if (!scope.has_number (name))
+      {
+        err.error ("'" + name + "' not in scope");
+        ok = false;
+      }
+    return ok;
+  }
+
+  NumberGet (const AttributeList& al)
+    : NumberLeaf (al),
+      name (al.name ("name"))
+  { }
+};
+
 static struct NumberGetSyntax
 {
   static Number& make (const AttributeList& al)
@@ -123,4 +140,56 @@ static struct NumberGetSyntax
     Librarian<Number>::add_type ("get", alist, syntax, &make);
   }
 } NumberGet_syntax;
+
+struct NumberFetch : public Number
+{
+  // Parameters.
+  const string name;
+  const std::string& title () const
+  { return name; }
+
+  // Simulation.
+  bool missing (const Scope& scope) const
+  { return !scope.has_number (name); }
+  double value (const Scope& scope) const
+  { return scope.number ( name); }
+  const std::string& dimension (const Scope& scope) const
+  { return scope.dimension ( name); }
+
+  // Create.
+  bool check (const Scope& scope, Treelog& err) const
+  {
+    Treelog::Open nest (err, name);
+
+    bool ok = true;
+    if (!scope.has_number (name))
+      {
+        err.error ("'" + name + "' not in scope");
+        ok = false;
+      }
+    return ok;
+  }
+  NumberFetch (const AttributeList& al)
+    : Number (al),
+      name (al.name ("name"))
+  { }
+};
+
+static struct NumberFetchSyntax
+{
+  static Number& make (const AttributeList& al)
+  { return *new NumberFetch (al); }
+  NumberFetchSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+	       "Fetch the value and dimension in the current scope.");
+    syntax.add ("name", Syntax::String, Syntax::Const, 
+                "Name of a the symbol.");
+    syntax.order ("name");
+    Librarian<Number>::add_type ("fetch", alist, syntax, &make);
+  }
+} NumberFetch_syntax;
 

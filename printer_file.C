@@ -149,7 +149,7 @@ PrinterFile::Implementation::is_identifier (const string& name)
 {
   if (name.size () < 1)
     return false;
-
+  
   const char c = name[0];
   if (c != '_' && !isalpha (c))
     return false;
