@@ -372,6 +372,11 @@ SourceExpr::load (Treelog& msg)
 
   // Scope
   ScopeSource scope (missing, tag_pos, dim_names);
+  if (!expr->check (scope, msg))
+    {
+      lex.error ("Bad expression");
+      return false;
+    }
   dimension_ = expr->dimension (scope);
 
   // Read data.
