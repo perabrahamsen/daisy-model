@@ -28,6 +28,23 @@
 #include "mathlib.h"
 #include <sstream>
 
+static int
+find_tag (const std::map<std::string,int>& tag_pos, const std::string& tag)
+{
+  if (tag_pos.find (tag) == tag_pos.end ())
+    return -1;
+  return tag_pos.find (tag)->second;
+}
+
+static int
+find_tag (const std::map<std::string,int>& tag_pos, 
+	  const std::string& tag1,
+	  const std::string& tag2)
+{
+  int result = find_tag (tag_pos, tag1);
+  return result < 0 ? find_tag (tag_pos, tag2) : result;
+}
+
 // ScopeScource
 class ScopeSource : public Scope
 {
@@ -37,23 +54,41 @@ private:
   const std::map<std::string,int> tag_pos;
   const std::vector<std::string> dimensions;
   std::vector<std::string> values;
-
+  
   // Interface.
 public:
   bool has_number (const std::string& tag) const
   {
-    if (tag_pos.find (tag) == tag_pos.end ())
-      return false;
-    const std::string value = values
-    if (missing.
+    return find_tag (tag_pos, tag) >= 0
+      && (find (missing.begin (), missing.end (), 
+		values[find_tag (tag_pos, tag)])
+	  == missing.end ());
+  }
+  double number (const std::string& tag) const
+  {
+    daisy_assert (tag_pos.find (tag) != tag_pos.end ());
+    daisy_assert (values.size () > find_tag (tag_pos, tag));
+    daisy_assert (find_tag (tag_pos, tag) >= 0);
+    std::istringstream in (values[find_tag (tag_pos, tag)]);
+    double value;
+    in >> value;
+    return value;
   }    
-  double number (const std::string&) const = 0;
-  const std::string& dimension (const std::string&) const = 0;
+  const std::string& dimension (const std::string& tag) const
+  {
+    daisy_assert (tag_pos.find (tag) != tag_pos.end ());
+    daisy_assert (dimensions.size () > find_tag (tag_pos, tag));
+    daisy_assert (find_tag (tag_pos, tag) >= 0);
+    return dimensions[find_tag (tag_pos, tag)];
+  }
 
   // Use.
 public:
   void set (const std::vector<std::string>& entries)
-  { values = entries; }
+  { 
+    daisy_assert (entries.size () == dimensions.size ());
+    values = entries; 
+  }
 
   // Create and Destroy.
 public:
@@ -72,7 +107,8 @@ struct SourceExpr : public Source
   const std::string filename;  
   const std::auto_ptr<Number> expr;
   const std::string title_;
-  const std::string dimension_;
+  const std::vector<std::string> original;
+  std::string dimension_;
   const bool dim_line;
   std::string with_;
   const int style_;
@@ -106,11 +142,6 @@ struct SourceExpr : public Source
   { return values; }
 
   // Read.
-  static int find_tag (std::map<std::string,int>& tag_pos,
-                       const std::string& tag);
-  static int find_tag (std::map<std::string,int>& tag_pos,
-                       const std::string& tag1,
-                       const std::string& tag2);
   std::string get_entry (LexerData& lex) const;
   std::vector<std::string> get_entries (LexerData& lex) const;
   static int get_date_component (LexerData& lex,
@@ -143,23 +174,6 @@ SourceExpr::Filter::Filter (const AttributeList& al)
   : tag (al.name ("tag")),
     allowed (al.name_sequence ("allowed"))
 { }
-
-int
-SourceExpr::find_tag (std::map<std::string,int>& tag_pos, const std::string& tag)
-{
-  if (tag_pos.find (tag) == tag_pos.end ())
-    return -1;
-  return tag_pos[tag];
-}
-
-int
-SourceExpr::find_tag (std::map<std::string,int>& tag_pos, 
-		      const std::string& tag1,
-		      const std::string& tag2)
-{
-  int result = find_tag (tag_pos, tag1);
-  return result < 0 ? find_tag (tag_pos, tag2) : result;
-}
 
 std::string
 SourceExpr::get_entry (LexerData& lex) const
@@ -347,16 +361,18 @@ SourceExpr::load (Treelog& msg)
     }
 
   // Read dimensions.
-  const std::vector<std::string> 
-    dim_names (dim_line
-	       ? get_entries (lex)
-	       : std::vector<std::string> (tag_names.size (),
-                                           Syntax::Unknown ()));
+  const std::vector<std::string> dim_names (dim_line
+					    ? get_entries (lex)
+					    : original);
   if (dim_names.size () != tag_names.size ())
     {
       lex.error ("Number of dimensions does not match number of tags");
       return false;
     }
+
+  // Scope
+  ScopeSource scope (missing, tag_pos, dim_names);
+  dimension_ = expr->dimension (scope);
 
   // Read data.
   while (lex.good ())
@@ -370,6 +386,7 @@ SourceExpr::load (Treelog& msg)
             lex.warning ("Wrong number of entries on this line");
           continue;
         }
+      scope.set (entries);
 
       // Extract date.
       Time time (9999, 1, 1, 0);
@@ -406,33 +423,14 @@ SourceExpr::load (Treelog& msg)
 	    goto cont;
 	}
       
-      // Extract value.
-      {
-        const std::string value = entries[tag_c];
+      // Missing value.
+      if (expr->missing (scope))
+	continue;
+      
+      // Store it.
+      times.push_back (time);
+      values.push_back (expr->value (scope));
 
-        // Skip missing values.
-        if (std::find (missing.begin (), missing.end (), value) 
-            != missing.end ())
-          continue;
-        
-        // Convert it.
-        double val = convert_to_double (lex, value);
-        if (has_factor)
-          val *= factor;
-        else if (Units::can_convert (original, dimension_, val))
-          val = Units::convert (original, dimension_, val);
-        else 
-          {
-            std::ostringstream tmp;
-            tmp << "Cannot convert " << val << " from " << original 
-                << " to " << dimension_;
-            lex.warning (tmp.str ());
-          }
-
-        // Store it.
-        times.push_back (time);
-        values.push_back (val);
-      }
       // Next line.
     cont:;
     }
@@ -444,13 +442,13 @@ SourceExpr::load (Treelog& msg)
 SourceExpr::SourceExpr (const AttributeList& al)
   : Source (al),
     filename (al.name ("file")),
-    expr (Librarian<Number>::create ("expr")),
-    title_ (al.name ("title", expr->name)),
-    original (al.name ("dimension", Syntax::Unknown ())),
-    dimension_ (al.name ("dimension", original)),
+    expr (Librarian<Number>::create (al.alist ("expr"))),
+    title_ (al.name ("title", expr->name.name ())),
+    original (al.check ("original")
+	      ? al.name_sequence ("original")
+	      : std::vector<std::string> ()),
+    dimension_ ("UNINITIALIZED"),
     dim_line (al.flag ("dim_line", !al.check ("original"))),
-    has_factor (al.check ("factor")),
-    factor (al.number ("factor", 1.0)),
     with_ (al.name ("with", "")),
     style_ (al.integer ("style", -1)),
     missing (al.name_sequence ("missing")),
@@ -482,9 +480,10 @@ Name of Daisy log file where data is found.");
 Name of column in Daisy log file where data is found.");
     syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
 Name of data legend in plot, by default the same as 'tag'.");
-    syntax.add ("original", Syntax::String, Syntax::OptionalConst, "\
-Dimension of the data in the data file.\n\
-By default use the name specified in data file.");
+    syntax.add ("original", Syntax::String, Syntax::OptionalConst, 
+		Syntax::Sequence, "\
+Dimensions of the data in the data file.\n\
+By default use the names specified in data file.");
     syntax.add ("dim_line", Syntax::Boolean, Syntax::OptionalConst, "\
 If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");

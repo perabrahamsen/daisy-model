@@ -428,7 +428,7 @@ SourceStandard::SourceStandard (const AttributeList& al)
     filename (al.name ("file")),
     tag (al.name ("tag")),
     title_ (al.name ("title", tag)),
-    original (al.name ("dimension", Syntax::Unknown ())),
+    original (al.name ("original", Syntax::Unknown ())),
     dimension_ (al.name ("dimension", original)),
     dim_line (al.flag ("dim_line", !al.check ("original"))),
     has_factor (al.check ("factor")),
