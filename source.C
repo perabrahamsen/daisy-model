@@ -84,6 +84,10 @@ Source::distance (const Time begin, const Time end,
     }
 }
 
+void
+Source::load_syntax (Syntax&, AttributeList&)
+{ }
+
 Source::Source (const AttributeList& al)
   : name (al.identifier ("type"))
 { }

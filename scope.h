@@ -28,7 +28,7 @@ class Scope
 {
   // Use.
 public:
-  virtual bool has_number (const std::string) const = 0;
+  virtual bool has_number (const std::string&) const = 0;
   virtual double number (const std::string&) const = 0;
   virtual const std::string& dimension (const std::string&) const = 0;
   

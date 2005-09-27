@@ -48,8 +48,9 @@ public:
 		 double& nw, double& ne, double& sw, double& se) const;
   
   // Create and Destroy.
-protected:
+public:
   static void load_syntax (Syntax& syntax, AttributeList&);
+protected:
   explicit Source (const AttributeList& al);
 public:
   virtual ~Source ();

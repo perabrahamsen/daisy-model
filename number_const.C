@@ -32,6 +32,8 @@ struct NumberConst : public Number
   const string dim;
 
   // Simulation.
+  bool missing (const Scope&) const
+  { return false; }
   double value (const Scope&) const
   { return val; }
   const string& dimension (const Scope&) const
@@ -67,6 +69,8 @@ struct NumberGet : public NumberLeaf
   const string name;
 
   // Simulation.
+  bool missing (const Scope& scope) const
+  { return !scope.has_number (name); }
   double value (const Scope& scope) const
   { 
     daisy_assert (scope.has_number (name));

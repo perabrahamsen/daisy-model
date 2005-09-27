@@ -25,7 +25,7 @@
 struct ScopeNull : public Scope
 {
   // Use.
-  bool has_number (const std::string) const
+  bool has_number (const std::string&) const
   { return false; }
   double number (const std::string&) const
   { daisy_assert (false); }

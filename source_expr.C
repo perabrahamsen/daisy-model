@@ -1,4 +1,4 @@
-// source_std.C -- Data source for gnuplot interface 
+// source_expr.C -- Data source for gnuplot interface 
 // 
 // Copyright 2005 Per Abrahamsen and KVL.
 //
@@ -19,6 +19,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "source.h"
+#include "number.h"
+#include "scope.h"
 #include "units.h"
 #include "librarian.h"
 #include "vcheck.h"
@@ -26,17 +28,49 @@
 #include "mathlib.h"
 #include <sstream>
 
-struct SourceStandard : public Source
+// ScopeScource
+class ScopeSource : public Scope
 {
   // Content.
-  const std::string filename;
-  const std::string tag;
+private:
+  const std::vector<std::string> missing;
+  const std::map<std::string,int> tag_pos;
+  const std::vector<std::string> dimensions;
+  std::vector<std::string> values;
+
+  // Interface.
+public:
+  bool has_number (const std::string& tag) const
+  {
+    if (tag_pos.find (tag) == tag_pos.end ())
+      return false;
+  }    
+  double number (const std::string&) const = 0;
+  const std::string& dimension (const std::string&) const = 0;
+
+  // Use.
+public:
+  void set (const std::vector<std::string>& entries)
+  { values = entries; }
+
+  // Create and Destroy.
+public:
+  ScopeSource (const std::vector<std::string>& miss,
+	       const std::map<std::string,int>& tags,
+	       const std::vector<std::string>& dims)
+    : missing (miss),
+      tag_pos (tags),
+      dimensions (dims)
+  { }
+};
+
+struct SourceExpr : public Source
+{
+  // Content.
+  const std::string filename;  
+  const std::auto_ptr<Number> expr;
   const std::string title_;
-  std::string original;
-  std::string dimension_;
   const bool dim_line;
-  const bool has_factor;
-  const double factor;
   std::string with_;
   const int style_;
   const std::vector<std::string> missing;
@@ -58,7 +92,7 @@ struct SourceStandard : public Source
   const std::string& title () const
   { return title_; }
   const std::string& dimension () const 
-  { return dimension_; }
+  { return expr->dimension (scope); }
   const std::string& with () const
   { return with_; }
   int style () const 
@@ -87,12 +121,12 @@ public:
 
   // Create and Destroy.
 public:
-  explicit SourceStandard (const AttributeList& al);
-  ~SourceStandard ();
+  explicit SourceExpr (const AttributeList& al);
+  ~SourceExpr ();
 };
 
 void 
-SourceStandard::Filter::load_syntax (Syntax& syntax, AttributeList&)
+SourceExpr::Filter::load_syntax (Syntax& syntax, AttributeList&)
 {
   syntax.add ("tag", Syntax::String, Syntax::Const, "\
 Name of column in Daisy log file to filter for.");
@@ -102,13 +136,13 @@ List of allowable values in filter.");
   syntax.order ("tag", "allowed");
 }
 
-SourceStandard::Filter::Filter (const AttributeList& al)
+SourceExpr::Filter::Filter (const AttributeList& al)
   : tag (al.name ("tag")),
     allowed (al.name_sequence ("allowed"))
 { }
 
 int
-SourceStandard::find_tag (std::map<std::string,int>& tag_pos, const std::string& tag)
+SourceExpr::find_tag (std::map<std::string,int>& tag_pos, const std::string& tag)
 {
   if (tag_pos.find (tag) == tag_pos.end ())
     return -1;
@@ -116,16 +150,16 @@ SourceStandard::find_tag (std::map<std::string,int>& tag_pos, const std::string&
 }
 
 int
-SourceStandard::find_tag (std::map<std::string,int>& tag_pos, 
-                          const std::string& tag1,
-                          const std::string& tag2)
+SourceExpr::find_tag (std::map<std::string,int>& tag_pos, 
+		      const std::string& tag1,
+		      const std::string& tag2)
 {
   int result = find_tag (tag_pos, tag1);
   return result < 0 ? find_tag (tag_pos, tag2) : result;
 }
 
 std::string
-SourceStandard::get_entry (LexerData& lex) const
+SourceExpr::get_entry (LexerData& lex) const
 {
   std::string tmp_term;  // Data storage.
   const char* field_term;
@@ -159,7 +193,7 @@ SourceStandard::get_entry (LexerData& lex) const
 }
 
 std::vector<std::string>
-SourceStandard::get_entries (LexerData& lex) const
+SourceExpr::get_entries (LexerData& lex) const
 {
   lex.skip ("\n");
   std::vector<std::string> entries;
@@ -180,11 +214,11 @@ SourceStandard::get_entries (LexerData& lex) const
 }
 
 int
-SourceStandard::get_date_component (LexerData& lex,
-                                    const std::vector<std::string>&
-                                    /**/ entries, 
-                                    int column, 
-                                    int default_value)
+SourceExpr::get_date_component (LexerData& lex,
+				const std::vector<std::string>&
+				/**/ entries, 
+				int column, 
+				int default_value)
 {
   if (column < 0)
     return default_value;
@@ -201,7 +235,7 @@ SourceStandard::get_date_component (LexerData& lex,
 }
 
 Time 
-SourceStandard::get_time (const std::string& entry)
+SourceExpr::get_time (const std::string& entry)
 {
   int year;
   int month;
@@ -220,8 +254,8 @@ SourceStandard::get_time (const std::string& entry)
 }
 
 double
-SourceStandard::convert_to_double (LexerData& lex,
-                                   const std::string& value)
+SourceExpr::convert_to_double (LexerData& lex,
+			       const std::string& value)
 {
   const char *const str = value.c_str ();
   const char* end_ptr = str;
@@ -232,7 +266,7 @@ SourceStandard::convert_to_double (LexerData& lex,
 }
 
 bool
-SourceStandard::load (Treelog& msg)
+SourceExpr::load (Treelog& msg)
 {
   LexerData lex (filename, msg);
 
@@ -289,19 +323,14 @@ SourceStandard::load (Treelog& msg)
 	lex.warning ("Duplicate tag: " + candidate);
     }
 
-  const int tag_c = find_tag (tag_pos, tag);
+  // Date tags.
   const int year_c = find_tag (tag_pos, "year", "Year");
   const int month_c = find_tag (tag_pos, "month", "Month");
   const int mday_c = find_tag (tag_pos, "mday", "Day");
   const int hour_c = find_tag (tag_pos, "hour", "Hour");
   const int time_c = find_tag (tag_pos, "time", "Date");
 
-  if (tag_c < 0)
-    {
-      lex.error ("Tag '" + tag + "' not found");
-      return false;
-    }
-
+  // Filter tags.
   std::vector<size_t> fil_col;
   for (size_t i = 0; i < filter.size (); i++)
     {
@@ -315,28 +344,14 @@ SourceStandard::load (Treelog& msg)
     }
 
   // Read dimensions.
-  if (dim_line)
+  const std::vector<std::string> 
+    dim_names (dim_line
+	       ? get_entries (lex)
+	       : std::vector<std::string> (Syntax::Unknown (), 
+					   tag_names.size ()));
+  if (dim_names.size () != tag_names.size ())
     {
-      const std::vector<std::string> dim_names = get_entries (lex);
-      if (dim_names.size () != tag_names.size ())
-        if (dim_names.size () > tag_c)
-          lex.warning ("Number of dimensions does not match number of tags");
-        else
-          {
-            lex.error ("No dimension for '" + tag + "' found");
-            return false;
-          }
-      if (original == Syntax::Unknown ())
-        original = dim_names[tag_c];
-      if (dimension_ == Syntax::Unknown ())
-        dimension_ = dim_names[tag_c];
-    }
-
-  if (!has_factor && !Units::can_convert (original, dimension_))
-    {
-      std::ostringstream tmp;
-      tmp << "Cannot convert from " << original << " to " << dimension_;
-      lex.error (tmp.str ());
+      lex.error ("Number of dimensions does not match number of tags");
       return false;
     }
 
@@ -387,7 +402,7 @@ SourceStandard::load (Treelog& msg)
 	      == allowed.end ())
 	    goto cont;
 	}
-
+      
       // Extract value.
       {
         const std::string value = entries[tag_c];
@@ -423,11 +438,11 @@ SourceStandard::load (Treelog& msg)
   return true;
 }
 
-SourceStandard::SourceStandard (const AttributeList& al)
+SourceExpr::SourceExpr (const AttributeList& al)
   : Source (al),
     filename (al.name ("file")),
-    tag (al.name ("tag")),
-    title_ (al.name ("title", tag)),
+    expr (Librarian<Number>::create ("expr")),
+    title_ (al.name ("title", expr->name)),
     original (al.name ("dimension", Syntax::Unknown ())),
     dimension_ (al.name ("dimension", original)),
     dim_line (al.flag ("dim_line", !al.check ("original"))),
@@ -440,16 +455,16 @@ SourceStandard::SourceStandard (const AttributeList& al)
     filter (map_construct_const<Filter> (al.alist_sequence ("filter")))
 { }
 
-SourceStandard::~SourceStandard ()
+SourceExpr::~SourceExpr ()
 { sequence_delete (filter.begin (), filter.end ()); }
 
 
-static struct SourceStandardSyntax
+static struct SourceExprSyntax
 {
   static Source& make (const AttributeList& al)
-  { return *new SourceStandard (al); }
+  { return *new SourceExpr (al); }
 
-  SourceStandardSyntax ()
+  SourceExprSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
@@ -459,23 +474,17 @@ static struct SourceStandardSyntax
 
     syntax.add ("file", Syntax::String, Syntax::Const, "\
 Name of Daisy log file where data is found.");
-    syntax.add ("tag", Syntax::String, Syntax::Const, "\
+    syntax.add ("expr", Librarian<Number>::library (), 
+		Syntax::Const, Syntax::Singleton, "\
 Name of column in Daisy log file where data is found.");
     syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
 Name of data legend in plot, by default the same as 'tag'.");
     syntax.add ("original", Syntax::String, Syntax::OptionalConst, "\
 Dimension of the data in the data file.\n\
 By default use the name specified in data file.");
-    syntax.add ("dimension", Syntax::String, Syntax::OptionalConst, "\
-Dimension of data to plot.\n\
-By default this is the same as 'original'.\n\
-If 'factor' is not specified, Daisy will attempt to convert the data.");
     syntax.add ("dim_line", Syntax::Boolean, Syntax::OptionalConst, "\
 If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
-    syntax.add ("factor", Syntax::Unknown (), Syntax::OptionalConst, "\
-Multiply all data by this number.\n\
-By default will try to find a convertion from 'original' to 'dimension'.");
     syntax.add ("missing", Syntax::String, Syntax::Const, Syntax::Sequence, "\
 List of strings indicating 'missing value'.");
     std::vector<symbol> misses;
@@ -484,7 +493,7 @@ List of strings indicating 'missing value'.");
     alist.add ("missing", misses);
     syntax.add_submodule_sequence ("filter", Syntax::Const, "\
 Only include data from rows that passes all these filters.",
-                                   SourceStandard::Filter::load_syntax);
+                                   SourceExpr::Filter::load_syntax);
     alist.add ("filter", std::vector<AttributeList*> ());
     syntax.add ("with", Syntax::String, Syntax::OptionalConst, "\
 Specify 'points' to plot each point individually, or 'lines' to draw\n\
@@ -499,8 +508,8 @@ so forth until it runs out of styles and has to start over.  Points\n\
 work similar, but with its own style counter.  For color plots, points\n\
 and lines with the same style number also have the same color.");
 
-    Librarian<Source>::add_type ("default", alist, syntax, &make);
+    Librarian<Source>::add_type ("expr", alist, syntax, &make);
   }
-} SourceStandard_syntax;
+} SourceExpr_syntax;
 
 // source_std.C ends here.

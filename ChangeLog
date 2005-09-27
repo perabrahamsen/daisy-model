@@ -1,3 +1,12 @@
+2005-09-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (standard_conversions): [g CO2-C/cm^2] -> [CO2/m^2]
+	* lib/log.dai ("Crop Photosynthesis"): Use spec.
+	* production.C (RootRespiration): Fixed dimension.
+
+	* source_expr.C: New model.
+	* Makefile (MODELS): Added it.
+	
 2005-09-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* source_std.C: New model.

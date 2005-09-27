@@ -1430,33 +1430,28 @@ the sum of all chemicals."
   (entries ;; Year Month MDay Hour
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod NetPhotosynthesis)
-                   (dimension "g CO2/m^2/&")
-                   (handle sum)
-                   (factor 1.0))
+		   (spec fixed Production NetPhotosynthesis)
+                   (handle sum))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod RootRespiration)
-                   (dimension "g CO2/m^2/&")
-                   (handle sum)
-                   (factor 1.0))
+		   (spec fixed Production RootRespiration)
+                   (handle sum))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod CanopyAss)
-                   (dimension "g CH2O/m^2/&")
-                   (handle sum)
-                   (factor 1.0))
+		   (spec fixed Production CanopyAss)
+                   (handle sum))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod PotCanopyAss)
-                   (dimension "g CH2O/m^2/&")
-                   (handle sum)
-                   (factor 1.0))
+		   (spec fixed Production PotCanopyAss)
+                   (handle sum))
            (number (path column "$col" OrganicMatter Bioincorporation CO2)
+		   (spec fixed Bioincorporation CO2)
                    (tag "Bioinc_CO2")
-                   (handle sum)
-                   (dimension "kg C/ha/&")
-                   (factor 10))         ;g/m^2 -> kg/ha
+                   (handle sum)) 
            (interval (path column "$col" OrganicMatter CO2)
+		     (spec fixed OrganicMatter CO2)
                      (dimension "g CO2/m^2/&")
-                     (handle sum)
-                     (factor 1.7272e4)) ;g CO2-C/cm^2 -> CO2/m^2
+                     (handle sum))
            ))
 
 (deflog "Crop Production" table

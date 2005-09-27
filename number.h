@@ -36,6 +36,7 @@ public:
 
   // Simulation.
 public:
+  virtual bool missing (const Scope& scope) const = 0;
   virtual double value (const Scope&) const = 0; 
   virtual const std::string& dimension (const Scope&) const = 0;
 

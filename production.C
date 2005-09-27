@@ -637,7 +637,7 @@ For initialization, set this to the amount of N in the seed.");
 	      "Maintenance Respiration.");
   syntax.add ("GrowthRespiration", "g CH2O/m^2/h", Syntax::LogOnly,
 	      "Growth Respiration.");
-  syntax.add ("RootRespiration", "g CH2O/m^2/h", Syntax::LogOnly,
+  syntax.add ("RootRespiration", "g CO2/m^2/h", Syntax::LogOnly,
 	      "Root Respiration.");
   syntax.add ("IncWLeaf", "g DM/m^2/d", Syntax::LogOnly,
 	      "Leaf growth.");

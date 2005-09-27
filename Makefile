@@ -286,9 +286,10 @@ endif
 NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
-# These are all models of some componet.
+# These are all models of some component.
 #
-MODELS = source_std.C action_markvand.C photo_GL.C program_gnuplot.C \
+MODELS = source_expr.C \
+	source_std.C action_markvand.C photo_GL.C program_gnuplot.C \
 	program_document.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
 	domsorp_std.C chemistry_std.C equil_linear.C pedo_const.C \

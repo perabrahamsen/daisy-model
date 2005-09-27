@@ -480,8 +480,9 @@ By default determine this from the data.");
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
-    syntax.add ("source", Librarian<Source>::library (), Syntax::State, "\
-Data sources to plot.", Source::load_syntax);
+    syntax.add ("source", Librarian<Source>::library (), Syntax::State, 
+		Syntax::Sequence, "\
+Data sources to plot.");
     Librarian<Program>::add_type ("gnuplot", alist, syntax, &make);
   }
 } ProgramGnuplot_syntax;
