@@ -88,7 +88,8 @@ SourceStandard::load (Treelog& msg)
   if (!has_factor && !Units::can_convert (original, dimension_))
     {
       std::ostringstream tmp;
-      tmp << "Cannot convert from " << original << " to " << dimension_;
+      tmp << "Cannot convert from [" << original << "] to [" << dimension_ 
+          << "]";
       lex.error (tmp.str ());
       return false;
     }
@@ -119,8 +120,8 @@ SourceStandard::load (Treelog& msg)
       else 
         {
           std::ostringstream tmp;
-          tmp << "Cannot convert " << val << " from " << original 
-              << " to " << dimension_;
+          tmp << "Cannot convert " << val << " from [" << original 
+              << "] to [" << dimension_ << "]";
           lex.warning (tmp.str ());
         }
 
@@ -158,8 +159,8 @@ static struct SourceStandardSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     SourceFile::load_syntax (syntax, alist);
-    alist.add ("description", 
-	       "Read a daisy log, weather or data file.");
+    alist.add ("description", "\
+Read a a single column from a Daisy log, weather or data file.");
 
     syntax.add ("tag", Syntax::String, Syntax::Const, "\
 Name of column in Daisy log file where data is found.");
@@ -177,9 +178,9 @@ If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
     syntax.add ("factor", Syntax::Unknown (), Syntax::OptionalConst, "\
 Multiply all data by this number.\n\
-By default will try to find a convertion from 'original' to 'dimension'.");
+By default Daisy will convert from 'original' to 'dimension'.");
 
-    Librarian<Source>::add_type ("tag", alist, syntax, &make);
+    Librarian<Source>::add_type ("column", alist, syntax, &make);
   }
 } SourceStandard_syntax;
 

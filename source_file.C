@@ -314,7 +314,7 @@ SourceFile::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("file", Syntax::String, Syntax::Const, "\
 Name of Daisy log file where data is found.");
   syntax.add ("missing", Syntax::String, Syntax::Const, Syntax::Sequence, "\
-List of strings indicating 'missing value'.");
+List of strings indicating missing values.");
   std::vector<symbol> misses;
   misses.push_back (symbol (""));
   misses.push_back (symbol ("00.00"));

@@ -207,22 +207,28 @@ static struct SourceExprSyntax
     AttributeList& alist = *new AttributeList ();
     SourceFile::load_syntax (syntax, alist);
     alist.add ("description", 
-	       "Read a daisy log, weather or data file.");
-
+	       "Read a daisy log, weather or data file.\n\
+Calculate a single value for each time step, based on the value\n\
+in the various columns.");
     syntax.add ("expr", Librarian<Number>::library (), 
 		Syntax::Const, Syntax::Singleton, "\
 Name of column in Daisy log file where data is found.");
     syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
-Name of data legend in plot, by default the same as 'tag'.");
+Name of data legend in plot, by default the name of the 'expr' object.");
     syntax.add ("original", Syntax::String, Syntax::OptionalConst, 
 		Syntax::Sequence, "\
-Dimensions of the data in the data file.\n\
-By default use the names specified in data file.");
+List of dimensions of the data in the data file.\n\
+\n\
+If the list has only one element, that element is used as the\n\
+dimension for all columns in the file.  Otherwise, the list must have\n\
+one element for each column.\n\
+\n\
+By default Daisy will use the names specified in data file.");
     syntax.add ("dim_line", Syntax::Boolean, Syntax::OptionalConst, "\
 If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
 
-    Librarian<Source>::add_type ("expr", alist, syntax, &make);
+    Librarian<Source>::add_type ("arithmetic", alist, syntax, &make);
   }
 } SourceExpr_syntax;
 

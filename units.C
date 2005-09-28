@@ -324,6 +324,7 @@ Units::standard_conversions ()
   add ("cm", "pF", Convert_cm_pF);
   add ("cm", "hPa", 1.0);
   add ("cm", "kPa", 0.1);
+  add ("hPa", "kPa", 0.1);
   add ("cm", "Pa", 100.0);
   add ("d^-1", "h^-1", 1.0/24.0);
   add ("d", "h", 24.0);

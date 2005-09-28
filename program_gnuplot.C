@@ -109,6 +109,8 @@ ProgramGnuplot::run (Treelog& msg)
       Treelog::Open nest (msg, tmp.str ());
       if (!source[i]->load (msg))
         throw 1;
+      if (source[i]->value ().size () < 1)
+        msg.error ("No data in plot, ignoring");
     }
   
   // We open for append if we have used this file before.
@@ -148,6 +150,12 @@ set style data lines\n";
   std::vector<int> axis;
   for (size_t i = 0; i < source.size (); i++)
     {
+      if (source[i]->value ().size () < 1)
+        {
+          axis.push_back (-42);
+          continue;
+        }
+
       const std::string dim = source[i]->dimension ();
       
       for (size_t j = 0; j < dims.size (); j++)
@@ -187,8 +195,10 @@ set style data lines\n";
       double soft_y2min = soft_ymin;
       double soft_y2max = soft_ymax;
 
-      for (unsigned int i = 0; i < source.size (); i++)
-	if (axis[i] == 0)
+      for (size_t i = 0; i < source.size (); i++)
+        if (source[i]->value ().size () < 1)
+          /**/;
+        else if (axis[i] == 0)
 	  source[i]->limit (soft_begin, soft_end, soft_ymin, soft_ymax);
 	else
 	  source[i]->limit (soft_begin, soft_end, soft_y2min, soft_y2max);
@@ -211,8 +221,10 @@ set style data lines\n";
       double ne = 1.0;
       double sw = 1.0;
       double se = 1.0;
-      for (unsigned int i = 0; i < source.size (); i++)
-	if (axis[i] == 0)
+      for (size_t i = 0; i < source.size (); i++)
+	if (source[i]->value ().size () < 1)
+          /**/;
+        else if (axis[i] == 0)
 	  source[i]->distance (soft_begin, soft_end, soft_ymin, soft_ymax,
 			       nw, ne, sw, se);
 	else
@@ -271,10 +283,15 @@ set style data lines\n";
   out << "plot ";
   int points = 0;
   int lines = 0;
+  bool first = true;
   daisy_assert (axis.size () == source.size ());
   for (size_t i = 0; i < source.size (); i++)
     {
-      if (i != 0)
+      if (source[i]->value ().size () < 1)
+        continue;
+      if (first)
+        first = false;
+      else
         out << ", ";
       out << "'-' using 1:2 title " << quote (source[i]->title ());
       if (axis[i] == 1)
@@ -300,6 +317,8 @@ set style data lines\n";
   // Data.
   for (size_t i = 0; i < source.size (); i++)
     {
+      if (source[i]->value ().size () < 1)
+        continue;
       const size_t size = source[i]->time ().size ();
       daisy_assert (size == source[i]->value ().size ());
       for (size_t j = 0; j < size; j++)
