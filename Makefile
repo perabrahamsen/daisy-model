@@ -358,7 +358,7 @@ SUBMODELS = fetch.C horheat.C litter.C time.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = format_LaTeX.C log_all.C om.C select_value.C \
+SPECIALS = source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 	geometry.C printer_file.C log_alist.C log_clone.C column_base.C
 

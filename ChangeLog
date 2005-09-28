@@ -1,3 +1,8 @@
+2005-09-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_file.C: New model base.
+	* Makefile (SPECIALS): Added.
+
 2005-09-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* parser_file.C (load_derived): Special support for Number objects.

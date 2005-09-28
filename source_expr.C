@@ -18,12 +18,11 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "source.h"
+#include "source_file.h"
 #include "number.h"
 #include "scope.h"
 #include "units.h"
 #include "librarian.h"
-#include "vcheck.h"
 #include "lexer_data.h"
 #include "mathlib.h"
 #include <sstream>
@@ -101,45 +100,20 @@ public:
   { }
 };
 
-struct SourceExpr : public Source
+struct SourceExpr : public SourceFile
 {
   // Content.
-  const std::string filename;  
   const std::auto_ptr<Number> expr;
   const std::string title_;
   const std::vector<std::string> original;
   std::string dimension_;
   const bool dim_line;
-  std::string with_;
-  const int style_;
-  const std::vector<std::string> missing;
-  std::string field_sep;
-  std::vector<Time> times;
-  std::vector<double> values;
-  
-  // Filter.
-  struct Filter
-  {
-    const std::string tag;
-    const std::vector<std::string> allowed;
-    static void load_syntax (Syntax& syntax, AttributeList&);
-    explicit Filter (const AttributeList&);
-  };
-  std::vector<const Filter*> filter;
 
   // Interface.
   const std::string& title () const
   { return title_; }
   const std::string& dimension () const 
   { return dimension_; }
-  const std::string& with () const
-  { return with_; }
-  int style () const 
-  { return style_; }
-  const std::vector<Time>& time () const
-  { return times; }
-  const std::vector<double>& value () const
-  { return values; }
 
   // Read.
   std::string get_entry (LexerData& lex) const;
@@ -158,22 +132,6 @@ public:
   explicit SourceExpr (const AttributeList& al);
   ~SourceExpr ();
 };
-
-void 
-SourceExpr::Filter::load_syntax (Syntax& syntax, AttributeList&)
-{
-  syntax.add ("tag", Syntax::String, Syntax::Const, "\
-Name of column in Daisy log file to filter for.");
-  syntax.add ("allowed", Syntax::String, Syntax::Const, Syntax::Sequence, "\
-List of allowable values in filter.");
-  syntax.add_check ("allowed", VCheck::min_size_1 ());
-  syntax.order ("tag", "allowed");
-}
-
-SourceExpr::Filter::Filter (const AttributeList& al)
-  : tag (al.name ("tag")),
-    allowed (al.name_sequence ("allowed"))
-{ }
 
 std::string
 SourceExpr::get_entry (LexerData& lex) const
@@ -445,20 +403,14 @@ SourceExpr::load (Treelog& msg)
 }
 
 SourceExpr::SourceExpr (const AttributeList& al)
-  : Source (al),
-    filename (al.name ("file")),
+  : SourceFile (al),
     expr (Librarian<Number>::create (al.alist ("expr"))),
     title_ (al.name ("title", expr->title ())),
     original (al.check ("original")
 	      ? al.name_sequence ("original")
 	      : std::vector<std::string> ()),
     dimension_ ("UNINITIALIZED"),
-    dim_line (al.flag ("dim_line", !al.check ("original"))),
-    with_ (al.name ("with", "")),
-    style_ (al.integer ("style", -1)),
-    missing (al.name_sequence ("missing")),
-    field_sep ("UNINITIALIZED"),
-    filter (map_construct_const<Filter> (al.alist_sequence ("filter")))
+    dim_line (al.flag ("dim_line", !al.check ("original")))
 { }
 
 SourceExpr::~SourceExpr ()
@@ -474,12 +426,10 @@ static struct SourceExprSyntax
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    Source::load_syntax (syntax, alist);
+    SourceFile::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "Read a daisy log, weather or data file.");
 
-    syntax.add ("file", Syntax::String, Syntax::Const, "\
-Name of Daisy log file where data is found.");
     syntax.add ("expr", Librarian<Number>::library (), 
 		Syntax::Const, Syntax::Singleton, "\
 Name of column in Daisy log file where data is found.");
@@ -492,28 +442,6 @@ By default use the names specified in data file.");
     syntax.add ("dim_line", Syntax::Boolean, Syntax::OptionalConst, "\
 If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
-    syntax.add ("missing", Syntax::String, Syntax::Const, Syntax::Sequence, "\
-List of strings indicating 'missing value'.");
-    std::vector<symbol> misses;
-    misses.push_back (symbol (""));
-    misses.push_back (symbol ("00.00"));
-    alist.add ("missing", misses);
-    syntax.add_submodule_sequence ("filter", Syntax::Const, "\
-Only include data from rows that passes all these filters.",
-                                   SourceExpr::Filter::load_syntax);
-    alist.add ("filter", std::vector<AttributeList*> ());
-    syntax.add ("with", Syntax::String, Syntax::OptionalConst, "\
-Specify 'points' to plot each point individually, or 'lines' to draw\n\
-lines between them.  By default, data from dwf and dlf files will be\n\
-drawn with lines, and data from ddf files will be drawn with points.");
-    static VCheck::Enum with ("lines", "points");
-    syntax.add_check ("with", with);
-    syntax.add ("style", Syntax::Integer, Syntax::OptionalConst, "\
-Style to use for this dataset.  By default, gnuplot will use style 1\n\
-for the first source to plot with lines, style 2 for the second, and\n\
-so forth until it runs out of styles and has to start over.  Points\n\
-work similar, but with its own style counter.  For color plots, points\n\
-and lines with the same style number also have the same color.");
 
     Librarian<Source>::add_type ("expr", alist, syntax, &make);
   }
