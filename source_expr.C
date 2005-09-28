@@ -24,25 +24,7 @@
 #include "units.h"
 #include "librarian.h"
 #include "lexer_data.h"
-#include "mathlib.h"
 #include <sstream>
-
-static int
-find_tag (const std::map<std::string,int>& tag_pos, const std::string& tag)
-{
-  if (tag_pos.find (tag) == tag_pos.end ())
-    return -1;
-  return tag_pos.find (tag)->second;
-}
-
-static int
-find_tag (const std::map<std::string,int>& tag_pos, 
-	  const std::string& tag1,
-	  const std::string& tag2)
-{
-  int result = find_tag (tag_pos, tag1);
-  return result < 0 ? find_tag (tag_pos, tag2) : result;
-}
 
 // ScopeScource
 class ScopeSource : public Scope
@@ -58,10 +40,14 @@ private:
 public:
   bool has_number (const std::string& tag) const
   {
-    return find_tag (tag_pos, tag) >= 0
-      && (find (missing.begin (), missing.end (), 
-		values[find_tag (tag_pos, tag)])
-	  == missing.end ());
+    const int tag_c = find_tag (tag_pos, tag);
+    if (tag_c < 0)
+      return false;
+    if (values.size () == 0)
+      // Kludge: Uninitialized, simply checking if tags are there...
+      return true;
+    const std::string& value = values[tag_c];
+    return find (missing.begin (), missing.end (), value) == missing.end ();
   }
   double number (const std::string& tag) const
   {
@@ -110,22 +96,15 @@ struct SourceExpr : public SourceFile
   const bool dim_line;
 
   // Interface.
+public:
   const std::string& title () const
   { return title_; }
   const std::string& dimension () const 
   { return dimension_; }
 
-  // Read.
-  std::string get_entry (LexerData& lex) const;
-  std::vector<std::string> get_entries (LexerData& lex) const;
-  static int get_date_component (LexerData& lex,
-                                 const std::vector<std::string>& entries, 
-                                 int column, 
-                                 int default_value);
-  static Time get_time (const std::string& entry);
-  static double convert_to_double (LexerData& lex, const std::string& value);
+  // Read. 
 public:
-  bool load (Treelog& msg);
+ bool load (Treelog& msg);
 
   // Create and Destroy.
 public:
@@ -133,198 +112,38 @@ public:
   ~SourceExpr ();
 };
 
-std::string
-SourceExpr::get_entry (LexerData& lex) const
-{
-  std::string tmp_term;  // Data storage.
-  const char* field_term;
-
-  switch (field_sep.size ())
-    { 
-    case 0:
-      // Whitespace
-      field_term = " \t\n";
-      break;
-    case 1:
-      // Single character field seperator.
-      tmp_term = field_sep + "\n";
-      field_term = tmp_term.c_str ();
-      break;
-    default:
-      // Multi-character field seperator.
-      daisy_assert (false);
-    }
-
-  // Find it.
-  std::string entry = "";
-  while (lex.good ())
-    {
-      int c = lex.peek ();
-      if (strchr (field_term, c))
-	break;
-      entry += int2char (lex.get ());
-    }
-  return entry;
-}
-
-std::vector<std::string>
-SourceExpr::get_entries (LexerData& lex) const
-{
-  lex.skip ("\n");
-  std::vector<std::string> entries;
-
-  while (lex.good ())
-    {
-      entries.push_back (get_entry (lex));
-
-      if (lex.peek () == '\n')
-        break;
-
-      if (field_sep == "")
-	lex.skip_space ();
-      else
-	lex.skip(field_sep.c_str ());
-    }
-  return entries;
-}
-
-int
-SourceExpr::get_date_component (LexerData& lex,
-				const std::vector<std::string>&
-				/**/ entries, 
-				int column, 
-				int default_value)
-{
-  if (column < 0)
-    return default_value;
-  daisy_assert (column < entries.size ());
-  const char *const str = entries[column].c_str ();
-  const char* end_ptr = str;
-  const long lval = strtol (str, const_cast<char**> (&end_ptr), 10);
-  if (*end_ptr != '\0')
-    lex.error (std::string ("Junk at end of number '") + end_ptr + "'");
-  const int ival = lval;
-  if (ival != lval)
-    lex.error ("Number out of range");
-  return ival;
-}
-
-Time 
-SourceExpr::get_time (const std::string& entry)
-{
-  int year;
-  int month;
-  int mday;
-  int hour;
-  char dummy;
-
-  std::istringstream in (entry);
-  
-  in >> year >> dummy >> month >> dummy >> mday >> dummy >> hour;
-
-  if (Time::valid (year, month, mday, hour))
-    return Time (year, month, mday, hour);
-  
-  return Time (9999, 1, 1, 1);
-}
-
-double
-SourceExpr::convert_to_double (LexerData& lex,
-			       const std::string& value)
-{
-  const char *const str = value.c_str ();
-  const char* end_ptr = str;
-  const double val = strtod (str, const_cast<char**> (&end_ptr));
-  if (*end_ptr != '\0')
-    lex.error (std::string ("Junk at end of number '") + end_ptr + "'");
-  return val;
-}
-
 bool
 SourceExpr::load (Treelog& msg)
 {
+  // Lex it.
   LexerData lex (filename, msg);
-
-  // Open errors?
-  if (!lex.good ())
+  if (!read_header (lex))
     return false;
 
-  // Read first line.
-  const std::string type = lex.get_word ();
-  if (type == "dwf-0.0")
-    {
-      field_sep = "";
-      if (with_ == "")
-	with_ = "lines";
-    }
-  else if (type == "dlf-0.0")
-    {
-      field_sep = "\t";
-      if (with_ == "")
-	with_ = "lines";
-    }
-  else if (type == "ddf-0.0")
-    {
-      field_sep = "\t";
-      if (with_ == "")
-	with_ = "points";
-    }
-  else
-    lex.error ("Unknown file type '" + type + "'");
-  lex.skip_line ();
-  lex.next_line ();
-
-  // Skip keywords.
-  while (lex.good () && lex.peek () != '-')
-    {
-      lex.skip_line ();
-      lex.next_line ();
-    }
-
-  // Skip hyphens.
-  while (lex.good () && lex.peek () == '-')
-    lex.get ();
-  lex.skip_space ();
-  
-  // Read tags.
-  std::map<std::string,int> tag_pos;
-  const std::vector<std::string> tag_names = get_entries (lex);
-  for (int count = 0; count < tag_names.size (); count++)
-    {
-      const std::string candidate = tag_names[count];
-      if (tag_pos.find (candidate) == tag_pos.end ())
-        tag_pos[candidate] = count;
-      else
-	lex.warning ("Duplicate tag: " + candidate);
-    }
-
-  // Date tags.
-  const int year_c = find_tag (tag_pos, "year", "Year");
-  const int month_c = find_tag (tag_pos, "month", "Month");
-  const int mday_c = find_tag (tag_pos, "mday", "Day");
-  const int hour_c = find_tag (tag_pos, "hour", "Hour");
-  const int time_c = find_tag (tag_pos, "time", "Date");
-
-  // Filter tags.
-  std::vector<size_t> fil_col;
-  for (size_t i = 0; i < filter.size (); i++)
-    {
-      int c = find_tag (tag_pos, filter[i]->tag);
-      if (c < 0)
-	{
-	  lex.error ("Filter tag '" + filter[i]->tag + "' not found");
-	  return false;
-	}
-      fil_col.push_back (c);
-    }
-
   // Read dimensions.
-  const std::vector<std::string> dim_names (dim_line
-					    ? get_entries (lex)
-					    : original);
+  std::vector<std::string> dim_names;
+  if (dim_line)
+    dim_names = get_entries (lex);
+  else switch (original.size ())
+    {
+    case 0:
+      dim_names.insert (dim_names.end (), tag_names.size (), 
+                        Syntax::Unknown ());
+      break;
+    case 1:
+      dim_names.insert (dim_names.end (), tag_names.size (),
+                        original[0]);
+      break;
+    default:
+      dim_names = original;
+    }
+
   if (dim_names.size () != tag_names.size ())
     {
-      lex.error ("Number of dimensions does not match number of tags");
+      std::ostringstream tmp;
+      tmp << "Got " << tag_names.size () << " tags and " << dim_names.size ()
+          << " dimensions";
+      lex.error (tmp.str ());
       return false;
     }
 
@@ -341,50 +160,13 @@ SourceExpr::load (Treelog& msg)
   while (lex.good ())
     {
       // Read entries.
-      const std::vector<std::string> entries = get_entries (lex);
-
-      if (entries.size () != tag_names.size ())
-        {
-          if (entries.size () != 0 && lex.good ())
-            lex.warning ("Wrong number of entries on this line");
-          continue;
-        }
-      scope.set (entries);
-
-      // Extract date.
       Time time (9999, 1, 1, 0);
-      if (time_c < 0)
-	{
-	  int year = get_date_component (lex, entries, year_c, 1000);
-	  int month = get_date_component (lex, entries, month_c, 1);
-	  int mday = get_date_component (lex, entries, mday_c, 1);
-	  int hour = get_date_component (lex, entries, hour_c, 0);
+      std::vector<std::string> entries;
+      if (!read_entry (lex, entries, time))
+        continue;
 
-	  if (!Time::valid (year, month, mday, hour))
-	    {
-	      lex.warning ("Invalid date");
-	      continue;
-	    }
-	  time = Time (year, month, mday, hour);
-	}
-      else
-	time = get_time (entries[time_c]);
-
-      if (time.year () == 9999)
-	{
-	  lex.warning ("Invalid time");
-	  continue;
-	}
-
-      // Filter.
-      for (size_t i = 0; i < filter.size (); i++)
-	{
-	  const std::vector<std::string>& allowed = filter[i]->allowed;
-	  const std::string& v = entries[fil_col[i]];
-	  if (std::find (allowed.begin (), allowed.end (), v) 
-	      == allowed.end ())
-	    goto cont;
-	}
+      // Set it.
+      scope.set (entries);
       
       // Missing value.
       if (expr->missing (scope))
@@ -393,9 +175,6 @@ SourceExpr::load (Treelog& msg)
       // Store it.
       times.push_back (time);
       values.push_back (expr->value (scope));
-
-      // Next line.
-    cont:;
     }
 
   // Done.
@@ -414,7 +193,7 @@ SourceExpr::SourceExpr (const AttributeList& al)
 { }
 
 SourceExpr::~SourceExpr ()
-{ sequence_delete (filter.begin (), filter.end ()); }
+{ }
 
 
 static struct SourceExprSyntax

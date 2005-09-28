@@ -914,6 +914,8 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
   symbol.h syntax.h treelog.h log.h border.h librarian.h common.h \
   library.h assertion.h soil.h geometry.h horizon.h am.h submodel.h plf.h \
   aom.h om.h check.h vcheck.h mathlib.h
+source_file${OBJ}: source_file.C source_file.h source.h librarian.h common.h \
+  library.h symbol.h alist.h syntax.h treelog.h assertion.h vcheck.h
 format_LaTeX${OBJ}: format_LaTeX.C format_LaTeX.h format.h librarian.h \
   common.h library.h symbol.h alist.h syntax.h treelog.h assertion.h \
   version.h
@@ -1024,11 +1026,11 @@ submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
 number_arit${OBJ}: number_arit.C number.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h units.h vcheck.h \
   mathlib.h tmpstream.h
-source_expr${OBJ}: source_expr.C source.h librarian.h common.h library.h \
-  symbol.h alist.h syntax.h treelog.h assertion.h number.h scope.h \
-  units.h vcheck.h lexer_data.h lexer.h mathlib.h
-source_std${OBJ}: source_std.C source.h librarian.h common.h library.h \
-  symbol.h alist.h syntax.h treelog.h assertion.h units.h vcheck.h \
+source_expr${OBJ}: source_expr.C source_file.h source.h librarian.h common.h \
+  library.h symbol.h alist.h syntax.h treelog.h assertion.h number.h \
+  scope.h units.h lexer_data.h lexer.h mathlib.h
+source_std${OBJ}: source_std.C source_file.h source.h librarian.h common.h \
+  library.h symbol.h alist.h syntax.h treelog.h assertion.h units.h \
   lexer_data.h lexer.h mathlib.h
 action_markvand${OBJ}: action_markvand.C action.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h daisy.h \

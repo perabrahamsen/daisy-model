@@ -1,6 +1,6 @@
 // number_const.C -- Simple number objects.
 // 
-// Copyright 2004 Per Abrahamsen and KVL.
+// Copyright 2004, 2005 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -192,4 +192,189 @@ static struct NumberFetchSyntax
     Librarian<Number>::add_type ("fetch", alist, syntax, &make);
   }
 } NumberFetch_syntax;
+
+struct NumberIdentity : public Number
+{
+  // Parameters.
+  const auto_ptr<Number> child;
+  const string dim;
+
+  // Simulation.
+  bool missing (const Scope& scope) const 
+  { return child->missing (scope) 
+      || (known (dim) && known (child->dimension (scope))
+          && !Units::can_convert (child->dimension (scope), dim, 
+                                  child->value (scope))); }
+  double value (const Scope& scope) const
+  { 
+    const double v = child->value (scope); 
+    if (known (dim) && known (child->dimension (scope)))
+      return Units::convert (child->dimension (scope), dim, v);
+    return v;
+  }
+  const string& dimension (const Scope& scope) const
+  {
+    if (known (dim))
+      return dim; 
+    return child->dimension (scope);
+  }
+
+  // Create.
+  bool check (const Scope& scope, Treelog& err) const
+  { 
+    Treelog::Open nest (err, name);
+    bool ok = true;
+
+    if (!child->check (scope, err))
+      ok = false;
+    
+    if (known (dim) && known (child->dimension (scope))
+        && !Units::can_convert (child->dimension (scope), dim))
+      {
+        err.error ("Cannot convert [" + child->dimension (scope) 
+                   + "] to [" + dim + "]");
+        ok = false;
+      }
+    return ok;
+  }
+  NumberIdentity (const AttributeList& al)
+    : Number (al),
+      child (Librarian<Number>::create (al.alist ("value"))),
+      dim (al.name ("dimension", Syntax::Unknown ()))
+  { }
+};
+
+static struct NumberIdentitySyntax
+{
+  static Number& make (const AttributeList& al)
+  { return *new NumberIdentity (al); }
+  NumberIdentitySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", "Pass value unchanged.");
+    syntax.add ("value", Librarian<Number>::library (),
+		"Operand for this function.");
+    syntax.add ("dimension", Syntax::String, Syntax::OptionalConst,
+		"Dimension of this value.");
+    Librarian<Number>::add_type ("identity", alist, syntax, &make);
+  }
+} NumberIdentity_syntax;
+
+struct NumberConvert : public Number
+{
+  // Parameters.
+  const auto_ptr<Number> child;
+  const string dim;
+
+  // Simulation.
+  bool missing (const Scope& scope) const 
+  { return child->missing (scope) 
+      || !Units::can_convert (child->dimension (scope), dim, 
+                              child->value (scope)); }
+  double value (const Scope& scope) const
+  { 
+    const double v = child->value (scope); 
+    return Units::convert (child->dimension (scope), dim, v);
+  }
+  const string& dimension (const Scope&) const
+  { return dim; }
+
+  // Create.
+  bool check (const Scope& scope, Treelog& err) const
+  { 
+    Treelog::Open nest (err, name);
+    bool ok = true;
+
+    if (!child->check (scope, err))
+      ok = false;
+    
+    if (!Units::can_convert (child->dimension (scope), dim))
+      {
+        err.error ("Cannot convert [" + child->dimension (scope) 
+                   + "] to [" + dim + "]");
+        ok = false;
+      }
+    return ok;
+  }
+  NumberConvert (const AttributeList& al)
+    : Number (al),
+      child (Librarian<Number>::create (al.alist ("value"))),
+      dim (al.name ("dimension"))
+  { }
+};
+
+static struct NumberConvertSyntax
+{
+  static Number& make (const AttributeList& al)
+  { return *new NumberConvert (al); }
+  NumberConvertSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", "Convert to specified dimension.");
+    syntax.add ("value", Librarian<Number>::library (),
+		"Operand for this function.");
+    syntax.add ("dimension", Syntax::String, Syntax::Const,
+		"Dimension to convert to.");
+    syntax.order ("value", "dimension");
+    Librarian<Number>::add_type ("convert", alist, syntax, &make);
+  }
+} NumberConvert_syntax;
+
+struct NumberDim : public Number
+{
+  // Parameters.
+  const auto_ptr<Number> child;
+  const string dim;
+
+  // Simulation.
+  bool missing (const Scope& scope) const 
+  { return child->missing (scope); }
+  double value (const Scope& scope) const
+  { return child->value (scope); }
+  const string& dimension (const Scope&) const
+  { return dim; }
+
+  // Create.
+  bool check (const Scope& scope, Treelog& err) const
+  { 
+    Treelog::Open nest (err, name);
+    bool ok = true;
+
+    if (!child->check (scope, err))
+      ok = false;
+    
+    if (known (child->dimension (scope)))
+      err.warning ("Dimension for child already known");
+
+    return ok;
+  }
+  NumberDim (const AttributeList& al)
+    : Number (al),
+      child (Librarian<Number>::create (al.alist ("value"))),
+      dim (al.name ("dimension"))
+  { }
+};
+
+static struct NumberDimSyntax
+{
+  static Number& make (const AttributeList& al)
+  { return *new NumberDim (al); }
+  NumberDimSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", "Specify dimension for number.");
+    syntax.add ("value", Librarian<Number>::library (),
+		"Operand for this function.");
+    syntax.add ("dimension", Syntax::String, Syntax::Const,
+		"Dimension to use.");
+    syntax.order ("value", "dimension");
+    Librarian<Number>::add_type ("dim", alist, syntax, &make);
+  }
+} NumberDim_syntax;
 

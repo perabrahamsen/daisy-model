@@ -23,6 +23,16 @@
 
 #include "source.h"
 
+class LexerData;
+
+static int
+find_tag (const std::map<std::string,int>& tag_pos, const std::string& tag)
+{
+  if (tag_pos.find (tag) == tag_pos.end ())
+    return -1;
+  return tag_pos.find (tag)->second;
+}
+
 class SourceFile : public Source
 {
   // Content.
@@ -31,18 +41,12 @@ protected:
   std::string with_;
   const int style_;
   const std::vector<std::string> missing;
-  std::string field_sep;
   std::vector<Time> times;
   std::vector<double> values;
   
   // Filter.
-  struct Filter
-  {
-    const std::string tag;
-    const std::vector<std::string> allowed;
-    static void load_syntax (Syntax& syntax, AttributeList&);
-    explicit Filter (const AttributeList&);
-  };
+private:
+  struct Filter;
   std::vector<const Filter*> filter;
   
   // Interface.
@@ -56,11 +60,42 @@ public:
   const std::vector<double>& value () const
   { return values; }
 
+  // Read.
+private:
+  std::string get_entry (LexerData& lex) const;
+protected:
+  std::vector<std::string> get_entries (LexerData& lex) const;
+private:
+  static int get_date_component (LexerData& lex,
+                                 const std::vector<std::string>& entries, 
+                                 int column, 
+                                 int default_value);
+  static Time get_time (const std::string& entry);
+protected:
+  static double convert_to_double (LexerData& lex, const std::string& value);
+private:
+  std::string field_sep;
+protected:
+  std::vector<std::string> tag_names;
+  std::map<std::string,int> tag_pos;
+private:
+  std::vector<size_t> fil_col;
+  int year_c;
+  int month_c;
+  int mday_c;
+  int hour_c;
+  int time_c;
+protected:
+  bool read_header (LexerData&);
+  bool read_entry (LexerData&, std::vector<std::string>&, Time&) const;
+
   // Create.
 public:
   static void load_syntax (Syntax&, AttributeList&);
 protected:
   explicit SourceFile (const AttributeList&);
+public:
+  ~SourceFile ();
 };
 
 #endif // SOURCE_H

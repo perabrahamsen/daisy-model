@@ -1,6 +1,6 @@
 // number_arit.C -- Arithmetics on numbers.
 // 
-// Copyright 2004 Per Abrahamsen and KVL.
+// Copyright 2004, 2005 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -27,75 +27,6 @@
 #include <memory>
 
 using namespace std;
-
-struct NumberIdentity : public Number
-{
-  // Parameters.
-  const auto_ptr<Number> child;
-  const string dim;
-
-  // Simulation.
-  bool missing (const Scope& scope) const 
-  { return child->missing (scope) 
-      || (known (dim) && known (child->dimension (scope))
-          && !Units::can_convert (child->dimension (scope), dim, 
-                                  child->value (scope))); }
-  double value (const Scope& scope) const
-  { 
-    const double v = child->value (scope); 
-    if (known (dim) && known (child->dimension (scope)))
-      return Units::convert (child->dimension (scope), dim, v);
-    return v;
-  }
-  const string& dimension (const Scope& scope) const
-  {
-    if (known (dim))
-      return dim; 
-    return child->dimension (scope);
-  }
-
-  // Create.
-  bool check (const Scope& scope, Treelog& err) const
-  { 
-    Treelog::Open nest (err, name);
-    bool ok = true;
-
-    if (!child->check (scope, err))
-      ok = false;
-    
-    if (known (dim) && known (child->dimension (scope))
-        && !Units::can_convert (child->dimension (scope), dim))
-      {
-        err.error ("Cannot convert [" + child->dimension (scope) 
-                   + "] to [" + dim + "]");
-        ok = false;
-      }
-    return ok;
-  }
-  NumberIdentity (const AttributeList& al)
-    : Number (al),
-      child (Librarian<Number>::create (al.alist ("value"))),
-      dim (al.name ("dimension", Syntax::Unknown ()))
-  { }
-};
-
-static struct NumberIdentitySyntax
-{
-  static Number& make (const AttributeList& al)
-  { return *new NumberIdentity (al); }
-  NumberIdentitySyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", "Pass value unchanged.");
-    syntax.add ("value", Librarian<Number>::library (),
-		"Operand for this function.");
-    syntax.add ("dimension", Syntax::String, Syntax::OptionalConst,
-		"Dimension of this value.");
-    Librarian<Number>::add_type ("identity", alist, syntax, &make);
-  }
-} NumberIdentity_syntax;
 
 struct NumberOperand : public Number
 {
