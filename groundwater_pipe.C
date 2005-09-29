@@ -269,7 +269,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
 	{
           S[i] = a * K_to_pipes (i, soil, soil_heat);
 	}
-      daisy_assert (isfinite (Flow));
+      daisy_assert (std::isfinite (Flow));
       return Flow;
     }
   return 0.0;
