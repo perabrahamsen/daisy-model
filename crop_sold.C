@@ -36,7 +36,7 @@
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -1311,8 +1311,8 @@ CropSold::ActualWaterUptake (double Ept,
 {
   if (Ept < 0)
     {
-      TmpStream tmp;
-      tmp () << "BUG: Negative EPT (" << Ept << ")";
+      std::ostringstream tmp;
+      tmp << "BUG: Negative EPT (" << Ept << ")";
       out.error (tmp.str ());
       Ept = 0.0;
     }

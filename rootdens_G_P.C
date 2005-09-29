@@ -24,7 +24,7 @@
 #include "geometry.h"
 #include "log.h"
 #include "check.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "mathlib.h"
 
 using namespace std;
@@ -146,8 +146,8 @@ Rootdens_G_P::set_density (Treelog& msg,
 	    =  LengthPrArea - MinDens * Depth; // [cm/cm^2]
 #if 1
 	  Treelog::Open nest (msg, "RootDens G+P");
-	  TmpStream tmp;
-	  tmp () << "too_low = " << too_low 
+	  std::ostringstream tmp;
+	  tmp << "too_low = " << too_low 
 		 << ", NewLengthPrArea = " << NewLengthPrArea
 		 << "MinLengthPrArea = " << MinLengthPrArea;
 	  msg.warning (tmp.str ());

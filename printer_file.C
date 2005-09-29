@@ -25,7 +25,7 @@
 #include "time.h"
 #include "parser.h"
 #include "path.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <fstream>
 #include <algorithm>
 #include <numeric>
@@ -396,9 +396,9 @@ PrinterFile::Implementation::print_plf (const PLF& plf, int indent)
   int column = indent;
   for (unsigned int i = 0; i < plf.size (); i++)
     {
-      TmpStream tmp;
-      tmp () << "(" << plf.x (i) << " " << plf.y (i) << ")";
-      int entry = strlen (tmp.str ());
+      std::ostringstream tmp;
+      tmp << "(" << plf.x (i) << " " << plf.y (i) << ")";
+      int entry = tmp.str ().length ();
       
       if (column == indent)
 	/* do nothing */;

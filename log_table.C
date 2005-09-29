@@ -27,7 +27,7 @@
 #include "dlf.h"
 #include "daisy.h"
 #include "vcheck.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <fstream>
 
 using namespace std;
@@ -336,8 +336,8 @@ bool LogTable::check (const Border& border, Treelog& msg) const
   bool ok = LogSelect::check (border, msg);
   if (!out.good ())
     {
-      TmpStream tmp;
-      tmp () << "Write error for '" << file << "'";
+      std::ostringstream tmp;
+      tmp << "Write error for '" << file << "'";
       msg.error (tmp.str ());
       ok = false;
     }
@@ -406,18 +406,18 @@ LogTable::summarize (Treelog& msg)
   if (summary.size () > 0)
     {
       Treelog::Open nest (msg, name);
-      TmpStream tmp;
+      std::ostringstream tmp;
 
-      tmp () << "LOGFILE: " << file  << "\n";
+      tmp << "LOGFILE: " << file  << "\n";
       if (to < from)
-	tmp () << "INTERVAL: [" << from << ";" << to << "]\n";
-      tmp () << "TIME: " 
+	tmp << "INTERVAL: [" << from << ";" << to << "]\n";
+      tmp << "TIME: " 
 	     << begin.year () << "-" << begin.month () << "-" << begin.mday () 
 	     << "h" << begin.hour () << " to "
 	     << end.year () << "-" << end.month () << "-" << end.mday () 
 	     << "h" << end.hour ();
       for (unsigned int i = 0; i < conv_vector.size (); i += 2)
-	tmp () << "\nSET: " << conv_vector[i] << " = "
+	tmp << "\nSET: " << conv_vector[i] << " = "
 	       << conv_vector[i+1];
       msg.message (tmp.str ());
       

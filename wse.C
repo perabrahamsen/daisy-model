@@ -21,7 +21,7 @@
 
 #include "wse.h"
 #include "program.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "mathlib.h"
 #include <memory>
 
@@ -174,13 +174,13 @@ struct ProgramWSE_table : public Program
 
   void run (Treelog& msg)
   {
-    TmpStream tmp;
-    tmp () << "stress\teffect\n";
+    std::ostringstream tmp;
+    tmp << "stress\teffect\n";
     for (int i = 0; i <= intervals; i++)
       {
         const double ws = (i + 0.0) / (intervals + 0.0);
         const double e = wse->factor (ws);
-        tmp () << ws << "\t" << e << "\n";
+        tmp << ws << "\t" << e << "\n";
       }
     msg.message (tmp.str ());
   }

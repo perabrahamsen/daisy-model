@@ -38,7 +38,7 @@
 #include "time.h"
 #include "mathlib.h"
 #include "plf.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "submodel.h"
 #include "treelog.h"
 #include "check_range.h"
@@ -1225,12 +1225,12 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   if (!approximate (delta_N, N_source)
       && !approximate (old_N, new_N, 1e-10))
     {
-      TmpStream tmp;
-      tmp () << "BUG: OrganicMatter: delta_N != NO3 + NH4[g N/cm^2]\n"
+      std::ostringstream tmp;
+      tmp << "BUG: OrganicMatter: delta_N != NO3 + NH4[g N/cm^2]\n"
 	     << delta_N << " != " << soil.total (NO3_source)
 	     << " + " << soil.total (NH4_source);
       if (N_source != 0.0)
-	tmp () << " (error " 
+	tmp << " (error " 
 	       << fabs (delta_N / (N_source) - 1.0) * 100.0 << "%)";
       msg.error (tmp.str ());
     }
@@ -1245,8 +1245,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   if (!approximate (delta_C, C_source)
       && !approximate (old_C, new_C, 1e-10))
     {
-      TmpStream tmp;
-      tmp () << "BUG: OrganicMatter: "
+      std::ostringstream tmp;
+      tmp << "BUG: OrganicMatter: "
 	"delta_C != soil_CO2_slow + soil_CO2_fast + top_CO2 [g C/cm^2]\n"
 	     << delta_C << " != " << soil.total (CO2_slow) << " + " 
 	     << soil.total (CO2_fast) << " + " << top_CO2;
@@ -1530,34 +1530,34 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
   double total = -42.42e42;
 
   // Messages.
-  TmpStream table_string;
+  std::ostringstream table_string;
   if (lay == 0)
     {
       // Tag line.
-      table_string () << "lay\thumus\thumus\tinput\tinput\tAOM";
+      table_string << "lay\thumus\thumus\tinput\tinput\tAOM";
       for (unsigned int pool = 0; pool < smb_size; pool++)
-	table_string () << "\tSMB" << (pool + 1);
+	table_string << "\tSMB" << (pool + 1);
       for (unsigned int pool = 0; pool < som_size; pool++)
-	table_string () << "\tSOM" << (pool + 1);
+	table_string << "\tSOM" << (pool + 1);
       for (unsigned int pool = 0; pool < smb_size; pool++)
-	table_string () << "\tdSMB" << (pool + 1) << "\tdSMB" << (pool + 1);
+	table_string << "\tdSMB" << (pool + 1) << "\tdSMB" << (pool + 1);
       for (unsigned int pool = 0; pool < som_size; pool++)
-	table_string () << "\tdSOM" << (pool + 1) << "\tdSOM" << (pool + 1);
-      table_string () << "\n";
+	table_string << "\tdSOM" << (pool + 1) << "\tdSOM" << (pool + 1);
+      table_string << "\n";
       // Dimension line.
-      table_string () << "\tkg C/ha/cm\t%\tkg C/ha/cm/y\t%\t%";
+      table_string << "\tkg C/ha/cm\t%\tkg C/ha/cm/y\t%\t%";
       for (unsigned int pool = 0; pool < smb_size; pool++)
-	table_string () << "\t%";
+	table_string << "\t%";
       for (unsigned int pool = 0; pool < som_size; pool++)
-	table_string () << "\t%";
+	table_string << "\t%";
       for (unsigned int pool = 0; pool < smb_size; pool++)
-	table_string () << "\tkg C/ha/cm/y\ty^-1";
+	table_string << "\tkg C/ha/cm/y\ty^-1";
       for (unsigned int pool = 0; pool < som_size; pool++)
-	table_string () << "\tkg C/ha/cm/y\ty^-1";
-      table_string () << "\n";
+	table_string << "\tkg C/ha/cm/y\ty^-1";
+      table_string << "\n";
     }
-  TmpStream equation_string;
-  equation_string () << "Equations:\n";
+  std::ostringstream equation_string;
+  equation_string << "Equations:\n";
   bool error_found;
 
   // We try the default fractions first.
@@ -1824,7 +1824,7 @@ Setting additional pool to zero");
       // Print out equations.
       for (unsigned int row = 0; row < number_of_equations; row++)
 	{
-	  equation_string () << matrix.get_value (row) << " =";
+	  equation_string << matrix.get_value (row) << " =";
 	  bool first = true;
 
 	  for (unsigned int pool = 0; pool < smb_size; pool++)
@@ -1835,9 +1835,9 @@ Setting additional pool to zero");
 		  if (first)
 		    first = false;
 		  else
-		    equation_string () << " +";
+		    equation_string << " +";
 
-		  equation_string () << " " << value << " SMB" << (pool + 1);
+		  equation_string << " " << value << " SMB" << (pool + 1);
 		}
 	    }
 	  for (unsigned int pool = 0; pool < som_size; pool++)
@@ -1848,8 +1848,8 @@ Setting additional pool to zero");
 		  if (first)
 		    first = false;
 		  else
-		    equation_string () << " +";
-		  equation_string () << " " << value << " SOM" << (pool + 1);
+		    equation_string << " +";
+		  equation_string << " " << value << " SOM" << (pool + 1);
 		}
 	    }
 	  for (unsigned int pool = 0; pool < smb_size; pool++)
@@ -1860,8 +1860,8 @@ Setting additional pool to zero");
 		  if (first)
 		    first = false;
 		  else
-		    equation_string () << " +";
-		  equation_string () << " " << value << " dSMB" << (pool + 1);
+		    equation_string << " +";
+		  equation_string << " " << value << " dSMB" << (pool + 1);
 		}
 	    }
 	  for (unsigned int pool = 0; pool < som_size; pool++)
@@ -1872,11 +1872,11 @@ Setting additional pool to zero");
 		  if (first)
 		    first = false;
 		  else
-		    equation_string () << " +";
-		  equation_string () << " " << value << " dSOM" << (pool + 1);
+		    equation_string << " +";
+		  equation_string << " " << value << " dSOM" << (pool + 1);
 		}
 	    }
-	  equation_string () << "\n";
+	  equation_string << "\n";
 	}
 
       // Solve.
@@ -1908,7 +1908,7 @@ Setting additional pool to zero");
       static const double c_fraction_in_humus = 0.587;
 
       // Messages.
-      table_string () 
+      table_string
 	<< lay << "\t"
 	<< total * g_per_cm2_to_kg_per_ha << "\t"
 	<< 100.0 * total / (c_fraction_in_humus * dry_bulk_density) << "\t"
@@ -1920,12 +1920,12 @@ Setting additional pool to zero");
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	{
 	  const double value = matrix.result (smb_column + pool);
-	  table_string ()  << "\t" << 100.0 * value / total;
+	  table_string << "\t" << 100.0 * value / total;
 	}
       for (unsigned int pool = 0; pool < som_size; pool++)
 	{
 	  const double value = matrix.result (som_column + pool);
-	  table_string ()  << "\t" << 100.0 * value / total;
+	  table_string << "\t" << 100.0 * value / total;
 	}
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	{
@@ -1934,7 +1934,7 @@ Setting additional pool to zero");
 	  const double change = matrix.result (dsmb_column + pool)
 	    * g_per_cm2_per_h_to_kg_per_ha_per_y;
 	  const double rate = change / value;
-	  table_string () << "\t" << change << "\t" << rate;
+	  table_string << "\t" << change << "\t" << rate;
 	}
       for (unsigned int pool = 0; pool < som_size; pool++)
 	{
@@ -1943,7 +1943,7 @@ Setting additional pool to zero");
 	  const double change = matrix.result (dsom_column + pool)
 	    * g_per_cm2_per_h_to_kg_per_ha_per_y;
 	  const double rate = change / value;
-	  table_string () << "\t" << change << "\t" << rate;
+	  table_string << "\t" << change << "\t" << rate;
 	}
 
       // Store results.
@@ -2026,7 +2026,7 @@ Setting additional pool to zero");
 	    {
 	      // Too low.
 	      SOM_fractions = limit_lower;
-	      table_string () << "\tBelow SOM" 
+	      table_string << "\tBelow SOM" 
 			      << SOM_limit_where + 1 << " limit\n";
 	      continue;
 	    }
@@ -2034,7 +2034,7 @@ Setting additional pool to zero");
 	    {
 	      // To high.
 	      SOM_fractions = limit_upper;
-	      table_string () << "\tAbove SOM"
+	      table_string << "\tAbove SOM"
 			      << SOM_limit_where + 1 << " limit\n";
 	      continue;
 	    }
@@ -2045,7 +2045,7 @@ Setting additional pool to zero");
 	{
 	  // No forced equilibrium possible, try without.
 	  top_soil = true;
-	  table_string () << "\tTry as top soil.\n";
+	  table_string << "\tTry as top soil.\n";
 	  continue;
 	}
       // Done for this row.
@@ -2072,8 +2072,8 @@ Setting additional pool to zero");
       if (!print_equations)
 	msg.error (equation_string.str ());
 
-      TmpStream tmp;
-      tmp () << "Can't initialize organic matter from input in layer " << lay;
+      std::ostringstream tmp;
+      tmp << "Can't initialize organic matter from input in layer " << lay;
       throw (string (tmp.str ()));
     }
 }
@@ -2084,7 +2084,7 @@ OrganicMatter::Implementation::top_summary (const Soil& soil,
                                             const double zone_delta_N, 
                                             const double zone_delta_C) const
 {
-  TmpStream tmp;
+  std::ostringstream tmp;
     
   // Max number of AOM pools.
   size_t aom_max_size = 0;
@@ -2096,30 +2096,30 @@ OrganicMatter::Implementation::top_summary (const Soil& soil,
     }        
     
   // Header line.
-  tmp () << "\t";
+  tmp << "\t";
   for (unsigned int pool = 0; pool < som.size (); pool++)
-    tmp () << "SOM" << pool + 1 << "\t";
+    tmp << "SOM" << pool + 1 << "\t";
   for (unsigned int pool = 0; pool < smb.size (); pool++)
-    tmp () << "SMB" << pool + 1 << "\t";
+    tmp << "SMB" << pool + 1 << "\t";
   for (unsigned int pool = 0; pool < aom_max_size; pool++)
-    tmp () << "AOM" << pool + 1 << "\t";
+    tmp << "AOM" << pool + 1 << "\t";
   for (unsigned int pool = 0; pool < dom.size (); pool++)
-    tmp () << "DOM" << pool + 1 << "\t";
-  tmp () << "total\n";
+    tmp << "DOM" << pool + 1 << "\t";
+  tmp << "total\n";
 
   // C line
-  tmp () << "kg C/ha\t";
+  tmp << "kg C/ha\t";
   double total_C = 0.0;
   for (unsigned int pool = 0; pool < som.size (); pool++)
     {
       const double C = som[pool]->soil_C (soil, 0.0, init.end);
-      tmp () << C * g_per_cm2_to_kg_per_ha << "\t";
+      tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
   for (unsigned int pool = 0; pool < smb.size (); pool++)
     {
       const double C = smb[pool]->soil_C (soil, 0.0, init.end);
-      tmp () << C * g_per_cm2_to_kg_per_ha << "\t";
+      tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
   for (unsigned int pool = 0; pool < aom_max_size; pool++)
@@ -2132,30 +2132,30 @@ OrganicMatter::Implementation::top_summary (const Soil& soil,
           if (pool < added.size ())
             C += added[pool]->soil_C (soil, 0.0, init.end);
         }        
-      tmp () << C * g_per_cm2_to_kg_per_ha << "\t";
+      tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
   for (unsigned int pool = 0; pool < dom.size (); pool++)
     {
       const double C = dom[pool]->soil_C (soil, 0.0, init.end);
-      tmp () << C * g_per_cm2_to_kg_per_ha << "\t";
+      tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
-  tmp () << total_C * g_per_cm2_to_kg_per_ha << "\n";
+  tmp << total_C * g_per_cm2_to_kg_per_ha << "\n";
 
   // N line
-  tmp () << "kg N/ha\t";
+  tmp << "kg N/ha\t";
   double total_N = 0.0;
   for (unsigned int pool = 0; pool < som.size (); pool++)
     {
       const double N = som[pool]->soil_N (soil, 0.0, init.end);
-      tmp () << N * g_per_cm2_to_kg_per_ha << "\t";
+      tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
   for (unsigned int pool = 0; pool < smb.size (); pool++)
     {
       const double N = smb[pool]->soil_N (soil, 0.0, init.end);
-      tmp () << N * g_per_cm2_to_kg_per_ha << "\t";
+      tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
   for (unsigned int pool = 0; pool < aom_max_size; pool++)
@@ -2168,21 +2168,21 @@ OrganicMatter::Implementation::top_summary (const Soil& soil,
           if (pool < added.size ())
             N += added[pool]->soil_N (soil, 0.0, init.end);
         }        
-      tmp () << N * g_per_cm2_to_kg_per_ha << "\t";
+      tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
   for (unsigned int pool = 0; pool < dom.size (); pool++)
     {
       const double N = dom[pool]->soil_N (soil, 0.0, init.end);
-      tmp () << N * g_per_cm2_to_kg_per_ha << "\t";
+      tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
-  tmp () << total_N * g_per_cm2_to_kg_per_ha << "\n\n";
+  tmp << total_N * g_per_cm2_to_kg_per_ha << "\n\n";
     
   // Parameters.
-  tmp () << "Depth\t" << -init.end << "\tcm\n";
-  tmp () << "T\t" << init.T << "\tdg C\n";
-  tmp () << "h\t" << init.h << "\tcm\n";
+  tmp << "Depth\t" << -init.end << "\tcm\n";
+  tmp << "T\t" << init.T << "\tdg C\n";
+  tmp << "h\t" << init.h << "\tcm\n";
 
   // Clay and input.
   double clay = 0.0;
@@ -2205,28 +2205,28 @@ OrganicMatter::Implementation::top_summary (const Soil& soil,
       input += total_input * dz * g_per_cm2_per_h_to_kg_per_ha_per_y;
     }
   clay /= -init.end;
-  tmp () << "clay\t" << clay * 100 << "\t%\n";
-  tmp () << "Specified input\t";
+  tmp << "clay\t" << clay * 100 << "\t%\n";
+  tmp << "Specified input\t";
   if (init.input < 0.0)
-    tmp () << "not specified";
+    tmp << "not specified";
   else
-    tmp () << init.input;
-  tmp () << "\tkg C/ha/y\n";
-  tmp () << "Specified background mineralization\t";
+    tmp << init.input;
+  tmp << "\tkg C/ha/y\n";
+  tmp << "Specified background mineralization\t";
   if (init.background_mineralization < -1e10)
-    tmp () << "not specified";
+    tmp << "not specified";
   else
-    tmp () << init.background_mineralization;
-  tmp () << "\tkg N/ha/y\n";
+    tmp << init.background_mineralization;
+  tmp << "\tkg N/ha/y\n";
 
-  tmp () << "Zone input\t" << input << "\tkg C/ha/y\n";
-  tmp () << "Zone background mineralization\t" << zone_delta_N 
+  tmp << "Zone input\t" << input << "\tkg C/ha/y\n";
+  tmp << "Zone background mineralization\t" << zone_delta_N 
          << "\tkg C/ha/y\n";
-  tmp () << "Zone humus change\t" << zone_delta_C << "\tkg C/ha/y\n";
+  tmp << "Zone humus change\t" << zone_delta_C << "\tkg C/ha/y\n";
 
   // Time.
   time_t start_time = time (NULL);
-  tmp () << "Time\t" << ctime (&start_time);
+  tmp << "Time\t" << ctime (&start_time);
   return tmp.str ();
 }
 
@@ -2377,8 +2377,8 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   // Warnings in case of explicit SOM or SMB initialization.
   for (unsigned int pool = 0; pool < som_size; pool++)
     {
-      TmpStream tmp;
-      tmp () << "som[" << pool << "]";
+      std::ostringstream tmp;
+      tmp << "som[" << pool << "]";
       Treelog::Open nest (err, tmp.str ());
       if (som[pool]->C.size () > 0 && som[pool]->C.size () < soil.size ())
 	err.warning ("C partially initialized.\n\
@@ -2389,8 +2389,8 @@ Using humus for remaining entries");
     }
   for (unsigned int pool = 0; pool < smb_size; pool++)
     {
-      TmpStream tmp;
-      tmp () << "smb[" << pool << "]";
+      std::ostringstream tmp;
+      tmp << "smb[" << pool << "]";
       Treelog::Open nest (err, tmp.str ());
       if (smb[pool]->C.size () > 0 && smb[pool]->C.size () < soil.size ())
 	err.warning ("C partially initialized.\n\
@@ -2510,16 +2510,16 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   // Summary.
   {
     Treelog::Open nest (err, "Total soil summary");
-    TmpStream total;
-    total () << "Expected humus change: " 
+    std::ostringstream total;
+    total << "Expected humus change: " 
              << total_delta_C * g_per_cm2_per_h_to_kg_per_ha_per_y 
              << " [kg C/ha/y], ";
     const double all_C = this->total_C (soil);
     if (isnormal (all_C))
-      total () << total_delta_C / all_C << " [y^-1]";
+      total << total_delta_C / all_C << " [y^-1]";
     else
-      total () << "all new";
-    total () << ".\nExpected background mineralization: "
+      total << "all new";
+    total << ".\nExpected background mineralization: "
              << -total_delta_N * g_per_cm2_per_h_to_kg_per_ha_per_y 
              << " [kg N/ha/y].";
     if (init.debug_to_screen)
@@ -2679,8 +2679,8 @@ OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
       
       for (unsigned int i = 0; i < om_alist.size(); i++)
 	{
-	  TmpStream tmp;
-	  tmp () << "[" << i << "]";
+	  std::ostringstream tmp;
+	  tmp << "[" << i << "]";
 	  Treelog::Open nest (err, tmp.str ());
 	  bool om_ok = true;
 	  if (om_ok)
@@ -2690,8 +2690,8 @@ OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
 	      if (fractions.size () != impl.smb.size () + 1 + impl.dom.size ()
 		  && fractions.size () != impl.smb.size () + 1)
 		{
-		  TmpStream tmp;
-		  tmp () << "You have " << fractions.size ()
+		  std::ostringstream tmp;
+		  tmp << "You have " << fractions.size ()
 			 << " fractions but " << impl.smb.size ()
 			 << " smb, 1 som buffer and " << impl.dom.size () 
 			 << " dom";
@@ -2702,8 +2702,8 @@ OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
 		= accumulate (fractions.begin (), fractions.end (), 0.0);
 	      if (fabs (sum - 1.0) > 0.0001)
 		{
-		  TmpStream tmp;
-		  tmp () << "The sum of all fractions is " << sum;
+		  std::ostringstream tmp;
+		  tmp << "The sum of all fractions is " << sum;
 		  err.entry (tmp.str ());
 		  ok = false;
 		}
@@ -2768,8 +2768,8 @@ check_alist (const AttributeList& al, Treelog& err)
 
   for (unsigned int j = 0; j < am_alist.size(); j++)
     {
-      TmpStream tmp;
-      tmp () << "am[" << j << "]";
+      std::ostringstream tmp;
+      tmp << "am[" << j << "]";
       Treelog::Open nest (err, tmp.str ());
       bool am_ok = true;
       if (am_ok)
@@ -2779,8 +2779,8 @@ check_alist (const AttributeList& al, Treelog& err)
 	    = am_alist[j]->alist_sequence ("om");
 	  for (unsigned int i = 0; i < om_alist.size(); i++)
 	    {
-	      TmpStream tmp;
-	      tmp () << "om[" << i << "]";
+	      std::ostringstream tmp;
+	      tmp << "om[" << i << "]";
 	      Treelog::Open nest (err, tmp.str ());
 	      vector<double> fractions
 		= om_alist[i]->number_sequence ("fractions");
@@ -2788,8 +2788,8 @@ check_alist (const AttributeList& al, Treelog& err)
 		  != smb_alist.size () + 1 + dom_alist.size ()
 		  && fractions.size () != smb_alist.size () + 1)
 		{
-		  TmpStream tmp;
-		  tmp () << "You have " << fractions.size ()
+		  std::ostringstream tmp;
+		  tmp << "You have " << fractions.size ()
 			 << " fractions but " << smb_alist.size ()
 			 << " smb, 1 buffer and " << dom_alist.size ()
 			 << " dom";
@@ -2800,8 +2800,8 @@ check_alist (const AttributeList& al, Treelog& err)
 		= accumulate (fractions.begin (), fractions.end (), 0.0);
 	      if (fabs (sum - 1.0) > 0.0001)
 		{
-		  TmpStream tmp;
-		  tmp () << "The sum of all fractions is " << sum;
+		  std::ostringstream tmp;
+		  tmp << "The sum of all fractions is " << sum;
 		  err.error (tmp.str ());
 		  om_ok = false;
 		}
@@ -2820,16 +2820,16 @@ check_alist (const AttributeList& al, Treelog& err)
     }
   for (unsigned int i = 0; i < smb_alist.size(); i++)
     {
-      TmpStream tmp;
-      tmp () << "smb[" << i << "]";
+      std::ostringstream tmp;
+      tmp << "smb[" << i << "]";
       Treelog::Open nest (err, tmp.str ());
       bool om_ok = true;
       vector<double> fractions = smb_alist[i]->number_sequence ("fractions");
       if (fractions.size () 
 	  != smb_alist.size () + som_alist.size () + dom_alist.size ())
 	{
-	  TmpStream tmp;
-	  tmp () << "You have " << fractions.size () << " fractions but " 
+	  std::ostringstream tmp;
+	  tmp << "You have " << fractions.size () << " fractions but " 
 		 << smb_alist.size () << " smb, " << som_alist.size ()
 		 << " som and " << dom_alist.size () << " dom";
 	  err.error (tmp.str ());
@@ -2838,8 +2838,8 @@ check_alist (const AttributeList& al, Treelog& err)
       vector<double> efficiency = smb_alist[i]->number_sequence ("efficiency");
       if (efficiency.size () != smb_alist.size ())
 	{
-	  TmpStream tmp;
-	  tmp () << "You have " << efficiency.size () << " efficiency but " 
+	  std::ostringstream tmp;
+	  tmp << "You have " << efficiency.size () << " efficiency but " 
 		 << smb_alist.size () << " smb";
 	  err.error (tmp.str ());
 	  om_ok = false;
@@ -2847,8 +2847,8 @@ check_alist (const AttributeList& al, Treelog& err)
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
       if (fabs (sum - 1.0) > 0.0001)
 	{
-	  TmpStream tmp;
-	  tmp () << "The sum of all fractions is " << sum;
+	  std::ostringstream tmp;
+	  tmp << "The sum of all fractions is " << sum;
 	  err.error (tmp.str ());
 	  om_ok = false;
 	}
@@ -2879,15 +2879,15 @@ check_alist (const AttributeList& al, Treelog& err)
     }
   for (unsigned int i = 0; i < som_alist.size(); i++)
     {
-      TmpStream tmp;
-      tmp () << "som[" << i << "]";
+      std::ostringstream tmp;
+      tmp << "som[" << i << "]";
       Treelog::Open nest (err, tmp.str ());
       bool om_ok = true;
       vector<double> efficiency = som_alist[i]->number_sequence ("efficiency");
       if (efficiency.size () != smb_alist.size ())
 	{
-	  TmpStream tmp;
-	  tmp () << "You have " << efficiency.size () << " efficiency but " 
+	  std::ostringstream tmp;
+	  tmp << "You have " << efficiency.size () << " efficiency but " 
 		 << smb_alist.size () << " smb";
 	  err.error (tmp.str ());
 	  om_ok = false;
@@ -2896,8 +2896,8 @@ check_alist (const AttributeList& al, Treelog& err)
       if (fractions.size () 
 	  != smb_alist.size () + som_alist.size () + dom_alist.size ())
 	{
-	  TmpStream tmp;
-	  tmp () << "You have " << fractions.size () << " fractions but " 
+	  std::ostringstream tmp;
+	  tmp << "You have " << fractions.size () << " fractions but " 
 		 << smb_alist.size () << " smb, " << som_alist.size ()
 		 << " som and " << dom_alist.size () << " dom";
 	  err.error (tmp.str ());
@@ -2906,8 +2906,8 @@ check_alist (const AttributeList& al, Treelog& err)
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
       if (fabs (sum - 1.0) > 0.0001)
 	{
-	  TmpStream tmp;
-	  tmp () << "The sum of all fractions is " << sum;
+	  std::ostringstream tmp;
+	  tmp << "The sum of all fractions is " << sum;
 	  err.error (tmp.str ());
 	  om_ok = false;
 	}
@@ -2927,16 +2927,16 @@ check_alist (const AttributeList& al, Treelog& err)
     }
   for (unsigned int i = 0; i < dom_alist.size(); i++)
     {
-      TmpStream tmp;
-      tmp () << "dom[" << i << "]";
+      std::ostringstream tmp;
+      tmp << "dom[" << i << "]";
       Treelog::Open nest (err, tmp.str ());
       bool om_ok = true;
       
       vector<double> efficiency = dom_alist[i]->number_sequence ("efficiency");
       if (efficiency.size () != smb_alist.size ())
 	{
-	  TmpStream tmp;
-	  tmp () << "You have " << efficiency.size () << " efficiency but " 
+	  std::ostringstream tmp;
+	  tmp << "You have " << efficiency.size () << " efficiency but " 
 		 << smb_alist.size () << " smb";
 	  err.error (tmp.str ());
 	  om_ok = false;
@@ -2944,8 +2944,8 @@ check_alist (const AttributeList& al, Treelog& err)
       vector<double> fractions = dom_alist[i]->number_sequence ("fractions");
       if (fractions.size () != smb_alist.size ())
 	{
-	  TmpStream tmp;
-	  tmp () << "You have " << fractions.size () << " fractions but " 
+	  std::ostringstream tmp;
+	  tmp << "You have " << fractions.size () << " fractions but " 
 		 << smb_alist.size () << " smb";
 	  err.error (tmp.str ());
 	  om_ok = false;
@@ -2953,8 +2953,8 @@ check_alist (const AttributeList& al, Treelog& err)
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
       if (fabs (sum - 1.0) > 0.0001)
 	{
-	  TmpStream tmp;
-	  tmp () << "The sum of all fractions is " << sum;
+	  std::ostringstream tmp;
+	  tmp << "The sum of all fractions is " << sum;
 	  err.error (tmp.str ());
 	  om_ok = false;
 	}
@@ -2965,8 +2965,8 @@ check_alist (const AttributeList& al, Treelog& err)
   if (init_alist.number_sequence ("SOM_limit_lower").size ()
       != som_alist.size ())
     {
-      TmpStream tmp;
-      tmp () << "You have " 
+      std::ostringstream tmp;
+      tmp << "You have " 
 	     << init_alist.number_sequence ("SOM_limit_lower").size () 
 	     << " SOM_limit_lower but " << som_alist.size () << " som";
       err.error (tmp.str ());
@@ -2975,8 +2975,8 @@ check_alist (const AttributeList& al, Treelog& err)
   if (init_alist.number_sequence ("SOM_limit_upper").size ()
       != som_alist.size ())
     {
-      TmpStream tmp;
-      tmp () << "You have " 
+      std::ostringstream tmp;
+      tmp << "You have " 
 	     << init_alist.number_sequence ("SOM_limit_upper").size () 
 	     << " SOM_limit_upper but " << som_alist.size () << " som";
       err.error (tmp.str ());

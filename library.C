@@ -24,7 +24,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "treelog.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "assertion.h"
 #include "symbol.h"
 #include "common.h"

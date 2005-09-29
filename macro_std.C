@@ -28,7 +28,7 @@
 #include "uzmodel.h"
 #include "check.h"
 #include "vcheck.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -181,8 +181,8 @@ MacroStandard::tick (const Soil& soil,
   // Check that the sink terms add up.
   if (fabs (soil.total (S_p) - q_top) > 1.0e-11)
     {
-      TmpStream tmp;
-      tmp () << __FILE__ << ":" <<  __LINE__
+      std::ostringstream tmp;
+      tmp << __FILE__ << ":" <<  __LINE__
 	     << ": BUG: Total S_p = '" << (soil.total (S_p) - q_top)
 	     << "' first pass";
       msg.error (tmp.str ());
@@ -255,8 +255,8 @@ MacroStandard::tick (const Soil& soil,
   if (extra_water != 0.0)
     if (!surface.accept_top (msg, extra_water))
       {
-	TmpStream tmp;
-	tmp () << "BUG: Surface would not accept " << extra_water 
+	std::ostringstream tmp;
+	tmp << "BUG: Surface would not accept " << extra_water 
 	       << "mm overflowing water (layer " << from << ")";
 	msg.error (tmp.str ());
       }
@@ -264,8 +264,8 @@ MacroStandard::tick (const Soil& soil,
   // Check that the sink terms add up.
   if (fabs (soil.total (S_p) - q_top - extra_water) > 1.0e-11)
     {
-      TmpStream tmp;
-      tmp () << __FILE__ << ":" <<  __LINE__
+      std::ostringstream tmp;
+      tmp << __FILE__ << ":" <<  __LINE__
 	     << ": BUG: Total S_p = " << soil.total (S_p) << ", q_top = " 
 	     << q_top << ", extra_water = " << extra_water;
       msg.error (tmp.str ());

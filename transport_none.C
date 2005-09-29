@@ -26,7 +26,7 @@
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -75,8 +75,8 @@ TransportNone::tick (Treelog& msg,
 	{
 	  if (!nest)
 	    nest = new Treelog::Open (msg, "Transport none");
-	  TmpStream tmp;
-	  tmp () << "BUG: M[" << i << "] = " << M[i] 
+	  std::ostringstream tmp;
+	  tmp << "BUG: M[" << i << "] = " << M[i] 
 		 << " (J_in = " << J[0] << ") S[" << i << "] = " << S[i];
 	  msg.error (tmp.str ());
 	}

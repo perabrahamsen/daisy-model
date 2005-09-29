@@ -30,7 +30,6 @@
 #include "mathlib.h"
 #include "submodel.h"
 #include "check_range.h"
-#include "tmpstream.h"
 #include <numeric>
 
 using namespace std;

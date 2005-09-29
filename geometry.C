@@ -23,12 +23,12 @@
 #include "geometry.h"
 #include "syntax.h"
 #include "alist.h"
-#include "tmpstream.h"
 #include "mathlib.h"
 #include "check.h"
 #include "vcheck.h"
 #include "groundwater.h"
 #include "assertion.h"
+#include <sstream>
 
 using namespace std;
 
@@ -130,8 +130,8 @@ Geometry::add (vector<double>& v, const double from, const double to,
   const double new_total = total (v);
   if (!approximate (old_total + amount, new_total))
     {
-      TmpStream tmp;
-      tmp () << "Olt total (" << old_total << ") + amount (" << amount
+      std::ostringstream tmp;
+      tmp << "Olt total (" << old_total << ") + amount (" << amount
              << ") != new total (" << total (v) 
              << "); [" << from << ":" << to << "]";
       daisy_warning (tmp.str ());
@@ -276,8 +276,8 @@ static struct CheckLayers : public VCheck
 	  last = next;
 	else
 	  {
-	    TmpStream tmp;
-	    tmp () << "Layer ending at " << next 
+	    std::ostringstream tmp;
+	    tmp << "Layer ending at " << next 
 		   << " should be below " << last;
 	    throw string (tmp.str ());
 	  }
@@ -425,8 +425,8 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
           if (warn_about_small_intervals && zone_size < 0.99)
             {
               warn_about_small_intervals = false;
-              TmpStream tmp;
-              tmp () << "\
+              std::ostringstream tmp;
+              tmp << "\
 Can't automatically make discretizations less than 1 [cm], needed at " 
                      << last << " [cm].\nPlease set zplus manually.";
               msg.warning (tmp.str ());
@@ -479,11 +479,11 @@ Can't automatically make discretizations less than 1 [cm], needed at "
 	}
 
       // Debug messages.
-      TmpStream tmp;
-      tmp () << "(zplus";
+      std::ostringstream tmp;
+      tmp << "(zplus";
       for (unsigned int i = 0; i < zplus_.size (); i++)
-	tmp () << " " << zplus_[i];
-      tmp () << "); " << zplus_.size () << " nodes.";
+	tmp << " " << zplus_[i];
+      tmp << "); " << zplus_.size () << " nodes.";
       msg.debug (tmp.str ());
       // Check that zplus is strictly decreasing.
       last = 0.0;

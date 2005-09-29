@@ -26,7 +26,7 @@
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -180,8 +180,8 @@ TransportConvection::tick (Treelog& msg,
     {
       Treelog::Open nest (msg, name);
       const double total_S = soil.total (S) * dt;
-      TmpStream tmp;
-      tmp () << "In (" << - J[0] << ") - out (" << -J[size] 
+      std::ostringstream tmp;
+      tmp << "In (" << - J[0] << ") - out (" << -J[size] 
              << " != new (" << new_total 
              << ") - old (" << (old_total - total_S) 
              << ") - source (" << total_S << ")";

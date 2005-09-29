@@ -26,7 +26,7 @@
 #include "texture.h"
 #include "plf.h"
 #include "treelog.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "mathlib.h"
 
 class HydraulicHypres : public Hydraulic
@@ -186,8 +186,8 @@ pedotransfer function");
     }
   if (!approximate (clay + silt + sand + humus, 100.0))
     {
-      TmpStream tmp;
-      tmp () << "The sum of all fractions should be 100%, it is "
+      std::ostringstream tmp;
+      tmp << "The sum of all fractions should be 100%, it is "
              << clay + silt + sand + humus;
       msg.error (tmp.str ());
     }
@@ -257,17 +257,17 @@ pedotransfer function");
 
 
   // Debug messages.
-  TmpStream tmp;
-  tmp () << ";; clay = " << clay << ", silt = " << silt << ", sand = "
+  std::ostringstream tmp;
+  tmp << ";; clay = " << clay << ", silt = " << silt << ", sand = "
 	 << sand << ", humus = " << humus << ", rho_b = " << rho_b 
 	 << (top_soil ? " (topsoil) " : " (subsoil)") << "\n";
-  tmp () << "M_vG\n";
-  tmp () << "(l " << l << ")\n";
-  tmp () << ";; (m " << m << ")\n";
-  tmp () << "(n " << n << ")\n";
-  tmp () << "(alpha " << alpha << ")\n";
-  tmp () << "(K_sat " << K_sat << " [cm/h])\n";
-  tmp () << "(Theta_sat " << Theta_sat << ")";
+  tmp << "M_vG\n";
+  tmp << "(l " << l << ")\n";
+  tmp << ";; (m " << m << ")\n";
+  tmp << "(n " << n << ")\n";
+  tmp << "(alpha " << alpha << ")\n";
+  tmp << "(K_sat " << K_sat << " [cm/h])\n";
+  tmp << "(Theta_sat " << Theta_sat << ")";
   msg.debug (tmp.str ());
 }
 

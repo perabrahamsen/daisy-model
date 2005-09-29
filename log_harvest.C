@@ -26,7 +26,7 @@
 #include "dlf.h"
 #include "vcheck.h"
 #include "version.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <fstream>
 #include <time.h>
 
@@ -179,8 +179,8 @@ struct LogHarvest : public Log
     bool ok = true;
     if (!out.good ())
       {
-	TmpStream tmp;
-	tmp () << "Write error for '" << file << "'";
+	std::ostringstream tmp;
+	tmp << "Write error for '" << file << "'";
 	msg.error (tmp.str ());
 	ok = false;
       }

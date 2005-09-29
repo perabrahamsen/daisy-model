@@ -30,7 +30,7 @@
 #include "net_radiation.h"
 #include "vegetation.h"
 #include "log.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <memory>
 
 class PetFAO_PM : public Pet

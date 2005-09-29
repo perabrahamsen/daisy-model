@@ -22,7 +22,7 @@
 #include "pedo.h"
 #include "soil.h"
 #include "units.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "treelog.h"
 
 using namespace std;
@@ -76,11 +76,11 @@ Pedotransfer::debug_message (const string& name,
                              const string& dim,
                              Treelog& msg)
 { 
-  TmpStream tmp;
-  tmp () << "(" << name;
+  std::ostringstream tmp;
+  tmp << "(" << name;
   for (unsigned int i = 0; i < value.size (); i++)
-    tmp () << " " << value[i];
-  tmp () << " [" << dim << "])";
+    tmp << " " << value[i];
+  tmp << " [" << dim << "])";
   msg.debug (tmp.str ());
 }
 

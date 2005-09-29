@@ -25,12 +25,11 @@
 #include "library.h"
 #include "syntax.h"
 #include "alist.h"
-#include "tmpstream.h"
 #include "treelog.h"
 #include "assertion.h"
-
 #include <algorithm>
 #include <numeric>
+#include <sstream>
 
 using namespace std;
 
@@ -189,8 +188,8 @@ TraverseDepend::enter_submodel_sequence (const Syntax&,
 					 const AttributeList&,
 					 const string& name, unsigned index)
 { 
-  TmpStream str;
-  str () << name << "[" << index << "]";
+  std::ostringstream str;
+  str << name << "[" << index << "]";
   treelog.open (str.str ());
   return true; 
 }
@@ -239,8 +238,8 @@ TraverseDepend::enter_object_sequence (const Library& library,
 				       const AttributeList& default_alist,
 				       const string& name, unsigned index)
 { 
-  TmpStream str;
-  str () << name << "[" << index << "]";
+  std::ostringstream str;
+  str << name << "[" << index << "]";
 
   return enter_object (library, syntax, alist, default_alist, str.str ());
 }

@@ -367,7 +367,7 @@ SPECIALS = source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 OTHER = dlf.C scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
-	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
+	depend.C traverse.C treelog.C treelog_stream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	mathlib.C librarian.C cdaisy.C common.C nrutil.C \
 	submodel.C
@@ -409,7 +409,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = document_LaTeX.C document.C program_refdoc.C document.h
+REMOVE = tmpstream.C 
 
 # These are the file extensions we deal with.
 # 

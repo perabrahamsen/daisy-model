@@ -28,7 +28,7 @@
 #include "plf.h"
 #include "format.h"
 #include "treelog.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <iostream>
 #include <memory>
 #include <algorithm>
@@ -136,8 +136,8 @@ struct ProgramDocument : public Program
 void
 ProgramDocument::print_string (const std::string& name)
 {
-  TmpStream tmp;
-  PrinterFile::print_string (tmp (), name);
+  std::ostringstream tmp;
+  PrinterFile::print_string (tmp, name);
   format->text (tmp.str ());
 }
 
@@ -343,8 +343,8 @@ ProgramDocument::print_entry_value (const std::string& name,
 	  {
 	  case Syntax::Number:
 	    {
-	      TmpStream tmp;
-	      tmp () << " (default " << alist.number (name) << ")";
+	      std::ostringstream tmp;
+	      tmp << " (default " << alist.number (name) << ")";
 	      format->text (tmp.str ());
 	    }
 	    break;
@@ -376,8 +376,8 @@ ProgramDocument::print_entry_value (const std::string& name,
 	    break;
 	  case Syntax::PLF:
 	    {
-	      TmpStream tmp;
-	      tmp () << " (has default value with " << alist.plf (name).size ()
+	      std::ostringstream tmp;
+	      tmp << " (has default value with " << alist.plf (name).size ()
 		     << " points)";
 	      format->text (tmp.str ());
 	      if (alist.plf (name).size () > 0)
@@ -399,8 +399,8 @@ ProgramDocument::print_entry_value (const std::string& name,
 		format->text (" (default `" + value + "')");
 	      else
 		{
-		  TmpStream tmp;
-		  tmp () << " (has default value with length "
+		  std::ostringstream tmp;
+		  tmp << " (has default value with length "
 			 << value.length () << ")";
 		  format->text (tmp.str ());
 		  print_default_value = true;
@@ -409,8 +409,8 @@ ProgramDocument::print_entry_value (const std::string& name,
 	    break;
 	  case Syntax::Integer:
 	    {
-	      TmpStream tmp;
-	      tmp () << " (default " << alist.integer (name) << ")";
+	      std::ostringstream tmp;
+	      tmp << " (default " << alist.integer (name) << ")";
 	      format->text (tmp.str ());
 	    }
 	    break;
@@ -444,8 +444,8 @@ ProgramDocument::print_entry_value (const std::string& name,
 	      format->text (" (default: an empty sequence)");
 	    else
 	      {
-		TmpStream tmp;
-		tmp () << " (has default value with length " 
+		std::ostringstream tmp;
+		tmp << " (has default value with length " 
 		       << alist.size (name) << ")";
 		format->text (tmp.str ());
 		print_default_value = true;
@@ -458,8 +458,8 @@ ProgramDocument::print_entry_value (const std::string& name,
 
       if (print_default_value)
 	{
-	  TmpStream tmp;
-	  PrinterFile printer (tmp ());
+	  std::ostringstream tmp;
+	  PrinterFile printer (tmp);
 	  printer.print_entry (alist, syntax, name);
 	  format->soft_linebreak ();
 	  format->verbatim (tmp.str ());
@@ -559,16 +559,16 @@ ProgramDocument::print_sample_entry (const std::string& name,
 	    case Syntax::Number:
 	      {
 		format->special ("nbsp");
-		TmpStream tmp;
-		tmp () << alist.number (name);
+		std::ostringstream tmp;
+		tmp << alist.number (name);
                 const std::string& dimension = syntax.dimension (name);
                 if (dimension == Syntax::None ())
-                  tmp () << " []";
+                  tmp << " []";
                 else if (dimension == Syntax::Unknown ())
-                  tmp () << " [?]";
+                  tmp << " [?]";
                 else
-                  tmp () << " [" << dimension << "]";
-                tmp () << ")";
+                  tmp << " [" << dimension << "]";
+                tmp << ")";
 		format->text (tmp.str ());
 		print_name = false;
 	      }
@@ -605,8 +605,8 @@ ProgramDocument::print_sample_entry (const std::string& name,
 	    case Syntax::Integer:
 	      {
 		format->special ("nbsp");
-		TmpStream tmp;
-		tmp () << alist.integer (name) << ")";
+		std::ostringstream tmp;
+		tmp << alist.integer (name) << ")";
 		format->text (tmp.str ());
 		print_name = false;
 	      }
@@ -639,8 +639,8 @@ ProgramDocument::print_sample_entry (const std::string& name,
 		  for (int i = 0; i < numbers.size (); i++)
 		    {
 		      format->special ("nbsp");
-		      TmpStream tmp;
-		      tmp () << numbers[i];
+		      std::ostringstream tmp;
+		      tmp << numbers[i];
 		      format->text (tmp.str ());
 		    }
 		  format->text (")");
@@ -1018,8 +1018,8 @@ ProgramDocument::print_submodel_entry (const std::string& name, int level,
     format->text (" sequence");
   else
     {
-      TmpStream tmp;
-      tmp () << " array of length " << size;
+      std::ostringstream tmp;
+      tmp << " array of length " << size;
       format->text (tmp.str ());
     }
 
@@ -1088,8 +1088,8 @@ ProgramDocument::print_model (const symbol name, const Library& library)
 	}
       if (print_parameterizations)
 	{
-	  TmpStream tmp;
-	  PrinterFile printer (tmp ());
+	  std::ostringstream tmp;
+	  PrinterFile printer (tmp);
 	  printer.print_parameterization (library.name (), name, false);
 	  format->soft_linebreak ();
 	  format->verbatim (tmp.str ());

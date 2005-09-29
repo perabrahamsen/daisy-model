@@ -23,7 +23,7 @@
 #include "fetch.h"
 #include "select.h"
 #include "treelog.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <algorithm>
 #include <fstream>
 #include <string>
@@ -164,11 +164,11 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
   Treelog::Open nest (msg, title);
 
   // We write the summary to a string at first.
-  TmpStream tmp;
-  tmp ().precision (precision);
-  tmp ().flags (ios::right | ios::fixed);
+  std::ostringstream tmp;
+  tmp.precision (precision);
+  tmp.flags (ios::right | ios::fixed);
   if (description.name () != default_description)
-    tmp () << description << "\n\n";
+    tmp << description << "\n\n";
 
   // Find width of tags.
   const string total_title = "Balance (= In - Out - Increase)";
@@ -197,42 +197,42 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
   string shared_dim = Syntax::User ();
   if (input.size () > 0)
     {
-      const string dim = print_entries (tmp (), input, max_size, width, hours);
-      print_balance (tmp (), "Total input", total_input, dim,
+      const string dim = print_entries (tmp, input, max_size, width, hours);
+      print_balance (tmp, "Total input", total_input, dim,
                      dim_size, max_size, width);
       shared_dim = dim;
-      tmp () << "\n";
+      tmp << "\n";
     }
 
   if (output.size () > 0)
     {
-      const string dim = print_entries (tmp (), output, 
+      const string dim = print_entries (tmp, output, 
                                         max_size, width, hours);
-      print_balance (tmp (), "Total output", total_output, dim,
+      print_balance (tmp, "Total output", total_output, dim,
                      dim_size, max_size, width);
       if (shared_dim == Syntax::User ()) 
         shared_dim = dim;
       else if (dim != shared_dim)
         shared_dim = Syntax::Unknown ();
-      tmp () << "\n";
+      tmp << "\n";
     }
 
   if (content.size () > 0)
     {
-      const string dim = print_entries (tmp (), content, 
+      const string dim = print_entries (tmp, content, 
                                         max_size, width, hours);
-      print_balance (tmp (), content_title, total_content, dim,
+      print_balance (tmp, content_title, total_content, dim,
                      dim_size, max_size, width);
       if (shared_dim == Syntax::User ()) 
         shared_dim = dim;
       else if (dim != shared_dim)
         shared_dim = Syntax::Unknown ();
-      tmp () << "\n";
+      tmp << "\n";
     }
 
-  print_balance (tmp (), total_title, total, 
+  print_balance (tmp, total_title, total, 
                  shared_dim, dim_size, max_size, width);
-  tmp () << string (max_size + 3, ' ') << string (width, '=');
+  tmp << string (max_size + 3, ' ') << string (width, '=');
 
   // Where?
   if (file == "")

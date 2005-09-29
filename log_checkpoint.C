@@ -24,7 +24,7 @@
 #include "condition.h"
 #include "daisy.h"
 #include "printer_file.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -84,11 +84,11 @@ LogCheckpoint::done (const Time&)
       daisy_assert (library_stack.size () == 1U);
 
       // Create file name.
-      TmpStream scratch;
-      scratch ().fill (0);
-      scratch ().width (2);
-      scratch () << file.c_str () 
-		 << "-" << time.year () << "-" << time.month () << "-" 
+      std::ostringstream scratch;
+      scratch.fill (0);
+      scratch.width (2);
+      scratch << file.c_str () 
+	      << "-" << time.year () << "-" << time.month () << "-" 
 	      << time.mday () << "+" << time.hour () << ".dai";
       const string filename (scratch.str ());
 
@@ -153,8 +153,8 @@ LogCheckpoint::done (const Time&)
 
       if (!printer.good ())
 	{
-	  TmpStream tmp;
-	  tmp () << "Error writing to '" << filename << "'";
+	  std::ostringstream tmp;
+	  tmp << "Error writing to '" << filename << "'";
 	  Assertion::error (tmp.str ());
 	}
       // Close stack.

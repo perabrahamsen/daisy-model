@@ -37,7 +37,7 @@
 #include "alist.h"
 #include "common.h"
 #include "column.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -216,9 +216,9 @@ Daisy::run (Treelog& out)
 
     do
       {
-	TmpStream tmp;
-	tmp () << time.year () << "-" << time.month () << "-" 
-	       << time.mday () << "h" << time.hour ();
+	std::ostringstream tmp;
+	tmp << time.year () << "-" << time.month () << "-" 
+	    << time.mday () << "h" << time.hour ();
 	Treelog::Open nest (out, tmp.str ());
 
 	if (!running)

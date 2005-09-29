@@ -30,7 +30,7 @@
 #include "macro.h"
 #include "syntax.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "submodel.h"
 
 using namespace std;
@@ -213,8 +213,8 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
 	{
 	  if (X_ice[i] < -1e-13)
 	    {
-	      TmpStream tmp;
-	      tmp () << "BUG: X_ice[" << i << "] = " << X_ice[i]
+	      std::ostringstream tmp;
+	      tmp << "BUG: X_ice[" << i << "] = " << X_ice[i]
 		     << " (S_sum[i] = " << S_sum[i] << ")";
 	      msg.error (tmp.str ());
 	    }
@@ -365,8 +365,8 @@ SoilWater::Implementation::swap (Treelog& msg, const Soil& soil,
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
       if (Theta[i] > Theta_sat)
 	{
-	  TmpStream tmp;
-	  tmp () << "BUG: Theta[ " << i << "] (" << Theta[i]
+	  std::ostringstream tmp;
+	  tmp << "BUG: Theta[ " << i << "] (" << Theta[i]
 		 << ") > Theta_sat (" << Theta_sat << ")";
 	  msg.error (tmp.str ());
 	  Theta[i] = Theta_sat;
@@ -395,32 +395,32 @@ SoilWater::Implementation::check (unsigned n, Treelog& err) const
 
   if (Theta.size () != n)
     {
-      TmpStream tmp;
-      tmp () << "You have " << n 
+      std::ostringstream tmp;
+      tmp << "You have " << n 
 	     << " intervals but " << Theta.size () << " Theta values";
       err.entry (tmp.str ());
       ok = false;
     }
   if (h.size () != n)
     {
-      TmpStream tmp;
-      tmp () << "You have " << n 
+      std::ostringstream tmp;
+      tmp << "You have " << n 
 	     << " intervals but " << h.size () << " h values";
       err.entry (tmp.str ());
       ok = false;
     }
   if (X_ice.size () != n)
     {
-      TmpStream tmp;
-      tmp () << "You have " << n 
+      std::ostringstream tmp;
+      tmp << "You have " << n 
 	     << " intervals but " << X_ice.size () << " X_ice values";
       err.entry (tmp.str ());
       ok = false;
     }
   if (X_ice_buffer.size () != n)
     {
-      TmpStream tmp;
-      tmp () << "You have " << n 
+      std::ostringstream tmp;
+      tmp << "You have " << n 
 	     << " intervals but " << X_ice_buffer.size () 
 	     << " X_ice_buffer values";
       err.entry (tmp.str ());
@@ -535,8 +535,8 @@ SoilWater::Implementation::initialize (const AttributeList& al,
       const double Theta_h = soil.Theta (i, h[i], h_ice[i]);
       if (!approximate (Theta[i], Theta_h))
 	{
-	  TmpStream tmp;
-	  tmp () << "Theta[" << i << "] (" << Theta[i] << ") != Theta (" 
+	  std::ostringstream tmp;
+	  tmp << "Theta[" << i << "] (" << Theta[i] << ") != Theta (" 
 		 << h[i] << ") (" << Theta_h << ")";
 	  out.error (tmp.str ());
 	}

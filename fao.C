@@ -24,7 +24,6 @@
 #include "net_radiation.h"
 #include "assertion.h"
 #include "treelog.h"
-#include "tmpstream.h"
 #include "mathlib.h"
 
 double 

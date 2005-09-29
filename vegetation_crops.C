@@ -27,7 +27,7 @@
 #include "mathlib.h"
 #include "harvest.h"
 #include "log.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <deque>
 
 using namespace std;
@@ -390,8 +390,8 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
       if (!approximate (height_, HvsLAI_ (LAI_), 0.01))
 	{
 	  Treelog::Open nest (msg, "Vegetation reset canopy structure");
-	  TmpStream tmp;
-	  tmp () << "BUG: Vegetation: height == " << height_
+	  std::ostringstream tmp;
+	  tmp << "BUG: Vegetation: height == " << height_
 		 << ", LAI == " << LAI_
 		 << ", HvsLAI (LAI) == " << HvsLAI_ (LAI_);
 	  msg.error (tmp.str ());
@@ -399,8 +399,8 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 	       crop != crops.end(); 
 	       crop++)
 	    {
-	      TmpStream tmp;
-	      tmp () << (*crop)->name << " has height "
+	      std::ostringstream tmp;
+	      tmp << (*crop)->name << " has height "
 		     << (*crop)->height () << " and LAI "
 		     << (*crop)->LAI ();
 	      msg.error (tmp.str ());
@@ -563,9 +563,9 @@ VegetationCrops::harvest (const symbol column_name,
           + mine.total_C () * 10;
         if (fabs (balance) > 0.001 /* 1 [g/ha] */)
           {
-            TmpStream tmp;
-            tmp () << "delta Crop = " << new_crop_C - old_crop_C;
-            tmp () << "\ntop residuals = "
+            std::ostringstream tmp;
+            tmp << "delta Crop = " << new_crop_C - old_crop_C;
+            tmp << "\ntop residuals = "
                    << (residuals_C_top - old_residuals_C_top) * 10
                    << "\nsoil residuals = "
                    << (geometry.total (residuals_C_soil) * 10000

@@ -22,7 +22,7 @@
 
 #include "log_select.h"
 #include "field.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "format.h"
 
 using namespace std;
@@ -186,8 +186,8 @@ LogSelect::check (const Border& border, Treelog& err) const
 
   for (unsigned int i = 0; i < entries.size (); i++)
     {
-      TmpStream tmp;
-      tmp () << "entries [" << i << "]: " << entries[i]->tag ();
+      std::ostringstream tmp;
+      tmp << "entries [" << i << "]: " << entries[i]->tag ();
       Treelog::Open nest (err, tmp.str ());
       if (!entries[i]->check (err))
         ok = false;

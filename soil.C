@@ -32,7 +32,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "plf.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "mathlib.h"
 #if !(defined (__BORLANDC__) && __BORLANDC__ < 0x0550)
 #include <iomanip>
@@ -291,8 +291,8 @@ Soil::check (int som_size, Treelog& err) const
 	  if (f_size > 0 && f_size != som_size)
 	    {
 	      Treelog::Open nest (err, "SOM_fractions");
-	      TmpStream tmp;
-	      tmp () << "Need " << som_size << " fractions, got " << f_size;
+	      std::ostringstream tmp;
+	      tmp << "Need " << som_size << " fractions, got " << f_size;
 	      err.error (tmp.str ());
 	      ok = false;
 	    }
@@ -300,8 +300,8 @@ Soil::check (int som_size, Treelog& err) const
 	  if (n_size != som_size)
 	    {
 	      Treelog::Open nest (err, "SOM_C_per_N");
-	      TmpStream tmp;
-	      tmp () << "Need " << som_size << " C/N numbers, got " << n_size;
+	      std::ostringstream tmp;
+	      tmp << "Need " << som_size << " C/N numbers, got " << n_size;
 	      err.error (tmp.str ());
 	      ok = false;
 	    }
@@ -328,8 +328,8 @@ Soil::check_border (const double border, Treelog& err) const
     }
   if (!ok)
     {
-      TmpStream tmp;
-      tmp () << "No soil border near " << border 
+      std::ostringstream tmp;
+      tmp << "No soil border near " << border 
              << " [cm], log results may be inexact";
       err.warning (tmp.str ());
     }

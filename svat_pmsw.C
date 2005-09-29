@@ -41,7 +41,7 @@
 #include "fao.h"
 #ifndef NRGAUSS
 #include "gaussj.h"
-#include "tmpstream.h"
+#include <sstream>
 #endif
 # include "assertion.h"
 # define NRANSI // from xgaussj
@@ -1364,8 +1364,8 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 
   if (h > z_ref)
     {
-      TmpStream tmp;
-      tmp () << "Current crop height is " << h 
+      std::ostringstream tmp;
+      tmp << "Current crop height is " << h 
 	     << " [m].\nMax for svat model PMSW is screen height ("
 	     << z_ref << " [m])";
       throw (string (tmp.str ()));
@@ -1724,19 +1724,19 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 #else
       GaussJordan equations (n);
       
-      TmpStream tmp;
-      tmp () << "Equations\n";
+      std::ostringstream tmp;
+      tmp << "Equations\n";
       for (int l = 1; l <= n; l++)
 	{
 	  for (k = 1; k <= n; k++)
 	    {
 	      equations.set_entry (l-1, k-1, a[l][k]);
 	      if (k > 1)
-		tmp () << " + ";
-	      tmp () << a[l][k];
+		tmp << " + ";
+	      tmp << a[l][k];
 	    }
 	  equations.set_value (l-1, b[l][1]);
-	  tmp () << " = " << b[l][1] << "\n";
+	  tmp << " = " << b[l][1] << "\n";
 	}
       try
 	{
@@ -1744,7 +1744,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 	}
       catch (const char* error)
 	{
-	  tmp () << "Error: " << error;
+	  tmp << "Error: " << error;
 	  throw string (tmp.str ());
 	}
       for (int l = 1; l <= n; l++)

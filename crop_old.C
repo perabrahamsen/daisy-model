@@ -37,7 +37,7 @@
 #include "harvest.h"
 #include "mathlib.h"
 #include "treelog.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -1316,8 +1316,8 @@ CropOld::ActualWaterUptake (double Ept,
 {
   if (Ept < 0)
     {
-      TmpStream tmp;
-      tmp () << "\nBUG: Negative EPT (" << Ept << ")";
+      std::ostringstream tmp;
+      tmp << "\nBUG: Negative EPT (" << Ept << ")";
       out.error (tmp.str ());
       Ept = 0.0;
     }
@@ -1980,12 +1980,12 @@ CropOld::harvest (const symbol column_name,
 			WRoot * C_Root * m2_per_cm2);
 	}
     }
-  TmpStream tmp;
-  tmp () << "Harvest: " << name 
-	 << "\n\tStub N = " << NStub << " W = " << WStub
-	 << "\n\tStraw N = " << NStraw << " W = " << WStraw
-	 << "\n\tSOrg N = " << NSOrg << " W = " << WSOrg
-	 << "\n\tRoot N = " << NRoot << " W = " << WRoot;
+  std::ostringstream tmp;
+  tmp << "Harvest: " << name 
+      << "\n\tStub N = " << NStub << " W = " << WStub
+      << "\n\tStraw N = " << NStraw << " W = " << WStraw
+      << "\n\tSOrg N = " << NSOrg << " W = " << WSOrg
+      << "\n\tRoot N = " << NRoot << " W = " << WRoot;
   out.message (tmp.str ());
 
   Chemicals chemicals;

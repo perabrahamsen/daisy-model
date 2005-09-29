@@ -21,7 +21,7 @@
 
 #include "symbol.h"
 #include "assertion.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <map>
 #include <iostream>
 
@@ -62,8 +62,8 @@ symbol::DB::DB ()
 { 
   for (int i = 0; i < fast_ints; i++)
     {
-      TmpStream tmp;
-      tmp () << i;
+      std::ostringstream tmp;
+      tmp << i;
       const string name (tmp.str ());
       name_map[name] = i;
       reverse_map[i] = name;
@@ -105,8 +105,8 @@ symbol::DB::int2id (const int value)
   int_map_t::const_iterator i = int_map.find (value);
   if (i == int_map.end ())
     {
-      TmpStream tmp;
-      tmp () << value;
+      std::ostringstream tmp;
+      tmp << value;
       const string name (tmp.str ());
       daisy_assert (name_map.find (name) == name_map.end ());
       name_map[name] = counter;

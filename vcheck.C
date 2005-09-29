@@ -24,7 +24,7 @@
 #include "alist.h"
 #include "time.h"
 #include "plf.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "assertion.h"
 #include "mathlib.h"
 #include <algorithm>
@@ -39,8 +39,8 @@ struct ValidYear : public VCheck
   {
     if (!Time::valid (year, 1, 1, 1))
       {
-	TmpStream tmp;
-	tmp () << year << " is not a valid year";
+	std::ostringstream tmp;
+	tmp << year << " is not a valid year";
 	throw string (tmp.str ());
       }
   }
@@ -67,14 +67,14 @@ VCheck::IRange::validate (const int value) const throw (string)
 {
   if (value < min)
     {
-      TmpStream tmp;
-      tmp () << "Value is " << value << " but should be >= " << min;
+      std::ostringstream tmp;
+      tmp << "Value is " << value << " but should be >= " << min;
       throw string (tmp.str ());
     }
   if (value > max)
     {
-      TmpStream tmp;
-      tmp () << "Value is " << value << " but should be <= " << max;
+      std::ostringstream tmp;
+      tmp << "Value is " << value << " but should be <= " << max;
       throw string (tmp.str ());
     }
 }
@@ -165,8 +165,8 @@ struct Increasing : public LocalOrder
   {
     if (last >= next)
       {
-	TmpStream tmp;
-	tmp () << last << " >= " << next << ", must be increasing";
+	std::ostringstream tmp;
+	tmp << last << " >= " << next << ", must be increasing";
 	throw string (tmp.str ());
       }
   }
@@ -178,8 +178,8 @@ struct NonDecreasing : public LocalOrder
   {
     if (last > next)
       {
-	TmpStream tmp;
-	tmp () << last << " > " << next << ", must be non-decreasing";
+	std::ostringstream tmp;
+	tmp << last << " > " << next << ", must be non-decreasing";
 	throw string (tmp.str ());
       }
   }
@@ -191,8 +191,8 @@ struct NonIncreasing : public LocalOrder
   {
     if (last < next)
       {
-	TmpStream tmp;
-	tmp () << last << " < " << next << ", must be non-increasing";
+	std::ostringstream tmp;
+	tmp << last << " < " << next << ", must be non-increasing";
 	throw string (tmp.str ());
       }
   }
@@ -204,8 +204,8 @@ struct Decreasing : public LocalOrder
   {
     if (last <= next)
       {
-	TmpStream tmp;
-	tmp () << last << " <= " << next << ", must be decreasing";
+	std::ostringstream tmp;
+	tmp << last << " <= " << next << ", must be decreasing";
 	throw string (tmp.str ());
       }
   }
@@ -299,8 +299,8 @@ VCheck::SumEqual::validate (double value) const throw (string)
 {
   if (!approximate (value, sum))
     {
-      TmpStream tmp;
-      tmp () << "Sum is " << value << " but should be " << sum;
+      std::ostringstream tmp;
+      tmp << "Sum is " << value << " but should be " << sum;
       throw string (tmp.str ());
     }
 }
@@ -357,8 +357,8 @@ VCheck::StartValue::validate (double value) const throw (string)
 {
   if (!approximate (value, fixed))
     {
-      TmpStream tmp;
-      tmp () << "Start value is " << value << " but should be " << fixed;
+      std::ostringstream tmp;
+      tmp << "Start value is " << value << " but should be " << fixed;
       throw string (tmp.str ());
     }
 }
@@ -408,8 +408,8 @@ VCheck::EndValue::validate (double value) const throw (string)
 {
   if (!approximate (value, fixed))
     {
-      TmpStream tmp;
-      tmp () << "End value is " << value << " but should be " << fixed;
+      std::ostringstream tmp;
+      tmp << "End value is " << value << " but should be " << fixed;
       throw string (tmp.str ());
     }
 }
@@ -462,8 +462,8 @@ VCheck::FixedPoint::validate (const PLF& plf) const throw (string)
 { 
   if (!approximate (plf (fixed_x), fixed_y))
     {
-      TmpStream tmp;
-      tmp () << "Value at " << fixed_x << " should be " << fixed_y 
+      std::ostringstream tmp;
+      tmp << "Value at " << fixed_x << " should be " << fixed_y 
 	     << " but is << " << plf (fixed_x);
       throw (string (tmp.str ()));
     }
@@ -507,8 +507,8 @@ VCheck::MinSize::check (const Syntax& syntax, const AttributeList& alist,
   daisy_assert (syntax.size (key) == Syntax::Sequence);
   if (alist.size (key) < min_size)
     {
-      TmpStream tmp;
-      tmp () << "Need at least " << min_size << " elements, got " 
+      std::ostringstream tmp;
+      tmp << "Need at least " << min_size << " elements, got " 
 	     << alist.size (key);
       throw string (tmp.str ());
     }
@@ -539,8 +539,8 @@ VCheck::Compatible::validate (const string& value) const throw (string)
 {
   if (!Units::can_convert (dimension, value))
     {
-      TmpStream tmp;
-      tmp () << "Cannot convert [" << dimension << "] to [" << value << "]";
+      std::ostringstream tmp;
+      tmp << "Cannot convert [" << dimension << "] to [" << value << "]";
       throw string (tmp.str ());
     }
 }

@@ -23,7 +23,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "check.h"
 #include "vcheck.h"
 #include "assertion.h"
@@ -122,8 +122,8 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		      { check->check (array[i]); }
 		    catch (const string& message)
 		      {
-			TmpStream str;
-			str () << key << "[" << i << "]: " << message;
+			std::ostringstream str;
+			str << key << "[" << i << "]: " << message;
 			err.error (str.str ());
 			error = true;
 		      }
@@ -147,32 +147,32 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		 j != seq.end ();
 		 j++)
 	      {
-		TmpStream tmp;
-		tmp () << key << "[" << j_index << "]: ";
+		std::ostringstream tmp;
+		tmp << key << "[" << j_index << "]: ";
 		j_index++;
 		const AttributeList& al = **j;
 		if (!al.check ("type"))
 		  {
-		    tmp () << "Non object found";
+		    tmp << "Non object found";
 		    err.error (tmp.str ());
 		    error = true;
 		  }
 		else if (al.name ("type") == "error")
 		  {
-		    tmp () << "Error node found";
+		    tmp << "Error node found";
 		    error = true;
 		    err.error (tmp.str ());
 		  }
 		else if (!lib.check (al.identifier ("type")))
 		  {
-		    tmp () << "Unknown library member '"
+		    tmp << "Unknown library member '"
 			   << al.name ("type") << "'";
 		    err.error (tmp.str ());
 		    error = true;
 		  }
 		else 
 		  {
-		    tmp () << al.name ("type");
+		    tmp << al.name ("type");
 		    Treelog::Open nest (err, tmp.str ());
 		    if (!lib.syntax (al.identifier ("type")).impl.check (al,
 									 err))
@@ -206,8 +206,8 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		 j != seq.end ();
 		 j++)
 	      {
-		TmpStream tmp;
-		tmp () << key << " [" << j_index << "]";
+		std::ostringstream tmp;
+		tmp << key << " [" << j_index << "]";
 		Treelog::Open nest (err, tmp.str ());
 		j_index++;
 		const AttributeList& al = **j;

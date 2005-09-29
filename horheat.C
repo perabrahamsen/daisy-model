@@ -26,11 +26,11 @@
 #include "alist.h"
 #include "syntax.h"
 #include "check.h"
-#include "tmpstream.h"
 #include "mathlib.h"
 #include "assertion.h"
 #include "submodel.h"
 #include <numeric>
+#include <sstream>
 
 using namespace std;
 
@@ -104,8 +104,8 @@ HorHeat::initialize (const Hydraulic& hydraulic, const Texture& texture,
   const double LiquidWater = Theta_pF_high; 
   
   // Quarts content in soil.
-  TmpStream tmp;
-  tmp () << "Quartz = " << quarts << " []";
+  std::ostringstream tmp;
+  tmp << "Quartz = " << quarts << " []";
   msg.debug (tmp.str ());
 
   // Relative content of various constituents in soil.

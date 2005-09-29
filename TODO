@@ -1,8 +1,32 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* gnuplot
+* Udine
 
-** Aritmetic
+** Læs rapport
+
+** Opload rapport til www.fon.org
+
+** Præsentation
+
+* command
+
+Hav et command bibliotek, hvis elementer bliver kørt straks af
+parseren.  For eksempel 'directory', 'input', 'run' og 'path' kunne
+være kommandoer.
+
+Måske skal command bare være program?
+
+Hvis en attribut ikke er fundet i syntaksen, prøv at se om det er
+navnet på et program.  Og i så fald, kør der.
+
+* log_arithmetics
+
+En log model der bygger på log select, men hvor man i stedet for at
+skrive select ud direkte, har en "efterbehandlingssystem, en liste af
+output columns der har select column tags og værdier i en Scope, og
+laver beregninger på dem med en Number.
+
+* gnuplot
 
 ** automatisk find passende "ticks" på x-akse
 

@@ -30,7 +30,7 @@
 #include "version.h"
 #include "parser_file.h"
 #include "printer_file.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "treelog_stream.h"
 #include "options.h"
 
@@ -248,7 +248,7 @@ MainWindow::open_file (QString name)
 
   // Load new content.
   Busy busy (this, "Parsing file...");
-  TmpStream errors;
+  std::ostringstream errors;
   TreelogStream err (errors ());
   ParserFile parser (daisy_syntax, name.latin1 (), err);
   parser.load (daisy_alist);

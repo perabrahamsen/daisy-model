@@ -27,7 +27,7 @@
 #include "qmain.h"
 
 #include "library.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "treelog_stream.h"
 #include "depend.h"
 #include "traverse_delete.h"
@@ -282,7 +282,7 @@ void
 AListItem::view_check ()
 { 
   QString title = QString ("QDaisy: Check ") + entry;
-  TmpStream errors;
+  std::ostringstream errors;
   TreelogStream err (errors ());
   const bool ok = syntax.check (alist, err);
   if (strlen (errors.str ()) > 0)
@@ -565,7 +565,7 @@ ModelItem::view_dependencies ()
   const string& component = par->entry.latin1 ();
   const string& model = entry.latin1 ();
   
-  TmpStream deps;
+  std::ostringstream deps;
   TreelogStream treelog (deps ());
   QString title = QString ("QDaisy: ") + entry + " dependencies";
 

@@ -89,8 +89,8 @@ WeatherFile::tick (const Time& time, Treelog& out)
 
   if (!file.good ())
     {
-      TmpStream tmp;
-      tmp () << file_name << ":" << line << ": file error";
+      std::ostringstream tmp;
+      tmp << file_name << ":" << line << ": file error";
       out.error (tmp.str ());
       throw ("read error");
     }

@@ -26,7 +26,7 @@
 #include "daisy.h"
 #include "check.h"
 #include "log.h"
-#include "tmpstream.h"
+#include <sstream>
 
 struct ConditionTSum : public Condition
 {
@@ -86,8 +86,8 @@ static struct ConditionWeatherSyntax
     // don't test for bad month.
     else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
       {
-	TmpStream tmp;
-	tmp () << "day should be between 1 and " << Time::month_length (1, mm);
+	std::ostringstream tmp;
+	tmp << "day should be between 1 and " << Time::month_length (1, mm);
 	err.entry (tmp.str ());
 	ok = false;
       }

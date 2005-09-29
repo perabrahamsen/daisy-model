@@ -25,7 +25,7 @@
 #include "soil.h"
 #include "plf.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -72,8 +72,8 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
       const double matter_in_above = -J_p[i]; // [g/cm^2]
       if (matter_in_above < 0.0)
         {
-          TmpStream tmp;
-          tmp () << "Matter seem to pour out through the top, at a rate of "
+          std::ostringstream tmp;
+          tmp << "Matter seem to pour out through the top, at a rate of "
                  << -J_p[i] * (100 * 100) * (100 * 100) 
                  << " [g/ha/h].  Strange";
           out.warning (tmp.str ());
@@ -110,8 +110,8 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	      if (water_fraction < 0.0 || water_fraction > 1.0)
 		{
 		  Treelog::Open nest (out, "mactrans default");
-		  TmpStream tmp;
-		  tmp () << __FILE__ << ":" <<  __LINE__
+		  std::ostringstream tmp;
+		  tmp << __FILE__ << ":" <<  __LINE__
 			 << ": BUG: water fraction from macropore = " 
 			 << water_fraction;
 		  out.error (tmp.str ());
@@ -166,8 +166,8 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
       > max_delta_matter * 1e-8)
     {
       Treelog::Open nest (out, "mactrans default");
-      TmpStream tmp;
-      tmp () << __FILE__ << ":" <<  __LINE__
+      std::ostringstream tmp;
+      tmp << __FILE__ << ":" <<  __LINE__
 	     << ": BUG: Total S_p = '"
 	     << (soil.total (S_p) + J_p[0]  - J_p[soil.size ()])
 	     << "' solute\n";

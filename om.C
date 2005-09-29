@@ -31,7 +31,7 @@
 #include "geometry.h"
 #include "log.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "assertion.h"
 #include <numeric>
 using namespace std;

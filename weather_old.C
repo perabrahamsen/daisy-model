@@ -23,7 +23,7 @@
 #include "weather_old.h"
 #include "fao.h"
 #include "time.h"
-#include "tmpstream.h"
+#include <sstream>
 
 struct WeatherOld::Implementation
 {
@@ -163,8 +163,8 @@ check_alist (const AttributeList& al, Treelog& err)
   
   if (latitude > 66 || latitude < -66)
     {
-      TmpStream tmp;
-      tmp () << "Warning, Daisy is untested under arctic conditions "
+      std::ostringstream tmp;
+      tmp << "Warning, Daisy is untested under arctic conditions "
 	     << "(Latitude = " << latitude << ")";
       err.entry (tmp.str ());
     }

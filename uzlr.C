@@ -25,7 +25,7 @@
 #include "soil_heat.h"
 #include "log.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -217,8 +217,8 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
                 }
               else
                 {
-                  TmpStream tmp;
-                  tmp () << "BUG: h_new = " << h_new << " h_lim = " << h_lim;
+                  std::ostringstream tmp;
+                  tmp << "BUG: h_new = " << h_new << " h_lim = " << h_lim;
                   msg.error (tmp.str ());
                   q[i+1] = 0.0;
                   Theta[i] = Theta_new;

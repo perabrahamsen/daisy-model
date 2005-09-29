@@ -24,7 +24,7 @@
 #include "units.h"
 #include "vcheck.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <memory>
 
 using namespace std;
@@ -341,8 +341,8 @@ struct PedotransferOperands : public Pedotransfer
             {
               if (operands[i]->dimension () != *found)
                 {
-                  TmpStream tmp;
-                  tmp () << "Dimension [" << operands[i]->dimension () 
+                  std::ostringstream tmp;
+                  tmp << "Dimension [" << operands[i]->dimension () 
                          << "] differ from [" << *found << "]";
                   throw string (tmp.str ());
                 }
@@ -357,8 +357,8 @@ struct PedotransferOperands : public Pedotransfer
     bool ok = true;
     for (size_t i = 0; i < operands.size (); i++)
       {
-        TmpStream tmp;
-        tmp () << name << "[" << i << "]";
+        std::ostringstream tmp;
+        tmp << name << "[" << i << "]";
         Treelog::Open nest (err, tmp.str ());
         
         if (!operands[i]->check_nested (soil, err))

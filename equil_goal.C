@@ -27,8 +27,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include <memory>
-
-#include "tmpstream.h"
+#include <sstream>
 #include <iostream>
 
 using namespace std;
@@ -83,32 +82,32 @@ EquilibriumGoal_A::find (const Soil&, const SoilWater& soil_water,
   const double goal_A_dry = goal_A[i] * (A_solute ? Theta : 1.0);
   const double min_B_dry = min_B[i] * (B_solute ? Theta : 1.0);
 
-  TmpStream tmp;
+  std::ostringstream tmp;
 
   if (has_A > goal_A_dry)
     {
-      tmp () << "A->B";
+      tmp << "A->B";
       // We have too much A, convert surplus to B.
       want_A = goal_A_dry;
       want_B = M - want_A;
     }
   else if (has_B < min_B_dry)
     {
-      tmp () << "min_B";
+      tmp << "min_B";
       // We have too little A and too little B, do nothing.
       want_A = has_A;
       want_B = has_B;
     }
   else
     {
-      tmp () << "B->A";
+      tmp << "B->A";
       
       // We have too little A and too much B, convert just enough to fit one.
       want_B = max (min_B_dry, M - goal_A_dry);
       want_A = M - want_B;
     }
-  tmp () << "\t" << has_A << "\t" << goal_A_dry << "\t" << want_A << "\t"
-         << has_B << "\t" << min_B_dry << "\t" << want_B << "\t" << M;
+  tmp << "\t" << has_A << "\t" << goal_A_dry << "\t" << want_A << "\t"
+      << has_B << "\t" << min_B_dry << "\t" << want_B << "\t" << M;
   if (i == debug_node)
     cout << tmp.str () << "\n";
 

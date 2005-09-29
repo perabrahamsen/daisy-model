@@ -21,7 +21,7 @@
 
 
 #include "lexer.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "treelog.h"
 #include "path.h"
 
@@ -159,8 +159,8 @@ Lexer::good ()
 void 
 Lexer::warning (const string& str, const Position& pos)
 {
-  TmpStream tmp;
-  tmp () << file << ":" << pos.line << ":"
+  std::ostringstream tmp;
+  tmp << file << ":" << pos.line << ":"
 	 << (pos.column + 1) << ": " << str;
   err.entry (tmp.str ());
 }
@@ -175,8 +175,8 @@ Lexer::error (const string& str, const Position& pos)
 void 
 Lexer::warning (const string& str)
 {
-  TmpStream tmp;
-  tmp () << file << ":" << impl.line << ":"
+  std::ostringstream tmp;
+  tmp << file << ":" << impl.line << ":"
 	 << (impl.column + 1) << ": " << str;
   err.entry (tmp.str ());
 }

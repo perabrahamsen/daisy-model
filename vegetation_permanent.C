@@ -33,7 +33,7 @@
 #include "aom.h"
 #include "organic_matter.h"
 #include "check.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <deque>
 
 using namespace std;

@@ -29,7 +29,7 @@
 #include "time.h"
 #include "plf.h"
 #include "submodel.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "mathlib.h"
 
 using namespace std;
@@ -212,8 +212,8 @@ Production::tick (const double AirT, const double SoilT,
       if (!approximate (AssG - CH2OReMobil,
                         IncC * 30.0/12.0 + GrowthRespiration))
         {
-          TmpStream tmp;
-          tmp () << "C inblance in growth\n"
+          std::ostringstream tmp;
+          tmp << "C inblance in growth\n"
                  << "Assimilate = " <<  AssG * 10 * 12./30. << " kg C/ha\n"
                  << "Remobil = " << CH2OReMobil * 10 * 12./30. << " kg C/ha\n"
                  << "Growth = " <<  IncC * 10 << " kg C/ha\n"
@@ -292,8 +292,8 @@ Production::tick (const double AirT, const double SoilT,
 	{
 	  IncWRoot = 0.0;
 	  CH2OPool -= RMRoot;
-	  TmpStream tmp;
-	  tmp () << "BUG: Extra CH2O: " << CH2OPool;
+	  std::ostringstream tmp;
+	  tmp << "BUG: Extra CH2O: " << CH2OPool;
 	  msg.error (tmp.str ());
 	}
       else
@@ -416,8 +416,8 @@ Production::tick (const double AirT, const double SoilT,
   if (!approximate (old_CCrop + NetPhotosynthesis *  12./44 - C_Loss, CCrop)
       || error > 0.00001 /* 0.001 g/ha */)
     {
-      TmpStream tmp;
-      tmp () << "C balance error\n"
+      std::ostringstream tmp;
+      tmp << "C balance error\n"
              << "Old C = " << old_CCrop * 10 << " kg/ha\n"
              << "NetPhotosynthesis = " << NetPhotosynthesis *  12./30. * 10 
              << " kg/ha\n"

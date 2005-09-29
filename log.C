@@ -22,7 +22,7 @@
 
 #include "log.h"
 #include "daisy.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 

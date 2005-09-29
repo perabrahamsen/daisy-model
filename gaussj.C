@@ -8,8 +8,8 @@
 
 #ifdef DEBUG_MESSAGES
 #include "mathlib.h"
-#include "tmpstream.h"
 #include "assertion.h"
+#include <sstream>
 #endif
 
 using namespace std;
@@ -102,9 +102,9 @@ GaussJordan::solve ()
 	throw ("GaussJordan: non-finite number");
       if (fabs (entry) < 1e-100)
 	{
-	  TmpStream tmp;
-	  tmp () << "GaussJordan[" << i << "," << i << "] = " << entry 
-		 << ", value = " << value[i] << ", sum = " << sum;
+	  std::ostringstream tmp;
+	  tmp << "GaussJordan[" << i << "," << i << "] = " << entry 
+	      << ", value = " << value[i] << ", sum = " << sum;
 	  Assertion::message (tmp.str ());
 	}
 #endif

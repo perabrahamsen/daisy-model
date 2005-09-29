@@ -23,8 +23,8 @@
 #include "condition.h"
 #include "time.h"
 #include "daisy.h"
-#include "tmpstream.h"
 #include "vcheck.h"
+#include <sstream>
 
 using namespace std;
 
@@ -369,9 +369,9 @@ static struct ConditionTimeSyntax
 
     if (dd > Time::month_length (1 /* not a leap year */, mm))
       {
-        TmpStream tmp;
-        tmp () << "last valid day of " << Time::month_name (mm) << " is "
-               << Time::month_length (1, mm);
+	std::ostringstream tmp;
+        tmp << "last valid day of " << Time::month_name (mm) << " is "
+            << Time::month_length (1, mm);
         err.entry (tmp.str ());
         ok = false;
       }

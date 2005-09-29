@@ -25,8 +25,8 @@
 #include "hydraulic.h"
 #include "texture.h"
 #include "treelog.h"
-#include "tmpstream.h"
 #include "mathlib.h"
+#include <sstream>
 
 class Hydraulic_Cosby : public Hydraulic
 {
@@ -147,12 +147,12 @@ Hydraulic_Cosby::initialize (const Texture& texture, double /* rho_b */,
   daisy_assert (Theta_sat < 1.0);
 
   // Debug messages.
-  TmpStream tmp;
-  tmp () << "mod_C\n";
-  tmp () << "(b " << b << " [])\n";
-  tmp () << "(h_b " << h_b << " [cm])\n";
-  tmp () << "(K_sat " << K_sat << " [cm/h])\n";
-  tmp () << "(Theta_sat " << Theta_sat << " [])";
+  std::ostringstream tmp;
+  tmp << "mod_C\n";
+  tmp << "(b " << b << " [])\n";
+  tmp << "(h_b " << h_b << " [cm])\n";
+  tmp << "(K_sat " << K_sat << " [cm/h])\n";
+  tmp << "(Theta_sat " << Theta_sat << " [])";
   msg.debug (tmp.str ());
 }
 

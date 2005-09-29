@@ -23,7 +23,7 @@
 #include "units.h"
 #include "vcheck.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <memory>
 
 using namespace std;
@@ -299,8 +299,8 @@ struct NumberOperands : public Number
             {
               if (operands[i]->dimension (scope) != *found)
                 {
-                  TmpStream tmp;
-                  tmp () << "Dimension [" << operands[i]->dimension (scope) 
+                  std::ostringstream tmp;
+                  tmp << "Dimension [" << operands[i]->dimension (scope) 
                          << "] differ from [" << *found << "]";
                   throw string (tmp.str ());
                 }
@@ -317,8 +317,8 @@ struct NumberOperands : public Number
     bool ok = true;
     for (size_t i = 0; i < operands.size (); i++)
       {
-        TmpStream tmp;
-        tmp () << name << "[" << i << "]";
+        std::ostringstream tmp;
+        tmp << name << "[" << i << "]";
         Treelog::Open nest (err, tmp.str ());
         
         if (!operands[i]->check (scope, err))

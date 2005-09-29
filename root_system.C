@@ -31,7 +31,7 @@
 #include "log.h"
 #include "check.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -94,8 +94,8 @@ RootSystem::water_uptake (double Ept_,
   if (Ept_ < 0)
     {
       Treelog::Open nest (msg, "RootSystem water uptake");
-      TmpStream tmp;
-      tmp () << "BUG: Negative EPT (" << Ept_ << ")";
+      std::ostringstream tmp;
+      tmp << "BUG: Negative EPT (" << Ept_ << ")";
       msg.error (tmp.str ());
       Ept_ = 0.0;
     }

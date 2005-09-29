@@ -107,8 +107,8 @@ WeatherHourly::tick (const Time& time, Treelog& out)
 
   if (!file.good ())
     {
-      TmpStream tmp;
-      tmp () << file_name << ":" << line << ": file error";
+      std::ostringstream tmp;
+      tmp << file_name << ":" << line << ": file error";
       out.error (tmp.str ());
       throw ("read error");
     }
@@ -140,8 +140,8 @@ WeatherHourly::tick (const Time& time, Treelog& out)
       daisy_assert (cloudiness_ >= 0 && cloudiness_ <= 1);
       if (!approximate (cloudiness_, hourly_cloudiness ()))
 	{
-	  TmpStream tmp;
-	  tmp () << "cloudiness read (" << cloudiness_ 
+	  std::ostringstream tmp;
+	  tmp << "cloudiness read (" << cloudiness_ 
 		 << ") != calculated (" << hourly_cloudiness () << ")";
 	  out.error (tmp.str ());
 	}

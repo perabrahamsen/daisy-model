@@ -23,9 +23,9 @@
 #include "check.h"
 #include "smb.h"
 #include "soil.h"
-#include "tmpstream.h"
 #include "treelog.h"
 #include "mathlib.h"
+#include <sstream>
 
 using namespace std;
 
@@ -171,8 +171,8 @@ You must have exactly two SMB pool with the 'biomod' clay model");
   const double f = find_f (r_SMB1, r_SMB2, 0.1);
   if (!approximate (f, 1.0, 0.01))
     {
-      TmpStream tmp;
-      tmp () << "\
+      std::ostringstream tmp;
+      tmp << "\
 The biomod clay model is calibrated so f (0.1) must be 1.0, that is,\n\
 the turnover and maintenance parameters are normalized for 10% clay content.\n\
 However, f (0.1) is " << f << ", which mean any results produced are bogus";
@@ -183,8 +183,8 @@ However, f (0.1) is " << f << ", which mean any results produced are bogus";
   const double f = find_f (r_SMB1, r_SMB2, 0.0);
   if (!approximate (f, 1.0, 0.01))
     {
-      TmpStream tmp;
-      tmp () << "\
+      std::ostringstream tmp;
+      tmp << "\
 The biomod clay model is calibrated so f (0.0) must be 1.0, that is,\n\
 the turnover and maintenance parameters are normalized zero clay content.\n\
 However, f (0.0) is " << f << ", which mean any results produced are bogus";
@@ -197,8 +197,8 @@ However, f (0.0) is " << f << ", which mean any results produced are bogus";
   const double g = factor (0.1);
   if (!approximate (g, 1.0, 0.01))
     {
-      TmpStream tmp;
-      tmp () << "\
+      std::ostringstream tmp;
+      tmp << "\
 The biomod clay model is calibrated so g (0.1) must be 1.0, that is,\n\
 the turnover and maintenance parameters are normalized for 10% clay content.\n\
 However, g (0.1) is " << g << ", which mean any results produced are bogus";
@@ -213,8 +213,8 @@ However, g (0.1) is " << g << ", which mean any results produced are bogus";
          target++)
       if (!approximate (smb[pool]->efficiency[target], E_SMB))
         {
-          TmpStream tmp;
-          tmp () << "\
+          std::ostringstream tmp;
+          tmp << "\
 The efficiency specified for the biomod clay model (E_SMB) must be the\n\
 same as specified for the SMB pools.  However, E_SMB is " << E_SMB << "\n\
 and SMB[" << pool << "].efficiency[" << target << "] is "

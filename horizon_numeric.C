@@ -26,7 +26,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <numeric>
 
 using namespace std;
@@ -91,9 +91,9 @@ static struct HorizonNumericSyntax
 
     if (limits.size () != fractions.size ())
       {
-        TmpStream tmp;
-        tmp () << "You have " << limits.size () << " limits, but "
-               << fractions.size () << " fractions";
+        std::ostringstream tmp;
+        tmp << "You have " << limits.size () << " limits, but "
+            << fractions.size () << " fractions";
         err.error (tmp.str ());
         ok = false;
       }

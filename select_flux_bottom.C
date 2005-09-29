@@ -23,7 +23,7 @@
 #include "select_value.h"
 #include "soil.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "treelog.h"
 
 using namespace std;
@@ -50,8 +50,8 @@ struct SelectFluxBottom : public SelectValue
             if ((index == 0 && height < -1e-8)
                 || !approximate (height, soil->zplus (index-1)))
               {
-                TmpStream tmp;
-                tmp () << "Log column " << name 
+                std::ostringstream tmp;
+                tmp << "Log column " << name 
                        << ": No interval near to = " << height 
                        << " [cm]; closest match is " 
                        << ((index == 0) ? 0 : soil->zplus (index-1))

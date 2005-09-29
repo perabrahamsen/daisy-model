@@ -28,7 +28,7 @@
 #include "log.h"
 #include "check.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -160,12 +160,12 @@ DOM::Element::transport (const Soil& soil,
   if (!approximate (delta_content, expected)
       && new_content < fabs (expected) * 1e10)
     {
-      TmpStream tmp;
-      tmp () << __FILE__ << ":" << __LINE__ << ": DOM"
-	     << ": mass balance new - old != source + in - out\n"
-	     << new_content << " - " << old_content << " != " 
-	     << source << " + " << in << " - " << out << " (error "
-	     << (delta_content - expected) << ")";
+      std::ostringstream tmp;
+      tmp << __FILE__ << ":" << __LINE__ << ": DOM"
+	  << ": mass balance new - old != source + in - out\n"
+	  << new_content << " - " << old_content << " != " 
+	  << source << " + " << in << " - " << out << " (error "
+	  << (delta_content - expected) << ")";
       msg.error (tmp.str ());
     }
 }

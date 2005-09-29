@@ -25,7 +25,7 @@
 #include "log.h"
 #include "plf.h"
 #include "check.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "mathlib.h"
 
 using namespace std;

@@ -34,7 +34,7 @@
 #include "soil_chemicals.h"
 #include "plf.h"
 #include "ridge.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "check.h"
 
 using namespace std;
@@ -239,15 +239,15 @@ Surface::Implementation::exfiltrate (Treelog& msg, double water /* mm */)
       Treelog::Open nest (msg, "Surface exfiltration");
       if (im.NO3 < 0.0)
 	{
-	  TmpStream tmp;
-	  tmp () << "BUG: Added " << -im.NO3 << " NO3 to surface";
+	  std::ostringstream tmp;
+	  tmp << "BUG: Added " << -im.NO3 << " NO3 to surface";
 	  msg.error (tmp.str ());
 	  im.NO3 = 0.0;
 	}
       if (im.NH4 < 0.0)
 	{
-	  TmpStream tmp;
-	  tmp () << "BUG: Added " << -im.NH4 << " NH4 to surface\n";
+	  std::ostringstream tmp;
+	  tmp << "BUG: Added " << -im.NH4 << " NH4 to surface\n";
 	  msg.error (tmp.str ());
 	  im.NH4 = 0.0;
 	}
@@ -484,8 +484,8 @@ Surface::evap_pond (Treelog& msg) const	// [mm/h]
   if (ep < -1e-13)
     {
       Treelog::Open nest (msg, "Surface evap pond");
-      TmpStream tmp;
-      tmp () << "BUG: evap_pond = " << ep;
+      std::ostringstream tmp;
+      tmp << "BUG: evap_pond = " << ep;
       msg.error (tmp.str ());
     }
   return 0.0;

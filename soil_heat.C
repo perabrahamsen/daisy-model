@@ -30,7 +30,7 @@
 #include "time.h"
 #include "mathlib.h"
 #include "log.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "submodel.h"
 
 using namespace std;
@@ -586,8 +586,8 @@ SoilHeat::Implementation::check (unsigned n, Treelog& err) const
   bool ok = true;
   if (T.size () != n)
     {
-      TmpStream tmp;
-      tmp () << "You have " << n << " intervals but " 
+      std::ostringstream tmp;
+      tmp << "You have " << n << " intervals but " 
 	     << T.size () << " T values";
       err.entry (tmp.str ());
       ok = false;

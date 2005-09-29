@@ -34,7 +34,6 @@
 #include "log.h"
 #include "check_range.h"
 #include "vcheck.h"
-#include "tmpstream.h"
 #include <vector>
 #include <map>
 

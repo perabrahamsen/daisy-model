@@ -27,7 +27,7 @@
 #include "syntax.h"
 #include "submodel.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "check.h"
 
 using namespace std;
@@ -56,11 +56,11 @@ Photosynthesis::operator () (double Ta,
   // One crop: daisy_assert (approximate (canopy.CAI, bioclimate.CAI ()));
   if (!approximate (LAIvsH (canopy.Height), canopy.CAI))
     {
-      TmpStream tmp;
-      tmp () << "Bug: CAI below top: " << LAIvsH (canopy.Height)
+      std::ostringstream tmp;
+      tmp << "Bug: CAI below top: " << LAIvsH (canopy.Height)
 	     << " Total CAI: " << canopy.CAI << "\n";
       canopy.CanopyStructure (DS);
-      tmp () << "Adjusted: CAI below top: " << LAIvsH (canopy.Height)
+      tmp << "Adjusted: CAI below top: " << LAIvsH (canopy.Height)
 	     << " Total CAI: " << canopy.CAI;
       msg.error (tmp.str ());
     }

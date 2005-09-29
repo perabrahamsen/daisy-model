@@ -29,7 +29,7 @@
 #include "common.h"
 #include "log.h"
 #include "average.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -315,8 +315,8 @@ UZRichard::richard (Treelog& msg,
 #if 0
 		      if (top.h () < 0.0)
 			{
-			  TmpStream tmp;
-			  tmp () << "TOP H = " << top.h () << ", H ABOVE = " 
+			  std::ostringstream tmp;
+			  tmp << "TOP H = " << top.h () << ", H ABOVE = " 
 				 << h_above;
 			  msg.error (tmp.str ());
 			}
@@ -391,8 +391,8 @@ UZRichard::richard (Treelog& msg,
           daisy_assert (h.size () > 1);
 	  if (h[0] < -1e9 || h[1] < -1e9 || h[size-1] < -1e9)
 	    {
-	      TmpStream tmp;
-	      tmp () << "ABSURD: h[0] = " << h[0] << " h[1] = " << h[1] 
+	      std::ostringstream tmp;
+	      tmp << "ABSURD: h[0] = " << h[0] << " h[1] = " << h[1] 
 		     << " h[" << (size-1) << "] = " << h[size-1]
 		     << " stepping down";
 	      msg.error (tmp.str ());
@@ -457,8 +457,8 @@ UZRichard::richard (Treelog& msg,
 		{
 		  if (approximate (switched_top_last, time_left))
 		    {
-		      TmpStream tmp;
-		      tmp () << "available_water = " << available_water 
+		      std::ostringstream tmp;
+		      tmp << "available_water = " << available_water 
 			     << ", delta_top_water = " << delta_top_water
 			     << ", time left = " << time_left;
 		      msg.debug (tmp.str ());
@@ -496,8 +496,8 @@ UZRichard::richard (Treelog& msg,
 	    }
 	  else if (switched_top_last < time_left + ddt / 2.0)
             {
-              TmpStream tmp;
-              tmp () << "last: " << switched_top_last 
+              std::ostringstream tmp;
+              tmp << "last: " << switched_top_last 
                      << "; time left: " << time_left << "; h[" << first 
                      << "] = " << h[first] <<"; q = " << top.q ();
               msg.debug (tmp.str ());
@@ -544,8 +544,8 @@ UZRichard::richard (Treelog& msg,
                         && i<2)
 		      {
 			error_found = true;
-			TmpStream tmp;
-			tmp () << "q[" << (i + 1) << "] = " << q[i+1]
+			std::ostringstream tmp;
+			tmp << "q[" << (i + 1) << "] = " << q[i+1]
 			       << ", darcy = " << darcy
 			       << "delta_top_water = " << delta_top_water
 			       << " ddt = " << ddt
@@ -668,10 +668,10 @@ UZRichard::q_darcy (const Soil& soil,
   int start = soil.interval_plus (start_pos) - 1;
   if (!(start < last - 2))
     {
-      TmpStream tmp;
-      tmp () << "We need at least 2 numeric nodes below 3/4 depth for \
+      std::ostringstream tmp;
+      tmp << "We need at least 2 numeric nodes below 3/4 depth for \
 calculating flow with pressure top.\n";
-      tmp () << "3/4 depth is " << start_pos << " [cm]\n"
+      tmp << "3/4 depth is " << start_pos << " [cm]\n"
              << "node " << start << " ends at " << soil.zplus (start) << " [cm]\n"
              << "last " << last << " ends at " << soil.zplus (last) << " [cm]";
       throw (string (tmp.str ()));

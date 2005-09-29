@@ -23,12 +23,12 @@
 #include "hydraulic.h"
 #include "plf.h"
 #include "log.h"
-#include "tmpstream.h"
 #include "check_range.h"
 #include "mathlib.h"
 #include "program.h"
 #include "vcheck.h"
 #include <memory>
+#include <sstream>
 
 EMPTY_TEMPLATE
 Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content = NULL;
@@ -89,14 +89,14 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
 	{
 	  if (step < 1e-15)
 	    {
-	      TmpStream tmp;
-	      tmp () << "Hydraulic conductivity changes too fast in " 
+	      std::ostringstream tmp;
+	      tmp << "Hydraulic conductivity changes too fast in " 
 		     << name << "\n";
-	      tmp () << "h = " << h << ", step = " << step 
+	      tmp << "h = " << h << ", step = " << step 
 		     << " and h + step = " << (h + step) << "\n";
-	      tmp () << "K (h) = " << K (h) << ", K (h + step) = "
+	      tmp << "K (h) = " << K (h) << ", K (h + step) = "
 		     << K (h + step) << " and K (0) = " << Ksat << "\n";
-	      tmp () << "Change = " << K (h + step) / K (h) 
+	      tmp << "Change = " << K (h + step) / K (h) 
 		     << " > Max = " << max_change;
 	      Assertion::debug (tmp.str ());
 	      break;
@@ -216,16 +216,16 @@ struct ProgramHydraulic_table : public Program
 
   void run (Treelog& msg)
   {
-    TmpStream tmp;
-    tmp () << "pressure\tpressure\tTheta\tK\n";
-    tmp () << "pF\tcm\t%\tcm/h\n";
+    std::ostringstream tmp;
+    tmp << "pressure\tpressure\tTheta\tK\n";
+    tmp << "pF\tcm\t%\tcm/h\n";
     for (int i = 0; i <= intervals; i++)
       {
         const double pF = (5.0 * i) / (intervals + 0.0);
         const double h = pF2h (pF);
         const double Theta = hydraulic->Theta (h) * 100;
         const double K = hydraulic->K (h);
-        tmp () << pF << "\t" << h << "\t" << Theta << "\t" << K << "\n";
+        tmp << pF << "\t" << h << "\t" << Theta << "\t" << K << "\n";
       }
     msg.message (tmp.str ());
   }

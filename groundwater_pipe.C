@@ -26,11 +26,11 @@
 #include "soil_heat.h"
 #include "soil_water.h"
 #include "depth.h"
-#include "tmpstream.h"
 #include "treelog.h"
 #include "mathlib.h"
 #include "check.h"
 #include <memory>
+#include <sstream>
 
 class GroundwaterPipe : public Groundwater
 {
@@ -118,9 +118,9 @@ public:
     if (largest > 10.0)
       {
 	Treelog::Open nest (msg, "Groundwater pipe");
-	TmpStream tmp;
-	tmp () << "WARNING: drained soil needs soil intervals < 10.0 cm; "
-	       << "largest is " << largest << "";
+	std::ostringstream tmp;
+	tmp << "WARNING: drained soil needs soil intervals < 10.0 cm; "
+	    << "largest is " << largest << "";
 	msg.warning (tmp.str ());
       }
 

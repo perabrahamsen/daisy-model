@@ -26,7 +26,7 @@
 #include "alist.h"
 #include "check.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "common.h"
 
 using namespace std;
@@ -75,8 +75,8 @@ static bool check_alist (const AttributeList& al, Treelog& err)
 
   if (Shoot.max () > 1.0001)
     {
-      TmpStream tmp;
-      tmp () << "Leaf and Stem fractions must be <= 1.0 combined.\n"
+      std::ostringstream tmp;
+      tmp << "Leaf and Stem fractions must be <= 1.0 combined.\n"
 	     << "They are " << Shoot.max () << " at " << Shoot.max_at ();
       err.error (tmp.str ());
       ok = false;

@@ -27,7 +27,7 @@
 #include "treelog_dual.h"
 #include "options.h"
 #include "assertion.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <stdexcept>
 #include <typeinfo>
 #include <iostream>
@@ -123,15 +123,15 @@ attributes.");
 	return 1;
 
       const string when = string ("Program started ") + ctime (&start_time);
-      TmpStream start_msg;
-      start_msg () << when.substr (0, when.size () - 1);
+      std::ostringstream start_msg;
+      start_msg << when.substr (0, when.size () - 1);
       const time_t time_ago = time (NULL) - start_time;
       if (time_ago == 0)
-	start_msg () << ".";
+	start_msg << ".";
       if (time_ago == 1)
-	start_msg () << ", 1 second ago.";
+	start_msg << ", 1 second ago.";
       else
-	start_msg () << ", " << time_ago << " seconds ago.";
+	start_msg << ", " << time_ago << " seconds ago.";
       treelog.message (start_msg.str ());
 
       program->run (treelog);
@@ -140,20 +140,20 @@ attributes.");
       const int hours = time_used / 3600;
       const int minutes = (time_used % 3600) / 60;
       const int seconds = time_used % 60;
-      TmpStream end_msg;
-      end_msg () << "Program finished after ";
+      std::ostringstream end_msg;
+      end_msg << "Program finished after ";
       if (hours == 1)
-	end_msg () << "1 hour, ";
+	end_msg << "1 hour, ";
       else if (hours > 0)
-	end_msg () << hours << " hours, ";
+	end_msg << hours << " hours, ";
       if (minutes == 1)
-	end_msg () << " 1 minute and ";
+	end_msg << " 1 minute and ";
       else if (hours > 0 || minutes > 0)
-	end_msg () << minutes << " minutes and ";
+	end_msg << minutes << " minutes and ";
       if (seconds == 1)
-	end_msg () << "1 second.";
+	end_msg << "1 second.";
       else
-	end_msg () << seconds << " seconds.";
+	end_msg << seconds << " seconds.";
       treelog.message (end_msg.str ());
       
       // All is well.

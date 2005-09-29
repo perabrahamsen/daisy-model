@@ -27,7 +27,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -104,8 +104,8 @@ Solute::tick (const Soil& soil,
 	{
 	  if (soil_water.q (0) > 1.0e-10)
 	    {
-	      TmpStream tmp;
-	      tmp () << "BUG: q_p[0] = " << soil_water.q_p (0) 
+	      std::ostringstream tmp;
+	      tmp << "BUG: q_p[0] = " << soil_water.q_p (0) 
 		     << " and q[0] = " << soil_water.q (0);
 	      msg.error (tmp.str ());
 	    }
@@ -173,8 +173,8 @@ Solute::tick (const Soil& soil,
   if (!approximate (delta_content, expected)
       && new_content < fabs (expected) * 1e10)
     {
-      TmpStream tmp;
-      tmp () << __FILE__ << ":" << __LINE__ << ":" << submodel
+      std::ostringstream tmp;
+      tmp << __FILE__ << ":" << __LINE__ << ":" << submodel
 	     << ": mass balance new - old != source + in - out\n"
 	     << new_content << " - " << old_content << " != " 
 	     << source << " + " << in << " - " << out << " (error "

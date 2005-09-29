@@ -23,7 +23,7 @@
 #include "fetch.h"
 #include "select.h"
 #include "treelog.h"
-#include "tmpstream.h"
+#include <sstream>
 
 #include <fstream>
 #include <string>
@@ -84,11 +84,11 @@ void
 SummarySimple::summarize (const int hours, Treelog& msg) const
 {
   Treelog::Open nest (msg, title);
-  TmpStream tmp;
-  tmp ().precision (precision);
-  tmp ().flags (ios::right | ios::fixed);
+  std::ostringstream tmp;
+  tmp.precision (precision);
+  tmp.flags (ios::right | ios::fixed);
   if (description != default_description)
-    tmp () << description << "\n\n";
+    tmp << description << "\n\n";
 
   double total = 0.0;
   const int sum_size = sum_name.name ().size ();
@@ -112,18 +112,18 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
       else if (same_dim && fetch[i]->dimension (period) != last_dim)
 	same_dim = false;
 	
-      tmp () << string (max_size - fetch[i]->name_size (), ' ');
-      fetch[i]->summarize (tmp (), width, period, hours);
+      tmp << string (max_size - fetch[i]->name_size (), ' ');
+      fetch[i]->summarize (tmp, width, period, hours);
     }
   if (print_sum)
   {
-    tmp () << string (max_size + 3 + width + 3 + dim_size, '-') << "\n"
+    tmp << string (max_size + 3 + width + 3 + dim_size, '-') << "\n"
 	   << string (max_size - sum_size, ' ') << sum_name << " = ";
-    tmp ().width (width);
-    tmp () << total;
+    tmp.width (width);
+    tmp << total;
     if (same_dim)
-      tmp () << " [" << last_dim << "]";
-    tmp () << "\n" << string (max_size + 3, ' ') << string (width, '=');
+      tmp << " [" << last_dim << "]";
+    tmp << "\n" << string (max_size + 3, ' ') << string (width, '=');
   }
   if (file == "")
     msg.message (tmp.str ());

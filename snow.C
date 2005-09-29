@@ -29,7 +29,7 @@
 #include "soil_heat.h"
 #include "submodel.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 
 using namespace std;
 
@@ -203,8 +203,8 @@ Snow::Implementation::tick (Treelog& msg,
       if (Ssnow_new < -1.0e-7)
 	{
 	  Treelog::Open nest (msg, "Snow");
-	  TmpStream tmp;
-	  tmp () << "Lost " << -Ssnow_new << " mm from snow pack.";
+	  std::ostringstream tmp;
+	  tmp << "Lost " << -Ssnow_new << " mm from snow pack.";
 	  msg.error (tmp.str ());
 	}
       Ssnow_new = 0.0;
@@ -217,8 +217,8 @@ Snow::Implementation::tick (Treelog& msg,
       if (Swater_new < -1.0e-7)
 	{
 	  Treelog::Open nest (msg, "Snow");
-	  TmpStream tmp;
-	  tmp () << "Lost " << -Swater_new << " mm water from snow pack.";
+	  std::ostringstream tmp;
+	  tmp << "Lost " << -Swater_new << " mm water from snow pack.";
 	  msg.error (tmp.str ());
 	}
       Swater_new = 0.0;
@@ -228,8 +228,8 @@ Snow::Implementation::tick (Treelog& msg,
       if (Swater_new > Ssnow_new + 1.0e-7)
 	{
 	  Treelog::Open nest (msg, "Snow");
-	  TmpStream tmp;
-	  tmp () << "Removed " << (Swater_new - Ssnow_new) << " mm water.";
+	  std::ostringstream tmp;
+	  tmp << "Removed " << (Swater_new - Ssnow_new) << " mm water.";
 	  msg.error (tmp.str ());
 	}
       Swater_new = Ssnow_new;

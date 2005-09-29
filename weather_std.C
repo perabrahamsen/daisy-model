@@ -25,7 +25,7 @@
 #include "lexer_data.h"
 #include "time.h"
 #include "plf.h"
-#include "tmpstream.h"
+#include <sstream>
 #include "mathlib.h"
 #include "units.h"
 #include "check.h"
@@ -310,8 +310,8 @@ WeatherStandard::YearMap::YearInterval::check_alist (const AttributeList& al,
   const int to = al.integer ("to");
   if (from > to)
     {
-      TmpStream tmp;
-      tmp () << "Start year " << from << " comes after end year " << to;
+      std::ostringstream tmp;
+      tmp << "Start year " << from << " comes after end year " << to;
       err.error (tmp.str ());
       ok = false;
     }
@@ -355,8 +355,8 @@ WeatherStandard::YearMap::check_alist (const AttributeList& al, Treelog& msg)
   
   if (from.size () != to.size ())
     {
-      TmpStream tmp;
-      tmp () << "You cannot map " << from.size () << " years to "
+      std::ostringstream tmp;
+      tmp << "You cannot map " << from.size () << " years to "
 	     << to.size () << " years";
       msg.error (tmp.str ());
       ok = false;
@@ -632,8 +632,8 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
       active_map = find_map (time);
       if (active_map >= 0)
 	{
-	  TmpStream tmp;
-	  tmp () << "Using data from [" << missing_years[active_map]->to.from
+	  std::ostringstream tmp;
+	  tmp << "Using data from [" << missing_years[active_map]->to.from
 		 << "-" << missing_years[active_map]->to.to << "] for years ["
 		 << missing_years[active_map]->from.from << "-"
 		 << missing_years[active_map]->from.to << "]";
@@ -662,8 +662,8 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
       missing_years[active_map]->map_time (now);
       if (!now.between (begin, end))
         {
-	  TmpStream tmp;
-	  tmp () << "No mapped weather data for " << now.year () 
+	  std::ostringstream tmp;
+	  tmp << "No mapped weather data for " << now.year () 
 		 << "-" << now.month ()
 		 << "-" << now.mday () << ":" << now.hour ();
 	  msg.error (tmp.str ());
@@ -672,8 +672,8 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
     }
   if (!now.between (begin, end))
     {
-      TmpStream tmp;
-      tmp () << "No weather data for " << time.year () 
+      std::ostringstream tmp;
+      tmp << "No weather data for " << time.year () 
              << "-" << time.month ()
              << "-" << time.mday () << ":" << time.hour ()
              << "\nReusing yesterdays data.";
@@ -1103,8 +1103,8 @@ but not both");
                                  + ((WetDeposit.NH4 + WetDeposit.NO3)
                                     * deposition.precipitation / 100.0),
                                  deposition.total));
-      TmpStream tmp;
-      tmp () << "NH4WetDep: " << WetDeposit.NH4 << " ppm\n\
+      std::ostringstream tmp;
+      tmp << "NH4WetDep: " << WetDeposit.NH4 << " ppm\n\
 NH4DryDep: " << DryDeposit.NH4 << " kgN/ha/year\n\
 NO3WetDep: " << WetDeposit.NO3 << " ppm\n\
 NO3DryDep: " << DryDeposit.NO3 << " kgN/ha/year";
@@ -1268,8 +1268,8 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
     }
   if (lex->error_count > 0)
     {
-      TmpStream tmp;
-      tmp () << lex->error_count << " parser errors encountered";
+      std::ostringstream tmp;
+      tmp << lex->error_count << " parser errors encountered";
       err.error (tmp.str ());
       return false;
     }
@@ -1285,15 +1285,15 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
     }
   for (unsigned int i = 0; i < missing_years.size (); i++)
     {
-      TmpStream tmp;
-      tmp () << "missing_years[" << i << "]";
+      std::ostringstream tmp;
+      tmp << "missing_years[" << i << "]";
       Treelog::Open nest (err, tmp.str ());
       const int from_from = missing_years[i]->from.from;
       const int from_to = missing_years[i]->from.to;
       if (from_from > begin.year () && from_to < end.year ())
 	{
-	  TmpStream tmp;
-	  tmp () << "domain [" << from_from << "-" << from_to 
+	  std::ostringstream tmp;
+	  tmp << "domain [" << from_from << "-" << from_to 
 		 << "] fully within [" << begin.year () << "-" << end.year ()
 		 << "]";
 	  err.warning (tmp.str ());
@@ -1302,8 +1302,8 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
       const int to_to = missing_years[i]->to.to;
       if (to_from < begin.year () || to_to > end.year ())
 	{
-	  TmpStream tmp;
-	  tmp () << "range [" << to_from << "-" << to_to << "] not within [" 
+	  std::ostringstream tmp;
+	  tmp << "range [" << to_from << "-" << to_to << "] not within [" 
 		 << begin.year () << "-" << end.year () << "]";
 	  err.error (tmp.str ());
 	  ok = false;
@@ -1311,8 +1311,8 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
     }
   if (latitude < -66 || latitude > 66)
     {
-      TmpStream tmp;
-      tmp () << "Researching arctic agriculture? (latitude = " << 
+      std::ostringstream tmp;
+      tmp << "Researching arctic agriculture? (latitude = " << 
 	latitude << ")";
       err.error (tmp.str ());
     }

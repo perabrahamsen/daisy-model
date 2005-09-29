@@ -25,7 +25,7 @@
 #include "hydraulic.h"
 #include "check.h"
 #include "mathlib.h"
-#include "tmpstream.h"
+#include <sstream>
 #include <numeric>
 
 using namespace std;
@@ -138,13 +138,13 @@ HorizonSystem::System::add_to_lib (Horizon& (make)(const AttributeList&),
     daisy_assert (names.size () == limits.size ());
     for (unsigned int i = 0; i < names.size (); i++)
       {
-        TmpStream tmp;
-        tmp () << "Mineral particles ";
+        std::ostringstream tmp;
+        tmp << "Mineral particles ";
         if (i < 1)
-          tmp () << "up to";
+          tmp << "up to";
         else
-          tmp () << "between " << limits[i-1] << " [um] and";
-        tmp () << " " << limits[i] << " [um].";
+          tmp << "between " << limits[i-1] << " [um] and";
+        tmp << " " << limits[i] << " [um].";
         
         syntax.add_fraction (names[i], Syntax::Const, tmp.str ());
       }
