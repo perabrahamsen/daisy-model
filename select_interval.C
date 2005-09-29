@@ -95,7 +95,7 @@ struct SelectInterval : public SelectValue
     double result;
     if (to > 0.0)
       {
-	if (!isnormal (from))
+	if (!std::isnormal (from))
           result = soil->total (array);
 	else
 	  {

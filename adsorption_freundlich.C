@@ -67,7 +67,7 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
 			      double Theta, int i, double M) const
 {
   // Check for zero.
-  if (!isnormal (M))
+  if (!std::isnormal (M))
     return 0.0;
 
   // Guess start boundary.

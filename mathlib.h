@@ -26,27 +26,7 @@
 #include <vector>
 #define _GLIBCPP_USE_C99 1
 #define __USE_ISOC99 1
-#include <math.h>
-
-#if 0 // def _MSC_VER
-template <class T>
-T min (T a, T b)
-{ return (a < b) ? a : b; }
-
-template <class T>
-T max (T a, T b)
-{ return (a > b) ? a : b; }
-#endif // Visual C++
-
-#if !defined (isfinite)
-inline bool isfinite (double x)
-{ return x <= 0.0 || x >= 0.0; }
-#endif
-
-#if !defined (isnormal)
-inline bool isnormal (double x)
-{ return isfinite (x) && x != 0.0; }
-#endif
+#include <cmath>
 
 #ifndef pow
 #define pow(x, y) safe_pow (x, y, __FILE__, __LINE__)
