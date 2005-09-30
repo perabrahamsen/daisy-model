@@ -30,6 +30,7 @@
 #include "units.h"
 #include "check.h"
 #include "vcheck.h"
+#include "memutils.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>

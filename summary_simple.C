@@ -23,8 +23,8 @@
 #include "fetch.h"
 #include "select.h"
 #include "treelog.h"
+#include "memutils.h"
 #include <sstream>
-
 #include <fstream>
 #include <string>
 using namespace std;

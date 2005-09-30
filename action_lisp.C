@@ -23,6 +23,7 @@
 #include "action.h"
 #include "daisy.h"
 #include "log.h"
+#include "memutils.h"
 // We need to initialize the Condition library.
 #include "condition.h"
 

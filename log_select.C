@@ -22,8 +22,9 @@
 
 #include "log_select.h"
 #include "field.h"
-#include <sstream>
 #include "format.h"
+#include "memutils.h"
+#include <sstream>
 
 using namespace std;
 

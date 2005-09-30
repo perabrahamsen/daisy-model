@@ -23,6 +23,7 @@
 #include "lexer_data.h"
 #include "vcheck.h"
 #include "mathlib.h"
+#include "memutils.h"
 #include <sstream>
 
 static int

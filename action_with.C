@@ -26,6 +26,7 @@
 #include "alist.h"
 #include "field.h"
 #include "log.h"
+#include "memutils.h"
 
 using namespace std;
 

@@ -23,6 +23,7 @@
 #include "fetch.h"
 #include "select.h"
 #include "treelog.h"
+#include "memutils.h"
 #include <sstream>
 #include <algorithm>
 #include <fstream>

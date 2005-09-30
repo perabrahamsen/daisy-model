@@ -27,7 +27,7 @@
 #include <sstream>
 #include "assertion.h"
 #include "symbol.h"
-#include "common.h"
+#include "memutils.h"
 #include "options.h"
 #include <map>
 #include <set>

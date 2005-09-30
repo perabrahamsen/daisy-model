@@ -329,6 +329,7 @@ struct NumberDim : public Number
   // Parameters.
   const auto_ptr<Number> child;
   const string dim;
+  const bool warn_known;
 
   // Simulation.
   bool missing (const Scope& scope) const 
@@ -347,7 +348,7 @@ struct NumberDim : public Number
     if (!child->check (scope, err))
       ok = false;
     
-    if (known (child->dimension (scope)))
+    if (warn_known && known (child->dimension (scope)))
       err.warning ("Dimension for child already known");
 
     return ok;
@@ -355,7 +356,8 @@ struct NumberDim : public Number
   NumberDim (const AttributeList& al)
     : Number (al),
       child (Librarian<Number>::create (al.alist ("value"))),
-      dim (al.name ("dimension"))
+      dim (al.name ("dimension")),
+      warn_known (al.flag ("warn_known"))
   { }
 };
 
@@ -371,6 +373,9 @@ static struct NumberDimSyntax
     alist.add ("description", "Specify dimension for number.");
     syntax.add ("value", Librarian<Number>::library (),
 		"Operand for this function.");
+    syntax.add ("warn_known", Syntax::Boolean, Syntax::Const,
+                "Issue a warning if the dimensions is already known.");
+    alist.add ("warn_known", true);
     syntax.add ("dimension", Syntax::String, Syntax::Const,
 		"Dimension to use.");
     syntax.order ("value", "dimension");

@@ -32,8 +32,9 @@
 #include "check.h"
 #include "vcheck.h"
 #include "plf.h"
-#include <sstream>
+#include "memutils.h"
 #include "mathlib.h"
+#include <sstream>
 #include <iomanip>
 #include <iostream>
 

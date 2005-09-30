@@ -26,6 +26,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "mathlib.h"
+#include "memutils.h"
 
 using namespace std;
 

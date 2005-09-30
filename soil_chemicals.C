@@ -32,6 +32,7 @@
 #include "alist.h"
 #include "soil_chemical.h"
 #include "submodel.h"
+#include "memutils.h"
 #include <map>
 #include <set>
 

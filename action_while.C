@@ -22,6 +22,7 @@
 
 #include "action.h"
 #include "log.h"
+#include "memutils.h"
 
 using namespace std;
 

@@ -26,7 +26,7 @@
 #include "soil_water.h"
 #include "soil.h"
 #include "log.h"
-#include "common.h"
+#include "timestep.h"
 #include "im.h"
 #include "mathlib.h"
 #include "submodel.h"

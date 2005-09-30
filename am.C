@@ -32,6 +32,7 @@
 #include "vcheck.h"
 #include "mathlib.h"
 #include "program.h"
+#include "memutils.h"
 #include <numeric>
 #include <sstream>
 

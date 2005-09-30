@@ -27,7 +27,7 @@
 #include "alist.h"
 #include "soil.h"
 #include "soil_heat.h"
-#include "common.h"
+#include "timestep.h"
 #include "syntax.h"
 #include "snow.h"
 #include "log.h"

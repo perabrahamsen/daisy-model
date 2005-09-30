@@ -20,6 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "column_base.h"
+#include "memutils.h"
 
 using namespace std;
 

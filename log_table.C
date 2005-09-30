@@ -27,6 +27,7 @@
 #include "dlf.h"
 #include "daisy.h"
 #include "vcheck.h"
+#include "memutils.h"
 #include <sstream>
 #include <fstream>
 

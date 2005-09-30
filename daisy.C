@@ -35,8 +35,8 @@
 #include "syntax.h"
 #include "condition.h"
 #include "alist.h"
-#include "common.h"
 #include "column.h"
+#include "memutils.h"
 #include <sstream>
 
 using namespace std;

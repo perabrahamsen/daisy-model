@@ -30,6 +30,7 @@
 #include "path.h"
 #include "units.h"
 #include "mathlib.h"
+#include "memutils.h"
 #include <set>
 #include <memory>
 #include <sstream>

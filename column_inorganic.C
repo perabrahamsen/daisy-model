@@ -22,6 +22,7 @@
 
 #include "column_base.h"
 #include "am.h"
+#include "memutils.h"
 
 using namespace std;
 

@@ -31,6 +31,7 @@
 #include "check_range.h"
 #include "im.h"
 #include "vcheck.h"
+#include "memutils.h"
 #include <sstream>
 
 using namespace std;

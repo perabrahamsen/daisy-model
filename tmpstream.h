@@ -22,6 +22,7 @@
 // 
 // I'd use "ostringstream", but it isn't in GCC 2.95.2.
 
+#error "Use std::ostringstream instead"
 #ifndef TMPSTREAM_H
 #define TMPSTREAM_H
 

@@ -24,6 +24,7 @@
 #include "treelog.h"
 #include "path.h"
 #include "mathlib.h"
+#include "memutils.h"
 #include <string>
 #include <set>
 #include <fstream>

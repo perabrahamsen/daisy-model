@@ -27,7 +27,6 @@
 #include "check.h"
 #include "mathlib.h"
 #include <sstream>
-#include "common.h"
 
 using namespace std;
 

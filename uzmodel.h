@@ -24,6 +24,7 @@
 #define UZMODEL_H
 
 #include "librarian.h"
+#include "timestep.h"
 
 class Soil;
 class SoilHeat;

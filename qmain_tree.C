@@ -23,8 +23,6 @@
 #include "qmain_item.h"
 #include "qmain_populate.h"
 
-#include "common.h"
-
 #include <map>
 
 class TreeState

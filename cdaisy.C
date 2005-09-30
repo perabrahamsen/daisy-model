@@ -30,7 +30,6 @@
 #include "field.h"
 #include "column.h"
 #include "weather.h"
-#include "common.h"
 #include "action.h"
 #include "horizon.h"
 #include "printer_file.h"

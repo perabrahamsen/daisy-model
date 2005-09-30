@@ -23,6 +23,7 @@
 #include "units.h"
 #include "vcheck.h"
 #include "mathlib.h"
+#include "memutils.h"
 #include <sstream>
 #include <memory>
 

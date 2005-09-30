@@ -22,6 +22,7 @@
 #include "program.h"
 #include "treelog.h"
 #include "path.h"
+#include "memutils.h"
 #include <vector>
 
 struct ProgramBatch : public Program

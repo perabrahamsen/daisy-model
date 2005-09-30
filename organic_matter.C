@@ -44,6 +44,7 @@
 #include "check_range.h"
 #include "vcheck.h"
 #include "gaussj.h"
+#include "memutils.h"
 #include <algorithm>
 #include <numeric>
 #include <fstream>

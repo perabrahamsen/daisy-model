@@ -27,7 +27,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "assertion.h"
-#include "common.h"
+#include "memutils.h"
 #include <map>
 #include <algorithm>
 

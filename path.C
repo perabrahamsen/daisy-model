@@ -1,7 +1,6 @@
 // path.C -- Handle Unix and WinDOS style paths.
 
 #include "path.h"
-#include "common.h"
 #include "assertion.h"
 
 // Get chdir.

@@ -23,6 +23,8 @@
 // This file should contain compiler specific workarounds for bugs and
 // global constants.
 
+#error "Use timestep.h or memutils.h instead"
+
 #ifndef COMMON_H
 #define COMMON_H
 

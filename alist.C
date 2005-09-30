@@ -25,7 +25,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "time.h"
-#include "common.h"
+#include "memutils.h"
 #include "assertion.h"
 #include <map>
 

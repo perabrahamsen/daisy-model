@@ -29,6 +29,7 @@
 #include "mathlib.h"
 #include "check.h"
 #include "vcheck.h"
+#include "memutils.h"
 #include <vector>
 #include <memory>
 #include <sstream>

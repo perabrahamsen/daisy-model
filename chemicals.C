@@ -28,6 +28,7 @@
 #include "submodel.h"
 #include "treelog.h"
 #include "mathlib.h"
+#include "timestep.h"
 #include <map>
 
 using namespace std;
