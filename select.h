@@ -156,7 +156,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Select>::Content* Librarian<Select>::content;
 #endif
 

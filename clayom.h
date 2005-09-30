@@ -56,7 +56,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<ClayOM>::Content* Librarian<ClayOM>::content;
 #endif
 

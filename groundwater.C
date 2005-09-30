@@ -24,7 +24,7 @@
 #include "log.h"
 #include "assertion.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Groundwater>::Content* Librarian<Groundwater>::content = NULL;
 
 const char *const Groundwater::description = "\

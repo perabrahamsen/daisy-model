@@ -23,7 +23,7 @@
 #include "rootdens.h"
 #include "check.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Rootdens>::Content* Librarian<Rootdens>::content = NULL;
 
 const char *const Rootdens::description = "\

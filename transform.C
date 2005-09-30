@@ -21,7 +21,7 @@
 
 #include "transform.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Transform>::Content* Librarian<Transform>::content = NULL;
 
 const char *const Transform::description = "\

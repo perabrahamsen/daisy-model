@@ -55,7 +55,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Mactrans>::Content* Librarian<Mactrans>::content;
 #endif
 

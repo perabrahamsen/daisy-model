@@ -66,7 +66,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Groundwater>::Content* Librarian<Groundwater>::content;
 #endif
 

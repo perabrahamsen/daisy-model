@@ -25,7 +25,7 @@
 #include "weather.h"
 #include "mathlib.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<NetRadiation>::Content* Librarian<NetRadiation>::content = NULL;
 
 const char *const NetRadiation::description = "\

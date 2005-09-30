@@ -25,7 +25,7 @@
 #include "mathlib.h"
 #include <memory>
 
-EMPTY_TEMPLATE
+template<>
 Librarian<WSE>::Content* Librarian<WSE>::content = NULL;
 
 const char *const WSE::description = "\

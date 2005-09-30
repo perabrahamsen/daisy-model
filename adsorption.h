@@ -48,7 +48,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Adsorption>::Content* Librarian<Adsorption>::content;
 #endif
 

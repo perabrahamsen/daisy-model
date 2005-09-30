@@ -24,7 +24,7 @@
 #include "log.h"
 #include <map>
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Column>::Content* Librarian<Column>::content = NULL;
 
 const char *const Column::description = "\

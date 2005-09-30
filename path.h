@@ -5,18 +5,7 @@
 
 #include <vector>
 #include <string>
-
-#if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
-struct istream;
-struct ostream;
-namespace std 
-{ 
-  typedef istream istream;
-  typedef ostream ostream;
-}
-#else
 #include <iosfwd>
-#endif
 
 namespace Path
 {

@@ -121,10 +121,6 @@ struct clause
   { }
 };
 
-#ifdef BORLAND_TEMPLATES
-template class vector<clause>;
-#endif
-
 vector<clause>& make_clauses (const vector<AttributeList*>& s)
 {
   vector<clause>& c = *new vector<clause>;

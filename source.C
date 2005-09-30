@@ -20,7 +20,7 @@
 
 #include "source.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Source>::Content* Librarian<Source>::content = NULL;
 
 const char *const Source::description = "\

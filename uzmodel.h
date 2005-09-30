@@ -100,7 +100,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<UZmodel>::Content* Librarian<UZmodel>::content;
 #endif
 

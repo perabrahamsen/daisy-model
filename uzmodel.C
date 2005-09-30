@@ -47,7 +47,7 @@ UZmodel::UZmodel (const AttributeList& al)
 UZmodel::~UZmodel ()
 { }
 
-EMPTY_TEMPLATE
+template<>
 Librarian<UZmodel>::Content* Librarian<UZmodel>::content = NULL;
 
 const char *const UZmodel::description = "\

@@ -31,7 +31,7 @@
 
 // depth component.
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Depth>::Content* Librarian<Depth>::content = NULL;
 
 const char *const Depth::description = "\

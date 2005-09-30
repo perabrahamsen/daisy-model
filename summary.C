@@ -21,7 +21,7 @@
 
 #include "summary.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Summary>::Content* Librarian<Summary>::content = NULL;
 
 const char *const Summary::description = "\

@@ -58,7 +58,7 @@ Handle::symbol2handle (symbol s)
   return (*i).second;
 }  
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Select>::Content* Librarian<Select>::content = NULL;
 
 const char *const Select::description = "Select part of state.";

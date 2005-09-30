@@ -58,7 +58,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Pedotransfer>::Content* Librarian<Pedotransfer>::content;
 #endif
 

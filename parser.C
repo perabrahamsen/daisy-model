@@ -22,7 +22,7 @@
 
 #include "parser.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Parser>::Content* Librarian<Parser>::content = NULL;
 
 const char *const Parser::description = "\

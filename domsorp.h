@@ -56,7 +56,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Domsorp>::Content* Librarian<Domsorp>::content;
 #endif
 

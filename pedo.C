@@ -27,7 +27,7 @@
 
 using namespace std;
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Pedotransfer>::Content* Librarian<Pedotransfer>::content = NULL;
 
 const char *const Pedotransfer::description = "\

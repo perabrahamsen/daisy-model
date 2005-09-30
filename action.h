@@ -52,7 +52,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Action>::Content* Librarian<Action>::content;
 #endif
 

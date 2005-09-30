@@ -53,7 +53,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Equilibrium>::Content* Librarian<Equilibrium>::content;
 #endif
 

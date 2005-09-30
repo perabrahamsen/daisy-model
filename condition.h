@@ -49,7 +49,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Condition>::Content* Librarian<Condition>::content;
 #endif
 

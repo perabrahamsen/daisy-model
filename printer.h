@@ -58,7 +58,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Printer>::Content* Librarian<Printer>::content;
 #endif
 

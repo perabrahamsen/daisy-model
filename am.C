@@ -37,7 +37,7 @@
 
 using namespace std;
 
-EMPTY_TEMPLATE
+template<>
 Librarian<AM>::Content* Librarian<AM>::content = NULL;
 
 const char *const AM::description = "\

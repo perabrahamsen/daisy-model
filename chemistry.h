@@ -54,7 +54,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Chemistry>::Content* Librarian<Chemistry>::content;
 #endif
 

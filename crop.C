@@ -8,7 +8,7 @@ using namespace std;
 
 const double Crop::DSremove = -5001.0;
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Crop>::Content* Librarian<Crop>::content = NULL;
 
 const char *const Crop::description = "\

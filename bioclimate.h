@@ -106,7 +106,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Bioclimate>::Content* Librarian<Bioclimate>::content;
 #endif
 

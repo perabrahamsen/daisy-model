@@ -219,7 +219,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Format>::Content* Librarian<Format>::content;
 #endif
 

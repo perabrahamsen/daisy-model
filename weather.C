@@ -28,7 +28,7 @@
 
 using namespace std;
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Weather>::Content* Librarian<Weather>::content = NULL;
 
 const char *const Weather::description = "\

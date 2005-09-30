@@ -21,7 +21,7 @@
 
 #include "program.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Program>::Content* Librarian<Program>::content = NULL;
 
 const char *const Program::description = "\

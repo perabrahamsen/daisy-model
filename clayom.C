@@ -21,7 +21,7 @@
 
 #include "clayom.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<ClayOM>::Content* Librarian<ClayOM>::content = NULL;
 
 const char *const ClayOM::description = "\

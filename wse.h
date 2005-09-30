@@ -45,7 +45,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<WSE>::Content* Librarian<WSE>::content;
 #endif
 

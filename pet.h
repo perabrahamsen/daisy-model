@@ -66,7 +66,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Pet>::Content* Librarian<Pet>::content;
 #endif
 

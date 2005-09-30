@@ -29,7 +29,7 @@
 #include "log.h"
 #include "mathlib.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Nitrification>::Content* Librarian<Nitrification>::content = NULL;
 
 const char *const Nitrification::description = "\

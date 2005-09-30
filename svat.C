@@ -23,7 +23,7 @@
 #include "svat.h"
 #include "log.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<SVAT>::Content* Librarian<SVAT>::content = NULL;
 
 const char *const SVAT::description = "\

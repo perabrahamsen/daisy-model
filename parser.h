@@ -50,7 +50,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Parser>::Content* Librarian<Parser>::content;
 #endif
 

@@ -23,7 +23,7 @@
 #include "vegetation.h"
 #include "log.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Vegetation>::Content* Librarian<Vegetation>::content = NULL;
 
 const char *const Vegetation::description = "\

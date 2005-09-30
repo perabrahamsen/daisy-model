@@ -44,7 +44,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Average>::Content* Librarian<Average>::content;
 #endif
 

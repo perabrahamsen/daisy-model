@@ -23,7 +23,6 @@
 #ifndef LIBRARIAN_H
 #define LIBRARIAN_H
 
-#include "common.h"		// For BORLAND TEMPLATES and EMPTY_TEMPLATE
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
@@ -117,7 +116,6 @@ public:
 };
 
 // This cutie will create a vector of objects from a vector of alists.
-#ifndef BORLAND_TEMPLATES
 template <class T> 
 std::vector<T*>
 map_create (const std::vector<AttributeList*>& f)
@@ -165,68 +163,5 @@ map_construct_const (const std::vector<AttributeList*>& f)
     t.push_back (new T (**i));
   return t;
 }
-
-#else
-
-template <class T> 
-struct map_create
-{
-  std::vector<T*> t;
-  map_create (const std::vector<AttributeList*>& f)
-  { 
-    for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (Librarian<T>::create (**i));
-  }
-  operator std::vector<T*> ()
-  { return t; }
-};
-
-template <class T> 
-struct map_create_const
-{
-  std::vector<const T*> t;
-  map_create_const (const std::vector<AttributeList*>& f)
-  { 
-    for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (Librarian<T>::create (**i));
-  }
-  operator std::vector<const T*> ()
-  { return t; }
-};
-
-template <class T> 
-struct map_construct
-{
-  std::vector<T*> t;
-  map_construct (const std::vector<AttributeList*>& f)
-  { 
-    for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (new T (**i));
-  }
-  operator std::vector<T*> ()
-  { return t; }
-};
-
-template <class T> 
-struct map_construct_const
-{
-  std::vector<const T*> t;
-  map_construct_const (const std::vector<AttributeList*>& f)
-  { 
-    for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (new T (**i));
-  }
-  operator std::vector<const T*> ()
-  { return t; }
-};
-#endif
 
 #endif // LIBRARIAN_H

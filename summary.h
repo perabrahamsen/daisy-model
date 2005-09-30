@@ -47,7 +47,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Summary>::Content* Librarian<Summary>::content;
 #endif
 

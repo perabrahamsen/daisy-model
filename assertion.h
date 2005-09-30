@@ -63,16 +63,6 @@ namespace Assertion
   };
 }
 
-#if defined (__BORLANDC__) // && __BORLANDC__ < 0x0550
-#define daisy_assert(condition) \
-  while (!(condition)) \
-    Assertion::failure (__FILE__, __LINE__, NULL, #condition)
-#define daisy_bug(msg) Assertion::bug (__FILE__, __LINE__, NULL, msg)
-#define daisy_warning(msg) Assertion::warning (__FILE__, __LINE__, NULL, msg)
-#define daisy_panic(msg) Assertion::panic (__FILE__, __LINE__, NULL, msg)
-#define assert_non_negative(v) \
-  Assertion::non_negative (__FILE__, __LINE__, NULL, v)
-#else
 #define daisy_assert(condition) \
   while (!(condition)) \
     Assertion::failure (__FILE__, __LINE__, __FUNCTION__, #condition)
@@ -83,6 +73,5 @@ namespace Assertion
   Assertion::panic (__FILE__, __LINE__, __FUNCTION__, msg)
 #define assert_non_negative(v) \
   Assertion::non_negative (__FILE__, __LINE__, __FUNCTION__, v)
-#endif
 
 #endif // ASSERTION_H

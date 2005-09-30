@@ -30,7 +30,7 @@
 #include <memory>
 #include <sstream>
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content = NULL;
 
 const char *const Hydraulic::description = "\

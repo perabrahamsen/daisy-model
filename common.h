@@ -28,58 +28,23 @@
 
 // Portability code.
 
-#if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
-#define EMPTY_TEMPLATE
-#else
-#define EMPTY_TEMPLATE template<>
-#endif
-
-#ifdef __BORLANDC__
-
-// Borland complains about unused global constants unless "extern".
-#define GLOBAL_CONSTANT extern
-
-#if __BORLANDC__ < 0x0550
-// Define these for Borland C++ 5.0.1
-#define BORLAND_TEMPLATES
-#endif
-
-// If you can't delete const objects.
-#define NO_CONST_DELETE
-
-#elif defined (_MSC_VER)
+#if defined (_MSC_VER)
 // MS Visual C++.
 
 // #pragma warning (disable: 4786 4503)
 // #pragma warning (3: 4019 4032 4057 4061 4125 4130 4152 4189 4201 4706)
 // #pragma warning (disable: 4099 4290 4018)
-#define GLOBAL_CONSTANT
-
-#if 0
-double max (double, double);
-double min (double, double);
-int max (int, int);
-int min (int, int);
-size_t max (size_t, size_t);
-size_t min (size_t, size_t);
-unsigned long max (unsigned long, unsigned long);
-unsigned long min (unsigned long, unsigned long);
-#endif
-
-// Work around broken for-scoping
-// #define for if(0);else for
 
 #else
 // GCC & ICC
 
 // GNU doesn't mind unused global constants.
-#define GLOBAL_CONSTANT
 #define FORWARD_TEMPLATES
 #endif
 
 // Shared code.
 
-GLOBAL_CONSTANT const double dt = 1.0;	// time step.
+const double dt = 1.0;	// time step.
 
 // From Mumit's STL newbie guide.
 template <class ForwardIterator>

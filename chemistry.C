@@ -21,7 +21,7 @@
 
 #include "chemistry.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Chemistry>::Content* Librarian<Chemistry>::content = NULL;
 
 const char *const Chemistry::description = "\

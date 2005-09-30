@@ -26,7 +26,7 @@
 
 using namespace std;
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Log>::Content* Librarian<Log>::content = NULL;
 
 const char *const Log::description = "\

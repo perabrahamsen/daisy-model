@@ -21,7 +21,7 @@
 
 #include "number.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Number>::Content* Librarian<Number>::content = NULL;
 
 const char *const Number::description = "\

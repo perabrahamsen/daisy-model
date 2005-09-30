@@ -21,7 +21,7 @@
 
 #include "equil.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Equilibrium>::Content* Librarian<Equilibrium>::content = NULL;
 
 const char *const Equilibrium::description = "\

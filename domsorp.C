@@ -21,7 +21,7 @@
 
 #include "domsorp.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Domsorp>::Content* Librarian<Domsorp>::content = NULL;
 
 const char *const Domsorp::description = "\

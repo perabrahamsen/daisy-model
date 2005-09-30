@@ -26,7 +26,7 @@
 
 using namespace std;
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Bioclimate>::Content* Librarian<Bioclimate>::content = NULL;
 
 const char *const Bioclimate::description = "\

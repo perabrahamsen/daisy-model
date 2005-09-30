@@ -21,7 +21,7 @@
 
 #include "photo.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Photo>::Content* Librarian<Photo>::content = NULL;
 
 const char *const Photo::description = "\

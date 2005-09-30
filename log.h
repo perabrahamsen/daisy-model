@@ -279,7 +279,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Log>::Content* Librarian<Log>::content;
 #endif
 

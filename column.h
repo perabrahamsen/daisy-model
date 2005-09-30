@@ -136,7 +136,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Column>::Content* Librarian<Column>::content;
 #endif
 

@@ -62,7 +62,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Nitrification>::Content* Librarian<Nitrification>::content;
 #endif
 

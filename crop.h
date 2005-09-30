@@ -134,7 +134,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Crop>::Content* Librarian<Crop>::content;
 #endif
 

@@ -138,7 +138,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Vegetation>::Content* Librarian<Vegetation>::content;
 #endif
 

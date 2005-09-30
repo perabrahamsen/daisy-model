@@ -22,7 +22,7 @@
 
 #include "condition.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Condition>::Content* Librarian<Condition>::content = NULL;
 
 const char *const Condition::description = "\

@@ -22,7 +22,7 @@
 #include "phenology.h"
 #include "log.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Phenology>::Content* Librarian<Phenology>::content = NULL;
 
 const char *const Phenology::description = "\

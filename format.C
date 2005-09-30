@@ -21,7 +21,7 @@
 
 #include "format.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Format>::Content* Librarian<Format>::content = NULL;
 
 const char *const Format::description = "\

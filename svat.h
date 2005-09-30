@@ -60,7 +60,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<SVAT>::Content* Librarian<SVAT>::content;
 #endif
 

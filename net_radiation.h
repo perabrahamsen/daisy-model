@@ -53,7 +53,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<NetRadiation>::Content* Librarian<NetRadiation>::content;
 #endif
 

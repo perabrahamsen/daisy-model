@@ -22,7 +22,7 @@
 
 #include "macro.h"
 
-EMPTY_TEMPLATE
+template<>
 Librarian<Macro>::Content* Librarian<Macro>::content = NULL;
 
 const char *const Macro::description = "\

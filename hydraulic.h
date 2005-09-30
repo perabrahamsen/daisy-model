@@ -79,7 +79,7 @@ public:
 };
 
 #ifdef FORWARD_TEMPLATES
-EMPTY_TEMPLATE
+template<>
 Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content;
 #endif
 

@@ -25,13 +25,7 @@
 
 #include "treelog.h"
 #include <memory>
-
-#if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
-#include <iostream>
-namespace std { typedef ostream ostream; }
-#else
 #include <iosfwd>
-#endif
 
 class TreelogDual : public Treelog
 {

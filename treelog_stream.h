@@ -24,13 +24,7 @@
 #define TREELOG_STREAM_H
 
 #include "treelog.h"
-
-#if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
-struct ostream;
-namespace std { typedef ostream ostream; }
-#else
 #include <iosfwd>
-#endif
 
 class TreelogStream : public Treelog
 {
