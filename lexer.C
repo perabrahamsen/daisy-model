@@ -57,6 +57,9 @@ Lexer::Implementation::get ()
     case '\t':
       column += 8 - column % 8;
       break;
+    case '\r':
+      // Ignore carriage return for DOS files under Unix.
+      return get ();
     default:
       column++;
     }
@@ -150,7 +153,15 @@ Lexer::get ()
 
 int
 Lexer::peek ()
-{ return impl.in.peek (); }
+{ 
+  const int c = impl.in.peek ();
+  if (c != '\r')
+    return c;
+  
+  // Skip DOS carriage return on Unix.
+  (void) impl.in.get ();
+  return peek ();
+}
 
 bool
 Lexer::good ()

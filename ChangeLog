@@ -1,3 +1,7 @@
+2005-10-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lexer.C (get): Support DOS files under Unix.
+
 2005-09-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* timestep.h, memutils.h: New utility headers.
