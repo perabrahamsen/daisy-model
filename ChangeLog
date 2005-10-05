@@ -1,3 +1,9 @@
+2005-10-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_time.C (timestep): New condition.
+
+	* units.C (standard_conversions): [none] -> []-
+
 2005-10-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lexer.C (get): Support DOS files under Unix.

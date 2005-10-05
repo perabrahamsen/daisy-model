@@ -359,6 +359,31 @@ public:
     { return *new ConditionYear (al); }
 };
 
+struct ConditionTimestep : public Condition
+{
+  auto_ptr<Condition> condition;
+  const std::string dt;
+
+  bool match (const Daisy& daisy) const
+  { return condition->match (daisy); }
+
+  void tick (const Daisy& daisy, Treelog& out)
+  { condition->tick (daisy, out); }
+
+  void output (Log&) const
+  { }
+
+  ConditionTimestep (const AttributeList& al)
+    : Condition (al),
+      condition (Librarian<Condition>::create (al.alist ("operand"))),
+      dt (al.name ("timestep"))
+  { }
+  ~ConditionTimestep ()
+  { }
+  static Condition& make (const AttributeList& al)
+    { return *new ConditionTimestep (al); }
+};
+
 static struct ConditionTimeSyntax
 {
   static bool check_mday (const AttributeList& al, Treelog& err)
@@ -539,5 +564,21 @@ plus one modulo 'step' is 0.");
     syntax.order ("at");
     Librarian<Condition>::add_type ("year", alist, syntax,
 				    &ConditionYear::make);
+  }
+  // Add timestep to condition.
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Add a timestep to a condition.\n\
+It is true whenever 'operand' is true, but will let Daisy know what 
+'timestep' it represents.  The timestep is used for the dimension\n\
+in log files.");
+    syntax.add ("operand", Librarian<Condition>::library (), 
+		"Condition to use.");
+    syntax.add ("timestep", Syntax::String, Syntax::Const, "\
+Timestep to use.");
+    syntax.order ("operand", "timestep");
+    Librarian<Condition>::add_type ("timestep", alist, syntax,
+				    &ConditionTimestep::make);
   }
 }

@@ -343,6 +343,7 @@ Units::standard_conversions ()
   add (Syntax::Fraction (), "", 1.0);
   add ("", "ppm", 1000000.0);
   add ("", "%", 100.0);
+  add ("none", "", 1.0);
   add (Syntax::None (), "", 1.0);
   add ("cm^3/cm^3", Syntax::Fraction (), 1.0);
   add ("cm^3/cm^3", "", 1.0);
