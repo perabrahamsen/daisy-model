@@ -570,7 +570,7 @@ plus one modulo 'step' is 0.");
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Add a timestep to a condition.\n\
-It is true whenever 'operand' is true, but will let Daisy know what 
+It is true whenever 'operand' is true, but will let Daisy know what\n\
 'timestep' it represents.  The timestep is used for the dimension\n\
 in log files.");
     syntax.add ("operand", Librarian<Condition>::library (), 
