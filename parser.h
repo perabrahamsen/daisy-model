@@ -42,7 +42,7 @@ public:
  
   // Create and Destroy.
 public:
-  virtual void initialize (const Syntax&, Treelog&) = 0;
+  virtual void initialize (Syntax&, Treelog&) = 0;
 protected:
   explicit Parser (const AttributeList&);
 public:

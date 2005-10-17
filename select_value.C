@@ -97,7 +97,7 @@ SelectValue::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 // Create and Destroy.
-SelectValue::SelectValue (const AttributeList& al)
-  : Select (al),
-    value (al.number ("value"))
+SelectValue::SelectValue (const Block& bl)
+  : Select (bl),
+    value (bl.alist ().number ("value"))
 { }

@@ -44,7 +44,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (Treelog&);
-  LogClone (const std::string& name, const Syntax&, const AttributeList&);
+  LogClone (const std::string& name, const Block&);
   ~LogClone ();
 };
 

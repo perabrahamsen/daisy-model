@@ -42,7 +42,7 @@ public:
 
   // Create and Destroy.
 public:
-  LogExternSource (const AttributeList&);
+  LogExternSource (const Block&);
   virtual ~LogExternSource ();
 };
 

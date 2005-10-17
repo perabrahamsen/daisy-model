@@ -235,10 +235,11 @@ struct ProgramHydraulic_table : public Program
   { };
   bool check (Treelog&)
   { return true; }
-  ProgramHydraulic_table (const AttributeList& al)
-    : Program (al),
-      hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic"))),
-      intervals (al.integer ("intervals"))
+  ProgramHydraulic_table (const Block& bl)
+    : Program (bl),
+      hydraulic (Librarian<Hydraulic>::create
+		 /**/ (bl.alist ().alist ("hydraulic"))),
+      intervals (bl.alist ().integer ("intervals"))
   { }
   ~ProgramHydraulic_table ()
   { }
@@ -265,8 +266,8 @@ static const class CheckNoPedo : public VCheck
 static struct ProgramHydraulic_tableSyntax
 {
   static Program&
-  make (const AttributeList& al)
-  { return *new ProgramHydraulic_table (al); }
+  make (const Block& bl)
+  { return *new ProgramHydraulic_table (bl); }
   ProgramHydraulic_tableSyntax ()
   {
     Syntax& syntax = *new Syntax ();

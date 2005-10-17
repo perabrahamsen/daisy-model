@@ -1,8 +1,43 @@
+2005-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* librarian.h: Support lexical scope.
+	* program.h, program_gnuplot.C
+	
+2005-10-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* block.C: New utility.
+	* Makefile (OTHER): Added it.
+
+	* syntax.C, syntax.h (category_names, category_name, category_number)
+	(type_names, type_name, type_number): Use 'std::string'
+	instead of 'char*'.
+
+	* soil.C (initialize): Fixed comparison of signed and unsigned.
+
+2005-10-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon.C (initialize): Fixed comparison of signed and unsigned.
+	* syntax.C (total_order): Ditto.
+	* library.C (all_count): Ditto.
+
+	* library.h, library.C, librarian.h, librarian.C, 
+	* alist.h, alist.C: Removed 'const char* key' variants.
+
+2005-10-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic_M_BaC.C (h_b): Added check.
+
+	* parser_file.C (load_derived): Spelling error.
+
+2005-10-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/fertilizer.dai: Added dimensions.
+
 2005-10-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* condition_time.C (timestep): New condition.
 
-	* units.C (standard_conversions): [none] -> []-
+	* units.C (standard_conversions): [none] -> [].
 
 2005-10-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 

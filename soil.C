@@ -486,7 +486,7 @@ Soil::initialize (Groundwater& groundwater, const int som_size, Treelog& msg)
   {
     Treelog::Open nest (msg, "Horizons");
     double last = 0.0;
-    int next_border = 0;
+    size_t next_border = 0;
     for (layer = begin; layer != end; layer++)
       {
         const double current = (*layer)->end;

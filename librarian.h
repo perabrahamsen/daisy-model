@@ -24,6 +24,7 @@
 #define LIBRARIAN_H
 
 #include "library.h"
+#include "block.h"
 #include "alist.h"
 #include "syntax.h"
 #include "treelog.h"
@@ -39,7 +40,9 @@ class Librarian
   // Types.
 private:
   typedef T& (*constructor) (const AttributeList&);
-  typedef std::map<symbol, constructor> map_type;
+  typedef std::map<symbol, constructor> cmap_type;
+  typedef T& (*builder) (const Block&);
+  typedef std::map<symbol, builder> bmap_type;
 
   // Content.
 private:
@@ -48,12 +51,14 @@ private:
   static struct Content
   {
     Library lib;
-    map_type constructors;
+    cmap_type constructors;
+    bmap_type builders;
     int count;
     Content (const char *const name, derive_fun derive, 
 	     const char *const description)
       : lib (name, derive, description),
 	constructors (),
+	builders (),
 	count (0)
     { }
   } *content;
@@ -66,7 +71,20 @@ public:
     const symbol name = al.identifier ("type");
     daisy_assert (library ().check (name));
     daisy_assert (library ().syntax (name).check (al, Treelog::null ()));
+    daisy_assert (content->constructors.find (name) 
+		  != content->constructors.end ());
     return &(content->constructors)[name] (al);
+  }
+  static T* build (const Block& parent, const AttributeList& alist)
+  {
+    daisy_assert (alist.check ("type"));
+    const symbol type = alist.identifier ("type");
+    daisy_assert (library ().check (type));
+    const Syntax& syntax = library ().syntax (type);
+    Block nested (parent, syntax, alist);
+    daisy_assert (syntax.check (alist, Treelog::null ()));
+    daisy_assert (content->builders.find (type) != content->builders.end ());
+    return &(content->builders)[type] (nested);
   }
   static void add_base (AttributeList& al, const Syntax& syntax)
   { library ().add_base (al, syntax); }
@@ -77,14 +95,28 @@ public:
     library ().add (name, al, syntax);
     content->constructors.insert(std::make_pair (name, cons));
   }
+  static void add_type (const symbol name, AttributeList& al,
+			const Syntax& syntax,
+			builder build)
+  {
+    library ().add (name, al, syntax);
+    content->builders.insert(std::make_pair (name, build));
+  }
   static void add_type (const char *const name, AttributeList& al,
 			const Syntax& syntax,
 			constructor cons)
   { add_type (symbol (name), al, syntax, cons); }
-  static void derive_type (symbol name, AttributeList& al, symbol super)
+  static void add_type (const char *const name, AttributeList& al,
+			const Syntax& syntax,
+			builder build)
+  { add_type (symbol (name), al, syntax, build); }
+  static void derive_type (symbol name, const Syntax& syn, 
+			   AttributeList& al, symbol super)
   {
-    add_type (name, al, library ().syntax (super),
-	      (content->constructors)[super]);
+    if (content->constructors.find (super) != content->constructors.end ())
+      add_type (name, al, syn, (content->constructors)[super]);
+    else
+      add_type (name, al, syn, (content->builders)[super]);
   }
   static Library& library ()
   {
@@ -137,6 +169,20 @@ map_create_const (const std::vector<AttributeList*>& f)
        i != f.end ();
        i++)
     t.push_back (Librarian<T>::create (**i));
+  return t;
+}
+
+template <class T> 
+std::vector<T*>
+map_build (const Block& bl, const std::string& key)
+{ 
+  std::vector<T*> t;
+  const std::vector<AttributeList*> f (bl.alist ().alist_sequence (key));
+  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
+       i != f.end ();
+       i++)
+    t.push_back (Librarian<T>::build (bl, **i));
+
   return t;
 }
 

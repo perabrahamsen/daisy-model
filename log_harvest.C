@@ -187,15 +187,15 @@ struct LogHarvest : public Log
     return ok; 
   }
 
-  LogHarvest (const AttributeList& al)
-    : Log (al),
+  LogHarvest (const Block& bl)
+    : Log (bl),
       last_size (0),
-      file (al.name ("where")),
-      print_header (al.name ("print_header")),
-      print_tags (al.flag ("print_tags")),
-      print_dimension (al.flag ("print_dimension")),
-      print_N (al.flag ("print_N")),
-      print_C (al.flag ("print_C"))
+      file (bl.alist ().name ("where")),
+      print_header (bl.alist ().name ("print_header")),
+      print_tags (bl.alist ().flag ("print_tags")),
+      print_dimension (bl.alist ().flag ("print_dimension")),
+      print_N (bl.alist ().flag ("print_N")),
+      print_C (bl.alist ().flag ("print_C"))
   { }
 
   ~LogHarvest ()
@@ -207,8 +207,8 @@ struct LogHarvest : public Log
 
 static struct LogHarvestSyntax
 {
-  static Log& make (const AttributeList& al)
-  { return *new LogHarvest (al); }
+  static Log& make (const Block& bl)
+  { return *new LogHarvest (bl); }
 
   LogHarvestSyntax ()
   {  

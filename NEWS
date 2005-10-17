@@ -12,6 +12,23 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.85
+
+** DOS text format input files supported undet Unix.
+
+** New "timestep" condition for use in log files.
+
+Use it like this
+
+  (output ("Field nitrogen" 
+           (when (timestep (and (month 3) (mday 31) (hour 23)) "y"))))
+
+to tell daisy that this is yearly data.
+
+** New convertion: [none] -> []
+
+For plotting weather data.
+
 * 3.84
 
 ** gnuplot support
@@ -23,175 +40,14 @@ window.  The data to be plotted can be read from Daisy log files
 (*.dlf), Daisy weather files (*.dwf) or the new Daisy data files
 (*.ddf).
 
-*** Simple example.
-
-  (defprogram test gnuplot
-    (source (column (file "harvest.dlf") (tag "leaf_DM"))
-            (column (file "harvest.dlf") (tag "sorg_DM"))
-            (column (file "crop_prod.dlf") (tag "Leaf AI"))))
-  
-  (run test)
-
-This will create a 'daisy.gnuplot' file that generates a window with a
-plot of leaf and storage organ yields taken from the 'harvest.dlf'
-file, and LAI from the 'crop_prod.dlf' file.
-
-*** Complex example.
-
-  (defprogram test gnuplot
-    "Test of 'gnuplot' program."
-    (command_file "kurt.gnuplot")
-    (ymin -1) (ymax 6) (y2min 0) (y2max 10)
-    (begin 1986 9 1 0) (end 1987 11 1 0)
-    (extra "set title 'gnuplot demonstration'")
-    (legend se)   
-    (source (column (file "harvest.dlf")
-                    (tag "leaf_DM")
-                    (title "Leaf Harvest")
-                    (with points)
-                    (dimension "Mg DM/ha"))
-            (column (file "harvest.dlf")
-                    (tag "sorg_DM")
-                    (title "Grain Harvest")
-                    (with points)
-                    (dimension "Mg DM/ha"))
-            (column (file "crop_prod.dlf")
-                    (filter ("day_length" "10" "8")
-                    ("month" "9" "10"))
-                    (style 1)
-                    (tag "WLeaf"))
-            (column (file "crop_prod.dlf")
-                    (style 2)
-                    (tag "WSOrg"))
-            (column (file "crop_prod.dlf")
-                    (tag "Leaf AI"))))
-            
-  (defprogram main batch
-    (run (test)
-         (test (where "myplot.eps"))))
-  
-  (run main)
-  
-- This example chooses another command file ('kurt.gnuplot' instead of
-  'daisy.gnuplot').
-
-- It selects the range for the x-axis (begin and end) and both y-axes
-  (ymin, ymax, y2min, y2max) manually, instead of letting gnuplot
-  choose its own.
-
-- An uninterpreted gnuplot order is send via the 'extra' keyword.  In
-  this case in rder to give the plot a title.  You can also set fonts
-  and font sizes, ask for monochrome plots, and many other things.
-
-- We ask to get the legend in the South-East corner, instead of
-  letting Daisy find the corner farthest away from an data.  
-
-- We use different titles and different names for the dimensions for
-  the 'harvest.dlf' data, and we plot them with points instead of
-  lines.  By default Daisy use points for '*.ddf' files, and lines for
-  '*.dlf' and '*.dwf' files.
-
-- We only get WLeaf data from 'crop-prod.dlf' that are from days with
-  length 10 or 8, and from September or October.
-
-- We use the first and second style for plotting WLeaf and WSOrg from
-  'crop_prod.dlf', instead of letting Daisy find the next available
-  style.  This means they have the same style as the corresponding
-  data from 'harvest.dlf', except that they are plotted as lines
-  instead of points.  
-
-- We create a 'batch' program that run the plot twice.  Once to a
-  window, and once to a file name 'myplot.eps'.  Daisy deduce the
-  desired format from the file name.  Both are created from the same
-  'kurt.gnuplot' command file.  You can create as many plots as
-  desired from the same gnuplot command file.
-
-
-*** Daisy Data Files (*.ddf)
-
-Th '*.ddf' files are intended for measured data.  The data are by
-default plotted as points, and with the same styles as data sources in
-the same sequence from '*.dlf' and '*.dwf' files.  The idea is that
-you want to compare measured and simulated numbers.
-
-The format is:
-
-  ddf-0.0 You can insert a description after the seven first letters.
-  # Here you can add comments, here.
-  # As long as they begin with a '#'.
-  # After a line of hyphens, tab seperated data should be listed.
-  # The two first lines are tags and dimensions, like for '*.dlf' files.
-  ------
-  Date           Height
-                 cm
-  2005-09-24T01  20
-  2005-09-24T07  21
-
-You can use both seperate year/month/mday/hour columns, as in the dlf
-and dwf files, or a single Date column, with the format
-'yyyy-mm-ddThh' (which happens to be an ISO standard).
-
-If you don't have a dimension line, you must specify the dimension
-with the "original" keyword for each source.
-
-*** wgnuplot.exe
-
-The Daisy home page at <http://www.dina.kvl.dk/~daisy/> has a link to
-a windows binary for winplot.  You can execute the gnuplot commands by
-dragging the daisy.gnuplot file to the wgnuplot.exe binary.  If you
-open the application before dragging, you will be able to see any
-error messages that may be produced. The gnuplot homepage are at
-<http://www.gnuplot.info/> where you can find Unix and Mac versions of
-the program.  You need at least version 4.0 of gnuplot.
-
-*** The 'arithmetic' source model.
-
-The 'arithmetic' source mode allows simple arithmetics with columns in
-a single file.
-
-  (defprogram crop gnuplot
-    "Plot crop dry matter partitions."
-    (source (arithmetic (file "crop_prod.dlf")
-                         (expr WSOrg))
-            (arithmetic (file "crop_prod.dlf")
-                        (expr WRoot))
-            (arithmetic (file "crop_prod.dlf")
-                        (title "WShoot")
-                        (expr (+ WStem WLeaf WDead)))))
-
-Here we plot storage organ and roots as usual, but add the stem,
-leaves and dead leaves pools into a single graph named "WShoot".  When
-you use expressions like this, you usually will want to set the legend
-title explicitly, otherwise it would have been called "+".
-
-The format of arithmetic expressions are always prefix, the name of
-the operator followed by the operands.  Daisy currently understands
-the following functions +, -, *, /, min, max, pow, exp, sqrt, sqr, ln,
-and log10.
-
-Numbers are written as (const VAL DIM), like
-
-   (expr (+ WSOrg (const 1.0 [Mg DM/ha])))
-
-if we want to lie about our yield.
-
-You can convert dimensions with (convert EXPR DIM) like
-
-  (expr (convert WSOrg [g DM/m^2]))
-
-Daisy is in general unable to calculate the dimensions of the result
-of some arithementic expression, except in the most simple cases (like
-'+').  You can tell Daisy the dimension with (dim EXPR DIM), like
-
-  (expr (dim (* WSOrg (const 2.0 [])) [Mg DM/ha]))
-
-The difference from 'convert' is that dim will not change the value,
-only the dimension.
+See the new section about "plotting" in the Daisy tutorial for a
+description. 
 
 ** You can now do simple calculation in Daisy input files.
 
 Whenever Daisy expect a number in an input file, you can give it an
-expressions like those described above.
+expression like those accepted by the 'arithmetic' source model for
+gnuplot. 
 
 * 3.79
 

@@ -518,12 +518,6 @@ AttributeList::check (const string& key) const
 }
 
 bool
-AttributeList::check (const char *const key) const
-{ 
-  return impl.check (key);
-}
-
-bool
 AttributeList::subset (const AttributeList& other, const Syntax& syntax) const
 { 
   // Find syntax entries.
@@ -601,10 +595,6 @@ AttributeList::number (const string& key) const
 }
 
 double 
-AttributeList::number (const char *const key) const
-{ return number (string (key)); }
-
-double 
 AttributeList::number (const string& key, const double default_value) const
 {
   if (!check (key))
@@ -613,16 +603,8 @@ AttributeList::number (const string& key, const double default_value) const
   return number (key);
 }
 
-double 
-AttributeList::number (const char *const key, const double default_value) const
-{ return number (string (key), default_value); }
-
 const string& 
 AttributeList::name (const string& key) const
-{ return identifier (key).name (); }
-
-const string& 
-AttributeList::name (const char *const key) const
 { return identifier (key).name (); }
 
 const string& 
@@ -632,10 +614,6 @@ AttributeList::name (const string& key, const string& default_value) const
     return default_value;
   return identifier (key).name (); 
 }
-
-const string& 
-AttributeList::name (const char *const key, const string& default_value) const
-{ return name (string (key), default_value); }
 
 symbol
 AttributeList::identifier (const string& key) const
@@ -648,21 +626,8 @@ AttributeList::identifier (const string& key) const
   return value.scalar->name;
 }
 
-symbol
-AttributeList::identifier (const char *const key) const
-{ return identifier (string (key)); }
-
 bool 
 AttributeList::flag (const string& key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Boolean);
-  daisy_assert (!value.is_sequence);
-  return value.flag;
-}
-
-bool 
-AttributeList::flag (const char *const key) const
 {
   const Value& value = impl.lookup (key);
   daisy_assert (value.type == Syntax::Boolean);
@@ -678,21 +643,8 @@ AttributeList::flag (const string& key, const bool default_value) const
   return flag (key); 
 }
 
-bool
-AttributeList::flag (const char *const key, const bool default_value) const
-{ return flag (string (key), default_value); }
-
 int
 AttributeList::integer (const string& key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Integer);
-  daisy_assert (!value.is_sequence);
-  return value.integer;
-}
-
-int
-AttributeList::integer (const char *const key) const
 {
   const Value& value = impl.lookup (key);
   daisy_assert (value.type == Syntax::Integer);
@@ -708,21 +660,8 @@ AttributeList::integer (const string& key, const int default_value) const
   return integer (key); 
 }
 
-int
-AttributeList::integer (const char *const key, const int default_value) const
-{ return integer (string (key), default_value); }
-
 const PLF& 
 AttributeList::plf (const string& key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::PLF);
-  daisy_assert (!value.is_sequence);
-  return *value.plf;
-}
-
-const PLF& 
-AttributeList::plf (const char *const key) const
 {
   const Value& value = impl.lookup (key);
   daisy_assert (value.type == Syntax::PLF);
@@ -739,26 +678,8 @@ AttributeList::alist (const string& key) const
   return *value.alist;
 }
 
-AttributeList& 
-AttributeList::alist (const char *const key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::AList);
-  daisy_assert (!value.is_sequence);
-  return *value.alist;
-}
-
 const vector<double>& 
 AttributeList::number_sequence (const string& key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Number);
-  daisy_assert (value.is_sequence);
-  return *value.number_sequence;
-}
-
-const vector<double>& 
-AttributeList::number_sequence (const char *const key) const
 {
   const Value& value = impl.lookup (key);
   daisy_assert (value.type == Syntax::Number);
@@ -776,16 +697,6 @@ AttributeList::identifier_sequence (const string& key) const
 }
 
 vector<string>
-AttributeList::name_sequence (const char *const key) const
-{
-  const vector<symbol>& v = identifier_sequence (key);
-  vector<string> result;
-  for (size_t i = 0; i < v.size (); i++)
-    result.push_back (v[i].name ());
-  return result;
-}
-
-vector<string>
 AttributeList::name_sequence (const string& key) const
 {
   const vector<symbol>& v = identifier_sequence (key);
@@ -795,26 +706,8 @@ AttributeList::name_sequence (const string& key) const
   return result;
 }
 
-const vector<symbol>&
-AttributeList::identifier_sequence (const char *const key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::String);
-  daisy_assert (value.is_sequence);
-  return *value.name_sequence;
-}
-
 const vector<bool>& 
 AttributeList::flag_sequence (const string& key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Boolean);
-  daisy_assert (value.is_sequence);
-  return *value.flag_sequence;
-}
-
-const vector<bool>& 
-AttributeList::flag_sequence (const char *const key) const
 {
   const Value& value = impl.lookup (key);
   daisy_assert (value.type == Syntax::Boolean);
@@ -831,15 +724,6 @@ AttributeList::integer_sequence (const string& key) const
   return *value.integer_sequence;
 }
 
-const vector<int>& 
-AttributeList::integer_sequence (const char *const key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Integer);
-  daisy_assert (value.is_sequence);
-  return *value.integer_sequence;
-}
-
 const vector<const PLF*>& 
 AttributeList::plf_sequence (const string& key) const
 {
@@ -849,26 +733,8 @@ AttributeList::plf_sequence (const string& key) const
   return *value.plf_sequence;
 }
 
-const vector<const PLF*>& 
-AttributeList::plf_sequence (const char *const key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::PLF);
-  daisy_assert (value.is_sequence);
-  return *value.plf_sequence;
-}
-
 const vector<AttributeList*>& 
 AttributeList::alist_sequence (const string& key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::AList);
-  daisy_assert (value.is_sequence);
-  return *value.alist_sequence;
-}
-
-const vector<AttributeList*>& 
-AttributeList::alist_sequence (const char *const key) const
 {
   const Value& value = impl.lookup (key);
   daisy_assert (value.type == Syntax::AList);

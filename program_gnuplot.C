@@ -21,6 +21,7 @@
 #include "program.h"
 #include "source.h"
 #include "vcheck.h"
+#include "check.h"
 #include "treelog.h"
 #include "path.h"
 #include "mathlib.h"
@@ -39,7 +40,37 @@ struct ProgramGnuplot : public Program
   const std::string file;
   const std::string device;
   const std::vector<symbol> extra;
+  const std::string title;
 
+  struct Size 
+  {
+    const double x;
+    const double y;
+    static void load_syntax (Syntax& syntax, AttributeList&)
+    {
+      syntax.add ("x", Syntax::None (), Syntax::Const, "\
+Relative horizontal size of plot.");
+      syntax.add ("y", Syntax::None (), Syntax::Const, "\
+Relative vertical size of plot.");
+      syntax.order ("x", "y");
+    }
+    static const AttributeList& unset ()
+    {
+      static AttributeList alist;
+      if (!alist.check ("x"))
+	{
+	  alist.add ("x", -42.42e42);
+	  alist.add ("y", -42.42e42);
+	}
+      return alist;
+    }
+    explicit Size (const AttributeList& al)
+      : x (al.number ("x")),
+	y (al.number ("y"))
+    { }
+  };
+  Size size;
+  
   // Legend placement.
   static struct LegendTable : public std::map<std::string,std::string>
   {
@@ -81,7 +112,7 @@ struct ProgramGnuplot : public Program
   bool check (Treelog&)
   { return true; }
   static std::string file2device (const std::string& file);
-  explicit ProgramGnuplot (const AttributeList& al);
+  explicit ProgramGnuplot (const Block& bl);
   ~ProgramGnuplot ();
 };
 
@@ -144,6 +175,11 @@ set ytics nomirror\n\
 set xdata time\n\
 set timefmt \"%Y-%m-%dT%H\"\n\
 set style data lines\n";
+  if (title != "")
+    out << "set title " << quote (title) << "\n";
+  if (size.x > 0.0)
+    out << "set size " << size.x << ", " << size.y << "\n";
+
   // Removed: set format x "%m-%y"
 
   // Dimensions.
@@ -364,28 +400,36 @@ ProgramGnuplot::file2device (const std::string& file)
  return "unknown";
 }
 
-ProgramGnuplot::ProgramGnuplot (const AttributeList& al)
-  : Program (al),
-    command_file (al.name ("command_file")),
-    append (al.check ("append") 
-            ? (al.flag ("append") ? append_yes : append_no)
+ProgramGnuplot::ProgramGnuplot (const Block& bl)
+  : Program (bl),
+    command_file (bl.alist ().name ("command_file")),
+    append (bl.alist ().check ("append") 
+            ? (bl.alist ().flag ("append") ? append_yes : append_no)
             : append_maybe),
-    do_cd (al.flag ("cd")),
-    file (al.name ("where")),
+    do_cd (bl.alist ().flag ("cd")),
+    file (bl.alist ().name ("where")),
     device (file2device (file)),
-    extra (al.identifier_sequence ("extra")),
-    legend (al.name ("legend")),
-    begin (al.check ("begin") ? new Time (al.alist ("begin")) : NULL),
-    end (al.check ("end") ? new Time (al.alist ("end")) : NULL),
-    ymin_flag (al.check ("ymin")),
-    ymin (al.number ("ymin", 42.42e42)),
-    ymax_flag (al.check ("ymax")),
-    ymax (al.number ("ymax", 42.42e42)),
-    y2min_flag (al.check ("y2min")),
-    y2min (al.number ("y2min", 42.42e42)),
-    y2max_flag (al.check ("y2max")),
-    y2max (al.number ("y2max", 42.42e42)),
-    source (map_create<Source> (al.alist_sequence ("source")))
+    extra (bl.alist ().identifier_sequence ("extra")),
+    title (bl.alist ().name ("title", "")),
+    size (bl.alist ().check ("size")
+	  ? bl.alist ().alist ("size")
+	  : Size::unset ()),
+    legend (bl.alist ().name ("legend")),
+    begin (bl.alist ().check ("begin") 
+	   ? new Time (bl.alist ().alist ("begin")) 
+	   : NULL),
+    end (bl.alist ().check ("end")
+	 ? new Time (bl.alist ().alist ("end")) 
+	 : NULL),
+    ymin_flag (bl.alist ().check ("ymin")),
+    ymin (bl.alist ().number ("ymin", 42.42e42)),
+    ymax_flag (bl.alist ().check ("ymax")),
+    ymax (bl.alist ().number ("ymax", 42.42e42)),
+    y2min_flag (bl.alist ().check ("y2min")),
+    y2min (bl.alist ().number ("y2min", 42.42e42)),
+    y2max_flag (bl.alist ().check ("y2max")),
+    y2max (bl.alist ().number ("y2max", 42.42e42)),
+    source (map_build<Source> (bl, "source"))
 { }
 
 ProgramGnuplot::~ProgramGnuplot ()
@@ -398,8 +442,8 @@ ProgramGnuplot::~ProgramGnuplot ()
 static struct ProgramGnuplotSyntax
 {
   static Program&
-  make (const AttributeList& al)
-  { return *new ProgramGnuplot (al); }
+  make (const Block& bl)
+  { return *new ProgramGnuplot (bl); }
   ProgramGnuplotSyntax ()
   {
     Syntax& syntax = *new Syntax ();
@@ -452,6 +496,12 @@ The commands will be inserted right before the plot command.\n\
 Note that if you have multiple plots in the same command file,\n\
 The extra commands may affect the subsequence plots.");
     alist.add ("extra", std::vector<symbol> ());
+    syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
+Title of the plot, if any.  Set it to an empty string to disable.");
+    syntax.add_submodule ("size", alist, Syntax::OptionalConst, "\
+Relative to size of plot.\n\
+The standard size is 1.0, specify other numbers to scale accordingly.", 
+			  ProgramGnuplot::Size::load_syntax);
     syntax.add ("legend", Syntax::String, Syntax::OptionalConst, "\
 Placement of legend.  This can be one of the four corners, named by\n\
 compas locations (nw, ne, sw, se) to get the legend inside the graph\n\

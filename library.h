@@ -32,7 +32,8 @@ class AttributeList;
 class Treelog;
 class Format;
 
-typedef void (*derive_fun) (symbol name, AttributeList& al, symbol super);
+typedef void (*derive_fun) (symbol name, const Syntax& syn,
+			    AttributeList& al, symbol super);
 typedef void (*doc_fun) (Format&, const AttributeList& al);
 
 class Library
@@ -58,6 +59,8 @@ public:
   void add_base (AttributeList&, const Syntax&);
   void add (symbol, AttributeList&, const Syntax&);
   void add_derived (symbol name, AttributeList& al,
+		    symbol super);
+  void add_derived (symbol name, const Syntax&, AttributeList& al,
 		    symbol super);
   const Syntax& syntax (symbol) const;
   void entries (std::vector<symbol>&) const;

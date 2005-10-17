@@ -57,8 +57,8 @@ public:
   enum type 
   { Number, AList, PLF, Boolean, String,
     Integer, Object, Library, Error };
-  static const char* type_name (type);
-  static type type_number (const char* name);
+  static const std::string& type_name (type);
+  static type type_number (const std::string& name);
     
   // The requirements with regard to input and output varies with each
   // syntax entry.
@@ -82,8 +82,8 @@ public:
     // and not a part of the simulation state. 
     LogOnly
   };
-  static const char* category_name (category);
-  static int category_number (const char* name);
+  static const std::string& category_name (category);
+  static int category_number (const std::string& name);
 
   // This function will check that an alist conform to the syntax.
   bool check (const AttributeList&, Treelog& err) const;
@@ -247,11 +247,11 @@ public:
 				 Treelog& err);
   void add_check (check_fun);
 
-  Syntax ();
+  explicit Syntax ();
+  explicit Syntax (const Syntax&);
   ~Syntax ();
 private:
-  Syntax (Syntax&);
-  Syntax& operator= (Syntax&);
+  Syntax& operator= (const Syntax&);
 };
 
 #endif // SYNTAX_H

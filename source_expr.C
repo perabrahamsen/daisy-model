@@ -108,7 +108,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit SourceExpr (const AttributeList& al);
+  explicit SourceExpr (const Block& bl);
   ~SourceExpr ();
 };
 
@@ -181,15 +181,15 @@ SourceExpr::load (Treelog& msg)
   return true;
 }
 
-SourceExpr::SourceExpr (const AttributeList& al)
-  : SourceFile (al),
-    expr (Librarian<Number>::create (al.alist ("expr"))),
-    title_ (al.name ("title", expr->title ())),
-    original (al.check ("original")
-	      ? al.name_sequence ("original")
+SourceExpr::SourceExpr (const Block& bl)
+  : SourceFile (bl),
+    expr (Librarian<Number>::create (bl.alist ().alist ("expr"))),
+    title_ (bl.alist ().name ("title", expr->title ())),
+    original (bl.alist ().check ("original")
+	      ? bl.alist ().name_sequence ("original")
 	      : std::vector<std::string> ()),
     dimension_ ("UNINITIALIZED"),
-    dim_line (al.flag ("dim_line", !al.check ("original")))
+    dim_line (bl.alist ().flag ("dim_line", !bl.alist ().check ("original")))
 { }
 
 SourceExpr::~SourceExpr ()
@@ -198,8 +198,8 @@ SourceExpr::~SourceExpr ()
 
 static struct SourceExprSyntax
 {
-  static Source& make (const AttributeList& al)
-  { return *new SourceExpr (al); }
+  static Source& make (const Block& bl)
+  { return *new SourceExpr (bl); }
 
   SourceExprSyntax ()
   { 

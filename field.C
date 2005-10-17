@@ -564,14 +564,15 @@ Field::Implementation::divide (symbol original, symbol copy,
   old->size -= copy_size;
   const Library& library = Librarian<Column>::library ();
   const Syntax& syntax = library.syntax (old->alist.identifier ("type"));
-  LogClone log_clone ("column", syntax, old->alist);
+  Block block (syntax, old->alist);
+  LogClone log_clone ("column", block);
   old->output (log_clone);
   AttributeList& lib_alist = *new AttributeList ();
   // Remember where we got this object.
   lib_alist.add ("parsed_from_file", "*clone*");
   lib_alist.add ("parsed_sequence", Library::get_sequence ());
   lib_alist.add ("type", original.name ());
-  Librarian<Column>::derive_type (copy, lib_alist, original);
+  Librarian<Column>::derive_type (copy, syntax, lib_alist, original);
   AttributeList copy_alist (log_clone.result ());
   copy_alist.add ("type", copy.name ());
   copy_alist.add ("size", copy_size);

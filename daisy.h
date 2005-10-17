@@ -82,8 +82,11 @@ public:
                    Treelog& err);
   bool check (Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
-  explicit Daisy (const AttributeList&);
+  explicit Daisy (const Block&);
   ~Daisy ();
+private:
+  Daisy ();
+  Daisy (const Daisy&);
 };
 
 #endif // DAISY_H

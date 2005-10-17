@@ -75,11 +75,12 @@ struct ProgramBatch : public Program
     return ok;
   }
 
-  ProgramBatch (const AttributeList& al)
-    : Program (al),
-      directory (al.name ("directory")),
-      program (map_create<Program> (al.alist_sequence ("run")))
+  ProgramBatch (const Block& bl)
+    : Program (bl),
+      directory (bl.alist ().name ("directory")),
+      program (map_build<Program> (bl, "run"))
   { }
+
   ~ProgramBatch ()
   { sequence_delete (program.begin (), program.end ()); }
 };
@@ -87,8 +88,8 @@ struct ProgramBatch : public Program
 static struct ProgramBatchSyntax
 {
   static Program&
-  make (const AttributeList& al)
-  { return *new ProgramBatch (al); }
+  make (const Block& bl)
+  { return *new ProgramBatch (bl); }
   ProgramBatchSyntax ()
   {
     Syntax& syntax = *new Syntax ();

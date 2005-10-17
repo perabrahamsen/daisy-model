@@ -42,7 +42,6 @@ class AttributeList
 public:
   // Is 'key' an element of this alist?
   bool check (const std::string& key) const;
-  bool check (const char* key) const;
   // Is this alist a subset of 'other'?
   bool subset (const AttributeList& other, const Syntax& syntax) const;
   // Is the element 'key' in this alist a subset of the correspi
@@ -52,45 +51,26 @@ public:
 
   // Extract values.
   double number (const std::string&) const;
-  double number (const char*) const;
   double number (const std::string&, double default_value) const;
-  double number (const char*, double default_value) const;
   const std::string& name (const std::string&) const;
-  const std::string& name (const char*) const;
   const std::string& name (const std::string&,
                            const std::string& default_value) const;
-  const std::string& name (const char*,
-                           const std::string& default_value) const;
   symbol identifier (const std::string&) const;
-  symbol identifier (const char*) const;
   bool flag (const std::string&) const;
-  bool flag (const char*) const;
   bool flag (const std::string&, bool default_value) const;
-  bool flag (const char*, bool default_value) const;
   const PLF& plf (const std::string&) const;
-  const PLF& plf (const char*) const;
   AttributeList& alist (const std::string&) const;
-  AttributeList& alist (const char*) const;
   int integer (const std::string&) const;
-  int integer (const char*) const;
   int integer (const std::string&, int default_value) const;
-  int integer (const char*, int default_value) const;
   const std::vector<double>& number_sequence (const std::string&) const;
-  const std::vector<double>& number_sequence (const char*) const;
   const std::vector<symbol>& 
   /**/ identifier_sequence (const std::string& key) const;
-  const std::vector<symbol>& identifier_sequence (const char* key) const;
   std::vector<std::string> name_sequence (const std::string& key) const;
-  std::vector<std::string> name_sequence (const char* key) const;
   const std::vector<bool>& flag_sequence (const std::string& key) const;
-  const std::vector<bool>& flag_sequence (const char* key) const;
   const std::vector<int>& integer_sequence (const std::string& key) const;
-  const std::vector<int>& integer_sequence (const char* key) const;
   const std::vector<const PLF*>& plf_sequence (const std::string& key) const;
-  const std::vector<const PLF*>& plf_sequence (const char* key) const;
   const std::vector<AttributeList*>& 
   /**/ alist_sequence (const std::string& key) const;
-  const std::vector<AttributeList*>& alist_sequence (const char* key) const;
 
   // Create and Destroy.
   void add (const std::string&, double);

@@ -33,16 +33,16 @@ struct SelectIndex : public SelectValue
   { add_result (array[index]); }
 
   // Create and Destroy.
-  SelectIndex (const AttributeList& al)
-    : SelectValue (al),
-      index (al.integer ("index"))
+  SelectIndex (const Block& bl)
+    : SelectValue (bl),
+      index (bl.alist ().integer ("index"))
   { }
 };
 
 static struct SelectIndexSyntax
 {
-  static Select& make (const AttributeList& al)
-  { return *new SelectIndex (al); }
+  static Select& make (const Block& bl)
+  { return *new SelectIndex (bl); }
 
   SelectIndexSyntax ()
   { 

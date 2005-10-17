@@ -364,6 +364,9 @@ struct ConditionTimestep : public Condition
   auto_ptr<Condition> condition;
   const std::string dt;
 
+  const string timestep ()
+  { return dt; } 
+
   bool match (const Daisy& daisy) const
   { return condition->match (daisy); }
 
@@ -381,7 +384,7 @@ struct ConditionTimestep : public Condition
   ~ConditionTimestep ()
   { }
   static Condition& make (const AttributeList& al)
-    { return *new ConditionTimestep (al); }
+  { return *new ConditionTimestep (al); }
 };
 
 static struct ConditionTimeSyntax

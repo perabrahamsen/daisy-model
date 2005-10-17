@@ -88,7 +88,7 @@ daisy_category_number (const char* name)
 
 extern "C" const char* EXPORT
 daisy_category_name (Syntax::category number)
-{ return Syntax::category_name (number); }
+{ return Syntax::category_name (number).c_str (); }
 
 extern "C" int EXPORT
 daisy_size_sequence ()
@@ -104,7 +104,7 @@ daisy_type_number (const char* name)
 
 extern "C" const char* EXPORT
 daisy_type_name (Syntax::type number)
-{ return Syntax::type_name (number); }
+{ return Syntax::type_name (number).c_str (); }
 
 // @ The daisy_alist Type.
 
@@ -396,7 +396,7 @@ daisy_library_remove (Library* library, const char* name)
 // @ The daisy_parser Type.
 
 extern "C" Parser* EXPORT
-daisy_parser_create_file (const Syntax* syntax, const char* filename)
+daisy_parser_create_file (Syntax* syntax, const char* filename)
 { 
   static TreelogStream treelog (cerr);
   static Treelog::Open nest (treelog, "parser");
@@ -450,7 +450,8 @@ daisy_daisy_create (const Syntax* syntax, const AttributeList* alist)
 { 
   static TreelogStream treelog (cerr);
   static Treelog::Open nest (treelog, "daisy");
-  Daisy* daisy = new Daisy (*alist); 
+  Block block (*syntax, *alist);
+  Daisy* daisy = new Daisy (block); 
   daisy->initialize (syntax, alist, treelog);
   return daisy;
 }
@@ -657,7 +658,7 @@ daisy_daisy_count_columns (const Daisy* daisy)
 { return daisy->field.size (); }
 
 extern "C" Column* EXPORT
-daisy_daisy_get_column (Daisy* daisy, int col)
+daisy_daisy_get_column (Daisy* daisy, const int col)
 { 
   daisy_assert (daisy);
   daisy_assert (col >= 0 && col < daisy->field.size ()); 

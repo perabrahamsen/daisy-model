@@ -186,11 +186,11 @@ struct SelectInterval : public SelectValue
       ok = false;
     return ok; 
   }
-  SelectInterval (const AttributeList& al)
-    : SelectValue (al),
-      density_factor (al.flag ("density") ? -1.0 : 1.0),
-      from (al.number ("from", 1.0)),
-      to (al.number ("to", 1.0)),
+  SelectInterval (const Block& bl)
+    : SelectValue (bl),
+      density_factor (bl.alist ().flag ("density") ? -1.0 : 1.0),
+      from (bl.alist ().number ("from", 1.0)),
+      to (bl.alist ().number ("to", 1.0)),
       bd_convert (NULL)
   { }
   ~SelectInterval ()
@@ -199,8 +199,8 @@ struct SelectInterval : public SelectValue
 
 static struct SelectIntervalSyntax
 {
-  static Select& make (const AttributeList& al)
-  { return *new SelectInterval (al); }
+  static Select& make (const Block& bl)
+  { return *new SelectInterval (bl); }
 
   SelectIntervalSyntax ()
   { 

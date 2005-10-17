@@ -51,7 +51,9 @@ public:
 public:
   static void load_syntax (Syntax& syntax, AttributeList&);
 protected:
-  explicit Source (const AttributeList& al);
+  explicit Source (const Block&);
+private:
+  Source (const Source&);
 public:
   virtual ~Source ();
 };

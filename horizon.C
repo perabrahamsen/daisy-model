@@ -79,11 +79,11 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
   if (som_size > 0)
     {
       // Fill out SOM_fractions and SOM_C_per_N.
-      if (SOM_C_per_N.size () > 0 && SOM_C_per_N.size () < som_size)
+      if (SOM_C_per_N.size () > 0 && SOM_C_per_N.size () < som_size + 0U)
 	SOM_C_per_N.insert (SOM_C_per_N.end (),
 			    som_size - SOM_C_per_N.size (), 
 			    SOM_C_per_N.back ());
-      if (SOM_fractions.size () > 0 && SOM_fractions.size () < som_size)
+      if (SOM_fractions.size () > 0 && SOM_fractions.size () < som_size + 0U)
 	SOM_fractions.insert (SOM_fractions.end (),
 			      som_size - SOM_fractions.size (), 
 			      0.0);

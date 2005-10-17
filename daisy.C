@@ -58,27 +58,30 @@ Daisy::find_active_logs (const vector<Log*>& logs, LogAll& log_all)
   return result;
 }
 
-Daisy::Daisy (const AttributeList& al)
-  : Program (al),
+Daisy::Daisy (const Block& bl)
+  : Program (bl),
     global_syntax (NULL),
     global_alist (NULL),
     running (false),
     logging (false),
-    logs (map_create<Log> (al.alist_sequence ("output"))),
+    logs (map_create<Log> (bl.alist ().alist_sequence ("output"))),
     log_all (*new LogAll (logs)),
     active_logs (find_active_logs (logs, log_all)),
     activate_output (Librarian<Condition>::create
-		     (al.alist ("activate_output"))),
+		     (bl.alist ().alist ("activate_output"))),
     print_time (Librarian<Condition>::create
-		     (al.alist ("print_time"))),
-    time (al.alist ("time")),
-    stop (al.check ("stop") ? Time (al.alist ("stop")) : Time (9999, 1, 1, 1)),
-    action (Librarian<Action>::create (al.alist ("manager"))),
-    weather (al.check ("weather") 
-	     ? Librarian<Weather>::create (al.alist ("weather"))
+		     (bl.alist ().alist ("print_time"))),
+    time (bl.alist ().alist ("time")),
+    stop (bl.alist ().check ("stop")
+	  ? Time (bl.alist ().alist ("stop")) 
+	  : Time (9999, 1, 1, 1)),
+    action (Librarian<Action>::create (bl.alist ().alist ("manager"))),
+    weather (bl.alist ().check ("weather") 
+	     ? Librarian<Weather>::create (bl.alist ().alist ("weather"))
 	     : NULL), 
-    field (*new Field (al.alist_sequence ("column"))),
-    harvest (map_construct_const<Harvest> (al.alist_sequence ("harvest")))
+    field (*new Field (bl.alist ().alist_sequence ("column"))),
+    harvest (map_construct_const<Harvest> 
+	     (bl.alist ().alist_sequence ("harvest")))
 { }
 
 bool
@@ -326,8 +329,8 @@ Daisy::~Daisy ()
 static struct ProgramDaisySyntax
 {
   static Program&
-  make (const AttributeList& al)
-  { return *new Daisy (al); }
+  make (const Block& bl)
+  { return *new Daisy (bl); }
   ProgramDaisySyntax ()
   {
     Syntax& syntax = *new Syntax ();

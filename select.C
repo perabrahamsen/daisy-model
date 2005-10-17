@@ -103,7 +103,7 @@ struct Select::Implementation
   // Create and Destroy.
   bool check (const string& spec_tdim, Treelog& err) const;
   static string find_description (const AttributeList&);
-  Implementation (const AttributeList& al);
+  Implementation (const Block&);
   ~Implementation ();
 };
 
@@ -331,16 +331,18 @@ Select::Implementation::find_description (const AttributeList& al)
   return string ("");
 }
 
-Select::Implementation::Implementation (const AttributeList& al)
-  : spec (al.check ("spec") ? new Spec (al.alist ("spec")) : NULL),
+Select::Implementation::Implementation (const Block& bl)
+  : spec (bl.alist ().check ("spec")
+	  ? new Spec (bl.alist ().alist ("spec")) 
+	  : NULL),
     spec_conv (NULL),
-    factor (al.number ("factor")),
-    offset (al.number ("offset")),
-    negate (al.flag ("negate")),
-    tag (Select::select_get_tag (al)),
-    dimension (al.check ("dimension")
-	       ? al.name ("dimension") : Syntax::Unknown ()),
-    description (find_description (al))
+    factor (bl.alist ().number ("factor")),
+    offset (bl.alist ().number ("offset")),
+    negate (bl.alist ().flag ("negate")),
+    tag (Select::select_get_tag (bl.alist ())),
+    dimension (bl.alist ().check ("dimension")
+	       ? bl.expand ("dimension") : Syntax::Unknown ()),
+    description (find_description (bl.alist ()))
 { }
   
 Select::Implementation::~Implementation ()
@@ -653,18 +655,19 @@ Select::check_border (const Border&,
                       Treelog&) const
 { return true; }
 
-Select::Select (const AttributeList& al)
-  : name (al.name ("type")),
-    impl (*new Implementation (al)),
-    accumulate (al.flag ("accumulate")),
-    handle (al.check ("handle")
-            ? Handle (al.identifier ("handle"))
-            : Handle ((al.check ("when") 
-                       ||  (al.check ("flux") && al.flag ("flux")))
+Select::Select (const Block& bl)
+  : name (bl.alist ().name ("type")),
+    impl (*new Implementation (bl)),
+    accumulate (bl.alist ().flag ("accumulate")),
+    handle (bl.alist ().check ("handle")
+            ? Handle (bl.alist ().identifier ("handle"))
+            : Handle ((bl.alist ().check ("when") 
+                       ||  (bl.alist ().check ("flux")
+			    && bl.alist ().flag ("flux")))
                       ? Handle::sum : Handle::current)),
-    interesting_content (al.flag ("interesting_content")),
-    count (al.integer ("count")),
-    path (al.identifier_sequence ("path")),
+    interesting_content (bl.alist ().flag ("interesting_content")),
+    count (bl.alist ().integer ("count")),
+    path (bl.alist ().identifier_sequence ("path")),
     last_index (path.size () - 1),
     current_name (path[0]),
     is_active (false)

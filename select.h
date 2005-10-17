@@ -150,7 +150,7 @@ public:
                              double from, double to,
                              Treelog&) const;
 protected:
-  Select (const AttributeList& al);
+  Select (const Block& al);
 public:
   virtual ~Select ();
 };

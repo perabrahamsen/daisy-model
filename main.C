@@ -117,7 +117,9 @@ attributes.");
       options.copyright (treelog);
       if (!run_syntax->check (*run_alist, treelog))
         return 1;
-      auto_ptr<Program> program (Librarian<Program>::create (*run_alist));
+      Block block (syntax, alist);
+      auto_ptr<Program> program (Librarian<Program>::build (block, 
+							    *run_alist));
       program->initialize (&syntax, &alist, treelog);
       if (!program->check (treelog))
 	return 1;

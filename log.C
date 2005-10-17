@@ -57,7 +57,7 @@ Log::check_entry (symbol name, const Library& library) const
     {
       if (library.check (name))
 	{
-	  const AttributeList alist = library.lookup (name);
+	  const AttributeList alist (library.lookup (name));
 	  if (alist.check ("type"))
 	    name = alist.identifier ("type");
 	  else
@@ -141,9 +141,9 @@ Log::print_dlf_header (std::ostream& out, const AttributeList& al)
   out << "\n--------------------\n";
 }
 
-Log::Log (const AttributeList& al)
+Log::Log (const Block& bl)
   : impl (*new Implementation ()),
-    name (al.identifier ("type"))
+    name (bl.alist ().identifier ("type"))
 { }
 
 void

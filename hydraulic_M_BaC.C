@@ -23,6 +23,7 @@
 // Brooks and Corey retention curve model with Mualem theory.
 
 #include "hydraulic.h"
+#include "check.h"
 #include "mathlib.h"
 
 class HydraulicM_BaC : public Hydraulic
@@ -136,7 +137,7 @@ HydraulicM_BaCSyntax::HydraulicM_BaCSyntax ()
   Hydraulic::load_K_sat (syntax, alist);
   syntax.add ("lambda", Syntax::None (), Syntax::Const,
 	      "Pore size index.");
-  syntax.add ("h_b", "cm", Syntax::Const,
+  syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
 	      "Bubbling pressure.");
 
   Librarian<Hydraulic>::add_type ("M_BaC", alist, syntax, 

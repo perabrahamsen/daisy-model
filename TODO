@@ -1,5 +1,221 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Ryd op i TODO liste.
+
+* block
+
+** program_document should include local variables in parameterizations.
+
+* Udine præs
+
+** Jan Vos
+
+*** phenology
+
+cultivar, temperature!, photoperiod?, water?, nitrogen...
+
+Nitrogen deos not affect time and rate of appearence of crop parts,
+except severe N stress produce fewer leaves late in life.
+
+Size of leaves is affected, until a sat point.
+
+No clear effect of N on SpLAI.
+
+Clear affect of N on leaf size on the first 20 days, then leaf size
+constants. 
+
+Water does not affect on timeof rate of appearence of crop parts.
+
+N conc (= max photosynthesis) in leafs very little affected by N!
+
+*** Greenwood
+
+Y = n/conc %
+
+W = crop weight t/ha
+
+C3 crit: Y = 5.7 exp (W, -0.5)
+
+C4 crit: Y = 4.1 exp (W, -0.5)
+
+1 < W < 12 t/ha
+
+N stress effect on potatoes = -2.04 + 6.27 * stress - 3.20 * sqr (stress)
+
+** DKL MacKerron: Scottish Crop Research Institute
+
+Mineralizering + Immobilisering rater vigtigere end N_min
+
+Plant may steal N from immobilization?  (pig in the middle)
+
+Less (early?) N gives less leaves, which might be fine (LAI > 3 is a waste)
+
+** Three quadrant diagram of N response
+
+        W_yield
+           |
+N_supply --+-- N_uptake
+           |
+        N_supply
+
+* WP5
+
+** PL
+
+Need new soil texture.  Wladyslaw sends original report.
+
+** PT 2004
+
+** PT 2003 = Jose / Jozef
+
+** Grafer
+
+* CT arbejde på PL data i stedet?
+
+* Udine
+
+Send bank detaljer med fax til
+
+Navn: Lara Martini
+Fax: 0039.(0)432.558603
+Email: lara.martini@amm.uniud.it
+
+Send originale kviteringer for flybillet
+
+Lara Martini
+Dip. Scienze Agrarie
+via delle Scienze 208
+33100 Eduine
+Italy
+
+* WP6
+
+** husk plant and harvest dates!
+
+Skal være for FertOrgaNic sort!
+
+Specificer FertOrgaNic sort for alle sites.
+
+** Price of nitrogen needed for making FON breakeven for farmers?
+
+** Price of water needed for making FON breakeven for farmers?
+
+** Harvest når bladene er faldet af?
+
+** gun irrigation
+
+** send demand to everybody!
+
+* WP5 report
+
+** Joao
+
+*** PL cow FYM imobilizes 2004
+
+*** CZ pig FYM 10% N
+
+*** CZ pig slurry immobilizes
+
+*** DK pig slurry 8% N
+
+*** PT green rye residuals immobileses 60%
+
+*** PT green potato res immobilized 10%
+
+** We need H-E temperature sum in management overview table
+
+** DK + PL similar
+
+** IT + SK + CZ similar
+
+** DK
+
+2004 T2 data bad due to soil pan.
+
+DptEmr = 20 supported by measurements
+
+** PL
+
+PrecipCorrect
+
+LAI
+
+** IT
+
+2003 HOT (and bad compost)
+
+2004 bad compost evident
+
+2005 good crop
+
+* Database brev til Finn og Paul Lassen
+
+** Save selection.
+
+* IDE:  Mikkel implementerer Farquhar photosyntese.
+
+* gnuplot
+
+** size
+
+** lmargin, rmargin?
+
+** automatisk find passende "ticks" på x-akse
+
+** monochrome?
+
+** symbolske filnavne?
+
+(defprogram test gnuplot
+   (input "harvest.dlf" "crop_prod.dlf")
+   (source ((file "$1") (tag "Stem DM"))
+           ((file "$2") (tag "LAI"))))
+
+(declare foo[] string
+  "List of strings to foo.")
+;;(set foo "hello" "world")
+(foo "hello" "world")
+
+scope = alist + syntax
+
+(deflog SomeLog table
+   "Log something.  Set 'dim' to specify dimension"
+   (declare dim string
+      "Dimension to use in this log."
+      [Mg/ha])
+   (entries (foo (dimension "\{dim}"))))
+
+(deflog MyLog SomeLog
+   "Log something in kg/ha"
+   (dim [kg/ha]))
+
+Daisy -> MyLog -> foo -> dimension
+
+
+Alist har en "syntax" indeholdene lokale variable?
+
+En særlig scope?
+
+Frame frame (Frame& parent)
+
+frame.type (key)
+frame.alist (key).number (key)
+
+** Escape string for tex output
+
+Use FormatLaTeX to escape dimensions and tags in plot when outputting
+LaTeX.
+
+* Tutorial
+
+** Dokumenter groundwater file og pressure table
+
+Omskriv dem evt. til at bruge source.
+
+** Batch programming
+
+** hydraulic table program
+
 * command
 
 Hav et command bibliotek, hvis elementer bliver kørt straks af
@@ -18,39 +234,11 @@ skrive select ud direkte, har en "efterbehandlingssystem, en liste af
 output columns der har select column tags og værdier i en Scope, og
 laver beregninger på dem med en Number.
 
-* gnuplot
-
-** automatisk find passende "ticks" på x-akse
-
-** monochrome?
-
-** symbolske filnavne?
-
-(defprogram test gnuplot
-   (input "harvest.dlf" "crop_prod.dlf")
-   (source ((file "$1") (tag "Stem DM"))
-           ((file "$2") (tag "LAI"))))
-
-** Escape string for tex output
-
-Use FormatLaTeX to escape dimensions and tags in plot when outputting
-LaTeX.
-
-* Forbered præsentation i Udine
-
-* Skriv lille historie i tutorial om plot.
-
 * WP5 kalibrering
 
 ** N og vand balance for Polen.
 
 * Mandag: Kig på Portugisisk opsætning med Charlotte T.
-
-* WP6
-
-** FON WP6: Det skal hvede ind imellem (suk!).
-
-** FON WP6: TA for 1 år baseret på regneark fra DIAS.
 
 * from og to support for select_array
 
@@ -59,6 +247,10 @@ LaTeX.
 * gnuplot program
 
 ** Generelt fascilitet til at læse dwf/dlf/ddf filer?
+
+* Automisk udregning af partitioning?
+
+Angiv stem/leaf/sorg på forskellige datoer
 
 * Support bibliography attribute...
 
@@ -83,10 +275,6 @@ check kun de søjler der matcher log'en.
           (N amount 20 [kg N/ha])
           (N target 80 [kg N/ha] (from 0 [cm]) (to 50 [cm]))
           (NH4_fraction concentration 1 [mg N/l]))
-
-* strstream.[Ch], TmpStream
-
-Drop den, og brug stringstream i stedet.
 
 * PT data
 
@@ -135,6 +323,10 @@ prøv at disable abitioc factors...
 
 prøv at køre ler med sandsædskifte, og sand med lersædskift.
 
+** Forsøg emperisk sammenhæng mellem input/humus -> som1/som2
+
+Virker ikke!  Afhænger af startniveau!
+
 ** Plot initialisering med background_mineralization = 0.
 
 ** Find referencer.
@@ -145,10 +337,6 @@ prøv at køre ler med sandsædskifte, og sand med lersædskift.
 
 Hvis dagsregn er mindre end 24 * min_intensity, start timeregn med
 min_intensite kl. 8 
-
-* Skriv parameteriseringer i referencemanual.
-
-Specielt format for log filer.
 
 * (defstring field_sep "\t")
 

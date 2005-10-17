@@ -47,7 +47,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit SourceStandard (const AttributeList& al);
+  explicit SourceStandard (const Block& bl);
   ~SourceStandard ();
 };
 
@@ -134,15 +134,15 @@ SourceStandard::load (Treelog& msg)
   return true;
 }
 
-SourceStandard::SourceStandard (const AttributeList& al)
-  : SourceFile (al),
-    tag (al.name ("tag")),
-    title_ (al.name ("title", tag)),
-    original (al.name ("original", Syntax::Unknown ())),
-    dimension_ (al.name ("dimension", original)),
-    dim_line (al.flag ("dim_line", !al.check ("original"))),
-    has_factor (al.check ("factor")),
-    factor (al.number ("factor", 1.0))
+SourceStandard::SourceStandard (const Block& bl)
+  : SourceFile (bl),
+    tag (bl.alist ().name ("tag")),
+    title_ (bl.alist ().name ("title", tag)),
+    original (bl.alist ().name ("original", Syntax::Unknown ())),
+    dimension_ (bl.alist ().name ("dimension", original)),
+    dim_line (bl.alist ().flag ("dim_line", !bl.alist ().check ("original"))),
+    has_factor (bl.alist ().check ("factor")),
+    factor (bl.alist ().number ("factor", 1.0))
 { }
 
 SourceStandard::~SourceStandard ()
@@ -151,8 +151,8 @@ SourceStandard::~SourceStandard ()
 
 static struct SourceStandardSyntax
 {
-  static Source& make (const AttributeList& al)
-  { return *new SourceStandard (al); }
+  static Source& make (const Block& bl)
+  { return *new SourceStandard (bl); }
 
   SourceStandardSyntax ()
   { 

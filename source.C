@@ -88,8 +88,8 @@ void
 Source::load_syntax (Syntax&, AttributeList&)
 { }
 
-Source::Source (const AttributeList& al)
-  : name (al.identifier ("type"))
+Source::Source (const Block& bl)
+  : name (bl.alist ().identifier ("type"))
 { }
 
 Source::~Source ()

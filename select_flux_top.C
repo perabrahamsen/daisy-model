@@ -73,8 +73,8 @@ struct SelectFluxTop : public SelectValue
     if (default_from < 0.0)
       height = default_from;
   }
-  SelectFluxTop (const AttributeList& al)
-    : SelectValue (al),
+  SelectFluxTop (const Block& bl)
+    : SelectValue (bl),
       height (0.0),
       last (NULL),
       index (-1)
@@ -83,8 +83,8 @@ struct SelectFluxTop : public SelectValue
 
 static struct SelectFluxTopSyntax
 {
-  static Select& make (const AttributeList& al)
-  { return *new SelectFluxTop (al); }
+  static Select& make (const Block& bl)
+  { return *new SelectFluxTop (bl); }
 
   SelectFluxTopSyntax ()
   { 

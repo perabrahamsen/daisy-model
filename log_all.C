@@ -258,22 +258,25 @@ LogAll::output (symbol name, const Time& value)
       (*i)->output_time (value);
 }
 
-const AttributeList& 
-LogAll::get_alist ()
+const Block& 
+LogAll::get_block ()
 {
   static AttributeList alist;
+  static Syntax syntax;
   if (!alist.check ("type"))
     {
-      Syntax syntax;
       LogSelect::load_syntax (syntax, alist);
       alist.add ("type", "all");
       AttributeList when;
+
+
       when.add ("type", "true");
       alist.add ("when", when);
       alist.add ("entries", vector<AttributeList*> ());
       daisy_assert (syntax.check (alist, Treelog::null ()));
     }
-  return alist;
+  static Block block (syntax, alist);
+  return block;
 }
 
 void
@@ -281,7 +284,7 @@ LogAll::initialize (Treelog&)
 { }
 
 LogAll::LogAll (const vector<Log*>& logs)
-  : LogSelect (get_alist ()),
+  : LogSelect (get_block ()),
     msg (NULL)
 {
   // Combine entries.

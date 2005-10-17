@@ -79,18 +79,18 @@ struct SelectPF : public Select
   { return value.size (); }
 
   // Create and Destroy.
-  SelectPF (const AttributeList& al)
-    : Select (al),
-      max_h (al.number ("max_h")),
-      value (al.number_sequence ("value")),
+  SelectPF (const Block& bl)
+    : Select (bl),
+      max_h (bl.alist ().number ("max_h")),
+      value (bl.alist ().number_sequence ("value")),
       last_soil (NULL)
   { }
 };
 
 static struct SelectPFSyntax
 {
-  static Select& make (const AttributeList& al)
-  { return *new SelectPF (al); }
+  static Select& make (const Block& bl)
+  { return *new SelectPF (bl); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   {

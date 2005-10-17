@@ -243,7 +243,7 @@ Minimum ammonium concentration near roots for uptake.");
 	      Syntax::State,
 	       "Number of days production has halted due to nitrogen stress.\n\
 This is the sum of nitrogen stress for each hour, multiplied with the\n\
-fraction of the radition of that day that was received that hour.");
+action of the radition of that day that was received that hour.");
   alist.add ("nitrogen_stress_days", 0.0);
 
   // Fixation.

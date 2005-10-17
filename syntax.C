@@ -70,6 +70,30 @@ struct Syntax::Implementation
   void entries (vector<string>& result) const;
   Implementation ()
   { }
+  Implementation (const Implementation& old)
+    : checker (old.checker),
+      order (old.order),
+      types (old.types),
+      status (old.status),
+      size (old.size),
+      libraries (old.libraries),
+      domains (old.domains),
+      dimensions (old.dimensions),
+      num_checks (old.num_checks),
+      val_checks (old.val_checks),
+      descriptions (old.descriptions)
+  {
+    // Clone syntax.
+    for (syntax_map::const_iterator i = old.syntax.begin ();
+	 i != old.syntax.end (); 
+	 i++)
+      syntax[(*i).first] = new Syntax (*(*i).second);
+    // Clone alists.
+    for (alist_map::const_iterator i = old.alists.begin ();
+	 i != old.alists.end (); 
+	 i++)
+      alists[(*i).first] = new AttributeList (*(*i).second);
+  }
   ~Implementation ()
   {
     map_delete (syntax.begin (), syntax.end ());
@@ -103,10 +127,10 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
       // Spcial handling of various types.
       if (types[key] == Number)
 	{
-	  // This should already be checked by the file parse, but you
+	  // This should already be checked by the file parser, but you
 	  // never know... better safe than sorry...  don't drink and
 	  // drive...  Well, theoretically the alist could come from
-	  // another source (like one of the many other parser :/), or
+	  // another source (like one of the many other parsers :/), or
 	  // be one of the build in ones.
 	  check_map::const_iterator i = num_checks.find (key);
 
@@ -313,34 +337,34 @@ Syntax::User ()
 
 // Each syntax entry should have an associated type.
 
-static const char * const type_names[] = 
+static const std::string type_names[] = 
 { "Number", "AList", "PLF", "Boolean", "String",
-  "Integer", "Object", "Library", "Error", NULL };
+  "Integer", "Object", "Library", "Error" };
 
-const char* 
+const std::string&
 Syntax::type_name (type t)
 { return type_names[t]; }
     
 Syntax::type
-Syntax::type_number (const char* name)
+Syntax::type_number (const std::string& name)
 { 
-  for (int i = 0; type_names[i]; i++)
-    if (strcmp (name, type_names[i]) == 0)
+  for (int i = 0; type_names[i] != "Error"; i++)
+    if (name == type_names[i])
       return static_cast<type> (i);
   return Error;
 }
 
-static const char * const category_names[] = 
-{ "Const", "State", "OptionalState", "OptionalConst", "LogOnly", NULL };
+static const std::string category_names[] = 
+{ "Const", "State", "OptionalState", "OptionalConst", "LogOnly"};
 
-const char* Syntax::category_name (category c)
+const std::string& Syntax::category_name (category c)
 { return category_names[c]; }
 
 int
-Syntax::category_number (const char* name)
+Syntax::category_number (const std::string& name)
 { 
-  for (int i = 0; category_names[i]; i++)
-    if (strcmp (name, category_names[i]) == 0)
+  for (int i = 0; category_names[i] != "LogOnly"; i++)
+    if (name == category_names[i])
       return i;
   return -1;
 }
@@ -503,7 +527,7 @@ Syntax::order (const string& name) const
 bool
 Syntax::total_order () const
 { 
-  int non_logs = 0;
+  size_t non_logs = 0;
   for (Implementation::status_map::iterator i = impl.status.begin ();
        i != impl.status.end ();
        i++)
@@ -758,6 +782,10 @@ Syntax::add_check (check_fun fun)
 
 Syntax::Syntax ()
   : impl (*new Implementation ())
+{ }
+
+Syntax::Syntax (const Syntax& old)
+  : impl (*new Implementation (old.impl))
 { }
 
 Syntax::~Syntax ()

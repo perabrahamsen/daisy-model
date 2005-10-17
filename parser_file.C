@@ -84,12 +84,12 @@ struct ParserFile::Implementation
   void add_derived (Library&);
   AttributeList& load_derived (const Library& lib, bool in_sequence,
 			       const AttributeList* original);
-  void load_list (AttributeList&, const Syntax&);
+  void load_list (Syntax&, AttributeList&);
   Time get_time ();
-  const Syntax* global_syntax_table;
+  Syntax* global_syntax_table;
 
   // Create and destroy.
-  void initialize (const Syntax&, Treelog&);
+  void initialize (Syntax&, Treelog&);
   Implementation (const string&);
   ~Implementation ();
 };
@@ -132,6 +132,9 @@ ParserFile::Implementation::get_string ()
 		  break;
 		case '\n':
 		  c = get ();
+		  break;
+		case '{':
+		  str += '\\';
 		  break;
 		case '\\':
 		case '"':
@@ -460,7 +463,7 @@ ParserFile::Implementation::add_derived (Library& lib)
       skip_to_end ();
       return;
     }
-  const Syntax& syntax = lib.syntax (super);
+  Syntax& syntax = *new Syntax (lib.syntax (super));
   // Create new attribute derived from its superclass.
   const AttributeList& sl = lib.lookup (super);
   AttributeList& atts = *new AttributeList (sl);
@@ -475,9 +478,9 @@ ParserFile::Implementation::add_derived (Library& lib)
       && looking_at ('"'))
     atts.add ("description", get_string ());
   // Add separate attributes for this object.
-  load_list (atts, syntax);
+  load_list (syntax, atts);
   // Add new object to library.
-  lib.add_derived (name, atts, super);
+  lib.add_derived (name, syntax, atts, super);
 }
 
 AttributeList&
@@ -490,12 +493,12 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
   static const symbol original_symbol ("original");
   symbol type;
 
-  static const string compatibilty_symbol ("used_to_be_a_submodel");
-  if (original && original->check (compatibilty_symbol) && looking_at ('('))
+  static const string compatibility_symbol ("used_to_be_a_submodel");
+  if (original && original->check (compatibility_symbol) && looking_at ('('))
     {
       // Special hack to allow skipping the "original" keyword for
       // models that used to be submodels.
-      daisy_assert (original->flag (compatibilty_symbol));
+      daisy_assert (original->flag (compatibility_symbol));
       daisy_assert (original->check ("type"));
       const symbol original_type = original->identifier ("type");
       daisy_assert (lib.check (original_type));
@@ -554,7 +557,11 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
 	  alist->add ("type", type);
 	}
       if (skipped || !in_sequence)
-	load_list (*alist, lib.syntax (type));
+	{
+	  // TODO: allow local parameters in inline objects.
+	  Syntax syntax (lib.syntax (type));
+	  load_list (syntax, *alist);
+	}
     skip_it:;
     }
   catch (const string& msg)
@@ -571,8 +578,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
 }
 
 void
-ParserFile::Implementation::load_list (AttributeList& atts,
-				       const Syntax& syntax)
+ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 { 
   vector<string>::const_iterator current = syntax.order ().begin ();
   const vector<string>::const_iterator end = syntax.order ().end ();
@@ -596,6 +602,32 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	  in_order = true;
 	  name = *current;
 	  current++;
+	}
+
+      // Declarations.
+      if (name == "declare")
+	{
+	  bool ok = true;
+	  // Special handling of block local variales.
+	  const std::string var = get_string ();
+	  if (syntax.lookup (var) != Syntax::Error)
+	    {
+	      error ("'" + var + "' already exists");
+	      ok = false;
+	    }
+	  const std::string type_name = get_string ();
+	  const Syntax::type type = Syntax::type_number (type_name);
+	  if (type == Syntax::Error)
+	    {
+	      error ("'" + type_name + "' unknown type");
+	      ok = false;
+	    }
+	  std::string doc = "User defined variable";
+	  if (!looking_at ('('))
+	    doc = get_string ();
+	  if (ok)
+	    syntax.add (var, type, Syntax::Const, doc);
+	  goto done;
 	}
 
       // Duplicate warning.
@@ -646,8 +678,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      AttributeList list (atts.check (name) 
 				  ? atts.alist (name)
 				  : syntax.default_alist (name));
-	      
-	      load_list (list, syntax.syntax (name));
+	      // TODO: allow local parameters in submodels.
+	      Syntax syn (syntax.syntax (name));
+	      load_list (syn, list);
 	      atts.add (name, list);
 	      if (alist_skipped)
 		skip (")");
@@ -818,7 +851,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  : no_sequence;
 		while (!looking_at (')') && good ())
 		  {
-		    const int element = sequence.size ();
+		    const size_t element = sequence.size ();
 		    AttributeList& al 
 		      = (old_sequence.size () > element
 			 ? load_derived (lib, true, old_sequence[element])
@@ -852,7 +885,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      }
 	    case Syntax::AList:
 	      {
-		const int size = syntax.size (name);
+		const size_t size = syntax.size (name);
 		static const vector<AttributeList*> no_sequence;
 		const Syntax& syn = syntax.syntax (name);
 		const vector<AttributeList*>& old_sequence
@@ -873,12 +906,14 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		while (!looking_at (')') && good ())
 		  {
 		    skip ("(");
-		    const int element = sequence.size ();
+		    const size_t element = sequence.size ();
 		    AttributeList& al
 		      = *new AttributeList (old_sequence.size () > element
 					    ? *old_sequence[element]
 					    : syntax.default_alist (name));
-		    load_list (al, syn);
+		    // TODO: Allow local parameters in submodels.
+		    Syntax s (syn);
+		    load_list (s, al);
 		    sequence.push_back (&al);
 		    skip (")");
 		  }
@@ -1109,6 +1144,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    error (tmp.str ());
 	}
 
+done:
       if (skipped)
 	skip (")");
       skip ();
@@ -1136,7 +1172,7 @@ ParserFile::Implementation::get_time ()
 }
 
 void
-ParserFile::Implementation::initialize (const Syntax& syntax, Treelog& out)
+ParserFile::Implementation::initialize (Syntax& syntax, Treelog& out)
 { 
   global_syntax_table = &syntax; 
   lexer = new Lexer (file, out);
@@ -1161,7 +1197,7 @@ void
 ParserFile::load_nested (AttributeList& alist)
 {
   impl.skip ();
-  impl.load_list (alist, *impl.global_syntax_table);
+  impl.load_list (*impl.global_syntax_table, alist);
   impl.skip ();
   impl.eof ();
 }
@@ -1191,7 +1227,7 @@ ParserFile::error_count () const
 }
 
 void
-ParserFile::initialize (const Syntax& syntax, Treelog& out)
+ParserFile::initialize (Syntax& syntax, Treelog& out)
 { impl.initialize (syntax, out); }
 
 static const AttributeList& 
@@ -1203,7 +1239,7 @@ get_alist ()
   return alist;
 }
     
-ParserFile::ParserFile (const Syntax& syntax, const string& name, Treelog& out)
+ParserFile::ParserFile (Syntax& syntax, const string& name, Treelog& out)
   : Parser (get_alist ()),
     impl (*new Implementation (name))
 { initialize (syntax, out); }

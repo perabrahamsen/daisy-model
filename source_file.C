@@ -338,13 +338,14 @@ work similar, but with its own style counter.  For color plots, points\n\
 and lines with the same style number also have the same color.");
 }
 
-SourceFile::SourceFile (const AttributeList& al)
-  : Source (al),
-    filename (al.name ("file")),
-    with_ (al.name ("with", "")),
-    style_ (al.integer ("style", -1)),
-    missing (al.name_sequence ("missing")),
-    filter (map_construct_const<Filter> (al.alist_sequence ("filter"))),
+SourceFile::SourceFile (const Block& bl)
+  : Source (bl),
+    filename (bl.expand ("file")),
+    with_ (bl.alist ().name ("with", "")),
+    style_ (bl.alist ().integer ("style", -1)),
+    missing (bl.alist ().name_sequence ("missing")),
+    filter (map_construct_const<Filter> (bl.alist ()
+					 .alist_sequence ("filter"))),
     field_sep ("UNINITIALIZED"),
     year_c (-42),
     month_c (-42),

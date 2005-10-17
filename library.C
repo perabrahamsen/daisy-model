@@ -38,7 +38,7 @@ struct Library::Implementation
 {
   typedef map<symbol, Library*> library_map;
   static library_map* all;
-  static int all_count;
+  static size_t all_count;
 
   // We give each parsed object an increasing sequence number.
   static int sequence;
@@ -67,7 +67,7 @@ struct Library::Implementation
 };
 
 Library::Implementation::library_map* Library::Implementation::all = NULL;
-int Library::Implementation::all_count = 0;
+size_t Library::Implementation::all_count = 0;
 int Library::Implementation::sequence = 0;
 
 void
@@ -232,12 +232,11 @@ Library::Implementation::~Implementation ()
   all->erase (all->find (name)); 
 
   // Delete list of libraries if empty.
+  daisy_assert (all_count > 0);
   all_count--;
   daisy_assert (all->size () == all_count);
   if (all_count == 0)
     delete all;
-  else
-    daisy_assert (all_count > 0);
 }
 
 bool
@@ -291,8 +290,15 @@ void
 Library::add_derived (const symbol name, AttributeList& al,
 		      const symbol super)
 { 
+  add_derived (name, syntax (super), al, super); 
+}
+
+void
+Library::add_derived (const symbol name, const Syntax& syn, AttributeList& al,
+		      const symbol super)
+{ 
   al.add ("type", super);
-  impl.derive (name, al, super); 
+  impl.derive (name, syn, al, super); 
 }
 
 const Syntax& 

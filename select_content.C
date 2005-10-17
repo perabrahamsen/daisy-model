@@ -35,16 +35,16 @@ struct SelectContent : public SelectValue
   { add_result (array[soil->interval_plus (height)]); }
 
   // Create and Destroy.
-  SelectContent (const AttributeList& al)
-    : SelectValue (al),
-      height (al.number ("height"))
+  SelectContent (const Block& bl)
+    : SelectValue (bl),
+      height (bl.alist ().number ("height"))
     { }
 };
 
 static struct SelectContentSyntax
 {
-  static Select& make (const AttributeList& al)
-    { return *new SelectContent (al); }
+  static Select& make (const Block& bl)
+    { return *new SelectContent (bl); }
 
   SelectContentSyntax ()
     { 

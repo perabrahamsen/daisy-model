@@ -38,7 +38,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  SelectValue (const AttributeList& al);
+  SelectValue (const Block& bl);
 };
 
 #endif /* SELECT_VALUE_H */

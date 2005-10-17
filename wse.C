@@ -190,10 +190,10 @@ struct ProgramWSE_table : public Program
   { };
   bool check (Treelog&)
   { return true; }
-  ProgramWSE_table (const AttributeList& al)
-    : Program (al),
-      wse (Librarian<WSE>::create (al.alist ("wse"))),
-      intervals (al.integer ("intervals"))
+  ProgramWSE_table (const Block& bl)
+    : Program (bl),
+      wse (Librarian<WSE>::create (bl.alist ().alist ("wse"))),
+      intervals (bl.alist ().integer ("intervals"))
   { }
   ~ProgramWSE_table ()
   { }
@@ -202,8 +202,8 @@ struct ProgramWSE_table : public Program
 static struct ProgramWSE_tableSyntax
 {
   static Program&
-  make (const AttributeList& al)
-  { return *new ProgramWSE_table (al); }
+  make (const Block& bl)
+  { return *new ProgramWSE_table (bl); }
   ProgramWSE_tableSyntax ()
   {
     Syntax& syntax = *new Syntax ();

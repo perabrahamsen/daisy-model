@@ -85,7 +85,7 @@ struct LogTable : public LogSelect, public Destination
   bool check (const Border&, Treelog& msg) const;
   static bool contain_time_columns (const vector<Select*>& entries);
   void initialize (Treelog&);
-  explicit LogTable (const AttributeList& al);
+  explicit LogTable (const Block& bl);
   void summarize (Treelog&);
   ~LogTable ();
 };
@@ -374,22 +374,22 @@ LogTable::initialize (Treelog& msg)
     summary[i]->initialize (entries, msg);
 }
 
-LogTable::LogTable (const AttributeList& al)
-  : LogSelect (al),
-    parsed_from_file (al.name ("parsed_from_file", "")),
-    file (al.name ("where")),
-    flush (al.flag ("flush")),
-    record_separator (al.name ("record_separator")),
-    field_separator (al.name ("field_separator")),
-    error_string (al.name ("error_string")),
-    missing_value (al.name ("missing_value")),
-    array_separator (al.name ("array_separator")),
-    print_header (al.name ("print_header")),
-    print_tags (al.flag ("print_tags")),
-    print_dimension (al.flag ("print_dimension")),
-    print_initial (al.flag ("print_initial")),
+LogTable::LogTable (const Block& bl)
+  : LogSelect (bl),
+    parsed_from_file (bl.alist ().name ("parsed_from_file", "")),
+    file (bl.alist ().name ("where")),
+    flush (bl.alist ().flag ("flush")),
+    record_separator (bl.expand ("record_separator")),
+    field_separator (bl.expand ("field_separator")),
+    error_string (bl.expand ("error_string")),
+    missing_value (bl.expand ("missing_value")),
+    array_separator (bl.expand ("array_separator")),
+    print_header (bl.expand ("print_header")),
+    print_tags (bl.alist ().flag ("print_tags")),
+    print_dimension (bl.alist ().flag ("print_dimension")),
+    print_initial (bl.alist ().flag ("print_initial")),
     time_columns (!contain_time_columns (entries)),
-    summary (map_create<Summary> (al.alist_sequence ("summary"))),
+    summary (map_create<Summary> (bl.alist ().alist_sequence ("summary"))),
     begin (1, 1, 1, 1),
     end (1, 1, 1, 1),
     type (Error),
@@ -436,8 +436,8 @@ LogTable::~LogTable ()
 
 static struct LogTableSyntax
 {
-  static Log& make (const AttributeList& al)
-    { return *new LogTable (al); }
+  static Log& make (const Block& bl)
+  { return *new LogTable (bl); }
 
   LogTableSyntax ()
     { 

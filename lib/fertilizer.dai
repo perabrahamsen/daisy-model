@@ -3,21 +3,21 @@
 (defam Ammonia mineral
   (description "Pure NH4.
 Added by <sha@kvl.dk>, 2000.")
-  (NH4_fraction 1.000))
+  (NH4_fraction 1.000 []))
 
 (defam AmmoniumNitrate mineral
   (description "A 50-50 mix of NH4 and NO3.
 Added by <sha@kvl.dk>, 2000.")
-  (NH4_fraction 0.500)) 
+  (NH4_fraction 0.500 [])) 
 
 (defam Nitrate mineral
   (description "Pure NO3.")
-  (NH4_fraction 0.000))
+  (NH4_fraction 0.000 []))
 
 (defam N25S mineral
   (description "From _Kemira '97_.
 Added by <sha@kvl.dk>, 2000.")
-  (NH4_fraction 0.508))
+  (NH4_fraction 0.508 []))
 
 (defam NPK01 mineral
   (description "Various NPK and NS fertilizers")
@@ -39,67 +39,67 @@ Added by <sha@kvl.dk>, 2000.")
   (description "Average based on numbers provided by Torben Bonde, Danish
 Environmental Protection Agency, approximately 1991.
 Added by <sha@kvl.dk>, 2000.")
-  (volatilization 0.15)
-  (om ((initial_fraction 0.72)
-       (C_per_N 100)
-       (turnover_rate 2.0e-4)
-       (efficiency 0.60 0.60)
-       (fractions 0.0 1.0 0.0))
-      ((initial_fraction 0.18)
-       (turnover_rate 2.0e-3)
-       (efficiency 0.60 0.60)
-       (fractions 0.0 1.0 0.0))
-      ((C_per_N 11)
-       (turnover_rate 1.0)
-       (efficiency 1.0)
-       (fractions 0.0 0.0 1.0))))
+  (volatilization 0.15 [])
+  (om ((initial_fraction 0.72 [])
+       (C_per_N 100 [(g C/cm^3)/(g N/cm^3)])
+       (turnover_rate 2.0e-4 [h^-1])
+       (efficiency 0.60 0.60 [])
+       (fractions 0.0 1.0 0.0 []))
+      ((initial_fraction 0.18 [])
+       (turnover_rate 2.0e-3 [h^-1])
+       (efficiency 0.60 0.60 [])
+       (fractions 0.0 1.0 0.0 []))
+      ((C_per_N 11 [(g C/cm^3)/(g N/cm^3)])
+       (turnover_rate 1.0 [h^-1])
+       (efficiency 1.0 [])
+       (fractions 0.0 0.0 1.0 []))))
 
 (defam cattle_slurry slurry
   (description "Numbers found by <hsv@kvl.dk>, 2001.")
-  (dry_matter_fraction 0.059)
-  (total_N_fraction 0.100)
-  (total_C_fraction 0.375)
-  (NH4_fraction  0.700))
+  (dry_matter_fraction 0.059 [])
+  (total_N_fraction 0.100 [])
+  (total_C_fraction 0.375 [])
+  (NH4_fraction  0.700 []))
 
 (defam pig_slurry slurry
   (description "Numbers found by <hsv@kvl.dk>, 2001.")
-  (dry_matter_fraction 0.059)
-  (total_N_fraction 0.100)
-  (total_C_fraction 0.375)
-  (NH4_fraction  0.700))
+  (dry_matter_fraction 0.059 [])
+  (total_N_fraction 0.100 [])
+  (total_C_fraction 0.375 [])
+  (NH4_fraction  0.700 []))
 
 (defam manure slurry
   (description "We have no specific information about manure."))
 
 (defam cattle_manure manure
   (description "Numbers found by <hsv@kvl.dk>, 2001.")
-  (dry_matter_fraction 0.059)
-  (total_N_fraction 0.100)
-  (total_C_fraction 0.375)
-  (NH4_fraction  0.700)
-  (NO3_fraction  0.200))
+  (dry_matter_fraction 0.059 [])
+  (total_N_fraction 0.100 [])
+  (total_C_fraction 0.375 [])
+  (NH4_fraction  0.700 [])
+  (NO3_fraction  0.200 []))
 
 (defam pig_manure manure
   (description "Numbers found by <hsv@kvl.dk>, 2001.")
-  (dry_matter_fraction 0.059)
-  (total_N_fraction 0.100)
-  (total_C_fraction 0.375)
-  (NH4_fraction  0.700)
-  (NO3_fraction  0.200))
+  (dry_matter_fraction 0.059 [])
+  (total_N_fraction 0.100 [])
+  (total_C_fraction 0.375 [])
+  (NH4_fraction  0.700 [])
+  (NO3_fraction  0.200 []))
 
 (defam horse_manure manure
   (description "Numbers found by <hsv@kvl.dk>, 2001.")
-  (dry_matter_fraction 0.297)
-  (total_N_fraction 0.014)
-  (total_C_fraction 0.375)
-  (NH4_fraction  0.250)
-  (volatilization  0.000))
+  (dry_matter_fraction 0.297 [])
+  (total_N_fraction 0.014 [])
+  (total_C_fraction 0.375 [])
+  (NH4_fraction  0.250 [])
+  (volatilization  0.000 []))
 
 (defam Foulum_slurry slurry
   (description "Parameters provided by DJF in Foulum, 1998.
 Added by <sha@kvl.dk>, 2000.")
-  (dry_matter_fraction 0.0341)
-  (total_N_fraction 0.0615)
-  (total_C_fraction 0.323)
-  (NH4_fraction 0.57))
+  (dry_matter_fraction 0.0341 [])
+  (total_N_fraction 0.0615 [])
+  (total_C_fraction 0.323 [])
+  (NH4_fraction 0.57 []))
 
