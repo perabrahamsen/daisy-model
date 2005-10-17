@@ -202,7 +202,7 @@ LogSelect::LogSelect (const Block& bl)
   : Log (bl),
     description (bl.alist ().name ("description")),
     condition (Librarian<Condition>::create (bl.alist ().alist ("when"))),
-    entries (map_create<Select> (bl.alist ().alist_sequence ("entries"))),
+    entries (map_build<Select> (bl, "entries")),
     conv_vector (bl.alist ().identifier_sequence ("set")),
     from (bl.alist ().number ("from")),
     to (bl.alist ().number ("to"))
