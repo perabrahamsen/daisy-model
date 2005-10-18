@@ -31,8 +31,8 @@ struct Block::Implementation
 
   // Use.
   Syntax::type lookup (const std::string&) const;
-  const Syntax& syntax (const std::string& key) const;
-  const AttributeList& alist (const std::string& key) const;
+  const Syntax& find_syntax (const std::string& key) const;
+  const AttributeList& find_alist (const std::string& key) const;
   const std::string expand_string (const std::string& value) const;
 
   Implementation (const Block *const p, 
