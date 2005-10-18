@@ -230,18 +230,14 @@ map_submodel (const Block& parent, const std::string& key)
 { 
   std::vector<T*> t;
   const std::vector<AttributeList*> f (parent.alist_sequence (key));
-  const Library& library = Librarian<T>::library ();
+  const Syntax& syntax = parent.syntax ().syntax (key);
   for (std::vector<AttributeList*>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
     {
       const AttributeList& alist = **i;
-      daisy_assert (alist.check ("type"));
-      const symbol type = alist.identifier ("type");
-      daisy_assert (library.check (type));
-      const Syntax& syntax = library.syntax (type);
-      Block nested (parent, syntax, alist);
       daisy_assert (syntax.check (alist, Treelog::null ()));      
+      Block nested (parent, syntax, alist);
       t.push_back (new T (nested));
     }
   return t;
@@ -253,18 +249,14 @@ map_submodel_const (const Block& parent, const std::string& key)
 { 
   std::vector<const T*> t;
   const std::vector<AttributeList*> f (parent.alist_sequence (key));
-  const Library& library = Librarian<T>::library ();
+  const Syntax& syntax = parent.syntax ().syntax (key);
   for (std::vector<AttributeList*>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
     {
       const AttributeList& alist = **i;
-      daisy_assert (alist.check ("type"));
-      const symbol type = alist.identifier ("type");
-      daisy_assert (library.check (type));
-      const Syntax& syntax = library.syntax (type);
-      Block nested (parent, syntax, alist);
       daisy_assert (syntax.check (alist, Treelog::null ()));      
+      Block nested (parent, syntax, alist);
       t.push_back (new T (nested));
     }
   return t;

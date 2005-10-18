@@ -48,28 +48,28 @@ Block::Implementation::lookup (const std::string& key) const
 {
   Syntax::type type = syntax.lookup (key);
   if (type == Syntax::Error && parent)
-    return parent->lookup (key);
+    return parent->impl->lookup (key);
   return type;
 }
 
 const Syntax& 
-Block::Implementation::syntax (const std::string& key) const
+Block::Implementation::find_syntax (const std::string& key) const
 {
   Syntax::type type = syntax.lookup (key);
   if (type != Syntax::Error)
     return syntax;
   daisy_assert (parent != NULL);
-  return parent->syntax (key);
+  return parent->impl->find_syntax (key);
 }
 
 const AttributeList& 
-Block::Implementation::alist (const std::string& key) const
+Block::Implementation::find_alist (const std::string& key) const
 {
   Syntax::type type = syntax.lookup (key);
   if (type != Syntax::Error)
     return alist;
   daisy_assert (parent != NULL);
-  return parent->alist (key);
+  return parent->impl->find_alist (key);
 }
 
 const std::string 
@@ -104,11 +104,11 @@ Block::Implementation::expand_string (const std::string& value) const
 	      const Syntax::type type = lookup (key);
 	      if (type == Syntax::Error)
 		throw "Unknown expansion: '" + key + "'";
-	      const Syntax& syntax = this->syntax (key);
+	      const Syntax& syntax = find_syntax (key);
 	      if (syntax.size (key) != Syntax::Singleton)
 		throw "'" + key 
 		  + "' is a sequence, can only expand singletons";
-	      const AttributeList& alist = this->alist (key);
+	      const AttributeList& alist = find_alist (key);
 	      if (!alist.check (key))
 		throw "'" + key + "' has no value";
 	      switch (type)
@@ -126,6 +126,7 @@ Block::Implementation::expand_string (const std::string& value) const
 		  throw "'" + key + "' unhandled type";
 		}
 	      mode = normal;
+	      key = "";
 	    }
 	  else
 	    key += c;
@@ -163,7 +164,7 @@ Block::name (const std::string& key) const
 const std::string 
 Block::name (const std::string& key, const std::string& default_value) const
 {
-  if (impl->alist ().check (key))
+  if (impl->alist.check (key))
     return name (key);
 
   return default_value;
@@ -204,17 +205,17 @@ Block::number_sequence (const std::string& key) const
 const std::vector<symbol>
 Block::identifier_sequence (const std::string& key) const
 {
-  const std::vector<std::string>& value = impl->alist ().name_sequence (key);
+  const std::vector<std::string>& value = impl->alist.name_sequence (key);
   std::vector<symbol> result;
   for (size_t i = 0; i < value.size (); i++)
     result.push_back (symbol (impl->expand_string (value[i])));
   return result;
 }
   
-const std::vector<std::string>
+std::vector<std::string>
 Block::name_sequence (const std::string& key) const
 {
-  const std::vector<std::string>& value = impl->alist ().name_sequence (key);
+  const std::vector<std::string>& value = impl->alist.name_sequence (key);
   std::vector<std::string> result;
   for (size_t i = 0; i < value.size (); i++)
     result.push_back (impl->expand_string (value[i]));

@@ -103,7 +103,6 @@ public:
 
   type lookup (const std::string&) const;
   const Syntax& syntax (const std::string&) const;
-public:
   ::Library& library (const std::string&) const;
   int  size (const std::string&) const;
   const std::string& dimension (const std::string&) const;

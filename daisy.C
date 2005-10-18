@@ -64,7 +64,7 @@ Daisy::Daisy (const Block& al)
     global_alist (NULL),
     running (false),
     logging (false),
-    logs (map_build<Log> (bl, "output")),
+    logs (map_build<Log> (al, "output")),
     log_all (*new LogAll (logs)),
     active_logs (find_active_logs (logs, log_all)),
     activate_output (Librarian<Condition>::create

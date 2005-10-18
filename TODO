@@ -18,10 +18,6 @@ via delle Scienze 208
 33100 Eduine
 Italy
 
-** Database brev til Finn og Paul Lassen
-
-*** Save selection.
-
 ** Kattebilleder til Frantisek
 
 * WP5
@@ -92,97 +88,7 @@ Specificer FertOrgaNic sort for alle sites.
 
 ** send demand to everybody!
 
-* block
-
-** program_document should include local variables in parameterizations.
-
 * IDE:  Mikkel implementerer Farquhar photosyntese.
-
-* gnuplot
-
-** size
-
-** lmargin, rmargin?
-
-** automatisk find passende "ticks" på x-akse
-
-** monochrome?
-
-** symbolske filnavne?
-
-(defprogram test gnuplot
-   (input "harvest.dlf" "crop_prod.dlf")
-   (source ((file "$1") (tag "Stem DM"))
-           ((file "$2") (tag "LAI"))))
-
-(declare foo[] string
-  "List of strings to foo.")
-;;(set foo "hello" "world")
-(foo "hello" "world")
-
-scope = alist + syntax
-
-(deflog SomeLog table
-   "Log something.  Set 'dim' to specify dimension"
-   (declare dim string
-      "Dimension to use in this log."
-      [Mg/ha])
-   (entries (foo (dimension "\{dim}"))))
-
-(deflog MyLog SomeLog
-   "Log something in kg/ha"
-   (dim [kg/ha]))
-
-Daisy -> MyLog -> foo -> dimension
-
-
-Alist har en "syntax" indeholdene lokale variable?
-
-En særlig scope?
-
-Frame frame (Frame& parent)
-
-frame.type (key)
-frame.alist (key).number (key)
-
-** Escape string for tex output
-
-Use FormatLaTeX to escape dimensions and tags in plot when outputting
-LaTeX.
-
-* output column weather
-
-Weather should always be a column property for log purposes.
-
-Eller skal søjlerne summeres op til > 1? 
-
-* Tutorial
-
-** Dokumenter groundwater file og pressure table
-
-Omskriv dem evt. til at bruge source.
-
-** Batch programming
-
-** hydraulic table program
-
-* command
-
-Hav et command bibliotek, hvis elementer bliver kørt straks af
-parseren.  For eksempel 'directory', 'input', 'run' og 'path' kunne
-være kommandoer.
-
-Måske skal command bare være program?
-
-Hvis en attribut ikke er fundet i syntaksen, prøv at se om det er
-navnet på et program.  Og i så fald, kør der.
-
-* log_arithmetics
-
-En log model der bygger på log select, men hvor man i stedet for at
-skrive select ud direkte, har en "efterbehandlingssystem, en liste af
-output columns der har select column tags og værdier i en Scope, og
-laver beregninger på dem med en Number.
 
 * Udine
 
@@ -236,29 +142,119 @@ Plant may steal N from immobilization?  (pig in the middle)
 
 Less (early?) N gives less leaves, which might be fine (LAI > 3 is a waste)
 
-* from og to support for select_array
+* Distribution
 
-* Indsæt mmo grøntsager i lib (og sample?).
+** Indsæt mmo grøntsager i lib (og sample?).
 
-* gnuplot program
+* Programmering
 
-** Generelt fascilitet til at læse dwf/dlf/ddf filer?
+** block
 
-* Automisk udregning af partitioning?
+*** program_document should include local variables in parameterizations.
 
-Angiv stem/leaf/sorg på forskellige datoer
+** command
 
-* Support bibliography attribute...
+Hav et command bibliotek, hvis elementer bliver kørt straks af
+parseren.  For eksempel 'directory', 'input', 'run' og 'path' kunne
+være kommandoer.
 
-* Farquhar photo
+Måske skal command bare være program?
 
-* OM artikel
+Hvis en attribut ikke er fundet i syntaksen, prøv at se om det er
+navnet på et program.  Og i så fald, kør der.
 
-* check border
+** gnuplot
+
+*** lmargin, rmargin?
+
+*** automatisk find passende "ticks" på x-akse
+
+*** monochrome?
+
+*** Escape string for tex output
+
+Use FormatLaTeX to escape dimensions and tags in plot when outputting
+LaTeX.
+
+*** Generelt fascilitet til at læse dwf/dlf/ddf filer?
+
+** Farquhar photo
+
+** Program document
+
+*** Support bibliography attribute...
+
+** Logging
+
+*** log_arithmetics
+
+En log model der bygger på log select, men hvor man i stedet for at
+skrive select ud direkte, har en "efterbehandlingssystem, en liste af
+output columns der har select column tags og værdier i en Scope, og
+laver beregninger på dem med en Number.
+
+*** from og to support for select_array
+
+*** output column weather
+
+Weather should always be a column property for log purposes.
+
+Eller skal søjlerne summeres op til > 1? 
+
+*** check border
 
 check kun de søjler der matcher log'en.
 
-* action fertigate
+*** Vi skal have en måde at ændre log options globalt.  
+
+Det gælder også udskrivning af tid i excel format.
+
+*** Gør det muligt at skifte enhed i en log fil.
+
+*** Oprydning af log filer
+
+**** Solute log 
+
+C -> Vl (Volume liquid) [g/cm^3]
+
+M -> Vs (Volume soil)   [g/cm^3]
+
+     Ms (Mass soil)     []
+
+**** lib/log-general.dai
+
+{ System, Soil } x { Pesticides, Carbon, Nitrogen, Water }
+
+{ Content, Flux } x { Water, NH4-N, NO3-N, NO3, Pest }
+
+Water Pressure, Water Pressure (pF)
+
+Crop Production
+
+**** lib/log-extra.dai
+
+Crop Extra
+  Carbon
+  day_length
+
+AOM
+DOM 
+Bioclimate
+Weather
+
+**** sample/log-measured.dai
+
+Water Content in intervals
+
+Water Pressure in intervals
+
+N content in intervals (per soil)
+
+** Automisk udregning af partitioning?
+
+Angiv stem/leaf/sorg på forskellige datoer
+
+** action fertigate
 
 (irrigate (duration 12 [h])
           (flux 10 [mm/h])
@@ -272,31 +268,30 @@ check kun de søjler der matcher log'en.
           (N target 80 [kg N/ha] (from 0 [cm]) (to 50 [cm]))
           (NH4_fraction concentration 1 [mg N/l]))
 
-* PT data
+** min_intensity parameter for default weather
 
-** Lav nye log filer (kvælstof) 
+Hvis dagsregn er mindre end 24 * min_intensity, start timeregn med
+min_intensite kl. 8 
 
-** Excel data til fornuftigt format
+** crop simple med nit
 
-** gnuplot generation af sammenligning
+** Add user defineable convertions.
 
-** skabelon til rapport
+* Dokumentation
 
-** vandsammenligning
+** Tutorial
 
-** n soil
+*** Dokumenter groundwater file og pressure table
 
-** crop ds
+Omskriv dem evt. til at bruge source.
 
-** splai
+*** Batch programming
 
-** crop dm & lai
+*** hydraulic table program
 
-** crop n
+** Organic Matter Article
 
-* Organic Matter Article
-
-** Status
+*** Status
 
 Tilsyneladende er input nu rigtigt 
 
@@ -310,7 +305,7 @@ høj input giver for høj humus på både ler og sand
 
 lav input giver for lav humus på både ler og sand
 
-** næste ting
+*** næste ting
 
 prøv at køre med "rigeligt mineralsk kvælstof", så der aldrig er
 kvælstofbegrænsning (måske en "disable N om stress")
@@ -319,84 +314,21 @@ prøv at disable abitioc factors...
 
 prøv at køre ler med sandsædskifte, og sand med lersædskift.
 
-** Forsøg emperisk sammenhæng mellem input/humus -> som1/som2
+*** Forsøg emperisk sammenhæng mellem input/humus -> som1/som2
 
 Virker ikke!  Afhænger af startniveau!
 
-** Plot initialisering med background_mineralization = 0.
+*** Plot initialisering med background_mineralization = 0.
 
-** Find referencer.
+*** Find referencer.
 
-** Publicer.
+*** Publicer.
 
-* min_intensity parameter for default weather
-
-Hvis dagsregn er mindre end 24 * min_intensity, start timeregn med
-min_intensite kl. 8 
-
-* (defstring field_sep "\t")
-
-Vi skal have en måde at ændre log options globalt.  Det gælder også
-udskrivning af tid i excel format.
-
-* Gør det muligt at skifte enhed i en log fil.
-
-* Agronomy for Daisy Users  / Model overview
+** Agronomy for Daisy Users  / Model overview
 
 New chapter for reference manual?  
 
-* Solute log 
-
-C -> Vl (Volume liquid) [g/cm^3]
-
-M -> Vs (Volume soil)   [g/cm^3]
-
-     Ms (Mass soil)     []
-
-* Oprydning af log filer
-
-** lib/log-general.dai
-
-{ System, Soil } x { Pesticides, Carbon, Nitrogen, Water }
-
-{ Content, Flux } x { Water, NH4-N, NO3-N, NO3, Pest }
-
-Water Pressure, Water Pressure (pF)
-
-Crop Production
-
-** lib/log-extra.dai
-
-Crop Extra
-  Carbon
-  day_length
-
-AOM
-DOM 
-Bioclimate
-Weather
-
-** sample/log-measured.dai
-
-Water Content in intervals
-
-Water Pressure in intervals
-
-N content in intervals (per soil)
-
-* En måde at tilføje measured values i log filer.
-
-* crop simple med nit
-
-* FertOrgaNic 
-
-** gnuplot
-
-** lin_int til Polen
-
-** kalibreringsstrategi
-
-** Slovakiske data
+=== OLD STUFF ===
 
 * spec + dimension giver ikke fejl hvis der ikke kan konverteres
 
@@ -424,33 +356,11 @@ Skal kunne være afhængig af kvælstof og temperatur.
 
 ** Generaliser til Number med ScopeSoil?
 
-* Idea: Ignore "ordered" when creating a derived parameterization.
-
-I.e. 
-
-(defaction fertiligation irrigate_subsoil (from -5) (to -10))
-
-instead of 
-
-(defaction fertiligation irrigate_subsoil 0.0 (from -5) (to -10))
-
-DOESN'T WORK FOR "defaction activity".
-
-* Ny (set foo 3.4) pseudo-attribut.
-
 * seperate harvest and cut actions
 
 * SH: Salg af referencemanual på www-siden?
 
 * UZmodel top_t
-
-* Ny summary model
-
-Opdel den i tre
-
-Inputs, Outputs og Pool changes
-
-Balance = Input - Output - Pool changes
 
 * Carbon balance.
 
@@ -545,19 +455,6 @@ Udbyg.
 
 ** Simple Crop Types
 
-* Parser & Printer.
-
-** Don't order attributes when defining paramterizations.
-
-** Add long description for each column in a table log file.
-
-I.e. a new select parameter named "description", plus a table option
-of whether to add it to preamble of the dlf file.
-
-** Use new log table spec parameter
-
-*** Default descriptions in ref-doc.
-
 * New 'spec' log model.
 
 Select attribute with
@@ -570,12 +467,6 @@ Use filters like
 
 cutting of branch if it encounter an object from library not derived
 from type.
-
-* Paramerization library documentation
-
-** syntax.add_printer ("LaTeX", log_table_pp_LaTeX)
-
-** Differences from superclass.
 
 * N respiration
 
@@ -593,16 +484,6 @@ Bloker for begge når der ikke er assimilat nok.
     NO3_uptake_respiration  0.0 [g CH2O-C/g NO3-N]
 
 for nogen planter, i følge Søren.
-
-** Add DOM pool
-
-Dissolved Organic Matter, feed by all the OM pool transformations.
-
-** Phosphor
-
-** Pesticides
-
-* Add user defineable convertions.
 
 * QDaisy.
 
