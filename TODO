@@ -2,76 +2,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * Ryd op i TODO liste.
 
-* block
-
-** program_document should include local variables in parameterizations.
-
-* Udine præs
-
-** Jan Vos
-
-*** phenology
-
-cultivar, temperature!, photoperiod?, water?, nitrogen...
-
-Nitrogen deos not affect time and rate of appearence of crop parts,
-except severe N stress produce fewer leaves late in life.
-
-Size of leaves is affected, until a sat point.
-
-No clear effect of N on SpLAI.
-
-Clear affect of N on leaf size on the first 20 days, then leaf size
-constants. 
-
-Water does not affect on timeof rate of appearence of crop parts.
-
-N conc (= max photosynthesis) in leafs very little affected by N!
-
-*** Greenwood
-
-Y = n/conc %
-
-W = crop weight t/ha
-
-C3 crit: Y = 5.7 exp (W, -0.5)
-
-C4 crit: Y = 4.1 exp (W, -0.5)
-
-1 < W < 12 t/ha
-
-N stress effect on potatoes = -2.04 + 6.27 * stress - 3.20 * sqr (stress)
-
-** DKL MacKerron: Scottish Crop Research Institute
-
-Mineralizering + Immobilisering rater vigtigere end N_min
-
-Plant may steal N from immobilization?  (pig in the middle)
-
-Less (early?) N gives less leaves, which might be fine (LAI > 3 is a waste)
-
-** Three quadrant diagram of N response
-
-        W_yield
-           |
-N_supply --+-- N_uptake
-           |
-        N_supply
-
-* WP5
-
-** PL
-
-Need new soil texture.  Wladyslaw sends original report.
-
-** PT 2004
-
-** PT 2003 = Jose / Jozef
-
-** Grafer
-
-* CT arbejde på PL data i stedet?
-
 * Udine
 
 Send bank detaljer med fax til
@@ -88,25 +18,27 @@ via delle Scienze 208
 33100 Eduine
 Italy
 
-* WP6
+** Database brev til Finn og Paul Lassen
 
-** husk plant and harvest dates!
+*** Save selection.
 
-Skal være for FertOrgaNic sort!
+** Kattebilleder til Frantisek
 
-Specificer FertOrgaNic sort for alle sites.
+* WP5
 
-** Price of nitrogen needed for making FON breakeven for farmers?
+** PL
 
-** Price of water needed for making FON breakeven for farmers?
+*** Need new soil texture.  Wladyslaw sends original report.
 
-** Harvest når bladene er faldet af?
+*** N og vand balance for Polen.
 
-** gun irrigation
+*** CT arbejde på PL data i stedet?
 
-** send demand to everybody!
+** PT
 
-* WP5 report
+*** PT 2003 = Jose / Jozef
+
+*** PT 2004
 
 ** Joao
 
@@ -134,12 +66,6 @@ Specificer FertOrgaNic sort for alle sites.
 
 DptEmr = 20 supported by measurements
 
-** PL
-
-PrecipCorrect
-
-LAI
-
 ** IT
 
 2003 HOT (and bad compost)
@@ -148,9 +74,27 @@ LAI
 
 2005 good crop
 
-* Database brev til Finn og Paul Lassen
+* WP6
 
-** Save selection.
+** husk plant and harvest dates!
+
+Skal være for FertOrgaNic sort!
+
+Specificer FertOrgaNic sort for alle sites.
+
+** Price of nitrogen needed for making FON breakeven for farmers?
+
+** Price of water needed for making FON breakeven for farmers?
+
+** Harvest når bladene er faldet af?
+
+** gun irrigation
+
+** send demand to everybody!
+
+* block
+
+** program_document should include local variables in parameterizations.
 
 * IDE:  Mikkel implementerer Farquhar photosyntese.
 
@@ -206,6 +150,12 @@ frame.alist (key).number (key)
 Use FormatLaTeX to escape dimensions and tags in plot when outputting
 LaTeX.
 
+* output column weather
+
+Weather should always be a column property for log purposes.
+
+Eller skal søjlerne summeres op til > 1? 
+
 * Tutorial
 
 ** Dokumenter groundwater file og pressure table
@@ -234,11 +184,57 @@ skrive select ud direkte, har en "efterbehandlingssystem, en liste af
 output columns der har select column tags og værdier i en Scope, og
 laver beregninger på dem med en Number.
 
-* WP5 kalibrering
+* Udine
 
-** N og vand balance for Polen.
+** Jan Vos
 
-* Mandag: Kig på Portugisisk opsætning med Charlotte T.
+*** phenology
+
+cultivar, temperature!, photoperiod?, water?, nitrogen...
+
+Nitrogen deos not affect time and rate of appearence of crop parts,
+except severe N stress produce fewer leaves late in life.
+
+Size of leaves is affected, until a sat point.
+
+No clear effect of N on SpLAI.
+
+Clear affect of N on leaf size on the first 20 days, then leaf size
+constants. 
+
+Water does not affect on timeof rate of appearence of crop parts.
+
+N conc (= max photosynthesis) in leafs very little affected by N!
+
+*** Greenwood
+
+Y = n/conc %
+
+W = crop weight t/ha
+
+C3 crit: Y = 5.7 exp (W, -0.5)
+
+C4 crit: Y = 4.1 exp (W, -0.5)
+
+1 < W < 12 t/ha
+
+N stress effect on potatoes = -2.04 + 6.27 * stress - 3.20 * sqr (stress)
+
+*** Three quadrant diagram of N response
+
+        W_yield
+           |
+N_supply --+-- N_uptake
+           |
+        N_supply
+
+** DKL MacKerron: Scottish Crop Research Institute
+
+Mineralizering + Immobilisering rater vigtigere end N_min
+
+Plant may steal N from immobilization?  (pig in the middle)
+
+Less (early?) N gives less leaves, which might be fine (LAI > 3 is a waste)
 
 * from og to support for select_array
 

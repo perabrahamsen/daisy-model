@@ -27,9 +27,9 @@ Librarian<Program>::Content* Librarian<Program>::content = NULL;
 const char *const Program::description = "\
 Run a program.";
 
-Program::Program (const Block& bl)
-  : alist (bl.alist ()),
-    name (bl.alist ().identifier ("type"))
+Program::Program (const Block& al)
+  : alist (al.alist ()),
+    name (al.identifier ("type"))
 { }
 
 Program::~Program ()

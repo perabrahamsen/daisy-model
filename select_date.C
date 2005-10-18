@@ -49,8 +49,8 @@ struct SelectDate : public Select
   virtual int extract_date_component () const = 0;
 
   // Create and Destroy.
-  SelectDate (const Block& bl)
-    : Select (bl),
+  SelectDate (const Block& al)
+    : Select (al),
       value (1, 1, 1, 1)
     { }
 };
@@ -60,8 +60,8 @@ struct SelectYear : public SelectDate
   int extract_date_component () const
     { return value.year (); }
 
-  SelectYear (const Block& bl)
-    : SelectDate (bl)
+  SelectYear (const Block& al)
+    : SelectDate (al)
     { }
 };
 
@@ -70,8 +70,8 @@ struct SelectMonth : public SelectDate
   int extract_date_component () const
     { return value.month (); }
 
-  SelectMonth (const Block& bl)
-    : SelectDate (bl)
+  SelectMonth (const Block& al)
+    : SelectDate (al)
     { }
 };
 
@@ -80,8 +80,8 @@ struct SelectMDay : public SelectDate
   int extract_date_component () const
     { return value.mday (); }
 
-  SelectMDay (const Block& bl)
-    : SelectDate (bl)
+  SelectMDay (const Block& al)
+    : SelectDate (al)
     { }
 };
 
@@ -90,8 +90,8 @@ struct SelectHour : public SelectDate
   int extract_date_component () const
     { return value.hour (); }
 
-  SelectHour (const Block& bl)
-    : SelectDate (bl)
+  SelectHour (const Block& al)
+    : SelectDate (al)
     { }
 };
 
@@ -100,8 +100,8 @@ struct SelectWeek : public SelectDate
   int extract_date_component () const
     { return value.week (); }
 
-  SelectWeek (const Block& bl)
-    : SelectDate (bl)
+  SelectWeek (const Block& al)
+    : SelectDate (al)
     { }
 };
 
@@ -110,8 +110,8 @@ struct SelectYDay : public SelectDate
   int extract_date_component () const
     { return value.yday (); }
 
-  SelectYDay (const Block& bl)
-    : SelectDate (bl)
+  SelectYDay (const Block& al)
+    : SelectDate (al)
     { }
 };
 
@@ -120,27 +120,27 @@ struct SelectWDay : public SelectDate
   int extract_date_component () const
     { return value.wday (); }
 
-  SelectWDay (const Block& bl)
-    : SelectDate (bl)
+  SelectWDay (const Block& al)
+    : SelectDate (al)
     { }
 };
 
 static struct SelectDateSyntax
 {
-  static Select& make_year (const Block& bl)
-    { return *new SelectYear (bl); }
-  static Select& make_month (const Block& bl)
-    { return *new SelectMonth (bl); }
-  static Select& make_mday (const Block& bl)
-    { return *new SelectMDay (bl); }
-  static Select& make_hour (const Block& bl)
-    { return *new SelectHour (bl); }
-  static Select& make_week (const Block& bl)
-    { return *new SelectWeek (bl); }
-  static Select& make_yday (const Block& bl)
-    { return *new SelectYDay (bl); }
-  static Select& make_wday (const Block& bl)
-    { return *new SelectWDay (bl); }
+  static Select& make_year (const Block& al)
+    { return *new SelectYear (al); }
+  static Select& make_month (const Block& al)
+    { return *new SelectMonth (al); }
+  static Select& make_mday (const Block& al)
+    { return *new SelectMDay (al); }
+  static Select& make_hour (const Block& al)
+    { return *new SelectHour (al); }
+  static Select& make_week (const Block& al)
+    { return *new SelectWeek (al); }
+  static Select& make_yday (const Block& al)
+    { return *new SelectYDay (al); }
+  static Select& make_wday (const Block& al)
+    { return *new SelectWDay (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   {

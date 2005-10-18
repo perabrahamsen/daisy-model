@@ -198,14 +198,14 @@ LogSelect::check (const Border& border, Treelog& err) const
   return ok; 
 }
 
-LogSelect::LogSelect (const Block& bl)
-  : Log (bl),
-    description (bl.alist ().name ("description")),
-    condition (Librarian<Condition>::create (bl.alist ().alist ("when"))),
-    entries (map_build<Select> (bl, "entries")),
-    conv_vector (bl.alist ().identifier_sequence ("set")),
-    from (bl.alist ().number ("from")),
-    to (bl.alist ().number ("to"))
+LogSelect::LogSelect (const Block& al)
+  : Log (al),
+    description (al.name ("description")),
+    condition (Librarian<Condition>::create (al.alist ("when"))),
+    entries (map_build<Select> (al, "entries")),
+    conv_vector (al.identifier_sequence ("set")),
+    from (al.number ("from")),
+    to (al.number ("to"))
 {
   // Create path convertion map.
   map<symbol, symbol> conv_map;
@@ -243,8 +243,8 @@ struct DocSelect : public LogSelect
 {
   void initialize (Treelog&)
   { }
-  DocSelect (const Block& bl)
-    : LogSelect (bl)
+  DocSelect (const Block& al)
+    : LogSelect (al)
   { }
 };
 

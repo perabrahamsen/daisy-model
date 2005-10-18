@@ -112,7 +112,7 @@ Relative vertical size of plot.");
   bool check (Treelog&)
   { return true; }
   static std::string file2device (const std::string& file);
-  explicit ProgramGnuplot (const Block& bl);
+  explicit ProgramGnuplot (const Block& al);
   ~ProgramGnuplot ();
 };
 
@@ -400,35 +400,35 @@ ProgramGnuplot::file2device (const std::string& file)
  return "unknown";
 }
 
-ProgramGnuplot::ProgramGnuplot (const Block& bl)
-  : Program (bl),
-    command_file (bl.alist ().name ("command_file")),
-    append (bl.alist ().check ("append") 
-            ? (bl.alist ().flag ("append") ? append_yes : append_no)
+ProgramGnuplot::ProgramGnuplot (const Block& al)
+  : Program (al),
+    command_file (al.name ("command_file")),
+    append (al.check ("append") 
+            ? (al.flag ("append") ? append_yes : append_no)
             : append_maybe),
-    do_cd (bl.alist ().flag ("cd")),
-    file (bl.alist ().name ("where")),
+    do_cd (al.flag ("cd")),
+    file (al.name ("where")),
     device (file2device (file)),
-    extra (bl.alist ().identifier_sequence ("extra")),
-    title (bl.alist ().name ("title", "")),
-    size (bl.alist ().check ("size")
-	  ? bl.alist ().alist ("size")
+    extra (al.identifier_sequence ("extra")),
+    title (al.name ("title", "")),
+    size (al.check ("size")
+	  ? al.alist ("size")
 	  : Size::unset ()),
-    legend (bl.alist ().name ("legend")),
-    begin (bl.alist ().check ("begin") 
-	   ? new Time (bl.alist ().alist ("begin")) 
+    legend (al.name ("legend")),
+    begin (al.check ("begin") 
+	   ? new Time (al.alist ("begin")) 
 	   : NULL),
-    end (bl.alist ().check ("end")
-	 ? new Time (bl.alist ().alist ("end")) 
+    end (al.check ("end")
+	 ? new Time (al.alist ("end")) 
 	 : NULL),
-    ymin_flag (bl.alist ().check ("ymin")),
-    ymin (bl.alist ().number ("ymin", 42.42e42)),
-    ymax_flag (bl.alist ().check ("ymax")),
-    ymax (bl.alist ().number ("ymax", 42.42e42)),
-    y2min_flag (bl.alist ().check ("y2min")),
-    y2min (bl.alist ().number ("y2min", 42.42e42)),
-    y2max_flag (bl.alist ().check ("y2max")),
-    y2max (bl.alist ().number ("y2max", 42.42e42)),
+    ymin_flag (al.check ("ymin")),
+    ymin (al.number ("ymin", 42.42e42)),
+    ymax_flag (al.check ("ymax")),
+    ymax (al.number ("ymax", 42.42e42)),
+    y2min_flag (al.check ("y2min")),
+    y2min (al.number ("y2min", 42.42e42)),
+    y2max_flag (al.check ("y2max")),
+    y2max (al.number ("y2max", 42.42e42)),
     source (map_build<Source> (bl, "source"))
 { }
 
@@ -442,8 +442,8 @@ ProgramGnuplot::~ProgramGnuplot ()
 static struct ProgramGnuplotSyntax
 {
   static Program&
-  make (const Block& bl)
-  { return *new ProgramGnuplot (bl); }
+  make (const Block& al)
+  { return *new ProgramGnuplot (al); }
   ProgramGnuplotSyntax ()
   {
     Syntax& syntax = *new Syntax ();

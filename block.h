@@ -23,26 +23,42 @@
 #define BLOCK_H
 
 #include "syntax.h"
+#include "symbol.h"
+#include "plf.h"
 #include <string>
 
 class Block
 {
   struct Implementation;
   std::auto_ptr<Implementation> impl;
-
-  // Use.
 public:
-  const Syntax& syntax () const;
   const AttributeList& alist () const;
+  const Syntax& syntax () const;
 
-  Syntax::type lookup (const std::string&) const;
-
-  const Syntax& syntax (const std::string& key) const;
-  const AttributeList& alist (const std::string& key) const;
-
-  // Shortcuts.
+  // AList emulation.
 public:
-  const std::string expand (const std::string& name) const;
+  bool check (const std::string& key) const;
+  double number (const std::string&) const;
+  double number (const std::string&, double default_value) const;
+  const std::string name (const std::string&) const;
+  const std::string name (const std::string&,
+			  const std::string& default_value) const;
+  symbol identifier (const std::string&) const;
+  bool flag (const std::string&) const;
+  bool flag (const std::string&, bool default_value) const;
+  const PLF& plf (const std::string&) const;
+  AttributeList& alist (const std::string&) const;
+  int integer (const std::string&) const;
+  int integer (const std::string&, int default_value) const;
+  const std::vector<double>& number_sequence (const std::string&) const;
+  const std::vector<symbol>
+  /**/ identifier_sequence (const std::string& key) const;
+  std::vector<std::string> name_sequence (const std::string& key) const;
+  const std::vector<bool>& flag_sequence (const std::string& key) const;
+  const std::vector<int>& integer_sequence (const std::string& key) const;
+  const std::vector<const PLF*>& plf_sequence (const std::string& key) const;
+  const std::vector<AttributeList*>& 
+  /**/ alist_sequence (const std::string& key) const;
 
   // Create and Destroy.
 public:

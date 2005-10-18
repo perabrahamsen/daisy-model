@@ -39,11 +39,11 @@ LogExternSource::find (const symbol name)
   return *((*log_extern_map)[name]);
 }
 
-LogExternSource::LogExternSource (const Block& bl)
+LogExternSource::LogExternSource (const Block& al)
 { 
-  const symbol name = bl.alist ().check ("where") 
-    ? bl.alist ().identifier ("where") 
-    : bl.alist ().identifier ("type");
+  const symbol name = al.check ("where") 
+    ? al.identifier ("where") 
+    : al.identifier ("type");
 
   if (!log_extern_map)
     {
@@ -197,9 +197,9 @@ void
 LogExtern::initialize (Treelog&)
 { }
 
-LogExtern::LogExtern (const Block& bl)
-  : LogSelect (bl),
-    LogExternSource (bl)
+LogExtern::LogExtern (const Block& al)
+  : LogSelect (al),
+    LogExternSource (al)
 { 
   for (unsigned int i = 0; i < entries.size (); i++)
     entries[i]->add_dest (this);
@@ -210,8 +210,8 @@ LogExtern::~LogExtern ()
 
 static struct LogExternSyntax
 {
-  static Log& make (const Block& bl)
-  { return *new LogExtern (bl); }
+  static Log& make (const Block& al)
+  { return *new LogExtern (al); }
 
   LogExternSyntax ()
     { 

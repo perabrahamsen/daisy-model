@@ -45,7 +45,7 @@ struct LogCheckpoint : public LogAList
 
   // Create and Destroy.
   void initialize (Treelog&);
-  LogCheckpoint (const Block& bl);
+  LogCheckpoint (const Block& al);
   ~LogCheckpoint ();
 };
 
@@ -168,11 +168,11 @@ void
 LogCheckpoint::initialize (Treelog&)
 { }
 
-LogCheckpoint::LogCheckpoint (const Block& bl)
-  : LogAList (bl),
-    file (bl.alist ().name ("where")),
-    description (bl.alist ().name ("description")),
-    condition (Librarian<Condition>::create (bl.alist ().alist ("when"))),
+LogCheckpoint::LogCheckpoint (const Block& al)
+  : LogAList (al),
+    file (al.name ("where")),
+    description (al.name ("description")),
+    condition (Librarian<Condition>::create (al.alist ("when"))),
     time (1, 1, 1, 1)
 { }
 
@@ -181,8 +181,8 @@ LogCheckpoint::~LogCheckpoint ()
 
 static struct LogCheckpointSyntax
 {
-  static Log& make (const Block& bl)
-  { return *new LogCheckpoint (bl); }
+  static Log& make (const Block& al)
+  { return *new LogCheckpoint (al); }
 
   LogCheckpointSyntax ()
   { 

@@ -123,17 +123,17 @@ struct SelectArray : public Select
   { return value.size (); }
 
   // Create and Destroy.
-  SelectArray (const Block& bl)
-    : Select (bl),
-      value (bl.alist ().number_sequence ("value")),
+  SelectArray (const Block& al)
+    : Select (al),
+      value (al.number_sequence ("value")),
       last_soil (NULL)
   { }
 };
 
 static struct SelectArraySyntax
 {
-  static Select& make (const Block& bl)
-  { return *new SelectArray (bl); }
+  static Select& make (const Block& al)
+  { return *new SelectArray (al); }
 
   SelectArraySyntax ()
   { 

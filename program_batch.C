@@ -75,9 +75,9 @@ struct ProgramBatch : public Program
     return ok;
   }
 
-  ProgramBatch (const Block& bl)
-    : Program (bl),
-      directory (bl.alist ().name ("directory")),
+  ProgramBatch (const Block& al)
+    : Program (al),
+      directory (al.name ("directory")),
       program (map_build<Program> (bl, "run"))
   { }
 
@@ -88,8 +88,8 @@ struct ProgramBatch : public Program
 static struct ProgramBatchSyntax
 {
   static Program&
-  make (const Block& bl)
-  { return *new ProgramBatch (bl); }
+  make (const Block& al)
+  { return *new ProgramBatch (al); }
   ProgramBatchSyntax ()
   {
     Syntax& syntax = *new Syntax ();

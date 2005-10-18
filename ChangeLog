@@ -1,7 +1,10 @@
 2005-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* librarian.h: Support lexical scope.
-	* program.h, program_gnuplot.C
+	* lib/log-std.dai (column): New base parameterization.
+	("Field water", "Soil water", "Field nitrogen", "Soil nitrogen"):
+	Use it.
+
+	* librarian, select, log: Support lexical scope.
 	
 2005-10-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 

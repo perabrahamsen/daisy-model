@@ -29,6 +29,12 @@ struct Block::Implementation
   const Syntax& syntax;
   const AttributeList& alist;
 
+  // Use.
+  Syntax::type lookup (const std::string&) const;
+  const Syntax& syntax (const std::string& key) const;
+  const AttributeList& alist (const std::string& key) const;
+  const std::string expand_string (const std::string& value) const;
+
   Implementation (const Block *const p, 
 		  const Syntax& s, const AttributeList& a)
     : parent (p),
@@ -37,51 +43,38 @@ struct Block::Implementation
   { }
 };
 
-const Syntax& 
-Block::syntax () const
-{ return impl->syntax; }
-
-const AttributeList& 
-Block::alist () const
-{ return impl->alist; }
-
 Syntax::type 
-Block::lookup (const std::string& key) const
+Block::Implementation::lookup (const std::string& key) const
 {
-  Syntax::type type = impl->syntax.lookup (key);
-  if (type == Syntax::Error && impl->parent)
-    return impl->parent->lookup (key);
+  Syntax::type type = syntax.lookup (key);
+  if (type == Syntax::Error && parent)
+    return parent->lookup (key);
   return type;
 }
 
 const Syntax& 
-Block::syntax (const std::string& key) const
+Block::Implementation::syntax (const std::string& key) const
 {
-  Syntax::type type = impl->syntax.lookup (key);
+  Syntax::type type = syntax.lookup (key);
   if (type != Syntax::Error)
-    return impl->syntax;
-  daisy_assert (impl->parent != NULL);
-  return impl->parent->syntax (key);
+    return syntax;
+  daisy_assert (parent != NULL);
+  return parent->syntax (key);
 }
 
 const AttributeList& 
-Block::alist (const std::string& key) const
+Block::Implementation::alist (const std::string& key) const
 {
-  Syntax::type type = impl->syntax.lookup (key);
+  Syntax::type type = syntax.lookup (key);
   if (type != Syntax::Error)
-    return impl->alist;
-  daisy_assert (impl->parent != NULL);
-  return impl->parent->alist (key);
+    return alist;
+  daisy_assert (parent != NULL);
+  return parent->alist (key);
 }
 
 const std::string 
-Block::expand (const std::string& name) const
+Block::Implementation::expand_string (const std::string& value) const
 {
-  daisy_assert (alist ().check (name));
-  daisy_assert (syntax ().lookup (name) == Syntax::String);
-  daisy_assert (syntax ().size (name) == Syntax::Singleton);
-  
-  const std::string& value = alist ().name (name);
   std::ostringstream result;
   enum mode_t { normal, escaped, keyed } mode = normal;
   std::string key;
@@ -142,6 +135,107 @@ Block::expand (const std::string& name) const
     throw "Unterminated expansion '" + key + "'";
   return result.str ();
 }
+
+const AttributeList&
+Block::alist () const
+{ return impl->alist; }
+
+const Syntax&
+Block::syntax () const
+{ return impl->syntax; }
+
+bool 
+Block::check (const std::string& key) const
+{ return impl->alist.check (key); }
+
+double 
+Block::number (const std::string& key) const
+{ return impl->alist.number (key); }
+
+double 
+Block::number (const std::string& key, double default_value) const
+{ return impl->alist.number (key, default_value); }
+
+const std::string
+Block::name (const std::string& key) const
+{ return impl->expand_string (impl->alist.name (key)); }
+
+const std::string 
+Block::name (const std::string& key, const std::string& default_value) const
+{
+  if (impl->alist ().check (key))
+    return name (key);
+
+  return default_value;
+}
+
+symbol 
+Block::identifier (const std::string& key) const
+{ return symbol (name (key)); }
+
+bool 
+Block::flag (const std::string& key) const
+{ return impl->alist.flag (key); }
+
+bool 
+Block::flag (const std::string& key, bool default_value) const
+{ return impl->alist.flag (key, default_value); }
+
+const PLF& 
+Block::plf (const std::string& key) const
+{ return impl->alist.plf (key); }
+
+AttributeList& 
+Block::alist (const std::string& key) const
+{ return impl->alist.alist (key); }
+
+int 
+Block::integer (const std::string& key) const
+{ return impl->alist.integer (key); }
+
+int 
+Block::integer (const std::string& key, int default_value) const
+{ return impl->alist.integer (key, default_value); }
+
+const std::vector<double>& 
+Block::number_sequence (const std::string& key) const
+{ return impl->alist.number_sequence (key); }
+
+const std::vector<symbol>
+Block::identifier_sequence (const std::string& key) const
+{
+  const std::vector<std::string>& value = impl->alist ().name_sequence (key);
+  std::vector<symbol> result;
+  for (size_t i = 0; i < value.size (); i++)
+    result.push_back (symbol (impl->expand_string (value[i])));
+  return result;
+}
+  
+const std::vector<std::string>
+Block::name_sequence (const std::string& key) const
+{
+  const std::vector<std::string>& value = impl->alist ().name_sequence (key);
+  std::vector<std::string> result;
+  for (size_t i = 0; i < value.size (); i++)
+    result.push_back (impl->expand_string (value[i]));
+  return result;
+}
+
+const std::vector<bool>& 
+Block::flag_sequence (const std::string& key) const
+{ return impl->alist.flag_sequence (key); }
+
+const std::vector<int>& 
+Block::integer_sequence (const std::string& key) const
+{ return impl->alist.integer_sequence (key); }
+
+const std::vector<const PLF*>& 
+Block::plf_sequence (const std::string& key) const
+{ return impl->alist.plf_sequence (key); }
+
+const std::vector<AttributeList*>& 
+Block::alist_sequence (const std::string& key) const
+{ return impl->alist.alist_sequence (key); }
 
 Block::Block (const Block& block,
 	      const Syntax& syntax, const AttributeList& alist)

@@ -31,15 +31,15 @@ struct SelectNumber : public SelectValue
   { output_number (integer); }
 
   // Create and Destroy.
-  SelectNumber (const Block& bl)
-    : SelectValue (bl)
+  SelectNumber (const Block& al)
+    : SelectValue (al)
   { }
 };
 
 static struct SelectNumberSyntax
 {
-  static Select& make (const Block& bl)
-  { return *new SelectNumber (bl); }
+  static Select& make (const Block& al)
+  { return *new SelectNumber (al); }
 
   SelectNumberSyntax ()
   { 
