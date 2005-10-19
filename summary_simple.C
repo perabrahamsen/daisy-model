@@ -24,6 +24,7 @@
 #include "select.h"
 #include "treelog.h"
 #include "memutils.h"
+#include "submodeler.h"
 #include <sstream>
 #include <fstream>
 #include <string>

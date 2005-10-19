@@ -21,6 +21,7 @@
 
 #include "source_file.h"
 #include "lexer_data.h"
+#include "submodeler.h"
 #include "vcheck.h"
 #include "mathlib.h"
 #include "memutils.h"

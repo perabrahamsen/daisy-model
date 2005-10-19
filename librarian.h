@@ -174,30 +174,6 @@ map_create_const (const std::vector<AttributeList*>& f)
 
 template <class T> 
 std::vector<T*>
-map_construct (const std::vector<AttributeList*>& f)
-{ 
-  std::vector<T*> t;
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-       i != f.end ();
-       i++)
-    t.push_back (new T (**i));
-  return t;
-}
-
-template <class T> 
-std::vector<const T*>
-map_construct_const (const std::vector<AttributeList*>& f)
-{ 
-  std::vector<const T*> t;
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-       i != f.end ();
-       i++)
-    t.push_back (new T (**i));
-  return t;
-}
-
-template <class T> 
-std::vector<T*>
 map_build (const Block& al, const std::string& key)
 { 
   std::vector<T*> t;
@@ -221,44 +197,6 @@ map_build_const (const Block& al, const std::string& key)
        i++)
     t.push_back (Librarian<T>::build (al, **i));
 
-  return t;
-}
-
-template <class T> 
-std::vector<T*>
-map_submodel (const Block& parent, const std::string& key)
-{ 
-  std::vector<T*> t;
-  const std::vector<AttributeList*> f (parent.alist_sequence (key));
-  const Syntax& syntax = parent.syntax ().syntax (key);
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-       i != f.end ();
-       i++)
-    {
-      const AttributeList& alist = **i;
-      daisy_assert (syntax.check (alist, Treelog::null ()));      
-      Block nested (parent, syntax, alist);
-      t.push_back (new T (nested));
-    }
-  return t;
-}
-
-template <class T> 
-std::vector<const T*>
-map_submodel_const (const Block& parent, const std::string& key)
-{ 
-  std::vector<const T*> t;
-  const std::vector<AttributeList*> f (parent.alist_sequence (key));
-  const Syntax& syntax = parent.syntax ().syntax (key);
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-       i != f.end ();
-       i++)
-    {
-      const AttributeList& alist = **i;
-      daisy_assert (syntax.check (alist, Treelog::null ()));      
-      Block nested (parent, syntax, alist);
-      t.push_back (new T (nested));
-    }
   return t;
 }
 

@@ -19,10 +19,10 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #include "am.h"
 #include "aom.h"
 #include "im.h"
+#include "submodeler.h"
 #include "syntax.h"
 #include "alist.h"
 #include "time.h"

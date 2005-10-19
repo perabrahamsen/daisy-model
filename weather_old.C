@@ -38,7 +38,7 @@ struct WeatherOld::Implementation
   Time time;
 
   // Create and Destroy.
-  Implementation (const AttributeList& al)
+  Implementation (const Block& al)
     : T_rain (al.number ("T_rain")),
       T_snow (al.number ("T_snow")),
       daily_global_radiation (-42.42e42),
@@ -134,7 +134,7 @@ void
 WeatherOld::put_global_radiation (double radiation) // [W/m²]
 { impl.daily_global_radiation = radiation; }
 
-WeatherOld::WeatherOld (const AttributeList& al)
+WeatherOld::WeatherOld (const Block& al)
   : Weather (al),
     impl (*new Implementation (al))
 { 

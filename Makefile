@@ -371,8 +371,11 @@ OTHER = block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
-	mathlib.C librarian.C cdaisy.C nrutil.C \
+	mathlib.C cdaisy.C nrutil.C \
 	submodel.C
+
+# Utilities in header alone.
+HEADONLY = submodeler.h librarian.h border.h timestep.h memutil.h
 
 # Everything that has an interface.
 #
@@ -396,7 +399,7 @@ LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SPARCOBJ)
 OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
 SOURCES = $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN) $(QTSOURCES) \
 	cmain.c bugmain.c $(DISABLED) $(MSSRC)
-HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) border.h timestep.h memutil.h
+HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) $(HEADONLY)
 
 # Find all printable files.
 #
@@ -411,7 +414,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = tmpstream.C common.C tmpstream.h common.h
+REMOVE = librarian.C tmpstream.C common.C tmpstream.h common.h
 
 # These are the file extensions we deal with.
 # 

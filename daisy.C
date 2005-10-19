@@ -35,6 +35,7 @@
 #include "syntax.h"
 #include "condition.h"
 #include "alist.h"
+#include "submodeler.h"
 #include "column.h"
 #include "memutils.h"
 #include <sstream>
@@ -77,7 +78,7 @@ Daisy::Daisy (const Block& al)
 	  : Time (9999, 1, 1, 1)),
     action (Librarian<Action>::create (al.alist ("manager"))),
     weather (al.check ("weather") 
-	     ? Librarian<Weather>::create (al.alist ("weather"))
+	     ? Librarian<Weather>::build (al, al.alist ("weather"))
 	     : NULL), 
     field (*new Field (al.alist_sequence ("column"))),
     harvest (map_construct_const<Harvest> 

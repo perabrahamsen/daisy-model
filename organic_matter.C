@@ -22,6 +22,7 @@
 #include "organic_matter.h"
 #include "syntax.h"
 #include "alist.h"
+#include "submodeler.h"
 #include "log.h"
 #include "am.h"
 #include "om.h"

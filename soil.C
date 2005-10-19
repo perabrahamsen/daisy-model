@@ -28,6 +28,7 @@
 #include "syntax.h"
 #include "mathlib.h"
 #include "submodel.h"
+#include "submodeler.h"
 #include "log.h"
 #include "check.h"
 #include "vcheck.h"

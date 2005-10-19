@@ -72,13 +72,13 @@ public:
   // Create and Destroy.
 private:
   friend class WeatherNoneSyntax;
-  static Weather& make (const AttributeList&);
-  WeatherNone (const AttributeList&);
+  static Weather& make (const Block&);
+  WeatherNone (const Block&);
 public:
   ~WeatherNone ();
 };
 
-WeatherNone::WeatherNone (const AttributeList& al)
+WeatherNone::WeatherNone (const Block& al)
   : WeatherOld (al),
     air_temperature (al.number ("air_temperature")),
     global_radiation (al.number ("global_radiation")),
@@ -92,7 +92,7 @@ WeatherNone::~WeatherNone ()
 
 // Add the WeatherNone syntax to the syntax table.
 Weather&
-WeatherNone::make (const AttributeList& al)
+WeatherNone::make (const Block& al)
 {
   return *new WeatherNone (al);
 }

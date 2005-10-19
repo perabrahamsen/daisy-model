@@ -30,6 +30,7 @@
 #include "harvest.h"
 #include "check_range.h"
 #include "im.h"
+#include "submodeler.h"
 #include "vcheck.h"
 #include "memutils.h"
 #include <sstream>

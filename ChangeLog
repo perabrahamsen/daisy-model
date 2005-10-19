@@ -1,3 +1,7 @@
+2005-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* submodeler.h: New utility.
+
 2005-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lib/log-std.dai (column): New base parameterization.

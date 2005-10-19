@@ -23,6 +23,7 @@
 #include "rootdens.h"
 #include "geometry.h"
 #include "plf.h"
+#include "submodeler.h"
 #include "check.h"
 #include "vcheck.h"
 #include "mathlib.h"

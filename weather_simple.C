@@ -54,7 +54,7 @@ public:
 
   // Create and Destroy.
 public:
-  WeatherSimple (const AttributeList&);
+  WeatherSimple (const Block&);
   ~WeatherSimple ();
 };
 
@@ -136,7 +136,7 @@ WeatherSimple::Precipitation () const
     return 0.0;
 }
 
-WeatherSimple::WeatherSimple (const AttributeList& al)
+WeatherSimple::WeatherSimple (const Block& al)
   : WeatherOld (al),
     precipitation (al.number ("precipitation_value")),
     interval (al.integer ("interval")),
@@ -151,7 +151,7 @@ WeatherSimple::~WeatherSimple ()
 // Add the WeatherSimple syntax to the syntax table.
 static struct WeatherSimpleSyntax
 {
-  static Weather& make (const AttributeList& al)
+  static Weather& make (const Block& al)
     {
       return *new WeatherSimple (al);
     }
