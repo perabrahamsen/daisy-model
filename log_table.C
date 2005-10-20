@@ -388,7 +388,7 @@ LogTable::LogTable (Block& al)
     print_tags (al.flag ("print_tags")),
     print_dimension (al.flag ("print_dimension")),
     print_initial (al.flag ("print_initial")),
-    time_columns (!contain_time_columns (entries)),
+    time_columns (al.ok () && !contain_time_columns (entries)),
     summary (map_create<Summary> (al.alist_sequence ("summary"))),
     begin (1, 1, 1, 1),
     end (1, 1, 1, 1),
@@ -397,6 +397,8 @@ LogTable::LogTable (Block& al)
     dest_name ("Daisy bug"),
     dest_array (NULL)
 {
+  if (!al.ok ())
+    return;
   for (unsigned int i = 0; i < entries.size (); i++)
     entries[i]->add_dest (this);
 }

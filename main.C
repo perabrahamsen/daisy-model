@@ -117,13 +117,17 @@ attributes.");
       options.copyright (treelog);
       if (!run_syntax->check (*run_alist, treelog))
         return 1;
-      Block block (syntax, alist, treelog, "Building");
-      auto_ptr<Program> program (Librarian<Program>::build_alist (block, 
+
+      Block* block = new Block (syntax, alist, treelog, "Building");
+      auto_ptr<Program> program (Librarian<Program>::build_alist (*block, 
 								  *run_alist,
-								  "run"));
-      if (!block.ok ())
+ 								  "run"));
+      const bool block_ok = block->ok ();
+      delete block;
+      block = NULL;
+      if (!block_ok)
 	return 1;
-      
+    
       program->initialize (&syntax, &alist, treelog);
       if (!program->check (treelog))
 	return 1;

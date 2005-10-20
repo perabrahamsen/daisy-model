@@ -196,8 +196,8 @@ Block::syntax () const
 void
 Block::error (const std::string& msg)
 { 
-  return impl->msg.error (msg); 
   set_error (); 
+  impl->msg.error (msg); 
 }
 
 bool

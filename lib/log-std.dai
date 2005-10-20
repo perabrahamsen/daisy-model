@@ -34,7 +34,7 @@ Total amount of water entering the system as rain and snow.")
            (number (tag "Irrigation")
 		   (description "\
 Total amount of water added to the system from irrigation.")
-                   (path column "\{xcolumn}" Bioclimate "*" irrigation_total)
+                   (path column "\{column}" Bioclimate "*" irrigation_total)
                    (spec bioclimate default irrigation_total)
                    (handle sum)
                    (dimension "mm/&"))

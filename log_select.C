@@ -207,6 +207,9 @@ LogSelect::LogSelect (Block& al)
     from (al.number ("from")),
     to (al.number ("to"))
 {
+  if (!al.ok ())
+    return;
+
   // Create path convertion map.
   map<symbol, symbol> conv_map;
   for (unsigned int i = 0; i < conv_vector.size (); i += 2)
