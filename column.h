@@ -126,7 +126,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Column (const AttributeList&);
+  explicit Column (const Block&);
 public:
   static void load_syntax (Syntax&, AttributeList&);
   virtual Column& clone (symbol) const = 0;

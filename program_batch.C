@@ -78,7 +78,7 @@ struct ProgramBatch : public Program
   ProgramBatch (const Block& al)
     : Program (al),
       directory (al.name ("directory")),
-      program (map_build<Program> (al, "run"))
+      program (Librarian<Program>::build_vector (al, "run"))
   { }
 
   ~ProgramBatch ()

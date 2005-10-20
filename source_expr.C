@@ -183,7 +183,7 @@ SourceExpr::load (Treelog& msg)
 
 SourceExpr::SourceExpr (const Block& al)
   : SourceFile (al),
-    expr (Librarian<Number>::create (al.alist ("expr"))),
+    expr (Librarian<Number>::build_item (al, "expr")),
     title_ (al.name ("title", expr->title ())),
     original (al.check ("original")
 	      ? al.name_sequence ("original")

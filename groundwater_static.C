@@ -43,7 +43,7 @@ public:
 public:
   void initialize (const Soil&, const Time&, Treelog&)
   { }
-  GroundwaterStatic (const AttributeList&);
+  GroundwaterStatic (const Block&);
   ~GroundwaterStatic ();
 };
 
@@ -73,7 +73,7 @@ GroundwaterStatic::table () const
   return depth;
 }
 
-GroundwaterStatic::GroundwaterStatic (const AttributeList& al)
+GroundwaterStatic::GroundwaterStatic (const Block& al)
   : Groundwater (al),
     depth (al.number ("table"))
 { }
@@ -83,7 +83,7 @@ GroundwaterStatic::~GroundwaterStatic ()
 
 static struct GroundwaterStaticSyntax
 {
-  static Groundwater& make (const AttributeList& al)
+  static Groundwater& make (const Block& al)
   { 
     return *new GroundwaterStatic (al);
   }

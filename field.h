@@ -26,6 +26,7 @@
 #include "border.h"
 #include "symbol.h"
 #include <vector>
+#include <string>
 
 class Column;
 class AttributeList;
@@ -35,6 +36,7 @@ class Harvest;
 class Weather;
 class Treelog;
 class Log;
+class Block;
 
 class Field : public Border
 { 
@@ -119,7 +121,7 @@ public:
   bool check_am (const AttributeList& am, Treelog& err) const;
   bool check_border (const double border, Treelog& err) const;
   void initialize (const Time&, Treelog& err, const Weather*);
-  Field (const std::vector<AttributeList*>&);
+  Field (const Block&, const std::string& key);
   virtual ~Field ();
 };
 

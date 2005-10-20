@@ -398,32 +398,31 @@ ColumnBase::output_inner (Log&) const
 { }
 
 static Bioclimate*
-get_bioclimate (const AttributeList& al)
+get_bioclimate (const Block& al)
 {
   if (al.check ("Bioclimate"))
-    return Librarian<Bioclimate>::create (al.alist ("Bioclimate"));
+    return Librarian<Bioclimate>::build_item (al, "Bioclimate");
   static const symbol default_symbol ("default");
   AttributeList alist (Librarian<Bioclimate>::library ()
 		       .lookup (default_symbol));
   alist.add ("type", "default");
-  return Librarian<Bioclimate>::create (alist);
+  return Librarian<Bioclimate>::build_alist (al, alist);
 }
 
-ColumnBase::ColumnBase (const AttributeList& al)
+ColumnBase::ColumnBase (const Block& al)
   : Column (al),
     weather (al.check ("weather") 
-	     ? Librarian<Weather>::create (al.alist ("weather"))
+	     ? Librarian<Weather>::build_item (al, "weather")
 	     : NULL), 
-    vegetation (Librarian<Vegetation>::create (al.alist ("Vegetation"))),
+    vegetation (Librarian<Vegetation>::build_item (al, "Vegetation")),
     bioclimate (get_bioclimate (al)),
     surface (al.alist ("Surface")),
     soil (al.alist ("Soil")),
     soil_water (al.alist ("SoilWater")),
     soil_heat (al.alist ("SoilHeat")),
     soil_chemicals (al.alist ("SoilChemicals")),
-    chemistry (map_create<Chemistry> (al.alist_sequence 
-					    ("Chemistry"))),
-    groundwater (Librarian<Groundwater>::create (al.alist ("Groundwater"))),
+    chemistry (Librarian<Chemistry>::build_vector (al, "Chemistry")),
+    groundwater (Librarian<Groundwater>::build_item (al, "Groundwater")),
     harvest_DM (0.0),
     harvest_N (0.0),
     harvest_C (0.0),

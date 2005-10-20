@@ -47,8 +47,8 @@ The dimension is up to you, as long as all columns use the same unit.");
   alist.add ("size", 1.0);
 }
 
-Column::Column (const AttributeList& al)
-  : alist (al),
+Column::Column (const Block& al)
+  : alist (al.alist ()),
     name (al.identifier ("type")),
     size (alist.number ("size"))
 { }

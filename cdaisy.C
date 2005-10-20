@@ -910,8 +910,14 @@ extern "C" Chemical* EXPORT		// Return the chemical named NAME.
 daisy_chemical_find (const char* name)
 {
   const Library& chemlib = Library::find (symbol ("chemical"));
-  if (chemlib.check (symbol (name)))
-    return Librarian<Chemical>::create (chemlib.lookup (symbol (name)));
+  const symbol sym (name);
+  if (chemlib.check (sym))
+    {
+      Syntax parent_syntax;
+      AttributeList parent_alist;
+      Block block (parent_syntax, parent_alist);
+      return Librarian<Chemical>::build_alist (block, chemlib.lookup (sym));
+    }
   return NULL;
 }
 

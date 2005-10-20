@@ -118,8 +118,8 @@ attributes.");
       if (!run_syntax->check (*run_alist, treelog))
         return 1;
       Block block (syntax, alist);
-      auto_ptr<Program> program (Librarian<Program>::build (block, 
-							    *run_alist));
+      auto_ptr<Program> program (Librarian<Program>::build_alist (block, 
+								  *run_alist));
       program->initialize (&syntax, &alist, treelog);
       if (!program->check (treelog))
 	return 1;

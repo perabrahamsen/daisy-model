@@ -88,7 +88,7 @@ Canopy adsorbtion fraction of unreached potential soil evaporation.");
 	      "Canopy water storage capacity");
 }
 
-Vegetation::Vegetation (const AttributeList& al)
+Vegetation::Vegetation (const Block& al)
   : name (al.identifier ("type")),
     EpInterchange_ (al.number ("EpInterchange"))
 { }

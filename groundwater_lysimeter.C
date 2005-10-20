@@ -50,7 +50,7 @@ public:
   void initialize (const Soil& soil, const Time&, Treelog&)
   { location = soil.zplus (soil.size () - 1); }
 
-  GroundwaterLysimeter (const AttributeList& al)
+  GroundwaterLysimeter (const Block& al)
     : Groundwater (al),
       location (-42.42e42)
   { }
@@ -60,7 +60,7 @@ public:
 
 static struct GroundwaterLysimeterSyntax
 {
-  static Groundwater& make (const AttributeList& al)
+  static Groundwater& make (const Block& al)
   { return *new GroundwaterLysimeter (al); }
 
   GroundwaterLysimeterSyntax ()

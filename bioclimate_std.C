@@ -193,7 +193,7 @@ struct BioclimateStandard : public Bioclimate
   { return snow.storage (); }
   // Create.
   void initialize (const Weather&, Treelog&);
-  BioclimateStandard (const AttributeList&);
+  BioclimateStandard (const Block&);
   ~BioclimateStandard ();
 };
 
@@ -232,7 +232,7 @@ BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
   pet = Librarian<Pet>::create (alist);
 }
 
-BioclimateStandard::BioclimateStandard (const AttributeList& al)
+BioclimateStandard::BioclimateStandard (const Block& al)
   : Bioclimate (al),
     No (al.integer ("NoOfIntervals")),
     LAI_ (0.0),
@@ -779,7 +779,7 @@ BioclimateStandard::set_subsoil_irrigation (double flux)
 
 static struct BioclimateStandardSyntax
 {
-  static Bioclimate& make (const AttributeList& al)
+  static Bioclimate& make (const Block& al)
   { return *new BioclimateStandard (al); }
   
   BioclimateStandardSyntax ()

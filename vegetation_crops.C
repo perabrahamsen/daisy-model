@@ -171,7 +171,7 @@ struct VegetationCrops : public Vegetation
   // Create and destroy.
   void initialize (const Time&, const Soil& soil, OrganicMatter *const,
                    Treelog& msg);
-  VegetationCrops (const AttributeList&);
+  VegetationCrops (const Block&);
   ~VegetationCrops ();
 };
 
@@ -656,7 +656,7 @@ VegetationCrops::initialize (const Time&, const Soil& soil,
   reset_canopy_structure (msg);
 }
 
-VegetationCrops::VegetationCrops (const AttributeList& al)
+VegetationCrops::VegetationCrops (const Block& al)
   : Vegetation (al),
     crops (),			// deque, so we can't use map_create.
     forced_LAI (al.alist_sequence ("ForcedLAI")),
@@ -692,7 +692,7 @@ VegetationCrops::~VegetationCrops ()
 static struct
 VegetationCropsSyntax
 {
-  static Vegetation& make (const AttributeList& al)
+  static Vegetation& make (const Block& al)
   { return *new VegetationCrops (al); }
 
   VegetationCropsSyntax ()

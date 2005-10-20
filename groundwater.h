@@ -60,7 +60,7 @@ public:
   virtual void initialize (const Soil&, const Time& time, Treelog&) = 0;
   virtual bool check (Treelog&) const;
 protected:
-  Groundwater (const AttributeList& al);
+  Groundwater (const Block& al);
 public:
   virtual ~Groundwater ();
 };

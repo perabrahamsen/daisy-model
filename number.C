@@ -35,7 +35,7 @@ bool
 Number::known (const std::string& dim)
 { return dim != Syntax::Unknown (); }
 
-Number::Number (const AttributeList& al)
+Number::Number (const Block& al)
   : name (al.identifier ("type"))
 { }
 

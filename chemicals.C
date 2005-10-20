@@ -111,9 +111,12 @@ Chemicals::Implementation::lookup (symbol name)
   daisy_assert (syntax.check (alist, Treelog::null ()));
   AttributeList child (alist);
   child.add ("type", name);
-
+  
   // Then add it.
-  const Chemical* chemical = Librarian<Chemical>::create (child);
+  Syntax parent_syntax;
+  AttributeList parent_alist;
+  Block block (parent_syntax, parent_alist);
+  const Chemical* chemical = Librarian<Chemical>::build_alist (block, child);
   (*chemistry)[name] = chemical;
   return chemical;
 }

@@ -46,9 +46,9 @@ struct NumberOperand : public Number
     Treelog::Open nest (err, name);
     return operand->check (scope, err); 
   }
-  NumberOperand (const AttributeList& al)
+  NumberOperand (const Block& al)
     : Number (al),
-      operand (Librarian<Number>::create (al.alist ("operand")))
+      operand (Librarian<Number>::build_item (al, "operand"))
   { }
 };
 
@@ -63,14 +63,14 @@ struct NumberLog10 : public NumberOperand
   }
 
   // Create.
-  NumberLog10 (const AttributeList& al)
+  NumberLog10 (const Block& al)
     : NumberOperand (al)
   { }
 };
 
 static struct NumberLog10Syntax
 {
-  static Number& make (const AttributeList& al)
+  static Number& make (const Block& al)
   { return *new NumberLog10 (al); }
   NumberLog10Syntax ()
   {
@@ -97,14 +97,14 @@ struct NumberLn : public NumberOperand
   }
 
   // Create.
-  NumberLn (const AttributeList& al)
+  NumberLn (const Block& al)
     : NumberOperand (al)
   { }
 };
 
 static struct NumberLnSyntax
 {
-  static Number& make (const AttributeList& al)
+  static Number& make (const Block& al)
   { return *new NumberLn (al); }
   NumberLnSyntax ()
   {
@@ -131,14 +131,14 @@ struct NumberSqrt : public NumberOperand
   }
 
   // Create.
-  NumberSqrt (const AttributeList& al)
+  NumberSqrt (const Block& al)
     : NumberOperand (al)
   { }
 };
 
 static struct NumberSqrtSyntax
 {
-  static Number& make (const AttributeList& al)
+  static Number& make (const Block& al)
   { return *new NumberSqrt (al); }
   NumberSqrtSyntax ()
   {
@@ -164,14 +164,14 @@ struct NumberSqr : public NumberOperand
   }
 
   // Create.
-  NumberSqr (const AttributeList& al)
+  NumberSqr (const Block& al)
     : NumberOperand (al)
   { }
 };
 
 static struct NumberSqrSyntax
 {
-  static Number& make (const AttributeList& al)
+  static Number& make (const Block& al)
   { return *new NumberSqr (al); }
   NumberSqrSyntax ()
   {
@@ -217,16 +217,16 @@ struct NumberPow : public Number
       ok = false;
     return ok;
   }
-  NumberPow (const AttributeList& al)
+  NumberPow (const Block& al)
     : Number (al),
-      base (Librarian<Number>::create (al.alist ("base"))),
-      exponent (Librarian<Number>::create (al.alist ("exponent")))
+      base (Librarian<Number>::build_item (al, "base")),
+      exponent (Librarian<Number>::build_item (al, "exponent"))
   { }
 };
 
 static struct NumberPowSyntax
 {
-  static Number& make (const AttributeList& al)
+  static Number& make (const Block& al)
   { return *new NumberPow (al); }
   NumberPowSyntax ()
   {
@@ -286,8 +286,8 @@ struct NumberOperands : public Number
 
       const struct Operands : public  op_x
       {
-        Operands (const vector<AttributeList*>& as)
-          : op_x (map_create_const<Number> (as))
+        Operands (const Block& Blockconst vector<AttributeList*>& as)
+          : op_x (Librarian<Number>:build_vector_const (as))
         { }
         ~Operands ()
         { sequence_delete (begin (), end ()); }
@@ -327,10 +327,9 @@ struct NumberOperands : public Number
       }
     return ok;
   }
-  NumberOperands (const AttributeList& al)
+  NumberOperands (const Block& al)
     : Number (al),
-      operands (map_create_const<Number> 
-                (al.alist_sequence ("operands")))
+      operands (Librarian<Number>::build_vector_const (al, "operands"))
   { }
   ~NumberOperands ()
   { sequence_delete (operands.begin (), operands.end ()); }
@@ -359,14 +358,14 @@ struct NumberMax : public NumberOperands
   { return unique_dimension (scope); }
 
   // Create.
-  NumberMax (const AttributeList& al)
+  NumberMax (const Block& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberMaxSyntax
 {
-  static Number& make (const AttributeList& al)
+  static Number& make (const Block& al)
   { return *new NumberMax (al); }
   NumberMaxSyntax ()
   {
@@ -407,14 +406,14 @@ struct NumberMin : public NumberOperands
   { return unique_dimension (scope); }
 
   // Create.
-  NumberMin (const AttributeList& al)
+  NumberMin (const Block& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberMinSyntax
 {
-  static Number& make (const AttributeList& al)
+  static Number& make (const Block& al)
   { return *new NumberMin (al); }
   NumberMinSyntax ()
   {
@@ -452,14 +451,14 @@ struct NumberProduct : public NumberOperands
   { return Syntax::Unknown (); }
 
   // Create.
-  NumberProduct (const AttributeList& al)
+  NumberProduct (const Block& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberProductSyntax
 {
-  static Number& make (const AttributeList& al)
+  static Number& make (const Block& al)
   { return *new NumberProduct (al); }
   NumberProductSyntax ()
   {
@@ -490,14 +489,14 @@ struct NumberSum : public NumberOperands
   { return unique_dimension (scope); }
 
   // Create.
-  NumberSum (const AttributeList& al)
+  NumberSum (const Block& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberSumSyntax
 {
-  static Number& make (const AttributeList& al)
+  static Number& make (const Block& al)
   { return *new NumberSum (al); }
   NumberSumSyntax ()
   {
@@ -534,14 +533,14 @@ struct NumberSubtract : public NumberOperands
   { return unique_dimension (scope); }
 
   // Create.
-  NumberSubtract (const AttributeList& al)
+  NumberSubtract (const Block& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberSubtractSyntax
 {
-  static Number& make (const AttributeList& al)
+  static Number& make (const Block& al)
   { return *new NumberSubtract (al); }
   NumberSubtractSyntax ()
   {
@@ -580,14 +579,14 @@ struct NumberDivide : public NumberOperands
   { return Syntax::Unknown (); }
 
   // Create.
-  NumberDivide (const AttributeList& al)
+  NumberDivide (const Block& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberDivideSyntax
 {
-  static Number& make (const AttributeList& al)
+  static Number& make (const Block& al)
   { return *new NumberDivide (al); }
   NumberDivideSyntax ()
   {

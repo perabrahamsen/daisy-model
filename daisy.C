@@ -65,7 +65,7 @@ Daisy::Daisy (const Block& al)
     global_alist (NULL),
     running (false),
     logging (false),
-    logs (map_build<Log> (al, "output")),
+    logs (Librarian<Log>::build_vector (al, "output")),
     log_all (*new LogAll (logs)),
     active_logs (find_active_logs (logs, log_all)),
     activate_output (Librarian<Condition>::create
@@ -78,11 +78,10 @@ Daisy::Daisy (const Block& al)
 	  : Time (9999, 1, 1, 1)),
     action (Librarian<Action>::create (al.alist ("manager"))),
     weather (al.check ("weather") 
-	     ? Librarian<Weather>::build (al, al.alist ("weather"))
+	     ? Librarian<Weather>::build_item (al, "weather")
 	     : NULL), 
-    field (*new Field (al.alist_sequence ("column"))),
-    harvest (map_construct_const<Harvest> 
-	     (al.alist_sequence ("harvest")))
+    field (*new Field (al, "column")),
+    harvest (map_submodel_const<Harvest> (al, "harvest"))
 { }
 
 bool

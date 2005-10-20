@@ -102,7 +102,7 @@ public:
   bool check_am (const AttributeList& am, Treelog& err) const;
   bool check_border (const double border, Treelog& err) const;
   void initialize (const Time&, Treelog& err, const Weather*);
-  Implementation (const vector<AttributeList*>&);
+  Implementation (const Block& parent, const std::string& key);
   ~Implementation ();
 };
 
@@ -647,8 +647,9 @@ Field::Implementation::initialize (const Time& time, Treelog& err,
     (*i)->initialize (time, err, weather);
 }
 
-Field::Implementation::Implementation (const vector<AttributeList*>& sequence)
-  : columns (map_create<Column> (sequence)),
+Field::Implementation::Implementation (const Block& parent, 
+				       const std::string& key)
+  : columns (Librarian<Column>::build_vector (parent, key)),
     selected (NULL)
 { }
 
@@ -840,8 +841,8 @@ void
 Field::initialize (const Time& time, Treelog& err, const Weather* weather)
 { impl.initialize (time, err, weather); }
 
-Field::Field (const vector<AttributeList*>& sequence)
-  : impl (*new Implementation (sequence))
+Field::Field (const Block& parent, const std::string& key)
+  : impl (*new Implementation (parent, key))
 { }
 
 Field::~Field ()

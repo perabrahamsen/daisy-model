@@ -75,7 +75,8 @@ public:
 		  != content->constructors.end ());
     return &(content->constructors)[name] (al);
   }
-  static T* build (const Block& parent, const AttributeList& alist)
+
+  static T* build_alist (const Block& parent, const AttributeList& alist)
   {
     daisy_assert (alist.check ("type"));
     const symbol type = alist.identifier ("type");
@@ -86,6 +87,35 @@ public:
     daisy_assert (content->builders.find (type) != content->builders.end ());
     return &(content->builders)[type] (nested);
   }
+public:
+  static T* build_item (const Block& parent, const std::string& key)
+  { return build_alist (parent, parent.alist (key)); }
+
+  static std::vector<T*> build_vector (const Block& al, const std::string& key)
+  { 
+    std::vector<T*> t;
+    const std::vector<AttributeList*> f (al.alist_sequence (key));
+    for (std::vector<AttributeList*>::const_iterator i = f.begin ();
+	 i != f.end ();
+	 i++)
+      t.push_back (build_alist (al, **i));
+
+    return t;
+  }
+
+  static std::vector<const T*> build_vector_const (const Block& al,
+						   const std::string& key)
+  { 
+    std::vector<const T*> t;
+    const std::vector<AttributeList*> f (al.alist_sequence (key));
+    for (std::vector<AttributeList*>::const_iterator i = f.begin ();
+	 i != f.end ();
+	 i++)
+      t.push_back (build_alist (al, **i));
+
+    return t;
+  }
+
   static void add_base (AttributeList& al, const Syntax& syntax)
   { library ().add_base (al, syntax); }
   static void add_type (const symbol name, AttributeList& al,
@@ -169,34 +199,6 @@ map_create_const (const std::vector<AttributeList*>& f)
        i != f.end ();
        i++)
     t.push_back (Librarian<T>::create (**i));
-  return t;
-}
-
-template <class T> 
-std::vector<T*>
-map_build (const Block& al, const std::string& key)
-{ 
-  std::vector<T*> t;
-  const std::vector<AttributeList*> f (al.alist_sequence (key));
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-       i != f.end ();
-       i++)
-    t.push_back (Librarian<T>::build (al, **i));
-
-  return t;
-}
-
-template <class T> 
-std::vector<const T*>
-map_build_const (const Block& al, const std::string& key)
-{ 
-  std::vector<const T*> t;
-  const std::vector<AttributeList*> f (al.alist_sequence (key));
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-       i != f.end ();
-       i++)
-    t.push_back (Librarian<T>::build (al, **i));
-
   return t;
 }
 

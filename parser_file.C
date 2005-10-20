@@ -281,7 +281,10 @@ ParserFile::Implementation::get_number (const string& syntax_dim)
              + tmp.str () + "---");
       return -42.42e42;
     }
-  auto_ptr<Number> number (Librarian<Number>::create (*al));
+  Syntax parent_syntax;
+  AttributeList parent_alist;
+  Block block (parent_syntax, parent_alist);
+  auto_ptr<Number> number (Librarian<Number>::build_alist (block, *al));
   if (!number->check (Scope::null (), treelog))
     {
       error ("Bad number '" + obj + "'\n--- details:\n"

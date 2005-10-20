@@ -1,3 +1,9 @@
+2005-10-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* boolean.C, boolean.h: New component.
+	* stringer.h, stringer.C: New component.
+	* Makefile (COMPONENTS): Added them.
+
 2005-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* submodeler.h: New utility.
