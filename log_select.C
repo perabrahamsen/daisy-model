@@ -198,7 +198,7 @@ LogSelect::check (const Border& border, Treelog& err) const
   return ok; 
 }
 
-LogSelect::LogSelect (const Block& al)
+LogSelect::LogSelect (Block& al)
   : Log (al),
     description (al.name ("description")),
     condition (Librarian<Condition>::create (al.alist ("when"))),
@@ -243,7 +243,7 @@ struct DocSelect : public LogSelect
 {
   void initialize (Treelog&)
   { }
-  DocSelect (const Block& al)
+  DocSelect (Block& al)
     : LogSelect (al)
   { }
 };
@@ -298,7 +298,7 @@ LogSelect::document_entries (Format& format, const AttributeList& alist)
       return;
     }
   // Complete log.
-  Block block (syntax, alist);
+  Block block (syntax, alist, Treelog::null (), "docselect");
   DocSelect select (block);
 
   format.bold ("Table columns:");

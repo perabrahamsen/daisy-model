@@ -108,7 +108,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit SourceExpr (const Block& al);
+  explicit SourceExpr (Block& al);
   ~SourceExpr ();
 };
 
@@ -181,7 +181,7 @@ SourceExpr::load (Treelog& msg)
   return true;
 }
 
-SourceExpr::SourceExpr (const Block& al)
+SourceExpr::SourceExpr (Block& al)
   : SourceFile (al),
     expr (Librarian<Number>::build_item (al, "expr")),
     title_ (al.name ("title", expr->title ())),
@@ -198,7 +198,7 @@ SourceExpr::~SourceExpr ()
 
 static struct SourceExprSyntax
 {
-  static Source& make (const Block& al)
+  static Source& make (Block& al)
   { return *new SourceExpr (al); }
 
   SourceExprSyntax ()

@@ -48,7 +48,7 @@ public:
   virtual bool check (const Soil&, Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);
 protected:
-  explicit Chemistry (const Block& al);
+  Chemistry (Block& al);
 public:
   virtual ~Chemistry ();
 };

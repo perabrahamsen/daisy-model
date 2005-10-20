@@ -75,7 +75,7 @@ struct WeatherHourly : public WeatherOld
   void put_reference_evapotranspiration (double)
     { }
 
-  WeatherHourly (const Block& al)
+  WeatherHourly (Block& al)
     : WeatherOld (al),
       date (42, 1, 1, 0),
       file_name (al.name ("file")),
@@ -181,7 +181,7 @@ WeatherHourly::tick (const Time& time, Treelog& out)
 
 static struct WeatherHourlySyntax
 {
-  static Weather& make (const Block& al)
+  static Weather& make (Block& al)
     { return *new WeatherHourly (al); }
 
   WeatherHourlySyntax ()

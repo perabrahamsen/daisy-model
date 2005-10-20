@@ -85,7 +85,7 @@ struct LogTable : public LogSelect, public Destination
   bool check (const Border&, Treelog& msg) const;
   static bool contain_time_columns (const vector<Select*>& entries);
   void initialize (Treelog&);
-  explicit LogTable (const Block& al);
+  explicit LogTable (Block& al);
   void summarize (Treelog&);
   ~LogTable ();
 };
@@ -374,7 +374,7 @@ LogTable::initialize (Treelog& msg)
     summary[i]->initialize (entries, msg);
 }
 
-LogTable::LogTable (const Block& al)
+LogTable::LogTable (Block& al)
   : LogSelect (al),
     parsed_from_file (al.name ("parsed_from_file", "")),
     file (al.name ("where")),
@@ -436,7 +436,7 @@ LogTable::~LogTable ()
 
 static struct LogTableSyntax
 {
-  static Log& make (const Block& al)
+  static Log& make (Block& al)
   { return *new LogTable (al); }
 
   LogTableSyntax ()

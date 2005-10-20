@@ -112,7 +112,7 @@ Relative vertical size of plot.");
   bool check (Treelog&)
   { return true; }
   static std::string file2device (const std::string& file);
-  explicit ProgramGnuplot (const Block& al);
+  explicit ProgramGnuplot (Block& al);
   ~ProgramGnuplot ();
 };
 
@@ -400,7 +400,7 @@ ProgramGnuplot::file2device (const std::string& file)
  return "unknown";
 }
 
-ProgramGnuplot::ProgramGnuplot (const Block& al)
+ProgramGnuplot::ProgramGnuplot (Block& al)
   : Program (al),
     command_file (al.name ("command_file")),
     append (al.check ("append") 
@@ -442,7 +442,7 @@ ProgramGnuplot::~ProgramGnuplot ()
 static struct ProgramGnuplotSyntax
 {
   static Program&
-  make (const Block& al)
+  make (Block& al)
   { return *new ProgramGnuplot (al); }
   ProgramGnuplotSyntax ()
   {

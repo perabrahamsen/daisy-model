@@ -1274,7 +1274,7 @@ struct ProgramAM_table : public Program
   { };
   bool check (Treelog&)
   { return true; }
-  ProgramAM_table (const Block& al)
+  ProgramAM_table (Block& al)
     : Program (al)
   { }
   ~ProgramAM_table ()
@@ -1284,7 +1284,7 @@ struct ProgramAM_table : public Program
 static struct ProgramAM_tableSyntax
 {
   static Program&
-  make (const Block& al)
+  make (Block& al)
   { return *new ProgramAM_table (al); }
   ProgramAM_tableSyntax ()
   {

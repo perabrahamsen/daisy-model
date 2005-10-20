@@ -43,7 +43,7 @@ public:
 public:
   virtual bool check (const Scope&, Treelog&) const = 0;
 protected:
-  explicit Boolean (const Block&);
+  explicit Boolean (Block&);
 public:
   virtual ~Boolean ();
 };

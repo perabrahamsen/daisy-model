@@ -258,7 +258,7 @@ LogAll::output (symbol name, const Time& value)
       (*i)->output_time (value);
 }
 
-const Block& 
+Block& 
 LogAll::get_block ()
 {
   static AttributeList alist;
@@ -275,7 +275,7 @@ LogAll::get_block ()
       alist.add ("entries", vector<AttributeList*> ());
       daisy_assert (syntax.check (alist, Treelog::null ()));
     }
-  static Block block (syntax, alist);
+  static Block block (syntax, alist, Treelog::null (), "log_all");
   return block;
 }
 

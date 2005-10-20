@@ -143,7 +143,7 @@ public:
   }
   bool check (Treelog& msg) const
   { return pressure_table->check (msg); }
-  GroundwaterPipe (const Block& al)
+  GroundwaterPipe (Block& al)
     : Groundwater (al),
       L (al.number ("L")),
       x (al.number ("x", L / 2.0)),
@@ -287,7 +287,7 @@ GroundwaterPipe::output (Log& log) const
 
 static struct GroundwaterPipeSyntax
 {
-  static Groundwater& make (const Block& al)
+  static Groundwater& make (Block& al)
     {
       return *new GroundwaterPipe (al);
     }

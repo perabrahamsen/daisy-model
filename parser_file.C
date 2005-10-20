@@ -283,9 +283,10 @@ ParserFile::Implementation::get_number (const string& syntax_dim)
     }
   Syntax parent_syntax;
   AttributeList parent_alist;
-  Block block (parent_syntax, parent_alist);
-  auto_ptr<Number> number (Librarian<Number>::build_alist (block, *al));
-  if (!number->check (Scope::null (), treelog))
+  Block block (parent_syntax, parent_alist, treelog, "number");
+  auto_ptr<Number> number (Librarian<Number>::build_alist (block, *al,
+							   "number"));
+  if (!block.ok () || !number->check (Scope::null (), treelog))
     {
       error ("Bad number '" + obj + "'\n--- details:\n"
              + tmp.str () + "---");
@@ -619,17 +620,47 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      ok = false;
 	    }
 	  const std::string type_name = get_string ();
+	  std::string doc = "User defined " + type_name + ".";
 	  const Syntax::type type = Syntax::type_number (type_name);
-	  if (type == Syntax::Error)
+	  switch (type)
 	    {
-	      error ("'" + type_name + "' unknown type");
+	    case Syntax::String:
+	    case Syntax::Integer:
+	      {
+		if (!looking_at ('('))
+		  doc = get_string ();
+		if (ok)
+		  syntax.add (var, type, Syntax::Const, doc);
+		break;
+	      }
+	    case Syntax::Number:
+	      {
+		std::string dim = Syntax::Unknown ();
+		if (looking_at ('['))
+		  dim = get_string ();
+		if (!looking_at ('('))
+		  doc = get_string ();
+		if (ok)
+		  syntax.add (var, dim, Syntax::Const, doc);
+	      }
+	    case Syntax::Error:
+	      {
+		const symbol type_symbol (type_name);
+		if (Library::exist (type_symbol))
+		  {
+		    if (!looking_at ('('))
+		      doc = get_string ();
+		    if (ok)
+		      syntax.add (var, Library::find (type_symbol), 
+				  Syntax::Const, Syntax::Singleton, doc);
+		    break;
+		  }
+	      }
+	      // Fallthrough
+	    default:
+	      error ("'" + type_name + "' unhandled type");
 	      ok = false;
 	    }
-	  std::string doc = "User defined variable";
-	  if (!looking_at ('('))
-	    doc = get_string ();
-	  if (ok)
-	    syntax.add (var, type, Syntax::Const, doc);
 	  goto done;
 	}
 

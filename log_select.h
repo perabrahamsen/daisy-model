@@ -107,7 +107,7 @@ struct LogSelect : public Log
   bool check (const Border&, Treelog& err) const;
   static void document_entries (Format& format, const AttributeList& alist);
   static void load_syntax (Syntax&, AttributeList&);
-  LogSelect (const Block& al);
+  LogSelect (Block& al);
   ~LogSelect ();
 };
 

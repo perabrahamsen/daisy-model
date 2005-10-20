@@ -31,7 +31,7 @@ const std::string&
 Boolean::title () const
 { return name.name (); }
 
-Boolean::Boolean (const Block& al)
+Boolean::Boolean (Block& al)
   : name (al.identifier ("type"))
 { }
 
@@ -60,7 +60,7 @@ struct BooleanStringEqual : public Boolean
   // Create.
   bool check (const Scope&, Treelog&) const
   { return true; }
-  BooleanStringEqual (const Block& al)
+  BooleanStringEqual (Block& al)
     : Boolean (al),
       values (al.name_sequence ("values"))
   { }
@@ -68,7 +68,7 @@ struct BooleanStringEqual : public Boolean
 
 static struct BooleanStringEqualSyntax
 {
-  static Boolean& make (const Block& al)
+  static Boolean& make (Block& al)
   { return *new BooleanStringEqual (al); }
   BooleanStringEqualSyntax ()
   {

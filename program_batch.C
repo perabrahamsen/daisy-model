@@ -75,7 +75,7 @@ struct ProgramBatch : public Program
     return ok;
   }
 
-  ProgramBatch (const Block& al)
+  ProgramBatch (Block& al)
     : Program (al),
       directory (al.name ("directory")),
       program (Librarian<Program>::build_vector (al, "run"))
@@ -88,7 +88,7 @@ struct ProgramBatch : public Program
 static struct ProgramBatchSyntax
 {
   static Program&
-  make (const Block& al)
+  make (Block& al)
   { return *new ProgramBatch (al); }
   ProgramBatchSyntax ()
   {

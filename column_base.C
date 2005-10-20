@@ -398,7 +398,7 @@ ColumnBase::output_inner (Log&) const
 { }
 
 static Bioclimate*
-get_bioclimate (const Block& al)
+get_bioclimate (Block& al)
 {
   if (al.check ("Bioclimate"))
     return Librarian<Bioclimate>::build_item (al, "Bioclimate");
@@ -406,10 +406,10 @@ get_bioclimate (const Block& al)
   AttributeList alist (Librarian<Bioclimate>::library ()
 		       .lookup (default_symbol));
   alist.add ("type", "default");
-  return Librarian<Bioclimate>::build_alist (al, alist);
+  return Librarian<Bioclimate>::build_alist (al, alist, "Bioclimate");
 }
 
-ColumnBase::ColumnBase (const Block& al)
+ColumnBase::ColumnBase (Block& al)
   : Column (al),
     weather (al.check ("weather") 
 	     ? Librarian<Weather>::build_item (al, "weather")

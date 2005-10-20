@@ -75,7 +75,7 @@ struct SelectFluxBottom : public SelectValue
     if (default_to < 0.0)
       height = default_to;
   }
-  SelectFluxBottom (const Block& al)
+  SelectFluxBottom (Block& al)
     : SelectValue (al),
       height (1.0),
       last (NULL),
@@ -85,7 +85,7 @@ struct SelectFluxBottom : public SelectValue
 
 static struct SelectFluxBottomSyntax
 {
-  static Select& make (const Block& al)
+  static Select& make (Block& al)
   { return *new SelectFluxBottom (al); }
 
   SelectFluxBottomSyntax ()

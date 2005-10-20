@@ -187,7 +187,7 @@ struct LogHarvest : public Log
     return ok; 
   }
 
-  LogHarvest (const Block& al)
+  LogHarvest (Block& al)
     : Log (al),
       last_size (0),
       file (al.name ("where")),
@@ -207,7 +207,7 @@ struct LogHarvest : public Log
 
 static struct LogHarvestSyntax
 {
-  static Log& make (const Block& al)
+  static Log& make (Block& al)
   { return *new LogHarvest (al); }
 
   LogHarvestSyntax ()

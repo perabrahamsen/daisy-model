@@ -72,10 +72,11 @@ public:
     AttributeList new_alist (alist);
     // BUG: TODO: Log state of 'this' to new_alist.
     new_alist.add ("type", name.name ());
-    Block block (Librarian<Column>::library ().syntax (name), new_alist);
+    Block block (Librarian<Column>::library ().syntax (name), new_alist,
+		 Treelog::null(), "clone");
     return *new ColumnInorganic (block); 
   }
-  ColumnInorganic (const Block& al)
+  ColumnInorganic (Block& al)
     : ColumnBase (al)
   { }
   ~ColumnInorganic ()
@@ -185,7 +186,7 @@ ColumnInorganic::check_inner (Treelog& err) const
 }
 static struct ColumnInorganicSyntax
 {
-  static Column& make (const Block& al)
+  static Column& make (Block& al)
   { return *new ColumnInorganic (al); }
 
   ColumnInorganicSyntax ()

@@ -60,7 +60,7 @@ struct ChemistryStandard : public Chemistry
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);
     daisy_assert (S_AB.size () == soil.size ());
   }
-  explicit ChemistryStandard (const Block& al)
+  explicit ChemistryStandard (Block& al)
     : Chemistry (al),
       name_A (al.identifier ("A")),
       name_B (al.identifier ("B")),
@@ -70,7 +70,7 @@ struct ChemistryStandard : public Chemistry
 
 static struct ChemistryStandardSyntax
 {
-  static Chemistry& make (const Block& al)
+  static Chemistry& make (Block& al)
   { return *new ChemistryStandard (al); }
   ChemistryStandardSyntax ()
   {

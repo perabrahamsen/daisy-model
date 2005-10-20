@@ -65,7 +65,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  Harvest (const Block& al);
+  Harvest (Block& al);
   Harvest (symbol col, Time t, symbol crp, 
 	   double sDM, double sN, double sC, double dDM, double dN, double dC,
 	   double lDM, double lN, double lC, double oDM, double oN, double oC,

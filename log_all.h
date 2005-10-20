@@ -64,7 +64,7 @@ public:
   // Create and destroy.
   void initialize (Treelog&);
 private:
-  static const Block& get_block ();
+  static Block& get_block ();
 public:
   LogAll (const std::vector<Log*>& logs);
   ~LogAll ();

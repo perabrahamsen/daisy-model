@@ -141,7 +141,7 @@ Log::print_dlf_header (std::ostream& out, const AttributeList& al)
   out << "\n--------------------\n";
 }
 
-Log::Log (const Block& al)
+Log::Log (Block& al)
   : impl (*new Implementation ()),
     name (al.identifier ("type"))
 { }

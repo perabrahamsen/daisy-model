@@ -170,7 +170,7 @@ struct VegetationPermanent : public Vegetation
   // Create and destroy.
   void initialize (const Time& time, const Soil& soil, OrganicMatter *const, 
                    Treelog&);
-  VegetationPermanent (const Block&);
+  VegetationPermanent (Block&);
   ~VegetationPermanent ();
 };
 
@@ -346,7 +346,7 @@ VegetationPermanent::initialize (const Time& time, const Soil& soil,
     }
 }
 
-VegetationPermanent::VegetationPermanent (const Block& al)
+VegetationPermanent::VegetationPermanent (Block& al)
   : Vegetation (al),
     yearly_LAI (al.alist_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
@@ -374,7 +374,7 @@ VegetationPermanent::~VegetationPermanent ()
 static struct
 VegetationPermanentSyntax
 {
-  static Vegetation& make (const Block& al)
+  static Vegetation& make (Block& al)
   { return *new VegetationPermanent (al); }
 
   VegetationPermanentSyntax ()

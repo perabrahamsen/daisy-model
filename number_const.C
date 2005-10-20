@@ -42,7 +42,7 @@ struct NumberConst : public Number
   // Create.
   bool check (const Scope&, Treelog&) const
   { return true; }
-  NumberConst (const Block& al)
+  NumberConst (Block& al)
     : Number (al),
       val (al.number ("value")),
       dim (al.name ("value"))
@@ -51,7 +51,7 @@ struct NumberConst : public Number
 
 static struct NumberConstSyntax
 {
-  static Number& make (const Block& al)
+  static Number& make (Block& al)
   { return *new NumberConst (al); }
   NumberConstSyntax ()
   {
@@ -77,7 +77,7 @@ struct NumberLeaf : public Number
   { return dim; }
 
   // Create.
-  NumberLeaf (const Block& al)
+  NumberLeaf (Block& al)
     : Number (al),
       dim (al.name ("dimension"))
   { }
@@ -115,7 +115,7 @@ struct NumberGet : public NumberLeaf
     return ok;
   }
 
-  NumberGet (const Block& al)
+  NumberGet (Block& al)
     : NumberLeaf (al),
       name (al.name ("name"))
   { }
@@ -123,7 +123,7 @@ struct NumberGet : public NumberLeaf
 
 static struct NumberGetSyntax
 {
-  static Number& make (const Block& al)
+  static Number& make (Block& al)
   { return *new NumberGet (al); }
   NumberGetSyntax ()
   {
@@ -169,7 +169,7 @@ struct NumberFetch : public Number
       }
     return ok;
   }
-  NumberFetch (const Block& al)
+  NumberFetch (Block& al)
     : Number (al),
       name (al.name ("name"))
   { }
@@ -177,7 +177,7 @@ struct NumberFetch : public Number
 
 static struct NumberFetchSyntax
 {
-  static Number& make (const Block& al)
+  static Number& make (Block& al)
   { return *new NumberFetch (al); }
   NumberFetchSyntax ()
   {
@@ -237,7 +237,7 @@ struct NumberIdentity : public Number
       }
     return ok;
   }
-  NumberIdentity (const Block& al)
+  NumberIdentity (Block& al)
     : Number (al),
       child (Librarian<Number>::build_item (al, "value")),
       dim (al.name ("dimension", Syntax::Unknown ()))
@@ -246,7 +246,7 @@ struct NumberIdentity : public Number
 
 static struct NumberIdentitySyntax
 {
-  static Number& make (const Block& al)
+  static Number& make (Block& al)
   { return *new NumberIdentity (al); }
   NumberIdentitySyntax ()
   {
@@ -298,7 +298,7 @@ struct NumberConvert : public Number
       }
     return ok;
   }
-  NumberConvert (const Block& al)
+  NumberConvert (Block& al)
     : Number (al),
       child (Librarian<Number>::build_item (al, "value")),
       dim (al.name ("dimension"))
@@ -307,7 +307,7 @@ struct NumberConvert : public Number
 
 static struct NumberConvertSyntax
 {
-  static Number& make (const Block& al)
+  static Number& make (Block& al)
   { return *new NumberConvert (al); }
   NumberConvertSyntax ()
   {
@@ -353,7 +353,7 @@ struct NumberDim : public Number
 
     return ok;
   }
-  NumberDim (const Block& al)
+  NumberDim (Block& al)
     : Number (al),
       child (Librarian<Number>::build_item (al, "value")),
       dim (al.name ("dimension")),
@@ -363,7 +363,7 @@ struct NumberDim : public Number
 
 static struct NumberDimSyntax
 {
-  static Number& make (const Block& al)
+  static Number& make (Block& al)
   { return *new NumberDim (al); }
   NumberDimSyntax ()
   {

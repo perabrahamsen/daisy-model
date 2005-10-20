@@ -76,7 +76,7 @@ struct WeatherStandard : public Weather
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
-    YearMap (const Block&);
+    YearMap (Block&);
   };
   const vector<const YearMap*> missing_years;
   int active_map;
@@ -297,7 +297,7 @@ struct WeatherStandard : public Weather
 
   // Create and Destroy.
   bool initialize (const Time& time, Treelog& err);
-  WeatherStandard (const Block&);
+  WeatherStandard (Block&);
   ~WeatherStandard ();
   bool check (const Time& from, const Time& to, Treelog& err) const;
 };
@@ -379,7 +379,7 @@ WeatherStandard::YearMap::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.order ("from", "to");
 }
 
-WeatherStandard::YearMap::YearMap (const Block& al)
+WeatherStandard::YearMap::YearMap (Block& al)
   : from (al.alist ("from")),
     to (al.alist ("to"))
 { }
@@ -1190,7 +1190,7 @@ NO3DryDep: " << DryDeposit.NO3 << " kgN/ha/year";
   return true;
 }
 
-WeatherStandard::WeatherStandard (const Block& al)
+WeatherStandard::WeatherStandard (Block& al)
   : Weather (al),
     T_rain (al.number ("T_rain")),
     T_snow (al.number ("T_snow")),
@@ -1322,7 +1322,7 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 
 static struct WeatherStandardSyntax
 {
-  static Weather& make (const Block& al)
+  static Weather& make (Block& al)
   { return *new WeatherStandard (al); }
 
   WeatherStandardSyntax ()

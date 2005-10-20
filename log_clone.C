@@ -49,7 +49,7 @@ LogClone::initialize (Treelog&)
 { }
 
 LogClone::LogClone (const std::string& name, 
-		    const Block& al)
+		    Block& al)
   : LogAList (al)
 { 
   push (symbol (name), al.syntax (), al.alist ());

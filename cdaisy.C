@@ -450,8 +450,10 @@ daisy_daisy_create (const Syntax* syntax, const AttributeList* alist)
 { 
   static TreelogStream treelog (cerr);
   static Treelog::Open nest (treelog, "daisy");
-  Block block (*syntax, *alist);
+  Block block (*syntax, *alist, treelog, "Daisy");
   Daisy* daisy = new Daisy (block); 
+  daisy_assert (block.ok ());
+  daisy_assert (daisy);
   daisy->initialize (syntax, alist, treelog);
   return daisy;
 }
@@ -915,8 +917,9 @@ daisy_chemical_find (const char* name)
     {
       Syntax parent_syntax;
       AttributeList parent_alist;
-      Block block (parent_syntax, parent_alist);
-      return Librarian<Chemical>::build_alist (block, chemlib.lookup (sym));
+      Block block (parent_syntax, parent_alist, Treelog::null (), "chemical");
+      return Librarian<Chemical>::build_alist (block, chemlib.lookup (sym), 
+					       name);
     }
   return NULL;
 }

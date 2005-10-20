@@ -27,6 +27,8 @@
 #include "plf.h"
 #include <string>
 
+class Treelog;
+
 class Block
 {
   struct Implementation;
@@ -34,6 +36,11 @@ class Block
 public:
   const AttributeList& alist () const;
   const Syntax& syntax () const;
+
+  // Error handling.
+  void error (const std::string&);
+  bool ok () const;
+  void set_error ();
 
   // AList emulation.
 public:
@@ -62,8 +69,12 @@ public:
 
   // Create and Destroy.
 public:
-  explicit Block (const Syntax&, const AttributeList&);
-  explicit Block (const Block&, const Syntax&, const AttributeList&);
+  explicit Block (const Syntax&, const AttributeList&, Treelog& msg, 
+		  const std::string& scope_id);
+  explicit Block (Block&, const Syntax&, const AttributeList&, 
+		  const std::string& scope_tag);
+  explicit Block (Block&, const Syntax&, const AttributeList&, 
+		  const std::string& scope_tag, size_t index);
   ~Block ();
 };
 

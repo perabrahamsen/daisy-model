@@ -121,7 +121,7 @@ public:
   bool check_am (const AttributeList& am, Treelog& err) const;
   bool check_border (const double border, Treelog& err) const;
   void initialize (const Time&, Treelog& err, const Weather*);
-  Field (const Block&, const std::string& key);
+  Field (Block&, const std::string& key);
   virtual ~Field ();
 };
 

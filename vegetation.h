@@ -133,7 +133,7 @@ public:
   virtual void initialize (const Time&, const Soil& soil, OrganicMatter *const,
                            Treelog&) = 0;
   static void load_syntax (Syntax&, AttributeList&);
-  explicit Vegetation (const Block&);
+  explicit Vegetation (Block&);
   virtual ~Vegetation ();
 };
 

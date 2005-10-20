@@ -190,7 +190,7 @@ struct ProgramWSE_table : public Program
   { };
   bool check (Treelog&)
   { return true; }
-  ProgramWSE_table (const Block& al)
+  ProgramWSE_table (Block& al)
     : Program (al),
       wse (Librarian<WSE>::create (al.alist ("wse"))),
       intervals (al.integer ("intervals"))
@@ -202,7 +202,7 @@ struct ProgramWSE_table : public Program
 static struct ProgramWSE_tableSyntax
 {
   static Program&
-  make (const Block& al)
+  make (Block& al)
   { return *new ProgramWSE_table (al); }
   ProgramWSE_tableSyntax ()
   {

@@ -60,7 +60,7 @@ struct WeatherFile : public WeatherOld
     { reference_evapotranspiration_ = ref; }
 
   // Create and Destroy.
-  WeatherFile (const Block& al)
+  WeatherFile (Block& al)
     : WeatherOld (al),
       date (42, 1, 1, 0),
       file_name (al.name ("file")),
@@ -148,7 +148,7 @@ WeatherFile::tick (const Time& time, Treelog& out)
 
 static struct WeatherFileSyntax
 {
-  static Weather& make (const Block& al)
+  static Weather& make (Block& al)
     { return *new WeatherFile (al); }
 
   WeatherFileSyntax ()

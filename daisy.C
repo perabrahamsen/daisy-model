@@ -59,7 +59,7 @@ Daisy::find_active_logs (const vector<Log*>& logs, LogAll& log_all)
   return result;
 }
 
-Daisy::Daisy (const Block& al)
+Daisy::Daisy (Block& al)
   : Program (al),
     global_syntax (NULL),
     global_alist (NULL),
@@ -329,7 +329,7 @@ Daisy::~Daisy ()
 static struct ProgramDaisySyntax
 {
   static Program&
-  make (const Block& al)
+  make (Block& al)
   { return *new Daisy (al); }
   ProgramDaisySyntax ()
   {

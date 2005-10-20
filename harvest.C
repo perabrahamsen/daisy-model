@@ -104,7 +104,7 @@ Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
 			  "Chemicals in harvest.");
 }
 
-Harvest::Harvest (const Block& alist)
+Harvest::Harvest (Block& alist)
   : column (alist.identifier ("column")),
     time (alist.alist ("time")),
     crop (alist.identifier ("crop")),

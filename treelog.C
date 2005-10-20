@@ -21,8 +21,17 @@
 
 
 #include "treelog.h"
+#include <sstream>
 
 using namespace std;
+
+std::string 
+sequence_id (std::string key, size_t index)
+{
+  std::ostringstream tmp;
+  tmp << key << "[" << index << "]";
+  return tmp.str ();
+}
 
 Treelog::Open::Open (Treelog& l, const symbol name)
   : log (l)

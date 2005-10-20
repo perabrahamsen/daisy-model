@@ -93,7 +93,7 @@ protected:
 public:
   static void load_syntax (Syntax&, AttributeList&);
 protected:
-  explicit SourceFile (const Block&);
+  explicit SourceFile (Block&);
 private:
   SourceFile (const SourceFile&);
   SourceFile& operator= (const SourceFile&);

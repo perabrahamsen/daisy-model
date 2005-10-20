@@ -41,7 +41,7 @@ struct SourceFile::Filter
   const std::string tag;
   const std::vector<std::string> allowed;
   static void load_syntax (Syntax& syntax, AttributeList&);
-  explicit Filter (const Block&);
+  explicit Filter (Block&);
 };
 
 void 
@@ -55,7 +55,7 @@ List of allowable values in filter.");
   syntax.order ("tag", "allowed");
 }
 
-SourceFile::Filter::Filter (const Block& al)
+SourceFile::Filter::Filter (Block& al)
   : tag (al.name ("tag")),
     allowed (al.name_sequence ("allowed"))
 { }
@@ -339,7 +339,7 @@ work similar, but with its own style counter.  For color plots, points\n\
 and lines with the same style number also have the same color.");
 }
 
-SourceFile::SourceFile (const Block& al)
+SourceFile::SourceFile (Block& al)
   : Source (al),
     filename (al.name ("file")),
     with_ (al.name ("with", "")),

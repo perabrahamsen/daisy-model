@@ -25,9 +25,12 @@
 
 struct Block::Implementation
 {
-  const Block *const parent;
+  Block *const parent;
   const Syntax& syntax;
   const AttributeList& alist;
+  Treelog& msg;
+  Treelog::Open msg_nest;
+  bool is_ok;
 
   // Use.
   Syntax::type lookup (const std::string&) const;
@@ -35,11 +38,15 @@ struct Block::Implementation
   const AttributeList& find_alist (const std::string& key) const;
   const std::string expand_string (const std::string& value) const;
 
-  Implementation (const Block *const p, 
-		  const Syntax& s, const AttributeList& a)
+  Implementation (Block *const p, Treelog& m,
+		  const Syntax& s, const AttributeList& a,
+		  const std::string& scope_id)
     : parent (p),
       syntax (s),
-      alist (a)
+      alist (a),
+      msg (m),
+      msg_nest (msg, scope_id),
+      is_ok (true)
   { }
 };
 
@@ -145,6 +152,25 @@ const Syntax&
 Block::syntax () const
 { return impl->syntax; }
 
+void
+Block::error (const std::string& msg)
+{ 
+  return impl->msg.error (msg); 
+  set_error (); 
+}
+
+bool
+Block::ok () const
+{ return impl->is_ok; }
+
+void
+Block::set_error ()
+{ 
+  impl->is_ok = false; 
+  if (impl->parent) 
+    impl->parent->set_error (); 
+}
+
 bool 
 Block::check (const std::string& key) const
 { return impl->alist.check (key); }
@@ -238,13 +264,24 @@ const std::vector<AttributeList*>&
 Block::alist_sequence (const std::string& key) const
 { return impl->alist.alist_sequence (key); }
 
-Block::Block (const Block& block,
-	      const Syntax& syntax, const AttributeList& alist)
-  : impl (new Implementation (&block, syntax, alist))
+Block::Block (const Syntax& syntax, const AttributeList& alist, Treelog& msg, 
+	      const std::string& scope_id)
+  : impl (new Implementation (NULL, msg, syntax, alist, scope_id))
 { }
 
-Block::Block (const Syntax& syntax, const AttributeList& alist)
-  : impl (new Implementation (NULL, syntax, alist))
+Block::Block (Block& block,
+	      const Syntax& syntax, const AttributeList& alist, 
+	      const std::string& scope_id)
+  : impl (new Implementation (&block, block.impl->msg, syntax, alist,
+			      scope_id))
+{ }
+
+Block::Block (Block& block,
+	      const Syntax& syntax, const AttributeList& alist, 
+	      const std::string& scope_id, size_t index)
+  : impl (new Implementation (&block, block.impl->msg,
+			      syntax, alist, 
+			      sequence_id (scope_id, index)))
 { }
 
 Block::~Block ()

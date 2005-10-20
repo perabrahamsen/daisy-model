@@ -105,7 +105,7 @@ struct LogAList : public Log
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);
   bool check (const Border&, Treelog& err) const;
-  LogAList (const Block&);
+  LogAList (Block&);
   ~LogAList ();
 };
 

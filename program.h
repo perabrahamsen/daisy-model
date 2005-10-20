@@ -45,7 +45,7 @@ public:
                            Treelog& err) = 0;
   virtual bool check (Treelog& err) = 0;
 protected:
-  explicit Program (const Block&);
+  explicit Program (Block&);
 private:
   explicit Program ();
   explicit Program (const Program&);

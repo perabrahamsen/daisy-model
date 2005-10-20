@@ -57,7 +57,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (const Soil&, const Time& time, Treelog&);
-  GroundwaterFile (const Block&);
+  GroundwaterFile (Block&);
   ~GroundwaterFile ();
 };
 
@@ -151,7 +151,7 @@ GroundwaterFile::initialize (const Soil& soil, const Time& time,
   tick (soil, time, err); 
 }
 
-GroundwaterFile::GroundwaterFile (const Block& al)
+GroundwaterFile::GroundwaterFile (Block& al)
   : Groundwater (al),
     previous_time (42, 1, 1, 0),
     next_time (42, 1, 1, 0),
@@ -169,7 +169,7 @@ GroundwaterFile::~GroundwaterFile ()
 
 static struct GroundwaterFileSyntax
 {
-  static Groundwater& make (const Block& al)
+  static Groundwater& make (Block& al)
     { return *new GroundwaterFile (al); }
   GroundwaterFileSyntax ()
     { 

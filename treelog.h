@@ -26,6 +26,8 @@
 #include "symbol.h"
 #include <string>
 
+std::string sequence_id (std::string key, size_t index);
+
 class Treelog
 {
   // Content.

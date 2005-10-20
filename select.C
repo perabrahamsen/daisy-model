@@ -103,7 +103,7 @@ struct Select::Implementation
   // Create and Destroy.
   bool check (const string& spec_tdim, Treelog& err) const;
   static string find_description (const AttributeList&);
-  Implementation (const Block&);
+  Implementation (Block&);
   ~Implementation ();
 };
 
@@ -331,7 +331,7 @@ Select::Implementation::find_description (const AttributeList& al)
   return string ("");
 }
 
-Select::Implementation::Implementation (const Block& al)
+Select::Implementation::Implementation (Block& al)
   : spec (al.check ("spec")
 	  ? new Spec (al.alist ("spec")) 
 	  : NULL),
@@ -655,7 +655,7 @@ Select::check_border (const Border&,
                       Treelog&) const
 { return true; }
 
-Select::Select (const Block& al)
+Select::Select (Block& al)
   : name (al.name ("type")),
     impl (*new Implementation (al)),
     accumulate (al.flag ("accumulate")),

@@ -48,7 +48,7 @@ public:
 public:
   void initialize (const Soil&, const Time&, Treelog&)
   { }
-  GroundwaterFixed (const Block& al)
+  GroundwaterFixed (Block& al)
     : Groundwater (al),
       depth (al.number ("table"))
   { }
@@ -58,7 +58,7 @@ public:
 
 static struct GroundwaterFixedSyntax
 {
-  static Groundwater& make (const Block& al)
+  static Groundwater& make (Block& al)
   { return *new GroundwaterFixed (al); }
   GroundwaterFixedSyntax ()
   { 

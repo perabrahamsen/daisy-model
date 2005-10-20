@@ -128,10 +128,11 @@ public:
     AttributeList new_alist (alist);
     // BUG: TODO: Log state of 'this' to new_alist.
     new_alist.add ("type", name.name ());
-    Block block (Librarian<Column>::library ().syntax (name), new_alist);
+    Block block (Librarian<Column>::library ().syntax (name), new_alist,
+		 Treelog::null (), "clone");
     return *new ColumnStandard (block); 
   }
-  ColumnStandard (const Block& al);
+  ColumnStandard (Block& al);
   void initialize (const Time&, Treelog&, const Weather*);
   ~ColumnStandard ();
 };
@@ -537,7 +538,7 @@ ColumnStandard::check_inner (Treelog& err) const
   return ok;
 }
 
-ColumnStandard::ColumnStandard (const Block& al)
+ColumnStandard::ColumnStandard (Block& al)
   : ColumnBase (al),
     soil_NH4 (al.alist ("SoilNH4")),
     soil_NO3 (al.alist ("SoilNO3")),
@@ -583,7 +584,7 @@ ColumnStandard::~ColumnStandard ()
 
 static struct ColumnStandardSyntax
 {
-  static Column& make (const Block& al)
+  static Column& make (Block& al)
   { return *new ColumnStandard (al); }
 
   ColumnStandardSyntax ()

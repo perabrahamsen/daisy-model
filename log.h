@@ -272,7 +272,7 @@ public:
   virtual bool check (const Border&, Treelog& err) const = 0;
   virtual void initialize (Treelog& out) = 0;
 protected:
-  Log (const Block& al);
+  Log (Block& al);
 public:
   virtual void summarize (Treelog& out);
   virtual ~Log ();

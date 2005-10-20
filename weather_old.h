@@ -58,7 +58,7 @@ public:
 
   // Create and Destroy.
 protected:
-  WeatherOld (const Block&);
+  WeatherOld (Block&);
 public:
   static void load_syntax (Syntax&, AttributeList&);
   ~WeatherOld ();

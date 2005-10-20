@@ -146,7 +146,7 @@ private:
 public:
   virtual bool initialize (const Time& time, Treelog& err);
 protected:
-  Weather (const Block&);
+  Weather (Block&);
 public:
   virtual bool check (const Time& from, const Time& to, Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);

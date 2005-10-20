@@ -39,7 +39,7 @@ void
 Chemistry::load_syntax (Syntax&, AttributeList&)
 { }
 
-Chemistry::Chemistry (const Block& al)
+Chemistry::Chemistry (Block& al)
   : name (al.identifier ("type")),
     alist (al.alist ())
 { }

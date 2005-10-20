@@ -100,7 +100,7 @@ private:
 public:
   virtual void initialize (const Weather&, Treelog&) = 0;
 protected:
-  explicit Bioclimate (const Block&);
+  explicit Bioclimate (Block&);
 public:
   virtual ~Bioclimate ();
 };

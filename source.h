@@ -51,7 +51,7 @@ public:
 public:
   static void load_syntax (Syntax& syntax, AttributeList&);
 protected:
-  explicit Source (const Block&);
+  explicit Source (Block&);
 private:
   Source (const Source&);
 public:

@@ -48,7 +48,7 @@ public:
 public:
   virtual bool check (const Scope&, Treelog&) const = 0;
 protected:
-  explicit Number (const Block&);
+  explicit Number (Block&);
 public:
   virtual ~Number ();
 };

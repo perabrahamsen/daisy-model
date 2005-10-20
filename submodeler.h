@@ -52,53 +52,60 @@ map_construct_const (const std::vector<AttributeList*>& f)
 
 // New style (block scope).
 
-// Singletons
 template <class T> 
 T*
-submodel (const Block& parent, const std::string& key)
+submodel_block (Block& nested)
+{ 
+  try
+    { return new T (nested); }
+  catch (const std::string& err)
+    { nested.error ("Submodel build failed: " + err); }
+  catch (const char *const err)
+    { nested.error ("Submodel build failed: " + std::string (err)); }
+  return NULL;
+}
+template <class T> 
+T*
+submodel (Block& parent, const std::string& key)
 { 
   const AttributeList& alist = parent.alist (key);
   const Syntax& syntax = parent.syntax ().syntax (key);
   daisy_assert (syntax.check (alist, Treelog::null ()));      
-  Block nested (parent, syntax, alist);
-  return new T (nested);
+  Block nested (parent, syntax, alist, key);
+  return submodel_block<T> (nested);
 }
 
 // Sequences
 template <class T> 
 std::vector<T*>
-map_submodel (const Block& parent, const std::string& key)
+map_submodel (Block& parent, const std::string& key)
 { 
   std::vector<T*> t;
   const std::vector<AttributeList*> f (parent.alist_sequence (key));
   const Syntax& syntax = parent.syntax ().syntax (key);
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-       i != f.end ();
-       i++)
+  for (size_t i = 0; i < f.size (); i++)
     {
-      const AttributeList& alist = **i;
+      const AttributeList& alist = *f[i];
       daisy_assert (syntax.check (alist, Treelog::null ()));      
-      Block nested (parent, syntax, alist);
-      t.push_back (new T (nested));
+      Block nested (parent, syntax, alist, sequence_id (key, i));
+      t.push_back (submodel_block<T> (nested));
     }
   return t;
 }
 
 template <class T> 
 std::vector<const T*>
-map_submodel_const (const Block& parent, const std::string& key)
+map_submodel_const (Block& parent, const std::string& key)
 { 
   std::vector<const T*> t;
   const std::vector<AttributeList*> f (parent.alist_sequence (key));
   const Syntax& syntax = parent.syntax ().syntax (key);
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-       i != f.end ();
-       i++)
+  for (size_t i = 0; i < f.size (); i++)
     {
-      const AttributeList& alist = **i;
+      const AttributeList& alist = *f[i];
       daisy_assert (syntax.check (alist, Treelog::null ()));      
-      Block nested (parent, syntax, alist);
-      t.push_back (new T (nested));
+      Block nested (parent, syntax, alist, sequence_id (key, i));
+      t.push_back (submodel_block<T> (nested));
     }
   return t;
 }

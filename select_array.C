@@ -123,7 +123,7 @@ struct SelectArray : public Select
   { return value.size (); }
 
   // Create and Destroy.
-  SelectArray (const Block& al)
+  SelectArray (Block& al)
     : Select (al),
       value (al.number_sequence ("value")),
       last_soil (NULL)
@@ -132,7 +132,7 @@ struct SelectArray : public Select
 
 static struct SelectArraySyntax
 {
-  static Select& make (const Block& al)
+  static Select& make (Block& al)
   { return *new SelectArray (al); }
 
   SelectArraySyntax ()

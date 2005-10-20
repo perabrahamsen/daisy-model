@@ -20,6 +20,11 @@
 
 
 #include "stringer.h"
+#include "boolean.h"
+#include "submodeler.h"
+#include "memutils.h"
+#include <vector>
+#include <memory>
 
 template<>
 Librarian<Stringer>::Content* Librarian<Stringer>::content = NULL;
@@ -31,7 +36,7 @@ const std::string&
 Stringer::title () const
 { return name.name (); }
 
-Stringer::Stringer (const Block& al)
+Stringer::Stringer (Block& al)
   : name (al.identifier ("type"))
 { }
 
@@ -43,7 +48,7 @@ struct StringerCond : public Stringer
   // Parameters.
   struct Clause
   {
-    const auto_ptr<const Boolean> condition;
+    const std::auto_ptr<const Boolean> condition;
     const std::string value;
     static void load_syntax (Syntax& syntax, AttributeList& alist)
     {
@@ -55,20 +60,20 @@ Condition to test for.");
 Value to return.");
       syntax.order ("condition", "value");
     }
-    Clause (const Block& al)
+    Clause (Block& al)
       : condition (Librarian<Boolean>::build_item (al, "condition")),
         value (al.name ("value"))
     { }
-  }
-  std::vector<Clause*> clauses;
+  };
+  std::vector<const Clause*> clauses;
 
   // Simulation.
   bool missing (const Scope&) const
   { return false; }
-  bool value (const Scope& scope) const
+  std::string value (const Scope& scope) const
   { 
     for (size_t i = 0; i < clauses.size (); i++)
-      if (clauses[i]->condition (scope))
+      if (clauses[i]->condition->value (scope))
         return clauses[i]->value;
     throw "No matching conditions";
   }
@@ -77,14 +82,14 @@ Value to return.");
   bool check (const Scope& scope, Treelog& msg) const
   { 
     for (size_t i = 0; i < clauses.size (); i++)
-      if (clauses[i]->condition (scope))
+      if (clauses[i]->condition->value (scope))
         return true;
     msg.error ("No clause matches");
     return false; 
   }
-  StringerCond (const Block& al)
+  StringerCond (Block& al)
     : Stringer (al),
-      clauses (map_submodel<Clause> (al, "clauses"))
+      clauses (map_submodel_const<Clause> (al, "clauses"))
   { }
   ~StringerCond ()
   { sequence_delete (clauses.begin (), clauses.end ()); }
@@ -92,7 +97,7 @@ Value to return.");
 
 static struct StringerCondSyntax
 {
-  static Stringer& make (const Block& al)
+  static Stringer& make (Block& al)
   { return *new StringerCond (al); }
   StringerCondSyntax ()
   {

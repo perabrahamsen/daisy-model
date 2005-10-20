@@ -72,7 +72,7 @@ bool
 Groundwater::check (Treelog&) const
 { return true; }
 
-Groundwater::Groundwater (const Block& al)
+Groundwater::Groundwater (Block& al)
   : name (al.identifier ("type"))
 { }
 

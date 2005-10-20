@@ -124,7 +124,7 @@ struct ProgramDocument : public Program
   { };
   bool check (Treelog&)
   { return true; }
-  ProgramDocument (const Block& al)
+  ProgramDocument (Block& al)
     : Program (al),
        format (Librarian<Format>::create (al.alist ("format"))),
        print_parameterizations (al.flag ("print_parameterizations"))
@@ -1248,7 +1248,7 @@ standard parameterizations for the model.");
 static struct ProgramDocumentSyntax
 {
   static Program&
-  make (const Block& al)
+  make (Block& al)
   { return *new ProgramDocument (al); }
   ProgramDocumentSyntax ()
   {

@@ -82,7 +82,7 @@ public:
                    Treelog& err);
   bool check (Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
-  explicit Daisy (const Block&);
+  explicit Daisy (Block&);
   ~Daisy ();
 private:
   Daisy ();

@@ -115,8 +115,9 @@ Chemicals::Implementation::lookup (symbol name)
   // Then add it.
   Syntax parent_syntax;
   AttributeList parent_alist;
-  Block block (parent_syntax, parent_alist);
-  const Chemical* chemical = Librarian<Chemical>::build_alist (block, child);
+  Block block (parent_syntax, parent_alist, Treelog::null (), "chemical");
+  const Chemical* chemical 
+    = Librarian<Chemical>::build_alist (block, child, "chemical");
   (*chemistry)[name] = chemical;
   return chemical;
 }

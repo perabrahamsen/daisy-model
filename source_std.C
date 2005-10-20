@@ -47,7 +47,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit SourceStandard (const Block& al);
+  explicit SourceStandard (Block& al);
   ~SourceStandard ();
 };
 
@@ -134,7 +134,7 @@ SourceStandard::load (Treelog& msg)
   return true;
 }
 
-SourceStandard::SourceStandard (const Block& al)
+SourceStandard::SourceStandard (Block& al)
   : SourceFile (al),
     tag (al.name ("tag")),
     title_ (al.name ("title", tag)),
@@ -151,7 +151,7 @@ SourceStandard::~SourceStandard ()
 
 static struct SourceStandardSyntax
 {
-  static Source& make (const Block& al)
+  static Source& make (Block& al)
   { return *new SourceStandard (al); }
 
   SourceStandardSyntax ()

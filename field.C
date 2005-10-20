@@ -102,7 +102,7 @@ public:
   bool check_am (const AttributeList& am, Treelog& err) const;
   bool check_border (const double border, Treelog& err) const;
   void initialize (const Time&, Treelog& err, const Weather*);
-  Implementation (const Block& parent, const std::string& key);
+  Implementation (Block& parent, const std::string& key);
   ~Implementation ();
 };
 
@@ -564,7 +564,7 @@ Field::Implementation::divide (symbol original, symbol copy,
   old->size -= copy_size;
   const Library& library = Librarian<Column>::library ();
   const Syntax& syntax = library.syntax (old->alist.identifier ("type"));
-  Block block (syntax, old->alist);
+  Block block (syntax, old->alist, Treelog::null (), "divide");
   LogClone log_clone ("column", block);
   old->output (log_clone);
   AttributeList& lib_alist = *new AttributeList ();
@@ -647,7 +647,7 @@ Field::Implementation::initialize (const Time& time, Treelog& err,
     (*i)->initialize (time, err, weather);
 }
 
-Field::Implementation::Implementation (const Block& parent, 
+Field::Implementation::Implementation (Block& parent, 
 				       const std::string& key)
   : columns (Librarian<Column>::build_vector (parent, key)),
     selected (NULL)
@@ -841,7 +841,7 @@ void
 Field::initialize (const Time& time, Treelog& err, const Weather* weather)
 { impl.initialize (time, err, weather); }
 
-Field::Field (const Block& parent, const std::string& key)
+Field::Field (Block& parent, const std::string& key)
   : impl (*new Implementation (parent, key))
 { }
 

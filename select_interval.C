@@ -186,7 +186,7 @@ struct SelectInterval : public SelectValue
       ok = false;
     return ok; 
   }
-  SelectInterval (const Block& al)
+  SelectInterval (Block& al)
     : SelectValue (al),
       density_factor (al.flag ("density") ? -1.0 : 1.0),
       from (al.number ("from", 1.0)),
@@ -199,7 +199,7 @@ struct SelectInterval : public SelectValue
 
 static struct SelectIntervalSyntax
 {
-  static Select& make (const Block& al)
+  static Select& make (Block& al)
   { return *new SelectInterval (al); }
 
   SelectIntervalSyntax ()

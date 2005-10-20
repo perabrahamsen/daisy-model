@@ -41,7 +41,7 @@ class Librarian
 private:
   typedef T& (*constructor) (const AttributeList&);
   typedef std::map<symbol, constructor> cmap_type;
-  typedef T& (*builder) (const Block&);
+  typedef T& (*builder) (Block&);
   typedef std::map<symbol, builder> bmap_type;
 
   // Content.
@@ -76,42 +76,45 @@ public:
     return &(content->constructors)[name] (al);
   }
 
-  static T* build_alist (const Block& parent, const AttributeList& alist)
+  static T* build_alist (Block& parent, const AttributeList& alist, 
+			 const std::string& scope_id)
   {
     daisy_assert (alist.check ("type"));
     const symbol type = alist.identifier ("type");
     daisy_assert (library ().check (type));
     const Syntax& syntax = library ().syntax (type);
-    Block nested (parent, syntax, alist);
+    Block nested (parent, syntax, alist, scope_id);
     daisy_assert (syntax.check (alist, Treelog::null ()));
     daisy_assert (content->builders.find (type) != content->builders.end ());
-    return &(content->builders)[type] (nested);
+    try
+      {  return &(content->builders)[type] (nested); }
+    catch (const std::string& err)
+      { nested.error ("Build failed: " + err); }
+    catch (const char *const err)
+      { nested.error ("Build failed: " + std::string (err)); }
+    return NULL;
   }
-public:
-  static T* build_item (const Block& parent, const std::string& key)
-  { return build_alist (parent, parent.alist (key)); }
 
-  static std::vector<T*> build_vector (const Block& al, const std::string& key)
+  static T* build_item (Block& parent, const std::string& key)
+  { return build_alist (parent, parent.alist (key), key); }
+
+  static std::vector<T*> build_vector (Block& al, const std::string& key)
   { 
     std::vector<T*> t;
     const std::vector<AttributeList*> f (al.alist_sequence (key));
-    for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (build_alist (al, **i));
+    for (size_t i = 0; i < f.size (); i++)
+      t.push_back (build_alist (al, *f[i], sequence_id (key, i)));
 
     return t;
   }
 
-  static std::vector<const T*> build_vector_const (const Block& al,
+  static std::vector<const T*> build_vector_const (Block& al,
 						   const std::string& key)
   { 
     std::vector<const T*> t;
     const std::vector<AttributeList*> f (al.alist_sequence (key));
-    for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (build_alist (al, **i));
+    for (size_t i = 0; i < f.size (); i++)
+      t.push_back (build_alist (al, *f[i], sequence_id (key, i)));
 
     return t;
   }
