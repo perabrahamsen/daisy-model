@@ -19,8 +19,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "block.h"
-#include "alist.h"
+#include "librarian.h"
+#include "stringer.h"
+#include "number.h"
 #include "assertion.h"
+#include "scope.h"
 #include <sstream>
 
 struct Block::Implementation
@@ -36,7 +39,7 @@ struct Block::Implementation
   Syntax::type lookup (const std::string&) const;
   const Syntax& find_syntax (const std::string& key) const;
   const AttributeList& find_alist (const std::string& key) const;
-  const std::string expand_string (const std::string& value) const;
+  const std::string expand_string (Block&, const std::string&) const;
 
   Implementation (Block *const p, Treelog& m,
 		  const Syntax& s, const AttributeList& a,
@@ -80,7 +83,8 @@ Block::Implementation::find_alist (const std::string& key) const
 }
 
 const std::string 
-Block::Implementation::expand_string (const std::string& value) const
+Block::Implementation::expand_string (Block& block,
+				      const std::string& value) const
 {
   std::ostringstream result;
   enum mode_t { normal, escaped, keyed } mode = normal;
@@ -129,6 +133,43 @@ Block::Implementation::expand_string (const std::string& value) const
 		case Syntax::Number:
 		  result << alist.number (key); 
 		  break;
+		case Syntax::Object:
+		  {
+		    const AttributeList& obj = alist.alist (key);
+		    const std::string type = obj.name ("type");
+		    const Library& library = syntax.library (key);
+		    const Scope& scope = Scope::null ();
+		    if (&library == &Librarian<Stringer>::library ())
+		      {
+			const std::auto_ptr<Stringer> stringer 
+			  (Librarian<Stringer>::build_alist (block,
+							      obj, key));
+			if (!block.ok () 
+			    || !stringer->check (scope, msg)
+			    || stringer->missing (scope))
+			  throw "Bad string: '" + type + "'";
+			result << stringer->value (scope);
+		      }
+		    else if (&library == &Librarian<Number>::library ())
+		      {
+			const std::auto_ptr<Number> number 
+			  (Librarian<Number>::build_alist (block, obj, key));
+			if (!block.ok () 
+			    || !number->check (scope, msg)
+			    || number->missing (scope))
+			  throw "Bad number: '"+ type + "'";
+			result << number->value (scope);
+			const std::string dim = number->dimension (scope);
+			if (dim == Syntax::Fraction () 
+			    || dim == Syntax::None ())
+			  result << " []";
+			else if (dim != Syntax::Unknown ())
+			  result << " [" << dim << "]";
+		      }
+		    else
+		      throw "Unhandled object type '" + library.name ().name ()
+			+ "'";
+		  }
 		default:
 		  throw "'" + key + "' unhandled type";
 		}
@@ -184,11 +225,11 @@ Block::number (const std::string& key, double default_value) const
 { return impl->alist.number (key, default_value); }
 
 const std::string
-Block::name (const std::string& key) const
-{ return impl->expand_string (impl->alist.name (key)); }
+Block::name (const std::string& key)
+{ return impl->expand_string (*this, impl->alist.name (key)); }
 
 const std::string 
-Block::name (const std::string& key, const std::string& default_value) const
+Block::name (const std::string& key, const std::string& default_value)
 {
   if (impl->alist.check (key))
     return name (key);
@@ -197,7 +238,7 @@ Block::name (const std::string& key, const std::string& default_value) const
 }
 
 symbol 
-Block::identifier (const std::string& key) const
+Block::identifier (const std::string& key)
 { return symbol (name (key)); }
 
 bool 
@@ -229,22 +270,22 @@ Block::number_sequence (const std::string& key) const
 { return impl->alist.number_sequence (key); }
 
 const std::vector<symbol>
-Block::identifier_sequence (const std::string& key) const
+Block::identifier_sequence (const std::string& key)
 {
   const std::vector<std::string>& value = impl->alist.name_sequence (key);
   std::vector<symbol> result;
   for (size_t i = 0; i < value.size (); i++)
-    result.push_back (symbol (impl->expand_string (value[i])));
+    result.push_back (symbol (impl->expand_string (*this, value[i])));
   return result;
 }
   
 std::vector<std::string>
-Block::name_sequence (const std::string& key) const
+Block::name_sequence (const std::string& key)
 {
   const std::vector<std::string>& value = impl->alist.name_sequence (key);
   std::vector<std::string> result;
   for (size_t i = 0; i < value.size (); i++)
-    result.push_back (impl->expand_string (value[i]));
+    result.push_back (impl->expand_string (*this, value[i]));
   return result;
 }
 

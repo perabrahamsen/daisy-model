@@ -47,9 +47,9 @@ public:
   bool check (const std::string& key) const;
   double number (const std::string&) const;
   double number (const std::string&, double default_value) const;
-  const std::string name (const std::string&) const;
-  const std::string name (const std::string&,
-			  const std::string& default_value) const;
+  const std::string name (const std::string&);
+  const std::string name (const std::string&, 
+			  const std::string& default_value);
   symbol identifier (const std::string&) const;
   bool flag (const std::string&) const;
   bool flag (const std::string&, bool default_value) const;
@@ -58,9 +58,8 @@ public:
   int integer (const std::string&) const;
   int integer (const std::string&, int default_value) const;
   const std::vector<double>& number_sequence (const std::string&) const;
-  const std::vector<symbol>
-  /**/ identifier_sequence (const std::string& key) const;
-  std::vector<std::string> name_sequence (const std::string& key) const;
+  const std::vector<symbol> identifier_sequence (const std::string& key);
+  std::vector<std::string> name_sequence (const std::string& key);
   const std::vector<bool>& flag_sequence (const std::string& key) const;
   const std::vector<int>& integer_sequence (const std::string& key) const;
   const std::vector<const PLF*>& plf_sequence (const std::string& key) const;

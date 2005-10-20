@@ -83,7 +83,7 @@ public:
     const symbol type = alist.identifier ("type");
     daisy_assert (library ().check (type));
     const Syntax& syntax = library ().syntax (type);
-    Block nested (parent, syntax, alist, scope_id);
+    Block nested (parent, syntax, alist, scope_id + ": " + type.name ());
     daisy_assert (syntax.check (alist, Treelog::null ()));
     daisy_assert (content->builders.find (type) != content->builders.end ());
     try
