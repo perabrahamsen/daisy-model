@@ -38,48 +38,73 @@ Stringer::Stringer (const Block& al)
 Stringer::~Stringer ()
 { }
 
-struct StringerStringEqual : public Stringer
+struct StringerCond : public Stringer
 {
   // Parameters.
-  const std::vector<std::string> values;
+  struct Clause
+  {
+    const auto_ptr<const Boolean> condition;
+    const std::string value;
+    static void load_syntax (Syntax& syntax, AttributeList& alist)
+    {
+      alist.add ("description", "\
+If condition is true, return value.");
+      syntax.add ("condition", Librarian<Boolean>::library (), "\
+Condition to test for.");
+      syntax.add ("value", Syntax::String, Syntax::Const, "\
+Value to return.");
+      syntax.order ("condition", "value");
+    }
+    Clause (const Block& al)
+      : condition (Librarian<Boolean>::build_item (al, "condition")),
+        value (al.name ("value"))
+    { }
+  }
+  std::vector<Clause*> clauses;
 
   // Simulation.
   bool missing (const Scope&) const
   { return false; }
-  bool value (const Scope&) const
+  bool value (const Scope& scope) const
   { 
-    if (values.size () < 2)
-      return true;
-    const std::string first = values[0];
-    for (size_t i = 1; i < values.size (); i++)
-      if (first != values[i])
-	return false; 
-    return true;
+    for (size_t i = 0; i < clauses.size (); i++)
+      if (clauses[i]->condition (scope))
+        return clauses[i]->value;
+    throw "No matching conditions";
   }
 
   // Create.
-  bool check (const Scope&, Treelog&) const
-  { return true; }
-  StringerStringEqual (const Block& al)
+  bool check (const Scope& scope, Treelog& msg) const
+  { 
+    for (size_t i = 0; i < clauses.size (); i++)
+      if (clauses[i]->condition (scope))
+        return true;
+    msg.error ("No clause matches");
+    return false; 
+  }
+  StringerCond (const Block& al)
     : Stringer (al),
-      values (al.name_sequence ("values"))
+      clauses (map_submodel<Clause> (al, "clauses"))
   { }
+  ~StringerCond ()
+  { sequence_delete (clauses.begin (), clauses.end ()); }
 };
 
-static struct StringerStringEqualSyntax
+static struct StringerCondSyntax
 {
   static Stringer& make (const Block& al)
-  { return *new StringerStringEqual (al); }
-  StringerStringEqualSyntax ()
+  { return *new StringerCond (al); }
+  StringerCondSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "True iff the supplied strings are identical.");
-    syntax.add ("values", Syntax::String, Syntax::Const, Syntax::Sequence,
-		"Strings to compare.");
-    syntax.order ("values");
-    Librarian<Stringer>::add_type ("string-equal", alist, syntax, &make);
+    alist.add ("description", "\
+Return the value of the first clause whose condition is true.");
+    syntax.add_submodule_sequence ("clauses", Syntax::Const, "\
+List of clauses to match for.",
+                                   StringerCond::Clause::load_syntax);
+    syntax.order ("clauses");
+    Librarian<Stringer>::add_type ("cond", alist, syntax, &make);
   }
 } StringerStringEqual_syntax;

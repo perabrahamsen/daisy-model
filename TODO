@@ -277,6 +277,10 @@ min_intensite kl. 8
 
 ** Add user defineable convertions.
 
+** memutils.h -- add auto_vector
+
+Derived from vector, deletes its content on destruction.
+
 * Dokumentation
 
 ** Tutorial
