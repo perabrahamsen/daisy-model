@@ -169,6 +169,7 @@ Block::Implementation::expand_string (Block& block,
 		    else
 		      throw "Unhandled object type '" + library.name ().name ()
 			+ "'";
+		    break;
 		  }
 		default:
 		  throw "'" + key + "' unhandled type";
