@@ -4,15 +4,11 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 *** Formiddag
 
-**** Hent kviteringer.
-
-**** Kontakt varmemester
-
 **** Aftal tid med frisør.
 
-**** Bank: vis papir
-
 *** Eftermiddig
+
+**** Brev til Lara Martini med bankdetaljer.
 
 **** Birgitte/Jette:  Snak rejseregnskab.
 
@@ -29,6 +25,8 @@ TODO --- things that needs done with Daisy -*- outline -*-
 ***** Olie
 
 ***** Melon
+
+***** Mælk
 
 * Udine
 
@@ -180,6 +178,12 @@ Less (early?) N gives less leaves, which might be fine (LAI > 3 is a waste)
 
 *** program_document should include local variables in parameterizations.
 
+*** Omdan alle constructors til at bruge Block
+
+*** Fjern Librarian<T>::create
+
+*** Block er dynamisk scoped!
+
 ** command
 
 Hav et command bibliotek, hvis elementer bliver kørt straks af
@@ -190,6 +194,9 @@ Måske skal command bare være program?
 
 Hvis en attribut ikke er fundet i syntaksen, prøv at se om det er
 navnet på et program.  Og i så fald, kør der.
+
+Vi har måske brug for to sådanne biblioteker, et der kun virker på
+top-level, og et der virker alle steder (til "declare", "append")?
 
 ** gnuplot
 

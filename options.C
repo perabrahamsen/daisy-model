@@ -197,9 +197,13 @@ Options::Options (int& argc, char**& argv,
                 Treelog::Open nest (out, name);
                 if (syntax.check (alist, out))
                   {
+		    Block* block = new Block (syntax, alist, out, "Building");
                     auto_ptr<Program> program
-                      (Librarian<Program>::create (alist));
-                    program->run (out);
+                      (Librarian<Program>::build_item (*block, "-p"));
+		    const bool block_ok = block->ok ();
+		    delete block;
+		    if (block_ok)
+		      program->run (out);
                   }
                 prevent_run = true;
               }
