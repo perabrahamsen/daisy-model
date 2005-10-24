@@ -6,8 +6,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 ** Birgitte/Jette:  Snak rejseregnskab.
 
-** WP6 brev
-
 ** Check PT setup, har vi grafer for alle data?
 
 ** PT 2004
@@ -94,21 +92,19 @@ DptEmr = 20 supported by measurements
 
 * WP6
 
-** husk plant and harvest dates!
+** Opsætning
 
-Skal være for FertOrgaNic sort!
+*** gun irrigation
 
-Specificer FertOrgaNic sort for alle sites.
-
-** Price of nitrogen needed for making FON breakeven for farmers?
-
-** Price of water needed for making FON breakeven for farmers?
+*** Daisy skal kunne læse fertigation fil og plant/harvest fil!
 
 ** Harvest når bladene er faldet af?
 
-** gun irrigation
+** Ideer til SM
 
-** send demand to everybody!
+*** Price of nitrogen needed for making FON breakeven for farmers?
+
+*** Price of water needed for making FON breakeven for farmers?
 
 * IDE:  Mikkel implementerer Farquhar photosyntese.
 
