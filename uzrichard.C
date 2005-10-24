@@ -745,14 +745,16 @@ UZRichard::has_macropores (bool has_them)
 	  static AttributeList geometric;
 	  if (!geometric.check ("type"))
 	    geometric.add ("type", "geometric");
-	  K_average = Librarian<Average>::create (geometric);
+	  K_average = Librarian<Average>::build_free (Treelog::null (),
+						      geometric, "has macro");
 	}
       else
 	{
 	  static AttributeList arithmetic;
 	  if (!arithmetic.check ("type"))
 	    arithmetic.add ("type", "arithmetic");
-	  K_average = Librarian<Average>::create (arithmetic);
+	  K_average = Librarian<Average>::build_free (Treelog::null (),
+						      arithmetic, "no macro");
 	}
     }
 }

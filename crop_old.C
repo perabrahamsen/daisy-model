@@ -130,7 +130,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (Treelog&, const Geometry& geometry, OrganicMatter*);
-  CropOld (const AttributeList& vl);
+  CropOld (Block& vl);
   ~CropOld ();
 };
 
@@ -260,7 +260,7 @@ struct CropOld::Parameters
   bool enable_N_stress;
 private:
   friend class CropOld;
-  Parameters (const AttributeList&);
+  Parameters (Block&);
 public:
   ~Parameters ();
 };
@@ -345,12 +345,12 @@ struct CropOld::Variables
   } CrpAux;
 private:
   friend class CropOld;
-  Variables (const Parameters&, const AttributeList&);
+  Variables (const Parameters&, Block&);
 public:
   ~Variables ();
 };
 
-CropOld::Parameters::Parameters (const AttributeList& vl) 
+CropOld::Parameters::Parameters (Block& vl) 
   : Devel (vl.alist ("Devel")),
     Vernal (vl.alist ("Vernal")),
     LeafPhot (vl.alist ("LeafPhot")),
@@ -463,7 +463,7 @@ CropOld::Parameters::HarvestPar::HarvestPar (const AttributeList& vl)
 CropOld::Parameters::~Parameters ()
 { }
 
-CropOld::Variables::Variables (const Parameters& par, const AttributeList& vl)
+CropOld::Variables::Variables (const Parameters& par, Block& vl)
   : Phenology (par, vl.alist ("Phenology")),
     Canopy (par, vl.alist ("Canopy")),
     RootSys (par, vl.alist ("RootSys")),
@@ -633,7 +633,7 @@ CropOld::initialize (Treelog&, const Geometry& geometry, OrganicMatter*)
 
 static struct CropOldSyntax
 {
-  static Crop& make (const AttributeList& al)
+  static Crop& make (Block& al)
   { return *new CropOld (al); }
   CropOldSyntax ();
 } old_crop_syntax;
@@ -2047,7 +2047,7 @@ CropOld::total_C () const
   return total / conv;
 }
 
-CropOld::CropOld (const AttributeList& al)
+CropOld::CropOld (Block& al)
   : Crop (al),
     par (*new Parameters (al)),
     var (*new Variables (par, al))

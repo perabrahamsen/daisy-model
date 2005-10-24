@@ -149,7 +149,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (Treelog&, const Geometry& geometry, OrganicMatter *const);
-  CropStandard (const AttributeList& vl);
+  CropStandard (Block& vl);
   ~CropStandard ();
 };
 
@@ -488,7 +488,7 @@ CropStandard::output (Log& log) const
   output_submodule (nitrogen, "CrpN", log);
 }
 
-CropStandard::CropStandard (const AttributeList& al)
+CropStandard::CropStandard (Block& al)
   : Crop (al),
     root_system (al.alist ("Root")),
     canopy (al.alist ("Canopy")),
@@ -514,7 +514,7 @@ CropStandard::~CropStandard ()
 
 static struct CropStandardSyntax
 {
-  static Crop& make (const AttributeList& al)
+  static Crop& make (Block& al)
   { return *new CropStandard (al); }
   CropStandardSyntax ();
 } standard_crop_syntax;

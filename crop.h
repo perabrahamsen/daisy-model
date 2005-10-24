@@ -128,7 +128,7 @@ public:
 public:
   virtual void initialize (Treelog&, const Geometry&, OrganicMatter*) = 0;
 protected:
-  Crop (const AttributeList& al);
+  Crop (Block&);
 public:
   virtual ~Crop ();
 };

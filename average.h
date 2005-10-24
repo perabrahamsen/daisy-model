@@ -38,7 +38,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Average (const AttributeList& al);
+  Average (Block& al);
 public:
   virtual ~Average ();
 };

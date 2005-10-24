@@ -76,6 +76,29 @@ public:
     return &(content->constructors)[name] (al);
   }
 
+  static T* build_free (Treelog& msg, const AttributeList& alist, 
+			const std::string& scope_id)
+  {
+    daisy_assert (alist.check ("type"));
+    const symbol type = alist.identifier ("type");
+    daisy_assert (library ().check (type));
+    const Syntax& syntax = library ().syntax (type);
+    Block block (syntax, alist, msg, scope_id + ": " + type.name ());
+    daisy_assert (syntax.check (alist, msg));
+    daisy_assert (content->builders.find (type) != content->builders.end ());
+    try
+      {  
+	T* result = &(content->builders)[type] (block); 
+	daisy_assert (block.ok () && result);
+	return result;
+      }
+    catch (const std::string& err)
+      { block.error ("Build failed: " + err); }
+    catch (const char *const err)
+      { block.error ("Build failed: " + std::string (err)); }
+    return NULL;
+  }
+
   static T* build_alist (Block& parent, const AttributeList& alist, 
 			 const std::string& scope_id)
   {
@@ -84,7 +107,7 @@ public:
     daisy_assert (library ().check (type));
     const Syntax& syntax = library ().syntax (type);
     Block nested (parent, syntax, alist, scope_id + ": " + type.name ());
-    daisy_assert (syntax.check (alist, Treelog::null ()));
+    daisy_assert (syntax.check (alist, nested.msg ()));
     daisy_assert (content->builders.find (type) != content->builders.end ());
     try
       {  return &(content->builders)[type] (nested); }

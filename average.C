@@ -31,7 +31,7 @@ Librarian<Average>::Content* Librarian<Average>::content = NULL;
 const char *const Average::description = "\
 Find the average of two numbers.";
 
-Average::Average (const AttributeList& al)
+Average::Average (Block& al)
   : name (al.identifier ("type"))
 { }
 
@@ -46,7 +46,7 @@ struct AverageArithmetic : public Average
   double operator()(double a, double b) const
   { return (a + b) / 2.0; }
   // Create and Destroy.
-  AverageArithmetic (const AttributeList& al)
+  AverageArithmetic (Block& al)
     : Average (al)
   { }
   ~AverageArithmetic ()
@@ -56,7 +56,7 @@ struct AverageArithmetic : public Average
 static struct AverageArithmeticSyntax
 {
   static Average&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new AverageArithmetic (al); }
   AverageArithmeticSyntax ()
   {
@@ -75,7 +75,7 @@ struct AverageHarmonic : public Average
   double operator()(double a, double b) const
   { return 2.0 * a * b / (a + b); }
   // Create and Destroy.
-  AverageHarmonic (const AttributeList& al)
+  AverageHarmonic (Block& al)
     : Average (al)
   { }
   ~AverageHarmonic ()
@@ -85,7 +85,7 @@ struct AverageHarmonic : public Average
 static struct AverageHarmonicSyntax
 {
   static Average&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new AverageHarmonic (al); }
   AverageHarmonicSyntax ()
   {
@@ -104,7 +104,7 @@ struct AverageGeometric : public Average
   double operator()(double a, double b) const
   { return sqrt (a * b); }
   // Create and Destroy.
-  AverageGeometric (const AttributeList& al)
+  AverageGeometric (Block& al)
     : Average (al)
   { }
   ~AverageGeometric ()
@@ -114,7 +114,7 @@ struct AverageGeometric : public Average
 static struct AverageGeometricSyntax
 {
   static Average&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new AverageGeometric (al); }
   AverageGeometricSyntax ()
   {

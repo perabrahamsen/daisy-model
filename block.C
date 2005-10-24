@@ -194,6 +194,10 @@ const Syntax&
 Block::syntax () const
 { return impl->syntax; }
 
+Treelog&
+Block::msg () const
+{ return impl->msg; }
+
 void
 Block::error (const std::string& msg)
 { 

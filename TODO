@@ -1,32 +1,28 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Fredag
+* Dagens Dond
 
-*** Formiddag
+** Brev til Lara Martini med bankdetaljer.
 
-**** Aftal tid med frisør.
+** Birgitte/Jette:  Snak rejseregnskab.
 
-*** Eftermiddig
+** WP6 brev
 
-**** Brev til Lara Martini med bankdetaljer.
+** Check PT setup, har vi grafer for alle data?
 
-**** Birgitte/Jette:  Snak rejseregnskab.
+** PT 2004
 
-**** Check PT setup, har vi grafer for alle data?
+** PL
 
-**** PT 2004
+* Formiddag
 
-**** PL
+** Aftal tid med frisør.
 
-*** After
+* Eftermiddag
 
-**** Indkøb
+** Indkøb
 
-***** Olie
-
-***** Melon
-
-***** Mælk
+Salt, Melon
 
 * Udine
 
@@ -183,6 +179,11 @@ Less (early?) N gives less leaves, which might be fine (LAI > 3 is a waste)
 *** Fjern Librarian<T>::create
 
 *** Block er dynamisk scoped!
+
+*** Vi kan ikke bruge checkpoints, fordi context har ændret sig.
+
+En local variabel vil ikke længere være i scope, og ekspansioner vil
+derfor fejle.
 
 ** command
 

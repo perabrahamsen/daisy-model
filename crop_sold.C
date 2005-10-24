@@ -131,7 +131,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (Treelog&, const Geometry& geometry, OrganicMatter*);
-  CropSold (const AttributeList& vl);
+  CropSold (Block& vl);
   ~CropSold ();
 };
 
@@ -262,7 +262,7 @@ struct CropSold::Parameters
   double EpFac;
 private:
   friend class CropSold;
-  Parameters (const AttributeList&);
+  Parameters (Block&);
 public:
   ~Parameters ();
 };
@@ -346,12 +346,12 @@ struct CropSold::Variables
   } CrpAux;
 private:
   friend class CropSold;
-  Variables (const Parameters&, const AttributeList&);
+  Variables (const Parameters&, Block&);
 public:
   ~Variables ();
 };
 
-CropSold::Parameters::Parameters (const AttributeList& vl) 
+CropSold::Parameters::Parameters (Block& vl) 
   : Devel (vl.alist ("Devel")),
     Vernal (vl.alist ("Vernal")),
     LeafPhot (vl.alist ("LeafPhot")),
@@ -465,7 +465,7 @@ CropSold::Parameters::~Parameters ()
 { }
 
 CropSold::Variables::Variables (const Parameters& par, 
-				    const AttributeList& vl)
+				    Block& vl)
   : Phenology (par, vl.alist ("Phenology")),
     Canopy (par, vl.alist ("Canopy")),
     RootSys (par, vl.alist ("RootSys")),
@@ -629,7 +629,7 @@ CropSold::initialize (Treelog&, const Geometry& geometry, OrganicMatter*)
 
 static struct CropSoldSyntax
 {
-  static Crop& make (const AttributeList& al)
+  static Crop& make (Block& al)
     { return *new CropSold (al); }
   CropSoldSyntax ();
 } old_crop_syntax;
@@ -2001,7 +2001,7 @@ CropSold::total_C () const
   return total / conv;
 }
 
-CropSold::CropSold (const AttributeList& al)
+CropSold::CropSold (Block& al)
   : Crop (al),
     par (*new Parameters (al)),
     var (*new Variables (par, al))

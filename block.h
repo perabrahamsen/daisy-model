@@ -36,6 +36,7 @@ class Block
 public:
   const AttributeList& alist () const;
   const Syntax& syntax () const;
+  Treelog& msg () const;
 
   // Error handling.
   void error (const std::string&);

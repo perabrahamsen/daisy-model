@@ -150,7 +150,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (Treelog&, const Geometry& geometry, OrganicMatter*);
-  CropSimple (const AttributeList& vl);
+  CropSimple (Block& vl);
   ~CropSimple ();
 };
 
@@ -399,7 +399,7 @@ CropSimple::initialize (Treelog&, const Geometry& geometry, OrganicMatter*)
   CropCAI ();
 }
 
-CropSimple::CropSimple (const AttributeList& al)
+CropSimple::CropSimple (Block& al)
   : Crop (al),
     LAIvsT (al.check ("LAIvsTS") ? al.plf ("LAIvsTS") : al.plf ("LAIvsDay")),
     forced_LAI (al.number ("forced_LAI")),
@@ -437,7 +437,7 @@ CropSimple::~CropSimple ()
 
 static struct CropSimpleSyntax
 {
-  static Crop& make (const AttributeList& al)
+  static Crop& make (Block& al)
   { return *new CropSimple (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

@@ -171,6 +171,7 @@ struct VegetationCrops : public Vegetation
   // Create and destroy.
   void initialize (const Time&, const Soil& soil, OrganicMatter *const,
                    Treelog& msg);
+  static CropList build_crops (Block& block, const std::string& key);
   VegetationCrops (Block&);
   ~VegetationCrops ();
 };
@@ -608,7 +609,7 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 		      OrganicMatter& organic_matter, 
                       double& seed_N, double& seed_C)
 {
-  Crop *const crop = Librarian<Crop>::create (al);
+  Crop *const crop = Librarian<Crop>::build_free (msg, al, "sow");
   const symbol name = crop->name;
   for (CropList::iterator i = crops.begin();
        i != crops.end();
@@ -627,7 +628,7 @@ void
 VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 		      const Geometry& geometry)
 {
-  Crop *const crop = Librarian<Crop>::create (al);
+  Crop *const crop = Librarian<Crop>::build_free (msg, al, "sow");
   const symbol name = crop->name;
   for (CropList::iterator i = crops.begin();
        i != crops.end();
@@ -656,9 +657,22 @@ VegetationCrops::initialize (const Time&, const Soil& soil,
   reset_canopy_structure (msg);
 }
 
+VegetationCrops::CropList
+VegetationCrops::build_crops (Block& block, const std::string& key)
+{
+  CropList t;
+  const vector<AttributeList*>& f = block.alist_sequence (key);
+  for (size_t i = 0; i < f.size (); i++)
+    t.push_back (Librarian<Crop>::build_alist (block, *f[i],
+					       sequence_id (key, i)));
+  
+  return t;
+}
+
 VegetationCrops::VegetationCrops (Block& al)
   : Vegetation (al),
-    crops (),			// deque, so we can't use map_create.
+    crops (build_crops (al, "crops")),
+    // deque, so we can't use map_create.
     forced_LAI (al.alist_sequence ("ForcedLAI")),
     shared_light_fraction_ (1.0),
     LAI_ (0.0),
@@ -672,15 +686,7 @@ VegetationCrops::VegetationCrops (Block& al)
     EpFactor_ (0.0),
     albedo_ (0.0),
     interception_capacity_ (0.0)
-{
-  const vector<AttributeList*>& sequence = al.alist_sequence ("crops");
-  for (vector<AttributeList*>::const_iterator i = sequence.begin ();
-       i != sequence.end ();
-       i++)
-    {
-      crops.push_back (Librarian<Crop>::create (**i));
-    }
-}
+{ }
 
 VegetationCrops::~VegetationCrops ()
 { 
