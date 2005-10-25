@@ -105,7 +105,9 @@ HorizonSystem::System::check_alist (const AttributeList& al,
   for (unsigned int i = 0; i < names.size (); i++)
     sum += al.number (names[i]);
   
-  if (!approximate (sum, 1.0) && !approximate (sum + al.number ("humus"), 1.0))
+  if (!al.flag ("normalize")
+      && !approximate (sum, 1.0) 
+      && !approximate (sum + al.number ("humus"), 1.0))
     {
       err.error ("The sum of all soil components must be 1.0");
       ok = false;
@@ -150,7 +152,10 @@ HorizonSystem::System::add_to_lib (Horizon& (make)(const AttributeList&),
       }
     syntax.add_fraction ("humus", Syntax::Const,
                          "Humus content of soil.");
-
+    syntax.add ("normalize", Syntax::Boolean, Syntax::Const, "\
+If this is true, normalize the mineral fraction to 1.0.\n\
+Otherwise, give an error if the sum is not 1.0.");
+    alist.add ("normalize", false);
     Librarian<Horizon>::add_type (symbol (name), alist, syntax, make);
 }
 

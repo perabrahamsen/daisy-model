@@ -14,6 +14,58 @@ release.
 
 * 3.85
 
+** Unstable!
+
+Due to the implementation of next change, many submodel may not work
+correctly.  The symptom is that Daisy will crash! Please report all
+such crashes to daisy@dina.kvl.dk, together with the daisy.log file!
+
+** You can now declare local variables in parameterizations.
+
+For example, here we declare a specialization named 'column', of the
+table log model.  The specialization has a new parameter also named
+'column', declared with the 'declare' keyword.
+
+  (deflog column table
+    "A log table for a specific all for all columns."
+    (declare column String
+      "Name of column to log.  Use \"*\" to log all columns.")
+    (column "*"))
+
+The first argument to the 'declare' keyword is the name of the
+parameter, the second the type.  The type can be one of the build-in
+types, 'String', 'Number', or 'Integer', or the name of a component
+(see the reference manual for a list of components).  For the 'Number'
+type, you can specify a dimension right afterwards, in brackets.  Like
+"Number [cm]".  The last argument is a documentation string.
+
+After you have declared the parameter, you can set it just like any
+other parameter.  Here we set it to the string "*".  We can later
+refer to the value within a string, by using the "\{" escape
+sequence.  Here is an example where we refer to the value of the
+column attribute:
+
+  (deflog "Field nitrogen" column
+    "Nitrogen input, output, transformation and content for the system."
+    (where "field_nitrogen.dlf")
+    (when hourly)
+    (entries (number (path column "\{column}" fertilized_NH4)
+                     (spec column default fertilized_NH4)
+                     (handle sum)
+                     (tag "NH4-Fertilizer")
+                     (dimension "kg N/ha/&"))
+
+You can refer to any parameter with a String, Number or Integer type
+this way, including the standard build-in parameters.
+
+The effect for the end user is that you can now log "Field nitrogen"
+for a specific column, by setting the new attribute:
+
+  (output ("Field nitrogen" (column "Andeby")))
+
+It is the intention that all the log models should eventually use this
+new system, and the old (set "$col" "Andeby") system should go away.
+
 ** DOS text format input files supported undet Unix.
 
 ** New "timestep" condition for use in log files.
@@ -457,7 +509,7 @@ Example:
   (defcolumn Andeby default
     "The B.And farm, Andeby, 2002."
     (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
-  	(MaxRootingDepth max_rooting_depth))
+        (MaxRootingDepth max_rooting_depth))
     (Groundwater deep))
 
 This is useful if the same number is used in several places, and all
@@ -832,7 +884,7 @@ organic matter init parameter like this:
     "The B.And farm, Andeby, 2002."
     (OrganicMatter (init (top_summary "topsum.tab")))
     (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
-  	  (MaxRootingDepth 60.0 [cm]))
+          (MaxRootingDepth 60.0 [cm]))
     (Groundwater deep))
 
 Then the summary will also be written to the specified file for

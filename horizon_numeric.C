@@ -98,7 +98,8 @@ static struct HorizonNumericSyntax
         ok = false;
       }
     const double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
-    if (!approximate (sum, 1.0)
+    if (!al.flag ("normalize")
+        && !approximate (sum, 1.0)
         && !approximate (sum + al.number ("humus"), 1.0))
       {
         err.error ("The sum of all soil components must be 1.0");
@@ -127,6 +128,10 @@ Fraction of particles between the corresponding numrical limits.");
     
     syntax.add_fraction ("humus", Syntax::Const,
                          "Humus content of soil.");
+    syntax.add ("normalize", Syntax::Boolean, Syntax::Const, "\
+If this is true, normalize the mineral fraction to 1.0.\n\
+Otherwise, give an error if the sum is not 1.0.");
+    alist.add ("normalize", false);
 
     Librarian<Horizon>::add_type ("numeric", alist, syntax, make);
   }

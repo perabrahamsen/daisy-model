@@ -1,3 +1,7 @@
+2005-10-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon_numeric.C, horizon_system.C: (normalize): New parameter.
+
 2005-10-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* treelog.C, treelog.h (sequence_id): New global function.
