@@ -66,6 +66,15 @@ for a specific column, by setting the new attribute:
 It is the intention that all the log models should eventually use this
 new system, and the old (set "$col" "Andeby") system should go away.
 
+** You can now ask Daisy to normalize texture numbers.
+
+If you set (normalize true) in any other horizon type than "default",
+Daisy will normalize the texture numbers for you.  Otherwise, Daisy
+will complain if the sum is not 1.0 [] or 100 [%].  
+
+The "default" horizon always normalize, and you should avoid using
+that horizon model cause the texture system is unclear.
+
 ** DOS text format input files supported undet Unix.
 
 ** New "timestep" condition for use in log files.
