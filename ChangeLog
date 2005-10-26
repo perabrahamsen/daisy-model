@@ -1,5 +1,7 @@
 2005-10-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* boolean.C (true, false): New models.
+
 	* horizon_numeric.C, horizon_system.C: (normalize): New parameter.
 
 2005-10-20  Per Abrahamsen  <abraham@dina.kvl.dk>

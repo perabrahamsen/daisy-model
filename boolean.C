@@ -83,3 +83,65 @@ static struct BooleanStringEqualSyntax
     Librarian<Boolean>::add_type ("string-equal", alist, syntax, &make);
   }
 } BooleanStringEqual_syntax;
+
+struct BooleanTrue : public Boolean
+{
+  // Simulation.
+  bool missing (const Scope&) const
+  { return false; }
+  bool value (const Scope&) const
+  { return true; }
+
+  // Create.
+  bool check (const Scope&, Treelog&) const
+  { return true; }
+  BooleanTrue (Block& al)
+    : Boolean (al)
+  { }
+};
+
+static struct BooleanTrueSyntax
+{
+  static Boolean& make (Block& al)
+  { return *new BooleanTrue (al); }
+  BooleanTrueSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+	       "Always true.");
+    Librarian<Boolean>::add_type ("true", alist, syntax, &make);
+  }
+} BooleanTrue_syntax;
+
+struct BooleanFalse : public Boolean
+{
+  // Simulation.
+  bool missing (const Scope&) const
+  { return false; }
+  bool value (const Scope&) const
+  { return false; }
+
+  // Create.
+  bool check (const Scope&, Treelog&) const
+  { return true; }
+  BooleanFalse (Block& al)
+    : Boolean (al)
+  { }
+};
+
+static struct BooleanFalseSyntax
+{
+  static Boolean& make (Block& al)
+  { return *new BooleanFalse (al); }
+  BooleanFalseSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+	       "Always false.");
+    Librarian<Boolean>::add_type ("false", alist, syntax, &make);
+  }
+} BooleanFalse_syntax;
