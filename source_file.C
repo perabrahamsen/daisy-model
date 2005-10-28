@@ -142,12 +142,14 @@ SourceFile::get_time (const std::string& entry)
   int year;
   int month;
   int mday;
-  int hour;
+  int hour = 8;
   char dummy;
 
   std::istringstream in (entry);
   
-  in >> year >> dummy >> month >> dummy >> mday >> dummy >> hour;
+  in >> year >> dummy >> month >> dummy >> mday;
+  if (in.good () && !in.eof ())
+    in >> dummy >> hour;
 
   if (Time::valid (year, month, mday, hour))
     return Time (year, month, mday, hour);

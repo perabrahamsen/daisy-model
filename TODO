@@ -1,8 +1,31 @@
-TODO --- things that needs done with Daisy -*- outline -*-
+TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Torsdagens Dond
+* Fredagens Dond
 
-** F-fdag!
+** Ring til CT, spørg om tab-separerede filer.
+
+** Konverter ppm til kg/ha 0-75 cm PT 2003 (målt + sim) i Crop N
+
+[ På længere sigt: Lav en source der tager from, to rho_b argumenter,
+og konverterer ppm til kg N/ha.  ]
+
+S_N [ug N/g Jord] 
+
+* rho_b [g Jord/cm^3] = S_N [ug N/cm^3]
+
+* (from - to) [cm] = S_N [ug N/cm^2]
+
+* 1,000,000 [g/ug * 1000 kg/g = S_N [kg N/cm^2]
+
+/ (100 * 100) (cm^2/m^2) = S_N [kg N/m^2]
+
+/ (100 * 100) (m^2/ha) = S_N [kg N/ha]
+
+
+
+
+
+
 
 * Derefter
 
