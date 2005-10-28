@@ -262,8 +262,11 @@ SourceFile::read_entry (LexerData& lex,
           tmp << "Got " << entries.size () << " entries, expected "
               << tag_names.size ();
           lex.warning (tmp.str ());
+          while (entries.size () < tag_names.size ())
+            entries.push_back ("");
         }
-      return false;
+      else 
+        return false;
     }
 
   // Extract date.
