@@ -1,6 +1,6 @@
 ;;; batch.dai --- This demonstrate how to do batch processing with Daisy.
 
-;; Get out sample management, irrigation, and soil.
+;; Get our sample management, irrigation, and soil.
 (input file "dk-management.dai")
 (input file "irrigation.dai")
 (input file "pedo-soil.dai")
