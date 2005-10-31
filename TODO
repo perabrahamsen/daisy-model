@@ -1,36 +1,26 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Fredagens Dond
-
-** Ring til CT, spørg om tab-separerede filer.
-
-** Konverter ppm til kg/ha 0-75 cm PT 2003 (målt + sim) i Crop N
-
-[ På længere sigt: Lav en source der tager from, to rho_b argumenter,
-og konverterer ppm til kg N/ha.  ]
-
-S_N [ug N/g Jord] 
-
-* rho_b [g Jord/cm^3] = S_N [ug N/cm^3]
-
-* (from - to) [cm] = S_N [ug N/cm^2]
-
-* 1,000,000 [g/ug * 1000 kg/g = S_N [kg N/cm^2]
-
-/ (100 * 100) (cm^2/m^2) = S_N [kg N/m^2]
-
-/ (100 * 100) (m^2/ha) = S_N [kg N/ha]
-
-
 * Derefter
+
+** Gigantisk massebalancefejl!  Hvad sker der?
+
+Test seneste version fra nettet!
+
+** Check at det er Jose seneste opsætning vi bruger!
 
 ** PT 2003
 
-*** Vi mangler log værdier for Theta og h
+plotN skal have 
 
-*** Vi mangler plots for soil N
+- målt kg N/ha i øverste 20 cm
 
-Nej, vi mangler soil N
+- sim kg N/ha i øverste 20 cm
+
+- sim kg N/ha i øverste 50 cm
+
+** Skal vi bruge de målte værdier for 0-25 og 25-75 til noget?
+
+Der er to målepunkter for hver rep.
 
 ** PT 2004
 
@@ -166,6 +156,8 @@ Less (early?) N gives less leaves, which might be fine (LAI > 3 is a waste)
 
 ** block
 
+*** Brug $ i stedet for \ for inline streng variable
+
 *** program_document should include local variables in parameterizations.
 
 *** Omdan alle constructors til at bruge Block
@@ -238,6 +230,11 @@ check kun de søjler der matcher log'en.
 *** Vi skal have en måde at ændre log options globalt.  
 
 Det gælder også udskrivning af tid i excel format.
+
+
+*** Det skal være muligt at logge indhold i dynamisk rodzone.
+
+Rodzonen afhænger af roddybden.
 
 *** Gør det muligt at skifte enhed i en log fil.
 

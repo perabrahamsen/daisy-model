@@ -95,7 +95,7 @@ Block::Implementation::expand_string (Block& block,
       switch (mode)
 	{
 	case normal:
-	  if (c == '\\')
+	  if (c == '$')
 	    mode = escaped;
 	  else
 	    result << c;
@@ -103,9 +103,19 @@ Block::Implementation::expand_string (Block& block,
 	case escaped:
 	  if (c == '{')
 	    mode = keyed;
+	  else if (c == '$')
+	    {
+	      result << '$';
+	      mode = normal;
+	    }
 	  else
 	    {
-	      result << '\\' << c;
+#if 0
+	      // BUG: We still have too many $col and $crop around to warn.
+	      msg.warning (std::string ("Unknown $ escape '") 
+			   + c + "', ignored");
+#endif
+	      result << '$' << c;
 	      mode = normal;
 	    }
 	  break;

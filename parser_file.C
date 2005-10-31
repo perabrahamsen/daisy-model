@@ -133,9 +133,6 @@ ParserFile::Implementation::get_string ()
 		case '\n':
 		  c = get ();
 		  break;
-		case '{':
-		  str += '\\';
-		  break;
 		case '\\':
 		case '"':
 		  break;
@@ -642,6 +639,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  doc = get_string ();
 		if (ok)
 		  syntax.add (var, dim, Syntax::Const, doc);
+		break;
 	      }
 	    case Syntax::Error:
 	      {

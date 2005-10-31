@@ -41,7 +41,7 @@ type, you can specify a dimension right afterwards, in brackets.  Like
 
 After you have declared the parameter, you can set it just like any
 other parameter.  Here we set it to the string "*".  We can later
-refer to the value within a string, by using the "\{" escape
+refer to the value within a string, by using the "${" escape
 sequence.  Here is an example where we refer to the value of the
 column attribute:
 
@@ -49,7 +49,7 @@ column attribute:
     "Nitrogen input, output, transformation and content for the system."
     (where "field_nitrogen.dlf")
     (when hourly)
-    (entries (number (path column "\{column}" fertilized_NH4)
+    (entries (number (path column "${column}" fertilized_NH4)
                      (spec column default fertilized_NH4)
                      (handle sum)
                      (tag "NH4-Fertilizer")
@@ -72,8 +72,8 @@ If you set (normalize true) in any other horizon type than "default",
 Daisy will normalize the texture numbers for you.  Otherwise, Daisy
 will complain if the sum is not 1.0 [] or 100 [%].  
 
-The "default" horizon always normalize, and you should avoid using
-that horizon model cause the texture system is unclear.
+The "default" horizon always normalize,  but you should avoid using
+that horizon model because the texture system is unclear.
 
 ** DOS text format input files supported undet Unix.
 
