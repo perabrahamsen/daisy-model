@@ -191,17 +191,19 @@ Options::Options (int& argc, char**& argv,
                     argc = -2;
                     break;
                   }
-                const Syntax& syntax = library.syntax (name);
-                AttributeList alist (library.lookup (name));
-                alist.add ("type", name);
+                const Syntax& p_syntax = library.syntax (name);
+                AttributeList p_alist (library.lookup (name));
+                p_alist.add ("type", name);
                 Treelog::Open nest (out, name);
-                if (syntax.check (alist, out))
+                if (p_syntax.check (p_alist, out))
                   {
-		    Block* block = new Block (syntax, alist, out, "Building");
+		    auto_ptr<Block> block (new Block (syntax, alist, out, 
+                                                      "Building"));
                     auto_ptr<Program> program
-                      (Librarian<Program>::build_item (*block, "-p"));
+                      (Librarian<Program>::build_alist (*block, p_alist, 
+                                                        "Command line"));
 		    const bool block_ok = block->ok ();
-		    delete block;
+		    delete block.release ();
 		    if (block_ok)
 		      program->run (out);
                   }

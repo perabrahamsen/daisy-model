@@ -121,72 +121,80 @@ Block::Implementation::expand_string (Block& block,
 	  break;
 	case keyed:
 	  if (c == '}')
-	    {
-	      const Syntax::type type = lookup (key);
-	      if (type == Syntax::Error)
-		throw "Unknown expansion: '" + key + "'";
-	      const Syntax& syntax = find_syntax (key);
-	      if (syntax.size (key) != Syntax::Singleton)
-		throw "'" + key 
-		  + "' is a sequence, can only expand singletons";
-	      const AttributeList& alist = find_alist (key);
-	      if (!alist.check (key))
-		throw "'" + key + "' has no value";
-	      switch (type)
-		{
-		case Syntax::String:
-		  result << alist.name (key); 
-		  break;
-		case Syntax::Integer:
-		  result << alist.integer (key); 
-		  break;
-		case Syntax::Number:
-		  result << alist.number (key); 
-		  break;
-		case Syntax::Object:
-		  {
-		    const AttributeList& obj = alist.alist (key);
-		    const std::string type = obj.name ("type");
-		    const Library& library = syntax.library (key);
-		    const Scope& scope = Scope::null ();
-		    if (&library == &Librarian<Stringer>::library ())
-		      {
-			const std::auto_ptr<Stringer> stringer 
-			  (Librarian<Stringer>::build_alist (block,
-							      obj, key));
-			if (!block.ok () 
-			    || !stringer->check (scope, msg)
-			    || stringer->missing (scope))
-			  throw "Bad string: '" + type + "'";
-			result << stringer->value (scope);
-		      }
-		    else if (&library == &Librarian<Number>::library ())
-		      {
-			const std::auto_ptr<Number> number 
-			  (Librarian<Number>::build_alist (block, obj, key));
-			if (!block.ok () 
-			    || !number->check (scope, msg)
-			    || number->missing (scope))
-			  throw "Bad number: '"+ type + "'";
-			result << number->value (scope);
-			const std::string dim = number->dimension (scope);
-			if (dim == Syntax::Fraction () 
-			    || dim == Syntax::None ())
-			  result << " []";
-			else if (dim != Syntax::Unknown ())
-			  result << " [" << dim << "]";
-		      }
-		    else
-		      throw "Unhandled object type '" + library.name ().name ()
-			+ "'";
-		    break;
-		  }
-		default:
-		  throw "'" + key + "' unhandled type";
-		}
-	      mode = normal;
-	      key = "";
-	    }
+            {
+              try 
+                {
+                  const Syntax::type type = lookup (key);
+                  if (type == Syntax::Error)
+                    throw "Unknown expansion: '" + key + "'";
+                  const Syntax& syntax = find_syntax (key);
+                  if (syntax.size (key) != Syntax::Singleton)
+                    throw "'" + key 
+                      + "' is a sequence, can only expand singletons";
+                  const AttributeList& alist = find_alist (key);
+                  if (!alist.check (key))
+                    throw "'" + key + "' has no value";
+                  switch (type)
+                    {
+                    case Syntax::String:
+                      result << alist.name (key); 
+                      break;
+                    case Syntax::Integer:
+                      result << alist.integer (key); 
+                      break;
+                    case Syntax::Number:
+                      result << alist.number (key); 
+                      break;
+                    case Syntax::Object:
+                      {
+                        const AttributeList& obj = alist.alist (key);
+                        const std::string type = obj.name ("type");
+                        const Library& library = syntax.library (key);
+                        const Scope& scope = Scope::null ();
+                        if (&library == &Librarian<Stringer>::library ())
+                          {
+                            const std::auto_ptr<Stringer> stringer 
+                              (Librarian<Stringer>::build_alist (block,
+                                                                  obj, key));
+                            if (!block.ok () 
+                                || !stringer->check (scope, msg)
+                                || stringer->missing (scope))
+                              throw "Bad string: '" + type + "'";
+                            result << stringer->value (scope);
+                          }
+                        else if (&library == &Librarian<Number>::library ())
+                          {
+                            const std::auto_ptr<Number> number 
+                              (Librarian<Number>::build_alist (block, obj, key));
+                            if (!block.ok () 
+                                || !number->check (scope, msg)
+                                || number->missing (scope))
+                              throw "Bad number: '"+ type + "'";
+                            result << number->value (scope);
+                            const std::string dim = number->dimension (scope);
+                            if (dim == Syntax::Fraction () 
+                                || dim == Syntax::None ())
+                              result << " []";
+                            else if (dim != Syntax::Unknown ())
+                              result << " [" << dim << "]";
+                          }
+                        else
+                          throw "Unhandled object type '" + library.name ().name ()
+                            + "'";
+                        break;
+                      }
+                    default:
+                      throw "'" + key + "' unhandled type";
+                    }
+                }
+              catch (const std::string& error)
+                {
+                  result << "${" << key << "}";
+                  msg.warning (error); 
+                }
+              mode = normal;
+              key = "";
+            }
 	  else
 	    key += c;
 	}

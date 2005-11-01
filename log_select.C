@@ -303,6 +303,7 @@ LogSelect::document_entries (Format& format, const AttributeList& alist)
   // Complete log.
   Block block (syntax, alist, Treelog::null (), "docselect");
   DocSelect select (block);
+  daisy_assert (block.ok ());
 
   format.bold ("Table columns:");
   Format::List dummy (format);
