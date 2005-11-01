@@ -1,5 +1,7 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Check at "Field nitrogen" virker med checkpoints (local variable!)
+
 * Derefter
 
 ** Check at det er Jose seneste opsætning vi bruger!
@@ -150,9 +152,9 @@ Less (early?) N gives less leaves, which might be fine (LAI > 3 is a waste)
 
 * Programmering
 
-** block
+** The new/delete block doesn't work well with exceptions.
 
-*** Brug $ i stedet for \ for inline streng variable
+** block
 
 *** program_document should include local variables in parameterizations.
 
@@ -166,6 +168,8 @@ Less (early?) N gives less leaves, which might be fine (LAI > 3 is a waste)
 
 En local variabel vil ikke længere være i scope, og ekspansioner vil
 derfor fejle.
+
+Checkpoints SKAL virke når vi vi logger!
 
 ** command
 

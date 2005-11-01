@@ -43,6 +43,12 @@ public:
   bool ok () const;
   void set_error ();
 
+  // Nested scope handling.
+public:
+  Syntax::type lookup (const std::string&) const;
+  const Syntax& find_syntax (const std::string& key) const;
+  const AttributeList& find_alist (const std::string& key) const;
+
   // AList emulation.
 public:
   bool check (const std::string& key) const;

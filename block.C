@@ -196,6 +196,18 @@ Block::Implementation::expand_string (Block& block,
   return result.str ();
 }
 
+Syntax::type 
+Block::lookup (const std::string& key) const
+{ return impl->lookup (key); }
+
+const Syntax& 
+Block::find_syntax (const std::string& key) const
+{ return impl->find_syntax (key); }
+
+const AttributeList& 
+Block::find_alist (const std::string& key) const
+{ return impl->find_alist (key); }
+
 const AttributeList&
 Block::alist () const
 { return impl->alist; }

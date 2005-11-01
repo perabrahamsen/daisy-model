@@ -16,9 +16,10 @@ release.
 
 ** Unstable!
 
-Due to the implementation of next change, many submodel may not work
-correctly.  The symptom is that Daisy will crash! Please report all
-such crashes to daisy@dina.kvl.dk, together with the daisy.log file!
+Due to the implementation of the change below, many submodel may not
+work correctly.  The symptom is that Daisy will crash! Please report
+all such crashes to daisy@dina.kvl.dk, together with the daisy.log
+file.
 
 ** You can now declare local variables in parameterizations.
 
@@ -66,6 +67,9 @@ for a specific column, by setting the new attribute:
 It is the intention that all the log models should eventually use this
 new system, and the old (set "$col" "Andeby") system should go away.
 
+WARNING:  Local variables are not saved in checkpoints, so if your
+simulation setup depend on local variable, checkpoints may not work.
+
 ** You can now ask Daisy to normalize texture numbers.
 
 If you set (normalize true) in any other horizon type than "default",
@@ -85,6 +89,12 @@ Use it like this
            (when (timestep (and (month 3) (mday 31) (hour 23)) "y"))))
 
 to tell daisy that this is yearly data.
+
+Daisy will use this in log files to specify the dimension for flux
+variables, e.g. "kg N/ha/y" to indicate leaching with a yearly
+timestep.  Note that the actual value of the flux is not affected,
+only apparent dimension.  Daisy will alway write the accumulated flux
+since the last timestep logged.
 
 ** New convertion: [none] -> []
 

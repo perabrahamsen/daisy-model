@@ -145,16 +145,58 @@ struct NumberFetch : public Number
 {
   // Parameters.
   const string name;
+  const double *const default_value;
+  const std::string default_dimension;
   const std::string& title () const
   { return name; }
 
+  static double* fetch_default_value (Block& al, const string& key)
+  {
+    if (al.lookup (key) != Syntax::Number)
+      return NULL;
+    const AttributeList& alist = al.find_alist (key);
+    if (!alist.check (key))
+      return NULL;
+    const Syntax& syntax = al.find_syntax (key);
+    daisy_assert (syntax.lookup (key) == Syntax::Number);
+    if (syntax.size (key) != Syntax::Singleton)
+      {
+	al.msg ().warning ("Parameter '" + key + "' is a sequence, ignored");
+	return NULL;
+      }
+    return new double (alist.number (key));
+  }
+  static std::string fetch_default_dimension (Block& al, const string& key)
+  {
+    if (al.lookup (key) != Syntax::Number)
+      return Syntax::Unknown ();
+    const Syntax& syntax = al.find_syntax (key);
+    daisy_assert (syntax.lookup (key) == Syntax::Number);
+    const std::string dim = syntax.dimension (key);
+    if (dim == Syntax::User ())
+      {
+	const AttributeList& alist = al.find_alist (key);
+	if (alist.check (key))
+	  return alist.name (key);
+      }
+    return dim;
+  }
   // Simulation.
   bool missing (const Scope& scope) const
-  { return !scope.has_number (name); }
+  { return !default_value && !scope.has_number (name); }
   double value (const Scope& scope) const
-  { return scope.number ( name); }
+  { 
+    if (scope.has_number (name))
+      return scope.number (name);
+    daisy_assert (default_value);
+    return *default_value;
+  }
   const std::string& dimension (const Scope& scope) const
-  { return scope.dimension ( name); }
+  { 
+    if (scope.has_number (name))
+      return scope.dimension (name); 
+    return default_dimension;
+  }
 
   // Create.
   bool check (const Scope& scope, Treelog& err) const
@@ -162,7 +204,7 @@ struct NumberFetch : public Number
     Treelog::Open nest (err, name);
 
     bool ok = true;
-    if (!scope.has_number (name))
+    if (!default_value && !scope.has_number (name))
       {
         err.error ("'" + name + "' not in scope");
         ok = false;
@@ -171,8 +213,12 @@ struct NumberFetch : public Number
   }
   NumberFetch (Block& al)
     : Number (al),
-      name (al.name ("name"))
+      name (al.name ("name")),
+      default_value (fetch_default_value (al, name)),
+      default_dimension (fetch_default_dimension (al, name))
   { }
+  ~NumberFetch ()
+  { delete default_value; }
 };
 
 static struct NumberFetchSyntax

@@ -118,15 +118,13 @@ attributes.");
       if (!run_syntax->check (*run_alist, treelog))
         return 1;
 
-      Block* block = new Block (syntax, alist, treelog, "Building");
+      auto_ptr<Block> block (new Block (syntax, alist, treelog, "Building"));
       auto_ptr<Program> program (Librarian<Program>::build_alist (*block, 
 								  *run_alist,
  								  "run"));
-      const bool block_ok = block->ok ();
-      delete block;
-      block = NULL;
-      if (!block_ok)
+      if (!block->ok ())
 	return 1;
+      delete block.release ();
     
       program->initialize (&syntax, &alist, treelog);
       if (!program->check (treelog))
