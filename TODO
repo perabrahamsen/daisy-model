@@ -1,20 +1,64 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* CT:
+
+** Status side
+
+For hvert WP1 site:
+
+*** Er databasetal endelige? (- 2005 efterafgrøde)
+
+*** Er opsætning endelig?
+
+*** Hvem har ansvaret?
+
+** Opdater PT 2003 fra database
+
+** Hent PT 2004 fra database
+
+** Check at Jose opsætning (fra fertogranic hjemmeside) er den vi bruger.
+
+** Lav 2004 plots.
+
+** Evt. diskussion.
+
+** Hent PL data fra database.
+
+** Lab PL plots
+
+** Spørg Wladislaw om vi har seneste udgave.
+
+** Evt diskussion.
+
+** Hent DK tal fra database
+
+** Endelig opsætning fra Tove?
+
+** Lav DK plots
+
+** Evt diskussion.
+
+** Hent CZ, IT, SK tal fra database.
+
+** Evt. diskussion af målte tal.
+
+** PL kalibrering
+
+** PT kalibrering
+
+2003: Brug SK som udgangspunkt.
+
+2004: Ny afgrøde
+
+* Måske skal vi begynde at give kartofelparameteriseringerne navn efter sort?
+
 * Check at "Field nitrogen" virker med checkpoints (local variable!)
 
 * Derefter
 
+** Plot middelværdi og spredning
+
 ** Check at det er Jose seneste opsætning vi bruger!
-
-** PT 2003
-
-plotN skal have 
-
-- målt kg N/ha i øverste 20 cm
-
-- sim kg N/ha i øverste 20 cm
-
-- sim kg N/ha i øverste 50 cm
 
 ** Skal vi bruge de målte værdier for 0-25 og 25-75 til noget?
 

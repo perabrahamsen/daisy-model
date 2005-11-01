@@ -375,7 +375,7 @@ OTHER = block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
 	submodel.C
 
 # Utilities in header alone.
-HEADONLY = librarian.h submodeler.h border.h timestep.h memutil.h
+HEADONLY = librarian.h submodeler.h border.h timestep.h memutils.h
 
 # Everything that has an interface.
 #
