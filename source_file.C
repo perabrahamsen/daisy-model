@@ -49,12 +49,13 @@ public:
       {
         if (allowed[i] == value)
           return true;
-        if (allowed[i].size () <= value.size ())
+        // Try to pad out our allowed value with spaces...
+        if (value.size () <= allowed[i].size ())
           continue;
-        const std::string val 
-          = value + std::string (allowed[i].size () - value.size (), ' ');
-        daisy_assert (val.size () == allowed[i].size ());
-        if (allowed[i] == val)
+        const std::string allow
+          = allowed[i] + std::string (value.size () - allowed[i].size (), ' ');
+        daisy_assert (allow.size () == value.size ());
+        if (allow == value)
           return true;
       }
     return false;
