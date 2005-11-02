@@ -290,7 +290,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 #
-MODELS = number_arit.C source_expr.C \
+MODELS = source_combine.C number_arit.C source_expr.C \
 	source_std.C action_markvand.C photo_GL.C program_gnuplot.C \
 	program_document.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
@@ -704,7 +704,8 @@ pmain${OBJ}: pmain.C
 boolean${OBJ}: boolean.C boolean.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h
 stringer${OBJ}: stringer.C stringer.h librarian.h library.h symbol.h block.h \
-  syntax.h treelog.h plf.h alist.h assertion.h
+  syntax.h treelog.h plf.h alist.h assertion.h boolean.h submodeler.h \
+  memutils.h
 source${OBJ}: source.C source.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h
 photo${OBJ}: photo.C photo.h librarian.h library.h symbol.h block.h syntax.h \
@@ -975,8 +976,8 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h library.h \
   soil_water.h macro.h soil_heat.h soil_chemicals.h soil_chemical.h \
   solute.h adsorption.h transport.h mactrans.h chemistry.h groundwater.h \
   log.h border.h weather.h im.h vegetation.h memutils.h
-block${OBJ}: block.C block.h syntax.h treelog.h symbol.h plf.h alist.h \
-  assertion.h
+block${OBJ}: block.C block.h syntax.h treelog.h symbol.h plf.h librarian.h \
+  library.h alist.h assertion.h stringer.h number.h scope.h
 dlf${OBJ}: dlf.C dlf.h symbol.h alist.h assertion.h version.h daisy.h \
   program.h librarian.h library.h block.h syntax.h treelog.h plf.h
 scope${OBJ}: scope.C scope.h assertion.h
@@ -1035,6 +1036,9 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h program.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+source_combine${OBJ}: source_combine.C source.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h number.h \
+  scope.h vcheck.h memutils.h
 number_arit${OBJ}: number_arit.C number.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h units.h vcheck.h \
   mathlib.h memutils.h

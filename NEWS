@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.86
+
+** ".ddf" files now accept dates in dd/mm/yy format.
+
 * 3.85
 
 ** Unstable!

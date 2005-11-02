@@ -139,22 +139,49 @@ SourceFile::get_date_component (LexerData& lex,
 Time 
 SourceFile::get_time (const std::string& entry)
 {
-  int year;
-  int month;
-  int mday;
-  int hour = 8;
-  char dummy;
-
   std::istringstream in (entry);
-  
-  in >> year >> dummy >> month >> dummy >> mday;
-  if (in.good () && !in.eof ())
-    in >> dummy >> hour;
 
-  if (Time::valid (year, month, mday, hour))
-    return Time (year, month, mday, hour);
-  
-  return Time (9999, 1, 1, 1);
+  int val1;
+  char sep1;
+  int val2;
+  char sep2;
+  int val3;
+  in >> val1 >> sep1 >> val2 >> sep2 >> val3;
+
+  if (sep1 != sep2)
+    return Time (9999, 1, 1, 1);
+
+  int hour = 8;
+  if (in.good () && !in.eof ())
+    {
+      char sep3;
+      in >> sep3 >> hour;
+      if (sep3 != 'T')
+        return Time (9999, 1, 1, 1);
+    }        
+
+  int mday;
+  int month;
+  int year;
+  if (sep1 == '-')
+    {
+      year = val1;
+      month = val2;
+      mday = val3;
+    }
+  else if (sep1 == '/')
+    {
+      mday = val1;
+      month = val2;
+      year = val3;
+    }
+  else
+    return Time (9999, 1, 1, 1);
+
+  if (!Time::valid (year, month, mday, hour))
+    return Time (9999, 1, 1, 1);
+
+  return Time (year, month, mday, hour);
 }
 
 double
@@ -287,17 +314,25 @@ SourceFile::read_entry (LexerData& lex,
         }
       else
         time = Time (year, month, mday, hour);
+
+      if (time.year () == 9999)
+        {
+          std::ostringstream tmp;
+          tmp << time.year () << "-" << time.month () << "-" << time.mday () 
+              << "T" << time.hour () << ": invalid date";
+          lex.warning (tmp.str ());
+          return false;
+        }
     }
   else
-    time = get_time (entries[time_c]);
-
-  if (time.year () == 9999)
     {
-      std::ostringstream tmp;
-      tmp << time.year () << "-" << time.month () << "-" << time.mday () 
-          << "T" << time.hour () << ": invalid date";
-      lex.warning (tmp.str ());
-      return false;
+      time = get_time (entries[time_c]);
+
+      if (time.year () == 9999)
+        {
+          lex.warning (entries[time_c] + ": invalid time");
+          return false;
+        }
     }
 
   // Filter.
