@@ -357,7 +357,7 @@ SourceFile::read_entry (LexerData& lex,
   // Filter.
   for (size_t i = 0; i < filter.size (); i++)
     if (!filter[i]->match (entries[fil_col[i]]))
-        return false;
+      return false;
   
   // If we survived here, everything is fine.
   return true;
