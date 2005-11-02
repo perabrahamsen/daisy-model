@@ -1,8 +1,11 @@
 2005-11-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 3.86 released.
+	* Version 3.87 released.
 
 2005-11-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_file.C (Filter::match): New function.
+	(read_entry): Use it.
 
 	* Version 3.86 released.
 

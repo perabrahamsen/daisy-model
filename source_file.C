@@ -36,10 +36,29 @@ find_tag (const std::map<std::string,int>& tag_pos,
   return result < 0 ? find_tag (tag_pos, tag2) : result;
 }
 
-struct SourceFile::Filter
+class SourceFile::Filter
 {
+public:
   const std::string tag;
+private:
   const std::vector<std::string> allowed;
+public:
+  bool match (const std::string& value) const
+  {
+    for (size_t i = 0; i < allowed.size (); i++)
+      {
+        if (allowed[i] == value)
+          return true;
+        if (allowed[i].size () <= value.size ())
+          continue;
+        const std::string val 
+          = value + std::string (allowed[i].size () - value.size (), ' ');
+        daisy_assert (val.size () == allowed[i].size ());
+        if (allowed[i] == val)
+          return true;
+      }
+    return false;
+  }
   static void load_syntax (Syntax& syntax, AttributeList&);
   explicit Filter (Block&);
 };
@@ -337,13 +356,8 @@ SourceFile::read_entry (LexerData& lex,
 
   // Filter.
   for (size_t i = 0; i < filter.size (); i++)
-    {
-      const std::vector<std::string>& allowed = filter[i]->allowed;
-      const std::string& v = entries[fil_col[i]];
-      if (std::find (allowed.begin (), allowed.end (), v) 
-          == allowed.end ())
+    if (!filter[i]->match (entries[fil_col[i]]))
         return false;
-    }
   
   // If we survived here, everything is fine.
   return true;
