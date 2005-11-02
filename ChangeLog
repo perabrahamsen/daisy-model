@@ -4,6 +4,10 @@
 
 2005-11-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.86 released.
+
+2005-11-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* source_file.C (get_time): Accept dd/mm/yy format.
 
 	* source_combine.C: New model.
