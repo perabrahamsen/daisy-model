@@ -4,9 +4,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** plot 75 cm N suction
 
-
-
-** NH4-N in soil [(mg/kg dry soil]
+** Lille historie on Jose's PT 2003 kalibrering.
 
 ** Aftest og dokumenter source combine.
 
@@ -142,7 +140,7 @@ Less (early?) N gives less leaves, which might be fine (LAI > 3 is a waste)
 
 * Programmering
 
-** The new/delete block doesn't work well with exceptions.
+** Dokumenter '&old' keyword i reference manual.
 
 ** block
 

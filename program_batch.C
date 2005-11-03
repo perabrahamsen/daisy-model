@@ -42,6 +42,7 @@ struct ProgramBatch : public Program
         std::ostringstream tmp;
         tmp << name << "[" << i << "]: " << program[i]->name;
         Treelog::Open nest (msg, tmp.str ());
+        msg.touch ();
         program[i]->run (msg);
       }
   }

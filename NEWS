@@ -12,6 +12,40 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.90
+
+** New "&old" keyword.
+
+When you define a new parameterization, you can use the "&old" keyword
+allows you to refer to the original value of a list attribute, so you
+can prepend or append elements to the list.  Example:
+
+  (defprogram "Foo Project" Daisy
+     "Basic setup file for simulations in the Foo project."       
+     ;; We always want a field based nitrogen and water balance. 
+     (output "Field nitrogen" "Field water"))
+
+  (defprogram "Foo Soil" "Foo Project"
+     "Basic setup files for exmaining soil water and nitrogen."
+     ;; We still want the field based balances, but add soil based balances.
+     (output &old "Soil nitrogen" "Soil water"))
+
+Here the value of the output parameter in "Foo Soil" will be 
+
+  ("Field nitrogen" "Field water" "Soil nitrogen" "Soil water")
+
+If we had written (output "Soil nitrogen" "Soil water" &old), the
+value would have been
+
+  ("Soil nitrogen" "Soil water" "Field nitrogen" "Field water")
+
+The &old keyword can be places anywhere on the list, and even
+repeated.  This is not very useful for the 'output' parameter, where
+order doesn't matter, and duplicate entries will just confuse Daisy,
+but it can be useful for other parameters.
+
+** Batch programs are now more informative.
+
 * 3.89
 
 ** gnuplot program now support errorbars.

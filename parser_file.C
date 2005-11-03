@@ -913,6 +913,16 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  }
 		while (!looking_at (')') && good ())
 		  {
+                    if (looking_at ('&'))
+                      {
+                        skip ("&old");
+                        if (!atts.check (name))
+                          error ("No originals available");
+                        for (size_t i = 0; i < old_sequence.size (); i++)
+                          sequence.push_back (new AttributeList 
+                                              /**/(*old_sequence[i]));
+                        continue;
+                      }
 		    skip ("(");
 		    const size_t element = sequence.size ();
 		    AttributeList& al
@@ -953,6 +963,17 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		    const string range = syntax.range (name);
 		    while (!looking_at (')') && good ())
 		      {
+                        if (looking_at ('&'))
+                          {
+                            skip ("&old");
+                            if (!atts.check (name))
+                              error ("No originals available");
+                            const std::vector<const PLF*>& old_sequence
+                              = atts.plf_sequence (name);
+                            for (size_t i = 0; i < old_sequence.size (); i++)
+                              plfs.push_back (new PLF (*old_sequence[i]));
+                            continue;
+                          }
 			skip ("(");
 			double x = get_number (domain);
 			{
@@ -1003,6 +1024,17 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		unsigned int first_unchecked = 0;
 		while (good () && !looking_at (')'))
 		  {
+                    if (looking_at ('&'))
+                      {
+                        skip ("&old");
+                        if (!atts.check (name))
+                          error ("No originals available");
+                        const std::vector<double>& old_sequence
+                          = atts.number_sequence (name);
+                        for (size_t i = 0; i < old_sequence.size (); i++)
+                          array.push_back (old_sequence[i]);
+                        continue;
+                      }
 		    if (looking_at ('*'))
 		      {
 			skip ("*");
@@ -1080,6 +1112,17 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 
 		while (!looking_at (')') && good ())
 		  {
+                    if (looking_at ('&'))
+                      {
+                        skip ("&old");
+                        if (!atts.check (name))
+                          error ("No originals available");
+                        const std::vector<symbol>& old_sequence
+                          = atts.identifier_sequence (name);
+                        for (size_t i = 0; i < old_sequence.size (); i++)
+                          array.push_back (old_sequence[i]);
+                        continue;
+                      }
 		    array.push_back (get_symbol ());
 		    count++;
 		  }
@@ -1114,6 +1157,17 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 
 		while (!looking_at (')') && good ())
 		  {
+                    if (looking_at ('&'))
+                      {
+                        skip ("&old");
+                        if (!atts.check (name))
+                          error ("No originals available");
+                        const std::vector<int>& old_sequence
+                          = atts.integer_sequence (name);
+                        for (size_t i = 0; i < old_sequence.size (); i++)
+                          array.push_back (old_sequence[i]);
+                        continue;
+                      }
 		    array.push_back (get_integer ());
 		    count++;
 		  }
