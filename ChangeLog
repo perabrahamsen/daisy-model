@@ -1,5 +1,9 @@
 2005-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.90 released.
+
+2005-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* parser_file.C (load_list): Support '&old' keyword.
 
 	* program_batch.C (run): Tell user more about each program started.
