@@ -1,3 +1,9 @@
+2005-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_file.C (add_entry, ebar): New functions.
+	* source_expr.C, source_std.C: Support them.
+	* program_gnuplot.C (run): Ditto.
+
 2005-11-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.88 released.
