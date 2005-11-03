@@ -820,25 +820,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      else
 		{
 		  const string obj = al.name ("type");
-		  if (obj == "error")
-		    break;
-#ifdef REQUIRE_COMPLETE_OBJECTS
-		  // We can only use complete objects as attribute
-		  // values.
-		  // NO LONGER TRUE with the "original" type.
-		  ostringstream tmp;
-		  TreelogStream treelog (tmp);
-		  Treelog::Open nest (treelog, obj);
-		  if (!lib.syntax (obj).check (al, treelog))
-		    error (string ("Error for member '") + obj 
-			   + "' in library '" + name + "'\n--- details:\n"
-			   + tmp.str () + "---");
-		  else if (treelog.count)
-		    warning (string ("Warning for member '") + obj 
-			     + "' in library '" + name + "'\n--- details:\n"
-			     + tmp.str () + "---");
-#endif // REQUIRE_COMPLETE_OBJECTS
-		  atts.add (name, al);
+		  if (obj != "error")
+                    atts.add (name, al);
 		  delete &al;
 		}
 	    }
@@ -883,33 +866,26 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  : no_sequence;
 		while (!looking_at (')') && good ())
 		  {
+                    if (looking_at ('&'))
+                      {
+                        skip ("&old");
+                        if (!atts.check (name))
+                          error ("No originals available");
+                        for (size_t i = 0; i < old_sequence.size (); i++)
+                          sequence.push_back (new AttributeList 
+                                              /**/(*old_sequence[i]));
+                        continue;
+                      }
 		    const size_t element = sequence.size ();
 		    AttributeList& al 
 		      = (old_sequence.size () > element
 			 ? load_derived (lib, true, old_sequence[element])
 			 : load_derived (lib, true, NULL));
 		    const string obj = al.name ("type");
-		    if (obj != "error")
-		      {
-#ifdef REQUIRE_COMPLETE_OBJECTS
-			// We can only use complete objects as attribute
-			// values.
-			ostringstream tmp;
-			TreelogStream treelog (tmp);
-			Treelog::Open nest (treelog, obj);
-			const bool ok = lib.syntax (obj).check (al, treelog);
-			if (!ok)
-			  // Maybe don't put it on the list?
-			  error (string ("Error for member '") + obj 
-				 + "' in library '" + name
-				 + "'\n--- details:\n" + tmp.str () + "---");
-			else if (strlen (tmp.str ()) > 0)
-			  warning (string ("Warning for member '") + obj 
-				   + "' in library '" + name
-				   + "'\n--- details:\n" + tmp.str () + "---");
-#endif // REQUIRE_COMPLETE_OBJECTS
-			sequence.push_back (&al);
-		      }
+		    if (obj == "error")
+                      delete &al;
+                    else
+                      sequence.push_back (&al);
 		  }
 		atts.add (name, sequence);
 		sequence_delete (sequence.begin (), sequence.end ());
@@ -951,8 +927,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  }
 		if (skipped)
 		  skip (")");
-		if (size != Syntax::Sequence 
-		    && sequence.size () != size)
+		if (size != Syntax::Sequence && sequence.size () != size)
 		  {
 		    ostringstream str;
 		    str << "Got " << sequence.size ()

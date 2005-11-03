@@ -24,6 +24,7 @@
 #include "path.h"
 #include "memutils.h"
 #include <vector>
+#include <sstream>
 
 struct ProgramBatch : public Program
 {
@@ -38,7 +39,9 @@ struct ProgramBatch : public Program
 
     for (size_t i = 0; i < program.size (); i++)
       {
-        Treelog::Open nest (msg, program[i]->name);
+        std::ostringstream tmp;
+        tmp << name << "[" << i << "]: " << program[i]->name;
+        Treelog::Open nest (msg, tmp.str ());
         program[i]->run (msg);
       }
   }
