@@ -1,70 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* CT:
-
-** Status side
-
-For hvert WP1 site:
-
-*** Er databasetal endelige? (- 2005 efterafgrøde)
-
-*** Er opsætning endelig?
-
-*** Hvem har ansvaret?
-
-** Opdater PT 2003 fra database
-
-** Hent PT 2004 fra database
-
-** Check at Jose opsætning (fra fertogranic hjemmeside) er den vi bruger.
-
-** Lav 2004 plots.
-
-** Evt. diskussion.
-
-** Hent PL data fra database.
-
-** Lab PL plots
-
-** Spørg Wladislaw om vi har seneste udgave.
-
-** Evt diskussion.
-
-** Hent DK tal fra database
-
-** Endelig opsætning fra Tove?
-
-** Lav DK plots
-
-** Evt diskussion.
-
-** Hent CZ, IT, SK tal fra database.
-
-** Evt. diskussion af målte tal.
-
-** PL kalibrering
-
-** PT kalibrering
-
-2003: Brug SK som udgangspunkt.
-
-** PT 2003
-
-2004: Ny afgrøde
-
-*** Skal vi bruge de målte værdier for 0-25 og 25-75 til noget?
-
-Der er to målepunkter for hver rep.
-
-* Måske skal vi begynde at give kartofelparameteriseringerne navn efter sort?
-
-* Check at "Field nitrogen" virker med checkpoints (local variable!)
-
 * Derefter
 
-** Plot middelværdi og spredning
+** NH4-N in soil [(mg/kg dry soil]
 
-** Læs dd/mm/yyyy format
+** Aftest og dokumenter source combine.
 
 ** PT 2004
 
@@ -676,4 +616,64 @@ This will allow us to ship Condition and Action as part of the Daisy
 independent library.
 
 * Flyt astronomic utilities til seperat fil.
+
+* CT:
+
+** Status side
+
+For hvert WP1 site:
+
+*** Er databasetal endelige? (- 2005 efterafgrøde)
+
+*** Er opsætning endelig?
+
+*** Hvem har ansvaret?
+
+** Opdater PT 2003 fra database
+
+** Hent PT 2004 fra database
+
+** Check at Jose opsætning (fra fertogranic hjemmeside) er den vi bruger.
+
+** Lav 2004 plots.
+
+** Evt. diskussion.
+
+** Hent PL data fra database.
+
+** Lab PL plots
+
+** Spørg Wladislaw om vi har seneste udgave.
+
+** Evt diskussion.
+
+** Hent DK tal fra database
+
+** Endelig opsætning fra Tove?
+
+** Lav DK plots
+
+** Evt diskussion.
+
+** Hent CZ, IT, SK tal fra database.
+
+** Evt. diskussion af målte tal.
+
+** PL kalibrering
+
+** PT kalibrering
+
+2003: Brug SK som udgangspunkt.
+
+2004: Ny afgrøde
+
+* PT 2003
+
+** Skal vi bruge de målte værdier for 0-25 og 25-75 til noget?
+
+Der er to målepunkter for hver rep.
+
+** Måske skal vi begynde at give kartofelparameteriseringerne navn efter sort?
+
+* Check at "Field nitrogen" virker med checkpoints (local variable!)
 

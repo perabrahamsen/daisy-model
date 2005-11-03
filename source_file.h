@@ -39,10 +39,15 @@ class SourceFile : public Source
 protected:
   const std::string filename;  
   std::string with_;
+  const bool explicit_with;
   const int style_;
   const std::vector<std::string> missing;
+protected:
+  void add_entry (const Time& time, std::vector<double>& vals);
+private:
   std::vector<Time> times;
   std::vector<double> values;
+  std::vector<double> ebars;
   
   // Filter.
 private:
@@ -59,6 +64,8 @@ public:
   { return times; }
   const std::vector<double>& value () const
   { return values; }
+  const std::vector<double>& ebar () const
+  { return ebars; }
 
   // Read.
 private:

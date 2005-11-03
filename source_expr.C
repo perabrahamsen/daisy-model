@@ -157,6 +157,8 @@ SourceExpr::load (Treelog& msg)
   dimension_ = expr->dimension (scope);
 
   // Read data.
+  Time last_time (9999, 12, 31, 23);
+  std::vector<double> vals;
   while (lex.good ())
     {
       // Read entries.
@@ -173,9 +175,15 @@ SourceExpr::load (Treelog& msg)
 	continue;
       
       // Store it.
-      times.push_back (time);
-      values.push_back (expr->value (scope));
+      vals.push_back (expr->value (scope));
+      if (time != last_time)
+	{
+	  last_time = time;
+	  add_entry (time, vals);
+	}
     }
+  if (vals.size () > 0)
+    add_entry (last_time, vals);
 
   // Done.
   return true;

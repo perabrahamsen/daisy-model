@@ -326,25 +326,28 @@ set style data lines\n";
     {
       if (source[i]->value ().size () < 1)
         continue;
+      const std::string with = source[i]->with ();
       if (first)
         first = false;
       else
         out << ", ";
-      out << "'-' using 1:2 title " << quote (source[i]->title ());
+      out << "'-' using 1:2";
+      if (with == "errorbars")
+	out << ":3";
+      out << " title " << quote (source[i]->title ());
       if (axis[i] == 1)
 	out << " axes x1y2";
       else
 	daisy_assert (axis[i] == 0);
       out << " with ";	
-      const std::string with = source[i]->with ();
       const int style = source[i]->style ();
-      if (with == "points")
-	out << "points " << (style < 0 ? ++points : style);
+      out << with;
+      if (with == "points" || with == "errorbars")
+	out << " " << (style < 0 ? ++points : style);
       else if (with == "lines")
-	out << "lines " << (style < 0 ? ++lines : style);
+	out << " " << (style < 0 ? ++lines : style);
       else 
 	{
-	  out << with;
 	  if (style >= 0)
 	    out << " " << style;
 	}
@@ -356,13 +359,17 @@ set style data lines\n";
     {
       if (source[i]->value ().size () < 1)
         continue;
+      const bool use_ebars = source[i]->with () == "errorbars";
       const size_t size = source[i]->time ().size ();
       daisy_assert (size == source[i]->value ().size ());
       for (size_t j = 0; j < size; j++)
         {
           const Time time = source[i]->time ()[j];
           out << time.year () << "-" << time.month () << "-" << time.mday ()
-              << "T" << time.hour () << "\t" << source[i]->value ()[j] << "\n";
+              << "T" << time.hour () << "\t" << source[i]->value ()[j];
+	  if (use_ebars)
+	    out << "\t" << source[i]->ebar ()[j];
+	  out << "\n";
         }
       out << "e\n";
     }

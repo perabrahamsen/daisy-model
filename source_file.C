@@ -25,6 +25,8 @@
 #include "vcheck.h"
 #include "mathlib.h"
 #include "memutils.h"
+#include <algorithm>
+#include <numeric>
 #include <sstream>
 
 static int
@@ -79,6 +81,30 @@ SourceFile::Filter::Filter (Block& al)
   : tag (al.name ("tag")),
     allowed (al.name_sequence ("allowed"))
 { }
+
+void
+SourceFile::add_entry (const Time& time, std::vector<double>& vals)
+{
+  if (vals.size () > 1 && !explicit_with)
+    with_ = "errorbars";
+  const double total = std::accumulate (vals.begin (), vals.end (), 0.0);
+  const double N = vals.size ();
+  const double mean = total / N;
+  double variance = 0;
+  for (size_t i = 0; i < vals.size (); i++)
+    { 
+      const double diff = vals[i] - mean;
+      variance += diff * diff;
+    }
+  variance /= N;
+  const double std_deviation = sqrt (variance);
+  times.push_back (time);
+  values.push_back (mean);
+  ebars.push_back (std_deviation);
+  daisy_assert (times.size () == values.size ());
+  daisy_assert (values.size () == ebars.size ());
+  vals.clear ();
+}
 
 std::string
 SourceFile::get_entry (LexerData& lex) const
@@ -398,6 +424,7 @@ SourceFile::SourceFile (Block& al)
   : Source (al),
     filename (al.name ("file")),
     with_ (al.name ("with", "")),
+    explicit_with (al.check ("with")),
     style_ (al.integer ("style", -1)),
     missing (al.name_sequence ("missing")),
     filter (map_submodel_const<Filter> (al, "filter")),

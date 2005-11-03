@@ -160,6 +160,8 @@ public:
   { return times; }
   const std::vector<double>& value () const
   { return values; }
+  const std::vector<double>& ebar () const
+  { daisy_assert (false); }
   const std::string& title () const
   { return title_; }
   const std::string& dimension () const 

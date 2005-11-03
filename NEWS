@@ -12,6 +12,13 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.89
+
+** gnuplot program now support errorbars.
+
+If there are multiple datapoints for the same time spot, the mean will
+plotted with errorbars of one standard deviation to each side.
+
 * 3.88
 
 ** More flexible reading of ".ddf" files

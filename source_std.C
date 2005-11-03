@@ -95,6 +95,9 @@ SourceStandard::load (Treelog& msg)
     }
 
   // Read data.
+  Time last_time (9999, 12, 31, 23);
+  std::vector<double> vals;
+
   while (lex.good ())
     {
       // Read entries.
@@ -124,11 +127,15 @@ SourceStandard::load (Treelog& msg)
               << "] to [" << dimension_ << "]";
           lex.warning (tmp.str ());
         }
-
-      // Store it.
-      times.push_back (time);
-      values.push_back (val);
+      vals.push_back (val);
+      if (time != last_time)
+	{
+	  last_time = time;
+	  add_entry (time, vals);
+	}
     }
+  if (vals.size () > 0)
+    add_entry (last_time, vals);
 
   // Done.
   return true;
