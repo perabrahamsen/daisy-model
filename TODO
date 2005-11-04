@@ -2,10 +2,20 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Spørgsmål til Søren
 
+** Hydraulisk år
+
 Hvis vi ikke har vejrdata for vinter forår, skal vi så bruge vejrdata
 fra et andet år for at få et helt hydrologisk år til balancen?
 
 PT 2004, alle andre 2005
+
+** PT 2004
+
+Mangler 300 mm vand.  Hvad gør vi?
+
+* Poul
+
+** En select all til checkboxes
 
 * Derefter
 
