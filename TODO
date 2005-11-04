@@ -17,13 +17,23 @@ Mangler 300 mm vand.  Hvad gør vi?
 
 ** En select all til checkboxes
 
-* Derefter
+* PT 2003 calib
 
 ** RAPPORT: Ingen opvarmningsperiode.
 
 ** Udskriv plots.
 
 ** Lille historie on Jose's PT 2003 kalibrering.
+
+** Fortæl hvor mange repetitions der er.
+
+** Vi skal have efterafgrøde med i (nogle) plots (total DM / total N)
+
+** Vi skal have yield med i (nogle) plots
+
+Vi kan klare det med en notitle plot der har samme style.
+
+* Derefter
 
 ** Aftest og dokumenter source combine.
 
