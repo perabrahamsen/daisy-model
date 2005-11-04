@@ -305,15 +305,35 @@ Units::multiply (const string& one, const string& two)
 // GCC 2.95 requires these to be defined outside a function.
 static class Convert_pF_cm_ : public Units::Convert
 {
+  bool valid (double value) const
+  { return value >= 0.0; }
   double operator() (double value) const
   { return pF2h (value); }
 } Convert_pF_cm;
 
 static class Convert_cm_pF_ : public Units::Convert
 {
+  bool valid (double value) const
+  { return value < 0.0; }
   double operator() (double value) const
-  { return h2pF (value); }
+  {
+    if (value >= 0.0)
+      throw "Cannot represent non-negative pressure of pF";
+    return h2pF (value); 
+  }
 } Convert_cm_pF;
+
+static class Convert_kPa_pF_ : public Units::Convert
+{
+  bool valid (double value) const
+  { return value < 0.0; }
+  double operator() (double value) const
+  { 
+    if (value >= 0.0)
+      throw "Cannot represent non-negative pressure of pF";
+    return h2pF (value * 10.0); 
+  }
+} Convert_kPa_pF;
 
 void
 Units::standard_conversions ()
@@ -322,6 +342,7 @@ Units::standard_conversions ()
   add ("m", "cm", 100.0);
   add ("pF", "cm", Convert_pF_cm);
   add ("cm", "pF", Convert_cm_pF);
+  add ("kPa", "pF", Convert_kPa_pF);
   add ("cm", "hPa", 1.0);
   add ("cm", "kPa", 0.1);
   add ("hPa", "kPa", 0.1);

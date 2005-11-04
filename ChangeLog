@@ -1,3 +1,8 @@
+2005-11-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (Convert_kPa_pF): New class.
+       (standard_conversions): [kPa] -> [pF].
+	
 2005-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.90 released.

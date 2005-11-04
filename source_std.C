@@ -126,6 +126,8 @@ SourceStandard::load (Treelog& msg)
           tmp << "Cannot convert " << val << " from [" << original 
               << "] to [" << dimension_ << "]";
           lex.warning (tmp.str ());
+          // Treat as missing value.
+          continue;
         }
       vals.push_back (val);
       if (time != last_time)
