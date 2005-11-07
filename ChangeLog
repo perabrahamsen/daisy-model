@@ -1,5 +1,7 @@
 2005-11-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* program_gnuplot.C (legend): Support "none" keyword.
+
 	* Version 3.91 released.
 
 2005-11-07  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -82,6 +82,7 @@ Relative vertical size of plot.");
       (*this)["se"] = "right Right bottom";
       (*this)["below"] = "below";
       (*this)["outside"] = "outside";
+      (*this)["none"] = "off";
     }
   } legend_table;
   std::string legend;
