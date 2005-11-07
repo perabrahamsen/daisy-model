@@ -343,9 +343,9 @@ set style data lines\n";
       const int style = source[i]->style ();
       out << with;
       if (with == "points" || with == "errorbars")
-	out << " " << (style < 0 ? ++points : style);
+	out << " " << (style < 0 ? ++points : ((style == 0) ? points : style));
       else if (with == "lines")
-	out << " " << (style < 0 ? ++lines : style);
+	out << " " << (style < 0 ? ++lines :  ((style == 0) ? points : style));
       else 
 	{
 	  if (style >= 0)
@@ -544,16 +544,16 @@ cross the legend.");
 			  "First date at x-axis.", Time::load_syntax);
     syntax.add_submodule ("end", alist, Syntax::OptionalConst,
 			  "Last date at x-axis.", Time::load_syntax);
-    syntax.add ("ymin", Syntax::Unknown (), Syntax::OptionalConst, "\
+    syntax.add ("ymin", Syntax::User (), Syntax::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("ymax", Syntax::Unknown (), Syntax::OptionalConst, "\
+    syntax.add ("ymax", Syntax::User (), Syntax::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("y2min", Syntax::Unknown (), Syntax::OptionalConst, "\
+    syntax.add ("y2min", Syntax::User (), Syntax::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("y2max", Syntax::Unknown (), Syntax::OptionalConst, "\
+    syntax.add ("y2max", Syntax::User (), Syntax::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 

@@ -204,6 +204,8 @@ top-level, og et der virker alle steder (til "declare", "append")?
 
 ** gnuplot
 
+*** Væl y-akse efter hvad brugeren har specificeret af dim i ymax
+
 *** lmargin, rmargin?
 
 *** automatisk find passende "ticks" på x-akse
