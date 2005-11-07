@@ -213,6 +213,7 @@ set style data lines\n";
       out << "set ylabel " << quote (dims[0]) << "\n";
       break;
     case 1:
+      out << "unset y2tics\n";
       out << "unset y2label\n";
       out << "set ylabel " << quote (dims[0]) << "\n";
       break;
@@ -291,26 +292,43 @@ set style data lines\n";
   out << "set xrange [";
   if (begin)
     out << timeform (*begin);
+  else
+    out << "*";
   out << ":";
   if (end)
     out << timeform (*end);
+  else
+    out << "*";
   out << "]\n";
 
   // Y range
   out << "set yrange [";
   if (ymin_flag)
     out << ymin;
+  else
+    out << "*";
   out << ":";
   if (ymax_flag)
     out << ymax;
+  else
+    out << "*";
   out << "]\n";
-  out << "set y2range [";
-  if (y2min_flag)
-    out << y2min;
-  out << ":";
-  if (y2max_flag)
-    out << y2max;
-  out << "]\n";
+  if (dims.size () == 2)
+    {
+      out << "set y2range [";
+      if (y2min_flag)
+        out << y2min;
+      else
+        out << "*";
+      out << ":";
+      if (y2max_flag)
+        out << y2max;
+      else
+        out << "*";
+      out << "]\n";
+    }
+  else
+    out << "unset y2range\n";
 
   // Extra.
   for (size_t i = 0; i < extra.size (); i++)

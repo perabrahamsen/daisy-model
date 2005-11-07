@@ -81,6 +81,7 @@ public:
 	if (!source[i]->load (msg))
           ok = false;
       }
+    first ();
     return ok;
   }
 
@@ -230,8 +231,8 @@ static struct SourceCombineSyntax
     Source::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "Combine data from multiple sources with a single expression.");
-    syntax.add ("source", Librarian<Number>::library (), 
-		Syntax::Const, Syntax::Sequence, "\
+    syntax.add ("source", Librarian<Source>::library (), 
+		Syntax::State, Syntax::Sequence, "\
 List of sources for data.  The style information for the sources is\n\
 ignored, but the dates, title and value is used as specified by\n\
 'expr' to calculate the combines date and value pairs.");
