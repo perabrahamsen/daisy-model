@@ -1,46 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* plot x vs y
+* Check at "Field nitrogen" virker med checkpoints (local variable!)
 
-* h vs pF
+* WP5 
 
-* inkluder værdier fra database, hypres og kalibreret
+** plot hydraulic properties
 
-* WP5
+*** plot x vs y
 
-** Joao
+*** Theta vs pF, K vs pF
 
-*** PL cow FYM imobilizes 2004
+*** inkluder værdier fra database, hypres og kalibreret
 
-*** CZ pig FYM 10% N
+** resultatafsnit
 
-*** CZ pig slurry immobilizes
+Hvad gør vi med det?
 
-*** DK pig slurry 8% N
-
-*** PT green rye residuals immobileses 60%
-
-*** PT green potato res immobilized 10%
-
-** We need H-E temperature sum in management overview table
-
-** DK + PL similar
-
-** IT + SK + CZ similar
-
-** DK
-
-2004 T2 data bad due to soil pan.
-
-DptEmr = 20 supported by measurements
-
-** IT
-
-2003 HOT (and bad compost)
-
-2004 bad compost evident
-
-2005 good crop
+Tekst.  Massebalancer.
 
 * WP6
 
@@ -60,65 +36,11 @@ DptEmr = 20 supported by measurements
 
 * IDE:  Mikkel implementerer Farquhar photosyntese.
 
-* Udine
-
-** Jan Vos
-
-*** phenology
-
-cultivar, temperature!, photoperiod?, water?, nitrogen...
-
-Nitrogen deos not affect time and rate of appearence of crop parts,
-except severe N stress produce fewer leaves late in life.
-
-Size of leaves is affected, until a sat point.
-
-No clear effect of N on SpLAI.
-
-Clear affect of N on leaf size on the first 20 days, then leaf size
-constants. 
-
-Water does not affect on timeof rate of appearence of crop parts.
-
-N conc (= max photosynthesis) in leafs very little affected by N!
-
-*** Greenwood
-
-Y = n/conc %
-
-W = crop weight t/ha
-
-C3 crit: Y = 5.7 exp (W, -0.5)
-
-C4 crit: Y = 4.1 exp (W, -0.5)
-
-1 < W < 12 t/ha
-
-N stress effect on potatoes = -2.04 + 6.27 * stress - 3.20 * sqr (stress)
-
-*** Three quadrant diagram of N response
-
-        W_yield
-           |
-N_supply --+-- N_uptake
-           |
-        N_supply
-
-** DKL MacKerron: Scottish Crop Research Institute
-
-Mineralizering + Immobilisering rater vigtigere end N_min
-
-Plant may steal N from immobilization?  (pig in the middle)
-
-Less (early?) N gives less leaves, which might be fine (LAI > 3 is a waste)
-
 * Distribution
 
 ** Indsæt mmo grøntsager i lib (og sample?).
 
 * Programmering
-
-** Dokumenter '&old' keyword i reference manual.
 
 ** block
 
@@ -280,6 +202,10 @@ Derived from vector, deletes its content on destruction.
 
 * Dokumentation
 
+** Reference
+
+*** Dokumenter '&old' keyword.
+
 ** Tutorial
 
 *** Dokumenter groundwater file og pressure table
@@ -388,17 +314,7 @@ or use them everywhere.
 
 (deffoo sub super
   ;; Undo the setting of bar.
-  (bar #undef))
-
-* append / prepend command to parse
-
-(append output "N Balance")
-
-will append "N Balance" to the end of the "output" parameter.
-
-* horizon texture
-
-Gør det muligt at give fejl hvis summen er forskellig fra 1.0 (100%).
+  (bar &undef))
 
 * Dokumentation for output filer.
 
@@ -409,10 +325,6 @@ Gør det muligt at give fejl hvis summen er forskellig fra 1.0 (100%).
 Move cvs, dll, cdaisy, api, programmers guide, header, source.
 
 Explain about different compilers, and making me update.
-
-* top level stop kommando.
-
-* split common.h op i sysdeps.h, stlutils.h og timestep.h
 
 * saml check.? og check_range.?
 
@@ -549,8 +461,6 @@ for weather std, file, hourly, and for hydraulic old, old2
 
 ** Implementer merge.
 
-* GodeGuard errors
-
 * Døde blade skal tælle med i lysfordelingen.
 
 * Daisy som subsystem
@@ -600,64 +510,4 @@ This will allow us to ship Condition and Action as part of the Daisy
 independent library.
 
 * Flyt astronomic utilities til seperat fil.
-
-* CT:
-
-** Status side
-
-For hvert WP1 site:
-
-*** Er databasetal endelige? (- 2005 efterafgrøde)
-
-*** Er opsætning endelig?
-
-*** Hvem har ansvaret?
-
-** Opdater PT 2003 fra database
-
-** Hent PT 2004 fra database
-
-** Check at Jose opsætning (fra fertogranic hjemmeside) er den vi bruger.
-
-** Lav 2004 plots.
-
-** Evt. diskussion.
-
-** Hent PL data fra database.
-
-** Lab PL plots
-
-** Spørg Wladislaw om vi har seneste udgave.
-
-** Evt diskussion.
-
-** Hent DK tal fra database
-
-** Endelig opsætning fra Tove?
-
-** Lav DK plots
-
-** Evt diskussion.
-
-** Hent CZ, IT, SK tal fra database.
-
-** Evt. diskussion af målte tal.
-
-** PL kalibrering
-
-** PT kalibrering
-
-2003: Brug SK som udgangspunkt.
-
-2004: Ny afgrøde
-
-* PT 2003
-
-** Skal vi bruge de målte værdier for 0-25 og 25-75 til noget?
-
-Der er to målepunkter for hver rep.
-
-** Måske skal vi begynde at give kartofelparameteriseringerne navn efter sort?
-
-* Check at "Field nitrogen" virker med checkpoints (local variable!)
 

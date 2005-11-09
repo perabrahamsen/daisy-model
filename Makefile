@@ -290,7 +290,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 #
-MODELS = source_combine.C number_arit.C source_expr.C \
+MODELS = gnuplot_time.C source_combine.C number_arit.C source_expr.C \
 	source_std.C action_markvand.C photo_GL.C program_gnuplot.C \
 	program_document.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
@@ -336,7 +336,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = boolean.C stringer.C source.C photo.C \
+COMPONENTS = gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
 	transform.C rootdens.C select.C average.C mactrans.C macro.C \

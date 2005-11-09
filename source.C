@@ -1,4 +1,4 @@
-// source.C -- Data source for gnuplot interface 
+// source.C -- Time series for gnuplot interface 
 // 
 // Copyright 2005 Per Abrahamsen and KVL.
 //
@@ -24,7 +24,7 @@ template<>
 Librarian<Source>::Content* Librarian<Source>::content = NULL;
 
 const char *const Source::description = "\
-This library contain data sources for the 'gnuplot' program.";
+Time series, with possible error bars and formatting information.";
 
 void 
 Source::limit (Time& begin, Time& end, double& ymin, double& ymax) const
