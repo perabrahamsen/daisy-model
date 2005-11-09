@@ -702,6 +702,8 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+gnuplot${OBJ}: gnuplot.C gnuplot.h librarian.h library.h symbol.h block.h \
+  syntax.h treelog.h plf.h alist.h assertion.h
 boolean${OBJ}: boolean.C boolean.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h
 stringer${OBJ}: stringer.C stringer.h librarian.h library.h symbol.h block.h \
@@ -1037,6 +1039,12 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h program.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+gnuplot_multi${OBJ}: gnuplot_multi.C gnuplot.h librarian.h library.h symbol.h \
+  block.h syntax.h treelog.h plf.h alist.h assertion.h source.h \
+  memutils.h
+gnuplot_time${OBJ}: gnuplot_time.C gnuplot.h librarian.h library.h symbol.h \
+  block.h syntax.h treelog.h plf.h alist.h assertion.h source.h vcheck.h \
+  mathlib.h memutils.h
 source_combine${OBJ}: source_combine.C source.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h number.h \
   scope.h vcheck.h memutils.h
@@ -1057,8 +1065,8 @@ photo_GL${OBJ}: photo_GL.C photo.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h canopy_std.h \
   canopy_simple.h phenology.h submodel.h mathlib.h check.h
 program_gnuplot${OBJ}: program_gnuplot.C program.h librarian.h library.h \
-  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h source.h \
-  vcheck.h check.h path.h mathlib.h memutils.h
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h gnuplot.h \
+  path.h memutils.h
 program_document${OBJ}: program_document.C program.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   submodel.h printer_file.h printer.h xref.h format.h
