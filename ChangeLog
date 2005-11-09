@@ -1,5 +1,9 @@
 2005-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.93 released.
+
+2005-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* txt/tutorial.tex (Plotting simulation results): Updated gnuplot
 	syntax.
 

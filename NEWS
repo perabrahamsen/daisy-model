@@ -12,9 +12,13 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.93
+
+** New gnuplot syntax, see the tutorial for updated examples.
+
 * 3.92
 
-** You can now turn off the legend by specifying "none" as a placement.
+** You can now turn off the gnuplot legend by specifying "none" as a placement.
 
 * 3.91
 
