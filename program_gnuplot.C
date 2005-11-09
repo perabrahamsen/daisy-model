@@ -55,7 +55,7 @@ ProgramGnuplot::run (Treelog& msg)
 { 
   // Initialize.
   {
-    Treelog::Open nest (msg, "Initializing");
+    Treelog::Open nest (msg, "Reading");
     bool ok = true;
     for (size_t i = 0; i < graph.size(); i++)
       {
@@ -83,7 +83,7 @@ ProgramGnuplot::run (Treelog& msg)
   
   // Plot.
   {
-    Treelog::Open nest (msg, "Ploting");
+    Treelog::Open nest (msg, "Writing");
     bool ok = true;
     for (size_t i = 0; i < graph.size(); i++)
       {
@@ -101,7 +101,7 @@ ProgramGnuplot::run (Treelog& msg)
   // Done.
   if (!out.good ())
     {
-      msg.error ("Problems writting to temporary file '" + command_file + "'");
+      msg.error ("Problems writing to temporary file '" + command_file + "'");
       throw 1;
     }
 }

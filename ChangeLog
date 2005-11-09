@@ -1,11 +1,14 @@
 2005-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* source.C (description): Really time series.
+	* txt/tutorial.tex (Plotting simulation results): Updated gnuplot
+	syntax.
+
+	* source.C (description): Really a time series.
 
 	* gnuplot.C, gnuplot.h: New component.
 	* Makefile (COMPONENTS): Add it.
-	* gnuplot_time.C: New model.
-	* Makefile (MODELS): Add it.
+	* gnuplot_multi.C, gnuplot_time.C: New models.
+	* Makefile (MODELS): Add them.
 
 2005-11-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
