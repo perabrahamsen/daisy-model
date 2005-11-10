@@ -1,4 +1,4 @@
-// gnuplot_time.C -- 2D plot with Daisy time on the X axes. 
+// gnuplot_xy.C -- 2D plot with Daisy.
 // 
 // Copyright 2005 Per Abrahamsen and KVL.
 //
@@ -19,17 +19,23 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "gnuplot_base.h"
-#include "source.h"
+#include "xysource.h"
 #include "treelog.h"
 #include "mathlib.h"
 #include "memutils.h"
 #include <sstream>
 
-struct GnuplotTime : public GnuplotBase
+struct GnuplotXY : public GnuplotBase
 {
   // Ranges.
-  const Time* begin;
-  const Time* end;
+  const bool xmin_flag;
+  const double xmin;
+  const bool xmax_flag;
+  const double xmax;
+  const bool x2min_flag;
+  const double x2min;
+  const bool x2max_flag;
+  const double x2max;
   const bool ymin_flag;
   const double ymin;
   const bool ymax_flag;
@@ -40,29 +46,19 @@ struct GnuplotTime : public GnuplotBase
   const double y2max;
 
   // Source.
-  const std::vector<Source*> source;
+  const std::vector<XYSource*> source;
 
   // Use.
-  static std::string timeform (const Time& time);
   bool initialize (Treelog& msg);
   bool plot (std::ostream& out, Treelog& msg);
   
   // Create and Destroy.
-  explicit GnuplotTime (Block& al);
-  ~GnuplotTime ();
+  explicit GnuplotXY (Block& al);
+  ~GnuplotXY ();
 };
 
-std::string
-GnuplotTime::timeform (const Time& time)
-{
-  std::ostringstream tmp;
-  tmp << "\"" << time.year () << "-" << time.month () << "-" << time.mday ()
-      << "T" << time.hour () << "\"";
-  return tmp.str ();
-}
-
 bool
-GnuplotTime::initialize (Treelog& msg)
+GnuplotXY::initialize (Treelog& msg)
 { 
   bool ok = true;
   for (size_t i = 0; i < source.size(); i++)
@@ -73,89 +69,137 @@ GnuplotTime::initialize (Treelog& msg)
       Treelog::Open nest (msg, tmp.str ());
       if (!source[i]->load (msg))
         ok = false;
-      else if (source[i]->value ().size () < 1)
+      else if (source[i]->x ().size () < 1)
         msg.error ("No data in plot, ignoring");
     }
   return ok;
 }
 
 bool
-GnuplotTime::plot (std::ostream& out, Treelog& msg)
+GnuplotXY::plot (std::ostream& out, Treelog& msg)
 { 
   // Header.
   plot_header (out);
   out << "\
-set xtics nomirror autofreq\n\
+set xtics nomirror\n\
 set ytics nomirror\n\
-set xdata time\n\
-set timefmt \"%Y-%m-%dT%H\"\n\
+set xdata\n\
 set style data lines\n";
 
-  // Removed: set format x "%m-%y"
-
   // Dimensions.
-  std::vector<std::string> dims;
-  std::vector<int> axis;
+  std::vector<std::string> x_dims;
+  std::vector<int> x_axis;
+  std::vector<std::string> y_dims;
+  std::vector<int> y_axis;
   for (size_t i = 0; i < source.size (); i++)
     {
-      if (source[i]->value ().size () < 1)
+      if (source[i]->x ().size () < 1)
         {
-          axis.push_back (-42);
+          x_axis.push_back (-42);
+          y_axis.push_back (-42);
           continue;
         }
 
-      const std::string dim = source[i]->dimension ();
+      const std::string x_dim = source[i]->x_dimension ();
       
-      for (size_t j = 0; j < dims.size (); j++)
-        if (dim == dims[j])
+      for (size_t j = 0; j < x_dims.size (); j++)
+        if (x_dim == x_dims[j])
           {
-            axis.push_back (j);
+            x_axis.push_back (j);
             goto cont2;
           }
-      axis.push_back (dims.size ());
-      dims.push_back (dim);
-    cont2: ;
+      x_axis.push_back (x_dims.size ());
+      x_dims.push_back (x_dim);
+
+    cont2: 
+      const std::string y_dim = source[i]->y_dimension ();
+      
+      for (size_t j = 0; j < y_dims.size (); j++)
+        if (y_dim == y_dims[j])
+          {
+            y_axis.push_back (j);
+            goto cont3;
+          }
+      y_axis.push_back (y_dims.size ());
+      y_dims.push_back (y_dim);
+    cont3: 
+      ;
     }
-  switch (dims.size ())
+  bool ok = true;
+  switch (x_dims.size ())
+    {
+    case 2:
+      out << "set x2tics\n";
+      out << "set x2label " << quote (x_dims[1]) << "\n";
+      out << "set xlabel " << quote (x_dims[0]) << "\n";
+      break;
+    case 1:
+      out << "unset x2tics\n";
+      out << "unset x2label\n";
+      out << "set xlabel " << quote (x_dims[0]) << "\n";
+      break;
+    case 0:
+      msg.error ("Nothing to plotted");
+      return false;
+    default:
+      msg.error ("Can only plot one or two x units at a time");
+      ok = false;
+    }
+
+  switch (y_dims.size ())
     {
     case 2:
       out << "set y2tics\n";
-      out << "set y2label " << quote (dims[1]) << "\n";
-      out << "set ylabel " << quote (dims[0]) << "\n";
+      out << "set y2label " << quote (y_dims[1]) << "\n";
+      out << "set ylabel " << quote (y_dims[0]) << "\n";
       break;
     case 1:
       out << "unset y2tics\n";
       out << "unset y2label\n";
-      out << "set ylabel " << quote (dims[0]) << "\n";
+      out << "set ylabel " << quote (y_dims[0]) << "\n";
       break;
     default:
-      msg.error ("Can only plot one or two units at a time");
-      return false;
+      msg.error ("Can only plot one or two y units at a time");
+      ok = false;
     }
+  if (!ok)
+    return false;
 
   // Legend.
   if (legend == "auto")
     {
       // Find ranges.
-      Time soft_begin (9999, 12, 31, 23);
-      Time soft_end (1,1,1,0);
+      double soft_xmin = 1e99;
+      double soft_xmax = -soft_xmin;
+      double soft_x2min = soft_xmin;
+      double soft_x2max = soft_xmax;
       double soft_ymin = 1e99;
       double soft_ymax = -soft_ymin;
       double soft_y2min = soft_ymin;
       double soft_y2max = soft_ymax;
 
       for (size_t i = 0; i < source.size (); i++)
-        if (source[i]->value ().size () < 1)
+        if (source[i]->x ().size () < 1)
           /**/;
-        else if (axis[i] == 0)
-	  source[i]->limit (soft_begin, soft_end, soft_ymin, soft_ymax);
+        else if (x_axis[i] == 0)
+          if (y_axis[i] == 0)
+            source[i]->limit (soft_xmin, soft_xmax, soft_ymin, soft_ymax);
+          else
+            source[i]->limit (soft_xmin, soft_xmax, soft_y2min, soft_y2max);
 	else
-	  source[i]->limit (soft_begin, soft_end, soft_y2min, soft_y2max);
+          if (y_axis[i] == 0)
+            source[i]->limit (soft_x2min, soft_x2max, soft_ymin, soft_ymax);
+          else
+            source[i]->limit (soft_x2min, soft_x2max, soft_y2min, soft_y2max);
 
-      if (begin)
-	soft_begin = *begin;
-      if (end)
-	soft_end = *end;
+      if (xmin_flag)
+	soft_xmin = xmin;
+      if (xmax_flag)
+	soft_xmax = xmax;
+      if (x2min_flag)
+	soft_x2min = x2min;
+      if (x2max_flag)
+	soft_x2max = x2max;
       if (ymin_flag)
 	soft_ymin = ymin;
       if (ymax_flag)
@@ -171,14 +215,23 @@ set style data lines\n";
       double sw = 1.0;
       double se = 1.0;
       for (size_t i = 0; i < source.size (); i++)
-	if (source[i]->value ().size () < 1)
+	if (source[i]->x ().size () < 1)
           /**/;
-        else if (axis[i] == 0)
-	  source[i]->distance (soft_begin, soft_end, soft_ymin, soft_ymax,
-			       nw, ne, sw, se);
-	else
-	  source[i]->distance (soft_begin, soft_end, soft_y2min, soft_y2max,
-			       nw, ne, sw, se);
+        else if (x_axis[i] == 0)
+          if (y_axis[i] == 0)
+            source[i]->distance (soft_xmin, soft_xmax, soft_ymin, soft_ymax,
+                                 nw, ne, sw, se);
+          else
+            source[i]->distance (soft_xmin, soft_xmax, soft_y2min, soft_y2max,
+                                 nw, ne, sw, se);
+        else
+          if (y_axis[i] == 0)
+            source[i]->distance (soft_x2min, soft_x2max, soft_ymin, soft_ymax,
+                                 nw, ne, sw, se);
+          else
+            source[i]->distance (soft_x2min, soft_x2max,
+                                 soft_y2min, soft_y2max,
+                                 nw, ne, sw, se);
 
       // Choose closest.
       const double max_distance = std::max (std::max (nw, ne), 
@@ -199,19 +252,34 @@ set style data lines\n";
     }
   out << "set key " << legend_table[legend] << "\n";
 
-  // X Range
+  // X range
   out << "set xrange [";
-  if (begin)
-    out << timeform (*begin);
+  if (xmin_flag)
+    out << xmin;
   else
     out << "*";
   out << ":";
-  if (end)
-    out << timeform (*end);
+  if (xmax_flag)
+    out << xmax;
   else
     out << "*";
   out << "]\n";
-  out << "unset x2range\n";
+  if (x_dims.size () == 2)
+    {
+      out << "set x2range [";
+      if (x2min_flag)
+        out << x2min;
+      else
+        out << "*";
+      out << ":";
+      if (x2max_flag)
+        out << x2max;
+      else
+        out << "*";
+      out << "]\n";
+    }
+  else
+    out << "unset x2range\n";
 
   // Y range
   out << "set yrange [";
@@ -225,7 +293,7 @@ set style data lines\n";
   else
     out << "*";
   out << "]\n";
-  if (dims.size () == 2)
+  if (y_dims.size () == 2)
     {
       out << "set y2range [";
       if (y2min_flag)
@@ -251,10 +319,11 @@ set style data lines\n";
   int points = 0;
   int lines = 0;
   bool first = true;
-  daisy_assert (axis.size () == source.size ());
+  daisy_assert (x_axis.size () == source.size ());
+  daisy_assert (y_axis.size () == source.size ());
   for (size_t i = 0; i < source.size (); i++)
     {
-      if (source[i]->value ().size () < 1)
+      if (source[i]->x ().size () < 1)
         continue;
       const std::string with = source[i]->with ();
       if (first)
@@ -265,10 +334,7 @@ set style data lines\n";
       if (with == "errorbars")
 	out << ":3";
       out << " title " << quote (source[i]->title ());
-      if (axis[i] == 1)
-	out << " axes x1y2";
-      else
-	daisy_assert (axis[i] == 0);
+      out << " axes x" << x_axis[i] + 1 << "y" << y_axis[i] + 1;
       out << " with ";	
       const int style = source[i]->style ();
       out << with;
@@ -287,20 +353,12 @@ set style data lines\n";
   // Data.
   for (size_t i = 0; i < source.size (); i++)
     {
-      if (source[i]->value ().size () < 1)
+      if (source[i]->x ().size () < 1)
         continue;
-      const bool use_ebars = source[i]->with () == "errorbars";
-      const size_t size = source[i]->time ().size ();
-      daisy_assert (size == source[i]->value ().size ());
+      const size_t size = source[i]->x ().size ();
+      daisy_assert (size == source[i]->y ().size ());
       for (size_t j = 0; j < size; j++)
-        {
-          const Time time = source[i]->time ()[j];
-          out << time.year () << "-" << time.month () << "-" << time.mday ()
-              << "T" << time.hour () << "\t" << source[i]->value ()[j];
-	  if (use_ebars)
-	    out << "\t" << source[i]->ebar ()[j];
-	  out << "\n";
-        }
+        out <<  source[i]->x ()[j]  << "\t" <<  source[i]->y ()[j] << "\n";
       out << "e\n";
     }
 
@@ -311,14 +369,16 @@ set style data lines\n";
   return true;
 }
 
-GnuplotTime::GnuplotTime (Block& al)
+GnuplotXY::GnuplotXY (Block& al)
   : GnuplotBase (al),
-    begin (al.check ("begin") 
-	   ? new Time (al.alist ("begin")) 
-	   : NULL),
-    end (al.check ("end")
-	 ? new Time (al.alist ("end")) 
-	 : NULL),
+    xmin_flag (al.check ("xmin")),
+    xmin (al.number ("xmin", 42.42e42)),
+    xmax_flag (al.check ("xmax")),
+    xmax (al.number ("xmax", 42.42e42)),
+    x2min_flag (al.check ("x2min")),
+    x2min (al.number ("x2min", 42.42e42)),
+    x2max_flag (al.check ("x2max")),
+    x2max (al.number ("x2max", 42.42e42)),
     ymin_flag (al.check ("ymin")),
     ymin (al.number ("ymin", 42.42e42)),
     ymax_flag (al.check ("ymax")),
@@ -327,21 +387,17 @@ GnuplotTime::GnuplotTime (Block& al)
     y2min (al.number ("y2min", 42.42e42)),
     y2max_flag (al.check ("y2max")),
     y2max (al.number ("y2max", 42.42e42)),
-    source (Librarian<Source>::build_vector (al, "source"))
+    source (Librarian<XYSource>::build_vector (al, "source"))
 { }
 
-GnuplotTime::~GnuplotTime ()
-{ 
-  sequence_delete (source.begin (), source.end ()); 
-  delete begin;
-  delete end;
-}
+GnuplotXY::~GnuplotXY ()
+{ sequence_delete (source.begin (), source.end ()); }
 
-static struct GnuplotTimeSyntax
+static struct GnuplotXYSyntax
 {
   static Gnuplot& make (Block& al)
-  { return *new GnuplotTime (al); }
-  GnuplotTimeSyntax ()
+  { return *new GnuplotXY (al); }
+  GnuplotXYSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
@@ -350,10 +406,18 @@ static struct GnuplotTimeSyntax
     alist.add ("description",
                "Generate a gnuplot graph with times series."); 
 
-    syntax.add_submodule ("begin", alist, Syntax::OptionalConst,
-			  "First date at x-axis.", Time::load_syntax);
-    syntax.add_submodule ("end", alist, Syntax::OptionalConst,
-			  "Last date at x-axis.", Time::load_syntax);
+    syntax.add ("xmin", Syntax::User (), Syntax::OptionalConst, "\
+Fixed lowest value on left x-axis.\n\
+By default determine this from the data.");
+    syntax.add ("xmax", Syntax::User (), Syntax::OptionalConst, "\
+Fixed highest value on right x-axis.\n\
+By default determine this from the data.");
+    syntax.add ("x2min", Syntax::User (), Syntax::OptionalConst, "\
+Fixed lowest value on left x-axis.\n\
+By default determine this from the data.");
+    syntax.add ("x2max", Syntax::User (), Syntax::OptionalConst, "\
+Fixed highest value on right x-axis.\n\
+By default determine this from the data.");
     syntax.add ("ymin", Syntax::User (), Syntax::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
@@ -367,9 +431,9 @@ By default determine this from the data.");
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
-    syntax.add ("source", Librarian<Source>::library (), Syntax::State, 
+    syntax.add ("source", Librarian<XYSource>::library (), Syntax::State, 
 		Syntax::Sequence, "\
-Time series to plot.");
-    Librarian<Gnuplot>::add_type ("time", alist, syntax, &make);
+XY series to plot.");
+    Librarian<Gnuplot>::add_type ("xy", alist, syntax, &make);
   }
-} GnuplotTime_syntax;
+} GnuplotXY_syntax;

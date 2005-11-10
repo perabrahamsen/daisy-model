@@ -73,6 +73,7 @@ public:
   bool good ();
   void warning (const std::string& str, const Position&);
   void error (const std::string& str, const Position&);
+  void debug (const std::string& str);
   void warning (const std::string& str);
   void error (const std::string& str);
   void eof ();

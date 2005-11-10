@@ -173,14 +173,26 @@ Lexer::warning (const string& str, const Position& pos)
   std::ostringstream tmp;
   tmp << file << ":" << pos.line << ":"
 	 << (pos.column + 1) << ": " << str;
-  err.entry (tmp.str ());
+  err.warning (tmp.str ());
 }
 
 void 
 Lexer::error (const string& str, const Position& pos)
 {
+  std::ostringstream tmp;
+  tmp << file << ":" << pos.line << ":"
+	 << (pos.column + 1) << ": " << str;
+  err.error (tmp.str ());
   error_count++;
-  warning (str, pos);
+}
+
+void 
+Lexer::debug (const string& str)
+{
+  std::ostringstream tmp;
+  tmp << file << ":" << impl.line << ":"
+	 << (impl.column + 1) << ": " << str;
+  err.debug (tmp.str ());
 }
 
 void 
@@ -189,14 +201,17 @@ Lexer::warning (const string& str)
   std::ostringstream tmp;
   tmp << file << ":" << impl.line << ":"
 	 << (impl.column + 1) << ": " << str;
-  err.entry (tmp.str ());
+  err.warning (tmp.str ());
 }
 
 void 
 Lexer::error (const string& str)
 {
+  std::ostringstream tmp;
+  tmp << file << ":" << impl.line << ":"
+	 << (impl.column + 1) << ": " << str;
+  err.error (tmp.str ());
   error_count++;
-  warning (str);
 }
 
 void

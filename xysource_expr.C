@@ -22,6 +22,7 @@
 #include "lexer_table.h"
 #include "scope_table.h"
 #include "number.h"
+#include "vcheck.h"
 
 class XYSourceExpr : public XYSource
 {
@@ -203,7 +204,7 @@ for that column.");
     syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
 Name of data legend in plot, by default the name of the 'x' and 'y' objects.");
 
-    Librarian<Source>::add_type ("arithmetic", alist, syntax, &make);
+    Librarian<XYSource>::add_type ("arithmetic", alist, syntax, &make);
   }
 } XYSourceExpr_syntax;
 

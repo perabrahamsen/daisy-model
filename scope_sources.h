@@ -1,4 +1,4 @@
-// gnuplot.h --- A single gnuplot graph.
+// scope_sources.h --- A scope based on a time series.
 // 
 // Copyright 2005 Per Abrahamsen and KVL.
 //
@@ -18,45 +18,45 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GNUPLOT_H
-#define GNUPLOT_H
 
-#include "librarian.h"
-#include <ostream>
+#ifndef SCOPE_SOURCES_H
+#define SCOPE_SOURCES_H
+
+#include "scope.h"
+#include "time.h"
+#include <vector>
 
 class Treelog;
+class Source;
 
-class Gnuplot
+class ScopeSources : public Scope
 {
   // Content.
+private:
+  const std::vector<Source*> source;
+  std::vector<size_t> index;
 public:
-  const symbol name;
-  static const char *const description;
+  Time now;
 
-  // Utilities.
+  // Interface.
 public:
-  static std::string quote (const std::string& value);
+  bool has_number (const std::string& tag) const;
+  double number (const std::string& tag) const;
+  const std::string& dimension (const std::string& tag) const;
 
-  // Simulation.
-public:
-  virtual bool initialize (Treelog& err) = 0;
-  virtual bool plot (std::ostream& out, Treelog&) = 0;
+  // Propagate.
+  bool load (Treelog& msg);
+  std::string with ();
+
+  // Loop.
+  void first ();
+  bool done ();
+  void next ();
 
   // Create and Destroy.
-protected:
-  explicit Gnuplot (Block&);
-private:
-  explicit Gnuplot ();
-  explicit Gnuplot (const Gnuplot&);
 public:
-  virtual ~Gnuplot ();
+  ScopeSources (const std::vector<Source*>& s);
+  ~ScopeSources ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-Librarian<Gnuplot>::Content* Librarian<Gnuplot>::content;
-#endif
-
-static Librarian<Gnuplot> Gnuplot_init ("gnuplot");
-
-#endif // GNUPLOT_H
+#endif // SCOPE_SOURCES_H

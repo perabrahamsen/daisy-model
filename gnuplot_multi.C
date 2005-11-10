@@ -69,7 +69,6 @@ GnuplotMulti::plot (std::ostream& out, Treelog& msg)
       std::ostringstream tmp;
       tmp << name << "[" << i << "]: " << graph[i]->name;
       Treelog::Open nest (msg, tmp.str ());
-      msg.touch ();
       if (!graph[i]->plot (out, msg))
         ok = false;
     }

@@ -103,10 +103,15 @@ SourceStandard::load (Treelog& msg)
         val = Units::convert (original, dimension_, val);
       else 
         {
-          std::ostringstream tmp;
-          tmp << "Cannot convert " << val << " from [" << original 
-              << "] to [" << dimension_ << "]";
-          lex.warning (tmp.str ());
+          static bool has_warned = false;
+          if (!has_warned)
+            {
+              std::ostringstream tmp;
+              tmp << "Cannot convert " << val << " from [" << original 
+                  << "] to [" << dimension_ << "]";
+              lex.debug (tmp.str ());
+              has_warned = true;
+            }
           // Treat as missing value.
           continue;
         }

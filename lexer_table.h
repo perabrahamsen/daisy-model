@@ -79,6 +79,7 @@ public:
 
   // Messages.
 public:
+  void debug (const std::string& str) const;
   void warning (const std::string& str) const;
   void error (const std::string& str) const;
 

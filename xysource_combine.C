@@ -1,4 +1,4 @@
-// source_combine.C -- Combine data sources for gnuplot interface 
+// xysource_combine.C -- Combine data sources for gnuplot interface 
 // 
 // Copyright 2005 Per Abrahamsen and KVL.
 //
@@ -18,22 +18,24 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "source.h"
+#include "xysource.h"
 #include "number.h"
 #include "scope_sources.h"
 #include "vcheck.h"
 
-struct SourceCombine : public Source
+struct XYSourceCombine : public XYSource
 {
   // Content.
   ScopeSources scope;
-  const std::auto_ptr<Number> expr;
+  const std::auto_ptr<Number> x_expr;
+  const std::auto_ptr<Number> y_expr;
   const std::string title_;
-  std::string dimension_;
+  std::string x_dimension_;
+  std::string y_dimension_;
   std::string with_;
   const int style_;
-  std::vector<Time> times;
-  std::vector<double> values;
+  std::vector<double> xs;
+  std::vector<double> ys;
 
   // Interface.
 public:
@@ -41,16 +43,16 @@ public:
   { return with_; }
   int style () const 
   { return style_; }
-  const std::vector<Time>& time () const
-  { return times; }
-  const std::vector<double>& value () const
-  { return values; }
-  const std::vector<double>& ebar () const
-  { daisy_assert (false); }
+  const std::vector<double>& x () const
+  { return xs; }
+  const std::vector<double>& y () const
+  { return ys; }
   const std::string& title () const
   { return title_; }
-  const std::string& dimension () const 
-  { return dimension_; }
+  const std::string& x_dimension () const 
+  { return x_dimension_; }
+  const std::string& y_dimension () const 
+  { return y_dimension_; }
 
   // Read. 
 public:
@@ -58,61 +60,71 @@ public:
 
   // Create and Destroy.
 public:
-  explicit SourceCombine (Block& al);
-  ~SourceCombine ()
+  explicit XYSourceCombine (Block& al);
+  ~XYSourceCombine ()
   { }
 };
 
 bool
-SourceCombine::load (Treelog& msg)
+XYSourceCombine::load (Treelog& msg)
 {
   // Propagate.
   scope.load (msg);
 
   // Scope
-  if (!expr->check (scope, msg))
-    return false;
+  {
+    bool ok = true;
+    if (!x_expr->check (scope, msg))
+      ok = false;
+    if (!y_expr->check (scope, msg))
+      ok = false;
+    if (!ok)
+      return false;
+  }
 
   // Extract.
-  dimension_ = expr->dimension (scope);
+  x_dimension_ = x_expr->dimension (scope);
+  y_dimension_ = y_expr->dimension (scope);
   if (with_ == "")
     with_ = scope.with ();
 
   // Read data.
   for (scope.first (); !scope.done (); scope.next ())
     {
-      if (!expr->missing (scope))
+      if (!x_expr->missing (scope) && !y_expr->missing (scope))
         {
-          times.push_back (scope.now);
-          values.push_back (expr->value (scope));
+          xs.push_back (x_expr->value (scope));
+          ys.push_back (y_expr->value (scope));
         }
     }
-  daisy_assert (times.size () == values.size ());
+  daisy_assert (xs.size () == ys.size ());
 
   // Done.
   return true;
 }
 
-SourceCombine::SourceCombine (Block& al)
-  : Source (al),
+XYSourceCombine::XYSourceCombine (Block& al)
+  : XYSource (al),
     scope (Librarian<Source>::build_vector (al, "source")),
-    expr (Librarian<Number>::build_item (al, "expr")),
-    title_ (al.name ("title", expr->title ())),
-    dimension_ ("UNINITIALIZED"),
+    x_expr (Librarian<Number>::build_item (al, "x")),
+    y_expr (Librarian<Number>::build_item (al, "y")),
+    title_ (al.name ("title", y_expr->title () + " vs " + x_expr->title ())),
+    x_dimension_ ("UNINITIALIZED"),
+    y_dimension_ ("UNINITIALIZED"),
     with_ (al.name ("with", "")),
     style_ (al.integer ("style", -1))
 { }
 
-static struct SourceCombineSyntax
+static struct XYSourceCombineSyntax
 {
-  static Source& make (Block& al)
-  { return *new SourceCombine (al); }
+  static XYSource& make (Block& al)
+  { return *new XYSourceCombine (al); }
 
-  SourceCombineSyntax ()
+  XYSourceCombineSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    Source::load_syntax (syntax, alist);
+    XYSource::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "Combine data from multiple sources with a single expression.");
     syntax.add ("source", Librarian<Source>::library (), 
@@ -120,13 +132,18 @@ static struct SourceCombineSyntax
 List of sources for data.  The style information for the sources is\n\
 ignored, but the dates, title and value is used as specified by\n\
 'expr' to calculate the combines date and value pairs.");
-    syntax.add ("expr", Librarian<Number>::library (), 
+    syntax.add ("x", Librarian<Number>::library (), 
 		Syntax::Const, Syntax::Singleton, "\
-Expression for calculating the value for this source for each row.\n\
+Expression for calculating the x value for this source for each row.\n\
+A row is any date found in any of the member of 'source'.  The\n\
+expression may refer to the value of each source by its title.");
+    syntax.add ("y", Librarian<Number>::library (), 
+		Syntax::Const, Syntax::Singleton, "\
+Expression for calculating the y value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");
     syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
-Name of data legend in plot, by default the name of the 'expr' object.");
+Name of data legend in plot, by default a ombination of the x and y objects.");
   syntax.add ("with", Syntax::String, Syntax::OptionalConst, "\
 Specify 'points' to plot each point individually, or 'lines' to draw\n\
 lines between them.  By default, let the first source decide.");
@@ -139,8 +156,8 @@ so forth until it runs out of styles and has to start over.  Points\n\
 work similar, but with its own style counter.  For color plots, points\n\
 and lines with the same style number also have the same color.");
     
-    Librarian<Source>::add_type ("combine", alist, syntax, &make);
+    Librarian<XYSource>::add_type ("combine", alist, syntax, &make);
   }
-} SourceCombine_syntax;
+} XYSourceCombine_syntax;
 
-// source_combine.C ends here.
+// xysource_combine.C ends here.

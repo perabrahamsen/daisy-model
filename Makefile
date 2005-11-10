@@ -290,7 +290,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 #
-MODELS = xysource_expr.C gnuplot_multi.C \
+MODELS = xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
 	gnuplot_time.C source_combine.C number_arit.C source_expr.C \
 	source_std.C action_markvand.C photo_GL.C program_gnuplot.C \
 	program_document.C program_batch.C summary_balance.C \
@@ -361,13 +361,14 @@ SUBMODELS = fetch.C horheat.C litter.C time.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = source_file.C format_LaTeX.C log_all.C om.C select_value.C \
+SPECIALS = gnuplot_base.C \
+	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 	geometry.C printer_file.C log_alist.C log_clone.C column_base.C
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = scope_table.C lexer_table.C \
+OTHER = scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
@@ -933,9 +934,12 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
   symbol.h syntax.h treelog.h log.h border.h librarian.h library.h \
   block.h plf.h assertion.h soil.h geometry.h horizon.h am.h submodel.h \
   time.h aom.h om.h check.h vcheck.h mathlib.h timestep.h
+gnuplot_base${OBJ}: gnuplot_base.C gnuplot_base.h gnuplot.h librarian.h \
+  library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  vcheck.h
 source_file${OBJ}: source_file.C source_file.h source.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h time.h \
-  lexer_table.h submodeler.h vcheck.h mathlib.h memutils.h
+  lexer_table.h vcheck.h mathlib.h
 format_LaTeX${OBJ}: format_LaTeX.C format_LaTeX.h format.h librarian.h \
   library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   version.h
@@ -983,8 +987,14 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h library.h \
   soil_water.h macro.h soil_heat.h soil_chemicals.h soil_chemical.h \
   solute.h adsorption.h transport.h mactrans.h chemistry.h groundwater.h \
   log.h border.h weather.h im.h vegetation.h time.h memutils.h
-lexer_table${OBJ}: lexer_table.C lexer_table.h lexer_data.h lexer.h \
-  assertion.h mathlib.h
+scope_sources${OBJ}: scope_sources.C scope_sources.h scope.h time.h source.h \
+  librarian.h library.h symbol.h block.h syntax.h treelog.h plf.h alist.h \
+  assertion.h memutils.h
+scope_table${OBJ}: scope_table.C scope_table.h scope.h lexer_table.h block.h \
+  syntax.h treelog.h symbol.h plf.h assertion.h
+lexer_table${OBJ}: lexer_table.C lexer_table.h block.h syntax.h treelog.h \
+  symbol.h plf.h lexer_data.h lexer.h alist.h assertion.h mathlib.h \
+  submodeler.h memutils.h time.h vcheck.h
 block${OBJ}: block.C block.h syntax.h treelog.h symbol.h plf.h librarian.h \
   library.h alist.h assertion.h stringer.h number.h scope.h
 dlf${OBJ}: dlf.C dlf.h symbol.h alist.h assertion.h version.h daisy.h \
@@ -1046,24 +1056,33 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h program.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+xysource_combine${OBJ}: xysource_combine.C xysource.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h number.h \
+  scope_sources.h scope.h time.h vcheck.h
+gnuplot_xy${OBJ}: gnuplot_xy.C gnuplot_base.h gnuplot.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  xysource.h mathlib.h memutils.h
+xysource_expr${OBJ}: xysource_expr.C xysource.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  lexer_table.h scope_table.h scope.h number.h vcheck.h
 gnuplot_multi${OBJ}: gnuplot_multi.C gnuplot.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h source.h time.h \
   memutils.h
-gnuplot_time${OBJ}: gnuplot_time.C gnuplot.h librarian.h library.h symbol.h \
-  block.h syntax.h treelog.h plf.h alist.h assertion.h source.h time.h \
-  vcheck.h mathlib.h memutils.h
+gnuplot_time${OBJ}: gnuplot_time.C gnuplot_base.h gnuplot.h librarian.h \
+  library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  source.h time.h mathlib.h memutils.h
 source_combine${OBJ}: source_combine.C source.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h time.h \
-  number.h scope.h vcheck.h memutils.h
+  number.h scope_sources.h scope.h vcheck.h
 number_arit${OBJ}: number_arit.C number.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h units.h vcheck.h \
   mathlib.h memutils.h
 source_expr${OBJ}: source_expr.C source_file.h source.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h time.h \
-  number.h scope.h units.h lexer_table.h
+  lexer_table.h scope_table.h scope.h number.h
 source_std${OBJ}: source_std.C source_file.h source.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h time.h \
-  units.h lexer_table.h
+  lexer_table.h units.h
 action_markvand${OBJ}: action_markvand.C action.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h daisy.h \
   program.h time.h field.h border.h crop.h im.h fao.h log.h mathlib.h \

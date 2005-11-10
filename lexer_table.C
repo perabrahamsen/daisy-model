@@ -407,6 +407,10 @@ LexerTable::convert_to_double (const std::string& value) const
 }
 
 void
+LexerTable::debug (const std::string& str) const
+{ lex->warning (str); }
+
+void
 LexerTable::warning (const std::string& str) const
 { lex->warning (str); }
 

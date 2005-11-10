@@ -1,7 +1,21 @@
 2005-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* xysource_expr.C: New model.
+	* lexer.C, lexer.h (warning, error): Use proper Treelog functions.
+	* lexer.C, lexer.h, lexer_table.C, lexer_table.h (debug): New function.
+
+	* xysource_combine.C: New model.
 	* Makefile (MODELS): Add it.
+
+	* scope_sources.h, scope_sources.C: New utility.
+	* Makefile (OTHER): Added them.
+	* source_combine.C: Use it.
+
+	* gnuplot_base.C, gnuplot_base.h: New base model.
+	* Makefile (SPECIALS): Add it.
+	* gnuplot_time.C: Use it,
+	* gnuplot_xy.C: New model.
+	* xysource_expr.C: New model.
+	* Makefile (MODELS): Add them.
 
 2005-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
