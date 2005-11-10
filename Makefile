@@ -663,6 +663,9 @@ cvs: $(TEXT)
 	cvs commit -m "Version $(TAG)"
 	cvs tag release_`echo $(TAG) | sed -e 's/[.]/_/g'`
 
+add:
+	cvs add $(TEXT)
+
 cast:
 	fgrep _cast $(INTERFACES) $(MODELS) $(MAIN)
 	wc -l  $(INTERFACES) $(MODELS) $(MAIN)
