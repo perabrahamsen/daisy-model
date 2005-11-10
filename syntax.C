@@ -554,7 +554,8 @@ Syntax::default_alist (const string& key) const
 void
 Syntax::add (const string& key, type t, category req, int s, const string& d)
 {
-  daisy_assert (impl.size.find (key) == impl.size.end ());
+  if (impl.size.find (key) != impl.size.end ())
+    daisy_panic ("'" + key + "': already defined in syntax");
   impl.size[key] = s;
   impl.types[key] = t;
   impl.status[key] = req;

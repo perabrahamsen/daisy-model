@@ -1,10 +1,18 @@
-2005-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+2005-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* lexer_table.C, lexer_table.h: New utility.
-	* Makefile (OTHER): Added it.
+	* xysource_expr.C: New model.
+	* Makefile (MODELS): Add it.
+
+2005-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* xysource.C, xysource.h: New component.
 	* Makefile (COMPONENTS): Add it.
+
+	* scope_table.C, scope_table.h: New utility.
+	* lexer_table.C, lexer_table.h: New utility.
+	* Makefile (OTHER): Added them.
+	* source_file.h, source_file.C, source_std.h, source_std.C:
+	* source_expr.h, source_expr.C: Use them.
 
 	* Version 3.93 released.
 

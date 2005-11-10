@@ -84,13 +84,13 @@ ProgramGnuplot::run (Treelog& msg)
   // Plot.
   {
     Treelog::Open nest (msg, "Writing");
+    msg.touch ();
     bool ok = true;
     for (size_t i = 0; i < graph.size(); i++)
       {
         std::ostringstream tmp;
         tmp << name << "[" << i << "]: " << graph[i]->name;
         Treelog::Open nest (msg, tmp.str ());
-        msg.touch ();
         if (!graph[i]->plot (out, msg))
           ok = false;
       }

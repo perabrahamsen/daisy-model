@@ -20,7 +20,6 @@
 
 #include "source_file.h"
 #include "units.h"
-#include "librarian.h"
 #include "lexer_table.h"
 #include <sstream>
 
@@ -29,9 +28,7 @@ struct SourceStandard : public SourceFile
   // Content.
   const std::string tag;
   const std::string title_;
-  std::string original;
   std::string dimension_;
-  const bool dim_line;
   const bool has_factor;
   const double factor;
 
@@ -55,12 +52,11 @@ bool
 SourceStandard::load (Treelog& msg)
 {
   // Read header.
-  LexerTable lex (filename, msg);
-  if (!read_header (lex))
+  if (!read_header (msg))
     return false;
 
   // Tag.
-  const int tag_c = find_tag (tag_pos, tag);
+  const int tag_c = lex.find_tag (tag);
   if (tag_c < 0)
     {
       lex.error ("Tag '" + tag + "' not found");
@@ -68,24 +64,10 @@ SourceStandard::load (Treelog& msg)
     }
 
   // Read dimensions.
-  if (dim_line)
-    {
-      const std::vector<std::string> dim_names = get_entries (lex);
-      if (dim_names.size () != tag_names.size ())
-        if (dim_names.size () > tag_c)
-          lex.warning ("Number of dimensions does not match number of tags");
-        else
-          {
-            lex.error ("No dimension for '" + tag + "' found");
-            return false;
-          }
-      if (original == Syntax::Unknown ())
-        original = dim_names[tag_c];
-      if (dimension_ == Syntax::Unknown ())
-        dimension_ = dim_names[tag_c];
-    }
-
-  if (!has_factor && !Units::can_convert (original, dimension_))
+  const std::string original = lex.dimension (tag_c);
+  if (original != Syntax::Unknown () && dimension_ == Syntax::Unknown ())
+    dimension_ = original;
+  else if (!has_factor && !Units::can_convert (original, dimension_))
     {
       std::ostringstream tmp;
       tmp << "Cannot convert from [" << original << "] to [" << dimension_ 
@@ -103,19 +85,18 @@ SourceStandard::load (Treelog& msg)
       // Read entries.
       std::vector<std::string> entries;
       Time time (9999, 1, 1, 0);
-      if (!read_entry (lex, entries, time))
+      if (!read_entry (entries, time))
         continue;
 
       // Extract value.
       const std::string value = entries[tag_c];
 
       // Skip missing values.
-      if (std::find (missing.begin (), missing.end (), value) 
-          != missing.end ())
+      if (lex.is_missing (value) )
         continue;
         
       // Convert it.
-      double val = convert_to_double (lex, value);
+      double val = lex.convert_to_double (value);
       if (has_factor)
         val *= factor;
       else if (Units::can_convert (original, dimension_, val))
@@ -147,9 +128,7 @@ SourceStandard::SourceStandard (Block& al)
   : SourceFile (al),
     tag (al.name ("tag")),
     title_ (al.name ("title", tag)),
-    original (al.name ("original", Syntax::Unknown ())),
-    dimension_ (al.name ("dimension", original)),
-    dim_line (al.flag ("dim_line", !al.check ("original"))),
+    dimension_ (al.name ("dimension", Syntax::Unknown ())),
     has_factor (al.check ("factor")),
     factor (al.number ("factor", 1.0))
 { }
@@ -175,16 +154,10 @@ Read a a single column from a Daisy log, weather or data file.");
 Name of column in Daisy log file where data is found.");
     syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
 Name of data legend in plot, by default the same as 'tag'.");
-    syntax.add ("original", Syntax::String, Syntax::OptionalConst, "\
-Dimension of the data in the data file.\n\
-By default use the name specified in data file.");
     syntax.add ("dimension", Syntax::String, Syntax::OptionalConst, "\
 Dimension of data to plot.\n\
 By default this is the same as 'original'.\n\
 If 'factor' is not specified, Daisy will attempt to convert the data.");
-    syntax.add ("dim_line", Syntax::Boolean, Syntax::OptionalConst, "\
-If true, assume the line after the tags contain dimensions.\n\
-By default this will be true iff 'original' is not specified.");
     syntax.add ("factor", Syntax::Unknown (), Syntax::OptionalConst, "\
 Multiply all data by this number.\n\
 By default Daisy will convert from 'original' to 'dimension'.");

@@ -6,6 +6,20 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** plot hydraulic properties
 
+** xysource_arit.C
+
+** gnuplot_xy.C
+
+** skal vi have et table komponent?
+
+xysource_function
+
+x = from, to, step
+
+y = expr (x)
+
+y = hydraulic_K (hydraulic, h)
+
 *** plot x vs y
 
 *** Theta vs pF, K vs pF

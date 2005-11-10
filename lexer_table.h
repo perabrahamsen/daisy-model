@@ -22,38 +22,74 @@
 #ifndef LEXER_TABLE_H
 #define LEXER_TABLE_H
 
-#include <memory>
+#include "block.h"
 #include <string>
 #include <vector>
+#include <map>
 
+class Treelog;
 class LexerData;
+class Time;
 
 class LexerTable
 {
   // Content.
 private:
-  std::auto_ptr<LexerData> lex;
+  const std::string filename;  
+  LexerData* lex;
   std::string field_sep;
   std::string type_;
-
+  const std::vector<std::string> missing;
+  std::vector<std::string> tag_names;
+  std::map<std::string,int> tag_pos;
+  std::vector<size_t> fil_col;
+  struct Filter;
+  std::vector<const Filter*> filter;
+  int year_c;
+  int month_c;
+  int mday_c;
+  int hour_c;
+  int time_c;
+  const std::vector<std::string> original;
+  const bool dim_line;
+  std::vector<std::string> dim_names;
+  
   // Use.
 public:
   bool good ();
-  bool read_header ();
+  bool read_header (Treelog& msg);
   const std::string& type () const;
+  const std::string& dimension (size_t tag_c) const;
+  int find_tag (const std::string& tag) const;
+private:
+  int find_tag (const std::string& tag1, const std::string& tag2) const;
 private:
   std::string get_entry () const;
+  void get_entries_raw (std::vector<std::string>& entries) const;
 public:
-  std::vector<std::string> get_entries () const;
+  bool get_entries (std::vector<std::string>& entries) const;
+private:
+  int get_date_component (const std::vector<std::string>& entries, 
+                          int column, int default_value) const;
+  static bool get_time (const std::string& entry, Time& time); 
+public:
+  bool get_time (const std::vector<std::string>& entries, Time& time) const;
+  bool is_missing (const std::string& value) const;
+  double convert_to_double (const std::string& value) const;
 
   // Messages.
 public:
-  void warning (const std::string& str);
-  void error (const std::string& str);
+  void warning (const std::string& str) const;
+  void error (const std::string& str) const;
 
   // Create and Destroy.
 public:
-  LexerTable (const std::string& name, Treelog&);
+  static void load_syntax (Syntax& syntax, AttributeList&);
+private:
+  LexerTable (const LexerTable&);
+  LexerTable ();
+public:
+  explicit LexerTable (Block&);
   ~LexerTable ();
 };
 

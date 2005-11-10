@@ -22,37 +22,22 @@
 #define SOURCE_FILE_H
 
 #include "source.h"
-
-class LexerTable;
-
-static int
-find_tag (const std::map<std::string,int>& tag_pos, const std::string& tag)
-{
-  if (tag_pos.find (tag) == tag_pos.end ())
-    return -1;
-  return tag_pos.find (tag)->second;
-}
+#include "lexer_table.h"
 
 class SourceFile : public Source
 {
   // Content.
 protected:
-  const std::string filename;  
+  LexerTable lex;
   std::string with_;
   const bool explicit_with;
   const int style_;
-  const std::vector<std::string> missing;
 protected:
   void add_entry (const Time& time, std::vector<double>& vals);
 private:
   std::vector<Time> times;
   std::vector<double> values;
   std::vector<double> ebars;
-  
-  // Filter.
-private:
-  struct Filter;
-  std::vector<const Filter*> filter;
   
   // Interface.
 public:
@@ -68,27 +53,9 @@ public:
   { return ebars; }
 
   // Read.
-private:
-  static int get_date_component (LexerTable& lex,
-                                 const std::vector<std::string>& entries, 
-                                 int column, 
-                                 int default_value);
-  static Time get_time (const std::string& entry);
 protected:
-  static double convert_to_double (LexerTable& lex, const std::string& value);
-protected:
-  std::vector<std::string> tag_names;
-  std::map<std::string,int> tag_pos;
-private:
-  std::vector<size_t> fil_col;
-  int year_c;
-  int month_c;
-  int mday_c;
-  int hour_c;
-  int time_c;
-protected:
-  bool read_header (LexerTable&);
-  bool read_entry (LexerTable&, std::vector<std::string>&, Time&) const;
+  bool read_header (Treelog&);
+  bool read_entry (std::vector<std::string>&, Time&);
 
   // Create.
 public:
