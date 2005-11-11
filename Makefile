@@ -290,7 +290,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 #
-MODELS = xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
+MODELS = xysource_inline.C number_soil.C xysource_loop.C \
+	xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
 	gnuplot_time.C source_combine.C number_arit.C source_expr.C \
 	source_std.C action_markvand.C photo_GL.C program_gnuplot.C \
 	program_document.C program_batch.C summary_balance.C \

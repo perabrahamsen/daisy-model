@@ -31,8 +31,9 @@ ScopeSources::has_number (const std::string& tag) const
 {
   for (size_t i = 0; i < source.size (); i++)
     if (source[i]->title () == tag 
-        && index[i] < source[i]->value ().size ()
-        && source[i]->time ().at (index[i]) == now)
+        && (index[i] < 0
+            || (index[i] < source[i]->value ().size ()
+                && source[i]->time ().at (index[i]) == now)))
       return true;
     
   return false;
@@ -75,7 +76,6 @@ ScopeSources::load (Treelog& msg)
       if (!source[i]->load (msg))
         ok = false;
     }
-  first ();
   return ok;
 }
 
@@ -126,7 +126,7 @@ ScopeSources::next ()
 
 ScopeSources::ScopeSources (const std::vector<Source*>& s)
   : source (s),
-     index (s.size (), 0),
+     index (s.size (), -1),
      now (1, 1, 1, 0)
 { }
 

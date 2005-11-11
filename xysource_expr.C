@@ -198,7 +198,7 @@ The expression can refer to the value in a specific column by the tag\n\
 for that column.");
     syntax.add ("y", Librarian<Number>::library (), 
 		Syntax::Const, Syntax::Singleton, "\
-Expression for calculating the x value for this source for each row.\n\
+Expression for calculating the y value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
     syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\

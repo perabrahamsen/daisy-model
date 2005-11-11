@@ -34,7 +34,7 @@ class ScopeSources : public Scope
   // Content.
 private:
   const std::vector<Source*> source;
-  std::vector<size_t> index;
+  std::vector<int> index;
 public:
   Time now;
 

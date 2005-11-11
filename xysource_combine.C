@@ -87,6 +87,8 @@ XYSourceCombine::load (Treelog& msg)
   y_dimension_ = y_expr->dimension (scope);
   if (with_ == "")
     with_ = scope.with ();
+  if (with_ == "errorbars")
+    with_ = "points";
 
   // Read data.
   for (scope.first (); !scope.done (); scope.next ())

@@ -92,7 +92,7 @@ SourceStandard::load (Treelog& msg)
       const std::string value = entries[tag_c];
 
       // Skip missing values.
-      if (lex.is_missing (value) )
+      if (lex.is_missing (value))
         continue;
         
       // Convert it.

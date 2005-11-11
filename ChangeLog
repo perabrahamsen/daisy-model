@@ -3,8 +3,9 @@
 	* lexer.C, lexer.h (warning, error): Use proper Treelog functions.
 	* lexer.C, lexer.h, lexer_table.C, lexer_table.h (debug): New function.
 
-	* xysource_combine.C: New model.
-	* Makefile (MODELS): Add it.
+	* xysource_inline.C: 
+	* number_soil.C, xysource_loop.C, xysource_combine.C: New models.
+	* Makefile (MODELS): Add them.
 
 	* scope_sources.h, scope_sources.C: New utility.
 	* Makefile (OTHER): Added them.

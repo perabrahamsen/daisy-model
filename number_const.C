@@ -201,7 +201,7 @@ struct NumberFetch : public Number
   // Create.
   bool check (const Scope& scope, Treelog& err) const
   {
-    Treelog::Open nest (err, name);
+    Treelog::Open nest (err, "Fetch: " + name);
 
     bool ok = true;
     if (!default_value && !scope.has_number (name))
