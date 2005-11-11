@@ -4,27 +4,23 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * WP5 
 
-** plot hydraulic properties
+** hydraulic graphs
 
-** xysource_arit.C
+*** Liberate "with"
 
-** gnuplot_xy.C
+*** gnuplot_utils
 
-** skal vi have et table komponent?
+add_style
 
-xysource_function
+*** Brug data fra db for db serie
 
-x = from, to, step
+*** tilføj filnavne
 
-y = expr (x)
+*** soil conductivity
 
-y = hydraulic_K (hydraulic, h)
+*** PT 2004
 
-*** plot x vs y
-
-*** Theta vs pF, K vs pF
-
-*** inkluder værdier fra database, hypres og kalibreret
+*** report
 
 ** resultatafsnit
 
