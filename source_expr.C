@@ -115,7 +115,8 @@ static struct SourceExprSyntax
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    SourceFile::load_syntax (syntax, alist);
+    SourceFile::load_style (syntax, alist, "\
+By default the name of the 'expr' object.");
     alist.add ("description", 
 	       "Read a daisy log, weather or data file.\n\
 Calculate a single value for each time step, based on the value\n\
@@ -125,8 +126,6 @@ in the various columns.");
 Expression for calculating the value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
-    syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
-Name of data legend in plot, by default the name of the 'expr' object.");
 
     Librarian<Source>::add_type ("arithmetic", alist, syntax, &make);
   }

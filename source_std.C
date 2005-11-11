@@ -151,14 +151,13 @@ static struct SourceStandardSyntax
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    SourceFile::load_syntax (syntax, alist);
+    SourceFile::load_style (syntax, alist, "\
+By default the same as 'tag'.");
     alist.add ("description", "\
 Read a a single column from a Daisy log, weather or data file.");
 
     syntax.add ("tag", Syntax::String, Syntax::Const, "\
 Name of column in Daisy log file where data is found.");
-    syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
-Name of data legend in plot, by default the same as 'tag'.");
     syntax.add ("dimension", Syntax::String, Syntax::OptionalConst, "\
 Dimension of data to plot.\n\
 By default this is the same as 'original'.\n\
