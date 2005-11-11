@@ -394,8 +394,10 @@ struct NumberDim : public Number
     if (!child->check (scope, err))
       ok = false;
     
-    if (warn_known && known (child->dimension (scope)))
-      err.warning ("Dimension for child already known");
+    if (warn_known && known (child->dimension (scope))
+        && child->dimension (scope) != dim)
+      err.warning ("Dimension for child [" + child->dimension (scope)
+                   + "] already known, now asserting it is [" + dim + "]");
 
     return ok;
   }
