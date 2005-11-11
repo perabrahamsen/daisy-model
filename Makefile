@@ -290,7 +290,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 #
-MODELS = xysource_inline.C number_soil.C xysource_loop.C \
+MODELS = xysource_merge.C xysource_inline.C number_soil.C xysource_loop.C \
 	xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
 	gnuplot_time.C source_combine.C number_arit.C source_expr.C \
 	source_std.C action_markvand.C photo_GL.C program_gnuplot.C \
@@ -369,7 +369,7 @@ SPECIALS = gnuplot_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = scope_sources.C scope_table.C lexer_table.C \
+OTHER = gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
@@ -943,7 +943,7 @@ gnuplot_base${OBJ}: gnuplot_base.C gnuplot_base.h gnuplot.h librarian.h \
   vcheck.h
 source_file${OBJ}: source_file.C source_file.h source.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h time.h \
-  lexer_table.h vcheck.h mathlib.h
+  lexer_table.h gnuplot_utils.h vcheck.h mathlib.h
 format_LaTeX${OBJ}: format_LaTeX.C format_LaTeX.h format.h librarian.h \
   library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   version.h
@@ -991,6 +991,8 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h library.h \
   soil_water.h macro.h soil_heat.h soil_chemicals.h soil_chemical.h \
   solute.h adsorption.h transport.h mactrans.h chemistry.h groundwater.h \
   log.h border.h weather.h im.h vegetation.h time.h memutils.h
+gnuplot_utils${OBJ}: gnuplot_utils.C gnuplot_utils.h syntax.h treelog.h \
+  symbol.h alist.h
 scope_sources${OBJ}: scope_sources.C scope_sources.h scope.h time.h source.h \
   librarian.h library.h symbol.h block.h syntax.h treelog.h plf.h alist.h \
   assertion.h memutils.h
@@ -1060,15 +1062,28 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h program.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+xysource_merge${OBJ}: xysource_merge.C xysource.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  gnuplot_utils.h number.h scope_sources.h scope.h time.h units.h \
+  vcheck.h memutils.h
+xysource_inline${OBJ}: xysource_inline.C xysource.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  gnuplot_utils.h number.h vcheck.h
+number_soil${OBJ}: number_soil.C number.h librarian.h library.h symbol.h \
+  block.h syntax.h treelog.h plf.h alist.h assertion.h horizon.h \
+  hydraulic.h units.h
+xysource_loop${OBJ}: xysource_loop.C xysource.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  gnuplot_utils.h scope.h number.h vcheck.h
 xysource_combine${OBJ}: xysource_combine.C xysource.h librarian.h library.h \
-  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h number.h \
-  scope_sources.h scope.h time.h vcheck.h
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  gnuplot_utils.h number.h scope_sources.h scope.h time.h
 gnuplot_xy${OBJ}: gnuplot_xy.C gnuplot_base.h gnuplot.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   xysource.h mathlib.h memutils.h
 xysource_expr${OBJ}: xysource_expr.C xysource.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
-  lexer_table.h scope_table.h scope.h number.h vcheck.h
+  lexer_table.h scope_table.h scope.h gnuplot_utils.h number.h vcheck.h
 gnuplot_multi${OBJ}: gnuplot_multi.C gnuplot.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h source.h time.h \
   memutils.h
@@ -1077,7 +1092,7 @@ gnuplot_time${OBJ}: gnuplot_time.C gnuplot_base.h gnuplot.h librarian.h \
   source.h time.h mathlib.h memutils.h
 source_combine${OBJ}: source_combine.C source.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h time.h \
-  number.h scope_sources.h scope.h vcheck.h
+  number.h scope_sources.h scope.h gnuplot_utils.h vcheck.h
 number_arit${OBJ}: number_arit.C number.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h units.h vcheck.h \
   mathlib.h memutils.h

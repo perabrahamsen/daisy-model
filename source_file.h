@@ -59,7 +59,8 @@ protected:
 
   // Create.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_style (Syntax&, AttributeList&, 
+                          const std::string& default_title);
 protected:
   explicit SourceFile (Block&);
 private:

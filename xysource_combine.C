@@ -19,9 +19,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "xysource.h"
+#include "gnuplot_utils.h"
 #include "number.h"
 #include "scope_sources.h"
-#include "vcheck.h"
 
 struct XYSourceCombine : public XYSource
 {
@@ -127,13 +127,18 @@ static struct XYSourceCombineSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     XYSource::load_syntax (syntax, alist);
-    alist.add ("description", 
-	       "Combine data from multiple sources with a single expression.");
+    GnuplotUtil::load_style (syntax, alist, "\
+By default, let the first source decide.", "\
+By default a combination of the x and y objects.");
+    alist.add ("description", "\
+Combine data from multiple time series with a single expression.\n\
+Data from times series are matched by date.");
     syntax.add ("source", Librarian<Source>::library (), 
 		Syntax::State, Syntax::Sequence, "\
-List of sources for data.  The style information for the sources is\n\
-ignored, but the dates, title and value is used as specified by\n\
-'expr' to calculate the combines date and value pairs.");
+List of sources for data.\n\
+The style information for the sources is ignored, but the dates, title\n\
+and value is used as specified by 'expr' to calculate the combined\n\
+date and value pairs.");
     syntax.add ("x", Librarian<Number>::library (), 
 		Syntax::Const, Syntax::Singleton, "\
 Expression for calculating the x value for this source for each row.\n\
@@ -144,20 +149,6 @@ expression may refer to the value of each source by its title.");
 Expression for calculating the y value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");
-    syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
-Name of data legend in plot, by default a ombination of the x and y objects.");
-  syntax.add ("with", Syntax::String, Syntax::OptionalConst, "\
-Specify 'points' to plot each point individually, or 'lines' to draw\n\
-lines between them.  By default, let the first source decide.");
-  static VCheck::Enum with ("lines", "points");
-  syntax.add_check ("with", with);
-  syntax.add ("style", Syntax::Integer, Syntax::OptionalConst, "\
-Style to use for this dataset.  By default, gnuplot will use style 1\n\
-for the first source to plot with lines, style 2 for the second, and\n\
-so forth until it runs out of styles and has to start over.  Points\n\
-work similar, but with its own style counter.  For color plots, points\n\
-and lines with the same style number also have the same color.");
-    
     Librarian<XYSource>::add_type ("combine", alist, syntax, &make);
   }
 } XYSourceCombine_syntax;

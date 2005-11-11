@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "xysource.h"
+#include "gnuplot_utils.h"
 #include "scope.h"
 #include "number.h"
 #include "vcheck.h"
@@ -27,8 +28,7 @@
 class XYSourceLoop : public XYSource
 {
   // Content.
-  std::string with_;
-  const bool explicit_with;
+  const std::string with_;
   const int style_;
   std::vector<double> xs;
   std::vector<double> ys;
@@ -132,8 +132,7 @@ XYSourceLoop::load (Treelog& msg)
 
 XYSourceLoop::XYSourceLoop (Block& al)
   : XYSource (al),
-    with_ (al.name ("with", "")),
-    explicit_with (al.check ("with")),
+    with_ (al.name ("with")),
     style_ (al.integer ("style", -1)),
     x_expr (Librarian<Number>::build_item (al, "x")),
     y_expr (Librarian<Number>::build_item (al, "y")),
@@ -176,6 +175,10 @@ static struct XYSourceLoopSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     XYSource::load_syntax (syntax, alist);
+    GnuplotUtil::load_style (syntax, alist, "", "\
+By default the name of the 'x' and 'y' objects.");
+    alist.add ("with", "lines");
+    
     syntax.add_check (check_alist);
     alist.add ("description", 
 	       "Calculate x and y pairs based on a single variable.\n\
@@ -183,18 +186,6 @@ static struct XYSourceLoopSyntax
 The variable cover an interval from 'begin' to 'end' in fixed steps\n\
 'step'.  The name of the variable is specified by 'tag'.  The x and y\n\
 expressions may refer to the variable.");
-    syntax.add ("with", Syntax::String, Syntax::Const, "\
-Specify 'points' to plot each point individually, or 'lines' to draw\n\
-lines between them.");
-    alist.add ("with", "lines");
-    static VCheck::Enum with ("lines", "points");
-    syntax.add_check ("with", with);
-    syntax.add ("style", Syntax::Integer, Syntax::OptionalConst, "\
-Style to use for this dataset.  By default, gnuplot will use style 1\n\
-for the first source to plot with lines, style 2 for the second, and\n\
-so forth until it runs out of styles and has to start over.  Points\n\
-work similar, but with its own style counter.  For color plots, points\n\
-and lines with the same style number also have the same color.");
     syntax.add ("x", Librarian<Number>::library (), 
 		Syntax::Const, Syntax::Singleton, "\
 Expression for calculating the x value.");
@@ -205,8 +196,6 @@ Expression for calculating the x value.");
     syntax.add ("y", Librarian<Number>::library (), 
 		Syntax::Const, Syntax::Singleton, "\
 Expression for calculating the y value.");
-    syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
-Name of data legend in plot, by default the name of the 'x' and 'y' objects.");
     syntax.add ("begin", Syntax::User (), Syntax::Const, "\
 Start of interval.");
     syntax.add ("end", Syntax::User (), Syntax::Const, "\

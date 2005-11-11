@@ -21,6 +21,7 @@
 #include "xysource.h"
 #include "lexer_table.h"
 #include "scope_table.h"
+#include "gnuplot_utils.h"
 #include "number.h"
 #include "vcheck.h"
 
@@ -178,19 +179,10 @@ static struct XYSourceExprSyntax
 Calculate an x and an y value for each time step, based on the value\n\
 in the various columns.");
     LexerTable::load_syntax (syntax, alist);
-
-    syntax.add ("with", Syntax::String, Syntax::OptionalConst, "\
-Specify 'points' to plot each point individually, or 'lines' to draw\n\
-lines between them.  By default, data from dwf and dlf files will be\n\
-drawn with lines, and data from ddf files will be drawn with points.");
-    static VCheck::Enum with ("lines", "points");
-    syntax.add_check ("with", with);
-    syntax.add ("style", Syntax::Integer, Syntax::OptionalConst, "\
-Style to use for this dataset.  By default, gnuplot will use style 1\n\
-for the first source to plot with lines, style 2 for the second, and\n\
-so forth until it runs out of styles and has to start over.  Points\n\
-work similar, but with its own style counter.  For color plots, points\n\
-and lines with the same style number also have the same color.");
+    GnuplotUtil::load_style (syntax, alist, "\
+By default, data from dwf and dlf files will be\n\
+drawn with lines, and data from ddf files will be drawn with points.", "\
+By default the name of the 'x' and 'y' objects.");
     syntax.add ("x", Librarian<Number>::library (), 
 		Syntax::Const, Syntax::Singleton, "\
 Expression for calculating the x value for this source for each row.\n\
@@ -201,8 +193,6 @@ for that column.");
 Expression for calculating the y value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
-    syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
-Name of data legend in plot, by default the name of the 'x' and 'y' objects.");
 
     Librarian<XYSource>::add_type ("arithmetic", alist, syntax, &make);
   }

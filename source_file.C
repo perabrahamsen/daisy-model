@@ -20,6 +20,7 @@
 
 
 #include "source_file.h"
+#include "gnuplot_utils.h"
 #include "vcheck.h"
 #include "mathlib.h"
 #include <algorithm>
@@ -86,23 +87,15 @@ SourceFile::read_entry (std::vector<std::string>& entries, Time& time)
 }
 
 void
-SourceFile::load_syntax (Syntax& syntax, AttributeList& alist)
+SourceFile::load_style (Syntax& syntax, AttributeList& alist, 
+                        const std::string& default_title)
 {
   Source::load_syntax (syntax, alist);
   LexerTable::load_syntax (syntax, alist);
-
-  syntax.add ("with", Syntax::String, Syntax::OptionalConst, "\
-Specify 'points' to plot each point individually, or 'lines' to draw\n\
-lines between them.  By default, data from dwf and dlf files will be\n\
-drawn with lines, and data from ddf files will be drawn with points.");
-  static VCheck::Enum with ("lines", "points");
-  syntax.add_check ("with", with);
-  syntax.add ("style", Syntax::Integer, Syntax::OptionalConst, "\
-Style to use for this dataset.  By default, gnuplot will use style 1\n\
-for the first source to plot with lines, style 2 for the second, and\n\
-so forth until it runs out of styles and has to start over.  Points\n\
-work similar, but with its own style counter.  For color plots, points\n\
-and lines with the same style number also have the same color.");
+  GnuplotUtil::load_style (syntax, alist, "\
+By default, data from dwf and dlf files will be\n\
+drawn with lines, and data from ddf files will be drawn with points.", 
+                           default_title);
 }
 
 SourceFile::SourceFile (Block& al)

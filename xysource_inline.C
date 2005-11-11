@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "xysource.h"
+#include "gnuplot_utils.h"
 #include "number.h"
 #include "vcheck.h"
 
@@ -26,8 +27,7 @@
 class XYSourceInline : public XYSource
 {
   // Content.
-  std::string with_;
-  const bool explicit_with;
+  const std::string with_;
   const int style_;
   std::vector<double> xs;
   std::vector<double> ys;
@@ -84,8 +84,7 @@ XYSourceInline::load (Treelog&)
 
 XYSourceInline::XYSourceInline (Block& al)
   : XYSource (al),
-    with_ (al.name ("with", "")),
-    explicit_with (al.check ("with")),
+    with_ (al.name ("with")),
     style_ (al.integer ("style", -1)),
     plf (al.plf ("points")),
     title_ (al.name ("title")),
@@ -109,23 +108,11 @@ static struct XYSourceInlineSyntax
     XYSource::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "A list of x, y pairs.");
-    syntax.add ("with", Syntax::String, Syntax::Const, "\
-Specify 'points' to plot each point individually, or 'lines' to draw\n\
-lines between them.");
-    alist.add ("with", "points");
-    static VCheck::Enum with ("lines", "points", "points pointsize 3 pointtype 2");
-    syntax.add_check ("with", with);
-    syntax.add ("style", Syntax::Integer, Syntax::OptionalConst, "\
-Style to use for this dataset.  By default, gnuplot will use style 1\n\
-for the first source to plot with lines, style 2 for the second, and\n\
-so forth until it runs out of styles and has to start over.  Points\n\
-work similar, but with its own style counter.  For color plots, points\n\
-and lines with the same style number also have the same color.");
+    GnuplotUtil::load_style (syntax, alist, "", "\
+By default the name of the 'x' and 'y' objects.");
     syntax.add ("points", Syntax::Unknown (), Syntax::Unknown (), 
 		Syntax::Const, Syntax::Singleton, "\
 List of (x y) pairs.");
-    syntax.add ("title", Syntax::String, Syntax::Const, "\
-Name of data legend in plot.");
     syntax.add ("x_dimension", Syntax::String, Syntax::Const, "\
 Dimension for x points.");
     syntax.add ("y_dimension", Syntax::String, Syntax::Const, "\

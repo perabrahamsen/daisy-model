@@ -1,3 +1,14 @@
+2005-11-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* xysource_merge.C: New model.
+	* Makefile (MODELS): Added.
+
+	* gnuplot_utils.C, gnuplot_utils.h: New utility.
+	* Makefile (OTHER): Added it.
+	* xysource_combine.C (XYSourceCombineSyntax): Use it.
+	* xysource_loop.C (XYSourceLoopSyntax): Ditto.
+
+
 2005-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lexer.C, lexer.h (warning, error): Use proper Treelog functions.
