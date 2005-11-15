@@ -1,16 +1,31 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Brev til Wladislaw
+
+Spørg om db værdier for conductivity.
+
+* Brev til Poul.
+
+Duplicate "Name of another method" tag i Soil_Moisture.
+
 * Check at "Field nitrogen" virker med checkpoints (local variable!)
 
 * WP5 
 
 ** hydraulic graphs
 
-*** soil conductivity
+*** IT
 
-*** PT 2004
+2003:  Ingen db tal
+       har Theta vs pF 
 
-*** report
+2004:  Har field cap og wielt pt i db, men ingen conductivity
+
+(husk jordtemperatur)
+
+*** SK
+
+*** CZ
 
 ** resultatafsnit
 
