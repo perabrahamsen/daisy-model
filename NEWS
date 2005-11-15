@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.94
+
+** Many more gnuplots options, mostly documented in the reference manual.
+
+** New convertion: [m/s] -> [cm/d]
+
 * 3.93
 
 ** New gnuplot syntax, see the tutorial for updated examples.

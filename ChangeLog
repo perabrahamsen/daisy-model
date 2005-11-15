@@ -1,3 +1,7 @@
+2005-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (standard_conversions): [m/s] -> [cm/d].
+
 2005-11-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* xysource_merge.C: New model.
