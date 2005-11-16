@@ -13,31 +13,6 @@ SM tension,  Watermark [kPa]
 
 * Check at "Field nitrogen" virker med checkpoints (local variable!)
 
-* WP5 
-
-** hydraulic graphs
-
-*** IT
-
-Målinger mellem A og B hor
-
-2003:  Ingen db tal
-       har Theta vs pF 
-
-2004:  Har field cap og wielt pt i db, men ingen conductivity
-
-(husk jordtemperatur)
-
-*** SK
-
-*** CZ
-
-** resultatafsnit
-
-Hvad gør vi med det?
-
-Tekst.  Massebalancer.
-
 * WP6
 
 ** Opsætning
@@ -54,11 +29,33 @@ Tekst.  Massebalancer.
 
 *** Price of water needed for making FON breakeven for farmers?
 
+* WP5 
+
+** hydraulic graphs
+
+*** SK
+*** CZ
+
+Der er MASSER af data i SoilProperties
+
+** resultatafsnit
+
+Hvad gør vi med det?
+
+Tekst.  Massebalancer.
+
+* IDE: CT laver "sample setups" for hvert FON land 
+
+De skal bruges på Daisy hjemmesiden, og er en del af "dissemination"
+(wp7) af FON.
+
 * IDE:  Mikkel implementerer Farquhar photosyntese.
 
 * Distribution
 
 ** Indsæt mmo grøntsager i lib (og sample?).
+
+** Ny plone baseret web side!
 
 * Programmering
 
