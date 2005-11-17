@@ -74,6 +74,10 @@ public:
   /**/ alist_sequence (const std::string& key) const;
 
   // Create and Destroy.
+private:
+  Block ();
+  Block (const Block&);
+  Block& operator= (const Block&);
 public:
   explicit Block (const Syntax&, const AttributeList&, Treelog& msg, 
 		  const std::string& scope_id);
