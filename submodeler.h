@@ -68,10 +68,7 @@ template <class T>
 T*
 submodel (Block& parent, const std::string& key)
 { 
-  const AttributeList& alist = parent.alist (key);
-  const Syntax& syntax = parent.syntax ().syntax (key);
-  daisy_assert (syntax.check (alist, Treelog::null ()));      
-  Block nested (parent, syntax, alist, key);
+  Block nested (parent, key);
   return submodel_block<T> (nested);
 }
 

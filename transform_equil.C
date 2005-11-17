@@ -47,9 +47,9 @@ struct TransformEquilibrium : public Transform
   enum { uninitialized, init_succes, init_failure } initialize_state;
   void initialize (const Soil&, Treelog&);
   bool check (const Soil&, Treelog& err) const;
-  TransformEquilibrium (const AttributeList& al)
+  TransformEquilibrium (Block& al)
     : Transform (al),
-      equilibrium (Librarian<Equilibrium>::create (al.alist ("equilibrium"))),
+      equilibrium (Librarian<Equilibrium>::build_item (al, "equilibrium")),
       initialize_state (uninitialized)
   { }
 };
@@ -158,7 +158,7 @@ TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
 
 static struct TransformEquilibriumSyntax
 {
-  static Transform& make (const AttributeList& al)
+  static Transform& make (Block& al)
   { return *new TransformEquilibrium (al); }
   TransformEquilibriumSyntax ()
   {

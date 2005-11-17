@@ -352,6 +352,13 @@ Block::Block (Block& block,
 			      scope_id))
 { }
 
+Block::Block (Block& block, const std::string& key)
+  : impl (new Implementation (&block, block.impl->msg, 
+                              syntax ().syntax (key), 
+                              alist ().alist (key),
+			      key))
+{ }
+
 Block::Block (Block& block,
 	      const Syntax& syntax, const AttributeList& alist, 
 	      const std::string& scope_id, size_t index)

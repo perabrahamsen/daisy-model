@@ -50,7 +50,7 @@ public:
                       Treelog& err) const = 0;
   static void load_syntax (Syntax&, AttributeList&);
 protected:
-  Domsorp (const AttributeList& al);
+  Domsorp (Block& al);
 public:
   virtual ~Domsorp ();
 };

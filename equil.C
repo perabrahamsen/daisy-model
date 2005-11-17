@@ -34,9 +34,9 @@ Equilibrium::load_syntax (Syntax& syntax, AttributeList&)
 	      "Description of this parameterization."); 
 }
 
-Equilibrium::Equilibrium (const AttributeList& al)
+Equilibrium::Equilibrium (Block& al)
   : name (al.identifier ("type")),
-    alist (al)
+    alist (al.alist ())
 { }
 
 Equilibrium::~Equilibrium ()

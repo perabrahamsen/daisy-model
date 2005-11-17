@@ -111,17 +111,17 @@ struct DomsorpStandard : public Domsorp
     S_N.insert (S_N.begin (), soil.size (), 0.0);
     daisy_assert (S_N.size () == soil.size ());
   }
-  DomsorpStandard (const AttributeList& al)
+  DomsorpStandard (Block& al)
     : Domsorp (al),
       dom_pool (al.integer ("dom_pool") - 1),
       som_pool (al.integer ("som_pool") - 1),
-      transform (Librarian<Transform>::create (al.alist ("transform")))
+      transform (Librarian<Transform>::build_item (al, "transform"))
   { }
 };
 
 static struct DomsorpStandardSyntax
 {
-  static Domsorp& make (const AttributeList& al)
+  static Domsorp& make (Block& al)
   { return *new DomsorpStandard (al); }
   DomsorpStandardSyntax ()
   {

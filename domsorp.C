@@ -35,9 +35,9 @@ void
 Domsorp::load_syntax (Syntax&, AttributeList&)
 { }
 
-Domsorp::Domsorp (const AttributeList& al)
+Domsorp::Domsorp (Block& al)
   : name (al.identifier ("type")),
-    alist (al)
+    alist (al.alist ())
 { }
 
 Domsorp::~Domsorp ()

@@ -43,7 +43,7 @@ struct EquilibriumLinear : public Equilibrium
   enum { uninitialized, init_succes, init_failure } initialize_state;
   void initialize (const Soil&, Treelog& err);
   bool check (const Soil&, Treelog& err) const;
-  EquilibriumLinear (const AttributeList& al)
+  EquilibriumLinear (Block& al)
     : Equilibrium (al),
       initialize_state (uninitialized)
   { }
@@ -105,7 +105,7 @@ EquilibriumLinear::check (const Soil&, Treelog& err) const
 
 static struct EquilibriumLinearSyntax
 {
-  static Equilibrium& make (const AttributeList& al)
+  static Equilibrium& make (Block& al)
   { return *new EquilibriumLinear (al); }
 
   EquilibriumLinearSyntax ()

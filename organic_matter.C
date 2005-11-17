@@ -250,7 +250,7 @@ struct OrganicMatter::Implementation
                       const double zone_delta_C) const;
   void initialize (const AttributeList&, const Soil&, const SoilWater&,
 		   double T_avg, Treelog& err);
-  Implementation (const AttributeList&);
+  Implementation (Block&);
   ~Implementation ();
 };
 
@@ -2566,7 +2566,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   tillage_C_soil.insert (tillage_C_soil.end (), soil.size (), 0.0);
 }
 
-OrganicMatter::Implementation::Implementation (const AttributeList& al)
+OrganicMatter::Implementation::Implementation (Block& al)
   : active_underground (al.flag ("active_underground")),
     active_groundwater (al.flag ("active_groundwater")),
     K_NH4 (al.number ("K_NH4")),
@@ -2577,7 +2577,7 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     smb (map_construct<SMB> (al.alist_sequence ("smb"))),
     som (map_construct<SOM> (al.alist_sequence ("som"))),
     dom (map_construct<DOM> (al.alist_sequence ("dom"))),
-    domsorp (map_create <Domsorp> (al.alist_sequence ("domsorp"))),
+    domsorp (Librarian<Domsorp>::build_vector (al, "domsorp")),
     buffer (al.alist ("buffer")),
     heat_factor (al.plf ("heat_factor")),
     water_factor (al.plf ("water_factor")),
@@ -2749,8 +2749,8 @@ OrganicMatter::initialize (const AttributeList& al,
 			   double T_avg, Treelog& err)
 { impl.initialize (al, soil, soil_water, T_avg, err); }
 
-OrganicMatter::OrganicMatter (const AttributeList& al)
-  : impl (*new Implementation (al))
+OrganicMatter::OrganicMatter (Block& parent, const std::string& key)
+  : impl (*submodel<Implementation> (parent, key))
 { }
 
 OrganicMatter::~OrganicMatter ()

@@ -46,8 +46,11 @@ public:
   virtual void initialize (const Soil&, Treelog&) = 0;
   virtual bool check (const Soil&, Treelog& err) const = 0;
   static void load_syntax (Syntax&, AttributeList&);
+private:
+  Equilibrium ();
+  Equilibrium (const Equilibrium&);
 protected:
-  Equilibrium (const AttributeList& al);
+  explicit Equilibrium (Block& al);
 public:
   virtual ~Equilibrium ();
 };

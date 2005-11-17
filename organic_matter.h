@@ -79,7 +79,12 @@ public:
   void initialize (const AttributeList&, const Soil&, const SoilWater&, 
 		   double T_avg, Treelog&);
   static void load_syntax (Syntax&, AttributeList&);
-  OrganicMatter (const AttributeList&);
+private:
+  OrganicMatter ();
+  OrganicMatter (const OrganicMatter&);
+  OrganicMatter& operator= (const OrganicMatter&);
+public:
+  explicit OrganicMatter (Block& parent, const std::string& key);
   ~OrganicMatter ();
 };
 

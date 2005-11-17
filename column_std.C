@@ -542,7 +542,7 @@ ColumnStandard::ColumnStandard (Block& al)
   : ColumnBase (al),
     soil_NH4 (al.alist ("SoilNH4")),
     soil_NO3 (al.alist ("SoilNO3")),
-    organic_matter (al.alist ("OrganicMatter")),
+    organic_matter (al, "OrganicMatter"),
     denitrification (al.alist ("Denitrification")),
     second_year_utilization_ (al.number ("second_year_utilization")),
     seed_N (0.0),

@@ -50,7 +50,7 @@ struct EquilibriumGoal_A : public Equilibrium
   enum { uninitialized, init_succes, init_failure } initialize_state;
   void initialize (const Soil&, Treelog& err);
   bool check (const Soil&, Treelog& err) const;
-  EquilibriumGoal_A (const AttributeList& al)
+  EquilibriumGoal_A (Block& al)
     : Equilibrium (al),
       A_solute (al.flag ("A_solute")),
       B_solute (al.flag ("B_solute")),
@@ -156,7 +156,7 @@ EquilibriumGoal_A::check (const Soil&, Treelog& err) const
 
 static struct EquilibriumGoal_ASyntax
 {
-  static Equilibrium& make (const AttributeList& al)
+  static Equilibrium& make (Block& al)
   { return *new EquilibriumGoal_A (al); }
 
   EquilibriumGoal_ASyntax ()

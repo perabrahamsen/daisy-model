@@ -79,6 +79,7 @@ public:
 		  const std::string& scope_id);
   explicit Block (Block&, const Syntax&, const AttributeList&, 
 		  const std::string& scope_tag);
+  explicit Block (Block&, const std::string&);
   explicit Block (Block&, const Syntax&, const AttributeList&, 
 		  const std::string& scope_tag, size_t index);
   ~Block ();

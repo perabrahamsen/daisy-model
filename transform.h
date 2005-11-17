@@ -48,8 +48,11 @@ public:
 public:
   virtual void initialize (const Soil&, Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
+private:
+  Transform ();
+  Transform (const Transform&);
 protected:
-  Transform (const AttributeList& al);
+  explicit Transform (Block&);
 public:
   virtual ~Transform ();
 };
