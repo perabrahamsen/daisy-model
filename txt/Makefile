@@ -34,21 +34,39 @@ reference.pdf:	components.tex
 	makeindex reference
 	pdflatex reference.tex < /dev/null
 
-exercises.ps:	exercises.dvi
-	dvips -f exercises.dvi > exercises.ps
-
-exercises.dvi:	components.tex
-	latex exercises.tex < /dev/null
-
-exercises.pdf:	exercises.tex
-	pdflatex exercises.tex < /dev/null
-
 components.tex:	/usr/local/daisy/$(HOSTTYPE)/daisy
 	/usr/local/daisy/$(HOSTTYPE)/daisy all.dai -p document > components.tex
 
-dist: reference.pdf reference.ps exercises.pdf
+exercises.ps:	exercises.dvi 
+	dvips -f exercises.dvi > exercises.ps
+
+exercises.dvi:	exercises.tex $(LIBS)
+	latex exercises.tex < /dev/null
+	bibtex exercises.tex
+	latex exercises.tex < /dev/null
+
+exercises.pdf:	exercises.tex $(LIBS)
+	pdflatex exercises.tex < /dev/null
+	bibtex exercises.tex
+	pdflatex exercises.tex < /dev/null
+
+tutorial.ps:	tutorial.dvi
+	dvips -f tutorial.dvi > tutorial.ps
+
+tutorial.dvi:	tutorial.tex $(LIBS)
+	latex tutorial.tex < /dev/null
+	bibtex tutorial.tex
+	latex tutorial.tex < /dev/null
+
+tutorial.pdf:	tutorial.tex $(LIBS)
+	pdflatex tutorial.tex < /dev/null
+	bibtex tutorial.tex
+	pdflatex tutorial.tex < /dev/null
+
+dist: reference.pdf reference.ps tutorial.pdf exercises.pdf
 	cp -f reference.pdf $(FTPDIR)/daisy-ref.pdf
 	cp -f reference.ps $(FTPDIR)/daisy-ref.ps
+	cp -f tutorial.pdf $(FTPDIR)/daisy-tut.pdf
 	cp -f exercises.pdf $(FTPDIR)/
 
 cvs: $(TEXT)
