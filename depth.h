@@ -45,7 +45,7 @@ public:
   static Depth* create (double height);
 protected:
   Depth (symbol name);
-  Depth (const AttributeList& al);
+  Depth (Block& al);
 public:
   virtual ~Depth ();
 };

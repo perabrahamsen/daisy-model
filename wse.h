@@ -39,8 +39,7 @@ public:
   // Create and Destroy.
 public:
   static const AttributeList& default_model ();
-  static const AttributeList& none_model ();
-  WSE (const AttributeList& al);
+  WSE (Block& al);
   virtual ~WSE ();
 };
 

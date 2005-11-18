@@ -40,7 +40,7 @@ NetRadiation::output (Log& log) const
   output_value (net_radiation (), "net_radiation", log);
 }
 
-NetRadiation::NetRadiation (const AttributeList& al)
+NetRadiation::NetRadiation (Block& al)
   : name (al.identifier ("type"))
 { }
 
@@ -84,7 +84,7 @@ struct NetRadiationParent : public NetRadiation
     }
 
   // Create & Destroy.
-  NetRadiationParent (const AttributeList& al)
+  NetRadiationParent (Block& al)
     : NetRadiation (al),
       net_radiation_ (0.0)
     { }
@@ -113,7 +113,7 @@ struct NetRadiationBrunt : public NetRadiationParent
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
   
-  NetRadiationBrunt (const AttributeList& al)
+  NetRadiationBrunt (Block& al)
     : NetRadiationParent (al),
       a (al.number ("a", 0.34)),
       b (al.number ("b", 0.14))
@@ -130,7 +130,7 @@ struct NetRadiationIdsoJackson : public NetRadiationParent
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
   
-  NetRadiationIdsoJackson (const AttributeList& al)
+  NetRadiationIdsoJackson (Block& al)
     : NetRadiationParent (al)
     { }
 };
@@ -147,7 +147,7 @@ struct NetRadiationBrutsaert : public NetRadiationParent
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
 
-  NetRadiationBrutsaert (const AttributeList& al)
+  NetRadiationBrutsaert (Block& al)
     : NetRadiationParent (al)
     { }
 };
@@ -162,7 +162,7 @@ struct NetRadiationSwinbank : public NetRadiationParent
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
 
-  NetRadiationSwinbank (const AttributeList& al)
+  NetRadiationSwinbank (Block& al)
     : NetRadiationParent (al)
     { }
 };
@@ -179,7 +179,7 @@ struct NetRadiationSatterlund : public NetRadiationParent
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
 
-  NetRadiationSatterlund (const AttributeList& al)
+  NetRadiationSatterlund (Block& al)
     : NetRadiationParent (al)
     { }
 };
@@ -189,19 +189,19 @@ struct NetRadiationSatterlund : public NetRadiationParent
 static struct NetRadiationSyntax
 {
   static NetRadiation&
-  make_brunt (const AttributeList& al)
+  make_brunt (Block& al)
     { return *new NetRadiationBrunt (al); }
   static NetRadiation&
-  make_idso_jackson (const AttributeList& al)
+  make_idso_jackson (Block& al)
     { return *new NetRadiationIdsoJackson (al); }
   static NetRadiation&
-  make_brutsaert (const AttributeList& al)
+  make_brutsaert (Block& al)
     { return *new NetRadiationBrutsaert (al); }
   static NetRadiation&
-  make_swinbank (const AttributeList& al)
+  make_swinbank (Block& al)
     { return *new NetRadiationSwinbank (al); }
   static NetRadiation&
-  make_satterlund (const AttributeList& al)
+  make_satterlund (Block& al)
     { return *new NetRadiationSatterlund (al); }
 
   NetRadiationSyntax ()

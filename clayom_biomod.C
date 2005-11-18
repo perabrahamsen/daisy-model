@@ -53,7 +53,7 @@ public:
   // Create and Destroy.
 public:
   bool check (const vector<SMB*>& smb, Treelog& err) const;
-  ClayOMBiomod (const AttributeList& al);
+  ClayOMBiomod (Block& al);
   ~ClayOMBiomod ();
 };
 
@@ -225,7 +225,7 @@ and SMB[" << pool << "].efficiency[" << target << "] is "
   return true;
 }
 
-ClayOMBiomod::ClayOMBiomod (const AttributeList& al)
+ClayOMBiomod::ClayOMBiomod (Block& al)
   : ClayOM (al),
     a (al.number ("a")),
 #ifdef OLD_VERSION
@@ -243,7 +243,7 @@ ClayOMBiomod::~ClayOMBiomod ()
 static struct ClayOMBiomodSyntax
 {
   static ClayOM&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new ClayOMBiomod (al); }
 
   ClayOMBiomodSyntax ()

@@ -60,8 +60,8 @@ private:
   // Create and Destroy.
 private:
   friend class HydraulicHypresSyntax;
-  static Hydraulic& make (const AttributeList& al);
-  HydraulicHypres (const AttributeList&);
+  static Hydraulic& make (Block& al);
+  HydraulicHypres (Block&);
   void initialize (const Texture&, double rho_b, bool top_soil,
 		   Treelog& msg);
 public:
@@ -272,7 +272,7 @@ pedotransfer function");
 }
 
 
-HydraulicHypres::HydraulicHypres (const AttributeList& al)
+HydraulicHypres::HydraulicHypres (Block& al)
   : Hydraulic (al),
     soil_type (al.check ("topsoil") 
 	       ? (al.flag ("topsoil") ? top : bottom)
@@ -291,7 +291,7 @@ HydraulicHypres::~HydraulicHypres ()
 // Add the HydraulicHypres syntax to the syntax table.
 
 Hydraulic&
-HydraulicHypres::make (const AttributeList& al)
+HydraulicHypres::make (Block& al)
 {
   return *new HydraulicHypres (al);
 }

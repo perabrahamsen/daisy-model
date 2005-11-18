@@ -95,7 +95,7 @@ public:
 public:
   virtual void has_macropores (bool); // Tell UZ that there is macropores.
 protected:
-  UZmodel (const AttributeList&);
+  UZmodel (Block&);
 public:
   virtual ~UZmodel ();
 };

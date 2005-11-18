@@ -52,7 +52,7 @@ public:
 
   // Create.
 public:
-  TransportCD (const AttributeList& al)
+  TransportCD (Block& al)
     : Transport (al),
       max_time_step_reductions (al.integer ("max_time_step_reductions")),
       ddt (dt)
@@ -359,7 +359,7 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 
 static struct TransportCDSyntax
 {
-  static Transport& make (const AttributeList& al)
+  static Transport& make (Block& al)
   {
     return *new TransportCD (al);
   }

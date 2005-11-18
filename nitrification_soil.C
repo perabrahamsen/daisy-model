@@ -46,7 +46,7 @@ public:
 
   // Create.
 public:
-  NitrificationSoil (const AttributeList&);
+  NitrificationSoil (Block&);
 };
 
 void 
@@ -76,7 +76,7 @@ NitrificationSoil::tick (const double M, const double /* C */,
     NH4 = N2O = NO3 = 0.0;
 }
 
-NitrificationSoil::NitrificationSoil (const AttributeList& al)
+NitrificationSoil::NitrificationSoil (Block& al)
   : Nitrification (al),
     k (al.number ("k")),
     k_10 (al.number ("k_10")),
@@ -87,7 +87,7 @@ NitrificationSoil::NitrificationSoil (const AttributeList& al)
 static struct NitrificationSoilSyntax
 {
   static Nitrification&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new NitrificationSoil (al); }
   NitrificationSoilSyntax ()
   {

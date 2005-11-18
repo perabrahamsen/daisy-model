@@ -27,7 +27,7 @@ Librarian<ClayOM>::Content* Librarian<ClayOM>::content = NULL;
 const char *const ClayOM::description = "\
 Find the effect of clay on organic matter processing.";
 
-ClayOM::ClayOM (const AttributeList& al)
+ClayOM::ClayOM (Block& al)
   : name (al.identifier ("type"))
 { }
 

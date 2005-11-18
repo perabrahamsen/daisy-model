@@ -445,14 +445,14 @@ DOM::initialize (const Soil& soil, const SoilWater& soil_water, Treelog& msg)
   N.initialize (soil, soil_water, *adsorption, msg);
 }
 
-DOM::DOM (const AttributeList& al)
+DOM::DOM (Block& al)
   : C (*new Element (al.alist ("C"))),
     N (*new Element (al.alist ("N"))),
-    trans (Librarian<Transport>::create (al.alist ("transport"))),
-    reserve (Librarian<Transport>::create (al.alist ("reserve"))),
-    last_resort (Librarian<Transport>::create (al.alist ("last_resort"))),
-    mactrans  (Librarian<Mactrans>::create (al.alist ("mactrans"))),
-    adsorption (Librarian<Adsorption>::create (al.alist ("adsorption"))),
+    trans (Librarian<Transport>::build_item (al, "transport")),
+    reserve (Librarian<Transport>::build_item (al, "reserve")),
+    last_resort (Librarian<Transport>::build_item (al, "last_resort")),
+    mactrans  (Librarian<Mactrans>::build_item (al, "mactrans")),
+    adsorption (Librarian<Adsorption>::build_item (al, "adsorption")),
     diffusion_coefficient (al.number ("diffusion_coefficient")),
     turnover_rate (al.check ("turnover_rate")
 		   ? al.number ("turnover_rate")

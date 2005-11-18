@@ -45,8 +45,8 @@ private:
   // Create and Destroy.
 private:
   friend class Hydraulic_mod_CSyntax;
-  static Hydraulic& make (const AttributeList& al);
-  Hydraulic_mod_C (const AttributeList&);
+  static Hydraulic& make (Block& al);
+  Hydraulic_mod_C (Block&);
 public:
   ~Hydraulic_mod_C ();
 };
@@ -111,7 +111,7 @@ Hydraulic_mod_C::Sr (double h) const
     return 1;
 }
 
-Hydraulic_mod_C::Hydraulic_mod_C (const AttributeList& al)
+Hydraulic_mod_C::Hydraulic_mod_C (Block& al)
   : Hydraulic (al),
     h_b (al.number ("h_b")),
     b (al.number ("b"))
@@ -123,7 +123,7 @@ Hydraulic_mod_C::~Hydraulic_mod_C ()
 // Add the Hydraulic_mod_C syntax to the syntax table.
 
 Hydraulic&
-Hydraulic_mod_C::make (const AttributeList& al)
+Hydraulic_mod_C::make (Block& al)
 {
   return *new Hydraulic_mod_C (al);
 }

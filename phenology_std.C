@@ -57,7 +57,7 @@ private:
 
   // Create.
 public:
-  PhenologyStandard (const AttributeList&);
+  PhenologyStandard (Block&);
 };
 
 void
@@ -108,7 +108,7 @@ PhenologyStandard::emergence (double h, double T)
     DS = DS_Emr;
 }
 
-PhenologyStandard::PhenologyStandard (const AttributeList& al)
+PhenologyStandard::PhenologyStandard (Block& al)
   : Phenology (al),
     EmrTSum (al.number ("EmrTSum")),
     EmrSMF (al.plf ("EmrSMF")),
@@ -127,7 +127,7 @@ PhenologyStandard::PhenologyStandard (const AttributeList& al)
 static struct PhenologyStandardSyntax
 {
   static Phenology&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new PhenologyStandard (al); }
 
   PhenologyStandardSyntax ()

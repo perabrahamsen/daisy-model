@@ -196,7 +196,7 @@ Hydraulic::initialize (const Texture&,
     }
 }
 
-Hydraulic::Hydraulic (const AttributeList& al)
+Hydraulic::Hydraulic (Block& al)
   : name (al.identifier ("type")),
     K_init (al.check ("K_at_h")
 	    ? new K_at_h (al.alist ("K_at_h"))
@@ -237,8 +237,7 @@ struct ProgramHydraulic_table : public Program
   { return true; }
   ProgramHydraulic_table (Block& al)
     : Program (al),
-      hydraulic (Librarian<Hydraulic>::create
-		 /**/ (al.alist ("hydraulic"))),
+      hydraulic (Librarian<Hydraulic>::build_item (al, "hydraulic")),
       intervals (al.integer ("intervals"))
   { }
   ~ProgramHydraulic_table ()

@@ -65,7 +65,7 @@ struct Horizon::Implementation
                    int som_size, Treelog& msg);
   static double_map get_attributes (const vector<AttributeList*>& alists);
   static string_map get_dimensions (const vector<AttributeList*>& alists);
-  Implementation (const AttributeList& al);
+  Implementation (Block& al);
   ~Implementation ();
 };
 
@@ -115,7 +115,7 @@ Horizon::Implementation::get_dimensions (const vector<AttributeList*>& alists)
   return result;
 }
 
-Horizon::Implementation::Implementation (const AttributeList& al)
+Horizon::Implementation::Implementation (Block& al)
   : dry_bulk_density (al.number ("dry_bulk_density", -42.42e42)),
     SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
     C_per_N (al.number ("C_per_N", -42.42e42)),
@@ -126,8 +126,7 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     anisotropy (al.number ("anisotropy")),
     attributes (get_attributes (al.alist_sequence ("attributes"))),
     dimensions (get_dimensions (al.alist_sequence ("attributes"))),
-    nitrification (Librarian<Nitrification>::create 
-		   (al.alist ("Nitrification"))),
+    nitrification (Librarian<Nitrification>::build_item (al, "Nitrification")),
     hor_heat (al.alist ("HorHeat"))
 { }
 
@@ -364,13 +363,13 @@ Intended for use with pedotransfer functions.");
   alist.add ("attributes", vector<AttributeList*> ());
 }
 
-Horizon::Horizon (const AttributeList& al)
+Horizon::Horizon (Block& al)
   : impl (new Implementation (al)),
     fast_clay (-42.42e42),
     fast_humus (-42.42e42),
     name (al.identifier ("type")),
-    hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic"))),
-    tortuosity (Librarian<Tortuosity>::create (al.alist ("tortuosity")))
+    hydraulic (Librarian<Hydraulic>::build_item (al, "hydraulic")),
+    tortuosity (Librarian<Tortuosity>::build_item (al, "tortuosity"))
 { }
 
 void 

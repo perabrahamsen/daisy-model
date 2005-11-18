@@ -55,7 +55,7 @@ public:
 
   // Create.
 public:
-  TransportConvection (const AttributeList& al)
+  TransportConvection (Block& al)
     : Transport (al),
       max_time_step_reductions (al.integer ("max_time_step_reductions")),
       ddt (dt)
@@ -193,7 +193,7 @@ TransportConvection::tick (Treelog& msg,
 
 static struct TransportConvectionSyntax
 {
-  static Transport& make (const AttributeList& al)
+  static Transport& make (Block& al)
   {
     return *new TransportConvection (al);
   }

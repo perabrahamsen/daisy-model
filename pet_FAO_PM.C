@@ -65,10 +65,9 @@ public:
   { return potential_evapotranspiration_dry; }
 
   // Create & Destroy.
-  PetFAO_PM (const AttributeList& al)
+  PetFAO_PM (Block& al)
     : Pet (al),
-      net_radiation (Librarian<NetRadiation>::create
-		     (al.alist ("net_radiation")))
+      net_radiation (Librarian<NetRadiation>::build_item (al, "net_radiation"))
   { }
   ~PetFAO_PM ()
   { }
@@ -121,7 +120,7 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const Vegetation& crops,
 static struct PetFAO_PMSyntax
 {
   static Pet&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new PetFAO_PM (al); }
   PetFAO_PMSyntax ()
   {

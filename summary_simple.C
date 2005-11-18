@@ -47,7 +47,7 @@ struct SummarySimple : public Summary
   // Create and Destroy.
   void clear ();
   void initialize (vector<Select*>&, Treelog&);
-  explicit SummarySimple (const AttributeList&);
+  explicit SummarySimple (Block&);
   ~SummarySimple ();
   void summarize (int hours, Treelog&) const;
 };
@@ -66,7 +66,7 @@ SummarySimple::initialize (vector<Select*>& select, Treelog& msg)
   Fetch::initialize (fetch, select, msg);
 }
 
-SummarySimple::SummarySimple (const AttributeList& al)
+SummarySimple::SummarySimple (Block& al)
   : Summary (al),
     description (al.identifier ("description")),
     file (al.name ("where", "")),
@@ -139,7 +139,7 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
 
 static struct SummarySimpleSyntax
 {
-  static Summary& make (const AttributeList& al)
+  static Summary& make (Block& al)
   { return *new SummarySimple (al); }
   SummarySimpleSyntax ()
     {

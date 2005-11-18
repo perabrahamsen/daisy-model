@@ -45,8 +45,8 @@ private:
   // Create and Destroy.
 private:
   friend class HydraulicM_BaCSyntax;
-  static Hydraulic& make (const AttributeList& al);
-  HydraulicM_BaC (const AttributeList&);
+  static Hydraulic& make (Block& al);
+  HydraulicM_BaC (Block&);
 public:
   ~HydraulicM_BaC ();
 };
@@ -105,7 +105,7 @@ HydraulicM_BaC::Se (double h) const
   return result;
 }
 
-HydraulicM_BaC::HydraulicM_BaC (const AttributeList& al)
+HydraulicM_BaC::HydraulicM_BaC (Block& al)
   : Hydraulic (al),
     lambda (al.number ("lambda")),
     h_b (al.number ("h_b"))
@@ -117,7 +117,7 @@ HydraulicM_BaC::~HydraulicM_BaC ()
 // Add the HydraulicM_BaC syntax to the syntax table.
 
 Hydraulic&
-HydraulicM_BaC::make (const AttributeList& al)
+HydraulicM_BaC::make (Block& al)
 {
   return *new HydraulicM_BaC (al);
 }

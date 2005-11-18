@@ -74,7 +74,7 @@ public:
 
   // Create and Destroy.
 public:
-  UZlr (const AttributeList& par);
+  UZlr (Block& par);
   ~UZlr ();
 };
 
@@ -368,7 +368,7 @@ UZlr::output (Log& log) const
   output_variable (q_down, log);
 }
 
-UZlr::UZlr (const AttributeList& al)
+UZlr::UZlr (Block& al)
   : UZmodel (al),
     h_fc (al.number ("h_fc")),
     z_top (al.number ("z_top")),
@@ -382,7 +382,7 @@ UZlr::~UZlr ()
 // Add the UZlr syntax to the syntax table.
 static struct UZlrSyntax
 {
-  static UZmodel& make (const AttributeList& al)
+  static UZmodel& make (Block& al)
     {
       return *new UZlr (al);
     }

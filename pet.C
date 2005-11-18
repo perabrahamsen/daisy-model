@@ -85,9 +85,9 @@ Pet::load_syntax (Syntax& syntax, AttributeList&)
 	      "Reference evapotranspiration for a dry system.");
 }
 
-Pet::Pet (const AttributeList& al)
+Pet::Pet (Block& al)
   : name (al.identifier ("type")),
-    alist (al)
+    alist (al.alist ())
 { }
 
 Pet::~Pet ()

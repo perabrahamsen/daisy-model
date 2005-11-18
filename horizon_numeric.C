@@ -44,7 +44,7 @@ struct HorizonNumeric : public Horizon
   void initialize (bool top_soil, int som_size, Treelog& msg)
   { initialize_base (top_soil, som_size, texture, msg); }
   static const vector<double> normalize (const vector<double>& original);
-  HorizonNumeric (const AttributeList& al)
+  HorizonNumeric (Block& al)
     : Horizon (al),
       texture (al.number_sequence ("limits"),
                normalize (al.number_sequence ("fractions")),
@@ -79,7 +79,7 @@ HorizonNumeric::normalize (const vector<double>& original)
 
 static struct HorizonNumericSyntax
 {
-  static Horizon& make (const AttributeList& al)
+  static Horizon& make (Block& al)
   { return *new HorizonNumeric (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

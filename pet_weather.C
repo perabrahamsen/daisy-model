@@ -52,7 +52,7 @@ struct PetWeather : public Pet
     { return potential_evapotranspiration; }
 
   // Create.
-  PetWeather (const AttributeList& al)
+  PetWeather (Block& al)
     : Pet (al)
     { }
 };
@@ -60,7 +60,7 @@ struct PetWeather : public Pet
 static struct PetWeatherSyntax
 {
   static Pet&
-  make (const AttributeList& al)
+  make (Block& al)
     { return *new PetWeather (al); }
   PetWeatherSyntax ()
     {

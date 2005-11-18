@@ -40,7 +40,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Tortuosity (const AttributeList&);
+  Tortuosity (Block&);
 public:
   virtual ~Tortuosity ();
 };

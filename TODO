@@ -1,6 +1,24 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Installer opgaver på U drev
+
 * WP6
+
+** En "tabel handling"
+
+** Læs breve
+
+*** CZ
+
+*** DK
+
+*** IT
+
+*** PL
+
+*** PT
+
+*** SK
 
 ** Opsætning
 
@@ -16,15 +34,25 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 *** Price of water needed for making FON breakeven for farmers?
 
-* Brev til Wladislaw
-
-Spørg om db værdier for conductivity.
-
 * Check at "Field nitrogen" virker med checkpoints (local variable!)
 
-* Læs excersises igennem
+* Konverter til Block
 
-* Installer opgaver på U drev
+** AM
+
+** Parser
+
+** Rootdens
+
+** Macro
+
+** Action
+
+*** MV_Crop
+
+*** MV_Soil
+
+*** Condition
 
 * WP5 
 

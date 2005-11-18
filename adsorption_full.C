@@ -37,14 +37,14 @@ public:
 
   // Create.
 public:
-  AdsorptionFull (const AttributeList& al)
+  AdsorptionFull (Block& al)
     : Adsorption (al)
   { }
 };
 
 static struct AdsorptionFullSyntax
 {
-  static Adsorption& make (const AttributeList& al)
+  static Adsorption& make (Block& al)
   { return *new AdsorptionFull (al); }
 
   AdsorptionFullSyntax ()

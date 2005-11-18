@@ -64,7 +64,7 @@ struct SummaryBalance : public Summary
   // Create and Destroy.
   void clear ();
   void initialize (vector<Select*>&, Treelog&);
-  explicit SummaryBalance (const AttributeList&);
+  explicit SummaryBalance (Block&);
   bool in_list (size_t i, const vector<symbol>& names) const;
   double find_total (const vector<symbol>& names, 
                      int& max_digits, int hours) const;
@@ -91,7 +91,7 @@ SummaryBalance::initialize (vector<Select*>& select, Treelog& msg)
   Fetch::initialize (fetch, select, msg);
 }
 
-SummaryBalance::SummaryBalance (const AttributeList& al)
+SummaryBalance::SummaryBalance (Block& al)
   : Summary (al),
     description (al.identifier ("description")),
     file (al.name ("where", "")),
@@ -249,7 +249,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
 
 static struct SummaryBalanceSyntax
 {
-  static Summary& make (const AttributeList& al)
+  static Summary& make (Block& al)
   { return *new SummaryBalance (al); }
   SummaryBalanceSyntax ()
     {

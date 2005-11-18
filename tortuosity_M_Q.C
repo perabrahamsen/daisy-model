@@ -36,14 +36,14 @@ public:
 
   // Create.
 public:
-  TortuosityM_Q (const AttributeList& al)
+  TortuosityM_Q (Block& al)
     : Tortuosity (al)
     { }
 };
 
 static struct TortuosityM_QSyntax
 {
-  static Tortuosity& make (const AttributeList& al)
+  static Tortuosity& make (Block& al)
   {
     return *new TortuosityM_Q (al);
   }

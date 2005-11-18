@@ -49,7 +49,7 @@ public:
     }
   // Create.
 public:
-  AdsorptionLinear (const AttributeList& al)
+  AdsorptionLinear (Block& al)
     : Adsorption (al),
       K_clay (al.number ("K_clay", 0.0)),
       K_OC (al.check ("K_OC") ? al.number ("K_OC") : al.number ("K_clay"))
@@ -58,7 +58,7 @@ public:
 
 static struct AdsorptionLinearSyntax
 {
-  static Adsorption& make (const AttributeList& al)
+  static Adsorption& make (Block& al)
   {
     return *new AdsorptionLinear (al);
   }

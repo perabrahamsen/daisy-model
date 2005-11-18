@@ -54,7 +54,7 @@ private:
   // Create and Destroy.
 public:
   void initialize (const Texture&, double rho_b, bool top_soil, Treelog&);
-  Hydraulic_Cosby (const AttributeList&);
+  Hydraulic_Cosby (Block&);
   ~Hydraulic_Cosby ();
 };
 
@@ -156,7 +156,7 @@ Hydraulic_Cosby::initialize (const Texture& texture, double /* rho_b */,
   msg.debug (tmp.str ());
 }
 
-Hydraulic_Cosby::Hydraulic_Cosby (const AttributeList& al)
+Hydraulic_Cosby::Hydraulic_Cosby (Block& al)
   : Hydraulic (al),
     h_b (-42.42e42),
     b (-42.42e42)
@@ -168,7 +168,7 @@ Hydraulic_Cosby::~Hydraulic_Cosby ()
 // Add the Hydraulic_Cosby syntax to the syntax table.
 static struct Hydraulic_CosbySyntax
 {
-  static Hydraulic& make (const AttributeList& al)
+  static Hydraulic& make (Block& al)
   { return *new Hydraulic_Cosby (al); }
 
   Hydraulic_CosbySyntax ()

@@ -36,7 +36,7 @@ struct SVAT_none : public SVAT
   { return -1; }
 
   // Create.
-  SVAT_none (const AttributeList& al)
+  SVAT_none (Block& al)
     : SVAT (al)
   { }
 };
@@ -44,7 +44,7 @@ struct SVAT_none : public SVAT
 static struct SVAT_NoneSyntax
 {
   static SVAT&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new SVAT_none (al); }
   SVAT_NoneSyntax ()
   {

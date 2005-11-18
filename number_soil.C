@@ -61,7 +61,7 @@ Set this to true for the A horizon.");
   }
   NumberByTension (Block& al)
     : Number (al),
-      horizon (Librarian<Horizon>::create (al.alist ("horizon"))),
+      horizon (Librarian<Horizon>::build_item (al, "horizon")),
       h (Librarian<Number>::build_item (al, "h"))
   { horizon->initialize (al.flag ("top_soil"), 2, al.msg ()); }
 };
@@ -176,7 +176,7 @@ struct NumberTensionByTheta : public Number
   }
   NumberTensionByTheta (Block& al)
     : Number (al),
-      horizon (Librarian<Horizon>::create (al.alist ("horizon"))),
+      horizon (Librarian<Horizon>::build_item (al, "horizon")),
                Theta (Librarian<Number>::build_item (al, "Theta"))
   { horizon->initialize (al.flag ("top_soil"), 2, al.msg ()); }
 };

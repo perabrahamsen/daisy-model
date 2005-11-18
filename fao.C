@@ -130,13 +130,14 @@ double
 FAO::RefNetRadiation (double Si, double rad,
 		      double Temp, double ea, Treelog& out)
 {
-  static NetRadiation* net_radiation = NULL;
-  if (net_radiation == NULL)
+  static std::auto_ptr<NetRadiation> net_radiation;
+  if (!net_radiation.get ())
     {
       Syntax syntax;
       AttributeList alist;
       alist.add ("type", "brunt");
-      net_radiation = Librarian<NetRadiation>::create (alist);
+      net_radiation.reset (Librarian<NetRadiation>
+                           ::build_free (out, alist, "net_radiation"));
     }
 
   const double albedo = 0.23;

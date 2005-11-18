@@ -93,7 +93,7 @@ Nitrification::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("N2O_fraction", 0.02);
 }
 
-Nitrification::Nitrification (const AttributeList& al)
+Nitrification::Nitrification (Block& al)
   : name (al.identifier ("type")),
     N2O_fraction (al.number ("N2O_fraction"))
 { }

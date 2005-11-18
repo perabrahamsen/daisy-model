@@ -111,7 +111,7 @@ public:
   // Create and Destroy.
 public:
   void has_macropores (bool); // Tell UZ that there is macropores.
-  UZRichard (const AttributeList& par);
+  UZRichard (Block& par);
   ~UZRichard ();
 };
 
@@ -759,7 +759,7 @@ UZRichard::has_macropores (bool has_them)
     }
 }
 
-UZRichard::UZRichard (const AttributeList& al)
+UZRichard::UZRichard (Block& al)
   : UZmodel (al),
     // Variables.
     q_up (0.0),
@@ -772,20 +772,19 @@ UZRichard::UZRichard (const AttributeList& al)
     max_absolute_difference (al.number ("max_absolute_difference")),
     max_relative_difference (al.number ("max_relative_difference")),
     K_average (al.check ("K_average")
-	       ? Librarian<Average>::create (al.alist ("K_average"))
+	       ? Librarian<Average>::build_item (al, "K_average")
 	       : NULL)
 { }
 
 UZRichard::~UZRichard ()
 { 
-  if (K_average)
-    delete K_average;
+  delete K_average;
 }
 
 // Add the UZRichard syntax to the syntax table.
 static struct UZRichardSyntax
 {
-  static UZmodel& make (const AttributeList& al)
+  static UZmodel& make (Block& al)
     {
       return *new UZRichard (al);
     }

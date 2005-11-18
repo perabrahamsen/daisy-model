@@ -389,7 +389,7 @@ LogTable::LogTable (Block& al)
     print_dimension (al.flag ("print_dimension")),
     print_initial (al.flag ("print_initial")),
     time_columns (al.ok () && !contain_time_columns (entries)),
-    summary (map_create<Summary> (al.alist_sequence ("summary"))),
+    summary (Librarian<Summary>::build_vector (al, "summary")),
     begin (1, 1, 1, 1),
     end (1, 1, 1, 1),
     type (Error),

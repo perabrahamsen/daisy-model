@@ -62,7 +62,7 @@ Phenology::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("day_length", 0.0);
 }
 
-Phenology::Phenology (const AttributeList& al)
+Phenology::Phenology (Block& al)
   : name (al.identifier ("type")),
     // State.
     DAP (al.number ("DAP")),

@@ -44,7 +44,7 @@ private:
 
   // Create.
 public:
-  PhenologyTSum (const AttributeList&);
+  PhenologyTSum (Block&);
 };
 
 void
@@ -93,7 +93,7 @@ PhenologyTSum::emergence (double /*h*/, double T)
     DS = 0.01;
 }
 
-PhenologyTSum::PhenologyTSum (const AttributeList& al)
+PhenologyTSum::PhenologyTSum (Block& al)
   : Phenology (al),
     EmrTSum (al.number ("EmrTSum")),
     EmrThrs (al.number ("EmrThrs")),
@@ -106,7 +106,7 @@ PhenologyTSum::PhenologyTSum (const AttributeList& al)
 static struct PhenologyTSumSyntax
 {
   static Phenology&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new PhenologyTSum (al); }
 
   PhenologyTSumSyntax ()

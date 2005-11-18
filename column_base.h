@@ -49,8 +49,8 @@ protected:
   std::auto_ptr<Vegetation> vegetation;
   std::auto_ptr<Bioclimate> bioclimate;
   Surface surface;
-  Soil soil;
-  SoilWater soil_water;
+  std::auto_ptr<Soil> soil;
+  std::auto_ptr<SoilWater> soil_water;
   SoilHeat soil_heat;
   SoilChemicals soil_chemicals;
   std::vector<Chemistry*> chemistry;

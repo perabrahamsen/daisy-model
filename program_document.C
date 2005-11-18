@@ -126,8 +126,8 @@ struct ProgramDocument : public Program
   { return true; }
   ProgramDocument (Block& al)
     : Program (al),
-       format (Librarian<Format>::create (al.alist ("format"))),
-       print_parameterizations (al.flag ("print_parameterizations"))
+      format (Librarian<Format>::build_item (al, "format")),
+      print_parameterizations (al.flag ("print_parameterizations"))
   { }
   ~ProgramDocument ()
   { }

@@ -46,7 +46,7 @@ public:
 
   // Create.
 public:
-  TransportNone (const AttributeList& al)
+  TransportNone (Block& al)
     : Transport (al)
     { }
 };
@@ -90,7 +90,7 @@ TransportNone::tick (Treelog& msg,
 
 static struct TransportNoneSyntax
 {
-  static Transport& make (const AttributeList& al)
+  static Transport& make (Block& al)
   {
     return *new TransportNone (al);
   }

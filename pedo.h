@@ -53,7 +53,7 @@ public:
   bool check (const Soil&, const std::string& dim,
               Treelog& err) const;
   virtual bool check_nested (const Soil&, Treelog& err) const = 0;
-  Pedotransfer (const AttributeList&);
+  Pedotransfer (Block&);
   virtual ~Pedotransfer ();
 };
 

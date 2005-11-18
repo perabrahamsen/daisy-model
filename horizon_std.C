@@ -39,10 +39,10 @@ struct HorizonStandard : public Horizon
 
   // Create and Destroy.
   static const vector<double>& get_limits ();
-  static const vector<double> get_fractions (const AttributeList& al);
-  static double get_humus (const AttributeList& al);
+  static const vector<double> get_fractions (Block& al);
+  static double get_humus (Block& al);
   void initialize (bool top_soil, int som_size, Treelog& msg);
-  HorizonStandard (const AttributeList& al);
+  HorizonStandard (Block& al);
   ~HorizonStandard ();
 };
 
@@ -60,7 +60,7 @@ HorizonStandard::get_limits ()
 }
 
 const vector<double>
-HorizonStandard::get_fractions (const AttributeList& al)
+HorizonStandard::get_fractions (Block& al)
 {
   daisy_assert (al.check ("sand") || 
 		(al.check ("fine_sand") && al.check ("coarse_sand")));
@@ -83,7 +83,7 @@ HorizonStandard::get_fractions (const AttributeList& al)
 }
 
 double
-HorizonStandard::get_humus (const AttributeList& al)
+HorizonStandard::get_humus (Block& al)
 {
   daisy_assert (al.check ("sand") || 
 		(al.check ("fine_sand") && al.check ("coarse_sand")));
@@ -102,7 +102,7 @@ void
 HorizonStandard::initialize (bool top_soil, int som_size, Treelog& msg)
 { initialize_base (top_soil, som_size, texture, msg); }
 
-HorizonStandard::HorizonStandard (const AttributeList& al)
+HorizonStandard::HorizonStandard (Block& al)
   : Horizon (al),
     texture (get_limits (), get_fractions (al), 
              get_humus (al), 0.0)
@@ -113,7 +113,7 @@ HorizonStandard::~HorizonStandard ()
 
 static struct HorizonStandardSyntax
 {
-  static Horizon& make (const AttributeList& al)
+  static Horizon& make (Block& al)
   { return *new HorizonStandard (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

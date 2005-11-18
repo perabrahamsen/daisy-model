@@ -203,7 +203,7 @@ Options::Options (int& argc, char**& argv,
                       (Librarian<Program>::build_alist (*block, p_alist, 
                                                         "Command line"));
 		    const bool block_ok = block->ok ();
-		    delete block.release ();
+                    block.reset ();
 		    if (block_ok)
 		      program->run (out);
                   }

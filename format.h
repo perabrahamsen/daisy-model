@@ -213,7 +213,7 @@ public:
 public:
   void initialize (std::ostream&);
 protected:
-  Format (const AttributeList& al);
+  Format (Block& al);
 public:
   virtual ~Format ();
 };

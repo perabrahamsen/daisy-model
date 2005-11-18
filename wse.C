@@ -31,7 +31,7 @@ Librarian<WSE>::Content* Librarian<WSE>::content = NULL;
 const char *const WSE::description = "\
 The water stress effect on crop growth.";
 
-WSE::WSE (const AttributeList& al)
+WSE::WSE (Block& al)
   : name (al.identifier ("type"))
 { }
 
@@ -43,7 +43,7 @@ struct WSE_full : public WSE
   double factor (const double water_stress) const
   { return 1.0 - water_stress; }
 
-  WSE_full (const AttributeList& al)
+  WSE_full (Block& al)
     : WSE (al)
   { }
   ~WSE_full ()
@@ -53,7 +53,7 @@ struct WSE_full : public WSE
 
 static struct WSE_fullSyntax
 {
-  static WSE& make (const AttributeList& al)
+  static WSE& make (Block& al)
   { return *new WSE_full (al); }
   WSE_fullSyntax ()
   {
@@ -79,44 +79,6 @@ WSE::default_model ()
   return alist;
 }
 
-struct WSE_none : public WSE
-{
-  double factor (const double) const
-  { return 1.0; }
-
-  WSE_none (const AttributeList& al)
-    : WSE (al)
-  { }
-  ~WSE_none ()
-  { }
-};
-
-const AttributeList& 
-WSE::none_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    alist.add ("type", "none");
-
-  return alist;
-}
-
-static struct WSE_noneSyntax
-{
-  static WSE& make (const AttributeList& al)
-  { return *new WSE_none (al); }
-  WSE_noneSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-               "Water stress has no effect on plant growth.");
-    Librarian<WSE>::add_type ("none", alist, syntax, &make);
-  }
-} WSE_none_syntax;
-
 struct WSE_partial : public WSE
 {
   const double y_half;
@@ -133,7 +95,7 @@ struct WSE_partial : public WSE
     return 1.0 + factor * (1.0 - y_half) / (2.0 * y_half - 1.0); 
   }
 
-  WSE_partial (const AttributeList& al)
+  WSE_partial (Block& al)
     : WSE (al),
       y_half (al.number ("y_half"))
   { }
@@ -143,7 +105,7 @@ struct WSE_partial : public WSE
 
 static struct WSE_partialSyntax
 {
-  static WSE& make (const AttributeList& al)
+  static WSE& make (Block& al)
   { return *new WSE_partial (al); }
   WSE_partialSyntax ()
   {
@@ -192,7 +154,7 @@ struct ProgramWSE_table : public Program
   { return true; }
   ProgramWSE_table (Block& al)
     : Program (al),
-      wse (Librarian<WSE>::create (al.alist ("wse"))),
+      wse (Librarian<WSE>::build_item (al, "wse")),
       intervals (al.integer ("intervals"))
   { }
   ~ProgramWSE_table ()

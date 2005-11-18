@@ -50,7 +50,7 @@ public:
   // Create and Destroy.
 public:
   static const AttributeList& default_model ();
-  Photo (const AttributeList&);
+  Photo (Block&);
   virtual ~Photo ();
 };
 

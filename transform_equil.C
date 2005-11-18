@@ -113,7 +113,8 @@ TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
   {
     Treelog::Open nest (err, "k_AB");
     auto_ptr<Pedotransfer> pedo_AB 
-      (Librarian<Pedotransfer>::create (alist.alist ("k_AB")));
+      (Librarian<Pedotransfer>::build_free (err, alist.alist ("k_AB"), 
+                                            "k_AB"));
     if (pedo_AB->check (soil, "h^-1", err))
       pedo_AB->set (soil, k_AB, "h^-1");
     else
@@ -127,7 +128,8 @@ TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
     {
       Treelog::Open nest (err, "k_BA");
       auto_ptr<Pedotransfer> pedo_BA 
-        (Librarian<Pedotransfer>::create (alist.alist ("k_BA")));
+        (Librarian<Pedotransfer>::build_free (err, alist.alist ("k_BA"),
+                                              "k_BA"));
       if (pedo_BA->check (soil, "h^-1", err))
         pedo_BA->set (soil, k_BA, "h^-1");
       else
@@ -145,7 +147,8 @@ TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
         {
           vector<double> debug;
           auto_ptr<Pedotransfer> pedo_debug 
-            (Librarian<Pedotransfer>::create (*alists[i]));
+            (Librarian<Pedotransfer>::build_free (err, *alists[i],
+                                                  sequence_id ("debug", i)));
           if (pedo_debug->check (soil, pedo_debug->dimension (), err))
             pedo_debug->set (soil, debug, pedo_debug->dimension ());
           else

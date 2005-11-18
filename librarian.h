@@ -98,6 +98,9 @@ public:
       { block.error ("Build failed: " + std::string (err)); }
     return NULL;
   }
+  
+  static T* build_cheat (const AttributeList& parent, const std::string& key)
+  { return build_free (Treelog::null (), parent.alist (key), key); }
 
   static T* build_alist (Block& parent, const AttributeList& alist, 
 			 const std::string& scope_id)

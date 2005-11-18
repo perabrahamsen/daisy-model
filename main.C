@@ -124,7 +124,7 @@ attributes.");
  								  "run"));
       if (!block->ok ())
 	return 1;
-      delete block.release ();
+      block.reset ();
     
       program->initialize (&syntax, &alist, treelog);
       if (!program->check (treelog))

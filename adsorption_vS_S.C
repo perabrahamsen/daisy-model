@@ -56,7 +56,7 @@ public:
 
   // Create.
 public:
-  Adsorption_vS_S (const AttributeList& al)
+  Adsorption_vS_S (Block& al)
     : Adsorption (al)
     { }
 };
@@ -103,7 +103,7 @@ Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M) const
 
 static struct Adsorption_vS_SSyntax
 {
-  static Adsorption& make (const AttributeList& al)
+  static Adsorption& make (Block& al)
   {
     return *new Adsorption_vS_S (al);
   }

@@ -58,8 +58,8 @@ public:
   // Create and Destroy.
 private:
   friend class HydraulicOld2Syntax;
-  static Hydraulic& make (const AttributeList& al);
-  HydraulicOld2 (const AttributeList&);
+  static Hydraulic& make (Block& al);
+  HydraulicOld2 (Block&);
 public:
   virtual ~HydraulicOld2 ();
 };
@@ -95,7 +95,7 @@ HydraulicOld2::M (double h) const
   return lookup (M_, h);
 }
 
-HydraulicOld2::HydraulicOld2 (const AttributeList& al)
+HydraulicOld2::HydraulicOld2 (Block& al)
   : Hydraulic (al)
 { 
   const int M_intervals (al.integer ("M_intervals"));
@@ -163,7 +163,7 @@ HydraulicOld2::~HydraulicOld2 ()
 // Add the HydraulicOld2 syntax to the syntax table.
 
 Hydraulic&
-HydraulicOld2::make (const AttributeList& al)
+HydraulicOld2::make (Block& al)
 {
   return *new HydraulicOld2 (al);
 }

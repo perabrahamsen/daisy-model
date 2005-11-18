@@ -49,8 +49,8 @@ private:
   // Create and Destroy.
 private:
   friend class HydraulicM_vGSyntax;
-  static Hydraulic& make (const AttributeList& al);
-  HydraulicM_vG (const AttributeList&);
+  static Hydraulic& make (Block& al);
+  HydraulicM_vG (Block&);
 public:
   ~HydraulicM_vG ();
 };
@@ -121,7 +121,7 @@ HydraulicM_vG::Se (double h) const
     return 1.0;
 }
 
-HydraulicM_vG::HydraulicM_vG (const AttributeList& al)
+HydraulicM_vG::HydraulicM_vG (Block& al)
   : Hydraulic (al),
     alpha (al.number ("alpha")),
     a (-alpha),
@@ -137,7 +137,7 @@ HydraulicM_vG::~HydraulicM_vG ()
 // Add the HydraulicM_vG syntax to the syntax table.
 
 Hydraulic&
-HydraulicM_vG::make (const AttributeList& al)
+HydraulicM_vG::make (Block& al)
 {
   return *new HydraulicM_vG (al);
 }

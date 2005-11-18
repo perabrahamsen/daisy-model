@@ -21,6 +21,8 @@
 
 #include "pedo.h"
 #include "soil.h"
+#include "treelog_stream.h"
+#include "submodeler.h"
 #include "units.h"
 #include "vcheck.h"
 #include "mathlib.h"
@@ -60,16 +62,16 @@ struct PedotransferIdentity : public Pedotransfer
       }
     return ok;
   }
-  PedotransferIdentity (const AttributeList& al)
+  PedotransferIdentity (Block& al)
     : Pedotransfer (al),
-      child (Librarian<Pedotransfer>::create (al.alist ("value"))),
+      child (Librarian<Pedotransfer>::build_item (al, "value")),
       dim (al.name ("dimension", child->dimension ()))
   { }
 };
 
 static struct PedotransferIdentitySyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferIdentity (al); }
   PedotransferIdentitySyntax ()
   {
@@ -100,9 +102,9 @@ struct PedotransferOperand : public Pedotransfer
     Treelog::Open nest (err, name);
     return operand->check_nested (soil, err); 
   }
-  PedotransferOperand (const AttributeList& al)
+  PedotransferOperand (Block& al)
     : Pedotransfer (al),
-      operand (Librarian<Pedotransfer>::create (al.alist ("operand")))
+      operand (Librarian<Pedotransfer>::build_item (al, "operand"))
   { }
 };
 
@@ -117,14 +119,14 @@ struct PedotransferLog10 : public PedotransferOperand
   }
 
   // Create.
-  PedotransferLog10 (const AttributeList& al)
+  PedotransferLog10 (Block& al)
     : PedotransferOperand (al)
   { }
 };
 
 static struct PedotransferLog10Syntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferLog10 (al); }
   PedotransferLog10Syntax ()
   {
@@ -151,14 +153,14 @@ struct PedotransferLn : public PedotransferOperand
   }
 
   // Create.
-  PedotransferLn (const AttributeList& al)
+  PedotransferLn (Block& al)
     : PedotransferOperand (al)
   { }
 };
 
 static struct PedotransferLnSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferLn (al); }
   PedotransferLnSyntax ()
   {
@@ -185,14 +187,14 @@ struct PedotransferSqrt : public PedotransferOperand
   }
 
   // Create.
-  PedotransferSqrt (const AttributeList& al)
+  PedotransferSqrt (Block& al)
     : PedotransferOperand (al)
   { }
 };
 
 static struct PedotransferSqrtSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferSqrt (al); }
   PedotransferSqrtSyntax ()
   {
@@ -218,14 +220,14 @@ struct PedotransferSqr : public PedotransferOperand
   }
 
   // Create.
-  PedotransferSqr (const AttributeList& al)
+  PedotransferSqr (Block& al)
     : PedotransferOperand (al)
   { }
 };
 
 static struct PedotransferSqrSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferSqr (al); }
   PedotransferSqrSyntax ()
   {
@@ -269,16 +271,16 @@ struct PedotransferPow : public Pedotransfer
       ok = false;
     return ok;
   }
-  PedotransferPow (const AttributeList& al)
+  PedotransferPow (Block& al)
     : Pedotransfer (al),
-      base (Librarian<Pedotransfer>::create (al.alist ("base"))),
-      exponent (Librarian<Pedotransfer>::create (al.alist ("exponent")))
+      base (Librarian<Pedotransfer>::build_item (al, "base")),
+      exponent (Librarian<Pedotransfer>::build_item (al, "exponent"))
   { }
 };
 
 static struct PedotransferPowSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferPow (al); }
   PedotransferPowSyntax ()
   {
@@ -321,20 +323,28 @@ struct PedotransferOperands : public Pedotransfer
   // Create.
   static const struct Unique : public VCheck
   {
-    void check (const Syntax&, const AttributeList& al,
+    void check (const Syntax& syn, const AttributeList& al,
                 const std::string&) const throw (std::string)
     {
       typedef vector<const Pedotransfer*> op_x;
 
+      std::ostringstream tmp;
+      TreelogStream msg (tmp);
+      
+      std::auto_ptr<Block> block (new Block (syn, al, msg, "unique"));
       const struct Operands : public  op_x
       {
-        Operands (const vector<AttributeList*>& as)
-          : op_x (map_create_const<Pedotransfer> (as))
+        Operands (Block& bl, const std::string& key)
+          : op_x (Librarian<Pedotransfer>::build_vector_const (bl, key))
         { }
         ~Operands ()
         { sequence_delete (begin (), end ()); }
-      } operands (al.alist_sequence ("operands"));
-      
+      } operands (*block, "operands");
+      const bool ok = block->ok ();
+      block.reset ();
+      if (ok)
+        throw string ("Build failure: ") + tmp.str ();
+
       const string* found = NULL;
       for (size_t i = 0; i < operands.size (); i++)
         if (known (operands[i]->dimension ()))
@@ -367,10 +377,9 @@ struct PedotransferOperands : public Pedotransfer
       }
     return ok;
   }
-  PedotransferOperands (const AttributeList& al)
+  PedotransferOperands (Block& al)
     : Pedotransfer (al),
-      operands (map_create_const<Pedotransfer> 
-                (al.alist_sequence ("operands")))
+      operands (Librarian<Pedotransfer>::build_vector_const (al, "operands"))
   { }
   ~PedotransferOperands ()
   { sequence_delete (operands.begin (), operands.end ()); }
@@ -397,14 +406,14 @@ struct PedotransferMax : public PedotransferOperands
   { return unique_dimension (); }
 
   // Create.
-  PedotransferMax (const AttributeList& al)
+  PedotransferMax (Block& al)
     : PedotransferOperands (al)
   { }
 };
 
 static struct PedotransferMaxSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferMax (al); }
   PedotransferMaxSyntax ()
   {
@@ -443,14 +452,14 @@ struct PedotransferMin : public PedotransferOperands
   { return unique_dimension (); }
 
   // Create.
-  PedotransferMin (const AttributeList& al)
+  PedotransferMin (Block& al)
     : PedotransferOperands (al)
   { }
 };
 
 static struct PedotransferMinSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferMin (al); }
   PedotransferMinSyntax ()
   {
@@ -484,14 +493,14 @@ struct PedotransferProduct : public PedotransferOperands
   { return Syntax::Unknown (); }
 
   // Create.
-  PedotransferProduct (const AttributeList& al)
+  PedotransferProduct (Block& al)
     : PedotransferOperands (al)
   { }
 };
 
 static struct PedotransferProductSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferProduct (al); }
   PedotransferProductSyntax ()
   {
@@ -522,14 +531,14 @@ struct PedotransferSum : public PedotransferOperands
   { return unique_dimension (); }
 
   // Create.
-  PedotransferSum (const AttributeList& al)
+  PedotransferSum (Block& al)
     : PedotransferOperands (al)
   { }
 };
 
 static struct PedotransferSumSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferSum (al); }
   PedotransferSumSyntax ()
   {
@@ -566,14 +575,14 @@ struct PedotransferSubtract : public PedotransferOperands
   { return unique_dimension (); }
 
   // Create.
-  PedotransferSubtract (const AttributeList& al)
+  PedotransferSubtract (Block& al)
     : PedotransferOperands (al)
   { }
 };
 
 static struct PedotransferSubtractSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferSubtract (al); }
   PedotransferSubtractSyntax ()
   {
@@ -610,14 +619,14 @@ struct PedotransferDivide : public PedotransferOperands
   { return Syntax::Unknown (); }
 
   // Create.
-  PedotransferDivide (const AttributeList& al)
+  PedotransferDivide (Block& al)
     : PedotransferOperands (al)
   { }
 };
 
 static struct PedotransferDivideSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferDivide (al); }
   PedotransferDivideSyntax ()
   {

@@ -47,7 +47,7 @@ public:
 
   // Create and Destroy.
 protected:
-  NetRadiation (const AttributeList&);
+  NetRadiation (Block&);
 public:
   virtual ~NetRadiation ();
 };

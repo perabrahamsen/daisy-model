@@ -74,7 +74,7 @@ public:
   static void load_K_sat (Syntax&, AttributeList&);
   virtual void initialize (const Texture&, double rho_b, bool top_soil,
 			   Treelog&);
-  Hydraulic (const AttributeList&);
+  Hydraulic (Block&);
   virtual ~Hydraulic ();
 };
 

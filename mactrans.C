@@ -28,7 +28,7 @@ Librarian<Mactrans>::Content* Librarian<Mactrans>::content = NULL;
 const char *const Mactrans::description = "\
 Macropore transportation of solutes.";
 
-Mactrans::Mactrans (const AttributeList& al)
+Mactrans::Mactrans (Block& al)
   : name (al.identifier ("type"))
 { }
 

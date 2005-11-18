@@ -93,7 +93,9 @@ public:
   double diffusion_coefficient () const	// [cm^2/h]
     { return diffusion_coefficient_; }
   const AttributeList& solute_alist () const
-    { return solute_alist_; }
+    { 
+      return solute_alist_; 
+    }
   double decompose_rate () const// [h^-1]
     { return decompose_rate_; }
   double decompose_heat_factor (double T) const

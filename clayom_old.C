@@ -40,7 +40,7 @@ public:
 
   // Create and Destroy.
   bool check (const vector<SMB*>& smb, Treelog& err) const;
-  ClayOMOld (const AttributeList& al);
+  ClayOMOld (Block& al);
   ~ClayOMOld ();
 };
 
@@ -78,7 +78,7 @@ bool
 ClayOMOld::check (const vector<SMB*>&, Treelog&) const
 { return true; }
 
-ClayOMOld::ClayOMOld (const AttributeList& al)
+ClayOMOld::ClayOMOld (Block& al)
   : ClayOM (al),
     factor_ (al.plf ("factor"))
 { }
@@ -89,7 +89,7 @@ ClayOMOld::~ClayOMOld ()
 static struct ClayOMOldSyntax
 {
   static ClayOM&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new ClayOMOld (al); }
 
   ClayOMOldSyntax ()

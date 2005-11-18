@@ -49,7 +49,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Mactrans (const AttributeList& al);
+  Mactrans (Block& al);
 public:
   virtual ~Mactrans ();
 };

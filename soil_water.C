@@ -27,6 +27,7 @@
 #include "soil.h"
 #include "surface.h"
 #include "groundwater.h"
+#include "submodeler.h"
 #include "macro.h"
 #include "syntax.h"
 #include "mathlib.h"
@@ -95,7 +96,7 @@ public:
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);
-  Implementation (const AttributeList&);
+  Implementation (Block&);
   void initialize (const AttributeList&, 
 		   const Soil& soil, const Groundwater& groundwater,
 		   Treelog&);
@@ -474,16 +475,16 @@ SoilWater::Implementation::put_h (const Soil& soil,
     Theta[i] = soil.Theta (i, h[i], h_ice[i]);
 }
 
-SoilWater::Implementation::Implementation (const AttributeList& al)
+SoilWater::Implementation::Implementation (Block& al)
   : S_permanent (al.number_sequence ("S_permanent")),
-    top (Librarian<UZmodel>::create (al.alist ("UZtop"))),
+    top (Librarian<UZmodel>::build_item (al, "UZtop")),
     bottom (  al.check ("UZbottom") 
-	    ? Librarian<UZmodel>::create (al.alist ("UZbottom"))
+	    ? Librarian<UZmodel>::build_item (al, "UZbottom")
 	    : 0),
     bottom_start (  al.check ("UZborder") 
 		  ? al.integer ("UZborder")
 		  : -1),
-    reserve (Librarian<UZmodel>::create (al.alist ("UZreserve"))),
+    reserve (Librarian<UZmodel>::build_item (al, "UZreserve")),
     macro (NULL)
 { }
 
@@ -635,33 +636,31 @@ SoilWater::Implementation::~Implementation ()
 {
   daisy_assert (top);
   delete top;
-  if (bottom)
-    delete bottom;
+  delete bottom;
   daisy_assert (reserve);
   delete reserve;
-  if (macro)
-    delete macro;
+  delete macro;
 }
 
 void
 SoilWater::clear (const Geometry& geometry)
-{ impl.clear (geometry); }
+{ impl->clear (geometry); }
 
 void
 SoilWater::root_uptake (const vector<double>& v)
-{ impl.root_uptake (v); }
+{ impl->root_uptake (v); }
 
 void
 SoilWater::drain (const vector<double>& v)
-{ impl.drain (v); }
+{ impl->drain (v); }
 
 void 
 SoilWater::freeze (const Soil& soil, const vector<double>& v)
-{ impl.freeze (soil, v); }
+{ impl->freeze (soil, v); }
 
 double
 SoilWater::h (int i) const
-{ return impl.h[i]; }
+{ return impl->h[i]; }
 
 double
 SoilWater::pF (int i) const
@@ -674,66 +673,66 @@ SoilWater::pF (int i) const
 
 double
 SoilWater::Theta (int i) const
-{ return impl.Theta[i]; }
+{ return impl->Theta[i]; }
 
 double
 SoilWater::Theta_left (int i) const
-{ return impl.Theta[i] - impl.S_sum[i]; }
+{ return impl->Theta[i] - impl->S_sum[i]; }
 
 double
 SoilWater::Theta_old (int i) const
-{ return impl.Theta_old[i]; }
+{ return impl->Theta_old[i]; }
 
 double 
 SoilWater::content (const Geometry& geometry, double from, double to) const
-{ return geometry.total (impl.Theta, from, to); }
+{ return geometry.total (impl->Theta, from, to); }
 
 double
 SoilWater::q (int i) const
 { 
-  return impl.q[i]; 
+  return impl->q[i]; 
 }
 
 double
 SoilWater::q_p (int i) const
-{ return impl.q_p[i]; }
+{ return impl->q_p[i]; }
 
 double
 SoilWater::S_sum (int i) const
-{ return impl.S_sum[i]; }
+{ return impl->S_sum[i]; }
 
 double
 SoilWater::S_root (int i) const
-{ return impl.S_root[i]; }
+{ return impl->S_root[i]; }
 
 double
 SoilWater::S_drain (int i) const
-{ return impl.S_drain[i]; }
+{ return impl->S_drain[i]; }
 
 double
 SoilWater::S_ice (int i) const
-{ return impl.S_ice[i]; }
+{ return impl->S_ice[i]; }
 
 double
 SoilWater::S_p (int i) const
-{ return impl.S_p[i]; }
+{ return impl->S_p[i]; }
 
 double
 SoilWater::h_ice (int i) const
-{ return impl.h_ice[i]; }
+{ return impl->h_ice[i]; }
 
 double
 SoilWater::X_ice (int i) const
-{ return impl.X_ice[i]; }
+{ return impl->X_ice[i]; }
 
 double
 SoilWater::X_ice_total (int i) const
-{ return impl.X_ice[i] + impl.X_ice_buffer[i]; }
+{ return impl->X_ice[i] + impl->X_ice_buffer[i]; }
 
 
 unsigned int 
 SoilWater::first_groundwater_node () const
-{ return impl.first_groundwater_node (); }
+{ return impl->first_groundwater_node (); }
 
 double 
 SoilWater::Theta (const Soil& soil, int i, double h) const
@@ -741,57 +740,57 @@ SoilWater::Theta (const Soil& soil, int i, double h) const
 
 void
 SoilWater::macro_tick (const Soil& soil, Surface& surface, Treelog& out)
-{ impl.macro_tick (soil, surface, out); }
+{ impl->macro_tick (soil, surface, out); }
 
 void
 SoilWater::tick (const Soil& soil, const SoilHeat& soil_heat, 
 		 Surface& surface, Groundwater& groundwater,
 		 Treelog& msg)
-{ impl.tick (soil, soil_heat, surface, groundwater, msg); }
+{ impl->tick (soil, soil_heat, surface, groundwater, msg); }
 
 void 
 SoilWater::set_external_source (const Geometry& geometry, 
 				double amount, double from, double to)
-{ impl.set_external_source (geometry, amount, from, to); }
+{ impl->set_external_source (geometry, amount, from, to); }
 
 void 
 SoilWater::incorporate (const Geometry& geometry, 
                         double amount, double from, double to)
-{ impl.incorporate (geometry, amount, from, to); }
+{ impl->incorporate (geometry, amount, from, to); }
 
 void
 SoilWater::mix (const Soil& soil, double from, double to)
-{ impl.mix (soil, from, to); }
+{ impl->mix (soil, from, to); }
 
 void
 SoilWater::swap (Treelog& msg,
 		 const Soil& soil, double from, double middle, double to)
-{ impl.swap (msg, soil, from, middle, to); }
+{ impl->swap (msg, soil, from, middle, to); }
   
 void
 SoilWater::set_Theta (const Soil& soil, 
 		      unsigned int from, unsigned int to, double Theta)
-{ impl.set_Theta (soil, from, to, Theta); }
+{ impl->set_Theta (soil, from, to, Theta); }
 
 bool 
 SoilWater::check (unsigned n, Treelog& err) const
-{ return impl.check (n, err); }
+{ return impl->check (n, err); }
 
 void 
 SoilWater::output (Log& log) const
-{ impl.output (log); }
+{ impl->output (log); }
 
 double
 SoilWater::MaxExfiltration (const Soil& soil, double T) const
-{ return impl.MaxExfiltration (soil, T); }
+{ return impl->MaxExfiltration (soil, T); }
 
 void 
 SoilWater::put_h (const Soil& soil, const vector<double>& v) // [cm]
-{ impl.put_h (soil, v); }
+{ impl->put_h (soil, v); }
 
 void 
 SoilWater::get_sink (vector<double>& v) const // [h^-1]
-{ v = impl.S_sum; }
+{ v = impl->S_sum; }
 
 void
 SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
@@ -869,18 +868,18 @@ By default, preferential flow is enabled if and only if the combined\n\
 amount of humus and clay in the top horizon is above 5%.");
 }
 
-SoilWater::SoilWater (const AttributeList& al)
-  : impl (*new Implementation (al))
+SoilWater::SoilWater (Block& al)
+  : impl (new Implementation (al))
 { }
 
 void
 SoilWater::initialize (const AttributeList& al,
 		       const Soil& soil, const Groundwater& groundwater, 
 		       Treelog& out)
-{ impl.initialize (al, soil, groundwater, out); }
+{ impl->initialize (al, soil, groundwater, out); }
 
 SoilWater::~SoilWater ()
-{ delete &impl; }
+{ }
 
 static Submodel::Register 
 soil_water_submodel ("SoilWater", SoilWater::load_syntax);

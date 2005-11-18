@@ -73,7 +73,7 @@ struct PetHargreaves : public Pet
     { return potential_evapotranspiration; }
 
   // Create.
-  PetHargreaves (const AttributeList& al)
+  PetHargreaves (Block& al)
     : Pet (al)
     { }
 };
@@ -81,7 +81,7 @@ struct PetHargreaves : public Pet
 static struct PetHargreavesSyntax
 {
   static Pet&
-  make (const AttributeList& al)
+  make (Block& al)
     { return *new PetHargreaves (al); }
   PetHargreavesSyntax ()
     {

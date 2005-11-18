@@ -320,14 +320,14 @@ FormatLaTeX::see_page (const std::string& scope, const std::string& id)
   out () << ")";
 }
 
-FormatLaTeX::FormatLaTeX (const AttributeList& al)
+FormatLaTeX::FormatLaTeX (Block& al)
   : Format (al),
     list_level (0)
 { }
 
 static struct FormatLaTeXSyntax
 {
-  static Format& make (const AttributeList& al)
+  static Format& make (Block& al)
   { return *new FormatLaTeX (al); }
   FormatLaTeXSyntax ()
   {

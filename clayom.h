@@ -50,7 +50,7 @@ public:
 public:
   virtual bool check (const std::vector<SMB*>& smb, Treelog& err) const = 0;
 protected:
-  ClayOM (const AttributeList& al);
+  ClayOM (Block& al);
 public:
   virtual ~ClayOM ();
 };

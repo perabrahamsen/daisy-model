@@ -42,7 +42,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Adsorption (const AttributeList& al);
+  Adsorption (Block& al);
 public:
   virtual ~Adsorption ();
 };

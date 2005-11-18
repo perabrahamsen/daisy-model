@@ -89,7 +89,7 @@ struct FormatPlain : public Format
   void see_page (const std::string& scope, const std::string& id);
 
   // Create and Destroy.
-  explicit FormatPlain (const AttributeList& al)
+  explicit FormatPlain (Block& al)
     : Format (al),
       list_level (0)
   { }
@@ -380,7 +380,7 @@ FormatPlain::see_page (const std::string& scope, const std::string& id)
 
 static struct FormatPlainSyntax
 {
-  static Format& make (const AttributeList& al)
+  static Format& make (Block& al)
   { return *new FormatPlain (al); }
   FormatPlainSyntax ()
   {

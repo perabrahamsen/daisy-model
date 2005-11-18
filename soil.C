@@ -65,9 +65,9 @@ A location and content of a soil layer.");
 		  "Soil properties of this layer.");
       syntax.order ("end", "horizon");
     }
-    Layer (const AttributeList& al)
+    Layer (Block& al)
       : end (al.number ("end")),
-	horizon (Librarian<Horizon>::create (al.alist ("horizon")))
+	horizon (Librarian<Horizon>::build_item (al, "horizon"))
     { }
     ~Layer ()
     { }
@@ -91,8 +91,8 @@ A location and content of a soil layer.");
   }
   
   // Create and Destroy.
-  Implementation (const AttributeList& al)
-    : layers (map_construct<Layer> (al.alist_sequence ("horizons"))),
+  Implementation (Block& al)
+    : layers (map_submodel<Layer> (al, "horizons")),
       original_layer_size (layers.size ()),
       has_zplus (al.check ("zplus")),
       MaxRootingDepth (al.number ("MaxRootingDepth")),
@@ -420,7 +420,7 @@ This attribute is ignored if zplus is specified explicitly.");
   alist.add ("border", default_borders);
 }
   
-Soil::Soil (const AttributeList& al)
+Soil::Soil (Block& al)
   : Geometry (al),
     impl (*new Implementation (al))
 { }
@@ -472,7 +472,8 @@ Soil::initialize (Groundwater& groundwater, const int som_size, Treelog& msg)
       layer_alist.add ("end", new_end);
       layer_alist.add ("horizon", horizon_alist);
       daisy_assert (layer_syntax.check (layer_alist, msg));
-      impl.layers.push_back (new Implementation::Layer (layer_alist));
+      Block block (layer_syntax, layer_alist, msg, "aquitard layer");
+      impl.layers.push_back (new Implementation::Layer (block));
     }
 
   const vector<Implementation::Layer*>::const_iterator begin

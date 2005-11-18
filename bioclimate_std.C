@@ -39,22 +39,20 @@
 #include "time.h"
 #include <sstream>
 
-using namespace std;
-
 struct BioclimateStandard : public Bioclimate
 { 
   // Canopy State.
   const long No;		// No of intervals in canopy discretization.
   double LAI_;			// Total LAI of all crops on this column. [0-]
-  vector<double> Height;	// Height in cm of each endpoint in c.d.
-  vector<double> PAR_;		// PAR of each interval of c.d.
+  std::vector<double> Height;	// Height in cm of each endpoint in c.d.
+  std::vector<double> PAR_;     // PAR of each interval of c.d.
   double shared_light_fraction_; // Fraction of field with light competition.
 
   // Canopy Tick.
   void CanopyStructure (const Vegetation&);
 
   // External water sinks and sources.
-  Pet* pet;			// Potential Evapotranspiration model.
+  std::auto_ptr<Pet> pet;       // Potential Evapotranspiration model.
   double total_ep;		// Potential evapotranspiration [mm/h]
   double total_ea;		// Actual evapotranspiration [mm/h]
 
@@ -103,7 +101,7 @@ struct BioclimateStandard : public Bioclimate
   double soil_ea;		// Actual exfiltration. [mm/h]
 
   // Water transpirated through plant roots.
-  auto_ptr<SVAT> svat;          // Soil Vegetation Atmosphere model.
+  std::auto_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
   double crop_ep;		// Potential transpiration. [mm/h]
   double crop_ea;		// Actual transpiration. [mm/h]
   double production_stress;	// Stress calculated by SVAT module.
@@ -145,9 +143,9 @@ struct BioclimateStandard : public Bioclimate
   void output (Log&) const;
 
   // Canopy.
-  const vector<double>& height () const
+  const std::vector<double>& height () const
   { return Height; }
-  const vector<double>& PAR () const
+  const std::vector<double>& PAR () const
   { return PAR_; }
   double LAI () const
   { return LAI_; }
@@ -200,7 +198,7 @@ struct BioclimateStandard : public Bioclimate
 void 
 BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
 {
-  if (pet)                      // Explicit.
+  if (pet.get ())                      // Explicit.
     return;
 
   Treelog::Open nest (msg, "Bioclimate: " + name);
@@ -229,7 +227,7 @@ BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
   AttributeList alist (library.lookup (type));
   alist.add ("type", type);
   daisy_assert (library.syntax (type).check (alist, msg));
-  pet = Librarian<Pet>::create (alist);
+  pet.reset (Librarian<Pet>::build_free (msg, alist, "pet"));
 }
 
 BioclimateStandard::BioclimateStandard (Block& al)
@@ -240,7 +238,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
     PAR_ (No + 1),
     shared_light_fraction_ (1.0),
     pet (al.check ("pet") 
-         ? Librarian<Pet>::create (al.alist ("pet"))
+         ? Librarian<Pet>::build_item (al, "pet")
          : NULL),
     total_ep (0.0),
     total_ea (0.0),
@@ -277,7 +275,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
     pond_ea (0.0),
     soil_ep (0.0),
     soil_ea (0.0),
-    svat (Librarian<SVAT>::create (al.alist ("svat"))),
+    svat (Librarian<SVAT>::build_item (al, "svat")),
     crop_ep (0.0),
     crop_ea (0.0),
     production_stress (-1.0),
@@ -301,9 +299,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
 { }
 
 BioclimateStandard::~BioclimateStandard ()
-{ 
-  delete pet;
-}
+{ }
 
 void
 BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
@@ -316,7 +312,7 @@ BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
   LAI_ = vegetation.LAI ();
   
   // Reset PAR intervals.
-  fill (Height.begin (), Height.end (), 0.0);
+  std::fill (Height.begin (), Height.end (), 0.0);
 
   if (LAI_ > 0.0)
     {
@@ -337,7 +333,7 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation)
 {
   if (LAI () == 0.0)
     {
-      fill (&PAR_[0], &PAR_[No+1], 0.0);
+      std::fill (&PAR_[0], &PAR_[No+1], 0.0);
       return;
     }
 
@@ -381,7 +377,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   // 1 External water sinks and sources. 
 
   // 1.1 Evapotranspiration
-  daisy_assert (pet != NULL);
+  daisy_assert (pet.get () != NULL);
   pet->tick (time, 
              weather, vegetation, surface, soil, soil_heat, soil_water, msg);
   total_ep = pet->wet ();
@@ -448,7 +444,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   else
     canopy_water_temperature = air_temperature;
 
-  canopy_ea = min (canopy_ep, canopy_water_storage / dt + canopy_water_in);
+  canopy_ea = std::min (canopy_ep, canopy_water_storage / dt + canopy_water_in);
   daisy_assert (canopy_ea >= 0.0);
   total_ea += canopy_ea;
   daisy_assert (total_ea >= 0.0);
@@ -477,7 +473,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   daisy_assert (snow_ea <= total_ep);
   if (litter_ep < 0.0)
     {
-      ostringstream tmp;
+      std::ostringstream tmp;
       tmp << "BUG:\nlitter_ep = " << litter_ep << "\n"
           << "total_ep = " << total_ep << "\n"
           << "snow_ea = " << snow_ea << "\n"
@@ -500,7 +496,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     litter_water_temperature = air_temperature;
 
   daisy_assert (litter_water_storage >= 0.0);
-  litter_ea = max (min (litter_ep,
+  litter_ea = std::max (std::min (litter_ep,
                         litter_water_storage / dt + litter_water_in),
                    0.0);
   total_ea += litter_ea;
@@ -512,7 +508,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     {
       if (litter_water_storage < -1e-8)
         {
-          ostringstream tmp;
+          std::ostringstream tmp;
           tmp << "BUG:\n"
               << "litter_water_storage = " << litter_water_storage << "\n"
               << "litter_water_capacity = " << litter_water_capacity << "\n"
@@ -538,7 +534,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   daisy_assert (litter_ea <= litter_ep);
   if (pond_ep < 0.0)
     {
-      ostringstream tmp;
+      std::ostringstream tmp;
       tmp << "BUG:\npond_ep = " << pond_ep << "\n"
           << "litter_ep = " << litter_ep << "\n"
           << "litter_ea = " << litter_ea << "\n"
@@ -572,7 +568,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     = (pond_ep - pond_ea - soil_ea) * vegetation.EpInterchange ();
   crop_ep = bound (0.0, 
 		   potential_crop_transpiration + potential_soil_transpiration,
-		   max (0.0, pet->dry ()));
+		   std::max (0.0, pet->dry ()));
 
   // Actual transpiration
   const double day_fraction
@@ -682,8 +678,8 @@ BioclimateStandard::ChemicalDistribution (Surface& surface,
 void 
 BioclimateStandard::output (Log& log) const
 {
-  daisy_assert (pet != NULL);
-  output_object (pet, "pet", log);
+  daisy_assert (pet.get () != NULL);
+  output_object (pet.get (), "pet", log);
   output_variable (total_ep, log);
   output_variable (total_ea, log);
   output_value (irrigation_overhead_old, "irrigation_overhead", log);

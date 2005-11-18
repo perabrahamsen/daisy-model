@@ -182,7 +182,7 @@ Format::initialize (std::ostream& o)
   output = &o;
 }
 
-Format::Format (const AttributeList& al)
+Format::Format (Block& al)
   : name (al.identifier ("type")),
     output (NULL)
 { }

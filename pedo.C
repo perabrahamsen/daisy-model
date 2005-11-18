@@ -84,7 +84,7 @@ Pedotransfer::debug_message (const string& name,
   msg.debug (tmp.str ());
 }
 
-Pedotransfer::Pedotransfer (const AttributeList& al)
+Pedotransfer::Pedotransfer (Block& al)
   : name (al.identifier ("type"))
 { }
 

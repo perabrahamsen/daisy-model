@@ -2576,12 +2576,12 @@ OrganicMatter::Implementation::Implementation (Block& al)
     am (map_create <AM> (al.alist_sequence ("am"))),
     smb (map_construct<SMB> (al.alist_sequence ("smb"))),
     som (map_construct<SOM> (al.alist_sequence ("som"))),
-    dom (map_construct<DOM> (al.alist_sequence ("dom"))),
+    dom (map_submodel<DOM> (al, "dom")),
     domsorp (Librarian<Domsorp>::build_vector (al, "domsorp")),
     buffer (al.alist ("buffer")),
     heat_factor (al.plf ("heat_factor")),
     water_factor (al.plf ("water_factor")),
-    clayom (Librarian<ClayOM>::create (al.alist ("ClayOM"))),
+    clayom (Librarian<ClayOM>::build_item (al, "ClayOM")),
     smb_tillage_factor (al.plf_sequence ("smb_tillage_factor")),
     som_tillage_factor (al.plf_sequence ("som_tillage_factor")),
     min_AM_C (al.number ("min_AM_C")),
@@ -2607,16 +2607,16 @@ OrganicMatter::Implementation::~Implementation ()
 
 void 
 OrganicMatter::clear ()
-{ impl.clear (); }
+{ impl->clear (); }
 
 void 
 OrganicMatter::monthly (const Geometry& geometry)
-{ impl.monthly (geometry); }
+{ impl->monthly (geometry); }
 
 size_t
 OrganicMatter::active_size (const Soil& soil, 
                             const SoilWater& soil_water) const
-{ return impl.active_size (soil, soil_water); }
+{ return impl->active_size (soil, soil_water); }
 
 void 
 OrganicMatter::tick (const Soil& soil, 
@@ -2625,50 +2625,50 @@ OrganicMatter::tick (const Soil& soil,
 		     SoilNO3& soil_NO3,
 		     SoilNH4& soil_NH4,
 		     Treelog& msg)
-{ impl.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4, msg); }
+{ impl->tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4, msg); }
 
 void 
 OrganicMatter::transport (const Soil& soil, 
 			  const SoilWater& soil_water, 
 			  Treelog& msg)
-{ impl.transport (soil, soil_water, msg); }
+{ impl->transport (soil, soil_water, msg); }
 
 void 
 OrganicMatter::mix (const Soil& soil,
 		    const SoilWater& soil_water,
 		    double from, double to, double penetration,
 		    const Time& time)
-{ impl.mix (soil, soil_water, from, to, penetration, time); }
+{ impl->mix (soil, soil_water, from, to, penetration, time); }
 
 void 
 OrganicMatter::swap (const Soil& soil,
 		     const SoilWater& soil_water,
 		     double from, double middle, double to,
 		     const Time& time)
-{ impl.swap (soil, soil_water, from, middle, to, time); }
+{ impl->swap (soil, soil_water, from, middle, to, time); }
 
 double
 OrganicMatter::CO2 (unsigned int i) const
 {
-  daisy_assert (impl.CO2_slow.size () > i);
-  daisy_assert (impl.CO2_fast.size () > i);
-  return impl.CO2_slow[i] + impl.CO2_fast[i];
+  daisy_assert (impl->CO2_slow.size () > i);
+  daisy_assert (impl->CO2_fast.size () > i);
+  return impl->CO2_slow[i] + impl->CO2_fast[i];
 }
 
 double
 OrganicMatter::CO2_fast (unsigned int i) const
 {
-  daisy_assert (impl.CO2_fast.size () > i);
-  return impl.CO2_fast[i];
+  daisy_assert (impl->CO2_fast.size () > i);
+  return impl->CO2_fast[i];
 }
 
 double 
 OrganicMatter::get_smb_c_at (unsigned int i) const
-{ return impl.get_smb_c_at (i); }
+{ return impl->get_smb_c_at (i); }
 
 void 
 OrganicMatter::output (Log& log, const Geometry& geometry) const
-{ impl.output (log, geometry); }
+{ impl->output (log, geometry); }
 
 bool
 OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
@@ -2689,13 +2689,13 @@ OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
 	    {
 	      vector<double> fractions
 		= om_alist[i]->number_sequence ("fractions");
-	      if (fractions.size () != impl.smb.size () + 1 + impl.dom.size ()
-		  && fractions.size () != impl.smb.size () + 1)
+	      if (fractions.size () != impl->smb.size () + 1 + impl->dom.size ()
+		  && fractions.size () != impl->smb.size () + 1)
 		{
 		  std::ostringstream tmp;
 		  tmp << "You have " << fractions.size ()
-			 << " fractions but " << impl.smb.size ()
-			 << " smb, 1 som buffer and " << impl.dom.size () 
+			 << " fractions but " << impl->smb.size ()
+			 << " smb, 1 som buffer and " << impl->dom.size () 
 			 << " dom";
 		  err.entry (tmp.str ());
 		  ok = false;
@@ -2718,45 +2718,43 @@ OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
 
 int 
 OrganicMatter::som_pools () const
-{ return impl.som.size (); }
+{ return impl->som.size (); }
 
 bool
 OrganicMatter::check (const Soil& soil, Treelog& err) const
-{ return impl.check (soil, err); }
+{ return impl->check (soil, err); }
 
 void 
 OrganicMatter::add (AM& am)
-{ impl.add (am); }
+{ impl->add (am); }
 
 void 
 OrganicMatter::fertilize (const AttributeList& al,
                           const Soil& soil)
-{ impl.fertilize (al, soil); }
+{ impl->fertilize (al, soil); }
 
 void 
 OrganicMatter::fertilize (const AttributeList& al,
                           const Soil& soil,
                           double from, double to)
-{ impl.fertilize (al, soil, from, to); }
+{ impl->fertilize (al, soil, from, to); }
 
 AM* 
 OrganicMatter::find_am (const symbol sort, const symbol part) const
-{ return impl.find_am (sort, part); }
+{ return impl->find_am (sort, part); }
 
 void
 OrganicMatter::initialize (const AttributeList& al, 
 			   const Soil& soil, const SoilWater& soil_water, 
 			   double T_avg, Treelog& err)
-{ impl.initialize (al, soil, soil_water, T_avg, err); }
+{ impl->initialize (al, soil, soil_water, T_avg, err); }
 
-OrganicMatter::OrganicMatter (Block& parent, const std::string& key)
-  : impl (*submodel<Implementation> (parent, key))
+OrganicMatter::OrganicMatter (Block& al)
+  : impl (new Implementation (al))
 { }
 
 OrganicMatter::~OrganicMatter ()
-{
-  delete &impl;
-}
+{ }
 
 static bool 
 check_alist (const AttributeList& al, Treelog& err)

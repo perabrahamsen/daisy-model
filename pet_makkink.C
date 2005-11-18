@@ -55,7 +55,7 @@ struct PetMakkink : public Pet
     { return potential_evapotranspiration; }
 
   // Create.
-  PetMakkink (const AttributeList& al)
+  PetMakkink (Block& al)
     : Pet (al)
     { }
 };
@@ -63,7 +63,7 @@ struct PetMakkink : public Pet
 static struct PetMakkinkSyntax
 {
   static Pet&
-  make (const AttributeList& al)
+  make (Block& al)
     { return *new PetMakkink (al); }
   PetMakkinkSyntax ()
     {

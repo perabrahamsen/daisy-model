@@ -61,11 +61,11 @@ public:
   void initialize (const Time& time, Treelog& err, 
 		   const Weather* global_weather)
   {
-    soil.initialize (*groundwater, -1, err);
+    soil->initialize (*groundwater, -1, err);
     Treelog::Open nest (err, name);
     if (!initialize_common (time, err, global_weather))
       return;
-    vegetation->initialize (time, soil, NULL, err);
+    vegetation->initialize (time, *soil, NULL, err);
   }
   Column& clone (symbol name) const
   { 
@@ -85,7 +85,7 @@ public:
 
 void 
 ColumnInorganic::sow (Treelog& msg, const AttributeList& al)
-{ vegetation->sow (msg, al, soil); }
+{ vegetation->sow (msg, al, *soil); }
 
 
 void
@@ -152,20 +152,20 @@ ColumnInorganic::tick (Treelog& out,
 
   // Early calculation.
   surface.mixture (soil_chemicals);
-  soil_water.macro_tick (soil, surface, out);
+  soil_water->macro_tick (*soil, surface, out);
 
   bioclimate->tick (time, surface, my_weather, 
-                    *vegetation, soil, soil_water, soil_heat, out);
-  vegetation->tick (time, *bioclimate, soil, NULL, soil_heat, soil_water,
+                    *vegetation, *soil, *soil_water, soil_heat, out);
+  vegetation->tick (time, *bioclimate, *soil, NULL, soil_heat, *soil_water,
 		   NULL, NULL, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, out);
-  groundwater->tick (soil, soil_water, surface.h (), soil_heat, time, out);
+  groundwater->tick (*soil, *soil_water, surface.h (), soil_heat, time, out);
 
   // Transport.
-  soil_heat.tick (time, soil, soil_water, surface, my_weather);
-  soil_water.tick (soil, soil_heat,surface, *groundwater, out);
-  soil_chemicals.tick (soil, soil_water, soil_heat, NULL, 
+  soil_heat.tick (time, *soil, *soil_water, surface, my_weather);
+  soil_water->tick (*soil, soil_heat,surface, *groundwater, out);
+  soil_chemicals.tick (*soil, *soil_water, soil_heat, NULL, 
 		       surface.chemicals_down (), out);
 }
 
@@ -179,7 +179,7 @@ ColumnInorganic::check_inner (Treelog& err) const
   bool ok = true;
   {
     Treelog::Open nest (err, "Soil");
-    if (!soil.check (-1, err))
+    if (!soil->check (-1, err))
       ok = false;
   }
   return ok;

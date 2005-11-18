@@ -27,7 +27,7 @@ Librarian<Photo>::Content* Librarian<Photo>::content = NULL;
 const char *const Photo::description = "\
 Leaf photosynthesis.";
 
-Photo::Photo (const AttributeList& al)
+Photo::Photo (Block& al)
   : name (al.identifier ("type"))
 { }
 

@@ -69,10 +69,9 @@ public:
     }
 
   // Create & Destroy.
-  PetPM (const AttributeList& al)
+  PetPM (Block& al)
     : Pet (al),
-      net_radiation (Librarian<NetRadiation>::create
-		     (al.alist ("net_radiation")))
+      net_radiation (Librarian<NetRadiation>::build_item (al, "net_radiation"))
     { }
   ~PetPM ()
     { }
@@ -150,7 +149,7 @@ PetPM::tick (const Time&, const Weather& weather, const Vegetation& crops,
 static struct PetPMSyntax
 {
   static Pet&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new PetPM (al); }
   PetPMSyntax ()
   {

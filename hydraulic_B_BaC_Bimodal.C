@@ -48,8 +48,8 @@ private:
   // Create and Destroy.
 private:
   friend class HydraulicB_BaC_BimodalSyntax;
-  static Hydraulic& make (const AttributeList& al);
-  HydraulicB_BaC_Bimodal (const AttributeList&);
+  static Hydraulic& make (Block& al);
+  HydraulicB_BaC_Bimodal (Block&);
 public:
   ~HydraulicB_BaC_Bimodal ();
 };
@@ -116,7 +116,7 @@ HydraulicB_BaC_Bimodal::Se (double h) const
     return 1;
 }
 
-HydraulicB_BaC_Bimodal::HydraulicB_BaC_Bimodal (const AttributeList& al)
+HydraulicB_BaC_Bimodal::HydraulicB_BaC_Bimodal (Block& al)
   : Hydraulic (al),
     lambda (al.number ("lambda")),
     h_b (al.number ("h_b")),
@@ -130,7 +130,7 @@ HydraulicB_BaC_Bimodal::~HydraulicB_BaC_Bimodal ()
 // Add the HydraulicB_BaC_Bimodal syntax to the syntax table.
 
 Hydraulic&
-HydraulicB_BaC_Bimodal::make (const AttributeList& al)
+HydraulicB_BaC_Bimodal::make (Block& al)
 {
   return *new HydraulicB_BaC_Bimodal (al);
 }

@@ -289,16 +289,15 @@ Only for initialization of the 'M' parameter.");
 Solute::Solute (const AttributeList& al)
   : submodel (al.name ("submodel")),
     S_permanent (al.number_sequence ("S_permanent")),
-    transport (Librarian<Transport>::create (al.alist ("transport"))),
-    reserve (Librarian<Transport>::create (al.alist ("reserve"))),
-    last_resort (Librarian<Transport>::create (al.alist ("last_resort"))),
-    mactrans  (Librarian<Mactrans>::create (al.alist ("mactrans"))),
-    adsorption (Librarian<Adsorption>::create (al.alist ("adsorption")))
+    transport (Librarian<Transport>::build_cheat (al, "transport")),
+    reserve (Librarian<Transport>::build_cheat (al, "reserve")),
+    last_resort (Librarian<Transport>::build_cheat (al, "last_resort")),
+    mactrans  (Librarian<Mactrans>::build_cheat (al, "mactrans")),
+    adsorption (Librarian<Adsorption>::build_cheat (al, "adsorption"))
 { }
 
 Solute::~Solute ()
-{ 
-}
+{ }
 
 void 
 Solute::incorporate (const Geometry& geometry, 

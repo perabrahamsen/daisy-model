@@ -71,7 +71,7 @@ public:
     }
   // Create and Destroy.
 public:
-  UZNone (const AttributeList& al)
+  UZNone (Block& al)
     : UZmodel (al)
     { }
   ~UZNone ()
@@ -81,7 +81,7 @@ public:
 // Add the UZNone syntax to the syntax table.
 static struct UZNoneSyntax
 {
-  static UZmodel& make (const AttributeList& al)
+  static UZmodel& make (Block& al)
     {
       return *new UZNone (al);
     }

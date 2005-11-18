@@ -41,7 +41,7 @@ private:
   
   // Create and Destroy.
 public:
-  HydraulicB_C (const AttributeList&);
+  HydraulicB_C (Block&);
   ~HydraulicB_C ();
 };
 
@@ -93,7 +93,7 @@ HydraulicB_C::Sr (double h) const
     return 1;
 }
 
-HydraulicB_C::HydraulicB_C (const AttributeList& al)
+HydraulicB_C::HydraulicB_C (Block& al)
   : Hydraulic (al),
     h_b (al.number ("h_b")),
     b (al.number ("b"))
@@ -106,7 +106,7 @@ HydraulicB_C::~HydraulicB_C ()
 
 static struct HydraulicB_CSyntax
 {
-  static Hydraulic& make (const AttributeList& al)
+  static Hydraulic& make (Block& al)
     {
       return *new HydraulicB_C (al);
     }

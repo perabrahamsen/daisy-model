@@ -25,6 +25,7 @@
 
 #include "macro.h"		// Must be initialized.
 #include <vector>
+#include <memory>
 
 class AttributeList;
 class Surface;
@@ -40,7 +41,7 @@ class SoilWater
 {
   // Content.
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
 
   // Sink.
 public:
@@ -97,7 +98,7 @@ public:
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);
-  SoilWater (const AttributeList&);
+  SoilWater (Block&);
   void initialize (const AttributeList&, 
 		   const Soil& soil, const Groundwater& groundwater,
 		   Treelog&);

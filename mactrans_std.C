@@ -43,7 +43,7 @@ struct MactransStandard : public Mactrans
     { }
 
   // Create and Destroy.
-  MactransStandard (const AttributeList& al)
+  MactransStandard (Block& al)
     : Mactrans (al)
     { }
   ~MactransStandard ()
@@ -179,7 +179,7 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 static struct MactransStandardSyntax
 {
   static Mactrans&
-  make (const AttributeList& al)
+  make (Block& al)
     { return *new MactransStandard (al); }
   MactransStandardSyntax ()
     {

@@ -41,8 +41,8 @@ public:
   // Create and Destroy.
 private:
   friend class HydraulicYoloSyntax;
-  static Hydraulic& make (const AttributeList& al);
-  HydraulicYolo (const AttributeList&);
+  static Hydraulic& make (Block& al);
+  HydraulicYolo (Block&);
 public:
   virtual ~HydraulicYolo ();
 };
@@ -93,7 +93,7 @@ HydraulicYolo::M (double h) const
   return M_ (h);
 }
 
-HydraulicYolo::HydraulicYolo (const AttributeList& al)
+HydraulicYolo::HydraulicYolo (Block& al)
   : Hydraulic (al),
     M_intervals (al.integer ("M_intervals")),
     M_ ()
@@ -105,7 +105,7 @@ HydraulicYolo::~HydraulicYolo ()
 // Add the HydraulicYolo syntax to the syntax table.
 
 Hydraulic&
-HydraulicYolo::make (const AttributeList& al)
+HydraulicYolo::make (Block& al)
 {
   return *new HydraulicYolo (al);
 }

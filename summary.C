@@ -27,7 +27,7 @@ Librarian<Summary>::Content* Librarian<Summary>::content = NULL;
 const char *const Summary::description = "\
 Summary reports for log parameterizations.";
 
-Summary::Summary (const AttributeList& al)
+Summary::Summary (Block& al)
   : name (al.identifier ("type"))
 { }
 

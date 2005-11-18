@@ -33,14 +33,14 @@ public:
 
   // Create.
 public:
-  AdsorptionNone (const AttributeList& al)
+  AdsorptionNone (Block& al)
     : Adsorption (al)
     { }
 };
 
 static struct AdsorptionNoneSyntax
 {
-  static Adsorption& make (const AttributeList& al)
+  static Adsorption& make (Block& al)
   {
     return *new AdsorptionNone (al);
   }

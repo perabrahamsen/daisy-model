@@ -25,6 +25,7 @@
 
 #include "clayom.h" // Must be included here to ensure correct initialization.
 #include "domsorp.h" // Ditto.
+#include <memory>
 
 class AttributeList;
 class Syntax;
@@ -44,7 +45,7 @@ class OrganicMatter
   // Content.
 private:
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
   
   // Simulation.
 public:
@@ -84,7 +85,7 @@ private:
   OrganicMatter (const OrganicMatter&);
   OrganicMatter& operator= (const OrganicMatter&);
 public:
-  explicit OrganicMatter (Block& parent, const std::string& key);
+  explicit OrganicMatter (Block&);
   ~OrganicMatter ();
 };
 

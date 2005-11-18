@@ -49,7 +49,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Transport (const AttributeList&);
+  Transport (Block&);
 public:
   virtual ~Transport ();
 };

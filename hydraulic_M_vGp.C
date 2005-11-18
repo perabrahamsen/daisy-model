@@ -54,8 +54,8 @@ private:
   // Create and Destroy.
 private:
   friend class HydraulicM_vGpSyntax;
-  static Hydraulic& make (const AttributeList& al);
-  HydraulicM_vGp (const AttributeList&);
+  static Hydraulic& make (Block& al);
+  HydraulicM_vGp (Block&);
 public:
   ~HydraulicM_vGp ();
 };
@@ -131,7 +131,7 @@ HydraulicM_vGp::Se (double h) const
     return 1.0;
 }
 
-HydraulicM_vGp::HydraulicM_vGp (const AttributeList& al)
+HydraulicM_vGp::HydraulicM_vGp (Block& al)
   : Hydraulic (al),
     alpha (al.number ("alpha")),
     a (-alpha),
@@ -150,7 +150,7 @@ HydraulicM_vGp::~HydraulicM_vGp ()
 // Add the HydraulicM_vGp syntax to the syntax table.
 
 Hydraulic&
-HydraulicM_vGp::make (const AttributeList& al)
+HydraulicM_vGp::make (Block& al)
 {
   return *new HydraulicM_vGp (al);
 }

@@ -41,7 +41,7 @@ struct PedotransferConst : public Pedotransfer
   // Create.
   bool check_nested (const Soil&, Treelog&) const
   { return true; }
-  PedotransferConst (const AttributeList& al)
+  PedotransferConst (Block& al)
     : Pedotransfer (al),
       val (al.number ("value")),
       dim (al.name ("value"))
@@ -60,7 +60,7 @@ struct PedotransferLeaf : public Pedotransfer
   // Create.
   bool check_nested (const Soil&, Treelog&) const
   { return true; }
-  PedotransferLeaf (const AttributeList& al)
+  PedotransferLeaf (Block& al)
     : Pedotransfer (al),
       dim (al.name ("dimension"))
   { }
@@ -76,7 +76,7 @@ struct PedotransferHumus : public PedotransferLeaf
   }
 
   // Create.
-  PedotransferHumus (const AttributeList& al)
+  PedotransferHumus (Block& al)
     : PedotransferLeaf (al)
   { }
 };
@@ -91,7 +91,7 @@ struct PedotransferMineral : public PedotransferLeaf
   }
 
   // Create.
-  PedotransferMineral (const AttributeList& al)
+  PedotransferMineral (Block& al)
     : PedotransferLeaf (al)
   { }
 };
@@ -105,7 +105,7 @@ struct PedotransferRho_B : public PedotransferLeaf
   }
 
   // Create.
-  PedotransferRho_B (const AttributeList& al)
+  PedotransferRho_B (Block& al)
     : PedotransferLeaf (al)
   { }
 };
@@ -123,7 +123,7 @@ struct PedotransferBelow : public PedotransferLeaf
   }
 
   // Create.
-  PedotransferBelow (const AttributeList& al)
+  PedotransferBelow (Block& al)
     : PedotransferLeaf (al),
       size (al.number ("size"))
   { }
@@ -165,7 +165,7 @@ struct PedotransferGet : public PedotransferLeaf
     return ok;
   }
 
-  PedotransferGet (const AttributeList& al)
+  PedotransferGet (Block& al)
     : PedotransferLeaf (al),
       name (al.name ("name"))
   { }
@@ -173,7 +173,7 @@ struct PedotransferGet : public PedotransferLeaf
 
 static struct PedotransferConstSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferConst (al); }
   PedotransferConstSyntax ()
   {
@@ -191,7 +191,7 @@ static struct PedotransferConstSyntax
 
 static struct PedotransferHumusSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferHumus (al); }
   PedotransferHumusSyntax ()
   {
@@ -210,7 +210,7 @@ static struct PedotransferHumusSyntax
 
 static struct PedotransferMineralSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferMineral (al); }
   PedotransferMineralSyntax ()
   {
@@ -229,7 +229,7 @@ static struct PedotransferMineralSyntax
 
 static struct PedotransferRho_BSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferRho_B (al); }
   PedotransferRho_BSyntax ()
   {
@@ -249,7 +249,7 @@ static struct PedotransferRho_BSyntax
 
 static struct PedotransferBelowSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferBelow (al); }
   PedotransferBelowSyntax ()
   {
@@ -270,7 +270,7 @@ static struct PedotransferBelowSyntax
 
 static struct PedotransferGetSyntax
 {
-  static Pedotransfer& make (const AttributeList& al)
+  static Pedotransfer& make (Block& al)
   { return *new PedotransferGet (al); }
   PedotransferGetSyntax ()
   {

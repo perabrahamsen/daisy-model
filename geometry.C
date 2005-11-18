@@ -363,7 +363,7 @@ The end points are listed descending from the surface to the bottom.");
   syntax.add_check ("zplus", zplus_check);
 }
   
-Geometry::Geometry (const AttributeList& al)
+Geometry::Geometry (Block& al)
 { 
   if (al.check ("zplus"))
     zplus_ = al.number_sequence ("zplus");

@@ -63,7 +63,7 @@ public:
     }
   // Create.
 public:
-  AdsorptionLangmuir (const AttributeList& al)
+  AdsorptionLangmuir (Block& al)
     : Adsorption (al),
       K (al.number ("K")),
       my_max_clay (al.number ("my_max_clay", 0.0)),
@@ -75,7 +75,7 @@ public:
 
 static struct AdsorptionLangmuirSyntax
 {
-  static Adsorption& make (const AttributeList& al)
+  static Adsorption& make (Block& al)
   {
     return *new AdsorptionLangmuir (al);
   }

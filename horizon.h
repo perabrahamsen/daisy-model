@@ -80,10 +80,12 @@ public:
   void output (Log&) const;
 
   // Create and Destroy.
+private:
+  Horizon (const Horizon&);
 public:
   static bool check_alist (const AttributeList& al, Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
-  Horizon (const AttributeList&);
+  explicit Horizon (Block&);
   virtual void initialize (bool top_soil, int som_size, Treelog&) = 0;
 protected:
   void initialize_base (bool top_soil, int som_size, const Texture& texture, 

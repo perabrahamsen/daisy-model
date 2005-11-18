@@ -37,7 +37,7 @@ Librarian<Depth>::Content* Librarian<Depth>::content = NULL;
 const char *const Depth::description = "\
 Find the depth of two numbers.";
 
-Depth::Depth (const AttributeList& al)
+Depth::Depth (Block& al)
   : name (al.identifier ("type"))
 { }
 
@@ -61,7 +61,7 @@ struct DepthConst : public Depth
   { }
   virtual bool check (Treelog&) const
   { return true; }
-  DepthConst (const AttributeList& al)
+  DepthConst (Block& al)
     : Depth (al),
       value (al.number ("value"))
   { }
@@ -79,7 +79,7 @@ Depth::create (const double height)
 
 static struct DepthConstSyntax
 {
-  static Depth& make (const AttributeList& al)
+  static Depth& make (Block& al)
   { return *new DepthConst (al); }
   DepthConstSyntax ()
   {
@@ -120,7 +120,7 @@ struct DepthPLF : public Depth
       }
     return result;
   }
-  DepthPLF (const AttributeList& al)
+  DepthPLF (Block& al)
     : Depth (al),
       start (al.alist_sequence ("table")[0]->alist ("time")),
       value (convert_to_plf (al.alist_sequence ("table")))
@@ -161,7 +161,7 @@ static struct DepthPLFSyntax
                 "Depth.");
     syntax.order ("time", "value");
   }
-  static Depth& make (const AttributeList& al)
+  static Depth& make (Block& al)
   { return *new DepthPLF (al); }
   DepthPLFSyntax ()
   {
@@ -282,7 +282,7 @@ struct DepthFile : public Depth
   }
   virtual bool check (Treelog&) const
   { return state == State::ok; }
-  DepthFile (const AttributeList& al)
+  DepthFile (Block& al)
     : Depth (al),
       file (al.name ("file")),
       state (State::uninitialized),
@@ -294,7 +294,7 @@ struct DepthFile : public Depth
 
 static struct DepthFileSyntax
 {
-  static Depth& make (const AttributeList& al)
+  static Depth& make (Block& al)
   { return *new DepthFile (al); }
 
   DepthFileSyntax ()

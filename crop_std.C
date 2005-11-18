@@ -494,17 +494,15 @@ CropStandard::CropStandard (Block& al)
     canopy (al.alist ("Canopy")),
     harvesting (al.alist ("Harvest")),
     production (al.alist ("Prod")),
-    development (Librarian<Phenology>::create (al.alist ("Devel"))),
+    development (Librarian<Phenology>::build_item (al, "Devel")),
     partition (al.alist ("Partit")),
     vernalization (al.check ("Vernal")
                    ? al.alist ("Vernal")
                    : Vernalization::no_vernalization ()),
-    photo (Librarian<Photo>::create (al.alist ("LeafPhot"))),
+    photo (Librarian<Photo>::build_item (al, "LeafPhot")),
     nitrogen (al.alist ("CrpN")),
-    water_stress_effect (Librarian<WSE>::create 
-                         (!al.flag ("enable_water_stress")
-                          ? WSE::none_model ()
-                          : al.alist ("water_stress_effect"))),
+    water_stress_effect (Librarian<WSE>::build_item (al, 
+                                                     "water_stress_effect")),
     enable_N_stress (al.flag ("enable_N_stress")),
     min_light_fraction (al.number ("min_light_fraction"))
 { }
@@ -548,10 +546,6 @@ CropStandardSyntax::CropStandardSyntax ()
   syntax.add_submodule ("CrpN", alist, Syntax::State,
 			"Nitrogen parameters.", CrpN::load_syntax);
 
-  syntax.add ("enable_water_stress", Syntax::Boolean, Syntax::Const,
-	      "Set this to true to let water stress limit production.\n\
-OBSOLETE: Use water_stress_effect none instead.");
-  alist.add ("enable_water_stress", true);
   syntax.add ("water_stress_effect", Librarian<WSE>::library (), 
               Syntax::Const, Syntax::Singleton,
 	      "Effect of water stress on production.");

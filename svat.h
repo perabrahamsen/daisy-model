@@ -54,7 +54,7 @@ public:
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);
 protected:
-  SVAT (const AttributeList&);
+  SVAT (Block&);
 public:
   virtual ~SVAT ();
 };

@@ -68,7 +68,7 @@ struct FormatLaTeX : public Format
   void see_page (const std::string& scope, const std::string& id);
 
   // Create and Destroy.
-  explicit FormatLaTeX (const AttributeList&);
+  explicit FormatLaTeX (Block&);
 };
 
 // format_LaTeX.h ends here.

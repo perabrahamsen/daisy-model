@@ -27,6 +27,7 @@
 #include <vector>
 #include <string>
 
+class Block;
 class AttributeList;
 class Treelog;
 class Groundwater;
@@ -82,7 +83,7 @@ public:
   bool check (Treelog&) const;
 protected:
   static void load_syntax (Syntax&, AttributeList&);
-  Geometry (const AttributeList&);
+  Geometry (Block&);
   void initialize_zplus (const Groundwater& groundwater,
 			 const std::vector<double>& fixed,
 			 const double max_rooting_depth,

@@ -93,7 +93,7 @@ public:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   void initialize (const Soil&, const SoilWater&, Treelog&);
-  DOM (const AttributeList& al);
+  DOM (Block& al);
   ~DOM ();
 };
 

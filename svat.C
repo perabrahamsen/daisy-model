@@ -40,7 +40,7 @@ void
 SVAT::load_syntax (Syntax&, AttributeList&)
 { }
 
-SVAT::SVAT (const AttributeList& al)
+SVAT::SVAT (Block& al)
   : name (al.identifier ("type"))
 { }
 

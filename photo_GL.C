@@ -59,7 +59,7 @@ public:
   
   // Create and Destroy.
 public:
-  PhotoGL (const AttributeList& al)
+  PhotoGL (Block& al)
     : Photo (al),
       Qeff (al.number ("Qeff")),
       Fm (al.number ("Fm")),
@@ -172,7 +172,7 @@ Photo::default_model ()
 static struct Photo_GLSyntax
 {
   static Photo&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new PhotoGL (al); }
   Photo_GLSyntax ()
   {

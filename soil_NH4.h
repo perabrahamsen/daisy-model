@@ -33,6 +33,7 @@ public:
 
 private:
   void default_initialize (const Soil& soil, const SoilWater&);
+  SoilNH4 (const SoilNH4&);
 public:
   static void load_syntax (Syntax&, AttributeList&);
   SoilNH4 (const AttributeList&);

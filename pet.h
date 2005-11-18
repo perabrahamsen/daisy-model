@@ -60,7 +60,7 @@ public:
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);
 protected:
-  Pet (const AttributeList&);
+  Pet (Block&);
 public:
   virtual ~Pet ();
 };

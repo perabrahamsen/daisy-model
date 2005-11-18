@@ -40,7 +40,7 @@ void
 UZmodel::has_macropores (bool)
 { }
 
-UZmodel::UZmodel (const AttributeList& al)
+UZmodel::UZmodel (Block& al)
   : name (al.identifier ("type"))
 { }
 

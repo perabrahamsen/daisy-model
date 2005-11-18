@@ -41,7 +41,7 @@ public:
 
   // Create.
 public:
-  AdsorptionFreundlich (const AttributeList& al)
+  AdsorptionFreundlich (Block& al)
     : Adsorption (al),
       K_clay (al.number ("K_clay", 0.0)),
       K_OC (al.number ("K_OC") ? al.number ("K_OC") : al.number ("K_clay")),
@@ -107,7 +107,7 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
 
 static struct AdsorptionFreundlichSyntax
 {
-  static Adsorption& make (const AttributeList& al)
+  static Adsorption& make (Block& al)
   {
     return *new AdsorptionFreundlich (al);
   }

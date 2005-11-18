@@ -1337,7 +1337,7 @@ public:
   void output (Log& log) const;
 
   // Create and Destroy.
-  SVAT_PMSW (const AttributeList& al);
+  SVAT_PMSW (Block& al);
   ~SVAT_PMSW();
 }; // end class SVAT_PMSW
 
@@ -1848,7 +1848,7 @@ SVAT_PMSW::output (Log& log) const
   output_variable (prec, log);                    // var 55
 }
 
-SVAT_PMSW::SVAT_PMSW (const AttributeList& al)
+SVAT_PMSW::SVAT_PMSW (Block& al)
   : SVAT (al),
     rcmin (1.0),		// BUG!  Totally bogus.  
     // We use rcmin in RSCSTAR without ever setting it. abraham 11-03-2002.
@@ -1971,7 +1971,7 @@ SVAT_PMSW::~SVAT_PMSW() // destructor
 static struct SVAT_PMSWSyntax
 {
   static SVAT&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new SVAT_PMSW (al); }
   SVAT_PMSWSyntax ()
   {
