@@ -79,6 +79,12 @@ SourceCombine::load (Treelog& msg)
   if (with_ == "")
     with_ = scope.with ();
 
+  if (with_ == "errorbars")
+    {
+      msg.warning ("Cannot combine data sources with errorbars");
+      with_ = "points";
+    }
+
   // Read data.
   for (scope.first (); !scope.done (); scope.next ())
     {
