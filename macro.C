@@ -32,7 +32,7 @@ bool
 Macro::none () const 
 { return false; }
 
-Macro::Macro (const AttributeList& al)
+Macro::Macro (Block& al)
   : name (al.identifier ("type"))
 { }
 

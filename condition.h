@@ -43,7 +43,7 @@ public:
 
   // Create & Destroy.
 protected:
-  Condition (const AttributeList& al);
+  Condition (Block& al);
 public:
   virtual ~Condition ();
 };

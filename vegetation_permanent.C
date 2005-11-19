@@ -32,6 +32,7 @@
 #include "am.h"
 #include "aom.h"
 #include "organic_matter.h"
+#include "submodeler.h"
 #include "check.h"
 #include <sstream>
 #include <deque>
@@ -69,7 +70,7 @@ struct VegetationPermanent : public Vegetation
   double N_litter;		// N litter this hour. [g N/m^2/h]
   const vector<AttributeList*>& litter_am; // Litter AM parameters.
   // Root.
-  RootSystem root_system;
+  std::auto_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
 
   // Radiation.
@@ -260,7 +261,7 @@ VegetationPermanent::tick (const Time& time,
 	N_actual = N_demand;	// Initialization.
       else
 	daisy_assert (N_actual >= 0.0);
-      N_uptake = root_system.nitrogen_uptake (soil, soil_water, 
+      N_uptake = root_system->nitrogen_uptake (soil, soil_water, 
 					      *soil_NH4, 0.0, *soil_NO3, 0.0,
 					      N_demand - N_actual);
     }
@@ -312,7 +313,7 @@ VegetationPermanent::transpiration (double potential_transpiration,
 				    double day_fraction, Treelog& msg)
 {
   if (canopy.CAI > 0.0)
-    return  root_system.water_uptake (potential_transpiration, 
+    return  root_system->water_uptake (potential_transpiration, 
 				      soil, soil_water, 
 				      canopy_evaporation, day_fraction, msg);
   return 0.0;
@@ -327,7 +328,7 @@ VegetationPermanent::output (Log& log) const
   output_variable (N_actual, log);
   output_variable (N_uptake, log);
   output_variable (N_litter, log);
-  output_submodule (root_system, "Root", log);
+  output_submodule (*root_system, "Root", log);
 }
 
 void
@@ -336,8 +337,8 @@ VegetationPermanent::initialize (const Time& time, const Soil& soil,
                                  Treelog& msg)
 {
   reset_canopy_structure (time);
-  root_system.initialize (soil.size ());
-  root_system.full_grown (msg, soil, WRoot);
+  root_system->initialize (soil.size ());
+  root_system->full_grown (msg, soil, WRoot);
   if (organic_matter)
     {
       static const symbol vegetation_symbol ("vegetation");
@@ -360,7 +361,7 @@ VegetationPermanent::VegetationPermanent (Block& al)
     N_uptake (0.0),
     N_litter (0.0),
     litter_am (al.alist_sequence ("litter_am")),
-    root_system (al.alist ("Root")),
+    root_system (submodel<RootSystem> (al, "Root")),
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     albedo_ (al.number ("Albedo")),
     litter (al.alist ("Litter"))

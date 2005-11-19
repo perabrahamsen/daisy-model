@@ -68,15 +68,13 @@ Daisy::Daisy (Block& al)
     logs (Librarian<Log>::build_vector (al, "output")),
     log_all (*new LogAll (logs)),
     active_logs (find_active_logs (logs, log_all)),
-    activate_output (Librarian<Condition>::create
-		     (al.alist ("activate_output"))),
-    print_time (Librarian<Condition>::create
-		     (al.alist ("print_time"))),
+    activate_output (Librarian<Condition>::build_item (al, "activate_output")),
+    print_time (Librarian<Condition>::build_item (al, "print_time")),
     time (al.alist ("time")),
     stop (al.check ("stop")
 	  ? Time (al.alist ("stop")) 
 	  : Time (9999, 1, 1, 1)),
-    action (Librarian<Action>::create (al.alist ("manager"))),
+    action (Librarian<Action>::build_item (al, "manager")),
     weather (al.check ("weather") 
 	     ? Librarian<Weather>::build_item (al, "weather")
 	     : NULL), 

@@ -42,13 +42,13 @@ public:
   }
   void output (Log&) const
   { }
-  ConditionMMDD (const AttributeList& al)
+  ConditionMMDD (Block& al)
     : Condition (al),
       month (al.integer ("month")),
       day (al.integer ("day")),
       hour (al.integer ("hour"))
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionMMDD (al); }
 };
 
@@ -69,13 +69,13 @@ public:
   }
   void output (Log&) const
   { }
-  ConditionBeforeMMDD (const AttributeList& al)
+  ConditionBeforeMMDD (Block& al)
     : Condition (al),
       month (al.integer ("month")),
       day (al.integer ("day")),
       hour (al.integer ("hour"))
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionBeforeMMDD (al); }
 };
 
@@ -96,13 +96,13 @@ public:
   }
   void output (Log&) const
   { }
-  ConditionAfterMMDD (const AttributeList& al)
+  ConditionAfterMMDD (Block& al)
     : Condition (al),
       month (al.integer ("month")),
       day (al.integer ("day")),
       hour (al.integer ("hour"))
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionAfterMMDD (al); }
 };
 
@@ -114,11 +114,11 @@ public:
   { return time == daisy.time; }
   void output (Log&) const
   { }
-  ConditionAt (const AttributeList& al)
+  ConditionAt (Block& al)
     : Condition (al),
       time (al.alist ("time"))
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionAt (al); }
 };
 
@@ -130,11 +130,11 @@ public:
   { return time > daisy.time; }
   void output (Log&) const
   { }
-  ConditionBefore (const AttributeList& al)
+  ConditionBefore (Block& al)
     : Condition (al),
       time (al.alist ("time"))
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionBefore (al); }
 };
 
@@ -146,11 +146,11 @@ public:
   { return time < daisy.time; }  
   void output (Log&) const
   { }
-  ConditionAfter (const AttributeList& al)
+  ConditionAfter (Block& al)
     : Condition (al),
       time (al.alist ("time"))
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionAfter (al); }
 };
 
@@ -170,11 +170,11 @@ struct ConditionHourly : public Condition
 	     + (daisy.time.hour () + 1)) % step) == 0; }
   void output (Log&) const
   { }
-  ConditionHourly (const AttributeList& al)
+  ConditionHourly (Block& al)
     : Condition (al),
       step (al.integer ("step"))
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionHourly (al); }
 };
 
@@ -191,11 +191,11 @@ struct ConditionDaily : public Condition
   { return daisy.time.hour () == 23 && (daisy.time.yday () % step) == 0; }
   void output (Log&) const
   { }
-  ConditionDaily (const AttributeList& al)
+  ConditionDaily (Block& al)
     : Condition (al),
       step (al.integer ("step"))
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionDaily (al); }
 };
 
@@ -214,11 +214,11 @@ struct ConditionWeekly : public Condition
       && (daisy.time.week () % step) == 0; }
   void output (Log&) const
   { }
-  ConditionWeekly (const AttributeList& al)
+  ConditionWeekly (Block& al)
     : Condition (al),
       step (al.integer ("step"))
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionWeekly (al); }
 };
 
@@ -242,11 +242,11 @@ struct ConditionMonthly : public Condition
   }
   void output (Log&) const
   { }
-  ConditionMonthly (const AttributeList& al)
+  ConditionMonthly (Block& al)
     : Condition (al),
       step (al.integer ("step"))
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionMonthly (al); }
 };
 
@@ -271,11 +271,11 @@ struct ConditionYearly : public Condition
 
   void output (Log&) const
   { }
-  ConditionYearly (const AttributeList& al)
+  ConditionYearly (Block& al)
     : Condition (al),
       step (al.integer ("step"))
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionYearly (al); }
 };
 
@@ -288,11 +288,11 @@ struct ConditionHour : public Condition
     { return daisy.time.hour () == at; }
   void output (Log&) const
     { }
-  ConditionHour (const AttributeList& al)
+  ConditionHour (Block& al)
     : Condition (al),
       at (al.integer ("at"))
     { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
     { return *new ConditionHour (al); }
 };
 
@@ -303,11 +303,11 @@ struct ConditionMDay : public Condition
     { return daisy.time.mday () == at; }
   void output (Log&) const
     { }
-  ConditionMDay (const AttributeList& al)
+  ConditionMDay (Block& al)
     : Condition (al),
       at (al.integer ("at"))
     { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
     { return *new ConditionMDay (al); }
 };
 
@@ -319,11 +319,11 @@ public:
     { return daisy.time.yday () == at; }
   void output (Log&) const
     { }
-  ConditionYDay (const AttributeList& al)
+  ConditionYDay (Block& al)
     : Condition (al),
       at (al.integer ("at"))
     { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
     { return *new ConditionYDay (al); }
 };
 
@@ -335,11 +335,11 @@ public:
     { return daisy.time.month () == at; }
   void output (Log&) const
     { }
-  ConditionMonth (const AttributeList& al)
+  ConditionMonth (Block& al)
     : Condition (al),
       at (al.integer ("at"))
     { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
     { return *new ConditionMonth (al); }
 };
 
@@ -351,11 +351,11 @@ public:
     { return daisy.time.year () == at; }
   void output (Log&) const
     { }
-  ConditionYear (const AttributeList& al)
+  ConditionYear (Block& al)
     : Condition (al),
       at (al.integer ("at"))
     { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
     { return *new ConditionYear (al); }
 };
 
@@ -376,14 +376,14 @@ struct ConditionTimestep : public Condition
   void output (Log&) const
   { }
 
-  ConditionTimestep (const AttributeList& al)
+  ConditionTimestep (Block& al)
     : Condition (al),
-      condition (Librarian<Condition>::create (al.alist ("operand"))),
+      condition (Librarian<Condition>::build_item (al, "operand")),
       dt (al.name ("timestep"))
   { }
   ~ConditionTimestep ()
   { }
-  static Condition& make (const AttributeList& al)
+  static Condition& make (Block& al)
   { return *new ConditionTimestep (al); }
 };
 

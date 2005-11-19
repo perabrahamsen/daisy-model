@@ -37,7 +37,7 @@ Rootdens::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("SpRtLength", 100.0);
 }
 
-Rootdens::Rootdens (const AttributeList& al)
+Rootdens::Rootdens (Block& al)
   : name (al.identifier ("type")),
     SpRtLength (al.number ("SpRtLength"))
 { }

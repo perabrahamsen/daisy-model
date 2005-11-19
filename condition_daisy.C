@@ -31,7 +31,7 @@ struct ConditionRunning : public Condition
     { return daisy.running; }
   void output (Log&) const
     { }
-  ConditionRunning (const AttributeList& al)
+  ConditionRunning (Block& al)
     : Condition (al)
     { }
 };
@@ -42,17 +42,17 @@ struct ConditionFinished : public Condition
     { return !daisy.running; }
   void output (Log&) const
     { }
-  ConditionFinished (const AttributeList& al)
+  ConditionFinished (Block& al)
     : Condition (al)
     { }
 };
 
 static struct ConditionDaisySyntax
 {
-  static Condition& make_running (const AttributeList& al)
+  static Condition& make_running (Block& al)
     { return *new ConditionRunning (al); }
 
-  static Condition& make_finished (const AttributeList& al)
+  static Condition& make_finished (Block& al)
     { return *new ConditionFinished (al); }
 
   ConditionDaisySyntax ()

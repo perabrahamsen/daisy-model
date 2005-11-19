@@ -37,7 +37,7 @@ struct ActionSpray : public Action
       daisy.field.spray (chemical, amount); 
     }
 
-  ActionSpray (const AttributeList& al)
+  ActionSpray (Block& al)
     : Action (al),
       chemical (al.identifier ("chemical")),
       amount (al.number ("amount"))
@@ -47,7 +47,7 @@ struct ActionSpray : public Action
 // Add the ActionSpray syntax to the syntax table.
 static struct ActionSpraySyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionSpray (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

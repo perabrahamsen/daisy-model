@@ -38,7 +38,7 @@ struct ActionMix : public Action
       daisy.field.mix (out, daisy.time, 0.0, depth, penetration);
     }
 
-  ActionMix (const AttributeList& al)
+  ActionMix (Block& al)
     : Action (al),
       depth (al.number ("depth")),
       penetration (al.number ("penetration"))
@@ -47,7 +47,7 @@ struct ActionMix : public Action
 
 static struct ActionMixSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
     { return *new ActionMix (al); }
 
   ActionMixSyntax ()
@@ -82,7 +82,7 @@ struct ActionSwap : public Action
     daisy.field.swap (out, daisy.time, 0.0, middle, depth);
   }
 
-  ActionSwap (const AttributeList& al)
+  ActionSwap (Block& al)
     : Action (al),
       middle (al.number ("middle")),
       depth (al.number ("depth"))
@@ -91,7 +91,7 @@ struct ActionSwap : public Action
 
 static struct ActionSwapSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
     { return *new ActionSwap (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
@@ -140,7 +140,7 @@ struct ActionSetPorosity : public Action
     daisy.field.set_porosity (depth, porosity);
   }
 
-  ActionSetPorosity (const AttributeList& al)
+  ActionSetPorosity (Block& al)
     : Action (al),
       porosity (al.number ("porosity")),
       depth (al.number ("depth"))
@@ -149,7 +149,7 @@ struct ActionSetPorosity : public Action
 
 static struct ActionSetPorositySyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
     { return *new ActionSetPorosity (al); }
 
   ActionSetPorositySyntax ()

@@ -161,7 +161,7 @@ struct ActionCrop : public Action
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
-    Tillage (const AttributeList&);
+    Tillage (Block&);
     ~Tillage ();
   };
   const vector<const Tillage*> tillage;
@@ -215,7 +215,7 @@ struct ActionCrop : public Action
   void output (Log&) const;
 
   // Create and Destroy.
-  ActionCrop (const AttributeList& al);
+  ActionCrop (Block& al);
   ~ActionCrop ();
 };
 
@@ -642,10 +642,10 @@ ActionCrop::Tillage::load_syntax (Syntax& syntax, AttributeList&)
   syntax.order ("month", "day", "operation");
 }
 
-ActionCrop::Tillage::Tillage (const AttributeList& al)
+ActionCrop::Tillage::Tillage (Block& al)
   : month (al.integer ("month")),
     day (al.integer ("day")),
-    operation (Librarian<Action>::create (al.alist ("operation")))
+    operation (Librarian<Action>::build_item (al, "operation"))
 { }
 
 ActionCrop::Tillage::~Tillage ()
@@ -932,7 +932,7 @@ ActionCrop::output (Log& log) const
   output_variable (irrigation_delay, log);
 }
 
-ActionCrop::ActionCrop (const AttributeList& al)
+ActionCrop::ActionCrop (Block& al)
   : Action (al),
     primary (new Sow (al.alist ("primary"))),
     secondary (al.check ("secondary") 
@@ -948,7 +948,7 @@ ActionCrop::ActionCrop (const AttributeList& al)
 		  (al.alist_sequence ("fertilize_at"))),
     fertilize_at_index (al.integer ("fertilize_at_index")),
     fertilize_incorporate (al.flag ("fertilize_incorporate")),
-    tillage (map_construct_const<Tillage> (al.alist_sequence ("tillage"))),
+    tillage (map_submodel_const<Tillage> (al, "tillage")),
     tillage_index (al.integer ("tillage_index")),
     spray (map_construct_const<Spray> (al.alist_sequence ("spray"))),
     spray_index (al.integer ("spray_index")),
@@ -982,7 +982,7 @@ ActionCrop::~ActionCrop ()
 // Add the ActionCrop syntax to the syntax table.
 static struct ActionCropSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionCrop (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

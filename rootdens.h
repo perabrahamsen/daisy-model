@@ -50,7 +50,7 @@ public:
   static const AttributeList& default_model ();
   static void load_syntax (Syntax&, AttributeList&);
 protected:
-  Rootdens (const AttributeList&);
+  Rootdens (Block&);
 public:
   virtual ~Rootdens ();
 };

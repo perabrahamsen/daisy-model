@@ -39,8 +39,9 @@ struct ActionRepeat : public Action
 	action = NULL;
       }
     if (action == NULL)
-      action = Librarian<Action>::create (repeat);
-    action->doIt (daisy, out);
+      action = Librarian<Action>::build_free (out, repeat, "repeat");
+    if (action != NULL)         // Build free may fail.
+      action->doIt (daisy, out);
   }
 
   bool done (const Daisy&) const
@@ -69,12 +70,12 @@ struct ActionRepeat : public Action
     return alist;
   }
 
-  ActionRepeat (const AttributeList& al)
-    : Action (add_do (al)),
+  ActionRepeat (Block& al)
+    : Action (al, add_do (al.alist ())),
       repeat (al.alist ("repeat")),
-      action (Librarian<Action>::create (al.check ("do") 
-					  ? al.alist ("do")
-					  : repeat))
+      action (Librarian<Action>::build_alist (al, (al.check ("do") 
+                                                   ? al.alist ("do")
+                                                   : repeat), "do"))
   { }
 
   ~ActionRepeat ()
@@ -86,7 +87,7 @@ struct ActionRepeat : public Action
 
 static struct ActionRepeatSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionRepeat (al); }
 
   ActionRepeatSyntax ()

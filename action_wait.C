@@ -43,9 +43,9 @@ struct ActionWait : public Action
   void output (Log& log) const
   { output_derived (condition, "condition", log); }
 
-  ActionWait (const AttributeList& al)
+  ActionWait (Block& al)
     : Action (al),
-      condition (Librarian<Condition>::create (al.alist ("condition")))
+      condition (Librarian<Condition>::build_item (al, "condition"))
   { }
 
   ~ActionWait ()
@@ -82,7 +82,7 @@ struct ActionWaitDays : public Action
       output_submodule (end_time, "end_time", log);
   }
 
-  ActionWaitDays (const AttributeList& al)
+  ActionWaitDays (Block& al)
     : Action (al),
       days (al.integer ("days")),
       hours (al.integer ("hours")),
@@ -113,7 +113,7 @@ struct ActionWaitMMDD : public Action
       && daisy.time.hour () == hour; 
   }
 
-  ActionWaitMMDD (const AttributeList& al)
+  ActionWaitMMDD (Block& al)
     : Action (al),
       month (al.integer ("month")),
       day (al.integer ("day")),
@@ -126,11 +126,11 @@ struct ActionWaitMMDD : public Action
 
 static struct ActionWaitSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionWait (al); }
-  static Action& make_days (const AttributeList& al)
+  static Action& make_days (Block& al)
   { return *new ActionWaitDays (al); }
-  static Action& make_mm_dd (const AttributeList& al)
+  static Action& make_mm_dd (Block& al)
   { return *new ActionWaitMMDD (al); }
 
   static bool check_mm_dd (const AttributeList& alist, Treelog& err)

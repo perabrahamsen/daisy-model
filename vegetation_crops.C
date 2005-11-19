@@ -672,7 +672,7 @@ VegetationCrops::build_crops (Block& block, const std::string& key)
 VegetationCrops::VegetationCrops (Block& al)
   : Vegetation (al),
     crops (build_crops (al, "crops")),
-    // deque, so we can't use map_create.
+    // deque, so we can't use build_vector.
     forced_LAI (al.alist_sequence ("ForcedLAI")),
     shared_light_fraction_ (1.0),
     LAI_ (0.0),

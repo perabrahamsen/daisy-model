@@ -172,7 +172,7 @@ LogCheckpoint::LogCheckpoint (Block& al)
   : LogAList (al),
     file (al.name ("where")),
     description (al.name ("description")),
-    condition (Librarian<Condition>::create (al.alist ("when"))),
+    condition (Librarian<Condition>::build_item (al, "when")),
     time (1, 1, 1, 1)
 { }
 

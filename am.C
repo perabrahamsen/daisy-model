@@ -1008,9 +1008,9 @@ AM::~AM ()
 static struct AM_Syntax
 {
   static AM&
-  make (const AttributeList& al1)
+  make (Block& al1)
   { 
-    AttributeList al2 (al1);
+    AttributeList al2 (al1.alist ());
     al2.add ("type", "state");
     if (!al2.check ("name"))
       al2.add ("name", al1.identifier ("type"));

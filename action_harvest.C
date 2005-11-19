@@ -50,7 +50,7 @@ struct ActionHarvest : public Action
       out.message ("Cutting " + crop);
   }
 
-  ActionHarvest (const AttributeList& al)
+  ActionHarvest (Block& al)
     : Action (al),
       crop (al.identifier ("crop")), 
       stub (al.number ("stub")),
@@ -63,7 +63,7 @@ struct ActionHarvest : public Action
 
 static struct ActionHarvestSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
     { return *new ActionHarvest (al); }
   ActionHarvestSyntax ();
 } ActionHarvest_syntax;

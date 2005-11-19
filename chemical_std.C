@@ -125,12 +125,12 @@ public:
 
   // Create.
 public:
-  ChemicalStandard (const AttributeList&);
+  ChemicalStandard (Block&);
 };
 
 
-ChemicalStandard::ChemicalStandard (const AttributeList& al)
-  : Chemical (al),
+ChemicalStandard::ChemicalStandard (Block& al)
+  : Chemical (al.alist ()),
     crop_uptake_reflection_factor_ 
   (al.number ("crop_uptake_reflection_factor")),
     canopy_dissipation_rate_ 
@@ -157,7 +157,7 @@ ChemicalStandard::ChemicalStandard (const AttributeList& al)
 static struct ChemicalStandardSyntax
 {
   static Chemical&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new ChemicalStandard (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

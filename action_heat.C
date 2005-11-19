@@ -38,7 +38,7 @@ struct ActionSetHeatSource : public Action
     daisy.field.set_heat_source (height, value);
   }
 
-  ActionSetHeatSource (const AttributeList& al)
+  ActionSetHeatSource (Block& al)
     : Action (al),
       height (al.number ("height")),
       value (al.number ("value"))
@@ -47,7 +47,7 @@ struct ActionSetHeatSource : public Action
 
 static struct ActionHeatSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionSetHeatSource (al); }
   
   ActionHeatSyntax ()

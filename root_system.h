@@ -122,7 +122,7 @@ public:
 public:
   void initialize (unsigned int size);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
-  RootSystem (const AttributeList& al);
+  RootSystem (Block& al);
   ~RootSystem ();
 };
 

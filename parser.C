@@ -31,7 +31,7 @@ variables must be given an initial value.  It is the responsibility of\n\
 the 'parser' component to read these data from an external source\n\
 (typically a setup file), and convert them into the internal format.";
 
-Parser::Parser (const AttributeList& al)
+Parser::Parser (Block& al)
   : name (al.identifier ("type"))
 { }
 

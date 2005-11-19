@@ -44,9 +44,9 @@ struct ActionAssert : public Action
   void output (Log& log) const
   { output_derived (condition, "condition", log); }
 
-  ActionAssert (const AttributeList& al)
+  ActionAssert (Block& al)
     : Action (al),
-      condition (Librarian<Condition>::create (al.alist ("condition"))),
+      condition (Librarian<Condition>::build_item (al, "condition")),
       message (al.name ("message"))
   { }
 
@@ -63,7 +63,7 @@ struct ActionMessage : public Action
     out.message (message);
   }
 
-  ActionMessage (const AttributeList& al)
+  ActionMessage (Block& al)
     : Action (al),
       message (al.name ("message"))
   { }
@@ -81,7 +81,7 @@ struct ActionWarning : public Action
     out.warning (message);
   }
 
-  ActionWarning (const AttributeList& al)
+  ActionWarning (Block& al)
     : Action (al),
       message (al.name ("message"))
   { }
@@ -97,7 +97,7 @@ struct ActionError : public Action
   void doIt (Daisy&, Treelog&)
   { throw (message); }
 
-  ActionError (const AttributeList& al)
+  ActionError (Block& al)
     : Action (al),
       message (al.name ("message"))
   { }
@@ -108,13 +108,13 @@ struct ActionError : public Action
 
 static struct ActionMessageSyntax
 {
-  static Action& make_assert (const AttributeList& al)
+  static Action& make_assert (Block& al)
   { return *new ActionAssert (al); }
-  static Action& make_message (const AttributeList& al)
+  static Action& make_message (Block& al)
   { return *new ActionMessage (al); }
-  static Action& make_warning (const AttributeList& al)
+  static Action& make_warning (Block& al)
   { return *new ActionWarning (al); }
-  static Action& make_error (const AttributeList& al)
+  static Action& make_error (Block& al)
   { return *new ActionError (al); }
 
   ActionMessageSyntax ()

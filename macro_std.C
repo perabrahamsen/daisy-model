@@ -57,7 +57,7 @@ struct MacroStandard : public Macro
   // Create and Destroy.
   static bool check_alist (const AttributeList& al, Treelog& err);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
-  MacroStandard (const AttributeList& al)
+  MacroStandard (Block& al)
     : Macro (al),
       distribution (al.plf ("distribution")),
       height_start (al.check ("height_start") 
@@ -372,7 +372,7 @@ After macropores are activated pond will havethis height.");
 
 }
 
-Macro& 
+std::auto_ptr<Macro> 
 Macro::create (double depth)
 { 
   daisy_assert (depth < 0.0);
@@ -394,13 +394,15 @@ Macro::create (double depth)
   alist.add ("distribution", distribution);
 
   daisy_assert (syntax.check (alist, Treelog::null ()));
-  return *new MacroStandard (alist); 
+  Block block (syntax, alist, Treelog::null (), "macro");
+
+  return std::auto_ptr<Macro> (new MacroStandard (block)); 
 }
 
 
 static struct MacroStandardSyntax
 {
-  static Macro& make (const AttributeList& al)
+  static Macro& make (Block& al)
   { return *new MacroStandard (al); }
 
   MacroStandardSyntax ()

@@ -43,7 +43,7 @@ struct ConditionDSAfter : public Condition
   void output (Log&) const
   { }
 
-  ConditionDSAfter (const AttributeList& al)
+  ConditionDSAfter (Block& al)
     : Condition (al),
       crop (al.identifier ("crop")),
       ds (al.number ("ds"))
@@ -62,7 +62,7 @@ struct ConditionDMOver : public Condition
   void output (Log&) const
   { }
 
-  ConditionDMOver (const AttributeList& al)
+  ConditionDMOver (Block& al)
     : Condition (al),
       crop (al.identifier ("crop")),
       weight (al.number ("weight")),
@@ -72,9 +72,9 @@ struct ConditionDMOver : public Condition
 
 static struct ConditionCropSyntax
 {
-  static Condition& make_ds (const AttributeList& al)
+  static Condition& make_ds (Block& al)
   { return *new ConditionDSAfter (al); }
-  static Condition& make_dm (const AttributeList& al)
+  static Condition& make_dm (Block& al)
   { return *new ConditionDMOver (al); }
 
   ConditionCropSyntax ()

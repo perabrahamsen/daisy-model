@@ -43,7 +43,7 @@ struct MacroNone : public Macro
     { }
 
   // Create and Destroy.
-  MacroNone (const AttributeList& al)
+  MacroNone (Block& al)
     : Macro (al)
     { }
   ~MacroNone ()
@@ -53,7 +53,7 @@ struct MacroNone : public Macro
 static struct MacroNoneSyntax
 {
   static Macro&
-  make (const AttributeList& al)
+  make (Block& al)
     { return *new MacroNone (al); }
   MacroNoneSyntax ()
     {

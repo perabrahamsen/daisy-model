@@ -37,7 +37,7 @@ struct ActionSetSurfaceDetentionCapacity : public Action
     daisy.field.set_surface_detention_capacity (height);
   }
 
-  ActionSetSurfaceDetentionCapacity (const AttributeList& al)
+  ActionSetSurfaceDetentionCapacity (Block& al)
     : Action (al),
       height (al.number ("height"))
   { }
@@ -45,7 +45,7 @@ struct ActionSetSurfaceDetentionCapacity : public Action
 
 static struct ActionSurfaceSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionSetSurfaceDetentionCapacity (al); }
   
   ActionSurfaceSyntax ()

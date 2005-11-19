@@ -36,6 +36,7 @@
 #include "soil_NO3.h"
 #include "am.h"
 #include "harvest.h"
+#include "submodeler.h"
 #include "mathlib.h"
 #include "check.h"
 
@@ -70,7 +71,7 @@ public:
   const double spring_LAI;	// LAI to use after T is zeroed.
 
   // Root.
-  RootSystem& root_system;
+  std::auto_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
   const double NRoot;		// Root nitrogen weight [g N/m^2]
   const vector<AttributeList*>& root_am; // Root AM parameters.
@@ -86,9 +87,9 @@ public:
 public:
 #if 0
   double water_stress () const // [0-1] (1 = full production)
-  { return root_system.water_stress; }
+  { return root_system->water_stress; }
   double nitrogen_stress () const // [0-1] (0 = no production)
-  { return root_system.nitrogen_stress; }
+  { return root_system->nitrogen_stress; }
   double rs_min () const	// Minimum transpiration resistance.
   { return canopy.rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
@@ -186,13 +187,13 @@ CropSimple::ActualWaterUptake (double Ept,
 			       const double EvapInterception, 
 			       const double day_fraction, Treelog& msg)
 {
-  return root_system.water_uptake (Ept, soil, soil_water, EvapInterception,
+  return root_system->water_uptake (Ept, soil, soil_water, EvapInterception,
 				   day_fraction, msg);
 }
 
 void 
 CropSimple::force_production_stress  (double pstress)
-{ root_system.production_stress = pstress; }
+{ root_system->production_stress = pstress; }
 
 void
 CropSimple::tick (const Time& time,
@@ -227,8 +228,8 @@ CropSimple::tick (const Time& time,
     }
 
   // Update average soil temperature.
-  const double T_soil = soil_heat.T (soil.interval_plus (-root_system.Depth));
-  root_system.tick_hourly (time.hour (), T_soil);
+  const double T_soil = soil_heat.T (soil.interval_plus (-root_system->Depth));
+  root_system->tick_hourly (time.hour (), T_soil);
   
   // Air temperature based growth.
   const double T_air = bioclimate.daily_air_temperature ();
@@ -252,14 +253,14 @@ CropSimple::tick (const Time& time,
 	  const double this_far = (T - T_emergence) / T_growth;
 	  
 	  canopy.Height = height_max * this_far;
-	  root_system.tick_daily (msg, soil, 
+	  root_system->tick_daily (msg, soil, 
 				  WRoot * this_far, WRoot * step, 
 				  DS ());
 	}
       else if (old_T < T_flowering)
 	{
 	  msg.message ("Flowering");
-	  root_system.tick_daily (msg, soil, WRoot,
+	  root_system->tick_daily (msg, soil, WRoot,
 				  WRoot * (1.0 - old_T / T_flowering), DS ());
 	}
       else if (T < T_ripe)
@@ -276,7 +277,7 @@ CropSimple::tick (const Time& time,
       if (soil_NO3)
 	{
 	  daisy_assert (soil_NH4);
-	  N_actual += root_system.nitrogen_uptake (soil, soil_water, 
+	  N_actual += root_system->nitrogen_uptake (soil, soil_water, 
 						   *soil_NH4, 0.0, 
 						   *soil_NO3, 0.0,
 						   N_demand - N_actual);
@@ -318,16 +319,16 @@ CropSimple::harvest (const symbol column_name,
 
       static const symbol root_symbol ("root");
       AM& am = AM::create (geometry, time, root_am, name, root_symbol);
-      daisy_assert (geometry.total (root_system.Density) > 0.0);
+      daisy_assert (geometry.total (root_system->Density) > 0.0);
       am.add (geometry, 
 	      this_far * WRoot * 0.420 * m2_per_cm2,
 	      this_far * NRoot * m2_per_cm2,
-	      root_system.Density);
+	      root_system->Density);
       residuals.push_back (&am);
       residuals_DM += this_far * WRoot;
-      geometry.add (residuals_N_soil, root_system.Density,
+      geometry.add (residuals_N_soil, root_system->Density,
 		    this_far * NRoot * m2_per_cm2);
-      geometry.add (residuals_C_soil, root_system.Density, 
+      geometry.add (residuals_C_soil, root_system->Density, 
 		    this_far * WRoot * 0.420 * m2_per_cm2);
     }
 
@@ -355,7 +356,7 @@ CropSimple::output (Log& log) const
   output_submodule (canopy, "Canopy", log);
   output_variable (T_sum, log);
   output_variable (day, log);
-  output_submodule (root_system, "Root", log);
+  output_submodule (*root_system, "Root", log);
   output_variable (N_demand, log);
   output_variable (N_actual, log);
 }
@@ -395,7 +396,7 @@ CropSimple::total_C () const
 void
 CropSimple::initialize (Treelog&, const Geometry& geometry, OrganicMatter*)
 {
-  root_system.initialize (geometry.size ());
+  root_system->initialize (geometry.size ());
   CropCAI ();
 }
 
@@ -416,7 +417,7 @@ CropSimple::CropSimple (Block& al)
     spring_mm (al.integer_sequence ("spring")[0]),
     spring_dd (al.integer_sequence ("spring")[1]),
     spring_LAI (al.number ("spring_LAI")),
-    root_system (*new RootSystem (al.alist ("Root"))),
+    root_system (submodel<RootSystem> (al, "Root")),
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     NRoot (al.number ("root_N") * 0.1),	// [kg N / ha] -> [g N / m^2]
     root_am (al.alist_sequence ("root_am")),
@@ -430,10 +431,7 @@ CropSimple::CropSimple (Block& al)
 { }
 
 CropSimple::~CropSimple ()
-{
-  delete &canopy;
-  delete &root_system;
-}
+{ delete &canopy; }
 
 static struct CropSimpleSyntax
 {

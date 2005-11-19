@@ -75,9 +75,9 @@ struct ActionActivity : public Action
     return ok;
   }
 
-  ActionActivity (const AttributeList& al)
+  ActionActivity (Block& al)
     : Action (al),
-      actions (map_create<Action> (al.alist_sequence ("actions")))
+      actions (Librarian<Action>::build_vector (al, "actions"))
   { }
 
   ~ActionActivity ()
@@ -86,7 +86,7 @@ struct ActionActivity : public Action
 
 static struct ActionActivitySyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionActivity (al); }
 
   ActionActivitySyntax ()

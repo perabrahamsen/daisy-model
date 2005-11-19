@@ -36,7 +36,7 @@ struct ActionDivide : public Action
       daisy.field.divide (original, copy, size, daisy.time, daisy.weather);
     }
 
-  ActionDivide (const AttributeList& al)
+  ActionDivide (Block& al)
     : Action (al),
       original (al.identifier ("original")), 
       copy (al.identifier ("copy")),
@@ -46,7 +46,7 @@ struct ActionDivide : public Action
 
 static struct ActionDivideSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
     { return *new ActionDivide (al); }
   ActionDivideSyntax ()
     { 

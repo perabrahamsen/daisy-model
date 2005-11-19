@@ -41,7 +41,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (Syntax&, Treelog&);
-  ParserFile (const AttributeList&);
+  ParserFile (Block&);
   ParserFile (Syntax& syntax, const std::string& n, Treelog&);
   ~ParserFile ();
 };

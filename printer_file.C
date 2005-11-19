@@ -767,8 +767,8 @@ PrinterFile::PrinterFile (std::ostream& stream)
     impl (*new Implementation (stream))
 { }
     
-PrinterFile::PrinterFile (const AttributeList& al)
-  : Printer (al),
+PrinterFile::PrinterFile (Block& al)
+  : Printer (al.alist ()),
     impl (*new Implementation (al.name ("where")))
 { }
     
@@ -777,7 +777,7 @@ PrinterFile::~PrinterFile ()
 
 static struct PrinterFileSyntax
 {
-  static Printer& make (const AttributeList& al)
+  static Printer& make (Block& al)
     { return *new PrinterFile (al); }
 
   PrinterFileSyntax ()

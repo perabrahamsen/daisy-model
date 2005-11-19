@@ -39,8 +39,6 @@ class Librarian
 {
   // Types.
 private:
-  typedef T& (*constructor) (const AttributeList&);
-  typedef std::map<symbol, constructor> cmap_type;
   typedef T& (*builder) (Block&);
   typedef std::map<symbol, builder> bmap_type;
 
@@ -51,13 +49,11 @@ private:
   static struct Content
   {
     Library lib;
-    cmap_type constructors;
     bmap_type builders;
     int count;
-    Content (const char *const name, derive_fun derive, 
+    Content (const char *const name, Library::derive_fun derive, 
 	     const char *const description)
       : lib (name, derive, description),
-	constructors (),
 	builders (),
 	count (0)
     { }
@@ -65,17 +61,6 @@ private:
 
   // Functions.
 public:
-  static T* create (const AttributeList& al)
-  {
-    daisy_assert (al.check ("type"));
-    const symbol name = al.identifier ("type");
-    daisy_assert (library ().check (name));
-    daisy_assert (library ().syntax (name).check (al, Treelog::null ()));
-    daisy_assert (content->constructors.find (name) 
-		  != content->constructors.end ());
-    return &(content->constructors)[name] (al);
-  }
-
   static T* build_free (Treelog& msg, const AttributeList& alist, 
 			const std::string& scope_id)
   {
@@ -149,13 +134,6 @@ public:
   { library ().add_base (al, syntax); }
   static void add_type (const symbol name, AttributeList& al,
 			const Syntax& syntax,
-			constructor cons)
-  {
-    library ().add (name, al, syntax);
-    content->constructors.insert(std::make_pair (name, cons));
-  }
-  static void add_type (const symbol name, AttributeList& al,
-			const Syntax& syntax,
 			builder build)
   {
     library ().add (name, al, syntax);
@@ -163,20 +141,11 @@ public:
   }
   static void add_type (const char *const name, AttributeList& al,
 			const Syntax& syntax,
-			constructor cons)
-  { add_type (symbol (name), al, syntax, cons); }
-  static void add_type (const char *const name, AttributeList& al,
-			const Syntax& syntax,
 			builder build)
   { add_type (symbol (name), al, syntax, build); }
   static void derive_type (symbol name, const Syntax& syn, 
 			   AttributeList& al, symbol super)
-  {
-    if (content->constructors.find (super) != content->constructors.end ())
-      add_type (name, al, syn, (content->constructors)[super]);
-    else
-      add_type (name, al, syn, (content->builders)[super]);
-  }
+  { add_type (name, al, syn, (content->builders)[super]); }
   static Library& library ()
   {
     daisy_assert (content);
@@ -205,30 +174,5 @@ public:
       daisy_assert (content->count > 0);
   }
 };
-
-// This cutie will create a vector of objects from a vector of alists.
-template <class T> 
-std::vector<T*>
-map_create (const std::vector<AttributeList*>& f)
-{ 
-  std::vector<T*> t;
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-       i != f.end ();
-       i++)
-    t.push_back (Librarian<T>::create (**i));
-  return t;
-}
-
-template <class T> 
-std::vector<const T*>
-map_create_const (const std::vector<AttributeList*>& f)
-{ 
-  std::vector<const T*> t;
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
-       i != f.end ();
-       i++)
-    t.push_back (Librarian<T>::create (**i));
-  return t;
-}
 
 #endif // LIBRARIAN_H

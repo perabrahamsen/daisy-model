@@ -483,7 +483,7 @@ fraction of the radition of that day that was received that hour.");
 }
 
 static double
-get_PotRtDpt (const AttributeList& al)
+get_PotRtDpt (Block& al)
 {
   if (al.check ("PotRtDpt"))
     return al.number ("PotRtDpt");
@@ -492,8 +492,8 @@ get_PotRtDpt (const AttributeList& al)
   return al.number ("DptEmr");
 }
 
-RootSystem::RootSystem (const AttributeList& al)
-  : rootdens (Librarian<Rootdens>::create (al.alist ("rootdens"))),
+RootSystem::RootSystem (Block& al)
+  : rootdens (Librarian<Rootdens>::build_item (al, "rootdens")),
     PenPar1 (al.number ("PenPar1")),
     PenPar2 (al.number ("PenPar2")),
     PenClayFac (al.plf ("PenClayFac")),

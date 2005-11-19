@@ -118,7 +118,7 @@ Nitrogen content of irrigation water [mg N/l] (default: none).",
 			  IM::load_ppm);
   }
 
-  ActionIrrigate (const AttributeList& al)
+  ActionIrrigate (Block& al)
     : Action (al),
       days (al.integer ("days")),
       hours (al.integer ("hours", (days > 0) ? 0 : 1)),
@@ -143,7 +143,7 @@ struct ActionIrrigateOverhead : public ActionIrrigate
     else
       f.irrigate_overhead (flux, temp, im); 
   }
-  ActionIrrigateOverhead (const AttributeList& al)
+  ActionIrrigateOverhead (Block& al)
     : ActionIrrigate (al)
   { }
 };
@@ -157,7 +157,7 @@ struct ActionIrrigateSurface : public ActionIrrigate
     else
       f.irrigate_surface (flux, temp, im); 
   }
-  ActionIrrigateSurface (const AttributeList& al)
+  ActionIrrigateSurface (Block& al)
     : ActionIrrigate (al)
   { }
 };
@@ -169,7 +169,7 @@ struct ActionIrrigateSubsoil : public ActionIrrigate
 
   void irrigate (Field& f, double flux, double /* temp */, const IM& im) const
   { f.irrigate_subsoil (flux, im, from, to); }
-  ActionIrrigateSubsoil (const AttributeList& al)
+  ActionIrrigateSubsoil (Block& al)
     : ActionIrrigate (al),
       from (al.number ("from")),
       to (al.number ("to"))
@@ -178,7 +178,7 @@ struct ActionIrrigateSubsoil : public ActionIrrigate
 
 static struct ActionIrrigateOverheadSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionIrrigateOverhead (al); }
   ActionIrrigateOverheadSyntax ()
   { 
@@ -193,7 +193,7 @@ Irrigate the field from above.");
 
 static struct ActionIrrigateSurfaceSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionIrrigateSurface (al); }
   ActionIrrigateSurfaceSyntax ()
   { 
@@ -208,7 +208,7 @@ Irrigate the field directly on the soil surface, bypassing the canopy.");
 
 static struct ActionIrrigateTopSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionIrrigateOverhead (al); }
   static bool check_alist (const AttributeList&, Treelog& err)
   {
@@ -233,7 +233,7 @@ OBSOLETE.  Use 'irrigate_overhead' instead.");
 
 static struct ActionIrrigateSubsoilSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionIrrigateSubsoil (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

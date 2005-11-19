@@ -35,7 +35,7 @@ struct ConditionFalse : public Condition
   void output (Log&) const
   { }
 
-  ConditionFalse (const AttributeList& al)
+  ConditionFalse (Block& al)
     : Condition (al)
   { }
 
@@ -50,7 +50,7 @@ struct ConditionTrue : public Condition
   void output (Log&) const
   { }
 
-  ConditionTrue (const AttributeList& al)
+  ConditionTrue (Block& al)
     : Condition (al)
   { }
 
@@ -85,9 +85,9 @@ struct ConditionOr : public Condition
   void output (Log&) const
   { }
 
-  ConditionOr (const AttributeList& al)
+  ConditionOr (Block& al)
     : Condition (al),
-      conditions (map_create<Condition> (al.alist_sequence ("operands")))
+      conditions (Librarian<Condition>::build_vector (al, "operands"))
   { }
 
   ~ConditionOr ()
@@ -121,9 +121,9 @@ struct ConditionAnd : public Condition
   void output (Log&) const
   { }
 
-  ConditionAnd (const AttributeList& al)
+  ConditionAnd (Block& al)
     : Condition (al),
-      conditions (map_create<Condition> (al.alist_sequence ("operands")))
+      conditions (Librarian<Condition>::build_vector (al, "operands"))
   { }
 
   ~ConditionAnd ()
@@ -143,9 +143,9 @@ struct ConditionNot : public Condition
   void output (Log&) const
   { }
 
-  ConditionNot (const AttributeList& al)
+  ConditionNot (Block& al)
     : Condition (al),
-      condition (Librarian<Condition>::create (al.alist ("operand")))
+      condition (Librarian<Condition>::build_item (al, "operand"))
   { }
 
   ~ConditionNot ()
@@ -174,11 +174,11 @@ struct ConditionIf : public Condition
   void output (Log&) const
   { }
 
-  ConditionIf (const AttributeList& al)
+  ConditionIf (Block& al)
     : Condition (al),
-      if_c (Librarian<Condition>::create (al.alist ("if"))),
-      then_c (Librarian<Condition>::create (al.alist ("then"))),
-      else_c (Librarian<Condition>::create (al.alist ("else")))
+      if_c (Librarian<Condition>::build_item (al, "if")),
+      then_c (Librarian<Condition>::build_item (al, "then")),
+      else_c (Librarian<Condition>::build_item (al, "else"))
   { }
 
   ~ConditionIf ()
@@ -187,17 +187,17 @@ struct ConditionIf : public Condition
 
 static struct ConditionLogicSyntax
 {
-  static Condition& make_false (const AttributeList& al)
+  static Condition& make_false (Block& al)
   { return *new ConditionFalse (al); }
-  static Condition& make_true (const AttributeList& al)
+  static Condition& make_true (Block& al)
   { return *new ConditionTrue (al); }
-  static Condition& make_or (const AttributeList& al)
+  static Condition& make_or (Block& al)
   { return *new ConditionOr (al); }
-  static Condition& make_and (const AttributeList& al)
+  static Condition& make_and (Block& al)
   { return *new ConditionAnd (al); }
-  static Condition& make_not (const AttributeList& al)
+  static Condition& make_not (Block& al)
   { return *new ConditionNot (al); }
-  static Condition& make_if (const AttributeList& al)
+  static Condition& make_if (Block& al)
   { return *new ConditionIf (al); }
   ConditionLogicSyntax ();
 } ConditionLogic_syntax;

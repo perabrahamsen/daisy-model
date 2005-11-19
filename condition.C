@@ -39,7 +39,7 @@ const std::string
 Condition::timestep ()
 { return "dt"; } 
 
-Condition::Condition (const AttributeList& al)
+Condition::Condition (Block& al)
   : name (al.identifier ("type"))
 { }
 

@@ -52,9 +52,9 @@ public:
 
   // Create and Destroy.
 public:
-  static Macro& create (double depth); // Defined in macro_std.C.
+  static std::auto_ptr<Macro> create (double depth); // Defined in macro_std.C.
 protected:
-  Macro (const AttributeList& al);
+  Macro (Block& al);
 public:
   virtual ~Macro ();
 };

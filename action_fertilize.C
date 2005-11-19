@@ -59,7 +59,7 @@ struct ActionFertilize : public Action
 
   // Create and Destroy.
   bool check (const Daisy& daisy, Treelog& err) const;
-  ActionFertilize (const AttributeList& al);
+  ActionFertilize (Block& al);
   ~ActionFertilize ();
 };
 
@@ -207,7 +207,7 @@ ActionFertilize::check (const Daisy& daisy, Treelog& err) const
   return ok;
 }
 
-ActionFertilize::ActionFertilize (const AttributeList& al)
+ActionFertilize::ActionFertilize (Block& al)
   : Action (al),
     am (al.alist ("am")),
     from (al.number ("from")),
@@ -231,7 +231,7 @@ ActionFertilize::~ActionFertilize ()
 
 static struct ActionFertilizeSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionFertilize (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

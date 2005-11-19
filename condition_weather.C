@@ -58,7 +58,7 @@ struct ConditionTSum : public Condition
   void output (Log& log) const
   { output_variable (TSum_now, log); }
 
-  ConditionTSum (const AttributeList& al)
+  ConditionTSum (Block& al)
     : Condition (al),
       check_hour (al.integer ("check_hour")),
       reset_mday (al.integer ("reset_mday")),
@@ -69,7 +69,7 @@ struct ConditionTSum : public Condition
 };
 static struct ConditionWeatherSyntax
 {
-  static Condition& make_TSum (const AttributeList& al)
+  static Condition& make_TSum (Block& al)
   { return *new ConditionTSum (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

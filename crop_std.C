@@ -40,6 +40,7 @@
 #include "organic_matter.h"
 #include "soil_heat.h"
 #include "am.h"
+#include "submodeler.h"
 #include "mathlib.h"
 
 using namespace std;
@@ -48,7 +49,7 @@ class CropStandard : public Crop
 {
   // Content.
 public:
-  RootSystem root_system;
+  std::auto_ptr<RootSystem> root_system;
   CanopyStandard canopy;
   Harvesting harvesting;
   Production production;
@@ -68,9 +69,9 @@ public:
 
 #if 0
   double water_stress () const // [0-1] (0 = full production)
-  { return root_system.water_stress; }
+  { return root_system->water_stress; }
   double nitrogen_stress () const // [0-1] (1 = no production)
-  { return root_system.nitrogen_stress; }
+  { return root_system->nitrogen_stress; }
 #endif
   double rs_min () const	// Minimum transpiration resistance.
   { return canopy.rs_min; }
@@ -101,10 +102,10 @@ public:
 			    const Soil& soil, SoilWater& soil_water,
 			    double EvapInterception, double day_fraction, 
 			    Treelog& msg)
-  { return root_system.water_uptake (Ept, soil, soil_water, EvapInterception, 
+  { return root_system->water_uptake (Ept, soil, soil_water, EvapInterception, 
 				     day_fraction, msg);}
   void force_production_stress  (double pstress)
-  { root_system.production_stress = pstress; }
+  { root_system->production_stress = pstress; }
 
   // Simulation.
 public:
@@ -175,7 +176,7 @@ void
 CropStandard::initialize (Treelog& msg, const Geometry& geometry,
                           OrganicMatter *const organic_matter)
 {
-  root_system.initialize (geometry.size ());
+  root_system->initialize (geometry.size ());
   production.initialize (nitrogen.SeedN);
 
   if (development->DS >= 0)
@@ -191,7 +192,7 @@ CropStandard::initialize (Treelog& msg, const Geometry& geometry,
 		   // We don't save the forced CAI, use simulated CAI
 		   //  until midnight (small error).
 		   -1.0);
-      root_system.set_density (msg, 
+      root_system->set_density (msg, 
 			       geometry, production.WRoot, development->DS);
       nitrogen.content (development->DS, production);
     }
@@ -219,8 +220,8 @@ CropStandard::tick (const Time& time,
   harvesting.tick (time);
 
   // Update average soil temperature.
-  const double T_soil = soil_heat.T (soil.interval_plus (-root_system.Depth));
-  root_system.tick_hourly (time.hour (), T_soil);
+  const double T_soil = soil_heat.T (soil.interval_plus (-root_system->Depth));
+  root_system->tick_hourly (time.hour (), T_soil);
 
   // Clear nitrogen.
   nitrogen.clear ();
@@ -233,15 +234,15 @@ CropStandard::tick (const Time& time,
     {
       daisy_assert (ForcedCAI < 0.0);
 
-      development->emergence (soil.interval_plus (-root_system.Depth/2.),
-                              root_system.soil_temperature);
+      development->emergence (soil.interval_plus (-root_system->Depth/2.),
+                              root_system->soil_temperature);
       if (development->DS >= 0)
 	{
 	  msg.message ("Emerging");
 	  canopy.tick (production.WLeaf, production.WSOrg,
 		       production.WStem, development->DS, -1.0);
 	  nitrogen.content (development->DS, production);
-	  root_system.tick_daily (msg, soil, production.WRoot, 0.0,
+	  root_system->tick_daily (msg, soil, production.WRoot, 0.0,
 				  development->DS);
 
 	  static const symbol root_symbol ("root");
@@ -287,7 +288,7 @@ CropStandard::tick (const Time& time,
 		       enable_N_stress,
 		       soil, soil_water, *soil_NH4, *soil_NO3,
                        bioclimate.day_fraction (),
-		       root_system);
+		       *root_system);
     }
   else
     {
@@ -295,7 +296,7 @@ CropStandard::tick (const Time& time,
       production.NCrop = nitrogen.PtNCnt;
     }  
   const double nitrogen_stress = nitrogen.nitrogen_stress;
-  const double water_stress = root_system.water_stress;
+  const double water_stress = root_system->water_stress;
 
   if (bioclimate.hourly_global_radiation () > 1e-10)
     {
@@ -328,8 +329,8 @@ CropStandard::tick (const Time& time,
         }
 
       production.PotCanopyAss = Ass;
-      if (root_system.production_stress >= 0.0)
-	Ass *= (1.0 - root_system.production_stress);
+      if (root_system->production_stress >= 0.0)
+	Ass *= (1.0 - root_system->production_stress);
       else 
 	Ass *= water_stress_effect->factor (water_stress);
       if (enable_N_stress)
@@ -342,8 +343,8 @@ CropStandard::tick (const Time& time,
     production.PotCanopyAss = production.CanopyAss = 0.0;
 
   production.tick (bioclimate.daily_air_temperature (),
-		   soil_heat.T (soil.interval_plus (-root_system.Depth / 3.0)),
-		   root_system.Density, soil, development->DS, 
+		   soil_heat.T (soil.interval_plus (-root_system->Depth / 3.0)),
+		   root_system->Density, soil, development->DS, 
 		   canopy.CAImRat, nitrogen, nitrogen_stress, partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, msg);
@@ -357,7 +358,7 @@ CropStandard::tick (const Time& time,
   development->tick_daily (bioclimate.daily_air_temperature (), 
 			  production.WLeaf, production, vernalization,
 			  harvesting.cut_stress, msg);
-  root_system.tick_daily (msg, soil, production.WRoot, production.IncWRoot,
+  root_system->tick_daily (msg, soil, production.WRoot, production.IncWRoot,
 			  development->DS);
 }
 
@@ -411,7 +412,7 @@ CropStandard::harvest (const symbol column_name,
 
   const Harvest& harvest 
     = harvesting (column_name, name, 
-		  root_system.Density,
+		  root_system->Density,
 		  time, geometry, production, development->DS,
 		  stem_harvest, leaf_harvest, chemicals,
 		  stem_harvest_frac, leaf_harvest_frac, sorg_harvest_frac,
@@ -419,7 +420,7 @@ CropStandard::harvest (const symbol column_name,
 		  residuals_N_top, residuals_C_top, 
 		  residuals_N_soil, residuals_C_soil,
                   combine,
-                  root_system.water_stress_days, 
+                  root_system->water_stress_days, 
                   nitrogen.nitrogen_stress_days);
 
   if (development->DS != DSremove)
@@ -469,7 +470,7 @@ CropStandard::harvest (const symbol column_name,
 void
 CropStandard::output (Log& log) const
 {
-  output_submodule (root_system, "Root", log);
+  output_submodule (*root_system, "Root", log);
   output_submodule (canopy, "Canopy", log);
   output_submodule (harvesting, "Harvest", log);
 #if 1
@@ -490,7 +491,7 @@ CropStandard::output (Log& log) const
 
 CropStandard::CropStandard (Block& al)
   : Crop (al),
-    root_system (al.alist ("Root")),
+    root_system (submodel<RootSystem> (al, "Root")),
     canopy (al.alist ("Canopy")),
     harvesting (al.alist ("Harvest")),
     production (al.alist ("Prod")),

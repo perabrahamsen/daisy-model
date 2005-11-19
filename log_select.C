@@ -201,7 +201,7 @@ LogSelect::check (const Border& border, Treelog& err) const
 LogSelect::LogSelect (Block& al)
   : Log (al),
     description (al.name ("description")),
-    condition (Librarian<Condition>::create (al.alist ("when"))),
+    condition (Librarian<Condition>::build_item (al, "when")),
     entries (Librarian<Select>::build_vector (al, "entries")),
     conv_vector (al.identifier_sequence ("set")),
     from (al.number ("from")),

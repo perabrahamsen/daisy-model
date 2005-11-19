@@ -47,7 +47,12 @@ bool
 Action::check (const Daisy&, Treelog&) const
 { return true; }
 
-Action::Action (const AttributeList& al)
+Action::Action (Block& al)
+  : name (al.identifier ("type")),
+    alist (al.alist ())
+{ }
+
+Action::Action (Block&, const AttributeList& al)
   : name (al.identifier ("type")),
     alist (al)
 { }

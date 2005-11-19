@@ -811,7 +811,9 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 #endif // !SLOPPY_PARENTHESES						   
 	      if (&lib == &Librarian<Parser>::library ())
 		{
-		  auto_ptr<Parser> parser (Librarian<Parser>::create (al));
+		  std::auto_ptr<Parser> 
+                    parser (Librarian<Parser>::build_free (lexer->err, al,
+                                                           "input"));
 		  parser->initialize (*global_syntax_table, lexer->err);
 		  parser->load_nested (atts);
 		  lexer->error_count += parser->error_count ();
@@ -1291,21 +1293,26 @@ void
 ParserFile::initialize (Syntax& syntax, Treelog& out)
 { impl.initialize (syntax, out); }
 
-static const AttributeList& 
-get_alist ()
+static Block& 
+get_block ()
 {
+  static Syntax syntax;
   static AttributeList alist;
-  if (!alist.check ("type"))
-    alist.add ("type", "file");
-  return alist;
+  static std::auto_ptr<Block> block (NULL);
+  if (!block.get ())
+    {
+      alist.add ("type", "file");
+      block.reset (new Block (syntax, alist, Treelog::null (), "input file"));
+    }
+  return *block;
 }
     
 ParserFile::ParserFile (Syntax& syntax, const string& name, Treelog& out)
-  : Parser (get_alist ()),
+  : Parser (get_block ()),
     impl (*new Implementation (name))
 { initialize (syntax, out); }
 
-ParserFile::ParserFile (const AttributeList& al)
+ParserFile::ParserFile (Block& al)
   : Parser (al),
     impl (*new Implementation (al.name ("where")))
 {  }
@@ -1315,7 +1322,7 @@ ParserFile::~ParserFile ()
 
 static struct ParserFileSyntax
 {
-  static Parser& make (const AttributeList& al)
+  static Parser& make (Block& al)
   { return *new ParserFile (al); }
 
   ParserFileSyntax ()

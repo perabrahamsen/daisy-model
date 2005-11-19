@@ -35,7 +35,7 @@ struct ActionMerge : public Action
     daisy.field.merge (combine, remove);
   }
   
-  ActionMerge (const AttributeList& al)
+  ActionMerge (Block& al)
     : Action (al),
       combine (al.identifier ("combine")), 
       remove (al.identifier ("remove"))
@@ -44,7 +44,7 @@ struct ActionMerge : public Action
 
 static struct ActionMergeSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
     { return *new ActionMerge (al); }
   ActionMergeSyntax ()
     { 

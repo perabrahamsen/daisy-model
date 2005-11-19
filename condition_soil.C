@@ -38,7 +38,7 @@ struct ConditionSoilTemperature : public Condition
   void output (Log&) const
   { }
 
-  ConditionSoilTemperature (const AttributeList& al)
+  ConditionSoilTemperature (Block& al)
     : Condition (al),
       temperature (al.number ("temperature")),
       height (al.number ("height"))
@@ -55,7 +55,7 @@ struct ConditionSoilPotential : public Condition
   void output (Log&) const
   { }
 
-  ConditionSoilPotential (const AttributeList& al)
+  ConditionSoilPotential (Block& al)
     : Condition (al),
       potential (al.number ("potential")),
       height (al.number ("height"))
@@ -73,7 +73,7 @@ struct ConditionSoilWater : public Condition
   void output (Log&) const
   { }
 
-  ConditionSoilWater (const AttributeList& al)
+  ConditionSoilWater (Block& al)
     : Condition (al),
       water (al.number ("water")),
       from (al.number ("from")),
@@ -92,7 +92,7 @@ struct ConditionSoilN_min : public Condition
   void output (Log&) const
   { }
 
-  ConditionSoilN_min (const AttributeList& al)
+  ConditionSoilN_min (Block& al)
     : Condition (al),
       amount (al.number ("amount")),
       from (al.number ("from")),
@@ -102,13 +102,13 @@ struct ConditionSoilN_min : public Condition
 
 static struct ConditionSoilSyntax
 {
-  static Condition& make_temperature (const AttributeList& al)
+  static Condition& make_temperature (Block& al)
   { return *new ConditionSoilTemperature (al); }
-  static Condition& make_potential (const AttributeList& al)
+  static Condition& make_potential (Block& al)
   { return *new ConditionSoilPotential (al); }
-  static Condition& make_water (const AttributeList& al)
+  static Condition& make_water (Block& al)
   { return *new ConditionSoilWater (al); }
-  static Condition& make_N_min (const AttributeList& al)
+  static Condition& make_N_min (Block& al)
   { return *new ConditionSoilN_min (al); }
 
   static bool check_water_content (const AttributeList& al, Treelog& err)

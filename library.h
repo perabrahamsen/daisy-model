@@ -32,12 +32,14 @@ class AttributeList;
 class Treelog;
 class Format;
 
-typedef void (*derive_fun) (symbol name, const Syntax& syn,
-			    AttributeList& al, symbol super);
-typedef void (*doc_fun) (Format&, const AttributeList& al);
-
 class Library
 {
+  // Types.
+public:
+  typedef void (*derive_fun) (symbol name, const Syntax& syn,
+                              AttributeList& al, symbol super);
+  typedef void (*doc_fun) (Format&, const AttributeList& al);
+
   // Content.
 public:
   struct Implementation;

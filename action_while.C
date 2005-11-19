@@ -68,9 +68,9 @@ struct ActionWhile : public Action
     return ok;
   }
 
-  ActionWhile (const AttributeList& al)
+  ActionWhile (Block& al)
     : Action (al),
-      actions (map_create<Action> (al.alist_sequence ("actions")))
+      actions (Librarian<Action>::build_vector (al, "actions"))
   { }
 
   ~ActionWhile ()
@@ -81,7 +81,7 @@ struct ActionWhile : public Action
 
 static struct ActionWhileSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionWhile (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

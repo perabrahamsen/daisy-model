@@ -37,7 +37,7 @@ struct ActionSow : public Action
     daisy.field.sow (msg, crop); 
   }
 
-  ActionSow (const AttributeList& al)
+  ActionSow (Block& al)
     : Action (al),
       crop (al.alist ("crop"))
   { }
@@ -46,7 +46,7 @@ struct ActionSow : public Action
 // Add the ActionSow syntax to the syntax table.
 static struct ActionSowSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionSow (al); }
 
   ActionSowSyntax ()

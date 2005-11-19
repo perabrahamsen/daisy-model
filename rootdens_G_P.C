@@ -47,7 +47,7 @@ struct Rootdens_G_P : public Rootdens
   void output (Log& log) const;
 
   // Create.
-  Rootdens_G_P (const AttributeList&);
+  Rootdens_G_P (Block&);
 };
 
 double
@@ -192,7 +192,7 @@ Rootdens_G_P::output (Log& log) const
   output_variable (L0, log); 
 }
 
-Rootdens_G_P::Rootdens_G_P (const AttributeList& al)
+Rootdens_G_P::Rootdens_G_P (Block& al)
   : Rootdens (al),
     DensRtTip (al.number ("DensRtTip")),
     MinDens (al.number ("MinDens")),
@@ -219,7 +219,7 @@ Rootdens::default_model ()
 static struct Rootdens_G_PSyntax
 {
   static Rootdens&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new Rootdens_G_P (al); }
   Rootdens_G_PSyntax ()
   {

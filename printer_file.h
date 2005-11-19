@@ -60,7 +60,7 @@ public:
 
  // Create and Destroy.
 public:
-  PrinterFile (const AttributeList& al);
+  PrinterFile (Block& al);
   PrinterFile (const std::string& filename);
   PrinterFile (std::ostream& out);
   ~PrinterFile ();

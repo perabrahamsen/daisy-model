@@ -64,7 +64,7 @@ struct Rootdens_PLF : public Rootdens
   { }
 
   // Create.
-  Rootdens_PLF (const AttributeList&);
+  Rootdens_PLF (Block&);
   ~Rootdens_PLF ();
 };
 
@@ -190,7 +190,7 @@ Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
   daisy_assert (approximate (LengthPrArea, geometry.total (abs_dens)));
 }
 
-Rootdens_PLF::Rootdens_PLF (const AttributeList& al)
+Rootdens_PLF::Rootdens_PLF (Block& al)
   : Rootdens (al),
     entries (map_construct_const<Entry> (al.alist_sequence ("entries")))
 { }
@@ -208,7 +208,7 @@ struct Rootdens_DS_Depth : public Rootdens_PLF
   { get_density (msg, abs_dens, geometry, WRoot, DS, -1.0); }
   
   // Create.
-  Rootdens_DS_Depth (const AttributeList& al)
+  Rootdens_DS_Depth (Block& al)
     : Rootdens_PLF (al)
   { }
   ~Rootdens_DS_Depth ()
@@ -218,7 +218,7 @@ struct Rootdens_DS_Depth : public Rootdens_PLF
 static struct Rootdens_DS_Depth_Syntax
 {
   static Rootdens&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new Rootdens_DS_Depth (al); }
 
   Rootdens_DS_Depth_Syntax ()
@@ -258,7 +258,7 @@ struct Rootdens_DS_Rel : public Rootdens_PLF
   }
 
   // Create.
-  Rootdens_DS_Rel (const AttributeList& al)
+  Rootdens_DS_Rel (Block& al)
     : Rootdens_PLF (al)
   { }
   ~Rootdens_DS_Rel ()
@@ -268,7 +268,7 @@ struct Rootdens_DS_Rel : public Rootdens_PLF
 static struct Rootdens_DS_Rel_Syntax
 {
   static Rootdens&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new Rootdens_DS_Rel (al); }
 
   Rootdens_DS_Rel_Syntax ()
@@ -308,7 +308,7 @@ struct Rootdens_Depth_Depth : public Rootdens_PLF
   }
 
   // Create.
-  Rootdens_Depth_Depth (const AttributeList& al)
+  Rootdens_Depth_Depth (Block& al)
     : Rootdens_PLF (al)
   { }
   ~Rootdens_Depth_Depth ()
@@ -318,7 +318,7 @@ struct Rootdens_Depth_Depth : public Rootdens_PLF
 static struct Rootdens_Depth_Depth_Syntax
 {
   static Rootdens&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new Rootdens_Depth_Depth (al); }
 
   Rootdens_Depth_Depth_Syntax ()

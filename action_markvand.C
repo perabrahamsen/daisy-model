@@ -70,7 +70,7 @@ struct MV_Soil
   { return max_capacity - C_r (z_r); }
 
   // Create and Destroy.
-  MV_Soil (const AttributeList& al)
+  MV_Soil (Block& al)
     : name (al.identifier ("type")),
       z_o (al.number ("z_o")),
       z_xJ (al.number ("z_xJ")),
@@ -103,7 +103,7 @@ Description of a soil for use by the MARKVAND model.";
 static struct MV_SoilSyntax
 {
   static MV_Soil&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new MV_Soil (al); }
   MV_SoilSyntax ()
   {
@@ -226,7 +226,7 @@ struct MV_Crop
   }
 
   // Create and Destroy.
-  MV_Crop (const AttributeList& al)
+  MV_Crop (Block& al)
     : name (al.identifier ("type")),
       S_F (accumulated (al.number_sequence ("S_F"))),
       A_F (al.number_sequence ("A_F")),
@@ -259,7 +259,7 @@ Description of a crop for use by the MARKVAND model.";
 
 static struct MV_CropSyntax
 {
-  static MV_Crop& make (const AttributeList& al)
+  static MV_Crop& make (Block& al)
   { return *new MV_Crop (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& msg)
@@ -327,7 +327,7 @@ struct ActionMarkvand : public Action
   const struct crop_map_t : public std::map<std::string, const MV_Crop*>
   {
     static void load_syntax (Syntax& syntax, AttributeList&);
-    crop_map_t (const std::vector<AttributeList*> alists);
+    crop_map_t (Block&, const std::string& key);
     ~crop_map_t ();
   } crop_map;
 
@@ -351,7 +351,7 @@ struct ActionMarkvand : public Action
   void output (Log&) const;
 
   // Create and destroy.
-  ActionMarkvand (const AttributeList& al);
+  ActionMarkvand (Block& al);
   ~ActionMarkvand ();
 };
 
@@ -366,13 +366,15 @@ ActionMarkvand::crop_map_t::load_syntax (Syntax& syntax, AttributeList&)
   syntax.order ("Daisy", "MARKVAND");
 }
 
-ActionMarkvand::crop_map_t::crop_map_t (const std::vector<AttributeList*> 
-					/**/alists)
+ActionMarkvand::crop_map_t::crop_map_t (Block& al, const std::string& key)
 {
+  const Syntax& syntax = al.syntax ().syntax (key);
+  const std::vector<AttributeList*>& alists = al.alist_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
     {
+      Block nest (al, syntax, *alists[i], sequence_id (key, i));
       (*this)[alists[i]->name ("Daisy")] 
-	= Librarian<MV_Crop>::create (alists[i]->alist ("MARKVAND"));
+	= Librarian<MV_Crop>::build_item (nest, "MARKVAND");
     }
 }
 
@@ -615,10 +617,10 @@ ActionMarkvand::output (Log& log) const
     output_variable (V_b, log);
 }
 
-ActionMarkvand::ActionMarkvand (const AttributeList& al)
+ActionMarkvand::ActionMarkvand (Block& al)
   : Action (al),
-    soil (Librarian<MV_Soil>::create (al.alist ("soil"))),
-    crop_map (al.alist_sequence ("map")),
+    soil (Librarian<MV_Soil>::build_item (al, "soil")),
+    crop_map (al, "map"),
     T_sum (al.number ("T_sum", -1.0)),
     dt (al.number ("dt", -42.42e42)),
     V_I (al.number ("V_I")),
@@ -634,7 +636,7 @@ ActionMarkvand::~ActionMarkvand ()
 
 static struct ActionMarkvandSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionMarkvand (al); }
   static bool check_alist (const AttributeList&, Treelog&)
   {

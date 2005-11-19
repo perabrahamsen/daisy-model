@@ -35,7 +35,7 @@ struct ActionRidge : public Action
       daisy.field.ridge (ridge); 
     }
 
-  ActionRidge (const AttributeList& al)
+  ActionRidge (Block& al)
     : Action (al),
       ridge (al.alist ("ridge"))
     { }
@@ -44,7 +44,7 @@ struct ActionRidge : public Action
 // Add the ActionRidge syntax to the syntax table.
 static struct ActionRidgeSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionRidge (al); }
 
   ActionRidgeSyntax ()

@@ -28,14 +28,14 @@ struct ActionStop : public Action
   void doIt (Daisy& daisy, Treelog&)
     { daisy.running = false; }
 
-  ActionStop (const AttributeList& al)
+  ActionStop (Block& al)
     : Action (al)
     { }
 };
 
 static struct ActionStopSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   {
     return *new ActionStop (al);
   }

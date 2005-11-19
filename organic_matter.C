@@ -2573,7 +2573,7 @@ OrganicMatter::Implementation::Implementation (Block& al)
     K_NO3 (al.number ("K_NO3")),
     CO2_threshold (al.number ("CO2_threshold")),
     top_CO2 (0.0),
-    am (map_create <AM> (al.alist_sequence ("am"))),
+    am (Librarian<AM>::build_vector (al, "am")),
     smb (map_construct<SMB> (al.alist_sequence ("smb"))),
     som (map_construct<SOM> (al.alist_sequence ("som"))),
     dom (map_submodel<DOM> (al, "dom")),

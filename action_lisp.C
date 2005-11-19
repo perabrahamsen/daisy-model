@@ -24,6 +24,8 @@
 #include "daisy.h"
 #include "log.h"
 #include "memutils.h"
+#include "submodeler.h"
+
 // We need to initialize the Condition library.
 #include "condition.h"
 
@@ -34,7 +36,7 @@ struct ActionNil : public Action
   void doIt (Daisy&, Treelog&)
   { }
 
-  ActionNil (const AttributeList& al)
+  ActionNil (Block& al)
     : Action (al)
   { }
 };
@@ -47,7 +49,7 @@ struct ActionT : public Action
   bool done (const Daisy&) const
   { return false; }
 
-  ActionT (const AttributeList& al)
+  ActionT (Block& al)
     : Action (al)
   { }
 };
@@ -95,62 +97,54 @@ struct ActionProgn : public Action
     return ok;
   }
 
-  ActionProgn (const AttributeList& al)
+  ActionProgn (Block& al)
     : Action (al),
-      actions (map_create<Action> (al.alist_sequence ("actions")))
+      actions (Librarian<Action>::build_vector (al, "actions"))
   { }
 
   ~ActionProgn ()
   { sequence_delete (actions.begin (), actions.end ()); }
 };
 
-struct clause
-{
-  Condition* condition;
-  vector<Action*> actions;
-  void output (Log& log) const
-  { 
-    output_derived (condition, "condition", log);
-    output_list (actions, "actions", log, Librarian<Action>::library ());
-  }
-  clause (Condition* c, vector<Action*>& a) 
-    : condition (c),
-      actions (a)
-  { }
-  clause ()
-    : condition (NULL)
-  { }
-};
-
-vector<clause>& make_clauses (const vector<AttributeList*>& s)
-{
-  vector<clause>& c = *new vector<clause>;
-  
-  for (vector<AttributeList*>::const_iterator i = s.begin ();
-       i != s.end ();
-       i++)
-    {
-      Condition *const condition 
-	= Librarian<Condition>::create ((*i)->alist ("condition"));
-      vector<Action*> actions 
-	= map_create<Action> ((*i)->alist_sequence ("actions"));
-      c.push_back (clause (condition, actions));
-    }
-  return c;
-}
 
 struct ActionCond : public Action
 {
-  vector<clause>& clauses;
+  struct clause
+  {
+    std::auto_ptr<Condition> condition;
+    vector<Action*> actions;
+    void output (Log& log) const
+    { 
+      output_derived (condition, "condition", log);
+      output_list (actions, "actions", log, Librarian<Action>::library ());
+    }
+    static void load_syntax (Syntax& syntax, AttributeList&)
+    {
+      syntax.add ("condition",
+                  Librarian<Condition>::library (), 
+                  "Condition for performing the actions.");
+      syntax.add ("actions", Librarian<Action>::library (),
+                  Syntax::State, Syntax::Sequence, 
+                  "Actions to perform when condition is meet.");
+      syntax.order ("condition", "actions");
+    }
+    clause (Block& al) 
+      : condition (Librarian<Condition>::build_item (al, "condition")),
+        actions (Librarian<Action>::build_vector (al, "actions"))
+    { }
+    ~clause ()
+    { sequence_delete (actions.begin (), actions.end ()); }
+  };
+  vector<clause*> clauses;
 
   void tick (const Daisy& daisy, Treelog& out)
   { 
-    for (vector<clause>::iterator i = clauses.begin (); 
+    for (vector<clause*>::iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	(*i).condition->tick (daisy, out);
-	vector<Action*>& actions = (*i).actions;
+	(*i)->condition->tick (daisy, out);
+	vector<Action*>& actions = (*i)->actions;
 	for (unsigned int j = 0; j < actions.size (); j++)
 	  actions[j]->tick (daisy, out);
       }
@@ -158,13 +152,13 @@ struct ActionCond : public Action
 
   void doIt (Daisy& daisy, Treelog& out)
   { 
-    for (vector<clause>::iterator i = clauses.begin (); 
+    for (vector<clause*>::iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	if ((*i).condition->match (daisy))
+	if ((*i)->condition->match (daisy))
 	  {
-	    vector<Action*>& actions = (*i).actions;
+	    vector<Action*>& actions = (*i)->actions;
 	    for (unsigned int j = 0; j < actions.size (); j++)
 	      actions[j]->doIt (daisy, out);
 	    break;
@@ -178,12 +172,12 @@ struct ActionCond : public Action
     if (log.check_interior (clauses_symbol))
       {
 	Log::Open open (log, clauses_symbol);
-	for (vector<clause>::const_iterator item = clauses.begin ();
+	for (vector<clause*>::const_iterator item = clauses.begin ();
 	     item != clauses.end ();
 	     item++)
 	  {
 	    Log::Unnamed unnamed (log);
-	    (*item).output (log);
+	    (*item)->output (log);
 	  }
       }
   }
@@ -191,11 +185,11 @@ struct ActionCond : public Action
   bool check (const Daisy& daisy, Treelog& err) const
   { 
     bool ok = true;
-    for (vector<clause>::const_iterator i = clauses.begin (); 
+    for (vector<clause*>::const_iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	const vector<Action*>& actions = (*i).actions;
+	const vector<Action*>& actions = (*i)->actions;
 	for (unsigned int j = 0; j < actions.size (); j++)
 	  if (!actions[j]->check (daisy, err))
 	    ok = false;
@@ -203,22 +197,13 @@ struct ActionCond : public Action
     return ok;
   }
 
-  ActionCond (const AttributeList& al)
+  ActionCond (Block& al)
     : Action (al),
-      clauses (make_clauses (al.alist_sequence ("clauses")))
+      clauses (map_submodel<clause> (al, "clauses"))
   { }
 
   ~ActionCond ()
-  { 
-    for (vector<clause>::const_iterator i = clauses.begin (); 
-	 i != clauses.end ();
-	 i++)
-      { 
-	delete (*i).condition; 
-	sequence_delete ((*i).actions.begin (), (*i).actions.end ());
-      }
-    delete &clauses;
-  }
+  { sequence_delete (clauses.begin (), clauses.end ()); }
 };
 
 struct ActionIf : public Action
@@ -259,11 +244,11 @@ struct ActionIf : public Action
     return ok;
   }
 
-  ActionIf (const AttributeList& al)
+  ActionIf (Block& al)
     : Action (al),
-      if_c (Librarian<Condition>::create (al.alist ("if"))),
-      then_a (Librarian<Action>::create (al.alist ("then"))),
-      else_a (Librarian<Action>::create (al.alist ("else")))
+      if_c (Librarian<Condition>::build_item (al, "if")),
+      then_a (Librarian<Action>::build_item (al, "then")),
+      else_a (Librarian<Action>::build_item (al, "else"))
   { }
 
   ~ActionIf ()
@@ -272,15 +257,15 @@ struct ActionIf : public Action
 
 static struct ActionLispSyntax
 {
-  static Action& make_nil (const AttributeList& al)
+  static Action& make_nil (Block& al)
   { return *new ActionNil (al); }
-  static Action& make_t (const AttributeList& al)
+  static Action& make_t (Block& al)
   { return *new ActionT (al); }
-  static Action& make_progn (const AttributeList& al)
+  static Action& make_progn (Block& al)
   { return *new ActionProgn (al); }
-  static Action& make_cond (const AttributeList& al)
+  static Action& make_cond (Block& al)
   { return *new ActionCond (al); }
-  static Action& make_if (const AttributeList& al)
+  static Action& make_if (Block& al)
   { return *new ActionIf (al); }
   ActionLispSyntax ();
 } ActionLisp_syntax;
@@ -320,19 +305,10 @@ All the actions will be performed in the same time step.");
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Perform the actions associated with the first true condition in the list.");
-    Syntax& clauseSyntax = *new Syntax ();
-    clauseSyntax.add ("condition",
-		      Librarian<Condition>::library (), 
-		      "Condition for performing the actions.");
-    clauseSyntax.add ("actions", 
-		      Librarian<Action>::library (),
-                      Syntax::State, Syntax::Sequence, 
-		      "Actions to perform when condition is meet.");
-    clauseSyntax.order ("condition", "actions");
-    syntax.add ("clauses", clauseSyntax, Syntax::Sequence,
-		"\
+    syntax.add_submodule_sequence ("clauses", Syntax::State, "\
 Each clause consist of a condition and a sequence of actions.\n\
-The first clause whose condition is true, will have its actions activated.");
+The first clause whose condition is true, will have its actions activated.",
+                                   ActionCond::clause::load_syntax);
     syntax.order ("clauses");
     Librarian<Action>::add_type ("cond", alist, syntax, &make_cond);
   }

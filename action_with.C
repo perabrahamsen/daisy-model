@@ -84,10 +84,10 @@ public:
     return ok;
   }
 
-  ActionWithColumn (const AttributeList& al)
+  ActionWithColumn (Block& al)
     : Action (al),
       column (al.identifier ("column")),
-      actions (map_create<Action> (al.alist_sequence ("actions")))
+      actions (Librarian<Action>::build_vector (al, "actions"))
   { }
 public:
   ~ActionWithColumn ()
@@ -96,7 +96,7 @@ public:
 
 static struct ActionWithColumnSyntax
 {
-  static Action& make (const AttributeList& al)
+  static Action& make (Block& al)
   { return *new ActionWithColumn (al); }
 
   ActionWithColumnSyntax ()

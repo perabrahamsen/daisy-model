@@ -48,7 +48,7 @@ struct Rootdens_AP : public Rootdens
   void output (Log& log) const;
 
   // Create.
-  Rootdens_AP (const AttributeList&);
+  Rootdens_AP (Block&);
 };
 
 static inline double sqr (double x)
@@ -101,7 +101,7 @@ Rootdens_AP::output (Log& log) const
   output_variable (L0, log); 
 }
 
-Rootdens_AP::Rootdens_AP (const AttributeList& al)
+Rootdens_AP::Rootdens_AP (Block& al)
   : Rootdens (al),
     a_DS (al.plf ("a_DS")),
     q (al.number ("q")),
@@ -113,7 +113,7 @@ Rootdens_AP::Rootdens_AP (const AttributeList& al)
 static struct Rootdens_APSyntax
 {
   static Rootdens&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new Rootdens_AP (al); }
   Rootdens_APSyntax ()
   {

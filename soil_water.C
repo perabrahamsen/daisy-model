@@ -31,10 +31,9 @@
 #include "macro.h"
 #include "syntax.h"
 #include "mathlib.h"
-#include <sstream>
 #include "submodel.h"
-
-using namespace std;
+#include <sstream>
+#include <memory>
 
 static const double rho_water = 1.0; // [g/cm^3]
 static const double rho_ice = 0.917; // [g/cm^3]
@@ -42,37 +41,37 @@ static const double rho_ice = 0.917; // [g/cm^3]
 struct SoilWater::Implementation
 {
   // Content.
-  vector<double> S_sum;
-  vector<double> S_root;
-  vector<double> S_drain;
-  vector<double> S_p;
-  vector<double> S_permanent;
-  vector<double> S_incorp;
-  vector<double> tillage;
-  vector<double> Theta_old;
-  vector<double> h_old;
-  vector<double> Theta;
-  vector<double> h;
-  vector<double> S_ice;
-  vector<double> X_ice;
-  vector<double> X_ice_buffer;
-  vector<double> h_ice;
-  vector<double> q;
-  vector<double> q_p;
-  UZmodel *const top;
-  UZmodel *const bottom;
+  std::vector<double> S_sum;
+  std::vector<double> S_root;
+  std::vector<double> S_drain;
+  std::vector<double> S_p;
+  std::vector<double> S_permanent;
+  std::vector<double> S_incorp;
+  std::vector<double> tillage;
+  std::vector<double> Theta_old;
+  std::vector<double> h_old;
+  std::vector<double> Theta;
+  std::vector<double> h;
+  std::vector<double> S_ice;
+  std::vector<double> X_ice;
+  std::vector<double> X_ice_buffer;
+  std::vector<double> h_ice;
+  std::vector<double> q;
+  std::vector<double> q_p;
+  std::auto_ptr<UZmodel> top;
+  std::auto_ptr<UZmodel> bottom;
   const int bottom_start;
-  UZmodel *const reserve;
-  Macro* macro;
+  std::auto_ptr<UZmodel> reserve;
+  std::auto_ptr<Macro> macro;
 
   unsigned int first_groundwater_node () const;
 
   // Sink.
 public:
   void clear (const Geometry&);
-  void root_uptake (const vector<double>&);
-  void drain (const vector<double>&);
-  void freeze (const Soil&, const vector<double>&);
+  void root_uptake (const std::vector<double>&);
+  void drain (const std::vector<double>&);
+  void freeze (const Soil&, const std::vector<double>&);
 
   // Simulation.
 public:
@@ -92,7 +91,7 @@ public:
   double MaxExfiltration (const Soil&, double T) const;
 
   // Communication with external model.
-  void put_h (const Soil& soil, const vector<double>& v); // [cm]
+  void put_h (const Soil& soil, const std::vector<double>& v); // [cm]
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);
@@ -117,7 +116,7 @@ SoilWater::Implementation::clear (const Geometry&)
 
 
 void
-SoilWater::Implementation::root_uptake (const vector<double>& v)
+SoilWater::Implementation::root_uptake (const std::vector<double>& v)
 {
   daisy_assert (S_sum.size () == v.size ());
   daisy_assert (S_root.size () == v.size ());
@@ -129,7 +128,7 @@ SoilWater::Implementation::root_uptake (const vector<double>& v)
 }
 
 void
-SoilWater::Implementation::drain (const vector<double>& v)
+SoilWater::Implementation::drain (const std::vector<double>& v)
 {
   daisy_assert (S_sum.size () == v.size ());
   daisy_assert (S_root.size () == v.size ());
@@ -141,7 +140,7 @@ SoilWater::Implementation::drain (const vector<double>& v)
 }
 
 void 
-SoilWater::Implementation::freeze (const Soil&, const vector<double>& v)
+SoilWater::Implementation::freeze (const Soil&, const std::vector<double>& v)
 {
   daisy_assert (v.size () == S_ice.size ());
   daisy_assert (S_sum.size () == v.size ());
@@ -165,12 +164,12 @@ void
 SoilWater::Implementation::macro_tick (const Soil& soil, Surface& surface, 
 				       Treelog& out)
 {
-  if (!macro)			// No macropores.
+  if (!macro.get ())			// No macropores.
     return;
 
   // Calculate preferential flow first.
-  fill (S_p.begin (), S_p.end (), 0.0);
-  fill (q_p.begin (), q_p.end (), 0.0);
+  std::fill (S_p.begin (), S_p.end (), 0.0);
+  std::fill (q_p.begin (), q_p.end (), 0.0);
   macro->tick (soil, 0, soil.size () - 1, surface, h_ice, h, Theta,
 	       S_sum, S_p, q_p, out);
 }
@@ -264,7 +263,7 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
   // Calculate matrix flow next.
   try
     {
-      if (bottom)
+      if (bottom.get ())
 	{
 	  // We have two UZ models.
 	  ok = top->tick (msg, soil, soil_heat,
@@ -291,12 +290,12 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
     }
   catch (const char* error)
     {
-      msg.warning (string ("UZ problem: ") + error);
+      msg.warning (std::string ("UZ problem: ") + error);
       ok = false;
     }
-  catch (const string& error)
+  catch (const std::string& error)
     {
-      msg.warning (string ("UZ problem: ") + error);
+      msg.warning (std::string ("UZ problem: ") + error);
       ok = false;
     }
   if (!ok)
@@ -449,7 +448,7 @@ SoilWater::Implementation::output (Log& log) const
   output_variable (q, log);
   output_variable (q_p, log);
   output_derived (top, "UZtop", log);
-  if (bottom)
+  if (bottom.get ())
     output_derived (bottom, "UZbottom", log);
 }
 
@@ -462,7 +461,7 @@ SoilWater::Implementation::MaxExfiltration (const Soil& soil, double T) const
 
 void 
 SoilWater::Implementation::put_h (const Soil& soil,
-				  const vector<double>& v) // [cm]
+				  const std::vector<double>& v) // [cm]
 {
   const int size = soil.size ();
   daisy_assert (v.size () == size);
@@ -591,7 +590,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
 	  
 	  for (unsigned int i = 0; i < soil.size (); i++)
 	    {
-	      h.push_back (max (-100.0, table - soil.z (i)));
+	      h.push_back (std::max (-100.0, table - soil.z (i)));
 	      Theta.push_back (soil.Theta (i, h[i], h_ice[i]));
 	    }
 	}
@@ -603,7 +602,8 @@ SoilWater::Implementation::initialize (const AttributeList& al,
   h_old = h;
 
   if (al.check ("macro"))
-    macro = Librarian<Macro>::create (al.alist ("macro"));
+    macro.reset (Librarian<Macro>::build_free (out, al.alist ("macro"), 
+                                               "macro"));
   else if (soil.humus (0) + soil.clay (0) > 0.05)
     // More than 5% clay (and humus) in first horizon.
     {
@@ -613,49 +613,42 @@ SoilWater::Implementation::initialize (const AttributeList& al,
 	lay++;
 
       // Don't go below 1.5 m.
-      double height = max (soil.zplus (lay-1), -150.0);
+      double height = std::max (soil.zplus (lay-1), -150.0);
 
       // Don't go below drain pipes.
       if (groundwater.is_pipe ())
-	height = max (height, groundwater.pipe_height ());
+	height = std::max (height, groundwater.pipe_height ());
 
       // Add them.
-      macro = &Macro::create (height);
+      macro = Macro::create (height);
 
       out.debug ("Adding macropores");
     }
 
   // Let 'macro' choose the default method to average K values in 'uz'.
-  const bool has_macropores = (macro && !macro->none ());
+  const bool has_macropores = (macro.get () && !macro->none ());
   top->has_macropores (has_macropores);
-  if (bottom)
+  if (bottom.get ())
     bottom->has_macropores (has_macropores);
 }
 
 SoilWater::Implementation::~Implementation ()
-{
-  daisy_assert (top);
-  delete top;
-  delete bottom;
-  daisy_assert (reserve);
-  delete reserve;
-  delete macro;
-}
+{ }
 
 void
 SoilWater::clear (const Geometry& geometry)
 { impl->clear (geometry); }
 
 void
-SoilWater::root_uptake (const vector<double>& v)
+SoilWater::root_uptake (const std::vector<double>& v)
 { impl->root_uptake (v); }
 
 void
-SoilWater::drain (const vector<double>& v)
+SoilWater::drain (const std::vector<double>& v)
 { impl->drain (v); }
 
 void 
-SoilWater::freeze (const Soil& soil, const vector<double>& v)
+SoilWater::freeze (const Soil& soil, const std::vector<double>& v)
 { impl->freeze (soil, v); }
 
 double
@@ -785,11 +778,11 @@ SoilWater::MaxExfiltration (const Soil& soil, double T) const
 { return impl->MaxExfiltration (soil, T); }
 
 void 
-SoilWater::put_h (const Soil& soil, const vector<double>& v) // [cm]
+SoilWater::put_h (const Soil& soil, const std::vector<double>& v) // [cm]
 { impl->put_h (soil, v); }
 
 void 
-SoilWater::get_sink (vector<double>& v) const // [h^-1]
+SoilWater::get_sink (std::vector<double>& v) const // [h^-1]
 { v = impl->S_sum; }
 
 void
@@ -838,7 +831,7 @@ will be used from there to the bottom.");
 	      "Changes in water content due to tillage operations.");
   syntax.add ("S_permanent", "h^-1", Syntax::State, Syntax::Sequence,
 	      "Permanent water sink, e.g. subsoil irrigation.");
-  vector<double> empty;
+  std::vector<double> empty;
   alist.add ("S_permanent", empty);
   Geometry::add_layer (syntax, Syntax::OptionalState,
                        "Theta", Syntax::Fraction (),

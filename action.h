@@ -45,8 +45,12 @@ public:
 public: 
   virtual bool check (const Daisy&, Treelog& err) const;
   static const char *const description;
+private:
+  Action (const Action&);
+  Action& operator= (const Action&);
 protected:
-  Action (const AttributeList& al);
+  explicit Action (Block&, const AttributeList& al);
+  explicit Action (Block& al);
 public:
   virtual ~Action ();
 };

@@ -1079,7 +1079,7 @@ ProgramDocument::print_model (const symbol name, const Library& library)
         print_description (alist.name ("description"));
 
       print_users (xref.models[used]);
-      const std::vector<doc_fun>& doc_funs 
+      const std::vector<Library::doc_fun>& doc_funs 
 	= library.doc_funs ();
       for (size_t i = 0; i < doc_funs.size ();i++)
 	{
