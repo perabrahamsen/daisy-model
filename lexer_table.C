@@ -80,7 +80,7 @@ LexerTable::good ()
 bool
 LexerTable::read_header (Treelog& msg)
 {
-  lex = new LexerData (filename, msg);
+  lex.reset (new LexerData (filename, msg));
   // Open errors?
   if (!lex->good ())
     return false;
@@ -466,7 +466,4 @@ LexerTable::LexerTable (Block& al)
 { }
 
 LexerTable::~LexerTable ()
-{ 
-  delete lex; 
-  sequence_delete (filter.begin (), filter.end ());
-}
+{ sequence_delete (filter.begin (), filter.end ()); }

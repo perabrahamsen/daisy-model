@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 class Treelog;
 class LexerData;
@@ -36,7 +37,7 @@ class LexerTable
   // Content.
 private:
   const std::string filename;  
-  LexerData* lex;
+  std::auto_ptr<LexerData> lex;
   std::string field_sep;
   std::string type_;
   const std::vector<std::string> missing;

@@ -36,22 +36,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Check at "Field nitrogen" virker med checkpoints (local variable!)
 
-* Konverter til Block
-
-** AM
-
-** Parser
-
-** Rootdens
-
-** Action
-
-*** MV_Crop
-
-*** MV_Soil
-
-*** Condition
-
 * WP5 
 
 ** hydraulic graphs
