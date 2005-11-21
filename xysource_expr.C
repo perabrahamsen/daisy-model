@@ -69,6 +69,7 @@ public:
 private:
   XYSourceExpr (const XYSourceExpr&);
   XYSourceExpr& operator= (const XYSourceExpr&);
+public:
   ~XYSourceExpr ();
 };
 

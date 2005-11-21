@@ -63,6 +63,7 @@ public:
 private:
   XYSourceInline (const XYSourceInline&);
   XYSourceInline& operator= (const XYSourceInline&);
+public:
   ~XYSourceInline ();
 };
 

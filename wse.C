@@ -129,6 +129,34 @@ enough to cover exactly half the potential evapotranspiration.");
   }
 } WSE_partial_syntax;
 
+struct WSE_none : public WSE
+{
+  double factor (const double) const
+  { return 1.0; }
+
+  WSE_none (Block& al)
+    : WSE (al)
+  { }
+  ~WSE_none ()
+  { }
+};
+
+static struct WSE_noneSyntax
+{
+  static WSE& make (Block& al)
+  { return *new WSE_none (al); }
+  WSE_noneSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+               "Water stress has no effect on plant growth.");
+    Librarian<WSE>::add_type ("none", alist, syntax, &make);
+  }
+} WSE_none_syntax;
+
+
 struct ProgramWSE_table : public Program
 {
   const std::auto_ptr<WSE> wse;

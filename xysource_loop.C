@@ -90,6 +90,7 @@ public:
 private:
   XYSourceLoop (const XYSourceLoop&);
   XYSourceLoop& operator= (const XYSourceLoop&);
+public:
   ~XYSourceLoop ();
 };
 
