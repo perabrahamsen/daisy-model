@@ -1,3 +1,7 @@
+2005-11-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_table.C: New model.
+
 2005-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* source_combine.C (load): Warn against errorbars.
