@@ -828,11 +828,10 @@ AM::set_utilized_weight (AttributeList& am, const double weight)
   else
     {
       daisy_assert (syntax == "organic");
-      daisy_assert (am.check ("first_year_utilization"));
       daisy_assert (am.check ("total_N_fraction"));
       daisy_assert (am.check ("dry_matter_fraction"));
       const double N_fraction = am.number ("total_N_fraction");
-      const double utilization = am.number ("first_year_utilization");
+      const double utilization = am.number ("first_year_utilization", 1.0);
       const double dry_matter_fraction = am.number ("dry_matter_fraction");
       const double kg_per_ton = 1000.0;
       am.add ("weight", weight 

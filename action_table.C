@@ -40,13 +40,18 @@ struct ActionTable : public Action
   std::set<Time> harvest_dates;
   std::map<Time, double> fertilize_events;
   std::map<Time, double> irrigate_events;
+  std::map<Time, const AttributeList*> fertilizers;
 
-  void read_event (const LexerTable&,
-                   const std::vector<std::string>& entries, 
-                   int tag_c, std::map<Time, double>& events);
-  void read_date (const LexerTable&,
-                  const std::vector<std::string>& entries, 
-                  int rag_c, std::set<Time>& dates);
+  static void read_alist (const LexerTable&,
+                          const std::vector<std::string>& entries, 
+                          int tag_c, const Library& library,
+                          std::map<Time, const AttributeList*>& alists);
+  static void read_event (const LexerTable&,
+                          const std::vector<std::string>& entries, 
+                          int tag_c, std::map<Time, double>& events);
+  static void read_date (const LexerTable&,
+                         const std::vector<std::string>& entries, 
+                         int rag_c, std::set<Time>& dates);
 
   void doIt (Daisy& daisy, Treelog& msg);
   bool check (const Daisy&, Treelog& err) const;
@@ -75,6 +80,32 @@ ActionTable::read_event (const LexerTable& lex,
 }
 
 void 
+ActionTable::read_alist (const LexerTable& lex,
+                         const std::vector<std::string>& entries, 
+                         int tag_c, const Library& library,
+                         std::map<Time, const AttributeList*>& alists)
+{
+  if (tag_c < 0)
+    return;
+
+  const std::string val = entries[tag_c];
+
+  if (lex.is_missing (val))
+    return;
+
+  if (!library.check (symbol (val)))
+    {
+      lex.error ("'" + val + "' undefined");
+      return;
+    }
+  Time time (9999, 1, 1, 0);
+  if (!lex.get_time (entries, time))
+    return;
+
+  alists[time] = &library.lookup (symbol (val));
+}
+
+void 
 ActionTable::read_date (const LexerTable& lex,
                         const std::vector<std::string>& entries, 
                         int tag_c, std::set<Time>& dates)
@@ -97,15 +128,17 @@ ActionTable::read_date (const LexerTable& lex,
 void 
 ActionTable::doIt (Daisy& daisy, Treelog& msg)
 { 
-  const std::string name =  crop->name ("type");
-
   if (crop.get () && sow_dates.find (daisy.time) != sow_dates.end ())
     {
+      const std::string name =  crop->name ("type");
+
       msg.message (std::string ("Sowing ") + name);      
       daisy.field.sow (msg, *crop); 
     }
   if (crop.get () && harvest_dates.find (daisy.time) != harvest_dates.end ())
     {
+      const std::string name =  crop->name ("type");
+
       if (daisy.field.crop_ds (symbol (name)) < 0.0)
         {
           msg.warning ("Attempting to harvest " + name 
@@ -123,30 +156,34 @@ ActionTable::doIt (Daisy& daisy, Treelog& msg)
             msg.message ("Cutting " + name);
         }
     }
-  if (am.get () 
+  if ((am.get () 
+       || fertilizers.find (daisy.time) != fertilizers.end ())
       && fertilize_events.find (daisy.time) != fertilize_events.end ())
     {
-      AM::set_utilized_weight (*am, fertilize_events[daisy.time]);
+      AttributeList fert ((fertilizers.find (daisy.time) != fertilizers.end ())
+                          ? *fertilizers[daisy.time] : *am);
+
+      AM::set_utilized_weight (fert, fertilize_events[daisy.time]);
 
       double water = 0.0;
-      const std::string syntax = am->name ("syntax");
+      const std::string syntax = fert.name ("syntax");
       std::ostringstream tmp;
       if (syntax == "mineral")
-        tmp << "Fertilizing " << am->number ("weight") 
-            << " kg "<< am->name ("type") << "-N/ha";
+        tmp << "Fertilizing " << fert.number ("weight") 
+            << " kg "<< fert.name ("type") << "-N/ha";
       else if (syntax == "organic")
         {
-          tmp  << "Fertilizing " << am->number ("weight") 
-               << " ton "<< am->name ("type") << " ww/ha";
-          const double utilized_weight = AM::utilized_weight (*am);
+          tmp  << "Fertilizing " << fert.number ("weight") 
+               << " ton "<< fert.name ("type") << " ww/ha";
+          const double utilized_weight = AM::utilized_weight (fert);
           if (utilized_weight > 0.0)
             tmp << "; utilized " << utilized_weight << " kg N/ha";
-          water = AM::get_water (*am);
+          water = AM::get_water (fert);
           if (water > 0.0)
             tmp << "; water " << water << " mm";
         }
       else
-        tmp << "Fertilizing " << am->name ("type");
+        tmp << "Fertilizing " << fert.name ("type");
       msg.message (tmp.str ());
       if (syntax != "mineral")
         {
@@ -155,9 +192,9 @@ ActionTable::doIt (Daisy& daisy, Treelog& msg)
           new_time.add ("month", daisy.time.month ());
           new_time.add ("mday", daisy.time.mday ());
           new_time.add ("hour", daisy.time.hour ());
-          am->add ("creation", new_time);
+          fert.add ("creation", new_time);
         }
-      daisy.field.fertilize (*am);
+      daisy.field.fertilize (fert);
       if (water > 0.0)
         daisy.field.irrigate_surface (water, IM ());
     }
@@ -191,9 +228,10 @@ ActionTable::ActionTable (Block& al)
       return;
     }
   const int harvest_c = lex.find_tag ("Harvest");
-  const int sow_c = lex.find_tag ("Sow");
+  const int sow_c = lex.find_tag ("Planting");
   const int irrigate_c = lex.find_tag ("Irrigate");
   const int fertilize_c = lex.find_tag ("Fertilize");
+  const int fertilizer_c = lex.find_tag ("Fertilizer");
   
   if (sow_c < 0 && harvest_c < 0 && irrigate_c < 0 && fertilize_c < 0)
     al.msg ().warning ("No applicable column found");
@@ -201,13 +239,15 @@ ActionTable::ActionTable (Block& al)
   if (sow_c < 0 && harvest_c < 0 && crop.get ())
     al.msg ().warning ("Specified crop not use");
   if (sow_c >= 0 && !crop.get ())
-    al.msg ().warning ("No crop to sow");
+    al.error ("No crop to sow");
   if (harvest_c >= 0 && !crop.get ())
-    al.msg ().warning ("No crop to harvest");
+    al.error ("No crop to harvest");
   if (fertilize_c < 0 && am.get ())
     al.msg ().warning ("Specified fertilizer not used");
-  if (fertilize_c >= 0 && !am.get ())
-    al.msg ().warning ("No fertilizer to use");
+  if (fertilize_c >= 0 && !am.get () && fertilizer_c < 0)
+    al.error ("No fertilizer to use");
+  if (fertilizer_c && am.get ())
+    al.msg ().warning ("Fertilizer specified twice");
 
   while (lex.good ())
     {
@@ -218,6 +258,8 @@ ActionTable::ActionTable (Block& al)
 
       read_event (lex, entries, irrigate_c, irrigate_events);
       read_event (lex, entries, fertilize_c, fertilize_events);
+      read_alist (lex, entries, fertilizer_c, Librarian<AM>::library (),
+                  fertilizers);
       read_date (lex, entries, sow_c, sow_dates);
       read_date (lex, entries, harvest_c, harvest_dates);
     }
