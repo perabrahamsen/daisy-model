@@ -219,7 +219,7 @@ ActionTable::check (const Daisy&, Treelog&) const
 ActionTable::ActionTable (Block& al)
   : Action (al),
     crop (al.check ("crop") ? new AttributeList (al.alist ("crop")) : NULL),
-    am (al.check ("am") ? new AttributeList (al.alist ("am")) : NULL)
+    am (al.check ("fertilizer") ? new AttributeList (al.alist ("fertilizer")) : NULL)
 { 
   LexerTable lex (al);
   if (!lex.read_header (al.msg ()))
@@ -227,26 +227,22 @@ ActionTable::ActionTable (Block& al)
       al.error ("Read failed");
       return;
     }
-  const int harvest_c = lex.find_tag ("Harvest");
-  const int sow_c = lex.find_tag ("Planting");
-  const int irrigate_c = lex.find_tag ("Irrigate");
-  const int fertilize_c = lex.find_tag ("Fertilize");
+  const int harvest_c = crop.get () ? lex.find_tag ("Harvest") : -1;
+  const int sow_c = crop.get () ? lex.find_tag ("Planting") : -1;
+  const int irrigate_c = al.flag ("enable_irrigation") 
+    ? lex.find_tag ("Irrigate") : -1;
   const int fertilizer_c = lex.find_tag ("Fertilizer");
+  const int fertilize_c = (am.get () || fertilizer_c >= 0)
+    ? lex.find_tag ("Fertilize") : -1;
   
   if (sow_c < 0 && harvest_c < 0 && irrigate_c < 0 && fertilize_c < 0)
     al.msg ().warning ("No applicable column found");
 
   if (sow_c < 0 && harvest_c < 0 && crop.get ())
     al.msg ().warning ("Specified crop not use");
-  if (sow_c >= 0 && !crop.get ())
-    al.error ("No crop to sow");
-  if (harvest_c >= 0 && !crop.get ())
-    al.error ("No crop to harvest");
   if (fertilize_c < 0 && am.get ())
     al.msg ().warning ("Specified fertilizer not used");
-  if (fertilize_c >= 0 && !am.get () && fertilizer_c < 0)
-    al.error ("No fertilizer to use");
-  if (fertilizer_c && am.get ())
+  if (fertilizer_c >= 0 && am.get ())
     al.msg ().warning ("Fertilizer specified twice");
 
   while (lex.good ())
@@ -286,9 +282,12 @@ static struct ActionTableSyntax
     syntax.add ("crop", Librarian<Crop>::library (), 
                 Syntax::OptionalConst, Syntax::Singleton, 
                 "Crop to sow.");
-    syntax.add ("am", Librarian<AM>::library (),
+    syntax.add ("fertilizer", Librarian<AM>::library (),
                 Syntax::OptionalConst, Syntax::Singleton, "\
 The fertilizer you want to apply.");
+    syntax.add ("enable_irrigation", Syntax::Boolean, Syntax::Const, "\
+Set this to false to ignore any irrigation information in the file.");
+    alist.add ("enable_irrigation", true);
     Librarian<Action>::add_type ("table", alist, syntax, &make);
   }
 } ActionTable_syntax;
