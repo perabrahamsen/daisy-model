@@ -162,7 +162,7 @@ struct ProgramWSE_table : public Program
   const std::auto_ptr<WSE> wse;
   const int intervals;
 
-  void run (Treelog& msg)
+  bool run (Treelog& msg)
   {
     std::ostringstream tmp;
     tmp << "stress\teffect\n";
@@ -173,6 +173,7 @@ struct ProgramWSE_table : public Program
         tmp << ws << "\t" << e << "\n";
       }
     msg.message (tmp.str ());
+    return true;
   }
 
   // Create and Destroy.

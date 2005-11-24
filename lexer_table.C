@@ -75,7 +75,16 @@ LexerTable::Filter::Filter (Block& al)
 
 bool 
 LexerTable::good ()
-{ return lex->good (); }
+{
+  if (!lex.get ())
+    return false;
+  if (lex->good ())
+    return true;
+
+  // Close file descriptor after first problem.
+  lex.reset (NULL);
+  return false;
+}
 
 bool
 LexerTable::read_header (Treelog& msg)

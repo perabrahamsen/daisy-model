@@ -216,7 +216,7 @@ ActionTable::ActionTable (Block& al)
   const int irrigate_c = al.flag ("enable_irrigation") 
     ? lex.find_tag ("Irrigate") : -1;
   const int fertilizer_c = lex.find_tag ("Fertilizer");
-  const int fertilize_c = (al.flag ("enable_irrigation") 
+  const int fertilize_c = (al.flag ("enable_fertilization") 
                            && (am.get () || fertilizer_c >= 0))
     ? lex.find_tag ("Fertilize") : -1;
   

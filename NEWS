@@ -18,6 +18,20 @@ release.
 
 Use (water_stress_effect none) instead.
 
+** New 'table' action that reads management data from a ddf table.
+
+See the tutorial section about plotting for a description of the ddf
+file formar.
+
+** More gnuplot works.
+
+Mostly documented in the reference manual.
+
+** The 'batch' program no longer open all files before starting.
+
+This should allow longer batch runs with more log files.  It also
+means that file problems will be discovered later.
+
 * 3.94
 
 ** Many more gnuplots options, mostly documented in the reference manual.

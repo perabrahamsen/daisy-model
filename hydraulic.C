@@ -214,7 +214,7 @@ struct ProgramHydraulic_table : public Program
   const std::auto_ptr<Hydraulic> hydraulic;
   const int intervals;
 
-  void run (Treelog& msg)
+  bool run (Treelog& msg)
   {
     std::ostringstream tmp;
     tmp << "pressure\tpressure\tTheta\tK\n";
@@ -228,6 +228,7 @@ struct ProgramHydraulic_table : public Program
         tmp << pF << "\t" << h << "\t" << Theta << "\t" << K << "\n";
       }
     msg.message (tmp.str ());
+    return true;
   }
 
   // Create and Destroy.

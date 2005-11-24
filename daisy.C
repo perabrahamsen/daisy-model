@@ -206,7 +206,7 @@ Daisy::tick (Treelog& out)
     running = false;
 }
 
-void 
+bool
 Daisy::run (Treelog& out)
 { 
   // Run simulation.
@@ -240,13 +240,14 @@ Daisy::run (Treelog& out)
 	  out.touch ();
       }
     while (running);
-  }
+      }
   // Print log file summaries at end of simulation.
   {
     Treelog::Open nest (out, "Summary");
     for (unsigned int i = 0; i < logs.size (); i++)
       logs[i]->summarize (out);
   }
+  return true;
 }
 
 void

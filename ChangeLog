@@ -1,3 +1,12 @@
+2005-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lexer_table.C (good): Close file descriptor after first problem.
+
+	* column_base.C (initialize_common): Check weather later.
+	* column_std.C (initialize): Ditto.
+
+	* number_soil.C ("depth_Theta", "depth_K"): New models.
+
 2005-11-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* action_table.C: New model.

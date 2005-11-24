@@ -31,11 +31,21 @@ struct ProgramBatch : public Program
   // Content.
   const std::string directory;
   std::vector<Program*> program;
+  const Syntax* global_syntax;
+  const AttributeList* global_alist;
 
   // Use.
-  void run (Treelog& msg)
+  bool run (Treelog& msg)
   { 
+    daisy_assert (global_syntax);
+    daisy_assert (global_alist);
+
     Path::InDirectory cwd (directory);
+    if (!cwd.check ())
+      {
+        msg.error ("Could not change to directory '" + directory + "'");
+        return false;
+      }
 
     for (size_t i = 0; i < program.size (); i++)
       {
@@ -43,38 +53,30 @@ struct ProgramBatch : public Program
         tmp << name << "[" << i << "]: " << program[i]->name;
         Treelog::Open nest (msg, tmp.str ());
         msg.touch ();
-        program[i]->run (msg);
+        program[i]->initialize (global_syntax, global_alist, msg);
+        if (!program[i]->check (msg))
+          return false;
+        if (!program[i]->run (msg))
+          return false;
       }
+    return true;
   }
 
   // Create and Destroy.
   void initialize (const Syntax *const gs, const AttributeList *const gal,
-                   Treelog& msg)
+                   Treelog&)
   { 
-    Path::InDirectory cwd (directory);
-
-    for (size_t i = 0; i < program.size (); i++)
-      {
-        Treelog::Open nest (msg, program[i]->name);
-        program[i]->initialize (gs, gal, msg);
-      }
+    global_syntax = gs;
+    global_alist = gal;
   }
   bool check (Treelog& msg)
   { 
     bool ok = true;
 
     Path::InDirectory cwd (directory);
-    if (!cwd.check ())
-      {
-        msg.error ("Could not change to directory '" + directory + "'");
-        ok = false;
-      }
-
     for (size_t i = 0; i < program.size (); i++)
       {
         Treelog::Open nest (msg, program[i]->name);
-        if (!program[i]->check (msg))
-          ok = false;
       }
     return ok;
   }
@@ -82,7 +84,9 @@ struct ProgramBatch : public Program
   ProgramBatch (Block& al)
     : Program (al),
       directory (al.name ("directory")),
-      program (Librarian<Program>::build_vector (al, "run"))
+      program (Librarian<Program>::build_vector (al, "run")),
+      global_syntax (NULL),
+      global_alist (NULL)
   { }
 
   ~ProgramBatch ()

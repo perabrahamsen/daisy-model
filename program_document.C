@@ -113,10 +113,11 @@ struct ProgramDocument : public Program
   void print_document ();
 
   // Program.
-  void run (Treelog&)
+  bool run (Treelog&)
   {
     format->initialize (std::cout);
     print_document (); 
+    return true;
   }
 
   // Create and Destroy.

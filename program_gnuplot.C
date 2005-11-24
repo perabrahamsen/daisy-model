@@ -39,7 +39,7 @@ struct ProgramGnuplot : public Program
   const std::vector<Gnuplot*> graph;
 
   // Use.
-  void run (Treelog& msg);
+  bool run (Treelog& msg);
   
   // Create and Destroy.
   void initialize (const Syntax*, const AttributeList*, Treelog&)
@@ -50,7 +50,7 @@ struct ProgramGnuplot : public Program
   ~ProgramGnuplot ();
 };
 
-void 
+bool
 ProgramGnuplot::run (Treelog& msg)
 { 
   // Initialize.
@@ -67,7 +67,7 @@ ProgramGnuplot::run (Treelog& msg)
           ok = false;
       }
     if (!ok)
-      throw 1;
+      return false;
   }
 
   // Open file, and change directory.
@@ -95,15 +95,16 @@ ProgramGnuplot::run (Treelog& msg)
           ok = false;
       }
     if (!ok)
-      throw 1;
+      return false;
   }
 
   // Done.
   if (!out.good ())
     {
       msg.error ("Problems writing to temporary file '" + command_file + "'");
-      throw 1;
+      return false;
     }
+  return true;
 }
 
 ProgramGnuplot::ProgramGnuplot (Block& al)

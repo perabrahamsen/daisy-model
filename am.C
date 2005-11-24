@@ -1221,7 +1221,7 @@ original.");
 struct ProgramAM_table : public Program
 {
   // Use.
-  void run (Treelog& msg)
+  bool run (Treelog& msg)
   {
     const Library& library = Librarian<AM>::library ();
     vector<symbol> entries;
@@ -1266,6 +1266,7 @@ struct ProgramAM_table : public Program
           tmp << alist.number ("dry_matter_fraction");
       }
     msg.message (tmp.str ());
+    return true;
   }
 
   // Create and Destroy.

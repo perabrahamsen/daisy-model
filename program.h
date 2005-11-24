@@ -36,7 +36,7 @@ public:
 
   // Simulation.
 public:
-  virtual void run (Treelog&) = 0;
+  virtual bool run (Treelog&) = 0;
 
   // Create and Destroy.
 public:

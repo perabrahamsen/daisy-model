@@ -74,7 +74,7 @@ public:
   void initial_logs (Treelog&);
   void tick_logs (Treelog&);
   void tick (Treelog&);
-  void run (Treelog&);
+  bool run (Treelog&);
 
   // Create and Destroy.
 public:
