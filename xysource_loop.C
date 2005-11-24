@@ -22,6 +22,7 @@
 #include "gnuplot_utils.h"
 #include "scope.h"
 #include "number.h"
+#include "check.h"
 #include "vcheck.h"
 
 
@@ -115,7 +116,9 @@ XYSourceLoop::load (Treelog& msg)
 
   // Read data.
   daisy_assert (xs.size () == ys.size ());
-  for (scope.value = begin; scope.value < end; scope.value += step)
+  for (scope.value = begin; 
+       (step > 0.0) ? (scope.value < end) : (scope.value > end); 
+       scope.value += step)
     {
       // Missing value.
       if (x_expr->missing (scope) || y_expr->missing (scope))
@@ -168,6 +171,15 @@ static struct XYSourceLoopSyntax
         msg.error ("'begin' and 'step' should have the same dimension.");
         ok = false;
       }
+    const double step = alist.number ("step");
+    const double begin = alist.number ("begin");
+    const double end = alist.number ("end");
+    
+    if (step < 0 && begin <= end)
+      msg.warning ("Empty loop");
+    if (step > 0 && begin >= end)
+      msg.warning ("Empty loop");
+
     return ok;
   }
 
@@ -201,8 +213,9 @@ Expression for calculating the y value.");
 Start of interval.");
     syntax.add ("end", Syntax::User (), Syntax::Const, "\
 End of interval.");
-    syntax.add ("step", Syntax::User (), Syntax::Const, "\
+    syntax.add ("step", Syntax::User (), Check::non_zero (), Syntax::Const, "\
 Disretization within interval.");
+    
     syntax.add ("tag", Syntax::String, Syntax::Const, "\
 Name of free variable to calculate the 'x' and 'y' expressions from.");
     alist.add ("tag", "x");

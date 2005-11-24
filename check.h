@@ -34,6 +34,7 @@ public:
 public:
   static const Check& none ();
   static const Check& unknown ();
+  static const Check& non_zero ();
   static const Check& non_negative ();
   static const Check& non_positive ();
   static const Check& negative ();

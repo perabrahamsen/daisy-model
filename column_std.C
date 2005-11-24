@@ -565,19 +565,19 @@ ColumnStandard::initialize (const Time& time, Treelog& err,
 			    const Weather* global_weather)
 {
   Treelog::Open nest (err, name);
-  if (!global_weather && !weather)
-    return;
   soil->initialize (*groundwater, organic_matter->som_pools (), err);
   if (!initialize_common (time, err, global_weather))
     return;
   soil_NH4.initialize (alist.alist ("SoilNH4"), *soil, *soil_water, err);
   soil_NO3.initialize (alist.alist ("SoilNO3"), *soil, *soil_water, err);
+  nitrification.initialize (soil->size ());
+  if (!global_weather && !weather)
+    return;
   const double T_avg = weather // Must be after initialize_common.
     ? weather->average_temperature ()
     : global_weather->average_temperature ();
   organic_matter->initialize (alist.alist ("OrganicMatter"), *soil, *soil_water, 
 			     T_avg, err);
-  nitrification.initialize (soil->size ());
   vegetation->initialize (time, *soil, organic_matter.get (), err);
 }
 

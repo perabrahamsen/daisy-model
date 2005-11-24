@@ -267,6 +267,11 @@ double
 ColumnBase::get_water_content_at (unsigned int i) const // [cm³/cm³]
 { return soil_water->Theta (i); }
 
+double 
+ColumnBase::get_water_conductivity_at (unsigned int i) const // [cm³/cm³]
+{ return soil->K (i, soil_water->h (i), soil_water->h_ice (i), 
+                  soil_heat.T (i)); }
+
 void
 ColumnBase::clear ()
 { 
@@ -440,21 +445,24 @@ ColumnBase::initialize_common (const Time& time, Treelog& err,
   daisy_assert (residuals_N_soil.size () == soil->size ());
   residuals_C_soil.insert (residuals_C_soil.begin (), soil->size (), 0.0);
   daisy_assert (residuals_C_soil.size () == soil->size ());
+  groundwater->initialize (*soil, time, err);
+  soil_water->initialize (alist.alist ("SoilWater"), *soil, *groundwater, err);
+  soil_chemicals.initialize (alist.alist ("SoilChemicals"),
+                             *soil, *soil_water, err);
+  for (vector<Chemistry*>::const_iterator i = chemistry.begin ();
+       i != chemistry.end ();
+       i++)
+    (*i)->initialize (*soil, err);
+
+  // Bioclimate and heat depends on weather.
   if (weather && !weather->initialize (time, err))
     return false;
   if (!global_weather && !weather)
     return false;
   const Weather& my_weather = *(weather ? weather : global_weather);
   bioclimate->initialize (my_weather, err);
-  groundwater->initialize (*soil, time, err);
-  soil_heat.initialize (alist.alist ("SoilHeat"), *soil, time, my_weather, err);
-  soil_water->initialize (alist.alist ("SoilWater"), *soil, *groundwater, err);
-  soil_chemicals.initialize (alist.alist ("SoilChemicals"), *soil, *soil_water, 
-			     err);
-  for (vector<Chemistry*>::const_iterator i = chemistry.begin ();
-       i != chemistry.end ();
-       i++)
-    (*i)->initialize (*soil, err);
+  soil_heat.initialize (alist.alist ("SoilHeat"), 
+                        *soil, time, my_weather, err);
   return true;
 }
 

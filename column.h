@@ -123,6 +123,7 @@ public:
   virtual double get_temperature_at (unsigned int i) const = 0; // [°C]
   virtual double get_crop_h2o_uptake_at (unsigned int i) const = 0; //[cm³/cm³]
   virtual double get_water_content_at (unsigned int i) const = 0; // [cm³/cm³]
+  virtual double get_water_conductivity_at (unsigned int i) const = 0; // [cm/h]
 
   // Create and Destroy.
 protected:

@@ -126,6 +126,7 @@ public:
   double get_temperature_at (unsigned int i) const; // [°C]
   double get_crop_h2o_uptake_at (unsigned int i) const; // [cm³/cm³/h]
   double get_water_content_at (unsigned int i) const; // [cm³/cm³]
+  double get_water_conductivity_at (unsigned int i) const; // [cm/h]
 
   // Simulation.
 public:

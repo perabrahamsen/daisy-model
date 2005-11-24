@@ -23,6 +23,7 @@
 #include "column.h"
 #include "horizon.h"
 #include "hydraulic.h"
+#include "weather.h"
 #include "time.h"
 #include "units.h"
 #include <memory>
@@ -100,7 +101,12 @@ The height we want to compare with.");
       z (Librarian<Number>::build_item (al, "z"))
   { 
     Time time (9999, 1, 1, 0);
-    column->initialize (time, al.msg (), NULL);
+    const Library& wlib = Librarian<Weather>::library ();
+    AttributeList alist = wlib.lookup (symbol ("none"));
+    alist.add ("type", "none");
+    std::auto_ptr<Weather> weather (Librarian<Weather>::build_alist
+                                    (al, alist, "initialize"));
+    column->initialize (time, al.msg (), weather.get ());
     max_depth = find_max_depth (*column);
   }
 };
@@ -115,6 +121,7 @@ struct NumberDepthTheta : public NumberByDepth
                                             "cm", 
                                             h->value (scope));
     std::vector<double> v (size, pressure);
+    column->put_water_pressure (v);
     const double height = Units::convert (z->dimension (scope), 
                                           "cm", 
                                           z->value (scope));
@@ -125,6 +132,7 @@ struct NumberDepthTheta : public NumberByDepth
           return column->get_water_content_at (i);
         now -= column->get_dz (i);
       }
+    daisy_assert (size > 0);
     return column->get_water_content_at (size - 1);
   }
 
@@ -152,6 +160,59 @@ static struct NumberDepthThetaSyntax
     Librarian<Number>::add_type ("depth_Theta", alist, syntax, &make);
   }
 } NumberDepthTheta_syntax;
+
+struct NumberDepthK : public NumberByDepth
+{
+  // Simulation.
+  double value (const Scope& scope) const
+  { 
+    const size_t size = column->count_layers ();
+    const double pressure = Units::convert (h->dimension (scope), 
+                                            "cm", 
+                                            h->value (scope));
+    std::vector<double> v (size, pressure);
+    column->put_water_pressure (v);
+    const double height = Units::convert (z->dimension (scope), 
+                                          "cm", 
+                                          z->value (scope));
+    double now = 0;
+    for (size_t i = 0; i < size; i++)
+      {
+        if (height > now)
+          return column->get_water_conductivity_at (i);
+        now -= column->get_dz (i);
+      }
+    daisy_assert (size > 0);
+    return column->get_water_conductivity_at (size - 1);
+  }
+
+  const std::string& dimension (const Scope&) const 
+  { 
+    static const std::string dim = "cm/h";
+    return dim;
+  }
+
+  // Create.
+  NumberDepthK (Block& al)
+    : NumberByDepth (al)
+  { }
+};
+
+static struct NumberDepthKSyntax
+{
+  static Number& make (Block& al)
+  { return *new NumberDepthK (al); }
+  NumberDepthKSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+	       "Find water conductivity (K) for a given pressure (h).");
+    NumberByDepth::load_syntax (syntax, alist);
+    Librarian<Number>::add_type ("depth_K", alist, syntax, &make);
+  }
+} NumberDepthK_syntax;
 
 struct NumberByTension : public Number
 {

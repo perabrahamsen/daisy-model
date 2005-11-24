@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "check.h"
+#include "mathlib.h"
 
 // GCC 2.95 -O2 dislike declaring these classes local.
 struct None : public Check
@@ -45,6 +46,22 @@ Check::unknown ()
 {
   static Unknown unknown;
   return unknown;
+}
+
+struct NonZero : public Check
+{
+  void check (const double value) const throw (std::string)
+  {
+    if (!std::isnormal (value))
+      throw std::string ("Zero value not permitted");
+  }
+};
+
+const Check& 
+Check::non_zero ()
+{
+  static NonZero non_zero;
+  return non_zero;
 }
 
 struct NonNegative : public Check
