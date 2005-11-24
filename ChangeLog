@@ -1,5 +1,9 @@
 2005-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Makefile (MODELS): Added it.
+
+	* program_file.C: New file.
+
 	* Version 3.95 released.
 
 2005-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>

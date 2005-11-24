@@ -47,17 +47,18 @@ struct ProgramBatch : public Program
         return false;
       }
 
-    for (size_t i = 0; i < program.size (); i++)
+    for (size_t i = 0; program.size () > 0 ; i++)
       {
         std::ostringstream tmp;
-        tmp << name << "[" << i << "]: " << program[i]->name;
+        tmp << name << "[" << i << "]: " << program[0]->name;
         Treelog::Open nest (msg, tmp.str ());
         msg.touch ();
-        program[i]->initialize (global_syntax, global_alist, msg);
-        if (!program[i]->check (msg))
+        program[0]->initialize (global_syntax, global_alist, msg);
+        if (!program[0]->check (msg))
           return false;
-        if (!program[i]->run (msg))
+        if (!program[0]->run (msg))
           return false;
+        program.erase (program.begin ());
       }
     return true;
   }
@@ -69,17 +70,8 @@ struct ProgramBatch : public Program
     global_syntax = gs;
     global_alist = gal;
   }
-  bool check (Treelog& msg)
-  { 
-    bool ok = true;
-
-    Path::InDirectory cwd (directory);
-    for (size_t i = 0; i < program.size (); i++)
-      {
-        Treelog::Open nest (msg, program[i]->name);
-      }
-    return ok;
-  }
+  bool check (Treelog&)
+  { return true; }
 
   ProgramBatch (Block& al)
     : Program (al),
