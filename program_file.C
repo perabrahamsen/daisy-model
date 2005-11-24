@@ -30,10 +30,12 @@ struct ProgramCD : public Program
   const std::string dir;
 
   // Use.
-  void run (Treelog& msg)
+  bool run (Treelog& msg)
   { 
-    if (!Path::set_directory (dir))
-      msg.error (std::string ("Could not change to directory '") + dir + "'");
+    if (Path::set_directory (dir))
+      return true;
+    msg.error (std::string ("Could not change to directory '") + dir + "'");
+    return false;
   }
 
   // Create and Destroy.
@@ -42,7 +44,7 @@ struct ProgramCD : public Program
   bool check (Treelog&)
   { return true; }
 
-  ProgramCD (const AttributeList& al)
+  ProgramCD (Block& al)
     : Program (al),
       dir (al.name ("directory"))
   { }
@@ -53,7 +55,7 @@ struct ProgramCD : public Program
 static struct ProgramCDSyntax
 {
   static Program&
-  make (const AttributeList& al)
+  make (Block& al)
   { return *new ProgramCD (al); }
   ProgramCDSyntax ()
   {
