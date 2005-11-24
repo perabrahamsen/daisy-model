@@ -1,5 +1,9 @@
 2005-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.95 released.
+
+2005-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* lexer_table.C (good): Close file descriptor after first problem.
 
 	* column_base.C (initialize_common): Check weather later.
