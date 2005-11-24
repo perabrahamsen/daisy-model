@@ -22,7 +22,6 @@
 #include "action.h"
 #include "daisy.h"
 #include "field.h"
-#include "crop.h"
 #include "am.h"
 #include "im.h"
 #include "lexer_table.h"
@@ -33,7 +32,8 @@
 
 struct ActionTable : public Action
 {
-  const std::auto_ptr<AttributeList> crop;
+  const std::auto_ptr<Action> sow;
+  const std::auto_ptr<Action> harvest;
   const std::auto_ptr<AttributeList> am;
 
   std::set<Time> sow_dates;
@@ -128,34 +128,11 @@ ActionTable::read_date (const LexerTable& lex,
 void 
 ActionTable::doIt (Daisy& daisy, Treelog& msg)
 { 
-  if (crop.get () && sow_dates.find (daisy.time) != sow_dates.end ())
-    {
-      const std::string name =  crop->name ("type");
-
-      msg.message (std::string ("Sowing ") + name);      
-      daisy.field.sow (msg, *crop); 
-    }
-  if (crop.get () && harvest_dates.find (daisy.time) != harvest_dates.end ())
-    {
-      const std::string name =  crop->name ("type");
-
-      if (daisy.field.crop_ds (symbol (name)) < 0.0)
-        {
-          msg.warning ("Attempting to harvest " + name 
-                       + " which has not emerged on the field");
-        }
-      else
-        {
-          daisy.field.harvest (daisy.time, symbol (name),
-                               1.0, 1.0, 1.0, 1.0, false,
-                               daisy.harvest, msg);
-
-          if (daisy.field.crop_ds (symbol (name)) < 0.0)
-            msg.message ("Harvesting " + name);
-          else
-            msg.message ("Cutting " + name);
-        }
-    }
+  if (sow.get () && sow_dates.find (daisy.time) != sow_dates.end ())
+    sow->doIt (daisy, msg);
+  if (harvest.get () 
+      && harvest_dates.find (daisy.time) != harvest_dates.end ())
+    harvest->doIt (daisy, msg);
   if ((am.get () 
        || fertilizers.find (daisy.time) != fertilizers.end ())
       && fertilize_events.find (daisy.time) != fertilize_events.end ())
@@ -218,8 +195,15 @@ ActionTable::check (const Daisy&, Treelog&) const
 
 ActionTable::ActionTable (Block& al)
   : Action (al),
-    crop (al.check ("crop") ? new AttributeList (al.alist ("crop")) : NULL),
-    am (al.check ("fertilizer") ? new AttributeList (al.alist ("fertilizer")) : NULL)
+    sow (al.check ("sow") 
+         ? Librarian<Action>::build_item (al, "sow")
+         : NULL),
+    harvest (al.check ("harvest") 
+             ? Librarian<Action>::build_item (al, "harvest")
+             : NULL),
+    am (al.check ("fertilizer") 
+        ? new AttributeList (al.alist ("fertilizer")) 
+        : NULL)
 { 
   LexerTable lex (al);
   if (!lex.read_header (al.msg ()))
@@ -227,19 +211,20 @@ ActionTable::ActionTable (Block& al)
       al.error ("Read failed");
       return;
     }
-  const int harvest_c = crop.get () ? lex.find_tag ("Harvest") : -1;
-  const int sow_c = crop.get () ? lex.find_tag ("Planting") : -1;
+  const int harvest_c = harvest.get () ? lex.find_tag ("Harvest") : -1;
+  const int sow_c = sow.get () ? lex.find_tag ("Planting") : -1;
   const int irrigate_c = al.flag ("enable_irrigation") 
     ? lex.find_tag ("Irrigate") : -1;
   const int fertilizer_c = lex.find_tag ("Fertilizer");
-  const int fertilize_c = (am.get () || fertilizer_c >= 0)
+  const int fertilize_c = (al.flag ("enable_irrigation") 
+                           && (am.get () || fertilizer_c >= 0))
     ? lex.find_tag ("Fertilize") : -1;
   
   if (sow_c < 0 && harvest_c < 0 && irrigate_c < 0 && fertilize_c < 0)
     al.msg ().warning ("No applicable column found");
 
-  if (sow_c < 0 && harvest_c < 0 && crop.get ())
-    al.msg ().warning ("Specified crop not use");
+  if (sow_c < 0 && harvest_c < 0 && harvest.get ())
+    al.msg ().warning ("Specified harvest operation not used");
   if (fertilize_c < 0 && am.get ())
     al.msg ().warning ("Specified fertilizer not used");
   if (fertilizer_c >= 0 && am.get ())
@@ -278,16 +263,47 @@ static struct ActionTableSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     LexerTable::load_syntax (syntax, alist);
-    alist.add ("description", "Sow a crop on the field.");
-    syntax.add ("crop", Librarian<Crop>::library (), 
+    alist.add ("description", "\
+Read management actions from a Daisy data file.\n\
+\n\
+After the ddf header, the following column tags are recognized (with\n\
+the dimension for the dimension linein square brackets).\n\
+\n\
+Date [date]: The date for fertilization or irrigation.\n\
+\n\
+Planting [date]: The content should be a date in yyyy-mm-dd format,\n\
+where the operation specified by the 'sow' attribute will be perfomed.\n\
+\n\
+Harvest [date]: The content should be a date in yyyy-mm-dd format,\n\
+where the operation specified by the 'harvest' attribute will be\n\
+perfomed.\n\
+\n\
+Irrigate [mm]: The content should be an irrigation amount, that will\n\
+be applied as overhead irrigation for the date specified in the 'Date'\n\
+field.  You can disable it with the 'enable_irrigation' attribute.\n\
+\n\
+Fertilize [kg N/ha]: The content should be an amount of nitrogen\n\
+fertilizer to be applied on the date specified in the 'Date' field.\n\
+The fertilizer type will be either the one specified in the\n\
+'Fertilizer' column, or the 'fertilizer' attribute.  You can disable\n\
+it with the 'enable_fertilization' attribute.\n\
+\n\
+Fertilizer [name]: The type of fertilizer to be applied.");
+    syntax.add ("sow", Librarian<Action>::library (), 
                 Syntax::OptionalConst, Syntax::Singleton, 
-                "Crop to sow.");
+                "Sow action.");
+    syntax.add ("harvest", Librarian<Action>::library (), 
+                Syntax::OptionalConst, Syntax::Singleton, 
+                "Harvest action.");
     syntax.add ("fertilizer", Librarian<AM>::library (),
                 Syntax::OptionalConst, Syntax::Singleton, "\
 The fertilizer you want to apply.");
     syntax.add ("enable_irrigation", Syntax::Boolean, Syntax::Const, "\
 Set this to false to ignore any irrigation information in the file.");
     alist.add ("enable_irrigation", true);
+    syntax.add ("enable_fertilization", Syntax::Boolean, Syntax::Const, "\
+Set this to false to ignore any fertilization information in the file.");
+    alist.add ("enable_fertilization", true);
     Librarian<Action>::add_type ("table", alist, syntax, &make);
   }
 } ActionTable_syntax;

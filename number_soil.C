@@ -20,10 +20,138 @@
 
 
 #include "number.h"
+#include "column.h"
 #include "horizon.h"
 #include "hydraulic.h"
+#include "time.h"
 #include "units.h"
 #include <memory>
+
+struct NumberByDepth : public Number
+{
+  // Parameters.
+  const std::auto_ptr<Column> column;
+  /* const */ double max_depth;
+  const std::auto_ptr<Number> h;
+  const std::auto_ptr<Number> z;
+
+  // Simulation.
+  bool missing (const Scope& scope) const 
+  { 
+    if (h->missing (scope) 
+        || !Units::can_convert (h->dimension (scope), "cm", h->value (scope))
+        || z->missing (scope) 
+        || !Units::can_convert (z->dimension (scope), "cm", z->value (scope)))
+      return true;
+
+    const double height = Units::convert (z->dimension (scope), 
+                                          "cm", 
+                                          z->value (scope));
+    if (height > 0 || height < max_depth)
+      return true;
+
+    return false;
+  }
+
+  // Create.
+  bool check (const Scope& scope, Treelog& err) const
+  { 
+    bool ok = true;
+    Treelog::Open nest (err, name);
+    if (!h->check (scope, err))
+      ok = false;
+    else if (!Units::can_convert (h->dimension (scope), "cm"))
+      {
+        err.error ("Cannot convert pressure [" + h->dimension (scope) 
+                   + "] to [cm] for soil hydraulics");
+        ok = false;
+      }
+    if (!z->check (scope, err))
+      ok = false;
+    else if (!Units::can_convert (z->dimension (scope), "cm"))
+      {
+        err.error ("Cannot convert height [" + z->dimension (scope) 
+                   + "] to [cm] for soil hydraulics");
+        ok = false;
+      }
+    return ok;
+  }
+  static void load_syntax (Syntax& syntax, AttributeList&)
+  {
+    syntax.add ("column", Librarian<Column>::library (), "\
+The soil column whose properties we want to examine.");
+    syntax.add ("h", Librarian<Number>::library (), "\
+The tension we want to compare with.");
+    syntax.add ("z", Librarian<Number>::library (), "\
+The height we want to compare with.");
+  }
+  static double find_max_depth (const Column& column)
+  {
+    const size_t size = column.count_layers ();
+    double now = 0;
+    for (size_t i = 0; i < size; i++)
+      now -= column.get_dz (i);
+    return now;
+  }
+  NumberByDepth (Block& al)
+    : Number (al),
+      column (Librarian<Column>::build_item (al, "column")),
+      h (Librarian<Number>::build_item (al, "h")),
+      z (Librarian<Number>::build_item (al, "z"))
+  { 
+    Time time (9999, 1, 1, 0);
+    column->initialize (time, al.msg (), NULL);
+    max_depth = find_max_depth (*column);
+  }
+};
+
+struct NumberDepthTheta : public NumberByDepth
+{
+  // Simulation.
+  double value (const Scope& scope) const
+  { 
+    const size_t size = column->count_layers ();
+    const double pressure = Units::convert (h->dimension (scope), 
+                                            "cm", 
+                                            h->value (scope));
+    std::vector<double> v (size, pressure);
+    const double height = Units::convert (z->dimension (scope), 
+                                          "cm", 
+                                          z->value (scope));
+    double now = 0;
+    for (size_t i = 0; i < size; i++)
+      {
+        if (height > now)
+          return column->get_water_content_at (i);
+        now -= column->get_dz (i);
+      }
+    return column->get_water_content_at (size - 1);
+  }
+
+  const std::string& dimension (const Scope&) const 
+  { return Syntax::Fraction (); }
+
+  // Create.
+  NumberDepthTheta (Block& al)
+    : NumberByDepth (al)
+  { }
+};
+
+static struct NumberDepthThetaSyntax
+{
+  static Number& make (Block& al)
+  { return *new NumberDepthTheta (al); }
+  NumberDepthThetaSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+	       "Find water content (Theta) for a given pressure (h).");
+    NumberByDepth::load_syntax (syntax, alist);
+    Librarian<Number>::add_type ("depth_Theta", alist, syntax, &make);
+  }
+} NumberDepthTheta_syntax;
 
 struct NumberByTension : public Number
 {
