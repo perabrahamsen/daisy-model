@@ -58,6 +58,7 @@ struct ProgramBatch : public Program
           return false;
         if (!program[0]->run (msg))
           return false;
+        delete *program.begin ();
         program.erase (program.begin ());
       }
     return true;
