@@ -84,6 +84,8 @@ TransportNone::tick (Treelog& msg,
       daisy_assert (M[i] >= 0.0);
       daisy_assert (C[i] >= 0.0);
     }
+  J[soil.size () = 0.0;
+
   if (nest)
     delete nest;
 }
