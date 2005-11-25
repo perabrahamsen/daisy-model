@@ -1,5 +1,11 @@
 2005-11-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.97 released.
+
+2005-11-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* program_batch.C (run): delete before erase.
+
 	* transport_none.C: Clear bottom flux.
 
 2005-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
