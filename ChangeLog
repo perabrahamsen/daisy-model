@@ -1,5 +1,7 @@
 2005-11-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* crop_std.C (harvest): Don't emerge twice.
+
 	* Version 3.97 released.
 
 2005-11-25  Per Abrahamsen  <abraham@dina.kvl.dk>

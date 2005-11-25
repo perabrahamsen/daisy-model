@@ -432,20 +432,12 @@ CropStandard::harvest (const symbol column_name,
 	  // Revert development.
 	  if (harvesting.DSnew < 0.0)
 	    {
-
-#if 0
-	      // Negative value means revert to canopy 
-	      if (stub_length < canopy.Height)
-		development->DS = canopy.DS_at_height (stub_length);
-#else
 	      // We want a cut to always put back development, even
 	      // for a crop which is so retarded that it has no stem
 	      // worth speaking about, and hence, no height.
 	      const double DS_height = canopy.DS_at_height (stub_length);
 	      if (development->DS > DS_height)
-		development->DS = DS_height;
-#endif
-	      
+		development->DS = std::max (DS_height, 0.01);
 	    }
 	  else if (development->DS > harvesting.DSnew)
 	    development->DS = harvesting.DSnew;
