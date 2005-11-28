@@ -1,16 +1,15 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Installer opgaver på U drev
-
-* Check at "Field nitrogen" virker med checkpoints (local variable!)
-
 * WP5 
 
 ** hydraulic graphs
 
 *** SK
 
-Skriv tekst
+**** hydro-profil
+
+Lav en minipdf med hydro kurver og forklaring.  Send til Jozef.  Spørg
+hvor gode målinger er.  Og om man skal kalibrere efter dem.
 
 *** CZ
 
@@ -24,10 +23,14 @@ Hvad gør vi med det?
 
 Tekst.  Massebalancer.
 
+* Installer opgaver på U drev
+
 * IDE: CT laver "sample setups" for hvert FON land 
 
 De skal bruges på Daisy hjemmesiden, og er en del af "dissemination"
 (wp7) af FON.
+
+Joao's gødningsparams skalogså bruges.
 
 * IDE:  Mikkel implementerer Farquhar photosyntese.
 
@@ -39,15 +42,11 @@ De skal bruges på Daisy hjemmesiden, og er en del af "dissemination"
 
 * Programmering
 
+** Check at "Field nitrogen" virker med checkpoints (local variable!)
+
 ** block
 
 *** program_document should include local variables in parameterizations.
-
-*** Omdan alle constructors til at bruge Block
-
-*** Fjern Librarian<T>::create
-
-*** Block er dynamisk scoped!
 
 *** Vi kan ikke bruge checkpoints, fordi context har ændret sig.
 
