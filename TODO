@@ -6,16 +6,23 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 *** SK
 
-**** hydro-profil
-
-Lav en minipdf med hydro kurver og forklaring.  Send til Jozef.  Spørg
-hvor gode målinger er.  Og om man skal kalibrere efter dem.
-
 *** CZ
 
-Få et overblik over data
+**** 2003 SoilProfiles
 
-Der er MASSER af data i SoilProperties
+***** dug pit T1, T2_1, T4, depth: 20, 40, 60, 80, 180, rep: A
+
+20/8-2002: Theta_sat, fc, wp
+
+***** Guelph permeameter, T1 C, T2_1 A, T4 B, depth 30-50, 50-70
+
+Period 30/6 to 2/7 2003: K_sat
+
+***** Mix sample taken by goauge T1, T2_1, T4, T5_1, TX
+
+depth 0-30, rep A-D, depth 30-60, rep A (+ D 7/5)
+
+Dates: 20/8-2002, 7/5-2003
 
 ** resultatafsnit
 
