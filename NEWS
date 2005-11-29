@@ -16,6 +16,8 @@ release.
 
 ** Bug fixes.
 
+** New 'and', 'or', 'xor' and 'not' Boolean models.
+
 * 3.97
 
 ** Removed the `enable_water_stress' crop parameter.

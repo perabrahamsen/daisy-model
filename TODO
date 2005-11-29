@@ -1,5 +1,9 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Installer opgaver på U drev
+
+inden mandag!
+
 * WP5 
 
 ** hydraulic graphs
@@ -28,11 +32,25 @@ Weekly measurements, T1-T6, rep: A, depth: 10, 20, 30, 40, 50, 60 cm
 
 ***** Theta probe
 
-Theta vs Tension
+irregular measurements, depth: 10, 15, 20, 25 (and 30 near end).
+
+Two measurements in growth season, at and between drips.
+
+***** Content vs Tension
+
+Theta-probe vs Watermark, 20 cm
+
+Theta-probe vs Tensiometer, 30 cm
+
+Neutron-probe vs Watermark, 20 & 40 cm
+
+Neutron-probe vs Tensiometer 30 & 60 cm
+
+Gravi? 
 
 *** CZ
 
-**** 2003 SoilProfiles
+**** 2003 SoilProperties
 
 ***** dug pit T1, T2_1, T4, depth: 20, 40, 60, 80, 180, rep: A
 
@@ -55,7 +73,6 @@ Hvad gør vi med det?
 
 Tekst.  Massebalancer.
 
-* Installer opgaver på U drev
 
 * IDE: CT laver "sample setups" for hvert FON land 
 

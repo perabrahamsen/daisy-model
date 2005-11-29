@@ -1,3 +1,7 @@
+2005-11-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* boolean.C (and, or, xor, not): New models.
+
 2005-11-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* crop_std.C (harvest): Don't emerge twice.
