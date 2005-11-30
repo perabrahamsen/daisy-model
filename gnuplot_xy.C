@@ -139,7 +139,7 @@ set style data lines\n";
       out << "set xlabel " << quote (x_dims[0]) << "\n";
       break;
     case 0:
-      msg.error ("Nothing to plotted");
+      msg.error ("Nothing to be plotted");
       return false;
     default:
       msg.error ("Can only plot one or two x units at a time");
@@ -341,7 +341,7 @@ set style data lines\n";
       if (with == "points" || with == "errorbars")
 	out << " " << (style < 0 ? ++points : ((style == 0) ? points : style));
       else if (with == "lines")
-	out << " " << (style < 0 ? ++lines :  ((style == 0) ? points : style));
+	out << " " << (style < 0 ? ++lines :  ((style == 0) ? lines : style));
       else 
 	{
 	  if (style >= 0)

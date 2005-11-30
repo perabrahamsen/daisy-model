@@ -275,7 +275,7 @@ set style data lines\n";
       if (with == "points" || with == "errorbars")
 	out << " " << (style < 0 ? ++points : ((style == 0) ? points : style));
       else if (with == "lines")
-	out << " " << (style < 0 ? ++lines :  ((style == 0) ? points : style));
+	out << " " << (style < 0 ? ++lines :  ((style == 0) ? lines : style));
       else 
 	{
 	  if (style >= 0)
