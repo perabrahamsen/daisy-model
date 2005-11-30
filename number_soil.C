@@ -102,7 +102,11 @@ The height we want to compare with.");
   { 
     Time time (9999, 1, 1, 0);
     const Library& wlib = Librarian<Weather>::library ();
+    const double T = 10.0;
     AttributeList alist = wlib.lookup (symbol ("none"));
+    alist.add ("average", T);
+    alist.add ("amplitude", 0.0);
+    alist.add ("air_temperature", T);
     alist.add ("type", "none");
     std::auto_ptr<Weather> weather (Librarian<Weather>::build_alist
                                     (al, alist, "initialize"));
@@ -128,9 +132,9 @@ struct NumberDepthTheta : public NumberByDepth
     double now = 0;
     for (size_t i = 0; i < size; i++)
       {
+        now -= column->get_dz (i);
         if (height > now)
           return column->get_water_content_at (i);
-        now -= column->get_dz (i);
       }
     daisy_assert (size > 0);
     return column->get_water_content_at (size - 1);
@@ -178,9 +182,9 @@ struct NumberDepthK : public NumberByDepth
     double now = 0;
     for (size_t i = 0; i < size; i++)
       {
+        now -= column->get_dz (i);
         if (height > now)
           return column->get_water_conductivity_at (i);
-        now -= column->get_dz (i);
       }
     daisy_assert (size > 0);
     return column->get_water_conductivity_at (size - 1);
