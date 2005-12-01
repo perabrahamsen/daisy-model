@@ -1,50 +1,21 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Installer opgaver på U drev
-
-inden mandag!
-
 * WP5 
 
 ** hydraulic graphs
 
 *** CZ
 
-**** 2003 SoilProperties
-
-***** dug pit T1, T2_1, T4, depth: 20, 40, 60, 80, 180, rep: A
-
-20/8-2002: Theta_sat, fc, wp
+**** 2003 Soil Moisture
 
 
-***** Guelph permeameter, T1 C, T2_1 A, T4 B, depth 30-50, 50-70
 
-Period 30/6 to 2/7 2003: K_sat
-
-***** Mix sample taken by goauge T1, T2_1, T4, T5_1, TX
-
-depth 0-30, rep A-D, depth 30-60, rep A (+ D 7/5)
-
-Dates: 20/8-2002, 7/5-2003: wp
-
-***** Pressure infiltrometer T5_1
-
-depth 30-50, 60-80, 90-110
-
-Dates: 30/8-2002: K_sat
-
-***** Tensiometer
-
-Many depths, some treatments and repetitionss
-
-K_sat, K2, K10
 
 ** resultatafsnit
 
 Hvad gør vi med det?
 
 Tekst.  Massebalancer.
-
 
 * IDE: CT laver "sample setups" for hvert FON land 
 
