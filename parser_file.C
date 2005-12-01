@@ -1251,7 +1251,6 @@ ParserFile::Implementation::Implementation (const string& name)
 ParserFile::Implementation::~Implementation ()
 { 
   sequence_delete (inputs.begin (), inputs.end ());
-  daisy_assert (lexer != NULL);
   delete lexer; 
   delete nest;
 }

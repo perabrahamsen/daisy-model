@@ -1,3 +1,8 @@
+2005-12-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (~Implementation): Remove test that lexer is not
+	NULL.  If there were problems opening the file, it might be NULL.
+
 2005-11-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* boolean.C (and, or, xor, not): New models.
