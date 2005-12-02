@@ -1,5 +1,7 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Send CZ oversigt til cto
+
 * WP5 
 
 ** hydraulic graphs
@@ -26,19 +28,58 @@ Irregular bimonthly 07/05-03 to 17/3-04: 45 & 70 cm, T all, A & D
 
 Irregular bimonthly 16/10-02 to 21/3-03: 40 & 80 cm, T all, A & D
 
-**** Tensiometer, 45 & 75 cm, T all, A, A*, C, C*
+***** Tensiometer, 45 & 75 cm, T all, A, A*, C, C*
 
 Daily 17/6-03 to 16/9-03
 
-**** Watermark, 30 & 45 & 75 cm, T all, A & A* & A** & A & A* & A**
+***** Watermark, 30 & 45 & 75 cm, T all, A & A* & A** & C & C* & C**
 
 Daily 19/6-03 to 16/9-03
 
-**** Compare 
+***** Compare 
 
 30 cm, A & C, Watermark with Theta-probe & VIRRIB
+Hor: "E(g)_Valecov_PG"
+
+45 cm, A & C, Watermark & Tensiometer with Gravimetric sampling
+Hor: "E(g)/Ig_Valecov_PG"
 
 **** 2004 Soil Moisture
+
+***** Theta-probe, 0 & 20 cm, T all, A & D
+
+Daily 25/5-04 to 19/9-04
+
+***** VIRRIB, 30 & 60, T all, A & D
+
+Daily 21/5-04 to 31/8-04
+
+***** Gravimetric sampling,
+
+27/5-04: 8 cm, T all, A & D
+
+Irregular bimonthly 2/10-03 to 6/4-05: 10 & 30 & 45 & 60 & 75 cm, T all, A & D
+
+7/8-03 & 13/8-03: 20 & 40 & 60 cm & 80 & 120, various T, A, A*, A**, A***
+
+21/7-04: 20 & 30 & 50 cm & 65, T all, A & D
+
+***** Watermark
+
+Daily 29/6-04 to 15/9-04, 0 & 20 cm, T all, A & D
+
+Daily 24/6-04 to 19/9-04, 30 & 45 & 75 cm, T all, A & A* & D & D*
+
+***** Compare
+
+0 & 20 cm, A & D, Watermark with Theta-probe
+Hor: "Orh(g)_Valecov_PG"
+
+30 cm, A & D, Watermark with VIRRIB
+Hor: "E(g)_Valecov_PG"
+
+45 & 75 cm, A & D, Watermark with Gravimetric sampling
+Hor: "E(g)/Ig_Valecov_PG" & "Ig_Valecov_PG"
 
 ** resultatafsnit
 
