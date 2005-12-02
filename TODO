@@ -8,42 +8,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 *** CZ
 
-**** 2003 Soil Moisture
-
-***** Theta-probe, depth 30 & 60, T all, A & C
-
-Daily 17/6-03 to 16/9-2003
-
-***** VIRRIB, depth 30 & 60, T all, A & C
-
-Daily 17/6-03 to 16/9-2003
-
-***** Gravimetric sampling
-
-Irregular bimonthly 16/10-02 to 17/3-04: 10 & 30 & 60 cm, T all, A & D
-
-Irregular bimonthly 07/05-03 to 17/3-04: 45 & 70 cm, T all, A & D
-
-20/8-03: 20 & 40 & 60 & 80 & 120 cm, T1 & T2_1 & T4, A & A*
-
-Irregular bimonthly 16/10-02 to 21/3-03: 40 & 80 cm, T all, A & D
-
-***** Tensiometer, 45 & 75 cm, T all, A, A*, C, C*
-
-Daily 17/6-03 to 16/9-03
-
-***** Watermark, 30 & 45 & 75 cm, T all, A & A* & A** & C & C* & C**
-
-Daily 19/6-03 to 16/9-03
-
-***** Compare 
-
-30 cm, A & C, Watermark with Theta-probe & VIRRIB
-Hor: "E(g)_Valecov_PG"
-
-45 cm, A & C, Watermark & Tensiometer with Gravimetric sampling
-Hor: "E(g)/Ig_Valecov_PG"
-
 **** 2004 Soil Moisture
 
 ***** Theta-probe, 0 & 20 cm, T all, A & D
