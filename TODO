@@ -4,56 +4,75 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * WP5 
 
-** hydraulic graphs
-
-*** CZ
-
-**** 2004 Soil Moisture
-
-***** Theta-probe, 0 & 20 cm, T all, A & D
-
-Daily 25/5-04 to 19/9-04
-
-***** VIRRIB, 30 & 60, T all, A & D
-
-Daily 21/5-04 to 31/8-04
-
-***** Gravimetric sampling,
-
-27/5-04: 8 cm, T all, A & D
-
-Irregular bimonthly 2/10-03 to 6/4-05: 10 & 30 & 45 & 60 & 75 cm, T all, A & D
-
-7/8-03 & 13/8-03: 20 & 40 & 60 cm & 80 & 120, various T, A, A*, A**, A***
-
-21/7-04: 20 & 30 & 50 cm & 65, T all, A & D
-
-***** Watermark
-
-Daily 29/6-04 to 15/9-04, 0 & 20 cm, T all, A & D
-
-Daily 24/6-04 to 19/9-04, 30 & 45 & 75 cm, T all, A & A* & D & D*
-
-***** Tensiometer
-
-Daily 21/5-04 to 15/9-04 45 & 75 cm, T all, A & A* & D & D*
-
-***** Compare
-
-0 & 20 cm, A & D, Watermark with Theta-probe
-Hor: "Orh(g)_Valecov_PG"
-
-30 cm, A & D, Watermark with VIRRIB
-Hor: "E(g)_Valecov_PG"
-
-45 & 75 cm, A & D, Watermark with Gravimetric sampling
-Hor: "E(g)/Ig_Valecov_PG" & "Ig_Valecov_PG"
-
 ** resultatafsnit
 
 Hvad gør vi med det?
 
 Tekst.  Massebalancer.
+
+Brug forskellig font (bold/italic) for målte og simulerede tal.
+
+Hent simulerede tal fra fil?
+\newcommand{\pt2004t1leachtot}{12.6}
+\newcommand{\pt2004t1leachconc}{0.6}
+
+*** Opsummering:
+
+Periode: 1/4 to 1/4
+
+ÅR                     T1     T2     T3    T4    T5    T6
+Potato     [Mg DM/ha]  M + S
+Catch crop [Mg DM/ha]  M + S
+Vanding    [mm]        M=S
+Gødning    [kg N/ha]   M=S
+Udvaskning [kg N/ha]   S
+Udvaskning [ppm]       S
+Percolation [mm]       S
+
+*** Vandbalance:
+
+Sim eller Sim = Målt
+
+ÅR                     T1  T2  T3  T4  T5  T6
+
+Vanding                M=S
+Regn                   M=S
+----------
+Total Input
+
+Fordampning            S
+Perkolation            S
+-----------
+Total Output
+
+Storage                S
+-------
+
+Balance                S
+=======
+
+*** N-balance:
+
+Gødning org            M=S
+Gødning min
+Deposition             M=S
+----------
+Total Input
+
+Høst                   M/S
+Udvaskning             S
+Denitrificering        S
+---------------
+Total Output
+
+d Storage org          S
+d Storage min          S
+------
+Total d Storage
+
+=======
+Balance
+
 
 * IDE: CT laver "sample setups" for hvert FON land 
 
