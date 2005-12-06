@@ -22,6 +22,7 @@
 
 #include "select_value.h"
 #include "soil.h"
+#include "border.h"
 #include "mathlib.h"
 #include <sstream>
 #include "treelog.h"
@@ -70,12 +71,26 @@ struct SelectFluxTop : public SelectValue
     Select::initialize (conv, default_from, default_to, timestep);
 
     // Overwrite default height.
-    if (default_from < 0.0)
-      height = default_from;
+    if (height > 0.0)
+      if (default_from <= 0.0 && height > 0.0)
+        height = default_from;
+      else
+        height = 0.0;
+  }
+  bool check_border (const Border& border, 
+                     const double default_from, const double,
+                     Treelog& msg) const
+  { 
+    bool ok = true;
+    if (height < 0.0 
+        && !approximate (height, default_from)
+        && !border.check_border (height, msg))
+      ok = false;
+    return ok; 
   }
   SelectFluxTop (Block& al)
     : SelectValue (al),
-      height (0.0),
+      height (al.number ("from", 1.0)),
       last (NULL),
       index (-1)
   { }
@@ -94,6 +109,10 @@ static struct SelectFluxTopSyntax
 
     alist.add ("description", "Extract flux at top of specified interval.\n\
 By default, log the first member of the sequence.");
+
+    syntax.add ("from", "cm", Syntax::OptionalConst,
+		"Specify height (negative) to measure from.\n\
+By default, measure from the top.");
 
     Librarian<Select>::add_type ("flux_top", alist, syntax, &make);
   }

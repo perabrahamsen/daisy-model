@@ -14,6 +14,11 @@ release.
 
 * 3.98
 
+** The 'flux_bottom' select model now takes a 'to' parameter.
+** The 'flux_top' select model now takes a 'from' parameter.
+
+This allows loging multiple intervals in the same log file.
+
 ** New DrainDrying.dai file in the sample directory.
 
 The file demonstrate a setup to test the ability of a simulated soil
@@ -21,6 +26,8 @@ to drain water and to dry, which can be used when evaluating the
 hydraulic conductivity parameters of the soil.
 
 ** New 'and', 'or', 'xor' and 'not' Boolean models.
+
+** Bug fixes.
 
 * 3.97
 
