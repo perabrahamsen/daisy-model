@@ -1,3 +1,8 @@
+2005-12-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/DrainDrying.dai: New file.
+	* sample/Makefile (SETUPS): Added it.
+
 2005-12-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* parser_file.C (~Implementation): Remove test that lexer is not

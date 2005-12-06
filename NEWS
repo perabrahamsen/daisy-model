@@ -14,7 +14,11 @@ release.
 
 * 3.98
 
-** Bug fixes.
+** New DrainDrying.dai file in the sample directory.
+
+The file demonstrate a setup to test the ability of a simulated soil
+to drain water and to dry, which can be used when evaluating the
+hydraulic conductivity parameters of the soil.
 
 ** New 'and', 'or', 'xor' and 'not' Boolean models.
 
