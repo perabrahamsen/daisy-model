@@ -26,6 +26,131 @@
 #include "scope.h"
 #include <sstream>
 
+class ScopeBlock : public Scope
+{
+  // Content.
+private:
+  Block& block;
+  
+  // Interface.
+public:
+  bool has_number (const std::string& tag) const;
+  double number (const std::string& tag) const;
+  const std::string& dimension (const std::string& tag) const;
+
+  // Create and Destroy.
+private:
+  ScopeBlock (const ScopeBlock&);
+  ScopeBlock ();
+public:
+  explicit ScopeBlock (Block& b)
+    : block (b)
+  { }
+  ~ScopeBlock ()
+  { }
+};
+
+bool 
+ScopeBlock::has_number (const std::string& tag) const
+{
+  Syntax::type type = block.lookup (tag);
+  if (type == Syntax::Error)
+    return false;
+
+  const Syntax& syntax = block.find_syntax (tag);
+  if (syntax.size (tag) != Syntax::Singleton)
+    return false;
+
+  const AttributeList& alist = block.find_alist (tag);
+  if (!alist.check (tag))
+    return false;
+
+  //Handle primitive numbers.
+  if (type == Syntax::Number)
+    return true;
+  
+  // Handle number objects.
+  if (type != Syntax::Object)
+    return false;
+  const Library& library = syntax.library (tag);
+  if (&library != &Librarian<Number>::library ())
+    return false;
+  if (!syntax.check (alist, block.msg ()))
+    return false;
+  std::auto_ptr<Number> number (Librarian<Number>::build_alist
+                                (block, alist.alist (tag), tag));
+  if (!number.get ())
+    return false;
+  if (number->missing (*this))
+    return false;
+
+  return true;
+}
+
+double 
+ScopeBlock::number (const std::string& tag) const
+{ 
+  Syntax::type type = block.lookup (tag);
+  daisy_assert (type != Syntax::Error);
+  const Syntax& syntax = block.find_syntax (tag);
+
+  daisy_assert (syntax.size (tag) == Syntax::Singleton);
+  const AttributeList& alist = block.find_alist (tag);
+  daisy_assert (alist.check (tag));
+
+  //Handle primitive numbers.
+  if (type == Syntax::Number)
+    return alist.number (tag);
+
+  // Handle number objects.
+  daisy_assert (type == Syntax::Object);
+  daisy_assert (&syntax.library (tag) == &Librarian<Number>::library ());
+  daisy_assert (syntax.check (alist, block.msg ()));
+  std::auto_ptr<Number> number (Librarian<Number>::build_alist 
+                                (block, alist.alist (tag), tag));
+  daisy_assert (number.get ());
+  daisy_assert (!number->missing (*this));
+  return number->value (*this);
+}
+
+const std::string&
+ScopeBlock::dimension (const std::string& tag) const
+{ 
+  Syntax::type type = block.lookup (tag);
+  if (type == Syntax::Error)
+    return Syntax::Unknown ();
+  const Syntax& syntax = block.find_syntax (tag);
+  if (syntax.size (tag) != Syntax::Singleton)
+    return Syntax::Unknown ();
+  const AttributeList& alist = block.find_alist (tag);
+
+  //Handle primitive numbers.
+  if (type == Syntax::Number)
+    {
+      const std::string& dim = syntax.dimension (tag); 
+      if (dim != Syntax::User ())
+        return dim;
+      if (!alist.check (tag))
+        return Syntax::Unknown ();
+      return alist.name (tag);
+    }
+
+  // Handle number objects.
+  if (type != Syntax::Object)
+    return Syntax::Unknown ();
+  if (&syntax.library (tag) != &Librarian<Number>::library ())
+    return Syntax::Unknown ();
+  if (!syntax.check (alist, block.msg ()))
+    return Syntax::Unknown ();
+    
+  std::auto_ptr<Number> number (Librarian<Number>::build_alist
+                                (block, alist.alist (tag), tag));
+  if (!number.get ())
+    return Syntax::Unknown ();
+  
+  return number->dimension (*this);
+}
+
 struct Block::Implementation
 {
   Block *const parent;
@@ -150,7 +275,7 @@ Block::Implementation::expand_string (Block& block,
                         const AttributeList& obj = alist.alist (key);
                         const std::string type = obj.name ("type");
                         const Library& library = syntax.library (key);
-                        const Scope& scope = Scope::null ();
+                        const ScopeBlock scope (block);
                         if (&library == &Librarian<Stringer>::library ())
                           {
                             const std::auto_ptr<Stringer> stringer 

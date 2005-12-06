@@ -41,6 +41,11 @@ struct NumberOperand : public Number
   { return Syntax::Unknown (); }
 
   // Create.
+  bool initialize (Treelog& err)
+  { 
+    Treelog::Open nest (err, name);
+    return operand->initialize (err); 
+  }
   bool check (const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, name);
@@ -207,6 +212,16 @@ struct NumberPow : public Number
   { return Syntax::Unknown (); }
 
   // Create.
+  bool initialize (Treelog& err)
+  { 
+    Treelog::Open nest (err, name);
+    bool ok = true;
+    if (!base->initialize (err))
+      ok = false;
+    if (!exponent->initialize (err))
+      ok = false;
+    return ok;
+  }
   bool check (const Scope& scope, Treelog& err) const
   {
     Treelog::Open nest (err, name);
@@ -247,7 +262,7 @@ static struct NumberPowSyntax
 struct NumberOperands : public Number
 {
   // Parameters.
-  const vector<const Number*> operands;
+  const vector<Number*> operands;
 
   // Utilities.
   const string& unique_dimension (const Scope& scope) const 
@@ -276,6 +291,20 @@ struct NumberOperands : public Number
   }
 
   // Create.
+  bool initialize (Treelog& err)
+  { 
+    bool ok = true;
+    for (size_t i = 0; i < operands.size (); i++)
+      {
+        std::ostringstream tmp;
+        tmp << name << "[" << i << "]";
+        Treelog::Open nest (err, tmp.str ());
+        
+        if (!operands[i]->initialize (err))
+          ok = false;
+      }
+    return ok;
+  }
 #ifdef CHECK_OPERANDS_DIM
   static const struct Unique : public VCheck
   {
@@ -329,7 +358,7 @@ struct NumberOperands : public Number
   }
   NumberOperands (Block& al)
     : Number (al),
-      operands (Librarian<Number>::build_vector_const (al, "operands"))
+      operands (Librarian<Number>::build_vector (al, "operands"))
   { }
   ~NumberOperands ()
   { sequence_delete (operands.begin (), operands.end ()); }

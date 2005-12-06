@@ -23,6 +23,7 @@
 #include "path.h"
 #include "treelog.h"
 #include <string>
+#include <fstream>
 
 struct ProgramCD : public Program
 {
@@ -68,3 +69,61 @@ Name of directory to change into.");
     Librarian<Program>::add_type ("cd", alist, syntax, &make);
   }
 } ProgramCD_syntax;
+
+struct ProgramWrite : public Program
+{
+  // Content.
+  const std::string what;
+  const std::string where;
+
+  // Use.
+  bool run (Treelog& msg)
+  { 
+    if (where == "screen")
+      {
+        msg.message (what);
+        return true;
+      }
+    std::ofstream out (where.c_str ());
+    out << what;
+    if (out.good ())
+      return true;
+
+    msg.error ("Could not write to '" + where + "'");
+    return false;
+  }
+
+  // Create and Destroy.
+  void initialize (const Syntax*, const AttributeList*, Treelog&)
+  { }
+  bool check (Treelog&)
+  { return true; }
+
+  ProgramWrite (Block& al)
+    : Program (al),
+      what (al.name ("what")),
+      where (al.name ("where"))
+  { }
+  ~ProgramWrite ()
+  { }
+};
+
+static struct ProgramWriteSyntax
+{
+  static Program&
+  make (Block& al)
+  { return *new ProgramWrite (al); }
+  ProgramWriteSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Write string to file."); 
+    syntax.add ("what", Syntax::String, Syntax::Const, "\
+String to write.");
+    syntax.add ("where", Syntax::String, Syntax::Const, "\
+File to write it in.\n\
+If the value is 'screen', write the string to the screen.");
+    alist.add ("where", "screen");
+    Librarian<Program>::add_type ("write", alist, syntax, &make);
+  }
+} ProgramWrite_syntax;

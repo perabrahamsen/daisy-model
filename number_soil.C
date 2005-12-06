@@ -55,23 +55,33 @@ struct NumberByDepth : public Number
   }
 
   // Create.
-  bool check (const Scope& scope, Treelog& err) const
+  bool initialize (Treelog& msg)
   { 
     bool ok = true;
-    Treelog::Open nest (err, name);
-    if (!h->check (scope, err))
+    Treelog::Open nest (msg, name);
+    if (!h->initialize (msg))
+      ok = false;
+    if (!z->initialize (msg))
+      ok = false;
+    return ok;
+  }
+  bool check (const Scope& scope, Treelog& msg) const
+  { 
+    bool ok = true;
+    Treelog::Open nest (msg, name);
+    if (!h->check (scope, msg))
       ok = false;
     else if (!Units::can_convert (h->dimension (scope), "cm"))
       {
-        err.error ("Cannot convert pressure [" + h->dimension (scope) 
+        msg.error ("Cannot convert pressure [" + h->dimension (scope) 
                    + "] to [cm] for soil hydraulics");
         ok = false;
       }
-    if (!z->check (scope, err))
+    if (!z->check (scope, msg))
       ok = false;
     else if (!Units::can_convert (z->dimension (scope), "cm"))
       {
-        err.error ("Cannot convert height [" + z->dimension (scope) 
+        msg.error ("Cannot convert height [" + z->dimension (scope) 
                    + "] to [cm] for soil hydraulics");
         ok = false;
       }
@@ -230,14 +240,22 @@ struct NumberByTension : public Number
       || !Units::can_convert (h->dimension (scope), "cm", h->value (scope)); }
 
   // Create.
-  bool check (const Scope& scope, Treelog& err) const
+  bool initialize (Treelog& msg)
   { 
-    Treelog::Open nest (err, name);
-    if (!h->check (scope, err))
+    bool ok = true;
+    Treelog::Open nest (msg, name);
+    if (!h->initialize (msg))
+      ok = false;
+    return ok;
+  }
+  bool check (const Scope& scope, Treelog& msg) const
+  { 
+    Treelog::Open nest (msg, name);
+    if (!h->check (scope, msg))
       return false;
     if (!Units::can_convert (h->dimension (scope), "cm"))
       {
-        err.error ("Cannot convert [" + h->dimension (scope) 
+        msg.error ("Cannot convert [" + h->dimension (scope) 
                    + "] to [cm] for soil hydraulics");
         return false;
       }
@@ -354,14 +372,16 @@ struct NumberTensionByTheta : public Number
   }
 
   // Create.
-  bool check (const Scope& scope, Treelog& err) const
+  bool initialize (Treelog&)
+  { return true; }
+  bool check (const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (err, name);
-    if (!Theta->check (scope, err))
+    Treelog::Open nest (msg, name);
+    if (!Theta->check (scope, msg))
       return false;
     if (!Units::can_convert (Theta->dimension (scope), Syntax::Fraction ()))
       {
-        err.error ("Cannot convert [" + Theta->dimension (scope) 
+        msg.error ("Cannot convert [" + Theta->dimension (scope) 
                    + "] to fraction for soil hydraulics");
         return false;
       }

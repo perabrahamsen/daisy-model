@@ -28,7 +28,6 @@
 
 class LexerTable;
 
-// ScopeScource
 class ScopeTable : public Scope
 {
   // Content.

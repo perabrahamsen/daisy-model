@@ -21,8 +21,10 @@
 
 #include "stringer.h"
 #include "boolean.h"
+#include "number.h"
 #include "submodeler.h"
 #include "memutils.h"
+#include <sstream>
 #include <vector>
 #include <memory>
 
@@ -112,4 +114,84 @@ List of clauses to match for.",
     syntax.order ("clauses");
     Librarian<Stringer>::add_type ("cond", alist, syntax, &make);
   }
-} StringerStringEqual_syntax;
+} StringerCond_syntax;
+
+struct StringerNumber : public Stringer
+{
+  // Parameters.
+  std::auto_ptr<Number> number;
+
+  // Simulation.
+  bool missing (const Scope& scope) const
+  { return number->missing (scope); }
+
+  // Create.
+  static void load_syntax (Syntax& syntax, AttributeList&)
+  { 
+    syntax.add ("number", Librarian<Number>::library (), "\
+Number to manipulate."); 
+    syntax.order ("number");
+  }
+  bool check (const Scope& scope, Treelog& msg) const
+  { return number->check (scope, msg); }
+  StringerNumber (Block& al)
+    : Stringer (al),
+      number (Librarian<Number>::build_item (al, "number"))
+  { }
+  ~StringerNumber ()
+  { }
+};
+
+struct StringerValue : public StringerNumber
+{
+  std::string value (const Scope& scope) const
+  { 
+    std::ostringstream tmp;
+    tmp << number->value (scope);
+    return tmp.str ();
+  }
+
+  StringerValue (Block& al)
+    : StringerNumber (al)
+  { }
+};
+
+static struct StringerValueSyntax
+{
+  static Stringer& make (Block& al)
+  { return *new StringerValue (al); }
+  StringerValueSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    StringerNumber::load_syntax (syntax, alist);
+    alist.add ("description", "\
+Extract the value of a number as a string.");
+    Librarian<Stringer>::add_type ("value", alist, syntax, &make);
+  }
+} StringerValue_syntax;
+
+struct StringerDimension : public StringerNumber
+{
+  std::string value (const Scope& scope) const
+  { return number->dimension (scope); }
+
+  StringerDimension (Block& al)
+    : StringerNumber (al)
+  { }
+};
+
+static struct StringerDimensionSyntax
+{
+  static Stringer& make (Block& al)
+  { return *new StringerDimension (al); }
+  StringerDimensionSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    StringerNumber::load_syntax (syntax, alist);
+    alist.add ("description", "\
+Extract the dimension of a number as a string.");
+    Librarian<Stringer>::add_type ("dimension", alist, syntax, &make);
+  }
+} StringerDimension_syntax;

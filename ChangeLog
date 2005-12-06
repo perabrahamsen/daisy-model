@@ -1,5 +1,16 @@
 2005-12-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* number_source.C: New file.
+	* Makefile (MODELS): Added it.
+
+	* stringer.C (value, dimension): New models.
+
+2005-12-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* program_file.C (write): New model.
+
+2005-12-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* Version 3.98 released.
 
 2005-12-06  Per Abrahamsen  <abraham@dina.kvl.dk>

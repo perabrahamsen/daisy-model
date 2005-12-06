@@ -1,6 +1,49 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Check juleferie.  
+* Resultatafsnit
+
+3. Lav en number_source.C, med source_unique som første model
+
+4. Hiv et tal ud.
+
+5. Fortsæt derfra.
+
+(defstring yield template
+  "Find yield"
+  (declare potato_DM_sim number)
+  (potato_DM_sim source_unique
+     (begin (2003 4 1 0))
+     (end (2004 4 1 0))
+     (source default (tag "Blah blah blah") 
+        (where "dsjkl") (filter (month "7" "8" "9" "10"))))
+  (declare potato_DM_mea number)
+  (potato_DM_mea source_unique 
+     (begin (2003 4 1 0))
+     (end (2004 4 1 0))
+     (source default (tag "Blah blah blah") 
+        (where "Yield") (filter ("Treatment" "${TT}"))))
+  (text "\
+\\begin{table}
+Foo ${potato_DM_sim}
+\\end{table}"))
+
+string:
+  template:
+    variable (String number) *
+    text String
+
+number:
+  source_unique, source_sum, source_difference, source_first
+    source
+    begin 
+    end
+
+program:
+  print
+    what: string
+    where: String
+
+    
 
 * WP5 
 
@@ -35,6 +78,8 @@ Sim eller Sim = Målt
 
 ÅR                     T1  T2  T3  T4  T5  T6
 
+Pot evap?
+
 Vanding                M=S
 Regn                   M=S
 ----------
@@ -54,7 +99,7 @@ Balance                S
 *** N-balance:
 
 Gødning org            M=S
-Gødning min
+Gødning min            M=S
 Deposition             M=S
 ----------
 Total Input

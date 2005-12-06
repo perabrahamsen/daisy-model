@@ -40,6 +40,8 @@ struct NumberConst : public Number
   { return dim; }
 
   // Create.
+  bool initialize (Treelog&)
+  { return true; }
   bool check (const Scope&, Treelog&) const
   { return true; }
   NumberConst (Block& al)
@@ -102,6 +104,8 @@ struct NumberGet : public NumberLeaf
   }
 
   // Create.
+  bool initialize (Treelog&)
+  { return true; }
   bool check (const Scope& scope, Treelog& err) const
   {
     Treelog::Open nest (err, name);
@@ -199,6 +203,8 @@ struct NumberFetch : public Number
   }
 
   // Create.
+  bool initialize (Treelog&)
+  { return true; }
   bool check (const Scope& scope, Treelog& err) const
   {
     Treelog::Open nest (err, "Fetch: " + name);
@@ -266,6 +272,8 @@ struct NumberIdentity : public Number
   }
 
   // Create.
+  bool initialize (Treelog& msg)
+  { return child->initialize (msg); }
   bool check (const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, name);
@@ -328,6 +336,8 @@ struct NumberConvert : public Number
   { return dim; }
 
   // Create.
+  bool initialize (Treelog& msg)
+  { return child->initialize (msg); }
   bool check (const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, name);
@@ -386,6 +396,8 @@ struct NumberDim : public Number
   { return dim; }
 
   // Create.
+  bool initialize (Treelog& msg)
+  { return child->initialize (msg); }
   bool check (const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, name);
