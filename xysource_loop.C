@@ -99,13 +99,13 @@ bool
 XYSourceLoop::load (Treelog& msg)
 {
   bool ok = true;
-  if (!x_expr->check (scope, msg))
+  if (!x_expr->initialize (msg) || !x_expr->check (scope, msg))
     {
       msg.error ("Bad x expression");
       ok = false;
     }
   x_dimension_ = x_expr->dimension (scope);
-  if (!y_expr->check (scope, msg))
+  if (!y_expr->initialize (msg) || !y_expr->check (scope, msg))
     {
       msg.error ("Bad y expression");
       ok = false;

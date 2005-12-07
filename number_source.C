@@ -55,6 +55,7 @@ struct NumberSource : public Number
   virtual void initialize_derived (Treelog& msg) = 0;
   bool initialize (Treelog& msg)
   {
+    Treelog::Open nest (msg, name);
     daisy_assert (state == uninitialized);
     daisy_assert (source.get ());
     if (!source->load (msg))
@@ -63,7 +64,7 @@ struct NumberSource : public Number
       initialize_derived (msg);
     return state != error;
   }
-  bool check (const Scope&, Treelog& msg) const
+  bool check (const Scope&, Treelog&) const
   { 
     daisy_assert (state != uninitialized);
     return state != error; 
@@ -93,11 +94,14 @@ struct NumberSourceUnique : public NumberSource
         state = has_value;
       }
     else if (size == 0U)
-      state = is_missing;
+      {
+        msg.warning ("Got zero elements, expected one");
+        state = is_missing;
+      }
     else
       {
         std::ostringstream tmp;
-        tmp << "Got " << size << " elementes, expected 1";
+        tmp << "Got " << size << " elements, expected 1";
         msg.error (tmp.str ());
         state = error;
       }

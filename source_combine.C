@@ -71,7 +71,7 @@ SourceCombine::load (Treelog& msg)
   scope.load (msg);
 
   // Scope
-  if (!expr->check (scope, msg))
+  if (!expr->initialize (msg) || !expr->check (scope, msg))
     return false;
 
   // Extract.

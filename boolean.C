@@ -21,6 +21,7 @@
 
 #include "boolean.h"
 #include "memutils.h"
+#include <sstream>
 #include <vector>
 
 template<>
@@ -60,6 +61,8 @@ struct BooleanStringEqual : public Boolean
   }
 
   // Create.
+  bool initialize (Treelog&)
+  { return true; }
   bool check (const Scope&, Treelog&) const
   { return true; }
   BooleanStringEqual (Block& al)
@@ -95,6 +98,8 @@ struct BooleanTrue : public Boolean
   { return true; }
 
   // Create.
+  bool initialize (Treelog&)
+  { return true; }
   bool check (const Scope&, Treelog&) const
   { return true; }
   BooleanTrue (Block& al)
@@ -127,6 +132,8 @@ struct BooleanFalse : public Boolean
   { return false; }
 
   // Create.
+  bool initialize (Treelog&)
+  { return true; }
   bool check (const Scope&, Treelog&) const
   { return true; }
   BooleanFalse (Block& al)
@@ -151,7 +158,7 @@ static struct BooleanFalseSyntax
 
 struct BooleanOperands : public Boolean
 {
-  const std::vector<const Boolean*> operand;
+  const std::vector<Boolean*> operand;
 
   // Simulation.
   bool missing (const Scope& scope) const
@@ -164,6 +171,20 @@ struct BooleanOperands : public Boolean
   }
 
   // Create.
+  bool initialize (Treelog& msg)
+  { 
+    bool ok = true;
+
+    for (size_t i = 0; i < operand.size (); i++)
+      if (!operand[i]->initialize (msg))
+        {
+          std::ostringstream tmp;
+          tmp << name << "[" << i << "]";
+          Treelog::Open nest (msg, tmp.str ());
+          ok = false;
+        }
+    return ok;
+  }
   bool check (const Scope& scope, Treelog& msg) const
   { 
     bool ok = true;
@@ -173,9 +194,7 @@ struct BooleanOperands : public Boolean
         ok = false;
 
     return ok;
-
-    return true; }
-
+  }
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
     syntax.add ("operands", Librarian<Boolean>::library (), 
@@ -185,7 +204,7 @@ List of operands to compare.");
   }
   BooleanOperands (Block& al)
     : Boolean (al),
-      operand (Librarian<Boolean>::build_vector_const (al, "operands"))
+      operand (Librarian<Boolean>::build_vector (al, "operands"))
   { }
   ~BooleanOperands ()
   { sequence_delete (operand.begin (), operand.end ()); }

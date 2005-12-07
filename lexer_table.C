@@ -154,10 +154,7 @@ LexerTable::read_header (Treelog& msg)
   
   // Read dimensions.
   if (dim_line)
-    {
-      if (!get_entries (dim_names))
-        return false;
-    }
+    get_entries_raw (dim_names);
   else switch (original.size ())
     {
     case 0:

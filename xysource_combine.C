@@ -74,9 +74,9 @@ XYSourceCombine::load (Treelog& msg)
   // Scope
   {
     bool ok = true;
-    if (!x_expr->check (scope, msg))
+    if (!x_expr->initialize (msg) || !x_expr->check (scope, msg))
       ok = false;
-    if (!y_expr->check (scope, msg))
+    if (!y_expr->initialize (msg) || !y_expr->check (scope, msg))
       ok = false;
     if (!ok)
       return false;

@@ -283,7 +283,9 @@ ParserFile::Implementation::get_number (const string& syntax_dim)
   Block block (parent_syntax, parent_alist, treelog, "number");
   auto_ptr<Number> number (Librarian<Number>::build_alist (block, *al,
 							   "number"));
-  if (!block.ok () || !number->check (Scope::null (), treelog))
+  if (!block.ok ()
+      || !number->initialize (treelog)
+      || !number->check (Scope::null (), treelog))
     {
       error ("Bad number '" + obj + "'\n--- details:\n"
              + tmp.str () + "---");

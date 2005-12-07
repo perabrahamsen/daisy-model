@@ -2,12 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Resultatafsnit
 
-3. Lav en number_source.C, med source_unique som første model
-
-4. Hiv et tal ud.
-
-5. Fortsæt derfra.
-
 (defstring yield template
   "Find yield"
   (declare potato_DM_sim number)
@@ -65,14 +59,15 @@ Periode: 1/4 to 1/4
 
 ÅR                     T1     T2     T3    T4    T5    T6
 Potato     [Mg DM/ha]  M + S
-Catch crop [Mg DM/ha]  M + S
 Vanding    [mm]        M=S
 Gødning    [kg N/ha]   M=S
 Udvaskning [kg N/ha]   S
-Udvaskning [ppm]       S
 Percolation [mm]       S
 
 *** Vandbalance:
+
+Udvaskning [ppm]       S
+Catch crop [Mg DM/ha]  M + S
 
 Sim eller Sim = Målt
 

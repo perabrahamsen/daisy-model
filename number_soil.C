@@ -372,8 +372,11 @@ struct NumberTensionByTheta : public Number
   }
 
   // Create.
-  bool initialize (Treelog&)
-  { return true; }
+  bool initialize (Treelog& msg)
+  {
+    Treelog::Open nest (msg, name);
+    return Theta->initialize (msg);
+  }
   bool check (const Scope& scope, Treelog& msg) const
   { 
     Treelog::Open nest (msg, name);

@@ -81,6 +81,8 @@ ScopeBlock::has_number (const std::string& tag) const
                                 (block, alist.alist (tag), tag));
   if (!number.get ())
     return false;
+  if (!number->initialize (block.msg ()))
+    return false;
   if (number->missing (*this))
     return false;
 
@@ -109,6 +111,7 @@ ScopeBlock::number (const std::string& tag) const
   std::auto_ptr<Number> number (Librarian<Number>::build_alist 
                                 (block, alist.alist (tag), tag));
   daisy_assert (number.get ());
+  daisy_assert (number->initialize (block.msg ()));
   daisy_assert (!number->missing (*this));
   return number->value (*this);
 }
@@ -146,6 +149,8 @@ ScopeBlock::dimension (const std::string& tag) const
   std::auto_ptr<Number> number (Librarian<Number>::build_alist
                                 (block, alist.alist (tag), tag));
   if (!number.get ())
+    return Syntax::Unknown ();
+  if (!number->initialize (block.msg ()))
     return Syntax::Unknown ();
   
   return number->dimension (*this);
@@ -282,6 +287,7 @@ Block::Implementation::expand_string (Block& block,
                               (Librarian<Stringer>::build_alist (block,
                                                                   obj, key));
                             if (!block.ok () 
+                                || !stringer->initialize (msg)
                                 || !stringer->check (scope, msg)
                                 || stringer->missing (scope))
                               throw "Bad string: '" + type + "'";
@@ -292,6 +298,7 @@ Block::Implementation::expand_string (Block& block,
                             const std::auto_ptr<Number> number 
                               (Librarian<Number>::build_alist (block, obj, key));
                             if (!block.ok () 
+                                || !number->initialize (msg)
                                 || !number->check (scope, msg)
                                 || number->missing (scope))
                               throw "Bad number: '"+ type + "'";

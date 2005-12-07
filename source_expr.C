@@ -55,7 +55,7 @@ SourceExpr::load (Treelog& msg)
 
   // Scope
   ScopeTable scope (lex);
-  if (!expr->check (scope, msg))
+  if (!expr->initialize (msg) || !expr->check (scope, msg))
     {
       lex.error ("Bad expression");
       return false;

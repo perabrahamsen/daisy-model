@@ -50,7 +50,7 @@ struct StringerCond : public Stringer
   // Parameters.
   struct Clause
   {
-    const std::auto_ptr<const Boolean> condition;
+    const std::auto_ptr<Boolean> condition;
     const std::string value;
     static void load_syntax (Syntax& syntax, AttributeList& alist)
     {
@@ -81,6 +81,19 @@ Value to return.");
   }
 
   // Create.
+  bool initialize (Treelog& msg)
+  {
+    bool ok = true;
+    for (size_t i = 0; i < clauses.size (); i++)
+      {
+        std::ostringstream tmp;
+        tmp << name << "[" << i << "]";
+        Treelog::Open nest (msg, tmp.str ());
+        if (!clauses[i]->condition->initialize (msg))
+          ok = false;
+      }
+    return ok;
+  }
   bool check (const Scope& scope, Treelog& msg) const
   { 
     for (size_t i = 0; i < clauses.size (); i++)
@@ -132,8 +145,16 @@ struct StringerNumber : public Stringer
 Number to manipulate."); 
     syntax.order ("number");
   }
+  bool initialize (Treelog& msg)
+  { 
+    Treelog::Open nest (msg, name);
+    return number->initialize (msg); 
+  }
   bool check (const Scope& scope, Treelog& msg) const
-  { return number->check (scope, msg); }
+  { 
+    Treelog::Open nest (msg, name);
+    return number->check (scope, msg); 
+  }
   StringerNumber (Block& al)
     : Stringer (al),
       number (Librarian<Number>::build_item (al, "number"))
