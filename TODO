@@ -2,42 +2,17 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Resultatafsnit
 
-(defstring yield template
-  "Find yield"
-  (declare potato_DM_sim number)
-  (potato_DM_sim source_unique
-     (begin (2003 4 1 0))
-     (end (2004 4 1 0))
-     (source default (tag "Blah blah blah") 
-        (where "dsjkl") (filter (month "7" "8" "9" "10"))))
-  (declare potato_DM_mea number)
-  (potato_DM_mea source_unique 
-     (begin (2003 4 1 0))
-     (end (2004 4 1 0))
-     (source default (tag "Blah blah blah") 
-        (where "Yield") (filter ("Treatment" "${TT}"))))
-  (text "\
-\\begin{table}
-Foo ${potato_DM_sim}
-\\end{table}"))
+** Måske skal program:result nedarve fra write, i stedet for batch.
 
-string:
-  template:
-    variable (String number) *
-    text String
+** Vi skal have udtrukket irr og fert for alle lande, alle år
 
-number:
-  source_unique, source_sum, source_difference, source_first
-    source
-    begin 
-    end
+** generic-2003 summary
 
-program:
-  print
-    what: string
-    where: String
+** cz, dk, it, pl, sk
 
-    
+** N balance tabel
+
+** Water balance tabel
 
 * WP5 
 
@@ -58,7 +33,7 @@ Hent simulerede tal fra fil?
 Periode: 1/4 to 1/4
 
 ÅR                     T1     T2     T3    T4    T5    T6
-Potato     [Mg DM/ha]  M + S
+Potato     [Mg DM/ha]  M / S
 Vanding    [mm]        M=S
 Gødning    [kg N/ha]   M=S
 Udvaskning [kg N/ha]   S

@@ -277,6 +277,7 @@ Block::Implementation::expand_string (Block& block,
                       break;
                     case Syntax::Object:
                       {
+                        Treelog::Open nest (msg, "${" + key + "}");
                         const AttributeList& obj = alist.alist (key);
                         const std::string type = obj.name ("type");
                         const Library& library = syntax.library (key);

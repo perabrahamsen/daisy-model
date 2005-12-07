@@ -28,8 +28,8 @@
 struct GnuplotTime : public GnuplotBase
 {
   // Ranges.
-  const Time* begin;
-  const Time* end;
+  std::auto_ptr<Time> begin;
+  std::auto_ptr<Time> end;
   const bool ymin_flag;
   const double ymin;
   const bool ymax_flag;
@@ -152,9 +152,9 @@ set style data lines\n";
 	else
 	  source[i]->limit (soft_begin, soft_end, soft_y2min, soft_y2max);
 
-      if (begin)
+      if (begin.get ())
 	soft_begin = *begin;
-      if (end)
+      if (end.get ())
 	soft_end = *end;
       if (ymin_flag)
 	soft_ymin = ymin;
@@ -201,12 +201,12 @@ set style data lines\n";
 
   // X Range
   out << "set xrange [";
-  if (begin)
+  if (begin.get ())
     out << timeform (*begin);
   else
     out << "*";
   out << ":";
-  if (end)
+  if (end.get ())
     out << timeform (*end);
   else
     out << "*";
@@ -333,8 +333,6 @@ GnuplotTime::GnuplotTime (Block& al)
 GnuplotTime::~GnuplotTime ()
 { 
   sequence_delete (source.begin (), source.end ()); 
-  delete begin;
-  delete end;
 }
 
 static struct GnuplotTimeSyntax

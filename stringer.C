@@ -143,7 +143,6 @@ struct StringerNumber : public Stringer
   { 
     syntax.add ("number", Librarian<Number>::library (), "\
 Number to manipulate."); 
-    syntax.order ("number");
   }
   bool initialize (Treelog& msg)
   { 
@@ -165,15 +164,23 @@ Number to manipulate.");
 
 struct StringerValue : public StringerNumber
 {
+  const int precision;
+
   std::string value (const Scope& scope) const
   { 
     std::ostringstream tmp;
+    if (precision >= 0)
+      {
+        tmp.precision (precision);
+        tmp.flags (std::ios::right | std::ios::fixed);
+      }
     tmp << number->value (scope);
     return tmp.str ();
   }
 
   StringerValue (Block& al)
-    : StringerNumber (al)
+    : StringerNumber (al),
+      precision (al.integer ("precision", -1))
   { }
 };
 
@@ -188,6 +195,8 @@ static struct StringerValueSyntax
     StringerNumber::load_syntax (syntax, alist);
     alist.add ("description", "\
 Extract the value of a number as a string.");
+    syntax.add ("precision", Syntax::Integer, Syntax::OptionalConst, "\
+Number of decimals after point.  By default, use a floating format.");
     Librarian<Stringer>::add_type ("value", alist, syntax, &make);
   }
 } StringerValue_syntax;
