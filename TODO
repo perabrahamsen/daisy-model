@@ -4,7 +4,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** Måske skal program:result nedarve fra write, i stedet for batch.
 
-** Vi skal have udtrukket irr og fert for alle lande, alle år
+** Vi skal have udtrukket irr og fert fra DB for alle lande, alle år
 
 ** generic-2003 summary
 
@@ -39,10 +39,11 @@ Gødning    [kg N/ha]   M=S
 Udvaskning [kg N/ha]   S
 Percolation [mm]       S
 
+Udvaskning [ppm]       S
+Catch crop [Mg DM/ha]  M / S
+
 *** Vandbalance:
 
-Udvaskning [ppm]       S
-Catch crop [Mg DM/ha]  M + S
 
 Sim eller Sim = Målt
 
@@ -50,8 +51,8 @@ Sim eller Sim = Målt
 
 Pot evap?
 
-Vanding                M=S
 Regn                   M=S
+Vanding                M=S
 ----------
 Total Input
 

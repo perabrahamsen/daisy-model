@@ -98,7 +98,7 @@ struct NumberSourceUnique : public NumberSource
   void initialize_derived (Treelog& msg)
   {
     const std::vector<Time>& time = source->time ();
-    size_t size = time.size ();
+    const size_t size = time.size ();
     int count = 0;
     for (size_t i = 0; i < size; i++)
       if ((!begin.get () || time[i] > *begin) 
@@ -143,13 +143,12 @@ static struct NumberSourceUniqueSyntax
   }
 } NumberSourceUnique_syntax;
 
-
 struct NumberSourceSum : public NumberSource
 {
   void initialize_derived (Treelog&)
   {
     const std::vector<Time>& time = source->time ();
-    size_t size = time.size ();
+    const size_t size = time.size ();
     val = 0.0;
     state = has_value;
     for (size_t i = 0; i < size; i++)
@@ -176,5 +175,51 @@ static struct NumberSourceSumSyntax
     Librarian<Number>::add_type ("source_sum", alist, syntax, &make);
   }
 } NumberSourceSum_syntax;
+
+struct NumberSourceIncrease : public NumberSource
+{
+  void initialize_derived (Treelog& msg)
+  {
+    const std::vector<Time>& time = source->time ();
+    const std::vector<double>& value = source->value ();
+    const size_t size = time.size ();
+    daisy_assert (value.size () == size);
+    state = has_value;
+    if (size < 2)
+      {
+         msg.warning ("Need two elements to make a difference");
+         val = 0;
+         return;
+      }
+    double first = value[0];
+    double last = value[0];
+    for (size_t i = 1; i < size; i++)
+      {
+        if (begin.get () && time[i] < *begin)
+          first = value[i];
+        if (!end.get () || time[i] <= *end)
+          last = value[i];
+      }
+    val = last - first;
+  }
+  NumberSourceIncrease (Block& al)
+    : NumberSource (al)
+  { }
+};
+
+static struct NumberSourceIncreaseSyntax
+{
+  static Number& make (Block& al)
+  { return *new NumberSourceIncrease (al); }
+  NumberSourceIncreaseSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", 
+	       "Find increase in value during time series.");
+    NumberSource::load_syntax (syntax, alist);
+    Librarian<Number>::add_type ("source_increase", alist, syntax, &make);
+  }
+} NumberSourceIncrease_syntax;
 
 // number_source.C ends here
