@@ -225,3 +225,45 @@ Extract the dimension of a number as a string.");
     Librarian<Stringer>::add_type ("dimension", alist, syntax, &make);
   }
 } StringerDimension_syntax;
+
+struct StringerIdentity : public Stringer
+{
+  const std::string val;
+
+  // Simulation.
+  bool missing (const Scope&) const
+  { return false; }
+  std::string value (const Scope&) const
+  { return val; }
+
+  // Create.
+  bool initialize (Treelog&)
+  { return true; }
+
+  bool check (const Scope&, Treelog&) const
+  { return true; }
+  StringerIdentity (Block& al)
+    : Stringer (al),
+      val (al.name ("value"))
+  { }
+  ~StringerIdentity ()
+  { }
+};
+
+static struct StringerIdentitySyntax
+{
+  static Stringer& make (Block& al)
+  { return *new StringerIdentity (al); }
+  StringerIdentitySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", "\
+Return the specified value.");
+    syntax.add ("value", Syntax::String, Syntax::Const, "\
+Constant value.");
+    Librarian<Stringer>::add_type ("identity", alist, syntax, &make);
+  }
+} StringerIdentity_syntax;
+

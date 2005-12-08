@@ -1,3 +1,7 @@
+2005-12-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* stringer.C (const): New model.
+
 2005-12-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* parser_file.C (get_string): Handle backslash after a backslashed

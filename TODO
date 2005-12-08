@@ -2,17 +2,13 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Resultatafsnit
 
-** Måske skal program:result nedarve fra write, i stedet for batch.
-
-** Vi skal have udtrukket irr og fert fra DB for alle lande, alle år
-
 ** generic-2003 summary
 
 ** cz, dk, it, pl, sk
 
 ** N balance tabel
 
-** Water balance tabel
+** Måske skal dimensionen ned på en seperat linie
 
 * WP5 
 
@@ -71,9 +67,9 @@ Balance                S
 
 Gødning org            M=S
 Gødning min            M=S
-Deposition             M=S
+Deposition               S
 ----------
-Total Input
+Total Input              S
 
 Høst                   M/S
 Udvaskning             S
