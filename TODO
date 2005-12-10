@@ -2,15 +2,37 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Resultatafsnit
 
+** IT 2003/2004 Yield
+
+total N i plante mangler.  Der er NO3-N...
+
+** N balance tabel
+
+Vi skal have catch crop med.  Det kræver enten begin/end, eller
+${year}+1.
+
 ** generic-2003 summary
 
 ** cz, dk, it, pl, sk
 
-** N balance tabel
+** Measure
 
-** Måske skal dimensionen ned på en seperat linie
+*** Vi skal have cover crops med for N balance.
+
+*** Measured (ukorrigeret) regn
+
+*** Kan ETc bruges?
+
+Hvad med ETc i dabasen?  Skal det plottes?  Er der nogen der har data
+i det felt?
+
+Evt tilføj ETp (som "målt") sammen med ETa (simuleret) i balancen.
+
+*** Hvad står der under vejr i databasen?
 
 * WP5 
+
+** Profilplot med gravimetric sampling for SK og CZ.
 
 ** resultatafsnit
 

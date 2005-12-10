@@ -143,6 +143,53 @@ static struct NumberSourceUniqueSyntax
   }
 } NumberSourceUnique_syntax;
 
+struct NumberSourceAverage : public NumberSource
+{
+  void initialize_derived (Treelog& msg)
+  {
+    const std::vector<Time>& time = source->time ();
+    const size_t size = time.size ();
+    int count = 0;
+    val = 0.0;
+    for (size_t i = 0; i < size; i++)
+      if ((!begin.get () || time[i] > *begin) 
+          && (!end.get () || time[i] <= *end))
+        {
+          val += source->value ()[i];
+          count++;
+        }
+
+    if (count == 0U)
+      {
+        msg.warning ("Can't take average of zero elements");
+        state = is_missing;
+      }
+    else
+      {
+        val /= (count + 0.0);
+        state = has_value;
+      }
+  }
+  NumberSourceAverage (Block& al)
+    : NumberSource (al)
+  { }
+};
+
+static struct NumberSourceAverageSyntax
+{
+  static Number& make (Block& al)
+  { return *new NumberSourceAverage (al); }
+  NumberSourceAverageSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", 
+	       "Find average number in time series.");
+    NumberSource::load_syntax (syntax, alist);
+    Librarian<Number>::add_type ("source_average", alist, syntax, &make);
+  }
+} NumberSourceAverage_syntax;
+
 struct NumberSourceSum : public NumberSource
 {
   void initialize_derived (Treelog&)
