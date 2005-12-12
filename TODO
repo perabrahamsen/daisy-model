@@ -1,19 +1,15 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* source merge
+
++ PL data
+
 * Resultatafsnit
-
-** IT 2003/2004 Yield
-
-total N i plante mangler.  Der er NO3-N...
 
 ** N balance tabel
 
 Vi skal have catch crop med.  Det kræver enten begin/end, eller
 ${year}+1.
-
-** generic-2003 summary
-
-** cz, dk, it, pl, sk
 
 ** Measure
 
@@ -21,12 +17,7 @@ ${year}+1.
 
 *** Measured (ukorrigeret) regn
 
-*** Kan ETc bruges?
-
-Hvad med ETc i dabasen?  Skal det plottes?  Er der nogen der har data
-i det felt?
-
-Evt tilføj ETp (som "målt") sammen med ETa (simuleret) i balancen.
+*** Evt tilføj ETp (som "målt") sammen med ETa (simuleret) i balancen.
 
 *** Hvad står der under vejr i databasen?
 
@@ -34,79 +25,9 @@ Evt tilføj ETp (som "målt") sammen med ETa (simuleret) i balancen.
 
 ** Profilplot med gravimetric sampling for SK og CZ.
 
-** resultatafsnit
+** ETc fra DB vs ETa fra Daisy
 
-Hvad gør vi med det?
-
-Tekst.  Massebalancer.
-
-Brug forskellig font (bold/italic) for målte og simulerede tal.
-
-Hent simulerede tal fra fil?
-\newcommand{\pt2004t1leachtot}{12.6}
-\newcommand{\pt2004t1leachconc}{0.6}
-
-*** Opsummering:
-
-Periode: 1/4 to 1/4
-
-ÅR                     T1     T2     T3    T4    T5    T6
-Potato     [Mg DM/ha]  M / S
-Vanding    [mm]        M=S
-Gødning    [kg N/ha]   M=S
-Udvaskning [kg N/ha]   S
-Percolation [mm]       S
-
-Udvaskning [ppm]       S
-Catch crop [Mg DM/ha]  M / S
-
-*** Vandbalance:
-
-
-Sim eller Sim = Målt
-
-ÅR                     T1  T2  T3  T4  T5  T6
-
-Pot evap?
-
-Regn                   M=S
-Vanding                M=S
-----------
-Total Input
-
-Fordampning            S
-Perkolation            S
------------
-Total Output
-
-Storage                S
--------
-
-Balance                S
-=======
-
-*** N-balance:
-
-Gødning org            M=S
-Gødning min            M=S
-Deposition               S
-----------
-Total Input              S
-
-Høst                   M/S
-Udvaskning             S
-Denitrificering        S
----------------
-Total Output
-
-d Storage org          S
-d Storage min          S
-------
-Total d Storage
-
-=======
-Balance
-
+Har lav prioritet, i følge Søren.
 
 * IDE: CT laver "sample setups" for hvert FON land 
 

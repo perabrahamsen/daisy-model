@@ -106,7 +106,7 @@ XYSourceMerge::load (Treelog& msg)
   
   // Inherit style.
   if (with_ == "")
-    source[0]->with ();
+    with_ = source[0]->with ();
 
   // Merge.
   for (size_t i = 0; i < source.size (); i++)

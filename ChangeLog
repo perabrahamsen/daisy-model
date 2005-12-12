@@ -1,3 +1,10 @@
+2005-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_merge.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* xysource_merge.C (load): Fix bug that prevented inheriting 'with'.  
+
 2005-12-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* stringer.C (const): New model.
