@@ -14,7 +14,11 @@ release.
 
 * 3.99
 
-** New number and source models.
+** New program "write" that writes text to file or screen.
+
+** More work related to scoped variables and gnuplot.
+
+** Bug fixes.
 
 * 3.98
 

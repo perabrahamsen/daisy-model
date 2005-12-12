@@ -1,5 +1,9 @@
 2005-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.99 released.
+
+2005-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* source_merge.C: New model.
 	* Makefile (MODELS): Added it.
 
