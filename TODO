@@ -1,15 +1,82 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* source merge
+* Status mail
 
-+ PL data
+Subject:  FertOrgaNic: WP1 and WP5 status and reminder
 
-* Resultatafsnit
+Hi FertOrgaNic
+
+I just want to remind everybody that the 31/12 deadline also cover the
+2005 database, or at least the part that should be included in the WP5
+report.  Obviously, the cover crop yield can't  be included.  Apart
+from the 2005 database (which only PL has delivered), here is the
+status per country:
+
+CZ & SK:
+
+  I need the final calibrations for both CZ and SK for all three
+  years.  For SK I don't believe a validation can be made, since the
+  variety was new each year.  For CZ it will be up to Jozef whether it
+  is best to include an uncalibrated 2005 setup for validation, or to
+  instead use the 2005 numbers in order to optimize the Agria potato
+  parameterization.  
+
+DK:
+  
+  I expect an uncalibrated 2005 setup file, which will be used as a
+  validation of the 2003/2004 calibration.
+
+IT:
+   
+  Adriano already send a 2005 setup and crop parameterization, and
+  promised me a hydraulic calibrated version of the 2003 and 2004
+  setups.  No validation will be possible because the problems the
+  first two years.
+
+PL:
+
+  Wladyslaw has delivered databases and setups already, and will
+  hopefully be available to assist further after the yearly meeting.
+  Since PL has three years with the same variety, Charlotte will
+  concentrate on working on that setup in 2006.
+
+PT:
+
+  I really would like to see a Daisy parameterization for the organc
+  fertilizers, in particular the Polish fertilizers, as it is probably
+  too late for calibration of the other sites.
+
+  No more work is needed on the PT setups, 2003 will be rerun with a
+  generic Agria potato based on Jozefs parameterization, and 2004 with a
+  generic FertOrgaNic potato developed by Charlotte, by extraction
+  what is common among the other parameterizations.
+  
+Also, a new version of the Daisy fon setups, as well as the wp5
+report, has been uploaded to the fertorganic web page.  This time
+graphs comparing measured and simulated data has been included for DK,
+PL, PT and SK.  And the Results section includes a summary table with
+the economically and environmentally significant values, plus tables
+with water and nitrogen balances, for each site.  The nitrogen balance
+is off in the table becaue a few more data need to be included.
+
+Feedback is welcome, in particular about what should be included in
+the Results sections. 
+
+All simulated numbers in graphs and tables will obviously change when
+the final setups arrive.  The Danish setups are final (and very fine!)
+though.
+
+Still missing is the IT, CZ and 2005 (apart from PL) graphs, and most
+of the text outside the Introduction and PT chapters.
+
+* Brev til Jozef med evaluering af SK 2003 and 2004.
+
+* Resultatafsnit.
 
 ** N balance tabel
 
 Vi skal have catch crop med.  Det kræver enten begin/end, eller
-${year}+1.
+${year}+1.  Eller at vi bruger field_nitrogen.dai?
 
 ** Measure
 
@@ -19,15 +86,25 @@ ${year}+1.
 
 *** Evt tilføj ETp (som "målt") sammen med ETa (simuleret) i balancen.
 
-*** Hvad står der under vejr i databasen?
-
 * WP5 
 
-** Profilplot med gravimetric sampling for SK og CZ.
+** Grundvandtabel?
+
+DK 2003+2004 = 2.2
+
+IT 2003+2004(1) variabelt
+
+PT 2003+2004 = 4
+
+SK 2003+2004 = 7
+
+PL + CZ uspecificeret
 
 ** ETc fra DB vs ETa fra Daisy
 
 Har lav prioritet, i følge Søren.
+
+** Profilplot med gravimetric sampling for SK og CZ.
 
 * IDE: CT laver "sample setups" for hvert FON land 
 

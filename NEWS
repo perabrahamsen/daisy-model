@@ -14,9 +14,13 @@ release.
 
 * 3.99
 
-** New program "write" that writes text to file or screen.
+** New program "write".
+
+It simple writes the specified text to the screen or a file.
 
 ** More work related to scoped variables and gnuplot.
+
+I really need to write some documentation someday.
 
 ** Bug fixes.
 
