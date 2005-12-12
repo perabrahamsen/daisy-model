@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.99
+
+** New number and source models.
+
 * 3.98
 
 ** The 'flux_bottom' select model now takes a 'to' parameter.
