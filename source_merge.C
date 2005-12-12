@@ -20,8 +20,12 @@
 
 #include "source.h"
 #include "gnuplot_utils.h"
+#include "units.h"
 #include "vcheck.h"
+#include "mathlib.h"
 #include "memutils.h"
+#include <numeric>
+#include <sstream>
 
 struct SourceMerge : public Source
 {
@@ -31,7 +35,7 @@ struct SourceMerge : public Source
   std::string dimension_;
   std::string with_;
   const int style_;
-  void add_entry (const Time& time, std::vector<double>& vals);
+  void add_entry (const Time& time, const std::vector<double>& vals);
   std::vector<Time> times;
   std::vector<double> values;
   std::vector<double> ebars;
@@ -67,7 +71,7 @@ public:
 void
 SourceMerge::add_entry (const Time& time, const std::vector<double>& vals)
 {
-  if (vals.size () > 1 && !explicit_with)
+  if (vals.size () > 1 && with_ == "")
     with_ = "errorbars";
   const double total = std::accumulate (vals.begin (), vals.end (), 0.0);
   const double N = vals.size ();
@@ -85,7 +89,6 @@ SourceMerge::add_entry (const Time& time, const std::vector<double>& vals)
   ebars.push_back (std_deviation);
   daisy_assert (times.size () == values.size ());
   daisy_assert (values.size () == ebars.size ());
-  vals.clear ();
 }
 
 bool
@@ -131,7 +134,7 @@ SourceMerge::load (Treelog& msg)
       for (size_t i = 0; i < source.size (); i++)
         {
           const size_t cur = index[i];
-          const std::vector<Time> times = source[i].time ();
+          const std::vector<Time> times = source[i]->time ();
           
           if (times.size () == cur)
             // No more data.
@@ -148,7 +151,7 @@ SourceMerge::load (Treelog& msg)
       for (size_t i = 0; i < source.size (); i++)
         {
           const size_t cur = index[i];
-          const std::vector<Time> times = source[i].time ();
+          const std::vector<Time> times = source[i]->time ();
 
           if (times.size () == cur)
             // No more data.
@@ -158,7 +161,7 @@ SourceMerge::load (Treelog& msg)
           if (time == first_time)
             {
               // Add this element.
-              vals.push_back (source[i].value ()[cur]);
+              vals.push_back (source[i]->value ()[cur]);
               index[i]++;
             }
           else
@@ -184,7 +187,7 @@ SourceMerge::load (Treelog& msg)
 SourceMerge::SourceMerge (Block& al)
   : Source (al),
     source (Librarian<Source>::build_vector (al, "source")),
-    title_ (al.name ("title", expr->title ())),
+    title_ (al.name ("title")),
     dimension_ (al.name ("dimension", Syntax::Unknown ())),
     with_ (al.name ("with", "")),
     style_ (al.integer ("style", -1))
@@ -201,8 +204,7 @@ static struct SourceMergeSyntax
     AttributeList& alist = *new AttributeList ();
     Source::load_syntax (syntax, alist);
     GnuplotUtil::load_style (syntax, alist, "\
-By default, let the first source decide.", "\
-By default the name of the 'expr' object.");
+By default, let the first source decide.", "");
     alist.add ("description", 
 	       "Merge multiple timeseries into one.\n\
 Any errorbars on the original timeseries is ignored, but the merged\n\
@@ -211,6 +213,7 @@ same time.");
     syntax.add ("source", Librarian<Source>::library (), 
 		Syntax::State, Syntax::Sequence, "\
 List of timeseries to merge.");
+    syntax.add_check ("source", VCheck::min_size_1 ());
     syntax.add ("dimension", Syntax::String, Syntax::OptionalConst, "\
 Dimension of data to plot.\n\
 By default use the first source with a known dimension.");
