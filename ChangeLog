@@ -1,3 +1,9 @@
+2005-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (tick): Check that CAI is larger than 0 before
+	calculating assimilate production by photosynthesis.  Needed to
+	make the code survive a cut that leaves no CAI.
+
 2005-12-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* number_source.C (source_average): New model.
