@@ -1,69 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Status mail
-
-Subject:  FertOrgaNic: WP1 and WP5 status and reminder
-
-Hi FertOrgaNic
-
-I just want to remind everybody that the 31/12 deadline also cover the
-2005 database, or at least the part that should be included in the WP5
-report.  Obviously, the cover crop yield can't  be included.  Apart
-from the 2005 database (which only PL has delivered), here is the
-status per country:
-
-CZ & SK:
-
-  I have sent a seperate letter to Jozef.
-
-DK:
-  
-  I expect an uncalibrated 2005 setup file, which will be used as a
-  validation of the 2003/2004 calibration.
-
-IT:
-   
-  Adriano knows what I expect.
-
-PL:
-
-  Wladyslaw has delivered databases and setups already, and will
-  hopefully be available to assist further after the yearly meeting.
-  Since PL has three years with the same variety, Charlotte will
-  concentrate on working on that setup in 2006.
-
-PT:
-
-  I really would like to see a Daisy parameterization for the organc
-  fertilizers, in particular the Polish fertilizers, as it is probably
-  too late for calibration of the other sites.
-
-  No more work is needed on the PT setups, 2003 will be rerun with a
-  generic Agria potato based on Jozefs parameterization, and 2004 with a
-  generic FertOrgaNic potato developed by Charlotte, by extraction
-  what is common among the other parameterizations.
-  
-Also, a new version of the Daisy fon setups, as well as the wp5
-report, has been uploaded to the fertorganic web page.  This time
-graphs comparing measured and simulated data has been included for DK,
-PL, PT and SK.  And the Results section includes a summary table with
-the economically and environmentally significant values, plus tables
-with water and nitrogen balances, for each site.  The table are
-automatically generated, and the numbers in many cases seem to
-indicate that there are problems with the generation script, so just
-focus on the structure for now.
-
-Feedback is welcome, in particular about what should be included in
-the Results sections. 
-
-All simulated numbers in graphs and tables will obviously change when
-the final setups arrive.  The Danish setups are final (and very fine!)
-though.
-
-Still missing is the IT, CZ and 2005 (apart from PL) graphs, and most
-of the text outside the Introduction and PT chapters.
-
 * Resultatafsnit.
+
+** Det skal bemærkes at "vand i gødning" er inkluderet i irrigation.
 
 ** N balance tabel
 
