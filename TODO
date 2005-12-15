@@ -14,7 +14,7 @@ status per country:
 
 CZ & SK:
 
-  I'll send a seperate letter to Jozef.
+  I have sent a seperate letter to Jozef.
 
 DK:
   
@@ -48,8 +48,10 @@ report, has been uploaded to the fertorganic web page.  This time
 graphs comparing measured and simulated data has been included for DK,
 PL, PT and SK.  And the Results section includes a summary table with
 the economically and environmentally significant values, plus tables
-with water and nitrogen balances, for each site.  The nitrogen balance
-is off in the table because a few more data need to be included.
+with water and nitrogen balances, for each site.  The table are
+automatically generated, and the numbers in many cases seem to
+indicate that there are problems with the generation script, so just
+focus on the structure for now.
 
 Feedback is welcome, in particular about what should be included in
 the Results sections. 
@@ -60,8 +62,6 @@ though.
 
 Still missing is the IT, CZ and 2005 (apart from PL) graphs, and most
 of the text outside the Introduction and PT chapters.
-
-* Brev til Jozef med evaluering af SK 2003 and 2004.
 
 * Resultatafsnit.
 
