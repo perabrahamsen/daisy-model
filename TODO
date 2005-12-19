@@ -1,5 +1,78 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Workplan WP5
+
+Hi FertOrgaNic.
+
+I tried to organize the remaining WP5 work into a sort of timeplan,
+which I include here.  It is going to be tight, but we will have to
+set our standards according to the time allocated.  
+
+The main point of interrest is that the WP1 sites should allocate some
+time in February to WP5.
+
+0. By the end of December, KVL will have created comparison graphs and
+   result tables for all sites, for the 2003 and 2004 experiments.
+
+   The WP1 sites will have send in the final versions of the setup
+   files and databases for use in the WP5 report.
+
+1. By the end of January, KVL will have uploaded a draft of the WP5
+   report that includes graphs and results for all years and sites,
+   based on the final setups and databases. The draft also include a
+   complete version of chapter 1, except for the Results section.
+
+   No WP5 tasks for the WP1 sites during January, except that this
+   will be the absolute last chance of PT lab work to be af use in the
+   report (for the PL calibration next month).
+
+2. By the end of February, KVL will have recalibrated the PL setup.
+
+   The WP1 will have gone through their own chapter of the report,
+   found and corrected any errors there might be, and contributed the
+   text to explain the calibration process.  No new graphs or tables
+   should be included, only text.  If some setups files or data from
+   the databases need to be updated for the text to be easier to
+   write, that can be negotiated.
+
+   Based on prior experience, this means 40 pages of text for CZ, and
+   4 words for IT.
+
+3. By the end of Marts, KVL will have integrated the text, developed a
+   shared potato parameterization, rerun PT 2004 with that, written
+   the Results section of chapter 1, and prepeared and uploaded the
+   final report and corresponding Daisy setup to the fertorganic home
+   page.
+
+   No WP5 tasks for the WP1 sites during Marts.
+
+4. The next delverable (deadline June) will be a scientific paper
+   based on WP5.  Presumably a condenced version of the report, maybe
+   focusing in the shared potato parameterization.
+
+   An alternative could be a paper on the significance of a correct
+   description of the organic fertilizers, focusing on the difference
+   between the results of the original setups with "standard"
+   fertilizers, and the results of the same setups with the PT
+   recalibrated fertilizers.  
+
+   Other suggestions are welcome.
+
+5. An updated report and setup including 2005 catch crop results could
+   be done at this point, if we can possible see this being benefitial
+   for anybody.
+
+6. Finally, I hope we can create sample Daisy setups for educational
+   purposes, based on the soil types, management practice, and climate
+   data from each WP1 site in the project.  These would be distributed
+   freely from the Daisy home page, and be part of the dissimination
+   of the results.  We would need permission from each site to do so,
+   especially for the climate data.
+
+Regards,
+
+  Per Abrahamsen
+
 * CZ
 
 ** lav cz 2004
@@ -20,7 +93,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** 2003 + 2004: Watermark 30 & 45 & 75 (2004 + 0 & 20)
 
-** 2003 + 2004: T: 40, 2003: 10, 2004: 15
+** 2003 + 2004: T: 40 (A, A**, C, C**, short), 2003: 10 (long), 2004: 15
 
 * Logning:
 
