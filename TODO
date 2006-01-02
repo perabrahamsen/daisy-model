@@ -1,8 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* CZ
-
-** ret grafer
+* Bestil billet til Polen (spørg CT?)
 
 * Logning:
 
@@ -38,13 +36,11 @@ stedet for at bruge zplus
 Vi skal have catch crop med.  Det kræver enten begin/end, eller
 ${year}+1.  Eller at vi bruger field_nitrogen.dai?
 
-** Measure
+** Vi skal have cover crops med for N balance.
 
-*** Vi skal have cover crops med for N balance.
+** Measured (ukorrigeret) regn
 
-*** Measured (ukorrigeret) regn
-
-*** Evt tilføj ETp (som "målt") sammen med ETa (simuleret) i balancen.
+** Evt tilføj ETp (som "målt") sammen med ETa (simuleret) i balancen.
 
 * WP5 
 
@@ -66,16 +62,19 @@ Har lav prioritet, i følge Søren.
 
 ** Profilplot med gravimetric sampling for SK og CZ.
 
+--------------------------------------------------
+
+
 * Omorganiser Daisy kode så omsætning er uafhængig af transport
 
 2D Daisy har brug for det
+
+--------------------------------------------------
 
 * IDE: CT laver "sample setups" for hvert FON land 
 
 De skal bruges på Daisy hjemmesiden, og er en del af "dissemination"
 (wp7) af FON.
-
-* IDE:  Mikkel implementerer Farquhar photosyntese.
 
 * Distribution
 
