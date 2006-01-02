@@ -1,27 +1,17 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Bestil billet til Polen (spørg CT?)
+* Polen billet
+
+** Få svar fra CT.
+
+** Bestil billet til Polen
+
+* Find uf af hvad der skal laves før mødet.
 
 * Logning:
 
 select content skal tage et gennemsnit de to nærmeste nodepunkter, i
 stedet for at bruge zplus
-
-* WP5 rapport efter nytår
-
-** 2005 data
-
-** gennemgå hvert land
-
-** send brev og bed om tekst
-
-** polen
-
-** fælles kartoffel
-
-** PT 2004
-
-** publiser
 
 * Resultatafsnit.
 
@@ -41,6 +31,22 @@ ${year}+1.  Eller at vi bruger field_nitrogen.dai?
 ** Measured (ukorrigeret) regn
 
 ** Evt tilføj ETp (som "målt") sammen med ETa (simuleret) i balancen.
+
+* WP5 rapport efter nytår
+
+** 2005 data
+
+** gennemgå hvert land
+
+** send brev og bed om tekst
+
+** polen
+
+** fælles kartoffel
+
+** PT 2004
+
+** publiser
 
 * WP5 
 

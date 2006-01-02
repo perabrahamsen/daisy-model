@@ -1,3 +1,7 @@
+2006-01-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_content.C: Use linear interpolation between node points.
+
 2005-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* crop_std.C (tick): Check that CAI is larger than 0 before
