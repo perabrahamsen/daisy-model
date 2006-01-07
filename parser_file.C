@@ -22,6 +22,7 @@
 
 #include "parser_file.h"
 #include "lexer.h"
+#include "submodel.h"
 #include "scope.h"
 #include "number.h"
 #include "plf.h"
@@ -644,16 +645,40 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      }
 	    case Syntax::Error:
 	      {
-		const symbol type_symbol (type_name);
-		if (Library::exist (type_symbol))
-		  {
-		    if (!looking_at ('('))
-		      doc = get_string ();
-		    if (ok)
-		      syntax.add (var, Library::find (type_symbol), 
-				  Syntax::Const, Syntax::Singleton, doc);
-		    break;
-		  }
+                if (type_name == "fixed")
+                  {
+                    const std::string submodel = get_string ();
+                    if (Submodel::registered (submodel))
+                      {
+                        if (!looking_at ('('))
+                          doc = get_string ();
+                        if (ok)
+                          {
+                            Syntax sub_syn;
+                            AttributeList sub_al;
+                            Submodel::load_syntax (submodel, sub_syn, sub_al);
+                            // This mimics what Syntax::add_submodule does
+                            // for a Syntax::Const.
+                            syntax.add (var, sub_syn, 
+                                        Syntax::Const, Syntax::Singleton, doc);
+                            atts.add (var, sub_al);
+                          }
+                        break;
+                      }
+                  }
+                else
+                  {
+                    const symbol type_symbol (type_name);
+                    if (Library::exist (type_symbol))
+                      {
+                        if (!looking_at ('('))
+                          doc = get_string ();
+                        if (ok)
+                          syntax.add (var, Library::find (type_symbol), 
+                                      Syntax::Const, Syntax::Singleton, doc);
+                        break;
+                      }
+                  }
 	      }
 	      // Fallthrough
 	    default:

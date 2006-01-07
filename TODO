@@ -2,8 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Resultatafsnit
 
-1. Tillad (declare begin Time "")
-
 2. Tillad (from $begin)
 
 3. Brug dem for at få tid på resultater
