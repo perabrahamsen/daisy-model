@@ -654,8 +654,9 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                           doc = get_string ();
                         if (ok)
                           {
-                            Syntax sub_syn;
-                            AttributeList sub_al;
+                            // BUG: Do these ever get freed?
+                            Syntax& sub_syn = *new Syntax ();
+                            AttributeList& sub_al = *new AttributeList ();
                             Submodel::load_syntax (submodel, sub_syn, sub_al);
                             // This mimics what Syntax::add_submodule does
                             // for a Syntax::Const.

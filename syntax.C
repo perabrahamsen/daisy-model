@@ -111,6 +111,8 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
        i++)
     {
       const string key = (*i).first;
+      Treelog::Open nest (err, key);
+      err.touch ();
       if (!vl.check (key))
 	{
 	  if (status[key] == Const || status[key] == State)
