@@ -701,7 +701,13 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
       if (syntax.is_log (name))
         warning (name + " is a log only variable, value will be ignored");
 
-      if (syntax.size (name) == Syntax::Singleton)
+      if (looking_at ('$'))
+        {
+          skip ("$");
+          const std::string var = get_string ();
+          atts.add_variable (name, var);
+        }
+      else if (syntax.size (name) == Syntax::Singleton)
 	switch (syntax.lookup (name))
 	  {
 	  case Syntax::Number:
@@ -724,7 +730,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      bool alist_skipped = false;
 	      if (in_order)
 		{
-		  // Last elelement of a total order does not need '('.
+		  // Last element of a total order does not need '('.
 		  if (looking_at ('(') 
 		      || current != end 
 		      || !syntax.total_order ())

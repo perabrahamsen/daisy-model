@@ -49,6 +49,11 @@ public:
 	       const std::string& key) const;
   int size (const std::string& key) const;
 
+  // Variables.
+  void add_variable (const std::string& key, const std::string& val);
+  bool has_variable (const std::string& key);
+  const std::string& get_variable (const std::string& key);
+
   // Extract values.
   double number (const std::string&) const;
   double number (const std::string&, double default_value) const;

@@ -72,6 +72,13 @@ struct Value
 
   bool subset (const Value& other, const Syntax&, const string& key) const;
 
+  // Variable
+  Value (const string& v, int)
+    : name (new symbol (v)),
+      type (Syntax::Object),
+      is_sequence (false),
+      ref_count (new int (1))
+    { }
   Value (double v)
     : number (v),
       type (Syntax::Number),
@@ -245,11 +252,11 @@ Value::subset (const Value& v, const Syntax& syntax,
 	}
       case Syntax::PLF:
 	return *plf == *v.plf;
+      case Syntax::Object:
       case Syntax::String:
 	return *name == *v.name;
       case Syntax::Library:
         return *scalar == *v.scalar;
-      case Syntax::Object:
       case Syntax::Error:
       default:
 	daisy_assert (false);
@@ -303,6 +310,7 @@ Value::subset (const Value& v, const Syntax& syntax,
       case Syntax::String:
 	return *name_sequence == *v.name_sequence;
       case Syntax::Object:
+	return *name == *v.name;
       case Syntax::Library:
       case Syntax::Error:
       default:
@@ -335,13 +343,13 @@ Value::cleanup ()
 	  case Syntax::Library:
             delete scalar;
             break;
+	  case Syntax::Object:
 	  case Syntax::String:
 	    delete name;
 	    break;
 	  case Syntax::Error:
 	    // Empty (dummy) value.
 	    break;
-	  case Syntax::Object:
 	  default:
 	    daisy_assert (false);
 	  }
@@ -369,6 +377,8 @@ Value::cleanup ()
 	    delete name_sequence;
 	    break;
 	  case Syntax::Object:
+	    delete name;
+	    break;
 	  case Syntax::Library:
 	  case Syntax::Error:
 	  default:
@@ -419,9 +429,9 @@ Value::operator = (const Value& v)
         scalar = v.scalar;
         break;
       case Syntax::String:
+      case Syntax::Object:
 	name = v.name;
         break;
-      case Syntax::Object:
       case Syntax::Error:
       default:
 	daisy_assert (false);
@@ -448,6 +458,8 @@ Value::operator = (const Value& v)
 	name_sequence = v.name_sequence;
         break;
       case Syntax::Object:
+	name = v.name;
+        break;
       case Syntax::Library:
       case Syntax::Error:
       default:
@@ -514,7 +526,7 @@ AttributeList::Implementation::clear ()
 bool
 AttributeList::check (const string& key) const
 { 
-  return impl.check (key);
+  return impl.check (key) && impl.lookup (key).type != Syntax::Object; 
 }
 
 bool
@@ -558,7 +570,7 @@ AttributeList::size (const string& key)	const
   const Value& value = impl.lookup (key);
 
   if (!value.is_sequence)
-    return Syntax::Singleton;
+    return (value.type == Syntax::Object) ? -1 : Syntax::Singleton;
   switch (value.type)
     {
     case Syntax::Number:
@@ -574,13 +586,29 @@ AttributeList::size (const string& key)	const
     case Syntax::Integer:
       return value.integer_sequence->size ();
     case Syntax::Object:
-      return value.alist_sequence->size ();
+      return -1;
     case Syntax::Library:
     case Syntax::Error:
     default:
       daisy_assert (false);
     }
   // Not reached.
+}
+
+  // Variables.
+void 
+AttributeList::add_variable (const string& key, const string& v)
+{ impl.add (key, Value (v, -1)); }
+
+bool
+AttributeList::has_variable (const string& key)
+{ return impl.check (key) && impl.lookup (key).type == Syntax::Object; }
+  
+const string& 
+AttributeList::get_variable (const string& key)
+{
+  daisy_assert (has_variable (key));
+  return identifier (key).name (); 
 }
 
 double 
