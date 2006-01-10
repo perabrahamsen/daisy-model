@@ -51,7 +51,7 @@ public:
 
   // References.
   void add_reference (const std::string& key, const std::string& val);
-  bool is_variable (const std::string& key) const;
+  bool is_reference (const std::string& key) const;
   const std::string& get_reference (const std::string& key) const;
 
   // Extract values.
