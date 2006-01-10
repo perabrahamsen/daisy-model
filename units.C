@@ -399,7 +399,7 @@ Units::standard_conversions ()
   add ("g N/cm^2", "g/cm^2", 1.0);	// For "per dry matter" logging.
   add ("g/m^2", "Mg DM/ha", 1.0e-2); // harvest DM.
   add ("g/m^2/h", "Mg DM/ha/h", 1.0e-2); // harvest DM.
-  add ("g CO2-C/cm^2/h", "CO2/m^2/h", 1.7272e4); // OM CO2
+  add ("g CO_2-C/cm^2/h", "g CO2/m^2/h", 1.7272e4); // OM CO2
   add ("t/ha", "Mg DM/ha", 1.0); // harvest.dlf
 }
 
