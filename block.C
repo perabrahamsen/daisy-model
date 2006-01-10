@@ -446,7 +446,7 @@ Block::name (const std::string& key)
 const std::string 
 Block::name (const std::string& key, const std::string& default_value)
 {
-  if (impl->alist.check (key))
+  if (check (key))
     return name (impl->expand_reference (key);
 
   return default_value;
@@ -462,7 +462,12 @@ Block::flag (const std::string& key) const
 
 bool 
 Block::flag (const std::string& key, bool default_value) const
-{ return impl->alist.flag (key, default_value)); }
+{ 
+  if (check (key))
+    return flag (key);
+
+  return default_value; 
+}
 
 const PLF& 
 Block::plf (const std::string& key) const
@@ -479,8 +484,9 @@ Block::integer (const std::string& key) const
 int 
 Block::integer (const std::string& key, int default_value) const
 { 
-  if (!impl->expand_check (key))
+  if (!check (key))
     return default_value;
+
   return impl->alist.integer (impl->expand_reference (key));
 }
 
