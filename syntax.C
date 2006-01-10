@@ -111,7 +111,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
        i++)
     {
       const string key = (*i).first;
-      if (vl.has_variable (key))
+      if (vl.is_reference (key))
         continue;
       else if (!vl.check (key))
 	{

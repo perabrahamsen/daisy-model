@@ -437,7 +437,7 @@ Block::number (const std::string& key) const
 
 double 
 Block::number (const std::string& key, double default_value) const
-{ return impl->alist.number (impl->expand_reference (key, default_value)); }
+{ return check (key) ?  number (key) : default_value; }
 
 const std::string
 Block::name (const std::string& key)
@@ -445,12 +445,7 @@ Block::name (const std::string& key)
 
 const std::string 
 Block::name (const std::string& key, const std::string& default_value)
-{
-  if (check (key))
-    return name (impl->expand_reference (key);
-
-  return default_value;
-}
+{ return check (key) ? name (key) : default_value; }
 
 symbol 
 Block::identifier (const std::string& key)
@@ -462,12 +457,7 @@ Block::flag (const std::string& key) const
 
 bool 
 Block::flag (const std::string& key, bool default_value) const
-{ 
-  if (check (key))
-    return flag (key);
-
-  return default_value; 
-}
+{ return check (key) ? flag (key) : default_value; }
 
 const PLF& 
 Block::plf (const std::string& key) const
@@ -483,12 +473,7 @@ Block::integer (const std::string& key) const
 
 int 
 Block::integer (const std::string& key, int default_value) const
-{ 
-  if (!check (key))
-    return default_value;
-
-  return impl->alist.integer (impl->expand_reference (key));
-}
+{ return check (key) ? integer (key) : default_value; }
 
 const std::vector<double>& 
 Block::number_sequence (const std::string& key) const
