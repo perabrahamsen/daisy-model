@@ -611,7 +611,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
       if (name == "declare")
 	{
 	  bool ok = true;
-	  // Special handling of block local variales.
+	  // Special handling of block local parameters.
 	  const std::string var = get_string ();
 	  if (syntax.lookup (var) != Syntax::Error)
 	    {
@@ -706,7 +706,10 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
         {
           skip ("$");
           const std::string var = get_string ();
-          atts.add_variable (name, var);
+          if (name == var)
+            error ("Reference $" + var + " refers to itself");
+          else
+            atts.add_reference (name, var);
         }
       else if (syntax.size (name) == Syntax::Singleton)
 	switch (syntax.lookup (name))

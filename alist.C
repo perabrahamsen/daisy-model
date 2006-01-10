@@ -597,18 +597,20 @@ AttributeList::size (const string& key)	const
 
   // Variables.
 void 
-AttributeList::add_variable (const string& key, const string& v)
+AttributeList::add_reference (const string& key, const string& v)
 { impl.add (key, Value (v, -1)); }
 
 bool
-AttributeList::has_variable (const string& key)
+AttributeList::is_reference (const string& key) const
 { return impl.check (key) && impl.lookup (key).type == Syntax::Object; }
   
 const string& 
-AttributeList::get_variable (const string& key)
+AttributeList::get_reference (const string& key) const
 {
-  daisy_assert (has_variable (key));
-  return identifier (key).name (); 
+  daisy_assert (is_reference (key));
+  const Value& value = impl.lookup (key);
+  daisy_assert (value.type == Syntax::Object);
+  return (*value.name).name (); 
 }
 
 double 

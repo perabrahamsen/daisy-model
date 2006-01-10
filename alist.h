@@ -49,10 +49,10 @@ public:
 	       const std::string& key) const;
   int size (const std::string& key) const;
 
-  // Variables.
-  void add_variable (const std::string& key, const std::string& val);
-  bool has_variable (const std::string& key);
-  const std::string& get_variable (const std::string& key);
+  // References.
+  void add_reference (const std::string& key, const std::string& val);
+  bool is_variable (const std::string& key) const;
+  const std::string& get_reference (const std::string& key) const;
 
   // Extract values.
   double number (const std::string&) const;
