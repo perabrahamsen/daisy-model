@@ -1,3 +1,10 @@
+2006-01-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* integer.C, integer.g: New component.
+	* Makefile (COMPONENTS): Add it.
+	* integer_arit.C: New model.
+	* Makefile (MODELS): Add it.
+
 2006-01-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* select_content.C: Use linear interpolation between node points.

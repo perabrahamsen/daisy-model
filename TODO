@@ -2,16 +2,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Resultatafsnit
 
-1. Find catch crop harvest for hvert site/år
+** Lav results.tex fil kun med resultattabeller, udskriv denne.
 
-
-2. Vælge begin/end periode for hvert site/år
-
-3. Brug dem for at få tid på resultater
-
-4. Lav udgave af tabel med intervaler (min - max)
-
-Perl?
+** Lav udgave af tabel med intervaler (min - max)
 
 * Resultatafsnit.
 
