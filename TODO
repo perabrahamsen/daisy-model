@@ -2,28 +2,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Resultatafsnit
 
-** Lav results.tex fil kun med resultattabeller, udskriv denne.
-
-** Lav udgave af tabel med intervaler (min - max)
-
-* Resultatafsnit.
-
-** Vores periode er ikke altid 1 år
-
-** Der skal vare et "spænd" for de lande hvor der er flere repetitions.
-
-** Det skal bemærkes at "vand i gødning" er inkluderet i irrigation.
-
-** N balance tabel
-
-Vi skal have catch crop med.  Det kræver enten begin/end, eller
-${year}+1.  Eller at vi bruger field_nitrogen.dai?
-
-** Vi skal have cover crops med for N balance.
-
-** Measured (ukorrigeret) regn
-
-** Evt tilføj ETp (som "målt") sammen med ETa (simuleret) i balancen.
+Hvad gør vi med flere repetition med flere målinger hver (sum & average)?
 
 * WP5 rapport efter nytår
 
