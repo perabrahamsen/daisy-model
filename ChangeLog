@@ -1,6 +1,10 @@
+2006-01-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* treelog.C (error, warning): Prefix message.
+
 2006-01-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* integer.C, integer.g: New component.
+	* integer.C, integer.h: New component.
 	* Makefile (COMPONENTS): Add it.
 	* integer_arit.C: New model.
 	* Makefile (MODELS): Add it.

@@ -62,11 +62,11 @@ Treelog::message (const string& str)
 
 void
 Treelog::warning (const string& str)
-{ entry (str); }
+{ entry ("warning: " + str); }
 
 void
 Treelog::error (const string& str)
-{ entry (str); }
+{ entry ("error: " + str); }
 
 void
 Treelog::lazy (const string& str)
