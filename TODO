@@ -1,15 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Resultatafsnit
-
-** Root zone problems with catch crop
-
-*** Ændr alle Gnuplot*.dai til ikke at bruge "Field nitrogen" (snak med ct)
-
-*** Ændr alle "Field nitrogen" og "Field water" til at dække hele profilen
-
-*** Kør simuleringer og result.dai igen
-
 ** Check resultater
 
 ** 2005 results
