@@ -32,6 +32,8 @@ protected:
   std::string with_;
   const bool explicit_with;
   const int style_;
+private:
+  bool use_sum;
 protected:
   void add_entry (const Time& time, std::vector<double>& vals);
 private:

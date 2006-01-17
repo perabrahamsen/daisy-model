@@ -1,18 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Mandag
-
-** Udskriv tidsplan.
-
-** CZ, DK, og IT opsætning
-
 * Resultatafsnit
 
-** 2004 cz nitrogen t1
+** Root zone problems with catch crop
 
-samme periode i log tabel
+*** Ændr alle Gnuplot*.dai til ikke at bruge "Field nitrogen" (snak med ct)
 
-flere detaljer i ny debres.dai tabel
+*** Ændr alle "Field nitrogen" og "Field water" til at dække hele profilen
+
+*** Kør simuleringer og result.dai igen
+
+** Check resultater
 
 ** 2005 results
 
@@ -24,7 +22,7 @@ flere detaljer i ny debres.dai tabel
 
 ** send brev og bed om tekst
 
-** polen
+** Polen
 
 ** fælles kartoffel
 
@@ -73,6 +71,11 @@ De skal bruges på Daisy hjemmesiden, og er en del af "dissemination"
 ** Ny plone baseret web side!
 
 * Programmering
+
+** Generering af zplus
+
+Det skal kun være tre intervaller mellem hver "border", hvis de
+representerer horizonter.  Ikke hvis de representer log grænser.
 
 ** Check at "Field nitrogen" virker med checkpoints (local variable!)
 

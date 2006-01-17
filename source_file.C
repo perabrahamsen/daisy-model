@@ -29,22 +29,33 @@
 void
 SourceFile::add_entry (const Time& time, std::vector<double>& vals)
 {
-  if (vals.size () > 1 && !explicit_with)
-    with_ = "errorbars";
   const double total = std::accumulate (vals.begin (), vals.end (), 0.0);
-  const double N = vals.size ();
-  const double mean = total / N;
-  double variance = 0;
-  for (size_t i = 0; i < vals.size (); i++)
-    { 
-      const double diff = vals[i] - mean;
-      variance += diff * diff;
+  
+  if (use_sum)
+    {
+      values.push_back (total);
+      ebars.push_back (0.0);
     }
-  variance /= N;
-  const double std_deviation = sqrt (variance);
+  else
+    {
+
+      if (vals.size () > 1 && !explicit_with)
+        with_ = "errorbars";
+      const double total = std::accumulate (vals.begin (), vals.end (), 0.0);
+      const double N = vals.size ();
+      const double mean = total / N;
+      double variance = 0;
+      for (size_t i = 0; i < vals.size (); i++)
+        { 
+          const double diff = vals[i] - mean;
+          variance += diff * diff;
+        }
+      variance /= N;
+      const double std_deviation = sqrt (variance);
+      values.push_back (mean);
+      ebars.push_back (std_deviation);
+    }
   times.push_back (time);
-  values.push_back (mean);
-  ebars.push_back (std_deviation);
   daisy_assert (times.size () == values.size ());
   daisy_assert (values.size () == ebars.size ());
   vals.clear ();
@@ -96,6 +107,16 @@ SourceFile::load_style (Syntax& syntax, AttributeList& alist,
 By default, data from dwf and dlf files will be\n\
 drawn with lines, and data from ddf files will be drawn with points.", 
                            default_title);
+  syntax.add ("handle", Syntax::String, Syntax::Const, "\
+Determine how to handle multiple simultaniously.  Possible values are:\n\
+\n\
+sum: use the sum of the values.\n\
+\n\
+normal: use the arithemetic average of the values, and calculate the\n\
+standard deviation.");
+  static VCheck::Enum handle_check ("sum", "normal");
+  syntax.add_check ("handle", handle_check);
+  alist.add ("handle", "normal");
 }
 
 SourceFile::SourceFile (Block& al)
@@ -103,7 +124,8 @@ SourceFile::SourceFile (Block& al)
     lex (al),
     with_ (al.name ("with", "")),
     explicit_with (al.check ("with")),
-    style_ (al.integer ("style", -1))
+    style_ (al.integer ("style", -1)),
+    use_sum (al.name ("handle") == "sum")
 { }
 
 SourceFile::~SourceFile ()

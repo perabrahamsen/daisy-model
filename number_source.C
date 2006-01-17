@@ -248,6 +248,9 @@ struct NumberSourceIncrease : public NumberSource
           last = value[i];
       }
     val = last - first;
+    std::ostringstream tmp;
+    tmp << last << " - " << first << " = " << val;
+    msg.message (tmp.str ());
   }
   NumberSourceIncrease (Block& al)
     : NumberSource (al)

@@ -1,3 +1,11 @@
+2006-01-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_file.C, source_file.h (handle): New parameter.
+
+2006-01-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* treelog.C (warning, error): Suffix message.
+
 2006-01-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* treelog.C (error, warning): Prefix message.
