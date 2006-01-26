@@ -265,7 +265,7 @@ static struct BooleanOrSyntax
     BooleanOperands::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "True if and only if any operand is true.");
-    Librarian<Boolean>::add_type ("on", alist, syntax, &make);
+    Librarian<Boolean>::add_type ("or", alist, syntax, &make);
   }
 } BooleanOr_syntax;
 
