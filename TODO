@@ -1,36 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Husk pas (torsdag)
-
-* Brev til CZ 
-
-DM ok, N ej.  Indsæt i DB.
-
-My guess is that the N fraction is more strongly affected by
-differences in irrigation and fertilization than the DM fraction.  So
-I think it 
-
-* Brev til SK
-
-Hi Jozef.
-
-I'm now looking at the 2005 comparison tables.  There seem to miss
-around 5 mm irrigation for T3, T4, and T5 in the simulation, compared
-to the database.  And T6 is all off, it is identical to the three
-others in the simulation, but much lower (134 mm instead of 181 mm) in
-the database.
-
-For fertilization, the organic fertilizer seem to be wrong.  It should
-give 35 kg N/ha total according to the database, but gives 71 kg N/ha
-in the simulation.  The problem seems to be the use of of "equivalent_wif
+* Udfyld visa (fredag)
 
 * 2005 Resultater
 
-** SK: fejl i org gødning og T6 irr.  Send brev.
-
 ** To søjler mere for CZ.
-
-** IT, DK, PL?
 
 * Gennemgå og upload WP5 rapport og setups database.
 
