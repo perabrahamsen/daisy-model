@@ -1,48 +1,32 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Skriv Wladyslaws bemærkninger ind i rapport.
+* Søndag
 
-* Mandag:  Husk pas!
+** CZ:  Check mail, send brev
 
-* 2005 Resultater
+Dear Frantisek,
 
-** To søjler mere for CZ.
+The 2005 comparison show that there are large differences in
+fertilizer from fertigation in T4 and T5 between database numbers and
+the values used in the simulation.
 
-* Gennemgå og upload WP5 rapport og setups database.
+The database fertilization is 170 and 147 kg N/ha for T4 and T5, while
+the one in the simulation are 137 and 134.
 
-* Send brev til alle, bed om tekst (PL kun til WP1)
+Irrigation is the same for all treatments, so is fertilization for the
+remaining 6 treatments.
 
-* Årsrapport
+Regards, 
 
-** WP5: Hent og udskriv rapporter.
+  Per A.
 
-** Økonomirapport, snak med SH.
+* Mandag: 
 
-** Send bidrag til andre WP (hvis der er nogen)
+** Husk pas!
 
-** Indsæt bidrag til WP5.
+** CT
 
-** Skriv bidrag til Partner 10.
-
-* Polen
-
-Vælg "startkartoffel" (måske den danske?)
-
-Kør simulering, generer plots, udskriv PL afsnit.
-
-Udskriv harvest for hvert år, for at se opvarmningsperioden.
-
-* Inkorporer tekst.
-
-* fælles kartoffel
-
-** Kør PT 2004 med fælles kartoffel.
-
-* publiser endelig rapport
-
-* WP5 
-
-** Grundvandtabel?
+*** Check at vi har groundwater table med
 
 DK 2003+2004 = 2.2
 
@@ -53,6 +37,150 @@ PT 2003+2004 = 4
 SK 2003+2004 = 7
 
 PL + CZ uspecificeret
+
+*** Synkroniser CVS
+
+*** Start kørsler
+
+*** Kig på joao data
+
+*** Udskriv
+
+* Tirdag
+
+** Gennemgå rapport med CT.
+
+** Upload rap og setups
+
+** Send brev
+
+Hi FertOrgaNic!
+
+It was nice seeing you all in Warsaw.  Now I have more work to you.
+
+You can download the latest version of the WP5 report and the setup
+files.  I now need each of you to skim the introduction, and carefully
+study the chapter for your site.  Please alert me of any errors in the
+graphs and tables.
+
+Also we need to add text to the chapters.  Each chapter has three
+sections.  The first is "WP1 data".  Here should be the information a
+calibrator should know, but is not directly clear from the measured
+numbers in the database.  For example, if some measurements are less
+reliable than others, or if some treatments has been affected by
+factors that Daisy cannot simulate, or is not clear from the database.
+
+The calibration section should contain a story about the calibration
+process.  The Polish story found in the appendix can be used as
+inspiration, but you should probably write in a less chatty style than
+I did.
+
+Finally, there are the results section.  What we want here is to know
+two things.  First, why are there differences between measured and
+simulated agronomy (irrigation and fertilization)?  [ Simulated
+irrigation is always a few mm larger than measured fo fertilized
+plots, because of water content of fertilizer.  You don't have to
+explain that. ]
+
+Second, given the differences in DM and N yield, do we trust the
+calibration?  Do we believe the soil and crop calibration wnough to
+use them for scenarios?  And do we believe the simulated leaching and
+percolation for the experimental years, given the diffences in those
+numbers we have measured?
+
+For Rain and Evapotranspiration, simulated and measured numbers refer
+to different things, and the difference does not need to be explained.
+
+---
+
+You are welcome to refer to the existing tables and figures in the
+text.  We can add new figures and tables, if you think they are needed
+to explain specific things for your site not covered by the existing
+figures, but please keep it to a minimum.  I don't want to remove any
+figures or tables.
+
+We have written some bits and pieces of text when generating the
+graphs and tables.  You are welcome to use, add to, or replace this
+text.
+
+Please indicate where you want your text pieces located, in the
+beginning of the section, in a subsection (like "2004"), or before or
+efter existing text.
+
+---
+
+If you find it makes the text easier to write, you *can* still make
+changes to both the database, and the setup files.  But we will not
+have time to iterate over this process.  If you make changes to the
+database, do it directly at the Trials database on the fertorganic.org
+webpage, and let us know.  I don't want any database updates in the
+form of Excel sheets.
+
+If you make changes to the setup files, use the version of the setup
+files uploaded to the fertorgnic.org page as reference, not your own
+original version.  We have made minor changes to all the setups, and
+don't want to redo those.
+
+---
+
+We need all the text form all partners by the end of February, in
+order to finish this deliverable on time.
+
+Regards, 
+
+  Per A.
+
+** CT1
+
+*** Joao data
+
+*** Lav "longplot" for opvarm  (2003, 2004 & 2005)
+
+*** Vælg PL kartoffel
+
+** CT2
+
+*** Kør sim (2003 & 2004)
+
+*** udskriv grafer
+
+Skal vi bruge Excel?
+
+*** diskuter med PA
+
+*** Lav rettelser 
+
+*** Gentag CT2 indtil vi er tilfredse, eller tiden er gået
+
+* Onsdag
+
+** Tal med CB
+
+*** Global warming?
+
+** WP5: Hent og udskriv rapporter.
+
+** Økonomirapport, aftal møde med SH.
+
+* Februar
+
+** Send bidrag til andre WP (hvis der er nogen)
+
+** Indsæt bidrag til WP5.
+
+** Skriv bidrag til Partner 10.
+
+* Marts
+
+** Inkorporer tekst.
+
+** fælles kartoffel
+
+** Kør PT 2004 med fælles kartoffel.
+
+** publiser endelig rapport
+
+* Hvis jeg får tid...
 
 ** ETc fra DB vs ETa fra Daisy
 
