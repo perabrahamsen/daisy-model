@@ -120,6 +120,9 @@ Skal vi bruge Excel?
 
 *** Global warming?
 
+Introduktion
+============
+
 I de seneste år har nye afgrøder (HENVIS) og dyrkningssystemer
 (HENVIS) vundet indpas i Danmark.  Dette skyldes både
 klimaforandringer, ny teknik, og forædling af eksisterende sorter.
@@ -161,7 +164,60 @@ kamdyrkningssystem.
 
 Et kamdyrkningssystem kan ikke modeleres i en enkelt dimension, og en
 omprogrammering af Daisy til at fungere i to dimensioner er en
-omfattende affære.  Heldigvis er denne 
+omfattende affære.  Heldigvis er det meste af denne funktionalitet
+allerede financierer i to project, (HENVIS, miljøstyrelsen) hvor
+pestiders vej til drænsystemet skal modeleres (et 2D-problem) og
+SAFIR (HENVIS) hvor vandbesparende teknikker ved delvis udtøring af
+rodzonen skal belyses (også et 2D problem).  Begge projekter fokuserer
+på processorne i jorden.
+
+I forbindelse med kamydyrkning er det processorne nær overfladen der
+er mest interessante.  I EKSISTERENDE-FORSØG har vi et godt grundlag
+for en koncpetuel modelering.  Vi anser på bagrund af disse OPREMS
+PROCESSER for særlig vigtige.  Vores første opgave vil være at
+formalisere dette i en konceptuel modelering.  Sideløbende med dette
+vil vi foretage en række fokuserede markeksperimenter for at give
+supplerende data.  Og sideløbende med disse vil vi implementere et 2D
+overflademodul til Daisy.  Efter disse tre aktiviteter, vil vi
+foretage scenarieanalyse afkamdyrkning KONKRETE AFGRØDER under
+forskellige forhold med en ren 2D-Daisy.
+
+Arbejdsopgaver
+==============
+
+AP1: Konceptuel modelering.
+
+AP2: Fokuserede eksperimenter.
+
+AP3: 2D overflademodul til Daisy 1D
+
+AP4: Scenarieanalyse med Daisy 2D.
+
+Udbytte
+=======
+
+Kort sigt (< 5 år, 95% sikker):
+
+* Konkrete råd til marsdyrkning i kamme
+
+Mellemlangt sigt (5-10 år):
+
+* Bedre styring af kvælstofudvaskning for grøntsager.
+
+* Bedre styring af pesticider for grøntsager.
+
+* Forslag til nye målrettede forsøg med kamdyrkning.
+
+Langt sigt (> 10 år)
+
+* Mere målrettede forsøg i landbruget.
+
+Kræver opgør med vanetænkning og rutiner.
+
+* Bedre styring af fosfor for grøntsager.
+
+Med udviklingen af 2D Daisy i (PESTICID) 
+
 
 ** WP5: Hent og udskriv rapporter.
 
