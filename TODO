@@ -4,29 +4,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** Husk pas!
 
-** CT
-
-*** Check at vi har groundwater table med
-
-DK 2003+2004 = 2.2
-
-IT 2003+2004(1) variabelt
-
-PT 2003+2004 = 4
-
-SK 2003+2004 = 7
-
-PL + CZ uspecificeret
-
-*** Synkroniser CVS
-
-*** Start kørsler
-
-*** Kig på joao data
-
-*** Udskriv
+** Udskriv
 
 * Tirdag
+
+** Snak med birgitte nielsen om møde den 7'
 
 ** Gennemgå rapport med CT.
 
@@ -151,8 +133,35 @@ forsinkelse på flere år før landbruget kan tilpasse sig forandringer.
 Denne forsinkelse bliver et større problem når forandringerne sker
 hurtigere.
 
+For bedste muligt at forberede Danmark på de udfordringer de kommende
+årtier, er det nødvendigt at supplere med en processforståelse der
+skalerer til et direkte agronomisk anvendeligt niveau.  Hvis dette
+opnås vil praktiske eksperimenter kunne suppleres med
+hurtige modelberegninger, og det vil i højere grad være muligt at
+kommer forandringerne i forkøbet.
 
-For bedste muligt at forberede Danmark på de udfordringer de kommene
+I Danmark har vi heldigvis allerede en stor del af denne
+processforståelse på markniveau, endda tilgængelig i form af en
+it-model "Daisy".  Daisy er en fysisk baseret markmodel, der både er
+blevet valideret internationalt (HENVIS), samt bliver anvendt i
+praksis (HENVIS).  Daisy kan på samme tid beregne udbytter og
+miljømæssige konsekvenser af ændringer i praksis og klima.
+
+En begrænsning ved Daisy er dog at den kun regner på en enkelt
+dimension, hvor et enkelt punkt på en mark regnes for repræsentativt
+for hele marken.  Dette er fint til kornafgrøder, men ikke til
+rækkeafgrøder.  
+
+En serie forsøg (HENVIS) giver anledning til at tro på at Majs, en af
+afgrøderne på vej frem, med fordel vil kunne dyrkes i kamsystemer.
+Nogle foreløbige resultater med roer (HENVIS) indikerer at det samme
+kunne være tilfældet med den afgrøde.  For at forstå hvorfor, er det
+nødvendigt med en bedre forståelse af processerne i
+kamdyrkningssystem.  
+
+Et kamdyrkningssystem kan ikke modeleres i en enkelt dimension, og en
+omprogrammering af Daisy til at fungere i to dimensioner er en
+omfattende affære.  Heldigvis er denne 
 
 ** WP5: Hent og udskriv rapporter.
 
