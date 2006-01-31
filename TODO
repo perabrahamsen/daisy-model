@@ -1,18 +1,9 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Tirdag
-
-** SH Joao møde
-
-Skal der skrives noget?
-
-SMB2 ud ikke med i ligning?
-
-** Udskriv
 
 ** Snak med birgitte nielsen om møde den 7'
 
-** Gennemgå rapport med CT.
+* Tirsdag aften
 
 ** Upload rap og setups
 
@@ -94,6 +85,20 @@ Regards,
 
   Per A.
 
+* Onsdag
+
+** WP5: Hent og udskriv rapporter.
+
+** Økonomirapport, aftal møde med SH.
+
+* Februar
+
+** Send bidrag til andre WP (hvis der er nogen)
+
+** Indsæt bidrag til WP5.
+
+** Skriv bidrag til Partner 10.
+
 ** CT1
 
 *** Joao data
@@ -113,151 +118,6 @@ Regards,
 *** Lav rettelser 
 
 *** Gentag CT2 indtil vi er tilfredse, eller tiden er gået
-
-* Onsdag
-
-** Tal med CB
-
-*** Global warming?
-
-Introduktion
-============
-
-I de seneste år har nye afgrøder (HENVIS) og dyrkningssystemer
-(HENVIS) vundet indpas i Danmark.  Dette skyldes både
-klimaforandringer, ny teknik, og forædling af eksisterende sorter.
-Givet forudsigelsrerne fra klimamodellerne (HENVIS) og den generelle
-udvikling i specielt bioteknologien, er der intet der tyder på at
-denne udvikling vil mindskes, tværtimod.
-
-Traditionelt har ændringer i dansk landbrug været begrundet af
-erfaringer med praktiske dyrkningsforsøg (HENVIS), men det giver en
-forsinkelse på flere år før landbruget kan tilpasse sig forandringer.
-Denne forsinkelse bliver et større problem når forandringerne sker
-hurtigere.
-
-For bedste muligt at forberede Danmark på de udfordringer de kommende
-år og årtier, er det nødvendigt at supplere med en processforståelse
-der skalerer til et direkte agronomisk anvendeligt niveau.  Hvis dette
-opnås vil praktiske eksperimenter kunne suppleres med hurtige
-modelberegninger, og det vil i højere grad være muligt at kommer
-forandringerne i forkøbet.
-
-I Danmark har vi heldigvis allerede en stor del af denne
-processforståelse på markniveau, endda tilgængelig i form af en
-it-model "Daisy".  Daisy er en fysisk baseret markmodel, der både er
-blevet valideret internationalt (HENVIS), samt bliver anvendt i
-praksis (HENVIS).  Daisy kan på samme tid beregne udbytter og
-miljømæssige konsekvenser af ændringer i praksis og klima.
-
-En begrænsning ved Daisy er dog at den kun regner på en enkelt
-dimension, hvor et enkelt punkt på en mark regnes for repræsentativt
-for hele marken.  Dette er fint til kornafgrøder, men ikke til
-rækkeafgrøder.  
-
-En serie forsøg (HENVIS) giver anledning til at tro på at Majs, en af
-afgrøderne på vej frem, med fordel vil kunne dyrkes i kamsystemer.
-Nogle foreløbige resultater med roer (HENVIS) indikerer at det samme
-kunne være tilfældet med den afgrøde.  For at forstå hvorfor, er det
-nødvendigt med en bedre forståelse af processerne i
-kamdyrkningssystem.  
-
-Et kamdyrkningssystem kan ikke modeleres i en enkelt dimension, og en
-omprogrammering af Daisy til at fungere i to dimensioner er en
-omfattende affære.  Heldigvis er det meste af denne funktionalitet
-allerede financieret i to projekter, (HENVIS, miljøstyrelsen) hvor
-pestiders vej til drænsystemet skal modeleres (et 2D-problem) og SAFIR
-(HENVIS) hvor vandbesparende teknikker ved delvis udtøring af rodzonen
-skal belyses (også et 2D problem).  Begge projekter fokuserer på
-processerne i jorden.
-
-I forbindelse med kamydyrkning er det processerne nær overfladen der
-er mest interessante.  I EKSISTERENDE-FORSØG har vi et godt grundlag
-for en koncepetuel modelering.  Vi anser på bagrund af disse OPREMS
-PROCESSER for særlig vigtige.  Vores første opgave vil være at
-formalisere dette i en konceptuel modelering.  Sideløbende med dette
-vil vi foretage en række fokuserede markeksperimenter for at give
-supplerende data.  Og sideløbende med disse vil vi implementere et 2D
-overflademodul til Daisy, hvor vi mener der er en enestående mulighed
-for synergi med de to netop igangsatte projekter med 2D modelering af
-jorden.  Efter disse tre aktiviteter, vil vi foretage en
-scenarieanalyse af kamdyrkning (NOGET KONKRET) under forskellige
-forhold med en ren 2D-Daisy.
-
-Arbejdsopgaver
-==============
-
-AP1: Konceptuel modelering. (alle)
----------------------------
-
-Pris: 15 mm. (6 egenfinancieret)
-
-Resutat: En konceptuel model, beskrevet i en selvstændig rapport. 
-Artikler: ?
-
-AP2: Fokuserede eksperimenter. (CB)
-------------------------------
-
-Pris: 15 mm (0 egenfinancieret)
-
-Resultat: Data til bestemelse af parametre i model.
-Artikler: ?
-
-AP3: Udvikling af 2D overflademodul. (BGJ)
-------------------------------------
-
-Pris: 15 mm (3 egenfinancieret)
-
-Resultat: Et funktionelt 2D overflademodul til Daisy.
-Artikler: ?
-
-AP4: Scenarieanalyse med Daisy 2D. (BGJ + CB)
-----------------------------------
-
-Pris: 15 mm (3 egenfinancieret).
-
-Resultat: Rapport med vurdering af kamdyrkning for en række afgrøder. 
-Artikler: ?
-
-Udbytte
-=======
-
-Vi regner med at dette projekt vil give afkast for det danske samfund
-på både kort, mellemlangt og langt sigt, påfølgende punkter.  De
-sikreste (og mest kortsigtede) står først:
-
-* Konkrete råd til majsdyrkning i kamme
-
-* Konkrete forslag til nye målrettede forsøg med kamdyrkning.
-
-* Bedre styring af kvælstofudvaskning for rækkeafgrøder.
-
-Kræver udvikling af nye grøntsagsparameteriseringer.
-
-* Bedre styring af pesticider for rækkeafgrøder.
-
-* Bedre styring af fosfor for rækkeafgrøder.
-
-Den forbedrede processforståelse vil hjælpe ethvert mekanistisk forsøg
-på modelering af fosfordynamikken.  Med udviklingen af 2D Daisy i
-(PESTICID) vil Daisy stå stærkt som værktøj til en sådan modellering.
-
-* Nyt koncept for udarbejdelse af ladbrugsforsøg.
-
-Brug af modelbaserede scenarieberegninger som grundlag for udvælgelse
-af forsøg.
-
-** WP5: Hent og udskriv rapporter.
-
-** Økonomirapport, aftal møde med SH.
-
-* Februar
-
-** Send bidrag til andre WP (hvis der er nogen)
-
-** Indsæt bidrag til WP5.
-
-** Skriv bidrag til Partner 10.
 
 * Marts
 
