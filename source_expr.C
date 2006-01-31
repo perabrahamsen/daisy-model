@@ -75,18 +75,19 @@ SourceExpr::load (Treelog& msg)
 
       // Set it.
       scope.set (entries);
-      
+
       // Missing value.
       if (expr->missing (scope))
 	continue;
-      
+
       // Store it.
-      vals.push_back (expr->value (scope));
       if (time != last_time)
 	{
+          if (vals.size () > 0)
+            add_entry (last_time, vals);
 	  last_time = time;
-	  add_entry (time, vals);
 	}
+      vals.push_back (expr->value (scope));
     }
   if (vals.size () > 0)
     add_entry (last_time, vals);
@@ -132,12 +133,3 @@ for that column.");
 } SourceExpr_syntax;
 
 // source_expr.C ends here.
-
-
-
-
-
-
-
-
-
