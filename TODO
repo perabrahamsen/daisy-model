@@ -27,7 +27,7 @@ files.  I now need each of you to skim the introduction, and carefully
 study the chapter for your site.  Please alert me of any errors in the
 graphs and tables.
 
-Also we need to add text to the chapters.  Each chapter has three
+Also you need to add text to the chapters.  Each chapter has three
 sections.  The first is "WP1 data".  Here should be the information a
 calibrator should know, but is not directly clear from the measured
 numbers in the database.  For example, if some measurements are less
@@ -67,9 +67,9 @@ We have written some bits and pieces of text when generating the
 graphs and tables.  You are welcome to use, add to, or replace this
 text.
 
-Please indicate where you want your text pieces located, in the
-beginning of the section, in a subsection (like "2004"), or before or
-efter existing text.
+Please indicate where you want your text pieces located, for example
+in the beginning of the section, in a subsection (like "2004"), or
+before or efter existing text.
 
 ---
 
@@ -88,7 +88,7 @@ don't want to redo those.
 ---
 
 We need all the text form all partners by the end of February, in
-order to finish this deliverable on time.
+order to finish this deliverable in Marts.
 
 Regards, 
 
@@ -107,8 +107,6 @@ Regards,
 *** Kør sim (2003 & 2004)
 
 *** udskriv grafer
-
-Skal vi bruge Excel?
 
 *** diskuter med PA
 
@@ -130,7 +128,7 @@ I de seneste år har nye afgrøder (HENVIS) og dyrkningssystemer
 klimaforandringer, ny teknik, og forædling af eksisterende sorter.
 Givet forudsigelsrerne fra klimamodellerne (HENVIS) og den generelle
 udvikling i specielt bioteknologien, er der intet der tyder på at
-denne udvikling vil mindskes i fart, tværtimod.
+denne udvikling vil mindskes, tværtimod.
 
 Traditionelt har ændringer i dansk landbrug været begrundet af
 erfaringer med praktiske dyrkningsforsøg (HENVIS), men det giver en
@@ -175,7 +173,7 @@ processerne i jorden.
 
 I forbindelse med kamydyrkning er det processerne nær overfladen der
 er mest interessante.  I EKSISTERENDE-FORSØG har vi et godt grundlag
-for en koncpetuel modelering.  Vi anser på bagrund af disse OPREMS
+for en koncepetuel modelering.  Vi anser på bagrund af disse OPREMS
 PROCESSER for særlig vigtige.  Vores første opgave vil være at
 formalisere dette i en konceptuel modelering.  Sideløbende med dette
 vil vi foretage en række fokuserede markeksperimenter for at give
@@ -189,7 +187,7 @@ forhold med en ren 2D-Daisy.
 Arbejdsopgaver
 ==============
 
-AP1: Konceptuel modelering.
+AP1: Konceptuel modelering. (alle)
 ---------------------------
 
 Pris: 15 mm. (6 egenfinancieret)
@@ -197,23 +195,23 @@ Pris: 15 mm. (6 egenfinancieret)
 Resutat: En konceptuel model, beskrevet i en selvstændig rapport. 
 Artikler: ?
 
-AP2: Fokuserede eksperimenter.
+AP2: Fokuserede eksperimenter. (CB)
 ------------------------------
 
-Pris: 21 mm (0 egenfinancieret)
+Pris: 15 mm (0 egenfinancieret)
 
 Resultat: Data til bestemelse af parametre i model.
 Artikler: ?
 
-AP3: Udvikling af 2D overflademodul.
+AP3: Udvikling af 2D overflademodul. (BGJ)
 ------------------------------------
 
-Pris: 21 mm (3 egenfinancieret)
+Pris: 15 mm (3 egenfinancieret)
 
 Resultat: Et funktionelt 2D overflademodul til Daisy.
 Artikler: ?
 
-AP4: Scenarieanalyse med Daisy 2D.
+AP4: Scenarieanalyse med Daisy 2D. (BGJ + CB)
 ----------------------------------
 
 Pris: 15 mm (3 egenfinancieret).
