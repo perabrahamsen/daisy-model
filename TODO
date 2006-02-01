@@ -1,9 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Tirdag aften
 
-** Snak med birgitte nielsen om møde den 7'
+** LaTeX det
 
-* Tirsdag aften
+** Se CZ errorbars...
 
 ** Upload rap og setups
 
@@ -87,9 +88,11 @@ Regards,
 
 * Onsdag
 
-** WP5: Hent og udskriv rapporter.
+** make dist TAG=4.00
 
-** Økonomirapport, aftal møde med SH.
+** WP5: Hent, udskriv og læs rapporter.
+
+** Lav plan for det arbejde der skal laves i rapporterne.
 
 * Februar
 
@@ -98,26 +101,6 @@ Regards,
 ** Indsæt bidrag til WP5.
 
 ** Skriv bidrag til Partner 10.
-
-** CT1
-
-*** Joao data
-
-*** Lav "longplot" for opvarm  (2003, 2004 & 2005)
-
-*** Vælg PL kartoffel
-
-** CT2
-
-*** Kør sim (2003 & 2004)
-
-*** udskriv grafer
-
-*** diskuter med PA
-
-*** Lav rettelser 
-
-*** Gentag CT2 indtil vi er tilfredse, eller tiden er gået
 
 * Marts
 
@@ -138,7 +121,6 @@ Har lav prioritet, i følge Søren.
 ** Profilplot med gravimetric sampling for SK og CZ.
 
 --------------------------------------------------
-
 
 * Omorganiser Daisy kode så omsætning er uafhængig af transport
 
