@@ -1,0 +1,64 @@
+WP5 leader:
+
+Focus this year has been on finalizing the setups for the WP1 sites
+for M5_3 and D5_3, as well as for use in scenarios in WP6.  Compared
+to earlier years, this year more focus was on the crop calibration.
+Also, initial setup files for the 2005 experiments were required
+earlier.  A soil and crop parameterization for use in WP6 was to be
+delivered by all WP1 sites by 2005-11-15, and the final soil and crop
+parameterization was to be delivered by 2005-12-31.  
+
+These deadlines were meet to a large degree.  As decided the previous
+year, Partner 6 took over crop calibration for partner 8, and partner
+10 visited partner 4 in order to help with the crop calibration.  At a
+modelling workshop in Udine, partner 1 and 10 provided support in
+calibrating Daisy for the remaining partners.  
+
+Several draft of D5_3 have been uploaded to the fertorganic homepage,
+and we are likely to meet M5_3 by delivering D5_3 on schedule.
+
+
+Partner 10:
+
+Research:
+
+WP3 and WP4: 
+
+Partner 10 have participated in the development of the DSS rules,
+along with partner 1 and partner 5.  In particular, partner 10 has
+ensured that the calculation of evapotranspiration is the same in the
+DSS system and Daisy, and developed the mineralization model used in
+the DSS.  Partner 10 also hosted a DSS workshop with participation of
+partner 1 and 5.
+
+WP5:
+
+Partner 10 has provided email support for the other partners for
+creating the initial site specific Daisy setups (milestone MP5_2).
+Partner 3 hosted a workshop in Udine where partners 10 and 1 helped
+partners 5, 3 and 12 create an initial site specific Daisy setup.
+Partner 10 hosted a workshop where they helped partner 1 reach
+milestone MP5_3.  Partner 10 provided the initial Daisy setup for
+Partner 2 who was indisposed.
+
+Based on experienses from the email support and workshops, partner 10
+has improved Daisy so it is more robust, more flexible, better
+documented and simpler to use.  Partner 10 also developed an initial
+potato parameterization based on SCRI data to be used as a starting
+point for the other partners.  
+
+Partner 10 ensured that initial setups from the other partners were
+submitted, organized these setups in a common and consistent
+framework, and uploaded this framework to the www.fertorganic.org
+site.  
+
+Troubles and delays:
+
+Late delivery of the WP1 databases continued to be a problem.  Late
+deliveries of the initial Daisy setups made the organization work more
+difficult, and left to little time to do any analyze work.  Partner 2
+never delivered an initial Daisy setup, which ment partner 10 had to
+do the additional work of creating one.  The WP1 database from partner
+2 had significant errors which made that work more time consuming than
+necessary.  Partner 4 never delivered the initial Daisy setup, which
+prevented us from meeting MP5_2.  
