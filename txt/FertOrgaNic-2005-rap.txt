@@ -8,7 +8,7 @@ earlier.  A soil and crop parameterization for use in WP6 was to be
 delivered by all WP1 sites by 2005-11-15, and the final soil and crop
 parameterization was to be delivered by 2005-12-31.  
 
-These deadlines were mostly meet.  As decided the previous year,
+These deadlines were mostly met.  As decided the previous year,
 Partner 6 took over crop calibration for partner 8, and partner 10
 visited partner 4 in order to help with the crop calibration.  At a
 modelling workshop in Udine, partner 1 and 10 provided support in
@@ -24,7 +24,7 @@ Research:
 WP3 and WP4: 
 
 Partner 10 have participated in the development of the DSS rules,
-along with partner 1 and partner 5. Partner 10 also hosted a DSS
+along with partner 1 and partner 5.  Partner 10 also hosted a DSS
 workshop with participation of partner 1 and 5.
 
 WP5:
