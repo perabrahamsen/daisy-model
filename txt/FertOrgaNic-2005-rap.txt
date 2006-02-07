@@ -14,7 +14,7 @@ visited partner 4 in order to help with the crop calibration.  At a
 modelling workshop in Udine, partner 1 and 10 provided support in
 calibrating Daisy for the remaining partners.
 
-Several draft of D5_3 have been uploaded to the fertorganic homepage,
+Several draft of D5_3 have been uploaded to the FertOrgaNic homepage,
 and we are likely to meet M5_3 by delivering D5_3 on schedule.
 
 Partner 10:
@@ -30,7 +30,7 @@ workshop with participation of partner 1 and 5.
 WP5:
 
 Partner 10 has provided email support for the other partners for
-creating the final site and crop speicific Daisy calibrations
+creating the final site and crop specific Daisy calibrations
 (milestone MP5_3).  Partners 10 also helped the remaining partners
 during the Udine workshop, and visited partner 4 for a week helping
 them do an initial calibration of their setup.  Partner 10 also did
@@ -38,18 +38,18 @@ all the calibration work for the Partner 2, with the help of a master
 student.
 
 During the second half of the period, focus has been meeting M5_3.  In
-the start by developing fascilities for Daisy for generating large
+the start by developing facilities for Daisy for generating large
 amount of plots and tables comparing simulated and measured numbers,
-and latter for using these fascilities for generating plots comparing
+and latter for using these facilities for generating plots comparing
 all comparable numbers from the databases and simulations.  These
 plots have been organized into a report, together with the general
 information on the project, the WP1 data, the calibration process and
 the results.  This report will evolve into D5_3, and a number of
-drafts have been uploaded to the ferorganic web site.
+drafts have been uploaded to the FertOrgaNic web site.
 
 Partner 10 has also continued to improve the Daisy software based on
 problems encountered, and to organize the setups delivered by the
-partners in a common structure, and uploading this to the fertorganic
+partners in a common structure, and uploading this to the FertOrgaNic
 site.
 
 WP6:
