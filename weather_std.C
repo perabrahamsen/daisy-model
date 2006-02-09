@@ -101,6 +101,8 @@ struct WeatherStandard : public Weather
 
   // Extra parameters.
   vector<double> precipitation_scale;
+  vector<double> temperature_scale;
+  vector<double> temperature_offset;
 
   // Data description.
   struct data_description_type
@@ -602,10 +604,17 @@ WeatherStandard::read_line ()
       return;
     }
 
-  // Precipitation correction.
+  // Monthly corrections and scaling.
   const int month = double2int (next_time.month ());
   next_precipitation *= precipitation_correction[month-1]
     * precipitation_scale[month-1];
+  next_air_temperature *= temperature_scale[month-1];
+  next_air_temperature += temperature_offset[month-1];
+  next_min_air_temperature *= temperature_scale[month-1];
+  next_min_air_temperature += temperature_offset[month-1];
+  next_max_air_temperature *= temperature_scale[month-1];
+  next_max_air_temperature += temperature_offset[month-1];
+
 }
 
 void 
@@ -1201,6 +1210,8 @@ WeatherStandard::WeatherStandard (Block& al)
     end (2100, 1, 1, 0),
     precipitation_correction (vector<double> (12, 1.0)),
     precipitation_scale (al.number_sequence ("PrecipScale")),
+    temperature_scale (al.number_sequence ("TempScale")),
+    temperature_offset (al.number_sequence ("TempOffset")),
     has_date (false),
     has_hour (false),
     has_temperature (false),
@@ -1363,7 +1374,7 @@ one will be used.",
 		"Below this air temperature all precipitation is snow.");
     alist.add ("T_snow", -2.0);
 
-    // PrecipScalee.
+    // Scaling.
     syntax.add ("PrecipScale", Syntax::None (), Check::non_negative (), 
 		Syntax::Const, 12, "\
 The precipitation listed in the file will be multiplied by the number\n\
@@ -1384,6 +1395,20 @@ experimenting with different precipitation values and for reusing data\n\
 from one weather station in nearby areas where only average values are\n\
 known.");
     alist.add ("PrecipScale", vector<double> (12, 1.0));
+    syntax.add ("TempScale", Syntax::None (),
+		Syntax::Const, 12, "\
+The temperature listed in the file will be multiplied by the number\n\
+from this list before it is used in the simulation, depending on the\n\
+month.  The first number corresponds to January, the second to\n\
+February, etc.");
+    alist.add ("TempScale", vector<double> (12, 1.0));
+    syntax.add ("TempOffset", "dg C",
+		Syntax::Const, 12, "\
+Anumber from this list will be added to the temperature listed in\n\
+the file before it is used in the simulation, depending on the\n\
+month.  The first number corresponds to January, the second to\n\
+February, etc.");
+    alist.add ("TempOffset", vector<double> (12, 0.0));
 
     Librarian<Weather>::add_type ("default", alist, syntax, &make);
   }

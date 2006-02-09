@@ -12,6 +12,38 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.01
+
+** New TempScale and TempOffset parameters to the default weather model.
+
+Use 
+
+   (weather default "taastrup.dwf" 
+            (TempOffset 1.0 0.0 0.0 0.0 0.0 2.0 
+                        0.0 0.0 0.0 0.0 0.0 0.0 0.0 [dg C]))
+
+to let the simulation use weather from "taastrup.dwf", except that
+temperatures in Januare will be one degree higher, and June two degree
+higher.   The argument to TempOffset should be 12 numbers, each
+representing an temperature increase for all values for that month.
+
+Use
+   (weather default "taastrup.dwf" 
+            (TempScale 1.5 0.0 0.0 0.0 0.0 2.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0))
+
+to let the simulation use weather from "taastrup.dwf", except that
+temperatures in Januare above zero degree will be 50% higher and below
+zero degree 50% lower, and temperatures in June will be 100% higher.
+
+If you use both, scale is applied before offset, as in
+
+  T_used = T_file * scale_m + offset_m
+
+where T_used is the temperature used by Daisy, T_file is the
+temperature listed in the file, scale_m is the scale factor for the
+current month as specified with TempScale, and offset_m is the offset
+for the current month as specified with TempOffset.
+
 * 4.00
 
 ** Bug fixes.

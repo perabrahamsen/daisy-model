@@ -1,3 +1,7 @@
+2006-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (TempScale, TempOffset): New parameters.
+
 2006-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.00 released.
