@@ -1,5 +1,13 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Omorganiser Daisy kode så omsætning er uafhængig af transport
+
+Ny R2D1 søjle (klon af default)
+
+Flyt "transport" ud i den nye 
+
+--------------------------------------------------
+
 * Marts
 
 ** Inkorporer tekst.
@@ -9,12 +17,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 ** Kør PT 2004 med fælles kartoffel.
 
 ** publiser endelig rapport
-
---------------------------------------------------
-
-* Omorganiser Daisy kode så omsætning er uafhængig af transport
-
-2D Daisy har brug for det
 
 --------------------------------------------------
 
