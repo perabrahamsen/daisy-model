@@ -59,8 +59,6 @@ struct SoilWater::Implementation
   std::vector<double> q;
   std::vector<double> q_p;
   std::auto_ptr<UZmodel> top;
-  std::auto_ptr<UZmodel> bottom;
-  const int bottom_start;
   std::auto_ptr<UZmodel> reserve;
   std::auto_ptr<Macro> macro;
 
@@ -263,30 +261,11 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
   // Calculate matrix flow next.
   try
     {
-      if (bottom.get ())
-	{
-	  // We have two UZ models.
-	  ok = top->tick (msg, soil, soil_heat,
-			  first, surface,
-			  bottom_start - 1, *bottom,
-			  S_sum, h_old, Theta_old, h_ice,
-			  h, Theta, q);
-	  if (ok)
-	    ok = bottom->tick (msg, soil, soil_heat,
-			       bottom_start, *top,
-			       last, groundwater,
-			       S_sum, h_old, Theta_old, h_ice,
-			       h, Theta, q);
-	}
-      else
-	{
-	  // We have only one UZ model.
-	  ok = top->tick (msg, soil, soil_heat,
-			  first, surface,
-			  last, groundwater,
-			  S_sum, h_old, Theta_old, h_ice,
-			  h, Theta, q);
-	}
+      ok = top->tick (msg, soil, soil_heat,
+                      first, surface,
+                      last, groundwater,
+                      S_sum, h_old, Theta_old, h_ice,
+                      h, Theta, q);
     }
   catch (const char* error)
     {
@@ -448,8 +427,6 @@ SoilWater::Implementation::output (Log& log) const
   output_variable (q, log);
   output_variable (q_p, log);
   output_derived (top, "UZtop", log);
-  if (bottom.get ())
-    output_derived (bottom, "UZbottom", log);
 }
 
 double
@@ -477,12 +454,6 @@ SoilWater::Implementation::put_h (const Soil& soil,
 SoilWater::Implementation::Implementation (Block& al)
   : S_permanent (al.number_sequence ("S_permanent")),
     top (Librarian<UZmodel>::build_item (al, "UZtop")),
-    bottom (  al.check ("UZbottom") 
-	    ? Librarian<UZmodel>::build_item (al, "UZbottom")
-	    : 0),
-    bottom_start (  al.check ("UZborder") 
-		  ? al.integer ("UZborder")
-		  : -1),
     reserve (Librarian<UZmodel>::build_item (al, "UZreserve")),
     macro (NULL)
 { }
@@ -628,8 +599,6 @@ SoilWater::Implementation::initialize (const AttributeList& al,
   // Let 'macro' choose the default method to average K values in 'uz'.
   const bool has_macropores = (macro.get () && !macro->none ());
   top->has_macropores (has_macropores);
-  if (bottom.get ())
-    bottom->has_macropores (has_macropores);
 }
 
 SoilWater::Implementation::~Implementation ()
@@ -801,14 +770,6 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
   richard.add ("max_absolute_difference", 0.02);
   richard.add ("max_relative_difference", 0.001);
   alist.add ("UZtop", richard);
-
-  syntax.add ("UZbottom", Librarian<UZmodel>::library (),
-	      Syntax::OptionalState, Syntax::Singleton, "\
-Water transport model for the bottom of the unsaturated zone.\n\
-If this is given, 'UZtop' will be used down to 'UZborder', and 'UZbottom'\n\
-will be used from there to the bottom.");
-  syntax.add ("UZborder", Syntax::Integer, Syntax::OptionalConst,
-	      "Top node to use 'UZbottom' in.");
   syntax.add ("UZreserve", Librarian<UZmodel>::library (),
 	      "Reserve transport model if UZtop fails.");
   // Use lr as UZreserve by default.
