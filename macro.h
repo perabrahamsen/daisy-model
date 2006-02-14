@@ -28,7 +28,7 @@
 
 class Soil;
 class Log;
-class UZtop;
+class Surface;
 
 class Macro
 {
@@ -41,7 +41,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Soil& soil, unsigned int first, unsigned int last,
-		     UZtop& surface,
+		     Surface& surface,
 		     const std::vector<double>& h_ice,
 		     const std::vector<double>& h,
 		     const std::vector<double>& Theta,

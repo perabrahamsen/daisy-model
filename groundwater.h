@@ -23,7 +23,6 @@
 #ifndef GROUNDWATER_H
 #define GROUNDWATER_H
 
-#include "uzmodel.h"
 #include "librarian.h"
 
 class Time;
@@ -32,12 +31,20 @@ class Soil;
 class SoilWater;
 class SoilHeat;
 
-class Groundwater : public UZbottom
+class Groundwater
 {
   // Content.
 public:
   const symbol name;
   static const char *const description;
+
+  // Lower boundary.
+  enum bottom_t { pressure, lysimeter, forced_flux, free_drainage };
+  virtual bottom_t bottom_type () const = 0;
+  virtual double q_bottom () const = 0;
+  virtual bool accept_bottom (double) = 0;
+
+  // Groundwater.
   virtual bool is_pipe () const;
   virtual double pipe_height () const;
   virtual double Z_aquitard () const;

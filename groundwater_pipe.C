@@ -61,7 +61,7 @@ class GroundwaterPipe : public Groundwater
   double h_aquifer;          // Pressure potential in the aquifer [cm]
 
 
-  // UZbottom.
+  // Groundwater.
 public:
   bottom_t bottom_type () const
   { 

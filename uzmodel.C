@@ -22,24 +22,6 @@
 
 #include "uzmodel.h"
 
-bool
-UZtop::soil_top () const
-{ return false; }
-
-UZtop::~UZtop ()
-{ }
-
-double
-UZbottom::q_bottom () const
-{ daisy_assert (false); }
-
-UZbottom::~UZbottom ()
-{ }
-
-void
-UZmodel::has_macropores (bool)
-{ }
-
 UZmodel::UZmodel (Block& al)
   : name (al.identifier ("type"))
 { }
@@ -52,4 +34,4 @@ Librarian<UZmodel>::Content* Librarian<UZmodel>::content = NULL;
 
 const char *const UZmodel::description = "\
 The 'uzmodel' component handles the vertical water movement in the\n\
-unsaturated zone.";
+unsaturated zone soil matrix.";

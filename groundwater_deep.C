@@ -24,10 +24,12 @@
 
 class GroundwaterDeep : public Groundwater
 {
-  // UZbottom.
+  // Groundwater.
 public:
   bottom_t bottom_type() const
   { return free_drainage; }
+  double q_bottom () const
+  { daisy_assert (false); }
   bool accept_bottom (double)
   { return true; }
 

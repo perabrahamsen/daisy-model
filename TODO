@@ -1,10 +1,13 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Spørg CT om effekt af joao gødning
+
 * Omorganiser Daisy kode så omsætning er uafhængig af transport
 
-Ny R2D1 søjle (klon af default)
+** Eliminer UZtop og UZbottom.
 
-Flyt "transport" ud i den nye 
+** Flyt vandtransport til column.
+
 
 --------------------------------------------------
 

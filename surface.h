@@ -30,7 +30,7 @@ class Soil;
 class Chemicals;
 class SoilChemicals;
 
-class Surface : public UZtop
+class Surface
 {
   struct Implementation;
   Implementation& impl;
@@ -38,8 +38,9 @@ class Surface : public UZtop
 public:
 
   // Communication with soil.
-  bool flux_top () const;	// From UZtop.
+  bool flux_top () const;
   double q () const;
+  double h () const;
   void flux_top_on () const;
   void flux_top_off () const;
   bool accept_top (Treelog&, double);

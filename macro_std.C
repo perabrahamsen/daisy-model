@@ -22,6 +22,7 @@
 
 #include "macro.h"
 #include "soil.h"
+#include "surface.h"
 #include "plf.h"
 #include "mathlib.h"
 #include "log.h"
@@ -44,7 +45,7 @@ struct MacroStandard : public Macro
 
   // Simulation.
  void tick (const Soil& soil, unsigned int first, unsigned int last,
-	    UZtop& surface,
+	    Surface& surface,
 	    const vector<double>& h_ice,
 	    const vector<double>& h,
 	    const vector<double>& Theta,
@@ -77,7 +78,7 @@ struct MacroStandard : public Macro
 void 
 MacroStandard::tick (const Soil& soil, 
 		     const unsigned int first, const unsigned int last,
-		     UZtop& surface,
+		     Surface& surface,
 		     const vector<double>& h_ice,
 		     const vector<double>& h,
 		     const vector<double>& Theta,

@@ -28,9 +28,11 @@ class GroundwaterStatic : public Groundwater
 private:
   const double depth;
   
-  // UZbottom.
+  // Groundwater.
 public:
   bottom_t bottom_type () const;
+  double q_bottom () const
+  { daisy_assert (false); }
   bool accept_bottom (double);
 
   // Simulation.
@@ -47,7 +49,7 @@ public:
   ~GroundwaterStatic ();
 };
 
-UZbottom::bottom_t 
+Groundwater::bottom_t 
 GroundwaterStatic::bottom_type () const
 {
   if (depth > 0)	     // Positive numbers indicate flux bottom.

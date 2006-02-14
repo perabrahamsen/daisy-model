@@ -188,6 +188,10 @@ Surface::q () const
     return -ponding () * 0.1;		// mm -> cm.
 }
   
+double
+Surface::h () const
+{ return -q () * dt; }
+
 void  
 Surface::flux_top_on () const
 { impl.flux_top_on (); }

@@ -41,9 +41,11 @@ private:
   const string file_name;
   LexerData* lex;
   
-  // UZbottom.
+  // Groundwater.
 public:
   bottom_t bottom_type () const;
+  double q_bottom () const
+  { daisy_assert (false); }
   bool accept_bottom (double);
 
   // Simulation.
@@ -61,7 +63,7 @@ public:
   ~GroundwaterFile ();
 };
 
-UZbottom::bottom_t
+Groundwater::bottom_t
 GroundwaterFile::bottom_type () const
 {
   if (depth > 0)	     // Positive numbers indicate flux bottom.

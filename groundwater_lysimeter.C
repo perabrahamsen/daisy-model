@@ -28,12 +28,14 @@ class GroundwaterLysimeter : public Groundwater
   // Content.
   double location;                // Location of lysimeter.
 
-  // UZbottom.
+  // Groundwater.
 public:
   bottom_t bottom_type () const
   { return lysimeter; }
   bool accept_bottom (double)
   { return true; }
+  double q_bottom () const
+  { daisy_assert (false); }
   bool is_lysimeter () const
   { return true; }
 

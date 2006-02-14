@@ -22,36 +22,16 @@
 
 #include "uzmodel.h"
 #include "soil.h"
-#include "log.h"
 #include "mathlib.h"
 
 using namespace std;
 
 class UZNone : public UZmodel
 {
-  // UZmodel.
-public:
-  bool flux_top () const
-    { return true; }
-  double q () const
-    { return 0.0; }
-  void flux_top_on () const
-    { }
-  void flux_top_off () const
-    { }
-  bool accept_top (Treelog&, double)
-    { return true; }
-  bottom_t bottom_type () const
-    { return free_drainage; }
-  bool accept_bottom (double)
-    { return true; }
-  void output (Log&) const
-    { }
-
 public:
   bool tick (Treelog&, const Soil& /* soil */, const SoilHeat&,
-	     unsigned int first, const UZtop& /* top */, 
-	     unsigned int last, const UZbottom& /* bottom */, 
+	     unsigned int first, const Surface& /* top */, 
+	     unsigned int last, const Groundwater& /* bottom */, 
 	     const vector<double>& /* S */,
 	     const vector<double>& h_old,
 	     const vector<double>& Theta_old,
@@ -69,7 +49,12 @@ public:
       q[last + 1] = 0.0;
       return true;
     }
+  void output (Log&) const
+  { }
+
   // Create and Destroy.
+  void has_macropores (bool)
+  { }
 public:
   UZNone (Block& al)
     : UZmodel (al)

@@ -29,10 +29,12 @@ class GroundwaterFixed : public Groundwater
 private:
   const double depth;
   
-  // UZbottom.
+  // Groundwater.
 public:
   bottom_t bottom_type () const
   { return pressure; }
+  double q_bottom () const
+  { daisy_assert (false); }
   bool accept_bottom (double)
   { return true; }
 

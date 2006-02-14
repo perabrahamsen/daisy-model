@@ -26,6 +26,8 @@
 #include "librarian.h"
 #include "timestep.h"
 
+class Surface;
+class Groundwater;
 class Soil;
 class SoilHeat;
 class Library;
@@ -33,55 +35,18 @@ class Syntax;
 class AttributeList;
 class Log;
 
-class UZtop
-{
-public:
-  virtual bool flux_top () const = 0;
-  virtual double q () const = 0;
-  double h () const
-  { return -q () * dt; }
-  virtual void flux_top_on () const = 0;
-  virtual void flux_top_off () const = 0;
-  virtual bool accept_top (Treelog&, double) = 0;
-  virtual bool soil_top () const;
-  virtual ~UZtop ();
-};
-
-class UZbottom
-{
-public:
-  enum bottom_t { pressure, lysimeter, forced_flux, free_drainage };
-  virtual bottom_t bottom_type () const = 0;
-  virtual double q_bottom () const;
-  virtual bool accept_bottom (double) = 0;
-  virtual ~UZbottom ();
-};
-
-class UZmodel : public UZtop, public UZbottom
+class UZmodel
 {
   // Content.
 public: 
   const symbol name;
   static const char *const description;
 
-  // UZtop.
-public:
-  bool flux_top () const = 0;
-  double q () const = 0;
-  void flux_top_on () const = 0;
-  void flux_top_off () const = 0;
-  bool accept_top (Treelog&, double) = 0;
-
-  // UZbottom.
-public:
-  bottom_t bottom_type () const = 0;
-  bool accept_bottom (double) = 0;
-  
   // Simulate.
 public:
   virtual bool tick (Treelog&, const Soil& soil, const SoilHeat&,
-		     unsigned int first, const UZtop& top, 
-		     unsigned int last, const UZbottom& bottom, 
+		     unsigned int first, const Surface& top, 
+		     unsigned int last, const Groundwater& bottom, 
 		     const std::vector<double>& S,
 		     const std::vector<double>& h_old,
 		     const std::vector<double>& Theta_old,
@@ -93,7 +58,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void has_macropores (bool); // Tell UZ that there is macropores.
+  virtual void has_macropores (bool) = 0; // Tell UZ that there are macropores.
 protected:
   UZmodel (Block&);
 public:

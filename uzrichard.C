@@ -21,6 +21,8 @@
 
 
 #include "uzmodel.h"
+#include "groundwater.h"
+#include "surface.h"
 #include "soil.h"
 #include "soil_heat.h"
 #include "mathlib.h"
@@ -37,8 +39,6 @@ class UZRichard : public UZmodel
 {
   // Variables.
 private:
-  double q_up;
-  double q_down;
   int iterations;
 
   // Parameters.
@@ -51,27 +51,13 @@ private:
 
   // UZmodel.
 public:
-  bool flux_top () const
-    { return true; };
-  double q () const
-    { return q_down; }
-  void flux_top_on () const
-    { }
-  void flux_top_off () const
-    { }
-  bool accept_top (Treelog&, double)
-    { return true; };
-  bottom_t bottom_type () const
-    { return free_drainage; };
-  bool accept_bottom (double)
-    { return true; };
   void output (Log&) const;
 
   // Simulate.
 private:
   bool richard (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
-		int first, const UZtop& top,
-		int last, const UZbottom& bottom,
+		int first, const Surface& top,
+		int last, const Groundwater& bottom,
 		const vector<double>& S,
 		const vector<double>& h_old,
 		const vector<double>& Theta_old,
@@ -98,8 +84,8 @@ private:
 		vector<double>& q);
 public:
   bool tick (Treelog&, const Soil& soil, const SoilHeat&,
-	     unsigned int first, const UZtop& top,
-	     unsigned int last, const UZbottom& bottom,
+	     unsigned int first, const Surface& top,
+	     unsigned int last, const Groundwater& bottom,
 	     const vector<double>& S,
 	     const vector<double>& h_old,
 	     const vector<double>& Theta_old,
@@ -119,8 +105,8 @@ bool
 UZRichard::richard (Treelog& msg,
 		    const Soil& soil,
 		    const SoilHeat& soil_heat,
-		    int first, const UZtop& top,
-		    const int last, const UZbottom& bottom,
+		    int first, const Surface& top,
+		    const int last, const Groundwater& bottom,
 		    const vector<double>& S,
 		    const vector<double>& h_old,
 		    const vector<double>& Theta_old,
@@ -151,7 +137,7 @@ UZRichard::richard (Treelog& msg,
   vector<double> Kplus (size);
 
   // For h bottom.
-  if (bottom.bottom_type () == UZbottom::pressure)
+  if (bottom.bottom_type () == Groundwater::pressure)
     {
       daisy_assert (last + 1 < soil.size ());
       K[size] = soil.K (last + 1, 0.0, h_ice[last + 1], 
@@ -220,7 +206,7 @@ UZRichard::richard (Treelog& msg,
       // Bottom flux.
       double q_bottom = 42.42e42;
       daisy_assert (size > 0);
-      if (bottom.bottom_type () == UZbottom::lysimeter)
+      if (bottom.bottom_type () == Groundwater::lysimeter)
         { 
           if (h[size - 1] > h_lim)
             {
@@ -241,12 +227,12 @@ UZRichard::richard (Treelog& msg,
           else 
             q_bottom = 0.0;
         }
-      else if (bottom.bottom_type () == UZbottom::forced_flux)
+      else if (bottom.bottom_type () == Groundwater::forced_flux)
         q_bottom = bottom.q_bottom ();
-      else if (bottom.bottom_type () == UZbottom::free_drainage)
+      else if (bottom.bottom_type () == Groundwater::free_drainage)
         q_bottom = - Kold[size - 1];
       else
-        daisy_assert (bottom.bottom_type () == UZbottom::pressure);
+        daisy_assert (bottom.bottom_type () == Groundwater::pressure);
 
       do
 	{
@@ -262,7 +248,7 @@ UZRichard::richard (Treelog& msg,
 				 soil_heat.T (first + i));
 	      K[i] = (Ksum[i] / iterations_used + Kold[i]) / 2.0;
 	    }
-	  if (bottom.bottom_type () != UZbottom::pressure)
+	  if (bottom.bottom_type () != Groundwater::pressure)
 	    K[size] = K[size - 1];
 
 	  internode (soil, soil_heat, first, last, h_ice, K, Kplus);
@@ -336,7 +322,7 @@ UZRichard::richard (Treelog& msg,
 		  // Calculate lower boundary
 		  const double dz_minus = soil.z (first + i - 1) - z;
 
-		  if (bottom.bottom_type () == pressure)
+		  if (bottom.bottom_type () == Groundwater::pressure)
 		    {
 		      const double dz_plus = z - soil.z (first + i + 1);
 		      //const double bottom_pressure = h[i + 1];
@@ -348,7 +334,7 @@ UZRichard::richard (Treelog& msg,
 			* (Kplus[i - 1]
 			   - Kplus[i] * (1.0 -  bottom_pressure/ dz_plus));
 		    }
-                  else if (bottom.bottom_type () == UZbottom::lysimeter
+                  else if (bottom.bottom_type () == Groundwater::lysimeter
                            && isnormal (q_bottom))
                     {
                       // Active lysimeter, use fake pressure bottom.
@@ -437,7 +423,7 @@ UZRichard::richard (Treelog& msg,
 	  if (!top.flux_top ())
 	    {
 	      // Find flux.
-	      if (bottom.bottom_type () == UZbottom::forced_flux)
+	      if (bottom.bottom_type () == Groundwater::forced_flux)
 		{
 		  q[last + 1] = bottom.q_bottom ();
 		  for (int i = last; i >= first; i--)
@@ -707,8 +693,8 @@ calculating flow with pressure top.");
 
 bool
 UZRichard::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
-		 unsigned int first, const UZtop& top, 
-		 unsigned int last, const UZbottom& bottom, 
+		 unsigned int first, const Surface& top, 
+		 unsigned int last, const Groundwater& bottom, 
 		 const vector<double>& S,
 		 const vector<double>& h_old,
 		 const vector<double>& Theta_old,
@@ -722,16 +708,12 @@ UZRichard::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
 		S, h_old, Theta_old, h_ice, h, Theta, q))
     throw ("Richard's Equation doesn't converge");
 
-  q_up = q[first];
-  q_down = q[last + 1];
   return true;
 }
 
 void
 UZRichard::output (Log& log) const
 {
-  output_variable (q_up, log);
-  output_variable (q_down, log);
   output_variable (iterations, log);
 }
 
@@ -762,8 +744,6 @@ UZRichard::has_macropores (bool has_them)
 UZRichard::UZRichard (Block& al)
   : UZmodel (al),
     // Variables.
-    q_up (0.0),
-    q_down (0.0),
     iterations (0),
     // Parameters.
     max_time_step_reductions (al.integer ("max_time_step_reductions")),
@@ -811,10 +791,6 @@ Maximum absolute difference in 'h' values for convergence.");
       syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
 Maximum relative difference in 'h' values for convergence.");
       alist.add ("max_relative_difference", 0.001);
-      syntax.add ("q_up", "mm/h", Syntax::LogOnly, 
-		  "Flux up through the surface.");
-      syntax.add ("q_down", "mm/h", Syntax::LogOnly,
-		  "Flux up through the bottom of the last node.");
       syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly,
 		  "Number of iterations used,");
       syntax.add ("K_average", Librarian<Average>::library (),

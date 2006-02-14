@@ -21,9 +21,10 @@
 
 
 #include "uzmodel.h"
+#include "surface.h"
+#include "groundwater.h"
 #include "soil.h"
 #include "soil_heat.h"
-#include "log.h"
 #include "mathlib.h"
 #include <sstream>
 
@@ -36,34 +37,11 @@ private:
   const double h_fc;		// Field Capacity. [cm]
   const double z_top;		// Depth of layer with upw. water movement [cm]
 
-  // Variables.
-private:
-  double q_up;
-  double q_down;
-
-  // UZmodel.
-public:
-  bool flux_top () const
-    { return true; };
-  double q () const
-    { return q_down; }
-  void flux_top_on () const
-    { }
-  void flux_top_off () const
-    { }
-  bool accept_top (Treelog&, double)
-    { return true; };
-  bottom_t bottom_type () const
-    { return free_drainage; };
-  bool accept_bottom (double)
-    { return true; };
-  void output (Log&) const;
-
   // Simulate.
 public:
   bool tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
-	     unsigned int first, const UZtop& top, 
-	     unsigned int last, const UZbottom& bottom, 
+	     unsigned int first, const Surface& top, 
+	     unsigned int last, const Groundwater& bottom, 
 	     const vector<double>& S,
 	     const vector<double>& h_old,
 	     const vector<double>& Theta_old,
@@ -71,8 +49,12 @@ public:
 	     vector<double>& h,
 	     vector<double>& Theta,
 	     vector<double>& q);
+  void output (Log&) const
+  { }
 
   // Create and Destroy.
+  void has_macropores (bool)
+  { }
 public:
   UZlr (Block& par);
   ~UZlr ();
@@ -80,8 +62,8 @@ public:
 
 bool
 UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
-	    unsigned int first, const UZtop& top, 
-	    unsigned int last, const UZbottom& bottom, 
+	    unsigned int first, const Surface& top, 
+	    unsigned int last, const Groundwater& bottom, 
 	    const vector<double>& S,
 	    const vector<double>& h_old,
 	    const vector<double>& Theta_old,
@@ -90,6 +72,9 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
 	    vector<double>& Theta,
 	    vector<double>& q)
 {
+  double q_up = 0.0;
+  double q_down = 0.0;
+
   if (top.soil_top ())
     {
       daisy_assert (!top.flux_top ());
@@ -158,7 +143,8 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
       // node), and wrong for forced flux (= pipe drained soil) where
       // the groundwater is usually much higher.  Still, it is better
       // than using h_fc.
-      const double h_lim = (bottom.bottom_type () == UZbottom::free_drainage) 
+      const double h_lim = (bottom.bottom_type ()
+                            == Groundwater::free_drainage) 
         ? h_fc
         : max (soil.zplus (last) - soil.z (i), h_fc);
       daisy_assert (h_lim < 0.0);
@@ -201,7 +187,7 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
 		K_new = sqrt (K_new * soil.K (i+1, h_old[i+1], h_ice[i+1],
 					      soil_heat.T (i+1)));
 	    }
-	  else if (bottom.bottom_type () == UZbottom::forced_flux)
+	  else if (bottom.bottom_type () == Groundwater::forced_flux)
 	    K_new = -bottom.q_bottom ();
           
 	  const double Theta_lim = soil.Theta (i, h_lim, h_ice[i]);
@@ -249,7 +235,7 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
   q_down = q[last + 1];
 
 #if 1
-  if (bottom.bottom_type () == UZbottom::forced_flux
+  if (bottom.bottom_type () == Groundwater::forced_flux
       && !approximate (q_down, bottom.q_bottom ()))
     {
       // Ensure forced bottom.
@@ -280,7 +266,7 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
     }
 #else
   double extra_water = 0.0;
-  if (bottom.type () == UZbottom::forced_flux
+  if (bottom.type () == Groundwater::forced_flux
       && !approximate (q_down, bottom.q_bottom ()))
       // Ensure forced bottom.
       extra_water = (bottom.q_bottom () - q_down) * dt;
@@ -361,19 +347,10 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
   return true;
 }
 
-void
-UZlr::output (Log& log) const
-{
-  output_variable (q_up, log);
-  output_variable (q_down, log);
-}
-
 UZlr::UZlr (Block& al)
   : UZmodel (al),
     h_fc (al.number ("h_fc")),
-    z_top (al.number ("z_top")),
-    q_up (0.0),
-    q_down (0.0)
+    z_top (al.number ("z_top"))
 { }
 
 UZlr::~UZlr ()
@@ -395,12 +372,6 @@ static struct UZlrSyntax
 Use gravitational water movement for wet soil, where h > h_fc.\n\
 There are no water movement when h < h_fc, except at the layers down\n\
 to z_top, where there can be darcy movement.");
-      
-      // Variables.
-      syntax.add ("q_up", "mm/h", Syntax::LogOnly, 
-		  "Flux up through the surface.");
-      syntax.add ("q_down", "mm/h", Syntax::LogOnly,
-		  "Flux up through the bottom of the last node.");
 
       // Parameters.
       syntax.add ("h_fc", "cm", Syntax::Const, "Field capacity.");
