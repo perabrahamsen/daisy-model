@@ -348,6 +348,84 @@ static struct NumberSoilKSyntax
   }
 } NumberSoilK_syntax;
 
+struct NumberSoilHeatCapacity : public NumberByTension
+{
+  // Simulation.
+  double value (const Scope& scope) const
+  { 
+    const std::string = h->dimension (scope);
+    const double my_val;
+    const double my_h = Units::convert (my_dim, "cm", my_val);
+    const double Theta = horizon->hydraulic->Theta (my_h);
+    return horizon->heat_capacity (Theta, 0.0);
+  }
+  const std::string& dimension (const Scope&) const 
+  { 
+    static const std::string dim = "erg/cm^3/dg C";
+    return dim;
+  }
+
+  // Create.
+  NumberSoilHeatCapacity (Block& al)
+    : NumberByTension (al)
+  { }
+};
+
+static struct NumberSoilHeatCapacitySyntax
+{
+  static Number& make (Block& al)
+  { return *new NumberSoilHeatCapacity (al); }
+  NumberSoilHeatCapacitySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+	       "Find heat capacity for a given pressure (h).");
+    NumberByTension::load_syntax (syntax, alist);
+    Librarian<Number>::add_type ("soil_heat_capacity", alist, syntax, &make);
+  }
+} NumberSoilHeatCapacity_syntax;
+
+struct NumberSoilHeatConductivity : public NumberByTension
+{
+  // Simulation.
+  double value (const Scope& scope) const
+  { 
+    const std::string = h->dimension (scope);
+    const double my_val;
+    const double my_h = Units::convert (my_dim, "cm", my_val);
+    const double Theta = horizon->hydraulic->Theta (my_h);
+    return horizon->heat_conductivity (Theta, 0.0);
+  }
+  const std::string& dimension (const Scope&) const 
+  { 
+    static const std::string dim = "erg/cm/h/dg C";
+    return dim;
+  }
+
+  // Create.
+  NumberSoilHeatConductivity (Block& al)
+    : NumberByTension (al)
+  { }
+};
+
+static struct NumberSoilHeatConductivitySyntax
+{
+  static Number& make (Block& al)
+  { return *new NumberSoilHeatConductivity (al); }
+  NumberSoilHeatConductivitySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+	       "Find heat conductivity for a given pressure (h).");
+    NumberByTension::load_syntax (syntax, alist);
+    Librarian<Number>::add_type ("soil_heat_conductivity", alist, syntax, &make);
+  }
+} NumberSoilHeatConductivity_syntax;
+
 struct NumberTensionByTheta : public Number
 {
   // Parameters.
