@@ -1,5 +1,10 @@
 2006-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* sample/heat-properties.dai: New file.
+	* sample/Makefile (SETUPS): Added.
+
+	* parser_file.C (get_string): Support '\t' escape.
+
 	* number_soil.C (soil_heat_capacity, soil_heat_conductivity): New
 	models.
 

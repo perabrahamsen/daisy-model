@@ -1,6 +1,6 @@
 LIBS 	= dk-soil.dai log-sample.dai \
 	init-soil.dai pedo-soil.dai irrigation.dai dk-management.dai
-SETUPS  = batch.dai sample.dai test.dai DrainDrying.dai
+SETUPS  = heat-properties.dai batch.dai sample.dai test.dai DrainDrying.dai 
 DATA = taastrup.dwf example.gwt
 TEXT	= Makefile README $(SETUPS) $(DATA) $(LIBS)
 REMOVE 	=  NOTHING

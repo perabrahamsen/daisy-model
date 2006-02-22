@@ -353,8 +353,8 @@ struct NumberSoilHeatCapacity : public NumberByTension
   // Simulation.
   double value (const Scope& scope) const
   { 
-    const std::string = h->dimension (scope);
-    const double my_val;
+    const std::string my_dim = h->dimension (scope);
+    const double my_val = h->value (scope);
     const double my_h = Units::convert (my_dim, "cm", my_val);
     const double Theta = horizon->hydraulic->Theta (my_h);
     return horizon->heat_capacity (Theta, 0.0);
@@ -392,8 +392,8 @@ struct NumberSoilHeatConductivity : public NumberByTension
   // Simulation.
   double value (const Scope& scope) const
   { 
-    const std::string = h->dimension (scope);
-    const double my_val;
+    const std::string my_dim = h->dimension (scope);
+    const double my_val = h->value (scope);
     const double my_h = Units::convert (my_dim, "cm", my_val);
     const double Theta = horizon->hydraulic->Theta (my_h);
     return horizon->heat_conductivity (Theta, 0.0);

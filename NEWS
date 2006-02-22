@@ -44,6 +44,15 @@ temperature listed in the file, scale_m is the scale factor for the
 current month as specified with TempScale, and offset_m is the offset
 for the current month as specified with TempOffset.
 
+** New 'soil_heat_capacity' and 'soil_heat_conductivity' number models.
+
+These extract heat information from a horizon.
+
+** New file 'sample-heat.dai' generates a table of heat properties.
+
+It also shows how to use the 'number' library to extract static
+information from a Daisy setup file.
+
 * 4.00
 
 ** Bug fixes.

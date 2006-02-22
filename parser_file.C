@@ -131,6 +131,9 @@ ParserFile::Implementation::get_string ()
 		case 'n':
 		  c = '\n';
 		  break;
+                case 't':
+                  c = '\t';
+                  break;
 		case '\n':
                   continue;
 		case '\\':
