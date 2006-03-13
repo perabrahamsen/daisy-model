@@ -1,19 +1,12 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Onsdag
-
-** Oversæt sidste afsnit
-
-** Skraber
-
-* Torsdag
-
-** Ryd op.
-
 * Omorganiser Daisy kode så omsætning er uafhængig af transport
 
 ** Flyt vandtransport til column.
 
+?  Vand er næsten kun transport...
+
+source/sink, content
 --------------------------------------------------
 
 * Marts
@@ -42,8 +35,6 @@ De skal bruges på Daisy hjemmesiden, og er en del af "dissemination"
 ** Ny plone baseret web side!
 
 * Programmering
-
-** Månedlig linear skalering af temperatur.
 
 ** Generering af zplus
 

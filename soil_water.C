@@ -649,6 +649,7 @@ double
 SoilWater::content (const Geometry& geometry, double from, double to) const
 { return geometry.total (impl->Theta, from, to); }
 
+#ifndef NEWMOVE
 double
 SoilWater::q (int i) const
 { 
@@ -658,6 +659,7 @@ SoilWater::q (int i) const
 double
 SoilWater::q_p (int i) const
 { return impl->q_p[i]; }
+#endif // !NEWMOVE
 
 double
 SoilWater::S_sum (int i) const

@@ -58,8 +58,10 @@ public:
   double Theta_left (int i) const;
   double Theta_old (int i) const;
   double content (const Geometry&, double from, double to) const; // [cm]
+#ifndef NEWMOVE
   double q (int i) const;
   double q_p (int i) const;
+#endif // OLDMOVE
   double S_sum (int i) const;
   double S_root (int i) const;
   double S_drain (int i) const;
