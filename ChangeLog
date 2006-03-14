@@ -1,3 +1,10 @@
+2006-03-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* movement.h, movement.C: New component.
+	* Makefile (COMPONENTS): Added it. 
+	* movement_1D.C: New model.
+	* Makefile (MODELS): Added it.
+
 2006-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* sample/heat-properties.dai: New file.

@@ -514,7 +514,7 @@ SoilHeat::Implementation::calculate_heat_flux (const Soil& soil,
 
   q[i] = - K * dT/dz - water_heat_capacity * rho_water *  q_water * T;
 }
-  
+ 
 
 double 
 SoilHeat::Implementation::energy (const Soil& soil,
