@@ -755,9 +755,9 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("q", "erg/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
               "Heat flux (positive upward).");
   syntax.add ("capacity", "erg/cm^3/dg C", Syntax::LogOnly, Syntax::Sequence,
-              "Soil heat capacity (exclusing freezing/melting).");
+              "Soil heat capacity (excluding freezing/melting).");
   syntax.add ("C_apparent", "erg/cm^3/dg C", Syntax::LogOnly, Syntax::Sequence,
-              "Soil heat capacity (exclusing freezing/melting).");
+              "Soil heat capacity (including freezing/melting).");
   syntax.add ("state", Syntax::Unknown (), Syntax::LogOnly, Syntax::Sequence,
               "Current freezing/melting state.");
   syntax.add ("S", "erg/cm^3/h", Syntax::OptionalState, 

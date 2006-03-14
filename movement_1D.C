@@ -19,12 +19,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "movement.h"
+#include "soil_water.h"
 #include "uzmodel.h"
 #include "macro.h"
-#include "soil_water.h"
+#include "soil_heat.h"
 #include "soil.h"
 #include "time.h"
 #include "log.h"
+
+static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
+static const double rho_water = 1.0; // [g/cm^3]
 
 class Movement1D : public Movement
 {
@@ -37,16 +41,17 @@ class Movement1D : public Movement
 
   // Soil heat
   double T_top;
-  double T_top_old;
-  double T_bottom;
   std::vector<double> heat_flux;
-  void heat (const Time& time,
-             const Soil& soil,
+  void heat (const Soil& soil,
              const SoilWater& soil_water,
+             const std::vector<double>& T,
+             std::vector<double>& T_new,
              const double T_top_new,
              const double T_bottom);
   void calculate_heat_flux (const Soil& soil,
-                            const SoilWater& soil_water);
+                            const SoilWater& soil_water,
+                            const std::vector<double>& T_old, 
+                            const std::vector<double>& T);
 
   // Simulation.
 public:
@@ -55,6 +60,7 @@ public:
     output_derived (water_matrix, "soil_matrix", log);
     output_variable (water_matrix_flux, log);
     output_variable (water_macro_flux, log);
+    output_value (T_top, "T_top", log);
     output_variable (heat_flux, log);
   }
 
@@ -71,14 +77,14 @@ public:
 };
 
 void
-Movement1D::heat (const Time& time,
-                  const Soil& soil,
+Movement1D::heat (const Soil& soil,
                   const SoilWater& soil_water,
+                  const std::vector<double>& T,
+                  std::vector<double>& T_new,
                   const double T_top_new,
                   const double T_bottom)
 {
-  // Initial state.
-  if (T_top < -400.0)
+  if (T_top < -400.0)  // Initial state.
     T_top = T_top_new;
 
   int size = soil.size ();
@@ -191,17 +197,19 @@ Movement1D::heat (const Time& time,
       d[i] += S[i];
     }
   d[size - 1] = d[size - 1] - c[size - 1] * T_bottom;
-  tridia (0, size, a, b, c, d, T.begin ());
+  tridia (0, size, a, b, c, d, T_new.begin ());
   T_top_old = T_top;
   T_top = T_top_new;
-  daisy_assert (T[0] < 50.0);
+  daisy_assert (T_new[0] < 50.0);
 
-  calculate_heat_flux (soil, soil_water);
+  calculate_heat_flux (soil, soil_water, T, T_new);
 }
 
 void
 Movement1D::calculate_heat_flux (const Soil& soil,
-                                 const SoilWater& soil_water)
+                                 const SoilWater& soil_water,
+                                 const std::vector<double>& T_old, 
+                                 const std::vector<double>& T)
 {
   // Top and inner nodes.
   double T_prev = (T_top + T_top_old) / 2.0;
@@ -277,7 +285,8 @@ amount of humus and clay in the top horizon is above 5%.");
                 "Water flux in macro pores (positive numbers mean upward).");
 
     // Soil heat.
-    output_value (impl.T_top, "T_top", log);
+    syntax.add ("T_top", "dg C", Syntax::OptionalState, 
+                "Surface temperature at previous time step.");
 
     Librarian<Movement>::add_type ("1D", alist, syntax, &make);
   }
