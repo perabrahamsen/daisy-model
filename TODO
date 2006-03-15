@@ -36,6 +36,10 @@ De skal bruges på Daisy hjemmesiden, og er en del af "dissemination"
 
 * Programmering
 
+** Plante
+
+Ny EmrDate parameter, overskriver EmrTSum, bruges for kartofler hvis fremspriring afhænger af opbevaring. 
+
 ** Generering af zplus
 
 Det skal kun være tre intervaller mellem hver "border", hvis de
