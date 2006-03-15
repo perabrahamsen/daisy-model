@@ -1,3 +1,10 @@
+2006-03-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat.C, soil_heat.h (capacity, capacity_apparent): New
+	public members. 
+	* soil_heat.C (capacity, C_apparent): Removed log variables.
+	(solve, calculate_freezing_rate): Update callers.
+
 2006-03-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* movement.h, movement.C: New component.

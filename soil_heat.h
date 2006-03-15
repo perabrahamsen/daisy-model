@@ -43,6 +43,8 @@ class SoilHeat
   Implementation& impl;
 
 public:
+  double capacity (const Soil&, const SoilWater&, size_t i) const;
+  double capacity_apparent (const Soil&, const SoilWater&, size_t i) const;
   double top_flux (const Soil&, const SoilWater&) const; // [W/m^2]
   void tick (const Time&, const Soil&, SoilWater&, 
 	     const Surface&, const Weather& weather);

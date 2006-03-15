@@ -43,6 +43,7 @@ class Movement1D : public Movement
   double T_top;
   std::vector<double> heat_flux;
   void heat (const Soil& soil,
+             const SoilHeat& soil_heat,
              const SoilWater& soil_water,
              const std::vector<double>& T,
              std::vector<double>& T_new,
@@ -78,6 +79,7 @@ public:
 
 void
 Movement1D::heat (const Soil& soil,
+                  const SoilHeat& soil_heat,
                   const SoilWater& soil_water,
                   const std::vector<double>& T,
                   std::vector<double>& T_new,
@@ -157,36 +159,21 @@ Movement1D::heat (const Soil& soil,
         * (soil_water.q (i) + soil_water.q (next)) / 2.0;
 
       // Heat capacity including thawing/freezing.
-      C_apparent[i] = capacity[i];
-      switch (state[i])
-        {
-        case freezing:
-          C_apparent[i] += (latent_heat_of_fussion * latent_heat_of_fussion
-                            * rho_water * soil.Cw2 (i, h)
-                            / (273. * gravity));
-          break;
-        case thawing:
-          C_apparent[i] += (latent_heat_of_fussion * latent_heat_of_fussion
-                            * rho_water * soil.Cw2 (i, h_ice)
-                            / (273. * gravity));
-          break;
-        case liquid:
-        case frozen:
-          break;
-        }
+      const double capacity 
+        = soil_heat.capacity_apparent (soil, soil_water, i);
 
       // Setup tridiagonal matrix.
       a[i] = - conductivity / dz_both / dz_prev + Cx / 2.0 / dz_both;
-      b[i] = C_apparent[i] / dt
+      b[i] = capacity / dt
         + conductivity / dz_both * (1.0 / dz_next + 1.0 / dz_prev);
       c[i] = - conductivity / dz_both / dz_next - Cx / 2.0 / dz_both;
       const double x2 = dT_next / dz_next - dT_prev/ dz_prev;
       if (i == 0)
-        d[i] = T[i] * C_apparent[i] / dt
+        d[i] = T[i] * capacity / dt
           + conductivity / soil.z (1) * (x2 + T_top_new / soil.z (0))
           + Cx * (T[1] - T_top + T_top_new) / (2.0 * soil.z (1));
       else
-        d[i] = T[i] * C_apparent[i] / dt + (conductivity / dz_both) * x2
+        d[i] = T[i] * capacity / dt + (conductivity / dz_both) * x2
           + Cx * dT_both / dz_both / 2.0;
       
       if (state[i] == freezing || state[i] == thawing)
