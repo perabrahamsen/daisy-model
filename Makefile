@@ -289,8 +289,8 @@ NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
-# movement_1D.C 
-MODELS = integer_arit.C \
+# 
+MODELS = movement_1D.C integer_arit.C \
 	source_merge.C number_source.C program_file.C action_table.C \
 	xysource_merge.C xysource_inline.C number_soil.C xysource_loop.C \
 	xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
