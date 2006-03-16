@@ -26,9 +26,11 @@
 #include "soil.h"
 #include "time.h"
 #include "log.h"
+#include "mathlib.h"
 
 static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
 static const double rho_water = 1.0; // [g/cm^3]
+static const double latent_heat_of_fussion = 3.35e9; // [erg/g]
 
 class Movement1D : public Movement
 {
@@ -42,17 +44,18 @@ class Movement1D : public Movement
   // Soil heat
   double T_top;
   std::vector<double> heat_flux;
-  void heat (const Soil& soil,
-             const SoilHeat& soil_heat,
-             const SoilWater& soil_water,
-             const std::vector<double>& T,
-             std::vector<double>& T_new,
-             const double T_top_new,
-             const double T_bottom);
+  void heat_solve (const Soil& soil,
+                   const SoilHeat& soil_heat,
+                   const SoilWater& soil_water,
+                   const std::vector<double>& T,
+                   std::vector<double>& T_new,
+                   const double T_top_new,
+                   const double T_bottom);
   void calculate_heat_flux (const Soil& soil,
                             const SoilWater& soil_water,
                             const std::vector<double>& T_old, 
-                            const std::vector<double>& T);
+                            const std::vector<double>& T,
+                            double T_top, double T_bottom);
 
   // Simulation.
 public:
@@ -78,13 +81,13 @@ public:
 };
 
 void
-Movement1D::heat (const Soil& soil,
-                  const SoilHeat& soil_heat,
-                  const SoilWater& soil_water,
-                  const std::vector<double>& T,
-                  std::vector<double>& T_new,
-                  const double T_top_new,
-                  const double T_bottom)
+Movement1D::heat_solve (const Soil& soil,
+                        const SoilHeat& soil_heat,
+                        const SoilWater& soil_water,
+                        const std::vector<double>& T,
+                        std::vector<double>& T_new,
+                        const double T_top_new,
+                        const double T_bottom)
 {
   if (T_top < -400.0)  // Initial state.
     T_top = T_top_new;
@@ -103,8 +106,6 @@ Movement1D::heat (const Soil& soil,
       // Soil Water
       const double Theta = soil_water.Theta (i);
       const double X_ice = soil_water.X_ice (i);
-      const double h = soil_water.h (i);
-      const double h_ice = soil_water.h_ice (i);
 
       const int prev = i - 1;
       const int next = i + 1;
@@ -176,30 +177,34 @@ Movement1D::heat (const Soil& soil,
         d[i] = T[i] * capacity / dt + (conductivity / dz_both) * x2
           + Cx * dT_both / dz_both / 2.0;
       
-      if (state[i] == freezing || state[i] == thawing)
+      const SoilHeat::state_t state = soil_heat.state (i);
+      if (state == SoilHeat::freezing || state == SoilHeat::thawing)
         d[i] -= latent_heat_of_fussion * rho_water
           * (soil_water.q (i) - soil_water.q (next)) / soil.dz (i) / dt;
 
       // External heat source.
-      d[i] += S[i];
+      d[i] += soil_heat.source (i);
     }
   d[size - 1] = d[size - 1] - c[size - 1] * T_bottom;
   tridia (0, size, a, b, c, d, T_new.begin ());
-  T_top_old = T_top;
-  T_top = T_top_new;
   daisy_assert (T_new[0] < 50.0);
+  const double T_top_old = T_top;
+  const double T_top = T_top_new;
+  const double T_top_prev = (T_top + T_top_old) / 2.0;
 
-  calculate_heat_flux (soil, soil_water, T, T_new);
+  calculate_heat_flux (soil, soil_water, T, T_new, T_top_prev, T_bottom);
 }
 
 void
 Movement1D::calculate_heat_flux (const Soil& soil,
                                  const SoilWater& soil_water,
                                  const std::vector<double>& T_old, 
-                                 const std::vector<double>& T)
+                                 const std::vector<double>& T,
+                                 const double T_top_prev,
+                                 const double T_bottom)
 {
   // Top and inner nodes.
-  double T_prev = (T_top + T_top_old) / 2.0;
+  double T_prev = T_top_prev;
   double z_prev = 0.0;
   for (unsigned int i = 0; i < soil.size (); i++)
     {
@@ -210,9 +215,10 @@ Movement1D::calculate_heat_flux (const Soil& soil,
       const double dT = T_prev - T_next;
       const double dz = z_prev - soil.z (i);
       const double q_water = soil_water.q (i);
-      const double T = (T_prev + T_next) / 2.0;
+      const double T_this = (T_prev + T_next) / 2.0;
 
-      q[i] = - K * dT/dz + water_heat_capacity * rho_water *  q_water * T;
+      heat_flux[i] 
+        = - K * dT/dz + water_heat_capacity * rho_water *  q_water * T_this;
       T_prev = T_next;
       z_prev = soil.z (i);
     }
@@ -226,9 +232,10 @@ Movement1D::calculate_heat_flux (const Soil& soil,
   const double dT = T_prev - T_next;
   const double dz = soil.z (prev-1U) - soil.z (prev);
   const double q_water = soil_water.q (i);
-  const double T = (T_prev + T_next) / 2.0;
+  const double T_this = (T_prev + T_next) / 2.0;
 
-  q[i] = - K * dT/dz - water_heat_capacity * rho_water *  q_water * T;
+  heat_flux[i]
+    = - K * dT/dz - water_heat_capacity * rho_water *  q_water * T_this;
 }
 
 static struct Movement1DSyntax

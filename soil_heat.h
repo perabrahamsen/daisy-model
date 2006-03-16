@@ -43,6 +43,8 @@ class SoilHeat
   Implementation& impl;
 
 public:
+  enum state_t { liquid, freezing, frozen, thawing };
+  state_t state (size_t i) const;
   double capacity (const Soil&, const SoilWater&, size_t i) const;
   double capacity_apparent (const Soil&, const SoilWater&, size_t i) const;
   double top_flux (const Soil&, const SoilWater&) const; // [W/m^2]
@@ -52,7 +54,8 @@ public:
   void set_energy (const Soil&, const SoilWater&, 
 		   double from, double to, double energy);
   void swap (const Soil&, double from, double middle, double to);
-  void set_source (unsigned int i, double value); // [erg/cm^3/h]
+  double source (size_t i) const;
+  void set_source (size_t i, double value); // [erg/cm^3/h]
   double T (unsigned int i) const; // [dg C]
   void output (Log&) const;
   bool check (unsigned n, Treelog&) const;

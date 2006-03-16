@@ -1,7 +1,7 @@
 // soil_heat.C
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2001,2006 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2001,2006 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -54,8 +54,6 @@ struct SoilHeat::Implementation
   vector<double> T_freezing;
   vector<double> T_thawing;
   vector<double> freezing_rate;
-  enum state_t
-    { liquid, freezing, frozen, thawing };
   vector<state_t> state;
   vector<double> q;
   vector<double> S;
@@ -664,6 +662,9 @@ SoilHeat::Implementation::initialize (const AttributeList& al,
   // daisy_assert (T.size () == soil.size ());
 }
 
+SoilHeat::state_t 
+SoilHeat::state (const size_t i) const
+{ return impl.state[i]; }
 
 double 
 SoilHeat::capacity (const Soil& soil, const SoilWater& soil_water, 
@@ -721,8 +722,12 @@ SoilHeat::swap (const Soil& soil, double from, double middle, double to)
   soil.swap (impl.T, from, middle, to);
 }
   
+double 
+SoilHeat::source (const size_t i) const
+{ return impl.S[i]; }
+
 void
-SoilHeat::set_source (unsigned int i, double value)
+SoilHeat::set_source (const size_t i, const double value)
 { impl.S[i] = value; }
 
 
