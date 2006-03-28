@@ -44,6 +44,8 @@ class Movement1D : public Movement
   // Soil heat
   double T_top;
   std::vector<double> heat_flux;
+  void heat_tick (const Time&, const Soil&, SoilWater&, SoilHeat&,
+                  const Surface&, const Weather& weather);
   void heat_solve (const Soil& soil,
                    const SoilHeat& soil_heat,
                    const SoilWater& soil_water,
@@ -80,6 +82,45 @@ public:
   { }
 };
 
+void
+Movement1D::heat_tick (const Time& time,
+                       const Soil& soil,
+                       SoilWater& soil_water, SoilHeat& soil_heat,
+                       const Surface& surface,
+                       const Weather& weather)
+{
+  // Update freezing and melting points.
+  soil_heat.update_freezing_points (soil, soil_water);
+
+  // Solve with old state.
+  T_old = T;
+  heat_solve (time, soil, soil_water, surface, weather);
+
+  // Check if ice is enabled.
+  if (!enable_ice)
+    return;
+
+  // Update state according to new temperatures.
+  const bool changed = soil_heat.update_state (soil, soil_water);
+
+  if (changed)
+    {
+      // Solve again with new state.
+      T = T_old;
+      heat_solve (time, soil, soil_water, surface, weather);
+
+      // Check if state match new temperatures.
+      const bool changed_again = check_state (soil);
+      
+      if (changed_again)
+        {
+          // Force temperatures to match state.
+          soil_heat.force_state (soil);
+        }
+    }
+  // Update ice in water.
+  soil_water.freeze (soil, freezing_rate);
+}
 void
 Movement1D::heat_solve (const Soil& soil,
                         const SoilHeat& soil_heat,

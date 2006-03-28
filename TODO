@@ -2,7 +2,23 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Omorganiser Daisy kode så omsætning er uafhængig af transport
 
+Fluxes need to be with content!
+
 ** Heat først
+
+SoilHeat : T
+
+SoilHeat1D : virtual tick
+
+SoilHeat1DStandard : actual tick
+
+Movement1D
+   SoilHeat1D
+
+
+"Tynd" SoilHeat, der kun har double T (size_t i) const;
+
+Ingen SoilHeat?  Bare "T".  SoilHeat i movement?
 
 Eget komponent?
 
