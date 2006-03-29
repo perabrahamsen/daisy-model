@@ -353,7 +353,7 @@ COMPONENTS = movement.C integer.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = fetch.C horheat.C litter.C time.C \
+SUBMODELS = soil_heat1d.C fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \
 	harvesting.C canopy_simple.C canopy_std.C root_system.C \

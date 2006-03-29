@@ -2,34 +2,15 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Omorganiser Daisy kode så omsætning er uafhængig af transport
 
-Fluxes need to be with content!
+** Hvad nu?
 
-** Heat først
+SoilWater vs. SoilWater1D ?
 
-SoilHeat : T
+Solute?
 
-SoilHeat1D : virtual tick
+DOM?
 
-SoilHeat1DStandard : actual tick
-
-Movement1D
-   SoilHeat1D
-
-
-"Tynd" SoilHeat, der kun har double T (size_t i) const;
-
-Ingen SoilHeat?  Bare "T".  SoilHeat i movement?
-
-Eget komponent?
-
-HeatTrans1DStandard?
-
-** Flyt vandtransport til column.
-
-?  Vand er næsten kun transport...
-
-source/sink, content
---------------------------------------------------
+Macro
 
 * Marts
 

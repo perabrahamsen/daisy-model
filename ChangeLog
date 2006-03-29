@@ -1,3 +1,9 @@
+2006-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (SUBMODELS): Added it.
+
+	* soil_heat1d.C: New submodel.
+
 2006-03-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* soil_heat.C, soil_heat.h (capacity, capacity_apparent): New

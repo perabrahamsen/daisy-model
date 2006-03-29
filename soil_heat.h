@@ -1,7 +1,6 @@
 // soil_heat.h
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -23,48 +22,34 @@
 #ifndef SOIL_HEAT_H
 #define SOIL_HEAT_H
 
-#include <string>
 #include <vector>
 
 class AttributeList;
 class Log;
-class Surface;
-class Bioclimate;
 class Syntax;
 class Soil;
 class SoilWater;
-class Weather;
-class Time;
 class Treelog;
 
 class SoilHeat
 {
-  struct Implementation;
-  Implementation& impl;
-
-  enum state_t { liquid, freezing, frozen, thawing };
-  state_t state (size_t i) const;
-  double capacity (const Soil&, const SoilWater&, size_t i) const;
-  double capacity_apparent (const Soil&, const SoilWater&, size_t i) const;
+  // Simulation.
+protected:
+  std::vector<double> T_;
 public:
-  double top_flux (const Soil&, const SoilWater&) const; // [W/m^2]
-  void tick (const Time&, const Soil&, SoilWater&, 
-	     const Surface&, const Weather& weather);
-  double energy (const Soil&, const SoilWater&, double from, double to) const;
-  void set_energy (const Soil&, const SoilWater&, 
-		   double from, double to, double energy);
-  void swap (const Soil&, double from, double middle, double to);
-  double source (size_t i) const;
-  void set_source (size_t i, double value); // [erg/cm^3/h]
-  double T (unsigned int i) const; // [dg C]
-  void output (Log&) const;
-  bool check (unsigned n, Treelog&) const;
-  static void load_syntax (Syntax&, AttributeList&);
+  double T (const size_t i) const // [dg C]
+  { return T_[i]; }
+  virtual double top_flux (const Soil&, const SoilWater&) const = 0;
+  
+  // Create and destroy.
+public:
+  void output_base (Log&) const;
+  bool check (size_t n, Treelog&) const;
+  static void load_base (Syntax&, AttributeList&);
   SoilHeat (const AttributeList&);
-  void initialize (const AttributeList& al, 
-		   const Soil& soil, const Time& time, const Weather& weather,
-		   Treelog&);
-  ~SoilHeat ();
+  void initialize_base (const AttributeList& al, 
+                        const Soil& soil, Treelog&);
+  virtual ~SoilHeat ();
 };
 
 #endif // SOIL_HEAT_H

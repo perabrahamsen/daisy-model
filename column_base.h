@@ -25,7 +25,7 @@
 #include "surface.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "soil_heat.h"
+#include "soil_heat1d.h"
 #include "soil_chemicals.h"
 #include "chemistry.h"
 #include "groundwater.h"
@@ -51,7 +51,7 @@ protected:
   Surface surface;
   std::auto_ptr<Soil> soil;
   std::auto_ptr<SoilWater> soil_water;
-  SoilHeat soil_heat;
+  SoilHeat1D soil_heat;
   SoilChemicals soil_chemicals;
   std::vector<Chemistry*> chemistry;
   std::auto_ptr<Groundwater> groundwater;

@@ -505,7 +505,7 @@ the simulation.  If unspecified, used global weather.");
 			SoilWater::load_syntax);
   syntax.add_submodule ("SoilHeat", alist, Syntax::State,
 			"Soil heat and flux.",
-			SoilHeat::load_syntax);
+			SoilHeat1D::load_syntax);
   syntax.add_submodule ("SoilChemicals", alist, Syntax::State,
 			"Chemicals in the soil.",
 			SoilChemicals::load_syntax);
