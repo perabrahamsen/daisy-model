@@ -751,7 +751,7 @@ SoilHeat1D::output (Log& log) const
 void
 SoilHeat1D::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  alist.add ("submodel", "SoilHeat1D");
+  alist.add ("submodel", "SoilHeat");
   alist.add ("description", "Temperature and heat flux in soil.");
   SoilHeat::load_base (syntax, alist);
   syntax.add ("h_frozen", "cm^-1", Syntax::Const,
