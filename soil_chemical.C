@@ -22,6 +22,7 @@
 
 #include "soil_chemical.h"
 #include "chemical.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_heat.h"
 #include "soil_water.h"
@@ -44,7 +45,8 @@ SoilChemical::uptake (const Soil& soil,
 }
 
 void 
-SoilChemical::decompose (const Soil& soil, 
+SoilChemical::decompose (const Geometry& geo,
+                         const Soil& soil, 
 			 const SoilWater& soil_water,
 			 const SoilHeat& soil_heat,
 			 const OrganicMatter* organic_matter)
@@ -91,7 +93,7 @@ SoilChemical::decompose (const Soil& soil,
       const double conc_factor
 	= chemical.decompose_conc_factor (C_[i]);
       const double depth_factor
-	= chemical.decompose_depth_factor (soil.z (i));
+	= chemical.decompose_depth_factor (geo.z (i));
       const double rate
 	= decompose_rate * heat_factor * water_factor * CO2_factor
 	* conc_factor * depth_factor;
@@ -137,10 +139,11 @@ When it reached 1.0, decomposition begins.");
 
 void
 SoilChemical::initialize (const AttributeList& al,
-			  const Soil& soil, const SoilWater& soil_water, 
+			  const Geometry& geo,
+                          const Soil& soil, const SoilWater& soil_water, 
 			  Treelog& out)
 {
-  Solute::initialize (al, soil, soil_water, out);
+  Solute::initialize (al, geo, soil, soil_water, out);
   uptaken.insert (uptaken.begin (), soil.size (), 0.0);
   decomposed.insert (decomposed.begin (), soil.size (), 0.0);
   lag.insert (lag.end (), soil.size () - lag.size (), 0.0);

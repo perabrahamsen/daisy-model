@@ -30,7 +30,7 @@ static const double cm2_per_m2 = 1.0 / m2_per_cm2;
 
 void 
 ColumnBase::ridge (const AttributeList& al)
-{ surface.ridge (*soil, *soil_water, al); }
+{ surface.ridge (*soil, *soil, *soil_water, al); }
 
 void 
 ColumnBase::irrigate_overhead (double flux, double temp, const IM&)
@@ -106,9 +106,9 @@ ColumnBase::mix (Treelog& msg, const Time& time,
                         residuals_N_soil, residuals_C_soil, msg);
   add_residuals (residuals);
   const double energy = soil_heat.energy (*soil, *soil_water, from, to);
-  soil_water->mix (*soil, from, to);
+  soil_water->mix (*soil, *soil, from, to);
   soil_heat.set_energy (*soil, *soil_water, from, to, energy);
-  soil_chemicals.mix (*soil, *soil_water, from, to);
+  soil_chemicals.mix (*soil, *soil, *soil_water, from, to);
   surface.unridge ();
 }
 
@@ -118,9 +118,9 @@ ColumnBase::swap (Treelog& msg,
 {
   mix (msg, time, from, middle, 1.0);
   mix (msg, time, middle, to, 0.0);
-  soil_water->swap (msg, *soil, from, middle, to);
+  soil_water->swap (msg, *soil, *soil, from, middle, to);
   soil_heat.swap (*soil, from, middle, to);
-  soil_chemicals.swap (*soil, *soil_water, from, middle, to);
+  soil_chemicals.swap (*soil, *soil, *soil_water, from, middle, to);
 }
 
 void 
@@ -356,7 +356,7 @@ ColumnBase::tick_base (Treelog& msg)
   for (vector<Chemistry*>::const_iterator i = chemistry.begin ();
        i != chemistry.end ();
        i++)
-    (*i)->tick (*soil, *soil_water, soil_chemicals, msg);
+    (*i)->tick (*soil, *soil, *soil_water, soil_chemicals, msg);
 }
 
 void
@@ -446,9 +446,9 @@ ColumnBase::initialize_common (const Time& time, Treelog& err,
   residuals_C_soil.insert (residuals_C_soil.begin (), soil->size (), 0.0);
   daisy_assert (residuals_C_soil.size () == soil->size ());
   groundwater->initialize (*soil, time, err);
-  soil_water->initialize (alist.alist ("SoilWater"), *soil, *groundwater, err);
+  soil_water->initialize (alist.alist ("SoilWater"), *soil, *soil, *groundwater, err);
   soil_chemicals.initialize (alist.alist ("SoilChemicals"),
-                             *soil, *soil_water, err);
+                             *soil, *soil, *soil_water, err);
   for (vector<Chemistry*>::const_iterator i = chemistry.begin ();
        i != chemistry.end ();
        i++)

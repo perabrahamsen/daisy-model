@@ -23,6 +23,7 @@
 #define CRPN_H
 
 class Production;
+class Geometry;
 class Soil;
 class SoilWater;
 class SoilNH4;
@@ -94,7 +95,7 @@ public:
   void clear ();
   void update (int Hour, double& NCrop, double DS,
 	       bool enable_N_stress,
-	       const Soil& soil, const SoilWater& soil_water,
+	       const Geometry&, const Soil& soil, const SoilWater& soil_water,
 	       SoilNH4& soil_NH4, SoilNO3& soil_NO3,
                double day_fraction,
 	       RootSystem& root_system);

@@ -51,7 +51,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Soil&);
+  void initialize (const Geometry&, const Soil&);
   AM* create_am (const Geometry&);
   void set_am (AM*);
   static void load_syntax (Syntax&, AttributeList&);

@@ -36,6 +36,7 @@
 #include "bioclimate.h"
 #include "plf.h"
 #include "soil_water.h"
+#include "geometry.h"
 #include "soil.h"
 #include "organic_matter.h"
 #include "soil_heat.h"
@@ -99,17 +100,19 @@ public:
   void CanopyStructure ()
   { canopy.CanopyStructure (development->DS); }
   double ActualWaterUptake (double Ept, 
+                            const Geometry& geo,
 			    const Soil& soil, SoilWater& soil_water,
 			    double EvapInterception, double day_fraction, 
 			    Treelog& msg)
-  { return root_system->water_uptake (Ept, soil, soil_water, EvapInterception, 
+  { return root_system->water_uptake (Ept, geo, soil, soil_water, EvapInterception, 
 				     day_fraction, msg);}
   void force_production_stress  (double pstress)
   { root_system->production_stress = pstress; }
 
   // Simulation.
 public:
-  void tick (const Time& time, const Bioclimate&, const Soil&,
+  void tick (const Time& time, const Bioclimate&, const Geometry& geo,
+             const Soil&,
 	     OrganicMatter*,
 	     const SoilHeat&,
 	     const SoilWater&,
@@ -201,6 +204,7 @@ CropStandard::initialize (Treelog& msg, const Geometry& geometry,
 void
 CropStandard::tick (const Time& time,
 		    const Bioclimate& bioclimate,
+                    const Geometry& geo,
 		    const Soil& soil,
 		    OrganicMatter* organic_matter,
 		    const SoilHeat& soil_heat,
@@ -242,8 +246,8 @@ CropStandard::tick (const Time& time,
 	  canopy.tick (production.WLeaf, production.WSOrg,
 		       production.WStem, development->DS, -1.0);
 	  nitrogen.content (development->DS, production);
-	  root_system->tick_daily (msg, soil, production.WRoot, 0.0,
-				  development->DS);
+	  root_system->tick_daily (msg, geo, soil, production.WRoot, 0.0,
+                                   development->DS);
 
 	  static const symbol root_symbol ("root");
 	  static const symbol dead_symbol ("dead");
@@ -286,7 +290,7 @@ CropStandard::tick (const Time& time,
       daisy_assert (soil_NH4);
       nitrogen.update (time.hour (), production.NCrop, development->DS,
 		       enable_N_stress,
-		       soil, soil_water, *soil_NH4, *soil_NO3,
+		       geo, soil, soil_water, *soil_NH4, *soil_NO3,
                        bioclimate.day_fraction (),
 		       *root_system);
     }
@@ -356,10 +360,11 @@ CropStandard::tick (const Time& time,
 	       production.WStem, development->DS, ForcedCAI);
 
   development->tick_daily (bioclimate.daily_air_temperature (), 
-			  production.WLeaf, production, vernalization,
-			  harvesting.cut_stress, msg);
-  root_system->tick_daily (msg, soil, production.WRoot, production.IncWRoot,
-			  development->DS);
+                           production.WLeaf, production, vernalization,
+                           harvesting.cut_stress, msg);
+  root_system->tick_daily (msg, geo, soil, 
+                           production.WRoot, production.IncWRoot,
+                           development->DS);
 }
 
 const Harvest&

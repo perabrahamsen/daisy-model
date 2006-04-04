@@ -23,6 +23,7 @@
 #include "root_system.h"
 #include "rootdens.h"
 #include "submodel.h"
+#include "geometry.h"
 #include "soil_heat.h"
 #include "soil_NH4.h"
 #include "soil_NO3.h"
@@ -37,6 +38,7 @@ using namespace std;
 
 double 
 RootSystem::potential_water_uptake (const double h_x,
+                                    const Geometry& geo,
 				    const Soil& soil,
 				    const SoilWater& soil_water)
 {
@@ -52,7 +54,7 @@ RootSystem::potential_water_uptake (const double h_x,
 	  S[i] = 0.0;
 	  continue;
 	}
-      const double h = h_x - (1 + Rxylem) * soil.z (i);
+      const double h = h_x - (1 + Rxylem) * geo.z (i);
       daisy_assert (soil_water.Theta_left (i) >= 0.0);
       daisy_assert (soil_water.Theta (soil, i, h_wp) >= soil.Theta_res (i));
       const double max_uptake
@@ -77,13 +79,14 @@ RootSystem::potential_water_uptake (const double h_x,
       daisy_assert ((- 0.5 * log (area * L[i])) != 0.0);
       daisy_assert (uptake >= 0.0);
       S[i] = uptake;
-      total += uptake * soil.dz (i) * 10; // mm/cm.
+      total += uptake * geo.dz (i) * 10; // mm/cm.
     }
   return total;
 }
 
 double
 RootSystem::water_uptake (double Ept_,
+                          const Geometry& geo,
 			  const Soil& soil,
 			  SoilWater& soil_water,
 			  const double EvapInterception,
@@ -102,13 +105,14 @@ RootSystem::water_uptake (double Ept_,
   Ept = Ept_;
 
   static const double min_step = 1.0;
-  double total = potential_water_uptake (h_x, soil, soil_water);
+  double total = potential_water_uptake (h_x, geo, soil, soil_water);
   double step = min_step;
 
   while (total < Ept && h_x > h_wp)
     {
       const double h_next = max (h_x - step, h_wp);
-      const double next = potential_water_uptake (h_next, soil, soil_water);
+      const double next = potential_water_uptake (h_next, geo, 
+                                                  soil, soil_water);
 
       if (next < total)
 	// We are past the top of the curve.
@@ -116,7 +120,7 @@ RootSystem::water_uptake (double Ept_,
 	  // We cannot go any closer to the top, skip it.
 	  {
 	    h_x = h_wp;
-	    total = potential_water_uptake (h_x, soil, soil_water);
+	    total = potential_water_uptake (h_x, geo, soil, soil_water);
 	    break;
 	  }
 	else
@@ -138,7 +142,8 @@ RootSystem::water_uptake (double Ept_,
     {
       daisy_assert (h_x < 0.001);
       const double h_next = min (h_x + step, 0.0);
-      const double next = potential_water_uptake (h_next, soil, soil_water);
+      const double next = potential_water_uptake (h_next, geo, 
+                                                  soil, soil_water);
 
       if (next < Ept)
 	// We went too far.
@@ -168,7 +173,7 @@ RootSystem::water_uptake (double Ept_,
     }
 
   // We need this to make sure H2OExtraction corresponds to 'h_x'.
-  const double total2 = potential_water_uptake (h_x, soil, soil_water);
+  const double total2 = potential_water_uptake (h_x, geo, soil, soil_water);
   daisy_assert (total == total2);
   daisy_assert (h_x >= h_wp);
 
@@ -196,7 +201,7 @@ RootSystem::water_uptake (double Ept_,
 }
 
 double
-RootSystem::solute_uptake (const Soil& soil,
+RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 			   const SoilWater& soil_water,
 			   Solute& solute,
 			   double PotNUpt,
@@ -258,8 +263,8 @@ RootSystem::solute_uptake (const Soil& soil,
 	    }
 	  daisy_assert (isfinite (I_zero[i]));
 	  daisy_assert (isfinite (B_zero[i]));
-	  B += L * soil.dz (i) * B_zero[i];
-	  U_zero += L * soil.dz (i) 
+	  B += L * geo.dz (i) * B_zero[i];
+	  U_zero += L * geo.dz (i) 
 	    * bound (0.0, I_zero[i] - B_zero[i] * C_root_min, I_max);
 	}
     }
@@ -282,11 +287,11 @@ RootSystem::solute_uptake (const Soil& soil,
   solute.add_to_root_sink (uptake);
 
   // gN/cm³/h -> gN/m²/h
-  return soil.total (uptake) * 1.0e4;
+  return geo.total (uptake) * 1.0e4;
 }
 
 double
-RootSystem::nitrogen_uptake (const Soil& soil,
+RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
 			     const SoilWater& soil_water,
 			     SoilNH4& soil_NH4,
 			     const double NH4_root_min,
@@ -294,9 +299,9 @@ RootSystem::nitrogen_uptake (const Soil& soil,
 			     const double NO3_root_min,
 			     const double PotNUpt)
 {
-  NH4Upt = solute_uptake (soil, soil_water, soil_NH4, 
+  NH4Upt = solute_uptake (geo, soil, soil_water, soil_NH4, 
 			  PotNUpt, NH4Extraction, MxNH4Up, NH4_root_min);
-  NO3Upt = solute_uptake (soil, soil_water, soil_NO3, 
+  NO3Upt = solute_uptake (geo, soil, soil_water, soil_NO3, 
 			  PotNUpt - NH4Upt, NO3Extraction, 
 			  MxNO3Up, NO3_root_min);
 
@@ -321,14 +326,14 @@ RootSystem::tick_hourly (int hour, double T)
 }
 
 void
-RootSystem::tick_daily (Treelog& msg, const Soil& soil, 
+RootSystem::tick_daily (Treelog& msg, const Geometry& geo, const Soil& soil, 
 			const double WRoot, const double IncWRoot,
 			const double DS)
 {
   // Penetration.
   if (IncWRoot > 0)
     {
-      const int i = soil.interval_plus (-Depth);
+      const int i = geo.interval_plus (-Depth);
       double clay_fac = PenClayFac (soil.clay (i));
       double dp = PenPar1 * clay_fac * max (0.0, soil_temperature - PenPar2);
       PotRtDpt = min (PotRtDpt + dp, MaxPen);
@@ -338,7 +343,7 @@ RootSystem::tick_daily (Treelog& msg, const Soil& soil,
       /*max depth determined by crop*/
       Depth = min (Depth, -soil.MaxRootingDepth ()); /*or by soil conditions*/
     }
-  set_density (msg, soil, WRoot, DS);
+  set_density (msg, geo, WRoot, DS);
 }
 
 void
@@ -347,12 +352,13 @@ RootSystem::set_density (Treelog& msg, const Geometry& geometry,
 { rootdens->set_density (msg, Density, geometry, Depth, PotRtDpt, WRoot, DS); }
 
 void
-RootSystem::full_grown (Treelog& msg, const Soil& soil, 
+RootSystem::full_grown (Treelog& msg, const Geometry& geometry, 
+                        const double max_rooting_depth,
 			const double WRoot)
 {
   PotRtDpt = MaxPen;
-  Depth = min (MaxPen, -soil.MaxRootingDepth ());
-  set_density (msg, soil, WRoot, 1.0);
+  Depth = min (MaxPen, -max_rooting_depth);
+  set_density (msg, geometry, WRoot, 1.0);
 }
 
 void

@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "uzmodel.h"
 #include "soil.h"
+#include "geometry.h"
 #include "surface.h"
 #include "groundwater.h"
 #include "submodeler.h"
@@ -74,19 +75,23 @@ public:
   // Simulation.
 public:
   void macro_tick (const Soil&, Surface&, Treelog&);
-  void tick (const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
+  void tick (const Geometry& geo,
+             const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
   void set_external_source (const Geometry&, 
 			    double amount, double from, double to);
   void incorporate (const Geometry&, double amount, double from, double to);
-  void mix (const Soil&, double from, double to);
-  void swap (Treelog&, const Soil&, double from, double middle, double to);
+  void mix (const Geometry& geo,
+            const Soil&, double from, double to);
+  void swap (Treelog&, const Geometry& geo,
+             const Soil&, double from, double middle, double to);
   void set_Theta (const Soil& soil, 
 		  unsigned int from, unsigned int to, double Theta);
   bool check (unsigned n, Treelog& err) const;
   void output (Log&) const;
 
   // Communication with surface.
-  double MaxExfiltration (const Soil&, double T) const;
+  double MaxExfiltration (const Geometry& geo,
+                          const Soil&, double T) const;
 
   // Communication with external model.
   void put_h (const Soil& soil, const std::vector<double>& v); // [cm]
@@ -95,7 +100,8 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   Implementation (Block&);
   void initialize (const AttributeList&, 
-		   const Soil& soil, const Groundwater& groundwater,
+		   const Geometry& geo,
+                   const Soil& soil, const Groundwater& groundwater,
 		   Treelog&);
   ~Implementation ();
 };
@@ -173,7 +179,8 @@ SoilWater::Implementation::macro_tick (const Soil& soil, Surface& surface,
 }
 
 void
-SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat, 
+SoilWater::Implementation::tick (const Geometry& geo,
+                                 const Soil& soil, const SoilHeat& soil_heat, 
 				 Surface& surface, Groundwater& groundwater,
 				 Treelog& msg)
 {
@@ -240,16 +247,16 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
   if (groundwater.bottom_type () == Groundwater::pressure)
     {
       daisy_assert (soil.size () > 1);
-      if (groundwater.table () <= soil.zplus (soil.size () - 2))
+      if (groundwater.table () <= geo.zplus (soil.size () - 2))
 	throw ("Groundwater table in or below lowest node.");
-      last = soil.interval_plus (groundwater.table ());
+      last = geo.interval_plus (groundwater.table ());
       if (last >=  soil.size () - 1)
 	daisy_assert ("Groundwater too low.");
       // Pressure at the last node is equal to the water above it.
       for (unsigned int i = last + 1; i < soil.size (); i++)
 	{
-	  h_old[i] = groundwater.table () - soil.z (i);
-	  h[i] = groundwater.table () - soil.z (i);
+	  h_old[i] = groundwater.table () - geo.z (i);
+	  h[i] = groundwater.table () - geo.z (i);
 	}
     }
 
@@ -326,18 +333,20 @@ SoilWater::Implementation::incorporate (const Geometry& geometry,
 }
 
 void
-SoilWater::Implementation::mix (const Soil& soil, double from, double to)
+SoilWater::Implementation::mix (const Geometry& geo,
+                                const Soil& soil, double from, double to)
 {
-  soil.mix (Theta, from, to, tillage);
+  geo.mix (Theta, from, to, tillage);
   for (unsigned int i = 0; i < soil.size(); i++)
     h[i] = soil.h (i, Theta[i]);
 }
 
 void
-SoilWater::Implementation::swap (Treelog& msg, const Soil& soil,
+SoilWater::Implementation::swap (Treelog& msg, const Geometry& geo,
+                                 const Soil& soil,
 				 double from, double middle, double to)
 {
-  soil.swap (Theta, from, middle, to, tillage);
+  geo.swap (Theta, from, middle, to, tillage);
 
   for (unsigned int i = 0; i < soil.size(); i++)
     {
@@ -430,10 +439,11 @@ SoilWater::Implementation::output (Log& log) const
 }
 
 double
-SoilWater::Implementation::MaxExfiltration (const Soil& soil, double T) const
+SoilWater::Implementation::MaxExfiltration (const Geometry& geo,
+                                            const Soil& soil, double T) const
 {
   return - ((soil.K (0, h[0], h_ice[0], T) / soil.Cw2 (0, h[0])) 
-	    * ((Theta[0] - soil.Theta_res (0)) / soil.z(0)));
+	    * ((Theta[0] - soil.Theta_res (0)) / geo.z(0)));
 }
 
 void 
@@ -460,7 +470,8 @@ SoilWater::Implementation::Implementation (Block& al)
 
 void
 SoilWater::Implementation::initialize (const AttributeList& al,
-				       const Soil& soil,
+				       const Geometry& geo,
+                                       const Soil& soil,
 				       const Groundwater& groundwater, 
 				       Treelog& out)
 {
@@ -498,8 +509,8 @@ SoilWater::Implementation::initialize (const AttributeList& al,
       h_ice[i] = soil.h (i, Theta_sat - X_ice[i]);
     }
 
-  soil.initialize_layer (Theta, al, "Theta", out);
-  soil.initialize_layer (h, al, "h", out);
+  geo.initialize_layer (Theta, al, "Theta", out);
+  geo.initialize_layer (h, al, "h", out);
 
   for (int i = 0; i < Theta.size () && i < h.size (); i++)
     {
@@ -561,7 +572,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
 	  
 	  for (unsigned int i = 0; i < soil.size (); i++)
 	    {
-	      h.push_back (std::max (-100.0, table - soil.z (i)));
+	      h.push_back (std::max (-100.0, table - geo.z (i)));
 	      Theta.push_back (soil.Theta (i, h[i], h_ice[i]));
 	    }
 	}
@@ -584,7 +595,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
 	lay++;
 
       // Don't go below 1.5 m.
-      double height = std::max (soil.zplus (lay-1), -150.0);
+      double height = std::max (geo.zplus (lay-1), -150.0);
 
       // Don't go below drain pipes.
       if (groundwater.is_pipe ())
@@ -707,10 +718,11 @@ SoilWater::macro_tick (const Soil& soil, Surface& surface, Treelog& out)
 { impl->macro_tick (soil, surface, out); }
 
 void
-SoilWater::tick (const Soil& soil, const SoilHeat& soil_heat, 
+SoilWater::tick (const Geometry& geo,
+                 const Soil& soil, const SoilHeat& soil_heat, 
 		 Surface& surface, Groundwater& groundwater,
 		 Treelog& msg)
-{ impl->tick (soil, soil_heat, surface, groundwater, msg); }
+{ impl->tick (geo, soil, soil_heat, surface, groundwater, msg); }
 
 void 
 SoilWater::set_external_source (const Geometry& geometry, 
@@ -723,13 +735,15 @@ SoilWater::incorporate (const Geometry& geometry,
 { impl->incorporate (geometry, amount, from, to); }
 
 void
-SoilWater::mix (const Soil& soil, double from, double to)
-{ impl->mix (soil, from, to); }
+SoilWater::mix (const Geometry& geo,
+                const Soil& soil, double from, double to)
+{ impl->mix (geo, soil, from, to); }
 
 void
 SoilWater::swap (Treelog& msg,
-		 const Soil& soil, double from, double middle, double to)
-{ impl->swap (msg, soil, from, middle, to); }
+		 const Geometry& geo,
+                 const Soil& soil, double from, double middle, double to)
+{ impl->swap (msg, geo, soil, from, middle, to); }
   
 void
 SoilWater::set_Theta (const Soil& soil, 
@@ -745,8 +759,9 @@ SoilWater::output (Log& log) const
 { impl->output (log); }
 
 double
-SoilWater::MaxExfiltration (const Soil& soil, double T) const
-{ return impl->MaxExfiltration (soil, T); }
+SoilWater::MaxExfiltration (const Geometry& geo,
+                            const Soil& soil, double T) const
+{ return impl->MaxExfiltration (geo, soil, T); }
 
 void 
 SoilWater::put_h (const Soil& soil, const std::vector<double>& v) // [cm]
@@ -830,9 +845,10 @@ SoilWater::SoilWater (Block& al)
 
 void
 SoilWater::initialize (const AttributeList& al,
-		       const Soil& soil, const Groundwater& groundwater, 
+		       const Geometry& geo,
+                       const Soil& soil, const Groundwater& groundwater, 
 		       Treelog& out)
-{ impl->initialize (al, soil, groundwater, out); }
+{ impl->initialize (al, geo, soil, groundwater, out); }
 
 SoilWater::~SoilWater ()
 { }

@@ -73,7 +73,8 @@ public:
 
   // Simulation
 public:
-  virtual void tick (const Time&, const Bioclimate&, const Soil&,
+  virtual void tick (const Time&, const Bioclimate&, 
+                     const Geometry&, const Soil&,
 		     OrganicMatter *const, const SoilHeat&, const SoilWater&,
 		     // Allow plants to grow (hourly).
 		     SoilNH4 *const, SoilNO3 *const, 
@@ -85,6 +86,7 @@ public:
   virtual double transpiration (// Actual trans. [mm/h]
 				double potential_transpiration,	
 				double canopy_evaporation,
+                                const Geometry& geo,
 				const Soil& soil, SoilWater& soil_water,
 				double day_fraction, Treelog&) = 0;
   virtual void force_production_stress  (double pstress) = 0;
@@ -130,7 +132,8 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Time&, const Soil& soil, OrganicMatter *const,
+  virtual void initialize (const Time&, const Geometry& geo,
+                           const Soil& soil, OrganicMatter *const,
                            Treelog&) = 0;
   static void load_syntax (Syntax&, AttributeList&);
   explicit Vegetation (Block&);

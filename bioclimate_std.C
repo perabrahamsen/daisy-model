@@ -108,7 +108,8 @@ struct BioclimateStandard : public Bioclimate
 
   void WaterDistribution (const Time&,
                           Surface& surface, const Weather& weather, 
-			  Vegetation& vegetation, const Soil& soil,
+			  Vegetation& vegetation, const Geometry& geo,
+                          const Soil& soil,
 			  SoilWater& soil_water, const SoilHeat&, Treelog&);
 
   // Chemicals.
@@ -139,7 +140,8 @@ struct BioclimateStandard : public Bioclimate
 
   // Simulation
   void tick (const Time&, Surface&, const Weather&, 
-	     Vegetation&, const Soil&, SoilWater&, const SoilHeat&, Treelog&);
+	     Vegetation&, const Geometry& geo,
+             const Soil&, SoilWater&, const SoilHeat&, Treelog&);
   void output (Log&) const;
 
   // Canopy.
@@ -358,6 +360,7 @@ void
 BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 				       const Weather& weather, 
 				       Vegetation& vegetation,
+                                       const Geometry& geo,
 				       const Soil& soil, 
 				       SoilWater& soil_water,
 				       const SoilHeat& soil_heat, Treelog& msg)
@@ -404,7 +407,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 	 + rain * air_temperature) / snow_water_in;
   else
     snow_water_in_temperature = air_temperature;
-  snow.tick (msg, soil, soil_water, soil_heat, 
+  snow.tick (msg, geo, soil, soil_water, soil_heat, 
 	     weather.hourly_global_radiation (), 0.0,
 	     snow_water_in, weather.snow (),
 	     surface.ponding (),
@@ -545,7 +548,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 
   surface.tick (msg, pond_ep, 
 		litter_water_out, litter_water_temperature, 
-		soil, soil_water, soil_heat.T (0));
+		geo, soil, soil_water, soil_heat.T (0));
   pond_ea = surface.evap_pond (msg);
   daisy_assert (pond_ea >= 0.0);
   total_ea += pond_ea;
@@ -575,7 +578,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     = (daily_global_radiation_ > 0.0)
     ? (weather.hourly_global_radiation () / (24.0 * daily_global_radiation_))
     : 0.0;
-  crop_ea = vegetation.transpiration (crop_ep, canopy_ea, soil, soil_water, 
+  crop_ea = vegetation.transpiration (crop_ep, canopy_ea, geo, soil,
+                                      soil_water, 
 				      day_fraction, msg);
   daisy_assert (crop_ea >= 0.0);
   total_ea += crop_ea;
@@ -607,7 +611,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 void 
 BioclimateStandard::tick (const Time& time, 
                           Surface& surface, const Weather& weather,  
-			  Vegetation& vegetation, const Soil& soil, 
+			  Vegetation& vegetation, const Geometry& geo,
+                          const Soil& soil, 
 			  SoilWater& soil_water, const SoilHeat& soil_heat,
 			  Treelog& msg)
 {
@@ -630,7 +635,7 @@ BioclimateStandard::tick (const Time& time,
 
   // Distribute water among canopy, snow, and soil.
   WaterDistribution (time, surface, weather, vegetation,
-		     soil, soil_water, soil_heat, msg);
+		     geo, soil, soil_water, soil_heat, msg);
 
   // Let the chemicals follow the water.
   ChemicalDistribution (surface, vegetation);

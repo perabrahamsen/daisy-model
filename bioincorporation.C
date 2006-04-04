@@ -24,6 +24,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "log.h"
+#include "geometry.h"
 #include "soil.h"
 #include "am.h"
 #include "submodel.h"
@@ -71,7 +72,7 @@ struct Bioincorporation::Implementation
 	    double amount) const;
 
   // Create and destroy.
-  void initialize (const Soil&);
+  void initialize (const Geometry&, const Soil&);
   AM* create_am (const Geometry& geometry);
   void set_am (AM*);
   Implementation (const AttributeList& al);
@@ -227,7 +228,8 @@ Bioincorporation::Implementation::add (const Geometry& geometry,
 { geometry.add (input, density, amount /* * (1.0 - respiration) */); }
 
 void 
-Bioincorporation::Implementation::initialize (const Soil& soil)
+Bioincorporation::Implementation::initialize (const Geometry& geo,
+                                              const Soil& soil)
 { 
   // Calculate distribution density for all nodes.
   double last = 0.0;
@@ -235,9 +237,9 @@ Bioincorporation::Implementation::initialize (const Soil& soil)
        i < soil.size () && last > soil.MaxRootingDepth ();
        i++)
     {
-      const double next = soil.zplus (i);
+      const double next = geo.zplus (i);
       const double dz = last - next;
-      daisy_assert (approximate (dz, soil.dz (i)));
+      daisy_assert (approximate (dz, geo.dz (i)));
       const double total = distribution.integrate (next, last);
       density.push_back (total / dz);
       last = next;
@@ -292,8 +294,9 @@ Bioincorporation::add (const Geometry& geometry, std::vector<double>& input,
 { impl.add (geometry, input, amount); }
 
 void 
-Bioincorporation::initialize (const Soil& soil)
-{ impl.initialize (soil); }
+Bioincorporation::initialize (const Geometry& geo,
+                              const Soil& soil)
+{ impl.initialize (geo, soil); }
 
 AM*
 Bioincorporation::create_am (const Geometry& geometry)

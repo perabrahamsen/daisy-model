@@ -66,6 +66,7 @@ Denitrification::output (Log& log) const
 }
 
 void Denitrification::tick (const size_t size,
+                            const Geometry& geo,
                             const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    SoilNO3& soil_NO3, 
@@ -86,7 +87,7 @@ void Denitrification::tick (const size_t size,
       const double Theta_fraction = Theta / Theta_sat;
       const double NO3 = soil_NO3.M_left (i) / dt;
       const double T = soil_heat.T (i);
-      const double height = soil.z (i);
+      const double height = geo.z (i);
       const double T_factor = (heat_factor.size () < 1)
 	? f_T (T)
 	: heat_factor (T);

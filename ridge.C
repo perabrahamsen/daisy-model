@@ -22,6 +22,7 @@
 
 #include "ridge.h"
 #include "soil.h"
+#include "geometry.h"
 #include "plf.h"
 #include "submodel.h"
 #include "syntax.h"
@@ -64,16 +65,17 @@ struct Ridge::Implementation
   double I;			// Total infiltration [cm/h]
   
   // Simulation.
-  void tick (const Soil&, const SoilWater&, 
+  void tick (const Geometry& geo, const Soil&, const SoilWater&, 
 	     double external_ponding /* [cm] */);
-  void update_water (const Soil&, const vector<double>& S_,
+  void update_water (const Geometry& geo,
+                     const Soil&, const vector<double>& S_,
 		     vector<double>& h_, vector<double>& Theta_,
 		     vector<double>& q, const vector<double>& q_p);
   void output (Log& log) const;
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);
-  void initialize (const Soil&, const SoilWater&);
+  void initialize (const Geometry& geo, const Soil&, const SoilWater&);
   static PLF normalize (PLF plf);
   Implementation (const AttributeList&);
   ~Implementation ();
@@ -82,12 +84,14 @@ struct Ridge::Implementation
 static const double x_width = 1.0;
 
 void 
-Ridge::tick (const Soil& soil, const SoilWater& soil_water,
+Ridge::tick (const Geometry& geo,
+             const Soil& soil, const SoilWater& soil_water,
 	     double external_ponding)
-{ impl.tick (soil, soil_water, external_ponding * 0.1 /* mm -> cm */); }
+{ impl.tick (geo, soil, soil_water, external_ponding * 0.1 /* mm -> cm */); }
 
 void 
-Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
+Ridge::Implementation::tick (const Geometry& geo,
+                             const Soil& soil, const SoilWater& soil_water,
 			     double external_ponding)
 {
   // First, we need to find the internal ponding height. 
@@ -316,7 +320,7 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   // Update water.
   Theta = I * dt;
   for (int i = 0; i <= last_node; i++)
-    Theta += soil_water.Theta (i) * soil.dz (i);
+    Theta += soil_water.Theta (i) * geo.dz (i);
   Theta /= dz;
   Theta_pre = Theta;
   daisy_assert (Theta < soil.Theta (0, 0.0, 0.0));
@@ -324,16 +328,18 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 }
 
 void
-Ridge::update_water (const Soil& soil,
+Ridge::update_water (const Geometry& geo,
+                     const Soil& soil,
 		     const vector<double>& S_,
 		     vector<double>& h_,
 		     vector<double>& Theta_,
 		     vector<double>& q,
 		     const vector<double>& q_p)
-{ impl.update_water (soil, S_, h_, Theta_, q, q_p); }
+{ impl.update_water (geo, soil, S_, h_, Theta_, q, q_p); }
 
 void
-Ridge::Implementation::update_water (const Soil& soil,
+Ridge::Implementation::update_water (const Geometry& geo,
+                                     const Soil& soil,
 				     const vector<double>& S_,
 				     vector<double>& h_,
 				     vector<double>& Theta_,
@@ -343,7 +349,7 @@ Ridge::Implementation::update_water (const Soil& soil,
   const double E = -(q[last_node + 1] + q_p[last_node + 1]);
   Theta = (I - E) * dt;
   for (int i = 0; i <= last_node; i++)
-    Theta += (Theta_[i] - S_[i] * dt) * soil.dz (i);
+    Theta += (Theta_[i] - S_[i] * dt) * geo.dz (i);
   Theta /= dz;
   const double Theta_sat = soil.Theta (0, 0.0, 0.0);
   daisy_assert (Theta < Theta_sat);
@@ -352,7 +358,7 @@ Ridge::Implementation::update_water (const Soil& soil,
   q[0] = -I;
   for (int i = 0; i <= last_node; i++)
     {
-      q[i+1] = q[i] + soil.dz (i) * (S_[i] + (Theta - Theta_[i]) / dt ) 
+      q[i+1] = q[i] + geo.dz (i) * (S_[i] + (Theta - Theta_[i]) / dt ) 
 	- q_p[i+1];
       Theta_[i] = Theta;
       h_[i] = h;
@@ -400,22 +406,25 @@ Ridge::exfiltration () const
 { return -impl.I * 10; }
 
 void 
-Ridge::initialize (const Soil& soil, const SoilWater& soil_water)
-{ impl.initialize (soil, soil_water); }
+Ridge::initialize (const Geometry& geo,
+                   const Soil& soil, const SoilWater& soil_water)
+{ impl.initialize (geo, soil, soil_water); }
 
 void 
-Ridge::Implementation::initialize (const Soil& soil, const SoilWater& soil_water)
+Ridge::Implementation::initialize (const Geometry& geo,
+                                   const Soil& soil,
+                                   const SoilWater& soil_water)
 {
   // Find values depending on soil numerics.
-  last_node = soil.interval_plus (lowest);
+  last_node = geo.interval_plus (lowest);
   daisy_assert (last_node+1 < soil.size ());
-  dz = 0 - soil.zplus (last_node);
+  dz = 0 - geo.zplus (last_node);
   K_sat_below = soil.K (last_node+1, 0.0, 0.0, 20.0);
 
   // Initialize water content.
   Theta = 0.0;
   for (int i = 0; i <= last_node; i++)
-    Theta += soil_water.Theta (i) * soil.dz (i);
+    Theta += soil_water.Theta (i) * geo.dz (i);
   Theta /= dz;
   Theta_pre = Theta;
   daisy_assert (Theta < soil.Theta (0, 0.0, 0.0));

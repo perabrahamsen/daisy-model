@@ -352,9 +352,9 @@ ColumnStandard::mix (Treelog& out, const Time& time,
 		     double from, double to, double penetration)
 {
   ColumnBase::mix (out, time, from, to, penetration);
-  soil_NO3.mix (*soil, *soil_water, from, to);
-  soil_NH4.mix (*soil, *soil_water, from, to);
-  organic_matter->mix (*soil, *soil_water, from, to, penetration, time);
+  soil_NO3.mix (*soil, *soil, *soil_water, from, to);
+  soil_NH4.mix (*soil, *soil, *soil_water, from, to);
+  organic_matter->mix (*soil, *soil, *soil_water, from, to, penetration, time);
 }
 
 void 
@@ -362,9 +362,9 @@ ColumnStandard::swap (Treelog& out,
 		      const Time& time, double from, double middle, double to)
 {
   ColumnBase::swap (out, time, from, middle, to);
-  soil_NO3.swap (*soil, *soil_water, from, middle, to);
-  soil_NH4.swap (*soil, *soil_water, from, middle, to);
-  organic_matter->swap (*soil, *soil_water, from, middle, to, time);
+  soil_NO3.swap (*soil, *soil, *soil_water, from, middle, to);
+  soil_NH4.swap (*soil, *soil, *soil_water, from, middle, to);
+  organic_matter->swap (*soil, *soil, *soil_water, from, middle, to, time);
 }
 
 double				// [kg N/ha]
@@ -451,29 +451,30 @@ ColumnStandard::tick (Treelog& out,
   soil_water->macro_tick (*soil, surface, out);
 
   bioclimate->tick (time, surface, my_weather, 
-                    *vegetation, *soil, *soil_water, soil_heat, out);
-  vegetation->tick (time, *bioclimate, *soil, organic_matter.get (), 
+                    *vegetation, *soil, *soil, *soil_water, soil_heat, out);
+  vegetation->tick (time, *bioclimate, *soil, *soil, organic_matter.get (), 
                     soil_heat, *soil_water, &soil_NH4, &soil_NO3, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, out);
-  organic_matter->tick (*soil, *soil_water, soil_heat, 
+  organic_matter->tick (*soil, *soil, *soil_water, soil_heat, 
 		       soil_NO3, soil_NH4, out);
   const size_t active_size 
-    = organic_matter->active_size (*soil, *soil_water);
+    = organic_matter->active_size (*soil, *soil, *soil_water);
   nitrification.tick (active_size,
                       *soil, *soil_water, soil_heat, soil_NO3, soil_NH4);
-  denitrification.tick (active_size, *soil, *soil_water, soil_heat, soil_NO3, 
+  denitrification.tick (active_size, *soil, *soil, *soil_water, soil_heat, soil_NO3, 
 			*organic_matter);
   groundwater->tick (*soil, *soil_water, surface.h (), soil_heat, time, out);
 
   // Transport.
   soil_heat.tick (time, *soil, *soil_water, surface, my_weather);
-  soil_water->tick (*soil, soil_heat, surface, *groundwater, out);
-  soil_chemicals.tick (*soil, *soil_water, soil_heat, organic_matter.get (),
+  soil_water->tick (*soil, *soil, soil_heat, surface, *groundwater, out);
+  soil_chemicals.tick (*soil, *soil, *soil_water, soil_heat,
+                       organic_matter.get (),
 		       surface.chemicals_down (), out);
-  organic_matter->transport (*soil, *soil_water, out);
-  soil_NO3.tick (*soil, *soil_water, surface.matter_flux ().NO3, out);
-  soil_NH4.tick (*soil, *soil_water, surface.matter_flux ().NH4, out);
+  organic_matter->transport (*soil, *soil, *soil_water, out);
+  soil_NO3.tick (*soil, *soil, *soil_water, surface.matter_flux ().NO3, out);
+  soil_NH4.tick (*soil, *soil, *soil_water, surface.matter_flux ().NH4, out);
   
   // Once a month we clean up old AM from organic matter.
   if (time.hour () == 13 && time.mday () == 13)
@@ -568,17 +569,20 @@ ColumnStandard::initialize (const Time& time, Treelog& err,
   soil->initialize (*groundwater, organic_matter->som_pools (), err);
   if (!initialize_common (time, err, global_weather))
     return;
-  soil_NH4.initialize (alist.alist ("SoilNH4"), *soil, *soil_water, err);
-  soil_NO3.initialize (alist.alist ("SoilNO3"), *soil, *soil_water, err);
+  soil_NH4.initialize (alist.alist ("SoilNH4"),
+                       *soil, *soil, *soil_water, err);
+  soil_NO3.initialize (alist.alist ("SoilNO3"), 
+                       *soil, *soil, *soil_water, err);
   nitrification.initialize (soil->size ());
   if (!global_weather && !weather)
     return;
   const double T_avg = weather // Must be after initialize_common.
     ? weather->average_temperature ()
     : global_weather->average_temperature ();
-  organic_matter->initialize (alist.alist ("OrganicMatter"), *soil, *soil_water, 
-			     T_avg, err);
-  vegetation->initialize (time, *soil, organic_matter.get (), err);
+  organic_matter->initialize (alist.alist ("OrganicMatter"), 
+                              *soil, *soil, *soil_water, 
+                              T_avg, err);
+  vegetation->initialize (time, *soil, *soil, organic_matter.get (), err);
 }
 
 ColumnStandard::~ColumnStandard ()

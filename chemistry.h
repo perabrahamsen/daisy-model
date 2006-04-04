@@ -24,6 +24,7 @@
 
 #include "librarian.h"
 
+class Geometry;
 class Soil;
 class SoilWater;
 class SoilChemicals;
@@ -38,7 +39,8 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Soil&, const SoilWater&, 
+  virtual void tick (const Geometry& geo,
+                     const Soil&, const SoilWater&, 
                      SoilChemicals&, Treelog&) = 0;
   virtual void output (Log&) const = 0;
 

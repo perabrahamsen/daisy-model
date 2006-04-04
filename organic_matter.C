@@ -31,6 +31,7 @@
 #include "dom.h"
 #include "aom.h"
 #include "soil.h"
+#include "geometry.h"
 #include "soil_water.h"
 #include "soil_NH4.h"
 #include "soil_NO3.h"
@@ -141,7 +142,8 @@ struct OrganicMatter::Implementation
     static bool check_alist (const AttributeList&, Treelog&);
   public:
     static void load_syntax (Syntax&, AttributeList&);
-    Initialization (const AttributeList&, const Soil& soil, 
+    Initialization (const AttributeList&, const Geometry& geo,
+                    const Soil& soil, 
                     const Bioincorporation& bioincorporation, 
 		    const vector<SOM*>& som, double T_avg);
     ~Initialization ();
@@ -164,8 +166,8 @@ struct OrganicMatter::Implementation
 
   // Simulation.
   void add (AM&);
-  void fertilize (const AttributeList&, const Soil&);
-  void fertilize (const AttributeList&, const Soil&,
+  void fertilize (const AttributeList&, const Geometry&);
+  void fertilize (const AttributeList&, const Geometry&,
                   double from, double to);
   void clear (); 
   void monthly (const Geometry&);
@@ -185,14 +187,16 @@ struct OrganicMatter::Implementation
 			      const vector<double>& default_value,
 			      bool use_clay,
 			      vector<double>& scratch) const;
-  size_t active_size (const Soil&, const SoilWater&) const;
-  void tick (const Soil&, const SoilWater&, const SoilHeat&,
+  size_t active_size (const Geometry& geo,
+                      const Soil&, const SoilWater&) const;
+  void tick (const Geometry& geo,
+             const Soil&, const SoilWater&, const SoilHeat&,
 	     SoilNO3&, SoilNH4&, Treelog& msg);
-  void transport (const Soil&, const SoilWater&, Treelog&);
-  void mix (const Soil&, const SoilWater&, 
+  void transport (const Geometry&, const Soil&, const SoilWater&, Treelog&);
+  void mix (const Geometry&, const Soil&, const SoilWater&, 
 	    double from, double to, double penetration,
 	    const Time& time);
-  void swap (const Soil&, const SoilWater&, 
+  void swap (const Geometry&, const Soil&, const SoilWater&, 
 	     double from, double middle, double to,
 	     const Time& time);
   void output (Log&, const Geometry&) const;
@@ -245,10 +249,12 @@ struct OrganicMatter::Implementation
 		     const double total_C_per_N,
 		     const vector<double>& SOM_C_per_N_goal,
 		     const vector<double>& SMB_results, int lay);
-  string top_summary (const Soil&, const Initialization&,
+  string top_summary (const Geometry& geo,
+                      const Soil&, const Initialization&,
                       const double zone_delta_N, 
                       const double zone_delta_C) const;
-  void initialize (const AttributeList&, const Soil&, const SoilWater&,
+  void initialize (const AttributeList&, const Geometry& geo,
+                   const Soil&, const SoilWater&,
 		   double T_avg, Treelog& err);
   Implementation (Block&);
   ~Implementation ();
@@ -572,7 +578,8 @@ OrganicMatter::Implementation::Initialization::
 }
 
 OrganicMatter::Implementation::Initialization::
-/**/ Initialization (const AttributeList& al, const Soil& soil, 
+/**/ Initialization (const AttributeList& al, const Geometry& geo,
+                     const Soil& soil, 
                      const Bioincorporation& bioincorporation,
 		     const vector<SOM*>& som, double T_avg)
   : input (al.number ("input", -1.0)),
@@ -611,26 +618,26 @@ OrganicMatter::Implementation::Initialization::
   // Add top.
   daisy_assert (input >= root + bioinc);
   const double top = input - root - bioinc;
-  soil.add (per_lay, 0.0, end, top * kg_per_ha_per_y_to_g_per_cm2_per_h);
+  geo.add (per_lay, 0.0, end, top * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Add roots
   const double depth = soil.MaxRootingDepth ();
   const double k = M_LN2 / al.number ("dist");
   vector<double> density (soil.size (), 0.0);
   for (unsigned int i = 0; 
-       i < soil.size () && soil.z (i) > depth;
+       i < soil.size () && geo.z (i) > depth;
        i++)
     {
-      density[i] = k * exp (k * soil.z (i));
+      density[i] = k * exp (k * geo.z (i));
     }
-  soil.add (per_lay, density, root * kg_per_ha_per_y_to_g_per_cm2_per_h);
+  geo.add (per_lay, density, root * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Add bioincorporation
-  bioincorporation.add (soil, per_lay,
+  bioincorporation.add (geo, per_lay,
 			bioinc * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Mix roots in top.
-  soil.mix (per_lay, 0.0, end);
+  geo.mix (per_lay, 0.0, end);
   
   assert_non_negative (per_lay);
 }
@@ -882,23 +889,23 @@ OrganicMatter::Implementation::add (AM& om)
 
 void 
 OrganicMatter::Implementation::fertilize (const AttributeList& al, 
-                                          const Soil& soil)
+                                          const Geometry& geometry)
 { 
-  AM& om = AM::create (al, soil);
-  fertilized_N += om.total_N (soil); 
-  fertilized_C += om.total_C (soil);
+  AM& om = AM::create (al, geometry);
+  fertilized_N += om.total_N (geometry); 
+  fertilized_C += om.total_C (geometry);
   add (om);
 }
 
 void 
 OrganicMatter::Implementation::fertilize (const AttributeList& al,
-                                          const Soil& soil,
+                                          const Geometry& geometry,
                                           double from, double to)
 { 
-  AM& om = AM::create (al, soil);
-  fertilized_N += om.total_N (soil); 
-  fertilized_C += om.total_C (soil);
-  om.mix (soil, from, to, 1.0,
+  AM& om = AM::create (al, geometry);
+  fertilized_N += om.total_N (geometry); 
+  fertilized_C += om.total_C (geometry);
+  om.mix (geometry, from, to, 1.0,
           tillage_N_top, tillage_C_top,
           tillage_N_soil, tillage_C_soil);
   add (om);
@@ -1054,12 +1061,13 @@ OrganicMatter::Implementation::find_abiotic (const OM& om,
 }
 
 size_t
-OrganicMatter::Implementation::active_size (const Soil& soil, 
+OrganicMatter::Implementation::active_size (const Geometry& geo,
+                                            const Soil& soil, 
                                             const SoilWater& soil_water) const
 {
   size_t size = soil.size ();
-  if (!active_underground && soil.zplus (size - 1) < -100.0)
-    size = soil.interval_plus (min (-100.0, soil.MaxRootingDepth ())) + 1;
+  if (!active_underground && geo.zplus (size - 1) < -100.0)
+    size = geo.interval_plus (min (-100.0, soil.MaxRootingDepth ())) + 1;
   if (!active_groundwater)
     size = min (soil_water.first_groundwater_node (), size);
   size = min (size, soil.size ());
@@ -1068,15 +1076,16 @@ OrganicMatter::Implementation::active_size (const Soil& soil,
 }
 
 void 
-OrganicMatter::Implementation::tick (const Soil& soil, 
+OrganicMatter::Implementation::tick (const Geometry& geo,
+                                     const Soil& soil, 
 				     const SoilWater& soil_water, 
 				     const SoilHeat& soil_heat,
 				     SoilNO3& soil_NO3,
 				     SoilNH4& soil_NH4,
 				     Treelog& msg)
 {
-  const double old_N = total_N (soil);
-  const double old_C = total_C (soil);
+  const double old_N = total_N (geo);
+  const double old_C = total_C (geo);
 
   // Create an array of all AM dk:puljer, sorted by their C_per_N.
   const int all_am_size = am.size ();
@@ -1095,7 +1104,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     dom[j]->clear ();
 
   // Setup arrays.
-  const size_t size = active_size (soil, soil_water);
+  const size_t size = active_size (geo, soil, soil_water);
   
   vector<double> N_soil (size);
   vector<double> N_used (size);
@@ -1210,7 +1219,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   soil_NH4.add_to_source (NH4_source);
 
   // Biological incorporation.
-  bioincorporation.tick (soil, am, soil_heat.T (0), top_CO2);
+  bioincorporation.tick (geo, am, soil_heat.T (0), top_CO2);
 
   // Tillage time.
   for (unsigned int i = 0; i < size; i++)
@@ -1219,18 +1228,18 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   // Mass balance.
   double N_to_DOM = 0.0;
   for (int j = 0; j < dom.size (); j++)
-    N_to_DOM += dom[j]->N_source (soil) * dt;
-  const double new_N = total_N (soil) + N_to_DOM;
+    N_to_DOM += dom[j]->N_source (geo) * dt;
+  const double new_N = total_N (geo) + N_to_DOM;
   const double delta_N = old_N - new_N;
-  const double N_source = soil.total (NO3_source) + soil.total (NH4_source);
+  const double N_source = geo.total (NO3_source) + geo.total (NH4_source);
 
   if (!approximate (delta_N, N_source)
       && !approximate (old_N, new_N, 1e-10))
     {
       std::ostringstream tmp;
       tmp << "BUG: OrganicMatter: delta_N != NO3 + NH4[g N/cm^2]\n"
-	     << delta_N << " != " << soil.total (NO3_source)
-	     << " + " << soil.total (NH4_source);
+	     << delta_N << " != " << geo.total (NO3_source)
+	     << " + " << geo.total (NH4_source);
       if (N_source != 0.0)
 	tmp << " (error " 
 	       << fabs (delta_N / (N_source) - 1.0) * 100.0 << "%)";
@@ -1238,11 +1247,11 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     }
   double C_to_DOM = 0.0;
   for (int j = 0; j < dom.size (); j++)
-    C_to_DOM += dom[j]->C_source (soil) * dt;
-  const double new_C = total_C (soil) + C_to_DOM;
+    C_to_DOM += dom[j]->C_source (geo) * dt;
+  const double new_C = total_C (geo) + C_to_DOM;
   const double delta_C = old_C - new_C;
   const double C_source 
-    = soil.total (CO2_slow) + soil.total (CO2_fast) + top_CO2;
+    = geo.total (CO2_slow) + geo.total (CO2_fast) + top_CO2;
   
   if (!approximate (delta_C, C_source)
       && !approximate (old_C, new_C, 1e-10))
@@ -1250,8 +1259,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
       std::ostringstream tmp;
       tmp << "BUG: OrganicMatter: "
 	"delta_C != soil_CO2_slow + soil_CO2_fast + top_CO2 [g C/cm^2]\n"
-	     << delta_C << " != " << soil.total (CO2_slow) << " + " 
-	     << soil.total (CO2_fast) << " + " << top_CO2;
+	     << delta_C << " != " << geo.total (CO2_slow) << " + " 
+	     << geo.total (CO2_fast) << " + " << top_CO2;
       msg.error (tmp.str ());
     }
 
@@ -1264,7 +1273,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 }
       
 void 
-OrganicMatter::Implementation::transport (const Soil& soil, 
+OrganicMatter::Implementation::transport (const Geometry& geometry,
+                                          const Soil& soil, 
 					  const SoilWater& soil_water, 
 					  Treelog& msg)
 {
@@ -1272,29 +1282,29 @@ OrganicMatter::Implementation::transport (const Soil& soil,
     domsorp[j]->tick (soil, soil_water, dom, som, msg);
 
   for (unsigned int j = 0; j < dom.size (); j++)
-    dom[j]->transport (soil, soil_water, msg);
+    dom[j]->transport (geometry, soil, soil_water, msg);
 }
 
 void 
-OrganicMatter::Implementation::mix (const Soil& soil,
+OrganicMatter::Implementation::mix (const Geometry& geo, const Soil& soil,
 				    const SoilWater& soil_water,
 				    double from, double to, 
                                     double penetration,
 				    const Time&)
 {
-  buffer.mix (soil, from, to);
+  buffer.mix (geo, from, to);
   for (unsigned int i = 0; i < am.size (); i++)
-    am[i]->mix (soil, from, to, penetration, 
+    am[i]->mix (geo, from, to, penetration, 
                 tillage_N_top, tillage_C_top, 
                 tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 1; i < smb.size (); i++)
-    smb[i]->mix (soil, from, to, 
+    smb[i]->mix (geo, from, to, 
                  tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 0; i < som.size (); i++)
-    som[i]->mix (soil, from, to, 
+    som[i]->mix (geo, from, to, 
                  tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 0; i < dom.size (); i++)
-    dom[i]->mix (soil, soil_water, from, to);
+    dom[i]->mix (geo, soil, soil_water, from, to);
 
   // Leave CO2 alone.
 
@@ -1302,7 +1312,7 @@ OrganicMatter::Implementation::mix (const Soil& soil,
   double previous = 0.0;
   for (unsigned int i = 0; i < tillage_age.size (); i++)
     {
-      const double next = soil.zplus (i);
+      const double next = geo.zplus (i);
       if (previous > to && next < from)
 	tillage_age[i] = 0.0;
       previous = next;
@@ -1310,23 +1320,23 @@ OrganicMatter::Implementation::mix (const Soil& soil,
 }
 
 void 
-OrganicMatter::Implementation::swap (const Soil& soil,
+OrganicMatter::Implementation::swap (const Geometry& geo, const Soil& soil,
 				     const SoilWater& soil_water,
 				     double from, double middle, double to,
 				     const Time&)
 {
-  buffer.swap (soil, from, middle, to);
+  buffer.swap (geo, from, middle, to);
   for (unsigned int i = 0; i < am.size (); i++)
-    am[i]->swap (soil, from, middle, to, 
+    am[i]->swap (geo, from, middle, to, 
                  tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 1; i < smb.size (); i++)
-    smb[i]->swap (soil, from, middle, to, 
+    smb[i]->swap (geo, from, middle, to, 
                   tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 0; i < som.size (); i++)
-    som[i]->swap (soil, from, middle, to, 
+    som[i]->swap (geo, from, middle, to, 
                   tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 0; i < dom.size (); i++)
-    dom[i]->swap (soil, soil_water, from, middle, to);
+    dom[i]->swap (geo, soil, soil_water, from, middle, to);
   // Leave CO2 alone.
 }
 
@@ -2081,7 +2091,8 @@ Setting additional pool to zero");
 }
 
 string
-OrganicMatter::Implementation::top_summary (const Soil& soil,
+OrganicMatter::Implementation::top_summary (const Geometry& geo,
+                                            const Soil& soil,
                                             const Initialization& init,
                                             const double zone_delta_N, 
                                             const double zone_delta_C) const
@@ -2114,13 +2125,13 @@ OrganicMatter::Implementation::top_summary (const Soil& soil,
   double total_C = 0.0;
   for (unsigned int pool = 0; pool < som.size (); pool++)
     {
-      const double C = som[pool]->soil_C (soil, 0.0, init.end);
+      const double C = som[pool]->soil_C (geo, 0.0, init.end);
       tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
   for (unsigned int pool = 0; pool < smb.size (); pool++)
     {
-      const double C = smb[pool]->soil_C (soil, 0.0, init.end);
+      const double C = smb[pool]->soil_C (geo, 0.0, init.end);
       tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
@@ -2132,14 +2143,14 @@ OrganicMatter::Implementation::top_summary (const Soil& soil,
           vector<AOM*> added;
           am[i]->append_to (added);
           if (pool < added.size ())
-            C += added[pool]->soil_C (soil, 0.0, init.end);
+            C += added[pool]->soil_C (geo, 0.0, init.end);
         }        
       tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
   for (unsigned int pool = 0; pool < dom.size (); pool++)
     {
-      const double C = dom[pool]->soil_C (soil, 0.0, init.end);
+      const double C = dom[pool]->soil_C (geo, 0.0, init.end);
       tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
@@ -2150,13 +2161,13 @@ OrganicMatter::Implementation::top_summary (const Soil& soil,
   double total_N = 0.0;
   for (unsigned int pool = 0; pool < som.size (); pool++)
     {
-      const double N = som[pool]->soil_N (soil, 0.0, init.end);
+      const double N = som[pool]->soil_N (geo, 0.0, init.end);
       tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
   for (unsigned int pool = 0; pool < smb.size (); pool++)
     {
-      const double N = smb[pool]->soil_N (soil, 0.0, init.end);
+      const double N = smb[pool]->soil_N (geo, 0.0, init.end);
       tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
@@ -2168,14 +2179,14 @@ OrganicMatter::Implementation::top_summary (const Soil& soil,
           vector<AOM*> added;
           am[i]->append_to (added);
           if (pool < added.size ())
-            N += added[pool]->soil_N (soil, 0.0, init.end);
+            N += added[pool]->soil_N (geo, 0.0, init.end);
         }        
       tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
   for (unsigned int pool = 0; pool < dom.size (); pool++)
     {
-      const double N = dom[pool]->soil_N (soil, 0.0, init.end);
+      const double N = dom[pool]->soil_N (geo, 0.0, init.end);
       tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
@@ -2191,10 +2202,10 @@ OrganicMatter::Implementation::top_summary (const Soil& soil,
   double input = 0.0;
   double last = 0.0;
   for (unsigned int lay = 0; 
-       lay < soil.size () && soil.z (lay) > init.end;
+       lay < geo.size () && geo.z (lay) > init.end;
        lay++)
     {
-      const double next = max (init.end, soil.zplus (lay));
+      const double next = max (init.end, geo.zplus (lay));
       const double dz = last - next;
       last = next;
 
@@ -2314,7 +2325,8 @@ OrganicMatter::Implementation::update_pools
 
 void
 OrganicMatter::Implementation::initialize (const AttributeList& al,
-					   const Soil& soil, 
+                                           const Geometry& geo,
+                                           const Soil& soil, 
 					   const SoilWater& soil_water,
 					   double T_avg, Treelog& err)
 { 
@@ -2364,10 +2376,10 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 
   // Initialize AM.
   for (unsigned int i = 0; i < am.size (); i++)
-    am[i]->initialize (soil);
+    am[i]->initialize (soil, soil.MaxRootingDepth ());
 
   // Biological incorporation.
-  bioincorporation.initialize (soil);
+  bioincorporation.initialize (geo, soil);
   static const symbol bio_symbol ("bio");
   static const symbol incorporation_symbol ("incorporation");
   AM* bioam = find_am (bio_symbol, incorporation_symbol);
@@ -2410,7 +2422,7 @@ Using initial C per N for remaining entries");
     {
       const vector<AttributeList*>& layers
 	= al.alist_sequence ("initial_SOM");
-      const double soil_end = soil.zplus (soil.size () - 1);
+      const double soil_end = geo.zplus (soil.size () - 1);
       double last = 0.0;
       for (unsigned int i = 0; i < layers.size (); i++)
 	{
@@ -2427,7 +2439,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
 	      i = layers.size ();
 	    }
 	  const double C = weight * 1000.0 / (100.0 * 100.0); // g C / cm²
-	  soil.add (total_C, last, end, C);
+	  geo.add (total_C, last, end, C);
 	  last = end;
 	}
       first_humus = last;
@@ -2439,18 +2451,18 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
     for (unsigned int lay = 0; lay < soil.size (); lay++)
       {
         const double humus_C = soil.humus_C (lay);
-        const double zplus = soil.zplus (lay);
+        const double zplus = geo.zplus (lay);
         if (zplus < first_humus)
           if (last <= first_humus)
             total_C[lay] = humus_C;
           else
-            soil.add (total_C, first_humus, zplus, 
+            geo.add (total_C, first_humus, zplus, 
                       humus_C * (first_humus - zplus));
         last = zplus;
       }
   }
   // Partitioning.
-  Initialization init (al.alist ("init"), soil, bioincorporation, som, T_avg);
+  Initialization init (al.alist ("init"), geo, soil, bioincorporation, som, T_avg);
 		       
   double total_delta_C = 0.0;
   double total_delta_N = 0.0;
@@ -2473,7 +2485,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
           ? init.find_total_input (lay)
           : total_input_from_am (init.T, init.h, lay);
       
-        const bool top_soil = soil.z (lay) > init.end;
+        const bool top_soil = geo.z (lay) > init.end;
         const double background_mineralization = 
           (top_soil && init.background_mineralization > -1e10)
           ? (init.background_mineralization 
@@ -2494,11 +2506,11 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
                    err,
                    init.print_equations (lay), init.debug_rows, 
                    init.debug_to_screen);
-        total_delta_C += delta_C * soil.dz (lay);
-        total_delta_N += delta_N * soil.dz (lay);
+        total_delta_C += delta_C * geo.dz (lay);
+        total_delta_N += delta_N * geo.dz (lay);
         if (top_soil)
           {
-            const double next = max (init.end, soil.zplus (lay));
+            const double next = max (init.end, geo.zplus (lay));
             const double dz = last - next;
             last = next;
             total_delta_C += delta_C * dz;
@@ -2541,7 +2553,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   // Print top summary.
   {
     const string summary 
-      = top_summary (soil, init, zone_delta_N, zone_delta_C);
+      = top_summary (geo, soil, init, zone_delta_N, zone_delta_C);
 
     Treelog::Open nest (err, "Top soil summary");
     if (init.debug_to_screen)
@@ -2614,38 +2626,40 @@ OrganicMatter::monthly (const Geometry& geometry)
 { impl->monthly (geometry); }
 
 size_t
-OrganicMatter::active_size (const Soil& soil, 
+OrganicMatter::active_size (const Geometry& geo,
+                            const Soil& soil, 
                             const SoilWater& soil_water) const
-{ return impl->active_size (soil, soil_water); }
+{ return impl->active_size (geo, soil, soil_water); }
 
 void 
-OrganicMatter::tick (const Soil& soil, 
+OrganicMatter::tick (const Geometry& geo,
+                     const Soil& soil, 
 		     const SoilWater& soil_water, 
 		     const SoilHeat& soil_heat,
 		     SoilNO3& soil_NO3,
 		     SoilNH4& soil_NH4,
 		     Treelog& msg)
-{ impl->tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4, msg); }
+{ impl->tick (geo, soil, soil_water, soil_heat, soil_NO3, soil_NH4, msg); }
 
 void 
-OrganicMatter::transport (const Soil& soil, 
+OrganicMatter::transport (const Geometry& geo, const Soil& soil, 
 			  const SoilWater& soil_water, 
 			  Treelog& msg)
-{ impl->transport (soil, soil_water, msg); }
+{ impl->transport (geo, soil, soil_water, msg); }
 
 void 
-OrganicMatter::mix (const Soil& soil,
+OrganicMatter::mix (const Geometry& geo, const Soil& soil,
 		    const SoilWater& soil_water,
 		    double from, double to, double penetration,
 		    const Time& time)
-{ impl->mix (soil, soil_water, from, to, penetration, time); }
+{ impl->mix (geo, soil, soil_water, from, to, penetration, time); }
 
 void 
-OrganicMatter::swap (const Soil& soil,
+OrganicMatter::swap (const Geometry& geo, const Soil& soil,
 		     const SoilWater& soil_water,
 		     double from, double middle, double to,
 		     const Time& time)
-{ impl->swap (soil, soil_water, from, middle, to, time); }
+{ impl->swap (geo, soil, soil_water, from, middle, to, time); }
 
 double
 OrganicMatter::CO2 (unsigned int i) const
@@ -2730,14 +2744,14 @@ OrganicMatter::add (AM& am)
 
 void 
 OrganicMatter::fertilize (const AttributeList& al,
-                          const Soil& soil)
-{ impl->fertilize (al, soil); }
+                          const Geometry& geometry)
+{ impl->fertilize (al, geometry); }
 
 void 
 OrganicMatter::fertilize (const AttributeList& al,
-                          const Soil& soil,
+                          const Geometry& geometry,
                           double from, double to)
-{ impl->fertilize (al, soil, from, to); }
+{ impl->fertilize (al, geometry, from, to); }
 
 AM* 
 OrganicMatter::find_am (const symbol sort, const symbol part) const
@@ -2745,9 +2759,10 @@ OrganicMatter::find_am (const symbol sort, const symbol part) const
 
 void
 OrganicMatter::initialize (const AttributeList& al, 
-			   const Soil& soil, const SoilWater& soil_water, 
+			   const Geometry& geo,
+                           const Soil& soil, const SoilWater& soil_water, 
 			   double T_avg, Treelog& err)
-{ impl->initialize (al, soil, soil_water, T_avg, err); }
+{ impl->initialize (al, geo, soil, soil_water, T_avg, err); }
 
 OrganicMatter::OrganicMatter (Block& al)
   : impl (new Implementation (al))

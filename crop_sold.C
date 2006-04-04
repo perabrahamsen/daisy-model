@@ -27,6 +27,7 @@
 #include "plf.h"
 #include "soil_water.h"
 #include "soil.h"
+#include "geometry.h"
 #include "organic_matter.h"
 #include "aom.h"
 #include "soil_heat.h"
@@ -59,7 +60,8 @@ public:
   double IntcpCap () const; // Interception Capacity.
   double EpFac () const; // Convertion to potential evapotransp.
   void CanopyStructure ();
-  double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
+  double ActualWaterUptake (double Ept, const Geometry& geo,
+                            const Soil&, SoilWater&,
 			    double EvapInterception, 
 			    double day_fraction, Treelog&);
   
@@ -99,7 +101,8 @@ protected:
 
   // Simulation.
 public:
-  void tick (const Time& time, const Bioclimate&, const Soil&,
+  void tick (const Time& time, const Bioclimate&, const Geometry& geo,
+             const Soil&,
 	     OrganicMatter*,
 	     const SoilHeat&, const SoilWater&, SoilNH4*, SoilNO3*,
 	     double&, double&, double&, vector<double>&, vector<double>&, 
@@ -1304,6 +1307,7 @@ CropSold::CanopyStructure ()
 
 double
 CropSold::ActualWaterUptake (double Ept,
+                             const Geometry&,
 			     const Soil& soil, SoilWater& soil_water,
 			     const double EvapInterception, 
 			     const double /*day_fraction*/, Treelog& out)
@@ -1702,6 +1706,7 @@ CropSold::NetProduction (const Bioclimate& bioclimate,
 void 
 CropSold::tick (const Time& time,
 		const Bioclimate& bioclimate,
+                const Geometry&,
 		const Soil& soil,
 		OrganicMatter*,
 		const SoilHeat& soil_heat,

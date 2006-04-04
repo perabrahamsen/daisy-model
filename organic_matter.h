@@ -50,18 +50,20 @@ private:
   // Simulation.
 public:
   void clear ();
-  void monthly (const Geometry& soil);
-  size_t active_size (const Soil&, const SoilWater&) const;
-  void tick (const Soil&, const SoilWater&, const SoilHeat&, 
+  void monthly (const Geometry&);
+  size_t active_size (const Geometry& geo,
+                      const Soil&, const SoilWater&) const;
+  void tick (const Geometry& geo,
+             const Soil&, const SoilWater&, const SoilHeat&, 
 	     SoilNO3&, SoilNH4&, Treelog& msg);
-  void transport (const Soil&, const SoilWater&, Treelog&);
+  void transport (const Geometry&, const Soil&, const SoilWater&, Treelog&);
   void output (Log&, const Geometry&) const;
   double CO2 (unsigned int i) const;	// [g C/cm³]
   double CO2_fast (unsigned int i) const;	// [g C/cm³]
-  void mix (const Soil&, const SoilWater&,
+  void mix (const Geometry&, const Soil&, const SoilWater&,
 	    double from, double to, double penetration,
 	    const Time& time);
-  void swap (const Soil&, const SoilWater&, 
+  void swap (const Geometry&, const Soil&, const SoilWater&, 
 	     double from, double middle, double to,
 	     const Time& time);
 
@@ -73,11 +75,13 @@ public:
   bool check (const Soil&, Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   void add (AM&);
-  void fertilize (const AttributeList&, const Soil&);
-  void fertilize (const AttributeList&, const Soil&, double from, double to);
+  void fertilize (const AttributeList&, const Geometry&);
+  void fertilize (const AttributeList&, const Geometry&,
+                  double from, double to);
   AM* find_am (symbol sort, symbol part) const;
 public:
-  void initialize (const AttributeList&, const Soil&, const SoilWater&, 
+  void initialize (const AttributeList&, const Geometry& geo,
+                   const Soil&, const SoilWater&, 
 		   double T_avg, Treelog&);
   static void load_syntax (Syntax&, AttributeList&);
 private:

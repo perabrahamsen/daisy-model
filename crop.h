@@ -73,14 +73,16 @@ public:
   virtual double EpFac () const = 0; // Convertion to potential evapotransp.
   virtual double albedo () const;
   virtual void CanopyStructure () = 0;
-  virtual double ActualWaterUptake (double Ept, const Soil&, SoilWater&, 
+  virtual double ActualWaterUptake (double Ept, const Geometry& geo,
+                                    const Soil&, SoilWater&, 
 				    double EvapInterception, 
 				    double day_fraction, Treelog&) = 0;
   virtual void force_production_stress  (double pstress);
 
   // Simulation.
 public:
-  virtual void tick (const Time& time, const Bioclimate&, const Soil&,
+  virtual void tick (const Time& time, const Bioclimate&, const Geometry& geo,
+                     const Soil&,
 		     OrganicMatter*, const SoilHeat&, const SoilWater&,
 		     SoilNH4*, SoilNO3*, 
 		     double& residuals_DM,

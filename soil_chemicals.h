@@ -44,24 +44,29 @@ private:
 
   // Simulation.
 public:
-  SoilChemical& find (const Soil& soil, 
+  SoilChemical& find (const Geometry& geo,
+                      const Soil& soil, 
 		      const SoilWater& soil_water,
 		      symbol name, Treelog&);
-  void tick (const Soil&, const SoilWater&, const SoilHeat&, 
+  void tick (const Geometry& geo,
+             const Soil&, const SoilWater&, const SoilHeat&, 
 	     const OrganicMatter*, const Chemicals& flux_in, Treelog&);
   void mixture (Chemicals& storage, // [g/m^2]
 		Chemicals& up,	// [g/m^2/h]
 		double pond,	// [mm]
 		double rate) const;	// [h/mm]
   void output (Log&) const;
-  void mix (const Soil&, const SoilWater&, double from, double to);
-  void swap (const Soil&, const SoilWater&,
+  void mix (const Geometry& geo,
+            const Soil&, const SoilWater&, double from, double to);
+  void swap (const Geometry& geo,
+             const Soil&, const SoilWater&,
 	     double from, double middle, double to);
 
   // Create & Destroy.
 public:
   void clear ();
-  void initialize (const AttributeList&, const Soil&, const SoilWater&, 
+  void initialize (const AttributeList&, const Geometry& geo,
+                   const Soil&, const SoilWater&, 
 		   Treelog&);
   bool check (unsigned n, Treelog&) const;
   static void load_syntax (Syntax&, AttributeList&);

@@ -123,6 +123,7 @@ struct VegetationPermanent : public Vegetation
   void reset_canopy_structure (const Time& time);
   void tick (const Time& time,
 	     const Bioclimate& bioclimate,
+             const Geometry& geo,
 	     const Soil& soil,
 	     OrganicMatter *const organic_matter,
 	     const SoilHeat& soil_heat,
@@ -135,6 +136,7 @@ struct VegetationPermanent : public Vegetation
 	     Treelog&);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
+                        const Geometry& geo,
 			const Soil& soil, SoilWater& soil_water, 
 			double day_fraction, Treelog&);
   void force_production_stress  (double)
@@ -169,7 +171,8 @@ struct VegetationPermanent : public Vegetation
   { return litter.albedo; }
 
   // Create and destroy.
-  void initialize (const Time& time, const Soil& soil, OrganicMatter *const, 
+  void initialize (const Time& time, const Geometry& geo,
+                   const Soil& soil, OrganicMatter *const, 
                    Treelog&);
   VegetationPermanent (Block&);
   ~VegetationPermanent ();
@@ -234,6 +237,7 @@ VegetationPermanent::reset_canopy_structure (const Time& time)
 void
 VegetationPermanent::tick (const Time& time,
 			   const Bioclimate&,
+                           const Geometry& geo,
 			   const Soil& soil,
 			   OrganicMatter *const organic_matter,
 			   const SoilHeat&,
@@ -261,9 +265,9 @@ VegetationPermanent::tick (const Time& time,
 	N_actual = N_demand;	// Initialization.
       else
 	daisy_assert (N_actual >= 0.0);
-      N_uptake = root_system->nitrogen_uptake (soil, soil_water, 
-					      *soil_NH4, 0.0, *soil_NO3, 0.0,
-					      N_demand - N_actual);
+      N_uptake = root_system->nitrogen_uptake (geo, soil, soil_water, 
+                                               *soil_NH4, 0.0, *soil_NO3, 0.0,
+                                               N_demand - N_actual);
     }
   
   if (canopy.CAI < old_LAI)
@@ -286,9 +290,9 @@ VegetationPermanent::tick (const Time& time,
 	      static const symbol vegetation_symbol ("vegetation");
 	      static const symbol dead_symbol ("dead");
 	      
-	      AM_litter = &AM::create (soil, time, litter_am,
-				    vegetation_symbol, dead_symbol,
-				    AM::Locked);
+	      AM_litter = &AM::create (geo, time, litter_am,
+                                       vegetation_symbol, dead_symbol,
+                                       AM::Locked);
 	      organic_matter->add (*AM_litter);
 
 	    }
@@ -308,14 +312,15 @@ VegetationPermanent::tick (const Time& time,
 double
 VegetationPermanent::transpiration (double potential_transpiration,
 				    double canopy_evaporation,
+                                    const Geometry& geo,
 				    const Soil& soil, 
 				    SoilWater& soil_water,
 				    double day_fraction, Treelog& msg)
 {
   if (canopy.CAI > 0.0)
     return  root_system->water_uptake (potential_transpiration, 
-				      soil, soil_water, 
-				      canopy_evaporation, day_fraction, msg);
+                                       geo, soil, soil_water, 
+                                       canopy_evaporation, day_fraction, msg);
   return 0.0;
 }
 
@@ -332,13 +337,15 @@ VegetationPermanent::output (Log& log) const
 }
 
 void
-VegetationPermanent::initialize (const Time& time, const Soil& soil, 
+VegetationPermanent::initialize (const Time& time, 
+                                 const Geometry& geo,
+                                 const Soil& soil, 
 				 OrganicMatter *const organic_matter,
                                  Treelog& msg)
 {
   reset_canopy_structure (time);
   root_system->initialize (soil.size ());
-  root_system->full_grown (msg, soil, WRoot);
+  root_system->full_grown (msg, geo, soil.MaxRootingDepth (), WRoot);
   if (organic_matter)
     {
       static const symbol vegetation_symbol ("vegetation");

@@ -67,7 +67,8 @@ struct Surface::Implementation
   Ridge* ridge_;
 
   // Functions.
-  void ridge (const Soil& soil, const SoilWater& soil_water,
+  void ridge (const Geometry& geo,
+              const Soil& soil, const SoilWater& soil_water,
 	      const AttributeList&);
   void mixture (const IM& soil_im /* g/cm^2/mm */);
   void mixture (const SoilChemicals& soil_chemicals);
@@ -76,7 +77,8 @@ struct Surface::Implementation
   bool exfiltrate (Treelog&, double water);
   double ponding () const;
   void tick (Treelog&, double PotSoilEvaporation, double water, double temp,
-	     const Soil& soil, const SoilWater& soil_water, double T);
+	     const Geometry& geo,
+             const Soil& soil, const SoilWater& soil_water, double T);
   double albedo (const Soil& soil, const SoilWater& soil_water) const;
   void fertilize (const IM& n);
   void spray (const Chemicals& chemicals_in);
@@ -90,12 +92,14 @@ struct Surface::Implementation
 };
 
 void 
-Surface::ridge (const Soil& soil, const SoilWater& soil_water, 
+Surface::ridge (const Geometry& geo,
+                const Soil& soil, const SoilWater& soil_water, 
 		const AttributeList& al)
-{ impl.ridge (soil, soil_water, al); }
+{ impl.ridge (geo, soil, soil_water, al); }
 
 void 
-Surface::Implementation::ridge (const Soil& soil, const SoilWater& soil_water,
+Surface::Implementation::ridge (const Geometry& geo,
+                                const Soil& soil, const SoilWater& soil_water,
 				const AttributeList& al)
 {
   // No permanent ponding.
@@ -107,7 +111,7 @@ Surface::Implementation::ridge (const Soil& soil, const SoilWater& soil_water,
 
   // Create new ridge system.
   ridge_ = new Ridge (al);
-  ridge_->initialize (soil, soil_water);
+  ridge_->initialize (geo, soil, soil_water);
 }
 
 void 
@@ -158,7 +162,8 @@ Surface::Implementation::mixture (const SoilChemicals& soil_chemicals)
 }
 
 void
-Surface::update_water (const Soil& soil,
+Surface::update_water (const Geometry& geo,
+                       const Soil& soil,
 		       const vector<double>& S_,
 		       vector<double>& h_,
 		       vector<double>& Theta_,
@@ -166,7 +171,7 @@ Surface::update_water (const Soil& soil,
 		       const vector<double>& q_p)
 {
   if (impl.ridge_)
-    impl.ridge_->update_water (soil, S_, h_, Theta_, q, q_p); 
+    impl.ridge_->update_water (geo, soil, S_, h_, Theta_, q, q_p); 
 }
 
 bool 
@@ -324,14 +329,17 @@ Surface::chemicals_down () const
 void
 Surface::tick (Treelog& msg,
 	       double PotSoilEvaporation, double water, double temp,
-	       const Soil& soil, const SoilWater& soil_water, double soil_T)
-{ impl.tick (msg, PotSoilEvaporation, water, temp, soil, soil_water, soil_T); }
+	       const Geometry& geo,
+               const Soil& soil, const SoilWater& soil_water, double soil_T)
+{ impl.tick (msg, PotSoilEvaporation, water, temp, geo, 
+             soil, soil_water, soil_T); }
 
 void
 Surface::Implementation::tick (Treelog& msg,
 			       double PotSoilEvaporation,
 			       double water, double temp,
-			       const Soil& soil, const SoilWater& soil_water,
+                               const Geometry& geo,
+                               const Soil& soil, const SoilWater& soil_water,
 			       double soil_T)
 {
   if (pond > DetentionCapacity)
@@ -351,7 +359,7 @@ Surface::Implementation::tick (Treelog& msg,
     }
 
   const double MaxExfiltration
-    = soil_water.MaxExfiltration (soil, soil_T) * 10.0; // cm -> mm.
+    = soil_water.MaxExfiltration (geo, soil, soil_T) * 10.0; // cm -> mm.
 
   Eps = PotSoilEvaporation;
 
@@ -380,7 +388,7 @@ Surface::Implementation::tick (Treelog& msg,
 
   if (ridge_)
     {
-      ridge_->tick (soil, soil_water, pond);
+      ridge_->tick (geo, soil, soil_water, pond);
       exfiltrate (msg, ridge_->exfiltration ());
     }
 }

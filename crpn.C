@@ -96,6 +96,7 @@ CrpN::clear ()
 void
 CrpN::update (const int Hour, double& NCrop, const double DS,
 	      const bool enable_N_stress,
+              const Geometry& geo,
 	      const Soil& soil, const SoilWater& soil_water,
 	      SoilNH4& soil_NH4, SoilNO3& soil_NO3,
               const double day_fraction,
@@ -103,7 +104,7 @@ CrpN::update (const int Hour, double& NCrop, const double DS,
 {
   double PotNUpt = (PtNCnt - NCrop) / ((Hour == 0) ? 1.0 : (25.0 - Hour));
 
-  const double NUpt = root_system.nitrogen_uptake (soil, soil_water, 
+  const double NUpt = root_system.nitrogen_uptake (geo, soil, soil_water, 
 						   soil_NH4, NH4_root_min, 
 						   soil_NO3, NO3_root_min,
 						   PotNUpt);

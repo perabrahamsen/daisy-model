@@ -27,6 +27,7 @@ class AttributeList;
 class Log;
 class SoilWater;
 class Soil;
+class Geometry;
 class Chemicals;
 class SoilChemicals;
 
@@ -54,7 +55,8 @@ public:
 
   void mixture (const IM& soil_im /* [g/cm^2/mm] */);
   void mixture (const SoilChemicals& soil_chemicals);
-  void update_water (const Soil&, const std::vector<double>& S_,
+  void update_water (const Geometry& geo,
+                     const Soil&, const std::vector<double>& S_,
 		     std::vector<double>& h_, std::vector<double>& Theta_,
 		     std::vector<double>& q, const std::vector<double>& q_p);
 
@@ -62,14 +64,16 @@ public:
   void fertilize (const IM& /* [g/cm^2] */);
   void spray (const Chemicals& chemicals_in);
   void set_detention_capacity (double);
-  void ridge (const Soil& soil, const SoilWater& soil_water,
+  void ridge (const Geometry& geo,
+              const Soil& soil, const SoilWater& soil_water,
 	      const AttributeList&);
   void unridge ();
 
   // Simulation.
   void output (Log&) const;
   void tick (Treelog&, double PotSoilEvaporation, double Water, double temp,
-	     const Soil&, const SoilWater&, double soil_T);
+	     const Geometry& geo,
+             const Soil&, const SoilWater&, double soil_T);
 
   // Communication with bioclimate.
   double EpFactor () const;

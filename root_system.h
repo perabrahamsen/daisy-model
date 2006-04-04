@@ -86,19 +86,23 @@ private:
   // Uptake.
 private:
   double potential_water_uptake (double h_x,
+                                 const Geometry&,
 				 const Soil& soil,
 				 const SoilWater& soil_water);
 public:
   double water_uptake (double Ept,
+                       const Geometry&,
 		       const Soil& soil, SoilWater& soil_water,
 		       const double EvapInterception, double day_fraction,
 		       Treelog&);
 private:
-  double solute_uptake (const Soil&, const SoilWater&, Solute&,
+  double solute_uptake (const Geometry&, 
+                        const Soil&, const SoilWater&, Solute&,
 			double PotNUpt, std::vector<double>& uptake,
 			double i_max, double C_root_min);
 public:
-  double nitrogen_uptake (const Soil& soil,
+  double nitrogen_uptake (const Geometry&,
+                          const Soil& soil,
 			  const SoilWater& soil_water,
 			  SoilNH4& soil_NH4,
 			  double NH4_root_min,
@@ -111,11 +115,12 @@ private:
   static double density_distribution_parameter (double a);
 public:
   void tick_hourly (int hour, double T);
-  void tick_daily (Treelog&, const Soil&, 
+  void tick_daily (Treelog&, const Geometry&, const Soil&, 
 		   double WRoot, double IncWRoot, double DS);
   void set_density (Treelog&,
 		    const Geometry& geometry, double WRoot, double DS);
-  void full_grown (Treelog&, const Soil& soil, double WRoot);
+  void full_grown (Treelog&, const Geometry&, 
+                   double max_rooting_depth, double WRoot);
   void output (Log& log) const;
 
   // Create and Destroy

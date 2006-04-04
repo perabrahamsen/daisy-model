@@ -28,6 +28,7 @@
 
 class AttributeList;
 class Syntax;
+class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
@@ -60,6 +61,7 @@ private:
 public:
   void output (Log&) const;
   void tick (size_t size, 
+             const Geometry& geo,
              const Soil&, const SoilWater&, const SoilHeat&, SoilNO3&,
 	     const OrganicMatter&);
 

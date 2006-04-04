@@ -92,14 +92,17 @@ public:
 
   // Simulation.
 public:
-  void tick (const Soil&, const SoilWater&, double J_in, Treelog&);
+  void tick (const Geometry& geo,
+             const Soil&, const SoilWater&, double J_in, Treelog&);
   bool check (unsigned n, Treelog& err) const;
   virtual void output (Log&) const;
   void incorporate (const Geometry&, double amount, double from, double to);
   void set_external_source (const Geometry&, 
 			    double amount, double from, double to);
-  void mix (const Soil&, const SoilWater&, double from, double to);
-  void swap (const Soil&, const SoilWater&, double from, double middle, double to);
+  void mix (const Geometry& geo,
+            const Soil&, const SoilWater&, double from, double to);
+  void swap (const Geometry& geo,
+             const Soil&, const SoilWater&, double from, double middle, double to);
 
   // Communication with external model.
   void put_M (const Soil& soil, const SoilWater& soil_water,
@@ -113,7 +116,8 @@ private:
   virtual void default_initialize (const Soil& soil, const SoilWater&);
 public:
   virtual void initialize (const AttributeList&,
-			   const Soil&, const SoilWater&, Treelog&);
+			   const Geometry& geo,
+                           const Soil&, const SoilWater&, Treelog&);
 public:
   virtual ~Solute ();
 };

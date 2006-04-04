@@ -22,6 +22,7 @@
 #include "vegetation.h"
 #include "crop.h"
 #include "organic_matter.h"
+#include "geometry.h"
 #include "soil.h"
 #include "plf.h"
 #include "mathlib.h"
@@ -119,6 +120,7 @@ struct VegetationCrops : public Vegetation
   // Simulation.
   void tick (const Time& time,
 	     const Bioclimate& bioclimate,
+             const Geometry& geo,
 	     const Soil& soil,
 	     OrganicMatter *const organic_matter,
 	     const SoilHeat& soil_heat,
@@ -132,6 +134,7 @@ struct VegetationCrops : public Vegetation
   void reset_canopy_structure (Treelog&);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
+                        const Geometry& geo,
 			const Soil& soil, SoilWater& soil_water, 
 			double day_fraction, Treelog&);
   void force_production_stress  (double pstress);
@@ -169,7 +172,8 @@ struct VegetationCrops : public Vegetation
   { return -1.0; }
 
   // Create and destroy.
-  void initialize (const Time&, const Soil& soil, OrganicMatter *const,
+  void initialize (const Time&, const Geometry& geo,
+                   const Soil& soil, OrganicMatter *const,
                    Treelog& msg);
   static CropList build_crops (Block& block, const std::string& key);
   VegetationCrops (Block&);
@@ -292,6 +296,7 @@ VegetationCrops::crop_names () const
 void 
 VegetationCrops::tick (const Time& time,
 		       const Bioclimate& bioclimate,
+                       const Geometry& geo,
 		       const Soil& soil,
 		       OrganicMatter *const organic_matter,
 		       const SoilHeat& soil_heat,
@@ -332,7 +337,7 @@ VegetationCrops::tick (const Time& time,
       const double my_force = use_force ? (MyLAI / SimLAI) * ForcedLAI : -1.0;
       
       // Tick.
-      (*crop)->tick (time, bioclimate, soil, organic_matter, 
+      (*crop)->tick (time, bioclimate, geo, soil, organic_matter, 
 		     soil_heat, soil_water, soil_NH4, soil_NO3, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
 		     residuals_N_soil, residuals_C_soil, my_force, msg);
@@ -440,6 +445,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 double
 VegetationCrops::transpiration (double potential_transpiration,
 				double canopy_evaporation,
+                                const Geometry& geo,
 				const Soil& soil, 
 				SoilWater& soil_water, double day_fraction, 
 				Treelog& msg)
@@ -460,7 +466,7 @@ VegetationCrops::transpiration (double potential_transpiration,
 	   crop++)
 	{
 	  value += (*crop)->ActualWaterUptake (pt_per_LAI * (*crop)->LAI (), 
-					       soil, soil_water, 
+					       geo, soil, soil_water, 
 					       canopy_evaporation, 
 					       day_fraction, msg);
 	}
@@ -648,7 +654,7 @@ VegetationCrops::output (Log& log) const
 }
 
 void
-VegetationCrops::initialize (const Time&, const Soil& soil, 
+VegetationCrops::initialize (const Time&, const Geometry&, const Soil& soil, 
 			     OrganicMatter *const organic_matter, Treelog& msg)
 {
   for (unsigned int i = 0; i < crops.size (); i++)

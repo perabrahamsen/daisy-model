@@ -27,6 +27,7 @@
 class AttributeList;
 class Log;
 class Syntax;
+class Geometry;
 class Soil;
 class SoilWater;
 class Treelog;
@@ -48,7 +49,8 @@ public:
   static void load_base (Syntax&, AttributeList&);
   SoilHeat (const AttributeList&);
   void initialize_base (const AttributeList& al, 
-                        const Soil& soil, Treelog&);
+                        const Geometry& geo,
+                        Treelog&);
   virtual ~SoilHeat ();
 };
 

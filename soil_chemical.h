@@ -49,7 +49,8 @@ private:
   // Simulation.
 public:
   void uptake (const Soil&, const SoilWater&);
-  void decompose (const Soil&, const SoilWater&, const SoilHeat&, 
+  void decompose (const Geometry& geo,
+                  const Soil&, const SoilWater&, const SoilHeat&, 
 		  const OrganicMatter*);
   void output (Log&) const;
   
@@ -60,7 +61,8 @@ public:
   // Create & Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  void initialize (const AttributeList&, const Soil&, const SoilWater&,
+  void initialize (const AttributeList&, const Geometry& geo,
+                   const Soil&, const SoilWater&,
 		   Treelog&);
   SoilChemical (const Chemical&, const AttributeList&);	// From parser.
   SoilChemical (const Chemical&); // From influx.

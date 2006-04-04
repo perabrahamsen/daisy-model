@@ -65,7 +65,7 @@ public:
     Treelog::Open nest (err, name);
     if (!initialize_common (time, err, global_weather))
       return;
-    vegetation->initialize (time, *soil, NULL, err);
+    vegetation->initialize (time, *soil, *soil, NULL, err);
   }
   Column& clone (symbol name) const
   { 
@@ -155,17 +155,18 @@ ColumnInorganic::tick (Treelog& out,
   soil_water->macro_tick (*soil, surface, out);
 
   bioclimate->tick (time, surface, my_weather, 
-                    *vegetation, *soil, *soil_water, soil_heat, out);
-  vegetation->tick (time, *bioclimate, *soil, NULL, soil_heat, *soil_water,
-		   NULL, NULL, 
-		   residuals_DM, residuals_N_top, residuals_C_top,
-		   residuals_N_soil, residuals_C_soil, out);
+                    *vegetation, *soil, *soil, *soil_water, soil_heat, out);
+  vegetation->tick (time, *bioclimate, *soil, 
+                    *soil, NULL, soil_heat, *soil_water,
+                    NULL, NULL, 
+                    residuals_DM, residuals_N_top, residuals_C_top,
+                    residuals_N_soil, residuals_C_soil, out);
   groundwater->tick (*soil, *soil_water, surface.h (), soil_heat, time, out);
 
   // Transport.
   soil_heat.tick (time, *soil, *soil_water, surface, my_weather);
-  soil_water->tick (*soil, soil_heat,surface, *groundwater, out);
-  soil_chemicals.tick (*soil, *soil_water, soil_heat, NULL, 
+  soil_water->tick (*soil, *soil, soil_heat,surface, *groundwater, out);
+  soil_chemicals.tick (*soil, *soil, *soil_water, soil_heat, NULL, 
 		       surface.chemicals_down (), out);
 }
 

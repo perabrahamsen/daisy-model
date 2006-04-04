@@ -79,12 +79,15 @@ public:
   // Simulation.
 public:
   void macro_tick (const Soil&, Surface&, Treelog&);
-  void tick (const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
+  void tick (const Geometry& geo,
+             const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
   void set_external_source (const Geometry&, 
 			    double amount, double from, double to);
   void incorporate (const Geometry&, double amount, double from, double to);
-  void mix (const Soil&, double from, double to);
-  void swap (Treelog&, const Soil&, double from, double middle, double to);
+  void mix (const Geometry& geo,
+            const Soil&, double from, double to);
+  void swap (Treelog&, const Geometry& geo,
+             const Soil&, double from, double middle, double to);
   void set_Theta (const Soil& soil, 
 		  unsigned int from, unsigned int to, double Theta);
   bool check (unsigned n, Treelog& err) const;
@@ -92,7 +95,8 @@ public:
 
 
   // Communication with surface.
-  double MaxExfiltration (const Soil&, double T) const;
+  double MaxExfiltration (const Geometry& geo,
+                          const Soil&, double T) const;
 
   // Communication with external model.
   void put_h (const Soil& soil, const std::vector<double>& v); // [cm]
@@ -102,7 +106,8 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   SoilWater (Block&);
   void initialize (const AttributeList&, 
-		   const Soil& soil, const Groundwater& groundwater,
+		   const Geometry& geo,
+                   const Soil& soil, const Groundwater& groundwater,
 		   Treelog&);
   ~SoilWater ();
 };

@@ -28,6 +28,7 @@ struct Weather;
 struct Bioclimate;
 struct Syntax;
 struct Log;
+struct Geometry;
 struct Soil;
 struct SoilWater;
 struct SoilHeat;
@@ -40,7 +41,8 @@ class Snow
 
   // Simulation.
 public:
-  void tick (Treelog&, const Soil&, const SoilWater&, const SoilHeat&,
+  void tick (Treelog&, const Geometry& geo,
+             const Soil&, const SoilWater&, const SoilHeat&,
 	     double Si, double q_h, double Prain,
 	     double Psnow, double Pond, double T, double Epot);
   void output (Log&) const;

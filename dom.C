@@ -20,6 +20,7 @@
 
 
 #include "dom.h"
+#include "geometry.h"
 #include "submodel.h"
 #include "alist.h"
 #include "syntax.h"
@@ -48,11 +49,11 @@ public:
   // Simulation.
 public:
   void output (Log&) const;
-  void mix (const Soil&, const SoilWater&, Adsorption&,
+  void mix (const Geometry&, const Soil&, const SoilWater&, Adsorption&,
 	    double from, double to);
-  void swap (const Soil&, const SoilWater&, Adsorption&, 
+  void swap (const Geometry&, const Soil&, const SoilWater&, Adsorption&, 
 	     double from, double middle, double to);
-  void transport (const Soil& soil, 
+  void transport (const Geometry&, const Soil& soil, 
 		  const SoilWater& soil_water, 
 		  Transport& trans,
 		  Transport& reserve,
@@ -84,27 +85,30 @@ DOM::Element::output (Log& log) const
 }
 
 void 
-DOM::Element::mix (const Soil& soil, const SoilWater& soil_water, 
+DOM::Element::mix (const Geometry& geometry, 
+                   const Soil& soil, const SoilWater& soil_water, 
 		   Adsorption& adsorption,
 		   double from, double to)
 {
-  soil.mix (M, from, to);
+  geometry.mix (M, from, to);
   for (unsigned int i = 0; i < C.size (); i++)
     C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
 }
 
 void 
-DOM::Element::swap (const Soil& soil, const SoilWater& soil_water,
+DOM::Element::swap (const Geometry& geometry, 
+                    const Soil& soil, const SoilWater& soil_water,
 		    Adsorption& adsorption,
 		    double from, double middle, double to)
 {
-  soil.swap (M, from, middle, to);
+  geometry.swap (M, from, middle, to);
   for (unsigned int i = 0; i < C.size (); i++)
     C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
 }
 
 void 
-DOM::Element::transport (const Soil& soil, 
+DOM::Element::transport (const Geometry& geo, 
+                         const Soil& soil, 
 			 const SoilWater& soil_water, 
 			 Transport& trans,
 			 Transport& reserve,
@@ -119,14 +123,14 @@ DOM::Element::transport (const Soil& soil,
   fill (J_p.begin (), J_p.end (), 0.0);
 
   // Drainage.
-  for (unsigned int i = 0; i < soil.size (); i++)
+  for (unsigned int i = 0; i < geo.size (); i++)
     {
       S_drain[i] = -soil_water.S_drain (i) * dt * C[i];
       S[i] += S_drain[i];
     }
 
   // Flow.
-  const double old_content = soil.total (M);
+  const double old_content = geo.total (M);
   mactrans.tick (soil, soil_water, M, C, S, S_p, J_p, msg);
 
   try
@@ -152,9 +156,9 @@ DOM::Element::transport (const Soil& soil,
 			    diffusion_coefficient, M, C, S, J);
 	}
     }
-  const double new_content = soil.total (M);
+  const double new_content = geo.total (M);
   const double delta_content = new_content - old_content;
-  const double source = soil.total (S);
+  const double source = geo.total (S);
   const double in = -J[0];	// No preferential transport, it is 
   const double out = -J[soil.size ()]; // included in S.
   const double expected = source + in - out;
@@ -235,19 +239,19 @@ DOM::output (Log& log) const
 }
 
 void 
-DOM::mix (const Soil& soil, const SoilWater& soil_water,
+DOM::mix (const Geometry& geo, const Soil& soil, const SoilWater& soil_water,
 	  double from, double to)
 {
-  C.mix (soil, soil_water, *adsorption, from, to);
-  N.mix (soil, soil_water, *adsorption, from, to);
+  C.mix (geo, soil, soil_water, *adsorption, from, to);
+  N.mix (geo, soil, soil_water, *adsorption, from, to);
 }
 
 void 
-DOM::swap (const Soil& soil, const SoilWater& soil_water,
+DOM::swap (const Geometry& geo, const Soil& soil, const SoilWater& soil_water,
 	   double from, double middle, double to)
 {
-  C.swap (soil, soil_water, *adsorption, from, middle, to);
-  N.swap (soil, soil_water, *adsorption, from, middle, to);
+  C.swap (geo, soil, soil_water, *adsorption, from, middle, to);
+  N.swap (geo, soil, soil_water, *adsorption, from, middle, to);
 }
 
 void
@@ -363,13 +367,14 @@ DOM::tock (unsigned int end,
 }
 
 void 
-DOM::transport (const Soil& soil, const SoilWater& soil_water, Treelog& msg)
+DOM::transport (const Geometry& geo, 
+                const Soil& soil, const SoilWater& soil_water, Treelog& msg)
 {
-  C.transport (soil, soil_water, 
+  C.transport (geo, soil, soil_water, 
 	       *trans, *reserve, *last_resort, *mactrans, 
 	       *adsorption, diffusion_coefficient,
 	       msg);
-  N.transport (soil, soil_water, 
+  N.transport (geo, soil, soil_water, 
 	       *trans, *reserve, *last_resort, *mactrans, 
 	       *adsorption, diffusion_coefficient,
 	       msg);

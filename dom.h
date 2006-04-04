@@ -65,8 +65,10 @@ public:
   // Simulation.
 public:
   void output (Log&) const;
-  void mix (const Soil&, const SoilWater&, double from, double to);
-  void swap (const Soil&, const SoilWater& soil_water,
+  void mix (const Geometry&, 
+            const Soil&, const SoilWater&, double from, double to);
+  void swap (const Geometry&, 
+             const Soil&, const SoilWater& soil_water,
 	     double from, double middle, double to);
   void add_to_source (unsigned int at, double C, double N);
   double soil_C (const Geometry& geometry) const;
@@ -87,7 +89,7 @@ private:
 	     const double* factor, double fraction, double efficiency,
 	     const double* N_soil, double* N_used, double* CO2, OM& om);
 public:
-  void transport (const Soil&, const SoilWater&, Treelog&);
+  void transport (const Geometry&, const Soil&, const SoilWater&, Treelog&);
 
   // Create & Destroy.
 public:

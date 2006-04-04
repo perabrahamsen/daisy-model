@@ -1,7 +1,7 @@
 // am.C -- Added Matter, i.e. fertilizer and residuals.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2002 Per Abrahamsen and KVL.
+// Copyright 2000-2002, 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -27,7 +27,7 @@
 #include "alist.h"
 #include "time.h"
 #include "log.h"
-#include "soil.h"
+#include "geometry.h"
 #include "check.h"
 #include "vcheck.h"
 #include "mathlib.h"
@@ -619,14 +619,15 @@ AM::check_om_pools ()
 }
 
 AM& 
-AM::create (const AttributeList& al1 , const Soil& soil)
+AM::create (const AttributeList& al1 , const Geometry& geometry, 
+            const double max_rooting_depth)
 { 
   AttributeList al2 (al1);
   al2.add ("type", "state");
   if (!al2.check ("name"))
     al2.add ("name", al1.identifier ("type"));
   AM& am = *new AM (al2); 
-  am.initialize (soil);
+  am.initialize (geometry, max_rooting_depth);
   return am;
 }
 
@@ -892,7 +893,7 @@ AM::AM (const AttributeList& al)
  }
 
 void
-AM::initialize (const Soil& soil)
+AM::initialize (const Geometry& geometry, const double max_rooting_depth)
 {
   const string syntax = alist.name ("syntax");
   
@@ -942,7 +943,7 @@ AM::initialize (const Soil& soil)
 		  daisy_assert (fraction >= 0.0);
 		  daisy_assert (fraction <= 1.0);
 		  missing_fraction -= fraction;
-		  soil.add (om[j]->C, last, end, C * fraction);
+		  geometry.add (om[j]->C, last, end, C * fraction);
 		}
 	      else if (missing_number != -1)
 		// Should be catched by syntax check.
@@ -955,7 +956,7 @@ AM::initialize (const Soil& soil)
 	      if (missing_fraction < -0.1e-10)
 		throw ("Specified over 100% C in om in initial am");
 	      else if (missing_fraction > 0.0)
-		soil.add (om[missing_number]->C, 
+		geometry.add (om[missing_number]->C, 
 			  last, end, C * missing_fraction);
 	    }
 	  else if (missing_fraction < -0.1e-10)
@@ -985,19 +986,17 @@ AM::initialize (const Soil& soil)
       const double N = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
 	* total_N_fraction; // g C / cm²;
       const double k = M_LN2 / alist.number ("dist");
-      const double depth = alist.number ("depth", soil.MaxRootingDepth ());
+      const double depth = alist.number ("depth", max_rooting_depth);
+      daisy_assert (depth < 0.0);
 
       // Calculate density.
-      vector<double> density (soil.size (), 0.0);
-      for (unsigned int i = 0; 
-	   i < soil.size () && soil.z (i) > depth;
-	   i++)
-	{
-	  density[i] = k * exp (k * soil.z (i));
-	}
+      vector<double> density (geometry.size (), 0.0);
+      for (unsigned int i = 0; i < geometry.size (); i++)
+        if (geometry.z (i) > depth)
+          density[i] = k * exp (k * geometry.z (i));
 
       // Add it.
-      impl.add (soil, C, N, density);
+      impl.add (geometry, C, N, density);
     }
 }
 

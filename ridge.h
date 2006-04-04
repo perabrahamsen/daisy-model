@@ -26,6 +26,7 @@
 struct AttributeList;
 struct Syntax;
 struct Log;
+struct Geometry;
 struct Soil;
 struct SoilWater;
 
@@ -38,9 +39,11 @@ class Ridge
 
   // Simulation.
 public:
-  void tick (const Soil&, const SoilWater&, 
+  void tick (const Geometry& geo,
+             const Soil&, const SoilWater&, 
 	     double external_ponding /* [mm] */);
-  void update_water (const Soil&, const std::vector<double>& S_,
+  void update_water (const Geometry& geo,
+                     const Soil&, const std::vector<double>& S_,
 		     std::vector<double>& h_, std::vector<double>& Theta_,
 		     std::vector<double>& q, const std::vector<double>& q_p);
   void output (Log&) const;
@@ -51,7 +54,8 @@ public:
   // Create & Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  void initialize (const Soil&, const SoilWater&);
+  void initialize (const Geometry& geo,
+                   const Soil&, const SoilWater&);
   Ridge (const AttributeList& al);
   ~Ridge ();
 };

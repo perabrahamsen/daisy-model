@@ -27,7 +27,6 @@
 #include <vector>
 
 class Geometry;
-class Soil;
 class Time;
 class AOM;
 class Treelog;
@@ -83,12 +82,13 @@ public:
 public:
   static const VCheck& check_om_pools ();
   // Initialization & Fertilizer.
-  static AM& create (const AttributeList&, const Soil&);
+  static AM& create (const AttributeList&, const Geometry&, 
+                     double max_rooting_depth = 1.0);
   // Crop part.
   static AM& create (const Geometry&, const Time&,
 		     const std::vector<AttributeList*>&,
 		     symbol sort, symbol part, lock_type lock = Unlocked);
-  void initialize (const Soil&);
+  void initialize (const Geometry& geometry, const double max_rooting_depth);
   static const std::vector<AttributeList*>& default_AM ();
   static const AttributeList& default_root ();
   static double get_NO3 (const AttributeList&);	// [g N/cm^2]

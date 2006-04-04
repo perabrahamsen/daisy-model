@@ -22,6 +22,7 @@
 #include "soil_heat.h"
 #include "alist.h"
 #include "soil.h"
+#include "geometry.h"
 #include "syntax.h"
 #include "log.h"
 #include <sstream>
@@ -57,11 +58,11 @@ SoilHeat::SoilHeat (const AttributeList&)
 
 void
 SoilHeat::initialize_base (const AttributeList& al, 
-                      const Soil& soil, 
-                      Treelog& out)
+                           const Geometry& geo,
+                           Treelog& out)
 {
   // Fetch initial T.
-  soil.initialize_layer (T_, al, "T", out);
+  geo.initialize_layer (T_, al, "T", out);
 }
 
 SoilHeat::~SoilHeat ()

@@ -28,6 +28,7 @@
 #include "bioclimate.h"
 #include "plf.h"
 #include "soil_water.h"
+#include "geometry.h"
 #include "soil.h"
 #include "aom.h"
 #include "organic_matter.h"
@@ -113,14 +114,16 @@ public:
   { return canopy.EpFactor (DS ()); }
   void CanopyStructure ();
   void CropCAI ();
-  double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
+  double ActualWaterUptake (double Ept, const Geometry& geo,
+                            const Soil&, SoilWater&,
 			    double EvapInterception, double day_fraction, 
 			    Treelog&);
   void force_production_stress  (double pstress);
 
   // Simulation.
 public:
-  void tick (const Time& time, const Bioclimate&, const Soil&,
+  void tick (const Time& time, const Bioclimate&, const Geometry& geo,
+             const Soil&,
 	     OrganicMatter*,
 	     const SoilHeat&, const SoilWater&, SoilNH4*, SoilNO3*, 
 	     double&, double&, double&, vector<double>&, vector<double>&,
@@ -183,12 +186,14 @@ CropSimple::CropCAI ()
 
 double
 CropSimple::ActualWaterUptake (double Ept,
+                               const Geometry& geo,
 			       const Soil& soil, SoilWater& soil_water,
 			       const double EvapInterception, 
 			       const double day_fraction, Treelog& msg)
 {
-  return root_system->water_uptake (Ept, soil, soil_water, EvapInterception,
-				   day_fraction, msg);
+  return root_system->water_uptake (Ept, geo, 
+                                    soil, soil_water, EvapInterception,
+                                    day_fraction, msg);
 }
 
 void 
@@ -198,6 +203,7 @@ CropSimple::force_production_stress  (double pstress)
 void
 CropSimple::tick (const Time& time,
 		  const Bioclimate& bioclimate,
+                  const Geometry& geo,
 		  const Soil& soil,
 		  OrganicMatter* /* organic_matter */,
 		  const SoilHeat& soil_heat,
@@ -228,7 +234,7 @@ CropSimple::tick (const Time& time,
     }
 
   // Update average soil temperature.
-  const double T_soil = soil_heat.T (soil.interval_plus (-root_system->Depth));
+  const double T_soil = soil_heat.T (geo.interval_plus (-root_system->Depth));
   root_system->tick_hourly (time.hour (), T_soil);
   
   // Air temperature based growth.
@@ -253,15 +259,15 @@ CropSimple::tick (const Time& time,
 	  const double this_far = (T - T_emergence) / T_growth;
 	  
 	  canopy.Height = height_max * this_far;
-	  root_system->tick_daily (msg, soil, 
-				  WRoot * this_far, WRoot * step, 
-				  DS ());
+	  root_system->tick_daily (msg, geo, soil, 
+                                   WRoot * this_far, WRoot * step, 
+                                   DS ());
 	}
       else if (old_T < T_flowering)
 	{
 	  msg.message ("Flowering");
-	  root_system->tick_daily (msg, soil, WRoot,
-				  WRoot * (1.0 - old_T / T_flowering), DS ());
+	  root_system->tick_daily (msg, geo, soil, WRoot,
+                                   WRoot * (1.0 - old_T / T_flowering), DS ());
 	}
       else if (T < T_ripe)
 	/* do nothing */;
@@ -277,10 +283,10 @@ CropSimple::tick (const Time& time,
       if (soil_NO3)
 	{
 	  daisy_assert (soil_NH4);
-	  N_actual += root_system->nitrogen_uptake (soil, soil_water, 
-						   *soil_NH4, 0.0, 
-						   *soil_NO3, 0.0,
-						   N_demand - N_actual);
+	  N_actual += root_system->nitrogen_uptake (geo, soil, soil_water, 
+                                                    *soil_NH4, 0.0, 
+                                                    *soil_NO3, 0.0,
+                                                    N_demand - N_actual);
 	}
       else
 	{

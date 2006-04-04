@@ -41,11 +41,12 @@ struct ChemistryStandard : public Chemistry
   { output_variable (S_AB, log); }
 
   // Simulation.
-  void tick (const Soil& soil, const SoilWater& soil_water, 
+  void tick (const Geometry& geo,
+             const Soil& soil, const SoilWater& soil_water, 
              SoilChemicals& soil_chemicals, Treelog& msg)
   { 
-    SoilChemical& A = soil_chemicals.find (soil, soil_water, name_A, msg);
-    SoilChemical& B = soil_chemicals.find (soil, soil_water, name_B, msg);
+    SoilChemical& A = soil_chemicals.find (geo, soil, soil_water, name_A, msg);
+    SoilChemical& B = soil_chemicals.find (geo, soil, soil_water, name_B, msg);
     transform->tick (soil, soil_water, A.M (), B.M (), S_AB, msg);
     A.add_to_sink (S_AB);
     B.add_to_source (S_AB);

@@ -24,6 +24,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "log.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
@@ -65,7 +66,8 @@ struct Snow::Implementation
 				// for snow water mix [W m^5/kg^2/dg C]
 
   void output (Log& log) const;
-  void tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
+  void tick (Treelog&, const Geometry& geo,
+             const Soil& soil, const SoilWater& soil_water,
 	     const SoilHeat& soil_heat,
 	     double Si, double q_h, double Prain,
 	     double Psnow, double Pond, double T, double Epot);
@@ -106,7 +108,8 @@ Snow::Implementation::output (Log& log) const
 
 void
 Snow::Implementation::tick (Treelog& msg,
-			    const Soil& soil, const SoilWater& soil_water,
+			    const Geometry& geo, 
+                            const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    const double Si, const double q_h,
 			    const double Prain, const double Psnow,
@@ -295,7 +298,7 @@ Snow::Implementation::tick (Treelog& msg,
 	= soil.heat_conductivity (0, soil_water.Theta (0),
 				  soil_water.X_ice (0)) 
 	* 1e-7 * 100.0 / 3600.0; // [erg/cm/h/dg C] -> [W/m/dg C]
-      const double Z = -soil.z (0) / 100.0; // [cm] -> [m]
+      const double Z = -geo.z (0) / 100.0; // [cm] -> [m]
       const double T_soil = soil_heat.T (0); // [dg C]
 
       // Density and conductivity of snowpack.
@@ -319,13 +322,14 @@ Snow::Implementation::tick (Treelog& msg,
 }
   
 void 
-Snow::tick (Treelog& msg, const Soil& soil, const SoilWater& soil_water,
+Snow::tick (Treelog& msg, const Geometry& geo,
+            const Soil& soil, const SoilWater& soil_water,
 	    const SoilHeat& soil_heat,
 	    double Si, double q_h, double Prain,
 	    double Psnow, double Pond, double T, double Epot)
 {
   if (impl.Ssnow > 0.0 || Psnow > 0.0)
-    impl.tick (msg, soil, soil_water, soil_heat, Si, q_h,
+    impl.tick (msg, geo, soil, soil_water, soil_heat, Si, q_h,
 	       Prain, Psnow, Pond, T, Epot);
   else
     {

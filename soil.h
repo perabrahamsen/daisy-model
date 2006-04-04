@@ -23,19 +23,31 @@
 #ifndef SOIL_H
 #define SOIL_H
 
+#define SOIL_GEO
+
+#ifdef SOIL_GEO
 #include "geometry.h"
+#endif  // SOIL_GEO
 #include "horizon.h" // Needed for initialization order.
 
 struct AttributeList;
 struct Log;
+struct Groundwater;
 
-class Soil : public Geometry
+class Soil
+#ifdef SOIL_GEO
+  : public Geometry
+#endif  // SOIL_GEO
 {
   // Content.
   struct Implementation;
   Implementation& impl;
   // Cache for fast inline access.
   /* const */ std::vector<Horizon*> horizon_;
+#ifndef SOIL_GEO
+public:
+  size_t size () const;
+#endif
 
 public:
   // Water.
