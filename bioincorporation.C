@@ -35,8 +35,7 @@
 #include "mathlib.h"
 #include "timestep.h"
 #include <algorithm>
-
-using namespace std;
+#include <sstream>
 
 struct Bioincorporation::Implementation
 { 
@@ -47,8 +46,8 @@ struct Bioincorporation::Implementation
   const PLF T_factor;
   const double respiration;
   const PLF distribution;
-  vector<double> density;
-  const vector<AttributeList*>& aom_alists; // Stem AM parameters.
+  std::vector<double> density;
+  const std::vector<AttributeList*>& aom_alists; // Stem AM parameters.
   
   // Content.
   AM* aom;
@@ -56,19 +55,19 @@ struct Bioincorporation::Implementation
   // Log.
   double C_removed;
   double N_removed;
-  vector<double> C_added;
-  vector<double> N_added;  
+  std::vector<double> C_added;
+  std::vector<double> N_added;  
   double speed;
 
   // Utitlites.
   static bool am_compare (const AM* a, const AM* b);
 
   // Simulation.
-  void tick (const Geometry&, vector <AM*>& am, double T, double& CO2);
+  void tick (const Geometry&, std::vector <AM*>& am, double T, double& CO2);
   void output (Log&) const;
 
   // Utitlites.
-  void add (const Geometry& geometry, vector<double>& input, 
+  void add (const Geometry& geometry, std::vector<double>& input, 
 	    double amount) const;
 
   // Create and destroy.
@@ -108,7 +107,7 @@ static const double soil_to_surface = 1.0 / surface_to_soil;
 
 void
 Bioincorporation::Implementation::tick (const Geometry& geometry, 
-					vector <AM*>& am, double T, 
+					std::vector <AM*>& am, double T, 
 					double& CO2)
 {
   // No bioincorporation.
@@ -145,7 +144,16 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
     const double top_N = am[i]->top_N ();
     daisy_assert (top_N > 0.0);
     const double C_per_N = top_C / top_N;
-    daisy_assert (C_per_N >= last_C_per_N);
+    if (C_per_N < last_C_per_N)
+      {
+        std::ostringstream tmp;
+        tmp << "C/N = " << top_C << "/" << top_N << " = " << C_per_N << "\n"
+            << "last C/N = ";
+        if (i > 0)
+          tmp << am[i-1]->top_C () << "/" << am[i-1]->top_N () << " = ";
+        tmp << last_C_per_N;
+        daisy_warning (tmp.str ());
+      }
     speed = R_total * C_per_N_factor (C_per_N) * top_C / (top_C + k_total);
 
     // Don't take more than the bioincorporation can handle.
@@ -214,7 +222,7 @@ Bioincorporation::Implementation::output (Log& log) const
 
 void 
 Bioincorporation::Implementation::add (const Geometry& geometry,
-				       vector<double>& input,
+				       std::vector<double>& input,
 				       const double amount) const
 { geometry.add (input, density, amount /* * (1.0 - respiration) */); }
 
@@ -266,7 +274,7 @@ Bioincorporation::Implementation::Implementation (const AttributeList& al)
 { }
 
 void 
-Bioincorporation::tick (const Geometry& geometry, vector <AM*>& am, double T,
+Bioincorporation::tick (const Geometry& geometry, std::vector <AM*>& am, double T,
 			double& CO2)
 {
   impl.tick (geometry, am, T, CO2);
@@ -279,7 +287,7 @@ Bioincorporation::output (Log& log) const
 }
 
 void 
-Bioincorporation::add (const Geometry& geometry, vector<double>& input,
+Bioincorporation::add (const Geometry& geometry, std::vector<double>& input,
 		       const double amount) const
 { impl.add (geometry, input, amount); }
 
@@ -366,15 +374,15 @@ the whole profile.");
   AttributeList AOM1 (aom_alist);
   AttributeList AOM2 (aom_alist);
   AOM1.add ("initial_fraction", 0.80);
-  vector<double> CN;
+  std::vector<double> CN;
   CN.push_back (60.0);
   AOM1.add ("C_per_N", CN);
-  vector<double> efficiency1;
+  std::vector<double> efficiency1;
   efficiency1.push_back (0.50);
   efficiency1.push_back (0.50);
   AOM1.add ("efficiency", efficiency1);
   AOM1.add ("turnover_rate", 2.0e-4);
-  vector<double> fractions1;
+  std::vector<double> fractions1;
 #if 1 // SANDER_PARAMS
       fractions1.push_back (0.00);
       fractions1.push_back (1.00);
@@ -384,17 +392,17 @@ the whole profile.");
 #endif
   fractions1.push_back (0.00);
   AOM1.add ("fractions", fractions1);
-  vector<double> efficiency2;
+  std::vector<double> efficiency2;
   efficiency2.push_back (0.50);
   efficiency2.push_back (0.50);
   AOM2.add ("efficiency", efficiency2);
   AOM2.add ("turnover_rate", 2.0e-3);
-  vector<double> fractions2;
+  std::vector<double> fractions2;
   fractions2.push_back (0.00);
   fractions2.push_back (1.00);
   fractions2.push_back (0.00);
   AOM2.add ("fractions", fractions2);
-  vector<AttributeList*> am;
+  std::vector<AttributeList*> am;
   am.push_back (&AOM1);
   am.push_back (&AOM2);
   syntax.add_submodule_sequence ("AOM", Syntax::Const, 
