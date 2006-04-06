@@ -39,8 +39,6 @@
 #include <iomanip>
 #include <iostream>
 
-using namespace std;
-
 struct Soil::Implementation
 {
   // Layers.
@@ -48,7 +46,7 @@ struct Soil::Implementation
   {
     // Content.
     const double end;
-    auto_ptr<Horizon> horizon;
+    std::auto_ptr<Horizon> horizon;
 
     // Simulation.
     void output (Log& log) const
@@ -72,16 +70,16 @@ A location and content of a soil layer.");
     ~Layer ()
     { }
   };
-  /* const */ vector<Layer*> layers;
+  /* const */ std::vector<Layer*> layers;
   const int original_layer_size; // Size before adding aquitard, for logging.
 
   // Parameters
   const bool has_zplus;
-  const double MaxRootingDepth;
+  /* const */ double MaxRootingDepth;
   const double dispersivity;
-  const vector<double> border;
+  const std::vector<double> border;
 
-  bool has_attribute (const string& name) const
+  bool has_attribute (const std::string& name) const
   { 
     bool missing = false;
     for (unsigned int i = 0; i < layers.size (); i++)
@@ -102,6 +100,12 @@ A location and content of a soil layer.");
   ~Implementation ()
   { sequence_delete (layers.begin (), layers.end ()); }
 };
+
+#ifndef SOIL_GEO
+size_t 
+Soil::size () const
+{ return horizon_.size (); }
+#endif // SOIL_GEO
 
 double 
 Soil::K (int i, double h, double h_ice, double T) const
@@ -224,7 +228,7 @@ Soil::heat_capacity (int i, double Theta, double Ice) const
 { return horizon_[i]->heat_capacity (Theta, Ice); }
 
 bool
-Soil::has_attribute (const string& name) const
+Soil::has_attribute (const std::string& name) const
 { return impl.has_attribute (name); }
 
 bool 
@@ -235,7 +239,7 @@ double
 Soil::get_attribute (int i, const std::string& name) const
 { return horizon_[i]->get_attribute (name); }
 
-string
+std::string
 Soil::get_dimension (int i, const std::string& name) const
 { return horizon_[i]->get_dimension (name); }
 
@@ -265,7 +269,7 @@ Soil::nitrification (const size_t i,
 double
 Soil::MaxRootingDepth () const
 {
-  return max (-impl.MaxRootingDepth, z (size () - 1));
+  return -impl.MaxRootingDepth;
 }
 
 double
@@ -278,8 +282,11 @@ Soil::end_of_first_horizon () const
 bool 
 Soil::check (int som_size, Treelog& err) const
 {
+#ifdef SOIL_GEO
   bool ok = Geometry::check (err);
-
+#else
+  bool ok = true;
+#endif
   if (som_size >= 0)
     {
       Treelog::Open nest (err, "horizons");
@@ -311,13 +318,14 @@ Soil::check (int som_size, Treelog& err) const
 }
 
 bool
-Soil::check_border (const double border, Treelog& err) const
+Soil::check_border (const double border, const Geometry& geo, 
+                    Treelog& err) const
 {
   bool ok = false;
   if (impl.has_zplus)
     {
-      for (size_t i = 0; i < size (); i++)
-        if (approximate (border, zplus (i)))
+      for (size_t i = 0; i < geo.size (); i++)
+        if (approximate (border, geo.zplus (i)))
           ok = true;
     }
   else
@@ -341,7 +349,7 @@ check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
-  const vector<AttributeList*>& layers = al.alist_sequence ("horizons");
+  const std::vector<AttributeList*>& layers = al.alist_sequence ("horizons");
 
   if (layers.size () < 1U)
     {
@@ -365,7 +373,7 @@ check_alist (const AttributeList& al, Treelog& err)
   if (ok && al.check ("zplus"))
     {
       // This check is only meaningful if zplus and layers are ok.
-      const vector<double> zplus = al.number_sequence ("zplus");
+      const std::vector<double> zplus = al.number_sequence ("zplus");
   
       if (last != zplus[zplus.size() - 1])
 	{
@@ -376,21 +384,6 @@ check_alist (const AttributeList& al, Treelog& err)
     }
   return ok;
 }  
-
-void 
-Soil::make_table (int i)
-{
-  cout << "pF   Theta   Cw2           K           (depth " << z (i) << ").\n";
-  for (double pF = 0.00; pF <= 5.0; pF += 0.01)
-    {
-      const double h = pF2h (pF);
-      cout << setw (4) << setprecision (3) << pF << " "
-	   << setw (6) << setprecision (5) << Theta (i, h, 0.0) << " "
-	   << setw (12) << setprecision (11) << Cw2 (i, h) * 100.0 << " "
-	   << setw (12) << setprecision (11) << K (i, h, 0.0, 20.0) / 3.6e5
-	   << "\n";
-    }
-}
 
 void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)
@@ -415,18 +408,22 @@ be added below the one specified here if you do not also specify 'zplus'.",
 List of flux depths where a mass balance should be possible when logging.\n\
 This attribute is ignored if zplus is specified explicitly.");
   syntax.add_check ("border", VCheck::decreasing ());
-  vector<double> default_borders;
+  std::vector<double> default_borders;
   default_borders.push_back (-100.0);
   alist.add ("border", default_borders);
 }
   
 Soil::Soil (Block& al)
-  : Geometry (al),
+  : 
+#ifdef SOIL_GEO
+  Geometry (al),
+#endif
     impl (*new Implementation (al))
 { }
 
 void
-Soil::initialize (Groundwater& groundwater, const int som_size, Treelog& msg)
+Soil::initialize (Geometry& geo,
+                  Groundwater& groundwater, const int som_size, Treelog& msg)
 {
   Treelog::Open nest (msg, "Soil");
 
@@ -476,15 +473,15 @@ Soil::initialize (Groundwater& groundwater, const int som_size, Treelog& msg)
       impl.layers.push_back (new Implementation::Layer (block));
     }
 
-  const vector<Implementation::Layer*>::const_iterator begin
+  const std::vector<Implementation::Layer*>::const_iterator begin
     = impl.layers.begin ();
-  const vector<Implementation::Layer*>::const_iterator end 
+  const std::vector<Implementation::Layer*>::const_iterator end 
     = impl.layers.end ();
   daisy_assert (begin != end);
-  vector<Implementation::Layer*>::const_iterator layer;
+  std::vector<Implementation::Layer*>::const_iterator layer;
 
   // Initialize geometry.
-  vector<double> fixed;
+  std::vector<double> fixed;
   {
     Treelog::Open nest (msg, "Horizons");
     double last = 0.0;
@@ -508,21 +505,24 @@ Soil::initialize (Groundwater& groundwater, const int som_size, Treelog& msg)
 	last = current;
 	fixed.push_back (last);
       }
+    if (-last < impl.MaxRootingDepth)
+      impl.MaxRootingDepth = -last;
   }
-  initialize_zplus (groundwater, fixed, -impl.MaxRootingDepth, 
-		    2 * impl.dispersivity, msg);
+  geo.initialize_zplus (groundwater, fixed, -impl.MaxRootingDepth, 
+                        2 * impl.dispersivity, msg);
 
   // Initialize horizons.
   layer = begin;
-  for (unsigned int i = 0; i < size (); i++)
+  for (unsigned int i = 0; i < geo.size (); i++)
     {
-      if (zplus (i) < (*layer)->end)
+      if (geo.zplus (i) < (*layer)->end)
 	{
 	  layer++;
 	  daisy_assert (layer != end);
 	}
       horizon_.push_back (&*((*layer)->horizon));
     }
+  daisy_assert (size () == geo.size ());
 }
 
 Soil::~Soil ()

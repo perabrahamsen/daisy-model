@@ -135,13 +135,13 @@ Solute::tick (const Geometry& geo,
 
   // Flow.
   const double old_content = geo.total (M_);
-  mactrans->tick (soil, soil_water, M_, C_, S, S_p, J_p, msg);
+  mactrans->tick (geo, soil_water, M_, C_, S, S_p, J_p, msg);
 
   try
     {
       for (unsigned i = 0; i < soil.size (); i++)
 	daisy_assert (M_left (i) >= 0.0);
-      transport->tick (msg, soil, soil_water, *adsorption, 
+      transport->tick (msg, geo, soil, soil_water, *adsorption, 
                        diffusion_coefficient (), 
                        M_, C_, S, J);
     }
@@ -153,7 +153,7 @@ Solute::tick (const Geometry& geo,
 	{
 	  for (unsigned i = 0; i < soil.size (); i++)
 	    daisy_assert (M_left (i) >= 0.0);
-	  reserve->tick (msg, soil, soil_water, *adsorption, 
+	  reserve->tick (msg, geo, soil, soil_water, *adsorption, 
                          diffusion_coefficient (), M_, C_, S, J);
 	}
       catch (const char* error)
@@ -162,7 +162,7 @@ Solute::tick (const Geometry& geo,
 			+ ", trying last resort.");
 	  for (unsigned i = 0; i < soil.size (); i++)
 	    daisy_assert (M_left (i) >= 0.0);
-	  last_resort->tick (msg, soil, soil_water, *adsorption, 
+	  last_resort->tick (msg, geo, soil, soil_water, *adsorption, 
                              diffusion_coefficient (), M_, C_, S, J);
 	}
     }

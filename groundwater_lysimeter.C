@@ -21,7 +21,7 @@
 
 
 #include "groundwater.h"
-#include "soil.h"
+#include "geometry.h"
 
 class GroundwaterLysimeter : public Groundwater
 {
@@ -41,7 +41,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Soil&, SoilWater&, double, 
+  void tick (const Geometry&, const Soil&, SoilWater&, double, 
 	     const SoilHeat&, const Time&, Treelog&)
   { }
   double table () const
@@ -49,8 +49,8 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Soil& soil, const Time&, Treelog&)
-  { location = soil.zplus (soil.size () - 1); }
+  void initialize (const Geometry& geo, const Time&, Treelog&)
+  { location = geo.zplus (geo.size () - 1); }
 
   GroundwaterLysimeter (Block& al)
     : Groundwater (al),

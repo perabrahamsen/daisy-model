@@ -35,7 +35,8 @@ public:
 
   // Simulation.
 public:
-  void tick (const Soil&, SoilWater&, double, 
+  void tick (const Geometry&,
+             const Soil&, SoilWater&, double, 
 	     const SoilHeat&, const Time&, Treelog&)
   { }
   double table () const
@@ -43,7 +44,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Soil&, const Time&, Treelog&)
+  void initialize (const Geometry&, const Time&, Treelog&)
   { }
   GroundwaterDeep (Block& al)
     : Groundwater (al)

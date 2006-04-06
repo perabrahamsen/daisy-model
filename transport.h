@@ -25,6 +25,7 @@
 
 #include "librarian.h"
 
+class Geometry;
 class Soil;
 class SoilWater;
 class Adsorption;
@@ -38,7 +39,8 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (Treelog&, const Soil&, const SoilWater&, 
+  virtual void tick (Treelog&, const Geometry&,
+                     const Soil&, const SoilWater&, 
 		     const Adsorption&, 
 		     double diffusion_coefficient,
 		     std::vector<double>& M, 

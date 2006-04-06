@@ -382,7 +382,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   // 1.1 Evapotranspiration
   daisy_assert (pet.get () != NULL);
   pet->tick (time, 
-             weather, vegetation, surface, soil, soil_heat, soil_water, msg);
+             weather, vegetation, surface, 
+             geo, soil, soil_heat, soil_water, msg);
   total_ep = pet->wet ();
   daisy_assert (total_ep >= 0.0);
   total_ea = 0.0;		// To be calculated.

@@ -654,11 +654,12 @@ VegetationCrops::output (Log& log) const
 }
 
 void
-VegetationCrops::initialize (const Time&, const Geometry&, const Soil& soil, 
+VegetationCrops::initialize (const Time&, const Geometry& geo,
+                             const Soil&, 
 			     OrganicMatter *const organic_matter, Treelog& msg)
 {
   for (unsigned int i = 0; i < crops.size (); i++)
-    crops[i]->initialize (msg, soil, organic_matter);
+    crops[i]->initialize (msg, geo, organic_matter);
 
   reset_canopy_structure (msg);
 }

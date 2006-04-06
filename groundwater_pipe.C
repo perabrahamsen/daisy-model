@@ -22,6 +22,7 @@
 
 #include "groundwater.h"
 #include "log.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_heat.h"
 #include "soil_water.h"
@@ -85,22 +86,24 @@ public:
 
   // Simulation.
 public:
-  void tick (const Soil&, SoilWater&, double,
+  void tick (const Geometry& geo,
+             const Soil&, SoilWater&, double,
 	     const SoilHeat&, const Time&, Treelog&);
   void output (Log& log) const;
 
 private:
-  void set_h_aquifer (const Soil& soil, const Time& time)
+  void set_h_aquifer (const Geometry& geo, const Time& time)
   {
-    const size_t size = soil.size ();
-    const double aquitart_bottom = soil.zplus (size-1) - Z_aquitard_;
+    const size_t size = geo.size ();
+    const double aquitart_bottom = geo.zplus (size-1) - Z_aquitard_;
     h_aquifer = pressure_table->operator()(time) - aquitart_bottom;
   }
-  double DeepPercolation (const Soil&);
+  double DeepPercolation (const Geometry&);
   double K_to_pipes (const unsigned int i, 
                      const Soil& soil, 
                      const SoilHeat& soil_heat) const;
-  double EquilibriumDrainFlow (const Soil&, const SoilHeat&);
+  double EquilibriumDrainFlow (const Geometry& geo,
+                               const Soil&, const SoilHeat&);
 
   // Accessors.
   double table () const
@@ -108,13 +111,13 @@ private:
 
   // Create and Destroy.
 public:
-  void initialize (const Soil& soil, const Time& time, Treelog& msg)
+  void initialize (const Geometry& geo, const Time& time, Treelog& msg)
   {
-    const int size = soil.size ();
+    const int size = geo.size ();
     double largest = 0.0;
     for (unsigned int i = 0; i < size; i++)
-      if (soil.dz (i) > largest)
-	largest = soil.dz (i);
+      if (geo.dz (i) > largest)
+	largest = geo.dz (i);
     if (largest > 10.0)
       {
 	Treelog::Open nest (msg, "Groundwater pipe");
@@ -124,14 +127,14 @@ public:
 	msg.warning (tmp.str ());
       }
 
-    i_drain = soil.interval_plus (pipe_position);
+    i_drain = geo.interval_plus (pipe_position);
     daisy_assert (i_drain > 0);
     S.insert (S.end (), size, 0.0);
 
     if (!pressure_table.get ())
       {
         // GCC 2.95 need the extra variable for the assignment.
-        std::auto_ptr<Depth> depth (Depth::create ((soil.zplus (size-1)
+        std::auto_ptr<Depth> depth (Depth::create ((geo.zplus (size-1)
                                                     - Z_aquitard_)
                                                    + h_aquifer));
         pressure_table = depth;
@@ -139,7 +142,7 @@ public:
     pressure_table->initialize (msg);
     // Pressure below aquitard.
     if (pressure_table->check (msg))
-      set_h_aquifer (soil, time);
+      set_h_aquifer (geo, time);
   }
   bool check (Treelog& msg) const
   { return pressure_table->check (msg); }
@@ -167,7 +170,8 @@ public:
 };
 
 void 
-GroundwaterPipe::tick (const Soil& soil, SoilWater& soil_water, 
+GroundwaterPipe::tick (const Geometry& geo,
+                       const Soil& soil, SoilWater& soil_water, 
 		       const double h_surface,
 		       const SoilHeat& soil_heat, const Time& time,
                        Treelog&)
@@ -178,7 +182,7 @@ GroundwaterPipe::tick (const Soil& soil, SoilWater& soil_water,
   fill (S.begin (), S.end (), 0.0);
   
   // Virtual pressure table.
-  set_h_aquifer (soil, time);
+  set_h_aquifer (geo, time);
 
   // Find groundwater height.
   height = h_surface;
@@ -187,8 +191,8 @@ GroundwaterPipe::tick (const Soil& soil, SoilWater& soil_water,
       const double h = soil_water.h (i);
       if (h < 0)
 	{
-	  const double zplus = soil.zplus (i);
-	  const double z = (i == 0) ? 0.0 : soil.zplus (i-1);
+	  const double zplus = geo.zplus (i);
+	  const double z = (i == 0) ? 0.0 : geo.zplus (i-1);
 	  const double zx = z - zplus; 
 	  if (h + zx > 0)
 	    // Groundwater in this node.
@@ -201,21 +205,21 @@ GroundwaterPipe::tick (const Soil& soil, SoilWater& soil_water,
     }
 
   // Find sink term.
-  EqDrnFlow = EquilibriumDrainFlow (soil, soil_heat);
-  DrainFlow= soil.total (S);
+  EqDrnFlow = EquilibriumDrainFlow (geo, soil, soil_heat);
+  DrainFlow= geo.total (S);
   soil_water.drain (S);
 
   // Find deep percolation.
-  deep_percolation = DeepPercolation (soil);
+  deep_percolation = DeepPercolation (geo);
 }
 
 
 double
-GroundwaterPipe::DeepPercolation(const Soil& soil)
+GroundwaterPipe::DeepPercolation(const Geometry& geo)
 {
-  const int size = soil.size ();
+  const int size = geo.size ();
   daisy_assert (size > 0);
-  const double hb = height - soil.zplus (size - 1);
+  const double hb = height - geo.zplus (size - 1);
   if (hb > 0)
     return K_aquitard_ * (1.0 + (hb - h_aquifer) / Z_aquitard_);
   else
@@ -234,21 +238,22 @@ GroundwaterPipe::K_to_pipes (const unsigned int i,
 }
 
 double
-GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil, 
+GroundwaterPipe::EquilibriumDrainFlow (const Geometry& geo,
+                                       const Soil& soil, 
 				       const SoilHeat& soil_heat)
 {
-  const int size = soil.size ();
-  const int i_GWT = soil.interval_plus (height) + 1;
+  const int size = geo.size ();
+  const int i_GWT = geo.interval_plus (height) + 1;
   daisy_assert (i_drain > 0);
-  if (height >= soil.zplus(i_drain-1))
+  if (height >= geo.zplus(i_drain-1))
     {
       // GWT located above drain
       double Ha = 0;
       double Ka = 0;
       for (unsigned int i = i_GWT; i <= i_drain; i++)
 	{
-	  Ha += soil.dz (i);
-	  Ka += soil.dz (i) * K_to_pipes (i, soil, soil_heat);
+	  Ha += geo.dz (i);
+	  Ka += geo.dz (i) * K_to_pipes (i, soil, soil_heat);
 	}
       Ka /= Ha;
 
@@ -257,8 +262,8 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
       double Kb = 0;
       for (unsigned int i = i_drain+1; i < size; i++)
 	{
-	  Hb += soil.dz (i);
-	  Kb += soil.dz (i) * K_to_pipes (i, soil, soil_heat);
+	  Hb += geo.dz (i);
+	  Kb += geo.dz (i) * K_to_pipes (i, soil, soil_heat);
 	}
       Kb /= Hb;
       const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);
@@ -274,6 +279,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
     }
   return 0.0;
 }
+
 void
 GroundwaterPipe::output (Log& log) const
 {

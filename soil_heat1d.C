@@ -26,6 +26,7 @@
 #include "weather.h"
 #include "soil_water.h"
 #include "soil.h"
+#include "geometry.h"
 #include "syntax.h"
 #include "time.h"
 #include "mathlib.h"
@@ -62,35 +63,42 @@ struct SoilHeat1D::Implementation
   // Simulation.
   double capacity (const Soil&, const SoilWater&, size_t i) const;
   double capacity_apparent (const Soil&, const SoilWater&, size_t i) const;
-  void tick (const Time&, const Soil&, SoilWater&, 
+  void tick (const Time&, const Geometry& geo,
+             const Soil&, SoilWater&, 
              const Surface&, const Weather&, 
              std::vector<double>& T);
   void update_freezing_points (const Soil& soil,
                                const SoilWater& soil_water);
-  bool update_state (const Soil& soil, const SoilWater& soil_water, 
+  bool update_state (const Geometry& geo,
+                     const Soil& soil, const SoilWater& soil_water, 
                      std::vector<double>& T);
-  double calculate_freezing_rate (const Soil& soil,
+  double calculate_freezing_rate (const Geometry& geo,
+                                  const Soil& soil,
                                   const SoilWater& soil_water,
                                   unsigned int i, 
                                   const std::vector<double>& T);
   bool check_state (const Soil& soil, 
                     const std::vector<double>& T) const;
-  void force_state (const Geometry& geometry, 
-                    std::vector<double>& T);
-  void solve (const Time&, const Soil&, const SoilWater&, 
+  void force_state (std::vector<double>& T);
+  void solve (const Time&, const Geometry& geo,
+              const Soil&, const SoilWater&, 
               const Surface&, const Weather&, 
               std::vector<double>& T);
-  void calculate_heat_flux (const Soil&, const SoilWater&, 
+  void calculate_heat_flux (const Geometry& geo,
+                            const Soil&, const SoilWater&, 
                             const std::vector<double>& T);
-  double energy (const Soil&, const SoilWater&, double from, double to, 
+  double energy (const Geometry& geo,
+                 const Soil&, const SoilWater&, double from, double to, 
                  const std::vector<double>& T) const;
-  void set_energy (const Soil&, const SoilWater&, 
+  void set_energy (const Geometry& geo,
+                   const Soil&, const SoilWater&, 
                    double from, double to, double energy, 
                    std::vector<double>& T);
   double bottom (const Time&, const Weather& weather) const;
 
   // Create & Destroy.
-  void initialize (const Soil& soil, const Time& time, const Weather& weather, 
+  void initialize (const Geometry& geo,
+                   const Soil& soil, const Time& time, const Weather& weather, 
                    std::vector<double>& T,
                    Treelog&);
   Implementation (const AttributeList&);
@@ -138,6 +146,7 @@ SoilHeat1D::Implementation::capacity_apparent
 
 void
 SoilHeat1D::Implementation::tick (const Time& time,
+                                  const Geometry& geo,
                                   const Soil& soil,
                                   SoilWater& soil_water,
                                   const Surface& surface,
@@ -149,20 +158,20 @@ SoilHeat1D::Implementation::tick (const Time& time,
 
   // Solve with old state.
   T_old = T;
-  solve (time, soil, soil_water, surface, weather, T);
+  solve (time, geo, soil, soil_water, surface, weather, T);
 
   // Check if ice is enabled.
   if (!enable_ice)
     return;
 
   // Update state according to new temperatures.
-  const bool changed = update_state (soil, soil_water, T);
+  const bool changed = update_state (geo, soil, soil_water, T);
 
   if (changed)
     {
       // Solve again with new state.
       T = T_old;
-      solve (time, soil, soil_water, surface, weather, T);
+      solve (time, geo, soil, soil_water, surface, weather, T);
 
       // Check if state match new temperatures.
       const bool changed_again = check_state (soil, T);
@@ -170,7 +179,7 @@ SoilHeat1D::Implementation::tick (const Time& time,
       if (changed_again)
         {
           // Force temperatures to match state.
-          force_state (soil, T);
+          force_state (T);
         }
     }
   // Update ice in water.
@@ -213,7 +222,8 @@ SoilHeat1D::Implementation::update_freezing_points (const Soil& soil,
 } 
 
 bool
-SoilHeat1D::Implementation::update_state (const Soil& soil, 
+SoilHeat1D::Implementation::update_state (const Geometry& geo,
+                                          const Soil& soil, 
                                           const SoilWater& soil_water, 
                                           std::vector<double>& T)
 {
@@ -227,7 +237,8 @@ SoilHeat1D::Implementation::update_state (const Soil& soil,
           if (T[i] < T_freezing[i])
             {
               // Find freezing rate.
-              freezing_rate[i] = calculate_freezing_rate (soil, soil_water, 
+              freezing_rate[i] = calculate_freezing_rate (geo, 
+                                                          soil, soil_water, 
                                                           i, T);
 
               if (freezing_rate[i] < 0.0)
@@ -272,7 +283,8 @@ SoilHeat1D::Implementation::update_state (const Soil& soil,
         case thawing:
           if (T[i] > T_thawing[i])
             {
-              freezing_rate[i] = calculate_freezing_rate (soil, soil_water, 
+              freezing_rate[i] = calculate_freezing_rate (geo, 
+                                                          soil, soil_water, 
                                                           i, T);
               if (freezing_rate[i] > 0.0)
                 freezing_rate[i] = 0.0;
@@ -317,7 +329,8 @@ SoilHeat1D::Implementation::update_state (const Soil& soil,
 }
 
 double
-SoilHeat1D::Implementation::calculate_freezing_rate (const Soil& soil,
+SoilHeat1D::Implementation::calculate_freezing_rate (const Geometry& geo,
+                                                     const Soil& soil,
                                                      const SoilWater& soil_water,
                                                      unsigned int i, 
                                                      const std::vector<double>& T)
@@ -325,7 +338,7 @@ SoilHeat1D::Implementation::calculate_freezing_rate (const Soil& soil,
   const double T_mean = (T[i] + T_old[i]) / 2.0;
   const double dT = T[i] - T_old[i];
   const double dq = q[i] - q[i+1];
-  const double dz = soil.dz (i);
+  const double dz = geo.dz (i);
   const double S 
     = soil_water.S_sum (i) - soil_water.S_ice (i) * rho_ice / rho_water;
   const double Sh
@@ -365,10 +378,9 @@ SoilHeat1D::Implementation::check_state (const Soil& soil,
 }
 
 void
-SoilHeat1D::Implementation::force_state (const Geometry& geometry, 
-                                         std::vector<double>& T)
+SoilHeat1D::Implementation::force_state (std::vector<double>& T)
 {
-  for (unsigned int i = 0; i < geometry.size (); i++)
+  for (unsigned int i = 0; T.size (); i++)
     {
       switch (state[i])
         {
@@ -392,6 +404,7 @@ SoilHeat1D::Implementation::force_state (const Geometry& geometry,
 
 void
 SoilHeat1D::Implementation::solve (const Time& time,
+                                   const Geometry& geo,
                                    const Soil& soil,
                                    const SoilWater& soil_water,
                                    const Surface& surface,
@@ -430,12 +443,12 @@ SoilHeat1D::Implementation::solve (const Time& time,
       // Calculate distances.
       const double dz_next 
         = (i == size - 1)
-        ? soil.z (i) - soil.z (prev)
-        : soil.z (next) - soil.z (i);
+        ? geo.z (i) - geo.z (prev)
+        : geo.z (next) - geo.z (i);
       const double dz_prev 
         = (i == 0)
-        ? soil.z (i) - 0.0
-        : soil.z (i) - soil.z (prev);
+        ? geo.z (i) - 0.0
+        : geo.z (i) - geo.z (prev);
       const double dz_both = dz_prev + dz_next;
 
       // Calculate temperature differences.
@@ -484,15 +497,15 @@ SoilHeat1D::Implementation::solve (const Time& time,
       const double x2 = dT_next / dz_next - dT_prev/ dz_prev;
       if (i == 0)
         d[i] = T[i] * capacity / dt
-          + conductivity / soil.z (1) * (x2 + T_top_new / soil.z (0))
-          + Cx * (T[1] - T_top + T_top_new) / (2.0 * soil.z (1));
+          + conductivity / geo.z (1) * (x2 + T_top_new / geo.z (0))
+          + Cx * (T[1] - T_top + T_top_new) / (2.0 * geo.z (1));
       else
         d[i] = T[i] * capacity / dt + (conductivity / dz_both) * x2
           + Cx * dT_both / dz_both / 2.0;
       
       if (state[i] == freezing || state[i] == thawing)
         d[i] -= latent_heat_of_fussion * rho_water
-          * (soil_water.q (i) - soil_water.q (next)) / soil.dz (i) / dt;
+          * (soil_water.q (i) - soil_water.q (next)) / geo.dz (i) / dt;
 
       // External heat source.
       d[i] += S[i];
@@ -503,11 +516,12 @@ SoilHeat1D::Implementation::solve (const Time& time,
   T_top = T_top_new;
   daisy_assert (T[0] < 50.0);
 
-  calculate_heat_flux (soil, soil_water, T);
+  calculate_heat_flux (geo, soil, soil_water, T);
 }
 
 void
-SoilHeat1D::Implementation::calculate_heat_flux (const Soil& soil,
+SoilHeat1D::Implementation::calculate_heat_flux (const Geometry& geo,
+                                                 const Soil& soil,
                                                  const SoilWater& soil_water, 
                                                  const std::vector<double>& T)
 {
@@ -521,13 +535,13 @@ SoilHeat1D::Implementation::calculate_heat_flux (const Soil& soil,
       const double K = soil.heat_conductivity (i, Theta, X_ice);
       const double T_next = (T[i] + T_old[i]) / 2.0;
       const double dT = T_prev - T_next;
-      const double dz = z_prev - soil.z (i);
+      const double dz = z_prev - geo.z (i);
       const double q_water = soil_water.q (i);
       const double T = (T_prev + T_next) / 2.0;
 
       q[i] = - K * dT/dz + water_heat_capacity * rho_water *  q_water * T;
       T_prev = T_next;
-      z_prev = soil.z (i);
+      z_prev = geo.z (i);
     }
   // Lower boundary.
   const unsigned int i = soil.size ();
@@ -537,7 +551,7 @@ SoilHeat1D::Implementation::calculate_heat_flux (const Soil& soil,
   const double K = soil.heat_conductivity (prev, Theta, X_ice);
   const double T_next = T_bottom;
   const double dT = T_prev - T_next;
-  const double dz = soil.z (prev-1U) - soil.z (prev);
+  const double dz = geo.z (prev-1U) - geo.z (prev);
   const double q_water = soil_water.q (i);
   const double my_T = (T_prev + T_next) / 2.0;
 
@@ -546,7 +560,8 @@ SoilHeat1D::Implementation::calculate_heat_flux (const Soil& soil,
  
 
 double 
-SoilHeat1D::Implementation::energy (const Soil& soil,
+SoilHeat1D::Implementation::energy (const Geometry& geo,
+                                    const Soil& soil,
                                     const SoilWater& soil_water,
                                     double from, double to, 
                                     const std::vector<double>& T) const
@@ -556,19 +571,20 @@ SoilHeat1D::Implementation::energy (const Soil& soil,
 
   for (unsigned int i = 0; i < soil.size () && old > to ; i++)
     {
-      if (soil.zplus (i) < from)
+      if (geo.zplus (i) < from)
         {
-          const double height = (std::min (old, from) - std::max (soil.zplus (i), to));
+          const double height = (std::min (old, from) - std::max (geo.zplus (i), to));
           const double C = soil.heat_capacity (i, soil_water.Theta (i), soil_water.X_ice (i));
           amount += C * T[i] * height;
         }
-      old = soil.zplus (i);
+      old = geo.zplus (i);
     }
   return amount;
 }
 
 void
-SoilHeat1D::Implementation::set_energy (const Soil& soil,
+SoilHeat1D::Implementation::set_energy (const Geometry& geo,
+                                        const Soil& soil,
                                         const SoilWater& soil_water, 
                                         double from, double to, double energy, 
                                         std::vector<double>& T)
@@ -579,13 +595,13 @@ SoilHeat1D::Implementation::set_energy (const Soil& soil,
 
   for (unsigned int i = 0; i < soil.size () && old > to ; i++)
     {
-      if (soil.zplus (i) < from)
+      if (geo.zplus (i) < from)
         {
-          const double height = (std::min (old, from) - std::max (soil.zplus (i), to));
+          const double height = (std::min (old, from) - std::max (geo.zplus (i), to));
           capacity += soil.heat_capacity (i, soil_water.Theta (i), 
                                           soil_water.X_ice (i)) * height;
         }
-      old = soil.zplus (i);
+      old = geo.zplus (i);
     }
   
   // Distribute temperature evenly.
@@ -594,13 +610,13 @@ SoilHeat1D::Implementation::set_energy (const Soil& soil,
 
   for (unsigned int i = 0; i < soil.size () && old > to ; i++)
     {
-      if (soil.zplus (i) < from)
+      if (geo.zplus (i) < from)
         {
-          const double height = (std::min (old, from) - std::max (soil.zplus (i), to));
-          T[i] = (height * average + (soil.dz (i) - height)* T[i]) 
-            / soil.dz (i);
+          const double height = (std::min (old, from) - std::max (geo.zplus (i), to));
+          T[i] = (height * average + (geo.dz (i) - height)* T[i]) 
+            / geo.dz (i);
         }
-      old = soil.zplus (i);
+      old = geo.zplus (i);
     }
 }
 
@@ -621,7 +637,8 @@ SoilHeat1D::Implementation::Implementation (const AttributeList& al)
 }
 
 void
-SoilHeat1D::Implementation::initialize (const Soil& soil, 
+SoilHeat1D::Implementation::initialize (const Geometry& geo,
+                                        const Soil& soil, 
                                         const Time& time, 
                                         const Weather& weather, 
                                         std::vector<double>& T,
@@ -647,10 +664,10 @@ SoilHeat1D::Implementation::initialize (const Soil& soil,
   for (unsigned int i = 0; i < soil.size (); i++)
     {
       const double Theta_pF_2_0 = soil.Theta (i, pF_2_0, 0.0);
-      k += soil.dz (i) * soil.heat_conductivity (i, Theta_pF_2_0, 0.0);
-      C += soil.dz (i) * soil.heat_capacity (i, Theta_pF_2_0, 0.0);
+      k += geo.dz (i) * soil.heat_conductivity (i, Theta_pF_2_0, 0.0);
+      C += geo.dz (i) * soil.heat_capacity (i, Theta_pF_2_0, 0.0);
       const double a = k / C;
-      delay = soil.zplus (i) / sqrt (24.0 * 2.0 * a / rad_per_day);
+      delay = geo.zplus (i) / sqrt (24.0 * 2.0 * a / rad_per_day);
 
       // Fill out T if necessary.
       if (T.size () <= i)
@@ -677,48 +694,53 @@ SoilHeat1D::capacity_apparent (const Soil& soil,
 { return impl.capacity_apparent (soil, soil_water, i); }
 
 double 
-SoilHeat1D::top_flux (const Soil& soil, const SoilWater& soil_water) const
+SoilHeat1D::top_flux (const Geometry& geo,
+                      const Soil& soil, const SoilWater& soil_water) const
 {
   const double k 
     = soil.heat_conductivity (0, soil_water.Theta (0), soil_water.X_ice (0))
     * 1e-7 * 1e4 / 3600.0;	// erg/h/ cm/ K -> W/m^2/K
-  return k * (T (0) - T (1)) / (soil.z (0) - soil.z (1));
+  return k * (T (0) - T (1)) / (geo.z (0) - geo.z (1));
 }
 
 void 
 SoilHeat1D::tick (const Time& time, 
+                  const Geometry& geo,
                   const Soil& soil,
                   SoilWater& soil_water,
                   const Surface& surface,
                   const Weather& weather)
 {
-  impl.tick (time, soil, soil_water, surface, weather, T_);
+  impl.tick (time, geo, soil, soil_water, surface, weather, T_);
 }
 
 double 
-SoilHeat1D::energy (const Soil& soil,
+SoilHeat1D::energy (const Geometry& geo,
+                    const Soil& soil,
                     const SoilWater& soil_water,
                     double from, double to) const
 {
-  return impl.energy (soil, soil_water, from, to, T_);
+  return impl.energy (geo, soil, soil_water, from, to, T_);
 }
 
 void
-SoilHeat1D::set_energy (const Soil& soil,
+SoilHeat1D::set_energy (const Geometry& geo,
+                        const Soil& soil,
                         const SoilWater& soil_water, 
                         double from, double to, double energy)
 {
-  impl.set_energy (soil, soil_water, from, to, energy, T_);
+  impl.set_energy (geo, soil, soil_water, from, to, energy, T_);
 }
 
 void
-SoilHeat1D::swap (const Soil& soil, double from, double middle, double to)
+SoilHeat1D::swap (const Geometry& geo,
+                  double from, double middle, double to)
 {
   // This will only work right if the water is also swaped.
   // There *might* be a small error on the top and bottom nodes, but I
   // believe it should work as long as the energy is directly
   // proportional with the water content.
-  soil.swap (T_, from, middle, to);
+  geo.swap (T_, from, middle, to);
 }
   
 double 
@@ -782,11 +804,12 @@ SoilHeat1D::SoilHeat1D (const AttributeList& al)
 
 void
 SoilHeat1D::initialize (const AttributeList& al, 
+                        const Geometry& geo,
                         const Soil& soil, const Time& time, 
                         const Weather& weather, Treelog& out)
 { 
-  SoilHeat::initialize_base (al, soil, out);
-  impl.initialize (soil, time, weather, T_, out); 
+  SoilHeat::initialize_base (al, geo, out);
+  impl.initialize (geo, soil, time, weather, T_, out); 
 }
 
 SoilHeat1D::~SoilHeat1D ()

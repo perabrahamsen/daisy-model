@@ -21,6 +21,7 @@
 
 
 #include "macro.h"
+#include "geometry.h"
 #include "soil.h"
 #include "surface.h"
 #include "plf.h"
@@ -44,7 +45,8 @@ struct MacroStandard : public Macro
   const double pond_max;	// Pond height before activating pref.flow [mm]
 
   // Simulation.
- void tick (const Soil& soil, unsigned int first, unsigned int last,
+ void tick (const Geometry& geo,
+            const Soil& soil, unsigned int first, unsigned int last,
 	    Surface& surface,
 	    const vector<double>& h_ice,
 	    const vector<double>& h,
@@ -76,7 +78,8 @@ struct MacroStandard : public Macro
 };
 
 void 
-MacroStandard::tick (const Soil& soil, 
+MacroStandard::tick (const Geometry& geo,
+                     const Soil& soil, 
 		     const unsigned int first, const unsigned int last,
 		     Surface& surface,
 		     const vector<double>& h_ice,
@@ -89,25 +92,25 @@ MacroStandard::tick (const Soil& soil,
 { 
   // Check input.
   daisy_assert (last > first);
-  daisy_assert (last < soil.size ()); 
-  daisy_assert (h.size () == soil.size ());
-  daisy_assert (Theta.size () == soil.size ());
-  daisy_assert (S_m.size () == soil.size ());
-  daisy_assert (S_p.size () == soil.size ());
-  daisy_assert (q_p.size () == soil.size () + 1U);
+  daisy_assert (last < geo.size ()); 
+  daisy_assert (h.size () == geo.size ());
+  daisy_assert (Theta.size () == geo.size ());
+  daisy_assert (S_m.size () == geo.size ());
+  daisy_assert (S_p.size () == geo.size ());
+  daisy_assert (q_p.size () == geo.size () + 1U);
 
   // Check for macropores outside our soil.
-  if (height_start < soil.z (last))
+  if (height_start < geo.z (last))
     return;
-  const double soil_end = soil.zplus (soil.size () - 1);
+  const double soil_end = geo.zplus (geo.size () - 1);
 
   // Start and end of macro intervals.
-  const unsigned int from = max (double2int (soil.interval_plus 
+  const unsigned int from = max (double2int (geo.interval_plus 
 					     (height_start)) - 1,
 				 /* not unsigned, or -1 fails */
 				 double2int (first));
   const unsigned int to 
-    = min (soil.interval_plus (max (height_end, soil_end)), last);
+    = min (geo.interval_plus (max (height_end, soil_end)), last);
 
   // Check if macropores reach surface, and there is ponding there.
   double q_top = 0.0;
@@ -128,14 +131,14 @@ MacroStandard::tick (const Soil& soil,
     }
 
   // End point of layer above.
-  double previous_end = (from == 0) ? 0.0 : soil.zplus (from - 1);
-  const double last_end = soil.zplus (to);
+  double previous_end = (from == 0) ? 0.0 : geo.zplus (from - 1);
+  const double last_end = geo.zplus (to);
 
   // Do the preferential flow.
   for (unsigned int i = from; i < to; i++)
     {
       // The size of the layer.
-      const double dz = soil.dz (i); // [cm]
+      const double dz = geo.dz (i); // [cm]
       // The flow into the layer from above.
       double flow = -q_p[i];	// [cm/h] (downwards)
 
@@ -151,7 +154,7 @@ MacroStandard::tick (const Soil& soil,
 	{
 	  // Find fraction ending in this layer.
 	  /* const */ double this_layer 
-	    = distribution (soil.zplus (i)) - distribution (previous_end);
+	    = distribution (geo.zplus (i)) - distribution (previous_end);
 	  const double rest
 	    = distribution (last_end) - distribution (previous_end);
 	  daisy_assert (rest > 0.0);
@@ -169,22 +172,22 @@ MacroStandard::tick (const Soil& soil,
       S_p[i] = (q_p[i] - q_p[i+1]) / dz;
       
       // Update end point of layer above.
-      previous_end = soil.zplus (i);
+      previous_end = geo.zplus (i);
     }
 
   // Put any remaining preferential flow in the last node.
   if (q_p[to] < 0.0)		// Flow downward.
     {
-      S_p[to] = q_p[to] / soil.dz (to);
+      S_p[to] = q_p[to] / geo.dz (to);
     }
   q_p[to+1] = 0.0;		// No more flow.
 
   // Check that the sink terms add up.
-  if (fabs (soil.total (S_p) - q_top) > 1.0e-11)
+  if (fabs (geo.total (S_p) - q_top) > 1.0e-11)
     {
       std::ostringstream tmp;
       tmp << __FILE__ << ":" <<  __LINE__
-	     << ": BUG: Total S_p = '" << (soil.total (S_p) - q_top)
+	     << ": BUG: Total S_p = '" << (geo.total (S_p) - q_top)
 	     << "' first pass";
       msg.error (tmp.str ());
     }
@@ -196,7 +199,7 @@ MacroStandard::tick (const Soil& soil,
 					    i--)
     {
       // The size of the layer.
-      const double dz = soil.dz (i); // [cm]
+      const double dz = geo.dz (i); // [cm]
       // Saturated water.
       const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
       // Expected water content.
@@ -263,11 +266,11 @@ MacroStandard::tick (const Soil& soil,
       }
 
   // Check that the sink terms add up.
-  if (fabs (soil.total (S_p) - q_top - extra_water) > 1.0e-11)
+  if (fabs (geo.total (S_p) - q_top - extra_water) > 1.0e-11)
     {
       std::ostringstream tmp;
       tmp << __FILE__ << ":" <<  __LINE__
-	     << ": BUG: Total S_p = " << soil.total (S_p) << ", q_top = " 
+	     << ": BUG: Total S_p = " << geo.total (S_p) << ", q_top = " 
 	     << q_top << ", extra_water = " << extra_water;
       msg.error (tmp.str ());
     }

@@ -22,7 +22,7 @@
 
 #include "mactrans.h"
 #include "soil_water.h"
-#include "soil.h"
+#include "geometry.h"
 #include "plf.h"
 #include "mathlib.h"
 #include "timestep.h"
@@ -33,7 +33,8 @@ using namespace std;
 struct MactransStandard : public Mactrans
 {
   // Simulation.
- void tick (const Soil& soil, const SoilWater&,
+ void tick (const Geometry& geo,
+            const SoilWater&,
 	    const vector<double>& M,
 	    const vector<double>& C,
 	    vector<double>& S,
@@ -51,7 +52,7 @@ struct MactransStandard : public Mactrans
 };
 
 void 
-MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
+MactransStandard::tick (const Geometry& geo, const SoilWater& soil_water,
 			const vector<double>& M,
 			const vector<double>& C,
 			vector<double>& S_m,
@@ -60,9 +61,9 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 { 
   double max_delta_matter = 0.0; // [g/cm^2]
 
-  for (unsigned int i = 0; i < soil.size (); i++)
+  for (unsigned int i = 0; i < geo.size (); i++)
     {
-      const double dz = soil.dz (i);
+      const double dz = geo.dz (i);
 
       // Amount of water entering this layer through macropores.
       const double water_in_above = -soil_water.q_p (i); // [cm]
@@ -163,14 +164,14 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
     }
   
   // Check that the sink terms add up.
-  if (fabs (soil.total (S_p) + J_p[0] - J_p[soil.size ()])
+  if (fabs (geo.total (S_p) + J_p[0] - J_p[geo.size ()])
       > max_delta_matter * 1e-8)
     {
       Treelog::Open nest (out, "mactrans default");
       std::ostringstream tmp;
       tmp << __FILE__ << ":" <<  __LINE__
 	     << ": BUG: Total S_p = '"
-	     << (soil.total (S_p) + J_p[0]  - J_p[soil.size ()])
+	     << (geo.total (S_p) + J_p[0]  - J_p[geo.size ()])
 	     << "' solute\n";
       out.error (tmp.str ());
     }

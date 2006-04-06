@@ -21,6 +21,7 @@
 
 
 #include "transport.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "adsorption.h"
@@ -45,7 +46,8 @@ private:
   
   // Simulation.
 public:
-  void tick (Treelog&, const Soil&, const SoilWater&, const Adsorption&,
+  void tick (Treelog&, const Geometry& geo,
+             const Soil&, const SoilWater&, const Adsorption&,
 	     double diffusion_coefficient,
 	     vector<double>& M, 
 	     vector<double>& C,
@@ -70,7 +72,8 @@ TransportConvection::output (Log& log) const
 
 void 
 TransportConvection::tick (Treelog& msg, 
-			   const Soil& soil, const SoilWater& soil_water,
+			   const Geometry& geo,
+                           const Soil& soil, const SoilWater& soil_water,
 			   const Adsorption& adsorption, double,
 			   vector<double>& M, 
 			   vector<double>& C,
@@ -84,10 +87,10 @@ TransportConvection::tick (Treelog& msg,
   const vector<double> M_prev = M;
 
   // Number of soil layers.
-  const unsigned int size = soil.size ();
+  const unsigned int size = geo.size ();
 
   // Remember old content
-  const double old_total = soil.total (M) + soil.total (S) * dt;
+  const double old_total = geo.total (M) + geo.total (S) * dt;
 
   // Flux in individual time step.
   vector<double> dJ (size + 1, 0.0); 
@@ -96,7 +99,7 @@ TransportConvection::tick (Treelog& msg,
   ddt = dt;
   for (unsigned int i = 0; i < size; i++)
     {
-      const double half_content = soil_water.Theta (i) * soil.dz (i) / 2.0;
+      const double half_content = soil_water.Theta (i) * geo.dz (i) / 2.0;
       const double q_up = soil_water.q (i);
       if (q_up > 0.0)
 	{
@@ -154,7 +157,7 @@ TransportConvection::tick (Treelog& msg,
       for (unsigned int i = 0; i < size; i++)
 	{
 	  J[i] += dJ[i] * ddt;
-	  M[i] += (-dJ[i] + dJ[i+1]) * ddt / soil.dz (i) + S[i] * ddt;
+	  M[i] += (-dJ[i] + dJ[i+1]) * ddt / geo.dz (i) + S[i] * ddt;
 	  C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
 	}
       J[size] += dJ[size] * ddt;
@@ -174,14 +177,14 @@ TransportConvection::tick (Treelog& msg,
       }
   
   // Check mass conservation.
-  const double new_total = soil.total (M);
+  const double new_total = geo.total (M);
   if (!approximate (old_total - J[0] * dt + J[size] * dt, new_total)
       && !approximate (- J[0] * dt + J[size] * dt, 
                        new_total - old_total,
                        0.05))
     {
       Treelog::Open nest (msg, name);
-      const double total_S = soil.total (S) * dt;
+      const double total_S = geo.total (S) * dt;
       std::ostringstream tmp;
       tmp << "In (" << - J[0] << ") - out (" << -J[size] 
              << " != new (" << new_total 

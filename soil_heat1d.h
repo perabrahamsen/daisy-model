@@ -42,20 +42,26 @@ class SoilHeat1D : public SoilHeat
   double capacity (const Soil&, const SoilWater&, size_t i) const;
   double capacity_apparent (const Soil&, const SoilWater&, size_t i) const;
 public:
-  double top_flux (const Soil&, const SoilWater&) const; // [W/m^2]
-  void tick (const Time&, const Soil&, SoilWater&, 
+  double top_flux (const Geometry& geo,
+                   const Soil&, const SoilWater&) const; // [W/m^2]
+  void tick (const Time&, const Geometry& geo,
+             const Soil&, SoilWater&, 
 	     const Surface&, const Weather& weather);
-  double energy (const Soil&, const SoilWater&, double from, double to) const;
-  void set_energy (const Soil&, const SoilWater&, 
+  double energy (const Geometry& geo,
+                 const Soil&, const SoilWater&, double from, double to) const;
+  void set_energy (const Geometry& geo,
+                   const Soil&, const SoilWater&, 
 		   double from, double to, double energy);
-  void swap (const Soil&, double from, double middle, double to);
+  void swap (const Geometry& geo,
+             double from, double middle, double to);
   double source (size_t i) const;
   void set_source (size_t i, double value); // [erg/cm^3/h]
   void output (Log&) const;
   static void load_syntax (Syntax&, AttributeList&);
   SoilHeat1D (const AttributeList&);
   void initialize (const AttributeList& al, 
-		   const Soil& soil, const Time& time, const Weather& weather,
+		   const Geometry& geo,
+                   const Soil& soil, const Time& time, const Weather& weather,
 		   Treelog&);
   ~SoilHeat1D ();
 };

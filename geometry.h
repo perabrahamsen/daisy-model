@@ -80,8 +80,8 @@ public:
 			 const std::string& name, Treelog&) const;
 
   // Creation.
+public:
   bool check (Treelog&) const;
-protected:
   static void load_syntax (Syntax&, AttributeList&);
   Geometry (Block&);
   void initialize_zplus (const Groundwater& groundwater,

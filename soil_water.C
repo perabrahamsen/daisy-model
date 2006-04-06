@@ -74,7 +74,8 @@ public:
 
   // Simulation.
 public:
-  void macro_tick (const Soil&, Surface&, Treelog&);
+  void macro_tick (const Geometry& geo, 
+                   const Soil&, Surface&, Treelog&);
   void tick (const Geometry& geo,
              const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
   void set_external_source (const Geometry&, 
@@ -165,7 +166,8 @@ SoilWater::Implementation::first_groundwater_node () const
 }
 
 void
-SoilWater::Implementation::macro_tick (const Soil& soil, Surface& surface, 
+SoilWater::Implementation::macro_tick (const Geometry& geo, 
+                                       const Soil& soil, Surface& surface, 
 				       Treelog& out)
 {
   if (!macro.get ())			// No macropores.
@@ -174,7 +176,7 @@ SoilWater::Implementation::macro_tick (const Soil& soil, Surface& surface,
   // Calculate preferential flow first.
   std::fill (S_p.begin (), S_p.end (), 0.0);
   std::fill (q_p.begin (), q_p.end (), 0.0);
-  macro->tick (soil, 0, soil.size () - 1, surface, h_ice, h, Theta,
+  macro->tick (geo, soil, 0, soil.size () - 1, surface, h_ice, h, Theta,
 	       S_sum, S_p, q_p, out);
 }
 
@@ -268,7 +270,7 @@ SoilWater::Implementation::tick (const Geometry& geo,
   // Calculate matrix flow next.
   try
     {
-      ok = top->tick (msg, soil, soil_heat,
+      ok = top->tick (msg, geo, soil, soil_heat,
                       first, surface,
                       last, groundwater,
                       S_sum, h_old, Theta_old, h_ice,
@@ -287,7 +289,7 @@ SoilWater::Implementation::tick (const Geometry& geo,
   if (!ok)
     {
       msg.message ("Using reserve uz model.");
-      reserve->tick (msg, soil, soil_heat,
+      reserve->tick (msg, geo, soil, soil_heat,
                      first, surface,
                      last, groundwater,
                      S_sum, h_old, Theta_old, h_ice,
@@ -714,8 +716,9 @@ SoilWater::Theta (const Soil& soil, int i, double h) const
 { return soil.Theta (i, h, h_ice (i)); }
 
 void
-SoilWater::macro_tick (const Soil& soil, Surface& surface, Treelog& out)
-{ impl->macro_tick (soil, surface, out); }
+SoilWater::macro_tick (const Geometry& geo,
+                       const Soil& soil, Surface& surface, Treelog& out)
+{ impl->macro_tick (geo, soil, surface, out); }
 
 void
 SoilWater::tick (const Geometry& geo,

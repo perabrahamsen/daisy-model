@@ -131,11 +131,11 @@ DOM::Element::transport (const Geometry& geo,
 
   // Flow.
   const double old_content = geo.total (M);
-  mactrans.tick (soil, soil_water, M, C, S, S_p, J_p, msg);
+  mactrans.tick (geo, soil_water, M, C, S, S_p, J_p, msg);
 
   try
     {
-      trans.tick (msg, soil, soil_water, adsorption, 
+      trans.tick (msg, geo, soil, soil_water, adsorption, 
 		  diffusion_coefficient, 
 		  M, C, S, J);
     }
@@ -145,14 +145,14 @@ DOM::Element::transport (const Geometry& geo,
 		   ", trying reserve.");
       try
 	{
-	  reserve.tick (msg, soil, soil_water, adsorption, 
+	  reserve.tick (msg, geo, soil, soil_water, adsorption, 
 			diffusion_coefficient, M, C, S, J);
 	}
       catch (const char* error)
 	{
 	  msg.warning (string ("Reserve transport problem: ") + error
 		       + ", trying last resort.");
-	  last_resort.tick (msg, soil, soil_water, adsorption, 
+	  last_resort.tick (msg, geo, soil, soil_water, adsorption, 
 			    diffusion_coefficient, M, C, S, J);
 	}
     }

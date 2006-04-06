@@ -363,6 +363,10 @@ symbol
 Select::tag () const
 { return impl.tag; }
 
+const Geometry* 
+Select::geometry () const
+{ return NULL; }
+
 const Soil* 
 Select::soil () const
 { return NULL; }
@@ -402,7 +406,8 @@ Select::output_name (const symbol)
 { throw ("This log selection can't log names."); }
 
 void 
-Select::output_array (const vector<double>&, const Soil*, Treelog&)
+Select::output_array (const vector<double>&, 
+                      const Geometry*, const Soil*, Treelog&)
 { throw ("This log selection can't log arrays."); }
 
 void 

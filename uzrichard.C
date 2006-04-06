@@ -23,6 +23,7 @@
 #include "uzmodel.h"
 #include "groundwater.h"
 #include "surface.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_heat.h"
 #include "mathlib.h"
@@ -55,7 +56,8 @@ public:
 
   // Simulate.
 private:
-  bool richard (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
+  bool richard (Treelog&, const Geometry& geo,
+                const Soil& soil, const SoilHeat& soil_heat,
 		int first, const Surface& top,
 		int last, const Groundwater& bottom,
 		const vector<double>& S,
@@ -72,7 +74,7 @@ private:
 		  const vector<double>& h_ice,
 		  const vector<double>& K,
 		  vector<double>& Kplus) const;
-  void q_darcy (const Soil& soil,
+  void q_darcy (const Geometry& geo,
 		int first, int last,
 		const vector<double>& h_previous,
 		const vector<double>& h,
@@ -83,7 +85,8 @@ private:
 		double ddt,
 		vector<double>& q);
 public:
-  bool tick (Treelog&, const Soil& soil, const SoilHeat&,
+  bool tick (Treelog&, const Geometry& geo,
+             const Soil& soil, const SoilHeat&,
 	     unsigned int first, const Surface& top,
 	     unsigned int last, const Groundwater& bottom,
 	     const vector<double>& S,
@@ -103,7 +106,8 @@ public:
 
 bool
 UZRichard::richard (Treelog& msg,
-		    const Soil& soil,
+		    const Geometry& geo,
+                    const Soil& soil,
 		    const SoilHeat& soil_heat,
 		    int first, const Surface& top,
 		    const int last, const Groundwater& bottom,
@@ -146,7 +150,7 @@ UZRichard::richard (Treelog& msg,
   
   // For lysimeter bottom.
   daisy_assert (q.size () > last);
-  const double h_lim = soil.zplus (last) - soil.z (last);
+  const double h_lim = geo.zplus (last) - geo.z (last);
   daisy_assert (h_lim < 0.0);
 
   // Check when we last switched top.
@@ -160,7 +164,7 @@ UZRichard::richard (Treelog& msg,
     {
       available_water
 	= (Theta_old[first] 
-	   - soil.Theta (first, -20000.0, h_ice[first])) * soil.dz (first);
+	   - soil.Theta (first, -20000.0, h_ice[first])) * geo.dz (first);
     }
   else
     {
@@ -169,7 +173,7 @@ UZRichard::richard (Treelog& msg,
       if (available_water
 	  > soil.K (first, 0.0, h_ice[first], soil_heat.T (first)) * dt
 	  + (soil.Theta (first, 0.0, h_ice[first]) - Theta_old[first])
-	  * soil.dz (first))
+	  * geo.dz (first))
 	top.flux_top_off ();
     }
 
@@ -201,7 +205,7 @@ UZRichard::richard (Treelog& msg,
       Theta_previous = Theta;
 
       if (!top.flux_top () && !top.soil_top ())
-	h[first] = top.h () - soil.z (first) + top_water;
+	h[first] = top.h () - geo.z (first) + top_water;
 
       // Bottom flux.
       double q_bottom = 42.42e42;
@@ -217,7 +221,7 @@ UZRichard::richard (Treelog& msg,
                 = soil.Theta (last, h[size - 1], h_ice[last])
                 - soil.Theta (last, h_lim - 1.0, h_ice[last]);
               daisy_assert (Theta_diff > 0);
-              const double dz = soil.dz (last);
+              const double dz = geo.dz (last);
               const double max_K = Theta_diff * dz / ddt;
 
               if (Kold[size-1] > max_K)
@@ -259,15 +263,15 @@ UZRichard::richard (Treelog& msg,
 	      const double Cw1 = soil.Cw1 (first + i, h[i], h_ice[first + i]);
 	      // const double Cw2 = max (1e-5, soil.Cw2 (first + i, h[i]));
 	      const double Cw2 = soil.Cw2 (first + i, h[i]);
-	      const double dz = soil.dz (first + i);
-	      const double z = soil.z (first + i);
+	      const double dz = geo.dz (first + i);
+	      const double z = geo.z (first + i);
 
 	      if (i == 0)
 		{
 		  if (top.flux_top ())
 		    {
 		      // Calculate upper boundary.
-		      const double dz_plus = z - soil.z (first + i + 1);
+		      const double dz_plus = z - geo.z (first + i + 1);
 
 		      b[i] = Cw2 + (ddt / dz) * (Kplus[i] / dz_plus);
 		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]
@@ -282,21 +286,21 @@ UZRichard::richard (Treelog& msg,
 	      else if (i == 1 && !top.flux_top ())
 		{
 		  // Calculate upper boundary.
-		  const double dz_plus = z - soil.z (first + i + 1);
-		  const double dz_minus = soil.z (first + i - 1) - z;
+		  const double dz_plus = z - geo.z (first + i + 1);
+		  const double dz_minus = geo.z (first + i - 1) - z;
 
 		  double h_above;
 		  if (top.soil_top ())
 		    {
 		      const double Theta_ddt = Theta_old[first]
-			+ top_water / soil.dz (first);
+			+ top_water / geo.dz (first);
 		      h_above = soil.h (first, Theta_ddt);
 		    }
 		  else
 		    {
 		      h_above = h[first];
                       daisy_assert (approximate (h_above, 
-                                                 top.h () - soil.z (first)
+                                                 top.h () - geo.z (first)
                                                  + top_water));
 #if 0
 		      if (top.h () < 0.0)
@@ -320,11 +324,11 @@ UZRichard::richard (Treelog& msg,
 	      else if (i == size - 1)
 		{
 		  // Calculate lower boundary
-		  const double dz_minus = soil.z (first + i - 1) - z;
+		  const double dz_minus = geo.z (first + i - 1) - z;
 
 		  if (bottom.bottom_type () == Groundwater::pressure)
 		    {
-		      const double dz_plus = z - soil.z (first + i + 1);
+		      const double dz_plus = z - geo.z (first + i + 1);
 		      //const double bottom_pressure = h[i + 1];
 		      const double bottom_pressure = h_old[first + i + 1];
 		      b[i] = Cw2 + (ddt / dz) * (  Kplus[i - 1] / dz_minus
@@ -338,7 +342,7 @@ UZRichard::richard (Treelog& msg,
                            && isnormal (q_bottom))
                     {
                       // Active lysimeter, use fake pressure bottom.
-		      const double dz_plus = z - soil.zplus (first + i);
+		      const double dz_plus = z - geo.zplus (first + i);
                       const double K_sat = soil.K (first + i, 0.0, 
                                                    h_ice[first + i], 
                                                    soil_heat.T (first + i));
@@ -361,8 +365,8 @@ UZRichard::richard (Treelog& msg,
 	      else
 		{
 		  // Calculate intermediate nodes.
-		  const double dz_minus = soil.z (first + i - 1) - z;
-		  const double dz_plus = z - soil.z (first + i + 1);
+		  const double dz_minus = geo.z (first + i - 1) - z;
+		  const double dz_plus = z - geo.z (first + i + 1);
 
 		  a[i] = - (ddt / dz) * (Kplus[i - 1] / dz_minus);
 		  b[i] = Cw2 + (ddt / dz) * (  Kplus[i - 1] / dz_minus
@@ -429,10 +433,10 @@ UZRichard::richard (Treelog& msg,
 		  for (int i = last; i >= first; i--)
 		    q[i] = - (((Theta[i - first] 
 				- Theta_previous[i-first]) / ddt) + S[i])
-		      * soil.dz (i) + q[i + 1];
+		      * geo.dz (i) + q[i + 1];
 		}
 	      else
-		q_darcy (soil, first, last, h_previous, h, 
+		q_darcy (geo, first, last, h_previous, h, 
 			 Theta_previous, Theta, Kplus, S, ddt, q);
 
 	      // We take water from flux pond first.
@@ -516,13 +520,13 @@ UZRichard::richard (Treelog& msg,
 		  {
 		    // Mass preservation.
 		    q[i + 1] = (((Theta[i - first] - Theta_previous[i - first]) / ddt)
-				+ S[i] * ddt) * soil.dz (i) + q[i];
+				+ S[i] * ddt) * geo.dz (i) + q[i];
 		    if (h[i - first] >= 0.0 && h[i + 1 - first] >= 0.0)
 		      continue;
 		    const double darcy
 		      = -Kplus[i - first]
 		      * ((  (h[i - first] - h[i + 1 - first])
-			  / (soil.z (i) - soil.z (i + 1)))
+			  / (geo.z (i) - geo.z (i + 1)))
 			 + 1);
 		    if ((fabs (darcy) > 1.0e-30
 			 && fabs (q[i+1] / darcy - 1.0) > 0.10)
@@ -589,7 +593,7 @@ Richard eq. mass balance flux is different than darcy flux");
   for (int i = first; i <= last; i++)
     {
       q[i + 1] = (((Theta_new[i] - Theta_old[i]) / dt) + S[i])
-	* soil.dz (i) + q[i];
+	* geo.dz (i) + q[i];
     }
 #endif
   return true;
@@ -637,7 +641,7 @@ UZRichard::internode (const Soil& soil, const SoilHeat& soil_heat,
 }
 
 void
-UZRichard::q_darcy (const Soil& soil, 
+UZRichard::q_darcy (const Geometry& geo,
 		    const int first, const int last,
 		    const vector<double>& /* h_previous */,
 		    const vector<double>& h,
@@ -650,16 +654,16 @@ UZRichard::q_darcy (const Soil& soil,
 {
   // Find an unsaturated area.
   // Start looking 3/4 towards the bottom.
-  const double start_pos = (soil.z (first) + soil.z (last) * 3.0) / 4.0;
-  int start = soil.interval_plus (start_pos) - 1;
+  const double start_pos = (geo.z (first) + geo.z (last) * 3.0) / 4.0;
+  int start = geo.interval_plus (start_pos) - 1;
   if (!(start < last - 2))
     {
       std::ostringstream tmp;
       tmp << "We need at least 2 numeric nodes below 3/4 depth for \
 calculating flow with pressure top.\n";
       tmp << "3/4 depth is " << start_pos << " [cm]\n"
-             << "node " << start << " ends at " << soil.zplus (start) << " [cm]\n"
-             << "last " << last << " ends at " << soil.zplus (last) << " [cm]";
+             << "node " << start << " ends at " << geo.zplus (start) << " [cm]\n"
+             << "last " << last << " ends at " << geo.zplus (last) << " [cm]";
       throw (string (tmp.str ()));
     }
   if (!(start > first + 1))
@@ -676,23 +680,24 @@ calculating flow with pressure top.");
   // Use Darcy equation to find flux here.
   q[start + 1] = -Kplus[start - first] 
     * (  (  (h[start - first] - h[start + 1 - first])
-	  / (soil.z (start) - soil.z (start + 1)))
+	  / (geo.z (start) - geo.z (start + 1)))
        + 1);
   // Use mass preservation to find flux below and above.
   for (int i = start + 1; i <= last; i++)
     {
       q[i + 1] = (((Theta[i - first] - Theta_previous[i-first]) / ddt) + S[i])
-	* soil.dz (i) + q[i];
+	* geo.dz (i) + q[i];
     }
   for (int i = start; i >= first; i--)
     {
       q[i] = - (((Theta[i - first] - Theta_previous[i-first]) / ddt) + S[i])
-	* soil.dz (i) + q[i + 1];
+	* geo.dz (i) + q[i + 1];
     }
 }
 
 bool
-UZRichard::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
+UZRichard::tick (Treelog& msg, const Geometry& geo,
+                 const Soil& soil, const SoilHeat& soil_heat,
 		 unsigned int first, const Surface& top, 
 		 unsigned int last, const Groundwater& bottom, 
 		 const vector<double>& S,
@@ -704,7 +709,7 @@ UZRichard::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
 		 vector<double>& q)
 {
   iterations = 0;
-  if (!richard (msg, soil, soil_heat, first, top, last, bottom, 
+  if (!richard (msg, geo, soil, soil_heat, first, top, last, bottom, 
 		S, h_old, Theta_old, h_ice, h, Theta, q))
     throw ("Richard's Equation doesn't converge");
 

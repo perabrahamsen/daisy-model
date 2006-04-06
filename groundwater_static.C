@@ -37,13 +37,14 @@ public:
 
   // Simulation.
 public:
-  void tick (const Soil&, SoilWater&, double, 
+  void tick (const Geometry&,
+             const Soil&, SoilWater&, double, 
 	     const SoilHeat&, const Time&, Treelog&);
   double table () const;
 
   // Create and Destroy.
 public:
-  void initialize (const Soil&, const Time&, Treelog&)
+  void initialize (const Geometry&, const Time&, Treelog&)
   { }
   GroundwaterStatic (Block&);
   ~GroundwaterStatic ();
@@ -65,7 +66,8 @@ GroundwaterStatic::accept_bottom (double)
 }
 
 void
-GroundwaterStatic::tick (const Soil&, SoilWater&, double, const SoilHeat&,
+GroundwaterStatic::tick (const Geometry&,
+                         const Soil&, SoilWater&, double, const SoilHeat&,
 			 const Time&, Treelog&)
 { }
 

@@ -37,7 +37,8 @@ summary of the state to a log file.";
 
 struct Log::Implementation
 {
-  list<const Soil*> geometries;
+  list<const Soil*> soils;
+  list<const Geometry*> geometries;
 };
 
 bool 
@@ -95,22 +96,31 @@ Log::close_alist ()
 { close (); }
 
 void 
-Log::open_soil (const Soil& g)
+Log::open_soil (const Geometry& g, const Soil& s)
 { 
   impl.geometries.push_back (&g);
+  impl.soils.push_back (&s);
 }
 
 void 
 Log::close_soil ()
 {
   impl.geometries.pop_back ();
+  impl.soils.pop_back ();
+}
+
+const Geometry*
+Log::geometry ()
+{
+  daisy_assert (!impl.geometries.empty ());
+  return impl.geometries.back ();
 }
 
 const Soil*
 Log::soil ()
 {
-  daisy_assert (!impl.geometries.empty ());
-  return impl.geometries.back ();
+  daisy_assert (!impl.soils.empty ());
+  return impl.soils.back ();
 }
 
 void 

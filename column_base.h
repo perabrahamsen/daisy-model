@@ -21,23 +21,34 @@
 
 
 #include "column.h"
-#include "bioclimate.h"
 #include "surface.h"
-#include "soil.h"
-#include "soil_water.h"
 #include "soil_heat1d.h"
 #include "soil_chemicals.h"
-#include "chemistry.h"
-#include "groundwater.h"
-#include "alist.h"
-#include "syntax.h"
-#include "library.h"
-#include "log.h"
-#include "weather.h"
-#include "vegetation.h"
-#include "time.h"
 #include <memory>
 
+#if 1
+// We need some of these in order to ensure initialization order.
+#include "geometry.h"
+#include "soil.h"
+#include "soil_water.h"
+#include "weather.h"
+#include "vegetation.h"
+#include "bioclimate.h"
+#include "groundwater.h"
+#include "chemistry.h"
+#include "log.h"
+#else
+struct Weather;
+struct Vegetation;
+struct Bioclimate;
+struct Geometry;
+struct Soil;
+struct SoilWater;
+struct Groundwater;
+struct Chemistry;
+#endif
+
+struct Time;
 struct IM;
 struct AM;
 
@@ -49,6 +60,7 @@ protected:
   std::auto_ptr<Vegetation> vegetation;
   std::auto_ptr<Bioclimate> bioclimate;
   Surface surface;
+  std::auto_ptr<Geometry> geometry;
   std::auto_ptr<Soil> soil;
   std::auto_ptr<SoilWater> soil_water;
   SoilHeat1D soil_heat;

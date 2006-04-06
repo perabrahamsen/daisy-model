@@ -26,7 +26,7 @@
 #include "librarian.h"
 #include <vector>
 
-class Soil;
+class Geometry;
 class SoilWater;
 class Log;
 
@@ -39,7 +39,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Soil& soil, const SoilWater&,
+  virtual void tick (const Geometry& geo, const SoilWater&,
 		     const std::vector<double>& M,
 		     const std::vector<double>& C,
 		     std::vector<double>& S,

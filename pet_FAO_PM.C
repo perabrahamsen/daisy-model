@@ -47,7 +47,8 @@ public:
 
   // Simulation.
   void tick (const Time&, const Weather& weather, const Vegetation& crops,
-	     const Surface& surface, const Soil& soil,
+	     const Surface& surface, const Geometry& geo,
+             const Soil& soil,
 	     const SoilHeat& soil_heat, const SoilWater& soil_water, Treelog&);
 
   void output (Log& log) const
@@ -75,9 +76,9 @@ public:
 
 void
 PetFAO_PM::tick (const Time&, const Weather& weather, const Vegetation& crops,
-	     const Surface& surface, const Soil& soil,
-	     const SoilHeat& soil_heat, const SoilWater& soil_water,
-	     Treelog& out)
+                 const Surface& surface, const Geometry& geo, const Soil& soil,
+                 const SoilHeat& soil_heat, const SoilWater& soil_water,
+                 Treelog& out)
 {
   // Weather.
   const double Cloudiness = weather.hourly_cloudiness ();
@@ -96,7 +97,7 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const Vegetation& crops,
   const double Rn = net_radiation->net_radiation ();
 
   // Ground heat flux.
-  const double G = soil_heat.top_flux (soil, soil_water);
+  const double G = soil_heat.top_flux (geo, soil, soil_water);
 
 
   reference_evapotranspiration_dry

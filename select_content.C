@@ -21,6 +21,7 @@
 
 
 #include "select_value.h"
+#include "geometry.h"
 #include "soil.h"
 #include "check.h"
 #include "mathlib.h"
@@ -29,6 +30,7 @@ struct SelectContent : public SelectValue
 {
   // Content.
   const double height;
+  const Geometry* old_geo;
   const Soil* old_soil;
   int ia;                       // First node above height.
   double za;                    // Depth of node above height.
@@ -39,26 +41,29 @@ struct SelectContent : public SelectValue
 
   // Output routines.
   void output_array (const std::vector<double>& array, 
-		     const Soil* soil, Treelog&)
+		     const Geometry* geo, const Soil* soil, Treelog&)
   { 
     if (soil != old_soil)
-      {
         old_soil = soil;
+
+    if (geo != old_geo)
+      {
+        old_geo = geo;
 
         if (std::fabs (height) < 0.001)
           ia = ib = 0;
         else
           {
             // Find first node below height.
-            for (ib = 0; ib < soil->size () && soil->z (ib) > height; ib++)
+            for (ib = 0; ib < geo->size () && geo->z (ib) > height; ib++)
               /* do nothing */;
-            zb = soil->z (ib);
+            zb = geo->z (ib);
         
             // Find first node above height.
-            daisy_assert (soil->size () > 0);
-            for (ia = soil->size () - 1; ia >= 0 && soil->z (ia) < height; ia--)
+            daisy_assert (geo->size () > 0);
+            for (ia = geo->size () - 1; ia >= 0 && geo->z (ia) < height; ia--)
               /* do nothing */;
-            za = soil->z (ia);
+            za = geo->z (ia);
 
             // Distance from za relative to zb.
             rel = (height - za) / (zb - za) ;
@@ -90,6 +95,7 @@ struct SelectContent : public SelectValue
   SelectContent (Block& al)
     : SelectValue (al),
       height (al.number ("height")),
+      old_geo (NULL),
       old_soil (NULL),
       ia (-42),
       za (42.42e42),

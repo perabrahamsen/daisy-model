@@ -23,6 +23,7 @@
 #include "uzmodel.h"
 #include "surface.h"
 #include "groundwater.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_heat.h"
 #include "mathlib.h"
@@ -39,7 +40,8 @@ private:
 
   // Simulate.
 public:
-  bool tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
+  bool tick (Treelog&, const Geometry& geo,
+             const Soil& soil, const SoilHeat& soil_heat,
 	     unsigned int first, const Surface& top, 
 	     unsigned int last, const Groundwater& bottom, 
 	     const vector<double>& S,
@@ -61,7 +63,8 @@ public:
 };
 
 bool
-UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
+UZlr::tick (Treelog& msg, const Geometry& geo,
+            const Soil& soil, const SoilHeat& soil_heat,
 	    unsigned int first, const Surface& top, 
 	    unsigned int last, const Groundwater& bottom, 
 	    const vector<double>& S,
@@ -83,7 +86,7 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
       // flux top between the first node (with a forced pressure) and
       // the second node, and then continue calculating with a flux
       // top from the second node.
-      const double dz = soil.z (first) - soil.z (first+1);
+      const double dz = geo.z (first) - geo.z (first+1);
       const double dh = (h_old[first] - h_old[first+1]);
       const double K = min (soil.K (first, h_old[first], h_ice[first],
 				    soil_heat.T (first)),
@@ -111,7 +114,7 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
       if (!top.flux_top ())
 	// It refuses to be a flux, must be a lake.
 	{
-	  const double dz = 0.0 - soil.z (first);
+	  const double dz = 0.0 - geo.z (first);
 	  const double dh = top.h () - h_old[first];
 	  q_up = q[first] = -K_sat * (dh/dz + 1.0);
 	}
@@ -121,12 +124,12 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
 
   //  Use darcy for upward movement in the top.
   const bool use_darcy = (h_old[first] < h_fc) && (q_up > 0.0);
-  const int to_darcy = max (soil.interval_plus (z_top), first + 5);
+  const int to_darcy = max (geo.interval_plus (z_top), first + 5);
 
   // Intermediate nodes.
   for (int i = first; i <= last; i++)
     {
-      const double dz = soil.dz (i);
+      const double dz = geo.dz (i);
       const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
       const double Theta_res = soil.Theta_res (i);
       const double Theta_new = Theta_old[i] - q[i] * dt / dz - S[i] * dt;
@@ -146,13 +149,13 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
       const double h_lim = (bottom.bottom_type ()
                             == Groundwater::free_drainage) 
         ? h_fc
-        : max (soil.zplus (last) - soil.z (i), h_fc);
+        : max (geo.zplus (last) - geo.z (i), h_fc);
       daisy_assert (h_lim < 0.0);
 
       if (use_darcy && i < to_darcy)
 	// Dry earth, near top.  Use darcy to move water up.
 	{
-	  const double dist = soil.z (i) - soil.z (i+1);
+	  const double dist = geo.z (i) - geo.z (i+1);
 	  q[i+1] = max (K_new * ((h_old[i+1] - h_new) / dist - 1.0), 0.0);
 
 	  if (Theta_new + q[i+1] * dt / dz > Theta_sat)
@@ -246,7 +249,7 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
 	  if (i < 0)
 	    // Take it from ponding.
 	    break;
-	  const double dz = soil.dz (i);
+	  const double dz = geo.dz (i);
 	  const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
 	  Theta[i] += extra_water / dz;
 	  if (Theta[i] <= Theta_sat)
@@ -273,7 +276,7 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
 
   for (int i = last; i >= int (first); i--)
     {
-      const double dz = soil.dz (i);
+      const double dz = geo.dz (i);
 
       if (isnormal (extra_water))
 	{
@@ -338,9 +341,9 @@ UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
   double total_S = 0.0;
   for (unsigned int i = first; i <= last; i++)
     {
-      total_old += soil.dz (i) * Theta_old[i];
-      total_new += soil.dz (i) * Theta[i];
-      total_S += soil.dz (i) * S[i] * dt;
+      total_old += geo.dz (i) * Theta_old[i];
+      total_new += geo.dz (i) * Theta[i];
+      total_S += geo.dz (i) * S[i] * dt;
     }
   daisy_assert (approximate (total_old + (-q_up + q_down - total_S) * dt, 
 			     total_new));

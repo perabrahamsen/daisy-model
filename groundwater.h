@@ -27,6 +27,7 @@
 
 class Time;
 class Treelog;
+class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
@@ -53,7 +54,8 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Soil&, SoilWater&, double h_surface /* [cm] */,
+  virtual void tick (const Geometry& geo,
+                     const Soil&, SoilWater&, double h_surface /* [cm] */,
 		     const SoilHeat&, const Time&, Treelog&) = 0;
   virtual void output (Log&) const;
 
@@ -64,7 +66,7 @@ public:
     // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  virtual void initialize (const Soil&, const Time& time, Treelog&) = 0;
+  virtual void initialize (const Geometry&, const Time& time, Treelog&) = 0;
   virtual bool check (Treelog&) const;
 protected:
   Groundwater (Block& al);

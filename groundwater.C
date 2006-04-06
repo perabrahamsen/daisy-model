@@ -64,10 +64,6 @@ Groundwater::load_syntax (Syntax& syntax, AttributeList&)
 	      "Groundwater level.  Positive numbers indicate free drainage.");
 }
 
-void
-Groundwater::initialize (const Soil&, const Time&, Treelog&)
-{ }
-
 bool
 Groundwater::check (Treelog&) const
 { return true; }

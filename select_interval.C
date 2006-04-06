@@ -21,6 +21,7 @@
 
 
 #include "select_value.h"
+#include "geometry.h"
 #include "soil.h"
 #include "border.h"
 #include "units.h"
@@ -51,16 +52,17 @@ struct SelectInterval : public SelectValue
       daisy_assert (bulk > 0.0);
       return in.valid (value) && out.valid (in (value) / bulk);
     }
-    void set_bulk (const Soil& soil, const double from, double to)
+    void set_bulk (const Geometry& geo,
+                   const Soil& soil, const double from, double to)
     {
       if (to > 0.0)
-	to = soil.zplus (soil.size () - 1);
+	to = geo.zplus (geo.size () - 1);
       bulk = 0.0;
       double old = 0.0;
 
-      for (unsigned i = 0; i < soil.size () && old > to ; i++)
+      for (unsigned i = 0; i < geo.size () && old > to ; i++)
 	{
-	  const double zplus = soil.zplus (i);
+	  const double zplus = geo.zplus (i);
 	  if (zplus < from)
 	    {
 	      const double height = (std::min (old, from) 
@@ -90,29 +92,30 @@ struct SelectInterval : public SelectValue
   // Output routines.
 
   void output_array (const std::vector<double>& array, 
-		     const Soil* soil, Treelog&)
+		     const Geometry* geo,
+                     const Soil* soil, Treelog&)
   { 
     double result;
     if (to > 0.0)
       {
 	if (!std::isnormal (from))
-          result = soil->total (array);
+          result = geo->total (array);
 	else
 	  {
-	    to = soil->zplus (soil->size () - 1);
-	    result = soil->total (array, from, to);
+	    to = geo->zplus (geo->size () - 1);
+	    result = geo->total (array, from, to);
 	  }
       }
     else 
-      result = soil->total (array, from, to);
+      result = geo->total (array, from, to);
 
     if (count == 0)
       {
         if (bd_convert)
-          bd_convert->set_bulk (*soil, from, to);
+          bd_convert->set_bulk (*geo, *soil, from, to);
         if (density_factor < 0.0)
           density_factor = 1.0 / (from - (to > 0 
-                                          ? soil->zplus (soil->size () - 1)
+                                          ? geo->zplus (geo->size () - 1)
                                           : to));
       }
     add_result (result);

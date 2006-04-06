@@ -40,7 +40,8 @@ protected:
 public:
   double T (const size_t i) const // [dg C]
   { return T_[i]; }
-  virtual double top_flux (const Soil&, const SoilWater&) const = 0;
+  virtual double top_flux (const Geometry& geo,
+                           const Soil&, const SoilWater&) const = 0;
   
   // Create and destroy.
 public:

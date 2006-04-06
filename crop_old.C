@@ -69,8 +69,10 @@ public:
   // Internal functions.
 protected:
   double PotentialWaterUptake (const double h, 
-			       const Soil& soil, const SoilWater& soil_water);
-  double SoluteUptake (const Soil&,
+			       const Geometry& geo,
+                               const Soil& soil, const SoilWater& soil_water);
+  double SoluteUptake (const Geometry& geo,
+                       const Soil&,
 		       const SoilWater&,
 		       Solute&,
 		       double /* PotNUpt */,
@@ -80,24 +82,26 @@ protected:
 public:				// Used by external development models.
   void Vernalization (double Ta);
 protected:
-  void Emergence (const Soil&, const SoilHeat&);
+  void Emergence (const Geometry&, const SoilHeat&);
   void DevelopmentStage (const Bioclimate&);
   double CropHeight ();
   void InitialLAI ();
   double CropLAI ();
-  void RootPenetration (const Soil&, const SoilHeat&);
+  void RootPenetration (const Geometry& geo,
+                        const Soil&, const SoilHeat&);
   double RootDensDistPar (double a);
-  void RootDensity (const Soil& soil);
+  void RootDensity (const Geometry&);
   void NitContent ();
   void NitrogenUptake (int Hour, 
-		       const Soil& soil,
+		       const Geometry& geo,
+                       const Soil& soil,
 		       const SoilWater& soil_water,
 		       SoilNH4& soil_NH4,
 		       SoilNO3& soil_NO3);
   // Sugar production [gCH2O/m2/h] by canopy photosynthesis.
   void AssimilatePartitioning (double DS, double& f_Leaf, double& f_Root);
   double MaintenanceRespiration (double r, double w, double T);
-  void NetProduction (const Bioclimate&, const Soil&, const SoilHeat&);
+  void NetProduction (const Bioclimate&, const Geometry&, const SoilHeat&);
 
   // Simulation.
 public:
@@ -1016,7 +1020,8 @@ CropOld::EpFac () const
 }
 
 double
-CropOld::SoluteUptake (const Soil& soil,
+CropOld::SoluteUptake (const Geometry& geo,
+                       const Soil& soil,
 		       const SoilWater& soil_water,
 		       Solute& solute,
 		       double PotNUpt,
@@ -1073,8 +1078,8 @@ CropOld::SoluteUptake (const Soil& soil,
 	  daisy_assert (isfinite (I_zero[i]));
 	  daisy_assert (isfinite (B_zero[i]));
 #endif
-	  B += L * soil.dz (i) * B_zero[i];
-	  U_zero += L * soil.dz (i) * min (I_zero[i], I_max);
+	  B += L * geo.dz (i) * B_zero[i];
+	  U_zero += L * geo.dz (i) * min (I_zero[i], I_max);
 	}
     }
   if (U_zero > PotNUpt)
@@ -1097,7 +1102,7 @@ CropOld::SoluteUptake (const Soil& soil,
     daisy_assert (solute.M_left (i) >= 0.0);
 
   // gN/cm³/h -> gN/m²/h
-  return soil.total (uptake) * 1.0e4; 
+  return geo.total (uptake) * 1.0e4; 
 }
 
 void
@@ -1115,13 +1120,13 @@ CropOld::Vernalization (double Ta)
 }
 
 void 
-CropOld::Emergence (const Soil& soil, const SoilHeat& soil_heat)
+CropOld::Emergence (const Geometry& geo, const SoilHeat& soil_heat)
 {
   const Parameters::DevelPar& Devel = par.Devel;
   const double EmrDpt = par.Root.DptEmr;
   double& DS = var.Phenology.DS;
 
-  DS += soil_heat.T (soil.interval_plus (-EmrDpt)) / Devel.EmrTSum;
+  DS += soil_heat.T (geo.interval_plus (-EmrDpt)) / Devel.EmrTSum;
   if (DS > 0.0)
     DS = Devel.DS_Emr;
 }
@@ -1312,7 +1317,7 @@ CropOld::CanopyStructure ()
 
 double
 CropOld::ActualWaterUptake (double Ept,
-                            const Geometry&,
+                            const Geometry& geo,
 			    const Soil& soil, SoilWater& soil_water,
 			    const double EvapInterception, 
 			    double /* day_fraction */, Treelog& out)
@@ -1328,14 +1333,14 @@ CropOld::ActualWaterUptake (double Ept,
   static const double min_step = 1.0;
   const double h_wp = par.Root.h_wp;
   double& h_x = var.RootSys.h_x;
-  double total = PotentialWaterUptake (h_x, soil, soil_water);
+  double total = PotentialWaterUptake (h_x, geo, soil, soil_water);
   double step = min_step;
   var.RootSys.Ept = Ept;
 
   while (total < Ept && h_x > h_wp)
     {
       const double h_next = max (h_x - step, h_wp);
-      const double next = PotentialWaterUptake (h_next, soil, soil_water);
+      const double next = PotentialWaterUptake (h_next, geo, soil, soil_water);
       
       if (next < total)
 	// We are past the top of the curve.
@@ -1343,7 +1348,7 @@ CropOld::ActualWaterUptake (double Ept,
 	  // We cannot go any closer to the top, skip it.
 	  {
 	    h_x = h_wp;
-	    total = PotentialWaterUptake (h_x, soil, soil_water);
+	    total = PotentialWaterUptake (h_x, geo, soil, soil_water);
 	    break;
 	  }
 	else
@@ -1365,7 +1370,7 @@ CropOld::ActualWaterUptake (double Ept,
     {
       daisy_assert (h_x < 0.001);
       const double h_next = min (h_x + step, 0.0);
-      const double next = PotentialWaterUptake (h_next, soil, soil_water);
+      const double next = PotentialWaterUptake (h_next, geo, soil, soil_water);
 
       if (next < Ept)
 	// We went too far.
@@ -1395,7 +1400,7 @@ CropOld::ActualWaterUptake (double Ept,
     }
 
   // We need this to make sure H2OExtraction corresponds to 'h_x'.
-  const double total2 = PotentialWaterUptake (h_x, soil, soil_water);
+  const double total2 = PotentialWaterUptake (h_x, geo, soil, soil_water);
   daisy_assert (total == total2);
 
   vector<double>& H2OExtraction = var.RootSys.H2OExtraction;
@@ -1431,7 +1436,8 @@ CropOld::ActualWaterUptake (double Ept,
 
 double
 CropOld::PotentialWaterUptake (const double h_x, 
-				    const Soil& soil, const SoilWater& soil_water)
+                               const Geometry& geo,
+                               const Soil& soil, const SoilWater& soil_water)
 {
   const double Rxylem = par.Root.Rxylem;
   const double area = M_PI * par.Root.Rad * par.Root.Rad;
@@ -1445,7 +1451,7 @@ CropOld::PotentialWaterUptake (const double h_x,
 	  S[i] = 0.0;
 	  continue;
 	}
-      const double h = h_x - (1 + Rxylem) * soil.z (i);
+      const double h = h_x - (1 + Rxylem) * geo.z (i);
       const double uptake = max (2 * M_PI * L[i] 
 				 * (soil_water.Theta (soil, i, h)
 				    / soil_water.Theta (soil, i, 0.0))
@@ -1462,13 +1468,14 @@ CropOld::PotentialWaterUptake (const double h_x,
       daisy_assert ((- 0.5 * log (area * L[i])) != 0.0);
       daisy_assert (uptake >= 0.0);
       S[i] = uptake;
-      total += uptake * soil.dz (i) * 10; // mm/cm.
+      total += uptake * geo.dz (i) * 10; // mm/cm.
     }
   return total;
 }
 
 void 
-CropOld::RootPenetration (const Soil& soil, const SoilHeat& soil_heat)
+CropOld::RootPenetration (const Geometry& geo,
+                          const Soil& soil, const SoilHeat& soil_heat)
 {
   const Parameters::RootPar& Root = par.Root;
   // const double DS = var.Phenology.DS;
@@ -1479,7 +1486,7 @@ CropOld::RootPenetration (const Soil& soil, const SoilHeat& soil_heat)
   if (IncWRoot <= 0)
     return;
 
-  double Ts = soil_heat.T (soil.interval_plus (-Depth));
+  double Ts = soil_heat.T (geo.interval_plus (-Depth));
   double dp = Root.PenPar1 * max (0.0, Ts - Root.PenPar2);
   PotRtDpt = min (PotRtDpt + dp, Root.MaxPen);
   /*max depth determined by crop*/
@@ -1549,7 +1556,7 @@ CropOld::RootDensDistPar (double a)
 }
 
 void 
-CropOld::RootDensity (const Soil& soil)
+CropOld::RootDensity (const Geometry& geo)
 {
   const Parameters::RootPar& Root = par.Root;
   const double WRoot = var.Prod.WRoot;
@@ -1571,10 +1578,10 @@ CropOld::RootDensity (const Soil& soil)
   vector<double>& d = var.RootSys.Density;
   
   unsigned int i = 0;
-  for (; i == 0 || -soil.zplus (i-1) < RootSys.Depth; i++)
-    d[i] = L0 * exp (a * soil.z (i));
-  daisy_assert (i < soil.size ());
-  for (; i < soil.size (); i++)
+  for (; i == 0 || -geo.zplus (i-1) < RootSys.Depth; i++)
+    d[i] = L0 * exp (a * geo.z (i));
+  daisy_assert (i < geo.size ());
+  for (; i < geo.size (); i++)
     d[i] = 0.0;
 }
 
@@ -1597,7 +1604,8 @@ CropOld::NitContent ()
 
 void
 CropOld::NitrogenUptake (int Hour, 
-			 const Soil& soil,
+			 const Geometry& geo,
+                         const Soil& soil,
 			 const SoilWater& soil_water,
 			 SoilNH4& soil_NH4,
 			 SoilNO3& soil_NO3)
@@ -1612,7 +1620,7 @@ CropOld::NitrogenUptake (int Hour,
   if (PotNUpt > 0)
     {
       CrpAux.NH4Upt
-	= SoluteUptake (soil, soil_water, soil_NH4, PotNUpt, 
+	= SoluteUptake (geo, soil, soil_water, soil_NH4, PotNUpt, 
 			RootSys.NH4Extraction, Root.MxNH4Up, Root.Rad);
       daisy_assert (CrpAux.NH4Upt >= 0.0);
 
@@ -1627,7 +1635,7 @@ CropOld::NitrogenUptake (int Hour,
   if (PotNUpt > 0)
     {
       CrpAux.NO3Upt
-	= SoluteUptake (soil, soil_water, soil_NO3, PotNUpt,
+	= SoluteUptake (geo, soil, soil_water, soil_NO3, PotNUpt,
 			RootSys.NO3Extraction, Root.MxNO3Up, Root.Rad); 
       daisy_assert (CrpAux.NO3Upt >= 0.0);
       NCrop += CrpAux.NO3Upt;
@@ -1669,7 +1677,8 @@ CropOld::MaintenanceRespiration (double r, double w, double T)
 
 void 
 CropOld::NetProduction (const Bioclimate& bioclimate,
-			const Soil& soil, const SoilHeat& soil_heat)
+			const Geometry& geo,
+                        const SoilHeat& soil_heat)
 {
   const Parameters::RespPar& Resp = par.Resp;
   const double DS = var.Phenology.DS;
@@ -1682,7 +1691,7 @@ CropOld::NetProduction (const Bioclimate& bioclimate,
 			      bioclimate.daily_air_temperature ());
   const double RMRoot
     = MaintenanceRespiration (Resp.r_Root (DS), Prod.WRoot, 
-			      soil_heat.T (soil.interval_plus (-Depth / 3)));
+			      soil_heat.T (geo.interval_plus (-Depth / 3)));
   double AssG, f_Leaf, f_Root;
     
   AssG = CrpAux.CanopyAss;
@@ -1705,7 +1714,7 @@ CropOld::NetProduction (const Bioclimate& bioclimate,
 void 
 CropOld::tick (const Time& time,
 	       const Bioclimate& bioclimate,
-               const Geometry&,
+               const Geometry& geo,
 	       const Soil& soil,
 	       OrganicMatter*,
 	       const SoilHeat& soil_heat,
@@ -1743,7 +1752,7 @@ CropOld::tick (const Time& time,
 
   if (time.hour () == 0 && var.Phenology.DS <= 0)
     {
-      Emergence (soil, soil_heat);
+      Emergence (geo, soil_heat);
       if (var.Phenology.DS >= 0)
 	{
 	  InitialLAI ();
@@ -1751,7 +1760,7 @@ CropOld::tick (const Time& time,
 	  NitContent ();
 	  var.CrpAux.PotCanopyAss = 0.0;
 	  var.CrpAux.CanopyAss = 0.0;
-	  RootDensity (soil);
+	  RootDensity (geo);
 	}
       return;
     }
@@ -1762,7 +1771,7 @@ CropOld::tick (const Time& time,
     {
       daisy_assert (soil_NH4);
       NitrogenUptake (time.hour (), 
-		      soil, soil_water, *soil_NH4, *soil_NO3);
+		      geo, soil, soil_water, *soil_NH4, *soil_NO3);
     }
   else
     {
@@ -1827,9 +1836,9 @@ CropOld::tick (const Time& time,
     InitialLAI ();
   else
     var.Canopy.LAI = CropLAI ();
-  NetProduction (bioclimate, soil, soil_heat);
-  RootPenetration (soil, soil_heat);
-  RootDensity (soil);
+  NetProduction (bioclimate, geo, soil_heat);
+  RootPenetration (geo, soil, soil_heat);
+  RootDensity (geo);
   NitContent ();
   var.CrpAux.LogPotCanopyAss = var.CrpAux.PotCanopyAss;
   var.CrpAux.LogCanopyAss = var.CrpAux.CanopyAss;

@@ -2376,7 +2376,7 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 
   // Initialize AM.
   for (unsigned int i = 0; i < am.size (); i++)
-    am[i]->initialize (soil, soil.MaxRootingDepth ());
+    am[i]->initialize (geo, soil.MaxRootingDepth ());
 
   // Biological incorporation.
   bioincorporation.initialize (geo, soil);
@@ -2386,7 +2386,7 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   if (bioam)
     bioincorporation.set_am (bioam);
   else
-    am.push_back (bioincorporation.create_am (soil)); 
+    am.push_back (bioincorporation.create_am (geo)); 
 
   // Warnings in case of explicit SOM or SMB initialization.
   for (unsigned int pool = 0; pool < som_size; pool++)
@@ -2528,7 +2528,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
     total << "Expected humus change: " 
              << total_delta_C * g_per_cm2_per_h_to_kg_per_ha_per_y 
              << " [kg C/ha/y], ";
-    const double all_C = this->total_C (soil);
+    const double all_C = this->total_C (geo);
     if (isnormal (all_C))
       total << total_delta_C / all_C << " [y^-1]";
     else
@@ -2571,7 +2571,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   }  
 
   // Initialize buffer.
-  buffer.initialize (soil);
+  buffer.initialize (geo);
 
   // Log variable.
   tillage_N_soil.insert (tillage_N_soil.end (), soil.size (), 0.0);

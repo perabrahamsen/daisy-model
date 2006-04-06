@@ -23,7 +23,7 @@
 #include "log_select.h"
 #include "select.h"
 #include "summary.h"
-#include "soil.h"
+#include "geometry.h"
 #include "dlf.h"
 #include "daisy.h"
 #include "vcheck.h"
@@ -112,14 +112,14 @@ LogTable::common_done (const Time& time)
 	  if (i != 0)
 	    out << field_separator;
 
-	  const Soil* soil = entries[i]->soil ();
+	  const Geometry* geo = entries[i]->geometry ();
 	  const int size = entries[i]->size ();
 	  const symbol tag = entries[i]->tag ();
 	  static const symbol empty_symbol ("");
 
-	  if (soil && size >= 0)
+	  if (geo && size >= 0)
 	    {
-	      if (soil->size () == size)
+	      if (geo->size () == size)
 		{
 		  // Content.
 		  for (unsigned j = 0; j < size; j++)
@@ -128,10 +128,10 @@ LogTable::common_done (const Time& time)
 			out << array_separator;
 		      if (tag != empty_symbol)
 			out << tag << " @ ";
-		      out << soil->z (j);
+		      out << geo->z (j);
 		    }
 		}
-	      else if (soil->size () + 1 == size)
+	      else if (geo->size () + 1 == size)
 		{
 		  // Flux
 		  double last = 0.0;
@@ -143,8 +143,8 @@ LogTable::common_done (const Time& time)
 		      if (tag != empty_symbol)
 			out << tag << " @ ";
 		      out << last;
-		      if (j <  soil->size ())
-			last = soil->zplus (j);
+		      if (j <  geo->size ())
+			last = geo->zplus (j);
 		    }
 		}
 	      else

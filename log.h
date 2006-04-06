@@ -30,6 +30,7 @@
 
 class Daisy;
 class PLF;
+class Geometry;
 class Soil;
 class Time;
 class Treelog;
@@ -250,17 +251,18 @@ public:
   private:
     Log& ll;
   public:
-    Geo (Log& l, const Soil& geo)
+    Geo (Log& l, const Geometry& geo, const Soil& soil)
       : ll (l)
-    { ll.open_soil (geo); }
+    { ll.open_soil (geo, soil); }
     ~Geo ()
     { ll.close_soil (); }
   };
 private:
-  void open_soil (const Soil&);
+  void open_soil (const Geometry&, const Soil&);
   void close_soil ();
   friend struct Log::Geo;
 public:
+  const Geometry* geometry ();
   const Soil* soil ();
 
   // Utilities

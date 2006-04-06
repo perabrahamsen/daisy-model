@@ -23,10 +23,12 @@
 #ifndef SOIL_H
 #define SOIL_H
 
-#define SOIL_GEO
+// #define SOIL_GEO
 
 #ifdef SOIL_GEO
 #include "geometry.h"
+#else
+class Geometry;
 #endif  // SOIL_GEO
 #include "horizon.h" // Needed for initialization order.
 
@@ -97,18 +99,16 @@ public:
   double MaxRootingDepth () const;
   double end_of_first_horizon () const;
 
-  // Debug.
-  void make_table (int i);
-
   // Creation.
   bool check (int som_size, Treelog&) const;
-  bool check_border (const double border, Treelog& err) const;
+  bool check_border (const double border, const Geometry& geo,
+                     Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);
 private:
   Soil (const Soil&);
 public:
   explicit Soil (Block&);
-  void initialize (Groundwater&, int som_size, Treelog&);
+  void initialize (Geometry&, Groundwater&, int som_size, Treelog&);
   ~Soil ();
 };
 

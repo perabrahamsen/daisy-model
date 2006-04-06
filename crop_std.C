@@ -224,7 +224,7 @@ CropStandard::tick (const Time& time,
   harvesting.tick (time);
 
   // Update average soil temperature.
-  const double T_soil = soil_heat.T (soil.interval_plus (-root_system->Depth));
+  const double T_soil = soil_heat.T (geo.interval_plus (-root_system->Depth));
   root_system->tick_hourly (time.hour (), T_soil);
 
   // Clear nitrogen.
@@ -238,7 +238,7 @@ CropStandard::tick (const Time& time,
     {
       daisy_assert (ForcedCAI < 0.0);
 
-      development->emergence (soil.interval_plus (-root_system->Depth/2.),
+      development->emergence (geo.interval_plus (-root_system->Depth/2.),
                               root_system->soil_temperature);
       if (development->DS >= 0)
 	{
@@ -256,14 +256,14 @@ CropStandard::tick (const Time& time,
 	      if (!production.AM_root)
 		{
 		  production.AM_root
-		    = &AM::create (soil, time, harvesting.Root,
+		    = &AM::create (geo, time, harvesting.Root,
 				   name, root_symbol, AM::Locked);
 		  organic_matter->add (*production.AM_root);
 		}
 	      if (!production.AM_leaf)
 		{
 		  production.AM_leaf
-		    = &AM::create (soil, time, harvesting.Dead,
+		    = &AM::create (geo, time, harvesting.Dead,
 				   name, dead_symbol, AM::Locked);
 		  organic_matter->add (*production.AM_leaf);
 		}
@@ -272,11 +272,11 @@ CropStandard::tick (const Time& time,
 	    {
 	      if (!production.AM_root)
 		production.AM_root
-		  = &AM::create (soil, time, harvesting.Root,
+		  = &AM::create (geo, time, harvesting.Root,
 				 name, root_symbol, AM::Unlocked);
 	      if (!production.AM_leaf)
 		production.AM_leaf
-		  = &AM::create (soil, time, harvesting.Dead,
+		  = &AM::create (geo, time, harvesting.Dead,
 				 name, dead_symbol, AM::Unlocked);
 	    }
 	}
@@ -347,8 +347,8 @@ CropStandard::tick (const Time& time,
     production.PotCanopyAss = production.CanopyAss = 0.0;
 
   production.tick (bioclimate.daily_air_temperature (),
-		   soil_heat.T (soil.interval_plus (-root_system->Depth / 3.0)),
-		   root_system->Density, soil, development->DS, 
+		   soil_heat.T (geo.interval_plus (-root_system->Depth / 3.0)),
+		   root_system->Density, geo, development->DS, 
 		   canopy.CAImRat, nitrogen, nitrogen_stress, partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, msg);

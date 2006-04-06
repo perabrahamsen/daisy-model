@@ -21,6 +21,7 @@
 
 
 #include "transport.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "adsorption.h"
@@ -42,7 +43,8 @@ private:
   
   // Simulation.
 public:
-  void tick (Treelog&, const Soil&, const SoilWater&, const Adsorption&,
+  void tick (Treelog&, const Geometry& geo,
+             const Soil&, const SoilWater&, const Adsorption&,
 	     double diffusion_coefficient,
 	     vector<double>& M, 
 	     vector<double>& C,
@@ -66,7 +68,8 @@ TransportCD::output (Log& log) const
 }
 
 void 
-TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
+TransportCD::tick (Treelog&, const Geometry& geo,
+                   const Soil& soil, const SoilWater& soil_water,
 		   const Adsorption& adsorption,
 		   const double diffusion_coefficient,
 		   vector<double>& M, 
@@ -81,7 +84,7 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
   const vector<double> M_prev = M;
 
   // Constants.
-  const unsigned int size = soil.size (); // Number of soil layers.
+  const unsigned int size = geo.size (); // Number of soil layers.
 
   // Check that incomming C and M makes sense.
   for (unsigned int i = 0; i < size; i++)
@@ -156,9 +159,9 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 	alpha[j] = 0.0;
     }
 
-  const double dz_top = 0 - soil.z (0);
-  // Or: - 2.0 * soil.z (0)
-  // Or: soil.z (0) - soil.z(1)
+  const double dz_top = 0 - geo.z (0);
+  // Or: - 2.0 * geo.z (0)
+  // Or: geo.z (0) - geo.z(1)
 
   double C_top = 0.0;
   double S_top = 0.0;
@@ -176,13 +179,13 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 	  C_top = J_in / soil_water.q (0);
 	else
 	  {
-	    S_top = -J_in / soil.dz (0);
+	    S_top = -J_in / geo.dz (0);
 	    J_in = 0.0;
 	  }
       else
 	{
 	  // This should only happen if Surface::total_matter_flux.
-	  S_top = -J_in / soil.dz (0);
+	  S_top = -J_in / geo.dz (0);
 	  J_in = 0.0;
 	}
     }
@@ -190,7 +193,7 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
   // Find the time step using Courant.
   ddt = 1.0;
   for (unsigned int i = 0; i < size; i++)
-    ddt = min (ddt, pow (soil.dz (i), 2) / (2 * D[i + 1]));
+    ddt = min (ddt, pow (geo.dz (i), 2) / (2 * D[i + 1]));
   int time_step_reductions = 0;
 
   // We restart from here if anything goes wrong.
@@ -224,11 +227,11 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
       for (unsigned int j = 1; j < size; j++)
 	{
 	  const double dz_minus	// Size of layer above current node.
-	    = soil.z (j-1) - soil.z (j);
+	    = geo.z (j-1) - geo.z (j);
 	  const double dz_plus	// Size of layer below current node.
-	    = (j == size - 1) ? dz_minus : (soil.z (j) - soil.z (j+1));
+	    = (j == size - 1) ? dz_minus : (geo.z (j) - geo.z (j+1));
 
-	  const double dz = soil.dz (j); // Size of current node.
+	  const double dz = geo.dz (j); // Size of current node.
 	  double q_minus = soil_water.q (j); // Flow to above.
 	  const double q_plus = soil_water.q (j+1);	// Flow from below.
 	  const double alpha_minus = alpha[j]; // Direction above.
@@ -270,10 +273,10 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 	// Size of layer above current node.
 	const double dz_minus = dz_top;
 	// Size of layer below current node.
-	const double dz_plus = soil.z (0) - soil.z (1);
+	const double dz_plus = geo.z (0) - geo.z (1);
 
 	// Size of current node.
-	const double dz = soil.dz (0);
+	const double dz = geo.dz (0);
 	// Flow to above.
 	double q_minus = (J_in == 0.0) ? 0.0 : soil_water.q (0);
 	// Flow from below.
@@ -349,11 +352,11 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
   if (size + 1 > J.size ())
     J.insert (J.begin (), size + 1 - J.size (), 0.0);
 
-  J[0] = J_in - S_top * soil.dz (0);
+  J[0] = J_in - S_top * geo.dz (0);
   for (unsigned int i = 0; i < size; i++)
     {
       daisy_assert (M[i] >= 0.0);
-      J[i + 1] = (((M[i] - M_prev[i]) / dt) - S[i]) * soil.dz (i) + J[i];
+      J[i + 1] = (((M[i] - M_prev[i]) / dt) - S[i]) * geo.dz (i) + J[i];
     }
 }
 

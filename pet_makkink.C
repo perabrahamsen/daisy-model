@@ -33,7 +33,8 @@ struct PetMakkink : public Pet
 
   // Simulation.
   void tick (const Time&, const Weather& weather, const Vegetation& crops,
-	     const Surface& surface, const Soil&, const SoilHeat&,
+	     const Surface& surface, const Geometry&,
+             const Soil&, const SoilHeat&,
 	     const SoilWater&, Treelog&)
     {
       reference_evapotranspiration 

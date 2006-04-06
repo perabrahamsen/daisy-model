@@ -28,6 +28,7 @@
 
 class Surface;
 class Groundwater;
+class Geometry;
 class Soil;
 class SoilHeat;
 class Library;
@@ -44,7 +45,8 @@ public:
 
   // Simulate.
 public:
-  virtual bool tick (Treelog&, const Soil& soil, const SoilHeat&,
+  virtual bool tick (Treelog&, const Geometry& geo,
+                     const Soil& soil, const SoilHeat&,
 		     unsigned int first, const Surface& top, 
 		     unsigned int last, const Groundwater& bottom, 
 		     const std::vector<double>& S,

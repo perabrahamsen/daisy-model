@@ -21,7 +21,7 @@
 
 
 #include "select_value.h"
-#include "soil.h"
+#include "geometry.h"
 #include "border.h"
 #include "mathlib.h"
 #include <sstream>
@@ -33,29 +33,33 @@ struct SelectFluxBottom : public SelectValue
 {
   // Content.
   double height;
-  const Soil* last;
+  const Geometry* last_geo;
+  const Soil* last_soil;
   int index;
 
   // Output routines.
   void output_array (const vector<double>& array, 
-		     const Soil* soil, Treelog& msg)
+		     const Geometry* geo, const Soil* soil, Treelog& msg)
   { 
-    if (soil != last)
+    if (soil != last_soil)
+      last_soil = soil;
+
+    if (geo != last_geo)
       {
-        last = soil;
+        last_geo = geo;
         if (height > 0.0) 
-          index = soil->size ();
+          index = geo->size ();
         else
           {
-            index = soil->interval_border (height);
+            index = geo->interval_border (height);
             if ((index == 0 && height < -1e-8)
-                || !approximate (height, soil->zplus (index-1)))
+                || !approximate (height, geo->zplus (index-1)))
               {
                 std::ostringstream tmp;
                 tmp << "Log column " << name 
                        << ": No interval near to = " << height 
                        << " [cm]; closest match is " 
-                       << ((index == 0) ? 0 : soil->zplus (index-1))
+                       << ((index == 0) ? 0 : geo->zplus (index-1))
                        << " [cm]";
                 msg.warning (tmp.str ());
               }
@@ -90,7 +94,8 @@ struct SelectFluxBottom : public SelectValue
   SelectFluxBottom (Block& al)
     : SelectValue (al),
       height (al.number ("to", 1.0)),
-      last (NULL),
+      last_geo (NULL),
+      last_soil (NULL),
       index (-1)
   { }
 };

@@ -50,15 +50,16 @@ public:
 
   // Simulation.
 public:
-  void tick (const Soil& soil, SoilWater&, double, const SoilHeat&,
+  void tick (const Geometry&,
+             const Soil&, SoilWater&, double, const SoilHeat&,
 	     const Time& time, Treelog& msg)
-  { tick (soil, time, msg); }
-  void tick (const Soil&, const Time&, Treelog&);
+  { tick (time, msg); }
+  void tick (const Time&, Treelog&);
   double table () const;
 
   // Create and Destroy.
 public:
-  void initialize (const Soil&, const Time& time, Treelog&);
+  void initialize (const Geometry&, const Time& time, Treelog&);
   GroundwaterFile (Block&);
   ~GroundwaterFile ();
 };
@@ -79,7 +80,7 @@ GroundwaterFile::accept_bottom (double)
 }
 
 void
-GroundwaterFile::tick (const Soil&, const Time& time, Treelog&)
+GroundwaterFile::tick (const Time& time, Treelog&)
 {
   daisy_assert (lex);
   while (next_time < time)
@@ -145,12 +146,12 @@ GroundwaterFile::table () const
 }
 
 void
-GroundwaterFile::initialize (const Soil& soil, const Time& time,
+GroundwaterFile::initialize (const Geometry&, const Time& time,
 			     Treelog& err)
 {
   daisy_assert (lex == NULL);
   lex = new LexerData (file_name, err);
-  tick (soil, time, err); 
+  tick (time, err); 
 }
 
 GroundwaterFile::GroundwaterFile (Block& al)

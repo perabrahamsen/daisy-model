@@ -39,7 +39,7 @@ struct SelectPF : public Select
     
   // Output routines.
   void output_array (const vector<double>& array, 
-		     const Soil* soil, Treelog&)
+		     const Geometry*, const Soil* soil, Treelog&)
   { 
     if (soil)
       last_soil = soil;

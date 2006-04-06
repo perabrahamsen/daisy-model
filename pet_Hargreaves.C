@@ -35,7 +35,8 @@ struct PetHargreaves : public Pet
 
   // Simulation.
   void tick (const Time& time, const Weather& weather, const Vegetation& crops,
-	     const Surface& surface, const Soil&, const SoilHeat&,
+	     const Surface& surface, const Geometry&,
+             const Soil&, const SoilHeat&,
 	     const SoilWater&, Treelog&)
     {
       const double K_hs = 0.0023;

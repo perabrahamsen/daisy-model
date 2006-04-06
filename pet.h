@@ -25,6 +25,7 @@
 
 #include "librarian.h"
 
+class Geometry;
 class Soil;
 class SoilHeat;
 class SoilWater;
@@ -51,7 +52,8 @@ public:
   // Simulation.
 public:
   virtual void tick (const Time&, const Weather&, const Vegetation&,
-		     const Surface&, const Soil&, const SoilHeat&, 
+		     const Surface&, const Geometry& geo,
+                     const Soil&, const SoilHeat&, 
 		     const SoilWater&, Treelog&) = 0;
   virtual double wet () const = 0; // [mm/h]
   virtual double dry () const; // [mm/h]

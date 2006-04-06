@@ -78,7 +78,7 @@ public:
  
   // Simulation.
 public:
-  void macro_tick (const Soil&, Surface&, Treelog&);
+  void macro_tick (const Geometry&, const Soil&, Surface&, Treelog&);
   void tick (const Geometry& geo,
              const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
   void set_external_source (const Geometry&, 

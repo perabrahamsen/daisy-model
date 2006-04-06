@@ -47,7 +47,8 @@ public:
 
   // Simulation.
   void tick (const Time&, const Weather& weather, const Vegetation& crops,
-	     const Surface& surface, const Soil& soil,
+	     const Surface& surface, const Geometry& geo,
+             const Soil& soil,
 	     const SoilHeat& soil_heat, const SoilWater& soil_water, Treelog&);
 
   void output (Log& log) const
@@ -79,7 +80,8 @@ public:
 
 void
 PetPM::tick (const Time&, const Weather& weather, const Vegetation& crops,
-	     const Surface& surface, const Soil& soil,
+	     const Surface& surface, const Geometry& geo,
+             const Soil& soil,
 	     const SoilHeat& soil_heat, const SoilWater& soil_water,
 	     Treelog& out)
 {
@@ -100,7 +102,7 @@ PetPM::tick (const Time&, const Weather& weather, const Vegetation& crops,
   const double Rn = net_radiation->net_radiation ();
 
   // Ground heat flux.
-  const double G = soil_heat.top_flux (soil, soil_water);
+  const double G = soil_heat.top_flux (geo, soil, soil_water);
 
   const double LAI = crops.LAI ();
   if (LAI > 0.0)

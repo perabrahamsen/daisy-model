@@ -23,6 +23,7 @@
 #include "denitrification.h"
 #include "alist.h"
 #include "syntax.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
