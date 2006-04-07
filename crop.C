@@ -49,7 +49,7 @@ Crop::albedo () const
 { return 0.20; }
 
 void
-Crop::kill (const symbol name, const Time& time, const Geometry& geometry,
+Crop::kill (const symbol name, const Time& time, const Geometry& geo,
 	    Bioclimate& bioclimate, vector<AM*>& residuals,
 	    double& residuals_DM,
 	    double& residuals_N_top, double& residuals_C_top,
@@ -59,7 +59,7 @@ Crop::kill (const symbol name, const Time& time, const Geometry& geometry,
 #if defined (_MSC_VER)  
   const Harvest& dummy = // MS Visual C++ 2003 sucks.
 #endif 
-    harvest (name, time, geometry, bioclimate,
+    harvest (name, time, geo, bioclimate,
              0.0, 0.0, 0.0, 0.0, true, residuals, 
              residuals_DM, residuals_N_top, residuals_C_top, 
              residuals_N_soil, residuals_C_soil, false, out); 

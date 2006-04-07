@@ -121,7 +121,7 @@ Production::GrowthRespCoef (double E)
 void
 Production::tick (const double AirT, const double SoilT,
 		  const vector<double>& Density,
-		  const Geometry& geometry,
+		  const Geometry& geo,
 		  const double DS, const double CAImRat,
 		  const CrpN& nitrogen,
                   const double nitrogen_stress,
@@ -386,13 +386,13 @@ Production::tick (const double AirT, const double SoilT,
       IncWRoot -= DeadWRoot;
       const double C_Root = DM_to_C_factor (E_Root) * DeadWRoot;
       C_Loss += C_Root;
-      AM_root->add (geometry, C_Root * m2_per_cm2,
+      AM_root->add (geo, C_Root * m2_per_cm2,
                     DeadNRoot * m2_per_cm2,
                     Density);
       daisy_assert (C_Root == 0.0 || DeadNRoot > 0.0);
       residuals_DM += DeadWRoot;
-      geometry.add (residuals_C_soil, Density, C_Root * m2_per_cm2);
-      geometry.add (residuals_N_soil, Density, DeadNRoot * m2_per_cm2);
+      geo.add (residuals_C_soil, Density, C_Root * m2_per_cm2);
+      geo.add (residuals_N_soil, Density, DeadNRoot * m2_per_cm2);
       C_AM += C_Root;
       N_AM += DeadNRoot;
     }
@@ -669,7 +669,7 @@ void
 Production::initialize (const symbol name, 
 			const vector<AttributeList*>& root,
 			const vector<AttributeList*>& dead,
-			const Geometry& geometry,
+			const Geometry& geo,
 			OrganicMatter& organic_matter)
 {
   // Hotstart, find pool in organic matter.
@@ -683,14 +683,14 @@ Production::initialize (const symbol name,
   // If not found, we is planting emerged crops.  Create pools.
   if (!AM_root)
     {
-      AM_root = &AM::create (geometry, Time (1, 1, 1, 1), root,
+      AM_root = &AM::create (geo, Time (1, 1, 1, 1), root,
 			     name, root_symbol, AM::Locked);
       organic_matter.add (*AM_root);
     }
 	  
   if (!AM_leaf)
     {
-      AM_leaf = &AM::create (geometry, Time (1, 1, 1, 1), dead,
+      AM_leaf = &AM::create (geo, Time (1, 1, 1, 1), dead,
 			     name, dead_symbol, AM::Locked);
       organic_matter.add (*AM_leaf);
     }

@@ -42,7 +42,7 @@ struct Rootdens_AP : public Rootdens
 
   // simulation.
   void set_density (Treelog&, vector<double>& Density,
-		    const Geometry& geometry, 
+		    const Geometry& geo, 
 		    double Depth, double PotRtDpt,
 		    double WRoot, double DS);
   void output (Log& log) const;
@@ -57,7 +57,7 @@ static inline double sqr (double x)
 void
 Rootdens_AP::set_density (Treelog& /*msg*/,
                           vector<double>& Density,
-                          const Geometry& geometry, 
+                          const Geometry& geo, 
                           const double Depth, const double /*PotRtDpt*/,
                           const double WRoot, const double DS)
 {
@@ -71,25 +71,25 @@ Rootdens_AP::set_density (Treelog& /*msg*/,
           * (-0.5 * sqr (d_m) - 0.5 * sqr (Depth) + d_m * Depth)));
   daisy_assert (L0 >= 0.0);
 
-  daisy_assert (Density.size () == geometry.size ());
+  daisy_assert (Density.size () == geo.size ());
   unsigned int i = 0;
   // Use GP down to Depth.
-  for (; i == 0 || -geometry.zplus (i-1) < Depth; i++)
+  for (; i == 0 || -geo.zplus (i-1) < Depth; i++)
     {
-      daisy_assert (i < geometry.size ());
-      Density[i] = L0 * exp (a * geometry.z (i));
+      daisy_assert (i < geo.size ());
+      Density[i] = L0 * exp (a * geo.z (i));
     }
   // Linear decrease downto Depth + q;
   PLF tip;
   tip.add (Depth, L0 * exp (- a * Depth));
   tip.add (d_m, 0.0);
-  for (; i == 0 || -geometry.zplus (i-1) < d_m; i++)
+  for (; i == 0 || -geo.zplus (i-1) < d_m; i++)
     {
-      daisy_assert (i < geometry.size ());
-      Density[i] += tip (-geometry.z (i));
+      daisy_assert (i < geo.size ());
+      Density[i] += tip (-geo.z (i));
     }
   // No roots below.
-  for (; i < geometry.size (); i++)
+  for (; i < geo.size (); i++)
     Density[i] = 0.0;
 
 }

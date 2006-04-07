@@ -487,7 +487,8 @@ VegetationCrops::force_production_stress (double pstress)
 
 void
 VegetationCrops::kill_all (symbol name, const Time& time, 
-			   const Geometry& geometry, 
+
+			   const Geometry& geo, 
 			   Bioclimate& bioclimate, vector<AM*>& residuals,
 			   double& residuals_DM,
 			   double& residuals_N_top, double& residuals_C_top,
@@ -499,7 +500,7 @@ VegetationCrops::kill_all (symbol name, const Time& time,
        crop != crops.end(); 
        crop++)
     {
-      (*crop)->kill (name, time, geometry, bioclimate, residuals, 
+      (*crop)->kill (name, time, geo, bioclimate, residuals, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
 		     residuals_N_soil, residuals_C_soil, msg);
       delete *crop;
@@ -513,7 +514,7 @@ void
 VegetationCrops::harvest (const symbol column_name,
 			  const symbol crop_name,
 			  const Time& time, 
-			  const Geometry& geometry, 
+			  const Geometry& geo, 
 			  Bioclimate& bioclimate,
 			  double stub_length,
 			  double stem_harvest, double leaf_harvest, 
@@ -542,13 +543,13 @@ VegetationCrops::harvest (const symbol column_name,
         const double old_crop_C = (*crop)->total_C ();
         const double old_residuals_C_top = residuals_C_top;
         const double old_residuals_C_soil
-          = geometry.total (residuals_C_soil) * 10000;
+          = geo.total (residuals_C_soil) * 10000;
         const double sorg_height = (*crop)->sorg_height ();
         const bool root_fruit = (sorg_height < 0.0);
         min_height = min (min_height, sorg_height);
 	const Harvest& mine = 
 	  (*crop)->harvest (column_name, time, 
-			    geometry, 
+			    geo, 
 			    bioclimate,
 			    stub_length, stem_harvest,
 			    leaf_harvest, sorg_harvest, 
@@ -565,7 +566,7 @@ VegetationCrops::harvest (const symbol column_name,
           ? 0.0 
           : (*crop)->total_C ();
         const double balance = (new_crop_C - old_crop_C)
-          + ((residuals_C_top + geometry.total (residuals_C_soil) * 10000)
+          + ((residuals_C_top + geo.total (residuals_C_soil) * 10000)
              - (old_residuals_C_top + old_residuals_C_soil)) * 10
           + mine.total_C () * 10;
         if (fabs (balance) > 0.001 /* 1 [g/ha] */)
@@ -575,7 +576,7 @@ VegetationCrops::harvest (const symbol column_name,
             tmp << "\ntop residuals = "
                    << (residuals_C_top - old_residuals_C_top) * 10
                    << "\nsoil residuals = "
-                   << (geometry.total (residuals_C_soil) * 10000
+                   << (geo.total (residuals_C_soil) * 10000
                        - old_residuals_C_soil) * 10
                    << "\nharvest = " << mine.total_C () * 10
                    << "\nbalance = " << balance;
@@ -611,7 +612,7 @@ VegetationCrops::harvest (const symbol column_name,
 
 void
 VegetationCrops::sow (Treelog& msg, const AttributeList& al,
-		      const Geometry& geometry,
+		      const Geometry& geo,
 		      OrganicMatter& organic_matter, 
                       double& seed_N, double& seed_C)
 {
@@ -623,7 +624,7 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
     if ((*i)->name == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
-  crop->initialize (msg, geometry, &organic_matter);
+  crop->initialize (msg, geo, &organic_matter);
   crops.push_back (crop);
   seed_N += crop->total_N ();
   seed_C += crop->total_C ();
@@ -632,7 +633,7 @@ If you want two " + name + " you should rename one of them");
 
 void
 VegetationCrops::sow (Treelog& msg, const AttributeList& al,
-		      const Geometry& geometry)
+		      const Geometry& geo)
 {
   Crop *const crop = Librarian<Crop>::build_free (msg, al, "sow");
   const symbol name = crop->name;
@@ -642,7 +643,7 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
     if ((*i)->name == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
-  crop->initialize (msg, geometry, NULL);
+  crop->initialize (msg, geo, NULL);
   crops.push_back (crop);
 }
 

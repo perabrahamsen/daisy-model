@@ -33,8 +33,8 @@
 using namespace std;
 
 double
-Solute::total (const Geometry& geometry, double from, double to) const
-{ return geometry.total (M_, from, to); }
+Solute::total (const Geometry& geo, double from, double to) const
+{ return geo.total (M_, from, to); }
 
 void
 Solute::clear ()
@@ -302,21 +302,21 @@ Solute::~Solute ()
 { }
 
 void 
-Solute::incorporate (const Geometry& geometry, 
+Solute::incorporate (const Geometry& geo, 
                      double amount, double from, double to)
 { 
   daisy_assert (amount >= 0.0);
   daisy_assert (from <= 0.0);
   daisy_assert (to <= from);
-  geometry.add (S_external, from, to, amount);
+  geo.add (S_external, from, to, amount);
 }
 
 void 
-Solute::set_external_source (const Geometry& geometry, 
+Solute::set_external_source (const Geometry& geo, 
 			     double amount, double from, double to)
 {
   fill (S_permanent.begin (), S_permanent.end (), 0.0);
-  geometry.add (S_permanent, from, to, amount);
+  geo.add (S_permanent, from, to, amount);
 }
 
 void 

@@ -78,8 +78,8 @@ struct AM::Implementation
   void mix (const Geometry&, double from, double to);
   void swap (const Geometry&, double from, double middle, double to,
              vector<double>& tillage_N_soil, vector<double>& tillage_C_soil);
-  double total_C (const Geometry& geometry) const;
-  double total_N (const Geometry& geometry) const;
+  double total_C (const Geometry& geo) const;
+  double total_N (const Geometry& geo) const;
   double C_at (unsigned int at) const;
   double N_at (unsigned int at) const;
   void pour (vector<double>& cc, vector<double>& nn); // Move content to cc&nn.
@@ -87,7 +87,7 @@ struct AM::Implementation
   void distribute (double C, vector<double>& om_C, // Helper for 'add' fns.
 		   double N, vector<double>& om_N);
   void add (double C, double N);// Add dead leafs.
-  void add (const Geometry& geometry, AM::Implementation& other);
+  void add (const Geometry& geo, AM::Implementation& other);
   void add (const Geometry&,	// Add dead roots.
 	    double C, double N, 
 	    const vector<double>& density);
@@ -310,18 +310,18 @@ AM::Implementation::add (double C, double N)
 }
 
 void
-AM::Implementation::add (const Geometry& geometry,
+AM::Implementation::add (const Geometry& geo,
 			 AM::Implementation& other)
 {
   daisy_assert (&other != this);
-  const double old_C = total_C (geometry) + other.total_C (geometry);
-  const double old_N = total_N (geometry) + other.total_N (geometry);
+  const double old_C = total_C (geo) + other.total_C (geo);
+  const double old_N = total_N (geo) + other.total_N (geo);
 
-  vector<double> cc (geometry.size (), 0.0);
-  vector<double> nn (geometry.size (), 0.0);
+  vector<double> cc (geo.size (), 0.0);
+  vector<double> nn (geo.size (), 0.0);
   other.pour (cc, nn);
 
-  for (unsigned int at = 0; at < geometry.size (); at++)
+  for (unsigned int at = 0; at < geo.size (); at++)
     {
       vector<double> om_C (om.size (), 0.0);
       vector<double> om_N (om.size (), 0.0);
@@ -334,21 +334,21 @@ AM::Implementation::add (const Geometry& geometry,
 
   add (other.top_C (), other.top_N ());
 
-  const double new_C = total_C (geometry);
-  const double new_N = total_N (geometry);
+  const double new_C = total_C (geo);
+  const double new_N = total_N (geo);
   daisy_assert (approximate (old_C, new_C));
   daisy_assert (approximate (old_N, new_N));
 }
 
 void
-AM::Implementation::add (const Geometry& geometry, 
+AM::Implementation::add (const Geometry& geo, 
 			 double C, double N,
 			 const vector<double>& density)
 {
   daisy_assert (C >= 0);
   daisy_assert (N >= 0);
-  const double old_C = total_C (geometry);
-  const double old_N = total_N (geometry);
+  const double old_C = total_C (geo);
+  const double old_N = total_N (geo);
 
   vector<double> om_C (om.size (), 0.0);
   vector<double> om_N (om.size (), 0.0);
@@ -356,10 +356,10 @@ AM::Implementation::add (const Geometry& geometry,
   distribute (C, om_C, N, om_N);
 
   for (unsigned int i = 0; i < om.size (); i++)
-    om[i]->add (geometry, om_C[i], om_N[i], density);
+    om[i]->add (geo, om_C[i], om_N[i], density);
 
-  daisy_assert (approximate (old_C + C, total_C (geometry)));
-  daisy_assert (approximate (old_N + N, total_N (geometry)));
+  daisy_assert (approximate (old_C + C, total_C (geo)));
+  daisy_assert (approximate (old_N + N, total_N (geo)));
 }
 
 double
@@ -416,65 +416,65 @@ AM::Implementation::check (Treelog& /*err*/) const
 }
 
 void 
-AM::Implementation::mix (const Geometry& geometry,
+AM::Implementation::mix (const Geometry& geo,
 			 double from, double to, double penetration,
                          double& tillage_N_top, double& tillage_C_top,
                          vector<double>& tillage_N_soil, 
                          vector<double>& tillage_C_soil)
 {
-  const double old_C = total_C (geometry);
-  const double old_N = total_N (geometry);
+  const double old_C = total_C (geo);
+  const double old_N = total_N (geo);
 
   for (unsigned int i = 0; i < om.size (); i++)
     {
-      om[i]->penetrate (geometry, from, to, penetration, 
+      om[i]->penetrate (geo, from, to, penetration, 
                         tillage_N_top, tillage_C_top, 
                         tillage_N_soil, tillage_C_soil);
-      om[i]->mix (geometry, from, to, 
+      om[i]->mix (geo, from, to, 
                   tillage_N_soil, tillage_C_soil);
     }
-  const double new_C = total_C (geometry);
-  const double new_N = total_N (geometry);
+  const double new_C = total_C (geo);
+  const double new_N = total_N (geo);
   
   daisy_assert (approximate (new_C, old_C));
   daisy_assert (approximate (new_N, old_N));
 }
 
 void
-AM::Implementation::swap (const Geometry& geometry,
+AM::Implementation::swap (const Geometry& geo,
 			  double from, double middle, double to,
                           vector<double>& tillage_N_soil,
                           vector<double>& tillage_C_soil)
 {
-  const double old_C = total_C (geometry);
-  const double old_N = total_N (geometry);
+  const double old_C = total_C (geo);
+  const double old_N = total_N (geo);
 
   for (unsigned int i = 0; i < om.size (); i++)
-    om[i]->swap (geometry, from, middle, to, 
+    om[i]->swap (geo, from, middle, to, 
                  tillage_N_soil, tillage_C_soil);
 
-  const double new_C = total_C (geometry);
-  const double new_N = total_N (geometry);
+  const double new_C = total_C (geo);
+  const double new_N = total_N (geo);
   
   daisy_assert (approximate (new_C, old_C));
   daisy_assert (approximate (new_N, old_N));
 }
 
 double 
-AM::Implementation::total_C (const Geometry& geometry) const
+AM::Implementation::total_C (const Geometry& geo) const
 {
   double total = 0.0;
   for (unsigned int i = 0; i < om.size (); i++)
-    total += om[i]->full_C (geometry);
+    total += om[i]->full_C (geo);
   return total;
 }
 
 double 
-AM::Implementation::total_N (const Geometry& geometry) const
+AM::Implementation::total_N (const Geometry& geo) const
 {
   double total = 0.0;
   for (unsigned int i = 0; i < om.size (); i++)
-    total += om[i]->full_N (geometry);
+    total += om[i]->full_N (geo);
   return total;
 }
 
@@ -535,27 +535,27 @@ AM::check (Treelog& err) const
 { return impl.check (err); }
 
 void 
-AM::mix (const Geometry& geometry,
+AM::mix (const Geometry& geo,
 	 double from, double to, double penetration,
          double& tillage_N_top, double& tillage_C_top,
          vector<double>& tillage_N_soil, vector<double>& tillage_C_soil)
-{ impl.mix (geometry, from, to, penetration, 
+{ impl.mix (geo, from, to, penetration, 
             tillage_N_top, tillage_C_top, 
             tillage_N_soil, tillage_C_soil); }
 
 void
-AM::swap (const Geometry& geometry,
+AM::swap (const Geometry& geo,
 	  double from, double middle, double to,
           vector<double>& tillage_N_soil, vector<double>& tillage_C_soil)
-{ impl.swap (geometry, from, middle, to, tillage_N_soil, tillage_C_soil); }
+{ impl.swap (geo, from, middle, to, tillage_N_soil, tillage_C_soil); }
 
 double 
-AM::total_C (const Geometry& geometry) const
-{ return impl.total_C (geometry); }
+AM::total_C (const Geometry& geo) const
+{ return impl.total_C (geo); }
 
 double 
-AM::total_N (const Geometry& geometry) const
-{ return impl.total_N (geometry); }
+AM::total_N (const Geometry& geo) const
+{ return impl.total_N (geo); }
 
 double 
 AM::C_at (unsigned int at) const
@@ -574,14 +574,14 @@ AM::add (double C, double N)
 { impl.add (C, N); }
 
 void 
-AM::add (const Geometry& geometry, AM& other)
-{ impl.add (geometry, other.impl); }
+AM::add (const Geometry& geo, AM& other)
+{ impl.add (geo, other.impl); }
 
 void 
-AM::add (const Geometry& geometry,
+AM::add (const Geometry& geo,
 	 double C, double N, 
 	 const vector<double>& density)
-{ impl.add (geometry, C, N, density); }
+{ impl.add (geo, C, N, density); }
 
 double
 AM::top_C () const
@@ -619,7 +619,7 @@ AM::check_om_pools ()
 }
 
 AM& 
-AM::create (const AttributeList& al1 , const Geometry& geometry, 
+AM::create (const AttributeList& al1 , const Geometry& geo, 
             const double max_rooting_depth)
 { 
   AttributeList al2 (al1);
@@ -627,13 +627,13 @@ AM::create (const AttributeList& al1 , const Geometry& geometry,
   if (!al2.check ("name"))
     al2.add ("name", al1.identifier ("type"));
   AM& am = *new AM (al2); 
-  am.initialize (geometry, max_rooting_depth);
+  am.initialize (geo, max_rooting_depth);
   return am;
 }
 
 // Crop part.
 AM& 
-AM::create (const Geometry& /*geometry*/, const Time& time,
+AM::create (const Geometry& /*geo*/, const Time& time,
 	    const vector<AttributeList*>& ol,
 	    const symbol sort, const symbol part,
 	    AM::lock_type lock)
@@ -893,7 +893,7 @@ AM::AM (const AttributeList& al)
  }
 
 void
-AM::initialize (const Geometry& geometry, const double max_rooting_depth)
+AM::initialize (const Geometry& geo, const double max_rooting_depth)
 {
   const string syntax = alist.name ("syntax");
   
@@ -943,7 +943,7 @@ AM::initialize (const Geometry& geometry, const double max_rooting_depth)
 		  daisy_assert (fraction >= 0.0);
 		  daisy_assert (fraction <= 1.0);
 		  missing_fraction -= fraction;
-		  geometry.add (om[j]->C, last, end, C * fraction);
+		  geo.add (om[j]->C, last, end, C * fraction);
 		}
 	      else if (missing_number != -1)
 		// Should be catched by syntax check.
@@ -956,7 +956,7 @@ AM::initialize (const Geometry& geometry, const double max_rooting_depth)
 	      if (missing_fraction < -0.1e-10)
 		throw ("Specified over 100% C in om in initial am");
 	      else if (missing_fraction > 0.0)
-		geometry.add (om[missing_number]->C, 
+		geo.add (om[missing_number]->C, 
 			  last, end, C * missing_fraction);
 	    }
 	  else if (missing_fraction < -0.1e-10)
@@ -990,13 +990,13 @@ AM::initialize (const Geometry& geometry, const double max_rooting_depth)
       daisy_assert (depth < 0.0);
 
       // Calculate density.
-      vector<double> density (geometry.size (), 0.0);
-      for (unsigned int i = 0; i < geometry.size (); i++)
-        if (geometry.z (i) > depth)
-          density[i] = k * exp (k * geometry.z (i));
+      vector<double> density (geo.size (), 0.0);
+      for (unsigned int i = 0; i < geo.size (); i++)
+        if (geo.z (i) > depth)
+          density[i] = k * exp (k * geo.z (i));
 
       // Add it.
-      impl.add (geometry, C, N, density);
+      impl.add (geo, C, N, density);
     }
 }
 

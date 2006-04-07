@@ -85,23 +85,23 @@ DOM::Element::output (Log& log) const
 }
 
 void 
-DOM::Element::mix (const Geometry& geometry, 
+DOM::Element::mix (const Geometry& geo, 
                    const Soil& soil, const SoilWater& soil_water, 
 		   Adsorption& adsorption,
 		   double from, double to)
 {
-  geometry.mix (M, from, to);
+  geo.mix (M, from, to);
   for (unsigned int i = 0; i < C.size (); i++)
     C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
 }
 
 void 
-DOM::Element::swap (const Geometry& geometry, 
+DOM::Element::swap (const Geometry& geo, 
                     const Soil& soil, const SoilWater& soil_water,
 		    Adsorption& adsorption,
 		    double from, double middle, double to)
 {
-  geometry.swap (M, from, middle, to);
+  geo.swap (M, from, middle, to);
   for (unsigned int i = 0; i < C.size (); i++)
     C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
 }
@@ -262,28 +262,28 @@ DOM::add_to_source (unsigned int at, double to_C, double to_N)
 }
 
 double 
-DOM::soil_C (const Geometry& geometry) const
-{ return geometry.total (C.M); }
+DOM::soil_C (const Geometry& geo) const
+{ return geo.total (C.M); }
 
 double 
-DOM::soil_N (const Geometry& geometry) const
-{ return geometry.total (N.M); }
+DOM::soil_N (const Geometry& geo) const
+{ return geo.total (N.M); }
 
 double 
-DOM::soil_C (const Geometry& geometry, double from, double to) const
-{ return geometry.total (C.M, from, to); }
+DOM::soil_C (const Geometry& geo, double from, double to) const
+{ return geo.total (C.M, from, to); }
 
 double 
-DOM::soil_N (const Geometry& geometry, double from, double to) const
-{ return geometry.total (N.M, from, to); }
+DOM::soil_N (const Geometry& geo, double from, double to) const
+{ return geo.total (N.M, from, to); }
 
 double
-DOM::C_source (const Geometry& geometry) const
-{ return geometry.total (C.S); }
+DOM::C_source (const Geometry& geo) const
+{ return geo.total (C.S); }
 
 double
-DOM::N_source (const Geometry& geometry) const
-{ return geometry.total (N.S); }
+DOM::N_source (const Geometry& geo) const
+{ return geo.total (N.S); }
 
 double 
 DOM::C_at (unsigned int at) const

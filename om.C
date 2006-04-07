@@ -60,54 +60,54 @@ OM::output (Log& log) const
 }
 
 void 
-OM::mix (const Geometry& geometry, double from, double to,
+OM::mix (const Geometry& geo, double from, double to,
          vector<double>& N_change, vector<double>& C_change)
 {
   // Ignore tiny pools.
-  if (soil_C (geometry) < 1e-20)
+  if (soil_C (geo) < 1e-20)
     return;
 
   // Mix.
   assert_non_negative (C);
-  geometry.mix (C, from, to, C_change);
+  geo.mix (C, from, to, C_change);
   assert_non_negative (C);
   assert_non_negative (N);
-  geometry.mix (N, from, to, N_change);
+  geo.mix (N, from, to, N_change);
   assert_non_negative (N);
 }
 
 void
-OM::swap (const Geometry& geometry, double from, double middle, double to,
+OM::swap (const Geometry& geo, double from, double middle, double to,
           vector<double>& N_change, vector<double>& C_change)
 {
   // Ignore tiny pools.
-  if (soil_C (geometry) < 1e-20)
+  if (soil_C (geo) < 1e-20)
     return;
 
   // Swap.
   assert_non_negative (C);
-  geometry.swap (C, from, middle, to, C_change);
+  geo.swap (C, from, middle, to, C_change);
   assert_non_negative (C);
   assert_non_negative (N);
-  geometry.swap (N, from, middle, to, N_change);
+  geo.swap (N, from, middle, to, N_change);
   assert_non_negative (N);
 }
 
 double 
-OM::soil_C (const Geometry& geometry) const
-{ return geometry.total (C); }
+OM::soil_C (const Geometry& geo) const
+{ return geo.total (C); }
 
 double 
-OM::soil_N (const Geometry& geometry) const
-{ return geometry.total (N); }
+OM::soil_N (const Geometry& geo) const
+{ return geo.total (N); }
 
 double 
-OM::soil_C (const Geometry& geometry, double from, double to) const
-{ return geometry.total (C, from, to); }
+OM::soil_C (const Geometry& geo, double from, double to) const
+{ return geo.total (C, from, to); }
 
 double 
-OM::soil_N (const Geometry& geometry, double from, double to) const
-{ return geometry.total (N, from, to); }
+OM::soil_N (const Geometry& geo, double from, double to) const
+{ return geo.total (N, from, to); }
 
 double 
 OM::goal_C_per_N (unsigned int at) const // Desired C/N ratio.

@@ -318,20 +318,20 @@ SoilWater::Implementation::tick (const Geometry& geo,
 }
 
 void 
-SoilWater::Implementation::set_external_source (const Geometry& geometry, 
+SoilWater::Implementation::set_external_source (const Geometry& geo, 
 						double amount, 
 						double from, double to)
 {
   fill (S_permanent.begin (), S_permanent.end (), 0.0);
-  geometry.add (S_permanent, from, to, -amount);
+  geo.add (S_permanent, from, to, -amount);
 }
 
 void 
-SoilWater::Implementation::incorporate (const Geometry& geometry, 
+SoilWater::Implementation::incorporate (const Geometry& geo, 
                                         double amount, double from, double to)
 
 {
-  geometry.add (S_incorp, from, to, -amount);
+  geo.add (S_incorp, from, to, -amount);
 }
 
 void
@@ -618,8 +618,8 @@ SoilWater::Implementation::~Implementation ()
 { }
 
 void
-SoilWater::clear (const Geometry& geometry)
-{ impl->clear (geometry); }
+SoilWater::clear (const Geometry& geo)
+{ impl->clear (geo); }
 
 void
 SoilWater::root_uptake (const std::vector<double>& v)
@@ -659,8 +659,8 @@ SoilWater::Theta_old (int i) const
 { return impl->Theta_old[i]; }
 
 double 
-SoilWater::content (const Geometry& geometry, double from, double to) const
-{ return geometry.total (impl->Theta, from, to); }
+SoilWater::content (const Geometry& geo, double from, double to) const
+{ return geo.total (impl->Theta, from, to); }
 
 #ifndef NEWMOVE
 double
@@ -728,14 +728,14 @@ SoilWater::tick (const Geometry& geo,
 { impl->tick (geo, soil, soil_heat, surface, groundwater, msg); }
 
 void 
-SoilWater::set_external_source (const Geometry& geometry, 
+SoilWater::set_external_source (const Geometry& geo, 
 				double amount, double from, double to)
-{ impl->set_external_source (geometry, amount, from, to); }
+{ impl->set_external_source (geo, amount, from, to); }
 
 void 
-SoilWater::incorporate (const Geometry& geometry, 
+SoilWater::incorporate (const Geometry& geo, 
                         double amount, double from, double to)
-{ impl->incorporate (geometry, amount, from, to); }
+{ impl->incorporate (geo, amount, from, to); }
 
 void
 SoilWater::mix (const Geometry& geo,

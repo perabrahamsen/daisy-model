@@ -57,7 +57,7 @@ struct Rootdens_PLF : public Rootdens
 
   // Simulation.
   void get_density (Treelog&, vector<double>& Density,
-		    const Geometry& geometry, 
+		    const Geometry& geo, 
 		    double WRoot, double value, double z_factor,
 		    double max_depth = 1e100);
   void output (Log&) const
@@ -121,12 +121,12 @@ Rootdens_PLF::Entry::~Entry ()
 	
 void 
 Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
-			   const Geometry& geometry, 
+			   const Geometry& geo, 
 			   const double WRoot,
 			   const double index, const double z_factor, 
 			   const double max_depth)
 { 
-  daisy_assert (abs_dens.size () == geometry.size ());
+  daisy_assert (abs_dens.size () == geo.size ());
 
   // Find entries before and after current index.
   const Entry* before = NULL;
@@ -146,14 +146,14 @@ Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
   if (before == NULL)
     {				// Current index is after last entry.
       daisy_assert (after != NULL);
-      for (unsigned int i = 0; i < geometry.size (); i++)
-	abs_dens[i] = after->density (geometry.z (i) * z_factor);
+      for (unsigned int i = 0; i < geo.size (); i++)
+	abs_dens[i] = after->density (geo.z (i) * z_factor);
     }
   else if (after == NULL)
     {				// Current index is before first entry.
       daisy_assert (before != NULL);
-      for (unsigned int i = 0; i < geometry.size (); i++)
-	abs_dens[i] = before->density (geometry.z (i) * z_factor);
+      for (unsigned int i = 0; i < geo.size (); i++)
+	abs_dens[i] = before->density (geo.z (i) * z_factor);
     }
   else
     {				// Current index is between two entries.
@@ -163,9 +163,9 @@ Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
 
       const double rel_dist 
 	= (index - before->index) / (after->index - before->index);
-      for (unsigned int i = 0; i < geometry.size (); i++)
+      for (unsigned int i = 0; i < geo.size (); i++)
 	{
-	  const double z = geometry.z (i) * z_factor;
+	  const double z = geo.z (i) * z_factor;
 	  if (z < max_depth || i == 1)
 	    {
 	      const double a = before->density (z);
@@ -182,12 +182,12 @@ Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
   daisy_assert (SpRtLength > 0.0);
   static const double m_per_cm = 0.01;
   const double LengthPrArea = m_per_cm * SpRtLength * WRoot; // [cm/cm^2]
-  const double sum = geometry.total (abs_dens);
+  const double sum = geo.total (abs_dens);
   daisy_assert (sum > 0.0);
   const double factor = LengthPrArea / sum;
   for (unsigned int i = 0; i < abs_dens.size (); i++)
     abs_dens[i] *= factor;
-  daisy_assert (approximate (LengthPrArea, geometry.total (abs_dens)));
+  daisy_assert (approximate (LengthPrArea, geo.total (abs_dens)));
 }
 
 Rootdens_PLF::Rootdens_PLF (Block& al)
@@ -202,10 +202,10 @@ struct Rootdens_DS_Depth : public Rootdens_PLF
 {
   // Simulation.
   void set_density (Treelog& msg, vector<double>& abs_dens,
-		    const Geometry& geometry, 
+		    const Geometry& geo, 
 		    double /* Depth */, double /* PotRtDpt */,
 		    double WRoot, double DS)
-  { get_density (msg, abs_dens, geometry, WRoot, DS, -1.0); }
+  { get_density (msg, abs_dens, geo, WRoot, DS, -1.0); }
   
   // Create.
   Rootdens_DS_Depth (Block& al)
@@ -249,12 +249,12 @@ struct Rootdens_DS_Rel : public Rootdens_PLF
 {
   // Simulation.
   void set_density (Treelog& msg, vector<double>& abs_dens,
-		    const Geometry& geometry, 
+		    const Geometry& geo, 
 		    double Depth, double /* PotRtDpt */,
 		    double WRoot, double DS)
   { 
     daisy_assert (Depth > 0.0);
-    get_density (msg, abs_dens, geometry, WRoot, DS, -1.0 / Depth); 
+    get_density (msg, abs_dens, geo, WRoot, DS, -1.0 / Depth); 
   }
 
   // Create.
@@ -300,11 +300,11 @@ struct Rootdens_Depth_Depth : public Rootdens_PLF
 {
   // Simulation.
   void set_density (Treelog& msg, vector<double>& abs_dens,
-		    const Geometry& geometry, 
+		    const Geometry& geo, 
 		    double Depth, double PotRtDpt,
 		    double WRoot, double /* DS */)
   { 
-    get_density (msg, abs_dens, geometry, WRoot, -PotRtDpt, -1.0, -Depth); 
+    get_density (msg, abs_dens, geo, WRoot, -PotRtDpt, -1.0, -Depth); 
   }
 
   // Create.

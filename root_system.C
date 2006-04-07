@@ -347,18 +347,18 @@ RootSystem::tick_daily (Treelog& msg, const Geometry& geo, const Soil& soil,
 }
 
 void
-RootSystem::set_density (Treelog& msg, const Geometry& geometry, 
+RootSystem::set_density (Treelog& msg, const Geometry& geo, 
 			 const double WRoot, const double DS)
-{ rootdens->set_density (msg, Density, geometry, Depth, PotRtDpt, WRoot, DS); }
+{ rootdens->set_density (msg, Density, geo, Depth, PotRtDpt, WRoot, DS); }
 
 void
-RootSystem::full_grown (Treelog& msg, const Geometry& geometry, 
+RootSystem::full_grown (Treelog& msg, const Geometry& geo, 
                         const double max_rooting_depth,
 			const double WRoot)
 {
   PotRtDpt = MaxPen;
   Depth = min (MaxPen, -max_rooting_depth);
-  set_density (msg, geometry, WRoot, 1.0);
+  set_density (msg, geo, WRoot, 1.0);
 }
 
 void

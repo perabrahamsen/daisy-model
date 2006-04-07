@@ -41,7 +41,7 @@ struct Rootdens_G_P : public Rootdens
   // Simulation.
   static double density_distribution_parameter (double a);
   void set_density (Treelog&, vector<double>& Density,
-		    const Geometry& geometry, 
+		    const Geometry& geo, 
 		    double Depth, double PotRtDpt,
 		    double WRoot, double DS);
   void output (Log& log) const;
@@ -111,7 +111,7 @@ Rootdens_G_P::density_distribution_parameter (double a)
 void
 Rootdens_G_P::set_density (Treelog& msg,
 			   vector<double>& Density,
-			   const Geometry& geometry, 
+			   const Geometry& geo, 
 			   const double Depth, const double PotRtDpt,
 			   const double WRoot, const double)
 {
@@ -172,15 +172,15 @@ Rootdens_G_P::set_density (Treelog& msg,
 	}
     }
 
-  daisy_assert (Density.size () == geometry.size ());
+  daisy_assert (Density.size () == geo.size ());
   unsigned int i = 0;
-  for (; i == 0 || -geometry.zplus (i-1) < Depth; i++)
+  for (; i == 0 || -geo.zplus (i-1) < Depth; i++)
     {
-      daisy_assert (i < geometry.size ());
-      Density[i] = extra + L0 * exp (a * geometry.z (i));
+      daisy_assert (i < geo.size ());
+      Density[i] = extra + L0 * exp (a * geo.z (i));
     }
 
-  for (; i < geometry.size (); i++)
+  for (; i < geo.size (); i++)
     Density[i] = 0.0;
 
 }

@@ -68,12 +68,12 @@ struct Bioincorporation::Implementation
   void output (Log&) const;
 
   // Utitlites.
-  void add (const Geometry& geometry, std::vector<double>& input, 
+  void add (const Geometry& geo, std::vector<double>& input, 
 	    double amount) const;
 
   // Create and destroy.
   void initialize (const Geometry&, const Soil&);
-  AM* create_am (const Geometry& geometry);
+  AM* create_am (const Geometry& geo);
   void set_am (AM*);
   Implementation (const AttributeList& al);
 };
@@ -107,7 +107,7 @@ static const double surface_to_soil = DM_to_C * m2_per_cm2;
 static const double soil_to_surface = 1.0 / surface_to_soil;
 
 void
-Bioincorporation::Implementation::tick (const Geometry& geometry, 
+Bioincorporation::Implementation::tick (const Geometry& geo, 
 					std::vector <AM*>& am, double T, 
 					double& CO2)
 {
@@ -195,9 +195,9 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
 
   // Add bioincorporation to soil.
   daisy_assert (aom);
-  aom->add (geometry, C_to_add, N_to_add, density);
-  geometry.add (C_added, density, C_to_add);
-  geometry.add (N_added, density, N_to_add);  
+  aom->add (geo, C_to_add, N_to_add, density);
+  geo.add (C_added, density, C_to_add);
+  geo.add (N_added, density, N_to_add);  
 
   // Update CO2.
   CO2 += (C_removed - C_to_add);
@@ -222,10 +222,10 @@ Bioincorporation::Implementation::output (Log& log) const
 }
 
 void 
-Bioincorporation::Implementation::add (const Geometry& geometry,
+Bioincorporation::Implementation::add (const Geometry& geo,
 				       std::vector<double>& input,
 				       const double amount) const
-{ geometry.add (input, density, amount /* * (1.0 - respiration) */); }
+{ geo.add (input, density, amount /* * (1.0 - respiration) */); }
 
 void 
 Bioincorporation::Implementation::initialize (const Geometry& geo,
@@ -249,11 +249,11 @@ Bioincorporation::Implementation::initialize (const Geometry& geo,
 }
 
 AM*
-Bioincorporation::Implementation::create_am (const Geometry& geometry)
+Bioincorporation::Implementation::create_am (const Geometry& geo)
 { 
   static const symbol bio_symbol ("bio");
   static const symbol incorporation_symbol ("incorporation");
-  aom = &AM::create (geometry, Time (1, 1, 1, 1), aom_alists,
+  aom = &AM::create (geo, Time (1, 1, 1, 1), aom_alists,
 		     bio_symbol, incorporation_symbol, AM::Locked); 
   return aom;
 }
@@ -276,10 +276,10 @@ Bioincorporation::Implementation::Implementation (const AttributeList& al)
 { }
 
 void 
-Bioincorporation::tick (const Geometry& geometry, std::vector <AM*>& am, double T,
+Bioincorporation::tick (const Geometry& geo, std::vector <AM*>& am, double T,
 			double& CO2)
 {
-  impl.tick (geometry, am, T, CO2);
+  impl.tick (geo, am, T, CO2);
 }
 
 void 
@@ -289,9 +289,9 @@ Bioincorporation::output (Log& log) const
 }
 
 void 
-Bioincorporation::add (const Geometry& geometry, std::vector<double>& input,
+Bioincorporation::add (const Geometry& geo, std::vector<double>& input,
 		       const double amount) const
-{ impl.add (geometry, input, amount); }
+{ impl.add (geo, input, amount); }
 
 void 
 Bioincorporation::initialize (const Geometry& geo,
@@ -299,8 +299,8 @@ Bioincorporation::initialize (const Geometry& geo,
 { impl.initialize (geo, soil); }
 
 AM*
-Bioincorporation::create_am (const Geometry& geometry)
-{ return impl.create_am (geometry); }
+Bioincorporation::create_am (const Geometry& geo)
+{ return impl.create_am (geo); }
 
 void 
 Bioincorporation::set_am (AM* am)

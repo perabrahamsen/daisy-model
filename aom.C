@@ -42,7 +42,7 @@ AOM::output (Log& log) const
 }
 
 void 
-AOM::penetrate (const Geometry& geometry, double from, double to,
+AOM::penetrate (const Geometry& geo, double from, double to,
 		double penetration,
                 double& tillage_N_top, double& tillage_C_top,
                 vector<double>& tillage_N_soil, vector<double>& tillage_C_soil)
@@ -60,14 +60,14 @@ AOM::penetrate (const Geometry& geometry, double from, double to,
   static const double cm2_to_m2 = 100 * 100;
 
   // Penetrate.
-  geometry.add (C, from, to, C_pen);
-  geometry.add (tillage_C_soil, from, to, C_pen);
+  geo.add (C, from, to, C_pen);
+  geo.add (tillage_C_soil, from, to, C_pen);
   assert_non_negative (C);
   top_C -= C_pen;
   tillage_C_top -= C_pen * cm2_to_m2;
   daisy_assert (top_C >= 0.0);
-  geometry.add (N, from, to, N_pen);
-  geometry.add (tillage_N_soil, from, to, N_pen);
+  geo.add (N, from, to, N_pen);
+  geo.add (tillage_N_soil, from, to, N_pen);
   assert_non_negative (N);
   top_N -= N_pen;
   tillage_N_top -= N_pen * cm2_to_m2;
@@ -75,12 +75,12 @@ AOM::penetrate (const Geometry& geometry, double from, double to,
 }
 
 double 
-AOM::full_C (const Geometry& geometry) const
-{ return soil_C (geometry) + top_C; }
+AOM::full_C (const Geometry& geo) const
+{ return soil_C (geo) + top_C; }
 
 double 
-AOM::full_N (const Geometry& geometry) const
-{ return soil_N (geometry) + top_N; }
+AOM::full_N (const Geometry& geo) const
+{ return soil_N (geo) + top_N; }
 
 double 
 AOM::C_at (unsigned int at) const
@@ -138,21 +138,21 @@ AOM::add (double C, double N)
 }
 
 void 
-AOM::add (const Geometry& geometry, // Add dead roots.
+AOM::add (const Geometry& geo, // Add dead roots.
 	 double to_C, double to_N, 
 	 const vector<double>& density)
 {
-  const double old_C = soil_C (geometry);
-  const double old_N = soil_N (geometry);
+  const double old_C = soil_C (geo);
+  const double old_N = soil_N (geo);
   grow (density.size ());
 
   // Distribute it according to the root density.
-  const double total = geometry.total (density);
+  const double total = geo.total (density);
   for (unsigned int i = 0; i < density.size (); i++)
     {
       // We should *not* multiply with dz here.  Reason: We want to
       // divide C on the total depth.  
-      const double factor = density[i] /* * geometry.dz (i) */ / total;
+      const double factor = density[i] /* * geo.dz (i) */ / total;
       daisy_assert (factor >= 0.0);
       N[i] += to_N * factor;
       C[i] += to_C * factor;
@@ -161,8 +161,8 @@ AOM::add (const Geometry& geometry, // Add dead roots.
     }
 
   // Check that we computed the correct value.
-  const double new_C = soil_C (geometry);
-  const double new_N = soil_N (geometry);
+  const double new_C = soil_C (geo);
+  const double new_N = soil_N (geo);
   daisy_assert (to_C * 1e9 < old_C
 	  ? approximate (old_C + to_C, new_C)
 	  : (approximate (new_C - old_C, to_C)));

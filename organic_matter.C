@@ -89,7 +89,7 @@ struct OrganicMatter::Implementation
     void mix (const Geometry&, double from, double to);
     void swap (const Geometry&, double from, double middle, double to);
     static void load_syntax (Syntax& syntax, AttributeList& alist);
-    void initialize (const Geometry& geometry);
+    void initialize (const Geometry& geo);
     Buffer (const AttributeList& al);
   } buffer;
   const PLF heat_factor;
@@ -302,28 +302,28 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
 }
 
 void 
-OrganicMatter::Implementation::Buffer::mix (const Geometry& geometry, 
+OrganicMatter::Implementation::Buffer::mix (const Geometry& geo, 
 					    double from, double to)
 {
   assert_non_negative (C);
-  geometry.mix (C, from, to);
+  geo.mix (C, from, to);
   assert_non_negative (C);
   assert_non_negative (N);
-  geometry.mix (N, from, to);
+  geo.mix (N, from, to);
   assert_non_negative (N);
 }
 
 void
-OrganicMatter::Implementation::Buffer::swap (const Geometry& geometry,
+OrganicMatter::Implementation::Buffer::swap (const Geometry& geo,
 					     double from,
 					     double middle, 
 					     double to)
 {
   assert_non_negative (C);
-  geometry.swap (C, from, middle, to);
+  geo.swap (C, from, middle, to);
   assert_non_negative (C);
   assert_non_negative (N);
-  geometry.swap (N, from, middle, to);
+  geo.swap (N, from, middle, to);
   assert_non_negative (N);
 }
 
@@ -661,35 +661,35 @@ OrganicMatter::Implementation::aom_compare (const AOM* a, const AOM* b)
 }
 
 double 
-OrganicMatter::Implementation::total_N (const Geometry& geometry) const
+OrganicMatter::Implementation::total_N (const Geometry& geo) const
 {
-  double result = geometry.total (buffer.N);
+  double result = geo.total (buffer.N);
 
   for (unsigned int i = 0; i < smb.size (); i++)
-    result += smb[i]->soil_N (geometry);
+    result += smb[i]->soil_N (geo);
   for (unsigned int i = 0; i < som.size (); i++)
-    result += som[i]->soil_N (geometry);
+    result += som[i]->soil_N (geo);
   for (unsigned int i = 0; i < dom.size (); i++)
-    result += dom[i]->soil_N (geometry);
+    result += dom[i]->soil_N (geo);
   for (int i = 0; i < am.size (); i++)
-    result += am[i]->total_N (geometry);
+    result += am[i]->total_N (geo);
   
   return result;
 }
 
 double 
-OrganicMatter::Implementation::total_C (const Geometry& geometry) const
+OrganicMatter::Implementation::total_C (const Geometry& geo) const
 {
-  double result = geometry.total (buffer.C);
+  double result = geo.total (buffer.C);
 
   for (unsigned int i = 0; i < smb.size (); i++)
-    result += smb[i]->soil_C (geometry);
+    result += smb[i]->soil_C (geo);
   for (unsigned int i = 0; i < som.size (); i++)
-    result += som[i]->soil_C (geometry);
+    result += som[i]->soil_C (geo);
   for (unsigned int i = 0; i < dom.size (); i++)
-    result += dom[i]->soil_C (geometry);
+    result += dom[i]->soil_C (geo);
   for (int i = 0; i < am.size (); i++)
-    result += am[i]->total_C (geometry);
+    result += am[i]->total_C (geo);
   
   return result;
 }
@@ -738,9 +738,9 @@ OrganicMatter::Implementation::water_turnover_factor (double h) const
 }
 
 void
-OrganicMatter::Implementation::Buffer::initialize (const Geometry& geometry)
+OrganicMatter::Implementation::Buffer::initialize (const Geometry& geo)
 { 
-  const unsigned int size = geometry.size ();
+  const unsigned int size = geo.size ();
   // Make sure the vectors are large enough.
   while (N.size () < size)
     N.push_back (0.0);
@@ -766,7 +766,7 @@ OrganicMatter::Implementation::Buffer::Buffer (const AttributeList& al)
 
 void
 OrganicMatter::Implementation::output (Log& log,
-				       const Geometry& geometry) const
+				       const Geometry& geo) const
 {
   static const symbol CO2_symbol ("CO2");
   if (log.check_leaf (CO2_symbol))
@@ -786,7 +786,7 @@ OrganicMatter::Implementation::output (Log& log,
       || log.check_leaf (total_C_symbol)
       || log.check_leaf (humus_symbol))
     {
-      const int size = geometry.size ();
+      const int size = geo.size ();
 
       vector<double> total_N (size, 0.0);
       vector<double> total_C (size, 0.0);
@@ -889,23 +889,23 @@ OrganicMatter::Implementation::add (AM& om)
 
 void 
 OrganicMatter::Implementation::fertilize (const AttributeList& al, 
-                                          const Geometry& geometry)
+                                          const Geometry& geo)
 { 
-  AM& om = AM::create (al, geometry);
-  fertilized_N += om.total_N (geometry); 
-  fertilized_C += om.total_C (geometry);
+  AM& om = AM::create (al, geo);
+  fertilized_N += om.total_N (geo); 
+  fertilized_C += om.total_C (geo);
   add (om);
 }
 
 void 
 OrganicMatter::Implementation::fertilize (const AttributeList& al,
-                                          const Geometry& geometry,
+                                          const Geometry& geo,
                                           double from, double to)
 { 
-  AM& om = AM::create (al, geometry);
-  fertilized_N += om.total_N (geometry); 
-  fertilized_C += om.total_C (geometry);
-  om.mix (geometry, from, to, 1.0,
+  AM& om = AM::create (al, geo);
+  fertilized_N += om.total_N (geo); 
+  fertilized_C += om.total_C (geo);
+  om.mix (geo, from, to, 1.0,
           tillage_N_top, tillage_C_top,
           tillage_N_soil, tillage_C_soil);
   add (om);
@@ -923,14 +923,14 @@ OrganicMatter::Implementation::clear ()
 }
 
 void
-OrganicMatter::Implementation::monthly (const Geometry& geometry)
+OrganicMatter::Implementation::monthly (const Geometry& geo)
 {
   static const symbol am_symbol ("am");
   static const symbol cleanup_symbol ("cleanup");
   AM* remainder = find_am (am_symbol, cleanup_symbol);
   if (!remainder)
     {
-      remainder = &AM::create (geometry, Time (1, 1, 1, 1), AM::default_AM (),
+      remainder = &AM::create (geo, Time (1, 1, 1, 1), AM::default_AM (),
 			       am_symbol, cleanup_symbol, AM::Locked);
       add (*remainder);
     }
@@ -952,21 +952,21 @@ OrganicMatter::Implementation::monthly (const Geometry& geometry)
 	  keep = true;
 	else
 	  // Only require N.
-	  keep = (am[i]->total_N (geometry) * (100.0 * 100.0) > min_AM_N);
+	  keep = (am[i]->total_N (geo) * (100.0 * 100.0) > min_AM_N);
       else
 	if (min_AM_N == 0.0)
 	  // Only require C.
-	  keep = (am[i]->total_C (geometry) * (100.0 * 100.0) > min_AM_C);
+	  keep = (am[i]->total_C (geo) * (100.0 * 100.0) > min_AM_C);
 	else 
 	  // Require either N or C.
-	  keep = (am[i]->total_N (geometry) * (100.0 * 100.0) > min_AM_N
-		  || am[i]->total_C (geometry) * (100.0 * 100.0) > min_AM_C);
+	  keep = (am[i]->total_N (geo) * (100.0 * 100.0) > min_AM_N
+		  || am[i]->total_C (geo) * (100.0 * 100.0) > min_AM_C);
       
       if (keep)
 	new_am.push_back (am[i]);
       else
 	{
-	  remainder->add (geometry, *am[i]);
+	  remainder->add (geo, *am[i]);
 	  delete am[i];
 	}
       am[i] = NULL;
@@ -1273,7 +1273,7 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
 }
       
 void 
-OrganicMatter::Implementation::transport (const Geometry& geometry,
+OrganicMatter::Implementation::transport (const Geometry& geo,
                                           const Soil& soil, 
 					  const SoilWater& soil_water, 
 					  Treelog& msg)
@@ -1282,7 +1282,7 @@ OrganicMatter::Implementation::transport (const Geometry& geometry,
     domsorp[j]->tick (soil, soil_water, dom, som, msg);
 
   for (unsigned int j = 0; j < dom.size (); j++)
-    dom[j]->transport (geometry, soil, soil_water, msg);
+    dom[j]->transport (geo, soil, soil_water, msg);
 }
 
 void 
@@ -2622,8 +2622,8 @@ OrganicMatter::clear ()
 { impl->clear (); }
 
 void 
-OrganicMatter::monthly (const Geometry& geometry)
-{ impl->monthly (geometry); }
+OrganicMatter::monthly (const Geometry& geo)
+{ impl->monthly (geo); }
 
 size_t
 OrganicMatter::active_size (const Geometry& geo,
@@ -2681,8 +2681,8 @@ OrganicMatter::get_smb_c_at (unsigned int i) const
 { return impl->get_smb_c_at (i); }
 
 void 
-OrganicMatter::output (Log& log, const Geometry& geometry) const
-{ impl->output (log, geometry); }
+OrganicMatter::output (Log& log, const Geometry& geo) const
+{ impl->output (log, geo); }
 
 bool
 OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
@@ -2744,14 +2744,14 @@ OrganicMatter::add (AM& am)
 
 void 
 OrganicMatter::fertilize (const AttributeList& al,
-                          const Geometry& geometry)
-{ impl->fertilize (al, geometry); }
+                          const Geometry& geo)
+{ impl->fertilize (al, geo); }
 
 void 
 OrganicMatter::fertilize (const AttributeList& al,
-                          const Geometry& geometry,
+                          const Geometry& geo,
                           double from, double to)
-{ impl->fertilize (al, geometry, from, to); }
+{ impl->fertilize (al, geo, from, to); }
 
 AM* 
 OrganicMatter::find_am (const symbol sort, const symbol part) const

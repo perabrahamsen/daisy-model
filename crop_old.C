@@ -136,7 +136,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (Treelog&, const Geometry& geometry, OrganicMatter*);
+  void initialize (Treelog&, const Geometry& geo, OrganicMatter*);
   CropOld (Block& vl);
   ~CropOld ();
 };
@@ -619,9 +619,9 @@ CropOld::Variables::~Variables ()
 { }
 
 void
-CropOld::initialize (Treelog&, const Geometry& geometry, OrganicMatter*)
+CropOld::initialize (Treelog&, const Geometry& geo, OrganicMatter*)
 {
-  unsigned int size = geometry.size ();
+  unsigned int size = geo.size ();
 
   // Fill rootsys arrays.
   var.RootSys.Density.insert (var.RootSys.Density.end (),
@@ -1848,7 +1848,7 @@ CropOld::tick (const Time& time,
 
 const Harvest&
 CropOld::harvest (const symbol column_name,
-		  const Time& time, const Geometry& geometry, 
+		  const Time& time, const Geometry& geo, 
 		  Bioclimate&,
 		  double stub_length,
 		  double stem_harvest, double, double sorg_harvest, 
@@ -1954,7 +1954,7 @@ CropOld::harvest (const symbol column_name,
       if (stem_harvest < 1.0 && WStem > 0.0)
 	{
 	  static const symbol stem_symbol ("stem");
-	  AM& am = AM::create (geometry, time, Stem, name, stem_symbol);
+	  AM& am = AM::create (geo, time, Stem, name, stem_symbol);
 	  am.add (WStem * C_Stem * m2_per_cm2,
 		  NStem * m2_per_cm2);
 	  residuals.push_back (&am);
@@ -1965,7 +1965,7 @@ CropOld::harvest (const symbol column_name,
       if (sorg_harvest < 1.0 && WSOrg > 0.0)
 	{
 	  static const symbol sorg_symbol ("sorg");
-	  AM& am = AM::create (geometry, time, SOrg, name, sorg_symbol);
+	  AM& am = AM::create (geo, time, SOrg, name, sorg_symbol);
 	  am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest) * m2_per_cm2,
 		  NSOrg * (1.0 - sorg_harvest) * m2_per_cm2);
 	  residuals.push_back (&am);
@@ -1976,9 +1976,9 @@ CropOld::harvest (const symbol column_name,
       if (WRoot > 0.0)
 	{
 	  static const symbol root_symbol ("root");
-	  AM& am = AM::create (geometry, time, Root, name, root_symbol);
-	  if (geometry.total (density) > 0.0)
-	    am.add (geometry,
+	  AM& am = AM::create (geo, time, Root, name, root_symbol);
+	  if (geo.total (density) > 0.0)
+	    am.add (geo,
 		    WRoot * C_Root * m2_per_cm2,
 		    NRoot * m2_per_cm2,
 		    density);
@@ -1987,10 +1987,10 @@ CropOld::harvest (const symbol column_name,
 		    NRoot * m2_per_cm2);
 	  residuals.push_back (&am);
 	  residuals_DM += WRoot;
-	  geometry.add (residuals_N_soil, density, 
-			NRoot * m2_per_cm2);
-	  geometry.add (residuals_C_soil, density, 
-			WRoot * C_Root * m2_per_cm2);
+	  geo.add (residuals_N_soil, density, 
+                   NRoot * m2_per_cm2);
+	  geo.add (residuals_C_soil, density, 
+                   WRoot * C_Root * m2_per_cm2);
 	}
     }
   std::ostringstream tmp;

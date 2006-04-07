@@ -48,7 +48,7 @@ Harvesting::operator() (const symbol column_name,
 			const symbol crop_name,
 			const vector<double>& density,
 			const Time& time,
-			const Geometry& geometry,
+			const Geometry& geo,
 			Production& production,
 			double& DS,
 			const double stem_harvest,
@@ -226,7 +226,7 @@ Harvesting::operator() (const symbol column_name,
 
   // Add crop remains to the soil.
   static const symbol stem_symbol ("stem");
-  AM& AM_stem = AM::create (geometry, time, Stem, crop_name, stem_symbol);
+  AM& AM_stem = AM::create (geo, time, Stem, crop_name, stem_symbol);
   residuals.push_back (&AM_stem);
   if (Stem_W_Loss > 0.0)
     {
@@ -242,7 +242,7 @@ Harvesting::operator() (const symbol column_name,
     {
       static const symbol dead_symbol ("dead");
       production.AM_leaf
-	= &AM::create (geometry, time, Dead, crop_name, dead_symbol, 
+	= &AM::create (geo, time, Dead, crop_name, dead_symbol, 
 		       AM::Unlocked /* no organic matter */);
     }
   if (Dead_W_Loss > 0.0)
@@ -256,7 +256,7 @@ Harvesting::operator() (const symbol column_name,
     }
 
   static const symbol leaf_symbol ("leaf");
-  AM& AM_leaf = AM::create (geometry, time, Leaf, crop_name, leaf_symbol);
+  AM& AM_leaf = AM::create (geo, time, Leaf, crop_name, leaf_symbol);
   residuals.push_back (&AM_leaf);
   if (Leaf_W_Loss > 0.0)
     {
@@ -269,7 +269,7 @@ Harvesting::operator() (const symbol column_name,
     }
 
   static const symbol sorg_symbol ("sorg");
-  AM& AM_sorg = AM::create (geometry, time, SOrg, crop_name, sorg_symbol);
+  AM& AM_sorg = AM::create (geo, time, SOrg, crop_name, sorg_symbol);
   residuals.push_back (&AM_sorg);
   if (SOrg_W_Loss > 0.0)
     {
@@ -318,7 +318,7 @@ Harvesting::operator() (const symbol column_name,
       // Create root AM if missing.
       static const symbol root_symbol ("root");
       if (!production.AM_root)
-	production.AM_root = &AM::create (geometry, time, Root,
+	production.AM_root = &AM::create (geo, time, Root,
 					  crop_name, root_symbol, 
 					  AM::Unlocked /* inorganic */);
 
@@ -378,9 +378,9 @@ Harvesting::operator() (const symbol column_name,
       const double Root_N = (production.NRoot + extra_N) * m2_per_cm2;
       if (accumulate (density.begin (), density.end (), 0.0) > 0.0)
 	{
-	  production.AM_root->add (geometry, Root_C, Root_N, density);
-	  geometry.add (residuals_N_soil, density, Root_N);
-	  geometry.add (residuals_C_soil, density, Root_C);
+	  production.AM_root->add (geo, Root_C, Root_N, density);
+	  geo.add (residuals_N_soil, density, Root_N);
+	  geo.add (residuals_C_soil, density, Root_C);
 	}
       else
 	{

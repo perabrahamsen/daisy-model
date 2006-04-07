@@ -153,7 +153,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (Treelog&, const Geometry& geometry, OrganicMatter*);
+  void initialize (Treelog&, const Geometry& geo, OrganicMatter*);
   CropSimple (Block& vl);
   ~CropSimple ();
 };
@@ -299,7 +299,7 @@ CropSimple::tick (const Time& time,
 const Harvest&
 CropSimple::harvest (const symbol column_name,
 		     const Time& time,
-		     const Geometry& geometry,
+		     const Geometry& geo,
 		     Bioclimate& bioclimate,
 		     double /* stub_length */,
 		     double /* stem_harvest */,
@@ -324,17 +324,17 @@ CropSimple::harvest (const symbol column_name,
       const double this_far = min (1.0, (T - T_emergence) / T_growth);
 
       static const symbol root_symbol ("root");
-      AM& am = AM::create (geometry, time, root_am, name, root_symbol);
-      daisy_assert (geometry.total (root_system->Density) > 0.0);
-      am.add (geometry, 
+      AM& am = AM::create (geo, time, root_am, name, root_symbol);
+      daisy_assert (geo.total (root_system->Density) > 0.0);
+      am.add (geo, 
 	      this_far * WRoot * 0.420 * m2_per_cm2,
 	      this_far * NRoot * m2_per_cm2,
 	      root_system->Density);
       residuals.push_back (&am);
       residuals_DM += this_far * WRoot;
-      geometry.add (residuals_N_soil, root_system->Density,
+      geo.add (residuals_N_soil, root_system->Density,
 		    this_far * NRoot * m2_per_cm2);
-      geometry.add (residuals_C_soil, root_system->Density, 
+      geo.add (residuals_C_soil, root_system->Density, 
 		    this_far * WRoot * 0.420 * m2_per_cm2);
     }
 
@@ -400,9 +400,9 @@ CropSimple::total_C () const
   return 0.0; 
 }
 void
-CropSimple::initialize (Treelog&, const Geometry& geometry, OrganicMatter*)
+CropSimple::initialize (Treelog&, const Geometry& geo, OrganicMatter*)
 {
-  root_system->initialize (geometry.size ());
+  root_system->initialize (geo.size ());
   CropCAI ();
 }
 
