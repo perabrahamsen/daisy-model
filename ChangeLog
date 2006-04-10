@@ -1,6 +1,12 @@
+2006-04-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_r2d2.C: New model.
+
 2006-04-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.02 released.
+
+	* Bug fixes.
 
 2006-04-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 

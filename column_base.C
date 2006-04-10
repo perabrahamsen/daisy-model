@@ -304,6 +304,11 @@ ColumnBase::check (bool require_weather,
   bool ok = true;
   const int n = soil->size ();
   {
+    Treelog::Open nest (err, "Soil");
+    if (!geometry->check (err))
+      ok = false;
+  }
+  {
     Treelog::Open nest (err, "Weather");
     if (weather)
       {

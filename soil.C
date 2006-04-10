@@ -101,11 +101,9 @@ A location and content of a soil layer.");
   { sequence_delete (layers.begin (), layers.end ()); }
 };
 
-#ifndef SOIL_GEO
 size_t 
 Soil::size () const
 { return horizon_.size (); }
-#endif // SOIL_GEO
 
 double 
 Soil::K (int i, double h, double h_ice, double T) const
@@ -282,11 +280,7 @@ Soil::end_of_first_horizon () const
 bool 
 Soil::check (int som_size, Treelog& err) const
 {
-#ifdef SOIL_GEO
-  bool ok = Geometry::check (err);
-#else
   bool ok = true;
-#endif
   if (som_size >= 0)
     {
       Treelog::Open nest (err, "horizons");
@@ -414,11 +408,7 @@ This attribute is ignored if zplus is specified explicitly.");
 }
   
 Soil::Soil (Block& al)
-  : 
-#ifdef SOIL_GEO
-  Geometry (al),
-#endif
-    impl (*new Implementation (al))
+  : impl (*new Implementation (al))
 { }
 
 void
