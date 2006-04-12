@@ -818,4 +818,4 @@ SoilHeat1D::~SoilHeat1D ()
 }
 
 static Submodel::Register 
-soil_heat_submodel ("SoilHeat1D", SoilHeat1D::load_syntax);
+soil_heat_submodel ("SoilHeat", SoilHeat1D::load_syntax);

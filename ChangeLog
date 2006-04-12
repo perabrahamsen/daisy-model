@@ -1,3 +1,7 @@
+2006-04-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat1d.C (soil_heat_submodel): Fix name of submodel.
+
 2006-04-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* column_r2d2.C: New model.
