@@ -26,7 +26,7 @@
 #include "weather.h"
 #include "soil_water.h"
 #include "soil.h"
-#include "geometry.h"
+#include "geometry1d.h"
 #include "syntax.h"
 #include "time.h"
 #include "mathlib.h"
@@ -63,16 +63,16 @@ struct SoilHeat1D::Implementation
   // Simulation.
   double capacity (const Soil&, const SoilWater&, size_t i) const;
   double capacity_apparent (const Soil&, const SoilWater&, size_t i) const;
-  void tick (const Time&, const Geometry& geo,
+  void tick (const Time&, const Geometry1D& geo,
              const Soil&, SoilWater&, 
              const Surface&, const Weather&, 
              std::vector<double>& T);
   void update_freezing_points (const Soil& soil,
                                const SoilWater& soil_water);
-  bool update_state (const Geometry& geo,
+  bool update_state (const Geometry1D& geo,
                      const Soil& soil, const SoilWater& soil_water, 
                      std::vector<double>& T);
-  double calculate_freezing_rate (const Geometry& geo,
+  double calculate_freezing_rate (const Geometry1D& geo,
                                   const Soil& soil,
                                   const SoilWater& soil_water,
                                   unsigned int i, 
@@ -80,24 +80,24 @@ struct SoilHeat1D::Implementation
   bool check_state (const Soil& soil, 
                     const std::vector<double>& T) const;
   void force_state (std::vector<double>& T);
-  void solve (const Time&, const Geometry& geo,
+  void solve (const Time&, const Geometry1D& geo,
               const Soil&, const SoilWater&, 
               const Surface&, const Weather&, 
               std::vector<double>& T);
   void calculate_heat_flux (const Geometry& geo,
                             const Soil&, const SoilWater&, 
                             const std::vector<double>& T);
-  double energy (const Geometry& geo,
+  double energy (const Geometry1D& geo,
                  const Soil&, const SoilWater&, double from, double to, 
                  const std::vector<double>& T) const;
-  void set_energy (const Geometry& geo,
+  void set_energy (const Geometry1D& geo,
                    const Soil&, const SoilWater&, 
                    double from, double to, double energy, 
                    std::vector<double>& T);
   double bottom (const Time&, const Weather& weather) const;
 
   // Create & Destroy.
-  void initialize (const Geometry& geo,
+  void initialize (const Geometry1D& geo,
                    const Soil& soil, const Time& time, const Weather& weather, 
                    std::vector<double>& T,
                    Treelog&);
@@ -146,7 +146,7 @@ SoilHeat1D::Implementation::capacity_apparent
 
 void
 SoilHeat1D::Implementation::tick (const Time& time,
-                                  const Geometry& geo,
+                                  const Geometry1D& geo,
                                   const Soil& soil,
                                   SoilWater& soil_water,
                                   const Surface& surface,
@@ -222,7 +222,7 @@ SoilHeat1D::Implementation::update_freezing_points (const Soil& soil,
 } 
 
 bool
-SoilHeat1D::Implementation::update_state (const Geometry& geo,
+SoilHeat1D::Implementation::update_state (const Geometry1D& geo,
                                           const Soil& soil, 
                                           const SoilWater& soil_water, 
                                           std::vector<double>& T)
@@ -329,7 +329,7 @@ SoilHeat1D::Implementation::update_state (const Geometry& geo,
 }
 
 double
-SoilHeat1D::Implementation::calculate_freezing_rate (const Geometry& geo,
+SoilHeat1D::Implementation::calculate_freezing_rate (const Geometry1D& geo,
                                                      const Soil& soil,
                                                      const SoilWater& soil_water,
                                                      unsigned int i, 
@@ -404,7 +404,7 @@ SoilHeat1D::Implementation::force_state (std::vector<double>& T)
 
 void
 SoilHeat1D::Implementation::solve (const Time& time,
-                                   const Geometry& geo,
+                                   const Geometry1D& geo,
                                    const Soil& soil,
                                    const SoilWater& soil_water,
                                    const Surface& surface,
@@ -560,7 +560,7 @@ SoilHeat1D::Implementation::calculate_heat_flux (const Geometry& geo,
  
 
 double 
-SoilHeat1D::Implementation::energy (const Geometry& geo,
+SoilHeat1D::Implementation::energy (const Geometry1D& geo,
                                     const Soil& soil,
                                     const SoilWater& soil_water,
                                     double from, double to, 
@@ -583,7 +583,7 @@ SoilHeat1D::Implementation::energy (const Geometry& geo,
 }
 
 void
-SoilHeat1D::Implementation::set_energy (const Geometry& geo,
+SoilHeat1D::Implementation::set_energy (const Geometry1D& geo,
                                         const Soil& soil,
                                         const SoilWater& soil_water, 
                                         double from, double to, double energy, 
@@ -637,7 +637,7 @@ SoilHeat1D::Implementation::Implementation (const AttributeList& al)
 }
 
 void
-SoilHeat1D::Implementation::initialize (const Geometry& geo,
+SoilHeat1D::Implementation::initialize (const Geometry1D& geo,
                                         const Soil& soil, 
                                         const Time& time, 
                                         const Weather& weather, 
@@ -705,7 +705,7 @@ SoilHeat1D::top_flux (const Geometry& geo,
 
 void 
 SoilHeat1D::tick (const Time& time, 
-                  const Geometry& geo,
+                  const Geometry1D& geo,
                   const Soil& soil,
                   SoilWater& soil_water,
                   const Surface& surface,
@@ -715,7 +715,7 @@ SoilHeat1D::tick (const Time& time,
 }
 
 double 
-SoilHeat1D::energy (const Geometry& geo,
+SoilHeat1D::energy (const Geometry1D& geo,
                     const Soil& soil,
                     const SoilWater& soil_water,
                     double from, double to) const
@@ -724,7 +724,7 @@ SoilHeat1D::energy (const Geometry& geo,
 }
 
 void
-SoilHeat1D::set_energy (const Geometry& geo,
+SoilHeat1D::set_energy (const Geometry1D& geo,
                         const Soil& soil,
                         const SoilWater& soil_water, 
                         double from, double to, double energy)
@@ -804,7 +804,7 @@ SoilHeat1D::SoilHeat1D (const AttributeList& al)
 
 void
 SoilHeat1D::initialize (const AttributeList& al, 
-                        const Geometry& geo,
+                        const Geometry1D& geo,
                         const Soil& soil, const Time& time, 
                         const Weather& weather, Treelog& out)
 { 

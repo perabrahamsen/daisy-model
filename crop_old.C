@@ -1078,8 +1078,8 @@ CropOld::SoluteUptake (const Geometry& geo,
 	  daisy_assert (isfinite (I_zero[i]));
 	  daisy_assert (isfinite (B_zero[i]));
 #endif
-	  B += L * geo.dz (i) * B_zero[i];
-	  U_zero += L * geo.dz (i) * min (I_zero[i], I_max);
+	  B += L * geo.volume (i) * B_zero[i];
+	  U_zero += L * geo.volume (i) * min (I_zero[i], I_max);
 	}
     }
   if (U_zero > PotNUpt)
@@ -1468,7 +1468,7 @@ CropOld::PotentialWaterUptake (const double h_x,
       daisy_assert ((- 0.5 * log (area * L[i])) != 0.0);
       daisy_assert (uptake >= 0.0);
       S[i] = uptake;
-      total += uptake * geo.dz (i) * 10; // mm/cm.
+      total += uptake * geo.volume (i) * 10; // mm/cm.
     }
   return total;
 }
@@ -1577,12 +1577,11 @@ CropOld::RootDensity (const Geometry& geo)
   
   vector<double>& d = var.RootSys.Density;
   
-  unsigned int i = 0;
-  for (; i == 0 || -geo.zplus (i-1) < RootSys.Depth; i++)
-    d[i] = L0 * exp (a * geo.z (i));
-  daisy_assert (i < geo.size ());
-  for (; i < geo.size (); i++)
-    d[i] = 0.0;
+  for (unsigned int i = 0; i < geo.size (); i++)
+    if (i == 0 || -geo.z(i) < RootSys.Depth)
+      d[i] = L0 * exp (a * geo.z (i));
+    else
+      d[i] = 0.0;
 }
 
 void 

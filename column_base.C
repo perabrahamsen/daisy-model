@@ -20,7 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "column_base.h"
-#include "geometry.h"
+#include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "weather.h"
@@ -438,7 +438,7 @@ ColumnBase::ColumnBase (Block& al)
     vegetation (Librarian<Vegetation>::build_item (al, "Vegetation")),
     bioclimate (get_bioclimate (al)),
     surface (al.alist ("Surface")),
-    geometry (submodel<Geometry> (al, "Soil")),
+    geometry (submodel<Geometry1D> (al, "Soil")),
     soil (submodel<Soil> (al, "Soil")),
     soil_water (submodel<SoilWater> (al, "SoilWater")),
     soil_heat (al.alist ("SoilHeat")),
@@ -491,6 +491,13 @@ ColumnBase::~ColumnBase ()
 }
 
 void
+load_soil_and_geometry (Syntax& syntax, AttributeList& alist)
+{
+  Geometry1D::load_syntax (syntax, alist);
+  Soil::load_syntax (syntax, alist);
+}
+
+void
 ColumnBase::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Column::load_syntax (syntax, alist);
@@ -516,7 +523,7 @@ the simulation.  If unspecified, used global weather.");
 			Surface::load_syntax);
   syntax.add_submodule ("Soil", alist, Syntax::State,
 		       "The numeric and physical soil properties.",
-			Soil::load_syntax);
+			load_soil_and_geometry);
   syntax.add_submodule ("SoilWater", alist, Syntax::State,
 			"Soil water content and transportation.",
 			SoilWater::load_syntax);

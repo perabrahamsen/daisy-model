@@ -21,6 +21,7 @@
 
 
 #include "column_base.h"
+#include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "vegetation.h"

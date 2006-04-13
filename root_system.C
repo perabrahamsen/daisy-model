@@ -44,12 +44,13 @@ RootSystem::potential_water_uptake (const double h_x,
 {
   const vector<double>& L = Density;
   vector<double>& S = H2OExtraction;
-
+  const size_t size = min (S.size (), soil.size ());
+  daisy_assert (L.size () >= size);
   const double area = M_PI * Rad * Rad;
-  double total = 0.0;
-  for (unsigned int i = 0; i < soil.size () && L[i] > 0.0; i++)
+
+  for (unsigned int i = 0; i < size; i++)
     {
-      if (soil_water.h (i) >= 0.0)
+      if (L[i] <= 0.0 || soil_water.h (i) >= 0.0)
 	{
 	  S[i] = 0.0;
 	  continue;
@@ -79,9 +80,8 @@ RootSystem::potential_water_uptake (const double h_x,
       daisy_assert ((- 0.5 * log (area * L[i])) != 0.0);
       daisy_assert (uptake >= 0.0);
       S[i] = uptake;
-      total += uptake * geo.dz (i) * 10; // mm/cm.
     }
-  return total;
+  return geo.total (S) * 10.0 /* [mm/cm] */;
 }
 
 double
@@ -174,7 +174,7 @@ RootSystem::water_uptake (double Ept_,
 
   // We need this to make sure H2OExtraction corresponds to 'h_x'.
   const double total2 = potential_water_uptake (h_x, geo, soil, soil_water);
-  daisy_assert (total == total2);
+  daisy_assert (approximate (total, total2));
   daisy_assert (h_x >= h_wp);
 
   if (total > Ept)
@@ -263,8 +263,8 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 	    }
 	  daisy_assert (isfinite (I_zero[i]));
 	  daisy_assert (isfinite (B_zero[i]));
-	  B += L * geo.dz (i) * B_zero[i];
-	  U_zero += L * geo.dz (i) 
+	  B += L * geo.volume (i) * B_zero[i];
+	  U_zero += L * geo.volume (i) 
 	    * bound (0.0, I_zero[i] - B_zero[i] * C_root_min, I_max);
 	}
     }
@@ -333,8 +333,8 @@ RootSystem::tick_daily (Treelog& msg, const Geometry& geo, const Soil& soil,
   // Penetration.
   if (IncWRoot > 0)
     {
-      const int i = geo.interval_plus (-Depth);
-      double clay_fac = PenClayFac (soil.clay (i));
+      const double clay = geo.content_at (soil, &Soil::clay, -Depth);
+      double clay_fac = PenClayFac (clay);
       double dp = PenPar1 * clay_fac * max (0.0, soil_temperature - PenPar2);
       PotRtDpt = min (PotRtDpt + dp, MaxPen);
       /*max depth determined by crop*/

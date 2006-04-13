@@ -2,10 +2,27 @@
 
 	* soil_heat1d.C (soil_heat_submodel): Fix name of submodel.
 
+2006-04-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_old.C: Ditto.
+
+	* geometry.h, geometry.C: Made it an almost pure base.
+	* geometry1d.h, geometry1d.C: New submodel.
+	* Makefile (SUBMODELS): Added it.
+	* column_base.C, column_base.h: Use it.
+	* ridge.C: Only works with Geometry1D.
+	* root_system.C (potential_water_uptake): Avoid using Geometry::dz.
+	
+	* crop_std.C (tick): First parameter of 'Phenology::emergence' is
+	pressure, not depth.
+
 2006-04-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* column_r2d2.C: New model.
+	* Makefile (MODELS): Added it.
 
+	* All: Split Soil and Geometry abstractions.
+	
 2006-04-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.02 released.

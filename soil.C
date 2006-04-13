@@ -382,7 +382,6 @@ check_alist (const AttributeList& al, Treelog& err)
 void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  Geometry::load_syntax (syntax, alist);
   syntax.add_check (check_alist);
   alist.add ("submodel", "Soil");
   alist.add ("description", "\
@@ -390,7 +389,8 @@ The soil component provides the numeric and physical properties of the soil.");
   syntax.add_submodule_sequence ("horizons", Syntax::State, "\
 Layered description of the soil properties.\n\
 Some groundwater models, specifically 'pipe', may cause an extra horizon to\n\
-be added below the one specified here if you do not also specify 'zplus'.",
+be added below the one specified here if you do not also specify an explicit\n\
+geometry.",
 				 Implementation::Layer::load_syntax);
   syntax.add ("MaxRootingDepth", "cm", Check::positive (), Syntax::Const,
 	      "Depth at the end of the root zone (a positive number).");

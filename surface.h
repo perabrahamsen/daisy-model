@@ -28,6 +28,7 @@ class Log;
 class SoilWater;
 class Soil;
 class Geometry;
+class Geometry1D;
 class Chemicals;
 class SoilChemicals;
 
@@ -55,7 +56,7 @@ public:
 
   void mixture (const IM& soil_im /* [g/cm^2/mm] */);
   void mixture (const SoilChemicals& soil_chemicals);
-  void update_water (const Geometry& geo,
+  void update_water (const Geometry1D& geo,
                      const Soil&, const std::vector<double>& S_,
 		     std::vector<double>& h_, std::vector<double>& Theta_,
 		     std::vector<double>& q, const std::vector<double>& q_p);
@@ -64,7 +65,7 @@ public:
   void fertilize (const IM& /* [g/cm^2] */);
   void spray (const Chemicals& chemicals_in);
   void set_detention_capacity (double);
-  void ridge (const Geometry& geo,
+  void ridge (const Geometry1D& geo,
               const Soil& soil, const SoilWater& soil_water,
 	      const AttributeList&);
   void unridge ();

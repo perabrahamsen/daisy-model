@@ -26,6 +26,7 @@
 #include "soil_heat.h"
 #include <string>
 
+class Geometry1D;
 class Surface;
 class Bioclimate;
 class SoilWater;
@@ -44,12 +45,12 @@ class SoilHeat1D : public SoilHeat
 public:
   double top_flux (const Geometry& geo,
                    const Soil&, const SoilWater&) const; // [W/m^2]
-  void tick (const Time&, const Geometry& geo,
+  void tick (const Time&, const Geometry1D& geo,
              const Soil&, SoilWater&, 
 	     const Surface&, const Weather& weather);
-  double energy (const Geometry& geo,
+  double energy (const Geometry1D& geo,
                  const Soil&, const SoilWater&, double from, double to) const;
-  void set_energy (const Geometry& geo,
+  void set_energy (const Geometry1D& geo,
                    const Soil&, const SoilWater&, 
 		   double from, double to, double energy);
   void swap (const Geometry& geo,
@@ -60,7 +61,7 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   SoilHeat1D (const AttributeList&);
   void initialize (const AttributeList& al, 
-		   const Geometry& geo,
+		   const Geometry1D& geo,
                    const Soil& soil, const Time& time, const Weather& weather,
 		   Treelog&);
   ~SoilHeat1D ();

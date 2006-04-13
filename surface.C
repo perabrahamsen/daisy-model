@@ -23,8 +23,9 @@
 #include "surface.h"
 #include "syntax.h"
 #include "alist.h"
-#include "soil_water.h"
+#include "geometry1d.h"
 #include "soil.h"
+#include "soil_water.h"
 #include "log.h"
 #include "timestep.h"
 #include "im.h"
@@ -67,7 +68,7 @@ struct Surface::Implementation
   Ridge* ridge_;
 
   // Functions.
-  void ridge (const Geometry& geo,
+  void ridge (const Geometry1D& geo,
               const Soil& soil, const SoilWater& soil_water,
 	      const AttributeList&);
   void mixture (const IM& soil_im /* g/cm^2/mm */);
@@ -92,13 +93,13 @@ struct Surface::Implementation
 };
 
 void 
-Surface::ridge (const Geometry& geo,
+Surface::ridge (const Geometry1D& geo,
                 const Soil& soil, const SoilWater& soil_water, 
 		const AttributeList& al)
 { impl.ridge (geo, soil, soil_water, al); }
 
 void 
-Surface::Implementation::ridge (const Geometry& geo,
+Surface::Implementation::ridge (const Geometry1D& geo,
                                 const Soil& soil, const SoilWater& soil_water,
 				const AttributeList& al)
 {
@@ -162,7 +163,7 @@ Surface::Implementation::mixture (const SoilChemicals& soil_chemicals)
 }
 
 void
-Surface::update_water (const Geometry& geo,
+Surface::update_water (const Geometry1D& geo,
                        const Soil& soil,
 		       const vector<double>& S_,
 		       vector<double>& h_,
@@ -388,7 +389,8 @@ Surface::Implementation::tick (Treelog& msg,
 
   if (ridge_)
     {
-      ridge_->tick (geo, soil, soil_water, pond);
+      const Geometry1D& geo1d = dynamic_cast<const Geometry1D&> (geo);
+      ridge_->tick (geo1d, soil, soil_water, pond);
       exfiltrate (msg, ridge_->exfiltration ());
     }
 }

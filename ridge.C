@@ -22,7 +22,7 @@
 
 #include "ridge.h"
 #include "soil.h"
-#include "geometry.h"
+#include "geometry1d.h"
 #include "plf.h"
 #include "submodel.h"
 #include "syntax.h"
@@ -65,9 +65,9 @@ struct Ridge::Implementation
   double I;			// Total infiltration [cm/h]
   
   // Simulation.
-  void tick (const Geometry& geo, const Soil&, const SoilWater&, 
+  void tick (const Geometry1D& geo, const Soil&, const SoilWater&, 
 	     double external_ponding /* [cm] */);
-  void update_water (const Geometry& geo,
+  void update_water (const Geometry1D& geo,
                      const Soil&, const vector<double>& S_,
 		     vector<double>& h_, vector<double>& Theta_,
 		     vector<double>& q, const vector<double>& q_p);
@@ -75,7 +75,7 @@ struct Ridge::Implementation
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);
-  void initialize (const Geometry& geo, const Soil&, const SoilWater&);
+  void initialize (const Geometry1D& geo, const Soil&, const SoilWater&);
   static PLF normalize (PLF plf);
   Implementation (const AttributeList&);
   ~Implementation ();
@@ -84,13 +84,13 @@ struct Ridge::Implementation
 static const double x_width = 1.0;
 
 void 
-Ridge::tick (const Geometry& geo,
+Ridge::tick (const Geometry1D& geo,
              const Soil& soil, const SoilWater& soil_water,
 	     double external_ponding)
 { impl.tick (geo, soil, soil_water, external_ponding * 0.1 /* mm -> cm */); }
 
 void 
-Ridge::Implementation::tick (const Geometry& geo,
+Ridge::Implementation::tick (const Geometry1D& geo,
                              const Soil& soil, const SoilWater& soil_water,
 			     double external_ponding)
 {
@@ -328,7 +328,7 @@ Ridge::Implementation::tick (const Geometry& geo,
 }
 
 void
-Ridge::update_water (const Geometry& geo,
+Ridge::update_water (const Geometry1D& geo,
                      const Soil& soil,
 		     const vector<double>& S_,
 		     vector<double>& h_,
@@ -338,7 +338,7 @@ Ridge::update_water (const Geometry& geo,
 { impl.update_water (geo, soil, S_, h_, Theta_, q, q_p); }
 
 void
-Ridge::Implementation::update_water (const Geometry& geo,
+Ridge::Implementation::update_water (const Geometry1D& geo,
                                      const Soil& soil,
 				     const vector<double>& S_,
 				     vector<double>& h_,
@@ -406,12 +406,12 @@ Ridge::exfiltration () const
 { return -impl.I * 10; }
 
 void 
-Ridge::initialize (const Geometry& geo,
+Ridge::initialize (const Geometry1D& geo,
                    const Soil& soil, const SoilWater& soil_water)
 { impl.initialize (geo, soil, soil_water); }
 
 void 
-Ridge::Implementation::initialize (const Geometry& geo,
+Ridge::Implementation::initialize (const Geometry1D& geo,
                                    const Soil& soil,
                                    const SoilWater& soil_water)
 {

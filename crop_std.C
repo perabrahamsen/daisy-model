@@ -238,7 +238,8 @@ CropStandard::tick (const Time& time,
     {
       daisy_assert (ForcedCAI < 0.0);
 
-      development->emergence (geo.interval_plus (-root_system->Depth/2.),
+      const int root_middle = geo.interval_plus (-root_system->Depth/2.);
+      development->emergence (soil_water.h (root_middle), 
                               root_system->soil_temperature);
       if (development->DS >= 0)
 	{

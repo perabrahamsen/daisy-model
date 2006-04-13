@@ -1,19 +1,18 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-*
-
-
 * Omorganiser Daisy kode så omsætning er uafhængig af transport
 
-** Hvad nu?
+** root_system.C
 
-SoilWater vs. SoilWater1D ?
+Root pen afhænger af lerindhold.  I hvilken node?
 
-Solute?
+** crop
 
-DOM?
+T (dybde) og h (dybde) for emergence.
 
-Macro
+** ridge.C
+
+
 
 * Marts
 

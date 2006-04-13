@@ -37,7 +37,7 @@
 struct Time;
 struct IM;
 struct AM;
-struct Geometry;
+struct Geometry1D;
 struct Soil;
 struct SoilWater;
 
@@ -49,7 +49,7 @@ protected:
   std::auto_ptr<Vegetation> vegetation;
   std::auto_ptr<Bioclimate> bioclimate;
   Surface surface;
-  std::auto_ptr<Geometry> geometry;
+  std::auto_ptr<Geometry1D> geometry;
   std::auto_ptr<Soil> soil;
   std::auto_ptr<SoilWater> soil_water;
   SoilHeat1D soil_heat;
