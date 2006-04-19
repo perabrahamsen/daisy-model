@@ -36,27 +36,30 @@ class Geometry
 {
   // Parameters.
 protected:
-  unsigned int size_;		// Number of intervals.
+  size_t size_;		// Number of intervals.
 public:
 
-#if 1
-  virtual double zplus (unsigned int i) const = 0;
-  virtual double dz (unsigned int i) const = 0;
-  virtual unsigned int interval_plus (double z) const = 0;
-  virtual unsigned int interval_border (double z) const = 0;
+#define GEO1D
+
+#ifdef GEO1D
+  virtual double zplus (size_t i) const = 0;
+  virtual double dz (size_t i) const = 0;
+  virtual size_t interval_plus (double z) const = 0;
+  virtual size_t interval_border (double z) const = 0;
 #endif
 
   // Accessors.
-  inline unsigned int size () const // Number of nodes.
+  inline size_t size () const // Number of nodes.
   { return size_; }
-  virtual double z (unsigned int i) const = 0; // Node depth [cm]
-  virtual double volume (unsigned int i) const = 0; // Node volume [cm^3]
+  virtual double z (size_t i) const = 0; // Node depth [cm]
+  virtual double volume (size_t i) const = 0; // Node volume [cm^3]
 private:
   virtual bool contain_z (size_t i, double z) const = 0; // True iff node i
                                                          // includes depth z
 public:
   template<class T>
-  double content_at (T& obj, double (T::*content) (int), const double z) const
+  double content_at (T& obj, double (T::*content) (size_t),
+                     const double z) const
   {
     double total_volume = 0.0;
     double total_content = 0.0;
@@ -107,6 +110,7 @@ public:
   // Creation.
 public:
   virtual bool check (Treelog&) const = 0;
+  virtual bool check_border (const double border, Treelog& err) const = 0;
   Geometry (Block&);
   virtual void initialize_zplus (const Groundwater& groundwater,
                                  const std::vector<double>& fixed,

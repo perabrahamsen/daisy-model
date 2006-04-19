@@ -63,7 +63,7 @@ struct SoilWater::Implementation
   std::auto_ptr<UZmodel> reserve;
   std::auto_ptr<Macro> macro;
 
-  unsigned int first_groundwater_node () const;
+  size_t first_groundwater_node () const;
 
   // Sink.
 public:
@@ -86,7 +86,7 @@ public:
   void swap (Treelog&, const Geometry& geo,
              const Soil&, double from, double middle, double to);
   void set_Theta (const Soil& soil, 
-		  unsigned int from, unsigned int to, double Theta);
+		  size_t from, size_t to, double Theta);
   bool check (unsigned n, Treelog& err) const;
   void output (Log&) const;
 
@@ -149,17 +149,17 @@ SoilWater::Implementation::freeze (const Soil&, const std::vector<double>& v)
 {
   daisy_assert (v.size () == S_ice.size ());
   daisy_assert (S_sum.size () == v.size ());
-  for (unsigned int i = 0; i < v.size (); i++)
+  for (size_t i = 0; i < v.size (); i++)
     {
       S_sum[i] += v[i];
       S_ice[i] -= v[i] * rho_water / rho_ice;
     }
 }
 
-unsigned int 
+size_t 
 SoilWater::Implementation::first_groundwater_node () const
 { 
-  for (unsigned int i = h.size (); i > 0u; i--)
+  for (size_t i = h.size (); i > 0u; i--)
     if (h[i-1] < 0.0)
       return i;
   return 0u;
@@ -189,7 +189,7 @@ SoilWater::Implementation::tick (const Geometry& geo,
   Treelog::Open nest (msg, "SoilWater");
 
   // Ice first.
-  for (unsigned int i = 0; i < soil.size (); i++)
+  for (size_t i = 0; i < soil.size (); i++)
     {
       X_ice[i] -= S_ice[i];
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
@@ -234,7 +234,7 @@ SoilWater::Implementation::tick (const Geometry& geo,
     }
 
   // External source.
-  for (unsigned int i = 0; i < soil.size (); i++)
+  for (size_t i = 0; i < soil.size (); i++)
     {
       S_incorp[i] += S_permanent[i];
       S_sum[i] += S_incorp[i];
@@ -245,7 +245,7 @@ SoilWater::Implementation::tick (const Geometry& geo,
   h_old = h;
 
   // Limit for groundwater table.
-  int last  = soil.size () - 1;
+  size_t last  = soil.size () - 1;
   if (groundwater.bottom_type () == Groundwater::pressure)
     {
       daisy_assert (soil.size () > 1);
@@ -255,7 +255,7 @@ SoilWater::Implementation::tick (const Geometry& geo,
       if (last >=  soil.size () - 1)
 	daisy_assert ("Groundwater too low.");
       // Pressure at the last node is equal to the water above it.
-      for (unsigned int i = last + 1; i < soil.size (); i++)
+      for (size_t i = last + 1; i < soil.size (); i++)
 	{
 	  h_old[i] = groundwater.table () - geo.z (i);
 	  h[i] = groundwater.table () - geo.z (i);
@@ -263,8 +263,7 @@ SoilWater::Implementation::tick (const Geometry& geo,
     }
 
   // Limit for ridging.
-  const int first = surface.soil_top () ? surface.last_node () : 0;
-  daisy_assert (first >= 0);
+  const size_t first = surface.soil_top () ? surface.last_node () : 0;
   bool ok = true;
 
   // Calculate matrix flow next.
@@ -296,7 +295,7 @@ SoilWater::Implementation::tick (const Geometry& geo,
                      h, Theta, q);
     }
 
-  for (unsigned int i = last + 2; i <= soil.size (); i++)
+  for (size_t i = last + 2; i <= soil.size (); i++)
     {
       q[i] = q[i-1];
       q_p[i] = q_p[i-1];
@@ -305,7 +304,7 @@ SoilWater::Implementation::tick (const Geometry& geo,
   // Update Theta below groundwater table.
   if (groundwater.bottom_type () == Groundwater::pressure)
     {
-      for(unsigned int i = last + 1; i < soil.size (); i++)
+      for(size_t i = last + 1; i < soil.size (); i++)
 	Theta[i] = soil.Theta (i, h[i], h_ice[i]);
     }
 
@@ -339,7 +338,7 @@ SoilWater::Implementation::mix (const Geometry& geo,
                                 const Soil& soil, double from, double to)
 {
   geo.mix (Theta, from, to, tillage);
-  for (unsigned int i = 0; i < soil.size(); i++)
+  for (size_t i = 0; i < soil.size(); i++)
     h[i] = soil.h (i, Theta[i]);
 }
 
@@ -350,7 +349,7 @@ SoilWater::Implementation::swap (Treelog& msg, const Geometry& geo,
 {
   geo.swap (Theta, from, middle, to, tillage);
 
-  for (unsigned int i = 0; i < soil.size(); i++)
+  for (size_t i = 0; i < soil.size(); i++)
     {
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
       if (Theta[i] > Theta_sat)
@@ -367,10 +366,10 @@ SoilWater::Implementation::swap (Treelog& msg, const Geometry& geo,
   
 void
 SoilWater::Implementation::set_Theta (const Soil& soil, 
-				      unsigned int from, unsigned int to, 
+				      size_t from, size_t to, 
 				      double value)
 {
-  for (unsigned int i = from; i <= to; i++)
+  for (size_t i = from; i <= to; i++)
     {
       Theta[i] = value;
       h[i] = soil.h (i, value);
@@ -452,14 +451,14 @@ void
 SoilWater::Implementation::put_h (const Soil& soil,
 				  const std::vector<double>& v) // [cm]
 {
-  const int size = soil.size ();
+  const size_t size = soil.size ();
   daisy_assert (v.size () == size);
   daisy_assert (h.size () == size);
   daisy_assert (Theta.size () == size);
 
   h = v;
 
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < size; i++)
     Theta[i] = soil.Theta (i, h[i], h_ice[i]);
 }
 
@@ -479,7 +478,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
 {
   Treelog::Open nest (out, "SoilWater");
 
-  const unsigned int size = soil.size ();
+  const size_t size = soil.size ();
 
   if (al.check ("X_ice"))
     {
@@ -504,7 +503,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
     X_ice_buffer.insert (X_ice_buffer.begin (), size, 0.0);
 
   h_ice.insert (h_ice.begin (), size, 0.0);
-  for (unsigned int i = 0; i < soil.size (); i++)
+  for (size_t i = 0; i < soil.size (); i++)
     {
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
       daisy_assert (Theta_sat >= X_ice[i]);
@@ -514,7 +513,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
   geo.initialize_layer (Theta, al, "Theta", out);
   geo.initialize_layer (h, al, "h", out);
 
-  for (int i = 0; i < Theta.size () && i < h.size (); i++)
+  for (size_t i = 0; i < Theta.size () && i < h.size (); i++)
     {
       const double Theta_h = soil.Theta (i, h[i], h_ice[i]);
       if (!approximate (Theta[i], Theta_h))
@@ -531,7 +530,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
       while (Theta.size () < size)
 	Theta.push_back (Theta[Theta.size () - 1]);
       if (h.size () == 0)
-	for (unsigned int i = 0; i < size; i++)
+	for (size_t i = 0; i < size; i++)
 	  h.push_back (soil.h (i, Theta[i]));
     }
   if (h.size () > 0)
@@ -539,7 +538,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
       while (h.size () < size)
 	h.push_back (h[h.size () - 1]);
       if (Theta.size () == 0)
-	for (unsigned int i = 0; i < size; i++)
+	for (size_t i = 0; i < size; i++)
 	  Theta.push_back (soil.Theta (i, h[i], h_ice[i]));
     }
 
@@ -562,7 +561,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
       if (groundwater.table () > 0.0)
 	{
 	  const double h_pF2 = -100.0; // pF 2.0;
-	  for (unsigned int i = 0; i < soil.size (); i++)
+	  for (size_t i = 0; i < soil.size (); i++)
 	    {
 	      h.push_back (h_pF2);
 	      Theta.push_back (soil.Theta (i, h_pF2, h_ice[i]));
@@ -572,7 +571,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
 	{
 	  const double table = groundwater.table ();
 	  
-	  for (unsigned int i = 0; i < soil.size (); i++)
+	  for (size_t i = 0; i < soil.size (); i++)
 	    {
 	      h.push_back (std::max (-100.0, table - geo.z (i)));
 	      Theta.push_back (soil.Theta (i, h[i], h_ice[i]));
@@ -592,7 +591,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
     // More than 5% clay (and humus) in first horizon.
     {
       // Find first non-clay layer.
-      int lay = 1;
+      size_t lay = 1;
       while (lay < soil.size () && soil.humus (lay) + soil.clay (lay) > 0.05)
 	lay++;
 
@@ -634,11 +633,11 @@ SoilWater::freeze (const Soil& soil, const std::vector<double>& v)
 { impl->freeze (soil, v); }
 
 double
-SoilWater::h (int i) const
+SoilWater::h (size_t i) const
 { return impl->h[i]; }
 
 double
-SoilWater::pF (int i) const
+SoilWater::pF (size_t i) const
 {
   if (h (i) < 0.0)
     return log10 (-h (i));
@@ -647,15 +646,15 @@ SoilWater::pF (int i) const
 }
 
 double
-SoilWater::Theta (int i) const
+SoilWater::Theta (size_t i) const
 { return impl->Theta[i]; }
 
 double
-SoilWater::Theta_left (int i) const
+SoilWater::Theta_left (size_t i) const
 { return impl->Theta[i] - impl->S_sum[i]; }
 
 double
-SoilWater::Theta_old (int i) const
+SoilWater::Theta_old (size_t i) const
 { return impl->Theta_old[i]; }
 
 double 
@@ -664,55 +663,55 @@ SoilWater::content (const Geometry& geo, double from, double to) const
 
 #ifndef NEWMOVE
 double
-SoilWater::q (int i) const
+SoilWater::q (size_t i) const
 { 
   return impl->q[i]; 
 }
 
 double
-SoilWater::q_p (int i) const
+SoilWater::q_p (size_t i) const
 { return impl->q_p[i]; }
 #endif // !NEWMOVE
 
 double
-SoilWater::S_sum (int i) const
+SoilWater::S_sum (size_t i) const
 { return impl->S_sum[i]; }
 
 double
-SoilWater::S_root (int i) const
+SoilWater::S_root (size_t i) const
 { return impl->S_root[i]; }
 
 double
-SoilWater::S_drain (int i) const
+SoilWater::S_drain (size_t i) const
 { return impl->S_drain[i]; }
 
 double
-SoilWater::S_ice (int i) const
+SoilWater::S_ice (size_t i) const
 { return impl->S_ice[i]; }
 
 double
-SoilWater::S_p (int i) const
+SoilWater::S_p (size_t i) const
 { return impl->S_p[i]; }
 
 double
-SoilWater::h_ice (int i) const
+SoilWater::h_ice (size_t i) const
 { return impl->h_ice[i]; }
 
 double
-SoilWater::X_ice (int i) const
+SoilWater::X_ice (size_t i) const
 { return impl->X_ice[i]; }
 
 double
-SoilWater::X_ice_total (int i) const
+SoilWater::X_ice_total (size_t i) const
 { return impl->X_ice[i] + impl->X_ice_buffer[i]; }
 
 
-unsigned int 
+size_t 
 SoilWater::first_groundwater_node () const
 { return impl->first_groundwater_node (); }
 
 double 
-SoilWater::Theta (const Soil& soil, int i, double h) const
+SoilWater::Theta (const Soil& soil, size_t i, double h) const
 { return soil.Theta (i, h, h_ice (i)); }
 
 void
@@ -750,7 +749,7 @@ SoilWater::swap (Treelog& msg,
   
 void
 SoilWater::set_Theta (const Soil& soil, 
-		      unsigned int from, unsigned int to, double Theta)
+		      size_t from, size_t to, double Theta)
 { impl->set_Theta (soil, from, to, Theta); }
 
 bool 

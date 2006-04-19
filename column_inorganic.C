@@ -187,7 +187,7 @@ ColumnInorganic::check_inner (Treelog& err) const
   bool ok = true;
   {
     Treelog::Open nest (err, "Soil");
-    if (!soil->check (-1, err))
+    if (!soil->check (-1, *geometry, err))
       ok = false;
   }
   return ok;

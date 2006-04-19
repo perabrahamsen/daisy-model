@@ -37,10 +37,10 @@ Geometry1D::contain_z (const size_t i, const double z) const
 // True iff node i// includes depth z.
 { return i == interval_plus (z); }
 
-unsigned int 
+size_t 
 Geometry1D::interval_plus (double z) const
 {
-  unsigned int i;
+  size_t i;
   for (i = 0; i < size_; i++)
     {
       if (zplus_[i] <= z)
@@ -49,12 +49,12 @@ Geometry1D::interval_plus (double z) const
   daisy_assert (false);
 }
 
-unsigned int
+size_t
 Geometry1D::interval_border (double z) const
 {
   double best = fabs (z - 0.0);
   
-  for (unsigned int i = 1; i <= size_; i++)
+  for (size_t i = 1; i <= size_; i++)
     {
       double dist = fabs (z - zplus_[i-1]);
       if (dist > best)
@@ -71,6 +71,26 @@ Geometry1D::check (Treelog&) const
   return ok;
 }
 
+bool 
+Geometry1D::check_border (const double border, Treelog& err) const
+{
+  bool ok = false;
+
+  for (size_t i = 0; i < size (); i++)
+    if (approximate (border, zplus (i)))
+      ok = true;
+
+  if (!ok)
+    {
+      std::ostringstream tmp;
+      tmp << "No geometric border near " << border 
+             << " [cm], log results may be inexact";
+      err.warning (tmp.str ());
+    }
+
+  return ok;
+}
+
 static bool 
 check_alist (const AttributeList&, Treelog&)
 {
@@ -81,9 +101,9 @@ check_alist (const AttributeList&, Treelog&)
 double
 Geometry1D::total (const vector<double>& v) const
 {
-  const unsigned int to = min (v.size (), size ());
+  const size_t to = min (v.size (), size ());
   double sum = 0.0;
-  for (unsigned int i = 0; i < to; i++)
+  for (size_t i = 0; i < to; i++)
     sum += v[i] * dz (i);
   return sum;
 }
@@ -114,13 +134,13 @@ Geometry1D::add (vector<double>& v, const double from, const double to,
   daisy_assert (to < from);
   const double old_total = total (v);
 
-  const unsigned int last = interval_plus (to);
+  const size_t last = interval_plus (to);
   while (v.size () <= last)
     v.push_back (0.0);
   const double density = amount / (from - to);
   double old = 0.0;
 
-  for (unsigned int i = 0; i <= last; i++)
+  for (size_t i = 0; i <= last; i++)
     {
       if (zplus_[i] < from)
 	{
@@ -150,7 +170,7 @@ Geometry1D::add (vector<double>& v, const vector<double>& density,
   const double old_total = total (v);
   const double total_density = total (density);
   daisy_assert (total_density > 0.0);
-  for (unsigned int i = 0; i <= size (); i++)
+  for (size_t i = 0; i <= size (); i++)
     if (density.size () > i)
       v[i] += amount * density[i] / total_density;
 
@@ -172,7 +192,7 @@ Geometry1D::mix (vector<double>& v, const double from, const double to,
   const vector<double> old = v;
   mix (v, from, to);
   daisy_assert (v.size () <= change.size ());
-  for (unsigned int i = 0; i < v.size (); i++)
+  for (size_t i = 0; i < v.size (); i++)
     change[i] += v[i] - (i < old.size () ? old[i] : 0.0);
 }
 
@@ -180,7 +200,7 @@ double
 Geometry1D::extract (vector<double>& v, const double from, const double to) const
 {
   const double old_total = total (v);
-  const unsigned int last = interval_plus (to);
+  const size_t last = interval_plus (to);
   while (v.size () <= last)
     v.push_back (0.0);
   double amount = 0.0;
@@ -210,7 +230,7 @@ Geometry1D::extract (vector<double>& v, const double from, const double to) cons
 void
 Geometry1D::set (vector<double>& v, double from, double to, double amount) const
 {
-  const unsigned int last = interval_plus (to);
+  const size_t last = interval_plus (to);
   while (v.size () <= last)
     v.push_back (0.0);
   const double density = amount / (from - to);
@@ -254,7 +274,7 @@ Geometry1D::swap (vector<double>& v, double from, double middle, double to,
   const vector<double> old = v;
   swap (v, from, middle, to);
   daisy_assert (v.size () <= change.size ());
-  for (unsigned int i = 0; i < v.size (); i++)
+  for (size_t i = 0; i < v.size (); i++)
     change[i] += v[i] - (i < old.size () ? old[i] : 0.0);
 }
 
@@ -274,7 +294,7 @@ Geometry1D::initialize_layer (vector<double>& array,
       const vector<AttributeList*>& layers = al.alist_sequence (initial);
       const double soil_end = zplus (size () - 1);
       double last = 0.0;
-      for (unsigned int i = 0; i < layers.size (); i++)
+      for (size_t i = 0; i < layers.size (); i++)
 	{
 	  double next = layers[i]->number ("end");
 	  daisy_assert (next < last);
@@ -331,7 +351,7 @@ Geometry1D::initialize_zplus (const Groundwater& groundwater,
       bool warn_about_small_intervals = true;
       double last = 0.0;
       double last_fixed = 0.0;
-      for (unsigned int i = 0; i < fixed.size ();)
+      for (size_t i = 0; i < fixed.size ();)
 	{
 	  const double current = fixed[i];
 
@@ -426,13 +446,13 @@ Can't automatically make discretizations less than 1 [cm], needed at "
       // Debug messages.
       std::ostringstream tmp;
       tmp << "(zplus";
-      for (unsigned int i = 0; i < zplus_.size (); i++)
+      for (size_t i = 0; i < zplus_.size (); i++)
 	tmp << " " << zplus_[i];
       tmp << "); " << zplus_.size () << " nodes.";
       msg.debug (tmp.str ());
       // Check that zplus is strictly decreasing.
       last = 0.0;
-      for (unsigned int i = 0; i < zplus_.size (); i++)
+      for (size_t i = 0; i < zplus_.size (); i++)
 	{
 	  daisy_assert (zplus_[i] < last);
 	  last = zplus_[i];
@@ -442,7 +462,7 @@ Can't automatically make discretizations less than 1 [cm], needed at "
   // Update z and dz from zplus.
   size_ = zplus_.size ();
   double last = 0.0;
-  for (unsigned int i = 0; i < size_; i++)
+  for (size_t i = 0; i < size_; i++)
     {
       double zplus = zplus_[i];
       double dz = last - zplus;

@@ -71,10 +71,9 @@ A location and content of a soil layer.");
     { }
   };
   /* const */ std::vector<Layer*> layers;
-  const int original_layer_size; // Size before adding aquitard, for logging.
+  const size_t original_layer_size; // Size before adding aquitard, for logging.
 
   // Parameters
-  const bool has_zplus;
   /* const */ double MaxRootingDepth;
   const double dispersivity;
   const std::vector<double> border;
@@ -82,7 +81,7 @@ A location and content of a soil layer.");
   bool has_attribute (const std::string& name) const
   { 
     bool missing = false;
-    for (unsigned int i = 0; i < layers.size (); i++)
+    for (size_t i = 0; i < layers.size (); i++)
       if (!layers[i]->horizon->has_attribute (name))
 	missing = true;
     return !missing;
@@ -92,7 +91,6 @@ A location and content of a soil layer.");
   Implementation (Block& al)
     : layers (map_submodel<Layer> (al, "horizons")),
       original_layer_size (layers.size ()),
-      has_zplus (al.check ("zplus")),
       MaxRootingDepth (al.number ("MaxRootingDepth")),
       dispersivity (al.number ("dispersivity")),
       border (al.number_sequence ("border"))
@@ -106,7 +104,7 @@ Soil::size () const
 { return horizon_.size (); }
 
 double 
-Soil::K (int i, double h, double h_ice, double T) const
+Soil::K (size_t i, double h, double h_ice, double T) const
 { 
   static struct ViscosityFactor : public PLF
   {
@@ -132,11 +130,11 @@ Soil::K (int i, double h, double h_ice, double T) const
 }
 
 double 
-Soil::Cw1 (int i, double h, double h_ice) const
+Soil::Cw1 (size_t i, double h, double h_ice) const
 { return Theta (i, h, h_ice) - Cw2 (i, h) * h; }
 
 double
-Soil::Cw2 (int i, double h) const
+Soil::Cw2 (size_t i, double h) const
 { 
   const double answer = horizon_[i]->hydraulic->Cw2 (h); 
   if (answer > 0.0)
@@ -145,7 +143,7 @@ Soil::Cw2 (int i, double h) const
   return 1.0e-8;
 }
 
-double Soil::Theta (int i, double h, double h_ice) const
+double Soil::Theta (size_t i, double h, double h_ice) const
 { 
   if (h < h_ice)
     return horizon_[i]->hydraulic->Theta (h);
@@ -154,75 +152,75 @@ double Soil::Theta (int i, double h, double h_ice) const
 }
 
 double 
-Soil::Theta_res (int i) const
+Soil::Theta_res (size_t i) const
 { return horizon_[i]->hydraulic->Theta_res; }
 
 double 
-Soil::h (int i, double Theta) const
+Soil::h (size_t i, double Theta) const
 { return horizon_[i]->hydraulic->h (Theta); }
 
 double 
-Soil::M (int i, double h) const
+Soil::M (size_t i, double h) const
 { return horizon_[i]->hydraulic->M (h); }
 
 double 
-Soil::dispersivity (int) const
+Soil::dispersivity (size_t) const
 { return impl.dispersivity; }
 
 void
-Soil::set_porosity (int i, double Theta)
+Soil::set_porosity (size_t i, double Theta)
 { horizon_[i]->hydraulic->set_porosity (Theta); }
 
 double 
-Soil::tortuosity_factor (int i, double Theta) const
+Soil::tortuosity_factor (size_t i, double Theta) const
 { return horizon_[i]->tortuosity->factor (*horizon_[i]->hydraulic, Theta); }
 
 double 
-Soil::anisotropy (int i) const
+Soil::anisotropy (size_t i) const
 { return horizon_[i]->anisotropy (); }
 
 double 
-Soil::dry_bulk_density (int i) const
+Soil::dry_bulk_density (size_t i) const
 { return horizon_[i]->dry_bulk_density (); }
 
 double 
-Soil::clay (int i) const
+Soil::clay (size_t i) const
 { return horizon_[i]->clay (); }
 
 double 
-Soil::texture_below (int i, double size) const
+Soil::texture_below (size_t i, double size) const
 { return horizon_[i]->texture_below (size); }
 
 double 
-Soil::humus (int i) const
+Soil::humus (size_t i) const
 { return horizon_[i]->humus (); }
 
 double 
-Soil::humus_C (int i) const
+Soil::humus_C (size_t i) const
 { return horizon_[i]->humus_C (); }
 
 const std::vector<double>& 
-Soil::SOM_fractions (int i) const
+Soil::SOM_fractions (size_t i) const
 { return horizon_[i]->SOM_fractions (); }
 
 const std::vector<double>& 
-Soil::SOM_C_per_N (int i) const
+Soil::SOM_C_per_N (size_t i) const
 { return horizon_[i]->SOM_C_per_N (); }
 
 double
-Soil::C_per_N (int i) const
+Soil::C_per_N (size_t i) const
 { return horizon_[i]->C_per_N (); }
 
 double 
-Soil::turnover_factor (int i) const
+Soil::turnover_factor (size_t i) const
 { return horizon_[i]->turnover_factor (); }
 
 double 
-Soil::heat_conductivity (int i, double Theta, double Ice) const
+Soil::heat_conductivity (size_t i, double Theta, double Ice) const
 { return horizon_[i]->heat_conductivity (Theta, Ice); }
 
 double 
-Soil::heat_capacity (int i, double Theta, double Ice) const
+Soil::heat_capacity (size_t i, double Theta, double Ice) const
 { return horizon_[i]->heat_capacity (Theta, Ice); }
 
 bool
@@ -230,15 +228,15 @@ Soil::has_attribute (const std::string& name) const
 { return impl.has_attribute (name); }
 
 bool 
-Soil::has_attribute (int i, const std::string& name) const
+Soil::has_attribute (size_t i, const std::string& name) const
 { return horizon_[i]->has_attribute (name); }
 
 double 
-Soil::get_attribute (int i, const std::string& name) const
+Soil::get_attribute (size_t i, const std::string& name) const
 { return horizon_[i]->get_attribute (name); }
 
 std::string
-Soil::get_dimension (int i, const std::string& name) const
+Soil::get_dimension (size_t i, const std::string& name) const
 { return horizon_[i]->get_dimension (name); }
 
 void
@@ -248,7 +246,7 @@ Soil::output (Log& log) const
   if (log.check_interior (horizons_symbol))
     {
       Log::Open open (log, horizons_symbol);
-      for (int i = 0; i < impl.original_layer_size; i++)
+      for (size_t i = 0; i < impl.original_layer_size; i++)
 	{
 	  Log::Unnamed unnamed (log);
 	  impl.layers[i]->output (log);
@@ -278,17 +276,17 @@ Soil::end_of_first_horizon () const
 }
 
 bool 
-Soil::check (int som_size, Treelog& err) const
+Soil::check (const int som_size, Geometry& geo, Treelog& err) const
 {
   bool ok = true;
   if (som_size >= 0)
     {
       Treelog::Open nest (err, "horizons");
-      for (unsigned int i = 0; i < impl.layers.size (); i++)
+      for (size_t i = 0; i < impl.layers.size (); i++)
 	{
 	  const Horizon& horizon = *impl.layers[i]->horizon;
 	  Treelog::Open nest (err, horizon.name);
-	  const int f_size = horizon.SOM_fractions ().size ();
+	  const size_t f_size = horizon.SOM_fractions ().size ();
 	  if (f_size > 0 && f_size != som_size)
 	    {
 	      Treelog::Open nest (err, "SOM_fractions");
@@ -297,7 +295,7 @@ Soil::check (int som_size, Treelog& err) const
 	      err.error (tmp.str ());
 	      ok = false;
 	    }
-	  const int n_size = horizon.SOM_C_per_N ().size ();
+	  const size_t n_size = horizon.SOM_C_per_N ().size ();
 	  if (n_size != som_size)
 	    {
 	      Treelog::Open nest (err, "SOM_C_per_N");
@@ -308,31 +306,36 @@ Soil::check (int som_size, Treelog& err) const
 	    }
 	}
     }
+
+  bool geo_ok = true;
+  for (size_t i = 0; i < geo.size (); i++)
+    if (horizon_[i] == NULL)
+      geo_ok = false;
+
+  if (!geo_ok)
+    {
+      Treelog::Open nest (err, "horizons");
+      err.error ("Some nodes have no associated horizon");
+      ok = false;
+    }
+
   return ok;
 }
 
 bool
-Soil::check_border (const double border, const Geometry& geo, 
-                    Treelog& err) const
+Soil::check_border (const double border, Treelog& err) const
 {
   bool ok = false;
-  if (impl.has_zplus)
-    {
-      for (size_t i = 0; i < geo.size (); i++)
-        if (approximate (border, geo.zplus (i)))
-          ok = true;
-    }
-  else
-    {
-      for (size_t i = 0; i < impl.border.size (); i++)
-        if (approximate (border, impl.border[i]))
-          ok = true;
-    }
+
+  for (size_t i = 0; i < impl.border.size (); i++)
+    if (approximate (border, impl.border[i]))
+      ok = true;
+
   if (!ok)
     {
       std::ostringstream tmp;
       tmp << "No soil border near " << border 
-             << " [cm], log results may be inexact";
+          << " [cm], log results may be inexact";
       err.warning (tmp.str ());
     }
   return ok;
@@ -352,7 +355,7 @@ check_alist (const AttributeList& al, Treelog& err)
     }
   double last = 0.0;
 
-  for (unsigned int i = 0; i < layers.size (); i++)
+  for (size_t i = 0; i < layers.size (); i++)
     {
       double end = layers[i]->number ("end");
       if (end >= last)
@@ -362,19 +365,6 @@ check_alist (const AttributeList& al, Treelog& err)
 	  break;
 	}
       last = end;
-    }
-
-  if (ok && al.check ("zplus"))
-    {
-      // This check is only meaningful if zplus and layers are ok.
-      const std::vector<double> zplus = al.number_sequence ("zplus");
-  
-      if (last != zplus[zplus.size() - 1])
-	{
-	  err.entry ("The last horizon must end the same place as the "
-		     "last interval");
-	  ok = false;
-	}
     }
   return ok;
 }  
@@ -400,7 +390,7 @@ geometry.",
   syntax.add ("border", "cm", Check::negative (), 
               Syntax::Const, Syntax::Sequence, "\
 List of flux depths where a mass balance should be possible when logging.\n\
-This attribute is ignored if zplus is specified explicitly.");
+This attribute is ignored if the geometry is specified explicitly.");
   syntax.add_check ("border", VCheck::decreasing ());
   std::vector<double> default_borders;
   default_borders.push_back (-100.0);
@@ -413,12 +403,13 @@ Soil::Soil (Block& al)
 
 void
 Soil::initialize (Geometry& geo,
-                  Groundwater& groundwater, const int som_size, Treelog& msg)
+                  Groundwater& groundwater,
+                  const int som_size, Treelog& msg)
 {
   Treelog::Open nest (msg, "Soil");
 
   // Extra aquitard layer.
-  if (!impl.has_zplus && groundwater.is_pipe ())
+  if (groundwater.is_pipe ())
     {
       // Find parameters.
       const double Z_aquitard = groundwater.Z_aquitard ();
@@ -502,17 +493,28 @@ Soil::initialize (Geometry& geo,
                         2 * impl.dispersivity, msg);
 
   // Initialize horizons.
-  layer = begin;
-  for (unsigned int i = 0; i < geo.size (); i++)
+  horizon_.insert (horizon_.end (), geo.size (), NULL);
+  daisy_assert (horizon_.size () == geo.size ());
+  double last = 0.0;
+
+  for (layer = begin; layer != end; layer++)
     {
-      if (geo.zplus (i) < (*layer)->end)
-	{
-	  layer++;
-	  daisy_assert (layer != end);
-	}
-      horizon_.push_back (&*((*layer)->horizon));
+      Horizon *const h  = (*layer)->horizon.get ();
+      const double next = (*layer)->end;
+
+      for (size_t i = 0; i < geo.size (); i++)
+        {
+          const double z = geo.z (i);
+          if (last > z && z >= next)
+            { 
+              daisy_assert (horizon_[i] == NULL);
+              horizon_[i] = h;
+            }
+        }
+      last = next;
     }
-  daisy_assert (size () == geo.size ());
+  for (size_t i = 0; i < geo.size (); i++)
+    daisy_assert (horizon_[i] != NULL);
 }
 
 Soil::~Soil ()

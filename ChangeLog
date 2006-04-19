@@ -1,3 +1,23 @@
+2006-04-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.h, geometry1d.h, geometry1d.C: Use size_t instead of
+	unsigned int. 
+	* soil.h, soil.C, soil_water.h, soil_water.C: Ditto.
+
+2006-04-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rootdens_AP.C, rootdens_G_P.C (set_density): 
+	* crop_std.C, crop_simple.C (tick): Generic geometry.
+	* crop_old.C, crop_sold.C (Emergence, RootPenetration)
+	(NetProduction): Ditto 
+
+	* rootdens_AP.C (set_density): Fix bug where tip density just
+	grew. 
+
+2006-04-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry1d.C (check_border): New function.
+
 2006-04-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* soil_heat1d.C (soil_heat_submodel): Fix name of submodel.

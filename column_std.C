@@ -533,7 +533,7 @@ ColumnStandard::check_inner (Treelog& err) const
 
   {
     Treelog::Open nest (err, "Soil");
-    if (!soil->check (organic_matter->som_pools (), err))
+    if (!soil->check (organic_matter->som_pools (), *geometry, err))
       ok = false;
   }
   {

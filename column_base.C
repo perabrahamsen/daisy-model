@@ -362,7 +362,14 @@ ColumnBase::check (bool require_weather,
 
 bool 
 ColumnBase::check_border (const double border, Treelog& err) const
-{ return soil->check_border (border, *geometry, err); }
+{ 
+  bool ok = true;
+  if (!geometry->check_border (border, err))
+    ok = false; 
+  if (!soil->check_border (border, err))
+    ok = false; 
+  return ok;
+}
 
 void
 ColumnBase::tick_base (Treelog& msg)

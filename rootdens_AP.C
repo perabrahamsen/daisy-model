@@ -71,6 +71,23 @@ Rootdens_AP::set_density (Treelog& /*msg*/,
           * (-0.5 * sqr (d_m) - 0.5 * sqr (Depth) + d_m * Depth)));
   daisy_assert (L0 >= 0.0);
 
+#ifndef GEO1D
+  PLF tip;                      // Linear decrease downto Depth + q;
+  tip.add (Depth, L0 * exp (- a * Depth));
+  tip.add (d_m, 0.0);
+
+  const size_t size = geo.size ();
+  for (size_t i = 0; i < size; i++)
+    {
+      const double d = -geo.z (i);
+      if (i == 0 || d < Depth)
+        Density[i] = L0 * exp (- a * d);
+      else if (d < d_m)
+        Density[i] = tip (d);
+      else
+        Density[i] = 0.0;
+    }
+#else // GEO1D
   daisy_assert (Density.size () == geo.size ());
   unsigned int i = 0;
   // Use GP down to Depth.
@@ -91,7 +108,7 @@ Rootdens_AP::set_density (Treelog& /*msg*/,
   // No roots below.
   for (; i < geo.size (); i++)
     Density[i] = 0.0;
-
+#endif // GEO1D
 }
 
 void 

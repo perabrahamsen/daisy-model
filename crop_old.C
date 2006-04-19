@@ -1126,7 +1126,8 @@ CropOld::Emergence (const Geometry& geo, const SoilHeat& soil_heat)
   const double EmrDpt = par.Root.DptEmr;
   double& DS = var.Phenology.DS;
 
-  DS += soil_heat.T (geo.interval_plus (-EmrDpt)) / Devel.EmrTSum;
+  const double T_soil = geo.content_at (soil_heat, &SoilHeat::T, -EmrDpt);
+  DS += T_soil / Devel.EmrTSum;
   if (DS > 0.0)
     DS = Devel.DS_Emr;
 }
@@ -1486,8 +1487,8 @@ CropOld::RootPenetration (const Geometry& geo,
   if (IncWRoot <= 0)
     return;
 
-  double Ts = soil_heat.T (geo.interval_plus (-Depth));
-  double dp = Root.PenPar1 * max (0.0, Ts - Root.PenPar2);
+  const double Ts = geo.content_at (soil_heat, &SoilHeat::T, -Depth);
+  const double dp = Root.PenPar1 * max (0.0, Ts - Root.PenPar2);
   PotRtDpt = min (PotRtDpt + dp, Root.MaxPen);
   /*max depth determined by crop*/
   Depth = min (Depth + dp, Root.MaxPen);
@@ -1688,9 +1689,9 @@ CropOld::NetProduction (const Bioclimate& bioclimate,
   const double RMLeaf
     = MaintenanceRespiration (Resp.r_Leaf (DS), Prod.WLeaf, 
 			      bioclimate.daily_air_temperature ());
+  const double T_soil = geo.content_at (soil_heat, &SoilHeat::T, -Depth/3.0);
   const double RMRoot
-    = MaintenanceRespiration (Resp.r_Root (DS), Prod.WRoot, 
-			      soil_heat.T (geo.interval_plus (-Depth / 3)));
+    = MaintenanceRespiration (Resp.r_Root (DS), Prod.WRoot, T_soil);
   double AssG, f_Leaf, f_Root;
     
   AssG = CrpAux.CanopyAss;

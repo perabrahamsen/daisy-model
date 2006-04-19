@@ -224,7 +224,8 @@ CropStandard::tick (const Time& time,
   harvesting.tick (time);
 
   // Update average soil temperature.
-  const double T_soil = soil_heat.T (geo.interval_plus (-root_system->Depth));
+  const double T_soil = geo.content_at (soil_heat, &SoilHeat::T,
+                                        -root_system->Depth);
   root_system->tick_hourly (time.hour (), T_soil);
 
   // Clear nitrogen.
@@ -238,9 +239,9 @@ CropStandard::tick (const Time& time,
     {
       daisy_assert (ForcedCAI < 0.0);
 
-      const int root_middle = geo.interval_plus (-root_system->Depth/2.);
-      development->emergence (soil_water.h (root_middle), 
-                              root_system->soil_temperature);
+      const double h_middle = geo.content_at (soil_water, &SoilWater::h,
+                                              -root_system->Depth/2.);
+      development->emergence (h_middle, root_system->soil_temperature);
       if (development->DS >= 0)
 	{
 	  msg.message ("Emerging");
@@ -347,8 +348,9 @@ CropStandard::tick (const Time& time,
   else
     production.PotCanopyAss = production.CanopyAss = 0.0;
 
-  production.tick (bioclimate.daily_air_temperature (),
-		   soil_heat.T (geo.interval_plus (-root_system->Depth / 3.0)),
+  const double T_soil_3 = geo.content_at (soil_heat, &SoilHeat::T,
+                                        -root_system->Depth/3.0);
+  production.tick (bioclimate.daily_air_temperature (), T_soil_3,
 		   root_system->Density, geo, development->DS, 
 		   canopy.CAImRat, nitrogen, nitrogen_stress, partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,

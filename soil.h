@@ -42,38 +42,38 @@ public:
   size_t size () const;
 
   // Water.
-  double K (int i, double h, double h_ice, double T) const;
-  double Cw1 (int i, double h, double h_ice) const;
-  double Cw2 (int i, double h) const;
-  double Theta (int i, double h, double h_ice) const;
-  double Theta_res (int i) const;
-  double h (int i, double Theta) const;
-  double M (int i, double h) const;
-  double dispersivity (int) const;
-  void set_porosity (int i, double Theta);
+  double K (size_t i, double h, double h_ice, double T) const;
+  double Cw1 (size_t i, double h, double h_ice) const;
+  double Cw2 (size_t i, double h) const;
+  double Theta (size_t i, double h, double h_ice) const;
+  double Theta_res (size_t i) const;
+  double h (size_t i, double Theta) const;
+  double M (size_t i, double h) const;
+  double dispersivity (size_t) const;
+  void set_porosity (size_t i, double Theta);
   
   // Texture.
-  double tortuosity_factor (int i, double Theta) const;
-  double anisotropy (int i) const;
-  double dry_bulk_density (int i) const;
-  double clay (int i) const;
-  double texture_below (int i, double size /* [um] */) const;
-  double humus (int i) const;
-  double humus_C (int i) const;
-  const std::vector<double>& SOM_fractions (int i) const;
-  const std::vector<double>& SOM_C_per_N (int i) const;
-  double C_per_N (int i) const;
-  double turnover_factor (int i) const;
+  double tortuosity_factor (size_t i, double Theta) const;
+  double anisotropy (size_t i) const;
+  double dry_bulk_density (size_t i) const;
+  double clay (size_t i) const;
+  double texture_below (size_t i, double size /* [um] */) const;
+  double humus (size_t i) const;
+  double humus_C (size_t i) const;
+  const std::vector<double>& SOM_fractions (size_t i) const;
+  const std::vector<double>& SOM_C_per_N (size_t i) const;
+  double C_per_N (size_t i) const;
+  double turnover_factor (size_t i) const;
 
   // Thermic.
-  double heat_conductivity (int i, double Theta, double Ice) const;
-  double heat_capacity (int i, double Theta, double Ice) const;
+  double heat_conductivity (size_t i, double Theta, double Ice) const;
+  double heat_capacity (size_t i, double Theta, double Ice) const;
   
   // Chemistry.
   bool has_attribute (const std::string& name) const;
-  bool has_attribute (int i, const std::string& name) const;
-  double get_attribute (int i, const std::string& name) const;
-  std::string get_dimension (int i, const std::string& name) const;
+  bool has_attribute (size_t i, const std::string& name) const;
+  double get_attribute (size_t i, const std::string& name) const;
+  std::string get_dimension (size_t i, const std::string& name) const;
 
   // Simulation.
 public:
@@ -89,9 +89,8 @@ public:
   double end_of_first_horizon () const;
 
   // Creation.
-  bool check (int som_size, Treelog&) const;
-  bool check_border (const double border, const Geometry& geo,
-                     Treelog& err) const;
+  bool check (int som_size, Geometry& geo, Treelog&) const;
+  bool check_border (const double border, Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);
 private:
   Soil (const Soil&);

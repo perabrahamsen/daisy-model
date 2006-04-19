@@ -1,30 +1,128 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Omorganiser Daisy kode så omsætning er uafhængig af transport
+* Daisy 2D
 
-** root_system.C
+** SH
 
-Root pen afhænger af lerindhold.  I hvilken node?
+rootdens: Er det i orden at rodtætheden kun er større end nul hvis der
+er rootdepth > z(i)  i stedet for hvis rootdepth > z_minus(i) ?
 
-** crop
+** A) Omorganiser Daisy kode så omsætning er uafhængig af transport
 
-T (dybde) og h (dybde) for emergence.
+1) Fjern 1D antagelser fra OM, bioinc
 
-** ridge.C
+2) Fjern 1D antagelser fra log table, select flux & interval.
 
+3) uz, transport, macro, macrotrans: 1D
 
+4) SoilWater & SoilWater1D
 
-* Marts
+5) DOM + Solute: fjern transport
 
-** Inkorporer tekst.
+** B) Grid
 
-** fælles kartoffel
+Disse skal (først) bare bruge 1D modellerne til vertikal transport,
+senere måske også horizontal transport afkoblet.
 
-** Kør PT 2004 med fælles kartoffel.
+ColumnGrid
+GeometryGrid (zplus, xplus)
 
-** publiser endelig rapport
+SoilWaterGrid
+  UZGrid
+  MacroGrid
 
---------------------------------------------------
+SolMoveGrid
+
+SoilHeatGrid
+
+** C) Graph / Net
+
+1) Geometry -> Graph
+
+2) Graph til Matrix
+
+3) Løs matrix
+
+4) Aftest mod 1D eller Grid
+
+** D)
+
+** Filer
+
+*** soil_water.C
+
+**** Vi har en særlig håndtering af mættet zone.
+
+**** Default makropore dybde antager i > j => z(i) < z (j)
+
+*** organic_matter.C
+
+**** active zone antager i > j => z(i) < z (j)
+
+**** tillage_age antager i > j => z(i) < z (j)
+
+**** init.end antager i > j => z(i) < z (j)
+
+**** initial_SOM antager i > j => z(i) < z (j)
+
+**** default humus antager  i > j => z(i) < z (j)
+
+**** total_delta_C
+
+***** counted twize...
+
+***** node volume limited by init.end
+
+*** bioincorporation.C
+
+**** distribution antager  i > j => z(i) < z (j)
+
+*** groundwater_lysimeter.C
+
+**** Need to find bottom of soil.
+
+*** select_flux_top.C, select_flux_bottom.C
+
+**** Need to handle fluxes correctly.
+
+*** groundwater_pipe.C
+
+Interesting challenges...  Probably need to disable for 2D at first.
+
+*** select_interval.C
+
+**** Need to find bottom of soil.
+
+**** Need Average dry bulk density of interval.
+
+*** log_table.C
+
+**** Need node id instead of zplus for arrays.
+
+*** mactrans_std.C, macro_std.C, uzrichard.C, uzlr.C, transport_cd.C, 
+*** transport_none.C, transport_convection.C
+
+**** 1D only
+
+** Done
+
+*** Split Soil fra Geometry
+
+*** Geometry og Geometry1D
+
+*** SoilHeat & SoilHeat1D
+
+*** root_system.C, crop_simple.C, crop_std.C, crop_old.C, crop_sold.C
+
+T, h, clay at depth
+
+*** rootdens_AP.C, rootdens_G_P.C
+
+**** density  antager  i > j => z(i) < z (j)
+
+*** 1D only
+
+ridge.C
 
 * IDE: CT laver "sample setups" for hvert FON land 
 
@@ -32,8 +130,6 @@ De skal bruges på Daisy hjemmesiden, og er en del af "dissemination"
 (wp7) af FON.
 
 * Distribution
-
-** Upload CT hydraulic optimering.
 
 ** Indsæt mmo grøntsager i lib (og sample?).
 

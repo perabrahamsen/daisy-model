@@ -42,20 +42,20 @@ class Geometry1D : public Geometry
 
 public:
   // Accessors.
-  inline unsigned int size () const
+  inline size_t size () const
   { return size_; }
-  inline double zplus (unsigned int i) const
+  inline double zplus (size_t i) const
   { return zplus_[i]; }
-  inline double z (unsigned int i) const
+  inline double z (size_t i) const
   { return z_[i]; }
-  inline double dz (unsigned int i) const
+  inline double dz (size_t i) const
   { return dz_[i]; }
-  inline double volume (unsigned int i) const
+  inline double volume (size_t i) const
   { return dz_[i] * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
   bool contain_z (size_t i, double z) const;
 
-  unsigned int interval_plus (double z) const;
-  unsigned int interval_border (double z) const;
+  size_t interval_plus (double z) const;
+  size_t interval_border (double z) const;
 
   // Vector operations.
   void mix (std::vector<double>& v, double from, double to) const;
@@ -87,6 +87,7 @@ public:
   // Creation.
 public:
   bool check (Treelog&) const;
+  bool check_border (const double border, Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);
   Geometry1D (Block&);
   void initialize_zplus (const Groundwater& groundwater,

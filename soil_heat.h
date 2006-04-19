@@ -38,7 +38,7 @@ class SoilHeat
 protected:
   std::vector<double> T_;
 public:
-  double T (const size_t i) const // [dg C]
+  double T (size_t i) const // [dg C]
   { return T_[i]; }
   virtual double top_flux (const Geometry& geo,
                            const Soil&, const SoilWater&) const = 0;

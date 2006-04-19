@@ -52,29 +52,29 @@ public:
   
   // Queries
 public:
-  double h (int i) const;
-  double pF (int i) const;
-  double Theta (int i) const;
-  double Theta_left (int i) const;
-  double Theta_old (int i) const;
+  double h (size_t i) const;
+  double pF (size_t i) const;
+  double Theta (size_t i) const;
+  double Theta_left (size_t i) const;
+  double Theta_old (size_t i) const;
   double content (const Geometry&, double from, double to) const; // [cm]
 #ifndef NEWMOVE
-  double q (int i) const;
-  double q_p (int i) const;
+  double q (size_t i) const;
+  double q_p (size_t i) const;
 #endif // OLDMOVE
-  double S_sum (int i) const;
-  double S_root (int i) const;
-  double S_drain (int i) const;
-  double S_ice (int i) const;
-  double S_p (int i) const;
-  double h_ice (int i) const;
-  double X_ice (int i) const;
-  double X_ice_total (int i) const;
+  double S_sum (size_t i) const;
+  double S_root (size_t i) const;
+  double S_drain (size_t i) const;
+  double S_ice (size_t i) const;
+  double S_p (size_t i) const;
+  double h_ice (size_t i) const;
+  double X_ice (size_t i) const;
+  double X_ice_total (size_t i) const;
 
-  unsigned int first_groundwater_node () const;
+  size_t first_groundwater_node () const;
     
   // Ice modified lookups.
-  double Theta (const Soil&, int i, double h) const;
+  double Theta (const Soil&, size_t i, double h) const;
  
   // Simulation.
 public:
@@ -89,8 +89,8 @@ public:
   void swap (Treelog&, const Geometry& geo,
              const Soil&, double from, double middle, double to);
   void set_Theta (const Soil& soil, 
-		  unsigned int from, unsigned int to, double Theta);
-  bool check (unsigned n, Treelog& err) const;
+		  size_t from, size_t to, double Theta);
+  bool check (size_t n, Treelog& err) const;
   void output (Log&) const;
 
 
