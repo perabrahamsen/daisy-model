@@ -7,17 +7,28 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 rootdens: Er det i orden at rodtætheden kun er større end nul hvis der
 er rootdepth > z(i)  i stedet for hvis rootdepth > z_minus(i) ?
 
+Alternativ: Brug "fraction_in_z_interval (0, -RootDepth) til at se om en
+node er i rodzonen.  Evt. gang tætheden med det tal.
+
 ** A) Omorganiser Daisy kode så omsætning er uafhængig af transport
 
 1) Fjern 1D antagelser fra OM, bioinc
 
 2) Fjern 1D antagelser fra log table, select flux & interval.
 
-3) uz, transport, macro, macrotrans: 1D
+Flux:
+  Hvis geo er ny
+    find strømme der krydser grænse
+  value = sum (strømme der krydser grænse)
 
-4) SoilWater & SoilWater1D
+Interval:
+  Hvis geo er nu
+    Find noder der overlapper interval, samt fraction i interval
+  value = sum (noder der overlapper * fraction)
 
-5) DOM + Solute: fjern transport
+3) transport, macrotrans: 1D
+
+4) DOM + Solute: fjern transport
 
 ** B) Grid
 
@@ -48,12 +59,6 @@ SoilHeatGrid
 ** D)
 
 ** Filer
-
-*** soil_water.C
-
-**** Vi har en særlig håndtering af mættet zone.
-
-**** Default makropore dybde antager i > j => z(i) < z (j)
 
 *** organic_matter.C
 
@@ -112,6 +117,8 @@ Interesting challenges...  Probably need to disable for 2D at first.
 
 *** SoilHeat & SoilHeat1D
 
+*** SoilWater & SoilWater1D
+
 *** root_system.C, crop_simple.C, crop_std.C, crop_old.C, crop_sold.C
 
 T, h, clay at depth
@@ -122,7 +129,7 @@ T, h, clay at depth
 
 *** 1D only
 
-ridge.C
+ridge, uz*, macro*, groundwater*
 
 * IDE: CT laver "sample setups" for hvert FON land 
 
