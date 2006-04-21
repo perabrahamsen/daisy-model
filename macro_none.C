@@ -28,7 +28,7 @@ struct MacroNone : public Macro
   { return true; }
 
   // Simulation.
-  void tick (const Geometry&,
+  void tick (const Geometry1D&,
              const Soil& /* soil */, 
 	     unsigned int /* first */, unsigned int /* last */,
 	     Surface& /* surface */,

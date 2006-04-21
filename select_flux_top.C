@@ -20,57 +20,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "select_value.h"
-#include "geometry.h"
+#include "select_flux.h"
 #include "border.h"
 #include "mathlib.h"
-#include <sstream>
-#include "treelog.h"
+#include <map>
 
-using namespace std;
-
-struct SelectFluxTop : public SelectValue
+struct SelectFluxTop : public SelectFlux
 {
-  // Content.
-  double height;
-  const Geometry* last_geo;
-  const Soil* last_soil;
-  int index;
-
-  // Output routines.
-  void output_array (const vector<double>& array, 
-		     const Geometry* geo, const Soil* soil, Treelog& msg)
-  { 
-    if (soil != last_soil)
-      last_soil = soil;
-
-    if (geo != last_geo)
-      {
-        last_geo = geo;
-        index = geo->interval_border (height);
-
-        if ((index == 0)
-            ? height < -1e-8
-            : !approximate (height, geo->zplus (index-1)))
-          {
-            std::ostringstream tmp;
-            tmp << "Log column " << name 
-                   << ": No interval near from = " << height 
-                   << " [cm]; closest match is " 
-                   << ((index == 0) ? 0 : geo->zplus (index-1))
-                   << " [cm]";
-            msg.warning (tmp.str ());
-          }
-        daisy_assert (array.size () > index);
-      }
-
-    add_result (array[index]);
-  }
-
   // Create and Destroy.
-  void initialize (const map<symbol, symbol>& conv, 
+  void initialize (const std::map<symbol, symbol>& conv, 
 		   double default_from, double default_to,
-		   const string& timestep)
+		   const std::string& timestep)
   {
     Select::initialize (conv, default_from, default_to, timestep);
 
@@ -93,11 +53,7 @@ struct SelectFluxTop : public SelectValue
     return ok; 
   }
   SelectFluxTop (Block& al)
-    : SelectValue (al),
-      height (al.number ("from", 1.0)),
-      last_geo (NULL),
-      last_soil (NULL),
-      index (-1)
+    : SelectFlux (al, al.number ("from", 1.0))
   { }
 };
 
@@ -112,13 +68,12 @@ static struct SelectFluxTopSyntax
     AttributeList& alist = *new AttributeList ();
     SelectValue::load_syntax (syntax, alist);
 
-    alist.add ("description", "Extract flux at top of specified interval.\n\
-By default, log the first member of the sequence.");
+    alist.add ("description", "Extract flux at top of specified interval.");
 
     syntax.add ("from", "cm", Syntax::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.");
 
     Librarian<Select>::add_type ("flux_top", alist, syntax, &make);
-  }
+  } 
 } Select_syntax;

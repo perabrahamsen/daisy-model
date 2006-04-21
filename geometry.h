@@ -32,14 +32,14 @@ class AttributeList;
 class Treelog;
 class Groundwater;
 
+#define GEO1D
+
 class Geometry
 {
   // Parameters.
 protected:
   size_t size_;		// Number of intervals.
 public:
-
-#define GEO1D
 
 #ifdef GEO1D
   virtual double zplus (size_t i) const = 0;
@@ -51,13 +51,22 @@ public:
   // Accessors.
   inline size_t size () const // Number of nodes.
   { return size_; }
+  virtual size_t edge_size () const = 0; // Number of edges.
   virtual double z (size_t i) const = 0; // Node depth [cm]
   virtual double volume (size_t i) const = 0; // Node volume [cm^3]
+  virtual double fraction_in_z_interval (size_t i, // The fraction of
+                                                   // a node volume
+                                                   // that is within a
+                                                   // specific depth
+                                                   // interval.
+                                         double from, double to) const = 0;
+  virtual bool edge_cross_z (size_t e, double z) const = 0; // Cross depth?
 private:
   virtual bool contain_z (size_t i, double z) const = 0; // True iff node i
                                                          // includes depth z
 public:
-  template<class T>
+  template<class T> // Here we we calculate a volume weighted average
+                    // value at a specific depth.
   double content_at (T& obj, double (T::*content) (size_t),
                      const double z) const
   {

@@ -1,3 +1,19 @@
+2006-04-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_flux.h: New interface.
+	* Makefile (SPECIALS): Add it.
+
+2006-04-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry1d.h, geometry1d.C, geometry.h (fraction_in_z_interval)
+	(edge_cross_z): New virtual member functions.
+
+	* soil_water.h, soil_water.C: Made most stuff virtual.
+	* soil_water1d.h, soil_water1d.C: New special.
+	* Makefile (SUBMODELS): Added it.
+	* column_base.h, column_base.C: Use it.
+	* groundwater.h, uzmodel.h, macro.h: Use it.
+
 2006-04-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* geometry.h, geometry1d.h, geometry1d.C: Use size_t instead of

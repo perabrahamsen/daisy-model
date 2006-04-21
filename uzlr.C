@@ -23,7 +23,7 @@
 #include "uzmodel.h"
 #include "surface.h"
 #include "groundwater.h"
-#include "geometry.h"
+#include "geometry1d.h"
 #include "soil.h"
 #include "soil_heat.h"
 #include "mathlib.h"
@@ -40,7 +40,7 @@ private:
 
   // Simulate.
 public:
-  bool tick (Treelog&, const Geometry& geo,
+  bool tick (Treelog&, const Geometry1D& geo,
              const Soil& soil, const SoilHeat& soil_heat,
 	     unsigned int first, const Surface& top, 
 	     unsigned int last, const Groundwater& bottom, 
@@ -63,7 +63,7 @@ public:
 };
 
 bool
-UZlr::tick (Treelog& msg, const Geometry& geo,
+UZlr::tick (Treelog& msg, const Geometry1D& geo,
             const Soil& soil, const SoilHeat& soil_heat,
 	    unsigned int first, const Surface& top, 
 	    unsigned int last, const Groundwater& bottom, 

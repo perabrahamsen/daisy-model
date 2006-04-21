@@ -22,7 +22,7 @@
 #include "column_base.h"
 #include "geometry1d.h"
 #include "soil.h"
-#include "soil_water.h"
+#include "soil_water1d.h"
 #include "weather.h"
 #include "vegetation.h"
 #include "bioclimate.h"
@@ -447,7 +447,7 @@ ColumnBase::ColumnBase (Block& al)
     surface (al.alist ("Surface")),
     geometry (submodel<Geometry1D> (al, "Soil")),
     soil (submodel<Soil> (al, "Soil")),
-    soil_water (submodel<SoilWater> (al, "SoilWater")),
+    soil_water (submodel<SoilWater1D> (al, "SoilWater")),
     soil_heat (al.alist ("SoilHeat")),
     soil_chemicals (al.alist ("SoilChemicals")),
     chemistry (Librarian<Chemistry>::build_vector (al, "Chemistry")),
@@ -533,7 +533,7 @@ the simulation.  If unspecified, used global weather.");
 			load_soil_and_geometry);
   syntax.add_submodule ("SoilWater", alist, Syntax::State,
 			"Soil water content and transportation.",
-			SoilWater::load_syntax);
+			SoilWater1D::load_syntax);
   syntax.add_submodule ("SoilHeat", alist, Syntax::State,
 			"Soil heat and flux.",
 			SoilHeat1D::load_syntax);

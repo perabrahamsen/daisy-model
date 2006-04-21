@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.03
+
+** Lots of restructuration.
+
+** Changes slightly the numerical approximation of root density at the tip. 
+
 * 4.02
 
 ** Bug fixes and restructuring.
@@ -20,7 +26,7 @@ release.
 
 ** New TempScale and TempOffset parameters to the default weather model.
 
-Use 
+Use
 
    (weather default "taastrup.dwf" 
             (TempOffset 1.0 0.0 0.0 0.0 0.0 2.0 

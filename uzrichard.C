@@ -23,7 +23,7 @@
 #include "uzmodel.h"
 #include "groundwater.h"
 #include "surface.h"
-#include "geometry.h"
+#include "geometry1d.h"
 #include "soil.h"
 #include "soil_heat.h"
 #include "mathlib.h"
@@ -56,7 +56,7 @@ public:
 
   // Simulate.
 private:
-  bool richard (Treelog&, const Geometry& geo,
+  bool richard (Treelog&, const Geometry1D& geo,
                 const Soil& soil, const SoilHeat& soil_heat,
 		int first, const Surface& top,
 		int last, const Groundwater& bottom,
@@ -74,7 +74,7 @@ private:
 		  const vector<double>& h_ice,
 		  const vector<double>& K,
 		  vector<double>& Kplus) const;
-  void q_darcy (const Geometry& geo,
+  void q_darcy (const Geometry1D& geo,
 		int first, int last,
 		const vector<double>& h_previous,
 		const vector<double>& h,
@@ -85,7 +85,7 @@ private:
 		double ddt,
 		vector<double>& q);
 public:
-  bool tick (Treelog&, const Geometry& geo,
+  bool tick (Treelog&, const Geometry1D& geo,
              const Soil& soil, const SoilHeat&,
 	     unsigned int first, const Surface& top,
 	     unsigned int last, const Groundwater& bottom,
@@ -106,7 +106,7 @@ public:
 
 bool
 UZRichard::richard (Treelog& msg,
-		    const Geometry& geo,
+		    const Geometry1D& geo,
                     const Soil& soil,
 		    const SoilHeat& soil_heat,
 		    int first, const Surface& top,
@@ -641,7 +641,7 @@ UZRichard::internode (const Soil& soil, const SoilHeat& soil_heat,
 }
 
 void
-UZRichard::q_darcy (const Geometry& geo,
+UZRichard::q_darcy (const Geometry1D& geo,
 		    const int first, const int last,
 		    const vector<double>& /* h_previous */,
 		    const vector<double>& h,
@@ -696,7 +696,7 @@ calculating flow with pressure top.");
 }
 
 bool
-UZRichard::tick (Treelog& msg, const Geometry& geo,
+UZRichard::tick (Treelog& msg, const Geometry1D& geo,
                  const Soil& soil, const SoilHeat& soil_heat,
 		 unsigned int first, const Surface& top, 
 		 unsigned int last, const Groundwater& bottom, 

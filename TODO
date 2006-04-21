@@ -1,14 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Send referat.
+
+* Add "Geometry" to "ColumnBase" (for sake of the reference manual).
+
 * Daisy 2D
-
-** SH
-
-rootdens: Er det i orden at rodtætheden kun er større end nul hvis der
-er rootdepth > z(i)  i stedet for hvis rootdepth > z_minus(i) ?
-
-Alternativ: Brug "fraction_in_z_interval (0, -RootDepth) til at se om en
-node er i rodzonen.  Evt. gang tætheden med det tal.
 
 ** A) Omorganiser Daisy kode så omsætning er uafhængig af transport
 
@@ -25,6 +21,9 @@ Interval:
   Hvis geo er nu
     Find noder der overlapper interval, samt fraction i interval
   value = sum (noder der overlapper * fraction)
+
+Content:
+  content_at
 
 3) transport, macrotrans: 1D
 

@@ -353,7 +353,8 @@ COMPONENTS = movement.C integer.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = geometry1d.C soil_heat1d.C fetch.C horheat.C litter.C time.C \
+SUBMODELS = soil_water1d.C \
+        geometry1d.C soil_heat1d.C fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \
 	harvesting.C canopy_simple.C canopy_std.C root_system.C \
@@ -365,7 +366,7 @@ SUBMODELS = geometry1d.C soil_heat1d.C fetch.C horheat.C litter.C time.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = gnuplot_base.C \
+SPECIALS = select_flux.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 	geometry.C printer_file.C log_alist.C log_clone.C column_base.C

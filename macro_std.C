@@ -21,7 +21,7 @@
 
 
 #include "macro.h"
-#include "geometry.h"
+#include "geometry1d.h"
 #include "soil.h"
 #include "surface.h"
 #include "plf.h"
@@ -45,7 +45,7 @@ struct MacroStandard : public Macro
   const double pond_max;	// Pond height before activating pref.flow [mm]
 
   // Simulation.
- void tick (const Geometry& geo,
+ void tick (const Geometry1D& geo,
             const Soil& soil, unsigned int first, unsigned int last,
 	    Surface& surface,
 	    const vector<double>& h_ice,
@@ -78,7 +78,7 @@ struct MacroStandard : public Macro
 };
 
 void 
-MacroStandard::tick (const Geometry& geo,
+MacroStandard::tick (const Geometry1D& geo,
                      const Soil& soil, 
 		     const unsigned int first, const unsigned int last,
 		     Surface& surface,

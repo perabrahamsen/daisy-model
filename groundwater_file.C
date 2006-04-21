@@ -50,7 +50,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Geometry&,
+  void tick (const Geometry1D&,
              const Soil&, SoilWater&, double, const SoilHeat&,
 	     const Time& time, Treelog& msg)
   { tick (time, msg); }
@@ -59,7 +59,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry&, const Time& time, Treelog&);
+  void initialize (const Geometry1D&, const Time& time, Treelog&);
   GroundwaterFile (Block&);
   ~GroundwaterFile ();
 };
@@ -146,7 +146,7 @@ GroundwaterFile::table () const
 }
 
 void
-GroundwaterFile::initialize (const Geometry&, const Time& time,
+GroundwaterFile::initialize (const Geometry1D&, const Time& time,
 			     Treelog& err)
 {
   daisy_assert (lex == NULL);

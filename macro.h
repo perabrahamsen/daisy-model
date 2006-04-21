@@ -26,7 +26,7 @@
 #include "librarian.h"
 #include <vector>
 
-class Geometry;
+class Geometry1D;
 class Soil;
 class Log;
 class Surface;
@@ -41,7 +41,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Geometry& geo,
+  virtual void tick (const Geometry1D& geo,
                      const Soil& soil, unsigned int first, unsigned int last,
 		     Surface& surface,
 		     const std::vector<double>& h_ice,

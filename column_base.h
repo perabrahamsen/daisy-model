@@ -39,7 +39,7 @@ struct IM;
 struct AM;
 struct Geometry1D;
 struct Soil;
-struct SoilWater;
+struct SoilWater1D;
 
 class ColumnBase : public Column
 {
@@ -51,7 +51,7 @@ protected:
   Surface surface;
   std::auto_ptr<Geometry1D> geometry;
   std::auto_ptr<Soil> soil;
-  std::auto_ptr<SoilWater> soil_water;
+  std::auto_ptr<SoilWater1D> soil_water;
   SoilHeat1D soil_heat;
   SoilChemicals soil_chemicals;
   std::vector<Chemistry*> chemistry;

@@ -71,23 +71,20 @@ Rootdens_AP::set_density (Treelog& /*msg*/,
           * (-0.5 * sqr (d_m) - 0.5 * sqr (Depth) + d_m * Depth)));
   daisy_assert (L0 >= 0.0);
 
-#ifndef GEO1D
   PLF tip;                      // Linear decrease downto Depth + q;
   tip.add (Depth, L0 * exp (- a * Depth));
   tip.add (d_m, 0.0);
 
+#if 1
   const size_t size = geo.size ();
   for (size_t i = 0; i < size; i++)
     {
       const double d = -geo.z (i);
-      if (i == 0 || d < Depth)
-        Density[i] = L0 * exp (- a * d);
-      else if (d < d_m)
-        Density[i] = tip (d);
-      else
-        Density[i] = 0.0;
+      const double f_top = geo.fraction_in_z_interval (i, 0.0, -Depth);
+      const double f_tip = geo.fraction_in_z_interval (i, -Depth, -d_m);
+      Density[i] = L0 * exp (- a * d) * f_top + tip (d) * f_tip;
     }
-#else // GEO1D
+#else // 0
   daisy_assert (Density.size () == geo.size ());
   unsigned int i = 0;
   // Use GP down to Depth.
@@ -97,18 +94,16 @@ Rootdens_AP::set_density (Treelog& /*msg*/,
       Density[i] = L0 * exp (a * geo.z (i));
     }
   // Linear decrease downto Depth + q;
-  PLF tip;
-  tip.add (Depth, L0 * exp (- a * Depth));
-  tip.add (d_m, 0.0);
   for (; i == 0 || -geo.zplus (i-1) < d_m; i++)
     {
       daisy_assert (i < geo.size ());
+      // BUG: Should this be "+="? pa 2006-04-20.
       Density[i] += tip (-geo.z (i));
     }
   // No roots below.
   for (; i < geo.size (); i++)
     Density[i] = 0.0;
-#endif // GEO1D
+#endif // 0
 }
 
 void 

@@ -20,59 +20,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "select_value.h"
-#include "geometry.h"
+#include "select_flux.h"
 #include "border.h"
 #include "mathlib.h"
-#include <sstream>
-#include "treelog.h"
 
-using namespace std;
-
-struct SelectFluxBottom : public SelectValue
+struct SelectFluxBottom : public SelectFlux
 {
-  // Content.
-  double height;
-  const Geometry* last_geo;
-  const Soil* last_soil;
-  int index;
-
-  // Output routines.
-  void output_array (const vector<double>& array, 
-		     const Geometry* geo, const Soil* soil, Treelog& msg)
-  { 
-    if (soil != last_soil)
-      last_soil = soil;
-
-    if (geo != last_geo)
-      {
-        last_geo = geo;
-        if (height > 0.0) 
-          index = geo->size ();
-        else
-          {
-            index = geo->interval_border (height);
-            if ((index == 0 && height < -1e-8)
-                || !approximate (height, geo->zplus (index-1)))
-              {
-                std::ostringstream tmp;
-                tmp << "Log column " << name 
-                       << ": No interval near to = " << height 
-                       << " [cm]; closest match is " 
-                       << ((index == 0) ? 0 : geo->zplus (index-1))
-                       << " [cm]";
-                msg.warning (tmp.str ());
-              }
-          }
-        daisy_assert (array.size () > index);
-      }
-    add_result (array[index]);
-  }
-
   // Create and Destroy.
-  void initialize (const map<symbol, symbol>& conv, 
+  void initialize (const std::map<symbol, symbol>& conv, 
 		   double default_from, double default_to, 
-		   const string& timestep )
+		   const std::string& timestep)
   {
     Select::initialize (conv, default_from, default_to, timestep);
 
@@ -92,11 +49,7 @@ struct SelectFluxBottom : public SelectValue
     return ok; 
   }
   SelectFluxBottom (Block& al)
-    : SelectValue (al),
-      height (al.number ("to", 1.0)),
-      last_geo (NULL),
-      last_soil (NULL),
-      index (-1)
+    : SelectFlux (al, al.number ("to", 1.0))
   { }
 };
 
@@ -112,8 +65,7 @@ static struct SelectFluxBottomSyntax
     SelectValue::load_syntax (syntax, alist);
 
     alist.add ("description", 
-               "Extract flux at bottom of specified interval.\n\
-By default, log the first member of the sequence.");
+               "Extract flux at bottom of specified interval.");
 
     syntax.add ("to", "cm", Syntax::OptionalConst,
 		"Specify height (negative) to measure interval.\n\

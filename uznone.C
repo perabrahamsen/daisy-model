@@ -29,7 +29,7 @@ using namespace std;
 class UZNone : public UZmodel
 {
 public:
-  bool tick (Treelog&, const Geometry&,
+  bool tick (Treelog&, const Geometry1D&,
              const Soil& /* soil */, const SoilHeat&,
 	     unsigned int first, const Surface& /* top */, 
 	     unsigned int last, const Groundwater& /* bottom */, 

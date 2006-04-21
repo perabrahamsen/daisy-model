@@ -1,7 +1,7 @@
-// soil_water.C
+// select_flux.C --- Shared interface for fluxes. 
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2002 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2002, 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,16 +19,23 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef SELECT_FLUX_H
+#define SELECT_FLUX_H
 
-#include "soil_water.h"
+#include "select_value.h"
 
-void
-SoilWater::load_base (Syntax&, AttributeList&)
-{ }
+struct SelectFlux : public SelectValue
+{
+  // Content.
+  double height;
+  const Geometry* last_geo;
+  const Soil* last_soil;
+  std::vector<int> edges;
 
-SoilWater::SoilWater (Block&)
-{ }
+  // Output routines.
+  void output_array (const std::vector<double>&, 
+                     const Geometry*, const Soil*, Treelog&);
+  SelectFlux (Block&, double height);
+};
 
-SoilWater::~SoilWater ()
-{ }
-
+#endif // SELECT_FLUX_H

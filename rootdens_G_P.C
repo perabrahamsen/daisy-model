@@ -174,16 +174,17 @@ Rootdens_G_P::set_density (Treelog& msg,
 
   const size_t size = geo.size ();
   daisy_assert (Density.size () == size);
-#ifndef GEO1D
+#if 1
   for (size_t i = 0; i < size; i++)
     {
+      const double f = geo.fraction_in_z_interval (i, 0.0, -Depth);
       const double d = -geo.z (i);
-      if (i == 0 || d < Depth)
-        Density[i] = extra + L0 * exp (- a * d);
+      if (f > 0.01)
+        Density[i] = f * (extra + L0 * exp (- a * d));
       else
         Density[i] = 0.0;
     }
-#else // GEO1D
+#else // 0
   unsigned int i = 0;
   for (; i == 0 || -geo.zplus (i-1) < Depth; i++)
     {
@@ -193,7 +194,7 @@ Rootdens_G_P::set_density (Treelog& msg,
 
   for (; i < geo.size (); i++)
     Density[i] = 0.0;
-#endif // GEO1D
+#endif // 0
 }
 
 void 

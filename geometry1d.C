@@ -30,7 +30,69 @@
 #include "assertion.h"
 #include <sstream>
 
-using namespace std;
+double 
+Geometry1D::fraction_in_z_interval (const size_t i, 
+                                    const double from, const double to) const
+{ 
+  daisy_assert (from > to);
+
+  const double zp = zplus (i);
+  const double zm = (i == 0) ? 0.0 : zplus (i-1);
+  daisy_assert (zm > zp);
+
+  if (zp >= from)
+    // Node is fully above interval.
+    return 0.0;
+  if (zm <= to)
+    // Node is fully below interval.
+    return 0.0;
+
+
+  if (zm <= from)
+    {
+      if (zp >= to)
+        // Node is fully within interval.
+        return 1.0;
+      
+      // Node overlap bottom of interval.
+      const double dz1 = zm - zp;
+      daisy_assert (approximate (dz1, dz (i)));
+      const double overlap = zm - to;
+      daisy_assert (overlap > 0.0);
+      daisy_assert (dz1 > overlap);
+      return overlap / dz1;
+    }
+  if (zp >= to)
+    {
+      // Node overlap top of interval.
+      const double dz1 = zm - zp;
+      daisy_assert (approximate (dz1, dz (i)));
+      const double overlap = from - zp;
+      daisy_assert (overlap > 0.0);
+      daisy_assert (dz1 > overlap);
+      return overlap / dz1;
+    }
+
+  // Interval is fully within node.
+  const double dz1 = zm - zp;
+  daisy_assert (approximate (dz1, dz (i)));
+  const double overlap = from - to;
+  daisy_assert (overlap > 0.0);
+  daisy_assert (dz1 > overlap);
+  return overlap / dz1;
+}
+
+bool 
+Geometry1D::edge_cross_z (const size_t e, const double zd) const
+{ 
+  // Positive number means below bottom.
+  if (zd > 0.0)
+    return e == edge_size () - 1;
+
+  const double z_above = (e == 0) ? z (0) + dz (0) : z (e - 1);
+  const double z_below = (e == size ()) ? z (e - 1) - dz (e - 1) : z (e);
+  return zd < z_above && zd > z_below;
+}
 
 bool
 Geometry1D::contain_z (const size_t i, const double z) const
@@ -99,9 +161,9 @@ check_alist (const AttributeList&, Treelog&)
 }
 
 double
-Geometry1D::total (const vector<double>& v) const
+Geometry1D::total (const std::vector<double>& v) const
 {
-  const size_t to = min (v.size (), size ());
+  const size_t to = std::min (v.size (), size ());
   double sum = 0.0;
   for (size_t i = 0; i < to; i++)
     sum += v[i] * dz (i);
@@ -109,7 +171,7 @@ Geometry1D::total (const vector<double>& v) const
 }
 
 double
-Geometry1D::total (const vector<double>& v, 
+Geometry1D::total (const std::vector<double>& v, 
                  const double from, const double to) const
 {
   double amount = 0.0;
@@ -119,7 +181,7 @@ Geometry1D::total (const vector<double>& v,
     {
       if (zplus_[i] < from)
 	{
-	  const double height = (min (old, from) - max (zplus_[i], to));
+	  const double height = (std::min (old, from) - std::max (zplus_[i], to));
 	  amount += v[i] * height;
 	}
       old = zplus_[i];
@@ -128,7 +190,7 @@ Geometry1D::total (const vector<double>& v,
 }
 
 void
-Geometry1D::add (vector<double>& v, const double from, const double to, 
+Geometry1D::add (std::vector<double>& v, const double from, const double to, 
                const double amount) const
 {
   daisy_assert (to < from);
@@ -144,8 +206,8 @@ Geometry1D::add (vector<double>& v, const double from, const double to,
     {
       if (zplus_[i] < from)
 	{
-	  const double top = min (old, from);
-	  const double bottom = max (zplus_[i], to);
+	  const double top = std::min (old, from);
+	  const double bottom = std::max (zplus_[i], to);
 	  daisy_assert (top > bottom);
 	  v[i] += density * (top - bottom) / dz_[i];
 	}
@@ -164,8 +226,8 @@ Geometry1D::add (vector<double>& v, const double from, const double to,
 }
 
 void
-Geometry1D::add (vector<double>& v, const vector<double>& density,
-	       double amount) const
+Geometry1D::add (std::vector<double>& v, const std::vector<double>& density,
+                 double amount) const
 {
   const double old_total = total (v);
   const double total_density = total (density);
@@ -178,7 +240,7 @@ Geometry1D::add (vector<double>& v, const vector<double>& density,
 }
 
 void
-Geometry1D::mix (vector<double>& v, double from, double to) const
+Geometry1D::mix (std::vector<double>& v, double from, double to) const
 {
   const double old_total = total (v);
   add (v, from, to, extract (v, from, to));
@@ -186,10 +248,10 @@ Geometry1D::mix (vector<double>& v, double from, double to) const
 }
 
 void
-Geometry1D::mix (vector<double>& v, const double from, const double to, 
-               vector<double>& change) const
+Geometry1D::mix (std::vector<double>& v, const double from, const double to, 
+               std::vector<double>& change) const
 {
-  const vector<double> old = v;
+  const std::vector<double> old = v;
   mix (v, from, to);
   daisy_assert (v.size () <= change.size ());
   for (size_t i = 0; i < v.size (); i++)
@@ -197,7 +259,7 @@ Geometry1D::mix (vector<double>& v, const double from, const double to,
 }
 
 double
-Geometry1D::extract (vector<double>& v, const double from, const double to) const
+Geometry1D::extract (std::vector<double>& v, const double from, const double to) const
 {
   const double old_total = total (v);
   const size_t last = interval_plus (to);
@@ -211,8 +273,8 @@ Geometry1D::extract (vector<double>& v, const double from, const double to) cons
       daisy_assert (approximate (old - zplus_[i], dz_[i]));
       if (zplus_[i] < from)
 	{
-	  const double top = min (old, from);
-	  const double bottom = max (zplus_[i], to);
+	  const double top = std::min (old, from);
+	  const double bottom = std::max (zplus_[i], to);
 	  daisy_assert (top > bottom);
 	  const double height = top - bottom;
 	  amount += v[i] * height;
@@ -228,7 +290,7 @@ Geometry1D::extract (vector<double>& v, const double from, const double to) cons
 }
 
 void
-Geometry1D::set (vector<double>& v, double from, double to, double amount) const
+Geometry1D::set (std::vector<double>& v, double from, double to, double amount) const
 {
   const size_t last = interval_plus (to);
   while (v.size () <= last)
@@ -240,7 +302,7 @@ Geometry1D::set (vector<double>& v, double from, double to, double amount) const
     {
       if (zplus_[i] < from)
 	{
-	  const double height = (min (old, from) - max (zplus_[i], to));
+	  const double height = (std::min (old, from) - std::max (zplus_[i], to));
 	  v[i] -= v[i] * height / (old - zplus_[i]); // Remove old.
 	  v[i] += density * height; // Add new.
 	}
@@ -249,7 +311,7 @@ Geometry1D::set (vector<double>& v, double from, double to, double amount) const
 }
 
 void
-Geometry1D::swap (vector<double>& v, double from, double middle, double to) const
+Geometry1D::swap (std::vector<double>& v, double from, double middle, double to) const
 {
   
   const double old_total = total (v);
@@ -268,10 +330,10 @@ Geometry1D::swap (vector<double>& v, double from, double middle, double to) cons
 }
 
 void
-Geometry1D::swap (vector<double>& v, double from, double middle, double to, 
-                vector<double>& change) const
+Geometry1D::swap (std::vector<double>& v, double from, double middle, double to, 
+                std::vector<double>& change) const
 {
-  const vector<double> old = v;
+  const std::vector<double> old = v;
   swap (v, from, middle, to);
   daisy_assert (v.size () <= change.size ());
   for (size_t i = 0; i < v.size (); i++)
@@ -279,11 +341,11 @@ Geometry1D::swap (vector<double>& v, double from, double middle, double to,
 }
 
 void 
-Geometry1D::initialize_layer (vector<double>& array, 
-			    const AttributeList& al, 
-			    const string& name, Treelog& out) const
+Geometry1D::initialize_layer (std::vector<double>& array, 
+                              const AttributeList& al, 
+                              const std::string& name, Treelog& out) const
 {
-  const string initial = string ("initial_") + name;
+  const std::string initial = std::string ("initial_") + name;
   daisy_assert (array.size () == 0);
   if (al.check (name))
     // Specified by user.
@@ -291,7 +353,7 @@ Geometry1D::initialize_layer (vector<double>& array,
   else if (al.check (initial))
     {
       // Initialize by layers.
-      const vector<AttributeList*>& layers = al.alist_sequence (initial);
+      const std::vector<AttributeList*>& layers = al.alist_sequence (initial);
       const double soil_end = zplus (size () - 1);
       double last = 0.0;
       for (size_t i = 0; i < layers.size (); i++)
@@ -301,7 +363,7 @@ Geometry1D::initialize_layer (vector<double>& array,
 	  const double value = layers[i]->number ("value");
 	  if (next < soil_end)
 	    {
-	      out.warning (string ("WARNING: initial_") + name 
+	      out.warning (std::string ("WARNING: initial_") + name 
 			   + " layer ends below the last node");
 	      next = soil_end;
 	      i = layers.size ();
@@ -336,7 +398,7 @@ Geometry1D::Geometry1D (Block& al)
 
 void
 Geometry1D::initialize_zplus (const Groundwater& groundwater,
-			    const vector<double>& fixed,
+			    const std::vector<double>& fixed,
 			    const double max_rooting_depth,
 			    const double max_interval,
 			    Treelog& msg)
@@ -385,7 +447,7 @@ Geometry1D::initialize_zplus (const Groundwater& groundwater,
 	      zone_size = 20.0;
 	    }
 
-          zone_size = min (zone_size, (last_fixed - current) / 3.0);
+          zone_size = std::min (zone_size, (last_fixed - current) / 3.0);
 
           if (warn_about_small_intervals && zone_size < 0.99)
             {

@@ -1,7 +1,7 @@
 // geometry1d.h
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2000-2001, 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -42,8 +42,8 @@ class Geometry1D : public Geometry
 
 public:
   // Accessors.
-  inline size_t size () const
-  { return size_; }
+  inline size_t edge_size () const
+  { return size () + 1; }
   inline double zplus (size_t i) const
   { return zplus_[i]; }
   inline double z (size_t i) const
@@ -52,6 +52,8 @@ public:
   { return dz_[i]; }
   inline double volume (size_t i) const
   { return dz_[i] * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
+  double fraction_in_z_interval (size_t i, double from, double to) const;
+  bool edge_cross_z (size_t i, double z) const;
   bool contain_z (size_t i, double z) const;
 
   size_t interval_plus (double z) const;

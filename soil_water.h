@@ -1,7 +1,6 @@
 // soil_water.h
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -23,9 +22,7 @@
 #ifndef SOIL_WATER_H
 #define SOIL_WATER_H
 
-#include "macro.h"		// Must be initialized.
 #include <vector>
-#include <memory>
 
 class AttributeList;
 class Surface;
@@ -36,80 +33,73 @@ class Syntax;
 class Geometry;
 class SoilHeat;
 class Treelog;
+class Block;
 
 class SoilWater
 {
-  // Content.
-  struct Implementation;
-  std::auto_ptr<Implementation> impl;
-
   // Sink.
 public:
-  void clear (const Geometry&);
-  void root_uptake (const std::vector<double>&);
-  void drain (const std::vector<double>&);
-  void freeze (const Soil&, const std::vector<double>&);
+  virtual void clear (const Geometry&) = 0;
+  virtual void root_uptake (const std::vector<double>&) = 0;
+  virtual void drain (const std::vector<double>&) = 0;
+  virtual void freeze (const Soil&, const std::vector<double>&) = 0;
   
   // Queries
 public:
-  double h (size_t i) const;
-  double pF (size_t i) const;
-  double Theta (size_t i) const;
-  double Theta_left (size_t i) const;
-  double Theta_old (size_t i) const;
-  double content (const Geometry&, double from, double to) const; // [cm]
+  virtual double h (size_t i) const = 0;
+  virtual double pF (size_t i) const = 0;
+  virtual double Theta (size_t i) const = 0;
+  virtual double Theta_left (size_t i) const = 0;
+  virtual double Theta_old (size_t i) const = 0;
+  virtual double content (const Geometry&,
+                          double from, double to) const = 0; // [cm]
 #ifndef NEWMOVE
-  double q (size_t i) const;
-  double q_p (size_t i) const;
+  virtual double q (size_t i) const = 0;
+  virtual double q_p (size_t i) const = 0;
 #endif // OLDMOVE
-  double S_sum (size_t i) const;
-  double S_root (size_t i) const;
-  double S_drain (size_t i) const;
-  double S_ice (size_t i) const;
-  double S_p (size_t i) const;
-  double h_ice (size_t i) const;
-  double X_ice (size_t i) const;
-  double X_ice_total (size_t i) const;
+  virtual double S_sum (size_t i) const = 0;
+  virtual double S_root (size_t i) const = 0;
+  virtual double S_drain (size_t i) const = 0;
+  virtual double S_ice (size_t i) const = 0;
+  virtual double S_p (size_t i) const = 0;
+  virtual double h_ice (size_t i) const = 0;
+  virtual double X_ice (size_t i) const = 0;
+  virtual double X_ice_total (size_t i) const = 0;
 
-  size_t first_groundwater_node () const;
+  virtual size_t first_groundwater_node () const = 0;
     
   // Ice modified lookups.
-  double Theta (const Soil&, size_t i, double h) const;
+  virtual double Theta (const Soil&, size_t i, double h) const = 0;
  
   // Simulation.
 public:
-  void macro_tick (const Geometry&, const Soil&, Surface&, Treelog&);
-  void tick (const Geometry& geo,
-             const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
-  void set_external_source (const Geometry&, 
-			    double amount, double from, double to);
-  void incorporate (const Geometry&, double amount, double from, double to);
-  void mix (const Geometry& geo,
-            const Soil&, double from, double to);
-  void swap (Treelog&, const Geometry& geo,
-             const Soil&, double from, double middle, double to);
-  void set_Theta (const Soil& soil, 
-		  size_t from, size_t to, double Theta);
-  bool check (size_t n, Treelog& err) const;
-  void output (Log&) const;
+  virtual void set_external_source (const Geometry&, 
+			    double amount, double from, double to) = 0;
+  virtual void incorporate (const Geometry&, 
+                            double amount, double from, double to) = 0;
+  virtual void mix (const Geometry& geo,
+            const Soil&, double from, double to) = 0;
+  virtual void swap (Treelog&, const Geometry& geo,
+             const Soil&, double from, double middle, double to) = 0;
+  virtual void set_Theta (const Soil& soil, 
+		  size_t from, size_t to, double Theta) = 0;
+  virtual bool check (size_t n, Treelog& err) const = 0;
+  virtual void output (Log&) const = 0;
 
 
   // Communication with surface.
-  double MaxExfiltration (const Geometry& geo,
-                          const Soil&, double T) const;
-
+  virtual double MaxExfiltration (const Geometry& geo,
+                                  const Soil&, double T) const = 0;
+  
   // Communication with external model.
-  void put_h (const Soil& soil, const std::vector<double>& v); // [cm]
-  void get_sink (std::vector<double>& v) const; // [cm^3/cm^3/h]
+  virtual void put_h (const Soil& soil, 
+                      const std::vector<double>& v) = 0; // [cm]
+  virtual void get_sink (std::vector<double>& v) const = 0; // [cm^3/cm^3/h]
 
   // Creation.
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_base (Syntax&, AttributeList&);
   SoilWater (Block&);
-  void initialize (const AttributeList&, 
-		   const Geometry& geo,
-                   const Soil& soil, const Groundwater& groundwater,
-		   Treelog&);
-  ~SoilWater ();
+  virtual ~SoilWater ();
 };
 
 #endif // SOIL_WATER_H

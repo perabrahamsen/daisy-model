@@ -22,7 +22,7 @@
 
 #include "groundwater.h"
 #include "log.h"
-#include "geometry.h"
+#include "geometry1d.h"
 #include "soil.h"
 #include "soil_heat.h"
 #include "soil_water.h"
@@ -86,23 +86,23 @@ public:
 
   // Simulation.
 public:
-  void tick (const Geometry& geo,
+  void tick (const Geometry1D& geo,
              const Soil&, SoilWater&, double,
 	     const SoilHeat&, const Time&, Treelog&);
   void output (Log& log) const;
 
 private:
-  void set_h_aquifer (const Geometry& geo, const Time& time)
+  void set_h_aquifer (const Geometry1D& geo, const Time& time)
   {
     const size_t size = geo.size ();
     const double aquitart_bottom = geo.zplus (size-1) - Z_aquitard_;
     h_aquifer = pressure_table->operator()(time) - aquitart_bottom;
   }
-  double DeepPercolation (const Geometry&);
+  double DeepPercolation (const Geometry1D&);
   double K_to_pipes (const unsigned int i, 
                      const Soil& soil, 
                      const SoilHeat& soil_heat) const;
-  double EquilibriumDrainFlow (const Geometry& geo,
+  double EquilibriumDrainFlow (const Geometry1D& geo,
                                const Soil&, const SoilHeat&);
 
   // Accessors.
@@ -111,7 +111,7 @@ private:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geo, const Time& time, Treelog& msg)
+  void initialize (const Geometry1D& geo, const Time& time, Treelog& msg)
   {
     const int size = geo.size ();
     double largest = 0.0;
@@ -170,7 +170,7 @@ public:
 };
 
 void 
-GroundwaterPipe::tick (const Geometry& geo,
+GroundwaterPipe::tick (const Geometry1D& geo,
                        const Soil& soil, SoilWater& soil_water, 
 		       const double h_surface,
 		       const SoilHeat& soil_heat, const Time& time,
@@ -215,7 +215,7 @@ GroundwaterPipe::tick (const Geometry& geo,
 
 
 double
-GroundwaterPipe::DeepPercolation(const Geometry& geo)
+GroundwaterPipe::DeepPercolation(const Geometry1D& geo)
 {
   const int size = geo.size ();
   daisy_assert (size > 0);
@@ -238,7 +238,7 @@ GroundwaterPipe::K_to_pipes (const unsigned int i,
 }
 
 double
-GroundwaterPipe::EquilibriumDrainFlow (const Geometry& geo,
+GroundwaterPipe::EquilibriumDrainFlow (const Geometry1D& geo,
                                        const Soil& soil, 
 				       const SoilHeat& soil_heat)
 {
