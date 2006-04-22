@@ -21,8 +21,8 @@
 
 
 #include "mactrans.h"
-#include "soil_water.h"
-#include "geometry.h"
+#include "soil_water1d.h"
+#include "geometry1d.h"
 #include "plf.h"
 #include "mathlib.h"
 #include "timestep.h"
@@ -33,12 +33,9 @@ using namespace std;
 struct MactransStandard : public Mactrans
 {
   // Simulation.
- void tick (const Geometry& geo,
-            const SoilWater&,
-	    const vector<double>& M,
-	    const vector<double>& C,
-	    vector<double>& S,
-	    vector<double>& S_p,
+ void tick (const Geometry1D&, const SoilWater1D&,
+	    const vector<double>& M, const vector<double>& C,
+	    vector<double>& S, vector<double>& S_p,
 	    vector<double>& J_p, Treelog&);
   void output (Log&) const
     { }
@@ -52,11 +49,9 @@ struct MactransStandard : public Mactrans
 };
 
 void 
-MactransStandard::tick (const Geometry& geo, const SoilWater& soil_water,
-			const vector<double>& M,
-			const vector<double>& C,
-			vector<double>& S_m,
-			vector<double>& S_p,
+MactransStandard::tick (const Geometry1D& geo, const SoilWater1D& soil_water,
+			const vector<double>& M, const vector<double>& C,
+			vector<double>& S_m, vector<double>& S_p,
 			vector<double>& J_p, Treelog& out)
 { 
   double max_delta_matter = 0.0; // [g/cm^2]

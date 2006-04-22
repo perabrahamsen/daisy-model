@@ -21,9 +21,9 @@
 
 
 #include "transport.h"
-#include "geometry.h"
+#include "geometry1d.h"
 #include "soil.h"
-#include "soil_water.h"
+#include "soil_water1d.h"
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
@@ -36,8 +36,8 @@ class TransportNone : public Transport
 {
   // Simulation.
 public:
-  void tick (Treelog&, const Geometry&,
-             const Soil&, const SoilWater&, const Adsorption&,
+  void tick (Treelog&, const Geometry1D&,
+             const Soil&, const SoilWater1D&, const Adsorption&,
 	     double diffusion_coefficient,
 	     vector<double>& M, 
 	     vector<double>& C,
@@ -55,8 +55,8 @@ public:
 
 void 
 TransportNone::tick (Treelog& msg,
-		     const Geometry& geo,
-                     const Soil& soil, const SoilWater& soil_water,
+		     const Geometry1D& geo,
+                     const Soil& soil, const SoilWater1D& soil_water,
 		     const Adsorption& adsorption, 
 		     const double,
 		     vector<double>& M, 

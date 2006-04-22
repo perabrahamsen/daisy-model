@@ -44,6 +44,8 @@ public:
   // Accessors.
   inline size_t edge_size () const
   { return node_size () + 1; }
+  std::string node_name (const size_t) const;
+  std::string edge_name (const size_t) const;
   inline double zplus (size_t i) const
   { return zplus_[i]; }
   inline double z (size_t i) const

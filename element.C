@@ -29,10 +29,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "timestep.h"
-#include "mactrans.h"
-#include "transport.h"
 #include <string>
-#include <sstream>
 
 void 
 Element::output (Log& log) const
@@ -81,64 +78,6 @@ Element::tick (const size_t node_size,
     {
       S_drain[i] = -soil_water.S_drain (i) * dt * C[i];
       S[i] += S_drain[i];
-    }
-}
-
-void 
-Element::transport (const Geometry& geo, 
-                    const Soil& soil, 
-                    const SoilWater& soil_water, 
-                    Transport& trans,
-                    Transport& reserve,
-                    Transport& last_resort,
-                    Mactrans& mactrans,		
-                    Adsorption& adsorption,
-                    double diffusion_coefficient,
-                    Treelog& msg)
-  {
-  // Flow.
-  const double old_content = geo.total (M);
-  mactrans.tick (geo, soil_water, M, C, S, S_p, J_p, msg);
-
-  try
-    {
-      trans.tick (msg, geo, soil, soil_water, adsorption, 
-		  diffusion_coefficient, 
-		  M, C, S, J);
-    }
-  catch (const char* error)
-    {
-      msg.warning (std::string ("Transport problem: ") + error +
-		   ", trying reserve.");
-      try
-	{
-	  reserve.tick (msg, geo, soil, soil_water, adsorption, 
-			diffusion_coefficient, M, C, S, J);
-	}
-      catch (const char* error)
-	{
-	  msg.warning (std::string ("Reserve transport problem: ") + error
-		       + ", trying last resort.");
-	  last_resort.tick (msg, geo, soil, soil_water, adsorption, 
-			    diffusion_coefficient, M, C, S, J);
-	}
-    }
-  const double new_content = geo.total (M);
-  const double delta_content = new_content - old_content;
-  const double source = geo.total (S);
-  const double in = -J[0];	// No preferential transport, it is 
-  const double out = -J[soil.size ()]; // included in S.
-  const double expected = source + in - out;
-  if (!approximate (delta_content, expected)
-      && new_content < fabs (expected) * 1e10)
-    {
-      std::ostringstream tmp;
-      tmp << __FILE__ << ":" << __LINE__ << ": DOM"
-	  << ": mass balance new - old != source + in - out\n"
-	  << new_content << " - " << old_content << " != " 
-	  << source << " + " << in << " - " << out << " (error "
-	  << (delta_content - expected) << ")";
-      msg.error (tmp.str ());
     }
 }
 

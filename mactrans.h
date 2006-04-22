@@ -26,8 +26,8 @@
 #include "librarian.h"
 #include <vector>
 
-class Geometry;
-class SoilWater;
+class Geometry1D;
+class SoilWater1D;
 class Log;
 
 class Mactrans
@@ -39,7 +39,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Geometry& geo, const SoilWater&,
+  virtual void tick (const Geometry1D& geo, const SoilWater1D&,
 		     const std::vector<double>& M,
 		     const std::vector<double>& C,
 		     std::vector<double>& S,

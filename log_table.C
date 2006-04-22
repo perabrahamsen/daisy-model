@@ -128,23 +128,19 @@ LogTable::common_done (const Time& time)
 			out << array_separator;
 		      if (tag != empty_symbol)
 			out << tag << " @ ";
-		      out << geo->z (j);
+		      out << geo->node_name (j);
 		    }
 		}
 	      else if (geo->edge_size () == size)
 		{
 		  // Flux
-		  double last = 0.0;
-		  
 		  for (unsigned j = 0; j < size; j++)
 		    {
 		      if (j != 0)
 			out << array_separator;
 		      if (tag != empty_symbol)
 			out << tag << " @ ";
-		      out << last;
-		      if (j <  geo->node_size ())
-			last = geo->zplus (j);
+		      out << geo->edge_name (j);
 		    }
 		}
 	      else

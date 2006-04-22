@@ -31,8 +31,6 @@ class Adsorption;
 class Treelog;
 class Syntax;
 class AttributeList;
-class Transport;
-class Mactrans;
 
 class Element
 {
@@ -54,15 +52,6 @@ public:
   void swap (const Geometry&, const Soil&, const SoilWater&, Adsorption&, 
 	     double from, double middle, double to);
   void tick (size_t node_size, const SoilWater& soil_water);
-  void transport (const Geometry&, const Soil& soil, 
-		  const SoilWater& soil_water, 
-		  Transport& trans,
-		  Transport& reserve,
-		  Transport& last_resort,
-		  Mactrans& mactrans,		
-		  Adsorption& adsorption,
-		  double diffusion_coefficient,
-		  Treelog& msg);
   
   // Create and Destroy.
 public:

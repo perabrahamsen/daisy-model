@@ -30,6 +30,27 @@
 #include "assertion.h"
 #include <sstream>
 
+std::string
+Geometry1D::node_name (const size_t n) const
+{
+  std::ostringstream tmp;
+  tmp << z (n);
+  return tmp.str ();
+}
+
+std::string
+Geometry1D::edge_name (const size_t e) const
+{
+  if (e == 0)
+    return "0";
+
+  std::ostringstream tmp;
+  tmp << zplus (e-1);
+  return tmp.str ();
+}
+
+
+
 double 
 Geometry1D::fraction_in_z_interval (const size_t i, 
                                     const double from, const double to) const

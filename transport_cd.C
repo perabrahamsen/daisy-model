@@ -21,9 +21,9 @@
 
 
 #include "transport.h"
-#include "geometry.h"
+#include "geometry1d.h"
 #include "soil.h"
-#include "soil_water.h"
+#include "soil_water1d.h"
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
@@ -43,8 +43,8 @@ private:
   
   // Simulation.
 public:
-  void tick (Treelog&, const Geometry& geo,
-             const Soil&, const SoilWater&, const Adsorption&,
+  void tick (Treelog&, const Geometry1D& geo,
+             const Soil&, const SoilWater1D&, const Adsorption&,
 	     double diffusion_coefficient,
 	     vector<double>& M, 
 	     vector<double>& C,
@@ -68,8 +68,8 @@ TransportCD::output (Log& log) const
 }
 
 void 
-TransportCD::tick (Treelog&, const Geometry& geo,
-                   const Soil& soil, const SoilWater& soil_water,
+TransportCD::tick (Treelog&, const Geometry1D& geo,
+                   const Soil& soil, const SoilWater1D& soil_water,
 		   const Adsorption& adsorption,
 		   const double diffusion_coefficient,
 		   vector<double>& M, 

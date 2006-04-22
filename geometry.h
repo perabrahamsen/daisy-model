@@ -32,8 +32,6 @@ class AttributeList;
 class Treelog;
 class Groundwater;
 
-#define GEO1D
-
 class Geometry
 {
   // Parameters.
@@ -41,7 +39,7 @@ protected:
   size_t size_;		// Number of intervals.
 public:
 
-#ifdef GEO1D
+#if 1
   virtual double zplus (size_t i) const = 0;
   virtual double dz (size_t i) const = 0;
   virtual size_t interval_plus (double z) const = 0;
@@ -52,8 +50,10 @@ public:
   inline size_t node_size () const // Number of nodes.
   { return size_; }
   virtual size_t edge_size () const = 0; // Number of edges.
-  virtual double z (size_t i) const = 0; // Node depth [cm]
-  virtual double volume (size_t i) const = 0; // Node volume [cm^3]
+  virtual std::string node_name (size_t) const = 0; // For array logging.
+  virtual std::string edge_name (size_t) const = 0;
+  virtual double z (size_t) const = 0; // Node depth [cm]
+  virtual double volume (size_t) const = 0; // Node volume [cm^3]
   virtual double fraction_in_z_interval (size_t i, // The fraction of
                                                    // a node volume
                                                    // that is within a

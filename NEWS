@@ -14,7 +14,11 @@ release.
 
 * 4.03
 
-** Lots of restructuration.
+** Lots of restructuring.
+
+In particular, you can no longer choose transport algorithm on a a per
+solute basis.  They are now selected per column, through the new
+Soltrans attribute.
 
 ** Changes slightly the numerical approximation of root density at the tip. 
 
