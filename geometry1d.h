@@ -43,7 +43,7 @@ class Geometry1D : public Geometry
 public:
   // Accessors.
   inline size_t edge_size () const
-  { return size () + 1; }
+  { return node_size () + 1; }
   inline double zplus (size_t i) const
   { return zplus_[i]; }
   inline double z (size_t i) const

@@ -56,11 +56,11 @@ struct SelectInterval : public SelectValue
                    const Soil& soil, const double from, double to)
     {
       if (to > 0.0)
-	to = geo.zplus (geo.size () - 1);
+	to = geo.zplus (geo.node_size () - 1);
       bulk = 0.0;
       double old = 0.0;
 
-      for (unsigned i = 0; i < geo.size () && old > to ; i++)
+      for (size_t i = 0; i < geo.node_size () && old > to ; i++)
 	{
 	  const double zplus = geo.zplus (i);
 	  if (zplus < from)
@@ -102,7 +102,7 @@ struct SelectInterval : public SelectValue
           result = geo->total (array);
 	else
 	  {
-	    to = geo->zplus (geo->size () - 1);
+	    to = geo->zplus (geo->node_size () - 1);
 	    result = geo->total (array, from, to);
 	  }
       }
@@ -115,7 +115,7 @@ struct SelectInterval : public SelectValue
           bd_convert->set_bulk (*geo, *soil, from, to);
         if (density_factor < 0.0)
           density_factor = 1.0 / (from - (to > 0 
-                                          ? geo->zplus (geo->size () - 1)
+                                          ? geo->zplus (geo->node_size () - 1)
                                           : to));
       }
     add_result (result);

@@ -126,7 +126,7 @@ Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
 			   const double index, const double z_factor, 
 			   const double max_depth)
 { 
-  daisy_assert (abs_dens.size () == geo.size ());
+  daisy_assert (abs_dens.size () == geo.node_size ());
 
   // Find entries before and after current index.
   const Entry* before = NULL;
@@ -146,13 +146,13 @@ Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
   if (before == NULL)
     {				// Current index is after last entry.
       daisy_assert (after != NULL);
-      for (unsigned int i = 0; i < geo.size (); i++)
+      for (size_t i = 0; i < geo.node_size (); i++)
 	abs_dens[i] = after->density (geo.z (i) * z_factor);
     }
   else if (after == NULL)
     {				// Current index is before first entry.
       daisy_assert (before != NULL);
-      for (unsigned int i = 0; i < geo.size (); i++)
+      for (size_t i = 0; i < geo.node_size (); i++)
 	abs_dens[i] = before->density (geo.z (i) * z_factor);
     }
   else
@@ -163,7 +163,7 @@ Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
 
       const double rel_dist 
 	= (index - before->index) / (after->index - before->index);
-      for (unsigned int i = 0; i < geo.size (); i++)
+      for (size_t i = 0; i < geo.node_size (); i++)
 	{
 	  const double z = geo.z (i) * z_factor;
 	  if (z < max_depth || i == 1)

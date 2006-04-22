@@ -49,7 +49,7 @@ public:
 #endif
 
   // Accessors.
-  inline size_t size () const // Number of nodes.
+  inline size_t node_size () const // Number of nodes.
   { return size_; }
   virtual size_t edge_size () const = 0; // Number of edges.
   virtual double z (size_t i) const = 0; // Node depth [cm]
@@ -73,7 +73,7 @@ public:
     double total_volume = 0.0;
     double total_content = 0.0;
   
-    for (size_t i = 0; i < this->size (); i++)
+    for (size_t i = 0; i < this->node_size (); i++)
       if (this->contain_z (i, z))
         {
           const double volume = this->volume (i);

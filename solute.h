@@ -25,8 +25,6 @@
 
 // These must be included in the header file, for 'load_syntax' to work.
 #include "adsorption.h"
-#include "transport.h"
-#include "mactrans.h"
 #include "timestep.h"
 #include <string>
 #include <memory>
@@ -42,6 +40,7 @@ class Solute
 {
   const std::string submodel;	// Derived submodel.
 
+  friend class Soltrans1D;
   // State variables.
 protected:
   std::vector<double> M_;		// Concentration in soil [g / cm³]
@@ -57,10 +56,6 @@ protected:
   std::vector<double> S_root;	// Root uptake source term (negative).
   std::vector<double> J;		// Solute transport log in matrix.
   std::vector<double> J_p;		// Solute transport log in macropores.
-  std::auto_ptr<Transport> transport; // Solute transport model in matrix.
-  std::auto_ptr<Transport> reserve; // Reserve solute transport model in matr.
-  std::auto_ptr<Transport> last_resort; // Last resort solute transport model.
-  std::auto_ptr<Mactrans> mactrans; // Solute transport model in macropores.
   std::auto_ptr<Adsorption> adsorption;	// Solute adsorption.
 private:
   std::vector<double> tillage;       // Changes during tillage.
@@ -91,9 +86,8 @@ public:
   void add_to_root_sink (const std::vector<double>&);
 
   // Simulation.
+  void tick (const size_t node_size, const SoilWater&);
 public:
-  void tick (const Geometry& geo,
-             const Soil&, const SoilWater&, double J_in, Treelog&);
   bool check (unsigned n, Treelog& err) const;
   virtual void output (Log&) const;
   void incorporate (const Geometry&, double amount, double from, double to);
@@ -102,7 +96,8 @@ public:
   void mix (const Geometry& geo,
             const Soil&, const SoilWater&, double from, double to);
   void swap (const Geometry& geo,
-             const Soil&, const SoilWater&, double from, double middle, double to);
+             const Soil&, const SoilWater&,
+             double from, double middle, double to);
 
   // Communication with external model.
   void put_M (const Soil& soil, const SoilWater& soil_water,

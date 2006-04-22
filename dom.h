@@ -24,10 +24,7 @@
 
 // These must be included in the header file, for 'load_syntax' to work.
 #include "adsorption.h"
-#include "transport.h"
-#include "mactrans.h"
 #include "plf.h"
-#include "smb.h"
 #include <memory>
 
 struct Log;
@@ -36,21 +33,20 @@ struct AttributeList;
 struct Geometry;
 struct Soil;
 struct SoilWater;
+struct Element;
+struct Adsorption;
+struct SMB;
+struct OM;
 
 class DOM
 { 
   // Content.
-  class Element;
-  friend class Element;
+public:
   Element& C;
   Element& N;
 
   // Transport.
-private:
-  std::auto_ptr<Transport> trans; // Solute transport model in matrix.
-  std::auto_ptr<Transport> reserve; // Reserve solute transport model in matr.
-  std::auto_ptr<Transport> last_resort; // Last resort solute transport model.
-  std::auto_ptr<Mactrans> mactrans; // Solute transport model in macropores.
+public:
   std::auto_ptr<Adsorption> adsorption;	// Solute adsorption.
   const double diffusion_coefficient;
 
@@ -88,8 +84,6 @@ private:
   void tock (unsigned int end,
 	     const double* factor, double fraction, double efficiency,
 	     const double* N_soil, double* N_used, double* CO2, OM& om);
-public:
-  void transport (const Geometry&, const Soil&, const SoilWater&, Treelog&);
 
   // Create & Destroy.
 public:

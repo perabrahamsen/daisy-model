@@ -87,7 +87,7 @@ TransportConvection::tick (Treelog& msg,
   const vector<double> M_prev = M;
 
   // Number of soil layers.
-  const unsigned int size = geo.size ();
+  const size_t size = geo.node_size ();
 
   // Remember old content
   const double old_total = geo.total (M) + geo.total (S) * dt;

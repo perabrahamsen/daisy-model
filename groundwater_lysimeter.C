@@ -50,7 +50,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (const Geometry1D& geo, const Time&, Treelog&)
-  { location = geo.zplus (geo.size () - 1); }
+  { location = geo.zplus (geo.node_size () - 1); }
 
   GroundwaterLysimeter (Block& al)
     : Groundwater (al),

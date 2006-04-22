@@ -119,7 +119,7 @@ LogTable::common_done (const Time& time)
 
 	  if (geo && size >= 0)
 	    {
-	      if (geo->size () == size)
+	      if (geo->node_size () == size)
 		{
 		  // Content.
 		  for (unsigned j = 0; j < size; j++)
@@ -131,7 +131,7 @@ LogTable::common_done (const Time& time)
 		      out << geo->z (j);
 		    }
 		}
-	      else if (geo->size () + 1 == size)
+	      else if (geo->edge_size () == size)
 		{
 		  // Flux
 		  double last = 0.0;
@@ -143,7 +143,7 @@ LogTable::common_done (const Time& time)
 		      if (tag != empty_symbol)
 			out << tag << " @ ";
 		      out << last;
-		      if (j <  geo->size ())
+		      if (j <  geo->node_size ())
 			last = geo->zplus (j);
 		    }
 		}

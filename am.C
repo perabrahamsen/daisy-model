@@ -317,11 +317,11 @@ AM::Implementation::add (const Geometry& geo,
   const double old_C = total_C (geo) + other.total_C (geo);
   const double old_N = total_N (geo) + other.total_N (geo);
 
-  vector<double> cc (geo.size (), 0.0);
-  vector<double> nn (geo.size (), 0.0);
+  vector<double> cc (geo.node_size (), 0.0);
+  vector<double> nn (geo.node_size (), 0.0);
   other.pour (cc, nn);
 
-  for (unsigned int at = 0; at < geo.size (); at++)
+  for (unsigned int at = 0; at < geo.node_size (); at++)
     {
       vector<double> om_C (om.size (), 0.0);
       vector<double> om_N (om.size (), 0.0);
@@ -990,8 +990,8 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
       daisy_assert (depth < 0.0);
 
       // Calculate density.
-      vector<double> density (geo.size (), 0.0);
-      for (unsigned int i = 0; i < geo.size (); i++)
+      vector<double> density (geo.node_size (), 0.0);
+      for (unsigned int i = 0; i < geo.node_size (); i++)
         if (geo.z (i) > depth)
           density[i] = k * exp (k * geo.z (i));
 

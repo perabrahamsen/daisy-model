@@ -90,7 +90,7 @@ Geometry1D::edge_cross_z (const size_t e, const double zd) const
     return e == edge_size () - 1;
 
   const double z_above = (e == 0) ? z (0) + dz (0) : z (e - 1);
-  const double z_below = (e == size ()) ? z (e - 1) - dz (e - 1) : z (e);
+  const double z_below = (e == node_size ()) ? z (e - 1) - dz (e - 1) : z (e);
   return zd < z_above && zd > z_below;
 }
 
@@ -138,7 +138,7 @@ Geometry1D::check_border (const double border, Treelog& err) const
 {
   bool ok = false;
 
-  for (size_t i = 0; i < size (); i++)
+  for (size_t i = 0; i < node_size (); i++)
     if (approximate (border, zplus (i)))
       ok = true;
 
@@ -163,7 +163,7 @@ check_alist (const AttributeList&, Treelog&)
 double
 Geometry1D::total (const std::vector<double>& v) const
 {
-  const size_t to = std::min (v.size (), size ());
+  const size_t to = std::min (v.size (), node_size ());
   double sum = 0.0;
   for (size_t i = 0; i < to; i++)
     sum += v[i] * dz (i);
@@ -232,7 +232,7 @@ Geometry1D::add (std::vector<double>& v, const std::vector<double>& density,
   const double old_total = total (v);
   const double total_density = total (density);
   daisy_assert (total_density > 0.0);
-  for (size_t i = 0; i <= size (); i++)
+  for (size_t i = 0; i <= node_size (); i++)
     if (density.size () > i)
       v[i] += amount * density[i] / total_density;
 
@@ -354,7 +354,7 @@ Geometry1D::initialize_layer (std::vector<double>& array,
     {
       // Initialize by layers.
       const std::vector<AttributeList*>& layers = al.alist_sequence (initial);
-      const double soil_end = zplus (size () - 1);
+      const double soil_end = zplus (node_size () - 1);
       double last = 0.0;
       for (size_t i = 0; i < layers.size (); i++)
 	{

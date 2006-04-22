@@ -20,6 +20,9 @@
 
 
 #include "dom.h"
+#include "element.h"
+#include "smb.h"
+#include "om.h"
 #include "geometry.h"
 #include "submodel.h"
 #include "alist.h"
@@ -28,213 +31,14 @@
 #include "soil_water.h"
 #include "log.h"
 #include "check.h"
-#include "mathlib.h"
-#include "timestep.h"
-#include <sstream>
 
 using namespace std;
-
-class DOM::Element
-{
-  // Content.
-public:
-  vector<double> M;		// Concentration in soil [g / cm³]
-  vector<double> C;		// Concentration in soil solution [g / cm³]
-  vector<double> S;		// Combined source term.
-  vector<double> S_p;		// Source term for macropores only.
-  vector<double> S_drain;	// Source term for soil drainage only.
-  vector<double> J;		// Solute transport log in matrix.
-  vector<double> J_p;		// Solute transport log in macropores.
-
-  // Simulation.
-public:
-  void output (Log&) const;
-  void mix (const Geometry&, const Soil&, const SoilWater&, Adsorption&,
-	    double from, double to);
-  void swap (const Geometry&, const Soil&, const SoilWater&, Adsorption&, 
-	     double from, double middle, double to);
-  void transport (const Geometry&, const Soil& soil, 
-		  const SoilWater& soil_water, 
-		  Transport& trans,
-		  Transport& reserve,
-		  Transport& last_resort,
-		  Mactrans& mactrans,		
-		  Adsorption& adsorption,
-		  double diffusion_coefficient,
-		  Treelog& msg);
-  
-  // Create and Destroy.
-public:
-  static Submodel::Register dom_element_submodel;
-  static void load_syntax (Syntax&, AttributeList&);
-  void initialize (const Soil&, const SoilWater&, Adsorption&, Treelog&);
-  Element (const AttributeList& al);
-  ~Element ();
-};
-
-void 
-DOM::Element::output (Log& log) const
-{
-  output_variable (M, log);
-  output_variable (C, log);
-  output_variable (S, log);
-  output_variable (S_p, log);
-  output_variable (S_drain, log);
-  output_variable (J, log);
-  output_variable (J_p, log);
-}
-
-void 
-DOM::Element::mix (const Geometry& geo, 
-                   const Soil& soil, const SoilWater& soil_water, 
-		   Adsorption& adsorption,
-		   double from, double to)
-{
-  geo.mix (M, from, to);
-  for (unsigned int i = 0; i < C.size (); i++)
-    C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
-}
-
-void 
-DOM::Element::swap (const Geometry& geo, 
-                    const Soil& soil, const SoilWater& soil_water,
-		    Adsorption& adsorption,
-		    double from, double middle, double to)
-{
-  geo.swap (M, from, middle, to);
-  for (unsigned int i = 0; i < C.size (); i++)
-    C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
-}
-
-void 
-DOM::Element::transport (const Geometry& geo, 
-                         const Soil& soil, 
-			 const SoilWater& soil_water, 
-			 Transport& trans,
-			 Transport& reserve,
-			 Transport& last_resort,
-			 Mactrans& mactrans,		
-			 Adsorption& adsorption,
-			 double diffusion_coefficient,
-			 Treelog& msg)
-{
-  // Initialize.
-  fill (S_p.begin (), S_p.end (), 0.0);
-  fill (J_p.begin (), J_p.end (), 0.0);
-
-  // Drainage.
-  for (unsigned int i = 0; i < geo.size (); i++)
-    {
-      S_drain[i] = -soil_water.S_drain (i) * dt * C[i];
-      S[i] += S_drain[i];
-    }
-
-  // Flow.
-  const double old_content = geo.total (M);
-  mactrans.tick (geo, soil_water, M, C, S, S_p, J_p, msg);
-
-  try
-    {
-      trans.tick (msg, geo, soil, soil_water, adsorption, 
-		  diffusion_coefficient, 
-		  M, C, S, J);
-    }
-  catch (const char* error)
-    {
-      msg.warning (string ("Transport problem: ") + error +
-		   ", trying reserve.");
-      try
-	{
-	  reserve.tick (msg, geo, soil, soil_water, adsorption, 
-			diffusion_coefficient, M, C, S, J);
-	}
-      catch (const char* error)
-	{
-	  msg.warning (string ("Reserve transport problem: ") + error
-		       + ", trying last resort.");
-	  last_resort.tick (msg, geo, soil, soil_water, adsorption, 
-			    diffusion_coefficient, M, C, S, J);
-	}
-    }
-  const double new_content = geo.total (M);
-  const double delta_content = new_content - old_content;
-  const double source = geo.total (S);
-  const double in = -J[0];	// No preferential transport, it is 
-  const double out = -J[soil.size ()]; // included in S.
-  const double expected = source + in - out;
-  if (!approximate (delta_content, expected)
-      && new_content < fabs (expected) * 1e10)
-    {
-      std::ostringstream tmp;
-      tmp << __FILE__ << ":" << __LINE__ << ": DOM"
-	  << ": mass balance new - old != source + in - out\n"
-	  << new_content << " - " << old_content << " != " 
-	  << source << " + " << in << " - " << out << " (error "
-	  << (delta_content - expected) << ")";
-      msg.error (tmp.str ());
-    }
-}
-
-void 
-DOM::Element::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  // Submodel.
-  alist.add ("submodel", "DOM-Element");
-  alist.add ("description", "\
-A single element in a Dissolved Organic Matter pool.");
-
-  // Content.
-  syntax.add ("M", "g/cm^3", Syntax::State, Syntax::Sequence,
-	      "Mass in water and soil.");
-  syntax.add ("C", "g/cm^3", Syntax::LogOnly, Syntax::Sequence,
-	      "Concentration in water.");
-  syntax.add ("S", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Combined source term.");
-  syntax.add ("S_p", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Source term (macropore transport only).");
-  syntax.add ("S_drain", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Source term (soil drainage only).");
-  syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Transportation in matrix (positive up).");
-  syntax.add ("J_p", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Transportation in macropores (positive up).");
-}
-
-void 
-DOM::Element::initialize (const Soil& soil, const SoilWater& soil_water,
-			  Adsorption& adsorption, Treelog& msg)
-{
-  if (soil.size () >= M.size ())
-    M.insert (M.end (), soil.size () - M.size (), 0.0);
-  else
-    msg.warning ("Too many elements of M in DOM pool");
-
-  for (unsigned int i = C.size (); i < M.size (); i++)
-    C.push_back (adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]));
-
-  S.insert (S.begin (), soil.size (), 0.0);
-  S_p.insert (S_p.begin (), soil.size (), 0.0);
-  S_drain.insert (S_drain.begin (), soil.size (), 0.0);
-  J.insert (J_p.begin (), soil.size () + 1, 0.0);
-  J_p.insert (J_p.begin (), soil.size () + 1, 0.0);
-}
-
-DOM::Element::Element (const AttributeList& al)
-  : M (al.number_sequence ("M"))
-{ }
-
-DOM::Element::~Element ()
-{ }
-
-Submodel::Register 
-DOM::Element::dom_element_submodel ("DOM-Element", DOM::Element::load_syntax);
 
 void 
 DOM::output (Log& log) const
 {
   output_submodule (C, "C", log);
   output_submodule (N, "N", log);
-  output_derived (trans, "transport", log);
   output_derived (adsorption, "adsorption", log);
 }
 
@@ -367,20 +171,6 @@ DOM::tock (unsigned int end,
 }
 
 void 
-DOM::transport (const Geometry& geo, 
-                const Soil& soil, const SoilWater& soil_water, Treelog& msg)
-{
-  C.transport (geo, soil, soil_water, 
-	       *trans, *reserve, *last_resort, *mactrans, 
-	       *adsorption, diffusion_coefficient,
-	       msg);
-  N.transport (geo, soil, soil_water, 
-	       *trans, *reserve, *last_resort, *mactrans, 
-	       *adsorption, diffusion_coefficient,
-	       msg);
-}
-
-void 
 DOM::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   // Submodel.
@@ -391,34 +181,12 @@ A single Dissolved Organic Matter pool.");
   // Content.
   syntax.add_submodule ("C", alist, Syntax::State,
 			"Carbon content of DOM pool.",
-			DOM::Element::load_syntax);
+			Element::load_syntax);
   syntax.add_submodule ("N", alist, Syntax::State,
 			"Nitrogen content of DOM pool.",
-			DOM::Element::load_syntax);
+			Element::load_syntax);
 
   // Transport
-  syntax.add ("transport", Librarian<Transport>::library (), 
-	      "Solute transport model in matrix.");
-  AttributeList cd;
-  cd.add ("type", "cd");
-  cd.add ("max_time_step_reductions", 20);
-  alist.add ("transport", cd);
-  syntax.add ("reserve", Librarian<Transport>::library (),
-	      "Reserve transport model if the primary model fails.");
-  AttributeList convection;
-  convection.add ("type", "convection");
-  convection.add ("max_time_step_reductions", 10);
-  alist.add ("reserve", convection);
-  syntax.add ("last_resort", Librarian<Transport>::library (),
-	      "Last resort transport model if the reserve model fails.");
-  AttributeList none;
-  none.add ("type", "none");
-  alist.add ("last_resort", none);
-  syntax.add ("mactrans", Librarian<Mactrans>::library (), 
-	      "Solute transport model in macropores.");
-  AttributeList mactrans;
-  mactrans.add ("type", "default");
-  alist.add ("mactrans", mactrans);
   syntax.add ("adsorption", Librarian<Adsorption>::library (), 
 	      "Soil adsorption properties.");
   syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
@@ -453,10 +221,6 @@ DOM::initialize (const Soil& soil, const SoilWater& soil_water, Treelog& msg)
 DOM::DOM (Block& al)
   : C (*new Element (al.alist ("C"))),
     N (*new Element (al.alist ("N"))),
-    trans (Librarian<Transport>::build_item (al, "transport")),
-    reserve (Librarian<Transport>::build_item (al, "reserve")),
-    last_resort (Librarian<Transport>::build_item (al, "last_resort")),
-    mactrans  (Librarian<Mactrans>::build_item (al, "mactrans")),
     adsorption (Librarian<Adsorption>::build_item (al, "adsorption")),
     diffusion_coefficient (al.number ("diffusion_coefficient")),
     turnover_rate (al.check ("turnover_rate")

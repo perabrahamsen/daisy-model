@@ -192,7 +192,7 @@ struct OrganicMatter::Implementation
   void tick (const Geometry& geo,
              const Soil&, const SoilWater&, const SoilHeat&,
 	     SoilNO3&, SoilNH4&, Treelog& msg);
-  void transport (const Geometry&, const Soil&, const SoilWater&, Treelog&);
+  void transport (const Soil&, const SoilWater&, Treelog&);
   void mix (const Geometry&, const Soil&, const SoilWater&, 
 	    double from, double to, double penetration,
 	    const Time& time);
@@ -740,7 +740,7 @@ OrganicMatter::Implementation::water_turnover_factor (double h) const
 void
 OrganicMatter::Implementation::Buffer::initialize (const Geometry& geo)
 { 
-  const unsigned int size = geo.size ();
+  const unsigned int size = geo.node_size ();
   // Make sure the vectors are large enough.
   while (N.size () < size)
     N.push_back (0.0);
@@ -786,7 +786,7 @@ OrganicMatter::Implementation::output (Log& log,
       || log.check_leaf (total_C_symbol)
       || log.check_leaf (humus_symbol))
     {
-      const int size = geo.size ();
+      const int size = geo.node_size ();
 
       vector<double> total_N (size, 0.0);
       vector<double> total_C (size, 0.0);
@@ -1273,16 +1273,12 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
 }
       
 void 
-OrganicMatter::Implementation::transport (const Geometry& geo,
-                                          const Soil& soil, 
+OrganicMatter::Implementation::transport (const Soil& soil, 
 					  const SoilWater& soil_water, 
 					  Treelog& msg)
 {
   for (size_t j = 0; j < domsorp.size (); j++)
     domsorp[j]->tick (soil, soil_water, dom, som, msg);
-
-  for (unsigned int j = 0; j < dom.size (); j++)
-    dom[j]->transport (geo, soil, soil_water, msg);
 }
 
 void 
@@ -2202,7 +2198,7 @@ OrganicMatter::Implementation::top_summary (const Geometry& geo,
   double input = 0.0;
   double last = 0.0;
   for (unsigned int lay = 0; 
-       lay < geo.size () && geo.z (lay) > init.end;
+       lay < geo.node_size () && geo.z (lay) > init.end;
        lay++)
     {
       const double next = max (init.end, geo.zplus (lay));
@@ -2642,10 +2638,14 @@ OrganicMatter::tick (const Geometry& geo,
 { impl->tick (geo, soil, soil_water, soil_heat, soil_NO3, soil_NH4, msg); }
 
 void 
-OrganicMatter::transport (const Geometry& geo, const Soil& soil, 
+OrganicMatter::transport (const Soil& soil, 
 			  const SoilWater& soil_water, 
 			  Treelog& msg)
-{ impl->transport (geo, soil, soil_water, msg); }
+{ impl->transport (soil, soil_water, msg); }
+
+const vector<DOM*>&
+OrganicMatter::dom () const
+{ return impl->dom; }
 
 void 
 OrganicMatter::mix (const Geometry& geo, const Soil& soil,

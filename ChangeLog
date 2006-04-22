@@ -1,8 +1,24 @@
+2006-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* element.h, element.C: Extracted from 'dom.C'.
+	* Makefile (SUBMODELS): Added.
+
 2006-04-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* select_flux.h: New interface.
-	* Makefile (SPECIALS): Add it.
+	* soltrans1d.C, soltrans1d.h: New submodel.
+	* Makefile (SUBMODELS): Added it.
+	* column_base.C: Use it.
+	* column_base.C, column_base.h (tick_base_soil_chemicals): New
+	function. 
+	* column_std.C, column_inorganic.C: Update derived.
+	* solute.C: Remove transport.
 
+	* all: Changed 'Geometry::size' to 'Geometry::node_size'.
+
+	* select_flux.h, select_flux.C: New interface.
+	* Makefile (SPECIALS): Add it.
+	* select_flux_top.C, select_flux_bottom.C: Use it.
+	
 2006-04-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* geometry1d.h, geometry1d.C, geometry.h (fraction_in_z_interval)

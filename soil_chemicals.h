@@ -25,6 +25,7 @@
 
 // These must be included in the header file, for 'load_syntax' to work.
 #include "soil_chemical.h"
+#include <map>
 
 struct Soil;
 struct SoilWater;
@@ -41,9 +42,12 @@ class SoilChemicals
 private:
   struct Implementation;
   Implementation& impl;
+public:
+  typedef std::map<symbol, SoilChemical*> SoluteMap;
 
   // Simulation.
 public:
+  const SoluteMap& all () const;
   SoilChemical& find (const Geometry& geo,
                       const Soil& soil, 
 		      const SoilWater& soil_water,

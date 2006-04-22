@@ -403,7 +403,7 @@ CropSimple::total_C () const
 void
 CropSimple::initialize (Treelog&, const Geometry& geo, OrganicMatter*)
 {
-  root_system->initialize (geo.size ());
+  root_system->initialize (geo.node_size ());
   CropCAI ();
 }
 

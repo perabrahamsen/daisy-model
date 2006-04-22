@@ -28,12 +28,14 @@
 #include "bioclimate.h"
 #include "weather.h"
 #include "groundwater.h"
+#include "soltrans1d.h"
 #include "soil_NH4.h"
 #include "soil_NO3.h"
 #include "organic_matter.h"
 #include "denitrification.h"
 #include "im.h"
 #include "am.h"
+#include "dom.h"
 #include "time.h"
 #include "log.h"
 #include "submodeler.h"
@@ -444,11 +446,7 @@ ColumnStandard::tick (Treelog& out,
 		      const Time& time, const Weather* global_weather)
 {
   // Base log.
-  tick_base (out);
-
-  // Weather.
-  if (weather)
-    weather->tick (time, out);
+  tick_base (out, time);
   const Weather& my_weather = *(weather ? weather : global_weather);
 
   // Early calculation.
@@ -474,6 +472,8 @@ ColumnStandard::tick (Treelog& out,
   denitrification.tick (active_size, 
                         *geometry, *soil, *soil_water, soil_heat, soil_NO3, 
 			*organic_matter);
+
+  
   groundwater->tick (*geometry, *soil,
                      *soil_water, surface.h (), soil_heat, time, out);
 
@@ -483,9 +483,24 @@ ColumnStandard::tick (Treelog& out,
   soil_chemicals.tick (*geometry, *soil, *soil_water, soil_heat,
                        organic_matter.get (),
 		       surface.chemicals_down (), out);
-  organic_matter->transport (*geometry, *soil, *soil_water, out);
-  soil_NO3.tick (*geometry, *soil, *soil_water, surface.matter_flux ().NO3, out);
-  soil_NH4.tick (*geometry, *soil, *soil_water, surface.matter_flux ().NH4, out);
+  tick_base_soil_chemicals (out);
+  organic_matter->transport (*soil, *soil_water, out);
+  const std::vector<DOM*>& dom = organic_matter->dom ();
+  for (size_t i = 0; i < dom.size (); i++)
+    {
+      soltrans->element (*geometry, *soil, *soil_water,
+                         dom[i]->C, 
+                         *dom[i]->adsorption, dom[i]->diffusion_coefficient, 
+                         out);
+      soltrans->element (*geometry, *soil, *soil_water,
+                         dom[i]->N, 
+                         *dom[i]->adsorption, dom[i]->diffusion_coefficient, 
+                         out);
+    }
+  soltrans->solute (*geometry, *soil, *soil_water, surface.matter_flux ().NO3, 
+                    soil_NO3, out);
+  soltrans->solute (*geometry, *soil, *soil_water, surface.matter_flux ().NH4, 
+                    soil_NH4, out);
   
   // Once a month we clean up old AM from organic matter.
   if (time.hour () == 13 && time.mday () == 13)
@@ -616,10 +631,10 @@ static struct ColumnStandardSyntax
     Librarian<Column>::add_type ("default", alist, syntax, &make);
 
     syntax.add_submodule ("SoilNH4", alist, Syntax::State,
-			  "Ammonium transport and adsorption in soil.",
+			  "Ammonium content in soil.",
 			  SoilNH4::load_syntax);
     syntax.add_submodule ("SoilNO3", alist, Syntax::State,
-			  "Nitrate transport in soil.",
+			  "Nitrate content in soil.",
 			  SoilNO3::load_syntax);
     syntax.add_submodule ("OrganicMatter", alist, Syntax::State, "\
 The organic matter in the soil and on the surface.",

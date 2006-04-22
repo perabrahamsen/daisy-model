@@ -617,7 +617,7 @@ CropSold::Variables::~Variables ()
 void
 CropSold::initialize (Treelog&, const Geometry& geo, OrganicMatter*)
 {
-  unsigned int size = geo.size ();
+  size_t size = geo.node_size ();
 
   // Fill rootsys arrays.
   var.RootSys.Density.insert (var.RootSys.Density.end (),
@@ -1569,7 +1569,7 @@ CropSold::RootDensity (const Geometry& geo)
   
   vector<double>& d = var.RootSys.Density;
   
-  for (unsigned int i = 0; i < geo.size (); i++)
+  for (size_t i = 0; i < geo.node_size (); i++)
     if (i == 0 || -geo.z(i) < RootSys.Depth)
       d[i] = L0 * exp (a * geo.z (i));
     else

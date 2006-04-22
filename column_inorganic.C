@@ -150,11 +150,7 @@ ColumnInorganic::tick (Treelog& out,
 		       const Time& time, const Weather* global_weather)
 {
   // Base log.
-  tick_base (out);
-
-  // Weather.
-  if (weather)
-    weather->tick (time, out);
+  tick_base (out, time);
   const Weather& my_weather = *(weather ? weather : global_weather);
 
   // Early calculation.
@@ -175,6 +171,7 @@ ColumnInorganic::tick (Treelog& out,
   soil_water->tick (*geometry, *soil, soil_heat,surface, *groundwater, out);
   soil_chemicals.tick (*geometry, *soil, *soil_water, soil_heat, NULL, 
 		       surface.chemicals_down (), out);
+  tick_base_soil_chemicals (out);
 }
 
 bool 

@@ -55,13 +55,13 @@ struct SelectContent : public SelectValue
         else
           {
             // Find first node below height.
-            for (ib = 0; ib < geo->size () && geo->z (ib) > height; ib++)
+            for (ib = 0; ib < geo->node_size () && geo->z (ib) > height; ib++)
               /* do nothing */;
             zb = geo->z (ib);
         
             // Find first node above height.
-            daisy_assert (geo->size () > 0);
-            for (ia = geo->size () - 1; ia >= 0 && geo->z (ia) < height; ia--)
+            daisy_assert (geo->node_size () > 0);
+            for (ia = geo->node_size () - 1; ia >= 0 && geo->z (ia) < height; ia--)
               /* do nothing */;
             za = geo->z (ia);
 

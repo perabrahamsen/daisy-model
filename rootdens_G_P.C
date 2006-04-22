@@ -172,7 +172,7 @@ Rootdens_G_P::set_density (Treelog& msg,
 	}
     }
 
-  const size_t size = geo.size ();
+  const size_t size = geo.node_size ();
   daisy_assert (Density.size () == size);
 #if 1
   for (size_t i = 0; i < size; i++)

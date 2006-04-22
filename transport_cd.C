@@ -84,7 +84,7 @@ TransportCD::tick (Treelog&, const Geometry& geo,
   const vector<double> M_prev = M;
 
   // Constants.
-  const unsigned int size = geo.size (); // Number of soil layers.
+  const size_t size = geo.node_size (); // Number of soil layers.
 
   // Check that incomming C and M makes sense.
   for (unsigned int i = 0; i < size; i++)

@@ -21,12 +21,15 @@
 
 #include "column_base.h"
 #include "geometry1d.h"
+#include "soltrans1d.h"
 #include "soil.h"
 #include "soil_water1d.h"
 #include "weather.h"
 #include "vegetation.h"
 #include "bioclimate.h"
 #include "groundwater.h"
+#include "soil_chemicals.h"
+#include "chemicals.h"
 #include "chemistry.h"
 #include "log.h"
 #include "submodeler.h"
@@ -372,12 +375,36 @@ ColumnBase::check_border (const double border, Treelog& err) const
 }
 
 void
-ColumnBase::tick_base (Treelog& msg)
+ColumnBase::tick_base (Treelog& msg, const Time& time)
 {
+  // Chemistry.
   for (vector<Chemistry*>::const_iterator i = chemistry.begin ();
        i != chemistry.end ();
        i++)
     (*i)->tick (*geometry, *soil, *soil_water, soil_chemicals, msg);
+
+  // Weather.
+  if (weather)
+    weather->tick (time, msg);
+}
+
+void
+ColumnBase::tick_base_soil_chemicals (Treelog& msg)
+{
+  const SoilChemicals::SoluteMap& solutes = soil_chemicals.all ();
+    // Transport.
+  for (SoilChemicals::SoluteMap::const_iterator i = solutes.begin ();
+       i != solutes.end ();
+       i++)
+    {
+      const symbol name = (*i).first;
+      SoilChemical& solute = *(*i).second;
+      Treelog::Open nest (msg, name);
+      // [g/m^2/h ned -> g/cm^2/h op]
+      const double J_in = -surface.chemicals_down ().amount (name) 
+        / (100.0 * 100.0);
+      soltrans->solute (*geometry, *soil, *soil_water, J_in, solute, msg); 
+    }
 }
 
 void
@@ -449,6 +476,7 @@ ColumnBase::ColumnBase (Block& al)
     soil (submodel<Soil> (al, "Soil")),
     soil_water (submodel<SoilWater1D> (al, "SoilWater")),
     soil_heat (al.alist ("SoilHeat")),
+    soltrans (submodel<Soltrans1D> (al, "Soltrans")),
     soil_chemicals (al.alist ("SoilChemicals")),
     chemistry (Librarian<Chemistry>::build_vector (al, "Chemistry")),
     groundwater (Librarian<Groundwater>::build_item (al, "Groundwater")),
@@ -537,6 +565,9 @@ the simulation.  If unspecified, used global weather.");
   syntax.add_submodule ("SoilHeat", alist, Syntax::State,
 			"Soil heat and flux.",
 			SoilHeat1D::load_syntax);
+  syntax.add_submodule ("Soltrans", alist, Syntax::State,
+                        "Solute transport in soil.",
+                        Soltrans1D::load_syntax);
   syntax.add_submodule ("SoilChemicals", alist, Syntax::State,
 			"Chemicals in the soil.",
 			SoilChemicals::load_syntax);

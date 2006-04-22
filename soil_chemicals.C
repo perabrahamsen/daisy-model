@@ -33,7 +33,6 @@
 #include "soil_chemical.h"
 #include "submodel.h"
 #include "memutils.h"
-#include <map>
 #include <set>
 
 using namespace std;
@@ -41,7 +40,6 @@ using namespace std;
 struct SoilChemicals::Implementation
 {
   // Content
-  typedef map<symbol, SoilChemical*> SoluteMap;
   SoluteMap solutes;
   typedef set<symbol> symbol_set;
   symbol_set all;
@@ -147,18 +145,6 @@ SoilChemicals::Implementation::tick (const Geometry& geo,
        i != solutes.end ();
        i++)
     (*i).second->decompose (geo, soil, soil_water, soil_heat, organic_matter); 
-
-  // Transport.
-  for (SoluteMap::const_iterator i = solutes.begin ();
-       i != solutes.end ();
-       i++)
-    {
-      symbol name = (*i).first;
-      SoilChemical& solute = *(*i).second;
-      // [g/m^2/h ned -> g/cm^2/h op]
-      const double J_in = -flux_in.amount (name) / (100.0 * 100.0);
-      solute.tick (geo, soil, soil_water, J_in, out); 
-    }
 }
 
 void 
@@ -306,6 +292,10 @@ SoilChemicals::Implementation::Implementation (const
   
 SoilChemicals::Implementation::~Implementation ()
 { map_delete (solutes.begin (), solutes.end ()); }
+
+const SoilChemicals::SoluteMap&
+SoilChemicals::all () const 
+{ return impl.solutes; }
 
 SoilChemical& 
 SoilChemicals::find (const Geometry& geo,

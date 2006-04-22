@@ -94,7 +94,7 @@ public:
 private:
   void set_h_aquifer (const Geometry1D& geo, const Time& time)
   {
-    const size_t size = geo.size ();
+    const size_t size = geo.node_size ();
     const double aquitart_bottom = geo.zplus (size-1) - Z_aquitard_;
     h_aquifer = pressure_table->operator()(time) - aquitart_bottom;
   }
@@ -113,7 +113,7 @@ private:
 public:
   void initialize (const Geometry1D& geo, const Time& time, Treelog& msg)
   {
-    const int size = geo.size ();
+    const int size = geo.node_size ();
     double largest = 0.0;
     for (unsigned int i = 0; i < size; i++)
       if (geo.dz (i) > largest)
@@ -217,7 +217,7 @@ GroundwaterPipe::tick (const Geometry1D& geo,
 double
 GroundwaterPipe::DeepPercolation(const Geometry1D& geo)
 {
-  const int size = geo.size ();
+  const int size = geo.node_size ();
   daisy_assert (size > 0);
   const double hb = height - geo.zplus (size - 1);
   if (hb > 0)
@@ -242,7 +242,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Geometry1D& geo,
                                        const Soil& soil, 
 				       const SoilHeat& soil_heat)
 {
-  const int size = geo.size ();
+  const int size = geo.node_size ();
   const int i_GWT = geo.interval_plus (height) + 1;
   daisy_assert (i_drain > 0);
   if (height >= geo.zplus(i_drain-1))

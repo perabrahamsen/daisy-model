@@ -40,6 +40,7 @@ struct AM;
 struct Geometry1D;
 struct Soil;
 struct SoilWater1D;
+struct Soltrans1D;
 
 class ColumnBase : public Column
 {
@@ -53,6 +54,7 @@ protected:
   std::auto_ptr<Soil> soil;
   std::auto_ptr<SoilWater1D> soil_water;
   SoilHeat1D soil_heat;
+  std::auto_ptr<Soltrans1D> soltrans;
   SoilChemicals soil_chemicals;
   std::vector<Chemistry*> chemistry;
   std::auto_ptr<Groundwater> groundwater;
@@ -130,8 +132,9 @@ public:
   double get_water_conductivity_at (unsigned int i) const; // [cm/h]
 
   // Simulation.
-public:
-  void tick_base (Treelog&);
+protected:
+  void tick_base (Treelog&, const Time&);
+  void tick_base_soil_chemicals (Treelog&);
   void output (Log&) const;
   virtual void output_inner (Log&) const;
   void clear ();

@@ -176,10 +176,10 @@ CropStandard::DM (double height) const
 }
 
 void
-CropStandard::initialize (Treelog& msg, const Geometry& geometry,
+CropStandard::initialize (Treelog& msg, const Geometry& geo,
                           OrganicMatter *const organic_matter)
 {
-  root_system->initialize (geometry.size ());
+  root_system->initialize (geo.node_size ());
   production.initialize (nitrogen.SeedN);
 
   if (development->DS >= 0)
@@ -187,7 +187,7 @@ CropStandard::initialize (Treelog& msg, const Geometry& geometry,
       // Dead organic matter.
       if (organic_matter)
         production.initialize (name, harvesting.Root, harvesting.Dead,
-                               geometry, *organic_matter);
+                               geo, *organic_matter);
       
       // Update derived state content.
       canopy.tick (production.WLeaf, production.WSOrg, 
@@ -196,7 +196,7 @@ CropStandard::initialize (Treelog& msg, const Geometry& geometry,
 		   //  until midnight (small error).
 		   -1.0);
       root_system->set_density (msg, 
-			       geometry, production.WRoot, development->DS);
+			       geo, production.WRoot, development->DS);
       nitrogen.content (development->DS, production);
     }
 }

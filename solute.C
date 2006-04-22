@@ -79,12 +79,10 @@ Solute::add_to_root_sink (const vector<double>& v)
 }
 
 void 
-Solute::tick (const Geometry& geo,
-              const Soil& soil, 
-	      const SoilWater& soil_water, 
-	      double J_in, Treelog& msg)
+Solute::tick (const size_t node_size,
+	      const SoilWater& soil_water)
 {
-  for (unsigned i = 0; i < soil.size (); i++)
+  for (unsigned i = 0; i < node_size; i++)
     daisy_assert (M_left (i) >= 0.0);
 
   // Initialize.
@@ -92,96 +90,19 @@ Solute::tick (const Geometry& geo,
   fill (J_p.begin (), J_p.end (), 0.0);
 
   // Permanent source.
-  for (unsigned int i = 0; i < soil.size (); i++)
+  for (unsigned int i = 0; i < node_size; i++)
     {
       S_external[i] += S_permanent[i];
       S[i] += S_external[i];
       daisy_assert (M_left (i) >= 0.0);
     }
 
-  // Upper border.
-  if (soil_water.q_p (0) < 0.0)
-    {
-      if (soil_water.q (0) >= 0.0)
-	{
-	  if (soil_water.q (0) > 1.0e-10)
-	    {
-	      std::ostringstream tmp;
-	      tmp << "BUG: q_p[0] = " << soil_water.q_p (0) 
-		     << " and q[0] = " << soil_water.q (0);
-	      msg.error (tmp.str ());
-	    }
-	  J_p[0] = J_in;
-	  J[0] = J_in;
-	}
-      else
-	{
-	  const double macro_fraction
-	    = soil_water.q_p (0) / (soil_water.q_p (0) + soil_water.q (0));
-	  J_p[0] = J_in * macro_fraction;
-	  J[0] = J_in - J_p[0];
-	}
-    }
-  else
-    J[0] = J_in;
-
   // Drainage.
-  for (unsigned int i = 0; i < soil.size (); i++)
+  for (unsigned int i = 0; i < node_size; i++)
     {
       S_drain[i] = -soil_water.S_drain (i) * dt * C (i);
       S[i] += S_drain[i];
       daisy_assert (M_left (i) >= 0.0);
-    }
-
-  // Flow.
-  const double old_content = geo.total (M_);
-  mactrans->tick (geo, soil_water, M_, C_, S, S_p, J_p, msg);
-
-  try
-    {
-      for (unsigned i = 0; i < soil.size (); i++)
-	daisy_assert (M_left (i) >= 0.0);
-      transport->tick (msg, geo, soil, soil_water, *adsorption, 
-                       diffusion_coefficient (), 
-                       M_, C_, S, J);
-    }
-  catch (const char* error)
-    {
-      msg.warning (string ("Transport problem: ") + error +
-		   ", trying reserve.");
-      try
-	{
-	  for (unsigned i = 0; i < soil.size (); i++)
-	    daisy_assert (M_left (i) >= 0.0);
-	  reserve->tick (msg, geo, soil, soil_water, *adsorption, 
-                         diffusion_coefficient (), M_, C_, S, J);
-	}
-      catch (const char* error)
-	{
-	   msg.warning (string ("Reserve transport problem: ") + error
-			+ ", trying last resort.");
-	  for (unsigned i = 0; i < soil.size (); i++)
-	    daisy_assert (M_left (i) >= 0.0);
-	  last_resort->tick (msg, geo, soil, soil_water, *adsorption, 
-                             diffusion_coefficient (), M_, C_, S, J);
-	}
-    }
-  const double new_content = geo.total (M_);
-  const double delta_content = new_content - old_content;
-  const double source = geo.total (S);
-  const double in = -J[0];	// No preferential transport, it is 
-  const double out = -J[soil.size ()]; // included in S.
-  const double expected = source + in - out;
-  if (!approximate (delta_content, expected)
-      && new_content < fabs (expected) * 1e10)
-    {
-      std::ostringstream tmp;
-      tmp << __FILE__ << ":" << __LINE__ << ":" << submodel
-	     << ": mass balance new - old != source + in - out\n"
-	     << new_content << " - " << old_content << " != " 
-	     << source << " + " << in << " - " << out << " (error "
-	     << (delta_content - expected) << ")";
-      msg.error (tmp.str ());
     }
 }
 
@@ -195,7 +116,6 @@ Solute::check (unsigned, Treelog&) const
 void
 Solute::output (Log& log) const
 {
-  output_derived (transport, "transport", log);
   output_derived (adsorption, "adsorption", log);
   output_value (C_, "C", log);
   output_value (M_, "M", log);
@@ -210,19 +130,9 @@ Solute::output (Log& log) const
   output_variable (tillage, log);
 }
 
-static bool check_alist (const AttributeList& al, Treelog& err)
+static bool check_alist (const AttributeList&, Treelog&)
 {
   bool ok = true;
-
-  daisy_assert (al.check ("transport"));
-  daisy_assert (al.check ("adsorption"));
-
-  if (al.alist ("adsorption").name ("type") == "full"
-      && al.alist ("transport").name ("type") != "none")
-    {
-      err.entry ("You can't have any transport with full adsorption");
-      ok = false;
-    }
   return ok;
 }
 
@@ -230,29 +140,6 @@ void
 Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
-  syntax.add ("transport", Librarian<Transport>::library (), 
-	      "Solute transport model in matrix.");
-  AttributeList cd;
-  cd.add ("type", "cd");
-  cd.add ("max_time_step_reductions", 20);
-  alist.add ("transport", cd);
-  syntax.add ("reserve", Librarian<Transport>::library (),
-	      "Reserve transport model if the primary model fails.");
-  AttributeList convection;
-  convection.add ("type", "convection");
-  convection.add ("max_time_step_reductions", 10);
-  alist.add ("reserve", convection);
-  syntax.add ("last_resort", Librarian<Transport>::library (),
-	      "Last resort transport model if the reserve model fails.");
-  AttributeList none;
-  none.add ("type", "none");
-  alist.add ("last_resort", none);
-
-  syntax.add ("mactrans", Librarian<Mactrans>::library (), 
-	      "Solute transport model in macropores.");
-  AttributeList mactrans;
-  mactrans.add ("type", "default");
-  alist.add ("mactrans", mactrans);
   syntax.add ("adsorption", Librarian<Adsorption>::library (), 
 	      "Soil adsorption properties.");
   Geometry::add_layer (syntax, Syntax::OptionalState, "C", Syntax::Fraction (),
@@ -291,10 +178,6 @@ Only for initialization of the 'M' parameter.");
 Solute::Solute (const AttributeList& al)
   : submodel (al.name ("submodel")),
     S_permanent (al.number_sequence ("S_permanent")),
-    transport (Librarian<Transport>::build_cheat (al, "transport")),
-    reserve (Librarian<Transport>::build_cheat (al, "reserve")),
-    last_resort (Librarian<Transport>::build_cheat (al, "last_resort")),
-    mactrans  (Librarian<Mactrans>::build_cheat (al, "mactrans")),
     adsorption (Librarian<Adsorption>::build_cheat (al, "adsorption"))
 { }
 
@@ -374,32 +257,32 @@ Solute::initialize (const AttributeList& al,
   if (C_.size () > 0)
     {
       // Fill it up.
-      while (C_.size () < geo.size ())
+      while (C_.size () < geo.node_size ())
 	C_.push_back (C_[C_.size () - 1]);
-      if (C_.size () > geo.size ())
+      if (C_.size () > geo.node_size ())
 	throw ("To many members of C sequence");
     }
   if (M_.size () > 0)
     {
       // Fill it up.
-      while (M_.size () < geo.size ())
+      while (M_.size () < geo.node_size ())
 	M_.push_back (M_[M_.size () - 1]);
-      if (M_.size () > geo.size ())
+      if (M_.size () > geo.node_size ())
 	throw ("To many members of M sequence");
     }
   if (Ms.size () > 0)
     {
       // Fill it up.
-      while (Ms.size () < geo.size ())
+      while (Ms.size () < geo.node_size ())
 	Ms.push_back ( Ms[Ms.size () - 1]);
-      if (Ms.size () > geo.size ())
+      if (Ms.size () > geo.node_size ())
 	throw ("To many members of Ms sequence");
     }
   if (M_.size () == 0 && C_.size () == 0)
     {
       if (Ms.size () != 0)
 	{
-	  daisy_assert (Ms.size () == geo.size ());
+	  daisy_assert (Ms.size () == geo.node_size ());
 
 	  for (unsigned int i = M_.size (); i < Ms.size (); i++)
 	    M_.push_back (Ms[i] * soil.dry_bulk_density (i));
@@ -415,9 +298,9 @@ Solute::initialize (const AttributeList& al,
     M_.push_back (C_to_M (soil, soil_water.Theta (i), i, C_[i]));
 
   daisy_assert (C_.size () == M_.size ());
-  daisy_assert (C_.size () == geo.size ());
+  daisy_assert (C_.size () == geo.node_size ());
 
-  for (unsigned int i = 0; i < geo.size (); i++)
+  for (size_t i = 0; i < geo.node_size (); i++)
     {
       if (M_[i] == 0.0)
 	{
@@ -433,16 +316,16 @@ Solute::initialize (const AttributeList& al,
 	}
     }
 
-  S.insert (S.begin (), geo.size (), 0.0);
-  S_p.insert (S_p.begin (), geo.size (), 0.0);
-  S_drain.insert (S_drain.begin (), geo.size (), 0.0);
-  S_external.insert (S_external.begin (), geo.size (), 0.0);
-  if (S_permanent.size () < geo.size ())
+  S.insert (S.begin (), geo.node_size (), 0.0);
+  S_p.insert (S_p.begin (), geo.node_size (), 0.0);
+  S_drain.insert (S_drain.begin (), geo.node_size (), 0.0);
+  S_external.insert (S_external.begin (), geo.node_size (), 0.0);
+  if (S_permanent.size () < geo.node_size ())
     S_permanent.insert (S_permanent.end (), 
-			geo.size () - S_permanent.size (),
+			geo.node_size () - S_permanent.size (),
 			0.0);
-  S_root.insert (S_root.begin (), geo.size (), 0.0);
-  J.insert (J_p.begin (), geo.size () + 1, 0.0);
-  J_p.insert (J_p.begin (), geo.size () + 1, 0.0);
-  tillage.insert (tillage.begin (), geo.size (), 0.0);
+  S_root.insert (S_root.begin (), geo.node_size (), 0.0);
+  J.insert (J_p.begin (), geo.edge_size (), 0.0);
+  J_p.insert (J_p.begin (), geo.edge_size (), 0.0);
+  tillage.insert (tillage.begin (), geo.node_size (), 0.0);
 }

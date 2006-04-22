@@ -56,7 +56,8 @@ public:
   void tick (const Geometry& geo,
              const Soil&, const SoilWater&, const SoilHeat&, 
 	     SoilNO3&, SoilNH4&, Treelog& msg);
-  void transport (const Geometry&, const Soil&, const SoilWater&, Treelog&);
+  void transport (const Soil&, const SoilWater&, Treelog&);
+  const std::vector<DOM*>& dom () const;
   void output (Log&, const Geometry&) const;
   double CO2 (unsigned int i) const;	// [g C/cm³]
   double CO2_fast (unsigned int i) const;	// [g C/cm³]

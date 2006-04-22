@@ -10,12 +10,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 1) Fjern 1D antagelser fra OM, bioinc
 
-2) Fjern 1D antagelser fra log table, select flux & interval.
-
-Flux:
-  Hvis geo er ny
-    find strømme der krydser grænse
-  value = sum (strømme der krydser grænse)
+2) Fjern 1D antagelser fra log table, select content & interval.
 
 Interval:
   Hvis geo er nu
@@ -27,23 +22,21 @@ Content:
 
 3) transport, macrotrans: 1D
 
-4) DOM + Solute: fjern transport
-
-** B) Grid
+** B) Rect
 
 Disse skal (først) bare bruge 1D modellerne til vertikal transport,
 senere måske også horizontal transport afkoblet.
 
-ColumnGrid
-GeometryGrid (zplus, xplus)
+ColumnRect
+GeometryRect (zplus, xplus)
 
-SoilWaterGrid
-  UZGrid
-  MacroGrid
+SoilWaterRect
+  UZRect
+  MacroRect
 
-SolMoveGrid
+SolMoveRect
 
-SoilHeatGrid
+SoilHeatRect rectangle
 
 ** C) Graph / Net
 
@@ -81,18 +74,6 @@ SoilHeatGrid
 
 **** distribution antager  i > j => z(i) < z (j)
 
-*** groundwater_lysimeter.C
-
-**** Need to find bottom of soil.
-
-*** select_flux_top.C, select_flux_bottom.C
-
-**** Need to handle fluxes correctly.
-
-*** groundwater_pipe.C
-
-Interesting challenges...  Probably need to disable for 2D at first.
-
 *** select_interval.C
 
 **** Need to find bottom of soil.
@@ -103,12 +84,7 @@ Interesting challenges...  Probably need to disable for 2D at first.
 
 **** Need node id instead of zplus for arrays.
 
-*** mactrans_std.C, macro_std.C, uzrichard.C, uzlr.C, transport_cd.C, 
-*** transport_none.C, transport_convection.C
-
-**** 1D only
-
-** Done
+** Done 2
 
 *** Split Soil fra Geometry
 
@@ -124,11 +100,25 @@ T, h, clay at depth
 
 *** rootdens_AP.C, rootdens_G_P.C
 
-**** density  antager  i > j => z(i) < z (j)
+antog  i > j => z(i) < z (j)
 
 *** 1D only
 
 ridge, uz*, macro*, groundwater*
+
+** Done 3
+
+*** select_flux_top.C, select_flux_bottom.C
+
+Generalized to handle 2D geometry.
+
+*** solute.C,  dom.C
+
+Removed transport.
+
+*** soltrans1D.C
+
+New transport module.
 
 * IDE: CT laver "sample setups" for hvert FON land 
 
