@@ -1,5 +1,7 @@
 2006-04-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* lib/chemistry.dai (solid): Removed transport.
+
 	* organic_matter.C (mix): Reset tillage age based on z, not zplus.
 
 	* organic_matter.C (active): New function.

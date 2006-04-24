@@ -6,7 +6,7 @@
   (canopy_dissipation_rate 0 [h^-1])
   (canopy_washoff_coefficient 1 [])
   (diffusion_coefficient 1 [cm^2/s])
-  (solute (adsorption full) (transport none))
+  (solute (adsorption full))
   (decompose_rate 0 [h^-1]))
   
 (defchemical common default
