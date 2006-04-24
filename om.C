@@ -46,7 +46,7 @@ OM::output (Log& log) const
   if (log.check_leaf (C_per_N_symbol))
     {
       vector<double> C_per_N;
-      unsigned int size = N.size ();
+      size_t size = N.size ();
       daisy_assert (C.size () >= size);
       for (int i = 0; i < size; i++)
 	{
@@ -110,7 +110,7 @@ OM::soil_N (const Geometry& geo, double from, double to) const
 { return geo.total (N, from, to); }
 
 double 
-OM::goal_C_per_N (unsigned int at) const // Desired C/N ratio.
+OM::goal_C_per_N (size_t at) const // Desired C/N ratio.
 {
   daisy_assert (C_per_N_goal.size () > at);
   return C_per_N_goal[at];
@@ -174,18 +174,19 @@ OM::turnover (const double from_C, const double from_N,
 }
 
 void
-OM::turnover_pool (unsigned int end, const double* factor,
+OM::turnover_pool (const std::vector<bool>& active, const double* factor,
 		   double fraction, double efficiency,
 		   const double* N_soil, double* N_used, double* CO2, OM& om)
 {
-  const unsigned int size = min (C.size (), end);
-  daisy_assert (N.size () >= size);
+  const size_t node_size = active.size ();
+  daisy_assert (C.size () == node_size);
+  daisy_assert (N.size () == node_size);
 
   const double speed = turnover_rate * fraction;
 
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < node_size; i++)
     {
-      if (C[i] < 1.0e-20)
+      if (!active[i] || C[i] < 1.0e-20)
 	continue;
 
       const double rate = min (factor[i] * speed, 0.1);
@@ -224,13 +225,16 @@ OM::turnover_pool (unsigned int end, const double* factor,
 }
 
 void
-OM::turnover_dom (unsigned int size, const double* factor,
+OM::turnover_dom (const std::vector<bool>& active, const double* factor,
 		  double fraction, DOM& dom)
 {
+  const size_t node_size = active.size ();
   const double speed = turnover_rate * fraction;
 
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < node_size; i++)
     {
+      if (!active[i])
+        continue;
       const double rate = min (speed * factor[i], 0.1);
       const double C_use = C[i] * rate;
       const double N_use = N[i] * rate;
@@ -243,7 +247,7 @@ OM::turnover_dom (unsigned int size, const double* factor,
 }
 
 void
-OM::tick (unsigned int end, const double* abiotic_factor, 
+OM::tick (const std::vector<bool>& active, const double* abiotic_factor, 
 	  const double* N_soil, double* N_used,
 	  double* CO2, const vector<SMB*>& smb, const vector<SOM*>&som,
 	  const vector<DOM*>& dom)
@@ -251,56 +255,43 @@ OM::tick (unsigned int end, const double* abiotic_factor,
   if (turnover_rate < 1e-200)
     return;
 
-  const unsigned int size = min (C.size (), end);
-  daisy_assert (N.size () >= size);
+  const size_t node_size = active.size ();
+  daisy_assert (C.size () == node_size);
+  daisy_assert (N.size () == node_size);
 
-  const unsigned int smb_size = smb.size ();
-  const unsigned int som_size = som.size ();
-  const unsigned int dom_size = dom.size ();
+  const size_t smb_size = smb.size ();
+  const size_t som_size = som.size ();
+  const size_t dom_size = dom.size ();
   daisy_assert (fractions.size () == smb_size + som_size + dom_size);
   // Distribute to all biological pools.
-  for (unsigned int j = 0; j < smb_size; j++)
+  for (size_t j = 0; j < smb_size; j++)
     {
       const double fraction = fractions[j];
       if (fraction > 1e-50)
-	turnover_pool (size, abiotic_factor, fraction, efficiency[j],
+	turnover_pool (active, abiotic_factor, fraction, efficiency[j],
 		       N_soil, N_used, CO2, *smb[j]);
     }
   // Distribute to all soil pools.
-  for (unsigned int j = 0; j < som_size; j++)
+  for (size_t j = 0; j < som_size; j++)
     {
       const double fraction = fractions[smb_size + j];
       if (fraction > 1e-50)
-	turnover_pool (size, abiotic_factor, fraction, 1.0,
+	turnover_pool (active, abiotic_factor, fraction, 1.0,
 		       N_soil, N_used, CO2, *som[j]);
     }
   // Distribute to all dissolved pools.
-  for (unsigned int j = 0; j < dom_size; j++)
+  for (size_t j = 0; j < dom_size; j++)
     {
       const double fraction = fractions[smb_size + som_size + j];
       if (fraction > 1e-50)
-	turnover_dom (size, abiotic_factor, fraction, *dom[j]);
+	turnover_dom (active, abiotic_factor, fraction, *dom[j]);
     }
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < node_size; i++)
     {
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (C[i] >= 0.0);
       daisy_assert (N[i] >= 0.0);
     }
-}
-
-void 
-OM::grow (unsigned int size)
-{
-  // Make sure C is large enough.
-  const int extra_C = size - C.size ();
-  if (extra_C > 0)
-    C.insert (C.end (), extra_C, 0.0);
-
-  // Make sure N is large enough.
-  const int extra_N = size - N.size ();
-  if (extra_N > 0)
-    N.insert (N.end (), extra_N, 0.0);
 }
 
 const double OM::Unspecified = -1042.42e42;
@@ -340,7 +331,7 @@ You cannot specify 'C_per_N' for intervals where 'C' is unspecified.");
 	  const vector<double>& N = al.number_sequence ("N");
 
 	  const int check_size = min (N.size (), C_per_N.size ());
-	  for (unsigned int i = 0; i < check_size; i++)
+	  for (size_t i = 0; i < check_size; i++)
 	    {
 	      if (C_per_N[i] < 0.0)
 		/* do nothing */;
@@ -422,6 +413,20 @@ OM::get_initial_C_per_N (const AttributeList& al)
   return OM::Unspecified;
 }
 
+void 
+OM::initialize (size_t size)
+{
+  // Make sure C is large enough.
+  const int extra_C = size - C.size ();
+  if (extra_C > 0)
+    C.insert (C.end (), extra_C, 0.0);
+
+  // Make sure N is large enough.
+  const int extra_N = size - N.size ();
+  if (extra_N > 0)
+    N.insert (N.end (), extra_N, 0.0);
+}
+
 OM::OM (const AttributeList& al)
   : initial_C_per_N (get_initial_C_per_N (al)),
     turnover_rate (al.check ("turnover_rate")
@@ -445,7 +450,7 @@ OM::OM (const AttributeList& al)
       if (C.size () > 0)
 	{
 	  daisy_assert (C_per_N.size () >= C.size ());
-	  for (unsigned int i = N.size (); i < C_per_N.size (); i++)
+	  for (size_t i = N.size (); i < C_per_N.size (); i++)
 	    {
 	      if (C_per_N[i] > 0)
 		N.push_back (C[i] / C_per_N[i]);

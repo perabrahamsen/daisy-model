@@ -106,13 +106,14 @@ DOM::clear ()
 }
 
 void 
-DOM::turnover (unsigned int end, const double* turnover_factor, 
+DOM::turnover (const std::vector<bool>& active, const double* turnover_factor, 
 	       const double* N_soil, double* N_used,
 	       double* CO2, const vector<SMB*>& smb)
 {
   // Find size.
-  const unsigned int size = min (C.M.size (), end);
-  daisy_assert (N.M.size () >= size);
+  const size_t node_size = active.size ();
+  daisy_assert (C.M.size () == node_size);
+  daisy_assert (N.M.size () == node_size);
   const unsigned int smb_size = smb.size ();
   daisy_assert (fractions.size () == smb_size);
   // Distribute to all biological pools.
@@ -120,21 +121,24 @@ DOM::turnover (unsigned int end, const double* turnover_factor,
     {
       const double fraction = fractions[j];
       if (fraction > 1e-50)
-	tock (size, turnover_factor, turnover_rate * fraction, efficiency[j],
+	tock (active, turnover_factor, turnover_rate * fraction, efficiency[j],
 	      N_soil, N_used, CO2, *smb[j]);
     }
 }
 
 void
-DOM::tock (unsigned int end, 
+DOM::tock (const std::vector<bool>& active, 
 	   const double* factor, double fraction, double efficiency,
 	   const double* N_soil, double* N_used, double* CO2, OM& om)
 {
-  const unsigned int size = min (C.M.size (), end);
-  daisy_assert (N.M.size () >= size);
+  const size_t node_size = active.size ();
+  daisy_assert (C.M.size () == node_size);
+  daisy_assert (N.M.size () == node_size);
 
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < node_size; i++)
     {
+      if (!active[i])
+        continue;
       double rate = min (factor[i] * fraction, 0.1);
       daisy_assert (C.M[i] >= 0.0);
       daisy_assert (isfinite (rate));

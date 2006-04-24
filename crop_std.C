@@ -258,14 +258,14 @@ CropStandard::tick (const Time& time,
 	      if (!production.AM_root)
 		{
 		  production.AM_root
-		    = &AM::create (geo, time, harvesting.Root,
+		    = &AM::create (geo.node_size (), time, harvesting.Root,
 				   name, root_symbol, AM::Locked);
 		  organic_matter->add (*production.AM_root);
 		}
 	      if (!production.AM_leaf)
 		{
 		  production.AM_leaf
-		    = &AM::create (geo, time, harvesting.Dead,
+		    = &AM::create (geo.node_size (), time, harvesting.Dead,
 				   name, dead_symbol, AM::Locked);
 		  organic_matter->add (*production.AM_leaf);
 		}
@@ -274,11 +274,11 @@ CropStandard::tick (const Time& time,
 	    {
 	      if (!production.AM_root)
 		production.AM_root
-		  = &AM::create (geo, time, harvesting.Root,
+		  = &AM::create (geo.node_size (), time, harvesting.Root,
 				 name, root_symbol, AM::Unlocked);
 	      if (!production.AM_leaf)
 		production.AM_leaf
-		  = &AM::create (geo, time, harvesting.Dead,
+		  = &AM::create (geo.node_size (), time, harvesting.Dead,
 				 name, dead_symbol, AM::Unlocked);
 	    }
 	}

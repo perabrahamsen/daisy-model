@@ -226,7 +226,7 @@ Harvesting::operator() (const symbol column_name,
 
   // Add crop remains to the soil.
   static const symbol stem_symbol ("stem");
-  AM& AM_stem = AM::create (geo, time, Stem, crop_name, stem_symbol);
+  AM& AM_stem = AM::create (geo.node_size (), time, Stem, crop_name, stem_symbol);
   residuals.push_back (&AM_stem);
   if (Stem_W_Loss > 0.0)
     {
@@ -242,7 +242,7 @@ Harvesting::operator() (const symbol column_name,
     {
       static const symbol dead_symbol ("dead");
       production.AM_leaf
-	= &AM::create (geo, time, Dead, crop_name, dead_symbol, 
+	= &AM::create (geo.node_size (), time, Dead, crop_name, dead_symbol, 
 		       AM::Unlocked /* no organic matter */);
     }
   if (Dead_W_Loss > 0.0)
@@ -256,7 +256,8 @@ Harvesting::operator() (const symbol column_name,
     }
 
   static const symbol leaf_symbol ("leaf");
-  AM& AM_leaf = AM::create (geo, time, Leaf, crop_name, leaf_symbol);
+  AM& AM_leaf = AM::create (geo.node_size (),
+                            time, Leaf, crop_name, leaf_symbol);
   residuals.push_back (&AM_leaf);
   if (Leaf_W_Loss > 0.0)
     {
@@ -269,7 +270,8 @@ Harvesting::operator() (const symbol column_name,
     }
 
   static const symbol sorg_symbol ("sorg");
-  AM& AM_sorg = AM::create (geo, time, SOrg, crop_name, sorg_symbol);
+  AM& AM_sorg = AM::create (geo.node_size (),
+                            time, SOrg, crop_name, sorg_symbol);
   residuals.push_back (&AM_sorg);
   if (SOrg_W_Loss > 0.0)
     {
@@ -318,7 +320,7 @@ Harvesting::operator() (const symbol column_name,
       // Create root AM if missing.
       static const symbol root_symbol ("root");
       if (!production.AM_root)
-	production.AM_root = &AM::create (geo, time, Root,
+	production.AM_root = &AM::create (geo.node_size (), time, Root,
 					  crop_name, root_symbol, 
 					  AM::Unlocked /* inorganic */);
 

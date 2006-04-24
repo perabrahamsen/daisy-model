@@ -121,7 +121,6 @@ AOM::add (unsigned int at, double to_C, double to_N)
 {
   daisy_assert (to_C >= 0.0);
   daisy_assert (to_N >= 0.0);
-  grow (at+1);
   C[at] += to_C;
   N[at] += to_N;
   daisy_assert (C[at] >= 0.0);
@@ -144,11 +143,10 @@ AOM::add (const Geometry& geo, // Add dead roots.
 {
   const double old_C = soil_C (geo);
   const double old_N = soil_N (geo);
-  grow (density.size ());
 
   // Distribute it according to the root density.
   const double total = geo.total (density);
-  for (unsigned int i = 0; i < density.size (); i++)
+  for (size_t i = 0; i < density.size (); i++)
     {
       // We should *not* multiply with dz here.  Reason: We want to
       // divide C on the total depth.  
@@ -172,32 +170,35 @@ AOM::add (const Geometry& geo, // Add dead roots.
 }
 
 void 
-AOM::tick (unsigned int end, const double* abiotic_factor, 
+AOM::tick (const std::vector<bool>& active, const double* abiotic_factor, 
 	  const double* N_soil, double* N_used,
 	  double* CO2, const vector<SMB*>& smb, double* som_C, double* som_N,
 	  const vector<DOM*>& dom)
 {
-  const unsigned int size = min (C.size (), end);
-  daisy_assert (N.size () >= size);
+  const size_t node_size = active.size ();
+  daisy_assert (C.size () == node_size);
+  daisy_assert (N.size () == node_size);
   
   const unsigned int smb_size = smb.size ();
   const unsigned int dom_size = dom.size ();
   daisy_assert (fractions.size () >= smb_size + 1);
 
   // Distribute to all biological pools.
-  for (unsigned int j = 0; j < smb_size; j++)
+  for (size_t j = 0; j < smb_size; j++)
     {
       const double fraction = fractions[j];
       if (fraction > 1e-50)
-	turnover_pool (size, abiotic_factor, fraction, efficiency[j],
+	turnover_pool (active, abiotic_factor, fraction, efficiency[j],
 		       N_soil, N_used, CO2, *smb[j]);
     }
 
   // Distribute to soil buffer.
   const double factor = turnover_rate * fractions[smb_size];
   if (factor > 1e-200)
-    for (unsigned int i = 0; i < size; i++)
+    for (size_t i = 0; i < node_size; i++)
       {
+        if (!active[i])
+          continue;
 	const double rate = min (factor * abiotic_factor[i], 0.1);
 	const double C_use = C[i] * rate;
 	const double N_use = N[i] * rate;
@@ -216,11 +217,11 @@ AOM::tick (unsigned int end, const double* abiotic_factor,
   daisy_assert (fractions.size () == smb_size + 1 + dom_size);
 
   // Distribute to all dissolved pools.
-  for (unsigned int j = 0; j < dom_size; j++)
+  for (size_t j = 0; j < dom_size; j++)
     {
       const double fraction = fractions[smb_size + 1 + j];
       if (fraction > 1e-50)
-	turnover_dom (size, abiotic_factor, fraction, *dom[j]);
+	turnover_dom (active, abiotic_factor, fraction, *dom[j]);
     }
 }
 

@@ -1493,7 +1493,7 @@ CropOld::RootPenetration (const Geometry& geo,
   /*max depth determined by crop*/
   Depth = min (Depth + dp, Root.MaxPen);
   /*max depth determined by crop*/
-  Depth = min (Depth, -soil.MaxRootingDepth ()); /*or by soil conditions*/
+  Depth = min (Depth, -soil.MaxRootingHeight ()); /*or by soil conditions*/
 }
 
 double 
@@ -1954,7 +1954,8 @@ CropOld::harvest (const symbol column_name,
       if (stem_harvest < 1.0 && WStem > 0.0)
 	{
 	  static const symbol stem_symbol ("stem");
-	  AM& am = AM::create (geo, time, Stem, name, stem_symbol);
+	  AM& am = AM::create (geo.node_size (),
+                               time, Stem, name, stem_symbol);
 	  am.add (WStem * C_Stem * m2_per_cm2,
 		  NStem * m2_per_cm2);
 	  residuals.push_back (&am);
@@ -1965,7 +1966,8 @@ CropOld::harvest (const symbol column_name,
       if (sorg_harvest < 1.0 && WSOrg > 0.0)
 	{
 	  static const symbol sorg_symbol ("sorg");
-	  AM& am = AM::create (geo, time, SOrg, name, sorg_symbol);
+	  AM& am = AM::create (geo.node_size (),
+                               time, SOrg, name, sorg_symbol);
 	  am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest) * m2_per_cm2,
 		  NSOrg * (1.0 - sorg_harvest) * m2_per_cm2);
 	  residuals.push_back (&am);
@@ -1976,7 +1978,8 @@ CropOld::harvest (const symbol column_name,
       if (WRoot > 0.0)
 	{
 	  static const symbol root_symbol ("root");
-	  AM& am = AM::create (geo, time, Root, name, root_symbol);
+	  AM& am = AM::create (geo.node_size (),
+                               time, Root, name, root_symbol);
 	  if (geo.total (density) > 0.0)
 	    am.add (geo,
 		    WRoot * C_Root * m2_per_cm2,

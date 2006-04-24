@@ -77,11 +77,11 @@ public:
   double N_at (unsigned int at) const;
 public:
   void clear ();
-  void turnover (unsigned int size, const double* turnover_factor, 
+  void turnover (const std::vector<bool>&, const double* turnover_factor, 
 		 const double* N_soil, double* N_used,
 		 double* CO2, const std::vector<SMB*>& smb);
 private:
-  void tock (unsigned int end,
+  void tock (const std::vector<bool>&,
 	     const double* factor, double fraction, double efficiency,
 	     const double* N_soil, double* N_used, double* CO2, OM& om);
 

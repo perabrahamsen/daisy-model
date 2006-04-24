@@ -53,13 +53,13 @@ public:
   void add (const Geometry&,	// Add dead roots.
 	    double C, double N, 
 	    const std::vector<double>& density);
-  void tick (unsigned int size, const double* turnover_factor,
+  void tick (const std::vector<bool>&, const double* turnover_factor,
 	     const double* N_soil, double* N_used,
 	     double* CO2, const std::vector<SMB*>& smb, 
 	     double* som_C, double* som_N, const std::vector<DOM*>& dom);
 private:
   // Disallow this OM function.
-  void tick (unsigned int size, const double* turnover_factor, 
+  void tick (const std::vector<bool>&, const double* turnover_factor, 
 	     const double* N_soil, double* N_used,
 	     double* CO2, 
 	     const std::vector<SMB*>& smb, const std::vector<SOM*>&som,

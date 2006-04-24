@@ -27,6 +27,7 @@
 #include "root_system.h"
 #include "canopy_simple.h"
 #include "time.h"
+#include "geometry.h"
 #include "soil.h"
 #include "crop.h"
 #include "am.h"
@@ -290,7 +291,7 @@ VegetationPermanent::tick (const Time& time,
 	      static const symbol vegetation_symbol ("vegetation");
 	      static const symbol dead_symbol ("dead");
 	      
-	      AM_litter = &AM::create (geo, time, litter_am,
+	      AM_litter = &AM::create (geo.node_size (), time, litter_am,
                                        vegetation_symbol, dead_symbol,
                                        AM::Locked);
 	      organic_matter->add (*AM_litter);
@@ -345,7 +346,7 @@ VegetationPermanent::initialize (const Time& time,
 {
   reset_canopy_structure (time);
   root_system->initialize (soil.size ());
-  root_system->full_grown (msg, geo, soil.MaxRootingDepth (), WRoot);
+  root_system->full_grown (msg, geo, soil.MaxRootingHeight (), WRoot);
   if (organic_matter)
     {
       static const symbol vegetation_symbol ("vegetation");

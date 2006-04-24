@@ -60,13 +60,14 @@ private:
   // Simulation.
 public:
   void output (Log&) const;
-  void tick (size_t size, 
+  void tick (const std::vector<bool>&, 
              const Geometry& geo,
              const Soil&, const SoilWater&, const SoilHeat&, SoilNO3&,
 	     const OrganicMatter&);
 
   // Create.
 public:
+  void initialize (size_t node_size);
   static void load_syntax (Syntax&, AttributeList&);
   Denitrification (const AttributeList&);
 };

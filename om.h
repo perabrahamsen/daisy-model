@@ -63,21 +63,23 @@ public:
   double soil_N (const Geometry& geometry) const;
   double soil_C (const Geometry& geometry, double from, double to) const;
   double soil_N (const Geometry& geometry, double from, double to) const;
-  double goal_C_per_N (unsigned int at) const; // Desired C/N ratio.
+  double goal_C_per_N (size_t at) const; // Desired C/N ratio.
   static void turnover (const double from_C, const double from_N, 
 			const double to_C_per_N, const double N_avail,
 			double rate, const double efficiency,
 			double& C_use, double& N_produce, double& N_consume);
 protected:
-  virtual void turnover_pool (unsigned int end, const double* factor,
+  virtual void turnover_pool (const std::vector<bool>& active, 
+                              const double* factor,
 			      double fraction, double efficiency,
 			      const double* N_soil, double* N_used, 
 			      double* CO2, OM& om);
-  virtual void turnover_dom (unsigned int size, const double* factor,
+  virtual void turnover_dom (const std::vector<bool>& active,
+                             const double* factor,
 			     double fraction, DOM& dom);
 
 public:
-  void tick (unsigned int size, const double* turnover_factor, 
+  void tick (const std::vector<bool>& active, const double* turnover_factor, 
 	     const double* N_soil, double* N_used, double* CO2, 
 	     const std::vector<SMB*>& smb, const std::vector<SOM*>&som,
 	     const std::vector<DOM*>& dom); // Used by SMB and SOM, but not AOM
@@ -88,7 +90,7 @@ public:
 
   // Create & Destroy.
 public:
-  void grow (unsigned int size);
+  void initialize (size_t);
 protected:
   static void load_syntax (Syntax&, AttributeList&, 
                            const std::string& frac_desc);

@@ -263,7 +263,7 @@ Soil::nitrification (const size_t i,
 { horizon_[i]->nitrification (M, C, M_left, h,  T, NH4, N2O, NO3); }
 
 double
-Soil::MaxRootingDepth () const
+Soil::MaxRootingHeight () const
 {
   return -impl.MaxRootingDepth;
 }

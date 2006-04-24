@@ -683,14 +683,14 @@ Production::initialize (const symbol name,
   // If not found, we is planting emerged crops.  Create pools.
   if (!AM_root)
     {
-      AM_root = &AM::create (geo, Time (1, 1, 1, 1), root,
+      AM_root = &AM::create (geo.node_size (), Time (1, 1, 1, 1), root,
 			     name, root_symbol, AM::Locked);
       organic_matter.add (*AM_root);
     }
 	  
   if (!AM_leaf)
     {
-      AM_leaf = &AM::create (geo, Time (1, 1, 1, 1), dead,
+      AM_leaf = &AM::create (geo.node_size (), Time (1, 1, 1, 1), dead,
 			     name, dead_symbol, AM::Locked);
       organic_matter.add (*AM_leaf);
     }

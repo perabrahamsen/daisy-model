@@ -1,3 +1,18 @@
+2006-04-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (mix): Reset tillage age based on z, not zplus.
+
+	* organic_matter.C (active): New function.
+	(active_size): Removed.
+	* column_std.C (tick): Update caller.
+	* denitrification.C (tick) Change argument.
+	(initialize): New function.
+	* column_std.C (initialize): Update caller.
+
+2006-04-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil.C, soil.h (MaxRootingHeight): Renamed from 'MaxRootingDepth'
+
 2006-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* element.h, element.C: Extracted from 'dom.C'.

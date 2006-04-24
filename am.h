@@ -59,8 +59,8 @@ public:
              std::vector<double>& tillage_C_soil);
   double total_C (const Geometry& geometry) const; // [g C/cm^2]
   double total_N (const Geometry& geometry) const; // [g N/cm^2]
-  double C_at (unsigned int at) const;
-  double N_at (unsigned int at) const;
+  double C_at (size_t at) const;
+  double N_at (size_t at) const;
   void pour (std::vector<double>& cc, std::vector<double>& nn);
   void add (double C, double N);// Add dead leafs.
   void add (const Geometry& geometry, AM& other); // Merge AOMs.
@@ -85,7 +85,7 @@ public:
   static AM& create (const AttributeList&, const Geometry&, 
                      double max_rooting_depth = 1.0);
   // Crop part.
-  static AM& create (const Geometry&, const Time&,
+  static AM& create (const size_t node_size, const Time&,
 		     const std::vector<AttributeList*>&,
 		     symbol sort, symbol part, lock_type lock = Unlocked);
   void initialize (const Geometry& geometry, const double max_rooting_depth);

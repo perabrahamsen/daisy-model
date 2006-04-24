@@ -36,14 +36,15 @@ public:
 
   // Simulation.
 public:
-  void maintain (unsigned int end, const double* abiotic_factor, 
+  void maintain (const std::vector<bool>& active,
+                 const double* abiotic_factor, 
 		 double* N_used, double* CO2);
 private:
-  void turnover_pool (unsigned int end, const double* factor,
+  void turnover_pool (const std::vector<bool>& active, const double* factor,
 		      double fraction, double efficiency,
 		      const double* N_soil, double* N_used, 
 		      double* CO2, OM& om);
-  void turnover_dom (unsigned int size, const double* factor,
+  void turnover_dom (const std::vector<bool>& active, const double* factor,
 		     double fraction, DOM& dom);
 
   // Create & Destroy.

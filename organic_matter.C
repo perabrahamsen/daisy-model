@@ -65,7 +65,7 @@ struct OrganicMatter::Implementation
 {
   // Content.
   const bool active_underground; // True, iff turnover happens below rootzone.
-  const bool active_groundwater; // True, iff turnover happens in groundwater.
+  vector<bool> active;          // Active nodes.
   const double K_NH4;		// Immobilization rate of NH4.
   const double K_NO3;		// Immobilization rate of NO3.
   vector<double> CO2_slow;	// CO2 produced per time step from slow pools.
@@ -173,13 +173,13 @@ struct OrganicMatter::Implementation
   void monthly (const Geometry&);
   template<class DAOM>
   const double* find_abiotic (const DAOM& om, // AOM & DOM
-			      const int size, 
+			      const std::vector<bool>&, 
 			      const SoilWater& soil_water, 
 			      const SoilHeat& soil_heat,
 			      const vector<double>& default_value,
 			      vector<double>& scratch) const;
   const double* find_abiotic (const OM& om, // SOM & SMB
-			      const int size, 
+			      const std::vector<bool>&, 
 			      const SoilWater& soil_water, 
 			      const SoilHeat& soil_heat,
 			      const vector<const PLF*> tillage_factor,
@@ -187,10 +187,7 @@ struct OrganicMatter::Implementation
 			      const vector<double>& default_value,
 			      bool use_clay,
 			      vector<double>& scratch) const;
-  size_t active_size (const Geometry& geo,
-                      const Soil&, const SoilWater&) const;
-  void tick (const Geometry& geo,
-             const Soil&, const SoilWater&, const SoilHeat&,
+  void tick (const Geometry&, const SoilWater&, const SoilHeat&,
 	     SoilNO3&, SoilNH4&, Treelog& msg);
   void transport (const Soil&, const SoilWater&, Treelog&);
   void mix (const Geometry&, const Soil&, const SoilWater&, 
@@ -208,10 +205,10 @@ struct OrganicMatter::Implementation
   vector<double> soil_turnover_factor;
 
   // Communication with external model.
-  double get_smb_c_at (unsigned int i) const // g C/cm³]
+  double get_smb_c_at (size_t i) const // g C/cm³]
     {
       double total = 0.0;
-      for (unsigned int j = 0; j < smb.size (); j++)
+      for (size_t j = 0; j < smb.size (); j++)
 	{
 	  if (smb[j]->C.size () > i)
 	    total += smb[j]->C[i];
@@ -360,7 +357,7 @@ OrganicMatter::Implementation::Initialization
 {
   daisy_assert (destination.size () == fractions.size ());
   daisy_assert (destination.size () >= efficiency.size ());
-  for (unsigned int i = 0; i < destination.size (); i++)
+  for (size_t i = 0; i < destination.size (); i++)
     {
       destination[i] = per_lay[lay] * fractions[i];
       // No abiotic factor since we this is already a rate.
@@ -621,10 +618,10 @@ OrganicMatter::Implementation::Initialization::
   geo.add (per_lay, 0.0, end, top * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Add roots
-  const double depth = soil.MaxRootingDepth ();
+  const double depth = soil.MaxRootingHeight ();
   const double k = M_LN2 / al.number ("dist");
   vector<double> density (soil.size (), 0.0);
-  for (unsigned int i = 0; 
+  for (size_t i = 0; 
        i < soil.size () && geo.z (i) > depth;
        i++)
     {
@@ -665,11 +662,11 @@ OrganicMatter::Implementation::total_N (const Geometry& geo) const
 {
   double result = geo.total (buffer.N);
 
-  for (unsigned int i = 0; i < smb.size (); i++)
+  for (size_t i = 0; i < smb.size (); i++)
     result += smb[i]->soil_N (geo);
-  for (unsigned int i = 0; i < som.size (); i++)
+  for (size_t i = 0; i < som.size (); i++)
     result += som[i]->soil_N (geo);
-  for (unsigned int i = 0; i < dom.size (); i++)
+  for (size_t i = 0; i < dom.size (); i++)
     result += dom[i]->soil_N (geo);
   for (int i = 0; i < am.size (); i++)
     result += am[i]->total_N (geo);
@@ -682,11 +679,11 @@ OrganicMatter::Implementation::total_C (const Geometry& geo) const
 {
   double result = geo.total (buffer.C);
 
-  for (unsigned int i = 0; i < smb.size (); i++)
+  for (size_t i = 0; i < smb.size (); i++)
     result += smb[i]->soil_C (geo);
-  for (unsigned int i = 0; i < som.size (); i++)
+  for (size_t i = 0; i < som.size (); i++)
     result += som[i]->soil_C (geo);
-  for (unsigned int i = 0; i < dom.size (); i++)
+  for (size_t i = 0; i < dom.size (); i++)
     result += dom[i]->soil_C (geo);
   for (int i = 0; i < am.size (); i++)
     result += am[i]->total_C (geo);
@@ -740,7 +737,7 @@ OrganicMatter::Implementation::water_turnover_factor (double h) const
 void
 OrganicMatter::Implementation::Buffer::initialize (const Geometry& geo)
 { 
-  const unsigned int size = geo.node_size ();
+  const size_t size = geo.node_size ();
   // Make sure the vectors are large enough.
   while (N.size () < size)
     N.push_back (0.0);
@@ -773,7 +770,7 @@ OrganicMatter::Implementation::output (Log& log,
     {
       vector<double> CO2 (CO2_slow);
       daisy_assert (CO2.size () == CO2_fast.size ());
-      for (unsigned int i =0; i < CO2.size(); i++)
+      for (size_t i =0; i < CO2.size(); i++)
 	CO2[i] += CO2_fast[i];
       output_variable (CO2, log);
     }
@@ -792,17 +789,17 @@ OrganicMatter::Implementation::output (Log& log,
       vector<double> total_C (size, 0.0);
       for (int i = 0; i < size; i++)
 	{
-	  for (unsigned int j = 0; j < smb.size (); j++)
+	  for (size_t j = 0; j < smb.size (); j++)
 	    {
 	      total_C[i] += smb[j]->C[i];
 	      total_N[i] += smb[j]->N[i];
 	    }
-	  for (unsigned int j = 0; j < som.size (); j++)
+	  for (size_t j = 0; j < som.size (); j++)
 	    {
 	      total_C[i] += som[j]->C[i];
 	      total_N[i] += som[j]->N[i];
 	    }
-	  for (unsigned int j = 0; j < dom.size (); j++)
+	  for (size_t j = 0; j < dom.size (); j++)
 	    {
 	      total_C[i] += dom[j]->C_at (i);
 	      total_N[i] += dom[j]->N_at (i);
@@ -868,7 +865,7 @@ OrganicMatter::Implementation::check (const Soil& soil, Treelog& err) const
 {
   Treelog::Open nest (err, "OrganicMatter");
   bool ok = true;
-  for (unsigned int i = 0; i < am.size (); i++)
+  for (size_t i = 0; i < am.size (); i++)
     if (!am[i]->check (err))
       ok = false;
   for (size_t i = 0; i < domsorp.size (); i++)
@@ -882,7 +879,7 @@ OrganicMatter::Implementation::check (const Soil& soil, Treelog& err) const
 void 
 OrganicMatter::Implementation::add (AM& om)
 { 
-  for (unsigned int i = 0; i < am.size (); i++)
+  for (size_t i = 0; i < am.size (); i++)
     daisy_assert (&om != am[i]);
   am.push_back (&om); 
 }
@@ -930,7 +927,8 @@ OrganicMatter::Implementation::monthly (const Geometry& geo)
   AM* remainder = find_am (am_symbol, cleanup_symbol);
   if (!remainder)
     {
-      remainder = &AM::create (geo, Time (1, 1, 1, 1), AM::default_AM (),
+      remainder = &AM::create (geo.node_size (),
+                               Time (1, 1, 1, 1), AM::default_AM (),
 			       am_symbol, cleanup_symbol, AM::Locked);
       add (*remainder);
     }
@@ -977,7 +975,7 @@ OrganicMatter::Implementation::monthly (const Geometry& geo)
 template <class DAOM>
 const double*
 OrganicMatter::Implementation::find_abiotic (const DAOM& om,
-					     const int size, 
+					     const std::vector<bool>& active, 
 					     const SoilWater& soil_water, 
 					     const SoilHeat& soil_heat,
 					     const vector<double>& 
@@ -991,8 +989,11 @@ OrganicMatter::Implementation::find_abiotic (const DAOM& om,
   if (!use_om_heat && !use_om_water)
     return &default_value[0];
   
-  for (unsigned int i = 0; i < size; i++)
+  const size_t node_size = active.size ();
+  for (size_t i = 0; i < node_size; i++)
     {
+      if (!active[i])
+        continue;
       const double T = soil_heat.T (i);
       if (use_om_heat)
 	scratch[i] = om.heat_factor (T);
@@ -1010,7 +1011,7 @@ OrganicMatter::Implementation::find_abiotic (const DAOM& om,
 
 const double*
 OrganicMatter::Implementation::find_abiotic (const OM& om,
-					     const int size, 
+					     const std::vector<bool>& active, 
 					     const SoilWater& soil_water, 
 					     const SoilHeat& soil_heat,
 					     const vector<const PLF*> 
@@ -1028,10 +1029,14 @@ OrganicMatter::Implementation::find_abiotic (const OM& om,
   if (!use_om_heat && !use_om_water && !use_tillage)
     return &default_value[0];
   
+  const size_t node_size = active.size ();
+
   if (use_om_heat || use_om_water)
     {
-      for (unsigned int i = 0; i < size; i++)
+      for (size_t i = 0; i < node_size; i++)
 	{
+          if (!active[i])
+            continue;
 	  if (use_clay)
 	    scratch[i] = clay_turnover_factor[i];
 	  else
@@ -1054,30 +1059,15 @@ OrganicMatter::Implementation::find_abiotic (const OM& om,
     scratch = default_value;
 
   if (use_tillage)
-    for (unsigned int i = 0; i < size; i++)
-      scratch[i] *= (*tillage_factor[pool]) (tillage_age[i]);
+    for (size_t i = 0; i < node_size; i++)
+      if (active[i])
+        scratch[i] *= (*tillage_factor[pool]) (tillage_age[i]);
 
   return &scratch[0];
 }
 
-size_t
-OrganicMatter::Implementation::active_size (const Geometry& geo,
-                                            const Soil& soil, 
-                                            const SoilWater& soil_water) const
-{
-  size_t size = soil.size ();
-  if (!active_underground && geo.zplus (size - 1) < -100.0)
-    size = geo.interval_plus (min (-100.0, soil.MaxRootingDepth ())) + 1;
-  if (!active_groundwater)
-    size = min (soil_water.first_groundwater_node (), size);
-  size = min (size, soil.size ());
-  
-  return size;
-}
-
 void 
 OrganicMatter::Implementation::tick (const Geometry& geo,
-                                     const Soil& soil, 
 				     const SoilWater& soil_water, 
 				     const SoilHeat& soil_heat,
 				     SoilNO3& soil_NO3,
@@ -1100,20 +1090,22 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
   fill (NO3_source.begin (), NO3_source.end (), 0.0);
   fill (NH4_source.begin (), NH4_source.end (), 0.0);
   top_CO2 = 0.0;
-  for (unsigned int j = 0; j < dom.size (); j++)
+  for (size_t j = 0; j < dom.size (); j++)
     dom[j]->clear ();
 
   // Setup arrays.
-  const size_t size = active_size (geo, soil, soil_water);
+  const size_t node_size = geo.node_size ();
+
+  vector<double> N_soil (node_size, -42.42e42);
+  vector<double> N_used (node_size, -42.42e42);
+  vector<double> clay_factor (node_size, -42.42e42);
+  vector<double> soil_factor (node_size, -42.42e42);
+  vector<double> tillage_factor (node_size, -42.42e42);
   
-  vector<double> N_soil (size);
-  vector<double> N_used (size);
-  vector<double> clay_factor (size);
-  vector<double> soil_factor (size);
-  vector<double> tillage_factor (size);
-  
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < node_size; i++)
     {
+      if (!active[i])
+        continue;
       daisy_assert (soil_NH4.M_left (i) >= 0);
       const double NH4 = (soil_NH4.M_left (i) < 1e-9) // 1 mg/l
 	? 0.0 : soil_NH4.M_left (i) * K_NH4;
@@ -1135,65 +1127,71 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
     }
   
   // Main processing.
-  for (unsigned int j = 0; j < dom.size (); j++)
+  for (size_t j = 0; j < dom.size (); j++)
     {
       const double *const abiotic 
-	= find_abiotic (*dom[j], size, soil_water, soil_heat, soil_factor, 
+	= find_abiotic (*dom[j], active, soil_water, soil_heat, soil_factor, 
                         tillage_factor);
       double *const CO2 = dom[j]->turnover_rate > CO2_threshold 
 	? &CO2_fast[0] 
 	: &CO2_slow[0];
-      dom[j]->turnover (size, abiotic, &N_soil[0], &N_used[0], CO2, smb);
+      dom[j]->turnover (active, abiotic, &N_soil[0], &N_used[0], CO2, smb);
     }
-  for (unsigned int j = 0; j < smb.size (); j++)
+  for (size_t j = 0; j < smb.size (); j++)
     {
       const bool use_clay = clayom->smb_use_clay (j);
       const vector<double>& default_factor = 
 	use_clay ? clay_factor : soil_factor;
       const double *const abiotic 
-	= find_abiotic (*smb[j], size, soil_water, soil_heat,
+	= find_abiotic (*smb[j], active, soil_water, soil_heat,
 			smb_tillage_factor, j,
 			default_factor, use_clay, tillage_factor);
       double *const CO2 = smb[j]->turnover_rate > CO2_threshold 
 	? &CO2_fast[0] 
 	: &CO2_slow[0];
-      smb[j]->maintain (size, abiotic, &N_used[0], CO2);
-      smb[j]->tick (size, abiotic, &N_soil[0], &N_used[0], CO2, smb, som, dom);
+      smb[j]->maintain (active, abiotic, &N_used[0], CO2);
+      smb[j]->tick (active, 
+                    abiotic, &N_soil[0], &N_used[0], CO2, smb, som, dom);
     }
-  for (unsigned int j = 0; j < som.size (); j++)
+  for (size_t j = 0; j < som.size (); j++)
     {
       const bool use_clay = clayom->som_use_clay (j);
       const vector<double>& default_factor = 
 	use_clay ? clay_factor : soil_factor;
       const double *const abiotic 
-	= find_abiotic (*som[j], size, soil_water, soil_heat,
+	= find_abiotic (*som[j], active, soil_water, soil_heat,
 			som_tillage_factor, j,
 			default_factor, use_clay, tillage_factor);
       double *const CO2 = som[j]->turnover_rate > CO2_threshold 
 	? &CO2_fast[0] 
 	: &CO2_slow[0];
-      som[j]->tick (size, abiotic, &N_soil[0], &N_used[0], CO2, smb, som, dom);
+      som[j]->tick (active,
+                    abiotic, &N_soil[0], &N_used[0], CO2, smb, som, dom);
     }
 
-  for (unsigned int j = 0; j < added.size (); j++)
+  for (size_t j = 0; j < added.size (); j++)
     {
       const double *const abiotic 
-	= find_abiotic (*added[j], size, soil_water, soil_heat,
+	= find_abiotic (*added[j], active, soil_water, soil_heat,
 			soil_factor, tillage_factor);
       double *const CO2 = added[j]->turnover_rate > CO2_threshold 
 	? &CO2_fast[0] 
 	: &CO2_slow[0];
-      added[j]->tick (size, abiotic, &N_soil[0], &N_used[0], &CO2[0],
+      added[j]->tick (active, abiotic, &N_soil[0], &N_used[0], &CO2[0],
 		      smb, &buffer.C[0], &buffer.N[0], dom);
     }
 
   // Update buffer.
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < node_size; i++)
+    if (active[i])
       buffer.tick (i, soil_factor[i], N_soil[i], N_used[i], som);
 
   // Update source.
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < node_size; i++)
     {
+      if (!active[i])
+        continue;
+      
       daisy_assert (N_used[i] < soil_NH4.M_left (i) + soil_NO3.M_left (i));
 
       const double NH4 = (soil_NH4.M_left (i) < 1e-9) // 1 mg/l
@@ -1219,11 +1217,13 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
   soil_NH4.add_to_source (NH4_source);
 
   // Biological incorporation.
-  bioincorporation.tick (geo, am, soil_heat.T (0), top_CO2);
+  const double soil_T = geo.content_at (soil_heat, &SoilHeat::T, -5.0 /* cm */);
+  bioincorporation.tick (geo, am, soil_T, top_CO2);
 
   // Tillage time.
-  for (unsigned int i = 0; i < size; i++)
-    tillage_age[i] += 1.0/24.0;
+  for (size_t i = 0; i < node_size; i++)
+    if (active[i])
+      tillage_age[i] += 1.0/24.0;
 
   // Mass balance.
   double N_to_DOM = 0.0;
@@ -1253,8 +1253,7 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
   const double C_source 
     = geo.total (CO2_slow) + geo.total (CO2_fast) + top_CO2;
   
-  if (!approximate (delta_C, C_source)
-      && !approximate (old_C, new_C, 1e-10))
+  if (!approximate (delta_C, C_source) && !approximate (old_C, new_C, 1e-10))
     {
       std::ostringstream tmp;
       tmp << "BUG: OrganicMatter: "
@@ -1265,7 +1264,7 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
     }
 
   // We didn't steal it all?
-  for (int i = 0; i < soil.size (); i++)
+  for (int i = 0; i < node_size; i++)
     {
       daisy_assert (soil_NO3.M_left (i) >= 0.0);
       daisy_assert (soil_NH4.M_left (i) >= 0.0);
@@ -1289,29 +1288,27 @@ OrganicMatter::Implementation::mix (const Geometry& geo, const Soil& soil,
 				    const Time&)
 {
   buffer.mix (geo, from, to);
-  for (unsigned int i = 0; i < am.size (); i++)
+  for (size_t i = 0; i < am.size (); i++)
     am[i]->mix (geo, from, to, penetration, 
                 tillage_N_top, tillage_C_top, 
                 tillage_N_soil, tillage_C_soil);
-  for (unsigned int i = 1; i < smb.size (); i++)
+  for (size_t i = 1; i < smb.size (); i++)
     smb[i]->mix (geo, from, to, 
                  tillage_N_soil, tillage_C_soil);
-  for (unsigned int i = 0; i < som.size (); i++)
+  for (size_t i = 0; i < som.size (); i++)
     som[i]->mix (geo, from, to, 
                  tillage_N_soil, tillage_C_soil);
-  for (unsigned int i = 0; i < dom.size (); i++)
+  for (size_t i = 0; i < dom.size (); i++)
     dom[i]->mix (geo, soil, soil_water, from, to);
 
   // Leave CO2 alone.
 
   // Reset tillage age.
-  double previous = 0.0;
-  for (unsigned int i = 0; i < tillage_age.size (); i++)
+  for (size_t i = 0; i < tillage_age.size (); i++)
     {
-      const double next = geo.zplus (i);
-      if (previous > to && next < from)
+      const double z = geo.z (i);
+      if (z > to && z < from)
 	tillage_age[i] = 0.0;
-      previous = next;
     }
 }
 
@@ -1322,16 +1319,16 @@ OrganicMatter::Implementation::swap (const Geometry& geo, const Soil& soil,
 				     const Time&)
 {
   buffer.swap (geo, from, middle, to);
-  for (unsigned int i = 0; i < am.size (); i++)
+  for (size_t i = 0; i < am.size (); i++)
     am[i]->swap (geo, from, middle, to, 
                  tillage_N_soil, tillage_C_soil);
-  for (unsigned int i = 1; i < smb.size (); i++)
+  for (size_t i = 1; i < smb.size (); i++)
     smb[i]->swap (geo, from, middle, to, 
                   tillage_N_soil, tillage_C_soil);
-  for (unsigned int i = 0; i < som.size (); i++)
+  for (size_t i = 0; i < som.size (); i++)
     som[i]->swap (geo, from, middle, to, 
                   tillage_N_soil, tillage_C_soil);
-  for (unsigned int i = 0; i < dom.size (); i++)
+  for (size_t i = 0; i < dom.size (); i++)
     dom[i]->swap (geo, soil, soil_water, from, middle, to);
   // Leave CO2 alone.
 }
@@ -1340,7 +1337,7 @@ AM*
 OrganicMatter::Implementation::find_am (const symbol sort,
 					const symbol part) const
 {
-  for (unsigned int i = 0; i < am.size (); i++)
+  for (size_t i = 0; i < am.size (); i++)
     if (am[i]->locked () 
 	&& am[i]->crop_name () == sort 
 	&& am[i]->crop_part_name () == part)
@@ -1354,24 +1351,24 @@ OrganicMatter::Implementation::input_from_am (vector<double>& destination,
 					      const int lay) const
 {
   // Calculate the input from all aom in soil layer lay to all destinations. 
-  const unsigned int size = destination.size ();
+  const size_t size = destination.size ();
   daisy_assert (size == smb.size () + 1);
-  const unsigned int som_pool = size - 1;
+  const size_t som_pool = size - 1;
   fill (destination.begin (), destination.end (), 0.0);
 
   // Loop over all AOM pools.
   vector<AOM*> added;
-  for (unsigned int i = 0; i < am.size (); i++)
+  for (size_t i = 0; i < am.size (); i++)
     am[i]->append_to (added);
 
-  for (unsigned int i = 0; i < added.size (); i++)
+  for (size_t i = 0; i < added.size (); i++)
     if (added[i]->C.size () > lay)
       {
 	daisy_assert (added[i]->fractions.size () == size);
 	const double abiotic_factor 
 	  = abiotic (*added[i], T, h, false, lay);
 	// For SMB pools.
-	for (unsigned int pool = 0; pool < som_pool ; pool++)
+	for (size_t pool = 0; pool < som_pool ; pool++)
 	  destination[pool] += added[i]->C[lay] 
 	    * added[i]->turnover_rate 
 	    * added[i]->fractions[pool]
@@ -1390,21 +1387,21 @@ double
 OrganicMatter::Implementation::total_input_from_am (double T, double h,
                                                     const int lay) const
 {
-  const unsigned int som_pool = smb.size ();
+  const size_t som_pool = smb.size ();
 
   // Loop over all AOM pools.
   vector<AOM*> added;
-  for (unsigned int i = 0; i < am.size (); i++)
+  for (size_t i = 0; i < am.size (); i++)
     am[i]->append_to (added);
 
   double total = 0.0;
-  for (unsigned int i = 0; i < added.size (); i++)
+  for (size_t i = 0; i < added.size (); i++)
     if (added[i]->C.size () > lay)
       {
 	const double abiotic_factor 
 	  = abiotic (*added[i], T, h, false, lay);
 	// For SMB pools.
-	for (unsigned int pool = 0; pool < som_pool ; pool++)
+	for (size_t pool = 0; pool < som_pool ; pool++)
 	  total += added[i]->C[lay] 
 	    * added[i]->turnover_rate 
 	    * added[i]->fractions[pool]
@@ -1439,7 +1436,7 @@ OrganicMatter::Implementation::SOM_limit_normalize
 {
   // If no fractions are specified, just use limit.
   bool unspecified = true;
-  for (unsigned int i = 0; i < fractions.size (); i++)
+  for (size_t i = 0; i < fractions.size (); i++)
     if (fractions[i] >= 0.0)
       unspecified = false;
   
@@ -1452,7 +1449,7 @@ OrganicMatter::Implementation::SOM_limit_normalize
   double added = 0.0;
   double removed = 0.0;
   int missing = 0;
-  for (unsigned int i = 0; i < fractions.size (); i++)
+  for (size_t i = 0; i < fractions.size (); i++)
     if (fractions[i] >= 0.0)
       {
         result[i] = fractions[i];
@@ -1467,7 +1464,7 @@ OrganicMatter::Implementation::SOM_limit_normalize
       // Distribute remaining SOM uniformly.
       daisy_assert (missing > 0);
       const double value = (1.0 - added) / (missing + 0.0);
-      for (unsigned int i = 0; i < result.size (); i++)
+      for (size_t i = 0; i < result.size (); i++)
         if (result[i] < 0.0)
           result[i] = value;
     }
@@ -1475,7 +1472,7 @@ OrganicMatter::Implementation::SOM_limit_normalize
     {
       // Distribute remaining SOM proportionally.
       const double factor = (1.0 - added) / (1.0 - removed);
-      for (unsigned int i = 0; i < result.size (); i++)
+      for (size_t i = 0; i < result.size (); i++)
         if (result[i] < 0.0)
           result[i] = limit[i] * factor;
     }
@@ -1515,7 +1512,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 {
   // Find AOM values.
   double total_am = 0.0;
-  for (unsigned int i = 0; i < am.size (); i++)
+  for (size_t i = 0; i < am.size (); i++)
     total_am += am[i]->C_at (lay);
 
   // We know the total humus, the yearly input and has been told the
@@ -1523,16 +1520,16 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
   // fractions.
 
   // Sizes.
-  const unsigned int smb_size = smb.size ();
-  const unsigned int som_size = som.size ();
+  const size_t smb_size = smb.size ();
+  const size_t som_size = som.size ();
 
   // The columns are:
   //  k = SMB1 SMB2 SOM1 SOM2 dSMB1 dSMB2 dSOM1 dSOM2
-  const unsigned int smb_column = 0;
-  const unsigned int som_column = smb_column + smb_size;
-  const unsigned int dsmb_column = som_column + som_size;
-  const unsigned int dsom_column = dsmb_column + smb_size;
-  const unsigned int number_of_equations = dsom_column + som_size;
+  const size_t smb_column = 0;
+  const size_t som_column = smb_column + smb_size;
+  const size_t dsmb_column = som_column + som_size;
+  const size_t dsom_column = dsmb_column + smb_size;
+  const size_t number_of_equations = dsom_column + som_size;
 
   // Calculated C content.
   double total = -42.42e42;
@@ -1543,24 +1540,24 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
     {
       // Tag line.
       table_string << "lay\thumus\thumus\tinput\tinput\tAOM";
-      for (unsigned int pool = 0; pool < smb_size; pool++)
+      for (size_t pool = 0; pool < smb_size; pool++)
 	table_string << "\tSMB" << (pool + 1);
-      for (unsigned int pool = 0; pool < som_size; pool++)
+      for (size_t pool = 0; pool < som_size; pool++)
 	table_string << "\tSOM" << (pool + 1);
-      for (unsigned int pool = 0; pool < smb_size; pool++)
+      for (size_t pool = 0; pool < smb_size; pool++)
 	table_string << "\tdSMB" << (pool + 1) << "\tdSMB" << (pool + 1);
-      for (unsigned int pool = 0; pool < som_size; pool++)
+      for (size_t pool = 0; pool < som_size; pool++)
 	table_string << "\tdSOM" << (pool + 1) << "\tdSOM" << (pool + 1);
       table_string << "\n";
       // Dimension line.
       table_string << "\tkg C/ha/cm\t%\tkg C/ha/cm/y\t%\t%";
-      for (unsigned int pool = 0; pool < smb_size; pool++)
+      for (size_t pool = 0; pool < smb_size; pool++)
 	table_string << "\t%";
-      for (unsigned int pool = 0; pool < som_size; pool++)
+      for (size_t pool = 0; pool < som_size; pool++)
 	table_string << "\t%";
-      for (unsigned int pool = 0; pool < smb_size; pool++)
+      for (size_t pool = 0; pool < smb_size; pool++)
 	table_string << "\tkg C/ha/cm/y\ty^-1";
-      for (unsigned int pool = 0; pool < som_size; pool++)
+      for (size_t pool = 0; pool < som_size; pool++)
 	table_string << "\tkg C/ha/cm/y\ty^-1";
       table_string << "\n";
     }
@@ -1574,7 +1571,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
   while (true)
     {
       GaussJordan matrix (number_of_equations);
-      unsigned int equation = 0;
+      size_t equation = 0;
 
       // The SMB and SOM change equations have this format:
       //
@@ -1582,14 +1579,14 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
       // => -k5 AOM1 - k6 AOM2) = k1 SMB1 + k2 SMB2 + k3 SOM1 + k4 SOM2 - dXXX
 
       // The SMB change equations.
-      for (unsigned int pool = 0; pool < smb_size; pool++)
+      for (size_t pool = 0; pool < smb_size; pool++)
 	{
 	  // Add contributions from AM pools
 	  if (am_input[pool] > 1e-30)
 	    matrix.set_value (equation, -am_input[pool]);
       
 	  // Add contributions from SMB pools.
-	  for (unsigned int i = 0; i < smb_size; i++)
+	  for (size_t i = 0; i < smb_size; i++)
 	    {
 	      const double abiotic_factor = abiotic (*smb[i], T, h,
 						     clayom->smb_use_clay (i),
@@ -1608,7 +1605,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	    }
 
 	  // Add contributions from SOM pools.
-	  for (unsigned int i = 0; i < som_size; i++)
+	  for (size_t i = 0; i < som_size; i++)
 	    {
 	      const double abiotic_factor = abiotic (*som[i], T, h,
 						     clayom->som_use_clay (i),
@@ -1630,14 +1627,14 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
       daisy_assert (equation == smb_size);
 
       // The SOM change equations.
-      for (unsigned int pool = 0; pool < som_size; pool++)
+      for (size_t pool = 0; pool < som_size; pool++)
 	{
 	  // Add contributions from AOM pools.
 	  if (pool == buffer.where && am_input[smb_size] > 1e-30)
 	    matrix.set_value (equation, -am_input[smb_size]);
       
 	  // Add contributions from SMB pools.
-	  for (unsigned int i = 0; i < smb_size; i++)
+	  for (size_t i = 0; i < smb_size; i++)
 	    {
 	      const double abiotic_factor = abiotic (*smb[i], T, h,
 						     clayom->smb_use_clay (i),
@@ -1651,7 +1648,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	    }
 
 	  // Add contributions from SOM pools.
-	  for (unsigned int i = 0; i < som_size; i++)
+	  for (size_t i = 0; i < som_size; i++)
 	    {
 	      const double abiotic_factor = abiotic (*som[i], T, h,
 						     clayom->som_use_clay (i), 
@@ -1674,7 +1671,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
       daisy_assert (equation == smb_size + som_size);
 
       // Additional SMB equations.
-      for (unsigned int pool = 0; pool < smb_size; pool++)
+      for (size_t pool = 0; pool < smb_size; pool++)
 	{
 	  if (smb[pool]->C.size () > lay)
 	    {
@@ -1696,7 +1693,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
       // Additional SOM equations.
       bool use_humus_equation = false;
       bool inert_pool_found = false;
-      for (unsigned int pool = 0; pool < som_size; pool++)
+      for (size_t pool = 0; pool < som_size; pool++)
 	{
 	  if (som[pool]->C.size () > lay)
 	    {
@@ -1713,9 +1710,9 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	      // => humus - AOM = SMB1 + SMB2 + SOM1 + SOM2
 	      //
 	      matrix.set_value (equation, total_C - total_am);
-	      for (unsigned int i = 0; i < smb_size; i++)
+	      for (size_t i = 0; i < smb_size; i++)
 		matrix.set_entry (equation, smb_column + i, 1.0);
-	      for (unsigned int i = 0; i < som_size; i++)
+	      for (size_t i = 0; i < som_size; i++)
 		matrix.set_entry (equation, som_column + i, 1.0);
 	      use_humus_equation = true;
 	    }
@@ -1738,7 +1735,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 		? SOM_fractions[pool]
 		: 0.0;
       
-	      for (unsigned int i = 0; i < som.size (); i++)
+	      for (size_t i = 0; i < som.size (); i++)
 		{
 		  if (i == pool)
 		    matrix.set_entry (equation, som_column + i, 
@@ -1755,7 +1752,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	      // dN = dSMB1 SMB1_N/C + + dSMBn SMBn_N/C 
 	      //      + dSOM1 SOM1_N/C + + dSOMn SOMn_N/C
 	      matrix.set_value (equation, -background_mineralization);
-	      for (unsigned int i = 0; i < smb_size; i++)
+	      for (size_t i = 0; i < smb_size; i++)
 		{
 		  double N_per_C = 0.0;
 		  if (smb[i]->C.size () > lay && smb[i]->N.size () > lay)
@@ -1771,7 +1768,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 		  matrix.set_entry (equation, dsmb_column + i, N_per_C);
 		}
 	      daisy_assert (SOM_C_per_N.size () == som.size ());
-	      for (unsigned int i = 0; i < som_size; i++)
+	      for (size_t i = 0; i < som_size; i++)
 		{
 		  daisy_assert (isnormal (SOM_C_per_N[i]));
 		  matrix.set_entry (equation, dsom_column + i,
@@ -1818,9 +1815,9 @@ Setting additional pool to zero");
 	      //
 	      // 0 = dSMB1 + dSMB2 + dSOM1 + dSOM2
 	      // matrix.set_value (equation, 0.0);
-	      for (unsigned int i = 0; i < smb_size; i++)
+	      for (size_t i = 0; i < smb_size; i++)
 		matrix.set_entry (equation, dsmb_column + i, 1.0);
-	      for (unsigned int i = 0; i < som_size; i++)
+	      for (size_t i = 0; i < som_size; i++)
 		matrix.set_entry (equation, dsom_column + i, 1.0);
 	      inert_pool_found = true;
 	    }
@@ -1830,12 +1827,12 @@ Setting additional pool to zero");
       daisy_assert (number_of_equations == equation);
 
       // Print out equations.
-      for (unsigned int row = 0; row < number_of_equations; row++)
+      for (size_t row = 0; row < number_of_equations; row++)
 	{
 	  equation_string << matrix.get_value (row) << " =";
 	  bool first = true;
 
-	  for (unsigned int pool = 0; pool < smb_size; pool++)
+	  for (size_t pool = 0; pool < smb_size; pool++)
 	    {
 	      const double value = matrix.get_entry (row, smb_column + pool);
 	      if (value != 0.0)
@@ -1848,7 +1845,7 @@ Setting additional pool to zero");
 		  equation_string << " " << value << " SMB" << (pool + 1);
 		}
 	    }
-	  for (unsigned int pool = 0; pool < som_size; pool++)
+	  for (size_t pool = 0; pool < som_size; pool++)
 	    {
 	      const double value = matrix.get_entry (row, som_column + pool);
 	      if (value != 0.0)
@@ -1860,7 +1857,7 @@ Setting additional pool to zero");
 		  equation_string << " " << value << " SOM" << (pool + 1);
 		}
 	    }
-	  for (unsigned int pool = 0; pool < smb_size; pool++)
+	  for (size_t pool = 0; pool < smb_size; pool++)
 	    {
 	      const double value = matrix.get_entry (row, dsmb_column + pool);
 	      if (value != 0.0)
@@ -1872,7 +1869,7 @@ Setting additional pool to zero");
 		  equation_string << " " << value << " dSMB" << (pool + 1);
 		}
 	    }
-	  for (unsigned int pool = 0; pool < som_size; pool++)
+	  for (size_t pool = 0; pool < som_size; pool++)
 	    {
 	      const double value = matrix.get_entry (row, dsom_column + pool);
 	      if (value != 0.0)
@@ -1909,7 +1906,7 @@ Setting additional pool to zero");
 
       // Check mass balance.
       total = total_am;
-      for (unsigned int i = 0; i < smb_size + som_size; i++)
+      for (size_t i = 0; i < smb_size + som_size; i++)
 	total += matrix.result (i);
       daisy_assert (!use_humus_equation || approximate (total, total_C));
 
@@ -1925,17 +1922,17 @@ Setting additional pool to zero");
 		    / (total * g_per_cm2_to_kg_per_ha)) << "\t"
 	<< 100.0 * total_am / total;
       
-      for (unsigned int pool = 0; pool < smb_size; pool++)
+      for (size_t pool = 0; pool < smb_size; pool++)
 	{
 	  const double value = matrix.result (smb_column + pool);
 	  table_string << "\t" << 100.0 * value / total;
 	}
-      for (unsigned int pool = 0; pool < som_size; pool++)
+      for (size_t pool = 0; pool < som_size; pool++)
 	{
 	  const double value = matrix.result (som_column + pool);
 	  table_string << "\t" << 100.0 * value / total;
 	}
-      for (unsigned int pool = 0; pool < smb_size; pool++)
+      for (size_t pool = 0; pool < smb_size; pool++)
 	{
 	  const double value = matrix.result (smb_column + pool) 
 	    * g_per_cm2_to_kg_per_ha;
@@ -1944,7 +1941,7 @@ Setting additional pool to zero");
 	  const double rate = change / value;
 	  table_string << "\t" << change << "\t" << rate;
 	}
-      for (unsigned int pool = 0; pool < som_size; pool++)
+      for (size_t pool = 0; pool < som_size; pool++)
 	{
 	  const double value = matrix.result (som_column + pool) 
 	    * g_per_cm2_to_kg_per_ha;
@@ -1955,16 +1952,16 @@ Setting additional pool to zero");
 	}
 
       // Store results.
-      for (unsigned int pool = 0; pool < smb_size; pool++)
+      for (size_t pool = 0; pool < smb_size; pool++)
 	SMB_results[pool] = max (0.0, matrix.result (smb_column + pool));
-      for (unsigned int pool = 0; pool < som_size; pool++)
+      for (size_t pool = 0; pool < som_size; pool++)
 	SOM_results[pool] = max (0.0, matrix.result (som_column + pool));
 
 
       // Store changes.
       delta_N = 0.0;
       delta_C = 0.0;
-      for (unsigned int pool = 0; pool < smb_size; pool++)
+      for (size_t pool = 0; pool < smb_size; pool++)
         {
           double N_per_C = 0.0;
           if (smb[pool]->C.size () > lay && smb[pool]->N.size () > lay)
@@ -1982,7 +1979,7 @@ Setting additional pool to zero");
           delta_N += C * N_per_C;
         }
       daisy_assert (SOM_C_per_N.size () == som.size ());
-      for (unsigned int pool = 0; pool < som_size; pool++)
+      for (size_t pool = 0; pool < som_size; pool++)
         {
           const double C = matrix.result (dsom_column + pool);
           delta_C += C;
@@ -2001,7 +1998,7 @@ Setting additional pool to zero");
 
       // Forced SOM fractions, don't retry.
       bool SOM_fractions_fully_specified = SOM_fractions.size () != 0;
-      for (unsigned int i = 0; i < SOM_fractions.size (); i++)
+      for (size_t i = 0; i < SOM_fractions.size (); i++)
         if (SOM_fractions[i] < 0.0)
           SOM_fractions_fully_specified = false;
       if (SOM_fractions_fully_specified)
@@ -2097,7 +2094,7 @@ OrganicMatter::Implementation::top_summary (const Geometry& geo,
     
   // Max number of AOM pools.
   size_t aom_max_size = 0;
-  for (unsigned int pool = 0; pool < am.size (); pool++)
+  for (size_t pool = 0; pool < am.size (); pool++)
     { 
       vector<AOM*> added;
       am[pool]->append_to (added);
@@ -2106,35 +2103,35 @@ OrganicMatter::Implementation::top_summary (const Geometry& geo,
     
   // Header line.
   tmp << "\t";
-  for (unsigned int pool = 0; pool < som.size (); pool++)
+  for (size_t pool = 0; pool < som.size (); pool++)
     tmp << "SOM" << pool + 1 << "\t";
-  for (unsigned int pool = 0; pool < smb.size (); pool++)
+  for (size_t pool = 0; pool < smb.size (); pool++)
     tmp << "SMB" << pool + 1 << "\t";
-  for (unsigned int pool = 0; pool < aom_max_size; pool++)
+  for (size_t pool = 0; pool < aom_max_size; pool++)
     tmp << "AOM" << pool + 1 << "\t";
-  for (unsigned int pool = 0; pool < dom.size (); pool++)
+  for (size_t pool = 0; pool < dom.size (); pool++)
     tmp << "DOM" << pool + 1 << "\t";
   tmp << "total\n";
 
   // C line
   tmp << "kg C/ha\t";
   double total_C = 0.0;
-  for (unsigned int pool = 0; pool < som.size (); pool++)
+  for (size_t pool = 0; pool < som.size (); pool++)
     {
       const double C = som[pool]->soil_C (geo, 0.0, init.end);
       tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
-  for (unsigned int pool = 0; pool < smb.size (); pool++)
+  for (size_t pool = 0; pool < smb.size (); pool++)
     {
       const double C = smb[pool]->soil_C (geo, 0.0, init.end);
       tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
-  for (unsigned int pool = 0; pool < aom_max_size; pool++)
+  for (size_t pool = 0; pool < aom_max_size; pool++)
     { 
       double C = 0.0;
-      for (unsigned int i = 0; i < am.size (); i++)
+      for (size_t i = 0; i < am.size (); i++)
         { 
           vector<AOM*> added;
           am[i]->append_to (added);
@@ -2144,7 +2141,7 @@ OrganicMatter::Implementation::top_summary (const Geometry& geo,
       tmp << C * g_per_cm2_to_kg_per_ha << "\t";
       total_C += C;
     }
-  for (unsigned int pool = 0; pool < dom.size (); pool++)
+  for (size_t pool = 0; pool < dom.size (); pool++)
     {
       const double C = dom[pool]->soil_C (geo, 0.0, init.end);
       tmp << C * g_per_cm2_to_kg_per_ha << "\t";
@@ -2155,22 +2152,22 @@ OrganicMatter::Implementation::top_summary (const Geometry& geo,
   // N line
   tmp << "kg N/ha\t";
   double total_N = 0.0;
-  for (unsigned int pool = 0; pool < som.size (); pool++)
+  for (size_t pool = 0; pool < som.size (); pool++)
     {
       const double N = som[pool]->soil_N (geo, 0.0, init.end);
       tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
-  for (unsigned int pool = 0; pool < smb.size (); pool++)
+  for (size_t pool = 0; pool < smb.size (); pool++)
     {
       const double N = smb[pool]->soil_N (geo, 0.0, init.end);
       tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
-  for (unsigned int pool = 0; pool < aom_max_size; pool++)
+  for (size_t pool = 0; pool < aom_max_size; pool++)
     { 
       double N = 0.0;
-      for (unsigned int i = 0; i < am.size (); i++)
+      for (size_t i = 0; i < am.size (); i++)
         { 
           vector<AOM*> added;
           am[i]->append_to (added);
@@ -2180,7 +2177,7 @@ OrganicMatter::Implementation::top_summary (const Geometry& geo,
       tmp << N * g_per_cm2_to_kg_per_ha << "\t";
       total_N += N;
     }
-  for (unsigned int pool = 0; pool < dom.size (); pool++)
+  for (size_t pool = 0; pool < dom.size (); pool++)
     {
       const double N = dom[pool]->soil_N (geo, 0.0, init.end);
       tmp << N * g_per_cm2_to_kg_per_ha << "\t";
@@ -2197,7 +2194,7 @@ OrganicMatter::Implementation::top_summary (const Geometry& geo,
   double clay = 0.0;
   double input = 0.0;
   double last = 0.0;
-  for (unsigned int lay = 0; 
+  for (size_t lay = 0; 
        lay < geo.node_size () && geo.z (lay) > init.end;
        lay++)
     {
@@ -2250,7 +2247,7 @@ OrganicMatter::Implementation::update_pools
   // Update SMB pools.
   double SMB_C = 0.0;
   double SMB_N = 0.0;
-  for (unsigned int pool = 0; pool < smb.size (); pool++)
+  for (size_t pool = 0; pool < smb.size (); pool++)
     {
       const double value = SMB_results[pool];
       if (smb[pool]->C.size () > lay)
@@ -2279,7 +2276,7 @@ OrganicMatter::Implementation::update_pools
   // Update SOM pools.
   daisy_assert (SOM_C_per_N_goal.size () == som.size ());
   double SOM_C = 0.0;
-  for (unsigned int pool = 0; pool < som.size (); pool++)
+  for (size_t pool = 0; pool < som.size (); pool++)
     {
       const double value = SOM_results[pool];
       if (som[pool]->C.size () > lay)
@@ -2302,7 +2299,7 @@ OrganicMatter::Implementation::update_pools
     {
       double AOM_C = 0.0;
       double AOM_N = 0.0;
-      for (unsigned int i = 0; i < am.size (); i++)
+      for (size_t i = 0; i < am.size (); i++)
 	{
 	  AOM_C += am[i]->C_at (lay);
 	  AOM_N += am[i]->N_at (lay);
@@ -2313,7 +2310,7 @@ OrganicMatter::Implementation::update_pools
       daisy_assert (SOM_N > 0.0);
       const double SOM_C_per_N = SOM_C / SOM_N;
 
-      for (unsigned int pool = 0; pool < som.size (); pool++)
+      for (size_t pool = 0; pool < som.size (); pool++)
 	if (som[pool]->N.size () == lay)
 	  som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N);
     }
@@ -2329,12 +2326,23 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   Treelog::Open nest (err, "OrganicMatter");
 
   // Sizes.
-  const unsigned int smb_size = smb.size ();
-  const unsigned int som_size = som.size ();
-  const unsigned int dom_size = dom.size ();
+  const size_t node_size = geo.node_size ();
+  const size_t smb_size = smb.size ();
+  const size_t som_size = som.size ();
+  const size_t dom_size = dom.size ();
+
+  if (active_underground)
+    active.insert (active.end (), node_size, true);
+  else
+    {
+      const double limit = min (-100.0, soil.MaxRootingHeight ());
+      for (size_t lay = 0; lay < node_size; lay++)
+        active.push_back (geo.z (lay) >= limit);
+    }
+  daisy_assert (active.size () == node_size);
 
   // Check horizons.
-  for (unsigned int lay = 0; lay < soil.size (); lay++)
+  for (size_t lay = 0; lay < node_size; lay++)
     {
       // We just return uninitialized if there is a mismatch, it will
       // be caught by Soil::check later.
@@ -2346,16 +2354,16 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
     }
 
   // Production.
-  CO2_slow.insert (CO2_slow.end (), soil.size (), 0.0);
-  CO2_fast.insert (CO2_fast.end (), soil.size (), 0.0);
-  NO3_source.insert (NO3_source.end (), soil.size (), 0.0);
-  NH4_source.insert (NH4_source.end (), soil.size (), 0.0);
+  CO2_slow.insert (CO2_slow.end (), node_size, 0.0);
+  CO2_fast.insert (CO2_fast.end (), node_size, 0.0);
+  NO3_source.insert (NO3_source.end (), node_size, 0.0);
+  NH4_source.insert (NH4_source.end (), node_size, 0.0);
   
   // Clay affect of SMB turnover and mantenance.
   clayom->set_rates (soil, smb);
 
   // Clay and soil.
-  for (unsigned int i = 0; i < soil.size (); i++)
+  for (size_t i = 0; i < node_size; i++)
     {
       const double soil_factor = soil.turnover_factor (i);
       const double clay_factor = clayom->factor (soil.clay (i));
@@ -2363,16 +2371,16 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
       clay_turnover_factor.push_back (soil_factor * clay_factor);
     }
 
-  abiotic_factor.insert (abiotic_factor.end (), soil.size (), 1.0);
+  abiotic_factor.insert (abiotic_factor.end (), node_size, 1.0);
     
 
   // Tillage.
   tillage_age.insert (tillage_age.end (), 
-		      soil.size () - tillage_age.size (), 1000000.0);
+		      node_size - tillage_age.size (), 1000000.0);
 
   // Initialize AM.
-  for (unsigned int i = 0; i < am.size (); i++)
-    am[i]->initialize (geo, soil.MaxRootingDepth ());
+  for (size_t i = 0; i < am.size (); i++)
+    am[i]->initialize (geo, soil.MaxRootingHeight ());
 
   // Biological incorporation.
   bioincorporation.initialize (geo, soil);
@@ -2385,32 +2393,32 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
     am.push_back (bioincorporation.create_am (geo)); 
 
   // Warnings in case of explicit SOM or SMB initialization.
-  for (unsigned int pool = 0; pool < som_size; pool++)
+  for (size_t pool = 0; pool < som_size; pool++)
     {
       std::ostringstream tmp;
       tmp << "som[" << pool << "]";
       Treelog::Open nest (err, tmp.str ());
-      if (som[pool]->C.size () > 0 && som[pool]->C.size () < soil.size ())
+      if (som[pool]->C.size () > 0 && som[pool]->C.size () < node_size)
 	err.warning ("C partially initialized.\n\
 Using humus for remaining entries");
-      if (som[pool]->N.size () > 0 && som[pool]->N.size () < soil.size ())
+      if (som[pool]->N.size () > 0 && som[pool]->N.size () < node_size)
 	err.warning ("N partially initialized.\n\
 Using humus for remaining entries");
     }
-  for (unsigned int pool = 0; pool < smb_size; pool++)
+  for (size_t pool = 0; pool < smb_size; pool++)
     {
       std::ostringstream tmp;
       tmp << "smb[" << pool << "]";
       Treelog::Open nest (err, tmp.str ());
-      if (smb[pool]->C.size () > 0 && smb[pool]->C.size () < soil.size ())
+      if (smb[pool]->C.size () > 0 && smb[pool]->C.size () < node_size)
 	err.warning ("C partially initialized.\n\
 Using equilibrium for remaining entries");
-      if (smb[pool]->N.size () > 0 && smb[pool]->N.size () < soil.size ())
+      if (smb[pool]->N.size () > 0 && smb[pool]->N.size () < node_size)
 	err.warning ("N partially initialized.\n\
 Using initial C per N for remaining entries");
     }
 
-  vector<double> total_C (soil.size (), 0.0);
+  vector<double> total_C (node_size, 0.0);
   double first_humus = 0.0;
 
   // Initialize C from layers, when available.
@@ -2418,9 +2426,9 @@ Using initial C per N for remaining entries");
     {
       const vector<AttributeList*>& layers
 	= al.alist_sequence ("initial_SOM");
-      const double soil_end = geo.zplus (soil.size () - 1);
+      const double soil_end = geo.zplus (node_size - 1);
       double last = 0.0;
-      for (unsigned int i = 0; i < layers.size (); i++)
+      for (size_t i = 0; i < layers.size (); i++)
 	{
 	  double end = layers[i]->number ("end");
 	  double weight = layers[i]->number ("weight"); // kg C/m²
@@ -2443,19 +2451,9 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
 
   // Initialize rest from humus.
   {
-    double last = 0.0;
-    for (unsigned int lay = 0; lay < soil.size (); lay++)
-      {
-        const double humus_C = soil.humus_C (lay);
-        const double zplus = geo.zplus (lay);
-        if (zplus < first_humus)
-          if (last <= first_humus)
-            total_C[lay] = humus_C;
-          else
-            geo.add (total_C, first_humus, zplus, 
-                      humus_C * (first_humus - zplus));
-        last = zplus;
-      }
+    for (size_t lay = 0; lay < node_size; lay++)
+      if (geo.z (lay) < first_humus)
+        total_C[lay] = soil.humus_C (lay);
   }
   // Partitioning.
   Initialization init (al.alist ("init"), geo, soil, bioincorporation, som, T_avg);
@@ -2469,7 +2467,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
     vector<double> SMB_results (smb_size, 0.0);
     double last = 0.0;
 
-    for (unsigned int lay = 0; lay < soil.size (); lay++)
+    for (size_t lay = 0; lay < node_size; lay++)
       {
         vector<double> am_input (smb.size () + 1);
         if (init.input >= 0)
@@ -2539,7 +2537,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   }
 
   // Initialize DOM.
-  for (unsigned int pool = 0; pool < dom_size; pool++)
+  for (size_t pool = 0; pool < dom_size; pool++)
     dom[pool]->initialize (soil, soil_water, err);
 
   // Initialize domsorp
@@ -2570,13 +2568,12 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   buffer.initialize (geo);
 
   // Log variable.
-  tillage_N_soil.insert (tillage_N_soil.end (), soil.size (), 0.0);
-  tillage_C_soil.insert (tillage_C_soil.end (), soil.size (), 0.0);
+  tillage_N_soil.insert (tillage_N_soil.end (), node_size, 0.0);
+  tillage_C_soil.insert (tillage_C_soil.end (), node_size, 0.0);
 }
 
 OrganicMatter::Implementation::Implementation (Block& al)
   : active_underground (al.flag ("active_underground")),
-    active_groundwater (al.flag ("active_groundwater")),
     K_NH4 (al.number ("K_NH4")),
     K_NO3 (al.number ("K_NO3")),
     CO2_threshold (al.number ("CO2_threshold")),
@@ -2621,21 +2618,18 @@ void
 OrganicMatter::monthly (const Geometry& geo)
 { impl->monthly (geo); }
 
-size_t
-OrganicMatter::active_size (const Geometry& geo,
-                            const Soil& soil, 
-                            const SoilWater& soil_water) const
-{ return impl->active_size (geo, soil, soil_water); }
+const std::vector<bool>& 
+OrganicMatter::active () const
+{ return impl->active; }
 
 void 
 OrganicMatter::tick (const Geometry& geo,
-                     const Soil& soil, 
 		     const SoilWater& soil_water, 
 		     const SoilHeat& soil_heat,
 		     SoilNO3& soil_NO3,
 		     SoilNH4& soil_NH4,
 		     Treelog& msg)
-{ impl->tick (geo, soil, soil_water, soil_heat, soil_NO3, soil_NH4, msg); }
+{ impl->tick (geo, soil_water, soil_heat, soil_NO3, soil_NH4, msg); }
 
 void 
 OrganicMatter::transport (const Soil& soil, 
@@ -2662,7 +2656,7 @@ OrganicMatter::swap (const Geometry& geo, const Soil& soil,
 { impl->swap (geo, soil, soil_water, from, middle, to, time); }
 
 double
-OrganicMatter::CO2 (unsigned int i) const
+OrganicMatter::CO2 (size_t i) const
 {
   daisy_assert (impl->CO2_slow.size () > i);
   daisy_assert (impl->CO2_fast.size () > i);
@@ -2670,14 +2664,14 @@ OrganicMatter::CO2 (unsigned int i) const
 }
 
 double
-OrganicMatter::CO2_fast (unsigned int i) const
+OrganicMatter::CO2_fast (size_t i) const
 {
   daisy_assert (impl->CO2_fast.size () > i);
   return impl->CO2_fast[i];
 }
 
 double 
-OrganicMatter::get_smb_c_at (unsigned int i) const
+OrganicMatter::get_smb_c_at (size_t i) const
 { return impl->get_smb_c_at (i); }
 
 void 
@@ -2693,7 +2687,7 @@ OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
       const vector<AttributeList*>& om_alist
 	= am.alist_sequence ("om");
       
-      for (unsigned int i = 0; i < om_alist.size(); i++)
+      for (size_t i = 0; i < om_alist.size(); i++)
 	{
 	  std::ostringstream tmp;
 	  tmp << "[" << i << "]";
@@ -2776,12 +2770,15 @@ check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
+  if (al.check ("active_groundwater"))
+    err.warning ("The 'active_groundwater' parameter is ignored.");
+
   const vector<AttributeList*>& am_alist = al.alist_sequence ("am");
   const vector<AttributeList*>& smb_alist = al.alist_sequence ("smb");
   const vector<AttributeList*>& som_alist = al.alist_sequence ("som");
   const vector<AttributeList*>& dom_alist = al.alist_sequence ("dom");
 
-  for (unsigned int j = 0; j < am_alist.size(); j++)
+  for (size_t j = 0; j < am_alist.size(); j++)
     {
       std::ostringstream tmp;
       tmp << "am[" << j << "]";
@@ -2792,7 +2789,7 @@ check_alist (const AttributeList& al, Treelog& err)
 	  bool om_ok = true;
 	  const vector<AttributeList*>& om_alist
 	    = am_alist[j]->alist_sequence ("om");
-	  for (unsigned int i = 0; i < om_alist.size(); i++)
+	  for (size_t i = 0; i < om_alist.size(); i++)
 	    {
 	      std::ostringstream tmp;
 	      tmp << "om[" << i << "]";
@@ -2833,7 +2830,7 @@ check_alist (const AttributeList& al, Treelog& err)
       err.error ("You nees at least one smb pool.");
       ok = false;
     }
-  for (unsigned int i = 0; i < smb_alist.size(); i++)
+  for (size_t i = 0; i < smb_alist.size(); i++)
     {
       std::ostringstream tmp;
       tmp << "smb[" << i << "]";
@@ -2892,7 +2889,7 @@ check_alist (const AttributeList& al, Treelog& err)
       err.error ("You nees at least one som pool.");
       ok = false;
     }
-  for (unsigned int i = 0; i < som_alist.size(); i++)
+  for (size_t i = 0; i < som_alist.size(); i++)
     {
       std::ostringstream tmp;
       tmp << "som[" << i << "]";
@@ -2940,7 +2937,7 @@ check_alist (const AttributeList& al, Treelog& err)
       if (!om_ok)
 	ok = false;
     }
-  for (unsigned int i = 0; i < dom_alist.size(); i++)
+  for (size_t i = 0; i < dom_alist.size(); i++)
     {
       std::ostringstream tmp;
       tmp << "dom[" << i << "]";
@@ -3011,9 +3008,8 @@ Recalibrated by Bruun et.al. 2002.");
   syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
 Set this flag to turn on mineralization below the root zone.");
   alist.add ("active_underground", false);
-  syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
-Clear this flag to turn off mineralization in groundwater.");
-  alist.add ("active_groundwater", true);
+  syntax.add ("active_groundwater", Syntax::Boolean, Syntax::OptionalConst, "\
+IGNORED: Use 'water_factor' to disable mineralization.");
   syntax.add ("K_NH4", "h^-1", Check::fraction (), Syntax::Const, 
 	      "Maximal immobilization rate for ammonium.");
   alist.add ("K_NH4", 0.020833); // 0.5 / 24.

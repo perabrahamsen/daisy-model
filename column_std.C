@@ -74,7 +74,7 @@ public:
     vector<double> N2O;
 
     // Simulation.
-    void tick (const size_t size,
+    void tick (const std::vector<bool>&, 
                const Soil& soil, const SoilWater& soil_water,
                const SoilHeat& soil_heat,
                SoilNO3& soil_NO3, SoilNH4& soil_NH4);
@@ -150,35 +150,38 @@ public:
 };
 
 void 
-ColumnStandard::NitLog::tick (const size_t size,
+ColumnStandard::NitLog::tick (const std::vector<bool>& active, 
                               const Soil& soil, const SoilWater& soil_water,
                               const SoilHeat& soil_heat,
                               SoilNO3& soil_NO3, SoilNH4& soil_NH4)
 {
-  for (int i = 0; i < soil.size (); i++)
+  const size_t node_size = soil.size ();
+  for (int i = 0; i < node_size; i++)
     {
       daisy_assert (soil_NO3.M_left (i) >= 0.0);
       daisy_assert (soil_NH4.M_left (i) >= 0.0);
     }
 
-  daisy_assert (NH4.size () == NO3.size ());
-  daisy_assert (N2O.size () == NO3.size ());
-  daisy_assert (soil.size () == NO3.size ());
+  daisy_assert (NH4.size () == node_size);
+  daisy_assert (N2O.size () == node_size);
+  daisy_assert (NO3.size () == node_size);
 
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < node_size; i++)
     {
-      soil.nitrification (i, 
-                          soil_NH4.M (i), soil_NH4.C (i), soil_NH4.M_left (i),
-                          soil_water.h (i), soil_heat.T (i),
-                          NH4[i], N2O[i], NO3[i]);
+      if (active[i])
+        soil.nitrification (i, 
+                            soil_NH4.M (i), soil_NH4.C (i), 
+                            soil_NH4.M_left (i),
+                            soil_water.h (i), soil_heat.T (i),
+                            NH4[i], N2O[i], NO3[i]);
+      else
+        NH4[i] = N2O[i] = NO3[i] = 0.0;        
     }
-  for (unsigned int i = size; i < NH4.size (); i++)
-    NH4[i] = N2O[i] = NO3[i] = 0.0;
 
   soil_NH4.add_to_sink (NH4);
   soil_NO3.add_to_source (NO3);
 
-  for (int i = 0; i < soil.size (); i++)
+  for (size_t i = 0; i < node_size; i++)
     {
       daisy_assert (soil_NO3.M_left (i) >= 0.0);
       daisy_assert (soil_NH4.M_left (i) >= 0.0);
@@ -463,13 +466,12 @@ ColumnStandard::tick (Treelog& out,
                     soil_heat, *soil_water, &soil_NH4, &soil_NO3, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, out);
-  organic_matter->tick (*geometry, *soil, *soil_water, soil_heat, 
+  organic_matter->tick (*geometry, *soil_water, soil_heat, 
 		       soil_NO3, soil_NH4, out);
-  const size_t active_size 
-    = organic_matter->active_size (*geometry, *soil, *soil_water);
-  nitrification.tick (active_size,
+  const std::vector<bool> active = organic_matter-> active (); 
+  nitrification.tick (active, 
                       *soil, *soil_water, soil_heat, soil_NO3, soil_NH4);
-  denitrification.tick (active_size, 
+  denitrification.tick (active, 
                         *geometry, *soil, *soil_water, soil_heat, soil_NO3, 
 			*organic_matter);
 
@@ -601,6 +603,7 @@ ColumnStandard::initialize (const Time& time, Treelog& err,
   soil_NO3.initialize (alist.alist ("SoilNO3"), 
                        *geometry, *soil, *soil_water, err);
   nitrification.initialize (soil->size ());
+  denitrification.initialize (soil->size ());
   if (!global_weather && !weather)
     return;
   const double T_avg = weather // Must be after initialize_common.

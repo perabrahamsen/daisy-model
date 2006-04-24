@@ -66,21 +66,22 @@ Denitrification::output (Log& log) const
   output_variable (potential_fast, log);
 }
 
-void Denitrification::tick (const size_t size,
+void Denitrification::tick (const std::vector<bool>& active,
                             const Geometry& geo,
                             const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    SoilNO3& soil_NO3, 
 			    const OrganicMatter& organic_matter)
 {
-  converted.erase (converted.begin (), converted.end ());
-  converted_fast.erase (converted_fast.begin (), converted_fast.end ());
-  converted_redox.erase (converted_redox.begin (), converted_redox.end ());
-  potential.erase (potential.begin (), potential.end ());
-  potential_fast.erase (potential_fast.begin (), potential_fast.end ());
-
-  for (unsigned int i = 0; i < size; i++)
+  const size_t node_size = geo.node_size ();
+  for (size_t i = 0; i < node_size; i++)
     {
+      if (!active[i])
+        {
+          converted[i] = converted_fast[i] = converted_redox[i]
+            = potential[i] = potential_fast[i] = 0.0;
+          continue;
+        }
       const double CO2_fast = organic_matter.CO2_fast (i);
       const double CO2_slow = organic_matter.CO2 (i) - CO2_fast;
       const double Theta = soil_water.Theta (i);
@@ -103,17 +104,17 @@ void Denitrification::tick (const size_t size,
       const double M = min (rate, K * NO3) + min (rate_fast, K_fast * NO3);
       if (redox_height <= 0 && height < redox_height)
 	{
-	  converted.push_back (NO3);
-	  converted_redox.push_back (NO3 - M);
+	  converted[i] = NO3;
+	  converted_redox[i] = NO3 - M;
 	}
       else
 	{
-	  converted.push_back (M);
-	  converted_redox.push_back (0.0);
+	  converted[i] = M;
+	  converted_redox[i] = 0.0;
 	}
-      converted_fast.push_back (M > rate ? M - rate : 0.0);
-      potential.push_back (pot);
-      potential_fast.push_back (pot_fast);
+      converted_fast[i] = (M > rate ? M - rate : 0.0);
+      potential[i] = pot;
+      potential_fast[i] = pot_fast;
     }
   soil_NO3.add_to_sink (converted);
 }
@@ -178,6 +179,16 @@ By default, this is identical to the 'water_factor' parameter.");
 Height (a negative number) blow which redox processes start.\n\
 All NO3 below this height will be denitrified immediately.\n\
 By default no redox denitrification occurs.");
+}
+
+void
+Denitrification::initialize (const size_t node_size)
+{
+  converted.insert (converted.begin (), node_size, 0.0);
+  converted_fast.insert (converted_fast.begin (), node_size, 0.0);
+  converted_redox.insert (converted_redox.begin (), node_size, 0.0);
+  potential.insert (potential.begin (), node_size, 0.0);
+  potential_fast.insert (potential_fast.begin (), node_size, 0.0);
 }
 
 Denitrification::Denitrification (const AttributeList& al)

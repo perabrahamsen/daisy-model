@@ -85,7 +85,7 @@ public:
                       double& NH4, double& N2O, double& NO3) const;
 
   // Calculations.
-  double MaxRootingDepth () const;
+  double MaxRootingHeight () const;
   double end_of_first_horizon () const;
 
   // Creation.

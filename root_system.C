@@ -341,7 +341,7 @@ RootSystem::tick_daily (Treelog& msg, const Geometry& geo, const Soil& soil,
       Depth = min (Depth + dp, MaxPen);
       PotRtDpt = max (PotRtDpt, Depth);
       /*max depth determined by crop*/
-      Depth = min (Depth, -soil.MaxRootingDepth ()); /*or by soil conditions*/
+      Depth = min (Depth, -soil.MaxRootingHeight ()); /*or by soil conditions*/
     }
   set_density (msg, geo, WRoot, DS);
 }

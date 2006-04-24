@@ -31,14 +31,18 @@
 using namespace std;
 
 void
-SMB::maintain (unsigned int end, const double* abiotic_factor, 
+SMB::maintain (const std::vector<bool>& active, const double* abiotic_factor, 
 	       double* N_used, double* CO2)
 {
-  const unsigned int size = min (C.size (), end);
-  daisy_assert (N.size () >= size);
+  const size_t node_size = active.size ();
+  daisy_assert (C.size () == node_size);
+  daisy_assert (N.size () == node_size);
 
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < node_size; i++)
     {
+      if (!active[i])
+        continue;
+
       // Maintenance.
       const double C_use = C[i] * clay_maintenance[i] * abiotic_factor[i];
       const double N_use = N[i] * clay_maintenance[i] * abiotic_factor[i];
@@ -52,17 +56,21 @@ SMB::maintain (unsigned int end, const double* abiotic_factor,
 }
 
 void
-SMB::turnover_pool (unsigned int end, const double* factor,
+SMB::turnover_pool (const std::vector<bool>& active, const double* factor,
 		    double fraction, double efficiency,
 		    const double* N_soil, double* N_used, double* CO2, OM& om)
 {
-  const unsigned int size = min (C.size (), end);
-  daisy_assert (N.size () >= size);
+  const size_t node_size = active.size ();
+  daisy_assert (C.size () == node_size);
+  daisy_assert (N.size () == node_size);
 
   // Maintenance.
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < node_size; i++)
     {
-      const double rate = min (factor[i] * clay_turnover[i] * fraction, 0.1);
+      if (!active[i])
+        continue;
+      const double rate 
+        = min (factor[i] * clay_turnover[i] * fraction, 0.1);
       daisy_assert (C[i] >= 0.0);
       daisy_assert (isfinite (rate));
       daisy_assert (rate >=0);
@@ -98,10 +106,12 @@ SMB::turnover_pool (unsigned int end, const double* factor,
 }
 
 void
-SMB::turnover_dom (unsigned int size, const double* factor,
+SMB::turnover_dom (const std::vector<bool>& active, const double* factor,
 		  double fraction, DOM& dom)
 {
-  for (unsigned int i = 0; i < size; i++)
+  const size_t node_size = active.size ();
+
+  for (unsigned int i = 0; i < node_size; i++)
     {
       const double rate = min (clay_turnover[i] * fraction * factor[i], 0.1);
       const double C_use = C[i] * rate;

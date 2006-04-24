@@ -51,10 +51,9 @@ private:
 public:
   void clear ();
   void monthly (const Geometry&);
-  size_t active_size (const Geometry& geo,
-                      const Soil&, const SoilWater&) const;
+  const std::vector<bool>& active () const;
   void tick (const Geometry& geo,
-             const Soil&, const SoilWater&, const SoilHeat&, 
+             const SoilWater&, const SoilHeat&, 
 	     SoilNO3&, SoilNH4&, Treelog& msg);
   void transport (const Soil&, const SoilWater&, Treelog&);
   const std::vector<DOM*>& dom () const;

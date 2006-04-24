@@ -80,8 +80,8 @@ struct AM::Implementation
              vector<double>& tillage_N_soil, vector<double>& tillage_C_soil);
   double total_C (const Geometry& geo) const;
   double total_N (const Geometry& geo) const;
-  double C_at (unsigned int at) const;
-  double N_at (unsigned int at) const;
+  double C_at (size_t at) const;
+  double N_at (size_t at) const;
   void pour (vector<double>& cc, vector<double>& nn); // Move content to cc&nn.
   void append_to (vector<AOM*>& added); // Add OM's to added.
   void distribute (double C, vector<double>& om_C, // Helper for 'add' fns.
@@ -116,7 +116,7 @@ AM::Implementation::Check_OM_Pools::check (const Syntax& syntax,
   int missing_C_per_N = 0;
   double total_fractions = 0.0;
   bool same_unspecified = false;
-  for (unsigned int i = 0; i < om_alist.size (); i++)
+  for (size_t i = 0; i < om_alist.size (); i++)
     {
       if (!om_alist[i]->check ("initial_fraction"))
 	missing_initial_fraction++;
@@ -222,7 +222,7 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
   int missing_fraction = -1;
   int missing_C_per_N = -1;
   
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     {
       const double fraction = om[i]->initial_fraction;
       const double C_per_N = om[i]->initial_C_per_N;
@@ -274,7 +274,7 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
   if (om_N[missing_C_per_N] < 0.0)
     {
       // Too little N, distribute evenly.
-      for (unsigned int i = 0; i < om.size (); i++)
+      for (size_t i = 0; i < om.size (); i++)
 	{
 	  const double fraction = om[i]->initial_fraction;
 	  if (fraction == OM::Unspecified)
@@ -305,7 +305,7 @@ AM::Implementation::add (double C, double N)
 
   distribute (C, om_C, N, om_N);
 
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     om[i]->add (om_C[i], om_N[i]);
 }
 
@@ -321,14 +321,14 @@ AM::Implementation::add (const Geometry& geo,
   vector<double> nn (geo.node_size (), 0.0);
   other.pour (cc, nn);
 
-  for (unsigned int at = 0; at < geo.node_size (); at++)
+  for (size_t at = 0; at < geo.node_size (); at++)
     {
       vector<double> om_C (om.size (), 0.0);
       vector<double> om_N (om.size (), 0.0);
 
       distribute (cc[at], om_C, nn[at], om_N);
 
-      for (unsigned int i = 0; i < om.size (); i++)
+      for (size_t i = 0; i < om.size (); i++)
 	om[i]->add (at, om_C[i], om_N[i]);
     }
 
@@ -355,7 +355,7 @@ AM::Implementation::add (const Geometry& geo,
 
   distribute (C, om_C, N, om_N);
 
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     om[i]->add (geo, om_C[i], om_N[i], density);
 
   daisy_assert (approximate (old_C + C, total_C (geo)));
@@ -366,7 +366,7 @@ double
 AM::Implementation::top_C () const
 { 
   double total = 0.0;
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     total += om[i]->top_C;
   return total;
 }
@@ -375,7 +375,7 @@ double
 AM::Implementation::top_N () const
 { 
   double total = 0.0;
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     total += om[i]->top_N;
   return total;
 }
@@ -383,7 +383,7 @@ AM::Implementation::top_N () const
 void 
 AM::Implementation::multiply_top (double fraction)
 { 
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     {
       om[i]->top_N *= fraction;
       om[i]->top_C *= fraction;
@@ -425,7 +425,7 @@ AM::Implementation::mix (const Geometry& geo,
   const double old_C = total_C (geo);
   const double old_N = total_N (geo);
 
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     {
       om[i]->penetrate (geo, from, to, penetration, 
                         tillage_N_top, tillage_C_top, 
@@ -449,7 +449,7 @@ AM::Implementation::swap (const Geometry& geo,
   const double old_C = total_C (geo);
   const double old_N = total_N (geo);
 
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     om[i]->swap (geo, from, middle, to, 
                  tillage_N_soil, tillage_C_soil);
 
@@ -464,7 +464,7 @@ double
 AM::Implementation::total_C (const Geometry& geo) const
 {
   double total = 0.0;
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     total += om[i]->full_C (geo);
   return total;
 }
@@ -473,25 +473,25 @@ double
 AM::Implementation::total_N (const Geometry& geo) const
 {
   double total = 0.0;
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     total += om[i]->full_N (geo);
   return total;
 }
 
 double 
-AM::Implementation::C_at (const unsigned int at) const
+AM::Implementation::C_at (const size_t at) const
 {
   double total = 0.0;
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     total += om[i]->C_at (at);
   return total;
 }
 
 double 
-AM::Implementation::N_at (const unsigned int at) const
+AM::Implementation::N_at (const size_t at) const
 {
   double total = 0.0;
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     total += om[i]->N_at (at);
   return total;
 }
@@ -499,7 +499,7 @@ AM::Implementation::N_at (const unsigned int at) const
 void 
 AM::Implementation::pour (vector<double>& cc, vector<double>& nn)
 {
-  for (unsigned int i = 0; i < om.size (); i++)
+  for (size_t i = 0; i < om.size (); i++)
     om[i]->pour (cc, nn);
 }
 
@@ -558,11 +558,11 @@ AM::total_N (const Geometry& geo) const
 { return impl.total_N (geo); }
 
 double 
-AM::C_at (unsigned int at) const
+AM::C_at (size_t at) const
 { return impl.C_at (at); }
 
 double 
-AM::N_at (unsigned int at) const
+AM::N_at (size_t at) const
 { return impl.N_at (at); }
 
 void 
@@ -633,7 +633,7 @@ AM::create (const AttributeList& al1 , const Geometry& geo,
 
 // Crop part.
 AM& 
-AM::create (const Geometry& /*geo*/, const Time& time,
+AM::create (const size_t node_size, const Time& time,
 	    const vector<AttributeList*>& ol,
 	    const symbol sort, const symbol part,
 	    AM::lock_type lock)
@@ -651,6 +651,8 @@ AM::create (const Geometry& /*geo*/, const Time& time,
   AM& am = *new AM (al);
   if (lock == AM::Locked)
     am.impl.lock = new AM::Implementation::Lock (sort, part);
+  for (size_t i = 0; i < am.impl.om.size (); i++)
+    am.impl.om[i]->initialize (node_size);
   return am;
 }
 
@@ -928,14 +930,14 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
 	= alist.alist_sequence ("layers");
       
       double last = 0.0;
-      for (unsigned int i = 0; i < layers.size (); i++)
+      for (size_t i = 0; i < layers.size (); i++)
 	{
 	  const double end = layers[i]->number ("end");
 	  const double weight = layers[i]->number ("weight"); // Kg C/m²
 	  const double C = weight * 1000.0 / (100.0 * 100.0); // g C / cm²
 	  int missing_number = -1;
 	  double missing_fraction = 1.0;
-	  for (unsigned int j = 0; j < oms.size (); j++)
+	  for (size_t j = 0; j < oms.size (); j++)
 	    {
 	      if (oms[j]->check  ("initial_fraction"))
 		{
@@ -967,7 +969,7 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
 	  last = end;
 	}
       // Fill N to match C.
-      for (unsigned int i = 0; i < om.size (); i++)
+      for (size_t i = 0; i < om.size (); i++)
 	{
 	  daisy_assert (om[i]->initial_C_per_N > 0);
 	  while (om[i]->N.size () < om[i]->C.size ())
@@ -991,13 +993,15 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
 
       // Calculate density.
       vector<double> density (geo.node_size (), 0.0);
-      for (unsigned int i = 0; i < geo.node_size (); i++)
+      for (size_t i = 0; i < geo.node_size (); i++)
         if (geo.z (i) > depth)
           density[i] = k * exp (k * geo.z (i));
 
       // Add it.
       impl.add (geo, C, N, density);
     }
+  for (size_t i = 0; i < impl.om.size (); i++)
+    impl.om[i]->initialize (geo.node_size ());
 }
 
 AM::~AM ()
@@ -1038,7 +1042,7 @@ static struct AM_Syntax
     daisy_assert (al.check ("om"));
     int unspecified = 0;
     const vector<AttributeList*>& om = al.alist_sequence ("om");
-    for (unsigned int i = 0; i < om.size (); i++)
+    for (size_t i = 0; i < om.size (); i++)
       if (OM::get_initial_C_per_N (*om[i]) == OM::Unspecified)
 	unspecified++;
     if (unspecified != 1)
@@ -1058,7 +1062,7 @@ static struct AM_Syntax
     // We need exactly one pool with unspecified OM.
     daisy_assert (al.check ("om"));
     const vector<AttributeList*>& om = al.alist_sequence ("om");
-    for (unsigned int i = 0; i < om.size (); i++)
+    for (size_t i = 0; i < om.size (); i++)
       if (OM::get_initial_C_per_N (*om[i]) == OM::Unspecified)
 	{
 	  ostringstream tmp;

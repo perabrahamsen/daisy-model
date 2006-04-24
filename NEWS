@@ -22,6 +22,10 @@ Soltrans attribute.
 
 ** Changes slightly the numerical approximation of root density at the tip. 
 
+May affect simulation results (< 1% change).
+
+** Removed the 'active_groundwater' parameter from 'OrganicMatter'.
+
 * 4.02
 
 ** Bug fixes and restructuring.

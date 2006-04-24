@@ -234,7 +234,7 @@ Bioincorporation::Implementation::initialize (const Geometry& geo,
   // Calculate distribution density for all nodes.
   double last = 0.0;
   for (unsigned int i = 0;
-       i < soil.size () && last > soil.MaxRootingDepth ();
+       i < soil.size () && last > soil.MaxRootingHeight ();
        i++)
     {
       const double next = geo.zplus (i);
@@ -253,7 +253,7 @@ Bioincorporation::Implementation::create_am (const Geometry& geo)
 { 
   static const symbol bio_symbol ("bio");
   static const symbol incorporation_symbol ("incorporation");
-  aom = &AM::create (geo, Time (1, 1, 1, 1), aom_alists,
+  aom = &AM::create (geo.node_size (), Time (1, 1, 1, 1), aom_alists,
 		     bio_symbol, incorporation_symbol, AM::Locked); 
   return aom;
 }
