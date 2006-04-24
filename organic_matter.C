@@ -2193,24 +2193,23 @@ OrganicMatter::Implementation::top_summary (const Geometry& geo,
   // Clay and input.
   double clay = 0.0;
   double input = 0.0;
-  double last = 0.0;
-  for (size_t lay = 0; 
-       lay < geo.node_size () && geo.z (lay) > init.end;
-       lay++)
+  double volume = 0.0;
+  for (size_t lay = 0; lay < geo.node_size (); lay++)
     {
-      const double next = max (init.end, geo.zplus (lay));
-      const double dz = last - next;
-      last = next;
-
-      clay += soil.clay (lay) * dz;
+      if (geo.z (lay) < init.end)
+        continue;
+      
+      const double v = geo.volume (lay);
+      volume += v;
+      clay += soil.clay (lay) * v;
 
       const double total_input 
         = (init.input >= 0)
         ? init.find_total_input (lay)
         : total_input_from_am (init.T, init.h, lay);
-      input += total_input * dz * g_per_cm2_per_h_to_kg_per_ha_per_y;
+      input += total_input * v * g_per_cm2_per_h_to_kg_per_ha_per_y;
     }
-  clay /= -init.end;
+  clay /= volume;
   tmp << "clay\t" << clay * 100 << "\t%\n";
   tmp << "Specified input\t";
   if (init.input < 0.0)
@@ -2465,7 +2464,6 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   {
     vector<double> SOM_results (som_size, 0.0);
     vector<double> SMB_results (smb_size, 0.0);
-    double last = 0.0;
 
     for (size_t lay = 0; lay < node_size; lay++)
       {
@@ -2500,16 +2498,12 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
                    err,
                    init.print_equations (lay), init.debug_rows, 
                    init.debug_to_screen);
-        total_delta_C += delta_C * geo.dz (lay);
-        total_delta_N += delta_N * geo.dz (lay);
         if (top_soil)
           {
-            const double next = max (init.end, geo.zplus (lay));
-            const double dz = last - next;
-            last = next;
-            total_delta_C += delta_C * dz;
-            total_delta_N += delta_N * dz;
+            total_delta_C += delta_C * geo.volume (lay);
+            total_delta_N += delta_N * geo.volume (lay);
           }
+
         update_pools (SOM_results, soil.C_per_N (lay), 
                       soil.SOM_C_per_N (lay), SMB_results, lay);
       }

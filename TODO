@@ -50,17 +50,6 @@ SoilHeatRect rectangle
 
 ** Filer
 
-*** organic_matter.C
-
-
-**** init.end antager i > j => z(i) < z (j)
-
-**** total_delta_C
-
-***** counted twize...
-
-***** node volume limited by init.end
-
 *** bioincorporation.C
 
 **** distribution antager  i > j => z(i) < z (j)
@@ -70,10 +59,6 @@ SoilHeatRect rectangle
 **** Need to find bottom of soil.
 
 **** Need Average dry bulk density of interval.
-
-*** log_table.C
-
-**** Need node id instead of zplus for arrays.
 
 ** Done 2
 
@@ -99,7 +84,7 @@ ridge, uz*, macro*, groundwater*
 
 ** Done 3
 
-*** select_flux_top.C, select_flux_bottom.C, log table.C
+*** select_flux_top.C, select_flux_bottom.C, log_table.C
 
 Generalized to handle 2D geometry.
 
@@ -109,10 +94,6 @@ Generalized to handle 2D geometry.
 *** transport, macrotrans: 1D
 
 *** organic_matter.C
-**** active zone antog i > j => z(i) < z (j)
-**** tillage_age antager i > j => z(i) < z (j)
-**** initial_SOM antager i > j => z(i) < z (j)
-**** default humus antager  i > j => z(i) < z (j)
 
 * IDE: CT laver "sample setups" for hvert FON land 
 

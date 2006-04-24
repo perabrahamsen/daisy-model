@@ -3,6 +3,7 @@
 	* lib/chemistry.dai (solid): Removed transport.
 
 	* organic_matter.C (mix): Reset tillage age based on z, not zplus.
+	(top_summary, initialize): Removed 1D assumptions.
 
 	* organic_matter.C (active): New function.
 	(active_size): Removed.
@@ -10,6 +11,9 @@
 	* denitrification.C (tick) Change argument.
 	(initialize): New function.
 	* column_std.C (initialize): Update caller.
+	* om.C (initialize): New function.
+	(grow): Removed.
+	* all: Updated callers.
 
 2006-04-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
