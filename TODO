@@ -8,8 +8,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** A) Omorganiser Daisy kode så omsætning er uafhængig af transport
 
-1) Fjern 1D antagelser fra OM, bioinc
-
 2) Fjern 1D antagelser fra select content & interval.
 
 Interval:
@@ -19,6 +17,8 @@ Interval:
 
 Content:
   content_at
+
+Check alle "(0)" 
 
 ** B) Rect
 
@@ -60,6 +60,7 @@ SoilHeatRect rectangle
 
 **** Need Average dry bulk density of interval.
 
+
 ** Done 2
 
 *** Split Soil fra Geometry
@@ -84,16 +85,11 @@ ridge, uz*, macro*, groundwater*
 
 ** Done 3
 
-*** select_flux_top.C, select_flux_bottom.C, log_table.C
-
-Generalized to handle 2D geometry.
-
-*** solute.C, dom.C: Removed transport.
-*** soltrans1D.C: New transport module.
-
+*** flux, array logs: Generalized to handle 2D geometry.
+*** solute, dom: Removed transport.
+*** soltrans1D: New transport module.
 *** transport, macrotrans: 1D
-
-*** organic_matter.C
+*** organic matter, bioincorporation: Removed 1D assumptions.
 
 * IDE: CT laver "sample setups" for hvert FON land 
 

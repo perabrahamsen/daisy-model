@@ -1,5 +1,10 @@
 2006-04-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* adadsorption.h, adsadsorption.C, adsorption_full.C (full): New
+	virtual member function with default implementation.
+
+	* bioincorporation.C: Removed 1D assumption.
+
 	* lib/chemistry.dai (solid): Removed transport.
 
 	* organic_matter.C (mix): Reset tillage age based on z, not zplus.

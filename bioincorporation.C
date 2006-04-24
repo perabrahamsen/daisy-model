@@ -232,18 +232,9 @@ Bioincorporation::Implementation::initialize (const Geometry& geo,
                                               const Soil& soil)
 { 
   // Calculate distribution density for all nodes.
-  double last = 0.0;
-  for (unsigned int i = 0;
-       i < soil.size () && last > soil.MaxRootingHeight ();
-       i++)
-    {
-      const double next = geo.zplus (i);
-      const double dz = last - next;
-      daisy_assert (approximate (dz, geo.dz (i)));
-      const double total = distribution.integrate (next, last);
-      density.push_back (total / dz);
-      last = next;
-    }
+  for (size_t i = 0; i < geo.node_size (); i++)
+    density.push_back (distribution (geo.z (i)));
+
   C_added.insert (C_added.end (), soil.size (), 0.0);
   N_added.insert (N_added.end (), soil.size (), 0.0);
 }

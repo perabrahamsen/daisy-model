@@ -42,6 +42,7 @@ class Soltrans1D
   std::auto_ptr<Transport> transport; // Solute transport model in matrix.
   std::auto_ptr<Transport> reserve; // Reserve solute transport model in matr.
   std::auto_ptr<Transport> last_resort; // Last resort solute transport model.
+  std::auto_ptr<Transport> transport_solid; // Pseudo transport for non-solutes
   std::auto_ptr<Mactrans> mactrans; // Solute transport model in macropores.
 
   // Simulation.

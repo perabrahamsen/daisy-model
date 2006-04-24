@@ -39,81 +39,34 @@ Soltrans1D::solute (const Geometry1D& geo, const Soil& soil,
   if (soil_water.q_p (0) < 0.0)
     {
       if (soil_water.q (0) >= 0.0)
-	{
-	  if (soil_water.q (0) > 1.0e-10)
-	    {
-	      std::ostringstream tmp;
-	      tmp << "BUG: q_p[0] = " << soil_water.q_p (0) 
-		     << " and q[0] = " << soil_water.q (0);
-	      msg.error (tmp.str ());
-	    }
-	  solute.J_p[0] = J_in;
-	  solute.J[0] = J_in;
-	}
+        {
+          if (soil_water.q (0) > 1.0e-10)
+            {
+              std::ostringstream tmp;
+              tmp << "BUG: q_p[0] = " << soil_water.q_p (0) 
+                  << " and q[0] = " << soil_water.q (0);
+              msg.error (tmp.str ());
+            }
+          solute.J_p[0] = J_in;
+          solute.J[0] = J_in;
+        }
       else
-	{
-	  const double macro_fraction
-	    = soil_water.q_p (0) / (soil_water.q_p (0) + soil_water.q (0));
-	  solute.J_p[0] = J_in * macro_fraction;
-	  solute.J[0] = J_in - solute.J_p[0];
-	}
+        {
+          const double macro_fraction
+            = soil_water.q_p (0) / (soil_water.q_p (0) + soil_water.q (0));
+          solute.J_p[0] = J_in * macro_fraction;
+          solute.J[0] = J_in - solute.J_p[0];
+        }
     }
   else
     solute.J[0] = J_in;
 
   // Flow.
-  const double old_content = geo.total (solute.M_);
-  mactrans->tick (geo, soil_water, solute.M_, solute.C_, solute.S, solute.S_p,
-                  solute.J_p, msg);
-
-  try
-    {
-      for (size_t i = 0; i < geo.node_size (); i++)
-	daisy_assert (solute.M_left (i) >= 0.0);
-      transport->tick (msg, geo, soil, soil_water, *solute.adsorption, 
-                       solute.diffusion_coefficient (), 
-                       solute.M_, solute.C_, solute.S, solute.J);
-    }
-  catch (const char* error)
-    {
-      msg.warning (std::string ("Transport problem: ") + error +
-		   ", trying reserve.");
-      try
-	{
-	  for (size_t i = 0; i < geo.node_size (); i++)
-	    daisy_assert (solute.M_left (i) >= 0.0);
-	  reserve->tick (msg, geo, soil, soil_water, *solute.adsorption, 
-                         solute.diffusion_coefficient (), 
-                         solute.M_, solute.C_, solute.S, solute.J);
-	}
-      catch (const char* error)
-	{
-	   msg.warning (std::string ("Reserve transport problem: ") + error
-			+ ", trying last resort.");
-	  for (size_t i = 0; i < geo.node_size (); i++)
-	    daisy_assert (solute.M_left (i) >= 0.0);
-	  last_resort->tick (msg, geo, soil, soil_water, *solute.adsorption, 
-                             solute.diffusion_coefficient (), 
-                             solute.M_, solute.C_, solute.S, solute.J);
-	}
-    }
-  const double new_content = geo.total (solute.M_);
-  const double delta_content = new_content - old_content;
-  const double source = geo.total (solute.S);
-  const double in = -solute.J[0];	// No preferential transport, it is 
-  const double out = -solute.J[geo.node_size ()]; // included in S.
-  const double expected = source + in - out;
-  if (!approximate (delta_content, expected)
-      && new_content < fabs (expected) * 1e10)
-    {
-      std::ostringstream tmp;
-      tmp << __FILE__ << ":" << __LINE__ << ":" << solute.submodel
-	     << ": mass balance new - old != source + in - out\n"
-	     << new_content << " - " << old_content << " != " 
-	     << source << " + " << in << " - " << out << " (error "
-	     << (delta_content - expected) << ")";
-      msg.error (tmp.str ());
-    }
+  flow (geo, soil, soil_water, solute.submodel, 
+        solute.M_, solute.C_, 
+        solute.S, solute.S_p,
+        solute.J, solute.J_p, 
+        *solute.adsorption, solute.diffusion_coefficient (), msg);
 }
 
 void 
@@ -146,32 +99,39 @@ Soltrans1D::flow (const Geometry1D& geo,
                   double diffusion_coefficient,
                   Treelog& msg)
 {
-  // Flow.
   const double old_content = geo.total (M);
-  mactrans->tick (geo, soil_water, M, C, S, S_p, J_p, msg);
 
-  try
+  // Flow.
+  if (adsorption.full ())
+    transport_solid->tick (msg, geo, soil, soil_water, adsorption, 
+                          diffusion_coefficient, M, C, S, J);
+  else
     {
-      transport->tick (msg, geo, soil, soil_water, adsorption, 
-                       diffusion_coefficient, 
-                       M, C, S, J);
-    }
-  catch (const char* error)
-    {
-      msg.warning (std::string ("Transport problem: ") + error +
-		   ", trying reserve.");
+      mactrans->tick (geo, soil_water, M, C, S, S_p, J_p, msg);
+
       try
-	{
-	  reserve->tick (msg, geo, soil, soil_water, adsorption, 
-                         diffusion_coefficient, M, C, S, J);
-	}
+        {
+          transport->tick (msg, geo, soil, soil_water, adsorption, 
+                           diffusion_coefficient, 
+                           M, C, S, J);
+        }
       catch (const char* error)
-	{
-	  msg.warning (std::string ("Reserve transport problem: ") + error
-		       + ", trying last resort.");
-	  last_resort->tick (msg, geo, soil, soil_water, adsorption, 
+        {
+          msg.warning (std::string ("Transport problem: ") + error +
+                       ", trying reserve.");
+          try
+            {
+              reserve->tick (msg, geo, soil, soil_water, adsorption, 
                              diffusion_coefficient, M, C, S, J);
-	}
+            }
+          catch (const char* error)
+            {
+              msg.warning (std::string ("Reserve transport problem: ") + error
+                           + ", trying last resort.");
+              last_resort->tick (msg, geo, soil, soil_water, adsorption, 
+                                 diffusion_coefficient, M, C, S, J);
+            }
+        }
     }
   const double new_content = geo.total (M);
   const double delta_content = new_content - old_content;
@@ -213,6 +173,11 @@ Soltrans1D::load_syntax (Syntax& syntax, AttributeList& alist)
   AttributeList none;
   none.add ("type", "none");
   alist.add ("last_resort", none);
+  
+  syntax.add ("transport_solid", Librarian<Transport>::library (),
+	      "Transport model for non-dissolvable chemicals.\n\
+Should be 'none'.");
+  alist.add ("transport_solid", none);
 
   syntax.add ("mactrans", Librarian<Mactrans>::library (), 
 	      "Solute transport model in macropores.");
@@ -225,6 +190,7 @@ Soltrans1D::Soltrans1D (Block& al)
   : transport (Librarian<Transport>::build_item (al, "transport")),
     reserve (Librarian<Transport>::build_item (al, "reserve")),
     last_resort (Librarian<Transport>::build_item (al, "last_resort")),
+    transport_solid (Librarian<Transport>::build_item (al, "transport_solid")),
     mactrans  (Librarian<Mactrans>::build_item (al, "mactrans"))
 { }
 

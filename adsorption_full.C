@@ -27,6 +27,9 @@ class AdsorptionFull : public Adsorption
 {
   // Simulation.
 public:
+  bool full () const
+  { return true; }
+
   double C_to_M (const Soil&, double, int, double C) const
   { 
     daisy_assert (fabs (C) < 1.0e-100); 
