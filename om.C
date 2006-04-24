@@ -288,6 +288,9 @@ OM::tick (const std::vector<bool>& active, const double* abiotic_factor,
     }
   for (size_t i = 0; i < node_size; i++)
     {
+      if (!active[i])
+        continue;
+
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (C[i] >= 0.0);
       daisy_assert (N[i] >= 0.0);

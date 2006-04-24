@@ -649,10 +649,10 @@ AM::create (const size_t node_size, const Time& time,
   al.add ("name", sort + "/" + part);
   al.add ("om", ol);
   AM& am = *new AM (al);
-  if (lock == AM::Locked)
-    am.impl.lock = new AM::Implementation::Lock (sort, part);
   for (size_t i = 0; i < am.impl.om.size (); i++)
     am.impl.om[i]->initialize (node_size);
+  if (lock == AM::Locked)
+    am.impl.lock = new AM::Implementation::Lock (sort, part);
   return am;
 }
 
@@ -897,6 +897,9 @@ AM::AM (const AttributeList& al)
 void
 AM::initialize (const Geometry& geo, const double max_rooting_depth)
 {
+  for (size_t i = 0; i < impl.om.size (); i++)
+    impl.om[i]->initialize (geo.node_size ());
+
   const string syntax = alist.name ("syntax");
   
   if (syntax == "state")
@@ -1000,8 +1003,6 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
       // Add it.
       impl.add (geo, C, N, density);
     }
-  for (size_t i = 0; i < impl.om.size (); i++)
-    impl.om[i]->initialize (geo.node_size ());
 }
 
 AM::~AM ()
