@@ -1,6 +1,10 @@
 2006-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* bioclimate_std.C: Removed "node 0 is top" assumption.
+	* bioclimate_std.C (WaterDistribution): Removed "node 0 is top"
+	assumption. 
+	* column_std.C (tick): Ditto.
+	* soil_chemicals.C (mixture): Ditto.
+	* surface.C (albedo): Ditto.
 
 	* select_content.C (output_array): Removed 1D assumptions.
 	* select_interval.C: Ditto.

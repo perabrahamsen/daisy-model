@@ -55,7 +55,8 @@ public:
   void tick (const Geometry& geo,
              const Soil&, const SoilWater&, const SoilHeat&, 
 	     const OrganicMatter*, const Chemicals& flux_in, Treelog&);
-  void mixture (Chemicals& storage, // [g/m^2]
+  void mixture (const Geometry& geo,
+                Chemicals& storage, // [g/m^2]
 		Chemicals& up,	// [g/m^2/h]
 		double pond,	// [mm]
 		double rate) const;	// [h/mm]

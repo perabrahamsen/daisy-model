@@ -367,8 +367,8 @@ SoilWater1D::Implementation::swap (Treelog& msg, const Geometry& geo,
   
 void
 SoilWater1D::Implementation::set_Theta (const Soil& soil, 
-				      size_t from, size_t to, 
-				      double value)
+                                        size_t from, size_t to, 
+                                        double value)
 {
   for (size_t i = from; i <= to; i++)
     {

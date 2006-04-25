@@ -21,6 +21,7 @@
 
 
 #include "soil_chemicals.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
@@ -58,7 +59,8 @@ struct SoilChemicals::Implementation
   void tick (const Geometry& geo,
              const Soil&, const SoilWater&, const SoilHeat&, 
 	     const OrganicMatter*, const Chemicals& flux_in, Treelog&);
-  void mixture (Chemicals& storage, Chemicals& down, 
+  void mixture (const Geometry& geo,
+                Chemicals& storage, Chemicals& down, 
 		double pond, double rate) const;
   void output (Log&) const;
   void mix (const Geometry& geo,
@@ -148,7 +150,8 @@ SoilChemicals::Implementation::tick (const Geometry& geo,
 }
 
 void 
-SoilChemicals::Implementation::mixture (Chemicals& storage, // [g/m^2]
+SoilChemicals::Implementation::mixture (const Geometry& geo,
+                                        Chemicals& storage, // [g/m^2]
 					Chemicals& up, // [g/m^2/h]
 					const double pond, // [mm]
 					const double rate) const // [h/mm]
@@ -167,7 +170,8 @@ SoilChemicals::Implementation::mixture (Chemicals& storage, // [g/m^2]
       symbol name = (*i).first;
       SoilChemical& solute = *(*i).second;
 
-      const double soil_conc = solute.C (0)
+      const double soil_conc
+        = geo.content_at (static_cast<const Solute&> (solute), &Solute::C, 0.0)
 	* (100.0 * 100.0) / 10.0; // [g/cm^3/] -> [g/m^2/mm]
       const double storage_amount = storage.amount (name); // [g/cm^2]
       const double storage_conc = storage_amount / pond;// [g/cm^2/mm]
@@ -313,11 +317,12 @@ SoilChemicals::tick (const Geometry& geo,
 { impl.tick (geo, soil, soil_water, soil_heat, organic_matter, flux_in, out); }
 
 void 
-SoilChemicals::mixture (Chemicals& storage, // [g/m^2]
+SoilChemicals::mixture (const Geometry& geo,
+                        Chemicals& storage, // [g/m^2]
 			Chemicals& up, // [g/m^2/h]
 			const double pond, // [mm]
 			const double rate) const // [h/mm]
-{ impl.mixture (storage, up, pond, rate); }
+{ impl.mixture (geo, storage, up, pond, rate); }
 
 void 
 SoilChemicals::output (Log& log) const

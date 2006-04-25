@@ -47,11 +47,12 @@ Pet::reference_to_potential (const Vegetation& crops,
 
 double 
 Pet::albedo (const Vegetation& crops, const Surface& surface, 
+             const Geometry& geo,
              const Soil& soil, const SoilWater& soil_water)
 {
   const double litter_albedo = crops.litter_albedo ();
   const double surface_albedo = (litter_albedo < 0.0) 
-    ? surface.albedo (soil, soil_water)
+    ? surface.albedo (geo, soil, soil_water)
     : litter_albedo;
 
   const double LAI = crops.LAI ();

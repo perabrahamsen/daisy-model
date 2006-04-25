@@ -47,7 +47,7 @@ public:
   static double reference_to_potential (const Vegetation&, const Surface&, 
 					double ref);
   static double albedo (const Vegetation& crops, const Surface& surface, 
-                        const Soil& soil, const SoilWater& soil_water);
+                        const Geometry&, const Soil&, const SoilWater&);
 
   // Simulation.
 public:

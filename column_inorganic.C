@@ -154,7 +154,7 @@ ColumnInorganic::tick (Treelog& out,
   const Weather& my_weather = *(weather ? weather : global_weather);
 
   // Early calculation.
-  surface.mixture (soil_chemicals);
+  surface.mixture (*geometry, soil_chemicals);
   soil_water->macro_tick (*geometry, *soil, surface, out);
 
   bioclimate->tick (time, surface, my_weather, 

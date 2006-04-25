@@ -1217,7 +1217,7 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
   soil_NH4.add_to_source (NH4_source);
 
   // Biological incorporation.
-  const double soil_T = geo.content_at (soil_heat, &SoilHeat::T, -5.0 /* cm */);
+  const double soil_T = geo.content_at (soil_heat, &SoilHeat::T, 0.0 /* cm */);
   bioincorporation.tick (geo, am, soil_T, top_CO2);
 
   // Tillage time.

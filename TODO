@@ -13,9 +13,21 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** A) Omorganiser Daisy kode så omsætning er uafhængig af transport
 
-2) Fjern 1D antagelser fra select content & interval.
-
 Check alle "(0)" 
+
+*** snow.C
+
+      const double K_soil 
+	= soil.heat_conductivity (0, soil_water.Theta (0),
+				  soil_water.X_ice (0)) 
+      const double Z = -geo.z (0) / 100.0; // [cm] -> [m]
+      const double T_soil = soil_heat.T (0); // [dg C]
+
+*** surface.C
+
+  const double Theta_pf_3 = soil_water.Theta (soil, 0, pF2h (3.0));
+  const double Theta_pf_1_7 = soil_water.Theta (soil, 0, pF2h (1.7));
+  const double Theta = soil_water.Theta (0);
 
 ** B) Rect
 

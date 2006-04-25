@@ -463,7 +463,7 @@ ColumnStandard::tick (Treelog& out,
                             &Solute::C, 0.0) 
     / 10.0; // [g/cm^3] -> [g/cm^2/mm]
   surface.mixture (soil_top_conc);
-  surface.mixture (soil_chemicals);
+  surface.mixture (*geometry, soil_chemicals);
   soil_water->macro_tick (*geometry, *soil, surface, out);
 
   bioclimate->tick (time, surface, my_weather, 

@@ -95,7 +95,7 @@ PetPM::tick (const Time&, const Weather& weather, const Vegetation& crops,
   const double AtmPressure = FAO::AtmosphericPressure (elevation);
 
   // Albedo.
-  const double Albedo = albedo (crops, surface, soil, soil_water);
+  const double Albedo = albedo (crops, surface, geo, soil, soil_water);
 
   // Net Radiation.
   net_radiation->tick (Cloudiness, Temp, VaporPressure, Si, Albedo, out);

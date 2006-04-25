@@ -55,7 +55,8 @@ public:
   const Chemicals&  chemicals_down () const;
 
   void mixture (const IM& soil_im /* [g/cm^2/mm] */);
-  void mixture (const SoilChemicals& soil_chemicals);
+  void mixture (const Geometry& geo,
+                const SoilChemicals& soil_chemicals);
   void update_water (const Geometry1D& geo,
                      const Soil&, const std::vector<double>& S_,
 		     std::vector<double>& h_, std::vector<double>& Theta_,
@@ -78,7 +79,7 @@ public:
 
   // Communication with bioclimate.
   double EpFactor () const;
-  double albedo (const Soil& soil, const SoilWater& soil_water) const;
+  double albedo (const Geometry&, const Soil&, const SoilWater&) const;
   double exfiltration () const; // [mm/h]
   double evap_soil_surface () const; // [mm/h]
   double evap_pond (Treelog&) const; // [mm/h]

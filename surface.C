@@ -72,7 +72,8 @@ struct Surface::Implementation
               const Soil& soil, const SoilWater& soil_water,
 	      const AttributeList&);
   void mixture (const IM& soil_im /* g/cm^2/mm */);
-  void mixture (const SoilChemicals& soil_chemicals);
+  void mixture (const Geometry& geo,
+                const SoilChemicals& soil_chemicals);
   bool flux_top () const;
   void  flux_top_on () const;
   bool exfiltrate (Treelog&, double water);
@@ -80,7 +81,7 @@ struct Surface::Implementation
   void tick (Treelog&, double PotSoilEvaporation, double water, double temp,
 	     const Geometry& geo,
              const Soil& soil, const SoilWater& soil_water, double T);
-  double albedo (const Soil& soil, const SoilWater& soil_water) const;
+  double albedo (const Geometry&, const Soil&, const SoilWater&) const;
   void fertilize (const IM& n);
   void spray (const Chemicals& chemicals_in);
   void output (Log& log) const;
@@ -129,9 +130,10 @@ Surface::mixture (const IM& soil_im /* g/cm^2/mm */)
 }
 
 void
-Surface::mixture (const SoilChemicals& soil_chemicals)
+Surface::mixture (const Geometry& geo,
+                  const SoilChemicals& soil_chemicals)
 {
-  impl.mixture (soil_chemicals);
+  impl.mixture (geo, soil_chemicals);
 }
 
 void
@@ -151,13 +153,14 @@ Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */)
 }
 
 void
-Surface::Implementation::mixture (const SoilChemicals& soil_chemicals)
+Surface::Implementation::mixture (const Geometry& geo,
+                                  const SoilChemicals& soil_chemicals)
 {
   if (chemicals_can_enter_soil)
     {
       chemicals_out.clear ();
 
-      soil_chemicals.mixture (chemicals_storage, chemicals_out,
+      soil_chemicals.mixture (geo, chemicals_storage, chemicals_out,
 			      pond, R_mixing);
     }
 }
@@ -400,23 +403,40 @@ Surface::EpFactor () const
 { return impl.EpFactor; }
 
 double
-Surface::albedo (const Soil& soil, const SoilWater& soil_water) const
-{ return impl.albedo (soil, soil_water); }
+Surface::albedo (const Geometry& geo, 
+                 const Soil& soil, const SoilWater& soil_water) const
+{ return impl.albedo (geo, soil, soil_water); }
 
 double
-Surface::Implementation::albedo (const Soil& soil,
+Surface::Implementation::albedo (const Geometry& geo, const Soil& soil,
 				 const SoilWater& soil_water) const
 { 
-  const double Theta_pf_3 = soil_water.Theta (soil, 0, pF2h (3.0));
-  const double Theta_pf_1_7 = soil_water.Theta (soil, 0, pF2h (1.7));
-  const double Theta = soil_water.Theta (0);
+  double Theta_pf_3 = 0.0;
+  double Theta_pf_1_7 = 0.0;
+  double Theta = 0.0; 
+  double volume = 0.0;
+  
+  const size_t node_size = geo.node_size ();
+  for (size_t i = 0; i < node_size; i++)
+    if (geo.contain_z (i, 0.0))
+      {
+        const double v = geo.volume (i);
+        volume += v;
+        Theta_pf_3 += soil_water.Theta (soil, i, pF2h (3.0)) * v;
+        Theta_pf_1_7 += soil_water.Theta (soil, i, pF2h (1.7)) * v;
+        Theta += soil_water.Theta (i) * v;
+      }
+  daisy_assert (volume > 0.0);
+  Theta_pf_3 /= volume;
+  Theta_pf_1_7 /= volume;
+  Theta /= volume;
+
+  daisy_assert (Theta_pf_1_7 > Theta_pf_3);
 
   if (Theta < Theta_pf_3)
     return albedo_dry;
   if (Theta > Theta_pf_1_7)
     return albedo_wet;
-
-  daisy_assert (Theta_pf_1_7 > Theta_pf_3);
 
   return albedo_dry + (albedo_wet - albedo_dry)
     * (Theta - Theta_pf_3) / (Theta_pf_1_7 - Theta_pf_3);
