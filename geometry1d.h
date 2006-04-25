@@ -54,6 +54,8 @@ public:
   { return dz_[i]; }
   inline double volume (size_t i) const
   { return dz_[i] * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
+  inline double bottom () const // Bottom of deepest node. [cm]
+  { return zplus_[node_size () - 1]; }
   double fraction_in_z_interval (size_t i, double from, double to) const;
   bool edge_cross_z (size_t i, double z) const;
   bool contain_z (size_t i, double z) const;

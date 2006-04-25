@@ -68,7 +68,6 @@ Geometry1D::fraction_in_z_interval (const size_t i,
     // Node is fully below interval.
     return 0.0;
 
-
   if (zm <= from)
     {
       if (zp >= to)

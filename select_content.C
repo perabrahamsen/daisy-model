@@ -32,12 +32,8 @@ struct SelectContent : public SelectValue
   const double height;
   const Geometry* old_geo;
   const Soil* old_soil;
-  int ia;                       // First node above height.
-  double za;                    // Depth of node above height.
-  int ib;                       // First node below height.
-  double zb;                    // Depth of node above height.
-  double rel;                   // Relative distance from za.
-  bool use_ia;                  // Always use ia.
+  std::vector<size_t> node;     // Nodes at height.
+  std::vector<double> weight;   // Relative volume for node.
 
   // Output routines.
   void output_array (const std::vector<double>& array, 
@@ -50,44 +46,25 @@ struct SelectContent : public SelectValue
       {
         old_geo = geo;
 
-        if (std::fabs (height) < 0.001)
-          ia = ib = 0;
-        else
-          {
-            // Find first node below height.
-            for (ib = 0; ib < geo->node_size () && geo->z (ib) > height; ib++)
-              /* do nothing */;
-            zb = geo->z (ib);
-        
-            // Find first node above height.
-            daisy_assert (geo->node_size () > 0);
-            for (ia = geo->node_size () - 1; ia >= 0 && geo->z (ia) < height; ia--)
-              /* do nothing */;
-            za = geo->z (ia);
-
-            // Distance from za relative to zb.
-            rel = (height - za) / (zb - za) ;
-
-            // If one is almost right, use that.
-            if (approximate (height, za))
-              ib = ia;
-            else if (approximate (height, zb))
-              ia = ib;
-          }
-        
-        // If they are the same, just use ia. 
-        use_ia = (ia == ib);
+        node.erase (node.begin (), node.end ());
+        double total_volume = 0.0;
+        const size_t node_size = geo->node_size ();
+        for (size_t i = 0; i < node_size; i++)
+          if (geo->contain_z (i, height))
+            {
+              const double volume = geo->volume (i);
+              total_volume += volume;
+              weight.push_back (volume);
+              node.push_back (i);
+            }
+        daisy_assert (total_volume > 0.0);
+        for (size_t i = 0; i < node.size (); i++)
+          weight[i] /= total_volume;
       }
-    double result;
-    if (use_ia) 
-      result = array [ia];
-    else
-      {
-        // Linear interpolation.
-        const double va = array[ia];
-        const double vb = array[ib];
-        result = va + (vb - va) * rel;
-      }
+    
+    double result = 0.0;
+    for (size_t i = 0; i < node.size (); i++)
+      result += array[node[i]] * weight[i];
     add_result (result); 
   }
 
@@ -96,13 +73,7 @@ struct SelectContent : public SelectValue
     : SelectValue (al),
       height (al.number ("height")),
       old_geo (NULL),
-      old_soil (NULL),
-      ia (-42),
-      za (42.42e42),
-      ib (-42),
-      zb (42.42e42),
-      rel (42.42e42),
-      use_ia (true)
+      old_soil (NULL)
     { }
 };
 
@@ -119,7 +90,8 @@ static struct SelectContentSyntax
 
       alist.add ("description", "Extract content at specified height.");
       syntax.add ("height", "cm", Check::non_positive (), Syntax::Const,
-		  "Specify height (negative) to measure content.");
+		  "Specify height (negative) to measure content.\n\
+The value willbe a weighted average of all nodes containing height.");
 
       Librarian<Select>::add_type ("content", alist, syntax, &make);
     }

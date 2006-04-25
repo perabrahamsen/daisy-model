@@ -10,14 +10,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 2) Fjern 1D antagelser fra select content & interval.
 
-Interval:
-  Hvis geo er nu
-    Find noder der overlapper interval, samt fraction i interval
-  value = sum (noder der overlapper * fraction)
-
-Content:
-  content_at
-
 Check alle "(0)" 
 
 ** B) Rect
@@ -85,7 +77,7 @@ ridge, uz*, macro*, groundwater*
 
 ** Done 3
 
-*** flux, array logs: Generalized to handle 2D geometry.
+*** content, flux, interval, array logs: Generalized to handle 2D geometry.
 *** solute, dom: Removed transport.
 *** soltrans1D: New transport module.
 *** transport, macrotrans: 1D

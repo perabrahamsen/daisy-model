@@ -56,20 +56,15 @@ struct SelectInterval : public SelectValue
                    const Soil& soil, const double from, double to)
     {
       if (to > 0.0)
-	to = geo.zplus (geo.node_size () - 1);
+	to = geo.bottom ();
       bulk = 0.0;
-      double old = 0.0;
 
-      for (size_t i = 0; i < geo.node_size () && old > to ; i++)
+      const size_t node_size = geo.node_size ();
+      for (size_t i = 0; i < node_size; i++)
 	{
-	  const double zplus = geo.zplus (i);
-	  if (zplus < from)
-	    {
-	      const double height = (std::min (old, from) 
-                                     - std::max (zplus, to));
-	      bulk += soil.dry_bulk_density (i) * height;
-	    }
-	  old = zplus;
+          const double f = geo.fraction_in_z_interval (i, from, to);
+          if (f > 1e-10)
+            bulk += soil.dry_bulk_density (i) * geo.volume (i) * f;
 	}
     }
     // Create and destroy.
@@ -102,7 +97,7 @@ struct SelectInterval : public SelectValue
           result = geo->total (array);
 	else
 	  {
-	    to = geo->zplus (geo->node_size () - 1);
+	    to = geo->bottom ();
 	    result = geo->total (array, from, to);
 	  }
       }
@@ -114,9 +109,7 @@ struct SelectInterval : public SelectValue
         if (bd_convert)
           bd_convert->set_bulk (*geo, *soil, from, to);
         if (density_factor < 0.0)
-          density_factor = 1.0 / (from - (to > 0 
-                                          ? geo->zplus (geo->node_size () - 1)
-                                          : to));
+          density_factor = 1.0 / (from - (to > 0 ? geo->bottom () : to));
       }
     add_result (result);
   }
@@ -138,11 +131,11 @@ struct SelectInterval : public SelectValue
             result /= (count + 0.0);
             result = exp (result);
             break;
-	case Handle::min:
-	case Handle::max:
-	case Handle::sum:
-	case Handle::current:
-	  break;
+          case Handle::min:
+          case Handle::max:
+          case Handle::sum:
+          case Handle::current:
+            break;
           }            
         dest.add (convert (result * density_factor));
       }

@@ -1,3 +1,10 @@
+2006-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C: Removed "node 0 is top" assumption.
+
+	* select_content.C (output_array): Removed 1D assumptions.
+	* select_interval.C: Ditto.
+
 2006-04-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* adadsorption.h, adsadsorption.C, adsorption_full.C (full): New

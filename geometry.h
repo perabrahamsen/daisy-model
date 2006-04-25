@@ -54,6 +54,7 @@ public:
   virtual std::string edge_name (size_t) const = 0;
   virtual double z (size_t) const = 0; // Node depth [cm]
   virtual double volume (size_t) const = 0; // Node volume [cm^3]
+  virtual double bottom () const = 0; // Bottom of deepest node. [cm]
   virtual double fraction_in_z_interval (size_t i, // The fraction of
                                                    // a node volume
                                                    // that is within a
@@ -61,10 +62,8 @@ public:
                                                    // interval.
                                          double from, double to) const = 0;
   virtual bool edge_cross_z (size_t e, double z) const = 0; // Cross depth?
-private:
   virtual bool contain_z (size_t i, double z) const = 0; // True iff node i
                                                          // includes depth z
-public:
   template<class T> // Here we we calculate a volume weighted average
                     // value at a specific depth.
   double content_at (T& obj, double (T::*content) (size_t),

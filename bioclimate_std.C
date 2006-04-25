@@ -25,6 +25,7 @@
 #include "weather.h"
 #include "plf.h"
 #include "alist.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_heat.h"
 #include "timestep.h"
@@ -547,9 +548,10 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
       pond_ep = 0.0;
     }
 
+  const double soil_T = geo.content_at (soil_heat, &SoilHeat::T, 0.0);
   surface.tick (msg, pond_ep, 
 		litter_water_out, litter_water_temperature, 
-		geo, soil, soil_water, soil_heat.T (0));
+		geo, soil, soil_water, soil_T);
   pond_ea = surface.evap_pond (msg);
   daisy_assert (pond_ea >= 0.0);
   total_ea += pond_ea;
