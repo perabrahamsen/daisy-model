@@ -293,27 +293,14 @@ Snow::Implementation::tick (Treelog& msg,
     T = 0.0;
   else if (dZs > 0.01)
     {
-      // Information about soil.
-      const double K_soil 
-	= soil.heat_conductivity (0, soil_water.Theta (0),
-				  soil_water.X_ice (0)) 
-	* 1e-7 * 100.0 / 3600.0; // [erg/cm/h/dg C] -> [W/m/dg C]
-      const double Z = -geo.z (0) / 100.0; // [cm] -> [m]
-      const double T_soil = soil_heat.T (0); // [dg C]
-
       // Density and conductivity of snowpack.
       const double rho = Ssnow / dZs; // [kg/m^3]
       const double K_snow = K_snow_factor * rho * rho; // [W/m^2]
       
-      const double T_calc = (K_soil / Z * T_soil + K_snow / dZs * T) 
-	/ (K_soil / Z + K_snow / dZs);
-#if 0
-      cerr << "Snow T_calc == " << T_calc << " Ssnow == " << Ssnow 
-	   << " Swater == " << Swater << " M == " << M << " T == " << T
-	   << " T_soil == " << T_soil << " K_soil == " << K_soil 
-	   << " K_snow == " << K_snow << "\n";
-#endif
-      T = min (T_calc, 0.0);
+      const double T_surface 
+        = soil_heat.T_surface_snow (geo, soil, soil_water, T, K_snow, dZs);
+
+      T = min (T_surface, 0.0);
       daisy_assert (T > -100.0 && T < 50.0);
     } 
   temperature = T;

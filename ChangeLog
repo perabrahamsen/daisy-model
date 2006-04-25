@@ -1,5 +1,9 @@
 2006-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* soil_heat.h, soil_heat1d.C (T_surface_snow): New virtual member
+	function. 
+	* snow.C (tick): Use it.
+
 	* bioclimate_std.C (WaterDistribution): Removed "node 0 is top"
 	assumption. 
 	* column_std.C (tick): Ditto.

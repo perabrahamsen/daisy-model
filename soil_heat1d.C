@@ -58,8 +58,6 @@ struct SoilHeat1D::Implementation
 
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
 
-  
-
   // Simulation.
   double capacity (const Soil&, const SoilWater&, size_t i) const;
   double capacity_apparent (const Soil&, const SoilWater&, size_t i) const;
@@ -703,6 +701,26 @@ SoilHeat1D::top_flux (const Geometry& geo,
   return k * (T (0) - T (1)) / (geo.z (0) - geo.z (1));
 }
 
+double
+SoilHeat1D::T_surface_snow (const Geometry& geo,
+                            const Soil& soil,
+                            const SoilWater& soil_water,
+                            const double T_snow,
+                            const double K_snow,
+                            const double dZs) const
+{
+  // Information about soil.
+  const double K_soil 
+    = soil.heat_conductivity (0, soil_water.Theta (0),
+                              soil_water.X_ice (0)) 
+    * 1e-7 * 100.0 / 3600.0; // [erg/cm/h/dg C] -> [W/m/dg C]
+  const double Z = -geo.z (0) / 100.0; // [cm] -> [m]
+  const double T_soil = T (0); // [dg C]
+
+  return (K_soil / Z * T_soil + K_snow / dZs * T_snow) 
+    / (K_soil / Z + K_snow / dZs);
+}
+
 void 
 SoilHeat1D::tick (const Time& time, 
                   const Geometry1D& geo,
@@ -750,7 +768,6 @@ SoilHeat1D::source (const size_t i) const
 void
 SoilHeat1D::set_source (const size_t i, const double value)
 { impl.S[i] = value; }
-
 
 void
 SoilHeat1D::output (Log& log) const

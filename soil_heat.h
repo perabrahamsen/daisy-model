@@ -42,7 +42,13 @@ public:
   { return T_[i]; }
   virtual double top_flux (const Geometry& geo,
                            const Soil&, const SoilWater&) const = 0;
-  
+  virtual double T_surface_snow (const Geometry& geo,
+                                 const Soil& soil,
+                                 const SoilWater& soil_water,
+                                 double T_snow,
+                                 double K_snow,
+                                 double dZs) const = 0;
+
   // Create and destroy.
 public:
   void output_base (Log&) const;

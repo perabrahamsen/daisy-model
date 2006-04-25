@@ -45,6 +45,8 @@ class SoilHeat1D : public SoilHeat
 public:
   double top_flux (const Geometry& geo,
                    const Soil&, const SoilWater&) const; // [W/m^2]
+  double T_surface_snow (const Geometry&, const Soil&, const SoilWater&,
+                         double T_snow, double K_snow, double dZs) const;
   void tick (const Time&, const Geometry1D& geo,
              const Soil&, SoilWater&, 
 	     const Surface&, const Weather& weather);
