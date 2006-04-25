@@ -62,19 +62,19 @@ private:
 
 public:
   virtual double diffusion_coefficient () const = 0; // in free solute. 
-  double C_to_M (const Soil& soil, double Theta, int i, double C) const
+  double C_to_M (const Soil& soil, double Theta, size_t i, double C) const
   { return adsorption->C_to_M (soil, Theta, i, C); }
-  double M_to_C (const Soil& soil, double Theta, int i, double M) const
+  double M_to_C (const Soil& soil, double Theta, size_t i, double M) const
   { return adsorption->M_to_C (soil, Theta, i, M); }
 
 public:
   const std::vector<double>& M () const
   { return M_; }
-  double M (int i) const
+  double M (size_t i) const
   { return M_[i]; }
-  double C (int i) const
+  double C (size_t i) const
   { return C_[i]; }
-  double M_left (int i) const
+  double M_left (size_t i) const
   { return M_[i] + S[i] * dt; }
   double total (const Geometry&, double from, double to) const;
 
@@ -88,7 +88,7 @@ public:
   // Simulation.
   void tick (const size_t node_size, const SoilWater&);
 public:
-  bool check (unsigned n, Treelog& err) const;
+  bool check (size_t n, Treelog& err) const;
   virtual void output (Log&) const;
   void incorporate (const Geometry&, double amount, double from, double to);
   void set_external_source (const Geometry&, 

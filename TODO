@@ -1,6 +1,11 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Send referat.
+#if 1
+  virtual double zplus (size_t i) const = 0;
+  virtual double dz (size_t i) const = 0;
+  virtual size_t interval_plus (double z) const = 0;
+  virtual size_t interval_border (double z) const = 0;
+#endif
 
 * Add "Geometry" to "ColumnBase" (for sake of the reference manual).
 

@@ -2425,7 +2425,7 @@ Using initial C per N for remaining entries");
     {
       const vector<AttributeList*>& layers
 	= al.alist_sequence ("initial_SOM");
-      const double soil_end = geo.zplus (node_size - 1);
+      const double soil_end = geo.bottom ();
       double last = 0.0;
       for (size_t i = 0; i < layers.size (); i++)
 	{

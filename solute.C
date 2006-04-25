@@ -90,7 +90,7 @@ Solute::tick (const size_t node_size,
   fill (J_p.begin (), J_p.end (), 0.0);
 
   // Permanent source.
-  for (unsigned int i = 0; i < node_size; i++)
+  for (size_t i = 0; i < node_size; i++)
     {
       S_external[i] += S_permanent[i];
       S[i] += S_external[i];
@@ -98,7 +98,7 @@ Solute::tick (const size_t node_size,
     }
 
   // Drainage.
-  for (unsigned int i = 0; i < node_size; i++)
+  for (size_t i = 0; i < node_size; i++)
     {
       S_drain[i] = -soil_water.S_drain (i) * dt * C (i);
       S[i] += S_drain[i];
@@ -208,7 +208,7 @@ Solute::mix (const Geometry& geo,
 	     double from, double to)
 { 
   geo.mix (M_, from, to, tillage);
-  for (unsigned int i = 0; i < C_.size (); i++)
+  for (size_t i = 0; i < C_.size (); i++)
     C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
 
@@ -218,7 +218,7 @@ Solute::swap (const Geometry& geo,
 	      double from, double middle, double to)
 { 
   geo.swap (M_, from, middle, to, tillage);
-  for (unsigned int i = 0; i < C_.size (); i++)
+  for (size_t i = 0; i < C_.size (); i++)
     C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
 
@@ -226,14 +226,14 @@ void
 Solute::put_M (const Soil& soil, const SoilWater& soil_water,
 	       const vector<double>& v)
 {
-  const unsigned int size = soil.size ();
+  const size_t size = soil.size ();
   daisy_assert (M_.size () == size);
   daisy_assert (C_.size () == size);
   daisy_assert (v.size () == size);
 
   M_ = v;
 
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < size; i++)
     C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
 
@@ -284,7 +284,7 @@ Solute::initialize (const AttributeList& al,
 	{
 	  daisy_assert (Ms.size () == geo.node_size ());
 
-	  for (unsigned int i = M_.size (); i < Ms.size (); i++)
+	  for (size_t i = M_.size (); i < Ms.size (); i++)
 	    M_.push_back (Ms[i] * soil.dry_bulk_density (i));
 	}
       if (M_.size () == 0 && C_.size () == 0)
@@ -292,9 +292,9 @@ Solute::initialize (const AttributeList& al,
 	  default_initialize (soil, soil_water);
 	}
     }
-  for (unsigned int i = C_.size (); i < M_.size (); i++)
+  for (size_t i = C_.size (); i < M_.size (); i++)
     C_.push_back (M_to_C (soil, soil_water.Theta (i), i, M_[i]));
-  for (unsigned int i = M_.size (); i < C_.size (); i++)
+  for (size_t i = M_.size (); i < C_.size (); i++)
     M_.push_back (C_to_M (soil, soil_water.Theta (i), i, C_[i]));
 
   daisy_assert (C_.size () == M_.size ());

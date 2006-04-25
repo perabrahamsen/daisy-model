@@ -39,13 +39,6 @@ protected:
   size_t size_;		// Number of intervals.
 public:
 
-#if 1
-  virtual double zplus (size_t i) const = 0;
-  virtual double dz (size_t i) const = 0;
-  virtual size_t interval_plus (double z) const = 0;
-  virtual size_t interval_border (double z) const = 0;
-#endif
-
   // Accessors.
   inline size_t node_size () const // Number of nodes.
   { return size_; }
