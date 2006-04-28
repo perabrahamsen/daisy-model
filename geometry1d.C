@@ -21,22 +21,15 @@
 
 
 #include "geometry1d.h"
+#include "groundwater.h"
 #include "syntax.h"
 #include "alist.h"
 #include "mathlib.h"
 #include "check.h"
 #include "vcheck.h"
-#include "groundwater.h"
+#include "submodel.h"
 #include "assertion.h"
 #include <sstream>
-
-std::string
-Geometry1D::node_name (const size_t n) const
-{
-  std::ostringstream tmp;
-  tmp << z (n);
-  return tmp.str ();
-}
 
 std::string
 Geometry1D::edge_name (const size_t e) const
@@ -45,79 +38,18 @@ Geometry1D::edge_name (const size_t e) const
     return "0";
 
   std::ostringstream tmp;
-  tmp << zplus (e-1);
+  tmp << zplus (e-1U);
   return tmp.str ();
 }
-
-
 
 double 
 Geometry1D::fraction_in_z_interval (const size_t i, 
                                     const double from, const double to) const
-{ 
-  daisy_assert (from > to);
-
-  const double zp = zplus (i);
-  const double zm = (i == 0) ? 0.0 : zplus (i-1);
-  daisy_assert (zm > zp);
-
-  if (zp >= from)
-    // Node is fully above interval.
-    return 0.0;
-  if (zm <= to)
-    // Node is fully below interval.
-    return 0.0;
-
-  if (zm <= from)
-    {
-      if (zp >= to)
-        // Node is fully within interval.
-        return 1.0;
-      
-      // Node overlap bottom of interval.
-      const double dz1 = zm - zp;
-      daisy_assert (approximate (dz1, dz (i)));
-      const double overlap = zm - to;
-      daisy_assert (overlap > 0.0);
-      daisy_assert (dz1 > overlap);
-      return overlap / dz1;
-    }
-  if (zp >= to)
-    {
-      // Node overlap top of interval.
-      const double dz1 = zm - zp;
-      daisy_assert (approximate (dz1, dz (i)));
-      const double overlap = from - zp;
-      daisy_assert (overlap > 0.0);
-      daisy_assert (dz1 > overlap);
-      return overlap / dz1;
-    }
-
-  // Interval is fully within node.
-  const double dz1 = zm - zp;
-  daisy_assert (approximate (dz1, dz (i)));
-  const double overlap = from - to;
-  daisy_assert (overlap > 0.0);
-  daisy_assert (dz1 > overlap);
-  return overlap / dz1;
-}
+{ return fraction_within (zplus (i), zminus (i), to, from); }
 
 bool 
-Geometry1D::edge_cross_z (const size_t e, const double zd) const
-{ 
-  // Positive number means below bottom.
-  if (zd > 0.0)
-    return e == edge_size () - 1;
-
-  const double z_above = (e == 0) ? z (0) + dz (0) : z (e - 1);
-  const double z_below = (e == node_size ()) ? z (e - 1) - dz (e - 1) : z (e);
-  return zd < z_above && zd > z_below;
-}
-
-bool
-Geometry1D::contain_z (const size_t i, const double z) const
-// True iff node i// includes depth z.
-{ return i == interval_plus (z); }
+Geometry1D::contain_z (size_t i, double z) const
+{ return  z <= zminus (i) && z >= zplus(i); }
 
 size_t 
 Geometry1D::interval_plus (double z) const
@@ -180,6 +112,8 @@ check_alist (const AttributeList&, Treelog&)
   return ok;
 }
 
+
+#if 0
 double
 Geometry1D::total (const std::vector<double>& v) const
 {
@@ -192,7 +126,7 @@ Geometry1D::total (const std::vector<double>& v) const
 
 double
 Geometry1D::total (const std::vector<double>& v, 
-                 const double from, const double to) const
+                   const double from, const double to) const
 {
   double amount = 0.0;
   double old = 0.0;
@@ -201,14 +135,14 @@ Geometry1D::total (const std::vector<double>& v,
     {
       if (zplus_[i] < from)
 	{
-	  const double height = (std::min (old, from) - std::max (zplus_[i], to));
+	  const double height = (std::min (old, from) 
+                                 - std::max (zplus_[i], to));
 	  amount += v[i] * height;
 	}
       old = zplus_[i];
     }
   return amount;
 }
-
 void
 Geometry1D::add (std::vector<double>& v, const double from, const double to, 
                const double amount) const
@@ -243,39 +177,6 @@ Geometry1D::add (std::vector<double>& v, const double from, const double to,
              << "); [" << from << ":" << to << "]";
       daisy_warning (tmp.str ());
     }
-}
-
-void
-Geometry1D::add (std::vector<double>& v, const std::vector<double>& density,
-                 double amount) const
-{
-  const double old_total = total (v);
-  const double total_density = total (density);
-  daisy_assert (total_density > 0.0);
-  for (size_t i = 0; i <= node_size (); i++)
-    if (density.size () > i)
-      v[i] += amount * density[i] / total_density;
-
-  daisy_assert (approximate (old_total + amount, total (v)));
-}
-
-void
-Geometry1D::mix (std::vector<double>& v, double from, double to) const
-{
-  const double old_total = total (v);
-  add (v, from, to, extract (v, from, to));
-  daisy_assert (approximate (old_total, total (v)));
-}
-
-void
-Geometry1D::mix (std::vector<double>& v, const double from, const double to, 
-               std::vector<double>& change) const
-{
-  const std::vector<double> old = v;
-  mix (v, from, to);
-  daisy_assert (v.size () <= change.size ());
-  for (size_t i = 0; i < v.size (); i++)
-    change[i] += v[i] - (i < old.size () ? old[i] : 0.0);
 }
 
 double
@@ -330,6 +231,8 @@ Geometry1D::set (std::vector<double>& v, double from, double to, double amount) 
     }
 }
 
+#endif // 0
+
 void
 Geometry1D::swap (std::vector<double>& v, double from, double middle, double to) const
 {
@@ -347,17 +250,6 @@ Geometry1D::swap (std::vector<double>& v, double from, double middle, double to)
   add (v, from, new_middle, bottom_content);
   add (v, new_middle, to, top_content);
   daisy_assert (approximate (old_total, total (v)));
-}
-
-void
-Geometry1D::swap (std::vector<double>& v, double from, double middle, double to, 
-                std::vector<double>& change) const
-{
-  const std::vector<double> old = v;
-  swap (v, from, middle, to);
-  daisy_assert (v.size () <= change.size ());
-  for (size_t i = 0; i < v.size (); i++)
-    change[i] += v[i] - (i < old.size () ? old[i] : 0.0);
 }
 
 void 
@@ -557,3 +449,6 @@ Can't automatically make discretizations less than 1 [cm], needed at "
 
 Geometry1D::~Geometry1D ()
 { }
+
+static Submodel::Register 
+geometry1d_submodel ("Geometry1D", Geometry1D::load_syntax);

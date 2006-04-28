@@ -1,3 +1,10 @@
+2006-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry_rect.C, geometry_rect.h: New submodel.
+	* Makefile (SUBMODELS): Add it.
+	* column_rect.C: New model.
+	* Makefile (MODELS): Add it.
+
 2006-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* soil_heat.h, soil_heat1d.C (T_surface_snow): New virtual member

@@ -132,6 +132,9 @@ inline void set_bound (double a, double& x, double b)
     x = b;
 }
 
+// The fraction of first interval that is within the second interval.
+double fraction_within (double from, double to, double begin, double end);
+
 inline int double2int (double x)
 { return static_cast<int> (x); }
 

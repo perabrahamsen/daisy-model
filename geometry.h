@@ -34,28 +34,47 @@ class Groundwater;
 
 class Geometry
 {
+  // Pseudo-node numbers.
+protected:
+  static const int edge_top = -13311331;
+  static const int edge_bottom = -424242;
   // Parameters.
 protected:
   size_t size_;		// Number of intervals.
+  
 public:
 
   // Accessors.
   inline size_t node_size () const // Number of nodes.
   { return size_; }
   virtual size_t edge_size () const = 0; // Number of edges.
-  virtual std::string node_name (size_t) const = 0; // For array logging.
-  virtual std::string edge_name (size_t) const = 0;
+  std::string node_name (int) const; // For array logging.
+  virtual std::string edge_name (size_t) const;
+  virtual int dimensions () const = 0; // Number of non-trivial dimensions.
+  virtual int edge_from (size_t) const = 0; // Node where edge originates.
+  virtual int edge_to (size_t) const = 0; // Node where edge leads.
   virtual double z (size_t) const = 0; // Node depth [cm]
+  double z_safe (int) const;    // Same, handles edge_top and edge_bottom.
+  virtual double x (size_t) const 
+  { return 0.5; }
+  virtual double y (size_t) const 
+  { return 0.5; }
   virtual double volume (size_t) const = 0; // Node volume [cm^3]
+  inline double top () const    // Top of highest node. [cm]
+  { return 0.0; }
   virtual double bottom () const = 0; // Bottom of deepest node. [cm]
-  virtual double fraction_in_z_interval (size_t i, // The fraction of
-                                                   // a node volume
-                                                   // that is within a
-                                                   // specific depth
-                                                   // interval.
+  virtual double fraction_in_z_interval (// The fraction of a node
+                                         // volume that is within a
+                                         // specific depth interval.
+                                         size_t n, 
                                          double from, double to) const = 0;
-  virtual bool edge_cross_z (size_t e, double z) const = 0; // Cross depth?
-  virtual bool contain_z (size_t i, double z) const = 0; // True iff node i
+  double volume_in_z_interval (double from, double to, 
+                               // Find fractions of all nodes in
+                               // interval, as well as the total
+                               // volume.
+                               std::vector<double>& frac) const;
+  bool edge_cross_z (size_t e, double z) const; // Cross depth?
+  virtual bool contain_z (size_t n, double z) const = 0; // True iff node i
                                                          // includes depth z
   template<class T> // Here we we calculate a volume weighted average
                     // value at a specific depth.
@@ -79,25 +98,23 @@ public:
   }
 
   // Vector operations.
-  virtual void mix (std::vector<double>& v, double from, double to) const = 0;
-  virtual void mix (std::vector<double>& v, double from, double to, 
-                    std::vector<double>& change) const = 0;
-  virtual void add (std::vector<double>& v,
-                    double from, double to, double amount) const = 0;
-  virtual void add (std::vector<double>& v, const std::vector<double>& density,
-                    double amount) const = 0;
-  virtual double extract (std::vector<double>& v, 
-                          double from, double to) const = 0;
-  virtual void set (std::vector<double>& v,
-                    double from, double to, double amount) const = 0;
-  virtual void swap (std::vector<double>& v,
-                     double from, double middle, double to) const = 0;
-  virtual void swap (std::vector<double>& v, 
-                     double from, double middle, double to, 
-                     std::vector<double>& change) const = 0;
-  virtual double total (const std::vector<double>& v) const = 0;
-  virtual double total (const std::vector<double>& v, 
-                        double from, double to) const = 0;
+  void mix (std::vector<double>& v, double from, double to) const;
+  void mix (std::vector<double>& v, double from, double to, 
+            std::vector<double>& change) const;
+  void add (std::vector<double>& v,
+            double from, double to, double amount) const;
+  void add (std::vector<double>& v, const std::vector<double>& density,
+            double amount) const;
+  double extract (std::vector<double>& v, double from, double to) const;
+  void set (std::vector<double>& v,
+            double from, double to, double amount) const;
+  void swap (std::vector<double>& v,
+             double from, double middle, double to) const;
+  void swap (std::vector<double>& v, 
+             double from, double middle, double to, 
+             std::vector<double>& change) const;
+  double total (const std::vector<double>& v) const;
+  double total (const std::vector<double>& v, double from, double to) const;
 
   // Layers -- Support initializing soil arrays layer by layer.
   static void add_layer (Syntax& syntax, Syntax::category, 

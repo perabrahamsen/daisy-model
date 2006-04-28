@@ -25,6 +25,284 @@
 #include "vcheck.h"
 #include <sstream>
 
+const int Geometry::edge_top;
+const int Geometry::edge_bottom;
+
+std::string
+Geometry::node_name (int n) const
+{ 
+  switch (n)
+    {
+    case edge_top:
+      return "top";
+    case edge_bottom:
+      return "bottom";
+    default:
+      std::ostringstream tmp;
+      switch (dimensions ())
+        {
+        case 1:
+          tmp << z (n);
+          break;
+        case 2:
+          tmp << "(" << z (n) << " " << x (n) << ")";
+          break;
+        case 3:
+          tmp << "(" << z (n) << " " << x (n) << " " << y (n) << ")";
+          break;
+        default:
+          daisy_panic ("Only 1, 2 and 3 dimensional geometries supported");
+        }
+      return tmp.str ();
+    }
+}
+
+std::string 
+Geometry::edge_name (size_t e) const
+{
+  std::ostringstream tmp;
+  tmp << "(" << node_name(edge_from (e)) << " " 
+      << node_name (edge_to (e)) << ")";
+  return tmp.str ();
+}
+
+double
+Geometry::z_safe (int n) const
+{
+  switch (n)
+    {
+    case edge_top:
+      return top () + 1.0 /* [cm] */;
+    case edge_bottom:
+      return bottom () - 1.0 /* [cm] */;
+    default:
+      return z (n);
+    }
+}
+  
+double
+Geometry::volume_in_z_interval (const double from, const double to, 
+                                std::vector<double>& frac) const
+{
+  const size_t node_size = this->node_size ();
+  daisy_assert (frac.size () == node_size);
+  double volume = 0.0;
+  for (size_t i = 0; i < node_size; i++)
+    {
+      const double f = fraction_in_z_interval (i, from, to);
+      if (f > 0.0)
+        {
+          const double rel_vol = f * this->volume (i);
+          frac[i] = f;
+          volume += rel_vol;
+        }
+    }
+  return volume;
+}
+
+bool 
+Geometry::edge_cross_z (const size_t e, const double zd) const
+{ 
+  const double z_from = z_safe (edge_from (e));
+  const double z_to = z_safe (edge_to (e));
+  const double z_above = std::max (z_from, z_to);
+  const double z_below = std::min (z_from, z_to);
+  return zd < z_above && zd > z_below;
+}
+
+void
+Geometry::mix (std::vector<double>& v, double from, double to) const
+{
+  const double old_total = total (v);
+  add (v, from, to, extract (v, from, to));
+  daisy_assert (approximate (old_total, total (v)));
+}
+
+void
+Geometry::mix (std::vector<double>& v, const double from, const double to, 
+               std::vector<double>& change) const
+{
+  const size_t node_size = this->node_size ();
+  daisy_assert (v.size () == node_size);
+  daisy_assert (change.size () == node_size);
+
+  const std::vector<double> old = v;
+  mix (v, from, to);
+  for (size_t i = 0; i < node_size; i++)
+    change[i] += v[i] - old[i];
+}
+
+void
+Geometry::add (std::vector<double>& v, const double from, const double to, 
+               const double amount) const
+{
+  // Pre-conditions.
+  daisy_assert (to < from);
+  const size_t node_size = this->node_size ();
+  daisy_assert (v.size () == node_size);
+
+  // Remember old value for post-condition.
+  const double old_total = total (v);
+
+  // Find total volume and node volumes inside interval.
+  std::vector<double> frac (node_size, 0.0);
+  const double total_volume = volume_in_z_interval (from, to, frac);
+  daisy_assert (total_volume > 0.0);
+
+  // Divide amount relative to volume.
+  const double density = amount / total_volume;
+  for (size_t i = 0; i < node_size; i++)
+    v[i] += density * frac[i];
+
+  // Post-condition.
+  const double new_total = total (v);
+  if (!approximate (old_total + amount, new_total))
+    {
+      std::ostringstream tmp;
+      tmp << "Old total (" << old_total << ") + amount (" << amount
+             << ") != new total (" << total (v) 
+          << "); [" << from << ":" << to << "], total_volume =" 
+          << total_volume << ", density = " << density;
+      daisy_warning (tmp.str ());
+    }
+}
+
+void
+Geometry::add (std::vector<double>& v, const std::vector<double>& density,
+               const double amount) const
+{
+  const size_t node_size = this->node_size ();
+  daisy_assert (v.size () == node_size);
+  const double old_total = total (v);
+
+  const double total_density = total (density);
+  daisy_assert (total_density > 0.0);
+  for (size_t i = 0; i < node_size; i++)
+    if (density.size () > i)
+      v[i] += amount * density[i] / total_density;
+
+  daisy_assert (approximate (old_total + amount, total (v)));
+}
+
+double
+Geometry::extract (std::vector<double>& v, 
+                   const double from, const double to) const
+{
+  const size_t node_size = this->node_size ();
+  daisy_assert (v.size () == node_size);
+
+  const double old_total = total (v);
+
+  double amount = 0.0;
+  for (size_t i = 0; i < node_size; i++)
+    {
+      const double f = fraction_in_z_interval (i, from, to);
+      if (f > 0.0)
+        {
+          amount += f * volume (i) * v[i];
+
+	  if (f < 1.0)
+	    v[i] *= (1.0 - f);
+	  else
+	    v[i] = 0.0;
+
+	}
+    }
+
+  daisy_assert (approximate (old_total, total (v) + amount));
+  return amount;
+}
+
+void
+Geometry::set (std::vector<double>& v, 
+               const double from, const double to, const double amount) const
+{
+  const size_t node_size = this->node_size ();
+  daisy_assert (v.size () == node_size);
+
+  const double old_total = total (v);
+  const double old_amount = total (v, from, to);
+
+  std::vector<double> frac (node_size, 0.0);
+  const double density = amount / volume_in_z_interval (from, to, frac);
+
+  for (size_t i = 0; i < node_size; i++)
+    {
+      const double f = fraction_in_z_interval (i, from, to);
+      if (f > 0.0)
+        {
+	  if (f < 1.0)
+            v[i] = v[i] + (density - v[i]) * f;
+          else
+            v[i] = density;
+	}
+    }
+  
+  daisy_assert (approximate (old_total - old_amount + amount, total (v)));
+}
+
+void
+Geometry::swap (std::vector<double>& v,
+                const double from, const double middle, const double to) const
+{
+  const size_t node_size = this->node_size ();
+  daisy_assert (v.size () == node_size);
+
+  const double old_total = total (v);
+
+  const double top = total (v, from, middle);
+  const double bottom = total (v, middle, to);
+  set (v, from, to, 0.0);
+  add (v, from, middle, bottom);
+  add (v, middle, to, top);
+
+  daisy_assert (approximate (old_total, total (v)));
+}
+
+void
+Geometry::swap (std::vector<double>& v, 
+                const double from,  const double middle, const double to, 
+                std::vector<double>& change) const
+{
+  const size_t node_size = this->node_size ();
+  daisy_assert (v.size () == node_size);
+  daisy_assert (change.size () == node_size);
+
+  const std::vector<double> old = v;
+  swap (v, from, middle, to);
+  for (size_t i = 0; i < v.size (); i++)
+    change[i] += v[i] - old[i];
+}
+
+double
+Geometry::total (const std::vector<double>& v) const
+{
+  const size_t node_size = this->node_size ();
+  daisy_assert (v.size () == node_size);
+  double sum = 0.0;
+  for (size_t i = 0; i < node_size; i++)
+    sum += v[i] * volume (i);
+  return sum;
+}
+
+double
+Geometry::total (const std::vector<double>& v, 
+                 const double from, const double to) const
+{
+  const size_t node_size = this->node_size ();
+  daisy_assert (v.size () == node_size);
+  double sum = 0.0;
+
+  for (size_t i = 0; i < node_size; i++)
+    {
+      const double f = fraction_in_z_interval (i, from, to);
+      if (f > 0.0)
+        sum += v[i] * volume (i) * f;
+    }
+
+  return sum;
+}
+
 static struct CheckLayers : public VCheck
 {
   void check (const Syntax& syntax, const AttributeList& alist, 

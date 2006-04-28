@@ -44,42 +44,34 @@ public:
   // Accessors.
   inline size_t edge_size () const
   { return node_size () + 1; }
-  std::string node_name (const size_t) const;
   std::string edge_name (const size_t) const;
-  inline double zplus (size_t i) const
-  { return zplus_[i]; }
-  inline double z (size_t i) const
-  { return z_[i]; }
-  inline double dz (size_t i) const
-  { return dz_[i]; }
-  inline double volume (size_t i) const
-  { return dz_[i] * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
+  inline int dimensions () const // Number of non-trivial dimensions.
+  { return 1; }
+  inline int edge_from (size_t e) const // Node where edge originates.
+  { return e == node_size () ? edge_bottom : static_cast<int> (e); }
+  inline int edge_to (size_t e) const // Node where edge leads.
+  { return e == 0 ? edge_top : static_cast<int> (e) - 1; };
+  inline double zplus (size_t n) const
+  { return zplus_[n]; }
+  inline double zminus (size_t n) const
+  { return (n == 0) ? 0.0 : zplus (n-1U); }
+  inline double z (size_t n) const
+  { return z_[n]; }
+  inline double dz (size_t n) const
+  { return dz_[n]; }
+  inline double volume (size_t n) const
+  { return dz_[n] * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
   inline double bottom () const // Bottom of deepest node. [cm]
   { return zplus_[node_size () - 1]; }
   double fraction_in_z_interval (size_t i, double from, double to) const;
-  bool edge_cross_z (size_t i, double z) const;
   bool contain_z (size_t i, double z) const;
 
   size_t interval_plus (double z) const;
   size_t interval_border (double z) const;
 
   // Vector operations.
-  void mix (std::vector<double>& v, double from, double to) const;
-  void mix (std::vector<double>& v, double from, double to, 
-            std::vector<double>& change) const;
-  void add (std::vector<double>& v,
-            double from, double to, double amount) const;
-  void add (std::vector<double>& v, const std::vector<double>& density,
-	    double amount) const;
-  double extract (std::vector<double>& v, double from, double to) const;
-  void set (std::vector<double>& v,
-            double from, double to, double amount) const;
   void swap (std::vector<double>& v,
              double from, double middle, double to) const;
-  void swap (std::vector<double>& v, double from, double middle, double to, 
-             std::vector<double>& change) const;
-  double total (const std::vector<double>& v) const;
-  double total (const std::vector<double>& v, double from, double to) const;
 
   // Layers -- Support initializing soil arrays layer by layer.
   static void add_layer (Syntax& syntax, Syntax::category, 

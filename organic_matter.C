@@ -2509,6 +2509,17 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
       }
   }
 
+  // Initialize buffer.
+  buffer.initialize (geo);
+
+  // Initialize DOM.
+  for (size_t pool = 0; pool < dom_size; pool++)
+    dom[pool]->initialize (soil, soil_water, err);
+
+  // Initialize domsorp
+  for (size_t i = 0; i < domsorp.size (); i++)
+    domsorp[i]->initialize (soil, err);
+
   // Summary.
   {
     Treelog::Open nest (err, "Total soil summary");
@@ -2530,14 +2541,6 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
       err.debug (total.str ());  
   }
 
-  // Initialize DOM.
-  for (size_t pool = 0; pool < dom_size; pool++)
-    dom[pool]->initialize (soil, soil_water, err);
-
-  // Initialize domsorp
-  for (size_t i = 0; i < domsorp.size (); i++)
-    domsorp[i]->initialize (soil, err);
-
   // Print top summary.
   {
     const string summary 
@@ -2557,9 +2560,6 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
           err.error ("Problems writing to '" + init.top_summary + "'");
       }
   }  
-
-  // Initialize buffer.
-  buffer.initialize (geo);
 
   // Log variable.
   tillage_N_soil.insert (tillage_N_soil.end (), node_size, 0.0);

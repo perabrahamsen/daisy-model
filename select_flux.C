@@ -36,7 +36,7 @@ SelectFlux::output_array (const std::vector<double>& array,
       last_geo = geo;
       const size_t size = geo->edge_size ();
       for (size_t e = 0; e < size; e++)
-        if (geo->edge_cross_z (e, height))
+        if (geo->edge_cross_z (e, height > 0 ? geo->bottom () : height))
           edges.push_back (e);
     }
   double sum = 0.0;

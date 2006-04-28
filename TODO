@@ -1,33 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-#if 1
-  virtual double zplus (size_t i) const = 0;
-  virtual double dz (size_t i) const = 0;
-  virtual size_t interval_plus (double z) const = 0;
-  virtual size_t interval_border (double z) const = 0;
-#endif
-
 * Add "Geometry" to "ColumnBase" (for sake of the reference manual).
 
 * Daisy 2D
-
-** A) Omorganiser Daisy kode så omsætning er uafhængig af transport
-
-Check alle "(0)" 
-
-*** snow.C
-
-      const double K_soil 
-	= soil.heat_conductivity (0, soil_water.Theta (0),
-				  soil_water.X_ice (0)) 
-      const double Z = -geo.z (0) / 100.0; // [cm] -> [m]
-      const double T_soil = soil_heat.T (0); // [dg C]
-
-*** surface.C
-
-  const double Theta_pf_3 = soil_water.Theta (soil, 0, pF2h (3.0));
-  const double Theta_pf_1_7 = soil_water.Theta (soil, 0, pF2h (1.7));
-  const double Theta = soil_water.Theta (0);
 
 ** B) Rect
 
@@ -99,6 +74,7 @@ ridge, uz*, macro*, groundwater*
 *** soltrans1D: New transport module.
 *** transport, macrotrans: 1D
 *** organic matter, bioincorporation: Removed 1D assumptions.
+*** snow, surface, bioclimate, column, soil chemicals: Removed node 0 = top.
 
 * IDE: CT laver "sample setups" for hvert FON land 
 
