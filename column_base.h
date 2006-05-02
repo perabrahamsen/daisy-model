@@ -53,7 +53,7 @@ protected:
   std::auto_ptr<Geometry1D> geometry;
   std::auto_ptr<Soil> soil;
   std::auto_ptr<SoilWater1D> soil_water;
-  SoilHeat1D soil_heat;
+  std::auto_ptr<SoilHeat1D> soil_heat;
   std::auto_ptr<Soltrans1D> soltrans;
   SoilChemicals soil_chemicals;
   std::vector<Chemistry*> chemistry;

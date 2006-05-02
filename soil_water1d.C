@@ -63,7 +63,7 @@ struct SoilWater1D::Implementation
   std::auto_ptr<UZmodel> reserve;
   std::auto_ptr<Macro> macro;
 
-  size_t first_groundwater_node () const;
+  size_t first_groundwater_cell () const;
 
   // Sink.
 public:
@@ -157,7 +157,7 @@ SoilWater1D::Implementation::freeze (const Soil&, const std::vector<double>& v)
 }
 
 size_t 
-SoilWater1D::Implementation::first_groundwater_node () const
+SoilWater1D::Implementation::first_groundwater_cell () const
 { 
   for (size_t i = h.size (); i > 0u; i--)
     if (h[i-1] < 0.0)
@@ -251,11 +251,11 @@ SoilWater1D::Implementation::tick (const Geometry1D& geo,
     {
       daisy_assert (soil.size () > 1);
       if (groundwater.table () <= geo.zplus (soil.size () - 2))
-	throw ("Groundwater table in or below lowest node.");
+	throw ("Groundwater table in or below lowest cell.");
       last = geo.interval_plus (groundwater.table ());
       if (last >=  soil.size () - 1)
 	daisy_assert ("Groundwater too low.");
-      // Pressure at the last node is equal to the water above it.
+      // Pressure at the last cell is equal to the water above it.
       for (size_t i = last + 1; i < soil.size (); i++)
 	{
 	  h_old[i] = groundwater.table () - geo.z (i);
@@ -264,7 +264,7 @@ SoilWater1D::Implementation::tick (const Geometry1D& geo,
     }
 
   // Limit for ridging.
-  const size_t first = surface.soil_top () ? surface.last_node () : 0;
+  const size_t first = surface.soil_top () ? surface.last_cell () : 0;
   bool ok = true;
 
   // Calculate matrix flow next.
@@ -708,8 +708,8 @@ SoilWater1D::X_ice_total (size_t i) const
 
 
 size_t 
-SoilWater1D::first_groundwater_node () const
-{ return impl->first_groundwater_node (); }
+SoilWater1D::first_groundwater_cell () const
+{ return impl->first_groundwater_cell (); }
 
 double 
 SoilWater1D::Theta (const Soil& soil, size_t i, double h) const
@@ -731,7 +731,6 @@ void
 SoilWater1D::set_external_source (const Geometry& geo, 
 				double amount, double from, double to)
 { impl->set_external_source (geo, amount, from, to); }
-
 void 
 SoilWater1D::incorporate (const Geometry& geo, 
                         double amount, double from, double to)

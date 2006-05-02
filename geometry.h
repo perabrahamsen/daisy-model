@@ -34,47 +34,46 @@ class Groundwater;
 
 class Geometry
 {
-  // Pseudo-node numbers.
+  // Pseudo-cell numbers.
 protected:
-  static const int edge_top = -13311331;
-  static const int edge_bottom = -424242;
+  static const int cell_above = -13311331;
+  static const int cell_below = -424242;
   // Parameters.
 protected:
   size_t size_;		// Number of intervals.
   
 public:
-
   // Accessors.
-  inline size_t node_size () const // Number of nodes.
+  inline size_t cell_size () const // Number of cells.
   { return size_; }
   virtual size_t edge_size () const = 0; // Number of edges.
-  std::string node_name (int) const; // For array logging.
+  std::string cell_name (int) const; // For array logging.
   virtual std::string edge_name (size_t) const;
   virtual int dimensions () const = 0; // Number of non-trivial dimensions.
-  virtual int edge_from (size_t) const = 0; // Node where edge originates.
-  virtual int edge_to (size_t) const = 0; // Node where edge leads.
-  virtual double z (size_t) const = 0; // Node depth [cm]
+  virtual int edge_from (size_t) const = 0; // Cell where edge originates.
+  virtual int edge_to (size_t) const = 0; // Cell where edge leads.
+  virtual double z (size_t) const = 0; // Cell center depth [cm]
   double z_safe (int) const;    // Same, handles edge_top and edge_bottom.
   virtual double x (size_t) const 
   { return 0.5; }
   virtual double y (size_t) const 
   { return 0.5; }
-  virtual double volume (size_t) const = 0; // Node volume [cm^3]
-  inline double top () const    // Top of highest node. [cm]
+  virtual double volume (size_t) const = 0; // Cell volume [cm^3]
+  inline double top () const    // Top of highest cell. [cm]
   { return 0.0; }
-  virtual double bottom () const = 0; // Bottom of deepest node. [cm]
-  virtual double fraction_in_z_interval (// The fraction of a node
+  virtual double bottom () const = 0; // Bottom of deepest cell. [cm]
+  virtual double fraction_in_z_interval (// The fraction of a cell
                                          // volume that is within a
                                          // specific depth interval.
                                          size_t n, 
                                          double from, double to) const = 0;
   double volume_in_z_interval (double from, double to, 
-                               // Find fractions of all nodes in
+                               // Find fractions of all cells in
                                // interval, as well as the total
                                // volume.
                                std::vector<double>& frac) const;
   bool edge_cross_z (size_t e, double z) const; // Cross depth?
-  virtual bool contain_z (size_t n, double z) const = 0; // True iff node i
+  virtual bool contain_z (size_t n, double z) const = 0; // True iff cell n
                                                          // includes depth z
   template<class T> // Here we we calculate a volume weighted average
                     // value at a specific depth.
@@ -84,7 +83,7 @@ public:
     double total_volume = 0.0;
     double total_content = 0.0;
   
-    for (size_t i = 0; i < this->node_size (); i++)
+    for (size_t i = 0; i < this->cell_size (); i++)
       if (this->contain_z (i, z))
         {
           const double volume = this->volume (i);
@@ -116,20 +115,27 @@ public:
   double total (const std::vector<double>& v) const;
   double total (const std::vector<double>& v, double from, double to) const;
 
+  // The fraction of first interval that is within the second interval.
+  static double fraction_within (double from, double to,
+                                 double begin, double end);
+
   // Layers -- Support initializing soil arrays layer by layer.
   static void add_layer (Syntax& syntax, Syntax::category, 
                          const std::string& name,
 			 const std::string& dimension,
                          const std::string& description);
-  virtual void initialize_layer (std::vector<double>& value, 
-                                 const AttributeList& al, 
-                                 const std::string& name, Treelog&) const = 0;
+  void initialize_layer (std::vector<double>& value, 
+			 const AttributeList& al, 
+			 const std::string& name, Treelog&) const;
 
   // Creation.
 public:
   virtual bool check (Treelog&) const = 0;
   virtual bool check_border (const double border, Treelog& err) const = 0;
   Geometry (Block&);
+  static void initialize_intervals (const std::vector<double>& end, 
+                                    std::vector<double>& center,
+                                    std::vector<double>& distance);
   virtual void initialize_zplus (const Groundwater& groundwater,
                                  const std::vector<double>& fixed,
                                  const double max_rooting_depth,

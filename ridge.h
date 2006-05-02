@@ -47,7 +47,7 @@ public:
 		     std::vector<double>& h_, std::vector<double>& Theta_,
 		     std::vector<double>& q, const std::vector<double>& q_p);
   void output (Log&) const;
-  int last_node () const;
+  int last_cell () const;
   double h () const;		// [cm]
   double exfiltration () const;	// [mm]
 

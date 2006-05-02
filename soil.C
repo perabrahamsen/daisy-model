@@ -308,14 +308,14 @@ Soil::check (const int som_size, Geometry& geo, Treelog& err) const
     }
 
   bool geo_ok = true;
-  for (size_t i = 0; i < geo.node_size (); i++)
+  for (size_t i = 0; i < geo.cell_size (); i++)
     if (horizon_[i] == NULL)
       geo_ok = false;
 
   if (!geo_ok)
     {
       Treelog::Open nest (err, "horizons");
-      err.error ("Some nodes have no associated horizon");
+      err.error ("Some cells have no associated horizon");
       ok = false;
     }
 
@@ -493,8 +493,8 @@ Soil::initialize (Geometry& geo,
                         2 * impl.dispersivity, msg);
 
   // Initialize horizons.
-  horizon_.insert (horizon_.end (), geo.node_size (), NULL);
-  daisy_assert (horizon_.size () == geo.node_size ());
+  horizon_.insert (horizon_.end (), geo.cell_size (), NULL);
+  daisy_assert (horizon_.size () == geo.cell_size ());
   double last = 0.0;
 
   for (layer = begin; layer != end; layer++)
@@ -502,7 +502,7 @@ Soil::initialize (Geometry& geo,
       Horizon *const h  = (*layer)->horizon.get ();
       const double next = (*layer)->end;
 
-      for (size_t i = 0; i < geo.node_size (); i++)
+      for (size_t i = 0; i < geo.cell_size (); i++)
         {
           const double z = geo.z (i);
           if (last > z && z >= next)
@@ -513,8 +513,13 @@ Soil::initialize (Geometry& geo,
         }
       last = next;
     }
-  for (size_t i = 0; i < geo.node_size (); i++)
-    daisy_assert (horizon_[i] != NULL);
+  for (size_t i = 0; i < geo.cell_size (); i++)
+    {
+      std::ostringstream tmp;
+      tmp << "cell[" << i << "] of " << geo.cell_size () << " z = " << geo.z (i) << ", last = " << last;
+      Treelog::Open nest (msg, tmp.str ());
+      daisy_assert (horizon_[i] != NULL);
+    }
 }
 
 Soil::~Soil ()

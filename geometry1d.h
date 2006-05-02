@@ -43,14 +43,14 @@ class Geometry1D : public Geometry
 public:
   // Accessors.
   inline size_t edge_size () const
-  { return node_size () + 1; }
+  { return cell_size () + 1; }
   std::string edge_name (const size_t) const;
   inline int dimensions () const // Number of non-trivial dimensions.
   { return 1; }
-  inline int edge_from (size_t e) const // Node where edge originates.
-  { return e == node_size () ? edge_bottom : static_cast<int> (e); }
-  inline int edge_to (size_t e) const // Node where edge leads.
-  { return e == 0 ? edge_top : static_cast<int> (e) - 1; };
+  inline int edge_from (size_t e) const // Cell where edge originates.
+  { return e == cell_size () ? cell_below : static_cast<int> (e); }
+  inline int edge_to (size_t e) const // Cell where edge leads.
+  { return e == 0 ? cell_above : static_cast<int> (e) - 1; };
   inline double zplus (size_t n) const
   { return zplus_[n]; }
   inline double zminus (size_t n) const
@@ -61,8 +61,8 @@ public:
   { return dz_[n]; }
   inline double volume (size_t n) const
   { return dz_[n] * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
-  inline double bottom () const // Bottom of deepest node. [cm]
-  { return zplus_[node_size () - 1]; }
+  inline double bottom () const // Bottom of deepest cell. [cm]
+  { return zplus_[cell_size () - 1]; }
   double fraction_in_z_interval (size_t i, double from, double to) const;
   bool contain_z (size_t i, double z) const;
 
@@ -78,9 +78,6 @@ public:
                          const std::string& name,
 			 const std::string& dimension,
                          const std::string& description);
-  void initialize_layer (std::vector<double>& value, 
-			 const AttributeList& al, 
-			 const std::string& name, Treelog&) const;
 
   // Creation.
 public:

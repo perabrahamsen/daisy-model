@@ -92,17 +92,17 @@ MacroStandard::tick (const Geometry1D& geo,
 { 
   // Check input.
   daisy_assert (last > first);
-  daisy_assert (last < geo.node_size ()); 
-  daisy_assert (h.size () == geo.node_size ());
-  daisy_assert (Theta.size () == geo.node_size ());
-  daisy_assert (S_m.size () == geo.node_size ());
-  daisy_assert (S_p.size () == geo.node_size ());
+  daisy_assert (last < geo.cell_size ()); 
+  daisy_assert (h.size () == geo.cell_size ());
+  daisy_assert (Theta.size () == geo.cell_size ());
+  daisy_assert (S_m.size () == geo.cell_size ());
+  daisy_assert (S_p.size () == geo.cell_size ());
   daisy_assert (q_p.size () == geo.edge_size ());
 
   // Check for macropores outside our soil.
   if (height_start < geo.z (last))
     return;
-  const double soil_end = geo.zplus (geo.node_size () - 1);
+  const double soil_end = geo.zplus (geo.cell_size () - 1);
 
   // Start and end of macro intervals.
   const unsigned int from = max (double2int (geo.interval_plus 
@@ -175,7 +175,7 @@ MacroStandard::tick (const Geometry1D& geo,
       previous_end = geo.zplus (i);
     }
 
-  // Put any remaining preferential flow in the last node.
+  // Put any remaining preferential flow in the last cell.
   if (q_p[to] < 0.0)		// Flow downward.
     {
       S_p[to] = q_p[to] / geo.dz (to);

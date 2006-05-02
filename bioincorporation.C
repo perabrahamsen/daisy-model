@@ -231,8 +231,8 @@ void
 Bioincorporation::Implementation::initialize (const Geometry& geo,
                                               const Soil& soil)
 { 
-  // Calculate distribution density for all nodes.
-  for (size_t i = 0; i < geo.node_size (); i++)
+  // Calculate distribution density for all cells.
+  for (size_t i = 0; i < geo.cell_size (); i++)
     density.push_back (distribution (geo.z (i)));
 
   C_added.insert (C_added.end (), soil.size (), 0.0);
@@ -244,7 +244,7 @@ Bioincorporation::Implementation::create_am (const Geometry& geo)
 { 
   static const symbol bio_symbol ("bio");
   static const symbol incorporation_symbol ("incorporation");
-  aom = &AM::create (geo.node_size (), Time (1, 1, 1, 1), aom_alists,
+  aom = &AM::create (geo.cell_size (), Time (1, 1, 1, 1), aom_alists,
 		     bio_symbol, incorporation_symbol, AM::Locked); 
   return aom;
 }

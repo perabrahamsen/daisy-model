@@ -65,7 +65,7 @@ struct OrganicMatter::Implementation
 {
   // Content.
   const bool active_underground; // True, iff turnover happens below rootzone.
-  vector<bool> active;          // Active nodes.
+  vector<bool> active;          // Active cells.
   const double K_NH4;		// Immobilization rate of NH4.
   const double K_NO3;		// Immobilization rate of NO3.
   vector<double> CO2_slow;	// CO2 produced per time step from slow pools.
@@ -737,7 +737,7 @@ OrganicMatter::Implementation::water_turnover_factor (double h) const
 void
 OrganicMatter::Implementation::Buffer::initialize (const Geometry& geo)
 { 
-  const size_t size = geo.node_size ();
+  const size_t size = geo.cell_size ();
   // Make sure the vectors are large enough.
   while (N.size () < size)
     N.push_back (0.0);
@@ -783,7 +783,7 @@ OrganicMatter::Implementation::output (Log& log,
       || log.check_leaf (total_C_symbol)
       || log.check_leaf (humus_symbol))
     {
-      const int size = geo.node_size ();
+      const int size = geo.cell_size ();
 
       vector<double> total_N (size, 0.0);
       vector<double> total_C (size, 0.0);
@@ -927,7 +927,7 @@ OrganicMatter::Implementation::monthly (const Geometry& geo)
   AM* remainder = find_am (am_symbol, cleanup_symbol);
   if (!remainder)
     {
-      remainder = &AM::create (geo.node_size (),
+      remainder = &AM::create (geo.cell_size (),
                                Time (1, 1, 1, 1), AM::default_AM (),
 			       am_symbol, cleanup_symbol, AM::Locked);
       add (*remainder);
@@ -989,8 +989,8 @@ OrganicMatter::Implementation::find_abiotic (const DAOM& om,
   if (!use_om_heat && !use_om_water)
     return &default_value[0];
   
-  const size_t node_size = active.size ();
-  for (size_t i = 0; i < node_size; i++)
+  const size_t cell_size = active.size ();
+  for (size_t i = 0; i < cell_size; i++)
     {
       if (!active[i])
         continue;
@@ -1029,11 +1029,11 @@ OrganicMatter::Implementation::find_abiotic (const OM& om,
   if (!use_om_heat && !use_om_water && !use_tillage)
     return &default_value[0];
   
-  const size_t node_size = active.size ();
+  const size_t cell_size = active.size ();
 
   if (use_om_heat || use_om_water)
     {
-      for (size_t i = 0; i < node_size; i++)
+      for (size_t i = 0; i < cell_size; i++)
 	{
           if (!active[i])
             continue;
@@ -1059,7 +1059,7 @@ OrganicMatter::Implementation::find_abiotic (const OM& om,
     scratch = default_value;
 
   if (use_tillage)
-    for (size_t i = 0; i < node_size; i++)
+    for (size_t i = 0; i < cell_size; i++)
       if (active[i])
         scratch[i] *= (*tillage_factor[pool]) (tillage_age[i]);
 
@@ -1094,15 +1094,15 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
     dom[j]->clear ();
 
   // Setup arrays.
-  const size_t node_size = geo.node_size ();
+  const size_t cell_size = geo.cell_size ();
 
-  vector<double> N_soil (node_size, -42.42e42);
-  vector<double> N_used (node_size, -42.42e42);
-  vector<double> clay_factor (node_size, -42.42e42);
-  vector<double> soil_factor (node_size, -42.42e42);
-  vector<double> tillage_factor (node_size, -42.42e42);
+  vector<double> N_soil (cell_size, -42.42e42);
+  vector<double> N_used (cell_size, -42.42e42);
+  vector<double> clay_factor (cell_size, -42.42e42);
+  vector<double> soil_factor (cell_size, -42.42e42);
+  vector<double> tillage_factor (cell_size, -42.42e42);
   
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       if (!active[i])
         continue;
@@ -1182,12 +1182,12 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
     }
 
   // Update buffer.
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     if (active[i])
       buffer.tick (i, soil_factor[i], N_soil[i], N_used[i], som);
 
   // Update source.
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       if (!active[i])
         continue;
@@ -1221,7 +1221,7 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
   bioincorporation.tick (geo, am, soil_T, top_CO2);
 
   // Tillage time.
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     if (active[i])
       tillage_age[i] += 1.0/24.0;
 
@@ -1264,7 +1264,7 @@ OrganicMatter::Implementation::tick (const Geometry& geo,
     }
 
   // We didn't steal it all?
-  for (int i = 0; i < node_size; i++)
+  for (int i = 0; i < cell_size; i++)
     {
       daisy_assert (soil_NO3.M_left (i) >= 0.0);
       daisy_assert (soil_NH4.M_left (i) >= 0.0);
@@ -2194,7 +2194,7 @@ OrganicMatter::Implementation::top_summary (const Geometry& geo,
   double clay = 0.0;
   double input = 0.0;
   double volume = 0.0;
-  for (size_t lay = 0; lay < geo.node_size (); lay++)
+  for (size_t lay = 0; lay < geo.cell_size (); lay++)
     {
       if (geo.z (lay) < init.end)
         continue;
@@ -2325,23 +2325,23 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   Treelog::Open nest (err, "OrganicMatter");
 
   // Sizes.
-  const size_t node_size = geo.node_size ();
+  const size_t cell_size = geo.cell_size ();
   const size_t smb_size = smb.size ();
   const size_t som_size = som.size ();
   const size_t dom_size = dom.size ();
 
   if (active_underground)
-    active.insert (active.end (), node_size, true);
+    active.insert (active.end (), cell_size, true);
   else
     {
       const double limit = min (-100.0, soil.MaxRootingHeight ());
-      for (size_t lay = 0; lay < node_size; lay++)
+      for (size_t lay = 0; lay < cell_size; lay++)
         active.push_back (geo.z (lay) >= limit);
     }
-  daisy_assert (active.size () == node_size);
+  daisy_assert (active.size () == cell_size);
 
   // Check horizons.
-  for (size_t lay = 0; lay < node_size; lay++)
+  for (size_t lay = 0; lay < cell_size; lay++)
     {
       // We just return uninitialized if there is a mismatch, it will
       // be caught by Soil::check later.
@@ -2353,16 +2353,16 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
     }
 
   // Production.
-  CO2_slow.insert (CO2_slow.end (), node_size, 0.0);
-  CO2_fast.insert (CO2_fast.end (), node_size, 0.0);
-  NO3_source.insert (NO3_source.end (), node_size, 0.0);
-  NH4_source.insert (NH4_source.end (), node_size, 0.0);
+  CO2_slow.insert (CO2_slow.end (), cell_size, 0.0);
+  CO2_fast.insert (CO2_fast.end (), cell_size, 0.0);
+  NO3_source.insert (NO3_source.end (), cell_size, 0.0);
+  NH4_source.insert (NH4_source.end (), cell_size, 0.0);
   
   // Clay affect of SMB turnover and mantenance.
   clayom->set_rates (soil, smb);
 
   // Clay and soil.
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       const double soil_factor = soil.turnover_factor (i);
       const double clay_factor = clayom->factor (soil.clay (i));
@@ -2370,12 +2370,12 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
       clay_turnover_factor.push_back (soil_factor * clay_factor);
     }
 
-  abiotic_factor.insert (abiotic_factor.end (), node_size, 1.0);
+  abiotic_factor.insert (abiotic_factor.end (), cell_size, 1.0);
     
 
   // Tillage.
   tillage_age.insert (tillage_age.end (), 
-		      node_size - tillage_age.size (), 1000000.0);
+		      cell_size - tillage_age.size (), 1000000.0);
 
   // Initialize AM.
   for (size_t i = 0; i < am.size (); i++)
@@ -2397,10 +2397,10 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
       std::ostringstream tmp;
       tmp << "som[" << pool << "]";
       Treelog::Open nest (err, tmp.str ());
-      if (som[pool]->C.size () > 0 && som[pool]->C.size () < node_size)
+      if (som[pool]->C.size () > 0 && som[pool]->C.size () < cell_size)
 	err.warning ("C partially initialized.\n\
 Using humus for remaining entries");
-      if (som[pool]->N.size () > 0 && som[pool]->N.size () < node_size)
+      if (som[pool]->N.size () > 0 && som[pool]->N.size () < cell_size)
 	err.warning ("N partially initialized.\n\
 Using humus for remaining entries");
     }
@@ -2409,15 +2409,15 @@ Using humus for remaining entries");
       std::ostringstream tmp;
       tmp << "smb[" << pool << "]";
       Treelog::Open nest (err, tmp.str ());
-      if (smb[pool]->C.size () > 0 && smb[pool]->C.size () < node_size)
+      if (smb[pool]->C.size () > 0 && smb[pool]->C.size () < cell_size)
 	err.warning ("C partially initialized.\n\
 Using equilibrium for remaining entries");
-      if (smb[pool]->N.size () > 0 && smb[pool]->N.size () < node_size)
+      if (smb[pool]->N.size () > 0 && smb[pool]->N.size () < cell_size)
 	err.warning ("N partially initialized.\n\
 Using initial C per N for remaining entries");
     }
 
-  vector<double> total_C (node_size, 0.0);
+  vector<double> total_C (cell_size, 0.0);
   double first_humus = 0.0;
 
   // Initialize C from layers, when available.
@@ -2436,7 +2436,7 @@ Using initial C per N for remaining entries");
 	  if (end < soil_end)
 	    {
 	      err.warning ("\
-An 'initial_SOM' layer in OrganicMatter ends below the last node");
+An 'initial_SOM' layer in OrganicMatter ends below the last cell");
 	      weight *= (last - soil_end) / (last - end);
 	      end = soil_end;
 	      i = layers.size ();
@@ -2450,7 +2450,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
 
   // Initialize rest from humus.
   {
-    for (size_t lay = 0; lay < node_size; lay++)
+    for (size_t lay = 0; lay < cell_size; lay++)
       if (geo.z (lay) < first_humus)
         total_C[lay] = soil.humus_C (lay);
   }
@@ -2465,7 +2465,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
     vector<double> SOM_results (som_size, 0.0);
     vector<double> SMB_results (smb_size, 0.0);
 
-    for (size_t lay = 0; lay < node_size; lay++)
+    for (size_t lay = 0; lay < cell_size; lay++)
       {
         vector<double> am_input (smb.size () + 1);
         if (init.input >= 0)
@@ -2562,8 +2562,8 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   }  
 
   // Log variable.
-  tillage_N_soil.insert (tillage_N_soil.end (), node_size, 0.0);
-  tillage_C_soil.insert (tillage_C_soil.end (), node_size, 0.0);
+  tillage_N_soil.insert (tillage_N_soil.end (), cell_size, 0.0);
+  tillage_C_soil.insert (tillage_C_soil.end (), cell_size, 0.0);
 }
 
 OrganicMatter::Implementation::Implementation (Block& al)

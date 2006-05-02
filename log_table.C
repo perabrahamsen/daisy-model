@@ -119,7 +119,7 @@ LogTable::common_done (const Time& time)
 
 	  if (geo && size >= 0)
 	    {
-	      if (geo->node_size () == size)
+	      if (geo->cell_size () == size)
 		{
 		  // Content.
 		  for (unsigned j = 0; j < size; j++)
@@ -128,7 +128,7 @@ LogTable::common_done (const Time& time)
 			out << array_separator;
 		      if (tag != empty_symbol)
 			out << tag << " @ ";
-		      out << geo->node_name (j);
+		      out << geo->cell_name (j);
 		    }
 		}
 	      else if (geo->edge_size () == size)

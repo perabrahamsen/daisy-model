@@ -56,7 +56,7 @@ MactransStandard::tick (const Geometry1D& geo, const SoilWater1D& soil_water,
 { 
   double max_delta_matter = 0.0; // [g/cm^2]
 
-  for (size_t i = 0; i < geo.node_size (); i++)
+  for (size_t i = 0; i < geo.cell_size (); i++)
     {
       const double dz = geo.dz (i);
 
@@ -166,7 +166,7 @@ MactransStandard::tick (const Geometry1D& geo, const SoilWater1D& soil_water,
       std::ostringstream tmp;
       tmp << __FILE__ << ":" <<  __LINE__
 	     << ": BUG: Total S_p = '"
-          << (geo.total (S_p) + J_p[0]  - J_p[geo.node_size ()])
+          << (geo.total (S_p) + J_p[0]  - J_p[geo.cell_size ()])
 	     << "' solute\n";
       out.error (tmp.str ());
     }

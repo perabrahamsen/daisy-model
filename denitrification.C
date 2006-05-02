@@ -73,8 +73,8 @@ void Denitrification::tick (const std::vector<bool>& active,
 			    SoilNO3& soil_NO3, 
 			    const OrganicMatter& organic_matter)
 {
-  const size_t node_size = geo.node_size ();
-  for (size_t i = 0; i < node_size; i++)
+  const size_t cell_size = geo.cell_size ();
+  for (size_t i = 0; i < cell_size; i++)
     {
       if (!active[i])
         {
@@ -182,13 +182,13 @@ By default no redox denitrification occurs.");
 }
 
 void
-Denitrification::initialize (const size_t node_size)
+Denitrification::initialize (const size_t cell_size)
 {
-  converted.insert (converted.begin (), node_size, 0.0);
-  converted_fast.insert (converted_fast.begin (), node_size, 0.0);
-  converted_redox.insert (converted_redox.begin (), node_size, 0.0);
-  potential.insert (potential.begin (), node_size, 0.0);
-  potential_fast.insert (potential_fast.begin (), node_size, 0.0);
+  converted.insert (converted.begin (), cell_size, 0.0);
+  converted_fast.insert (converted_fast.begin (), cell_size, 0.0);
+  converted_redox.insert (converted_redox.begin (), cell_size, 0.0);
+  potential.insert (potential.begin (), cell_size, 0.0);
+  potential_fast.insert (potential_fast.begin (), cell_size, 0.0);
 }
 
 Denitrification::Denitrification (const AttributeList& al)

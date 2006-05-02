@@ -67,7 +67,7 @@ public:
 
   // Create.
 public:
-  void initialize (size_t node_size);
+  void initialize (size_t cell_size);
   static void load_syntax (Syntax&, AttributeList&);
   Denitrification (const AttributeList&);
 };

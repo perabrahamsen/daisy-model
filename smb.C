@@ -34,11 +34,11 @@ void
 SMB::maintain (const std::vector<bool>& active, const double* abiotic_factor, 
 	       double* N_used, double* CO2)
 {
-  const size_t node_size = active.size ();
-  daisy_assert (C.size () == node_size);
-  daisy_assert (N.size () == node_size);
+  const size_t cell_size = active.size ();
+  daisy_assert (C.size () == cell_size);
+  daisy_assert (N.size () == cell_size);
 
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       if (!active[i])
         continue;
@@ -60,12 +60,12 @@ SMB::turnover_pool (const std::vector<bool>& active, const double* factor,
 		    double fraction, double efficiency,
 		    const double* N_soil, double* N_used, double* CO2, OM& om)
 {
-  const size_t node_size = active.size ();
-  daisy_assert (C.size () == node_size);
-  daisy_assert (N.size () == node_size);
+  const size_t cell_size = active.size ();
+  daisy_assert (C.size () == cell_size);
+  daisy_assert (N.size () == cell_size);
 
   // Maintenance.
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       if (!active[i])
         continue;
@@ -109,9 +109,9 @@ void
 SMB::turnover_dom (const std::vector<bool>& active, const double* factor,
 		  double fraction, DOM& dom)
 {
-  const size_t node_size = active.size ();
+  const size_t cell_size = active.size ();
 
-  for (unsigned int i = 0; i < node_size; i++)
+  for (unsigned int i = 0; i < cell_size; i++)
     {
       const double rate = min (clay_turnover[i] * fraction * factor[i], 0.1);
       const double C_use = C[i] * rate;

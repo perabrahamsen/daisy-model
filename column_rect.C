@@ -144,6 +144,7 @@ struct ColumnRect : public Column
   { daisy_panic ("unimplemented"); }
 
   // Parameters.
+  std::auto_ptr<GeometryRect> geometry;
   std::auto_ptr<Soil> soil;
 
   // Simulation.
@@ -158,13 +159,14 @@ struct ColumnRect : public Column
 void
 ColumnRect::output (Log& log) const
 {
-  // Log::Geo geo (log, *geometry, *soil);
+  Log::Geo geo (log, *geometry, *soil);
   Column::output (log);
   output_submodule (*soil, "Soil", log);
 }
 
 ColumnRect::ColumnRect (Block& al)
   : Column (al),
+    geometry (submodel<GeometryRect> (al, "Geometry")),
     soil (submodel<Soil> (al, "Soil"))
 { }
 
@@ -179,6 +181,9 @@ static struct ColumnRectSyntax
     AttributeList& alist = *new AttributeList ();
     Column::load_syntax (syntax, alist);
 
+    syntax.add_submodule ("Geometry", alist, Syntax::State,
+                          "The discretization of the soil.",
+                          GeometryRect::load_syntax);
     syntax.add_submodule ("Soil", alist, Syntax::State,
                           "The physical soil properties.",
                           Soil::load_syntax);

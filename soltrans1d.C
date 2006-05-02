@@ -33,7 +33,7 @@ Soltrans1D::solute (const Geometry1D& geo, const Soil& soil,
                     const double J_in, Solute& solute, 
                     Treelog& msg)
 { 
-  solute.tick (geo.node_size (), soil_water);
+  solute.tick (geo.cell_size (), soil_water);
 
   // Upper border.
   if (soil_water.q_p (0) < 0.0)
@@ -78,7 +78,7 @@ Soltrans1D::element (const Geometry1D& geo,
                      double diffusion_coefficient,
                      Treelog& msg)
 {
-  element.tick (geo.node_size (), soil_water);
+  element.tick (geo.cell_size (), soil_water);
   flow (geo, soil, soil_water, "DOM", 
         element.M, element.C, element.S, element.S_p, element.J, element.J_p, 
         adsorption, diffusion_coefficient, msg);

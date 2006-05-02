@@ -99,7 +99,7 @@ struct SoilHeat1D::Implementation
                    const Soil& soil, const Time& time, const Weather& weather, 
                    std::vector<double>& T,
                    Treelog&);
-  Implementation (const AttributeList&);
+  Implementation (const Block&);
 };
 
 static const double latent_heat_of_fussion = 3.35e9; // [erg/g]
@@ -425,7 +425,7 @@ SoilHeat1D::Implementation::solve (const Time& time,
   std::vector<double> c (size, 0.0);
   std::vector<double> d (size, 0.0);
 
-  // Inner nodes.
+  // Inner cells.
   for (int i = 0; i < size; i++)
     {
       // Soil Water
@@ -523,7 +523,7 @@ SoilHeat1D::Implementation::calculate_heat_flux (const Geometry& geo,
                                                  const SoilWater& soil_water, 
                                                  const std::vector<double>& T)
 {
-  // Top and inner nodes.
+  // Top and inner cells.
   double T_prev = (T_top + T_top_old) / 2.0;
   double z_prev = 0.0;
   for (unsigned int i = 0; i < soil.size (); i++)
@@ -625,7 +625,7 @@ SoilHeat1D::Implementation::bottom (const Time& time,
   return weather.T_normal (time, delay);
 }
 
-SoilHeat1D::Implementation::Implementation (const AttributeList& al)
+SoilHeat1D::Implementation::Implementation (const Block& al)
   : h_frozen (al.number ("h_frozen")),
     enable_ice (al.flag ("enable_ice")),
     T_top (al.number ("T_top", -500.0))
@@ -755,7 +755,7 @@ SoilHeat1D::swap (const Geometry& geo,
                   double from, double middle, double to)
 {
   // This will only work right if the water is also swaped.
-  // There *might* be a small error on the top and bottom nodes, but I
+  // There *might* be a small error on the top and bottom cells, but I
   // believe it should work as long as the energy is directly
   // proportional with the water content.
   geo.swap (T_, from, middle, to);
@@ -813,7 +813,7 @@ SoilHeat1D::load_syntax (Syntax& syntax, AttributeList& alist)
               "External heat source, by default zero.");
 }
 
-SoilHeat1D::SoilHeat1D (const AttributeList& al)
+SoilHeat1D::SoilHeat1D (const Block& al)
   : SoilHeat (al),
     impl (*new Implementation (al))
 { }

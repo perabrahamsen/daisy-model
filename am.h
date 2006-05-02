@@ -85,7 +85,7 @@ public:
   static AM& create (const AttributeList&, const Geometry&, 
                      double max_rooting_depth = 1.0);
   // Crop part.
-  static AM& create (const size_t node_size, const Time&,
+  static AM& create (const size_t cell_size, const Time&,
 		     const std::vector<AttributeList*>&,
 		     symbol sort, symbol part, lock_type lock = Unlocked);
   void initialize (const Geometry& geometry, const double max_rooting_depth);

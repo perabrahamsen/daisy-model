@@ -86,7 +86,7 @@ public:
   void add_to_root_sink (const std::vector<double>&);
 
   // Simulation.
-  void tick (const size_t node_size, const SoilWater&);
+  void tick (const size_t cell_size, const SoilWater&);
 public:
   bool check (size_t n, Treelog& err) const;
   virtual void output (Log&) const;

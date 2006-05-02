@@ -46,8 +46,8 @@ public:
 
   // Content.
 public:
-  std::vector<double> C;		// Carbon in each node.
-  std::vector<double> N;		// Nitrogen in each node.
+  std::vector<double> C;		// Carbon in each cell.
+  std::vector<double> N;		// Nitrogen in each cell.
   const double turnover_rate;	// How fast this is it turned over?
   const std::vector<double> efficiency;	// How digestible is this?
   const std::vector<double> fractions;	// How much is turned into SMB and SOM?

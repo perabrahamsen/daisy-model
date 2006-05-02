@@ -162,50 +162,6 @@ bool approximate (const double a, const double b, const double noise)
   return ((b == 0.0) ? (a == 0.0) : fabs (a / b - 1.0) < noise);
 }
 
-double fraction_within (const double from, const double to, 
-                        const double begin, const double end)
-{ 
-  daisy_assert (to > from);
-  daisy_assert (end > begin);
-
-  if (from >= end)
-    // Fully after interval.
-    return 0.0;
-  if (to <= begin)
-    // Fully before interval.
-    return 0.0;
-
-  if (to <= end)
-    {
-      if (from >= begin)
-        // Fully within interval.
-        return 1.0;
-      
-      // Overlaps start of interval.
-      const double width = to - from;
-      const double overlap = to - begin;
-      daisy_assert (overlap > 0.0);
-      daisy_assert (width > overlap);
-      return overlap / width;
-    }
-  if (from >= begin)
-    {
-      // Overlaps end of interval.
-      const double width = to - from;
-      const double overlap = end - from;
-      daisy_assert (overlap > 0.0);
-      daisy_assert (width > overlap);
-      return overlap / width;
-    }
-
-  // Interval is fully within.
-  const double width = to - from;
-  const double overlap = end - begin;
-  daisy_assert (overlap > 0.0);
-  daisy_assert (width > overlap);
-  return overlap / width;
-}
-
 double halftime_to_rate (double halftime)
 { return M_LN2 / halftime; }
 

@@ -79,10 +79,10 @@ Solute::add_to_root_sink (const vector<double>& v)
 }
 
 void 
-Solute::tick (const size_t node_size,
+Solute::tick (const size_t cell_size,
 	      const SoilWater& soil_water)
 {
-  for (unsigned i = 0; i < node_size; i++)
+  for (unsigned i = 0; i < cell_size; i++)
     daisy_assert (M_left (i) >= 0.0);
 
   // Initialize.
@@ -90,7 +90,7 @@ Solute::tick (const size_t node_size,
   fill (J_p.begin (), J_p.end (), 0.0);
 
   // Permanent source.
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       S_external[i] += S_permanent[i];
       S[i] += S_external[i];
@@ -98,7 +98,7 @@ Solute::tick (const size_t node_size,
     }
 
   // Drainage.
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       S_drain[i] = -soil_water.S_drain (i) * dt * C (i);
       S[i] += S_drain[i];
@@ -257,32 +257,32 @@ Solute::initialize (const AttributeList& al,
   if (C_.size () > 0)
     {
       // Fill it up.
-      while (C_.size () < geo.node_size ())
+      while (C_.size () < geo.cell_size ())
 	C_.push_back (C_[C_.size () - 1]);
-      if (C_.size () > geo.node_size ())
+      if (C_.size () > geo.cell_size ())
 	throw ("To many members of C sequence");
     }
   if (M_.size () > 0)
     {
       // Fill it up.
-      while (M_.size () < geo.node_size ())
+      while (M_.size () < geo.cell_size ())
 	M_.push_back (M_[M_.size () - 1]);
-      if (M_.size () > geo.node_size ())
+      if (M_.size () > geo.cell_size ())
 	throw ("To many members of M sequence");
     }
   if (Ms.size () > 0)
     {
       // Fill it up.
-      while (Ms.size () < geo.node_size ())
+      while (Ms.size () < geo.cell_size ())
 	Ms.push_back ( Ms[Ms.size () - 1]);
-      if (Ms.size () > geo.node_size ())
+      if (Ms.size () > geo.cell_size ())
 	throw ("To many members of Ms sequence");
     }
   if (M_.size () == 0 && C_.size () == 0)
     {
       if (Ms.size () != 0)
 	{
-	  daisy_assert (Ms.size () == geo.node_size ());
+	  daisy_assert (Ms.size () == geo.cell_size ());
 
 	  for (size_t i = M_.size (); i < Ms.size (); i++)
 	    M_.push_back (Ms[i] * soil.dry_bulk_density (i));
@@ -298,9 +298,9 @@ Solute::initialize (const AttributeList& al,
     M_.push_back (C_to_M (soil, soil_water.Theta (i), i, C_[i]));
 
   daisy_assert (C_.size () == M_.size ());
-  daisy_assert (C_.size () == geo.node_size ());
+  daisy_assert (C_.size () == geo.cell_size ());
 
-  for (size_t i = 0; i < geo.node_size (); i++)
+  for (size_t i = 0; i < geo.cell_size (); i++)
     {
       if (M_[i] == 0.0)
 	{
@@ -316,16 +316,16 @@ Solute::initialize (const AttributeList& al,
 	}
     }
 
-  S.insert (S.begin (), geo.node_size (), 0.0);
-  S_p.insert (S_p.begin (), geo.node_size (), 0.0);
-  S_drain.insert (S_drain.begin (), geo.node_size (), 0.0);
-  S_external.insert (S_external.begin (), geo.node_size (), 0.0);
-  if (S_permanent.size () < geo.node_size ())
+  S.insert (S.begin (), geo.cell_size (), 0.0);
+  S_p.insert (S_p.begin (), geo.cell_size (), 0.0);
+  S_drain.insert (S_drain.begin (), geo.cell_size (), 0.0);
+  S_external.insert (S_external.begin (), geo.cell_size (), 0.0);
+  if (S_permanent.size () < geo.cell_size ())
     S_permanent.insert (S_permanent.end (), 
-			geo.node_size () - S_permanent.size (),
+			geo.cell_size () - S_permanent.size (),
 			0.0);
-  S_root.insert (S_root.begin (), geo.node_size (), 0.0);
+  S_root.insert (S_root.begin (), geo.cell_size (), 0.0);
   J.insert (J_p.begin (), geo.edge_size (), 0.0);
   J_p.insert (J_p.begin (), geo.edge_size (), 0.0);
-  tillage.insert (tillage.begin (), geo.node_size (), 0.0);
+  tillage.insert (tillage.begin (), geo.cell_size (), 0.0);
 }

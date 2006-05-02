@@ -617,7 +617,7 @@ CropSold::Variables::~Variables ()
 void
 CropSold::initialize (Treelog&, const Geometry& geo, OrganicMatter*)
 {
-  size_t size = geo.node_size ();
+  size_t size = geo.cell_size ();
 
   // Fill rootsys arrays.
   var.RootSys.Density.insert (var.RootSys.Density.end (),
@@ -1569,7 +1569,7 @@ CropSold::RootDensity (const Geometry& geo)
   
   vector<double>& d = var.RootSys.Density;
   
-  for (size_t i = 0; i < geo.node_size (); i++)
+  for (size_t i = 0; i < geo.cell_size (); i++)
     if (i == 0 || -geo.z(i) < RootSys.Depth)
       d[i] = L0 * exp (a * geo.z (i));
     else
@@ -1912,7 +1912,7 @@ CropSold::harvest (const symbol column_name,
   if (leaf_harvest < 1.0 && WLeaf > 0.0)
     {
       static const symbol leaf_symbol ("leaf");
-      AM& am = AM::create (geo.node_size (), time, Leaf, name, leaf_symbol);
+      AM& am = AM::create (geo.cell_size (), time, Leaf, name, leaf_symbol);
       am.add (WLeaf * C_Leaf * (1.0 - leaf_harvest) * m2_per_cm2, 
 	      NLeaf * (1.0 - leaf_harvest) * m2_per_cm2);
       residuals.push_back (&am);
@@ -1923,7 +1923,7 @@ CropSold::harvest (const symbol column_name,
   if (sorg_harvest < 1.0 && WSOrg > 0.0)
     {
       static const symbol sorg_symbol ("sorg");
-      AM& am = AM::create (geo.node_size (), time, SOrg, name, sorg_symbol);
+      AM& am = AM::create (geo.cell_size (), time, SOrg, name, sorg_symbol);
       am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest) * m2_per_cm2,
 	      NSOrg * (1.0 - sorg_harvest) * m2_per_cm2);
       residuals.push_back (&am);
@@ -1934,7 +1934,7 @@ CropSold::harvest (const symbol column_name,
   if (WRoot > 0.0)
     {
       static const symbol root_symbol ("root");
-      AM& am = AM::create (geo.node_size (), time, Root, name, root_symbol);
+      AM& am = AM::create (geo.cell_size (), time, Root, name, root_symbol);
       residuals_DM += WRoot;
       if (geo.total (density) > 0.0)
 	{

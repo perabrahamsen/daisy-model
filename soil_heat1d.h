@@ -61,7 +61,7 @@ public:
   void set_source (size_t i, double value); // [erg/cm^3/h]
   void output (Log&) const;
   static void load_syntax (Syntax&, AttributeList&);
-  SoilHeat1D (const AttributeList&);
+  SoilHeat1D (const Block&);
   void initialize (const AttributeList& al, 
 		   const Geometry1D& geo,
                    const Soil& soil, const Time& time, const Weather& weather,

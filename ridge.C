@@ -47,8 +47,8 @@ struct Ridge::Implementation
   const double z_switch;	// Height where we switch between regimes. [cm]
   const double x_switch;	// Location where we switch between regimes. []
   const double R_crust;		// Resistance in crust. [h]
-  /*const*/ int last_node ;     // Last node in ridge system.
-  /*const*/ double dz;		// Depth of first node below ridge. [cm]
+  /*const*/ int last_cell ;     // Last cell in ridge system.
+  /*const*/ double dz;		// Depth of first cell below ridge. [cm]
   /*const*/ double K_sat_below; // Saturated conductivity below ridge. [cm/h]
   // Variables.
   double Theta;			// Water in ridge. [cm^3/cm^3]
@@ -319,7 +319,7 @@ Ridge::Implementation::tick (const Geometry1D& geo,
 
   // Update water.
   Theta = I * dt;
-  for (int i = 0; i <= last_node; i++)
+  for (int i = 0; i <= last_cell; i++)
     Theta += soil_water.Theta (i) * geo.dz (i);
   Theta /= dz;
   Theta_pre = Theta;
@@ -346,9 +346,9 @@ Ridge::Implementation::update_water (const Geometry1D& geo,
 				     vector<double>& q,
 				     const vector<double>& q_p)
 {
-  const double E = -(q[last_node + 1] + q_p[last_node + 1]);
+  const double E = -(q[last_cell + 1] + q_p[last_cell + 1]);
   Theta = (I - E) * dt;
-  for (int i = 0; i <= last_node; i++)
+  for (int i = 0; i <= last_cell; i++)
     Theta += (Theta_[i] - S_[i] * dt) * geo.dz (i);
   Theta /= dz;
   const double Theta_sat = soil.Theta (0, 0.0, 0.0);
@@ -356,7 +356,7 @@ Ridge::Implementation::update_water (const Geometry1D& geo,
   h = soil.h (0, Theta);
 
   q[0] = -I;
-  for (int i = 0; i <= last_node; i++)
+  for (int i = 0; i <= last_cell; i++)
     {
       q[i+1] = q[i] + geo.dz (i) * (S_[i] + (Theta - Theta_[i]) / dt ) 
 	- q_p[i+1];
@@ -368,7 +368,7 @@ Ridge::Implementation::update_water (const Geometry1D& geo,
 	  throw ("Soil hydraulic paramteres change in ridge area");
 	}
     }
-  daisy_assert (approximate (E, -(q[last_node + 1] + q_p[last_node + 1])));
+  daisy_assert (approximate (E, -(q[last_cell + 1] + q_p[last_cell + 1])));
 }
 
 void 
@@ -394,8 +394,8 @@ Ridge::Implementation::output (Log& log) const
 }
 
 int 
-Ridge::last_node () const
-{ return impl.last_node; }
+Ridge::last_cell () const
+{ return impl.last_cell; }
 
 double
 Ridge::h () const
@@ -416,14 +416,14 @@ Ridge::Implementation::initialize (const Geometry1D& geo,
                                    const SoilWater& soil_water)
 {
   // Find values depending on soil numerics.
-  last_node = geo.interval_plus (lowest);
-  daisy_assert (last_node+1 < soil.size ());
-  dz = 0 - geo.zplus (last_node);
-  K_sat_below = soil.K (last_node+1, 0.0, 0.0, 20.0);
+  last_cell = geo.interval_plus (lowest);
+  daisy_assert (last_cell+1 < soil.size ());
+  dz = 0 - geo.zplus (last_cell);
+  K_sat_below = soil.K (last_cell+1, 0.0, 0.0, 20.0);
 
   // Initialize water content.
   Theta = 0.0;
-  for (int i = 0; i <= last_node; i++)
+  for (int i = 0; i <= last_cell; i++)
     Theta += soil_water.Theta (i) * geo.dz (i);
   Theta /= dz;
   Theta_pre = Theta;
@@ -498,7 +498,7 @@ Ridge::Implementation::Implementation (const AttributeList& al)
     x_switch (x (z_switch)),
     R_crust (al.number ("R_crust")),
     // Utilities depending on soil...
-    last_node (42424242),
+    last_cell (42424242),
     dz (-42.42e42),
     // Log variables.
     Theta (-42.42e42),

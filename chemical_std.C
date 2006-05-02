@@ -270,7 +270,7 @@ You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
     syntax.add ("decompose_lag_increment", 
 		"g/cm^3/h", Syntax::Fraction (), Syntax::Const,
 		"Increment lag with the value of this PLF for the current\n\
-concentration each hour.  When lag in any node reaches 1.0,\n\
+concentration each hour.  When lag in any cell reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.");
     alist.add ("decompose_lag_increment", no_factor);
     syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\

@@ -185,7 +185,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		  }
 		else if (al.name ("type") == "error")
 		  {
-		    tmp << "Error node found";
+		    tmp << "Error cell found";
 		    error = true;
 		    err.error (tmp.str ());
 		  }

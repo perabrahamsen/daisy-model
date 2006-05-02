@@ -66,7 +66,7 @@ public:
   virtual double X_ice (size_t i) const = 0;
   virtual double X_ice_total (size_t i) const = 0;
 
-  virtual size_t first_groundwater_node () const = 0;
+  virtual size_t first_groundwater_cell () const = 0;
     
   // Ice modified lookups.
   virtual double Theta (const Soil&, size_t i, double h) const = 0;

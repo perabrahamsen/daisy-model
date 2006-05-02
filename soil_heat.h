@@ -25,6 +25,7 @@
 #include <vector>
 
 class AttributeList;
+class Block;
 class Log;
 class Syntax;
 class Geometry;
@@ -54,7 +55,7 @@ public:
   void output_base (Log&) const;
   bool check (size_t n, Treelog&) const;
   static void load_base (Syntax&, AttributeList&);
-  SoilHeat (const AttributeList&);
+  SoilHeat (const Block&);
   void initialize_base (const AttributeList& al, 
                         const Geometry& geo,
                         Treelog&);

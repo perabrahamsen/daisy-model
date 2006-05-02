@@ -175,9 +175,9 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
 	  double* CO2, const vector<SMB*>& smb, double* som_C, double* som_N,
 	  const vector<DOM*>& dom)
 {
-  const size_t node_size = active.size ();
-  daisy_assert (C.size () == node_size);
-  daisy_assert (N.size () == node_size);
+  const size_t cell_size = active.size ();
+  daisy_assert (C.size () == cell_size);
+  daisy_assert (N.size () == cell_size);
   
   const unsigned int smb_size = smb.size ();
   const unsigned int dom_size = dom.size ();
@@ -195,7 +195,7 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
   // Distribute to soil buffer.
   const double factor = turnover_rate * fractions[smb_size];
   if (factor > 1e-200)
-    for (size_t i = 0; i < node_size; i++)
+    for (size_t i = 0; i < cell_size; i++)
       {
         if (!active[i])
           continue;

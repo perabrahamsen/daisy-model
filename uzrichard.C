@@ -257,7 +257,7 @@ UZRichard::richard (Treelog& msg,
 
 	  internode (soil, soil_heat, first, last, h_ice, K, Kplus);
 
-	  // Calcualte nodes.
+	  // Calcualte cells.
 	  for (unsigned int i = 0; i < size; i++)
 	    {
 	      const double Cw1 = soil.Cw1 (first + i, h[i], h_ice[first + i]);
@@ -364,7 +364,7 @@ UZRichard::richard (Treelog& msg,
 		}
 	      else
 		{
-		  // Calculate intermediate nodes.
+		  // Calculate intermediate cells.
 		  const double dz_minus = geo.z (first + i - 1) - z;
 		  const double dz_plus = z - geo.z (first + i + 1);
 
@@ -659,15 +659,15 @@ UZRichard::q_darcy (const Geometry1D& geo,
   if (!(start < last - 2))
     {
       std::ostringstream tmp;
-      tmp << "We need at least 2 numeric nodes below 3/4 depth for \
+      tmp << "We need at least 2 numeric cells below 3/4 depth for \
 calculating flow with pressure top.\n";
       tmp << "3/4 depth is " << start_pos << " [cm]\n"
-             << "node " << start << " ends at " << geo.zplus (start) << " [cm]\n"
+             << "cell " << start << " ends at " << geo.zplus (start) << " [cm]\n"
              << "last " << last << " ends at " << geo.zplus (last) << " [cm]";
       throw (string (tmp.str ()));
     }
   if (!(start > first + 1))
-    throw ("We need at least 1 numeric node above 3/4 depth for \
+    throw ("We need at least 1 numeric cell above 3/4 depth for \
 calculating flow with pressure top.");
 
   for (; start > 0; start--)
@@ -800,7 +800,7 @@ Maximum relative difference in 'h' values for convergence.");
 		  "Number of iterations used,");
       syntax.add ("K_average", Librarian<Average>::library (),
 		  Syntax::OptionalConst, Syntax::Singleton,
-		  "Model for calculating average K between nodes.\n\
+		  "Model for calculating average K between cells.\n\
 The default model is 'geometric' if there are macropores, and\n\
 'arithmetic' otherwise.");
 

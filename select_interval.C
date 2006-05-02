@@ -59,8 +59,8 @@ struct SelectInterval : public SelectValue
 	to = geo.bottom ();
       bulk = 0.0;
 
-      const size_t node_size = geo.node_size ();
-      for (size_t i = 0; i < node_size; i++)
+      const size_t cell_size = geo.cell_size ();
+      for (size_t i = 0; i < cell_size; i++)
 	{
           const double f = geo.fraction_in_z_interval (i, from, to);
           if (f > 1e-10)

@@ -83,9 +83,9 @@ UZlr::tick (Treelog& msg, const Geometry1D& geo,
       daisy_assert (!top.flux_top ());
       // We have a forced pressure top, in the form of a ridge system.
       // Since LR only works with flux top, we use Darcy to simulate a
-      // flux top between the first node (with a forced pressure) and
-      // the second node, and then continue calculating with a flux
-      // top from the second node.
+      // flux top between the first cell (with a forced pressure) and
+      // the second cell, and then continue calculating with a flux
+      // top from the second cell.
       const double dz = geo.z (first) - geo.z (first+1);
       const double dh = (h_old[first] - h_old[first+1]);
       const double K = min (soil.K (first, h_old[first], h_ice[first],
@@ -126,7 +126,7 @@ UZlr::tick (Treelog& msg, const Geometry1D& geo,
   const bool use_darcy = (h_old[first] < h_fc) && (q_up > 0.0);
   const int to_darcy = max (geo.interval_plus (z_top), first + 5);
 
-  // Intermediate nodes.
+  // Intermediate cells.
   for (int i = first; i <= last; i++)
     {
       const double dz = geo.dz (i);
@@ -140,10 +140,10 @@ UZlr::tick (Treelog& msg, const Geometry1D& geo,
 
       // If we have free drainage bottom, we go for field capacity all
       // the way.  Otherwise, we assume groundwater start at the
-      // bottom of the last node, and attempt equilibrium from there.
+      // bottom of the last cell, and attempt equilibrium from there.
       // This asumption is correct for lysimeter bottom, adequate for
       // pressure bottom (where groundwater table is in the last
-      // node), and wrong for forced flux (= pipe drained soil) where
+      // cell), and wrong for forced flux (= pipe drained soil) where
       // the groundwater is usually much higher.  Still, it is better
       // than using h_fc.
       const double h_lim = (bottom.bottom_type ()

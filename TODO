@@ -1,8 +1,13 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Terminologi
+
 * Add "Geometry" to "ColumnBase" (for sake of the reference manual).
 
 * Daisy 2D
+
+* Movement?
+
 
 ** B) Rect
 
@@ -11,6 +16,8 @@ senere måske også horizontal transport afkoblet.
 
 ColumnRect
 GeometryRect (zplus, xplus)
+
+
 
 SoilWaterRect
   UZRect

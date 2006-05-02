@@ -39,7 +39,7 @@ struct EquilibriumGoal_A : public Equilibrium
   const bool A_solute;
   /* const */ vector<double> min_B;
   const bool B_solute;
-  const int debug_node;
+  const int debug_cell;
 
   // Simulation.
   void find (const Soil&, const SoilWater&, unsigned int i,
@@ -54,7 +54,7 @@ struct EquilibriumGoal_A : public Equilibrium
     : Equilibrium (al),
       A_solute (al.flag ("A_solute")),
       B_solute (al.flag ("B_solute")),
-      debug_node (al.integer ("debug_node")),
+      debug_cell (al.integer ("debug_cell")),
       initialize_state (uninitialized)
   { }
   ~EquilibriumGoal_A ()
@@ -108,7 +108,7 @@ EquilibriumGoal_A::find (const Soil&, const SoilWater& soil_water,
     }
   tmp << "\t" << has_A << "\t" << goal_A_dry << "\t" << want_A << "\t"
       << has_B << "\t" << min_B_dry << "\t" << want_B << "\t" << M;
-  if (i == debug_node)
+  if (i == debug_cell)
     cout << tmp.str () << "\n";
 
   daisy_assert (want_A >= 0.0);
@@ -138,7 +138,7 @@ EquilibriumGoal_A::initialize (const Soil& soil, Treelog& err)
     initialize_state = init_failure;
   Pedotransfer::debug_message ("min_B", min_B, "g/cm^3",err);
 
-  if (debug_node >= 0 && debug_node < soil.size ())
+  if (debug_cell >= 0 && debug_cell < soil.size ())
     cout << "type\thas_A\tgoal_A\twant_A\thas_B\tgoal_B\twant_B\ttotal\n"
          << "\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\n";
 }
@@ -176,10 +176,10 @@ If false, the unit is assumed to be mass per volume space.");
     syntax.add ("B_solute", Syntax::Boolean, Syntax::Const, 
                 "True iff 'min_B' is in solute (mass per volume water).\n\
 If false, the unit is assumed to be mass per volume space.");
-    syntax.add ("debug_node", Syntax::Integer, Syntax::Const,
-                "Print debug information for this node.\n\
+    syntax.add ("debug_cell", Syntax::Integer, Syntax::Const,
+                "Print debug information for this cell.\n\
 Set it to a negative number to disable it.");
-    alist.add ("debug_node", -1);
+    alist.add ("debug_cell", -1);
     Librarian<Equilibrium>::add_type ("goal_A", alist, syntax, &make);
   }
 } EquilibriumGoal_A_syntax;

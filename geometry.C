@@ -25,17 +25,17 @@
 #include "vcheck.h"
 #include <sstream>
 
-const int Geometry::edge_top;
-const int Geometry::edge_bottom;
+const int Geometry::cell_above;
+const int Geometry::cell_below;
 
 std::string
-Geometry::node_name (int n) const
+Geometry::cell_name (int n) const
 { 
   switch (n)
     {
-    case edge_top:
+    case cell_above:
       return "top";
-    case edge_bottom:
+    case cell_below:
       return "bottom";
     default:
       std::ostringstream tmp;
@@ -61,8 +61,8 @@ std::string
 Geometry::edge_name (size_t e) const
 {
   std::ostringstream tmp;
-  tmp << "(" << node_name(edge_from (e)) << " " 
-      << node_name (edge_to (e)) << ")";
+  tmp << "(" << cell_name(edge_from (e)) << " " 
+      << cell_name (edge_to (e)) << ")";
   return tmp.str ();
 }
 
@@ -71,9 +71,9 @@ Geometry::z_safe (int n) const
 {
   switch (n)
     {
-    case edge_top:
+    case cell_above:
       return top () + 1.0 /* [cm] */;
-    case edge_bottom:
+    case cell_below:
       return bottom () - 1.0 /* [cm] */;
     default:
       return z (n);
@@ -84,10 +84,10 @@ double
 Geometry::volume_in_z_interval (const double from, const double to, 
                                 std::vector<double>& frac) const
 {
-  const size_t node_size = this->node_size ();
-  daisy_assert (frac.size () == node_size);
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (frac.size () == cell_size);
   double volume = 0.0;
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       const double f = fraction_in_z_interval (i, from, to);
       if (f > 0.0)
@@ -122,13 +122,13 @@ void
 Geometry::mix (std::vector<double>& v, const double from, const double to, 
                std::vector<double>& change) const
 {
-  const size_t node_size = this->node_size ();
-  daisy_assert (v.size () == node_size);
-  daisy_assert (change.size () == node_size);
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
+  daisy_assert (change.size () == cell_size);
 
   const std::vector<double> old = v;
   mix (v, from, to);
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     change[i] += v[i] - old[i];
 }
 
@@ -138,20 +138,20 @@ Geometry::add (std::vector<double>& v, const double from, const double to,
 {
   // Pre-conditions.
   daisy_assert (to < from);
-  const size_t node_size = this->node_size ();
-  daisy_assert (v.size () == node_size);
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
 
   // Remember old value for post-condition.
   const double old_total = total (v);
 
-  // Find total volume and node volumes inside interval.
-  std::vector<double> frac (node_size, 0.0);
+  // Find total volume and cell volumes inside interval.
+  std::vector<double> frac (cell_size, 0.0);
   const double total_volume = volume_in_z_interval (from, to, frac);
   daisy_assert (total_volume > 0.0);
 
   // Divide amount relative to volume.
   const double density = amount / total_volume;
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     v[i] += density * frac[i];
 
   // Post-condition.
@@ -171,13 +171,13 @@ void
 Geometry::add (std::vector<double>& v, const std::vector<double>& density,
                const double amount) const
 {
-  const size_t node_size = this->node_size ();
-  daisy_assert (v.size () == node_size);
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
   const double old_total = total (v);
 
   const double total_density = total (density);
   daisy_assert (total_density > 0.0);
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     if (density.size () > i)
       v[i] += amount * density[i] / total_density;
 
@@ -188,13 +188,13 @@ double
 Geometry::extract (std::vector<double>& v, 
                    const double from, const double to) const
 {
-  const size_t node_size = this->node_size ();
-  daisy_assert (v.size () == node_size);
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
 
   const double old_total = total (v);
 
   double amount = 0.0;
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       const double f = fraction_in_z_interval (i, from, to);
       if (f > 0.0)
@@ -217,16 +217,16 @@ void
 Geometry::set (std::vector<double>& v, 
                const double from, const double to, const double amount) const
 {
-  const size_t node_size = this->node_size ();
-  daisy_assert (v.size () == node_size);
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
 
   const double old_total = total (v);
   const double old_amount = total (v, from, to);
 
-  std::vector<double> frac (node_size, 0.0);
+  std::vector<double> frac (cell_size, 0.0);
   const double density = amount / volume_in_z_interval (from, to, frac);
 
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       const double f = fraction_in_z_interval (i, from, to);
       if (f > 0.0)
@@ -245,8 +245,8 @@ void
 Geometry::swap (std::vector<double>& v,
                 const double from, const double middle, const double to) const
 {
-  const size_t node_size = this->node_size ();
-  daisy_assert (v.size () == node_size);
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
 
   const double old_total = total (v);
 
@@ -264,9 +264,9 @@ Geometry::swap (std::vector<double>& v,
                 const double from,  const double middle, const double to, 
                 std::vector<double>& change) const
 {
-  const size_t node_size = this->node_size ();
-  daisy_assert (v.size () == node_size);
-  daisy_assert (change.size () == node_size);
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
+  daisy_assert (change.size () == cell_size);
 
   const std::vector<double> old = v;
   swap (v, from, middle, to);
@@ -277,10 +277,10 @@ Geometry::swap (std::vector<double>& v,
 double
 Geometry::total (const std::vector<double>& v) const
 {
-  const size_t node_size = this->node_size ();
-  daisy_assert (v.size () == node_size);
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
   double sum = 0.0;
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     sum += v[i] * volume (i);
   return sum;
 }
@@ -289,11 +289,11 @@ double
 Geometry::total (const std::vector<double>& v, 
                  const double from, const double to) const
 {
-  const size_t node_size = this->node_size ();
-  daisy_assert (v.size () == node_size);
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
   double sum = 0.0;
 
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       const double f = fraction_in_z_interval (i, from, to);
       if (f > 0.0)
@@ -301,6 +301,51 @@ Geometry::total (const std::vector<double>& v,
     }
 
   return sum;
+}
+
+double
+Geometry::fraction_within (const double from, const double to, 
+                           const double begin, const double end)
+{ 
+  daisy_assert (to > from);
+  daisy_assert (end > begin);
+
+  if (from >= end)
+    // Fully after interval.
+    return 0.0;
+  if (to <= begin)
+    // Fully before interval.
+    return 0.0;
+
+  if (to <= end)
+    {
+      if (from >= begin)
+        // Fully within interval.
+        return 1.0;
+      
+      // Overlaps start of interval.
+      const double width = to - from;
+      const double overlap = to - begin;
+      daisy_assert (overlap > 0.0);
+      daisy_assert (width > overlap);
+      return overlap / width;
+    }
+  if (from >= begin)
+    {
+      // Overlaps end of interval.
+      const double width = to - from;
+      const double overlap = end - from;
+      daisy_assert (overlap > 0.0);
+      daisy_assert (width > overlap);
+      return overlap / width;
+    }
+
+  // Interval is fully within.
+  const double width = to - from;
+  const double overlap = end - begin;
+  daisy_assert (overlap > 0.0);
+  daisy_assert (width > overlap);
+  return overlap / width;
 }
 
 static struct CheckLayers : public VCheck
@@ -366,6 +411,59 @@ VALUE from the END of the previous layer, to the END of the current layer.");
                 description);
 }
 
+void 
+Geometry::initialize_layer (std::vector<double>& array, 
+                            const AttributeList& al, 
+                            const std::string& name, Treelog& out) const
+{
+  const std::string initial = std::string ("initial_") + name;
+  daisy_assert (array.size () == 0);
+  if (al.check (name))
+    // Specified by user.
+    array = al.number_sequence (name);
+  else if (al.check (initial))
+    {
+      // Initialize by layers.
+      std::vector<double> unused (cell_size (), 0.0);
+      const std::vector<AttributeList*>& layers = al.alist_sequence (initial);
+      const double soil_end = bottom ();
+      double last = 0.0;
+      for (size_t i = 0; i < layers.size (); i++)
+	{
+	  double next = layers[i]->number ("end");
+	  daisy_assert (next < last);
+	  const double value = layers[i]->number ("value");
+	  if (next < soil_end)
+	    {
+	      out.warning (std::string ("WARNING: initial_") + name 
+			   + " layer ends below the last cell");
+	      next = soil_end;
+	      i = layers.size ();
+	    }
+	  add (array, last, next, 
+               value * volume_in_z_interval (last, next, unused));
+	  last = next;
+	}
+    }
+  // We must leave any remaining values unspecified, the
+  // initialization of Theta and h in SoilWater depends on that.
+}
+
+void
+Geometry::initialize_intervals (const std::vector<double>& end, 
+                                std::vector<double>& center,
+                                std::vector<double>& distance)
+{
+  double last = 0.0;
+  for (size_t i = 0; i < end.size (); i++)
+    {
+      const double next = end[i];
+      const double diff = next - last;
+      distance.push_back (std::fabs (diff));
+      center.push_back (last + diff / 2.0);
+      last = next;
+    }
+}
 Geometry::Geometry (Block&)
 { }
 

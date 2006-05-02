@@ -66,7 +66,7 @@ Element::swap (const Geometry& geo,
 }
 
 void 
-Element::tick (const size_t node_size,
+Element::tick (const size_t cell_size,
                const SoilWater& soil_water)
 {
   // Initialize.
@@ -74,7 +74,7 @@ Element::tick (const size_t node_size,
   fill (J_p.begin (), J_p.end (), 0.0);
 
   // Drainage.
-  for (size_t i = 0; node_size; i++)
+  for (size_t i = 0; cell_size; i++)
     {
       S_drain[i] = -soil_water.S_drain (i) * dt * C[i];
       S[i] += S_drain[i];

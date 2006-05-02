@@ -315,10 +315,10 @@ Surface::temperature () const
 { return impl.T; }
 
 int 
-Surface::last_node () const 
+Surface::last_cell () const 
 { 
   if (impl.ridge_)
-    return impl.ridge_->last_node ();
+    return impl.ridge_->last_cell ();
   return -1; 
 }
 
@@ -416,8 +416,8 @@ Surface::Implementation::albedo (const Geometry& geo, const Soil& soil,
   double Theta = 0.0; 
   double volume = 0.0;
   
-  const size_t node_size = geo.node_size ();
-  for (size_t i = 0; i < node_size; i++)
+  const size_t cell_size = geo.cell_size ();
+  for (size_t i = 0; i < cell_size; i++)
     if (geo.contain_z (i, 0.0))
       {
         const double v = geo.volume (i);

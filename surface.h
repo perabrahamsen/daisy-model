@@ -49,7 +49,7 @@ public:
   bool soil_top () const;
   double ponding () const;
   double temperature () const;
-  int last_node () const;
+  int last_cell () const;
 
   const IM& matter_flux ();
   const Chemicals&  chemicals_down () const;

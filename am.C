@@ -317,11 +317,11 @@ AM::Implementation::add (const Geometry& geo,
   const double old_C = total_C (geo) + other.total_C (geo);
   const double old_N = total_N (geo) + other.total_N (geo);
 
-  vector<double> cc (geo.node_size (), 0.0);
-  vector<double> nn (geo.node_size (), 0.0);
+  vector<double> cc (geo.cell_size (), 0.0);
+  vector<double> nn (geo.cell_size (), 0.0);
   other.pour (cc, nn);
 
-  for (size_t at = 0; at < geo.node_size (); at++)
+  for (size_t at = 0; at < geo.cell_size (); at++)
     {
       vector<double> om_C (om.size (), 0.0);
       vector<double> om_N (om.size (), 0.0);
@@ -633,7 +633,7 @@ AM::create (const AttributeList& al1 , const Geometry& geo,
 
 // Crop part.
 AM& 
-AM::create (const size_t node_size, const Time& time,
+AM::create (const size_t cell_size, const Time& time,
 	    const vector<AttributeList*>& ol,
 	    const symbol sort, const symbol part,
 	    AM::lock_type lock)
@@ -650,7 +650,7 @@ AM::create (const size_t node_size, const Time& time,
   al.add ("om", ol);
   AM& am = *new AM (al);
   for (size_t i = 0; i < am.impl.om.size (); i++)
-    am.impl.om[i]->initialize (node_size);
+    am.impl.om[i]->initialize (cell_size);
   if (lock == AM::Locked)
     am.impl.lock = new AM::Implementation::Lock (sort, part);
   return am;
@@ -898,7 +898,7 @@ void
 AM::initialize (const Geometry& geo, const double max_rooting_depth)
 {
   for (size_t i = 0; i < impl.om.size (); i++)
-    impl.om[i]->initialize (geo.node_size ());
+    impl.om[i]->initialize (geo.cell_size ());
 
   const string syntax = alist.name ("syntax");
   
@@ -995,8 +995,8 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
       daisy_assert (depth < 0.0);
 
       // Calculate density.
-      vector<double> density (geo.node_size (), 0.0);
-      for (size_t i = 0; i < geo.node_size (); i++)
+      vector<double> density (geo.cell_size (), 0.0);
+      for (size_t i = 0; i < geo.cell_size (); i++)
         if (geo.z (i) > depth)
           density[i] = k * exp (k * geo.z (i));
 

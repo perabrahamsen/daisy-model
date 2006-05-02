@@ -19,265 +19,39 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "movement.h"
-#include "soil_water.h"
-#include "uzmodel.h"
-#include "macro.h"
-#include "soil_heat.h"
-#include "soil.h"
-#include "time.h"
+#include "geometry1d.h"
+#include "soil_water1d.h"
+#include "soil_heat1d.h"
+#include "soltrans1d.h"
 #include "log.h"
-#include "mathlib.h"
-
-static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
-static const double rho_water = 1.0; // [g/cm^3]
-static const double latent_heat_of_fussion = 3.35e9; // [erg/g]
+#include "submodeler.h"
 
 class Movement1D : public Movement
 {
   // Water.
-  std::auto_ptr<UZmodel> water_matrix;
-  std::auto_ptr<UZmodel> water_matrix_reserve;
-  std::auto_ptr<Macro> water_macro;
-  std::vector<double> water_matrix_flux;
-  std::vector<double> water_macro_flux;
-
-  // Soil heat
-  double T_top;
-  std::vector<double> heat_flux;
-  void heat_tick (const Time&, const Soil&, SoilWater&, SoilHeat&,
-                  const Surface&, const Weather& weather);
-  void heat_solve (const Soil& soil,
-                   const SoilHeat& soil_heat,
-                   const SoilWater& soil_water,
-                   const std::vector<double>& T,
-                   std::vector<double>& T_new,
-                   const double T_top_new,
-                   const double T_bottom);
-  void calculate_heat_flux (const Soil& soil,
-                            const SoilWater& soil_water,
-                            const std::vector<double>& T_old, 
-                            const std::vector<double>& T,
-                            double T_top, double T_bottom);
+  std::auto_ptr<Geometry1D> geometry;
+  std::auto_ptr<SoilWater1D> water;
+  std::auto_ptr<SoilHeat1D> heat;
+  std::auto_ptr<Soltrans1D> solute;
 
   // Simulation.
 public:
   void output (Log& log) const
   { 
-    output_derived (water_matrix, "soil_matrix", log);
-    output_variable (water_matrix_flux, log);
-    output_variable (water_macro_flux, log);
-    output_value (T_top, "T_top", log);
-    output_variable (heat_flux, log);
+    output_submodule (*water, "SoilWater", log);
+    output_submodule (*heat, "SoilHeat", log);
   }
 
   // Create.
 public:
   Movement1D (Block& al)
     : Movement (al),
-      water_matrix (Librarian<UZmodel>::build_item (al, "water_matrix")),
-      water_matrix_reserve (Librarian<UZmodel>::build_item 
-                            /**/ (al, "water_matrix_reserve")),
-      water_macro (NULL),
-      T_top (al.number ("T_top", -500.0))
+      geometry (submodel<Geometry1D> (al, "Geometry")),
+      water (submodel<SoilWater1D> (al, "Water")),
+      heat (submodel<SoilHeat1D> (al, "Heat")),
+      solute (submodel<Soltrans1D> (al, "Solute"))
   { }
 };
-
-void
-Movement1D::heat_tick (const Time& time,
-                       const Soil& soil,
-                       SoilWater& soil_water, SoilHeat& soil_heat,
-                       const Surface& surface,
-                       const Weather& weather)
-{
-  // Update freezing and melting points.
-  soil_heat.update_freezing_points (soil, soil_water);
-
-  // Solve with old state.
-  T_old = T;
-  heat_solve (time, soil, soil_water, surface, weather);
-
-  // Check if ice is enabled.
-  if (!enable_ice)
-    return;
-
-  // Update state according to new temperatures.
-  const bool changed = soil_heat.update_state (soil, soil_water);
-
-  if (changed)
-    {
-      // Solve again with new state.
-      T = T_old;
-      heat_solve (time, soil, soil_water, surface, weather);
-
-      // Check if state match new temperatures.
-      const bool changed_again = check_state (soil);
-      
-      if (changed_again)
-        {
-          // Force temperatures to match state.
-          soil_heat.force_state (soil);
-        }
-    }
-  // Update ice in water.
-  soil_water.freeze (soil, freezing_rate);
-}
-void
-Movement1D::heat_solve (const Soil& soil,
-                        const SoilHeat& soil_heat,
-                        const SoilWater& soil_water,
-                        const std::vector<double>& T,
-                        std::vector<double>& T_new,
-                        const double T_top_new,
-                        const double T_bottom)
-{
-  if (T_top < -400.0)  // Initial state.
-    T_top = T_top_new;
-
-  int size = soil.size ();
-
-  // Tridiagonal matrix.
-  std::vector<double> a (size, 0.0);
-  std::vector<double> b (size, 0.0);
-  std::vector<double> c (size, 0.0);
-  std::vector<double> d (size, 0.0);
-
-  // Inner nodes.
-  for (int i = 0; i < size; i++)
-    {
-      // Soil Water
-      const double Theta = soil_water.Theta (i);
-      const double X_ice = soil_water.X_ice (i);
-
-      const int prev = i - 1;
-      const int next = i + 1;
-
-      // Calculate average heat capacity and conductivity.
-      const double conductivity = soil.heat_conductivity (i, Theta, X_ice);
-
-      // Calculate distances.
-      const double dz_next 
-        = (i == size - 1)
-        ? soil.z (i) - soil.z (prev)
-        : soil.z (next) - soil.z (i);
-      const double dz_prev 
-        = (i == 0)
-        ? soil.z (i) - 0.0
-        : soil.z (i) - soil.z (prev);
-      const double dz_both = dz_prev + dz_next;
-
-      // Calculate temperature differences.
-      const double dT_next = ((i == size - 1)
-                              ? T_bottom - T[i] 
-                              : T[next] - T[i]);
-      const double dT_prev = (i == 0) ? T[i] - T_top : T[i] - T[prev];
-      const double dT_both = dT_prev + dT_next;
-      
-      // Calculate conductivity gradient.
-      double gradient;
-      if (i == 0)
-        gradient = 0.0;
-      else if (i == size - 1)
-        gradient 
-          = (soil.heat_conductivity (i, 
-                                     soil_water.Theta (i),
-                                     soil_water.X_ice (i))
-             - soil.heat_conductivity (prev, 
-                                       soil_water.Theta (prev),
-                                       soil_water.X_ice (prev)))
-          / dz_prev;
-      else
-        gradient 
-          = (soil.heat_conductivity (next, 
-                                     soil_water.Theta (next),
-                                     soil_water.X_ice (next))
-             - soil.heat_conductivity (prev, 
-                                       soil_water.Theta (prev),
-                                       soil_water.X_ice (prev)))
-          / dz_both;
-      
-      // Computational,
-      const double Cx = gradient
-        + water_heat_capacity
-        * (soil_water.q (i) + soil_water.q (next)) / 2.0;
-
-      // Heat capacity including thawing/freezing.
-      const double capacity 
-        = soil_heat.capacity_apparent (soil, soil_water, i);
-
-      // Setup tridiagonal matrix.
-      a[i] = - conductivity / dz_both / dz_prev + Cx / 2.0 / dz_both;
-      b[i] = capacity / dt
-        + conductivity / dz_both * (1.0 / dz_next + 1.0 / dz_prev);
-      c[i] = - conductivity / dz_both / dz_next - Cx / 2.0 / dz_both;
-      const double x2 = dT_next / dz_next - dT_prev/ dz_prev;
-      if (i == 0)
-        d[i] = T[i] * capacity / dt
-          + conductivity / soil.z (1) * (x2 + T_top_new / soil.z (0))
-          + Cx * (T[1] - T_top + T_top_new) / (2.0 * soil.z (1));
-      else
-        d[i] = T[i] * capacity / dt + (conductivity / dz_both) * x2
-          + Cx * dT_both / dz_both / 2.0;
-      
-      const SoilHeat::state_t state = soil_heat.state (i);
-      if (state == SoilHeat::freezing || state == SoilHeat::thawing)
-        d[i] -= latent_heat_of_fussion * rho_water
-          * (soil_water.q (i) - soil_water.q (next)) / soil.dz (i) / dt;
-
-      // External heat source.
-      d[i] += soil_heat.source (i);
-    }
-  d[size - 1] = d[size - 1] - c[size - 1] * T_bottom;
-  tridia (0, size, a, b, c, d, T_new.begin ());
-  daisy_assert (T_new[0] < 50.0);
-  const double T_top_old = T_top;
-  const double T_top = T_top_new;
-  const double T_top_prev = (T_top + T_top_old) / 2.0;
-
-  calculate_heat_flux (soil, soil_water, T, T_new, T_top_prev, T_bottom);
-}
-
-void
-Movement1D::calculate_heat_flux (const Soil& soil,
-                                 const SoilWater& soil_water,
-                                 const std::vector<double>& T_old, 
-                                 const std::vector<double>& T,
-                                 const double T_top_prev,
-                                 const double T_bottom)
-{
-  // Top and inner nodes.
-  double T_prev = T_top_prev;
-  double z_prev = 0.0;
-  for (unsigned int i = 0; i < soil.size (); i++)
-    {
-      const double Theta = soil_water.Theta (i);
-      const double X_ice = soil_water.X_ice (i);
-      const double K = soil.heat_conductivity (i, Theta, X_ice);
-      const double T_next = (T[i] + T_old[i]) / 2.0;
-      const double dT = T_prev - T_next;
-      const double dz = z_prev - soil.z (i);
-      const double q_water = soil_water.q (i);
-      const double T_this = (T_prev + T_next) / 2.0;
-
-      heat_flux[i] 
-        = - K * dT/dz + water_heat_capacity * rho_water *  q_water * T_this;
-      T_prev = T_next;
-      z_prev = soil.z (i);
-    }
-  // Lower boundary.
-  const unsigned int i = soil.size ();
-  const unsigned int prev = i - 1U;
-  const double Theta = soil_water.Theta (prev);
-  const double X_ice = soil_water.X_ice (prev);
-  const double K = soil.heat_conductivity (prev, Theta, X_ice);
-  const double T_next = T_bottom;
-  const double dT = T_prev - T_next;
-  const double dz = soil.z (prev-1U) - soil.z (prev);
-  const double q_water = soil_water.q (i);
-  const double T_this = (T_prev + T_next) / 2.0;
-
-  heat_flux[i]
-    = - K * dT/dz - water_heat_capacity * rho_water *  q_water * T_this;
-}
 
 static struct Movement1DSyntax
 {
@@ -290,38 +64,18 @@ static struct Movement1DSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "One dimensional movement.");
 
-    // Soil water.
-    syntax.add ("water_matrix", Librarian<UZmodel>::library (),
-                "Main water transport model in unsaturated zone.");
-    AttributeList richard;
-    richard.add ("type", "richards");
-    richard.add ("max_time_step_reductions", 4);
-    richard.add ("time_step_reduction", 4);
-    richard.add ("max_iterations", 25);
-    richard.add ("max_absolute_difference", 0.02);
-    richard.add ("max_relative_difference", 0.001);
-    alist.add ("water_matrix", richard);
-    syntax.add ("water_matrix_reserve", Librarian<UZmodel>::library (),
-                "Reserve transport model if UZtop fails.");
-    // Use lr as UZreserve by default.
-    AttributeList lr;
-    lr.add ("type", "lr");
-    lr.add ("h_fc", -100.0);
-    lr.add ("z_top", -10.0);
-    alist.add ("water_matrix_reserve", lr);
-    syntax.add ("water_macro", Librarian<Macro>::library (),
-                Syntax::OptionalState, Syntax::Singleton,
-                "Preferential flow model.\n\
-By default, preferential flow is enabled if and only if the combined\n\
-amount of humus and clay in the top horizon is above 5%.");
-    syntax.add ("water_matrix_flux", "cm/h", Syntax::LogOnly, Syntax::Sequence,
-                "Matrix water flux (positive numbers mean upward).");
-    syntax.add ("water_macro_flux", "cm/h", Syntax::LogOnly, Syntax::Sequence,
-                "Water flux in macro pores (positive numbers mean upward).");
-
-    // Soil heat.
-    syntax.add ("T_top", "dg C", Syntax::OptionalState, 
-                "Surface temperature at previous time step.");
+    syntax.add_submodule ("Geometry", alist, Syntax::State,
+                          "Discretization of the soil.",
+                          Geometry1D::load_syntax);
+    syntax.add_submodule ("Water", alist, Syntax::State,
+                          "Soil water content and transportation.",
+                          SoilWater1D::load_syntax);
+    syntax.add_submodule ("Heat", alist, Syntax::State,
+                          "Soil heat and flux.",
+                          SoilHeat1D::load_syntax);
+    syntax.add_submodule ("Solute", alist, Syntax::State,
+                          "Solute transport in soil.",
+                          Soltrans1D::load_syntax);
 
     Librarian<Movement>::add_type ("1D", alist, syntax, &make);
   }

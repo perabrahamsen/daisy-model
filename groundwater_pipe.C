@@ -43,7 +43,7 @@ class GroundwaterPipe : public Groundwater
   const double K_aquitard_;	// Conductivity of the aquitard. [cm h^-1]
   /*const*/ double Z_aquitard_;	// Vertical length of the aquitard. [cm]
   std::auto_ptr<Depth> pressure_table; // Virtual groundwater height. [cm]
-  int i_drain;			// Node, drain
+  int i_drain;			// Cell, drain
 
   // Accessors.
   double Z_aquitard () const
@@ -94,7 +94,7 @@ public:
 private:
   void set_h_aquifer (const Geometry1D& geo, const Time& time)
   {
-    const size_t size = geo.node_size ();
+    const size_t size = geo.cell_size ();
     const double aquitart_bottom = geo.zplus (size-1) - Z_aquitard_;
     h_aquifer = pressure_table->operator()(time) - aquitart_bottom;
   }
@@ -113,7 +113,7 @@ private:
 public:
   void initialize (const Geometry1D& geo, const Time& time, Treelog& msg)
   {
-    const int size = geo.node_size ();
+    const int size = geo.cell_size ();
     double largest = 0.0;
     for (unsigned int i = 0; i < size; i++)
       if (geo.dz (i) > largest)
@@ -195,10 +195,10 @@ GroundwaterPipe::tick (const Geometry1D& geo,
 	  const double z = (i == 0) ? 0.0 : geo.zplus (i-1);
 	  const double zx = z - zplus; 
 	  if (h + zx > 0)
-	    // Groundwater in this node.
+	    // Groundwater in this cell.
 	    height = zplus + h + zx;
 	  else
-	    // Groundwater between nodes.
+	    // Groundwater between cells.
 	    height = zplus;
 	  break;
 	}
@@ -217,7 +217,7 @@ GroundwaterPipe::tick (const Geometry1D& geo,
 double
 GroundwaterPipe::DeepPercolation(const Geometry1D& geo)
 {
-  const int size = geo.node_size ();
+  const int size = geo.cell_size ();
   daisy_assert (size > 0);
   const double hb = height - geo.zplus (size - 1);
   if (hb > 0)
@@ -242,7 +242,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Geometry1D& geo,
                                        const Soil& soil, 
 				       const SoilHeat& soil_heat)
 {
-  const int size = geo.node_size ();
+  const int size = geo.cell_size ();
   const int i_GWT = geo.interval_plus (height) + 1;
   daisy_assert (i_drain > 0);
   if (height >= geo.zplus(i_drain-1))
@@ -306,7 +306,7 @@ If you specify this groundwater model, and does not specify the 'zplus' Soil\n\
 discretization parameter, an extra aquitard soil horizon approximately a third\n\
 of the size of 'Z_aquitart' will be added.  This will allow the grounwater\n\
 level to sink into the aquitart.  The model cannot handle groundwater levels\n\
-below the last node, or above the soil surface.");
+below the last cell, or above the soil surface.");
       // We define our own "height", so don't load from here.
       // Groundwater::load_syntax (syntax, alist);
 

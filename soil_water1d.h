@@ -62,7 +62,7 @@ public:
   double X_ice (size_t i) const;
   double X_ice_total (size_t i) const;
 
-  size_t first_groundwater_node () const;
+  size_t first_groundwater_cell () const;
     
   // Ice modified lookups.
   double Theta (const Soil&, size_t i, double h) const;

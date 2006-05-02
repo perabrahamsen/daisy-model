@@ -291,7 +291,7 @@ VegetationPermanent::tick (const Time& time,
 	      static const symbol vegetation_symbol ("vegetation");
 	      static const symbol dead_symbol ("dead");
 	      
-	      AM_litter = &AM::create (geo.node_size (), time, litter_am,
+	      AM_litter = &AM::create (geo.cell_size (), time, litter_am,
                                        vegetation_symbol, dead_symbol,
                                        AM::Locked);
 	      organic_matter->add (*AM_litter);

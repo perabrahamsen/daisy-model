@@ -289,8 +289,8 @@ NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
-# movement_1D.C column_r2d2.C 
-MODELS = column_rect.C integer_arit.C \
+# column_r2d2.C 
+MODELS = movement_1D.C column_rect.C integer_arit.C \
 	source_merge.C number_source.C program_file.C action_table.C \
 	xysource_merge.C xysource_inline.C number_soil.C xysource_loop.C \
 	xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
@@ -352,8 +352,8 @@ COMPONENTS = movement.C integer.C \
 	pet.C net_radiation.C svat.C vegetation.C 
 
 # Submodels are combined models and components.
-# geometry_rect.C 
-SUBMODELS = element.C soltrans1d.C soil_water1d.C \
+# 
+SUBMODELS = geometry_rect.C element.C soltrans1d.C soil_water1d.C \
         geometry1d.C soil_heat1d.C fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \

@@ -724,7 +724,7 @@ int NETRAD(double srad,double e_pa,double tair, double relsun, double b1,
 // calculation of ground heat flux
 int GFLUX(double tskin, double kh, double temp_0, double &rgflux)
 {
-  double z_sz=0.02; // depth from soil surface to first node
+  double z_sz=0.02; // depth from soil surface to first cell
 
   rgflux = kh*(tskin-temp_0)/z_sz; // positive directed from soil surface
 

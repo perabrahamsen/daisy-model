@@ -325,7 +325,7 @@ CropSimple::harvest (const symbol column_name,
       const double this_far = min (1.0, (T - T_emergence) / T_growth);
 
       static const symbol root_symbol ("root");
-      AM& am = AM::create (geo.node_size (), time, root_am, name, root_symbol);
+      AM& am = AM::create (geo.cell_size (), time, root_am, name, root_symbol);
       daisy_assert (geo.total (root_system->Density) > 0.0);
       am.add (geo, 
 	      this_far * WRoot * 0.420 * m2_per_cm2,
@@ -403,7 +403,7 @@ CropSimple::total_C () const
 void
 CropSimple::initialize (Treelog&, const Geometry& geo, OrganicMatter*)
 {
-  root_system->initialize (geo.node_size ());
+  root_system->initialize (geo.cell_size ());
   CropCAI ();
 }
 

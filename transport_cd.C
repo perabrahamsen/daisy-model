@@ -84,7 +84,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
   const vector<double> M_prev = M;
 
   // Constants.
-  const size_t size = geo.node_size (); // Number of soil layers.
+  const size_t size = geo.cell_size (); // Number of soil layers.
 
   // Check that incomming C and M makes sense.
   for (unsigned int i = 0; i < size; i++)
@@ -226,12 +226,12 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 
       for (unsigned int j = 1; j < size; j++)
 	{
-	  const double dz_minus	// Size of layer above current node.
+	  const double dz_minus	// Size of layer above current cell.
 	    = geo.z (j-1) - geo.z (j);
-	  const double dz_plus	// Size of layer below current node.
+	  const double dz_plus	// Size of layer below current cell.
 	    = (j == size - 1) ? dz_minus : (geo.z (j) - geo.z (j+1));
 
-	  const double dz = geo.dz (j); // Size of current node.
+	  const double dz = geo.dz (j); // Size of current cell.
 	  double q_minus = soil_water.q (j); // Flow to above.
 	  const double q_plus = soil_water.q (j+1);	// Flow from below.
 	  const double alpha_minus = alpha[j]; // Direction above.
@@ -239,7 +239,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 	  double D_minus = D[j]; // Dispertion above.
 	  const double D_plus = D[j+1]; // Dispertion below.
 
-	  // Concentration above and below current node.
+	  // Concentration above and below current cell.
 	  const double C_minus = C[j-1];
 	  const double C_plus = (j == size - 1) ? C[j] : C[j+1];
 
@@ -270,12 +270,12 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 	}
       // Adjust for upper boundary condition.
       {
-	// Size of layer above current node.
+	// Size of layer above current cell.
 	const double dz_minus = dz_top;
-	// Size of layer below current node.
+	// Size of layer below current cell.
 	const double dz_plus = geo.z (0) - geo.z (1);
 
-	// Size of current node.
+	// Size of current cell.
 	const double dz = geo.dz (0);
 	// Flow to above.
 	double q_minus = (J_in == 0.0) ? 0.0 : soil_water.q (0);
@@ -286,7 +286,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 	double D_minus = D[0]; // Dispertion above.
 	const double D_plus = D[1]; // Dispertion below.
 
-	// Concentration above and below current node.
+	// Concentration above and below current cell.
 	const double C_minus = C_top;
 	const double C_plus = C[1];
 

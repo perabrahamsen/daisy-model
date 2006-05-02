@@ -179,7 +179,7 @@ void
 CropStandard::initialize (Treelog& msg, const Geometry& geo,
                           OrganicMatter *const organic_matter)
 {
-  root_system->initialize (geo.node_size ());
+  root_system->initialize (geo.cell_size ());
   production.initialize (nitrogen.SeedN);
 
   if (development->DS >= 0)
@@ -258,14 +258,14 @@ CropStandard::tick (const Time& time,
 	      if (!production.AM_root)
 		{
 		  production.AM_root
-		    = &AM::create (geo.node_size (), time, harvesting.Root,
+		    = &AM::create (geo.cell_size (), time, harvesting.Root,
 				   name, root_symbol, AM::Locked);
 		  organic_matter->add (*production.AM_root);
 		}
 	      if (!production.AM_leaf)
 		{
 		  production.AM_leaf
-		    = &AM::create (geo.node_size (), time, harvesting.Dead,
+		    = &AM::create (geo.cell_size (), time, harvesting.Dead,
 				   name, dead_symbol, AM::Locked);
 		  organic_matter->add (*production.AM_leaf);
 		}
@@ -274,11 +274,11 @@ CropStandard::tick (const Time& time,
 	    {
 	      if (!production.AM_root)
 		production.AM_root
-		  = &AM::create (geo.node_size (), time, harvesting.Root,
+		  = &AM::create (geo.cell_size (), time, harvesting.Root,
 				 name, root_symbol, AM::Unlocked);
 	      if (!production.AM_leaf)
 		production.AM_leaf
-		  = &AM::create (geo.node_size (), time, harvesting.Dead,
+		  = &AM::create (geo.cell_size (), time, harvesting.Dead,
 				 name, dead_symbol, AM::Unlocked);
 	    }
 	}

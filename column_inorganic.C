@@ -158,18 +158,18 @@ ColumnInorganic::tick (Treelog& out,
   soil_water->macro_tick (*geometry, *soil, surface, out);
 
   bioclimate->tick (time, surface, my_weather, 
-                    *vegetation, *geometry, *soil, *soil_water, soil_heat, out);
+                    *vegetation, *geometry, *soil, *soil_water, *soil_heat, out);
   vegetation->tick (time, *bioclimate, *geometry, 
-                    *soil, NULL, soil_heat, *soil_water,
+                    *soil, NULL, *soil_heat, *soil_water,
                     NULL, NULL, 
                     residuals_DM, residuals_N_top, residuals_C_top,
                     residuals_N_soil, residuals_C_soil, out);
-  groundwater->tick (*geometry, *soil, *soil_water, surface.h (), soil_heat, time, out);
+  groundwater->tick (*geometry, *soil, *soil_water, surface.h (), *soil_heat, time, out);
 
   // Transport.
-  soil_heat.tick (time, *geometry, *soil, *soil_water, surface, my_weather);
-  soil_water->tick (*geometry, *soil, soil_heat,surface, *groundwater, out);
-  soil_chemicals.tick (*geometry, *soil, *soil_water, soil_heat, NULL, 
+  soil_heat->tick (time, *geometry, *soil, *soil_water, surface, my_weather);
+  soil_water->tick (*geometry, *soil, *soil_heat,surface, *groundwater, out);
+  soil_chemicals.tick (*geometry, *soil, *soil_water, *soil_heat, NULL, 
 		       surface.chemicals_down (), out);
   tick_base_soil_chemicals (out);
 }

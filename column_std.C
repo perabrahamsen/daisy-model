@@ -155,18 +155,18 @@ ColumnStandard::NitLog::tick (const std::vector<bool>& active,
                               const SoilHeat& soil_heat,
                               SoilNO3& soil_NO3, SoilNH4& soil_NH4)
 {
-  const size_t node_size = soil.size ();
-  for (int i = 0; i < node_size; i++)
+  const size_t cell_size = soil.size ();
+  for (int i = 0; i < cell_size; i++)
     {
       daisy_assert (soil_NO3.M_left (i) >= 0.0);
       daisy_assert (soil_NH4.M_left (i) >= 0.0);
     }
 
-  daisy_assert (NH4.size () == node_size);
-  daisy_assert (N2O.size () == node_size);
-  daisy_assert (NO3.size () == node_size);
+  daisy_assert (NH4.size () == cell_size);
+  daisy_assert (N2O.size () == cell_size);
+  daisy_assert (NO3.size () == cell_size);
 
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       if (active[i])
         soil.nitrification (i, 
@@ -181,7 +181,7 @@ ColumnStandard::NitLog::tick (const std::vector<bool>& active,
   soil_NH4.add_to_sink (NH4);
   soil_NO3.add_to_source (NO3);
 
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       daisy_assert (soil_NO3.M_left (i) >= 0.0);
       daisy_assert (soil_NH4.M_left (i) >= 0.0);
@@ -467,28 +467,28 @@ ColumnStandard::tick (Treelog& out,
   soil_water->macro_tick (*geometry, *soil, surface, out);
 
   bioclimate->tick (time, surface, my_weather, 
-                    *vegetation, *geometry, *soil, *soil_water, soil_heat, out);
+                    *vegetation, *geometry, *soil, *soil_water, *soil_heat, out);
   vegetation->tick (time, *bioclimate, *geometry, *soil, organic_matter.get (), 
-                    soil_heat, *soil_water, &soil_NH4, &soil_NO3, 
+                    *soil_heat, *soil_water, &soil_NH4, &soil_NO3, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, out);
-  organic_matter->tick (*geometry, *soil_water, soil_heat, 
+  organic_matter->tick (*geometry, *soil_water, *soil_heat, 
 		       soil_NO3, soil_NH4, out);
   const std::vector<bool> active = organic_matter-> active (); 
   nitrification.tick (active, 
-                      *soil, *soil_water, soil_heat, soil_NO3, soil_NH4);
+                      *soil, *soil_water, *soil_heat, soil_NO3, soil_NH4);
   denitrification.tick (active, 
-                        *geometry, *soil, *soil_water, soil_heat, soil_NO3, 
+                        *geometry, *soil, *soil_water, *soil_heat, soil_NO3, 
 			*organic_matter);
 
   
   groundwater->tick (*geometry, *soil,
-                     *soil_water, surface.h (), soil_heat, time, out);
+                     *soil_water, surface.h (), *soil_heat, time, out);
 
   // Transport.
-  soil_heat.tick (time, *geometry, *soil, *soil_water, surface, my_weather);
-  soil_water->tick (*geometry, *soil, soil_heat, surface, *groundwater, out);
-  soil_chemicals.tick (*geometry, *soil, *soil_water, soil_heat,
+  soil_heat->tick (time, *geometry, *soil, *soil_water, surface, my_weather);
+  soil_water->tick (*geometry, *soil, *soil_heat, surface, *groundwater, out);
+  soil_chemicals.tick (*geometry, *soil, *soil_water, *soil_heat,
                        organic_matter.get (),
 		       surface.chemicals_down (), out);
   tick_base_soil_chemicals (out);

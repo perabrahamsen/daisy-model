@@ -111,9 +111,9 @@ DOM::turnover (const std::vector<bool>& active, const double* turnover_factor,
 	       double* CO2, const vector<SMB*>& smb)
 {
   // Find size.
-  const size_t node_size = active.size ();
-  daisy_assert (C.M.size () == node_size);
-  daisy_assert (N.M.size () == node_size);
+  const size_t cell_size = active.size ();
+  daisy_assert (C.M.size () == cell_size);
+  daisy_assert (N.M.size () == cell_size);
   const unsigned int smb_size = smb.size ();
   daisy_assert (fractions.size () == smb_size);
   // Distribute to all biological pools.
@@ -131,11 +131,11 @@ DOM::tock (const std::vector<bool>& active,
 	   const double* factor, double fraction, double efficiency,
 	   const double* N_soil, double* N_used, double* CO2, OM& om)
 {
-  const size_t node_size = active.size ();
-  daisy_assert (C.M.size () == node_size);
-  daisy_assert (N.M.size () == node_size);
+  const size_t cell_size = active.size ();
+  daisy_assert (C.M.size () == cell_size);
+  daisy_assert (N.M.size () == cell_size);
 
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       if (!active[i])
         continue;

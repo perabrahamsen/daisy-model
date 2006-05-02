@@ -87,7 +87,7 @@ TransportConvection::tick (Treelog& msg,
   const vector<double> M_prev = M;
 
   // Number of soil layers.
-  const size_t size = geo.node_size ();
+  const size_t size = geo.cell_size ();
 
   // Remember old content
   const double old_total = geo.total (M) + geo.total (S) * dt;
@@ -139,7 +139,7 @@ TransportConvection::tick (Treelog& msg,
       // Upper boundary.
       dJ[0] = J_in;
 
-      // Middle nodes.
+      // Middle cells.
       for (unsigned int i = 1; i < size; i++)
 	{
 	  const double q = soil_water.q (i);
@@ -150,7 +150,7 @@ TransportConvection::tick (Treelog& msg,
 	}
   
       // Lower boundary.
-      // We assume the same concentration below the lowest node.
+      // We assume the same concentration below the lowest cell.
       dJ[size] = soil_water.q (size) * C[size-1];
 
       // Update content.

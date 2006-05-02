@@ -53,7 +53,7 @@ SoilHeat::load_base (Syntax& syntax, AttributeList&)
                        "Soil temperature.");
 }
 
-SoilHeat::SoilHeat (const AttributeList&)
+SoilHeat::SoilHeat (const Block&)
 { }
 
 void

@@ -90,7 +90,7 @@ Geometry1D::check_border (const double border, Treelog& err) const
 {
   bool ok = false;
 
-  for (size_t i = 0; i < node_size (); i++)
+  for (size_t i = 0; i < cell_size (); i++)
     if (approximate (border, zplus (i)))
       ok = true;
 
@@ -117,7 +117,7 @@ check_alist (const AttributeList&, Treelog&)
 double
 Geometry1D::total (const std::vector<double>& v) const
 {
-  const size_t to = std::min (v.size (), node_size ());
+  const size_t to = std::min (v.size (), cell_size ());
   double sum = 0.0;
   for (size_t i = 0; i < to; i++)
     sum += v[i] * dz (i);
@@ -250,42 +250,6 @@ Geometry1D::swap (std::vector<double>& v, double from, double middle, double to)
   add (v, from, new_middle, bottom_content);
   add (v, new_middle, to, top_content);
   daisy_assert (approximate (old_total, total (v)));
-}
-
-void 
-Geometry1D::initialize_layer (std::vector<double>& array, 
-                              const AttributeList& al, 
-                              const std::string& name, Treelog& out) const
-{
-  const std::string initial = std::string ("initial_") + name;
-  daisy_assert (array.size () == 0);
-  if (al.check (name))
-    // Specified by user.
-    array = al.number_sequence (name);
-  else if (al.check (initial))
-    {
-      // Initialize by layers.
-      const std::vector<AttributeList*>& layers = al.alist_sequence (initial);
-      const double soil_end = zplus (node_size () - 1);
-      double last = 0.0;
-      for (size_t i = 0; i < layers.size (); i++)
-	{
-	  double next = layers[i]->number ("end");
-	  daisy_assert (next < last);
-	  const double value = layers[i]->number ("value");
-	  if (next < soil_end)
-	    {
-	      out.warning (std::string ("WARNING: initial_") + name 
-			   + " layer ends below the last node");
-	      next = soil_end;
-	      i = layers.size ();
-	    }
-	  add (array, last, next, value * (last - next));
-	  last = next;
-	}
-    }
-  // We must leave any remaining values unspecified, the
-  // initialization of Theta and h in SoilWater depends on that.
 }
 
 void
@@ -422,7 +386,7 @@ Can't automatically make discretizations less than 1 [cm], needed at "
       tmp << "(zplus";
       for (size_t i = 0; i < zplus_.size (); i++)
 	tmp << " " << zplus_[i];
-      tmp << "); " << zplus_.size () << " nodes.";
+      tmp << "); " << zplus_.size () << " cells.";
       msg.debug (tmp.str ());
       // Check that zplus is strictly decreasing.
       last = 0.0;
@@ -435,16 +399,7 @@ Can't automatically make discretizations less than 1 [cm], needed at "
 
   // Update z and dz from zplus.
   size_ = zplus_.size ();
-  double last = 0.0;
-  for (size_t i = 0; i < size_; i++)
-    {
-      double zplus = zplus_[i];
-      double dz = last - zplus;
-      dz_.push_back (dz);
-      double z = last - dz / 2;
-      z_.push_back (z);
-      last = zplus;
-    }
+  initialize_intervals (zplus_, z_, dz_);
 }
 
 Geometry1D::~Geometry1D ()

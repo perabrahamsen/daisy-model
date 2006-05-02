@@ -178,13 +178,13 @@ OM::turnover_pool (const std::vector<bool>& active, const double* factor,
 		   double fraction, double efficiency,
 		   const double* N_soil, double* N_used, double* CO2, OM& om)
 {
-  const size_t node_size = active.size ();
-  daisy_assert (C.size () == node_size);
-  daisy_assert (N.size () == node_size);
+  const size_t cell_size = active.size ();
+  daisy_assert (C.size () == cell_size);
+  daisy_assert (N.size () == cell_size);
 
   const double speed = turnover_rate * fraction;
 
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       if (!active[i] || C[i] < 1.0e-20)
 	continue;
@@ -228,10 +228,10 @@ void
 OM::turnover_dom (const std::vector<bool>& active, const double* factor,
 		  double fraction, DOM& dom)
 {
-  const size_t node_size = active.size ();
+  const size_t cell_size = active.size ();
   const double speed = turnover_rate * fraction;
 
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       if (!active[i])
         continue;
@@ -255,9 +255,9 @@ OM::tick (const std::vector<bool>& active, const double* abiotic_factor,
   if (turnover_rate < 1e-200)
     return;
 
-  const size_t node_size = active.size ();
-  daisy_assert (C.size () == node_size);
-  daisy_assert (N.size () == node_size);
+  const size_t cell_size = active.size ();
+  daisy_assert (C.size () == cell_size);
+  daisy_assert (N.size () == cell_size);
 
   const size_t smb_size = smb.size ();
   const size_t som_size = som.size ();
@@ -286,7 +286,7 @@ OM::tick (const std::vector<bool>& active, const double* abiotic_factor,
       if (fraction > 1e-50)
 	turnover_dom (active, abiotic_factor, fraction, *dom[j]);
     }
-  for (size_t i = 0; i < node_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       if (!active[i])
         continue;

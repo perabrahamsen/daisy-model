@@ -76,7 +76,7 @@ Rootdens_AP::set_density (Treelog& /*msg*/,
   tip.add (d_m, 0.0);
 
 #if 1
-  const size_t size = geo.node_size ();
+  const size_t size = geo.cell_size ();
   for (size_t i = 0; i < size; i++)
     {
       const double d = -geo.z (i);

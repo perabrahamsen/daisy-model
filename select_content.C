@@ -32,8 +32,8 @@ struct SelectContent : public SelectValue
   const double height;
   const Geometry* old_geo;
   const Soil* old_soil;
-  std::vector<size_t> node;     // Nodes at height.
-  std::vector<double> weight;   // Relative volume for node.
+  std::vector<size_t> cell;     // Cells at height.
+  std::vector<double> weight;   // Relative volume for cell.
 
   // Output routines.
   void output_array (const std::vector<double>& array, 
@@ -46,25 +46,25 @@ struct SelectContent : public SelectValue
       {
         old_geo = geo;
 
-        node.erase (node.begin (), node.end ());
+        cell.erase (cell.begin (), cell.end ());
         double total_volume = 0.0;
-        const size_t node_size = geo->node_size ();
-        for (size_t i = 0; i < node_size; i++)
+        const size_t cell_size = geo->cell_size ();
+        for (size_t i = 0; i < cell_size; i++)
           if (geo->contain_z (i, height))
             {
               const double volume = geo->volume (i);
               total_volume += volume;
               weight.push_back (volume);
-              node.push_back (i);
+              cell.push_back (i);
             }
         daisy_assert (total_volume > 0.0);
-        for (size_t i = 0; i < node.size (); i++)
+        for (size_t i = 0; i < cell.size (); i++)
           weight[i] /= total_volume;
       }
     
     double result = 0.0;
-    for (size_t i = 0; i < node.size (); i++)
-      result += array[node[i]] * weight[i];
+    for (size_t i = 0; i < cell.size (); i++)
+      result += array[cell[i]] * weight[i];
     add_result (result); 
   }
 
@@ -91,7 +91,7 @@ static struct SelectContentSyntax
       alist.add ("description", "Extract content at specified height.");
       syntax.add ("height", "cm", Check::non_positive (), Syntax::Const,
 		  "Specify height (negative) to measure content.\n\
-The value willbe a weighted average of all nodes containing height.");
+The value willbe a weighted average of all cells containing height.");
 
       Librarian<Select>::add_type ("content", alist, syntax, &make);
     }
