@@ -1,5 +1,11 @@
 2006-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* column_rect.C, column_inorganic.C, column_r2d2.C:
+	* column_base.C, column_base.h: Removed files. 
+	* Makefile: Update.
+
+	* column_std.C: Included base.
+
 	* organic_none.C: New model.
 
 	* organic_matter.C: made it a component.
