@@ -95,7 +95,7 @@ GeometryRect::GeometryRect (Block& al)
   std::vector<double> x_distance;
   initialize_intervals (x_end, x_center, x_distance);
 
-  // Fill in cell by column, starting from the top left corner.
+  // Fill in cells by column, starting from the top left corner.
   size_t next_cell = 0;
   for (size_t column = 0; column < cell_columns_ - 1; column++)
     {
@@ -115,7 +115,7 @@ GeometryRect::GeometryRect (Block& al)
           edge_from_.push_back (next_cell);
           edge_to_.push_back (last_cell);
           // Horizontal edge.
-          if (row > 0U)
+          if (column > 0U)
             {
               edge_from_.push_back (next_cell - cell_rows_);
               edge_to_.push_back (next_cell);

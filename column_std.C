@@ -68,7 +68,7 @@ private:
 public:
   struct NitLog			// Nitrification log variables.
   {
-  // Log variables.
+    // Log variables.
     vector<double> NH4;
     vector<double> NO3;
     vector<double> N2O;
@@ -473,7 +473,7 @@ ColumnStandard::tick (Treelog& out,
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, out);
   organic_matter->tick (*geometry, *soil_water, *soil_heat, 
-		       soil_NO3, soil_NH4, out);
+                        soil_NO3, soil_NH4, out);
   const std::vector<bool> active = organic_matter-> active (); 
   nitrification.tick (active, 
                       *soil, *soil_water, *soil_heat, soil_NO3, soil_NH4);
@@ -493,7 +493,7 @@ ColumnStandard::tick (Treelog& out,
 		       surface.chemicals_down (), out);
   tick_base_soil_chemicals (out);
   organic_matter->transport (*soil, *soil_water, out);
-  const std::vector<DOM*>& dom = organic_matter->dom ();
+  const std::vector<DOM*>& dom = organic_matter->fetch_dom ();
   for (size_t i = 0; i < dom.size (); i++)
     {
       soltrans->element (*geometry, *soil, *soil_water,
@@ -520,12 +520,7 @@ ColumnStandard::output_inner (Log& log) const
 {
   output_submodule (soil_NH4, "SoilNH4", log);
   output_submodule (soil_NO3, "SoilNO3", log);
-  static const symbol OrganicMatter_symbol ("OrganicMatter");
-  if (log.check_interior (OrganicMatter_symbol))
-    {
-      Log::Open open (log, OrganicMatter_symbol);
-      organic_matter->output (log, *geometry);
-    }
+  output_derived (organic_matter, "OrganicMatter", log);
   output_submodule (denitrification, "Denitrification", log);
   output_value (second_year_utilization_, "second_year_utilization", log);
   output_variable (seed_N, log);
@@ -579,7 +574,8 @@ ColumnStandard::ColumnStandard (Block& al)
   : ColumnBase (al),
     soil_NH4 (al.alist ("SoilNH4")),
     soil_NO3 (al.alist ("SoilNO3")),
-    organic_matter (submodel<OrganicMatter> (al, "OrganicMatter")),
+    organic_matter (Librarian<OrganicMatter>::build_item 
+                    (al, "OrganicMatter")),
     denitrification (al.alist ("Denitrification")),
     second_year_utilization_ (al.number ("second_year_utilization")),
     seed_N (0.0),
@@ -645,9 +641,10 @@ static struct ColumnStandardSyntax
     syntax.add_submodule ("SoilNO3", alist, Syntax::State,
 			  "Nitrate content in soil.",
 			  SoilNO3::load_syntax);
-    syntax.add_submodule ("OrganicMatter", alist, Syntax::State, "\
-The organic matter in the soil and on the surface.",
-			  OrganicMatter::load_syntax);
+    syntax.add ("OrganicMatter", Librarian<OrganicMatter>::library (),
+                Syntax::State, Syntax::Singleton, "\
+The organic matter in the soil and on the surface.");
+    alist.add ("OrganicMatter", OrganicMatter::default_model ());
     syntax.add_submodule ("Denitrification", alist, Syntax::State, "\
 The denitrification process.",
 			  Denitrification::load_syntax);

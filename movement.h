@@ -36,6 +36,8 @@ public:
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
+public:
+  static const AttributeList& default_model ();
 protected:
   Movement (Block&);
 public:

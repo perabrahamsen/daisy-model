@@ -21,9 +21,39 @@ solute basis.  They are now selected per column, through the new
 Soltrans attribute.
 
 Some of the changes affect simulation results, in the order of
-magnitude 1%.
+magnitude 1-2%.
 
 Removed the 'active_groundwater' parameter from 'OrganicMatter'.
+
+** Organic matter is now a component.
+
+In practice, this means that when specifying the OrganicMatter
+parameter in the default column model, you need to insert the name of
+the model for organic matter you want to use.  In practice, I
+suggest you specify "original" in order to get the default parameters
+and model.
+
+Instead of 
+
+  (OrganicMatter 
+     (init (input 1400 [kg C/ha/y])
+           (background_mineralization 30 [kg N/ha/y])))
+
+write
+
+  (OrganicMatter original 
+     (init (input 1400 [kg C/ha/y])
+     (background_mineralization 30 [kg N/ha/y])))
+
+You can also use named parameterizations,  like
+
+  (deforganic "low input" default
+     (init (input 1400 [kg C/ha/y])
+     (background_mineralization 30 [kg N/ha/y])))
+
+and use them like
+
+  (OrganicMatter "low input")
 
 * 4.02
 

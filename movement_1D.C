@@ -26,7 +26,7 @@
 #include "log.h"
 #include "submodeler.h"
 
-class Movement1D : public Movement
+struct Movement1D : public Movement
 {
   // Water.
   std::auto_ptr<Geometry1D> geometry;
@@ -35,7 +35,6 @@ class Movement1D : public Movement
   std::auto_ptr<Soltrans1D> solute;
 
   // Simulation.
-public:
   void output (Log& log) const
   { 
     output_submodule (*water, "SoilWater", log);
@@ -43,7 +42,7 @@ public:
   }
 
   // Create.
-public:
+  static void load_syntax (Syntax& syntax, AttributeList& alist);
   Movement1D (Block& al)
     : Movement (al),
       geometry (submodel<Geometry1D> (al, "Geometry")),
@@ -52,6 +51,37 @@ public:
       solute (submodel<Soltrans1D> (al, "Solute"))
   { }
 };
+
+void 
+Movement1D::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+   syntax.add_submodule ("Geometry", alist, Syntax::State,
+                         "Discretization of the soil.",
+                         Geometry1D::load_syntax);
+   syntax.add_submodule ("Water", alist, Syntax::State,
+                         "Soil water content and transportation.",
+                         SoilWater1D::load_syntax);
+   syntax.add_submodule ("Heat", alist, Syntax::State,
+                         "Soil heat and flux.",
+                         SoilHeat1D::load_syntax);
+   syntax.add_submodule ("Solute", alist, Syntax::State,
+                         "Solute transport in soil.",
+                         Soltrans1D::load_syntax);
+}
+
+const AttributeList& 
+Movement::default_model ()
+{
+  static AttributeList alist;
+  
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      Movement1D::load_syntax (dummy, alist);
+      alist.add ("type", "1D");
+    }
+  return alist;
+}
 
 static struct Movement1DSyntax
 {
@@ -63,20 +93,8 @@ static struct Movement1DSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "One dimensional movement.");
-
-    syntax.add_submodule ("Geometry", alist, Syntax::State,
-                          "Discretization of the soil.",
-                          Geometry1D::load_syntax);
-    syntax.add_submodule ("Water", alist, Syntax::State,
-                          "Soil water content and transportation.",
-                          SoilWater1D::load_syntax);
-    syntax.add_submodule ("Heat", alist, Syntax::State,
-                          "Soil heat and flux.",
-                          SoilHeat1D::load_syntax);
-    syntax.add_submodule ("Solute", alist, Syntax::State,
-                          "Solute transport in soil.",
-                          Soltrans1D::load_syntax);
-
+    Movement1D::load_syntax (syntax, alist);
+ 
     Librarian<Movement>::add_type ("1D", alist, syntax, &make);
   }
 } Movement1D_syntax;

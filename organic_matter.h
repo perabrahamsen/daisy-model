@@ -2,6 +2,7 @@
 // 
 // Copyright 1996-2001 Per Abrahamsen and S鷨en Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -23,14 +24,17 @@
 #ifndef ORGANIC_MATTER_H
 #define ORGANIC_MATTER_H
 
-#include "clayom.h" // Must be included here to ensure correct initialization.
-#include "domsorp.h" // Ditto.
-#include <memory>
+#include "librarian.h"
+
+// Needed for initialization order.
+#include "domsorp.h"
+#include "clayom.h"
 
 class AttributeList;
 class Syntax;
 class Log;
 class AM;
+class DOM;
 class Geometry;
 class Soil;
 class SoilWater;
@@ -43,54 +47,61 @@ class Treelog;
 class OrganicMatter
 {
   // Content.
-private:
-  struct Implementation;
-  std::auto_ptr<Implementation> impl;
-  
+public:
+  const symbol name;
+  static const char *const description;
+
   // Simulation.
 public:
-  void clear ();
-  void monthly (const Geometry&);
-  const std::vector<bool>& active () const;
-  void tick (const Geometry& geo,
+  virtual void clear () = 0;
+  virtual void monthly (const Geometry&) = 0;
+  virtual const std::vector<bool>& active () const = 0;
+  virtual void tick (const Geometry& geo,
              const SoilWater&, const SoilHeat&, 
-	     SoilNO3&, SoilNH4&, Treelog& msg);
-  void transport (const Soil&, const SoilWater&, Treelog&);
-  const std::vector<DOM*>& dom () const;
-  void output (Log&, const Geometry&) const;
-  double CO2 (unsigned int i) const;	// [g C/cm設
-  double CO2_fast (unsigned int i) const;	// [g C/cm設
-  void mix (const Geometry&, const Soil&, const SoilWater&,
-	    double from, double to, double penetration,
-	    const Time& time);
-  void swap (const Geometry&, const Soil&, const SoilWater&, 
-	     double from, double middle, double to,
-	     const Time& time);
+	     SoilNO3&, SoilNH4&, Treelog& msg) = 0;
+  virtual void transport (const Soil&, const SoilWater&, Treelog&) = 0;
+  virtual const std::vector<DOM*>& fetch_dom () const = 0;
+  virtual void output (Log&) const = 0;
+  virtual double CO2 (size_t i) const = 0;	// [g C/cm設
+  virtual double CO2_fast (size_t i) const = 0;	// [g C/cm設
+  virtual void mix (const Geometry&, const Soil&, const SoilWater&,
+                    double from, double to, double penetration,
+                    const Time& time) = 0;
+  virtual void swap (const Geometry&, const Soil&, const SoilWater&, 
+                     double from, double middle, double to,
+                     const Time& time) = 0;
 
   // Communication with external model.
-  double get_smb_c_at (unsigned int i) const; // [g C/cm設
+  virtual double get_smb_c_at (size_t i) const = 0; // [g C/cm設
 
   // Create and Destroy.
-  int som_pools () const;
-  bool check (const Soil&, Treelog& err) const;
-  bool check_am (const AttributeList& am, Treelog& err) const;
-  void add (AM&);
-  void fertilize (const AttributeList&, const Geometry&);
-  void fertilize (const AttributeList&, const Geometry&,
-                  double from, double to);
-  AM* find_am (symbol sort, symbol part) const;
+  virtual int som_pools () const = 0;
+  virtual bool check (const Soil&, Treelog& err) const = 0;
+  virtual bool check_am (const AttributeList& am, Treelog& err) const = 0;
+  virtual void add (AM&) = 0;
+  virtual void fertilize (const AttributeList&, const Geometry&) = 0;
+  virtual void fertilize (const AttributeList&, const Geometry&,
+                          double from, double to) = 0;
+  virtual AM* find_am (symbol sort, symbol part) const = 0;
 public:
-  void initialize (const AttributeList&, const Geometry& geo,
-                   const Soil&, const SoilWater&, 
-		   double T_avg, Treelog&);
-  static void load_syntax (Syntax&, AttributeList&);
+  virtual void initialize (const AttributeList&, const Geometry& geo,
+                           const Soil&, const SoilWater&, 
+                           double T_avg, Treelog&) = 0;
+  static const AttributeList& default_model ();
 private:
   OrganicMatter ();
   OrganicMatter (const OrganicMatter&);
   OrganicMatter& operator= (const OrganicMatter&);
 public:
   explicit OrganicMatter (Block&);
-  ~OrganicMatter ();
+  virtual ~OrganicMatter ();
 };
+
+#ifdef FORWARD_TEMPLATES
+template<>
+Librarian<OrganicMatter>::Content* Librarian<OrganicMatter>::content;
+#endif
+
+static Librarian<OrganicMatter> Organic_init ("organic");
 
 #endif // ORGANIC_MATTER_H

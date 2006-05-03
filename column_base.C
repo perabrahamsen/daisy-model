@@ -20,6 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "column_base.h"
+#include "movement.h"
 #include "geometry1d.h"
 #include "soltrans1d.h"
 #include "soil.h"
@@ -536,6 +537,11 @@ void
 ColumnBase::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Column::load_syntax (syntax, alist);
+
+  syntax.add ("Movement", Librarian<Movement>::library (),
+              Syntax::State, Syntax::Singleton, "\
+Discretization and movement of water, heat and solutes in the soil.");
+  alist.add ("Movement", Movement::default_model ());
   syntax.add ("weather", Librarian<Weather>::library (),
 	      Syntax::OptionalState, Syntax::Singleton,
 	      "Weather model for providing climate information during\n\

@@ -166,7 +166,7 @@ ifeq ($(COMPILER),gcc)
 	ifeq ($(HOSTTYPE),mingw)
 		OSFLAGS = -DMINGW -mno-cygwin
 #		          -I/home/mingw/include -L/home/mingw/lib
-		DEBUG =
+		DEBUG = 
 	endif
 	WARNING = -W -Wall -Wno-uninitialized \
 		  -Wconversion -Woverloaded-virtual \
@@ -290,7 +290,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # column_r2d2.C 
-MODELS = movement_1D.C column_rect.C integer_arit.C \
+MODELS = organic_none.C \
+	organic_std.C movement_1D.C column_rect.C integer_arit.C \
 	source_merge.C number_source.C program_file.C action_table.C \
 	xysource_merge.C xysource_inline.C number_soil.C xysource_loop.C \
 	xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
@@ -340,7 +341,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = movement.C integer.C \
+COMPONENTS = organic_matter.C movement.C integer.C \
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
@@ -359,7 +360,7 @@ SUBMODELS = geometry_rect.C element.C soltrans1d.C soil_water1d.C \
 	partition.C production.C \
 	harvesting.C canopy_simple.C canopy_std.C root_system.C \
 	ridge.C soil.C surface.C soil_water.C soil_NH4.C soil_NO3.C \
-	organic_matter.C denitrification.C soil_heat.C \
+	denitrification.C soil_heat.C \
 	snow.C im.C harvest.C chemicals.C field.C \
 	soil_chemical.C soil_chemicals.C bioincorporation.C
 
@@ -1012,10 +1013,10 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h surface.h \
   uzmodel.h timestep.h soil_heat1d.h soil_heat.h soil_chemicals.h \
   soil_chemical.h solute.h adsorption.h weather.h im.h vegetation.h \
-  bioclimate.h groundwater.h chemistry.h log.h border.h geometry1d.h \
-  geometry.h mathlib.h soltrans1d.h transport.h mactrans.h soil.h \
-  horizon.h soil_water1d.h soil_water.h macro.h chemicals.h submodeler.h \
-  memutils.h
+  bioclimate.h groundwater.h chemistry.h log.h border.h movement.h \
+  geometry1d.h geometry.h mathlib.h soltrans1d.h transport.h mactrans.h \
+  soil.h horizon.h soil_water1d.h soil_water.h macro.h chemicals.h \
+  submodeler.h memutils.h
 gnuplot_utils${OBJ}: gnuplot_utils.C gnuplot_utils.h syntax.h treelog.h \
   symbol.h alist.h
 scope_sources${OBJ}: scope_sources.C scope_sources.h scope.h time.h source.h \
@@ -1087,6 +1088,11 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h program.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+movement_1D${OBJ}: movement_1D.C movement.h librarian.h library.h symbol.h \
+  block.h syntax.h treelog.h plf.h alist.h assertion.h geometry1d.h \
+  geometry.h mathlib.h soil_water1d.h soil_water.h macro.h soil_heat1d.h \
+  soil_heat.h soltrans1d.h transport.h mactrans.h log.h border.h \
+  submodeler.h
 column_rect${OBJ}: column_rect.C column.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h geometry_rect.h \
   geometry.h mathlib.h soil.h horizon.h log.h border.h submodeler.h

@@ -25,6 +25,7 @@
 #include "soil_heat1d.h"
 #include "soil_chemicals.h"
 // We need some of these in order to ensure initialization order.
+#include "movement.h"
 #include "weather.h"
 #include "vegetation.h"
 #include "bioclimate.h"
