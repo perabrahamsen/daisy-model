@@ -56,8 +56,6 @@ SoilChemical::decompose (const Geometry& geo,
   const double decompose_rate = chemical.decompose_rate ();
 
   unsigned int size = soil.size ();
-  if (!chemical.active_groundwater ())
-    size = soil_water.first_groundwater_cell ();
 
   // Update lag time.
   bool found = false;

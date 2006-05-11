@@ -24,6 +24,22 @@
 
 #include "librarian.h"
 
+// Needed for initialization order.
+#include "transport.h"
+#include "mactrans.h"
+
+class Geometry;
+class Soil;
+class SoilWater;
+class SoilHeat;
+class Element;
+class Solute;
+class Adsorption;
+class Surface;
+class Weather;
+class Time;
+class Treelog;
+
 class Movement
 {
   // Content.
@@ -31,13 +47,33 @@ public:
   const symbol name;
   static const char *const description;
 
+  virtual Geometry& geometry () const = 0;
+  virtual SoilWater& soil_water () const = 0;
+  virtual SoilHeat& soil_heat () const = 0;
+
   // Simulation.
 public:
+  virtual void macro_tick (const Soil&, Surface&, Treelog&) = 0;
+  virtual void tick (const Soil&, Surface&, 
+                     const Time&, const Weather&, Treelog&) = 0;
+  virtual void solute (const Soil&, const double J_in, Solute&, Treelog&) = 0;
+  virtual void element (const Soil&, Element&, Adsorption&,
+                        double diffusion_coefficient, Treelog&) = 0;
+  virtual void ridge (Surface&, const Soil&, const AttributeList&) = 0;
+
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 public:
+  virtual bool check (Treelog& err) const = 0;
+  virtual bool volatile_bottom () const = 0;
+  virtual void initialize_soil (Soil&, Treelog&) const = 0;
+  virtual void initialize (const AttributeList&,
+                           const Soil&, const Time&, const Weather&, 
+                           Treelog&) = 0;
   static const AttributeList& default_model ();
+  static void load_vertical (Syntax& syntax, AttributeList& alist);
+  static Movement* build_vertical (Block& al);
 protected:
   Movement (Block&);
 public:

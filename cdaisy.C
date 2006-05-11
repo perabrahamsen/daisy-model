@@ -739,6 +739,8 @@ daisy_column_get_name (const Column* column)
 
 // @@@ Soil Geometry.
 
+#ifdef EXCOM
+
 extern "C" unsigned int EXPORT
 daisy_column_count_layers (const Column* column)
 { return column->count_layers (); }
@@ -903,6 +905,8 @@ daisy_column_get_temperature_at (Column* column, unsigned int index)
 extern "C" double EXPORT	// [cm³ H2O/cm³/h]
 daisy_column_get_crop_h2o_uptake_at (Column* column, unsigned int index)
 { return column->get_crop_h2o_uptake_at (index); }
+
+#endif // EXCOM
 
 // @ The daisy_chemical Type.
 //

@@ -46,7 +46,6 @@ public:
   virtual double decompose_conc_factor (double conc) const = 0; // [g X/cm^3 H2O->]
   virtual double decompose_depth_factor (double depth) const = 0; // [cm->]
   virtual double decompose_lag_increment (double conc) const = 0; // [g X/cm^3 H2O->]
-  virtual bool active_groundwater () const = 0;
 
   // Create and Destroy.
 protected:

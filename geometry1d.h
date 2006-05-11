@@ -31,7 +31,6 @@
 class Block;
 class AttributeList;
 class Treelog;
-class Groundwater;
 
 class Geometry1D : public Geometry
 {
@@ -63,6 +62,7 @@ public:
   { return dz_[n] * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
   inline double bottom () const // Bottom of deepest cell. [cm]
   { return zplus_[cell_size () - 1]; }
+  size_t cell_at (double z, double x, double y) const ;
   double fraction_in_z_interval (size_t i, double from, double to) const;
   bool contain_z (size_t i, double z) const;
 
@@ -85,7 +85,7 @@ public:
   bool check_border (const double border, Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);
   Geometry1D (Block&);
-  void initialize_zplus (const Groundwater& groundwater,
+  void initialize_zplus (bool volatile_bottom,
 			 const std::vector<double>& fixed,
 			 const double max_rooting_depth,
 			 const double max_interval,

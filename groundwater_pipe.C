@@ -25,7 +25,7 @@
 #include "geometry1d.h"
 #include "soil.h"
 #include "soil_heat.h"
-#include "soil_water.h"
+#include "soil_water1d.h"
 #include "depth.h"
 #include "treelog.h"
 #include "mathlib.h"
@@ -87,7 +87,7 @@ public:
   // Simulation.
 public:
   void tick (const Geometry1D& geo,
-             const Soil&, SoilWater&, double,
+             const Soil&, SoilWater1D&, double,
 	     const SoilHeat&, const Time&, Treelog&);
   void output (Log& log) const;
 
@@ -171,7 +171,7 @@ public:
 
 void 
 GroundwaterPipe::tick (const Geometry1D& geo,
-                       const Soil& soil, SoilWater& soil_water, 
+                       const Soil& soil, SoilWater1D& soil_water, 
 		       const double h_surface,
 		       const SoilHeat& soil_heat, const Time& time,
                        Treelog&)

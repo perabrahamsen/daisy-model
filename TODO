@@ -1,31 +1,51 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* cd'er til Fie
+
+* oprydning
+
+** Fjern overflødige accessors fra SoilWater1D
+
+** inline simple accessors i SoilWater1D
+
+** Flyt noget content + accessors til SoilWater
+
+** Lav samme nummer med SoilHeat
+
+* Send WP6 description to Luisa and Joao.
+
+* reintroduce number_soil.C
+
 * Terminologi
 
-* Add "Geometry" to "ColumnBase" (for sake of the reference manual).
+cell, edge, vertex
 
-* Daisy 2D
+* Doc
 
-* Movement?
+** program structure, input, output
 
+* Movement
 
-** B) Rect
+1. Lad soltrans, soil_water, soil_heat, 
 
-Disse skal (først) bare bruge 1D modellerne til vertikal transport,
-senere måske også horizontal transport afkoblet.
+2. Ret fejl
 
-ColumnRect
-GeometryRect (zplus, xplus)
+3. Ret logs.
 
-
+* Movement rectangle
 
 SoilWaterRect
   UZRect
   MacroRect
+SoltransRect
+SoilHeatRect
 
-SolMoveRect
+Disse skal (først) bare bruge 1D modellerne til vertikal transport,
+senere måske også horizontal transport afkoblet.
 
-SoilHeatRect rectangle
+* Add "Geometry" to "ColumnBase" (for sake of the reference manual).
+
+* Daisy 2D
 
 ** C) Graph / Net
 
@@ -36,52 +56,6 @@ SoilHeatRect rectangle
 3) Løs matrix
 
 4) Aftest mod 1D eller Grid
-
-** D)
-
-** Filer
-
-*** bioincorporation.C
-
-**** distribution antager  i > j => z(i) < z (j)
-
-*** select_interval.C
-
-**** Need to find bottom of soil.
-
-**** Need Average dry bulk density of interval.
-
-
-** Done 2
-
-*** Split Soil fra Geometry
-
-*** Geometry og Geometry1D
-
-*** SoilHeat & SoilHeat1D
-
-*** SoilWater & SoilWater1D
-
-*** root_system.C, crop_simple.C, crop_std.C, crop_old.C, crop_sold.C
-
-T, h, clay at depth
-
-*** rootdens_AP.C, rootdens_G_P.C
-
-antog  i > j => z(i) < z (j)
-
-*** 1D only
-
-ridge, uz*, macro*, groundwater*
-
-** Done 3
-
-*** content, flux, interval, array logs: Generalized to handle 2D geometry.
-*** solute, dom: Removed transport.
-*** soltrans1D: New transport module.
-*** transport, macrotrans: 1D
-*** organic matter, bioincorporation: Removed 1D assumptions.
-*** snow, surface, bioclimate, column, soil chemicals: Removed node 0 = top.
 
 * IDE: CT laver "sample setups" for hvert FON land 
 

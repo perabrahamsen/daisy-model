@@ -73,7 +73,7 @@ public:
 public:
   bool check (Treelog&) const;
   bool check_border (const double border, Treelog& err) const;
-  void initialize_zplus (const Groundwater&, const std::vector<double>&,
+  void initialize_zplus (const bool, const std::vector<double>&,
                          const double, const double, Treelog&)
   { }
   static void load_syntax (Syntax& syntax, AttributeList&);

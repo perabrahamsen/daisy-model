@@ -1,3 +1,31 @@
+2006-05-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.h: Removed unnecessary pure virtuals.
+	* soil_heat1d.C, grounwater_pipe.C: Take 'SoilWater1D' arguments.
+	
+	* chemical_std.C, chemical.h (active_grounwater): Removed flag.
+	* soil_chemical.C: Update caller.
+
+	* soil_water1d.h, soil_water1d.C: Don't hide implementation in
+	'Implementation' struct.
+
+	* column_std.C, column.h: Removed functions for communication with
+	external model.
+	* geometry.h, geometry1d.C (cell_at): New function.
+	* soil.h (horizon): New function.
+	* column_std.C, column.h (horizon_at): New function.
+	* number_soil.C: Rewrote to use new function.
+
+2006-05-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* movement_rect.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* movement.h, movement_1D.C: Rewrote.
+	* column_std.C: Now define both 'default' and 'generic' columns,
+	where the later takes a 'Movement' parameter instead of
+	'SoilHeat', 'SoilWater' and 'Groundwater'.
+
 2006-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* column_rect.C, column_inorganic.C, column_r2d2.C:
@@ -8,7 +36,7 @@
 
 	* organic_none.C: New model.
 
-	* organic_matter.C: made it a component.
+	* organic_matter.C: Made it a component.
 	* Makefile (COMPONENTS): Added it.
 	* organic_std.C: Moved model here.
 	* Makefile (MODELS): Added it.

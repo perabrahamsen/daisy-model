@@ -62,6 +62,7 @@ public:
   inline double top () const    // Top of highest cell. [cm]
   { return 0.0; }
   virtual double bottom () const = 0; // Bottom of deepest cell. [cm]
+  virtual size_t cell_at (double z, double x, double y) const = 0;
   virtual double fraction_in_z_interval (// The fraction of a cell
                                          // volume that is within a
                                          // specific depth interval.
@@ -136,7 +137,7 @@ public:
   static void initialize_intervals (const std::vector<double>& end, 
                                     std::vector<double>& center,
                                     std::vector<double>& distance);
-  virtual void initialize_zplus (const Groundwater& groundwater,
+  virtual void initialize_zplus (bool volatile_bottom,
                                  const std::vector<double>& fixed,
                                  const double max_rooting_depth,
                                  const double max_interval,

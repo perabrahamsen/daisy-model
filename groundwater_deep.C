@@ -36,7 +36,7 @@ public:
   // Simulation.
 public:
   void tick (const Geometry1D&,
-             const Soil&, SoilWater&, double, 
+             const Soil&, SoilWater1D&, double, 
 	     const SoilHeat&, const Time&, Treelog&)
   { }
   double table () const

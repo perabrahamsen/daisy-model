@@ -30,6 +30,7 @@ class Geometry1D;
 class Surface;
 class Bioclimate;
 class SoilWater;
+class SoilWater1D;
 class Weather;
 class Time;
 
@@ -41,22 +42,15 @@ class SoilHeat1D : public SoilHeat
   enum state_t { liquid, freezing, frozen, thawing };
   state_t state (size_t i) const;
   double capacity (const Soil&, const SoilWater&, size_t i) const;
-  double capacity_apparent (const Soil&, const SoilWater&, size_t i) const;
+  double capacity_apparent (const Soil&, const SoilWater1D&, size_t i) const;
 public:
   double top_flux (const Geometry& geo,
                    const Soil&, const SoilWater&) const; // [W/m^2]
   double T_surface_snow (const Geometry&, const Soil&, const SoilWater&,
                          double T_snow, double K_snow, double dZs) const;
   void tick (const Time&, const Geometry1D& geo,
-             const Soil&, SoilWater&, 
+             const Soil&, SoilWater1D&, 
 	     const Surface&, const Weather& weather);
-  double energy (const Geometry1D& geo,
-                 const Soil&, const SoilWater&, double from, double to) const;
-  void set_energy (const Geometry1D& geo,
-                   const Soil&, const SoilWater&, 
-		   double from, double to, double energy);
-  void swap (const Geometry& geo,
-             double from, double middle, double to);
   double source (size_t i) const;
   void set_source (size_t i, double value); // [erg/cm^3/h]
   void output (Log&) const;

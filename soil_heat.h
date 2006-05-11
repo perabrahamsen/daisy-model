@@ -49,6 +49,14 @@ public:
                                  double T_snow,
                                  double K_snow,
                                  double dZs) const = 0;
+  double energy (const Geometry& geo, const Soil& soil,
+                 const SoilWater& soil_water,
+                 const double from, const double to) const;
+  void set_energy (const Geometry& geo, 
+                   const Soil& soil, const SoilWater& soil_water, 
+                   double from, double to, double energy);
+  void swap (const Geometry& geo, double from, double middle, double to);
+  virtual void set_source (size_t i, double value) = 0; // [erg/cm^3/h]
 
   // Create and destroy.
 public:

@@ -38,7 +38,7 @@ public:
   // Simulation.
 public:
   void tick (const Geometry1D&,
-             const Soil&, SoilWater&, double, 
+             const Soil&, SoilWater1D&, double, 
 	     const SoilHeat&, const Time&, Treelog&);
   double table () const;
 
@@ -67,7 +67,7 @@ GroundwaterStatic::accept_bottom (double)
 
 void
 GroundwaterStatic::tick (const Geometry1D&,
-                         const Soil&, SoilWater&, double, const SoilHeat&,
+                         const Soil&, SoilWater1D&, double, const SoilHeat&,
 			 const Time&, Treelog&)
 { }
 

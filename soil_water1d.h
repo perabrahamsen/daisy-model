@@ -27,12 +27,31 @@
 #include "macro.h"		// Must be initialized.
 
 class Geometry1D;
+class UZmodel;
 
 class SoilWater1D : public SoilWater
 {
   // Content.
-  struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::vector<double> S_sum_;
+  std::vector<double> S_root_;
+  std::vector<double> S_drain_;
+  std::vector<double> S_p_;
+  std::vector<double> S_permanent_;
+  std::vector<double> S_incorp_;
+  std::vector<double> tillage_;
+  std::vector<double> Theta_old_;
+  std::vector<double> h_old_;
+  std::vector<double> Theta_;
+  std::vector<double> h_;
+  std::vector<double> S_ice_;
+  std::vector<double> X_ice_;
+  std::vector<double> X_ice_buffer_;
+  std::vector<double> h_ice_;
+  std::vector<double> q_;
+  std::vector<double> q_p_;
+  std::auto_ptr<UZmodel> top;
+  std::auto_ptr<UZmodel> reserve;
+  std::auto_ptr<Macro> macro;
 
   // Sink.
 public:
@@ -49,10 +68,8 @@ public:
   double Theta_left (size_t i) const;
   double Theta_old (size_t i) const;
   double content (const Geometry&, double from, double to) const; // [cm]
-#ifndef NEWMOVE
   double q (size_t i) const;
   double q_p (size_t i) const;
-#endif // OLDMOVE
   double S_sum (size_t i) const;
   double S_root (size_t i) const;
   double S_drain (size_t i) const;
@@ -63,6 +80,8 @@ public:
   double X_ice_total (size_t i) const;
 
   size_t first_groundwater_cell () const;
+  double top_flux () const
+  { return q (0); }
     
   // Ice modified lookups.
   double Theta (const Soil&, size_t i, double h) const;

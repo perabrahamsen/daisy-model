@@ -80,7 +80,6 @@ private:
   const PLF decompose_conc_factor_;
   const PLF decompose_depth_factor_;
   const PLF decompose_lag_increment_;
-  const bool active_groundwater_;
 
   // Queries.
 public:
@@ -120,8 +119,6 @@ public:
     { return decompose_depth_factor_ (depth); }
   double decompose_lag_increment (double conc) const
     { return decompose_lag_increment_ (conc); }
-  bool active_groundwater () const
-    { return active_groundwater_; }
 
   // Create.
 public:
@@ -150,8 +147,7 @@ ChemicalStandard::ChemicalStandard (Block& al)
     decompose_CO2_factor_ (al.plf ("decompose_CO2_factor")),
     decompose_conc_factor_ (al.plf ("decompose_conc_factor")),
     decompose_depth_factor_ (al.plf ("decompose_depth_factor")),
-    decompose_lag_increment_ (al.plf ("decompose_lag_increment")),
-    active_groundwater_ (al.flag ("active_groundwater"))
+    decompose_lag_increment_ (al.plf ("decompose_lag_increment"))
 { }
 
 static struct ChemicalStandardSyntax
@@ -273,9 +269,6 @@ You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
 concentration each hour.  When lag in any cell reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.");
     alist.add ("decompose_lag_increment", no_factor);
-    syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
-Clear this flag to turn off decomposition in groundwater.");
-    alist.add ("active_groundwater", true);
     Librarian<Chemical>::add_type ("default", alist, syntax, &make);
   }
 } ChemicalStandard_syntax;

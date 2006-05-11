@@ -21,7 +21,7 @@
 
 
 #include "geometry1d.h"
-#include "groundwater.h"
+#include "block.h"
 #include "syntax.h"
 #include "alist.h"
 #include "mathlib.h"
@@ -40,6 +40,15 @@ Geometry1D::edge_name (const size_t e) const
   std::ostringstream tmp;
   tmp << zplus (e-1U);
   return tmp.str ();
+}
+
+size_t 
+Geometry1D::cell_at (const double z, double, double) const
+{
+  for (size_t cell = 1; cell < cell_size (); cell++)
+    if (zplus_[cell-1U] >= z)
+      return cell;
+  return cell_size () - 1;
 }
 
 double 
@@ -273,18 +282,15 @@ Geometry1D::Geometry1D (Block& al)
 }
 
 void
-Geometry1D::initialize_zplus (const Groundwater& groundwater,
-			    const std::vector<double>& fixed,
-			    const double max_rooting_depth,
-			    const double max_interval,
-			    Treelog& msg)
+Geometry1D::initialize_zplus (const bool volatile_bottom,
+                              const std::vector<double>& fixed,
+                              const double max_rooting_depth,
+                              const double max_interval,
+                              Treelog& msg)
 {
   if (zplus_.empty ())
     {
       Treelog::Open nest (msg, "Geometry");
-      const bool volatile_bottom = 
-	groundwater.bottom_type () == Groundwater::lysimeter 
-	|| groundwater.is_pipe ();
       
       bool warn_about_small_intervals = true;
       double last = 0.0;

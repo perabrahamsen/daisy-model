@@ -96,14 +96,6 @@ The tension we want to compare with.");
     syntax.add ("z", Librarian<Number>::library (), "\
 The height we want to compare with.");
   }
-  static double find_max_depth (const Column& column)
-  {
-    const size_t size = column.count_layers ();
-    double now = 0;
-    for (size_t i = 0; i < size; i++)
-      now -= column.get_dz (i);
-    return now;
-  }
   NumberByDepth (Block& al)
     : Number (al),
       column (Librarian<Column>::build_item (al, "column")),
@@ -121,7 +113,7 @@ The height we want to compare with.");
     std::auto_ptr<Weather> weather (Librarian<Weather>::build_alist
                                     (al, alist, "initialize"));
     column->initialize (time, al.msg (), weather.get ());
-    max_depth = find_max_depth (*column);
+    max_depth = column->bottom ();
   }
 };
 
@@ -130,24 +122,12 @@ struct NumberDepthTheta : public NumberByDepth
   // Simulation.
   double value (const Scope& scope) const
   { 
-    const size_t size = column->count_layers ();
-    const double pressure = Units::convert (h->dimension (scope), 
-                                            "cm", 
-                                            h->value (scope));
-    std::vector<double> v (size, pressure);
-    column->put_water_pressure (v);
-    const double height = Units::convert (z->dimension (scope), 
-                                          "cm", 
-                                          z->value (scope));
-    double now = 0;
-    for (size_t i = 0; i < size; i++)
-      {
-        now -= column->get_dz (i);
-        if (height > now)
-          return column->get_water_content_at (i);
-      }
-    daisy_assert (size > 0);
-    return column->get_water_content_at (size - 1);
+    const double pressure 
+      = Units::convert (h->dimension (scope), "cm", h->value (scope));
+    const double height
+      = Units::convert (z->dimension (scope), "cm", z->value (scope));
+    const Horizon& horizon = column->horizon_at (height, 0.5, 0.5);
+    return horizon.hydraulic->Theta (pressure);
   }
 
   const std::string& dimension (const Scope&) const 
@@ -180,24 +160,12 @@ struct NumberDepthK : public NumberByDepth
   // Simulation.
   double value (const Scope& scope) const
   { 
-    const size_t size = column->count_layers ();
-    const double pressure = Units::convert (h->dimension (scope), 
-                                            "cm", 
-                                            h->value (scope));
-    std::vector<double> v (size, pressure);
-    column->put_water_pressure (v);
-    const double height = Units::convert (z->dimension (scope), 
-                                          "cm", 
-                                          z->value (scope));
-    double now = 0;
-    for (size_t i = 0; i < size; i++)
-      {
-        now -= column->get_dz (i);
-        if (height > now)
-          return column->get_water_conductivity_at (i);
-      }
-    daisy_assert (size > 0);
-    return column->get_water_conductivity_at (size - 1);
+    const double pressure 
+      = Units::convert (h->dimension (scope), "cm", h->value (scope));
+    const double height
+      = Units::convert (z->dimension (scope), "cm", z->value (scope));
+    const Horizon& horizon = column->horizon_at (height, 0.5, 0.5);
+    return horizon.hydraulic->K (pressure);
   }
 
   const std::string& dimension (const Scope&) const 

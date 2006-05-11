@@ -40,6 +40,8 @@ class Soil
 
 public:
   size_t size () const;
+  const Horizon& horizon (size_t i) const
+  { return *horizon_[i]; }
 
   // Water.
   double K (size_t i, double h, double h_ice, double T) const;
@@ -96,7 +98,8 @@ private:
   Soil (const Soil&);
 public:
   explicit Soil (Block&);
-  void initialize (Geometry&, Groundwater&, int som_size, Treelog&);
+  double initialize_aquitard (double Z_aquitard, double K_aquitard, Treelog&);
+  void initialize (Geometry&, bool volatile_bottom, int som_size, Treelog&);
   ~Soil ();
 };
 

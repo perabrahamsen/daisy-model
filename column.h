@@ -28,6 +28,7 @@
 class Time;
 class Weather;
 class OrganicMatter;
+class Horizon;
 class IM;
 class Crop;
 class Harvest;
@@ -41,6 +42,8 @@ public:
   double size;
   static const char *const description;
 
+  virtual const Horizon& horizon_at (double z, double x, double y) const = 0;
+
   // Actions.
 public:
   virtual void sow (Treelog&, const AttributeList& crop) = 0;
@@ -49,7 +52,8 @@ public:
   virtual void irrigate_surface (double flux, double temp, const IM&) = 0;
   virtual void irrigate_overhead (double flux, const IM&) = 0;
   virtual void irrigate_surface (double flux, const IM&) = 0;
-  virtual void irrigate_subsoil (double flux, const IM&, double from, double to) = 0;
+  virtual void irrigate_subsoil (double flux, const IM&, 
+                                 double from, double to) = 0;
   virtual void fertilize (const AttributeList&, double from, double to) = 0;
   virtual void fertilize (const AttributeList&) = 0;
   virtual void clear_second_year_utilization () = 0;
@@ -87,7 +91,9 @@ public:
   virtual double crop_dm (symbol crop, double height) const = 0; 
   // All names of all crops on the column.
   virtual std::string crop_names () const = 0;
-  
+  // Lower limit of soil description.
+  virtual double bottom () const = 0;
+
   // Simulation.
   virtual void clear () = 0;
   virtual void tick (Treelog&, const Time&, const Weather*) = 0;
@@ -99,31 +105,6 @@ public:
   virtual bool check_border (const double border, Treelog& err) const = 0;
   virtual void output (Log&) const;
 
-  // Communication with external model.
-  virtual unsigned int count_layers () const = 0; // Number of num. layers.
-  virtual double get_dz (unsigned int i) const = 0; // Size of layer 'i'. [cm]
-  virtual void put_water_pressure (const std::vector<double>& v) = 0; // [cm]
-  virtual void get_water_sink (std::vector<double>& v) 
-    const = 0; // [cm^3/cm^3/h]
-  virtual void put_no3_m (const std::vector<double>& v) = 0; // [g/cm^3]
-  virtual void get_no3_m (std::vector<double>& v) const = 0; // [g/cm^3]
-  virtual double get_evap_interception () const = 0; // [mm/h]
-  virtual double get_intercepted_water () const = 0; // [mm]
-  virtual double get_net_throughfall () const = 0; // [mm/h]
-  virtual double get_snow_storage () const = 0; // [mm]
-  virtual double get_exfiltration () const = 0; // [mm/h]
-  virtual double get_evap_soil_surface () const = 0; // [mm/h]
-  virtual void put_ponding (double pond) = 0;	// [mm]
-  virtual void put_surface_no3 (double no3) = 0; // [g/cm^2]
-  virtual double get_surface_no3 () const = 0; // [g/cm^2]
-  virtual void put_surface_chemical (symbol, double) = 0; // [g/cm^2]
-  virtual double get_surface_chemical (symbol) const = 0; // [g/cm^2]
-  virtual double get_smb_c_at (unsigned int i) const = 0; // [g C/cm³]
-  virtual double get_co2_production_at (unsigned int i) const = 0; // [g C/cm³]
-  virtual double get_temperature_at (unsigned int i) const = 0; // [°C]
-  virtual double get_crop_h2o_uptake_at (unsigned int i) const = 0; //[cm³/cm³]
-  virtual double get_water_content_at (unsigned int i) const = 0; // [cm³/cm³]
-  virtual double get_water_conductivity_at (unsigned int i) const = 0; // [cm/h]
   // Create and Destroy.
 protected:
   explicit Column (Block&);

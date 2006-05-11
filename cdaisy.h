@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#if 0
+#ifdef EXCOM
            }
 #endif
 
@@ -482,6 +482,8 @@ daisy_column_merge (daisy_column* column, const daisy_column* other,
 const char*                     /* The name of the column. */
 daisy_column_get_name (const daisy_column* column);
 
+#if 0
+
 /* @@@ Soil Geometry.
  *
  * The numeric layers used in the soil.
@@ -595,6 +597,7 @@ daisy_column_get_temperature_at (const daisy_column* column,
 double                            /* [cm³ H2O/cm³/h] */
 daisy_column_get_crop_h2o_uptake_at (const daisy_column* column,
 				     unsigned int index);
+#endif // EXCOM
 
 /* @ The daisy_chemical Type.
  *

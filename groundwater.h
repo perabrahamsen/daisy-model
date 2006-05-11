@@ -29,7 +29,7 @@ class Time;
 class Treelog;
 class Geometry1D;
 class Soil;
-class SoilWater;
+class SoilWater1D;
 class SoilHeat;
 
 class Groundwater
@@ -55,7 +55,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Geometry1D& geo,
-                     const Soil&, SoilWater&, double h_surface /* [cm] */,
+                     const Soil&, SoilWater1D&, double h_surface /* [cm] */,
 		     const SoilHeat&, const Time&, Treelog&) = 0;
   virtual void output (Log&) const;
 

@@ -20,40 +20,128 @@
 
 #include "movement.h"
 #include "geometry1d.h"
+#include "soil.h"
 #include "soil_water1d.h"
 #include "soil_heat1d.h"
 #include "soltrans1d.h"
+#include "surface.h"
+#include "groundwater.h"
 #include "log.h"
 #include "submodeler.h"
 
 struct Movement1D : public Movement
 {
   // Water.
-  std::auto_ptr<Geometry1D> geometry;
+  std::auto_ptr<Geometry1D> geo;
   std::auto_ptr<SoilWater1D> water;
   std::auto_ptr<SoilHeat1D> heat;
-  std::auto_ptr<Soltrans1D> solute;
+  std::auto_ptr<Soltrans1D> soltrans;
+  std::auto_ptr<Groundwater> groundwater;
 
   // Simulation.
+  Geometry& geometry () const
+  { return *geo; }
+  SoilWater& soil_water () const
+  { return *water; }
+  SoilHeat& soil_heat () const
+  { return *heat; }
+
+  void macro_tick (const Soil& soil, Surface& surface, Treelog& msg)
+  { water->macro_tick (*geo, soil, surface, msg); }
+
+  void tick (const Soil& soil, Surface& surface, const Time& time,
+             const Weather& weather, Treelog& msg) 
+  {
+    groundwater->tick (*geo, soil, *water, surface.h (), *heat, time, msg);
+    heat->tick (time, *geo, soil, *water, surface, weather);
+    water->tick (*geo, soil, *heat, surface, *groundwater, msg);
+  }
+
+  void solute (const Soil& soil, const double J_in, Solute& sol, Treelog& msg)
+  { soltrans->solute (*geo, soil, *water, J_in, sol, msg); }
+
+  void element (const Soil& soil, Element& elem,
+                Adsorption& adsorption, double diffusion_coefficient,
+                Treelog& msg)
+  { soltrans->element (*geo, soil, *water, elem, 
+                       adsorption, diffusion_coefficient, msg); }
+
+  void ridge (Surface& surface, const Soil& soil, const AttributeList& al)
+  { surface.ridge (*geo, soil, *water, al); }
+
+
   void output (Log& log) const
   { 
     output_submodule (*water, "SoilWater", log);
     output_submodule (*heat, "SoilHeat", log);
+    output_derived (groundwater, "Groundwater", log);
   }
 
   // Create.
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
+  bool check (Treelog& err) const;
+  bool volatile_bottom () const
+  { return groundwater->bottom_type () == Groundwater::lysimeter 
+      || groundwater->is_pipe (); }
+  void initialize_soil (Soil& soil, Treelog& msg) const
+  {
+    // Extra aquitard layer.
+    if (groundwater->is_pipe ())
+      {
+        // Find parameters.
+        const double Z_aquitard = groundwater->Z_aquitard ();
+        const double K_aquitard = groundwater->K_aquitard ();
+        const double new_Z_aq 
+          = soil.initialize_aquitard (Z_aquitard, K_aquitard, msg);
+        groundwater->set_Z_aquitard (new_Z_aq);
+      }
+  }
+
+  void initialize (const AttributeList& alist,
+                   const Soil& soil, const Time& time, const Weather& weather,
+                   Treelog& msg)
+  {
+    heat->initialize (alist.alist ("Heat"), 
+                      *geo, soil, time, weather, msg);
+    groundwater->initialize (*geo, time, msg);
+    water->initialize (alist.alist ("Water"), 
+                       *geo, soil, *groundwater, msg);
+  }
   Movement1D (Block& al)
     : Movement (al),
-      geometry (submodel<Geometry1D> (al, "Geometry")),
+      geo (submodel<Geometry1D> (al, "Geometry")),
       water (submodel<SoilWater1D> (al, "Water")),
       heat (submodel<SoilHeat1D> (al, "Heat")),
-      solute (submodel<Soltrans1D> (al, "Solute"))
+      soltrans (submodel<Soltrans1D> (al, "Solute")),
+      groundwater (Librarian<Groundwater>::build_item (al, "Groundwater"))
   { }
 };
 
+bool
+Movement1D::check (Treelog& err) const
+{
+  const size_t n = geo->cell_size ();
+
+  bool ok = true;
+  {
+    Treelog::Open nest (err, "Water");
+    if (!water->check (n, err))
+      ok = false;
+  }
+  {
+    Treelog::Open nest (err, "Heat");
+    if (!heat->check (n, err))
+      ok = false;
+  }
+  {
+    Treelog::Open nest (err, "Groundwater");
+    if (!groundwater->check (err))
+      ok = false;
+  }
+  return ok;
+}
+
 void 
-Movement1D::load_syntax (Syntax& syntax, AttributeList& alist)
+Movement::load_vertical (Syntax& syntax, AttributeList& alist)
 {
    syntax.add_submodule ("Geometry", alist, Syntax::State,
                          "Discretization of the soil.",
@@ -67,6 +155,8 @@ Movement1D::load_syntax (Syntax& syntax, AttributeList& alist)
    syntax.add_submodule ("Solute", alist, Syntax::State,
                          "Solute transport in soil.",
                          Soltrans1D::load_syntax);
+   syntax.add ("Groundwater", Librarian<Groundwater>::library (),
+               "The groundwater level.");
 }
 
 const AttributeList& 
@@ -77,11 +167,15 @@ Movement::default_model ()
   if (!alist.check ("type"))
     {
       Syntax dummy;
-      Movement1D::load_syntax (dummy, alist);
-      alist.add ("type", "1D");
+      Movement::load_vertical (dummy, alist);
+      alist.add ("type", "vertical");
     }
   return alist;
 }
+
+Movement*
+Movement::build_vertical (Block& al)
+{ return new Movement1D (al); }
 
 static struct Movement1DSyntax
 {
@@ -93,8 +187,8 @@ static struct Movement1DSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "One dimensional movement.");
-    Movement1D::load_syntax (syntax, alist);
+    Movement::load_vertical (syntax, alist);
  
-    Librarian<Movement>::add_type ("1D", alist, syntax, &make);
+    Librarian<Movement>::add_type ("vertical", alist, syntax, &make);
   }
 } Movement1D_syntax;

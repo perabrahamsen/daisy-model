@@ -289,11 +289,11 @@ NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
-# 
-MODELS = organic_none.C \
+# movement_rect.C 
+MODELS = number_soil.C organic_none.C \
 	organic_std.C movement_1D.C integer_arit.C \
 	source_merge.C number_source.C program_file.C action_table.C \
-	xysource_merge.C xysource_inline.C number_soil.C xysource_loop.C \
+	xysource_merge.C xysource_inline.C xysource_loop.C \
 	xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
 	gnuplot_time.C source_combine.C number_arit.C source_expr.C \
 	source_std.C action_markvand.C photo_GL.C program_gnuplot.C \
@@ -846,8 +846,8 @@ soil_water1d${OBJ}: soil_water1d.C soil_water1d.h soil_water.h macro.h \
   geometry1d.h geometry.h mathlib.h surface.h groundwater.h submodeler.h \
   submodel.h
 geometry1d${OBJ}: geometry1d.C geometry1d.h geometry.h syntax.h treelog.h \
-  symbol.h mathlib.h assertion.h groundwater.h librarian.h library.h \
-  block.h plf.h alist.h check.h vcheck.h submodel.h
+  symbol.h mathlib.h assertion.h block.h plf.h alist.h check.h vcheck.h \
+  submodel.h
 soil_heat1d${OBJ}: soil_heat1d.C soil_heat1d.h soil_heat.h alist.h symbol.h \
   surface.h uzmodel.h librarian.h library.h block.h syntax.h treelog.h \
   plf.h assertion.h timestep.h weather.h im.h soil_water.h soil.h \
@@ -907,8 +907,8 @@ ridge${OBJ}: ridge.C ridge.h soil.h horizon.h librarian.h library.h symbol.h \
   timestep.h
 soil${OBJ}: soil.C soil.h horizon.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h geometry.h mathlib.h \
-  hydraulic.h tortuosity.h groundwater.h submodel.h submodeler.h log.h \
-  border.h check.h vcheck.h memutils.h
+  hydraulic.h tortuosity.h submodel.h submodeler.h log.h border.h check.h \
+  vcheck.h memutils.h
 surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h timestep.h \
   geometry1d.h geometry.h mathlib.h soil.h horizon.h soil_water.h log.h \
@@ -926,9 +926,9 @@ denitrification${OBJ}: denitrification.C denitrification.h plf.h alist.h \
   horizon.h librarian.h library.h block.h soil_water.h soil_heat.h \
   organic_matter.h domsorp.h clayom.h soil_NO3.h solute.h adsorption.h \
   timestep.h log.h border.h submodel.h check.h
-soil_heat${OBJ}: soil_heat.C soil_heat.h alist.h symbol.h soil.h horizon.h \
-  librarian.h library.h block.h syntax.h treelog.h plf.h assertion.h \
-  geometry.h mathlib.h log.h border.h
+soil_heat${OBJ}: soil_heat.C soil_heat.h alist.h symbol.h geometry.h syntax.h \
+  treelog.h mathlib.h assertion.h soil.h horizon.h librarian.h library.h \
+  block.h plf.h soil_water.h log.h border.h
 snow${OBJ}: snow.C snow.h alist.h symbol.h syntax.h treelog.h log.h border.h \
   librarian.h library.h block.h plf.h assertion.h geometry.h mathlib.h \
   soil.h horizon.h soil_water.h soil_heat.h submodel.h
@@ -1088,8 +1088,9 @@ organic_std${OBJ}: organic_std.C organic_matter.h librarian.h library.h \
   memutils.h
 movement_1D${OBJ}: movement_1D.C movement.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h geometry1d.h \
-  geometry.h mathlib.h soil_water1d.h soil_water.h macro.h soil_heat1d.h \
-  soil_heat.h soltrans1d.h transport.h mactrans.h log.h border.h \
+  geometry.h mathlib.h soil.h horizon.h soil_water1d.h soil_water.h \
+  macro.h soil_heat1d.h soil_heat.h soltrans1d.h transport.h mactrans.h \
+  surface.h uzmodel.h timestep.h groundwater.h log.h border.h \
   submodeler.h
 integer_arit${OBJ}: integer_arit.C integer.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h vcheck.h \
@@ -1111,9 +1112,6 @@ xysource_merge${OBJ}: xysource_merge.C xysource.h librarian.h library.h \
 xysource_inline${OBJ}: xysource_inline.C xysource.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   gnuplot_utils.h number.h vcheck.h
-number_soil${OBJ}: number_soil.C number.h librarian.h library.h symbol.h \
-  block.h syntax.h treelog.h plf.h alist.h assertion.h column.h horizon.h \
-  hydraulic.h weather.h im.h time.h units.h
 xysource_loop${OBJ}: xysource_loop.C xysource.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   gnuplot_utils.h scope.h number.h check.h vcheck.h
@@ -1353,13 +1351,12 @@ macro_none${OBJ}: macro_none.C macro.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h
 column_std${OBJ}: column_std.C column.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h surface.h \
-  uzmodel.h timestep.h soil_heat1d.h soil_heat.h soil_chemicals.h \
-  soil_chemical.h solute.h adsorption.h movement.h geometry1d.h \
-  geometry.h mathlib.h soil.h horizon.h soil_water1d.h soil_water.h \
-  macro.h vegetation.h bioclimate.h weather.h im.h groundwater.h \
-  soltrans1d.h transport.h mactrans.h chemistry.h chemicals.h soil_NH4.h \
-  soil_NO3.h organic_matter.h domsorp.h clayom.h denitrification.h am.h \
-  dom.h time.h log.h border.h submodeler.h memutils.h
+  uzmodel.h timestep.h soil_heat.h soil_chemicals.h soil_chemical.h \
+  solute.h adsorption.h movement.h geometry.h mathlib.h soil.h horizon.h \
+  soil_water.h vegetation.h bioclimate.h weather.h im.h chemistry.h \
+  chemicals.h soil_NH4.h soil_NO3.h organic_matter.h domsorp.h clayom.h \
+  denitrification.h am.h dom.h time.h log.h border.h submodeler.h \
+  memutils.h
 weather_simple${OBJ}: weather_simple.C weather_old.h weather.h librarian.h \
   library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   im.h time.h log.h border.h mathlib.h

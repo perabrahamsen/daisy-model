@@ -23,7 +23,6 @@
 #include "geometry.h"
 #include "hydraulic.h"
 #include "tortuosity.h"
-#include "groundwater.h"
 #include "alist.h"
 #include "syntax.h"
 #include "mathlib.h"
@@ -33,6 +32,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "plf.h"
+#include "treelog.h"
 #include "memutils.h"
 #include "mathlib.h"
 #include <sstream>
@@ -401,58 +401,59 @@ Soil::Soil (Block& al)
   : impl (*new Implementation (al))
 { }
 
+double
+Soil::initialize_aquitard (const double Z_aquitard, const double K_aquitard,
+                           Treelog& msg)
+{
+  const double old_end = impl.layers[impl.layers.size () - 1]->end;
+  const double Z_horizon
+    = (Z_aquitard > 5.0) ? floor (Z_aquitard / 3.0)	: (Z_aquitard / 3.0);
+  const double new_end = old_end - Z_horizon;
+
+  // Add layer.
+  Library& library = Librarian<Horizon>::library ();
+  static const symbol aquitard_symbol ("aquitard");
+  static const symbol default_symbol ("default");
+  if (!library.check (aquitard_symbol))
+    {
+      // Create aquitard horizon.
+      AttributeList& alist 
+        = *new AttributeList (library.lookup (default_symbol));
+      alist.add ("clay", 50.0);
+      alist.add ("silt", 20.0);
+      alist.add ("sand", 29.99);
+      alist.add ("humus", 0.01);
+      alist.add ("dry_bulk_density", 2.0);
+      library.add_derived (aquitard_symbol, alist, default_symbol);
+    }
+  daisy_assert (library.check (aquitard_symbol));
+  AttributeList horizon_alist (library.lookup (aquitard_symbol));
+  horizon_alist.add ("type", "aquitard");
+  AttributeList hydraulic_alist (horizon_alist.alist ("hydraulic"));
+  hydraulic_alist.add ("K_sat", K_aquitard);
+  horizon_alist.add ("hydraulic", hydraulic_alist);
+  daisy_assert (library.syntax (aquitard_symbol).check (horizon_alist,
+                                                        msg));
+  Syntax layer_syntax;
+  AttributeList layer_alist;
+  Implementation::Layer::load_syntax (layer_syntax, layer_alist);
+  layer_alist.add ("end", new_end);
+  layer_alist.add ("horizon", horizon_alist);
+  daisy_assert (layer_syntax.check (layer_alist, msg));
+  Block block (layer_syntax, layer_alist, msg, "aquitard layer");
+  impl.layers.push_back (new Implementation::Layer (block));
+
+  // Return the new value of Z_aquitard.
+  return Z_aquitard - Z_horizon;
+}
+
 void
 Soil::initialize (Geometry& geo,
-                  Groundwater& groundwater,
+                  const bool volatile_bottom,
                   const int som_size, Treelog& msg)
 {
   Treelog::Open nest (msg, "Soil");
 
-  // Extra aquitard layer.
-  if (groundwater.is_pipe ())
-    {
-      // Find parameters.
-      const double Z_aquitard = groundwater.Z_aquitard ();
-      const double K_aquitard = groundwater.K_aquitard ();
-      const double old_end = impl.layers[impl.layers.size () - 1]->end;
-      const double Z_horizon
-	= (Z_aquitard > 5.0) ? floor (Z_aquitard / 3.0)	: (Z_aquitard / 3.0);
-      const double new_end = old_end - Z_horizon;
-      groundwater.set_Z_aquitard (Z_aquitard - Z_horizon);
-
-      // Add layer.
-      Library& library = Librarian<Horizon>::library ();
-      static const symbol aquitard_symbol ("aquitard");
-      static const symbol default_symbol ("default");
-      if (!library.check (aquitard_symbol))
-	{
-	  // Create aquitard horizon.
-	  AttributeList& alist 
-	    = *new AttributeList (library.lookup (default_symbol));
-	  alist.add ("clay", 50.0);
-	  alist.add ("silt", 20.0);
-	  alist.add ("sand", 29.99);
-	  alist.add ("humus", 0.01);
-	  alist.add ("dry_bulk_density", 2.0);
-	  library.add_derived (aquitard_symbol, alist, default_symbol);
-	}
-      daisy_assert (library.check (aquitard_symbol));
-      AttributeList horizon_alist (library.lookup (aquitard_symbol));
-      horizon_alist.add ("type", "aquitard");
-      AttributeList hydraulic_alist (horizon_alist.alist ("hydraulic"));
-      hydraulic_alist.add ("K_sat", K_aquitard);
-      horizon_alist.add ("hydraulic", hydraulic_alist);
-      daisy_assert (library.syntax (aquitard_symbol).check (horizon_alist,
-							    msg));
-      Syntax layer_syntax;
-      AttributeList layer_alist;
-      Implementation::Layer::load_syntax (layer_syntax, layer_alist);
-      layer_alist.add ("end", new_end);
-      layer_alist.add ("horizon", horizon_alist);
-      daisy_assert (layer_syntax.check (layer_alist, msg));
-      Block block (layer_syntax, layer_alist, msg, "aquitard layer");
-      impl.layers.push_back (new Implementation::Layer (block));
-    }
 
   const std::vector<Implementation::Layer*>::const_iterator begin
     = impl.layers.begin ();
@@ -489,7 +490,7 @@ Soil::initialize (Geometry& geo,
     if (-last < impl.MaxRootingDepth)
       impl.MaxRootingDepth = -last;
   }
-  geo.initialize_zplus (groundwater, fixed, -impl.MaxRootingDepth, 
+  geo.initialize_zplus (volatile_bottom, fixed, -impl.MaxRootingDepth, 
                         2 * impl.dispersivity, msg);
 
   // Initialize horizons.
