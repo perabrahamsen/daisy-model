@@ -108,7 +108,7 @@ shoot.");
 	      "Fraction of shoot assimilate that goes to the stem.");
   syntax.add ("RSR", "DS", Syntax::None (), Check::positive (), Syntax::Const,
 	      "Maximal root/shoot ratio as a function of development state.\n\
-If the root/shoot ratio is above this, the roots will srtart dying.");
+If the root/shoot ratio is above this, the roots will start dying.");
   syntax.add ("nitrogen_stress_limit", Syntax::None (), Check::fraction (), 
               Syntax::Const,
 	      "If nitrogen stress is above this number and DS is above 1,\n\
