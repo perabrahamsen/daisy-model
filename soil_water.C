@@ -21,10 +21,41 @@
 
 
 #include "soil_water.h"
+#include "geometry.h"
+#include "log.h"
+
+double 
+SoilWater::content (const Geometry& geo, double from, double to) const
+{ return geo.total (Theta_, from, to); }
+
+void 
+SoilWater::output_base (Log& log) const
+{
+  output_variable (h_, log);
+  output_variable (Theta_, log);
+  output_variable (S_sum_, log);
+  output_variable (S_root_, log);
+  output_variable (S_drain_, log);
+  output_variable (X_ice_, log);
+}
 
 void
-SoilWater::load_base (Syntax&, AttributeList&)
-{ }
+SoilWater::load_base (Syntax& syntax, AttributeList&)
+{
+  Geometry::add_layer (syntax, Syntax::OptionalState, 
+                       "h", "cm", "Soil water pressure.");
+  Geometry::add_layer (syntax, Syntax::OptionalState,
+                       "Theta", Syntax::Fraction (),
+                       "Soil water content.");
+  syntax.add ("S_sum", "h^-1", Syntax::LogOnly, Syntax::Sequence,
+	      "Total water sink (due to root uptake and macropores).");
+  syntax.add ("S_root", "h^-1", Syntax::LogOnly, Syntax::Sequence,
+	      "Water sink due to root uptake.");
+  syntax.add ("S_drain", "h^-1", Syntax::LogOnly, Syntax::Sequence,
+	      "Water sink due to soil drainage.");
+  syntax.add_fraction ("X_ice", Syntax::OptionalState, Syntax::Sequence,
+		       "Ice volume fraction in soil.");
+}
 
 SoilWater::SoilWater (Block&)
 { }

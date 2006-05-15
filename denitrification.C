@@ -85,7 +85,7 @@ void Denitrification::tick (const std::vector<bool>& active,
       const double CO2_fast = organic_matter.CO2_fast (i);
       const double CO2_slow = organic_matter.CO2 (i) - CO2_fast;
       const double Theta = soil_water.Theta (i);
-      const double Theta_sat = soil_water.Theta (soil, i, 0.0);
+      const double Theta_sat = soil_water.Theta_ice (soil, i, 0.0);
       const double Theta_fraction = Theta / Theta_sat;
       const double NO3 = soil_NO3.M_left (i) / dt;
       const double T = soil_heat.T (i);

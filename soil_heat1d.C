@@ -34,29 +34,9 @@
 #include <sstream>
 #include "submodel.h"
 
-static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
-static const double rho_water = 1.0; // [g/cm^3]
-static const double rho_ice = 0.917; // [g/cm^3]
-
+#if 0
 struct SoilHeat1D::Implementation
 {
-  // Parameters
-  const double h_frozen;
-  const bool enable_ice;
-
-  // State
-  std::vector<double> T_old;
-  double T_top;
-  double T_top_old;
-  double T_bottom;
-  std::vector<double> T_freezing;
-  std::vector<double> T_thawing;
-  std::vector<double> freezing_rate;
-  std::vector<state_t> state;
-  std::vector<double> q;
-  std::vector<double> S;
-
-  /* const */ double delay;	// Period delay [ cm/rad ??? ]
 
   // Simulation.
   double capacity (const Soil&, const SoilWater&, size_t i) const;
@@ -65,27 +45,6 @@ struct SoilHeat1D::Implementation
              const Soil&, SoilWater1D&, 
              const Surface&, const Weather&, 
              std::vector<double>& T);
-  void update_freezing_points (const Soil& soil,
-                               const SoilWater1D& soil_water);
-  bool update_state (const Geometry1D& geo,
-                     const Soil& soil, const SoilWater1D& soil_water, 
-                     std::vector<double>& T);
-  double calculate_freezing_rate (const Geometry1D& geo,
-                                  const Soil& soil,
-                                  const SoilWater1D& soil_water,
-                                  unsigned int i, 
-                                  const std::vector<double>& T);
-  bool check_state (const Soil& soil, 
-                    const std::vector<double>& T) const;
-  void force_state (std::vector<double>& T);
-  void solve (const Time&, const Geometry1D& geo,
-              const Soil&, const SoilWater1D&, 
-              const Surface&, const Weather&, 
-              std::vector<double>& T);
-  void calculate_heat_flux (const Geometry& geo,
-                            const Soil&, const SoilWater1D&, 
-                            const std::vector<double>& T);
-  double bottom (const Time&, const Weather& weather) const;
 
   // Create & Destroy.
   void initialize (const Geometry1D& geo,
@@ -94,14 +53,18 @@ struct SoilHeat1D::Implementation
                    Treelog&);
   Implementation (const Block&);
 };
+#endif
 
+static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
+static const double rho_water = 1.0; // [g/cm^3]
+static const double rho_ice = 0.917; // [g/cm^3]
 static const double latent_heat_of_fussion = 3.35e9; // [erg/g]
 static const double gravity = 982.; // [cm/s^2]
 
 double 
-SoilHeat1D::Implementation::capacity (const Soil& soil, 
-                                      const SoilWater& soil_water,
-                                      const size_t i) const
+SoilHeat1D::capacity (const Soil& soil, 
+                      const SoilWater& soil_water,
+                      const size_t i) const
 { 
   const double Theta = soil_water.Theta (i);
   const double X_ice = soil_water.X_ice (i);
@@ -109,7 +72,7 @@ SoilHeat1D::Implementation::capacity (const Soil& soil,
 }
 
 double 
-SoilHeat1D::Implementation::capacity_apparent
+SoilHeat1D::capacity_apparent
 /**/ (const Soil& soil, const SoilWater1D& soil_water, const size_t i) const
 { 
   const double h = soil_water.h (i);
@@ -136,50 +99,8 @@ SoilHeat1D::Implementation::capacity_apparent
 }
 
 void
-SoilHeat1D::Implementation::tick (const Time& time,
-                                  const Geometry1D& geo,
-                                  const Soil& soil,
-                                  SoilWater1D& soil_water,
-                                  const Surface& surface,
-                                  const Weather& weather, 
-                                  std::vector<double>& T)
-{
-  // Update freezing and melting points.
-  update_freezing_points (soil, soil_water);
-
-  // Solve with old state.
-  T_old = T;
-  solve (time, geo, soil, soil_water, surface, weather, T);
-
-  // Check if ice is enabled.
-  if (!enable_ice)
-    return;
-
-  // Update state according to new temperatures.
-  const bool changed = update_state (geo, soil, soil_water, T);
-
-  if (changed)
-    {
-      // Solve again with new state.
-      T = T_old;
-      solve (time, geo, soil, soil_water, surface, weather, T);
-
-      // Check if state match new temperatures.
-      const bool changed_again = check_state (soil, T);
-      
-      if (changed_again)
-        {
-          // Force temperatures to match state.
-          force_state (T);
-        }
-    }
-  // Update ice in water.
-  soil_water.freeze (soil, freezing_rate);
-}
-  
-void
-SoilHeat1D::Implementation::update_freezing_points (const Soil& soil,
-                                                    const SoilWater1D& soil_water)
+SoilHeat1D::update_freezing_points (const Soil& soil,
+                                    const SoilWater1D& soil_water)
 {
   for (unsigned int i = 0; i < soil.size (); i++)
     {
@@ -213,10 +134,10 @@ SoilHeat1D::Implementation::update_freezing_points (const Soil& soil,
 } 
 
 bool
-SoilHeat1D::Implementation::update_state (const Geometry1D& geo,
-                                          const Soil& soil, 
-                                          const SoilWater1D& soil_water, 
-                                          std::vector<double>& T)
+SoilHeat1D::update_state (const Geometry1D& geo,
+                          const Soil& soil, 
+                          const SoilWater1D& soil_water, 
+                          std::vector<double>& T)
 {
   bool changed = false;
 
@@ -320,11 +241,11 @@ SoilHeat1D::Implementation::update_state (const Geometry1D& geo,
 }
 
 double
-SoilHeat1D::Implementation::calculate_freezing_rate (const Geometry1D& geo,
-                                                     const Soil& soil,
-                                                     const SoilWater1D& soil_water,
-                                                     unsigned int i, 
-                                                     const std::vector<double>& T)
+SoilHeat1D::calculate_freezing_rate (const Geometry1D& geo,
+                                     const Soil& soil,
+                                     const SoilWater1D& soil_water,
+                                     unsigned int i, 
+                                     const std::vector<double>& T)
 {
   const double T_mean = (T[i] + T_old[i]) / 2.0;
   const double dT = T[i] - T_old[i];
@@ -340,8 +261,8 @@ SoilHeat1D::Implementation::calculate_freezing_rate (const Geometry1D& geo,
 }
 
 bool
-SoilHeat1D::Implementation::check_state (const Soil& soil, 
-                                         const std::vector<double>& T) const
+SoilHeat1D::check_state (const Soil& soil, 
+                         const std::vector<double>& T) const
 {
   for (unsigned int i = 0; i < soil.size (); i++)
     {
@@ -369,7 +290,7 @@ SoilHeat1D::Implementation::check_state (const Soil& soil,
 }
 
 void
-SoilHeat1D::Implementation::force_state (std::vector<double>& T)
+SoilHeat1D::force_state (std::vector<double>& T)
 {
   for (unsigned int i = 0; T.size (); i++)
     {
@@ -394,13 +315,13 @@ SoilHeat1D::Implementation::force_state (std::vector<double>& T)
 }
 
 void
-SoilHeat1D::Implementation::solve (const Time& time,
-                                   const Geometry1D& geo,
-                                   const Soil& soil,
-                                   const SoilWater1D& soil_water,
-                                   const Surface& surface,
-                                   const Weather& weather, 
-                                   std::vector<double>& T)
+SoilHeat1D::solve (const Time& time,
+                   const Geometry1D& geo,
+                   const Soil& soil,
+                   const SoilWater1D& soil_water,
+                   const Surface& surface,
+                   const Weather& weather, 
+                   std::vector<double>& T)
 {
   // Border conditions.
   T_bottom = bottom (time, weather); // BUGLET: Should be time - 1 hour.
@@ -511,10 +432,10 @@ SoilHeat1D::Implementation::solve (const Time& time,
 }
 
 void
-SoilHeat1D::Implementation::calculate_heat_flux (const Geometry& geo,
-                                                 const Soil& soil,
-                                                 const SoilWater1D& soil_water,
-                                                 const std::vector<double>& T)
+SoilHeat1D::calculate_heat_flux (const Geometry& geo,
+                                 const Soil& soil,
+                                 const SoilWater1D& soil_water,
+                                 const std::vector<double>& T)
 {
   // Top and inner cells.
   double T_prev = (T_top + T_top_old) / 2.0;
@@ -550,79 +471,6 @@ SoilHeat1D::Implementation::calculate_heat_flux (const Geometry& geo,
 }
 
 double 
-SoilHeat1D::Implementation::bottom (const Time& time, 
-                                    const Weather& weather) const 
-{
-  return weather.T_normal (time, delay);
-}
-
-SoilHeat1D::Implementation::Implementation (const Block& al)
-  : h_frozen (al.number ("h_frozen")),
-    enable_ice (al.flag ("enable_ice")),
-    T_top (al.number ("T_top", -500.0))
-{ 
-  if (al.check ("S"))
-    S = al.number_sequence ("S");
-}
-
-void
-SoilHeat1D::Implementation::initialize (const Geometry1D& geo,
-                                        const Soil& soil, 
-                                        const Time& time, 
-                                        const Weather& weather, 
-                                        std::vector<double>& T,
-                                        Treelog&)
-{
-  // Freezing point.
-  T_freezing.insert (T_freezing.end (), soil.size (), 0.0);
-  T_thawing.insert (T_thawing.end (), soil.size (), 0.0);
-  state.insert (state.end (), soil.size (), liquid);
-  freezing_rate.insert (freezing_rate.end (), soil.size (), 0.0);
-  q.insert (q.end (), soil.size () + 1U, 0.0);
-  while (S.size () < soil.size ())
-    S.push_back (0.0);
-
-  // Fetch average temperatur.
-  const double rad_per_day = 2.0 * M_PI / 365.0;
-
-  // Calculate delay.
-  const double pF_2_0 = -100.0;
-  double k = 0;
-  double C = 0;
-  
-  for (unsigned int i = 0; i < soil.size (); i++)
-    {
-      const double Theta_pF_2_0 = soil.Theta (i, pF_2_0, 0.0);
-      k += geo.dz (i) * soil.heat_conductivity (i, Theta_pF_2_0, 0.0);
-      C += geo.dz (i) * soil.heat_capacity (i, Theta_pF_2_0, 0.0);
-      const double a = k / C;
-      delay = geo.zplus (i) / sqrt (24.0 * 2.0 * a / rad_per_day);
-
-      // Fill out T if necessary.
-      if (T.size () <= i)
-        T.push_back (bottom (time, weather));
-    }
-
-  // We check for this in SoilHeat1D::check ().
-  // daisy_assert (T.size () == soil.size ());
-}
-
-SoilHeat1D::state_t 
-SoilHeat1D::state (const size_t i) const
-{ return impl.state[i]; }
-
-double 
-SoilHeat1D::capacity (const Soil& soil, const SoilWater& soil_water, 
-                      const size_t i) const
-{ return impl.capacity (soil, soil_water, i); }
-
-double 
-SoilHeat1D::capacity_apparent (const Soil& soil,
-                               const SoilWater1D& soil_water,
-                               const size_t i) const
-{ return impl.capacity_apparent (soil, soil_water, i); }
-
-double 
 SoilHeat1D::top_flux (const Geometry& geo,
                       const Soil& soil, const SoilWater& soil_water) const
 {
@@ -652,39 +500,125 @@ SoilHeat1D::T_surface_snow (const Geometry& geo,
     / (K_soil / Z + K_snow / dZs);
 }
 
-void 
-SoilHeat1D::tick (const Time& time, 
+double 
+SoilHeat1D::bottom (const Time& time, 
+                    const Weather& weather) const 
+{
+  return weather.T_normal (time, delay);
+}
+
+void
+SoilHeat1D::tick (const Time& time,
                   const Geometry1D& geo,
                   const Soil& soil,
                   SoilWater1D& soil_water,
                   const Surface& surface,
                   const Weather& weather)
 {
-  impl.tick (time, geo, soil, soil_water, surface, weather, T_);
+  // Update freezing and melting points.
+  update_freezing_points (soil, soil_water);
+
+  // Solve with old state.
+  T_old = T_;
+  solve (time, geo, soil, soil_water, surface, weather, T_);
+
+  // Check if ice is enabled.
+  if (!enable_ice)
+    return;
+
+  // Update state according to new temperatures.
+  const bool changed = update_state (geo, soil, soil_water, T_);
+
+  if (changed)
+    {
+      // Solve again with new state.
+      T_ = T_old;
+      solve (time, geo, soil, soil_water, surface, weather, T_);
+
+      // Check if state match new temperatures.
+      const bool changed_again = check_state (soil, T_);
+      
+      if (changed_again)
+        {
+          // Force temperatures to match state.
+          force_state (T_);
+        }
+    }
+  // Update ice in water.
+  soil_water.freeze (soil, freezing_rate);
+}
+  
+SoilHeat1D::SoilHeat1D (const Block& al)
+  : SoilHeat (al),
+    h_frozen (al.number ("h_frozen")),
+    enable_ice (al.flag ("enable_ice")),
+    T_top (al.number ("T_top", -500.0))
+{ 
+  if (al.check ("S"))
+    S = al.number_sequence ("S");
 }
 
-double 
-SoilHeat1D::source (const size_t i) const
-{ return impl.S[i]; }
+SoilHeat1D::~SoilHeat1D ()
+{ }
 
 void
-SoilHeat1D::set_source (const size_t i, const double value)
-{ impl.S[i] = value; }
+SoilHeat1D::initialize (const AttributeList& al, 
+                        const Geometry1D& geo,
+                        const Soil& soil, 
+                        const Time& time, 
+                        const Weather& weather, 
+                        Treelog& msg)
+{
+  initialize_base (al, geo, msg);
+
+  // Freezing point.
+  T_freezing.insert (T_freezing.end (), soil.size (), 0.0);
+  T_thawing.insert (T_thawing.end (), soil.size (), 0.0);
+  state.insert (state.end (), soil.size (), liquid);
+  freezing_rate.insert (freezing_rate.end (), soil.size (), 0.0);
+  q.insert (q.end (), soil.size () + 1U, 0.0);
+  while (S.size () < soil.size ())
+    S.push_back (0.0);
+
+  // Fetch average temperatur.
+  const double rad_per_day = 2.0 * M_PI / 365.0;
+
+  // Calculate delay.
+  const double pF_2_0 = -100.0;
+  double k = 0;
+  double C = 0;
+  
+  for (unsigned int i = 0; i < soil.size (); i++)
+    {
+      const double Theta_pF_2_0 = soil.Theta (i, pF_2_0, 0.0);
+      k += geo.dz (i) * soil.heat_conductivity (i, Theta_pF_2_0, 0.0);
+      C += geo.dz (i) * soil.heat_capacity (i, Theta_pF_2_0, 0.0);
+      const double a = k / C;
+      delay = geo.zplus (i) / sqrt (24.0 * 2.0 * a / rad_per_day);
+
+      // Fill out T if necessary.
+      if (T_.size () <= i)
+        T_.push_back (bottom (time, weather));
+    }
+
+  // We check for this in SoilHeat1D::check ().
+  // daisy_assert (T.size () == soil.size ());
+}
 
 void
 SoilHeat1D::output (Log& log) const
 {
   SoilHeat::output_base (log);
-  output_value (impl.T_top, "T_top", log);
-  output_value (impl.T_freezing, "T_freezing", log);
-  output_value (impl.T_thawing, "T_thawing", log);
-  output_value (impl.q, "q", log);
+  output_value (T_top, "T_top", log);
+  output_value (T_freezing, "T_freezing", log);
+  output_value (T_thawing, "T_thawing", log);
+  output_value (q, "q", log);
   static const symbol state_symbol ("state");
   if (log.check_leaf (state_symbol))
     {
-      std::vector<double> tmp (impl.state.size (), -1.0);
-      for (unsigned int i = 0; i < impl.state.size (); i++)
-        tmp[i] = static_cast<double> (impl.state[i]);
+      std::vector<double> tmp (state.size (), -1.0);
+      for (unsigned int i = 0; i < state.size (); i++)
+        tmp[i] = static_cast<double> (state[i]);
       output_value (tmp, "state", log);
     }
 }
@@ -713,27 +647,6 @@ SoilHeat1D::load_syntax (Syntax& syntax, AttributeList& alist)
               "Current freezing/melting state.");
   syntax.add ("S", "erg/cm^3/h", Syntax::OptionalState, 
               "External heat source, by default zero.");
-}
-
-SoilHeat1D::SoilHeat1D (const Block& al)
-  : SoilHeat (al),
-    impl (*new Implementation (al))
-{ }
-
-
-void
-SoilHeat1D::initialize (const AttributeList& al, 
-                        const Geometry1D& geo,
-                        const Soil& soil, const Time& time, 
-                        const Weather& weather, Treelog& out)
-{ 
-  SoilHeat::initialize_base (al, geo, out);
-  impl.initialize (geo, soil, time, weather, T_, out); 
-}
-
-SoilHeat1D::~SoilHeat1D ()
-{
-  delete &impl;
 }
 
 static Submodel::Register 

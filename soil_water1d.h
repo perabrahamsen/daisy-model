@@ -24,6 +24,7 @@
 #define SOIL_WATER1D_H
 
 #include "soil_water.h"
+#include "soil.h"
 #include "macro.h"		// Must be initialized.
 
 class Geometry1D;
@@ -32,19 +33,12 @@ class UZmodel;
 class SoilWater1D : public SoilWater
 {
   // Content.
-  std::vector<double> S_sum_;
-  std::vector<double> S_root_;
-  std::vector<double> S_drain_;
   std::vector<double> S_p_;
   std::vector<double> S_permanent_;
   std::vector<double> S_incorp_;
   std::vector<double> tillage_;
-  std::vector<double> Theta_old_;
   std::vector<double> h_old_;
-  std::vector<double> Theta_;
-  std::vector<double> h_;
   std::vector<double> S_ice_;
-  std::vector<double> X_ice_;
   std::vector<double> X_ice_buffer_;
   std::vector<double> h_ice_;
   std::vector<double> q_;
@@ -62,44 +56,39 @@ public:
   
   // Queries
 public:
-  double h (size_t i) const;
   double pF (size_t i) const;
-  double Theta (size_t i) const;
-  double Theta_left (size_t i) const;
-  double Theta_old (size_t i) const;
-  double content (const Geometry&, double from, double to) const; // [cm]
-  double q (size_t i) const;
-  double q_p (size_t i) const;
-  double S_sum (size_t i) const;
-  double S_root (size_t i) const;
-  double S_drain (size_t i) const;
-  double S_ice (size_t i) const;
-  double S_p (size_t i) const;
-  double h_ice (size_t i) const;
-  double X_ice (size_t i) const;
-  double X_ice_total (size_t i) const;
+  double q (size_t i) const
+  { return q_[i]; }
+  double q_p (size_t i) const
+  { return q_p_[i]; }
+  double S_sum (size_t i) const
+  { return S_sum_[i]; }
+  double S_ice (size_t i) const
+  { return S_ice_[i]; }
+  double S_p (size_t i) const
+  { return S_p_[i]; }
+  double h_ice (size_t i) const
+  { return h_ice_[i]; }
+  double X_ice_total (size_t i) const
+  { return X_ice_[i] + X_ice_buffer_[i]; }
 
-  size_t first_groundwater_cell () const;
   double top_flux () const
   { return q (0); }
     
   // Ice modified lookups.
-  double Theta (const Soil&, size_t i, double h) const;
+  double Theta_ice (const Soil& soil, size_t i, double h) const
+  { return soil.Theta (i, h, h_ice (i)); }
  
   // Simulation.
 public:
   void macro_tick (const Geometry1D&, const Soil&, Surface&, Treelog&);
   void tick (const Geometry1D& geo,
              const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
-  void set_external_source (const Geometry&, 
-			    double amount, double from, double to);
   void incorporate (const Geometry&, double amount, double from, double to);
   void mix (const Geometry& geo,
             const Soil&, double from, double to);
   void swap (Treelog&, const Geometry& geo,
              const Soil&, double from, double middle, double to);
-  void set_Theta (const Soil& soil, 
-		  size_t from, size_t to, double Theta);
   bool check (size_t n, Treelog& err) const;
   void output (Log&) const;
 
@@ -107,10 +96,6 @@ public:
   // Communication with surface.
   double MaxExfiltration (const Geometry& geo,
                           const Soil&, double T) const;
-
-  // Communication with external model.
-  void put_h (const Soil& soil, const std::vector<double>& v); // [cm]
-  void get_sink (std::vector<double>& v) const; // [cm^3/cm^3/h]
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);

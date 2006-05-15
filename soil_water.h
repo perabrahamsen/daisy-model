@@ -37,6 +37,16 @@ class Block;
 
 class SoilWater
 {
+  // Content.
+protected:
+  std::vector<double> h_;
+  std::vector<double> Theta_;
+  std::vector<double> Theta_old_;
+  std::vector<double> S_sum_;
+  std::vector<double> S_root_;
+  std::vector<double> S_drain_;
+  std::vector<double> X_ice_;
+  
   // Sink.
 public:
   virtual void clear (const Geometry&) = 0;
@@ -44,22 +54,31 @@ public:
   
   // Queries
 public:
-  virtual double h (size_t i) const = 0;
-  virtual double Theta (size_t i) const = 0;
-  virtual double Theta_left (size_t i) const = 0;
-  virtual double Theta_old (size_t i) const = 0;
-  virtual double content (const Geometry&,
-                          double from, double to) const = 0; // [cm]
-  virtual double S_root (size_t i) const = 0;
-  virtual double S_drain (size_t i) const = 0;
-  virtual double X_ice (size_t i) const = 0;
+  double h (size_t i) const
+  { return h_[i]; }
+  double Theta (size_t i) const
+  { return Theta_[i]; }
+  double Theta_left (size_t i) const
+  { return Theta_[i] - S_sum_[i]; }
+  double Theta_old (size_t i) const
+  { return Theta_old_[i]; }
+  double content (const Geometry&,
+                  double from, double to) const; // [cm]
+  double S_root (size_t i) const
+  { return S_root_[i]; }
+  double S_drain (size_t i) const
+  { return S_drain_[i]; }
+  double X_ice (size_t i) const
+  { return X_ice_[i]; }
 
   virtual double top_flux () const = 0;
 
   // Ice modified lookups.
-  virtual double Theta (const Soil&, size_t i, double h) const = 0;
+  virtual double Theta_ice (const Soil&, size_t i, double h) const = 0;
  
   // Simulation.
+protected:
+  void output_base (Log& log) const;
 public:
   virtual void incorporate (const Geometry&, 
                             double amount, double from, double to) = 0;

@@ -422,8 +422,8 @@ Surface::Implementation::albedo (const Geometry& geo, const Soil& soil,
       {
         const double v = geo.volume (i);
         volume += v;
-        Theta_pf_3 += soil_water.Theta (soil, i, pF2h (3.0)) * v;
-        Theta_pf_1_7 += soil_water.Theta (soil, i, pF2h (1.7)) * v;
+        Theta_pf_3 += soil_water.Theta_ice (soil, i, pF2h (3.0)) * v;
+        Theta_pf_1_7 += soil_water.Theta_ice (soil, i, pF2h (1.7)) * v;
         Theta += soil_water.Theta (i) * v;
       }
   daisy_assert (volume > 0.0);

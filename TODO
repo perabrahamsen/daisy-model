@@ -1,17 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* cd'er til Fie
-
-* oprydning
-
-** Fjern overflødige accessors fra SoilWater1D
-
-** inline simple accessors i SoilWater1D
-
-** Flyt noget content + accessors til SoilWater
-
-** Lav samme nummer med SoilHeat
-
 * Send WP6 description to Luisa and Joao.
 
 * reintroduce number_soil.C
@@ -23,14 +11,6 @@ cell, edge, vertex
 * Doc
 
 ** program structure, input, output
-
-* Movement
-
-1. Lad soltrans, soil_water, soil_heat, 
-
-2. Ret fejl
-
-3. Ret logs.
 
 * Movement rectangle
 

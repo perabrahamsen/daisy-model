@@ -247,7 +247,7 @@ ColumnStandard::NitLog::load_syntax (Syntax& syntax, AttributeList&)
 const Horizon& 
 ColumnStandard::horizon_at (const double z, 
                             const double x, const double y) const
-{ return soil->horizon (geometry->cell_at (z, x, y)); }
+{ return soil->horizon (geometry.cell_at (z, x, y)); }
 
 void 
 ColumnStandard::sow (Treelog& msg, const AttributeList& al)
@@ -307,7 +307,7 @@ void
 ColumnStandard::irrigate_subsoil (double flux, const IM& sm, 
                                   double from, double to)
 {
-  soil_water->incorporate (geometry, flux / 10.0 /* mm -> cm */, from, to);
+  soil_water.incorporate (geometry, flux / 10.0 /* mm -> cm */, from, to);
   bioclimate->irrigate_subsoil (flux);
   const IM im (sm, flux * irrigate_solute_factor);
   soil_NH4.incorporate (geometry, im.NH4, from, to);
@@ -433,9 +433,9 @@ ColumnStandard::mix (Treelog& msg, const Time& time,
                         residuals_DM, residuals_N_top, residuals_C_top, 
                         residuals_N_soil, residuals_C_soil, msg);
   add_residuals (residuals);
-  const double energy = soil_heat->energy (geometry, *soil, soil_water, from, to);
-  soil_water->mix (geometry, *soil, from, to);
-  soil_heat->set_energy (geometry, *soil, soil_water, from, to, energy);
+  const double energy = soil_heat.energy (geometry, *soil, soil_water, from, to);
+  soil_water.mix (geometry, *soil, from, to);
+  soil_heat.set_energy (geometry, *soil, soil_water, from, to, energy);
   soil_chemicals.mix (geometry, *soil, soil_water, from, to);
   surface.unridge ();
   soil_NO3.mix (geometry, *soil, soil_water, from, to);
@@ -449,8 +449,8 @@ ColumnStandard::swap (Treelog& msg,
 {
   mix (msg, time, from, middle, 1.0);
   mix (msg, time, middle, to, 0.0);
-  soil_water->swap (msg, geometry, *soil, from, middle, to);
-  soil_heat->swap (geometry, from, middle, to);
+  soil_water.swap (msg, geometry, *soil, from, middle, to);
+  soil_heat.swap (geometry, from, middle, to);
   soil_chemicals.swap (geometry, *soil, soil_water, from, middle, to);
   soil_NO3.swap (geometry, *soil, soil_water, from, middle, to);
   soil_NH4.swap (geometry, *soil, soil_water, from, middle, to);
@@ -460,25 +460,25 @@ ColumnStandard::swap (Treelog& msg,
 void 
 ColumnStandard::set_porosity (double at, double Theta)
 { 
-  const size_t cell_size = geometry->cell_size ();
+  const size_t cell_size = geometry.cell_size ();
   for (size_t i = 0; i < cell_size; i++)
-    if (geometry->contain_z (i, at))
+    if (geometry.contain_z (i, at))
       soil->set_porosity (i, Theta); 
 }
 
 void 
 ColumnStandard::set_heat_source (double at, double value) // [W/m^2]
 {
- const size_t cell_size = geometry->cell_size ();
+ const size_t cell_size = geometry.cell_size ();
  for (size_t i = 0; i < cell_size; i++)
-   if (geometry->contain_z (i, at))
+   if (geometry.contain_z (i, at))
      {
-       const double V = geometry->volume (i);
+       const double V = geometry.volume (i);
        value *= 10^3;		// [W/m^2] -> [erg/cm^2/s]
        value *= 3600;		// [erg/cm^2/s] -> [erg/cm^2/h]
        value /= V;              // [erg/cm^2/h] -> [erg/cm^3/h]
 
-       soil_heat->set_source (i, value);
+       soil_heat.set_source (i, value);
      }
 }
 
@@ -504,12 +504,12 @@ ColumnStandard::daily_global_radiation () const
 
 double 
 ColumnStandard::soil_temperature (double height) const
-{ return geometry->content_at (static_cast<const SoilHeat&> (soil_heat),
+{ return geometry.content_at (static_cast<const SoilHeat&> (soil_heat),
                                &SoilHeat::T, height); }
 
 double 
 ColumnStandard::soil_water_potential (double height) const
-{ return geometry->content_at (static_cast<const SoilWater&> (soil_water), 
+{ return geometry.content_at (static_cast<const SoilWater&> (soil_water), 
                                &SoilWater::h, height); }
 
 double 
@@ -517,8 +517,8 @@ ColumnStandard::soil_water_content (double from, double to) const
 {
   daisy_assert (to <= from);
   daisy_assert (to <= 0.0);
-  daisy_assert (to > geometry->z (soil->size () - 1));
-  return soil_water->content (geometry, from, to);
+  daisy_assert (to > geometry.z (soil->size () - 1));
+  return soil_water.content (geometry, from, to);
 }
 
 double				// [kg N/ha]
@@ -547,12 +547,12 @@ ColumnStandard::crop_names () const
 
 double
 ColumnStandard::bottom () const
-{ return geometry->bottom (); }
+{ return geometry.bottom (); }
 
 void
 ColumnStandard::clear ()
 { 
-  soil_water->clear (geometry);
+  soil_water.clear (geometry);
   soil_chemicals.clear ();
 
   harvest_DM = 0.0;
@@ -600,11 +600,11 @@ ColumnStandard::tick (Treelog& msg,
   // Early calculation.
   IM soil_top_conc;
   soil_top_conc.NO3 
-    = geometry->content_at (static_cast<const Solute&> (soil_NO3),
+    = geometry.content_at (static_cast<const Solute&> (soil_NO3),
                             &Solute::C, 0.0)
     / 10.0; // [g/cm^3] -> [g/cm^2/mm]
   soil_top_conc.NH4 
-    = geometry->content_at (static_cast<const Solute&> (soil_NH4),
+    = geometry.content_at (static_cast<const Solute&> (soil_NH4),
                             &Solute::C, 0.0) 
     / 10.0; // [g/cm^3] -> [g/cm^2/mm]
   surface.mixture (soil_top_conc);
@@ -675,7 +675,7 @@ ColumnStandard::check (bool require_weather,
   const int n = soil->size ();
   {
     Treelog::Open nest (err, "Soil");
-    if (!geometry->check (err))
+    if (!geometry.check (err))
       ok = false;
   }
   {
@@ -746,7 +746,7 @@ bool
 ColumnStandard::check_border (const double border, Treelog& err) const
 { 
   bool ok = true;
-  if (!geometry->check_border (border, err))
+  if (!geometry.check_border (border, err))
     ok = false; 
   if (!soil->check_border (border, err))
     ok = false; 
@@ -797,10 +797,10 @@ ColumnStandard::output (Log& log) const
   const double cm2_per_m2 = 1.0 / m2_per_cm2;
   static const symbol N_symbol ("residuals_N_root");
   if (log.check_leaf (N_symbol))
-    log.output (N_symbol, geometry->total (residuals_N_soil) * cm2_per_m2);
+    log.output (N_symbol, geometry.total (residuals_N_soil) * cm2_per_m2);
   static const symbol C_symbol ("residuals_C_root");
   if (log.check_leaf (C_symbol))
-    log.output (C_symbol, geometry->total (residuals_C_soil) * cm2_per_m2);
+    log.output (C_symbol, geometry.total (residuals_C_soil) * cm2_per_m2);
   static const symbol surface_water_symbol ("surface_water");
   if (log.check_leaf (surface_water_symbol))
     log.output (surface_water_symbol, (bioclimate->get_intercepted_water ()
@@ -835,10 +835,10 @@ ColumnStandard::ColumnStandard (Block& al)
     vegetation (Librarian<Vegetation>::build_item (al, "Vegetation")),
     bioclimate (Librarian<Bioclimate>::build_item (al, "Bioclimate")),
     surface (al.alist ("Surface")),
-    geometry (&movement->geometry ()),
+    geometry (movement->geometry ()),
     soil (submodel<Soil> (al, "Soil")),
-    soil_water (&movement->soil_water ()),
-    soil_heat (&movement->soil_heat ()),
+    soil_water (movement->soil_water ()),
+    soil_heat (movement->soil_heat ()),
     soil_chemicals (al.alist ("SoilChemicals")),
     chemistry (Librarian<Chemistry>::build_vector (al, "Chemistry")),
     soil_NH4 (al.alist ("SoilNH4")),
