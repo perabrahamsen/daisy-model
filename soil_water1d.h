@@ -24,7 +24,6 @@
 #define SOIL_WATER1D_H
 
 #include "soil_water.h"
-#include "soil.h"
 #include "macro.h"		// Must be initialized.
 
 class Geometry1D;
@@ -35,8 +34,6 @@ class SoilWater1D : public SoilWater
   // Content.
   std::vector<double> S_p_;
   std::vector<double> S_permanent_;
-  std::vector<double> S_incorp_;
-  std::vector<double> tillage_;
   std::vector<double> h_old_;
   std::vector<double> S_ice_;
   std::vector<double> X_ice_buffer_;
@@ -50,7 +47,6 @@ class SoilWater1D : public SoilWater
   // Sink.
 public:
   void clear (const Geometry&);
-  void root_uptake (const std::vector<double>&);
   void drain (const std::vector<double>&);
   void freeze (const Soil&, const std::vector<double>&);
   
@@ -71,24 +67,15 @@ public:
   { return h_ice_[i]; }
   double X_ice_total (size_t i) const
   { return X_ice_[i] + X_ice_buffer_[i]; }
-
   double top_flux () const
   { return q (0); }
+  double Theta_ice (const Soil&, size_t i, double h) const;
     
-  // Ice modified lookups.
-  double Theta_ice (const Soil& soil, size_t i, double h) const
-  { return soil.Theta (i, h, h_ice (i)); }
- 
   // Simulation.
 public:
   void macro_tick (const Geometry1D&, const Soil&, Surface&, Treelog&);
   void tick (const Geometry1D& geo,
              const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
-  void incorporate (const Geometry&, double amount, double from, double to);
-  void mix (const Geometry& geo,
-            const Soil&, double from, double to);
-  void swap (Treelog&, const Geometry& geo,
-             const Soil&, double from, double middle, double to);
   bool check (size_t n, Treelog& err) const;
   void output (Log&) const;
 

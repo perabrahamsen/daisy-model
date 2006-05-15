@@ -45,12 +45,14 @@ protected:
   std::vector<double> S_sum_;
   std::vector<double> S_root_;
   std::vector<double> S_drain_;
+  std::vector<double> S_incorp_;
+  std::vector<double> tillage_;
   std::vector<double> X_ice_;
   
   // Sink.
 public:
   virtual void clear (const Geometry&) = 0;
-  virtual void root_uptake (const std::vector<double>&) = 0;
+  void root_uptake (const std::vector<double>&);
   
   // Queries
 public:
@@ -70,28 +72,27 @@ public:
   { return S_drain_[i]; }
   double X_ice (size_t i) const
   { return X_ice_[i]; }
-
   virtual double top_flux () const = 0;
-
-  // Ice modified lookups.
   virtual double Theta_ice (const Soil&, size_t i, double h) const = 0;
  
   // Simulation.
-protected:
-  void output_base (Log& log) const;
 public:
-  virtual void incorporate (const Geometry&, 
-                            double amount, double from, double to) = 0;
-  virtual void mix (const Geometry& geo,
-                    const Soil&, double from, double to) = 0;
-  virtual void swap (Treelog&, const Geometry& geo,
-                     const Soil&, double from, double middle, double to) = 0;
+  void incorporate (const Geometry&, double amount, double from, double to);
+  void mix (const Geometry& geo,
+            const Soil&, double from, double to);
+  void swap (Treelog&, const Geometry& geo,
+             const Soil&, double from, double middle, double to);
+protected:
+  bool check_base (size_t n, Treelog& err) const;
+  void output_base (Log& log) const;
 
   // Communication with surface.
+public:
   virtual double MaxExfiltration (const Geometry& geo,
                                   const Soil&, double T) const = 0;
   
   // Creation.
+protected:
   static void load_base (Syntax&, AttributeList&);
   SoilWater (Block&);
   virtual ~SoilWater ();

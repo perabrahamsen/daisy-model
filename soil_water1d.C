@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "uzmodel.h"
 #include "geometry1d.h"
+#include "soil.h"
 #include "surface.h"
 #include "groundwater.h"
 #include "submodeler.h"
@@ -48,19 +49,6 @@ SoilWater1D::clear (const Geometry&)
   fill (S_incorp_.begin (), S_incorp_.end (), 0.0);
   fill (tillage_.begin (), tillage_.end (), 0.0);
   // We don't clear S_p and S_drain, because they are needed in solute.
-}
-
-
-void
-SoilWater1D::root_uptake (const std::vector<double>& v)
-{
-  daisy_assert (S_sum_.size () == v.size ());
-  daisy_assert (S_root_.size () == v.size ());
-  for (unsigned i = 0; i < v.size (); i++)
-    {
-      S_sum_[i] += v[i];
-      S_root_[i] += v[i];
-    }
 }
 
 void
@@ -87,6 +75,19 @@ SoilWater1D::freeze (const Soil&, const std::vector<double>& v)
     }
 }
 
+double
+SoilWater1D::pF (size_t i) const
+{
+  if (h (i) < 0.0)
+    return log10 (-h (i));
+  else
+    return 0.0;
+}
+
+double
+SoilWater1D::Theta_ice (const Soil& soil, size_t i, double h) const
+{ return soil.Theta (i, h, h_ice (i)); }
+ 
 void
 SoilWater1D::macro_tick (const Geometry1D& geo, 
                          const Soil& soil, Surface& surface, 
@@ -239,81 +240,18 @@ SoilWater1D::tick (const Geometry1D& geo,
   daisy_assert (bottom_accepted);
 }
 
-void 
-SoilWater1D::incorporate (const Geometry& geo, const double amount,
-                          const double from, const double to)
-
-{
-  geo.add (S_incorp_, from, to, -amount);
-}
-
-void
-SoilWater1D::mix (const Geometry& geo,
-                  const Soil& soil, double from, double to)
-{
-  geo.mix (Theta_, from, to, tillage_);
-  for (size_t i = 0; i < soil.size(); i++)
-    h_[i] = soil.h (i, Theta_[i]);
-}
-
-void
-SoilWater1D::swap (Treelog& msg, const Geometry& geo,
-                   const Soil& soil,
-                   double from, double middle, double to)
-{
-  geo.swap (Theta_, from, middle, to, tillage_);
-
-  for (size_t i = 0; i < soil.size(); i++)
-    {
-      const double Theta_sat = soil.Theta (i, 0.0, 0.0);
-      if (Theta_[i] > Theta_sat)
-	{
-	  std::ostringstream tmp;
-	  tmp << "BUG: Theta[ " << i << "] (" << Theta_[i]
-              << ") > Theta_sat (" << Theta_sat << ")";
-	  msg.error (tmp.str ());
-	  Theta_[i] = Theta_sat;
-	}
-      h_[i] = soil.h (i, Theta_[i]);
-    }
-}
-
 bool 
-SoilWater1D::check (unsigned n, Treelog& err) const
+SoilWater1D::check (size_t n, Treelog& msg) const
 {
-  bool ok = true;
+  bool ok = check_base (n, msg);
 
-  if (Theta_.size () != n)
-    {
-      std::ostringstream tmp;
-      tmp << "You have " << n 
-          << " intervals but " << Theta_.size () << " Theta values";
-      err.entry (tmp.str ());
-      ok = false;
-    }
-  if (h_.size () != n)
-    {
-      std::ostringstream tmp;
-      tmp << "You have " << n 
-          << " intervals but " << h_.size () << " h values";
-      err.entry (tmp.str ());
-      ok = false;
-    }
-  if (X_ice_.size () != n)
-    {
-      std::ostringstream tmp;
-      tmp << "You have " << n 
-          << " intervals but " << X_ice_.size () << " X_ice values";
-      err.entry (tmp.str ());
-      ok = false;
-    }
   if (X_ice_buffer_.size () != n)
     {
       std::ostringstream tmp;
       tmp << "You have " << n 
           << " intervals but " << X_ice_buffer_.size () 
           << " X_ice_buffer values";
-      err.entry (tmp.str ());
+      msg.error (tmp.str ());
       ok = false;
     }
   return ok;
@@ -323,15 +261,13 @@ void
 SoilWater1D::output (Log& log) const
 {
   output_base (log);
-  output_variable (S_p_, log);
-  output_variable (S_permanent_, log);
-  output_variable (S_incorp_, log);
-  output_variable (tillage_, log);
-  output_variable (S_ice_, log);
-  output_variable (X_ice_buffer_, log);
-  output_variable (h_ice_, log);
-  output_variable (q_, log);
-  output_variable (q_p_, log);
+  output_value (S_p_, "S_p", log);
+  output_value (S_permanent_, "S_permanent", log);
+  output_value (S_ice_, "S_ice", log);
+  output_value (X_ice_buffer_, "X_ice_buffer", log);
+  output_value (h_ice_, "h_ice", log);
+  output_value (q_, "q", log);
+  output_value (q_p_, "q_p", log);
   output_derived (top, "UZtop", log);
 }
 
@@ -498,15 +434,6 @@ SoilWater1D::SoilWater1D (Block& al)
 SoilWater1D::~SoilWater1D ()
 { }
 
-double
-SoilWater1D::pF (size_t i) const
-{
-  if (h (i) < 0.0)
-    return log10 (-h (i));
-  else
-    return 0.0;
-}
-
 void
 SoilWater1D::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
@@ -534,10 +461,6 @@ SoilWater1D::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("UZreserve", lr);
   syntax.add ("S_p", "h^-1", Syntax::LogOnly, Syntax::Sequence,
 	      "Water sink (due to macropores).");
-  syntax.add ("S_incorp", "h^-1", Syntax::LogOnly, Syntax::Sequence,
-	      "Incorporated water sink, typically from subsoil irrigation.");
-  syntax.add ("tillage", "h^-1", Syntax::LogOnly, Syntax::Sequence,
-	      "Changes in water content due to tillage operations.");
   syntax.add ("S_permanent", "h^-1", Syntax::State, Syntax::Sequence,
 	      "Permanent water sink, e.g. subsoil irrigation.");
   std::vector<double> empty;

@@ -806,6 +806,8 @@ ColumnStandard::output (Log& log) const
     log.output (surface_water_symbol, (bioclimate->get_intercepted_water ()
                                        + bioclimate->get_snow_storage ()
                                        + surface.ponding ()));
+
+  output_derived (movement, "Movement", log);
 }
 
 Movement*

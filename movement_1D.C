@@ -72,8 +72,8 @@ struct Movement1D : public Movement
 
   void output (Log& log) const
   { 
-    output_submodule (*water, "SoilWater", log);
-    output_submodule (*heat, "SoilHeat", log);
+    output_submodule (*water, "Water", log);
+    output_submodule (*heat, "Heat", log);
     output_derived (groundwater, "Groundwater", log);
   }
 

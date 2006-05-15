@@ -916,8 +916,8 @@ surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h symbol.h \
   border.h im.h submodel.h chemicals.h soil_chemicals.h soil_chemical.h \
   solute.h adsorption.h ridge.h check.h
 soil_water${OBJ}: soil_water.C soil_water.h geometry.h syntax.h treelog.h \
-  symbol.h mathlib.h assertion.h log.h border.h librarian.h library.h \
-  block.h plf.h alist.h
+  symbol.h mathlib.h assertion.h soil.h horizon.h librarian.h library.h \
+  block.h plf.h alist.h log.h border.h
 soil_NH4${OBJ}: soil_NH4.C soil_NH4.h solute.h adsorption.h librarian.h \
   library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   timestep.h soil.h horizon.h soil_water.h submodel.h
@@ -1348,8 +1348,7 @@ action_activity${OBJ}: action_activity.C action.h librarian.h library.h \
   border.h memutils.h
 mactrans_std${OBJ}: mactrans_std.C mactrans.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h soil_water1d.h \
-  soil_water.h soil.h horizon.h macro.h geometry1d.h geometry.h mathlib.h \
-  timestep.h
+  soil_water.h macro.h geometry1d.h geometry.h mathlib.h timestep.h
 macro_std${OBJ}: macro_std.C macro.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h geometry1d.h geometry.h \
   mathlib.h soil.h horizon.h surface.h uzmodel.h timestep.h log.h \
