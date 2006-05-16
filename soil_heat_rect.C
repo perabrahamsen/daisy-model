@@ -60,6 +60,9 @@ SoilHeatRect::initialize (const AttributeList& al,
                           Treelog& msg)
 { 
   initialize_base (al, geo, msg);
+
+  while (T_.size () < geo.cell_size ())
+    T_.push_back (10.0);
 }
 
 SoilHeatRect::~SoilHeatRect ()

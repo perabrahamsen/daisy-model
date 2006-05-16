@@ -134,6 +134,7 @@ GeometryRect::GeometryRect (Block& al)
           // Horizontal edge.
           if (column > 0U)
             {
+              daisy_assert (next_cell >= cell_rows_);
               edge_from_.push_back (next_cell - cell_rows_);
               edge_to_.push_back (next_cell);
             }
@@ -145,7 +146,6 @@ GeometryRect::GeometryRect (Block& al)
       edge_from_.push_back (cell_below);
       edge_to_.push_back (last_cell);
     }
-  
 }
 
 GeometryRect::~GeometryRect ()

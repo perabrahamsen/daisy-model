@@ -1059,7 +1059,8 @@ Note that the nitrification parameters are found in the horizons.",
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Hansen et.al. 1990.\n\
-OBSOLETE: Use 'generic' instead.");
+OBSOLETE: Use 'generic' instead.\n\
+This column type cannot be used with checkpoints.");
     load_common (syntax, alist);
 
     syntax.add_submodule ("Soil", alist, Syntax::State,
