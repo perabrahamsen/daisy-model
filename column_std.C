@@ -552,7 +552,7 @@ ColumnStandard::bottom () const
 void
 ColumnStandard::clear ()
 { 
-  soil_water.clear (geometry);
+  soil_water.clear ();
   soil_chemicals.clear ();
 
   harvest_DM = 0.0;

@@ -53,7 +53,6 @@ private:
   enum state_t { liquid, freezing, frozen, thawing };
   std::vector<state_t> state;
   std::vector<double> q;
-  std::vector<double> S;
 
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
 
@@ -92,10 +91,6 @@ public:
   void tick (const Time&, const Geometry1D& geo,
              const Soil&, SoilWater1D&, 
 	     const Surface&, const Weather& weather);
-  double source (size_t i) const
-  { return S[i]; }
-  void set_source (const size_t i, const double value) // [erg/cm^3/h]
-  { S[i] = value; }
   void output (Log&) const;
   static void load_syntax (Syntax&, AttributeList&);
   SoilHeat1D (const Block&);

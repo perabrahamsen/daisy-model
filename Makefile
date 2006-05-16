@@ -289,8 +289,8 @@ NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
-# movement_rect.C 
-MODELS = number_soil.C organic_none.C \
+# 
+MODELS = movement_rect.C number_soil.C organic_none.C \
 	organic_std.C movement_1D.C integer_arit.C \
 	source_merge.C number_source.C program_file.C action_table.C \
 	xysource_merge.C xysource_inline.C xysource_loop.C \
@@ -354,7 +354,8 @@ COMPONENTS = organic_matter.C movement.C integer.C \
 
 # Submodels are combined models and components.
 # 
-SUBMODELS = geometry_rect.C element.C soltrans1d.C soil_water1d.C \
+SUBMODELS = soil_heat_rect.C soil_water_rect.C \
+	geometry_rect.C element.C soltrans1d.C soil_water1d.C \
         geometry1d.C soil_heat1d.C fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \

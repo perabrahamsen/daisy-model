@@ -60,6 +60,7 @@ public:
   { return dz_[n] * dx_[n] * 1.0 /* [cm] */; }
   inline double bottom () const // Bottom of deepest cell. [cm]
   { return zplus_[cell_rows_ - 1]; }
+  size_t cell_at (double z, double x, double y) const;
   double fraction_in_z_interval (size_t n, double from, double to) const;
   bool edge_cross_z (size_t e, double z) const; // Cross depth?
   bool contain_z (size_t n, double z) const;

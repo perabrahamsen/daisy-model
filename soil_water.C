@@ -27,6 +27,17 @@
 #include <sstream>
 
 void
+SoilWater::clear_base ()
+{
+  fill (S_sum_.begin (), S_sum_.end (), 0.0);
+  fill (S_drain_.begin (), S_drain_.end (), 0.0);
+  fill (S_root_.begin (), S_root_.end (), 0.0);
+  fill (S_incorp_.begin (), S_incorp_.end (), 0.0);
+  fill (tillage_.begin (), tillage_.end (), 0.0);
+  // We don't clear S_p and S_drain, because they are needed in solute.
+}
+
+void
 SoilWater::root_uptake (const std::vector<double>& v)
 {
   daisy_assert (S_sum_.size () == v.size ());
@@ -42,6 +53,18 @@ double
 SoilWater::content (const Geometry& geo, double from, double to) const
 { return geo.total (Theta_, from, to); }
 
+double 
+SoilWater::h_ice (size_t) const
+{ return 0.0; }
+
+double 
+SoilWater::X_ice (size_t) const
+{ return 0.0; }
+
+double
+SoilWater::Theta_ice (const Soil& soil, size_t i, double h) const
+{ return soil.Theta (i, h, h_ice (i)); }
+ 
 void 
 SoilWater::incorporate (const Geometry& geo, const double amount,
                         const double from, const double to)
@@ -89,7 +112,6 @@ SoilWater::output_base (Log& log) const
   output_value (S_drain_, "S_drain", log);
   output_value (S_incorp_, "S_incorp", log);
   output_value (tillage_, "tillage", log);
-  output_value (X_ice_, "X_ice", log);
 }
 
 bool 
@@ -110,14 +132,6 @@ SoilWater::check_base (size_t n, Treelog& msg) const
       std::ostringstream tmp;
       tmp << "You have " << n 
           << " intervals but " << h_.size () << " h values";
-      msg.error (tmp.str ());
-      ok = false;
-    }
-  if (X_ice_.size () != n)
-    {
-      std::ostringstream tmp;
-      tmp << "You have " << n 
-          << " intervals but " << X_ice_.size () << " X_ice values";
       msg.error (tmp.str ());
       ok = false;
     }
@@ -142,8 +156,53 @@ SoilWater::load_base (Syntax& syntax, AttributeList&)
 	      "Incorporated water sink, typically from subsoil irrigation.");
   syntax.add ("tillage", "h^-1", Syntax::LogOnly, Syntax::Sequence,
 	      "Changes in water content due to tillage operations.");
-  syntax.add_fraction ("X_ice", Syntax::OptionalState, Syntax::Sequence,
-		       "Ice volume fraction in soil.");
+}
+
+void
+SoilWater::initialize_base (const AttributeList& al, const Geometry& geo,
+                            const Soil& soil, Treelog& msg)
+{
+  Treelog::Open nest (msg, "SoilWater base");
+
+  const size_t size = geo.cell_size ();
+
+  geo.initialize_layer (Theta_, al, "Theta", msg);
+  geo.initialize_layer (h_, al, "h", msg);
+
+  for (size_t i = 0; i < Theta_.size () && i < h_.size (); i++)
+    {
+      const double Theta_h = soil.Theta (i, h_[i], h_ice (i));
+      if (!approximate (Theta_[i], Theta_h))
+	{
+	  std::ostringstream tmp;
+	  tmp << "Theta[" << i << "] (" << Theta_[i] << ") != Theta (" 
+              << h_[i] << ") (" << Theta_h << ")";
+	  msg.error (tmp.str ());
+	}
+      Theta_[i] = Theta_h;
+    }
+  if (Theta_.size () > 0)
+    {
+      while (Theta_.size () < size)
+	Theta_.push_back (Theta_[Theta_.size () - 1]);
+      if (h_.size () == 0)
+	for (size_t i = 0; i < size; i++)
+	  h_.push_back (soil.h (i, Theta_[i]));
+    }
+  if (h_.size () > 0)
+    {
+      while (h_.size () < size)
+	h_.push_back (h_[h_.size () - 1]);
+      if (Theta_.size () == 0)
+	for (size_t i = 0; i < size; i++)
+	  Theta_.push_back (soil.Theta (i, h_[i], h_ice (i)));
+    }
+  daisy_assert (h_.size () == Theta_.size ());
+
+  S_sum_.insert (S_sum_.begin (), size, 0.0);
+  S_root_.insert (S_root_.begin (), size, 0.0);
+  S_incorp_.insert (S_incorp_.begin (), size, 0.0);
+  tillage_.insert (tillage_.begin (), size, 0.0);
 }
 
 SoilWater::SoilWater (Block&)

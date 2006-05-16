@@ -553,10 +553,7 @@ SoilHeat1D::SoilHeat1D (const Block& al)
     h_frozen (al.number ("h_frozen")),
     enable_ice (al.flag ("enable_ice")),
     T_top (al.number ("T_top", -500.0))
-{ 
-  if (al.check ("S"))
-    S = al.number_sequence ("S");
-}
+{ }
 
 SoilHeat1D::~SoilHeat1D ()
 { }
@@ -577,8 +574,6 @@ SoilHeat1D::initialize (const AttributeList& al,
   state.insert (state.end (), soil.size (), liquid);
   freezing_rate.insert (freezing_rate.end (), soil.size (), 0.0);
   q.insert (q.end (), soil.size () + 1U, 0.0);
-  while (S.size () < soil.size ())
-    S.push_back (0.0);
 
   // Fetch average temperatur.
   const double rad_per_day = 2.0 * M_PI / 365.0;
@@ -645,8 +640,6 @@ SoilHeat1D::load_syntax (Syntax& syntax, AttributeList& alist)
               "Heat flux (positive upward).");
   syntax.add ("state", Syntax::Unknown (), Syntax::LogOnly, Syntax::Sequence,
               "Current freezing/melting state.");
-  syntax.add ("S", "erg/cm^3/h", Syntax::OptionalState, 
-              "External heat source, by default zero.");
 }
 
 static Submodel::Register 

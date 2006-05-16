@@ -4,6 +4,8 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * reintroduce number_soil.C
 
+* Sørg for at checkpoints virker med "default" column eller dokumenter ej virk
+
 * Terminologi
 
 cell, edge, vertex

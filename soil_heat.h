@@ -38,6 +38,7 @@ class SoilHeat
   // Simulation.
 protected:
   std::vector<double> T_;
+  std::vector<double> S;
 public:
   double T (size_t i) const // [dg C]
   { return T_[i]; }
@@ -56,7 +57,10 @@ public:
                    const Soil& soil, const SoilWater& soil_water, 
                    double from, double to, double energy);
   void swap (const Geometry& geo, double from, double middle, double to);
-  virtual void set_source (size_t i, double value) = 0; // [erg/cm^3/h]
+  double source (size_t i) const
+  { return S[i]; }
+  void set_source (const size_t i, const double value) // [erg/cm^3/h]
+  { S[i] = value; }
 
   // Create and destroy.
 public:

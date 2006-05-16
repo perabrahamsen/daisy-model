@@ -125,7 +125,7 @@ public:
 
   // Create and Destroy
 public:
-  void initialize (unsigned int size);
+  void initialize (size_t size);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   RootSystem (Block& al);
   ~RootSystem ();

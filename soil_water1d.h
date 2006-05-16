@@ -36,6 +36,7 @@ class SoilWater1D : public SoilWater
   std::vector<double> S_permanent_;
   std::vector<double> h_old_;
   std::vector<double> S_ice_;
+  std::vector<double> X_ice_;
   std::vector<double> X_ice_buffer_;
   std::vector<double> h_ice_;
   std::vector<double> q_;
@@ -46,7 +47,7 @@ class SoilWater1D : public SoilWater
 
   // Sink.
 public:
-  void clear (const Geometry&);
+  void clear ();
   void drain (const std::vector<double>&);
   void freeze (const Soil&, const std::vector<double>&);
   
@@ -65,11 +66,12 @@ public:
   { return S_p_[i]; }
   double h_ice (size_t i) const
   { return h_ice_[i]; }
+  double X_ice (size_t i) const
+  { return X_ice_[i]; }
   double X_ice_total (size_t i) const
   { return X_ice_[i] + X_ice_buffer_[i]; }
   double top_flux () const
   { return q (0); }
-  double Theta_ice (const Soil&, size_t i, double h) const;
     
   // Simulation.
 public:

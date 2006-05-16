@@ -122,10 +122,15 @@ SoilHeat::load_base (Syntax& syntax, AttributeList&)
 { 
   Geometry::add_layer (syntax, Syntax::OptionalState, "T", "dg C",
                        "Soil temperature.");
+  syntax.add ("S", "erg/cm^3/h", Syntax::OptionalState, 
+              "External heat source, by default zero.");
 }
 
-SoilHeat::SoilHeat (const Block&)
-{ }
+SoilHeat::SoilHeat (const Block& al)
+{
+  if (al.check ("S"))
+    S = al.number_sequence ("S");
+}
 
 void
 SoilHeat::initialize_base (const AttributeList& al, 
@@ -134,6 +139,8 @@ SoilHeat::initialize_base (const AttributeList& al,
 {
   // Fetch initial T.
   geo.initialize_layer (T_, al, "T", out);
+  while (S.size () < geo.cell_size ())
+    S.push_back (0.0);
 }
 
 SoilHeat::~SoilHeat ()

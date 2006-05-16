@@ -25,6 +25,23 @@
 #include "submodel.h"
 #include <sstream>
 
+size_t 
+GeometryRect::cell_at (const double z, const double x, const double) const
+{ 
+  size_t cell = 0;
+  while (zplus_[cell] > z)
+    {
+      cell++;
+      daisy_assert (cell < cell_size ());
+    }
+  while (xplus_[cell] < x)
+    { 
+      cell += cell_columns_;
+      daisy_assert (cell < cell_size ());
+    }      
+  return cell;
+}
+
 double 
 GeometryRect::fraction_in_z_interval (const size_t i, 
                                       const double from, const double to) const
@@ -65,14 +82,14 @@ void
 GeometryRect::load_syntax (Syntax& syntax, AttributeList&)
 { 
   syntax.add ("zplus", "cm", Check::negative (), 
-	      Syntax::OptionalConst, Syntax::Sequence,
+	      Syntax::Const, Syntax::Sequence,
 	      "Depth of each numeric layer (a negative number).\n\
 The end points are listed descending from the surface to the bottom.");
   static VCheck::All zplus_check (VCheck::decreasing (), 
 				  VCheck::min_size_1 ());
   syntax.add_check ("zplus", zplus_check);
   syntax.add ("xplus", "cm", Check::positive (), 
-	      Syntax::OptionalConst, Syntax::Sequence,
+	      Syntax::Const, Syntax::Sequence,
 	      "Horizontal end of each numeric layer (a positive number).\n\
 The end points are listed ascending from left (0.0) to right.");
   static VCheck::All xplus_check (VCheck::increasing (), 

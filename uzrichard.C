@@ -102,6 +102,7 @@ public:
   void has_macropores (bool); // Tell UZ that there is macropores.
   UZRichard (Block& par);
   ~UZRichard ();
+  static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
 
 bool
@@ -766,6 +767,50 @@ UZRichard::~UZRichard ()
   delete K_average;
 }
 
+void 
+UZRichard::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add ("max_time_step_reductions",
+              Syntax::Integer, Syntax::Const, "\
+Number of times we may reduce the time step before giving up");
+  alist.add ("max_time_step_reductions", 4);
+  syntax.add ("time_step_reduction", Syntax::Integer, Syntax::Const, 
+              "Divide the time step with this at each reduction.");
+  alist.add ("time_step_reduction", 4);
+  syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
+Maximum number of iterations when seeking convergence before reducing\n\
+the time step.");
+  alist.add ("max_iterations", 25);
+  syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
+Maximum absolute difference in 'h' values for convergence.");
+  alist.add ("max_absolute_difference", 0.02);
+  syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
+Maximum relative difference in 'h' values for convergence.");
+  alist.add ("max_relative_difference", 0.001);
+  syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly,
+              "Number of iterations used,");
+  syntax.add ("K_average", Librarian<Average>::library (),
+              Syntax::OptionalConst, Syntax::Singleton,
+              "Model for calculating average K between cells.\n\
+The default model is 'geometric' if there are macropores, and\n\
+'arithmetic' otherwise.");
+}
+
+const AttributeList& 
+UZmodel::default_model ()
+{
+  static AttributeList alist;
+  
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      UZRichard::load_syntax (dummy, alist);
+      alist.add ("type", "richards");
+
+    }
+  return alist;
+}
+
 // Add the UZRichard syntax to the syntax table.
 static struct UZRichardSyntax
 {
@@ -779,31 +824,7 @@ static struct UZRichardSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "A numerical solution to Richard's Equation.");
-      syntax.add ("max_time_step_reductions",
-		  Syntax::Integer, Syntax::Const, "\
-Number of times we may reduce the time step before giving up");
-      alist.add ("max_time_step_reductions", 4);
-      syntax.add ("time_step_reduction", Syntax::Integer, Syntax::Const, 
-		  "Divide the time step with this at each reduction.");
-      alist.add ("time_step_reduction", 4);
-      syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
-Maximum number of iterations when seeking convergence before reducing\n\
-the time step.");
-      alist.add ("max_iterations", 25);
-      syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
-Maximum absolute difference in 'h' values for convergence.");
-      alist.add ("max_absolute_difference", 0.02);
-      syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
-Maximum relative difference in 'h' values for convergence.");
-      alist.add ("max_relative_difference", 0.001);
-      syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly,
-		  "Number of iterations used,");
-      syntax.add ("K_average", Librarian<Average>::library (),
-		  Syntax::OptionalConst, Syntax::Singleton,
-		  "Model for calculating average K between cells.\n\
-The default model is 'geometric' if there are macropores, and\n\
-'arithmetic' otherwise.");
-
+      UZRichard::load_syntax (syntax, alist);
       Librarian<UZmodel>::add_type ("richards", alist, syntax, &make);
     }
 } UZRichard_syntax;

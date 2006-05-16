@@ -47,11 +47,12 @@ protected:
   std::vector<double> S_drain_;
   std::vector<double> S_incorp_;
   std::vector<double> tillage_;
-  std::vector<double> X_ice_;
   
   // Sink.
+protected:
+  void clear_base ();
 public:
-  virtual void clear (const Geometry&) = 0;
+  virtual void clear () = 0;
   void root_uptake (const std::vector<double>&);
   
   // Queries
@@ -70,10 +71,10 @@ public:
   { return S_root_[i]; }
   double S_drain (size_t i) const
   { return S_drain_[i]; }
-  double X_ice (size_t i) const
-  { return X_ice_[i]; }
+  virtual double h_ice (size_t i) const;
+  virtual double X_ice (size_t i) const;
   virtual double top_flux () const = 0;
-  virtual double Theta_ice (const Soil&, size_t i, double h) const = 0;
+  double Theta_ice (const Soil&, size_t i, double h) const;
  
   // Simulation.
 public:
@@ -94,6 +95,8 @@ public:
   // Creation.
 protected:
   static void load_base (Syntax&, AttributeList&);
+  void initialize_base (const AttributeList&, const Geometry&, const Soil&,
+                        Treelog&);
   SoilWater (Block&);
   virtual ~SoilWater ();
 };

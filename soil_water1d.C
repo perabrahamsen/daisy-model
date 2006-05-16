@@ -40,15 +40,10 @@ static const double rho_water = 1.0; // [g/cm^3]
 static const double rho_ice = 0.917; // [g/cm^3]
 
 void
-SoilWater1D::clear (const Geometry&)
+SoilWater1D::clear ()
 {
-  fill (S_sum_.begin (), S_sum_.end (), 0.0);
-  fill (S_drain_.begin (), S_drain_.end (), 0.0);
-  fill (S_root_.begin (), S_root_.end (), 0.0);
+  clear_base ();
   fill (S_ice_.begin (), S_ice_.end (), 0.0);
-  fill (S_incorp_.begin (), S_incorp_.end (), 0.0);
-  fill (tillage_.begin (), tillage_.end (), 0.0);
-  // We don't clear S_p and S_drain, because they are needed in solute.
 }
 
 void
@@ -84,14 +79,10 @@ SoilWater1D::pF (size_t i) const
     return 0.0;
 }
 
-double
-SoilWater1D::Theta_ice (const Soil& soil, size_t i, double h) const
-{ return soil.Theta (i, h, h_ice (i)); }
- 
 void
 SoilWater1D::macro_tick (const Geometry1D& geo, 
                          const Soil& soil, Surface& surface, 
-                         Treelog& out)
+                         Treelog& msg)
 {
   if (!macro.get ())			// No macropores.
     return;
@@ -100,7 +91,7 @@ SoilWater1D::macro_tick (const Geometry1D& geo,
   std::fill (S_p_.begin (), S_p_.end (), 0.0);
   std::fill (q_p_.begin (), q_p_.end (), 0.0);
   macro->tick (geo, soil, 0, soil.size () - 1, surface, h_ice_, h_, Theta_,
-	       S_sum_, S_p_, q_p_, out);
+	       S_sum_, S_p_, q_p_, msg);
 }
 
 void
@@ -245,6 +236,15 @@ SoilWater1D::check (size_t n, Treelog& msg) const
 {
   bool ok = check_base (n, msg);
 
+  // Check ice.
+  if (X_ice_.size () != n)
+    {
+      std::ostringstream tmp;
+      tmp << "You have " << n 
+          << " intervals but " << X_ice_.size () << " X_ice values";
+      msg.error (tmp.str ());
+      ok = false;
+    }
   if (X_ice_buffer_.size () != n)
     {
       std::ostringstream tmp;
@@ -264,6 +264,7 @@ SoilWater1D::output (Log& log) const
   output_value (S_p_, "S_p", log);
   output_value (S_permanent_, "S_permanent", log);
   output_value (S_ice_, "S_ice", log);
+  output_value (X_ice_, "X_ice", log);
   output_value (X_ice_buffer_, "X_ice_buffer", log);
   output_value (h_ice_, "h_ice", log);
   output_value (q_, "q", log);
@@ -284,12 +285,12 @@ SoilWater1D::initialize (const AttributeList& al,
                          const Geometry1D& geo,
                          const Soil& soil,
                          const Groundwater& groundwater, 
-                         Treelog& out)
+                         Treelog& msg)
 {
-  Treelog::Open nest (out, "SoilWater1D");
+  Treelog::Open nest (msg, "SoilWater1D");
+  const size_t size = geo.cell_size ();
 
-  const size_t size = soil.size ();
-
+  // Initialize ice.
   if (al.check ("X_ice"))
     {
       X_ice_ = al.number_sequence ("X_ice");
@@ -312,66 +313,36 @@ SoilWater1D::initialize (const AttributeList& al,
   else 
     X_ice_buffer_.insert (X_ice_buffer_.begin (), size, 0.0);
 
-  h_ice_.insert (h_ice_.begin (), size, 0.0);
-  for (size_t i = 0; i < soil.size (); i++)
+  for (size_t i = 0; i < size; i++)
     {
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
       daisy_assert (Theta_sat >= X_ice_[i]);
-      h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
+      h_ice_.push_back (soil.h (i, Theta_sat - X_ice_[i]));
     }
+  daisy_assert (h_ice_.size () == size);
 
-  geo.initialize_layer (Theta_, al, "Theta", out);
-  geo.initialize_layer (h_, al, "h", out);
+  // Initialize base (requires ice!).
+  initialize_base (al, geo, soil, msg);
 
-  for (size_t i = 0; i < Theta_.size () && i < h_.size (); i++)
-    {
-      const double Theta_h = soil.Theta (i, h_[i], h_ice_[i]);
-      if (!approximate (Theta_[i], Theta_h))
-	{
-	  std::ostringstream tmp;
-	  tmp << "Theta[" << i << "] (" << Theta_[i] << ") != Theta (" 
-              << h_[i] << ") (" << Theta_h << ")";
-	  out.error (tmp.str ());
-	}
-      Theta_[i] = Theta_h;
-    }
-  if (Theta_.size () > 0)
-    {
-      while (Theta_.size () < size)
-	Theta_.push_back (Theta_[Theta_.size () - 1]);
-      if (h_.size () == 0)
-	for (size_t i = 0; i < size; i++)
-	  h_.push_back (soil.h (i, Theta_[i]));
-    }
-  if (h_.size () > 0)
-    {
-      while (h_.size () < size)
-	h_.push_back (h_[h_.size () - 1]);
-      if (Theta_.size () == 0)
-	for (size_t i = 0; i < size; i++)
-	  Theta_.push_back (soil.Theta (i, h_[i], h_ice_[i]));
-    }
-
-  S_sum_.insert (S_sum_.begin (), size, 0.0);
-  S_root_.insert (S_root_.begin (), size, 0.0);
+  // Sources.
   S_drain_.insert (S_drain_.begin (), size, 0.0);
   S_p_.insert (S_p_.begin (), size, 0.0);
-  S_incorp_.insert (S_incorp_.begin (), size, 0.0);
-  tillage_.insert (tillage_.begin (), size, 0.0);
   if (S_permanent_.size () < size)
-    S_permanent_.insert (S_permanent_.end (), size - S_permanent_.size (), 0.0);
-
-  q_.insert (q_.begin (), size + 1, 0.0);
-  q_p_.insert (q_p_.begin (), size + 1, 0.0);
+    S_permanent_.insert (S_permanent_.end (), size - S_permanent_.size (), 
+                         0.0);
   S_ice_.insert (S_ice_.begin (), size, 0.0);
 
-  daisy_assert (h_.size () == Theta_.size ());
+  // Fluxes.
+  q_.insert (q_.begin (), size + 1, 0.0);
+  q_p_.insert (q_p_.begin (), size + 1, 0.0);
+
+  // Groundwater based pressure.
   if (h_.size () == 0)
     {
       if (groundwater.table () > 0.0)
 	{
 	  const double h_pF2 = -100.0; // pF 2.0;
-	  for (size_t i = 0; i < soil.size (); i++)
+	  for (size_t i = 0; i < size; i++)
 	    {
 	      h_.push_back (h_pF2);
 	      Theta_.push_back (soil.Theta (i, h_pF2, h_ice_[i]));
@@ -381,28 +352,29 @@ SoilWater1D::initialize (const AttributeList& al,
 	{
 	  const double table = groundwater.table ();
 	  
-	  for (size_t i = 0; i < soil.size (); i++)
+	  for (size_t i = 0; i < size; i++)
 	    {
 	      h_.push_back (std::max (-100.0, table - geo.z (i)));
 	      Theta_.push_back (soil.Theta (i, h_[i], h_ice_[i]));
 	    }
 	}
     }
-  daisy_assert (h_.size () == soil.size ());
+  daisy_assert (h_.size () == size);
 
   // We just assume no changes.
   Theta_old_ = Theta_;
   h_old_ = h_;
 
+  // Macropores.
   if (al.check ("macro"))
-    macro.reset (Librarian<Macro>::build_free (out, al.alist ("macro"), 
+    macro.reset (Librarian<Macro>::build_free (msg, al.alist ("macro"), 
                                                "macro"));
   else if (soil.humus (0) + soil.clay (0) > 0.05)
     // More than 5% clay (and humus) in first horizon.
     {
       // Find first non-clay layer.
       size_t lay = 1;
-      while (lay < soil.size () && soil.humus (lay) + soil.clay (lay) > 0.05)
+      while (lay < size && soil.humus (lay) + soil.clay (lay) > 0.05)
 	lay++;
 
       // Don't go below 1.5 m.
@@ -415,7 +387,7 @@ SoilWater1D::initialize (const AttributeList& al,
       // Add them.
       macro = Macro::create (height);
 
-      out.debug ("Adding macropores");
+      msg.debug ("Adding macropores");
     }
 
   // Let 'macro' choose the default method to average K values in 'uz'.
@@ -439,26 +411,14 @@ SoilWater1D::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   load_base (syntax, alist);
   alist.add ("submodel", "SoilWater1D");
-  alist.add ("description", "Water content of soil.");
+  alist.add ("description", "Water content of a vertical soil column.");
 
   syntax.add ("UZtop", Librarian<UZmodel>::library (),
 	      "Main water transport model in unsaturated zone.");
-  AttributeList richard;
-  richard.add ("type", "richards");
-  richard.add ("max_time_step_reductions", 4);
-  richard.add ("time_step_reduction", 4);
-  richard.add ("max_iterations", 25);
-  richard.add ("max_absolute_difference", 0.02);
-  richard.add ("max_relative_difference", 0.001);
-  alist.add ("UZtop", richard);
+  alist.add ("UZtop", UZmodel::default_model ());
   syntax.add ("UZreserve", Librarian<UZmodel>::library (),
 	      "Reserve transport model if UZtop fails.");
-  // Use lr as UZreserve by default.
-  AttributeList lr;
-  lr.add ("type", "lr");
-  lr.add ("h_fc", -100.0);
-  lr.add ("z_top", -10.0);
-  alist.add ("UZreserve", lr);
+  alist.add ("UZreserve", UZmodel::reserve_model ());
   syntax.add ("S_p", "h^-1", Syntax::LogOnly, Syntax::Sequence,
 	      "Water sink (due to macropores).");
   syntax.add ("S_permanent", "h^-1", Syntax::State, Syntax::Sequence,
@@ -467,6 +427,8 @@ SoilWater1D::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("S_permanent", empty);
   syntax.add ("S_ice", "h^-1", Syntax::LogOnly, Syntax::Sequence,
 	      "Ice sink (due to thawing or freezing).");
+  syntax.add_fraction ("X_ice", Syntax::OptionalState, Syntax::Sequence,
+		       "Ice volume fraction in soil.");
   syntax.add ("X_ice_buffer", Syntax::None (), 
 	      Syntax::OptionalState, Syntax::Sequence,
 	      "Ice volume that didn't fit the soil durin freezing.");
@@ -487,4 +449,4 @@ amount of humus and clay in the top horizon is above 5%.");
 }
 
 static Submodel::Register 
-soil_water_submodel ("SoilWater", SoilWater1D::load_syntax);
+soil_water_1d_submodel ("SoilWater1D", SoilWater1D::load_syntax);

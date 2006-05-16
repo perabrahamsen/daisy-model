@@ -60,6 +60,7 @@ public:
 public:
   UZlr (Block& par);
   ~UZlr ();
+  static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
 
 bool
@@ -359,32 +360,46 @@ UZlr::UZlr (Block& al)
 UZlr::~UZlr ()
 { }
 
-// Add the UZlr syntax to the syntax table.
+void 
+UZlr::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add ("h_fc", "cm", Syntax::Const, "Field capacity.");
+  alist.add ("h_fc", -100.0);
+  syntax.add ("z_top", "cm", Syntax::Const, 
+              "Depth of layer where upward water movement is possible.");
+  alist.add ("z_top", -10.0);
+}
+
+const AttributeList& 
+UZmodel::reserve_model ()
+{
+  static AttributeList alist;
+  
+  if (!alist.check ("lr"))
+    {
+      Syntax dummy;
+      UZlr::load_syntax (dummy, alist);
+      alist.add ("type", "lr");
+    }
+  return alist;
+}
+
 static struct UZlrSyntax
 {
   static UZmodel& make (Block& al)
-    {
-      return *new UZlr (al);
-    }
+  { return *new UZlr (al); }
 
   UZlrSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "\
 Use gravitational water movement for wet soil, where h > h_fc.\n\
 There are no water movement when h < h_fc, except at the layers down\n\
-to z_top, where there can be darcy movement.");
-
-      // Parameters.
-      syntax.add ("h_fc", "cm", Syntax::Const, "Field capacity.");
-      alist.add ("h_fc", -100.0);
-      syntax.add ("z_top", "cm", Syntax::Const, 
-		  "Depth of layer where upward water movement is possible.");
-      alist.add ("z_top", -10.0);
-
-      Librarian<UZmodel>::add_type ("lr", alist, syntax, &make);
-    }
+to z_top, where there can be Darcy movement.");
+    UZlr::load_syntax (syntax, alist);
+    Librarian<UZmodel>::add_type ("lr", alist, syntax, &make);
+  }
 } UZlr_syntax;
 
 

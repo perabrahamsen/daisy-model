@@ -1,3 +1,9 @@
+2006-05-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat_rect.C, soil_heat_rect.h: New submodel.
+	* soil_water_rect.C, soil_water_rect.h: New submodel.
+	* Makefile (SUBMODELS): Add them.
+
 2006-05-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* soil_water.h: Removed unnecessary pure virtuals.

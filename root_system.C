@@ -48,7 +48,7 @@ RootSystem::potential_water_uptake (const double h_x,
   daisy_assert (L.size () >= size);
   const double area = M_PI * Rad * Rad;
 
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t i = 0; i < size; i++)
     {
       if (L[i] <= 0.0 || soil_water.h (i) >= 0.0)
 	{
@@ -183,7 +183,7 @@ RootSystem::water_uptake (double Ept_,
       daisy_assert (h_x < 0.001);
       daisy_assert (total > 0);
       const double factor = Ept / total;
-      for (unsigned int i = 0; i < soil.size (); i++)
+      for (size_t i = 0; i < soil.size (); i++)
 	H2OExtraction[i] *= factor;
       total = Ept;
     }
@@ -385,7 +385,7 @@ RootSystem::output (Log& log) const
 }
 
 void
-RootSystem::initialize (unsigned int size)
+RootSystem::initialize (size_t size)
 {
   while (Density.size () < size)
     Density.push_back (0.0);
