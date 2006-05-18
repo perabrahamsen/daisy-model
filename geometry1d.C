@@ -404,8 +404,10 @@ Can't automatically make discretizations less than 1 [cm], needed at "
     }
 
   // Update z and dz from zplus.
-  size_ = zplus_.size ();
   initialize_intervals (zplus_, z_, dz_);
+
+  // Initialize base!
+  size_ = zplus_.size ();
 }
 
 Geometry1D::~Geometry1D ()

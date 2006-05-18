@@ -22,6 +22,7 @@
 #include "soil_water_rect.h"
 #include "geometry_rect.h"
 #include "soil.h"
+#include "timestep.h"
 #include "submodel.h"
 
 void
@@ -32,6 +33,27 @@ double
 SoilWaterRect::top_flux () const
 { return 0.0; }
  
+void
+SoilWaterRect::tick (const Soil& soil)
+{
+  const size_t cell_size = soil.size ();
+
+  // Remember old value.
+  Theta_old_ = Theta_;
+  h_old_ = h_;
+
+  // Incorporated water.
+  for (size_t i = 0; i < cell_size; i++)
+    S_sum_[i] += S_incorp_[i];
+
+  // Update water.
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      Theta_[i] -= S_sum_[i] * dt;
+      h_[i] = soil.h (i, Theta_[i]);
+    }
+}
+
 bool 
 SoilWaterRect::check (size_t n, Treelog& msg) const
 {

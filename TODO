@@ -2,10 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Send WP6 description to Luisa and Joao.
 
-* reintroduce number_soil.C
-
-* Sørg for at checkpoints virker med "default" column eller dokumenter ej virk
-
 * Terminologi
 
 cell, edge, vertex
@@ -16,16 +12,7 @@ cell, edge, vertex
 
 * Movement rectangle
 
-SoilWaterRect
-  UZRect
-  MacroRect
-SoltransRect
-SoilHeatRect
-
-Disse skal (først) bare bruge 1D modellerne til vertikal transport,
-senere måske også horizontal transport afkoblet.
-
-* Add "Geometry" to "ColumnBase" (for sake of the reference manual).
+** uz vertical
 
 * Daisy 2D
 
@@ -51,6 +38,12 @@ De skal bruges på Daisy hjemmesiden, og er en del af "dissemination"
 ** Ny plone baseret web side!
 
 * Programmering
+
+** reintroduce number_soil.C
+
+** Sørg for at checkpoints virker med "default" column
+
+Alternativt, giv en forståelig fejl hvis man prøver.
 
 ** Plante
 

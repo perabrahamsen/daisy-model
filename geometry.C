@@ -465,6 +465,7 @@ Geometry::initialize_intervals (const std::vector<double>& end,
     }
 }
 Geometry::Geometry (Block&)
+  : size_ (0)
 { }
 
 Geometry::~Geometry ()

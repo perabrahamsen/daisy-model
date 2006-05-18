@@ -51,8 +51,8 @@ public:
   inline double zplus (size_t n) const
   { return zplus_[n]; }
   inline double zminus (size_t n) const
-  { return (edge_to (n) == cell_above) ? 0.0 : zplus (n-1U); }
-    inline double z (size_t n) const // Cell depth [cm]
+  { return (n % cell_rows_ == 0) ? 0.0 : zplus (n-1U); }
+  inline double z (size_t n) const // Cell depth [cm]
   { return z_[n]; }
   inline double x (size_t n) const // Cell horizontal center [cm]
   { return x_[n]; }

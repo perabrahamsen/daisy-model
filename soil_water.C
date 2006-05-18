@@ -201,6 +201,7 @@ SoilWater::initialize_base (const AttributeList& al, const Geometry& geo,
 
   S_sum_.insert (S_sum_.begin (), size, 0.0);
   S_root_.insert (S_root_.begin (), size, 0.0);
+  S_drain_.insert (S_incorp_.begin (), size, 0.0);
   S_incorp_.insert (S_incorp_.begin (), size, 0.0);
   tillage_.insert (tillage_.begin (), size, 0.0);
 }

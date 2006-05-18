@@ -584,6 +584,12 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   total_ea += snow_ea;
   daisy_assert (total_ea >= 0.0);
   snow_water_out = snow.percolation ();
+  if (snow_water_out < 0.0)
+    {
+      daisy_assert (snow_water_out + surface.ponding () >= 0.0);
+      surface.put_ponding (snow_water_out + surface.ponding ());
+      snow_water_out = 0.0;
+    }
   snow_water_out_temperature = snow.temperature ();
 
   // 3 Water intercepted on canopy

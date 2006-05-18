@@ -325,7 +325,6 @@ SoilWater1D::initialize (const AttributeList& al,
   initialize_base (al, geo, soil, msg);
 
   // Sources.
-  S_drain_.insert (S_drain_.begin (), size, 0.0);
   S_p_.insert (S_p_.begin (), size, 0.0);
   if (S_permanent_.size () < size)
     S_permanent_.insert (S_permanent_.end (), size - S_permanent_.size (), 

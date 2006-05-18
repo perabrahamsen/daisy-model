@@ -41,14 +41,17 @@ public:
  
   // Simulation.
 public:
+  void tick (const Soil& soil);
   bool check (size_t n, Treelog& msg) const;
   void output (Log& log) const;
   
   // Communication with surface.
+public:
   double MaxExfiltration (const Geometry& geo,
                           const Soil&, double T) const;
 
   // Creation.
+public:
   void initialize (const AttributeList& al,
                    const GeometryRect& geo, const Soil& soil,
                    Treelog& msg);

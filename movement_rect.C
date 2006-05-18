@@ -43,12 +43,14 @@ struct MovementRect : public Movement
   void macro_tick (const Soil&, Surface&, Treelog&)
   { }
 
-  void tick (const Soil&, Surface&, const Time&,
+  void tick (const Soil& soil, Surface&, const Time&,
              const Weather&, Treelog&) 
   {
 #if 0
     heat->tick (time, *geo, soil, *water, surface, weather);
     water->tick (*geo, soil, *heat, surface, msg);
+#else 
+    water->tick (soil);
 #endif
   }
 

@@ -49,7 +49,10 @@ GeometryRect::fraction_in_z_interval (const size_t i,
 
 bool 
 GeometryRect::contain_z (const size_t i, const double z) const
-{ return  z < zminus (i) && z > zplus(i); }
+{ 
+  daisy_assert (zminus (i) > zplus (i));
+  return  zminus (i) > z && z >= zplus (i); 
+}
 
 bool 
 GeometryRect::check (Treelog&) const
@@ -102,6 +105,9 @@ GeometryRect::GeometryRect (Block& al)
     cell_rows_ (al.number_sequence ("zplus").size ()),
     cell_columns_ (al.number_sequence ("xplus").size ())
 {
+  // Initialize base.
+  size_ = cell_columns_ * cell_rows_;
+
   // Extract grid information from parameters.
   const std::vector<double> z_end (al.number_sequence ("zplus"));
   std::vector<double> z_center;
@@ -114,7 +120,7 @@ GeometryRect::GeometryRect (Block& al)
 
   // Fill in cells by column, starting from the top left corner.
   size_t next_cell = 0;
-  for (size_t column = 0; column < cell_columns_ - 1; column++)
+  for (size_t column = 0; column < cell_columns_; column++)
     {
       // Top edge.
       size_t last_cell = cell_above;
@@ -146,6 +152,7 @@ GeometryRect::GeometryRect (Block& al)
       edge_from_.push_back (cell_below);
       edge_to_.push_back (last_cell);
     }
+  daisy_assert (next_cell == cell_size ());
 }
 
 GeometryRect::~GeometryRect ()

@@ -77,7 +77,7 @@ SoilHeat::set_energy (const Geometry& geo,
     }
   
   // Distribute temperature evenly.
-  const double average = amount / capacity / volume;
+  const double average = amount / capacity;
 
   for (size_t i = 0; i < cell_size; i++)
     {

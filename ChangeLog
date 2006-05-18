@@ -1,3 +1,8 @@
+2006-05-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (WaterDistribution): Handle pond/snow
+	interaction directly.
+
 2006-05-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* soil_heat_rect.C, soil_heat_rect.h: New submodel.
