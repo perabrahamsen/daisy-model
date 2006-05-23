@@ -22,21 +22,19 @@
 #ifndef GEOMETRY_RECT_H
 #define GEOMETRY_RECT_H
 
-#include "geometry.h"
+#include "geometry_vert.h"
 
-class GeometryRect : public Geometry
+class GeometryRect : public GeometryVert
 {
   // Parameters.
   const size_t cell_rows_;
   const size_t cell_columns_;
-  std::vector<double> zplus_;	// Lower boundary of each cell.
-  std::vector<double> z_;       // Vertical center of each cell.
-  std::vector<double> dz_;      // Vertical size of each cell.
   std::vector<double> xplus_;	// Right edge of each cell.
   std::vector<double> x_;       // Horizontal center of each cell.
   std::vector<double> dx_;      // Horizontal size of each cell.
   std::vector<int> edge_from_;
   std::vector<int> edge_to_;
+  std::vector<double> edge_area_;
   
   // Accessors.
 public:
@@ -48,17 +46,17 @@ public:
   { return edge_from_[e]; }
   inline int edge_to (size_t e) const   // Cell where edge leads.
   { return edge_to_[e]; }
-  inline double zplus (size_t n) const
-  { return zplus_[n]; }
+  inline double edge_area (size_t e) const // Area connecting cells [cm^2]
+  { return edge_area_[e]; }
+  inline double surface_area () const // Total surface area.
+  { return xplus_[cell_size () - 1] * 1.0 /* cm */; }
   inline double zminus (size_t n) const
   { return (n % cell_rows_ == 0) ? 0.0 : zplus (n-1U); }
-  inline double z (size_t n) const // Cell depth [cm]
-  { return z_[n]; }
   inline double x (size_t n) const // Cell horizontal center [cm]
   { return x_[n]; }
   inline double volume (size_t n) const // Cell volume [cm^3]
   { return dz_[n] * dx_[n] * 1.0 /* [cm] */; }
-  inline double bottom () const // Bottom of deepest cell. [cm]
+  inline double bottom () const // Bottom of deepest cell [cm]
   { return zplus_[cell_rows_ - 1]; }
   size_t cell_at (double z, double x, double y) const;
   double fraction_in_z_interval (size_t n, double from, double to) const;

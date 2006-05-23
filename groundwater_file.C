@@ -46,12 +46,11 @@ public:
   bottom_t bottom_type () const;
   double q_bottom () const
   { daisy_assert (false); }
-  bool accept_bottom (double);
 
   // Simulation.
 public:
-  void tick (const Geometry1D&,
-             const Soil&, SoilWater1D&, double, const SoilHeat&,
+  void tick (const Geometry&,
+             const Soil&, SoilWater&, double, const SoilHeat&,
 	     const Time& time, Treelog& msg)
   { tick (time, msg); }
   void tick (const Time&, Treelog&);
@@ -59,7 +58,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry1D&, const Time& time, Treelog&);
+  void initialize (const Geometry&, const Time& time, Treelog&);
   GroundwaterFile (Block&);
   ~GroundwaterFile ();
 };
@@ -71,12 +70,6 @@ GroundwaterFile::bottom_type () const
     return free_drainage;
   else
     return pressure;
-}
-
-bool
-GroundwaterFile::accept_bottom (double)
-{
-  return true;
 }
 
 void
@@ -146,7 +139,7 @@ GroundwaterFile::table () const
 }
 
 void
-GroundwaterFile::initialize (const Geometry1D&, const Time& time,
+GroundwaterFile::initialize (const Geometry&, const Time& time,
 			     Treelog& err)
 {
   daisy_assert (lex == NULL);

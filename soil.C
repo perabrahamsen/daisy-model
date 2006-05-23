@@ -23,6 +23,7 @@
 #include "geometry.h"
 #include "hydraulic.h"
 #include "tortuosity.h"
+#include "groundwater.h"
 #include "alist.h"
 #include "syntax.h"
 #include "mathlib.h"
@@ -449,11 +450,24 @@ Soil::initialize_aquitard (const double Z_aquitard, const double K_aquitard,
 
 void
 Soil::initialize (Geometry& geo,
-                  const bool volatile_bottom,
+                  Groundwater& groundwater,
                   const int som_size, Treelog& msg)
 {
   Treelog::Open nest (msg, "Soil");
 
+  // Extra aquitard layer.
+  if (groundwater.is_pipe ())
+    {
+      // Find parameters.
+      const double Z_aquitard = groundwater.Z_aquitard ();
+      const double K_aquitard = groundwater.K_aquitard ();
+      const double new_Z_aq 
+        = initialize_aquitard (Z_aquitard, K_aquitard, msg);
+      groundwater.set_Z_aquitard (new_Z_aq);
+    }
+  const bool volatile_bottom =
+    groundwater.bottom_type () == Groundwater::lysimeter 
+    || groundwater.is_pipe (); 
 
   const std::vector<Implementation::Layer*>::const_iterator begin
     = impl.layers.begin ();

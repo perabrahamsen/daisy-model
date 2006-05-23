@@ -88,7 +88,8 @@ private:
   // Create & Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  void initialize (const Soil&, const SoilWater&, Treelog&);
+  void initialize (const Geometry& geo, 
+                   const Soil&, const SoilWater&, Treelog&);
   DOM (Block& al);
   ~DOM ();
 };

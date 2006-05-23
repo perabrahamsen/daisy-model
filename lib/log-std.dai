@@ -64,8 +64,8 @@ evapotranspiration when the available water is insufficient.")
 			(description "\
 This is the amount of water leaving the system through the soil bottom.
 It can be negative if there are cabilary raise.")
-                        (path column "${column}" Movement "*" Water q)
-                        (spec movement vertical Water q)
+                        (path column "${column}" SoilWater q)
+                        (spec fixed SoilWater q)
                         (handle sum)
                         (negate true)
                         (dimension "mm/&"))
@@ -78,8 +78,8 @@ soil allowing satured water flow.
 In Daisy, macropores (if any) usually end withing the system, so this
 amount will usually be zero.  However if you have specified the 'to'
 parameter, you may see macropore flow.")
-                        (path column "${column}" Movement "*" Water q_p)
-                        (spec movement vertical Water q_p)
+                        (path column "${column}" SoilWater q_p)
+                        (spec fixed SoilWater q_p)
                         (handle sum)
                         (negate true)
                         (dimension "mm/&"))
@@ -91,8 +91,8 @@ Note that the total amount of water in the drain pipes may be higher
 than this if you have specified the 'to' parameter, as the whole soil
 profile will contribute to the drain flow, and only the contributions
 from the soil interval being logged is counted here.")
-                     (path column "${column}" Movement "*" Water S_drain)
-                     (spec movement vertical Water S_drain)
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
                      (handle sum)
                      (dimension "mm/&"))
            (number (tag "Runoff")
@@ -109,8 +109,8 @@ nowhere go to.  For typical setups, this value will be zero.")
            (interval (tag "Soil water")
 		     (description "\
 Total water content of the soil.")
-                     (path column "${column}" Movement "*" Water Theta)
-                     (spec movement vertical Water Theta)
+                     (path column "${column}" SoilWater Theta)
+                     (spec fixed SoilWater Theta)
                      (dimension "mm"))
            (number (tag "Surface water")
 		   (description "Total water stored on the surface.
@@ -138,8 +138,8 @@ the litter layer.")
 Amount of water entering the soil through the matrix system.
 
 This is the normal infiltration channel.")
-                     (path column "${column}" Movement "*" Water q)
-                     (spec movement vertical Water q)
+                     (path column "${column}" SoilWater q)
+                     (spec fixed SoilWater q)
                      (handle sum)
                      (negate true)
                      (dimension "mm/&"))
@@ -151,8 +151,8 @@ Preferential flow can occur if the soil has macropores, and the
 water pressure in an area with macropores is above a given threshold.
 If the macropores that are activated within the soil interval is not
 included in this number.")
-                     (path column "${column}" Movement "*" Water q_p)
-                     (spec movement vertical Water q_p)
+                     (path column "${column}" SoilWater q_p)
+                     (spec fixed SoilWater q_p)
                      (handle sum)
                      (negate true)
                      (dimension "mm/&"))
@@ -162,8 +162,8 @@ Amount of water incorporated directly into the soil.
 
 This include both subsoil irrigation and any water in fertilizer
 directly incorporated into the soil.")
-                     (path column "${column}" Movement "*" Water S_incorp)
-                     (spec movement vertical Water S_incorp)
+                     (path column "${column}" SoilWater S_incorp)
+                     (spec fixed SoilWater S_incorp)
                      (handle sum)
                      (negate true)
                      (dimension "mm/&"))
@@ -172,8 +172,8 @@ directly incorporated into the soil.")
 Amount of water leaving the soil through the matrix system.
 
 This is the normal percolation channel.")
-                        (path column "${column}" Movement "*" Water q)
-                        (spec movement vertical Water q)
+                        (path column "${column}" SoilWater q)
+                        (spec fixed SoilWater q)
                         (handle sum)
                         (negate true)
                         (dimension "mm/&"))
@@ -187,8 +187,8 @@ included in this number.
 This means that macropore flow that is purely internal to the soil
 interval will not be logged.  This is the common case if you are
 logging the entire interval of the soil where there are macropores.")
-                        (path column "${column}" Movement "*" Water q_p)
-                        (spec movement vertical Water q_p)
+                        (path column "${column}" SoilWater q_p)
+                        (spec fixed SoilWater q_p)
                         (handle sum)
                         (negate true)
                         (dimension "mm/&"))
@@ -205,8 +205,8 @@ be less than the total amount of water in the drain pipes.
 
 If the soil is not drained, that is, if the specified groundwater model
 is not 'pipe', this amount will be zero.")
-                     (path column "${column}" Movement "*" Water S_drain)
-                     (spec movement vertical Water S_drain)
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
                      (handle sum)
                      (dimension "mm/&"))
            (interval (tag "Root extraction")
@@ -215,8 +215,8 @@ Water in the soil interval extracted by the roots.
 
 This number will be equal to the transpiration if the soil interval
 being logged includes the entire root zone.")
-                     (path column "${column}" Movement "*" Water S_root)
-                     (spec movement vertical Water S_root)
+                     (path column "${column}" SoilWater S_root)
+                     (spec fixed SoilWater S_root)
                      (handle sum)
                      (dimension "mm/&"))
            (interval (tag "Freezing")
@@ -225,8 +225,8 @@ Water in the soil interval turned into ice.
 
 This number will be zero unless the 'enable_ice' SoilHeat parameter
 has been set.")
-                     (path column "${column}" Movement "*" Water S_ice)
-                     (spec movement vertical Water S_ice)
+                     (path column "${column}" SoilWater S_ice)
+                     (spec fixed SoilWater S_ice)
                      (handle sum)
                      (dimension "mm/&"))
            (interval (tag "Tillage")
@@ -237,15 +237,15 @@ This number will be zero if the soil interval includes the all the
 soil affected by the tillage operation, which is the normal case.  The
 number will be negative if more water have been added than removed by
 the tillage operation.")
-                     (path column "${column}" Movement "*" Water tillage)
-                     (spec movement vertical Water tillage)
+                     (path column "${column}" SoilWater tillage)
+                     (spec fixed SoilWater tillage)
                      (handle sum)
                      (dimension "mm/&"))
            (interval (tag "Soil water")
                      (description "\
 The total amount of water in the soil interval")
-                     (path column "${column}" Movement "*" Water Theta)
-                     (spec movement vertical Water Theta)
+                     (path column "${column}" SoilWater Theta)
+                     (spec fixed SoilWater Theta)
                      (dimension "mm"))))
 
 (defsummary "Field nitrogen balance" balance

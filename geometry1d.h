@@ -1,4 +1,4 @@
-// geometry1d.h
+// geometry1d.h -- Soil discretization based on horizontal layers.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001, 2006 Per Abrahamsen and KVL.
@@ -23,8 +23,7 @@
 #ifndef GEOMETRY1D_H
 #define GEOMETRY1D_H
 
-#include "geometry.h"
-#include "syntax.h"
+#include "geometry_vert.h"
 #include <vector>
 #include <string>
 
@@ -32,13 +31,8 @@ class Block;
 class AttributeList;
 class Treelog;
 
-class Geometry1D : public Geometry
+class Geometry1D : public GeometryVert
 {
-  // Parameters.
-  std::vector<double> zplus_;	// Lower boundary of each interval.
-  std::vector<double> z_;       // Center of each interval.
-  std::vector<double> dz_;      // Size of each interval.
-
 public:
   // Accessors.
   inline size_t edge_size () const
@@ -50,18 +44,16 @@ public:
   { return e == cell_size () ? cell_below : static_cast<int> (e); }
   inline int edge_to (size_t e) const // Cell where edge leads.
   { return e == 0 ? cell_above : static_cast<int> (e) - 1; };
-  inline double zplus (size_t n) const
-  { return zplus_[n]; }
+  inline double edge_area (size_t) const // Area connecting the cells.
+  { return 1.0; }
+  inline double surface_area () const // Total surface area.
+  { return 1.0; }
   inline double zminus (size_t n) const
   { return (n == 0) ? 0.0 : zplus (n-1U); }
-  inline double z (size_t n) const
-  { return z_[n]; }
-  inline double dz (size_t n) const
-  { return dz_[n]; }
   inline double volume (size_t n) const
-  { return dz_[n] * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
+  { return dz (n) * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
   inline double bottom () const // Bottom of deepest cell. [cm]
-  { return zplus_[cell_size () - 1]; }
+  { return zplus (cell_size () - 1); }
   size_t cell_at (double z, double x, double y) const ;
   double fraction_in_z_interval (size_t i, double from, double to) const;
   bool contain_z (size_t i, double z) const;

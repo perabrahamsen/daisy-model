@@ -24,7 +24,7 @@
 #include "alist.h"
 #include "surface.h"
 #include "weather.h"
-#include "soil_water1d.h"
+#include "soil_water.h"
 #include "soil.h"
 #include "geometry1d.h"
 #include "syntax.h"
@@ -33,27 +33,6 @@
 #include "log.h"
 #include <sstream>
 #include "submodel.h"
-
-#if 0
-struct SoilHeat1D::Implementation
-{
-
-  // Simulation.
-  double capacity (const Soil&, const SoilWater&, size_t i) const;
-  double capacity_apparent (const Soil&, const SoilWater1D&, size_t i) const;
-  void tick (const Time&, const Geometry1D& geo,
-             const Soil&, SoilWater1D&, 
-             const Surface&, const Weather&, 
-             std::vector<double>& T);
-
-  // Create & Destroy.
-  void initialize (const Geometry1D& geo,
-                   const Soil& soil, const Time& time, const Weather& weather, 
-                   std::vector<double>& T,
-                   Treelog&);
-  Implementation (const Block&);
-};
-#endif
 
 static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
 static const double rho_water = 1.0; // [g/cm^3]
@@ -73,7 +52,7 @@ SoilHeat1D::capacity (const Soil& soil,
 
 double 
 SoilHeat1D::capacity_apparent
-/**/ (const Soil& soil, const SoilWater1D& soil_water, const size_t i) const
+/**/ (const Soil& soil, const SoilWater& soil_water, const size_t i) const
 { 
   const double h = soil_water.h (i);
   const double h_ice = soil_water.h_ice (i);
@@ -100,7 +79,7 @@ SoilHeat1D::capacity_apparent
 
 void
 SoilHeat1D::update_freezing_points (const Soil& soil,
-                                    const SoilWater1D& soil_water)
+                                    const SoilWater& soil_water)
 {
   for (unsigned int i = 0; i < soil.size (); i++)
     {
@@ -136,7 +115,7 @@ SoilHeat1D::update_freezing_points (const Soil& soil,
 bool
 SoilHeat1D::update_state (const Geometry1D& geo,
                           const Soil& soil, 
-                          const SoilWater1D& soil_water, 
+                          const SoilWater& soil_water, 
                           std::vector<double>& T)
 {
   bool changed = false;
@@ -243,7 +222,7 @@ SoilHeat1D::update_state (const Geometry1D& geo,
 double
 SoilHeat1D::calculate_freezing_rate (const Geometry1D& geo,
                                      const Soil& soil,
-                                     const SoilWater1D& soil_water,
+                                     const SoilWater& soil_water,
                                      unsigned int i, 
                                      const std::vector<double>& T)
 {
@@ -318,7 +297,7 @@ void
 SoilHeat1D::solve (const Time& time,
                    const Geometry1D& geo,
                    const Soil& soil,
-                   const SoilWater1D& soil_water,
+                   const SoilWater& soil_water,
                    const Surface& surface,
                    const Weather& weather, 
                    std::vector<double>& T)
@@ -434,7 +413,7 @@ SoilHeat1D::solve (const Time& time,
 void
 SoilHeat1D::calculate_heat_flux (const Geometry& geo,
                                  const Soil& soil,
-                                 const SoilWater1D& soil_water,
+                                 const SoilWater& soil_water,
                                  const std::vector<double>& T)
 {
   // Top and inner cells.
@@ -511,7 +490,7 @@ void
 SoilHeat1D::tick (const Time& time,
                   const Geometry1D& geo,
                   const Soil& soil,
-                  SoilWater1D& soil_water,
+                  SoilWater& soil_water,
                   const Surface& surface,
                   const Weather& weather)
 {

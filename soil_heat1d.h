@@ -30,7 +30,6 @@ class Geometry1D;
 class Surface;
 class Bioclimate;
 class SoilWater;
-class SoilWater1D;
 class Weather;
 class Time;
 
@@ -59,26 +58,26 @@ private:
   // Solve.
 private:
   double capacity (const Soil&, const SoilWater&, size_t i) const;
-  double capacity_apparent (const Soil&, const SoilWater1D&, size_t i) const;
+  double capacity_apparent (const Soil&, const SoilWater&, size_t i) const;
   void update_freezing_points (const Soil& soil,
-                               const SoilWater1D& soil_water);
+                               const SoilWater& soil_water);
   bool update_state (const Geometry1D& geo,
-                     const Soil& soil, const SoilWater1D& soil_water, 
+                     const Soil& soil, const SoilWater& soil_water, 
                      std::vector<double>& T);
   double calculate_freezing_rate (const Geometry1D& geo,
                                   const Soil& soil,
-                                  const SoilWater1D& soil_water,
+                                  const SoilWater& soil_water,
                                   unsigned int i, 
                                   const std::vector<double>& T);
   bool check_state (const Soil& soil, 
                     const std::vector<double>& T) const;
   void force_state (std::vector<double>& T);
   void solve (const Time&, const Geometry1D& geo,
-              const Soil&, const SoilWater1D&, 
+              const Soil&, const SoilWater&, 
               const Surface&, const Weather&, 
               std::vector<double>& T);
   void calculate_heat_flux (const Geometry& geo,
-                            const Soil&, const SoilWater1D&, 
+                            const Soil&, const SoilWater&, 
                             const std::vector<double>& T);
   double bottom (const Time&, const Weather& weather) const;
 
@@ -89,7 +88,7 @@ public:
   double T_surface_snow (const Geometry&, const Soil&, const SoilWater&,
                          double T_snow, double K_snow, double dZs) const;
   void tick (const Time&, const Geometry1D& geo,
-             const Soil&, SoilWater1D&, 
+             const Soil&, SoilWater&, 
 	     const Surface&, const Weather& weather);
   void output (Log&) const;
   static void load_syntax (Syntax&, AttributeList&);

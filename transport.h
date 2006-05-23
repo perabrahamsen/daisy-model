@@ -27,7 +27,7 @@
 
 class Geometry1D;
 class Soil;
-class SoilWater1D;
+class SoilWater;
 class Adsorption;
 
 class Transport
@@ -40,16 +40,19 @@ public:
   // Simulation.
 public:
   virtual void tick (Treelog&, const Geometry1D&,
-                     const Soil&, const SoilWater1D&, 
+                     const Soil&, const SoilWater&, 
 		     const Adsorption&, 
 		     double diffusion_coefficient,
 		     std::vector<double>& M, 
 		     std::vector<double>& C,
 		     const std::vector<double>& S,
 		     std::vector<double>& J) = 0;
-  virtual void output (Log&) const = 0;
 
   // Create and Destroy.
+public:
+  static const AttributeList& default_model ();
+  static const AttributeList& reserve_model ();
+  static const AttributeList& none_model ();
 protected:
   Transport (Block&);
 public:

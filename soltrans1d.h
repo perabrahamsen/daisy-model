@@ -32,7 +32,7 @@ struct AttributeList;
 struct Block;
 struct Geometry1D;
 struct Soil;
-struct SoilWater1D;
+struct SoilWater;
 struct Solute;
 struct Element;
 struct Adsorption;
@@ -47,14 +47,14 @@ class Soltrans1D
 
   // Simulation.
 public:
-  void solute (const Geometry1D&, const Soil&, const SoilWater1D&, 
+  void solute (const Geometry1D&, const Soil&, const SoilWater&, 
                const double J_in, Solute&, Treelog& msg);
   void element (const Geometry1D& geo, const Soil& soil, 
-                const SoilWater1D& soil_water, Element& element,
+                const SoilWater& soil_water, Element& element,
                 Adsorption& adsorption, double diffusion_coefficient,
                 Treelog& msg);
 private:
-  void flow (const Geometry1D&, const Soil&, const SoilWater1D&, 
+  void flow (const Geometry1D&, const Soil&, const SoilWater&, 
              const std::string& name,
              std::vector<double>& M, std::vector<double>& C, 
              std::vector<double>& S, std::vector<double>& S_p, 

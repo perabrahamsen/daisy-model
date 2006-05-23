@@ -56,7 +56,8 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  void initialize (const Soil&, const SoilWater&, Adsorption&, Treelog&);
+  void initialize (const Geometry&, 
+                   const Soil&, const SoilWater&, Adsorption&, Treelog&);
   Element (const AttributeList& al);
   ~Element ();
 };

@@ -28,7 +28,7 @@
 
 class Surface;
 class Groundwater;
-class Geometry1D;
+class GeometryVert;
 class Soil;
 class SoilHeat;
 class Library;
@@ -45,7 +45,7 @@ public:
 
   // Simulate.
 public:
-  virtual bool tick (Treelog&, const Geometry1D& geo,
+  virtual bool tick (Treelog&, const GeometryVert& geo,
                      const Soil& soil, const SoilHeat&,
 		     unsigned int first, const Surface& top, 
 		     unsigned int last, const Groundwater& bottom, 
@@ -56,7 +56,6 @@ public:
 		     std::vector<double>& h,
 		     std::vector<double>& Theta,
 		     std::vector<double>& q) = 0;
-  virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 public:

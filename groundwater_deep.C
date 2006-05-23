@@ -30,13 +30,11 @@ public:
   { return free_drainage; }
   double q_bottom () const
   { daisy_assert (false); }
-  bool accept_bottom (double)
-  { return true; }
 
   // Simulation.
 public:
-  void tick (const Geometry1D&,
-             const Soil&, SoilWater1D&, double, 
+  void tick (const Geometry&,
+             const Soil&, SoilWater&, double, 
 	     const SoilHeat&, const Time&, Treelog&)
   { }
   double table () const
@@ -44,7 +42,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry1D&, const Time&, Treelog&)
+  void initialize (const Geometry&, const Time&, Treelog&)
   { }
   GroundwaterDeep (Block& al)
     : Groundwater (al)

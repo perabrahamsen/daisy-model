@@ -23,7 +23,7 @@
 #include "transport.h"
 #include "geometry1d.h"
 #include "soil.h"
-#include "soil_water1d.h"
+#include "soil_water.h"
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
@@ -31,45 +31,31 @@
 
 using namespace std;
 
-class TransportCD : public Transport
+struct TransportCD : public Transport
 {
   // Parameters.
-private:
-  int max_time_step_reductions;
-
-  // Log variable.
-private:
-  double ddt;
+  const int max_time_step_reductions;
   
   // Simulation.
-public:
   void tick (Treelog&, const Geometry1D& geo,
-             const Soil&, const SoilWater1D&, const Adsorption&,
+             const Soil&, const SoilWater&, const Adsorption&,
 	     double diffusion_coefficient,
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
 	     vector<double>& J);
-  void output (Log&) const;
 
   // Create.
-public:
   TransportCD (Block& al)
     : Transport (al),
-      max_time_step_reductions (al.integer ("max_time_step_reductions")),
-      ddt (dt)
-    { }
+      max_time_step_reductions (al.integer ("max_time_step_reductions"))
+  { }
+  static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
-
-void
-TransportCD::output (Log& log) const
-{
-  output_variable (ddt, log);
-}
 
 void 
 TransportCD::tick (Treelog&, const Geometry1D& geo,
-                   const Soil& soil, const SoilWater1D& soil_water,
+                   const Soil& soil, const SoilWater& soil_water,
 		   const Adsorption& adsorption,
 		   const double diffusion_coefficient,
 		   vector<double>& M, 
@@ -191,7 +177,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
     }
 
   // Find the time step using Courant.
-  ddt = 1.0;
+  double ddt = 1.0;
   for (unsigned int i = 0; i < size; i++)
     ddt = min (ddt, pow (geo.dz (i), 2) / (2 * D[i + 1]));
   int time_step_reductions = 0;
@@ -360,6 +346,29 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
     }
 }
 
+const AttributeList& 
+Transport::default_model ()
+{
+  static AttributeList alist;
+  
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      TransportCD::load_syntax (dummy, alist);
+      alist.add ("type", "cd");
+    }
+  return alist;
+}
+
+void 
+TransportCD::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+    syntax.add ("max_time_step_reductions",
+		Syntax::Integer, Syntax::Const, "\
+Number of times we may reduce the time step before giving up");
+    alist.add ("max_time_step_reductions", 20);
+}
+
 static struct TransportCDSyntax
 {
   static Transport& make (Block& al)
@@ -373,12 +382,7 @@ static struct TransportCDSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
 	       "Solute transport using convection-dispersion.");
-    syntax.add ("ddt", "h", Syntax::LogOnly, Syntax::Singleton,
-		"Time step used in the numeric solution.");
-    syntax.add ("max_time_step_reductions",
-		Syntax::Integer, Syntax::Const, "\
-Number of times we may reduce the time step before giving up");
-    alist.add ("max_time_step_reductions", 20);
+    TransportCD::load_syntax (syntax, alist);
     Librarian<Transport>::add_type ("cd", alist, syntax, &make);
   }
 } TransportCD_syntax;

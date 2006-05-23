@@ -107,22 +107,26 @@ A single element in a Dissolved Organic Matter pool.");
 }
 
 void 
-Element::initialize (const Soil& soil, const SoilWater& soil_water,
+Element::initialize (const Geometry& geo, 
+                     const Soil& soil, const SoilWater& soil_water,
                      Adsorption& adsorption, Treelog& msg)
 {
-  if (soil.size () >= M.size ())
-    M.insert (M.end (), soil.size () - M.size (), 0.0);
+  const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
+  
+  if (cell_size >= M.size ())
+    M.insert (M.end (), cell_size - M.size (), 0.0);
   else
     msg.warning ("Too many elements of M in DOM pool");
 
   for (unsigned int i = C.size (); i < M.size (); i++)
     C.push_back (adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]));
 
-  S.insert (S.begin (), soil.size (), 0.0);
-  S_p.insert (S_p.begin (), soil.size (), 0.0);
-  S_drain.insert (S_drain.begin (), soil.size (), 0.0);
-  J.insert (J_p.begin (), soil.size () + 1, 0.0);
-  J_p.insert (J_p.begin (), soil.size () + 1, 0.0);
+  S.insert (S.begin (), cell_size, 0.0);
+  S_p.insert (S_p.begin (), cell_size, 0.0);
+  S_drain.insert (S_drain.begin (), cell_size, 0.0);
+  J.insert (J_p.begin (), edge_size, 0.0);
+  J_p.insert (J_p.begin (), edge_size, 0.0);
 }
 
 Element::Element (const AttributeList& al)

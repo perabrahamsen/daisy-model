@@ -21,7 +21,7 @@
 
 
 #include "groundwater.h"
-#include "geometry1d.h"
+#include "geometry.h"
 
 class GroundwaterLysimeter : public Groundwater
 {
@@ -32,8 +32,6 @@ class GroundwaterLysimeter : public Groundwater
 public:
   bottom_t bottom_type () const
   { return lysimeter; }
-  bool accept_bottom (double)
-  { return true; }
   double q_bottom () const
   { daisy_assert (false); }
   bool is_lysimeter () const
@@ -41,7 +39,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Geometry1D&, const Soil&, SoilWater1D&, double, 
+  void tick (const Geometry&, const Soil&, SoilWater&, double, 
 	     const SoilHeat&, const Time&, Treelog&)
   { }
   double table () const
@@ -49,8 +47,8 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry1D& geo, const Time&, Treelog&)
-  { location = geo.zplus (geo.cell_size () - 1); }
+  void initialize (const Geometry& geo, const Time&, Treelog&)
+  { location = geo.bottom (); }
 
   GroundwaterLysimeter (Block& al)
     : Groundwater (al),

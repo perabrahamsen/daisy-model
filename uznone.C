@@ -29,9 +29,9 @@ using namespace std;
 class UZNone : public UZmodel
 {
 public:
-  bool tick (Treelog&, const Geometry1D&,
+  bool tick (Treelog&, const GeometryVert& geo,
              const Soil& /* soil */, const SoilHeat&,
-	     unsigned int first, const Surface& /* top */, 
+	     unsigned int first, const Surface& top, 
 	     unsigned int last, const Groundwater& /* bottom */, 
 	     const vector<double>& /* S */,
 	     const vector<double>& h_old,
@@ -48,10 +48,9 @@ public:
 	  h[i] = h_old[i];
 	}
       q[last + 1] = 0.0;
+
       return true;
     }
-  void output (Log&) const
-  { }
 
   // Create and Destroy.
   void has_macropores (bool)

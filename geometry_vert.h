@@ -1,4 +1,4 @@
-// soil_water_rect.h -- Soil water movement in a a rectangular grid.
+// geometry_vert.h --- A discretization based on vertical columns.
 // 
 // Copyright 2006 Per Abrahamsen and KVL.
 //
@@ -19,27 +19,35 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef SOIL_WATER_RECT_H
-#define SOIL_WATER_RECT_H
+#ifndef GEOMETRY_VERT_H
+#define GEOMETRY_VERT_H
 
-#include "soil_water.h"
+#include "geometry.h"
+#include <vector>
 
-struct GeometryRect;
+class Block;
 
-class SoilWaterRect : public SoilWater
+class GeometryVert : public Geometry
 {
-  // Simulation.
+  // Parameters.
+protected:
+  std::vector<double> zplus_;	// Lower boundary of each interval.
+  std::vector<double> z_;       // Center of each interval.
+  std::vector<double> dz_;      // Size of each interval.
+
 public:
-  void tick (GeometryRect&, const Soil&, Surface&, Treelog&);
-  void output (Log&) const;
+  // Accessors.
+  inline double zplus (size_t n) const
+  { return zplus_[n]; }
+  inline double z (size_t n) const
+  { return z_[n]; }
+  inline double dz (size_t n) const
+  { return dz_[n]; }
 
   // Creation.
 public:
-  void initialize (const AttributeList& al, const GeometryRect& geo, 
-                   const Soil& soil, const Groundwater&, Treelog& msg);
-  static void load_syntax (Syntax&, AttributeList&);
-  SoilWaterRect (Block&);
-  ~SoilWaterRect ();
+  GeometryVert (Block&);
+  ~GeometryVert ();
 };
 
-#endif // SOIL_WATER_RECT_H
+#endif // GEOMETRY_VERT_H

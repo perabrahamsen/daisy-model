@@ -21,7 +21,7 @@
 
 
 #include "mactrans.h"
-#include "soil_water1d.h"
+#include "soil_water.h"
 #include "geometry1d.h"
 #include "plf.h"
 #include "mathlib.h"
@@ -33,7 +33,7 @@ using namespace std;
 struct MactransStandard : public Mactrans
 {
   // Simulation.
- void tick (const Geometry1D&, const SoilWater1D&,
+ void tick (const Geometry1D&, const SoilWater&,
 	    const vector<double>& M, const vector<double>& C,
 	    vector<double>& S, vector<double>& S_p,
 	    vector<double>& J_p, Treelog&);
@@ -49,7 +49,7 @@ struct MactransStandard : public Mactrans
 };
 
 void 
-MactransStandard::tick (const Geometry1D& geo, const SoilWater1D& soil_water,
+MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,
 			const vector<double>& M, const vector<double>& C,
 			vector<double>& S_m, vector<double>& S_p,
 			vector<double>& J_p, Treelog& out)
@@ -170,6 +170,19 @@ MactransStandard::tick (const Geometry1D& geo, const SoilWater1D& soil_water,
 	     << "' solute\n";
       out.error (tmp.str ());
     }
+}
+
+const AttributeList& 
+Mactrans::default_model ()
+{
+  static AttributeList alist;
+  
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      alist.add ("type", "default");
+    }
+  return alist;
 }
 
 static struct MactransStandardSyntax

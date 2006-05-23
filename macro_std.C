@@ -125,8 +125,7 @@ MacroStandard::tick (const Geometry1D& geo,
 	  daisy_assert (q_p[0] == 0.0);
 	  daisy_assert (from == 0);
 	  q_p[0] = q_top;
-	  const bool accepted = surface.accept_top (msg, q_p[0]);
-	  daisy_assert (accepted);
+	  surface.accept_top (q_p[0], geo, 0U, msg);
 	}
     }
 
@@ -257,13 +256,7 @@ MacroStandard::tick (const Geometry1D& geo,
 
   // Check that we got all the extra water stored somewhere.
   if (extra_water != 0.0)
-    if (!surface.accept_top (msg, extra_water))
-      {
-	std::ostringstream tmp;
-	tmp << "BUG: Surface would not accept " << extra_water 
-	       << "mm overflowing water (layer " << from << ")";
-	msg.error (tmp.str ());
-      }
+    surface.accept_top (extra_water, geo, 0U, msg);
 
   // Check that the sink terms add up.
   if (fabs (geo.total (S_p) - q_top - extra_water) > 1.0e-11)

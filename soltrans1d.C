@@ -22,14 +22,14 @@
 #include "solute.h"
 #include "element.h"
 #include "geometry1d.h"
-#include "soil_water1d.h"
+#include "soil_water.h"
 #include "submodel.h"
 #include "mathlib.h"
 #include <sstream>
 
 void 
 Soltrans1D::solute (const Geometry1D& geo, const Soil& soil, 
-                    const SoilWater1D& soil_water, 
+                    const SoilWater& soil_water, 
                     const double J_in, Solute& solute, 
                     Treelog& msg)
 { 
@@ -72,7 +72,7 @@ Soltrans1D::solute (const Geometry1D& geo, const Soil& soil,
 void 
 Soltrans1D::element (const Geometry1D& geo, 
                      const Soil& soil, 
-                     const SoilWater1D& soil_water, 
+                     const SoilWater& soil_water, 
                      Element& element,
                      Adsorption& adsorption,
                      double diffusion_coefficient,
@@ -87,7 +87,7 @@ Soltrans1D::element (const Geometry1D& geo,
 void 
 Soltrans1D::flow (const Geometry1D& geo, 
                   const Soil& soil, 
-                  const SoilWater1D& soil_water, 
+                  const SoilWater& soil_water, 
                   const std::string& name,
                   std::vector<double>& M, 
                   std::vector<double>& C, 

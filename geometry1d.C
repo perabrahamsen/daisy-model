@@ -46,7 +46,7 @@ size_t
 Geometry1D::cell_at (const double z, double, double) const
 {
   for (size_t cell = 1; cell < cell_size (); cell++)
-    if (zplus_[cell-1U] >= z)
+    if (zplus (cell-1U) >= z)
       return cell;
   return cell_size () - 1;
 }
@@ -66,7 +66,7 @@ Geometry1D::interval_plus (double z) const
   size_t i;
   for (i = 0; i < size_; i++)
     {
-      if (zplus_[i] <= z)
+      if (zplus (i) <= z)
 	return i;
     }
   daisy_assert (false);
@@ -79,7 +79,7 @@ Geometry1D::interval_border (double z) const
   
   for (size_t i = 1; i <= size_; i++)
     {
-      double dist = fabs (z - zplus_[i-1]);
+      const double dist = fabs (z - zplus (i-1U));
       if (dist > best)
 	return i - 1;
       best = dist;
@@ -121,127 +121,6 @@ check_alist (const AttributeList&, Treelog&)
   return ok;
 }
 
-
-#if 0
-double
-Geometry1D::total (const std::vector<double>& v) const
-{
-  const size_t to = std::min (v.size (), cell_size ());
-  double sum = 0.0;
-  for (size_t i = 0; i < to; i++)
-    sum += v[i] * dz (i);
-  return sum;
-}
-
-double
-Geometry1D::total (const std::vector<double>& v, 
-                   const double from, const double to) const
-{
-  double amount = 0.0;
-  double old = 0.0;
-
-  for (unsigned i = 0; i < v.size () && old > to ; i++)
-    {
-      if (zplus_[i] < from)
-	{
-	  const double height = (std::min (old, from) 
-                                 - std::max (zplus_[i], to));
-	  amount += v[i] * height;
-	}
-      old = zplus_[i];
-    }
-  return amount;
-}
-void
-Geometry1D::add (std::vector<double>& v, const double from, const double to, 
-               const double amount) const
-{
-  daisy_assert (to < from);
-  const double old_total = total (v);
-
-  const size_t last = interval_plus (to);
-  while (v.size () <= last)
-    v.push_back (0.0);
-  const double density = amount / (from - to);
-  double old = 0.0;
-
-  for (size_t i = 0; i <= last; i++)
-    {
-      if (zplus_[i] < from)
-	{
-	  const double top = std::min (old, from);
-	  const double bottom = std::max (zplus_[i], to);
-	  daisy_assert (top > bottom);
-	  v[i] += density * (top - bottom) / dz_[i];
-	}
-      old = zplus_[i];
-    }
-
-  const double new_total = total (v);
-  if (!approximate (old_total + amount, new_total))
-    {
-      std::ostringstream tmp;
-      tmp << "Olt total (" << old_total << ") + amount (" << amount
-             << ") != new total (" << total (v) 
-             << "); [" << from << ":" << to << "]";
-      daisy_warning (tmp.str ());
-    }
-}
-
-double
-Geometry1D::extract (std::vector<double>& v, const double from, const double to) const
-{
-  const double old_total = total (v);
-  const size_t last = interval_plus (to);
-  while (v.size () <= last)
-    v.push_back (0.0);
-  double amount = 0.0;
-  double old = 0.0;
-
-  for (unsigned i = 0; i <= last; i++)
-    {
-      daisy_assert (approximate (old - zplus_[i], dz_[i]));
-      if (zplus_[i] < from)
-	{
-	  const double top = std::min (old, from);
-	  const double bottom = std::max (zplus_[i], to);
-	  daisy_assert (top > bottom);
-	  const double height = top - bottom;
-	  amount += v[i] * height;
-	  if (approximate (height, old - zplus_[i]))
-	    v[i] = 0;
-	  else
-	    v[i] -= v[i] * height / dz_[i];
-	}
-      old = zplus_[i];
-    }
-  daisy_assert (approximate (old_total, total (v) + amount));
-  return amount;
-}
-
-void
-Geometry1D::set (std::vector<double>& v, double from, double to, double amount) const
-{
-  const size_t last = interval_plus (to);
-  while (v.size () <= last)
-    v.push_back (0.0);
-  const double density = amount / (from - to);
-  double old = 0.0;
-
-  for (unsigned i = 0; i <= last; i++)
-    {
-      if (zplus_[i] < from)
-	{
-	  const double height = (std::min (old, from) - std::max (zplus_[i], to));
-	  v[i] -= v[i] * height / (old - zplus_[i]); // Remove old.
-	  v[i] += density * height; // Add new.
-	}
-      old = zplus_[i];
-    }
-}
-
-#endif // 0
-
 void
 Geometry1D::swap (std::vector<double>& v, double from, double middle, double to) const
 {
@@ -275,7 +154,7 @@ The end points are listed descending from the surface to the bottom.");
 }
   
 Geometry1D::Geometry1D (Block& al)
-  : Geometry (al)
+  : GeometryVert (al)
 { 
   if (al.check ("zplus"))
     zplus_ = al.number_sequence ("zplus");

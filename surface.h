@@ -31,6 +31,7 @@ class Geometry;
 class Geometry1D;
 class Chemicals;
 class SoilChemicals;
+class Treelog;
 
 class Surface
 {
@@ -45,7 +46,7 @@ public:
   double h () const;
   void flux_top_on () const;
   void flux_top_off () const;
-  bool accept_top (Treelog&, double);
+  void accept_top (double amount, const Geometry&, size_t edge, Treelog&);
   bool soil_top () const;
   double ponding () const;
   double temperature () const;

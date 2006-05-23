@@ -23,7 +23,7 @@
 #include "transport.h"
 #include "geometry1d.h"
 #include "soil.h"
-#include "soil_water1d.h"
+#include "soil_water.h"
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
@@ -33,47 +33,32 @@
 
 using namespace std;
 
-class TransportConvection : public Transport
+struct TransportConvection : public Transport
 {
   // Parameters.
-private:
-  int max_time_step_reductions;
+  const int max_time_step_reductions;
 
-  // Log variable.
-private:
-  vector<double> J;		// Upward matter flux [g/cm²].
-  double ddt;			// Small time step [h].
-  
   // Simulation.
-public:
   void tick (Treelog&, const Geometry1D& geo,
-             const Soil&, const SoilWater1D&, const Adsorption&,
+             const Soil&, const SoilWater&, const Adsorption&,
 	     double diffusion_coefficient,
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
 	     vector<double>& J);
-  void output (Log&) const;
 
   // Create.
-public:
   TransportConvection (Block& al)
     : Transport (al),
-      max_time_step_reductions (al.integer ("max_time_step_reductions")),
-      ddt (dt)
+      max_time_step_reductions (al.integer ("max_time_step_reductions"))
     { }
+  static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
-
-void
-TransportConvection::output (Log& log) const
-{
-  output_variable (ddt, log);
-}
 
 void 
 TransportConvection::tick (Treelog& msg, 
 			   const Geometry1D& geo,
-                           const Soil& soil, const SoilWater1D& soil_water,
+                           const Soil& soil, const SoilWater& soil_water,
 			   const Adsorption& adsorption, double,
 			   vector<double>& M, 
 			   vector<double>& C,
@@ -96,7 +81,7 @@ TransportConvection::tick (Treelog& msg,
   vector<double> dJ (size + 1, 0.0); 
 
   // Find time step.
-  ddt = dt;
+  double ddt = dt;
   for (unsigned int i = 0; i < size; i++)
     {
       const double half_content = soil_water.Theta (i) * geo.dz (i) / 2.0;
@@ -194,6 +179,29 @@ TransportConvection::tick (Treelog& msg,
     };
 }
 
+const AttributeList& 
+Transport::reserve_model ()
+{
+  static AttributeList alist;
+  
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      TransportConvection::load_syntax (dummy, alist);
+      alist.add ("type", "convection");
+    }
+  return alist;
+}
+
+void 
+TransportConvection::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add ("max_time_step_reductions",
+              Syntax::Integer, Syntax::Const, "\
+Number of times we may reduce the time step before giving up");
+  alist.add ("max_time_step_reductions", 10);
+}
+
 static struct TransportConvectionSyntax
 {
   static Transport& make (Block& al)
@@ -206,12 +214,7 @@ static struct TransportConvectionSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Transport using convection alone.");
-    syntax.add ("ddt", "h", Syntax::LogOnly, Syntax::Singleton,
-		"Time step used in the numeric solution.");
-    syntax.add ("max_time_step_reductions",
-		Syntax::Integer, Syntax::Const, "\
-Number of times we may reduce the time step before giving up");
-    alist.add ("max_time_step_reductions", 10);
+    TransportConvection::load_syntax (syntax, alist);
     Librarian<Transport>::add_type ("convection", alist, syntax, &make);
   }
 } TransportConvection_syntax;

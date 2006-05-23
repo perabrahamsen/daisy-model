@@ -31,6 +31,10 @@ const char *const Groundwater::description = "\
 The 'groundwater' component is responsible for specifying the\n\
 groundwater table at each timestep.";
 
+void
+Groundwater::accept_bottom (double, const Geometry&, size_t)
+{ }
+
 bool 
 Groundwater::is_pipe () const
 { return false; }

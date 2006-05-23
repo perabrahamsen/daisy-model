@@ -22,29 +22,18 @@
 #include "soil_water_rect.h"
 #include "geometry_rect.h"
 #include "soil.h"
+#include "surface.h"
 #include "timestep.h"
 #include "submodel.h"
 
 void
-SoilWaterRect::clear ()
-{ clear_base (); }
-
-double 
-SoilWaterRect::top_flux () const
-{ return 0.0; }
- 
-void
-SoilWaterRect::tick (const Soil& soil)
+SoilWaterRect::tick (GeometryRect& geo, const Soil& soil, 
+                     Surface& surface, Treelog& msg)
 {
-  const size_t cell_size = soil.size ();
+  const size_t cell_size = geo.cell_size ();
 
-  // Remember old value.
-  Theta_old_ = Theta_;
-  h_old_ = h_;
-
-  // Incorporated water.
-  for (size_t i = 0; i < cell_size; i++)
-    S_sum_[i] += S_incorp_[i];
+  // Shared work.
+  tick_base (cell_size, soil, msg);
 
   // Update water.
   for (size_t i = 0; i < cell_size; i++)
@@ -52,50 +41,38 @@ SoilWaterRect::tick (const Soil& soil)
       Theta_[i] -= S_sum_[i] * dt;
       h_[i] = soil.h (i, Theta_[i]);
     }
+
+  const double q_up = surface.q ();
+  const size_t edge_size = geo.edge_size ();
+  const double surface_area = geo.surface_area ();
+
+  for (size_t e = 0; e < edge_size; e++)
+    if (geo.edge_to (e) == Geometry::cell_above)
+      {
+        if (q_up > 0)
+          // We obey exfiltration.
+          {
+            const size_t n = geo.edge_from (e);
+            q_[e] = q_up / surface_area;
+            Theta_[n] -= q_[e] * geo.edge_area (e) * dt / geo.volume (n);
+            surface.accept_top (q_up, geo, e, msg);
+          }
+        else
+          q_[e] = 0.0;
+      }
 }
 
-bool 
-SoilWaterRect::check (size_t n, Treelog& msg) const
-{
-  bool ok = check_base (n, msg);
-  return ok;
-}
 void 
 SoilWaterRect::output (Log& log) const
 { output_base (log); }
 
-  // Communication with surface.
-double
-SoilWaterRect::MaxExfiltration (const Geometry&,
-                                const Soil&, double) const
-{ return 0.0; }
-
 void
-SoilWaterRect::initialize (const AttributeList& al,
-                           const GeometryRect& geo,
-                           const Soil& soil,
+SoilWaterRect::initialize (const AttributeList& al, const GeometryRect& geo,
+                           const Soil& soil, const Groundwater& groundwater, 
                            Treelog& msg)
 {
   Treelog::Open nest (msg, "SoilWaterRect");
-  initialize_base (al, geo, soil, msg);
-
-  const size_t size = geo.cell_size ();
-
-  if (h_.size () == 0)
-    {
-      const double h_pF2 = -100.0; // pF 2.0;
-      for (size_t i = 0; i < size; i++)
-        {
-          h_.push_back (h_pF2);
-          Theta_.push_back (soil.Theta (i, h_pF2, h_ice (i)));
-        }
-    }
-  daisy_assert (h_.size () == size);
-  daisy_assert (h_.size () == Theta_.size ());
-
-  // We just assume no changes.
-  Theta_old_ = Theta_;
-  h_old_ = h_;
+  initialize_base (al, geo, soil, groundwater, msg);
 }
 
 void

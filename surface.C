@@ -76,7 +76,7 @@ struct Surface::Implementation
                 const SoilChemicals& soil_chemicals);
   bool flux_top () const;
   void  flux_top_on () const;
-  bool exfiltrate (Treelog&, double water);
+  void exfiltrate (double water, Treelog&);
   double ponding () const;
   void tick (Treelog&, double PotSoilEvaporation, double water, double temp,
 	     const Geometry& geo,
@@ -217,81 +217,86 @@ Surface::flux_top_off () const
   impl.flux = false;
 }
 
-bool  
-Surface::accept_top (Treelog& msg, double water /* cm */)
+void
+Surface::accept_top (double water /* cm */, const Geometry& geo, size_t edge, 
+                     Treelog& msg)
 { 
   if (impl.ridge_)
-    return true;		// Handled by ridge based on flux.
-  else
-    return impl.exfiltrate (msg, water * 10.0); 
+    return;		// Handled by ridge based on flux.
+
+  impl.exfiltrate (water * 10.0 * geo.edge_area (edge) / geo.surface_area (),
+                   msg); 
 }
 
 bool
 Surface::soil_top () const
 { return impl.ridge_ != NULL; }
 
-bool  
-Surface::Implementation::exfiltrate (Treelog& msg, double water /* mm */)
+void
+Surface::Implementation::exfiltrate (double water /* mm */, Treelog& msg)
 {
   if (lake >= 0.0)
-    return true;
+    return;
 
   if (fabs (water) < 1e-99)
-    return true;
+    return;
 
   // Exfiltration.
   if (water >= 0)
     {
       pond += water * dt;
-      return true;
+      return;
     }
+
+  Treelog::Open nest (msg, "Surface exfiltration");
 
   // Infiltration.
-  if (pond + water * dt >= - max (fabs (pond), fabs (water)) / 100.0)
+  if (pond + water * dt < - max (fabs (pond), fabs (water)) / 100.0)
     {
-      Treelog::Open nest (msg, "Surface exfiltration");
-      if (im.NO3 < 0.0)
-	{
-	  std::ostringstream tmp;
-	  tmp << "BUG: Added " << -im.NO3 << " NO3 to surface";
-	  msg.error (tmp.str ());
-	  im.NO3 = 0.0;
-	}
-      if (im.NH4 < 0.0)
-	{
-	  std::ostringstream tmp;
-	  tmp << "BUG: Added " << -im.NH4 << " NH4 to surface\n";
-	  msg.error (tmp.str ());
-	  im.NH4 = 0.0;
-	}
-      if (total_matter_flux)
-	{
-	  IM delta_matter (im, 1.0);
-	  delta_matter /= dt;
-	  im_flux -= delta_matter;
-	  im.clear ();
-	  if (chemicals_can_enter_soil)
-	    {
-	      chemicals_out += chemicals_storage;
-	      chemicals_storage.clear ();
-	    }
-	}
-      else if (-water > minimal_matter_flux)
-	{
-	  IM delta_matter (im, (-water * dt) / pond);
-	  im -= delta_matter;
-	  delta_matter /= dt;
-	  im_flux -= delta_matter;
-	  if (chemicals_can_enter_soil)
-	    Chemicals::move_fraction (chemicals_storage, chemicals_out,
-				      (-water * dt) / pond);
-	}
-
-      pond += water * dt;
-      return true;
+      std::ostringstream tmp;
+      tmp << "pond (" << pond << ") + flux (" << water << ") * dt (" << dt 
+          << ") = " << pond + water * dt << ", should be non-negative";
+      msg.error (tmp.str ());
+      return;
     }
-  else
-    return false;
+  if (im.NO3 < 0.0)
+    {
+      std::ostringstream tmp;
+      tmp << "Added " << -im.NO3 << " NO3 to surface";
+      msg.error (tmp.str ());
+      im.NO3 = 0.0;
+    }
+  if (im.NH4 < 0.0)
+    {
+      std::ostringstream tmp;
+      tmp << "Added " << -im.NH4 << " NH4 to surface\n";
+      msg.error (tmp.str ());
+      im.NH4 = 0.0;
+    }
+  if (total_matter_flux)
+    {
+      IM delta_matter (im, 1.0);
+      delta_matter /= dt;
+      im_flux -= delta_matter;
+      im.clear ();
+      if (chemicals_can_enter_soil)
+        {
+          chemicals_out += chemicals_storage;
+          chemicals_storage.clear ();
+        }
+    }
+  else if (-water > minimal_matter_flux)
+    {
+      IM delta_matter (im, (-water * dt) / pond);
+      im -= delta_matter;
+      delta_matter /= dt;
+      im_flux -= delta_matter;
+      if (chemicals_can_enter_soil)
+        Chemicals::move_fraction (chemicals_storage, chemicals_out,
+                                  (-water * dt) / pond);
+    }
+
+  pond += water * dt;
 }
 
 double
@@ -394,7 +399,7 @@ Surface::Implementation::tick (Treelog& msg,
     {
       const Geometry1D& geo1d = dynamic_cast<const Geometry1D&> (geo);
       ridge_->tick (geo1d, soil, soil_water, pond);
-      exfiltrate (msg, ridge_->exfiltration ());
+      exfiltrate (ridge_->exfiltration (), msg);
     }
 }
 

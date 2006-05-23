@@ -101,7 +101,7 @@ The end points are listed ascending from left (0.0) to right.");
 }
   
 GeometryRect::GeometryRect (Block& al)
-  : Geometry (al), 
+  : GeometryVert (al), 
     cell_rows_ (al.number_sequence ("zplus").size ()),
     cell_columns_ (al.number_sequence ("xplus").size ())
 {
@@ -137,12 +137,14 @@ GeometryRect::GeometryRect (Block& al)
           // Vertical edge.
           edge_from_.push_back (next_cell);
           edge_to_.push_back (last_cell);
+          edge_area_.push_back (x_distance[column]);
           // Horizontal edge.
           if (column > 0U)
             {
               daisy_assert (next_cell >= cell_rows_);
               edge_from_.push_back (next_cell - cell_rows_);
               edge_to_.push_back (next_cell);
+              edge_area_.push_back (z_distance[row]);
             }
           // Next node.
           last_cell = next_cell;
@@ -151,8 +153,13 @@ GeometryRect::GeometryRect (Block& al)
       // Bottom edge.
       edge_from_.push_back (cell_below);
       edge_to_.push_back (last_cell);
+      edge_area_.push_back (x_distance[column]);
     }
   daisy_assert (next_cell == cell_size ());
+  daisy_assert (edge_area_.size () == edge_to_.size ());
+  daisy_assert (edge_from_.size () == edge_to_.size ());
+  daisy_assert (edge_size () == ((cell_rows_ + 1U) * cell_columns_
+                                 + (cell_columns_ - 1U) * cell_rows_));
 }
 
 GeometryRect::~GeometryRect ()

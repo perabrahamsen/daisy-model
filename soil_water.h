@@ -37,22 +37,34 @@ class Block;
 
 class SoilWater
 {
+  friend class Movement1D;
+  friend class MovementRect;
+
   // Content.
 protected:
   std::vector<double> h_;
+  std::vector<double> h_old_;
   std::vector<double> Theta_;
   std::vector<double> Theta_old_;
   std::vector<double> S_sum_;
   std::vector<double> S_root_;
   std::vector<double> S_drain_;
   std::vector<double> S_incorp_;
+  std::vector<double> S_p_;
+  std::vector<double> S_permanent_;
+  std::vector<double> S_ice_;
   std::vector<double> tillage_;
+  std::vector<double> X_ice_;
+  std::vector<double> X_ice_buffer_;
+  std::vector<double> h_ice_;
+  std::vector<double> q_;
+  std::vector<double> q_p_;
   
   // Sink.
-protected:
-  void clear_base ();
 public:
-  virtual void clear () = 0;
+  void clear ();
+  void freeze (const Soil&, const std::vector<double>&);
+  void drain (const std::vector<double>&);
   void root_uptake (const std::vector<double>&);
   
   // Queries
@@ -71,32 +83,42 @@ public:
   { return S_root_[i]; }
   double S_drain (size_t i) const
   { return S_drain_[i]; }
-  virtual double h_ice (size_t i) const;
-  virtual double X_ice (size_t i) const;
-  virtual double top_flux () const = 0;
+  double S_ice (size_t i) const
+  { return S_ice_[i]; }
+  double S_sum (size_t i) const
+  { return S_sum_[i]; }
+  double h_ice (size_t i) const
+  { return h_ice_[i]; }
+  double X_ice (size_t i) const
+  { return X_ice_[i]; }
+  double X_ice_total (size_t i) const
+  { return X_ice_[i] + X_ice_buffer_[i]; }
+  double q (size_t i) const
+  { return q_[i]; }
+  double q_p (size_t i) const
+  { return q_p_[i]; }
   double Theta_ice (const Soil&, size_t i, double h) const;
  
   // Simulation.
 public:
+  void tick (const size_t cell_size, const Soil& soil, Treelog& msg);
   void incorporate (const Geometry&, double amount, double from, double to);
   void mix (const Geometry& geo,
             const Soil&, double from, double to);
   void swap (Treelog&, const Geometry& geo,
              const Soil&, double from, double middle, double to);
-protected:
-  bool check_base (size_t n, Treelog& err) const;
-  void output_base (Log& log) const;
+  bool check (size_t n, Treelog& err) const;
+  void output (Log& log) const;
 
   // Communication with surface.
 public:
-  virtual double MaxExfiltration (const Geometry& geo,
-                                  const Soil&, double T) const = 0;
+  double MaxExfiltration (const Geometry&, const Soil&, double T) const;
   
   // Creation.
-protected:
-  static void load_base (Syntax&, AttributeList&);
-  void initialize_base (const AttributeList&, const Geometry&, const Soil&,
-                        Treelog&);
+public:
+  static void load_syntax (Syntax&, AttributeList&);
+  void initialize (const AttributeList&, const Geometry&,
+                   const Soil&, const Groundwater&, Treelog&);
   SoilWater (Block&);
   virtual ~SoilWater ();
 };

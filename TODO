@@ -1,5 +1,28 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Lad solute bruge geometry vert
+
+* Lad movement_rect bruge uz
+
+Test om den giver identiske resultater med movement_vertical
+
+* Øvre rand: 
+
+  lake (konstant tryk), 
+  pond / precip (begrænset mængde vand)
+  Ep (flux ud)
+
+  pond
+  ____
+  ||||
+
+* Nedre rand:
+
+  lysimeter
+  tryk
+  pipes (tvungen flux)
+  fri afdræning
+
 * Send WP6 description to Luisa and Joao.
 
 * Terminologi

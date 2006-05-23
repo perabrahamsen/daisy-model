@@ -33,18 +33,17 @@ public:
   bottom_t bottom_type () const;
   double q_bottom () const
   { daisy_assert (false); }
-  bool accept_bottom (double);
 
   // Simulation.
 public:
-  void tick (const Geometry1D&,
-             const Soil&, SoilWater1D&, double, 
+  void tick (const Geometry&,
+             const Soil&, SoilWater&, double, 
 	     const SoilHeat&, const Time&, Treelog&);
   double table () const;
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry1D&, const Time&, Treelog&)
+  void initialize (const Geometry&, const Time&, Treelog&)
   { }
   GroundwaterStatic (Block&);
   ~GroundwaterStatic ();
@@ -59,15 +58,9 @@ GroundwaterStatic::bottom_type () const
     return pressure;
 }
 
-bool 
-GroundwaterStatic::accept_bottom (double)
-{
-  return true;
-}
-
 void
-GroundwaterStatic::tick (const Geometry1D&,
-                         const Soil&, SoilWater1D&, double, const SoilHeat&,
+GroundwaterStatic::tick (const Geometry&,
+                         const Soil&, SoilWater&, double, const SoilHeat&,
 			 const Time&, Treelog&)
 { }
 

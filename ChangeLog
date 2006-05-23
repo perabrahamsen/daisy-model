@@ -1,3 +1,11 @@
+2006-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry_vert.h, geometry_vert.C: New interface.
+	* Makefile (SPECIALS): Add it.
+	* geometry_rect.h, geometry_rect.C:
+	* geometry1d.h, geometry1d.C: Derive from it.
+	* uzmodel.h, uzlr.C, uznone.C, uzrichard.C: Use it.
+	
 2006-05-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* bioclimate_std.C (WaterDistribution): Handle pond/snow

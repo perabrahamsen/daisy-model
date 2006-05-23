@@ -27,7 +27,7 @@
 #include <vector>
 
 class Geometry1D;
-class SoilWater1D;
+class SoilWater;
 class Log;
 
 class Mactrans
@@ -39,7 +39,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Geometry1D& geo, const SoilWater1D&,
+  virtual void tick (const Geometry1D& geo, const SoilWater&,
 		     const std::vector<double>& M,
 		     const std::vector<double>& C,
 		     std::vector<double>& S,
@@ -52,6 +52,7 @@ protected:
   Mactrans (Block& al);
 public:
   virtual ~Mactrans ();
+  static const AttributeList& default_model ();
 };
 
 #ifdef FORWARD_TEMPLATES

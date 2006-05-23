@@ -99,7 +99,7 @@ private:
 public:
   explicit Soil (Block&);
   double initialize_aquitard (double Z_aquitard, double K_aquitard, Treelog&);
-  void initialize (Geometry&, bool volatile_bottom, int som_size, Treelog&);
+  void initialize (Geometry&, Groundwater&, int som_size, Treelog&);
   ~Soil ();
 };
 

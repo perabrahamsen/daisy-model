@@ -2523,7 +2523,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
 
   // Initialize DOM.
   for (size_t pool = 0; pool < dom_size; pool++)
-    dom[pool]->initialize (soil, soil_water, err);
+    dom[pool]->initialize (geo, soil, soil_water, err);
 
   // Initialize domsorp
   for (size_t i = 0; i < domsorp.size (); i++)

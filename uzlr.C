@@ -23,7 +23,7 @@
 #include "uzmodel.h"
 #include "surface.h"
 #include "groundwater.h"
-#include "geometry1d.h"
+#include "geometry_vert.h"
 #include "soil.h"
 #include "soil_heat.h"
 #include "mathlib.h"
@@ -40,7 +40,7 @@ private:
 
   // Simulate.
 public:
-  bool tick (Treelog&, const Geometry1D& geo,
+  bool tick (Treelog&, const GeometryVert& geo,
              const Soil& soil, const SoilHeat& soil_heat,
 	     unsigned int first, const Surface& top, 
 	     unsigned int last, const Groundwater& bottom, 
@@ -51,8 +51,6 @@ public:
 	     vector<double>& h,
 	     vector<double>& Theta,
 	     vector<double>& q);
-  void output (Log&) const
-  { }
 
   // Create and Destroy.
   void has_macropores (bool)
@@ -64,7 +62,7 @@ public:
 };
 
 bool
-UZlr::tick (Treelog& msg, const Geometry1D& geo,
+UZlr::tick (Treelog& msg, const GeometryVert& geo,
             const Soil& soil, const SoilHeat& soil_heat,
 	    unsigned int first, const Surface& top, 
 	    unsigned int last, const Groundwater& bottom, 
@@ -125,11 +123,11 @@ UZlr::tick (Treelog& msg, const Geometry1D& geo,
 
   //  Use darcy for upward movement in the top.
   const bool use_darcy = (h_old[first] < h_fc) && (q_up > 0.0);
-  const int to_darcy = max (geo.interval_plus (z_top), first + 5);
 
   // Intermediate cells.
   for (int i = first; i <= last; i++)
     {
+      const double z = geo.z (i);
       const double dz = geo.dz (i);
       const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
       const double Theta_res = soil.Theta_res (i);
@@ -150,13 +148,13 @@ UZlr::tick (Treelog& msg, const Geometry1D& geo,
       const double h_lim = (bottom.bottom_type ()
                             == Groundwater::free_drainage) 
         ? h_fc
-        : max (geo.zplus (last) - geo.z (i), h_fc);
+        : max (geo.zplus (last) - z, h_fc);
       daisy_assert (h_lim < 0.0);
 
-      if (use_darcy && i < to_darcy)
+      if (use_darcy && i < first + 5 && z > z_top)
 	// Dry earth, near top.  Use darcy to move water up.
 	{
-	  const double dist = geo.z (i) - geo.z (i+1);
+	  const double dist = z - geo.z (i+1);
 	  q[i+1] = max (K_new * ((h_old[i+1] - h_new) / dist - 1.0), 0.0);
 
 	  if (Theta_new + q[i+1] * dt / dz > Theta_sat)
@@ -375,7 +373,7 @@ UZmodel::reserve_model ()
 {
   static AttributeList alist;
   
-  if (!alist.check ("lr"))
+  if (!alist.check ("type"))
     {
       Syntax dummy;
       UZlr::load_syntax (dummy, alist);

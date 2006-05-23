@@ -32,59 +32,16 @@ class UZmodel;
 class SoilWater1D : public SoilWater
 {
   // Content.
-  std::vector<double> S_p_;
-  std::vector<double> S_permanent_;
-  std::vector<double> h_old_;
-  std::vector<double> S_ice_;
-  std::vector<double> X_ice_;
-  std::vector<double> X_ice_buffer_;
-  std::vector<double> h_ice_;
-  std::vector<double> q_;
-  std::vector<double> q_p_;
   std::auto_ptr<UZmodel> top;
   std::auto_ptr<UZmodel> reserve;
   std::auto_ptr<Macro> macro;
 
-  // Sink.
-public:
-  void clear ();
-  void drain (const std::vector<double>&);
-  void freeze (const Soil&, const std::vector<double>&);
-  
-  // Queries
-public:
-  double pF (size_t i) const;
-  double q (size_t i) const
-  { return q_[i]; }
-  double q_p (size_t i) const
-  { return q_p_[i]; }
-  double S_sum (size_t i) const
-  { return S_sum_[i]; }
-  double S_ice (size_t i) const
-  { return S_ice_[i]; }
-  double S_p (size_t i) const
-  { return S_p_[i]; }
-  double h_ice (size_t i) const
-  { return h_ice_[i]; }
-  double X_ice (size_t i) const
-  { return X_ice_[i]; }
-  double X_ice_total (size_t i) const
-  { return X_ice_[i] + X_ice_buffer_[i]; }
-  double top_flux () const
-  { return q (0); }
-    
   // Simulation.
 public:
   void macro_tick (const Geometry1D&, const Soil&, Surface&, Treelog&);
   void tick (const Geometry1D& geo,
              const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
-  bool check (size_t n, Treelog& err) const;
   void output (Log&) const;
-
-
-  // Communication with surface.
-  double MaxExfiltration (const Geometry& geo,
-                          const Soil&, double T) const;
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);

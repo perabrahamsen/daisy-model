@@ -24,9 +24,11 @@
 #include "geometry.h"
 #include "treelog.h"
 
+#include <sstream>
+
 void
 SelectFlux::output_array (const std::vector<double>& array, 
-                          const Geometry* geo, const Soil* soil, Treelog&)
+                          const Geometry* geo, const Soil* soil, Treelog& msg)
 { 
   if (soil != last_soil)
     last_soil = soil;

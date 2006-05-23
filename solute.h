@@ -41,6 +41,9 @@ class Solute
   const std::string submodel;	// Derived submodel.
 
   friend class Soltrans1D;
+  friend class Movement1D;
+  friend class MovementRect;
+
   // State variables.
 protected:
   std::vector<double> M_;		// Concentration in soil [g / cm³]

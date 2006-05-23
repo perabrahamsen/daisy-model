@@ -1,4 +1,4 @@
-// soil_water_rect.h -- Soil water movement in a a rectangular grid.
+// geometry_vert.C --- A discretization based on vertical columns.
 // 
 // Copyright 2006 Per Abrahamsen and KVL.
 //
@@ -19,27 +19,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef SOIL_WATER_RECT_H
-#define SOIL_WATER_RECT_H
+#include "geometry_vert.h"
+#include "block.h"
 
-#include "soil_water.h"
+GeometryVert::GeometryVert (Block& al)
+  : Geometry (al)
+{ }
 
-struct GeometryRect;
-
-class SoilWaterRect : public SoilWater
-{
-  // Simulation.
-public:
-  void tick (GeometryRect&, const Soil&, Surface&, Treelog&);
-  void output (Log&) const;
-
-  // Creation.
-public:
-  void initialize (const AttributeList& al, const GeometryRect& geo, 
-                   const Soil& soil, const Groundwater&, Treelog& msg);
-  static void load_syntax (Syntax&, AttributeList&);
-  SoilWaterRect (Block&);
-  ~SoilWaterRect ();
-};
-
-#endif // SOIL_WATER_RECT_H
+GeometryVert::~GeometryVert ()
+{ }

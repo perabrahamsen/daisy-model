@@ -22,10 +22,10 @@
 
 #include "groundwater.h"
 #include "log.h"
-#include "geometry1d.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_heat.h"
-#include "soil_water1d.h"
+#include "soil_water.h"
 #include "depth.h"
 #include "treelog.h"
 #include "mathlib.h"
@@ -43,7 +43,6 @@ class GroundwaterPipe : public Groundwater
   const double K_aquitard_;	// Conductivity of the aquitard. [cm h^-1]
   /*const*/ double Z_aquitard_;	// Vertical length of the aquitard. [cm]
   std::auto_ptr<Depth> pressure_table; // Virtual groundwater height. [cm]
-  int i_drain;			// Cell, drain
 
   // Accessors.
   double Z_aquitard () const
@@ -75,9 +74,6 @@ public:
   double q_bottom () const
   { return -deep_percolation; }
 
-  bool accept_bottom (double)
-  { return true; }
-
   // Identity
   bool is_pipe () const
   { return true; }
@@ -86,23 +82,22 @@ public:
 
   // Simulation.
 public:
-  void tick (const Geometry1D& geo,
-             const Soil&, SoilWater1D&, double,
+  void tick (const Geometry& geo,
+             const Soil&, SoilWater&, double,
 	     const SoilHeat&, const Time&, Treelog&);
   void output (Log& log) const;
 
 private:
-  void set_h_aquifer (const Geometry1D& geo, const Time& time)
+  void set_h_aquifer (const Geometry& geo, const Time& time)
   {
-    const size_t size = geo.cell_size ();
-    const double aquitart_bottom = geo.zplus (size-1) - Z_aquitard_;
+    const double aquitart_bottom = geo.bottom () - Z_aquitard_;
     h_aquifer = pressure_table->operator()(time) - aquitart_bottom;
   }
-  double DeepPercolation (const Geometry1D&);
+  double DeepPercolation (const Geometry&);
   double K_to_pipes (const unsigned int i, 
                      const Soil& soil, 
                      const SoilHeat& soil_heat) const;
-  double EquilibriumDrainFlow (const Geometry1D& geo,
+  double EquilibriumDrainFlow (const Geometry& geo,
                                const Soil&, const SoilHeat&);
 
   // Accessors.
@@ -111,13 +106,13 @@ private:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry1D& geo, const Time& time, Treelog& msg)
+  void initialize (const Geometry& geo, const Time& time, Treelog& msg)
   {
     const int size = geo.cell_size ();
     double largest = 0.0;
     for (unsigned int i = 0; i < size; i++)
-      if (geo.dz (i) > largest)
-	largest = geo.dz (i);
+      if (geo.volume (i) > largest)
+	largest = geo.volume (i);
     if (largest > 10.0)
       {
 	Treelog::Open nest (msg, "Groundwater pipe");
@@ -127,14 +122,12 @@ public:
 	msg.warning (tmp.str ());
       }
 
-    i_drain = geo.interval_plus (pipe_position);
-    daisy_assert (i_drain > 0);
     S.insert (S.end (), size, 0.0);
 
     if (!pressure_table.get ())
       {
         // GCC 2.95 need the extra variable for the assignment.
-        std::auto_ptr<Depth> depth (Depth::create ((geo.zplus (size-1)
+        std::auto_ptr<Depth> depth (Depth::create ((geo.bottom ()
                                                     - Z_aquitard_)
                                                    + h_aquifer));
         pressure_table = depth;
@@ -170,13 +163,13 @@ public:
 };
 
 void 
-GroundwaterPipe::tick (const Geometry1D& geo,
-                       const Soil& soil, SoilWater1D& soil_water, 
+GroundwaterPipe::tick (const Geometry& geo,
+                       const Soil& soil, SoilWater& soil_water, 
 		       const double h_surface,
 		       const SoilHeat& soil_heat, const Time& time,
                        Treelog&)
 {
-  const size_t size = soil.size ();
+  const size_t cell_size = geo.cell_size ();
 
   // Empty source.
   fill (S.begin (), S.end (), 0.0);
@@ -185,6 +178,37 @@ GroundwaterPipe::tick (const Geometry1D& geo,
   set_h_aquifer (geo, time);
 
   // Find groundwater height.
+#if 1
+  const double old_height = height;
+  height = 1.0;
+  double lowest = 0.0;
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      // Look for an unsaturated node.
+      const double h = soil_water.h (i);
+      if (h >= 0)
+        continue;
+      // as low as possible.
+      const double z = geo.z (i);
+      if (approximate (z, lowest))
+        {
+          const double new_height = z + h;
+ 
+          // Use closest value to old height;
+          if (height >= 0.0
+              || (std::fabs (new_height - old_height)
+                  < std::fabs (height - old_height)))
+            height = new_height;
+        }
+      else if (z < lowest)
+        {
+          lowest = z;
+          height = z + h;
+        }
+    }    
+  if (height > 0.0)
+    height = h_surface;
+#else
   height = h_surface;
   for (int i = size - 1; i >= 0; i--)
     {
@@ -203,7 +227,7 @@ GroundwaterPipe::tick (const Geometry1D& geo,
 	  break;
 	}
     }
-
+#endif
   // Find sink term.
   EqDrnFlow = EquilibriumDrainFlow (geo, soil, soil_heat);
   DrainFlow= geo.total (S);
@@ -215,11 +239,11 @@ GroundwaterPipe::tick (const Geometry1D& geo,
 
 
 double
-GroundwaterPipe::DeepPercolation(const Geometry1D& geo)
+GroundwaterPipe::DeepPercolation (const Geometry& geo)
 {
   const int size = geo.cell_size ();
   daisy_assert (size > 0);
-  const double hb = height - geo.zplus (size - 1);
+  const double hb = height - geo.bottom ();
   if (hb > 0)
     return K_aquitard_ * (1.0 + (hb - h_aquifer) / Z_aquitard_);
   else
@@ -238,46 +262,62 @@ GroundwaterPipe::K_to_pipes (const unsigned int i,
 }
 
 double
-GroundwaterPipe::EquilibriumDrainFlow (const Geometry1D& geo,
+GroundwaterPipe::EquilibriumDrainFlow (const Geometry& geo,
                                        const Soil& soil, 
 				       const SoilHeat& soil_heat)
 {
-  const int size = geo.cell_size ();
-  const int i_GWT = geo.interval_plus (height) + 1;
-  daisy_assert (i_drain > 0);
-  if (height >= geo.zplus(i_drain-1))
+  // If groundwater table is below pipes, there is no flow.
+  if (height <= pipe_position)
+    return 0.0;
+
+  const size_t cell_size = geo.cell_size ();
+
+  double Ha = 0.0;            // Volume above pipes.
+  double Ka = 0.0;            // Conductivity above pipes.
+  double Hb = 0.0;            // Volume below pipes.
+  double Kb = 0.0;            // Conductivity below pipes.
+    
+  for (size_t i = 0; i < cell_size; i++)
     {
-      // GWT located above drain
-      double Ha = 0;
-      double Ka = 0;
-      for (unsigned int i = i_GWT; i <= i_drain; i++)
-	{
-	  Ha += geo.dz (i);
-	  Ka += geo.dz (i) * K_to_pipes (i, soil, soil_heat);
-	}
-      Ka /= Ha;
+      const double z = geo.z (i);
 
-      // GWT located below drain
-      double Hb = 0;
-      double Kb = 0;
-      for (unsigned int i = i_drain+1; i < size; i++)
-	{
-	  Hb += geo.dz (i);
-	  Kb += geo.dz (i) * K_to_pipes (i, soil, soil_heat);
-	}
-      Kb /= Hb;
-      const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);
+      // No contribution from cells above the groundwater table.
+      if (z >= height)
+        continue;
 
-      // Distribution of drain flow among numeric soil layers
-      const double a = Flow / (Ka*Ha + Kb*Hb);
-      for (unsigned int i = i_GWT; i < size; i++)
-	{
-          S[i] = a * K_to_pipes (i, soil, soil_heat);
-	}
-      daisy_assert (std::isfinite (Flow));
-      return Flow;
+      const double volume = geo.volume (i);
+
+      if (z >= pipe_position)
+        {
+          Ha += volume;
+          Ka += volume * K_to_pipes (i, soil, soil_heat);
+        }
+      else
+        {
+          Hb += volume;
+          Kb += volume * K_to_pipes (i, soil, soil_heat);
+        }
     }
-  return 0.0;
+
+  // There may be no nodes with pipe_position < z < height.
+  if (!std::isnormal (Ha))
+    return 0.0;
+
+  // Average conductivity.
+  Ka /= Ha;
+  daisy_assert (std::isnormal (Hb));
+  Kb /= Hb;
+  
+  const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);
+
+  // Distribution of drain flow among numeric soil layers
+  const double a = Flow / (Ka*Ha + Kb*Hb);
+  for (size_t i = 0; i < cell_size; i++)
+    if (geo.z (i) < height)
+      S[i] = a * K_to_pipes (i, soil, soil_heat);
+
+  daisy_assert (std::isfinite (Flow));
+  return Flow;
 }
 
 void

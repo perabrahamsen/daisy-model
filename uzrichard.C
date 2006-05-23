@@ -38,10 +38,6 @@ using namespace std;
 
 class UZRichard : public UZmodel
 {
-  // Variables.
-private:
-  int iterations;
-
   // Parameters.
   int max_time_step_reductions;
   int time_step_reduction;
@@ -50,13 +46,9 @@ private:
   double max_relative_difference;
   /* const */ Average* K_average;
 
-  // UZmodel.
-public:
-  void output (Log&) const;
-
   // Simulate.
 private:
-  bool richard (Treelog&, const Geometry1D& geo,
+  bool richard (Treelog&, const GeometryVert& geo,
                 const Soil& soil, const SoilHeat& soil_heat,
 		int first, const Surface& top,
 		int last, const Groundwater& bottom,
@@ -74,7 +66,7 @@ private:
 		  const vector<double>& h_ice,
 		  const vector<double>& K,
 		  vector<double>& Kplus) const;
-  void q_darcy (const Geometry1D& geo,
+  void q_darcy (const GeometryVert& geo,
 		int first, int last,
 		const vector<double>& h_previous,
 		const vector<double>& h,
@@ -85,7 +77,7 @@ private:
 		double ddt,
 		vector<double>& q);
 public:
-  bool tick (Treelog&, const Geometry1D& geo,
+  bool tick (Treelog&, const GeometryVert& geo,
              const Soil& soil, const SoilHeat&,
 	     unsigned int first, const Surface& top,
 	     unsigned int last, const Groundwater& bottom,
@@ -107,7 +99,7 @@ public:
 
 bool
 UZRichard::richard (Treelog& msg,
-		    const Geometry1D& geo,
+		    const GeometryVert& geo,
                     const Soil& soil,
 		    const SoilHeat& soil_heat,
 		    int first, const Surface& top,
@@ -243,7 +235,6 @@ UZRichard::richard (Treelog& msg,
 	{
 	  h_conv = h;
 	  iterations_used++;
-	  iterations++;
 
 	  // Calculate parameters.
 	  for (unsigned int i = 0; i < size; i++)
@@ -642,7 +633,7 @@ UZRichard::internode (const Soil& soil, const SoilHeat& soil_heat,
 }
 
 void
-UZRichard::q_darcy (const Geometry1D& geo,
+UZRichard::q_darcy (const GeometryVert& geo,
 		    const int first, const int last,
 		    const vector<double>& /* h_previous */,
 		    const vector<double>& h,
@@ -656,7 +647,11 @@ UZRichard::q_darcy (const Geometry1D& geo,
   // Find an unsaturated area.
   // Start looking 3/4 towards the bottom.
   const double start_pos = (geo.z (first) + geo.z (last) * 3.0) / 4.0;
-  int start = geo.interval_plus (start_pos) - 1;
+  int start;
+  for (start = first; 
+       start < last && geo.zplus (start + 1) <= start_pos; 
+       start++)
+    ;
   if (!(start < last - 2))
     {
       std::ostringstream tmp;
@@ -697,7 +692,7 @@ calculating flow with pressure top.");
 }
 
 bool
-UZRichard::tick (Treelog& msg, const Geometry1D& geo,
+UZRichard::tick (Treelog& msg, const GeometryVert& geo,
                  const Soil& soil, const SoilHeat& soil_heat,
 		 unsigned int first, const Surface& top, 
 		 unsigned int last, const Groundwater& bottom, 
@@ -709,18 +704,11 @@ UZRichard::tick (Treelog& msg, const Geometry1D& geo,
 		 vector<double>& Theta,
 		 vector<double>& q)
 {
-  iterations = 0;
   if (!richard (msg, geo, soil, soil_heat, first, top, last, bottom, 
 		S, h_old, Theta_old, h_ice, h, Theta, q))
     throw ("Richard's Equation doesn't converge");
 
   return true;
-}
-
-void
-UZRichard::output (Log& log) const
-{
-  output_variable (iterations, log);
 }
 
 void
@@ -749,8 +737,6 @@ UZRichard::has_macropores (bool has_them)
 
 UZRichard::UZRichard (Block& al)
   : UZmodel (al),
-    // Variables.
-    iterations (0),
     // Parameters.
     max_time_step_reductions (al.integer ("max_time_step_reductions")),
     time_step_reduction (al.integer ("time_step_reduction")),
@@ -787,8 +773,6 @@ Maximum absolute difference in 'h' values for convergence.");
   syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
 Maximum relative difference in 'h' values for convergence.");
   alist.add ("max_relative_difference", 0.001);
-  syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly,
-              "Number of iterations used,");
   syntax.add ("K_average", Librarian<Average>::library (),
               Syntax::OptionalConst, Syntax::Singleton,
               "Model for calculating average K between cells.\n\

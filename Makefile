@@ -353,9 +353,8 @@ COMPONENTS = organic_matter.C movement.C integer.C \
 	pet.C net_radiation.C svat.C vegetation.C 
 
 # Submodels are combined models and components.
-# 
-SUBMODELS = soil_heat_rect.C soil_water_rect.C \
-	geometry_rect.C element.C soltrans1d.C soil_water1d.C \
+#
+SUBMODELS = soil_heat_rect.C geometry_rect.C element.C \
         geometry1d.C soil_heat1d.C fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \
@@ -368,7 +367,7 @@ SUBMODELS = soil_heat_rect.C soil_water_rect.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = select_flux.C gnuplot_base.C \
+SPECIALS = geometry_vert.C select_flux.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 	geometry.C printer_file.C log_alist.C log_clone.C 
@@ -424,7 +423,10 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = column_r2d2.C column_rect.C column_inorganic.C column_base.C column_baseh.h
+REMOVE = soltrans1d.C\
+	soil_water1d.C soil_water_rect.C soil_water1d.h soil_water_rect.h \
+	column_r2d2.C column_rect.C column_inorganic.C \
+	column_base.C column_baseh.h 
 
 # These are the file extensions we deal with.
 # 
@@ -836,7 +838,7 @@ soil_heat_rect${OBJ}: soil_heat_rect.C soil_heat_rect.h soil_heat.h \
 soil_water_rect${OBJ}: soil_water_rect.C soil_water_rect.h soil_water.h \
   geometry_rect.h geometry.h syntax.h treelog.h symbol.h mathlib.h \
   assertion.h soil.h horizon.h librarian.h library.h block.h plf.h \
-  alist.h submodel.h
+  alist.h timestep.h submodel.h
 geometry_rect${OBJ}: geometry_rect.C geometry_rect.h geometry.h syntax.h \
   treelog.h symbol.h mathlib.h assertion.h check.h vcheck.h block.h plf.h \
   submodel.h
@@ -915,8 +917,8 @@ ridge${OBJ}: ridge.C ridge.h soil.h horizon.h librarian.h library.h symbol.h \
   timestep.h
 soil${OBJ}: soil.C soil.h horizon.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h geometry.h mathlib.h \
-  hydraulic.h tortuosity.h submodel.h submodeler.h log.h border.h check.h \
-  vcheck.h memutils.h
+  hydraulic.h tortuosity.h groundwater.h submodel.h submodeler.h log.h \
+  border.h check.h vcheck.h memutils.h
 surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h timestep.h \
   geometry1d.h geometry.h mathlib.h soil.h horizon.h soil_water.h log.h \
@@ -1089,8 +1091,8 @@ submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
 movement_rect${OBJ}: movement_rect.C movement.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   transport.h mactrans.h geometry_rect.h geometry.h mathlib.h \
-  soil_water_rect.h soil_water.h soil_heat_rect.h soil_heat.h log.h \
-  border.h submodeler.h
+  soil_water_rect.h soil_water.h soil_heat_rect.h soil_heat.h solute.h \
+  adsorption.h timestep.h element.h log.h border.h submodeler.h
 number_soil${OBJ}: number_soil.C number.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h column.h horizon.h \
   hydraulic.h weather.h im.h time.h units.h
@@ -1108,8 +1110,7 @@ movement_1D${OBJ}: movement_1D.C movement.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h transport.h \
   mactrans.h geometry1d.h geometry.h mathlib.h soil.h horizon.h \
   soil_water1d.h soil_water.h macro.h soil_heat1d.h soil_heat.h \
-  soltrans1d.h surface.h uzmodel.h timestep.h groundwater.h log.h \
-  border.h submodeler.h
+  soltrans1d.h surface.h uzmodel.h timestep.h log.h border.h submodeler.h
 integer_arit${OBJ}: integer_arit.C integer.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h vcheck.h \
   memutils.h
@@ -1305,7 +1306,7 @@ action_crop${OBJ}: action_crop.C action.h librarian.h library.h symbol.h \
   check_range.h check.h im.h submodeler.h vcheck.h memutils.h
 groundwater_lysimeter${OBJ}: groundwater_lysimeter.C groundwater.h \
   librarian.h library.h symbol.h block.h syntax.h treelog.h plf.h alist.h \
-  assertion.h geometry1d.h geometry.h mathlib.h
+  assertion.h geometry.h mathlib.h
 action_message${OBJ}: action_message.C action.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   condition.h log.h border.h daisy.h program.h time.h
@@ -1323,8 +1324,8 @@ select_flux_bottom${OBJ}: select_flux_bottom.C select_flux.h select_value.h \
   mathlib.h
 groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h librarian.h \
   library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
-  log.h border.h geometry1d.h geometry.h mathlib.h soil.h horizon.h \
-  soil_heat.h soil_water1d.h soil_water.h macro.h depth.h check.h
+  log.h border.h geometry.h mathlib.h soil.h horizon.h soil_heat.h \
+  soil_water.h depth.h check.h
 select_index${OBJ}: select_index.C select_value.h select.h destination.h \
   symbol.h condition.h librarian.h library.h block.h syntax.h treelog.h \
   plf.h alist.h assertion.h units.h
@@ -1371,9 +1372,9 @@ column_std${OBJ}: column_std.C column.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h surface.h \
   uzmodel.h timestep.h soil_heat1d.h soil_heat.h soil_chemicals.h \
   soil_chemical.h solute.h adsorption.h movement.h transport.h mactrans.h \
-  geometry1d.h geometry.h mathlib.h soil.h horizon.h soil_water1d.h \
-  soil_water.h macro.h vegetation.h bioclimate.h weather.h im.h \
-  chemistry.h chemicals.h soil_NH4.h soil_NO3.h organic_matter.h \
+  groundwater.h geometry1d.h geometry.h mathlib.h soil.h horizon.h \
+  soil_water1d.h soil_water.h macro.h vegetation.h bioclimate.h weather.h \
+  im.h chemistry.h chemicals.h soil_NH4.h soil_NO3.h organic_matter.h \
   domsorp.h clayom.h denitrification.h am.h dom.h time.h log.h border.h \
   submodeler.h memutils.h
 weather_simple${OBJ}: weather_simple.C weather_old.h weather.h librarian.h \

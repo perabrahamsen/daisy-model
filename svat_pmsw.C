@@ -1512,7 +1512,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 
       // communication with soil_water.h
       // water flow positive to soil surface (LEs)
-      les_q=6800.0*soil_water.top_flux (); // in W/m^2
+      les_q=6800.0*soil_water.q(0); // in W/m^2
       // cout << "past les_q\n";
 
       // soil evap. is min[abs(-q0),epots]

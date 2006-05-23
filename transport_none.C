@@ -23,7 +23,7 @@
 #include "transport.h"
 #include "geometry1d.h"
 #include "soil.h"
-#include "soil_water1d.h"
+#include "soil_water.h"
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
@@ -32,22 +32,18 @@
 
 using namespace std;
 
-class TransportNone : public Transport
+struct TransportNone : public Transport
 {
   // Simulation.
-public:
   void tick (Treelog&, const Geometry1D&,
-             const Soil&, const SoilWater1D&, const Adsorption&,
+             const Soil&, const SoilWater&, const Adsorption&,
 	     double diffusion_coefficient,
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
 	     vector<double>& J);
-  void output (Log&) const
-    { }
 
   // Create.
-public:
   TransportNone (Block& al)
     : Transport (al)
     { }
@@ -56,7 +52,7 @@ public:
 void 
 TransportNone::tick (Treelog& msg,
 		     const Geometry1D& geo,
-                     const Soil& soil, const SoilWater1D& soil_water,
+                     const Soil& soil, const SoilWater& soil_water,
 		     const Adsorption& adsorption, 
 		     const double,
 		     vector<double>& M, 
@@ -91,6 +87,19 @@ TransportNone::tick (Treelog& msg,
 
   if (nest)
     delete nest;
+}
+
+const AttributeList& 
+Transport::none_model ()
+{
+  static AttributeList alist;
+  
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      alist.add ("type", "none");
+    }
+  return alist;
 }
 
 static struct TransportNoneSyntax

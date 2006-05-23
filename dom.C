@@ -216,10 +216,11 @@ Fraction of this pool that ends up in each SMB pools");
 }
 
 void
-DOM::initialize (const Soil& soil, const SoilWater& soil_water, Treelog& msg)
+DOM::initialize (const Geometry& geo, 
+                 const Soil& soil, const SoilWater& soil_water, Treelog& msg)
 { 
-  C.initialize (soil, soil_water, *adsorption, msg);
-  N.initialize (soil, soil_water, *adsorption, msg);
+  C.initialize (geo, soil, soil_water, *adsorption, msg);
+  N.initialize (geo, soil, soil_water, *adsorption, msg);
 }
 
 DOM::DOM (Block& al)

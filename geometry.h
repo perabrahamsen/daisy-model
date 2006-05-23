@@ -35,7 +35,7 @@ class Groundwater;
 class Geometry
 {
   // Pseudo-cell numbers.
-protected:
+public:
   static const int cell_above = -13311331;
   static const int cell_below = -424242;
   // Parameters.
@@ -52,6 +52,8 @@ public:
   virtual int dimensions () const = 0; // Number of non-trivial dimensions.
   virtual int edge_from (size_t) const = 0; // Cell where edge originates.
   virtual int edge_to (size_t) const = 0; // Cell where edge leads.
+  virtual double edge_area (size_t) const = 0; // Area connecting the cells.
+  virtual double surface_area () const = 0; // Total surface area.
   virtual double z (size_t) const = 0; // Cell center depth [cm]
   double z_safe (int) const;    // Same, handles edge_top and edge_bottom.
   virtual double x (size_t) const 
