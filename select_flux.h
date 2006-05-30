@@ -31,6 +31,7 @@ struct SelectFlux : public SelectValue
   const Geometry* last_geo;
   const Soil* last_soil;
   std::vector<int> edges;
+  std::vector<double> weight;
 
   // Output routines.
   void output_array (const std::vector<double>&, 

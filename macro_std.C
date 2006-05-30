@@ -114,13 +114,14 @@ MacroStandard::tick (const Geometry1D& geo,
 
   // Check if macropores reach surface, and there is ponding there.
   double q_top = 0.0;
-  if (height_start >= 0.0  && !surface.flux_top () && surface.h () > 0.0)
+  if (height_start >= 0.0
+      && surface.top_type (geo, 0U) == Surface::limited_water)
     {
+      const double surface_q = surface.q_top (geo, 0U);
       // Empty it.
-      surface.flux_top_on ();
-      if (-surface.q () * 10.0 * dt > pond_max)
+      if (-surface_q * 10.0 * dt > pond_max)
 	{
-	  q_top = surface.q () + pond_max / 10.0 / dt;
+	  q_top = surface_q + pond_max / 10.0 / dt;
 	  daisy_assert (q_top < 0.0);
 	  daisy_assert (q_p[0] == 0.0);
 	  daisy_assert (from == 0);

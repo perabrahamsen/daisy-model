@@ -48,6 +48,7 @@ public:
   virtual bool tick (Treelog&, const GeometryVert& geo,
                      const Soil& soil, const SoilHeat&,
 		     unsigned int first, const Surface& top, 
+                     const size_t top_edge,
 		     unsigned int last, const Groundwater& bottom, 
 		     const std::vector<double>& S,
 		     const std::vector<double>& h_old,
@@ -55,6 +56,7 @@ public:
 		     const std::vector<double>& h_ice,
 		     std::vector<double>& h,
 		     std::vector<double>& Theta,
+                     const size_t q_offset,
 		     std::vector<double>& q) = 0;
 
   // Create and Destroy.

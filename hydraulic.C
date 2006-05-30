@@ -155,7 +155,7 @@ void
 Hydraulic::load_K_sat_optional (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_check (check_K_sat_optional);
-  syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::OptionalConst,
+  syntax.add ("K_sat", "cm/h", Check::positive (), Syntax::OptionalConst,
 	      "Water conductivity of saturated soil.");
   syntax.add_submodule ("K_at_h", alist, Syntax::OptionalConst, "\
 Water conductivity at specified pressure.", K_at_h::load_syntax);

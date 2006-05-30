@@ -50,7 +50,6 @@ struct Surface::Implementation
   const double albedo_dry;
   const double lake;
   double pond;
-  mutable bool flux;
   IM im_flux;
   double EvapSoilSurface;
   double Eps;
@@ -74,8 +73,6 @@ struct Surface::Implementation
   void mixture (const IM& soil_im /* g/cm^2/mm */);
   void mixture (const Geometry& geo,
                 const SoilChemicals& soil_chemicals);
-  bool flux_top () const;
-  void  flux_top_on () const;
   void exfiltrate (double water, Treelog&);
   double ponding () const;
   void tick (Treelog&, double PotSoilEvaporation, double water, double temp,
@@ -92,6 +89,75 @@ struct Surface::Implementation
   Implementation (const AttributeList& al);
   ~Implementation ();
 };
+
+Surface::top_t 
+Surface::top_type (const Geometry& geo, size_t edge) const
+{
+  daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
+
+  if (impl.ridge_)
+    return soil;
+
+  if (impl.lake >= 0.0)
+    return forced_pressure;
+  
+  if (impl.pond <= 0.0)
+    return forced_flux;
+  
+  return limited_water;
+}
+
+double 
+Surface::q_top (const Geometry& geo, size_t edge) const
+{
+  daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
+
+  if (impl.ridge_)
+    return -impl.ridge_->h () / dt;
+  else
+    return -ponding () * 0.1;		// mm -> cm.
+}
+  
+double
+Surface::h_top (const Geometry& geo, size_t edge) const
+{ 
+  return -q_top (geo, edge) * dt; 
+}
+
+void
+Surface::accept_top (double water /* cm */, const Geometry& geo, size_t edge, 
+                     Treelog& msg)
+{ 
+  daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
+
+  if (impl.ridge_)
+    return;		// Handled by ridge based on flux.
+
+  impl.exfiltrate (water * 10.0 * geo.edge_area (edge) / geo.surface_area (),
+                   msg); 
+}
+
+size_t 
+Surface::last_cell (const Geometry& geo, size_t edge) const 
+{ 
+  daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
+  daisy_assert (edge == 0);
+  daisy_assert (impl.ridge_);
+  return impl.ridge_->last_cell ();
+}
+
+void
+Surface::update_water (const Geometry1D& geo,
+                       const Soil& soil,
+		       const vector<double>& S_,
+		       vector<double>& h_,
+		       vector<double>& Theta_,
+		       vector<double>& q,
+		       const vector<double>& q_p)
+{
+  if (impl.ridge_)
+    impl.ridge_->update_water (geo, soil, S_, h_, Theta_, q, q_p); 
+}
 
 void 
 Surface::ridge (const Geometry1D& geo,
@@ -164,73 +230,6 @@ Surface::Implementation::mixture (const Geometry& geo,
 			      pond, R_mixing);
     }
 }
-
-void
-Surface::update_water (const Geometry1D& geo,
-                       const Soil& soil,
-		       const vector<double>& S_,
-		       vector<double>& h_,
-		       vector<double>& Theta_,
-		       vector<double>& q,
-		       const vector<double>& q_p)
-{
-  if (impl.ridge_)
-    impl.ridge_->update_water (geo, soil, S_, h_, Theta_, q, q_p); 
-}
-
-bool 
-Surface::flux_top () const
-{ return impl.flux_top (); }
-
-bool 
-Surface::Implementation::flux_top () const
-{
-  return !ridge_ && lake < 0.0 && flux;
-}
-
-double 
-Surface::q () const
-{
-  if (impl.ridge_)
-    return -impl.ridge_->h () / dt;
-  else
-    return -ponding () * 0.1;		// mm -> cm.
-}
-  
-double
-Surface::h () const
-{ return -q () * dt; }
-
-void  
-Surface::flux_top_on () const
-{ impl.flux_top_on (); }
-
-void  
-Surface::Implementation::flux_top_on () const
-{ 
-  flux = true;
-}
-
-void  
-Surface::flux_top_off () const
-{ 
-  impl.flux = false;
-}
-
-void
-Surface::accept_top (double water /* cm */, const Geometry& geo, size_t edge, 
-                     Treelog& msg)
-{ 
-  if (impl.ridge_)
-    return;		// Handled by ridge based on flux.
-
-  impl.exfiltrate (water * 10.0 * geo.edge_area (edge) / geo.surface_area (),
-                   msg); 
-}
-
-bool
-Surface::soil_top () const
-{ return impl.ridge_ != NULL; }
 
 void
 Surface::Implementation::exfiltrate (double water /* mm */, Treelog& msg)
@@ -315,18 +314,6 @@ Surface::Implementation::ponding () const
     return lake;
 }
 
-double
-Surface::temperature () const
-{ return impl.T; }
-
-int 
-Surface::last_cell () const 
-{ 
-  if (impl.ridge_)
-    return impl.ridge_->last_cell ();
-  return -1; 
-}
-
 const IM& 
 Surface::matter_flux ()
 { return impl.im_flux; }
@@ -334,6 +321,10 @@ Surface::matter_flux ()
 const Chemicals& 
 Surface::chemicals_down () const
 { return impl.chemicals_out; }
+
+double
+Surface::temperature () const
+{ return impl.T; }
 
 void
 Surface::tick (Treelog& msg,
@@ -371,9 +362,6 @@ Surface::Implementation::tick (Treelog& msg,
     = soil_water.MaxExfiltration (geo, soil, soil_T) * 10.0; // cm -> mm.
 
   Eps = PotSoilEvaporation;
-
-  if (pond + water * dt < Eps * dt)
-    flux_top_on ();
 
   if (pond + water * dt + MaxExfiltration * dt < Eps * dt)
     EvapSoilSurface = pond / dt + water + MaxExfiltration;
@@ -483,7 +471,6 @@ Surface::Implementation::output (Log& log) const
 {
   output_variable (T, log);
   output_variable (pond, log);
-  output_variable (flux, log);
   output_variable (EvapSoilSurface, log);
   output_variable (Eps, log);
   output_variable (runoff, log);
@@ -589,9 +576,6 @@ Set this to a positive number to force a permanent pressure top.");
 Amount of ponding on the surface.\n\
 Negative numbers indicate soil exfiltration.");
   alist.add ("pond", 0.0);
-  syntax.add ("flux", Syntax::Boolean, Syntax::State, "\
-True, iff the surface is currently a flux top for water transport.");
-  alist.add ("flux", true);
   syntax.add ("EvapSoilSurface", "mm", Syntax::LogOnly, "\
 Water evaporated from the surface, including the pond and exfiltration.");
   syntax.add ("Eps", "mm", Syntax::LogOnly, "\
@@ -643,7 +627,6 @@ Surface::Implementation::Implementation (const AttributeList& al)
     albedo_dry (al.number ("albedo_dry")),
     lake (al.number ("lake")),
     pond (al.number ("pond")),
-    flux (al.flag ("flux")),
     im_flux (),
     EvapSoilSurface (0.0),
     Eps (0.0),

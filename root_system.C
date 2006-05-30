@@ -82,7 +82,7 @@ RootSystem::potential_water_uptake (const double h_x,
       daisy_assert (uptake >= 0.0);
       S[i] = uptake;
     }
-  return geo.total (S) * 10.0 /* [mm/cm] */;
+  return geo.total_surface (S) * 10.0 /* [mm/cm] */;
 }
 
 double
@@ -288,7 +288,7 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
   solute.add_to_root_sink (uptake);
 
   // gN/cm³/h -> gN/m²/h
-  return geo.total (uptake) * 1.0e4;
+  return geo.total_surface (uptake) * 1.0e4;
 }
 
 double

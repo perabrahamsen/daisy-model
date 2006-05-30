@@ -64,9 +64,9 @@ public:
   void pour (std::vector<double>& cc, std::vector<double>& nn);
   void add (double C, double N);// Add dead leafs.
   void add (const Geometry& geometry, AM& other); // Merge AOMs.
-  void add (const Geometry&,	// Add dead roots.
-	    double C, double N, 
-	    const std::vector<double>& density);
+  void add_surface (const Geometry&,	// Add dead roots.
+                    double C, double N, 
+                    const std::vector<double>& density);
   double top_C () const;	// [g C/cm^2]
   double top_N () const;	// [g N/cm^2]
   void multiply_top (double fraction);

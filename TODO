@@ -1,31 +1,47 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Lad solute bruge geometry vert
+* R2D2
 
-* Lad movement_rect bruge uz
+** Check interface mellem jord og overflade (geo total, add, extract, set)
 
-Test om den giver identiske resultater med movement_vertical
+** horizontal vandtransport
 
-* Øvre rand: 
+** stoftransport
 
-  lake (konstant tryk), 
-  pond / precip (begrænset mængde vand)
-  Ep (flux ud)
+** varmetransport.
 
-  pond
-  ____
-  ||||
+** makroporer.
 
-* Nedre rand:
+* artikel, cto
 
-  lysimeter
-  tryk
-  pipes (tvungen flux)
-  fri afdræning
+== abstract ==
+
+In the FertOrgaNic EU project, 3 years of field experiments with
+fertigation was carried out at 6 different sites across Europe,
+involving seven different varieties of potato.
+
+In order to condense these data to a form useful for making production
+and environmental predictions with the Daisy agroecological simulation
+model, a four phase calibration procedure was followed.  The first
+step was to develop a parameterization based on an independent data
+set, and distribute that to the individual sites.  The second step was
+for the local experts to calibrate it for the varieties found on their
+site.  The third step was to extract shared traits from these site and
+variety specific calibrations into a common parameterization.  The
+final step was to recalibrate for the individul varieties based on the
+measured data.
+
+We believe this procedure combines both local and model expertise in a
+way that result more robust and general parameterizations than had the
+common parameterization step been skipped.
+
+* lær cto wp6 
 
 * Send WP6 description to Luisa and Joao.
 
-* Terminologi
+* r2d2 paper
+
+** Terminologi
 
 cell, edge, vertex
 

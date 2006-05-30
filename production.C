@@ -386,13 +386,13 @@ Production::tick (const double AirT, const double SoilT,
       IncWRoot -= DeadWRoot;
       const double C_Root = DM_to_C_factor (E_Root) * DeadWRoot;
       C_Loss += C_Root;
-      AM_root->add (geo, C_Root * m2_per_cm2,
-                    DeadNRoot * m2_per_cm2,
-                    Density);
+      AM_root->add_surface (geo, C_Root * m2_per_cm2,
+                            DeadNRoot * m2_per_cm2,
+                            Density);
       daisy_assert (C_Root == 0.0 || DeadNRoot > 0.0);
       residuals_DM += DeadWRoot;
-      geo.add (residuals_C_soil, Density, C_Root * m2_per_cm2);
-      geo.add (residuals_N_soil, Density, DeadNRoot * m2_per_cm2);
+      geo.add_surface (residuals_C_soil, Density, C_Root * m2_per_cm2);
+      geo.add_surface (residuals_N_soil, Density, DeadNRoot * m2_per_cm2);
       C_AM += C_Root;
       N_AM += DeadNRoot;
     }

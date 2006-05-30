@@ -60,14 +60,14 @@ AOM::penetrate (const Geometry& geo, double from, double to,
   static const double cm2_to_m2 = 100 * 100;
 
   // Penetrate.
-  geo.add (C, from, to, C_pen);
-  geo.add (tillage_C_soil, from, to, C_pen);
+  geo.add_surface (C, from, to, C_pen);
+  geo.add_surface (tillage_C_soil, from, to, C_pen);
   assert_non_negative (C);
   top_C -= C_pen;
   tillage_C_top -= C_pen * cm2_to_m2;
   daisy_assert (top_C >= 0.0);
-  geo.add (N, from, to, N_pen);
-  geo.add (tillage_N_soil, from, to, N_pen);
+  geo.add_surface (N, from, to, N_pen);
+  geo.add_surface (tillage_N_soil, from, to, N_pen);
   assert_non_negative (N);
   top_N -= N_pen;
   tillage_N_top -= N_pen * cm2_to_m2;

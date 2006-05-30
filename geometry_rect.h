@@ -38,8 +38,18 @@ class GeometryRect : public GeometryVert
   
   // Accessors.
 public:
+  inline size_t cell_rows () const
+  { return cell_rows_; }
+  inline size_t cell_columns () const
+  { return cell_columns_; }
+  inline size_t edge_rows () const
+  { return cell_rows () + 1U; }
+  inline size_t edge_columns () const
+  { return cell_columns () - 1U; }
   inline size_t edge_size () const
   { return edge_from_.size (); }
+  inline size_t cell_index (const size_t row, const size_t column) const
+  { return column * cell_rows () + row; }
   inline int dimensions () const
   { return 2; }
   inline int edge_from (size_t e) const // Cell where edge originates.
@@ -60,7 +70,6 @@ public:
   { return zplus_[cell_rows_ - 1]; }
   size_t cell_at (double z, double x, double y) const;
   double fraction_in_z_interval (size_t n, double from, double to) const;
-  bool edge_cross_z (size_t e, double z) const; // Cross depth?
   bool contain_z (size_t n, double z) const;
 
   // Layers -- Support initializing soil arrays layer by layer.

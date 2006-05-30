@@ -39,25 +39,19 @@ class Surface
   Implementation& impl;
 
 public:
-
-  // Communication with soil.
-  bool flux_top () const;
-  double q () const;
-  double h () const;
-  void flux_top_on () const;
-  void flux_top_off () const;
+  // Communication with soil water.
+  enum top_t { forced_pressure, forced_flux, limited_water, soil };
+  top_t top_type (const Geometry&, size_t edge) const;
+  double q_top (const Geometry&, size_t edge) const; // [cm]
+  double h_top (const Geometry&, size_t edge) const; // [cm]
   void accept_top (double amount, const Geometry&, size_t edge, Treelog&);
-  bool soil_top () const;
-  double ponding () const;
-  double temperature () const;
-  int last_cell () const;
+  size_t last_cell (const Geometry&, size_t edge) const;
 
+  // Column.
   const IM& matter_flux ();
   const Chemicals&  chemicals_down () const;
 
-  void mixture (const IM& soil_im /* [g/cm^2/mm] */);
-  void mixture (const Geometry& geo,
-                const SoilChemicals& soil_chemicals);
+  // Ridge.
   void update_water (const Geometry1D& geo,
                      const Soil&, const std::vector<double>& S_,
 		     std::vector<double>& h_, std::vector<double>& Theta_,
@@ -73,12 +67,17 @@ public:
   void unridge ();
 
   // Simulation.
+  void mixture (const IM& soil_im /* [g/cm^2/mm] */);
+  void mixture (const Geometry& geo,
+                const SoilChemicals& soil_chemicals);
   void output (Log&) const;
   void tick (Treelog&, double PotSoilEvaporation, double Water, double temp,
 	     const Geometry& geo,
              const Soil&, const SoilWater&, double soil_T);
 
   // Communication with bioclimate.
+  double ponding () const;
+  double temperature () const;
   double EpFactor () const;
   double albedo (const Geometry&, const Soil&, const SoilWater&) const;
   double exfiltration () const; // [mm/h]

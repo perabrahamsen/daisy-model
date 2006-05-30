@@ -106,7 +106,7 @@ GeometryRect::GeometryRect (Block& al)
     cell_columns_ (al.number_sequence ("xplus").size ())
 {
   // Initialize base.
-  size_ = cell_columns_ * cell_rows_;
+  size_ = cell_columns () * cell_rows ();
 
   // Extract grid information from parameters.
   const std::vector<double> z_end (al.number_sequence ("zplus"));
@@ -120,12 +120,12 @@ GeometryRect::GeometryRect (Block& al)
 
   // Fill in cells by column, starting from the top left corner.
   size_t next_cell = 0;
-  for (size_t column = 0; column < cell_columns_; column++)
+  for (size_t column = 0; column < cell_columns (); column++)
     {
       // Top edge.
       size_t last_cell = cell_above;
       
-      for (size_t row = 0; row < cell_rows_; row++)
+      for (size_t row = 0; row < cell_rows (); row++)
         {
           // Cell
           zplus_.push_back (z_end[row]);
@@ -138,15 +138,8 @@ GeometryRect::GeometryRect (Block& al)
           edge_from_.push_back (next_cell);
           edge_to_.push_back (last_cell);
           edge_area_.push_back (x_distance[column]);
-          // Horizontal edge.
-          if (column > 0U)
-            {
-              daisy_assert (next_cell >= cell_rows_);
-              edge_from_.push_back (next_cell - cell_rows_);
-              edge_to_.push_back (next_cell);
-              edge_area_.push_back (z_distance[row]);
-            }
           // Next node.
+          daisy_assert (next_cell == cell_index (row, column));
           last_cell = next_cell;
           next_cell++;
         }
@@ -156,10 +149,21 @@ GeometryRect::GeometryRect (Block& al)
       edge_area_.push_back (x_distance[column]);
     }
   daisy_assert (next_cell == cell_size ());
+
+  // Horizontal edges.
+  for (size_t row = 0; row < cell_rows (); row++)
+    for (size_t column = 0; column < edge_columns (); column++)
+      {
+        edge_from_.push_back (cell_index (row, column));
+        edge_to_.push_back (cell_index (row, column + 1));
+        edge_area_.push_back (z_distance[row]);
+      }
+
+  // Done.
   daisy_assert (edge_area_.size () == edge_to_.size ());
   daisy_assert (edge_from_.size () == edge_to_.size ());
-  daisy_assert (edge_size () == ((cell_rows_ + 1U) * cell_columns_
-                                 + (cell_columns_ - 1U) * cell_rows_));
+  daisy_assert (edge_size () == (edge_rows () * cell_columns () 
+                                 + edge_columns () * cell_rows ()));
 }
 
 GeometryRect::~GeometryRect ()

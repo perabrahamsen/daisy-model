@@ -39,11 +39,11 @@ using namespace std;
 class UZRichard : public UZmodel
 {
   // Parameters.
-  int max_time_step_reductions;
-  int time_step_reduction;
-  int max_iterations;
-  double max_absolute_difference;
-  double max_relative_difference;
+  const int max_time_step_reductions;
+  const int time_step_reduction;
+  const int max_iterations;
+  const double max_absolute_difference;
+  const double max_relative_difference;
   /* const */ Average* K_average;
 
   // Simulate.
@@ -51,6 +51,7 @@ private:
   bool richard (Treelog&, const GeometryVert& geo,
                 const Soil& soil, const SoilHeat& soil_heat,
 		int first, const Surface& top,
+                size_t top_edge,
 		int last, const Groundwater& bottom,
 		const vector<double>& S,
 		const vector<double>& h_old,
@@ -58,6 +59,7 @@ private:
 		const vector<double>& h_ice,
 		vector<double>& h,
 		vector<double>& Theta,
+                size_t q_offset,
 		vector<double>& q);
   bool converges (const vector<double>& previous,
 		  const vector<double>& current) const;
@@ -75,11 +77,12 @@ private:
 		const vector<double>& Kplus,
 		const vector<double>& S,
 		double ddt,
-		vector<double>& q);
+		double *const q);
 public:
   bool tick (Treelog&, const GeometryVert& geo,
              const Soil& soil, const SoilHeat&,
 	     unsigned int first, const Surface& top,
+             size_t top_edge, 
 	     unsigned int last, const Groundwater& bottom,
 	     const vector<double>& S,
 	     const vector<double>& h_old,
@@ -87,8 +90,9 @@ public:
 	     const vector<double>& h_ice,
 	     vector<double>& h,
 	     vector<double>& Theta,
-	     vector<double>& q);
-
+             size_t q_offset, 
+	     std::vector<double>& q_base);
+  
   // Create and Destroy.
 public:
   void has_macropores (bool); // Tell UZ that there is macropores.
@@ -103,6 +107,7 @@ UZRichard::richard (Treelog& msg,
                     const Soil& soil,
 		    const SoilHeat& soil_heat,
 		    int first, const Surface& top,
+                    const size_t top_edge,
 		    const int last, const Groundwater& bottom,
 		    const vector<double>& S,
 		    const vector<double>& h_old,
@@ -110,11 +115,28 @@ UZRichard::richard (Treelog& msg,
 		    const vector<double>& h_ice,
 		    vector<double>& h_new,
 		    vector<double>& Theta_new,
-		    vector<double>& q)
+                    const size_t q_offset,
+		    vector<double>& q_base)
 {
-  Treelog::Open nest (msg, "UZ Richard");
+  std::ostringstream tmp;
+  tmp << "UZ Richard: " << first << " to " << last;
+  Treelog::Open nest (msg, tmp.str ());
   // Input variables for solving a tridiagonal matrix.
   const unsigned int size = last - first + 1;
+  const Surface::top_t top_type = top.top_type (geo, top_edge);
+  const double h_top = top.h_top (geo, top_edge);
+  const double q_top = top.q_top (geo, top_edge);
+  const Groundwater::bottom_t bottom_type = bottom.bottom_type ();
+  const double q_bottom_forced = (bottom_type == Groundwater::forced_flux)
+    ? bottom.q_bottom () : -42.42e42;
+
+  // Find relevant fluxes.
+  daisy_assert (geo.edge_to (top_edge) == Geometry::cell_above);
+  daisy_assert (first + q_offset >= top_edge);
+  daisy_assert (last + q_offset + 1 < geo.edge_size ());
+  daisy_assert (q_base.size () > q_offset + last + 1);
+  double *const q = &q_base[q_offset];
+
   if (size < 2)
     throw ("Richard's equation need at least two numerical layers");
   vector<double> a (size);
@@ -134,15 +156,14 @@ UZRichard::richard (Treelog& msg,
   vector<double> Kplus (size);
 
   // For h bottom.
-  if (bottom.bottom_type () == Groundwater::pressure)
+  if (bottom_type == Groundwater::pressure)
     {
-      daisy_assert (last + 1 < soil.size ());
+      daisy_assert (last + 1 < geo.cell_size ());
       K[size] = soil.K (last + 1, 0.0, h_ice[last + 1], 
 			soil_heat.T (last + 1));
     }
   
   // For lysimeter bottom.
-  daisy_assert (q.size () > last);
   const double h_lim = geo.zplus (last) - geo.z (last);
   daisy_assert (h_lim < 0.0);
 
@@ -152,8 +173,9 @@ UZRichard::richard (Treelog& msg,
   // Keep track of water going to the top.
   double top_water = 0.0;
   double available_water;
+  bool flux = true;
 
-  if (top.soil_top ())
+  if (top_type == Surface::soil)
     {
       available_water
 	= (Theta_old[first] 
@@ -161,20 +183,18 @@ UZRichard::richard (Treelog& msg,
     }
   else
     {
-      available_water = top.h ();
+      available_water = h_top;
 
       if (available_water
 	  > soil.K (first, 0.0, h_ice[first], soil_heat.T (first)) * dt
 	  + (soil.Theta (first, 0.0, h_ice[first]) - Theta_old[first])
 	  * geo.dz (first))
-	top.flux_top_off ();
+	flux = false;
     }
 
-
   // First guess is the old value.
-  copy (h_old.begin () + first, h_old.begin () + last + 1, h.begin ());
-  copy (Theta_old.begin () + first, Theta_old.begin () + last + 1,
-	Theta.begin ());
+  copy (&h_old[first], &h_old[last + 1], h.begin ());
+  copy (&Theta_old[first], &Theta_old[last + 1], Theta.begin ());
 
   double time_left = dt;	// How much of the large time step left.
   double ddt = dt;		// We start with small == large time step.
@@ -197,40 +217,31 @@ UZRichard::richard (Treelog& msg,
       h_previous = h;
       Theta_previous = Theta;
 
-      if (!top.flux_top () && !top.soil_top ())
-	h[first] = top.h () - geo.z (first) + top_water;
+      if (!flux && top_type != Surface::soil)
+	h[0] = h_top - geo.z (first) + top_water;
 
       // Bottom flux.
       double q_bottom = 42.42e42;
       daisy_assert (size > 0);
-      if (bottom.bottom_type () == Groundwater::lysimeter)
-        { 
+      switch (bottom_type)
+        {
+        case Groundwater::lysimeter:
           if (h[size - 1] > h_lim)
-            {
-              q_bottom = -Kold[size-1];
-
-#if 0
-              const double Theta_diff 
-                = soil.Theta (last, h[size - 1], h_ice[last])
-                - soil.Theta (last, h_lim - 1.0, h_ice[last]);
-              daisy_assert (Theta_diff > 0);
-              const double dz = geo.dz (last);
-              const double max_K = Theta_diff * dz / ddt;
-
-              if (Kold[size-1] > max_K)
-                ddt = max (1e-5, Theta_diff * dz / Kold[size-1]);
-#endif
-            }
+            q_bottom = -Kold[size-1];
           else 
             q_bottom = 0.0;
+          break;
+        case Groundwater::forced_flux:
+          q_bottom = q_bottom_forced;
+          break;
+        case Groundwater::free_drainage:
+          q_bottom = - Kold[size - 1];
+          break;
+        case Groundwater::pressure:
+          break;
+        default:
+          daisy_panic ("Unknown bottom type");
         }
-      else if (bottom.bottom_type () == Groundwater::forced_flux)
-        q_bottom = bottom.q_bottom ();
-      else if (bottom.bottom_type () == Groundwater::free_drainage)
-        q_bottom = - Kold[size - 1];
-      else
-        daisy_assert (bottom.bottom_type () == Groundwater::pressure);
-
       do
 	{
 	  h_conv = h;
@@ -244,7 +255,7 @@ UZRichard::richard (Treelog& msg,
 				 soil_heat.T (first + i));
 	      K[i] = (Ksum[i] / iterations_used + Kold[i]) / 2.0;
 	    }
-	  if (bottom.bottom_type () != Groundwater::pressure)
+	  if (bottom_type != Groundwater::pressure)
 	    K[size] = K[size - 1];
 
 	  internode (soil, soil_heat, first, last, h_ice, K, Kplus);
@@ -260,7 +271,7 @@ UZRichard::richard (Treelog& msg,
 
 	      if (i == 0)
 		{
-		  if (top.flux_top ())
+		  if (flux)
 		    {
 		      // Calculate upper boundary.
 		      const double dz_plus = z - geo.z (first + i + 1);
@@ -275,14 +286,14 @@ UZRichard::richard (Treelog& msg,
 		      c[i] = - (ddt / dz) * (Kplus[i] / dz_plus);
 		    }
 		}
-	      else if (i == 1 && !top.flux_top ())
+	      else if (i == 1 && !flux)
 		{
 		  // Calculate upper boundary.
 		  const double dz_plus = z - geo.z (first + i + 1);
 		  const double dz_minus = geo.z (first + i - 1) - z;
 
 		  double h_above;
-		  if (top.soil_top ())
+		  if (top_type == Surface::soil)
 		    {
 		      const double Theta_ddt = Theta_old[first]
 			+ top_water / geo.dz (first);
@@ -290,19 +301,11 @@ UZRichard::richard (Treelog& msg,
 		    }
 		  else
 		    {
-		      h_above = h[first];
+		      h_above = h[0];
                       daisy_assert (approximate (h_above, 
-                                                 top.h () - geo.z (first)
+                                                 h_top
+                                                 - geo.z (first)
                                                  + top_water));
-#if 0
-		      if (top.h () < 0.0)
-			{
-			  std::ostringstream tmp;
-			  tmp << "TOP H = " << top.h () << ", H ABOVE = " 
-				 << h_above;
-			  msg.error (tmp.str ());
-			}
-#endif
 		    }
 		  b[i] = Cw2
 		    + (ddt / dz) * (Kplus[i - 1] / dz_minus
@@ -318,7 +321,7 @@ UZRichard::richard (Treelog& msg,
 		  // Calculate lower boundary
 		  const double dz_minus = geo.z (first + i - 1) - z;
 
-		  if (bottom.bottom_type () == Groundwater::pressure)
+		  if (bottom_type == Groundwater::pressure)
 		    {
 		      const double dz_plus = z - geo.z (first + i + 1);
 		      //const double bottom_pressure = h[i + 1];
@@ -330,7 +333,7 @@ UZRichard::richard (Treelog& msg,
 			* (Kplus[i - 1]
 			   - Kplus[i] * (1.0 -  bottom_pressure/ dz_plus));
 		    }
-                  else if (bottom.bottom_type () == Groundwater::lysimeter
+                  else if (bottom_type == Groundwater::lysimeter
                            && isnormal (q_bottom))
                     {
                       // Active lysimeter, use fake pressure bottom.
@@ -368,7 +371,7 @@ UZRichard::richard (Treelog& msg,
 		    +  (ddt / dz) * (Kplus[i - 1] - Kplus[i] );
 		}
 	    }
-	  tridia (top.flux_top () ? 0 : 1, size, a, b, c, d, h.begin ());
+	  tridia (flux ? 0 : 1, size, a, b, c, d, h.begin ());
 
           daisy_assert (h.size () > 1);
 	  if (h[0] < -1e9 || h[1] < -1e9 || h[size-1] < -1e9)
@@ -394,10 +397,8 @@ UZRichard::richard (Treelog& msg,
 	    {
 	      if (approximate (switched_top_last, time_left))
 		return false;
-	      else if (top.flux_top ())
-		top.flux_top_off ();
-	      else
-		top.flux_top_on ();
+	      else 
+                flux = !flux;
 		
 	      switched_top_last = time_left;
 	      ddt = time_left;
@@ -416,10 +417,10 @@ UZRichard::richard (Treelog& msg,
 	  bool accepted = true;	// Could the top accept the results?
 	  // Amount of water we put into the top this small time step.
 	  double delta_top_water = 88.0e88;
-	  if (!top.flux_top ())
+	  if (!flux)
 	    {
 	      // Find flux.
-	      if (bottom.bottom_type () == Groundwater::forced_flux)
+	      if (bottom_type == Groundwater::forced_flux)
 		{
 		  q[last + 1] = bottom.q_bottom ();
 		  for (int i = last; i >= first; i--)
@@ -443,103 +444,48 @@ UZRichard::richard (Treelog& msg,
 		      tmp << "available_water = " << available_water 
 			     << ", delta_top_water = " << delta_top_water
 			     << ", time left = " << time_left;
-		      msg.debug (tmp.str ());
-#if 0
-		      throw ("Couldn't accept top flux");
-#else
+		      msg.warning (tmp.str ());
                       msg.warning ("Couldn't accept top flux");
                       Theta = Theta_previous;
                       goto try_again;
-#endif
 		    }
 		  else
 		    {
-		      top.flux_top_on ();
+		      flux = true;
 		      accepted = false;
 		    }
 		}
 	    }
-	  else if (h[first] <= 0)
+	  else if (h[0] <= 0)
 	    // We have a flux top, and unsaturated soil.
 	    {
               delta_top_water = -(available_water / time_left) * ddt;
 	    }
-	  else if (top.q () > 0.0)
+	  else if (q_top > 0.0)
 	    {
 	      // We have a saturated soil, with an upward flux.
-#if 0
 	      throw ("Saturated soil with an upward flux");
-#else
-              msg.warning ("Saturated soil with an upward flux");
-	      Theta = Theta_previous;
-              goto try_again;
-#endif
-              
 	    }
 	  else if (switched_top_last < time_left + ddt / 2.0)
             {
               std::ostringstream tmp;
               tmp << "last: " << switched_top_last 
-                     << "; time left: " << time_left << "; h[" << first 
-                     << "] = " << h[first] <<"; q = " << top.q ();
-              msg.debug (tmp.str ());
-#if 0
-              throw ("Couldn't drain top flux");
-#else
+                  << "; time left: " << time_left << "; h[" << first 
+                  << "] = " << h[first] <<"; q = " << q_top;
+              msg.warning (tmp.str ());
               msg.warning ("Couldn't drain top flux");
 	      Theta = Theta_previous;
               goto try_again;
-#endif
             }
 	  else
 	    // We have saturated soil, make it a pressure top.
 	    {
-	      top.flux_top_off ();
+	      flux = false;
 	      accepted = false;
 	    }
 
 	  if (accepted)
 	    {
-
-#if 0
-	      // This code checks that darcy and the mass preservation
-	      // code gives the same results.
-	      // Disabled because this is not the case when ice is present.
-	      {
-		bool error_found = false;
-                q[first] = delta_top_water / ddt;
-		for (int i = first; i < last; i++)
-		  {
-		    // Mass preservation.
-		    q[i + 1] = (((Theta[i - first] - Theta_previous[i - first]) / ddt)
-				+ S[i] * ddt) * geo.dz (i) + q[i];
-		    if (h[i - first] >= 0.0 && h[i + 1 - first] >= 0.0)
-		      continue;
-		    const double darcy
-		      = -Kplus[i - first]
-		      * ((  (h[i - first] - h[i + 1 - first])
-			  / (geo.z (i) - geo.z (i + 1)))
-			 + 1);
-		    if ((fabs (darcy) > 1.0e-30
-			 && fabs (q[i+1] / darcy - 1.0) > 0.10)
-                        && fabs (q[i+1] - darcy) > 0.01 / ddt
-                        && i<2)
-		      {
-			error_found = true;
-			std::ostringstream tmp;
-			tmp << "q[" << (i + 1) << "] = " << q[i+1]
-			       << ", darcy = " << darcy
-			       << "delta_top_water = " << delta_top_water
-			       << " ddt = " << ddt
-			       << " top.flux() = " << top.flux_top();
-			msg.error (tmp.str ());
-		      }
-		  }
-		if (error_found)
-		    throw ("\
-Richard eq. mass balance flux is different than darcy flux");
-	      }
-#endif
 	      top_water += delta_top_water;
               available_water += delta_top_water;
 	      time_left -= ddt;
@@ -563,22 +509,19 @@ Richard eq. mass balance flux is different than darcy flux");
 
   // Make it official.
   daisy_assert (h_new.size () >= first + size);
-  copy (h.begin (), h.end (), h_new.begin () + first);
+  copy (h.begin (), h.end (), &h_new[first]);
   daisy_assert (Theta_new.size () >= first + size);
-  copy (Theta.begin (), Theta.end (), Theta_new.begin () + first);
+  copy (Theta.begin (), Theta.end (), &Theta_new[first]);
 
   // Check upper boundary.
-  daisy_assert (top.soil_top () 
-	  || approximate (top.h (), available_water - top_water));
+  daisy_assert (top_type == Surface::soil
+                || approximate (h_top,
+                                available_water - top_water));
 
-#if 0
-  q_darcy (soil, first, last, h_old, h_new, Theta_old, Theta_new,
-	   Kplus, S, dt, q);
-#else
   // We know flux on upper border, use mass preservation to
   // calculate flux below given the change in water content.
 
-  if (top.soil_top ())
+  if (top_type == Surface::soil)
     first++;
 
   q[first] = top_water / dt;
@@ -587,7 +530,7 @@ Richard eq. mass balance flux is different than darcy flux");
       q[i + 1] = (((Theta_new[i] - Theta_old[i]) / dt) + S[i])
 	* geo.dz (i) + q[i];
     }
-#endif
+
   return true;
 }
 
@@ -642,29 +585,37 @@ UZRichard::q_darcy (const GeometryVert& geo,
 		    const vector<double>& Kplus,
 		    const vector<double>& S,
 		    const double ddt,
-		    vector<double>& q)
+		    double *const q)
 {
   // Find an unsaturated area.
   // Start looking 3/4 towards the bottom.
-  const double start_pos = (geo.z (first) + geo.z (last) * 3.0) / 4.0;
-  int start;
-  for (start = first; 
-       start < last && geo.zplus (start + 1) <= start_pos; 
-       start++)
-    ;
+  const double start_pos = geo.z (first) 
+    + (geo.z (last) - geo.z (first)) * 3.0 / 4.0;
+  int start = first; 
+  while (start < last && geo.zplus (start + 1) > start_pos)
+    start++;
   if (!(start < last - 2))
     {
       std::ostringstream tmp;
       tmp << "We need at least 2 numeric cells below 3/4 depth for \
 calculating flow with pressure top.\n";
       tmp << "3/4 depth is " << start_pos << " [cm]\n"
-             << "cell " << start << " ends at " << geo.zplus (start) << " [cm]\n"
-             << "last " << last << " ends at " << geo.zplus (last) << " [cm]";
+          << "cell " << start << " ends at " << geo.zplus (start) << " [cm]\n"
+          << "first " << first << " ends at " << geo.zplus (first) << " [cm]\n"
+          << "last " << last << " ends at " << geo.zplus (last) << " [cm]";
       throw (string (tmp.str ()));
     }
   if (!(start > first + 1))
-    throw ("We need at least 1 numeric cell above 3/4 depth for \
-calculating flow with pressure top.");
+    {
+      std::ostringstream tmp;
+      tmp << "We need at least 1 numeric cell above 3/4 depth for \
+calculating flow with pressure top.\n";
+      tmp << "3/4 depth is " << start_pos << " [cm]\n"
+          << "cell " << start << " ends at " << geo.zplus (start) << " [cm]\n"
+          << "first " << first << " ends at " << geo.zplus (first) << " [cm]\n"
+          << "last " << last << " ends at " << geo.zplus (last) << " [cm]";
+      throw (tmp.str ());
+    }
 
   for (; start > 0; start--)
     {
@@ -694,19 +645,21 @@ calculating flow with pressure top.");
 bool
 UZRichard::tick (Treelog& msg, const GeometryVert& geo,
                  const Soil& soil, const SoilHeat& soil_heat,
-		 unsigned int first, const Surface& top, 
-		 unsigned int last, const Groundwater& bottom, 
+		 const unsigned int first, const Surface& top, 
+                 const size_t top_edge,
+		 const unsigned int last, const Groundwater& bottom, 
 		 const vector<double>& S,
 		 const vector<double>& h_old,
 		 const vector<double>& Theta_old,
 		 const vector<double>& h_ice,
 		 vector<double>& h,
 		 vector<double>& Theta,
-		 vector<double>& q)
+                 const size_t q_offset,
+		 vector<double>& q_base)
 {
-  if (!richard (msg, geo, soil, soil_heat, first, top, last, bottom, 
-		S, h_old, Theta_old, h_ice, h, Theta, q))
-    throw ("Richard's Equation doesn't converge");
+  if (!richard (msg, geo, soil, soil_heat, first, top, top_edge, last, bottom, 
+		S, h_old, Theta_old, h_ice, h, Theta, q_offset, q_base))
+    throw ("Richard's equation doesn't converge");
 
   return true;
 }

@@ -82,7 +82,7 @@ Options::copyright (Treelog& out)
   has_printed_copyright = true;
   out.lazy (string ("Daisy crop/soil simulation version ")
 	    + version + ". (" + version_date + ")\n"
-	    "Copyright 1996 - 2004 Per Abrahamsen, "
+	    "Copyright 1996 - 2006 Per Abrahamsen, "
 	    "Søren Hansen and KVL.");
 }
 

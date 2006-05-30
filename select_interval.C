@@ -30,9 +30,14 @@
 struct SelectInterval : public SelectValue
 {
   // Content.
-  double density_factor;
+  const bool density;
   double from;
   double to;
+
+  const Geometry* last_geo;
+  const Soil* last_soil;
+  std::vector<int> cells;
+  std::vector<double> weight;
 
   // Bulk density convertions.
   struct BD_convert : public Units::Convert
@@ -90,28 +95,48 @@ struct SelectInterval : public SelectValue
 		     const Geometry* geo,
                      const Soil* soil, Treelog&)
   { 
-    double result;
-    if (to > 0.0)
+    if (soil != last_soil)
       {
-	if (!std::isnormal (from))
-          result = geo->total (array);
-	else
-	  {
-	    to = geo->bottom ();
-	    result = geo->total (array, from, to);
-	  }
-      }
-    else 
-      result = geo->total (array, from, to);
+        last_soil = soil;
 
-    if (count == 0)
-      {
         if (bd_convert)
           bd_convert->set_bulk (*geo, *soil, from, to);
-        if (density_factor < 0.0)
-          density_factor = 1.0 / (from - (to > 0 ? geo->bottom () : to));
       }
-    add_result (result);
+
+    if (geo != last_geo)
+      {
+        if (to > 0.0)
+          to = geo->bottom ();
+        last_geo = geo;
+        const size_t cell_size = geo->cell_size ();
+        cells.clear ();
+        weight.clear ();
+        double total_volume = 0.0;
+        for (size_t n = 0; n < cell_size; n++)
+          {
+            const double f = geo->fraction_in_z_interval (n, from, to);
+            if (f > 1e-10)
+              {
+                cells.push_back (n);
+                const double volume = geo->volume (n) * f;
+                weight.push_back (volume);
+                total_volume += volume;
+              }
+          }
+        daisy_assert (std::isnormal (total_volume) || weight.size () == 0);
+        if (!density)
+          total_volume /= (from - to);
+        for (size_t i = 0; i < weight.size (); i++)
+          weight[i] /= total_volume;
+        daisy_assert (cells.size () == weight.size ());
+      }
+    daisy_assert (cells.size () <= array.size ());
+
+    double sum = 0.0;
+    for (size_t i = 0; i < cells.size (); i++)
+      sum += array[cells[i]] * weight[i];
+
+    add_result (sum);
   }
 
   // Print result at end of time step.
@@ -137,7 +162,7 @@ struct SelectInterval : public SelectValue
           case Handle::current:
             break;
           }            
-        dest.add (convert (result * density_factor));
+        dest.add (convert (result));
       }
     if (!accumulate)
       count = 0;
@@ -146,7 +171,7 @@ struct SelectInterval : public SelectValue
   // Create and Destroy.
   const std::string default_dimension (const std::string& spec_dim) const
   { 
-    if (density_factor < 0.0)
+    if (density)
       return spec_dim;
     
     return Units::multiply (spec_dim, "cm");
@@ -184,7 +209,7 @@ struct SelectInterval : public SelectValue
   }
   SelectInterval (Block& al)
     : SelectValue (al),
-      density_factor (al.flag ("density") ? -1.0 : 1.0),
+      density (al.flag ("density")),
       from (al.number ("from", 1.0)),
       to (al.number ("to", 1.0)),
       bd_convert (NULL)

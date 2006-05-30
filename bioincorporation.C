@@ -195,9 +195,9 @@ Bioincorporation::Implementation::tick (const Geometry& geo,
 
   // Add bioincorporation to soil.
   daisy_assert (aom);
-  aom->add (geo, C_to_add, N_to_add, density);
-  geo.add (C_added, density, C_to_add);
-  geo.add (N_added, density, N_to_add);  
+  aom->add_surface (geo, C_to_add, N_to_add, density);
+  geo.add_surface (C_added, density, C_to_add);
+  geo.add_surface (N_added, density, N_to_add);  
 
   // Update CO2.
   CO2 += (C_removed - C_to_add);

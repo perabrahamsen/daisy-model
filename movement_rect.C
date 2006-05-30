@@ -26,6 +26,7 @@
 #include "solute.h"
 #include "element.h"
 #include "surface.h"
+#include "groundwater.h"
 #include "log.h"
 #include "submodeler.h"
 
@@ -60,55 +61,133 @@ struct MovementRect : public Movement
              Surface& surface, Groundwater& groundwater, const Time&,
              const Weather&, Treelog& msg) 
   {
-    soil_water.tick (geo->cell_size (), soil, msg); 
-    tick_water (*geo, soil, *heat, surface, groundwater, 
-                soil_water.S_sum_, soil_water.h_old_, soil_water.Theta_old_,
-                soil_water.h_ice_, soil_water.h_, soil_water.Theta_,
-                soil_water.q_, soil_water.q_p_,
-                msg);
+    const size_t cell_size = geo->cell_size ();
+    const size_t edge_size = geo->edge_size ();
+    const size_t cell_rows = geo->cell_rows ();
+    const size_t cell_columns = geo->cell_columns ();
+    const size_t edge_rows = geo->edge_rows ();
+
+    soil_water.tick (cell_size, soil, msg); 
+
+    for (size_t col = 0; col < cell_columns; col++)
+      {
+        // Find relevant cells.
+        const size_t c_first = col * cell_rows;
+        const size_t c_last = (col + 1U) * cell_rows - 1U;
+
+        // Find relevant edges.
+        const size_t e_first = col * edge_rows;
+        const size_t e_last = (col + 1U) * edge_rows - 1U;
+        
+        // Check that they match.
+        daisy_assert (geo->edge_to (e_first) == Geometry::cell_above);
+        daisy_assert (geo->edge_from (e_first) == c_first);
+        daisy_assert (geo->edge_to (e_last) == c_last);
+        daisy_assert (geo->edge_from (e_last) == Geometry::cell_below);
+ 
+        water_column (soil, *heat, surface, groundwater, 
+                      c_first, c_last,
+                      soil_water.S_sum_, soil_water.h_old_, 
+                      soil_water.Theta_old_,
+                      soil_water.h_ice_, soil_water.h_, soil_water.Theta_,
+                      col, soil_water.q_, soil_water.q_p_,
+                      msg);
+     }
+    // Update surface and groundwater reservoirs.
+    for (size_t edge = 0; edge < edge_size; edge++)
+      {
+        if (geo->edge_to (edge) == Geometry::cell_above)
+          surface.accept_top (soil_water.q (edge) * dt, *geo, edge, msg);
+        if (geo->edge_from (edge) == Geometry::cell_below)
+          groundwater.accept_bottom ((soil_water.q (edge)
+                                      + soil_water.q_p (edge)) * dt,
+                                     *geo, edge);
+      }
   }
 
-  static void tick_water (const Geometry& geo,
-                          const Soil& soil, const SoilHeat&, 
-                          Surface& surface, Groundwater&,
-                          const std::vector<double>& S,
-                          std::vector<double>& /* h_old */,
-                          const std::vector<double>& /* Theta_old */,
-                          const std::vector<double>& /* h_ice */,
-                          std::vector<double>& h,
-                          std::vector<double>& Theta,
-                          std::vector<double>& q,
-                          std::vector<double>& /* q_p */,
-                          Treelog& msg)
+  void water_column (const Soil& soil, const SoilHeat& soil_heat, 
+                     Surface& surface, Groundwater& groundwater,
+                     const size_t top_cell, const size_t bottom_cell,
+                     const std::vector<double>& S,
+                     std::vector<double>& h_old,
+                     const std::vector<double>& Theta_old,
+                     const std::vector<double>& h_ice,
+                     std::vector<double>& h,
+                     std::vector<double>& Theta,
+                     const size_t q_offset,
+                     std::vector<double>& q,
+                     std::vector<double>& q_p,
+                     Treelog& msg)
   {
-    const size_t cell_size = geo.cell_size ();
+    // Find top edge.
+    const size_t top_edge = top_cell + q_offset;
+    daisy_assert (geo->edge_to (top_edge) == Geometry::cell_above);
+    daisy_assert (q.size () > bottom_cell + 1);
 
-    // Update water.
-    for (size_t i = 0; i < cell_size; i++)
+    // Limit for ridging.
+    const size_t first = top_cell +
+      (surface.top_type (*geo, top_edge) == Surface::soil
+       ?  surface.last_cell (*geo, top_edge) : 0);
+    
+    // Limit for groundwater table.
+    size_t last = bottom_cell;
+    if (groundwater.bottom_type () == Groundwater::pressure)
       {
-        Theta[i] -= S[i] * dt;
-        h[i] = soil.h (i, Theta[i]);
+        if (groundwater.table () <= geo->zminus (bottom_cell))
+          throw ("Groundwater table in or below lowest cell.");
+
+        while (groundwater.table () > geo->zminus (last) && last > first)
+          last--;
+
+        // Pressure at the last cell is equal to the water above it.
+        for (size_t i = last + 1; i <= bottom_cell; i++)
+          h_old[i] = h[i] = groundwater.table () - geo->z (i);
       }
 
-    const double q_up = surface.q ();
-    const size_t edge_size = geo.edge_size ();
-    const double surface_area = geo.surface_area ();
+    bool ok = true;
 
-    for (size_t e = 0; e < edge_size; e++)
-      if (geo.edge_to (e) == Geometry::cell_above)
-        {
-          if (q_up > 0)
-            // We obey exfiltration.
-            {
-              const size_t n = geo.edge_from (e);
-              q[e] = q_up / surface_area;
-              Theta[n] -= q[e] * geo.edge_area (e) * dt / geo.volume (n);
-              surface.accept_top (q_up, geo, e, msg);
-            }
-          else
-            q[e] = 0.0;
-        }
+    // Calculate matrix flow next.
+    try
+      {
+        ok = uzdefault->tick (msg, *geo, soil, soil_heat,
+                              first, surface, top_edge, last, groundwater,
+                              S, h_old, Theta_old, h_ice, h, Theta, 
+                              q_offset, q);
+      }
+    catch (const char* error)
+      {
+        msg.warning (std::string ("UZ problem: ") + error);
+        ok = false;
+      }
+    catch (const std::string& error)
+      {
+        msg.warning (std::string ("UZ problem: ") + error);
+        ok = false;
+      }
+    if (!ok)
+      {
+        msg.message ("Using reserve uz model.");
+        uzreserve->tick (msg, *geo, soil, soil_heat,
+                         first, surface, top_edge, last, groundwater,
+                         S, h, Theta_old, h_ice, h, Theta, 
+                         q_offset, q);
+      }
+
+    for (size_t i = last + 2; i <= bottom_cell + 1; i++)
+      {
+        daisy_assert (q.size () > i + q_offset);
+        q[i + q_offset] = q[i-1 + q_offset];
+        q_p[i + q_offset] = q_p[i-1 + q_offset];
+      }
+
+    // Update Theta below groundwater table.
+    if (groundwater.bottom_type () == Groundwater::pressure)
+      {
+        for(size_t i = last + 1; i < soil.size (); i++)
+          Theta[i] = soil.Theta (i, h[i], h_ice[i]);
+      }
   }
+
   void solute (const Soil& soil, const SoilWater& soil_water,
                const double J_in, Solute& solute,
                Treelog& msg)
@@ -231,17 +310,16 @@ struct MovementRect : public Movement
   }
 
   // Create.
-  bool check (Treelog& err) const;
-  bool volatile_bottom () const
-  { return false; }
-  void initialize_soil (Soil&, Treelog&) const
-  { }
+  bool check (Treelog&) const;
 
   void initialize (const AttributeList& alist,
                    const Soil&, const Groundwater&, 
                    const Time&, const Weather&, Treelog& msg)
   {
     heat->initialize (alist.alist ("Heat"), *geo, msg);
+    const bool has_macropores = false;
+    uzdefault->has_macropores (has_macropores);
+    uzreserve->has_macropores (has_macropores);
   }
   MovementRect (Block& al)
     : Movement (al),

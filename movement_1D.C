@@ -117,15 +117,17 @@ struct Movement1D : public Movement
       }
 
     // Limit for ridging.
-    const size_t first = surface.soil_top () ? surface.last_cell () : 0;
+    const size_t first = (surface.top_type (geo, 0U) == Surface::soil)
+      ? surface.last_cell (geo, 0U) 
+      : 0U;
     bool ok = true;
 
     // Calculate matrix flow next.
     try
       {
         ok = uzdefault->tick (msg, geo, soil, soil_heat,
-                              first, surface, last, groundwater,
-                              S, h_old, Theta_old, h_ice, h, Theta, q);
+                              first, surface, 0U, last, groundwater,
+                              S, h_old, Theta_old, h_ice, h, Theta, 0U, q);
       }
     catch (const char* error)
       {
@@ -141,8 +143,8 @@ struct Movement1D : public Movement
       {
         msg.message ("Using reserve uz model.");
         uzreserve->tick (msg, geo, soil, soil_heat,
-                         first, surface, last, groundwater,
-                         S, h, Theta_old, h_ice, h, Theta, q);
+                         first, surface, 0U, last, groundwater,
+                         S, h, Theta_old, h_ice, h, Theta, 0U, q);
       }
 
     for (size_t i = last + 2; i <= soil.size (); i++)

@@ -23,12 +23,12 @@
 #include "select_flux.h"
 #include "geometry.h"
 #include "treelog.h"
-
+#include <cmath>
 #include <sstream>
 
 void
 SelectFlux::output_array (const std::vector<double>& array, 
-                          const Geometry* geo, const Soil* soil, Treelog& msg)
+                          const Geometry* geo, const Soil* soil, Treelog&)
 { 
   if (soil != last_soil)
     last_soil = soil;
@@ -37,16 +37,28 @@ SelectFlux::output_array (const std::vector<double>& array,
     {
       last_geo = geo;
       const size_t size = geo->edge_size ();
+      edges.clear ();
+      weight.clear ();
+      double total_area = 0.0;
       for (size_t e = 0; e < size; e++)
         if (geo->edge_cross_z (e, height > 0 ? geo->bottom () : height))
-          edges.push_back (e);
+          {
+            edges.push_back (e);
+            const double area = geo->edge_area (e);
+            weight.push_back (area);
+            total_area += area;
+          }
+      daisy_assert (std::isnormal (total_area) || weight.size () == 0);
+      for (size_t i = 0; i < weight.size (); i++)
+        weight[i] /= total_area;
+      daisy_assert (edges.size () == weight.size ());
     }
+  daisy_assert (edges.size () <= array.size ());
+
   double sum = 0.0;
   for (size_t i = 0; i < edges.size (); i++)
-    {
-      daisy_assert (edges[i] < array.size ());
-      sum += array[edges[i]];
-    }
+    sum += array[edges[i]] * weight[i];
+
   add_result (sum);
 }
 

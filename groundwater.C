@@ -21,6 +21,7 @@
 
 
 #include "groundwater.h"
+#include "geometry.h"
 #include "log.h"
 #include "assertion.h"
 
@@ -32,8 +33,8 @@ The 'groundwater' component is responsible for specifying the\n\
 groundwater table at each timestep.";
 
 void
-Groundwater::accept_bottom (double, const Geometry&, size_t)
-{ }
+Groundwater::accept_bottom (double, const Geometry& geo, size_t edge)
+{ daisy_assert (geo.edge_from (edge) == Geometry::cell_below); }
 
 bool 
 Groundwater::is_pipe () const

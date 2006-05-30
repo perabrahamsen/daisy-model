@@ -88,9 +88,9 @@ struct AM::Implementation
 		   double N, vector<double>& om_N);
   void add (double C, double N);// Add dead leafs.
   void add (const Geometry& geo, AM::Implementation& other);
-  void add (const Geometry&,	// Add dead roots.
-	    double C, double N, 
-	    const vector<double>& density);
+  void add_surface (const Geometry&,	// Add dead roots.
+                    double C, double N, 
+                    const vector<double>& density);
   double top_C () const;
   double top_N () const;
   void multiply_top (double fraction);
@@ -341,12 +341,14 @@ AM::Implementation::add (const Geometry& geo,
 }
 
 void
-AM::Implementation::add (const Geometry& geo, 
-			 double C, double N,
-			 const vector<double>& density)
+AM::Implementation::add_surface (const Geometry& geo, 
+                                 double C, double N,
+                                 const vector<double>& density)
 {
   daisy_assert (C >= 0);
   daisy_assert (N >= 0);
+  C *= geo.surface_area ();
+  N *= geo.surface_area ();
   const double old_C = total_C (geo);
   const double old_N = total_N (geo);
 
@@ -578,10 +580,10 @@ AM::add (const Geometry& geo, AM& other)
 { impl.add (geo, other.impl); }
 
 void 
-AM::add (const Geometry& geo,
-	 double C, double N, 
-	 const vector<double>& density)
-{ impl.add (geo, C, N, density); }
+AM::add_surface (const Geometry& geo,
+                 double C, double N, 
+                 const vector<double>& density)
+{ impl.add_surface (geo, C, N, density); }
 
 double
 AM::top_C () const
@@ -948,7 +950,7 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
 		  daisy_assert (fraction >= 0.0);
 		  daisy_assert (fraction <= 1.0);
 		  missing_fraction -= fraction;
-		  geo.add (om[j]->C, last, end, C * fraction);
+		  geo.add_surface (om[j]->C, last, end, C * fraction);
 		}
 	      else if (missing_number != -1)
 		// Should be catched by syntax check.
@@ -961,8 +963,8 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
 	      if (missing_fraction < -0.1e-10)
 		throw ("Specified over 100% C in om in initial am");
 	      else if (missing_fraction > 0.0)
-		geo.add (om[missing_number]->C, 
-			  last, end, C * missing_fraction);
+		geo.add_surface (om[missing_number]->C, 
+                                 last, end, C * missing_fraction);
 	    }
 	  else if (missing_fraction < -0.1e-10)
 	    throw ("Specified more than all C in om in initial am");
@@ -1001,7 +1003,7 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
           density[i] = k * exp (k * geo.z (i));
 
       // Add it.
-      impl.add (geo, C, N, density);
+      impl.add_surface (geo, C, N, density);
     }
 }
 

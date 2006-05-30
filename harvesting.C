@@ -380,9 +380,9 @@ Harvesting::operator() (const symbol column_name,
       const double Root_N = (production.NRoot + extra_N) * m2_per_cm2;
       if (accumulate (density.begin (), density.end (), 0.0) > 0.0)
 	{
-	  production.AM_root->add (geo, Root_C, Root_N, density);
-	  geo.add (residuals_N_soil, density, Root_N);
-	  geo.add (residuals_C_soil, density, Root_C);
+	  production.AM_root->add_surface (geo, Root_C, Root_N, density);
+	  geo.add_surface (residuals_N_soil, density, Root_N);
+	  geo.add_surface (residuals_C_soil, density, Root_C);
 	}
       else
 	{

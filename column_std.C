@@ -630,7 +630,8 @@ ColumnStandard::tick (Treelog& msg,
 
   
   // Transport.
-  groundwater->tick (geometry, *soil, *soil_water, surface.h (), 
+  groundwater->tick (geometry, *soil, *soil_water, 
+                     surface.ponding () * 0.1, 
                      soil_heat, time, msg);
   movement->tick (*soil, *soil_water, 
                   surface, *groundwater, time, my_weather, msg);
@@ -810,10 +811,12 @@ ColumnStandard::output (Log& log) const
   const double cm2_per_m2 = 1.0 / m2_per_cm2;
   static const symbol N_symbol ("residuals_N_root");
   if (log.check_leaf (N_symbol))
-    log.output (N_symbol, geometry.total (residuals_N_soil) * cm2_per_m2);
+    log.output (N_symbol,
+                geometry.total_surface (residuals_N_soil) * cm2_per_m2);
   static const symbol C_symbol ("residuals_C_root");
   if (log.check_leaf (C_symbol))
-    log.output (C_symbol, geometry.total (residuals_C_soil) * cm2_per_m2);
+    log.output (C_symbol,
+                geometry.total_surface (residuals_C_soil) * cm2_per_m2);
   static const symbol surface_water_symbol ("surface_water");
   if (log.check_leaf (surface_water_symbol))
     log.output (surface_water_symbol, (bioclimate->get_intercepted_water ()
@@ -824,26 +827,9 @@ ColumnStandard::output (Log& log) const
   output_derived (groundwater, "Groundwater", log);
 }
 
-Movement*
-ColumnStandard::build_vertical (Block& al)
-{
-  Syntax syntax;
-  AttributeList movement;
-  Movement::load_vertical (syntax, movement);
-  movement.add ("Heat", al.alist ("SoilHeat"));
-  movement.add ("Groundwater", al.alist ("Groundwater"));
-  movement.add ("Geometry", al.alist ("Soil"));
-
-  movement.add ("type", "vertical");
-  Block block (al, syntax, movement, "Movement");
-  return Movement::build_vertical (block);
-}
-
 ColumnStandard::ColumnStandard (Block& al)
   : Column (al),
-    movement (al.check ("Movement")
-              ? Librarian<Movement>::build_item (al, "Movement")
-              : ColumnStandard::build_vertical (al)),
+    movement (Librarian<Movement>::build_item (al, "Movement")),
     groundwater (Librarian<Groundwater>::build_item (al, "Groundwater")),
     weather (al.check ("weather") 
 	     ? Librarian<Weather>::build_item (al, "weather")
@@ -950,12 +936,32 @@ static struct ColumnStandardSyntax
   static Column& make (Block& al)
   { return *new ColumnStandard (al); }
 
-  static void load_common (Syntax& syntax, AttributeList& alist)
+  static void load_soil_and_geometry (Syntax& syntax, AttributeList& alist)
   {
+    Geometry1D::load_syntax (syntax, alist);
+    Soil::load_syntax (syntax, alist);
+  }
+
+  ColumnStandardSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
     Column::load_syntax (syntax, alist);
     syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 		"Description of this column."); 
+    alist.add ("description", "\
+Hansen et.al. 1990. with generic movement in soil.");
 
+    syntax.add_submodule ("Soil", alist, Syntax::State,
+                          "The numeric and physical soil properties.",
+                          load_soil_and_geometry);
+    syntax.add_submodule ("SoilWater", alist, Syntax::State,
+                          "Soil water content and transportation.",
+                          SoilWater::load_syntax);
+    syntax.add ("Movement", Librarian<Movement>::library (),
+                Syntax::State, Syntax::Singleton, "\
+Discretization and movement of water, heat and solutes in the soil.");
+    alist.add ("Movement", Movement::default_model ());
     syntax.add ("weather", Librarian<Weather>::library (),
                 Syntax::OptionalState, Syntax::Singleton,
                 "Weather model for providing climate information during\n\
@@ -1064,60 +1070,7 @@ Amount of NH4 volatilization, only from surface applied fertilizer.");
 The nitrification log.\n\
 Note that the nitrification parameters are found in the horizons.",
 			  ColumnStandard::NitLog::load_syntax);
-  }
-
-  static void load_soil_and_geometry (Syntax& syntax, AttributeList& alist)
-  {
-    Geometry1D::load_syntax (syntax, alist);
-    Soil::load_syntax (syntax, alist);
-  }
-
-  void add_default ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Hansen et.al. 1990.\n\
-OBSOLETE: Use 'generic' instead.\n\
-This column type cannot be used with checkpoints.");
-    load_common (syntax, alist);
-
-    syntax.add_submodule ("Soil", alist, Syntax::State,
-                          "The numeric and physical soil properties.",
-                          load_soil_and_geometry);
-    syntax.add_submodule ("SoilWater", alist, Syntax::State,
-                          "Soil water content and transportation.",
-                          SoilWater::load_syntax);
-    syntax.add_submodule ("SoilHeat", alist, Syntax::State,
-                          "Soil heat and transportation.",
-                          SoilHeat1D::load_syntax);
-
+    
     Librarian<Column>::add_type ("default", alist, syntax, &make);
-  }
-
-  void add_generic ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Hansen et.al. 1990. with generic movement in soil.");
-    load_common (syntax, alist);
-
-    syntax.add_submodule ("Soil", alist, Syntax::State,
-                          "The numeric and physical soil properties.",
-                          Soil::load_syntax);
-    syntax.add_submodule ("SoilWater", alist, Syntax::State,
-                          "Soil water content and transportation.",
-                          SoilWater::load_syntax);
-    syntax.add ("Movement", Librarian<Movement>::library (),
-                Syntax::State, Syntax::Singleton, "\
-Discretization and movement of water, heat and solutes in the soil.");
-    alist.add ("Movement", Movement::default_model ());
-
-    Librarian<Column>::add_type ("generic", alist, syntax, &make);
-  }
-  ColumnStandardSyntax ()
-  { 
-    add_default ();
-    add_generic ();
   }
 } column_syntax;

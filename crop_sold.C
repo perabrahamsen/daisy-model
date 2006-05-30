@@ -1938,14 +1938,14 @@ CropSold::harvest (const symbol column_name,
       residuals_DM += WRoot;
       if (geo.total (density) > 0.0)
 	{
-	  am.add (geo,
-		  WRoot * C_Root * m2_per_cm2,
-		  NRoot * m2_per_cm2,
-		  density);
-	  geo.add (residuals_N_soil, density,
-                   NRoot * m2_per_cm2);
-	  geo.add (residuals_C_soil, density,
-                   WRoot * C_Root * m2_per_cm2);
+	  am.add_surface (geo,
+                          WRoot * C_Root * m2_per_cm2,
+                          NRoot * m2_per_cm2,
+                          density);
+	  geo.add_surface (residuals_N_soil, density,
+                           NRoot * m2_per_cm2);
+	  geo.add_surface (residuals_C_soil, density,
+                           WRoot * C_Root * m2_per_cm2);
 	}
       else
 	{

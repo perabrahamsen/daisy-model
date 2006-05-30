@@ -327,16 +327,16 @@ CropSimple::harvest (const symbol column_name,
       static const symbol root_symbol ("root");
       AM& am = AM::create (geo.cell_size (), time, root_am, name, root_symbol);
       daisy_assert (geo.total (root_system->Density) > 0.0);
-      am.add (geo, 
-	      this_far * WRoot * 0.420 * m2_per_cm2,
-	      this_far * NRoot * m2_per_cm2,
-	      root_system->Density);
+      am.add_surface (geo, 
+                      this_far * WRoot * 0.420 * m2_per_cm2,
+                      this_far * NRoot * m2_per_cm2,
+                      root_system->Density);
       residuals.push_back (&am);
       residuals_DM += this_far * WRoot;
-      geo.add (residuals_N_soil, root_system->Density,
-		    this_far * NRoot * m2_per_cm2);
-      geo.add (residuals_C_soil, root_system->Density, 
-		    this_far * WRoot * 0.420 * m2_per_cm2);
+      geo.add_surface (residuals_N_soil, root_system->Density,
+                       this_far * NRoot * m2_per_cm2);
+      geo.add_surface (residuals_C_soil, root_system->Density, 
+                       this_far * WRoot * 0.420 * m2_per_cm2);
     }
 
   // Yield.

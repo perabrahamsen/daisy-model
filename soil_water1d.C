@@ -70,7 +70,7 @@ SoilWater1D::tick (const Geometry1D& geo,
 	throw ("Groundwater table in or below lowest cell.");
       last = geo.interval_plus (groundwater.table ());
       if (last >=  soil.size () - 1)
-	daisy_assert ("Groundwater too low.");
+	daisy_panic ("Groundwater too low.");
       // Pressure at the last cell is equal to the water above it.
       for (size_t i = last + 1; i < soil.size (); i++)
 	{

@@ -215,7 +215,7 @@ Geometry::extract (std::vector<double>& v,
 
 void
 Geometry::set (std::vector<double>& v, 
-               const double from, const double to, const double amount) const
+               const double from, const double to, double amount) const
 {
   const size_t cell_size = this->cell_size ();
   daisy_assert (v.size () == cell_size);

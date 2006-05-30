@@ -29,28 +29,30 @@ using namespace std;
 class UZNone : public UZmodel
 {
 public:
-  bool tick (Treelog&, const GeometryVert& geo,
+  bool tick (Treelog&, const GeometryVert& /* geo */,
              const Soil& /* soil */, const SoilHeat&,
-	     unsigned int first, const Surface& top, 
-	     unsigned int last, const Groundwater& /* bottom */, 
+	     const unsigned int first, const Surface& /* top */, 
+             const size_t /* top_edge */,
+	     const unsigned int last, const Groundwater& /* bottom */, 
 	     const vector<double>& /* S */,
 	     const vector<double>& h_old,
 	     const vector<double>& Theta_old,
 	     const vector<double>& /* h_ice */,
 	     vector<double>& h,
 	     vector<double>& Theta,
-	     vector<double>& q)
-    {
-      for (int i = first; i <= last; i++)
-	{
-	  q[i] = 0.0;
-	  Theta[i] = Theta_old[i];
-	  h[i] = h_old[i];
-	}
-      q[last + 1] = 0.0;
+             size_t q_offset,
+             vector<double>& q_base)
+  {
+    for (int i = first; i <= last; i++)
+      {
+        q_base[q_offset + i] = 0.0;
+        Theta[i] = Theta_old[i];
+        h[i] = h_old[i];
+      }
+    q_base[q_offset + last + 1] = 0.0;
 
-      return true;
-    }
+    return true;
+  }
 
   // Create and Destroy.
   void has_macropores (bool)

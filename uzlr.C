@@ -43,6 +43,7 @@ public:
   bool tick (Treelog&, const GeometryVert& geo,
              const Soil& soil, const SoilHeat& soil_heat,
 	     unsigned int first, const Surface& top, 
+             size_t top_edge,
 	     unsigned int last, const Groundwater& bottom, 
 	     const vector<double>& S,
 	     const vector<double>& h_old,
@@ -50,7 +51,8 @@ public:
 	     const vector<double>& h_ice,
 	     vector<double>& h,
 	     vector<double>& Theta,
-	     vector<double>& q);
+             size_t q_offset,
+	     vector<double>& q_base);
 
   // Create and Destroy.
   void has_macropores (bool)
@@ -65,6 +67,7 @@ bool
 UZlr::tick (Treelog& msg, const GeometryVert& geo,
             const Soil& soil, const SoilHeat& soil_heat,
 	    unsigned int first, const Surface& top, 
+            const size_t top_edge,
 	    unsigned int last, const Groundwater& bottom, 
 	    const vector<double>& S,
 	    const vector<double>& h_old,
@@ -72,14 +75,16 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	    const vector<double>& h_ice,
 	    vector<double>& h,
 	    vector<double>& Theta,
-	    vector<double>& q)
+            const size_t q_offset,
+            vector<double>& q_base)
 {
+  double *const q = &q_base[q_offset];
   double q_up = 0.0;
   double q_down = 0.0;
+  const Surface::top_t top_type = top.top_type (geo, top_edge);
 
-  if (top.soil_top ())
+  if (top_type == Surface::soil)
     {
-      daisy_assert (!top.flux_top ());
       // We have a forced pressure top, in the form of a ridge system.
       // Since LR only works with flux top, we use Darcy to simulate a
       // flux top between the first cell (with a forced pressure) and
@@ -107,18 +112,15 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 				   soil_heat.T (first));
       daisy_assert (K_sat > 0.0);
 
-      // Make sure it is a flux top.
-      top.flux_top_on ();
-
-      if (!top.flux_top ())
-	// It refuses to be a flux, must be a lake.
+      if (top_type == Surface::forced_pressure)
 	{
 	  const double dz = 0.0 - geo.z (first);
-	  const double dh = top.h () - h_old[first];
+	  const double dh = top.h_top (geo, top_edge) - h_old[first];
 	  q_up = q[first] = -K_sat * (dh/dz + 1.0);
 	}
       else
-	q_up = q[first] = max (top.q (), -K_sat);
+        // Limited water or forced flux.
+	q_up = q[first] = max (top.q_top (geo, top_edge), -K_sat);
     }
 
   //  Use darcy for upward movement in the top.
