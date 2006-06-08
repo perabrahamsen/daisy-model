@@ -14,26 +14,33 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * artikel, cto
 
-== abstract ==
+== Method ==
 
-In the FertOrgaNic EU project, 3 years of field experiments with
-fertigation was carried out at 6 different sites across Europe,
-involving seven different varieties of potato.
+The FertOrgaNic project generated a lot of data, enough to setup Daisy
+for each site, and make useful predictions for that site.  However, we
+wanted more than that.  We also wanted to make the knowledge generally
+available for potato simulation across Europe.
 
-In order to condense these data to a form useful for making production
-and environmental predictions with the Daisy agroecological simulation
-model, a four phase calibration procedure was followed.  The first
-step was to develop a parameterization based on an independent data
-set, and distribute that to the individual sites.  The second step was
-for the local experts to calibrate it for the varieties found on their
-site.  The third step was to extract shared traits from these site and
-variety specific calibrations into a common parameterization.  The
-final step was to recalibrate for the individul varieties based on the
-measured data.
+repetitions, soil types, climate variations.
 
-We believe this procedure combines both local and model expertise in a
-way that result more robust and general parameterizations than had the
-common parameterization step been skipped.
+, the challenge was to
+condense this data into a form that would be useful for later 
+
+Challenge: no 
+
+Assumptions: common traits 
+
+1. workshop & base parameterization
+
+2. site calibration
+
+A misapplication of slurry in Czeckia, a root stopping pan in Denmark,
+a heat wave in Italy, dead instruments in Poland, a unexpected staff
+turnover in Portugal, and inconsistent seed tuber supply in Slovakia.
+
+3. common parameterization
+
+4. site recalibration
 
 * lær cto wp6 
 
