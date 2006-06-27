@@ -893,8 +893,15 @@ ColumnStandard::initialize (const Time& time, Treelog& msg,
                           geometry, *soil, *groundwater, msg);
 
   if (alist.check ("Movement"))
-    movement->initialize (alist.alist ("Movement"), 
-                          *soil, *groundwater, time, my_weather, msg);
+    {
+      AttributeList move_alist (alist.alist ("Movement"));
+      const AttributeList& water_alist = alist.alist ("SoilWater");
+      if (water_alist.check ("macro")
+          && !move_alist.check ("macro"))
+        move_alist.add ("macro", water_alist.alist ("macro"));
+      movement->initialize (move_alist,
+                            *soil, *groundwater, time, my_weather, msg);
+    }
   else
     {
       AttributeList al;
@@ -942,6 +949,16 @@ static struct ColumnStandardSyntax
     Soil::load_syntax (syntax, alist);
   }
 
+  static void load_water_and_macro (Syntax& syntax, AttributeList& alist)
+  {
+    SoilWater::load_syntax (syntax, alist);
+    syntax.add ("macro", Librarian<Macro>::library (),
+                Syntax::OptionalState, Syntax::Singleton,
+                "Preferential flow model.\n\
+By default, preferential flow is enabled if and only if the combined\n\
+amount of humus and clay in the top horizon is above 5%.");
+  }
+
   ColumnStandardSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
@@ -957,7 +974,7 @@ Hansen et.al. 1990. with generic movement in soil.");
                           load_soil_and_geometry);
     syntax.add_submodule ("SoilWater", alist, Syntax::State,
                           "Soil water content and transportation.",
-                          SoilWater::load_syntax);
+                          load_water_and_macro);
     syntax.add ("Movement", Librarian<Movement>::library (),
                 Syntax::State, Syntax::Singleton, "\
 Discretization and movement of water, heat and solutes in the soil.");

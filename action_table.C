@@ -25,6 +25,7 @@
 #include "am.h"
 #include "im.h"
 #include "lexer_table.h"
+#include "mathlib.h"
 #include <set>
 #include <map>
 #include <memory>
@@ -141,41 +142,60 @@ ActionTable::doIt (Daisy& daisy, Treelog& msg)
                           ? *fertilizers[daisy.time] : *am);
 
       AM::set_utilized_weight (fert, fertilize_events[daisy.time]);
-
-      double water = 0.0;
-      const std::string syntax = fert.name ("syntax");
-      std::ostringstream tmp;
-      if (syntax == "mineral")
-        tmp << "Fertilizing " << fert.number ("weight") 
-            << " kg "<< fert.name ("type") << "-N/ha";
-      else if (syntax == "organic")
+      if (irrigate_events.find (daisy.time) != irrigate_events.end ())
         {
-          tmp  << "Fertilizing " << fert.number ("weight") 
-               << " ton "<< fert.name ("type") << " ww/ha";
-          const double utilized_weight = AM::utilized_weight (fert);
-          if (utilized_weight > 0.0)
-            tmp << "; utilized " << utilized_weight << " kg N/ha";
-          water = AM::get_water (fert);
-          if (water > 0.0)
-            tmp << "; water " << water << " mm";
+          double value = irrigate_events[daisy.time];
+          std::ostringstream tmp;
+          if (!std::isnormal (value))
+            {
+              tmp << "Applying minimum of 0.1 mm\n";
+              value = 0.1;
+            }
+          IM im (fert);
+          const double conv = 100 * 100 * 1000; // [g/cm^2] -> [mg/m^2]
+          im *= conv / value;   // [mg/l]
+          daisy.field.irrigate_subsoil (value, im, -5.0, -25.0); 
+          tmp << "Fertigating " << value << " mm, " 
+              << im.NO3 << " ppm NO3 and " << im.NH4 << " ppm NH4";
+          msg.message (tmp.str ());
         }
       else
-        tmp << "Fertilizing " << fert.name ("type");
-      msg.message (tmp.str ());
-      if (syntax != "mineral")
         {
-          AttributeList new_time;
-          new_time.add ("year", daisy.time.year ());
-          new_time.add ("month", daisy.time.month ());
-          new_time.add ("mday", daisy.time.mday ());
-          new_time.add ("hour", daisy.time.hour ());
-          fert.add ("creation", new_time);
+          double water = 0.0;
+          const std::string syntax = fert.name ("syntax");
+          std::ostringstream tmp;
+          if (syntax == "mineral")
+            tmp << "Fertilizing " << fert.number ("weight") 
+                << " kg "<< fert.name ("type") << "-N/ha";
+          else if (syntax == "organic")
+            {
+              tmp  << "Fertilizing " << fert.number ("weight") 
+                   << " ton "<< fert.name ("type") << " ww/ha";
+              const double utilized_weight = AM::utilized_weight (fert);
+              if (utilized_weight > 0.0)
+                tmp << "; utilized " << utilized_weight << " kg N/ha";
+              water = AM::get_water (fert);
+              if (water > 0.0)
+                tmp << "; water " << water << " mm";
+            }
+          else
+            tmp << "Fertilizing " << fert.name ("type");
+          msg.message (tmp.str ());
+          if (syntax != "mineral")
+            {
+              AttributeList new_time;
+              new_time.add ("year", daisy.time.year ());
+              new_time.add ("month", daisy.time.month ());
+              new_time.add ("mday", daisy.time.mday ());
+              new_time.add ("hour", daisy.time.hour ());
+              fert.add ("creation", new_time);
+            }
+          daisy.field.fertilize (fert);
+          if (water > 0.0)
+            daisy.field.irrigate_surface (water, IM ());
         }
-      daisy.field.fertilize (fert);
-      if (water > 0.0)
-        daisy.field.irrigate_surface (water, IM ());
     }
-  if (irrigate_events.find (daisy.time) != irrigate_events.end ())
+  else if (irrigate_events.find (daisy.time) != irrigate_events.end ())
     {
       const double value = irrigate_events[daisy.time];
       std::ostringstream tmp;
