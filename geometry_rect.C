@@ -82,7 +82,7 @@ GeometryRect::check_border (const double border, Treelog& err) const
 }
 
 void
-GeometryRect::load_syntax (Syntax& syntax, AttributeList&)
+GeometryRect::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   alist.add ("submodel", "GeometryRect");
   syntax.add ("zplus", "cm", Check::negative (), 
