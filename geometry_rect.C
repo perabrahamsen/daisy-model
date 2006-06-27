@@ -84,6 +84,7 @@ GeometryRect::check_border (const double border, Treelog& err) const
 void
 GeometryRect::load_syntax (Syntax& syntax, AttributeList&)
 { 
+  alist.add ("submodel", "GeometryRect");
   syntax.add ("zplus", "cm", Check::negative (), 
 	      Syntax::Const, Syntax::Sequence,
 	      "Depth of each numeric layer (a negative number).\n\

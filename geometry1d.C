@@ -141,8 +141,9 @@ Geometry1D::swap (std::vector<double>& v, double from, double middle, double to)
 }
 
 void
-Geometry1D::load_syntax (Syntax& syntax, AttributeList&)
+Geometry1D::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  alist.add ("submodel", "Geometry1D");
   syntax.add_check (check_alist);
   syntax.add ("zplus", "cm", Check::negative (), 
 	      Syntax::OptionalConst, Syntax::Sequence,
