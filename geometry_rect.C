@@ -22,6 +22,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "block.h"
+#include "alist.h"
 #include "submodel.h"
 #include <sstream>
 
