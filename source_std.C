@@ -115,12 +115,15 @@ SourceStandard::load (Treelog& msg)
           // Treat as missing value.
           continue;
         }
-      vals.push_back (val);
+
+      // Store it.
       if (time != last_time)
 	{
+          if (vals.size () > 0)
+            add_entry (last_time, vals);
 	  last_time = time;
-	  add_entry (time, vals);
 	}
+      vals.push_back (val);
     }
   if (vals.size () > 0)
     add_entry (last_time, vals);

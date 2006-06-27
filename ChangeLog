@@ -1,3 +1,7 @@
+2006-06-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_std.C (load): Bug fix.  Stored values in wrong time steps.
+
 2006-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* geometry_vert.h, geometry_vert.C: New interface.
