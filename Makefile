@@ -161,12 +161,12 @@ ifeq ($(COMPILER),gcc)
 	endif
 	ifeq ($(HOSTTYPE),cygwin)
 		OSFLAGS =
-		DEBUG = 
+		DEBUG = -g
 	endif
 	ifeq ($(HOSTTYPE),mingw)
 		OSFLAGS = -DMINGW -mno-cygwin
 #		          -I/home/mingw/include -L/home/mingw/lib
-		DEBUG = 
+		DEBUG = -g
 	endif
 	WARNING = -W -Wall -Wno-uninitialized \
 		  -Wconversion -Woverloaded-virtual \
