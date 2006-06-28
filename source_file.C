@@ -90,7 +90,7 @@ SourceFile::read_entry (std::vector<std::string>& entries, Time& time)
   if (!lex.get_entries (entries))
     return false;
 
-  if (!lex.get_time (entries, time))
+  if (!lex.get_time (entries, time, default_hour))
     return false;
 
   // If we survived here, everything is fine.
@@ -114,6 +114,10 @@ sum: use the sum of the values.\n\
 \n\
 normal: use the arithemetic average of the values, and calculate the\n\
 standard deviation.");
+  syntax.add ("default_hour", Syntax::Integer, Syntax::Const, "\
+Hour to assume when nothing else is specified;");
+  alist.add ("default_hour", 8);
+  syntax.add_check ("default_hour", VCheck::valid_hour ());
   static VCheck::Enum handle_check ("sum", "normal");
   syntax.add_check ("handle", handle_check);
   alist.add ("handle", "normal");
@@ -125,7 +129,8 @@ SourceFile::SourceFile (Block& al)
     with_ (al.name ("with", "")),
     explicit_with (al.check ("with")),
     style_ (al.integer ("style", -1)),
-    use_sum (al.name ("handle") == "sum")
+    use_sum (al.name ("handle") == "sum"),
+    default_hour (al.integer ("default_hour"))
 { }
 
 SourceFile::~SourceFile ()

@@ -73,8 +73,10 @@ private:
   int get_date_component (const std::vector<std::string>& entries, 
                           int column, int default_value) const;
 public:
-  static bool get_time (const std::string& entry, Time& time); 
-  bool get_time (const std::vector<std::string>& entries, Time& time) const;
+  static bool get_time (const std::string& entry, Time& time, 
+                        int default_hour); 
+  bool get_time (const std::vector<std::string>& entries, Time& time, 
+                 int default_hour) const;
   bool is_missing (const std::string& value) const;
   double convert_to_double (const std::string& value) const;
 

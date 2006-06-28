@@ -307,7 +307,7 @@ LexerTable::get_date_component (const std::vector<std::string>& entries,
 }
 
 bool
-LexerTable::get_time (const std::string& entry, Time& time)
+LexerTable::get_time (const std::string& entry, Time& time, int default_hour)
 {
   std::istringstream in (entry);
 
@@ -321,7 +321,7 @@ LexerTable::get_time (const std::string& entry, Time& time)
   if (sep1 != sep2)
     return false;
 
-  int hour = 8;
+  int hour = default_hour;
   if (in.good () && !in.eof ())
     {
       char sep3;
@@ -357,7 +357,7 @@ LexerTable::get_time (const std::string& entry, Time& time)
 
 bool
 LexerTable::get_time (const std::vector<std::string>& entries,
-                      Time& time) const
+                      Time& time, const int default_hour) const
 {
   // Extract date.
   if (time_c < 0)
@@ -365,7 +365,7 @@ LexerTable::get_time (const std::vector<std::string>& entries,
       int year = get_date_component (entries, year_c, 1000);
       int month = get_date_component (entries, month_c, 1);
       int mday = get_date_component (entries, mday_c, 1);
-      int hour = get_date_component (entries, hour_c, 0);
+      int hour = get_date_component (entries, hour_c, default_hour);
 
       if (!Time::valid (year, month, mday, hour))
         {
@@ -387,7 +387,7 @@ LexerTable::get_time (const std::vector<std::string>& entries,
           return false;
         }
     }
-  else if (!get_time (entries[time_c], time))
+  else if (!get_time (entries[time_c], time, default_hour))
     {
       warning (entries[time_c] + ": invalid time");
       return false;

@@ -34,6 +34,7 @@ protected:
   const int style_;
 private:
   bool use_sum;
+  int default_hour;
 protected:
   void add_entry (const Time& time, std::vector<double>& vals);
 private:

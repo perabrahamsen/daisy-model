@@ -1,3 +1,7 @@
+2006-06-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_file.C, source_file.h (default_hour): New parameter.
+
 2006-06-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* select.C (check_path): Complain if fixed components are found in
