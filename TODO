@@ -1,5 +1,7 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* log entry referencer til spec parametre i dokumentationen.
+
 * R2D2
 
 ** Check interface mellem jord og overflade (geo total, add, extract, set)
@@ -16,10 +18,10 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 == Method ==
 
-The FertOrgaNic project generated a lot of data, enough to setup Daisy
-for each site, and make useful predictions for that site.  However, we
-wanted more than that.  We also wanted to make the knowledge generally
-available for potato simulation across Europe.
+The FertOrgaNic project generated a large amount of data, enough to
+setup Daisy for each site, and make useful predictions for that site.
+However, we wanted to generalize this knowledge to a form generally
+useful for potato simulation across Europe.
 
 repetitions, soil types, climate variations.
 

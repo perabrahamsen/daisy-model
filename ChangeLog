@@ -1,5 +1,10 @@
 2006-06-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* select.C (check_path): Complain if fixed components are found in
+	the spec.
+
+	* lib/log-std.dai ("Field nitrogen"): Simplify 'spec' entries.
+
 	* Version 4.03 released.
 
 2006-06-27  Per Abrahamsen  <abraham@dina.kvl.dk>

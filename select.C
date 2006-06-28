@@ -82,7 +82,8 @@ struct Select::Implementation
 
     // Create and Destroy.
     static bool check_path (const vector<symbol>& path,
-			    const Syntax* syntax,
+			    const Syntax& syntax,
+			    const AttributeList& alist,
 			    Treelog& err);
     static bool check_alist (const AttributeList& al, Treelog& err);
     static void load_syntax (Syntax& syntax, AttributeList&);
@@ -191,29 +192,42 @@ Select::Implementation::Spec::refer (Format& format) const
 
 bool 
 Select::Implementation::Spec::check_path (const vector<symbol>& path,
-					  const Syntax* syntax,
+					  const Syntax& top_syntax,
+					  const AttributeList& top_alist,
 					  Treelog& err)
 {
+  const Syntax* syntax = &top_syntax;
+  const AttributeList* alist = &top_alist;
+
   bool ok = true;
   for (unsigned int i = 0; i < path.size (); i++)
     {
-      const symbol name = path[i];
+      const std::string name = path[i].name ();
       bool last = (i + 1 == path.size ());
-      const Syntax::type type = syntax->lookup (name.name ());
+      const Syntax::type type = syntax->lookup (name);
 
       if (!last)
 	{
 	  if (type != Syntax::AList)
 	    {
-	      err.entry ("'" + name + "': no such submodel");
+	      err.error ("'" + name + "': no such submodel");
 	      ok = false;
 	      break;
 	    }
-	  syntax = &syntax->syntax (name.name ());
+
+          if (syntax->size (name) != Syntax::Singleton || !alist->check (name))
+            alist = &syntax->default_alist (name);
+          else
+            alist = &alist->alist (name);
+	  syntax = &syntax->syntax (name);
+          
+          if (alist->check ("submodel"))
+            err.warning ("'" + name + "' is a fixed '" 
+                         + alist->name ("submodel") + "' component");
 	}
       else if (type == Syntax::Error)
 	{
-	  err.entry ("'" + name + "': no such attribute");
+	  err.error ("'" + name + "': no such attribute");
 	  ok = false;
 	  break;
 	}
@@ -249,7 +263,7 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
 	  Syntax syntax;
 	  AttributeList alist;
 	  Submodel::load_syntax (model_name.name (), syntax, alist);
-	  if (!check_path (submodels_and_attribute, &syntax, err))
+	  if (!check_path (submodels_and_attribute, syntax, alist, err))
 	    ok = false;
 	}
     }
@@ -269,8 +283,9 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
 	}
       else
 	{
-	  const Syntax* syntax = &library.syntax (model_name);
-	  if (!check_path (submodels_and_attribute, syntax, err))
+	  const Syntax& syntax = library.syntax (model_name);
+	  const AttributeList& alist = library.lookup (model_name);
+	  if (!check_path (submodels_and_attribute, syntax, alist, err))
 	    ok = false;
 	}
     }
