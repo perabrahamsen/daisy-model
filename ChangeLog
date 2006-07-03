@@ -1,5 +1,7 @@
 2006-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* lib/log.dai, lib/log-std.dai: Cleaned up specs.
+
 	* Version 4.05 released.
 
 2006-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
