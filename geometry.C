@@ -424,7 +424,6 @@ Geometry::initialize_layer (std::vector<double>& array,
   else if (al.check (initial))
     {
       // Initialize by layers.
-      std::vector<double> unused (cell_size (), 0.0);
       const std::vector<AttributeList*>& layers = al.alist_sequence (initial);
       const double soil_end = bottom ();
       double last = 0.0;
@@ -440,8 +439,17 @@ Geometry::initialize_layer (std::vector<double>& array,
 	      next = soil_end;
 	      i = layers.size ();
 	    }
-	  add (array, last, next, 
-               value * volume_in_z_interval (last, next, unused));
+          for (size_t cell = 0; cell < cell_size (); cell++)
+            {
+              const double f = fraction_in_z_interval (cell, last, next);
+              if (f > 0.001)
+                {
+                  // We only grow array as needed, which helps the 1D case.
+                  while (array.size () <= cell)
+                    array.push_back (0.0);
+                  array[cell] += f * value;
+                }
+            }
 	  last = next;
 	}
     }

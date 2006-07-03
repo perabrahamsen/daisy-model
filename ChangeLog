@@ -1,3 +1,12 @@
+2006-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.05 released.
+
+2006-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C (initialize_layer): Don't assume array is large
+	enough to hold all cells.
+
 2006-06-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.04 released.
