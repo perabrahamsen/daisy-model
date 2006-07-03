@@ -273,6 +273,12 @@ else
 	endif
 endif
 
+ifeq ($(HOSTTYPE),mingw)
+	DAISYEXE = /home/abraham/daisy/daisy.exe
+else
+	DAISYEXE = /usr/local/daisy/$(HOSTTYPE)/daisy
+endif
+
 # Figure out how to link.
 #
 ifeq ($(COMPILER),borland)
@@ -591,10 +597,8 @@ txt/reference.pdf:	txt/components.tex
 	 && makeindex reference \
 	 && pdflatex reference.tex < /dev/null )
 
-txt/components.tex:	/usr/local/daisy/$(HOSTTYPE)/daisy
-	(cd txt \
-	 && /usr/local/daisy/$(HOSTTYPE)/daisy all.dai -p document \
-            > components.tex)
+txt/components.tex:	$(DAISYEXE)
+	(cd txt && $(DAISYEXE) all.dai -p document > components.tex)
 
 # Remove all the temporary files.
 #

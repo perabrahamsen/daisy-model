@@ -207,7 +207,7 @@ static struct SourceMergeSyntax
 By default, let the first source decide.", "");
     alist.add ("description", 
 	       "Merge multiple timeseries into one.\n\
-Any errorbars on the original timeseries is ignored, but the merged\n\
+Any errorbars on the original timeseries are ignored, but the merged\n\
 timeseries may have errorbars if there are multiple values for the\n\
 same time.");
     syntax.add ("source", Librarian<Source>::library (), 
