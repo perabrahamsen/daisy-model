@@ -510,18 +510,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
       daisy_assert (lib.check (original_type));
 
       type = original_symbol;
-#if 1
       warning ("Model specified missing, assuming 'original'");
-#else
-      static bool has_warned = false;
-      if (!has_warned)
-        {
-          has_warned = true;
-          ostringstream tmp;
-          tmp << "Assuming original type '" << original_type << "'";
-          warning (tmp.str ());
-        }
-#endif
     }
   else  
     {

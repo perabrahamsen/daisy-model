@@ -1,3 +1,7 @@
+2006-07-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (load_derived): Handle '$' variables.
+
 2006-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lib/log.dai, lib/log-std.dai: Cleaned up specs.
