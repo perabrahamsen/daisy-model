@@ -1,3 +1,10 @@
+2006-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/log-sample.dai ("Sample water content"): Fixed spec.
+
+	* parser_file.C (load_list): Handle fixed size object sequences.
+	(load_list): Handle sequence valued variables.
+
 2006-07-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* parser_file.C (load_derived): Handle '$' variables.

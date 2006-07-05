@@ -610,6 +610,16 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      error ("'" + var + "' already exists");
 	      ok = false;
 	    }
+          int size = Syntax::Singleton;
+          if (looking_at ('['))
+            {
+              skip ("[");
+              if (looking_at (']'))
+                size = Syntax::Sequence;
+              else
+                size = get_integer ();
+              skip ("]");
+            }
 	  const std::string type_name = get_string ();
 	  std::string doc = "User defined " + type_name + ".";
 	  const Syntax::type type = Syntax::type_number (type_name);
@@ -621,7 +631,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		if (!looking_at ('('))
 		  doc = get_string ();
 		if (ok)
-		  syntax.add (var, type, Syntax::Const, doc);
+		  syntax.add (var, type, Syntax::Const, size, doc);
 		break;
 	      }
 	    case Syntax::Number:
@@ -632,7 +642,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		if (!looking_at ('('))
 		  doc = get_string ();
 		if (ok)
-		  syntax.add (var, dim, Syntax::Const, doc);
+		  syntax.add (var, dim, Syntax::Const, size, doc);
 		break;
 	      }
 	    case Syntax::Error:
@@ -653,7 +663,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                             // This mimics what Syntax::add_submodule does
                             // for a Syntax::Const.
                             syntax.add (var, sub_syn, 
-                                        Syntax::Const, Syntax::Singleton, doc);
+                                        Syntax::Const, size, doc);
                             atts.add (var, sub_al);
                           }
                         break;
@@ -668,7 +678,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                           doc = get_string ();
                         if (ok)
                           syntax.add (var, Library::find (type_symbol), 
-                                      Syntax::Const, Syntax::Singleton, doc);
+                                      Syntax::Const, size, doc);
                         break;
                       }
                   }
@@ -885,8 +895,6 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    {
 	    case Syntax::Object:
 	      {
-		// We don't support fixed sized object arrays yet.
-		daisy_assert (syntax.size (name) == Syntax::Sequence);
 		const Library& lib = syntax.library (name);
 		static const vector<AttributeList*> no_sequence;
 		vector<AttributeList*> sequence;
@@ -896,6 +904,14 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  : no_sequence;
 		while (!looking_at (')') && good ())
 		  {
+                    if (syntax.size (name) == sequence.size ())
+                      {
+                        std::ostringstream tmp;
+                        tmp << "The '" << name 
+                            << "' sequence should only contain "
+                            << syntax.size (name) << " elements";
+                        error (tmp.str ());
+                      }
                     if (looking_at ('&'))
                       {
                         skip ("&old");
