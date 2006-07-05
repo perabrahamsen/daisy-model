@@ -1,5 +1,9 @@
 2006-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.06 released.
+
+2006-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* sample/log-sample.dai ("Sample water content"): Fixed spec.
 
 	* parser_file.C (load_list): Handle fixed size object sequences.
