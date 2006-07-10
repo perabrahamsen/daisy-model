@@ -162,8 +162,8 @@ struct Movement1D : public Movement
 
     // Update surface and groundwater reservoirs.
     surface.accept_top (q[0] * dt, geo, 0U, msg);
-    groundwater.accept_bottom ((q[last + 1] + q_p[last + 1]) * dt,
-                               geo, last + 1U);
+    groundwater.accept_bottom ((q[soil.size ()] + q_p[soil.size ()]) * dt,
+                               geo, soil.size ());
   }
 
 

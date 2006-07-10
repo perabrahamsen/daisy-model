@@ -255,21 +255,21 @@ Surface::Implementation::exfiltrate (double water /* mm */, Treelog& msg)
       std::ostringstream tmp;
       tmp << "pond (" << pond << ") + flux (" << water << ") * dt (" << dt 
           << ") = " << pond + water * dt << ", should be non-negative";
-      msg.error (tmp.str ());
+      msg.warning (tmp.str ());
       return;
     }
   if (im.NO3 < 0.0)
     {
       std::ostringstream tmp;
       tmp << "Added " << -im.NO3 << " NO3 to surface";
-      msg.error (tmp.str ());
+      msg.warning (tmp.str ());
       im.NO3 = 0.0;
     }
   if (im.NH4 < 0.0)
     {
       std::ostringstream tmp;
       tmp << "Added " << -im.NH4 << " NH4 to surface\n";
-      msg.error (tmp.str ());
+      msg.warning (tmp.str ());
       im.NH4 = 0.0;
     }
   if (total_matter_flux)
@@ -512,7 +512,7 @@ Surface::evap_pond (Treelog& msg) const	// [mm/h]
       Treelog::Open nest (msg, "Surface evap pond");
       std::ostringstream tmp;
       tmp << "BUG: evap_pond = " << ep;
-      msg.error (tmp.str ());
+      msg.warning (tmp.str ());
     }
   return 0.0;
 }

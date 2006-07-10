@@ -1,5 +1,54 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* manglende figurer
+
+./title.tex:22: LaTeX Error: File `../fig/potatofield4' not found.
+./introduction.tex:904: LaTeX Error: File `../fig/partitionering/CZpartitionering.EPS' not found.
+./introduction.tex:905: LaTeX Error: File `../fig/partitionering/DKpartitionering.EPS' not found.
+./introduction.tex:906: LaTeX Error: File `../fig/partitionering/ITpartitionering.EPS' not found.
+./introduction.tex:907: LaTeX Error: File `../fig/partitionering/PLpartitionering.EPS' not found.
+./introduction.tex:908: LaTeX Error: File `../fig/partitionering/PTpartitionering.EPS' not found.
+./introduction.tex:909: LaTeX Error: File `../fig/partitionering/SKAgriapartitionering.EPS' not found.
+./introduction.tex:910: LaTeX Error: File `../fig/partitionering/SKSolarapartitionering.EPS' not found.
+./introduction.tex:911: LaTeX Error: File `../fig/partitionering/SKFileapartitionering.EPS' not found.
+./introduction.tex:958: LaTeX Error: File `../fig/canopy/SpLAICZ.EPS' not found.
+./introduction.tex:959: LaTeX Error: File `../fig/canopy/SpLAIDK.EPS' not found.
+./introduction.tex:960: LaTeX Error: File `../fig/canopy/SpLAIIT.EPS' not found.
+./introduction.tex:961: LaTeX Error: File `../fig/canopy/SpLAIPL.EPS' not found.
+./introduction.tex:962: LaTeX Error: File `../fig/canopy/SpLAIPT.EPS' not found.
+./introduction.tex:963: LaTeX Error: File `../fig/canopy/SpLAISK.EPS' not found.
+./introduction.tex:971: LaTeX Error: File `../fig/canopy/SpLAICommon.EPS' not found.
+./introduction.tex:1001: LaTeX Error: File `../fig/production/LfDR.EPS' not found.
+./introduction.tex:1040: LaTeX Error: File `../fig/CrpN/PtLeaf.EPS' not found.
+./introduction.tex:1041: LaTeX Error: File `../fig/CrpN/CrLeaf.EPS' not found.
+./introduction.tex:1042: LaTeX Error: File `../fig/CrpN/NfLeaf.EPS' not found.
+./introduction.tex:1050: LaTeX Error: File `../fig/CrpN/PtStem.EPS' not found.
+./introduction.tex:1051: LaTeX Error: File `../fig/CrpN/CrStem.EPS' not found.
+./introduction.tex:1052: LaTeX Error: File `../fig/CrpN/NfStem.EPS' not found.
+./introduction.tex:1060: LaTeX Error: File `../fig/CrpN/PtSorg.EPS' not found.
+./introduction.tex:1061: LaTeX Error: File `../fig/CrpN/CrSorg.EPS' not found.
+./introduction.tex:1062: LaTeX Error: File `../fig/CrpN/NfSorg.EPS' not found.
+./Denmark.tex:752: LaTeX Error: File `../fig/wp1-dk-dias-2003/T1_TDR' not found.
+./Denmark.tex:753: LaTeX Error: File `../fig/wp1-dk-dias-2003/T2_TDR' not found.
+./Denmark.tex:755: LaTeX Error: File `../fig/wp1-dk-dias-2003/T3_TDR' not found.
+./Denmark.tex:756: LaTeX Error: File `../fig/wp1-dk-dias-2003/T4_TDR' not found.
+./Denmark.tex:757: LaTeX Error: File `../fig/wp1-dk-dias-2003/T5_TDR' not found.
+./Denmark.tex:909: LaTeX Error: File `../fig/wp1-dk-dias-2004/T1_TDR' not found.
+./Denmark.tex:910: LaTeX Error: File `../fig/wp1-dk-dias-2004/T2_TDR' not found.
+./Denmark.tex:912: LaTeX Error: File `../fig/wp1-dk-dias-2004/T3_TDR' not found.
+./Denmark.tex:913: LaTeX Error: File `../fig/wp1-dk-dias-2004/T4_TDR' not found.
+./Denmark.tex:914: LaTeX Error: File `../fig/wp1-dk-dias-2004/T5_TDR' not found.
+./Denmark.tex:1066: LaTeX Error: File `../fig/wp1-dk-dias-2005/T1_TDR' not found.
+./Denmark.tex:1067: LaTeX Error: File `../fig/wp1-dk-dias-2005/T2_TDR' not found.
+./Denmark.tex:1069: LaTeX Error: File `../fig/wp1-dk-dias-2005/T3_TDR' not found.
+./Denmark.tex:1070: LaTeX Error: File `../fig/wp1-dk-dias-2005/T4_TDR' not found.
+./Denmark.tex:1071: LaTeX Error: File `../fig/wp1-dk-dias-2005/T5_TDR' not found.
+./Poland.tex:1142: LaTeX Error: File `../fig/pl-irrigation/pl-2004-irrigation.eps' not found.
+
+LaTeX Warning: Reference `app:potatocharacteristics' on page 6 undefined on input line 381.
+LaTeX Warning: Reference `app:scottishparm' on page 10 undefined on input line 598.
+LaTeX Warning: Reference `app:scottishparm' on page 14 undefined on input line 798.
+
 * Test brug af variable af type list of objects.
 
 * R2D2
