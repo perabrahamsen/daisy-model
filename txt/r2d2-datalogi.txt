@@ -80,7 +80,7 @@ indledningen i dag har dobbelt så mange modeller som processer, så
 skyldes det at hver process repræsenteres af et interface, og hver
 model af en implementation af et sådant interface.  OOP tillader
 således at vi har flere implementationer (modeller) af hvert interface
-(process).  Et ekesmpel er transport af vand, hvor man kan vælge
+(process).  Et eksmpel er transport af vand, hvor man kan vælge
 mellem en simpelt model hvor hvert lag i jorden har en fast kapacitet,
 samt en mere kompleks men fysisk mere korrekt beskrivelse ved Richards
 ligning.  Transport af vand regnes her for en process, og
