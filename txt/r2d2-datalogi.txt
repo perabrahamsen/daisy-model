@@ -153,5 +153,5 @@ Samtidig betyder det at hele omsætningsdelen fortsat vil være fælles
 mellem 1D og 2D Daisy, og at alle forbedringer af denne derfor vil
 komme brugere af begge til gode.  Det samme gælder generelle
 forbedringer i programmets "infrastruktur", såsom læsning af
-opsætningsfiler, generering og processering af resultatfiler, og
+opsætningsfiler, generering og processering af resultatfiler, samt
 dokumentation.
