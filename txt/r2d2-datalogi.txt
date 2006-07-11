@@ -4,10 +4,10 @@ Daisy kildekode.
 Udviklingen af Daisy begyndte i slutningen af 80'erne som en del af
 NPO-programmet, og har været i gang med varierende intensitet siden da
 under mange forskellige projekter.  En enkelt omskrivning blev det til
-i midten af 90'erne.  I dag er kildekoden til Daisy på lige knap
-100.000 linier, hvilket er ti gange mere end den første færdige
-version fra 1990.  Daisy kan simulere ca. 100 forskellige processer,
-med dobbelt så mange modeller.
+i slutningen af 90'erne.  I dag er kildekoden til Daisy på lige knap
+100.000 linier, hvilket er ti gange mere end den oprindelige version
+fra 1990.   Daisy kan simulere ca. 100 forskellige processer, med
+dobbelt så mange modeller.  
 
 Alt dette repræsenterer en kompleksitet det er en udfordring at holde
 styr på.  En tommelfingerregel er at man med brug af struktureret
@@ -74,7 +74,7 @@ repræsenterer stadig data og funktioner.  Når en klasse bliver
 instantieret (man laver nyt kopi af klassens data) kaldes instansen et
 objekt, deraf navnet OOP.
 
-Ved omskrivningen i midten af 90'erne blev Daisy da også designet
+Ved omskrivningen i starten af 90'erne blev Daisy da også designet
 omkring objekt-orienteret programmering.  Når Daisy som nævnt i
 indledningen i dag har dobbelt så mange modeller som processer, så
 skyldes det at hver process repræsenteres af et interface, og hver
@@ -137,7 +137,7 @@ Det andet punkt var transportprocesserne, der traditionelt var knyttet
 til de enkelte stoffer som skulle transporteres, og
 omsætningsprocesserne.  I forbindelse med R2D2 projektet var denne
 opdeling uhensigtmæssig, i stedet var det en fordel at knytte
-transportprocesserne tæt til valget af geometri 8de modeller man
+transportprocesserne tæt til valget af geometri (de modeller man
 bruger til transport er generelt stærkt geometriafhængige), og
 samtidig justere omsætningsprocesserne så disse var uafhængige af
 valget af geometri.
