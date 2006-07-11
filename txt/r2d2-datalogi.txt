@@ -114,7 +114,7 @@ høj grad er værd at betale.
 Når man bruger OOP bliver et nyt princip relevant for designet af
 programmet, nemlig at hvert modul vælges så det svarer til de
 funktioner man kunne ønske at udskifte.  Eftersom man ofte ikke ved
-det på forånd, betyder dte at en kontinuerligt redesign af programmet
+det på forhånd, betyder det at en kontinuerligt redesign af programmet
 er ønskværdigt efterhånden som det udvikler sig.
 
 R2D2 redesign
