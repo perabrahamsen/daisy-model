@@ -1,5 +1,9 @@
 2006-07-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.07 released.
+
+2006-07-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* action_table.C: New "Emerging" column.
 	* action_harvest.C: Added "emerge" action.
 	* field.h, field.C (emerge): New operation.
