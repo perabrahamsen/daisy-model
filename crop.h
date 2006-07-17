@@ -91,6 +91,7 @@ public:
 		     std::vector<double>& residuals_C_soil,
 		     double ForcedCAI,
 		     Treelog&) = 0;
+  virtual void emerge () = 0;
   virtual const Harvest& harvest (symbol column_name,
 				  const Time&, const Geometry&, 
 				  Bioclimate& bioclimate,

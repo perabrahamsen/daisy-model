@@ -68,6 +68,7 @@ public:
   void fertilize (const AttributeList&, double from, double to); // Organic.
   void fertilize (const AttributeList&);
   void clear_second_year_utilization ();
+  void emerge (symbol crop, Treelog&);
   void harvest (const Time&, symbol name,
 		double stub_length, 
 		double stem_harvest, 

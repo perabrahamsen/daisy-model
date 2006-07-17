@@ -57,6 +57,7 @@ public:
   virtual void fertilize (const AttributeList&, double from, double to) = 0;
   virtual void fertilize (const AttributeList&) = 0;
   virtual void clear_second_year_utilization () = 0;
+  virtual void emerge (symbol crop, Treelog&) = 0;
   virtual void harvest (const Time&, symbol name,
 			double stub_length, 
 			double stem_harvest, 

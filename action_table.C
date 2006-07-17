@@ -34,10 +34,12 @@
 struct ActionTable : public Action
 {
   const std::auto_ptr<Action> sow;
+  const std::auto_ptr<Action> emerge;
   const std::auto_ptr<Action> harvest;
   const std::auto_ptr<AttributeList> am;
 
   std::set<Time> sow_dates;
+  std::set<Time> emerge_dates;
   std::set<Time> harvest_dates;
   std::map<Time, double> fertilize_events;
   std::map<Time, double> irrigate_events;
@@ -131,6 +133,8 @@ ActionTable::doIt (Daisy& daisy, Treelog& msg)
 { 
   if (sow.get () && sow_dates.find (daisy.time) != sow_dates.end ())
     sow->doIt (daisy, msg);
+  if (emerge.get () && emerge_dates.find (daisy.time) != emerge_dates.end ())
+    emerge->doIt (daisy, msg);
   if (harvest.get () 
       && harvest_dates.find (daisy.time) != harvest_dates.end ())
     harvest->doIt (daisy, msg);
@@ -218,6 +222,9 @@ ActionTable::ActionTable (Block& al)
     sow (al.check ("sow") 
          ? Librarian<Action>::build_item (al, "sow")
          : NULL),
+    emerge (al.check ("emerge") 
+         ? Librarian<Action>::build_item (al, "emerge")
+         : NULL),
     harvest (al.check ("harvest") 
              ? Librarian<Action>::build_item (al, "harvest")
              : NULL),
@@ -233,6 +240,7 @@ ActionTable::ActionTable (Block& al)
     }
   const int harvest_c = harvest.get () ? lex.find_tag ("Harvest") : -1;
   const int sow_c = sow.get () ? lex.find_tag ("Planting") : -1;
+  const int emerge_c = emerge.get () ? lex.find_tag ("Emerging") : -1;
   const int irrigate_c = al.flag ("enable_irrigation") 
     ? lex.find_tag ("Irrigate") : -1;
   const int fertilizer_c = lex.find_tag ("Fertilizer");
@@ -240,10 +248,15 @@ ActionTable::ActionTable (Block& al)
                            && (am.get () || fertilizer_c >= 0))
     ? lex.find_tag ("Fertilize") : -1;
   
-  if (sow_c < 0 && harvest_c < 0 && irrigate_c < 0 && fertilize_c < 0)
+  if (sow_c < 0 && emerge_c < 0 && harvest_c < 0 
+      && irrigate_c < 0 && fertilize_c < 0)
     al.msg ().warning ("No applicable column found");
 
-  if (sow_c < 0 && harvest_c < 0 && harvest.get ())
+  if (sow_c < 0 && sow.get ())
+    al.msg ().warning ("Specified planting operation not used");
+  if (emerge_c < 0 && emerge.get ())
+    al.msg ().warning ("Specified emerge operation not used");
+  if (harvest_c < 0 && harvest.get ())
     al.msg ().warning ("Specified harvest operation not used");
   if (fertilize_c < 0 && am.get ())
     al.msg ().warning ("Specified fertilizer not used");
@@ -262,10 +275,12 @@ ActionTable::ActionTable (Block& al)
       read_alist (lex, entries, fertilizer_c, Librarian<AM>::library (),
                   fertilizers);
       read_date (lex, entries, sow_c, sow_dates);
+      read_date (lex, entries, emerge_c, emerge_dates);
       read_date (lex, entries, harvest_c, harvest_dates);
     }
 
   if (sow_dates.size () == 0 
+      && emerge_dates.size () == 0 
       && harvest_dates.size () == 0
       && fertilize_events.size () == 0
       && irrigate_events.size () == 0)
@@ -294,6 +309,9 @@ Date [date]: The date for fertilization or irrigation.\n\
 Planting [date]: The content should be a date in yyyy-mm-dd format,\n\
 where the operation specified by the 'sow' attribute will be perfomed.\n\
 \n\
+Emerging [date]: The content should be a date in yyyy-mm-dd format,\n\
+where the operation specified by the 'emerge' attribute will be perfomed.\n\
+\n\
 Harvest [date]: The content should be a date in yyyy-mm-dd format,\n\
 where the operation specified by the 'harvest' attribute will be\n\
 perfomed.\n\
@@ -312,6 +330,9 @@ Fertilizer [name]: The type of fertilizer to be applied.");
     syntax.add ("sow", Librarian<Action>::library (), 
                 Syntax::OptionalConst, Syntax::Singleton, 
                 "Sow action.");
+    syntax.add ("emerge", Librarian<Action>::library (), 
+                Syntax::OptionalConst, Syntax::Singleton, 
+                "Emerge action.");
     syntax.add ("harvest", Librarian<Action>::library (), 
                 Syntax::OptionalConst, Syntax::Singleton, 
                 "Harvest action.");

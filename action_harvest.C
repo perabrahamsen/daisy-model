@@ -2,6 +2,7 @@
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -23,6 +24,59 @@
 #include "action.h"
 #include "daisy.h"
 #include "field.h"
+
+struct ActionEmerge : public Action
+{
+  const symbol crop;
+
+  void doIt (Daisy& daisy, Treelog& out)
+  {
+    static const symbol all_symbol ("all");
+    if (crop != all_symbol)
+      {
+        if (daisy.field.crop_ds (crop) < -1.0)
+          {
+            out.warning ("Attempted forced emerge of " 
+                         + crop + " which is not on the field");
+            return;
+          }
+        if (daisy.field.crop_ds (crop) >= 0.0)
+          {
+            out.warning ("Forced emerge of " + crop
+                         + " which is already emerged");
+            return;
+          }
+      }
+    daisy.field.emerge (crop, out);
+  }
+
+  ActionEmerge (Block& al)
+    : Action (al),
+      crop (al.identifier ("crop")),
+  { }
+};
+
+static struct ActionEmergeSyntax
+{
+  static Action& make (Block& al)
+  { return *new ActionEmerge (al); }
+  ActionEmergeSyntax ();
+} ActionEmerge_syntax;
+
+ActionEmergeSyntax::ActionEmergeSyntax ()
+{ 
+  Syntax& syntax = *new Syntax ();
+  AttributeList& alist = *new AttributeList ();
+  alist.add ("description", "Force a crop to emerge.");
+  syntax.add ("crop", Syntax::String, Syntax::Const, 
+	      "Name of the crop to emerge.\n\
+If you specify 'all', all crops will emerge.\n\
+If there are no crop on the field with the specified name,\n\
+nothing will happen.");
+  alist.add ("crop", "all");
+  syntax.order ("crop");
+  Librarian<Action>::add_type ("emerge", alist, syntax, &make);
+}
 
 struct ActionHarvest : public Action
 {

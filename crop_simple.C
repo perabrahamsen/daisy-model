@@ -129,6 +129,14 @@ public:
 	     double&, double&, double&, vector<double>&, vector<double>&,
 	     double ForcedCAI,
 	     Treelog&);
+  void emerge ()
+  {
+    if (use_T_sum)
+      T_sum = std::max (T_sum, T_emergence - 0.1);
+    else
+      day = std::max (day, T_emergence - 0.1);
+
+  }
   const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&, 
 			  Bioclimate& bioclimate,

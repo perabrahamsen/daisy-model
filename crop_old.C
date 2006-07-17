@@ -111,6 +111,8 @@ public:
 	     SoilNH4*, SoilNO3*, 
 	     double&, double&, double&, vector<double>&, vector<double>&,
 	     double ForcedCAI, Treelog&);
+  void emerge ()
+  { var.Phenology.DS = -0.1; }
   const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&,
 			  Bioclimate& bioclimate,

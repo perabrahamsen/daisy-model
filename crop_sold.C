@@ -112,6 +112,8 @@ public:
 	     double&, double&, double&, vector<double>&, vector<double>&, 
 	     double ForcedCAI,
 	     Treelog&);
+  void emerge ()
+  { var.Phenology.DS = -0.1; }
   const Harvest& harvest (symbol column_name, const Time&,
 			  const Geometry& geo, 
 			  Bioclimate& bioclimate,

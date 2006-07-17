@@ -60,3 +60,35 @@ static struct ActionSowSyntax
   }
 } ActionSow_syntax;
 
+struct ActionSow : public Action
+{
+  const AttributeList& crop;
+
+  void doIt (Daisy& daisy, Treelog& msg)
+  { 
+    msg.message (string ("Sowing ") + crop.name ("type"));      
+    daisy.field.sow (msg, crop); 
+  }
+
+  ActionSow (Block& al)
+    : Action (al),
+      crop (al.alist ("crop"))
+  { }
+};
+
+// Add the ActionSow syntax to the syntax table.
+static struct ActionSowSyntax
+{
+  static Action& make (Block& al)
+  { return *new ActionSow (al); }
+
+  ActionSowSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Sow a crop on the field.");
+    syntax.add ("crop", Librarian<Crop>::library (), "Crop to sow.");
+    syntax.order ("crop");
+    Librarian<Action>::add_type ("sow", alist, syntax, &make);
+  }
+} ActionSow_syntax;

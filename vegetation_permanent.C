@@ -142,6 +142,8 @@ struct VegetationPermanent : public Vegetation
 			double day_fraction, Treelog&);
   void force_production_stress  (double)
   { }
+  void emerge (const symbol, Treelog&)
+  { }
   void kill_all (symbol, const Time&, const Geometry&, Bioclimate&,
 		 vector<AM*>&, double&, double&, double&, 
 		 vector<double>&, vector<double>&, Treelog&)

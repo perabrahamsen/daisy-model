@@ -97,6 +97,7 @@ public:
 			 std::vector<double>& residuals_N_soil,
 			 std::vector<double>& residuals_C_soil,
 			 Treelog&) = 0;
+  virtual void emerge (symbol crop_name, Treelog&) = 0;
   virtual void harvest (symbol column_name,
 			symbol crop_name,
 			const Time&, const Geometry&, 

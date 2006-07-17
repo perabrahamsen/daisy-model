@@ -125,6 +125,7 @@ public:
   void fertilize (const AttributeList&);
   void fertilize (const AttributeList&, double from, double to);
   void clear_second_year_utilization ();
+  void emerge (const symbol crop_name, Treelog& msg);
   void harvest (const Time& time, const symbol crop_name,
                 double stub_length, double stem_harvest,
                 double leaf_harvest, double sorg_harvest, const bool combine,
@@ -391,6 +392,12 @@ ColumnStandard::fertilize (const AttributeList& al, double from, double to)
 void 
 ColumnStandard::clear_second_year_utilization ()
 { second_year_utilization_ = 0.0; }
+
+void
+ColumnStandard::emerge (const symbol crop_name, Treelog& msg)
+{ 
+  vegetation->harvest (crop_name, msg); 
+}
 
 void
 ColumnStandard::harvest (const Time& time, const symbol crop_name,

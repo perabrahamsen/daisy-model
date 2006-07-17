@@ -51,6 +51,7 @@ struct Field::Implementation
   void fertilize (const AttributeList&, double from, double to);  // Organic.
   void fertilize (const AttributeList&);
   void clear_second_year_utilization ();
+  void emerge (symbol crop, Treelog&);
   void harvest (const Time&, symbol name,
 		double stub_length, 
 		double stem_harvest, 
@@ -253,6 +254,26 @@ Field::Implementation::clear_second_year_utilization ()
 	    i != columns.end ();
 	    i++)
     (*i)->clear_second_year_utilization ();
+}
+
+void
+Field::Implementation::emerge (symbol name, Treelog& out)
+{
+  if (selected)
+    {
+      Treelog::Open nest (out, selected->name);
+      selected->emerge (name, out);
+    }
+  else
+    {
+      for (ColumnList::iterator i = columns.begin ();
+	   i != columns.end ();
+	   i++)
+	{
+	  Treelog::Open nest (out, (*i)->name);
+	  (*i)->emerge (name, out);
+	}
+    }
 }
 
 void

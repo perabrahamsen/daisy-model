@@ -124,6 +124,8 @@ public:
 	     vector<double>& residuals_C_soil,
 	     double ForcedCAI,
 	     Treelog&);
+  void emerge ()
+  { development->DS = -0.1; }
   const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&,
 			  Bioclimate& bioclimate,

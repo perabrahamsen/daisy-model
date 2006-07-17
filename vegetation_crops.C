@@ -145,6 +145,7 @@ struct VegetationCrops : public Vegetation
 		 vector<double>& residuals_N_soil,
 		 vector<double>& residuals_C_soil,
 		 Treelog&);
+  void emerge (symbol crop_name, Treelog&);
   void harvest (symbol column_name, symbol crop_name,
 		const Time&, const Geometry&, Bioclimate&,
 		double stub_length,
@@ -509,6 +510,21 @@ VegetationCrops::kill_all (symbol name, const Time& time,
   daisy_assert (crops.size () == 0);
   reset_canopy_structure (msg);
 }
+
+void
+VegetationCrops::emerge (const symbol crop_name, Treelog& msg)
+{
+  static const symbol all_symbol ("all");
+  const bool all = (crop_name == all_symbol);
+
+  // Harvest all crops of this type.
+  for (CropList::iterator crop = crops.begin();
+       crop != crops.end();
+       crop++)
+    if (all || (*crop)->name == crop_name)
+      (*crop)->emerge ();
+}
+
 
 void
 VegetationCrops::harvest (const symbol column_name,
