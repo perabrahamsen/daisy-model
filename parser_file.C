@@ -853,7 +853,10 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                     parser (Librarian<Parser>::build_free (lexer->err, al,
                                                            "input"));
 		  parser->initialize (*global_syntax_table, lexer->err);
-		  parser->load_nested (atts);
+                  if (!parser->check ())
+                    error ("file error");
+                  else
+                    parser->load_nested (atts);
 		  lexer->error_count += parser->error_count ();
 		  inputs.push_back (&al);
 		}
@@ -1335,6 +1338,10 @@ ParserFile::error_count () const
 void
 ParserFile::initialize (Syntax& syntax, Treelog& out)
 { impl.initialize (syntax, out); }
+
+bool
+ParserFile::check () const
+{ return impl.lexer->good (); }
 
 static Block& 
 get_block ()

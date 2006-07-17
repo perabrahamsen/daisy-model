@@ -9,6 +9,12 @@
 	* crop_sold.C, crop_old.C, crop_std.C, crop_simple.C:
 	* crop.h (emerge): Ditto.
 
+2006-07-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C, parser_file.h, parser.h (check): New virtual
+	member function.
+	(load_list): Use it.
+
 2006-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.06 released.

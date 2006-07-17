@@ -43,6 +43,7 @@ public:
   // Create and Destroy.
 public:
   virtual void initialize (Syntax&, Treelog&) = 0;
+  virtual bool check () const = 0;
 protected:
   explicit Parser (Block&);
 public:
