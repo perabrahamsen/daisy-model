@@ -731,6 +731,10 @@ Field::clear_second_year_utilization ()
 { impl.clear_second_year_utilization (); }
 
 void
+Field::emerge (symbol name, Treelog& out)
+{ impl.emerge (name, out); }
+
+void
 Field::harvest (const Time& time, symbol name,
 		double stub_length, 
 		double stem_harvest, 

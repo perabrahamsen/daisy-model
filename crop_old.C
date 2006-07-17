@@ -111,8 +111,7 @@ public:
 	     SoilNH4*, SoilNO3*, 
 	     double&, double&, double&, vector<double>&, vector<double>&,
 	     double ForcedCAI, Treelog&);
-  void emerge ()
-  { var.Phenology.DS = -0.1; }
+  void emerge ();
   const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&,
 			  Bioclimate& bioclimate,
@@ -1712,6 +1711,9 @@ CropOld::NetProduction (const Bioclimate& bioclimate,
   Prod.WLeaf += CrpAux.IncWLeaf;
   Prod.WRoot += CrpAux.IncWRoot;
 }
+
+void CropOld::emerge ()
+{ var.Phenology.DS = -0.1; }
 
 void 
 CropOld::tick (const Time& time,

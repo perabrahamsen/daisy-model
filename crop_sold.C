@@ -112,8 +112,7 @@ public:
 	     double&, double&, double&, vector<double>&, vector<double>&, 
 	     double ForcedCAI,
 	     Treelog&);
-  void emerge ()
-  { var.Phenology.DS = -0.1; }
+  void emerge ();
   const Harvest& harvest (symbol column_name, const Time&,
 			  const Geometry& geo, 
 			  Bioclimate& bioclimate,
@@ -1713,6 +1712,9 @@ CropSold::NetProduction (const Bioclimate& bioclimate,
   Prod.WSOrg += CrpAux.IncWSOrg;
   Prod.WRoot += CrpAux.IncWRoot;
 }
+
+void CropSold::emerge ()
+{ var.Phenology.DS = -0.1; }
 
 void 
 CropSold::tick (const Time& time,

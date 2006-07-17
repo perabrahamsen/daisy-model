@@ -47,12 +47,13 @@ struct ActionEmerge : public Action
             return;
           }
       }
+    out.message ("Forcing emergence of " + crop);
     daisy.field.emerge (crop, out);
   }
 
   ActionEmerge (Block& al)
     : Action (al),
-      crop (al.identifier ("crop")),
+      crop (al.identifier ("crop"))
   { }
 };
 

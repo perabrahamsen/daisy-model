@@ -512,7 +512,7 @@ VegetationCrops::kill_all (symbol name, const Time& time,
 }
 
 void
-VegetationCrops::emerge (const symbol crop_name, Treelog& msg)
+VegetationCrops::emerge (const symbol crop_name, Treelog&)
 {
   static const symbol all_symbol ("all");
   const bool all = (crop_name == all_symbol);

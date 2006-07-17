@@ -125,7 +125,7 @@ public:
 	     double ForcedCAI,
 	     Treelog&);
   void emerge ()
-  { development->DS = -0.1; }
+  { development->DS = -1e-10; }
   const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&,
 			  Bioclimate& bioclimate,

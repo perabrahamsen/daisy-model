@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.07
+
+** New "emerge" management action.
+
+This will force a crop to emerge the next day.
+
 * 4.06
 
 ** You can now declare sequence parameters.

@@ -395,9 +395,7 @@ ColumnStandard::clear_second_year_utilization ()
 
 void
 ColumnStandard::emerge (const symbol crop_name, Treelog& msg)
-{ 
-  vegetation->harvest (crop_name, msg); 
-}
+{ vegetation->emerge (crop_name, msg); }
 
 void
 ColumnStandard::harvest (const Time& time, const symbol crop_name,
