@@ -47,8 +47,6 @@ USE_OPTIMIZE = true
 #USE_PROFILE = true
 USE_PROFILE = false
 
-default: daisy.exe
-
 # Set COMPILER according to which compiler you use.
 #	sun		Use the unbundled sun compiler.
 #	gcc		Use the experimental GNU compiler.
@@ -56,11 +54,11 @@ default: daisy.exe
 #
 ifeq ($(HOSTTYPE),sun4)
 	COMPILER = gcc
-#	COMPILER = sun
+#	COMPILER = sun	
 endif
 ifeq ($(HOSTTYPE),i386-linux)
 	COMPILER = gcc
-#	COMPILER = sun
+#	COMPILER = sun	
 endif
 ifeq ($(HOSTTYPE),hp)
 	COMPILER = gcc
@@ -74,7 +72,7 @@ endif
 
 # On SPARC platforms we trap mathematical exception with some assembler code.
 #
-ifeq ($(HOSTTYPE),sun4)
+ifeq ($(HOSTTYPE),sun4) 
 	SPARCSRC = set_exceptions.S
 	SPARCOBJ = set_exceptions.o
 endif
@@ -95,7 +93,7 @@ endif
 #
 ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),gcc)
-		OPTIMIZE = -O3 -ffast-math
+		OPTIMIZE = -O3 -ffast-math 
 		ifeq ($(HOSTTYPE),sun4)
 		  OPTIMIZE = -O3 -ffast-math -mcpu=v8 -mtune=ultrasparc
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
@@ -154,11 +152,11 @@ CROSSSTRIP = "$(TARGETTYPE)-strip"
 
 ifeq ($(COMPILER),gcc)
 	ifeq ($(HOSTTYPE),sun4)
-		OSFLAGS =
+		OSFLAGS = 
 		DEBUG = -g
 	endif
 	ifeq ($(HOSTTYPE),i386-linux)
-		OSFLAGS =
+		OSFLAGS = 
 		DEBUG = -g
 	endif
 	ifeq ($(HOSTTYPE),cygwin)
@@ -173,7 +171,7 @@ ifeq ($(COMPILER),gcc)
 	WARNING = -W -Wall -Wno-uninitialized \
 		  -Wconversion -Woverloaded-virtual \
 		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings \
-                  -Wno-sign-compare
+                  -Wno-sign-compare 
 #  -Wold-style-cast: triggered by header files for 2.95/woody
 #  -Wmissing-noreturn: triggered by some virtual functions.
 #  -Wmissing-prototypes -Wstrict-prototypes: Not C++ flags.
@@ -295,9 +293,9 @@ ifeq ($(COMPILER),icc)
 endif
 NOLINK = -c
 
-
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
+# 
 MODELS = movement_rect.C number_soil.C organic_none.C \
 	organic_std.C movement_1D.C integer_arit.C \
 	source_merge.C number_source.C program_file.C action_table.C \
@@ -358,10 +356,11 @@ COMPONENTS = organic_matter.C movement.C integer.C \
 	action.C condition.C horizon.C 	uzmodel.C hydraulic.C \
 	bioclimate.C groundwater.C am.C transport.C \
 	adsorption.C tortuosity.C printer.C chemical.C \
-	pet.C net_radiation.C svat.C vegetation.C
+	pet.C net_radiation.C svat.C vegetation.C 
 
 # Submodels are combined models and components.
-SUBMODELS = geometry_rect.C element.C soltrans1d.C soil_water1d.C \
+#
+SUBMODELS = soil_heat_rect.C geometry_rect.C element.C \
         geometry1d.C soil_heat1d.C fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \
@@ -377,7 +376,7 @@ SUBMODELS = geometry_rect.C element.C soltrans1d.C soil_water1d.C \
 SPECIALS = geometry_vert.C select_flux.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C solute.C \
-	geometry.C printer_file.C log_alist.C log_clone.C
+	geometry.C printer_file.C log_alist.C log_clone.C 
 
 # Various utility code that are neither a component nor a (sub)model.
 #
@@ -436,7 +435,7 @@ REMOVE = soltrans1d.C\
 	column_base.C column_baseh.h 
 
 # These are the file extensions we deal with.
-#
+# 
 .SUFFIXES:	.C ${OBJ} .h .c ${EXT} .a
 
 # Create all the executables.
@@ -452,11 +451,11 @@ daisy.exe:	main${OBJ} $(LIBOBJ)
 daisy:	main${OBJ} $(LIBOBJ) #daisy.so
 	$(LINK)daisy $^ $(CPPLIB) $(MATHLIB)
 
-exp:
+exp:	
 	(cd $(OBJHOME)/exp \
          && $(MAKE) VPATH=$(SRCDIR) USE_PROFILE=true -f $(SRCDIR)/Makefile daisy)
 
-native:
+native:	
 	(cd $(OBJHOME)/$(HOSTTYPE) \
          && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy)
 
@@ -536,7 +535,7 @@ mmm${EXT}:	$(MOBJECTS)
 
 # Count the size of daisy.
 #
-wc: $(HEADERS) $(SOURCES)
+wc: $(HEADERS) $(SOURCES) 
 	wc -l $(HEADERS) $(SOURCES) | sort -nr
 
 wc-h: $(HEADERS)
@@ -548,11 +547,11 @@ wc-s: $(SOURCES)
 wc-split: $(MODELS) $(INTERFACES)
 	cat $(MODELS) | wc
 	cat $(COMPONENTS) $(COMPONENTS:.C=.h) | wc
-	cat $(SUBMODELS) $(SUBMODELS:.C=.h) | wc
+	cat $(SUBMODELS) $(SUBMODELS:.C=.h) | wc 
 	cat $(SPECIALS) $(SPECIALS:.C=.h) | wc
 	cat $(OTHER) $(OTHER:.C=.h) | wc
 
-filecount: $(HEADERS) $(SOURCES)
+filecount: $(HEADERS) $(SOURCES) 
 	ls $(TEXT) | wc
 
 # Update the TAGS table.
@@ -608,7 +607,7 @@ clean:
 
 # Update the Makefile when dependencies have changed.
 #
-depend: #$(SOURCES)
+depend: #$(SOURCES) 
 	rm -f Makefile.old
 	mv Makefile Makefile.old
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
@@ -672,8 +671,8 @@ cvs: $(TEXT)
 	(cd sample; $(MAKE) cvs);
 	(cd txt; $(MAKE) cvs);
 	-cvs add $(TEXT)
-	rm -f $(REMOVE)
-	-cvs remove $(REMOVE)
+	rm -f $(REMOVE) 
+	-cvs remove $(REMOVE) 
 	cvs commit -m "Version $(TAG)"
 	cvs tag release_`echo $(TAG) | sed -e 's/[.]/_/g'`
 

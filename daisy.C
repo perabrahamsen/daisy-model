@@ -218,7 +218,7 @@ Daisy::run (Treelog& out)
     do
       {
 	std::ostringstream tmp;
-	tmp << time.year () << "-" << time.month () << "-" 
+        tmp << time.year () << "-" << time.month () << "-" 
 	    << time.mday () << "h" << time.hour ();
 	Treelog::Open nest (out, tmp.str ());
 
