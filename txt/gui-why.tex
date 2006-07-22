@@ -1,0 +1,152 @@
+\documentclass{article}
+
+\begin{document}
+
+\section{Graphical User Interfaces and Scientific Models}
+
+Modelling is an integral part of the scientific method, and the advent
+of computers have made scientific predictions made with complex
+numerical models feasible.  Computer programming has thus become an
+important tool for scientific research.
+
+Computer programs originating from scientific research are rarely
+characterized by easy of use or accessibility from people outside the
+research groups who created the programs.  Which is a pity, as this
+seriously impair the dissimination of the research results if anyone
+who wants to build upon them have to recreate the model from published
+papers.  Especially for large system model that aggregate a number of
+simpler models this can be an immense barrier.  
+
+There are two root causes for this problem.  First, the primary users
+of the model are the scientists themselves, who are of caurse expert
+users with initimate knowledge of both the model and the software
+implementing it.  The need of these users would be flexibility, rather
+than simplicity.
+
+The second is due to the way the research grant system work.  Grants
+aren't given to programming work, and the only relevant dissimination
+is considered scientific publication.  This means that most grants
+will only cover the basic modifications to the software needed to
+prove or disprove specific hypothesises, and not adjustments in the
+user interface to needed make the new knowlede accessible that way.
+Which again means that even if a non-specialist user-interface is
+developed, it will not be maintained to cover new functionality. 
+
+\subsection{Graphical User Interfaces and Daisy}
+
+Daisy is a scientific model which has generated interest outside the
+research community, leading to two attempts to create a graphical user
+interfaces.  The first was a standalone interface written in Delphi by
+a pair of student programmers, and the second was a integrated GIS
+version written by DHI.  The Delphi version never quite got to the
+point where we were ready to distribute it, before the the funding was
+used up.  A graphical log file viewer did for a fast presentation of
+the output did came out of the project.  The GIS version is a current
+commercial product, but some frictions do occur when people meet the
+limitations of the GIS interface, and want to use features from the
+research version.  Since the GIS interface tend to be build upon older
+versions of Daisy, mixing features from the latest research version
+can meet incompatibilities.
+
+Our proposal is to develop a GUI for Daisy that is closely so
+integrated with the Daisy kernal that changes and new features in
+Daisy will automatically be reflected in the GUI.  This requires a
+greater initial investment than a stand-alone GUI, but has the benefit
+of being maintainable, even without continues funding.  
+
+\section{The Daisy Model}
+
+Daisy is a model of an agro-ecosystem, that is, a model of the
+processes that happens at field scale.  It can be used to predict both
+environmental impact and production of different agronomic practices,
+which leads to interest in both environmental protection offices and
+farmers. 
+
+Daisy is a mechanistic, deterministic, simulation model.  It is
+mechanistic because it attempts to model the actual physical, chemical
+and biological processes that occurs in the field.  It is
+deterministic because it doesn't attempt to model out lack of
+knowledge of the state of the system, but assumes the state is fully
+specified.  It is a simulation model because we model what happens
+following the time axis, from an initial state, through one time step
+to a new state, and so on until we end the simulation.
+
+\subsection{Structure}
+
+The design of the Daisy program is build upon three layers.  The top
+layer is called a component.  A component is meant to represent a
+process in the domain being modelled, such as for example
+nitrification, the process that turns ammonium into nitrate, but it
+also used for software artifacts such as input and output code. The
+second layer is a model.  A model is mathematic description of the
+process.  In the code, a process is implemented as a base class which
+exports its interface.  The models are implemented as derived,
+concrete classes, with no exported interface.  All access to the model
+is through the base classe interface.  The models register themself in
+a ``librarian'' template class (these days known as a factory
+pattern), associated with the base class. The librarian is then
+responsible for instantiating the derived classes.
+
+The third layer is the model parameterizations.  When a model register
+itself in the appropriate library, it also register the parameters and
+state variables associated with the model, as well as default values,
+type information, and textual description of parameters and variables.
+One particular parameter type is ``model'', which allow the parameter
+to specify a registered parameterization of a model for a specific
+process.  This allows for a hierarchical system description, where all
+the agro-ecological processes are ultimately part of the Daisy model.
+
+\subsection{Input, Output and Documentation}
+
+This design is used to automate the input and output procedures, and
+to automatically generate a reference manual.  The input system works
+by reading a file containing named parameterizations of a given
+process.  Each new parameterization is derived from an existing
+parameterization or model.  The input system will then read parameters
+of the given model, and check that their type matches what is
+specified in the library.  The new parameterization is then registered
+in the library, using the same model as the base parameterization.
+
+The output system is implemented as a component, with models that
+create tables or checkpoints.  The table model allow the user to
+specify which state variables to print in each column, and how
+often. 
+
+The document system simply creates a (\LaTeX{}) file with processes as
+chapters, models and paramterizations as sections, and an autmatically
+generated table of parameters, state variables, their types and a
+description string, all found in the komponent libraries.
+
+This mean that any change to an existing model, or any new model
+introduced to the system, automatically will be reflected in both the
+input and output subsystems, as well as documented in the reference
+manual. 
+
+The goal is to make the same true for the graphical user interface.
+
+\section{Graphical User Interfaces and Daisy}
+
+Not perfect, but maintainable.
+
+
+files
+
+libraries
+
+dependencies
+
+...
+
+text 
+
+model form
+
+subset views (is parameterizations)
+
+
+automatisk GUI (advanceret)
+
+Specialiseret GUI for bestemte brugere.  Vælg parametre fra filer, i
+stil med log parameteriseringer.
+
+\end{document}
