@@ -1,3 +1,14 @@
+2006-07-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (add_derived): Shorthand for defining 'const'
+	numbers and integers. 
+	(load_derived): Shorthand for specifying 'const' numbers and
+	integers. 
+
+2006-07-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (get_time): Removed unused function.
+
 2006-07-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.07 released.

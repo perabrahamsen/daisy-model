@@ -25,6 +25,7 @@
 #include "submodel.h"
 #include "scope.h"
 #include "number.h"
+#include "integer.h"
 #include "plf.h"
 #include "time.h"
 #include "treelog_stream.h"
@@ -86,7 +87,6 @@ struct ParserFile::Implementation
   AttributeList& load_derived (const Library& lib, bool in_sequence,
 			       const AttributeList* original);
   void load_list (Syntax&, AttributeList&);
-  Time get_time ();
   Syntax* global_syntax_table;
 
   // Create and destroy.
@@ -176,23 +176,67 @@ int
 ParserFile::Implementation::get_integer ()
 {
   skip ();
-  string str;
   int c = peek ();
 
-  while (good () && (isdigit (c) || c == '-' || c == '+'))
+  // Check for number literals first.
+  if (isdigit (c) || c == '-')
     {
-      str += int2char (c);
-      get ();
-      c = peek ();
+      string str;
+
+      while (good () && (isdigit (c) || c == '-' || c == '+'))
+        {
+          str += int2char (c);
+          get ();
+          c = peek ();
+        }
+      // Empty number?
+      if (str.size () < 1U)
+        {
+          error ("Integer expected");
+          skip_to_end ();
+          return -42;
+        }
+      return atoi (str.c_str ());
     }
-  // Empty number?
-  if (str.size () < 1U)
+  // Then try an integer object.
+  const Library& lib = Librarian<Integer>::library ();
+  auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
+  const symbol obj = al->identifier ("type");
+  static const symbol error_sym ("error");
+  if (obj == error_sym)
+    return -42;
+  // Check for completness.
+  ostringstream tmp;
+  TreelogStream treelog (tmp);
+  Treelog::Open nest (treelog, obj);
+  if (!lib.syntax (obj).check (*al, treelog))
     {
-      error ("Integer expected");
-      skip_to_end ();
+      error ("Bogus integer '" + obj + "'\n--- details:\n"
+             + tmp.str () + "---");
       return -42;
     }
-  return atoi (str.c_str ());
+  Syntax parent_syntax;
+  AttributeList parent_alist;
+  Block block (parent_syntax, parent_alist, treelog, "integer");
+  auto_ptr<Integer> integer (Librarian<Integer>::build_alist (block, *al,
+                                                              "integer"));
+  if (!block.ok ()
+      || !integer->initialize (treelog)
+      || !integer->check (Scope::null (), treelog))
+    {
+      error ("Bad integer '" + obj + "'\n--- details:\n"
+             + tmp.str () + "---");
+      return -42;
+    }
+  if (treelog.count)
+    warning ("Warning for integer '" + obj + "'\n--- details:\n"
+             + tmp.str () + "---");
+  if (integer->missing (Scope::null ()))
+    {
+      error ("Missing integer '" + obj + "'");
+      return -42;
+    }
+  return integer->value (Scope::null ());
 }
 
 double
@@ -462,7 +506,12 @@ ParserFile::Implementation::add_derived (Library& lib)
 	warning (name + " is already defined, overwriting");
       lib.remove (name);
     }
-  const symbol super = get_symbol ();
+  static const symbol const_symbol ("const");
+  skip ();
+  int c = peek ();
+  const symbol super = (isdigit (c) || c == '-' || c == '.')
+    ? const_symbol
+    : get_symbol ();
   if (!lib.check (super))
     {
       error (string ("Unknown '") + lib.name () + "' model '" + super + "'");
@@ -497,10 +546,13 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
   bool skipped = false;
 
   static const symbol original_symbol ("original");
-  symbol type;
-
   static const string compatibility_symbol ("used_to_be_a_submodel");
-  if (original && original->check (compatibility_symbol) && looking_at ('('))
+
+  symbol type;
+  skip ();
+  int c = peek ();
+
+  if (original && original->check (compatibility_symbol) && c == '(')
     {
       // Special hack to allow skipping the "original" keyword for
       // models that used to be submodels.
@@ -512,9 +564,33 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
       type = original_symbol;
       warning ("Model specified missing, assuming 'original'");
     }
-  else  
+  // Handle numeric literals.
+  else if (isdigit (c) || c == '.' || c == '-')
+    {                          
+      alist = new AttributeList ();
+      if (&lib == &Librarian<Number>::library ())
+        {
+          alist->add ("type", "const");
+          const double value = get_number ();
+          const string dim = get_dimension ();
+          alist->add ("value", value, dim);
+        }
+      else if (&lib == &Librarian<Integer>::library ())
+        {
+          alist->add ("type", "const");
+          alist->add ("value", get_integer ());
+        }
+      else
+        {
+          error ("Number not expected");
+          skip_to_end ();
+          alist->add ("type", "error");
+        }
+      return *alist;
+    }
+  else
     {
-      if (looking_at ('('))
+      if (c == '(')
         {
           skip ("(");
           skipped = true;
@@ -1259,26 +1335,6 @@ done:
 	skip (")");
       skip ();
     }
-}
-
-Time
-ParserFile::Implementation::get_time ()
-{
-  int year = get_integer ();
-  int month = get_integer ();
-  int mday = get_integer ();
-  int hour = (looking_at (')') ? 0 : get_integer ());
-
-  if (month < 1 || month > 12)
-    error ("There are only 12 month in a year");
-  else if (mday < 1 || mday > Time::month_length (year, month))
-    error ("That day doesn't exists in the selected month");
-  else if (hour < 0 || hour > 23)
-    error ("Specify an hour between 0 and 23 only");
-  else
-    return Time (year, month, mday, hour); 
-
-  return Time (-999, 1, 1, 0);
 }
 
 void

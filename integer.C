@@ -42,6 +42,46 @@ Integer::Integer (Block& al)
 Integer::~Integer ()
 { }
 
+struct IntegerConst : public Integer
+{
+  // Parameters.
+  const int val;
+
+  // Simulation.
+  bool missing (const Scope&) const
+  { return false; }
+  int value (const Scope&) const
+  { return val; }
+
+  // Create.
+  bool initialize (Treelog&)
+  { return true; }
+  bool check (const Scope&, Treelog&) const
+  { return true; }
+  IntegerConst (Block& al)
+    : Integer (al),
+      val (al.integer ("value"))
+  { }
+};
+
+static struct IntegerConstSyntax
+{
+  static Integer& make (Block& al)
+  { return *new IntegerConst (al); }
+  IntegerConstSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+	       "Always give the specified value.");
+    syntax.add ("value", Syntax::Integer, Syntax::Const,
+		"Fixed value for this integer.");
+    syntax.order ("value");
+    Librarian<Integer>::add_type ("const", alist, syntax, &make);
+  }
+} IntegerConst_syntax;
+
 struct IntegerCond : public Integer
 {
   // Parameters.
