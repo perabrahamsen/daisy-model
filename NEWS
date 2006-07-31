@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.08
+
+** Easier to mix integer and number objects with literals.
+
 * 4.07
 
 ** New "emerge" management action.
