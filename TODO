@@ -4,9 +4,30 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Opsætning til DJF webside
 
-Log "rodzone".
+** Vand
 
-- Aktuelt vandindhold, vand ved pF=?, Aktuelt N.
+Regn
+Vanding
+Aktuel fordampning
+
+Aktuelt vand i rodzone
+Vand ved markkapacitet i rodzone
+Vand ved visnepunkt i rodzone
+
+pF ved "triggerdybde"
+
+Vandtab fra maxroddybde.
+
+** Kvælstof
+
+Mineralisering i rodzone
+Denitrificering i rodzone
+Mineralsk gødning
+Total gødning
+
+Aktuelt N_min i rodzone
+
+Kvælstoftab fra maxroddybde
 
 * Designforslag til Daisy brugerflade
 
