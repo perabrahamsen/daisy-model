@@ -1,6 +1,41 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* !!! WP6 log mangler "to" parameter !!!
+* NABIIT vision
+
+== Vision 1 ==
+
+Kamdyrkning giver nogen gange stor udbyttestigning.  Men ikke altid.
+Vi har derfor brug for at forstå de indvolverede proceser bedre.
+Derfor laver vi præcisionsforsøg plus modelbygning.  KVL står for
+forsøg plus modelekspertise, DJF bidrager med relevant
+processekspertise (og måling?).
+
+== Vision 2 ==
+
+Mekanistisk modeling bruges meget på miljøsiden i lansk landbrug,
+mindre på produktionssiden hvor markforsøg hersker.  Vi tror på at der
+er meget at hente ved at bruge modelsimulkeringer til udvælgelse og
+plænlægning af markforsøg.
+
+Derfor har vi samlet LR, der er de førende i produktion og markforsøg,
+og KVL, der er de førende i markmodeler, om at samle de to så vi kan
+få modelbserede markforsøg.  Vi mener primært dette skal ske ved at
+gøre modellerne mere tilgængelige gennem en bedre
+brugerflade. Udgangspunktet og motivationen for at prøve noget nyt er
+de lovende teknikker beskrevet i vision 1.
+
+Da vi gerne vil have at arbejdet er mere generelt anvendeligt end
+"blot" LR, og vi ligeledes ønsker at arbejde skal være starten på et
+vedvarende strategisk samarbejde mellem modelfolk og markforsægfolk,
+har vi valgt at involvere ITU, der både har ekspertise i modelbaserede
+brugergrænseflader (ref: PhD-projekt) og evolable software komponenter
+(Yvonnes NABIIT projekt).
+
+Vi mener at denne kombination af spidskompetenser har muligheden for
+at skabe en platform for et vedvarende stategisk samarbejde der kan
+føre tilen meget hurtigere tilpasning af dansk landbrugsproduktion til
+nye udvikling indenfor bioteknologi og produktionsteknik, samt til et
+klima under forandring.
 
 * Opsætning til DJF webside
 
