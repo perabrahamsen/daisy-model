@@ -101,7 +101,6 @@ struct LogSelect : public Log
   void output (symbol name, symbol);
   void output (symbol name, const std::vector<double>&);
   void output (symbol name, const PLF&);
-  void output (symbol name, const Time&); // Obsolete.
 
   // Create and Destroy.
   bool check (const Border&, Treelog& err) const;

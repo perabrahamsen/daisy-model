@@ -148,8 +148,6 @@ struct LogHarvest : public Log
   void close_named_entry ()
   { daisy_assert (false); }
 
-  void output (symbol, const Time&)
-  { }
   void output (symbol, bool)
   { }
   void output (symbol, double)

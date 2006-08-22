@@ -246,18 +246,6 @@ void
 LogAll::output (symbol, const PLF&)
 { }
 
-void 
-LogAll::output (symbol name, const Time& value)
-{ 
-  const vector<Select*>& sels = active_leafs.top ();
-
-  for (vector<Select*>::const_iterator i = sels.begin ();
-       i != sels.end ();
-       i++)
-    if (name == (*i)->current_name)
-      (*i)->output_time (value);
-}
-
 Block& 
 LogAll::get_block ()
 {

@@ -5,6 +5,16 @@
 	parameterizations.
 	(Potato): Changed default to Folva.
 
+2006-08-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (MODELS): Removed 'select_date.C'.
+	* select.C, select.h (output_time): Removed.
+	* log.h(output): Removed "const Time&" argument.
+	* log_select.h, log_select.h (output): Ditto.
+	* log_harvest.C (output): Ditto.
+	* log_all.C, log_all.h (output): Ditto.
+	* log_alist.C, log_alist.h (output): Ditto.
+
 2006-07-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.08 released.

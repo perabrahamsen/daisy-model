@@ -63,7 +63,7 @@ public:
   const symbol name;
 private:
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
 protected:
   MultiDest dest;
 public:
@@ -114,7 +114,6 @@ public:
   virtual void output_name (symbol);
   virtual void output_array (const std::vector<double>&,
                              const Geometry*, const Soil*, Treelog&);
-  virtual void output_time (const Time&); // Obsolete
 
   // Reset at start of time step.
 public:

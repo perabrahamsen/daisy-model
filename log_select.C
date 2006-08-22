@@ -171,10 +171,6 @@ void
 LogSelect::output (symbol, const PLF&)
 { daisy_assert (false); }
 
-void 
-LogSelect::output (symbol, const Time&)
-{ daisy_assert (false); }
-
 bool 
 LogSelect::check (const Border& border, Treelog& err) const
 {

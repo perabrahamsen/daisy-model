@@ -242,7 +242,6 @@ public:
   virtual void output (symbol, symbol) = 0;
   virtual void output (symbol, const std::vector<double>&) = 0;
   virtual void output (symbol, const PLF&) = 0;
-  virtual void output (symbol, const Time&) = 0; // Obsolete.
 
   // Keep track of geometry for logging arrays.
 public:

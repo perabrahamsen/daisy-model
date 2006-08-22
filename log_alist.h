@@ -100,7 +100,6 @@ struct LogAList : public Log
   void output (symbol name, symbol value);
   void output (symbol name, const std::vector<double>& value);
   void output (symbol name, const PLF& value);
-  void output (symbol name, const Time& value);
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);

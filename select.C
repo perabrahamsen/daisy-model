@@ -21,6 +21,7 @@
 
 #include "select.h"
 #include "geometry.h"
+#include "number.h"
 #include "check.h"
 #include "vcheck.h"
 #include "units.h"
@@ -30,27 +31,25 @@
 #include <numeric>
 #include <set>
 
-using namespace std;
-
 Handle::handle_t
 Handle::symbol2handle (symbol s)
 {
-  static struct sym_set_t : map<symbol,handle_t>
+  static struct sym_set_t : std::map<symbol, handle_t>
   {
     sym_set_t ()
     {
       static symbol min_symbol ("min");
-      insert (pair<symbol,handle_t> (min_symbol, min));
+      insert (std::pair<symbol,handle_t> (min_symbol, min));
       static symbol max_symbol ("max");
-      insert (pair<symbol,handle_t> (max_symbol, max));
+      insert (std::pair<symbol,handle_t> (max_symbol, max));
       static symbol average_symbol ("average");
-      insert (pair<symbol,handle_t> (average_symbol, average));
+      insert (std::pair<symbol,handle_t> (average_symbol, average));
       static symbol geometric_symbol ("geometric");
-      insert (pair<symbol,handle_t> (geometric_symbol, geometric));
+      insert (std::pair<symbol,handle_t> (geometric_symbol, geometric));
       static symbol sum_symbol ("sum");
-      insert (pair<symbol,handle_t> (sum_symbol, sum));
+      insert (std::pair<symbol,handle_t> (sum_symbol, sum));
       static symbol current_symbol ("current");
-      insert (pair<symbol,handle_t> (current_symbol, current));
+      insert (std::pair<symbol,handle_t> (current_symbol, current));
     } 
   } sym_set;
   sym_set_t::const_iterator i = sym_set.find (s);
@@ -71,17 +70,17 @@ struct Select::Implementation
     // Content.
     const symbol library_name;
     const symbol model_name;
-    const vector<symbol> submodels_and_attribute;
+    const std::vector<symbol> submodels_and_attribute;
     
     // Use.
     const Syntax& leaf_syntax (Syntax&) const;
-    const string& leaf_name () const;
-    string dimension () const;
-    string description () const;
+    const std::string& leaf_name () const;
+    std::string dimension () const;
+    std::string description () const;
     void refer (Format&) const;
 
     // Create and Destroy.
-    static bool check_path (const vector<symbol>& path,
+    static bool check_path (const std::vector<symbol>& path,
 			    const Syntax& syntax,
 			    const AttributeList& alist,
 			    Treelog& err);
@@ -93,17 +92,18 @@ struct Select::Implementation
 
   // Content.
   const Units::Convert* spec_conv; // Convert value.
+  std::auto_ptr<Number> expr;   // - || -
   const double factor;		// - || -
   const double offset;		// - || -
   const bool negate;            // - || -
   double convert (double) const; // - || -
   const symbol tag;		// Name of this entry.
-  string dimension;		// Physical dimension of this entry.
-  const string description;
+  std::string dimension;		// Physical dimension of this entry.
+  const std::string description;
 
   // Create and Destroy.
-  bool check (const string& spec_tdim, Treelog& err) const;
-  static string find_description (const AttributeList&);
+  bool check (const std::string& spec_tdim, Treelog& err) const;
+  static std::string find_description (const AttributeList&);
   Implementation (Block&);
   ~Implementation ();
 };
@@ -131,14 +131,14 @@ Select::Implementation::Spec::leaf_syntax (Syntax& buffer) const
   return *syntax;
 }
 
-const string&
+const std::string&
 Select::Implementation::Spec::leaf_name () const
 { 
   daisy_assert (submodels_and_attribute.size () > 0);
   return submodels_and_attribute.back ().name (); 
 }
 
-string /* can't return reference because buffer is automatic */
+std::string /* can't return reference because buffer is automatic */
 Select::Implementation::Spec::dimension () const
 {
   Syntax buffer;
@@ -149,7 +149,7 @@ Select::Implementation::Spec::dimension () const
     return Syntax::Unknown ();
 }
 
-string /* can't return reference because buffer is automatic */
+std::string /* can't return reference because buffer is automatic */
 Select::Implementation::Spec::description () const
 { 
   Syntax buffer;
@@ -168,7 +168,7 @@ Select::Implementation::Spec::refer (Format& format) const
     }
   format.text (model_name.name ());
   format.text (" ");
-  string aref = library_name.name () + "-" + model_name.name ();
+  std::string aref = library_name.name () + "-" + model_name.name ();
   format.text ("(section");
   format.special ("nbsp");
   if (is_fixed)
@@ -178,7 +178,7 @@ Select::Implementation::Spec::refer (Format& format) const
   format.text (")");
   for (unsigned int i = 0; i < submodels_and_attribute.size (); i++)
     {
-      const string name = submodels_and_attribute[i].name ();
+      const std::string name = submodels_and_attribute[i].name ();
       aref += "-" + name;
       format.text (" ");
       format.text (name);
@@ -191,7 +191,7 @@ Select::Implementation::Spec::refer (Format& format) const
 }
 
 bool 
-Select::Implementation::Spec::check_path (const vector<symbol>& path,
+Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
 					  const Syntax& top_syntax,
 					  const AttributeList& top_alist,
 					  Treelog& err)
@@ -243,7 +243,7 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
   
   const symbol library_name = al.identifier ("library");
   const symbol model_name = al.identifier ("model");
-  const vector<symbol> submodels_and_attribute 
+  const std::vector<symbol> submodels_and_attribute 
     = al.identifier_sequence ("submodels_and_attribute");
 
   if (submodels_and_attribute.size () < 1)
@@ -328,22 +328,22 @@ Select::Implementation::convert (double value) const
 
 // Create and Destroy.
 bool 
-Select::Implementation::check (const string& spec_dim, Treelog& err) const
+Select::Implementation::check (const std::string& spec_dim, Treelog& err) const
 {
   bool ok = true;
   if (spec && !spec_conv && spec->dimension () != Syntax::Unknown ())
-    err.warning (string ("Don't know how to convert [") + spec_dim
+    err.warning ("Don't know how to convert [" + spec_dim
                  + "] to [" + dimension + "]");
   return ok;
 }
   
-string 
+std::string 
 Select::Implementation::find_description (const AttributeList& al)
 {
   const Library& library = Librarian<Select>::library ();
   if (library.has_interesting_description (al))
     return al.name ("description");
-  return string ("");
+  return "";
 }
 
 Select::Implementation::Implementation (Block& al)
@@ -368,15 +368,15 @@ Select::Implementation::~Implementation ()
 
 double 
 Select::convert (double value) const
-{ return impl.convert (value); }
+{ return impl->convert (value); }
 
-const string& 
+const std::string& 
 Select::dimension () const
-{ return impl.dimension; }
+{ return impl->dimension; }
 
 symbol
 Select::tag () const
-{ return impl.tag; }
+{ return impl->tag; }
 
 const Geometry* 
 Select::geometry () const
@@ -396,7 +396,7 @@ Select::select_get_tag (const AttributeList& al)
   if (al.check ("tag"))
     return al.identifier ("tag");
 
-  vector<symbol> path  = al.identifier_sequence ("path");
+  std::vector<symbol> path  = al.identifier_sequence ("path");
   
   if (path.size () > 0)
     return path[path.size () - 1];
@@ -421,13 +421,9 @@ Select::output_name (const symbol)
 { throw ("This log selection can't log names."); }
 
 void 
-Select::output_array (const vector<double>&, 
+Select::output_array (const std::vector<double>&, 
                       const Geometry*, const Soil*, Treelog&)
 { throw ("This log selection can't log arrays."); }
-
-void 
-Select::output_time (const Time&)
-{ throw ("This log selection can't log time values."); }
 
 bool
 Select::prevent_printing ()
@@ -461,22 +457,22 @@ Select::document (Format& format) const
   format.text ("[");
   format.bold (dimension ());
   format.text ("]");
-  if (impl.description != "")
+  if (impl->description != "")
     {
       format.hard_linebreak ();
-      format.text (impl.description);
+      format.text (impl->description);
       format.soft_linebreak ();
     }
-  else if (impl.spec)
+  else if (impl->spec)
     {
-      if (impl.negate)
+      if (impl->negate)
 	{
 	  format.special ("nbsp");
 	  format.text ("(reversed)");
 	}
-      impl.spec->refer (format);
+      impl->spec->refer (format);
       format.hard_linebreak ();
-      format.text (impl.spec->description ());
+      format.text (impl->spec->description ());
       format.soft_linebreak ();
     }
 }
@@ -589,12 +585,12 @@ Number of times the path has matched a variable since the last log entry.");
   alist.add ("count", 0);
 }
 
-const string
-Select::default_dimension (const string& spec_dim) const
+const std::string
+Select::default_dimension (const std::string& spec_dim) const
 { return spec_dim; }
 
 const Units::Convert*
-Select::special_convert (const string&, const string&)
+Select::special_convert (const std::string&, const std::string&)
 { return NULL; }
 
 void 
@@ -602,71 +598,72 @@ Select::add_dest (Destination* d)
 { dest.add_dest (d); }
 
 void 
-Select::initialize (const map<symbol, symbol>& conv, double, double, 
-		    const string& timestep)
+Select::initialize (const std::map<symbol, symbol>& conv, double, double, 
+		    const std::string& timestep)
 { 
-  string spec_dim;
-  if (impl.spec)
-    spec_dim = default_dimension (impl.spec->dimension ());
+  std::string spec_dim;
+  if (impl->spec)
+    spec_dim = default_dimension (impl->spec->dimension ());
   else
     spec_dim = Syntax::Unknown ();
 
   // Convert path according to mapping in 'conv'.
   for (unsigned int i = 0; i < path.size (); i++)
     {
-      const string& sname = path[i].name ();
-      const map<symbol, symbol>::const_iterator entry = conv.find (path[i]);
+      const std::string& sname = path[i].name ();
+      const std::map<symbol, symbol>::const_iterator entry
+        = conv.find (path[i]);
       if (entry != conv.end ())
 	path[i] = (*entry).second;
       else if (sname.size () > 0 && sname[0] == '$')
 	path[i] = Select::wildcard;
     }
 
-  if (impl.dimension == Syntax::Unknown ())
-    impl.dimension = spec_dim;
+  if (impl->dimension == Syntax::Unknown ())
+    impl->dimension = spec_dim;
 
   // Attempt to find convertion with original dimension.
-  if (impl.spec)
-    if (Units::can_convert (spec_dim, impl.dimension))
-      impl.spec_conv = &Units::get_convertion (spec_dim, impl.dimension);
+  if (impl->spec)
+    if (Units::can_convert (spec_dim, impl->dimension))
+      impl->spec_conv = &Units::get_convertion (spec_dim, impl->dimension);
     else
-      impl.spec_conv = special_convert (spec_dim, impl.dimension);
+      impl->spec_conv = special_convert (spec_dim, impl->dimension);
 
   // Replace '&' with timestep.
-  string new_dim;
-  string hour_dim;
-  for (unsigned int i = 0; i < impl.dimension.length (); i++)
-    if (impl.dimension[i] == '&')
+  std::string new_dim;
+  std::string hour_dim;
+  for (unsigned int i = 0; i < impl->dimension.length (); i++)
+    if (impl->dimension[i] == '&')
       {
 	new_dim += timestep;
 	hour_dim += "h";
       }
     else
       {
-	new_dim += impl.dimension[i];
-	hour_dim += impl.dimension[i];
+	new_dim += impl->dimension[i];
+	hour_dim += impl->dimension[i];
       }
 
   // Attempt to find convertion with new dimension.
-  if (impl.spec && !impl.spec_conv)
+  if (impl->spec && !impl->spec_conv)
     {
       if (Units::can_convert (spec_dim, hour_dim))
-	impl.spec_conv = &Units::get_convertion (spec_dim, hour_dim);
+	impl->spec_conv = &Units::get_convertion (spec_dim, hour_dim);
     }
 
   // Use new dimension.
-  impl.dimension = new_dim;
+  impl->dimension = new_dim;
 }
 
 bool 
 Select::check (Treelog& err) const
 {
-  string spec_dim;
-  if (impl.spec)
-    spec_dim = default_dimension (impl.spec->dimension ());
+  std::string spec_dim;
+  if (impl->spec)
+    spec_dim = default_dimension (impl->spec->dimension ());
   else
     spec_dim = Syntax::Unknown ();
-  return impl.check (spec_dim, err); 
+  return impl->check (spec_dim, err); 
 }
 
 bool 
@@ -677,7 +674,7 @@ Select::check_border (const Border&,
 
 Select::Select (Block& al)
   : name (al.name ("type")),
-    impl (*new Implementation (al)),
+    impl (new Implementation (al)),
     accumulate (al.flag ("accumulate")),
     handle (al.check ("handle")
             ? Handle (al.identifier ("handle"))
@@ -694,7 +691,7 @@ Select::Select (Block& al)
 { }
 
 Select::~Select ()
-{ delete &impl; }
+{ }
 
 static struct SelectSyntax
 {

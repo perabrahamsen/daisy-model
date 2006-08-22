@@ -59,7 +59,6 @@ public:
   void output (symbol name, symbol);
   void output (symbol name, const std::vector<double>& value);
   void output (symbol name, const PLF&);
-  void output (symbol name, const Time&); // Obsolete.
 
   // Create and destroy.
   void initialize (Treelog&);

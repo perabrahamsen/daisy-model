@@ -307,7 +307,7 @@ MODELS = movement_rect.C number_soil.C organic_none.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
 	domsorp_std.C chemistry_std.C equil_linear.C pedo_const.C \
 	horizon_numeric.C horizon_system.C select_pF.C pet_FAO_PM.C \
-	pet_Hargreaves.C hydraulic_M_vGp.C summary_simple.C select_date.C \
+	pet_Hargreaves.C hydraulic_M_vGp.C summary_simple.C \
 	phenology_TSum.C phenology_std.C hydraulic_hypres.C clayom_biomod.C \
         clayom_old.C hydraulic_Cosby.C adsorption_full.C \
 	equil_langmuir.C transform_equil.C condition_weather.C \
@@ -429,10 +429,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = soltrans1d.C\
-	soil_water1d.C soil_water_rect.C soil_water1d.h soil_water_rect.h \
-	column_r2d2.C column_rect.C column_inorganic.C \
-	column_base.C column_baseh.h 
+REMOVE = select_date.C soltrans1d.h
 
 # These are the file extensions we deal with.
 # 
