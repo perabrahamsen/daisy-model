@@ -1,7 +1,7 @@
-LIBS 	= dk-soil.dai log-sample.dai \
+LIBS 	= it-sample.dai it-management.dai it-soil.dai dk-soil.dai log-sample.dai \
 	init-soil.dai pedo-soil.dai irrigation.dai dk-management.dai
 SETUPS  = heat-properties.dai batch.dai sample.dai test.dai DrainDrying.dai 
-DATA = taastrup.dwf example.gwt
+DATA = it-bologne.dwf taastrup.dwf example.gwt it-cer.gwt
 TEXT	= Makefile README $(SETUPS) $(DATA) $(LIBS)
 REMOVE 	=  NOTHING
 
@@ -33,6 +33,9 @@ cvs: $(TEXT)
 	rm -f $(REMOVE) 
 	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"
+
+add:
+	cvs add $(TEXT)
 
 # Check
 #
