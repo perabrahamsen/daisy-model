@@ -1,6 +1,6 @@
 ;;; it-sample.dai -- Sample Italian setup file.
 ;;
-;; This is from the CER institute, near Bologne.
+;; This is from the CER institute, near Bologna.
 ;; The original parameterization was by 
 ;;  "A. Battilani" <battilani@consorziocer.it>
 ;; Some modification has been made by Per Abrahamsen <abraham@dina.kvl.dk>.
@@ -21,7 +21,7 @@
   (column "WP1 IT CER 2005")
   (output harvest)
   (manager "WP1 IT 2005 warmup")
-  (weather default "it-weather.dwf"
+  (weather default "it-bologna.dwf"
            (missing_years ((2005 2006) (2004 2005)))))
 
 (run "WP1 IT CER 2005")

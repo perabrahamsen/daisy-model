@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.09
+
+** New Folva, Triada, and Agria potato varieties in potato.dai.
+
+** New examples from Italy in the sample directory.
+
 * 4.08
 
 ** Easier to mix integer and number objects with literals.

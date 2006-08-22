@@ -1,3 +1,10 @@
+2006-08-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/potato.dai ("Potato; FertOrgaNic"): New base parameterization.
+	("Potato; Agria", "Potato; Folva", "Potato; Triada"): New
+	parameterizations.
+	(Potato): Changed default to Folva.
+
 2006-07-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.08 released.

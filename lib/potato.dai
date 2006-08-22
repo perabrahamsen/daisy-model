@@ -1,3 +1,29 @@
+;;; potato.dai -- Potato parameterizations.
+;;
+;; We recommend:
+;;
+;;   "Potato; Agria", "Potato; Folva", or "Potato; Triada" if you know
+;;   the variety is one of those three, or close.
+;;
+;;   For other varieties, we recommend "Potato; Folva" in Scandinavia,
+;;   "Potato; Triada" in Poland, and "Potato; Agria" in central and
+;;   southern Europe.
+;;
+;;   "Potato; SCRI" is only recommended in Scotland, for unstressed
+;;   growth. 
+;;
+;;   "Potato; Koege" is not recommended.
+;; 
+;;   "Potato; FertOrgaNic" is recommded as a base for writting your
+;;   own paramterization of a new variety.
+;;
+;; We have good faith in the Agria, Folva and Triada paramterizations,
+;; also in the SCRI paramterization under unstressed conditions.  We
+;; have no faith in the Koege paramterization.
+;; 
+;; For all varieties, remember to set EmrTSum manually, it depends on
+;; storage of the mother tuber.
+
 (defcrop "Potato; Koege" default
   "Køge Project"
   (Devel default (EmrTSum  125)
@@ -184,4 +210,104 @@ It is based on experimental data from SCRI from 1983 and 1984."
   (Harvest (DSmax 0.0)
            (sorg_height -10.0 [cm])))
 
-(defcrop Potato "Potato; Koege")
+(defcrop "Potato; FertOrgaNic" "Potato; SCRI"
+  "These parameters represent common traits from various site specific
+calibrations performed as part of the FertOrgaNic project from
+2003-2005.  It is not recommended for direct use, but as a base for a
+veriety specific calibration.
+
+The calibration was perfomed by Charlotte Tofteng <cto@kvl.dk> in 2006."
+  (Devel original (DSRate1 0.06)
+                  (DSRate2 0.009))
+  (Root (PenPar1 0.06 [cm/dg C/d])
+  )
+  (LeafPhot original (Fm 4.0 [g CO2/m^2/h]))                        
+  (Partit (Root (0.00 0.20) (1.00 0.20) (1.36 0.00))
+          (Leaf (0.00 0.95) (1.00 0.80) (1.05 0.30) (1.25 0.25) (1.40 0.00))
+          (Stem (0.00 0.05) (1.00 0.20) (1.05 0.45) (1.25 0.05) (1.40 0.00))
+          (RSR  (0.00 0.50) (0.75 0.50) (2.00 0.25))
+          (nitrogen_stress_limit 0.01))
+  (Canopy (SpLAI  0.020 [(m^2/m^2)/(g DM/m^2)])
+          (LeafAIMod (1.5 1.0) (2.0 0.3))
+          (DSLAI05   0.2)
+          (SpLAIfac (0.0 100) (1.0 100)))
+  (Prod (LfDR (0.00 0.00) (1.50 0.00) (1.60 0.02) (2.00 0.10))
+  	(ExfoliationFac 0.0))
+  (CrpN (PtLeafCnc (0.00 0.060) (1.00 0.050) (1.30 0.040) (1.50 0.025) (2.00 0.020))
+        (CrLeafCnc (0.00 0.045) (1.00 0.040) (1.30 0.030) (1.50 0.020) (2.00 0.010))
+        (NfLeafCnc (0.00 0.010) (1.00 0.010) (2.00 0.010))
+        (PtStemCnc (0.00 0.040) (1.00 0.035) (1.30 0.020) (1.50 0.010) (2.00 0.010))
+        (CrStemCnc (0.00 0.020) (1.00 0.015) (1.30 0.010) (1.50 0.005) (2.00 0.005))
+	(PtSOrgCnc (0.00 0.020) (1.30 0.015) (2.00 0.010))
+	(CrSOrgCnc (0.00 0.008) (1.30 0.008) (2.00 0.007))        
+	(NH4_root_min 1E-8 [g N/cm^3])
+	(NO3_root_min 1E-8 [g N/cm^3])
+  )
+)
+
+(defcrop "Potato; Agria" "Potato; FertOrgaNic"
+  "Recalibration of Agria potato performed by Charlotte Tofteng
+<cto@kvl.dk> in 2006 based on experimental results from Czechia
+(2003-2005), Slovakia (2003) and Portugal (2003)."
+  (Devel original (EmrTSum 260 [dg C d])
+                  (TempEff1 (6.4 0.0)(12 1.9)(18 0.4)(33 0.0))
+                  (TempEff2 (02 0.00) (13 1.00) (19 1.00) (29 1))
+)
+  (Partit (Root (0.00 0.20) (1.00 0.20) (1.36 0.00))
+          (Leaf (0.00 0.95) (1.00 0.80) (1.05 0.30) (1.25 0.25) (1.40 0.00))
+          (Stem (0.00 0.05) (1.00 0.20) (1.05 0.15) (1.25 0.02) (1.40 0.00)))
+  (Canopy (DSLAI05   0.5))
+)
+
+(defcrop "Potato; Folva" "Potato; FertOrgaNic"
+  "Recalibration of Agria potato performed by Tove Heidman in 2006
+based on experimental results from DJF."
+  (Devel original (EmrTSum 330 [dg C d])
+                  (DSRate1 0.055)
+                  (DSRate2 0.011)) 
+  (LeafPhot original (Fm 4.8 [g CO2/m^2/h]))                      
+  (Canopy (SpLAI  0.020 [(m^2/m^2)/(g DM/m^2)])
+          (SpLAIfac (0.0 100) (1.0 100))
+          (LeafAIMod (1.5 1.1)(2.0 0.3))
+          (DSLAI05 0.5))
+  (Partit (Root (0.00 0.20) (1.00 0.20) (1.36 0.00))
+          (Leaf (0.00 0.95) (1.00 0.80) (1.05 0.20) (1.25 0.15) (1.35 0.00))
+          (Stem (0.00 0.05) (1.00 0.20) (1.05 0.35) (1.25 0.00) (1.35 0.00))
+          (nitrogen_stress_limit 0.01))
+  (Prod (LfDR (0.00 0.00)(1.48 0.00)(2.00 0.10));1.50 0.00
+        (ExfoliationFac 0.0))  
+  (Root 
+       (PenPar1    0.06 [cm/dg C/d]))
+  (CrpN 
+       (PtLeafCnc (0.00 0.0600) (1.00 0.0500) (1.30 0.0400) (1.50 0.025) (2.00 0.020))
+       (CrLeafCnc (0.00 0.0450) (1.00 0.0400) (1.30 0.0300) (1.50 0.020) (2.00 0.010))
+       (NfLeafCnc (0.00 0.0100) (1.00 0.0100) (2.00 0.0100))
+       (PtStemCnc (0.00 0.0400) (1.00 0.0350) (1.30 0.0200) (1.50 0.010) (2.00 0.010))
+       (CrStemCnc (0.00 0.0200) (1.00 0.0150) (1.30 0.0100) (1.50 0.005) (2.00 0.005))
+       (PtSOrgCnc (0.00 0.0200) (1.30 0.0150) (2.00 0.0100))
+       (CrSOrgCnc (0.00 0.0080) (1.30 0.0080) (2.00 0.0070))
+       (NH4_root_min 1E-8 [g N/cm^3])
+       (NO3_root_min 1E-8 [g N/cm^3])
+))
+
+;;; PL Potato.
+
+(defcrop "Potato; Triada" "Potato; FertOrgaNic"
+  "Recalibration of Triada potato performed by Charlotte Tofteng
+<cto@kvl.dk> based on experimental results from Jadwisin, Poland 2003-2005."
+  (Devel original (EmrTSum 330 [dg C d])
+                  (TempEff2 (15 0.7)(20 1.6)(25 0.7)))
+  (LeafPhot original (Fm 5 [g CO2/m^2/h]))                        
+  (Canopy (SpLAI  0.015 [(m^2/m^2)/(g DM/m^2)])
+          (LeafAIMod (1.0 1.0) (2.0 0.62))
+          (DSLAI05   0.4))
+  (CrpN   (NH4_root_min 3e-5 [g N/cm^3])
+          (NO3_root_min 3e-5 [g N/cm^3]))
+  (Partit (Leaf (0.00 0.95) (1.00 0.90) (1.05 0.40) (1.25 0.28) (1.40 0.00))
+          (Stem (0.00 0.05) (1.00 0.10) (1.05 0.35) (1.25 0.02) (1.40 0.00)))
+  (water_stress_effect partial (y_half 0.75))
+)
+
+(defcrop Potato "Potato; Folva")
+
+;;; potato.dai ends here
