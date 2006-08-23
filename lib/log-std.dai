@@ -38,6 +38,12 @@ Total amount of water added to the system from irrigation.")
                    (spec bioclimate default irrigation_total)
                    (handle sum)
                    (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" 
+                         pet "*" reference_evapotranspiration)
+                   (tag "Reference evapotranspiration")
+                   (spec pet "makkink" reference_evapotranspiration
+                   (handle sum)
+                   (dimension "mm/&"))
            (number (tag "Potential evapotranspiration")
 		   (description "\
 There is energy enough to evaporate this amount of water.")

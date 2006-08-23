@@ -22,6 +22,7 @@
 #include "select.h"
 #include "geometry.h"
 #include "number.h"
+#include "scope.h"
 #include "check.h"
 #include "vcheck.h"
 #include "units.h"
@@ -88,7 +89,31 @@ struct Select::Implementation
     static void load_syntax (Syntax& syntax, AttributeList&);
     Spec (const AttributeList&);
     ~Spec ();
-  } *spec;
+  };
+  std::auto_ptr<Spec> spec;
+
+  // We need a scope for the expression.
+  struct ScopeX : public Scope
+  {
+    // Content.
+    double value;
+    std::string dim;
+
+    // Interface.
+    bool has_number (const std::string& name) const
+    { return name == "x"; }
+    double number (const std::string&) const
+    { return value; }
+    const std::string& dimension (const std::string&) const
+    { return dim;}
+
+    // Create.
+    ScopeX ()
+      : value (-42.42e42),
+        dim (Syntax::Unknown ())
+    { }
+  } scope;
+    
 
   // Content.
   const Units::Convert* spec_conv; // Convert value.
@@ -320,6 +345,13 @@ Select::Implementation::Spec::~Spec ()
 double 
 Select::Implementation::convert (double value) const
 { 
+#if 0
+  if (expr)
+    {
+      scope.value = value;
+      value = expr->value (scope);
+    }
+#endif
   const double result = (spec_conv)
     ? spec_conv->operator() (value)
     :  value * factor + offset; 
@@ -331,7 +363,7 @@ bool
 Select::Implementation::check (const std::string& spec_dim, Treelog& err) const
 {
   bool ok = true;
-  if (spec && !spec_conv && spec->dimension () != Syntax::Unknown ())
+  if (spec.get () && !spec_conv && spec->dimension () != Syntax::Unknown ())
     err.warning ("Don't know how to convert [" + spec_dim
                  + "] to [" + dimension + "]");
   return ok;
@@ -351,6 +383,9 @@ Select::Implementation::Implementation (Block& al)
 	  ? new Spec (al.alist ("spec")) 
 	  : NULL),
     spec_conv (NULL),
+    expr (al.check ("expr") 
+          ? Librarian<Number>::build_item (al, "expr")
+          : NULL),
     factor (al.number ("factor")),
     offset (al.number ("offset")),
     negate (al.flag ("negate")),
@@ -361,10 +396,7 @@ Select::Implementation::Implementation (Block& al)
 { }
   
 Select::Implementation::~Implementation ()
-{ 
-  if (spec)
-    delete spec;
-}
+{ }
 
 double 
 Select::convert (double value) const
@@ -463,7 +495,7 @@ Select::document (Format& format) const
       format.text (impl->description);
       format.soft_linebreak ();
     }
-  else if (impl->spec)
+  else if (impl->spec.get ())
     {
       if (impl->negate)
 	{
@@ -568,6 +600,11 @@ If 'accumulate' is true, the printed values will be accumulated..");
 True if the content of this column is interesting enough to warrent an\n\
 initial line in the log file.  This only affects non-flux variables.");
   alist.add ("interesting_content", true);
+  syntax.add ("expr", Librarian<Number>::library (), 
+              Syntax::OptionalConst, Syntax::Singleton, "\
+Expression for findig the value for the log file, given the internal\n\
+value 'x'.  For example '(expr (ln x))' will give you the natural\n\
+logarithm of the value.");  
   syntax.add ("factor", Syntax::Unknown (), Check::none (), Syntax::Const, "\
 Factor to multiply the calculated value with, before logging.");
   alist.add ("factor", 1.0);
@@ -597,15 +634,28 @@ void
 Select::add_dest (Destination* d)
 { dest.add_dest (d); }
 
-void 
+bool
 Select::initialize (const std::map<symbol, symbol>& conv, double, double, 
-		    const std::string& timestep)
+		    const std::string& timestep, Treelog& msg)
 { 
   std::string spec_dim;
-  if (impl->spec)
+  if (impl->spec.get ())
     spec_dim = default_dimension (impl->spec->dimension ());
   else
     spec_dim = Syntax::Unknown ();
+
+  // Let the expression modify the dimension.
+  impl->scope.dim = spec_dim;
+  if (impl->expr.get ())
+    { 
+      if (!impl->expr->initialize (msg) 
+          || !impl->expr->check (impl->scope, msg))
+        {
+          msg.error ("Bad expression");
+          return false;
+        }
+      spec_dim = impl->expr->dimension (impl->scope);
+    }
 
   // Convert path according to mapping in 'conv'.
   for (unsigned int i = 0; i < path.size (); i++)
@@ -623,7 +673,7 @@ Select::initialize (const std::map<symbol, symbol>& conv, double, double,
     impl->dimension = spec_dim;
 
   // Attempt to find convertion with original dimension.
-  if (impl->spec)
+  if (impl->spec.get ())
     if (Units::can_convert (spec_dim, impl->dimension))
       impl->spec_conv = &Units::get_convertion (spec_dim, impl->dimension);
     else
@@ -645,7 +695,7 @@ Select::initialize (const std::map<symbol, symbol>& conv, double, double,
       }
 
   // Attempt to find convertion with new dimension.
-  if (impl->spec && !impl->spec_conv)
+  if (impl->spec.get () && !impl->spec_conv)
     {
       if (Units::can_convert (spec_dim, hour_dim))
 	impl->spec_conv = &Units::get_convertion (spec_dim, hour_dim);
@@ -653,16 +703,19 @@ Select::initialize (const std::map<symbol, symbol>& conv, double, double,
 
   // Use new dimension.
   impl->dimension = new_dim;
+
+  return true;
 }
 
 bool 
 Select::check (Treelog& err) const
 {
   std::string spec_dim;
-  if (impl->spec)
-    spec_dim = default_dimension (impl->spec->dimension ());
-  else
-    spec_dim = Syntax::Unknown ();
+  if (impl->expr.get ())
+    spec_dim = impl->expr->dimension (impl->scope);
+  else 
+    spec_dim = impl->scope.dim;
+  
   return impl->check (spec_dim, err); 
 }
 

@@ -177,11 +177,14 @@ struct SelectInterval : public SelectValue
     return Units::multiply (spec_dim, "cm");
   }
 
-  void initialize (const std::map<symbol, symbol>& conv, 
+  bool initialize (const std::map<symbol, symbol>& conv, 
 		   double default_from, double default_to, 
-		   const std::string& timestep)
+		   const std::string& timestep, Treelog& msg)
   {
-    Select::initialize (conv, default_from, default_to, timestep);
+    bool ok = true;
+
+    if (!Select::initialize (conv, default_from, default_to, timestep, msg))
+      ok = false;
 
     // Set default range.
     if (default_from <= 0.0 && from > 0.0)
@@ -191,6 +194,8 @@ struct SelectInterval : public SelectValue
 
     if (from > 0.0)
       from = 0.0;
+    
+    return ok;
   }
   bool check_border (const Border& border, 
                      const double default_from, const double default_to,

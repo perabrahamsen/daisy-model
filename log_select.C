@@ -216,7 +216,9 @@ LogSelect::LogSelect (Block& al)
 
   // Initialize entries.
   for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->initialize (conv_map, from, to, condition->timestep ());
+    if (!entries[i]->initialize (conv_map, from, to, condition->timestep (),
+                                 al.msg ()))
+      al.set_error ();
 }
 
   

@@ -25,6 +25,7 @@
 
 #include "destination.h"
 #include "condition.h"		// Needed for proper initialization.
+#include "number.h"             // Ditto.
 #include "librarian.h"
 #include "symbol.h"
 #include "units.h"
@@ -142,9 +143,9 @@ protected:
   virtual const Units::Convert* 
   /**/ special_convert (const std::string& has, const std::string& want);
 public:
-  virtual void initialize (const std::map<symbol, symbol>& conv, 
+  virtual bool initialize (const std::map<symbol, symbol>& conv, 
 			   double from, double to,
-                           const std::string& timestep);
+                           const std::string& timestep, Treelog&);
   void add_dest (Destination* dest);
   virtual bool check (Treelog& err) const;
   virtual bool check_border (const Border&, 

@@ -27,15 +27,19 @@
 struct SelectFluxBottom : public SelectFlux
 {
   // Create and Destroy.
-  void initialize (const std::map<symbol, symbol>& conv, 
+  bool initialize (const std::map<symbol, symbol>& conv, 
 		   double default_from, double default_to, 
-		   const std::string& timestep)
+		   const std::string& timestep, Treelog& msg)
   {
-    Select::initialize (conv, default_from, default_to, timestep);
+    bool ok = true;
+    if (!Select::initialize (conv, default_from, default_to, timestep, msg))
+      ok = false;
 
     // Overwrite default height.
     if (default_to <= 0.0 && height > 0.0)
       height = default_to;
+
+    return ok;
   }
   bool check_border (const Border& border, 
                      const double, const double default_to,
