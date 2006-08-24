@@ -112,7 +112,7 @@ struct Select::Implementation
       : value (-42.42e42),
         dim (Syntax::Unknown ())
     { }
-  } scope;
+  } mutable scope;
     
 
   // Content.
@@ -345,13 +345,13 @@ Select::Implementation::Spec::~Spec ()
 double 
 Select::Implementation::convert (double value) const
 { 
-#if 0
-  if (expr)
+
+  if (expr.get ())
     {
       scope.value = value;
       value = expr->value (scope);
     }
-#endif
+
   const double result = (spec_conv)
     ? spec_conv->operator() (value)
     :  value * factor + offset; 
