@@ -1,0 +1,27 @@
+;;; sk-sample.dai -- Sample Slovakian setup file.
+;;
+;; 
+;; The original parameterization was by 
+;;  "Jozef Takac" <takac@hmsp.sk>
+;; Some modification has been made by Per Abrahamsen <abraham@dina.kvl.dk>.
+
+(input file "fertilizer.dai")
+(input file "crop.dai")
+(input file "tillage.dai")
+(input file "sk-soil.dai")
+(input file "sk-management.dai")
+
+(defprogram "WP1 SK RIIDLE 2003" Daisy
+  "Slovak WP1 data for 2003."
+  (weather default "sk-weather.dwf"
+         (missing_years ((2005 2006) (2004 2005))))
+  (time 1993 1 1)
+  (stop 2003 4 28 23)
+  (column "WP1 SK RIIDLE 2003")
+  (output harvest)))
+ )
+
+(run "WP1 SK RIIDLE 2003")
+
+;;; sk-sample.dai ends here.
+

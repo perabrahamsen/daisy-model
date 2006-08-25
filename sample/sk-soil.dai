@@ -1,0 +1,81 @@
+;;; sk-soil.dai -- From FertOrgaNic project, 2003 field.
+;;
+;; The original parameterization was by 
+;;  "Jozef Takac" <takac@hmsp.sk>
+;; Some modification has been made by Per Abrahamsen <abraham@dina.kvl.dk>.
+
+(defhorizon "Aor Most7" default
+  (dry_bulk_density 1.35 [g/cm^3]) 
+  (clay 0.20 []) (silt 0.65 []) (sand 0.15 [])
+  (humus 0.0302 [])
+  (C_per_N 6.0 [g C/g N])
+  (hydraulic M_vG 
+             (Theta_res 0.08 [cm^3 H2O/cm^3])
+             (Theta_sat 0.4237 [cm^3 H2O/cm^3])
+             (alpha 0.04611 [cm^-1])
+             (n 1.17693 [])
+             (K_sat 1.00 [cm/h])))      ; 0.72, 0.99, 7.53
+
+(defhorizon "B Most7" default
+  (dry_bulk_density 1.44 [g/cm^3]) 
+  (clay 0.18 []) (silt 0.66 []) (sand 0.16 [])
+  (humus 0.025 [])
+  (C_per_N 6.0 [g C/g N])
+  (hydraulic M_vG 
+             (Theta_res 0.0709 [cm^3 H2O/cm^3])
+             (Theta_sat 0.3766 [cm^3 H2O/cm^3])
+             (alpha 0.0157 [cm^-1])
+             (n 1.1258 [])
+             (K_sat 1.02 [cm/h])))
+
+(defhorizon "C Most7" default
+  (dry_bulk_density 1.35 [g/cm^3]) 
+  (clay 0.21 []) (silt 0.64 []) (sand 0.15 [])
+  (humus 0.0121 [])
+  (C_per_N 8.0 [g C/g N])
+  (hydraulic M_vG 
+             (Theta_res 0.0324 [cm^3 H2O/cm^3])
+             (Theta_sat 0.4089 [cm^3 H2O/cm^3])
+             (alpha 0.0172 [cm^-1])
+             (n 1.1514 [])
+             (K_sat 0.95 [cm/h])))
+
+(defhorizon "D Most7" default
+  (dry_bulk_density 1.43 [g/cm^3]) 
+  (clay 0.21 []) (silt 0.65 []) (sand 0.14 [])
+  (humus 0.0101 [])
+  (C_per_N 8.0 [g C/g N])
+  (hydraulic M_vG 
+             (Theta_res 0.0406 [cm^3 H2O/cm^3])
+             (Theta_sat 0.4196 [cm^3 H2O/cm^3])
+             (alpha 0.0359 [cm^-1])
+             (n 1.1447 [])
+             (K_sat 0.75 [cm/h])))
+
+(defhorizon "S Most7" default
+  (dry_bulk_density 1.43 [g/cm^3]) 
+  (clay 0.15 []) (silt 0.54 []) (sand 0.31 [])
+  (humus 0.0081 [])
+  (C_per_N 8.0 [g C/g N])
+  (hydraulic M_vG 
+             (Theta_res 0.0158 [cm^3 H2O/cm^3])
+             (Theta_sat 0.3569 [cm^3 H2O/cm^3])
+             (alpha 0.0203 [cm^-1])
+             (n 1.1579 [])
+             (K_sat 0.5 [cm/h])))
+
+(defcolumn "WP1 SK RIIDLE 2003" default
+  (OrganicMatter  original
+                  (init (input 5867 [kg C/ha/y])
+                        (root 1854 [kg C/ha/y])  
+                        (background_mineralization 250 [kg N/ha/y])
+                        (end -25 [cm])))
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (  -30 [cm] "Aor Most7")
+                  (  -70 [cm] "B Most7")
+                  ( -110 [cm] "C Most7")
+                  ( -150 [cm] "D Most7")
+                  ( -400 [cm] "S Most7")))
+  (Groundwater deep))
+
+;;; sk-soil.dai ends here

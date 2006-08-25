@@ -1,7 +1,8 @@
-LIBS 	= it-sample.dai it-management.dai it-soil.dai dk-soil.dai log-sample.dai \
-	init-soil.dai pedo-soil.dai irrigation.dai dk-management.dai
+LIBS 	= sk-sample.dai sk-management.dai sk-soil.dai it-sample.dai\
+	  it-management.dai it-soil.dai dk-soil.dai log-sample.dai \
+	  init-soil.dai pedo-soil.dai irrigation.dai dk-management.dai
 SETUPS  = heat-properties.dai batch.dai sample.dai test.dai DrainDrying.dai 
-DATA = it-bologna.dwf taastrup.dwf example.gwt it-cer.gwt
+DATA = sk-bratislava.dwf it-bologna.dwf taastrup.dwf example.gwt it-cer.gwt
 TEXT	= Makefile README $(SETUPS) $(DATA) $(LIBS)
 REMOVE 	=  NOTHING
 
