@@ -4,6 +4,21 @@
 ;;  "Jozef Takac" <takac@hmsp.sk>
 ;; Some modification has been made by Per Abrahamsen <abraham@dina.kvl.dk>.
 
+(defcrop "Maize_SK" "Maize" 
+  (Devel original (EmrTSum 200) (DSRate1  0.019) (DSRate2  0.017))
+  (CrpN (PtLeafCnc (0.000 0.038)(0.500 0.038) (1.00 0.030) (1.500 0.018)(1.800 0.015) (2.00 0.013))
+  	(CrLeafCnc (0.000 0.010) (0.367 0.010) (0.500 0.009) (1.00 0.008) (2.00 0.008)))
+)
+(defcrop "Spring Barley_SK" "Spring Barley"
+  (Devel original (DSRate1  0.035) (DSRate2  0.025))
+  (CrpN (PtLeafCnc (0.000 0.040) (1.00 0.040) (2.00 0.030)))
+)  
+(defcrop "Winter Wheat_SK" "Winter Wheat"
+  (Devel original (EmrTSum  150) (DSRate1  0.017)(DSRate2 0.025))
+  (CrpN (PtLeafCnc (0.000 0.050) (0.50 0.035) (1.28 0.033) (1.52 0.025) (2.00 0.012))
+  	(CrLeafCnc (0.000 0.021) (0.50 0.021) (1.28 0.021) (1.52 0.015) (2.00 0.010)))
+)  
+
 ;;; Warmup
 ;; sugar beet 1993
 (defaction SBeet_management activity

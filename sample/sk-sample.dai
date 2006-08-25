@@ -13,13 +13,13 @@
 
 (defprogram "WP1 SK RIIDLE 2003" Daisy
   "Slovak WP1 data for 2003."
-  (weather default "sk-weather.dwf"
+  (weather default "sk-bratislava.dwf"
          (missing_years ((2005 2006) (2004 2005))))
   (time 1993 1 1)
   (stop 2003 4 28 23)
   (column "WP1 SK RIIDLE 2003")
-  (output harvest)))
- )
+  (manager "WP1 SK 2003 warmup")
+  (output harvest))
 
 (run "WP1 SK RIIDLE 2003")
 
