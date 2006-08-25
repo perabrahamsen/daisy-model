@@ -112,7 +112,7 @@ LogTable::common_done (const Time& time)
 	  if (i != 0)
 	    out << field_separator;
 
-	  const Geometry* geo = entries[i]->geometry ();
+	  const Geometry *const geo = entries[i]->geometry ();
 	  const int size = entries[i]->size ();
 	  const symbol tag = entries[i]->tag ();
 	  static const symbol empty_symbol ("");
@@ -172,7 +172,6 @@ LogTable::common_done (const Time& time)
 	  if (i != 0)
 	    out << field_separator;
 
-	  const Soil* soil = entries[i]->soil ();
 	  const int size = entries[i]->size ();
 	  string dimension = entries[i]->dimension ();
 	  if (dimension == Syntax::None () 
@@ -180,7 +179,7 @@ LogTable::common_done (const Time& time)
 	      || dimension == Syntax::Fraction ())
 	    dimension = "";
 
-	  if (soil && size >= 0)
+	  if (size >= 0)
 	    {
 	      for (unsigned j = 0; j < size; j++)
 		{

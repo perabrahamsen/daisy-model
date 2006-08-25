@@ -78,7 +78,6 @@ public:
   static const char *const description;
   virtual const std::string& dimension () const;
   virtual symbol tag () const;
-  virtual const Soil* soil () const; // For array tags.
   virtual const Geometry* geometry () const; // For array tags.
   virtual int size () const;	// For array tags.
   static symbol select_get_tag (const AttributeList& al);

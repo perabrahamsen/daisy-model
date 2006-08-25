@@ -414,10 +414,6 @@ const Geometry*
 Select::geometry () const
 { return NULL; }
 
-const Soil* 
-Select::soil () const
-{ return NULL; }
-
 int 
 Select::size () const
 { return -1; }
