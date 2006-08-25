@@ -93,7 +93,7 @@ struct Select::Implementation
   std::auto_ptr<Spec> spec;
 
   // We need a scope for the expression.
-  struct ScopeX : public Scope
+  mutable struct ScopeX : public Scope
   {
     // Content.
     double value;
@@ -112,7 +112,7 @@ struct Select::Implementation
       : value (-42.42e42),
         dim (Syntax::Unknown ())
     { }
-  } mutable scope;
+  } scope;
     
 
   // Content.
@@ -467,6 +467,14 @@ static bool check_alist (const AttributeList& al, Treelog& err)
       else if (al.number ("offset") != 0.0)
 	err.warning ("Specifying both 'spec' and 'offset' may conflict");
     }
+  if (al.check ("expr"))
+    {
+      if (al.number ("factor") != 1.0)
+	err.warning ("Specifying both 'expr' and 'factor' may conflict");
+      else if (al.number ("offset") != 0.0)
+	err.warning ("Specifying both 'expr' and 'offset' may conflict");
+    }
+    
   static bool has_warned_about_when = false;
   if (!has_warned_about_when && al.check ("when"))
     {
