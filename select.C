@@ -118,8 +118,6 @@ struct Select::Implementation
   // Content.
   const Units::Convert* spec_conv; // Convert value.
   std::auto_ptr<Number> expr;   // - || -
-  const double factor;		// - || -
-  const double offset;		// - || -
   const bool negate;            // - || -
   double convert (double) const; // - || -
   const symbol tag;		// Name of this entry.
@@ -129,6 +127,7 @@ struct Select::Implementation
   // Create and Destroy.
   bool check (const std::string& spec_tdim, Treelog& err) const;
   static std::string find_description (const AttributeList&);
+  static Number* get_expr (Block& al);
   Implementation (Block&);
   ~Implementation ();
 };
@@ -346,16 +345,16 @@ double
 Select::Implementation::convert (double value) const
 { 
 
-  if (expr.get ())
-    {
-      scope.value = value;
-      value = expr->value (scope);
-    }
+  scope.value = value;
+  value = expr->value (scope);
 
-  const double result = (spec_conv)
-    ? spec_conv->operator() (value)
-    :  value * factor + offset; 
-  return negate ? -result : result;
+  if (spec_conv)
+    value =  spec_conv->operator() (value);
+
+  if (negate)
+    value = -value;
+
+  return value;
 }
 
 // Create and Destroy.
@@ -378,16 +377,87 @@ Select::Implementation::find_description (const AttributeList& al)
   return "";
 }
 
+Number*
+Select::Implementation::get_expr (Block& al)
+{
+  if (al.check ("expr"))
+    return Librarian<Number>::build_item (al, "expr");
+
+  // Support for old factor + offset style.
+  struct NumberFactor : public Number
+  {
+    const double factor;
+    bool missing (const Scope&) const
+    { return false; }
+    double value (const Scope& scope) const
+    { return static_cast<const ScopeX&> (scope).value * factor; }
+    const std::string& dimension (const Scope& scope) const
+    { return static_cast<const ScopeX&> (scope).dim; }
+    bool initialize (Treelog&)
+    { return true; }
+    bool check (const Scope&, Treelog&) const
+    { return true; }
+    explicit NumberFactor (Block& al, const double f)
+      : Number (al),
+        factor (f)
+    { }
+  };
+
+  struct NumberLinear : public Number
+  {
+    const double factor;
+    const double offset;
+    bool missing (const Scope&) const
+    { return false; }
+    double value (const Scope& scope) const
+    { return static_cast<const ScopeX&> (scope).value * factor + offset; }
+    const std::string& dimension (const Scope& scope) const
+    { return static_cast<const ScopeX&> (scope).dim; }
+    bool initialize (Treelog&)
+    { return true; }
+    bool check (const Scope&, Treelog&) const
+    { return true; }
+    explicit NumberLinear (Block& al, const double f, const double o)
+      : Number (al),
+        factor (f),
+        offset (o)
+    { }
+  };
+  const double factor = al.number ("factor");
+  const double offset = al.number ("offset");
+
+  if (offset != 0.0)
+    return new NumberLinear (al,factor, offset);
+
+  if (factor != 1.0)
+    return new NumberFactor (al, factor);
+  
+  // No change.
+  struct NumberX : public Number
+  {
+    bool missing (const Scope&) const
+    { return false; }
+    double value (const Scope& scope) const
+    { return static_cast<const ScopeX&> (scope).value; }
+    const std::string& dimension (const Scope& scope) const
+    { return static_cast<const ScopeX&> (scope).dim; }
+    bool initialize (Treelog&)
+    { return true; }
+    bool check (const Scope&, Treelog&) const
+    { return true; }
+    explicit NumberX (Block& al)
+      : Number (al)
+    { }
+  };
+  return new NumberX (al);
+}
+
 Select::Implementation::Implementation (Block& al)
   : spec (al.check ("spec")
 	  ? new Spec (al.alist ("spec")) 
 	  : NULL),
     spec_conv (NULL),
-    expr (al.check ("expr") 
-          ? Librarian<Number>::build_item (al, "expr")
-          : NULL),
-    factor (al.number ("factor")),
-    offset (al.number ("offset")),
+    expr (get_expr (al)),
     negate (al.flag ("negate")),
     tag (Select::select_get_tag (al.alist ())),
     dimension (al.check ("dimension")
@@ -610,10 +680,12 @@ Expression for findig the value for the log file, given the internal\n\
 value 'x'.  For example '(expr (ln x))' will give you the natural\n\
 logarithm of the value.");  
   syntax.add ("factor", Syntax::Unknown (), Check::none (), Syntax::Const, "\
-Factor to multiply the calculated value with, before logging.");
+Factor to multiply the calculated value with, before logging.\n\
+OBSOLETE: Use 'expr' instead.");
   alist.add ("factor", 1.0);
   syntax.add ("offset", Syntax::Unknown (), Check::none (), Syntax::Const, "\
-Offset to add to the calculated value, before logging.");
+Offset to add to the calculated value, before logging.\n\
+OBSOLETE: Use 'expr' instead.");
   alist.add ("offset", 0.0);
   syntax.add ("negate", Syntax::Boolean, Syntax::Const, "\
 Switch sign of value.  I.e. upward fluxes become downward fluxes.");
