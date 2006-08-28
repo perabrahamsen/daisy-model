@@ -540,9 +540,15 @@ static bool check_alist (const AttributeList& al, Treelog& err)
   if (al.check ("expr"))
     {
       if (al.number ("factor") != 1.0)
-	err.warning ("Specifying both 'expr' and 'factor' may conflict");
+        {
+          err.error ("Can't specify both 'expr' and 'factor'");
+          ok = false;
+        }
       else if (al.number ("offset") != 0.0)
-	err.warning ("Specifying both 'expr' and 'offset' may conflict");
+        {
+          err.error ("Can't specify both 'expr' and 'offset'");
+          ok = false;
+        }
     }
     
   static bool has_warned_about_when = false;

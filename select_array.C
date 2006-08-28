@@ -2,6 +2,7 @@
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -23,14 +24,12 @@
 #include "select.h"
 #include "mathlib.h"
 
-using namespace std;
-
 struct SelectArray : public Select
 {
   // Content.
-  vector<double> value;		// Total array.
-  vector<double> result;        // For logging (need to be persistent!).
-
+  std::vector<double> value;		// Total array.
+  std::vector<double> result;        // For logging (needs to be persistent!).
+  
   const Geometry* last_geo; // For printing dimensions;
 
   // Output routines.
@@ -123,6 +122,12 @@ struct SelectArray : public Select
   { return value.size (); }
 
   // Create and Destroy.
+  bool initialize (const std::map<symbol, symbol>& conv, 
+		   double default_from, double default_to, 
+		   const std::string& timestep, Treelog& msg)
+  {
+    return Select::initialize (conv, default_from, default_to, timestep, msg);
+  }
   SelectArray (Block& al)
     : Select (al),
       value (al.number_sequence ("value")),
@@ -143,7 +148,7 @@ static struct SelectArraySyntax
 
     syntax.add ("value", Syntax::Unknown (), Syntax::State, Syntax::Sequence,
 		"The current accumulated value.");
-    vector<double> empty;
+    std::vector<double> empty;
     alist.add ("value", empty);
 
     Librarian<Select>::add_type ("array", alist, syntax, &make);

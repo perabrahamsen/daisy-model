@@ -39,6 +39,9 @@ class SoilHeat
 protected:
   std::vector<double> T_;
   std::vector<double> S;
+private:
+  std::vector<double> capacity_;
+  std::vector<double> conductivity_;
 public:
   double T (size_t i) const // [dg C]
   { return T_[i]; }
@@ -61,6 +64,8 @@ public:
   { return S[i]; }
   void set_source (const size_t i, const double value) // [erg/cm^3/h]
   { S[i] = value; }
+  void tick_after (const size_t cell_size, 
+                   const Soil&, const SoilWater&, Treelog&);
 
   // Create and destroy.
 public:

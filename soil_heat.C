@@ -99,8 +99,27 @@ SoilHeat::swap (const Geometry& geo,
 }
   
 void
+SoilHeat::tick_after (const size_t cell_size, 
+                      const Soil& soil, const SoilWater& soil_water, 
+                      Treelog&)
+{
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      conductivity_[i]
+        = soil.heat_conductivity (i,
+                                  soil_water.Theta (i), soil_water.X_ice (i));
+      capacity_[i]
+        = soil.heat_capacity (i, soil_water.Theta (i), soil_water.X_ice (i));
+    }
+}
+
+void
 SoilHeat::output_base (Log& log) const
-{ output_value (T_, "T", log); }
+{
+  output_value (T_, "T", log); 
+  output_value (capacity_, "capacity", log); 
+  output_value (conductivity_, "conductivity", log); 
+}
 
 bool
 SoilHeat::check (const size_t n, Treelog& err) const
@@ -124,6 +143,10 @@ SoilHeat::load_base (Syntax& syntax, AttributeList&)
                        "Soil temperature.");
   syntax.add ("S", "erg/cm^3/h", Syntax::OptionalState, 
               "External heat source, by default zero.");
+  syntax.add ("conductivity", "erg/cm^3/dg C/h", Syntax::LogOnly, 
+              "Heat conductivity.");
+  syntax.add ("capacity", "erg/cm^3/dg C", Syntax::LogOnly, 
+              "Heat capacity.");
 }
 
 SoilHeat::SoilHeat (const Block& al)
@@ -139,8 +162,11 @@ SoilHeat::initialize_base (const AttributeList& al,
 {
   // Fetch initial T.
   geo.initialize_layer (T_, al, "T", out);
-  while (S.size () < geo.cell_size ())
+  const size_t cell_size = geo.cell_size ();
+  while (S.size () < cell_size)
     S.push_back (0.0);
+  capacity_.insert (capacity_.begin (), cell_size, -42.42e42);
+  conductivity_.insert (conductivity_.begin (), cell_size, -42.42e42);
 }
 
 SoilHeat::~SoilHeat ()

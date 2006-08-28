@@ -1,3 +1,17 @@
+2006-08-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C (load_syntax): Changed dimension of sinks to match
+	'log.dai'. 
+
+	* soil_water.C (K): New log variable.
+	* soil_water.h, soil_water.C (tick_after): New member function.
+	* column_std.C (initialize): Call it.
+	* lib/log.dai ("Soil Water Conductivity (log10)"): Use it.
+
+	* select_utils.h, select_utils.C: New utility.
+	* Makefile (OTHER): Added it.
+	* select_interval.C: Use it.
+
 2006-08-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lib/potato.dai ("Potato; FertOrgaNic"): New base parameterization.

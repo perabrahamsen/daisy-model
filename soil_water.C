@@ -23,6 +23,7 @@
 #include "soil_water.h"
 #include "geometry.h"
 #include "soil.h"
+#include "soil_heat.h"
 #include "groundwater.h"
 #include "timestep.h"
 #include "log.h"
@@ -150,6 +151,15 @@ SoilWater::tick (const size_t cell_size, const Soil& soil, Treelog& msg)
   h_old_ = h_;
 }
 
+void
+SoilWater::tick_after (const size_t cell_size, 
+                       const Soil& soil, const SoilHeat& soil_heat, 
+                       Treelog&)
+{
+  for (size_t i = 0; i < cell_size; i++)
+    K_[i] = soil.K (i, h_[i], h_ice_[i], soil_heat.T(i));
+}
+
 void 
 SoilWater::incorporate (const Geometry& geo, const double amount,
                         const double from, const double to)
@@ -205,6 +215,7 @@ SoilWater::output (Log& log) const
   output_value (h_ice_, "h_ice", log);
   output_value (q_, "q", log);
   output_value (q_p_, "q_p", log);
+  output_value (K_, "K", log);
 }
 
 double
@@ -277,22 +288,22 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
   Geometry::add_layer (syntax, Syntax::OptionalState,
                        "Theta", Syntax::Fraction (),
                        "Soil water content.");
-  syntax.add ("S_sum", "h^-1", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_sum", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Total water sink (due to root uptake and macropores).");
-  syntax.add ("S_root", "h^-1", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_root", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Water sink due to root uptake.");
-  syntax.add ("S_drain", "h^-1", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_drain", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Water sink due to soil drainage.");
-  syntax.add ("S_incorp", "h^-1", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_incorp", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Incorporated water sink, typically from subsoil irrigation.");
-  syntax.add ("tillage", "h^-1", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("tillage", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Changes in water content due to tillage operations.");
-  syntax.add ("S_p", "h^-1", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_p", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Water sink (due to macropores).");
-  syntax.add ("S_permanent", "h^-1", Syntax::State, Syntax::Sequence,
+  syntax.add ("S_permanent", "cm^3/cm^3/h", Syntax::State, Syntax::Sequence,
 	      "Permanent water sink, e.g. subsoil irrigation.");
   alist.add ("S_permanent", std::vector<double> ());
-  syntax.add ("S_ice", "h^-1", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_ice", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Ice sink (due to thawing or freezing).");
   syntax.add_fraction ("X_ice", Syntax::OptionalState, Syntax::Sequence,
 		       "Ice volume fraction in soil.");
@@ -307,6 +318,8 @@ presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
 	      "Matrix water flux (positive numbers mean upward).");
   syntax.add ("q_p", "cm/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Water flux in macro pores (positive numbers mean upward).");
+  syntax.add ("K", "cm/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Hydraulic conductivity.");
 }
 
 void
@@ -427,6 +440,9 @@ SoilWater::initialize (const AttributeList& al, const Geometry& geo,
   // Fluxes.
   q_.insert (q_.begin (), edge_size, 0.0);
   q_p_.insert (q_p_.begin (), edge_size, 0.0);
+
+  // Conductivity.
+  K_.insert (K_.begin (), cell_size, -42.42e42);
 }
 
 SoilWater::SoilWater (Block& al)

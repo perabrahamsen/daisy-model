@@ -380,7 +380,8 @@ SPECIALS = geometry_vert.C select_flux.C gnuplot_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
+OTHER = select_utils.C \
+	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \

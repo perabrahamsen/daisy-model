@@ -14,9 +14,27 @@ release.
 
 * 4.09
 
-** New Folva, Triada, and Agria potato varieties in potato.dai.
+** New Folva, Triada, and Agria potato varieties in 'potato.dai'.
 
-** New examples from Italy in the sample directory.
+** New examples from Italy, Poland and SLovakia in the sample directory.
+
+** You can now log actual hydraulic conductivity.
+
+This is the hydraulic conductivity at the end of the time step.
+
+** You can also log thermic conductivity and capacity.
+
+** New 'expr' keyword in the select models.
+
+This allows arbitrary arithmetic expressions in log files.
+
+** New "Soil Water Conductivity (log10)" log model.
+
+This logs log10 of the actual hydraulic conductivity.
+
+** New "Soil Heat Conductivity" and "Soil Heat Capacity" models
+
+** Bug fixes.
 
 * 4.08
 

@@ -205,6 +205,26 @@ flow to drain pipes, and subsoil irrigation."
                   (handle sum)
                   (dimension "cm^3/cm^3/&"))))
 
+(deflog "Soil Water Conductivity (log10)" table
+  (when daily)
+  (where "soil_water_conductivity.dlf")
+  (entries (array (path column "*" SoilWater K)
+                  (expr (dim (log10 x) [log10 cm/h]))
+                  (spec fixed SoilWater K))))
+
+
+(deflog "Soil Heat Conductivity" table
+  (when daily)
+  (where "soil_heat_conductivity.dlf")
+  (entries (array (path column "*" Movement "*" Heat conductivity)
+                  (spec fixed SoilHeat conductivity))))
+
+(deflog "Soil Heat Capacity" table
+  (when daily)
+  (where "soil_heat_capacity.dlf")
+  (entries (array (path column "*" Movement "*" Heat capacity)
+                  (spec fixed SoilHeat capacity))))
+
 (deflog "Preferential Water Flux" table
   "The preferential water flux between all numeric soil layers."
   (where "pref_water_flux.dlf")

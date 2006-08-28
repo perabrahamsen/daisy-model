@@ -10,14 +10,6 @@ Den aktuelle termiske varmekapacitet for hvert lag.
 
 Check sinkterm for vand.
 
-* FertOrgaNic WWW DSS
-
-** Vent på CT
-
-** Brug IT WP1 jord 
-
-** Tilføj Padova klima/management
-
 * Designforslag til Daisy brugerflade
 
 * Test brug af variable af type list of objects.
@@ -106,6 +98,14 @@ De skal bruges på Daisy hjemmesiden, og er en del af "dissemination"
 ** Ny plone baseret web side!
 
 * Programmering
+
+** Håndter domain errors i expr i select.
+
+** log volumen.  
+
+'from' og 'to' skal erstattes af generelt "volumenen" component, med
+forskellige modeller for hvodan man logger det volumen.  Fluxe går ind
+eller ud af volumen, noder overlapper.
 
 ** reintroduce number_soil.C
 

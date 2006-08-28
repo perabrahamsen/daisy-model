@@ -96,7 +96,7 @@ public:
   { 
     // Check if next level is also in path.
     if (!valid (name))
-	return false;
+      return false;
 
     // Direct acces to new head of path.
     current_name = path[depth];

@@ -639,7 +639,10 @@ ColumnStandard::tick (Treelog& msg,
                      surface.ponding () * 0.1, 
                      soil_heat, time, msg);
   movement->tick (*soil, *soil_water, 
-                  surface, *groundwater, time, my_weather, msg);
+ 
+                 surface, *groundwater, time, my_weather, msg);
+  soil_water->tick_after (geometry.cell_size (), *soil, soil_heat, msg);
+  soil_heat.tick_after (geometry.cell_size (), *soil, *soil_water, msg);
 
   soil_chemicals.tick (geometry, *soil, *soil_water, soil_heat,
                        organic_matter.get (),
@@ -934,6 +937,10 @@ ColumnStandard::initialize (const Time& time, Treelog& msg,
                               geometry, *soil, *soil_water, 
                               T_avg, msg);
   vegetation->initialize (time, geometry, *soil, &*organic_matter, msg);
+  
+  // Soil conductivity and capacity logs.
+  soil_water->tick_after (geometry.cell_size (), *soil, soil_heat, msg);
+  soil_heat.tick_after (geometry.cell_size (), *soil, *soil_water, msg);
 }
 
 ColumnStandard::~ColumnStandard ()
