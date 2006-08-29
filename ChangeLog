@@ -1,5 +1,10 @@
 2006-08-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* geometry.C (edge_cross_z): Include top of the centers, so you
+	won't get excluded if you choose the center of a node.
+
+2006-08-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* Version 4.09 released.
 
 2006-08-28  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -1,14 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Log 
+* www.dss
 
-Logaritmen til den aktuelle hydrauliske ledningsevne for hvert lag.
+** Ingen perc i DK!
 
-Den aktuelle termiske ledningsevne for hvert lag.
-
-Den aktuelle termiske varmekapacitet for hvert lag.
-
-Check sinkterm for vand.
+** intercept_ea fejl.
 
 * Designforslag til Daisy brugerflade
 

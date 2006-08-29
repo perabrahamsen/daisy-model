@@ -63,9 +63,7 @@
 (deflog "Daily Water Flux" "Hourly Water Flux"
   (where "daily_water_flux.dlf")
   (when daily)
-  (entries (year (path time))
-           (month (path time))
-           (mday (path time))
+  (entries Year Month MDay 
            (array (path column "$col" SoilWater q)
                   (factor -10)          ;cm->mm
                   (when hourly)
@@ -74,9 +72,7 @@
 (deflog "Soil Nitrate Concentration" table
   (where "soil_nitrate_conc.dlf")
   (when daily)
-  (entries (year (path time))
-           (month (path time))
-           (mday (path time))
+  (entries Year Month MDay 
            (array (path column "$col" SoilNO3 C)
                   (dimension "mg/l")
                   (factor 1.0e6))))     ;g/cm³ -> mg/l
@@ -84,9 +80,7 @@
 (deflog "Soil Water NO3 Concentration" table
   (where "soil_NO3_conc.dlf")
   (when daily)
-  (entries (year (path time))
-           (month (path time))
-           (mday (path time))
+  (entries Year Month MDay 
            (array (path column "$col" SoilNO3 C)
                   (dimension "mg/l")
                   (factor 4.43e6))))     ;g NO3-N/cm³ -> mg NO3/l

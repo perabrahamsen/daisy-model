@@ -107,7 +107,7 @@ Geometry::edge_cross_z (const size_t e, const double zd) const
   const double z_to = z_safe (edge_to (e));
   const double z_above = std::max (z_from, z_to);
   const double z_below = std::min (z_from, z_to);
-  return zd < z_above && zd > z_below;
+  return z_above >= zd && zd > z_below;
 }
 
 void

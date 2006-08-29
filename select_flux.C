@@ -28,7 +28,7 @@
 
 void
 SelectFlux::output_array (const std::vector<double>& array, 
-                          const Geometry* geo, const Soil* soil, Treelog&)
+                          const Geometry* geo, const Soil* soil, Treelog& msg)
 { 
   if (soil != last_soil)
     last_soil = soil;
@@ -48,7 +48,15 @@ SelectFlux::output_array (const std::vector<double>& array,
             weight.push_back (area);
             total_area += area;
           }
-      daisy_assert (std::isnormal (total_area) || weight.size () == 0);
+      if (weight.size () ==0)
+        {
+          std::ostringstream tmp;
+          tmp << "No edges crossing " << height << " [cm] found";
+          msg.warning (tmp.str ());
+        }
+      else
+        daisy_assert (std::isnormal (total_area));
+
       for (size_t i = 0; i < weight.size (); i++)
         weight[i] /= total_area;
       daisy_assert (edges.size () == weight.size ());
