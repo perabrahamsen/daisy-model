@@ -1,3 +1,7 @@
+2006-08-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.09 released.
+
 2006-08-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* select_flux.C (output_array): Add warning if there are no edges.
