@@ -1,10 +1,19 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* www.dss
+* Volume 
 
-** Ingen perc i DK!
+top bottom
+left right
+near far
 
-** intercept_ea fejl.
+value | infinite
+
+geo -> intersect (cell,volume)
+
+geo -> enter (edge, volume)
+geo -> leave (edge, volume)
+
+direction of edge?  direction of stream?
 
 * Designforslag til Daisy brugerflade
 
