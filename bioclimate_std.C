@@ -109,8 +109,8 @@ struct BioclimateStandard : public Bioclimate
 
   void WaterDistribution (const Time&,
                           Surface& surface, const Weather& weather, 
-			  Vegetation& vegetation, const Geometry& geo,
-                          const Soil& soil,
+			  Vegetation& vegetation, const Movement&,
+                          const Geometry&, const Soil& soil,
 			  SoilWater& soil_water, const SoilHeat&, Treelog&);
 
   // Chemicals.
@@ -141,7 +141,7 @@ struct BioclimateStandard : public Bioclimate
 
   // Simulation
   void tick (const Time&, Surface&, const Weather&, 
-	     Vegetation&, const Geometry& geo,
+	     Vegetation&, const Movement&, const Geometry&,
              const Soil&, SoilWater&, const SoilHeat&, Treelog&);
   void output (Log&) const;
 
@@ -526,6 +526,7 @@ void
 BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 				       const Weather& weather, 
 				       Vegetation& vegetation,
+                                       const Movement& movement,
                                        const Geometry& geo,
 				       const Soil& soil, 
 				       SoilWater& soil_water,
@@ -574,7 +575,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 	 + rain * air_temperature) / snow_water_in;
   else
     snow_water_in_temperature = air_temperature;
-  snow.tick (msg, geo, soil, soil_water, soil_heat, 
+  snow.tick (msg, movement, soil, soil_water, soil_heat, 
 	     weather.hourly_global_radiation (), 0.0,
 	     snow_water_in, weather.snow (),
 	     surface.ponding (),
@@ -785,8 +786,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 void 
 BioclimateStandard::tick (const Time& time, 
                           Surface& surface, const Weather& weather,  
-			  Vegetation& vegetation, const Geometry& geo,
-                          const Soil& soil, 
+			  Vegetation& vegetation, const Movement& movement,
+                          const Geometry& geo, const Soil& soil, 
 			  SoilWater& soil_water, const SoilHeat& soil_heat,
 			  Treelog& msg)
 {
@@ -808,8 +809,8 @@ BioclimateStandard::tick (const Time& time,
   RadiationDistribution (vegetation);
 
   // Distribute water among canopy, snow, and soil.
-  WaterDistribution (time, surface, weather, vegetation,
-		     geo, soil, soil_water, soil_heat, msg);
+  WaterDistribution (time, surface, weather, vegetation, 
+		     movement, geo, soil, soil_water, soil_heat, msg);
 
   // Let the chemicals follow the water.
   ChemicalDistribution (surface, vegetation);

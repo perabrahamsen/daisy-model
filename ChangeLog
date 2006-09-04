@@ -1,3 +1,13 @@
+2006-09-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (standard_conversions): New SoilHeat convertions.
+
+2006-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all:  Moved soil heat back to column.
+
+	* weather.C (T_normal): Include hour.
+
 2006-08-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.09 released.

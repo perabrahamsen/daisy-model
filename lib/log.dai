@@ -173,7 +173,7 @@ This include only nitrogen atoms of the ammonium."
   (when hourly)
   (entries ;; Year Month MDay Hour
            (array (path column "$col" SoilHeat T)
-                  (spec column default SoilHeat T)
+                  (spec fixed SoilHeat T)
                   (dimension "dg C"))))
 
 (deflog "Soil Water Potential" table
@@ -205,10 +205,10 @@ flow to drain pipes, and subsoil irrigation."
                   (handle sum)
                   (dimension "cm^3/cm^3/&"))))
 
-(deflog "Soil Water Conductivity (log10)" table
+(deflog "Soil Hydraulic Conductivity (log10)" table
   (when daily)
-  (where "soil_water_conductivity.dlf")
-  (entries (array (path column "*" SoilWater K)
+  (where "soil_hydraulic_conductivity.dlf")
+  (entries (array (path column "$col" SoilWater K)
                   (expr (dim (log10 x) [log10 cm/h]))
                   (spec fixed SoilWater K))))
 
@@ -216,13 +216,15 @@ flow to drain pipes, and subsoil irrigation."
 (deflog "Soil Heat Conductivity" table
   (when daily)
   (where "soil_heat_conductivity.dlf")
-  (entries (array (path column "*" Movement "*" Heat conductivity)
+  (entries (array (path column "$col" SoilHeat conductivity)
+                  (dimension [W/m/K])
                   (spec fixed SoilHeat conductivity))))
 
 (deflog "Soil Heat Capacity" table
   (when daily)
   (where "soil_heat_capacity.dlf")
-  (entries (array (path column "*" Movement "*" Heat capacity)
+  (entries (array (path column "$col" SoilHeat capacity)
+                  (dimension [kJ/m^3/K])
                   (spec fixed SoilHeat capacity))))
 
 (deflog "Preferential Water Flux" table

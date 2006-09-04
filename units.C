@@ -402,6 +402,8 @@ Units::standard_conversions ()
   add ("g/m^2/h", "Mg DM/ha/h", 1.0e-2); // harvest DM.
   add ("g CO_2-C/cm^2/h", "g CO2/m^2/h", 1.7272e4); // OM CO2
   add ("t/ha", "Mg DM/ha", 1.0); // harvest.dlf
+  add ("erg/cm^3/dg C/h", "W/m/K", 2.7778e-9); // SoilHeat.
+  add ("erg/cm^3/dg C", "kJ/m^3/K", 1e-4); // SoilHeat.
 }
 
 Units::Units ()

@@ -12,6 +12,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.10
+
+** Moved SoilHeat back to 'column' from 'movement'.
+
+** "Soil Water Conductivity (log10)" 
+
+Renamed "Soil Hydraulic Conductivity (log10)".
+
+** The new themic logs new use SI units.
+
 * 4.09
 
 ** New Folva, Triada, and Agria potato varieties in 'potato.dai'.

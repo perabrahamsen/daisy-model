@@ -28,11 +28,10 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
+#include "movement.h"
 #include "submodel.h"
 #include "mathlib.h"
 #include <sstream>
-
-using namespace std;
 
 struct Snow::Implementation
 { 
@@ -66,9 +65,8 @@ struct Snow::Implementation
 				// for snow water mix [W m^5/kg^2/dg C]
 
   void output (Log& log) const;
-  void tick (Treelog&, const Geometry& geo,
-             const Soil& soil, const SoilWater& soil_water,
-	     const SoilHeat& soil_heat,
+  void tick (Treelog&, const Movement&,
+             const Soil&, const SoilWater&, const SoilHeat&,
 	     double Si, double q_h, double Prain,
 	     double Psnow, double Pond, double T, double Epot);
   Implementation (const AttributeList& al);
@@ -108,7 +106,7 @@ Snow::Implementation::output (Log& log) const
 
 void
 Snow::Implementation::tick (Treelog& msg,
-			    const Geometry& geo, 
+                            const Movement& movement,
                             const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    const double Si, const double q_h,
@@ -117,7 +115,7 @@ Snow::Implementation::tick (Treelog& msg,
 			    double T, const double Epot)
 { 
   const double Ssnow_old = Ssnow;
-  Pond = max (Pond, 0.0);
+  Pond = std::max (Pond, 0.0);
   Ssnow += Pond;
   Swater += Pond;
 
@@ -153,7 +151,7 @@ Snow::Implementation::tick (Treelog& msg,
     }
 
   // We evaporate as much as we can.  
-  EvapSnowPack = min (Epot, Ssnow / dt + P);
+  EvapSnowPack = std::min (Epot, Ssnow / dt + P);
 
   daisy_assert (EvapSnowPack >= 0.0);
   daisy_assert (EvapSnowPack <= Epot);
@@ -171,7 +169,9 @@ Snow::Implementation::tick (Treelog& msg,
   daisy_assert (dZp >= 0.0);
 
   // Air temperature melting factor. [kg/J]
-  const double mt = mtprime * ((T < 0.0) ? min (1.0, (dZs + dZp) * mf) : 1);
+  const double mt = mtprime * ((T < 0.0) 
+                               ? std::min (1.0, (dZs + dZp) * mf) 
+                               : 1);
   
   // Radiation melting factor. [kg/J]
   const double mr = mrprime * (1 + m1 * (1 - exp (-m2 * age)));
@@ -186,17 +186,17 @@ Snow::Implementation::tick (Treelog& msg,
   const double M2 = (Ssnow - Swater)/dt + Psnow;
 
   // Actual melting. [mm/h]
-  const double M = min (max (M1, Mprime), M2);
+  const double M = std::min (std::max (M1, Mprime), M2);
 
   // Evaporation from snow pack water. [mm/h]
-  double Eprime = min (Swater / dt + Prain + M, EvapSnowPack);
+  double Eprime = std::min (Swater / dt + Prain + M, EvapSnowPack);
   
   // Water storage capacity of snow [mm]
   const double Scapacity = f_c * Ssnow_old;
   daisy_assert (Scapacity >= 0.0);
 
   // We can now calculate how much water is leaking.
-  q_s = max (0.0, Swater + (Prain - EvapSnowPack + M) * dt - Scapacity) / dt;
+  q_s = std::max (0.0, Swater + (Prain - EvapSnowPack + M) * dt - Scapacity) / dt;
   daisy_assert (q_s >= 0.0);
   
   // New snow pack storage [mm].
@@ -246,7 +246,7 @@ Snow::Implementation::tick (Treelog& msg,
 	  // Density of collapsing snow pack [kg/m³]
 	  daisy_assert (Scapacity > 0.0);
 	  const double rho_c
-	    = max (Ssnow_old / (f * dZs), 
+	    = std::max (Ssnow_old / (f * dZs), 
 		   rho_s + rho_1 * Swater_new / Scapacity + rho_2 * Ssnow_old);
 #if 0
 	  cerr << "rho_c == " << rho_c << " Ssnow _old== " << Ssnow_old
@@ -275,8 +275,8 @@ Snow::Implementation::tick (Treelog& msg,
   else
     dZs = 0.0;
 
-  dZs = min (dZs, Ssnow_new / rho_s);
-  dZs = max (dZs, Ssnow_new / rho_i);
+  dZs = std::min (dZs, Ssnow_new / rho_s);
+  dZs = std::max (dZs, Ssnow_new / rho_i);
 
   // Update snow storage.
   Ssnow = Ssnow_new;
@@ -298,9 +298,10 @@ Snow::Implementation::tick (Treelog& msg,
       const double K_snow = K_snow_factor * rho * rho; // [W/m^2]
       
       const double T_surface 
-        = soil_heat.T_surface_snow (geo, soil, soil_water, T, K_snow, dZs);
+        = movement.surface_snow_T (soil, soil_water, soil_heat, 
+                                   T, K_snow, dZs);
 
-      T = min (T_surface, 0.0);
+      T = std::min (T_surface, 0.0);
       daisy_assert (T > -100.0 && T < 50.0);
     } 
   temperature = T;
@@ -309,14 +310,14 @@ Snow::Implementation::tick (Treelog& msg,
 }
   
 void 
-Snow::tick (Treelog& msg, const Geometry& geo,
+Snow::tick (Treelog& msg, const Movement& movement,
             const Soil& soil, const SoilWater& soil_water,
 	    const SoilHeat& soil_heat,
 	    double Si, double q_h, double Prain,
 	    double Psnow, double Pond, double T, double Epot)
 {
   if (impl.Ssnow > 0.0 || Psnow > 0.0)
-    impl.tick (msg, geo, soil, soil_water, soil_heat, Si, q_h,
+    impl.tick (msg, movement, soil, soil_water, soil_heat, Si, q_h,
 	       Prain, Psnow, Pond, T, Epot);
   else
     {

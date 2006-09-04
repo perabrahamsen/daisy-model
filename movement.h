@@ -30,6 +30,8 @@
 #include "transport.h"
 #include "mactrans.h"
 
+#include <vector>
+
 class Geometry;
 class Soil;
 class SoilWater;
@@ -51,12 +53,11 @@ public:
   static const char *const description;
 
   virtual Geometry& geometry () const = 0;
-  virtual SoilHeat& soil_heat () const = 0;
 
   // Simulation.
 public:
   virtual void macro_tick (const Soil&, SoilWater&, Surface&, Treelog&) = 0;
-  virtual void tick (const Soil&, SoilWater&, Surface&, Groundwater&,
+  virtual void tick (const Soil&, SoilWater&, SoilHeat&, Surface&, Groundwater&,
                      const Time&, const Weather&, Treelog&) = 0;
   virtual void solute (const Soil&, const SoilWater&, 
                        const double J_in, Solute&, Treelog&) = 0;
@@ -68,12 +69,18 @@ public:
 
   virtual void output (Log&) const = 0;
 
+  // Heat.
+  virtual double surface_snow_T (const Soil&, const SoilWater&, const SoilHeat&,
+                                 double T_snow, double K_snow,
+                                 double dZs) const = 0;
+  virtual std::vector<double> default_heat (const Soil&, 
+                                            const Time&, const Weather&) = 0;
+
   // Create and Destroy.
 public:
   virtual bool check (Treelog& err) const = 0;
   virtual void initialize (const AttributeList&,
-                           const Soil&, const Groundwater&,
-                           const Time&, const Weather&, Treelog&) = 0;
+                           const Soil&, const Groundwater&, Treelog&) = 0;
   static const AttributeList& default_model ();
   static void load_vertical (Syntax& syntax, AttributeList& alist);
   static Movement* build_vertical (Block& al);

@@ -24,6 +24,8 @@
 
 #include <vector>
 
+class Time;
+class Weather;
 class AttributeList;
 class Block;
 class Log;
@@ -33,26 +35,38 @@ class Soil;
 class SoilWater;
 class Treelog;
 
+static const double latent_heat_of_fussion = 3.35e9; // [erg/g]
+static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
+
 class SoilHeat
 {
-  // Simulation.
-protected:
+  friend class Movement1D;
+  friend class MovementRect;
+
+  // Parameters
+private:
+  const double h_frozen;
+  const bool enable_ice;
+
+  // State
+private:
+  std::vector<double> T_old;
+  double T_top;
+  std::vector<double> T_freezing;
+  std::vector<double> T_thawing;
+  std::vector<double> freezing_rate;
+  enum state_t { liquid, freezing, frozen, thawing };
+  std::vector<state_t> state;
+  std::vector<double> q;
   std::vector<double> T_;
   std::vector<double> S;
-private:
   std::vector<double> capacity_;
   std::vector<double> conductivity_;
 public:
   double T (size_t i) const // [dg C]
   { return T_[i]; }
-  virtual double top_flux (const Geometry& geo,
-                           const Soil&, const SoilWater&) const = 0;
-  virtual double T_surface_snow (const Geometry& geo,
-                                 const Soil& soil,
-                                 const SoilWater& soil_water,
-                                 double T_snow,
-                                 double K_snow,
-                                 double dZs) const = 0;
+  double top_flux (const Geometry& geo,
+                   const Soil&, const SoilWater&) const;
   double energy (const Geometry& geo, const Soil& soil,
                  const SoilWater& soil_water,
                  const double from, const double to) const;
@@ -67,16 +81,36 @@ public:
   void tick_after (const size_t cell_size, 
                    const Soil&, const SoilWater&, Treelog&);
 
+  // Solve.
+private:
+  double capacity (const Soil&, const SoilWater&, size_t i) const;
+  double capacity_apparent (const Soil&, const SoilWater&, size_t i) const;
+  void update_freezing_points (const Soil& soil,
+                               const SoilWater& soil_water);
+  bool update_state (const Geometry& geo,
+                     const Soil& soil, const SoilWater& soil_water, 
+                     std::vector<double>& T);
+  double calculate_freezing_rate (const Geometry& geo,
+                                  const Soil& soil,
+                                  const SoilWater& soil_water,
+                                  unsigned int i, 
+                                  const std::vector<double>& T);
+  bool check_state (const Soil& soil, 
+                    const std::vector<double>& T) const;
+  void force_state (std::vector<double>& T);
+
   // Create and destroy.
 public:
-  void output_base (Log&) const;
+  void output (Log&) const;
   bool check (size_t n, Treelog&) const;
-  static void load_base (Syntax&, AttributeList&);
+  static void load_syntax (Syntax&, AttributeList&);
   SoilHeat (const Block&);
-  void initialize_base (const AttributeList& al, 
-                        const Geometry& geo,
-                        Treelog&);
-  virtual ~SoilHeat ();
+  void initialize (const AttributeList& al, const Geometry& geo, 
+                   const std::vector<double>& default_T, Treelog&);
+  ~SoilHeat ();
+private:                        // Disable.
+  SoilHeat ();
+  SoilHeat (const SoilHeat&);
 };
 
 #endif // SOIL_HEAT_H

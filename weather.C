@@ -203,7 +203,8 @@ Weather::T_normal (const Time& time, double delay) const
   return T_average
     + T_amplitude
     * exp (delay)
-    * cos (rad_per_day * (time.yday () - max_Ta_yday) + delay);
+    * cos (rad_per_day * (time.yday () + (time.hour () - 15) / 24.0
+                          - max_Ta_yday) + delay);
 }
 
 double 

@@ -30,7 +30,8 @@ class Surface;
 class Weather;
 class AttributeList;
 class Vegetation;
-class Geometry; 
+class Movement; 
+class Geometry;
 class Soil;
 class Syntax;
 class SoilWater;
@@ -50,7 +51,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Time&, Surface&, const Weather&, Vegetation&, 
-                     const Geometry& geo,
+                     const Movement&, const Geometry&,
 		     const Soil&, SoilWater&, const SoilHeat&, Treelog&) = 0;
   virtual void output (Log&) const = 0;
   virtual double get_intercepted_water () const = 0; // [mm]
