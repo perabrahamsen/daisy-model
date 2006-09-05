@@ -26,7 +26,7 @@
 #include "soil_chemicals.h"
 #include "movement.h"
 #include "groundwater.h"
-#include "geometry1d.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "vegetation.h"
@@ -962,12 +962,6 @@ static struct ColumnStandardSyntax
   static Column& make (Block& al)
   { return *new ColumnStandard (al); }
 
-  static void load_soil_and_geometry (Syntax& syntax, AttributeList& alist)
-  {
-    Geometry1D::load_syntax (syntax, alist);
-    Soil::load_syntax (syntax, alist);
-  }
-
   static void load_water_and_macro (Syntax& syntax, AttributeList& alist)
   {
     SoilWater::load_syntax (syntax, alist);
@@ -990,7 +984,7 @@ Hansen et.al. 1990. with generic movement in soil.");
 
     syntax.add_submodule ("Soil", alist, Syntax::State,
                           "The numeric and physical soil properties.",
-                          load_soil_and_geometry);
+                          Soil::load_syntax);
     syntax.add_submodule ("SoilWater", alist, Syntax::State,
                           "Soil water content and transportation.",
                           load_water_and_macro);

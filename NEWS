@@ -14,6 +14,11 @@ release.
 
 * 4.10
 
+** zplus can no longer be specified in 'Soil'.
+
+It is now (only) a parameter of the 'Geometry' submodel in the
+'vertical' movement model.
+
 ** Moved SoilHeat back to 'column' from 'movement'.
 
 ** "Soil Water Conductivity (log10)" 
