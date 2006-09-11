@@ -353,7 +353,9 @@ Block::Implementation::expand_reference (const std::string& key)
       throw ("Reference loop");
     }
   if (lookup (var) == syntax.lookup (key)
-      && find_syntax (var).size (var) == syntax.size (key))
+      && (find_syntax (var).size (var) == syntax.size (key)
+          || (syntax.size (key) == Syntax::Sequence
+              && find_syntax (var).size (var) != Syntax::Singleton)))
     return var;
 
   error ("Value of '" + key + "' is $" + var

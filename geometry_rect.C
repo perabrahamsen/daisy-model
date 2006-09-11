@@ -75,7 +75,7 @@ GeometryRect::check_border (const double border, Treelog& err) const
     {
       std::ostringstream tmp;
       tmp << "No geometric border near " << border 
-             << " [cm], log results may be inexact";
+             << " [cm], log results will be inexact";
       err.warning (tmp.str ());
     }
 

@@ -519,10 +519,6 @@ by whitespace.
     "Data for the farm of B.And, Andeby, as collected by F.Guf, 2002."
     (Groundwater static)
     (Soil (horizons (-20 [cm] top_soil) (-250 [cm] bottom_soil))
-          (zplus -2.5 -5 -10 -15 -20
-                 -25 -30 -40 -50 -60 -70
-                 -80 -90 -100 -125 -150 -175
-                 -200 -225 -250 [cm])
           (MaxRootingDepth 60.0 [cm])
           (dispersivity 8.0 [cm]))
     (OrganicMatter (initial_SOM (-20  [cm] 4.86 [kg C/m^2])
@@ -547,7 +543,7 @@ optional values.
 \item You need to specify a groundwater model.  In this case we have
   specified static (unchanging) groundwater conditions with free
   drainage.
-\item You need to specify the numeric and physical properties of the
+\item You need to specify the physical properties of the
   soil.  
   \begin{itemize}
   \item Here we claim that the soil is divided in two horizons, the
@@ -563,8 +559,6 @@ optional values.
     each submodel having two ordered attributes.  The first attribute
     specifies the endpoint of that horizon (a number), while the second
     attribute specifies the horizon parameterization to use.
-  \item The `zplus' soil attribute contains a sequence of numbers,
-    each specifying the endpoint of one of the numeric layers.
   \item The two remaining attributes are physical properties that
     relate to the soil as a whole, rather than the individual
     horizons.

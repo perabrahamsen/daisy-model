@@ -285,6 +285,7 @@ Units::multiply (const string& one, const string& two)
   } table[] = { 
     { "h^-1", "cm", "cm/h" },
     { "cm^3/cm^3", "cm", "cm" },
+    { "cm^3/cm^3/h", "cm", "cm/h" },
     { "g/cm^3", "cm", "g/cm^2" },
     { "g C/cm^3", "cm", "g C/cm^2" },
     { "g N/cm^3", "cm", "g N/cm^2" },

@@ -772,10 +772,12 @@ ColumnStandard::check_am (const AttributeList& am, Treelog& err) const
 bool 
 ColumnStandard::check_border (const double border, Treelog& err) const
 { 
+  Treelog::Open nest (err, "column: " + name);
+
   bool ok = true;
-  if (!geometry.check_border (border, err))
-    ok = false; 
   if (!soil->check_border (border, err))
+    ok = false; 
+  if (!geometry.check_border (border, err))
     ok = false; 
   return ok;
 }

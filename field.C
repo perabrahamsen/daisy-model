@@ -645,17 +645,12 @@ Field::Implementation::check_am (const AttributeList& am, Treelog& err) const
 bool
 Field::Implementation::check_border (const double border, Treelog& err) const
 { 
-  Treelog::Open nest (err, "column");
-
   bool ok = true;
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    {
-      Treelog::Open nest (err, (*i)->name);
-      if (!(*i)->check_border (border, err))
-	ok = false;
-    }
+    if (!(*i)->check_border (border, err))
+      ok = false;
   return ok;
 }
 
