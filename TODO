@@ -51,84 +51,31 @@ direction of edge?  direction of stream?
 
 == Method ==
 
-The FertOrgaNic project generated a large amount of data, enough to
-setup Daisy for each site, and make useful predictions for that site.
-However, we wanted to generalize this knowledge to a form that was
-generally useful for potato simulation across Europe.
+The FertOrgaNic project generated a large amount of data, enough to setup Daisy for each site, and make useful predictions for that site.  However, we wanted to generalize this knowledge to a form that was generally useful for potato simulation across Europe.
 
-We had six field sites, six different treatments, and three
-experimental years.  The variables in the system can be divided into
-climate, soil, management and potato variety.  
+We had six field sites, six different treatments, and three experimental years.  The variables in the system can be divided into climate, soil, management and potato variety.
 
-- Due to the geographic distribution of the sites, there was a general
-  variation in the climate between the sites, and of course also
-  variation between the years, for example with the 2003 summer being
-  exceptionally hot in most of Europe.
+- Due to the geographic distribution of the sites, there was a general variation in the climate between the sites, and of course also variation between the years, for example with the 2003 summer being exceptionally hot in most of Europe.
 
-- The soil types varied from sand to silt loam.  Some sites were able
-  to use field with similar soil all three years, for other sites
-  there were significant variations in the soil between the years.
+- The soil types varied from sand to silt loam.  Some sites were able to use field with similar soil all three years, for other sites there were significant variations in the soil between the years.
 
-- The treatments were combinations of with and without irrigation,
-  organic fertilizer and fertigation.  However tillage operations, the
-  type of organic fertilizer, and planting and harvest dates were
-  determined by local expertise, and are thus site specific.  The
-  amount of irrigation and fertigation was determined by a decision
-  support system (DSS) that was continuously being developed in the
-  project, and thus changed every year.  Of course, the result of the
-  DSS depended on soil, climate, and the organic fertilizer, which
-  also were variable.
+- The treatments were combinations of with and without irrigation, organic fertilizer and fertigation.  However tillage operations, the type of organic fertilizer, and planting and harvest dates were determined by local expertise, and are thus site specific.  The amount of irrigation and fertigation was determined by a decision support system (DSS) that was continuously being developed in the project, and thus changed every year.  Of course, the result of the DSS depended on soil, climate, and the organic fertilizer, which also were variable.
 
-- Some sites kept the same potato variety for all three years, others
-  experimented with different varieties.  Some varieties were used at
-  multiple sites, others only at one site.
+- Some sites kept the same potato variety for all three years, others experimented with different varieties.  Some varieties were used at multiple sites, others only at one site.
 
-The main purpose of the FertOrgaNic project was the development of the
-electronic DSS as well as practical guidelines for using a combination
-of organic fertilizer and subsoil fertigation.  However, as an
-additional product of the experiments, we also wanted to use the data
-for potato modeling in a European context.   
+The main purpose of the FertOrgaNic project was the development of the electronic DSS as well as practical guidelines for using a combination of organic fertilizer and subsoil fertigation.  However, as an additional product of the experiments, we also wanted to use the data for potato modeling in a European context.
 
-We saw the challenge as a social one, how to combine the central model
-specific knowledge (mostly located at the Danish Agricultural and
-Veterinary University "ER DER HVAD VI HEDDER?" (KVL)), with the
-the distributed site specific knowledge.  This lead to a four stage
-model (illustrated on figure XXX).
+We saw the challenge as a social one, how to combine the central model specific knowledge (mostly located at the Danish Agricultural and Veterinary University "ER DER HVAD VI HEDDER?" (KVL)), with the the distributed site specific knowledge.  This lead to a four stage model (illustrated on figure XXX).
 
-1. The first stage was to create a common basis for the project.
-   Luckily, we had access to some very good experimental results from
-   "HVAD STÅR SCRI FOR?" (SCRI), from which a base potato
-   parametrization was made by the KVL experts.  KVL also hosted a
-   Daisy workshop for all the local site experts, to give them a basic
-   understanding of how to work with and calibrate the model.
+1. The first stage was to create a common basis for the project.  Luckily, we had access to some very good experimental results from "HVAD STÅR SCRI FOR?" (SCRI), from which a base potato parametrization was made by the KVL experts.  KVL also hosted a Daisy workshop for all the local site experts, to give them a basic understanding of how to work with and calibrate the model.
 
-2. The local experts made a complete system calibration for the sites,
-   including site specific recalibrations of the potato
-   parameterization.  Those sites that used the same variety for all
-   three years, used the first two years for calibration, and the
-   third for validation.  
+2. The local experts made a complete system calibration for the sites, including site specific recalibrations of the potato parameterization.  Those sites that used the same variety for all three years, used the first two years for calibration, and the third for validation.
 
-3. Under the assumption that all the potato varieties share some
-   traits, the model experts at KVL created a common parameterization
-   by merging the various site parameterizations.  The merge was
-   performed by looking at the site specific values for each
-   parameter, and use the one we found most representative for the set
-   as a whole.
+3. Under the assumption that all the potato varieties share some traits, the model experts at KVL created a common parameterization by merging the various site parameterizations.  The merge was performed by looking at the site specific values for each parameter, and use the one we found most representative for the set as a whole.
 
-4. Using this common parameterization as a new base, we derived new
-   parameterization for the three varieties that had the best data
-   sets.  Even though only one of the three varieties was used in
-   multiple sites, it is our belief that all three are now less site
-   specific because they are based on the common potato
-   parameterization developed in step 3, and thus indirectly
-   incorporating data from all sites.
+4. Using this common parameterization as a new base, we derived new parameterization for the three varieties that had the best data sets.  Even though only one of the three varieties was used in multiple sites, it is our belief that all three are now less site specific because they are based on the common potato parameterization developed in step 3, and thus indirectly incorporating data from all sites.
 
-Unlike the site specific parameterizations, the new variety specific
-parameterizations have not yet been validated, as we have no new data
-to validate them on.  We do however believe that the process itself is
-a significant accomplishment, and something like this is necessary for
-model based tools to be successfully applied in a trans-European
-context.
+Unlike the site specific parameterizations, the new variety specific parameterizations have not yet been validated, as we have no new data to validate them on.  We do however believe that the process itself is a significant accomplishment, and something like this is necessary for model based tools to be successfully applied in a trans-European context.
 
 * lær cto wp6 
 
