@@ -36,6 +36,7 @@ public:
   // Utilities.
 public:
   static std::string quote (const std::string& value);
+  static std::string quote (symbol);
 
   // Simulation.
 public:

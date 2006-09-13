@@ -47,10 +47,10 @@ struct NumberSource : public Number
     daisy_assert (state == has_value);
     return val;
   }
-  const std::string& dimension (const Scope&) const 
+  symbol dimension (const Scope&) const 
   {     
     daisy_assert (state != uninitialized);
-    return source->dimension ();
+    return symbol (source->dimension ());
   }
 
   // Create.

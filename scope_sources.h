@@ -40,9 +40,9 @@ public:
 
   // Interface.
 public:
-  bool has_number (const std::string& tag) const;
-  double number (const std::string& tag) const;
-  const std::string& dimension (const std::string& tag) const;
+  bool has_number (symbol tag) const;
+  double number (symbol tag) const;
+  symbol dimension (symbol tag) const;
 
   // Propagate.
   bool load (Treelog& msg);

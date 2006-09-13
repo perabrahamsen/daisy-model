@@ -31,6 +31,10 @@ std::string
 Gnuplot::quote (const std::string& value)
 { return "'" + value + "'"; }
 
+std::string 
+Gnuplot::quote (const symbol value)
+{ return quote (value.name ()); }
+
 Gnuplot::Gnuplot (Block& al)
   : name (al.identifier ("type"))
 { }

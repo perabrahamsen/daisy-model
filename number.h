@@ -22,6 +22,7 @@
 #ifndef NUMBER_H
 #define NUMBER_H
 
+#include "symbol.h"
 #include "librarian.h"
 #include <vector>
 
@@ -37,11 +38,11 @@ public:
 
   // Simulation.
 protected:
-  static bool known (const std::string&);
+  static bool known (const symbol);
 public:
   virtual bool missing (const Scope& scope) const = 0;
   virtual double value (const Scope&) const = 0; 
-  virtual const std::string& dimension (const Scope&) const = 0;
+  virtual symbol dimension (const Scope&) const = 0;
 
 
   // Create and Destroy.

@@ -34,9 +34,9 @@ private:
   
   // Interface.
 public:
-  bool has_number (const std::string& tag) const;
-  double number (const std::string& tag) const;
-  const std::string& dimension (const std::string& tag) const;
+  bool has_number (symbol tag) const;
+  double number (symbol tag) const;
+  symbol dimension (symbol tag) const;
 
   // Create and Destroy.
 private:
@@ -51,8 +51,10 @@ public:
 };
 
 bool 
-ScopeBlock::has_number (const std::string& tag) const
+ScopeBlock::has_number (const symbol tag_symbol) const
 {
+  const std::string& tag = tag_symbol.name ();
+
   Syntax::type type = block.lookup (tag);
   if (type == Syntax::Error)
     return false;
@@ -90,8 +92,10 @@ ScopeBlock::has_number (const std::string& tag) const
 }
 
 double 
-ScopeBlock::number (const std::string& tag) const
+ScopeBlock::number (const symbol tag_symbol) const
 { 
+  const std::string& tag = tag_symbol.name ();
+
   Syntax::type type = block.lookup (tag);
   daisy_assert (type != Syntax::Error);
   const Syntax& syntax = block.find_syntax (tag);
@@ -116,15 +120,17 @@ ScopeBlock::number (const std::string& tag) const
   return number->value (*this);
 }
 
-const std::string&
-ScopeBlock::dimension (const std::string& tag) const
+symbol
+ScopeBlock::dimension (symbol tag_symbol) const
 { 
+  const std::string& tag = tag_symbol.name ();
+
   Syntax::type type = block.lookup (tag);
   if (type == Syntax::Error)
-    return Syntax::Unknown ();
+    return Syntax::unknown ();
   const Syntax& syntax = block.find_syntax (tag);
   if (syntax.size (tag) != Syntax::Singleton)
-    return Syntax::Unknown ();
+    return Syntax::unknown ();
   const AttributeList& alist = block.find_alist (tag);
 
   //Handle primitive numbers.
@@ -132,26 +138,26 @@ ScopeBlock::dimension (const std::string& tag) const
     {
       const std::string& dim = syntax.dimension (tag); 
       if (dim != Syntax::User ())
-        return dim;
+        return symbol (dim);
       if (!alist.check (tag))
-        return Syntax::Unknown ();
-      return alist.name (tag);
+        return Syntax::unknown ();
+      return alist.identifier (tag);
     }
 
   // Handle number objects.
   if (type != Syntax::Object)
-    return Syntax::Unknown ();
+    return Syntax::unknown ();
   if (&syntax.library (tag) != &Librarian<Number>::library ())
-    return Syntax::Unknown ();
+    return Syntax::unknown ();
   if (!syntax.check (alist, block.msg ()))
-    return Syntax::Unknown ();
+    return Syntax::unknown ();
     
   std::auto_ptr<Number> number (Librarian<Number>::build_alist
                                 (block, alist.alist (tag), tag));
   if (!number.get ())
-    return Syntax::Unknown ();
+    return Syntax::unknown ();
   if (!number->initialize (block.msg ()))
-    return Syntax::Unknown ();
+    return Syntax::unknown ();
   
   return number->dimension (*this);
 }
@@ -307,11 +313,11 @@ Block::Implementation::expand_string (Block& block,
                                 || number->missing (scope))
                               throw "Bad number: '"+ type + "'";
                             result << number->value (scope);
-                            const std::string dim = number->dimension (scope);
-                            if (dim == Syntax::Fraction () 
-                                || dim == Syntax::None ())
+                            const symbol dim = number->dimension (scope);
+                            if (dim == Syntax::fraction ()
+                                || dim == Syntax::none ())
                               result << " []";
-                            else if (dim != Syntax::Unknown ())
+                            else if (dim != Syntax::unknown ())
                               result << " [" << dim << "]";
                           }
                         else

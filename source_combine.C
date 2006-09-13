@@ -30,7 +30,7 @@ struct SourceCombine : public Source
   ScopeSources scope;
   const std::auto_ptr<Number> expr;
   const std::string title_;
-  std::string dimension_;
+  symbol dimension_;
   std::string with_;
   const int style_;
   std::vector<Time> times;
@@ -50,7 +50,7 @@ public:
   { daisy_assert (false); }
   const std::string& title () const
   { return title_; }
-  const std::string& dimension () const 
+  symbol dimension () const 
   { return dimension_; }
 
   // Read. 

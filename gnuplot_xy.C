@@ -87,9 +87,9 @@ set xdata\n\
 set style data lines\n";
 
   // Dimensions.
-  std::vector<std::string> x_dims;
+  std::vector<symbol> x_dims;
   std::vector<int> x_axis;
-  std::vector<std::string> y_dims;
+  std::vector<symbol> y_dims;
   std::vector<int> y_axis;
   for (size_t i = 0; i < source.size (); i++)
     {
@@ -100,7 +100,7 @@ set style data lines\n";
           continue;
         }
 
-      const std::string x_dim = source[i]->x_dimension ();
+      const symbol x_dim = source[i]->x_dimension ();
       
       for (size_t j = 0; j < x_dims.size (); j++)
         if (x_dim == x_dims[j])
@@ -112,7 +112,7 @@ set style data lines\n";
       x_dims.push_back (x_dim);
 
     cont2: 
-      const std::string y_dim = source[i]->y_dimension ();
+      const symbol y_dim = source[i]->y_dimension ();
       
       for (size_t j = 0; j < y_dims.size (); j++)
         if (y_dim == y_dims[j])

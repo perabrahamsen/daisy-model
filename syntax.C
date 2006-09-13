@@ -309,34 +309,6 @@ Syntax::Implementation::entries (vector<string>& result) const
     }
 }
 
-const string&
-Syntax::Unknown ()
-{
-  static const string unknown = "<unknown>";
-  return unknown;
-}
-
-const string&
-Syntax::None ()
-{
-  static const string none = "<none>";
-  return none;
-}
-
-const string&
-Syntax::Fraction ()
-{
-  static const string fraction = "<fraction>";
-  return fraction;
-}
-
-const string&
-Syntax::User ()
-{
-  static const string fraction = "<user>";
-  return fraction;
-}
-
 // Each syntax entry should have an associated type.
 
 static const std::string type_names[] = 
@@ -355,6 +327,50 @@ Syntax::type_number (const std::string& name)
       return static_cast<type> (i);
   return Error;
 }
+
+symbol
+Syntax::unknown ()
+{
+  static const symbol unknown ("<unknown>");
+  return unknown; 
+}
+
+symbol
+Syntax::none ()
+{
+  static const symbol none ("<none>");
+  return none;
+}
+
+symbol
+Syntax::fraction ()
+{
+  static const symbol fraction ("<fraction>");
+  return fraction; 
+}
+
+symbol
+Syntax::user ()
+{
+  static const symbol user ("<user>");
+  return user; 
+}
+
+const std::string& 
+Syntax::Unknown ()
+{ return unknown ().name (); }
+
+const std::string& 
+Syntax::None ()
+{ return none ().name (); }
+
+const std::string& 
+Syntax::Fraction ()
+{ return fraction ().name (); }
+
+const std::string& 
+Syntax::User ()
+{ return user ().name (); }
 
 static const std::string category_names[] = 
 { "Const", "State", "OptionalState", "OptionalConst", "LogOnly"};

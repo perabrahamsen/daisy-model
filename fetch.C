@@ -242,7 +242,7 @@ Fetch::initialize (const vector<Fetch*>& fetch,
 	    else
 	      {	
 		select[j]->add_dest (fetch[i]);
-		fetch[i]->select_dimension = select[j]->dimension ();
+		fetch[i]->select_dimension = select[j]->dimension ().name ();
 		fetch[i]->type = ((select[j]->handle != Handle::current)
                                   && !select[j]->accumulate)
 		  ? Fetch::Flux 

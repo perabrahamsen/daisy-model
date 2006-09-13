@@ -33,8 +33,8 @@ class XYSourceInline : public XYSource
   std::vector<double> ys;
   PLF plf;
   const std::string title_;
-  std::string x_dimension_;
-  std::string y_dimension_;
+  symbol x_dimension_;
+  symbol y_dimension_;
 
   // Interface.
 public:
@@ -48,9 +48,9 @@ public:
   { return with_; }
   int style () const 
   { return style_; }
-  const std::string& x_dimension () const 
+  symbol x_dimension () const 
   { return x_dimension_; }
-  const std::string& y_dimension () const 
+  symbol y_dimension () const 
   { return y_dimension_; }
 
   // Read.

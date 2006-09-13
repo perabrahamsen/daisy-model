@@ -18,6 +18,17 @@ piller (bt, hovedpine, strepsil), skraber, tandbørste
 
 ** Sutsko
 
+* Daisy variables in expressions
+
+Hardcode?
+
+(test (with (DM (crop_DM "Potato"))
+            (DS (crop_DS "Potato")))
+      (expr (and (> DM 1.5 [Mg/ha])
+                 (> DS 1.9 []))))
+
+Use external log!
+
 * Designforslag til Daisy brugerflade
 
 * R2D2

@@ -33,8 +33,8 @@ struct XYSourceMerge : public XYSource
   // Source.
   const std::vector<XYSource*> source;
   const std::string title_;
-  std::string x_dimension_;
-  std::string y_dimension_;
+  symbol x_dimension_;
+  symbol y_dimension_;
   std::string with_;
   const int style_;
   std::vector<double> xs;
@@ -52,9 +52,9 @@ public:
   { return ys; }
   const std::string& title () const
   { return title_; }
-  const std::string& x_dimension () const 
+  symbol x_dimension () const 
   { return x_dimension_; }
-  const std::string& y_dimension () const 
+  symbol y_dimension () const 
   { return y_dimension_; }
 
   // Read. 

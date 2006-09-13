@@ -23,11 +23,10 @@
 #ifndef LOG_EXTERN_H
 #define LOG_EXTERN_H
 
+#include "scope.h"
 #include <vector>
 
-struct AttributeList;
-
-class LogExternSource
+class LogExternSource : public Scope
 {
   // Interface.
 public:

@@ -32,8 +32,8 @@ Number::title () const
 { return name.name (); }
 
 bool 
-Number::known (const std::string& dim)
-{ return dim != Syntax::Unknown (); }
+Number::known (symbol dim)
+{ return dim != Syntax::unknown (); }
 
 Number::Number (Block& al)
   : name (al.identifier ("type"))

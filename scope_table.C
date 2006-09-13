@@ -23,9 +23,12 @@
 #include "assertion.h"
 
 bool 
-ScopeTable::has_number (const std::string& tag) const
+ScopeTable::has_number (const symbol tag_symbol) const
 {
+  const std::string& tag = tag_symbol.name ();
+
   const int tag_c = lex.find_tag (tag);
+  
   if (tag_c < 0)
     return false;
   if (values.size () == 0)
@@ -36,20 +39,24 @@ ScopeTable::has_number (const std::string& tag) const
 }
 
 double
-ScopeTable::number (const std::string& tag) const
+ScopeTable::number (const symbol tag_symbol) const
 {
+  const std::string& tag = tag_symbol.name ();
+
   const int tag_c = lex.find_tag (tag);
   daisy_assert (tag_c >= 0);
   daisy_assert (values.size () > tag_c);
   return lex.convert_to_double (values[tag_c]);
 }    
 
-const std::string& 
-ScopeTable::dimension (const std::string& tag) const
+symbol 
+ScopeTable::dimension (const symbol tag_symbol) const
 {
+  const std::string& tag = tag_symbol.name ();
+
   const int tag_c = lex.find_tag (tag);
   daisy_assert (tag_c >= 0);
-  return lex.dimension (tag_c);
+  return symbol (lex.dimension (tag_c));
 }
 
 void 

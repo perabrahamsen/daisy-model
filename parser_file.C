@@ -347,7 +347,7 @@ ParserFile::Implementation::get_number (const string& syntax_dim)
       return -42.42e42;
     }
   double value = number->value (Scope::null ());
-  const string read_dim = number->dimension (Scope::null ());
+  const string read_dim = number->dimension (Scope::null ()).name ();
   if (check_dimension (syntax_dim, read_dim))
     value = convert (value, syntax_dim, read_dim, lexer->position ());
   return value;

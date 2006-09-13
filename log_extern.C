@@ -20,14 +20,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "log_select.h"
 #include "log_extern.h"
+#include "log_select.h"
 #include "select.h"
 #include <map>
 
-using namespace std;
-
-typedef map<symbol, const LogExternSource*> log_extern_map_type; 
+typedef std::map<symbol, const LogExternSource*> log_extern_map_type; 
 log_extern_map_type* log_extern_map = NULL;
 int log_extern_count = 0;
 

@@ -23,20 +23,18 @@
 #include "scope.h"
 #include "units.h"
 
-using namespace std;
-
 struct NumberConst : public Number
 {
   // Parameters.
   const double val;
-  const string dim;
+  const symbol dim;
 
   // Simulation.
   bool missing (const Scope&) const
   { return false; }
   double value (const Scope&) const
   { return val; }
-  const string& dimension (const Scope&) const
+  symbol dimension (const Scope&) const
   { return dim; }
 
   // Create.
@@ -47,7 +45,7 @@ struct NumberConst : public Number
   NumberConst (Block& al)
     : Number (al),
       val (al.number ("value")),
-      dim (al.name ("value"))
+      dim (al.identifier ("value"))
   { }
 };
 
@@ -72,10 +70,10 @@ static struct NumberConstSyntax
 struct NumberLeaf : public Number
 {
   // Parameters.
-  const string dim;
+  const symbol dim;
 
   // Simulation.
-  const string& dimension (const Scope&) const
+  symbol dimension (const Scope&) const
   { return dim; }
 
   // Create.
@@ -88,9 +86,9 @@ struct NumberLeaf : public Number
 struct NumberGet : public NumberLeaf
 {
   // Parameters.
-  const string name;
+  const symbol name;
   const std::string& title () const
-  { return name; }
+  { return name.name (); }
 
   // Simulation.
   bool missing (const Scope& scope) const
@@ -99,7 +97,7 @@ struct NumberGet : public NumberLeaf
   { 
     daisy_assert (scope.has_number (name));
     const double value = scope.number ( name);
-    const string got_dim = scope.dimension ( name);
+    const symbol got_dim = scope.dimension ( name);
     return Units::convert (got_dim, dim, value);
   }
 
@@ -148,14 +146,15 @@ static struct NumberGetSyntax
 struct NumberFetch : public Number
 {
   // Parameters.
-  const string name;
+  const symbol name;
   const double *const default_value;
-  const std::string default_dimension;
+  const symbol default_dimension;
   const std::string& title () const
-  { return name; }
+  { return name.name (); }
 
-  static double* fetch_default_value (Block& al, const string& key)
+  static double* fetch_default_value (Block& al, const symbol key_symbol)
   {
+    const std::string& key = key_symbol.name ();
     if (al.lookup (key) != Syntax::Number)
       return NULL;
     const AttributeList& alist = al.find_alist (key);
@@ -170,18 +169,19 @@ struct NumberFetch : public Number
       }
     return new double (alist.number (key));
   }
-  static std::string fetch_default_dimension (Block& al, const string& key)
+  static symbol fetch_default_dimension (Block& al, const symbol key_symbol)
   {
+    const std::string& key = key_symbol.name ();
     if (al.lookup (key) != Syntax::Number)
-      return Syntax::Unknown ();
+      return Syntax::unknown ();
     const Syntax& syntax = al.find_syntax (key);
     daisy_assert (syntax.lookup (key) == Syntax::Number);
-    const std::string dim = syntax.dimension (key);
-    if (dim == Syntax::User ())
+    const symbol dim (syntax.dimension (key));
+    if (dim == Syntax::user ())
       {
 	const AttributeList& alist = al.find_alist (key);
 	if (alist.check (key))
-	  return alist.name (key);
+	  return alist.identifier (key);
       }
     return dim;
   }
@@ -195,7 +195,7 @@ struct NumberFetch : public Number
     daisy_assert (default_value);
     return *default_value;
   }
-  const std::string& dimension (const Scope& scope) const
+  symbol dimension (const Scope& scope) const
   { 
     if (scope.has_number (name))
       return scope.dimension (name); 
@@ -248,8 +248,8 @@ static struct NumberFetchSyntax
 struct NumberIdentity : public Number
 {
   // Parameters.
-  const auto_ptr<Number> child;
-  const string dim;
+  const std::auto_ptr<Number> child;
+  const symbol dim;
 
   // Simulation.
   bool missing (const Scope& scope) const 
@@ -264,7 +264,7 @@ struct NumberIdentity : public Number
       return Units::convert (child->dimension (scope), dim, v);
     return v;
   }
-  const string& dimension (const Scope& scope) const
+  symbol dimension (const Scope& scope) const
   {
     if (known (dim))
       return dim; 
@@ -319,8 +319,8 @@ static struct NumberIdentitySyntax
 struct NumberConvert : public Number
 {
   // Parameters.
-  const auto_ptr<Number> child;
-  const string dim;
+  const std::auto_ptr<Number> child;
+  const symbol dim;
 
   // Simulation.
   bool missing (const Scope& scope) const 
@@ -332,7 +332,7 @@ struct NumberConvert : public Number
     const double v = child->value (scope); 
     return Units::convert (child->dimension (scope), dim, v);
   }
-  const string& dimension (const Scope&) const
+  symbol dimension (const Scope&) const
   { return dim; }
 
   // Create.
@@ -383,8 +383,8 @@ static struct NumberConvertSyntax
 struct NumberDim : public Number
 {
   // Parameters.
-  const auto_ptr<Number> child;
-  const string dim;
+  const std::auto_ptr<Number> child;
+  const symbol dim;
   const bool warn_known;
 
   // Simulation.
@@ -392,7 +392,7 @@ struct NumberDim : public Number
   { return child->missing (scope); }
   double value (const Scope& scope) const
   { return child->value (scope); }
-  const string& dimension (const Scope&) const
+  symbol dimension (const Scope&) const
   { return dim; }
 
   // Create.

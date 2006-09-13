@@ -76,7 +76,7 @@ struct Select::Implementation
     // Use.
     const Syntax& leaf_syntax (Syntax&) const;
     const std::string& leaf_name () const;
-    std::string dimension () const;
+    symbol dimension () const;
     std::string description () const;
     void refer (Format&) const;
 
@@ -97,14 +97,17 @@ struct Select::Implementation
   {
     // Content.
     double value;
-    std::string dim;
+    symbol dim;
 
     // Interface.
-    bool has_number (const std::string& name) const
-    { return name == "x"; }
-    double number (const std::string&) const
+    bool has_number (symbol name) const
+    {
+      static const symbol x_symbol ("x");
+      return name == x_symbol; 
+    }
+    double number (symbol) const
     { return value; }
-    const std::string& dimension (const std::string&) const
+    symbol dimension (symbol) const
     { return dim;}
 
     // Create.
@@ -121,11 +124,11 @@ struct Select::Implementation
   const bool negate;            // - || -
   double convert (double) const; // - || -
   const symbol tag;		// Name of this entry.
-  std::string dimension;		// Physical dimension of this entry.
+  symbol dimension;		// Physical dimension of this entry.
   const std::string description;
 
   // Create and Destroy.
-  bool check (const std::string& spec_tdim, Treelog& err) const;
+  bool check (symbol spec_dim, Treelog& err) const;
   static std::string find_description (const AttributeList&);
   static Number* get_expr (Block& al);
   Implementation (Block&);
@@ -162,15 +165,15 @@ Select::Implementation::Spec::leaf_name () const
   return submodels_and_attribute.back ().name (); 
 }
 
-std::string /* can't return reference because buffer is automatic */
+symbol
 Select::Implementation::Spec::dimension () const
 {
   Syntax buffer;
   const Syntax& syntax = leaf_syntax (buffer);
   if (syntax.lookup (leaf_name ()) == Syntax::Number)
-    return syntax.dimension (leaf_name ());
+    return symbol (syntax.dimension (leaf_name ()));
   else
-    return Syntax::Unknown ();
+    return Syntax::unknown ();
 }
 
 std::string /* can't return reference because buffer is automatic */
@@ -359,10 +362,10 @@ Select::Implementation::convert (double value) const
 
 // Create and Destroy.
 bool 
-Select::Implementation::check (const std::string& spec_dim, Treelog& err) const
+Select::Implementation::check (const symbol spec_dim, Treelog& err) const
 {
   bool ok = true;
-  if (spec.get () && !spec_conv && spec->dimension () != Syntax::Unknown ())
+  if (spec.get () && !spec_conv && spec->dimension () != Syntax::unknown ())
     err.warning ("Don't know how to convert [" + spec_dim
                  + "] to [" + dimension + "]");
   return ok;
@@ -391,7 +394,7 @@ Select::Implementation::get_expr (Block& al)
     { return false; }
     double value (const Scope& scope) const
     { return static_cast<const ScopeX&> (scope).value * factor; }
-    const std::string& dimension (const Scope& scope) const
+    symbol dimension (const Scope& scope) const
     { return static_cast<const ScopeX&> (scope).dim; }
     bool initialize (Treelog&)
     { return true; }
@@ -411,7 +414,7 @@ Select::Implementation::get_expr (Block& al)
     { return false; }
     double value (const Scope& scope) const
     { return static_cast<const ScopeX&> (scope).value * factor + offset; }
-    const std::string& dimension (const Scope& scope) const
+    symbol dimension (const Scope& scope) const
     { return static_cast<const ScopeX&> (scope).dim; }
     bool initialize (Treelog&)
     { return true; }
@@ -439,7 +442,7 @@ Select::Implementation::get_expr (Block& al)
     { return false; }
     double value (const Scope& scope) const
     { return static_cast<const ScopeX&> (scope).value; }
-    const std::string& dimension (const Scope& scope) const
+    symbol dimension (const Scope& scope) const
     { return static_cast<const ScopeX&> (scope).dim; }
     bool initialize (Treelog&)
     { return true; }
@@ -472,7 +475,7 @@ double
 Select::convert (double value) const
 { return impl->convert (value); }
 
-const std::string& 
+symbol
 Select::dimension () const
 { return impl->dimension; }
 
@@ -567,7 +570,7 @@ Select::document (Format& format) const
   Format::Item item (format, tag ().name ());  
   format.special ("nbsp");
   format.text ("[");
-  format.bold (dimension ());
+  format.bold (dimension ().name ());
   format.text ("]");
   if (impl->description != "")
     {
@@ -704,12 +707,12 @@ Number of times the path has matched a variable since the last log entry.");
   alist.add ("count", 0);
 }
 
-const std::string
-Select::default_dimension (const std::string& spec_dim) const
+symbol
+Select::default_dimension (const symbol spec_dim) const
 { return spec_dim; }
 
 const Units::Convert*
-Select::special_convert (const std::string&, const std::string&)
+Select::special_convert (const symbol, const symbol)
 { return NULL; }
 
 void 
@@ -720,11 +723,11 @@ bool
 Select::initialize (const std::map<symbol, symbol>& conv, double, double, 
 		    const std::string& timestep, Treelog& msg)
 { 
-  std::string spec_dim;
+  symbol spec_dim;
   if (impl->spec.get ())
     spec_dim = default_dimension (impl->spec->dimension ());
   else
-    spec_dim = Syntax::Unknown ();
+    spec_dim = Syntax::unknown ();
 
   // Let the expression modify the dimension.
   impl->scope.dim = spec_dim;
@@ -751,7 +754,7 @@ Select::initialize (const std::map<symbol, symbol>& conv, double, double,
 	path[i] = Select::wildcard;
     }
 
-  if (impl->dimension == Syntax::Unknown ())
+  if (impl->dimension == Syntax::unknown ())
     impl->dimension = spec_dim;
 
   // Attempt to find convertion with original dimension.
@@ -764,27 +767,28 @@ Select::initialize (const std::map<symbol, symbol>& conv, double, double,
   // Replace '&' with timestep.
   std::string new_dim;
   std::string hour_dim;
-  for (unsigned int i = 0; i < impl->dimension.length (); i++)
-    if (impl->dimension[i] == '&')
+  const std::string impl_dim = impl->dimension.name ();
+  for (unsigned int i = 0; i < impl_dim.length (); i++)
+    if (impl_dim[i] == '&')
       {
 	new_dim += timestep;
 	hour_dim += "h";
       }
     else
       {
-	new_dim += impl->dimension[i];
-	hour_dim += impl->dimension[i];
+	new_dim += impl_dim[i];
+	hour_dim += impl_dim[i];
       }
 
   // Attempt to find convertion with new dimension.
   if (impl->spec.get () && !impl->spec_conv)
     {
-      if (Units::can_convert (spec_dim, hour_dim))
-	impl->spec_conv = &Units::get_convertion (spec_dim, hour_dim);
+      if (Units::can_convert (spec_dim, symbol (hour_dim)))
+	impl->spec_conv = &Units::get_convertion (spec_dim, symbol (hour_dim));
     }
 
   // Use new dimension.
-  impl->dimension = new_dim;
+  impl->dimension = symbol (new_dim);
 
   return true;
 }
@@ -792,7 +796,7 @@ Select::initialize (const std::map<symbol, symbol>& conv, double, double,
 bool 
 Select::check (Treelog& err) const
 {
-  std::string spec_dim;
+  symbol spec_dim;
   if (impl->expr.get ())
     spec_dim = impl->expr->dimension (impl->scope);
   else 

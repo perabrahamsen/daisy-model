@@ -189,6 +189,9 @@ Units::Content::~Content ()
 Units::Content* Units::content = NULL;
 int Units::count = 0;
 
+const symbol Units::cm ("cm");
+const symbol Units::cm_per_h ("cm/h");
+
 bool
 Units::Convert::valid (double) const
 { return true; }
@@ -303,6 +306,34 @@ Units::multiply (const string& one, const string& two)
   return Syntax::Unknown ();
 }
 
+void 
+Units::add (symbol from, symbol to, double factor, double offset)
+{ add (from.name (), to.name (), factor, offset); }
+
+void 
+Units::add (symbol from, symbol to, Convert& conv)
+{ add (from.name (), to.name (), conv); }
+
+double 
+Units::convert (symbol from, symbol to, double value)
+{ return convert (from.name (), to.name (), value); }
+
+bool 
+Units::can_convert (symbol from, symbol to)
+{ return can_convert (from.name (), to.name ()); }
+
+bool 
+Units::can_convert (symbol from, symbol to, double value)
+{ return can_convert (from.name (), to.name (), value); }
+
+const Units::Convert& 
+Units::get_convertion (const symbol from, const symbol to)
+{ return get_convertion (from.name (), to.name ()); }
+
+symbol
+Units::multiply (const symbol a, const symbol b)
+{ return symbol (multiply (a.name (), b.name ())); }
+
 // GCC 2.95 requires these to be defined outside a function.
 static class Convert_pF_cm_ : public Units::Convert
 {
@@ -366,6 +397,7 @@ Units::standard_conversions ()
   add (Syntax::Fraction (), "ppm", 1000000.0);
   add (Syntax::Fraction (), "%", 100.0);
   add (Syntax::Fraction (), "", 1.0);
+
   add ("", "ppm", 1000000.0);
   add ("", "%", 100.0);
   add ("none", "", 1.0);

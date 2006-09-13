@@ -32,7 +32,7 @@ struct SourceMerge : public Source
   // Content.
   const std::vector<Source*> source;
   const std::string title_;
-  std::string dimension_;
+  symbol dimension_;
   std::string with_;
   const int style_;
   void add_entry (const Time& time, const std::vector<double>& vals);
@@ -54,7 +54,7 @@ public:
   { return ebars; }
   const std::string& title () const
   { return title_; }
-  const std::string& dimension () const 
+  symbol dimension () const 
   { return dimension_; }
 
   // Read. 
@@ -109,7 +109,7 @@ SourceMerge::load (Treelog& msg)
         }
       
       // Set or check dimension.
-      if (dimension_ == Syntax::Unknown ())
+      if (dimension_ == Syntax::unknown ())
         dimension_ = source[i]->dimension ();
       else if (!Units::can_convert (source[i]->dimension (), dimension_))
         {

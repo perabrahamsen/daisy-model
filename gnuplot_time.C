@@ -94,7 +94,7 @@ set style data lines\n";
   // Removed: set format x "%m-%y"
 
   // Dimensions.
-  std::vector<std::string> dims;
+  std::vector<symbol> dims;
   std::vector<int> axis;
   for (size_t i = 0; i < source.size (); i++)
     {
@@ -104,7 +104,7 @@ set style data lines\n";
           continue;
         }
 
-      const std::string dim = source[i]->dimension ();
+      const symbol dim = source[i]->dimension ();
       
       for (size_t j = 0; j < dims.size (); j++)
         if (dim == dims[j])

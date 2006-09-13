@@ -76,7 +76,7 @@ protected:
   int count;			// Number of accumulated values.
 public:
   static const char *const description;
-  virtual const std::string& dimension () const;
+  virtual symbol dimension () const;
   virtual symbol tag () const;
   virtual const Geometry* geometry () const; // For array tags.
   virtual int size () const;	// For array tags.
@@ -137,10 +137,10 @@ public:
   void document (Format&) const;
   static void load_syntax (Syntax&, AttributeList&);
 protected:
-  virtual const std::string 
-  /**/ default_dimension (const std::string& spec_dim) const;
+  virtual symbol
+  /**/ default_dimension (symbol spec_dim) const;
   virtual const Units::Convert* 
-  /**/ special_convert (const std::string& has, const std::string& want);
+  /**/ special_convert (symbol has, symbol want);
 public:
   virtual bool initialize (const std::map<symbol, symbol>& conv, 
 			   double from, double to,

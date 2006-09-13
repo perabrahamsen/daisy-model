@@ -204,7 +204,7 @@ Number of decimals after point.  By default, use a floating format.");
 struct StringerDimension : public StringerNumber
 {
   std::string value (const Scope& scope) const
-  { return number->dimension (scope); }
+  { return number->dimension (scope).name (); }
 
   StringerDimension (Block& al)
     : StringerNumber (al)

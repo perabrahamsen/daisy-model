@@ -27,18 +27,16 @@
 #include <sstream>
 #include <memory>
 
-using namespace std;
-
 struct NumberOperand : public Number
 {
   // Parameters.
-  const auto_ptr<Number> operand;
+  const std::auto_ptr<Number> operand;
 
   // Simulation.
   bool missing (const Scope& scope) const 
   { return operand->missing (scope); }
-  const string& dimension (const Scope&) const
-  { return Syntax::Unknown (); }
+  symbol dimension (const Scope&) const
+  { return Syntax::unknown (); }
 
   // Create.
   bool initialize (Treelog& err)
@@ -195,8 +193,8 @@ static struct NumberSqrSyntax
 struct NumberPow : public Number
 {
   // Parameters.
-  const auto_ptr<Number> base;
-  const auto_ptr<Number> exponent;
+  const std::auto_ptr<Number> base;
+  const std::auto_ptr<Number> exponent;
 
   // Simulation.
   bool missing (const Scope& scope) const 
@@ -208,8 +206,8 @@ struct NumberPow : public Number
     daisy_assert (x >= 0.0);
     return pow (x, y); 
   }
-  const string& dimension (const Scope&) const 
-  { return Syntax::Unknown (); }
+  symbol dimension (const Scope&) const 
+  { return Syntax::unknown (); }
 
   // Create.
   bool initialize (Treelog& err)
@@ -262,23 +260,24 @@ static struct NumberPowSyntax
 struct NumberOperands : public Number
 {
   // Parameters.
-  const vector<Number*> operands;
+  const std::vector<Number*> operands;
 
   // Utilities.
-  const string& unique_dimension (const Scope& scope) const 
+  symbol unique_dimension (const Scope& scope) const 
   { 
-    const string* found = NULL;
+    static const symbol unspecified ("<unspecified>");
+    symbol found = unspecified;
     for (size_t i = 0; i < operands.size (); i++)
       if (known (operands[i]->dimension (scope)))
-        if (found)
+        if (found != unspecified)
           {
-            if (operands[i]->dimension (scope) != *found)
-              return Syntax::Unknown ();
+            if (operands[i]->dimension (scope) != found)
+              return Syntax::unknown ();
           }
         else
-          found = &operands[i]->dimension (scope);
+          found = operands[i]->dimension (scope);
     
-    return found ? *found : Syntax::Unknown ();
+    return found != unspecified ? found : Syntax::unknown ();
   }
 
   // Use.
@@ -311,11 +310,11 @@ struct NumberOperands : public Number
     void check (const Syntax&, const AttributeList& al,
                 const std::string&) const throw (std::string)
     {
-      typedef vector<const Number*> op_x;
+      typedef std::vector<const Number*> op_x;
 
       const struct Operands : public  op_x
       {
-        Operands (Block& Blockconst vector<AttributeList*>& as)
+        Operands (Block& Block, const std::vector<AttributeList*>& as)
           : op_x (Librarian<Number>:build_vector_const (as))
         { }
         ~Operands ()
@@ -383,7 +382,7 @@ struct NumberMax : public NumberOperands
       }
     return max;
   }
-  const string& dimension (const Scope& scope) const 
+  symbol dimension (const Scope& scope) const 
   { return unique_dimension (scope); }
 
   // Create.
@@ -431,7 +430,7 @@ struct NumberMin : public NumberOperands
       }
     return min;
   }
-  const string& dimension (const Scope& scope) const 
+  symbol dimension (const Scope& scope) const 
   { return unique_dimension (scope); }
 
   // Create.
@@ -476,8 +475,8 @@ struct NumberProduct : public NumberOperands
       product *= operands[i]->value (scope);
     return product;
   }
-  const string& dimension (const Scope&) const 
-  { return Syntax::Unknown (); }
+  symbol dimension (const Scope&) const 
+  { return Syntax::unknown (); }
 
   // Create.
   NumberProduct (Block& al)
@@ -514,7 +513,7 @@ struct NumberSum : public NumberOperands
       sum += operands[i]->value (scope);
     return sum;
   }
-  const string& dimension (const Scope& scope) const 
+  symbol dimension (const Scope& scope) const 
   { return unique_dimension (scope); }
 
   // Create.
@@ -558,7 +557,7 @@ struct NumberSubtract : public NumberOperands
       val -= operands[i]->value (scope);
     return val;
   }
-  const string& dimension (const Scope& scope) const 
+  symbol dimension (const Scope& scope) const 
   { return unique_dimension (scope); }
 
   // Create.
@@ -604,8 +603,8 @@ struct NumberDivide : public NumberOperands
       val /= operands[i]->value (scope);
     return val;
   }
-  const string& dimension (const Scope&) const 
-  { return Syntax::Unknown (); }
+  symbol dimension (const Scope&) const 
+  { return Syntax::unknown (); }
 
   // Create.
   NumberDivide (Block& al)

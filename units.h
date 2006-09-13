@@ -22,6 +22,7 @@
 #ifndef UNITS_H
 #define UNITS_H
 
+#include "symbol.h"
 #include <string>
 
 static class Units
@@ -31,6 +32,11 @@ private:
   struct Content;
   static Content* content;
   static int count;
+
+  // Symbols.
+public:
+  static const symbol cm;
+  static const symbol cm_per_h;
 
   // Conversion.
 public:
@@ -58,6 +64,16 @@ public:
   static const Convert& get_convertion (const std::string& from,
                                         const std::string& to);
   static std::string multiply (const std::string&, const std::string&);
+
+public:
+  // Variants using symbol instead of std::string.
+  static void add (symbol from, symbol to, double factor, double offset = 0.0);
+  static void add (symbol from, symbol to, Convert&);
+  static double convert (symbol from, symbol to, double value);
+  static bool can_convert (symbol from, symbol to);
+  static bool can_convert (symbol from, symbol to, double value);
+  static const Convert& get_convertion (symbol from, symbol to);
+  static symbol multiply (symbol, symbol);
 
   // Create and destroy.
 private:

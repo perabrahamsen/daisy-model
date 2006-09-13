@@ -71,18 +71,17 @@ struct SelectInterval : public SelectValue
 	}
     }
     // Create and destroy.
-    BD_convert (const std::string& has, const std::string& want)
-      : in (Units::get_convertion (has, "g/cm^2")),
-	out (Units::get_convertion (Syntax::Fraction (), want)),
+    BD_convert (const symbol has, const symbol want)
+      : in (Units::get_convertion (has, symbol ("g/cm^2"))),
+	out (Units::get_convertion (Syntax::fraction (), want)),
 	bulk (-42.42e42)
     { }
   } *bd_convert;
-  const Units::Convert* special_convert (const std::string& has,
-                                         const std::string& want)
+  const Units::Convert* special_convert (const symbol has, const symbol want)
   {
     daisy_assert (!bd_convert);
-    if (Units::can_convert (has, "g/cm^2")
-	&& Units::can_convert (Syntax::Fraction (), want))
+    if (Units::can_convert (has, symbol ("g/cm^2"))
+	&& Units::can_convert (Syntax::fraction (), want))
       bd_convert = new BD_convert (has, want);
     return bd_convert;
   }
@@ -169,12 +168,12 @@ struct SelectInterval : public SelectValue
   }
 
   // Create and Destroy.
-  const std::string default_dimension (const std::string& spec_dim) const
+  symbol default_dimension (const symbol spec_dim) const
   { 
     if (density)
       return spec_dim;
     
-    return Units::multiply (spec_dim, "cm");
+    return Units::multiply (spec_dim, Units::cm);
   }
 
   bool initialize (const std::map<symbol, symbol>& conv, 

@@ -24,6 +24,7 @@
 #define SYNTAX_H
 
 #include "treelog.h"
+#include "symbol.h"
 #include <vector>
 #include <string>
 
@@ -48,9 +49,13 @@ public:
   static const int Unspecified;
 
   // A syntax may have a dimension associated.
+  static symbol unknown ();
   static const std::string& Unknown ();
+  static symbol none ();
   static const std::string& None ();
+  static symbol fraction ();
   static const std::string& Fraction ();
+  static symbol user ();
   static const std::string& User ();
 
   // Each syntax entry should have an associated type.

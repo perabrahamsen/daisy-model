@@ -173,7 +173,7 @@ LogTable::common_done (const Time& time)
 	    out << field_separator;
 
 	  const int size = entries[i]->size ();
-	  string dimension = entries[i]->dimension ();
+	  std::string dimension = entries[i]->dimension ().name ();
 	  if (dimension == Syntax::None () 
 	      || dimension == Syntax::Unknown ()
 	      || dimension == Syntax::Fraction ())

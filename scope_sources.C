@@ -27,8 +27,10 @@
 #include <sstream>
 
 bool 
-ScopeSources::has_number (const std::string& tag) const
+ScopeSources::has_number (const symbol tag_symbol) const
 {
+  const std::string& tag = tag_symbol.name ();
+
   for (size_t i = 0; i < source.size (); i++)
     if (source[i]->title () == tag 
         && (index[i] < 0
@@ -40,8 +42,10 @@ ScopeSources::has_number (const std::string& tag) const
 }
 
 double 
-ScopeSources::number (const std::string& tag) const
+ScopeSources::number (const symbol tag_symbol) const
 {
+  const std::string& tag = tag_symbol.name ();
+
   for (size_t i = 0; i < source.size (); i++)
     if (source[i]->title () == tag)
       {
@@ -52,12 +56,14 @@ ScopeSources::number (const std::string& tag) const
   daisy_assert (false);
 }
 
-const std::string& 
-ScopeSources::dimension (const std::string& tag) const
+symbol 
+ScopeSources::dimension (const symbol tag_symbol) const
 {
+  const std::string& tag = tag_symbol.name ();
+
   for (size_t i = 0; i < source.size (); i++)
     if (source[i]->title () == tag)
-      return source[i]->dimension ();
+      return symbol (source[i]->dimension ());
   daisy_assert (false);
 }
 

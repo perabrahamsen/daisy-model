@@ -27,13 +27,13 @@ struct SourceExpr : public SourceFile
   // Content.
   const std::auto_ptr<Number> expr;
   const std::string title_;
-  std::string dimension_;
+  symbol dimension_;
 
   // Interface.
 public:
   const std::string& title () const
   { return title_; }
-  const std::string& dimension () const 
+  symbol dimension () const 
   { return dimension_; }
 
   // Read. 

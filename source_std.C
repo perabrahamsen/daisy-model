@@ -28,14 +28,14 @@ struct SourceStandard : public SourceFile
   // Content.
   const std::string tag;
   const std::string title_;
-  std::string dimension_;
+  symbol dimension_;
   const bool has_factor;
   const double factor;
 
   // Interface.
   const std::string& title () const
   { return title_; }
-  const std::string& dimension () const 
+  symbol dimension () const 
   { return dimension_; }
 
   // Read.
@@ -64,8 +64,8 @@ SourceStandard::load (Treelog& msg)
     }
 
   // Read dimensions.
-  const std::string original = lex.dimension (tag_c);
-  if (original != Syntax::Unknown () && dimension_ == Syntax::Unknown ())
+  const symbol original (lex.dimension (tag_c));
+  if (original != Syntax::unknown () && dimension_ == Syntax::unknown ())
     dimension_ = original;
   else if (!has_factor && !Units::can_convert (original, dimension_))
     {

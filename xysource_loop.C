@@ -36,25 +36,25 @@ class XYSourceLoop : public XYSource
   const std::auto_ptr<Number> x_expr;
   const std::auto_ptr<Number> y_expr;
   const std::string title_;
-  std::string x_dimension_;
-  std::string y_dimension_;
+  symbol x_dimension_;
+  symbol y_dimension_;
 
   const double begin;
   const double end;
   const double step;
   class ScopeT : public Scope
   {
-    const std::string tag;
-    const std::string dim;
+    const symbol tag;
+    const symbol dim;
   public:
     double value;
 
   private:
-    bool has_number (const std::string& t) const
+    bool has_number (symbol t) const
     { return tag == t; }
-    double number (const std::string&) const
+    double number (symbol) const
     { return value; }
-    const std::string& dimension (const std::string&) const
+    symbol dimension (symbol) const
     { return dim; }
 
   public:
@@ -76,9 +76,9 @@ public:
   { return with_; }
   int style () const 
   { return style_; }
-  const std::string& x_dimension () const 
+  symbol x_dimension () const 
   { return x_dimension_; }
-  const std::string& y_dimension () const 
+  symbol y_dimension () const 
   { return y_dimension_; }
 
   // Read.

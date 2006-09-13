@@ -22,15 +22,15 @@
 #ifndef SCOPE_H
 #define SCOPE_H
 
-#include <string>
+#include "symbol.h"
 
 class Scope
 {
   // Use.
 public:
-  virtual bool has_number (const std::string&) const = 0;
-  virtual double number (const std::string&) const = 0;
-  virtual const std::string& dimension (const std::string&) const = 0;
+  virtual bool has_number (symbol) const = 0;
+  virtual double number (symbol) const = 0;
+  virtual symbol dimension (symbol) const = 0;
   
   // Create and Destroy.
 public:
