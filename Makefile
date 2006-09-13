@@ -302,7 +302,7 @@ MODELS = movement_rect.C number_soil.C organic_none.C \
 	xysource_merge.C xysource_inline.C xysource_loop.C \
 	xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
 	gnuplot_time.C source_combine.C number_arit.C source_expr.C \
-	source_std.C action_markvand.C photo_GL.C program_gnuplot.C \
+	source_std.C action_markvand.C photo_Farquhar.C photo_GL.C program_gnuplot.C \
 	program_document.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
 	domsorp_std.C chemistry_std.C equil_linear.C pedo_const.C \
