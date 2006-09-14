@@ -24,7 +24,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "photo.h"
-#include "Bioclimate.h"
+#include "bioclimate.h"
 #include "canopy_std.h"
 #include "phenology.h"
 #include "plf.h"
@@ -241,7 +241,7 @@ PhotoFarquhar::C3Model (double Q /* */, double gbw /* */, double gsw /* */,
   const double maxiter = 150.0;
   double aiter, lastci, newci;
   
-  if (ci = 0) lastci = CO2_atm;//Pa
+  if (ci == 0) lastci = CO2_atm;//Pa
   else lastci = ci;
   newci = 0;
   aiter = 0;
