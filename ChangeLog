@@ -1,3 +1,17 @@
+2006-09-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* boolean_string.C: Split from 'boolean.C'.
+	* Makefile (MODELS): Added it.
+
+	* number_extern.C: New model.
+	* Makefile (MODELS): Added.
+	* scope_multi.C: New utility.
+	* Makefile (OTHER): Added.
+
+2006-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Made a lot of dimensions symbols instead of std::strings.
+
 2006-09-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* units.C (standard_conversions): New SoilHeat convertions.

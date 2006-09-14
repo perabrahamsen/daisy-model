@@ -936,6 +936,7 @@ daisy_chemical_reflection_factor (const Chemical* chemical)
 //
 // Extract information from the 'extern' log model.
 
+#if 0
 extern "C" LogExternSource::type EXPORT
 daisy_log_lookup (const char* log, const char* tag)
 { return LogExternSource::find (symbol (log)).lookup (symbol (tag)); }
@@ -957,7 +958,7 @@ daisy_log_get_array (const char* log, const char* tag, double value[])
   
   copy (array.begin (), array.end (), value);
 }
-
+#endif
 // @ Miscellaneous.
 //
 // Other functions which doesn't fit nicely into the above categories.

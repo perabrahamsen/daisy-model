@@ -2,6 +2,7 @@
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -22,63 +23,36 @@
 
 #include "log_extern.h"
 #include "log_select.h"
-#include "select.h"
+#include "scope.h"
+#include "block.h"
 #include <map>
-
-typedef std::map<symbol, const LogExternSource*> log_extern_map_type; 
-log_extern_map_type* log_extern_map = NULL;
-int log_extern_count = 0;
-
-const LogExternSource& 
-LogExternSource::find (const symbol name)
-{ 
-  daisy_assert (log_extern_map);
-  daisy_assert (log_extern_count > 0);
-  return *((*log_extern_map)[name]);
-}
-
-LogExternSource::LogExternSource (Block& al)
-{ 
-  const symbol name = al.check ("where") 
-    ? al.identifier ("where") 
-    : al.identifier ("type");
-
-  if (!log_extern_map)
-    {
-      daisy_assert (log_extern_count == 0);
-      log_extern_map = new log_extern_map_type;
-    }
-  (*log_extern_map)[name] = this;
-  log_extern_count++;
-}
-
-LogExternSource::~LogExternSource ()
-{ 
-  daisy_assert (log_extern_count > 0);
-  log_extern_count--;
-  if (log_extern_count == 0)
-    {
-      delete log_extern_map;
-      log_extern_map = NULL;
-    }
-}
-
+#include <vector>
 
 struct LogExtern : public LogSelect,
 		   public Destination, 
-		   public LogExternSource
+		   public Scope
 {
+  // Global register.
+  typedef std::map<symbol, const Scope*> log_extern_map_type; 
+  static log_extern_map_type* log_extern_map;
+  static int log_extern_count;
+
   // Destination Content.
-  typedef map<symbol, type> type_map;
-  typedef map<symbol, double> number_map;
-  typedef map<symbol, symbol> name_map;
-  typedef map<symbol, const vector<double>*> array_map;
+  typedef enum { Error, Missing, Number, Name, Array } type;
+  typedef std::map<symbol, type> type_map;
+  typedef std::map<symbol, double> number_map;
+  typedef std::map<symbol, symbol> name_map;
+  typedef std::map<symbol, int> int_map;
+  typedef std::map<symbol, const std::vector<double>*> array_map;
   type_map types;
   number_map numbers;
   name_map names;
   array_map arrays;
+  int_map sizes;
+  name_map dimensions;
   
   // Log.
+  bool fetch_dimensions;
   symbol tag;
   void done (const Time&);
 
@@ -89,21 +63,29 @@ struct LogExtern : public LogSelect,
   // Select::Destination
   void error ();
   void missing ();
-  void add (const vector<double>& value);
+  void add (const std::vector<double>& value);
   void add (const double value);
   void add (const symbol value);
 
-  // LogExternSource
+  // Scope
+  bool has_number (symbol) const;
+  double number (symbol) const;
+  symbol dimension (symbol) const;
+
+  // Scope to be?
   type lookup (symbol tag) const;
-  double number (symbol tag) const;
   symbol name (symbol tag) const;
-  const vector<double>& array (symbol tag) const;
+  const std::vector<double>& array (symbol tag) const;
+  int size (symbol tag) const;
 
   // Create and destroy.
   void initialize (Treelog&);
   LogExtern (Block&);
   ~LogExtern ();
 };
+
+LogExtern::log_extern_map_type* LogExtern::log_extern_map = NULL;
+int LogExtern::log_extern_count = 0;
 
 void 
 LogExtern::done (const Time& time)
@@ -112,6 +94,18 @@ LogExtern::done (const Time& time)
 
   if (!is_printing)
     return;
+
+  if (fetch_dimensions)
+    {
+      fetch_dimensions = false;
+
+      for (unsigned int i = 0; i < entries.size (); i++)
+	{
+          tag = entries[i]->tag ();
+          sizes[tag] = entries[i]->size ();
+	  dimensions[tag] = entries[i]->dimension ();
+        }
+    }
 
   for (unsigned int i = 0; i < entries.size (); i++)
     {
@@ -133,7 +127,7 @@ LogExtern::missing ()
 }
 
 void 
-LogExtern::add (const vector<double>& value)
+LogExtern::add (const std::vector<double>& value)
 { 
   types[tag] = Array;
   arrays[tag] = &value;
@@ -153,40 +147,58 @@ LogExtern::add (symbol value)
   names[tag] = value;
 }
 
-LogExternSource::type 
+bool 
+LogExtern::has_number (symbol tag) const
+{ return lookup (tag) == Number; }
+
+double 
+LogExtern::number (symbol tag) const
+{
+  daisy_assert (has_number (tag));
+  const number_map::const_iterator i = numbers.find (tag);
+  daisy_assert (i != numbers.end ());
+  return (*i).second;
+}
+
+int
+LogExtern::size (symbol tag) const
+{
+  const int_map::const_iterator i = sizes.find (tag);
+  daisy_assert (i != sizes.end ());
+  return (*i).second;
+}
+
+symbol 
+LogExtern::dimension (symbol tag) const
+{
+  const name_map::const_iterator i = dimensions.find (tag);
+  daisy_assert (i != dimensions.end ());
+  return (*i).second;
+}
+
+LogExtern::type 
 LogExtern::lookup (symbol tag) const
 { 
-  type_map::const_iterator i = types.find (tag);
-  
+  const type_map::const_iterator i = types.find (tag);
+
   if (i == types.end ())
     return Error;
 
   return (*i).second;
 }
 
-double 
-LogExtern::number (symbol tag) const
-{
-  number_map::const_iterator i = numbers.find (tag);
-  
-  daisy_assert (i != numbers.end ());
-  return (*i).second;
-}
-
 symbol
 LogExtern::name (symbol tag) const
 { 
-  name_map::const_iterator i = names.find (tag);
-  
+  const name_map::const_iterator i = names.find (tag);
   daisy_assert (i != names.end ());
   return (*i).second;
 }
 
-const vector<double>&
+const std::vector<double>&
 LogExtern::array (symbol tag) const
 { 
-  array_map::const_iterator i = arrays.find (tag);
-  
+  const array_map::const_iterator i = arrays.find (tag);
   daisy_assert (i != arrays.end ());
   return *(*i).second;
 }
@@ -197,14 +209,37 @@ LogExtern::initialize (Treelog&)
 
 LogExtern::LogExtern (Block& al)
   : LogSelect (al),
-    LogExternSource (al)
+    fetch_dimensions (true)
 { 
   for (unsigned int i = 0; i < entries.size (); i++)
     entries[i]->add_dest (this);
+
+  // Register extern access.
+  const symbol name = al.check ("where") 
+    ? al.identifier ("where") 
+    : al.identifier ("type");
+
+  if (!log_extern_map)
+    {
+      daisy_assert (log_extern_count == 0);
+      log_extern_map = new log_extern_map_type;
+    }
+  (*log_extern_map)[name] = this;
+  log_extern_count++;
 }
 
 LogExtern::~LogExtern ()
-{ }
+{
+  
+  // Unregister extern access.
+  daisy_assert (log_extern_count > 0);
+  log_extern_count--;
+  if (log_extern_count == 0)
+    {
+      delete log_extern_map;
+      log_extern_map = NULL;
+    }
+}
 
 static struct LogExternSyntax
 {
@@ -225,3 +260,11 @@ By default, use the model name.");
     }
 } LogExtern_syntax;
 
+// Extern access.
+const Scope*
+find_extern_scope (const symbol name)
+{ 
+  daisy_assert (LogExtern::log_extern_map);
+  daisy_assert (LogExtern::log_extern_count > 0);
+  return (*LogExtern::log_extern_map)[name];
+}

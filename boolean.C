@@ -41,54 +41,6 @@ Boolean::Boolean (Block& al)
 Boolean::~Boolean ()
 { }
 
-struct BooleanStringEqual : public Boolean
-{
-  // Parameters.
-  const std::vector<std::string> values;
-
-  // Simulation.
-  bool missing (const Scope&) const
-  { return false; }
-  bool value (const Scope&) const
-  { 
-    if (values.size () < 2)
-      return true;
-    const std::string first = values[0];
-    for (size_t i = 1; i < values.size (); i++)
-      if (first != values[i])
-	return false; 
-    return true;
-  }
-
-  // Create.
-  bool initialize (Treelog&)
-  { return true; }
-  bool check (const Scope&, Treelog&) const
-  { return true; }
-  BooleanStringEqual (Block& al)
-    : Boolean (al),
-      values (al.name_sequence ("values"))
-  { }
-};
-
-static struct BooleanStringEqualSyntax
-{
-  static Boolean& make (Block& al)
-  { return *new BooleanStringEqual (al); }
-  BooleanStringEqualSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-	       "True iff the supplied strings are identical.");
-    syntax.add ("values", Syntax::String, Syntax::Const, Syntax::Sequence,
-		"Strings to compare.");
-    syntax.order ("values");
-    Librarian<Boolean>::add_type ("string-equal", alist, syntax, &make);
-  }
-} BooleanStringEqual_syntax;
-
 struct BooleanTrue : public Boolean
 {
   // Simulation.

@@ -1,7 +1,6 @@
-// log_extern.h --- Logging to external model.
+// scope_multi.h --- Combine multiple scopes.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,13 +19,31 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LOG_EXTERN_H
-#define LOG_EXTERN_H
+#ifndef SCOPE_MULTI_H
+#define SCOPE_MULTI_H
 
-#include "symbol.h"
+#include "scope.h"
+#include <vector>
 
-struct Scope;
+class ScopeMulti : public Scope
+{
+  // Content.
+private:
+  std::vector<const Scope*> scopes;
+  
+  // Interface.
+public:
+  bool has_number (symbol tag) const;
+  double number (symbol tag) const;
+  symbol dimension (symbol tag) const;
 
-extern const Scope* find_extern_scope (symbol name);
+  // Create and Destroy.
+private:
+  ScopeMulti (const ScopeMulti&);
+  ScopeMulti ();
+public:
+  explicit ScopeMulti (const Scope& first, const Scope& second);
+  ~ScopeMulti ();
+};
 
-#endif // LOG_EXTERN_H
+#endif // SCOPE_MULTI_H

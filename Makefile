@@ -296,13 +296,15 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-MODELS = movement_rect.C number_soil.C organic_none.C \
+MODELS = boolean_string.C \
+	number_extern.C movement_rect.C number_soil.C organic_none.C \
 	organic_std.C movement_1D.C integer_arit.C \
 	source_merge.C number_source.C program_file.C action_table.C \
 	xysource_merge.C xysource_inline.C xysource_loop.C \
 	xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
 	gnuplot_time.C source_combine.C number_arit.C source_expr.C \
-	source_std.C action_markvand.C photo_Farquhar.C photo_GL.C program_gnuplot.C \
+	source_std.C action_markvand.C photo_Farquhar.C photo_GL.C \
+	program_gnuplot.C \
 	program_document.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
 	domsorp_std.C chemistry_std.C equil_linear.C pedo_const.C \
@@ -380,7 +382,7 @@ SPECIALS = geometry_vert.C select_flux.C gnuplot_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = select_utils.C \
+OTHER = scope_multi.C select_utils.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
