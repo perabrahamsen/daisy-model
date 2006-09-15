@@ -42,11 +42,6 @@ class PhotoFarquhar : public Photo
 {
   // Parameters.
 private:
-    const double Qeff;	// Quantum efficiency at low light
-    //double Vmax;      // Max assimilation rate 
-    //double Vmsun;     // 
-    //double Vmshade;   //
-    //double Jm;        // Potential rate of electron transport per unit leaf area
     const double Vm25;  // Photosynthetic Rubisco capacity per unit leaf area at 25 degrees, (110 umol/m2/h)
     const double Jm25;  // Potential rate of electron transport per unit leaf area at 25 degrees, (2*110 umol/m2/h)
     const double S;     // Electron transport temperature response parametre, (710 J/mol/K) 
@@ -65,28 +60,27 @@ private:
     const double Ea_rd; // Activation energy for rd, (66400 J/mol)
     const double Ea_Gamma; // Activation energy for Gamma, (2900 J/mol)
     const double Sv;    // Entropy term, 0,65 ??
+    const double gbw;   // Leaf boundary conductance of water 
     const double theta; // Curvature of leaf response of electron transport to irradiance, 0.7 
     const double beta;  // Curvanture, 1
     const double alfa;  // Quantum efficiency. Fraction of PAR effectively absorbed by PSII, 0.08
     const double Ptot;  // Atmospheric pressure, (100000 Pa)
     const double m;     // Stomatal slope factor, Ball and Berry model, (unitless)
     const double b;     // Stomatal intercept factor, Ball and Berry model, (0.01 mol/m2/s)
-    
+   
     const PLF& TempEff;	// Temperature effect, photosynthesis
     const PLF& DSEff;	// Development stage effect, photosynthesis
-    const PLF& DAPEff;	// Age effect, photosynthesis
-
+    
 // Simulation.
 public:
     double Conductance(double gb, Bioclimate& kd, Bioclimate& kb, double& Lai) const;
-    double Transpiration(double Rni, double gbw, double gr, double Ls) const;
+    double Transpiration(double Rni, double gr, double Ls) const;
     double Arrhenius (const double k25, const double Ea, double T) const;  
     double V_m (double T)const;
     double J_m (double T) const;
-    double C3Model (double Q, double gbw,double gsw, double T, double& rsw, 
-		    double& ci,  Treelog& msg) const;
+    double C3Model (double Q, double gsw, double T, double& ci,  Treelog& msg) const;
     double GSTModel(double vp_ref, double pn, double LA, double T, 
-		    double gb, double Ls, Treelog& msg) const;
+		    double gb, Treelog& msg) const;
 
     double assimilate (double T,
 		       const std::vector<double>& PAR,
@@ -101,8 +95,6 @@ public:
 public:
     PhotoFarquhar (Block& al)
       : Photo (al),
-      Qeff (al.number ("Qeff")),
-      
       Vm25 (al.number ("Vm25")),
       Jm25 (al.number ("Jm25")),
       S (al.number ("S")),
@@ -121,6 +113,7 @@ public:
       Ea_rd (al.number ("Ea_rd")),
       Ea_Gamma (al.number ("Ea_Gamma")),
       Sv (al.number ("Sv")),
+      gbw (al.number("gbw")),
       theta (al.number("theta")),
       beta (al.number("beta")),
       alfa (al.number("alfa")),
@@ -129,8 +122,7 @@ public:
       b (al.number("b")),
 
       TempEff (al.plf ("TempEff")),
-      DSEff (al.plf ("DSEff")),
-      DAPEff (al.plf ("DAPEff"))
+      DSEff (al.plf ("DSEff"))
       { }
     ~PhotoFarquhar ()
       { }
@@ -154,15 +146,7 @@ PhotoFarquhar::Conductance(double gb, Bioclimate& kd, Bioclimate& kb, double& La
 {
 #if 0
 
-  /*
-  // ??
-  const double rh_ref = 0.67;
-  double vp_ref = rh_ref * e_sat; //kPa
-  //relative to atmosphere
-  double wa = vp_ref*1000/Ptot;  //Pa/Pa -> unitless
-  */ 
-
-  double Tref = 17.09; //??
+ double Tref = 17.09; //??
 
   // Radiative conductance m/s
   // Resistance to radioactive transfer
@@ -170,11 +154,10 @@ PhotoFarquhar::Conductance(double gb, Bioclimate& kd, Bioclimate& kb, double& La
   const double pcp = -4.0252 * Tref + 1283.52; // J/m3/K  
   double R = pcp /(4*rho*(Tref+273)*(Tref+273)*(Tref+273)); // s/m
   //
-  double grtotal = 1/R*0.99*2*(1-exp(-kd*Lai)); //m/s
-  double grsun   = 1/R*0.99*2*kd*(1-exp(-(kd+kb)*Lai))/(kd+kb); //m/s
+  double grtotal = 1./R*0.99*2*(1.-exp(-kd*Lai)); //m/s
+  double grsun   = 1./R*0.99*2*kd*(1.-exp(-(kd+kb)*Lai))/(kd+kb); //m/s
   double grshade = grtotal - grsun; //m/s
 
-  
   const double gbconv = -0.1377*Tref+43.85818; //multiplikationsfaktor -> mol/m²/s
   //
   gb = gb * gbconv; // mol/m²/s
@@ -184,8 +167,7 @@ PhotoFarquhar::Conductance(double gb, Bioclimate& kd, Bioclimate& kb, double& La
 }
 //Transpiration is the evaporation of water from aerial parts of plants, especially leaves but also stems, flowers and fruits. Transpiration is a side effect of the plant needing to open its stomata in order to obtain carbon dioxide gas from the air for photosynthesis.
 double 
-PhotoFarquhar::Transpiration(double Rni/**/, double gbw/**/, double gr /**/,
-			     double Ls/**/)const
+PhotoFarquhar::Transpiration(double Rni/**/, double gr /**/, double Ls/**/)const
 {
 
 }
@@ -203,63 +185,73 @@ double
 PhotoFarquhar::V_m (const double T) const
 {
   const double R = 8.314; //Gas constant, J/(mol K) 
-  const double a = exp((c_Vm-Ea_Vm)/(R*(T+273.15))); //unitless ?
-  const double c = 1+(exp((Sv *(T+273.15)-Ea_Vm)/(R*(T+273.15))));
-  return Vm25 * a/c; //umol/m2/h 
+  const double a = exp(c_Vm-Ea_Vm/(R*(T+273.15))); 
+  const double c = 1.+(exp((Sv *(T+273.15)-Ea_Vm)/(R*(T+273.15))));
+  return Vm25 * a/c * 1.0e-6; //mol/m2/s
 }
 
 // Temperature response function for Jm according to De Pury & Farquhar (1997).
 double
-PhotoFarquhar::J_m (const double T) const
+PhotoFarquhar::J_m (const double T/*[degree C]*/) const
 {
   const double R = 8.314; //Gas constant, J/(mol K) 
-  return Jm25 * exp((T+273.0-298.0)*Ea_Jm/(298.0*R*(T+273.0)))*
+  return Jm25 * 1.0e-6* exp((T+273.0-298.0)*Ea_Jm/(298.0*R*(T+273.0)))*
              (1+exp((298.0*S-H)/(298.0*R)))/
-             (1+exp(S*(T+273.0)-H)/(R*(T+273.0))); //umol/m2/h   OK!
+             (1+exp(S*(T+273.0)-H)/(R*(T+273.0))); //mol/m2/s   OK!
 }
 double 
-PhotoFarquhar::C3Model (double Q /* */, double gbw /* */, double gsw /* */,
-			double T, double& rsw /* */, double& ci, Treelog& msg) const 
+PhotoFarquhar::C3Model (double Q /* */, double gsw /*[mol/m²/s]*/, double T, 
+			double& ci, Treelog& msg) const 
 {
   // Updating temperature dependent parameters:
-  const double Vm = V_m(T); //umol/m2/h
-  const double Jm = J_m(T); //umol/m2/h
-  const double Ko = Arrhenius(Ko25, Ea_ko, T);//Pa
-  const double Kc = Arrhenius(Kc25, Ea_kc, T);//Pa
-  const double rd = Arrhenius(rd25, Ea_rd, T);//umol/m2/h
-  const double Gamma = Arrhenius (Gamma25, Ea_Gamma, T);//Pa
+  const double Vm = V_m(T); //[mol/m2/s]
+  const double Jm = J_m(T); //[mol/m2/s]
+  const double Ko = Arrhenius(Ko25, Ea_ko, T); //[Pa]
+  const double Kc = Arrhenius(Kc25, Ea_kc, T); //[Pa]
+  const double rd = Arrhenius(rd25, Ea_rd, T); // leaf respiration [mol/m2/s]
+  const double Gamma = Arrhenius (Gamma25, Ea_Gamma, T);//[Pa]
 
-  const double Kcl = Kc *(1+ O2_atm/Ko); //Pa
+  const double Kcl = Kc *(1.+ O2_atm/Ko); //[Pa]
 
-  double rbw = 1/gbw; //boundary layer resistance to water vapor, m2*s/mol
-  rsw = 1/gsw; 
+  double rbw = 1./gbw; // leaf boundary resistance to water vapor, [m2*s/mol]
+  double rsw = 1./gsw; // stomatal resistance to water [m2*s/mol]
   
   //Newton Raphsons solution to ...
-  const double maxiter = 150.0;
+  const double maxiter = 150;
   double aiter, lastci, newci;
   
+
   if (ci == 0) lastci = CO2_atm;//Pa
   else lastci = ci;
   newci = 0;
   aiter = 0;
-  double pn; //netto assimilate
+
+  double pn; //netto assimilate [mol/m2/s] 
 
   while(std::abs(newci - lastci) > 0.01)
     {
       if (aiter < maxiter)
 	{
-	  double wc = Vm*(ci-Gamma)/(ci+Kcl); // Rubisco limited, umol/m2/h
-          double Ile = Q * alfa;              // PAR effectively absorbed by PSII
-	  double J = (Ile+Jm-sqrt((Ile+Jm)*(Ile+Jm)-(4*theta*Ile*Jm)))/(2*theta); 
-	  double we = J * (ci-Gamma)/(ci+2*Gamma);
-	  double p = ((wc+we)-sqrt((wc+we)*(we+wc)-(4*beta*we*wc)))/(2*beta); 
-	  pn = p - rd; //net CO2 uptake mol/m2/s 
-	  double gtc = 1/(1.4*rbw+1.6*rsw);   // Total conductance to CO2
-	  newci = ((gtc * CO2_atm /Ptot) -pn)/(gtc)*Ptot;
+	  // Gross CO2 uptake limited by Rubisco
+	  double wc = Vm*(ci-Gamma)/(ci+Kcl); // Rubisco limited, [umol/m2/h]
+          double Ile = Q * alfa;              // PAR effectively absorbed by PSII [umol/m2/h]. Q = ?? [mol/m2/s]
+	  double J = (Ile+Jm-sqrt((Ile+Jm)*(Ile+Jm)-(4.*theta*Ile*Jm)))/(2.*theta); // [umol/m2/h]
+
+	  // Gross CO2 uptake limited by RuBP
+	  double we = J * (ci-Gamma)/(ci+2.*Gamma);//[umol/m2/h]
+	  double p = ((wc+we)-sqrt((wc+we)*(we+wc)-(4.*beta*we*wc)))/(2.*beta); 
+
+	  // Net CO2 uptake
+	  pn = p - rd; //net CO2 uptake [umol/m2/s] 
+	  
+	  //Total resistance to CO2
+	  double gtc = 1./(1.4*rbw+1.6*rsw);   //[mol/m2/s]?? umol??
+
+	  newci = ((gtc * CO2_atm /Ptot)-pn)/(gtc)*Ptot;// enheder?? gtc og pn??
 	  double dp;
-	  if (wc < we) dp = Vm*(Kcl+Gamma)/((ci+Kcl)*(ci+Kcl));
-	  else dp = 3.0*J*(Gamma/((ci+2*Gamma)*(ci+2*Gamma))); 
-	  double dcc = -(Ptot/gtc)*dp;
+	  if (wc < we) dp = Vm*(Kcl+Gamma)/((ci+Kcl)*(ci+Kcl));//[umol/m2/s/Pa]
+	  else dp = 3.0*J*(Gamma/((ci+2.*Gamma)*(ci+2.*Gamma))); //[umol/m2/s/Pa]
+	  double dcc = -(Ptot/gtc)*dp;   // unitless?
 	  newci = ci-(newci-ci)/(dcc-1); // Newtons next iteration
 	  lastci = ci; 
 	  if (newci > 0) ci = newci;
@@ -278,34 +270,36 @@ PhotoFarquhar::C3Model (double Q /* */, double gbw /* */, double gsw /* */,
 }
 
 double
-PhotoFarquhar:: GSTModel(double vp_ref, double pn, double LA, double gbw, double T, double Ls, Treelog& msg) const
+PhotoFarquhar:: GSTModel(double vp_ref /*Pa*/, double pn/*[umol/m2/s]*/, 
+			 double LA, double gbw/*[mol/m2/s]*/, double T, 
+			 Treelog& msg) const
 {
-  double wa = vp_ref * 1000/Ptot; //Pa, water-vapour preassure in atmosphere?
+  double wa = vp_ref * 1000./Ptot; //Pa, water-vapour preassure in atmosphere?
  
   //The saturation water-vapour preassure
-  const double fff = 1.0007+3.46*0.001;
+  const double fff = 1.0007+3.46*0.001;// enheder??
   const double aaa = 0.061121;
   const double bbb = 17.502;
   const double ccc = 240.97;
   // The saturation water-vapour pressure increase exponential with leaf temperature 
-  double est = 10*fff*(aaa*exp((bbb*T)/(ccc+T))); //kPa
-  double wi = est *1000 / Ptot;//Pa/Pa -> unitless, water-vapour pressure at leaf surface relative to atmosphere? 
+  double est = 10.*fff*(aaa*exp((bbb*T)/(ccc+T))); //kPa
+  double wi = est *1000. / Ptot;//Pa/Pa -> unitless, water-vapour pressure at leaf surface relative to atmosphere? 
 
   // Interception at leafsurface?? hvad er det??
-  const double b = 0.01;  //?? unit??
-  const double wsf = 1.0; //?? water stress factor
-  double intercept = b*LA*wsf;
-  double rbw = 1/gbw;     //gbw = bulk leaf boundary conductance of canopy
-  double cs = CO2_atm-(1.4*pn*Ptot*rbw);
+  const double wsf = 1.0;      //?? water stress factor
+  double intercept = b*LA*wsf; // mol/m2/s
+  double rbw = 1./gbw;          //
+                               //gbw = bulk leaf boundary conductance of canopy
+  double cs = CO2_atm-(1.4*pn*Ptot*rbw); //
   
   double pz; //
   if(pn <= 0) pz = 1.0e-12;
   else pz = pn;
 
   double aa = m*pz*Ptot/cs;
-  double bb = intercept+(1/rbw)-(m*pz*Ptot/cs);
+  double bb = intercept+(1./rbw)-(m*pz*Ptot/cs);
   double cc = (-wa/(wi*rbw))-intercept;
-  double hs = (-bb+(sqrt(bb*bb-4*aa*cc)))/(2*aa);
+  double hs = (-bb+(sqrt(bb*bb-4.*aa*cc)))/(2.*aa);
   if(hs > 1) hs = 1.0;
   double Ds = wi*(1.0-hs)*Ptot;//Pa
   //double es = hs*wi*Ptot;      //pa
@@ -313,15 +307,15 @@ PhotoFarquhar:: GSTModel(double vp_ref, double pn, double LA, double gbw, double
 
   double gsw; //stomatal conductance
   if(pn <= 0) gsw = intercept;
-  else gsw = ((m*pz*Ptot)/((cs-gamma)*(1+Ds/1000)))+intercept;
+  else gsw = ((m*pz*Ptot)/((cs-gamma)*(1.+Ds/1000.)))+intercept;
   
   return gsw;
 }
 
 double
 PhotoFarquhar::assimilate (const double T,
-                     const vector<double>& PAR,
-                     const vector<double>& PAR_height,
+                     const vector<double>& PAR, 
+		     const vector<double>& PAR_height,
                      const double PAR_LAI,
                      CanopyStandard& canopy,
                      Phenology& development,
@@ -330,11 +324,7 @@ PhotoFarquhar::assimilate (const double T,
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.
   const PLF& LAIvsH = canopy.LAIvsH;
   const double DS = development.DS;
-  const double DAP = development.DAP;
-
-  // Temperature effect and development stage effect
-  const double Teff = TempEff (T) * DSEff (DS) * DAPEff (DAP);
-
+  
   // One crop: daisy_assert (approximate (canopy.CAI, bioclimate.CAI ()));
   if (!approximate (LAIvsH (canopy.Height), canopy.CAI))
     {
@@ -386,20 +376,19 @@ PhotoFarquhar::assimilate (const double T,
 
 	  const double dPAR = (PAR[i] - PAR[i+1]) / dCAI;
 	  
-	  double kd = 1.0;
+	  double kd = 0.7;
 	  double vp_ref = 1.0;
-	  double gb = 1.0; // Conductance(gb, kd, kb, LA);
-	  double Ls;
-
+	  double pn;
+	  
 	  //solving photosynthesis and stomatacondctance model for each layer
 	  double lastcil, lastci, newcil, cil, ci; //Stomata CO2 pressure 
 	  double aiter, iter; 
-	  const double maxiter = 150;
+	  const double maxiter = 150.0;
 	  //int sunconfirmatin;
 
 	  ci = 0.5*CO2_atm;  //first guess for ci
-	  double rsw = 5/LA; //first gues for rsw
-	  double gsw = 1/rsw;//first gues for stomatal conductance gsw 
+	  double rsw = 5.0/LA; //first gues for rsw
+	  double gsw = 1.0/rsw;//first gues for stomatal conductance gsw 
 
 	  iter = 0;
 	  lastcil = CO2_atm;
@@ -410,11 +399,10 @@ PhotoFarquhar::assimilate (const double T,
 	      while ((lastcil-newcil)> 0.01)
 		{
 		  lastci = ci; 
-		  iter = iter + 1.0;
-		  //Transpiration();
-		  
-		  double pn = C3Model(dPAR, gb, gsw, T, rsw, ci, msg);
-		  ci = GSTModel(vp_ref, pn, LA, gb,T, Ls, msg);
+		  iter = iter + 1;
+		  //Transpiration(); returnerer Tl
+		  pn = C3Model(dPAR, gsw, T, ci, msg);
+		  ci = GSTModel(vp_ref, pn, LA, gbw, T, msg);
 		  lastcil=lastci;
 		  newcil = ci;
 		  std::ostringstream tmp;
@@ -429,18 +417,14 @@ PhotoFarquhar::assimilate (const double T,
 	      msg.error (tmp.str ());
 	    }
 	  
-      	  // Leaf Photosynthesis [gCO2/m2/h] (De Pury & Farquhar, 1997)
-#if 0
-	  const double wc = Vm;
-	  const double F = Vmax * (1.0 - exp (- (Qeff * dPAR / Vmax)));
+      	  // Leaf Photosynthesis [gCO2/m2/h] 
+	  Ass += LA * pn;// ??gCO2/m2/h
 
-	  Ass += LA * F;
-#endif
 	}
     }
   daisy_assert (approximate (accCAI, canopy.CAI));
 
-  return (molWeightCH2O / molWeightCO2) * Teff * Ass;
+  return (molWeightCH2O / molWeightCO2)* Ass;
 }
 
 
@@ -461,17 +445,13 @@ static struct Photo_FarquharSyntax
 
     alist.add ("description", "Photosynthesis by De Pury & Farquhar (1997) and stomataconductance model by Collatz et al., 1991.");
 
-    syntax.add ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Syntax::Const,
-                "Quantum efficiency at low light.");
-
-
-    syntax.add ("Vm25", "umol/m^2/h", Check::positive (), Syntax::Const,
+    syntax.add ("Vm25", "umol/m^2/s", Check::positive (), Syntax::Const,
                 "Photosynthetic Rubisco capacity per unit leaf area at 25 degrees. For wheat Vm25 = 110 ( De Pury & Farquhar, 1997). For Barley Vm25 = 105 (Thorgeirsson & Soegaard, 1999).");
-    alist.add ("Vm25", 110.);
+    alist.add ("Vm25", 110./3600.);
 
-    syntax.add ("Jm25", "umol/m^2/h", Check::positive (), Syntax::Const,
+    syntax.add ("Jm25", "umol/m^2/s", Check::positive (), Syntax::Const,
                 "Potential rate of electron transport per unit leaf area at 25 degrees. Jm25 = 2.1*Vm25");
-    alist.add ("Jm25", 2.1*110);
+    alist.add ("Jm25", 2.1*110/3600);
 
     syntax.add ("Kc25", "Pa", Check::positive (), Syntax::Const,
                 "Micahaelis-Menten constant of Rubisco for CO2. Kc25 = 40.4 Pa for wheat (Collatz et al., ) ");
@@ -498,9 +478,9 @@ static struct Photo_FarquharSyntax
                 "Curvature parameter of Jm, (De Pury & Farquhar, 1997)");
     alist.add ("H", 220000.);
     
-    syntax.add ("c_Vm", "J/mol", Check::positive (), Syntax::Const,
-                "Temperature scaling constant for Vmax. c_Vm, = 26350 J/mol (Bernacchi et al., 2001)");
-    alist.add ("c_Vm", 26350.);
+    syntax.add ("c_Vm", "", Check::positive (), Syntax::Const,
+                "Temperature scaling constant for Vmax. c_Vm, = 26.350 (Bernacchi et al., 2001)");
+    alist.add ("c_Vm", 26.350);
     
     syntax.add ("Ea_Vm", "J/mol", Check::positive (), Syntax::Const,
                 "Actimation energy for Vmax. Ea_Vm = 65330 J/mol (Ball, 1988)");
@@ -529,6 +509,10 @@ static struct Photo_FarquharSyntax
     syntax.add ("Sv", "J/mol/K", Check::positive (), Syntax::Const,
                 "Entropy term. Sv = 0.65 J/mol/K (Bernacchi et al., 2001?)");
     alist.add ("Sv", 0.65);
+
+    syntax.add ("gbw", "s/m2/mol", Check::positive (), Syntax::Const,
+                "Leaf boundary conductance of water. gbw = 2 s/m2/mol (Collatz et al., 1991");
+    alist.add ("gbw", 2.00);
 
     syntax.add ("theta", " ", Check::positive (), Syntax::Const,
                 "Curvature of leaf response of electron transport to irradiance, (De Pury & Farquhar, 1997");
