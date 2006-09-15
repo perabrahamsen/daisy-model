@@ -1,7 +1,9 @@
 2006-09-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* condition_extern.C: New model.
+	* condition_boolean.C: New model.
 	* boolean_extern.C: New model.
-	* Makefile (MODELS): Added it.
+	* Makefile (MODELS): Added them.
 
 2006-09-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
