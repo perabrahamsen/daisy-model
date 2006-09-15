@@ -1,7 +1,13 @@
+2006-09-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* boolean_extern.C: New model.
+	* Makefile (MODELS): Added it.
+
 2006-09-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* boolean_number.C: New models.
 	* boolean_string.C: Split from 'boolean.C'.
-	* Makefile (MODELS): Added it.
+	* Makefile (MODELS): Added them.
 
 	* number_extern.C: New model.
 	* Makefile (MODELS): Added.

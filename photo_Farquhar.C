@@ -1,6 +1,3 @@
-
-
-
 // photo_Farquhar.C -- Leaf photosynthesis based on De Pury & Farquhar, 1997.
 // 
 // Copyright 1996-2001,2005 Per Abrahamsen and Søren Hansen
@@ -470,7 +467,7 @@ static struct Photo_FarquharSyntax
 
     syntax.add ("Vm25", "umol/m^2/h", Check::positive (), Syntax::Const,
                 "Photosynthetic Rubisco capacity per unit leaf area at 25 degrees. For wheat Vm25 = 110 ( De Pury & Farquhar, 1997). For Barley Vm25 = 105 (Thorgeirsson & Soegaard, 1999).");
-    alist.add ("Vm25", 110);
+    alist.add ("Vm25", 110.);
 
     syntax.add ("Jm25", "umol/m^2/h", Check::positive (), Syntax::Const,
                 "Potential rate of electron transport per unit leaf area at 25 degrees. Jm25 = 2.1*Vm25");
@@ -483,7 +480,7 @@ static struct Photo_FarquharSyntax
 
     syntax.add ("Ko25", "Pa", Check::positive (), Syntax::Const,
                 "Micahaelis-Menten constant of Rubisco for O2 at 25 degrees. Ko25 = 24800 Pa for wheat (Collatz et al., )");
-    alist.add ("Ko25", 24800);
+    alist.add ("Ko25", 24800.);
 
     syntax.add ("Gamma25", "Pa", Check::positive (), Syntax::Const,
                 "CO2 compensation point of photosynthesis. Gamma25 = 3.69 Pa for wheat? (Collatz et al., )");
@@ -491,43 +488,43 @@ static struct Photo_FarquharSyntax
 
     syntax.add ("rd25", "J/mol", Check::positive (), Syntax::Const,
                 "Leaf respiration at 25 degrees. rd25 = 0.0089*Vm25, De Pury & Farquhar, 1997)");
-    alist.add ("rd25", 0.0089*110);
+    alist.add ("rd25", 0.0089*110.);
     
     syntax.add ("S", "J/mol/K", Check::positive (), Syntax::Const,
                 "Electron transport temperature response parameter,(De Pury & Farquhar, 1997)");
-    alist.add ("S", 710);
+    alist.add ("S", 710.);
     
     syntax.add ("H", "J/mol", Check::positive (), Syntax::Const,
                 "Curvature parameter of Jm, (De Pury & Farquhar, 1997)");
-    alist.add ("H", 220000);
+    alist.add ("H", 220000.);
     
     syntax.add ("c_Vm", "J/mol", Check::positive (), Syntax::Const,
                 "Temperature scaling constant for Vmax. c_Vm, = 26350 J/mol (Bernacchi et al., 2001)");
-    alist.add ("c_Vm", 26350);
+    alist.add ("c_Vm", 26350.);
     
     syntax.add ("Ea_Vm", "J/mol", Check::positive (), Syntax::Const,
                 "Actimation energy for Vmax. Ea_Vm = 65330 J/mol (Ball, 1988)");
-    alist.add ("Ea_Vm", 65330);
+    alist.add ("Ea_Vm", 65330.);
    
     syntax.add ("Ea_Jm", "J/mol", Check::positive (), Syntax::Const,
                 "Actimation energy for Jm. Ea_Jm = 37000 J/mol (Farquhar et al., 1980).");
-    alist.add ("Ea_Jm", 37000);
+    alist.add ("Ea_Jm", 37000.);
 
     syntax.add ("Ea_ko", "J/mol", Check::positive (), Syntax::Const,
                 "Actimation energy for ko. Ea_ko 0 36000 J/mol (Badger & Collatz, 1977).");
-    alist.add ("Ea_ko", 36000);
+    alist.add ("Ea_ko", 36000.);
 
     syntax.add ("Ea_kc", "J/mol", Check::positive (), Syntax::Const,
                 "Actimation energy for kc. Ea_kc = 59400 J/mol (Badger & Collatz, 1977)");
-    alist.add ("Ea_kc", 59400);
+    alist.add ("Ea_kc", 59400.);
 
     syntax.add ("Ea_rd", "J/mol", Check::positive (), Syntax::Const,
                 "Actimation energy for rd. Ea_rd = 66400 J/mol (Farquhar et al., 1980)");
-    alist.add ("Ea_rd", 66400);
+    alist.add ("Ea_rd", 66400.);
 
     syntax.add ("Ea_Gamma", "J/mol", Check::positive (), Syntax::Const,
                 "Actimation energy for Gamma. Ea_Gamma = 29000 (Jordan & Ogren, 1984)");
-    alist.add ("Ea_Gamma", 29000);
+    alist.add ("Ea_Gamma", 29000.);
 
     syntax.add ("Sv", "J/mol/K", Check::positive (), Syntax::Const,
                 "Entropy term. Sv = 0.65 J/mol/K (Bernacchi et al., 2001?)");
