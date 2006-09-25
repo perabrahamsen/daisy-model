@@ -37,6 +37,11 @@ struct NumberByDepth : public Number
   const std::auto_ptr<Number> z;
 
   // Simulation.
+  void tick (const Scope& scope, Treelog& msg)
+  { 
+    h->tick (scope, msg);
+    z->tick (scope, msg);
+  }
   bool missing (const Scope& scope) const 
   { 
     if (h->missing (scope) 
@@ -202,9 +207,12 @@ struct NumberByTension : public Number
   const std::auto_ptr<Number> h;
 
   // Simulation.
+  void tick (const Scope& scope, Treelog& msg)
+  { h->tick (scope, msg); }
   bool missing (const Scope& scope) const 
   { return h->missing (scope) 
-      || !Units::can_convert (h->dimension (scope), Units::cm, h->value (scope)); }
+      || !Units::can_convert (h->dimension (scope), Units::cm,
+                              h->value (scope)); }
 
   // Create.
   bool initialize (Treelog& msg)
@@ -247,6 +255,8 @@ Set this to true for the A horizon.");
 struct NumberSoilTheta : public NumberByTension
 {
   // Simulation.
+  void tick (const Scope&, Treelog&)
+  { }
   double value (const Scope& scope) const
   { 
     return horizon->hydraulic->Theta (Units::convert (h->dimension (scope), 
@@ -397,6 +407,8 @@ struct NumberTensionByTheta : public Number
   const std::auto_ptr<Number> Theta;
 
   // Simulation.
+  void tick (const Scope& scope, Treelog& msg)
+  { Theta->tick (scope, msg); }
   bool missing (const Scope& scope) const 
   { return Theta->missing (scope) 
       || !Units::can_convert (Theta->dimension (scope), Syntax::fraction (),

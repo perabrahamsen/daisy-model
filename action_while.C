@@ -42,10 +42,10 @@ struct ActionWhile : public Action
       actions[i]->doIt (daisy, out);
   }
 
-  bool done (const Daisy& daisy) const
+  bool done (const Daisy& daisy, Treelog& msg) const
   {
     daisy_assert (actions.size () != 0U);
-    return (actions[0]->done (daisy)); 
+    return (actions[0]->done (daisy, msg)); 
   }
 
   void output (Log& log) const

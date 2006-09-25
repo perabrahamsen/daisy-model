@@ -46,7 +46,7 @@ struct ActionT : public Action
   void doIt (Daisy&, Treelog&)
   { }
 
-  bool done (const Daisy&) const
+  bool done (const Daisy&, Treelog&) const
   { return false; }
 
   ActionT (Block& al)
@@ -156,7 +156,7 @@ struct ActionCond : public Action
 	 i != clauses.end ();
 	 i++)
       {
-	if ((*i)->condition->match (daisy))
+	if ((*i)->condition->match (daisy, out))
 	  {
 	    vector<Action*>& actions = (*i)->actions;
 	    for (unsigned int j = 0; j < actions.size (); j++)
@@ -221,7 +221,7 @@ struct ActionIf : public Action
 
   void doIt (Daisy& daisy, Treelog& out)
   { 
-    if (if_c->match (daisy))
+    if (if_c->match (daisy, out))
       then_a->doIt (daisy, out);
     else
       else_a->doIt (daisy, out);

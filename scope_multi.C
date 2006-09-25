@@ -21,6 +21,10 @@
 #include "scope_multi.h"
 #include "assertion.h"
 
+void 
+ScopeMulti::tick (const Scope&, Treelog&)
+{ daisy_panic ("ScopeMulti should not tick."); }
+
 bool 
 ScopeMulti::has_number (const symbol tag) const
 {

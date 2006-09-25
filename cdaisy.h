@@ -313,10 +313,12 @@ daisy_printer_create_file (const char* filename);
 void                            /* Print COMMENT */
 daisy_printer_comment (daisy_printer* printer, const char* comment);
 
+#if 0
 void                            /* Print ALIST. */
 daisy_printer_alist (daisy_printer* printer, 
                      const daisy_alist* alist, const daisy_syntax* syntax,
 		     const daisy_alist* super);
+#endif
 
 /* Save all elements in all libraries that are associated with FILE. */
 void

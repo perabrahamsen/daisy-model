@@ -33,7 +33,7 @@ struct ActionRepeat : public Action
     
   void doIt (Daisy& daisy, Treelog& out)
   { 
-    if (action && action->done (daisy))
+    if (action && action->done (daisy, out))
       {
 	delete action;
 	action = NULL;
@@ -44,10 +44,8 @@ struct ActionRepeat : public Action
       action->doIt (daisy, out);
   }
 
-  bool done (const Daisy&) const
-  { 
-    return false;
-  }
+  bool done (const Daisy&, Treelog&) const
+  { return false; }
 
   void output (Log& log) const
   { 

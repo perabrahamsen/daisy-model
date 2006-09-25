@@ -4,10 +4,16 @@
 ;; information relevant to non-expert users of Daisy.
 
 (deflog column table
-  "A log table for a specific all for all columns."
+  "A log table for a specific column."
   (declare column String
 	   "Name of column to log.  Use \"*\" to log all columns.")
   (column "*"))
+
+(deflog crop column
+  "A log table for a specific crop."
+  (declare crop String
+	   "Name of crop to log.  Use \"*\" to log all crops.")
+  (crop "*"))
 
 (defsummary "Field water balance" balance
   "Water balance for the complete system."

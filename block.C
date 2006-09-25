@@ -34,6 +34,7 @@ private:
   
   // Interface.
 public:
+  void tick (const Scope&, Treelog&);
   bool has_number (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;
@@ -49,6 +50,10 @@ public:
   ~ScopeBlock ()
   { }
 };
+
+void 
+ScopeBlock::tick (const Scope&, Treelog&)
+{ }
 
 bool 
 ScopeBlock::has_number (const symbol tag_symbol) const
@@ -116,6 +121,8 @@ ScopeBlock::number (const symbol tag_symbol) const
                                 (block, alist.alist (tag), tag));
   daisy_assert (number.get ());
   daisy_assert (number->initialize (block.msg ()));
+  daisy_assert (number->check (*this, block.msg ()));
+  number->tick (*this, block.msg ());
   daisy_assert (!number->missing (*this));
   return number->value (*this);
 }
@@ -249,11 +256,9 @@ Block::Implementation::expand_string (Block& block,
 	    }
 	  else
 	    {
-#if 0
 	      // BUG: We still have too many $col and $crop around to warn.
 	      msg.warning (std::string ("Unknown $ escape '") 
 			   + c + "', ignored");
-#endif
 	      result << '$' << c;
 	      mode = normal;
 	    }
@@ -309,8 +314,10 @@ Block::Implementation::expand_string (Block& block,
                               (Librarian<Number>::build_alist (block, obj, key));
                             if (!block.ok () 
                                 || !number->initialize (msg)
-                                || !number->check (scope, msg)
-                                || number->missing (scope))
+                                || !number->check (scope, msg))
+                              throw "Bad number: '"+ type + "'";
+                            number->tick (scope, msg);
+                            if (number->missing (scope))
                               throw "Bad number: '"+ type + "'";
                             result << number->value (scope);
                             const symbol dim = number->dimension (scope);

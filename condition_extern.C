@@ -23,24 +23,30 @@
 #include "condition.h"
 #include "boolean.h"
 #include "log_extern.h"
+#include "scope.h"
 #include <memory>
 
 struct ConditionExtern : public Condition
 {
   const symbol extern_name;
-  const Scope* extern_scope;
+  mutable const Scope* extern_scope;
   std::auto_ptr<Boolean> expr;
   
   // State.
-  enum { isfalse, istrue, missing, uninitialized, error } state;
+  mutable enum { isfalse, istrue, missing, uninitialized, error } state;
 
-  void tick (const Daisy&, Treelog& msg)
-  {
+  void tick (const Daisy&, Treelog&)
+  { }
+
+  bool match (const Daisy&, Treelog& msg) const
+  { 
     Treelog::Open nest (msg, name);
 
     if (state == uninitialized)
       {
         extern_scope = find_extern_scope (extern_name);
+        if (!extern_scope)
+          msg.error ("No extern log names '" + extern_name + "' found");
         if (!expr->initialize (msg)
             || !extern_scope
             || !expr->check (*extern_scope, msg))
@@ -50,14 +56,15 @@ struct ConditionExtern : public Condition
           }
       }
     if (state != error)
-      if (expr->missing (*extern_scope))
-        state = missing;
-      else
-        state = expr->value (*extern_scope) ? istrue : isfalse;
+      {
+        expr->tick (*extern_scope, msg);
+        if (expr->missing (*extern_scope))
+          state = missing;
+        else
+          state = expr->value (*extern_scope) ? istrue : isfalse;
+      }
+    return state == istrue ? true : false; 
   }
-
-  bool match (const Daisy&) const
-  { return state == istrue ? true : false; }
 
   void output (Log&) const
   { }
@@ -66,7 +73,7 @@ struct ConditionExtern : public Condition
     : Condition (al),
       extern_name (al.identifier ("name")),
       extern_scope (NULL),
-      expr (Librarian<Boolean>::build_item (al, "extern")),
+      expr (Librarian<Boolean>::build_item (al, "expr")),
       state (uninitialized)
   { }
 };

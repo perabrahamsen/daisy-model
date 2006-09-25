@@ -30,6 +30,8 @@ struct NumberConst : public Number
   const symbol dim;
 
   // Simulation.
+  void tick (const Scope&, Treelog&)
+  { }
   bool missing (const Scope&) const
   { return false; }
   double value (const Scope&) const
@@ -73,6 +75,8 @@ struct NumberLeaf : public Number
   const symbol dim;
 
   // Simulation.
+  void tick (const Scope&, Treelog&)
+  { }
   symbol dimension (const Scope&) const
   { return dim; }
 
@@ -186,6 +190,8 @@ struct NumberFetch : public Number
     return dim;
   }
   // Simulation.
+  void tick (const Scope&, Treelog&)
+  { }
   bool missing (const Scope& scope) const
   { return !default_value && !scope.has_number (name); }
   double value (const Scope& scope) const
@@ -245,10 +251,32 @@ static struct NumberFetchSyntax
   }
 } NumberFetch_syntax;
 
-struct NumberIdentity : public Number
+struct NumberChild : public Number
 {
   // Parameters.
   const std::auto_ptr<Number> child;
+
+  // Simulation.
+  void tick (const Scope& scope, Treelog& msg)
+  { child->tick (scope, msg); }
+
+  // Create.
+  bool initialize (Treelog& msg)
+  { return child->initialize (msg); }
+  static void load_syntax (Syntax& syntax, AttributeList&)
+  {
+    syntax.add ("value", Librarian<Number>::library (),
+		"Operand for this function.");
+  }
+  NumberChild (Block& al)
+    : Number (al),
+      child (Librarian<Number>::build_item (al, "value"))
+  { }
+};
+
+struct NumberIdentity : public NumberChild
+{
+  // Parameters.
   const symbol dim;
 
   // Simulation.
@@ -272,8 +300,6 @@ struct NumberIdentity : public Number
   }
 
   // Create.
-  bool initialize (Treelog& msg)
-  { return child->initialize (msg); }
   bool check (const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, name);
@@ -292,8 +318,7 @@ struct NumberIdentity : public Number
     return ok;
   }
   NumberIdentity (Block& al)
-    : Number (al),
-      child (Librarian<Number>::build_item (al, "value")),
+    : NumberChild (al),
       dim (al.name ("dimension", Syntax::Unknown ()))
   { }
 };
@@ -306,20 +331,17 @@ static struct NumberIdentitySyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-
     alist.add ("description", "Pass value unchanged.");
-    syntax.add ("value", Librarian<Number>::library (),
-		"Operand for this function.");
+    NumberChild::load_syntax (syntax, alist);
     syntax.add ("dimension", Syntax::String, Syntax::OptionalConst,
 		"Dimension of this value.");
     Librarian<Number>::add_type ("identity", alist, syntax, &make);
   }
 } NumberIdentity_syntax;
 
-struct NumberConvert : public Number
+struct NumberConvert : public NumberChild
 {
   // Parameters.
-  const std::auto_ptr<Number> child;
   const symbol dim;
 
   // Simulation.
@@ -336,8 +358,6 @@ struct NumberConvert : public Number
   { return dim; }
 
   // Create.
-  bool initialize (Treelog& msg)
-  { return child->initialize (msg); }
   bool check (const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, name);
@@ -355,8 +375,7 @@ struct NumberConvert : public Number
     return ok;
   }
   NumberConvert (Block& al)
-    : Number (al),
-      child (Librarian<Number>::build_item (al, "value")),
+    : NumberChild (al),
       dim (al.name ("dimension"))
   { }
 };
@@ -371,8 +390,7 @@ static struct NumberConvertSyntax
     AttributeList& alist = *new AttributeList ();
 
     alist.add ("description", "Convert to specified dimension.");
-    syntax.add ("value", Librarian<Number>::library (),
-		"Operand for this function.");
+    NumberChild::load_syntax (syntax, alist);
     syntax.add ("dimension", Syntax::String, Syntax::Const,
 		"Dimension to convert to.");
     syntax.order ("value", "dimension");
@@ -380,10 +398,9 @@ static struct NumberConvertSyntax
   }
 } NumberConvert_syntax;
 
-struct NumberDim : public Number
+struct NumberDim : public NumberChild
 {
   // Parameters.
-  const std::auto_ptr<Number> child;
   const symbol dim;
   const bool warn_known;
 
@@ -396,8 +413,6 @@ struct NumberDim : public Number
   { return dim; }
 
   // Create.
-  bool initialize (Treelog& msg)
-  { return child->initialize (msg); }
   bool check (const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, name);
@@ -414,8 +429,7 @@ struct NumberDim : public Number
     return ok;
   }
   NumberDim (Block& al)
-    : Number (al),
-      child (Librarian<Number>::build_item (al, "value")),
+    : NumberChild (al),
       dim (al.name ("dimension")),
       warn_known (al.flag ("warn_known"))
   { }
@@ -431,8 +445,7 @@ static struct NumberDimSyntax
     AttributeList& alist = *new AttributeList ();
 
     alist.add ("description", "Specify dimension for number.");
-    syntax.add ("value", Librarian<Number>::library (),
-		"Operand for this function.");
+    NumberChild::load_syntax (syntax, alist);
     syntax.add ("warn_known", Syntax::Boolean, Syntax::Const,
                 "Issue a warning if the dimensions is already known.");
     alist.add ("warn_known", true);

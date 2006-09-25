@@ -32,6 +32,8 @@ struct BooleanExtern : public Boolean
 
   const std::string& title () const
   { return extern_name.name (); }
+  void tick (const Scope& scope, Treelog& msg)
+  { expr->tick (scope, msg); }
   bool missing (const Scope& inherit_scope) const 
   { 
     daisy_assert (extern_scope);
@@ -68,7 +70,7 @@ struct BooleanExtern : public Boolean
     : Boolean (al),
       extern_name (al.identifier ("name")),
       extern_scope (NULL),
-      expr (Librarian<Boolean>::build_item (al, "extern"))
+      expr (Librarian<Boolean>::build_item (al, "expr"))
   { }
 };
 

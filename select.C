@@ -100,6 +100,8 @@ struct Select::Implementation
     symbol dim;
 
     // Interface.
+    void tick (const Scope&, Treelog&)
+    { }
     bool has_number (symbol name) const
     {
       static const symbol x_symbol ("x");
@@ -390,6 +392,8 @@ Select::Implementation::get_expr (Block& al)
   struct NumberFactor : public Number
   {
     const double factor;
+    void tick (const Scope&, Treelog&)
+    { }
     bool missing (const Scope&) const
     { return false; }
     double value (const Scope& scope) const
@@ -410,6 +414,8 @@ Select::Implementation::get_expr (Block& al)
   {
     const double factor;
     const double offset;
+    void tick (const Scope&, Treelog&)
+    { }
     bool missing (const Scope&) const
     { return false; }
     double value (const Scope& scope) const
@@ -438,6 +444,8 @@ Select::Implementation::get_expr (Block& al)
   // No change.
   struct NumberX : public Number
   {
+    void tick (const Scope&, Treelog&)
+    { }
     bool missing (const Scope&) const
     { return false; }
     double value (const Scope& scope) const
@@ -739,6 +747,7 @@ Select::initialize (const std::map<symbol, symbol>& conv, double, double,
           msg.error ("Bad expression");
           return false;
         }
+      impl->expr->tick  (impl->scope, msg);
       spec_dim = impl->expr->dimension (impl->scope);
     }
 

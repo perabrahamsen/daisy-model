@@ -26,21 +26,23 @@
 #include "printer.h"
 #include "symbol.h"
 #include <iosfwd>
+#include <memory>
 
 class PrinterFile : public Printer
 {
   // Content.
 private:
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
 
   // Interface.
 public:
   // Print comment.
   void print_comment (const std::string& comment);
   // Print content of alist.
-  void print_alist (const AttributeList& alist, const Syntax&,
-		    const AttributeList& super);
+  void print_alist (const AttributeList& alist, const Syntax& syntax,
+		    const AttributeList& super_alist, 
+                    const Syntax& super_syntax);
   // Print entry in alist.
   void print_entry (const AttributeList&, const Syntax&,
 		    const std::string& key);

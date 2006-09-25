@@ -44,6 +44,8 @@ Boolean::~Boolean ()
 struct BooleanTrue : public Boolean
 {
   // Simulation.
+  void tick (const Scope&, Treelog&)
+  { }
   bool missing (const Scope&) const
   { return false; }
   bool value (const Scope&) const
@@ -78,6 +80,8 @@ static struct BooleanTrueSyntax
 struct BooleanFalse : public Boolean
 {
   // Simulation.
+  void tick (const Scope&, Treelog&)
+  { }
   bool missing (const Scope&) const
   { return false; }
   bool value (const Scope&) const
@@ -113,6 +117,11 @@ struct BooleanOperands : public Boolean
   const std::vector<Boolean*> operand;
 
   // Simulation.
+  void tick (const Scope& scope, Treelog& msg)
+  { 
+    for (size_t i = 0; i < operand.size (); i++)
+      operand[i]->tick (scope, msg);
+  }
   bool missing (const Scope& scope) const
   { 
     for (size_t i = 0; i < operand.size (); i++)
@@ -139,6 +148,7 @@ struct BooleanOperands : public Boolean
   }
   bool check (const Scope& scope, Treelog& msg) const
   { 
+    Treelog::Open nest (msg, name);
     bool ok = true;
 
     for (size_t i = 0; i < operand.size (); i++)

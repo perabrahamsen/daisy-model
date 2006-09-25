@@ -111,12 +111,14 @@ XYSourceExpr::load (Treelog& msg)
         lex.error ("Bad x expression");
         ok = false;
       }
+    x_expr->tick (scope, msg);
     x_dimension_ = x_expr->dimension (scope);
     if (!y_expr->initialize (msg) || !y_expr->check (scope, msg))
       {
         lex.error ("Bad y expression");
         ok = false;
       }
+    y_expr->tick (scope, msg);
     y_dimension_ = y_expr->dimension (scope);
     if (!ok)
       return false;

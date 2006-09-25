@@ -60,6 +60,7 @@ SourceExpr::load (Treelog& msg)
       lex.error ("Bad expression");
       return false;
     }
+  expr->tick (scope, msg);
   dimension_ = expr->dimension (scope);
 
   // Read data.

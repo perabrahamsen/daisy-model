@@ -1,4 +1,24 @@
+2006-09-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_extern.C (numbers): Made it logable.
+	* log.h, log.C, daisy.C: Made logs logable.
+	
+2006-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* printer_file.C (print_alist): Don't treat alist sequences
+	specially. 
+
+	* parser_file.C (load_list): Don't skip parenteses twice at start
+	of alist sequence.
+
+2006-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* number_lisp.C: New model.
+	* Makefile (MODELS): Added it.
+
 2006-09-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all (Condition::match, Action::done): Takes Treelog arguments.
 
 	* condition_extern.C: New model.
 	* condition_boolean.C: New model.

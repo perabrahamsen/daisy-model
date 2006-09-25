@@ -52,7 +52,7 @@ struct ConditionTSum : public Condition
       }
   }
 
-  bool match (const Daisy&) const
+  bool match (const Daisy&, Treelog&) const
   { return TSum_now > TSum_limit; }
 
   void output (Log& log) const

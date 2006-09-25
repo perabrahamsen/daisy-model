@@ -30,6 +30,11 @@ struct BooleanNumbers : public Boolean
   const std::vector<Number*> operand;
 
   // Simulation.
+  void tick (const Scope& scope, Treelog& msg)
+  { 
+    for (size_t i = 0; i < operand.size (); i++)
+      operand[i]->tick (scope, msg);
+  }
   bool missing (const Scope& scope) const
   { 
     for (size_t i = 0; i < operand.size (); i++)
@@ -56,12 +61,31 @@ struct BooleanNumbers : public Boolean
   }
   bool check (const Scope& scope, Treelog& msg) const
   { 
+    Treelog::Open nest (msg, name);
     bool ok = true;
 
+    symbol dim = Syntax::unknown ();
     for (size_t i = 0; i < operand.size (); i++)
       if (!operand[i]->check (scope, msg))
         ok = false;
-
+      else 
+        {
+          static const symbol blank ("");
+          symbol new_dim = operand[i]->dimension (scope);
+          if (new_dim == Syntax::none ()
+              || new_dim == Syntax::fraction ())
+            new_dim = blank;
+          if (new_dim != dim)
+            if (dim == Syntax::unknown ())
+              dim = new_dim;
+            else if (new_dim != Syntax::unknown ())
+              {
+                msg.error ("I don't know how to compare [" + dim + "] with ["
+                           + new_dim + "]");
+                dim = new_dim;
+                ok = false;
+              }
+        }
     return ok;
   }
   static void load_syntax (Syntax& syntax, AttributeList&)

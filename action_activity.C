@@ -46,14 +46,14 @@ struct ActionActivity : public Action
     Action* action = actions.front ();
     action->doIt (daisy, out);
 
-    if (action->done (daisy))
+    if (action->done (daisy, out))
       {
 	delete action;
 	actions.erase (actions.begin ());
       }
   }
 
-  bool done (const Daisy&) const
+  bool done (const Daisy&, Treelog&) const
   { return (actions.size () == 0U); }
 
   void output (Log& log) const

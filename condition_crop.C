@@ -33,7 +33,7 @@ struct ConditionDSAfter : public Condition
   const symbol crop;
   const double ds;
 
-  bool match (const Daisy& daisy) const
+  bool match (const Daisy& daisy, Treelog&) const
   { 
     const double crop_ds = daisy.field.crop_ds (crop); 
     if (crop_ds != Crop::DSremove && crop_ds >= ds)
@@ -56,7 +56,7 @@ struct ConditionDMOver : public Condition
   const double weight;
   const double height;
 
-  bool match (const Daisy& daisy) const
+  bool match (const Daisy& daisy, Treelog&) const
   { return (daisy.field.crop_dm (crop, height) >= weight); }
 
   void output (Log&) const

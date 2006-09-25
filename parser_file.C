@@ -104,6 +104,8 @@ ParserFile::Implementation::get_string ()
     { return find (c) != end (); }
     IdExtra ()
     { 
+      insert ('<');
+      insert ('>');
       insert ('_');
       insert ('+');
       insert ('-');
@@ -338,6 +340,7 @@ ParserFile::Implementation::get_number (const string& syntax_dim)
              + tmp.str () + "---");
       return -42.42e42;
     }
+  number->tick (Scope::null (), treelog);
   if (treelog.count)
     warning ("Warning for number '" + obj + "'\n--- details:\n"
              + tmp.str () + "---");
@@ -961,6 +964,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	  if (!in_order)
 	    // Unordered, we already skipped this one
 	    daisy_assert (skipped);
+#if 0
+          // We already skipped...
 	  else if (current != end || !syntax.total_order ())
 	    // This is not the last element or the order is not total.
 	    {
@@ -968,7 +973,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      skip ("(");
 	      skipped = true;
 	    }
-
+#endif 
 	  // Support for sequences not really finished yet.
 	  switch (syntax.lookup (name))
 	    {

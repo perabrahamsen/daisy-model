@@ -40,6 +40,7 @@ public:
 
   // Interface.
 public:
+  void tick (const Scope&, Treelog&);
   bool has_number (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;

@@ -38,7 +38,7 @@ public:
 public:
   virtual void tick (const Daisy&, Treelog&);
   virtual void doIt (Daisy&, Treelog&) = 0;
-  virtual bool done (const Daisy&) const;
+  virtual bool done (const Daisy&, Treelog&) const;
   virtual void output (Log&) const;
 
   // Create and Destroy.

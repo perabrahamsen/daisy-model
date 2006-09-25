@@ -53,6 +53,7 @@ public:
   void open (symbol name);
   void close ();
 
+  using Log::output;
   void output (symbol name, bool);
   void output (symbol name, double);
   void output (symbol name, int);

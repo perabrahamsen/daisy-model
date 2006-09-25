@@ -73,6 +73,7 @@ SourceCombine::load (Treelog& msg)
   // Scope
   if (!expr->initialize (msg) || !expr->check (scope, msg))
     return false;
+  expr->tick (scope, msg);
 
   // Extract.
   dimension_ = expr->dimension (scope);

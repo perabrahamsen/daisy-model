@@ -50,6 +50,8 @@ class XYSourceLoop : public XYSource
     double value;
 
   private:
+    void tick (const Scope&, Treelog&)
+    { }
     bool has_number (symbol t) const
     { return tag == t; }
     double number (symbol) const
@@ -104,12 +106,14 @@ XYSourceLoop::load (Treelog& msg)
       msg.error ("Bad x expression");
       ok = false;
     }
+  x_expr->tick (scope, msg);
   x_dimension_ = x_expr->dimension (scope);
   if (!y_expr->initialize (msg) || !y_expr->check (scope, msg))
     {
       msg.error ("Bad y expression");
       ok = false;
     }
+  y_expr->tick (scope, msg);
   y_dimension_ = y_expr->dimension (scope);
   if (!ok)
     return false;

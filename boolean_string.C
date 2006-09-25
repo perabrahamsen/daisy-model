@@ -28,6 +28,8 @@ struct BooleanStringEqual : public Boolean
   const std::vector<std::string> values;
 
   // Simulation.
+  void tick (const Scope&, Treelog&)
+  { }
   bool missing (const Scope&) const
   { return false; }
   bool value (const Scope&) const

@@ -346,7 +346,7 @@ struct ActionMarkvand : public Action
   // Simulation.
   const MV_Crop* get_crop (Daisy& daisy) const;
   void doIt (Daisy& daisy, Treelog& out);
-  bool done (const Daisy&) const
+  bool done (const Daisy&, Treelog&) const
   { return false; }
   void output (Log&) const;
 

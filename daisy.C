@@ -50,7 +50,7 @@ Daisy::find_active_logs (const vector<Log*>& logs, LogAll& log_all)
 {
   vector<Log*> result;
 
-  for (unsigned int i = 0; i < logs.size (); i++)
+  for (size_t i = 0; i < logs.size (); i++)
     if (!dynamic_cast<LogSelect*> (logs[i]))
       result.push_back (logs[i]);
   
@@ -131,7 +131,7 @@ Daisy::initial_logs (Treelog& out)
 {
   activate_output->tick (*this, out);
 
-  if (activate_output->match (*this))
+  if (activate_output->match (*this, out))
     {
       if (!logging)
 	{
@@ -139,7 +139,7 @@ Daisy::initial_logs (Treelog& out)
 	  // get initial values for previous day.
 	  Time previous (time);
 	  previous.tick_hour (-1);
-	  for (unsigned int i = 0; i < active_logs.size (); i++)
+	  for (size_t i = 0; i < active_logs.size (); i++)
 	    {
 	      Log& log = *active_logs[i];
 	      if (log.initial_match (*this, out))
@@ -150,6 +150,8 @@ Daisy::initial_logs (Treelog& out)
 		  output_submodule (field, "column", log);
 		  output_vector (harvest, "harvest", log);
 		  output_derived (action, "manager", log);
+                  output_list (logs, "output", log, 
+                               Librarian<Log>::library ());
 		  log.initial_done (previous);
 		}
 	    }
@@ -168,7 +170,7 @@ Daisy::tick_logs (Treelog& out)
 {
   if (logging)
     {
-      for (unsigned int i = 0; i < active_logs.size (); i++)
+      for (size_t i = 0; i < active_logs.size (); i++)
 	{
 	  Log& log = *active_logs[i];
 	  if (log.match (*this, out))
@@ -179,6 +181,7 @@ Daisy::tick_logs (Treelog& out)
 	      output_submodule (field, "column", log);
 	      output_vector (harvest, "harvest", log);
 	      output_derived (action, "manager", log);
+              output_list (logs, "output", log, Librarian<Log>::library ());
 	      log.done (time);
 	    }
 	}
@@ -229,7 +232,7 @@ Daisy::run (Treelog& out)
 	  }
 
 	print_time->tick (*this, out);
-	const bool force_print = print_time->match (*this);
+	const bool force_print = print_time->match (*this, out);
 
 	tick (out);
 
@@ -244,7 +247,7 @@ Daisy::run (Treelog& out)
   // Print log file summaries at end of simulation.
   {
     Treelog::Open nest (out, "Summary");
-    for (unsigned int i = 0; i < logs.size (); i++)
+    for (size_t i = 0; i < logs.size (); i++)
       logs[i]->summarize (out);
   }
   return true;
@@ -261,7 +264,7 @@ Daisy::initialize (const Syntax* glob_syn, const AttributeList* glob_al,
   field.initialize (time, err, weather);
   {
     Treelog::Open nest (err, "output");
-    for (unsigned int i = 0; i < logs.size (); i++)
+    for (size_t i = 0; i < logs.size (); i++)
       logs[i]->initialize (err);
   }
 }
@@ -273,7 +276,7 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Description of this simulation setup.");
   alist.add ("description", default_description);
   syntax.add ("output", Librarian<Log>::library (),
-	      Syntax::Const, Syntax::Sequence,
+	      Syntax::State, Syntax::Sequence,
 	      "List of logs for output during the simulation.");
   syntax.add ("activate_output", Librarian<Condition>::library (),
 	      "Activate output logs when this condition is true.\n\

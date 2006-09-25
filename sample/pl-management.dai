@@ -61,7 +61,7 @@
   (fertilize (AmmoniumNitrate (weight 90 [kg N/ha])))
   (wait_mm_dd 4 19)
   (seed_bed_preparation)
-  (sow "Potato; IHAR 2004")
+  (sow "Potato; Triada")
   (wait (or (crop_ds_after "Potato; IHAR 2004" 2.0 []) ;Ripe
             (mm_dd 9 10)))
   (harvest "Potato; IHAR 2004"(stem 0.00 []) (leaf 0.00 []))

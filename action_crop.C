@@ -121,7 +121,7 @@ struct ActionCrop : public Action
   public:
     bool doIt (Daisy&, Treelog&, symbol name);
     bool doIt (Daisy&, Treelog&, symbol primary, symbol secondary);
-    bool done (const Daisy&) const;
+    bool done (const Daisy&, Treelog&) const;
     void output (Log&) const;
 
     // Create and Destroy.
@@ -211,7 +211,7 @@ struct ActionCrop : public Action
   // Simulation.
   void tick (const Daisy&, Treelog&);
   void doIt (Daisy&, Treelog&);
-  bool done (const Daisy&) const;
+  bool done (const Daisy&, Treelog&) const;
   void output (Log&) const;
 
   // Create and Destroy.
@@ -441,7 +441,7 @@ ActionCrop::Perennial::doIt (Daisy& daisy, Treelog& out,
 }
 
 bool
-ActionCrop::Perennial::done (const Daisy& daisy) const
+ActionCrop::Perennial::done (const Daisy& daisy, Treelog&) const
 { 
   if (year_of_last_harvest < 0)
     return false;
@@ -908,9 +908,9 @@ ActionCrop::doIt (Daisy& daisy, Treelog& out)
 }
 
 bool 
-ActionCrop::done (const Daisy& daisy) const
+ActionCrop::done (const Daisy& daisy, Treelog& msg) const
 { return (!harvest_annual || harvest_annual->done) 
-    && (!harvest_perennial || harvest_perennial->done (daisy)); }
+    && (!harvest_perennial || harvest_perennial->done (daisy, msg)); }
 
 void 
 ActionCrop::output (Log& log) const

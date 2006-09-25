@@ -32,6 +32,8 @@ struct NumberExtern : public Number
 
   const std::string& title () const
   { return extern_name.name (); }
+  void tick (const Scope& scope, Treelog& msg)
+  { expr->tick (scope, msg); }
   bool missing (const Scope& inherit_scope) const 
   { 
     daisy_assert (extern_scope);
@@ -74,7 +76,7 @@ struct NumberExtern : public Number
     : Number (al),
       extern_name (al.identifier ("name")),
       extern_scope (NULL),
-      expr (Librarian<Number>::build_item (al, "extern"))
+      expr (Librarian<Number>::build_item (al, "expr"))
   { }
 };
 

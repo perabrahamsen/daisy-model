@@ -171,11 +171,13 @@ ifeq ($(COMPILER),gcc)
 	WARNING = -W -Wall -Wno-uninitialized \
 		  -Wconversion -Woverloaded-virtual \
 		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings \
-                  -Wno-sign-compare 
+                  -Wno-sign-compare -Wfloat-equal -Wundef -Wendif-labels \
+		  -Wcast-qual -Wcast-align -Wmissing-format-attribute 
 #  -Wold-style-cast: triggered by header files for 2.95/woody
 #  -Wmissing-noreturn: triggered by some virtual functions.
 #  -Wmissing-prototypes -Wstrict-prototypes: Not C++ flags.
 #  -Wuninitialized: triggered in 3.4 in initializations!
+#  -Wunreachable-code: triggered by header files
 	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 	CPPLIB = -lstdc++
@@ -296,7 +298,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-MODELS = condition_extern.C condition_boolean.C \
+MODELS = number_lisp.C condition_extern.C condition_boolean.C \
 	boolean_extern.C boolean_number.C boolean_string.C \
 	number_extern.C movement_rect.C number_soil.C organic_none.C \
 	organic_std.C movement_1D.C integer_arit.C \
@@ -560,7 +562,7 @@ filecount: $(HEADERS) $(SOURCES)
 #
 tags: TAGS
 
-TAGS: $(SOURCES) $(HEADERS)
+TAGS: $(INTERFACES) $(MODELS) $(MAIN) $(HEADERS)
 	etags $(SOURCES) $(HEADERS)
 
 # Fix DOS newline breakage.
@@ -986,9 +988,9 @@ select_value${OBJ}: select_value.C select_value.h select.h destination.h \
 weather_old${OBJ}: weather_old.C weather_old.h weather.h librarian.h \
   library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   im.h fao.h time.h
-log_extern${OBJ}: log_extern.C log_select.h log.h border.h librarian.h \
-  library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
-  select.h destination.h condition.h number.h units.h log_extern.h
+log_extern${OBJ}: log_extern.C log_extern.h symbol.h log_select.h log.h \
+  border.h librarian.h library.h block.h syntax.h treelog.h plf.h alist.h \
+  assertion.h select.h destination.h condition.h number.h units.h scope.h
 log_select${OBJ}: log_select.C log_select.h log.h border.h librarian.h \
   library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   select.h destination.h condition.h number.h units.h field.h format.h \
@@ -1010,6 +1012,7 @@ log_alist${OBJ}: log_alist.C log_alist.h log.h border.h librarian.h library.h \
 log_clone${OBJ}: log_clone.C log_clone.h log_alist.h log.h border.h \
   librarian.h library.h symbol.h block.h syntax.h treelog.h plf.h alist.h \
   assertion.h
+scope_multi${OBJ}: scope_multi.C scope_multi.h scope.h symbol.h assertion.h
 select_utils${OBJ}: select_utils.C select_utils.h border.h block.h syntax.h \
   treelog.h symbol.h plf.h check.h mathlib.h assertion.h
 gnuplot_utils${OBJ}: gnuplot_utils.C gnuplot_utils.h syntax.h treelog.h \
@@ -1083,6 +1086,26 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h program.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+number_lisp${OBJ}: number_lisp.C number.h symbol.h librarian.h library.h \
+  block.h syntax.h treelog.h plf.h alist.h assertion.h scope_multi.h \
+  scope.h submodeler.h memutils.h
+condition_extern${OBJ}: condition_extern.C condition.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h boolean.h \
+  log_extern.h
+condition_boolean${OBJ}: condition_boolean.C condition.h librarian.h \
+  library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  boolean.h scope.h
+boolean_extern${OBJ}: boolean_extern.C boolean.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  log_extern.h scope_multi.h scope.h
+boolean_number${OBJ}: boolean_number.C boolean.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h number.h \
+  memutils.h
+boolean_string${OBJ}: boolean_string.C boolean.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h
+number_extern${OBJ}: number_extern.C number.h symbol.h librarian.h library.h \
+  block.h syntax.h treelog.h plf.h alist.h assertion.h log_extern.h \
+  scope_multi.h scope.h
 movement_rect${OBJ}: movement_rect.C movement.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h uzmodel.h \
   timestep.h macro.h transport.h mactrans.h geometry_rect.h \
@@ -1162,6 +1185,9 @@ action_markvand${OBJ}: action_markvand.C action.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h daisy.h \
   program.h time.h field.h border.h crop.h im.h fao.h log.h mathlib.h \
   check.h vcheck.h memutils.h
+photo_Farquhar${OBJ}: photo_Farquhar.C photo.h librarian.h library.h symbol.h \
+  block.h syntax.h treelog.h plf.h alist.h assertion.h bioclimate.h \
+  canopy_std.h canopy_simple.h phenology.h submodel.h mathlib.h check.h
 photo_GL${OBJ}: photo_GL.C photo.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h canopy_std.h \
   canopy_simple.h phenology.h submodel.h mathlib.h check.h

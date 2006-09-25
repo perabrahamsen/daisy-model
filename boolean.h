@@ -36,6 +36,7 @@ public:
 
   // Simulation.
 public:
+  virtual void tick (const Scope& scope, Treelog& msg) = 0;
   virtual bool missing (const Scope& scope) const = 0;
   virtual bool value (const Scope&) const = 0; 
 

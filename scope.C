@@ -25,6 +25,8 @@
 struct ScopeNull : public Scope
 {
   // Use.
+  void tick (const Scope&, Treelog&)
+  { }
   bool has_number (symbol) const
   { return false; }
   double number (symbol) const

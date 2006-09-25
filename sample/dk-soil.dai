@@ -59,3 +59,58 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
   (Soil (MaxRootingDepth 60 [cm])
         (horizons (  -30.00 "Jyndevad Ap")
                   ( -250.00 "Jyndevad C"))))
+
+(defhorizon "Foulum AP" default
+    (clay 0.115)
+    (silt 0.110)
+    (fine_sand 0.420)
+    (coarse_sand 0.332)
+    (humus 0.023)
+    (C_per_N 11.2)
+    (dry_bulk_density 1.45)  
+    (hydraulic M_vG
+        (K_sat 2.995)
+        (Theta_sat 0.46)
+        (Theta_res 0.00)
+        (alpha 0.05334)
+        (n 1.2870)))
+
+(defhorizon "Foulum B" default
+    (clay 0.149)
+    (silt 0.101)
+    (fine_sand 0.435)
+    (coarse_sand 0.310)
+    (humus 0.005)
+    (C_per_N 11.3)
+    (dry_bulk_density 1.45) 
+    (hydraulic M_vG
+        (K_sat 1.796)
+        (Theta_sat 0.386)
+        (Theta_res 0.000)
+        (alpha 0.0398)
+        (n 1.2585)))
+
+(defhorizon "Foulum C" default
+    (clay 0.164)
+    (silt 0.106)
+    (fine_sand 0.419)
+    (coarse_sand 0.310)
+    (humus 0.002)
+    (C_per_N 9.1)
+    (dry_bulk_density 1.55) 
+    (hydraulic M_vG
+        (K_sat 1.038)
+        (Theta_sat 0.345)
+        (Theta_res 0.00)
+        (alpha 0.0283)
+        (n 1.2200)))
+
+(defcolumn Foulum default
+  (Soil (MaxRootingDepth 100.00)
+        (horizons (  -30.00 "Foulum AP")
+                  (  -90.00 "Foulum B")	
+                  ( -150.00 "Foulum C")))
+  (OrganicMatter original
+                 (init (input 4411 [kg C/ha/y])
+                 (end -18 [cm])
+                 (root 911 [kg C/ha/y]))))

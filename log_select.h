@@ -95,6 +95,7 @@ struct LogSelect : public Log
 			 const AttributeList&);
   void close_named_entry ();
 
+  using Log::output;
   void output (symbol name, bool);
   void output (symbol name, double);
   void output (symbol name, int);

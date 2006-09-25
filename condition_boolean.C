@@ -30,10 +30,13 @@ struct ConditionBoolean : public Condition
   std::auto_ptr<Boolean> expr;
   
   // State.
-  enum { isfalse, istrue, missing, uninitialized, error } state;
+  mutable enum { isfalse, istrue, missing, uninitialized, error } state;
 
-  void tick (const Daisy&, Treelog& msg)
-  {
+  void tick (const Daisy&, Treelog&)
+  { }
+
+  bool match (const Daisy&, Treelog& msg) const
+  { 
     Treelog::Open nest (msg, name);
 
     if (state == uninitialized
@@ -42,14 +45,16 @@ struct ConditionBoolean : public Condition
       state = error;
 
     if (state != error)
-      if (expr->missing (Scope::null ()))
-        state = missing;
-      else
-        state = expr->value (Scope::null ()) ? istrue : isfalse;
+      {
+        expr->tick (Scope::null (), msg);
+        if (expr->missing (Scope::null ()))
+          state = missing;
+        else
+          state = expr->value (Scope::null ()) ? istrue : isfalse;
+      }
+    
+    return state == istrue ? true : false; 
   }
-
-  bool match (const Daisy&) const
-  { return state == istrue ? true : false; }
 
   void output (Log&) const
   { }

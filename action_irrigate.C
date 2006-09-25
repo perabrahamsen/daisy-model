@@ -73,7 +73,7 @@ struct ActionIrrigate : public Action
     irrigate (daisy.field, flux, temp, sm);
   }
 
-  bool done (const Daisy& daisy) const
+  bool done (const Daisy& daisy, Treelog&) const
   {
     daisy_assert (activated);
     return daisy.time >= end_time; 

@@ -425,11 +425,13 @@ extern "C" void EXPORT
 daisy_printer_comment (Printer* printer, const char* comment)
 { printer->print_comment (comment); }
 
+#if 0
 extern "C" void EXPORT
 daisy_printer_alist (Printer* printer, 
 		     const AttributeList* alist, const Syntax* syntax,
 		     const AttributeList* super)
 { printer->print_alist (*alist, *syntax, *super); }
+#endif
 
 extern "C" void EXPORT
 daisy_printer_library_file (Printer* printer, const char* filename)

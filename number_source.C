@@ -37,6 +37,8 @@ struct NumberSource : public Number
     daisy_assert (state != uninitialized);
     return source->title ();
   }
+  void tick (const Scope&, Treelog&)
+  { }
   bool missing (const Scope&) const 
   { 
     daisy_assert (state != uninitialized);

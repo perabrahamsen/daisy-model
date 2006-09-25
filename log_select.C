@@ -45,7 +45,7 @@ bool
 LogSelect::match (const Daisy& daisy, Treelog& out)
 {
   condition->tick (daisy, out);
-  is_printing = condition->match (daisy);
+  is_printing = condition->match (daisy, out);
   is_active = is_printing;
 
   for (vector<Select*>::const_iterator i = entries.begin (); 

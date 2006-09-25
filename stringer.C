@@ -70,6 +70,11 @@ Value to return.");
   std::vector<const Clause*> clauses;
 
   // Simulation.
+  void tick (const Scope& scope, Treelog& msg)
+  { 
+    for (size_t i = 0; i < clauses.size (); i++)
+      clauses[i]->condition->tick (scope, msg);
+  }
   bool missing (const Scope&) const
   { return false; }
   std::string value (const Scope& scope) const
@@ -135,6 +140,8 @@ struct StringerNumber : public Stringer
   std::auto_ptr<Number> number;
 
   // Simulation.
+  void tick (const Scope& scope, Treelog& msg)
+  { number->tick (scope, msg); }
   bool missing (const Scope& scope) const
   { return number->missing (scope); }
 
@@ -231,6 +238,8 @@ struct StringerIdentity : public Stringer
   const std::string val;
 
   // Simulation.
+  void tick (const Scope&, Treelog&)
+  { }
   bool missing (const Scope&) const
   { return false; }
   std::string value (const Scope&) const

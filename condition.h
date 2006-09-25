@@ -38,7 +38,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Daisy&, Treelog&);
-  virtual bool match (const Daisy&) const = 0;
+  virtual bool match (const Daisy&, Treelog&) const = 0;
   virtual void output (Log&) const = 0;
 
   // Create & Destroy.

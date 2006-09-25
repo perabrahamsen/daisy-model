@@ -14,6 +14,29 @@ release.
 
 * 4.10
 
+** log-std.dai is now included from log.dai
+
+** New way to specify column, crop, chemical, aom and pool to log.
+
+Now use 
+
+  (crop "Spring Barley")  
+
+instead of 
+
+  (set "$crop" "Spring Barley")  
+
+This was already the case for the log parameterizations in
+log-std.dai, but now also work with "log.dai" and "log-old.dai".
+
+** New examples from Czechia in the sample directory.
+
+** Weather data from Jyndeval and Foulum in the sample directory.
+** Soil parameterization from Foulum in dk-soil.dai in sample directory.
+
+Kindly provided by DJF, as part of the FertOrgaNic project, with
+permission to distribute widely.
+
 ** zplus can no longer be specified in 'Soil'.
 
 It is now (only) a parameter of the 'Geometry' submodel in the
@@ -31,7 +54,7 @@ Renamed "Soil Hydraulic Conductivity (log10)".
 
 ** New Folva, Triada, and Agria potato varieties in 'potato.dai'.
 
-** New examples from Italy, Poland and SLovakia in the sample directory.
+** New examples from Italy, Poland and Slovakia in the sample directory.
 
 ** You can now log actual hydraulic conductivity.
 

@@ -52,13 +52,15 @@ struct LogExtern : public LogSelect,
   name_map dimensions;
   
   // Log.
-  bool fetch_dimensions;
   symbol tag;
   void done (const Time&);
-
-  // No initial line.
   bool initial_match (const Daisy&, Treelog&)
+    // No initial line.
   { return false; }
+
+  // Self use.
+  using LogSelect::output;
+  void output (Log&) const;
 
   // Select::Destination
   void error ();
@@ -68,6 +70,7 @@ struct LogExtern : public LogSelect,
   void add (const symbol value);
 
   // Scope
+  void tick (const Scope&, Treelog&);
   bool has_number (symbol) const;
   double number (symbol) const;
   symbol dimension (symbol) const;
@@ -95,22 +98,29 @@ LogExtern::done (const Time& time)
   if (!is_printing)
     return;
 
-  if (fetch_dimensions)
-    {
-      fetch_dimensions = false;
-
-      for (unsigned int i = 0; i < entries.size (); i++)
-	{
-          tag = entries[i]->tag ();
-          sizes[tag] = entries[i]->size ();
-	  dimensions[tag] = entries[i]->dimension ();
-        }
-    }
-
   for (unsigned int i = 0; i < entries.size (); i++)
     {
       tag = entries[i]->tag ();
       entries[i]->done ();
+    }
+}
+
+void 
+LogExtern::output (Log& log) const
+{
+  // output_vector
+  static const symbol numbers_symbol ("numbers");
+  if (log.check_interior (numbers_symbol))
+    {
+      Log::Open open (log, numbers_symbol);
+      for (number_map::const_iterator item = numbers.begin ();
+	   item != numbers.end ();
+	   item++)
+	{
+	  Log::Unnamed unnamed (log);
+          output_value ((*item).first, "name", log);
+          output_value ((*item).second, "value", log);
+	}
     }
 }
 
@@ -147,9 +157,31 @@ LogExtern::add (symbol value)
   names[tag] = value;
 }
 
+void 
+LogExtern::tick (const Scope&, Treelog&)
+{ }
+
 bool 
 LogExtern::has_number (symbol tag) const
 { return lookup (tag) == Number; }
+
+#if 0
+bool 
+LogExtern::has_number (symbol tag) const
+{ 
+  const type_map::const_iterator i = types.find (tag);
+  if (i != types.end ())
+    return (*i).second == Number;
+
+  // For initialization, we need to claim we have a number before it is ready.
+
+  const int_map::const_iterator j = sizes.find (tag);
+  if (i != types.end ())
+    return (*i).second == Syntax::Singleton;
+
+  return false; 
+}
+#endif
 
 double 
 LogExtern::number (symbol tag) const
@@ -205,12 +237,34 @@ LogExtern::array (symbol tag) const
 
 void 
 LogExtern::initialize (Treelog&)
-{ }
+{
+  for (unsigned int i = 0; i < entries.size (); i++)
+    {
+      tag = entries[i]->tag ();
+      sizes[tag] = entries[i]->size ();
+      dimensions[tag] = entries[i]->dimension ();
+#if 0
+      if (entries[i]->has_default_value ())
+        numbers[tag] = entries[i]->default_value ();
+#endif 
+    }
+}
 
 LogExtern::LogExtern (Block& al)
-  : LogSelect (al),
-    fetch_dimensions (true)
+  : LogSelect (al)
 { 
+  if (al.check ("numbers"))
+    {
+      const std::vector<AttributeList*>& alists 
+        = al.alist_sequence ("numbers");
+      for (size_t i = 0; i < alists.size (); i++)
+        {
+          const symbol id = alists[i]->identifier ("name");
+          numbers[id] = alists[i]->number ("value");
+          types[id] = Number;
+        }
+    }
+
   for (unsigned int i = 0; i < entries.size (); i++)
     entries[i]->add_dest (this);
 
@@ -246,12 +300,21 @@ static struct LogExternSyntax
   static Log& make (Block& al)
   { return *new LogExtern (al); }
 
+  static void load_numbers (Syntax& syntax, AttributeList&)
+  {
+    syntax.add ("name", Syntax::String, Syntax::State, "\
+Name to refer to number with.");
+    syntax.add ("value", Syntax::Unknown (), Syntax::State, "\
+Numeric value.");
+  }
+
   LogExternSyntax ()
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       LogSelect::load_syntax (syntax, alist);
-
+      syntax.add_submodule_sequence ("numbers", Syntax::OptionalState, "\
+Inititial numeric values.  By default, none.", load_numbers);
       syntax.add ("where", Syntax::String, Syntax::OptionalConst,
 		  "Name of the extern log to use.\n\
 By default, use the model name.");

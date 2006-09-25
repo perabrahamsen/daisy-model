@@ -30,7 +30,7 @@ using namespace std;
 
 struct ConditionFalse : public Condition
 {
-  bool match (const Daisy&) const
+  bool match (const Daisy&, Treelog&) const
   { return false; }
   void output (Log&) const
   { }
@@ -45,7 +45,7 @@ struct ConditionFalse : public Condition
 
 struct ConditionTrue : public Condition
 {
-  bool match (const Daisy&) const
+  bool match (const Daisy&, Treelog&) const
   { return true; }
   void output (Log&) const
   { }
@@ -71,13 +71,13 @@ struct ConditionOr : public Condition
 	(*i)->tick (daisy, out);
       }
   }
-  bool match (const Daisy& daisy) const
+  bool match (const Daisy& daisy, Treelog& msg) const
   {
     for (vector<Condition*>::const_iterator i = conditions.begin ();
 	 i != conditions.end ();
 	 i++)
       {
-	if ((*i)->match (daisy))
+	if ((*i)->match (daisy, msg))
 	  return true;
       }
     return false;
@@ -107,13 +107,13 @@ struct ConditionAnd : public Condition
 	(*i)->tick (daisy, out);
       }
   }
-  bool match (const Daisy& daisy) const
+  bool match (const Daisy& daisy, Treelog& msg) const
   {
     for (vector<Condition*>::const_iterator i = conditions.begin ();
 	 i != conditions.end ();
 	 i++)
       {
-	if (!(*i)->match (daisy))
+	if (!(*i)->match (daisy, msg))
 	  return false;
       }
     return true;
@@ -134,8 +134,8 @@ struct ConditionNot : public Condition
 {
   auto_ptr<Condition> condition;
 
-  bool match (const Daisy& daisy) const
-  { return !condition->match (daisy); }
+  bool match (const Daisy& daisy, Treelog& msg) const
+  { return !condition->match (daisy, msg); }
 
   void tick (const Daisy& daisy, Treelog& out)
   { condition->tick (daisy, out); }
@@ -164,12 +164,12 @@ struct ConditionIf : public Condition
     then_c->tick (daisy, out);
     else_c->tick (daisy, out);
   }
-  bool match (const Daisy& daisy) const
+  bool match (const Daisy& daisy, Treelog& msg) const
   { 
-    if (if_c->match (daisy))
-      return then_c->match (daisy);
+    if (if_c->match (daisy, msg))
+      return then_c->match (daisy, msg);
     else
-      return else_c->match (daisy); 
+      return else_c->match (daisy, msg); 
   }
   void output (Log&) const
   { }

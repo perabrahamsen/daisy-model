@@ -37,8 +37,9 @@ public:
   // Print comment.
   virtual void print_comment (const std::string& comment) = 0;
   // Print content of alist.
-  virtual void print_alist (const AttributeList& alist, const Syntax&,
-			    const AttributeList& super) = 0;
+  virtual void print_alist (const AttributeList& alist, const Syntax& syntax,
+			    const AttributeList& super_alist,
+                            const Syntax& super_syntax) = 0;
   // Print entry in alist.
   virtual void print_entry (const AttributeList&, const Syntax&,
 			    const std::string& key) = 0;

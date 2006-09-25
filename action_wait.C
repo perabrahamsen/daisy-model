@@ -37,8 +37,8 @@ struct ActionWait : public Action
   void doIt (Daisy&, Treelog&)
   { }
 
-  bool done (const Daisy& daisy) const
-  { return condition->match (daisy); }
+  bool done (const Daisy& daisy, Treelog& msg) const
+  { return condition->match (daisy, msg); }
 
   void output (Log& log) const
   { output_derived (condition, "condition", log); }
@@ -70,7 +70,7 @@ struct ActionWaitDays : public Action
       }
   }
 
-  bool done (const Daisy& daisy) const
+  bool done (const Daisy& daisy, Treelog&) const
   {
     daisy_assert (activated);
     return daisy.time >= end_time; 
@@ -106,7 +106,7 @@ struct ActionWaitMMDD : public Action
   void doIt (Daisy&, Treelog&)
   { }
 
-  bool done (const Daisy& daisy) const
+  bool done (const Daisy& daisy, Treelog&) const
   { 
     return daisy.time.month () == month
       && daisy.time.mday () == day 

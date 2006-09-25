@@ -40,6 +40,7 @@ public:
 protected:
   static bool known (const symbol);
 public:
+  virtual void tick (const Scope& scope, Treelog& msg) = 0;
   virtual bool missing (const Scope& scope) const = 0;
   virtual double value (const Scope&) const = 0; 
   virtual symbol dimension (const Scope&) const = 0;

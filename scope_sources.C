@@ -26,6 +26,10 @@
 #include "memutils.h"
 #include <sstream>
 
+void 
+ScopeSources::tick (const Scope&, Treelog&)
+{ }
+
 bool 
 ScopeSources::has_number (const symbol tag_symbol) const
 {

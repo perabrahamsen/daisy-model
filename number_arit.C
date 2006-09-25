@@ -33,6 +33,8 @@ struct NumberOperand : public Number
   const std::auto_ptr<Number> operand;
 
   // Simulation.
+  void tick (const Scope& scope, Treelog& msg)
+  { operand->tick (scope, msg); }
   bool missing (const Scope& scope) const 
   { return operand->missing (scope); }
   symbol dimension (const Scope&) const
@@ -197,6 +199,11 @@ struct NumberPow : public Number
   const std::auto_ptr<Number> exponent;
 
   // Simulation.
+  void tick (const Scope& scope, Treelog& msg)
+  { 
+    base->tick (scope, msg);
+    exponent->tick (scope, msg);
+  }
   bool missing (const Scope& scope) const 
   { return base->missing (scope) || exponent->missing (scope); }
   double value (const Scope& scope) const
@@ -281,6 +288,11 @@ struct NumberOperands : public Number
   }
 
   // Use.
+  void tick (const Scope& scope, Treelog& msg)
+  { 
+    for (size_t i = 0; i < operands.size (); i++)
+      operands[i]->tick (scope, msg);
+  }
   bool missing (const Scope& scope) const 
   { 
     for (size_t i = 0; i < operands.size (); i++)

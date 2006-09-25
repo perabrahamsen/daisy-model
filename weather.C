@@ -68,7 +68,7 @@ Weather::tick_after (const Time& time, Treelog&)
     }
 
   // Daily claudiness.
-  if (time.hour () == 0.0)
+  if (time.hour () == 0)
     {
       const double Si = daily_global_radiation () ;
       const double rad = ExtraterrestrialRadiation (time);

@@ -26,6 +26,7 @@
 #include "symbol.h"
 
 struct Scope;
+struct Treelog;
 
 extern const Scope* find_extern_scope (symbol name);
 

@@ -35,9 +35,9 @@ struct ActionAssert : public Action
   void tick (const Daisy& daisy, Treelog& out)
   { condition->tick (daisy, out); }
 
-  void doIt (Daisy& daisy, Treelog&)
+  void doIt (Daisy& daisy, Treelog& msg)
   { 
-    if (!condition->match (daisy))
+    if (!condition->match (daisy, msg))
       throw (message);
   }
 

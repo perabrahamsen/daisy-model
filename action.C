@@ -40,7 +40,7 @@ Action::output (Log&) const
 { }
 
 bool
-Action::done (const Daisy&) const
+Action::done (const Daisy&, Treelog&) const
 { return true; }
 
 bool

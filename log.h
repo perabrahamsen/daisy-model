@@ -42,6 +42,7 @@ private:
   struct Implementation;
   Implementation& impl;
 public:
+  const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
   static const char *const description;
 
@@ -267,6 +268,10 @@ public:
   // Utilities
 public:
   static void print_dlf_header (std::ostream& out, const AttributeList& al);
+
+  // Self use.
+public:
+  virtual void output (Log&) const;
 
   // Create and Destroy.
 public:

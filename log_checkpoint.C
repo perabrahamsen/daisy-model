@@ -62,7 +62,7 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& out)
 {
   daisy_assert (nested == 0);
   condition->tick (daisy, out);
-  is_active = condition->match (daisy);
+  is_active = condition->match (daisy, out);
   if (is_active)
     {
       static const symbol daisy_symbol ("daisy");
@@ -149,7 +149,7 @@ LogCheckpoint::done (const Time&)
       AttributeList default_alist;
       Daisy::load_syntax (daisy_syntax, default_alist);
 
-      printer.print_alist (alist (), daisy_syntax, default_alist);
+      printer.print_alist (alist (), daisy_syntax, default_alist, daisy_syntax);
 
       if (!printer.good ())
 	{
