@@ -1,0 +1,592 @@
+;; cz-management.dai -- Sample Czeckia management from FertOrgaNic project.
+
+;; Fertilizer.
+
+;;Defining Fertilization pigcz01_slurry
+(defam pigcz01_slurry pig_slurry
+ (description "pigcz01_slurry")
+ (dry_matter_fraction 0.0249)
+ (total_N_fraction 0.1242) 
+ (total_C_fraction 0.41017)
+ (NH4_fraction 0.88106 []) 
+ (NO3_fraction 0.00327 []) 
+ (volatilization 0.017))
+
+;;Defining Fertilization pigcz02_slurry
+(defam pigcz02_slurry pig_slurry
+ (description "pigcz02_slurry")
+ (dry_matter_fraction 0.0565)
+ (total_N_fraction 0.0853) 
+ (total_C_fraction 0.41017)
+ (NH4_fraction 0.615475 []) 
+ (NO3_fraction 0.06331 []) 
+ (volatilization 0.017))
+    
+;;Defining Fertilization pigcz03_slurry
+(defam pigcz03_slurry pig_slurry
+ (description "pigcz03_slurry")
+ (dry_matter_fraction 0.0584)
+ (total_N_fraction 0.08621) 
+ (total_C_fraction 0.418)
+ (NH4_fraction 0.554 [])  ; 0,4791
+ (NO3_fraction 0.1283 []) ; 0,00045
+ (volatilization 0.017))
+ 
+;;Defining Fertilization pigcz04_slurry
+(defam pigcz04_slurry pig_slurry
+ (description "pigcz04_slurry")
+ (dry_matter_fraction 0.05335)
+ (total_N_fraction 0.0552) 
+ (total_C_fraction 0.4025)
+ (NH4_fraction 0.35688 []) 
+ (NO3_fraction 0.02228 []) 
+ (volatilization 0.017))
+
+;;Defining Fertilization pigcz05_slurry
+(defam pigcz05_slurry pig_slurry
+ (description "pigcz05_slurry")
+ (dry_matter_fraction 0.0729)
+ (total_N_fraction 0.056775) 
+ (total_C_fraction 0.41)
+ (NH4_fraction 0.51387 []) 
+ (NO3_fraction 0.02659 []) 
+ (volatilization 0.017))
+  
+;;Defining Fertilization pig_farmyard_manurecz01
+(defam pig_farmyard_manurecz01 pig_manure
+ (description "pig_farmyard_manurecz01")
+ (dry_matter_fraction 0.2401)
+ (total_N_fraction 0.0355) 
+ (total_C_fraction 0.316)
+ (NH4_fraction 0.33651 []) 
+ (NO3_fraction 0.08592 []) 
+ (volatilization 0.065))
+
+;;Defining Fertilization pig_farmyard_manurecz02
+(defam pig_farmyard_manurecz02 pig_manure
+ (description "pig_farmyard_manurecz02")
+ (dry_matter_fraction 0.211)
+ (total_N_fraction 0.0419) 
+ (total_C_fraction 0.365787)
+ (NH4_fraction 0.26084 []) ;???NO3
+ (NO3_fraction 0.02780 []) ; prùmìr z jiných let místo hodnoty 0,26084 (extrémnì vysoká)
+ (volatilization 0.065))
+    
+ ;;Defining Fertilization pig_farmyard_manurecz03
+(defam pig_farmyard_manurecz03 pig_manure
+ (description "pig_farmyard_manurecz03")
+ (dry_matter_fraction 0.3215)
+ (total_N_fraction 0.03471) 
+ (total_C_fraction 0.316)
+ (NH4_fraction 0.15552 []) ; 0,16105
+ (NO3_fraction 0.00727 []) ; 0,01459
+ (volatilization 0.065))
+
+;;Defining Fertilization pig_farmyard_manurecz04
+(defam pig_farmyard_manurecz04 pig_manure
+ (description "pig_farmyard_manurecz04")
+ (dry_matter_fraction 0.2332)
+ (total_N_fraction 0.0542) 
+ (total_C_fraction 0.3317)
+ (NH4_fraction 0.58191 []) 
+ (NO3_fraction 0.00891 []) 
+ (volatilization 0.065))
+ 
+;;Defining Fertilization pig_farmyard_manurecz05
+(defam pig_farmyard_manurecz05 pig_manure
+ (description "pig_farmyard_manurecz05")
+ (dry_matter_fraction 0.19625)
+ (total_N_fraction 0.057) 
+ (total_C_fraction 0.35875)
+ (NH4_fraction 0.55 []) 
+ (NO3_fraction 0.00912 []) 
+ (volatilization 0.065))
+   
+ (defam cattle_manurecz pig_manure
+  (description "cattle_manurecz")
+  (dry_matter_fraction 0.24))
+
+(defam cattle_dungwatercz pigcz03_slurry
+   (description "cattle_dungwatercz")
+   (dry_matter_fraction 0.02))
+  
+;;Defining mineral fertilisers
+;;calcium_nitratecz (15,5% N-NH3) Ca(NO3)2
+(defam calcium_nitratecz mineral
+(description "calcium_nitratecz")
+(NH4_fraction 0.0 []))
+
+;;amonium_sulphatecz (20% N-NH4) SA
+(defam amonium_sulphatecz mineral
+(description "amonium_sulphatecz")
+(NH4_fraction 1.0 []))
+
+;;ureacz (46% N-NH4) CO(NH2)2
+(defam ureacz mineral
+(description "ureacz")
+(NH4_fraction 1.0 []))
+
+;;DAM390cz (30% N-mineral)
+(defam DAM390cz mineral
+(description "DAM390cz")
+(NH4_fraction 0.75 []))
+
+;;LAV27cz (27% N-mineral)
+(defam LAV27cz mineral
+(description "LAV27cz")
+(NH4_fraction 0.5 []))
+
+;;LA33cz (33% N-mineral)
+(defam LA33cz mineral
+(description "LA33cz")
+(NH4_fraction 0.5 []))
+
+;;NPK11-12-12cz 
+(defam NPK11-12-12cz mineral
+(description "Simferta NPK11-12-12cz")
+(NH4_fraction 0.5 []))
+
+;;NP26-14cz 
+(defam NP26-14cz mineral
+(description "Norsk Hydro NP26-14cz")
+(NH4_fraction 0.5 []))
+
+;;NP20-20cz 
+(defam NP20-20cz mineral
+(description "NP20-20cz")
+(NH4_fraction 0.5 []))
+
+;;; Crops.
+
+(defcrop "Clovercz" "Pea")
+(defcrop "Oatcz" "Rye")
+(defcrop "Triticale" "Rye")
+(defcrop "Rye-grasscz" "Grass to grain")
+(defcrop "Mustardcz" "Winter Rape")
+
+;;; Tillage.
+
+(defaction harrowing mix -7.0) ; Also used by PL 2005.
+(defaction roller mix -2.0)
+(defaction sweep mix -10.0)
+(defaction ridging mix -5.0)
+(defaction haulm_destruction mix -2.0)
+(defaction surface_levelling mix -10.0)
+(defaction manual_burrying_drip_lines mix -5.0)
+(defaction manual_removal_of_drip_lines mix -5.0)
+
+;;; Rotation.
+
+(defaction "WP1 CZ RISWC 2004 WARMUP" activity
+  ;;1991 Spring Barley Jarek with Clover Chlumecky (as pea)
+  ; FD 16/11/04: Spring barley is not modelled, clover only remains
+  (wait (mm_dd 4 3))
+  ; fertilize  200 kg SA 21%/ha (=amonia) 
+  (fertilize (amonium_sulphatecz (weight 48.0 [kg N/ha])))
+  (wait (mm_dd 4 4))
+  (seed_bed_preparation)
+  (wait (mm_dd 4 6))
+  ;(sow "Spring Barley") operation made inactive by FD 16/11/04
+  (sow "Clovercz")
+  ;(wait (mm_dd 4 7))
+  ;(harrowing) operation made inactive FD 16/11/04
+  (wait (mm_dd 6 6))
+    ;(spray MCPA 640 [g/ha]) 
+    ;; = in Herbicide Aminex Pur (2,0 l/ha)(320g MCPA/l)
+    ;fertilize CO(NH2)2=urea (46% N-mineral)
+    (fertilize (ureacz (weight 17.0 [kg N/ha])))
+  ;(wait (mm_dd 6 29))
+    ;(spray Propiconazole 125 [g/ha]) 
+    ;; = in Fungicide Tilt 250 EC (0,5 l/ha)(250g Propiconazole/l)
+  (wait (mm_dd 8 18))
+  ;(harvest "Spring Barley" (stem 0)(leaf 0)(sorg 0.95)) operation made inactive by FD 16/11/04
+  (harvest "Clovercz" (stub 10.0 [cm])(stem 1.0))  
+  
+  ;;1992 Clover Chlumecky (as pea) + rye-grass 20 kg/ha (as grass)+ oats 20 kg/ha (as rye)
+  ;FD 16/11/04: rye-grass is not modelled, oats only remains
+   (wait (mm_dd 4 7))
+    ;(sow "Rye-grasscz") operation made inactive by FD 16/11/04
+    (sow "Oatcz")
+   ;(fertilize (mocuvka=stale? (weight xx.x [kg N/ha]))) !!!!!
+  (fertilize (cattle_dungwatercz (weight 20.0 [Mg w.w./ha])))
+  ;(plowing) operation made inactive FD 16/11/04
+  (wait (mm_dd 4 8))
+  ; fertilize  100 kg LAV 27%/ha (=amonium nitrate) 
+  (fertilize (LAV27cz (weight 27.0 [kg N/ha])))
+  (wait (mm_dd 6 10))
+  ;(harvest "Clovercz" (stub 10.0 [cm])(stem 1.0)) operation made inactive by FD 16/1104
+  (wait (mm_dd 6 11))
+  ; fertilize  100 kg LAV 27%/ha (=amonium nitrate) 
+  (fertilize (LAV27cz (weight 27.0 [kg N/ha])))  
+  (wait (mm_dd 8 20))
+  ;(harvest "Clovercz" (stub 10.0 [cm])(stem 1.0)) operation made inactive by FD 16/11/04
+  (harvest "Oatcz" (stub 10.0 [cm])(stem 1.0)(sorg 0.95)) ;operation added by FD 16/11/04
+  (wait (mm_dd 9 1))
+  (plowing)
+  (wait (mm_dd 9 14))
+  ; fertilize  300 kg SA 21%/ha (=ammonia) 
+   (fertilize (amonium_sulphatecz (weight 63.0 [kg N/ha])))
+   (sow "Winter Barley")
+  ;(wait (mm_dd 9 16))
+  ;(spray Chlortoluron 2000 [g/ha]) 
+  ;; = in Herbicide Dicuran 80 WP (2,5 kg/ha)(80% Chlortoluron)
+  
+  ;;1993 Winter Barley Borvina 240 kg/ha
+  ;(wait (mm_dd 4 27))
+   ;(spray MCPA 960 [g/ha]) 
+   ;; = in Herbicide Aminex Pur (3,0 l/ha)(320g MCPA/l)
+   ;(spray Chlorsulfuron 4.5 [g/ha]) 
+   ;; = in Herbicide Glean 75 WG (6,0 g/ha)(75% Chlorsulfuron)
+  (wait (mm_dd 5 17))
+  ; fertilize  xx kg LA 33%/ha - the dose estimated by FD
+  (fertilize (LA33cz (weight 50.0 [kg N/ha])))
+  (wait (mm_dd 7 25))
+  (harvest "Winter Barley" (stem 0.95)(leaf 0.95)(sorg 0.95))
+  (wait (mm_dd 7 28))
+  (fertilize (cattle_manurecz (weight 35.0 [T w.w./ha])))
+  (wait (mm_dd 7 29))
+  (plowing)
+  (wait (mm_dd 7 30))
+    (disk_harrowing)
+    (seed_bed_preparation)
+  (wait (mm_dd 8 1)) 
+  ; ferttilize  300 kg LA 33%/ha
+  (fertilize (LA33cz (weight 99.0 [kg N/ha])))
+  (wait (mm_dd 8 2)) 
+  ; sow mustard (=winter rape)
+   (sow "Mustardcz")
+   ;(roller) operation made inactive by FD 16/10/04
+  ;(wait (mm_dd 10 22))
+  ;(harvest "Mustardcz" (stem 0.00)(leaf 0.00)(sorg 0.00)) made inactive by FD 16/11/04
+  (wait (mm_dd 11 5))
+  (plowing)
+  
+  ;;1994 Potato; RISWC Karin 2500 kg/ha
+  (wait (mm_dd 4 19))
+  (sweep) 
+  (wait (mm_dd 4 22))
+   ;fertilize 730kg Simferta (N:P:K=11:12:12)=80,3kgN+88kgP2O5+88kgK2O
+   (fertilize (NPK11-12-12cz (weight 80.3 [kg N/ha])))
+  (wait (mm_dd 4 26))
+   (seed_bed_preparation)
+  (wait (mm_dd 4 27)) 
+  (sow "Potato; Agria")
+  ;(wait (mm_dd 5 13)) 
+  ;(harrowing) ;vlaceni sitovymi branami operation made inactive FD 16/11/04
+  ;(wait (mm_dd 5 18)) 
+  ;(stubble_cultivation) ;podmitka naslepo bez vlaceni (ruska plecka)
+  ; the previous operation was made inactive by FD 16/11/04
+  ;(wait (mm_dd 6 2)) 
+  ;(ridging) operation made inactive FD 16/11/04
+  ;(wait (mm_dd 6 3)) 
+  ;(harrowing) ;vlaceni operation made inactive FD 16/11/04 
+  ;(wait (mm_dd 6 13)) 
+  ;(ridging) operation made inactive FD 16/11/04
+  ;(wait (mm_dd 6 22)) 
+  ;(ridging) operation made inactive FD 16/11/04
+  ;(wait (mm_dd 7 12))
+   ;(spray Cymoxanil 80 [g/ha]) 
+   ;(spray Oxadixyl 200 [g/ha]) 
+   ;(spray Mancozeb 1400 [g/ha]) 
+   ;; = in Fungicide Ripost M (2,5 kg/ha)(3,2% Cymoxanilu, 8% Oxadixylu a 56% Mancozebu)
+   ;(spray Deltamethrin 10 [g/ha]) 
+   ;; = in Insecticide Decis EW 50 (0,2 l/ha)(50 g/l Deltamethrinu)
+  ;(wait (mm_dd 8 2))
+   ;(spray Oxadixyl 200 [g/ha]) 
+   ;(spray Mancozeb 1400 [g/ha]) 
+   ;; = in Fungicide Sandofan M (2,5 kg/ha)(8% Oxadixylu a 56% Mancozebu)
+  ;(wait (mm_dd 8 16))
+   ;(spray Fentin acetat 270 [g/ha]) 
+   ;(spray Maneb 75 [g/ha]) 
+   ;; = in Fungicide Brestan 60 WP (0,5 kg/ha)(54% Fentin acetatu a 15% Manebu)
+  ;(wait (mm_dd 8 2))
+   ;(spray Fentin acetat 324 [g/ha]) 
+   ;(spray Maneb 90 [g/ha]) 
+   ;; = in Fungicide Brestan 60 WP (0,6 kg/ha)(54% Fentin acetatu a 15% Manebu)
+   (wait (mm_dd 10 4))
+  (harvest "Potato; Agria" (stem 0.00)(leaf 0.00)(sorg 0.95))
+  (wait (mm_dd 11 12))
+  (plowing)
+  
+  ;;1995 Spring Barley Akcent 180 kg/ha with Clover Start 20kg/ha (=spring rape)
+  ;FD 16/11/04: spring barley not modelled, clover only remains
+  (wait (mm_dd 4 8))
+  ;fertilize 500kg Simferta NPK (N:P:K=11:12,4:12,4)=55kgN+62kgP2O5+62kgK2O
+   (fertilize (NPK11-12-12cz (weight 55.0 [kg N/ha])))
+   (seed_bed_preparation)
+  (wait (mm_dd 4 9))
+  ;(sow "Spring Barley") operation made inactive by FD 16/11/04
+  (sow "Clovercz") 
+  ;(wait (mm_dd 4 10))
+  ;(harrowing) operation made inactive by FD 16/10/04
+  (wait (mm_dd 6 4))
+    ;(spray MCPA 640 [g/ha]) 
+    ;; = in Herbicide Aminex Pur (2,0 l/ha)(320g MCPA/l)
+    ;fertilize 60 kg DAM 390/ha (30%) 75%ammonia
+    (fertilize (DAM390cz (weight 18.0 [kg N/ha])))
+  (wait (mm_dd 8 11))
+  ;(harvest "Spring Barley" (stem 0)(leaf 0)(sorg 0.95)) made inactive FD 16/11/04
+  (wait (mm_dd 9 30))
+  (harvest "Clovercz" (stub 10.0 [cm])(stem 1.0))
+
+  ;;1996 Clover Start (=pea)+ pea 20 kg/ha + rye-grass - jílek (=grass) 30 kg/ha
+  ; rygrass and clover not modelled, pea only remains)
+  (wait (mm_dd 4 10))
+   (sow "Pea")
+   ;(sow "Rye-grasscz") operation made inactive by FD 16/11/04
+  ;(wait (mm_dd 4 11)) 
+  ;(roller) operation made inactive by FD 16/11/04
+  ;(wait (mm_dd 5 28))
+   ;(harvest "Clovercz" (stub 10.0 [cm])(stem 1.0)) made inactive by FD 16/11/04
+   ;(harvest "Pea" (stub 10.0 [cm])(stem 1.0)) made inactive by FD 16/11/04
+   ;(harvest "Rye-grasscz" (stub 10.0 [cm])(stem 1.0)) made inactive by FD 16/11/04
+  ;(wait (mm_dd 7 23))
+  ; (harvest "Clovercz" (stub 10.0 [cm])(stem 1.0)) made inactive by FD 16/11/04
+  ; (harvest "Pea" (stub 10.0 [cm])(stem 1.0))made inactive by FD 16/11/04
+  ; (harvest "Rye-grasscz" (stub 10.0 [cm])(stem 1.0)) made inactive by FD 16/11/04
+  (wait (mm_dd 9 24))
+  ; (harvest "Clovercz" (stub 10.0 [cm])(stem 1.0)) made inactive by FD 16/11/04
+   (harvest "Pea" (stub 10.0 [cm])(stem 1.0)(sorg 0.80)) ; sorg added by FD 16/11/04
+  ; (harvest "Rye-grasscz" (stub 10.0 [cm])(stem 1.0)) made inactive by FD 16/11/04
+  (wait (mm_dd 9 25))
+  (plowing)
+  (wait (mm_dd 9 28))
+    ;fertilize 600kg Simferta NPK (N:P:K=11:12,4:12,4)=66kgN+74,4kgP2O5+74,4kgK2O
+    (fertilize (NPK11-12-12cz (weight 66.0 [kg N/ha])))
+    (seed_bed_preparation)
+   (wait (mm_dd 9 29))
+   (sow "Winter Wheat") ; WW Hana 220 kg/ha
+   ;(wait (mm_dd 9 30))
+    ;(roller) operation made inactive by FD 16/11/04
+    ;(spray Trifluralin 720 [g/ha]) 
+    ;; = in Herbicide Synfloran 48 EC (1,5 l/ha)(480g Trifluralinu/l)
+ 
+ ;;1997 Winter Wheat Hana 220 kg/ha 
+ (wait (mm_dd 3 15))
+   ;fertilize 300kg LAV 27% = 81 kg N/ha
+   (fertilize (LAV27cz (weight 81.0 [kg N/ha])))
+ ;(wait (mm_dd 4 23)) 
+  ;(spray Prochloraz 675 [g/ha]) 
+  ;; = in Fungicide Sportak HF (1,5 l/ha)(450g Prochlorazu/l)  
+  ;(spray Chlormequat-chlorin 720 [g/ha]) 
+  ;; = in RR Retacel extra R68 (1,0 l/ha)(720g Chl./l)   
+ ;(wait (mm_dd 4 28)) 
+  ;(spray Isoproturon 1000 [g/ha]) 
+  ;; = in Herbicide Arelon 500 Fw (2,0 l/ha)(500g Isoproturonu/l)  
+  ;(spray Fluroxypyr 150 [g/ha]) 
+  ;; = in Herbicide Starane 250 EC (0,6 l/ha)(250g Fluroxyryru/l)
+ (wait (mm_dd 5 31))
+   ;fertilize 300kg LAV 27% = 81 kg N/ha
+   (fertilize (LAV27cz (weight 81.0 [kg N/ha])))
+ ;(wait (mm_dd 6 11)) 
+  ;(spray Epoxiconazole 50.4 [g/ha]) 
+  ;(spray Fenpropimorph 150 [g/ha]) 
+  ;; = in Fungicide Tango Super (0,6 l/ha)(84g Epoxiconazole/ha + 250g Fenpropimorphu/l)  
+ (wait (mm_dd 8 19))
+ (harvest "Winter Wheat" (stem 0)(leaf 0)(sorg 0.95))
+ (wait (mm_dd 8 28)) 
+   (stubble_cultivation) ;podmitka
+ (wait (mm_dd 9 2)) 
+   (sweep)
+   (harrowing)
+  (disk_harrowing) ;smykování a vláèení
+ (wait (mm_dd 9 12)) 
+ (fertilize (cattle_manurecz (weight 35.0 [T w.w./ha])))
+ (wait (mm_dd 9 13))
+ (plowing)
+ 
+  ;;1998 Potato; RISWC Rosela 3000 kg/ha
+   (wait (mm_dd 4 12))
+   (disk_harrowing)
+   (wait (mm_dd 4 25))
+    ;fertilize 800kg Simferta (N:P:K=11:12,4:12,4)=88kgN+99,2kgP2O5+99,2kgK2O
+    (fertilize (NPK11-12-12cz (weight 88.0 [kg N/ha])))
+   (wait (mm_dd 4 27))
+   (seed_bed_preparation)
+   (wait (mm_dd 4 28)) 
+   (sow "Potato; Agria")
+   ;(wait (mm_dd 5 14))
+    ;(spray Terbuthylazine 210 [g/ha]) 
+    ;(spray Terbutryn 490 [g/ha]) 
+    ;; = in Herbicide Topogard 50 WP (1,4 kg/ha)(15% Terbuthylazinu, 35% Terbutynu)
+    ;(spray Clomazone 48 [g/ha]) 
+    ;; = in Herbicide Command 4 EC (0,1 l/ha)(480 g/l Clomazone)
+   ;(wait (mm_dd 6 8))
+    ;(spray Mancozeb 1600 [g/ha]) 
+    ;; = in Fungicide Novozir NM 80 (2,0 kg/ha)(80% Mancozebu)
+   ;(wait (mm_dd 6 22))
+    ;(spray Mancozeb 1600 [g/ha]) 
+    ;(spray Metalaxyl 200 [g/ha]) 
+    ;; = in Fungicide Ridomil MZ 72 WP (2,5 kg/ha)(64% Mancozebu a 8% Metalaxylu)
+   ;(wait (mm_dd 7 5))
+    ;(spray Mancozeb 1600 [g/ha]) 
+    ;(spray Metalaxyl 200 [g/ha]) 
+    ;; = in Fungicide Ridomil MZ 72 WP (2,5 kg/ha)(64% Mancozebu a 8% Metalaxylu)
+   ;(wait (mm_dd 7 19))
+    ;(spray Fentin acetat 270 [g/ha]) 
+    ;(spray Maneb 75 [g/ha]) 
+    ;; = in Fungicide Brestan 60 WP (0,5 kg/ha)(54% Fentin acetatu a 15% Manebu)
+  (wait (mm_dd 9 10))
+  (harvest "Potato; Agria" (stem 0.00)(leaf 0.00)(sorg 0.95))
+
+ ;;1999 Spring Barley Primus 200 kg/ha 
+   (wait (mm_dd 4 29))
+     ;fertilize 250kg NP (Norsk Hydro) (N:P=26:14)=65kgN+35kgP2O5 (fertilize (AmmoniumNitrate (weight 88.0 [kg N/ha])))
+     (fertilize (NP26-14cz (weight 65.0 [kg N/ha])))
+    (seed_bed_preparation)
+   ;(stop)
+   (wait (mm_dd 4 30))
+   (sow "Spring Barley")
+   ;(wait (mm_dd 4 31)) corrected by FD 16/11/04 - see the following line:
+   ;(wait (mm_dd 5 1))
+   ;(roller) operation made inactive by FD 16/11/04
+   ;(wait (mm_dd 5 13))
+    ;(spray Dicamba 79.1 [g/ha]) 
+    ;(spray Triasulfuron 4.9 [g/ha]) 
+    ;; = in Herbicide Lintur 70 WG (120 g/ha)(65,9% Dicamba a 4,1% Triasulfuron)
+   (wait (mm_dd 6 4))
+   ;fertilize 111,11 kg LAV 27% = 30 kg N/ha
+   (fertilize (LAV27cz (weight 30.0 [kg N/ha])))
+   ;(wait (mm_dd 6 8)) 
+    ;(spray Propiconazole 125 [g/ha]) 
+    ;; = in Fungicide Tilt 250 EC (0,5 l/ha)(250g Propiconazole/l)  
+   (wait (mm_dd 6 28))
+   ;fertilize 111,11 kg LAV 27% = 30 kg N/ha
+   (fertilize (LAV27cz (weight 30.0 [kg N/ha])))
+   (wait (mm_dd 8 3))
+    (harvest "Spring Barley" (stem 0)(leaf 0)(sorg 0.95))
+    (plowing)
+   (wait (mm_dd 8 23))
+   (seed_bed_preparation) ;this line was added by FD 16/11/04
+   (sow "Winter Rape");Pronto 4,8 kg/ha (hybrid)
+   ;(wait (mm_dd 8 24))
+    ;(spray Metazachlor 400 [g/ha]) 
+    ;; = in Herbicide Butisan 400 SC (1,5 l/ha)(400 g/l Metazachloru)
+    ;(spray Clomazone 48 [g/ha]) 
+    ;; = in Herbicide Command 4 EC (0,1 l/ha)(480 g/l Clomazone)
+   
+  ; 2000 Winter Rape Pronto 4,8 kg/ha (hybrid)
+   (wait (mm_dd 4 6))
+    ;fertilize 180,0 kg LAV 27% = 48,6 kg N/ha
+    (fertilize (LAV27cz (weight 48.6 [kg N/ha])))
+   (wait (mm_dd 4 14))
+    ;(spray Chlorpyrifos 300 [g/ha]) 
+    ;(spray Cypermethrin 30 [g/ha]) 
+    ;; = in Insecticide Nurelle D (0,6 l/ha)(500 g/l Chlorpyrifosu a 50 g/l Cypermethrinu)
+   (wait (mm_dd 4 16))
+    ;fertilize 210,0 kg LAV 27% = 56,5 kg N/ha
+    (fertilize (LAV27cz (weight 56.5 [kg N/ha])))
+   (wait (mm_dd 4 26))
+    ;(spray Deltamethrin 2.5 [g/ha]) 
+    ;; = in Insecticide Decis Flow 2,5 EW (0,1 l/ha)(25 g/l Deltamethrinu)
+    ;fertilize 120 l DAM390 30%/ha 75%ammonia
+    (fertilize (DAM390cz (weight 36.0 [kg N/ha])))
+   (wait (mm_dd 7 23))
+   (harvest "Winter Rape" (stem 0)(leaf 0)(sorg 0.95))
+   (wait (mm_dd 7 27))
+   (stubble_cultivation) ;podmítka
+   (wait (mm_dd 9 27))
+    ;fertilize 100kg NP (N:P=20:20)=20kgN+20kgP2O5  (fertilize (AmmoniumNitrate (weight 55.0 [kg N/ha])))
+    (fertilize (NP20-20cz (weight 20.0 [kg N/ha])))
+   ;(wait (mm_dd 7 27)) corrected by FD 16/11/04 - see the following line:
+    (wait (mm_dd 9 28))
+    (seed_bed_preparation)
+    (sow "Winter Wheat")
+  
+   ;;2001 Winter Wheat EBI OR 200 kg/ha 
+   (wait (mm_dd 4 3))
+     ;fertilize 200kg LAV 27% = 54 kg N/ha
+     (fertilize (LAV27cz (weight 54.0 [kg N/ha])))
+   ;(wait (mm_dd 4 24)) 
+    ;(spray Fluroxypyr 100 [g/ha]) 
+    ;; = in Herbicide Starane 250 EC (0,4 l/ha)(250g Fluroxyryru/l) 
+    ;(spray Chlorsulfuron 5.25 [g/ha]) 
+    ;; = in Herbicide Glean 75 WG (7,0 g/ha)(75% Chlorsulfuron)  
+   ;(wait (mm_dd 5 3)) 
+    ;(spray Propiconazole 125 [g/ha]) 
+    ;; = in Fungicide Tilt 250 EC (0,5 l/ha)(250g Propiconazole/l)  
+   (wait (mm_dd 5 10))
+     ;fertilize 200kg LAV 27% = 54 kg N/ha
+     (fertilize (LAV27cz (weight 54.0 [kg N/ha])))
+   ;(wait (mm_dd 5 25)) 
+    ;(spray Spiroxamine 150 [g/ha]) 
+    ;(spray Tebuconazole 100.2 [g/ha]) 
+    ;(spray Triadimenol 25.8 [g/ha]) 
+    ;; = in Fungicide Falcon 460 EC (0,6 l/ha)(250g Spiroxamine/ha + 167g Tebuconazole/l + 43 g Triadimenolu/l)  
+   (wait (mm_dd 8 19))
+   (harvest "Winter Wheat" (stem 0)(leaf 0)(sorg 0.95))
+   (wait (mm_dd 8 30)) 
+   (stubble_cultivation) ;podmitka 
+   (wait (mm_dd 11 21)) 
+   ;fertilize pig manure 26 t/ha
+   (fertilize (pig_farmyard_manurecz03 (weight 26.000 [Mg w.w./ha])))
+   (wait (mm_dd 11 23))
+   (plowing)
+ 
+ ;;2002 Potato; RISWC Karin 2500 kg/ha 
+  (wait (mm_dd 4 9))
+     (sweep) ; Corrected by F.D., 24/1/05 
+     (wait (mm_dd 4 11))
+      ;fertilize 800kg Simferta (N:P:K=11:12,4:12,4)=88kgN+99,2kgP2O5+99,2kgK2O
+      (fertilize (NPK11-12-12cz (weight 88.0 [kg N/ha])))
+     (wait (mm_dd 4 26))
+     (seed_bed_preparation)
+     (wait (mm_dd 4 30)) 
+     (sow "Potato; Agria")
+     ;(wait (mm_dd 5 14))
+      ;(spray Metribuzin 350 [g/ha])
+     ;; = in Herbicide Sencor 70 WP (0,5 kg/ha)(70% Metribuzin)
+      ;(spray Clomazone 48 [g/ha]) 
+      ;; = in Herbicide Command 4 EC (0,1 l/ha)(480 g/l Clomazone)
+     ;(wait (mm_dd 6 19))
+      ;(spray Mancozeb 1600 [g/ha]) 
+      ;(spray Metalaxyl-M 100 [g/ha]) 
+      ;; = in Fungicide Ridomil Gold MZ 68 WP (2,5 kg/ha)(64% Mancozebu a 4% Metalaxylu-M)
+     ;(wait (mm_dd 7 2))
+      ;(spray Mancozeb 1600 [g/ha]) 
+      ;(spray Metalaxyl-M 100 [g/ha]) 
+      ;; = in Fungicide Ridomil Gold MZ 68 WP (2,5 kg/ha)(64% Mancozebu a 4% Metalaxylu-M)
+     ;(wait (mm_dd 7 12))
+      ;(spray Mancozeb 1600 [g/ha]) 
+      ;(spray Metalaxyl-M 100 [g/ha]) 
+      ;; = in Fungicide Ridomil Gold MZ 68 WP (2,5 kg/ha)(64% Mancozebu a 4% Metalaxylu-M)    
+     ;(wait (mm_dd 7 23))
+      ;(spray  Fluazinam 200 [g/ha]) 
+      ;; = in Fungicide Altima 500 SC (0,4 l/ha)(Fluazinam 500 g/l)
+     ;(wait (mm_dd 8 5))
+      ;(spray  Fluazinam 200 [g/ha]) 
+      ;; = in Fungicide Altima 500 SC (0,4 l/ha)(Fluazinam 500 g/l)
+     ;(wait (mm_dd 8 16))
+      ;(spray  Fluazinam 200 [g/ha]) 
+      ;; = in Fungicide Altima 500 SC (0,4 l/ha)(Fluazinam 500 g/l)
+     ;(wait (mm_dd 8 26))
+      ;(spray  Fluazinam 200 [g/ha]) 
+      ;; = in Fungicide Altima 500 SC (0,4 l/ha)(Fluazinam 500 g/l)
+    ; (wait_mm_dd 9 20)
+    ; (haulm_destruction)  made inactive by FD 16/11/04       
+    (wait (mm_dd 9 10))
+     (harvest "Potato; Agria" (stem 0.00)(leaf 0.00)(sorg 0.95))
+    (wait (mm_dd 11 16))
+      (plowing)
+ ;;2003 Spring Barley Tolar 200 kg/ha 
+   (wait (mm_dd 3 28))
+    (sow "Spring Barley")
+   (wait (mm_dd 4 25))
+     ;fertilize 200kg LAV 27% = 54 kg N/ha
+     (fertilize (LAV27cz (weight 54.0 [kg N/ha])))
+   ;(wait (mm_dd 5 20))
+    ;(spray Amidosulfuron 12.5 [g/ha]) 
+    ;(spray Lodosulfuron-methylNa 3.125 [g/ha]) 
+    ;(spray Mefenpyr-diethyl 31.25 [g/ha])
+    ; = in Herbicide Sekator (250 g/ha)(Amidosulfuron 5 %, Lodosulfuron-methyl Na 1,25 %, Mefenpyr-diethyl 12,5%)
+   ;(wait (mm_dd 6 5))
+     ;(spray Flusilazole 125.0 [g/ha]) 
+     ;(spray Carbendazim 250.0 [g/ha]) 
+    ; = in Fungicide Alert S (1 kg/ha)(Flusilazole 125 g/l a Carbendazim 250 g/l)
+   (wait (mm_dd 6 5))
+     ;fertilize 200kg LAV 27% = 54 kg N/ha
+     (fertilize (LAV27cz (weight 54.0 [kg N/ha])))
+   (wait (mm_dd 8 3))
+    (harvest "Spring Barley" (stem 0)(leaf 0)(sorg 0.95)))
+
+;; cz-management.dai ends here.
