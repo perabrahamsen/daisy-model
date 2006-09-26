@@ -71,17 +71,6 @@ DLF::interval (std::ostream& out, const double from, const double to) const
 }
 
 void
-DLF::convertions (std::ostream& out, 
-                  const std::vector<symbol>& conv_vector) const
-{
-  if (value != DLF::Full)
-    return;
-
-  for (unsigned int i = 0; i < conv_vector.size (); i += 2)
-    out << "SET: " << conv_vector[i] << " = " << conv_vector[i+1] << "\n";
-}
-
-void
 DLF::log_description (std::ostream& out, const std::string& description) const
 {
   if (value != DLF::Full)

@@ -4,12 +4,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** dissimination til Frantisek
 
-** CZ: sample: Give credit.
-
-** DK: sample: Give credit.
-
-** NEWS: credit for sample setups.
-
 ** etip => log ind, your result, ...(november 1)
 
 * Designforslag til Daisy brugerflade
@@ -79,7 +73,7 @@ cell, edge, vertex
 
 ** log volumen.  
 
-'from' og 'to' skal erstattes af generelt "volumenen" component, med
+'from' og 'to' skal erstattes af generelt "volumen" component, med
 forskellige modeller for hvodan man logger det volumen.  Fluxe går ind
 eller ud af volumen, noder overlapper.
 
@@ -95,13 +89,6 @@ representerer horizonter.  Ikke hvis de representer log grænser.
 ** block
 
 *** program_document should include local variables in parameterizations.
-
-*** Vi kan ikke bruge checkpoints, fordi context har ændret sig.
-
-En local variabel vil ikke længere være i scope, og ekspansioner vil
-derfor fejle.
-
-Checkpoints SKAL virke når vi vi logger!
 
 ** command
 
@@ -303,8 +290,6 @@ New chapter for reference manual?
 
 === OLD STUFF ===
 
-* spec + dimension giver ikke fejl hvis der ikke kan konverteres
-
 * Ny phenology model 
 
 En liste af stages, hver med sit eget navn og egne parametre.
@@ -344,8 +329,6 @@ Få den til at passe ved høst.
 Use by summary.
 
 * SH: PowerPoint validation slides på hjemmeside.
-
-* Check let at bruge GUI version of CVS til Windows.
 
 * Cleanup: Get rid of Path:Output and Path:Input
 

@@ -29,6 +29,7 @@
 #include "symbol.h"
 #include "format.h"
 #include "submodel.h"
+#include "mathlib.h"
 #include <numeric>
 #include <set>
 
@@ -435,10 +436,10 @@ Select::Implementation::get_expr (Block& al)
   const double factor = al.number ("factor");
   const double offset = al.number ("offset");
 
-  if (offset != 0.0)
+  if (std::isnormal (offset))
     return new NumberLinear (al,factor, offset);
 
-  if (factor != 1.0)
+  if (!approximate (factor, 1.0, 1.0e-7))
     return new NumberFactor (al, factor);
   
   // No change.
@@ -543,19 +544,19 @@ static bool check_alist (const AttributeList& al, Treelog& err)
   bool ok = true;
   if (al.check ("spec"))
     {
-      if (al.number ("factor") != 1.0)
+      if (!approximate (al.number ("factor"), 1.0, 1e-7))
 	err.warning ("Specifying both 'spec' and 'factor' may conflict");
-      else if (al.number ("offset") != 0.0)
+      else if (std::isnormal (al.number ("offset")))
 	err.warning ("Specifying both 'spec' and 'offset' may conflict");
     }
   if (al.check ("expr"))
     {
-      if (al.number ("factor") != 1.0)
+      if (!approximate (al.number ("factor"), 1.0, 1e-7))
         {
           err.error ("Can't specify both 'expr' and 'factor'");
           ok = false;
         }
-      else if (al.number ("offset") != 0.0)
+      else if (std::isnormal (al.number ("offset")))
         {
           err.error ("Can't specify both 'expr' and 'offset'");
           ok = false;
@@ -728,7 +729,7 @@ Select::add_dest (Destination* d)
 { dest.add_dest (d); }
 
 bool
-Select::initialize (const std::map<symbol, symbol>& conv, double, double, 
+Select::initialize (double, double, 
 		    const std::string& timestep, Treelog& msg)
 { 
   symbol spec_dim;
@@ -749,18 +750,6 @@ Select::initialize (const std::map<symbol, symbol>& conv, double, double,
         }
       impl->expr->tick  (impl->scope, msg);
       spec_dim = impl->expr->dimension (impl->scope);
-    }
-
-  // Convert path according to mapping in 'conv'.
-  for (unsigned int i = 0; i < path.size (); i++)
-    {
-      const std::string& sname = path[i].name ();
-      const std::map<symbol, symbol>::const_iterator entry
-        = conv.find (path[i]);
-      if (entry != conv.end ())
-	path[i] = (*entry).second;
-      else if (sname.size () > 0 && sname[0] == '$')
-	path[i] = Select::wildcard;
     }
 
   if (impl->dimension == Syntax::unknown ())

@@ -45,8 +45,6 @@ public:
               const std::string& file,
               const std::string& parsed_from_file) const;
   void interval (std::ostream& out, const double from, const double to) const;
-  void convertions (std::ostream& out, 
-                    const std::vector<symbol>& conv_vector) const;
   void log_description (std::ostream& out, 
                         const std::string& description) const;
   void finish (std::ostream& out, const Daisy& daisy);

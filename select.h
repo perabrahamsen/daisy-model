@@ -29,7 +29,6 @@
 #include "librarian.h"
 #include "symbol.h"
 #include "units.h"
-#include <map>
 #include <vector>
 
 class Geometry;
@@ -142,8 +141,7 @@ protected:
   virtual const Units::Convert* 
   /**/ special_convert (symbol has, symbol want);
 public:
-  virtual bool initialize (const std::map<symbol, symbol>& conv, 
-			   double from, double to,
+  virtual bool initialize (double from, double to,
                            const std::string& timestep, Treelog&);
   void add_dest (Destination* dest);
   virtual bool check (Treelog& err) const;

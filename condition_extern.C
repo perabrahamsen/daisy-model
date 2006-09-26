@@ -46,7 +46,7 @@ struct ConditionExtern : public Condition
       {
         extern_scope = find_extern_scope (extern_name);
         if (!extern_scope)
-          msg.error ("No extern log names '" + extern_name + "' found");
+          msg.error ("No extern log named '" + extern_name + "' found");
         if (!expr->initialize (msg)
             || !extern_scope
             || !expr->check (*extern_scope, msg))

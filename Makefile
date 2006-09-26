@@ -1091,7 +1091,7 @@ number_lisp${OBJ}: number_lisp.C number.h symbol.h librarian.h library.h \
   scope.h submodeler.h memutils.h
 condition_extern${OBJ}: condition_extern.C condition.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h boolean.h \
-  log_extern.h
+  log_extern.h scope.h
 condition_boolean${OBJ}: condition_boolean.C condition.h librarian.h \
   library.h symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   boolean.h scope.h

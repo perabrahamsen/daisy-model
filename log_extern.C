@@ -327,7 +327,9 @@ By default, use the model name.");
 const Scope*
 find_extern_scope (const symbol name)
 { 
-  daisy_assert (LogExtern::log_extern_map);
-  daisy_assert (LogExtern::log_extern_count > 0);
+  if (!LogExtern::log_extern_map)
+    return NULL;
+  if (LogExtern::log_extern_count < 1)
+    return NULL;
   return (*LogExtern::log_extern_map)[name];
 }

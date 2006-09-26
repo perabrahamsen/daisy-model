@@ -358,7 +358,6 @@ LogTable::initialize (Treelog& msg)
   print_header.start (out, name, file, parsed_from_file);
 
   print_header.interval (out, from, to);
-  print_header.convertions (out, conv_vector);
   if (description != default_description)
     print_header.log_description (out, description);
 
@@ -414,9 +413,6 @@ LogTable::summarize (Treelog& msg)
 	     << "h" << begin.hour () << " to "
 	     << end.year () << "-" << end.month () << "-" << end.mday () 
 	     << "h" << end.hour ();
-      for (unsigned int i = 0; i < conv_vector.size (); i += 2)
-	tmp << "\nSET: " << conv_vector[i] << " = "
-	       << conv_vector[i+1];
       msg.message (tmp.str ());
       
       for (unsigned int i = 0; i < summary.size (); i++)

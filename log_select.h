@@ -41,7 +41,6 @@ struct LogSelect : public Log
   const std::string description;	// Description of log file.
   std::auto_ptr<Condition> condition;	// Should we print a log now?
   std::vector<Select*> entries;
-  const std::vector<symbol> conv_vector;
   const double from;
   const double to;
 

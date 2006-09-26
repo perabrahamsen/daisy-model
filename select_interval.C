@@ -176,13 +176,12 @@ struct SelectInterval : public SelectValue
     return Units::multiply (spec_dim, Units::cm);
   }
 
-  bool initialize (const std::map<symbol, symbol>& conv, 
-		   double default_from, double default_to, 
+  bool initialize (double default_from, double default_to, 
 		   const std::string& timestep, Treelog& msg)
   {
     interval.initialize (default_from, default_to);
 
-    return Select::initialize (conv, default_from, default_to, timestep, msg);
+    return Select::initialize (default_from, default_to, timestep, msg);
   }
   bool check_border (const Border& border, 
                      const double default_from, const double default_to,

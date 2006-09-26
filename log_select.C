@@ -26,8 +26,6 @@
 #include "memutils.h"
 #include <sstream>
 
-using namespace std;
-
 bool 
 LogSelect::check_leaf (symbol) const
 { daisy_assert (false); }
@@ -48,7 +46,7 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
   is_printing = condition->match (daisy, out);
   is_active = is_printing;
 
-  for (vector<Select*>::const_iterator i = entries.begin (); 
+  for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 
        i++)
     if ((*i)->match (is_printing))
@@ -66,7 +64,7 @@ LogSelect::initial_match (const Daisy&, Treelog&)
 {
   is_active = false;
 
-  for (vector<Select*>::const_iterator i = entries.begin (); 
+  for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 
        i++)
     if ((*i)->initial_match ())
@@ -164,7 +162,7 @@ LogSelect::output (symbol, const symbol)
 { daisy_assert (false); }
 
 void 
-LogSelect::output (symbol, const vector<double>&)
+LogSelect::output (symbol, const std::vector<double>&)
 { daisy_assert (false); }
 
 void 
@@ -199,43 +197,26 @@ LogSelect::LogSelect (Block& al)
     description (al.name ("description")),
     condition (Librarian<Condition>::build_item (al, "when")),
     entries (Librarian<Select>::build_vector (al, "entries")),
-    conv_vector (al.identifier_sequence ("set")),
     from (al.number ("from")),
     to (al.number ("to"))
 {
   if (!al.ok ())
     return;
 
-  // Create path convertion map.
-  map<symbol, symbol> conv_map;
-  for (unsigned int i = 0; i < conv_vector.size (); i += 2)
-    {
-      daisy_assert (i+1 < conv_vector.size ());
-      conv_map[conv_vector[i]] = conv_vector[i+1];
-    }
-
   // Initialize entries.
   for (unsigned int i = 0; i < entries.size (); i++)
-    if (!entries[i]->initialize (conv_map, from, to, condition->timestep (),
+    if (!entries[i]->initialize (from, to, condition->timestep (),
                                  al.msg ()))
       al.set_error ();
 }
 
   
 LogSelect::~LogSelect ()
-{
-  sequence_delete (entries.begin (), entries.end ());
-}
+{ sequence_delete (entries.begin (), entries.end ()); }
 
-static bool check_alist (const AttributeList& al, Treelog& err)
+static bool check_alist (const AttributeList&, Treelog&)
 {
   bool ok = true;
-
-  if ((al.size ("set") % 2) == 1)
-    {
-      err.entry ("'set' should contain an even number of arguments");
-      ok = false;
-    }
   return ok;
 }
 
@@ -272,7 +253,8 @@ LogSelect::document_entries (Format& format, const AttributeList& alist)
       if (!alist.check ("entries"))
 	return;
 
-      const vector<AttributeList*>& entries = alist.alist_sequence ("entries");
+      const std::vector<AttributeList*>& entries 
+        = alist.alist_sequence ("entries");
       if (entries.size () < 1)
 	return;
 
@@ -327,14 +309,6 @@ Each selected variable is represented by a column in the log.");
 Iff true, add columns for year, month, mday and hour in the begining of\n\
 the lines.  By default, this will be true of you have not specified any\n\
 time entries yourself.");
-  syntax.add ("set", Syntax::String, Syntax::Const, Syntax::Sequence, 
-	      "Map path names in the entries.\n\
-The first entry in the sequence is a symbol from the paths (e.g. $crop),\n\
-and the second is the value to replace the symbol with (e.g. Grass).\n\
-The third entry is another symbol to replace, and the fourth is another\n\
-value to replace it with.  And so forth.");
-  const vector<symbol> empty_symbol_vector;
-  alist.add ("set", empty_symbol_vector);
   syntax.add ("from", "cm", Syntax::Const,
 	      "Default 'from' value for all entries.");
   alist.add ("from", 0.0);
