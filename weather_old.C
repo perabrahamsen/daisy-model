@@ -68,6 +68,10 @@ WeatherOld::daily_global_radiation () const
 { return impl.daily_global_radiation; }
 
 double
+WeatherOld::hourly_diffuse_radiation () const
+{ return 0.0; }
+
+double
 WeatherOld::rain () const
 {
   return impl.Prain;

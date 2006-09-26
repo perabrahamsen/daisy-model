@@ -44,7 +44,8 @@ public:
                              const std::vector<double>& PAR_Height,
                              const double PAR_LAI,
                              CanopyStandard& canopy,
-                             Phenology& development, Treelog&) const = 0;
+                             Phenology& development, Treelog&) = 0;
+  virtual void clear ();
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

@@ -125,6 +125,7 @@ struct WeatherStandard : public Weather
   bool has_min_temperature;
   bool has_max_temperature;
   bool has_vapor_pressure_;
+  bool has_diffuse_radiation_;
   bool has_relative_humidity;
   bool has_wind_speed;
   bool has_reference_evapotranspiration_;
@@ -136,6 +137,7 @@ struct WeatherStandard : public Weather
   string global_radiation_read;
   string precipitation_read;
   string vapor_pressure_read;
+  string diffuse_radiation_read;
   string relative_humidity_read;
   string wind_speed_read;
   string reference_evapotranspiration_read;
@@ -153,6 +155,7 @@ struct WeatherStandard : public Weather
   double last_global_radiation;
   double last_precipitation;
   double last_vapor_pressure;
+  double last_diffuse_radiation;
   double last_relative_humidity;
   double last_wind_speed;
   double last_reference_evapotranspiration;
@@ -173,6 +176,7 @@ struct WeatherStandard : public Weather
   double next_global_radiation;
   double next_precipitation;
   double next_vapor_pressure;
+  double next_diffuse_radiation;
   double next_relative_humidity;
   double next_wind_speed;
   double next_reference_evapotranspiration;
@@ -183,6 +187,7 @@ struct WeatherStandard : public Weather
   double global_radiation_[24];
   double precipitation_[24];
   double vapor_pressure_[24];
+  double diffuse_radiation_[24];
   double wind_speed_[24];
   double reference_evapotranspiration_[24];
 
@@ -260,6 +265,11 @@ struct WeatherStandard : public Weather
     daisy_assert (initialized);
     return vapor_pressure_[hour]; 
   }
+  double hourly_diffuse_radiation () const // [W/m2]
+  { 
+    daisy_assert (initialized);
+    return diffuse_radiation_[hour]; 
+  }
   double wind () const	// [m/s]
   { 
     daisy_assert (initialized);
@@ -271,6 +281,9 @@ struct WeatherStandard : public Weather
 
   bool has_vapor_pressure () const
   { return has_vapor_pressure_ || has_relative_humidity; }
+
+  bool has_diffuse_radiation () const
+  { return has_diffuse_radiation_; }
 
   bool has_wind () const
   { return has_wind_speed; }
@@ -442,6 +455,9 @@ WeatherStandard::data_description[] =
     { "VapPres", "Pa", &WeatherStandard::next_vapor_pressure,
       &WeatherStandard::vapor_pressure_read,
       0, 5000, false },
+    { "DiffRad", "W/m^2", &WeatherStandard::next_diffuse_radiation,
+      &WeatherStandard::diffuse_radiation_read,
+      0, 1400, false },
     { "RelHum", "fraction", &WeatherStandard::next_relative_humidity,
       &WeatherStandard::relative_humidity_read,
       0, 5000, false },
@@ -526,6 +542,7 @@ WeatherStandard::read_line ()
   last_global_radiation = next_global_radiation;
   last_precipitation = next_precipitation;
   last_vapor_pressure = next_vapor_pressure;
+  last_diffuse_radiation = next_diffuse_radiation;
   last_relative_humidity = next_relative_humidity;
   last_wind_speed = next_wind_speed;
   last_reference_evapotranspiration = next_reference_evapotranspiration;
@@ -741,6 +758,15 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	  global_radiation_[hour] = last_global_radiation;
 	  if (long_timestep)
 	    global_radiation_[hour] *= day_cycle (now) * 24.0;
+	  if (has_diffuse_radiation_)
+	    {
+	      diffuse_radiation_[hour] = last_diffuse_radiation;
+	      if (long_timestep)
+		diffuse_radiation_[hour] *= day_cycle (now) * 24.0;
+	    }
+	  else 
+	    diffuse_radiation_[hour] = 0.0;
+	    
 	  precipitation_[hour] = last_precipitation;
 	  if (has_vapor_pressure_)
 	    vapor_pressure_[hour] = last_vapor_pressure;
@@ -1162,6 +1188,7 @@ NO3DryDep: " << DryDeposit.NO3 << " kgN/ha/year";
   has_min_temperature = has_data ("T_min");
   has_max_temperature = has_data ("T_max");
   has_vapor_pressure_ = has_data ("VapPres");
+  has_diffuse_radiation_ = has_data ("DiffRad");
   has_relative_humidity = has_data ("RelHum");
   if (has_relative_humidity && has_vapor_pressure_)
     lex->error ("You should only specify one of VapPres or RelHum");
@@ -1218,6 +1245,7 @@ WeatherStandard::WeatherStandard (Block& al)
     has_min_temperature (false),
     has_max_temperature (false),
     has_vapor_pressure_ (false),
+    has_diffuse_radiation_ (false),
     has_relative_humidity (false),
     has_wind_speed (false),
     has_reference_evapotranspiration_ (false),
@@ -1231,6 +1259,7 @@ WeatherStandard::WeatherStandard (Block& al)
     last_global_radiation (-42.42e42),
     last_precipitation (-42.42e42),
     last_vapor_pressure (-42.42e42),
+    last_diffuse_radiation (-42.42e42),
     last_relative_humidity (-42.42e42),
     last_wind_speed (-42.42e42),
     last_reference_evapotranspiration (-42.42e42),
@@ -1247,6 +1276,7 @@ WeatherStandard::WeatherStandard (Block& al)
     next_global_radiation (-42.42e42),
     next_precipitation (42.42e42),
     next_vapor_pressure (-42.42e42),
+    next_diffuse_radiation (-42.42e42),
     next_relative_humidity (-42.42e42),
     next_wind_speed (-42.42e42),
     next_reference_evapotranspiration (-42.42e42),

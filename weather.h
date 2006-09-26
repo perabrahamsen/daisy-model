@@ -86,6 +86,7 @@ public:
   virtual double daily_min_air_temperature () const = 0; // [dg C]
   virtual double hourly_global_radiation () const = 0; // [W/m2]
   virtual double daily_global_radiation () const = 0; // [W/m2]
+  virtual double hourly_diffuse_radiation () const = 0; // [W/m2]
   virtual double reference_evapotranspiration () const = 0; // [mm/h]
   virtual double daily_precipitation () const = 0; // [mm/d]
   virtual double rain () const = 0;	// [mm/h]
@@ -104,6 +105,7 @@ public:
   virtual bool has_vapor_pressure () const;
   virtual bool has_wind () const;
   virtual bool has_min_max_temperature () const;
+  virtual bool has_diffuse_radiation () const;
 
   // Light distribution.
 public:

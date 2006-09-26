@@ -53,7 +53,7 @@ public:
                      const std::vector<double>& PAR_Height,
                      const double PAR_LAI,
                      CanopyStandard& canopy,
-                     Phenology& development, Treelog&) const;
+                     Phenology& development, Treelog&);
   void output (Log&) const
   { }
   
@@ -78,7 +78,7 @@ PhotoGL::assimilate (const double Ta,
                      const double PAR_LAI,
                      CanopyStandard& canopy,
                      Phenology& development,
-                     Treelog& msg) const
+                     Treelog& msg) 
 {
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.
   const PLF& LAIvsH = canopy.LAIvsH;

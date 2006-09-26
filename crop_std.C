@@ -232,6 +232,8 @@ CropStandard::tick (const Time& time,
 
   // Clear nitrogen.
   nitrogen.clear ();
+  // Clear photo
+  photo->clear ();
 
   // Update age.
   development->DAP += 1.0/24.0;
@@ -488,6 +490,7 @@ CropStandard::output (Log& log) const
   output_derived (development, "Devel", log);
   if (vernalization.required)	// Test needed for checkpoint.
     output_submodule (vernalization, "Vernal", log);
+  output_derived (photo, "LeafPhot", log);
   output_submodule (nitrogen, "CrpN", log);
 }
 

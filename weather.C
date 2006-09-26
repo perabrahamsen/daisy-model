@@ -123,6 +123,7 @@ Weather::output (Log& log) const
   output_value (hourly_cloudiness (), "hourly_cloudiness", log);
   output_value (daily_cloudiness (), "daily_cloudiness", log);
   output_value (vapor_pressure (), "vapor_pressure", log);
+  output_value (hourly_diffuse_radiation (), "hourly_diffuse_radiation", log);
   output_value (wind (), "wind", log);
   output_value (day_length (), "day_length", log);
   output_value (day_cycle (), "day_cycle", log);
@@ -139,6 +140,10 @@ Weather::has_reference_evapotranspiration () const
 
 bool 
 Weather::has_vapor_pressure () const
+{ return false; }
+
+bool 
+Weather::has_diffuse_radiation () const
 { return false; }
 
 bool 
@@ -318,6 +323,8 @@ This is not a model, but a list of parameters shared by all weather models.");
 	      "Global radiation this hour.");
   syntax.add ("daily_global_radiation", "W/m^2", Syntax::LogOnly,
 	      "Average radiation this day.");
+  syntax.add ("hourly_diffuse__radiation", "W/m^2", Syntax::LogOnly,
+	      "Diffuse radiation this hour.");
   syntax.add ("reference_evapotranspiration", "mm/h", Syntax::LogOnly,
 	      "Reference evapotranspiration this hour");
   syntax.add ("daily_extraterrastial_radiation", "W/m^2", Syntax::LogOnly,
