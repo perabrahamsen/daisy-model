@@ -1,0 +1,217 @@
+\documentclass[a4paper]{article}
+\usepackage{a4}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+%\usepackage{doublespace}
+%\usepackage{hyperref}
+
+\bibliographystyle{apalike}
+\input{macro}
+
+\begin{document}
+
+\section*{A flexible system for specifying agricultural field management strategies}
+
+\begin{abstract}
+  Modelling the farmer is hard, a flexible system is needed.  Such a
+  system is present in Daisy.  The two main abstractions in the system
+  is actions, and conditions. Actions are divided into field
+  operations, waiting for conditions, and two special facilities for
+  performing multiple actions in sequence, or at the same time.
+  Conditions either directly examine the state of the simulation, or
+  are Boolean operations on other conditions.  Some conditions examine
+  hard-coded parts of the state directly (in particular time), others
+  allows allow arithmetic operations on a user defined subset of the
+  state.  By combining these actions and conditions, quite flexible
+  starategies can be described.
+\end{abstract}
+
+\tableofcontents
+
+\section{Modelling the farmer}
+
+A conceptual problem for modelling the ecosystem of a field is how to
+model the farmer.  The farmer is a human being, and those are
+notoriously difficult to model, especially when they may have access
+to the model themselves[REF].
+
+\paragraph{The past} When using the model on historic data, the
+problem is much simplified.  The management actions have already been
+performed.  The model is simply feed with a list of mangement
+operations, at the same level of detail as the model itself.  This is
+the approach traditionally taken by simulation models[REF].  Running
+the model on historic data is useful when analysing a field
+experiment, and when trying to extract data that have not been
+directly measured, such as nitrogen leaching.
+
+\paragraph{The present} When using the model as part of a decision
+support system (DSS), we have access to historic data, and need to
+advice the farmer of what decision to take now.  We thus also here
+avoid the need to model the farmer.  The advice tends to be hard coded
+heuristics on top of either a simulation model [REF] or purely
+empirical relations on the input data [REF].  An optimization model
+may find the optimal management for the field.  Optimization models
+are very computationally intensive, and are most usefyl for simple
+system descriptions.  For field management, an additional obstacle for
+optimization models is that the weather is not known in advance by the
+farmer.
+
+\paragraph{The future} Sometimes simulations models are used for
+predicting the effect of some change imposed on the field.  This
+change can be to the soil (eg.\ depletion of soil carbon[REF]),
+climate (e.g. effect of global warming[REF]) or management (e.g.
+introduction of irrigation[REF]).  These scenarios can also be build
+on historical data, with proper alternation.  A simulation model may
+be able to simulate the soil carbon change itself.  Global warming may
+be immitated by simply scaling historical data.  And irrigation may be
+imposed on top of an exsisting management discription.  The problem
+occurs when these changes affect the basis for the historical
+management decisions.  Soil carbon depletion and irrigation are both
+likely to increase the need of fertilization, and a warmer climate
+will almost always affect crop phenology, and therefore harvest time.
+This means the sensible management decisions in the hypothetical
+scenario will likely be different from the historical data the
+scenario is based upon.  This means that we either need to stop the
+scenario simulation regularly and make the new managment decision
+based on the new state of the system, or use an automated decision
+making system, i.e.\ a model of the farmer.
+
+\paragraph{Decision making systems} A sufficiently detailed DSS can be
+used as a decision making system in a scanario simulation, simply by
+assuming that the farmer always follow the suggestions.  Scenario
+simulations can also be used for developing the DSS, by examining what
+would happen if the farmer followed the suggestions.  The decision
+making system that most faithfully models the farmer in a specific
+scenario varies a lot.  Where a DSS will often try to optimize
+production within legal boundaries, some scenarios (such a soil carbon
+fate) will be best served by decisions that reflect common or
+traditional practise.  As both the legal boundaries, common practise,
+and the selection of crops varies between locations, and change over
+time in the same location,, having a flexible system to describe the
+strategy for making decisions is very useful.  Such a system, together
+with a robust mechanistic model of the field, can also be used for
+optimizing the strategy in a DSS.
+
+In this paper we will describe a flexible system for specifying
+agricultural field management strategies.  The system is implemented
+as part of the Daisy agro-ecological simulation model, which we will
+describe first.
+
+\section{Daisy}
+
+Daisy\cite{daisy-fertilizer,daisy-ems} is a mechanistic simulation
+model of an agro-ecological system.  It simulates water, nitrogen,
+carbon and energy below and above the soil surface.  Above the soil
+surface there is one or more crop, competing for light, water and
+nutrients.  Plant growth is fueled by available light, and limited by
+available nitrogen, water and respiration.  The accumulated growth is
+divided into stem, leaf, storage organs, and roots.  For light
+competition, the canopy is divided into vertical layers, where the
+crops with leafs in the uppper layers may shadow the crops with leafs
+in the lower layer.  Below the soil surface, the soil is also divided
+into vertical (for now) numerical layers.  Transport of water in the
+soil is done with Richard's equations for the matrix, suplemented with
+a simple macropore model.  Solute transport is done with
+convection-dispersion (and macropores).  The user is able to choose
+simpler models for transport, when computational speed is more
+important than accuracy.  Organic matter in the soils divided into
+multiple pools, by default 6, and both short-term (days) and long-term
+(decades) dynamics can be simulated.  Daisy has been validated under a
+number of occations [REF], sometimes comming up as best of breed in
+comparitative studies. 
+
+
+The current focus on Daisy development is on 2-dimensional transport
+in the soil, macropores, pesticide and pollutant fate, as well as
+partial root zone drying irrigation with hormonal signalling in the
+crop, and the relationship between nitrogen contant and
+photosynthesis.
+
+
+\section{Concepts}
+
+actions
+  sequential and concurrent
+  farm operations and waiting
+conditions
+
+named parameterizations
+
+\section{Historical management}
+
+\begin{verbatim}
+  (manager activity
+    (wait (at (2006 10 1 1)))
+    (plowing)
+    ...)
+\end{verbatim}
+
+\section{Crop management}
+    
+\begin{verbatim}
+  (defaction sbarley activity
+    (wait (mm_dd 10 1))
+    (plowing)
+    ...)
+
+  (defaction rotation activity
+    sbarley sbarley potato)
+
+  (manager rotation)
+\end{verbatim}
+   
+\section{Simple state}
+
+
+\begin{verbatim}
+  (defcondition trafficable ...)
+
+  (defaction sbarley activity
+    (wait (mm_dd 10 1))
+    (wait (or trafficable (mm_dd 11 1)))
+    (plowing)
+    ....
+    (wait (or (crop_DS_above all 2.0) (mm_dd 9 1)))
+    (harvest "Spring Barley"))
+\end{verbatim}
+
+Defcond.  Fjernede året.  Moden.  Logic.
+
+\section{Concurrency}
+
+\begin{verbatim}
+  (defaction irrigation ...)
+
+  (defaction irrigated_sbarley activity
+    (while sbarley
+       irrigation))
+\end{verbatim}
+
+\section{Advanced state}
+
+\begin{verbatim}
+  (deflog DSS extern ...)
+
+  (defnumber N_min ...)
+
+  (defaction sbarley ... (extern DSS))
+\end{verbatim}
+
+\section{Implementation}
+
+base class
+
+factory [REF]
+
+\section{Conclusion}
+
+Vi er så gode.
+
+\section{Acknowledgements}
+
+DINA, FertOrgaNic.
+
+\addcontentsline{toc}{section}{\numberline{}Bibliography}
+\bibliography{daisy}
+
+\end{document}
