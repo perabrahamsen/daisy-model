@@ -23,7 +23,9 @@
   hard-coded parts of the state directly (in particular time), others
   allows allow arithmetic operations on a user defined subset of the
   state.  By combining these actions and conditions, quite flexible
-  starategies can be described.
+  starategies can be described.  The system is easy to implement using
+  modern elementary computer science principles, and have been
+  succesfully used for diverse purposes.
 \end{abstract}
 
 \tableofcontents
@@ -114,37 +116,97 @@ soil is done with Richard's equations for the matrix, suplemented with
 a simple macropore model.  Solute transport is done with
 convection-dispersion (and macropores).  The user is able to choose
 simpler models for transport, when computational speed is more
-important than accuracy.  Organic matter in the soils divided into
+important than accuracy.  Organic matter in the soils is divided into
 multiple pools, by default 6, and both short-term (days) and long-term
-(decades) dynamics can be simulated.  Daisy has been validated under a
-number of occations [REF], sometimes comming up as best of breed in
-comparitative studies. 
-
+(decades) dynamics have been validated [REF].
 
 The current focus on Daisy development is on 2-dimensional transport
 in the soil, macropores, pesticide and pollutant fate, as well as
 partial root zone drying irrigation with hormonal signalling in the
-crop, and the relationship between nitrogen contant and
-photosynthesis.
-
+crop, and the relationship between nitrogen content and photosynthesis.
 
 \section{Concepts}
 
-actions
-  sequential and concurrent
-  farm operations and waiting
-conditions
+In this section we will brifly explain the contral primiives in the
+Daisy decision making system, they will be illustrated further with
+examples in the following section.  The two central concepts in our
+decision making system are \emph{actions} and \emph{conditions}.  An
+action has a \emph{duration} (in simulation time), and may both
+examine and change the \emph{state} of the simulation.  A condition is
+either true or false, has no duration, and may examine but not modify
+the state of the simulation.
 
-named parameterizations
+The actions can roughly be divided into three subcategories: The first
+type of actions simulate field operations, such as plowing or
+harvesting.  The second type of action is to do nothing, waiting for
+some condition to be true.  The third type of action combines other
+actions.  The \texttt{activity} action perfom a list of actions
+sequentionally, when the first action is finished, begin the next, and
+so on.  The \texttt{while} action perform a list of actions
+simultaniously.  For the duration of the first action, also perform
+all the remaining actions.  The \texttt{if} action takes a condition
+and two actions as arguments, if the condition is true, it will
+perform the first action, otherwise the second.
+
+The conditions can similarily be divided into subcategories.  The
+simple conditions directly test some aspect of the simulation state,
+such as whether the crop has passed a certeain development stage, or
+if the soil moisture at a specified depth is a above a certain
+threshold.  The logic conditions allow the user to combine other
+conditions with Boolean operations, such as \texttt{or}, \texttt{and}
+and \texttt{not}.  Finally, the \texttt{extern} condition allows full
+access to both state and arithmetic operations on the state, through
+the indirection of a user specified log file.
 
 \section{Historical management}
 
+Our first example is with historical data, where we know what the
+farmer did, and when.
 \begin{verbatim}
-  (manager activity
-    (wait (at (2006 10 1 1)))
-    (plowing)
-    ...)
+(manager activity
+  (wait (at 1987 3 20 1))
+  (plowing)
+  (wait (at 1987 4 4 1))
+  (fertilize (N25S (weight 100.0 [kg N/ha])))
+  (wait (at 1987 4 5 1))
+  (sow "Spring Barley")
+  (wait (at 1987 9 5 1))
+  (harvest "Spring Barley"))
 \end{verbatim}
+First a few words about the notation.  Everything is fully
+parenthesised, with the name comming after after the opening
+parenthesis, followed by the arguments separated by whitespace.
+Floating point numbers are followed by a dimension in square brackets,
+cardinals are not.  Strings containing whitespace must be surrounded
+by quotation marks.
+
+The string ``\texttt{manager}'' is the name of a parameter in the
+Daisy model, here we specify the value for that parameter.  The Daisy
+model takes other parameters, such as ``\texttt{column}'' to specify
+the properties of the field, and ``\texttt{weather}'', but those are
+not the topic of this article.  The next string is
+``\texttt{activity}'', which is the action that takes a list of
+actions as arguments, and perform them sequentially.  In this case
+there are 8 arguments, as each argument is surrounded by
+parenthesizes.
+
+The format of the action list is that we wait for a specific
+condition, and then perform a field operation action
+(\texttt{plowing}, \texttt{fertilize}, \texttt{sow} and
+\texttt{harvest}).  The ``\texttt{wait}'' action takes a condition as
+argument, in this setup the same each time.  The ``\texttt{at}''
+condition takes four cardinal numbers as arguments, representing year,
+month, day in month, and hour.  It is true when the simulation time
+reaches that point.  The ``\texttt{fertilize}'' action takes a
+fertilizer as an argument, and the ``\texttt{sow}'' and
+``\texttt{harvest}'' actions both takes a crop as an argument.
+
+Not all the fascilities in this example are build into Daisy.  The
+``\texttt{N25S}'' fertilizer, the ``\texttt{Spring Barley}'' crop, and
+even the ``\texttt{plowing}'' action are defined in parameterization
+libraries that are distributed with Daisy in a user editable format.
+The user also is able to define and name parameterizations for later
+use, which leads us to our next example.
 
 \section{Crop management}
     
@@ -199,13 +261,43 @@ Defcond.  Fjernede året.  Moden.  Logic.
 
 \section{Implementation}
 
-base class
+Since all expressions are fully parenthesised, the input language is
+implemented with a trivial hand-written recursive-descend parser with
+a single token lookahead, and no backtracking.  Alternatively, if one
+is willing to accept a somewhat bulkier notation, a ready-to-use XML
+based parser could be used.
 
-factory [REF]
+The base concepts \texttt{action}, \emph{condition}, \texttt{boolean},
+and \emph{number} are all represented by pure base class, and the
+specific actions, conditions, etc.\ by concrete classes derived from
+the base.  The accessor functions for action and conditions needs to
+take the simulation state as an argument (for condition it can be a
+read-only argument).
+
+Each concrete class is respsonsible for registering itself with name,
+constructor and parameters with a factory pattern.  This registry is
+also use by the parser.  A global table of extern logs is used for
+making the log information available in the numerical expressions
+within the ``extern'' condition.
+
+\section{Applications}
+
+Has been succesfully used in (examples)...
+
+\begin{itemize}
+\item Is rutinely used with historical management data for analysing
+  experiments.
+\item Loop: Skriv noget om opskalering.
+\item VVM: Godkendelse for skift af brug.
+\item FertOrgaNic: Brug som DSS
+\item Min OM-init artikel: Langtidssimulering for initialisering af OM
+  puljer. 
+\end{itemize}
 
 \section{Conclusion}
 
-Vi er så gode.
+
+Vi er bare så gode.
 
 \section{Acknowledgements}
 
