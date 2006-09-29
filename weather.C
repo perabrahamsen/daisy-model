@@ -250,6 +250,13 @@ Weather::ExtraterrestrialRadiation (const Time& time) const // [W/m2]
 double
 Weather::HourlyExtraterrestrialRadiation (const Time& time) const // [W/m2]
 {
+  return (SolarConstant * RelativeSunEarthDistance (time) 
+          * sin_solar_elevation_angle (time));
+}
+
+double
+Weather::sin_solar_elevation_angle (const Time& time) const // []
+{
   static const double EQT0   = 0.002733;
   static const double EQT1[] = {-7.343,-9.470,-0.3289,-0.1955};
   static const double EQT2[] = {0.5519,-3.020,-0.07581,-0.1245};
@@ -265,10 +272,7 @@ Weather::HourlyExtraterrestrialRadiation (const Time& time) const // [W/m2]
   EQT /= 60.0;
   const double SunHourAngle = M_PI / 12.0 
     * (time.hour() + 0.5 + EQT - timelag + 12);
-  const double sin_solar_elevation_angle 
-    = (sin(Lat)*sin(Dec) + cos(Lat)*cos(Dec)*cos(SunHourAngle));
-  return (SolarConstant * RelativeSunEarthDistance (time) 
-          * sin_solar_elevation_angle);
+  return (sin(Lat)*sin(Dec) + cos(Lat)*cos(Dec)*cos(SunHourAngle));
 }
 
 bool

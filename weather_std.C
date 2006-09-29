@@ -606,6 +606,9 @@ WeatherStandard::read_line ()
   if (has_min_temperature && has_max_temperature
       && next_min_air_temperature > next_max_air_temperature)
     lex->warning ("T_min > T_max");
+  if (has_diffuse_radiation_
+      && next_diffuse_radiation > next_global_radiation)
+    lex->warning ("DiffRad > GlobRad");
   if (has_min_temperature && has_temperature
       && next_min_air_temperature > next_air_temperature)
     lex->warning ("T_min > AirTemp");

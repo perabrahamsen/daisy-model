@@ -69,8 +69,6 @@ private:
     const double m;     // Stomatal slope factor, Ball and Berry model, (unitless)
     const double b;     // Stomatal intercept factor, Ball and Berry model, (0.01 mol/m2/s)
    
-    const PLF& DSEff;	// Development stage effect, photosynthesis
-    
     // Log variable.
     std::vector<double> ci_vector; // Stomata CO2 pressure
     double ci_middel;              // Average stomata CO2 pressure per LAI units
@@ -126,9 +124,8 @@ public:
       alfa (al.number("alfa")),
       Ptot (al.number("Ptot")),
       m (al.number("m")),
-      b (al.number("b")),
+      b (al.number("b"))
 
-      DSEff (al.plf ("DSEff"))
       { }
     ~PhotoFarquhar ()
       { }
@@ -364,6 +361,7 @@ PhotoFarquhar::assimilate (const double T,
  
   // CAI below the current leaf layer.
   double prevLA = LAIvsH (PAR_height[0]);
+
   // Assimilate produced by canopy photosynthesis
   Ass = 0.0;
   double pn = 0.0;
@@ -466,12 +464,7 @@ PhotoFarquhar::assimilate (const double T,
   daisy_assert (approximate (accCAI, canopy.CAI));
 
   ci_middel = ci_acc/accCAI;
- 
-  std::ostringstream tmp;
-  tmp << "Ass = " << Ass << " g/m2/h , ci_middel = " << ci_middel << " Pa" << endl;
-  msg.message (tmp.str ());
-
-  return (molWeightCH2O / molWeightCO2)* Ass;  
+  return (molWeightCH2O / molWeightCO2)* Ass;         //g CH2O /m2/h
 }
 
 void
@@ -519,7 +512,7 @@ static struct Photo_FarquharSyntax
     alist.add ("Jm25", 2.1*110.);
 
     syntax.add ("Kc25", "Pa", Check::positive (), Syntax::Const,
-                "Micahaelis-Menten constant of Rubisco for CO2. Kc25 = 40.4 Pa for wheat (Collatz et al., ) ");
+                "Micahyaelis-Menten constant of Rubisco for CO2. Kc25 = 40.4 Pa for wheat (Collatz et al., ) ");
 
     alist.add ("Kc25", 40.4);
 
@@ -613,20 +606,10 @@ static struct Photo_FarquharSyntax
 
     syntax.add ("ci_vector", "Pa", Syntax::LogOnly, Syntax::Sequence, "CO2 pressure in Stomatal in each layer.");
     syntax.add ("ci_middel", "Pa", Syntax::LogOnly, "Average CO2 pressure in Stomatal per LAI.");
-    syntax.add ("Ass", "g/m2/h", Syntax::LogOnly, "Netto leaf assimilate of CO2.");
+    syntax.add ("Ass", "g CO2/m2", Syntax::LogOnly, "Netto leaf assimilate of CO2.");
     syntax.add ("LA", "", Syntax::LogOnly, "Leaf area index.");
     syntax.add ("PAR_", "mol/m2/day", Syntax::LogOnly, "PAR.");
 
-
-    syntax.add ("DSEff", "DS", Syntax::None (), Check::non_negative (),
-                Syntax::Const, "\
-Development stage factor for assimilate production.");
-    alist.add ("DSEff",DS_null_eff);
-
-    syntax.add ("DAPEff", "d", Syntax::None (), Check::non_negative (),
-                Syntax::Const, "Age factor for assimilate production.\n\
-Age is given as day after planting.");
-    alist.add ("DAPEff",DS_null_eff);
 
     Librarian<Photo>::add_type ("Farquhar", alist, syntax, &make);
   }

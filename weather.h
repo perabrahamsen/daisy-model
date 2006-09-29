@@ -141,6 +141,7 @@ public:
   static double SunsetHourAngle (double Dec, double Lat); // [rad]
   double ExtraterrestrialRadiation (const Time& time) const; // [W/m2]
   double HourlyExtraterrestrialRadiation (const Time& time) const; // [W/m2]
+  double sin_solar_elevation_angle (const Time& time) const; // []
 
   // Create and Destroy.
 private:

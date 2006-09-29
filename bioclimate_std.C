@@ -34,6 +34,7 @@
 #include "log.h"
 #include "mathlib.h"
 #include "pet.h"
+#include "difrad.h"
 #include "svat.h"
 #include "vegetation.h"
 #include "chemicals.h"
@@ -131,6 +132,8 @@ struct BioclimateStandard : public Bioclimate
 
   // Radiation.
   void RadiationDistribution (const Vegetation&);
+  std::auto_ptr<Difrad> difrad;  // Diffuse radiation model.
+  double difrad0;                // Diffuse radiation above canopy [W/m2]
 
   // Weather.
   double daily_air_temperature_; // Air temperature in canopy. [dg C]
@@ -207,31 +210,54 @@ BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
 
   Treelog::Open nest (msg, "Bioclimate: " + name);
 
-  symbol type;
-
-  if (weather.has_reference_evapotranspiration ())
-    type = symbol ("weather");
-  else if (weather.has_vapor_pressure () && weather.has_wind ())
+  if (!pet.get ())                      // Explicit.
     {
-      if (weather.surface () == Weather::field)
-        type = symbol ("PM");
+      symbol type;
+
+      if (weather.has_reference_evapotranspiration ())
+	type = symbol ("weather");
+      else if (weather.has_vapor_pressure () && weather.has_wind ())
+	{
+	  if (weather.surface () == Weather::field)
+	    type = symbol ("PM");
+	  else
+	    type = symbol ("FAO_PM");    
+	}
+      else if (weather.has_min_max_temperature ())
+	type = symbol ("Hargreaves");
       else
-        type = symbol ("FAO_PM");    
-    }
-  else if (weather.has_min_max_temperature ())
-    type = symbol ("Hargreaves");
-  else
-    type = symbol ("makkink");
+	type = symbol ("makkink");
 
-  msg.debug ("Pet choosen: " + type);
+      msg.debug ("Pet choosen: " + type);
 
-  const Library& library = Librarian<Pet>::library ();
-  daisy_assert (library.check (type));
+      const Library& library = Librarian<Pet>::library ();
+      daisy_assert (library.check (type));
   
-  AttributeList alist (library.lookup (type));
-  alist.add ("type", type);
-  daisy_assert (library.syntax (type).check (alist, msg));
-  pet.reset (Librarian<Pet>::build_free (msg, alist, "pet"));
+      AttributeList alist (library.lookup (type));
+      alist.add ("type", type);
+      daisy_assert (library.syntax (type).check (alist, msg));
+      pet.reset (Librarian<Pet>::build_free (msg, alist, "pet"));
+    }
+
+  if (!difrad.get ())                      // Explicit.
+    {
+      symbol type;
+
+      if (weather.has_diffuse_radiation ())
+	type = symbol ("weather");
+      else
+	type = symbol ("DPF");
+
+      msg.debug ("Difrad choosen: " + type);
+
+      const Library& library = Librarian<Difrad>::library ();
+      daisy_assert (library.check (type));
+  
+      AttributeList alist (library.lookup (type));
+      alist.add ("type", type);
+      daisy_assert (library.syntax (type).check (alist, msg));
+      difrad.reset (Librarian<Difrad>::build_free (msg, alist, "difrad"));
+    }
 }
 
 void 
@@ -382,6 +408,17 @@ As a last resort,  Makkink (makkink) will be used.");
   Chemicals::add_syntax  ("surface_chemicals_in",
                           syntax, alist, Syntax::LogOnly,
                           "Chemicals entering soil surface.");
+  //Radiation
+  syntax.add ("difrad", Librarian<Pet>::library (), 
+              Syntax::OptionalState, Syntax::Singleton, 
+              "Diffuse radiation component.\n\
+\n\
+By default, choose depending on available climate date.\n\
+\n\
+If diffuse radiation is available in the climate data, Daisy will\n\
+use these (the weather difrad model). Otherwise Daisy wil use the DPF model.");
+  syntax.add ("difrad0", "W/m^2", Syntax::LogOnly,
+              "Diffuse radiation above canopy.");
 }
 
 const AttributeList& 
@@ -458,6 +495,11 @@ BioclimateStandard::BioclimateStandard (Block& al)
     canopy_chemicals_out (),
 
     surface_chemicals_in (),
+    difrad (al.check ("difrad") 
+         ? Librarian<Difrad>::build_item (al, "difrad")
+         : NULL),
+    difrad0 (0.0),
+
     // BUG: These should really be part of the state, for checkpoints.
     daily_air_temperature_ (0.0),
     daily_precipitation_ (0.0),
@@ -804,6 +846,11 @@ BioclimateStandard::tick (const Time& time,
 
   // Update canopy structure.
   CanopyStructure (vegetation);
+ 
+  // Radiation.
+  daisy_assert (difrad.get () != NULL);
+  difrad0 = difrad->value (time, weather, msg) * hourly_global_radiation_;
+  //daisy_assert (difrad0 >= 0.0);
 
   // Calculate total canopy, divide it intervalsm, and distribute PAR.
   RadiationDistribution (vegetation);
@@ -916,6 +963,10 @@ BioclimateStandard::output (Log& log) const
 		    log);
   output_submodule (canopy_chemicals_out, "canopy_chemicals_out", log);
   output_submodule (surface_chemicals_in, "surface_chemicals_in", log);
+  //radiation
+  daisy_assert (difrad.get () != NULL);
+  output_object (difrad.get (), "difrad", log);
+  output_variable (difrad0, log);
 }
 
 void

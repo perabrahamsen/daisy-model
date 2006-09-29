@@ -298,7 +298,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-MODELS = number_lisp.C condition_extern.C condition_boolean.C \
+MODELS = difrad_DPF.C \
+        difrad_weather.C number_lisp.C condition_extern.C condition_boolean.C \
 	boolean_extern.C boolean_number.C boolean_string.C \
 	number_extern.C movement_rect.C number_soil.C organic_none.C \
 	organic_std.C movement_1D.C integer_arit.C \
@@ -352,7 +353,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = organic_matter.C movement.C integer.C \
+COMPONENTS = difrad.C organic_matter.C movement.C integer.C \
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \

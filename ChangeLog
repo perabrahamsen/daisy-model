@@ -1,3 +1,19 @@
+2006-09-28  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* difrad_DPF.C: New model.
+	* Makefile (MODELS): Added it.
+
+2006-09-27  U-BGJ203512\bgj  <bgj@bgj203512.agsci.kvl.dk>
+
+	* weather.C, weather.h (sin_solar_elevation_angle): New function.
+	(HourlyExtraterrestrialRadiation): Use it.
+
+	* difrad_weather.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* difrad.C, difrad.h: New component.
+	* Makefile (COMPONENTS): Added it.
+
 2006-09-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log_extern.C (numbers): Made it logable.
