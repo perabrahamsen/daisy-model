@@ -23,7 +23,7 @@
 #include "uzmodel.h"
 #include "groundwater.h"
 #include "surface.h"
-#include "geometry1d.h"
+#include "geometry_vert.h"
 #include "soil.h"
 #include "soil_heat.h"
 #include "mathlib.h"
@@ -33,8 +33,6 @@
 #include "log.h"
 #include "average.h"
 #include <sstream>
-
-using namespace std;
 
 class UZRichard : public UZmodel
 {
@@ -53,29 +51,29 @@ private:
 		int first, const Surface& top,
                 size_t top_edge,
 		int last, const Groundwater& bottom,
-		const vector<double>& S,
-		const vector<double>& h_old,
-		const vector<double>& Theta_old,
-		const vector<double>& h_ice,
-		vector<double>& h,
-		vector<double>& Theta,
+		const std::vector<double>& S,
+		const std::vector<double>& h_old,
+		const std::vector<double>& Theta_old,
+		const std::vector<double>& h_ice,
+		std::vector<double>& h,
+		std::vector<double>& Theta,
                 size_t q_offset,
-		vector<double>& q);
-  bool converges (const vector<double>& previous,
-		  const vector<double>& current) const;
+		std::vector<double>& q);
+  bool converges (const std::vector<double>& previous,
+		  const std::vector<double>& current) const;
   void internode (const Soil&, const SoilHeat&,
 		  int first, int last,
-		  const vector<double>& h_ice,
-		  const vector<double>& K,
-		  vector<double>& Kplus) const;
+		  const std::vector<double>& h_ice,
+		  const std::vector<double>& K,
+		  std::vector<double>& Kplus) const;
   void q_darcy (const GeometryVert& geo,
 		int first, int last,
-		const vector<double>& h_previous,
-		const vector<double>& h,
-		const vector<double>& Theta_previous,
-		const vector<double>& Theta,
-		const vector<double>& Kplus,
-		const vector<double>& S,
+		const std::vector<double>& h_previous,
+		const std::vector<double>& h,
+		const std::vector<double>& Theta_previous,
+		const std::vector<double>& Theta,
+		const std::vector<double>& Kplus,
+		const std::vector<double>& S,
 		double ddt,
 		double *const q);
 public:
@@ -84,12 +82,12 @@ public:
 	     unsigned int first, const Surface& top,
              size_t top_edge, 
 	     unsigned int last, const Groundwater& bottom,
-	     const vector<double>& S,
-	     const vector<double>& h_old,
-	     const vector<double>& Theta_old,
-	     const vector<double>& h_ice,
-	     vector<double>& h,
-	     vector<double>& Theta,
+	     const std::vector<double>& S,
+	     const std::vector<double>& h_old,
+	     const std::vector<double>& Theta_old,
+	     const std::vector<double>& h_ice,
+	     std::vector<double>& h,
+	     std::vector<double>& Theta,
              size_t q_offset, 
 	     std::vector<double>& q_base);
   
@@ -109,14 +107,14 @@ UZRichard::richard (Treelog& msg,
 		    int first, const Surface& top,
                     const size_t top_edge,
 		    const int last, const Groundwater& bottom,
-		    const vector<double>& S,
-		    const vector<double>& h_old,
-		    const vector<double>& Theta_old,
-		    const vector<double>& h_ice,
-		    vector<double>& h_new,
-		    vector<double>& Theta_new,
+		    const std::vector<double>& S,
+		    const std::vector<double>& h_old,
+		    const std::vector<double>& Theta_old,
+		    const std::vector<double>& h_ice,
+		    std::vector<double>& h_new,
+		    std::vector<double>& Theta_new,
                     const size_t q_offset,
-		    vector<double>& q_base)
+		    std::vector<double>& q_base)
 {
   std::ostringstream tmp;
   tmp << "UZ Richard: " << first << " to " << last;
@@ -139,21 +137,21 @@ UZRichard::richard (Treelog& msg,
 
   if (size < 2)
     throw ("Richard's equation need at least two numerical layers");
-  vector<double> a (size);
-  vector<double> b (size);
-  vector<double> c (size);
-  vector<double> d (size);
+  std::vector<double> a (size);
+  std::vector<double> b (size);
+  std::vector<double> c (size);
+  std::vector<double> d (size);
 
   // Intermeditate results.
-  vector<double> h (size);
-  vector<double> h_previous (size);
-  vector<double> h_conv (size);
-  vector<double> Theta_previous (size);
-  vector<double> Theta (size);
-  vector<double> Ksum (size);
-  vector<double> Kold (size);
-  vector<double> K (size + 1);
-  vector<double> Kplus (size);
+  std::vector<double> h (size);
+  std::vector<double> h_previous (size);
+  std::vector<double> h_conv (size);
+  std::vector<double> Theta_previous (size);
+  std::vector<double> Theta (size);
+  std::vector<double> Ksum (size);
+  std::vector<double> Kold (size);
+  std::vector<double> K (size + 1);
+  std::vector<double> Kplus (size);
 
   // For h bottom.
   if (bottom_type == Groundwater::pressure)
@@ -334,7 +332,7 @@ UZRichard::richard (Treelog& msg,
 			   - Kplus[i] * (1.0 -  bottom_pressure/ dz_plus));
 		    }
                   else if (bottom_type == Groundwater::lysimeter
-                           && isnormal (q_bottom))
+                           && std::isnormal (q_bottom))
                     {
                       // Active lysimeter, use fake pressure bottom.
 		      const double dz_plus = z - geo.zplus (first + i);
@@ -535,8 +533,8 @@ UZRichard::richard (Treelog& msg,
 }
 
 bool
-UZRichard::converges (const vector<double>& previous,
-		      const vector<double>& current) const
+UZRichard::converges (const std::vector<double>& previous,
+		      const std::vector<double>& current) const
 {
   size_t size = previous.size ();
   daisy_assert (current.size () == size);
@@ -544,8 +542,8 @@ UZRichard::converges (const vector<double>& previous,
   for (unsigned int i = 0; i < size; i++)
     {
       if (   fabs (current[i] - previous[i]) > max_absolute_difference
-	  && (   previous[i] == 0.0
-	      || current[i] == 0.0
+	  && (   !std::isnormal (previous[i])
+              || !std::isnormal (current[i])
 	      || (  fabs ((current[i] - previous[i]) / previous[i])
 		  > max_relative_difference)))
 	return false;
@@ -556,9 +554,9 @@ UZRichard::converges (const vector<double>& previous,
 void 
 UZRichard::internode (const Soil& soil, const SoilHeat& soil_heat,
 		      int first, int last,
-		      const vector<double>& h_ice,
-		      const vector<double>& K, 
-		      vector<double>& Kplus) const
+		      const std::vector<double>& h_ice,
+		      const std::vector<double>& K, 
+		      std::vector<double>& Kplus) const
 {
   int size = last - first + 1;
   daisy_assert (K_average != NULL);
@@ -569,21 +567,21 @@ UZRichard::internode (const Soil& soil, const SoilHeat& soil_heat,
     {
       double Ksat = soil.K (first + i, 0.0, h_ice[first + i], 
 			    soil_heat.T (first + i));
-      Kplus[i] = min (Ksat, Kplus[i]);
+      Kplus[i] = std::min (Ksat, Kplus[i]);
       if (i > 0)
-	Kplus[i - 1] = min (Ksat, Kplus[i - 1]);
+	Kplus[i - 1] = std::min (Ksat, Kplus[i - 1]);
     }
 }
 
 void
 UZRichard::q_darcy (const GeometryVert& geo,
 		    const int first, const int last,
-		    const vector<double>& /* h_previous */,
-		    const vector<double>& h,
-		    const vector<double>& Theta_previous,
-		    const vector<double>& Theta,
-		    const vector<double>& Kplus,
-		    const vector<double>& S,
+		    const std::vector<double>& /* h_previous */,
+		    const std::vector<double>& h,
+		    const std::vector<double>& Theta_previous,
+		    const std::vector<double>& Theta,
+		    const std::vector<double>& Kplus,
+		    const std::vector<double>& S,
 		    const double ddt,
 		    double *const q)
 {
@@ -603,7 +601,7 @@ calculating flow with pressure top.\n";
           << "cell " << start << " ends at " << geo.zplus (start) << " [cm]\n"
           << "first " << first << " ends at " << geo.zplus (first) << " [cm]\n"
           << "last " << last << " ends at " << geo.zplus (last) << " [cm]";
-      throw (string (tmp.str ()));
+      throw (tmp.str ());
     }
   if (!(start > first + 1))
     {
@@ -648,14 +646,14 @@ UZRichard::tick (Treelog& msg, const GeometryVert& geo,
 		 const unsigned int first, const Surface& top, 
                  const size_t top_edge,
 		 const unsigned int last, const Groundwater& bottom, 
-		 const vector<double>& S,
-		 const vector<double>& h_old,
-		 const vector<double>& Theta_old,
-		 const vector<double>& h_ice,
-		 vector<double>& h,
-		 vector<double>& Theta,
+		 const std::vector<double>& S,
+		 const std::vector<double>& h_old,
+		 const std::vector<double>& Theta_old,
+		 const std::vector<double>& h_ice,
+		 std::vector<double>& h,
+		 std::vector<double>& Theta,
                  const size_t q_offset,
-		 vector<double>& q_base)
+		 std::vector<double>& q_base)
 {
   if (!richard (msg, geo, soil, soil_heat, first, top, top_edge, last, bottom, 
 		S, h_old, Theta_old, h_ice, h, Theta, q_offset, q_base))

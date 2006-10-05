@@ -81,6 +81,24 @@ struct ParserFile::Implementation
   void skip_token ();
   bool looking_at (char);
 
+  class Parskip 
+  {
+    ParserFile::Implementation& parser;
+    bool skipped;
+  public:
+    Parskip (ParserFile::Implementation& p, bool skip = true)
+      : parser (p),
+        skipped (skip)
+    { 
+      if (skip)
+        parser.skip ("(");
+    }
+    ~Parskip ()
+    {
+      if (skipped)
+        parser.skip (")");
+    }
+  };
   // Parser.
   void check_value (const Syntax& syntax, const string& name,  double value);
   void add_derived (Library&);
@@ -512,6 +530,7 @@ ParserFile::Implementation::add_derived (Library& lib)
   static const symbol const_symbol ("const");
   skip ();
   int c = peek ();
+  Parskip skip (*this, c == '(');
   const symbol super = (isdigit (c) || c == '-' || c == '.')
     ? const_symbol
     : get_symbol ();
@@ -837,8 +856,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    }
 	  case Syntax::PLF:
 	    {
-	      if (in_order)
-		skip ("(");
+	      Parskip skip (*this, in_order);
 	      PLF plf;
 	      double last_x = -42;
 	      int count = 0;
@@ -847,7 +865,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      bool ok = true;
 	      while (!looking_at (')') && good ())
 		{
-		  skip ("(");
+                  Parskip skip (*this);
 		  double x = get_number (domain);
 		  {
 		    if (count > 0 && x <= last_x)
@@ -868,7 +886,6 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		      error (name + ": " + message);
 		      ok = false;
 		    }
-		  skip (")");
 		  if (ok)
 		    plf.add (x, y);
 		}
@@ -879,8 +896,6 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		}
 	      if (ok)
 		atts.add (name, plf);
-	      if (in_order)
-		skip (")");
 	      break;
 	    }
 	  case Syntax::String:
@@ -1053,7 +1068,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                                               /**/(*old_sequence[i]));
                         continue;
                       }
-		    skip ("(");
+		    Parskip skip (*this);
 		    const size_t element = sequence.size ();
 		    AttributeList& al
 		      = *new AttributeList (old_sequence.size () > element
@@ -1063,7 +1078,6 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		    Syntax s (syn);
 		    load_list (s, al);
 		    sequence.push_back (&al);
-		    skip (")");
 		  }
 		if (skipped)
 		  skip (")");
@@ -1085,7 +1099,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		const int size = syntax.size (name);
 		while (good () && !looking_at (')'))
 		  {
-		    skip ("(");
+		    Parskip dummy (*this);
 		    PLF& plf = *new PLF ();
 		    double last_x = -42;
 		    int count = 0;
@@ -1104,7 +1118,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                               plfs.push_back (new PLF (*old_sequence[i]));
                             continue;
                           }
-			skip ("(");
+			Parskip dummy2 (*this);
 			double x = get_number (domain);
 			{
 			  if (count > 0 && x <= last_x)
@@ -1121,13 +1135,11 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 			  {
 			    error (name + ": " + message);
 			  }
-			skip (")");
 			plf.add (x, y);
 		      }
 		    if (count < 2)
 		      error ("Need at least 2 points");
 		    total++;
-		    skip (")");
 		    plfs.push_back (&plf);
 		  }
 		if (size != Syntax::Sequence && total != size)

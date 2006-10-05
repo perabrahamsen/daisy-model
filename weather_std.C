@@ -823,7 +823,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
     {
       double T_min = daily_min_air_temperature_;
       const double T_max = daily_max_air_temperature_;
-      if (T_min == T_max)
+      if (T_min + 0.001 >= T_max)
 	T_min -= 5.0;
       for (int hour = 0; hour < 24; hour++)
 	vapor_pressure_[hour] = FAO::SaturationVapourPressure (T_min);
@@ -1044,7 +1044,7 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	      else
 		lex->error ("Unknown dimension");
 	      timestep = double2int (val);
-	      if (timestep != val || timestep < 0.0)
+	      if (!approximate (timestep, val) || timestep < 0.0)
 		lex->error ("Timestep should be a cardinal number");
 	    }
 	  else

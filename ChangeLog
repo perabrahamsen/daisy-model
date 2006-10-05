@@ -1,3 +1,8 @@
+2006-10-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (Parskip): New helper class.
+	(add_derived, load_list): Use it.
+
 2006-09-28  Birgitte Gjettermann  <bgj@kvl.dk>
 
 	* difrad_DPF.C: New model.

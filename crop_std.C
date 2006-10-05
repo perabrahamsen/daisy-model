@@ -435,7 +435,7 @@ CropStandard::harvest (const symbol column_name,
                   root_system->water_stress_days, 
                   nitrogen.nitrogen_stress_days);
 
-  if (development->DS != DSremove)
+  if (!approximate (development->DS, DSremove))
     {
       nitrogen.cut (development->DS); // Stop fixation.
 

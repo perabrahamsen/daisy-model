@@ -273,7 +273,7 @@ MovementRect::flow (const GeometryRect& geo,
           in -= J[e] * geo.edge_area (e);
         }
       else
-        daisy_assert (J[e] == 0.0);
+        daisy_assert (!std::isnormal (J[e]));
     }
 
   // Cell fluxes.

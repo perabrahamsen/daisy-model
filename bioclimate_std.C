@@ -532,7 +532,7 @@ BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
       for (int i = 0; i <= No; i++)
 	Height[i] = HvsLAI ((No - i) * dLAI);
 
-      daisy_assert (Height[No] == 0.0);
+      daisy_assert (!std::isnormal (Height[No]));
       //  daisy_assert (approximate (Height[0], MxH));
       Height[0] = vegetation.height ();
     }
@@ -541,7 +541,7 @@ BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
 void 
 BioclimateStandard::RadiationDistribution (const Vegetation& vegetation)
 {
-  if (LAI () == 0.0)
+  if (!std::isnormal (LAI ()))
     {
       std::fill (&PAR_[0], &PAR_[No+1], 0.0);
       return;

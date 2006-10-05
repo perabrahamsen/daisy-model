@@ -1,92 +1,90 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper]{article} 
 \usepackage{a4}
-\usepackage[T1]{fontenc}
-\usepackage[latin1]{inputenc}
-%\usepackage{doublespace}
-%\usepackage{hyperref}
+\usepackage[T1]{fontenc} \usepackage[latin1]{inputenc}
+\usepackage{hyperref}
+%\usepackage{setspace}
 
 \bibliographystyle{apalike}
 \input{macro}
 
-\begin{document}
+\newcommand{\dname}[1]{``\texttt{#1}''}
 
+\setcounter{secnumdepth}{0}
+
+\begin{document}
 \section*{A flexible system for specifying agricultural field management strategies}
 
 \begin{abstract}
   Modelling the farmer is hard, a flexible system is needed.  Such a
   system is present in Daisy.  The two main abstractions in the system
-  is actions, and conditions. Actions are divided into field
-  operations, waiting for conditions, and two special facilities for
-  performing multiple actions in sequence, or at the same time.
-  Conditions either directly examine the state of the simulation, or
-  are Boolean operations on other conditions.  Some conditions examine
-  hard-coded parts of the state directly (in particular time), others
-  allows allow arithmetic operations on a user defined subset of the
-  state.  By combining these actions and conditions, quite flexible
-  starategies can be described.  The system is easy to implement using
-  modern elementary computer science principles, and have been
-  succesfully used for diverse purposes.
+  are \emph{actions} and \emph{conditions}. Actions are divided into
+  field operations, waiting for conditions to be fulfilled, and
+  facilities for performing multiple actions in sequence or
+  simultaneously.  Conditions either directly examine the state of the
+  simulation, or are Boolean operations on other conditions.  Some
+  conditions examine hard-coded parts of the state directly (in
+  particular \emph{time}), others allow arithmetic operations on a
+  user defined subset of the state.  By combining these actions and
+  conditions, quite flexible strategies can be described.  The system
+  is easy to implement using modern computer science principles, and
+  have been successfully used for various diverse purposes.
 \end{abstract}
 
-\tableofcontents
+% \tableofcontents
 
 \section{Modelling the farmer}
 
 A conceptual problem for modelling the ecosystem of a field is how to
 model the farmer.  The farmer is a human being, and those are
 notoriously difficult to model, especially when they may have access
-to the model themselves[REF].
+to the model themselves.
 
 \paragraph{The past} When using the model on historic data, the
 problem is much simplified.  The management actions have already been
-performed.  The model is simply feed with a list of mangement
+performed.  The model is simply provided with a list of management
 operations, at the same level of detail as the model itself.  This is
-the approach traditionally taken by simulation models[REF].  Running
-the model on historic data is useful when analysing a field
-experiment, and when trying to extract data that have not been
-directly measured, such as nitrogen leaching.
+the approach traditionally taken by simulation models.  Running the
+model on historic data is useful for analysing a field experiment, and
+especially for extracting data that have not been directly measured.
 
 \paragraph{The present} When using the model as part of a decision
-support system (DSS), we have access to historic data, and need to
-advice the farmer of what decision to take now.  We thus also here
-avoid the need to model the farmer.  The advice tends to be hard coded
-heuristics on top of either a simulation model [REF] or purely
-empirical relations on the input data [REF].  An optimization model
+support system (DSS), we have access to historical data, and need to
+advice the farmer of what decision to take now.  The advice tends to
+be hard coded heuristics on top of either a simulation model, or
+purely empirical relations on the input data.  An optimization model
 may find the optimal management for the field.  Optimization models
-are very computationally intensive, and are most usefyl for simple
-system descriptions.  For field management, an additional obstacle for
-optimization models is that the weather is not known in advance by the
-farmer.
+are in general very computationally intensive, and are most useful
+with simple system descriptions.  For field management, an additional
+obstacle for optimization models is that the weather is not known in
+advance by the farmer.
 
 \paragraph{The future} Sometimes simulations models are used for
 predicting the effect of some change imposed on the field.  This
-change can be to the soil (eg.\ depletion of soil carbon[REF]),
-climate (e.g. effect of global warming[REF]) or management (e.g.
-introduction of irrigation[REF]).  These scenarios can also be build
-on historical data, with proper alternation.  A simulation model may
-be able to simulate the soil carbon change itself.  Global warming may
-be immitated by simply scaling historical data.  And irrigation may be
-imposed on top of an exsisting management discription.  The problem
-occurs when these changes affect the basis for the historical
-management decisions.  Soil carbon depletion and irrigation are both
-likely to increase the need of fertilization, and a warmer climate
-will almost always affect crop phenology, and therefore harvest time.
-This means the sensible management decisions in the hypothetical
-scenario will likely be different from the historical data the
-scenario is based upon.  This means that we either need to stop the
-scenario simulation regularly and make the new managment decision
-based on the new state of the system, or use an automated decision
-making system, i.e.\ a model of the farmer.
+change can be to the soil (e.g.\ depletion of soil carbon
+\cite{daisy-somnew}), climate (e.g. effect of global warming
+\cite{climate}) or management (e.g.  introduction of irrigation).
+These scenarios can also be build on historical data, with relevant
+alternations.  A simulation model may be able to simulate the soil
+carbon change itself.  Global warming may be imitated by simply
+scaling historical data.  And irrigation may be imposed on top of an
+existing management description.  The problem occurs when these
+changes affect the basis for the historical management decisions.
+Soil carbon depletion and irrigation are both likely to increase the
+need of fertilization, and a warmer climate will almost always affect
+crop phenology, and therefore harvest time.  This means the reasonable
+management decisions in the hypothetical scenario will likely be
+different from the historical data the scenario is based upon.  This
+means that we either need to stop the scenario simulation regularly
+and make the new management decision based on the new state of the
+system, or use an automated decision making system.
 
 \paragraph{Decision making systems} A sufficiently detailed DSS can be
-used as a decision making system in a scanario simulation, simply by
-assuming that the farmer always follow the suggestions.  Scenario
-simulations can also be used for developing the DSS, by examining what
-would happen if the farmer followed the suggestions.  The decision
+used as a decision making system in a scenario simulation, simply by
+assuming that the farmer always follow the suggestions.  The decision
 making system that most faithfully models the farmer in a specific
 scenario varies a lot.  Where a DSS will often try to optimize
-production within legal boundaries, some scenarios (such a soil carbon
-fate) will be best served by decisions that reflect common or
+production within legal boundaries, some scenarios (such as soil
+carbon fate) will be best served by decisions that reflect common or
 traditional practise.  As both the legal boundaries, common practise,
 and the selection of crops varies between locations, and change over
 time in the same location,, having a flexible system to describe the
@@ -97,11 +95,11 @@ optimizing the strategy in a DSS.
 In this paper we will describe a flexible system for specifying
 agricultural field management strategies.  The system is implemented
 as part of the Daisy agro-ecological simulation model, which we will
-describe first.
+present first.
 
 \section{Daisy}
 
-Daisy\cite{daisy-fertilizer,daisy-ems} is a mechanistic simulation
+Daisy \cite{daisy-fertilizer,daisy-ems} is a mechanistic simulation
 model of an agro-ecological system.  It simulates water, nitrogen,
 carbon and energy below and above the soil surface.  Above the soil
 surface there is one or more crop, competing for light, water and
@@ -109,199 +107,520 @@ nutrients.  Plant growth is fueled by available light, and limited by
 available nitrogen, water and respiration.  The accumulated growth is
 divided into stem, leaf, storage organs, and roots.  For light
 competition, the canopy is divided into vertical layers, where the
-crops with leafs in the uppper layers may shadow the crops with leafs
+crops with leafs in the upper layers may shadow the crops with leafs
 in the lower layer.  Below the soil surface, the soil is also divided
 into vertical (for now) numerical layers.  Transport of water in the
-soil is done with Richard's equations for the matrix, suplemented with
-a simple macropore model.  Solute transport is done with
-convection-dispersion (and macropores).  The user is able to choose
-simpler models for transport, when computational speed is more
-important than accuracy.  Organic matter in the soils is divided into
-multiple pools, by default 6, and both short-term (days) and long-term
-(decades) dynamics have been validated [REF].
+soil matrix is done with Richard's equations, and supplemented with a
+simple macropore model.  Solute transport is done with
+convection-dispersion.  The user is able to choose simpler models for
+transport, when computational speed is more important than accuracy.
+Organic matter in the soils is divided into multiple pools, by default
+6, and both short-term (days) and long-term (decades) dynamics have
+been validated
+\cite{willigen91-compar,vereecken91-compar,diekkruger95-compar,smith97-compar,daisy-somnew}.
+The internal timestep used for most of the calculations is one hour,
+but for water and solute transport this may be much shorter.
 
 The current focus on Daisy development is on 2-dimensional transport
-in the soil, macropores, pesticide and pollutant fate, as well as
+in the soil; macropores; pesticide and pollutant fate; as well as
 partial root zone drying irrigation with hormonal signalling in the
-crop, and the relationship between nitrogen content and photosynthesis.
+crop; and the relationship between nitrogen content and
+photosynthesis.
 
 \section{Concepts}
 
-In this section we will brifly explain the contral primiives in the
+In this section we will briefly explain the central concepts in the
 Daisy decision making system, they will be illustrated further with
 examples in the following section.  The two central concepts in our
 decision making system are \emph{actions} and \emph{conditions}.  An
 action has a \emph{duration} (in simulation time), and may both
-examine and change the \emph{state} of the simulation.  A condition is
-either true or false, has no duration, and may examine but not modify
-the state of the simulation.
+examine and change the state of the simulation.  A condition is either
+true or false, has no duration, and may examine but not modify the
+state of the simulation.
 
 The actions can roughly be divided into three subcategories: The first
 type of actions simulate field operations, such as plowing or
 harvesting.  The second type of action is to do nothing, waiting for
-some condition to be true.  The third type of action combines other
-actions.  The \texttt{activity} action perfom a list of actions
-sequentionally, when the first action is finished, begin the next, and
-so on.  The \texttt{while} action perform a list of actions
-simultaniously.  For the duration of the first action, also perform
-all the remaining actions.  The \texttt{if} action takes a condition
+some condition to be true.  The third type of actions combines other
+actions.  The \dname{activity} action perform a list of actions
+sequentially, when the first action is finished, begin the next, and
+so on.  The \dname{while} action perform a list of actions
+simultaneously.  For the duration of the first action, also perform
+all the remaining actions.  The \dname{if} action takes a condition
 and two actions as arguments, if the condition is true, it will
-perform the first action, otherwise the second.
+perform the first action, otherwise the second.  The \dname{repeat}
+action will repeat an action indefinitely.
 
-The conditions can similarily be divided into subcategories.  The
+The conditions can similarly be divided into subcategories.  The
 simple conditions directly test some aspect of the simulation state,
-such as whether the crop has passed a certeain development stage, or
+such as whether the crop has passed a certain development stage, or
 if the soil moisture at a specified depth is a above a certain
 threshold.  The logic conditions allow the user to combine other
-conditions with Boolean operations, such as \texttt{or}, \texttt{and}
-and \texttt{not}.  Finally, the \texttt{extern} condition allows full
+conditions with Boolean operations, such as \dname{or}, \dname{and}
+and \dname{not}.  Finally, the \dname{extern} condition allows full
 access to both state and arithmetic operations on the state, through
 the indirection of a user specified log file.
 
-\section{Historical management}
+\section{Historical management (modelling the past)}
 
 Our first example is with historical data, where we know what the
 farmer did, and when.
 \begin{verbatim}
-(manager activity
-  (wait (at 1987 3 20 1))
-  (plowing)
-  (wait (at 1987 4 4 1))
-  (fertilize (N25S (weight 100.0 [kg N/ha])))
-  (wait (at 1987 4 5 1))
-  (sow "Spring Barley")
-  (wait (at 1987 9 5 1))
-  (harvest "Spring Barley"))
+  (manager activity
+    (wait (at 1987 3 20 1))
+    (plowing)
+    (wait (at 1987 4 4 1))
+    (fertilize (N25S (weight 100.0 [kg N/ha])))
+    (wait (at 1987 4 5 1))
+    (sow "Spring Barley")
+    (wait (at 1987 9 5 1))
+    (harvest "Spring Barley"))
 \end{verbatim}
+
 First a few words about the notation.  Everything is fully
-parenthesised, with the name comming after after the opening
+parenthesised, with the name coming after after the opening
 parenthesis, followed by the arguments separated by whitespace.
 Floating point numbers are followed by a dimension in square brackets,
-cardinals are not.  Strings containing whitespace must be surrounded
+cardinals are not.  Names containing whitespace must be surrounded
 by quotation marks.
 
-The string ``\texttt{manager}'' is the name of a parameter in the
+The string \dname{manager} is the name of a parameter in the
 Daisy model, here we specify the value for that parameter.  The Daisy
-model takes other parameters, such as ``\texttt{column}'' to specify
-the properties of the field, and ``\texttt{weather}'', but those are
+model takes other parameters, such as \dname{column} to specify
+the properties of the field, and \dname{weather}, but those are
 not the topic of this article.  The next string is
-``\texttt{activity}'', which is the action that takes a list of
+\dname{activity}, which is the action that takes a list of
 actions as arguments, and perform them sequentially.  In this case
 there are 8 arguments, as each argument is surrounded by
 parenthesizes.
 
 The format of the action list is that we wait for a specific
 condition, and then perform a field operation action
-(\texttt{plowing}, \texttt{fertilize}, \texttt{sow} and
-\texttt{harvest}).  The ``\texttt{wait}'' action takes a condition as
-argument, in this setup the same each time.  The ``\texttt{at}''
+(\dname{plowing}, \dname{fertilize}, \dname{sow}, and
+\dname{harvest}).  The \dname{wait} action takes a condition as
+argument, in this setup the same each time.  The \dname{at}
 condition takes four cardinal numbers as arguments, representing year,
 month, day in month, and hour.  It is true when the simulation time
-reaches that point.  The ``\texttt{fertilize}'' action takes a
-fertilizer as an argument, and the ``\texttt{sow}'' and
-``\texttt{harvest}'' actions both takes a crop as an argument.
+reaches that point.  The \dname{fertilize} action takes a
+fertilizer as an argument, and the \dname{sow}, and
+\dname{harvest} actions both takes a crop as an argument.
 
-Not all the fascilities in this example are build into Daisy.  The
-``\texttt{N25S}'' fertilizer, the ``\texttt{Spring Barley}'' crop, and
-even the ``\texttt{plowing}'' action are defined in parameterization
+Not all the facilities in this example are build into Daisy.  The
+\dname{N25S} fertilizer, the \dname{Spring Barley} crop, and
+even the \dname{plowing} action are defined in parameterization
 libraries that are distributed with Daisy in a user editable format.
-The user also is able to define and name parameterizations for later
+The user is also able to define and name parameterizations for later
 use, which leads us to our next example.
 
-\section{Crop management}
+\section{Flexible crop management (modelling the future)}
     
+In this example, we define a rotation consisting of two times spring
+barley, followed by potatoes.
 \begin{verbatim}
   (defaction sbarley activity
-    (wait (mm_dd 10 1))
+    (wait (mm_dd 3 20))
     (plowing)
-    ...)
-
-  (defaction rotation activity
+    (wait (mm_dd 4 4))
+    (fertilize (N25S (weight 100.0 [kg N/ha])))
+    (wait (mm_dd 4 5))
+    (sow "Spring Barley")
+    (wait (mm_dd 9 5))
+    (harvest "Spring Barley"))
+  
+  (defaction barbarpot activity
     sbarley sbarley potato)
-
-  (manager rotation)
+  
+  (manager barbarpot)
 \end{verbatim}
-   
-\section{Simple state}
+The first thing we notice is the \dname{defaction} keyword.  This is
+an abbreviation for \emph{define action}, and simply associate its
+first argument, a name, with the following arguments, an action.  We
+can then later refer to the defined action by the name used.  We do
+that when we define the \dname{barbarpot} action, which again is used
+as the value for the \dname{manager} parameter of the Daisy simulation
+model.  The \dname{sbarley} action consist of the same sequence of 8
+actions as in the first example, with a single difference.  Instead of
+specifying the absolute simulation time in the \dname{wait} actions,
+we only specify month and day in the month.  This \dname{mm\_dd} will
+be true once every year (at 8AM by default).  This allows us to use
+the \dname{sbarley} action repeatedly in a rotation, here together
+with a similar \dname{potato} action not shown here.
 
+\subsection{Simple state}
 
+The problem is that due to climate variation, we are unlikely to do
+perform the same actions at the same date for different years.  So we
+modify the example to depend on other state than just the simulation
+time. 
 \begin{verbatim}
-  (defcondition trafficable ...)
-
+  (defcondition trafficable 
+    (and (not (soil_water_pressure_above (height -10.0 [cm])
+                                         (potential -50.0 [cm])))
+         (soil_temperature_above (height -10.0 [cm]) 
+                                 (temperature 0.0 [dg C]))))
+  
   (defaction sbarley activity
-    (wait (mm_dd 10 1))
-    (wait (or trafficable (mm_dd 11 1)))
+    (wait (mm_dd 3 20))
+    (wait (or trafficable (mm_dd 4 3)))
     (plowing)
-    ....
-    (wait (or (crop_DS_above all 2.0) (mm_dd 9 1)))
+    (wait (mm_dd 4 4))
+    (fertilize (N25S (weight 100.0 [kg N/ha])))
+    (wait (mm_dd 4 5))
+    (sow "Spring Barley")
+    (wait (or (crop_ds_after "Spring Barley" 2.0)
+              (mm_dd 10 1)))
     (harvest "Spring Barley"))
 \end{verbatim}
+Here, we first define a \dname{trafficable} condition.  The idea
+behind this is that we want to test if the simulated soil is in a good
+condition for use with farm vehicles.  The condition is of type
+\dname{and}, which is true if and only if all the arguments are true.
+Here, the first test is whether the soil is too wet.  We test the
+state 10 cm down the soil, and see if the potential is above -50 cm
+water pressure.  If this is \emph{not} true, the soil is sufficiently
+dry to carry traffic.  At the same time, we don't want to do tillage
+operations on frozen soil, so the second condition is that the
+temperature at 10 cm depth must be above 0 $^\circ$C.  We use the
+\dname{trafficable} condition before plowing, but inside an \dname{or}
+condition to ensure that plowing happens before sowing. For harvest,
+we use the built-in \dname{crop\_ds\_after} condition to ensure that
+the spring barley is ripe, which is at development stage 2.0 in the
+Daisy model.
 
-Defcond.  Fjernede året.  Moden.  Logic.
+With these modifications, we have a definition of spring barley
+management that can be used in a rotation with variable weather.
 
-\section{Concurrency}
+\subsection{Concurrency}
 
+Until now, all our management examples have been build upon the
+\dname{activity} action, performing one task at a time.  We could
+do the same with irrigation, but defining it separately can simplify
+it, and illustrates how we provide concurrency.
 \begin{verbatim}
-  (defaction irrigation ...)
-
-  (defaction irrigated_sbarley activity
-    (while sbarley
-       irrigation))
+  (defaction irrigate_30 activity 
+    (wait (and (after_mm_dd 6 1)
+               (before_mm_dd 8 15)
+               (not (soil_water_pressure_above 
+                      (height -25.0 [cm])
+                      (potential -1000 [pF])))))
+    (irrigate_overhead 5 [mm/h] (hours 6))
+    (wait_days 2))
 \end{verbatim}
-
-\section{Advanced state}
-
+Here we first define a single irrigation activity called
+\dname{irrigate\_30}.  We wait until the soil is sufficiently dry
+(more than 3 pF) at 25 cm.  We also check that we are within the local
+irrigation season with the \dname{after\_mm\_dd} and
+\dname{before\_mm\_dd} conditions\footnote{These test the date
+  relative to the calendar year, and are most useful in Northern
+  climates where it is too cold to grow crops in December/January.}.
+When all three conditions are true, we irrigate with 5 mm/h for 6
+hours.  Afterwards, we wait two days in order to ensure the water
+reach our measuring point at 25 cm.
 \begin{verbatim}
-  (deflog DSS extern ...)
+  (defaction irr_sbarley
+    (while sbarley
+      (repeat irrigate_30)))
+\end{verbatim}
+Our irrigated spring barley now demonstrates two actions.  The first
+is \dname{while}, which takes a list of actions as arguments, in this
+case two.  The first is our already defined \dname{sbarley} action,
+which defines a (non-irrigated) management for a spring barley.  This
+action controls the duration of the \dname{while} action, so our
+irrigated barley will have the same duration as out non-irrigated
+barley.  For that duration the second argument is also active.  The
+second argument is a \dname{repeat} action.  The \dname{repeat} action
+takes a single argument, and repeat it indefinitely.  Here the
+duration is limited because the repeat is used inside a \dname{while}, and
+the duration of the \dname{while} is limited by the first
+argument.
 
-  (defnumber N_min ...)
+\section{Advanced state (modelling the present)} 
 
-  (defaction sbarley ... (extern DSS))
+There are not build-in conditions for all the state in Daisy, only the
+part most commonly used.  And the only thing the conditions can do
+with them, is to compare them with constants.  However, all parts of
+the state of Daisy can be written to log files during the simulation.
+We have used this to create an even more flexible system, especially
+suitable for DSS use.
+
+\subsection{The \dname{extern} log}
+
+First we must define what part of the state we want to examine.
+\begin{verbatim}
+  (deflog DSS extern
+    (when hourly)
+    (entries (interval (tag "NO3-N 0-30 cm")
+                       (from 0 [cm]) (to   -30 [cm])
+                       (path column "*" SoilNO3 M)
+                       (spec fixed SoilNO3 M)
+                       (dimension [kg N/ha]))
+             (interval (tag "NH4-N 0-30 cm")
+                       (from 0 [cm]) (to   -30 [cm])
+                       (path column "*" SoilNH4 M)
+                       (spec fixed SoilNH4 M)
+                       (dimension [kg N/ha]))
+             (number (path column "*" Vegetation crops crops "*"
+                           Devel "*" DS)
+                     (spec phenology default DS))
+             (number (path column "*" Vegetation crops crops "*"
+                           CrpN PtNCnt)
+                     (spec fixed CrpN PtNCnt)
+                     (dimension "kg N/ha"))
+             (number (path column "*" Vegetation crops crops "*"
+                           CrpN CrNCnt)
+                     (spec fixed CrpN CrNCnt)
+                     (dimension "kg N/ha"))
+             (number (tag AcNCnt)
+                     (path column "*" Vegetation crops crops "*"
+                           Prod NCrop)
+                     (spec fixed Production NCrop)
+                     (dimension "kg N/ha"))))
+\end{verbatim}
+Here we define a log named \dname{DSS} of the type \dname{extern}.  A
+similar system is used by Daisy for defining what part of the state to
+write to files during the simulation, the only differences are that 1)
+the name of the log type is \dname{table} instead of \dname{extern},
+and 2) an additional parameter \dname{where} specifies the name of
+file to store the result.  For both \dname{table} and \dname{extern}
+logs, the \dname{when} parameter specifies how often to store the
+results, and the \dname{entries} parameter specifies which part of the
+state to store.
+
+\paragraph{Select methods} The \dname{entries} parameter takes a list
+of select methods for individual state variables within the system.
+Here we use two types of select methods, \dname{interval} and
+\dname{number}.  Both have some shared parameters: \dname{path} and
+\dname{spec} specify how to find the state variable within the
+internal hierarchical structure of Daisy\footnote{Described in
+  \cite{daisy-ref}, and outside the scope of this article}, and
+\dname{dimension} the desired dimension for the value\footnote{Daisy
+  will convert from the internal dimension if needed.}.  Finally,
+\dname{tag} is the external name (the use of which we will come back
+to) for the value, if not specified the last element of the
+\dname{path} list is used.  The \dname{interval} select method is used
+for soil state only, and will integrate the soil content from the
+depth specified by the \dname{from} and \dname{to} parameters.  The
+values of these two parameters are height above soil surface, so 0 cm
+is the soil surface, and -30 cm is 30 cm below the soil surface.
+
+\subsection{The \dname{extern} condition}
+
+We can access the information in \dname{extern} logs from the
+management system using the similarly named \dname{extern} condition.
+\begin{verbatim}
+  (defcondition DSS_fert
+    (extern DSS 
+      (and (< 0 [] DS 1.8 [])
+           (< (+ "NO3-N 0-30 cm" "NH4-N 0-30 cm") 15 [kg N/ha])
+           (or (> (- PtNCnt AcNCnt) 20 [kg N/ha])
+               (> (- PtNCnt AcNCnt) (- AcNCnt CrNCnt))))))
+\end{verbatim}
+The first argument to the condition is the name of the \dname{extern}
+log that defines the state information we examine.  The second
+argument is a \emph{boolean}. 
+
+\paragraph{Booleans and numbers} A boolean is similar to a condition
+in that it is either true or false, and indeed, the value of the
+\dname{extern} condition will be the value of its second argument.
+Booleans, as one might guess from the name, also provides the usual
+operations on Boolsk algebra.  Additionally, booleans provides
+comparison operations ($<$ and $>$) on \emph{numbers}, another new
+abstraction here.  A number can be either a constant (like \texttt{1.8
+  []} in the example above, number constants have dimensions), an
+arithmetic expression (\texttt{-} and \texttt{+} are used in the
+example, but a full range of arithmetic operations and functions are
+available), or finally the name of one of the entries in the log
+specified by the first argument of the \dname{extern} condition.  The
+name of the entry is either the value of the \dname{tag} parameter if
+specified, or the last entry of the \dname{path} parameter.  When the
+number is evaluated, the latest value for that entry in the
+\dname{extern} log will be used.
+
+\paragraph{Explanation} In the example above, we let fertilization
+depend on both crop phenology, available nitrogen in the soil, and the
+nitrogen concentration of the crop.  \dname{DS} refers to the
+developing stage of the crop.  We here require it to be between 0 and
+1.8, when translates to emergence, and nearly ripe. We also require
+that the sum of nitrate-nitrogen and ammonium-nitrogen in the top 30
+cm should be less than 15 kg/ha.  And finally we we look at the
+nitrogen status in the crop.  Here, \dname{AcNCnt} refers to the
+actual nitrogen content of the crop.  \dname{PtNCnt} refers to the
+potential nitrogen content of the crop.  And finally, \dname{CrNCnt}
+refers to the critical nitrogen content of the crop.  If the actual
+content falls below critical, dry matter production is affected.
+Everything above critical is luxury uptake.  \dname{PtNCnt} and
+\dname{CrNCnt} depend on the age and dry matter content of the crop.
+Our requirement for fertilizing is now that the crop either has room
+for an additional 20 kg N/ha before reaching its potential, or that
+the crop is closer to the critical than the potential.
+
+\subsection{Putting it all together}
+
+This condition can now be used in a fertilizer strategy, similar to
+how we earlier defined an irrigation strategy.
+\begin{verbatim}
+  (defaction fertilize_DSS activity 
+    (wait DSS_fert)
+    (fertilize (N25S (weight 20.0 [kg N/ha])))
+
+  (defaction fert_sbarley
+    (while sbarley
+      (repeat fertilize_DSS)))
+\end{verbatim}
+Or we could combine them.
+\begin{verbatim}
+  (defaction fert_irr_sbarley
+    (while sbarley
+      (repeat irrigate_30)
+      (repeat fertilize_DSS)))
 \end{verbatim}
 
 \section{Implementation}
 
-Since all expressions are fully parenthesised, the input language is
-implemented with a trivial hand-written recursive-descend parser with
-a single token lookahead, and no backtracking.  Alternatively, if one
-is willing to accept a somewhat bulkier notation, a ready-to-use XML
+Since all expressions are fully parenthesised, the input language can
+be implemented with a trivial recursive-descend parser with a single
+token lookahead, and no backtracking.  Alternatively, if one is
+willing to accept a somewhat bulkier notation, a ready-to-use XML
 based parser could be used.
 
-The base concepts \texttt{action}, \emph{condition}, \texttt{boolean},
-and \emph{number} are all represented by pure base class, and the
-specific actions, conditions, etc.\ by concrete classes derived from
-the base.  The accessor functions for action and conditions needs to
-take the simulation state as an argument (for condition it can be a
-read-only argument).
+The base concepts \emph{action}, \emph{condition}, \emph{boolean}, and
+\emph{number} are all represented by pure base class, and the specific
+actions, conditions, etc.\ by concrete classes derived from the base.
+The accessor functions for actions and conditions need to take the
+simulation state as an argument (for conditions it can be a read-only
+argument).
 
-Each concrete class is respsonsible for registering itself with name,
+Each concrete class is responsible for registering itself with name,
 constructor and parameters with a factory pattern.  This registry is
 also use by the parser.  A global table of extern logs is used for
 making the log information available in the numerical expressions
 within the ``extern'' condition.
 
+In \cite{daisy-ems} more information about the implementation
+framework can be found.
+
+\section{History}
+
+The original Daisy implementation in \textsc{Fortran} from 1989
+provided for only historical management, with a few hardcoded
+exceptions such as an early version of \dname{trafficable} condition,
+to delay the specified tillage operation dates.  In 1995 the Danish
+Informatics Network in Agriculture (Dina) funded a rewrite in
+\cplusplus{} based on the computer science principles mentioned in the
+previous section.  This rewrite laid the foundation for the current
+system.  Originally a simple rule based system was implemented, with a
+list of condition and action pairs.  If the condition was true, the
+action was performed.  This system is still available as a special
+action named \dname{cond}, but proved unsuitable for teaching
+purposes.  So it was supplemented with the \dname{activity} action,
+which required actions to have a duration.  The \dname{while} and
+\dname{repeat} action were implemented shortly after, in order to
+describe irrigation strategies independently of the specific crop on the
+field.
+
+The \dname{extern} log model was implemented in 1999, as a part of a
+flexible interface to the Mike/SHE groundwater model \cite{mikeshe}
+under the the SDSS EU project \cite{sdss}.  The ``number'' abstraction
+for doing arithmetic was implemented in 2004 to support generic
+pedotransfer functions for sorbtion in a Ph.D. project about dissolved
+organic matter \cite{bgj-dom}.  The last components were provided as
+part of the FertOrgaNic project \cite{fertorganic}, where we should
+develop DSS rules in a project with 3 experimental years and 9
+experimental sites across Europe.  In 2005 the ``boolean'' abstraction
+was implemented and the ``number'' abstraction significantly extended
+as part of a subsystem that should plot the large amountof field data
+together with simulation results.  Finally, in 2006 the \dname{extern}
+condition and implemented and the ``boolean'' abstraction further
+developed in order to implement the DSS directly in Daisy.
+
 \section{Applications}
 
-Has been succesfully used in (examples)...
+The FertOrgaNic project is the first use of the system to implement a
+DSS, which is where the advanced state management comes to its right.
+A running demo can be found on the project home page,
+\url{http://www.fertorganic.org/}.  We hope many more DSS uses will
+follow, especially as the advanced state management system was only
+developed near the end of the project.
 
-\begin{itemize}
-\item Is rutinely used with historical management data for analysing
-  experiments.
-\item Loop: Skriv noget om opskalering.
-\item VVM: Godkendelse for skift af brug.
-\item FertOrgaNic: Brug som DSS
-\item Min OM-init artikel: Langtidssimulering for initialisering af OM
-  puljer. 
-\end{itemize}
+The historical data management is used in basically every project
+where we have experimental data we want to analyze with the model,
+including the FertOrgaNic project.
+
+\paragraph{Flexible crop management use by the adminsitration} The
+flexible crop management system has been used mainly by the Danish
+environmental administration.  One example is a standardized procedure
+\cite{daisy-staabi} for getting an environmental permit for major
+changes in farm management, such as introducing pigs to what used to
+be a pure crop farm.  The procedure calls for running a crop rotation
+with the new and old farm management with 10 years of historical
+weather data, and compare the nitrogen leaching predicted by Daisy.
+This simulation must be repeated several times with the weather data
+shifted one year, so each crop in the rotation is grown under each
+year in the weather data.  Setting up management for all these
+combinations by hand would be unmanageable and errorprone, so the
+flexible crop management system, where we only have to describe each
+crop once, has been a great help.
+
+Another example is the program for evaluating the effect of the
+national ``Action Plan for the Aquatic Environment''.  In selected
+areas the aquatic environment is intensively monitored (the
+\textsc{Loop} areas), and this information is used together with
+statistical information about the farm management and soil types in
+the area to model the nitrogen leaching \cite{novana}.  Since the
+regional authorities don't have the exact information, they instead
+use statistical combinations of soil types and typical crop management
+to estimate the total leaching.  This, again, is only possible because
+the crop management can be described independently of the individual
+farm.
+
+\paragraph{Flexible crop management use in research} In a scientific
+context, the crop management is often used for testing hypothetical
+scenarios.  This is also useful for educational purpose, asking
+students to introduce irrigation to a simulated and see the effect in
+nitrogen is an example of a typical exercise using the flexible crop
+management system.  An example of a scientific use is found in
+\cite{boegh04a}, where a water balance for Zealand is calculated based
+on statistical information in a GIS setup, another in \cite{org-init},
+where we examine how best to initialize the organic matter pool based
+on 1000 year simulations where we go from equilibrium under one
+management strategy, to equilibrium under another management strategy.
+In the first example we scale up in space, in the second we scale up
+in time.
+
+\section{Usability}
+
+We have taught the system to agronomy students, and other academic
+students, as well as to administrators with a background in science,
+and other scientist.  In our experience, people with a programming
+background find it intuitive, people with no programming knowledge
+less so.  However, when we start with the system for historical data
+management and build from there, they will in general understand it.
+Most people who later use the system for real work learn to appreciate
+the flexibility.
+
+There exist several graphical user interfaces for Daisy
+\cite{plantinfo-daisy,daisygis,fertorganic}, which generate management
+descriptions using a subset of the textual interface described in this
+article.  Most users of these interfaces tend to run into the limits
+eventually, and switch to the textual interface.  However, for users
+not accustomed to textual program interfaces, the graphical user
+interfaces may seem less intimidating.
 
 \section{Conclusion}
 
+The ``action'' and ``condition'' abstractions we choose in the 1995
+rewrite have proved very flexible, and provided the basis for several
+different systems for describing the management component of the
+model.  The flexible crop management system have proved useful in the
+administration, for teaching, and for research.  The latest system, the
+advanced state, has not yet proved itself, but looks promising.  
 
-Vi er bare så gode.
-
-\section{Acknowledgements}
-
-DINA, FertOrgaNic.
+All of these are easily implementable using
+elementary\footnote{Elementary today, they were not all elementary in
+  1995.}  computer science tools, and we believe that the diverse
+applications of the system demonstrate the value of combining the the
+specific modelling expertize behind the original Daisy model, with the
+computer science expertize the 1995 rewrite added.
 
 \addcontentsline{toc}{section}{\numberline{}Bibliography}
 \bibliography{daisy}
