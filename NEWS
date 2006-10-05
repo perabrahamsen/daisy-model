@@ -29,6 +29,13 @@ instead of
 This was already the case for the log parameterizations in
 log-std.dai, but now also work with "log.dai" and "log-old.dai".
 
+Old log parameterizations supporting the "set" attribute must be
+updated to use the new system.  For most parameterizations it will be
+enough to derive from "column" or "crop" instead of "table", and use
+"${column}" or "${crop}" instead of "$col" or "$crop" in the paths.
+If you never actually use the "set" attribute, it may be enough to
+replace all instances of "$col" and "$crop" with "*".
+
 ** New examples from Czechia in the sample directory.
 
 ** Weather data from Jyndeval and Foulum in the sample directory.
