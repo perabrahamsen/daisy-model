@@ -38,6 +38,9 @@ replace all instances of "$col" and "$crop" with "*".
 
 ** New examples from Czechia in the sample directory.
 
+Kindly provided by RISWC, as part of the FertOrgaNic project, with
+permission to distribute widely.
+
 ** Weather data from Jyndeval and Foulum in the sample directory.
 ** Soil parameterization from Foulum in dk-soil.dai in sample directory.
 
@@ -62,6 +65,9 @@ Renamed "Soil Hydraulic Conductivity (log10)".
 ** New Folva, Triada, and Agria potato varieties in 'potato.dai'.
 
 ** New examples from Italy, Poland and Slovakia in the sample directory.
+
+Kindly provided by the field sites, as part of the FertOrgaNic
+project, with permission to distribute widely.
 
 ** You can now log actual hydraulic conductivity.
 

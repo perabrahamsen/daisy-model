@@ -61,6 +61,7 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
                   ( -250.00 "Jyndevad C"))))
 
 (defhorizon "Foulum AP" default
+  "Provided by DJF as part if the FertOrgaNic project."
     (clay 0.115)
     (silt 0.110)
     (fine_sand 0.420)
@@ -76,6 +77,7 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
         (n 1.2870)))
 
 (defhorizon "Foulum B" default
+  "Provided by DJF as part if the FertOrgaNic project."
     (clay 0.149)
     (silt 0.101)
     (fine_sand 0.435)
@@ -91,6 +93,7 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
         (n 1.2585)))
 
 (defhorizon "Foulum C" default
+  "Provided by DJF as part if the FertOrgaNic project."
     (clay 0.164)
     (silt 0.106)
     (fine_sand 0.419)
@@ -106,6 +109,7 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
         (n 1.2200)))
 
 (defcolumn Foulum default
+  "Provided by DJF as part if the FertOrgaNic project."
   (Soil (MaxRootingDepth 100.00)
         (horizons (  -30.00 "Foulum AP")
                   (  -90.00 "Foulum B")	
@@ -114,3 +118,5 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
                  (init (input 4411 [kg C/ha/y])
                  (end -18 [cm])
                  (root 911 [kg C/ha/y]))))
+
+;;; dk-soil.dai ends here
