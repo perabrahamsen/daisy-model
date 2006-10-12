@@ -585,7 +585,7 @@ simulation is should save for later processing.
           ("N Balance" (when monthly)
                        (from 0 [m]) (to -1 [m]))
           ("Crop Production"
-           (set "$crop" "Spring Barley")
+           (crop "Spring Barley")
            (where "sbarley.dlf"))
           (checkpoint (when (at 1987 8 7 6))))
 
@@ -615,7 +615,7 @@ We have two crops simultaneously on the soil.  By default,
 and log it in a \texttt{crop\_prod.dlf} file.  The weird looking
 
 \begin{verbatim}
-           (set "$crop" "Spring Barley")
+           (crop "Spring Barley")
 \end{verbatim}%$
 
 line tells \daisy{} to only log information about the spring barley,
@@ -1913,10 +1913,10 @@ Here are some log models that are useful when dealing with pesticides:
 \end{description}
 
 In general, you will get the sum of all chemicals.  To log the content
-of a specific pesticide, such as `Atrazine', specify the \verb|$chem|%$
-parameter, as in:
+of a specific pesticide, such as `Atrazine', specify the
+\emph{\texttt{chemical}} parameter, as in:
 \begin{verbatim}
-    ("Soil Chemical" (set "$chem" Atrazine))
+    ("Soil Chemical" (chemical Atrazine))
 \end{verbatim}%$
 
 \section{Log Files}
@@ -2502,19 +2502,18 @@ forced CAI is active, this is the only use of the simulated CAI\@.
 
 The simulated CAI will be calculated anyway and can be logged.  Most
 log files will only log the CAI actually used which, when Forced LAI
-is in effect, will not be the sum of Leaf, Stem and SOrg AI\@.  The new
-"Forced LAI" log model will log both the used, forced and simulated
-CAI\@.  By default, it will log the sum of all crops, set
-\verb|$crop|%$
-to log a particular crop alone as below:
+is in effect, will not be the sum of Leaf, Stem and SOrg AI\@.  The
+new "Forced LAI" log model will log both the used, forced and
+simulated CAI\@.  By default, it will log the sum of all crops, set
+\texttt{crop} to log a particular crop alone as below:
 
 \begin{verbatim}
   (output "Forced LAI"
           ("Forced LAI"
-           (set "$crop" "Spring Barley")
+           (crop "Spring Barley")
            (where "sbarley.dlf"))
           ("Forced LAI"
-           (set "$crop" "Grass to grain")
+           (crop "Grass to grain")
            (where "grass.dlf")))
 \end{verbatim}
 
@@ -2596,7 +2595,7 @@ to log a particular crop alone as below:
         ("N Balance" (when monthly)
                      (from 0 [m]) (to -1 [m]))
         ("Crop Production"
-         (set "$crop" "Spring Barley")
+         (crop "Spring Barley")
          (where "sbarley.dlf"))
         (checkpoint (when (at 1987 8 7 6))))
 
