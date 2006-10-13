@@ -436,8 +436,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = select_date.C soltrans1d.h column_base.h \
-	soil_heat_rect.C soil_heat1d.C soil_heat_rect.h soil_heat1d.h 
+REMOVE = photosynthesis.h photosynthesis.C
 
 # These are the file extensions we deal with.
 # 
