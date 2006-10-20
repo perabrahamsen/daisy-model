@@ -763,5 +763,3 @@ static struct UZRichardSyntax
       Librarian<UZmodel>::add_type ("richards", alist, syntax, &make);
     }
 } UZRichard_syntax;
-
-

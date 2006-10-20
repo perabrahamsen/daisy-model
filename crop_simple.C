@@ -233,7 +233,7 @@ CropSimple::tick (const Time& time,
   // Growth
   if (time.month () == spring_mm
       && time.mday () == spring_dd 
-      && time.hour () == 0.0)
+      && time.hour () == 0)
     {
       T_sum = 0.0;
       day = 0.0;
@@ -248,7 +248,7 @@ CropSimple::tick (const Time& time,
   
   // Air temperature based growth.
   const double T_air = bioclimate.daily_air_temperature ();
-  if (time.hour () == 0.0  && T_air > 0.0)
+  if (time.hour () == 0  && T_air > 0.0)
     {
       const double old_T = T;
 

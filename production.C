@@ -389,7 +389,7 @@ Production::tick (const double AirT, const double SoilT,
       AM_root->add_surface (geo, C_Root * m2_per_cm2,
                             DeadNRoot * m2_per_cm2,
                             Density);
-      daisy_assert (C_Root == 0.0 || DeadNRoot > 0.0);
+      daisy_assert (!std::isnormal (C_Root) || DeadNRoot > 0.0);
       residuals_DM += DeadWRoot;
       geo.add_surface (residuals_C_soil, Density, C_Root * m2_per_cm2);
       geo.add_surface (residuals_N_soil, Density, DeadNRoot * m2_per_cm2);

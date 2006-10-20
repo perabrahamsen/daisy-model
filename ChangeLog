@@ -1,3 +1,11 @@
+2006-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uz1d_richard.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* uz1d.C, uz1d.h: New component.
+	* Makefile (COMPONENTS): Added it.
+
 2006-10-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* parser_file.C (Parskip): New helper class.
@@ -8,7 +16,7 @@
 	* difrad_DPF.C: New model.
 	* Makefile (MODELS): Added it.
 
-2006-09-27  U-BGJ203512\bgj  <bgj@bgj203512.agsci.kvl.dk>
+2006-09-27  Birgitte Gjettermann  <bgj@kvl.dk>
 
 	* weather.C, weather.h (sin_solar_elevation_angle): New function.
 	(HourlyExtraterrestrialRadiation): Use it.

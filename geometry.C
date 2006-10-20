@@ -66,6 +66,15 @@ Geometry::edge_name (size_t e) const
   return tmp.str ();
 }
 
+int
+Geometry::edge_index (const int from, const int to)
+{
+  for (size_t e = 0; e < edge_size (); e++)
+    if (edge_from (e) == from && edge_to (e) == to)
+      return e;
+  return -1;
+}
+
 double
 Geometry::z_safe (int n) const
 {

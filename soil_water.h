@@ -72,6 +72,8 @@ public:
 public:
   double h (size_t i) const
   { return h_[i]; }
+  double h_old (size_t i) const
+  { return h_old_[i]; }
   double Theta (size_t i) const
   { return Theta_[i]; }
   double Theta_left (size_t i) const
@@ -100,6 +102,11 @@ public:
   { return q_p_[i]; }
   double Theta_ice (const Soil&, size_t i, double h) const;
  
+  // Modify.
+public:
+  void set_content (size_t i, double h, double Theta);
+  void set_flux (size_t i, double q);
+
   // Simulation.
 public:
   void tick (const size_t cell_size, const Soil& soil, Treelog& msg);

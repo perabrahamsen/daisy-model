@@ -42,6 +42,7 @@ struct MovementRect : public Movement
   // Water.
   std::auto_ptr<UZmodel> uzdefault;
   std::auto_ptr<UZmodel> uzreserve;
+  std::auto_ptr<UZ1D> uzhor;
   void macro_tick (const Soil&, SoilWater&, Surface&, Treelog&);
   void water_column (const Soil& soil, const SoilHeat& soil_heat, 
                      Surface& surface, Groundwater& groundwater,
@@ -172,7 +173,7 @@ MovementRect::water_column (const Soil& soil, const SoilHeat& soil_heat,
     }
   catch (const std::string& error)
     {
-      msg.warning (std::string ("UZ problem: ") + error);
+      msg.warning (std::string ("UZ trouble: ") + error);
       ok = false;
     }
   if (!ok)
@@ -180,7 +181,7 @@ MovementRect::water_column (const Soil& soil, const SoilHeat& soil_heat,
       msg.message ("Using reserve uz model.");
       uzreserve->tick (msg, *geo, soil, soil_heat,
                        first, surface, top_edge, last, groundwater,
-                       S, h, Theta_old, h_ice, h, Theta, 
+                       S, h_old, Theta_old, h_ice, h, Theta, 
                        q_offset, q);
     }
 
@@ -399,6 +400,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
 
   soil_water.tick (cell_size, soil, msg); 
 
+  // Vertical movement.
   for (size_t col = 0; col < cell_columns; col++)
     {
       // Find relevant cells.
@@ -433,6 +435,42 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
                                     + soil_water.q_p (edge)) * dt,
                                    *geo, edge);
     }
+
+  // Horizontal movement.
+  for (size_t row = 0; row < cell_rows; row++)
+    {
+      std::vector<size_t> cells;
+      std::vector<int> edges;
+      
+      for (size_t col = 0; col < cell_columns; col++)
+        cells.push_back (geo->cell_index (row, col));
+
+      edges.push_back (-1);
+      for (size_t col = 1; col < cell_columns; col++)
+        {
+          const int edge = geo->edge_index (cells[col-1], cells[col]);
+          daisy_assert (edge >= 0);
+          daisy_assert (edge < geo->edge_size ());
+          edges.push_back (edge);
+        }
+      edges.push_back (-1);
+      daisy_assert (cells.size () + 1 == edges.size ());
+
+      SMM1D smm (*geo, soil, soil_water, soil_heat, cells, edges);
+
+      try 
+        {
+          uzhor->tick (smm, 0.0, msg);
+        }
+      catch (const char* error)
+        {
+          msg.warning (std::string ("UZhor problem: ") + error);
+        }
+      catch (const std::string& error)
+        {
+          msg.warning (std::string ("UZhor trouble: ") + error);
+        }
+    }
 }
 
 void 
@@ -458,6 +496,7 @@ MovementRect::MovementRect (Block& al)
     geo (submodel<GeometryRect> (al, "Geometry")),
     uzdefault (Librarian<UZmodel>::build_item (al, "UZdefault")),
     uzreserve (Librarian<UZmodel>::build_item (al, "UZreserve")),
+    uzhor (Librarian<UZ1D>::build_item (al, "UZhor")),
     transport (Librarian<Transport>::build_item (al, "transport")),
     reserve (Librarian<Transport>::build_item (al, "transport_reserve")),
     last_resort (Librarian<Transport>::build_item (al, 
@@ -485,6 +524,9 @@ static struct MovementRectSyntax
     syntax.add ("UZreserve", Librarian<UZmodel>::library (),
                 "Reserve transport model if UZtop fails.");
     alist.add ("UZreserve", UZmodel::reserve_model ());
+    syntax.add ("UZhor", Librarian<UZmodel>::library (),
+                "Horizonatl transport model for soil matrix water.");
+    alist.add ("UZhor", UZ1D::default_model ());
     syntax.add ("transport", Librarian<Transport>::library (), 
                 "Solute transport model in matrix.");
     alist.add ("transport", Transport::default_model ());

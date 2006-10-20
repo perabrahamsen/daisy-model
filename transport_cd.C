@@ -77,8 +77,8 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
     {
       daisy_assert (C[i] >= 0.0);
       daisy_assert (M[i] >= 0.0);
-      if (C[i] == 0.0)
-	daisy_assert (M[i] == 0.0);
+      if (!std::isnormal (C[i]))
+	daisy_assert (!std::isnormal (M[i]));
       else
 	daisy_assert (approximate (M[i], 
 				   adsorption.C_to_M (soil,
@@ -154,7 +154,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 #ifdef DISABLE_MIXING
   daisy_assert (J_in <= 0.0);
 #endif
-  if (J_in != 0.0)
+  if (std::isnormal (J_in))
     {
 #ifdef DISABLE_MIXING
       daisy_assert (J_in < 0.0);
@@ -264,7 +264,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 	// Size of current cell.
 	const double dz = geo.dz (0);
 	// Flow to above.
-	double q_minus = (J_in == 0.0) ? 0.0 : soil_water.q (0);
+	double q_minus = std::isnormal (J_in) ? soil_water.q (0) : 0.0;
 	// Flow from below.
 	const double q_plus = soil_water.q (1);
 	const double alpha_minus = alpha[0]; // Direction above.

@@ -268,7 +268,7 @@ OrganicStandard::Buffer::tick (int i, double abiotic_factor,
                                double N_soil, double& N_used,
                                const std::vector<SOM*>& som)
 {
-  if (C[i] == 0.0)
+  if (!std::isnormal (C[i]))
     return;
 
   double rate;
@@ -1857,7 +1857,7 @@ Setting additional pool to zero");
 	  for (size_t pool = 0; pool < som_size; pool++)
 	    {
 	      const double value = matrix.get_entry (row, som_column + pool);
-	      if (value != 0.0)
+	      if (std::isnormal (value))
 		{
 		  if (first)
 		    first = false;
@@ -1869,7 +1869,7 @@ Setting additional pool to zero");
 	  for (size_t pool = 0; pool < smb_size; pool++)
 	    {
 	      const double value = matrix.get_entry (row, dsmb_column + pool);
-	      if (value != 0.0)
+	      if (std::isnormal (value))
 		{
 		  if (first)
 		    first = false;
@@ -1881,7 +1881,7 @@ Setting additional pool to zero");
 	  for (size_t pool = 0; pool < som_size; pool++)
 	    {
 	      const double value = matrix.get_entry (row, dsom_column + pool);
-	      if (value != 0.0)
+	      if (std::isnormal (value))
 		{
 		  if (first)
 		    first = false;

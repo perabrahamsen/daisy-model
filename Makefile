@@ -298,7 +298,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-MODELS = difrad_DPF.C \
+MODELS = uz1d_richard.C difrad_DPF.C \
         difrad_weather.C number_lisp.C condition_extern.C condition_boolean.C \
 	boolean_extern.C boolean_number.C boolean_string.C \
 	number_extern.C movement_rect.C number_soil.C organic_none.C \
@@ -353,7 +353,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = difrad.C organic_matter.C movement.C integer.C \
+COMPONENTS = uz1d.C difrad.C organic_matter.C movement.C integer.C \
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
@@ -724,6 +724,11 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+uz1d${OBJ}: uz1d.C uz1d.h geometry_rect.h geometry_vert.h geometry.h syntax.h \
+  treelog.h symbol.h mathlib.h assertion.h soil.h horizon.h librarian.h \
+  library.h block.h plf.h alist.h soil_water.h soil_heat.h
+difrad${OBJ}: difrad.C difrad.h librarian.h library.h symbol.h block.h \
+  syntax.h treelog.h plf.h alist.h assertion.h
 organic_matter${OBJ}: organic_matter.C organic_matter.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h domsorp.h \
   clayom.h
@@ -1086,6 +1091,16 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h program.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+uz1d_richard${OBJ}: uz1d_richard.C uz1d.h geometry_rect.h geometry_vert.h \
+  geometry.h syntax.h treelog.h symbol.h mathlib.h assertion.h soil.h \
+  horizon.h librarian.h library.h block.h plf.h alist.h soil_water.h \
+  soil_heat.h average.h timestep.h
+difrad_DPF${OBJ}: difrad_DPF.C difrad.h librarian.h library.h symbol.h \
+  block.h syntax.h treelog.h plf.h alist.h assertion.h weather.h im.h \
+  fao.h mathlib.h check.h
+difrad_weather${OBJ}: difrad_weather.C difrad.h librarian.h library.h \
+  symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h weather.h \
+  im.h mathlib.h
 number_lisp${OBJ}: number_lisp.C number.h symbol.h librarian.h library.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h scope_multi.h \
   scope.h submodeler.h memutils.h
@@ -1110,8 +1125,8 @@ movement_rect${OBJ}: movement_rect.C movement.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h uzmodel.h \
   timestep.h macro.h transport.h mactrans.h geometry_rect.h \
   geometry_vert.h geometry.h mathlib.h soil.h horizon.h soil_water.h \
-  soil_heat.h solute.h adsorption.h element.h surface.h groundwater.h \
-  weather.h im.h log.h border.h submodeler.h
+  uz1d.h soil_heat.h solute.h adsorption.h element.h surface.h \
+  groundwater.h weather.h im.h log.h border.h submodeler.h
 number_soil${OBJ}: number_soil.C number.h symbol.h librarian.h library.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h column.h horizon.h \
   hydraulic.h weather.h im.h time.h units.h
@@ -1187,7 +1202,8 @@ action_markvand${OBJ}: action_markvand.C action.h librarian.h library.h \
   check.h vcheck.h memutils.h
 photo_Farquhar${OBJ}: photo_Farquhar.C photo.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h bioclimate.h \
-  canopy_std.h canopy_simple.h phenology.h submodel.h mathlib.h check.h
+  canopy_std.h canopy_simple.h phenology.h log.h border.h submodel.h \
+  mathlib.h check.h
 photo_GL${OBJ}: photo_GL.C photo.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h canopy_std.h \
   canopy_simple.h phenology.h submodel.h mathlib.h check.h
@@ -1403,8 +1419,8 @@ weather_simple${OBJ}: weather_simple.C weather_old.h weather.h librarian.h \
   im.h time.h log.h border.h mathlib.h
 uzrichard${OBJ}: uzrichard.C uzmodel.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h timestep.h groundwater.h \
-  surface.h geometry1d.h geometry_vert.h geometry.h mathlib.h soil.h \
-  horizon.h soil_heat.h log.h border.h average.h
+  surface.h geometry_vert.h geometry.h mathlib.h soil.h horizon.h \
+  soil_heat.h log.h border.h average.h
 hydraulic_yolo${OBJ}: hydraulic_yolo.C hydraulic.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h mathlib.h
 hydraulic_M_vG${OBJ}: hydraulic_M_vG.C hydraulic.h librarian.h library.h \
@@ -1522,8 +1538,8 @@ adsorption_langmuir${OBJ}: adsorption_langmuir.C adsorption.h librarian.h \
 bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h surface.h \
   uzmodel.h timestep.h weather.h im.h geometry.h mathlib.h soil.h \
-  horizon.h soil_heat.h snow.h log.h border.h pet.h svat.h vegetation.h \
-  chemicals.h time.h
+  horizon.h soil_heat.h snow.h log.h border.h pet.h difrad.h svat.h \
+  vegetation.h chemicals.h time.h
 condition_crop${OBJ}: condition_crop.C condition.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h crop.h \
   time.h field.h border.h daisy.h program.h check_range.h check.h

@@ -26,6 +26,7 @@
 
 // Needed for initialization order.
 #include "uzmodel.h"
+#include "uz1d.h"
 #include "macro.h"
 #include "transport.h"
 #include "mactrans.h"

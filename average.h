@@ -37,6 +37,8 @@ public:
   virtual double operator()(double a, double b) const = 0;
 
   // Create and Destroy.
+public:
+  static const AttributeList& arithmetic_model ();
 protected:
   Average (Block& al);
 public:

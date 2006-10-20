@@ -87,7 +87,7 @@ Bioincorporation::Implementation::am_compare (const AM* a, const AM* b)
     {
       const double b_top_C = b->top_C ();
       daisy_assert (b_top_C >= 0);
-      if (b_top_C == 0.0)
+      if (!std::isnormal (b_top_C))
 	return true;
       
       const double a_top_N = a->top_N ();
@@ -112,7 +112,7 @@ Bioincorporation::Implementation::tick (const Geometry& geo,
 					double& CO2)
 {
   // No bioincorporation.
-  if (R_max == 0.0)
+  if (!std::isnormal (R_max))
     return;
 
   // Clear old log variables.
@@ -165,8 +165,8 @@ Bioincorporation::Implementation::tick (const Geometry& geo,
       {
 	// Take all.
 	am[i]->multiply_top (0.0);
-	daisy_assert (am[i]->top_C () == 0.0);
-	daisy_assert (am[i]->top_N () == 0.0);
+	daisy_assert (!std::isnormal (am[i]->top_C ()));
+	daisy_assert (!std::isnormal (am[i]->top_N ()));
 	C_removed += top_C;
 	N_removed += top_N;
       }

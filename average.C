@@ -67,6 +67,22 @@ static struct AverageArithmeticSyntax
   }
 } AverageArithmetic_syntax;
 
+const AttributeList& 
+Average::arithmetic_model ()
+{
+  static AttributeList alist;
+  
+  if (!alist.check ("type"))
+    {
+#if 0
+      Syntax dummy;
+      AverageArithmetic::load_syntax (dummy, alist);
+#endif
+      alist.add ("type", "arithmetic");
+    }
+  return alist;
+}
+
 // harmonic model.
 
 struct AverageHarmonic : public Average

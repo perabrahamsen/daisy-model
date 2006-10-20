@@ -82,13 +82,30 @@ SoilWater::root_uptake (const std::vector<double>& v)
 }
 
 double 
-SoilWater::content (const Geometry& geo, double from, double to) const
+SoilWater::content (const Geometry& geo, 
+                    const double from, const double to) const
 { return geo.total (Theta_, from, to); }
 
 double
-SoilWater::Theta_ice (const Soil& soil, size_t i, double h) const
+SoilWater::Theta_ice (const Soil& soil, const size_t i, const double h) const
 { return soil.Theta (i, h, h_ice (i)); }
  
+void 
+SoilWater::set_content (const size_t i, const double h, const double Theta)
+{
+  daisy_assert (i < h_.size ());
+  h_[i] = h;
+  daisy_assert (i < Theta_.size ());
+  Theta_[i] = Theta;
+}
+
+void
+SoilWater::set_flux (const size_t i, const double q)
+{
+  daisy_assert (i < q_.size ());
+  q_[i] = q;
+}
+
 void
 SoilWater::tick (const size_t cell_size, const Soil& soil, Treelog& msg)
 {

@@ -70,7 +70,7 @@ RootSystem::potential_water_uptake (const double h_x,
 		    * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
 		  / (- 0.5 * log (area * L[i]))),
 		 max_uptake);
-      daisy_assert (soil_water.h (i) > h_wp || uptake == 0.0);
+      daisy_assert (soil_water.h (i) > h_wp || !std::isnormal (uptake));
       daisy_assert (soil_water.Theta_left (i) - uptake > soil.Theta_res (i));
       daisy_assert (L[i] >= 0.0);
       daisy_assert (soil_water.Theta_ice (soil, i, h) > 0.0);
@@ -78,7 +78,7 @@ RootSystem::potential_water_uptake (const double h_x,
       daisy_assert (soil.M (i, soil_water.h (i)) >= 0.0);
       daisy_assert (soil.M (i, h) >= 0.0);
       daisy_assert (area * L[i] > 0.0);
-      daisy_assert ((- 0.5 * log (area * L[i])) != 0.0);
+      daisy_assert (std::isnormal (- 0.5 * log (area * L[i])));
       daisy_assert (uptake >= 0.0);
       S[i] = uptake;
     }
@@ -243,25 +243,33 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 	  if (alpha < 1e-10)
 	    {
 	      B_zero[i] = 4.0 * M_PI * D
-		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);
+		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0)
+                   - 1.0);
 	      I_zero[i] = B_zero[i] * C_l;
 	    }
-	  else if (alpha == 2.0)
-	    {
-	      B_zero[i] = q_r * log (beta_squared)
-		/ ((beta_squared - 1.0) - log (beta_squared));
-	      I_zero[i] = q_r * (beta_squared - 1.0) * C_l
-		/ ((beta_squared - 1.0) - log (beta_squared));
-	    }
 	  else
-	    {
-	      B_zero[i] = q_r * (pow (beta, 2.0 - alpha) - 1.0)
-		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
-		   - (pow (beta, 2.0 - alpha) - 1.0));
-	      I_zero[i] = q_r * (beta_squared - 1.0) * (1.0 - 0.5 * alpha) * C_l
-		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
-		   - (pow (beta, 2.0 - alpha) - 1.0));
-	    }
+            { 
+              const double divisor 
+                = ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
+                   - (pow (beta, 2.0 - alpha) - 1.0));
+              
+              if (std::isnormal (divisor))
+                {
+                  B_zero[i] = q_r * (pow (beta, 2.0 - alpha) - 1.0)
+                    / divisor;
+                  I_zero[i] = q_r * (beta_squared - 1.0) * (1.0 - 0.5 * alpha)
+                    * C_l / divisor;
+                }
+              else              
+                {
+                  daisy_assert (approximate (alpha, 2.0));
+                  const double div2 
+                    = ((beta_squared - 1.0) - log (beta_squared));
+                  daisy_assert (std::isnormal (div2));
+                  B_zero[i] = q_r * log (beta_squared) / div2;
+                  I_zero[i] = q_r * (beta_squared - 1.0) * C_l / div2;
+                }
+            }
 	  daisy_assert (isfinite (I_zero[i]));
 	  daisy_assert (isfinite (B_zero[i]));
 	  B += L * geo.volume (i) * B_zero[i];
