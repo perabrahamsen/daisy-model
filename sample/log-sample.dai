@@ -3,7 +3,7 @@
 ;; These are mostly intended to show how you can create log files for
 ;; comparing simulated data with measured data.
 
-(deflog "Sample water content" table
+(deflog "Sample water content" column
   "Average water content in two intervals.
 This could be used for comparison with, say, TDR probes."
   (where "interval_water_content.dlf")
@@ -11,14 +11,14 @@ This could be used for comparison with, say, TDR probes."
   (entries (interval (tag "0-15 cm")
                      (from 0 [cm])
                      (to -15 [cm])
-                     (path column "*" SoilWater Theta)
+                     (path column "${column}" SoilWater Theta)
                      (spec fixed SoilWater Theta)
                      (density true)
                      (dimension "%"))
            (interval (tag "15-30 cm")
                      (from -15 [cm])
                      (to -40 [cm])
-                     (path column "*" SoilWater Theta)
+                     (path column "${column}" SoilWater Theta)
                      (spec fixed SoilWater Theta)
                      (density true)
                      (dimension "%"))))

@@ -425,7 +425,7 @@ HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) $(HEADONLY)
 
 # Find all printable files.
 #
-TEXT =  update_index ChangeLog.2 ChangeLog.1 \
+TEXT =  ChangeLog.2 ChangeLog.1 \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB \
 	$(HEADERS) $(SOURCES) tlink32.ini daisy.bpr daisy.bpf daisy.bpg \
 	Daisy.vcproj
@@ -650,6 +650,10 @@ dist:	cvs
 		$(OBJHOME)/$(TARGETTYPE)/daisy
 	(cd $(FTPDIR); ln -s $(TARGETTYPE)/daisy-$(TAG).exe daisy.exe)
 	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
+	./utils/update_index $(FTPDIR)
+	./utils/update_index $(FTPDIR)/daisy-lib
+	./utils/update_index $(FTPDIR)/$(TARGETTYPE)
+	./utils/update_index $(FTPDIR)/$(HOSTTYPE)
 
 version.C:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
