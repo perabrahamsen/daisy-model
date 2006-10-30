@@ -1,0 +1,60 @@
+The purpose of the article is to explore three simple ways to use
+already installed capacity probes to estimate root zone drainage.  The
+major scientific problem with the article is that these three ways are
+not compared with any more reliable method, so they can only be
+compared with each other.
+
+The first method use the capacity probes together with potential
+evapotranspiration and rain to make a water balance.  The second
+method uses Darcy's equation between two points of measurements above
+and below the bottom of the root zone.  The third method use the
+probes to estimate the field capacity, and let drainage occur when
+water content is FC above the field capacity.
+
+The two later methods gave similar results, and the authors believe
+they are worth examining further.
+
+The paper is only 5 pages including references, so many details have
+to be omitted.  
+
+The apparent field capacity is estimated from a visual inspection of
+figure 1.  It is not clear why a visual inspection of that figure
+would give the apparent field capacity shown.  My initial estimate
+would be closer to 15% than to 25%.  But I don't know the soil, the
+depth of the probes, or the estimated transpiration in the period.
+
+Figure 2 and 3 are not that interesting, Darcy's equation is a
+function of both the pressure gradient and the water content, and it
+is thus not a big surprise that it correlates to the water content.
+And the leaching function has water input as a factor, so again the
+correlation input is not really surprising.  So the two figures can be
+omitted.
+
+Instead, add information about the soil profile (especially texture),
+and a new figure showing precipitation, irrigation, potential
+evapotranspiration and perhaps LAI over the same period as figure 1.
+If space permits, graphs showing dynamic draininge for the two later
+methods would also be informative.
+
+...
+
+Quality of science: 2
+
+Importance of science: 2
+
+New or novel: 2
+
+Easily readable/clear: 4
+
+...
+
+Accept with the following (minimum) revisions:
+
+1) Soil profile information.
+
+2) Depth of probes in figure 1.
+
+3) A precise definition of the "leaching fraction".
+
+4) Make it clear whether or not the faith in the two later method is
+   based solely on the fact that they give similar results.
