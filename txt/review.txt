@@ -9,7 +9,7 @@ evapotranspiration and rain to make a water balance.  The second
 method uses Darcy's equation between two points of measurements above
 and below the bottom of the root zone.  The third method use the
 probes to estimate the field capacity, and let drainage occur when
-water content is FC above the field capacity.
+water content is above the field capacity.
 
 The two later methods gave similar results, and the authors believe
 they are worth examining further.
@@ -18,33 +18,30 @@ The paper is only 5 pages including references, so many details have
 to be omitted.  
 
 The apparent field capacity is estimated from a visual inspection of
-figure 1.  It is not clear why a visual inspection of that figure
-would give the apparent field capacity shown.  My initial estimate
-would be closer to 15% than to 25%.  But I don't know the soil, the
-depth of the probes, or the estimated transpiration in the period.
+figure 1.  The criteria for doing this should be explained.
 
 Figure 2 and 3 are not that interesting, Darcy's equation is a
 function of both the pressure gradient and the water content, and it
 is thus not a big surprise that it correlates to the water content.
 And the leaching function has water input as a factor, so again the
-correlation input is not really surprising.  So the two figures can be
+correlation to input is not really surprising.  So the two figures can be
 omitted.
 
 Instead, add information about the soil profile (especially texture),
 and a new figure showing precipitation, irrigation, potential
 evapotranspiration and perhaps LAI over the same period as figure 1.
-If space permits, graphs showing dynamic draininge for the two later
+If space permits, graphs showing dynamic drainage for the two later
 methods would also be informative.
 
 ...
 
-Quality of science: 2
+Quality of science: 3
 
-Importance of science: 2
+Importance of science: 3
 
-New or novel: 2
+New or novel: 3
 
-Easily readable/clear: 4
+Easily readable/clear: 5
 
 ...
 
