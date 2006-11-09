@@ -14,6 +14,22 @@ release.
 
 * 4.10
 
+** New photosynthesis model: Farquhar
+
+Implement a more advanced system than the default GL model.
+
+** New radiation distribution model: sun-shade
+
+Divides radiation input to leaves into sunlit and shaded.  Works well
+with the new Farquhar photosynthesis model.
+
+** Diffuse radiation now supported.
+
+The global radiation can now be divided into diffuse and direct.  The
+diffuse part can either be specified in the weather file, or estimated
+by the difrad component in the bioclimate.  The sun-shade radiation
+distribution model makes use of this new information.
+
 ** log-std.dai is now included from log.dai
 
 ** New way to specify column, crop, chemical, aom and pool to log.

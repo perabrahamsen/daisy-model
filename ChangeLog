@@ -1,3 +1,7 @@
+2006-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.10 released.
+
 2006-11-09  Birgitte Gjettermann  <bgj@kvl.dk>
 
 	* photo_GL.C, photo.h (assimilate): New members in function call.
