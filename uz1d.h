@@ -33,6 +33,8 @@ class SMM1D
   const GeometryRect& geo;
   const Soil& soil;
   SoilWater& soil_water;
+  const std::vector<double> Theta_old_;
+  const std::vector<double> h_old;
   const SoilHeat& soil_heat;
   const std::vector<size_t> cells;
   const std::vector<int> edges;
@@ -82,10 +84,7 @@ public:
     return soil.Theta (cell, h, soil_water.h_ice (cell));
   } 
   double Theta_old (const size_t index) const
-  {
-    const size_t cell = cells[index];
-    return soil_water.Theta_old (cell);
-  } 
+  { return Theta_old_[index]; }
 
   // Update.
 public:
@@ -96,9 +95,6 @@ public:
 
   // Create and Destroy.
 public:
-  static std::vector<double>
-  /**/ calculate_edge_distance (const GeometryRect& geo,
-                                const std::vector<size_t>& cells);
   SMM1D (const GeometryRect&, const Soil&,
          SoilWater&, const SoilHeat&,
          const std::vector<size_t>& cells, const std::vector<int>& edges);

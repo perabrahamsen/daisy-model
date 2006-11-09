@@ -3,8 +3,7 @@
 #include "crop.h"
 #include "chemicals.h"
 #include "om.h"
-
-using namespace std;
+#include "mathlib.h"
 
 const double Crop::DSremove = -5001.0;
 
@@ -50,10 +49,11 @@ Crop::albedo () const
 
 void
 Crop::kill (const symbol name, const Time& time, const Geometry& geo,
-	    Bioclimate& bioclimate, vector<AM*>& residuals,
+	    Bioclimate& bioclimate, std::vector<AM*>& residuals,
 	    double& residuals_DM,
 	    double& residuals_N_top, double& residuals_C_top,
-	    vector<double>& residuals_N_soil, vector<double>& residuals_C_soil,
+	    std::vector<double>& residuals_N_soil, 
+            std::vector<double>& residuals_C_soil,
 	    Treelog& out)
 { 
 #if defined (_MSC_VER)  
@@ -71,7 +71,7 @@ Crop::force_production_stress  (double)
 
 bool
 Crop::ds_remove (const Crop* crop)
-{ return crop->DS () == Crop::DSremove; }
+{ return approximate (crop->DS (), Crop::DSremove); }
 
 Crop::Crop (Block& al)
   : alist (al.alist ()),

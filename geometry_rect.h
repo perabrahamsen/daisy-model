@@ -70,12 +70,18 @@ public:
   { return zplus_[cell_rows_ - 1]; }
   size_t cell_at (double z, double x, double y) const;
   double fraction_in_z_interval (size_t n, double from, double to) const;
+  double fraction_in_volume (size_t n, const Volume& volume) const;
   bool contain_z (size_t n, double z) const;
 
   // Layers -- Support initializing soil arrays layer by layer.
   void initialize_layer (std::vector<double>& value, 
                          const AttributeList& al, 
                          const std::string& name, Treelog&) const;
+
+  // Internal use.
+private:
+  double xplus (size_t n) const;
+  double xminus (size_t n) const;
 
   // Creation.
 public:

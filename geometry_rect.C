@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "geometry_rect.h"
+#include "volume.h"
 #include "check.h"
 #include "vcheck.h"
 #include "block.h"
@@ -48,12 +49,29 @@ GeometryRect::fraction_in_z_interval (const size_t i,
                                       const double from, const double to) const
 { return fraction_within (zplus (i), zminus (i), to, from); }
 
+double 
+GeometryRect::fraction_in_volume (size_t n, const Volume& volume) const
+{ return volume.box_fraction (zplus (n), zminus (n), 
+                              xminus (n), xplus (n));
+}
+
 bool 
 GeometryRect::contain_z (const size_t i, const double z) const
 { 
   daisy_assert (zminus (i) > zplus (i));
   return  zminus (i) > z && z >= zplus (i); 
 }
+
+double 
+GeometryRect::xplus (size_t n) const
+{ 
+  daisy_assert (n < xplus_.size ());
+  return xplus_[n]; 
+}
+
+double 
+GeometryRect::xminus (size_t n) const
+{ return (n < cell_rows_) ? 0.0 : xplus (n-cell_rows_); }
 
 bool 
 GeometryRect::check (Treelog&) const

@@ -436,6 +436,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
                                    *geo, edge);
     }
 
+#if 1
   // Horizontal movement.
   for (size_t row = 0; row < cell_rows; row++)
     {
@@ -451,6 +452,10 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
           const int edge = geo->edge_index (cells[col-1], cells[col]);
           daisy_assert (edge >= 0);
           daisy_assert (edge < geo->edge_size ());
+          daisy_assert (geo->edge_from (edge) == cells[col-1]);
+          daisy_assert (geo->edge_to (edge) == cells[col]);
+          daisy_assert (approximate (geo->z (cells[col-1]),
+                                     geo->z (cells[col])));
           edges.push_back (edge);
         }
       edges.push_back (-1);
@@ -471,6 +476,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
           msg.warning (std::string ("UZhor trouble: ") + error);
         }
     }
+#endif
 }
 
 void 

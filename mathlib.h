@@ -154,4 +154,8 @@ inline double h2pF (double h)
 extern double halftime_to_rate (double halftime);
 extern double rate_to_halftime (double rate);
 
+  // The fraction of first interval that is within the second interval.
+double fraction_within (double from, double to,
+                        double begin, double end);
+
 #endif // MATHLIB_H

@@ -310,9 +310,9 @@ VCheck::SumEqual::validate (const PLF& plf) const throw (string)
 {
   const int end = plf.size () - 1;
   daisy_assert (end >= 0);
-  if (plf.y (0) != 0.0)
+  if (std::isnormal (plf.y (0)))
     throw (string ("Value at start of PLF should be 0.0"));
-  if (plf.y (end) != 0.0)
+  if (std::isnormal (plf.y (end)))
     throw (string ("Value at end of PLF should be 0.0"));
   validate (plf.integrate (plf.x (0), plf.x (end)));
 }

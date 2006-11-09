@@ -343,7 +343,9 @@ LogAList::open_object (symbol field, symbol type,
       daisy_assert (syntax ().lookup (sfield) == Syntax::Object);
       daisy_assert (syntax ().size (sfield) == Syntax::Singleton);
       const Library& library = syntax ().library (sfield);
-      daisy_assert (library.check (type));
+      if (!library.check (type))
+        daisy_panic ("Field '" + sfield + "' containing component '"
+                     + library.name () + "' has unknown model '" + type + "'");
       const Syntax& syntax = library.syntax (type);
       push (field, syntax, alist);
     }

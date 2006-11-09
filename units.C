@@ -191,6 +191,7 @@ int Units::count = 0;
 
 const symbol Units::cm ("cm");
 const symbol Units::cm_per_h ("cm/h");
+const symbol Units::cm3 ("cm^3");
 
 bool
 Units::Convert::valid (double) const
@@ -296,6 +297,16 @@ Units::multiply (const string& one, const string& two)
     { "g C/cm^3/h", "cm", "g C/cm^2/h" },
     { "g N/cm^3/h", "cm", "g N/cm^2/h" }, 
     { "g CO_2-C/cm^3/h", "cm", "g CO_2-C/cm^2/h"},
+    { "h^-1", "cm^3", "cm^3/h" },
+    { "cm^3/cm^3", "cm^3", "cm^3" },
+    { "cm^3/cm^3/h", "cm^3", "cm^3/h" },
+    { "g/cm^3", "cm^3", "g" },
+    { "g C/cm^3", "cm^3", "g C" },
+    { "g N/cm^3", "cm^3", "g N" },
+    { "g/cm^3/h", "cm^3", "g/h" },
+    { "g C/cm^3/h", "cm^3", "g C/h" },
+    { "g N/cm^3/h", "cm^3", "g N/h" }, 
+    { "g CO_2-C/cm^3/h", "cm^3", "g CO_2-C/h"},
   };
   
   for (unsigned int i = 0; i < sizeof (table) / sizeof (multiply_table); i++)

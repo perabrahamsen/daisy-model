@@ -1404,7 +1404,7 @@ CropOld::ActualWaterUptake (double Ept,
 
   // We need this to make sure H2OExtraction corresponds to 'h_x'.
   const double total2 = PotentialWaterUptake (h_x, geo, soil, soil_water);
-  daisy_assert (total == total2);
+  daisy_assert (approximate (total, total2));
 
   vector<double>& H2OExtraction = var.RootSys.H2OExtraction;
   if (total > Ept)
@@ -1903,7 +1903,7 @@ CropOld::harvest (const symbol column_name,
   const double WStem = WStub + WStraw;
   const double Climit = (CStem * WStem + CSOrg * WSOrg);
   
-  if (WSOrg == 0.0)
+  if (!std::isnormal (WSOrg))
     CStem = NLeaf / WStem;
   else if (CLeaf <= Climit)
     CSOrg = (NLeaf - CStem * WStem) / WSOrg;

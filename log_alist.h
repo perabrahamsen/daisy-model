@@ -94,6 +94,7 @@ struct LogAList : public Log
   void close_named_entry ();
 
   // Logging.
+  using Log::output;
   void output (symbol name, bool value);
   void output (symbol name, double value);
   void output (symbol name, int value);

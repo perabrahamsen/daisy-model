@@ -14,6 +14,33 @@
 
 	* bioclimate.h (sun_PAR, sun_LAI_fraction): New virtual member functions.
 
+2006-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (multiply): Multiple with [cm^3] added.
+
+	* volume_box.C: New model.
+	* Makefile (MODELS): Use it.
+
+2006-11-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* volume.C, volume.h: New component.
+	* Makefile (COMPONENTS): Added it.
+
+	* select_volume.C: New model.
+	* Makefile (MODELS): Added it.
+
+2006-11-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uz1d_none.C: New model.
+	* Makefile (MODELS): Added it.
+
+2006-10-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_walltime.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* bioclimate_std.C (load_syntax): Fix type of 'difrad'.
+
 2006-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* uz1d_richard.C: New model.

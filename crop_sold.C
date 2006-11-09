@@ -1398,7 +1398,7 @@ CropSold::ActualWaterUptake (double Ept,
 
   // We need this to make sure H2OExtraction corresponds to 'h_x'.
   const double total2 = PotentialWaterUptake (h_x, geo, soil, soil_water);
-  daisy_assert (total == total2);
+  daisy_assert (approximate (total, total2));
 
   vector<double>& H2OExtraction = var.RootSys.H2OExtraction;
   if (total > Ept)
@@ -1458,7 +1458,7 @@ CropSold::PotentialWaterUptake (const double h_x,
       daisy_assert (soil.M (i, soil_water.h (i)) >= 0.0);
       daisy_assert (soil.M (i, h) >= 0.0);
       daisy_assert (area * L[i] > 0.0);
-      daisy_assert ((- 0.5 * log (area * L[i])) != 0.0);
+      daisy_assert (std::isnormal (- 0.5 * log (area * L[i])));
       daisy_assert (uptake >= 0.0);
       S[i] = uptake;
       total += uptake * geo.volume (i) * 10; // mm/cm.

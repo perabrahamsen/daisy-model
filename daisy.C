@@ -243,7 +243,7 @@ Daisy::run (Treelog& out)
 	  out.touch ();
       }
     while (running);
-      }
+  }
   // Print log file summaries at end of simulation.
   {
     Treelog::Open nest (out, "Summary");

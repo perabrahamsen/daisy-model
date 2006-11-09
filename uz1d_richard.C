@@ -164,8 +164,8 @@ UZ1DRichard::tick (SMM1D& smm, const double gravity, Treelog& msg)
 	      break;
 	    }
 	}
-      while (   !converges (h_conv, h, 
-                            max_absolute_difference, max_absolute_difference)
+      while (!converges (h_conv, h, 
+                         max_absolute_difference, max_absolute_difference)
 	     && iterations_used <= max_iterations);
 
       if (iterations_used > max_iterations)

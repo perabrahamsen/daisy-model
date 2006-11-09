@@ -20,9 +20,51 @@
 
 #include "uz1d.h"
 
-std::vector<double>
-SMM1D::calculate_edge_distance (const GeometryRect& geo,
-                                const std::vector<size_t>& cells)
+void 
+SMM1D::reset (std::vector<double>& h, std::vector<double>& Theta) const
+{
+  const size_t cell_size = cells.size ();
+  daisy_assert (h.size () == cell_size);
+  daisy_assert (Theta.size () == cell_size);
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      h[i] = h_old[i];
+      Theta[i] = Theta_old_[i];
+    }
+}
+
+void 
+SMM1D::update (const std::vector<double>& h,
+               const std::vector<double>& Theta,
+               const std::vector<double>& q)
+{
+  const size_t cell_size = cells.size ();
+  daisy_assert (h.size () == cell_size);
+  daisy_assert (Theta.size () == cell_size);
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      const size_t cell = cells[i];
+      soil_water.set_content (cell, h[i], Theta[i]);
+    }
+  const size_t edge_size = edges.size ();
+  daisy_assert (q.size () == edge_size);
+  for (size_t i = 0; i < edge_size; i++)
+    {
+      const int edge = edges[i];
+      if (edge >= 0)
+        {
+          daisy_assert (edge < geo.edge_size ());
+          daisy_assert (approximate (geo.z_safe (geo.edge_from (edge)), 
+                                     geo.z_safe (geo.edge_to (edge))));
+          soil_water.set_flux (edge, q[i]);
+        }
+    }
+}
+
+
+static std::vector<double>
+calculate_edge_distance (const GeometryRect& geo, 
+                         const std::vector<size_t>& cells)
 { 
   std::vector<double> result;
   const size_t size = cells.size ();
@@ -47,43 +89,31 @@ SMM1D::calculate_edge_distance (const GeometryRect& geo,
   return result;
 }
 
-void 
-SMM1D::reset (std::vector<double>& h, std::vector<double>& Theta) const
-{
-  const size_t cell_size = cells.size ();
-  daisy_assert (h.size () == cell_size);
-  daisy_assert (Theta.size () == cell_size);
-  for (size_t i = 0; i < cell_size; i++)
-    {
-      const size_t cell = cells[i];
-      h[i] = soil_water.h_old (cell);
-      Theta[i] = soil_water.Theta_old (cell);
-    }
+static std::vector<double>
+fetch_Theta (const SoilWater& soil_water, const std::vector<size_t>& cells)
+{ 
+  std::vector<double> result;
+  const size_t size = cells.size ();
+
+  for (size_t i = 0; i < size; i++)
+    result.push_back (soil_water.Theta (cells[i]));
+
+  daisy_assert (result.size () == size);
+  return result;
 }
 
-void 
-SMM1D::update (const std::vector<double>& h,
-               const std::vector<double>& Theta,
-               const std::vector<double>& q)
-{
-  const size_t cell_size = cells.size ();
-  daisy_assert (h.size () == cell_size);
-  daisy_assert (Theta.size () == cell_size);
-  for (size_t i = 0; i < cell_size; i++)
-    {
-      const size_t cell = cells[i];
-      soil_water.set_content (cell, h[i], Theta[i]);
-    }
-  const size_t edge_size = edges.size ();
-  daisy_assert (q.size () == edge_size);
-  for (size_t i = 0; i < edge_size; i++)
-    {
-      const int edge = edges[i];
-      if (edge >= 0)
-        soil_water.set_flux (edge, q[i]);
-    }
-}
+static std::vector<double>
+fetch_h (const SoilWater& soil_water, const std::vector<size_t>& cells)
+{ 
+  std::vector<double> result;
+  const size_t size = cells.size ();
 
+  for (size_t i = 0; i < size; i++)
+    result.push_back (soil_water.h (cells[i]));
+
+  daisy_assert (result.size () == size);
+  return result;
+}
 
 SMM1D::SMM1D (const GeometryRect& geo_, const Soil& soil_,
               SoilWater& soil_water_, const SoilHeat& soil_heat_,
@@ -92,6 +122,8 @@ SMM1D::SMM1D (const GeometryRect& geo_, const Soil& soil_,
   : geo (geo_),
     soil (soil_),
     soil_water (soil_water_),
+    Theta_old_ (fetch_Theta (soil_water_, cells_)),
+    h_old (fetch_h (soil_water_, cells_)),
     soil_heat (soil_heat_),
     cells (cells_),
     edges (edges_),

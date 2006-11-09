@@ -31,6 +31,7 @@ class Block;
 class AttributeList;
 class Treelog;
 class Groundwater;
+class Volume;
 
 class Geometry
 {
@@ -71,6 +72,11 @@ public:
                                          // specific depth interval.
                                          size_t n, 
                                          double from, double to) const = 0;
+  virtual double fraction_in_volume (// The fraction of a cell
+                                     // volume that is within a
+                                     // specific volume.
+                                     size_t n, 
+                                     const Volume& volume) const = 0;
   double volume_in_z_interval (double from, double to, 
                                // Find fractions of all cells in
                                // interval, as well as the total
@@ -143,10 +149,6 @@ public:
   double total_surface (const std::vector<double>& v, 
                         const double from, const double to) const
   { return total (v, from, to) / surface_area (); }
-
-  // The fraction of first interval that is within the second interval.
-  static double fraction_within (double from, double to,
-                                 double begin, double end);
 
   // Layers -- Support initializing soil arrays layer by layer.
   static void add_layer (Syntax& syntax, Syntax::category, 

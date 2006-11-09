@@ -1,35 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* FON
+* R2D2 møder igen
 
-** 5 linier omhver deliverable
+* Volume based logging
 
-** Saml manmåned
+** VolumeBox
 
-** Send endeligt brev til Finn.
+** Få horizontal transport til at virke.
 
-* John Porter
-
-Hej John. 
-
-I dit seminar om bioenergi var jeg overrasket over at Norden +
-Baltikum skulle være en af de bedste områder til bioenergi.  Jeg
-forventede det skulle det være en af de dårligste.  Mest fordi at
-Danmark er det eneste af de nordiske lande der for alvor er velegnet
-til landbrug (jeg ved ikke noget om Baltikum).  I Sverige, Norge og
-Finland er der kun få gode områder til at dyrke afgrøder.  Til gengæld
-er afstandende store, så energiforbruget til transport bør være
-tilsvarende stort.  Og transport er den mest olieafhængige
-energisektor.
-
-Mit gæt vil være et at med et energiregnskab for Danmark alene vil
-bioenergi se meget bedre ud end sammen med de øvrige nordiske lande. 
-
-Mvh,
-
-Per A.
-
-* BGJ: husk at nævne dine ændringer i bioclimate* og crop* i ChangeLog
+* MMO: Daisy
 
 * FON:
 
@@ -51,9 +30,7 @@ Per A.
 
 ** Volume (mest for log)
 
-top bottom
-left right
-near far
+top bottom left right near far
 
 value | infinite
 

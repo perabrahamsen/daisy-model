@@ -312,51 +312,6 @@ Geometry::total (const std::vector<double>& v,
   return sum;
 }
 
-double
-Geometry::fraction_within (const double from, const double to, 
-                           const double begin, const double end)
-{ 
-  daisy_assert (to > from);
-  daisy_assert (end > begin);
-
-  if (from >= end)
-    // Fully after interval.
-    return 0.0;
-  if (to <= begin)
-    // Fully before interval.
-    return 0.0;
-
-  if (to <= end)
-    {
-      if (from >= begin)
-        // Fully within interval.
-        return 1.0;
-      
-      // Overlaps start of interval.
-      const double width = to - from;
-      const double overlap = to - begin;
-      daisy_assert (overlap > 0.0);
-      daisy_assert (width > overlap);
-      return overlap / width;
-    }
-  if (from >= begin)
-    {
-      // Overlaps end of interval.
-      const double width = to - from;
-      const double overlap = end - from;
-      daisy_assert (overlap > 0.0);
-      daisy_assert (width > overlap);
-      return overlap / width;
-    }
-
-  // Interval is fully within.
-  const double width = to - from;
-  const double overlap = end - begin;
-  daisy_assert (overlap > 0.0);
-  daisy_assert (width > overlap);
-  return overlap / width;
-}
-
 static struct CheckLayers : public VCheck
 {
   void check (const Syntax& syntax, const AttributeList& alist, 

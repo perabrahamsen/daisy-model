@@ -1,4 +1,4 @@
-// select_flux.C --- Shared interface for fluxes. 
+// select_flux.h --- Shared interface for fluxes. 
 // 
 // Copyright 1996-2002 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2002, 2006 Per Abrahamsen and KVL.

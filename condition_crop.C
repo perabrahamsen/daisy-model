@@ -27,6 +27,7 @@
 #include "field.h"
 #include "daisy.h"
 #include "check_range.h"
+#include "mathlib.h"
 
 struct ConditionDSAfter : public Condition
 {
@@ -36,7 +37,7 @@ struct ConditionDSAfter : public Condition
   bool match (const Daisy& daisy, Treelog&) const
   { 
     const double crop_ds = daisy.field.crop_ds (crop); 
-    if (crop_ds != Crop::DSremove && crop_ds >= ds)
+    if (!approximate (crop_ds, Crop::DSremove) && crop_ds >= ds)
       return true;
     return false;
   }

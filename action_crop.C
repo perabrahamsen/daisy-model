@@ -33,6 +33,7 @@
 #include "submodeler.h"
 #include "vcheck.h"
 #include "memutils.h"
+#include "mathlib.h"
 #include <sstream>
 
 using namespace std;
@@ -707,7 +708,7 @@ ActionCrop::Spray::~Spray ()
 bool
 ActionCrop::Irrigation::doIt (Daisy& daisy, Treelog& out) const
 {
-  if (amount == 0.0)
+  if (!std::isnormal (amount))
     return false;
 
   const int mm = daisy.time.month ();

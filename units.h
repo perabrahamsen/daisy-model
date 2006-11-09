@@ -37,6 +37,7 @@ private:
 public:
   static const symbol cm;
   static const symbol cm_per_h;
+  static const symbol cm3;
 
   // Conversion.
 public:

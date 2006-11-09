@@ -21,6 +21,7 @@
 
 
 #include "geometry1d.h"
+#include "volume.h"
 #include "block.h"
 #include "syntax.h"
 #include "alist.h"
@@ -55,6 +56,10 @@ double
 Geometry1D::fraction_in_z_interval (const size_t i, 
                                     const double from, const double to) const
 { return fraction_within (zplus (i), zminus (i), to, from); }
+
+double 
+Geometry1D::fraction_in_volume (size_t n, const Volume& volume) const
+{ return volume.box_fraction (zminus (n), zplus (n)); }
 
 bool 
 Geometry1D::contain_z (size_t i, double z) const

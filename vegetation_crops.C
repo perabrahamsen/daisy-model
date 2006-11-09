@@ -389,7 +389,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
   if (LAI_ > 0.0)
     {
       // Check that we calculated LAIvsH right.
-      daisy_assert (LAIvsH_ (0.0) == 0.0);
+      daisy_assert (!std::isnormal (LAIvsH_ (0.0)));
       daisy_assert (approximate (LAI_, LAIvsH_ (height_)));
 
       // Find H as a function of LAI.
@@ -417,7 +417,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 	}
       else
 	{
-	  daisy_assert (HvsLAI_ (0.0) == 0.0);
+	  daisy_assert (!std::isnormal (HvsLAI_ (0.0)));
 	  
 	  // Other stuff
 	  cover_ =  1.0 - exp (-CanopySum (&Crop::EPext));

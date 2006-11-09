@@ -227,12 +227,12 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
       const double fraction = om[i]->initial_fraction;
       const double C_per_N = om[i]->initial_C_per_N;
 
-      if (fraction != OM::Unspecified)
+      if (!approximate (fraction, OM::Unspecified))
 	{
 	  om_C[i] = C * fraction;
 	  daisy_assert (om_C[i] >= 0.0);
 
-	  if (C_per_N != OM::Unspecified)
+	  if (!approximate (C_per_N, OM::Unspecified))
 	    {
 	      om_N[i] = om_C[i] / C_per_N;
 	      daisy_assert (om_N[i] >= 0.0);
@@ -247,7 +247,7 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
 	{
 	  daisy_assert (missing_fraction < 0);
 	  missing_fraction = i;
-	  if (om[i]->initial_C_per_N == OM::Unspecified)
+	  if (approximate (om[i]->initial_C_per_N, OM::Unspecified))
 	    {
 	      daisy_assert (missing_C_per_N < 0);
 	      missing_C_per_N = i;
@@ -277,7 +277,7 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
       for (size_t i = 0; i < om.size (); i++)
 	{
 	  const double fraction = om[i]->initial_fraction;
-	  if (fraction == OM::Unspecified)
+	  if (approximate (fraction, OM::Unspecified))
 	    {
 	      daisy_assert (i == missing_fraction);
 	      om_N[i] = 0.0;
@@ -1046,7 +1046,7 @@ static struct AM_Syntax
     int unspecified = 0;
     const vector<AttributeList*>& om = al.alist_sequence ("om");
     for (size_t i = 0; i < om.size (); i++)
-      if (OM::get_initial_C_per_N (*om[i]) == OM::Unspecified)
+      if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
 	unspecified++;
     if (unspecified != 1)
       { 
@@ -1066,7 +1066,7 @@ static struct AM_Syntax
     daisy_assert (al.check ("om"));
     const vector<AttributeList*>& om = al.alist_sequence ("om");
     for (size_t i = 0; i < om.size (); i++)
-      if (OM::get_initial_C_per_N (*om[i]) == OM::Unspecified)
+      if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
 	{
 	  ostringstream tmp;
 	  tmp << "om[" << i << "]";

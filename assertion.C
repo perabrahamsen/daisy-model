@@ -26,18 +26,16 @@
 #include <iostream>
 #include <sstream>
 
-using namespace std;
-
 namespace Assertion
 {
-  vector<Treelog*> logs;
+  std::vector<Treelog*> logs;
 }
 
 void 
-Assertion::message (const string& msg)
+Assertion::message (const std::string& msg)
 {
   if (logs.size () == 0)
-    cout << msg;
+    std::cout << msg;
 
   for (unsigned int i = 0; i < logs.size (); i++)
     {
@@ -47,10 +45,10 @@ Assertion::message (const string& msg)
 }
 
 void 
-Assertion::error (const string& msg)
+Assertion::error (const std::string& msg)
 {
   if (logs.size () == 0)
-    cerr << msg;
+    std::cerr << msg;
 
   for (unsigned int i = 0; i < logs.size (); i++)
     {
@@ -60,10 +58,10 @@ Assertion::error (const string& msg)
 }
 
 void 
-Assertion::warning (const string& msg)
+Assertion::warning (const std::string& msg)
 {
   if (logs.size () == 0)
-    cerr << msg;
+    std::cerr << msg;
 
   for (unsigned int i = 0; i < logs.size (); i++)
     {
@@ -73,10 +71,10 @@ Assertion::warning (const string& msg)
 }
 
 void 
-Assertion::debug (const string& msg)
+Assertion::debug (const std::string& msg)
 {
   if (logs.size () == 0)
-    cerr << msg;
+    std::cerr << msg;
 
   for (unsigned int i = 0; i < logs.size (); i++)
     {
@@ -89,7 +87,7 @@ void
 Assertion::failure (const char* file, int line, const char* fun,
 		    const char* test)
 {
-  ostringstream tmp;
+  std::ostringstream tmp;
   tmp << file << ":" << line << ": assertion '" << test << "' failed";
   if (fun)
     tmp << " in " << fun;
@@ -100,9 +98,9 @@ Assertion::failure (const char* file, int line, const char* fun,
 
 void 
 Assertion::bug (const char* file, int line, const char* fun,
-		const string& msg)
+		const std::string& msg)
 {
-  ostringstream tmp;
+  std::ostringstream tmp;
   tmp << file << ":" << line << ": Daisy bug: '" << msg << "'";
   if (fun)
     tmp << " in " << fun;
@@ -112,9 +110,9 @@ Assertion::bug (const char* file, int line, const char* fun,
 
 void 
 Assertion::warning (const char* file, int line, const char* fun,
-		    const string& msg)
+		    const std::string& msg)
 {
-  ostringstream tmp;
+  std::ostringstream tmp;
   tmp << file << ":" << line << ": ";
   if (fun)
     tmp << "(" << fun << ") ";
@@ -125,7 +123,7 @@ Assertion::warning (const char* file, int line, const char* fun,
 
 void 
 Assertion::panic (const char* file, int line, const char* fun,
-		  const string& msg)
+		  const std::string& msg)
 {
   bug (file, line, fun, msg);
   throw 3;
@@ -136,9 +134,9 @@ Assertion::non_negative (const char* file, int line, const char* fun,
 			 const std::vector<double>& v)
 {
   for (unsigned int i = 0; i < v.size (); i++)
-    if (v[i] < 0 || !isfinite (v[i]))
+    if (v[i] < 0 || !std::isfinite (v[i]))
       {
-	ostringstream tmp;
+	std::ostringstream tmp;
 	tmp << "v[" << i << "] >= 0";
 	Assertion::failure (file, line, fun, tmp.str ().c_str ());
       }

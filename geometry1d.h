@@ -56,6 +56,7 @@ public:
   { return zplus (cell_size () - 1); }
   size_t cell_at (double z, double x, double y) const ;
   double fraction_in_z_interval (size_t i, double from, double to) const;
+  double fraction_in_volume (size_t n, const Volume& volume) const;
   bool contain_z (size_t i, double z) const;
 
   size_t interval_plus (double z) const;
