@@ -41,7 +41,9 @@ struct DifradWeather : public Difrad
       }
     if(!std::isnormal (gb))
       return 0.0;
-    return df/gb;
+    const double val = df/gb;
+    daisy_assert (std::isfinite (val));
+    return val;
   }
 
   void output (Log& log) const

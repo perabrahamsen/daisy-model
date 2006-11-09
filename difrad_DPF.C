@@ -38,25 +38,33 @@ struct DifradDPF : public Difrad
   {
     // Solar elevation angle and atmospheric pressure
     const double sin_beta = weather.sin_solar_elevation_angle (time);
+
+    if (sin_beta < 0.01)
+      return 1.0;
+
     const double P = FAO::AtmosphericPressure (weather.elevation ()); //[Pa]
+   
     // Atmospheric pressure at sea level
     const double P0 = 1.013E5; //[Pa]
     // The optical air mass, m:
     const double m = (P/P0)/sin_beta; // []
-    
+       
     // Extra-terrestrial PAR from weather.C
     const double I_e = weather.HourlyExtraterrestrialRadiation (time);//[W/m^2]
+   
     // Beam PAR calculated from extra-terrestrial PAR
-    const double I_b = pow(a,m) * I_e * sin_beta;
+       const double I_b = pow(a, m) * I_e * sin_beta;
+   
     // Diffuse radiation under a cloudless sky
-    const double I_d = fa * (1 - pow(a,m)) * I_e * sin_beta;
+    const double I_d = fa * (1 - pow(a, m)) * I_e * sin_beta;
+   
     // Fraction of diffuse radiation
-    const double fd = I_d /(I_d + I_b);
-
-    if(fd < 0.0)
-      return 1.0; 
-    else 
-      return fd;//fraction [ ]
+    const double I_total = I_d + I_b;
+    if (!std::isnormal (I_total))
+      return 1.0;
+    const double fd = I_d /(I_total);
+    daisy_assert (std::isfinite (fd));
+    return bound (0.0, fd, 1.0); 
   }
 
   void output (Log& log) const
@@ -84,18 +92,18 @@ static struct DifradDPFSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    Difrad::load_syntax (syntax, alist);
     alist.add ("description", "\
 Diffuse radiation calculated using the model of De Pury and Farquhar, 1997.");
 
-    syntax.add ("fa", "fraction", Check::positive (), Syntax::Const,
+    syntax.add ("fa", Syntax::Fraction (), Check::positive (), Syntax::Const,
                 "The proportion of attenuated radiation that reaches the surface as diffuse radiation");
-    alist.add ("fa", 0.426);
+    alist.add ("fa", 0.5);
 
-    syntax.add ("a", "", Check::positive (), Syntax::Const,
-                "Atmospheric transmission coefficient of PAR");
-    alist.add ("a", 0.72);
-
-    Difrad::load_syntax (syntax, alist);
+    syntax.add ("a", Syntax::None (), Check::positive (), Syntax::Const,
+                "Atmospheric transmission coefficient of PAR. Value around 0.6-0.9 depending on dustparticles");
+    alist.add ("a", 0.84);
+    
     Librarian<Difrad>::add_type ("DPF", alist, syntax, &make);
   }
 } DifradDPF_syntax;

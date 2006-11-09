@@ -622,7 +622,8 @@ ColumnStandard::tick (Treelog& msg,
                     *vegetation, *movement,
                     geometry, *soil, *soil_water, *soil_heat, 
                     msg);
-  vegetation->tick (time, *bioclimate, geometry, *soil, organic_matter.get (),
+  vegetation->tick (time, *bioclimate, geometry, *soil, 
+		    organic_matter.get (),
                     *soil_heat, *soil_water, &soil_NH4, &soil_NO3, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, msg);

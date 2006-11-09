@@ -31,6 +31,7 @@ class Log;
 class Time;
 class AttributeList;
 class Bioclimate;
+class Raddist;
 class PLF;
 class Library;
 class Syntax;
@@ -81,9 +82,9 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Time& time, const Bioclimate&, const Geometry& geo,
-                     const Soil&,
-		     OrganicMatter*, const SoilHeat&, const SoilWater&,
+  virtual void tick (const Time& time, const Bioclimate&, 
+		     const Geometry& geo, const Soil&, OrganicMatter*, 
+		     const SoilHeat&, const SoilWater&,
 		     SoilNH4*, SoilNO3*, 
 		     double& residuals_DM,
 		     double& residuals_N_top, double& residuals_C_top,

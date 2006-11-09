@@ -73,8 +73,7 @@ public:
 
   // Simulation
 public:
-  virtual void tick (const Time&, const Bioclimate&, 
-                     const Geometry&, const Soil&,
+  virtual void tick (const Time&, const Bioclimate&, const Geometry&, const Soil&,
 		     OrganicMatter *const, const SoilHeat&, const SoilWater&,
 		     // Allow plants to grow (hourly).
 		     SoilNH4 *const, SoilNO3 *const, 

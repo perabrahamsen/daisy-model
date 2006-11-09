@@ -35,6 +35,7 @@
 #include "mathlib.h"
 #include "pet.h"
 #include "difrad.h"
+#include "raddist.h"
 #include "svat.h"
 #include "vegetation.h"
 #include "chemicals.h"
@@ -47,7 +48,10 @@ struct BioclimateStandard : public Bioclimate
   const long No;		// No of intervals in canopy discretization.
   double LAI_;			// Total LAI of all crops on this column. [0-]
   std::vector<double> Height;	// Height in cm of each endpoint in c.d.
-  std::vector<double> PAR_;     // PAR of each interval of c.d.
+  std::vector<double> total_PAR_;// Total PAR of each interval of c.d.
+  std::vector<double> sun_PAR_;  // Sunlit fraction of PAR of each interval of c.d.
+  std::vector<double> sun_LAI_fraction_;  // Fraction of sunlit LAI of each interval of c.d.
+
   double shared_light_fraction_; // Fraction of field with light competition.
 
   // Canopy Tick.
@@ -131,7 +135,8 @@ struct BioclimateStandard : public Bioclimate
   void ChemicalDistribution (Surface& surface, const Vegetation&);
 
   // Radiation.
-  void RadiationDistribution (const Vegetation&);
+  std::auto_ptr<Raddist> raddist;// Radiation distribution model.
+  void RadiationDistribution (const Vegetation&, double sin_beta, Treelog&);
   std::auto_ptr<Difrad> difrad;  // Diffuse radiation model.
   double difrad0;                // Diffuse radiation above canopy [W/m2]
 
@@ -152,7 +157,11 @@ struct BioclimateStandard : public Bioclimate
   const std::vector<double>& height () const
   { return Height; }
   const std::vector<double>& PAR () const
-  { return PAR_; }
+  { return total_PAR_; }
+  const std::vector<double>& sun_PAR () const
+  { return sun_PAR_; }
+  const std::vector<double>& sun_LAI_fraction () const
+  { return sun_LAI_fraction_; }
   double LAI () const
   { return LAI_; }
   double shared_light_fraction () const
@@ -409,7 +418,10 @@ As a last resort,  Makkink (makkink) will be used.");
                           syntax, alist, Syntax::LogOnly,
                           "Chemicals entering soil surface.");
   //Radiation
-  syntax.add ("difrad", Librarian<Pet>::library (), 
+  syntax.add ("raddist", Librarian<Raddist>::library (), 
+              "Radiation distribution model.");
+  alist.add ("raddist", Raddist::default_model ());
+  syntax.add ("difrad", Librarian<Difrad>::library (), 
               Syntax::OptionalState, Syntax::Singleton, 
               "Diffuse radiation component.\n\
 \n\
@@ -419,6 +431,12 @@ If diffuse radiation is available in the climate data, Daisy will\n\
 use these (the weather difrad model). Otherwise Daisy wil use the DPF model.");
   syntax.add ("difrad0", "W/m^2", Syntax::LogOnly,
               "Diffuse radiation above canopy.");
+  syntax.add ("Total_PAR", "W/m^2", Syntax::LogOnly, Syntax::Sequence,
+              "Total PAR between canopy layers.");
+  syntax.add ("Sun_PAR", "W/m^2", Syntax::LogOnly, Syntax::Sequence,
+              "Sun PAR between canopy layers.");
+  syntax.add ("Sun_LAI_fraction", Syntax::Fraction (), Syntax::LogOnly, 
+	      Syntax::Sequence, "Sunlit LAI in canopy layers.");
 }
 
 const AttributeList& 
@@ -440,7 +458,9 @@ BioclimateStandard::BioclimateStandard (Block& al)
     No (al.integer ("NoOfIntervals")),
     LAI_ (0.0),
     Height (No + 1),
-    PAR_ (No + 1),
+    total_PAR_ (No + 1),
+    sun_PAR_ (No + 1),
+    sun_LAI_fraction_ (No),
     shared_light_fraction_ (1.0),
     pet (al.check ("pet") 
          ? Librarian<Pet>::build_item (al, "pet")
@@ -495,6 +515,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
     canopy_chemicals_out (),
 
     surface_chemicals_in (),
+    raddist (Librarian<Raddist>::build_item (al, "raddist")),
     difrad (al.check ("difrad") 
          ? Librarian<Difrad>::build_item (al, "difrad")
          : NULL),
@@ -539,11 +560,13 @@ BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
 }
 
 void 
-BioclimateStandard::RadiationDistribution (const Vegetation& vegetation)
+BioclimateStandard::RadiationDistribution (const Vegetation& vegetation, 
+					   const double sin_beta, Treelog& msg)
 {
+#if 0
   if (!std::isnormal (LAI ()))
     {
-      std::fill (&PAR_[0], &PAR_[No+1], 0.0);
+      std::fill (&total_PAR_[0], &total_PAR_[No+1], 0.0);
       return;
     }
 
@@ -561,7 +584,10 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation)
 #endif 
 
   radiation_distribution (No, LAI_, ACRef, hourly_global_radiation (),
-                          ACExt, PAR_);
+                          ACExt, total_PAR_);
+#endif
+  raddist->tick(sun_LAI_fraction_, sun_PAR_, total_PAR_, hourly_global_radiation (), 
+		difrad0, sin_beta, vegetation, msg);
 }
 
 void
@@ -852,8 +878,9 @@ BioclimateStandard::tick (const Time& time,
   difrad0 = difrad->value (time, weather, msg) * hourly_global_radiation_;
   //daisy_assert (difrad0 >= 0.0);
 
-  // Calculate total canopy, divide it intervalsm, and distribute PAR.
-  RadiationDistribution (vegetation);
+  const double sin_beta = weather.sin_solar_elevation_angle (time);
+  // Calculate total canopy, divide it into intervals, and distribute PAR.
+  RadiationDistribution (vegetation, sin_beta, msg);
 
   // Distribute water among canopy, snow, and soil.
   WaterDistribution (time, surface, weather, vegetation, 
@@ -964,9 +991,13 @@ BioclimateStandard::output (Log& log) const
   output_submodule (canopy_chemicals_out, "canopy_chemicals_out", log);
   output_submodule (surface_chemicals_in, "surface_chemicals_in", log);
   //radiation
+  output_derived (raddist, "raddist", log);
   daisy_assert (difrad.get () != NULL);
   output_object (difrad.get (), "difrad", log);
   output_variable (difrad0, log);
+  output_value (total_PAR_, "total_PAR", log);
+  output_value (sun_PAR_, "sun_PAR", log);
+  output_value (sun_LAI_fraction_, "sun_LAI_fraction", log);
 }
 
 void

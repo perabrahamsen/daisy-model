@@ -1717,7 +1717,7 @@ void CropSold::emerge ()
 { var.Phenology.DS = -0.1; }
 
 void 
-CropSold::tick (const Time& time,
+CropSold::tick (const Time& time, 
 		const Bioclimate& bioclimate,
                 const Geometry& geo,
 		const Soil& soil,

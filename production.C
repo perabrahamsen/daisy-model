@@ -178,6 +178,7 @@ Production::tick (const double AirT, const double SoilT,
   NetAss -= RM;
   double RootResp = RMRoot;
 
+  daisy_assert (CH2OPool >= 0.0);
   if (CH2OPool >= RM)
     {
       // We have enough assimilate to cover respiration.

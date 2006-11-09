@@ -1,6 +1,6 @@
-// photo.h -- Leaf photosynthesis component parameters.
+// cropNdist.h -- Crop N distribution
 // 
-// Copyright 2005 Per Abrahamsen and KVL.
+// Copyright 2006 Birgitte Gjettermann, Per Abrahamsen and KVL
 //
 // This file is part of Daisy.
 // 
@@ -18,50 +18,45 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef PHOTO_H
-#define PHOTO_H
+
+#ifndef CROPNDIST_H
+#define CROPNDIST_H
 
 #include "librarian.h"
-
-class CanopyStandard;
-class Phenology;
-class Log;
-class Treelog;
-
-
 #include <vector>
 
-class Photo 
+class CropNdist
 {
   // Content.
 public:
   const symbol name;
   static const char *const description;
+  const AttributeList alist;	// Remember attributes for checkpoint.
 
   // Simulation.
 public:
-  virtual double assimilate (double Ta, const double cropN,
-                             const std::vector<double>& PAR,
-                             const std::vector<double>& PAR_Height,
-                             const double PAR_LAI, 
-			     const std::vector<double>& fraction,
-                             CanopyStandard& canopy,
-                             Phenology& development, Treelog&) = 0;
-  virtual void clear ();
+  virtual void tick (std::vector <double>& cropNdist, 
+		     std::vector <double>& cropVmax, 
+		     const double CropN, Treelog&) = 0;
   virtual void output (Log&) const = 0;
-
+  virtual void cropN_distribution (const double LAI, 
+				   std::vector <double>& cropNdist, 
+				   std::vector <double>& cropVmax, 
+				   const double cropN, Treelog& msg)=0;
   // Create and Destroy.
+protected:
+  CropNdist (Block&);
+
 public:
   static const AttributeList& default_model ();
-  Photo (Block&);
-  virtual ~Photo ();
+  virtual ~CropNdist ();
 };
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Photo>::Content* Librarian<Photo>::content;
+Librarian<CropNdist>::Content* Librarian<CropNdist>::content;
 #endif
 
-static Librarian<Photo> Photo_init ("photosynthesis");
+static Librarian<CropNdist> CropNdist_init ("cropNdist");
 
-#endif // PHOTO_H
+#endif // CROPNDIST_H

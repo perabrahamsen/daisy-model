@@ -119,7 +119,7 @@ struct VegetationCrops : public Vegetation
 
   // Simulation.
   void tick (const Time& time,
-	     const Bioclimate& bioclimate,
+	     const Bioclimate& bioclimate, 
              const Geometry& geo,
 	     const Soil& soil,
 	     OrganicMatter *const organic_matter,
@@ -296,7 +296,7 @@ VegetationCrops::crop_names () const
 
 void 
 VegetationCrops::tick (const Time& time,
-		       const Bioclimate& bioclimate,
+		       const Bioclimate& bioclimate, 
                        const Geometry& geo,
 		       const Soil& soil,
 		       OrganicMatter *const organic_matter,

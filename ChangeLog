@@ -1,3 +1,19 @@
+2006-11-09  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* photo_GL.C, photo.h (assimilate): New members in function call.
+
+	* crop_std.C, crop_sold.C, crop_old.C, crop_simple.C, crop.h (tick): 
+	Modified to include different types of radiation. 
+
+	* bioclimate_std.C (struct BioclimateStandard)
+	(total_PAR_, sun_PAR_, sun_LAI_fraction_): New members.
+
+	* bioclimate_std.C (raddist, difrad): New data members.  
+	(struct BioclimateStandard)(sun_PAR, sun_LAI_fraction): New member functions.
+	(load_syntax): Added "raddist" and "difrad".
+
+	* bioclimate.h (sun_PAR, sun_LAI_fraction): New virtual member functions.
+
 2006-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* uz1d_richard.C: New model.
@@ -5,6 +21,29 @@
 
 	* uz1d.C, uz1d.h: New component.
 	* Makefile (COMPONENTS): Added it.
+
+2006-10-13  Birgitte Gjettermann  <bgj@kvl.dk>
+	
+	* cropNdist_DPF.C (struct cropNdistDPF): New model.
+	* Makefile (MODELS): Added it.
+
+2006-10-12  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* cropNdist.C, cropNdist.h: New component  
+	* Makefile (COMPONENTS): Added it.
+
+2006-10-03  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* raddist_DPF.C: New model.
+	* Makefile (MODELS): Added it. 
+
+2006-10-02  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* raddist_std.C:New model. 
+	* Makefile (MODELS): Added it.
+
+	* raddist.C, raddist.h: New component.
+	* Makefile (COMPONENTS):Added it.
 
 2006-10-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 

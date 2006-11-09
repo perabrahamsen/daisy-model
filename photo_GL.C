@@ -48,10 +48,11 @@ private:
 
   // Simulation.
 public:
-  double assimilate (double Ta,
+  double assimilate (double Ta, const double cropN,
                      const std::vector<double>& PAR,
                      const std::vector<double>& PAR_Height,
                      const double PAR_LAI,
+		     const std::vector<double>& fraction,
                      CanopyStandard& canopy,
                      Phenology& development, Treelog&);
   void output (Log&) const
@@ -72,10 +73,11 @@ public:
 };
 
 double
-PhotoGL::assimilate (const double Ta,
+PhotoGL::assimilate (const double Ta, const double,
                      const vector<double>& PAR,
                      const vector<double>& PAR_height,
                      const double PAR_LAI,
+		     const std::vector<double>& ,
                      CanopyStandard& canopy,
                      Phenology& development,
                      Treelog& msg) 

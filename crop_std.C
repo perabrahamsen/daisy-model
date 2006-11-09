@@ -33,6 +33,7 @@
 #include "wse.h"
 #include "log.h"
 #include "time.h"
+#include "weather.h"
 #include "bioclimate.h"
 #include "plf.h"
 #include "soil_water.h"
@@ -43,6 +44,8 @@
 #include "am.h"
 #include "submodeler.h"
 #include "mathlib.h"
+#include <sstream>
+#include <numeric>
 
 using namespace std;
 
@@ -111,7 +114,8 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time& time, const Bioclimate&, const Geometry& geo,
+  void tick (const Time& time,  
+	     const Bioclimate&, const Geometry& geo,
              const Soil&,
 	     OrganicMatter*,
 	     const SoilHeat&,
@@ -311,19 +315,51 @@ CropStandard::tick (const Time& time,
   if (bioclimate.hourly_global_radiation () > 1e-10 && canopy.CAI > 0)
     {
       double Ass = 0.0;
+      const vector<double>& total_PAR = bioclimate.PAR (); 
+      const vector<double>& sun_PAR = bioclimate.sun_PAR ();
+      daisy_assert (sun_PAR.size () > 1);
+      daisy_assert (total_PAR.size () == sun_PAR.size ());
+      vector<double> shadow_PAR;
+      
+      for(int i = 0; i < total_PAR.size (); i++) 
+	shadow_PAR.push_back(total_PAR[i] - sun_PAR[i]);
+      
+      const double total_LAI = bioclimate.LAI ();
+      const vector<double>& fraction_sun_LAI = bioclimate.sun_LAI_fraction ();
 
+      vector<double> fraction_shadow_LAI;
+      vector<double> fraction_total_LAI;
+      const int No = fraction_sun_LAI.size ();
+
+      for(int i = 0; i < No; i++) 
+	{
+	  const double f_sun = fraction_sun_LAI[i]; 
+	  fraction_shadow_LAI.push_back(1.0-f_sun);
+	  fraction_total_LAI.push_back(1.0);
+	  daisy_assert (f_sun <= 1.0);
+	  daisy_assert (f_sun >= 0.0);
+	}
+      
+      const double cropN = production.NLeaf;
+      daisy_assert (cropN >= 0.0);
+   
       if (bioclimate.shared_light_fraction () > 1e-10)
         {
           // Shared light.
-          const vector<double>& PAR = bioclimate.PAR ();
-          daisy_assert (PAR.size () > 1);
+	  Ass += photo->assimilate (bioclimate.daily_air_temperature (),
+				    production.NLeaf, shadow_PAR, bioclimate.height (),
+                                    total_LAI, fraction_shadow_LAI,
+                                    canopy, *development, msg)
+            * bioclimate.shared_light_fraction ();
+
           Ass += photo->assimilate (bioclimate.daily_air_temperature (),
-                                    PAR, bioclimate.height (),
-                                    bioclimate.LAI (),
+				    production.NLeaf, sun_PAR, bioclimate.height (),
+                                    total_LAI, fraction_sun_LAI,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
         }
-      if (min_light_fraction > 1e-10)
+
+      if (min_light_fraction > 1e-10)// Only total PAR, not sun shadow
         {
           // Private light.
           const int No = 30;
@@ -331,10 +367,10 @@ CropStandard::tick (const Time& time,
           Bioclimate::radiation_distribution 
             (No, LAI (), PARref (), bioclimate.hourly_global_radiation (),
              PARext (), PAR); 
-          Ass += photo->assimilate (bioclimate.daily_air_temperature (),
-                                   PAR, bioclimate.height (),
-                                   bioclimate.LAI (),
-                                   canopy, *development, msg)
+          Ass += photo->assimilate (bioclimate.daily_air_temperature (), 
+				    production.NLeaf, PAR, bioclimate.height (),
+				    bioclimate.LAI (), fraction_total_LAI,
+				    canopy, *development, msg)
             * min_light_fraction;
         }
 
@@ -348,6 +384,7 @@ CropStandard::tick (const Time& time,
       Ass *= (1.0 - harvesting.cut_stress);
       production.CanopyAss = Ass;
       production.CH2OPool += Ass;
+      daisy_assert (Ass >= 0.0);
     }
   else
     production.PotCanopyAss = production.CanopyAss = 0.0;

@@ -61,6 +61,8 @@ public:
 public:
   virtual const std::vector<double>& height () const = 0;
   virtual const std::vector<double>& PAR () const = 0;
+  virtual const std::vector<double>& sun_PAR () const = 0;
+  virtual const std::vector<double>& sun_LAI_fraction () const = 0;
   virtual double LAI () const = 0;
   virtual double shared_light_fraction () const = 0;
 

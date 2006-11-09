@@ -261,7 +261,8 @@ Weather::sin_solar_elevation_angle (const Time& time) const // []
   static const double EQT1[] = {-7.343,-9.470,-0.3289,-0.1955};
   static const double EQT2[] = {0.5519,-3.020,-0.07581,-0.1245};
   const double Dec = SolarDeclination (time);
-  const double Lat = M_PI / 180 * latitude;
+  
+  const double Lat = M_PI / 180.0 * latitude;
   const double timelag = (timezone - longitude) / 15.0;
   double EQT = EQT0;
   for (unsigned int i = 0; i < 3; i++)
