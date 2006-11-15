@@ -338,7 +338,7 @@ You cannot specify 'C_per_N' for intervals where 'C' is unspecified.");
 	    {
 	      if (C_per_N[i] < 0.0)
 		/* do nothing */;
-	      else if (!std::isnormal (N[i]))
+	      else if (iszero (N[i]))
 		bogus = true;
 	      else if (!approximate (C[i] / N[i], C_per_N[i]))
 		bogus = true;

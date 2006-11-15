@@ -28,6 +28,9 @@
 #define __USE_ISOC99 1
 #include <cmath>
 
+inline bool iszero (const double d)
+{ return !std::isnormal (d); }
+
 #ifndef pow
 #define pow(x, y) safe_pow (x, y, __FILE__, __LINE__)
 #endif //!pow

@@ -37,9 +37,12 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (std::vector <double>& fraction_sun_LAI, std::vector <double>& sun_PAR, 
-		     std::vector <double>& total_PAR, double global_radiation, 
-		     double diffuse_radiation, double sin_beta, const Vegetation&, 
+  virtual void tick (std::vector <double>& fraction_sun_LAI, 
+                     std::vector <double>& sun_PAR, 
+		     std::vector <double>& total_PAR,
+                     double global_radiation, 
+                     double diffuse_radiation, double sin_beta,
+                     const Vegetation&, 
 		     Treelog&) = 0;
   virtual void output (Log&) const;
 

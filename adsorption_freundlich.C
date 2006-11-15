@@ -44,7 +44,7 @@ public:
   AdsorptionFreundlich (Block& al)
     : Adsorption (al),
       K_clay (al.number ("K_clay", 0.0)),
-      K_OC (al.number ("K_OC") ? al.number ("K_OC") : al.number ("K_clay")),
+      K_OC (al.number ("K_OC", K_clay)),
       m (al.number ("m"))
     { }
 };
@@ -67,7 +67,7 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
 			      double Theta, int i, double M) const
 {
   // Check for zero.
-  if (!std::isnormal (M))
+  if (iszero (M))
     return 0.0;
 
   // Guess start boundary.

@@ -45,7 +45,7 @@ public:
   inline size_t edge_rows () const
   { return cell_rows () + 1U; }
   inline size_t edge_columns () const
-  { return cell_columns () - 1U; }
+  { return cell_columns () + 1U; }
   inline size_t edge_size () const
   { return edge_from_.size (); }
   inline size_t cell_index (const size_t row, const size_t column) const
@@ -58,14 +58,19 @@ public:
   { return edge_to_[e]; }
   inline double edge_area (size_t e) const // Area connecting cells [cm^2]
   { return edge_area_[e]; }
-  inline double surface_area () const // Total surface area.
-  { return xplus_[cell_size () - 1] * 1.0 /* cm */; }
+  inline double surface_area () const // Total surface area [cm^2].
+  { return right () * back (); }
   inline double zminus (size_t n) const
   { return (n % cell_rows_ == 0) ? 0.0 : zplus (n-1U); }
   inline double x (size_t n) const // Cell horizontal center [cm]
   { return x_[n]; }
+  inline double dx (size_t n) const // Horizontal width of cell [cm]
+  { return dx_[n]; }
+  double right () const
+  { return xplus_[cell_size () - 1]; }  
+
   inline double volume (size_t n) const // Cell volume [cm^3]
-  { return dz_[n] * dx_[n] * 1.0 /* [cm] */; }
+  { return dz (n) * dx (n) * 1.0 /* [cm] */; }
   inline double bottom () const // Bottom of deepest cell [cm]
   { return zplus_[cell_rows_ - 1]; }
   size_t cell_at (double z, double x, double y) const;

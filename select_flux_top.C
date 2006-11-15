@@ -23,7 +23,6 @@
 #include "select_flux.h"
 #include "border.h"
 #include "mathlib.h"
-#include <map>
 
 struct SelectFluxTop : public SelectFlux
 {

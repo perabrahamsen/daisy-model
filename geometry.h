@@ -39,6 +39,11 @@ class Geometry
 public:
   static const int cell_above = -13311331;
   static const int cell_below = -424242;
+  static const int cell_left = -123456;
+  static const int cell_right = -654321;
+  static const int cell_front = -9999;
+  static const int cell_back = -8888;
+
   // Parameters.
 protected:
   size_t size_;		// Number of intervals.
@@ -48,6 +53,8 @@ public:
   inline size_t cell_size () const // Number of cells.
   { return size_; }
   virtual size_t edge_size () const = 0; // Number of edges.
+  inline bool is_regular_cell (int cell) const
+  { return cell >= 0; }
   std::string cell_name (int) const; // For array logging.
   virtual std::string edge_name (size_t) const;
   virtual int dimensions () const = 0; // Number of non-trivial dimensions.
@@ -57,15 +64,24 @@ public:
   virtual double edge_area (size_t) const = 0; // Area connecting the cells.
   virtual double surface_area () const = 0; // Total surface area.
   virtual double z (size_t) const = 0; // Cell center depth [cm]
-  double z_safe (int) const;    // Same, handles edge_top and edge_bottom.
-  virtual double x (size_t) const 
-  { return 0.5; }
-  virtual double y (size_t) const 
-  { return 0.5; }
-  virtual double volume (size_t) const = 0; // Cell volume [cm^3]
+  double z_safe (int) const;    // Same, handles cell_top and cell_bottom.
   inline double top () const    // Top of highest cell. [cm]
   { return 0.0; }
   virtual double bottom () const = 0; // Bottom of deepest cell. [cm]
+  virtual double x (size_t) const 
+  { return 0.5; }
+  double x_safe (int) const;    // Same, handles cell_left and cell_right.
+  inline double left () const    // Left side of leftmost cell. [cm]
+  { return 0.0; }
+  virtual double right () const; // Right side of rightmost cell. [cm]
+  virtual double y (size_t) const 
+  { return 0.5; }
+  double y_safe (int) const;    // Same, handles cell_front and cell_back.
+  inline double front () const    // Front of nearest cell. [cm]
+  { return 0.0; }
+  inline double back () const // Back of farthest cell. [cm]
+  { return 1.0; }
+  virtual double volume (size_t) const = 0; // Cell volume [cm^3]
   virtual size_t cell_at (double z, double x, double y) const = 0;
   virtual double fraction_in_z_interval (// The fraction of a cell
                                          // volume that is within a
@@ -100,7 +116,7 @@ public:
           total_volume += volume;
           total_content += volume * (obj.*content) (i);
         }
-    if (!std::isnormal (total_volume))
+    if (iszero (total_volume))
       return 0.0;
     
     return total_content / total_volume;

@@ -300,7 +300,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Geometry& geo,
     }
 
   // There may be no nodes with pipe_position < z < height.
-  if (!std::isnormal (Ha))
+  if (iszero (Ha))
     return 0.0;
 
   // Average conductivity.

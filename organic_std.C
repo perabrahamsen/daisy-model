@@ -268,7 +268,7 @@ OrganicStandard::Buffer::tick (int i, double abiotic_factor,
                                double N_soil, double& N_used,
                                const std::vector<SOM*>& som)
 {
-  if (!std::isnormal (C[i]))
+  if (iszero (C[i]))
     return;
 
   double rate;
@@ -614,7 +614,8 @@ OrganicStandard::Initialization::
   // Add top.
   daisy_assert (input >= root + bioinc);
   const double top = input - root - bioinc;
-  geo.add (per_lay, 0.0, end, top * kg_per_ha_per_y_to_g_per_cm2_per_h);
+  geo.add (per_lay, 0.0, end, 
+           top * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Add roots
   const double depth = soil.MaxRootingHeight ();
@@ -626,7 +627,8 @@ OrganicStandard::Initialization::
     {
       density[i] = k * exp (k * geo.z (i));
     }
-  geo.add (per_lay, density, root * kg_per_ha_per_y_to_g_per_cm2_per_h);
+  geo.add (per_lay, density, 
+           root * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Add bioincorporation
   bioincorporation.add (geo, per_lay,
@@ -645,11 +647,11 @@ bool
 OrganicStandard::aom_compare (const AOM* a, const AOM* b)
 {
   double A = a->initial_C_per_N;
-  if (A == OM::Unspecified
+  if (approximate (A, OM::Unspecified)
       && a->N.size () > 0 && a->C.size () > 0 && a->N[0] > 0)
     A = a->C[0] / a->N[0];
   double B = b->initial_C_per_N;
-  if (B == OM::Unspecified 
+  if (approximate (B, OM::Unspecified)
       && b->N.size () > 0 && b->C.size () > 0 && b->N[0] > 0)
     B = b->C[0] / b->N[0];
 
@@ -943,15 +945,15 @@ OrganicStandard::monthly (const Geometry& geo)
       
       if (am[i]->locked ())
 	keep = true;
-      else if (min_AM_C == 0.0)
-	if (min_AM_N == 0.0)
+      else if (iszero (min_AM_C))
+	if (iszero (min_AM_N))
 	  // No requirement, keep it.
 	  keep = true;
 	else
 	  // Only require N.
 	  keep = (am[i]->total_N (geo) * (100.0 * 100.0) > min_AM_N);
       else
-	if (min_AM_N == 0.0)
+	if (iszero (min_AM_N))
 	  // Only require C.
 	  keep = (am[i]->total_C (geo) * (100.0 * 100.0) > min_AM_C);
 	else 
@@ -1237,7 +1239,7 @@ OrganicStandard::tick (const Geometry& geo,
       tmp << "BUG: OrganicStandard: delta_N != NO3 + NH4[g N/cm^2]\n"
           << delta_N << " != " << geo.total (NO3_source)
           << " + " << geo.total (NH4_source);
-      if (N_source != 0.0)
+      if (std::isnormal (N_source))
 	tmp << " (error " 
             << fabs (delta_N / (N_source) - 1.0) * 100.0 << "%)";
       msg.error (tmp.str ());
@@ -1844,7 +1846,7 @@ Setting additional pool to zero");
 	  for (size_t pool = 0; pool < smb_size; pool++)
 	    {
 	      const double value = matrix.get_entry (row, smb_column + pool);
-	      if (value != 0.0)
+	      if (std::isnormal (value))
 		{
 		  if (first)
 		    first = false;

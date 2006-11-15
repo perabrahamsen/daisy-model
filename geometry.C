@@ -27,6 +27,10 @@
 
 const int Geometry::cell_above;
 const int Geometry::cell_below;
+const int Geometry::cell_left;
+const int Geometry::cell_right;
+const int Geometry::cell_front;
+const int Geometry::cell_back;
 
 std::string
 Geometry::cell_name (int n) const
@@ -37,6 +41,14 @@ Geometry::cell_name (int n) const
       return "top";
     case cell_below:
       return "bottom";
+    case cell_left:
+      return "left";
+    case cell_right:
+      return "right";
+    case cell_front:
+      return "front";
+    case cell_back:
+      return "back";
     default:
       std::ostringstream tmp;
       switch (dimensions ())
@@ -78,6 +90,8 @@ Geometry::edge_index (const int from, const int to)
 double
 Geometry::z_safe (int n) const
 {
+  if (n >= 0)
+    return z (n);
   switch (n)
     {
     case cell_above:
@@ -85,10 +99,46 @@ Geometry::z_safe (int n) const
     case cell_below:
       return bottom () - 1.0 /* [cm] */;
     default:
-      return z (n);
+      return (bottom () - top ()) / 2.0;
     }
 }
   
+double
+Geometry::x_safe (int n) const
+{
+  if (n >= 0)
+    return x (n);
+  switch (n)
+    {
+    case cell_right:
+      return right () + 1.0 /* [cm] */;
+    case cell_left:
+      return left () - 1.0 /* [cm] */;
+    default:
+      return (right () - left ()) / 2.0;
+    }
+}
+
+double 
+Geometry::right () const
+{ return 1.0 /* [cm] */; }  
+
+double
+Geometry::y_safe (int n) const
+{
+  if (n >= 0)
+    return y (n);
+  switch (n)
+    {
+    case cell_back:
+      return back () + 1.0 /* [cm] */;
+    case cell_front:
+      return front () - 1.0 /* [cm] */;
+    default:
+      return (back () - front ()) / 2.0;
+    }
+}
+
 double
 Geometry::volume_in_z_interval (const double from, const double to, 
                                 std::vector<double>& frac) const

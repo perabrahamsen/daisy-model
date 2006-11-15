@@ -39,7 +39,7 @@ GaussJordan::process_column (const int k)
 void 
 GaussJordan::find_pivot (const int k)
 {
-  if (get_entry (k, k) == 0.0)
+  if (iszero (get_entry (k, k)))
     swap_rows (k, find_nonzero (k));
 }
 
@@ -47,7 +47,7 @@ int
 GaussJordan::find_nonzero (const int k)
 {
   for (int i = k; i < size; i++)
-    if (get_entry (i, k) != 0.0)
+    if (std::isnormal (get_entry (i, k)))
       return i;
   throw ("GaussJordan: Dependent equations.");
 }
@@ -95,7 +95,7 @@ GaussJordan::solve ()
 	sum += get_entry (i, j) * result_[j];
 
       const double entry = get_entry (i, i);
-      if (entry == 0.0)
+      if (iszero (entry))
 	throw ("GaussJordan: zero solution");
 #ifdef DEBUG_MESSAGES
       if (!isfinite (entry) || !isfinite (value[i]) || !isfinite (sum))

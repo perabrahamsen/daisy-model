@@ -182,8 +182,9 @@ Chemicals::Implementation::canopy_update (const Implementation& in,
       const double old_amount = (*i).second;
       const double k_1 = chemical->canopy_dissipation_rate ();
       const double f_w = chemical->canopy_washoff_coefficient ();
-      const double washoff_fraction = f_w * 
-	(water_storage > 0.0) ? water_out / water_storage : 0.0;
+      const double washoff_fraction = (water_storage > 0.0) 
+        ? f_w * water_out / water_storage
+        : 0.0;
       const double new_amount 
 	= old_amount / (1.0 + dt * (k_1 + washoff_fraction));
       const double dissipated = k_1 * new_amount * dt;

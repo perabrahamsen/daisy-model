@@ -643,8 +643,8 @@ Surface::Implementation::Implementation (const AttributeList& al)
     chemicals_can_enter_soil (al.flag ("chemicals_can_enter_soil")),
     ridge_ (al.check ("ridge") ? new Ridge (al.alist ("ridge")) : NULL)
 {
-  daisy_assert (!std::isnormal (im_flux.NO3));
-  daisy_assert (!std::isnormal (im_flux.NH4));
+  daisy_assert (iszero (im_flux.NO3));
+  daisy_assert (iszero (im_flux.NH4));
 }
 
 Surface::~Surface ()

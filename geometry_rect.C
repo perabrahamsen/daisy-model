@@ -172,12 +172,16 @@ GeometryRect::GeometryRect (Block& al)
 
   // Horizontal edges.
   for (size_t row = 0; row < cell_rows (); row++)
-    for (size_t column = 0; column < edge_columns (); column++)
-      {
-        edge_from_.push_back (cell_index (row, column));
-        edge_to_.push_back (cell_index (row, column + 1));
-        edge_area_.push_back (z_distance[row]);
-      }
+    {
+      edge_from_.push_back (cell_left);
+      for (size_t column = 0; column < cell_columns (); column++)
+        {
+          edge_to_.push_back (cell_index (row, column));
+          edge_from_.push_back (cell_index (row, column));
+        }
+      edge_to_.push_back (cell_right);
+      edge_area_.insert (edge_area_.end (), edge_columns (), z_distance[row]);
+    }
 
   // Done.
   daisy_assert (edge_area_.size () == edge_to_.size ());

@@ -51,13 +51,14 @@ SMM1D::update (const std::vector<double>& h,
   for (size_t i = 0; i < edge_size; i++)
     {
       const int edge = edges[i];
-      if (edge >= 0)
-        {
-          daisy_assert (edge < geo.edge_size ());
-          daisy_assert (approximate (geo.z_safe (geo.edge_from (edge)), 
-                                     geo.z_safe (geo.edge_to (edge))));
-          soil_water.set_flux (edge, q[i]);
-        }
+      daisy_assert (edge > 0);
+      daisy_assert (edge < geo.edge_size ());
+      const int from = geo.edge_from (edge);
+      const int to = geo.edge_to (edge);
+      daisy_assert (!geo.is_regular_cell (from)
+                    || !geo.is_regular_cell (to)
+                    || approximate (geo.z (from), geo.z (to)));
+      soil_water.set_flux (edge, q[i]);
     }
 }
 

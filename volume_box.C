@@ -19,41 +19,49 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "volume.h"
+#include "bound.h"
 #include "border.h"
 #include "mathlib.h"
 
 class VolumeBox : public Volume
 {
-  bool has_lower_bound;
-  double lower_bound;
-  bool has_upper_bound;
-  double upper_bound;
-  bool has_left_bound;
-  double left_bound;
-  bool has_right_bound;
-  double right_bound;
-  bool has_near_bound;
-  double near_bound;
-  bool has_far_bound;
-  double far_bound;
+  std::auto_ptr<Bound> bottom;
+  std::auto_ptr<Bound> top;
+  std::auto_ptr<Bound> left;
+  std::auto_ptr<Bound> right;
+  std::auto_ptr<Bound> front;
+  std::auto_ptr<Bound> back;
 
   // Use.
 public:
   bool has_bottom () const
-  { return has_lower_bound; }
+  { return bottom->type () != Bound::none; }
   void limit_bottom (const double limit)
   { 
-    daisy_assert (!has_lower_bound);
-    has_lower_bound = true;
-    lower_bound = limit;
+    daisy_assert (!has_bottom ());
+    bottom->set_finite (limit);
   }
   bool has_top () const
-  { return has_upper_bound; }
+  { return top->type () != Bound::none; }
   void limit_top (const double limit)
   { 
-    daisy_assert (!has_upper_bound);
-    has_upper_bound = true;
-    upper_bound = limit;
+    daisy_assert (!has_top ());
+    top->set_finite (limit);
+  }
+  static bool bound_check (const Border& border, 
+                           const Bound& bound,
+                           const double default_value,
+                           Treelog& msg)
+  {
+    if (bound.type () != Bound::finite)
+      // Nothing to test.
+      return true;
+    const double value = bound.value ();
+    if (approximate (value, default_value))
+      // Already tested.
+      return true;
+
+    return border.check_border (value, msg);
   }
   bool check_border (const Border& border, 
                      const double default_upper,
@@ -61,66 +69,71 @@ public:
                      Treelog& msg) const
   { 
     bool ok = true;
-    if (has_upper_bound 
-        && !approximate (upper_bound, default_upper)
-        && !border.check_border (upper_bound, msg))
+    if (!bound_check (border, *top, default_upper, msg))
       ok = false;
-    if (has_lower_bound 
-        && !approximate (lower_bound, default_lower)
-        && !border.check_border (lower_bound, msg))
+    if (!bound_check (border, *bottom, default_lower, msg))
       ok = false;
     return ok; 
   }
+
+  static double bound_default (const Bound& bound, const double value)
+  { return (bound.type () == Bound::finite ? bound.value () : value); }
+
+  static double fraction_interval (const double min, const double max,
+                                   const Bound& from, const Bound& to)
+  { return fraction_within (min, max, 
+                            bound_default (from, min - 1.0),
+                            bound_default (to, max + 1.0)); }
+                            
   double box_fraction (const double zm, const double zp, 
                        const double xm, const double xp,
                        const double ym, const double yp) const
-  {
-    return fraction_within (zm, zp, 
-                            (has_lower_bound ? lower_bound : zm - 1.0),
-                            (has_upper_bound ? upper_bound : zp + 1.0))
-      * fraction_within (xm, xp, 
-                         (has_left_bound ? left_bound : xm - 1.0),
-                         (has_right_bound ? right_bound : xp + 1.0))
-      * fraction_within (ym, yp, 
-                         (has_near_bound ? near_bound : ym - 1.0),
-                         (has_far_bound ? far_bound : yp + 1.0)); }
+  { return fraction_interval (zm, zp, *bottom, *top)
+      * fraction_interval (xm, xp, *left, *right)
+      * fraction_interval (ym, yp, *front, *back); }
 
   // Create and Destroy.
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   VolumeBox (Block& al)
     : Volume (al),
-      has_lower_bound (al.check ("lower")),
-      lower_bound (al.number ("lower", -42.42e42)),
-      has_upper_bound (al.check ("upper")),
-      upper_bound (al.number ("upper", -42.42e42)),
-      has_left_bound (al.check ("left")),
-      left_bound (al.number ("left", -42.42e42)),
-      has_right_bound (al.check ("right")),
-      right_bound (al.number ("right", -42.42e42)),
-      has_near_bound (al.check ("near")),
-      near_bound (al.number ("near", -42.42e42)),
-      has_far_bound (al.check ("far")),
-      far_bound (al.number ("far", -42.42e42))
+      bottom (Librarian<Bound>::build_item (al, "bottom")),
+      top (Librarian<Bound>::build_item (al, "top")),
+      left (Librarian<Bound>::build_item (al, "left")),
+      right (Librarian<Bound>::build_item (al, "right")),
+      front (Librarian<Bound>::build_item (al, "front")),
+      back (Librarian<Bound>::build_item (al, "back"))
   { }
   ~VolumeBox ()
   { }
 };
 
 void 
-VolumeBox::load_syntax (Syntax& syntax, AttributeList&)
+VolumeBox::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("lower", "cm", Syntax::OptionalConst,
-              "Lower boundary on the z-axis.  By default it is unbounded.");
-  syntax.add ("upper", "cm", Syntax::OptionalConst,
-              "Upper boundary on the z-axis.  By default it is unbounded.");
-  syntax.add ("left", "cm", Syntax::OptionalConst,
-              "Lower boundary on the x-axis.  By default it is unbounded.");
-  syntax.add ("right", "cm", Syntax::OptionalConst,
-              "Upper boundary on the x-axis.  By default it is unbounded.");
-  syntax.add ("near", "cm", Syntax::OptionalConst,
-              "Lower boundary on the y-axis.  By default it is unbounded.");
-  syntax.add ("far", "cm", Syntax::OptionalConst,
-              "Upper boundary on the y-axis.  By default it is unbounded.");
+  syntax.add ("bottom", Librarian<Bound>::library (), 
+              Syntax::Const, Syntax::Singleton,
+              "Lower boundary on the z-axis.");
+  alist.add ("bottom", Bound::none_model ());
+  syntax.add ("top", Librarian<Bound>::library (),
+              Syntax::Const, Syntax::Singleton,
+              "Upper boundary on the z-axis.");
+  alist.add ("top", Bound::none_model ());
+  syntax.add ("left", Librarian<Bound>::library (),
+              Syntax::Const, Syntax::Singleton,
+              "Lower boundary on the x-axis.");
+  alist.add ("left", Bound::none_model ());
+  syntax.add ("right", Librarian<Bound>::library (),
+              Syntax::Const, Syntax::Singleton,
+              "Upper boundary on the x-axis.");
+  alist.add ("right", Bound::none_model ());
+  syntax.add ("front", Librarian<Bound>::library (),
+              Syntax::Const, Syntax::Singleton,
+              "Lower boundary on the y-axis.");
+  alist.add ("front", Bound::none_model ());
+  syntax.add ("back", Librarian<Bound>::library (),
+              Syntax::Const, Syntax::Singleton,
+              "Upper boundary on the y-axis.");
+  alist.add ("back", Bound::none_model ());
 }
 
 static struct Volume_BoxSyntax
@@ -156,62 +169,3 @@ Volume::infinite_box ()
 }
 
 // volume_box.C ends here.
-
-#if 0
-struct ext_number
-{
-  // Content.
-  enum type {
-    minus_infinite,
-    finite,
-    plus_infinite } state;
-  double value;
-  
-  // Create and Destroy.
-  ext_number (double v)
-    : state (finite),
-      value (v)
-  { }
-  ext_number (type s)
-    : state (s),
-      value (-42.42e42)
-  { daisy_assert (state != finite); }
-  ext_number (const ext_number& other)
-    : state (other.state),
-      value (other.value)
-  { }
-};
-
-struct ext_interval
-{
-  // Content.
-  ext_number from;
-  ext_number to;
-
-  // Create and Destroy;
-  ext_interval (const ext_number& f, const ext_number& t)
-    : from (f),
-      to (t)
-  { daisy_assert (f < t); }
-  ext_interval (const ext_interval& other)
-    : from (other.from),
-      to (other.to)
-  { }
-};
-
-struct Box
-{
-  // Content.
-  ext_interval x;
-  ext_interval y;
-  ext_interval z;
-
-  // Create and Destroy.
-  Box (const ext_interval& x_, const ext_interval& y _, const ext_interval& z_)
-    : x (x_),
-      y (y_),
-      z (z_)
-  { }
-};
-
-#endif

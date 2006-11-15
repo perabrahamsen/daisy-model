@@ -60,7 +60,7 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   const double LAI = vegetation.LAI ();
 
   // No LAI
-  if (!std::isnormal (LAI))
+  if (iszero (LAI))
   {
     std::fill (&total_PAR[0], &total_PAR[No+1], 0.0);
     std::fill (&sun_PAR[0], &sun_PAR[No+1], 0.0); 

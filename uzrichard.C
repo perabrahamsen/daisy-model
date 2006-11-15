@@ -542,8 +542,8 @@ UZRichard::converges (const std::vector<double>& previous,
   for (unsigned int i = 0; i < size; i++)
     {
       if (   fabs (current[i] - previous[i]) > max_absolute_difference
-	  && (   !std::isnormal (previous[i])
-              || !std::isnormal (current[i])
+	  && (   iszero (previous[i])
+              || iszero (current[i])
 	      || (  fabs ((current[i] - previous[i]) / previous[i])
 		  > max_relative_difference)))
 	return false;

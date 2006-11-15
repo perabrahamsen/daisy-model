@@ -99,13 +99,13 @@ ifeq ($(USE_OPTIMIZE),true)
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
 		endif
 		ifeq ($(HOSTTYPE),i386-linux)
-		  OPTIMIZE = -O3 -ffast-math -mcpu=pentiumpro -march=pentium
+		  OPTIMIZE = -O3 -ffast-math -mcpu=pentium-m -march=pentium
 	        endif
 		ifeq ($(HOSTTYPE),cygwin)
-		  OPTIMIZE = -O3 -ffast-math -mtune=pentiumpro -march=pentium
+		  OPTIMIZE = -O3 -ffast-math -mtune=pentium-m -march=pentium
 		endif
 		ifeq ($(HOSTTYPE),mingw)
-		  OPTIMIZE = -O3 -ffast-math -mtune=pentiumpro -march=pentium
+		  OPTIMIZE = -O3 -ffast-math -mtune=pentium-m -march=pentium
 		endif
 	endif
 	ifeq ($(COMPILER),icc)
@@ -297,7 +297,7 @@ NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
-# 
+# select_flow.C 
 MODELS = volume_box.C \
 	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
 	cropNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \
@@ -355,7 +355,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = volume.C uz1d.C \
+COMPONENTS = bound.C volume.C uz1d.C \
 	cropNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C \
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
@@ -731,8 +731,10 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+bound${OBJ}: bound.C bound.h librarian.h library.h symbol.h block.h syntax.h \
+  treelog.h plf.h alist.h assertion.h mathlib.h
 volume${OBJ}: volume.C volume.h librarian.h library.h symbol.h block.h \
-  syntax.h treelog.h plf.h alist.h assertion.h
+  syntax.h treelog.h plf.h alist.h assertion.h bound.h
 uz1d${OBJ}: uz1d.C uz1d.h geometry_rect.h geometry_vert.h geometry.h syntax.h \
   treelog.h symbol.h mathlib.h assertion.h soil.h horizon.h librarian.h \
   library.h block.h plf.h alist.h soil_water.h soil_heat.h
@@ -818,7 +820,7 @@ weather${OBJ}: weather.C weather.h librarian.h library.h symbol.h block.h \
 column${OBJ}: column.C column.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h log.h border.h
 crop${OBJ}: crop.C crop.h time.h librarian.h library.h symbol.h block.h \
-  syntax.h treelog.h plf.h alist.h assertion.h chemicals.h om.h
+  syntax.h treelog.h plf.h alist.h assertion.h chemicals.h om.h mathlib.h
 action${OBJ}: action.C action.h librarian.h library.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h assertion.h
 condition${OBJ}: condition.C condition.h librarian.h library.h symbol.h \
@@ -863,14 +865,15 @@ vegetation${OBJ}: vegetation.C vegetation.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h log.h border.h
 geometry_rect${OBJ}: geometry_rect.C geometry_rect.h geometry_vert.h \
   geometry.h syntax.h treelog.h symbol.h mathlib.h assertion.h volume.h \
-  librarian.h library.h block.h plf.h alist.h check.h vcheck.h submodel.h
+  librarian.h library.h block.h plf.h alist.h bound.h check.h vcheck.h \
+  submodel.h
 element${OBJ}: element.C element.h log.h border.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
   geometry.h mathlib.h adsorption.h submodel.h soil.h horizon.h \
   soil_water.h timestep.h
 geometry1d${OBJ}: geometry1d.C geometry1d.h geometry_vert.h geometry.h \
   syntax.h treelog.h symbol.h mathlib.h assertion.h volume.h librarian.h \
-  library.h block.h plf.h alist.h check.h vcheck.h submodel.h
+  library.h block.h plf.h alist.h bound.h check.h vcheck.h submodel.h
 fetch${OBJ}: fetch.C fetch.h destination.h symbol.h select.h condition.h \
   librarian.h library.h block.h syntax.h treelog.h plf.h alist.h \
   assertion.h number.h units.h mathlib.h
@@ -1096,7 +1099,7 @@ syntax${OBJ}: syntax.C syntax.h treelog.h symbol.h alist.h library.h check.h \
   vcheck.h assertion.h memutils.h
 library${OBJ}: library.C library.h symbol.h alist.h syntax.h treelog.h \
   assertion.h memutils.h options.h
-plf${OBJ}: plf.C plf.h assertion.h
+plf${OBJ}: plf.C plf.h assertion.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
 cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h program.h \
   librarian.h library.h block.h plf.h assertion.h time.h parser_file.h \
@@ -1106,11 +1109,16 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h program.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+select_flow${OBJ}: select_flow.C select_value.h select.h destination.h \
+  symbol.h condition.h librarian.h library.h block.h syntax.h treelog.h \
+  plf.h alist.h assertion.h number.h units.h bound.h border.h geometry.h \
+  mathlib.h
 volume_box${OBJ}: volume_box.C volume.h librarian.h library.h symbol.h \
-  block.h syntax.h treelog.h plf.h alist.h assertion.h border.h mathlib.h
+  block.h syntax.h treelog.h plf.h alist.h assertion.h bound.h border.h \
+  mathlib.h
 select_volume${OBJ}: select_volume.C select_value.h select.h destination.h \
   symbol.h condition.h librarian.h library.h block.h syntax.h treelog.h \
-  plf.h alist.h assertion.h number.h units.h volume.h geometry.h \
+  plf.h alist.h assertion.h number.h units.h volume.h bound.h geometry.h \
   mathlib.h
 uz1d_none${OBJ}: uz1d_none.C uz1d.h geometry_rect.h geometry_vert.h \
   geometry.h syntax.h treelog.h symbol.h mathlib.h assertion.h soil.h \
@@ -1376,7 +1384,7 @@ hydraulic_M_vG_compact${OBJ}: hydraulic_M_vG_compact.C hydraulic.h \
 action_crop${OBJ}: action_crop.C action.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h daisy.h program.h \
   time.h field.h border.h crop.h am.h log.h harvest.h chemicals.h \
-  check_range.h check.h im.h submodeler.h vcheck.h memutils.h
+  check_range.h check.h im.h submodeler.h vcheck.h memutils.h mathlib.h
 groundwater_lysimeter${OBJ}: groundwater_lysimeter.C groundwater.h \
   librarian.h library.h symbol.h block.h syntax.h treelog.h plf.h alist.h \
   assertion.h geometry.h mathlib.h
@@ -1500,7 +1508,7 @@ condition_logic${OBJ}: condition_logic.C condition.h librarian.h library.h \
   memutils.h
 action_irrigate${OBJ}: action_irrigate.C action.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h daisy.h \
-  program.h time.h field.h border.h im.h check.h
+  program.h time.h field.h border.h im.h check.h mathlib.h
 action_lisp${OBJ}: action_lisp.C action.h librarian.h library.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h daisy.h program.h \
   time.h log.h border.h memutils.h submodeler.h condition.h
@@ -1578,7 +1586,8 @@ bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h library.h \
   svat.h vegetation.h chemicals.h time.h
 condition_crop${OBJ}: condition_crop.C condition.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h crop.h \
-  time.h field.h border.h daisy.h program.h check_range.h check.h
+  time.h field.h border.h daisy.h program.h check_range.h check.h \
+  mathlib.h
 condition_soil${OBJ}: condition_soil.C condition.h librarian.h library.h \
   symbol.h block.h syntax.h treelog.h plf.h alist.h assertion.h field.h \
   border.h daisy.h program.h time.h check.h

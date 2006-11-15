@@ -708,7 +708,7 @@ ActionCrop::Spray::~Spray ()
 bool
 ActionCrop::Irrigation::doIt (Daisy& daisy, Treelog& out) const
 {
-  if (!std::isnormal (amount))
+  if (iszero (amount))
     return false;
 
   const int mm = daisy.time.month ();

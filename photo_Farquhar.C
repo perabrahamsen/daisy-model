@@ -269,7 +269,7 @@ PhotoFarquhar::C3Model (double& pn, double& ci, const double PAR /*[mol/m²/s]*/,
       const double wc = Vm*(ci-Gamma)/(ci+Kcl); // Rubisco limited, [mol/m² leaf/s]
       const double Ile = PAR * alfa;            // PAR effectively absorbed by PSII [mol/m² leaf/s]
 
-      if (!std::isnormal((Ile+Jm)*(Ile+Jm)-(4.*theta*Ile*Jm)))
+      if (iszero((Ile+Jm)*(Ile+Jm)-(4.*theta*Ile*Jm)))
 	{
 	  std::ostringstream tmp;
 	  tmp << "Bug: negative: " << 4.*theta*Ile*Jm 

@@ -302,7 +302,7 @@ Solute::initialize (const AttributeList& al,
 
   for (size_t i = 0; i < geo.cell_size (); i++)
     {
-      if (!std::isnormal (M_[i]))
+      if (iszero (M_[i]))
 	{
 	  if (std::isnormal (C_[i]))
 	    throw ("C & M mismatch in solute");

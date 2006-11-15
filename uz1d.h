@@ -44,15 +44,15 @@ class SMM1D
 public:
   size_t cell_size () const
   { return cells.size (); }
-  double cell_distance (const size_t index) const
+  double cell_length (const size_t index) const
   { 
     const size_t cell = cells[index];
-    return geo.dz (cell);
+    return geo.dx (cell);
   }
   double center (const size_t index) const
   { 
     const size_t cell = cells[index];
-    return geo.z (cell);
+    return geo.x (cell);
   }
   size_t edge_previous (const size_t i) const
   { return i; }

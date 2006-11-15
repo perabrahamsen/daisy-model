@@ -191,6 +191,7 @@ int Units::count = 0;
 
 const symbol Units::cm ("cm");
 const symbol Units::cm_per_h ("cm/h");
+const symbol Units::cm2 ("cm^2");
 const symbol Units::cm3 ("cm^3");
 
 bool
@@ -287,6 +288,7 @@ Units::multiply (const string& one, const string& two)
     const char* two;
     const char* result;
   } table[] = { 
+    // select_interval.C
     { "h^-1", "cm", "cm/h" },
     { "cm^3/cm^3", "cm", "cm" },
     { "cm^3/cm^3/h", "cm", "cm/h" },
@@ -297,6 +299,10 @@ Units::multiply (const string& one, const string& two)
     { "g C/cm^3/h", "cm", "g C/cm^2/h" },
     { "g N/cm^3/h", "cm", "g N/cm^2/h" }, 
     { "g CO_2-C/cm^3/h", "cm", "g CO_2-C/cm^2/h"},
+    // select_flow.C
+    { "cm/h", "cm^2", "cm^3/h" },
+    { "g/cm^2/h", "cm^2", "g/h" },   
+    // select_volume.C
     { "h^-1", "cm^3", "cm^3/h" },
     { "cm^3/cm^3", "cm^3", "cm^3" },
     { "cm^3/cm^3/h", "cm^3", "cm^3/h" },

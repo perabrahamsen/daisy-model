@@ -25,6 +25,7 @@
 #include "field.h"
 #include "im.h"
 #include "check.h"
+#include "mathlib.h"
 #include <sstream>
 
 struct ActionIrrigate : public Action
@@ -138,7 +139,7 @@ struct ActionIrrigateOverhead : public ActionIrrigate
 {
   void irrigate (Field& f, double flux, double temp, const IM& im) const
   { 
-    if (temp == at_air_temperature)
+    if (approximate (temp, at_air_temperature))
       f.irrigate_overhead (flux, im); 
     else
       f.irrigate_overhead (flux, temp, im); 
@@ -152,7 +153,7 @@ struct ActionIrrigateSurface : public ActionIrrigate
 {
   void irrigate (Field& f, double flux, double temp, const IM& im) const
   {
-    if (temp == at_air_temperature)
+    if (approximate (temp, at_air_temperature))
       f.irrigate_surface (flux, im);
     else
       f.irrigate_surface (flux, temp, im); 

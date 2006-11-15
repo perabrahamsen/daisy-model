@@ -1060,7 +1060,7 @@ CropOld::SoluteUptake (const Geometry& geo,
 		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);
 	      I_zero[i] = B_zero[i] * C_l;
 	    }
-	  else if (alpha == 2.0)
+	  else if (approximate (alpha, 2.0, 1e-6))
 	    {
 	      B_zero[i] = q_r * log (beta_squared) 
 		/ ((beta_squared - 1.0) - log (beta_squared));
@@ -1903,7 +1903,7 @@ CropOld::harvest (const symbol column_name,
   const double WStem = WStub + WStraw;
   const double Climit = (CStem * WStem + CSOrg * WSOrg);
   
-  if (!std::isnormal (WSOrg))
+  if (iszero (WSOrg))
     CStem = NLeaf / WStem;
   else if (CLeaf <= Climit)
     CSOrg = (NLeaf - CStem * WStem) / WSOrg;

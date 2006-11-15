@@ -121,14 +121,15 @@ UZ1DRichard::tick (SMM1D& smm, const double gravity, Treelog& msg)
 	  internode (smm, *K_average, K, Kedge);
           const double *const Kminus = &Kedge[0];
           const double *const Kplus = &Kedge[1];
-
+          daisy_assert (iszero (Kminus[0]));
+          daisy_assert (iszero (Kplus[cell_size-1]));
 	  // Calcualte cells.
 	  for (size_t i = 0; i < cell_size; i++)
 	    {
               // Elements.
 	      const double Cw1 = smm.Cw1 (i, h[i]);
 	      const double Cw2 = smm.Cw2 (i, h[i]);
-	      const double dx = smm.cell_distance (i);
+	      const double dx = smm.cell_length (i);
               const size_t e_minus = smm.edge_previous (i);
               const size_t e_plus = smm.edge_next (i);
               const double dx_plus = smm.edge_distance (e_plus);
@@ -163,6 +164,7 @@ UZ1DRichard::tick (SMM1D& smm, const double gravity, Treelog& msg)
 	      iterations_used = max_iterations + 42;
 	      break;
 	    }
+
 	}
       while (!converges (h_conv, h, 
                          max_absolute_difference, max_absolute_difference)
@@ -212,8 +214,8 @@ UZ1DRichard::tick (SMM1D& smm, const double gravity, Treelog& msg)
       const double S = 0.0;
       const double Theta_new = Theta[i];
       const double Theta_old = smm.Theta_old (i);
-      q[i + 1] = (((Theta_new - Theta_old) / dt) + S)
-	* smm.cell_distance (i) + q[i];
+      const double dx = smm.cell_length (i);
+      q[i + 1] = (((Theta_new - Theta_old) / dt) + S) * dx + q[i];
     }
 
   // Make it official.
@@ -263,7 +265,7 @@ UZ1DRichard::converges (const std::vector<double>& previous,
       const double diff = cur - prev;
       if (fabs (diff) < max_absolute_difference)
         continue;
-      if (!std::isnormal (prev))
+      if (iszero (prev))
         continue;
       if (fabs (diff / prev) > max_relative_difference)
         return false;

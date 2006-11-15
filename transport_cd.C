@@ -77,8 +77,8 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
     {
       daisy_assert (C[i] >= 0.0);
       daisy_assert (M[i] >= 0.0);
-      if (!std::isnormal (C[i]))
-	daisy_assert (!std::isnormal (M[i]));
+      if (iszero (C[i]))
+	daisy_assert (iszero (M[i]));
       else
 	daisy_assert (approximate (M[i], 
 				   adsorption.C_to_M (soil,
@@ -187,7 +187,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 
   // Loop through small time steps.
   for (double old_t = 0.0, t = ddt; 
-       old_t != t;
+       old_t < t;
        old_t = t, t = min (dt, t + ddt))
     {
       // Parameters for tridiagonal matrix.

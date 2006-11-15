@@ -39,7 +39,7 @@ struct DifradWeather : public Difrad
 	msg.warning (tmp.str ());
 	return 1.0;
       }
-    if(!std::isnormal (gb))
+    if(iszero (gb))
       return 0.0;
     const double val = df/gb;
     daisy_assert (std::isfinite (val));

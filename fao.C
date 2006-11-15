@@ -53,7 +53,7 @@ double
 FAO::AerodynamicResistance (double CropHeight, double ScreenHeight,
 			    double U)
 {
-  if (U == 0.0)
+  if (iszero (U))
     U = 0.1;
 
   daisy_assert (U > 0.0);
@@ -74,7 +74,7 @@ FAO::AerodynamicResistance (double CropHeight, double ScreenHeight,
 double 
 FAO::RefAerodynamicResistance (double U2)
 { 
-  if (U2 == 0.0)
+  if (iszero (U2))
     U2 = 0.1;
 
   daisy_assert (U2 > 0.0);

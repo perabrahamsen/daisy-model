@@ -57,10 +57,12 @@ HorHeat::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "HorHeat");
   alist.add ("description", "Heat capacity and conductivity per horizon.");
 
-  syntax.add ("quarts_form_factor", Syntax::None (), Syntax::Const,
+  syntax.add ("quarts_form_factor", Syntax::None (), Check::positive (), 
+              Syntax::Const,
 	      "Gemetry factor used for conductivity calculation.");
   alist.add ("quarts_form_factor", 2.0);
-  syntax.add ("mineral_form_factor", Syntax::None (), Syntax::Const,
+  syntax.add ("mineral_form_factor", Syntax::None (), Check::positive (), 
+              Syntax::Const,
 	      "Gemetry factor used for conductivity calculation.");
   alist.add ("mineral_form_factor", 4.0);
   syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\
@@ -204,25 +206,27 @@ HorHeat::HeatCapacity ()
 
 double 
 HorHeat::DepolationsFactor (const Hydraulic& hydraulic,
-					    const constituents medium, 
-					    const double alfa)
+                            const constituents medium, 
+                            const double alfa)
 {
   if (medium == Air)
     return 0.333 - (0.333 - 0.070) * content[Air] / (hydraulic.porosity()
 						     - Theta_pF_high);
 
-  const double a = 1 - alfa * alfa;
+  const double a = 1.0 - alfa * alfa;
   
-  if (alfa < 1)
+  if (iszero (a))               // alpha = 1.0
+    return 1.0 / 3.0;
+
+  if (a > 0.0)                    // alfa < 1.0
     return 1.0 / (2.0 * a)
       + alfa * alfa / (4.0 * a * sqrt (a)) 
       * log ((1.0 - sqrt (a)) / (1.0 + sqrt (a)));
-  if (alfa == 1.0)
-    return 1.0 / 3.0;
-  if (alfa > 1.0)
-    return (alfa * alfa / sqrt (-a) * (M_PI_2 - atan (sqrt (-1.0 / a))) - 1.0)
-      / (2.0 * -a);
-  daisy_assert (false);
+
+  daisy_assert (alfa > 1.0);
+  daisy_assert (a < 0);
+  return (alfa * alfa / sqrt (-a) * (M_PI_2 - atan (sqrt (-1.0 / a))) - 1.0)
+    / (2.0 * -a);
 }
 
 double 

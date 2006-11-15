@@ -59,7 +59,7 @@ struct SelectVolume : public SelectValue
                 total_volume += vol;
               }
           }
-        if (!std::isnormal (total_volume))
+        if (iszero (total_volume))
           daisy_assert (weight.size () == 0);
         else if (density)
           for (size_t i = 0; i < cells.size (); i++)
@@ -131,7 +131,8 @@ struct SelectVolume : public SelectValue
   SelectVolume (Block& al)
     : SelectValue (al),
       density (al.flag ("density")),
-      volume (Librarian<Volume>::build_item (al, "volume"))
+      volume (Librarian<Volume>::build_item (al, "volume")),
+      last_geo (NULL)
   { }
   ~SelectVolume ()
   { }

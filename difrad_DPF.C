@@ -60,7 +60,7 @@ struct DifradDPF : public Difrad
    
     // Fraction of diffuse radiation
     const double I_total = I_d + I_b;
-    if (!std::isnormal (I_total))
+    if (iszero (I_total))
       return 1.0;
     const double fd = I_d /(I_total);
     daisy_assert (std::isfinite (fd));

@@ -130,7 +130,7 @@ single_positive_root_of_square_equation (double a, double b, double c)
   const double D = sqrt (pow2 (b) - 4.0 * a * c);
   
   // One solution.
-  if (D == 0.0)
+  if (iszero (D))
     {
       const double x = -b / (2.0 * a);
       // Must be positive.
@@ -159,7 +159,7 @@ bool approximate (const double a, const double b, const double noise)
 {
   if (fabs (a) < 1.0e-100)
     return fabs (b) < 1.0e-100;
-  return ((b == 0.0) ? (a == 0.0) : fabs (a / b - 1.0) < noise);
+  return (iszero (b) ? iszero (a) : fabs (a / b - 1.0) < noise);
 }
 
 double halftime_to_rate (double halftime)

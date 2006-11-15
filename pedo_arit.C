@@ -342,7 +342,7 @@ struct PedotransferOperands : public Pedotransfer
       } operands (*block, "operands");
       const bool ok = block->ok ();
       block.reset ();
-      if (ok)
+      if (!ok)
         throw string ("Build failure: ") + tmp.str ();
 
       const string* found = NULL;

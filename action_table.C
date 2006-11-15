@@ -150,7 +150,7 @@ ActionTable::doIt (Daisy& daisy, Treelog& msg)
         {
           double value = irrigate_events[daisy.time];
           std::ostringstream tmp;
-          if (!std::isnormal (value))
+          if (iszero (value))
             {
               tmp << "Applying minimum of 0.1 mm\n";
               value = 0.1;

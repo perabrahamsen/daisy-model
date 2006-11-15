@@ -233,7 +233,7 @@ Harvesting::operator() (const symbol column_name,
       const double C = C_C_Stem * Stem_W_Loss;
       const double N = Stem_N_Loss;
       AM_stem.add (C * m2_per_cm2, N * m2_per_cm2);
-      daisy_assert (!std::isnormal (C) || N > 0.0);
+      daisy_assert (iszero (C) || N > 0.0);
       production.C_AM += C;
       production.N_AM += N;
     }
@@ -250,7 +250,7 @@ Harvesting::operator() (const symbol column_name,
       const double C = C_C_Dead * Dead_W_Loss;
       const double N = Dead_N_Loss;
       production.AM_leaf->add (C * m2_per_cm2, N * m2_per_cm2);
-      daisy_assert (!std::isnormal (C) || N > 0.0);
+      daisy_assert (iszero (C) || N > 0.0);
       production.C_AM += C;
       production.N_AM += N;
     }
@@ -263,7 +263,7 @@ Harvesting::operator() (const symbol column_name,
     {
       const double C = C_C_Leaf * Leaf_W_Loss;
       const double N = Leaf_N_Loss;
-      daisy_assert (!std::isnormal (C) || N > 0.0);
+      daisy_assert (iszero (C) || N > 0.0);
       AM_leaf.add ( C * m2_per_cm2, N * m2_per_cm2);
       production.C_AM += C;
       production.N_AM += N;
@@ -277,7 +277,7 @@ Harvesting::operator() (const symbol column_name,
     {
       const double C = C_C_SOrg * SOrg_W_Loss;
       const double N = SOrg_N_Loss;
-      daisy_assert (!std::isnormal (C) || N > 0.0);
+      daisy_assert (iszero (C) || N > 0.0);
       AM_sorg.add ( C * m2_per_cm2, N * m2_per_cm2);
       production.C_AM += C;
       production.N_AM += N;
@@ -374,7 +374,7 @@ Harvesting::operator() (const symbol column_name,
       SOrg_C_Loss += production.WSOrg * C_C_SOrg;
       SOrg_N_Loss += production.NSOrg;
 
-      daisy_assert (!std::isnormal (production.WRoot)
+      daisy_assert (iszero (production.WRoot)
                     || production.NRoot > 0.0);
       const double Root_C
         = (production.WRoot * C_C_Root + extra_C) * m2_per_cm2;

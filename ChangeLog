@@ -1,3 +1,16 @@
+2006-11-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioincorporation.C (add): Use 'Geometry::add_surface'.
+	* organic_std.C (Initialization): Ditto.
+
+2006-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_flow.C: New model.
+
+2006-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bound.C: New component.
+
 2006-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.10 released.
@@ -13,10 +26,11 @@
 	(total_PAR_, sun_PAR_, sun_LAI_fraction_): New members.
 
 	* bioclimate_std.C (raddist, difrad): New data members.  
-	(struct BioclimateStandard)(sun_PAR, sun_LAI_fraction): New member functions.
+	(sun_PAR, sun_LAI_fraction): New member functions.
 	(load_syntax): Added "raddist" and "difrad".
 
-	* bioclimate.h (sun_PAR, sun_LAI_fraction): New virtual member functions.
+	* bioclimate.h (sun_PAR, sun_LAI_fraction): New virtual member 
+	functions.
 
 2006-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 

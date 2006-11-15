@@ -1,12 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* R2D2 møder igen
+* Få OM init til at blive uafhængig af geometri.
 
-* Volume based logging
-
-** VolumeBox
-
-** Få horizontal transport til at virke.
+* Få select flow til at bruge et volume.
 
 * MMO: Daisy
 

@@ -22,16 +22,16 @@
 
 #include "plf.h"
 #include "assertion.h"
+#include "mathlib.h"
 #include <vector>
 #include <list>
 #include <stdexcept>
-using namespace std;
 
 struct PLF::Implementation
 {
-  vector<double> x;
-  vector<double> y;
-  vector<double> slope;
+  std::vector<double> x;
+  std::vector<double> y;
+  std::vector<double> slope;
 
   double operator () (const double pos) const;
   PLF inverse () const;
@@ -89,7 +89,7 @@ PLF::Implementation::operator () (const double pos) const
 
       if (x[guess] < pos)
 	min = guess;
-      else if (x[guess] == pos)
+      else if (iszero (pos - x[guess]))
 	// We need this case to avoid numeric clutter.
 	return y[guess];
       else			// x[guess] > pos
@@ -141,9 +141,9 @@ PLF::Implementation::first_interesting () const
 {
   const int size = x.size ();
   for (unsigned int i = 1U; i < size; i++)
-    if (y[i] != y[i-1])
+    if (std::isnormal (y[i] - y[i-1]))
       return x[i-1];
-  throw invalid_argument ("PLF::first_interesting: constant function");
+  throw std::invalid_argument ("PLF::first_interesting: constant function");
 }
 
 // Find the x value where the function start being constant.
@@ -152,9 +152,9 @@ PLF::Implementation::last_interesting () const
 {
   const int size = x.size ();
   for (int i = size-2; i >= 0; i--)
-    if (y[i] != y[i+1])
+    if (std::isnormal (y[i] - y[i+1]))
       return x[i+1];
-  throw invalid_argument ("PLF::last_interesting: constant function");
+  throw std::invalid_argument ("PLF::last_interesting: constant function");
 }
 
 // Find the functions minimum value.
@@ -163,7 +163,7 @@ PLF::Implementation::min () const
 {
   const int size = x.size ();
   if (size < 1)
-    throw invalid_argument ("PLF::min: empty function");
+    throw std::invalid_argument ("PLF::min: empty function");
   double min_y = y[0];
   
   for (unsigned int i = 1; i < size; i++)
@@ -179,7 +179,7 @@ PLF::Implementation::max () const
 {
   const int size = x.size ();
   if (size < 1)
-    throw invalid_argument ("PLF::max: empty function");
+    throw std::invalid_argument ("PLF::max: empty function");
   double max_y = y[0];
   
   for (unsigned int i = 1; i < size; i++)
@@ -195,7 +195,7 @@ PLF::Implementation::max_at () const
 {
   const int size = x.size ();
   if (size < 1)
-    throw invalid_argument ("PLF::max_at: empty function");
+    throw std::invalid_argument ("PLF::max_at: empty function");
   double max_x = x[0];
   double max_y = y[0];
   
@@ -272,7 +272,7 @@ PLF::Implementation::integrate_stupidly () const
       else
 	{
 	  // The PLF is discontinues at this point.
-	  daisy_assert (x[i] == last_x);
+	  daisy_assert (iszero (x[i] - last_x));
 	}
       last_x = x[i];
       last_y = y[i];
@@ -346,7 +346,7 @@ PLF::offset (double offset)	// Add 'offset' to all y values.
 }
 
 double 
-PLF::find (const vector<double>& x, const vector<double>& y, double value)
+PLF::find (const std::vector<double>& x, const std::vector<double>& y, double value)
 {
   daisy_assert (x.size () == y.size ());
 
@@ -407,13 +407,13 @@ PLF::operator += (const PLF& plf)
 
   // I want a vector with all the x points.
   // First I create two lists containing the x points from each plf.
-  list<double> combined (impl.x.begin (), impl.x.end ());
-  list<double> other (plf.impl.x.begin (), plf.impl.x.end ());
+  std::list<double> combined (impl.x.begin (), impl.x.end ());
+  std::list<double> other (plf.impl.x.begin (), plf.impl.x.end ());
   // Then I merge them and remove duplicates.
   combined.merge (other);
   combined.unique ();
   // Finally, I convert it to a vector.
-  vector<double> points (combined.begin (), combined.end ());
+  std::vector<double> points (combined.begin (), combined.end ());
 
   // I then add the points to a temporary PLF.
   PLF result;

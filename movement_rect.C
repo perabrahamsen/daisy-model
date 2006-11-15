@@ -274,7 +274,7 @@ MovementRect::flow (const GeometryRect& geo,
           in -= J[e] * geo.edge_area (e);
         }
       else
-        daisy_assert (!std::isnormal (J[e]));
+        daisy_assert (iszero (J[e]));
     }
 
   // Cell fluxes.
@@ -446,20 +446,24 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       for (size_t col = 0; col < cell_columns; col++)
         cells.push_back (geo->cell_index (row, col));
 
-      edges.push_back (-1);
-      for (size_t col = 1; col < cell_columns; col++)
+      int from = Geometry::cell_left;
+      for (size_t col = 0; col <= cell_columns; col++)
         {
-          const int edge = geo->edge_index (cells[col-1], cells[col]);
+          const int to = (col == cell_columns 
+                          ? Geometry::cell_right
+                          : static_cast<int> (cells[col]));
+          const int edge = geo->edge_index (from, to);
           daisy_assert (edge >= 0);
           daisy_assert (edge < geo->edge_size ());
-          daisy_assert (geo->edge_from (edge) == cells[col-1]);
-          daisy_assert (geo->edge_to (edge) == cells[col]);
-          daisy_assert (approximate (geo->z (cells[col-1]),
-                                     geo->z (cells[col])));
+          daisy_assert (geo->edge_from (edge) == from);
+          daisy_assert (geo->edge_to (edge) == to);
+          daisy_assert (col == 0 
+                        || col == cell_columns
+                        || approximate (geo->z (cells[col-1]),
+                                        geo->z (cells[col])));
           edges.push_back (edge);
+          from = to;
         }
-      edges.push_back (-1);
-      daisy_assert (cells.size () + 1 == edges.size ());
 
       SMM1D smm (*geo, soil, soil_water, soil_heat, cells, edges);
 

@@ -123,7 +123,7 @@ MacroStandard::tick (const Geometry1D& geo,
 	{
 	  q_top = surface_q + pond_max / 10.0 / dt;
 	  daisy_assert (q_top < 0.0);
-	  daisy_assert (q_p[0] == 0.0);
+	  daisy_assert (iszero (q_p[0]));
 	  daisy_assert (from == 0);
 	  q_p[0] = q_top;
 	  surface.accept_top (q_p[0], geo, 0U, msg);
@@ -256,7 +256,7 @@ MacroStandard::tick (const Geometry1D& geo,
     S_m[i] += S_p[i];
 
   // Check that we got all the extra water stored somewhere.
-  if (extra_water != 0.0)
+  if (std::isnormal (extra_water))
     surface.accept_top (extra_water, geo, 0U, msg);
 
   // Check that the sink terms add up.
@@ -287,7 +287,7 @@ MacroStandard::check_alist (const AttributeList& al, Treelog& err)
   if (al.check ("height_start"))
     {
       height_start = al.number ("height_start");
-      if (distribution (height_start) != 0.0)
+      if (std::isnormal (distribution (height_start)))
 	{
 	  err.error ("distribution (height_start) should be 0.0");
 	  ok = false;
@@ -300,7 +300,7 @@ MacroStandard::check_alist (const AttributeList& al, Treelog& err)
   if (al.check ("height_end"))
     {
       height_end = al.number ("height_end");
-      if (distribution (height_end) != 1.0)
+      if (std::isnormal (distribution (height_end)))
 	{
 	  err.error ("distribution (height_end) should be 1.0");
 	  ok = false;

@@ -24,6 +24,7 @@
 #define VOLUME_H
 
 #include "librarian.h"
+#include "bound.h" // Needed for static initialization order.
 
 class Border;
 class Treelog;

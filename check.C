@@ -52,7 +52,7 @@ struct NonZero : public Check
 {
   void check (const double value) const throw (std::string)
   {
-    if (!std::isnormal (value))
+    if (iszero (value))
       throw std::string ("Zero value not permitted");
   }
 };
