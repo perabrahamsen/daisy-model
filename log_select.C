@@ -23,6 +23,7 @@
 #include "log_select.h"
 #include "field.h"
 #include "format.h"
+#include "volume.h"
 #include "memutils.h"
 #include <sstream>
 
@@ -173,11 +174,9 @@ bool
 LogSelect::check (const Border& border, Treelog& err) const
 {
   bool ok = true;
-  bool border_ok = true;
-  if (from < 0 && !border.check_border (from, err))
-    border_ok = false;
-  if (to < 0 && !border.check_border (to, err))
-    border_ok = false;
+
+  if (!volume->check_border (border, err))
+    /* ok = false */;
 
   for (unsigned int i = 0; i < entries.size (); i++)
     {
@@ -186,8 +185,8 @@ LogSelect::check (const Border& border, Treelog& err) const
       Treelog::Open nest (err, tmp.str ());
       if (!entries[i]->check (err))
         ok = false;
-      if (!entries[i]->check_border (border, from, to, err))
-        /* border_ok = false */;
+      if (!entries[i]->check_border (border, *volume, err))
+        /* ok = false */;
     }
   return ok; 
 }
@@ -197,15 +196,14 @@ LogSelect::LogSelect (Block& al)
     description (al.name ("description")),
     condition (Librarian<Condition>::build_item (al, "when")),
     entries (Librarian<Select>::build_vector (al, "entries")),
-    from (al.number ("from")),
-    to (al.number ("to"))
+    volume (Volume::build_obsolete (al))
 {
   if (!al.ok ())
     return;
 
   // Initialize entries.
   for (unsigned int i = 0; i < entries.size (); i++)
-    if (!entries[i]->initialize (from, to, condition->timestep (),
+    if (!entries[i]->initialize (*volume, condition->timestep (),
                                  al.msg ()))
       al.set_error ();
 }
@@ -309,10 +307,16 @@ Each selected variable is represented by a column in the log.");
 Iff true, add columns for year, month, mday and hour in the begining of\n\
 the lines.  By default, this will be true of you have not specified any\n\
 time entries yourself.");
-  syntax.add ("from", "cm", Syntax::Const,
-	      "Default 'from' value for all entries.");
-  alist.add ("from", 0.0);
-  syntax.add ("to", "cm", Syntax::Const,
-	      "Default 'to' value for all entries.");
-  alist.add ("to", 1.0);
+  syntax.add ("volume", Librarian<Volume>::library (), 
+              Syntax::Const, Syntax::Singleton,
+              "Soil volume to log.");
+  alist.add ("volume", Volume::infinite_box ());
+  syntax.add ("from", "cm", Syntax::OptionalConst,
+	      "Default 'from' value for all entries.\n\
+By default, use the top of the soil.\n\
+OBSOLETE: Use (volume box (top FROM)) instead.");
+  syntax.add ("to", "cm", Syntax::OptionalConst,
+	      "Default 'to' value for all entries.\n\
+By default, use the bottom of the soil.\n\
+OBSOLETE: Use (volume box (bottom TO)) instead.");
 }

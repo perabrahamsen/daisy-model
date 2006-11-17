@@ -22,8 +22,9 @@
 #include "bound.h"
 #include "border.h"
 #include "mathlib.h"
+#include <sstream>
 
-class VolumeBox : public Volume
+struct VolumeBox : public Volume
 {
   std::auto_ptr<Bound> bottom;
   std::auto_ptr<Bound> top;
@@ -32,48 +33,167 @@ class VolumeBox : public Volume
   std::auto_ptr<Bound> front;
   std::auto_ptr<Bound> back;
 
-  // Use.
-public:
-  bool has_bottom () const
-  { return bottom->type () != Bound::none; }
-  void limit_bottom (const double limit)
+  struct bounds_t
   { 
-    daisy_assert (!has_bottom ());
-    bottom->set_finite (limit);
-  }
-  bool has_top () const
-  { return top->type () != Bound::none; }
-  void limit_top (const double limit)
-  { 
-    daisy_assert (!has_top ());
-    top->set_finite (limit);
-  }
-  static bool bound_check (const Border& border, 
-                           const Bound& bound,
-                           const double default_value,
-                           Treelog& msg)
-  {
-    if (bound.type () != Bound::finite)
-      // Nothing to test.
-      return true;
-    const double value = bound.value ();
-    if (approximate (value, default_value))
-      // Already tested.
-      return true;
+    std::auto_ptr<Bound> VolumeBox::* bound;
+    bool (Border::*check_border) (double, Treelog&) const;
+  };
+  static const bounds_t bounds[];
+  static const size_t bounds_size;
 
-    return border.check_border (value, msg);
+  std::string one_line_description () const 
+  {
+    std::ostringstream tmp;
+    tmp << "box ";
+
+    bool all_none = true;
+    bool all_full = true;
+    bool has_finite = false;
+
+    for (size_t i = 0; i < bounds_size; i++)
+      {
+        Bound& bound = *(this->*(bounds[i].bound));
+        switch (bound.type ())
+          {
+          case Bound::none:
+            all_full = false;
+            break;
+          case Bound::full:
+            all_none = false;
+            break;
+          case Bound::finite:
+            all_none = false;
+            all_full = false;
+            has_finite = true;
+            break;
+          }
+      }
+    if (all_full)
+      tmp << "full";
+    else if (all_none)
+      tmp << "none";
+    else if (!has_finite)
+      tmp << "mixed";
+    else
+      {
+        tmp << "[" << bottom->describe () << "; " << top->describe () << "]";
+        const bool has_x = (left->type () == Bound::finite 
+                            || right->type () == Bound::finite);
+        const bool has_y = (front->type () == Bound::finite 
+                            || back->type () == Bound::finite);
+        if (has_x || has_y)
+          tmp << ", [" << left->describe ()
+              << "; " << right->describe () << "]";
+        if (has_y)
+          tmp << ", [" << front->describe () 
+              << "; " << back->describe () << "]";
+      }
+    return tmp.str ();
+  }
+
+  // Use.
+  double height (double low, double high) const
+  {
+    if (bottom->type () == Bound::finite)
+      low = bottom->value ();
+    if (top->type () == Bound::finite)
+      high = top->value ();
+    daisy_assert (high > low);
+    return high - low;
+  }
+  double width (double low, double high) const
+  {
+    if (left->type () == Bound::finite)
+      low = left->value ();
+    if (right->type () == Bound::finite)
+      high = right->value ();
+    daisy_assert (high > low);
+    return high - low;
+  }
+  double depth (double low, double high) const
+  {
+    if (front->type () == Bound::finite)
+      low = front->value ();
+    if (back->type () == Bound::finite)
+      high = back->value ();
+    daisy_assert (high > low);
+    return high - low;
+  }
+
+  void limit_top (const double limit)
+  { top->set_finite (limit); }
+  void limit_bottom (const double limit)
+  { bottom->set_finite (limit); }
+  bool limit (const Volume& other, Treelog& msg)
+  { 
+    if (const VolumeBox* limit = dynamic_cast<const VolumeBox*> (&other))
+      {
+        for (size_t i = 0; i < bounds_size; i++)
+          {
+            Bound& bound = *(this->*(bounds[i].bound));
+            if (bound.type () == Bound::none)
+              {
+                const Bound& lim = *(limit->*(bounds[i].bound));
+                switch (lim.type ())
+                  {
+                  case Bound::none:
+                    /* do nothing */;
+                  break;
+                  case Bound::full:
+                    bound.set_full ();
+                    break;
+                  case Bound::finite:
+                    bound.set_finite (lim.value ());
+                    break;
+                  }
+              }
+          }
+        return true;
+      }
+    msg.error ("Don't know how to limit a '" + name 
+               + "' to a '" + other.name + "'");
+    return false;
   }
   bool check_border (const Border& border, 
-                     const double default_upper,
-                     const double default_lower,
                      Treelog& msg) const
   { 
     bool ok = true;
-    if (!bound_check (border, *top, default_upper, msg))
-      ok = false;
-    if (!bound_check (border, *bottom, default_lower, msg))
-      ok = false;
-    return ok; 
+
+    for (size_t i = 0; i < bounds_size; i++)
+      {
+        const Bound& bound = *(this->*(bounds[i].bound));
+        if (!bound.type () != Bound::finite)
+          continue;
+        if (!((border.*(bounds[i].check_border)) (bound.value (), msg)))
+          ok = false;
+      }
+    return ok;
+  }
+  bool check_border (const Border& border, 
+                     const Volume& default_volume,
+                     Treelog& msg) const
+  { 
+    if (const VolumeBox* box_volume
+        = dynamic_cast<const VolumeBox*> (&default_volume))
+      {
+        bool ok = true;
+
+        for (size_t i = 0; i < bounds_size; i++)
+          {
+            const Bound& bound = *(this->*(bounds[i].bound));
+            if (bound.type () != Bound::finite)
+              continue;
+            const Bound& other = *(box_volume->*(bounds[i].bound));
+            if (other.type () != Bound::finite)
+              continue;
+            if (approximate (bound.value (), other.value ()))
+              continue;
+            if (!((border.*(bounds[i].check_border)) (bound.value (), msg)))
+              ok = false;
+          }
+        return ok;
+      }
+    return check_border (border, msg);
   }
 
   static double bound_default (const Bound& bound, const double value)
@@ -81,9 +201,13 @@ public:
 
   static double fraction_interval (const double min, const double max,
                                    const Bound& from, const Bound& to)
-  { return fraction_within (min, max, 
-                            bound_default (from, min - 1.0),
-                            bound_default (to, max + 1.0)); }
+  { 
+    const double begin = bound_default (from, min - 1.0);
+    const double end = bound_default (to, max + 1.0);
+    if (begin >= end)
+      return 0.0;
+    return fraction_within (min, max, begin, end); 
+  }
                             
   double box_fraction (const double zm, const double zp, 
                        const double xm, const double xp,
@@ -91,6 +215,26 @@ public:
   { return fraction_interval (zm, zp, *bottom, *top)
       * fraction_interval (xm, xp, *left, *right)
       * fraction_interval (ym, yp, *front, *back); }
+  static bool in_interval (const double point,
+                           const Bound& from, const Bound& to)
+  {
+    if (from.type () == Bound::finite
+        && point <= from.value ())
+      // Point before interval.
+      return false;
+    if (to.type () == Bound::finite
+        && point > to.value ())
+      // Point after interval.
+      return false;
+
+    // Point in interval.
+    return true;
+  }
+  bool contain_point (double z, double x, double y) const
+  { return in_interval (z, *bottom, *top)
+      && in_interval (x, *left, *right)
+      && in_interval (y, *front, *back);
+  }
 
   // Create and Destroy.
   static void load_syntax (Syntax& syntax, AttributeList& alist);
@@ -106,6 +250,20 @@ public:
   ~VolumeBox ()
   { }
 };
+
+const VolumeBox::bounds_t 
+VolumeBox::bounds[] = {
+  { &VolumeBox::top, &Border::check_z_border },
+  { &VolumeBox::bottom, &Border::check_z_border },
+  { &VolumeBox::left, &Border::check_x_border },
+  { &VolumeBox::right, &Border::check_x_border },
+  { &VolumeBox::front, &Border::check_y_border },
+  { &VolumeBox::back, &Border::check_y_border },
+};
+
+const size_t 
+VolumeBox::bounds_size = sizeof (VolumeBox::bounds) 
+  / sizeof (VolumeBox::bounds_t);
 
 void 
 VolumeBox::load_syntax (Syntax& syntax, AttributeList& alist)

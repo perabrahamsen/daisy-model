@@ -22,7 +22,6 @@
 
 
 #include "select_value.h"
-#include "select_utils.h"
 #include "geometry.h"
 #include "soil.h"
 #include "units.h"
@@ -31,171 +30,221 @@ struct SelectInterval : public SelectValue
 {
   // Content.
   const bool density;
-  SelectUtil::Interval interval;
+  std::auto_ptr<Volume> volume;
   const Geometry* last_geo;
   const Soil* last_soil;
   std::vector<int> cells;
   std::vector<double> weight;
 
   // Bulk density convertions.
-  struct BD_convert : public Units::Convert
-  {
-    const Units::Convert& in;
-    const Units::Convert& out;
-    double bulk;
+  struct BD_convert;
 
-    // Use.
-    double operator()(double value) const
-    { 
-      daisy_assert (bulk > 0.0);
-      return out (in (value) / bulk); 
-    }
-    bool valid (double value) const
-    {
-      daisy_assert (bulk > 0.0);
-      return in.valid (value) && out.valid (in (value) / bulk);
-    }
-    void set_bulk (const Geometry& geo,
-                   const Soil& soil, const double from, double to)
-    {
-      if (to > 0.0)
-	to = geo.bottom ();
-      bulk = 0.0;
-
-      const size_t cell_size = geo.cell_size ();
-      for (size_t i = 0; i < cell_size; i++)
-	{
-          const double f = geo.fraction_in_z_interval (i, from, to);
-          if (f > 1e-10)
-            bulk += soil.dry_bulk_density (i) * geo.volume (i) * f;
-	}
-    }
-    // Create and destroy.
-    BD_convert (const symbol has, const symbol want)
-      : in (Units::get_convertion (has, symbol ("g/cm^2"))),
-	out (Units::get_convertion (Syntax::fraction (), want)),
-	bulk (-42.42e42)
-    { }
-  } *bd_convert;
-  const Units::Convert* special_convert (const symbol has, const symbol want)
-  {
-    daisy_assert (!bd_convert);
-    if (Units::can_convert (has, symbol ("g/cm^2"))
-	&& Units::can_convert (Syntax::fraction (), want))
-      bd_convert = new BD_convert (has, want);
-    return bd_convert;
-  }
+  std::auto_ptr<BD_convert> bd_convert;
+  const Units::Convert* special_convert (const symbol has, const symbol want);
 
   // Output routines.
-
   void output_array (const std::vector<double>& array, 
 		     const Geometry* geo,
-                     const Soil* soil, Treelog&)
-  { 
-    if (soil != last_soil)
-      {
-        last_soil = soil;
-
-        if (bd_convert)
-          bd_convert->set_bulk (*geo, *soil,
-                                interval.from, interval.to);
-      }
-
-    if (geo != last_geo)
-      {
-        if (interval.to > 0.0)
-          interval.to = geo->bottom ();
-        last_geo = geo;
-        const size_t cell_size = geo->cell_size ();
-        cells.clear ();
-        weight.clear ();
-        double total_volume = 0.0;
-        for (size_t n = 0; n < cell_size; n++)
-          {
-            const double f 
-              = geo->fraction_in_z_interval (n, interval.from, interval.to);
-            if (f > 1e-10)
-              {
-                cells.push_back (n);
-                const double volume = geo->volume (n) * f;
-                weight.push_back (volume);
-                total_volume += volume;
-              }
-          }
-        daisy_assert (std::isnormal (total_volume) || weight.size () == 0);
-        if (!density)
-          total_volume /= (interval.from - interval.to);
-        for (size_t i = 0; i < weight.size (); i++)
-          weight[i] /= total_volume;
-        daisy_assert (cells.size () == weight.size ());
-      }
-    daisy_assert (cells.size () <= array.size ());
-
-    double sum = 0.0;
-    for (size_t i = 0; i < cells.size (); i++)
-      sum += array[cells[i]] * weight[i];
-
-    add_result (sum);
-  }
+                     const Soil* soil, Treelog&);
 
   // Print result at end of time step.
-  void done ()
-  {
-    if (count == 0)
-      dest.missing ();
-    else 
-      {
-        double result = value;
-        switch (handle)
-          {
-          case Handle::average:
-            result /= (count + 0.0);
-            break;
-          case Handle::geometric:
-            result /= (count + 0.0);
-            result = exp (result);
-            break;
-          case Handle::min:
-          case Handle::max:
-          case Handle::sum:
-          case Handle::current:
-            break;
-          }            
-        dest.add (convert (result));
-      }
-    if (!accumulate)
-      count = 0;
-  }
+  void done (); 
 
   // Create and Destroy.
-  symbol default_dimension (const symbol spec_dim) const
-  { 
-    if (density)
-      return spec_dim;
-    
-    return Units::multiply (spec_dim, Units::cm);
-  }
-
-  bool initialize (double default_from, double default_to, 
-		   const std::string& timestep, Treelog& msg)
-  {
-    interval.initialize (default_from, default_to);
-
-    return Select::initialize (default_from, default_to, timestep, msg);
-  }
-  bool check_border (const Border& border, 
-                     const double default_from, const double default_to,
-                     Treelog& msg) const
-  { return interval.check_border (border, default_from, default_to, msg); }
-  SelectInterval (Block& al)
-    : SelectValue (al),
-      density (al.flag ("density")),
-      interval (al),
-      bd_convert (NULL)
-  { }
-  ~SelectInterval ()
-  { delete bd_convert; }
+  symbol default_dimension (const symbol spec_dim) const;
+  bool initialize (const Volume& default_volume,
+                   const std::string& timestep, Treelog& msg);
+  bool check_border (const Border& border, const Volume& default_volume,
+                     Treelog& msg) const;
+  SelectInterval (Block& al);
+  ~SelectInterval ();
 };
+
+struct SelectInterval::BD_convert : public Units::Convert
+{
+  const Units::Convert& in;
+  const Units::Convert& out;
+  double bulk;
+  static const symbol bulk_unit;
+
+  // Use.
+  double operator()(double value) const;
+  bool valid (double value) const;
+  void set_bulk (const Geometry& geo,
+                 const Soil& soil, const Volume& volume);
+
+  // Create and destroy.
+  BD_convert (const symbol has, const symbol want);
+};
+
+const symbol 
+SelectInterval::BD_convert::bulk_unit ("g/cm^2");
+
+double
+SelectInterval::BD_convert::operator()(double value) const
+{ 
+  daisy_assert (bulk > 0.0);
+  return out (in (value) / bulk); 
+}
+
+bool 
+SelectInterval::BD_convert::valid (double value) const
+{
+  daisy_assert (bulk > 0.0);
+  return in.valid (value) && out.valid (in (value) / bulk);
+}
+
+void 
+SelectInterval::BD_convert::set_bulk (const Geometry& geo,
+                                      const Soil& soil, const Volume& volume)
+{
+  const size_t cell_size = geo.cell_size ();
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      const double f = geo.fraction_in_volume (i, volume);
+      if (f > 1e-10)
+        bulk += soil.dry_bulk_density (i) * geo.volume (i) * f;
+    }
+  bulk /= volume.width (geo.left (), geo.right ()); 
+  bulk /= volume.depth (geo.front (), geo.back ()); 
+}
+
+SelectInterval::BD_convert::BD_convert (const symbol has, const symbol want)
+  : in (Units::get_convertion (has, bulk_unit)),
+    out (Units::get_convertion (Syntax::fraction (), want)),
+    bulk (-42.42e42)
+{ }
+
+const Units::Convert* 
+SelectInterval::special_convert (const symbol has, const symbol want)
+{
+  daisy_assert (!bd_convert.get ());
+  if (Units::can_convert (has, BD_convert::bulk_unit)
+      && Units::can_convert (Syntax::fraction (), want))
+    bd_convert.reset (new BD_convert (has, want));
+  return bd_convert.get ();
+}
+
+// Output routines.
+
+void 
+SelectInterval::output_array (const std::vector<double>& array, 
+                              const Geometry* geo,
+                              const Soil* soil, Treelog&)
+{ 
+  if (soil != last_soil)
+    {
+      last_soil = soil;
+
+      if (bd_convert.get ())
+        bd_convert->set_bulk (*geo, *soil, *volume);
+    }
+
+  if (geo != last_geo)
+    {
+      last_geo = geo;
+      const size_t cell_size = geo->cell_size ();
+      cells.clear ();
+      weight.clear ();
+      double total_volume = 0.0;
+      for (size_t n = 0; n < cell_size; n++)
+        {
+          const double f 
+            = geo->fraction_in_volume (n, *volume);
+          if (f > 1e-10)
+            {
+              cells.push_back (n);
+              const double cell_vol = geo->volume (n) * f;
+              weight.push_back (cell_vol);
+              total_volume += cell_vol;
+            }
+        }
+      daisy_assert (std::isnormal (total_volume) || weight.size () == 0);
+      if (!density)
+        total_volume /= volume->height (geo->bottom (), geo->top ());
+      for (size_t i = 0; i < weight.size (); i++)
+        weight[i] /= total_volume;
+      daisy_assert (cells.size () == weight.size ());
+    }
+  daisy_assert (cells.size () <= array.size ());
+
+  double sum = 0.0;
+  for (size_t i = 0; i < cells.size (); i++)
+    sum += array[cells[i]] * weight[i];
+
+  add_result (sum);
+}
+
+void 
+SelectInterval::done ()
+{
+  if (count == 0)
+    dest.missing ();
+  else 
+    {
+      double result = value;
+      switch (handle)
+        {
+        case Handle::average:
+          result /= (count + 0.0);
+          break;
+        case Handle::geometric:
+          result /= (count + 0.0);
+          result = exp (result);
+          break;
+        case Handle::min:
+        case Handle::max:
+        case Handle::sum:
+        case Handle::current:
+          break;
+        }            
+      dest.add (convert (result));
+    }
+  if (!accumulate)
+    count = 0;
+}
+
+symbol 
+SelectInterval::default_dimension (const symbol spec_dim) const
+{ 
+  if (density)
+    return spec_dim;
+    
+  return Units::multiply (spec_dim, Units::cm);
+}
+
+bool 
+SelectInterval::initialize (const Volume& default_volume,
+                            const std::string& timestep, Treelog& msg)
+{
+  bool ok = true;
+
+  if (!Select::initialize (default_volume, timestep, msg))
+    ok = false;
+
+  if (!volume->limit (default_volume, msg))
+    ok = false;
+
+  return ok;
+}
+
+bool 
+SelectInterval::check_border (const Border& border, 
+                              const Volume& default_volume,
+                              Treelog& msg) const
+{ return volume->check_border (border, default_volume, msg); }
+  
+SelectInterval::SelectInterval (Block& al)
+  : SelectValue (al),
+    density (al.flag ("density")),
+    volume (Volume::build_obsolete (al)),
+    last_geo (NULL),
+    last_soil (NULL),
+    bd_convert (NULL)
+{ }
+  
+SelectInterval::~SelectInterval ()
+{ }
 
 static struct SelectIntervalSyntax
 {
@@ -212,7 +261,18 @@ static struct SelectIntervalSyntax
     syntax.add ("density", Syntax::Boolean, Syntax::Const, 
 		"If true, divide value with interval height.");
     alist.add ("density", false);
-    SelectUtil::Interval::load_syntax (syntax, alist);
+    syntax.add ("volume", Librarian<Volume>::library (), 
+                Syntax::Const, Syntax::Singleton,
+                "Soil volume to log.");
+    alist.add ("volume", Volume::infinite_box ());
+    syntax.add ("from", "cm", Syntax::OptionalConst,
+		"Specify height (negative) to measure from.\n\
+By default, measure from the top.\n\
+OBSOLETE: Use (volume box (top FROM)) instead.");
+    syntax.add ("to", "cm", Syntax::OptionalConst,
+		"Specify height (negative) to measure interval.\n\
+By default, measure to the bottom.\n\
+OBSOLETE: Use (volume box (bottom TO)) instead.");
 
     Librarian<Select>::add_type ("interval", alist, syntax, &make);
   }

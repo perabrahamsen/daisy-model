@@ -103,7 +103,9 @@ public:
 		      const Time& from, const Time& to, 
 		      Treelog& err) const = 0;
   virtual bool check_am (const AttributeList& am, Treelog& err) const = 0;
-  virtual bool check_border (const double border, Treelog& err) const = 0;
+  virtual bool check_z_border (double, Treelog& err) const = 0;
+  virtual bool check_x_border (double, Treelog& err) const = 0;
+  virtual bool check_y_border (double, Treelog& err) const = 0;
   virtual void output (Log&) const;
 
   // Create and Destroy.

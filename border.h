@@ -25,6 +25,10 @@
 class Treelog;
 
 struct Border
-{ virtual bool check_border (double, Treelog&) const = 0; };
+{ 
+  virtual bool check_z_border (double, Treelog&) const = 0; 
+  virtual bool check_x_border (double, Treelog&) const = 0; 
+  virtual bool check_y_border (double, Treelog&) const = 0; 
+};
 
 #endif // BORDER_H

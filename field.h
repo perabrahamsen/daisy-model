@@ -120,7 +120,10 @@ public:
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
-  bool check_border (const double border, Treelog& err) const;
+  bool check_z_border (double, Treelog& err) const;
+  bool check_x_border (double, Treelog& err) const;
+  bool check_y_border (double, Treelog& err) const;
+
   void initialize (const Time&, Treelog& err, const Weather*);
   Field (Block&, const std::string& key);
   virtual ~Field ();

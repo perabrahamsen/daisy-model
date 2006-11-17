@@ -41,7 +41,7 @@ struct SelectFluxBottom : public SelectFlux
     return ok;
   }
   bool check_border (const Border& border, 
-                     const double, const double default_to,
+                     const Volume& default_volume,
                      Treelog& msg) const
   { 
     bool ok = true;

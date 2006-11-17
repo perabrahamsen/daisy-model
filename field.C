@@ -101,7 +101,9 @@ public:
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
-  bool check_border (const double border, Treelog& err) const;
+  bool check_z_border (double, Treelog& err) const;
+  bool check_x_border (double, Treelog& err) const;
+  bool check_y_border (double, Treelog& err) const;
   void initialize (const Time&, Treelog& err, const Weather*);
   Implementation (Block& parent, const std::string& key);
   ~Implementation ();
@@ -643,13 +645,37 @@ Field::Implementation::check_am (const AttributeList& am, Treelog& err) const
 }
 
 bool
-Field::Implementation::check_border (const double border, Treelog& err) const
+Field::Implementation::check_z_border (const double value, Treelog& err) const
 { 
   bool ok = true;
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    if (!(*i)->check_border (border, err))
+    if (!(*i)->check_z_border (value, err))
+      ok = false;
+  return ok;
+}
+
+bool
+Field::Implementation::check_x_border (const double value, Treelog& err) const
+{ 
+  bool ok = true;
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    if (!(*i)->check_x_border (value, err))
+      ok = false;
+  return ok;
+}
+
+bool
+Field::Implementation::check_y_border (const double value, Treelog& err) const
+{ 
+  bool ok = true;
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    if (!(*i)->check_y_border (value, err))
       ok = false;
   return ok;
 }
@@ -855,8 +881,16 @@ Field::check_am (const AttributeList& am, Treelog& err) const
 { return impl.check_am (am, err); }
 
 bool
-Field::check_border (const double border, Treelog& err) const
-{ return impl.check_border (border, err); }
+Field::check_z_border (const double value, Treelog& err) const
+{ return impl.check_z_border (value, err); }
+
+bool
+Field::check_x_border (const double value, Treelog& err) const
+{ return impl.check_x_border (value, err); }
+
+bool
+Field::check_y_border (const double value, Treelog& err) const
+{ return impl.check_y_border (value, err); }
 
 void 
 Field::initialize (const Time& time, Treelog& err, const Weather* weather)

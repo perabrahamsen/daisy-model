@@ -92,7 +92,10 @@ public:
 
   // Creation.
   bool check (int som_size, Geometry& geo, Treelog&) const;
-  bool check_border (const double border, Treelog& err) const;
+  bool check_z_border (double, Treelog& err) const;
+  bool check_x_border (double, Treelog& err) const;
+  bool check_y_border (double, Treelog& err) const;
+
   static void load_syntax (Syntax&, AttributeList&);
 private:
   Soil (const Soil&);

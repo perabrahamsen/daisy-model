@@ -35,23 +35,30 @@ class Volume
 public:
   const symbol name;
   static const char *const description;
+  virtual std::string one_line_description () const = 0;
 
   // Use.
-public:
-  virtual bool has_top () const = 0;
-  virtual bool has_bottom () const = 0;
+private:
   virtual void limit_top (double) = 0;
   virtual void limit_bottom (double) = 0;
+public:
+  virtual double height (const double low, const double high) const = 0;
+  virtual double width (const double low, const double high) const = 0;
+  virtual double depth (const double low, const double high) const = 0;
+  virtual bool limit (const Volume&, Treelog& msg) = 0;
   virtual bool check_border (const Border& border, 
-                             const double default_upper,
-                             const double default_lower,
+                             Treelog& msg) const = 0;
+  virtual bool check_border (const Border& border, 
+                             const Volume& default_volume,
                              Treelog& msg) const = 0;
   virtual double box_fraction (double zm, double zp, 
                                double xm = 0.0, double xp = 1.0,
                                double ym = 0.0, double yp = 1.0) const = 0;
+  virtual bool contain_point (double z, double x, double y) const = 0;
 
   // Create and Destroy.
 public:
+  static Volume* build_obsolete (Block&);
   static const AttributeList& infinite_box ();
   Volume (Block&);
   virtual ~Volume ();

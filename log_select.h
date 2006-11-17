@@ -34,6 +34,7 @@
 struct Select;
 struct Condition;
 struct Format;
+struct Volume;
 
 struct LogSelect : public Log
 {
@@ -41,8 +42,7 @@ struct LogSelect : public Log
   const std::string description;	// Description of log file.
   std::auto_ptr<Condition> condition;	// Should we print a log now?
   std::vector<Select*> entries;
-  const double from;
-  const double to;
+  std::auto_ptr<const Volume> volume;
 
   // State. 
   bool is_printing;		// True iff this time step should be logged.

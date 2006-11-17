@@ -1,11 +1,13 @@
+2006-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log, select: Rewrote so they use a 'Volume' object to limit
+	logging rather than a top and a bottom height.
+
+
 2006-11-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* bioincorporation.C (add): Use 'Geometry::add_surface'.
 	* organic_std.C (Initialization): Ditto.
-
-2006-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
-
-	* select_flow.C: New model.
 
 2006-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 

@@ -34,9 +34,11 @@ namespace SelectUtil
 
     // Create and Destroy.
     void initialize (double default_from, double default_to);
+#if 0
     bool check_border (const Border& border, 
                        const double default_from, const double default_to,
                        Treelog& msg) const;
+#endif
     static void load_syntax (Syntax&, AttributeList&);
     Interval (Block& al);
     ~Interval ();

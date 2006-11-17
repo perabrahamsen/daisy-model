@@ -28,6 +28,7 @@
 
 class AttributeList;
 class Daisy;
+class Volume;
 
 class DLF
 {
@@ -44,7 +45,7 @@ public:
   void start (std::ostream& out, const symbol name,
               const std::string& file,
               const std::string& parsed_from_file) const;
-  void interval (std::ostream& out, const double from, const double to) const;
+  void interval (std::ostream& out, const Volume&) const;
   void log_description (std::ostream& out, 
                         const std::string& description) const;
   void finish (std::ostream& out, const Daisy& daisy);

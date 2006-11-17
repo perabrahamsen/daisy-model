@@ -101,6 +101,7 @@ public:
   bool edge_cross_z (size_t e, double z) const; // Cross depth?
   virtual bool contain_z (size_t n, double z) const = 0; // True iff cell n
                                                          // includes depth z
+  bool node_center_in_volume (int c, const Volume& volume) const;
   template<class T> // Here we we calculate a volume weighted average
                     // value at a specific depth.
   double content_at (T& obj, double (T::*content) (size_t),
@@ -178,7 +179,9 @@ public:
   // Creation.
 public:
   virtual bool check (Treelog&) const = 0;
-  virtual bool check_border (const double border, Treelog& err) const = 0;
+  virtual bool check_z_border (double, Treelog& err) const = 0;
+  virtual bool check_x_border (double, Treelog& err) const = 0;
+  virtual bool check_y_border (double, Treelog& err) const = 0;
   Geometry (Block&);
   static void initialize_intervals (const std::vector<double>& end, 
                                     std::vector<double>& center,

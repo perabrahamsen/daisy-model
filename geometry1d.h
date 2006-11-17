@@ -75,7 +75,8 @@ public:
   // Creation.
 public:
   bool check (Treelog&) const;
-  bool check_border (const double border, Treelog& err) const;
+  bool check_x_border (const double value, Treelog& err) const;
+  bool check_y_border (const double value, Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);
   Geometry1D (Block&);
   void initialize_zplus (bool volatile_bottom,

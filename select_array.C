@@ -122,11 +122,6 @@ struct SelectArray : public Select
   { return value.size (); }
 
   // Create and Destroy.
-  bool initialize (double default_from, double default_to, 
-		   const std::string& timestep, Treelog& msg)
-  {
-    return Select::initialize (default_from, default_to, timestep, msg);
-  }
   SelectArray (Block& al)
     : Select (al),
       value (al.number_sequence ("value")),

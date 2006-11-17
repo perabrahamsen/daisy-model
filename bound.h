@@ -30,6 +30,7 @@ class Bound
 public:
   const symbol name;
   static const char *const description;
+  std::string describe () const;
 
   // Content.
 public:

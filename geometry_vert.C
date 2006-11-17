@@ -21,6 +21,26 @@
 
 #include "geometry_vert.h"
 #include "block.h"
+#include <sstream>
+
+bool 
+GeometryVert::check_z_border (const double value, Treelog& err) const
+{
+  bool ok = false;
+
+  for (size_t i = 0; i < cell_size (); i++)
+    if (approximate (value, zplus (i)))
+      ok = true;
+
+  if (!ok)
+    {
+      std::ostringstream tmp;
+      tmp << "No geometric border near " << value 
+          << " [cm]on z-axis, log results will be inexact";
+      err.warning (tmp.str ());
+    }
+  return ok;
+}
 
 GeometryVert::GeometryVert (Block& al)
   : Geometry (al)

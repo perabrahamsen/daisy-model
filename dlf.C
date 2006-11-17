@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "dlf.h"
+#include "volume.h"
 #include "alist.h"
 #include "assertion.h"
 #include "version.h"
@@ -59,16 +60,8 @@ DLF::start (std::ostream& out, const symbol name,
 }
 
 void
-DLF::interval (std::ostream& out, const double from, const double to) const
-{
-  if (value == DLF::None)
-    return;
-
-  if (to < from)
-    out << "INTERVAL: [" << from << ";" << to << "]\n";
-  else if (value == Terse)
-    out << "INTERVAL: full\n";
-}
+DLF::interval (std::ostream& out, const Volume& volume) const
+{ out << "INTERVAL: " << volume.one_line_description () << "\n"; }
 
 void
 DLF::log_description (std::ostream& out, const std::string& description) const

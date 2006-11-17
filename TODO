@@ -1,8 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Få OM init til at blive uafhængig af geometri.
+* Check Daisy bog ligninger, inc i = inc x
 
-* Få select flow til at bruge et volume.
+* Løs BGJ init problem
+
+* Få OM init til at blive uafhængig af geometri.
 
 * MMO: Daisy
 

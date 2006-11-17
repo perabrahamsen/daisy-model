@@ -36,7 +36,7 @@ SelectUtil::Interval::initialize (double default_from, double default_to)
     from = 0.0;
 }
 
-  
+#if 0  
 bool
 SelectUtil::Interval::check_border (const Border& border, 
                                   const double default_from, 
@@ -54,6 +54,7 @@ SelectUtil::Interval::check_border (const Border& border,
     ok = false;
   return ok; 
 }
+#endif
 
 void 
 SelectUtil::Interval::load_syntax (Syntax& syntax, AttributeList&)

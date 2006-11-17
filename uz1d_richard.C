@@ -215,7 +215,7 @@ UZ1DRichard::tick (SMM1D& smm, const double gravity, Treelog& msg)
       const double Theta_new = Theta[i];
       const double Theta_old = smm.Theta_old (i);
       const double dx = smm.cell_length (i);
-      q[i + 1] = (((Theta_new - Theta_old) / dt) + S) * dx + q[i];
+      q[i + 1] = q[i] - (((Theta_new - Theta_old) / dt) + S) * dx;
     }
 
   // Make it official.

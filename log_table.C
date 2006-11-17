@@ -357,7 +357,7 @@ LogTable::initialize (Treelog& msg)
 
   print_header.start (out, name, file, parsed_from_file);
 
-  print_header.interval (out, from, to);
+  print_header.interval (out, *volume);
   if (description != default_description)
     print_header.log_description (out, description);
 
@@ -406,8 +406,7 @@ LogTable::summarize (Treelog& msg)
       std::ostringstream tmp;
 
       tmp << "LOGFILE: " << file  << "\n";
-      if (to < from)
-	tmp << "INTERVAL: [" << from << ";" << to << "]\n";
+      tmp << "VOLUME: " << volume->one_line_description () << "\n";
       tmp << "TIME: " 
 	     << begin.year () << "-" << begin.month () << "-" << begin.mday () 
 	     << "h" << begin.hour () << " to "

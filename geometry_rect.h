@@ -91,7 +91,8 @@ private:
   // Creation.
 public:
   bool check (Treelog&) const;
-  bool check_border (const double border, Treelog& err) const;
+  bool check_x_border (const double value, Treelog& err) const;
+  bool check_y_border (const double value, Treelog& err) const;
   void initialize_zplus (const bool, const std::vector<double>&,
                          const double, const double, Treelog&)
   { }

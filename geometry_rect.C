@@ -81,23 +81,29 @@ GeometryRect::check (Treelog&) const
 }
 
 bool 
-GeometryRect::check_border (const double border, Treelog& err) const
+GeometryRect::check_x_border (const double value, Treelog& err) const
 {
   bool ok = false;
 
-  for (size_t i = 0; i < cell_rows_; i++)
-    if (approximate (border, zplus (i)))
+  for (size_t i = 0; i < cell_size (); i++)
+    if (approximate (value, xplus (i)))
       ok = true;
 
   if (!ok)
     {
       std::ostringstream tmp;
-      tmp << "No geometric border near " << border 
-             << " [cm], log results will be inexact";
+      tmp << "No geometric border near " << value 
+          << " [cm]on x-axis, log results will be inexact";
       err.warning (tmp.str ());
     }
-
   return ok;
+}
+
+bool 
+GeometryRect::check_y_border (const double, Treelog& err) const
+{
+  err.warning ("Logging on y-axis on a 2D geometry is meaningless");
+  return false;
 }
 
 void

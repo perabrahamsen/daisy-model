@@ -436,7 +436,6 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
                                    *geo, edge);
     }
 
-#if 1
   // Horizontal movement.
   for (size_t row = 0; row < cell_rows; row++)
     {
@@ -480,7 +479,6 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
           msg.warning (std::string ("UZhor trouble: ") + error);
         }
     }
-#endif
 }
 
 void 

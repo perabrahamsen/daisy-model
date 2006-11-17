@@ -324,23 +324,31 @@ Soil::check (const int som_size, Geometry& geo, Treelog& err) const
 }
 
 bool
-Soil::check_border (const double border, Treelog& err) const
+Soil::check_z_border (const double value, Treelog& err) const
 {
   bool ok = false;
 
   for (size_t i = 0; i < impl.border.size (); i++)
-    if (approximate (border, impl.border[i]))
+    if (approximate (value, impl.border[i]))
       ok = true;
 
   if (!ok)
     {
       std::ostringstream tmp;
-      tmp << "No soil border near " << border 
+      tmp << "No soil border near " << value
           << " [cm], log results may be inexact";
       err.warning (tmp.str ());
     }
   return ok;
 }
+
+bool
+Soil::check_x_border (const double, Treelog&) const
+{ return true; }
+
+bool
+Soil::check_y_border (const double, Treelog&) const
+{ return true; }
 
 static bool
 check_alist (const AttributeList& al, Treelog& err)

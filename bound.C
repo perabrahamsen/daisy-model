@@ -21,6 +21,7 @@
 
 #include "bound.h"
 #include "mathlib.h"
+#include <sstream>
 
 // bound component.
 
@@ -29,6 +30,25 @@ Librarian<Bound>::Content* Librarian<Bound>::content = NULL;
 
 const char *const Bound::description = "\
 Specify one end of an interval boundary.";
+
+std::string
+Bound::describe () const
+{
+  std::ostringstream tmp;
+  switch (type ())
+    {
+    case none:
+      tmp << "none";
+      break;
+    case full:
+      tmp << "full";
+      break;
+    case finite:
+      tmp << value ();
+      break;
+    }
+  return tmp.str ();
+}
 
 double 
 Bound::value () const

@@ -100,23 +100,17 @@ Geometry1D::check (Treelog&) const
 }
 
 bool 
-Geometry1D::check_border (const double border, Treelog& err) const
+Geometry1D::check_x_border (const double, Treelog& err) const
 {
-  bool ok = false;
+  err.warning ("Logging on x-axis on a 1D geometry is meaningless");
+  return false;
+}
 
-  for (size_t i = 0; i < cell_size (); i++)
-    if (approximate (border, zplus (i)))
-      ok = true;
-
-  if (!ok)
-    {
-      std::ostringstream tmp;
-      tmp << "No geometric border near " << border 
-             << " [cm], log results will be inexact";
-      err.warning (tmp.str ());
-    }
-
-  return ok;
+bool 
+Geometry1D::check_y_border (const double, Treelog& err) const
+{
+  err.warning ("Logging on y-axis on a 1D geometry is meaningless");
+  return false;
 }
 
 static bool 

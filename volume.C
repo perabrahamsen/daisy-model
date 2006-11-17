@@ -26,6 +26,26 @@ Librarian<Volume>::Content* Librarian<Volume>::content = NULL;
 const char *const Volume::description = "\
 A subset of 3D space.";
 
+Volume*
+Volume::build_obsolete (Block& al)
+{
+  Volume *const vol = Librarian<Volume>::build_item (al, "volume");
+  daisy_assert (vol);
+  if (al.check ("from"))
+    {
+      const double from = al.number ("from");
+      if (from < 0)
+        vol->limit_top (from);
+    }
+  if (al.check ("to"))
+    {
+      const double to = al.number ("to");
+      if (to < 0)
+        vol->limit_bottom (to);
+    }
+  return vol;
+}
+
 Volume::Volume (Block& al)
   : name (al.identifier ("type"))
 { }
@@ -34,62 +54,3 @@ Volume::~Volume ()
 { }
 
 // volume.C ends here.
-
-#if 0
-struct ext_number
-{
-  // Content.
-  enum type {
-    minus_infinite,
-    finite,
-    plus_infinite } state;
-  double value;
-  
-  // Create and Destroy.
-  ext_number (double v)
-    : state (finite),
-      value (v)
-  { }
-  ext_number (type s)
-    : state (s),
-      value (-42.42e42)
-  { daisy_assert (state != finite); }
-  ext_number (const ext_number& other)
-    : state (other.state),
-      value (other.value)
-  { }
-};
-
-struct ext_interval
-{
-  // Content.
-  ext_number from;
-  ext_number to;
-
-  // Create and Destroy;
-  ext_interval (const ext_number& f, const ext_number& t)
-    : from (f),
-      to (t)
-  { daisy_assert (f < t); }
-  ext_interval (const ext_interval& other)
-    : from (other.from),
-      to (other.to)
-  { }
-};
-
-struct Box
-{
-  // Content.
-  ext_interval x;
-  ext_interval y;
-  ext_interval z;
-
-  // Create and Destroy.
-  Box (const ext_interval& x_, const ext_interval& y _, const ext_interval& z_)
-    : x (x_),
-      y (y_),
-      z (z_)
-  { }
-};
-
-#endif

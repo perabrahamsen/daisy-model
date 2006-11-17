@@ -162,7 +162,9 @@ public:
               const Time& from, const Time& to, 
               Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
-  bool check_border (const double border, Treelog& err) const;
+  bool check_z_border (double, Treelog& err) const;
+  bool check_x_border (double, Treelog& err) const;
+  bool check_y_border (double, Treelog& err) const;
   void output (Log&) const;
 
   // Create and Destroy.
@@ -771,14 +773,40 @@ ColumnStandard::check_am (const AttributeList& am, Treelog& err) const
 }
 
 bool 
-ColumnStandard::check_border (const double border, Treelog& err) const
+ColumnStandard::check_z_border (const double value, Treelog& err) const
 { 
   Treelog::Open nest (err, "column: " + name);
 
   bool ok = true;
-  if (!soil->check_border (border, err))
+  if (!soil->check_z_border (value, err))
     ok = false; 
-  if (!geometry.check_border (border, err))
+  if (!geometry.check_z_border (value, err))
+    ok = false; 
+  return ok;
+}
+
+bool 
+ColumnStandard::check_x_border (const double value, Treelog& err) const
+{ 
+  Treelog::Open nest (err, "column: " + name);
+
+  bool ok = true;
+  if (!soil->check_x_border (value, err))
+    ok = false; 
+  if (!geometry.check_x_border (value, err))
+    ok = false; 
+  return ok;
+}
+
+bool 
+ColumnStandard::check_y_border (const double value, Treelog& err) const
+{ 
+  Treelog::Open nest (err, "column: " + name);
+
+  bool ok = true;
+  if (!soil->check_y_border (value, err))
+    ok = false; 
+  if (!geometry.check_y_border (value, err))
     ok = false; 
   return ok;
 }

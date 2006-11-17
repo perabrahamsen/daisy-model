@@ -29,6 +29,7 @@
 #include "librarian.h"
 #include "symbol.h"
 #include "units.h"
+#include "volume.h"
 #include <vector>
 
 class Geometry;
@@ -37,6 +38,7 @@ class Time;
 class Treelog;
 class Format;
 class Border;
+class Volume;
 
 struct Handle 
 {
@@ -141,12 +143,11 @@ protected:
   virtual const Units::Convert* 
   /**/ special_convert (symbol has, symbol want);
 public:
-  virtual bool initialize (double from, double to,
+  virtual bool initialize (const Volume&,
                            const std::string& timestep, Treelog&);
   void add_dest (Destination* dest);
   virtual bool check (Treelog& err) const;
-  virtual bool check_border (const Border&, 
-                             double from, double to,
+  virtual bool check_border (const Border&, const Volume& volume,
                              Treelog&) const;
 protected:
   Select (Block& al);

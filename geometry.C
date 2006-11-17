@@ -20,6 +20,7 @@
 
 
 #include "geometry.h"
+#include "volume.h"
 #include "alist.h"
 #include "check.h"
 #include "vcheck.h"
@@ -167,6 +168,14 @@ Geometry::edge_cross_z (const size_t e, const double zd) const
   const double z_above = std::max (z_from, z_to);
   const double z_below = std::min (z_from, z_to);
   return z_above >= zd && zd > z_below;
+}
+
+bool 
+Geometry::node_center_in_volume (int c, const Volume& volume) const
+{
+  if (!is_regular_cell (c))
+    return false;
+  return volume.contain_point (z (c), x (c), y (c));
 }
 
 void

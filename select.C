@@ -464,13 +464,18 @@ Select::Implementation::get_expr (Block& al)
   return new NumberX (al);
 }
 
+static const symbol flux_top_symbol ("flux_top");
+
 Select::Implementation::Implementation (Block& al)
   : spec (al.check ("spec")
 	  ? new Spec (al.alist ("spec")) 
 	  : NULL),
     spec_conv (NULL),
     expr (get_expr (al)),
-    negate (al.flag ("negate")),
+    negate (al.flag ("negate")
+            // Kludge to negate the meaning of negate for "flux_top".
+            != Librarian<Select>::library ()
+            /**/ .is_derived_from (al.identifier ("type"), flux_top_symbol)),
     tag (Select::select_get_tag (al.alist ())),
     dimension (al.check ("dimension")
 	       ? al.name ("dimension") : Syntax::Unknown ()),
@@ -729,7 +734,7 @@ Select::add_dest (Destination* d)
 { dest.add_dest (d); }
 
 bool
-Select::initialize (double, double, 
+Select::initialize (const Volume&, 
 		    const std::string& timestep, Treelog& msg)
 { 
   symbol spec_dim;
@@ -805,7 +810,7 @@ Select::check (Treelog& err) const
 
 bool 
 Select::check_border (const Border&, 
-                      const double /*from*/, const double /*to*/,
+                      const Volume&,
                       Treelog&) const
 { return true; }
 
