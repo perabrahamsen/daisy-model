@@ -148,8 +148,13 @@ UZ1DRichard::tick (SMM1D& smm, const double gravity, Treelog& msg)
               a[i] = - ddt_dx * K_dx_minus;
               b[i] = Cw2 + ddt_dx * (K_dx_minus + K_dx_plus);
               c[i] = - ddt_dx * K_dx_plus;
+#if 0
               d[i] = Theta[i] - Cw1 - ddt * S 
                 + gravity * ddt_dx * (K_minus - K_plus);
+#else
+              d[i] = Theta[i] * Cw2 - ddt * S 
+                + gravity * ddt_dx * (K_minus - K_plus);
+#endif
 	    }
 	  tridia (0, cell_size, a, b, c, d, h.begin ());
 
