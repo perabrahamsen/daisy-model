@@ -97,6 +97,7 @@ public:
   double daily_cloudiness () const // [0-1]
     { return daily_cloudiness_; }
   virtual double vapor_pressure () const = 0; // [Pa]
+  virtual double relative_humidity () const = 0; // []
   virtual double wind () const = 0;	// [m/s]
 
   // Initializing bioclimate.
@@ -106,6 +107,7 @@ public:
   virtual bool has_wind () const;
   virtual bool has_min_max_temperature () const;
   virtual bool has_diffuse_radiation () const;
+  virtual bool has_relative_humidity () const;
 
   // Light distribution.
 public:

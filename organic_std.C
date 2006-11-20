@@ -603,9 +603,11 @@ OrganicStandard::Initialization::
   if (input < 0)
     return;
 
+  const size_t cell_size = geo.cell_size ();
+
   // Per Lay
   daisy_assert (per_lay.size () == 0);
-  per_lay.insert (per_lay.end (), soil.size (), 0.0);
+  per_lay.insert (per_lay.end (), cell_size, 0.0);
 
   // Parameters.
   const double root = al.number ("root");
@@ -614,13 +616,13 @@ OrganicStandard::Initialization::
   // Add top.
   daisy_assert (input >= root + bioinc);
   const double top = input - root - bioinc;
-  geo.add (per_lay, 0.0, end, 
-           top * kg_per_ha_per_y_to_g_per_cm2_per_h);
+  geo.add_surface (per_lay, 0.0, end, 
+                   top * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Add roots
   const double depth = soil.MaxRootingHeight ();
   const double k = M_LN2 / al.number ("dist");
-  std::vector<double> density (soil.size (), 0.0);
+  std::vector<double> density (cell_size, 0.0);
   for (size_t i = 0; 
        i < soil.size () && geo.z (i) > depth;
        i++)

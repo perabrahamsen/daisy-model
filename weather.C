@@ -124,6 +124,7 @@ Weather::output (Log& log) const
   output_value (daily_cloudiness (), "daily_cloudiness", log);
   output_value (vapor_pressure (), "vapor_pressure", log);
   output_value (hourly_diffuse_radiation (), "hourly_diffuse_radiation", log);
+  output_value (relative_humidity (), "relative_humidity", log);
   output_value (wind (), "wind", log);
   output_value (day_length (), "day_length", log);
   output_value (day_cycle (), "day_cycle", log);
@@ -144,6 +145,10 @@ Weather::has_vapor_pressure () const
 
 bool 
 Weather::has_diffuse_radiation () const
+{ return false; }
+
+bool 
+Weather::has_relative_humidity () const
 { return false; }
 
 bool 
@@ -343,6 +348,8 @@ This is not a model, but a list of parameters shared by all weather models.");
   syntax.add_fraction ("daily_cloudiness", Syntax::LogOnly,
 	      "Fraction of sky covered by clouds [0-1].");
   syntax.add ("vapor_pressure", "Pa", Syntax::LogOnly, "Humidity.");
+  syntax.add ("relative_humidity", Syntax::Fraction (), Syntax::LogOnly,
+              "Relative humidity.");
   syntax.add ("wind", "m/s", Syntax::LogOnly, "Wind speed.");
   syntax.add ("day_length", "h", Syntax::LogOnly,
 	      "Number of light hours this day.");

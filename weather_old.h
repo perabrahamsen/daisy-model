@@ -49,6 +49,7 @@ public:
   double rain () const;	// [mm/h]
   double snow () const;	// [mm/h]
   double vapor_pressure () const; // [Pa]
+  double relative_humidity () const; // []
   double wind () const;	// [m/s]
 
   // Communication with external model.

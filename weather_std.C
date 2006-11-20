@@ -126,7 +126,7 @@ struct WeatherStandard : public Weather
   bool has_max_temperature;
   bool has_vapor_pressure_;
   bool has_diffuse_radiation_;
-  bool has_relative_humidity;
+  bool has_relative_humidity_;
   bool has_wind_speed;
   bool has_reference_evapotranspiration_;
 
@@ -188,6 +188,7 @@ struct WeatherStandard : public Weather
   double precipitation_[24];
   double vapor_pressure_[24];
   double diffuse_radiation_[24];
+  double relative_humidity_[24];
   double wind_speed_[24];
   double reference_evapotranspiration_[24];
 
@@ -270,6 +271,11 @@ struct WeatherStandard : public Weather
     daisy_assert (initialized);
     return diffuse_radiation_[hour]; 
   }
+  double relative_humidity () const // []
+  { 
+    daisy_assert (initialized);
+    return relative_humidity_[hour]; 
+  }
   double wind () const	// [m/s]
   { 
     daisy_assert (initialized);
@@ -280,10 +286,13 @@ struct WeatherStandard : public Weather
   { return has_reference_evapotranspiration_; }
 
   bool has_vapor_pressure () const
-  { return has_vapor_pressure_ || has_relative_humidity; }
+  { return has_vapor_pressure_ || has_relative_humidity_; }
 
   bool has_diffuse_radiation () const
   { return has_diffuse_radiation_; }
+
+  bool has_relative_humidity () const
+  { return has_relative_humidity_; }
 
   bool has_wind () const
   { return has_wind_speed; }
@@ -773,7 +782,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	  precipitation_[hour] = last_precipitation;
 	  if (has_vapor_pressure_)
 	    vapor_pressure_[hour] = last_vapor_pressure;
-	  else if (has_relative_humidity)
+	  else if (has_relative_humidity_)
 	    vapor_pressure_[hour] 
 	      = FAO::SaturationVapourPressure (air_temperature_[hour])
 	      * last_relative_humidity;
@@ -781,6 +790,10 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	    wind_speed_[hour] = last_wind_speed;
 	  else
 	    wind_speed_[hour] = 3.0;
+	  if (has_relative_humidity_)
+	    relative_humidity_[hour] = last_relative_humidity;
+          else if (has_vapor_pressure_)
+            relative_humidity_[hour] = 0.5;
 	  if (has_reference_evapotranspiration_)
 	    {
 	      reference_evapotranspiration_[hour] 
@@ -819,7 +832,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
     ? last_min_air_temperature
     : *min_element (&air_temperature_[0], &air_temperature_[24]);
 
-  if (!has_vapor_pressure_ && !has_relative_humidity)
+  if (!has_vapor_pressure_ && !has_relative_humidity_)
     {
       double T_min = daily_min_air_temperature_;
       const double T_max = daily_max_air_temperature_;
@@ -1192,8 +1205,8 @@ NO3DryDep: " << DryDeposit.NO3 << " kgN/ha/year";
   has_max_temperature = has_data ("T_max");
   has_vapor_pressure_ = has_data ("VapPres");
   has_diffuse_radiation_ = has_data ("DiffRad");
-  has_relative_humidity = has_data ("RelHum");
-  if (has_relative_humidity && has_vapor_pressure_)
+  has_relative_humidity_ = has_data ("RelHum");
+  if (has_relative_humidity_ && has_vapor_pressure_)
     lex->error ("You should only specify one of VapPres or RelHum");
   has_wind_speed = has_data ("Wind");
   has_reference_evapotranspiration_ = has_data ("RefEvap");
@@ -1249,7 +1262,7 @@ WeatherStandard::WeatherStandard (Block& al)
     has_max_temperature (false),
     has_vapor_pressure_ (false),
     has_diffuse_radiation_ (false),
-    has_relative_humidity (false),
+    has_relative_humidity_ (false),
     has_wind_speed (false),
     has_reference_evapotranspiration_ (false),
     where (al.name ("where")),
