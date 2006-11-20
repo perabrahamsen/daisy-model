@@ -82,7 +82,8 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Time& time, const Bioclimate&, 
+  virtual void tick (const Time& time, double relative_humidity,
+                     const Bioclimate&, 
 		     const Geometry& geo, const Soil&, OrganicMatter*, 
 		     const SoilHeat&, const SoilWater&,
 		     SoilNH4*, SoilNO3*, 

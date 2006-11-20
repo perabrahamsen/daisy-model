@@ -122,7 +122,8 @@ struct VegetationPermanent : public Vegetation
 
   // Simulation.
   void reset_canopy_structure (const Time& time);
-  void tick (const Time& time, const Bioclimate& bioclimate,
+  void tick (const Time& time, const double relative_humidity,
+             const Bioclimate& bioclimate,
              const Geometry& geo,
 	     const Soil& soil,
 	     OrganicMatter *const organic_matter,
@@ -237,7 +238,7 @@ VegetationPermanent::reset_canopy_structure (const Time& time)
   HvsLAI_ = canopy.LAIvsH.inverse ();
 }
 void
-VegetationPermanent::tick (const Time& time, 
+VegetationPermanent::tick (const Time& time, const double,
 			   const Bioclimate&, 
                            const Geometry& geo,
 			   const Soil& soil,

@@ -1,3 +1,10 @@
+2006-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.h (reletive_humidity): New pure virtual.
+	* weather_old.C, weather_std.C: Implement it.
+	* weather.h (has_relative_humidity): New virtual function.
+	* weather.C, weather_std.C: Implement it.
+	
 2006-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log, select: Rewrote so they use a 'Volume' object to limit

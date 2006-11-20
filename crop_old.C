@@ -105,7 +105,7 @@ protected:
 
   // Simulation.
 public:
-  void tick (const Time& time,  
+  void tick (const Time& time,  double relative_humidity,
 	     const Bioclimate&, const Geometry& geo,
              const Soil&,
 	     OrganicMatter*, const SoilHeat&, const SoilWater&, 
@@ -1717,7 +1717,7 @@ void CropOld::emerge ()
 { var.Phenology.DS = -0.1; }
 
 void 
-CropOld::tick (const Time& time, 
+CropOld::tick (const Time& time, const double,
 	       const Bioclimate& bioclimate,
                const Geometry& geo,
 	       const Soil& soil,

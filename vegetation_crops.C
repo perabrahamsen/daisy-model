@@ -118,7 +118,7 @@ struct VegetationCrops : public Vegetation
   string crop_names () const;
 
   // Simulation.
-  void tick (const Time& time,
+  void tick (const Time& time, double relative_humidity,
 	     const Bioclimate& bioclimate, 
              const Geometry& geo,
 	     const Soil& soil,
@@ -295,7 +295,7 @@ VegetationCrops::crop_names () const
 }
 
 void 
-VegetationCrops::tick (const Time& time,
+VegetationCrops::tick (const Time& time, const double relative_humidity,
 		       const Bioclimate& bioclimate, 
                        const Geometry& geo,
 		       const Soil& soil,
@@ -338,7 +338,8 @@ VegetationCrops::tick (const Time& time,
       const double my_force = use_force ? (MyLAI / SimLAI) * ForcedLAI : -1.0;
       
       // Tick.
-      (*crop)->tick (time, bioclimate, geo, soil, organic_matter, 
+      (*crop)->tick (time, relative_humidity, 
+                     bioclimate, geo, soil, organic_matter, 
 		     soil_heat, soil_water, soil_NH4, soil_NO3, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
 		     residuals_N_soil, residuals_C_soil, my_force, msg);

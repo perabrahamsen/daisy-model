@@ -114,7 +114,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time& time,  
+  void tick (const Time& time, double relative_humidity,
 	     const Bioclimate&, const Geometry& geo,
              const Soil&,
 	     OrganicMatter*,
@@ -208,7 +208,7 @@ CropStandard::initialize (Treelog& msg, const Geometry& geo,
 }
 
 void
-CropStandard::tick (const Time& time,
+CropStandard::tick (const Time& time, const double relative_humidity,
 		    const Bioclimate& bioclimate,
                     const Geometry& geo,
 		    const Soil& soil,
