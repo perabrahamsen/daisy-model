@@ -59,7 +59,7 @@ Geometry1D::fraction_in_z_interval (const size_t i,
 
 double 
 Geometry1D::fraction_in_volume (size_t n, const Volume& volume) const
-{ return volume.box_fraction (zminus (n), zplus (n)); }
+{ return volume.box_fraction (zplus (n), zminus (n)); }
 
 bool 
 Geometry1D::contain_z (size_t i, double z) const

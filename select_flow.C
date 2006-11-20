@@ -22,8 +22,8 @@
 #include "volume.h"
 #include "border.h"
 #include "geometry.h"
-#ifdef DEBUG_EDGES
 #include "treelog.h"
+#ifdef DEBUG_EDGES
 #include <sstream>
 #endif
 
@@ -108,9 +108,7 @@ SelectFlow::output_array (const std::vector<double>& array,
 { 
   if (geo != last_geo)
     {
-#ifdef DEBUG_EDGES
       Treelog::Open nest (msg, name);
-#endif
       last_geo = geo;
       const size_t size = geo->edge_size ();
       edges.clear ();

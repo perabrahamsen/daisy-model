@@ -58,8 +58,6 @@ UZ1DRichard::tick (SMM1D& smm, const double gravity, Treelog& msg)
 {
   // Check input.
   const size_t cell_size = smm.cell_size ();
-  if (cell_size < 2)
-    throw ("Richard's equation need at least two numerical layers");
   const size_t edge_size = cell_size + 1;
   daisy_assert (gravity >= -1);
   daisy_assert (gravity <= 1);
@@ -148,13 +146,8 @@ UZ1DRichard::tick (SMM1D& smm, const double gravity, Treelog& msg)
               a[i] = - ddt_dx * K_dx_minus;
               b[i] = Cw2 + ddt_dx * (K_dx_minus + K_dx_plus);
               c[i] = - ddt_dx * K_dx_plus;
-#if 0
               d[i] = Theta[i] - Cw1 - ddt * S 
-                + gravity * ddt_dx * (K_minus - K_plus);
-#else
-              d[i] = Theta[i] * Cw2 - ddt * S 
-                + gravity * ddt_dx * (K_minus - K_plus);
-#endif
+                + gravity * ddt_dx * (K_plus - K_minus);
 	    }
 	  tridia (0, cell_size, a, b, c, d, h.begin ());
 

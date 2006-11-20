@@ -582,7 +582,7 @@ VegetationCrops::harvest (const symbol column_name,
           ? 0.0 
           : (*crop)->total_C ();
         const double balance = (new_crop_C - old_crop_C)
-          + ((residuals_C_top + geo.total (residuals_C_soil) * 10000)
+          + ((residuals_C_top + geo.total_surface (residuals_C_soil) * 10000)
              - (old_residuals_C_top + old_residuals_C_soil)) * 10
           + mine.total_C () * 10;
         if (fabs (balance) > 0.001 /* 1 [g/ha] */)
