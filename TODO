@@ -1,12 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* TRANS HOR: Kun når der en en plante.
-
-Planten overkompenserer(?) for ekstra vand.
-
-* Løs BGJ init problem
-
-* Få OM init til at blive uafhængig af geometri.
+* BGJ: Spørg om Jim opsætning...
 
 * MMO: Daisy
 
@@ -27,19 +21,6 @@ Planten overkompenserer(?) for ekstra vand.
 ** varmetransport.
 
 ** makroporer.
-
-** Volume (mest for log)
-
-top bottom left right near far
-
-value | infinite
-
-geo -> intersect (cell,volume)
-
-geo -> enter (edge, volume)
-geo -> leave (edge, volume)
-
-direction of edge?  direction of stream?
 
 * r2d2 paper
 

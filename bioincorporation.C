@@ -225,7 +225,7 @@ void
 Bioincorporation::Implementation::add (const Geometry& geo,
 				       std::vector<double>& input,
 				       const double amount) const
-{ geo.add (input, density, amount /* * (1.0 - respiration) */); }
+{ geo.add_surface (input, density, amount /* * (1.0 - respiration) */); }
 
 void 
 Bioincorporation::Implementation::initialize (const Geometry& geo,

@@ -145,7 +145,7 @@ AOM::add (const Geometry& geo, // Add dead roots.
   const double old_N = soil_N (geo);
 
   // Distribute it according to the root density.
-  const double total = geo.total (density);
+  const double total = geo.total_soil (density);
   for (size_t i = 0; i < density.size (); i++)
     {
       // We should *not* multiply with dz here.  Reason: We want to

@@ -24,6 +24,8 @@
 #include "action.h"
 #include "daisy.h"
 #include "field.h"
+#include "harvest.h"
+#include <sstream>
 
 struct ActionEmerge : public Action
 {
@@ -97,12 +99,21 @@ struct ActionHarvest : public Action
 		     + " which has not emerged on the field");
 	return;
       }
+    double old_DM = 0.0;
+    for (size_t i = 0; i < daisy.harvest.size (); i++)
+      old_DM += daisy.harvest[i]->total_DM ();
     daisy.field.harvest (daisy.time, crop, stub, stem, leaf, sorg, combine,
 			 daisy.harvest, out);
+    double new_DM = 0.0;
+    for (size_t i = 0; i < daisy.harvest.size (); i++)
+      new_DM += daisy.harvest[i]->total_DM ();
+    std::ostringstream tmp;
     if (daisy.field.crop_ds (crop) < 0.0)
-      out.message ("Harvesting " + crop);
+      tmp << "Harvesting ";
     else
-      out.message ("Cutting " + crop);
+      tmp << "Cutting ";
+    tmp << crop << ", removing " << (new_DM - old_DM) * 0.01 << " Mg DM/ha";
+    out.message (tmp.str ());
   }
 
   ActionHarvest (Block& al)

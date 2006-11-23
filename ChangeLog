@@ -1,5 +1,8 @@
 2006-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* organic_std.C (Initialization): Use 'add_surface'.
+	* bioincorporation.C (add): Ditto.
+
 	* weather.h (reletive_humidity): New pure virtual.
 	* weather_old.C, weather_std.C: Implement it.
 	* weather.h (has_relative_humidity): New virtual function.

@@ -127,45 +127,37 @@ public:
   void mix (std::vector<double>& v, double from, double to) const;
   void mix (std::vector<double>& v, double from, double to, 
             std::vector<double>& change) const;
-  void add (std::vector<double>& v,
-            double from, double to, double amount) const;
-  void add (std::vector<double>& v, const std::vector<double>& density,
-            double amount) const;
   void add_soil (std::vector<double>& v,
-                 const double from, const double to, 
-                 const double amount) const
-  { add (v, from, to, amount); }
+                 double from, double to, double amount) const;
   void add_soil (std::vector<double>& v, const std::vector<double>& density,
-                 const double amount) const
-  { add (v, density, amount); }
+                 double amount) const;
   void add_surface (std::vector<double>& v,
                     const double from, const double to, 
-                    const double amount) const
-  { add (v, from, to, amount * surface_area ()); }
+                    const double amount) const;
   void add_surface (std::vector<double>& v, const std::vector<double>& density,
-                    const double amount) const
-  { add (v, density, amount * surface_area ()); }
-  double extract (std::vector<double>& v, double from, double to) const;
-  double extract_surface (std::vector<double>& v, double from, double to) const
-  { return extract (v, from, to) / surface_area (); }
-  void set (std::vector<double>& v,
-            double from, double to, double amount) const;
+                    const double amount) const;
+  double extract_soil (std::vector<double>& v, double from, double to) const;
+  double extract_surface (std::vector<double>& v, 
+                          double from, double to) const;
+  void set_soil (std::vector<double>& v,
+                 double from, double to, double amount) const;
   void set_surface (std::vector<double>& v,
                     const double from, const double to, 
-                    const double amount) const
-  { set (v, from, to, amount * surface_area ()); }
+                    const double amount) const;
   void swap (std::vector<double>& v,
              double from, double middle, double to) const;
   void swap (std::vector<double>& v, 
              double from, double middle, double to, 
              std::vector<double>& change) const;
-  double total (const std::vector<double>& v) const;
-  double total (const std::vector<double>& v, double from, double to) const;
-  double total_surface (const std::vector<double>& v) const
-  { return total (v) / surface_area (); }
+  double total_soil (const std::vector<double>& v) const;
+  double total_soil (const std::vector<double>& v, double from, double to) const;
+  double total_surface (const std::vector<double>& v) const;
   double total_surface (const std::vector<double>& v, 
-                        const double from, const double to) const
-  { return total (v, from, to) / surface_area (); }
+                        const double from, const double to) const;
+  double total (const std::vector<double>& v) const
+  { return total_soil (v); }
+  double total (const std::vector<double>& v, double from, double to) const
+  { return total_soil (v, from, to); }
 
   // Layers -- Support initializing soil arrays layer by layer.
   static void add_layer (Syntax& syntax, Syntax::category, 

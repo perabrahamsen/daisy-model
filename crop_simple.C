@@ -334,7 +334,7 @@ CropSimple::harvest (const symbol column_name,
 
       static const symbol root_symbol ("root");
       AM& am = AM::create (geo.cell_size (), time, root_am, name, root_symbol);
-      daisy_assert (geo.total (root_system->Density) > 0.0);
+      daisy_assert (geo.total_soil (root_system->Density) > 0.0);
       am.add_surface (geo, 
                       this_far * WRoot * 0.420 * m2_per_cm2,
                       this_far * NRoot * m2_per_cm2,

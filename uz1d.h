@@ -66,7 +66,8 @@ public:
   double K (const size_t index, const double h) const
   { 
     const size_t cell = cells[index];
-    return soil.K (cell, h, soil_water.h_ice (cell), soil_heat.T (cell));
+    return soil.K (cell, h, soil_water.h_ice (cell), soil_heat.T (cell))
+      * soil.anisotropy (cell);
   }
   double Cw1 (const size_t index, const double h) const
   {

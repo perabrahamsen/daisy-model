@@ -191,7 +191,7 @@ Solute::incorporate (const Geometry& geo,
   daisy_assert (amount >= 0.0);
   daisy_assert (from <= 0.0);
   daisy_assert (to <= from);
-  geo.add (S_external, from, to, amount);
+  geo.add_surface (S_external, from, to, amount);
 }
 
 void 
@@ -199,7 +199,7 @@ Solute::set_external_source (const Geometry& geo,
 			     double amount, double from, double to)
 {
   fill (S_permanent.begin (), S_permanent.end (), 0.0);
-  geo.add (S_permanent, from, to, amount);
+  geo.add_surface (S_permanent, from, to, amount);
 }
 
 void 

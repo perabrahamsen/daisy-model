@@ -623,14 +623,12 @@ OrganicStandard::Initialization::
   const double depth = soil.MaxRootingHeight ();
   const double k = M_LN2 / al.number ("dist");
   std::vector<double> density (cell_size, 0.0);
-  for (size_t i = 0; 
-       i < soil.size () && geo.z (i) > depth;
-       i++)
-    {
+  for (size_t i = 0; i < soil.size (); i++)
+    if (geo.z (i) > depth)
       density[i] = k * exp (k * geo.z (i));
-    }
-  geo.add (per_lay, density, 
-           root * kg_per_ha_per_y_to_g_per_cm2_per_h);
+
+  geo.add_surface (per_lay, density, 
+                   root * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Add bioincorporation
   bioincorporation.add (geo, per_lay,
@@ -2455,7 +2453,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
 	      i = layers.size ();
 	    }
 	  const double C = weight * 1000.0 / (100.0 * 100.0); // g C / cm²
-	  geo.add (total_C, last, end, C);
+	  geo.add_surface (total_C, last, end, C);
 	  last = end;
 	}
       first_humus = last;

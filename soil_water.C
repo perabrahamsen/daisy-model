@@ -181,7 +181,7 @@ void
 SoilWater::incorporate (const Geometry& geo, const double amount,
                         const double from, const double to)
 
-{ geo.add (S_incorp_, from, to, -amount); }
+{ geo.add_surface (S_incorp_, from, to, -amount); }
 
 void
 SoilWater::mix (const Geometry& geo,

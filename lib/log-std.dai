@@ -129,9 +129,10 @@ the litter layer.")
 (defsummary "Soil water balance" balance
   "Water balance for the soil."
   (precision 1)
-  (input "Matrix infiltration" "Macropore infiltration" "Subsoil irrigation")
-  (output "Matrix percolation" "Macropore percolation"
-          "Drain flow" "Root extraction" "Freezing" "Tillage")
+  (input "Matrix infiltration" "Macropore infiltration" "Subsoil irrigation" 
+         "Tillage")
+  (output "Matrix percolation" "Macropore percolation" "Drain flow"
+          "Root extraction" "Freezing")
   (content "Soil water"))
 
 (deflog "Soil water" column
@@ -237,7 +238,7 @@ has been set.")
                      (dimension "mm/&"))
            (interval (tag "Tillage")
                      (description "\
-Net amount of water being removed from the soil interval by tillage operations.
+Net amount of water being added to the soil interval by tillage operations.
 
 This number will be zero if the soil interval includes the all the
 soil affected by the tillage operation, which is the normal case.  The
