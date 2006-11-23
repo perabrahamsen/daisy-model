@@ -449,6 +449,8 @@ Units::standard_conversions ()
   add (Syntax::Fraction (), "mg/l", 1e6);
   add ("g C/cm^2", "g/cm^2", 1.0);	// For "per dry matter" logging.
   add ("g N/cm^2", "g/cm^2", 1.0);	// For "per dry matter" logging.
+  add ("g C/cm^3", "g/cm^3", 1.0);	// For "per dry matter" logging.
+  add ("g N/cm^3", "g/cm^3", 1.0);	// For "per dry matter" logging.
   add ("g DM/m^2", "Mg DM/ha", 1.0e-2); // Crop production.
   add ("g/m^2", "Mg DM/ha", 1.0e-2); // harvest DM.
   add ("g/m^2/h", "Mg DM/ha/h", 1.0e-2); // harvest DM.

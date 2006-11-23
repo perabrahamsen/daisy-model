@@ -214,9 +214,6 @@ struct BioclimateStandard : public Bioclimate
 void 
 BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
 {
-  if (pet.get ())                      // Explicit.
-    return;
-
   Treelog::Open nest (msg, "Bioclimate: " + name);
 
   if (!pet.get ())                      // Explicit.

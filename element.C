@@ -73,6 +73,9 @@ Element::tick (const size_t cell_size,
   fill (S_p.begin (), S_p.end (), 0.0);
   fill (J_p.begin (), J_p.end (), 0.0);
 
+  daisy_assert (S_drain.size () >= cell_size);
+  daisy_assert (S.size () >= cell_size);
+
   // Drainage.
   for (size_t i = 0; cell_size; i++)
     {

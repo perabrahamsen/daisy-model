@@ -1,3 +1,8 @@
+2006-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (check): 'pressure_table' may not be
+	initialized.
+
 2006-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* organic_std.C (Initialization): Use 'add_surface'.

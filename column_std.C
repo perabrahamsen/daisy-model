@@ -927,18 +927,9 @@ ColumnStandard::initialize (const Time& time, Treelog& msg,
   residuals_C_soil.insert (residuals_C_soil.begin (), soil->size (), 0.0);
   daisy_assert (residuals_C_soil.size () == soil->size ());
 
-
-  // Bioclimate and heat depends on weather.
-  if (weather && !weather->initialize (time, msg))
-    return;
-  if (!global_weather && !weather)
-    return;
-  const Weather& my_weather = *(weather ? weather : global_weather);
-  bioclimate->initialize (my_weather, msg);
   groundwater->initialize (geometry, time, msg);
   soil_water->initialize (alist.alist ("SoilWater"), 
                           geometry, *soil, *groundwater, msg);
-
   if (alist.check ("Movement"))
     {
       AttributeList move_alist (alist.alist ("Movement"));
@@ -953,8 +944,6 @@ ColumnStandard::initialize (const Time& time, Treelog& msg,
       AttributeList al;
       movement->initialize (al, *soil, *groundwater, msg);
     }
-  soil_heat->initialize (alist.alist ("SoilHeat"), geometry, 
-                         movement->default_heat (*soil, time, my_weather), msg);
 
   // Solutes depends on water.
   soil_chemicals.initialize (alist.alist ("SoilChemicals"),
@@ -970,6 +959,15 @@ ColumnStandard::initialize (const Time& time, Treelog& msg,
   nitrification.initialize (soil->size ());
   denitrification.initialize (soil->size ());
 
+  // Bioclimate and heat depends on weather.
+  if (weather && !weather->initialize (time, msg))
+    return;
+  if (!global_weather && !weather)
+    return;
+  const Weather& my_weather = *(weather ? weather : global_weather);
+  bioclimate->initialize (my_weather, msg);
+  soil_heat->initialize (alist.alist ("SoilHeat"), geometry, 
+                         movement->default_heat (*soil, time, my_weather), msg);
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
   organic_matter->initialize (alist.alist ("OrganicMatter"), 

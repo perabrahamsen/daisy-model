@@ -138,7 +138,12 @@ public:
       set_h_aquifer (geo, time);
   }
   bool check (Treelog& msg) const
-  { return pressure_table->check (msg); }
+  {
+    if (pressure_table.get ())
+      return pressure_table->check (msg); 
+    msg.warning ("No pressure table");
+    return true;
+  }
   GroundwaterPipe (Block& al)
     : Groundwater (al),
       L (al.number ("L")),
