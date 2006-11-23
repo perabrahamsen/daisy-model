@@ -1,5 +1,12 @@
 2006-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* librarian.h (BuildBase): New helper class.
+	* librarian.C: New file.
+	* Makefile (OTHER): Add it.
+	(HEADONLY): Remove it.
+
+2006-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* groundwater_pipe.C (check): 'pressure_table' may not be
 	initialized.
 

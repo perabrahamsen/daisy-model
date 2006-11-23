@@ -20,6 +20,8 @@
 
 
 #include "bound.h"
+#include "block.h"
+#include "alist.h"
 #include "mathlib.h"
 #include <sstream>
 

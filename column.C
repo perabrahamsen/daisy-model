@@ -21,6 +21,8 @@
 
 
 #include "column.h"
+#include "block.h"
+#include "syntax.h"
 #include "log.h"
 #include <map>
 

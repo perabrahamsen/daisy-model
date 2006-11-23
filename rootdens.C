@@ -21,6 +21,9 @@
 
 
 #include "rootdens.h"
+#include "block.h"
+#include "syntax.h"
+#include "alist.h"
 #include "check.h"
 
 template<>

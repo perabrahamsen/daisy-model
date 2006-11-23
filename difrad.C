@@ -20,6 +20,7 @@
 
 
 #include "difrad.h"
+#include "block.h"
 
 template<>
 Librarian<Difrad>::Content* Librarian<Difrad>::content = NULL;

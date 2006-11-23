@@ -20,7 +20,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "phenology.h"
+#include "block.h"
 #include "log.h"
+#include "syntax.h"
+#include "alist.h"
 
 template<>
 Librarian<Phenology>::Content* Librarian<Phenology>::content = NULL;

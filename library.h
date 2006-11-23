@@ -24,9 +24,12 @@
 #define LIBRARY_H
 
 #include "symbol.h"
+#include "block.h"
+#include "alist.h"
 #include <string>
 #include <vector>
 
+class Block;
 class Syntax;
 class AttributeList;
 class Treelog;

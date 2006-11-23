@@ -22,6 +22,8 @@
 #include "integer.h"
 #include "boolean.h"
 #include "submodeler.h"
+#include "block.h"
+#include "alist.h"
 #include "memutils.h"
 #include <sstream>
 

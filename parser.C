@@ -21,6 +21,7 @@
 
 
 #include "parser.h"
+#include "block.h"
 
 template<>
 Librarian<Parser>::Content* Librarian<Parser>::content = NULL;

@@ -20,6 +20,9 @@
 
 
 #include "wse.h"
+#include "block.h"
+#include "alist.h"
+#include "syntax.h"
 #include "program.h"
 #include <sstream>
 #include "mathlib.h"

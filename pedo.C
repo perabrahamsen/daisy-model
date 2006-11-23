@@ -22,6 +22,8 @@
 #include "pedo.h"
 #include "soil.h"
 #include "units.h"
+#include "block.h"
+#include "syntax.h"
 #include <sstream>
 #include "treelog.h"
 

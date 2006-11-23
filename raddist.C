@@ -20,6 +20,7 @@
 
 
 #include "raddist.h"
+#include "block.h"
 #include "mathlib.h"
 
 template<>

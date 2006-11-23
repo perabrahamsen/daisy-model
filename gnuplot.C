@@ -20,6 +20,7 @@
 
 
 #include "gnuplot.h"
+#include "block.h"
 
 template<>
 Librarian<Gnuplot>::Content* Librarian<Gnuplot>::content = NULL;

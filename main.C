@@ -21,9 +21,10 @@
 
 #include "daisy.h"
 #include "parser.h"
-#include "syntax.h"
+#include "block.h"
 #include "alist.h"
 #include "library.h"
+#include "block.h"
 #include "treelog_dual.h"
 #include "options.h"
 #include "assertion.h"

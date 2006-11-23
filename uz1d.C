@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "uz1d.h"
+#include "block.h"
 
 void 
 SMM1D::reset (std::vector<double>& h, std::vector<double>& Theta) const

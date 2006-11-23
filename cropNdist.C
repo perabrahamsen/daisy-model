@@ -20,6 +20,7 @@
 
 
 #include "cropNdist.h"
+#include "block.h"
 #include "mathlib.h"
 
 template<>

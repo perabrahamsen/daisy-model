@@ -21,6 +21,9 @@
 
 
 #include "nitrification.h"
+#include "block.h"
+#include "syntax.h"
+#include "alist.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"

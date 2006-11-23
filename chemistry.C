@@ -20,6 +20,7 @@
 
 
 #include "chemistry.h"
+#include "block.h"
 
 template<>
 Librarian<Chemistry>::Content* Librarian<Chemistry>::content = NULL;

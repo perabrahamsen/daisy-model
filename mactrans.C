@@ -21,6 +21,7 @@
 
 
 #include "mactrans.h"
+#include "block.h"
 
 template<>
 Librarian<Mactrans>::Content* Librarian<Mactrans>::content = NULL;

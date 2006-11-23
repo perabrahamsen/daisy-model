@@ -20,6 +20,7 @@
 
 
 #include "movement.h"
+#include "block.h"
 
 template<>
 Librarian<Movement>::Content* Librarian<Movement>::content = NULL;

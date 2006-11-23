@@ -24,6 +24,7 @@
 #define COLUMN_H
 
 #include "librarian.h"
+#include "alist.h"
 
 class Time;
 class Weather;

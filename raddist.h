@@ -23,6 +23,7 @@
 #define RADDIST_H
 
 #include "librarian.h"
+#include "alist.h"
 #include <vector>
 
 class Vegetation;

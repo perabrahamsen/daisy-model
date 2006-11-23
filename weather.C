@@ -21,6 +21,8 @@
 
 
 #include "weather.h"
+#include "block.h"
+#include "syntax.h"
 #include "fao.h"
 #include "time.h"
 #include "log.h"

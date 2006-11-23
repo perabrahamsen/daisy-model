@@ -20,6 +20,7 @@
 
 
 #include "number.h"
+#include "block.h"
 
 template<>
 Librarian<Number>::Content* Librarian<Number>::content = NULL;

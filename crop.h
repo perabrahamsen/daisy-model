@@ -24,6 +24,7 @@
 #define CROP_H
 
 #include "time.h"
+#include "alist.h"
 #include "librarian.h"
 #include <vector>
 

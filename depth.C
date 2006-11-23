@@ -20,6 +20,9 @@
 
 
 #include "depth.h"
+#include "block.h"
+#include "alist.h"
+#include "syntax.h"
 #include "time.h"
 #include "plf.h"
 #include "lexer_data.h"

@@ -23,6 +23,7 @@
 #include "boolean.h"
 #include "number.h"
 #include "submodeler.h"
+#include "alist.h"
 #include "memutils.h"
 #include <sstream>
 #include <vector>

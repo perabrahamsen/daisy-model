@@ -20,6 +20,7 @@
 
 
 #include "photo.h"
+#include "block.h"
 
 template<>
 Librarian<Photo>::Content* Librarian<Photo>::content = NULL;

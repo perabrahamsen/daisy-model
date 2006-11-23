@@ -25,6 +25,7 @@
 
 #include "border.h"
 #include "librarian.h"
+#include "alist.h"
 #include "symbol.h"
 #include <iosfwd>
 

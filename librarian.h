@@ -24,15 +24,40 @@
 #define LIBRARIAN_H
 
 #include "library.h"
-#include "block.h"
-#include "alist.h"
-#include "syntax.h"
-#include "treelog.h"
 #include "assertion.h"
 #include <map>
 #include <vector>
 
 class Log;
+class Block;
+class AttributeList;
+class Syntax;
+class Treeelog;
+
+struct BuildBase 
+{
+  // Content.
+  Library lib;
+  int count;
+
+  // Use.
+  virtual void* build_raw (symbol type, Block&) const = 0;
+  void* build_free (Treelog& msg, const AttributeList& alist, 
+                    const std::string& scope_id) const;
+  void* build_cheat (const AttributeList& parent, 
+                     const std::string& key) const;
+  void* build_alist (Block& parent, const AttributeList& alist, 
+                     const std::string& scope_id) const;
+  void* build_item (Block& parent, const std::string& key) const;
+  std::vector<void*> build_vector (Block& al, const std::string& key) const;
+  std::vector<const void*> build_vector_const (Block& al, 
+                                               const std::string& key) const;
+
+  // Create and destroy.
+  BuildBase (const char *const name, Library::derive_fun derive, 
+	     const char *const description);
+  virtual ~BuildBase ();
+};
 
 template <class T>
 class Librarian
@@ -44,18 +69,19 @@ private:
 
   // Content.
 private:
-  struct Content;
-  friend struct Librarian::Content;
-  static struct Content
+  static struct Content : BuildBase
   {
-    Library lib;
     bmap_type builders;
-    int count;
+
+    void* build_raw (const symbol type, Block& block) const
+    { 
+      daisy_assert (builders.find (type) != builders.end ());
+      return &(content->builders)[type] (block);
+    }
     Content (const char *const name, Library::derive_fun derive, 
 	     const char *const description)
-      : lib (name, derive, description),
-	builders (),
-	count (0)
+      : BuildBase (name, derive, description),
+        builders ()
     { }
   } *content;
 
@@ -64,69 +90,42 @@ public:
   static T* build_free (Treelog& msg, const AttributeList& alist, 
 			const std::string& scope_id)
   {
-    daisy_assert (alist.check ("type"));
-    const symbol type = alist.identifier ("type");
-    daisy_assert (library ().check (type));
-    const Syntax& syntax = library ().syntax (type);
-    Block block (syntax, alist, msg, scope_id + ": " + type.name ());
-    daisy_assert (syntax.check (alist, msg));
-    daisy_assert (content->builders.find (type) != content->builders.end ());
-    try
-      {  
-	T* result = &(content->builders)[type] (block); 
-	daisy_assert (block.ok () && result);
-	return result;
-      }
-    catch (const std::string& err)
-      { block.error ("Build failed: " + err); }
-    catch (const char *const err)
-      { block.error ("Build failed: " + std::string (err)); }
-    return NULL;
+    daisy_assert (content);
+    return static_cast<T*> (content->build_free (msg, alist, scope_id)); 
   }
-  
   static T* build_cheat (const AttributeList& parent, const std::string& key)
-  { return build_free (Treelog::null (), parent.alist (key), key); }
-
+  {
+    daisy_assert (content);
+    return static_cast<T*> (content->build_cheat (parent, key)); 
+  }
   static T* build_alist (Block& parent, const AttributeList& alist, 
 			 const std::string& scope_id)
   {
-    daisy_assert (alist.check ("type"));
-    const symbol type = alist.identifier ("type");
-    daisy_assert (library ().check (type));
-    const Syntax& syntax = library ().syntax (type);
-    Block nested (parent, syntax, alist, scope_id + ": " + type.name ());
-    daisy_assert (syntax.check (alist, nested.msg ()));
-    daisy_assert (content->builders.find (type) != content->builders.end ());
-    try
-      {  return &(content->builders)[type] (nested); }
-    catch (const std::string& err)
-      { nested.error ("Build failed: " + err); }
-    catch (const char *const err)
-      { nested.error ("Build failed: " + std::string (err)); }
-    return NULL;
+    daisy_assert (content);
+    return static_cast<T*> (content->build_alist (parent, alist, scope_id)); 
   }
-
   static T* build_item (Block& parent, const std::string& key)
-  { return build_alist (parent, parent.alist (key), key); }
-
-  static std::vector<T*> build_vector (Block& al, const std::string& key)
   { 
+    daisy_assert (content);
+    return static_cast<T*> (content->build_item (parent, key)); 
+  }
+  static std::vector<T*> build_vector (Block& al, const std::string& key)
+  {  
+    daisy_assert (content);
+    std::vector<void*> c = content->build_vector (al, key);
     std::vector<T*> t;
-    const std::vector<AttributeList*> f (al.alist_sequence (key));
-    for (size_t i = 0; i < f.size (); i++)
-      t.push_back (build_alist (al, *f[i], sequence_id (key, i)));
-
+    for (size_t i = 0; i < c.size (); i++)
+      t.push_back (static_cast<T*> (c[i]));
     return t;
   }
-
   static std::vector<const T*> build_vector_const (Block& al,
 						   const std::string& key)
-  { 
+  {  
+    daisy_assert (content);
+    std::vector<const void*> c = content->build_vector_const (al, key);
     std::vector<const T*> t;
-    const std::vector<AttributeList*> f (al.alist_sequence (key));
-    for (size_t i = 0; i < f.size (); i++)
-      t.push_back (build_alist (al, *f[i], sequence_id (key, i)));
-
+    for (size_t i = 0; i < c.size (); i++)
+      t.push_back (static_cast<const T*> (c[i]));
     return t;
   }
 
@@ -137,7 +136,7 @@ public:
 			builder build)
   {
     library ().add (name, al, syntax);
-    content->builders.insert(std::make_pair (name, build));
+    content->builders.insert (std::make_pair (name, build));
   }
   static void add_type (const char *const name, AttributeList& al,
 			const Syntax& syntax,

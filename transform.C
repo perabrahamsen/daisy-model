@@ -20,6 +20,7 @@
 
 
 #include "transform.h"
+#include "block.h"
 
 template<>
 Librarian<Transform>::Content* Librarian<Transform>::content = NULL;

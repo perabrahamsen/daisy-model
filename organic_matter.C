@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "organic_matter.h"
+#include "block.h"
 
 template<>
 Librarian<OrganicMatter>::Content* Librarian<OrganicMatter>::content = NULL;

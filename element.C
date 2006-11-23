@@ -77,7 +77,7 @@ Element::tick (const size_t cell_size,
   daisy_assert (S.size () >= cell_size);
 
   // Drainage.
-  for (size_t i = 0; cell_size; i++)
+  for (size_t i = 0; i < cell_size; i++)
     {
       S_drain[i] = -soil_water.S_drain (i) * dt * C[i];
       S[i] += S_drain[i];

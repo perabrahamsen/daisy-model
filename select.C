@@ -20,9 +20,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "select.h"
+#include "block.h"
 #include "geometry.h"
 #include "number.h"
 #include "scope.h"
+#include "alist.h"
 #include "check.h"
 #include "vcheck.h"
 #include "units.h"

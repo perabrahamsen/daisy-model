@@ -20,6 +20,7 @@
 
 
 #include "clayom.h"
+#include "block.h"
 
 template<>
 Librarian<ClayOM>::Content* Librarian<ClayOM>::content = NULL;

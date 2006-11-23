@@ -23,6 +23,7 @@
 #define DIFRAD_H
 
 #include "librarian.h"
+#include "alist.h"
 
 class Weather;
 class Time;

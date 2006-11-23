@@ -21,6 +21,7 @@
 
 
 #include "macro.h"
+#include "block.h"
 
 template<>
 Librarian<Macro>::Content* Librarian<Macro>::content = NULL;

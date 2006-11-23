@@ -20,6 +20,7 @@
 
 
 #include "domsorp.h"
+#include "block.h"
 
 template<>
 Librarian<Domsorp>::Content* Librarian<Domsorp>::content = NULL;

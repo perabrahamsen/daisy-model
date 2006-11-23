@@ -20,6 +20,7 @@
 
 
 #include "equil.h"
+#include "block.h"
 
 template<>
 Librarian<Equilibrium>::Content* Librarian<Equilibrium>::content = NULL;
