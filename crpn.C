@@ -84,7 +84,21 @@ CrpN::content (const double DS, Production& production)
   daisy_assert (production.NLeaf >= 0.0);
   daisy_assert (production.NStem >= 0.0);
   daisy_assert (production.NSOrg >= 0.0);
-  daisy_assert (production.NRoot >= 0.0);
+  if (production.NRoot < 0.0)
+    {
+      std::ostringstream tmp;
+      tmp << "NCrop = " << production.NCrop << "; NfNCnt = " << NfNCnt 
+          << "; CrNCnt = " << CrNCnt << "; PtNCnc = " << PtNCnc << "\n";
+      tmp << "NLeaf = " << production.NLeaf 
+          << "; NStem = " << production.NStem
+          << "; NSOrg = " << production.NSOrg << "\n";
+      tmp << "NRoot = NCrop - NLeaf - NStem - NSOrg = "
+          << production.NRoot << "\n";
+      production.NRoot = production.WRoot = NfRootCnc (DS);
+      tmp << "NRoot adjusted to " << production.NRoot;
+      daisy_warning (tmp.str ());
+      production.NRoot = production.WRoot = NfRootCnc (DS);
+    }
 }
 
 void
