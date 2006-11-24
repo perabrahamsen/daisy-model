@@ -83,20 +83,19 @@ Bioincorporation::Implementation::am_compare (const AM* a, const AM* b)
 {
   const double a_top_C = a->top_C ();
   daisy_assert (a_top_C >= 0);
-  if (a_top_C > 0)
-    {
-      const double b_top_C = b->top_C ();
-      daisy_assert (b_top_C >= 0);
-      if (iszero (b_top_C))
-	return true;
+  if (iszero (a_top_C))
+    return false;
+
+  const double b_top_C = b->top_C ();
+  daisy_assert (b_top_C >= 0);
+  if (iszero (b_top_C))
+    return true;
       
-      const double a_top_N = a->top_N ();
-      daisy_assert (a_top_N > 0.0);
-      const double b_top_N = b->top_N ();
-      daisy_assert (b_top_N > 0.0);
-      return a_top_C / a_top_N < b_top_C / b_top_N;
-    }
-  return false;
+  const double a_top_N = a->top_N ();
+  daisy_assert (a_top_N > 0.0);
+  const double b_top_N = b->top_N ();
+  daisy_assert (b_top_N > 0.0);
+  return a_top_C / a_top_N < b_top_C / b_top_N;
 }
 
 static const double DM_to_C = 0.420; // C fraction of DM.
@@ -145,7 +144,7 @@ Bioincorporation::Implementation::tick (const Geometry& geo,
     const double top_N = am[i]->top_N ();
     daisy_assert (top_N > 0.0);
     const double C_per_N = top_C / top_N;
-    if (C_per_N < last_C_per_N)
+    if (C_per_N < last_C_per_N && !approximate (C_per_N, last_C_per_N))
       {
         std::ostringstream tmp;
         tmp << "C/N = " << top_C << "/" << top_N << " = " << C_per_N << "\n"

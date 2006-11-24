@@ -30,8 +30,7 @@
 #include "mathlib.h"
 #include "submodel.h"
 #include "check.h"
-
-using namespace std;
+#include <sstream>
 
 void
 CrpN::cut (const double DS)
@@ -88,7 +87,7 @@ CrpN::content (const double DS, Production& production)
     {
       std::ostringstream tmp;
       tmp << "NCrop = " << production.NCrop << "; NfNCnt = " << NfNCnt 
-          << "; CrNCnt = " << CrNCnt << "; PtNCnc = " << PtNCnc << "\n";
+          << "; CrNCnt = " << CrNCnt << "; PtNCnt = " << PtNCnt << "\n";
       tmp << "NLeaf = " << production.NLeaf 
           << "; NStem = " << production.NStem
           << "; NSOrg = " << production.NSOrg << "\n";
@@ -142,7 +141,7 @@ CrpN::update (const int Hour, double& NCrop, const double DS,
   
   // Ensure we have enough N for all the crop parts.
   if (!enable_N_stress)
-    NCrop = max (NCrop, CrNCnt);
+    NCrop = std::max (NCrop, CrNCnt);
 }
 
 void
