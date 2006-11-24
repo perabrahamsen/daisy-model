@@ -149,10 +149,8 @@ struct PedotransferGet : public PedotransferLeaf
     Treelog::Open nest (err, name);
     bool ok = true;
 
-    if (!soil.has_attribute (name))
+    if (!soil.has_attribute (name, err))
       {
-        err.error ("Required attribute '" 
-                   + name + "' is missing from the soil");
         ok = false;
       }
     for (size_t i = 0; i < soil.size () && ok; i++)

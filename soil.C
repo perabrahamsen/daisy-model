@@ -79,6 +79,20 @@ A location and content of a soil layer.");
   const double dispersivity;
   const std::vector<double> border;
 
+  bool has_attribute (const std::string& name, Treelog& msg) const
+  { 
+    bool missing = false;
+    for (size_t i = 0; i < layers.size (); i++)
+      if (!layers[i]->horizon->has_attribute (name))
+        {
+          msg.error ("Required attribute '" 
+                     + name + "' is missing from the soil horizon '"
+                     + layers[i]->horizon->name + "'");
+          missing = true;
+        }
+    return !missing;
+  }
+  
   bool has_attribute (const std::string& name) const
   { 
     bool missing = false;
