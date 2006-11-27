@@ -21,6 +21,8 @@
 
 
 #include "weather_old.h"
+#include "block.h"
+#include "alist.h"
 #include "fao.h"
 #include "time.h"
 #include <sstream>

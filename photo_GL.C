@@ -20,6 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "photo.h"
+#include "block.h"
 #include "canopy_std.h"
 #include "phenology.h"
 #include "plf.h"

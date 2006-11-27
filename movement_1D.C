@@ -194,33 +194,27 @@ Movement1D::tick_water (const Geometry1D& geo,
   const size_t first = (surface.top_type (geo, 0U) == Surface::soil)
     ? surface.last_cell (geo, 0U) 
     : 0U;
-  bool ok = true;
-
   // Calculate matrix flow next.
   try
     {
-      ok = uzdefault->tick (msg, geo, soil, soil_heat,
-                            first, surface, 0U, last, groundwater,
-                            S, h_old, Theta_old, h_ice, h, Theta, 0U, q);
+      uzdefault->tick (msg, geo, soil, soil_heat,
+                       first, surface, 0U, last, groundwater,
+                       S, h_old, Theta_old, h_ice, h, Theta, 0U, q);
+      goto find_flux;
     }
   catch (const char* error)
     {
       msg.warning (std::string ("UZ problem: ") + error);
-      ok = false;
     }
   catch (const std::string& error)
     {
       msg.warning (std::string ("UZ problem: ") + error);
-      ok = false;
     }
-  if (!ok)
-    {
-      msg.message ("Using reserve uz model.");
-      uzreserve->tick (msg, geo, soil, soil_heat,
-                       first, surface, 0U, last, groundwater,
-                       S, h_old, Theta_old, h_ice, h, Theta, 0U, q);
-    }
-
+  msg.message ("Using reserve uz model.");
+  uzreserve->tick (msg, geo, soil, soil_heat,
+                   first, surface, 0U, last, groundwater,
+                   S, h_old, Theta_old, h_ice, h, Theta, 0U, q);
+ find_flux:
   for (size_t i = last + 2; i <= soil.size (); i++)
     {
       q[i] = q[i-1];

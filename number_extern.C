@@ -20,6 +20,8 @@
 
 
 #include "number.h"
+#include "block.h"
+#include "alist.h"
 #include "log_extern.h"
 #include "scope_multi.h"
 #include <memory>

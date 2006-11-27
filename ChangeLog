@@ -1,3 +1,14 @@
+2006-11-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrect_Mollerup.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* uzrect.C: New component.
+	* Makefile (COMPONENTS): Added it.
+	* uzrect_2x1.C: New model.
+	* Makefile (MODELS): Use it.
+	* movement_rect.C: Use it.
+
 2006-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* librarian.h (BuildBase): New helper class.

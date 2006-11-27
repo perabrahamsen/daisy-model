@@ -20,6 +20,7 @@
 
 
 #include "difrad.h"
+#include "block.h"
 #include "weather.h"
 #include "fao.h"
 #include "mathlib.h"

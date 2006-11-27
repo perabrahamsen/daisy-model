@@ -24,6 +24,7 @@
 #include "geometry.h"
 #include "number.h"
 #include "scope.h"
+#include "library.h"
 #include "alist.h"
 #include "check.h"
 #include "vcheck.h"

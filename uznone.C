@@ -21,6 +21,8 @@
 
 
 #include "uzmodel.h"
+#include "syntax.h"
+#include "alist.h"
 #include "soil.h"
 #include "mathlib.h"
 
@@ -29,7 +31,7 @@ using namespace std;
 class UZNone : public UZmodel
 {
 public:
-  bool tick (Treelog&, const GeometryVert& /* geo */,
+  void tick (Treelog&, const GeometryVert& /* geo */,
              const Soil& /* soil */, const SoilHeat&,
 	     const unsigned int first, const Surface& /* top */, 
              const size_t /* top_edge */,
@@ -50,8 +52,6 @@ public:
         h[i] = h_old[i];
       }
     q_base[q_offset + last + 1] = 0.0;
-
-    return true;
   }
 
   // Create and Destroy.

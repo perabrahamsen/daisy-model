@@ -19,6 +19,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "source.h"
+#include "block.h"
+#include "alist.h"
 #include "number.h"
 #include "scope_sources.h"
 #include "gnuplot_utils.h"

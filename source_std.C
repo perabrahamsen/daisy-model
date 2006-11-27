@@ -21,6 +21,7 @@
 #include "source_file.h"
 #include "units.h"
 #include "lexer_table.h"
+#include "alist.h"
 #include <sstream>
 
 struct SourceStandard : public SourceFile

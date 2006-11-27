@@ -24,6 +24,7 @@
 #define AM_H
 
 #include "librarian.h"
+#include "alist.h"
 #include <vector>
 
 class Geometry;

@@ -21,6 +21,8 @@
 
 
 #include "adsorption.h"
+#include "syntax.h"
+#include "alist.h"
 #include "soil.h"
 #include "mathlib.h"
 

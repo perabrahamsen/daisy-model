@@ -20,6 +20,8 @@
 
 
 #include "number.h"
+#include "block.h"
+#include "alist.h"
 #include "source.h"
 #include <sstream>
 #include <memory>

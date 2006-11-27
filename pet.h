@@ -24,6 +24,7 @@
 #define PET_H
 
 #include "librarian.h"
+#include "alist.h"
 
 class Geometry;
 class Soil;

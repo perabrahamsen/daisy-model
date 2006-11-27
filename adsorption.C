@@ -21,6 +21,7 @@
 
 
 #include "adsorption.h"
+#include "block.h"
 
 template<>
 Librarian<Adsorption>::Content* Librarian<Adsorption>::content = NULL;

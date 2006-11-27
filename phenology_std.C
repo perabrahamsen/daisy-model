@@ -21,6 +21,8 @@
 
 
 #include "phenology.h"
+#include "block.h"
+#include "alist.h"
 #include "production.h"
 #include "vernalization.h"
 #include "plf.h"

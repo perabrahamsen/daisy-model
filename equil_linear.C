@@ -20,6 +20,8 @@
 
 
 #include "equil.h"
+#include "syntax.h"
+#include "alist.h"
 #include "pedo.h"
 #include "soil.h"
 #include "treelog.h"

@@ -20,6 +20,7 @@
 
 
 #include "pedo.h"
+#include "alist.h"
 #include "soil.h"
 #include "treelog_stream.h"
 #include "submodeler.h"

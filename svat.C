@@ -22,6 +22,7 @@
 
 #include "svat.h"
 #include "log.h"
+#include "block.h"
 
 template<>
 Librarian<SVAT>::Content* Librarian<SVAT>::content = NULL;

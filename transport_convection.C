@@ -21,6 +21,7 @@
 
 
 #include "transport.h"
+#include "block.h"
 #include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"

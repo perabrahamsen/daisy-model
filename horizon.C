@@ -22,6 +22,7 @@
 
 #include "horizon.h"
 #include "library.h"
+#include "block.h"
 #include "alist.h"
 #include "syntax.h"
 #include "plf.h"

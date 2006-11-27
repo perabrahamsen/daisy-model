@@ -23,6 +23,7 @@
 #include "soil_NO3.h"
 #include "soil.h"
 #include "submodel.h"
+#include "alist.h"
 
 double 
 SoilNO3::diffusion_coefficient () const

@@ -20,6 +20,8 @@
 
 
 #include "format_LaTeX.h"
+#include "syntax.h"
+#include "alist.h"
 #include "version.h"
 // GCC 2.95 lack ostream.
 #include <iostream>

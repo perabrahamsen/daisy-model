@@ -21,6 +21,7 @@
 
 
 #include "rootdens.h"
+#include "alist.h"
 #include "geometry.h"
 #include "plf.h"
 #include "submodeler.h"

@@ -21,6 +21,8 @@
 
 
 #include "horizon.h"
+#include "block.h"
+#include "alist.h"
 #include "texture.h"
 #include "hydraulic.h"
 #include "check.h"

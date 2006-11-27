@@ -21,6 +21,8 @@
 
 
 #include "transform.h"
+#include "syntax.h"
+#include "alist.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "pedo.h"

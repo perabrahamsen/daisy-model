@@ -23,6 +23,8 @@
 // van Genuchten retention curve model with Burdine theory.
 
 #include "hydraulic.h"
+#include "block.h"
+#include "alist.h"
 #include "plf.h"
 #include "mathlib.h"
 

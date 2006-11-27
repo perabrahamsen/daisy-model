@@ -58,7 +58,7 @@ public:
   std::string cell_name (int) const; // For array logging.
   virtual std::string edge_name (size_t) const;
   virtual int dimensions () const = 0; // Number of non-trivial dimensions.
-  virtual int edge_index (int from, int to); // Find edge between two cells.
+  virtual int edge_index (int from, int to) const; // Find edge between two cells.
   virtual int edge_from (size_t) const = 0; // Cell where edge originates.
   virtual int edge_to (size_t) const = 0; // Cell where edge leads.
   virtual double edge_area (size_t) const = 0; // Area connecting the cells.

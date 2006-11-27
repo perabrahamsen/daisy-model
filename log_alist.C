@@ -23,6 +23,8 @@
 // Log to an alist.
 
 #include "log_alist.h"
+#include "library.h"
+#include "syntax.h"
 
 using namespace std;
 

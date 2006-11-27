@@ -80,7 +80,7 @@ Geometry::edge_name (size_t e) const
 }
 
 int
-Geometry::edge_index (const int from, const int to)
+Geometry::edge_index (const int from, const int to) const
 {
   for (size_t e = 0; e < edge_size (); e++)
     if (edge_from (e) == from && edge_to (e) == to)

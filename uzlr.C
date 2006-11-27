@@ -21,6 +21,8 @@
 
 
 #include "uzmodel.h"
+#include "block.h"
+#include "alist.h"
 #include "surface.h"
 #include "groundwater.h"
 #include "geometry_vert.h"
@@ -40,7 +42,7 @@ private:
 
   // Simulate.
 public:
-  bool tick (Treelog&, const GeometryVert& geo,
+  void tick (Treelog&, const GeometryVert& geo,
              const Soil& soil, const SoilHeat& soil_heat,
 	     unsigned int first, const Surface& top, 
              size_t top_edge,
@@ -63,7 +65,7 @@ public:
   static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
 
-bool
+void
 UZlr::tick (Treelog& msg, const GeometryVert& geo,
             const Soil& soil, const SoilHeat& soil_heat,
 	    unsigned int first, const Surface& top, 
@@ -348,7 +350,6 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
     }
   daisy_assert (approximate (total_old + (-q_up + q_down - total_S) * dt, 
 			     total_new));
-  return true;
 }
 
 UZlr::UZlr (Block& al)

@@ -21,6 +21,8 @@
 
 
 #include "options.h"
+#include "library.h"
+#include "block.h"
 #include "parser_file.h"
 #include "program.h"
 #include "syntax.h"

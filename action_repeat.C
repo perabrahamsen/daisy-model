@@ -21,6 +21,7 @@
 
 
 #include "action.h"
+#include "block.h"
 #include "log.h"
 
 struct ActionRepeat : public Action

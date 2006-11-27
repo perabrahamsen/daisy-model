@@ -20,6 +20,7 @@
 
 
 #include "raddist.h"
+#include "syntax.h"
 #include "vegetation.h"
 #include "mathlib.h"
 #include <sstream>

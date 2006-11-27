@@ -3,6 +3,7 @@
 #include "crop.h"
 #include "chemicals.h"
 #include "om.h"
+#include "block.h"
 #include "mathlib.h"
 
 const double Crop::DSremove = -5001.0;

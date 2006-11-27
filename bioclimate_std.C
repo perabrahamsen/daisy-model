@@ -21,6 +21,8 @@
 
 
 #include "bioclimate.h"
+#include "library.h"
+#include "block.h"
 #include "surface.h"
 #include "weather.h"
 #include "plf.h"

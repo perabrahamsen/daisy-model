@@ -20,6 +20,8 @@
 
 
 #include "boolean.h"
+#include "syntax.h"
+#include "alist.h"
 #include "number.h"
 #include "memutils.h"
 #include <sstream>

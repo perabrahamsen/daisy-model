@@ -23,6 +23,8 @@
 // Parameters specified by the HYPRES transfer function.
 
 #include "hydraulic.h"
+#include "block.h"
+#include "alist.h"
 #include "texture.h"
 #include "plf.h"
 #include "treelog.h"

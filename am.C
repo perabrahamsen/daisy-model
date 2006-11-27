@@ -22,6 +22,7 @@
 #include "am.h"
 #include "aom.h"
 #include "im.h"
+#include "library.h"
 #include "submodeler.h"
 #include "syntax.h"
 #include "alist.h"

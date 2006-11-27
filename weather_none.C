@@ -21,6 +21,8 @@
 
 
 #include "weather_old.h"
+#include "block.h"
+#include "alist.h"
 
 class WeatherNone : public WeatherOld
 {

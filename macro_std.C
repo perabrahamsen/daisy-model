@@ -21,6 +21,7 @@
 
 
 #include "macro.h"
+#include "block.h"
 #include "geometry1d.h"
 #include "soil.h"
 #include "surface.h"

@@ -21,6 +21,7 @@
 
 
 #include "pet.h"
+#include "syntax.h"
 #include "weather.h"
 #include "log.h"
 

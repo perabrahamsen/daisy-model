@@ -21,6 +21,8 @@
 
 
 #include "select.h"
+#include "block.h"
+#include "alist.h"
 #include "mathlib.h"
 #include "check.h"
 #include "vcheck.h"

@@ -21,6 +21,8 @@
 
 
 #include "select_value.h"
+#include "block.h"
+#include "alist.h"
 
 struct SelectIndex : public SelectValue
 {

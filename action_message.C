@@ -21,6 +21,7 @@
 
 
 #include "action.h"
+#include "block.h"
 #include "condition.h"
 #include "log.h"
 #include "daisy.h"

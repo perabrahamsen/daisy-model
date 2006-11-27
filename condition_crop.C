@@ -23,6 +23,7 @@
 // Checking crop state.
 
 #include "condition.h"
+#include "block.h"
 #include "crop.h"
 #include "field.h"
 #include "daisy.h"

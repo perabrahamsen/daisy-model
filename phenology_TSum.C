@@ -1,4 +1,4 @@
-// phenology_TSum.C -- Pure teemperature sum crop phenology model.
+// phenology_TSum.C -- Pure temperature sum crop phenology model.
 // 
 // Copyright 2003 Per Abrahamsen and Søren Hansen
 // Copyright 2003 KVL.
@@ -21,6 +21,8 @@
 
 
 #include "phenology.h"
+#include "block.h"
+#include "alist.h"
 #include "production.h"
 #include "vernalization.h"
 #include "plf.h"

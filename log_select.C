@@ -21,6 +21,8 @@
 
 
 #include "log_select.h"
+#include "library.h"
+#include "block.h"
 #include "field.h"
 #include "format.h"
 #include "volume.h"

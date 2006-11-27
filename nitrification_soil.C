@@ -21,6 +21,8 @@
 
 
 #include "nitrification.h"
+#include "block.h"
+#include "alist.h"
 #include "mathlib.h"
 #include "plf.h"
 #include "check.h"

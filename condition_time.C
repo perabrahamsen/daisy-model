@@ -21,6 +21,8 @@
 
 
 #include "condition.h"
+#include "block.h"
+#include "alist.h"
 #include "time.h"
 #include "daisy.h"
 #include "vcheck.h"

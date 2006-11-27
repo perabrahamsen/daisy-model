@@ -21,6 +21,7 @@
 
 
 #include "pet.h"
+#include "syntax.h"
 #include "fao.h"
 #include "weather.h"
 #include "soil.h"

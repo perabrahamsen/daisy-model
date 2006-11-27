@@ -21,6 +21,7 @@
 
 
 #include "uzmodel.h"
+#include "block.h"
 #include "groundwater.h"
 #include "surface.h"
 #include "geometry_vert.h"
@@ -77,7 +78,7 @@ private:
 		double ddt,
 		double *const q);
 public:
-  bool tick (Treelog&, const GeometryVert& geo,
+  void tick (Treelog&, const GeometryVert& geo,
              const Soil& soil, const SoilHeat&,
 	     unsigned int first, const Surface& top,
              size_t top_edge, 
@@ -640,7 +641,7 @@ calculating flow with pressure top.\n";
     }
 }
 
-bool
+void
 UZRichard::tick (Treelog& msg, const GeometryVert& geo,
                  const Soil& soil, const SoilHeat& soil_heat,
 		 const unsigned int first, const Surface& top, 
@@ -657,9 +658,7 @@ UZRichard::tick (Treelog& msg, const GeometryVert& geo,
 {
   if (!richard (msg, geo, soil, soil_heat, first, top, top_edge, last, bottom, 
 		S, h_old, Theta_old, h_ice, h, Theta, q_offset, q_base))
-    throw ("Richard's equation doesn't converge");
-
-  return true;
+    throw "Richard's equation doesn't converge";
 }
 
 void

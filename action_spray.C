@@ -21,6 +21,8 @@
 
 
 #include "action.h"
+#include "library.h"
+#include "block.h"
 #include "daisy.h"
 #include "field.h"
 #include "chemical.h"

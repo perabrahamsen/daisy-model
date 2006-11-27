@@ -21,6 +21,8 @@
 
 
 #include "groundwater.h"
+#include "syntax.h"
+#include "alist.h"
 
 class GroundwaterDeep : public Groundwater
 {

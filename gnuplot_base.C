@@ -20,6 +20,9 @@
 
 #include "gnuplot_base.h"
 #include "vcheck.h"
+#include "block.h"
+#include "syntax.h"
+#include "alist.h"
 
 void 
 GnuplotBase::Size::load_syntax (Syntax& syntax, AttributeList&)

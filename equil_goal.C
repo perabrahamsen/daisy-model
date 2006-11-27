@@ -20,6 +20,8 @@
 
 
 #include "equil.h"
+#include "block.h"
+#include "alist.h"
 #include "soil_water.h"
 #include "pedo.h"
 #include "soil.h"

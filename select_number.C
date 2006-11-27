@@ -21,6 +21,8 @@
 
 
 #include "select_value.h"
+#include "syntax.h"
+#include "alist.h"
 
 struct SelectNumber : public SelectValue
 {

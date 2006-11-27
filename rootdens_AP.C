@@ -21,6 +21,7 @@
 
 
 #include "rootdens.h"
+#include "block.h"
 #include "geometry.h"
 #include "log.h"
 #include "plf.h"

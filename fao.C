@@ -21,6 +21,8 @@
 
 
 #include "fao.h"
+#include "alist.h"
+#include "syntax.h"
 #include "net_radiation.h"
 #include "assertion.h"
 #include "treelog.h"

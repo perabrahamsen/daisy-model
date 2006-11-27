@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "xysource.h"
+#include "alist.h"
 #include "lexer_table.h"
 #include "scope_table.h"
 #include "gnuplot_utils.h"

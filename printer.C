@@ -21,6 +21,8 @@
 
 
 #include "printer.h"
+#include "alist.h"
+#include "block.h"
 
 template<>
 Librarian<Printer>::Content* Librarian<Printer>::content = NULL;

@@ -23,6 +23,8 @@
 // Checking daisy state.
 
 #include "condition.h"
+#include "syntax.h"
+#include "alist.h"
 #include "daisy.h"
 
 struct ConditionRunning : public Condition

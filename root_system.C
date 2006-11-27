@@ -31,6 +31,7 @@
 #include "soil.h"
 #include "log.h"
 #include "check.h"
+#include "block.h"
 #include "mathlib.h"
 #include <sstream>
 

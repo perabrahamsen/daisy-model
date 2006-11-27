@@ -22,6 +22,9 @@
 
 
 #include "program.h"
+#include "library.h"
+#include "block.h"
+#include "alist.h"
 #include "submodel.h"
 #include "printer_file.h"
 #include "xref.h"

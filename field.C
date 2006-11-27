@@ -25,6 +25,8 @@
 #include "log.h"
 #include "log_clone.h"
 #include "treelog.h"
+#include "library.h"
+#include "block.h"
 #include "memutils.h"
 
 using namespace std;

@@ -23,6 +23,8 @@
 // Logical operators.
 
 #include "condition.h"
+#include "syntax.h"
+#include "alist.h"
 #include "memutils.h"
 #include <memory>
 

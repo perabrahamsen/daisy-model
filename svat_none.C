@@ -21,6 +21,8 @@
 
 
 #include "svat.h"
+#include "syntax.h"
+#include "alist.h"
 
 struct SVAT_none : public SVAT
 {

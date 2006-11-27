@@ -21,6 +21,8 @@
 
 
 #include "tortuosity.h"
+#include "block.h"
+#include "alist.h"
 #include "hydraulic.h"
 
 using namespace std;

@@ -21,6 +21,7 @@
 
 
 #include "log.h"
+#include "library.h"
 #include "block.h"
 #include "daisy.h"
 #include <sstream>

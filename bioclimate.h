@@ -24,6 +24,7 @@
 #define BIOCLIMATE_H
 
 #include "librarian.h"
+#include "alist.h"
 #include "symbol.h"
 
 class Surface;

@@ -28,6 +28,7 @@
 #include "timestep.h"
 #include "log.h"
 #include "submodel.h"
+#include "block.h"
 #include <sstream>
 
 void

@@ -20,6 +20,8 @@
 
 
 #include "boolean.h"
+#include "block.h"
+#include "alist.h"
 #include <vector>
 
 struct BooleanStringEqual : public Boolean

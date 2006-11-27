@@ -23,6 +23,8 @@
 // Parameters specified by Cosby et al.
 
 #include "hydraulic.h"
+#include "syntax.h"
+#include "alist.h"
 #include "texture.h"
 #include "treelog.h"
 #include "mathlib.h"

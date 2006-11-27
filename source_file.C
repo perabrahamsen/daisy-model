@@ -20,6 +20,7 @@
 
 
 #include "source_file.h"
+#include "alist.h"
 #include "gnuplot_utils.h"
 #include "vcheck.h"
 #include "mathlib.h"

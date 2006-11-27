@@ -22,6 +22,8 @@
 //
 // See 'cdaisy.h' for more documentation.
 
+#include "block.h"
+#include "library.h"
 #include "syntax.h"
 #include "alist.h"
 #include "daisy.h"

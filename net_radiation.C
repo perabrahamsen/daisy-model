@@ -23,6 +23,8 @@
 #include "net_radiation.h"
 #include "log.h"
 #include "weather.h"
+#include "block.h"
+#include "syntax.h"
 #include "mathlib.h"
 
 template<>

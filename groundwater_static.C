@@ -21,6 +21,8 @@
 
 
 #include "groundwater.h"
+#include "block.h"
+#include "alist.h"
 
 class GroundwaterStatic : public Groundwater
 {

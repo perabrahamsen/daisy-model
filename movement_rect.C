@@ -24,13 +24,11 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 #include "solute.h"
-#include "element.h"
-#include "surface.h"
-#include "groundwater.h"
 #include "weather.h"
-#include "log.h"
+#include "element.h"
+#include "uzrect.h"
+#include "alist.h"
 #include "submodeler.h"
-
 #include <sstream>
 
 struct MovementRect : public Movement
@@ -40,23 +38,9 @@ struct MovementRect : public Movement
   Geometry& geometry () const;
 
   // Water.
-  std::auto_ptr<UZmodel> uzdefault;
-  std::auto_ptr<UZmodel> uzreserve;
-  std::auto_ptr<UZ1D> uzhor;
+  const std::vector<UZRect*> matrix_water;
   void macro_tick (const Soil&, SoilWater&, Surface&, Treelog&);
-  void water_column (const Soil& soil, const SoilHeat& soil_heat, 
-                     Surface& surface, Groundwater& groundwater,
-                     const size_t top_cell, const size_t bottom_cell,
-                     const std::vector<double>& S,
-                     std::vector<double>& h_old,
-                     const std::vector<double>& Theta_old,
-                     const std::vector<double>& h_ice,
-                     std::vector<double>& h,
-                     std::vector<double>& Theta,
-                     const size_t q_offset,
-                     std::vector<double>& q,
-                     std::vector<double>& q_p,
-                     Treelog& msg);
+
   // Solute.
   std::auto_ptr<Transport> transport; // Solute transport model in matrix.
   std::auto_ptr<Transport> reserve; // Reserve solute transport model in matr.
@@ -115,90 +99,6 @@ MovementRect::geometry () const
 void
 MovementRect::macro_tick (const Soil&, SoilWater&, Surface&, Treelog&)
 { }
-
-void
-MovementRect::water_column (const Soil& soil, const SoilHeat& soil_heat, 
-                            Surface& surface, Groundwater& groundwater,
-                            const size_t top_cell, const size_t bottom_cell,
-                            const std::vector<double>& S,
-                            std::vector<double>& h_old,
-                            const std::vector<double>& Theta_old,
-                            const std::vector<double>& h_ice,
-                            std::vector<double>& h,
-                            std::vector<double>& Theta,
-                            const size_t q_offset,
-                            std::vector<double>& q,
-                            std::vector<double>& q_p,
-                            Treelog& msg)
-{
-  // Find top edge.
-  const size_t top_edge = top_cell + q_offset;
-  daisy_assert (geo->edge_to (top_edge) == Geometry::cell_above);
-  daisy_assert (q.size () > bottom_cell + 1);
-
-  // Limit for ridging.
-  const size_t first = top_cell +
-    (surface.top_type (*geo, top_edge) == Surface::soil
-     ?  surface.last_cell (*geo, top_edge) : 0);
-
-  // Limit for groundwater table.
-  size_t last = bottom_cell;
-  if (groundwater.bottom_type () == Groundwater::pressure)
-    {
-      if (groundwater.table () <= geo->zminus (bottom_cell))
-        throw ("Groundwater table in or below lowest cell.");
-
-      while (groundwater.table () > geo->zminus (last) && last > first)
-        last--;
-
-      // Pressure at the last cell is equal to the water above it.
-      for (size_t i = last + 1; i <= bottom_cell; i++)
-        h_old[i] = h[i] = groundwater.table () - geo->z (i);
-    }
-
-  bool ok = true;
-
-  // Calculate matrix flow next.
-  try
-    {
-      ok = uzdefault->tick (msg, *geo, soil, soil_heat,
-                            first, surface, top_edge, last, groundwater,
-                            S, h_old, Theta_old, h_ice, h, Theta, 
-                            q_offset, q);
-    }
-  catch (const char* error)
-    {
-      msg.warning (std::string ("UZ problem: ") + error);
-      ok = false;
-    }
-  catch (const std::string& error)
-    {
-      msg.warning (std::string ("UZ trouble: ") + error);
-      ok = false;
-    }
-  if (!ok)
-    {
-      msg.message ("Using reserve uz model.");
-      uzreserve->tick (msg, *geo, soil, soil_heat,
-                       first, surface, top_edge, last, groundwater,
-                       S, h_old, Theta_old, h_ice, h, Theta, 
-                       q_offset, q);
-    }
-
-  for (size_t i = last + 2; i <= bottom_cell + 1; i++)
-    {
-      daisy_assert (q.size () > i + q_offset);
-      q[i + q_offset] = q[i-1 + q_offset];
-      q_p[i + q_offset] = q_p[i-1 + q_offset];
-    }
-
-  // Update Theta below groundwater table.
-  if (groundwater.bottom_type () == Groundwater::pressure)
-    {
-      for(size_t i = last + 1; i < soil.size (); i++)
-        Theta[i] = soil.Theta (i, h[i], h_ice[i]);
-    }
-}
 
 void
 MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
@@ -393,92 +293,28 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
                     const Weather&, Treelog& msg) 
 {
   const size_t cell_size = geo->cell_size ();
-  const size_t edge_size = geo->edge_size ();
-  const size_t cell_rows = geo->cell_rows ();
-  const size_t cell_columns = geo->cell_columns ();
-  const size_t edge_rows = geo->edge_rows ();
 
   soil_water.tick (cell_size, soil, msg); 
 
-  // Vertical movement.
-  for (size_t col = 0; col < cell_columns; col++)
+  for (size_t i = 0; i < matrix_water.size (); i++)
     {
-      // Find relevant cells.
-      const size_t c_first = col * cell_rows;
-      const size_t c_last = (col + 1U) * cell_rows - 1U;
-
-      // Find relevant edges.
-      const size_t e_first = col * edge_rows;
-      const size_t e_last = (col + 1U) * edge_rows - 1U;
-
-      // Check that they match.
-      daisy_assert (geo->edge_to (e_first) == Geometry::cell_above);
-      daisy_assert (geo->edge_from (e_first) == c_first);
-      daisy_assert (geo->edge_to (e_last) == c_last);
-      daisy_assert (geo->edge_from (e_last) == Geometry::cell_below);
-
-      water_column (soil, soil_heat, surface, groundwater, 
-                    c_first, c_last,
-                    soil_water.S_sum_, soil_water.h_old_, 
-                    soil_water.Theta_old_,
-                    soil_water.h_ice_, soil_water.h_, soil_water.Theta_,
-                    col, soil_water.q_, soil_water.q_p_,
-                    msg);
-   }
-  // Update surface and groundwater reservoirs.
-  for (size_t edge = 0; edge < edge_size; edge++)
-    {
-      if (geo->edge_to (edge) == Geometry::cell_above)
-        surface.accept_top (soil_water.q (edge) * dt, *geo, edge, msg);
-      if (geo->edge_from (edge) == Geometry::cell_below)
-        groundwater.accept_bottom ((soil_water.q (edge)
-                                    + soil_water.q_p (edge)) * dt,
-                                   *geo, edge);
-    }
-
-  // Horizontal movement.
-  for (size_t row = 0; row < cell_rows; row++)
-    {
-      std::vector<size_t> cells;
-      std::vector<int> edges;
-      
-      for (size_t col = 0; col < cell_columns; col++)
-        cells.push_back (geo->cell_index (row, col));
-
-      int from = Geometry::cell_left;
-      for (size_t col = 0; col <= cell_columns; col++)
+      Treelog::Open nest (msg, matrix_water[i]->name);
+      try
         {
-          const int to = (col == cell_columns 
-                          ? Geometry::cell_right
-                          : static_cast<int> (cells[col]));
-          const int edge = geo->edge_index (from, to);
-          daisy_assert (edge >= 0);
-          daisy_assert (edge < geo->edge_size ());
-          daisy_assert (geo->edge_from (edge) == from);
-          daisy_assert (geo->edge_to (edge) == to);
-          daisy_assert (col == 0 
-                        || col == cell_columns
-                        || approximate (geo->z (cells[col-1]),
-                                        geo->z (cells[col])));
-          edges.push_back (edge);
-          from = to;
-        }
-
-      SMM1D smm (*geo, soil, soil_water, soil_heat, cells, edges);
-
-      try 
-        {
-          uzhor->tick (smm, 0.0, msg);
+          matrix_water[i]->tick (*geo, soil, soil_water, soil_heat,
+                                 surface, groundwater, msg);
+          return;
         }
       catch (const char* error)
         {
-          msg.warning (std::string ("UZhor problem: ") + error);
+          msg.warning (std::string ("UZ problem: ") + error);
         }
       catch (const std::string& error)
         {
-          msg.warning (std::string ("UZhor trouble: ") + error);
+          msg.warning (std::string ("UZ trouble: ") + error);
         }
     }
+  throw "Matrix water transport failed";
 }
 
 void 
@@ -495,16 +331,14 @@ MovementRect::initialize (const AttributeList&,
                           Treelog&)
 {
   const bool has_macropores = false;
-  uzdefault->has_macropores (has_macropores);
-  uzreserve->has_macropores (has_macropores);
+  for (size_t i = 0; i < matrix_water.size (); i++)
+    matrix_water[i]->has_macropores (has_macropores);
 }
 
 MovementRect::MovementRect (Block& al)
   : Movement (al),
     geo (submodel<GeometryRect> (al, "Geometry")),
-    uzdefault (Librarian<UZmodel>::build_item (al, "UZdefault")),
-    uzreserve (Librarian<UZmodel>::build_item (al, "UZreserve")),
-    uzhor (Librarian<UZ1D>::build_item (al, "UZhor")),
+    matrix_water (Librarian<UZRect>::build_vector (al, "matrix_water")),
     transport (Librarian<Transport>::build_item (al, "transport")),
     reserve (Librarian<Transport>::build_item (al, "transport_reserve")),
     last_resort (Librarian<Transport>::build_item (al, 
@@ -526,17 +360,15 @@ static struct MovementRectSyntax
     syntax.add_submodule ("Geometry", alist, Syntax::State,
                           "Discretization of the soil.",
                           GeometryRect::load_syntax);
-    syntax.add ("UZdefault", Librarian<UZmodel>::library (),
-                "Main water transport model in unsaturated zone.");
-    alist.add ("UZdefault", UZmodel::default_model ());
-    syntax.add ("UZreserve", Librarian<UZmodel>::library (),
-                "Reserve transport model if UZtop fails.");
-    alist.add ("UZreserve", UZmodel::reserve_model ());
-    syntax.add ("UZhor", Librarian<UZmodel>::library (),
-                "Horizonatl transport model for soil matrix water.");
-    alist.add ("UZhor", UZ1D::default_model ());
-    syntax.add ("transport", Librarian<Transport>::library (), 
-                "Solute transport model in matrix.");
+    syntax.add ("matrix_water", Librarian<UZRect>::library (), 
+                Syntax::Const, Syntax::Sequence,
+                "Matrix water transport models.\n\
+Each model will be tried in turn, until one succeeds.\n\
+If none succeeds, the simulation ends.");
+    std::vector<AttributeList*> matrix_water_models;
+    AttributeList matrix_water_reserve (UZRect::reserve_model ());
+    matrix_water_models.push_back (&matrix_water_reserve);
+    alist.add ("matrix_water", matrix_water_models);
     alist.add ("transport", Transport::default_model ());
     syntax.add ("transport_reserve", Librarian<Transport>::library (),
                 "Reserve solute transport if the primary model fails.");

@@ -45,7 +45,7 @@ public:
 
   // Simulate.
 public:
-  virtual bool tick (Treelog&, const GeometryVert& geo,
+  virtual void tick (Treelog&, const GeometryVert& geo,
                      const Soil& soil, const SoilHeat&,
 		     unsigned int first, const Surface& top, 
                      const size_t top_edge,

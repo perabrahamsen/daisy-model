@@ -21,6 +21,7 @@
 
 
 #include "chemical.h"
+#include "alist.h"
 
 template<>
 Librarian<Chemical>::Content* Librarian<Chemical>::content = NULL;

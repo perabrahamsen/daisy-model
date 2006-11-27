@@ -21,6 +21,7 @@
 
 
 #include "log_alist.h"
+#include "block.h"
 #include "condition.h"
 #include "daisy.h"
 #include "printer_file.h"

@@ -20,6 +20,8 @@
 
 
 #include "program.h"
+#include "block.h"
+#include "alist.h"
 #include "treelog.h"
 #include "path.h"
 #include "memutils.h"

@@ -21,6 +21,7 @@
 
 
 #include "weather_old.h"
+#include "block.h"
 #include "time.h"
 #include "log.h"
 #include "mathlib.h"

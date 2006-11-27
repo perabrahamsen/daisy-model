@@ -20,6 +20,7 @@
 
 
 #include "raddist.h"
+#include "syntax.h"
 #include "vegetation.h"
 #include "weather.h"
 #include "mathlib.h"

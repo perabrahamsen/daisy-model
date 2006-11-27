@@ -1,7 +1,6 @@
-// action.h -- Manager actions
+// uzrect.h --- 2D water movement in a rectangular grid.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,48 +18,52 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-#ifndef ACTION_H
-#define ACTION_H
+#ifndef UZRect_H
+#define UZRect_H
 
 #include "librarian.h"
-#include "alist.h"
+#include "symbol.h"
 
-class Daisy;
+struct GeometryRect;
+struct Soil;
+struct SoilWater;
+struct SoilHeat;
+struct Surface;
+struct Groundwater;
+struct Treelog;
 
-class Action
+class UZRect
 {
   // Content.
-public:
+public: 
   const symbol name;
-  const AttributeList alist;
+  static const char *const description;
 
-  // Simulation.
+  // Simulate.
 public:
-  virtual void tick (const Daisy&, Treelog&);
-  virtual void doIt (Daisy&, Treelog&) = 0;
-  virtual bool done (const Daisy&, Treelog&) const;
-  virtual void output (Log&) const;
+  virtual void tick (const GeometryRect&, const Soil&, SoilWater&, 
+                     const SoilHeat&, Surface&, Groundwater&, Treelog&) = 0;
 
   // Create and Destroy.
-public: 
-  virtual bool check (const Daisy&, Treelog& err) const;
-  static const char *const description;
-private:
-  Action (const Action&);
-  Action& operator= (const Action&);
-protected:
-  explicit Action (Block&, const AttributeList& al);
-  explicit Action (Block& al);
 public:
-  virtual ~Action ();
+  virtual void has_macropores (bool) = 0;
+  static const AttributeList& default_model ();
+  static const AttributeList& reserve_model ();
+private:
+  UZRect ();
+  UZRect (const UZRect&);
+  UZRect& operator= (const UZRect&);
+protected:
+  explicit UZRect (Block&);
+public:
+  virtual ~UZRect ();
 };
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Action>::Content* Librarian<Action>::content;
+Librarian<UZRect>::Content* Librarian<UZRect>::content;
 #endif
 
-static Librarian<Action> Action_init ("action");
+static Librarian<UZRect> UZRect_init ("uzrect");
 
-#endif // ACTION_H
+#endif // UZRect_H

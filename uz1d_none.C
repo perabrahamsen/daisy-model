@@ -21,6 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "uz1d.h"
+#include "alist.h"
 #include <sstream>
 
 struct UZ1DNone : public UZ1D
@@ -32,6 +33,8 @@ struct UZ1DNone : public UZ1D
   { }
 
   // Create and Destroy.
+  static void load_syntax (Syntax&, AttributeList&)
+  { }
   UZ1DNone (Block& al)
     : UZ1D (al)
   { }
@@ -39,7 +42,6 @@ struct UZ1DNone : public UZ1D
   { }
 };
 
-#if 0
 const AttributeList& 
 UZ1D::none_model ()
 {
@@ -50,11 +52,9 @@ UZ1D::none_model ()
       Syntax dummy;
       UZ1DNone::load_syntax (dummy, alist);
       alist.add ("type", "none");
-
     }
   return alist;
 }
-#endif
 
 static struct UZ1DNoneSyntax
 {

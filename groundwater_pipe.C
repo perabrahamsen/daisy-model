@@ -21,6 +21,7 @@
 
 
 #include "groundwater.h"
+#include "block.h"
 #include "log.h"
 #include "geometry.h"
 #include "soil.h"

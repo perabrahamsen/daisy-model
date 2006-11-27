@@ -20,6 +20,7 @@
 
 
 #include "pet.h"
+#include "syntax.h"
 #include "weather.h"
 #include "fao.h"
 #include "log.h"

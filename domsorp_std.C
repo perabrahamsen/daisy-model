@@ -20,6 +20,7 @@
 
 
 #include "domsorp.h"
+#include "block.h"
 #include "transform.h"
 #include "dom.h"
 #include "som.h"

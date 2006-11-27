@@ -22,6 +22,8 @@
 
 
 #include "select.h"
+#include "block.h"
+#include "alist.h"
 #include "mathlib.h"
 
 struct SelectArray : public Select

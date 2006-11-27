@@ -21,6 +21,9 @@
 
 
 #include "printer_file.h"
+#include "library.h"
+#include "block.h"
+#include "alist.h"
 #include "plf.h"
 #include "time.h"
 #include "parser.h"

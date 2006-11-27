@@ -21,6 +21,8 @@
 
 
 #include "log_select.h"
+#include "library.h"
+#include "block.h"
 #include "select.h"
 #include "summary.h"
 #include "geometry.h"

@@ -21,6 +21,9 @@
 
 
 #include "parser_file.h"
+#include "library.h"
+#include "block.h"
+#include "alist.h"
 #include "lexer.h"
 #include "submodel.h"
 #include "scope.h"

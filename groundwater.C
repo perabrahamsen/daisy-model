@@ -23,6 +23,7 @@
 #include "groundwater.h"
 #include "geometry.h"
 #include "log.h"
+#include "block.h"
 #include "assertion.h"
 
 template<>

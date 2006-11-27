@@ -23,6 +23,7 @@
 #include "canopy_std.h"
 #include "submodel.h"
 #include "log.h"
+#include "syntax.h"
 #include "mathlib.h"
 using namespace std;
 

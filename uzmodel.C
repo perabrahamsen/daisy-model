@@ -21,6 +21,7 @@
 
 
 #include "uzmodel.h"
+#include "block.h"
 
 UZmodel::UZmodel (Block& al)
   : name (al.identifier ("type"))

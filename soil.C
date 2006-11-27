@@ -24,6 +24,7 @@
 #include "hydraulic.h"
 #include "tortuosity.h"
 #include "groundwater.h"
+#include "library.h"
 #include "alist.h"
 #include "syntax.h"
 #include "mathlib.h"
@@ -237,6 +238,10 @@ Soil::heat_conductivity (size_t i, double Theta, double Ice) const
 double 
 Soil::heat_capacity (size_t i, double Theta, double Ice) const
 { return horizon_[i]->heat_capacity (Theta, Ice); }
+
+bool
+Soil::has_attribute (const std::string& name, Treelog& msg) const
+{ return impl.has_attribute (name, msg); }
 
 bool
 Soil::has_attribute (const std::string& name) const

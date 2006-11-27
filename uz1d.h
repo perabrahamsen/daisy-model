@@ -115,6 +115,7 @@ public:
   // Create and Destroy.
 public:
   static const AttributeList& default_model ();
+  static const AttributeList& none_model ();
 private:
   UZ1D ();
   UZ1D (const UZ1D&);

@@ -20,6 +20,7 @@
 
 
 #include "difrad.h"
+#include "syntax.h"
 #include "weather.h"
 #include "mathlib.h"
 #include <sstream>

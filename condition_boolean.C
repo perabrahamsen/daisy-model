@@ -21,6 +21,8 @@
 // Interface to generic boolean library.
 
 #include "condition.h"
+#include "syntax.h"
+#include "alist.h"
 #include "boolean.h"
 #include "scope.h"
 #include <memory>

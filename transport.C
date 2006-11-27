@@ -21,6 +21,7 @@
 
 
 #include "transport.h"
+#include "block.h"
 
 template<>
 Librarian<Transport>::Content* Librarian<Transport>::content = NULL;

@@ -20,6 +20,8 @@
 
 
 #include "pedo.h"
+#include "block.h"
+#include "alist.h"
 #include "soil.h"
 #include "units.h"
 #include "vcheck.h"

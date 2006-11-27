@@ -23,6 +23,8 @@
 // Brooks and Corey retention curve model with Burdine theory.
 
 #include "hydraulic.h"
+#include "block.h"
+#include "alist.h"
 #include "mathlib.h"
 
 class HydraulicB_BaC : public Hydraulic

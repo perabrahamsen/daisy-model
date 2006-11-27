@@ -21,6 +21,7 @@
 
 
 #include "action.h"
+#include "block.h"
 #include "daisy.h"
 #include "field.h"
 #include "im.h"

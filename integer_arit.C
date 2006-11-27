@@ -20,6 +20,8 @@
 
 
 #include "integer.h"
+#include "syntax.h"
+#include "alist.h"
 #include "vcheck.h"
 #include "memutils.h"
 #include <sstream>

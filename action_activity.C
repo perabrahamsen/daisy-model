@@ -21,6 +21,7 @@
 
 
 #include "action.h"
+#include "syntax.h"
 #include "log.h"
 #include "memutils.h"
 

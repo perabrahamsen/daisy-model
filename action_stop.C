@@ -21,6 +21,7 @@
 
 
 #include "action.h"
+#include "syntax.h"
 #include "daisy.h"
 
 struct ActionStop : public Action

@@ -20,6 +20,9 @@
 
 
 #include "log_all.h"
+#include "block.h"
+#include "syntax.h"
+#include "treelog.h"
 #include "assertion.h"
 
 using namespace std;

@@ -21,6 +21,8 @@
 
 
 #include "groundwater.h"
+#include "block.h"
+#include "alist.h"
 #include "check.h"
 
 class GroundwaterFixed : public Groundwater

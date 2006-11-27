@@ -21,6 +21,8 @@
 
 
 #include "macro.h"
+#include "syntax.h"
+#include "alist.h"
 
 struct MacroNone : public Macro
 {

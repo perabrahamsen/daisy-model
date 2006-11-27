@@ -23,6 +23,7 @@
 #include "canopy_simple.h"
 #include "submodel.h"
 #include "log.h"
+#include "syntax.h"
 
 double
 CanopySimple::EpFactor (double DS) const

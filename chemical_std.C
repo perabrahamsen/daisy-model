@@ -20,6 +20,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "chemical.h"
+#include "block.h"
+#include "alist.h"
 #include "mathlib.h"
 #include "plf.h"
 #include "soil_chemical.h"

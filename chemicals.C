@@ -22,6 +22,8 @@
 
 #include "chemicals.h"
 #include "log.h"
+#include "library.h"
+#include "block.h"
 #include "syntax.h"
 #include "alist.h"
 #include "chemical.h"

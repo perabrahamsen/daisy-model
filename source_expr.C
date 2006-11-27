@@ -21,6 +21,7 @@
 #include "source_file.h"
 #include "scope_table.h"
 #include "number.h"
+#include "alist.h"
 
 struct SourceExpr : public SourceFile
 {

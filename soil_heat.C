@@ -20,6 +20,7 @@
 
 
 #include "soil_heat.h"
+#include "block.h"
 #include "alist.h"
 #include "geometry.h"
 #include "soil.h"

@@ -56,12 +56,6 @@ cell, edge, vertex
 
 ** Håndter domain errors i expr i select.
 
-** log volumen.  
-
-'from' og 'to' skal erstattes af generelt "volumen" component, med
-forskellige modeller for hvodan man logger det volumen.  Fluxe går ind
-eller ud af volumen, noder overlapper.
-
 ** Plante
 
 Ny EmrDate parameter, overskriver EmrTSum, bruges for kartofler hvis fremspriring afhænger af opbevaring. 

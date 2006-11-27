@@ -23,7 +23,7 @@
 #ifndef LIBRARIAN_H
 #define LIBRARIAN_H
 
-#include "library.h"
+#include "symbol.h"
 #include "assertion.h"
 #include <map>
 #include <vector>
@@ -33,14 +33,19 @@ class Block;
 class AttributeList;
 class Syntax;
 class Treeelog;
+class Library;
 
 struct BuildBase 
 {
   // Content.
-  Library lib;
+  std::auto_ptr<Library> lib;
   int count;
 
-  // Use.
+  // Type.
+  typedef void (*derive_fun) (symbol name, const Syntax& syn,
+                              AttributeList& al, symbol super);
+
+  // Build.
   virtual void* build_raw (symbol type, Block&) const = 0;
   void* build_free (Treelog& msg, const AttributeList& alist, 
                     const std::string& scope_id) const;
@@ -53,9 +58,16 @@ struct BuildBase
   std::vector<const void*> build_vector_const (Block& al, 
                                                const std::string& key) const;
 
+  // Library.
+  void add_base (AttributeList& al, const Syntax& syntax) const;
+  void add_type (const symbol name, AttributeList& al,
+                 const Syntax& syntax) const;
+
   // Create and destroy.
-  BuildBase (const char *const name, Library::derive_fun derive, 
+protected:
+  BuildBase (const char *const name, derive_fun derive, 
 	     const char *const description);
+public:
   virtual ~BuildBase ();
 };
 
@@ -78,7 +90,7 @@ private:
       daisy_assert (builders.find (type) != builders.end ());
       return &(content->builders)[type] (block);
     }
-    Content (const char *const name, Library::derive_fun derive, 
+    Content (const char *const name, BuildBase::derive_fun derive, 
 	     const char *const description)
       : BuildBase (name, derive, description),
         builders ()
@@ -130,12 +142,16 @@ public:
   }
 
   static void add_base (AttributeList& al, const Syntax& syntax)
-  { library ().add_base (al, syntax); }
+  { 
+    daisy_assert (content);
+    content->add_base (al, syntax); 
+  }
   static void add_type (const symbol name, AttributeList& al,
 			const Syntax& syntax,
 			builder build)
   {
-    library ().add (name, al, syntax);
+    daisy_assert (content);
+    content->add_type (name, al, syntax);
     content->builders.insert (std::make_pair (name, build));
   }
   static void add_type (const char *const name, AttributeList& al,
@@ -148,7 +164,7 @@ public:
   static Library& library ()
   {
     daisy_assert (content);
-    return content->lib;
+    return *(content->lib);
   }
 
   // Create and Destroy.

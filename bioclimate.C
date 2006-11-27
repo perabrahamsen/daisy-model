@@ -22,6 +22,7 @@
 
 #include "bioclimate.h"
 #include "weather.h"
+#include "block.h"
 #include "mathlib.h"
 
 using namespace std;

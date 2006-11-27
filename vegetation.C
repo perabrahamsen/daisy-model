@@ -22,6 +22,8 @@
 
 #include "vegetation.h"
 #include "log.h"
+#include "syntax.h"
+#include "block.h"
 
 template<>
 Librarian<Vegetation>::Content* Librarian<Vegetation>::content = NULL;

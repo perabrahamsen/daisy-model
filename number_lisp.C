@@ -20,6 +20,7 @@
 
 
 #include "number.h"
+#include "alist.h"
 #include "scope_multi.h"
 #include "submodeler.h"
 #include "memutils.h"

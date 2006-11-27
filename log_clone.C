@@ -23,6 +23,7 @@
 // Clone an object by using its log function.
 
 #include "log_clone.h"
+#include "block.h"
 
 bool
 LogClone::match (const Daisy&, Treelog&)

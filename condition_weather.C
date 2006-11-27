@@ -22,6 +22,7 @@
 // Checking the weather.
 
 #include "condition.h"
+#include "block.h"
 #include "field.h"
 #include "daisy.h"
 #include "check.h"

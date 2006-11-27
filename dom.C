@@ -25,6 +25,7 @@
 #include "om.h"
 #include "geometry.h"
 #include "submodel.h"
+#include "block.h"
 #include "alist.h"
 #include "syntax.h"
 #include "soil.h"

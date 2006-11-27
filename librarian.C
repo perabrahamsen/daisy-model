@@ -20,6 +20,7 @@
 
 
 #include "librarian.h"
+#include "library.h"
 #include "block.h"
 #include "alist.h"
 #include "treelog.h"
@@ -31,14 +32,14 @@ BuildBase::build_free (Treelog& msg, const AttributeList& alist,
 {
   daisy_assert (alist.check ("type"));
   const symbol type = alist.identifier ("type");
-  if (!lib.check (type))
+  if (!lib->check (type))
     {
       std::ostringstream tmp;
-      tmp << "Library '" << lib.name () << "' contains no model '"
+      tmp << "Library '" << lib->name () << "' contains no model '"
           << type << "'";
       daisy_panic (tmp.str ());
     }
-  const Syntax& syntax = lib.syntax (type);
+  const Syntax& syntax = lib->syntax (type);
   Block block (syntax, alist, msg, scope_id + ": " + type.name ());
   daisy_assert (syntax.check (alist, msg));
   try
@@ -65,14 +66,14 @@ BuildBase::build_alist (Block& parent, const AttributeList& alist,
 {
   daisy_assert (alist.check ("type"));
   const symbol type = alist.identifier ("type");
-  if (!lib.check (type))
+  if (!lib->check (type))
     {
       std::ostringstream tmp;
-      tmp << "Component '" << lib.name () << "' contains no model '"
+      tmp << "Component '" << lib->name () << "' contains no model '"
           << type << "'";
       daisy_panic (tmp.str ());
     }
-  const Syntax& syntax = lib.syntax (type);
+  const Syntax& syntax = lib->syntax (type);
   Block nested (parent, syntax, alist, scope_id + ": " + type.name ());
   daisy_assert (syntax.check (alist, nested.msg ()));
   try
@@ -108,11 +109,20 @@ BuildBase::build_vector_const (Block& al, const std::string& key) const
   return t;
 }
 
+void 
+BuildBase::add_base (AttributeList& al, const Syntax& syntax) const
+{ lib->add_base (al, syntax); }
+
+void 
+BuildBase::add_type (const symbol name, AttributeList& al,
+                     const Syntax& syntax) const
+{ lib->add (name, al, syntax); }
+
 BuildBase::BuildBase (const char *const name, Library::derive_fun derive, 
                       const char *const description)
-  : lib (name, derive, description),
+  : lib (new Library (name, derive, description)),
     count (0)
-{ }
+{ daisy_assert (lib.get ()); }
 
 BuildBase::~BuildBase ()
 { }

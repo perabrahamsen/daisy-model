@@ -20,6 +20,7 @@
 
 
 #include "action.h"
+#include "library.h"
 #include "daisy.h"
 #include "field.h"
 #include "am.h"

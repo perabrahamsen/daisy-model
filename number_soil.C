@@ -20,6 +20,8 @@
 
 
 #include "number.h"
+#include "library.h"
+#include "block.h"
 #include "column.h"
 #include "horizon.h"
 #include "hydraulic.h"

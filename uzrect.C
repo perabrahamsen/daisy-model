@@ -1,7 +1,6 @@
-// condition.C -- Logic expressions
+// uzrect.C --- 2D water movement in a rectangular grid.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,31 +18,20 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-#include "condition.h"
+#include "uzrect.h"
 #include "block.h"
 
 template<>
-Librarian<Condition>::Content* Librarian<Condition>::content = NULL;
+Librarian<UZRect>::Content* Librarian<UZRect>::content = NULL;
 
-const char *const Condition::description = "\
-A 'condition' component tests the state of the simulation, like\n\
-whether the water pressure in a specific depth is above a given\n\
-threshold.  Logic conditions like 'and' and 'or' can be used for\n\
-testing whether multiple conditions are fulfilled simultaneously.";
+const char *const UZRect::description = "\
+2D water movement in a rectangular grid.";
 
-void
-Condition::tick (const Daisy&, Treelog&)
-{ }
-
-const std::string
-Condition::timestep ()
-{ return "dt"; } 
-
-Condition::Condition (Block& al)
+UZRect::UZRect (Block& al)
   : name (al.identifier ("type"))
 { }
 
-Condition::~Condition ()
+UZRect::~UZRect ()
 { }
 
+// uzrect.C ends here.

@@ -21,6 +21,8 @@
 
 
 #include "pet.h"
+#include "syntax.h"
+#include "block.h"
 #include "log.h"
 #include "vegetation.h"
 #include "surface.h"

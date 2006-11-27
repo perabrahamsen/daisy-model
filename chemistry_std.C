@@ -20,6 +20,7 @@
 
 
 #include "chemistry.h"
+#include "block.h"
 #include "transform.h"
 #include "soil_chemicals.h"
 #include "soil.h"

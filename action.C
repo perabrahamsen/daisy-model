@@ -21,6 +21,7 @@
 
 
 #include "action.h"
+#include "block.h"
 
 template<>
 Librarian<Action>::Content* Librarian<Action>::content = NULL;

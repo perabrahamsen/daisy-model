@@ -19,6 +19,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "gnuplot.h"
+#include "block.h"
+#include "alist.h"
 #include "source.h"
 #include "treelog.h"
 #include "memutils.h"

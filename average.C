@@ -21,6 +21,9 @@
 
 
 #include "average.h"
+#include "block.h"
+#include "alist.h"
+#include "syntax.h"
 #include "mathlib.h"
 
 // average component.

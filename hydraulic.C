@@ -21,9 +21,14 @@
 
 
 #include "hydraulic.h"
+#include "library.h"
+#include "block.h"
 #include "plf.h"
 #include "log.h"
 #include "check_range.h"
+#include "syntax.h"
+#include "block.h"
+#include "treelog.h"
 #include "mathlib.h"
 #include "program.h"
 #include "vcheck.h"
