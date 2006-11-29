@@ -34,6 +34,7 @@
 #include "log.h"
 #include "average.h"
 #include <sstream>
+#include <memory>
 
 class UZRichard : public UZmodel
 {
@@ -43,7 +44,7 @@ class UZRichard : public UZmodel
   const int max_iterations;
   const double max_absolute_difference;
   const double max_relative_difference;
-  /* const */ Average* K_average;
+  std::auto_ptr<const Average> K_average;
 
   // Simulate.
 private:
@@ -560,7 +561,7 @@ UZRichard::internode (const Soil& soil, const SoilHeat& soil_heat,
 		      std::vector<double>& Kplus) const
 {
   int size = last - first + 1;
-  daisy_assert (K_average != NULL);
+  daisy_assert (K_average.get ());
   for (int i = 0; i < size; i++)
     Kplus[i] = (*K_average)(K[i], K[i + 1]);
   
@@ -664,25 +665,28 @@ UZRichard::tick (Treelog& msg, const GeometryVert& geo,
 void
 UZRichard::has_macropores (bool has_them)
 { 
-  if (K_average == NULL)
+  if (!K_average.get ())
     {
       if (has_them)
 	{
 	  static AttributeList geometric;
 	  if (!geometric.check ("type"))
 	    geometric.add ("type", "geometric");
-	  K_average = Librarian<Average>::build_free (Treelog::null (),
-						      geometric, "has macro");
+	  K_average.reset (Librarian<Average>
+                           ::build_free (Treelog::null (),
+                                         geometric, "has macro"));
 	}
       else
 	{
 	  static AttributeList arithmetic;
 	  if (!arithmetic.check ("type"))
 	    arithmetic.add ("type", "arithmetic");
-	  K_average = Librarian<Average>::build_free (Treelog::null (),
-						      arithmetic, "no macro");
+	  K_average.reset (Librarian<Average>
+                           ::build_free (Treelog::null (),
+                                         arithmetic, "no macro"));
 	}
     }
+  daisy_assert (K_average.get ());
 }
 
 UZRichard::UZRichard (Block& al)
@@ -699,9 +703,7 @@ UZRichard::UZRichard (Block& al)
 { }
 
 UZRichard::~UZRichard ()
-{ 
-  delete K_average;
-}
+{ }
 
 void 
 UZRichard::load_syntax (Syntax& syntax, AttributeList& alist)

@@ -42,7 +42,8 @@ public:
   // Simulate.
 public:
   virtual void tick (const GeometryRect&, const Soil&, SoilWater&, 
-                     const SoilHeat&, Surface&, Groundwater&, Treelog&) = 0;
+                     const SoilHeat&, 
+                     const Surface&, const Groundwater&, Treelog&) = 0;
 
   // Create and Destroy.
 public:

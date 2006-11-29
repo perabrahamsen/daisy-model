@@ -34,9 +34,8 @@ struct UZRectMollerup : public UZRect
   // Parameters.
 
   // Interface.
-  void tick (const GeometryRect&, const Soil&, SoilWater&, 
-             const SoilHeat&, Surface& surface, Groundwater& groundwater, 
-             Treelog&);
+  void tick (const GeometryRect&, const Soil&, SoilWater&, const SoilHeat&, 
+             const Surface&, const Groundwater&, Treelog&);
 
   // Internal functions.
 
@@ -49,8 +48,9 @@ struct UZRectMollerup : public UZRect
 
 void 
 UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil, 
-                 SoilWater& soil_water, const SoilHeat& soil_heat,
-                 Surface& surface, Groundwater& groundwater, Treelog& msg)
+                      SoilWater& soil_water, const SoilHeat& soil_heat,
+                      const Surface& surface, const Groundwater& groundwater,
+                      Treelog& msg)
 {
   const size_t edge_size = geo.edge_size ();
   const size_t cell_rows = geo.cell_rows ();
@@ -59,16 +59,6 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 
   // Insert magic here.
 
-  // Update surface and groundwater reservoirs.
-  for (size_t edge = 0; edge < edge_size; edge++)
-    {
-      if (geo.edge_to (edge) == Geometry::cell_above)
-        surface.accept_top (soil_water.q (edge) * dt, geo, edge, msg);
-      if (geo.edge_from (edge) == Geometry::cell_below)
-        groundwater.accept_bottom ((soil_water.q (edge)
-                                    + soil_water.q_p (edge)) * dt,
-                                   geo, edge);
-    }
 }
 
 void 

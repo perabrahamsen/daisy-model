@@ -38,13 +38,13 @@ struct UZRect2x1 : public UZRect
 
   // Interface.
   void tick (const GeometryRect&, const Soil&, SoilWater&, 
-             const SoilHeat&, Surface& surface, Groundwater& groundwater, 
+             const SoilHeat&, const Surface&, const Groundwater&, 
              Treelog&);
 
   // Internal function.
   void water_column (const GeometryRect&, const Soil& soil,
                      const SoilHeat& soil_heat, 
-                     Surface& surface, Groundwater& groundwater,
+                     const Surface& surface, const Groundwater& groundwater,
                      const size_t top_cell, const size_t bottom_cell,
                      const std::vector<double>& S,
                      std::vector<double>& h_old,
@@ -67,9 +67,9 @@ struct UZRect2x1 : public UZRect
 void 
 UZRect2x1::tick (const GeometryRect& geo, const Soil& soil, 
                  SoilWater& soil_water, const SoilHeat& soil_heat,
-                 Surface& surface, Groundwater& groundwater, Treelog& msg)
+                 const Surface& surface, const Groundwater& groundwater, 
+                 Treelog& msg)
 {
-  const size_t edge_size = geo.edge_size ();
   const size_t cell_rows = geo.cell_rows ();
   const size_t cell_columns = geo.cell_columns ();
   const size_t edge_rows = geo.edge_rows ();
@@ -103,16 +103,6 @@ UZRect2x1::tick (const GeometryRect& geo, const Soil& soil,
                     col, soil_water.q_, soil_water.q_p_,
                     msg);
    }
-  // Update surface and groundwater reservoirs.
-  for (size_t edge = 0; edge < edge_size; edge++)
-    {
-      if (geo.edge_to (edge) == Geometry::cell_above)
-        surface.accept_top (soil_water.q (edge) * dt, geo, edge, msg);
-      if (geo.edge_from (edge) == Geometry::cell_below)
-        groundwater.accept_bottom ((soil_water.q (edge)
-                                    + soil_water.q_p (edge)) * dt,
-                                   geo, edge);
-    }
 
   // Horizontal movement.
   for (size_t row = 0; row < cell_rows; row++)
@@ -174,7 +164,8 @@ UZRect2x1::tick (const GeometryRect& geo, const Soil& soil,
 void
 UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
                          const SoilHeat& soil_heat, 
-                         Surface& surface, Groundwater& groundwater,
+                         const Surface& surface, 
+                         const Groundwater& groundwater,
                          const size_t top_cell, const size_t bottom_cell,
                          const std::vector<double>& S,
                          std::vector<double>& h_old,

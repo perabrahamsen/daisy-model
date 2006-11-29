@@ -24,6 +24,8 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 #include "solute.h"
+#include "groundwater.h"
+#include "surface.h"
 #include "weather.h"
 #include "element.h"
 #include "uzrect.h"
@@ -293,6 +295,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
                     const Weather&, Treelog& msg) 
 {
   const size_t cell_size = geo->cell_size ();
+  const size_t edge_size = geo->edge_size ();
 
   soil_water.tick (cell_size, soil, msg); 
 
@@ -303,7 +306,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
         {
           matrix_water[i]->tick (*geo, soil, soil_water, soil_heat,
                                  surface, groundwater, msg);
-          return;
+          goto update_borders;
         }
       catch (const char* error)
         {
@@ -315,6 +318,18 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
         }
     }
   throw "Matrix water transport failed";
+
+  // Update surface and groundwater reservoirs.
+ update_borders:
+  for (size_t edge = 0; edge < edge_size; edge++)
+    {
+      if (geo->edge_to (edge) == Geometry::cell_above)
+        surface.accept_top (soil_water.q (edge) * dt, *geo, edge, msg);
+      if (geo->edge_from (edge) == Geometry::cell_below)
+        groundwater.accept_bottom ((soil_water.q (edge)
+                                    + soil_water.q_p (edge)) * dt,
+                                   *geo, edge);
+    }
 }
 
 void 
