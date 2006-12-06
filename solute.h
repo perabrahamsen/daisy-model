@@ -40,9 +40,9 @@ class Solute
 {
   const std::string submodel;	// Derived submodel.
 
-  friend class Soltrans1D;
   friend class Movement1D;
   friend class MovementRect;
+  friend class Msoltranrect2x1;
 
   // State variables.
 protected:
@@ -79,7 +79,8 @@ public:
   { return C_[i]; }
   double M_left (size_t i) const
   { return M_[i] + S[i] * dt; }
-  double total (const Geometry&, double from, double to) const;
+  double total_surface (const Geometry&, double from, double to) 
+    const; // [g/cm^2]
 
   // Sink.
 public:

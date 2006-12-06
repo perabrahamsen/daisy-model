@@ -236,7 +236,7 @@ GroundwaterPipe::tick (const Geometry& geo,
 #endif
   // Find sink term.
   EqDrnFlow = EquilibriumDrainFlow (geo, soil, soil_heat);
-  DrainFlow= geo.total (S);
+  DrainFlow= geo.total_surface (S);
   soil_water.drain (S);
 
   // Find deep percolation.

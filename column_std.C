@@ -529,14 +529,15 @@ ColumnStandard::soil_water_content (double from, double to) const
   daisy_assert (to <= from);
   daisy_assert (to <= 0.0);
   daisy_assert (to > geometry.z (soil->size () - 1));
-  return soil_water->content (geometry, from, to);
+  return soil_water->content_surface (geometry, from, to);
 }
 
 double				// [kg N/ha]
 ColumnStandard::soil_inorganic_nitrogen (double from, double to) const
 {
-  return (soil_NH4.total (geometry, from, to) 
-	  + soil_NO3.total (geometry, from, to)) * 1.0e5; // g N/cm^2 -> kg N/ha
+  return (soil_NH4.total_surface (geometry, from, to) 
+	  + soil_NO3.total_surface (geometry, from, to))
+    * 1.0e5; // g N/cm^2 -> kg N/ha
 }  
 
 double				// [kg N/ha]

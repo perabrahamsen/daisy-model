@@ -298,7 +298,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-MODELS = uzrect_Mollerup.C uzrect_2x1.C select_flow.C volume_box.C \
+MODELS = msoltranrect_2x1.C \
+	uzrect_Mollerup.C uzrect_2x1.C select_flow.C volume_box.C \
 	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
 	cropNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \
         difrad_weather.C number_lisp.C condition_extern.C condition_boolean.C \
@@ -355,7 +356,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = uzrect.C bound.C volume.C uz1d.C \
+COMPONENTS = msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
 	cropNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C \
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
@@ -1094,6 +1095,12 @@ cdaisy${OBJ}: cdaisy.C block.h syntax.h treelog.h symbol.h plf.h library.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+msoltranrect_2x1${OBJ}: msoltranrect_2x1.C msoltranrect.h librarian.h \
+  symbol.h assertion.h uzmodel.h timestep.h uz1d.h geometry_rect.h \
+  geometry_vert.h geometry.h syntax.h treelog.h mathlib.h soil.h \
+  horizon.h soil_water.h soil_heat.h macro.h transport.h mactrans.h \
+  solute.h adsorption.h element.h alist.h submodeler.h block.h plf.h \
+  memutils.h
 uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h librarian.h symbol.h \
   assertion.h geometry_rect.h geometry_vert.h geometry.h syntax.h \
   treelog.h mathlib.h soil_water.h groundwater.h surface.h uzmodel.h \
@@ -1101,7 +1108,7 @@ uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h librarian.h symbol.h \
 uzrect_2x1${OBJ}: uzrect_2x1.C uzrect.h librarian.h symbol.h assertion.h \
   uzmodel.h timestep.h uz1d.h geometry_rect.h geometry_vert.h geometry.h \
   syntax.h treelog.h mathlib.h soil.h horizon.h soil_water.h soil_heat.h \
-  groundwater.h surface.h alist.h
+  groundwater.h surface.h alist.h memutils.h
 select_flow${OBJ}: select_flow.C select_value.h select.h destination.h \
   symbol.h condition.h librarian.h assertion.h number.h units.h volume.h \
   bound.h block.h syntax.h treelog.h plf.h alist.h border.h geometry.h \
@@ -1155,7 +1162,8 @@ movement_rect${OBJ}: movement_rect.C movement.h librarian.h symbol.h \
   assertion.h uzmodel.h timestep.h uz1d.h geometry_rect.h geometry_vert.h \
   geometry.h syntax.h treelog.h mathlib.h soil.h horizon.h soil_water.h \
   soil_heat.h macro.h transport.h mactrans.h solute.h adsorption.h \
-  weather.h im.h element.h uzrect.h alist.h submodeler.h block.h plf.h
+  groundwater.h surface.h weather.h im.h element.h uzrect.h alist.h \
+  submodeler.h block.h plf.h memutils.h
 number_soil${OBJ}: number_soil.C number.h symbol.h librarian.h assertion.h \
   library.h block.h syntax.h treelog.h plf.h column.h alist.h horizon.h \
   hydraulic.h weather.h im.h time.h units.h
@@ -1173,7 +1181,7 @@ movement_1D${OBJ}: movement_1D.C movement.h librarian.h symbol.h assertion.h \
   syntax.h treelog.h mathlib.h soil.h horizon.h soil_water.h soil_heat.h \
   macro.h transport.h mactrans.h geometry1d.h groundwater.h surface.h \
   weather.h im.h solute.h adsorption.h element.h log.h border.h alist.h \
-  submodeler.h block.h plf.h
+  submodeler.h block.h plf.h memutils.h
 integer_arit${OBJ}: integer_arit.C integer.h librarian.h symbol.h assertion.h \
   syntax.h treelog.h alist.h vcheck.h memutils.h
 source_merge${OBJ}: source_merge.C source.h librarian.h symbol.h assertion.h \

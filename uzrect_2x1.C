@@ -28,6 +28,7 @@
 #include "alist.h"
 #include "mathlib.h"
 #include "assertion.h"
+#include "memutils.h"
 #include <sstream>
 
 struct UZRect2x1 : public UZRect
@@ -280,7 +281,10 @@ UZRect2x1::UZRect2x1 (Block& al)
 { }
 
 UZRect2x1::~UZRect2x1 ()
-{ }
+{ 
+  sequence_delete (vertical.begin (), vertical.end ());
+  sequence_delete (horizontal.begin (), horizontal.end ());
+}
 
 const AttributeList& 
 UZRect::reserve_model ()

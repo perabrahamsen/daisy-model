@@ -95,19 +95,19 @@ OM::swap (const Geometry& geo, double from, double middle, double to,
 
 double 
 OM::soil_C (const Geometry& geo) const
-{ return geo.total (C); }
+{ return geo.total_soil (C); }
 
 double 
 OM::soil_N (const Geometry& geo) const
-{ return geo.total (N); }
+{ return geo.total_soil (N); }
 
 double 
 OM::soil_C (const Geometry& geo, double from, double to) const
-{ return geo.total (C, from, to); }
+{ return geo.total_soil (C, from, to); }
 
 double 
 OM::soil_N (const Geometry& geo, double from, double to) const
-{ return geo.total (N, from, to); }
+{ return geo.total_soil (N, from, to); }
 
 double 
 OM::goal_C_per_N (size_t at) const // Desired C/N ratio.

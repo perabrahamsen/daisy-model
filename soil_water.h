@@ -81,8 +81,8 @@ public:
   { return Theta_[i] - S_sum_[i]; }
   double Theta_old (size_t i) const
   { return Theta_old_[i]; }
-  double content (const Geometry&,
-                  double from, double to) const; // [cm]
+  double content_surface (const Geometry&, 
+                          double from, double to) const; // [cm]
   double S_root (size_t i) const
   { return S_root_[i]; }
   double S_drain (size_t i) const

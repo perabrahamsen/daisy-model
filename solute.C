@@ -33,8 +33,8 @@
 using namespace std;
 
 double
-Solute::total (const Geometry& geo, double from, double to) const
-{ return geo.total (M_, from, to); }
+Solute::total_surface (const Geometry& geo, double from, double to) const
+{ return geo.total_surface (M_, from, to); }
 
 void
 Solute::clear ()

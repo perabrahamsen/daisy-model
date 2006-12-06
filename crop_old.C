@@ -1103,8 +1103,8 @@ CropOld::SoluteUptake (const Geometry& geo,
   for (int i = 0; i < size; i++)
     daisy_assert (solute.M_left (i) >= 0.0);
 
-  // gN/cm³/h -> gN/m²/h
-  return geo.total (uptake) * 1.0e4; 
+  // g N/cm^3/h -> g N/m^2/h
+  return geo.total_surface (uptake) * 1.0e4; 
 }
 
 void
@@ -1985,7 +1985,7 @@ CropOld::harvest (const symbol column_name,
 	  static const symbol root_symbol ("root");
 	  AM& am = AM::create (geo.cell_size (),
                                time, Root, name, root_symbol);
-	  if (geo.total (density) > 0.0)
+	  if (geo.total_soil (density) > 0.0)
 	    am.add_surface (geo,
                             WRoot * C_Root * m2_per_cm2,
                             NRoot * m2_per_cm2,

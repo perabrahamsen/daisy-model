@@ -229,7 +229,7 @@ Geometry::add_soil (std::vector<double>& v,
     {
       std::ostringstream tmp;
       tmp << "Old total (" << old_total << ") + amount (" << amount
-             << ") != new total (" << total (v) 
+             << ") != new total (" << total_soil (v) 
           << "); [" << from << ":" << to << "], total_volume =" 
           << total_volume << ", density = " << density;
       daisy_warning (tmp.str ());

@@ -661,7 +661,7 @@ OrganicStandard::aom_compare (const AOM* a, const AOM* b)
 double 
 OrganicStandard::total_N (const Geometry& geo) const
 {
-  double result = geo.total (buffer.N);
+  double result = geo.total_soil (buffer.N);
 
   for (size_t i = 0; i < smb.size (); i++)
     result += smb[i]->soil_N (geo);
@@ -678,7 +678,7 @@ OrganicStandard::total_N (const Geometry& geo) const
 double 
 OrganicStandard::total_C (const Geometry& geo) const
 {
-  double result = geo.total (buffer.C);
+  double result = geo.total_soil (buffer.C);
 
   for (size_t i = 0; i < smb.size (); i++)
     result += smb[i]->soil_C (geo);
@@ -890,8 +890,8 @@ OrganicStandard::fertilize (const AttributeList& al,
                             const Geometry& geo)
 { 
   AM& om = AM::create (al, geo);
-  fertilized_N += om.total_N (geo); 
-  fertilized_C += om.total_C (geo);
+  fertilized_N += om.total_N (geo) / geo.surface_area (); 
+  fertilized_C += om.total_C (geo) / geo.surface_area ();
   add (om);
 }
 
@@ -901,8 +901,8 @@ OrganicStandard::fertilize (const AttributeList& al,
                             double from, double to)
 { 
   AM& om = AM::create (al, geo);
-  fertilized_N += om.total_N (geo); 
-  fertilized_C += om.total_C (geo);
+  fertilized_N += om.total_N (geo) / geo.surface_area (); 
+  fertilized_C += om.total_C (geo) / geo.surface_area ();
   om.mix (geo, from, to, 1.0,
           tillage_N_top, tillage_C_top,
           tillage_N_soil, tillage_C_soil);
@@ -1230,15 +1230,16 @@ OrganicStandard::tick (const Geometry& geo,
     N_to_DOM += dom[j]->N_source (geo) * dt;
   const double new_N = total_N (geo) + N_to_DOM;
   const double delta_N = old_N - new_N;
-  const double N_source = geo.total (NO3_source) + geo.total (NH4_source);
+  const double N_source = geo.total_soil (NO3_source) 
+    + geo.total_soil (NH4_source);
 
   if (!approximate (delta_N, N_source)
       && !approximate (old_N, new_N, 1e-10))
     {
       std::ostringstream tmp;
-      tmp << "BUG: OrganicStandard: delta_N != NO3 + NH4[g N/cm^2]\n"
-          << delta_N << " != " << geo.total (NO3_source)
-          << " + " << geo.total (NH4_source);
+      tmp << "BUG: OrganicStandard: delta_N != NO3 + NH4 [g N]\n"
+          << delta_N << " != " << geo.total_soil (NO3_source)
+          << " + " << geo.total_soil (NH4_source);
       if (std::isnormal (N_source))
 	tmp << " (error " 
             << fabs (delta_N / (N_source) - 1.0) * 100.0 << "%)";
@@ -1250,15 +1251,17 @@ OrganicStandard::tick (const Geometry& geo,
   const double new_C = total_C (geo) + C_to_DOM;
   const double delta_C = old_C - new_C;
   const double C_source 
-    = geo.total (CO2_slow_) + geo.total (CO2_fast_) + top_CO2;
+    = geo.total_soil (CO2_slow_) + geo.total_soil (CO2_fast_)
+    + top_CO2 * geo.surface_area ();
   
   if (!approximate (delta_C, C_source) && !approximate (old_C, new_C, 1e-10))
     {
       std::ostringstream tmp;
       tmp << "BUG: OrganicStandard: "
-	"delta_C != soil_CO2_slow + soil_CO2_fast + top_CO2 [g C/cm^2]\n"
-          << delta_C << " != " << geo.total (CO2_slow_) << " + " 
-          << geo.total (CO2_fast_) << " + " << top_CO2;
+	"delta_C != soil_CO2_slow + soil_CO2_fast + top_CO2 [g C]\n"
+          << delta_C << " != " << geo.total_soil (CO2_slow_) << " + " 
+          << geo.total_soil (CO2_fast_) << " + "
+          << top_CO2 * geo.surface_area ();
       msg.error (tmp.str ());
     }
 

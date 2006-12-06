@@ -1098,8 +1098,8 @@ CropSold::SoluteUptake (const Geometry& geo,
     }
   solute.add_to_root_sink (uptake);
 
-  // gN/cm³/h -> gN/m²/h
-  return geo.total (uptake) * 1.0e4; 
+  // g N/cm^3/h -> g N/m^2/h
+  return geo.total_surface (uptake) * 1.0e4; 
 }
 
 void
@@ -1941,7 +1941,7 @@ CropSold::harvest (const symbol column_name,
       static const symbol root_symbol ("root");
       AM& am = AM::create (geo.cell_size (), time, Root, name, root_symbol);
       residuals_DM += WRoot;
-      if (geo.total (density) > 0.0)
+      if (geo.total_soil (density) > 0.0)
 	{
 	  am.add_surface (geo,
                           WRoot * C_Root * m2_per_cm2,

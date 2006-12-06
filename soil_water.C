@@ -83,9 +83,9 @@ SoilWater::root_uptake (const std::vector<double>& v)
 }
 
 double 
-SoilWater::content (const Geometry& geo, 
-                    const double from, const double to) const
-{ return geo.total (Theta_, from, to); }
+SoilWater::content_surface (const Geometry& geo, 
+                            const double from, const double to) const
+{ return geo.total_surface (Theta_, from, to); }
 
 double
 SoilWater::Theta_ice (const Soil& soil, const size_t i, const double h) const

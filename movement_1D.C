@@ -31,6 +31,7 @@
 #include "element.h"
 #include "log.h"
 #include "submodeler.h"
+#include "memutils.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]
@@ -42,8 +43,7 @@ struct Movement1D : public Movement
   Geometry& geometry () const;
 
   // Water.
-  std::auto_ptr<UZmodel> uzdefault;
-  std::auto_ptr<UZmodel> uzreserve;
+  const std::vector<UZmodel*> matrix_water;
   std::auto_ptr<Macro> macro;
   void macro_tick (const Soil& soil, SoilWater& soil_water,
                    Surface& surface, Treelog& msg);
@@ -61,9 +61,7 @@ struct Movement1D : public Movement
                    Treelog& msg);
 
   // Solute.
-  std::auto_ptr<Transport> transport; // Solute transport model in matrix.
-  std::auto_ptr<Transport> reserve; // Reserve solute transport model in matr.
-  std::auto_ptr<Transport> last_resort; // Last resort solute transport model.
+  const std::vector<Transport*> matrix_solute;
   std::auto_ptr<Transport> transport_solid; // Pseudo transport for non-solutes
   std::auto_ptr<Mactrans> mactrans; // Solute transport model in macropores.
   void solute (const Soil& soil, 
@@ -136,6 +134,7 @@ struct Movement1D : public Movement
                    const Soil& soil, const Groundwater& groundwater,
                    Treelog& msg);
   Movement1D (Block& al);
+  ~Movement1D ();
 };
 
 
@@ -195,43 +194,48 @@ Movement1D::tick_water (const Geometry1D& geo,
     ? surface.last_cell (geo, 0U) 
     : 0U;
   // Calculate matrix flow next.
-  try
-    {
-      uzdefault->tick (msg, geo, soil, soil_heat,
-                       first, surface, 0U, last, groundwater,
-                       S, h_old, Theta_old, h_ice, h, Theta, 0U, q);
-      goto find_flux;
-    }
-  catch (const char* error)
-    {
-      msg.warning (std::string ("UZ problem: ") + error);
-    }
-  catch (const std::string& error)
-    {
-      msg.warning (std::string ("UZ problem: ") + error);
-    }
-  msg.message ("Using reserve uz model.");
-  uzreserve->tick (msg, geo, soil, soil_heat,
-                   first, surface, 0U, last, groundwater,
-                   S, h_old, Theta_old, h_ice, h, Theta, 0U, q);
- find_flux:
-  for (size_t i = last + 2; i <= soil.size (); i++)
-    {
-      q[i] = q[i-1];
-      q_p[i] = q_p[i-1];
-    }
 
-  // Update Theta below groundwater table.
-  if (groundwater.bottom_type () == Groundwater::pressure)
+  for (size_t m = 0; m < matrix_water.size (); m++)
     {
-      for(size_t i = last + 1; i < soil.size (); i++)
-        Theta[i] = soil.Theta (i, h[i], h_ice[i]);
-    }
+      Treelog::Open nest (msg, matrix_water[m]->name);
+      try
+        {
+          matrix_water[m]->tick (msg, geo, soil, soil_heat,
+                                 first, surface, 0U, last, groundwater,
+                                 S, h_old, Theta_old, h_ice, h, Theta, 0U, q);
 
-  // Update surface and groundwater reservoirs.
-  surface.accept_top (q[0] * dt, geo, 0U, msg);
-  groundwater.accept_bottom ((q[soil.size ()] + q_p[soil.size ()]) * dt,
-                             geo, soil.size ());
+          for (size_t i = last + 2; i <= soil.size (); i++)
+            {
+              q[i] = q[i-1];
+              q_p[i] = q_p[i-1];
+            }
+
+          // Update Theta below groundwater table.
+          if (groundwater.bottom_type () == Groundwater::pressure)
+            {
+              for(size_t i = last + 1; i < soil.size (); i++)
+                Theta[i] = soil.Theta (i, h[i], h_ice[i]);
+            }
+
+          // Update surface and groundwater reservoirs.
+          surface.accept_top (q[0] * dt, geo, 0U, msg);
+          groundwater.accept_bottom ((q[soil.size ()]
+                                      + q_p[soil.size ()]) * dt,
+                                     geo, soil.size ());
+          if (m > 0)
+            msg.message ("Reserve model succeeded");
+          return;
+        }
+      catch (const char* error)
+        {
+          msg.warning (std::string ("UZ problem: ") + error);
+        }
+      catch (const std::string& error)
+        {
+          msg.warning (std::string ("UZ trouble: ") + error);
+        }
+    }
+  throw "Water matrix transport failed"; 
 }
 
 void 
@@ -303,43 +307,45 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
                   double diffusion_coefficient,
                   Treelog& msg)
 {
-  const double old_content = geo->total (M);
+  const double old_content = geo->total_surface (M);
 
   // Flow.
   if (adsorption.full ())
-    transport_solid->tick (msg, *geo, soil, soil_water, adsorption, 
-                          diffusion_coefficient, M, C, S, J);
-  else
     {
-      mactrans->tick (*geo, soil_water, M, C, S, S_p, J_p, msg);
+      transport_solid->tick (msg, *geo, soil, soil_water, adsorption, 
+                             diffusion_coefficient, M, C, S, J);
+      goto done;
+    }
+
+  mactrans->tick (*geo, soil_water, M, C, S, S_p, J_p, msg);
+
+  for (size_t m = 0; m < matrix_solute.size (); m++)
+    {
+      Treelog::Open nest (msg, matrix_solute[m]->name);
 
       try
         {
-          transport->tick (msg, *geo, soil, soil_water, adsorption, 
-                           diffusion_coefficient, 
-                           M, C, S, J);
+          matrix_solute[m]->tick (msg, *geo, soil, soil_water, adsorption, 
+                                  diffusion_coefficient, 
+                                  M, C, S, J);
+          if (m > 0)
+            msg.message ("Reserve model succeeded");
+          goto done;
         }
       catch (const char* error)
         {
-          msg.warning (std::string ("Transport problem: ") + error +
-                       ", trying reserve.");
-          try
-            {
-              reserve->tick (msg, *geo, soil, soil_water, adsorption, 
-                             diffusion_coefficient, M, C, S, J);
-            }
-          catch (const char* error)
-            {
-              msg.warning (std::string ("Reserve transport problem: ") 
-                           + error + ", trying last resort.");
-              last_resort->tick (msg, *geo, soil, soil_water, adsorption, 
-                                 diffusion_coefficient, M, C, S, J);
-            }
+          msg.warning (std::string ("Transport problem: ") + error);
+        }
+      catch (const std::string& error)
+        {
+          msg.warning (std::string ("Transport trouble: ") + error);
         }
     }
-  const double new_content = geo->total (M);
+  throw "Water matrix transport failed"; 
+ done:
+  const double new_content = geo->total_surface (M);
   const double delta_content = new_content - old_content;
-  const double source = geo->total (S);
+  const double source = geo->total_surface (S);
   const double in = -J[0];	// No preferential transport, it is 
   const double out = -J[geo->edge_size () - 1]; // included in S.
   const double expected = source + in - out;
@@ -684,24 +690,25 @@ Movement1D::initialize (const AttributeList& al,
 
   // Let 'macro' choose the default method to average K values in 'uz'.
   const bool has_macropores = (macro.get () && !macro->none ());
-  uzdefault->has_macropores (has_macropores);
-  uzreserve->has_macropores (has_macropores);
+  for (size_t i = 0; i < matrix_water.size (); i++)
+    matrix_water[i]->has_macropores (has_macropores);
 }
 
 Movement1D::Movement1D (Block& al)
   : Movement (al),
     geo (submodel<Geometry1D> (al, "Geometry")),
-    uzdefault (Librarian<UZmodel>::build_item (al, "UZdefault")),
-    uzreserve (Librarian<UZmodel>::build_item (al, "UZreserve")),
-    macro (NULL),
-    transport (Librarian<Transport>::build_item (al, "transport")),
-    reserve (Librarian<Transport>::build_item (al, "transport_reserve")),
-    last_resort (Librarian<Transport>::build_item (al, 
-                                                   "transport_last_resort")),
-    transport_solid (Librarian<Transport>::build_item (al,
-                                                       "transport_solid")),
+    matrix_water (Librarian<UZmodel>::build_vector (al, "matrix_water")),
+    macro (NULL), 
+    matrix_solute (Librarian<Transport>::build_vector (al, "matrix_solute")),
+    transport_solid (Librarian<Transport>::build_item (al, "transport_solid")),
     mactrans  (Librarian<Mactrans>::build_item (al, "mactrans"))
 { }
+
+Movement1D::~Movement1D ()
+{
+  sequence_delete (matrix_water.begin (), matrix_water.end ()); 
+  sequence_delete (matrix_solute.begin (), matrix_solute.end ()); 
+}
 
 void 
 Movement::load_vertical (Syntax& syntax, AttributeList& alist)
@@ -709,21 +716,30 @@ Movement::load_vertical (Syntax& syntax, AttributeList& alist)
    syntax.add_submodule ("Geometry", alist, Syntax::State,
                          "Discretization of the soil.",
                          Geometry1D::load_syntax);
-   syntax.add ("UZdefault", Librarian<UZmodel>::library (),
-               "Main water transport model in unsaturated zone.");
-   alist.add ("UZdefault", UZmodel::default_model ());
-   syntax.add ("UZreserve", Librarian<UZmodel>::library (),
-               "Reserve transport model if UZtop fails.");
-   alist.add ("UZreserve", UZmodel::reserve_model ());
-   syntax.add ("transport", Librarian<Transport>::library (), 
-	      "Solute transport model in matrix.");
-   alist.add ("transport", Transport::default_model ());
-   syntax.add ("transport_reserve", Librarian<Transport>::library (),
-               "Reserve solute transport if the primary model fails.");
-   alist.add ("transport_reserve", Transport::reserve_model ());
-   syntax.add ("transport_last_resort", Librarian<Transport>::library (),
-               "Last resort solute transport if the reserve model fails.");
-   alist.add ("transport_last_resort", Transport::none_model ());
+   syntax.add ("matrix_water", Librarian<UZmodel>::library (), 
+               Syntax::Const, Syntax::Sequence,
+               "Vertical matrix water transport models.\n\
+Each model will be tried in turn, until one succeeds.\n\
+If none succeeds, the simulation ends.");
+   std::vector<AttributeList*> vertical_models;
+   AttributeList vertical_default (UZmodel::default_model ());
+   vertical_models.push_back (&vertical_default);
+   AttributeList vertical_reserve (UZmodel::reserve_model ());
+   vertical_models.push_back (&vertical_reserve);
+   alist.add ("matrix_water", vertical_models);
+   syntax.add ("matrix_solute", Librarian<Transport>::library (), 
+               Syntax::Const, Syntax::Sequence,
+               "Vertical matrix solute transport models.\n\
+Each model will be tried in turn, until one succeeds.\n\
+If none succeeds, the simulation ends.");
+   std::vector<AttributeList*> transport_models;
+   AttributeList transport_default (Transport::default_model ());
+   transport_models.push_back (&transport_default);
+   AttributeList transport_reserve (Transport::reserve_model ());
+   transport_models.push_back (&transport_reserve);
+   AttributeList transport_last_resort (Transport::none_model ());
+   transport_models.push_back (&transport_last_resort);
+   alist.add ("matrix_solute", transport_models);
    syntax.add ("transport_solid", Librarian<Transport>::library (),
                "Transport model for non-dissolvable chemicals.\n\
 Should be 'none'.");

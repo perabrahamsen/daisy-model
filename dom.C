@@ -68,27 +68,27 @@ DOM::add_to_source (unsigned int at, double to_C, double to_N)
 
 double 
 DOM::soil_C (const Geometry& geo) const
-{ return geo.total (C.M); }
+{ return geo.total_soil (C.M); }
 
 double 
 DOM::soil_N (const Geometry& geo) const
-{ return geo.total (N.M); }
+{ return geo.total_soil (N.M); }
 
 double 
 DOM::soil_C (const Geometry& geo, double from, double to) const
-{ return geo.total (C.M, from, to); }
+{ return geo.total_soil (C.M, from, to); }
 
 double 
 DOM::soil_N (const Geometry& geo, double from, double to) const
-{ return geo.total (N.M, from, to); }
+{ return geo.total_soil (N.M, from, to); }
 
 double
 DOM::C_source (const Geometry& geo) const
-{ return geo.total (C.S); }
+{ return geo.total_soil (C.S); }
 
 double
 DOM::N_source (const Geometry& geo) const
-{ return geo.total (N.S); }
+{ return geo.total_soil (N.S); }
 
 double 
 DOM::C_at (unsigned int at) const

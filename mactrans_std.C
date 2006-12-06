@@ -160,14 +160,14 @@ MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,
     }
   
   // Check that the sink terms add up.
-  if (fabs (geo.total (S_p) + J_p[0] - J_p[geo.edge_size () - 1])
+  if (fabs (geo.total_surface (S_p) + J_p[0] - J_p[geo.edge_size () - 1])
       > max_delta_matter * 1e-8)
     {
       Treelog::Open nest (out, "mactrans default");
       std::ostringstream tmp;
       tmp << __FILE__ << ":" <<  __LINE__
 	     << ": BUG: Total S_p = '"
-          << (geo.total (S_p) + J_p[0]  - J_p[geo.cell_size ()])
+          << (geo.total_surface (S_p) + J_p[0]  - J_p[geo.cell_size ()])
 	     << "' solute\n";
       out.error (tmp.str ());
     }

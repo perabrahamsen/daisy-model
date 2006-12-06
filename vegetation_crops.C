@@ -560,7 +560,7 @@ VegetationCrops::harvest (const symbol column_name,
         const double old_crop_C = (*crop)->total_C ();
         const double old_residuals_C_top = residuals_C_top;
         const double old_residuals_C_soil
-          = geo.total (residuals_C_soil) * 10000;
+          = geo.total_surface (residuals_C_soil) * 10000;
         const double sorg_height = (*crop)->sorg_height ();
         const bool root_fruit = (sorg_height < 0.0);
         min_height = min (min_height, sorg_height);
@@ -591,12 +591,12 @@ VegetationCrops::harvest (const symbol column_name,
             std::ostringstream tmp;
             tmp << "delta Crop = " << new_crop_C - old_crop_C;
             tmp << "\ntop residuals = "
-                   << (residuals_C_top - old_residuals_C_top) * 10
-                   << "\nsoil residuals = "
-                   << (geo.total (residuals_C_soil) * 10000
-                       - old_residuals_C_soil) * 10
-                   << "\nharvest = " << mine.total_C () * 10
-                   << "\nbalance = " << balance;
+                << (residuals_C_top - old_residuals_C_top) * 10
+                << "\nsoil residuals = "
+                << (geo.total_surface (residuals_C_soil) * 10000
+                    - old_residuals_C_soil) * 10
+                << "\nharvest = " << mine.total_C () * 10
+                << "\nbalance = " << balance;
             msg.error (tmp.str ());
           }
       }

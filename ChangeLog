@@ -1,3 +1,10 @@
+2006-12-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* msoltranrect.h, msoltranrect.C: New component.
+	* Makefile (COMPONENTS): Added it.
+	* msoltranrect_2x1.C: New model.
+	* Makefile (MODELS): Added it.
+
 2006-11-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* uzrect_Mollerup.C: New model.

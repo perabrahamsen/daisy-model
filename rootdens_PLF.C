@@ -183,12 +183,12 @@ Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
   daisy_assert (SpRtLength > 0.0);
   static const double m_per_cm = 0.01;
   const double LengthPrArea = m_per_cm * SpRtLength * WRoot; // [cm/cm^2]
-  const double sum = geo.total (abs_dens);
+  const double sum = geo.total_soil (abs_dens);
   daisy_assert (sum > 0.0);
   const double factor = LengthPrArea / sum;
   for (unsigned int i = 0; i < abs_dens.size (); i++)
     abs_dens[i] *= factor;
-  daisy_assert (approximate (LengthPrArea, geo.total (abs_dens)));
+  daisy_assert (approximate (LengthPrArea, geo.total_soil (abs_dens)));
 }
 
 Rootdens_PLF::Rootdens_PLF (Block& al)

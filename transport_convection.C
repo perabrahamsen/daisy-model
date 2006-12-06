@@ -76,7 +76,7 @@ TransportConvection::tick (Treelog& msg,
   const size_t size = geo.cell_size ();
 
   // Remember old content
-  const double old_total = geo.total (M) + geo.total (S) * dt;
+  const double old_total = geo.total_surface (M) + geo.total_surface (S) * dt;
 
   // Flux in individual time step.
   vector<double> dJ (size + 1, 0.0); 
@@ -163,14 +163,14 @@ TransportConvection::tick (Treelog& msg,
       }
   
   // Check mass conservation.
-  const double new_total = geo.total (M);
+  const double new_total = geo.total_surface (M);
   if (!approximate (old_total - J[0] * dt + J[size] * dt, new_total)
       && !approximate (- J[0] * dt + J[size] * dt, 
                        new_total - old_total,
                        0.05))
     {
       Treelog::Open nest (msg, name);
-      const double total_S = geo.total (S) * dt;
+      const double total_S = geo.total_surface (S) * dt;
       std::ostringstream tmp;
       tmp << "In (" << - J[0] << ") - out (" << -J[size] 
              << " != new (" << new_total 

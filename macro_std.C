@@ -184,11 +184,11 @@ MacroStandard::tick (const Geometry1D& geo,
   q_p[to+1] = 0.0;		// No more flow.
 
   // Check that the sink terms add up.
-  if (fabs (geo.total (S_p) - q_top) > 1.0e-11)
+  if (fabs (geo.total_surface (S_p) - q_top) > 1.0e-11)
     {
       std::ostringstream tmp;
       tmp << __FILE__ << ":" <<  __LINE__
-	     << ": BUG: Total S_p = '" << (geo.total (S_p) - q_top)
+	     << ": BUG: Total S_p = '" << (geo.total_surface (S_p) - q_top)
 	     << "' first pass";
       msg.error (tmp.str ());
     }
@@ -261,12 +261,13 @@ MacroStandard::tick (const Geometry1D& geo,
     surface.accept_top (extra_water, geo, 0U, msg);
 
   // Check that the sink terms add up.
-  if (fabs (geo.total (S_p) - q_top - extra_water) > 1.0e-11)
+  if (fabs (geo.total_surface (S_p) - q_top - extra_water) > 1.0e-11)
     {
       std::ostringstream tmp;
       tmp << __FILE__ << ":" <<  __LINE__
-	     << ": BUG: Total S_p = " << geo.total (S_p) << ", q_top = " 
-	     << q_top << ", extra_water = " << extra_water;
+          << ": BUG: Total S_p = " << geo.total_surface (S_p) 
+          << ", q_top = " 
+          << q_top << ", extra_water = " << extra_water;
       msg.error (tmp.str ());
     }
 }

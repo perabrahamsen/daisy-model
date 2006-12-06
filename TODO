@@ -1,38 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* MMO: Daisy
+* 2D stoftransport: komponent
 
-* FON:
-
-** etip => log ind, your result, ...(november 1)
-
-* Designforslag til Daisy brugerflade
+* 2D stoftransport model 2x1
 
 * R2D2
-
-** Check interface mellem jord og overflade (geo total, add, extract, set)
-
-** horizontal vandtransport
 
 ** stoftransport
 
 ** varmetransport.
 
 ** makroporer.
-
-* r2d2 paper
-
-** Terminologi
-
-cell, edge, vertex
-
-* Doc
-
-** program structure, input, output
-
-* Movement rectangle
-
-** uz vertical
 
 * Daisy 2D
 

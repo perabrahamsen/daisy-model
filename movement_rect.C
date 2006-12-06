@@ -31,6 +31,7 @@
 #include "uzrect.h"
 #include "alist.h"
 #include "submodeler.h"
+#include "memutils.h"
 #include <sstream>
 
 struct MovementRect : public Movement
@@ -91,7 +92,7 @@ struct MovementRect : public Movement
   void initialize (const AttributeList&, const Soil&, const Groundwater&, 
                    Treelog&);
   MovementRect (Block& al);
-
+  ~MovementRect ();
 };
 
 Geometry& 
@@ -162,7 +163,7 @@ MovementRect::flow (const GeometryRect& geo,
   const size_t cell_size = geo.cell_size ();
 
   // Remember old content for checking mass balance later.
-  const double old_content = geo.total (M);
+  const double old_content = geo.total_soil (M);
   double in = 0.0;	
   double out = 0.0; 
 
@@ -199,9 +200,9 @@ MovementRect::flow (const GeometryRect& geo,
     }
 
   // Mass balance.
-  const double new_content = geo.total (M);
+  const double new_content = geo.total_soil (M);
   const double delta_content = new_content - old_content;
-  const double source = geo.total (S);
+  const double source = geo.total_soil (S);
   // BUG: ASSume uniform boundaries.
   const double expected = source + in - out;
   if (!approximate (delta_content, expected)
@@ -361,6 +362,9 @@ MovementRect::MovementRect (Block& al)
     transport_solid (Librarian<Transport>::build_item (al, "transport_solid"))
 { }
 
+MovementRect::~MovementRect ()
+{ sequence_delete (matrix_water.begin (), matrix_water.end ()); }
+
 static struct MovementRectSyntax
 {
   static Movement& make (Block& al)
@@ -384,6 +388,8 @@ If none succeeds, the simulation ends.");
     AttributeList matrix_water_reserve (UZRect::reserve_model ());
     matrix_water_models.push_back (&matrix_water_reserve);
     alist.add ("matrix_water", matrix_water_models);
+    syntax.add ("transport", Librarian<Transport>::library (),
+                "Primary solute transport model.");
     alist.add ("transport", Transport::default_model ());
     syntax.add ("transport_reserve", Librarian<Transport>::library (),
                 "Reserve solute transport if the primary model fails.");

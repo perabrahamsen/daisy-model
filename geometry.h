@@ -154,11 +154,6 @@ public:
   double total_surface (const std::vector<double>& v) const;
   double total_surface (const std::vector<double>& v, 
                         const double from, const double to) const;
-  double total (const std::vector<double>& v) const
-  { return total_soil (v); }
-  double total (const std::vector<double>& v, double from, double to) const
-  { return total_soil (v, from, to); }
-
   // Layers -- Support initializing soil arrays layer by layer.
   static void add_layer (Syntax& syntax, Syntax::category, 
                          const std::string& name,
