@@ -29,6 +29,7 @@
 #include <vector>
 
 class Log;
+class Weather;
 class Time;
 class AttributeList;
 class Bioclimate;
@@ -83,6 +84,7 @@ public:
 
   // Simulation.
 public:
+
   virtual void tick (const Time& time, double relative_humidity,
                      const Bioclimate&, 
 		     const Geometry& geo, const Soil&, OrganicMatter*, 

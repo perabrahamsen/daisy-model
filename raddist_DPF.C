@@ -20,16 +20,25 @@
 
 
 #include "raddist.h"
-#include "syntax.h"
+#include "block.h"
 #include "vegetation.h"
 #include "weather.h"
 #include "mathlib.h"
+#include "check.h"
 #include <sstream>
 
 using namespace std;
 
 struct RaddistDPF : public Raddist
 {
+  // Parameters.
+private:
+  const double sigma;//  Leaf scattering coefficient of PAR []
+  const double kds;  // Extinction coefficient of scattered diffuse PAR []
+  const double Pcd;  // Reflection coefficient of beam PAR []
+  const double Pcb;  // Reflection coefficient of diffuse PAR []
+
+public:
   // Simulation.
   void tick (std::vector <double>& fraction_sun_LAI, std::vector <double>& sun_PAR, 
 	     std::vector <double>& total_PAR, double global_radiation, 
@@ -41,7 +50,11 @@ struct RaddistDPF : public Raddist
 
   // Create.
   RaddistDPF (Block& al)
-    : Raddist (al)
+    : Raddist (al),
+      sigma (al.number ("sigma")),
+      kds (al.number ("kds")),
+      Pcd (al.number ("Pcd")),
+      Pcb (al.number ("Pcb"))
   { }
 };
 
@@ -81,25 +94,15 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   // Diffuse radiation above the canopy:
   const double IRd0 = diffuse_radiation;
 
- // Leaf scattering coefficient of PAR
-  const double o = 0.15; //wheat
-  // Extinction coefficient of beam and scattered beam and diffuse scattered PAR, respectively 
+  // Extinction coefficient of beam and scattered beam PAR, respectively 
   daisy_assert (std::isnormal (sin_beta));
   double kb  = 0.50 / sin_beta;
   if(kb > 8.0) 
     kb = 8.0;
   if(kb < 0.0)
     kb = 8.0;
-  const double kbs = kb *sqrt(1.0-o); // = 0.46 / sin_beta;
-  const double kds = 0.719;
-  // Reflection coefficient of beam and diffuse PAR, respectively
-   const double Pcd = 0.036;
-   //  const double Ph = 1.0-sqrt(1.0 - o)/(1.0+sqrt(1.0-o));
-   const double one_plus_kb = 1.0+kb;
-   daisy_assert (std::isnormal (one_plus_kb));
-   const double Pcb = 0.029; //1.0-exp((-2.0*Ph*kb)/one_plus_kb);
-  
-  
+  const double kbs = kb *sqrt(1.0-sigma);
+
   // Total PAR
   // Fill beam PAR (cummulative)
    daisy_assert (std::isfinite (IRb0));
@@ -111,11 +114,11 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
 
   // Sunlit PAR
   // Fill direct beam PAR without scattering (cummulative)
-  radiation_distribution (No, LAI, o, IRb0, kb, dir_beam_PAR);
+  radiation_distribution (No, LAI, sigma, IRb0, kb, dir_beam_PAR);
   // Fill direct beam PAR with scattering 1 (cummulative)
   radiation_distribution (No, LAI, Pcb, IRb0, kbs+kb, beam_scat1_PAR);
   // Fill direct beam PAR with scattering 1 (cummulative)
-  radiation_distribution (No, LAI, o, IRb0, 2*kb, beam_scat2_PAR);
+  radiation_distribution (No, LAI, sigma, IRb0, 2*kb, beam_scat2_PAR);
   // Fill diffuse PAR sunlit (cummulative)
   radiation_distribution (No, LAI, Pcd, IRd0, kds+kb, dif_sun_PAR);
 
@@ -142,7 +145,7 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
 
   for (int i = 0; i <= No - 1; i++)
     {
-      fraction_sun_LAI[i]=(exp(-kb * dLAI*i));
+      fraction_sun_LAI[i]=(exp(-kb * dLAI*(i+0.5)));
       daisy_assert (fraction_sun_LAI[i] >= 0.0);    
       daisy_assert (fraction_sun_LAI[i] <= 1.0);
     }
@@ -159,6 +162,23 @@ static struct RaddistDPFSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
 	       "Sun-shade model of radiation distribution in the canopy.");
+
+    syntax.add ("sigma", " ", Check::positive (), Syntax::Const,
+                " Leaf scattering coefficient of PAR. sigma = 0,15 for wheat, (De Pury & Farquhar, 1997)");
+    alist.add ("sigma", 0.15);
+
+    syntax.add ("kds", " ", Check::positive (), Syntax::Const,
+                "Extinction coefficient of scattered diffuse PAR, kds = , (De Pury & Farquhar, 1997)");
+    alist.add ("kds", 0.719); 
+
+    syntax.add ("Pcd", " ", Check::positive (), Syntax::Const,
+                " Reflection coefficient of beam PAR, Pcd = , (De Pury & Farquhar, 1997)");
+    alist.add ("Pcd", 0.036); 
+
+    syntax.add ("Pcb", " ", Check::positive (), Syntax::Const,
+                "Reflection coefficient of diffuse PAR, Pcb = , (De Pury & Farquhar, 1997)");
+    alist.add ("Pcb", 0.029); 
+
     Raddist::load_syntax (syntax, alist);
     Librarian<Raddist>::add_type ("sun-shade", alist, syntax, &make);
   }

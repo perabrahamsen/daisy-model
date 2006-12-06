@@ -5,6 +5,11 @@
 	* msoltranrect_2x1.C: New model.
 	* Makefile (MODELS): Added it.
 
+2006-12-05  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* photo_FCC4.C (class PhotoFCC4): New model.
+	* Makefile (MODELS): Added it.
+
 2006-11-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* uzrect_Mollerup.C: New model.
@@ -27,6 +32,17 @@
 
 	* groundwater_pipe.C (check): 'pressure_table' may not be
 	initialized.
+
+2006-11-20  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* ABAeffect_exp.C (default_model): New model.
+	* Makefile (MODELS): 
+	
+	* ABAeffect.C, ABAeffect.h: New component. 
+	* Makefile (COMPONENTS): Added it.
+	
+	* cropNdist_uniform.C: New model.
+	* Makefile (MODELS): Added it.
 
 2006-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 

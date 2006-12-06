@@ -27,6 +27,7 @@
 #include <vector>
 
 class Time;
+class Weather;
 class Bioclimate;
 class Geometry;
 class Soil;

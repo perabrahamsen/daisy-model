@@ -626,6 +626,7 @@ ColumnStandard::tick (Treelog& msg,
                     *vegetation, *movement,
                     geometry, *soil, *soil_water, *soil_heat, 
                     msg);
+
   vegetation->tick (time, my_weather.relative_humidity (),
                     *bioclimate, geometry, *soil, 
 		    organic_matter.get (),

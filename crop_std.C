@@ -33,7 +33,6 @@
 #include "wse.h"
 #include "log.h"
 #include "time.h"
-#include "weather.h"
 #include "bioclimate.h"
 #include "plf.h"
 #include "soil_water.h"
@@ -342,17 +341,21 @@ CropStandard::tick (const Time& time, const double relative_humidity,
       
       const double cropN = production.NLeaf;
       daisy_assert (cropN >= 0.0);
-   
+      
+      const double ABA_xylem = 0.0;
+
       if (bioclimate.shared_light_fraction () > 1e-10)
         {
           // Shared light.
-	  Ass += photo->assimilate (bioclimate.daily_air_temperature (),
+	  Ass += photo->assimilate (ABA_xylem, relative_humidity, 
+				    bioclimate.daily_air_temperature (),
 				    production.NLeaf, shadow_PAR, bioclimate.height (),
                                     total_LAI, fraction_shadow_LAI,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
 
-          Ass += photo->assimilate (bioclimate.daily_air_temperature (),
+          Ass += photo->assimilate (ABA_xylem, relative_humidity,
+				    bioclimate.daily_air_temperature (),
 				    production.NLeaf, sun_PAR, bioclimate.height (),
                                     total_LAI, fraction_sun_LAI,
                                     canopy, *development, msg)
@@ -367,7 +370,8 @@ CropStandard::tick (const Time& time, const double relative_humidity,
           Bioclimate::radiation_distribution 
             (No, LAI (), PARref (), bioclimate.hourly_global_radiation (),
              PARext (), PAR); 
-          Ass += photo->assimilate (bioclimate.daily_air_temperature (), 
+          Ass += photo->assimilate (ABA_xylem, relative_humidity,
+				    bioclimate.daily_air_temperature (), 
 				    production.NLeaf, PAR, bioclimate.height (),
 				    bioclimate.LAI (), fraction_total_LAI,
 				    canopy, *development, msg)

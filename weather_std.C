@@ -794,7 +794,24 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	  if (has_relative_humidity_)
 	    relative_humidity_[hour] = last_relative_humidity;
           else if (has_vapor_pressure_)
-            relative_humidity_[hour] = 0.5;
+	    {
+	      relative_humidity_[hour] = last_vapor_pressure / 
+		FAO::SaturationVapourPressure (air_temperature_[hour]);
+#if 0
+	      if (relative_humidity_[hour] < 0.0 
+		  ||relative_humidity_[hour] > 1.0)
+		{
+		  std::ostringstream tmp;
+		  tmp << "RelHum[" << hour << "] = " << relative_humidity_[hour] 
+		      << " [] because VapPres = " << last_vapor_pressure
+		      << " [Pa] and T = " << air_temperature_[hour]
+		      << " [dg C], giving Sat. VapPres = " 
+		      << FAO::SaturationVapourPressure (air_temperature_[hour])
+		      << " [Pa]";
+		  lex->warning (tmp.str ());
+		}
+#endif
+	    }
 	  if (has_reference_evapotranspiration_)
 	    {
 	      reference_evapotranspiration_[hour] 
@@ -839,8 +856,13 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
       const double T_max = daily_max_air_temperature_;
       if (T_min + 0.001 >= T_max)
 	T_min -= 5.0;
+      const double VapMin = FAO::SaturationVapourPressure (T_min);
       for (int hour = 0; hour < 24; hour++)
-	vapor_pressure_[hour] = FAO::SaturationVapourPressure (T_min);
+	{
+	  vapor_pressure_[hour] = VapMin;
+	  relative_humidity_[hour]
+	    = VapMin / FAO::SaturationVapourPressure (air_temperature_[hour]);
+	}
     }
 }
 

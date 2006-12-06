@@ -298,7 +298,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-MODELS = msoltranrect_2x1.C \
+MODELS = msoltranrect_2x1.C photo_FCC4.C ABAeffect_exp.C cropNdist_uniform.C \
 	uzrect_Mollerup.C uzrect_2x1.C select_flow.C volume_box.C \
 	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
 	cropNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \
@@ -356,7 +356,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
+COMPONENTS = ABAeffect.C msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
 	cropNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C \
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
@@ -733,6 +733,10 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+ABAeffect${OBJ}: ABAeffect.C ABAeffect.h librarian.h symbol.h assertion.h \
+  alist.h mathlib.h block.h syntax.h treelog.h plf.h
+bound${OBJ}: bound.C bound.h librarian.h symbol.h assertion.h block.h \
+  syntax.h treelog.h plf.h alist.h mathlib.h
 uzrect${OBJ}: uzrect.C uzrect.h librarian.h symbol.h assertion.h block.h \
   syntax.h treelog.h plf.h
 bound${OBJ}: bound.C bound.h librarian.h symbol.h assertion.h block.h \
@@ -1095,6 +1099,14 @@ cdaisy${OBJ}: cdaisy.C block.h syntax.h treelog.h symbol.h plf.h library.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+photo_FQC4${OBJ}: photo_FQC4.C photo.h librarian.h symbol.h assertion.h \
+  cropNdist.h alist.h ABAeffect.h bioclimate.h canopy_std.h \
+  canopy_simple.h plf.h phenology.h log.h border.h syntax.h treelog.h \
+  block.h submodel.h mathlib.h check.h
+ABAeffect_exp${OBJ}: ABAeffect_exp.C ABAeffect.h librarian.h symbol.h \
+  assertion.h alist.h mathlib.h check.h block.h syntax.h treelog.h plf.h
+cropNdist_uniform${OBJ}: cropNdist_uniform.C cropNdist.h librarian.h symbol.h \
+  assertion.h alist.h mathlib.h check.h block.h syntax.h treelog.h plf.h
 msoltranrect_2x1${OBJ}: msoltranrect_2x1.C msoltranrect.h librarian.h \
   symbol.h assertion.h uzmodel.h timestep.h uz1d.h geometry_rect.h \
   geometry_vert.h geometry.h syntax.h treelog.h mathlib.h soil.h \
@@ -1129,10 +1141,10 @@ uz1d_richard${OBJ}: uz1d_richard.C uz1d.h geometry_rect.h geometry_vert.h \
   horizon.h librarian.h soil_water.h soil_heat.h block.h plf.h alist.h \
   average.h timestep.h
 cropNdist_DPF${OBJ}: cropNdist_DPF.C cropNdist.h librarian.h symbol.h \
-  assertion.h alist.h block.h syntax.h treelog.h plf.h vegetation.h \
-  weather.h im.h mathlib.h check.h
+  assertion.h alist.h mathlib.h block.h syntax.h treelog.h plf.h check.h
 raddist_DPF${OBJ}: raddist_DPF.C raddist.h librarian.h symbol.h assertion.h \
-  alist.h syntax.h treelog.h vegetation.h weather.h im.h mathlib.h
+  alist.h block.h syntax.h treelog.h plf.h vegetation.h weather.h im.h \
+  mathlib.h check.h
 raddist_std${OBJ}: raddist_std.C raddist.h librarian.h symbol.h assertion.h \
   alist.h syntax.h treelog.h vegetation.h mathlib.h
 difrad_DPF${OBJ}: difrad_DPF.C difrad.h librarian.h symbol.h assertion.h \
@@ -1235,8 +1247,8 @@ action_markvand${OBJ}: action_markvand.C action.h librarian.h symbol.h \
   vcheck.h memutils.h
 photo_Farquhar${OBJ}: photo_Farquhar.C photo.h librarian.h symbol.h \
   assertion.h block.h syntax.h treelog.h plf.h cropNdist.h alist.h \
-  bioclimate.h canopy_std.h canopy_simple.h phenology.h log.h border.h \
-  submodel.h mathlib.h check.h
+  ABAeffect.h bioclimate.h canopy_std.h canopy_simple.h phenology.h log.h \
+  border.h submodel.h mathlib.h check.h
 photo_GL${OBJ}: photo_GL.C photo.h librarian.h symbol.h assertion.h block.h \
   syntax.h treelog.h plf.h canopy_std.h canopy_simple.h phenology.h \
   alist.h submodel.h mathlib.h check.h
@@ -1458,8 +1470,8 @@ crop_std${OBJ}: crop_std.C crop.h time.h alist.h symbol.h librarian.h \
   assertion.h chemicals.h syntax.h treelog.h root_system.h rootdens.h \
   plf.h canopy_std.h canopy_simple.h harvesting.h production.h \
   phenology.h partition.h vernalization.h photo.h crpn.h wse.h log.h \
-  border.h weather.h im.h bioclimate.h soil_water.h geometry.h mathlib.h \
-  soil.h horizon.h organic_matter.h domsorp.h clayom.h soil_heat.h am.h \
+  border.h bioclimate.h soil_water.h geometry.h mathlib.h soil.h \
+  horizon.h organic_matter.h domsorp.h clayom.h soil_heat.h am.h \
   submodeler.h block.h
 action_sow${OBJ}: action_sow.C action.h librarian.h symbol.h assertion.h \
   alist.h block.h syntax.h treelog.h plf.h daisy.h program.h time.h \

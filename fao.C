@@ -154,7 +154,7 @@ FAO::Makkink (double air_temperature /* dg C */,
 {
   // Use Makkink's equation for calculating reference_evapotranspiration.
   const double T = 273.16 + air_temperature; // dg C -> K
-  const double Delta = 5362.7 / pow (T, 2.0) * exp (26.042 - 5362.7 / T);
+  const double Delta = 5362.7 / (T * T) * exp (26.042 - 5362.7 / T);
   return 1.05e-3
     * Delta / (Delta + 66.7) * global_radiation;
 }

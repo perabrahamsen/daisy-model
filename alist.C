@@ -28,6 +28,7 @@
 #include "memutils.h"
 #include "assertion.h"
 #include <map>
+#include <sstream>
 
 using namespace std;
 
@@ -620,7 +621,13 @@ AttributeList::number (const string& key) const
   daisy_assert (!value.is_sequence);
   if (value.type == Syntax::Number)
     return value.number;
-  daisy_assert (value.type == Syntax::Library);
+  if (value.type != Syntax::Library)
+    {
+      std::ostringstream tmp;
+      tmp << "Parameter '" << key << "' is a " << Syntax::type_name (value.type)
+	  << ", expected Number";
+      daisy_panic (tmp.str ());
+    }
   return value.scalar->number;
 }
 

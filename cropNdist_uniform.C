@@ -1,4 +1,4 @@
-// cropNdist_DPF.C -- Crop N distribution model of De Pury & Farquhar (1997)
+// cropNdist_Uniform.C -- Crop N distribution model of De Pury & Farquhar (1997)
 // 
 // Copyright 2006 Birgitte Gjettermann and KVL
 //
@@ -20,18 +20,16 @@
 
 #include "cropNdist.h"
 #include "mathlib.h"
-#include "block.h"
-#include "syntax.h"
 #include <sstream>
 #include "check.h"
+#include "block.h"
 
 static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
 
-struct cropNdistDPF : public CropNdist
+struct cropNdistUniform : public CropNdist
 {
   // Parameters.
 private:
-  const double kn;  //Extinction coefficient of nitrogen in the canopy
   const double f_photo; //Fraction of photosynthetically active N in canopy
   const double Xn; //Slope of relationship between leaf N and Vm [mmol/mol/s]
   
@@ -52,16 +50,15 @@ private:
 
   // Create.
   public:
-  cropNdistDPF (Block& al)
+  cropNdistUniform (Block& al)
     : CropNdist (al),
-       kn (al.number ("kn")),
        f_photo (al.number ("f_photo")),
        Xn (al.number ("Xn"))
   { }
 };
 
 void
-cropNdistDPF::cropN_distribution (const double LAI, 
+cropNdistUniform::cropN_distribution (const double LAI, 
 				  std::vector <double>& cropNdist /*[mol/m²]*/,  
 				  std::vector <double>& cropVm_total,  
 				  const double cropN /*[g/m²area]*/, Treelog&)
@@ -70,26 +67,22 @@ cropNdistDPF::cropN_distribution (const double LAI,
   daisy_assert (cropN >= 0.0);
   
   // Crop N in top of the canopy:
-  const double divisor = 1. - exp(-LAI * kn);
-  daisy_assert(divisor > 0.0);
-  daisy_assert (std::isnormal(divisor));
-  double cropN0 = kn * cropN / divisor; // [g/m² area]
+  double cropN0 = cropN; // [g/m² area]
   cropN0 = cropN0 / Mw;  // [mol/m² area]
-  //  cropN0 = cropN0 / LAI; // [mol/m² leaf] 
+  cropN0 = cropN0 / LAI; // [mol/m² leaf] 
   daisy_assert (cropN0 >= 0.0);
 
   // Fill photosynthetically active N (cummulative) for each canopy layer in vector
   const int No = cropVm_total.size ();
   daisy_assert (cropNdist.size () == No);
 
-  const double dLAI = (LAI /(No + 0.0));
   for (int i = 0; i < No; i++)
-     cropNdist[i] = f_photo * cropN0 * (exp(-kn * dLAI *(i+0.5))); //[mol/m² leaf]
+     cropNdist[i] = f_photo * cropN0; //[mol/m² leaf]
   crop_Vmax_total (LAI, cropNdist, cropVm_total);  
 }
 
 void
-cropNdistDPF::crop_Vmax_total (const double, 
+cropNdistUniform::crop_Vmax_total (const double, 
 		       std::vector <double>& cropNdist /*[mol/m² leaf]*/,  
 		       std::vector <double>& cropVm)
 {
@@ -100,17 +93,13 @@ cropNdistDPF::crop_Vmax_total (const double,
      cropVm[i] = Xn * cropNdist[i]; //[mol/m² leaf/s]
 }
 
-static struct cropNdistDPFSyntax
+static struct cropNdistUniformSyntax
 {
   static CropNdist&
   make (Block& al)
-  { return *new cropNdistDPF (al); }
+  { return *new cropNdistUniform (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("kn", Syntax::None (), Check::positive (), Syntax::Const,
-                "Extinction coefficient of nitrogen in the canopy, kn = 0.713 (De Pury &Farquhar, 1997)");
-    alist.add ("kn", 0.513);
-
     syntax.add ("f_photo", Syntax::None (), Check::positive (), Syntax::Const,
                 "Fraction of photosynthetically active N in canopy, f_photo = 0.75 (Boegh et al., 2002)");
     alist.add ("f_photo", 0.75);
@@ -119,30 +108,17 @@ static struct cropNdistDPFSyntax
                 "Slope of relationship between leaf nitrogen and Vmax, Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
    alist.add ("Xn", 1.16e-3);
   }  
-
-  cropNdistDPFSyntax ()
+  cropNdistUniformSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
-	       "Boegh et al.(2002) crop N-distribution model in the canopy for photosynthesis and distribution of photosynthetical capacity.");
+	       "Uniform  crop N-distribution model in the canopy for photosynthesis and distribution of photosynthetical capacity.");
 
     load_syntax (syntax, alist);
-    Librarian<CropNdist>::add_type ("N-exp", alist, syntax, &make);
+
+    Librarian<CropNdist>::add_type ("N-uniform", alist, syntax, &make);
   }
-} cropNdistDPF_syntax;
+} cropNdistUniform_syntax;
 
 
-const AttributeList& 
-CropNdist::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax syntax;
-      cropNdistDPFSyntax::load_syntax (syntax, alist);
-      alist.add ("type", "N-exp");
-    }
-  return alist;
-}
