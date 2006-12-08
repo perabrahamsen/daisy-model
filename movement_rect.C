@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "movement.h"
+#include "msoltranrect.h"
 #include "geometry_rect.h"
 #include "soil.h"
 #include "soil_water.h"
@@ -45,29 +46,13 @@ struct MovementRect : public Movement
   void macro_tick (const Soil&, SoilWater&, Surface&, Treelog&);
 
   // Solute.
-  std::auto_ptr<Transport> transport; // Solute transport model in matrix.
-  std::auto_ptr<Transport> reserve; // Reserve solute transport model in matr.
-  std::auto_ptr<Transport> last_resort; // Last resort solute transport model.
-  std::auto_ptr<Transport> transport_solid; // Pseudo transport for non-solutes
+  const std::vector<Msoltranrect*> matrix_solute;
   void solute (const Soil& soil, const SoilWater& soil_water,
                const double J_in, Solute& solute,
                Treelog& msg);
   void element (const Soil& soil, const SoilWater& soil_water,
                 Element& element, Adsorption& adsorption,
                 const double diffusion_coefficient, Treelog& msg);
-  static void flow (const GeometryRect& geo, 
-                    const Soil& soil, 
-                    const SoilWater& soil_water, 
-                    const std::string& name,
-                    std::vector<double>& M, 
-                    std::vector<double>& C, 
-                    std::vector<double>& S, 
-                    std::vector<double>& /* S_p */, 
-                    std::vector<double>& J, 
-                    std::vector<double>& /* J_p */, 
-                    Adsorption& adsorption,
-                    double /* diffusion_coefficient */,
-                    Treelog& msg);
 
   // Management.
   void ridge (Surface&, const Soil&, const SoilWater&, const AttributeList&);
@@ -107,29 +92,27 @@ void
 MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
                       const double J_in, Solute& solute,
                       Treelog& msg)
-{ 
-  Treelog::Open nest (msg, "Movement: " + name);
-  const size_t edge_size = geo->edge_size ();
-  const size_t cell_size = geo->cell_size ();
-
-  solute.tick (cell_size, soil_water);
-
-  // Upper border.
-  for (size_t e = 0; e < edge_size; e++)
+{
+  for (size_t i = 0; i < matrix_solute.size (); i++)
     {
-      if (geo->edge_to (e) != Geometry::cell_above)
-        continue;
-
-      solute.J_p[e] = 0.0;
-      solute.J[e] = J_in;
+      Treelog::Open nest (msg, matrix_solute[i]->name);
+      try
+        {
+          matrix_solute[i]->solute (*geo, soil, soil_water, J_in, solute, msg);
+          if (i > 0)
+            msg.message ("Succeeded");
+          return;
+        }
+      catch (const char* error)
+        {
+          msg.warning (std::string ("Solute problem: ") + error);
+        }
+      catch (const std::string& error)
+        {
+          msg.warning (std::string ("Solute trouble: ") + error);
+        }
     }
-
-  // Flow.
-  flow (*geo, soil, soil_water, solute.submodel, 
-        solute.M_, solute.C_, 
-        solute.S, solute.S_p,
-        solute.J, solute.J_p, 
-        *solute.adsorption, solute.diffusion_coefficient (), msg);
+  throw "Matrix solute transport failed";
 }
 
 void 
@@ -137,85 +120,27 @@ MovementRect::element (const Soil& soil, const SoilWater& soil_water,
                        Element& element, Adsorption& adsorption,
                        const double diffusion_coefficient, Treelog& msg)
 {
-  element.tick (geo->cell_size (), soil_water);
-  flow (*geo, soil, soil_water, "DOM", 
-        element.M, element.C, element.S, element.S_p, 
-        element.J, element.J_p, 
-        adsorption, diffusion_coefficient, msg);
-}
-
-void
-MovementRect::flow (const GeometryRect& geo, 
-                    const Soil& soil, 
-                    const SoilWater& soil_water, 
-                    const std::string& name,
-                    std::vector<double>& M, 
-                    std::vector<double>& C, 
-                    std::vector<double>& S, 
-                    std::vector<double>& /* S_p */, 
-                    std::vector<double>& J, 
-                    std::vector<double>& /* J_p */, 
-                    Adsorption& adsorption,
-                    double /* diffusion_coefficient */,
-                    Treelog& msg)
-{
-  const size_t edge_size = geo.edge_size ();
-  const size_t cell_size = geo.cell_size ();
-
-  // Remember old content for checking mass balance later.
-  const double old_content = geo.total_soil (M);
-  double in = 0.0;	
-  double out = 0.0; 
-
-  // Upper border.
-  for (size_t e = 0; e < edge_size; e++)
+  for (size_t i = 0; i < matrix_solute.size (); i++)
     {
-      if (geo.edge_to (e) == Geometry::cell_above)
+      Treelog::Open nest (msg, matrix_solute[i]->name);
+      try
         {
-          const size_t n = geo.edge_from (e);
-          M[n] -= J[e] * geo.edge_area (e) / geo.volume (n);
-          in -= J[e] * geo.edge_area (e);
+          matrix_solute[i]->element (*geo, soil, soil_water, element, 
+                                     adsorption, diffusion_coefficient, msg);
+          if (i > 0)
+            msg.message ("Succeeded");
+          return;
         }
-      else
-        daisy_assert (iszero (J[e]));
-    }
-
-  // Cell fluxes.
-  for (size_t n = 0; n < cell_size; n++)
-    {
-      M[n] += S[n] * dt;
-      C[n] = adsorption.M_to_C (soil, soil_water.Theta (n), n, M[n]);
-
-      if (!(M[n] >= 0.0))
+      catch (const char* error)
         {
-
-          std::ostringstream tmp;
-          tmp << "BUG: M[" << n << "] = " << M[n] 
-              << " (J[0] = " << J[0] << ") S[" << n << "] = " << S[n];
-          msg.error (tmp.str ());
-          M[n] = C[n] = 0.0;
+          msg.warning (std::string ("DOM problem: ") + error);
         }
-      daisy_assert (M[n] >= 0.0);
-      daisy_assert (C[n] >= 0.0);
+      catch (const std::string& error)
+        {
+          msg.warning (std::string ("DOM trouble: ") + error);
+        }
     }
-
-  // Mass balance.
-  const double new_content = geo.total_soil (M);
-  const double delta_content = new_content - old_content;
-  const double source = geo.total_soil (S);
-  // BUG: ASSume uniform boundaries.
-  const double expected = source + in - out;
-  if (!approximate (delta_content, expected)
-      && new_content < fabs (expected) * 1e10)
-    {
-      std::ostringstream tmp;
-      tmp << __FILE__ << ":" << __LINE__ << ": " << name
-          << ": mass balance new - old != source + in - out\n"
-          << new_content << " - " << old_content << " != " 
-          << source << " + " << in << " - " << out << " (error "
-          << (delta_content - expected) << ")";
-      msg.error (tmp.str ());
-    }
+  throw "Matrix element transport failed";
 }
 
 void
@@ -355,15 +280,14 @@ MovementRect::MovementRect (Block& al)
   : Movement (al),
     geo (submodel<GeometryRect> (al, "Geometry")),
     matrix_water (Librarian<UZRect>::build_vector (al, "matrix_water")),
-    transport (Librarian<Transport>::build_item (al, "transport")),
-    reserve (Librarian<Transport>::build_item (al, "transport_reserve")),
-    last_resort (Librarian<Transport>::build_item (al, 
-                                                   "transport_last_resort")),
-    transport_solid (Librarian<Transport>::build_item (al, "transport_solid"))
+    matrix_solute (Librarian<Msoltranrect>::build_vector (al, "matrix_solute"))
 { }
 
 MovementRect::~MovementRect ()
-{ sequence_delete (matrix_water.begin (), matrix_water.end ()); }
+{ 
+  sequence_delete (matrix_water.begin (), matrix_water.end ());
+  sequence_delete (matrix_solute.begin (), matrix_solute.end ());
+}
 
 static struct MovementRectSyntax
 {
@@ -388,20 +312,15 @@ If none succeeds, the simulation ends.");
     AttributeList matrix_water_reserve (UZRect::reserve_model ());
     matrix_water_models.push_back (&matrix_water_reserve);
     alist.add ("matrix_water", matrix_water_models);
-    syntax.add ("transport", Librarian<Transport>::library (),
-                "Primary solute transport model.");
-    alist.add ("transport", Transport::default_model ());
-    syntax.add ("transport_reserve", Librarian<Transport>::library (),
-                "Reserve solute transport if the primary model fails.");
-    alist.add ("transport_reserve", Transport::reserve_model ());
-    syntax.add ("transport_last_resort", Librarian<Transport>::library (),
-                "Last resort solute transport if the reserve model fails.");
-    alist.add ("transport_last_resort", Transport::none_model ());
-    syntax.add ("transport_solid", Librarian<Transport>::library (),
-                "Transport model for non-dissolvable chemicals.\n\
-Should be 'none'.");
-    alist.add ("transport_solid", Transport::none_model ());
- 
+    syntax.add ("matrix_solute", Librarian<Msoltranrect>::library (), 
+                Syntax::Const, Syntax::Sequence,
+                "Matrix solute transport models.\n\
+Each model will be tried in turn, until one succeeds.\n\
+If none succeeds, the simulation ends.");
+    std::vector<AttributeList*> matrix_solute_models;
+    AttributeList matrix_solute_reserve (Msoltranrect::reserve_model ());
+    matrix_solute_models.push_back (&matrix_solute_reserve);
+    alist.add ("matrix_solute", matrix_solute_models);
     Librarian<Movement>::add_type ("rectangle", alist, syntax, &make);
   }
 } MovementRect_syntax;

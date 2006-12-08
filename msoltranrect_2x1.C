@@ -214,7 +214,7 @@ Should be 'none'.");
 }
 
 const AttributeList& 
-Msoltranrect::default_model ()
+Msoltranrect::reserve_model ()
 {
   static AttributeList alist;
 

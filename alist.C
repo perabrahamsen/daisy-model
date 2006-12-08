@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "time.h"
+#include "mathlib.h"
 #include "memutils.h"
 #include "assertion.h"
 #include <map>
@@ -49,7 +50,7 @@ struct Value
         name (s)
     { }
     bool operator== (const Scalar& s)
-    { return number == s.number && name == s.name; }
+    { return iszero (number - s.number) && name == s.name; }
   };
   union
   {
@@ -60,18 +61,22 @@ struct Value
     PLF* plf;
     AttributeList* alist;
     int integer;
-    vector<double>* number_sequence;
-    vector<symbol>* name_sequence;
-    vector<bool>* flag_sequence;
-    vector<int>* integer_sequence;
-    vector<const PLF*>* plf_sequence;
-    vector<AttributeList*>* alist_sequence;
+    std::vector<double>* number_sequence;
+    std::vector<symbol>* name_sequence;
+    std::vector<bool>* flag_sequence;
+    std::vector<int>* integer_sequence;
+    std::vector<const PLF*>* plf_sequence;
+    std::vector<AttributeList*>* alist_sequence;
   };
   Syntax::type type;
   bool is_sequence;
   int* ref_count;
 
   bool subset (const Value& other, const Syntax&, const string& key) const;
+
+  void expect (const std::string& key, Syntax::type expected) const;
+  void singleton (const std::string& key) const;
+  void sequence (const std::string& key) const;
 
   // Variable
   Value (const string& v, int)
@@ -226,7 +231,7 @@ Value::subset (const Value& v, const Syntax& syntax,
     switch (type)
       {
       case Syntax::Number:
-	return number == v.number;
+	return iszero (number - v.number);
       case Syntax::Boolean:
 	return flag == v.flag;
       case Syntax::Integer:
@@ -266,7 +271,18 @@ Value::subset (const Value& v, const Syntax& syntax,
     switch (type)
       {
       case Syntax::Number:
-	return *number_sequence == *v.number_sequence;
+        {
+          // We get warnings with -Wfloat-equal if we just do a 
+          //   return *number_sequence == *v.number_sequence
+          // So here is the workaround...
+          const size_t size = number_sequence->size ();
+          if (size != v.number_sequence->size ())
+            return false;
+          for (size_t i = 0; i < size; i++)
+            if (!iszero ((*number_sequence)[i] - (*v.number_sequence)[i]))
+              return false;
+          return true;
+        }
       case Syntax::Boolean:
 	return *flag_sequence == *v.flag_sequence;
       case Syntax::Integer:
@@ -315,9 +331,44 @@ Value::subset (const Value& v, const Syntax& syntax,
       case Syntax::Library:
       case Syntax::Error:
       default:
-	daisy_assert (false);
+	daisy_panic ("Not reached");
       }
   // Not reached.
+}
+
+void 
+Value::expect (const std::string& key, Syntax::type expected) const
+{
+  if (type != expected)
+    {
+      std::ostringstream tmp;
+      tmp << "Value of parameter '" << key << "' is a '" 
+          << Syntax::type_name (type) << ", expected '"
+          << Syntax::type_name (expected) << "'";
+      daisy_panic (tmp.str ());
+    }
+}
+
+void
+Value::singleton (const string& key) const
+{
+  if (!is_sequence)
+    return;
+  std::ostringstream tmp;
+  tmp << "Value of parameter '" << key 
+      << "' is a sequence, expected a singleton";
+  daisy_panic (tmp.str ());
+}
+
+void
+Value::sequence (const string& key) const
+{
+  if (is_sequence)
+    return;
+  std::ostringstream tmp;
+  tmp << "Value of parameter '" << key 
+      << "' is a singleton, expected a sequence";
+  daisy_panic (tmp.str ());
 }
 
 void 
@@ -393,7 +444,7 @@ Value::cleanup ()
 }
 
 Value& 
-Value::operator = (const Value& v)
+Value::operator= (const Value& v)
 {
   // Check that we aren't overwriting ourself.
   if (&v == this)
@@ -618,17 +669,11 @@ double
 AttributeList::number (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  daisy_assert (!value.is_sequence);
-  if (value.type == Syntax::Number)
-    return value.number;
-  if (value.type != Syntax::Library)
-    {
-      std::ostringstream tmp;
-      tmp << "Parameter '" << key << "' is a " << Syntax::type_name (value.type)
-	  << ", expected Number";
-      daisy_panic (tmp.str ());
-    }
-  return value.scalar->number;
+  value.singleton (key);
+  if (value.type == Syntax::Library)
+    return value.scalar->number;
+  value.expect (key, Syntax::Number);
+  return value.number;
 }
 
 double 

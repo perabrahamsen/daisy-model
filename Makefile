@@ -733,6 +733,10 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+msoltranrect${OBJ}: msoltranrect.C msoltranrect.h librarian.h symbol.h \
+  assertion.h uzmodel.h timestep.h uz1d.h geometry_rect.h geometry_vert.h \
+  geometry.h syntax.h treelog.h mathlib.h soil.h horizon.h soil_water.h \
+  soil_heat.h macro.h transport.h mactrans.h block.h plf.h
 ABAeffect${OBJ}: ABAeffect.C ABAeffect.h librarian.h symbol.h assertion.h \
   alist.h mathlib.h block.h syntax.h treelog.h plf.h
 bound${OBJ}: bound.C bound.h librarian.h symbol.h assertion.h block.h \
@@ -1173,9 +1177,9 @@ number_extern${OBJ}: number_extern.C number.h symbol.h librarian.h \
 movement_rect${OBJ}: movement_rect.C movement.h librarian.h symbol.h \
   assertion.h uzmodel.h timestep.h uz1d.h geometry_rect.h geometry_vert.h \
   geometry.h syntax.h treelog.h mathlib.h soil.h horizon.h soil_water.h \
-  soil_heat.h macro.h transport.h mactrans.h solute.h adsorption.h \
-  groundwater.h surface.h weather.h im.h element.h uzrect.h alist.h \
-  submodeler.h block.h plf.h memutils.h
+  soil_heat.h macro.h transport.h mactrans.h msoltranrect.h solute.h \
+  adsorption.h groundwater.h surface.h weather.h im.h element.h uzrect.h \
+  alist.h submodeler.h block.h plf.h memutils.h
 number_soil${OBJ}: number_soil.C number.h symbol.h librarian.h assertion.h \
   library.h block.h syntax.h treelog.h plf.h column.h alist.h horizon.h \
   hydraulic.h weather.h im.h time.h units.h

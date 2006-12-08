@@ -64,7 +64,7 @@ public:
 
   // Create and Destroy.
 public:
-  static const AttributeList& default_model ();
+  static const AttributeList& reserve_model ();
 protected:
   Msoltranrect (Block&);
 public:
