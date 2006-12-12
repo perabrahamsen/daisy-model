@@ -26,18 +26,16 @@
 #include "geometry1d.h"
 #include "plf.h"
 #include "mathlib.h"
-#include "timestep.h"
 #include <sstream>
-
-using namespace std;
+#include <vector>
 
 struct MactransStandard : public Mactrans
 {
   // Simulation.
  void tick (const Geometry1D&, const SoilWater&,
-	    const vector<double>& M, const vector<double>& C,
-	    vector<double>& S, vector<double>& S_p,
-	    vector<double>& J_p, Treelog&);
+	    const std::vector<double>& M, const std::vector<double>& C,
+	    std::vector<double>& S, std::vector<double>& S_p,
+	    std::vector<double>& J_p, double dt, Treelog&);
   void output (Log&) const
     { }
 
@@ -51,9 +49,11 @@ struct MactransStandard : public Mactrans
 
 void 
 MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,
-			const vector<double>& M, const vector<double>& C,
-			vector<double>& S_m, vector<double>& S_p,
-			vector<double>& J_p, Treelog& out)
+			const std::vector<double>& M,
+                        const std::vector<double>& C,
+			std::vector<double>& S_m, std::vector<double>& S_p,
+			std::vector<double>& J_p, const double dt, 
+                        Treelog& out)
 { 
   double max_delta_matter = 0.0; // [g/cm^2]
 
@@ -87,8 +87,8 @@ MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,
 	{
 	  // More is going out below of the pore than comming in above.  
 	  // Water enter here from the matrix with the local concentration.
-	  delta_matter = min (-C[i] * delta_water,
-                              (M[i] + S_m[i] * dt) * dz - 1e-16);
+	  delta_matter = std::min (-C[i] * delta_water,
+                                   (M[i] + S_m[i] * dt) * dz - 1e-16);
 	  if (delta_matter < 0.0)
 	    delta_matter = 0.0;
 	}

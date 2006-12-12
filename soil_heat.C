@@ -26,7 +26,6 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "weather.h"
-#include "timestep.h"
 #include "syntax.h"
 #include "log.h"
 #include "submodel.h"
@@ -197,7 +196,8 @@ bool
 SoilHeat::update_state (const Geometry& geo,
                         const Soil& soil, 
                         const SoilWater& soil_water, 
-                        std::vector<double>& T)
+                        std::vector<double>& T,
+                        const double dt)
 {
   bool changed = false;
 
@@ -211,7 +211,7 @@ SoilHeat::update_state (const Geometry& geo,
               // Find freezing rate.
               freezing_rate[i] = calculate_freezing_rate (geo, 
                                                           soil, soil_water, 
-                                                          i, T);
+                                                          i, T, dt);
 
               if (freezing_rate[i] < 0.0)
                 freezing_rate[i] = 0.0;
@@ -257,7 +257,7 @@ SoilHeat::update_state (const Geometry& geo,
             {
               freezing_rate[i] = calculate_freezing_rate (geo, 
                                                           soil, soil_water, 
-                                                          i, T);
+                                                          i, T, dt);
               if (freezing_rate[i] > 0.0)
                 freezing_rate[i] = 0.0;
 
@@ -305,7 +305,8 @@ SoilHeat::calculate_freezing_rate (const Geometry& geo,
                                    const Soil& soil,
                                    const SoilWater& soil_water,
                                    unsigned int i, 
-                                   const std::vector<double>& T)
+                                   const std::vector<double>& T,
+                                   const double dt)
 {
   const double T_mean = (T[i] + T_old[i]) / 2.0;
   const double dT = T[i] - T_old[i];

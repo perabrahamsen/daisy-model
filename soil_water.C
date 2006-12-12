@@ -25,7 +25,6 @@
 #include "soil.h"
 #include "soil_heat.h"
 #include "groundwater.h"
-#include "timestep.h"
 #include "log.h"
 #include "submodel.h"
 #include "block.h"
@@ -108,7 +107,8 @@ SoilWater::set_flux (const size_t i, const double q)
 }
 
 void
-SoilWater::tick (const size_t cell_size, const Soil& soil, Treelog& msg)
+SoilWater::tick (const size_t cell_size, const Soil& soil, 
+                 const double dt, Treelog& msg)
 {
   Treelog::Open nest (msg, "SoilWater");
 

@@ -41,7 +41,7 @@ public:
 public:
   virtual void tick (const Geometry& geo,
                      const Soil&, const SoilWater&, 
-                     SoilChemicals&, Treelog&) = 0;
+                     SoilChemicals&, const double dt, Treelog&) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

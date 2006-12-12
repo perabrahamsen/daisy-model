@@ -49,7 +49,8 @@ public:
 
   // Canopy functions.
 public:
-  void canopy_update (const Chemicals& canopy_chemicals_in, 
+  void canopy_update (const double dt,
+                      const Chemicals& canopy_chemicals_in, 
 		      double canopy_water_storage,
 		      double canopy_water_out,
 		      Chemicals& canopy_chemicals_dissipate,

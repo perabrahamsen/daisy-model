@@ -58,7 +58,7 @@ public:
   virtual const std::vector<bool>& active () const = 0;
   virtual void tick (const Geometry& geo,
              const SoilWater&, const SoilHeat&, 
-	     SoilNO3&, SoilNH4&, Treelog& msg) = 0;
+	     SoilNO3&, SoilNH4&, double dt, Treelog& msg) = 0;
   virtual void transport (const Soil&, const SoilWater&, Treelog&) = 0;
   virtual const std::vector<DOM*>& fetch_dom () const = 0;
   virtual void output (Log&) const = 0;

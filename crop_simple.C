@@ -117,7 +117,7 @@ public:
   double ActualWaterUptake (double Ept, const Geometry& geo,
                             const Soil&, SoilWater&,
 			    double EvapInterception, double day_fraction, 
-			    Treelog&);
+                            double dt, Treelog&);
   void force_production_stress  (double pstress);
 
   // Simulation.
@@ -128,7 +128,7 @@ public:
 	     const SoilHeat&, const SoilWater&, SoilNH4*, SoilNO3*, 
 	     double&, double&, double&, vector<double>&, vector<double>&,
 	     double ForcedCAI,
-	     Treelog&);
+	     double dt, Treelog&);
   void emerge ()
   {
     if (use_T_sum)
@@ -197,11 +197,12 @@ CropSimple::ActualWaterUptake (double Ept,
                                const Geometry& geo,
 			       const Soil& soil, SoilWater& soil_water,
 			       const double EvapInterception, 
-			       const double day_fraction, Treelog& msg)
+			       const double day_fraction, 
+                               const double dt, Treelog& msg)
 {
   return root_system->water_uptake (Ept, geo, 
                                     soil, soil_water, EvapInterception,
-                                    day_fraction, msg);
+                                    day_fraction, dt, msg);
 }
 
 void 
@@ -218,7 +219,8 @@ CropSimple::tick (const Time& time, const double,
 		  const SoilWater& soil_water,
 		  SoilNH4* soil_NH4, SoilNO3* soil_NO3, 
 		  double&, double&, double&, vector<double>&, vector<double>&,
-		  double ForcedCAI,
+		  const double ForcedCAI,
+                  const double dt,
 		  Treelog& msg)
 {
   Treelog::Open nest (msg, name);
@@ -295,7 +297,8 @@ CropSimple::tick (const Time& time, const double,
 	  N_actual += root_system->nitrogen_uptake (geo, soil, soil_water, 
                                                     *soil_NH4, 0.0, 
                                                     *soil_NO3, 0.0,
-                                                    N_demand - N_actual);
+                                                    N_demand - N_actual,
+                                                    dt);
 	}
       else
 	{

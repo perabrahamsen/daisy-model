@@ -27,7 +27,6 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "log.h"
-#include "timestep.h"
 #include "im.h"
 #include "mathlib.h"
 #include "submodel.h"
@@ -70,14 +69,14 @@ struct Surface::Implementation
   void ridge (const Geometry1D& geo,
               const Soil& soil, const SoilWater& soil_water,
 	      const AttributeList&);
-  void mixture (const IM& soil_im /* g/cm^2/mm */);
+  void mixture (const IM& soil_im /* g/cm^2/mm */, double dt);
   void mixture (const Geometry& geo,
-                const SoilChemicals& soil_chemicals);
-  void exfiltrate (double water, Treelog&);
+                const SoilChemicals& soil_chemicals, double dt);
+  void exfiltrate (double water, double dt, Treelog&);
   double ponding () const;
   void tick (Treelog&, double PotSoilEvaporation, double water, double temp,
-	     const Geometry& geo,
-             const Soil& soil, const SoilWater& soil_water, double T);
+	     const Geometry&, const Soil&, const SoilWater&, double T, 
+             double dt);
   double albedo (const Geometry&, const Soil&, const SoilWater&) const;
   void fertilize (const IM& n);
   void spray (const Chemicals& chemicals_in);
@@ -108,7 +107,7 @@ Surface::top_type (const Geometry& geo, size_t edge) const
 }
 
 double 
-Surface::q_top (const Geometry& geo, size_t edge) const
+Surface::q_top (const Geometry& geo, const size_t edge, const double dt) const
 {
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
 
@@ -119,14 +118,14 @@ Surface::q_top (const Geometry& geo, size_t edge) const
 }
   
 double
-Surface::h_top (const Geometry& geo, size_t edge) const
+Surface::h_top (const Geometry& geo, size_t edge, double dt) const
 { 
-  return -q_top (geo, edge) * dt; 
+  return -q_top (geo, edge, dt) * dt; 
 }
 
 void
 Surface::accept_top (double water /* cm */, const Geometry& geo, size_t edge, 
-                     Treelog& msg)
+                     double dt, Treelog& msg)
 { 
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
 
@@ -134,7 +133,7 @@ Surface::accept_top (double water /* cm */, const Geometry& geo, size_t edge,
     return;		// Handled by ridge based on flux.
 
   impl.exfiltrate (water * 10.0 * geo.edge_area (edge) / geo.surface_area (),
-                   msg); 
+                   dt, msg); 
 }
 
 size_t 
@@ -153,10 +152,11 @@ Surface::update_water (const Geometry1D& geo,
 		       vector<double>& h_,
 		       vector<double>& Theta_,
 		       vector<double>& q,
-		       const vector<double>& q_p)
+		       const vector<double>& q_p, 
+                       const double dt)
 {
   if (impl.ridge_)
-    impl.ridge_->update_water (geo, soil, S_, h_, Theta_, q, q_p); 
+    impl.ridge_->update_water (geo, soil, S_, h_, Theta_, q, q_p, dt); 
 }
 
 void 
@@ -190,20 +190,21 @@ Surface::unridge ()
 }
 
 void
-Surface::mixture (const IM& soil_im /* g/cm^2/mm */)
+Surface::mixture (const IM& soil_im /* g/cm^2/mm */, const double dt)
 {
-  impl.mixture (soil_im);
+  impl.mixture (soil_im, dt);
 }
 
 void
 Surface::mixture (const Geometry& geo,
-                  const SoilChemicals& soil_chemicals)
+                  const SoilChemicals& soil_chemicals, const double dt)
 {
-  impl.mixture (geo, soil_chemicals);
+  impl.mixture (geo, soil_chemicals, dt);
 }
 
 void
-Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */)
+Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */, 
+                                  const double dt /* [h] */)
 {
   if (!total_matter_flux && pond > 1e-6 && R_mixing > 0.0)
     {
@@ -220,19 +221,21 @@ Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */)
 
 void
 Surface::Implementation::mixture (const Geometry& geo,
-                                  const SoilChemicals& soil_chemicals)
+                                  const SoilChemicals& soil_chemicals,
+                                  const double dt)
 {
   if (chemicals_can_enter_soil)
     {
       chemicals_out.clear ();
 
       soil_chemicals.mixture (geo, chemicals_storage, chemicals_out,
-			      pond, R_mixing);
+			      pond, R_mixing, dt);
     }
 }
 
 void
-Surface::Implementation::exfiltrate (double water /* mm */, Treelog& msg)
+Surface::Implementation::exfiltrate (double water /* [mm] */, 
+                                     const double dt /* [h] */, Treelog& msg)
 {
   if (lake >= 0.0)
     return;
@@ -328,19 +331,23 @@ Surface::temperature () const
 
 void
 Surface::tick (Treelog& msg,
-	       double PotSoilEvaporation, double water, double temp,
+	       const double PotSoilEvaporation, 
+               const double water, const double temp,
 	       const Geometry& geo,
-               const Soil& soil, const SoilWater& soil_water, double soil_T)
+               const Soil& soil, const SoilWater& soil_water, 
+               const double soil_T,
+               const double dt)
 { impl.tick (msg, PotSoilEvaporation, water, temp, geo, 
-             soil, soil_water, soil_T); }
+             soil, soil_water, soil_T, dt); }
 
 void
 Surface::Implementation::tick (Treelog& msg,
 			       double PotSoilEvaporation,
-			       double water, double temp,
+			       const double water, const double temp,
                                const Geometry& geo,
                                const Soil& soil, const SoilWater& soil_water,
-			       double soil_T)
+			       const double soil_T,
+                               const double dt)
 {
   if (pond > DetentionCapacity)
     {
@@ -386,8 +393,8 @@ Surface::Implementation::tick (Treelog& msg,
   if (ridge_)
     {
       const Geometry1D& geo1d = dynamic_cast<const Geometry1D&> (geo);
-      ridge_->tick (geo1d, soil, soil_water, pond);
-      exfiltrate (ridge_->exfiltration (), msg);
+      ridge_->tick (geo1d, soil, soil_water, pond, dt);
+      exfiltrate (ridge_->exfiltration (), dt, msg);
     }
 }
 

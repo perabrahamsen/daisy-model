@@ -220,7 +220,7 @@ struct OrganicStandard : public OrganicMatter
   const std::vector<bool>& active () const;
   void tick (const Geometry& geo,
              const SoilWater&, const SoilHeat&, 
-	     SoilNO3&, SoilNH4&, Treelog& msg);
+	     SoilNO3&, SoilNH4&, double dt, Treelog& msg);
   void transport (const Soil&, const SoilWater&, Treelog&);
   const std::vector<DOM*>& fetch_dom () const;
   void output (Log&) const;
@@ -1071,6 +1071,7 @@ OrganicStandard::tick (const Geometry& geo,
                        const SoilHeat& soil_heat,
                        SoilNO3& soil_NO3,
                        SoilNH4& soil_NH4,
+                       const double dt,
                        Treelog& msg)
 {
   const double old_N = total_N (geo);
@@ -1105,12 +1106,12 @@ OrganicStandard::tick (const Geometry& geo,
     {
       if (!active_[i])
         continue;
-      daisy_assert (soil_NH4.M_left (i) >= 0);
-      const double NH4 = (soil_NH4.M_left (i) < 1e-9) // 1 mg/l
-	? 0.0 : soil_NH4.M_left (i) * K_NH4;
-      daisy_assert (soil_NO3.M_left (i) >= 0);
-      const double NO3 = (soil_NO3.M_left (i) < 1e-9) // 1 mg/l
-	? 0.0 : soil_NO3.M_left (i) * K_NO3;
+      daisy_assert (soil_NH4.M_left (i, dt) >= 0);
+      const double NH4 = (soil_NH4.M_left (i, dt) < 1e-9) // 1 mg/l
+	? 0.0 : soil_NH4.M_left (i, dt) * K_NH4;
+      daisy_assert (soil_NO3.M_left (i, dt) >= 0);
+      const double NO3 = (soil_NO3.M_left (i, dt) < 1e-9) // 1 mg/l
+	? 0.0 : soil_NO3.M_left (i, dt) * K_NO3;
 
       N_soil[i] = NH4 + NO3;
       N_used[i] = 0.0;
@@ -1191,10 +1192,10 @@ OrganicStandard::tick (const Geometry& geo,
       if (!active_[i])
         continue;
       
-      daisy_assert (N_used[i] < soil_NH4.M_left (i) + soil_NO3.M_left (i));
+      daisy_assert (N_used[i] < soil_NH4.M_left (i, dt) + soil_NO3.M_left (i, dt));
 
-      const double NH4 = (soil_NH4.M_left (i) < 1e-9) // 1 mg/l
-	? 0.0 : soil_NH4.M_left (i) * K_NH4;
+      const double NH4 = (soil_NH4.M_left (i, dt) < 1e-9) // 1 mg/l
+	? 0.0 : soil_NH4.M_left (i, dt) * K_NH4;
       daisy_assert (NH4 >= 0.0);
 
       if (N_used[i] > NH4)
@@ -1212,12 +1213,12 @@ OrganicStandard::tick (const Geometry& geo,
     }
   
   // Update soil solutes.
-  soil_NO3.add_to_source (NO3_source);
-  soil_NH4.add_to_source (NH4_source);
+  soil_NO3.add_to_source (NO3_source, dt);
+  soil_NH4.add_to_source (NH4_source, dt);
 
   // Biological incorporation.
   const double soil_T = geo.content_at (soil_heat, &SoilHeat::T, 0.0 /* cm */);
-  bioincorporation.tick (geo, am, soil_T, top_CO2);
+  bioincorporation.tick (geo, am, soil_T, top_CO2, dt);
 
   // Tillage time.
   for (size_t i = 0; i < cell_size; i++)
@@ -1268,8 +1269,8 @@ OrganicStandard::tick (const Geometry& geo,
   // We didn't steal it all?
   for (int i = 0; i < cell_size; i++)
     {
-      daisy_assert (soil_NO3.M_left (i) >= 0.0);
-      daisy_assert (soil_NH4.M_left (i) >= 0.0);
+      daisy_assert (soil_NO3.M_left (i, dt) >= 0.0);
+      daisy_assert (soil_NH4.M_left (i, dt) >= 0.0);
     }
 }
       

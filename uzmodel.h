@@ -24,7 +24,6 @@
 #define UZMODEL_H
 
 #include "librarian.h"
-#include "timestep.h"
 
 class Surface;
 class Groundwater;
@@ -57,7 +56,8 @@ public:
 		     std::vector<double>& h,
 		     std::vector<double>& Theta,
                      const size_t q_offset,
-		     std::vector<double>& q) = 0;
+		     std::vector<double>& q,
+                     double dt) = 0;
 
   // Create and Destroy.
 public:

@@ -46,7 +46,7 @@ public:
 		     std::vector<double>& M, 
 		     std::vector<double>& C,
 		     const std::vector<double>& S,
-		     std::vector<double>& J) = 0;
+		     std::vector<double>& J, double dt) = 0;
 
   // Create and Destroy.
 public:

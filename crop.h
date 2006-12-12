@@ -79,7 +79,8 @@ public:
   virtual double ActualWaterUptake (double Ept, const Geometry& geo,
                                     const Soil&, SoilWater&, 
 				    double EvapInterception, 
-				    double day_fraction, Treelog&) = 0;
+				    double day_fraction, 
+                                    double dt, Treelog&) = 0;
   virtual void force_production_stress  (double pstress);
 
   // Simulation.
@@ -95,7 +96,7 @@ public:
 		     std::vector<double>& residuals_N_soil, 
 		     std::vector<double>& residuals_C_soil,
 		     double ForcedCAI,
-		     Treelog&) = 0;
+		     double dt, Treelog&) = 0;
   virtual void emerge () = 0;
   virtual const Harvest& harvest (symbol column_name,
 				  const Time&, const Geometry&, 

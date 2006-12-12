@@ -20,20 +20,13 @@
 
 #include "movement.h"
 #include "msoltranrect.h"
-#include "geometry_rect.h"
-#include "soil.h"
-#include "soil_water.h"
-#include "soil_heat.h"
-#include "solute.h"
 #include "groundwater.h"
 #include "surface.h"
 #include "weather.h"
-#include "element.h"
 #include "uzrect.h"
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
-#include <sstream>
 
 struct MovementRect : public Movement
 {
@@ -43,16 +36,16 @@ struct MovementRect : public Movement
 
   // Water.
   const std::vector<UZRect*> matrix_water;
-  void macro_tick (const Soil&, SoilWater&, Surface&, Treelog&);
+  void macro_tick (const Soil&, SoilWater&, Surface&, double dt, Treelog&);
 
   // Solute.
   const std::vector<Msoltranrect*> matrix_solute;
   void solute (const Soil& soil, const SoilWater& soil_water,
-               const double J_in, Solute& solute,
+               double J_in, Solute& solute, double dt,
                Treelog& msg);
   void element (const Soil& soil, const SoilWater& soil_water,
                 Element& element, Adsorption& adsorption,
-                const double diffusion_coefficient, Treelog& msg);
+                double diffusion_coefficient, double dt, Treelog& msg);
 
   // Management.
   void ridge (Surface&, const Soil&, const SoilWater&, const AttributeList&);
@@ -69,7 +62,7 @@ struct MovementRect : public Movement
   // Simulation.
   void tick (const Soil& soil, SoilWater& soil_water, SoilHeat& soil_heat,
              Surface& surface, Groundwater& groundwater, const Time&,
-             const Weather&, Treelog& msg);
+             const Weather&, double dt, Treelog& msg);
   void output (Log&) const;
 
   // Create.
@@ -85,12 +78,13 @@ MovementRect::geometry () const
 { return *geo; }
 
 void
-MovementRect::macro_tick (const Soil&, SoilWater&, Surface&, Treelog&)
+MovementRect::macro_tick (const Soil&, SoilWater&, Surface&, 
+                          const double /* dt */, Treelog&)
 { }
 
 void
 MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
-                      const double J_in, Solute& solute,
+                      const double J_in, Solute& solute, const double dt,
                       Treelog& msg)
 {
   for (size_t i = 0; i < matrix_solute.size (); i++)
@@ -98,7 +92,8 @@ MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
       Treelog::Open nest (msg, matrix_solute[i]->name);
       try
         {
-          matrix_solute[i]->solute (*geo, soil, soil_water, J_in, solute, msg);
+          matrix_solute[i]->solute (*geo, soil, soil_water, J_in, solute, 
+                                    dt, msg);
           if (i > 0)
             msg.message ("Succeeded");
           return;
@@ -118,7 +113,8 @@ MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
 void 
 MovementRect::element (const Soil& soil, const SoilWater& soil_water,
                        Element& element, Adsorption& adsorption,
-                       const double diffusion_coefficient, Treelog& msg)
+                       const double diffusion_coefficient, double dt, 
+                       Treelog& msg)
 {
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
@@ -126,7 +122,8 @@ MovementRect::element (const Soil& soil, const SoilWater& soil_water,
       try
         {
           matrix_solute[i]->element (*geo, soil, soil_water, element, 
-                                     adsorption, diffusion_coefficient, msg);
+                                     adsorption, diffusion_coefficient, dt, 
+                                     msg);
           if (i > 0)
             msg.message ("Succeeded");
           return;
@@ -218,12 +215,12 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
                     SoilHeat& soil_heat,
                     Surface& surface, Groundwater& groundwater, 
                     const Time&,
-                    const Weather&, Treelog& msg) 
+                    const Weather&, const double dt, Treelog& msg) 
 {
   const size_t cell_size = geo->cell_size ();
   const size_t edge_size = geo->edge_size ();
 
-  soil_water.tick (cell_size, soil, msg); 
+  soil_water.tick (cell_size, soil, dt, msg); 
 
   for (size_t i = 0; i < matrix_water.size (); i++)
     {
@@ -231,7 +228,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       try
         {
           matrix_water[i]->tick (*geo, soil, soil_water, soil_heat,
-                                 surface, groundwater, msg);
+                                 surface, groundwater, dt, msg);
           goto update_borders;
         }
       catch (const char* error)
@@ -250,7 +247,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
   for (size_t edge = 0; edge < edge_size; edge++)
     {
       if (geo->edge_to (edge) == Geometry::cell_above)
-        surface.accept_top (soil_water.q (edge) * dt, *geo, edge, msg);
+        surface.accept_top (soil_water.q (edge) * dt, *geo, edge, dt, msg);
       if (geo->edge_from (edge) == Geometry::cell_below)
         groundwater.accept_bottom ((soil_water.q (edge)
                                     + soil_water.q_p (edge)) * dt,

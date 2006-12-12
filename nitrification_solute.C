@@ -45,7 +45,7 @@ public:
   void tick (const double M, const double C, 
              const double M_left,
              const double h, const double T,
-             double& NH4, double& N2O, double& NO3) const;
+             double& NH4, double& N2O, double& NO3, double dt) const;
 
   // Create.
 public:
@@ -56,7 +56,8 @@ void
 NitrificationSolute::tick (const double /* M */, const double C, 
                            const double M_left,
                            const double h, const double T,
-                           double& NH4, double& N2O, double& NO3) const
+                           double& NH4, double& N2O, double& NO3,
+                           const double dt) const
 {
   const double T_factor = (heat_factor.size () < 1)
     ? f_T (T)

@@ -114,7 +114,7 @@ int EBAL_DT(double, double, double, double, double, double, double, double,
             double&, double&, double&, double&, double&);
 int EBAL_PM(double, double, double, double, double, double, double, double,
             double, double, double, double&, double&, double&, double&, double&,
-            double&, double&, double&, double&, double&);
+            double&, double&, double&, double&, double&, double);
 
 // Declaration of functions
 
@@ -1134,7 +1134,8 @@ int EBAL_PM(double tair,double tsurf_pm,double srad,double e_pa,double relsun,
             double rsc_pm,double &rnetshortwave_pm,double &rnetlongwave_pm,
             double &rnetrad_pm,double &rdnetrad_pm,double &rgflux_pm,
             double &rdgflux_pm,double &rhflux_pm,double &rdhflux_pm,
-            double &rleflux_pm,double &rdleflux_pm)
+            double &rleflux_pm,double &rdleflux_pm,
+            const double dt)
 {
   const double albedo = 0.2;
 

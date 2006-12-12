@@ -31,59 +31,8 @@
 inline bool iszero (const double d)
 { return !std::isnormal (d); }
 
-#ifndef pow
-#define pow(x, y) safe_pow (x, y, __FILE__, __LINE__)
-#endif //!pow
-#ifndef sqrt
-#define sqrt(x) safe_sqrt (x, __FILE__, __LINE__)
-#endif //!sqrt
-#ifndef log
-#define log(x) safe_log (x, __FILE__, __LINE__)
-#endif //!log
-#ifndef acos
-#define acos(x) safe_acos (x, __FILE__, __LINE__)
-#endif //!acos
-#ifndef asin
-#define asin(x) safe_asin (x, __FILE__, __LINE__)
-#endif //!asin
-
-inline double safe_pow (double x, double y, const char* file, int line)
-{
-  if (x >= 0)
-    return (pow)(x, y);
-  Assertion::failure (file, line, "pow", "x >= 0");
-}
-
-inline double safe_pow (double x, int y, const char*, int)
-{ return (pow)(x, y); }
-
-inline double safe_sqrt (double x, const char* file, int line)
-{
-  if (x >= 0)
-    return (sqrt)(x);
-  Assertion::failure (file, line, "sqrt", "x >= 0");
-}
-
-inline double safe_log (double x, const char* file, int line)
-{
-  if (x > 0)
-    return (log)(x);
-  Assertion::failure (file, line, "log", "x > 0");
-}
-
-inline double safe_acos (double x, const char* file, int line)
-{
-  if (x >= -1 && x <= 1)
-    return (acos)(x);
-  Assertion::failure (file, line, "acos", "x >= -1 && x <= 1");
-}
-
-inline double safe_asin (double x, const char* file, int line)
-{
-  if (x >= -1 && x <= 1)
-    return (asin)(x);
-  Assertion::failure (file, line, "asin", "x >= -1 && x <= 1");
-}
+inline bool isequal (const double a, const double b)
+{ return !std::isnormal (a - b); }
 
 #ifndef M_LN2
 #define	M_LN2		0.69314718055994530942

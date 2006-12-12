@@ -38,7 +38,7 @@ struct OrganicNone : public OrganicMatter
   { return active_; }
   void tick (const Geometry&,
              const SoilWater&, const SoilHeat&, 
-	     SoilNO3&, SoilNH4&, Treelog&)
+	     SoilNO3&, SoilNH4&, double, Treelog&)
   { }
   void transport (const Soil&, const SoilWater&, Treelog&)
   { }

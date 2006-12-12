@@ -26,8 +26,6 @@
 #include "soil.h"
 #include "mathlib.h"
 
-using namespace std;
-
 class UZNone : public UZmodel
 {
 public:
@@ -36,14 +34,15 @@ public:
 	     const unsigned int first, const Surface& /* top */, 
              const size_t /* top_edge */,
 	     const unsigned int last, const Groundwater& /* bottom */, 
-	     const vector<double>& /* S */,
-	     const vector<double>& h_old,
-	     const vector<double>& Theta_old,
-	     const vector<double>& /* h_ice */,
-	     vector<double>& h,
-	     vector<double>& Theta,
+	     const std::vector<double>& /* S */,
+	     const std::vector<double>& h_old,
+	     const std::vector<double>& Theta_old,
+	     const std::vector<double>& /* h_ice */,
+	     std::vector<double>& h,
+	     std::vector<double>& Theta,
              size_t q_offset,
-             vector<double>& q_base)
+             std::vector<double>& q_base, 
+             double dt)
   {
     for (int i = first; i <= last; i++)
       {

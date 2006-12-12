@@ -41,7 +41,8 @@ private:
   
   // Simulation.
 public:
-  void tick (const Geometry&, std::vector <AM*>&, double T, double& CO2);
+  void tick (const Geometry&, std::vector <AM*>&, double T, double& CO2, 
+             double dt);
   void output (Log&) const;
 
   // Utilities.

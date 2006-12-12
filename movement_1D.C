@@ -46,7 +46,7 @@ struct Movement1D : public Movement
   const std::vector<UZmodel*> matrix_water;
   std::auto_ptr<Macro> macro;
   void macro_tick (const Soil& soil, SoilWater& soil_water,
-                   Surface& surface, Treelog& msg);
+                   Surface& surface, const double dt, Treelog& msg);
   void tick_water (const Geometry1D& geo,
                    const Soil& soil, const SoilHeat& soil_heat, 
                    Surface& surface, Groundwater& groundwater,
@@ -58,7 +58,7 @@ struct Movement1D : public Movement
                    std::vector<double>& Theta,
                    std::vector<double>& q,
                    std::vector<double>& q_p,
-                   Treelog& msg);
+                   double dt, Treelog& msg);
 
   // Solute.
   const std::vector<Transport*> matrix_solute;
@@ -67,12 +67,14 @@ struct Movement1D : public Movement
   void solute (const Soil& soil, 
                const SoilWater& soil_water, 
                const double J_in, Solute& solute, 
+               const double dt,
                Treelog& msg);
   void element (const Soil& soil, 
                 const SoilWater& soil_water, 
                 Element& element,
                 Adsorption& adsorption,
                 double diffusion_coefficient,
+                double dt,
                 Treelog& msg);
   void flow (const Soil& soil, const SoilWater& soil_water, 
              const std::string& name,
@@ -84,6 +86,7 @@ struct Movement1D : public Movement
              std::vector<double>& J_p, 
              Adsorption& adsorption,
              double diffusion_coefficient,
+             double dt,
              Treelog& msg);
 
   // Heat.
@@ -110,13 +113,13 @@ struct Movement1D : public Movement
                           const SoilWater& soil_water,
                           SoilHeat& soil_heat,
                           const Surface& surface,
-                          double T_bottom);
+                          double T_bottom, double dt);
   void tick_heat (const Geometry1D& geo,
                   const Soil& soil,
                   SoilWater& soil_water,
                   SoilHeat& soil_heat,
                   const Surface& surface, 
-                  double T_bottom);
+                  double T_bottom, double dt);
 
   // Management.
   void ridge (Surface& surface, const Soil& soil, const SoilWater& soil_water,
@@ -125,7 +128,8 @@ struct Movement1D : public Movement
   // Simulation.
   void tick (const Soil& soil, SoilWater& soil_water, SoilHeat& soil_heat,
              Surface& surface, Groundwater& groundwater,
-             const Time& time, const Weather& weather, Treelog& msg);
+             const Time& time, const Weather& weather, double dt, 
+             Treelog& msg);
    void output (Log&) const;
 
   // Create.
@@ -144,7 +148,7 @@ Movement1D::geometry () const
 
 void 
 Movement1D::macro_tick (const Soil& soil, SoilWater& soil_water,
-                        Surface& surface, Treelog& msg)
+                        Surface& surface, const double dt, Treelog& msg)
 { 
   if (!macro.get ())			// No macropores.
     return;
@@ -154,7 +158,7 @@ Movement1D::macro_tick (const Soil& soil, SoilWater& soil_water,
   std::fill (soil_water.q_p_.begin (), soil_water.q_p_.end (), 0.0);
   macro->tick (*geo, soil, 0, soil.size () - 1, surface, 
                soil_water.h_ice_, soil_water.h_, soil_water.Theta_,
-               soil_water.S_sum_, soil_water.S_p_, soil_water.q_p_, msg);
+               soil_water.S_sum_, soil_water.S_p_, soil_water.q_p_, dt, msg);
 }
 
 void 
@@ -169,6 +173,7 @@ Movement1D::tick_water (const Geometry1D& geo,
                         std::vector<double>& Theta,
                         std::vector<double>& q,
                         std::vector<double>& q_p,
+                        const double dt, 
                         Treelog& msg)
 {
   // Limit for groundwater table.
@@ -202,7 +207,8 @@ Movement1D::tick_water (const Geometry1D& geo,
         {
           matrix_water[m]->tick (msg, geo, soil, soil_heat,
                                  first, surface, 0U, last, groundwater,
-                                 S, h_old, Theta_old, h_ice, h, Theta, 0U, q);
+                                 S, h_old, Theta_old, h_ice, h, Theta, 0U, q, 
+                                 dt);
 
           for (size_t i = last + 2; i <= soil.size (); i++)
             {
@@ -218,7 +224,7 @@ Movement1D::tick_water (const Geometry1D& geo,
             }
 
           // Update surface and groundwater reservoirs.
-          surface.accept_top (q[0] * dt, geo, 0U, msg);
+          surface.accept_top (q[0] * dt, geo, 0U, dt, msg);
           groundwater.accept_bottom ((q[soil.size ()]
                                       + q_p[soil.size ()]) * dt,
                                      geo, soil.size ());
@@ -242,9 +248,10 @@ void
 Movement1D::solute (const Soil& soil, 
                     const SoilWater& soil_water, 
                     const double J_in, Solute& solute, 
+                    const double dt,
                     Treelog& msg)
 { 
-  solute.tick (geo->cell_size (), soil_water);
+  solute.tick (geo->cell_size (), soil_water, dt);
 
   // Upper border.
   if (soil_water.q_p (0) < 0.0)
@@ -277,7 +284,7 @@ Movement1D::solute (const Soil& soil,
         solute.M_, solute.C_, 
         solute.S, solute.S_p,
         solute.J, solute.J_p, 
-        *solute.adsorption, solute.diffusion_coefficient (), msg);
+        *solute.adsorption, solute.diffusion_coefficient (), dt, msg);
 }
 
 void 
@@ -285,13 +292,14 @@ Movement1D::element (const Soil& soil,
                      const SoilWater& soil_water, 
                      Element& element,
                      Adsorption& adsorption,
-                     double diffusion_coefficient,
+                     const double diffusion_coefficient,
+                     const double dt,
                      Treelog& msg)
 {
-  element.tick (geo->cell_size (), soil_water);
+  element.tick (geo->cell_size (), soil_water, dt);
   flow (soil, soil_water, "DOM", element.M, element.C, 
         element.S, element.S_p, element.J, element.J_p, 
-        adsorption, diffusion_coefficient, msg);
+        adsorption, diffusion_coefficient, dt, msg);
 }
 
 void 
@@ -305,6 +313,7 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
                   std::vector<double>& J_p, 
                   Adsorption& adsorption,
                   double diffusion_coefficient,
+                  const double dt,
                   Treelog& msg)
 {
   const double old_content = geo->total_surface (M);
@@ -313,11 +322,11 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
   if (adsorption.full ())
     {
       transport_solid->tick (msg, *geo, soil, soil_water, adsorption, 
-                             diffusion_coefficient, M, C, S, J);
+                             diffusion_coefficient, M, C, S, J, dt);
       goto done;
     }
 
-  mactrans->tick (*geo, soil_water, M, C, S, S_p, J_p, msg);
+  mactrans->tick (*geo, soil_water, M, C, S, S_p, J_p, dt, msg);
 
   for (size_t m = 0; m < matrix_solute.size (); m++)
     {
@@ -327,7 +336,7 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
         {
           matrix_solute[m]->tick (msg, *geo, soil, soil_water, adsorption, 
                                   diffusion_coefficient, 
-                                  M, C, S, J);
+                                  M, C, S, J, dt);
           if (m > 0)
             msg.message ("Reserve model succeeded");
           goto done;
@@ -463,7 +472,8 @@ Movement1D::solve_heat (const Geometry1D& geo,
                         const SoilWater& soil_water,
                         SoilHeat& soil_heat,
                         const Surface& surface,
-                        const double T_bottom)
+                        const double T_bottom,
+                        const double dt)
 {
   double& T_top = soil_heat.T_top;
   std::vector<double>& T = soil_heat.T_;
@@ -586,7 +596,8 @@ Movement1D::tick_heat (const Geometry1D& geo,
                        SoilWater& soil_water,
                        SoilHeat& soil_heat,
                        const Surface& surface,
-                       const double T_bottom)
+                       const double T_bottom,
+                       const double dt)
 {
   // Update freezing and melting points.
   soil_heat.update_freezing_points (soil, soil_water);
@@ -594,7 +605,7 @@ Movement1D::tick_heat (const Geometry1D& geo,
   // Solve with old state.
   soil_heat.T_old = soil_heat.T_;
   solve_heat (geo, soil, soil_water, soil_heat, 
-              surface, T_bottom);
+              surface, T_bottom, dt);
 
   // Check if ice is enabled.
   if (!soil_heat.enable_ice)
@@ -602,13 +613,13 @@ Movement1D::tick_heat (const Geometry1D& geo,
 
   // Update state according to new temperatures.
   const bool changed 
-    = soil_heat.update_state (geo, soil, soil_water, soil_heat.T_);
+    = soil_heat.update_state (geo, soil, soil_water, soil_heat.T_, dt);
 
   if (changed)
     {
       // Solve again with new state.
       soil_heat.T_ = soil_heat.T_old;
-      solve_heat (geo, soil, soil_water, soil_heat, surface, T_bottom);
+      solve_heat (geo, soil, soil_water, soil_heat, surface, T_bottom, dt);
 
       // Check if state match new temperatures.
       const bool changed_again = soil_heat.check_state (soil, soil_heat.T_);
@@ -632,18 +643,19 @@ Movement1D::ridge (Surface& surface, const Soil& soil,
 void 
 Movement1D::tick (const Soil& soil, SoilWater& soil_water, SoilHeat& soil_heat,
                   Surface& surface, Groundwater& groundwater,
-                  const Time& time, const Weather& weather, Treelog& msg) 
+                  const Time& time, const Weather& weather, 
+                  const double dt, Treelog& msg) 
 {
   Treelog::Open nest (msg, "Movement: " + name.name ());
 
   tick_heat (*geo, soil, soil_water, soil_heat, surface, 
-             bottom_heat (time, weather));
-  soil_water.tick (geo->cell_size (), soil, msg);
+             bottom_heat (time, weather), dt);
+  soil_water.tick (geo->cell_size (), soil, dt, msg);
   tick_water (*geo, soil, soil_heat, surface, groundwater, 
               soil_water.S_sum_, soil_water.h_old_, soil_water.Theta_old_,
               soil_water.h_ice_, soil_water.h_, soil_water.Theta_,
               soil_water.q_, soil_water.q_p_,
-              msg);
+              dt, msg);
 }
 
 void 

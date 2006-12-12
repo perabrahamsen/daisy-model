@@ -28,11 +28,8 @@
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
-#include "timestep.h"
-
+#include <vector>
 #include <sstream>
-
-using namespace std;
 
 struct TransportConvection : public Transport
 {
@@ -43,10 +40,11 @@ struct TransportConvection : public Transport
   void tick (Treelog&, const Geometry1D& geo,
              const Soil&, const SoilWater&, const Adsorption&,
 	     double diffusion_coefficient,
-	     vector<double>& M, 
-	     vector<double>& C,
-	     const vector<double>& S,
-	     vector<double>& J);
+	     std::vector<double>& M, 
+	     std::vector<double>& C,
+	     const std::vector<double>& S,
+	     std::vector<double>& J, 
+             double dt);
 
   // Create.
   TransportConvection (Block& al)
@@ -61,16 +59,17 @@ TransportConvection::tick (Treelog& msg,
 			   const Geometry1D& geo,
                            const Soil& soil, const SoilWater& soil_water,
 			   const Adsorption& adsorption, double,
-			   vector<double>& M, 
-			   vector<double>& C,
-			   const vector<double>& S,
-			   vector<double>& J)
+			   std::vector<double>& M, 
+			   std::vector<double>& C,
+			   const std::vector<double>& S,
+			   std::vector<double>& J,
+                           const double dt)
 {
   const double J_in = J[0];
 
   // Remember old values.
-  const vector<double> C_prev = C;
-  const vector<double> M_prev = M;
+  const std::vector<double> C_prev = C;
+  const std::vector<double> M_prev = M;
 
   // Number of soil layers.
   const size_t size = geo.cell_size ();
@@ -79,7 +78,7 @@ TransportConvection::tick (Treelog& msg,
   const double old_total = geo.total_surface (M) + geo.total_surface (S) * dt;
 
   // Flux in individual time step.
-  vector<double> dJ (size + 1, 0.0); 
+  std::vector<double> dJ (size + 1, 0.0); 
 
   // Find time step.
   double ddt = dt;

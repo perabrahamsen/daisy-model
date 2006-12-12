@@ -57,14 +57,16 @@ public:
 
   // Simulation.
 public:
-  virtual void macro_tick (const Soil&, SoilWater&, Surface&, Treelog&) = 0;
-  virtual void tick (const Soil&, SoilWater&, SoilHeat&, Surface&, Groundwater&,
-                     const Time&, const Weather&, Treelog&) = 0;
+  virtual void macro_tick (const Soil&, SoilWater&, Surface&, 
+                           const double dt, Treelog&) = 0;
+  virtual void tick (const Soil&, SoilWater&, SoilHeat&, Surface&,
+                     Groundwater&, const Time&, const Weather&, 
+                     double dt, Treelog&) = 0;
   virtual void solute (const Soil&, const SoilWater&, 
-                       const double J_in, Solute&, Treelog&) = 0;
+                       const double J_in, Solute&, double dt, Treelog&) = 0;
   virtual void element (const Soil&, const SoilWater&, 
                         Element&, Adsorption&,
-                        double diffusion_coefficient, Treelog&) = 0;
+                        double diffusion_coefficient, double dt, Treelog&) = 0;
   virtual void ridge (Surface&, const Soil&, const SoilWater&, 
                       const AttributeList&) = 0;
 

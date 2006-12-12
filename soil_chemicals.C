@@ -58,10 +58,11 @@ struct SoilChemicals::Implementation
   // Simulation
   void tick (const Geometry& geo,
              const Soil&, const SoilWater&, const SoilHeat&, 
-	     const OrganicMatter*, const Chemicals& flux_in, Treelog&);
+	     const OrganicMatter*, const Chemicals& flux_in, 
+             double dt, Treelog&);
   void mixture (const Geometry& geo,
                 Chemicals& storage, Chemicals& down, 
-		double pond, double rate) const;
+		double pond, double rate, double dt) const;
   void output (Log&) const;
   void mix (const Geometry& geo,
             const Soil&, const SoilWater&, double from, double to);
@@ -131,6 +132,7 @@ SoilChemicals::Implementation::tick (const Geometry& geo,
 				     const SoilHeat& soil_heat,
 				     const OrganicMatter* organic_matter,
 				     const Chemicals& flux_in,
+                                     const double dt,
 				     Treelog& out)
 { 
   // Allow 'flux_in' to create new solutes.
@@ -140,13 +142,14 @@ SoilChemicals::Implementation::tick (const Geometry& geo,
   for (SoluteMap::const_iterator i = solutes.begin ();
        i != solutes.end ();
        i++)
-    (*i).second->uptake (soil, soil_water); 
+    (*i).second->uptake (soil, soil_water, dt); 
 
   // Decompose.
   for (SoluteMap::const_iterator i = solutes.begin ();
        i != solutes.end ();
        i++)
-    (*i).second->decompose (geo, soil, soil_water, soil_heat, organic_matter); 
+    (*i).second->decompose (geo, soil, soil_water, soil_heat, organic_matter,
+                            dt); 
 }
 
 void 
@@ -154,7 +157,8 @@ SoilChemicals::Implementation::mixture (const Geometry& geo,
                                         Chemicals& storage, // [g/m^2]
 					Chemicals& up, // [g/m^2/h]
 					const double pond, // [mm]
-					const double rate) const // [h/mm]
+					const double rate, // [h/mm]
+                                        const double dt) const
 {
   // Make sure we have something to mix.
   if (pond < 1e-6 || rate < 1e-99)
@@ -313,16 +317,18 @@ SoilChemicals::tick (const Geometry& geo,
                      const Soil& soil, const SoilWater& soil_water,
 		     const SoilHeat& soil_heat, 
 		     const OrganicMatter* organic_matter,
-		     const Chemicals& flux_in, Treelog& out)
-{ impl.tick (geo, soil, soil_water, soil_heat, organic_matter, flux_in, out); }
+		     const Chemicals& flux_in, double dt, Treelog& out)
+{ impl.tick (geo, soil, soil_water, soil_heat, organic_matter, flux_in, 
+             dt, out); }
 
 void 
 SoilChemicals::mixture (const Geometry& geo,
                         Chemicals& storage, // [g/m^2]
 			Chemicals& up, // [g/m^2/h]
 			const double pond, // [mm]
-			const double rate) const // [h/mm]
-{ impl.mixture (geo, storage, up, pond, rate); }
+			const double rate, // [h/mm]
+                        const double dt) const
+{ impl.mixture (geo, storage, up, pond, rate, dt); }
 
 void 
 SoilChemicals::output (Log& log) const

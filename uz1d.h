@@ -110,7 +110,7 @@ public:
 
   // Simulate.
 public:
-  virtual void tick (SMM1D&, double gravity, Treelog&) = 0;
+  virtual void tick (SMM1D&, double gravity, double dt, Treelog&) = 0;
 
   // Create and Destroy.
 public:

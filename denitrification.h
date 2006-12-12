@@ -63,7 +63,7 @@ public:
   void tick (const std::vector<bool>&, 
              const Geometry& geo,
              const Soil&, const SoilWater&, const SoilHeat&, SoilNO3&,
-	     const OrganicMatter&);
+	     const OrganicMatter&, double dt);
 
   // Create.
 public:

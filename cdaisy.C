@@ -40,6 +40,7 @@
 #include "chemical.h"
 #include "log_extern.h"
 #include "treelog_stream.h"
+#include "timestep.h"
 #include <fstream>
 #include <iostream>
 
@@ -594,7 +595,7 @@ daisy_daisy_tick_column (Daisy* daisy, int col)
   try
     {
       TreelogStream treelog (cerr);
-      daisy->field.find (col)->tick (treelog, daisy->time, daisy->weather);
+      daisy->field.find (col)->tick (treelog, dt, daisy->time, daisy->weather);
     }
   catch (const char* error)
     {

@@ -88,18 +88,19 @@ private:
   double potential_water_uptake (double h_x,
                                  const Geometry&,
 				 const Soil& soil,
-				 const SoilWater& soil_water);
+				 const SoilWater& soil_water,
+                                 double dt);
 public:
   double water_uptake (double Ept,
                        const Geometry&,
 		       const Soil& soil, SoilWater& soil_water,
-		       const double EvapInterception, double day_fraction,
+                       double EvapInterception, double day_fraction, double dt,
 		       Treelog&);
 private:
   double solute_uptake (const Geometry&, 
                         const Soil&, const SoilWater&, Solute&,
 			double PotNUpt, std::vector<double>& uptake,
-			double i_max, double C_root_min);
+			double i_max, double C_root_min, double dt);
 public:
   double nitrogen_uptake (const Geometry&,
                           const Soil& soil,
@@ -108,7 +109,8 @@ public:
 			  double NH4_root_min,
 			  SoilNO3& soil_NO3,
 			  double NO3_root_min,
-			  double PotNUpt);
+			  double PotNUpt,
+                          double dt);
 
   // Simulation.
 private:

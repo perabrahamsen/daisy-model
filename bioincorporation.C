@@ -34,7 +34,6 @@
 #include "check.h"
 #include "vcheck.h"
 #include "mathlib.h"
-#include "timestep.h"
 #include <algorithm>
 #include <sstream>
 
@@ -64,7 +63,8 @@ struct Bioincorporation::Implementation
   static bool am_compare (const AM* a, const AM* b);
 
   // Simulation.
-  void tick (const Geometry&, std::vector <AM*>& am, double T, double& CO2);
+  void tick (const Geometry&, std::vector <AM*>& am, double T, double& CO2, 
+             double dt);
   void output (Log&) const;
 
   // Utitlites.
@@ -108,7 +108,8 @@ static const double soil_to_surface = 1.0 / surface_to_soil;
 void
 Bioincorporation::Implementation::tick (const Geometry& geo, 
 					std::vector <AM*>& am, double T, 
-					double& CO2)
+					double& CO2,
+                                        const double dt)
 {
   // No bioincorporation.
   if (iszero (R_max))
@@ -267,9 +268,9 @@ Bioincorporation::Implementation::Implementation (const AttributeList& al)
 
 void 
 Bioincorporation::tick (const Geometry& geo, std::vector <AM*>& am, double T,
-			double& CO2)
+			double& CO2, const double dt)
 {
-  impl.tick (geo, am, T, CO2);
+  impl.tick (geo, am, T, CO2, dt);
 }
 
 void 

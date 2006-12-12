@@ -27,30 +27,28 @@
 #include "log.h"
 #include <memory>
 
-using namespace std;
-
 struct ChemistryStandard : public Chemistry
 {
   // Parameters.
   const symbol name_A;
   const symbol name_B;
-  const auto_ptr<Transform> transform;
+  const std::auto_ptr<Transform> transform;
   
   // Output.
-  vector<double> S_AB;
+  std::vector<double> S_AB;
   void output (Log& log) const
   { output_variable (S_AB, log); }
 
   // Simulation.
   void tick (const Geometry& geo,
              const Soil& soil, const SoilWater& soil_water, 
-             SoilChemicals& soil_chemicals, Treelog& msg)
+             SoilChemicals& soil_chemicals, const double dt, Treelog& msg)
   { 
     SoilChemical& A = soil_chemicals.find (geo, soil, soil_water, name_A, msg);
     SoilChemical& B = soil_chemicals.find (geo, soil, soil_water, name_B, msg);
     transform->tick (soil, soil_water, A.M (), B.M (), S_AB, msg);
-    A.add_to_sink (S_AB);
-    B.add_to_source (S_AB);
+    A.add_to_sink (S_AB, dt);
+    B.add_to_source (S_AB, dt);
   }
 
   // Create.

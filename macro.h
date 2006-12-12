@@ -49,7 +49,8 @@ public:
 		     const std::vector<double>& Theta,
 		     std::vector<double>& S,
 		     std::vector<double>& S_p,
-		     std::vector<double>& q_p, Treelog&) = 0;
+		     std::vector<double>& q_p, 
+                     double dt, Treelog&) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

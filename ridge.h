@@ -41,11 +41,12 @@ class Ridge
 public:
   void tick (const Geometry1D& geo,
              const Soil&, const SoilWater&, 
-	     double external_ponding /* [mm] */);
+	     double external_ponding /* [mm] */, double dt /* [h] */);
   void update_water (const Geometry1D& geo,
                      const Soil&, const std::vector<double>& S_,
 		     std::vector<double>& h_, std::vector<double>& Theta_,
-		     std::vector<double>& q, const std::vector<double>& q_p);
+		     std::vector<double>& q, const std::vector<double>& q_p, 
+                     const double dt);
   void output (Log&) const;
   int last_cell () const;
   double h () const;		// [cm]

@@ -29,7 +29,7 @@ struct UZ1DNone : public UZ1D
   // Parameters.
 
   // Interface.
-  void tick (SMM1D&, const double /* gravity */, Treelog&)
+  void tick (SMM1D&, double /* gravity */, double /* dt */, Treelog&)
   { }
 
   // Create and Destroy.

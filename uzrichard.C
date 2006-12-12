@@ -30,7 +30,6 @@
 #include "mathlib.h"
 #include "alist.h"
 #include "syntax.h"
-#include "timestep.h"
 #include "log.h"
 #include "average.h"
 #include <sstream>
@@ -60,7 +59,7 @@ private:
 		std::vector<double>& h,
 		std::vector<double>& Theta,
                 size_t q_offset,
-		std::vector<double>& q);
+		std::vector<double>& q, double dt);
   bool converges (const std::vector<double>& previous,
 		  const std::vector<double>& current) const;
   void internode (const Soil&, const SoilHeat&,
@@ -91,7 +90,8 @@ public:
 	     std::vector<double>& h,
 	     std::vector<double>& Theta,
              size_t q_offset, 
-	     std::vector<double>& q_base);
+	     std::vector<double>& q_base, 
+             double dt);
   
   // Create and Destroy.
 public:
@@ -116,7 +116,8 @@ UZRichard::richard (Treelog& msg,
 		    std::vector<double>& h_new,
 		    std::vector<double>& Theta_new,
                     const size_t q_offset,
-		    std::vector<double>& q_base)
+		    std::vector<double>& q_base,
+                    const double dt)
 {
   std::ostringstream tmp;
   tmp << "UZ Richard: " << first << " to " << last;
@@ -124,8 +125,8 @@ UZRichard::richard (Treelog& msg,
   // Input variables for solving a tridiagonal matrix.
   const unsigned int size = last - first + 1;
   const Surface::top_t top_type = top.top_type (geo, top_edge);
-  const double h_top = top.h_top (geo, top_edge);
-  const double q_top = top.q_top (geo, top_edge);
+  const double h_top = top.h_top (geo, top_edge, dt);
+  const double q_top = top.q_top (geo, top_edge, dt);
   const Groundwater::bottom_t bottom_type = bottom.bottom_type ();
   const double q_bottom_forced = (bottom_type == Groundwater::forced_flux)
     ? bottom.q_bottom () : -42.42e42;
@@ -655,10 +656,11 @@ UZRichard::tick (Treelog& msg, const GeometryVert& geo,
 		 std::vector<double>& h,
 		 std::vector<double>& Theta,
                  const size_t q_offset,
-		 std::vector<double>& q_base)
+		 std::vector<double>& q_base,
+                 const double dt)
 {
   if (!richard (msg, geo, soil, soil_heat, first, top, top_edge, last, bottom, 
-		S, h_old, Theta_old, h_ice, h, Theta, q_offset, q_base))
+		S, h_old, Theta_old, h_ice, h, Theta, q_offset, q_base, dt))
     throw "Richard's equation doesn't converge";
 }
 

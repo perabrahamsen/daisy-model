@@ -1,6 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Brug 2D stoftransport komponent.
+* Brug Rect2x1 stoftransport komponent.
+
+** Flyt surface/groundwater opdatering til MovementRect?
 
 * R2D2
 

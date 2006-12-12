@@ -55,10 +55,10 @@ public:
   // Simulation.
 public:
   virtual void solute (const GeometryRect&, const Soil&, const SoilWater&, 
-                       const double J_in, Solute&, Treelog&) = 0;
+                       const double J_in, Solute&, double dt, Treelog&) = 0;
   virtual void element (const GeometryRect&, const Soil&, const SoilWater&, 
                         Element&, Adsorption&,
-                        double diffusion_coefficient, Treelog&) = 0;
+                        double diffusion_coefficient, double dt, Treelog&) = 0;
 
   virtual void output (Log&) const = 0;
 

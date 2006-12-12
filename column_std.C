@@ -99,7 +99,7 @@ public:
     void tick (const std::vector<bool>&, 
                const Soil& soil, const SoilWater& soil_water,
                const SoilHeat& soil_heat,
-               SoilNO3& soil_NO3, SoilNH4& soil_NH4);
+               SoilNO3& soil_NO3, SoilNH4& soil_NH4, double dt);
     void output (Log&) const;
     
     // Create and Destroy.
@@ -158,7 +158,7 @@ public:
 
   // Simulation.
   void clear ();
-  void tick (Treelog&, const Time&, const Weather*);
+  void tick (Treelog&, double dt, const Time&, const Weather*);
   bool check (bool require_weather,
               const Time& from, const Time& to, 
               Treelog& err) const;
@@ -188,13 +188,14 @@ void
 ColumnStandard::NitLog::tick (const std::vector<bool>& active, 
                               const Soil& soil, const SoilWater& soil_water,
                               const SoilHeat& soil_heat,
-                              SoilNO3& soil_NO3, SoilNH4& soil_NH4)
+                              SoilNO3& soil_NO3, SoilNH4& soil_NH4,
+                              const double dt)
 {
   const size_t cell_size = soil.size ();
   for (int i = 0; i < cell_size; i++)
     {
-      daisy_assert (soil_NO3.M_left (i) >= 0.0);
-      daisy_assert (soil_NH4.M_left (i) >= 0.0);
+      daisy_assert (soil_NO3.M_left (i, dt) >= 0.0);
+      daisy_assert (soil_NH4.M_left (i, dt) >= 0.0);
     }
 
   daisy_assert (NH4.size () == cell_size);
@@ -206,20 +207,20 @@ ColumnStandard::NitLog::tick (const std::vector<bool>& active,
       if (active[i])
         soil.nitrification (i, 
                             soil_NH4.M (i), soil_NH4.C (i), 
-                            soil_NH4.M_left (i),
+                            soil_NH4.M_left (i, dt),
                             soil_water.h (i), soil_heat.T (i),
-                            NH4[i], N2O[i], NO3[i]);
+                            NH4[i], N2O[i], NO3[i], dt);
       else
         NH4[i] = N2O[i] = NO3[i] = 0.0;        
     }
 
-  soil_NH4.add_to_sink (NH4);
-  soil_NO3.add_to_source (NO3);
+  soil_NH4.add_to_sink (NH4, dt);
+  soil_NO3.add_to_source (NO3, dt);
 
   for (size_t i = 0; i < cell_size; i++)
     {
-      daisy_assert (soil_NO3.M_left (i) >= 0.0);
-      daisy_assert (soil_NH4.M_left (i) >= 0.0);
+      daisy_assert (soil_NO3.M_left (i, dt) >= 0.0);
+      daisy_assert (soil_NH4.M_left (i, dt) >= 0.0);
     }
 }
 
@@ -594,14 +595,14 @@ ColumnStandard::clear ()
 }
 
 void
-ColumnStandard::tick (Treelog& msg, 
+ColumnStandard::tick (Treelog& msg, const double dt,
 		      const Time& time, const Weather* global_weather)
 {
   // Chemistry.
   for (std::vector<Chemistry*>::const_iterator i = chemistry.begin ();
        i != chemistry.end ();
        i++)
-    (*i)->tick (geometry, *soil, *soil_water, soil_chemicals, msg);
+    (*i)->tick (geometry, *soil, *soil_water, soil_chemicals, dt, msg);
 
   // Weather.
   if (weather)
@@ -619,28 +620,28 @@ ColumnStandard::tick (Treelog& msg,
     = geometry.content_at (static_cast<const Solute&> (soil_NH4),
                             &Solute::C, 0.0) 
     / 10.0; // [g/cm^3] -> [g/cm^2/mm]
-  surface.mixture (soil_top_conc);
-  surface.mixture (geometry, soil_chemicals);
-  movement->macro_tick (*soil, *soil_water, surface, msg);
+  surface.mixture (soil_top_conc, dt);
+  surface.mixture (geometry, soil_chemicals, dt);
+  movement->macro_tick (*soil, *soil_water, surface, dt, msg);
   bioclimate->tick (time, surface, my_weather, 
                     *vegetation, *movement,
                     geometry, *soil, *soil_water, *soil_heat, 
-                    msg);
+                    dt, msg);
 
   vegetation->tick (time, my_weather.relative_humidity (),
                     *bioclimate, geometry, *soil, 
 		    organic_matter.get (),
                     *soil_heat, *soil_water, &soil_NH4, &soil_NO3, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
-                    residuals_N_soil, residuals_C_soil, msg);
+                    residuals_N_soil, residuals_C_soil, dt, msg);
   organic_matter->tick (geometry, *soil_water, *soil_heat, 
-                        soil_NO3, soil_NH4, msg);
+                        soil_NO3, soil_NH4, dt, msg);
   const std::vector<bool> active = organic_matter-> active (); 
   nitrification.tick (active, 
-                      *soil, *soil_water, *soil_heat, soil_NO3, soil_NH4);
+                      *soil, *soil_water, *soil_heat, soil_NO3, soil_NH4, dt);
   denitrification.tick (active, 
                         geometry, *soil, *soil_water, *soil_heat, soil_NO3, 
-			*organic_matter);
+			*organic_matter, dt);
 
   
   // Transport.
@@ -648,13 +649,13 @@ ColumnStandard::tick (Treelog& msg,
                      surface.ponding () * 0.1, 
                      *soil_heat, time, msg);
   movement->tick (*soil, *soil_water, *soil_heat,
-                  surface, *groundwater, time, my_weather, msg);
+                  surface, *groundwater, time, my_weather, dt, msg);
   soil_water->tick_after (geometry.cell_size (), *soil, *soil_heat, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
 
   soil_chemicals.tick (geometry, *soil, *soil_water, *soil_heat,
                        organic_matter.get (),
-		       surface.chemicals_down (), msg);
+		       surface.chemicals_down (), dt, msg);
   const SoilChemicals::SoluteMap& solutes = soil_chemicals.all ();
   for (SoilChemicals::SoluteMap::const_iterator i = solutes.begin ();
        i != solutes.end ();
@@ -666,7 +667,7 @@ ColumnStandard::tick (Treelog& msg,
       // [g/m^2/h ned -> g/cm^2/h op]
       const double J_in = -surface.chemicals_down ().amount (name) 
         / (100.0 * 100.0);
-      movement->solute (*soil, *soil_water, J_in, solute, msg); 
+      movement->solute (*soil, *soil_water, J_in, solute, dt, msg); 
     }
 
   organic_matter->transport (*soil, *soil_water, msg);
@@ -675,16 +676,16 @@ ColumnStandard::tick (Treelog& msg,
     {
       movement->element (*soil, *soil_water, dom[i]->C, 
                          *dom[i]->adsorption, dom[i]->diffusion_coefficient, 
-                         msg);
+                         dt, msg);
       movement->element (*soil, *soil_water, dom[i]->N, 
                          *dom[i]->adsorption, dom[i]->diffusion_coefficient, 
-                         msg);
+                         dt, msg);
     }
 
   movement->solute (*soil, *soil_water, 
-                    surface.matter_flux ().NO3, soil_NO3, msg);
+                    surface.matter_flux ().NO3, soil_NO3, dt, msg);
   movement->solute (*soil, *soil_water,
-                    surface.matter_flux ().NH4, soil_NH4, msg);
+                    surface.matter_flux ().NH4, soil_NH4, dt, msg);
   
   // Once a month we clean up old AM from organic matter.
   if (time.hour () == 13 && time.mday () == 13)

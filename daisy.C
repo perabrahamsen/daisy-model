@@ -37,6 +37,7 @@
 #include "alist.h"
 #include "submodeler.h"
 #include "column.h"
+#include "timestep.h"
 #include "memutils.h"
 #include <sstream>
 
@@ -124,7 +125,7 @@ Daisy::check (Treelog& err)
 
 void
 Daisy::tick_columns (Treelog& out)
-{ field.tick (out, time, weather); }
+{ field.tick (out, dt, time, weather); }
 
 void
 Daisy::initial_logs (Treelog& out)

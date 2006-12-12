@@ -44,7 +44,7 @@ public:
 		     const std::vector<double>& C,
 		     std::vector<double>& S,
 		     std::vector<double>& S_p,
-		     std::vector<double>& J_p, Treelog&) = 0;
+		     std::vector<double>& J_p, double dt, Treelog&) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

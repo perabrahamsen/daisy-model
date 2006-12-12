@@ -32,7 +32,8 @@
 
 void 
 SoilChemical::uptake (const Soil& soil, 
-		      const SoilWater& soil_water)
+		      const SoilWater& soil_water,
+                      const double dt)
 {
   daisy_assert (uptaken.size () == soil.size ());
 
@@ -41,7 +42,7 @@ SoilChemical::uptake (const Soil& soil,
   for (unsigned int i = 0; i < soil.size (); i++)
     uptaken[i] = C (i) * soil_water.S_root (i) * rate;
   
-  add_to_root_sink (uptaken);
+  add_to_root_sink (uptaken, dt);
 }
 
 void 
@@ -49,7 +50,8 @@ SoilChemical::decompose (const Geometry& geo,
                          const Soil& soil, 
 			 const SoilWater& soil_water,
 			 const SoilHeat& soil_heat,
-			 const OrganicMatter* organic_matter)
+			 const OrganicMatter* organic_matter,
+                         const double dt)
 {
   daisy_assert (decomposed.size () == soil.size ());
 
@@ -95,12 +97,12 @@ SoilChemical::decompose (const Geometry& geo,
       const double rate
 	= decompose_rate * heat_factor * water_factor * CO2_factor
 	* conc_factor * depth_factor;
-      decomposed[i] = M_left (i) * rate;
+      decomposed[i] = M_left (i, dt) * rate;
     }
   for (unsigned int i = size; i < soil.size (); i++)
     decomposed[i] = 0.0;
 
-  add_to_sink (decomposed);
+  add_to_sink (decomposed, dt);
 }
 
 void

@@ -26,9 +26,6 @@
 #include "mathlib.h"
 #include "plf.h"
 #include "check.h"
-#include "timestep.h"
-
-using namespace std;
 
 class NitrificationSoil : public Nitrification
 {
@@ -44,7 +41,7 @@ public:
   void tick (const double M, const double C, 
              const double M_left,
              const double h, const double T,
-             double& NH4, double& N2O, double& NO3) const;
+             double& NH4, double& N2O, double& NO3, double dt) const;
 
   // Create.
 public:
@@ -55,7 +52,8 @@ void
 NitrificationSoil::tick (const double M, const double /* C */, 
                          const double M_left,
                          const double h, const double T,
-                         double& NH4, double& N2O, double& NO3) const
+                         double& NH4, double& N2O, double& NO3,
+                         const double dt) const
 {
   const double T_factor = (heat_factor.size () < 1)
     ? f_T (T)
@@ -67,7 +65,7 @@ NitrificationSoil::tick (const double M, const double /* C */,
   const double rate = k_10 * w_factor * T_factor * M / (k + M);
   daisy_assert (rate >= 0.0);
   daisy_assert (M_left >= 0.0);
-  const double M_new = min (rate, M_left / dt - 1e-8);
+  const double M_new = std::min (rate, M_left / dt - 1e-8);
   if (M_new > 0.0)
     {
       NH4 = M_new;

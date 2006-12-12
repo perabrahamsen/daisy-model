@@ -35,8 +35,6 @@
 #include "check.h"
 #include "mathlib.h"
 
-using namespace std;
-
 static double f_T (double T)
 {
   if (T < 2.0)
@@ -50,7 +48,7 @@ static double f_T (double T)
   if (T < 60.0)
     {
       // J.A. van Veen and M.J.Frissel.
-      const double max_val = exp (0.47 - 0.027 * T + 0.00193 * T * T);
+      const double max_val = std::exp (0.47 - 0.027 * T + 0.00193 * T * T);
       return max_val * (1.0 - (T - 37.0) / (60.0 - 37.0));
     }
   return 0.0;
@@ -71,7 +69,8 @@ void Denitrification::tick (const std::vector<bool>& active,
                             const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    SoilNO3& soil_NO3, 
-			    const OrganicMatter& organic_matter)
+			    const OrganicMatter& organic_matter, 
+                            const double dt)
 {
   const size_t cell_size = geo.cell_size ();
   for (size_t i = 0; i < cell_size; i++)
@@ -87,7 +86,7 @@ void Denitrification::tick (const std::vector<bool>& active,
       const double Theta = soil_water.Theta (i);
       const double Theta_sat = soil_water.Theta_ice (soil, i, 0.0);
       const double Theta_fraction = Theta / Theta_sat;
-      const double NO3 = soil_NO3.M_left (i) / dt;
+      const double NO3 = soil_NO3.M_left (i, dt) / dt;
       const double T = soil_heat.T (i);
       const double height = geo.z (i);
       const double T_factor = (heat_factor.size () < 1)
@@ -101,7 +100,8 @@ void Denitrification::tick (const std::vector<bool>& active,
       const double w_factor_fast = water_factor_fast (Theta_fraction);
       const double rate_fast = w_factor_fast * pot_fast;
 
-      const double M = min (rate, K * NO3) + min (rate_fast, K_fast * NO3);
+      const double M 
+        = std::min (rate, K * NO3) + std::min (rate_fast, K_fast * NO3);
       if (redox_height <= 0 && height < redox_height)
 	{
 	  converted[i] = NO3;
@@ -116,7 +116,7 @@ void Denitrification::tick (const std::vector<bool>& active,
       potential[i] = pot;
       potential_fast[i] = pot_fast;
     }
-  soil_NO3.add_to_sink (converted);
+  soil_NO3.add_to_sink (converted, dt);
 }
 
 void

@@ -1,3 +1,9 @@
+2006-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* alist.C: Better panic messages.
+
+	* mathlib.h (pow, sqrt, log, acos, asin): Removed "safe" versions.
+
 2006-12-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* msoltranrect.h, msoltranrect.C: New component.

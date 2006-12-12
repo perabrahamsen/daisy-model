@@ -54,7 +54,7 @@ struct MacroStandard : public Macro
 	    const vector<double>& Theta,
 	    vector<double>& S_m,
 	    vector<double>& S_p,
-	    vector<double>& q_p, Treelog&);
+	    vector<double>& q_p, double dt, Treelog&);
   void output (Log&) const
     { }
 
@@ -89,7 +89,8 @@ MacroStandard::tick (const Geometry1D& geo,
 		     vector<double>& S_m,
 		     vector<double>& S_p,
 		     vector<double>& q_p,
-		     Treelog& msg)
+		     const double dt, 
+                     Treelog& msg)
 { 
   // Check input.
   daisy_assert (last > first);
@@ -118,7 +119,7 @@ MacroStandard::tick (const Geometry1D& geo,
   if (height_start >= 0.0
       && surface.top_type (geo, 0U) == Surface::limited_water)
     {
-      const double surface_q = surface.q_top (geo, 0U);
+      const double surface_q = surface.q_top (geo, 0U, dt);
       // Empty it.
       if (-surface_q * 10.0 * dt > pond_max)
 	{
@@ -127,7 +128,7 @@ MacroStandard::tick (const Geometry1D& geo,
 	  daisy_assert (iszero (q_p[0]));
 	  daisy_assert (from == 0);
 	  q_p[0] = q_top;
-	  surface.accept_top (q_p[0], geo, 0U, msg);
+	  surface.accept_top (q_p[0], geo, 0U, dt, msg);
 	}
     }
 
@@ -258,7 +259,7 @@ MacroStandard::tick (const Geometry1D& geo,
 
   // Check that we got all the extra water stored somewhere.
   if (std::isnormal (extra_water))
-    surface.accept_top (extra_water, geo, 0U, msg);
+    surface.accept_top (extra_water, geo, 0U, dt, msg);
 
   // Check that the sink terms add up.
   if (fabs (geo.total_surface (S_p) - q_top - extra_water) > 1.0e-11)

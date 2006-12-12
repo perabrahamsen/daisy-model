@@ -88,7 +88,7 @@ public:
   string crop_names () const;
   // Simulation.
   void clear ();
-  void tick (Treelog&, const Time&, const Weather*);
+  void tick (Treelog&, double dt, const Time&, const Weather*);
   void output (Log&) const;
 
   // Find a specific column.
@@ -537,13 +537,13 @@ Field::Implementation::clear ()
 }
 
 void 
-Field::Implementation::tick (Treelog& out, 
+Field::Implementation::tick (Treelog& out, const double dt,
 			     const Time& time, const Weather* weather)
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    (*i)->tick (out, time, weather);
+    (*i)->tick (out, dt, time, weather);
 }
 
 void 
@@ -845,8 +845,9 @@ Field::clear ()
 { impl.clear (); }
 
 void
-Field::tick (Treelog& out, const Time& time, const Weather* weather)
-{ impl.tick (out, time, weather); }
+Field::tick (Treelog& out, const double dt, 
+             const Time& time, const Weather* weather)
+{ impl.tick (out, dt, time, weather); }
 
 void 
 Field::output (Log& log) const

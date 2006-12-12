@@ -89,12 +89,13 @@ private:
                                const SoilWater& soil_water);
   bool update_state (const Geometry& geo,
                      const Soil& soil, const SoilWater& soil_water, 
-                     std::vector<double>& T);
+                     std::vector<double>& T, double dt);
   double calculate_freezing_rate (const Geometry& geo,
                                   const Soil& soil,
                                   const SoilWater& soil_water,
                                   unsigned int i, 
-                                  const std::vector<double>& T);
+                                  const std::vector<double>& T,
+                                  double dt);
   bool check_state (const Soil& soil, 
                     const std::vector<double>& T) const;
   void force_state (std::vector<double>& T);

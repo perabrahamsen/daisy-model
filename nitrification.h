@@ -47,7 +47,8 @@ public:
   virtual void tick (const double M, const double C, 
                      const double M_left,
                      const double h, const double T,
-                     double& NH4, double& N2O, double& NO3) const = 0;
+                     double& NH4, double& N2O, double& NO3, 
+                     double dt) const = 0;
 
   // Utilities.
   static double f_h (double h);

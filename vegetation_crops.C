@@ -31,12 +31,10 @@
 #include <sstream>
 #include <deque>
 
-using namespace std;
-
 struct VegetationCrops : public Vegetation
 {
   // Types.
-  typedef deque <Crop*> CropList;
+  typedef std::deque <Crop*> CropList;
   typedef double (Crop::*CropFun) () const;
 
   // Crops.
@@ -45,8 +43,8 @@ struct VegetationCrops : public Vegetation
   // Forced LAI
   class ForcedLAI
   {
-    /* const */ vector<int> years;
-    /* const */ vector<PLF> LAIvsDAY;
+    /* const */ std::vector<int> years;
+    /* const */ std::vector<PLF> LAIvsDAY;
 
     // use.
   public:
@@ -54,7 +52,7 @@ struct VegetationCrops : public Vegetation
     
     // Create;
     static void load_syntax (Syntax&, AttributeList&);
-    ForcedLAI (const vector<AttributeList*>& als);
+    ForcedLAI (const std::vector<AttributeList*>& als);
   } forced_LAI;
 
   // Canopy structure.
@@ -115,7 +113,7 @@ struct VegetationCrops : public Vegetation
   // Individual crop queries.
   double DS_by_name (symbol name) const;
   double DM_by_name (symbol name, double height) const;
-  string crop_names () const;
+  std::string crop_names () const;
 
   // Simulation.
   void tick (const Time& time, double relative_humidity,
@@ -128,35 +126,35 @@ struct VegetationCrops : public Vegetation
 	     SoilNH4 *const soil_NH4, SoilNO3 *const soil_NO3, 
 	     double& residuals_DM,
 	     double& residuals_N_top, double& residuals_C_top,
-	     vector<double>& residuals_N_soil,
-	     vector<double>& residuals_C_soil,
-	     Treelog&);
+	     std::vector<double>& residuals_N_soil,
+	     std::vector<double>& residuals_C_soil,
+	     double dt, Treelog&);
   void reset_canopy_structure (Treelog&);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
                         const Geometry& geo,
 			const Soil& soil, SoilWater& soil_water, 
-			double day_fraction, Treelog&);
+			double day_fraction, double dt, Treelog&);
   void force_production_stress  (double pstress);
   void kill_all (symbol, const Time&, const Geometry&, 
-		 Bioclimate&, vector<AM*>& residuals, 			 
+		 Bioclimate&, std::vector<AM*>& residuals, 			 
 		 double& residuals_DM,
 		 double& residuals_N_top, double& residuals_C_top,
-		 vector<double>& residuals_N_soil,
-		 vector<double>& residuals_C_soil,
+		 std::vector<double>& residuals_N_soil,
+		 std::vector<double>& residuals_C_soil,
 		 Treelog&);
   void emerge (symbol crop_name, Treelog&);
   void harvest (symbol column_name, symbol crop_name,
 		const Time&, const Geometry&, Bioclimate&,
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
-		vector<const Harvest*>& harvest, double& min_height,
-                vector<AM*>& residuals,
+		std::vector<const Harvest*>& harvest, double& min_height,
+                std::vector<AM*>& residuals,
 		double& harvest_DM, double& harvest_N, double& harvest_C, 
 		double& residuals_DM,
 		double& residuals_N_top, double& residuals_C_top,
-		vector<double>& residuals_N_soil,
-		vector<double>& residuals_C_soil,
+		std::vector<double>& residuals_N_soil,
+		std::vector<double>& residuals_C_soil,
                 const bool combine,
 		Treelog&);
   void sow (Treelog& msg, 
@@ -213,7 +211,7 @@ whenever 'LAIvsDAY' becomes negative.");
   syntax.order ("year", "LAIvsDAY");
 }
 
-VegetationCrops::ForcedLAI::ForcedLAI (const vector<AttributeList*>& als)
+VegetationCrops::ForcedLAI::ForcedLAI (const std::vector<AttributeList*>& als)
 {
   for (unsigned int i = 0; i < als.size (); i++)
     {
@@ -279,10 +277,10 @@ VegetationCrops::DM_by_name (symbol name, double height) const
   return 0.0;
 }
 
-string
+std::string
 VegetationCrops::crop_names () const
 { 
-  string result;
+  std::string result;
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)
@@ -305,9 +303,9 @@ VegetationCrops::tick (const Time& time, const double relative_humidity,
 		       SoilNH4 *const soil_NH4, SoilNO3 *const soil_NO3,
 		       double& residuals_DM,
 		       double& residuals_N_top, double& residuals_C_top,
-		       vector<double>& residuals_N_soil,
-		       vector<double>& residuals_C_soil,
-		       Treelog& msg)
+		       std::vector<double>& residuals_N_soil,
+		       std::vector<double>& residuals_C_soil,
+		       double dt, Treelog& msg)
 {
   // Forced LAI_
   double ForcedLAI = forced_LAI (time.year (), time.yday ());
@@ -342,7 +340,7 @@ VegetationCrops::tick (const Time& time, const double relative_humidity,
                      bioclimate, geo, soil, organic_matter, 
 		     soil_heat, soil_water, soil_NH4, soil_NO3, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
-		     residuals_N_soil, residuals_C_soil, my_force, msg);
+		     residuals_N_soil, residuals_C_soil, my_force, dt, msg);
     }
 
   // Make sure the crop which took first this time will be last next.
@@ -445,12 +443,13 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 }
 
 double
-VegetationCrops::transpiration (double potential_transpiration,
-				double canopy_evaporation,
+VegetationCrops::transpiration (const double potential_transpiration,
+				const double canopy_evaporation,
                                 const Geometry& geo,
 				const Soil& soil, 
-				SoilWater& soil_water, double day_fraction, 
-				Treelog& msg)
+				SoilWater& soil_water, 
+                                const double day_fraction, const double dt,
+                                Treelog& msg)
 {
   double value = 0.0;
   
@@ -470,7 +469,7 @@ VegetationCrops::transpiration (double potential_transpiration,
 	  value += (*crop)->ActualWaterUptake (pt_per_LAI * (*crop)->LAI (), 
 					       geo, soil, soil_water, 
 					       canopy_evaporation, 
-					       day_fraction, msg);
+					       day_fraction, dt, msg);
 	}
     }
   return value;
@@ -491,11 +490,11 @@ void
 VegetationCrops::kill_all (symbol name, const Time& time, 
 
 			   const Geometry& geo, 
-			   Bioclimate& bioclimate, vector<AM*>& residuals,
+			   Bioclimate& bioclimate, std::vector<AM*>& residuals,
 			   double& residuals_DM,
 			   double& residuals_N_top, double& residuals_C_top,
-			   vector<double>& residuals_N_soil,
-			   vector<double>& residuals_C_soil,
+			   std::vector<double>& residuals_N_soil,
+			   std::vector<double>& residuals_C_soil,
 			   Treelog& msg)
 {
   for (CropList::iterator crop = crops.begin(); 
@@ -536,15 +535,15 @@ VegetationCrops::harvest (const symbol column_name,
 			  double stub_length,
 			  double stem_harvest, double leaf_harvest, 
 			  double sorg_harvest, 
-			  vector<const Harvest*>& harvest,
+			  std::vector<const Harvest*>& harvest,
                           double& min_height,
-			  vector<AM*>& residuals,
+			  std::vector<AM*>& residuals,
 			  double& harvest_DM, 
 			  double& harvest_N, double& harvest_C,
 			  double& residuals_DM, 
 			  double& residuals_N_top, double& residuals_C_top,
-			  vector<double>& residuals_N_soil,
-			  vector<double>& residuals_C_soil,
+			  std::vector<double>& residuals_N_soil,
+			  std::vector<double>& residuals_C_soil,
                           const bool combine,
 			  Treelog& msg)
 {
@@ -563,7 +562,7 @@ VegetationCrops::harvest (const symbol column_name,
           = geo.total_surface (residuals_C_soil) * 10000;
         const double sorg_height = (*crop)->sorg_height ();
         const bool root_fruit = (sorg_height < 0.0);
-        min_height = min (min_height, sorg_height);
+        min_height = std::min (min_height, sorg_height);
 	const Harvest& mine = 
 	  (*crop)->harvest (column_name, time, 
 			    geo, 
@@ -686,7 +685,7 @@ VegetationCrops::CropList
 VegetationCrops::build_crops (Block& block, const std::string& key)
 {
   CropList t;
-  const vector<AttributeList*>& f = block.alist_sequence (key);
+  const std::vector<AttributeList*>& f = block.alist_sequence (key);
   for (size_t i = 0; i < f.size (); i++)
     t.push_back (Librarian<Crop>::build_alist (block, *f[i],
 					       sequence_id (key, i)));
@@ -745,11 +744,11 @@ field, and want to force the model to confirm to the measurements.  \n\
 'ForcedDAY' will not affect the LAI for crops that have not yet\n\
 emerged.  If no crops have emerged on the field, it will be ignored.",
 				  VegetationCrops::ForcedLAI::load_syntax);
-    alist.add ("ForcedLAI", vector<AttributeList*> ());
+    alist.add ("ForcedLAI", std::vector<AttributeList*> ());
     syntax.add ("crops", Librarian<Crop>::library (), 
 		Syntax::State, Syntax::Sequence,
 		"List of crops growing in the field");
-    alist.add ("crops", vector<AttributeList*> ());
+    alist.add ("crops", std::vector<AttributeList*> ());
     Librarian<Vegetation>::add_type ("crops", alist, syntax, &make);
   }
 } VegetationCrops_syntax;

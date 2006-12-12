@@ -110,7 +110,8 @@ public:
 
   // Simulation.
 public:
-  void tick (const size_t cell_size, const Soil& soil, Treelog& msg);
+  void tick (const size_t cell_size, const Soil& soil, 
+             double dt, Treelog& msg);
   void tick_after (const size_t cell_size, 
                    const Soil& soil, const SoilHeat& soil_heat, Treelog& msg);
   void incorporate (const Geometry&, double amount, double from, double to);

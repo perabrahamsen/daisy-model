@@ -27,10 +27,7 @@
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
-#include "timestep.h"
 #include <sstream>
-
-using namespace std;
 
 struct TransportNone : public Transport
 {
@@ -38,10 +35,10 @@ struct TransportNone : public Transport
   void tick (Treelog&, const Geometry1D&,
              const Soil&, const SoilWater&, const Adsorption&,
 	     double diffusion_coefficient,
-	     vector<double>& M, 
-	     vector<double>& C,
-	     const vector<double>& S,
-	     vector<double>& J);
+	     std::vector<double>& M, 
+	     std::vector<double>& C,
+	     const std::vector<double>& S,
+	     std::vector<double>& J, double dt);
 
   // Create.
   TransportNone (Block& al)
@@ -55,10 +52,11 @@ TransportNone::tick (Treelog& msg,
                      const Soil& soil, const SoilWater& soil_water,
 		     const Adsorption& adsorption, 
 		     const double,
-		     vector<double>& M, 
-		     vector<double>& C,
-		     const vector<double>& S,
-		     vector<double>& J)
+		     std::vector<double>& M, 
+		     std::vector<double>& C,
+		     const std::vector<double>& S,
+		     std::vector<double>& J,
+                     const double dt)
 {
   Treelog::Open* nest = NULL;
   for (unsigned int i = 0; i < soil.size (); i++)

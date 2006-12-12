@@ -35,7 +35,7 @@ struct UZRectMollerup : public UZRect
 
   // Interface.
   void tick (const GeometryRect&, const Soil&, SoilWater&, const SoilHeat&, 
-             const Surface&, const Groundwater&, Treelog&);
+             const Surface&, const Groundwater&, double dt, Treelog&);
 
   // Internal functions.
 
@@ -50,6 +50,7 @@ void
 UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil, 
                       SoilWater& soil_water, const SoilHeat& soil_heat,
                       const Surface& surface, const Groundwater& groundwater,
+                      const double dt,
                       Treelog& msg)
 {
   const size_t edge_size = geo.edge_size ();

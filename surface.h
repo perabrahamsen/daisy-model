@@ -42,9 +42,10 @@ public:
   // Communication with soil water.
   enum top_t { forced_pressure, forced_flux, limited_water, soil };
   top_t top_type (const Geometry&, size_t edge) const;
-  double q_top (const Geometry&, size_t edge) const; // [cm]
-  double h_top (const Geometry&, size_t edge) const; // [cm]
-  void accept_top (double amount, const Geometry&, size_t edge, Treelog&);
+  double q_top (const Geometry&, size_t edge, double dt) const; // [cm]
+  double h_top (const Geometry&, size_t edge, double dt) const; // [cm]
+  void accept_top (double amount, const Geometry&, size_t edge, 
+                   double dt, Treelog&);
   size_t last_cell (const Geometry&, size_t edge) const;
 
   // Column.
@@ -55,7 +56,8 @@ public:
   void update_water (const Geometry1D& geo,
                      const Soil&, const std::vector<double>& S_,
 		     std::vector<double>& h_, std::vector<double>& Theta_,
-		     std::vector<double>& q, const std::vector<double>& q_p);
+		     std::vector<double>& q, const std::vector<double>& q_p,
+                     double dt);
 
   // Manager.
   void fertilize (const IM& /* [g/cm^2] */);
@@ -67,13 +69,13 @@ public:
   void unridge ();
 
   // Simulation.
-  void mixture (const IM& soil_im /* [g/cm^2/mm] */);
+  void mixture (const IM& soil_im /* [g/cm^2/mm] */, double dt);
   void mixture (const Geometry& geo,
-                const SoilChemicals& soil_chemicals);
+                const SoilChemicals& soil_chemicals, double dt);
   void output (Log&) const;
   void tick (Treelog&, double PotSoilEvaporation, double Water, double temp,
 	     const Geometry& geo,
-             const Soil&, const SoilWater&, double soil_T);
+             const Soil&, const SoilWater&, double soil_T, double dt);
 
   // Communication with bioclimate.
   double ponding () const;

@@ -54,12 +54,14 @@ public:
 		      symbol name, Treelog&);
   void tick (const Geometry& geo,
              const Soil&, const SoilWater&, const SoilHeat&, 
-	     const OrganicMatter*, const Chemicals& flux_in, Treelog&);
+	     const OrganicMatter*, const Chemicals& flux_in, 
+             double dt, Treelog&);
   void mixture (const Geometry& geo,
                 Chemicals& storage, // [g/m^2]
 		Chemicals& up,	// [g/m^2/h]
 		double pond,	// [mm]
-		double rate) const;	// [h/mm]
+		double rate, 	// [h/mm]
+                double dt) const;
   void output (Log&) const;
   void mix (const Geometry& geo,
             const Soil&, const SoilWater&, double from, double to);

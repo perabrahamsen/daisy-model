@@ -51,7 +51,7 @@ public:
 	    double from, double to);
   void swap (const Geometry&, const Soil&, const SoilWater&, Adsorption&, 
 	     double from, double middle, double to);
-  void tick (size_t cell_size, const SoilWater& soil_water);
+  void tick (size_t cell_size, const SoilWater& soil_water, double dt);
   
   // Create and Destroy.
 public:

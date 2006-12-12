@@ -41,7 +41,8 @@ double
 RootSystem::potential_water_uptake (const double h_x,
                                     const Geometry& geo,
 				    const Soil& soil,
-				    const SoilWater& soil_water)
+				    const SoilWater& soil_water,
+                                    const double dt)
 {
   const vector<double>& L = Density;
   vector<double>& S = H2OExtraction;
@@ -93,6 +94,7 @@ RootSystem::water_uptake (double Ept_,
 			  SoilWater& soil_water,
 			  const double EvapInterception,
 			  const double day_fraction,
+                          const double dt,
 			  Treelog& msg)
 {
   daisy_assert (EvapInterception >= 0);
@@ -107,14 +109,14 @@ RootSystem::water_uptake (double Ept_,
   Ept = Ept_;
 
   static const double min_step = 1.0;
-  double total = potential_water_uptake (h_x, geo, soil, soil_water);
+  double total = potential_water_uptake (h_x, geo, soil, soil_water, dt);
   double step = min_step;
 
   while (total < Ept && h_x > h_wp)
     {
       const double h_next = max (h_x - step, h_wp);
       const double next = potential_water_uptake (h_next, geo, 
-                                                  soil, soil_water);
+                                                  soil, soil_water, dt);
 
       if (next < total)
 	// We are past the top of the curve.
@@ -122,7 +124,7 @@ RootSystem::water_uptake (double Ept_,
 	  // We cannot go any closer to the top, skip it.
 	  {
 	    h_x = h_wp;
-	    total = potential_water_uptake (h_x, geo, soil, soil_water);
+	    total = potential_water_uptake (h_x, geo, soil, soil_water, dt);
 	    break;
 	  }
 	else
@@ -145,7 +147,7 @@ RootSystem::water_uptake (double Ept_,
       daisy_assert (h_x < 0.001);
       const double h_next = min (h_x + step, 0.0);
       const double next = potential_water_uptake (h_next, geo, 
-                                                  soil, soil_water);
+                                                  soil, soil_water, dt);
 
       if (next < Ept)
 	// We went too far.
@@ -175,7 +177,8 @@ RootSystem::water_uptake (double Ept_,
     }
 
   // We need this to make sure H2OExtraction corresponds to 'h_x'.
-  const double total2 = potential_water_uptake (h_x, geo, soil, soil_water);
+  const double total2 
+    = potential_water_uptake (h_x, geo, soil, soil_water, dt);
   daisy_assert (approximate (total, total2));
   daisy_assert (h_x >= h_wp);
 
@@ -209,7 +212,8 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 			   double PotNUpt,
 			   vector<double>& uptake,
 			   const double I_max,
-			   const double C_root_min)
+			   const double C_root_min,
+                           const double dt)
 {
   if (PotNUpt <= 0.0)
     {
@@ -285,16 +289,16 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
   for (int i = 0; i < size; i++)
     {
       const double L = Density[i];
-      if (solute.M_left (i) > 1e-8 && L > 0 && soil_water.h (i) <= 0.0)
+      if (solute.M_left (i, dt) > 1e-8 && L > 0 && soil_water.h (i) <= 0.0)
 	uptake[i] = bound (0.0,
-			   L * (min (I_zero[i], I_max)
+			   L * (std::min (I_zero[i], I_max)
 				- B_zero[i] * C_root),
-			   max (solute.M_left (i) - 1e-8, 0.0));
+			   std::max (solute.M_left (i, dt) - 1e-8, 0.0));
       else
 	uptake[i] = 0.0;
       daisy_assert (uptake[i] >= 0.0);
     }
-  solute.add_to_root_sink (uptake);
+  solute.add_to_root_sink (uptake, dt);
 
   // gN/cm³/h -> gN/m²/h
   return geo.total_surface (uptake) * 1.0e4;
@@ -307,13 +311,13 @@ RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
 			     const double NH4_root_min,
 			     SoilNO3& soil_NO3,
 			     const double NO3_root_min,
-			     const double PotNUpt)
+			     const double PotNUpt, double dt)
 {
   NH4Upt = solute_uptake (geo, soil, soil_water, soil_NH4, 
-			  PotNUpt, NH4Extraction, MxNH4Up, NH4_root_min);
+			  PotNUpt, NH4Extraction, MxNH4Up, NH4_root_min, dt);
   NO3Upt = solute_uptake (geo, soil, soil_water, soil_NO3, 
 			  PotNUpt - NH4Upt, NO3Extraction, 
-			  MxNO3Up, NO3_root_min);
+			  MxNO3Up, NO3_root_min, dt);
 
   daisy_assert (NH4Upt >= 0.0);
   daisy_assert (NO3Upt >= 0.0);

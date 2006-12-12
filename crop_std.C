@@ -46,8 +46,6 @@
 #include <sstream>
 #include <numeric>
 
-using namespace std;
-
 class CropStandard : public Crop
 {
   // Content.
@@ -56,12 +54,12 @@ public:
   CanopyStandard canopy;
   Harvesting harvesting;
   Production production;
-  auto_ptr<Phenology> development;
+  std::auto_ptr<Phenology> development;
   const Partition partition;
   Vernalization vernalization;
-  auto_ptr<Photo> photo;
+  std::auto_ptr<Photo> photo;
   CrpN nitrogen;
-  const auto_ptr<WSE> water_stress_effect;
+  const std::auto_ptr<WSE> water_stress_effect;
   const bool enable_N_stress;
   const double min_light_fraction;
 
@@ -105,9 +103,11 @@ public:
                             const Geometry& geo,
 			    const Soil& soil, SoilWater& soil_water,
 			    double EvapInterception, double day_fraction, 
+                            const double dt, 
 			    Treelog& msg)
-  { return root_system->water_uptake (Ept, geo, soil, soil_water, EvapInterception, 
-				     day_fraction, msg);}
+  { return root_system->water_uptake (Ept, geo, soil, soil_water, 
+                                      EvapInterception, day_fraction,
+                                      dt, msg); }
   void force_production_stress  (double pstress)
   { root_system->production_stress = pstress; }
 
@@ -123,9 +123,10 @@ public:
 	     SoilNO3*, 
 	     double& residuals_DM,
 	     double& residuals_N_top, double& residuals_C_top,
-	     vector<double>& residuals_N_soil,
-	     vector<double>& residuals_C_soil,
+	     std::vector<double>& residuals_N_soil,
+	     std::vector<double>& residuals_C_soil,
 	     double ForcedCAI,
+             double dt,
 	     Treelog&);
   void emerge ()
   { development->DS = -1e-10; }
@@ -135,11 +136,11 @@ public:
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
 			  bool kill_off,
-			  vector<AM*>& residuals,
+			  std::vector<AM*>& residuals,
 			  double& residuals_DM,
 			  double& residuals_N_top, double& residuals_C_top,
-			  vector<double>& residuals_N_soil,
-			  vector<double>& residuals_C_soil,
+			  std::vector<double>& residuals_N_soil,
+			  std::vector<double>& residuals_C_soil,
                           const bool combine,
 			  Treelog&);
   double sorg_height () const 
@@ -218,9 +219,10 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 		    SoilNO3* soil_NO3, 
 		    double& residuals_DM,
 		    double& residuals_N_top, double& residuals_C_top,
-		    vector<double>& residuals_N_soil,
-		    vector<double>& residuals_C_soil,
-		    double ForcedCAI,
+		    std::vector<double>& residuals_N_soil,
+		    std::vector<double>& residuals_C_soil,
+		    const double ForcedCAI,
+                    const double dt,
 		    Treelog& msg)
 {
   Treelog::Open nest (msg, name);
@@ -301,7 +303,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 		       enable_N_stress,
 		       geo, soil, soil_water, *soil_NH4, *soil_NO3,
                        bioclimate.day_fraction (),
-		       *root_system);
+		       *root_system, dt);
     }
   else
     {
@@ -314,20 +316,20 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   if (bioclimate.hourly_global_radiation () > 1e-10 && canopy.CAI > 0)
     {
       double Ass = 0.0;
-      const vector<double>& total_PAR = bioclimate.PAR (); 
-      const vector<double>& sun_PAR = bioclimate.sun_PAR ();
+      const std::vector<double>& total_PAR = bioclimate.PAR (); 
+      const std::vector<double>& sun_PAR = bioclimate.sun_PAR ();
       daisy_assert (sun_PAR.size () > 1);
       daisy_assert (total_PAR.size () == sun_PAR.size ());
-      vector<double> shadow_PAR;
+      std::vector<double> shadow_PAR;
       
       for(int i = 0; i < total_PAR.size (); i++) 
 	shadow_PAR.push_back(total_PAR[i] - sun_PAR[i]);
       
       const double total_LAI = bioclimate.LAI ();
-      const vector<double>& fraction_sun_LAI = bioclimate.sun_LAI_fraction ();
+      const std::vector<double>& fraction_sun_LAI = bioclimate.sun_LAI_fraction ();
 
-      vector<double> fraction_shadow_LAI;
-      vector<double> fraction_total_LAI;
+      std::vector<double> fraction_shadow_LAI;
+      std::vector<double> fraction_total_LAI;
       const int No = fraction_sun_LAI.size ();
 
       for(int i = 0; i < No; i++) 
@@ -366,7 +368,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
         {
           // Private light.
           const int No = 30;
-          vector<double> PAR (No + 1, 0.0);
+          std::vector<double> PAR (No + 1, 0.0);
           Bioclimate::radiation_distribution 
             (No, LAI (), PARref (), bioclimate.hourly_global_radiation (),
              PARext (), PAR); 
@@ -425,11 +427,11 @@ CropStandard::harvest (const symbol column_name,
 		       const double leaf_harvest_frac,
 		       const double sorg_harvest_frac,
 		       const bool kill_off,
-		       vector<AM*>& residuals,
+		       std::vector<AM*>& residuals,
 		       double& residuals_DM,
 		       double& residuals_N_top, double& residuals_C_top,
-		       vector<double>& residuals_N_soil,
-		       vector<double>& residuals_C_soil,
+		       std::vector<double>& residuals_N_soil,
+		       std::vector<double>& residuals_C_soil,
                        const bool combine,
 		       Treelog& msg)
 {

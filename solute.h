@@ -25,7 +25,6 @@
 
 // These must be included in the header file, for 'load_syntax' to work.
 #include "adsorption.h"
-#include "timestep.h"
 #include <string>
 #include <memory>
 
@@ -77,7 +76,7 @@ public:
   { return M_[i]; }
   double C (size_t i) const
   { return C_[i]; }
-  double M_left (size_t i) const
+  double M_left (size_t i, double dt) const
   { return M_[i] + S[i] * dt; }
   double total_surface (const Geometry&, double from, double to) 
     const; // [g/cm^2]
@@ -85,12 +84,12 @@ public:
   // Sink.
 public:
   void clear ();
-  void add_to_source (const std::vector<double>&);
-  void add_to_sink (const std::vector<double>&);
-  void add_to_root_sink (const std::vector<double>&);
+  void add_to_source (const std::vector<double>&, double dt);
+  void add_to_sink (const std::vector<double>&, double dt);
+  void add_to_root_sink (const std::vector<double>&, double dt);
 
   // Simulation.
-  void tick (const size_t cell_size, const SoilWater&);
+  void tick (const size_t cell_size, const SoilWater&, double dt);
 public:
   bool check (size_t n, Treelog& err) const;
   virtual void output (Log&) const;

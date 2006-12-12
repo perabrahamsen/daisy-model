@@ -30,16 +30,14 @@
 #include "submodel.h"
 #include "treelog.h"
 #include "mathlib.h"
-#include "timestep.h"
 #include <map>
-
-using namespace std;
 
 struct Chemicals::Implementation
 { 
   // Types.
-  typedef map<const Chemical*, double, less<const Chemical*>/**/> chemical_map;
-  typedef map<symbol, const Chemical*> chemistry_map;
+  typedef std::map<const Chemical*,
+                   double, std::less<const Chemical*>/**/> chemical_map;
+  typedef std::map<symbol, const Chemical*> chemistry_map;
   
   // Class variables.
   static chemistry_map* chemistry;
@@ -55,7 +53,8 @@ struct Chemicals::Implementation
 			     double fraction);
   
   // Canopy functions.
-  void canopy_update (const Implementation& canopy_chemicals_in, 
+  void canopy_update (const double dt, 
+                      const Implementation& canopy_chemicals_in, 
 		      double canopy_water_storage,
 		      double canopy_water_out,
 		      Implementation& canopy_chemicals_dissipate,
@@ -81,7 +80,7 @@ struct Chemicals::Implementation
   Implementation ()
     : chemicals ()
     { }
-  Implementation (const vector<AttributeList*>&);
+  Implementation (const std::vector<AttributeList*>&);
   Implementation (const Implementation& impl)
     : chemicals (impl.chemicals)
     { }
@@ -158,7 +157,8 @@ Chemicals::Implementation::copy_fraction (const Implementation& from,
 }
 
 void
-Chemicals::Implementation::canopy_update (const Implementation& in, 
+Chemicals::Implementation::canopy_update (const double dt,
+                                          const Implementation& in, 
 					  double water_storage,
 					  double water_out,
 					  Implementation& dissipate,
@@ -268,7 +268,8 @@ Chemicals::Implementation::operator += (const Implementation& other)
     add ((*i).first, (*i).second);
 }
 
-Chemicals::Implementation::Implementation (const vector<AttributeList*>& al)
+Chemicals::Implementation::Implementation 
+/**/ (const std::vector<AttributeList*>& al)
 {
   for (unsigned int i = 0; i < al.size (); i++)
     add (al[i]->identifier ("chemical"), al[i]->number ("amount"));
@@ -288,12 +289,13 @@ Chemicals::copy_fraction (const Chemicals& from, Chemicals& to,
 { Implementation::copy_fraction (from.impl, to.impl, fraction); }
 
 void
-Chemicals::canopy_update (const Chemicals& canopy_chemicals_in, 
+Chemicals::canopy_update (const double dt,
+                          const Chemicals& canopy_chemicals_in, 
 			  double canopy_water_storage,
 			  double canopy_water_out,
 			  Chemicals& canopy_chemicals_dissipate,
 			  Chemicals& canopy_chemicals_out)
-{ impl.canopy_update (canopy_chemicals_in.impl, 
+{ impl.canopy_update (dt, canopy_chemicals_in.impl, 
 		      canopy_water_storage, canopy_water_out,
 		      canopy_chemicals_dissipate.impl,
 		      canopy_chemicals_out.impl); }
@@ -391,12 +393,12 @@ Chemicals::add_syntax (const char *const name,
   chemicals_load_syntax (entry_syntax, entry_alist);
   syntax.add (name, entry_syntax, entry_alist,
 	      cat, Syntax::Sequence, description);
-  alist.add (name, vector<AttributeList*> ());
+  alist.add (name, std::vector<AttributeList*> ());
   // KLUDGE: Ugly hack to be able to use the standard 'load_syntax' form.
   chemicals_default_category = Syntax::State;
 }
   
-Chemicals::Chemicals (const vector<AttributeList*>& al)
+Chemicals::Chemicals (const std::vector<AttributeList*>& al)
   : impl (*new Implementation (al))
 { }
   

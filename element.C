@@ -28,7 +28,6 @@
 #include "syntax.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "timestep.h"
 #include <string>
 
 void 
@@ -67,7 +66,8 @@ Element::swap (const Geometry& geo,
 
 void 
 Element::tick (const size_t cell_size,
-               const SoilWater& soil_water)
+               const SoilWater& soil_water,
+               const double dt)
 {
   // Initialize.
   fill (S_p.begin (), S_p.end (), 0.0);

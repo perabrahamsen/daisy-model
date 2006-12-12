@@ -48,10 +48,10 @@ private:
 
   // Simulation.
 public:
-  void uptake (const Soil&, const SoilWater&);
+  void uptake (const Soil&, const SoilWater&, double dt);
   void decompose (const Geometry& geo,
                   const Soil&, const SoilWater&, const SoilHeat&, 
-		  const OrganicMatter*);
+		  const OrganicMatter*, double dt);
   void output (Log&) const;
   
 public:

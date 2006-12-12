@@ -54,7 +54,8 @@ public:
 	     vector<double>& h,
 	     vector<double>& Theta,
              size_t q_offset,
-	     vector<double>& q_base);
+	     vector<double>& q_base,
+             double dt);
 
   // Create and Destroy.
   void has_macropores (bool)
@@ -78,7 +79,8 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	    vector<double>& h,
 	    vector<double>& Theta,
             const size_t q_offset,
-            vector<double>& q_base)
+            vector<double>& q_base,
+            const double dt)
 {
   double *const q = &q_base[q_offset];
   double q_up = 0.0;
@@ -117,12 +119,12 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       if (top_type == Surface::forced_pressure)
 	{
 	  const double dz = 0.0 - geo.z (first);
-	  const double dh = top.h_top (geo, top_edge) - h_old[first];
+	  const double dh = top.h_top (geo, top_edge, dt) - h_old[first];
 	  q_up = q[first] = -K_sat * (dh/dz + 1.0);
 	}
       else
         // Limited water or forced flux.
-	q_up = q[first] = max (top.q_top (geo, top_edge), -K_sat);
+	q_up = q[first] = max (top.q_top (geo, top_edge, dt), -K_sat);
     }
 
   //  Use darcy for upward movement in the top.

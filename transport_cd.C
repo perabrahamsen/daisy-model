@@ -28,9 +28,6 @@
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
-#include "timestep.h"
-
-using namespace std;
 
 struct TransportCD : public Transport
 {
@@ -41,10 +38,10 @@ struct TransportCD : public Transport
   void tick (Treelog&, const Geometry1D& geo,
              const Soil&, const SoilWater&, const Adsorption&,
 	     double diffusion_coefficient,
-	     vector<double>& M, 
-	     vector<double>& C,
-	     const vector<double>& S,
-	     vector<double>& J);
+	     std::vector<double>& M, 
+	     std::vector<double>& C,
+	     const std::vector<double>& S,
+	     std::vector<double>& J, double dt);
 
   // Create.
   TransportCD (Block& al)
@@ -59,16 +56,16 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
                    const Soil& soil, const SoilWater& soil_water,
 		   const Adsorption& adsorption,
 		   const double diffusion_coefficient,
-		   vector<double>& M, 
-		   vector<double>& C,
-		   const vector<double>& S,
-		   vector<double>& J)
+		   std::vector<double>& M, 
+		   std::vector<double>& C,
+		   const std::vector<double>& S,
+		   std::vector<double>& J, const double dt)
 {
   double J_in = J[0];
 
   // Remember old values.
-  const vector<double> C_prev = C;
-  const vector<double> M_prev = M;
+  const std::vector<double> C_prev = C;
+  const std::vector<double> M_prev = M;
 
   // Constants.
   const size_t size = geo.cell_size (); // Number of soil layers.
@@ -90,7 +87,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
   // Note: q, D, and alpha depth indexes are all [j-½].
 
   // Dispersion coefficient [cm²/s]
-  vector<double> D (size + 1);
+  std::vector<double> D (size + 1);
 
   for (unsigned int j = 1; j < size; j++)
     {
@@ -111,7 +108,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 	* Theta;
 
       // Check for NaN.
-      daisy_assert (isfinite (D[j]));
+      daisy_assert (std::isfinite (D[j]));
     }
   // Lower boundary.
   {
@@ -136,7 +133,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 
   // Weight factor (how important is this flux for the concentration)
   // This is 1 for incomming flux and 0 for outgoing flux.
-  vector<double> alpha (size + 1);
+  std::vector<double> alpha (size + 1);
 
   for (unsigned int j = 0; j < size + 1; j++)
     {
@@ -180,7 +177,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
   // Find the time step using Courant.
   double ddt = 1.0;
   for (unsigned int i = 0; i < size; i++)
-    ddt = min (ddt, pow (geo.dz (i), 2) / (2 * D[i + 1]));
+    ddt = std::min (ddt, std::pow (geo.dz (i), 2) / (2 * D[i + 1]));
   int time_step_reductions = 0;
 
   // We restart from here if anything goes wrong.
@@ -189,19 +186,19 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
   // Loop through small time steps.
   for (double old_t = 0.0, t = ddt; 
        old_t < t;
-       old_t = t, t = min (dt, t + ddt))
+       old_t = t, t = std::min (dt, t + ddt))
     {
       // Parameters for tridiagonal matrix.
-      vector<double> a (size);
-      vector<double> b (size);
-      vector<double> c (size);
-      vector<double> d (size);
+      std::vector<double> a (size);
+      std::vector<double> b (size);
+      std::vector<double> c (size);
+      std::vector<double> d (size);
   
       // Old absorbed matter.
-      vector<double> A (size);
+      std::vector<double> A (size);
       // Water content at start and end of small timestep.
-      vector<double> Theta_old (size);
-      vector<double> Theta_new (size);
+      std::vector<double> Theta_old (size);
+      std::vector<double> Theta_new (size);
       for (unsigned int j = 0; j < size; j++)
 	{
 	  const double Theta_ratio 
@@ -250,10 +247,10 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 		     / (2.0 * dz)));
 
 	  // Check for NaN.
-	  daisy_assert (isfinite (a[j]));
-	  daisy_assert (isfinite (b[j]));
-	  daisy_assert (isfinite (c[j]));
-	  daisy_assert (isfinite (d[j]));
+	  daisy_assert (std::isfinite (a[j]));
+	  daisy_assert (std::isfinite (b[j]));
+	  daisy_assert (std::isfinite (c[j]));
+	  daisy_assert (std::isfinite (d[j]));
 	}
       // Adjust for upper boundary condition.
       {
@@ -297,10 +294,10 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 		   / (2.0 * dz)));
 
 	// Check for NaN.
-	daisy_assert (isfinite (a[0]));
-	daisy_assert (isfinite (b[0]));
-	daisy_assert (isfinite (c[0]));
-	daisy_assert (isfinite (d[0]));
+	daisy_assert (std::isfinite (a[0]));
+	daisy_assert (std::isfinite (b[0]));
+	daisy_assert (std::isfinite (c[0]));
+	daisy_assert (std::isfinite (d[0]));
 	d[0] -= a[0] * C_top;
       }
       // Adjust for lower boundary condition.

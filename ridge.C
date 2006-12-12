@@ -32,9 +32,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "check.h"
-#include "timestep.h"
-
-using namespace std;
+#include <vector>
 
 struct Ridge::Implementation
 {
@@ -66,11 +64,12 @@ struct Ridge::Implementation
   
   // Simulation.
   void tick (const Geometry1D& geo, const Soil&, const SoilWater&, 
-	     double external_ponding /* [cm] */);
+	     double external_ponding /* [cm] */, double dt /* [h] */);
   void update_water (const Geometry1D& geo,
-                     const Soil&, const vector<double>& S_,
-		     vector<double>& h_, vector<double>& Theta_,
-		     vector<double>& q, const vector<double>& q_p);
+                     const Soil&, const std::vector<double>& S_,
+		     std::vector<double>& h_, std::vector<double>& Theta_,
+		     std::vector<double>& q, const std::vector<double>& q_p,
+                     const double dt);
   void output (Log& log) const;
 
   // Create and Destroy.
@@ -86,13 +85,14 @@ static const double x_width = 1.0;
 void 
 Ridge::tick (const Geometry1D& geo,
              const Soil& soil, const SoilWater& soil_water,
-	     double external_ponding)
-{ impl.tick (geo, soil, soil_water, external_ponding * 0.1 /* mm -> cm */); }
+	     const double external_ponding, const double dt)
+{ impl.tick (geo, soil, soil_water, external_ponding * 0.1 /* mm -> cm */, 
+             dt); }
 
 void 
 Ridge::Implementation::tick (const Geometry1D& geo,
                              const Soil& soil, const SoilWater& soil_water,
-			     double external_ponding)
+			     const double external_ponding, const double dt)
 {
   // First, we need to find the internal ponding height. 
   // The external ponding assumes a flat surface, we need to find the
@@ -254,15 +254,15 @@ Ridge::Implementation::tick (const Geometry1D& geo,
       const double Theta_sat = soil.Theta (0, 0.0, 0.0);
       const double available_space = (Theta_sat - Theta) * dz;
       daisy_assert (available_space > 0.0);
-      const double I_max = min (external_ponding, 
-				available_space - 1.0e-8) / dt;
+      const double I_max = std::min (external_ponding, 
+                                     available_space - 1.0e-8) / dt;
 
       // Find resistance and infiltration for bottom regime.
-      const double x_bottom = min (x_pond, x_switch);
+      const double x_bottom = std::min (x_pond, x_switch);
       const double bottom_width = x_bottom - 0.0;
       if (bottom_width > 0.0)
 	{
-	  const double K_bottom = min (K, K_sat_below);
+	  const double K_bottom = std::min (K, K_sat_below);
 	  const double dz_bottom
 	    = z.integrate (0.0, x_bottom) / bottom_width + dz;
 #if 0
@@ -272,7 +272,7 @@ Ridge::Implementation::tick (const Geometry1D& geo,
 #endif
 	  R_bottom
 	    = (x_width / bottom_width) * (dz_bottom /  K_bottom + R_crust);
-	  I_bottom = min (internal_ponding / R_bottom, I_max);
+	  I_bottom = std::min (internal_ponding / R_bottom, I_max);
 	}
       else
 	{
@@ -296,7 +296,7 @@ Ridge::Implementation::tick (const Geometry1D& geo,
 	  cerr << "R_wall = " << R_wall << ", x_width = " <<x_width
 	       << ", dz_wall = " <<dz_wall << ", K = " << K << "\n";
 #endif
-	  I_wall = min ((z_pond - z_switch) / R_wall, I_max - I_bottom);
+	  I_wall = std::min ((z_pond - z_switch) / R_wall, I_max - I_bottom);
 	}
       else
 	{
@@ -330,21 +330,23 @@ Ridge::Implementation::tick (const Geometry1D& geo,
 void
 Ridge::update_water (const Geometry1D& geo,
                      const Soil& soil,
-		     const vector<double>& S_,
-		     vector<double>& h_,
-		     vector<double>& Theta_,
-		     vector<double>& q,
-		     const vector<double>& q_p)
-{ impl.update_water (geo, soil, S_, h_, Theta_, q, q_p); }
+		     const std::vector<double>& S_,
+		     std::vector<double>& h_,
+		     std::vector<double>& Theta_,
+		     std::vector<double>& q,
+		     const std::vector<double>& q_p,
+                     const double dt)
+{ impl.update_water (geo, soil, S_, h_, Theta_, q, q_p, dt); }
 
 void
 Ridge::Implementation::update_water (const Geometry1D& geo,
                                      const Soil& soil,
-				     const vector<double>& S_,
-				     vector<double>& h_,
-				     vector<double>& Theta_,
-				     vector<double>& q,
-				     const vector<double>& q_p)
+				     const std::vector<double>& S_,
+				     std::vector<double>& h_,
+				     std::vector<double>& Theta_,
+				     std::vector<double>& q,
+				     const std::vector<double>& q_p,
+                                     const double dt)
 {
   const double E = -(q[last_cell + 1] + q_p[last_cell + 1]);
   Theta = (I - E) * dt;

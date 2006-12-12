@@ -40,7 +40,7 @@ struct UZRect2x1 : public UZRect
   // Interface.
   void tick (const GeometryRect&, const Soil&, SoilWater&, 
              const SoilHeat&, const Surface&, const Groundwater&, 
-             Treelog&);
+             double dt, Treelog&);
 
   // Internal function.
   void water_column (const GeometryRect&, const Soil& soil,
@@ -56,7 +56,7 @@ struct UZRect2x1 : public UZRect
                      const size_t q_offset,
                      std::vector<double>& q,
                      std::vector<double>& q_p,
-                     Treelog& msg);
+                     double dt, Treelog& msg);
 
   // Create and Destroy.
   void has_macropores (bool);
@@ -69,7 +69,7 @@ void
 UZRect2x1::tick (const GeometryRect& geo, const Soil& soil, 
                  SoilWater& soil_water, const SoilHeat& soil_heat,
                  const Surface& surface, const Groundwater& groundwater, 
-                 Treelog& msg)
+                 const double dt, Treelog& msg)
 {
   const size_t cell_rows = geo.cell_rows ();
   const size_t cell_columns = geo.cell_columns ();
@@ -102,7 +102,7 @@ UZRect2x1::tick (const GeometryRect& geo, const Soil& soil,
                     soil_water.Theta_old_,
                     soil_water.h_ice_, soil_water.h_, soil_water.Theta_,
                     col, soil_water.q_, soil_water.q_p_,
-                    msg);
+                    dt, msg);
    }
 
   // Horizontal movement.
@@ -144,7 +144,7 @@ UZRect2x1::tick (const GeometryRect& geo, const Soil& soil,
           Treelog::Open nest (msg, horizontal[i]->name);
           try 
             {
-              horizontal[i]->tick (smm, 0.0, msg);
+              horizontal[i]->tick (smm, 0.0, dt, msg);
               goto success;
             }
           catch (const char* error)
@@ -177,6 +177,7 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
                          const size_t q_offset,
                          std::vector<double>& q,
                          std::vector<double>& q_p,
+                         const double dt,
                          Treelog& msg)
 {
   // Find top edge.
@@ -213,7 +214,7 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
           vertical[i]->tick (msg, geo, soil, soil_heat,
                              first, surface, top_edge, last, groundwater,
                              S, h_old, Theta_old, h_ice, h, Theta, 
-                             q_offset, q);
+                             q_offset, q, dt);
           for (size_t i = last + 2; i <= bottom_cell + 1; i++)
             {
               daisy_assert (q.size () > i + q_offset);

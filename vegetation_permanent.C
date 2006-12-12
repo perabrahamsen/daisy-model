@@ -134,12 +134,12 @@ struct VegetationPermanent : public Vegetation
 	     double& residuals_N_top, double& residuals_C_top,
 	     vector<double>& residuals_N_soil,
 	     vector<double>& residuals_C_soil,
-	     Treelog&);
+	     double dt, Treelog&);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
                         const Geometry& geo,
 			const Soil& soil, SoilWater& soil_water, 
-			double day_fraction, Treelog&);
+			double day_fraction, double dt, Treelog&);
   void force_production_stress  (double)
   { }
   void emerge (const symbol, Treelog&)
@@ -251,6 +251,7 @@ VegetationPermanent::tick (const Time& time, const double,
 			   double& residuals_N_top, double& residuals_C_top,
 			   vector<double>& /* residuals_N_soil */,
 			   vector<double>& /* residuals_C_soil */,
+                           const double dt, 
 			   Treelog&)
 {
   // Canopy.
@@ -270,7 +271,7 @@ VegetationPermanent::tick (const Time& time, const double,
 	daisy_assert (N_actual >= 0.0);
       N_uptake = root_system->nitrogen_uptake (geo, soil, soil_water, 
                                                *soil_NH4, 0.0, *soil_NO3, 0.0,
-                                               N_demand - N_actual);
+                                               N_demand - N_actual, dt);
     }
   
   if (canopy.CAI < old_LAI)
@@ -318,12 +319,14 @@ VegetationPermanent::transpiration (double potential_transpiration,
                                     const Geometry& geo,
 				    const Soil& soil, 
 				    SoilWater& soil_water,
-				    double day_fraction, Treelog& msg)
+				    double day_fraction, double dt, 
+                                    Treelog& msg)
 {
   if (canopy.CAI > 0.0)
     return  root_system->water_uptake (potential_transpiration, 
                                        geo, soil, soil_water, 
-                                       canopy_evaporation, day_fraction, msg);
+                                       canopy_evaporation, day_fraction, 
+                                       dt, msg);
   return 0.0;
 }
 

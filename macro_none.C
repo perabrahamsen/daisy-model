@@ -40,7 +40,7 @@ struct MacroNone : public Macro
 	     std::vector<double>& /* S */,
 	     std::vector<double>& /* S_p */,
 	     std::vector<double>& /* q_p */,
-	     Treelog&)
+	     const double /* dt */ , Treelog&)
     { }
   void output (Log&) const
     { }

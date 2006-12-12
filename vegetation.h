@@ -83,13 +83,13 @@ public:
 		     double& residuals_N_top, double& residuals_C_top,
 		     std::vector<double>& residuals_N_soil,
 		     std::vector<double>& residuals_C_soil,
-		     Treelog&) = 0;
+                     double dt, Treelog&) = 0;
   virtual double transpiration (// Actual trans. [mm/h]
 				double potential_transpiration,	
 				double canopy_evaporation,
                                 const Geometry& geo,
 				const Soil& soil, SoilWater& soil_water,
-				double day_fraction, Treelog&) = 0;
+				double day_fraction, double dt, Treelog&) = 0;
   virtual void force_production_stress  (double pstress) = 0;
   virtual void kill_all (symbol, const Time&, const Geometry&,
 			 Bioclimate&, std::vector<AM*>& residuals, 

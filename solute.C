@@ -46,44 +46,45 @@ Solute::clear ()
 }
 
 void
-Solute::add_to_source (const vector<double>& v)
+Solute::add_to_source (const vector<double>& v, const double dt)
 {
   daisy_assert (S.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
       S[i] += v[i];
       daisy_assert (isfinite (S[i]));
-      daisy_assert (M_left (i) >= 0.0);
+      daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
 
 void
-Solute::add_to_sink (const vector<double>& v)
+Solute::add_to_sink (const vector<double>& v, const double dt)
 {
   daisy_assert (S.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
       S[i] -= v[i];
       daisy_assert (isfinite (S[i]));
-      daisy_assert (M_left (i) >= 0.0);
+      daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
 
 void
-Solute::add_to_root_sink (const vector<double>& v)
+Solute::add_to_root_sink (const vector<double>& v, const double dt)
 {
   daisy_assert (S_root.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     S_root[i] -= v[i];
-  add_to_sink (v);
+  add_to_sink (v, dt);
 }
 
 void 
 Solute::tick (const size_t cell_size,
-	      const SoilWater& soil_water)
+	      const SoilWater& soil_water,
+              const double dt)
 {
   for (unsigned i = 0; i < cell_size; i++)
-    daisy_assert (M_left (i) >= 0.0);
+    daisy_assert (M_left (i, dt) >= 0.0);
 
   // Initialize.
   fill (S_p.begin (), S_p.end (), 0.0);
@@ -94,7 +95,7 @@ Solute::tick (const size_t cell_size,
     {
       S_external[i] += S_permanent[i];
       S[i] += S_external[i];
-      daisy_assert (M_left (i) >= 0.0);
+      daisy_assert (M_left (i, dt) >= 0.0);
     }
 
   // Drainage.
@@ -102,7 +103,7 @@ Solute::tick (const size_t cell_size,
     {
       S_drain[i] = -soil_water.S_drain (i) * dt * C (i);
       S[i] += S_drain[i];
-      daisy_assert (M_left (i) >= 0.0);
+      daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
 

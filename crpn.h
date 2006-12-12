@@ -98,7 +98,7 @@ public:
 	       const Geometry&, const Soil& soil, const SoilWater& soil_water,
 	       SoilNH4& soil_NH4, SoilNO3& soil_NO3,
                double day_fraction,
-	       RootSystem& root_system);
+	       RootSystem& root_system, double dt);
   void output (Log& log) const;
 
   // Create and Destroy.

@@ -24,7 +24,6 @@
 #include "block.h"
 #include "alist.h"
 #include "average.h"
-#include "timestep.h"
 #include <sstream>
 
 struct UZ1DRichard : public UZ1D
@@ -38,7 +37,7 @@ struct UZ1DRichard : public UZ1D
   std::auto_ptr<Average> K_average;
 
   // Interface.
-  void tick (SMM1D&, const double gravity, Treelog&);
+  void tick (SMM1D&, double gravity, double dt, Treelog&);
 
   // Utilities.
   static void internode (const SMM1D&, const Average&, 
@@ -56,7 +55,8 @@ struct UZ1DRichard : public UZ1D
 };
 
 void
-UZ1DRichard::tick (SMM1D& smm, const double gravity, Treelog& msg)
+UZ1DRichard::tick (SMM1D& smm, const double gravity, const double dt,
+                   Treelog& msg)
 {
   // Check input.
   const size_t cell_size = smm.cell_size ();

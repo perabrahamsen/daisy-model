@@ -30,7 +30,6 @@
 #include "geometry.h"
 #include "soil.h"
 #include "soil_heat.h"
-#include "timestep.h"
 #include "syntax.h"
 #include "snow.h"
 #include "log.h"
@@ -118,7 +117,8 @@ struct BioclimateStandard : public Bioclimate
                           Surface& surface, const Weather& weather, 
 			  Vegetation& vegetation, const Movement&,
                           const Geometry&, const Soil& soil,
-			  SoilWater& soil_water, const SoilHeat&, Treelog&);
+			  SoilWater& soil_water, const SoilHeat&, 
+                          double dt, Treelog&);
 
   // Chemicals.
   Chemicals spray_;
@@ -134,7 +134,8 @@ struct BioclimateStandard : public Bioclimate
 
   Chemicals surface_chemicals_in;
 
-  void ChemicalDistribution (Surface& surface, const Vegetation&);
+  void ChemicalDistribution (Surface& surface, const Vegetation&, 
+                             const double dt);
 
   // Radiation.
   std::auto_ptr<Raddist> raddist;// Radiation distribution model.
@@ -152,7 +153,7 @@ struct BioclimateStandard : public Bioclimate
   // Simulation
   void tick (const Time&, Surface&, const Weather&, 
 	     Vegetation&, const Movement&, const Geometry&,
-             const Soil&, SoilWater&, const SoilHeat&, Treelog&);
+             const Soil&, SoilWater&, const SoilHeat&, double dt, Treelog&);
   void output (Log&) const;
 
   // Canopy.
@@ -597,7 +598,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
                                        const Geometry& geo,
 				       const Soil& soil, 
 				       SoilWater& soil_water,
-				       const SoilHeat& soil_heat, Treelog& msg)
+				       const SoilHeat& soil_heat, 
+                                       const double dt, Treelog& msg)
 {
   // Overview.
   //
@@ -790,7 +792,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   const double soil_T = geo.content_at (soil_heat, &SoilHeat::T, 0.0);
   surface.tick (msg, pond_ep, 
 		litter_water_out, litter_water_temperature, 
-		geo, soil, soil_water, soil_T);
+		geo, soil, soil_water, soil_T, dt);
   pond_ea = surface.evap_pond (msg);
   daisy_assert (pond_ea >= 0.0);
   total_ea += pond_ea;
@@ -821,8 +823,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     ? (weather.hourly_global_radiation () / (24.0 * daily_global_radiation_))
     : 0.0;
   crop_ea = vegetation.transpiration (crop_ep, canopy_ea, geo, soil,
-                                      soil_water, 
-				      day_fraction, msg);
+                                      soil_water, day_fraction, dt, msg);
   daisy_assert (crop_ea >= 0.0);
   total_ea += crop_ea;
   daisy_assert (total_ea >= 0.0);
@@ -856,7 +857,7 @@ BioclimateStandard::tick (const Time& time,
 			  Vegetation& vegetation, const Movement& movement,
                           const Geometry& geo, const Soil& soil, 
 			  SoilWater& soil_water, const SoilHeat& soil_heat,
-			  Treelog& msg)
+			  const double dt, Treelog& msg)
 {
   // Keep weather information during time step.
   // Remember this in case the crops should ask.
@@ -883,15 +884,16 @@ BioclimateStandard::tick (const Time& time,
 
   // Distribute water among canopy, snow, and soil.
   WaterDistribution (time, surface, weather, vegetation, 
-		     movement, geo, soil, soil_water, soil_heat, msg);
+		     movement, geo, soil, soil_water, soil_heat, dt, msg);
 
   // Let the chemicals follow the water.
-  ChemicalDistribution (surface, vegetation);
+  ChemicalDistribution (surface, vegetation, dt);
 }
 
 void 
 BioclimateStandard::ChemicalDistribution (Surface& surface, 
-					  const Vegetation& vegetation)
+					  const Vegetation& vegetation,
+                                          double dt)
 {
   const double cover = vegetation.cover ();
 
@@ -911,7 +913,7 @@ BioclimateStandard::ChemicalDistribution (Surface& surface,
   // Canopy
   canopy_chemicals_in.clear ();
   Chemicals::copy_fraction (snow_chemicals_out, canopy_chemicals_in, cover);
-  canopy_chemicals_storage.canopy_update (canopy_chemicals_in, 
+  canopy_chemicals_storage.canopy_update (dt, canopy_chemicals_in, 
 					  canopy_water_storage,
 					  canopy_water_out,
 					  canopy_chemicals_dissipate,

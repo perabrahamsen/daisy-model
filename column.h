@@ -98,7 +98,7 @@ public:
 
   // Simulation.
   virtual void clear () = 0;
-  virtual void tick (Treelog&, const Time&, const Weather*) = 0;
+  virtual void tick (Treelog&, double dt, const Time&, const Weather*) = 0;
 
   virtual bool check (bool require_weather,
 		      const Time& from, const Time& to, 
