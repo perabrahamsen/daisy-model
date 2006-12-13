@@ -194,11 +194,11 @@ LogAll::close ()
 }
 
 void 
-LogAll::output (symbol, const bool)
+LogAll::output_entry (symbol, const bool)
 { }
 
 void 
-LogAll::output (symbol name, const double value)
+LogAll::output_entry (symbol name, const double value)
 { 
   const vector<Select*>& sels = active_leafs.top ();
 
@@ -210,7 +210,7 @@ LogAll::output (symbol name, const double value)
 }
 
 void 
-LogAll::output (symbol name, const int value)
+LogAll::output_entry (symbol name, const int value)
 { 
   const vector<Select*>& sels = active_leafs.top ();
 
@@ -222,7 +222,7 @@ LogAll::output (symbol name, const int value)
 }
 
 void 
-LogAll::output (symbol name, const symbol value)
+LogAll::output_entry (symbol name, const symbol value)
 { 
   const vector<Select*>& sels = active_leafs.top ();
 
@@ -234,7 +234,7 @@ LogAll::output (symbol name, const symbol value)
 }
 
 void 
-LogAll::output (symbol name, const vector<double>& value)
+LogAll::output_entry (symbol name, const vector<double>& value)
 { 
   const vector<Select*>& sels = active_leafs.top ();
 
@@ -246,7 +246,7 @@ LogAll::output (symbol name, const vector<double>& value)
 }
 
 void 
-LogAll::output (symbol, const PLF&)
+LogAll::output_entry (symbol, const PLF&)
 { }
 
 Block& 

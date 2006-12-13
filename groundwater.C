@@ -43,19 +43,19 @@ Groundwater::is_pipe () const
 
 double 
 Groundwater::pipe_height () const
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 double 
 Groundwater::Z_aquitard () const
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 double 
 Groundwater::K_aquitard () const
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 void 
 Groundwater::set_Z_aquitard (double)
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 void
 Groundwater::output (Log& log) const

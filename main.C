@@ -97,7 +97,7 @@ attributes.");
 	  // Do nothing.
 	  break;
 	default:
-	  daisy_assert (false);
+	  daisy_notreached ();
 	}
 
       // Explicit or implicit program?

@@ -53,13 +53,12 @@ public:
   void open (symbol name);
   void close ();
 
-  using Log::output;
-  void output (symbol name, bool);
-  void output (symbol name, double);
-  void output (symbol name, int);
-  void output (symbol name, symbol);
-  void output (symbol name, const std::vector<double>& value);
-  void output (symbol name, const PLF&);
+  void output_entry (symbol name, bool);
+  void output_entry (symbol name, double);
+  void output_entry (symbol name, int);
+  void output_entry (symbol name, symbol);
+  void output_entry (symbol name, const std::vector<double>& value);
+  void output_entry (symbol name, const PLF&);
 
   // Create and destroy.
   void initialize (Treelog&);

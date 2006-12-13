@@ -265,7 +265,7 @@ Value::subset (const Value& v, const Syntax& syntax,
         return *scalar == *v.scalar;
       case Syntax::Error:
       default:
-	daisy_assert (false);
+	daisy_notreached ();
       }
   else
     switch (type)
@@ -403,7 +403,7 @@ Value::cleanup ()
 	    // Empty (dummy) value.
 	    break;
 	  default:
-	    daisy_assert (false);
+	    daisy_notreached ();
 	  }
       else
 	switch (type)
@@ -434,7 +434,7 @@ Value::cleanup ()
 	  case Syntax::Library:
 	  case Syntax::Error:
 	  default:
-	    daisy_assert (false);
+	    daisy_notreached ();
 	  }
       break;
     default:
@@ -486,7 +486,7 @@ Value::operator= (const Value& v)
         break;
       case Syntax::Error:
       default:
-	daisy_assert (false);
+	daisy_notreached ();
       }
   else
     switch (type)
@@ -515,7 +515,7 @@ Value::operator= (const Value& v)
       case Syntax::Library:
       case Syntax::Error:
       default:
-	daisy_assert (false);
+	daisy_notreached ();
       }
 
   // Return this for further mutilation.
@@ -642,7 +642,7 @@ AttributeList::size (const string& key)	const
     case Syntax::Library:
     case Syntax::Error:
     default:
-      daisy_assert (false);
+      daisy_notreached ();
     }
   // Not reached.
 }
@@ -931,7 +931,7 @@ AttributeList::revert (const string& key,
       case Syntax::Library:
       case Syntax::Error:
       default:
-	daisy_assert (false);
+	daisy_notreached ();
       }
   else
     switch (syntax.lookup (key))
@@ -958,7 +958,7 @@ AttributeList::revert (const string& key,
       case Syntax::Library:
       case Syntax::Error:
       default:
-	daisy_assert (false);
+	daisy_notreached ();
       }
   return true;
 }

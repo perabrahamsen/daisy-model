@@ -48,7 +48,7 @@ struct FormatPlain : public Format
     { }
   private:
     Table(const Table&)
-    { daisy_assert (false); }
+    { daisy_notreached (); }
   };
   void table_open (const std::string& format);
   void table_close ();

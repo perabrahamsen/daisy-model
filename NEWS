@@ -12,6 +12,11 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.11
+
+More work on 2D transport and Farquhar photosynthesis.  Code cleanup
+and bug fixes.
+
 * 4.10
 
 ** New photosynthesis model: Farquhar

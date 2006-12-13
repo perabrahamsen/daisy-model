@@ -24,6 +24,7 @@
 #define TIME_H
 
 #include <string>
+#include <memory>
 
 class AttributeList;
 class Syntax;
@@ -34,7 +35,7 @@ class Time
   // Content.
 private:
   struct Implementation;
-  Implementation& impl;
+  const std::auto_ptr<Implementation> impl;
     
   // Extract.
 public:
@@ -45,14 +46,21 @@ public:
   int mday () const;
   int wday () const;		// 0=monday, 6=sunday.
   int hour () const;
+  int minute () const;
+  int second () const;
+  void set_alist (AttributeList& alist) const;
 
   // Simulate. 
+  int tick_generic (const int amount, const int limit, 
+                    void (Time::*next) (int), const int old);
 public:
-  void output (Log&) const;
+  void tick_second (int seconds = 1);
+  void tick_minute (int minutes = 1);
   void tick_hour (int hours = 1);
   void tick_day (int days = 1);
   void tick_year (int years = 1);
-
+  void output (Log&) const;
+  
   // Convert.
 public:
   static std::string month_name (int month);
@@ -68,7 +76,8 @@ public:
   // Test.
   static bool leap (int year);
   static int month_length (int year, int month);
-  static bool valid (int year, int month, int mday, int hour = 0);
+  static bool valid (int year, int month, int mday, 
+                     int hour = 0, int minute = 0, int second = 0);
   static int days_between (const Time& first, const Time& last);
   static int hours_between (const Time& first, const Time& last);
 
@@ -83,12 +92,13 @@ public:
   // Create.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  Time (const AttributeList&);
+  explicit Time (const AttributeList&);
 
   // Construct.
 public:
   const Time& operator= (const Time&);
-  Time (int year, int month, int mday, int hour);
+  Time (int year, int month, int mday, int hour,
+        int minute = 0, int second = 0);
   Time (const Time&);
   ~Time ();
 };

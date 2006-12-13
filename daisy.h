@@ -38,6 +38,7 @@ class AttributeList;
 class Condition;
 class Treelog;
 class LogAll;
+class Timestep;
 
 class Daisy : public Program
 {
@@ -57,9 +58,11 @@ public:
   static const std::vector<Log*> 
   /**/ find_active_logs (const std::vector<Log*>& logs, LogAll& log_all);
   const std::vector<Log*> active_logs;
-  std::auto_ptr<Condition> activate_output;
-  std::auto_ptr<Condition> print_time;
+  const std::auto_ptr<Condition> activate_output;
+  const std::auto_ptr<Condition> print_time;
   Time time;
+  const std::auto_ptr<Timestep> timestep;
+  const double dt;
 private:
   const Time stop;
 public:

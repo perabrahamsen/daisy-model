@@ -57,7 +57,7 @@ ScopeSources::number (const symbol tag_symbol) const
         daisy_assert (source[i]->time ().at (index[i]) == now);
         return source[i]->value ().at (index[i]);
       }
-  daisy_assert (false);
+  daisy_notreached ();
 }
 
 symbol 
@@ -68,7 +68,7 @@ ScopeSources::dimension (const symbol tag_symbol) const
   for (size_t i = 0; i < source.size (); i++)
     if (source[i]->title () == tag)
       return symbol (source[i]->dimension ());
-  daisy_assert (false);
+  daisy_notreached ();
 }
 
 bool 

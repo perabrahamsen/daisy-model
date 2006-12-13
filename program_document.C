@@ -226,7 +226,7 @@ ProgramDocument::print_entry_type (const std::string& name,
     case Syntax::Library:
     case Syntax::Error:
     default:
-      daisy_assert (false);
+      daisy_notreached ();
     };
 }
 
@@ -306,7 +306,7 @@ ProgramDocument::print_entry_category (const std::string& name,
 	  format->text ("Optional log variable");
 	}
       else 
-	daisy_assert (false);
+	daisy_notreached ();
     }
   else
     {
@@ -326,7 +326,7 @@ ProgramDocument::print_entry_category (const std::string& name,
 	  format->text ("Log variable");
 	}
       else 
-	daisy_assert (false);
+	daisy_notreached ();
     }
 }
 
@@ -432,7 +432,7 @@ ProgramDocument::print_entry_value (const std::string& name,
 	    break;
 	  case Syntax::Library:
 	  case Syntax::Error:
-	    daisy_assert (false);
+	    daisy_notreached ();
 	  }
       else
 	switch (type)
@@ -457,7 +457,7 @@ ProgramDocument::print_entry_value (const std::string& name,
 	    break;
 	  case Syntax::Library:
 	  case Syntax::Error:
-	    daisy_assert (false);
+	    daisy_notreached ();
 	  }
 
       if (print_default_value)
@@ -625,7 +625,7 @@ ProgramDocument::print_sample_entry (const std::string& name,
 	      break;
 	    case Syntax::Library:
 	    case Syntax::Error:
-	      daisy_assert (false);
+	      daisy_notreached ();
 	    }
 	else if (alist.size (name) == 0)
 	  {
@@ -660,7 +660,7 @@ ProgramDocument::print_sample_entry (const std::string& name,
 	      break;
 	    case Syntax::Library:
 	    case Syntax::Error:
-	      daisy_assert (false);
+	      daisy_notreached ();
 	    }
 	if (print_name)
 	  {

@@ -51,6 +51,7 @@ namespace Assertion
 		const std::string& msg);
   NORETURN void panic (const char* file, int line, const char* fun,
 	               const std::string& msg);
+  NORETURN void notreached (const char* file, int line, const char* fun);
   void non_negative (const char* file, int line, const char* fun,
 		     const std::vector<double>& v);
 
@@ -71,6 +72,8 @@ namespace Assertion
   Assertion::warning (__FILE__, __LINE__, __FUNCTION__, msg)
 #define daisy_panic(msg) \
   Assertion::panic (__FILE__, __LINE__, __FUNCTION__, msg)
+#define daisy_notreached() \
+  Assertion::notreached (__FILE__, __LINE__, __FUNCTION__)
 #define assert_non_negative(v) \
   Assertion::non_negative (__FILE__, __LINE__, __FUNCTION__, v)
 

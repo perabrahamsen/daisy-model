@@ -1,3 +1,19 @@
+2006-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* timestep.C: New submodel.
+	* Makefile (SUBMODELS): Added it.
+
+2006-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.h (output_lazy): New macro.
+	* column_std.C (output): Use it.
+	* bioincorporation.C (output): Ditto.
+
+	* assertion.C (notreached): New assertion.
+	* All: Use it.
+
+	* All: Removed timestep.h.
+
 2006-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* alist.C: Better panic messages.

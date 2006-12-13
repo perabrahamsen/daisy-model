@@ -59,7 +59,6 @@ struct LogExtern : public LogSelect,
   { return false; }
 
   // Self use.
-  using LogSelect::output;
   void output (Log&) const;
 
   // Select::Destination

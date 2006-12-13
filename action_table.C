@@ -189,10 +189,7 @@ ActionTable::doIt (Daisy& daisy, Treelog& msg)
           if (syntax != "mineral")
             {
               AttributeList new_time;
-              new_time.add ("year", daisy.time.year ());
-              new_time.add ("month", daisy.time.month ());
-              new_time.add ("mday", daisy.time.mday ());
-              new_time.add ("hour", daisy.time.hour ());
+              daisy.time.set_alist (new_time);
               fert.add ("creation", new_time);
             }
           daisy.field.fertilize (fert);

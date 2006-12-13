@@ -860,20 +860,14 @@ ColumnStandard::output (Log& log) const
 
   const double m2_per_cm2 = 0.0001;
   const double cm2_per_m2 = 1.0 / m2_per_cm2;
-  static const symbol N_symbol ("residuals_N_root");
-  if (log.check_leaf (N_symbol))
-    log.output (N_symbol,
-                geometry.total_surface (residuals_N_soil) * cm2_per_m2);
-  static const symbol C_symbol ("residuals_C_root");
-  if (log.check_leaf (C_symbol))
-    log.output (C_symbol,
-                geometry.total_surface (residuals_C_soil) * cm2_per_m2);
-  static const symbol surface_water_symbol ("surface_water");
-  if (log.check_leaf (surface_water_symbol))
-    log.output (surface_water_symbol, (bioclimate->get_intercepted_water ()
-                                       + bioclimate->get_snow_storage ()
-                                       + surface.ponding ()));
-
+  output_lazy (geometry.total_surface (residuals_N_soil) * cm2_per_m2,
+               "residuals_N_root", log);
+  output_lazy (geometry.total_surface (residuals_C_soil) * cm2_per_m2,
+               "residuals_C_root", log);
+  output_lazy (bioclimate->get_intercepted_water ()
+               + bioclimate->get_snow_storage ()
+               + surface.ponding (),
+               "surface_water", log);
   output_derived (movement, "Movement", log);
   output_derived (groundwater, "Groundwater", log);
 }

@@ -25,20 +25,20 @@ Crop::minimum_light_fraction () const
 #if 0
 double 
 Crop::water_stress () const
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 double 
 Crop::nitrogen_stress () const
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 #endif
 
 double 
 Crop::rs_min () const
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 double 
 Crop::rs_max () const
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 double 
 Crop::SimLAI () const

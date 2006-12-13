@@ -154,7 +154,7 @@ struct LocalOrder : public VCheck
 	  }
 	break;
       default:
-	daisy_assert (false);
+	daisy_notreached ();
       }
   }
 };
@@ -344,7 +344,7 @@ VCheck::SumEqual::check (const Syntax& syntax, const AttributeList& alist,
 	}
       break;
     default:
-      daisy_assert (false);
+      daisy_notreached ();
     }
 }
 
@@ -395,7 +395,7 @@ VCheck::StartValue::check (const Syntax& syntax, const AttributeList& alist,
 	}
       break;
     default:
-      daisy_assert (false);
+      daisy_notreached ();
     }
 }
 
@@ -449,7 +449,7 @@ VCheck::EndValue::check (const Syntax& syntax, const AttributeList& alist,
 	}
       break;
     default:
-      daisy_assert (false);
+      daisy_notreached ();
     }
 }
 
@@ -489,7 +489,7 @@ VCheck::FixedPoint::check (const Syntax& syntax, const AttributeList& alist,
 	}
       break;
     default:
-      daisy_assert (false);
+      daisy_notreached ();
     }
 }
 

@@ -86,7 +86,7 @@ Library::Implementation::lookup (const symbol key) const
   alist_map::const_iterator i = alists.find (key);
 
   if (i == alists.end ())
-    daisy_assert (false);
+    daisy_notreached ();
 
   return *(*i).second;
 }

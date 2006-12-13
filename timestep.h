@@ -1,6 +1,6 @@
-// timestep.h -- The global timestep.
+// timestep.h -- Time difference.
 // 
-// Copyright 2005 Per Abrahamsen and KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -21,6 +21,51 @@
 #ifndef TIMESTEP_H
 #define TIMESTEP_H
 
-const double dt = 1.0;	// time step.
+#include "time.h"
+#include <memory>
+
+class AttributeList;
+class Syntax;
+class Block;
+
+class Timestep
+{
+  // Content.
+private:
+  struct Implementation;
+  const std::auto_ptr<Implementation> impl;
+
+  // Extract elements.
+public:
+  int years () const;
+  int days () const;
+  int hours () const;
+  int minutes () const;
+  int seconds () const;
+
+  // Extract totals.
+public:
+  double total_hours () const;
+    
+  // Create.
+public:
+  static void load_syntax (Syntax&, AttributeList&);
+  explicit Timestep (Block&);
+  Timestep (int years, int days, int hours, int minutes, int seconds);
+  ~Timestep ();
+  Timestep (const Timestep&);
+private:                    
+  const Timestep& operator= (const Timestep&);
+};
+
+// Time operations.
+void operator+= (Time&, const Timestep&);
+
+Time operator+ (const Time&, const Timestep&);
+Time operator- (const Time&, const Timestep&);
+
+Timestep operator- (const Timestep& step);
+Timestep operator- (const Time&, const Time&);
+Timestep operator+ (const Timestep&, const Timestep&);
 
 #endif // TIMESTEP_H

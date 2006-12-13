@@ -68,7 +68,7 @@ Submodel::find_submodel (const Syntax& syntax,
       if (nested.check ("submodel"))
 	return nested.name ("submodel");
     }
-  daisy_assert (false);
+  daisy_notreached ();
 }
 
 void

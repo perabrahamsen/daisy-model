@@ -1,7 +1,8 @@
-// @ time.C
+// time.C
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
+// Copyright 1996-2001 Per Abrahamsen and Søren Hansen.
 // Copyright 2000-2001 KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -27,86 +28,100 @@
 #include "alist.h"
 #include "vcheck.h"
 #include "submodel.h"
-using namespace std;
 
-// @ Content.
+// Content.
 
 struct Time::Implementation
 {
   static const int mlen[];
-  static const string mname[];
-  static const string wname[];
+  static const std::string mname[];
+  static const std::string wname[];
   short year;
   short yday;
   char hour;  
-  Implementation (int, int, int);
+  char minute;
+  char second;
+  Implementation (int, int, int, int, int);
   Implementation (const Implementation&);
 };
 
 const int Time::Implementation::mlen[] =
 { -999, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
 
-const string Time::Implementation::mname[] =
+const std::string Time::Implementation::mname[] =
 { "Error", "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November" , "December" };
 
-const string Time::Implementation::wname[] =
+const std::string Time::Implementation::wname[] =
 { "Error", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
   "Saturday", "Sunday" };
 
-Time::Implementation::Implementation (int y, int d, int h)
-  : year (short (y)), yday (short (d)), hour (char (h))
+Time::Implementation::Implementation (int y, int d, int h, int m, int s)
+  : year (static_cast<short> (y)),
+    yday (static_cast<short> (d)),
+    hour (static_cast<char> (h)),
+    minute (static_cast<char> (m)),
+    second (static_cast<char> (s))
 { }
 
 Time::Implementation::Implementation (const Implementation& i)
-  : year (i.year), yday (i.yday), hour (i.hour)
+  : year (i.year),
+    yday (i.yday),
+    hour (i.hour), 
+    minute (i.minute), 
+    second (i.second)
 { }
 
 // @ Extract.
 
 int
 Time::year () const
-{
-  return impl.year;
-}
+{ return impl->year; }
 
 int
 Time::month () const
-{
-  return yday2month (impl.year, impl.yday);
-}
+{ return yday2month (impl->year, impl->yday); }
 
 int
 Time::week () const
-{
-  return yday2week (impl.year, impl.yday);
-}
+{ return yday2week (impl->year, impl->yday); }
 
 int
 Time::yday () const
-{
-  return impl.yday;
-}
+{ return impl->yday; }
 
 int
 Time::mday () const
-{
-  return yday2mday (impl.year, impl.yday);
-}
+{ return yday2mday (impl->year, impl->yday); }
 
 int
 Time::wday () const
-{
-  return yday2wday (impl.year, impl.yday);
-}
+{ return yday2wday (impl->year, impl->yday); }
 
 int
 Time::hour () const
+{ return impl->hour; }
+
+int
+Time::minute () const
+{ return impl->minute; }
+
+int
+Time::second () const
+{ return impl->second; }
+
+void 
+Time::set_alist (AttributeList& alist) const
 {
-  return impl.hour;
+  alist.add ("year", year ());
+  alist.add ("month", month ());
+  alist.add ("mday", mday ());
+  alist.add ("hour", hour ());
+  alist.add ("minute", minute ());
+  alist.add ("second", second ());
 }
 
-// @ Simulate. 
+// Simulate. 
 
 void 
 Time::output (Log& log) const
@@ -120,74 +135,123 @@ Time::output (Log& log) const
   output_value (hour (), "hour", log);
 }
 
+int
+Time::tick_generic (const int amount, const int limit, 
+                    void (Time::*next) (int), const int old)
+{
+  const long int sum = old + amount;
+  if (sum >= limit)
+    {
+      int div = sum / limit;
+      int mod = sum % limit;
+      daisy_assert (sum == div * limit + mod);
+      (this->*next) (div);
+      return mod;
+    }
+  if (sum < 0)
+    {
+      // My hopeless way to implement protable div/mod for negative integers.
+      int div = -((-sum) / limit + 1);
+      int mod = limit - (-sum) % limit;
+      if (mod == limit)
+        {
+          div += 1;
+          mod = 0;
+        }
+      daisy_assert (sum == div * limit + mod);
+      (this->*next) (div);
+      return mod;
+      
+    }
+  else
+    return sum;
+}
+
+void
+Time::tick_second (int seconds)
+{ impl->second 
+    = tick_generic (seconds, 60, &Time::tick_minute, impl->second); }
+
+void
+Time::tick_minute (int minutes)
+{ impl->minute
+    = tick_generic (minutes, 60, &Time::tick_hour, impl->minute); }
+
+void
+Time::tick_hour (int hours)
+{ impl->hour
+    = tick_generic (hours, 24, &Time::tick_day, impl->hour); }
+
+#if 0
 void 
 Time::tick_hour (int hours)
 {
   for (; hours > 0; --hours)
-    if (impl.hour < 23)
-      impl.hour++;
+    if (impl->hour < 23)
+      impl->hour++;
     else
       {
-	impl.hour = 0;
+	impl->hour = 0;
 	tick_day (1);
       }
   for (; hours < 0; ++hours)
-    if (impl.hour > 0)
-      impl.hour--;
+    if (impl->hour > 0)
+      impl->hour--;
     else
       {
-	impl.hour = 23;
+	impl->hour = 23;
 	tick_day (-1);
       }
 }
+#endif
 
 void 
 Time::tick_day (int days)
 {
   for (; days > 0; --days)
-    switch (impl.yday)
+    switch (impl->yday)
       {
       case 365:
-	if (leap (impl.year))
+	if (leap (impl->year))
 	  {
-	    impl.yday++;
+	    impl->yday++;
 	    return;
 	  }
 	/* fallthrough */
       case 366:
-	impl.yday = 1;
-	impl.year++;
+	impl->yday = 1;
+	impl->year++;
 	break;
       default:
-	impl.yday++;
+	impl->yday++;
       }
   for (; days < 0; ++days)
-    if (impl.yday > 1)
-      impl.yday--;
+    if (impl->yday > 1)
+      impl->yday--;
     else
       {
-	impl.year--;
-	if (leap (impl.year))
-	  impl.yday = 366;
+	impl->year--;
+	if (leap (impl->year))
+	  impl->yday = 366;
 	else
-	  impl.yday = 365;
+	  impl->yday = 365;
       }
 }
 
 void
 Time::tick_year (int years)
-{ impl.year += static_cast<short> (years); }
+{ impl->year += static_cast<short> (years); }
 
 // @ Convert.
 
-string
+std::string
 Time::month_name (int month)
 {
   daisy_assert (month >= 1 && month <= 12);
   return Implementation::mname[month];
 }
 
-string
+std::string
 Time::wday_name (int wday)
 {
   daisy_assert (wday >= 1 && wday <= 7);
@@ -195,21 +259,21 @@ Time::wday_name (int wday)
 }
 
 int
-Time::month_number (string name)
+Time::month_number (std::string name)
 {
   for (int month = 1; month <= 12; month++)
     if (Implementation::mname[month] == name)
       return month;
-  throw invalid_argument ("Time::month_number");
+  daisy_notreached ();
 }
 
 int
-Time::wday_number (string name)
+Time::wday_number (std::string name)
 {
   for (int wday = 1; wday <= 7; wday++)
     if (Implementation::wname[wday] == name)
       return wday;
-  throw invalid_argument ("Time::wday_number");
+  daisy_notreached ();
 }
 
 int
@@ -276,7 +340,7 @@ Time::month_length (int year, int month)
 }
 
 bool 
-Time::valid (int year, int month, int mday, int hour)
+Time::valid (int year, int month, int mday, int hour, int minute, int second)
 {
   if (1 > year || year > 9999)
     return false;
@@ -285,6 +349,10 @@ Time::valid (int year, int month, int mday, int hour)
   if (1 > mday || mday > Time::month_length (year, month))
     return false;
   if (0 > hour || hour > 23)
+    return false;
+  if (0 > minute || minute > 60)
+    return false;
+  if (0 > second || second > 60)
     return false;
 
   return true;
@@ -333,8 +401,10 @@ static bool check_alist (const AttributeList& al, Treelog& msg)
   const int month = al.integer ("month");
   const int mday = al.integer ("mday");
   const int hour = al.integer ("hour");
+  const int minute = al.integer ("minute");
+  const int second = al.integer ("second");
 
-  if (!Time::valid (year, month, mday, hour))
+  if (!Time::valid (year, month, mday, hour, minute, second))
     {
       msg.error ("Invalid date");
       ok = false;
@@ -361,6 +431,13 @@ Time::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_check ("hour", hh);
   alist.add ("hour", 0);
   syntax.order ("year", "month", "mday", "hour");
+  syntax.add ("minute", Syntax::Integer, Syntax::State, "Current minute.");
+  static VCheck::IRange ss (0, 59);
+  syntax.add_check ("minute", ss);
+  alist.add ("minute", 0);
+  syntax.add ("second", Syntax::Integer, Syntax::State, "Current second.");
+  syntax.add_check ("second", ss);
+  alist.add ("second", 0);
   syntax.add ("week", Syntax::Integer, Syntax::LogOnly, "Current week.");
   syntax.add ("yday", Syntax::Integer, Syntax::LogOnly, "Current Julian day.");
   syntax.add ("wday", Syntax::String, Syntax::LogOnly, "Current weekday.\n\
@@ -368,11 +445,13 @@ Monday is 1, Sunday is 7.");
 }
 
 Time::Time (const AttributeList& al)
-  : impl (*new Implementation (al.integer ("year"), 
-			       mday2yday (al.integer ("year"),
-					  al.integer ("month"),
-					  al.integer ("mday")),
-			       al.integer ("hour")))
+  : impl (new Implementation (al.integer ("year"), 
+                              mday2yday (al.integer ("year"),
+                                         al.integer ("month"),
+                                         al.integer ("mday")),
+                              al.integer ("hour"),
+                              al.integer ("minute"),
+                              al.integer ("second")))
 { }
 
 static Submodel::Register 
@@ -384,78 +463,80 @@ time_submodel ("Time", Time::load_syntax);
 const Time& 
 Time::operator= (const Time& t)
 {
-  this->impl = t.impl;
+  *(this->impl) = *(t.impl);
   return *this;
 }
 
-Time::Time (int y, int m, int md, int h)
-  : impl (*new Implementation (y, mday2yday (y, m, md), h))
+Time::Time (int y, int mo, int md, int h, int mi, int s)
+  : impl (new Implementation (y, mday2yday (y, mo, md), h, mi, s))
 { 
-  daisy_assert (m > 0 && m < 13);
-  daisy_assert (md > 0 && m == month ());
+  daisy_assert (mo > 0 && mo < 13);
+  daisy_assert (md > 0 && mo == month ());
   daisy_assert (h >= 0 && h < 24);
+  daisy_assert (mi >= 0 && mi < 60);
+  daisy_assert (s >= 0 && s < 60);
 }
     
-Time::Time (const Time&t)
-  : impl (*new Implementation (t.impl))
-{
-}
+Time::Time (const Time& t)
+  : impl (new Implementation (*t.impl))
+{ }
 
 Time::~Time ()
-{
-  delete &impl;
-}
+{ }
 
-// @ Operators.
+// Operators.
 
 bool 
 Time::operator== (const Time& other) const
-{
-  return (impl.year == other.impl.year)
-    && (impl.yday == other.impl.yday)
-    && (impl.hour == other.impl.hour);
-}
+{ return (impl->year == other.impl->year)
+    && (impl->yday == other.impl->yday)
+    && (impl->hour == other.impl->hour)
+    && (impl->minute == other.impl->minute)
+    && (impl->second == other.impl->second); }
 
 bool
 Time::operator!= (const Time& other) const
-{
-  return !(*this == other);
-}
+{ return !(*this == other); }
     
 bool
 Time::operator<  (const Time& other) const
-{
-  if (impl.year < other.impl.year)
+{ 
+  if (impl->year < other.impl->year)
     return true;
-  if (impl.year > other.impl.year)
+  if (impl->year > other.impl->year)
     return false;
-  if (impl.yday < other.impl.yday)
+  if (impl->yday < other.impl->yday)
     return true;
-  if (impl.yday > other.impl.yday)
+  if (impl->yday > other.impl->yday)
     return false;
-  if (impl.hour < other.impl.hour)
+  if (impl->hour < other.impl->hour)
     return true;
+  if (impl->hour > other.impl->hour)
+    return false;
+  if (impl->minute < other.impl->minute)
+    return true;
+  if (impl->minute > other.impl->minute)
+    return false;
+  if (impl->second < other.impl->second)
+    return true;
+#if 0
+  if (impl->second > other.impl->second)
+    return false;
+#endif
   return false;
-
 }
 
 bool
 Time::operator<= (const Time& other) const
-{
-  return *this == other || *this < other;
-}
+{ return *this == other || *this < other; }
 
 bool
 Time::operator>= (const Time& other) const
-{
-  return !(*this < other);
-}
+{ return !(*this < other); }
 
 bool
 Time::operator>  (const Time& other) const
-{
-  return !(*this <= other);
-}
+{ return !(*this <= other); }
 
 bool 
 Time::between (const Time& from, const Time& to) const

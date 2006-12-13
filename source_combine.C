@@ -49,7 +49,7 @@ public:
   const std::vector<double>& value () const
   { return values; }
   const std::vector<double>& ebar () const
-  { daisy_assert (false); }
+  { daisy_notreached (); }
   const std::string& title () const
   { return title_; }
   symbol dimension () const 

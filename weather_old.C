@@ -134,11 +134,11 @@ WeatherOld::put_precipitation (double prec)
 
 void 
 WeatherOld::put_air_temperature (double)
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 void 
 WeatherOld::put_reference_evapotranspiration (double)
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 void
 WeatherOld::put_global_radiation (double radiation) // [W/m²]

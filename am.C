@@ -644,10 +644,7 @@ AM::create (const size_t cell_size, const Time& time,
   AttributeList al;
   al.add ("type", "state");
   AttributeList new_time;
-  new_time.add ("year", time.year ());
-  new_time.add ("month", time.month ());
-  new_time.add ("mday", time.mday ());
-  new_time.add ("hour", time.hour ());
+  time.set_alist (new_time);
   al.add ("creation", new_time);
   al.add ("name", sort + "/" + part);
   al.add ("om", ol);
@@ -924,9 +921,9 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
       add (C, N);
     }
   else if (syntax == "mineral")
-    daisy_assert (false);
+    daisy_notreached ();
   else if (syntax == "crop")
-    daisy_assert (false);
+    daisy_notreached ();
   else if (syntax == "initial")
     {
       const vector<AttributeList*>& oms = alist.alist_sequence ("om");

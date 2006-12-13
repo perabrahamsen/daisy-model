@@ -210,9 +210,7 @@ Bioincorporation::Implementation::tick (const Geometry& geo,
 void 
 Bioincorporation::Implementation::output (Log& log) const
 { 
-  static const symbol CO2_symbol ("CO2");
-  if (log.check_leaf (CO2_symbol))
-    output_value (respiration * C_removed, "CO2", log);
+  output_value (respiration * C_removed, "CO2", log);
   output_value (C_removed * C_to_DM, "DM", log);
   output_variable (C_removed, log);
   output_variable (N_removed, log);

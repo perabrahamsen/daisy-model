@@ -110,55 +110,55 @@ struct LogHarvest : public Log
   }
 
   void done (const Time&)
-  { daisy_assert (false); }
+  { daisy_notreached (); }
 
   // Normal items.
   void open (symbol)
-  { daisy_assert (false); }
+  { daisy_notreached (); }
   void close ()
-  { daisy_assert (false); }
+  { daisy_notreached (); }
 
   // Unnamed items.
   void open_unnamed ()
-  { daisy_assert (false); }
+  { daisy_notreached (); }
   void close_unnamed ()
-  { daisy_assert (false); }
+  { daisy_notreached (); }
 
   // Derived items.
   void open_derived (symbol, symbol)
-  { daisy_assert (false); }
+  { daisy_notreached (); }
   void close_derived ()
-  { daisy_assert (false); }
+  { daisy_notreached (); }
 
   // Derived items with their own alist
   void open_object (symbol, symbol, const AttributeList&)
-  { daisy_assert (false); }
+  { daisy_notreached (); }
   void close_object ()
-  { daisy_assert (false); }
+  { daisy_notreached (); }
 
   // Derived items in a list.
   void open_entry (symbol, const AttributeList&)
-  { daisy_assert (false); }
+  { daisy_notreached (); }
   void close_entry ()
-  { daisy_assert (false); }
+  { daisy_notreached (); }
 
   // Named derived items in a list.
   void open_named_entry (symbol, symbol, const AttributeList&)
-  { daisy_assert (false); }
+  { daisy_notreached (); }
   void close_named_entry ()
-  { daisy_assert (false); }
+  { daisy_notreached (); }
 
-  void output (symbol, bool)
+  void output_entry (symbol, bool)
   { }
-  void output (symbol, double)
+  void output_entry (symbol, double)
   { }
-  void output (symbol, int)
+  void output_entry (symbol, int)
   { }
-  void output (symbol, symbol)
+  void output_entry (symbol, symbol)
   { }
-  void output (symbol, const vector<double>&)
+  void output_entry (symbol, const vector<double>&)
   { }
-  void output (symbol, const PLF&)
+  void output_entry (symbol, const PLF&)
   { }
 
   // Create and Destroy.

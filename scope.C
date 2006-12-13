@@ -30,9 +30,9 @@ struct ScopeNull : public Scope
   bool has_number (symbol) const
   { return false; }
   double number (symbol) const
-  { daisy_assert (false); }
+  { daisy_notreached (); }
   symbol dimension (symbol) const
-  { daisy_assert (false); }
+  { daisy_notreached (); }
 
   // Create and Destroy.
   ScopeNull ()

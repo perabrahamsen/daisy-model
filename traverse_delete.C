@@ -128,7 +128,7 @@ TraverseDelete::enter_submodel_default (const Syntax&, const AttributeList&,
 
 void
 TraverseDelete::leave_submodel_default ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool
 TraverseDelete::enter_submodel_sequence (const Syntax&,
@@ -149,7 +149,7 @@ TraverseDelete::enter_submodel_sequence_default (const Syntax&,
 
 void
 TraverseDelete::leave_submodel_sequence_default ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool
 TraverseDelete::enter_object (const Library& library, 

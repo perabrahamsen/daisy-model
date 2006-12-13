@@ -31,11 +31,11 @@
 
 bool 
 LogSelect::check_leaf (symbol) const
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool 
 LogSelect::check_interior (symbol) const
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool 
 LogSelect::check_derived (symbol field, symbol /* name */,
@@ -83,11 +83,11 @@ LogSelect::initial_done (const Time&)
 
 void 
 LogSelect::open (symbol)
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 void 
 LogSelect::close ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 void 
 LogSelect::open_unnamed ()
@@ -149,28 +149,28 @@ LogSelect::close_named_entry ()
 { close (); }
 
 void 
-LogSelect::output (symbol, const bool)
-{ daisy_assert (false); }
+LogSelect::output_entry (symbol, const bool)
+{ daisy_notreached (); }
 
 void 
-LogSelect::output (symbol, const double)
-{ daisy_assert (false); }
+LogSelect::output_entry (symbol, const double)
+{ daisy_notreached (); }
 
 void 
-LogSelect::output (symbol, const int)
-{ daisy_assert (false); }
+LogSelect::output_entry (symbol, const int)
+{ daisy_notreached (); }
 
 void 
-LogSelect::output (symbol, const symbol)
-{ daisy_assert (false); }
+LogSelect::output_entry (symbol, const symbol)
+{ daisy_notreached (); }
 
 void 
-LogSelect::output (symbol, const std::vector<double>&)
-{ daisy_assert (false); }
+LogSelect::output_entry (symbol, const std::vector<double>&)
+{ daisy_notreached (); }
 
 void 
-LogSelect::output (symbol, const PLF&)
-{ daisy_assert (false); }
+LogSelect::output_entry (symbol, const PLF&)
+{ daisy_notreached (); }
 
 bool 
 LogSelect::check (const Border& border, Treelog& err) const

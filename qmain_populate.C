@@ -415,7 +415,7 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	order = 8888;
     }
   else
-    daisy_assert (false);
+    daisy_notreached ();
 
   if (syntax.is_optional (parameter))
     category_name += " (opt)";
@@ -523,7 +523,7 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
       return false;
     case Syntax::Error:
     default:
-      daisy_assert (false);
+      daisy_notreached ();
     }
 
   // Size specific changes.

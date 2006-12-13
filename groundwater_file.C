@@ -47,7 +47,7 @@ private:
 public:
   bottom_t bottom_type () const;
   double q_bottom () const
-  { daisy_assert (false); }
+  { daisy_notreached (); }
 
   // Simulation.
 public:

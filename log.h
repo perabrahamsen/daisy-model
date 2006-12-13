@@ -238,12 +238,12 @@ private:
 
   // The data.
 public:
-  virtual void output (symbol, bool) = 0;
-  virtual void output (symbol, double) = 0;
-  virtual void output (symbol, int) = 0;
-  virtual void output (symbol, symbol) = 0;
-  virtual void output (symbol, const std::vector<double>&) = 0;
-  virtual void output (symbol, const PLF&) = 0;
+  virtual void output_entry (symbol, bool) = 0;
+  virtual void output_entry (symbol, double) = 0;
+  virtual void output_entry (symbol, int) = 0;
+  virtual void output_entry (symbol, symbol) = 0;
+  virtual void output_entry (symbol, const std::vector<double>&) = 0;
+  virtual void output_entry (symbol, const PLF&) = 0;
 
   // Keep track of geometry for logging arrays.
 public:
@@ -296,11 +296,19 @@ static Librarian<Log> Log_init ("log");
 #define output_value(value, key, log)\
 do { \
   static const symbol MACRO_name (key); \
-  (log).output (MACRO_name, (value)); \
+  (log).output_entry (MACRO_name, (value)); \
 } while (false)
 
 // Shorthand for when the C++ and log variable are named the same.
 #define output_variable(var, log) output_value (var, #var, log)
+
+#define output_lazy(value, key, log)\
+do { \
+  static const symbol MACRO_name (key); \
+  Log& MACRO_log = (log); \
+  if (MACRO_log.check_leaf (MACRO_name)) \
+    MACRO_log.output_entry (MACRO_name, (value)); \
+} while (false)
 
 // Output an alist.
 #define output_submodule(submodule, key, log)\

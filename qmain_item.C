@@ -78,47 +78,47 @@ TreeItem::container (string& component, string& parameterization)
 
 void
 TreeItem::edit_edit ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool
 TreeItem::edit_raw ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool
 TreeItem::edit_after ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool
 TreeItem::edit_child ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool
 TreeItem::edit_copy ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool
 TreeItem::edit_inherit ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool
 TreeItem::edit_delete ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 void
 TreeItem::view_selected ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 void 
 TreeItem::view_check ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool 
 TreeItem::toggle_view_defaults ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 void 
 TreeItem::view_dependencies ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 TreeItem::TreeItem (TreeItem* i,
 		    const QString& e, const QString& t, 
@@ -341,7 +341,7 @@ AListItem::edit_item (TreeItem* item)
       recreate_item (item);
       return true;
     }
-  daisy_assert (false);
+  daisy_notreached ();
 }
 
 bool
@@ -546,7 +546,7 @@ Really delete?",
 	case 1:
 	  return false;
 	default:
-	  daisy_assert (false);
+	  daisy_notreached ();
 	}
     }
   remove_dependencies (symbol (component), symbol (model));
@@ -686,7 +686,7 @@ SimulationItem::set_selected ()
 
 bool
 SimulationItem::edit_delete ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 QString 
 SimulationItem::key (int, bool) const

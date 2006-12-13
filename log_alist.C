@@ -195,7 +195,7 @@ LogAList::open (const symbol name)
 		    syntax ().default_alist (sname));
 	      break;
 	    default:
-	      daisy_assert (false);
+	      daisy_notreached ();
 	    }
 	  // We know how to handle this, continue.
 	  return;
@@ -243,7 +243,7 @@ LogAList::close ()
 	      delete &old_alist;
 	      break;
 	    default:
-	      daisy_assert (false);
+	      daisy_notreached ();
 	    }
 	}
     }
@@ -402,7 +402,7 @@ LogAList::close_named_entry ()
 { close_entry (); }
 
 void
-LogAList::output (symbol name, const bool value)
+LogAList::output_entry (symbol name, const bool value)
 { 
   if (!is_active)
     return;
@@ -413,7 +413,7 @@ LogAList::output (symbol name, const bool value)
 }
 
 void
-LogAList::output (symbol name, const double value)
+LogAList::output_entry (symbol name, const double value)
 { 
   if (!is_active)
     return;
@@ -424,7 +424,7 @@ LogAList::output (symbol name, const double value)
 }
 
 void
-LogAList::output (symbol name, const int value)
+LogAList::output_entry (symbol name, const int value)
 { 
   if (!is_active)
     return;
@@ -435,7 +435,7 @@ LogAList::output (symbol name, const int value)
 }
 
 void
-LogAList::output (symbol name, symbol value)
+LogAList::output_entry (symbol name, symbol value)
 { 
   if (!is_active)
     return;
@@ -446,7 +446,7 @@ LogAList::output (symbol name, symbol value)
 }
 
 void
-LogAList::output (symbol name, const vector<double>& value)
+LogAList::output_entry (symbol name, const vector<double>& value)
 { 
   if (!is_active)
     return;
@@ -457,7 +457,7 @@ LogAList::output (symbol name, const vector<double>& value)
 }
 
 void
-LogAList::output (symbol name, const PLF& value)
+LogAList::output_entry (symbol name, const PLF& value)
 { 
   if (!is_active)
     return;

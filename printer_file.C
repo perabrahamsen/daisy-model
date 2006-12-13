@@ -125,7 +125,7 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
     case Syntax::Library:
     case Syntax::Error:
     default:
-      daisy_assert (false);
+      daisy_notreached ();
     } 
 }
 

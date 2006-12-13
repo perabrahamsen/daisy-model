@@ -130,6 +130,10 @@ Assertion::panic (const char* file, int line, const char* fun,
 }
 
 void 
+Assertion::notreached (const char* file, int line, const char* fun)
+{ panic (file, line, fun, "This line should never have been reached"); }
+
+void 
 Assertion::non_negative (const char* file, int line, const char* fun,
 			 const std::vector<double>& v)
 {

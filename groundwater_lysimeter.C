@@ -34,7 +34,7 @@ public:
   bottom_t bottom_type () const
   { return lysimeter; }
   double q_bottom () const
-  { daisy_assert (false); }
+  { daisy_notreached (); }
   bool is_lysimeter () const
   { return true; }
 

@@ -94,13 +94,12 @@ struct LogAList : public Log
   void close_named_entry ();
 
   // Logging.
-  using Log::output;
-  void output (symbol name, bool value);
-  void output (symbol name, double value);
-  void output (symbol name, int value);
-  void output (symbol name, symbol value);
-  void output (symbol name, const std::vector<double>& value);
-  void output (symbol name, const PLF& value);
+  void output_entry (symbol name, bool value);
+  void output_entry (symbol name, double value);
+  void output_entry (symbol name, int value);
+  void output_entry (symbol name, symbol value);
+  void output_entry (symbol name, const std::vector<double>& value);
+  void output_entry (symbol name, const PLF& value);
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);

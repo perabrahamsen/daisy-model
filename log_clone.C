@@ -27,19 +27,19 @@
 
 bool
 LogClone::match (const Daisy&, Treelog&)
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool 
 LogClone::check_leaf (symbol) const
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool 
 LogClone::check_interior (symbol) const
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 void
 LogClone::done (const Time&)
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 const AttributeList& 
 LogClone::result ()

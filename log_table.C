@@ -235,7 +235,7 @@ LogTable::common_done (const Time& time)
 	  }
 	  break;
 	default:
-	  daisy_assert (false);
+	  daisy_notreached ();
 	}
     }
   out << record_separator;

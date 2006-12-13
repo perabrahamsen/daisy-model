@@ -137,10 +137,7 @@ LogCheckpoint::done (const Time&)
       Time time (alist ().alist ("time"));
       time.tick_hour ();
       AttributeList new_time;
-      new_time.add ("year", time.year ());
-      new_time.add ("month", time.month ());
-      new_time.add ("mday", time.mday ());
-      new_time.add ("hour", time.hour ());
+      time.set_alist (new_time);
       alist ().add ("time", new_time);
 
       // Print content.

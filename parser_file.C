@@ -971,7 +971,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    skip_to_end ();
 	    break;
 	  default:
-	    daisy_assert (false);
+	    daisy_notreached ();
 	  }
       else
 	{

@@ -94,13 +94,12 @@ struct LogSelect : public Log
 			 const AttributeList&);
   void close_named_entry ();
 
-  using Log::output;
-  void output (symbol name, bool);
-  void output (symbol name, double);
-  void output (symbol name, int);
-  void output (symbol name, symbol);
-  void output (symbol name, const std::vector<double>&);
-  void output (symbol name, const PLF&);
+  void output_entry (symbol name, bool);
+  void output_entry (symbol name, double);
+  void output_entry (symbol name, int);
+  void output_entry (symbol name, symbol);
+  void output_entry (symbol name, const std::vector<double>&);
+  void output_entry (symbol name, const PLF&);
 
   // Create and Destroy.
   bool check (const Border&, Treelog& err) const;

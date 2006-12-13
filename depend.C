@@ -180,7 +180,7 @@ TraverseDepend::enter_submodel_default (const Syntax&, const AttributeList&,
 
 void
 TraverseDepend::leave_submodel_default ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool
 TraverseDepend::enter_submodel_sequence (const Syntax&,
@@ -206,7 +206,7 @@ TraverseDepend::enter_submodel_sequence_default (const Syntax&,
 
 void
 TraverseDepend::leave_submodel_sequence_default ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool
 TraverseDepend::enter_object (const Library& library, 

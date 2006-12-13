@@ -113,7 +113,7 @@ TraverseXRef::use_submodel (const string& submodel)
       break;
     case is_invalid:
     default:
-      daisy_assert (false);
+      daisy_notreached ();
     }
   
 }
@@ -137,7 +137,7 @@ TraverseXRef::use_component (const Library& library)
       break;
     case is_invalid:
     default:
-      daisy_assert (false);
+      daisy_notreached ();
     }
   
 }
@@ -161,7 +161,7 @@ TraverseXRef::use_model (const Library& library, const symbol model)
       break;
     case is_invalid:
     default:
-      daisy_assert (false);
+      daisy_notreached ();
     }
   
 }
@@ -282,7 +282,7 @@ TraverseXRef::enter_object (const Library& library,
 
 void
 TraverseXRef::leave_object ()
-{ daisy_assert (false); }
+{ daisy_notreached (); }
 
 bool
 TraverseXRef::enter_object_sequence (const Library& library, 

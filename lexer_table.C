@@ -226,7 +226,7 @@ LexerTable::get_entry () const
       break;
     default:
       // Multi-character field seperator.
-      daisy_assert (false);
+      daisy_notreached ();
     }
 
   // Find it.

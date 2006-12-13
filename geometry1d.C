@@ -74,7 +74,7 @@ Geometry1D::interval_plus (double z) const
       if (zplus (i) <= z)
 	return i;
     }
-  daisy_assert (false);
+  daisy_notreached ();
 }
 
 size_t

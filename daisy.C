@@ -31,25 +31,24 @@
 #include "field.h"
 #include "harvest.h"
 #include "action.h"
+#include "timestep.h"
 #include "library.h"
 #include "syntax.h"
 #include "condition.h"
 #include "alist.h"
 #include "submodeler.h"
 #include "column.h"
-#include "timestep.h"
+#include "mathlib.h"
 #include "memutils.h"
 #include <sstream>
-
-using namespace std;
 
 const char *const Daisy::default_description = "\
 The Daisy crop/soil/atmosphere model.";
 
-const vector<Log*> 
-Daisy::find_active_logs (const vector<Log*>& logs, LogAll& log_all)
+const std::vector<Log*> 
+Daisy::find_active_logs (const std::vector<Log*>& logs, LogAll& log_all)
 {
-  vector<Log*> result;
+  std::vector<Log*> result;
 
   for (size_t i = 0; i < logs.size (); i++)
     if (!dynamic_cast<LogSelect*> (logs[i]))
@@ -72,6 +71,10 @@ Daisy::Daisy (Block& al)
     activate_output (Librarian<Condition>::build_item (al, "activate_output")),
     print_time (Librarian<Condition>::build_item (al, "print_time")),
     time (al.alist ("time")),
+    timestep (al.check ("timestep") 
+              ? submodel<Timestep> (al, "timestep")
+              : new Timestep (0, 0, 1, 0, 0)),
+    dt (timestep->total_hours ()),
     stop (al.check ("stop")
 	  ? Time (al.alist ("stop")) 
 	  : Time (9999, 1, 1, 1)),
@@ -90,6 +93,14 @@ Daisy::check (Treelog& err)
   daisy_assert (global_alist);
   bool ok = true;
 
+  if (!approximate (dt, 1.0))
+    {
+      std::ostringstream tmp;
+      tmp << "Daisy only works with a timestep of 1 hour, you specified " 
+          << dt << " hours";
+      err.warning (tmp.str ());
+    }
+
   // Check weather.
   {
     Treelog::Open nest (err, "weather");
@@ -106,7 +117,7 @@ Daisy::check (Treelog& err)
   // Check logs.
   {
     Treelog::Open nest (err, "output");
-    for (vector<Log*>::const_iterator i = logs.begin ();
+    for (std::vector<Log*>::const_iterator i = logs.begin ();
 	 i != logs.end ();
 	 i++)
       {
@@ -138,8 +149,7 @@ Daisy::initial_logs (Treelog& out)
 	{
 	  out.message ("Start logging");
 	  // get initial values for previous day.
-	  Time previous (time);
-	  previous.tick_hour (-1);
+	  Time previous = time - *timestep;
 	  for (size_t i = 0; i < active_logs.size (); i++)
 	    {
 	      Log& log = *active_logs[i];
@@ -204,7 +214,7 @@ Daisy::tick (Treelog& out)
 
   tick_columns (out);
   tick_logs (out);
-  time.tick_hour ();
+  time += *timestep;
   
   if (time >= stop)
     running = false;
@@ -301,6 +311,10 @@ Good values for this parameter would be hourly, daily or monthly.");
 the simulation.");
   syntax.add_submodule ("time", alist, Syntax::State,
 			"Current time in the simulation.", Time::load_syntax);
+  syntax.add_submodule ("timestep", alist, Syntax::OptionalState,
+			"Length of timestep in simlation.\n\
+The default value is 1 hour, anything else is unlikely to work.",
+                        Timestep::load_syntax);
   syntax.add_submodule ("stop", alist, Syntax::OptionalConst,
 			"Latest time where the simulation stops.\n\
 By default, the simulation will run until the manager request it to stop.",
@@ -316,7 +330,7 @@ the simulation.  Can be overwritten by column specific weather.");
   syntax.add_submodule_sequence ("harvest", Syntax::State, 
 				 "Total list of all crop yields.",
 				 Harvest::load_syntax);
-  alist.add ("harvest", vector<AttributeList*> ());
+  alist.add ("harvest", std::vector<AttributeList*> ());
 }
 
 Daisy::~Daisy ()
