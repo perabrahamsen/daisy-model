@@ -37,8 +37,6 @@
 #include <sstream>
 #include "check.h"
 
-using namespace std;
-
 struct Surface::Implementation
 {
   // Content.
@@ -114,7 +112,7 @@ Surface::q_top (const Geometry& geo, const size_t edge, const double dt) const
   if (impl.ridge_)
     return -impl.ridge_->h () / dt;
   else
-    return -ponding () * 0.1;		// mm -> cm.
+    return -ponding () * 0.1 / dt;		// mm -> cm.
 }
   
 double
@@ -124,7 +122,8 @@ Surface::h_top (const Geometry& geo, size_t edge, double dt) const
 }
 
 void
-Surface::accept_top (double water /* cm */, const Geometry& geo, size_t edge, 
+Surface::accept_top (double water /* [cm] */,
+                     const Geometry& geo, size_t edge, 
                      double dt, Treelog& msg)
 { 
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
@@ -148,11 +147,11 @@ Surface::last_cell (const Geometry& geo, size_t edge) const
 void
 Surface::update_water (const Geometry1D& geo,
                        const Soil& soil,
-		       const vector<double>& S_,
-		       vector<double>& h_,
-		       vector<double>& Theta_,
-		       vector<double>& q,
-		       const vector<double>& q_p, 
+		       const std::vector<double>& S_,
+		       std::vector<double>& h_,
+		       std::vector<double>& Theta_,
+		       std::vector<double>& q,
+		       const std::vector<double>& q_p, 
                        const double dt)
 {
   if (impl.ridge_)
@@ -209,10 +208,10 @@ Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */,
   if (!total_matter_flux && pond > 1e-6 && R_mixing > 0.0)
     {
       // [g/cm^2/h] = ([g/cm^2/mm] - [g/cm^2] / [mm]) / [h/mm]
-      im_flux.NO3 = max (-im.NO3 / dt,
-			 (soil_im.NO3 - im.NO3 / pond) / R_mixing);
-      im_flux.NH4 = max (-im.NH4 / dt,
-			 (soil_im.NH4 - im.NH4 / pond) / R_mixing);
+      im_flux.NO3 = std::max (-im.NO3 / dt,
+                              (soil_im.NO3 - im.NO3 / pond) / R_mixing);
+      im_flux.NH4 = std::max (-im.NH4 / dt,
+                              (soil_im.NH4 - im.NH4 / pond) / R_mixing);
       im += im_flux * dt;
     }
   else
@@ -234,7 +233,7 @@ Surface::Implementation::mixture (const Geometry& geo,
 }
 
 void
-Surface::Implementation::exfiltrate (double water /* [mm] */, 
+Surface::Implementation::exfiltrate (const double water /* [mm] */, 
                                      const double dt /* [h] */, Treelog& msg)
 {
   if (lake >= 0.0)
@@ -246,18 +245,18 @@ Surface::Implementation::exfiltrate (double water /* [mm] */,
   // Exfiltration.
   if (water >= 0)
     {
-      pond += water * dt;
+      pond += water;
       return;
     }
 
   Treelog::Open nest (msg, "Surface exfiltration");
 
   // Infiltration.
-  if (pond + water * dt < - max (fabs (pond), fabs (water)) / 100.0)
+  if (pond + water < - std::max (fabs (pond), fabs (water)) / 100.0)
     {
       std::ostringstream tmp;
-      tmp << "pond (" << pond << ") + flux (" << water << ") * dt (" << dt 
-          << ") = " << pond + water * dt << ", should be non-negative";
+      tmp << "pond (" << pond << ") + exfiltration (" << water << ") in dt ("
+          << dt << ") = " << pond + water << ", should be non-negative";
       msg.warning (tmp.str ());
       return;
     }
@@ -287,18 +286,18 @@ Surface::Implementation::exfiltrate (double water /* [mm] */,
           chemicals_storage.clear ();
         }
     }
-  else if (-water > minimal_matter_flux)
+  else if (-water / dt > minimal_matter_flux)
     {
-      IM delta_matter (im, (-water * dt) / pond);
+      IM delta_matter (im, -water / pond);
       im -= delta_matter;
       delta_matter /= dt;
       im_flux -= delta_matter;
       if (chemicals_can_enter_soil)
         Chemicals::move_fraction (chemicals_storage, chemicals_out,
-                                  (-water * dt) / pond);
+                                  -water / pond);
     }
 
-  pond += water * dt;
+  pond += water;
 }
 
 double
@@ -332,18 +331,18 @@ Surface::temperature () const
 void
 Surface::tick (Treelog& msg,
 	       const double PotSoilEvaporation, 
-               const double water, const double temp,
+               const double flux_in, const double temp,
 	       const Geometry& geo,
                const Soil& soil, const SoilWater& soil_water, 
                const double soil_T,
                const double dt)
-{ impl.tick (msg, PotSoilEvaporation, water, temp, geo, 
+{ impl.tick (msg, PotSoilEvaporation, flux_in, temp, geo, 
              soil, soil_water, soil_T, dt); }
 
 void
 Surface::Implementation::tick (Treelog& msg,
-			       double PotSoilEvaporation,
-			       const double water, const double temp,
+			       const double PotSoilEvaporation,
+			       const double flux_in, const double temp,
                                const Geometry& geo,
                                const Soil& soil, const SoilWater& soil_water,
 			       const double soil_T,
@@ -370,24 +369,24 @@ Surface::Implementation::tick (Treelog& msg,
 
   Eps = PotSoilEvaporation;
 
-  if (pond + water * dt + MaxExfiltration * dt < Eps * dt)
-    EvapSoilSurface = pond / dt + water + MaxExfiltration;
+  if (pond + flux_in * dt + MaxExfiltration * dt < Eps * dt)
+    EvapSoilSurface = pond / dt + flux_in + MaxExfiltration;
   else
     EvapSoilSurface = Eps;
 
   if (pond < 1e-6)
     T = temp;
-  else if (water < 0.0)
+  else if (flux_in < 0.0)
     {
-      if (pond - EvapSoilSurface * dt + water * dt < 1e-6)
+      if (pond - EvapSoilSurface * dt + flux_in * dt < 1e-6)
 	T = temp;
       // else use old temperature.
     }
   else
-    T = (T * pond + temp * water * dt) / (pond + water * dt);
+    T = (T * pond + temp * flux_in * dt) / (pond + flux_in * dt);
 
   daisy_assert (T > -100.0 && T < 50.0);
-  pond = pond - EvapSoilSurface * dt + water * dt;
+  pond = pond - EvapSoilSurface * dt + flux_in * dt;
   daisy_assert (EvapSoilSurface < 1000.0);
 
   if (ridge_)
@@ -518,8 +517,11 @@ Surface::evap_pond (Treelog& msg) const	// [mm/h]
     {
       Treelog::Open nest (msg, "Surface evap pond");
       std::ostringstream tmp;
-      tmp << "BUG: evap_pond = " << ep;
+      tmp << "evap_pond = " << ep << ", evap_soil_surface = " << evap_soil_surface () << ", exfiltration = " << exfiltration ();
       msg.warning (tmp.str ());
+      static int wcount = 10;
+      if (--wcount < 0)
+        throw 3;
     }
   return 0.0;
 }
@@ -583,9 +585,9 @@ Set this to a positive number to force a permanent pressure top.");
 Amount of ponding on the surface.\n\
 Negative numbers indicate soil exfiltration.");
   alist.add ("pond", 0.0);
-  syntax.add ("EvapSoilSurface", "mm", Syntax::LogOnly, "\
+  syntax.add ("EvapSoilSurface", "mm/h", Syntax::LogOnly, "\
 Water evaporated from the surface, including the pond and exfiltration.");
-  syntax.add ("Eps", "mm", Syntax::LogOnly, "\
+  syntax.add ("Eps", "mm/h", Syntax::LogOnly, "\
 Potential evaporation from the surface.");
   syntax.add ("T", "dg C", Syntax::LogOnly, "\
 Temperature of water or air directly above the surface.");

@@ -173,6 +173,7 @@ ScopeBlock::dimension (symbol tag_symbol) const
 
 struct Block::Implementation
 {
+  static const Syntax empty_syntax;
   Block *const parent;
   const Syntax& syntax;
   const AttributeList& alist;
@@ -200,6 +201,8 @@ struct Block::Implementation
       is_ok (true)
   { }
 };
+
+const Syntax Block::Implementation::empty_syntax;
 
 Syntax::type 
 Block::Implementation::lookup (const std::string& key) const
@@ -639,6 +642,12 @@ Block::Block (Block& block,
   : impl (new Implementation (&block, block.msg (),
 			      syntax, alist, 
 			      sequence_id (scope_id, index)))
+{ }
+
+Block::Block (const AttributeList& alist)
+  : impl (new Implementation (NULL, Treelog::null (),
+                              Implementation::empty_syntax, alist,
+                              "Plain AttributeList"))
 { }
 
 Block::~Block ()

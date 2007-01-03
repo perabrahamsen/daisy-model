@@ -66,19 +66,20 @@ private:
   std::vector<double> H2OExtraction; // Extraction of H2O in soil [cm³/cm³/h]
   std::vector<double> NH4Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
   std::vector<double> NO3Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
-  double h_x;			// Root extraction at surface.
+  double h_x;			// Root extraction at surface
 public:
-  double partial_soil_temperature; // Accumaleted soil temperature. [°C]
-  double soil_temperature;	// Soil temperature previous day. [°C]
+  double partial_soil_temperature; // Accumaleted soil temperature [°C]
+  double partial_day;           // Accuumalted time [h]
+  double soil_temperature;	// Soil temperature previous day [°C]
 
   // Log.
 public:
-  double water_stress;		// Fraction of requested water we didn't got.
-  double water_stress_days;	// Accumulated water stress.
-  double production_stress;	// SVAT induced stress, -1 if not applicable.
+  double water_stress;		// Fraction of requested water we didn't got
+  double water_stress_days;	// Accumulated water stress
+  double production_stress;	// SVAT induced stress, -1 if not applicable
  
 private:
-  double Ept;			// Potential evapotranspiration.
+  double Ept;			// Potential evapotranspiration
   double H2OUpt;		// H2O uptake [mm/h]
   double NH4Upt;		// NH4-N uptake [g/m2/h]
   double NO3Upt;		// NO3-N uptake [g/m2/h]
@@ -116,7 +117,7 @@ public:
 private:
   static double density_distribution_parameter (double a);
 public:
-  void tick_hourly (int hour, double T);
+  void tick (double T, double dt);
   void tick_daily (Treelog&, const Geometry&, const Soil&, 
 		   double WRoot, double IncWRoot, double DS);
   void set_density (Treelog&,

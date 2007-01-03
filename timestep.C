@@ -23,10 +23,8 @@
 #include "alist.h"
 #include "block.h"
 #include "assertion.h"
+#include "mathlib.h"
 #include <memory>
-
-class AttributeList;
-class Syntax;
 
 struct Timestep::Implementation
 { 
@@ -69,6 +67,49 @@ Timestep::total_hours () const
 {
   return (365.2425 * years () + days ()) * 24.0 + hours ()
     + (minutes () + seconds () / 60.0) / 60.0;
+}
+
+void
+Timestep::GenCheck::check (const Syntax& syntax, 
+                           const AttributeList& alist, 
+                           const std::string& key) const throw (std::string)
+{ 
+  daisy_assert (alist.check (key));
+  daisy_assert (syntax.lookup (key) == Syntax::AList);
+  daisy_assert (!syntax.is_log (key));
+  daisy_assert (syntax.size (key) == Syntax::Singleton);
+
+  Block block (alist.alist (key));
+  Timestep timestep (block);
+  check_dt (timestep.total_hours ());
+}
+
+const VCheck& 
+Timestep::positive ()
+{
+  static struct Postive : public GenCheck
+  {
+    void check_dt (const double dt) const throw (std::string)
+    {
+      if (dt <= 0.0)
+        throw std::string ("Timestep must be positive");
+    }
+  } positive;
+  return positive;
+}
+
+const VCheck& 
+Timestep::non_zero ()
+{
+  static struct NonZero : public GenCheck
+  {
+    void check_dt (const double dt) const throw (std::string)
+    {
+      if (iszero (dt))
+        throw std::string ("Timestep must be non-zero");
+    }
+  } non_zero;
+  return non_zero;
 }
 
 void 
@@ -115,7 +156,7 @@ void operator+= (Time& time, const Timestep& step)
 {
   time.tick_year (step.years ());
   time.tick_day (step.days ());
-  time.tick_year (step.hours ());
+  time.tick_hour (step.hours ());
   time.tick_minute (step.minutes ());
   time.tick_second (step.seconds ());
 }

@@ -28,6 +28,7 @@
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
+#include <sstream>
 
 struct TransportCD : public Transport
 {
@@ -77,11 +78,11 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
       daisy_assert (M[i] >= 0.0);
       if (iszero (C[i]))
 	daisy_assert (iszero (M[i]));
-      else
-	daisy_assert (approximate (M[i], 
-				   adsorption.C_to_M (soil,
-						      soil_water.Theta_old (i),
-						      i, C[i])));
+      else 
+        daisy_assert (approximate (M[i], 
+                                   adsorption.C_to_M (soil,
+                                                      soil_water.Theta_old (i),
+                                                      i, C[i])));
     }
 
   // Note: q, D, and alpha depth indexes are all [j-½].
@@ -175,7 +176,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
     }
 
   // Find the time step using Courant.
-  double ddt = 1.0;
+  double ddt = dt;
   for (unsigned int i = 0; i < size; i++)
     ddt = std::min (ddt, std::pow (geo.dz (i), 2) / (2 * D[i + 1]));
   int time_step_reductions = 0;
@@ -329,6 +330,14 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 
 	  // We calculate new C by assumining instant absorption.
 	  C[j] = adsorption.M_to_C (soil, Theta_new[j], j, M[j]);
+
+          // Check that it goes both ways.
+          if (iszero (C[j]))
+            daisy_assert (iszero (M[j]));
+          else
+            daisy_assert (approximate (M[j], 
+                                       adsorption.C_to_M (soil, Theta_new[j],
+                                                          j, C[j])));
 	}
     }
 

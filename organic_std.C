@@ -1234,7 +1234,7 @@ OrganicStandard::tick (const Geometry& geo,
   const double N_source = geo.total_soil (NO3_source) 
     + geo.total_soil (NH4_source);
 
-  if (!approximate (delta_N, N_source)
+  if (!approximate (delta_N, N_source * dt)
       && !approximate (old_N, new_N, 1e-10))
     {
       std::ostringstream tmp;

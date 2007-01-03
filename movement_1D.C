@@ -354,9 +354,9 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
  done:
   const double new_content = geo->total_surface (M);
   const double delta_content = new_content - old_content;
-  const double source = geo->total_surface (S);
-  const double in = -J[0];	// No preferential transport, it is 
-  const double out = -J[geo->edge_size () - 1]; // included in S.
+  const double source = geo->total_surface (S) * dt;
+  const double in = -J[0] * dt;	// No preferential transport, it is 
+  const double out = -J[geo->edge_size () - 1] * dt; // included in S.
   const double expected = source + in - out;
   if (!approximate (delta_content, expected)
       && new_content < fabs (expected) * 1e10)

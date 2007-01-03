@@ -681,11 +681,16 @@ ColumnStandard::tick (Treelog& msg, const double dt,
                          *dom[i]->adsorption, dom[i]->diffusion_coefficient, 
                          dt, msg);
     }
-
-  movement->solute (*soil, *soil_water, 
-                    surface.matter_flux ().NO3, soil_NO3, dt, msg);
-  movement->solute (*soil, *soil_water,
-                    surface.matter_flux ().NH4, soil_NH4, dt, msg);
+  {
+    Treelog::Open nest (msg, "soil_NO3");
+    movement->solute (*soil, *soil_water, 
+                      surface.matter_flux ().NO3, soil_NO3, dt, msg);
+  }
+  {
+    Treelog::Open nest (msg, "soil_NH4");
+    movement->solute (*soil, *soil_water,
+                      surface.matter_flux ().NH4, soil_NH4, dt, msg);
+  }
   
   // Once a month we clean up old AM from organic matter.
   if (time.hour () == 13 && time.mday () == 13)

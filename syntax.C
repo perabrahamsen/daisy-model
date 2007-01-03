@@ -397,7 +397,7 @@ Syntax::check (const string& key, const double value) const
 
 bool 
 Syntax::check (const AttributeList& vl, 
-		    const string& key, Treelog& err) const
+               const string& key, Treelog& err) const
 {
   bool ok = true;
   Implementation::vcheck_map::const_iterator i = impl.val_checks.find (key);

@@ -246,7 +246,7 @@ CropSimple::tick (const Time& time, const double,
   // Update average soil temperature.
   const double T_soil = geo.content_at (soil_heat, &SoilHeat::T,
                                         -root_system->Depth);
-  root_system->tick_hourly (time.hour (), T_soil);
+  root_system->tick (T_soil, dt);
   
   // Air temperature based growth.
   const double T_air = bioclimate.daily_air_temperature ();

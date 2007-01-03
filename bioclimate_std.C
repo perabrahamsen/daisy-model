@@ -648,7 +648,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 	     weather.hourly_global_radiation (), 0.0,
 	     snow_water_in, weather.snow (),
 	     surface.ponding (),
-	     snow_water_in_temperature, snow_ep);
+	     snow_water_in_temperature, snow_ep, dt);
   snow_ea = snow.evaporation ();
   daisy_assert (snow_ea >= 0.0);
   total_ea += snow_ea;

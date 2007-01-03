@@ -68,7 +68,7 @@ struct Snow::Implementation
   void tick (Treelog&, const Movement&,
              const Soil&, const SoilWater&, const SoilHeat&,
 	     double Si, double q_h, double Prain,
-	     double Psnow, double Pond, double T, double Epot);
+	     double Psnow, double Pond, double T, double Epot, double dt);
   Implementation (const AttributeList& al);
 };
 
@@ -112,7 +112,8 @@ Snow::Implementation::tick (Treelog& msg,
 			    const double Si, const double q_h,
 			    const double Prain, const double Psnow,
 			    double Pond,
-			    double T, const double Epot)
+			    double T, const double Epot,
+                            const double dt)
 { 
   const double Ssnow_old = Ssnow;
   Pond = std::max (Pond, 0.0);
@@ -125,7 +126,6 @@ Snow::Implementation::tick (Treelog& msg,
   daisy_assert (Epot >= 0.0);
   daisy_assert (T > -374 && T <= 100);
 
-  static const double dt = 1.0; // Time step [h].
   static const double f = 1.0;	// Melting factor. [mm H2O / (kg H2O / m²)]
   static const double rho_w = 1.0e3; // Density of water. [kg / m³]
   static const double rho_i = 0.917e3; // Density of ice. [kg / m³]
@@ -314,11 +314,11 @@ Snow::tick (Treelog& msg, const Movement& movement,
             const Soil& soil, const SoilWater& soil_water,
 	    const SoilHeat& soil_heat,
 	    double Si, double q_h, double Prain,
-	    double Psnow, double Pond, double T, double Epot)
+	    double Psnow, double Pond, double T, double Epot, const double dt)
 {
   if (impl.Ssnow > 0.0 || Psnow > 0.0)
     impl.tick (msg, movement, soil, soil_water, soil_heat, Si, q_h,
-	       Prain, Psnow, Pond, T, Epot);
+	       Prain, Psnow, Pond, T, Epot, dt);
   else
     {
       impl.EvapSnowPack = 0.0;

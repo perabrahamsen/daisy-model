@@ -28,6 +28,8 @@
 #include "alist.h"
 #include "vcheck.h"
 #include "submodel.h"
+#include <sstream>
+#include <iomanip>
 
 // Content.
 
@@ -109,6 +111,19 @@ Time::minute () const
 int
 Time::second () const
 { return impl->second; }
+
+std::string
+Time::print () const
+{
+  std::ostringstream tmp;
+  tmp << std::setfill ('0') << std:: setw (4) << year () << "-"
+      << std::setw (2) << month () << "-" 
+      << std::setw (2) << mday () << "T"
+      << std::setw (2) << hour () << ":"
+      << std::setw (2) << minute () << ":"
+      << std::setw (2) << second ();
+  return tmp.str ();
+}
 
 void 
 Time::set_alist (AttributeList& alist) const
@@ -456,7 +471,6 @@ Time::Time (const AttributeList& al)
 
 static Submodel::Register 
 time_submodel ("Time", Time::load_syntax);
-
 
 // @ Construct.
 

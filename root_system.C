@@ -326,13 +326,15 @@ RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
 }
 
 void
-RootSystem::tick_hourly (int hour, double T)
+RootSystem::tick (const double T, const double dt)
 {
-  partial_soil_temperature += T;
-  if (hour == 0)
+  partial_soil_temperature += T * dt;
+  partial_day += dt;
+  if (partial_day >= 24.0)
     {
-      soil_temperature = partial_soil_temperature / 24.0;
+      soil_temperature = partial_soil_temperature / partial_day;
       partial_soil_temperature = 0.0;
+      partial_day = 0.0;
     }
 
   // Clear nitrogen.
@@ -387,6 +389,7 @@ RootSystem::output (Log& log) const
   output_variable (NO3Extraction, log);
   output_variable (h_x, log);
   output_variable (partial_soil_temperature, log);
+  output_variable (partial_day, log);
   output_variable (soil_temperature, log);
   output_variable (water_stress, log);
   output_variable (water_stress_days, log);
@@ -477,6 +480,9 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("partial_soil_temperature", "dg C h", Syntax::State,
 	      "Soil temperature hours this day, so far.");
   alist.add ("partial_soil_temperature", 0.0);
+  syntax.add ("partial_day", "h", Syntax::State,
+	      "Hours we have accumulated soil temperature this day.");
+  alist.add ("partial_day", 0.0);
   syntax.add ("soil_temperature", "dg C", Syntax::State,
 	      "Average soil temperature yesterday.");
   alist.add ("soil_temperature", 0.0);
@@ -527,6 +533,7 @@ RootSystem::RootSystem (Block& al)
     Depth (al.check ("Depth") ? al.number ("Depth") : al.number ("DptEmr")),
     h_x (al.number ("h_x")),
     partial_soil_temperature (al.number ("partial_soil_temperature")),
+    partial_day (al.number ("partial_day")),
     soil_temperature (al.number ("soil_temperature")),
     water_stress (0.0),
     water_stress_days (al.number ("water_stress_days")),

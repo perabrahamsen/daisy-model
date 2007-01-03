@@ -54,6 +54,7 @@ public:
   CanopyStandard canopy;
   Harvesting harvesting;
   Production production;
+  std::auto_ptr<Time> last_time;
   std::auto_ptr<Phenology> development;
   const Partition partition;
   Vernalization vernalization;
@@ -202,7 +203,7 @@ CropStandard::initialize (Treelog& msg, const Geometry& geo,
 		   //  until midnight (small error).
 		   -1.0);
       root_system->set_density (msg, 
-			       geo, production.WRoot, development->DS);
+                                geo, production.WRoot, development->DS);
       nitrogen.content (development->DS, production);
     }
 }
@@ -233,7 +234,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   // Update average soil temperature.
   const double T_soil = geo.content_at (soil_heat, &SoilHeat::T,
                                         -root_system->Depth);
-  root_system->tick_hourly (time.hour (), T_soil);
+  root_system->tick (T_soil, dt);
 
   // Clear nitrogen.
   nitrogen.clear ();
@@ -241,16 +242,19 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   photo->clear ();
 
   // Update age.
-  development->DAP += 1.0/24.0;
+  development->DAP += dt/24.0;
 
   // Emergence.
-  if (time.hour () == 0 && development->DS <= 0)
+  if ((time.yday () != last_time->yday ()
+       || time.year () != last_time->year ())
+      && development->DS <= 0)
     {
+      *last_time = time;
       daisy_assert (ForcedCAI < 0.0);
 
       const double h_middle = geo.content_at (soil_water, &SoilWater::h,
                                               -root_system->Depth/2.);
-      development->emergence (h_middle, root_system->soil_temperature);
+      development->emergence (h_middle, root_system->soil_temperature, dt);
       if (development->DS >= 0)
 	{
 	  msg.message ("Emerging");
@@ -379,6 +383,8 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 				    canopy, *development, msg)
             * min_light_fraction;
         }
+
+      Ass *= dt;
 
       production.PotCanopyAss = Ass;
       if (root_system->production_stress >= 0.0)
@@ -530,6 +536,7 @@ CropStandard::output (Log& log) const
 #else
   output_submodule (production, "Prod", log);
 #endif
+  output_submodule (*last_time, "last_time", log);
   output_derived (development, "Devel", log);
   if (vernalization.required)	// Test needed for checkpoint.
     output_submodule (vernalization, "Vernal", log);
@@ -543,6 +550,9 @@ CropStandard::CropStandard (Block& al)
     canopy (al.alist ("Canopy")),
     harvesting (al.alist ("Harvest")),
     production (al.alist ("Prod")),
+    last_time (al.check ("last_time")
+               ? new Time (al.alist ("last_time"))
+               : new Time (9999, 1, 1, 0)),
     development (Librarian<Phenology>::build_item (al, "Devel")),
     partition (al.alist ("Partit")),
     vernalization (al.check ("Vernal")
@@ -582,6 +592,9 @@ CropStandardSyntax::CropStandardSyntax ()
 			"Harvest parameters.", Harvesting::load_syntax);
   syntax.add_submodule ("Prod", alist, Syntax::State,
 			"Production.", Production::load_syntax);
+  syntax.add_submodule ("last_time", alist, Syntax::OptionalState,
+			"The time of the previous timestep.",
+                        Time::load_syntax);
   syntax.add ("Devel", Librarian<Phenology>::library (), 
 	      "Development and phenology.");
   syntax.add_submodule ("Partit", alist, Syntax::Const,

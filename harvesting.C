@@ -27,6 +27,7 @@
 #include "harvest.h"
 #include "geometry.h"
 #include "log.h"
+#include "timestep.h"
 #include "mathlib.h"
 #include "submodel.h"
 #include "check_range.h"
@@ -477,8 +478,8 @@ Harvesting::tick (const Time& time)
     {
       if (!last_cut)
         last_cut = new Time (time);
-      const double days_between 
-	= (0.0 + Time::hours_between (*last_cut, time)) / 24.0;
+      const Timestep step = time - *last_cut;
+      const double days_between = step.total_hours () / 24.0;
       daisy_assert (days_between >= 0.0);
       
       if (days_between >= production_delay)

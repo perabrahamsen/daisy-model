@@ -106,7 +106,8 @@ LogTable::common_done (const Time& time)
     {
       if (time_columns)
 	out << "year" << field_separator << "month" << field_separator 
-	    << "mday" << field_separator << "hour" << field_separator;
+	    << "mday" << field_separator << "hour" << field_separator
+            << "minute" << field_separator << "second" << field_separator;
 
       // Print the entry names in the first line of the log file..
       for (unsigned int i = 0; i < entries.size (); i++)
@@ -166,6 +167,7 @@ LogTable::common_done (const Time& time)
     {
       if (time_columns)
 	out << field_separator << field_separator 
+	    << field_separator << field_separator 
 	    << field_separator << field_separator;
 
       // Print the entry names in the first line of the log file..
@@ -198,8 +200,9 @@ LogTable::common_done (const Time& time)
     }
 
   if (time_columns)
-    out << time.year () << "\t" << time.month () << "\t" 
-	<< time.mday () << "\t" << time.hour () << "\t";
+    out << time.year () << field_separator << time.month () << field_separator 
+	<< time.mday () << field_separator << time.hour () << field_separator
+        << time.minute () << field_separator << time.second () << field_separator;
 
   for (unsigned int i = 0; i < entries.size (); i++)
     {

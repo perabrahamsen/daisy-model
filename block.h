@@ -86,6 +86,7 @@ public:
   explicit Block (Block&, const std::string&);
   explicit Block (Block&, const Syntax&, const AttributeList&, 
 		  const std::string& scope_tag, size_t index);
+  explicit Block (const AttributeList&);
   ~Block ();
 };
 

@@ -231,10 +231,7 @@ Daisy::run (Treelog& out)
 
     do
       {
-	std::ostringstream tmp;
-        tmp << time.year () << "-" << time.month () << "-" 
-	    << time.mday () << "h" << time.hour ();
-	Treelog::Open nest (out, tmp.str ());
+	Treelog::Open nest (out, time.print ());
 
 	if (!running)
 	  {
@@ -315,6 +312,7 @@ the simulation.");
 			"Length of timestep in simlation.\n\
 The default value is 1 hour, anything else is unlikely to work.",
                         Timestep::load_syntax);
+  syntax.add_check ("timestep", Timestep::positive ());
   syntax.add_submodule ("stop", alist, Syntax::OptionalConst,
 			"Latest time where the simulation stops.\n\
 By default, the simulation will run until the manager request it to stop.",

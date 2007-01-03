@@ -50,7 +50,7 @@ public:
   virtual void tick_daily (double Ta, double WLeaf, 
 			   Production&, Vernalization&, 
 			   double cut_stress, Treelog&) = 0;
-  virtual void emergence (double h, double T) = 0;
+  virtual void emergence (double h, double T, double dt) = 0;
   void output (Log& log) const;
   virtual bool mature () const;
 

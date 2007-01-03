@@ -48,6 +48,7 @@ public:
   int hour () const;
   int minute () const;
   int second () const;
+  std::string print () const;
   void set_alist (AttributeList& alist) const;
 
   // Simulate. 

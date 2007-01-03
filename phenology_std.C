@@ -53,7 +53,7 @@ private:
 private:
   void tick_daily (double Ta, double WLeaf, 
 		   Production&, Vernalization&, double cut_stress, Treelog&);
-  void emergence (double h, double T);
+  void emergence (double h, double T, double dt);
   bool mature () const
   { return DS >= DSMature; }
 
@@ -103,9 +103,9 @@ PhenologyStandard::tick_daily (const double Ta, const double WLeaf,
 }
 
 void
-PhenologyStandard::emergence (double h, double T)
+PhenologyStandard::emergence (const double h, const double T, const double dt)
 {
-  DS += T / EmrTSum * EmrSMF (h);
+  DS += dt * T / EmrTSum * EmrSMF (h);
   if (DS > 0)
     DS = DS_Emr;
 }

@@ -22,6 +22,8 @@
 #define TIMESTEP_H
 
 #include "time.h"
+#include "vcheck.h"
+#include <string>
 #include <memory>
 
 class AttributeList;
@@ -49,6 +51,15 @@ public:
     
   // Create.
 public:
+  struct GenCheck : public VCheck
+  {
+  private:
+    virtual void check_dt (double dt) const throw (std::string) = 0;
+    void check (const Syntax& syntax, const AttributeList& alist, 
+                const std::string& key) const throw (std::string);
+  };
+  static const VCheck& positive ();
+  static const VCheck& non_zero ();
   static void load_syntax (Syntax&, AttributeList&);
   explicit Timestep (Block&);
   Timestep (int years, int days, int hours, int minutes, int seconds);

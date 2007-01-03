@@ -73,9 +73,10 @@ public:
   void mixture (const Geometry& geo,
                 const SoilChemicals& soil_chemicals, double dt);
   void output (Log&) const;
-  void tick (Treelog&, double PotSoilEvaporation, double Water, double temp,
-	     const Geometry& geo,
-             const Soil&, const SoilWater&, double soil_T, double dt);
+  void tick (Treelog&, double PotSoilEvaporation, double flux_in /* [mm/h] */,
+             double temp /* [dg C] */, const Geometry& geo,
+             const Soil&, const SoilWater&,
+             double soil_T /* [dg C] */, double dt /* [h] */);
 
   // Communication with bioclimate.
   double ponding () const;
