@@ -76,9 +76,9 @@ public:
 public:
   virtual void tick (const Time&, double relative_humidity,
                      const Bioclimate&, const Geometry&, const Soil&,
-		     OrganicMatter *const, const SoilHeat&, const SoilWater&,
+		     OrganicMatter&, const SoilHeat&, const SoilWater&,
 		     // Allow plants to grow (hourly).
-		     SoilNH4 *const, SoilNO3 *const, 
+		     SoilNH4&, SoilNO3&, 
 		     double& residuals_DM,
 		     double& residuals_N_top, double& residuals_C_top,
 		     std::vector<double>& residuals_N_soil,
@@ -118,13 +118,11 @@ public:
 			std::vector<double>& residuals_C_soil,
                         const bool combine,
 			Treelog&) = 0;
-  virtual void sow (Treelog& msg, 
-                    const AttributeList& al, 
+  virtual void sow (const AttributeList& al, 
                     const Geometry&, OrganicMatter&, 
                     double& seed_N /* kg/ha */,
-                    double& seed_C /* kg/ha */) = 0;
-  virtual void sow (Treelog& msg, const AttributeList& al,
-		    const Geometry&) = 0;
+                    double& seed_C /* kg/ha */,
+                    const Time&, Treelog& msg) = 0;
   virtual void output (Log&) const;
   
   // Litter
@@ -135,7 +133,7 @@ public:
   // Create and Destroy.
 public:
   virtual void initialize (const Time&, const Geometry& geo,
-                           const Soil& soil, OrganicMatter *const,
+                           const Soil& soil, OrganicMatter&,
                            Treelog&) = 0;
   static void load_syntax (Syntax&, AttributeList&);
   explicit Vegetation (Block&);

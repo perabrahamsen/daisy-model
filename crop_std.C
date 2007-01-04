@@ -33,6 +33,7 @@
 #include "wse.h"
 #include "log.h"
 #include "time.h"
+#include "timestep.h"
 #include "bioclimate.h"
 #include "plf.h"
 #include "soil_water.h"
@@ -117,11 +118,11 @@ public:
   void tick (const Time& time, double relative_humidity,
 	     const Bioclimate&, const Geometry& geo,
              const Soil&,
-	     OrganicMatter*,
+	     OrganicMatter&,
 	     const SoilHeat&,
 	     const SoilWater&,
-	     SoilNH4*,
-	     SoilNO3*, 
+	     SoilNH4&,
+	     SoilNO3&, 
 	     double& residuals_DM,
 	     double& residuals_N_top, double& residuals_C_top,
 	     std::vector<double>& residuals_N_soil,
@@ -159,7 +160,8 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (Treelog&, const Geometry& geometry, OrganicMatter *const);
+  void initialize (const Geometry& geometry, OrganicMatter&, 
+                   const Time&, Treelog&);
   CropStandard (Block& vl);
   ~CropStandard ();
 };
@@ -183,18 +185,20 @@ CropStandard::DM (double height) const
 }
 
 void
-CropStandard::initialize (Treelog& msg, const Geometry& geo,
-                          OrganicMatter *const organic_matter)
+CropStandard::initialize (const Geometry& geo,
+                          OrganicMatter& organic_matter,
+                          const Time& now, Treelog& msg)
 {
+  if (!last_time.get ())
+    last_time.reset (new Time (now));
   root_system->initialize (geo.cell_size ());
   production.initialize (nitrogen.SeedN);
 
   if (development->DS >= 0)
     {
       // Dead organic matter.
-      if (organic_matter)
-        production.initialize (name, harvesting.Root, harvesting.Dead,
-                               geo, *organic_matter);
+      production.initialize (name, harvesting.Root, harvesting.Dead,
+                             geo, organic_matter);
       
       // Update derived state content.
       canopy.tick (production.WLeaf, production.WSOrg, 
@@ -213,11 +217,11 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 		    const Bioclimate& bioclimate,
                     const Geometry& geo,
 		    const Soil& soil,
-		    OrganicMatter* organic_matter,
+		    OrganicMatter& organic_matter,
 		    const SoilHeat& soil_heat,
 		    const SoilWater& soil_water,
-		    SoilNH4* soil_NH4,
-		    SoilNO3* soil_NO3, 
+		    SoilNH4& soil_NH4,
+		    SoilNO3& soil_NO3, 
 		    double& residuals_DM,
 		    double& residuals_N_top, double& residuals_C_top,
 		    std::vector<double>& residuals_N_soil,
@@ -226,6 +230,8 @@ CropStandard::tick (const Time& time, const double relative_humidity,
                     const double dt,
 		    Treelog& msg)
 {
+  daisy_assert (last_time.get ());
+
   Treelog::Open nest (msg, name);
 
   // Update cut stress.
@@ -249,12 +255,14 @@ CropStandard::tick (const Time& time, const double relative_humidity,
        || time.year () != last_time->year ())
       && development->DS <= 0)
     {
+      const Timestep step = time - *last_time;
       *last_time = time;
       daisy_assert (ForcedCAI < 0.0);
 
       const double h_middle = geo.content_at (soil_water, &SoilWater::h,
                                               -root_system->Depth/2.);
-      development->emergence (h_middle, root_system->soil_temperature, dt);
+      development->emergence (h_middle, root_system->soil_temperature, 
+                              step.total_hours ());
       if (development->DS >= 0)
 	{
 	  msg.message ("Emerging");
@@ -266,22 +274,20 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 
 	  static const symbol root_symbol ("root");
 	  static const symbol dead_symbol ("dead");
-	  if (organic_matter)
-	    {
-	      if (!production.AM_root)
-		{
-		  production.AM_root
-		    = &AM::create (geo.cell_size (), time, harvesting.Root,
-				   name, root_symbol, AM::Locked);
-		  organic_matter->add (*production.AM_root);
-		}
-	      if (!production.AM_leaf)
-		{
-		  production.AM_leaf
-		    = &AM::create (geo.cell_size (), time, harvesting.Dead,
-				   name, dead_symbol, AM::Locked);
-		  organic_matter->add (*production.AM_leaf);
-		}
+
+          if (!production.AM_root)
+            {
+              production.AM_root
+                = &AM::create (geo.cell_size (), time, harvesting.Root,
+                               name, root_symbol, AM::Locked);
+              organic_matter.add (*production.AM_root);
+            }
+          if (!production.AM_leaf)
+            {
+              production.AM_leaf
+                = &AM::create (geo.cell_size (), time, harvesting.Dead,
+                               name, dead_symbol, AM::Locked);
+              organic_matter.add (*production.AM_leaf);
 	    }
 	  else
 	    {
@@ -300,20 +306,12 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   if (development->DS <= 0 || development->mature ())
     return;
 
-  if (soil_NO3)
-    {
-      daisy_assert (soil_NH4);
-      nitrogen.update (time.hour (), production.NCrop, development->DS,
-		       enable_N_stress,
-		       geo, soil, soil_water, *soil_NH4, *soil_NO3,
-                       bioclimate.day_fraction (),
-		       *root_system, dt);
-    }
-  else
-    {
-      daisy_assert (!soil_NH4);
-      production.NCrop = nitrogen.PtNCnt;
-    }  
+  nitrogen.update (time.hour (), production.NCrop, development->DS,
+                   enable_N_stress,
+                   geo, soil, soil_water, soil_NH4, soil_NO3,
+                   bioclimate.day_fraction (),
+                   *root_system, dt);
+
   const double nitrogen_stress = nitrogen.nitrogen_stress;
   const double water_stress = root_system->water_stress;
 
@@ -536,6 +534,7 @@ CropStandard::output (Log& log) const
 #else
   output_submodule (production, "Prod", log);
 #endif
+  daisy_assert (last_time.get ());
   output_submodule (*last_time, "last_time", log);
   output_derived (development, "Devel", log);
   if (vernalization.required)	// Test needed for checkpoint.
@@ -552,7 +551,7 @@ CropStandard::CropStandard (Block& al)
     production (al.alist ("Prod")),
     last_time (al.check ("last_time")
                ? new Time (al.alist ("last_time"))
-               : new Time (9999, 1, 1, 0)),
+               : NULL),
     development (Librarian<Phenology>::build_item (al, "Devel")),
     partition (al.alist ("Partit")),
     vernalization (al.check ("Vernal")

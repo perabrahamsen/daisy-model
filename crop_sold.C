@@ -108,8 +108,8 @@ public:
   void tick (const Time& time, double relative_humidity,
              const Bioclimate&, const Geometry& geo,
              const Soil&,
-	     OrganicMatter*,
-	     const SoilHeat&, const SoilWater&, SoilNH4*, SoilNO3*,
+	     OrganicMatter&,
+	     const SoilHeat&, const SoilWater&, SoilNH4&, SoilNO3&,
 	     double&, double&, double&, 
              std::vector<double>&, std::vector<double>&, 
 	     double ForcedCAI,
@@ -140,7 +140,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (Treelog&, const Geometry& geo, OrganicMatter*);
+  void initialize (const Geometry& geo, OrganicMatter&, const Time&, Treelog&);
   CropSold (Block& vl);
   ~CropSold ();
 };
@@ -618,7 +618,8 @@ CropSold::Variables::~Variables ()
 { }
 
 void
-CropSold::initialize (Treelog&, const Geometry& geo, OrganicMatter*)
+CropSold::initialize (const Geometry& geo, OrganicMatter&, const Time&, 
+                      Treelog&)
 {
   size_t size = geo.cell_size ();
 
@@ -1726,10 +1727,10 @@ CropSold::tick (const Time& time, const double,
 		const Bioclimate& bioclimate,
                 const Geometry& geo,
 		const Soil& soil,
-		OrganicMatter*,
+		OrganicMatter&,
 		const SoilHeat& soil_heat,
 		const SoilWater& soil_water, 
-		SoilNH4* soil_NH4, SoilNO3* soil_NO3, 
+		SoilNH4& soil_NH4, SoilNO3& soil_NO3, 
 		double&, double&, double&,
                 std::vector<double>&, std::vector<double>&, 
 		const double ForcedCAI,
@@ -1778,17 +1779,8 @@ CropSold::tick (const Time& time, const double,
     }
   if (var.Phenology.DS <= 0 || var.Phenology.DS >= 2)
     return;
-  if (soil_NO3)
-    {
-      daisy_assert (soil_NH4);
-      NitrogenUptake (time.hour (), 
-		      geo, soil, soil_water, *soil_NH4, *soil_NO3, dt);
-    }
-  else
-    {
-      daisy_assert (!soil_NH4);
-      var.Prod.NCrop = var.CrpAux.PtNCnt;
-    }
+  NitrogenUptake (time.hour (), 
+                  geo, soil, soil_water, soil_NH4, soil_NO3, dt);
   if (time.hour () != 0)
     return;
   double& water_stress = var.RootSys.water_stress;

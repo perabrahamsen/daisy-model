@@ -105,7 +105,7 @@ PhenologyStandard::tick_daily (const double Ta, const double WLeaf,
 void
 PhenologyStandard::emergence (const double h, const double T, const double dt)
 {
-  DS += dt * T / EmrTSum * EmrSMF (h);
+  DS += (dt / 24.0) * T / EmrTSum * EmrSMF (h);
   if (DS > 0)
     DS = DS_Emr;
 }

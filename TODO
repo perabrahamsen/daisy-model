@@ -1,17 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* R2D2 tidsplan
-
-Subject: R2D2 tidsplan
-
-Hej Alle!
-
-Grunden til at jeg helst ville i gang med stof og varme så hurtigt som
-muligt, er at hvis vi har dem (i det mindste som reservemodel), kan vi
-begynde at sammenligne 1D og 2D Daisy direkte på rigtige opsætninger.
-
--- Per
-
 * Brug Rect2x1 stoftransport komponent.
 
 ** Flyt surface/groundwater opdatering til MovementRect?

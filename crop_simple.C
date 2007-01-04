@@ -124,8 +124,8 @@ public:
 public:
   void tick (const Time& time, const double relative_humidity,
 	     const Bioclimate&, const Geometry& geo,
-             const Soil&, OrganicMatter*,
-	     const SoilHeat&, const SoilWater&, SoilNH4*, SoilNO3*, 
+             const Soil&, OrganicMatter&,
+	     const SoilHeat&, const SoilWater&, SoilNH4&, SoilNO3&, 
 	     double&, double&, double&, vector<double>&, vector<double>&,
 	     double ForcedCAI,
 	     double dt, Treelog&);
@@ -161,7 +161,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (Treelog&, const Geometry& geo, OrganicMatter*);
+  void initialize (const Geometry& geo, OrganicMatter&, const Time&, Treelog&);
   CropSimple (Block& vl);
   ~CropSimple ();
 };
@@ -214,10 +214,10 @@ CropSimple::tick (const Time& time, const double,
 		  const Bioclimate& bioclimate,
                   const Geometry& geo,
 		  const Soil& soil,
-		  OrganicMatter* /* organic_matter */,
+		  OrganicMatter& /* organic_matter */,
 		  const SoilHeat& soil_heat,
 		  const SoilWater& soil_water,
-		  SoilNH4* soil_NH4, SoilNO3* soil_NO3, 
+		  SoilNH4& soil_NH4, SoilNO3& soil_NO3, 
 		  double&, double&, double&, vector<double>&, vector<double>&,
 		  const double ForcedCAI,
                   const double dt,
@@ -291,20 +291,11 @@ CropSimple::tick (const Time& time, const double,
     {
       N_demand = N_potential / (1.0 + ((N_potential - N_b) / N_b)
 				* exp (- N_c * (T - T_emergence)));
-      if (soil_NO3)
-	{
-	  daisy_assert (soil_NH4);
-	  N_actual += root_system->nitrogen_uptake (geo, soil, soil_water, 
-                                                    *soil_NH4, 0.0, 
-                                                    *soil_NO3, 0.0,
-                                                    N_demand - N_actual,
-                                                    dt);
-	}
-      else
-	{
-	  daisy_assert (!soil_NH4);
-	  N_actual = N_demand;
-	}
+      N_actual += root_system->nitrogen_uptake (geo, soil, soil_water, 
+                                                soil_NH4, 0.0, 
+                                                soil_NO3, 0.0,
+                                                N_demand - N_actual,
+                                                dt);
     }
 }
 
@@ -411,8 +402,10 @@ CropSimple::total_C () const
 { 
   return 0.0; 
 }
+
 void
-CropSimple::initialize (Treelog&, const Geometry& geo, OrganicMatter*)
+CropSimple::initialize (const Geometry& geo, OrganicMatter&, 
+                        const Time&, Treelog&)
 {
   root_system->initialize (geo.cell_size ());
   CropCAI ();

@@ -120,10 +120,10 @@ struct VegetationCrops : public Vegetation
 	     const Bioclimate& bioclimate, 
              const Geometry& geo,
 	     const Soil& soil,
-	     OrganicMatter *const organic_matter,
+	     OrganicMatter& organic_matter,
 	     const SoilHeat& soil_heat,
 	     const SoilWater& soil_water,
-	     SoilNH4 *const soil_NH4, SoilNO3 *const soil_NO3, 
+	     SoilNH4& soil_NH4, SoilNO3& soil_NO3, 
 	     double& residuals_DM,
 	     double& residuals_N_top, double& residuals_C_top,
 	     std::vector<double>& residuals_N_soil,
@@ -157,10 +157,9 @@ struct VegetationCrops : public Vegetation
 		std::vector<double>& residuals_C_soil,
                 const bool combine,
 		Treelog&);
-  void sow (Treelog& msg, 
-            const AttributeList& al, const Geometry&, OrganicMatter&, 
-            double& seed_N /* kg/ha */, double& seed_C /* kg/ha */);
-  void sow (Treelog& msg, const AttributeList& al, const Geometry&);
+  void sow (const AttributeList& al, const Geometry&, OrganicMatter&, 
+            double& seed_N /* kg/ha */, double& seed_C /* kg/ha */,
+            const Time&, Treelog&);
   void output (Log&) const;
 
   double litter_vapor_flux_factor () const
@@ -172,7 +171,7 @@ struct VegetationCrops : public Vegetation
 
   // Create and destroy.
   void initialize (const Time&, const Geometry& geo,
-                   const Soil& soil, OrganicMatter *const,
+                   const Soil& soil, OrganicMatter&,
                    Treelog& msg);
   static CropList build_crops (Block& block, const std::string& key);
   VegetationCrops (Block&);
@@ -297,15 +296,15 @@ VegetationCrops::tick (const Time& time, const double relative_humidity,
 		       const Bioclimate& bioclimate, 
                        const Geometry& geo,
 		       const Soil& soil,
-		       OrganicMatter *const organic_matter,
+		       OrganicMatter& organic_matter,
 		       const SoilHeat& soil_heat,
 		       const SoilWater& soil_water,
-		       SoilNH4 *const soil_NH4, SoilNO3 *const soil_NO3,
+		       SoilNH4& soil_NH4, SoilNO3& soil_NO3,
 		       double& residuals_DM,
 		       double& residuals_N_top, double& residuals_C_top,
 		       std::vector<double>& residuals_N_soil,
 		       std::vector<double>& residuals_C_soil,
-		       double dt, Treelog& msg)
+		       const double dt, Treelog& msg)
 {
   // Forced LAI_
   double ForcedLAI = forced_LAI (time.year (), time.yday ());
@@ -627,10 +626,11 @@ VegetationCrops::harvest (const symbol column_name,
 }
 
 void
-VegetationCrops::sow (Treelog& msg, const AttributeList& al,
+VegetationCrops::sow (const AttributeList& al,
 		      const Geometry& geo,
 		      OrganicMatter& organic_matter, 
-                      double& seed_N, double& seed_C)
+                      double& seed_N, double& seed_C, const Time& time, 
+                      Treelog& msg)
 {
   Crop *const crop = Librarian<Crop>::build_free (msg, al, "sow");
   const symbol name = crop->name;
@@ -640,27 +640,11 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
     if ((*i)->name == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
-  crop->initialize (msg, geo, &organic_matter);
+  crop->initialize (geo, organic_matter, time, msg);
   crops.push_back (crop);
   seed_N += crop->total_N ();
   seed_C += crop->total_C ();
   reset_canopy_structure (msg);
-}
-
-void
-VegetationCrops::sow (Treelog& msg, const AttributeList& al,
-		      const Geometry& geo)
-{
-  Crop *const crop = Librarian<Crop>::build_free (msg, al, "sow");
-  const symbol name = crop->name;
-  for (CropList::iterator i = crops.begin();
-       i != crops.end();
-       i++)
-    if ((*i)->name == name)
-      msg.error ("There is already an " + name + " on the field.\n\
-If you want two " + name + " you should rename one of them");
-  crop->initialize (msg, geo, NULL);
-  crops.push_back (crop);
 }
 
 void
@@ -671,12 +655,12 @@ VegetationCrops::output (Log& log) const
 }
 
 void
-VegetationCrops::initialize (const Time&, const Geometry& geo,
+VegetationCrops::initialize (const Time& time, const Geometry& geo,
                              const Soil&, 
-			     OrganicMatter *const organic_matter, Treelog& msg)
+			     OrganicMatter& organic_matter, Treelog& msg)
 {
   for (unsigned int i = 0; i < crops.size (); i++)
-    crops[i]->initialize (msg, geo, organic_matter);
+    crops[i]->initialize (geo, organic_matter, time, msg);
 
   reset_canopy_structure (msg);
 }

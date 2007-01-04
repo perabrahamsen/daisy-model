@@ -88,9 +88,9 @@ public:
 
   virtual void tick (const Time& time, double relative_humidity,
                      const Bioclimate&, 
-		     const Geometry& geo, const Soil&, OrganicMatter*, 
+		     const Geometry& geo, const Soil&, OrganicMatter&, 
 		     const SoilHeat&, const SoilWater&,
-		     SoilNH4*, SoilNO3*, 
+		     SoilNH4&, SoilNO3&, 
 		     double& residuals_DM,
 		     double& residuals_N_top, double& residuals_C_top,
 		     std::vector<double>& residuals_N_soil, 
@@ -135,7 +135,8 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (Treelog&, const Geometry&, OrganicMatter*) = 0;
+  virtual void initialize (const Geometry&, OrganicMatter&, 
+                           const Time& now, Treelog&) = 0;
 protected:
   Crop (Block&);
 public:

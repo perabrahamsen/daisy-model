@@ -58,7 +58,7 @@ public:
 
   // Actions.
 public:
-  void sow (Treelog&, const AttributeList& crop);
+  void sow (const AttributeList& crop, const Time&, Treelog&);
   void ridge (const AttributeList& ridge);
   void irrigate_overhead (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);

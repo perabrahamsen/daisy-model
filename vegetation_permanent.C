@@ -126,10 +126,10 @@ struct VegetationPermanent : public Vegetation
              const Bioclimate& bioclimate,
              const Geometry& geo,
 	     const Soil& soil,
-	     OrganicMatter *const organic_matter,
+	     OrganicMatter& organic_matter,
 	     const SoilHeat& soil_heat,
 	     const SoilWater& soil_water,
-	     SoilNH4 *const soil_NH4, SoilNO3 *const soil_NO3,
+	     SoilNH4& soil_NH4, SoilNO3& soil_NO3,
 	     double& residuals_DM,
 	     double& residuals_N_top, double& residuals_C_top,
 	     vector<double>& residuals_N_soil,
@@ -159,10 +159,8 @@ struct VegetationPermanent : public Vegetation
                 const bool,
 		Treelog&)
   { }
-  void sow (Treelog&, const AttributeList&, const Geometry&, OrganicMatter&, 
-            double& /* kg/ha */, double& /* kg/ha */)
-  { throw "Can't sow on permanent vegetation"; }
-  void sow (Treelog&, const AttributeList&, const Geometry&)
+  void sow (const AttributeList&, const Geometry&, OrganicMatter&, 
+            double& /* kg/ha */, double& /* kg/ha */, const Time&, Treelog&)
   { throw "Can't sow on permanent vegetation"; }
   void output (Log&) const;
 
@@ -175,7 +173,7 @@ struct VegetationPermanent : public Vegetation
 
   // Create and destroy.
   void initialize (const Time& time, const Geometry& geo,
-                   const Soil& soil, OrganicMatter *const, 
+                   const Soil& soil, OrganicMatter&, 
                    Treelog&);
   VegetationPermanent (Block&);
   ~VegetationPermanent ();
@@ -242,11 +240,11 @@ VegetationPermanent::tick (const Time& time, const double,
 			   const Bioclimate&, 
                            const Geometry& geo,
 			   const Soil& soil,
-			   OrganicMatter *const organic_matter,
+			   OrganicMatter& organic_matter,
 			   const SoilHeat&,
 			   const SoilWater& soil_water,
-			   SoilNH4 *const soil_NH4,
-			   SoilNO3 *const soil_NO3,
+			   SoilNH4& soil_NH4,
+			   SoilNO3& soil_NO3,
 			   double& residuals_DM,
 			   double& residuals_N_top, double& residuals_C_top,
 			   vector<double>& /* residuals_N_soil */,
@@ -259,20 +257,14 @@ VegetationPermanent::tick (const Time& time, const double,
   reset_canopy_structure (time);
 
   // Nitrogen uptake.
-  if (organic_matter)
-    {
-      daisy_assert (soil_NH4);
-      daisy_assert (soil_NO3);
-
-      N_demand = canopy.CAI * N_per_LAI;
-      if (N_actual < -1e10)
-	N_actual = N_demand;	// Initialization.
-      else
-	daisy_assert (N_actual >= 0.0);
-      N_uptake = root_system->nitrogen_uptake (geo, soil, soil_water, 
-                                               *soil_NH4, 0.0, *soil_NO3, 0.0,
-                                               N_demand - N_actual, dt);
-    }
+  N_demand = canopy.CAI * N_per_LAI;
+  if (N_actual < -1e10)
+    N_actual = N_demand;	// Initialization.
+  else
+    daisy_assert (N_actual >= 0.0);
+  N_uptake = root_system->nitrogen_uptake (geo, soil, soil_water, 
+                                           soil_NH4, 0.0, soil_NO3, 0.0,
+                                           N_demand - N_actual, dt);
   
   if (canopy.CAI < old_LAI)
     {
@@ -286,31 +278,29 @@ VegetationPermanent::tick (const Time& time, const double,
       const double DM = dLAI * DM_per_LAI * g_per_Mg 
         *ha_per_cm2 / m2_per_cm2; // [g DM/m^2]
       const double C = DM * C_per_DM; // [g C/m^2]
-      if (organic_matter)
-	{
-	  N_litter = N_actual * (dLAI / old_LAI);
-	  if (!AM_litter)
-	    {
-	      static const symbol vegetation_symbol ("vegetation");
-	      static const symbol dead_symbol ("dead");
-	      
-	      AM_litter = &AM::create (geo.cell_size (), time, litter_am,
-                                       vegetation_symbol, dead_symbol,
-                                       AM::Locked);
-	      organic_matter->add (*AM_litter);
 
-	    }
-	  AM_litter->add (C * m2_per_cm2, N_litter * m2_per_cm2);
-	  residuals_N_top += N_litter;
-	}
+      N_litter = N_actual * (dLAI / old_LAI);
+      if (!AM_litter)
+        {
+          static const symbol vegetation_symbol ("vegetation");
+          static const symbol dead_symbol ("dead");
+
+          AM_litter = &AM::create (geo.cell_size (), time, litter_am,
+                                   vegetation_symbol, dead_symbol,
+                                   AM::Locked);
+          organic_matter.add (*AM_litter);
+
+        }
+      AM_litter->add (C * m2_per_cm2, N_litter * m2_per_cm2);
+      residuals_N_top += N_litter;
+
       residuals_DM += DM;
       residuals_C_top += C;
     }
-  else if (organic_matter)
+  else 
     N_litter = 0.0;
 
-  if (organic_matter)
-    N_actual += N_uptake - N_litter;
+  N_actual += N_uptake - N_litter;
 }
 
 double
@@ -346,18 +336,16 @@ void
 VegetationPermanent::initialize (const Time& time, 
                                  const Geometry& geo,
                                  const Soil& soil, 
-				 OrganicMatter *const organic_matter,
+				 OrganicMatter& organic_matter,
                                  Treelog& msg)
 {
   reset_canopy_structure (time);
   root_system->initialize (soil.size ());
   root_system->full_grown (msg, geo, soil.MaxRootingHeight (), WRoot);
-  if (organic_matter)
-    {
-      static const symbol vegetation_symbol ("vegetation");
-      static const symbol litter_symbol ("litter");
-      AM_litter = organic_matter->find_am (vegetation_symbol, litter_symbol);
-    }
+
+  static const symbol vegetation_symbol ("vegetation");
+  static const symbol litter_symbol ("litter");
+  AM_litter = organic_matter.find_am (vegetation_symbol, litter_symbol);
 }
 
 VegetationPermanent::VegetationPermanent (Block& al)

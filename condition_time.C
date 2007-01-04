@@ -449,17 +449,18 @@ True after specific month, day and hour in the year.");
   // At, before, or after a given time.
   {
     Syntax& syntax = *new Syntax ();
-    AttributeList& alist_at = *new AttributeList ();
+    AttributeList alist_time;
+    syntax.add_submodule ("time", alist_time, Syntax::Const,
+			  "Fixed time to test for.", Time::load_syntax);
+    AttributeList& alist_at = *new AttributeList (alist_time);
     alist_at.add ("description", "\
 True, iff the simulation time is at the specified time.");
-    AttributeList& alist_before = *new AttributeList ();
+    AttributeList& alist_before = *new AttributeList (alist_time);
     alist_before.add ("description", "\
 True, iff the simulation time is before the specified time.");
-    AttributeList& alist_after = *new AttributeList ();
+    AttributeList& alist_after = *new AttributeList (alist_time);
     alist_after.add ("description", "\
 True, iff the simulation time is after the specified time.");
-    syntax.add_submodule ("time", alist_at, Syntax::Const,
-			  "Fixed time to test for.", Time::load_syntax);
     syntax.order ("time");
     Librarian<Condition>::add_type ("at", alist_at, syntax,
 				    &ConditionAt::make);

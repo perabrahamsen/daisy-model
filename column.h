@@ -47,7 +47,7 @@ public:
 
   // Actions.
 public:
-  virtual void sow (Treelog&, const AttributeList& crop) = 0;
+  virtual void sow (const AttributeList& crop, const Time&, Treelog&) = 0;
   virtual void ridge (const AttributeList& ridge) = 0;
   virtual void irrigate_overhead (double flux, double temp, const IM&) = 0;
   virtual void irrigate_surface (double flux, double temp, const IM&) = 0;

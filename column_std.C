@@ -114,7 +114,7 @@ public:
   const Horizon& horizon_at (double z, double x, double y) const;
 
   // Actions.
-  void sow (Treelog&, const AttributeList&);
+  void sow (const AttributeList&, const Time&, Treelog&);
   void ridge (const AttributeList& al);
   void irrigate_overhead (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
@@ -257,8 +257,8 @@ ColumnStandard::horizon_at (const double z,
 { return soil->horizon (geometry.cell_at (z, x, y)); }
 
 void 
-ColumnStandard::sow (Treelog& msg, const AttributeList& al)
-{ vegetation->sow (msg, al, geometry, *organic_matter, seed_N, seed_C); }
+ColumnStandard::sow (const AttributeList& al, const Time& time, Treelog& msg)
+{ vegetation->sow (al, geometry, *organic_matter, seed_N, seed_C, time, msg); }
 
 // We need to convert from mm * mg N / liter to g N/cm^2.
 // mm / liter = 1/m^2 = 1/(100^2 cm^2) = 1/10000 1/cm^2 = 1.0e-4 1/cm^2
@@ -630,8 +630,8 @@ ColumnStandard::tick (Treelog& msg, const double dt,
 
   vegetation->tick (time, my_weather.relative_humidity (),
                     *bioclimate, geometry, *soil, 
-		    organic_matter.get (),
-                    *soil_heat, *soil_water, &soil_NH4, &soil_NO3, 
+		    *organic_matter,
+                    *soil_heat, *soil_water, soil_NH4, soil_NO3, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, dt, msg);
   organic_matter->tick (geometry, *soil_water, *soil_heat, 
@@ -976,7 +976,7 @@ ColumnStandard::initialize (const Time& time, Treelog& msg,
   organic_matter->initialize (alist.alist ("OrganicMatter"), 
                               geometry, *soil, *soil_water, 
                               T_avg, msg);
-  vegetation->initialize (time, geometry, *soil, &*organic_matter, msg);
+  vegetation->initialize (time, geometry, *soil, *organic_matter, msg);
   
   // Soil conductivity and capacity logs.
   soil_water->tick_after (geometry.cell_size (), *soil, *soil_heat, msg);

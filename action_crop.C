@@ -294,7 +294,7 @@ ActionCrop::Sow::doIt (Daisy& daisy, Treelog& out)
   if (!done && date.match (daisy.time))
     {
       out.message ("Sowing " + crop.name ("type"));      
-      daisy.field.sow (out, crop); 
+      daisy.field.sow (crop, daisy.time, out); 
       done = true;
     }
 }

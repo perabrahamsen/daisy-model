@@ -35,7 +35,7 @@ struct ActionSow : public Action
   void doIt (Daisy& daisy, Treelog& msg)
   { 
     msg.message (string ("Sowing ") + crop.name ("type"));      
-    daisy.field.sow (msg, crop); 
+    daisy.field.sow (crop,daisy.time, msg); 
   }
 
   ActionSow (Block& al)
