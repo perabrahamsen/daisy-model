@@ -250,19 +250,22 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   // Update age.
   development->DAP += dt/24.0;
 
+  // New day?
+  const Timestep daystep = time - *last_time;
+  const bool new_day = (time.yday () != last_time->yday ()
+                        || time.year () != last_time->year ());
+  if (new_day)
+    *last_time = time;
+
   // Emergence.
-  if ((time.yday () != last_time->yday ()
-       || time.year () != last_time->year ())
-      && development->DS <= 0)
+  if (new_day && development->DS <= 0)
     {
-      const Timestep step = time - *last_time;
-      *last_time = time;
       daisy_assert (ForcedCAI < 0.0);
 
       const double h_middle = geo.content_at (soil_water, &SoilWater::h,
                                               -root_system->Depth/2.);
       development->emergence (h_middle, root_system->soil_temperature, 
-                              step.total_hours ());
+                              daystep.total_hours ());
       if (development->DS >= 0)
 	{
 	  msg.message ("Emerging");
@@ -407,7 +410,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, msg);
   nitrogen.content (development->DS, production);
-  if (time.hour () != 0)
+  if (!new_day)
     return;
 
   canopy.tick (production.WLeaf, production.WSOrg,
