@@ -61,7 +61,7 @@ SelectValue::add_result (double result)
 
 // Print result at end of time step.
 void 
-SelectValue::done ()
+SelectValue::done (const double dt)
 {
   if (count == 0)
     dest.missing ();
@@ -77,9 +77,11 @@ SelectValue::done ()
           result /= (count + 0.0);
           result = exp (result);
           break;
+	case Handle::sum:
+          result *= dt;
+          break;
 	case Handle::min:
 	case Handle::max:
-	case Handle::sum:
 	case Handle::current:
 	  break;
         }

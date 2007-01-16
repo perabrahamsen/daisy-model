@@ -104,6 +104,7 @@ public:
 		     const std::vector<double>& PAR_Height,
 		     const double PAR_LAI,
 		     const std::vector<double>& fraction,
+                     double dt,
 		     CanopyStandard& canopy,
 		     Phenology& development, Treelog&);
   void clear ();
@@ -330,6 +331,7 @@ PhotoFCC4::assimilate (const double ABA_xylem, const double rel_hum,
 		       const vector<double>& PAR_height,
 		       const double PAR_LAI,
 		       const std::vector<double>& fraction,
+                       const double dt,
 		       CanopyStandard& canopy,
 		       Phenology& development,
 		       Treelog& msg) 
@@ -420,7 +422,7 @@ PhotoFCC4::assimilate (const double ABA_xylem, const double rel_hum,
 	  // We count day hours at the top of the crop.
 	  top_crop = false;
 	  if (PAR[i] > 0.5 * 25.0)      //W/m2
-	    development.light_hour ();
+	    development.light_time (dt);
 	}
       // Leaf Area index for a given leaf layer
       const double LA = prevLA - LAIvsH (height);

@@ -206,9 +206,8 @@ CropStandard::initialize (const Geometry& geo,
 		   // We don't save the forced CAI, use simulated CAI
 		   //  until midnight (small error).
 		   -1.0);
-      root_system->set_density (msg, 
-                                geo, production.WRoot, development->DS);
-      nitrogen.content (development->DS, production);
+      root_system->set_density (geo, production.WRoot, development->DS, msg);
+      nitrogen.content (development->DS, production, msg);
     }
 }
 
@@ -271,9 +270,9 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 	  msg.message ("Emerging");
 	  canopy.tick (production.WLeaf, production.WSOrg,
 		       production.WStem, development->DS, -1.0);
-	  nitrogen.content (development->DS, production);
-	  root_system->tick_daily (msg, geo, soil, production.WRoot, 0.0,
-                                   development->DS);
+	  nitrogen.content (development->DS, production, msg);
+	  root_system->tick_daily (geo, soil, production.WRoot, 0.0,
+                                   development->DS, msg);
 
 	  static const symbol root_symbol ("root");
 	  static const symbol dead_symbol ("dead");
@@ -309,8 +308,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   if (development->DS <= 0 || development->mature ())
     return;
 
-  nitrogen.update (time.hour (), production.NCrop, development->DS,
-                   enable_N_stress,
+  nitrogen.update (production.NCrop, development->DS, enable_N_stress,
                    geo, soil, soil_water, soil_NH4, soil_NO3,
                    bioclimate.day_fraction (),
                    *root_system, dt);
@@ -357,14 +355,14 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 	  Ass += photo->assimilate (ABA_xylem, relative_humidity, 
 				    bioclimate.daily_air_temperature (),
 				    production.NLeaf, shadow_PAR, bioclimate.height (),
-                                    total_LAI, fraction_shadow_LAI,
+                                    total_LAI, fraction_shadow_LAI, dt,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
 
           Ass += photo->assimilate (ABA_xylem, relative_humidity,
 				    bioclimate.daily_air_temperature (),
 				    production.NLeaf, sun_PAR, bioclimate.height (),
-                                    total_LAI, fraction_sun_LAI,
+                                    total_LAI, fraction_sun_LAI, dt,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
         }
@@ -380,12 +378,10 @@ CropStandard::tick (const Time& time, const double relative_humidity,
           Ass += photo->assimilate (ABA_xylem, relative_humidity,
 				    bioclimate.daily_air_temperature (), 
 				    production.NLeaf, PAR, bioclimate.height (),
-				    bioclimate.LAI (), fraction_total_LAI,
+				    bioclimate.LAI (), fraction_total_LAI, dt,
 				    canopy, *development, msg)
             * min_light_fraction;
         }
-
-      Ass *= dt;
 
       production.PotCanopyAss = Ass;
       if (root_system->production_stress >= 0.0)
@@ -396,20 +392,19 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 	Ass *= (1.0 - nitrogen_stress);
       Ass *= (1.0 - harvesting.cut_stress);
       production.CanopyAss = Ass;
-      production.CH2OPool += Ass;
       daisy_assert (Ass >= 0.0);
     }
   else
     production.PotCanopyAss = production.CanopyAss = 0.0;
 
   const double T_soil_3 = geo.content_at (soil_heat, &SoilHeat::T,
-                                        -root_system->Depth/3.0);
+                                          -root_system->Depth/3.0);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
 		   root_system->Density, geo, development->DS, 
 		   canopy.CAImRat, nitrogen, nitrogen_stress, partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
-		   residuals_N_soil, residuals_C_soil, msg);
-  nitrogen.content (development->DS, production);
+		   residuals_N_soil, residuals_C_soil, dt, msg);
+  nitrogen.content (development->DS, production, msg);
   if (!new_day)
     return;
 
@@ -419,9 +414,9 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   development->tick_daily (bioclimate.daily_air_temperature (), 
                            production.WLeaf, production, vernalization,
                            harvesting.cut_stress, msg);
-  root_system->tick_daily (msg, geo, soil, 
+  root_system->tick_daily (geo, soil, 
                            production.WRoot, production.IncWRoot,
-                           development->DS);
+                           development->DS, msg);
 }
 
 const Harvest&
@@ -445,7 +440,7 @@ CropStandard::harvest (const symbol column_name,
   Treelog::Open nest (msg, name + " harvest");
 
   // Update nitrogen content.
-  nitrogen.content (development->DS, production);
+  nitrogen.content (development->DS, production, msg);
 
   // Removed chemicals.
   Chemicals chemicals;

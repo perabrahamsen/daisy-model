@@ -1,6 +1,10 @@
+2007-01-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crpn.C (content): Fix partisioning under stress.
+
 2006-12-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* harvesting.C (tick): Use 'Timestep' to simplyfy calculation.
+	* harvesting.C (tick): Use 'Timestep' to simplify calculation.
 
 	* time.h, time.C: Support minutes and seconds.
 	* log_table.C (common_done): Use it.

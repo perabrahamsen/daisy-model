@@ -82,7 +82,7 @@ struct SelectArray : public Select
   }
 
   // Print result at end of time step.
-  void done ()
+  void done (const double dt)
   {
     if (count == 0)
       dest.missing ();
@@ -102,6 +102,11 @@ struct SelectArray : public Select
           case Handle::geometric:
             for (size_t i = 0; i < value.size (); i++)
               result[i] = convert (exp (value[i] / count));
+            dest.add (result);
+            break;
+          case Handle::sum:
+            for (size_t i = 0; i < value.size (); i++)
+              result[i] = convert (exp (value[i] * dt));
             dest.add (result);
             break;
           default:

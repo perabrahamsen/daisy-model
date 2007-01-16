@@ -60,7 +60,7 @@ struct SelectPF : public Select
   }
 
   // Print result at end of time step.
-  void done ()
+  void done (const double)
   {
     if (count == 0)
       dest.missing ();

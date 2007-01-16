@@ -34,7 +34,7 @@ struct ActionIrrigate : public Action
   const int days;
   const int hours;
   bool activated;
-  Time end_time;
+  double remaining_time;
 
   static const double at_air_temperature;
 
@@ -50,15 +50,12 @@ struct ActionIrrigate : public Action
     if (!activated)
       {
 	activated = true;
-	end_time = daisy.time;
-	end_time.tick_hour (hours - 1);
-	end_time.tick_day (days);
+        remaining_time = days * 24 + hours ;
         std::ostringstream tmp;
-        if (daisy.time == end_time)
-          tmp << "Irrigating " << flux << " mm";
-        else
-          tmp << "Irrigating " << flux << " mm/h for "
-                 << days * 24 + hours << " hours";
+        tmp << "Irrigating " << flux << " mm/h for "
+            << remaining_time << " hour";
+        if (!approximate (remaining_time, 1.0))
+          tmp << "s";
         // [kg/ha] -> [g/cm^2]
         const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
         // [mm * mg N/ l] = [l/m^2 * mg N/l] = [mg/m^2] -> [g N/cm^2]
@@ -69,16 +66,26 @@ struct ActionIrrigate : public Action
           tmp << "; " << N << " kg N/ha";
         out.message (tmp.str ());      
       }
-    else if (daisy.time == end_time)
-      out.message ("Irrigating done");
+    const double dt = daisy.dt;
+    double this_flux = flux;
+    if (remaining_time < dt * 1.001)
+      {
+        if (remaining_time < dt * 0.999)
+          this_flux *= remaining_time / dt;
 
-    irrigate (daisy.field, flux, temp, sm);
+        remaining_time = 0.0;
+        out.message ("Irrigating done");
+      }
+    else 
+      remaining_time -= dt;
+    daisy_assert (std::isnormal (this_flux));
+    irrigate (daisy.field, this_flux, temp, sm);
   }
 
   bool done (const Daisy& daisy, Treelog&) const
   {
     daisy_assert (activated);
-    return daisy.time >= end_time; 
+    return remaining_time < daisy.dt * 0.0001; 
   }
 
   static bool check_alist (const AttributeList& alist, Treelog& err)
@@ -106,9 +113,9 @@ struct ActionIrrigate : public Action
                 "Irrigate this number of hours.\n\
 By default, irrigate 1 hour if days is 0, and 0 hours plus the specified\n\
 number of days else.");
-    syntax.add_submodule ("end_time", alist, Syntax::OptionalState,
-                          "Irrigate until this date.\
-Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
+    syntax.add ("remaining_time", "h", Syntax::OptionalState,
+                "Irrigate this number of hours.\
+Setting this overrides the 'days' and 'hours' parameters.");
     syntax.add ("flux", "mm/h", Check::non_negative (), Syntax::Const, 
 		"Amount of irrigation applied.");
     syntax.order ("flux");
@@ -124,8 +131,8 @@ Nitrogen content of irrigation water [mg N/l] (default: none).",
     : Action (al),
       days (al.integer ("days")),
       hours (al.integer ("hours", (days > 0) ? 0 : 1)),
-      activated (al.check ("end_time")),
-      end_time (1, 1, 1, 1),
+      activated (al.check ("remaining_time")),
+      remaining_time (al.number ("remaining_time", 0.0)),
       flux (al.number ("flux")),
       temp (al.number ("temperature", at_air_temperature)),
       sm (al.alist ("solute"))

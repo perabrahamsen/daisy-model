@@ -163,7 +163,7 @@ Daisy::initial_logs (Treelog& out)
 		  output_derived (action, "manager", log);
                   output_list (logs, "output", log, 
                                Librarian<Log>::library ());
-		  log.initial_done (previous);
+		  log.initial_done (previous, dt);
 		}
 	    }
 	}
@@ -193,7 +193,7 @@ Daisy::tick_logs (Treelog& out)
 	      output_vector (harvest, "harvest", log);
 	      output_derived (action, "manager", log);
               output_list (logs, "output", log, Librarian<Log>::library ());
-	      log.done (time);
+	      log.done (time, dt);
 	    }
 	}
     }

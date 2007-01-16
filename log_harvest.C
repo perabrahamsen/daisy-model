@@ -109,7 +109,12 @@ struct LogHarvest : public Log
     return false;
   }
 
-  void done (const Time&)
+  void done (const Time&, double)
+  { daisy_notreached (); }
+
+  bool initial_match (const Daisy&, Treelog&)
+  { return false; }
+  void initial_done (const Time&, double)
   { daisy_notreached (); }
 
   // Normal items.

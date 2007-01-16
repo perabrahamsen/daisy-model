@@ -53,7 +53,7 @@ struct LogExtern : public LogSelect,
   
   // Log.
   symbol tag;
-  void done (const Time&);
+  void done (const Time&, double dt);
   bool initial_match (const Daisy&, Treelog&)
     // No initial line.
   { return false; }
@@ -90,9 +90,9 @@ LogExtern::log_extern_map_type* LogExtern::log_extern_map = NULL;
 int LogExtern::log_extern_count = 0;
 
 void 
-LogExtern::done (const Time& time)
+LogExtern::done (const Time& time, const double dt)
 { 
-  LogSelect::done (time);
+  LogSelect::done (time, dt);
 
   if (!is_printing)
     return;
@@ -100,7 +100,7 @@ LogExtern::done (const Time& time)
   for (unsigned int i = 0; i < entries.size (); i++)
     {
       tag = entries[i]->tag ();
-      entries[i]->done ();
+      entries[i]->done (dt);
     }
 }
 

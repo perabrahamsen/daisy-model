@@ -53,7 +53,7 @@ struct SelectVolume : public SelectValue
 		     const Geometry* geo, const Soil* soil, Treelog&);
 
   // Print result at end of time step.
-  void done ();
+  void done (double dt);
 
   // Create and Destroy.
   symbol default_dimension (const symbol spec_dim) const;
@@ -204,7 +204,7 @@ SelectVolume::output_array (const std::vector<double>& array,
 
 // Print result at end of time step.
 void 
-SelectVolume::done ()
+SelectVolume::done (const double dt)
 {
   if (count == 0)
     dest.missing ();
@@ -220,9 +220,11 @@ SelectVolume::done ()
           result /= (count + 0.0);
           result = exp (result);
           break;
+        case Handle::sum:
+          result *= dt;
+          break;
         case Handle::min:
         case Handle::max:
-        case Handle::sum:
         case Handle::current:
           break;
         }            

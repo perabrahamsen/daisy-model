@@ -55,6 +55,7 @@ public:
                      const std::vector<double>& PAR_Height,
                      const double PAR_LAI,
 		     const std::vector<double>& fraction,
+                     double dt,
                      CanopyStandard& canopy,
                      Phenology& development, Treelog&);
   void output (Log&) const
@@ -80,7 +81,8 @@ PhotoGL::assimilate (const double,  const double,
                      const vector<double>& PAR,
                      const vector<double>& PAR_height,
                      const double PAR_LAI,
-		     const std::vector<double>& ,
+		     const std::vector<double>&,
+                     const double dt,
                      CanopyStandard& canopy,
                      Phenology& development,
                      Treelog& msg) 
@@ -132,7 +134,7 @@ PhotoGL::assimilate (const double,  const double,
 	  // We count day hours at the top of the crop.
 	  top_crop = false;
 	  if (PAR[i] > 0.5 * 25.0)
-	    development.light_hour ();
+	    development.light_time (dt);
 	}
       // Leaf Area index for a given leaf layer
       const double LA = prevLA - LAIvsH (height);

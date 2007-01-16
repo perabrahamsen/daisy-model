@@ -100,6 +100,10 @@ CanopyStandard::CropCAI (double WLeaf, double WSOrg, double WStem, double DS)
   CAI = LeafAI + StemPhotEff * StemAI + SOrgPhotEff * SOrgAI;
 }
 
+double 
+CanopyStandard::corresponding_WLeaf (const double DS) const
+{ return CAI / (SpLAI * LeafAIMod (DS)); }
+
 void
 CanopyStandard::CanopyStructure (double DS)
 {

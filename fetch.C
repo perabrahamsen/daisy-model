@@ -24,10 +24,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "mathlib.h"
-// GCC 2.95 lack ostream.
-#include <iostream>
-
-using namespace std;
+#include <ostream>
 
 void 
 Fetch::error ()
@@ -53,7 +50,7 @@ Fetch::missing ()
 }
 
 void 
-Fetch::add (const vector<double>&)
+Fetch::add (const std::vector<double>&)
 { type = Error; }
 
 void 
@@ -101,7 +98,7 @@ Fetch::period_factor (const symbol period, const int hours)
 int 
 Fetch::width (const double value)
 {
-  if (!isnormal (value))
+  if (!std::isnormal (value))
     return 0;
 
   const int absolute = double2int (floor (log10 (fabs (value)))) + 1;
@@ -111,7 +108,7 @@ Fetch::width (const double value)
     return absolute;
 }
 
-const string 
+const std::string 
 Fetch::dimension (const symbol period) const
 {
   if (type != Flux)
@@ -126,7 +123,7 @@ Fetch::dimension (const symbol period) const
           && (last == 'h' || last == 'd' || last == 'w' 
               || last == 'm' || last == 'y'))
         {
-          const string strip = select_dimension.substr (0, size - 2);
+          const std::string strip = select_dimension.substr (0, size - 2);
           if (period.name () != "")
             return strip + "/" + period;
           else
@@ -173,7 +170,7 @@ Fetch::value_size (double& total, const symbol period, const int hours) const
 }
 
 void 
-Fetch::summarize (ostream& out, const int width, 
+Fetch::summarize (std::ostream& out, const int width, 
                   const symbol period, const int hours) const
 {
   if (type == Content && add_delta)
@@ -208,9 +205,9 @@ Fetch::summarize (ostream& out, const int width,
 }
 
 void
-Fetch::clear (const vector<Fetch*>& fetch)
+Fetch::clear (const std::vector<Fetch*>& fetch)
 { 
-  for (unsigned int i = 0; i != fetch.size (); i++)
+  for (size_t i = 0; i != fetch.size (); i++)
     fetch[i]->clear ();
 }
 
@@ -224,15 +221,15 @@ Fetch::clear ()
 }
 
 void
-Fetch::initialize (const vector<Fetch*>& fetch,
-                   vector<Select*>& select, Treelog& msg)
+Fetch::initialize (const std::vector<Fetch*>& fetch,
+                   std::vector<Select*>& select, Treelog& msg)
 { 
-  for (unsigned int i = 0; i != fetch.size (); i++)
+  for (size_t i = 0; i != fetch.size (); i++)
     {
       Treelog::Open nest (msg, fetch[i]->tag);
       bool found = false;
       
-      for (unsigned int j = 0; j != select.size (); j++)
+      for (size_t j = 0; j != select.size (); j++)
 	{
 	  Treelog::Open nest (msg, select[j]->tag ());
 	  

@@ -42,7 +42,12 @@ struct LogCheckpoint : public LogAList
   bool check_leaf (symbol) const;
   bool check_interior (symbol) const;
   bool match (const Daisy& daisy, Treelog& out);
-  void done (const Time& time);
+  void done (const Time& time, double dt);
+
+  bool initial_match (const Daisy&, Treelog&)
+  { return false; }
+  void initial_done (const Time&, double)
+  { daisy_notreached (); }
 
   // Create and Destroy.
   void initialize (Treelog&);
@@ -75,7 +80,7 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& out)
 }
 
 void
-LogCheckpoint::done (const Time&)
+LogCheckpoint::done (const Time&, double)
 {
   if (is_active)
     {

@@ -118,12 +118,12 @@ private:
   static double density_distribution_parameter (double a);
 public:
   void tick (double T, double dt);
-  void tick_daily (Treelog&, const Geometry&, const Soil&, 
-		   double WRoot, double IncWRoot, double DS);
-  void set_density (Treelog&,
-		    const Geometry& geometry, double WRoot, double DS);
-  void full_grown (Treelog&, const Geometry&, 
-                   double max_rooting_depth, double WRoot);
+  void tick_daily (const Geometry&, const Soil&, 
+		   double WRoot, double IncWRoot, double DS, Treelog&);
+  void set_density (const Geometry& geometry, double WRoot, double DS, 
+                    Treelog&);
+  void full_grown (const Geometry&, double max_rooting_depth, double WRoot, 
+                   Treelog&);
   void output (Log& log) const;
 
   // Create and Destroy

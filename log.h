@@ -28,6 +28,7 @@
 #include "alist.h"
 #include "symbol.h"
 #include <iosfwd>
+#include <memory>
 
 class Daisy;
 class PLF;
@@ -41,7 +42,7 @@ class Log
   // Content.
 private:
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
@@ -60,12 +61,12 @@ public:
   // Called at the start of each time step.
   virtual bool match (const Daisy&, Treelog&) = 0;
   // Called at the end of each time step.
-  virtual void done (const Time& time);
+  virtual void done (const Time& time, double dt) = 0;
 
   // Initial line.
 public:
-  virtual bool initial_match (const Daisy&, Treelog&);
-  virtual void initial_done (const Time& time);
+  virtual bool initial_match (const Daisy&, Treelog&) = 0;
+  virtual void initial_done (const Time& time, double dt) = 0;
 
   // Normal items.
 public:

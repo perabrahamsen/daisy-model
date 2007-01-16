@@ -685,8 +685,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   if (canopy_water_in > 0.01)
     canopy_water_temperature 
       = (canopy_water_storage * air_temperature 
-	 + canopy_water_in * snow_water_out_temperature)
-      / (canopy_water_storage + canopy_water_in);
+	 + canopy_water_in * snow_water_out_temperature * dt)
+      / (canopy_water_storage + canopy_water_in * dt);
   else
     canopy_water_temperature = air_temperature;
 
@@ -704,7 +704,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   
   if (canopy_water_storage > canopy_water_capacity + 1e-8)
     {
-      canopy_water_out = canopy_water_storage - canopy_water_capacity;
+      canopy_water_out = (canopy_water_storage - canopy_water_capacity) / dt;
       canopy_water_storage = canopy_water_capacity;
     }
   else
@@ -734,10 +734,10 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   if (litter_water_in > 0.01)
     litter_water_temperature 
       = (litter_water_storage * air_temperature
-         + canopy_water_bypass * snow_water_out_temperature
-	 + canopy_water_out * canopy_water_temperature
-	 + irrigation_surface * irrigation_surface_temperature)
-      / (litter_water_in + litter_water_storage);
+         + canopy_water_bypass * snow_water_out_temperature * dt
+	 + canopy_water_out * canopy_water_temperature* dt
+	 + irrigation_surface * irrigation_surface_temperature * dt)
+      / (litter_water_in * dt + litter_water_storage);
   else
     litter_water_temperature = air_temperature;
 
@@ -763,12 +763,12 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
               << "litter_ep = " << litter_ep;
           msg.error (tmp.str ());
         }
-      litter_water_out = litter_water_storage;
+      litter_water_out = litter_water_storage / dt;
       litter_water_storage = 0.0;
     }
   else if (litter_water_storage > litter_water_capacity + 1e-8)
     {
-      litter_water_out = litter_water_storage - litter_water_capacity;
+      litter_water_out = (litter_water_storage - litter_water_capacity) / dt;
       litter_water_storage = litter_water_capacity;
     }
   else
@@ -820,7 +820,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   // Actual transpiration
   const double day_fraction
     = (daily_global_radiation_ > 0.0)
-    ? (weather.hourly_global_radiation () / (24.0 * daily_global_radiation_))
+    ? (weather.hourly_global_radiation () * dt 
+       / (24.0 * daily_global_radiation_))
     : 0.0;
   crop_ea = vegetation.transpiration (crop_ep, canopy_ea, geo, soil,
                                       soil_water, day_fraction, dt, msg);
@@ -1005,8 +1006,12 @@ void
 BioclimateStandard::irrigate_overhead (double flux, double temp)
 {
   double new_top = irrigation_overhead + flux;
+
   irrigation_overhead_temperature 
-    = (temp * flux + irrigation_overhead * irrigation_overhead_temperature) / new_top;
+    = (new_top > 0.01)
+    ? (temp * flux
+       + irrigation_overhead * irrigation_overhead_temperature) / new_top
+    : daily_air_temperature ();
   irrigation_overhead = new_top;
 }
 
@@ -1015,8 +1020,10 @@ BioclimateStandard::irrigate_surface (double flux, double temp)
 {
   double new_surface = irrigation_surface + flux;
   irrigation_surface_temperature 
-    = (temp * flux
-       + irrigation_surface * irrigation_surface_temperature) / new_surface;
+    = (new_surface > 0.01) 
+    ? (temp * flux
+       + irrigation_surface * irrigation_surface_temperature) / new_surface
+    : daily_air_temperature ();
   irrigation_surface = new_surface;
 }
 

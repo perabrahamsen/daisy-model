@@ -1,5 +1,13 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* OpenMI Daisy
+
+** C# læs DLL
+
+** C# main program.
+
+** OpenMI interface
+
 * Brug Rect2x1 stoftransport komponent.
 
 ** Flyt surface/groundwater opdatering til MovementRect?

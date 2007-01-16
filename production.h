@@ -45,7 +45,7 @@ private:
   const double ReMobilDS;	// Remobilization, Initial DS
   const double ReMobilRt;	// Remobilization, release rate
   double StemRes;		// Shielded Reserves in Stems
-  double remobilization (const double DS);
+  double remobilization (const double DS, const double dt);
 
   // Parameters.
 private:
@@ -144,6 +144,7 @@ public:
 	     double& residuals_N_top, double& residuals_C_top,
 	     std::vector<double>& residuals_N_soil,
 	     std::vector<double>& residuals_C_soil,
+             double dt,
 	     Treelog&);
   void update_carbon ();
   void none ();

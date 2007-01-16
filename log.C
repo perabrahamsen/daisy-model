@@ -43,13 +43,15 @@ struct Log::Implementation
   list<const Geometry*> geometries;
 };
 
+#if 0
 bool 
 Log::initial_match (const Daisy&, Treelog&)
 { return false; }
 
 void
-Log::initial_done (const Time&)
+Log::initial_done (const Time&, double)
 { }
+#endif
 
 bool
 Log::check_entry (symbol name, const Library& library) const
@@ -100,34 +102,37 @@ Log::close_alist ()
 void 
 Log::open_soil (const Geometry& g, const Soil& s)
 { 
-  impl.geometries.push_back (&g);
-  impl.soils.push_back (&s);
+  impl->geometries.push_back (&g);
+  impl->soils.push_back (&s);
 }
 
 void 
 Log::close_soil ()
 {
-  impl.geometries.pop_back ();
-  impl.soils.pop_back ();
+  impl->geometries.pop_back ();
+  impl->soils.pop_back ();
 }
 
 const Geometry*
 Log::geometry ()
 {
-  daisy_assert (!impl.geometries.empty ());
-  return impl.geometries.back ();
+  daisy_assert (!impl->geometries.empty ());
+  return impl->geometries.back ();
 }
 
 const Soil*
 Log::soil ()
 {
-  daisy_assert (!impl.soils.empty ());
-  return impl.soils.back ();
+  daisy_assert (!impl->soils.empty ());
+  return impl->soils.back ();
 }
 
+
+#if 0
 void 
-Log::done (const Time&)
+Log::done (const Time&, const double)
 { }
+#endif
 
 void
 Log::print_dlf_header (std::ostream& out, const AttributeList& al)
@@ -158,7 +163,7 @@ Log::output (Log&) const
 { }
 
 Log::Log (Block& al)
-  : impl (*new Implementation ()),
+  : impl (new Implementation ()),
     alist (al.alist ()),
     name (al.identifier ("type"))
 { }
@@ -168,6 +173,4 @@ Log::summarize (Treelog&)
 { }
 
 Log::~Log ()
-{
-  delete &impl;
-}
+{ }

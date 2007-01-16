@@ -64,6 +64,7 @@ private:
   void InitialCAI (double WLeaf, double DS);
 public:
   void CropCAI (double WLeaf, double WSOrg, double WStem, double DS);
+  double corresponding_WLeaf (const double DS) const;
   void CanopyStructure (double DS);
 
   // Simulation.

@@ -28,6 +28,7 @@
 #include "geometry.h"
 #include "dlf.h"
 #include "daisy.h"
+#include "timestep.h"
 #include "vcheck.h"
 #include "memutils.h"
 #include <sstream>
@@ -66,15 +67,15 @@ struct LogTable : public LogSelect, public Destination
   
   // Log.
   void common_match (const Daisy& daisy, Treelog& out);
-  void common_done (const Time& time);
+  void common_done (const Time& time, double dt);
 
   // Log.
   bool match (const Daisy& daisy, Treelog& out);
-  void done (const Time& time);
+  void done (const Time& time, double dt);
 
   // Initial line.
   bool initial_match (const Daisy&, Treelog&);
-  void initial_done (const Time& time);
+  void initial_done (const Time& time, const double dt);
 
   // Select::Destination
   void error ();
@@ -100,7 +101,7 @@ LogTable::common_match (const Daisy& daisy, Treelog&)
 { print_header.finish (out, daisy); }
 
 void 
-LogTable::common_done (const Time& time)
+LogTable::common_done (const Time& time, const double dt)
 { 
   if (print_tags)
     {
@@ -204,12 +205,12 @@ LogTable::common_done (const Time& time)
 	<< time.mday () << field_separator << time.hour () << field_separator
         << time.minute () << field_separator << time.second () << field_separator;
 
-  for (unsigned int i = 0; i < entries.size (); i++)
+  for (size_t i = 0; i < entries.size (); i++)
     {
       if (i != 0)
 	out << field_separator;
       
-      entries[i]->done ();
+      entries[i]->done (dt);
 
       switch (type)
 	{
@@ -253,9 +254,9 @@ LogTable::match (const Daisy& daisy, Treelog& msg)
   return LogSelect::match (daisy, msg);
 }
 void 
-LogTable::done (const Time& time)
+LogTable::done (const Time& time, const double dt)
 { 
-  LogSelect::done (time);
+  LogSelect::done (time, dt);
 
   if (!is_printing)
     return;
@@ -264,7 +265,7 @@ LogTable::done (const Time& time)
     if (entries[i]->prevent_printing ())
       return;
 
-  common_done (time);
+  common_done (time, dt);
   end = time;
 }
 bool 
@@ -279,14 +280,14 @@ LogTable::initial_match (const Daisy& daisy, Treelog& msg)
   return LogSelect::initial_match (daisy, msg);
 }
 void 
-LogTable::initial_done (const Time& time)
+LogTable::initial_done (const Time& time, const double dt)
 { 
-  LogSelect::initial_done (time);
+  LogSelect::initial_done (time, dt);
 
   if (!print_initial)
     {
       for (unsigned int i = 0; i < entries.size (); i++)
-        entries[i]->done ();
+        entries[i]->done (dt);
       return;
     }
 
@@ -294,7 +295,7 @@ LogTable::initial_done (const Time& time)
     if (entries[i]->prevent_printing ())
       return;
 
-  common_done (time);
+  common_done (time, dt);
   begin = time;
 }
 
@@ -412,14 +413,10 @@ LogTable::summarize (Treelog& msg)
 
       tmp << "LOGFILE: " << file  << "\n";
       tmp << "VOLUME: " << volume->one_line_description () << "\n";
-      tmp << "TIME: " 
-	     << begin.year () << "-" << begin.month () << "-" << begin.mday () 
-	     << "h" << begin.hour () << " to "
-	     << end.year () << "-" << end.month () << "-" << end.mday () 
-	     << "h" << end.hour ();
+      tmp << "TIME: " << begin.print () << " to " << end.print ();
       msg.message (tmp.str ());
-      
-      for (unsigned int i = 0; i < summary.size (); i++)
+      const Timestep step = end - begin;
+      for (size_t i = 0; i < summary.size (); i++)
 	summary[i]->summarize (Time::hours_between (begin, end), msg);
     }
 }

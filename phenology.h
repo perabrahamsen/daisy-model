@@ -46,7 +46,7 @@ public:
 
   // Simulation.
 public:
-  void light_hour ();
+  void light_time (double dt);
   virtual void tick_daily (double Ta, double WLeaf, 
 			   Production&, Vernalization&, 
 			   double cut_stress, Treelog&) = 0;

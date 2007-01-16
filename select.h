@@ -130,7 +130,7 @@ public:
     return is_active;
   }
   // Print result at end of time step.
-  virtual void done () = 0;
+  virtual void done (double dt) = 0;
   virtual bool prevent_printing ();
 
   // Create and Destroy.

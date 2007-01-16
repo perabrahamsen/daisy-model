@@ -40,8 +40,14 @@ CrpN::cut (const double DS)
 }
 
 void
-CrpN::content (const double DS, Production& production)
+CrpN::content (const double DS, Production& production, Treelog& msg)
 {
+  daisy_assert (production.WRoot >= 0.0);
+  daisy_assert (production.WLeaf >= 0.0);
+  daisy_assert (production.WStem >= 0.0);
+  daisy_assert (production.WSOrg >= 0.0);
+  daisy_assert (production.NCrop >= 0.0);
+
   PtNCnt = PtLeafCnc (DS) * production.WLeaf
     + PtStemCnc (DS) * production.WStem
     + PtSOrgCnc (DS) * production.WSOrg
@@ -59,8 +65,25 @@ CrpN::content (const double DS, Production& production)
 
   if (production.NCrop >= CrNCnt)
     {
+      daisy_assert (!isequal (PtNCnt, CrNCnt));
       const double x = (production.NCrop - CrNCnt)
         / (PtNCnt - CrNCnt);
+      daisy_assert (x >= 0.0);
+      if (x > 1.0)
+        { 
+          if (state != above_PT && state != N_uninitialized)
+            msg.warning ("Nitrogen content of crop above maximum");
+          state = above_PT;
+        }
+      else
+        {
+          if (state != PT_to_CR && state != N_uninitialized)
+            msg.message ("Luxury nitrogen uptake initiated");
+          state = PT_to_CR;
+        }
+        
+      production.NRoot = ((PtRootCnc (DS) - CrRootCnc (DS)) * x
+        + CrRootCnc (DS)) * production.WRoot;
       production.NLeaf = ((PtLeafCnc (DS) - CrLeafCnc (DS)) * x
         + CrLeafCnc (DS)) * production.WLeaf;
       production.NStem = ((PtStemCnc (DS) - CrStemCnc (DS)) * x
@@ -68,36 +91,47 @@ CrpN::content (const double DS, Production& production)
       production.NSOrg = ((PtSOrgCnc (DS) - CrSOrgCnc (DS)) * x
         + CrSOrgCnc (DS)) * production.WSOrg;
     }
+  else if (production.NCrop >= NfNCnt)
+    {
+      daisy_assert (!isequal (CrNCnt, NfNCnt));
+      const double x = (production.NCrop - NfNCnt) / (CrNCnt - NfNCnt);
+      daisy_assert (x >= 0.0);
+      daisy_assert (x <= 1.0);
+      if (state != CR_to_NF && state != N_uninitialized)
+        msg.message ("Crop affected by nitrogen stress");
+      state = CR_to_NF;
+
+      production.NRoot = ((CrRootCnc (DS) - NfRootCnc (DS)) * x
+        + NfRootCnc (DS)) * production.WRoot;
+      production.NLeaf = ((CrLeafCnc (DS) - NfLeafCnc (DS)) * x
+        + NfLeafCnc (DS)) * production.WLeaf;
+      production.NStem = ((CrStemCnc (DS) - NfStemCnc (DS)) * x
+        + NfStemCnc (DS)) * production.WStem;
+      production.NSOrg = ((CrSOrgCnc (DS) - NfSOrgCnc (DS)) * x
+        + NfSOrgCnc (DS)) * production.WSOrg;
+    }
   else
     {
-      const double x = (production.NCrop - CrNCnt) / (NfNCnt - CrNCnt);
-      production.NLeaf = ((NfLeafCnc (DS) - CrLeafCnc (DS)) * x
-        + CrLeafCnc (DS)) * production.WLeaf;
-      production.NStem = ((NfStemCnc (DS) - CrStemCnc (DS)) * x
-        + CrStemCnc (DS)) * production.WStem;
-      production.NSOrg = ((NfSOrgCnc (DS) - CrSOrgCnc (DS)) * x
-        + CrSOrgCnc (DS)) * production.WSOrg;
+      if (state != below_NF && state != N_uninitialized)
+        msg.warning ("Nitrogen content of crop below minimum");
+      state = below_NF;
+      daisy_assert (NfNCnt > 0.0);
+      const double x = production.NCrop / NfNCnt;
+      daisy_assert (x >= 0.0);
+      daisy_assert (x <= 1.0);
+      production.NRoot = NfRootCnc (DS) * x * production.WRoot;
+      production.NLeaf = NfLeafCnc (DS) * x * production.WLeaf;
+      production.NStem = NfStemCnc (DS) * x * production.WStem;
+      production.NSOrg = NfSOrgCnc (DS) * x * production.WSOrg;
     }
-  production.NRoot = production.NCrop 
-    - production.NLeaf - production.NStem - production.NSOrg;
-  if (production.NRoot < 0.0)
-    {
-      std::ostringstream tmp;
-      tmp << "NCrop = " << production.NCrop << "; NfNCnt = " << NfNCnt 
-          << "; CrNCnt = " << CrNCnt << "; PtNCnt = " << PtNCnt << "\n";
-      tmp << "NLeaf = " << production.NLeaf 
-          << "; NStem = " << production.NStem
-          << "; NSOrg = " << production.NSOrg << "\n";
-      tmp << "NRoot = NCrop - NLeaf - NStem - NSOrg = "
-          << production.NRoot << "\n";
-      production.NRoot = production.WRoot = NfRootCnc (DS);
-      tmp << "NRoot adjusted to " << production.NRoot;
-      daisy_warning (tmp.str ());
-      production.NRoot = production.WRoot = NfRootCnc (DS);
-    }
+
+  daisy_assert (production.NRoot >= 0.0);
   daisy_assert (production.NLeaf >= 0.0);
   daisy_assert (production.NStem >= 0.0);
   daisy_assert (production.NSOrg >= 0.0);
+  daisy_assert (approximate (production.NCrop, 
+                             production.NRoot + production.NLeaf 
+                             + production.NStem + production.NSOrg));
 }
 
 void
@@ -107,7 +141,7 @@ CrpN::clear ()
 }
 
 void
-CrpN::update (const int Hour, double& NCrop, const double DS,
+CrpN::update (double& NCrop, const double DS,
 	      const bool enable_N_stress,
               const Geometry& geo,
 	      const Soil& soil, const SoilWater& soil_water,
@@ -116,20 +150,25 @@ CrpN::update (const int Hour, double& NCrop, const double DS,
 	      RootSystem& root_system,
               const double dt)
 {
+#if 0
+  // I believe this is a leftover from daily production.
   double PotNUpt = (PtNCnt - NCrop) / ((Hour == 0) ? 1.0 : (25.0 - Hour));
+#else
+  double PotNUpt = (PtNCnt - NCrop);
+#endif
 
   const double NUpt = root_system.nitrogen_uptake (geo, soil, soil_water, 
 						   soil_NH4, NH4_root_min, 
 						   soil_NO3, NO3_root_min,
-						   PotNUpt, dt);
+						   PotNUpt, dt) * dt;
   NCrop += NUpt;
   PotNUpt -= NUpt;
 
   if (PotNUpt > 0 && DS > DS_start_fixate)
     {
-      Fixated = fixate_factor * PotNUpt;
-      AccFixated += Fixated;
-      NCrop += Fixated;
+      Fixated = fixate_factor * PotNUpt / dt;
+      AccFixated += Fixated * dt;
+      NCrop += Fixated * dt;
       // PotNUpt -= auxiliary.Fixated;
     }
   else
@@ -303,6 +342,7 @@ CrpN::CrpN (const AttributeList& al)
     NH4_root_min (al.number ("NH4_root_min")),
     nitrogen_stress (0.0),
     nitrogen_stress_days (al.number ("nitrogen_stress_days")),
+    state (N_uninitialized),
     DS_fixate (al.number ("DS_fixate")),
     DS_cut_fixate (al.number ("DS_cut_fixate")),
     fixate_factor (al.number ("fixate_factor")),

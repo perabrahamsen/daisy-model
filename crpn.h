@@ -78,6 +78,10 @@ public:
   double nitrogen_stress;	// Fraction of requested nitrogen didn't got.
   double nitrogen_stress_days;	// Accumulated nitrogen stress.
 
+  // State
+private:
+  enum { N_uninitialized, above_PT, PT_to_CR, CR_to_NF, below_NF } state;
+
   // Fixation.
 private:
   const double DS_fixate;	// Fixation of atmospheric N. after this DS
@@ -91,10 +95,9 @@ private:
   // Simulation.
 public:
   void cut (double DS);
-  void content (const double DS, Production& production);
+  void content (double DS, Production&, Treelog&);
   void clear ();
-  void update (int Hour, double& NCrop, double DS,
-	       bool enable_N_stress,
+  void update (double& NCrop, double DS, bool enable_N_stress,
 	       const Geometry&, const Soil& soil, const SoilWater& soil_water,
 	       SoilNH4& soil_NH4, SoilNO3& soil_NO3,
                double day_fraction,

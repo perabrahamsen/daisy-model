@@ -33,7 +33,7 @@ protected:
 
   // Output routines.
 public:
-  void done ();
+  void done (double dt);
 
   // Create and Destroy.
 public:

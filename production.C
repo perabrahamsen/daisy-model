@@ -32,8 +32,6 @@
 #include <sstream>
 #include "mathlib.h"
 
-using namespace std;
-
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
 // Based on Penning de Vries et al. 1989, page 63
@@ -47,7 +45,7 @@ const double molWeightCH2O = 30.0; // [gCH2O/mol]
 const double molWeightCO2 = 44.0; // [gCO2/mol]
 
 double
-Production::remobilization (const double DS)
+Production::remobilization (const double DS, const double dt)
 {
   if (DS < ReMobilDS)
     {
@@ -62,7 +60,7 @@ Production::remobilization (const double DS)
   else
     {
       const double ReMobilization = ReMobilRt / 24. * StemRes;
-      StemRes -= ReMobilization;
+      StemRes -= ReMobilization * dt;
       return ReMobilization;
     }
 }
@@ -107,9 +105,9 @@ Production::maintenance_respiration (double r, double w, double T)
 
   return (molWeightCH2O / molWeightCO2)
     * r / 24. 
-    * max (0.0, 
-	   0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
-			       - exp (0.57 - 0.042 * T - 0.0051 * T * T))) * w;
+    * std::max (0.0, 
+                0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
+                          - exp (0.57 - 0.042 * T - 0.0051 * T * T))) * w;
 }
 
 // Based on Penning de Vries et al. 1989, page 63
@@ -120,7 +118,7 @@ Production::GrowthRespCoef (double E)
 
 void
 Production::tick (const double AirT, const double SoilT,
-		  const vector<double>& Density,
+		  const std::vector<double>& Density,
 		  const Geometry& geo,
 		  const double DS, const double CAImRat,
 		  const CrpN& nitrogen,
@@ -128,8 +126,9 @@ Production::tick (const double AirT, const double SoilT,
 		  const Partition& partition,
 		  double& residuals_DM,
 		  double& residuals_N_top, double& residuals_C_top,
-		  vector<double>& residuals_N_soil,
-		  vector<double>& residuals_C_soil,
+		  std::vector<double>& residuals_N_soil,
+		  std::vector<double>& residuals_C_soil,
+                  const double dt,
 		  Treelog& msg)
 {
   const double LeafGrowthRespCoef = GrowthRespCoef (E_Leaf);
@@ -139,13 +138,13 @@ Production::tick (const double AirT, const double SoilT,
   const double DS1 = fmod (DS, 2.0);
 
   // Remobilization
-  const double ReMobil = remobilization (DS);
+  const double ReMobil = remobilization (DS, dt);
   const double CH2OReMobil = ReMobil * DM_to_C_factor (E_Stem) * 30.0/12.0;
   const double ReMobilResp = CH2OReMobil - ReMobil;
   // Note:  We used to have "CH2OPool += Remobil", but that does not
   // give C balance.  ReMobilResp was invented, and gets it's strange
   // value, to get the same result but with a mass balance.  
-  CH2OPool += CH2OReMobil;
+  CH2OPool += CH2OReMobil * dt;
 
   // Release of root reserves
   bool ReleaseOfRootReserves = false;
@@ -153,38 +152,44 @@ Production::tick (const double AirT, const double SoilT,
     {
       if (WLeaf < LfRtRelRtRes * WRoot)
 	{
-	  const double RootRelease = RelRateRtRes * WRoot / 24.;
+	  const double RootRelease = RelRateRtRes * WRoot * dt / 24.;
 	  CH2OPool += RootRelease * DM_to_C_factor (E_Root) * (30./12.);
 	  WRoot -= RootRelease;
 	  ReleaseOfRootReserves = true;
 	}
     }
-  double NetAss = CanopyAss;
 
-  double RMLeaf
+  // Photosyntheses.
+  CH2OPool += CanopyAss * dt;
+  double NetAss = CanopyAss;    // [g CH2O/m^2/h]
+
+  // Mantenance respiration.
+  double RMLeaf                 // [g CH2O/m^2/h]
     = maintenance_respiration (r_Leaf, WLeaf, AirT);
-  const double RMStem
+  const double RMStem           // [g CH2O/m^2/h]
     = maintenance_respiration (r_Stem, WStem, AirT);
-  const double RMSOrg
+  const double RMSOrg           // [g CH2O/m^2/h]
     = maintenance_respiration (r_SOrg, WSOrg, AirT);
-  const double RMRoot
+  const double RMRoot           // [g CH2O/m^2/h]
     = maintenance_respiration (r_Root, WRoot, SoilT);
 
   // Water stress stops leaf respiration.
-  RMLeaf = max (0.0, RMLeaf - PotCanopyAss + CanopyAss);
-  const double RM = RMLeaf + RMStem + RMSOrg + RMRoot + ReMobilResp;
+  RMLeaf = std::max (0.0, RMLeaf - PotCanopyAss + CanopyAss);
+  const double RM =             // [g CH2O/m^2/h]
+    RMLeaf + RMStem + RMSOrg + RMRoot + ReMobilResp;
   Respiration += RM;
   MaintRespiration = RM;
   NetAss -= RM;
-  double RootResp = RMRoot;
+  double RootResp = RMRoot;     // [g CH2O/m^2/h]
 
   daisy_assert (CH2OPool >= 0.0);
-  if (CH2OPool >= RM)
+  if (CH2OPool >= RM * dt)
     {
       // We have enough assimilate to cover respiration.
-      CH2OPool -= RM;
-      const double AssG = CH2OReleaseRate * CH2OPool;
-      CH2OPool -= AssG;
+      CH2OPool -= RM * dt;
+      const double AssG         // [g CH2O/m^2/h]
+        = std::max (1.0, dt * CH2OReleaseRate) * CH2OPool;
+      CH2OPool -= AssG * dt;
 
       // Partition growth.
       double f_Leaf, f_Stem, f_SOrg, f_Root;
@@ -202,11 +207,13 @@ Production::tick (const double AirT, const double SoilT,
       IncWSOrg = E_SOrg * f_SOrg * AssG;
       IncWRoot = E_Root * f_Root * AssG;
 
-      GrowthRespiration = LeafGrowthRespCoef * f_Leaf * AssG
+      GrowthRespiration         // [g CH2O/m^2/h]
+        = LeafGrowthRespCoef * f_Leaf * AssG
         + StemGrowthRespCoef * f_Stem * AssG
         + SOrgGrowthRespCoef * f_SOrg * AssG
         + RootGrowthRespCoef * f_Root * AssG;
-      const double IncC = IncWLeaf * DM_to_C_factor (E_Leaf)
+      const double IncC         // // [g C/m^2/h]
+        = IncWLeaf * DM_to_C_factor (E_Leaf)
         + IncWStem * DM_to_C_factor (E_Stem)
         + IncWSOrg * DM_to_C_factor (E_SOrg)
         + IncWRoot * DM_to_C_factor (E_Root);
@@ -215,14 +222,14 @@ Production::tick (const double AirT, const double SoilT,
         {
           std::ostringstream tmp;
           tmp << "C inblance in growth\n"
-                 << "Assimilate = " <<  AssG * 10 * 12./30. << " kg C/ha\n"
-                 << "Remobil = " << CH2OReMobil * 10 * 12./30. << " kg C/ha\n"
-                 << "Growth = " <<  IncC * 10 << " kg C/ha\n"
-                 << "Resp = " <<  GrowthRespiration * 10 * 12./30.
-                 << " kg C/ha\nError " 
-                 << ((AssG - CH2OReMobil) * 12./30
-                     - IncC - GrowthRespiration * 12./30) * 10 
-                 <<  " kg C/ha";
+              << "Assimilate = " <<  AssG * 10 * 12./30. << " kg C/ha/h\n"
+              << "Remobil = " << CH2OReMobil * 10 * 12./30. << " kg C/ha/h\n"
+              << "Growth = " <<  IncC * 10 << " kg C/ha/h\n"
+              << "Resp = " <<  GrowthRespiration * 10 * 12./30.
+              << " kg C/ha/h\nError " 
+              << ((AssG - CH2OReMobil) * 12./30
+                  - IncC - GrowthRespiration * 12./30) * 10 
+              <<  " kg C/ha/h";
           msg.error (tmp.str ());
         }
       NetAss -= GrowthRespiration;
@@ -236,48 +243,48 @@ Production::tick (const double AirT, const double SoilT,
 
       // Remobilization should generate more assimilate than it
       // consumes.  We satisfy that process first. 
-      daisy_assert (ReMobilResp <= CH2OPool);
-      CH2OPool -= ReMobilResp;
+      daisy_assert (ReMobilResp * dt <= CH2OPool);
+      CH2OPool -= ReMobilResp * dt;
 
       // We need leafs for photosyntheses, to generate more assimilate.
-      if (RMLeaf <= CH2OPool)
+      if (RMLeaf * dt <= CH2OPool)
 	{
 	  IncWLeaf = 0.0;
-	  CH2OPool -= RMLeaf;
+	  CH2OPool -= RMLeaf * dt;
 	}
       else
 	{
-	  IncWLeaf = (CH2OPool - RMLeaf) * 12.0/30.0
+	  IncWLeaf = (CH2OPool / dt - RMLeaf) * 12.0/30.0
             / DM_to_C_factor (E_Leaf);
 	  CH2OPool = 0.0;
 	}
 
       // Will somebody please think of the children!
-      if (RMSOrg <= CH2OPool)
+      if (RMSOrg * dt <= CH2OPool)
 	{
 	  IncWSOrg = 0.0;
-	  CH2OPool -= RMSOrg;
+	  CH2OPool -= RMSOrg * dt;
 	}
       else
 	{
-	  IncWSOrg = (CH2OPool - RMSOrg) * 12.0/30.0
+	  IncWSOrg = (CH2OPool - RMSOrg * dt) * 12.0/30.0
             / DM_to_C_factor (E_SOrg);
 	  CH2OPool = 0.0;
 	}
 
       // An upstanding crop.
-      if (RMStem <= CH2OPool)
+      if (RMStem * dt <= CH2OPool)
 	{
 	  IncWStem = -ReMobil;
-	  CH2OPool -= RMStem;
+	  CH2OPool -= RMStem * dt;
 	}
       else
 	{
-	  IncWStem = (CH2OPool - RMStem) * 12.0/30.0
+	  IncWStem = (CH2OPool / dt - RMStem) * 12.0/30.0
              / DM_to_C_factor (E_Stem) - ReMobil;
           // If we have more stem than sorg, and enough stem to cover
           // the loss of sorg, we do so.
-          if (WStem + IncWStem + IncWSOrg >= 0.0
+          if (WStem + IncWStem * dt + IncWSOrg * dt >= 0.0
 	      && WStem > WSOrg)
             {
               daisy_assert (IncWSOrg <= 0.0);
@@ -289,23 +296,23 @@ Production::tick (const double AirT, const double SoilT,
 	}
 
       // Roots are furthest away from the CH2O source, gets last.
-      if (RMRoot < CH2OPool)
+      if (RMRoot * dt < CH2OPool)
 	{
 	  IncWRoot = 0.0;
-	  CH2OPool -= RMRoot;
+	  CH2OPool -= RMRoot * dt;
 	  std::ostringstream tmp;
 	  tmp << "BUG: Extra CH2O: " << CH2OPool;
 	  msg.error (tmp.str ());
 	}
       else
 	{
-	  IncWRoot = (CH2OPool - RMRoot) * 12.0/30.0
+	  IncWRoot = (CH2OPool / dt - RMRoot) * 12.0/30.0
             / DM_to_C_factor (E_Root) ;
 	  CH2OPool = 0.0;
 	}
     }
   NetPhotosynthesis = molWeightCO2 / molWeightCH2O * NetAss;
-  AccNetPhotosynthesis += NetPhotosynthesis;
+  AccNetPhotosynthesis += NetPhotosynthesis * dt;
 
   RootRespiration = molWeightCO2 / molWeightCH2O * RootResp;
 
@@ -347,8 +354,8 @@ Production::tick (const double AirT, const double SoilT,
   daisy_assert (DeadNLeaf >= 0.0);
   IncWLeaf -= DeadWLeaf;
   daisy_assert (DeadWLeaf >= 0.0);
-  WDead += (1.0 - ExfoliationFac) * DeadWLeaf;
-  NDead += (1.0 - ExfoliationFac) * DeadNLeaf;
+  WDead += (1.0 - ExfoliationFac) * DeadWLeaf * dt;
+  NDead += (1.0 - ExfoliationFac) * DeadNLeaf * dt;
   daisy_assert (NDead >= 0.0);
 
   const double W_foli = ExfoliationFac * DeadWLeaf;
@@ -361,12 +368,12 @@ Production::tick (const double AirT, const double SoilT,
   else
     {
       daisy_assert (N_foli > 0.0);
-      AM_leaf->add ( C_foli * m2_per_cm2, N_foli * m2_per_cm2);
+      AM_leaf->add (dt * C_foli * m2_per_cm2, dt * N_foli * m2_per_cm2);
       residuals_DM += W_foli;
       residuals_N_top += N_foli;
       residuals_C_top += C_foli;
-      C_AM += C_foli;
-      N_AM += N_foli;
+      C_AM += C_foli * dt;
+      N_AM += N_foli * dt;
     }
 
   // Update dead roots.
@@ -387,42 +394,43 @@ Production::tick (const double AirT, const double SoilT,
       IncWRoot -= DeadWRoot;
       const double C_Root = DM_to_C_factor (E_Root) * DeadWRoot;
       C_Loss += C_Root;
-      AM_root->add_surface (geo, C_Root * m2_per_cm2,
-                            DeadNRoot * m2_per_cm2,
+      AM_root->add_surface (geo, dt * C_Root * m2_per_cm2,
+                            dt * DeadNRoot * m2_per_cm2,
                             Density);
       daisy_assert (iszero (C_Root) || DeadNRoot > 0.0);
       residuals_DM += DeadWRoot;
       geo.add_surface (residuals_C_soil, Density, C_Root * m2_per_cm2);
       geo.add_surface (residuals_N_soil, Density, DeadNRoot * m2_per_cm2);
-      C_AM += C_Root;
-      N_AM += DeadNRoot;
+      C_AM += C_Root * dt;
+      N_AM += DeadNRoot * dt;
     }
   else
     DeadWRoot = DeadNRoot = 0.0;
 
   // Update production.
-  NCrop -= (DeadNLeaf + DeadNRoot);
+  NCrop -= (DeadNLeaf + DeadNRoot) * dt;
   daisy_assert (NCrop > 0.0);
-  WLeaf += IncWLeaf;
-  WStem += IncWStem;
-  WSOrg += IncWSOrg;
-  WRoot += IncWRoot;
+  WLeaf += IncWLeaf * dt;
+  WStem += IncWStem * dt;
+  WSOrg += IncWSOrg * dt;
+  WRoot += IncWRoot * dt;
   const double old_CCrop = CCrop;
   update_carbon ();
   CCrop = CLeaf + CStem + CSOrg + CRoot + CDead + CH2OPool * 12./30.;
   const double error 
-    = (old_CCrop + NetPhotosynthesis *  12./44. - C_Loss - CCrop) * 10;
+    = (old_CCrop + dt * (NetPhotosynthesis *  12./44. - C_Loss) - CCrop) * 10;
   static double accum = 0.0;
   accum += error;
-  if (!approximate (old_CCrop + NetPhotosynthesis *  12./44 - C_Loss, CCrop)
+  if (!approximate (old_CCrop + dt * (NetPhotosynthesis *  12./44 - C_Loss),
+                    CCrop)
       || error > 0.00001 /* 0.001 g/ha */)
     {
       std::ostringstream tmp;
       tmp << "C balance error\n"
              << "Old C = " << old_CCrop * 10 << " kg/ha\n"
-             << "NetPhotosynthesis = " << NetPhotosynthesis *  12./30. * 10 
+             << "NetPhotosynthesis = " << NetPhotosynthesis *  12./30. * 10 * dt
              << " kg/ha\n"
-             << "Loss " << C_Loss << " kg/ha\n"
+             << "Loss " << C_Loss * dt << " kg/ha\n"
              << "New C = " << CCrop * 10 << " kg/ha\n"
              << "Error = " << error * 1000 << " g/ha\n"
              << "Accumulated = " << accum << " kg/ha"; 
@@ -511,7 +519,7 @@ Production::load_syntax (Syntax& syntax, AttributeList& alist)
 Crop production in the default crop model.");
 
   // Remobilization.
-  syntax.add ("ShldResC", Syntax::None (), Syntax::Const,
+  syntax.add ("ShldResC", Syntax::Fraction (), Syntax::Const,
 	      "Capacity of shielded reserves (fraction of stem DM).");
   alist.add ("ShldResC", 0.0);
   syntax.add ("ReMobilDS", Syntax::None (), Syntax::Const,
@@ -525,7 +533,7 @@ Crop production in the default crop model.");
   alist.add ("StemRes", 0.0);
 
   // Parameters.
-  syntax.add ("CH2OReleaseRate", Syntax::None (), Syntax::Const,
+  syntax.add ("CH2OReleaseRate", "h^-1", Syntax::Const,
 	      "CH2O Release Rate constant.");
   alist.add ("CH2OReleaseRate", 0.04);
   syntax.add ("E_Root", Syntax::None (), Syntax::Const,
@@ -542,11 +550,11 @@ Crop production in the default crop model.");
   syntax.add ("r_Root", Syntax::None (), Syntax::Const,
 	      "Maintenance respiration coefficient, root.");
   alist.add ("r_Root", 0.015);
-  syntax.add ("r_Leaf", Syntax::None (), Syntax::Const,
+  syntax.add ("r_Leaf", "d^-1", Syntax::Const,
 	      "Maintenance respiration coefficient, leaf.");
-  syntax.add ("r_Stem", Syntax::None (), Syntax::Const,
+  syntax.add ("r_Stem", "d^-1", Syntax::Const,
 	      "Maintenance respiration coefficient, stem.");
-  syntax.add ("r_SOrg", Syntax::None (), Syntax::Const,
+  syntax.add ("r_SOrg", "d^-1", Syntax::Const,
 	      "Maintenance respiration coefficient, storage organ.");
   syntax.add ("ExfoliationFac", Syntax::None (), Syntax::Const,
 	      "Exfoliation factor, 0-1.");
@@ -640,23 +648,23 @@ For initialization, set this to the amount of N in the seed.");
 	      "Growth Respiration.");
   syntax.add ("RootRespiration", "g CO2/m^2/h", Syntax::LogOnly,
 	      "Root Respiration.");
-  syntax.add ("IncWLeaf", "g DM/m^2/d", Syntax::LogOnly,
+  syntax.add ("IncWLeaf", "g DM/m^2/h", Syntax::LogOnly,
 	      "Leaf growth.");
-  syntax.add ("IncWStem", "g DM/m^2/d", Syntax::LogOnly,
+  syntax.add ("IncWStem", "g DM/m^2/h", Syntax::LogOnly,
 	      "Stem growth.");
-  syntax.add ("IncWSOrg", "g DM/m^2/d", Syntax::LogOnly,
+  syntax.add ("IncWSOrg", "g DM/m^2/h", Syntax::LogOnly,
 	      "Storage organ growth.");
-  syntax.add ("IncWRoot", "g DM/m^2/d", Syntax::LogOnly,
+  syntax.add ("IncWRoot", "g DM/m^2/h", Syntax::LogOnly,
 	      "Root growth.");
-  syntax.add ("DeadWLeaf", "g DM/m^2/d", Syntax::LogOnly,
+  syntax.add ("DeadWLeaf", "g DM/m^2/h", Syntax::LogOnly,
 	      "Leaf DM removed.");
-  syntax.add ("DeadNLeaf", "g N/m2/d", Syntax::LogOnly,
+  syntax.add ("DeadNLeaf", "g N/m2/h", Syntax::LogOnly,
 	      "Leaf N removed.");
-  syntax.add ("DeadWRoot", "g DM/m^2/d", Syntax::LogOnly,
+  syntax.add ("DeadWRoot", "g DM/m^2/h", Syntax::LogOnly,
 	      "Root DM removed.");
-  syntax.add ("DeadNRoot", "g N/m2/d", Syntax::LogOnly,
+  syntax.add ("DeadNRoot", "g N/m2/h", Syntax::LogOnly,
 	      "Root N removed.");
-  syntax.add ("C_Loss", "g C/m^2", Syntax::LogOnly,"C lost from the crop");
+  syntax.add ("C_Loss", "g C/m^2/h", Syntax::LogOnly,"C lost from the crop");
 }
 
 void
@@ -668,8 +676,8 @@ Production::initialize (const double SeedN)
 
 void
 Production::initialize (const symbol name, 
-			const vector<AttributeList*>& root,
-			const vector<AttributeList*>& dead,
+			const std::vector<AttributeList*>& root,
+			const std::vector<AttributeList*>& dead,
 			const Geometry& geo,
 			OrganicMatter& organic_matter)
 {

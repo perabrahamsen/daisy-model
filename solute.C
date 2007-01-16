@@ -30,8 +30,6 @@
 #include "mathlib.h"
 #include <sstream>
 
-using namespace std;
-
 double
 Solute::total_surface (const Geometry& geo, double from, double to) const
 { return geo.total_surface (M_, from, to); }
@@ -39,38 +37,38 @@ Solute::total_surface (const Geometry& geo, double from, double to) const
 void
 Solute::clear ()
 {
-  fill (S.begin (), S.end (), 0.0);
-  fill (S_external.begin (), S_external.end (), 0.0);
-  fill (S_root.begin (), S_root.end (), 0.0);
-  fill (tillage.begin (), tillage.end (), 0.0);
+  std::fill (S.begin (), S.end (), 0.0);
+  std::fill (S_external.begin (), S_external.end (), 0.0);
+  std::fill (S_root.begin (), S_root.end (), 0.0);
+  std::fill (tillage.begin (), tillage.end (), 0.0);
 }
 
 void
-Solute::add_to_source (const vector<double>& v, const double dt)
+Solute::add_to_source (const std::vector<double>& v, const double dt)
 {
   daisy_assert (S.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
       S[i] += v[i];
-      daisy_assert (isfinite (S[i]));
+      daisy_assert (std::isfinite (S[i]));
       daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
 
 void
-Solute::add_to_sink (const vector<double>& v, const double dt)
+Solute::add_to_sink (const std::vector<double>& v, const double dt)
 {
   daisy_assert (S.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
       S[i] -= v[i];
-      daisy_assert (isfinite (S[i]));
+      daisy_assert (std::isfinite (S[i]));
       daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
 
 void
-Solute::add_to_root_sink (const vector<double>& v, const double dt)
+Solute::add_to_root_sink (const std::vector<double>& v, const double dt)
 {
   daisy_assert (S_root.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
@@ -87,8 +85,8 @@ Solute::tick (const size_t cell_size,
     daisy_assert (M_left (i, dt) >= 0.0);
 
   // Initialize.
-  fill (S_p.begin (), S_p.end (), 0.0);
-  fill (J_p.begin (), J_p.end (), 0.0);
+  std::fill (S_p.begin (), S_p.end (), 0.0);
+  std::fill (J_p.begin (), J_p.end (), 0.0);
 
   // Permanent source.
   for (size_t i = 0; i < cell_size; i++)
@@ -164,7 +162,7 @@ Only for initialization of the 'M' parameter.");
 	      "External source, such as incorporated fertilizer.");
   syntax.add ("S_permanent", "g/cm^3/h", Syntax::State, Syntax::Sequence,
 	      "Permanent external source, e.g. subsoil irrigation.");
-  vector<double> empty;
+  std::vector<double> empty;
   alist.add ("S_permanent", empty);
   syntax.add ("S_root", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term (root uptake only, always negative).");
@@ -199,7 +197,7 @@ void
 Solute::set_external_source (const Geometry& geo, 
 			     double amount, double from, double to)
 {
-  fill (S_permanent.begin (), S_permanent.end (), 0.0);
+  std::fill (S_permanent.begin (), S_permanent.end (), 0.0);
   geo.add_surface (S_permanent, from, to, amount);
 }
 
@@ -225,7 +223,7 @@ Solute::swap (const Geometry& geo,
 
 void 
 Solute::put_M (const Soil& soil, const SoilWater& soil_water,
-	       const vector<double>& v)
+	       const std::vector<double>& v)
 {
   const size_t size = soil.size ();
   daisy_assert (M_.size () == size);
@@ -250,7 +248,7 @@ Solute::initialize (const AttributeList& al,
                     const Soil& soil, const SoilWater& soil_water, 
 		    Treelog& out)
 {
-  vector<double> Ms;
+  std::vector<double> Ms;
   geo.initialize_layer (C_, al, "C", out);
   geo.initialize_layer (M_, al, "M", out);
   geo.initialize_layer (Ms, al, "Ms", out);

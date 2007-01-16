@@ -32,8 +32,8 @@ const char *const Phenology::description = "\
 The development process.";
 
 void
-Phenology::light_hour ()
-{ partial_day_length += 1.0; }
+Phenology::light_time (const double dt)
+{ partial_day_length += dt; }
 
 void 
 Phenology::output (Log& log) const

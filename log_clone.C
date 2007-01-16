@@ -38,7 +38,15 @@ LogClone::check_interior (symbol) const
 { daisy_notreached (); }
 
 void
-LogClone::done (const Time&)
+LogClone::done (const Time&, double)
+{ daisy_notreached (); }
+
+bool 
+LogClone::initial_match (const Daisy&, Treelog&) 
+{ daisy_notreached (); }
+
+void 
+LogClone::initial_done (const Time&, double)
 { daisy_notreached (); }
 
 const AttributeList& 

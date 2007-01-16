@@ -341,7 +341,7 @@ VegetationPermanent::initialize (const Time& time,
 {
   reset_canopy_structure (time);
   root_system->initialize (soil.size ());
-  root_system->full_grown (msg, geo, soil.MaxRootingHeight (), WRoot);
+  root_system->full_grown (geo, soil.MaxRootingHeight (), WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");
   static const symbol litter_symbol ("litter");

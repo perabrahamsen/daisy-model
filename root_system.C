@@ -35,8 +35,6 @@
 #include "mathlib.h"
 #include <sstream>
 
-using namespace std;
-
 double 
 RootSystem::potential_water_uptake (const double h_x,
                                     const Geometry& geo,
@@ -44,9 +42,9 @@ RootSystem::potential_water_uptake (const double h_x,
 				    const SoilWater& soil_water,
                                     const double dt)
 {
-  const vector<double>& L = Density;
-  vector<double>& S = H2OExtraction;
-  const size_t size = min (S.size (), soil.size ());
+  const std::vector<double>& L = Density;
+  std::vector<double>& S = H2OExtraction;
+  const size_t size = std::min (S.size (), soil.size ());
   daisy_assert (L.size () >= size);
   const double area = M_PI * Rad * Rad;
 
@@ -62,7 +60,7 @@ RootSystem::potential_water_uptake (const double h_x,
       daisy_assert (soil_water.Theta_ice (soil, i, h_wp) 
                     >= soil.Theta_res (i));
       const double max_uptake
-	= max (0.0, (soil_water.Theta_left (i) 
+	= std::max (0.0, (soil_water.Theta_left (i) 
 		     - soil_water.Theta_ice (soil, i, h_wp)) / dt);
       const double uptake
 	= bound (0.0, 
@@ -114,7 +112,7 @@ RootSystem::water_uptake (double Ept_,
 
   while (total < Ept && h_x > h_wp)
     {
-      const double h_next = max (h_x - step, h_wp);
+      const double h_next = std::max (h_x - step, h_wp);
       const double next = potential_water_uptake (h_next, geo, 
                                                   soil, soil_water, dt);
 
@@ -145,7 +143,7 @@ RootSystem::water_uptake (double Ept_,
   while (total > Ept && h_x < 0.0)
     {
       daisy_assert (h_x < 0.001);
-      const double h_next = min (h_x + step, 0.0);
+      const double h_next = std::min (h_x + step, 0.0);
       const double next = potential_water_uptake (h_next, geo, 
                                                   soil, soil_water, dt);
 
@@ -210,7 +208,7 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 			   const SoilWater& soil_water,
 			   Solute& solute,
 			   double PotNUpt,
-			   vector<double>& uptake,
+			   std::vector<double>& uptake,
 			   const double I_max,
 			   const double C_root_min,
                            const double dt)
@@ -226,8 +224,8 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
   const int size = soil.size ();
   // I: Uptake per root length.
   // I = I_zero - B_zero * C_root
-  vector<double> I_zero (size, 0.0);
-  vector<double> B_zero (size, 0.0);
+  std::vector<double> I_zero (size, 0.0);
+  std::vector<double> B_zero (size, 0.0);
   double U_zero = 0.0;		// Total uptake a C_root_min
   double B = 0.0;
 
@@ -275,8 +273,8 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
                   I_zero[i] = q_r * (beta_squared - 1.0) * C_l / div2;
                 }
             }
-	  daisy_assert (isfinite (I_zero[i]));
-	  daisy_assert (isfinite (B_zero[i]));
+	  daisy_assert (std::isfinite (I_zero[i]));
+	  daisy_assert (std::isfinite (B_zero[i]));
 	  B += L * geo.volume (i) * B_zero[i];
 	  U_zero += L * geo.volume (i) 
 	    * bound (0.0, I_zero[i] - B_zero[i] * C_root_min, I_max);
@@ -284,7 +282,7 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
     }
   double C_root = C_root_min;
   if (U_zero > PotNUpt)
-    C_root = max ((U_zero - PotNUpt) / B, C_root_min);
+    C_root = std::max ((U_zero - PotNUpt) / B, C_root_min);
 
   for (int i = 0; i < size; i++)
     {
@@ -342,39 +340,39 @@ RootSystem::tick (const double T, const double dt)
 }
 
 void
-RootSystem::tick_daily (Treelog& msg, const Geometry& geo, const Soil& soil, 
+RootSystem::tick_daily (const Geometry& geo, const Soil& soil, 
 			const double WRoot, const double IncWRoot,
-			const double DS)
+			const double DS, Treelog& msg)
 {
   // Penetration.
   if (IncWRoot > 0)
     {
       const double clay = geo.content_at (soil, &Soil::clay, -Depth);
       double clay_fac = PenClayFac (clay);
-      double dp = PenPar1 * clay_fac * max (0.0, soil_temperature - PenPar2);
-      PotRtDpt = min (PotRtDpt + dp, MaxPen);
+      double dp = PenPar1 * clay_fac * std::max (0.0, soil_temperature - PenPar2);
+      PotRtDpt = std::min (PotRtDpt + dp, MaxPen);
       /*max depth determined by crop*/
-      Depth = min (Depth + dp, MaxPen);
-      PotRtDpt = max (PotRtDpt, Depth);
+      Depth = std::min (Depth + dp, MaxPen);
+      PotRtDpt = std::max (PotRtDpt, Depth);
       /*max depth determined by crop*/
-      Depth = min (Depth, -soil.MaxRootingHeight ()); /*or by soil conditions*/
+      Depth = std::min (Depth, -soil.MaxRootingHeight ()); /*or by soil conditions*/
     }
-  set_density (msg, geo, WRoot, DS);
+  set_density (geo, WRoot, DS, msg);
 }
 
 void
-RootSystem::set_density (Treelog& msg, const Geometry& geo, 
-			 const double WRoot, const double DS)
+RootSystem::set_density (const Geometry& geo, 
+			 const double WRoot, const double DS, Treelog& msg)
 { rootdens->set_density (msg, Density, geo, Depth, PotRtDpt, WRoot, DS); }
 
 void
-RootSystem::full_grown (Treelog& msg, const Geometry& geo, 
+RootSystem::full_grown (const Geometry& geo, 
                         const double max_rooting_depth,
-			const double WRoot)
+			const double WRoot, Treelog& msg)
 {
   PotRtDpt = MaxPen;
-  Depth = min (MaxPen, -max_rooting_depth);
-  set_density (msg, geo, WRoot, 1.0);
+  Depth = std::min (MaxPen, -max_rooting_depth);
+  set_density (geo, WRoot, 1.0, msg);
 }
 
 void

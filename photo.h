@@ -40,12 +40,13 @@ public:
 
   // Simulation.
 public:
-  virtual double assimilate (const double ABA_xylem, const double rel_hum, 
-			     double Ta, const double cropN,
+  virtual double assimilate (double ABA_xylem, double rel_hum, 
+			     double Ta, double cropN,
                              const std::vector<double>& PAR,
                              const std::vector<double>& PAR_Height,
-                             const double PAR_LAI, 
+                             double PAR_LAI, 
 			     const std::vector<double>& fraction,
+                             double dt,
                              CanopyStandard& canopy,
                              Phenology& development, Treelog&) = 0;
   virtual void clear ();
