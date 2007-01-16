@@ -80,7 +80,7 @@ public:
 
   // State
 private:
-  enum { N_uninitialized, above_PT, PT_to_CR, CR_to_NF, below_NF } state;
+  enum { N_uninitialized, init_above, above_PT, PT_to_CR, CR_to_NF, below_NF } state;
 
   // Fixation.
 private:

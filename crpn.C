@@ -71,13 +71,14 @@ CrpN::content (const double DS, Production& production, Treelog& msg)
       daisy_assert (x >= 0.0);
       if (x > 1.0)
         { 
-          if (state != above_PT && state != N_uninitialized)
-            msg.warning ("Nitrogen content of crop above maximum");
-          state = above_PT;
+          if (state == N_uninitialized)
+            state = init_above;
+          else if (state != init_above)
+            state = above_PT;
         }
       else
         {
-          if (state != PT_to_CR && state != N_uninitialized)
+          if (state != PT_to_CR && state != above_PT)
             msg.message ("Luxury nitrogen uptake initiated");
           state = PT_to_CR;
         }
@@ -97,7 +98,7 @@ CrpN::content (const double DS, Production& production, Treelog& msg)
       const double x = (production.NCrop - NfNCnt) / (CrNCnt - NfNCnt);
       daisy_assert (x >= 0.0);
       daisy_assert (x <= 1.0);
-      if (state != CR_to_NF && state != N_uninitialized)
+      if (state != CR_to_NF)
         msg.message ("Crop affected by nitrogen stress");
       state = CR_to_NF;
 
@@ -112,7 +113,7 @@ CrpN::content (const double DS, Production& production, Treelog& msg)
     }
   else
     {
-      if (state != below_NF && state != N_uninitialized)
+      if (state != below_NF)
         msg.warning ("Nitrogen content of crop below minimum");
       state = below_NF;
       daisy_assert (NfNCnt > 0.0);
