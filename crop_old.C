@@ -1077,8 +1077,8 @@ CropOld::SoluteUptake (const Geometry& geo,
 		   - (pow (beta, 2.0 - alpha) - 1.0));
 	    }
 #ifndef __MINGW32__
-	  daisy_assert (isfinite (I_zero[i]));
-	  daisy_assert (isfinite (B_zero[i]));
+	  daisy_assert (std::isfinite (I_zero[i]));
+	  daisy_assert (std::isfinite (B_zero[i]));
 #endif
 	  B += L * geo.volume (i) * B_zero[i];
 	  U_zero += L * geo.volume (i) * std::min (I_zero[i], I_max);
