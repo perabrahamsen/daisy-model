@@ -1,4 +1,4 @@
-// photo_FQC4.C -- C4 leaf photosynthesis and stomata model (Collatz et al., 1992)
+// photo_FCC4.C -- C4 leaf photosynthesis and stomata model (Collatz et al., 1992)
 // 
 // Copyright 1996-2001,2005 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001,2005-2006 KVL.
@@ -48,10 +48,11 @@ class PhotoFCC4 : public Photo
 {
   // Parameters.
 private:
-  const double Q10k;  //
-  const double Q10vm; //
-  const double Q10rd; //
-  const double efcon; // PEP quantum requirement
+  const double Q10k;  // Q10 value for rate constant
+  const double Q10vm; // Q10 value for capacity
+  const double Q10rd; // Q10 value for respiration
+  const double kj;    // Initial slope of photosynthetic CO2 response 
+  const double alpha; // Initial slope of photosynthetic light response
   const double paab;  // leaf absorbtivity to PAR
   const double Gamma25;//CO2 compensation point of photosynthesis
   const double Ea_Gamma; // Activation energy for Gamma
@@ -99,7 +100,7 @@ public:
 		  const double fraction, const double Ta, const double Tl,  
 		  double gb, Treelog& msg);
   double assimilate (const double ABA_xylem, const double rel_hum, 
-		     double T, const double cropN,
+		     double Ta, double Tl, const double cropN,
 		     const std::vector<double>& PAR,
 		     const std::vector<double>& PAR_Height,
 		     const double PAR_LAI,
@@ -117,7 +118,8 @@ public:
       Q10k (al.number ("Q10k")),
       Q10vm (al.number ("Q10vm")),
       Q10rd (al.number ("Q10rd")),
-      efcon (al.number ("efcon")),
+      kj (al.number ("kj")),
+      alpha (al.number ("alpha")),
       paab (al.number ("paab")),
       Gamma25 (al.number ("Gamma25")),
       Ea_Gamma (al.number ("Ea_Gamma")),
@@ -188,7 +190,7 @@ second_root_of_square_equation (double a, double b, double c)
 {
   const double D = sqrt (pow2 (b) - 4.0 * a * c);
   const double x1 = (-b + D) / (2.0 * a);
-  // Return the first solution.
+  // Return the second solution.
   return x1;
 }
 
@@ -203,15 +205,10 @@ PhotoFCC4::C4Model (double& pn, double& ci/*[Pa]*/,
   const double Vm1 = V_m(vmax25, T); //[mol/m²leaf/s/fraction]
   const double Vm = Qt(Vm1, T, Q10vm);  
   daisy_assert (Vm >=0.0);
+  const double kjc = Qt(kj, T, Q10k); //[mol/Pa/m²leaf/s/fraction]
 
-  const double k = 18000. * vmax25;
-  const double kjc = Qt(k, T, Q10k); //[mol/Pa/m²leaf/s/fraction]
-
-  const double alpha = efcon; //[mol/mol]
-  
   daisy_assert (gbw > 0.0);
   daisy_assert (gsw > 0.0);
-  double rbw = 1./gbw; // leaf boundary resistance to water vapor, [m²leaf*s/mol]
   double rsw = 1./gsw; // stomatal resistance to water [m²leaf*s/mol]
   
   //Newton Raphsons solution to 'net'photosynthesis and stomatal conductance.
@@ -236,7 +233,7 @@ PhotoFCC4::C4Model (double& pn, double& ci/*[Pa]*/,
 	  break;
 	}
       // Gross CO2 uptake limited by Rubisco
-      const double wc = kjc * ci;           //[mol/m² leaf/s]
+      const double wc = kjc * ci /Ptot;           //[mol/m² leaf/s]
       const double we = alpha * paab * PAR; //[mol/m²leaf/s/fraction]
       const double a = first_root_of_square_equation(theta, -(Vm+we), we*Vm); //[mol/m² leaf/s/fraction]
       const double p = first_root_of_square_equation(beta, -(a+wc), a*wc);    //[mol/m² leaf/s/fraction]
@@ -245,7 +242,7 @@ PhotoFCC4::C4Model (double& pn, double& ci/*[Pa]*/,
       pn = p - rd; // [mol/m² leaf/s] 
       
       //Total resistance to CO2
-      const double gtc = 1./(1.4*rbw+1.6*rsw);   //[mol/m² leaf/s]
+      const double gtc = 1./(1.6*rsw);   //[mol/m² leaf/s]
       newci = ((gtc * CO2_atm /Ptot)-pn)/gtc*Ptot;//[Pa]
 
       const double dp = (kjc*(p-a))/((2. * beta * p) -a -wc);
@@ -326,7 +323,7 @@ PhotoFCC4:: GSTModel(double ABA, double pn, double rel_hum /*[unitless]*/,
 
 double
 PhotoFCC4::assimilate (const double ABA_xylem, const double rel_hum, 
-		       const double T, const double cropN,
+		       const double Ta, const double Tl, const double cropN,
 		       const vector<double>& PAR, 
 		       const vector<double>& PAR_height,
 		       const double PAR_LAI,
@@ -438,9 +435,6 @@ PhotoFCC4::assimilate (const double ABA_xylem, const double rel_hum,
 	  // log variable
 	  PAR_ += dPAR * dCAI * 3600.0; //mol/m2/h/fraction
 	  
-	  const double Ta = T;
-	  const double Tl = T;
-
 	  // Photosynthetic rubisco capacity 
 	  const double vmax25 = crop_Vmax_total[i]*fraction[i];//[mol/m²leaf/s/fracti.]
 	  daisy_assert (vmax25 >= 0.0);
@@ -449,7 +443,7 @@ PhotoFCC4::assimilate (const double ABA_xylem, const double rel_hum,
 	  const double ABA = ABAeffect->ABA_effect(ABA_xylem, msg);
 
 	  // leaf respiration
-	  const double rd_25 = 0.021 * vmax25;// [mol/m²leaf/s/fraction]
+	  const double rd_25 = 0.015 * vmax25;// [mol/m²leaf/s/fraction]
 	  const double rdz = Qt(rd_25,Tl, Q10rd); 
 	  const double rd = rdz/(1. + exp(1.3*(Tl-55.)));
 	  daisy_assert (rd >= 0.0);
@@ -597,9 +591,13 @@ static struct Photo_FQC4Syntax
                 "Q10rd = 2.0 (Collatz et al., 1992)");
     alist.add ("Q10rd", 2.0);
 
-    syntax.add ("efcon", "", Check::positive (), Syntax::Const,
-                "PEP quantum requirement. efcon = 0.04 (Collatz et al., 1992)");
-    alist.add ("efcon", 0.04);
+    syntax.add ("kj", "", Check::positive (), Syntax::Const,
+                "Initial slope of photosynthetic CO2 response, kj = 0.6 mol/m²/s (Collatz et al., 1992)");
+    alist.add ("kj", 0.6);
+
+    syntax.add ("alpha", "mol/mol", Check::positive (), Syntax::Const,
+                "Initial slope of photosynthetic light response. alpha = 0.04 (Collatz et al., 1992)");
+    alist.add ("alpha", 0.04);
 
     syntax.add ("paab", "", Check::positive (), Syntax::Const,
                 "Leaf absorbtivity to PAR. paab = 0.86 (Collatz et al., 1992)");

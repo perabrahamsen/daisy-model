@@ -196,6 +196,11 @@ ifeq ($(COMPILER),icc)
 	CCOMPILE = /opt/intel/compiler70/ia32/bin/icc -Xc -x c -g -w1
 endif
 
+CSHARP = /cygdrive/C/WINDOWS/Microsoft.NET/Framework/v2.0.50727/csc.exe
+
+hello.exe:	hello.cs
+	$(CSHARP) hello.cs
+
 # Construct the compile command.
 #
 CC = $(COMPILE) $(OPTIMIZE) $(PROFILE)
@@ -520,12 +525,15 @@ cdaisy_test${EXT}:  cmain_test${OBJ} daisy.so
 # Create a DLL.
 #
 daisy.dll:	$(LIBOBJ)
-	$(DLLLINK)daisy.dll $^
+	$(CC) -shared -o daisy.dll $^ $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
 
 # Create a shared library.
 #
 daisy.so: $(LIBOBJ)
 	$(CC) -shared -o daisy.so $^ $(MATHLIB)
+
+cdaisy.o:
+	$(CC) $(NOLINK) -DBUILD_DLL $<
 
 # Create daisy plot executable.
 #
@@ -533,8 +541,8 @@ pdaisy${EXT}: pmain${OBJ} time.o
 	$(LINK)pdaisy $^ $(GTKMMDRAWLIB) $(MATHLIB)
 
 
-dlldaisy${EXT}:	cmain${OBJ} daisy.dll
-	$(LINK)dlldaisy $^ $(MATHLIB)
+dlldaisy.exe:	cmain${OBJ} daisy.dll
+	gcc -o dlldaisy.exe $^ 
 
 
 # Create the MMM executable.

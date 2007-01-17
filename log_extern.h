@@ -29,5 +29,8 @@ struct Scope;
 struct Treelog;
 
 extern const Scope* find_extern_scope (symbol name);
+extern const int daisy_scope_has_number (const Scope* scope, symbol name);
+extern const double daisy_scope_number (const Scope* scope, symbol name);
+extern const char* daisy_scope_dimension (const Scope* scope, symbol name);
 
 #endif // LOG_EXTERN_H

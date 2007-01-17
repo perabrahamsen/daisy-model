@@ -109,7 +109,7 @@ static struct cropNdistDPFSyntax
   {
     syntax.add ("kn", Syntax::None (), Check::positive (), Syntax::Const,
                 "Extinction coefficient of nitrogen in the canopy, kn = 0.713 (De Pury &Farquhar, 1997)");
-    alist.add ("kn", 0.513);
+    alist.add ("kn", 0.713);
 
     syntax.add ("f_photo", Syntax::None (), Check::positive (), Syntax::Const,
                 "Fraction of photosynthetically active N in canopy, f_photo = 0.75 (Boegh et al., 2002)");

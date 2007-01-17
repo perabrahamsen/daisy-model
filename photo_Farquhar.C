@@ -108,7 +108,7 @@ public:
 		  const double fraction, const double Ta, const double Tl,  
 		  double gb, Treelog& msg);
   double assimilate (const double ABA_xylem, const double rel_hum, 
-		     double T, const double cropN,
+		     double Ta, double Tl, const double cropN,
 		     const std::vector<double>& PAR,
 		     const std::vector<double>& PAR_Height,
 		     const double PAR_LAI,
@@ -349,7 +349,7 @@ PhotoFarquhar:: GSTModel(double ABA, double pn, double rel_hum /*[unitless]*/,
     hs = 1.0;
 
   double gsw; //stomatal conductance
-  if(pn <= 0.0) 
+  if(pn <= 0.0)
     gsw = intercept;//[mol/m2/s]
   else 
     {
@@ -363,7 +363,7 @@ PhotoFarquhar:: GSTModel(double ABA, double pn, double rel_hum /*[unitless]*/,
 
 double
 PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum, 
-			   const double T, const double cropN,
+			   const double Ta, const double Tl, const double cropN,
 			   const vector<double>& PAR, 
 			   const vector<double>& PAR_height,
 			   const double PAR_LAI,
@@ -486,7 +486,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 
 	  // leaf respiration
 	  const double rd_25 = 0.0089 * vmax25;// [mol/m² leaf/s]
-	  const double rd = Arrhenius(rd_25, Ea_rd, T); 
+	  const double rd = Arrhenius(rd_25, Ea_rd, Tl); 
 	  daisy_assert (rd >= 0.0);
 
 	  //solving photosynthesis and stomatacondctance model for each layer
@@ -497,9 +497,6 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	  int iter = 0;
 	  double lastci;
 
-	  const double Ta = T;
-	  const double Tl = T;
-	  
 	  do
 	    {
 	      lastci = ci; //Stomata CO2 pressure 
@@ -507,7 +504,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	      //Transpiration(); returnerer Tl
 
 	      //Calculating ci and "net"photosynthesis
-	      pn = C3Model(pn, ci, dPAR, gsw, T, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
+	      pn = C3Model(pn, ci, dPAR, gsw, Tl, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
 	      gsw = GSTModel(ABA, pn, rel_hum, LA, fraction[i], gbw, Ta, Tl, msg);//[mol/s/m²leaf/fraction]
 
 	      iter++;
@@ -524,8 +521,8 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	  // Leaf brutto photosynthesis [gCO2/m2/h] 
 	  const double pn_ = (pn+rd) * molWeightCO2 * 3600.0;//mol CO2/m²leaf/s->g CO2/m²leaf/h
 	  const double rd_ = (rd) * molWeightCO2 * 3600.0;   //mol CO2/m²/s->g CO2/m²/h
-	  const double Vm_ = V_m(vmax25, T); //[mol/m² leaf/s/fraction]
-	  const double Jm_ = J_m(vmax25, T); //[mol/m² leaf/s/fraction]
+	  const double Vm_ = V_m(vmax25, Tl); //[mol/m² leaf/s/fraction]
+	  const double Jm_ = J_m(vmax25, Tl); //[mol/m² leaf/s/fraction]
 
 	  daisy_assert (pn_>= 0.0);
 	  Ass_ += LA * pn_; // [g/m²area/s] 
@@ -656,7 +653,7 @@ static struct Photo_FarquharSyntax
     alist.add ("c_Vm", 26.35);
     
     syntax.add ("Ea_Vm", "J/mol", Check::positive (), Syntax::Const,
-                "Actimation energy for Vmax. Ea_Vm = 65330 J/mol (Ball, 1988)");
+                "Activation energy for Vmax. Ea_Vm = 65330 J/mol (Ball, 1988)");
     alist.add ("Ea_Vm", 65330.);
 
     syntax.add ("Eda_Vm", "J/mol", Check::positive (), Syntax::Const,
@@ -691,7 +688,7 @@ static struct Photo_FarquharSyntax
                 "Leaf boundary conductance of water. gbw = 2 mol/m2/s (Collatz et al., 1991");
     alist.add ("gbw", 2.00);
 
-    syntax.add ("theta", " ", Check::positive (), Syntax::Const,
+    syntax.add ("theta", "", Check::positive (), Syntax::Const,
                 "Curvature of leaf response of electron transport to irradiance, (De Pury & Farquhar, 1997");
     alist.add ("theta", 0.7);
     
@@ -716,11 +713,11 @@ static struct Photo_FarquharSyntax
     alist.add ("Ptot", 1.0E5);
 
     syntax.add ("m", " ", Check::positive (), Syntax::Const,
-                "Stomatal slope factor. Ball and Berry: m = 9 for soyabean. Wang and Leuning: m = 11 for wheat");
+                "Stomatal slope factor. Ball and Berry (1982): m = 9 for soyabean. Wang and Leuning(1998): m = 11 for wheat");
     alist.add ("m", 11.0);
 
     syntax.add ("b", "mol/m2/s", Check::positive (), Syntax::Const,
-                "Stomatal intercept factor, Ball and Berry model, (0.01 mol/m2/s)");
+                "Stomatal intercept factor, Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
     alist.add ("b", 0.01);
 
     //log variables

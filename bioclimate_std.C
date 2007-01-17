@@ -41,6 +41,8 @@
 #include "vegetation.h"
 #include "chemicals.h"
 #include "time.h"
+#include "check.h"
+#include "fao.h"
 #include <sstream>
 
 struct BioclimateStandard : public Bioclimate
@@ -113,6 +115,12 @@ struct BioclimateStandard : public Bioclimate
   double crop_ea;		// Actual transpiration. [mm/h]
   double production_stress;	// Stress calculated by SVAT module.
 
+  // Bioclimate leaf
+  double r_ae;                  // Atmospheric resistance
+  double LeafTemperature;       // Leaf temperature
+  double AirTemperature;        // Air temperature
+
+
   void WaterDistribution (const Time&,
                           Surface& surface, const Weather& weather, 
 			  Vegetation& vegetation, const Movement&,
@@ -173,6 +181,8 @@ struct BioclimateStandard : public Bioclimate
   // Weather.
   double daily_air_temperature () const
   { return daily_air_temperature_; }
+  double hourly_leaf_temperature () const
+  { return LeafTemperature; }
   double daily_precipitation () const
   { return daily_precipitation_; }
   double day_length () const
@@ -386,6 +396,12 @@ As a last resort,  Makkink (makkink) will be used.");
               "Actual transpiration.");
   syntax.add ("production_stress", Syntax::None (), Syntax::LogOnly,
               "SVAT module induced stress, -1 means use water stress.");
+  syntax.add ("r_ae", "s/m", Check::positive (), Syntax::Const,
+              "Atmospheric resistance.");
+  syntax.add ("LeafTemperature", "dg C", Syntax::LogOnly,
+              "Actual leaf temperature.");
+  syntax.add ("AirTemperature", "dg C", Syntax::LogOnly,
+              "Actual air temperature.");
 
   // Chemicals.
   Chemicals::add_syntax  ("spray", syntax, alist, Syntax::LogOnly,
@@ -504,6 +520,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
     crop_ep (0.0),
     crop_ea (0.0),
     production_stress (-1.0),
+    r_ae (al.number ("r_ae")),
     spray_ (),
     snow_chemicals_storage (al.alist_sequence ("snow_chemicals_storage")),
     snow_chemicals_in (),
@@ -889,6 +906,27 @@ BioclimateStandard::tick (const Time& time,
 
   // Let the chemicals follow the water.
   ChemicalDistribution (surface, vegetation, dt);
+
+  // Calculate leaf temperature of canopy
+  static const double rho_water = 1.0; // [kg/dm^3]
+  AirTemperature = weather.hourly_air_temperature ();//[dg C]
+  const double LatentHeatVapor = FAO::LatentHeatVaporization (AirTemperature); //[J/kg]
+  const double LeafTranspirationRate = 
+    crop_ea /*[mm/h]*/* rho_water * LatentHeatVapor / 3600. /*[s/h]*/; //[W/m^2] 
+
+  const double ex = weather.HourlyExtraterrestrialRadiation (time);
+  const double hr = weather.hourly_global_radiation ();
+  const double vap = weather.vapor_pressure ();
+  const double NetRadiation = FAO::RefNetRadiation (hr, ex, AirTemperature, vap, msg);//[W/m^2] 
+  const double SensibleHeatFlux = NetRadiation - LeafTranspirationRate;//[W/m^2] 
+  
+  const double AirPressure = FAO::AtmosphericPressure (weather.elevation ());//[Pa]
+  const double pa = FAO::AirDensity(AirPressure, AirTemperature);//[kg/m3]
+  const double gamma = FAO::PsychrometricConstant (AirPressure, AirTemperature);//[Pa/dgC]
+  const double epsilon = 0.622; //[]
+  const double cp = gamma * epsilon * LatentHeatVapor / AirPressure;//[J/kg/dg C]
+  LeafTemperature = SensibleHeatFlux * r_ae / (pa * cp) + AirTemperature;//[dg C]
+
 }
 
 void 
@@ -979,6 +1017,8 @@ BioclimateStandard::output (Log& log) const
   output_variable (crop_ep, log);
   output_variable (crop_ea, log);
   output_variable (production_stress, log);
+  output_variable (LeafTemperature, log);
+  output_variable (AirTemperature, log);
 
   // Note: We use snow_chemicals_in instead of spray, since the former
   // is reset after each time step.

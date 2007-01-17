@@ -33,6 +33,7 @@ main (int argc, char* argv[])
   daisy_alist* alist;
   daisy_parser* parser;
   daisy_daisy* daisy;
+  const daisy_scope* scope;
 
   /* We need exactly one argument. */
   if (argc != 2)
@@ -80,6 +81,15 @@ main (int argc, char* argv[])
     printf ("Starting simulation.\n");
     daisy_daisy_start (daisy);
 
+    //
+    scope = daisy_scope_find_extern ("check");
+    if (scope)
+      {
+	printf ("check OK end.\n");
+      }
+    else printf ("check not recognized.\n");
+    
+
     while (daisy_daisy_is_running (daisy))
       {
         daisy_daisy_tick_action (daisy);
@@ -93,12 +103,23 @@ main (int argc, char* argv[])
 
         daisy_daisy_tick_logs (daisy);
         daisy_daisy_tick_time (daisy);
-
+	
         if (daisy_time_get_hour (time) == 0)
 	  printf ("%04d-%02d-%02d\n", 
 		  daisy_time_get_year (time),
 		  daisy_time_get_month (time),
 		  daisy_time_get_mday (time));
+
+	if (scope)
+	  {
+	    if(daisy_scope_has_number (scope, "height"))
+	      {
+		printf ("Height %g [%s]\n", 
+			daisy_scope_number(scope, "height"),
+			daisy_scope_dimension (scope, "height"));
+	      }
+	    else  printf ("height not recognized.\n");
+	  }
       }
     printf ("Simulation end.\n");
   }

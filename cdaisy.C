@@ -22,6 +22,7 @@
 //
 // See 'cdaisy.h' for more documentation.
 
+#include "scope.h"
 #include "block.h"
 #include "library.h"
 #include "syntax.h"
@@ -42,15 +43,25 @@
 #include "treelog_stream.h"
 #include <fstream>
 #include <iostream>
+#include <string>
 
 using namespace std;
-
+/*bgj
 #ifdef __BORLANDC__
 #define EXPORT _export
 #define IMPORT _import
 #else
 #define EXPORT
 #define IMPORT
+#endif
+*/
+
+#ifdef BUILD_DLL
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
 #endif
 
 typedef int daisy_bool;
@@ -937,33 +948,37 @@ extern "C" double EXPORT	// The crop uptake reflection factor.
 daisy_chemical_reflection_factor (const Chemical* chemical)
 { return chemical->crop_uptake_reflection_factor (); }
 
-// @ The daisy_log Type.
+// @ The daisy_scope Type.
 //
 // Extract information from the 'extern' log model.
-
-#if 0
-extern "C" LogExternSource::type EXPORT
-daisy_log_lookup (const char* log, const char* tag)
-{ return LogExternSource::find (symbol (log)).lookup (symbol (tag)); }
-
-extern "C" double  EXPORT
-daisy_log_get_number (const char* log, const char* tag)
-{ return LogExternSource::find (symbol (log)).number (symbol (tag)); }
-
-extern "C" const char*  EXPORT
-daisy_log_get_name (const char* log, const char* tag)
-{ return LogExternSource::find (symbol (log))
-    .name (symbol (tag)).name ().c_str (); }
-
-extern "C" void EXPORT
-daisy_log_get_array (const char* log, const char* tag, double value[])
-{ 
-  const vector<double>& array 
-    = LogExternSource::find (symbol (log)).array (symbol (tag)); 
-  
-  copy (array.begin (), array.end (), value);
+extern "C" const Scope* EXPORT		// Return scope named NAME.
+daisy_scope_find_extern (const char* name)
+{
+  return find_extern_scope (symbol (name));
 }
-#endif
+
+extern "C" const int EXPORT	// check if NAME is defined in SCOPE.
+daisy_scope_has_number (const Scope* scope, const char* name)
+{ 
+  if (scope->has_number (symbol (name)))
+    return 1;
+  else 
+    return 0; 
+}
+
+extern "C" const double EXPORT	// Return NUMBER of NAME defined in SCOPE.
+daisy_scope_number (const Scope* scope, const char* name)
+{ 
+  return (scope->number (symbol (name)));
+}
+
+extern "C" const char* EXPORT	// Return UNITS of NAME defined in SCOPE.
+daisy_scope_dimension (const Scope* scope, const char* name)
+{ 
+  return scope->dimension (symbol (name)).name ().c_str ();
+}
+
+
 // @ Miscellaneous.
 //
 // Other functions which doesn't fit nicely into the above categories.
@@ -972,7 +987,26 @@ extern "C" void EXPORT
 daisy_load (Syntax* syntax, AttributeList* alist)
 { 
   Daisy::load_syntax (*syntax, *alist); 
+  alist->add ("type", "Daisy");
   Library::load_syntax (*syntax, *alist); 
+  syntax->add ("directory", Syntax::String, Syntax::OptionalConst,
+	      "Run program in this directory.\n\
+This can affect both where input files are found and where log files\n\
+are generated.");
+  syntax->add ("path", Syntax::String,
+	      Syntax::OptionalConst, Syntax::Sequence,
+	      "List of directories to search for input files in.\n\
+The special value \".\" means the current directory.");
+  syntax->add ("input", Librarian<Parser>::library (),
+	      Syntax::OptionalConst, Syntax::Singleton,
+	      "Command to add more information about the simulation.");
+  syntax->add ("run", Librarian<Program>::library (), 
+	      Syntax::OptionalState, Syntax::Singleton, 
+	      "Program to run.\n\
+\n\
+If this option is specified, all the 'Daisy' specific top-level attributes\n\
+will be ignored.  If unspecified, run 'Daisy' on the current top-level\n\
+attributes.");
 }
 
 extern "C" void EXPORT

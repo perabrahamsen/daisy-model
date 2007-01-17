@@ -40,8 +40,8 @@ public:
 
   // Simulation.
 public:
-  virtual double assimilate (double ABA_xylem, double rel_hum, 
-			     double Ta, double cropN,
+  virtual double assimilate (const double ABA_xylem, const double rel_hum, 
+			     double Ta, double Tl, const double cropN,
                              const std::vector<double>& PAR,
                              const std::vector<double>& PAR_Height,
                              double PAR_LAI, 

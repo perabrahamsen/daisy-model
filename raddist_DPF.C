@@ -172,11 +172,11 @@ static struct RaddistDPFSyntax
     alist.add ("kds", 0.719); 
 
     syntax.add ("Pcd", " ", Check::positive (), Syntax::Const,
-                " Reflection coefficient of beam PAR, Pcd = , (De Pury & Farquhar, 1997)");
+                " Reflection coefficient of diffuse PAR, Pcd = 0.036 (De Pury & Farquhar, 1997)");
     alist.add ("Pcd", 0.036); 
 
     syntax.add ("Pcb", " ", Check::positive (), Syntax::Const,
-                "Reflection coefficient of diffuse PAR, Pcb = , (De Pury & Farquhar, 1997)");
+                "Reflection coefficient of beam PAR, Pcb = 0.029 (De Pury & Farquhar, 1997)");
     alist.add ("Pcb", 0.029); 
 
     Raddist::load_syntax (syntax, alist);

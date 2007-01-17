@@ -42,10 +42,8 @@ public:
   const double SeedN;		// N-content in seed [ g N/m^2 ]
 
   // Content.
-private:
   const PLF& PtLeafCnc;		// Upper limit for N-conc in leaves
   const PLF& CrLeafCnc;		// Critical lim f. N-conc in leaves
-public:
   const PLF& NfLeafCnc;		// Non-func lim f. N-conc in leaves
 private:
   const PLF& PtStemCnc;		// Upper limit for N-conc in stems

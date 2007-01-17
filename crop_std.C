@@ -344,7 +344,13 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 	  daisy_assert (f_sun >= 0.0);
 	}
       
-      const double cropN = production.NLeaf;
+      const double cropN = std::min (production.NLeaf
+				     -(canopy.corresponding_WLeaf (development->DS)
+				     * nitrogen.NfLeafCnc (development->DS)),
+				     canopy.corresponding_WLeaf (development->DS)
+				     * nitrogen.CrLeafCnc (development->DS) 
+				     -(canopy.corresponding_WLeaf (development->DS)
+				     * nitrogen.NfLeafCnc (development->DS)));
       daisy_assert (cropN >= 0.0);
       
       const double ABA_xylem = 0.0;
@@ -353,15 +359,17 @@ CropStandard::tick (const Time& time, const double relative_humidity,
         {
           // Shared light.
 	  Ass += photo->assimilate (ABA_xylem, relative_humidity, 
-				    bioclimate.daily_air_temperature (),
-				    production.NLeaf, shadow_PAR, bioclimate.height (),
+				    bioclimate.daily_air_temperature (), 
+				    bioclimate.hourly_leaf_temperature(),
+				    cropN, shadow_PAR, bioclimate.height (),
                                     total_LAI, fraction_shadow_LAI, dt,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
 
           Ass += photo->assimilate (ABA_xylem, relative_humidity,
 				    bioclimate.daily_air_temperature (),
-				    production.NLeaf, sun_PAR, bioclimate.height (),
+				    bioclimate.hourly_leaf_temperature(),
+				    cropN, sun_PAR, bioclimate.height (),
                                     total_LAI, fraction_sun_LAI, dt,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
@@ -377,7 +385,8 @@ CropStandard::tick (const Time& time, const double relative_humidity,
              PARext (), PAR); 
           Ass += photo->assimilate (ABA_xylem, relative_humidity,
 				    bioclimate.daily_air_temperature (), 
-				    production.NLeaf, PAR, bioclimate.height (),
+				    bioclimate.hourly_leaf_temperature(),
+				    cropN, PAR, bioclimate.height (),
 				    bioclimate.LAI (), fraction_total_LAI, dt,
 				    canopy, *development, msg)
             * min_light_fraction;
