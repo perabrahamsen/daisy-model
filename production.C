@@ -97,6 +97,14 @@ Production::total_C () const
   return CCrop / conv;
 }
 
+bool 
+Production::root_growth () const
+{ return DailyNetRoot > 0.0; }
+
+bool
+Production::leaf_growth () const
+{ return DailyNetLeaf > 0.0; }
+
 double
 Production::maintenance_respiration (double r, double w, double T)
 {
@@ -414,6 +422,9 @@ Production::tick (const double AirT, const double SoilT,
   WStem += IncWStem * dt;
   WSOrg += IncWSOrg * dt;
   WRoot += IncWRoot * dt;
+  DailyNetRoot += (IncWRoot + DeadWRoot) * dt;
+  DailyNetLeaf += (IncWRoot + DeadWRoot) * dt;
+
   const double old_CCrop = CCrop;
   update_carbon ();
   CCrop = CLeaf + CStem + CSOrg + CRoot + CDead + CH2OPool * 12./30.;
@@ -437,6 +448,10 @@ Production::tick (const double AirT, const double SoilT,
       msg.error (tmp.str ());
     }
 }
+
+void
+Production::tick_daily ()
+{ DailyNetRoot = DailyNetLeaf = 0.0; }
 
 void 
 Production::update_carbon ()
@@ -466,6 +481,8 @@ Production::none ()
   DeadWRoot = 0.0;
   DeadNRoot = 0.0;
   C_Loss = 0.0;
+  DailyNetRoot = 0.0;
+  DailyNetLeaf = 0.0;
 }
 
 void 
@@ -509,6 +526,8 @@ Production::output (Log& log) const
   output_variable (DeadWRoot, log);
   output_variable (DeadNRoot, log);
   output_variable (C_Loss, log);
+  output_variable (DailyNetRoot, log);
+  output_variable (DailyNetLeaf, log);
 }
 
 void 
@@ -665,6 +684,12 @@ For initialization, set this to the amount of N in the seed.");
   syntax.add ("DeadNRoot", "g N/m2/h", Syntax::LogOnly,
 	      "Root N removed.");
   syntax.add ("C_Loss", "g C/m^2/h", Syntax::LogOnly,"C lost from the crop");
+  syntax.add ("DailyNetRoot", "g DM/m^2", Syntax::State,
+	      "Root growth minus root respiration so far this day.");
+  alist.add ("DailyNetRoot", 0.0);
+  syntax.add ("DailyNetLeaf", "g DM/m^2", Syntax::State,
+	      "Leaf growth minus leaf respiration so far this day.");
+  alist.add ("DailyNetLeaf", 0.0);
 }
 
 void
@@ -770,7 +795,9 @@ Production::Production (const AttributeList& al)
     DeadNLeaf (0.0),
     DeadWRoot (0.0),
     DeadNRoot (0.0),
-    C_Loss (0.0)
+    C_Loss (0.0),
+    DailyNetRoot  (al.number ("DailyNetRoot")),
+    DailyNetLeaf  (al.number ("DailyNetLeaf"))
 { }
 
 Production::~Production ()

@@ -51,7 +51,7 @@ class CropStandard : public Crop
 {
   // Content.
 public:
-  std::auto_ptr<RootSystem> root_system;
+  const std::auto_ptr<RootSystem> root_system;
   CanopyStandard canopy;
   Harvesting harvesting;
   Production production;
@@ -59,7 +59,7 @@ public:
   std::auto_ptr<Phenology> development;
   const Partition partition;
   Vernalization vernalization;
-  std::auto_ptr<Photo> photo;
+  const std::auto_ptr<Photo> photo;
   CrpN nitrogen;
   const std::auto_ptr<WSE> water_stress_effect;
   const bool enable_N_stress;
@@ -421,11 +421,12 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 	       production.WStem, development->DS, ForcedCAI);
 
   development->tick_daily (bioclimate.daily_air_temperature (), 
-                           production.WLeaf, production, vernalization,
-                           harvesting.cut_stress, msg);
+                           production.leaf_growth (), production, 
+                           vernalization, harvesting.cut_stress, msg);
   root_system->tick_daily (geo, soil, 
-                           production.WRoot, production.IncWRoot,
+                           production.WRoot, production.root_growth (),
                            development->DS, msg);
+  production.tick_daily ();
 }
 
 const Harvest&

@@ -40,7 +40,7 @@ private:
 
   // Simulation.
 private:
-  void tick_daily (double Ta, double WLeaf, 
+  void tick_daily (double Ta, bool leaf_growth, 
 		   Production&, Vernalization&, double cut_stress, Treelog&);
   void emergence (double h, double T, double dt);
 
@@ -50,7 +50,7 @@ public:
 };
 
 void
-PhenologyTSum::tick_daily (const double Ta, const double /*WLeaf*/, 
+PhenologyTSum::tick_daily (const double Ta, const bool /* leaf_growth */, 
 			   Production& production, 
 			   Vernalization& vernalization,
 			   const double /*cut_stress*/, Treelog& out)

@@ -47,8 +47,8 @@ public:
   // Simulation.
 public:
   void light_time (double dt);
-  virtual void tick_daily (double Ta, double WLeaf, 
-			   Production&, Vernalization&, 
+  virtual void tick_daily (double Ta, bool leaf_growth, 
+                           Production&, Vernalization&, 
 			   double cut_stress, Treelog&) = 0;
   virtual void emergence (double h, double T, double dt) = 0;
   void output (Log& log) const;

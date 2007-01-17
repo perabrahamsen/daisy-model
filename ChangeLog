@@ -1,3 +1,12 @@
+2007-01-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C, root_system.h (tick_daily): New parameters.
+	* phenology_std.C, phenology_TSum.C, phenology.h (tick_daily): Ditto.
+	* crop_std.C (tick): Update caller.
+	* production.C, production.h (root_growth, leaf_growth)
+	(tick_daily): New functions.
+	* crop_std.C (tick): Use them.
+
 2007-01-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* crpn.C (content): Fix partisioning under stress.

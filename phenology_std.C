@@ -41,7 +41,7 @@ private:
 				// the reproductive stage
   const PLF& TempEff1;	        // Temperature effect, vegetative stage
   const PLF& TempEff2;	        // Temperature effect, reproductive stage
-  const PLF& PhotEff1; // Ptotoperiode effect, vegetative stage defi. limit
+  const PLF& PhotEff1; // Photoperiode effect, vegetative stage defi. limit
 
   const double DSMature;	// DS at maturation
   const double DSRepeat;        // DS where DS is set back (perennial crops)
@@ -51,7 +51,7 @@ private:
 
   // Simulation.
 private:
-  void tick_daily (double Ta, double WLeaf, 
+  void tick_daily (double Ta, bool leaf_growth, 
 		   Production&, Vernalization&, double cut_stress, Treelog&);
   void emergence (double h, double T, double dt);
   bool mature () const
@@ -63,8 +63,8 @@ public:
 };
 
 void
-PhenologyStandard::tick_daily (const double Ta, const double WLeaf, 
-			       Production& production, 
+PhenologyStandard::tick_daily (const double Ta, const bool leaf_growth, 
+                               Production& production,
 			       Vernalization& vernalization,
 			       const double cut_stress, Treelog& out)
 {
@@ -76,8 +76,7 @@ PhenologyStandard::tick_daily (const double Ta, const double WLeaf,
   if (fmod (DS, 2.0) < 1.0)
     {
       // Only increase DS if assimilate production covers leaf respiration.
-      if (production.IncWLeaf +  production.DeadWLeaf
-	  >  -WLeaf /1000.0) // It lost 0.1% of its leafs to resp.
+      if (leaf_growth)
 	DS += (DSRate1 * TempEff1 (Ta) * PhotEff1 (day_length + 1.0))
 	  * (1.0 - cut_stress);
       vernalization (Ta, DS);

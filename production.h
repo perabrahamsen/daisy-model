@@ -106,19 +106,17 @@ private:
   double MaintRespiration;	// Maintenance Respiration [g CO2/m2/h]
   double GrowthRespiration;	// Growth Respiration [g CO2/m2/h]
   double RootRespiration;	// Root Respiration [g CO2/m2/h]
-public:
   double IncWLeaf;		// Leaf growth [g DM/m2/d]
-private:
   double IncWStem;		// Stem growth [g DM/m2/d]
   double IncWSOrg;		// Storage organ growth [g DM/m2/d]
-public:
   double IncWRoot;		// Root growth [g DM/m2/d]
   double DeadWLeaf;		// Leaf DM removed [g DM/m2/d]
-private:
   double DeadNLeaf;		// Leaf N removed [g N/m2/d]
   double DeadWRoot;		// Root DM removed [g DM/m2/d]
   double DeadNRoot;		// Root N removed [g N/m2/d]
   double C_Loss;		// C lost from the plant. [g/m2]
+  double DailyNetRoot;          // Net root growth this day.
+  double DailyNetLeaf;          // Net root growth this day.
 
   // Queries.
 private:
@@ -127,6 +125,8 @@ public:
   double DM () const;		// Shoot dry matter, [kg DM/ha].
   double total_N () const;	// N content [kg N/ha]
   double total_C () const;	// C content [kg N/ha]
+  bool root_growth () const;    // True iff daily ass. covers root resp.
+  bool leaf_growth () const;    // True iff daily ass. covers leaf resp.
 
   // Simulation.
 private:
@@ -146,6 +146,7 @@ public:
 	     std::vector<double>& residuals_C_soil,
              double dt,
 	     Treelog&);
+  void tick_daily ();
   void update_carbon ();
   void none ();
   void output (Log& log) const;

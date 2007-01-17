@@ -71,7 +71,8 @@ RootSystem::potential_water_uptake (const double h_x,
 		  / (- 0.5 * log (area * L[i]))),
 		 max_uptake);
       daisy_assert (soil_water.h (i) > h_wp || iszero (uptake));
-      daisy_assert (soil_water.Theta_left (i) - uptake > soil.Theta_res (i));
+      daisy_assert (soil_water.Theta_left (i) - uptake * dt
+                    > soil.Theta_res (i));
       daisy_assert (L[i] >= 0.0);
       daisy_assert (soil_water.Theta_ice (soil, i, h) > 0.0);
       daisy_assert (soil_water.Theta_ice (soil, i, 0.0) > 0.0);
@@ -341,11 +342,11 @@ RootSystem::tick (const double T, const double dt)
 
 void
 RootSystem::tick_daily (const Geometry& geo, const Soil& soil, 
-			const double WRoot, const double IncWRoot,
+			const double WRoot, const bool root_growth,
 			const double DS, Treelog& msg)
 {
   // Penetration.
-  if (IncWRoot > 0)
+  if (root_growth)
     {
       const double clay = geo.content_at (soil, &Soil::clay, -Depth);
       double clay_fac = PenClayFac (clay);
