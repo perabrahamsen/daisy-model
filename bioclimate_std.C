@@ -398,6 +398,7 @@ As a last resort,  Makkink (makkink) will be used.");
               "SVAT module induced stress, -1 means use water stress.");
   syntax.add ("r_ae", "s/m", Check::positive (), Syntax::Const,
               "Atmospheric resistance.");
+  alist.add ("r_ae", 53.);
   syntax.add ("LeafTemperature", "dg C", Syntax::LogOnly,
               "Actual leaf temperature.");
   syntax.add ("AirTemperature", "dg C", Syntax::LogOnly,
