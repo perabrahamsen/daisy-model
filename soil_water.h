@@ -77,8 +77,8 @@ public:
   { return h_old_[i]; }
   double Theta (size_t i) const
   { return Theta_[i]; }
-  double Theta_left (size_t i) const
-  { return Theta_[i] - S_sum_[i]; }
+  double Theta_left (size_t i, const double dt) const
+  { return Theta_[i] - S_sum_[i] * dt; }
   double Theta_old (size_t i) const
   { return Theta_old_[i]; }
   double content_surface (const Geometry&, 
