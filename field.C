@@ -43,7 +43,7 @@ struct Field::Implementation
   void unrestrict ();
 
   // Actions.
-  void sow (const AttributeList& crop, const Time& time, Treelog&);
+  void sow (const AttributeList& crop, const Time& time, double dt, Treelog&);
   void ridge (const AttributeList& ridge);
   void irrigate_overhead (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
@@ -131,12 +131,12 @@ Field::Implementation::unrestrict ()
 
 void 
 Field::Implementation::sow (const AttributeList& crop, 
-                            const Time& time, Treelog& msg)
+                            const Time& time, const double dt, Treelog& msg)
 {
   if (selected)
     {
       Treelog::Open nest (msg, selected->name);
-      selected->sow (crop, time, msg);
+      selected->sow (crop, time, dt, msg);
     }
   else 
     {
@@ -145,7 +145,7 @@ Field::Implementation::sow (const AttributeList& crop,
 	   i++)
 	{
 	  Treelog::Open nest (msg, (*i)->name);
-	  (*i)->sow (crop, time, msg);
+	  (*i)->sow (crop, time, dt, msg);
 	}
     }
 }
@@ -715,8 +715,9 @@ Field::Restrict::~Restrict ()
 { field.impl.unrestrict (); }
 
 void 
-Field::sow (const AttributeList& crop, const Time& time, Treelog& msg)
-{ impl.sow (crop, time, msg); }
+Field::sow (const AttributeList& crop, 
+            const Time& time, const double dt, Treelog& msg)
+{ impl.sow (crop, time, dt, msg); }
 
 void 
 Field::ridge (const AttributeList& al)

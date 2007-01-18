@@ -120,9 +120,9 @@ public:
 			Treelog&) = 0;
   virtual void sow (const AttributeList& al, 
                     const Geometry&, OrganicMatter&, 
-                    double& seed_N /* kg/ha */,
-                    double& seed_C /* kg/ha */,
-                    const Time&, Treelog& msg) = 0;
+                    double& seed_N /* kg/ha/h */,
+                    double& seed_C /* kg/ha/h */,
+                    const Time&, double dt, Treelog& msg) = 0;
   virtual void output (Log&) const;
   
   // Litter

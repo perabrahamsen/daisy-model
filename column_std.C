@@ -114,7 +114,7 @@ public:
   const Horizon& horizon_at (double z, double x, double y) const;
 
   // Actions.
-  void sow (const AttributeList&, const Time&, Treelog&);
+  void sow (const AttributeList&, const Time&, const double dt, Treelog&);
   void ridge (const AttributeList& al);
   void irrigate_overhead (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
@@ -257,8 +257,10 @@ ColumnStandard::horizon_at (const double z,
 { return soil->horizon (geometry.cell_at (z, x, y)); }
 
 void 
-ColumnStandard::sow (const AttributeList& al, const Time& time, Treelog& msg)
-{ vegetation->sow (al, geometry, *organic_matter, seed_N, seed_C, time, msg); }
+ColumnStandard::sow (const AttributeList& al, 
+                     const Time& time, const double dt, Treelog& msg)
+{ vegetation->sow (al, geometry, *organic_matter, seed_N, seed_C, 
+                   time, dt, msg); }
 
 // We need to convert from mm * mg N / liter to g N/cm^2.
 // mm / liter = 1/m^2 = 1/(100^2 cm^2) = 1/10000 1/cm^2 = 1.0e-4 1/cm^2

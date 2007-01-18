@@ -158,8 +158,8 @@ struct VegetationCrops : public Vegetation
                 const bool combine,
 		Treelog&);
   void sow (const AttributeList& al, const Geometry&, OrganicMatter&, 
-            double& seed_N /* kg/ha */, double& seed_C /* kg/ha */,
-            const Time&, Treelog&);
+            double& seed_N /* kg/ha/h */, double& seed_C /* kg/ha/h */,
+            const Time&, double dt, Treelog&);
   void output (Log&) const;
 
   double litter_vapor_flux_factor () const
@@ -630,6 +630,7 @@ VegetationCrops::sow (const AttributeList& al,
 		      const Geometry& geo,
 		      OrganicMatter& organic_matter, 
                       double& seed_N, double& seed_C, const Time& time, 
+                      const double dt,
                       Treelog& msg)
 {
   Crop *const crop = Librarian<Crop>::build_free (msg, al, "sow");
@@ -642,8 +643,8 @@ VegetationCrops::sow (const AttributeList& al,
 If you want two " + name + " you should rename one of them");
   crop->initialize (geo, organic_matter, time, msg);
   crops.push_back (crop);
-  seed_N += crop->total_N ();
-  seed_C += crop->total_C ();
+  seed_N += crop->total_N () / dt;
+  seed_C += crop->total_C () / dt;
   reset_canopy_structure (msg);
 }
 
