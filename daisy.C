@@ -135,25 +135,25 @@ Daisy::check (Treelog& err)
 }
 
 void
-Daisy::tick_columns (Treelog& out)
-{ field.tick (out, dt, time, weather); }
+Daisy::tick_columns (Treelog& msg)
+{ field.tick (time, dt, weather, msg); }
 
 void
-Daisy::initial_logs (Treelog& out)
+Daisy::initial_logs (Treelog& msg)
 {
-  activate_output->tick (*this, out);
+  activate_output->tick (*this, msg);
 
-  if (activate_output->match (*this, out))
+  if (activate_output->match (*this, msg))
     {
       if (!logging)
 	{
-	  out.message ("Start logging");
+	  msg.message ("Start logging");
 	  // get initial values for previous day.
 	  Time previous = time - *timestep;
 	  for (size_t i = 0; i < active_logs.size (); i++)
 	    {
 	      Log& log = *active_logs[i];
-	      if (log.initial_match (*this, out))
+	      if (log.initial_match (*this, msg))
 		{
 		  output_submodule (previous, "time", log);
 		  if (weather)
@@ -171,20 +171,20 @@ Daisy::initial_logs (Treelog& out)
     }
   else if (logging)
     {
-      out.message ("End logging");
+      msg.message ("End logging");
       logging = false;
     }
 }
 
 void
-Daisy::tick_logs (Treelog& out)
+Daisy::tick_logs (Treelog& msg)
 {
   if (logging)
     {
       for (size_t i = 0; i < active_logs.size (); i++)
 	{
 	  Log& log = *active_logs[i];
-	  if (log.match (*this, out))
+	  if (log.match (*this, msg))
 	    {
 	      output_submodule (time, "time", log);
 	      if (weather)
@@ -204,16 +204,16 @@ Daisy::tick_logs (Treelog& out)
 }
 
 void
-Daisy::tick (Treelog& out)
+Daisy::tick (Treelog& msg)
 { 
-  initial_logs (out);
+  initial_logs (msg);
   if (weather)
-    weather->tick (time, out);
-  action->tick (*this, out);
-  action->doIt (*this, out);
+    weather->tick (time, msg);
+  action->tick (*this, msg);
+  action->doIt (*this, msg);
 
-  tick_columns (out);
-  tick_logs (out);
+  tick_columns (msg);
+  tick_logs (msg);
   time += *timestep;
   
   if (time >= stop)
@@ -221,42 +221,42 @@ Daisy::tick (Treelog& out)
 }
 
 bool
-Daisy::run (Treelog& out)
+Daisy::run (Treelog& msg)
 { 
   // Run simulation.
   {
-    Treelog::Open nest (out, "Running");
+    Treelog::Open nest (msg, "Running");
 
     running = false;
 
     do
       {
-	Treelog::Open nest (out, time.print ());
+	Treelog::Open nest (msg, time.print ());
 
 	if (!running)
 	  {
 	    running = true;
-	    out.message ("Begin simulation");
+	    msg.message ("Begin simulation");
 	  }
 
-	print_time->tick (*this, out);
-	const bool force_print = print_time->match (*this, out);
+	print_time->tick (*this, msg);
+	const bool force_print = print_time->match (*this, msg);
 
-	tick (out);
+	tick (msg);
 
 	if (!running)
-	  out.message ("End simulation");
-	print_time->tick (*this, out);
+	  msg.message ("End simulation");
+	print_time->tick (*this, msg);
 	if (force_print)
-	  out.touch ();
+	  msg.touch ();
       }
     while (running);
   }
   // Print log file summaries at end of simulation.
   {
-    Treelog::Open nest (out, "Summary");
+    Treelog::Open nest (msg, "Summary");
     for (size_t i = 0; i < logs.size (); i++)
-      logs[i]->summarize (out);
+      logs[i]->summarize (msg);
   }
   return true;
 }

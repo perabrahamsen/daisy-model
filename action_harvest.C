@@ -90,20 +90,21 @@ struct ActionHarvest : public Action
   const double sorg;
   const bool combine;
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, Treelog& msg)
   {
     static const symbol all_symbol ("all");
     if (crop != all_symbol && daisy.field.crop_ds (crop) < 0.0)
       {
-	out.warning ("Attempting to harvest " + crop 
+	msg.warning ("Attempting to harvest " + crop 
 		     + " which has not emerged on the field");
 	return;
       }
     double old_DM = 0.0;
     for (size_t i = 0; i < daisy.harvest.size (); i++)
       old_DM += daisy.harvest[i]->total_DM ();
-    daisy.field.harvest (daisy.time, crop, stub, stem, leaf, sorg, combine,
-			 daisy.harvest, out);
+    daisy.field.harvest (daisy.time, daisy.dt, 
+                         crop, stub, stem, leaf, sorg, combine,
+			 daisy.harvest, msg);
     double new_DM = 0.0;
     for (size_t i = 0; i < daisy.harvest.size (); i++)
       new_DM += daisy.harvest[i]->total_DM ();
@@ -113,7 +114,7 @@ struct ActionHarvest : public Action
     else
       tmp << "Cutting ";
     tmp << crop << ", removing " << (new_DM - old_DM) * 0.01 << " Mg DM/ha";
-    out.message (tmp.str ());
+    msg.message (tmp.str ());
   }
 
   ActionHarvest (Block& al)

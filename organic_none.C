@@ -54,10 +54,10 @@ struct OrganicNone : public OrganicMatter
   double CO2_fast (size_t) const	// [g C/cm³]
   { return 0.0; }
   void mix (const Geometry&, const Soil&, const SoilWater&,
-	    double, double, double, const Time&)
+	    double, double, double, const Time&, double)
   { }
   void swap (const Geometry&, const Soil&, const SoilWater&, 
-	     double, double, double, const Time&)
+	     double, double, double, const Time&, double)
   { }
 
   // Communication with external model.
@@ -73,9 +73,10 @@ struct OrganicNone : public OrganicMatter
   { return true; }
   void add (AM&)
   { }
-  void fertilize (const AttributeList&, const Geometry&)
+  void fertilize (const AttributeList&, const Geometry&, double)
   { }
-  void fertilize (const AttributeList&, const Geometry&, double, double)
+  void fertilize (const AttributeList&, const Geometry&, 
+                  double, double, double)
   { }
   AM* find_am (symbol, symbol) const
   { return NULL; }

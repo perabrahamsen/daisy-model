@@ -887,7 +887,7 @@ BioclimateStandard::tick (const Time& time,
   day_length_ = weather.day_length ();
   
   // Add nitrogen deposit. 
-  surface.fertilize (weather.deposit ());
+  surface.fertilize (weather.deposit () * dt);
 
   // Update canopy structure.
   CanopyStructure (vegetation);

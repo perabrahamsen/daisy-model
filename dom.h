@@ -79,11 +79,12 @@ public:
   void clear ();
   void turnover (const std::vector<bool>&, const double* turnover_factor, 
 		 const double* N_soil, double* N_used,
-		 double* CO2, const std::vector<SMB*>& smb);
+		 double* CO2, const std::vector<SMB*>& smb, double dt);
 private:
   void tock (const std::vector<bool>&,
 	     const double* factor, double fraction, double efficiency,
-	     const double* N_soil, double* N_used, double* CO2, OM& om);
+	     const double* N_soil, double* N_used, double* CO2, OM& om, 
+             double dt);
 
   // Create & Destroy.
 public:

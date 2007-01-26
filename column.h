@@ -50,27 +50,30 @@ public:
   virtual void sow (const AttributeList& crop, 
                     const Time&, double dt, Treelog&) = 0;
   virtual void ridge (const AttributeList& ridge) = 0;
-  virtual void irrigate_overhead (double flux, double temp, const IM&) = 0;
-  virtual void irrigate_surface (double flux, double temp, const IM&) = 0;
-  virtual void irrigate_overhead (double flux, const IM&) = 0;
-  virtual void irrigate_surface (double flux, const IM&) = 0;
+  virtual void irrigate_overhead (double flux, double temp, const IM&, 
+                                  double dt) = 0;
+  virtual void irrigate_surface (double flux, double temp, const IM&,
+                                 double dt) = 0;
+  virtual void irrigate_overhead (double flux, const IM&, double dt) = 0;
+  virtual void irrigate_surface (double flux, const IM&, double dt) = 0;
   virtual void irrigate_subsoil (double flux, const IM&, 
-                                 double from, double to) = 0;
-  virtual void fertilize (const AttributeList&, double from, double to) = 0;
-  virtual void fertilize (const AttributeList&) = 0;
+                                 double from, double to, double dt) = 0;
+  virtual void fertilize (const AttributeList&, 
+                          double from, double to, double dt) = 0;
+  virtual void fertilize (const AttributeList&, double dt) = 0;
   virtual void clear_second_year_utilization () = 0;
   virtual void emerge (symbol crop, Treelog&) = 0;
-  virtual void harvest (const Time&, symbol name,
+  virtual void harvest (const Time&, double dt, symbol name,
 			double stub_length, 
 			double stem_harvest, 
 			double leaf_harvest, 
 			double sorg_harvest, 
                         const bool combine,
 			std::vector<const Harvest*>& harvest, Treelog&) = 0;
-  virtual void mix (Treelog&, const Time&,
-		    double from, double to, double penetration = 1.0) = 0;
-  virtual void swap (Treelog&, 
-		     const Time&, double from, double middle, double to) = 0;
+  virtual void mix (double from, double to, double penetration, 
+                    const Time&, double dt, Treelog&) = 0;
+  virtual void swap (double from, double middle, double to, 
+                     const Time&,  double dt, Treelog&) = 0;
   virtual void set_porosity (double at, double Theta) = 0;
   virtual void set_heat_source (double at, double value) = 0; // [W/m^2]
   virtual void spray (symbol chemical, double amount) = 0; // [g/ha]
@@ -99,15 +102,15 @@ public:
 
   // Simulation.
   virtual void clear () = 0;
-  virtual void tick (Treelog&, double dt, const Time&, const Weather*) = 0;
+  virtual void tick (const Time&, double dt, const Weather*, Treelog&) = 0;
 
   virtual bool check (bool require_weather,
 		      const Time& from, const Time& to, 
-		      Treelog& err) const = 0;
-  virtual bool check_am (const AttributeList& am, Treelog& err) const = 0;
-  virtual bool check_z_border (double, Treelog& err) const = 0;
-  virtual bool check_x_border (double, Treelog& err) const = 0;
-  virtual bool check_y_border (double, Treelog& err) const = 0;
+		      Treelog&) const = 0;
+  virtual bool check_am (const AttributeList& am, Treelog&) const = 0;
+  virtual bool check_z_border (double, Treelog&) const = 0;
+  virtual bool check_x_border (double, Treelog&) const = 0;
+  virtual bool check_y_border (double, Treelog&) const = 0;
   virtual void output (Log&) const;
 
   // Create and Destroy.

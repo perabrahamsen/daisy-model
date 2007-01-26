@@ -33,10 +33,10 @@ struct ActionMix : public Action
   const double penetration;
 
   // Simulation.
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, Treelog& msg)
     {
-      out.message ("Tillage operation " + name);
-      daisy.field.mix (out, daisy.time, 0.0, depth, penetration);
+      msg.message ("Tillage operation " + name);
+      daisy.field.mix (0.0, depth, penetration, daisy.time, daisy.dt, msg);
     }
 
   ActionMix (Block& al)
@@ -77,10 +77,10 @@ struct ActionSwap : public Action
   const double depth;
 
   // Simulation.
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, Treelog& msg)
   {
-    out.message ("Tillage operation " + name);
-    daisy.field.swap (out, daisy.time, 0.0, middle, depth);
+    msg.message ("Tillage operation " + name);
+    daisy.field.swap (0.0, middle, depth, daisy.time, daisy.dt, msg);
   }
 
   ActionSwap (Block& al)

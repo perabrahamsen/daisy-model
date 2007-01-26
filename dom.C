@@ -109,7 +109,7 @@ DOM::clear ()
 void 
 DOM::turnover (const std::vector<bool>& active, const double* turnover_factor, 
 	       const double* N_soil, double* N_used,
-	       double* CO2, const vector<SMB*>& smb)
+	       double* CO2, const vector<SMB*>& smb, const double dt)
 {
   // Find size.
   const size_t cell_size = active.size ();
@@ -123,14 +123,15 @@ DOM::turnover (const std::vector<bool>& active, const double* turnover_factor,
       const double fraction = fractions[j];
       if (fraction > 1e-50)
 	tock (active, turnover_factor, turnover_rate * fraction, efficiency[j],
-	      N_soil, N_used, CO2, *smb[j]);
+	      N_soil, N_used, CO2, *smb[j], dt);
     }
 }
 
 void
 DOM::tock (const std::vector<bool>& active, 
 	   const double* factor, double fraction, double efficiency,
-	   const double* N_soil, double* N_used, double* CO2, OM& om)
+	   const double* N_soil, double* N_used, double* CO2, OM& om,
+           const double dt)
 {
   const size_t cell_size = active.size ();
   daisy_assert (C.M.size () == cell_size);
@@ -160,7 +161,7 @@ DOM::tock (const std::vector<bool>& active,
       // Update C.
       daisy_assert (om.C[i] >= 0.0);
       CO2[i] += C_use * (1.0 - efficiency);
-      om.C[i] += C_use * efficiency;
+      om.C[i] += C_use * efficiency * dt;
       daisy_assert (om.C[i] >= 0.0);
       daisy_assert (C.M[i] >= 0.0);
 
@@ -169,7 +170,7 @@ DOM::tock (const std::vector<bool>& active,
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (om.N[i] >= 0.0);
       daisy_assert (N.M[i] >= 0.0);
-      om.N[i] += N_consume;
+      om.N[i] += N_consume * dt;
       daisy_assert (om.N[i] >= 0.0);
       daisy_assert (N.M[i] >= 0.0);
     }

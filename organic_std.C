@@ -228,10 +228,10 @@ struct OrganicStandard : public OrganicMatter
   double CO2_fast (size_t i) const;	// [g C/cm³]
   void mix (const Geometry&, const Soil&, const SoilWater&,
 	    double from, double to, double penetration,
-	    const Time& time);
+	    const Time& time, double dt);
   void swap (const Geometry&, const Soil&, const SoilWater&, 
 	     double from, double middle, double to,
-	     const Time& time);
+	     const Time& time, double dt);
 
   // Communication with external model.
   double get_smb_c_at (size_t i) const; // [g C/cm³]
@@ -241,9 +241,9 @@ struct OrganicStandard : public OrganicMatter
   bool check (const Soil&, Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   void add (AM&);
-  void fertilize (const AttributeList&, const Geometry&);
+  void fertilize (const AttributeList&, const Geometry&, double dt);
   void fertilize (const AttributeList&, const Geometry&,
-                  double from, double to);
+                  double from, double to, double dt);
   AM* find_am (symbol sort, symbol part) const;
   void initialize (const AttributeList&, const Geometry& geo,
                    const Soil&, const SoilWater&, 
@@ -887,25 +887,26 @@ OrganicStandard::add (AM& om)
 
 void 
 OrganicStandard::fertilize (const AttributeList& al, 
-                            const Geometry& geo)
+                            const Geometry& geo, const double dt)
 { 
   AM& om = AM::create (al, geo);
-  fertilized_N += om.total_N (geo) / geo.surface_area (); 
-  fertilized_C += om.total_C (geo) / geo.surface_area ();
+  fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
+  fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   add (om);
 }
 
 void 
 OrganicStandard::fertilize (const AttributeList& al,
                             const Geometry& geo,
-                            double from, double to)
+                            const double from, const double to,
+                            const double dt)
 { 
   AM& om = AM::create (al, geo);
-  fertilized_N += om.total_N (geo) / geo.surface_area (); 
-  fertilized_C += om.total_C (geo) / geo.surface_area ();
+  fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
+  fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   om.mix (geo, from, to, 1.0,
           tillage_N_top, tillage_C_top,
-          tillage_N_soil, tillage_C_soil);
+          tillage_N_soil, tillage_C_soil, dt);
   add (om);
 }
 
@@ -1135,7 +1136,8 @@ OrganicStandard::tick (const Geometry& geo,
       double *const CO2 = dom[j]->turnover_rate > CO2_threshold 
 	? &CO2_fast_[0] 
 	: &CO2_slow_[0];
-      dom[j]->turnover (active_, abiotic, &N_soil[0], &N_used[0], CO2, smb);
+      dom[j]->turnover (active_, abiotic, &N_soil[0], &N_used[0], CO2, smb,
+                        dt);
     }
   for (size_t j = 0; j < smb.size (); j++)
     {
@@ -1149,9 +1151,9 @@ OrganicStandard::tick (const Geometry& geo,
       double *const CO2 = smb[j]->turnover_rate > CO2_threshold 
 	? &CO2_fast_[0] 
 	: &CO2_slow_[0];
-      smb[j]->maintain (active_, abiotic, &N_used[0], CO2);
+      smb[j]->maintain (active_, abiotic, &N_used[0], CO2, dt);
       smb[j]->tick (active_, 
-                    abiotic, &N_soil[0], &N_used[0], CO2, smb, som, dom);
+                    abiotic, &N_soil[0], &N_used[0], CO2, smb, som, dom, dt);
     }
   for (size_t j = 0; j < som.size (); j++)
     {
@@ -1166,7 +1168,7 @@ OrganicStandard::tick (const Geometry& geo,
 	? &CO2_fast_[0] 
 	: &CO2_slow_[0];
       som[j]->tick (active_,
-                    abiotic, &N_soil[0], &N_used[0], CO2, smb, som, dom);
+                    abiotic, &N_soil[0], &N_used[0], CO2, smb, som, dom, dt);
     }
 
   for (size_t j = 0; j < added.size (); j++)
@@ -1178,7 +1180,7 @@ OrganicStandard::tick (const Geometry& geo,
 	? &CO2_fast_[0] 
 	: &CO2_slow_[0];
       added[j]->tick (active_, abiotic, &N_soil[0], &N_used[0], &CO2[0],
-		      smb, &buffer.C[0], &buffer.N[0], dom);
+		      smb, &buffer.C[0], &buffer.N[0], dom, dt);
     }
 
   // Update buffer.
@@ -1194,20 +1196,20 @@ OrganicStandard::tick (const Geometry& geo,
       
       daisy_assert (N_used[i] < soil_NH4.M_left (i, dt) + soil_NO3.M_left (i, dt));
 
-      const double NH4 = (soil_NH4.M_left (i, dt) < 1e-9) // 1 mg/l
+      const double NH4 = (soil_NH4.M_left (i, dt) < 1e-9 * dt) // 1 mg/l/h
 	? 0.0 : soil_NH4.M_left (i, dt) * K_NH4;
       daisy_assert (NH4 >= 0.0);
 
       if (N_used[i] > NH4)
 	{
-	  NH4_source[i] = -NH4 / dt;
-	  NO3_source[i] = (NH4 - N_used[i]) / dt;
+	  NH4_source[i] = -NH4;
+	  NO3_source[i] = (NH4 - N_used[i]);
 	  daisy_assert (NH4_source[i] <= 0.0);
 	  daisy_assert (NO3_source[i] <= 0.0);
 	}
       else
 	{
-	  NH4_source[i] = -N_used[i] / dt;
+	  NH4_source[i] = -N_used[i];
 	  NO3_source[i] = 0.0;
 	}
     }
@@ -1255,14 +1257,15 @@ OrganicStandard::tick (const Geometry& geo,
     = geo.total_soil (CO2_slow_) + geo.total_soil (CO2_fast_)
     + top_CO2 * geo.surface_area ();
   
-  if (!approximate (delta_C, C_source) && !approximate (old_C, new_C, 1e-10))
+  if (!approximate (delta_C, C_source * dt)
+      && !approximate (old_C, new_C, 1e-10))
     {
       std::ostringstream tmp;
       tmp << "BUG: OrganicStandard: "
 	"delta_C != soil_CO2_slow + soil_CO2_fast + top_CO2 [g C]\n"
-          << delta_C << " != " << geo.total_soil (CO2_slow_) << " + " 
-          << geo.total_soil (CO2_fast_) << " + "
-          << top_CO2 * geo.surface_area ();
+          << delta_C << " != " << geo.total_soil (CO2_slow_) * dt << " + " 
+          << geo.total_soil (CO2_fast_) * dt << " + "
+          << top_CO2 * geo.surface_area () * dt;
       msg.error (tmp.str ());
     }
 
@@ -1286,21 +1289,21 @@ OrganicStandard::transport (const Soil& soil,
 void 
 OrganicStandard::mix (const Geometry& geo, const Soil& soil,
                       const SoilWater& soil_water,
-                      double from, double to, 
-                      double penetration,
-                      const Time&)
+                      const double from, const double to, 
+                      const double penetration,
+                      const Time&, const double dt)
 {
   buffer.mix (geo, from, to);
   for (size_t i = 0; i < am.size (); i++)
     am[i]->mix (geo, from, to, penetration, 
                 tillage_N_top, tillage_C_top, 
-                tillage_N_soil, tillage_C_soil);
+                tillage_N_soil, tillage_C_soil, dt);
   for (size_t i = 1; i < smb.size (); i++)
     smb[i]->mix (geo, from, to, 
-                 tillage_N_soil, tillage_C_soil);
+                 tillage_N_soil, tillage_C_soil, dt);
   for (size_t i = 0; i < som.size (); i++)
     som[i]->mix (geo, from, to, 
-                 tillage_N_soil, tillage_C_soil);
+                 tillage_N_soil, tillage_C_soil, dt);
   for (size_t i = 0; i < dom.size (); i++)
     dom[i]->mix (geo, soil, soil_water, from, to);
 
@@ -1330,19 +1333,19 @@ OrganicStandard::get_smb_c_at (size_t i) const // [g C/cm³]
 void 
 OrganicStandard::swap (const Geometry& geo, const Soil& soil,
                        const SoilWater& soil_water,
-                       double from, double middle, double to,
-                       const Time&)
+                       const double from, const double middle, const double to,
+                       const Time&, const double dt)
 {
   buffer.swap (geo, from, middle, to);
   for (size_t i = 0; i < am.size (); i++)
     am[i]->swap (geo, from, middle, to, 
-                 tillage_N_soil, tillage_C_soil);
+                 tillage_N_soil, tillage_C_soil, dt);
   for (size_t i = 1; i < smb.size (); i++)
     smb[i]->swap (geo, from, middle, to, 
-                  tillage_N_soil, tillage_C_soil);
+                  tillage_N_soil, tillage_C_soil, dt);
   for (size_t i = 0; i < som.size (); i++)
     som[i]->swap (geo, from, middle, to, 
-                  tillage_N_soil, tillage_C_soil);
+                  tillage_N_soil, tillage_C_soil, dt);
   for (size_t i = 0; i < dom.size (); i++)
     dom[i]->swap (geo, soil, soil_water, from, middle, to);
   // Leave CO2 alone.

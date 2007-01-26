@@ -65,10 +65,10 @@ struct SoilChemicals::Implementation
 		double pond, double rate, double dt) const;
   void output (Log&) const;
   void mix (const Geometry& geo,
-            const Soil&, const SoilWater&, double from, double to);
+            const Soil&, const SoilWater&, double from, double to, double dt);
   void swap (const Geometry& geo,
              const Soil&, const SoilWater&,
-	     double from, double middle, double to);
+	     double from, double middle, double to, double dt);
 
   // Create & Destroy
   void clear ();
@@ -216,14 +216,15 @@ void
 SoilChemicals::Implementation::mix (const Geometry& geo,
                                     const Soil& soil,
 				    const SoilWater& soil_water,
-				    double from, double to)
+				    const double from, const double to,
+                                    const double dt)
 {
   for (SoluteMap::const_iterator i = solutes.begin ();
        i != solutes.end ();
        i++)
     {
       SoilChemical& solute = *(*i).second;
-      solute.mix (geo, soil, soil_water, from, to); 
+      solute.mix (geo, soil, soil_water, from, to, dt); 
     }
 }
 
@@ -231,14 +232,15 @@ void
 SoilChemicals::Implementation::swap (const Geometry& geo,
                                      const Soil& soil,
 				     const SoilWater& soil_water,
-				     double from, double middle, double to)
+				     const double from, const double middle,
+                                     const double to, const double dt)
 { 
   for (SoluteMap::const_iterator i = solutes.begin ();
        i != solutes.end ();
        i++)
     {
       SoilChemical& solute = *(*i).second;
-      solute.swap (geo, soil, soil_water, from, middle, to); 
+      solute.swap (geo, soil, soil_water, from, middle, to, dt); 
     }
 }
 
@@ -337,14 +339,15 @@ SoilChemicals::output (Log& log) const
 void 
 SoilChemicals::mix (const Geometry& geo,
                     const Soil& soil, const SoilWater& soil_water,
-		    double from, double to)
-{ impl.mix (geo, soil, soil_water, from, to); }
+		    const double from, const double to, const double dt)
+{ impl.mix (geo, soil, soil_water, from, to, dt); }
 
 void 
 SoilChemicals::swap (const Geometry& geo,
                      const Soil& soil, const SoilWater& soil_water,
-		     double from, double middle, double to)
-{ impl.swap (geo, soil, soil_water, from, middle, to); }
+		     const double from, const double middle, const double to,
+                     const double dt)
+{ impl.swap (geo, soil, soil_water, from, middle, to, dt); }
 
 void
 SoilChemicals::clear ()

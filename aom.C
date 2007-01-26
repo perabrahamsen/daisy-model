@@ -171,9 +171,9 @@ AOM::add (const Geometry& geo, // Add dead roots.
 
 void 
 AOM::tick (const std::vector<bool>& active, const double* abiotic_factor, 
-	  const double* N_soil, double* N_used,
-	  double* CO2, const vector<SMB*>& smb, double* som_C, double* som_N,
-	  const vector<DOM*>& dom)
+           const double* N_soil, double* N_used,
+           double* CO2, const vector<SMB*>& smb, double* som_C, double* som_N,
+           const vector<DOM*>& dom, const double dt)
 {
   const size_t cell_size = active.size ();
   daisy_assert (C.size () == cell_size);
@@ -189,7 +189,7 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
       const double fraction = fractions[j];
       if (fraction > 1e-50)
 	turnover_pool (active, abiotic_factor, fraction, efficiency[j],
-		       N_soil, N_used, CO2, *smb[j]);
+		       N_soil, N_used, CO2, *smb[j], dt);
     }
 
   // Distribute to soil buffer.
@@ -202,10 +202,10 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
 	const double rate = min (factor * abiotic_factor[i], 0.1);
 	const double C_use = C[i] * rate;
 	const double N_use = N[i] * rate;
-	som_N[i] += N_use;
-	som_C[i] += C_use;
-	C[i] -= C_use;
-	N[i] -= N_use;
+	som_N[i] += N_use * dt;
+	som_C[i] += C_use * dt;
+	C[i] -= C_use * dt;
+	N[i] -= N_use * dt;
 	daisy_assert (C[i] >= 0.0);
 	daisy_assert (N[i] >= 0.0);
 	daisy_assert (som_C[i] >= 0.0);
@@ -221,7 +221,7 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
     {
       const double fraction = fractions[smb_size + 1 + j];
       if (fraction > 1e-50)
-	turnover_dom (active, abiotic_factor, fraction, *dom[j]);
+	turnover_dom (active, abiotic_factor, fraction, *dom[j], dt);
     }
 }
 

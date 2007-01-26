@@ -64,10 +64,10 @@ public:
                 double dt) const;
   void output (Log&) const;
   void mix (const Geometry& geo,
-            const Soil&, const SoilWater&, double from, double to);
+            const Soil&, const SoilWater&, double from, double to, double dt);
   void swap (const Geometry& geo,
              const Soil&, const SoilWater&,
-	     double from, double middle, double to);
+	     double from, double middle, double to, double dt);
 
   // Create & Destroy.
 public:

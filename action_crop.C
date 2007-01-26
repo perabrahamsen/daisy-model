@@ -343,7 +343,8 @@ ActionCrop::Annual::doIt (Daisy& daisy, Treelog& out, symbol name)
       const double leaf = remove_residuals ? 1.0 : 0.0;
       const double sorg = (1.0 - loss);
       static const symbol all_symbol ("all");
-      daisy.field.harvest (daisy.time, all_symbol, stub, stem, leaf, sorg, 
+      daisy.field.harvest (daisy.time, daisy.dt, 
+                           all_symbol, stub, stem, leaf, sorg, 
 			   false, daisy.harvest, out);
       out.message ("Annual harvest of " + name);
       done = true;
@@ -399,7 +400,8 @@ ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& out)
   const double leaf = 1.0;
   const double sorg = 1.0;
   static const symbol all_symbol ("all");
-  daisy.field.harvest (daisy.time, all_symbol, stub, stem, leaf, sorg, 
+  daisy.field.harvest (daisy.time, daisy.dt,
+                       all_symbol, stub, stem, leaf, sorg, 
 		       false, daisy.harvest, out);
   out.message ("Perennial harvest");
 }
@@ -600,9 +602,9 @@ ActionCrop::fertilize (Daisy& daisy, Treelog& out,
   const double to = -18.0;
       
   if (fertilize_incorporate)
-    daisy.field.fertilize (am, from, to);
+    daisy.field.fertilize (am, from, to, daisy.dt);
   else
-    daisy.field.fertilize (am);
+    daisy.field.fertilize (am, daisy.dt);
 }
 
 void 
@@ -727,7 +729,7 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, Treelog& out) const
   ostringstream tmp;
   tmp << "Irrigating " << amount << " mm";
   out.message (tmp.str ());
-  daisy.field.irrigate_overhead (amount, IM ());
+  daisy.field.irrigate_overhead (amount, IM (), daisy.dt);
   return true;
 }
 

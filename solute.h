@@ -93,14 +93,15 @@ public:
 public:
   bool check (size_t n, Treelog& err) const;
   virtual void output (Log&) const;
-  void incorporate (const Geometry&, double amount, double from, double to);
+  void incorporate (const Geometry&, double amount, 
+                    double from, double to, double dt);
   void set_external_source (const Geometry&, 
 			    double amount, double from, double to);
   void mix (const Geometry& geo,
-            const Soil&, const SoilWater&, double from, double to);
+            const Soil&, const SoilWater&, double from, double to, double dt);
   void swap (const Geometry& geo,
              const Soil&, const SoilWater&,
-             double from, double middle, double to);
+             double from, double middle, double to, double dt);
 
   // Communication with external model.
   void put_M (const Soil& soil, const SoilWater& soil_water,

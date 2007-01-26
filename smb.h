@@ -38,14 +38,14 @@ public:
 public:
   void maintain (const std::vector<bool>& active,
                  const double* abiotic_factor, 
-		 double* N_used, double* CO2);
+		 double* N_used, double* CO2, double dt);
 private:
   void turnover_pool (const std::vector<bool>& active, const double* factor,
 		      double fraction, double efficiency,
 		      const double* N_soil, double* N_used, 
-		      double* CO2, OM& om);
+		      double* CO2, OM& om, double dt);
   void turnover_dom (const std::vector<bool>& active, const double* factor,
-		     double fraction, DOM& dom);
+		     double fraction, DOM& dom, double dt);
 
   // Create & Destroy.
 public:

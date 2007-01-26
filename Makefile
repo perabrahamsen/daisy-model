@@ -25,6 +25,7 @@ SRCDIR = $(HOME)/daisy
 OBJHOME = /usr/local/daisy
 FTPDIR = /home/ftp/pub/daisy
 WWWINDEX = /home/user_3/daisy/.public_html/index.html
+BOOSTINC = -isystem /usr/include/boost-1_33_1/
 
 BORLAND = "e:/Program Files/Borland/CBuilder5/"
 TARGETTYPE = i586-mingw32msvc
@@ -178,7 +179,7 @@ ifeq ($(COMPILER),gcc)
 #  -Wmissing-prototypes -Wstrict-prototypes: Not C++ flags.
 #  -Wuninitialized: triggered in 3.4 in initializations!
 #  -Wunreachable-code: triggered by header files
-	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS)
+	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 	CPPLIB = -lstdc++
 endif
@@ -266,16 +267,16 @@ endif
 #
 ifeq ($(HOSTTYPE),win32)
 	OBJ = .obj
-	EXT = .exe
+	EXE = .exe
 else
 	OBJ = .o
 	ifeq ($(HOSTTYPE),cygwin)
-		EXT = .exe
+		EXE = .exe
 	else
 		ifeq ($(HOSTTYPE),mingw)
-			EXT = .exe
+			EXE = .exe
 		else
-			EXT =
+			EXE =
 		endif
 	endif
 endif
@@ -441,7 +442,7 @@ TEXT =  ChangeLog.2 ChangeLog.1 \
 
 # The executables.
 #
-EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
+EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next cvs update.
 #
@@ -450,7 +451,7 @@ REMOVE = select_interval.C select_utils.h select_utils.C select_flux_top.C selec
 
 # These are the file extensions we deal with.
 # 
-.SUFFIXES:	.C ${OBJ} .h .c ${EXT} .a
+.SUFFIXES:	.C ${OBJ} .h .c ${EXE} .a
 
 # Create all the executables.
 #
@@ -459,11 +460,8 @@ all:	#(EXECUTABLES)
 
 # Create the main executable.
 #
-daisy.exe:	main${OBJ} $(LIBOBJ)
-	$(LINK)daisy.exe $^ $(CPPLIB) $(MATHLIB)
-
-daisy:	main${OBJ} $(LIBOBJ) #daisy.so
-	$(LINK)daisy $^ $(CPPLIB) $(MATHLIB)
+daisy${EXE}:	main${OBJ} $(LIBOBJ)
+	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
 
 exp:	
 	(cd $(OBJHOME)/exp \
@@ -480,28 +478,28 @@ cross:
 
 # Create manager test executable.
 #
-mandaisy${EXT}:	manmain${OBJ} daisy.so
-	$(LINK)mandaisy  $^ $(MATHLIB)
+mandaisy${EXE}:	manmain${OBJ} daisy.so
+	$(LINK)$@  $^ $(MATHLIB)
 
 # Create bug test executable.
 #
-bugdaisy${EXT}:	bugmain${OBJ} daisy.so
-	$(LINK)bugdaisy  $^ $(MATHLIB)
+bugdaisy${EXE}:	bugmain${OBJ} daisy.so
+	$(LINK)$@  $^ $(MATHLIB)
 
 # Create executable with embedded tcl/tk.
 #
-tkdaisy${EXT}:	tkmain${OBJ} daisy.so
-	$(LINK)tkdaisy $^ $(TKLIB) $(MATHLIB)
+tkdaisy${EXE}:	tkmain${OBJ} daisy.so
+	$(LINK)$@ $^ $(TKLIB) $(MATHLIB)
 
 # Create executable with Gtk--.
 #
-gdaisy${EXT}:	gmain${OBJ} daisy.so
-	$(LINK)gdaisy $^ $(GTKMMLIB)
+gdaisy${EXE}:	gmain${OBJ} daisy.so
+	$(LINK)$@ $^ $(GTKMMLIB)
 
 # Create executable with Qt.
 #
-qdaisy${EXT}:	$(QTOBJECTS) daisy.so
-	$(LINK)qdaisy $(QTOBJECTS) `pwd`/daisy.so $(QTLIB)
+qdaisy${EXE}:	$(QTOBJECTS) daisy.so
+	$(LINK)$@ $(QTOBJECTS) `pwd`/daisy.so $(QTLIB)
 
 qmain_moc.C:	qmain.h
 	$(MOC) $^ > qmain_moc.C
@@ -511,16 +509,16 @@ qmain_edit_moc.C:	qmain_edit.h
 
 # Create the C main executable.
 #
-cdaisy${EXT}:  cmain${OBJ} daisy.so
-	$(LINK)cdaisy cmain${OBJ} `pwd`/daisy.so $(MATHLIB)
+cdaisy${EXE}:  cmain${OBJ} daisy.so
+	$(LINK)$@ cmain${OBJ} `pwd`/daisy.so $(MATHLIB)
 
-cdaisy-mshe${EXT}:  cmain-mshe${OBJ} daisy.so
-	$(LINK)cdaisy-mshe cmain-mshe${OBJ} `pwd`/daisy.so $(MATHLIB)
+cdaisy-mshe${EXE}:  cmain-mshe${OBJ} daisy.so
+	$(LINK)$@ cmain-mshe${OBJ} `pwd`/daisy.so $(MATHLIB)
 
 # Create the C main executable for testing.
 #
-cdaisy_test${EXT}:  cmain_test${OBJ} daisy.so
-	$(LINK)cdaisy_test $^ $(MATHLIB)
+cdaisy_test${EXE}:  cmain_test${OBJ} daisy.so
+	$(LINK)$@ $^ $(MATHLIB)
 
 # Create a DLL.
 #
@@ -537,18 +535,22 @@ cdaisy.o:
 
 # Create daisy plot executable.
 #
-pdaisy${EXT}: pmain${OBJ} time.o
-	$(LINK)pdaisy $^ $(GTKMMDRAWLIB) $(MATHLIB)
+pdaisy${EXE}: pmain${OBJ} time.o
+	$(LINK)$@ $^ $(GTKMMDRAWLIB) $(MATHLIB)
 
 
 dlldaisy.exe:	cmain${OBJ} daisy.dll
-	gcc -o dlldaisy.exe $^ 
+	gcc -o $@ $^ 
 
+# Boost test
+
+btest${EXE}: btest.C
+	$(LINK)$@ -isystem /usr/include/boost-1_33_1/ $< $(CPPLIB) $(MATHLIB)
 
 # Create the MMM executable.
 
-mmm${EXT}:	$(MOBJECTS)
-	$(LINK)mmm  $^ $(MATHLIB)
+mmm${EXE}:	$(MOBJECTS)
+	$(LINK)$@  $^ $(MATHLIB)
 
 # Count the size of daisy.
 #

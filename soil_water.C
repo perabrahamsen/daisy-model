@@ -185,20 +185,20 @@ SoilWater::incorporate (const Geometry& geo, const double amount,
 { geo.add_surface (S_incorp_, from, to, -amount); }
 
 void
-SoilWater::mix (const Geometry& geo,
-                const Soil& soil, double from, double to)
+SoilWater::mix (const Geometry& geo, const Soil& soil,
+                const double from, const double to, const double dt)
 {
-  geo.mix (Theta_, from, to, tillage_);
+  geo.mix (Theta_, from, to, tillage_, dt);
   for (size_t i = 0; i < soil.size(); i++)
     h_[i] = soil.h (i, Theta_[i]);
 }
 
 void
-SoilWater::swap (Treelog& msg, const Geometry& geo,
-                 const Soil& soil,
-                 double from, double middle, double to)
+SoilWater::swap (const Geometry& geo, const Soil& soil,
+                 const double from, const double middle, const double to,
+                 const double dt, Treelog& msg)
 {
-  geo.swap (Theta_, from, middle, to, tillage_);
+  geo.swap (Theta_, from, middle, to, tillage_, dt);
 
   for (size_t i = 0; i < soil.size(); i++)
     {

@@ -56,9 +56,11 @@ public:
 public:
   void output (Log&) const;
   void mix (const Geometry&, double from, double to,
-            std::vector<double>& N_change, std::vector<double>& C_change);
+            std::vector<double>& N_change, std::vector<double>& C_change, 
+            double dt);
   void swap (const Geometry&, double from, double middle, double to,
-             std::vector<double>& N_change, std::vector<double>& C_change);
+             std::vector<double>& N_change, std::vector<double>& C_change,
+             double dt);
   double soil_C (const Geometry& geometry) const;
   double soil_N (const Geometry& geometry) const;
   double soil_C (const Geometry& geometry, double from, double to) const;
@@ -73,16 +75,17 @@ protected:
                               const double* factor,
 			      double fraction, double efficiency,
 			      const double* N_soil, double* N_used, 
-			      double* CO2, OM& om);
+			      double* CO2, OM& om, double dt);
   virtual void turnover_dom (const std::vector<bool>& active,
                              const double* factor,
-			     double fraction, DOM& dom);
+			     double fraction, DOM& dom, double dt);
 
 public:
   void tick (const std::vector<bool>& active, const double* turnover_factor, 
 	     const double* N_soil, double* N_used, double* CO2, 
 	     const std::vector<SMB*>& smb, const std::vector<SOM*>&som,
-	     const std::vector<DOM*>& dom); // Used by SMB and SOM, but not AOM
+	     const std::vector<DOM*>& dom,
+             double dt);        // Used by SMB and SOM, but not AOM
 
   // Utilities.
 public:

@@ -32,7 +32,7 @@ using namespace std;
 
 void
 SMB::maintain (const std::vector<bool>& active, const double* abiotic_factor, 
-	       double* N_used, double* CO2)
+	       double* N_used, double* CO2, const double dt)
 {
   const size_t cell_size = active.size ();
   daisy_assert (C.size () == cell_size);
@@ -47,8 +47,8 @@ SMB::maintain (const std::vector<bool>& active, const double* abiotic_factor,
       const double C_use = C[i] * clay_maintenance[i] * abiotic_factor[i];
       const double N_use = N[i] * clay_maintenance[i] * abiotic_factor[i];
       CO2[i] += C_use;
-      C[i] -= C_use;
-      N[i] -= N_use;
+      C[i] -= C_use * dt;
+      N[i] -= N_use * dt;
       N_used[i] -= N_use;
       daisy_assert (C[i] >= 0.0);
       daisy_assert (N[i] >= 0.0);
@@ -58,7 +58,8 @@ SMB::maintain (const std::vector<bool>& active, const double* abiotic_factor,
 void
 SMB::turnover_pool (const std::vector<bool>& active, const double* factor,
 		    double fraction, double efficiency,
-		    const double* N_soil, double* N_used, double* CO2, OM& om)
+		    const double* N_soil, double* N_used, double* CO2, OM& om,
+                    const double dt)
 {
   const size_t cell_size = active.size ();
   daisy_assert (C.size () == cell_size);
@@ -88,8 +89,8 @@ SMB::turnover_pool (const std::vector<bool>& active, const double* factor,
       // Update C.
       daisy_assert (om.C[i] >= 0.0);
       CO2[i] += C_use * (1.0 - efficiency);
-      om.C[i] += C_use * efficiency;
-      C[i] -= C_use;
+      om.C[i] += C_use * efficiency * dt;
+      C[i] -= C_use * dt;
       daisy_assert (om.C[i] >= 0.0);
       daisy_assert (C[i] >= 0.0);
 
@@ -98,8 +99,8 @@ SMB::turnover_pool (const std::vector<bool>& active, const double* factor,
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (om.N[i] >= 0.0);
       daisy_assert (N[i] >= 0.0);
-      om.N[i] += N_consume;
-      N[i] -= N_produce;
+      om.N[i] += N_consume * dt;
+      N[i] -= N_produce * dt;
       daisy_assert (om.N[i] >= 0.0);
       daisy_assert (N[i] >= 0.0);
     }
@@ -107,7 +108,7 @@ SMB::turnover_pool (const std::vector<bool>& active, const double* factor,
 
 void
 SMB::turnover_dom (const std::vector<bool>& active, const double* factor,
-		  double fraction, DOM& dom)
+                   double fraction, DOM& dom, const double dt)
 {
   const size_t cell_size = active.size ();
 
@@ -117,8 +118,8 @@ SMB::turnover_dom (const std::vector<bool>& active, const double* factor,
       const double C_use = C[i] * rate;
       const double N_use = N[i] * rate;
       dom.add_to_source (i, C_use, N_use);
-      C[i] -= C_use;
-      N[i] -= N_use;
+      C[i] -= C_use * dt;
+      N[i] -= N_use * dt;
       daisy_assert (C[i] >= 0.0);
       daisy_assert (N[i] >= 0.0);
     }

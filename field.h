@@ -60,25 +60,26 @@ public:
 public:
   void sow (const AttributeList& crop, const Time&, double dt, Treelog&);
   void ridge (const AttributeList& ridge);
-  void irrigate_overhead (double flux, double temp, const IM&);
-  void irrigate_surface (double flux, double temp, const IM&);
-  void irrigate_overhead (double flux, const IM&);
-  void irrigate_surface (double flux, const IM&);
-  void irrigate_subsoil (double flux, const IM&, double from, double to);
-  void fertilize (const AttributeList&, double from, double to); // Organic.
-  void fertilize (const AttributeList&);
+  void irrigate_overhead (double water, double temp, const IM&, double dt);
+  void irrigate_surface (double water, double temp, const IM&, double dt);
+  void irrigate_overhead (double water, const IM&, double dt);
+  void irrigate_surface (double water, const IM&, double dt);
+  void irrigate_subsoil (double water, const IM&, double from, double to, 
+                         double dt);
+  void fertilize (const AttributeList&,
+                  double from, double to, double dt); // Organic.
+  void fertilize (const AttributeList&, double dt);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
-  void harvest (const Time&, symbol name,
+  void harvest (const Time&, double dt, symbol name,
 		double stub_length, 
-		double stem_harvest, 
-		double leaf_harvest, 
-		double sorg_harvest,
-                const bool combine,
+		double stem_harvest, double leaf_harvest, double sorg_harvest,
+                bool combine,
 		std::vector<const Harvest*>&, Treelog&);
-  void mix (Treelog&, const Time&,
-	    double from, double to, double penetration = 1.0);
-  void swap (Treelog&, const Time&, double from, double middle, double to);
+  void mix (double from, double to, double penetration, 
+            const Time&, double dt, Treelog&);
+  void swap (double from, double middle, double to, 
+             const Time&, double dt, Treelog&);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]
   void spray (symbol chemical, double amount); // [g/ha]
@@ -103,7 +104,7 @@ public:
   std::string crop_names () const;
   // Simulation.
   void clear ();
-  void tick (Treelog&, double dt, const Time&, const Weather*);
+  void tick (const Time&, double dt, const Weather*, Treelog&);
   void output (Log&) const;
 
   // Find a specific column.

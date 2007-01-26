@@ -185,12 +185,13 @@ Solute::~Solute ()
 
 void 
 Solute::incorporate (const Geometry& geo, 
-                     double amount, double from, double to)
+                     const double amount, const double from, const double to,
+                     const double dt)
 { 
   daisy_assert (amount >= 0.0);
   daisy_assert (from <= 0.0);
   daisy_assert (to <= from);
-  geo.add_surface (S_external, from, to, amount);
+  geo.add_surface (S_external, from, to, amount / dt);
 }
 
 void 
@@ -204,9 +205,9 @@ Solute::set_external_source (const Geometry& geo,
 void 
 Solute::mix (const Geometry& geo,
              const Soil& soil, const SoilWater& soil_water, 
-	     double from, double to)
+	     const double from, const double to, const double dt)
 { 
-  geo.mix (M_, from, to, tillage);
+  geo.mix (M_, from, to, tillage, dt);
   for (size_t i = 0; i < C_.size (); i++)
     C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
@@ -214,9 +215,10 @@ Solute::mix (const Geometry& geo,
 void 
 Solute::swap (const Geometry& geo,
               const Soil& soil, const SoilWater& soil_water,
-	      double from, double middle, double to)
+	      const double from, const double middle, const double to,
+              const double dt)
 { 
-  geo.swap (M_, from, middle, to, tillage);
+  geo.swap (M_, from, middle, to, tillage, dt);
   for (size_t i = 0; i < C_.size (); i++)
     C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }

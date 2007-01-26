@@ -359,7 +359,8 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
   const double out = -J[geo->edge_size () - 1] * dt; // included in S.
   const double expected = source + in - out;
   if (!approximate (delta_content, expected)
-      && new_content < fabs (expected) * 1e10)
+      && new_content < fabs (expected) * 1e10
+      )
     {
       std::ostringstream tmp;
       tmp << __FILE__ << ":" << __LINE__ << ": " << name

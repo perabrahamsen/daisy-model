@@ -469,7 +469,7 @@ ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
       tmp << "MARKVAND Irrigating " << I << " mm";
       out.message (tmp.str ());
       IM im;
-      daisy.field.irrigate_overhead (I, im);
+      daisy.field.irrigate_overhead (I, im, daisy.dt);
     }
 
   // Update temperature sum and time.

@@ -1,16 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Kan man få block til at returnere en alist VÆRDI?
+* Check om boost er i cywin...
 
-Hvor alle $variable er blevet instantierede?
-
-På den måde kunne man slippe for at gøre submodels til referencer...
-
-Det ville måske også gøre checkpoints sikrere.
+* Returner celler der har en edge til en bestemt side.
 
 * OpenMI Daisy
-
-** C# læs DLL
 
 ** C# main program.
 

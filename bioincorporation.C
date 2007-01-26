@@ -133,7 +133,7 @@ Bioincorporation::Implementation::tick (const Geometry& geo,
   double available = R_total * dt;	// [g C/cm^2]
   double last_C_per_N = 0.0;
 
-  for (unsigned int i = 0; i < am_size; i++)
+  for (size_t i = 0; i < am_size; i++)
   {
     const double top_C = am[i]->top_C ();
 
@@ -196,15 +196,15 @@ Bioincorporation::Implementation::tick (const Geometry& geo,
   // Add bioincorporation to soil.
   daisy_assert (aom);
   aom->add_surface (geo, C_to_add, N_to_add, density);
-  geo.add_surface (C_added, density, C_to_add);
-  geo.add_surface (N_added, density, N_to_add);  
+  geo.add_surface (C_added, density, C_to_add / dt);
+  geo.add_surface (N_added, density, N_to_add / dt);  
 
   // Update CO2.
-  CO2 += (C_removed - C_to_add);
+  CO2 += (C_removed - C_to_add) / dt;
 
   // Update log variables.
-  C_removed *= cm2_per_m2;
-  N_removed *= cm2_per_m2;
+  C_removed *= cm2_per_m2 / dt;
+  N_removed *= cm2_per_m2 / dt;
 }
   
 void 

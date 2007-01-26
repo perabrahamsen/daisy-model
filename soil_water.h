@@ -116,9 +116,10 @@ public:
                    const Soil& soil, const SoilHeat& soil_heat, Treelog& msg);
   void incorporate (const Geometry&, double amount, double from, double to);
   void mix (const Geometry& geo,
-            const Soil&, double from, double to);
-  void swap (Treelog&, const Geometry& geo,
-             const Soil&, double from, double middle, double to);
+            const Soil&, double from, double to, double dt);
+  void swap (const Geometry& geo,
+             const Soil&, double from, double middle, double to, double dt, 
+             Treelog&);
   bool check (size_t n, Treelog& err) const;
   void output (Log& log) const;
 

@@ -37,8 +37,6 @@
 #include <numeric>
 #include <sstream>
 
-using namespace std;
-
 template<>
 Librarian<AM>::Content* Librarian<AM>::content = NULL;
 
@@ -54,13 +52,13 @@ struct AM::Implementation
   {
     // Check that the OM pools are correct for organic fertilizer.
     void check (const Syntax& syntax, const AttributeList& alist, 
-		const string& key) const throw (string);
+		const std::string& key) const throw (std::string);
   };
 
   // Content.
   const Time creation;		// When it was created.
   const symbol name;		// What is was.
-  const vector<AOM*> om;		// Organic matter pool.
+  const std::vector<AOM*> om;		// Organic matter pool.
 
   // Use this if a living crop is adding to this AM.
   struct Lock;
@@ -75,44 +73,46 @@ struct AM::Implementation
   bool check (Treelog& err) const;
   void mix (const Geometry&, double from, double to, double penetration,
             double& tillage_N_top, double& tillage_C_top,
-            vector<double>& tillage_N_soil, vector<double>& tillage_C_soil);
+            std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil,
+            double dt);
   void mix (const Geometry&, double from, double to);
   void swap (const Geometry&, double from, double middle, double to,
-             vector<double>& tillage_N_soil, vector<double>& tillage_C_soil);
+             std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil,
+             double dt);
   double total_C (const Geometry& geo) const;
   double total_N (const Geometry& geo) const;
   double C_at (size_t at) const;
   double N_at (size_t at) const;
-  void pour (vector<double>& cc, vector<double>& nn); // Move content to cc&nn.
-  void append_to (vector<AOM*>& added); // Add OM's to added.
-  void distribute (double C, vector<double>& om_C, // Helper for 'add' fns.
-		   double N, vector<double>& om_N);
+  void pour (std::vector<double>& cc, std::vector<double>& nn); // Move content to cc&nn.
+  void append_to (std::vector<AOM*>& added); // Add OM's to added.
+  void distribute (double C, std::vector<double>& om_C, // Helper for 'add' fns.
+		   double N, std::vector<double>& om_N);
   void add (double C, double N);// Add dead leafs.
   void add (const Geometry& geo, AM::Implementation& other);
   void add_surface (const Geometry&,	// Add dead roots.
                     double C, double N, 
-                    const vector<double>& density);
+                    const std::vector<double>& density);
   double top_C () const;
   double top_N () const;
   void multiply_top (double fraction);
 
   // Create and Destroy.
-  Implementation (const Time& c, symbol n, const vector<AOM*>& o);
+  Implementation (const Time& c, symbol n, const std::vector<AOM*>& o);
   ~Implementation ();
 };
 
 void
 AM::Implementation::Check_OM_Pools::check (const Syntax& syntax, 
 					   const AttributeList& alist, 
-					   const string& key) 
-  const throw (string)
+					   const std::string& key) 
+  const throw (std::string)
 { 
   daisy_assert (alist.check (key));
   daisy_assert (syntax.lookup (key) == Syntax::AList);
   daisy_assert (!syntax.is_log (key));
   daisy_assert (syntax.size (key) == Syntax::Sequence);
 
-  const vector<AttributeList*>& om_alist = alist.alist_sequence (key);
+  const std::vector<AttributeList*>& om_alist = alist.alist_sequence (key);
   int missing_initial_fraction = 0;
   int missing_C_per_N = 0;
   double total_fractions = 0.0;
@@ -132,15 +132,15 @@ AM::Implementation::Check_OM_Pools::check (const Syntax& syntax,
     }
   daisy_assert (total_fractions >= 0.0);
   if (total_fractions < 1e-10 && !same_unspecified)
-    throw string ("you should specify at least one non-zero fraction");
+    throw std::string ("you should specify at least one non-zero fraction");
   if (approximate (total_fractions, 1.0))
-    throw string ("sum of specified fractions should be < 1.0");
+    throw std::string ("sum of specified fractions should be < 1.0");
   if (total_fractions > 1.0)
-    throw string ("sum of fractions should be < 1.0");
+    throw std::string ("sum of fractions should be < 1.0");
   if (missing_initial_fraction != 1)
-    throw string ("you should leave initial_fraction in one om unspecified");
+    throw std::string ("you should leave initial_fraction in one om unspecified");
   if (missing_C_per_N != 1)
-    throw string ("You must leave C/N unspecified in exactly one pool");
+    throw std::string ("You must leave C/N unspecified in exactly one pool");
 }
 
 struct AM::Implementation::Lock
@@ -212,12 +212,12 @@ AM::Implementation::crop_part_name () const
 }
 
 void
-AM::Implementation::distribute (double C, vector<double>& om_C, 
-				double N, vector<double>& om_N)
+AM::Implementation::distribute (double C, std::vector<double>& om_C, 
+				double N, std::vector<double>& om_N)
 {
   daisy_assert (C >= 0.0);
   daisy_assert (N >= 0.0);
-  daisy_assert (!isnormal (C) || N > 0.0);
+  daisy_assert (!std::isnormal (C) || N > 0.0);
 
   // Fill out the blanks.
   int missing_fraction = -1;
@@ -301,8 +301,8 @@ AM::Implementation::add (double C, double N)
 {
   daisy_assert (C >= 0);
   daisy_assert (N >= 0);
-  vector<double> om_C (om.size (), 0.0);
-  vector<double> om_N (om.size (), 0.0);
+  std::vector<double> om_C (om.size (), 0.0);
+  std::vector<double> om_N (om.size (), 0.0);
 
   distribute (C, om_C, N, om_N);
 
@@ -318,14 +318,14 @@ AM::Implementation::add (const Geometry& geo,
   const double old_C = total_C (geo) + other.total_C (geo);
   const double old_N = total_N (geo) + other.total_N (geo);
 
-  vector<double> cc (geo.cell_size (), 0.0);
-  vector<double> nn (geo.cell_size (), 0.0);
+  std::vector<double> cc (geo.cell_size (), 0.0);
+  std::vector<double> nn (geo.cell_size (), 0.0);
   other.pour (cc, nn);
 
   for (size_t at = 0; at < geo.cell_size (); at++)
     {
-      vector<double> om_C (om.size (), 0.0);
-      vector<double> om_N (om.size (), 0.0);
+      std::vector<double> om_C (om.size (), 0.0);
+      std::vector<double> om_N (om.size (), 0.0);
 
       distribute (cc[at], om_C, nn[at], om_N);
 
@@ -344,7 +344,7 @@ AM::Implementation::add (const Geometry& geo,
 void
 AM::Implementation::add_surface (const Geometry& geo, 
                                  double C, double N,
-                                 const vector<double>& density)
+                                 const std::vector<double>& density)
 {
   daisy_assert (C >= 0);
   daisy_assert (N >= 0);
@@ -353,8 +353,8 @@ AM::Implementation::add_surface (const Geometry& geo,
   const double old_C = total_C (geo);
   const double old_N = total_N (geo);
 
-  vector<double> om_C (om.size (), 0.0);
-  vector<double> om_N (om.size (), 0.0);
+  std::vector<double> om_C (om.size (), 0.0);
+  std::vector<double> om_N (om.size (), 0.0);
 
   distribute (C, om_C, N, om_N);
 
@@ -394,7 +394,7 @@ AM::Implementation::multiply_top (double fraction)
 }
 
 void 
-AM::Implementation::append_to (vector<AOM*>& added)
+AM::Implementation::append_to (std::vector<AOM*>& added)
 {
   for (unsigned i = 0; i < om.size (); i++)
     added.push_back (om[i]);
@@ -422,8 +422,9 @@ void
 AM::Implementation::mix (const Geometry& geo,
 			 double from, double to, double penetration,
                          double& tillage_N_top, double& tillage_C_top,
-                         vector<double>& tillage_N_soil, 
-                         vector<double>& tillage_C_soil)
+                         std::vector<double>& tillage_N_soil, 
+                         std::vector<double>& tillage_C_soil, 
+                         const double dt)
 {
   const double old_C = total_C (geo);
   const double old_N = total_N (geo);
@@ -434,7 +435,7 @@ AM::Implementation::mix (const Geometry& geo,
                         tillage_N_top, tillage_C_top, 
                         tillage_N_soil, tillage_C_soil);
       om[i]->mix (geo, from, to, 
-                  tillage_N_soil, tillage_C_soil);
+                  tillage_N_soil, tillage_C_soil, dt);
     }
   const double new_C = total_C (geo);
   const double new_N = total_N (geo);
@@ -445,16 +446,18 @@ AM::Implementation::mix (const Geometry& geo,
 
 void
 AM::Implementation::swap (const Geometry& geo,
-			  double from, double middle, double to,
-                          vector<double>& tillage_N_soil,
-                          vector<double>& tillage_C_soil)
+			  const double from, const double middle, 
+                          const double to,
+                          std::vector<double>& tillage_N_soil,
+                          std::vector<double>& tillage_C_soil,
+                          const double dt)
 {
   const double old_C = total_C (geo);
   const double old_N = total_N (geo);
 
   for (size_t i = 0; i < om.size (); i++)
     om[i]->swap (geo, from, middle, to, 
-                 tillage_N_soil, tillage_C_soil);
+                 tillage_N_soil, tillage_C_soil, dt);
 
   const double new_C = total_C (geo);
   const double new_N = total_N (geo);
@@ -500,14 +503,14 @@ AM::Implementation::N_at (const size_t at) const
 }
 
 void 
-AM::Implementation::pour (vector<double>& cc, vector<double>& nn)
+AM::Implementation::pour (std::vector<double>& cc, std::vector<double>& nn)
 {
   for (size_t i = 0; i < om.size (); i++)
     om[i]->pour (cc, nn);
 }
 
 AM::Implementation::Implementation (const Time& c, const symbol n,
-				    const vector<AOM*>& o)
+				    const std::vector<AOM*>& o)
   : creation (c),
     name (n),
     om (o),
@@ -530,7 +533,7 @@ AM::output (Log& log) const
 { impl.output (log); }
 
 void 
-AM::append_to (vector<AOM*>& added)
+AM::append_to (std::vector<AOM*>& added)
 { impl.append_to (added); }
 
 bool 
@@ -539,18 +542,20 @@ AM::check (Treelog& err) const
 
 void 
 AM::mix (const Geometry& geo,
-	 double from, double to, double penetration,
+	 const double from, const double to, const double penetration,
          double& tillage_N_top, double& tillage_C_top,
-         vector<double>& tillage_N_soil, vector<double>& tillage_C_soil)
+         std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil,
+         const double dt)
 { impl.mix (geo, from, to, penetration, 
             tillage_N_top, tillage_C_top, 
-            tillage_N_soil, tillage_C_soil); }
+            tillage_N_soil, tillage_C_soil, dt); }
 
 void
 AM::swap (const Geometry& geo,
-	  double from, double middle, double to,
-          vector<double>& tillage_N_soil, vector<double>& tillage_C_soil)
-{ impl.swap (geo, from, middle, to, tillage_N_soil, tillage_C_soil); }
+	  const double from, const double middle, const double to,
+          std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil,
+          const double dt)
+{ impl.swap (geo, from, middle, to, tillage_N_soil, tillage_C_soil, dt); }
 
 double 
 AM::total_C (const Geometry& geo) const
@@ -569,7 +574,7 @@ AM::N_at (size_t at) const
 { return impl.N_at (at); }
 
 void 
-AM::pour (vector<double>& cc, vector<double>& nn)
+AM::pour (std::vector<double>& cc, std::vector<double>& nn)
 { impl.pour (cc, nn); }
 
 void 
@@ -583,7 +588,7 @@ AM::add (const Geometry& geo, AM& other)
 void 
 AM::add_surface (const Geometry& geo,
                  double C, double N, 
-                 const vector<double>& density)
+                 const std::vector<double>& density)
 { impl.add_surface (geo, C, N, density); }
 
 double
@@ -637,7 +642,7 @@ AM::create (const AttributeList& al1 , const Geometry& geo,
 // Crop part.
 AM& 
 AM::create (const size_t cell_size, const Time& time,
-	    const vector<AttributeList*>& ol,
+	    const std::vector<AttributeList*>& ol,
 	    const symbol sort, const symbol part,
 	    AM::lock_type lock)
 {
@@ -656,10 +661,10 @@ AM::create (const size_t cell_size, const Time& time,
   return am;
 }
 
-const vector<AttributeList*>&
+const std::vector<AttributeList*>&
 AM::default_AM ()
 {
-  static vector<AttributeList*> am;
+  static std::vector<AttributeList*> am;
 
   if (am.size () < 1)
     {
@@ -669,15 +674,15 @@ AM::default_AM ()
       AttributeList& AOM1 = *new AttributeList (aom_alist);
       AttributeList& AOM2 = *new AttributeList (aom_alist);
       AOM1.add ("initial_fraction", 0.80);
-      vector<double> CN;
+      std::vector<double> CN;
       CN.push_back (90.0);
       AOM1.add ("C_per_N", CN);
-      vector<double> efficiency1;
+      std::vector<double> efficiency1;
       efficiency1.push_back (0.50);
       efficiency1.push_back (0.50);
       AOM1.add ("efficiency", efficiency1);
       AOM1.add ("turnover_rate", 2.0e-4);
-      vector<double> fractions1;
+      std::vector<double> fractions1;
 #if 1 // SANDER_PARAMS
       fractions1.push_back (0.00);
       fractions1.push_back (1.00);
@@ -687,12 +692,12 @@ AM::default_AM ()
 #endif
       fractions1.push_back (0.00);
       AOM1.add ("fractions", fractions1);
-      vector<double> efficiency2;
+      std::vector<double> efficiency2;
       efficiency2.push_back (0.50);
       efficiency2.push_back (0.50);
       AOM2.add ("efficiency", efficiency2);
       AOM2.add ("turnover_rate", 2.0e-3);
-      vector<double> fractions2;
+      std::vector<double> fractions2;
       fractions2.push_back (0.00);
       fractions2.push_back (1.00);
       fractions2.push_back (0.00);
@@ -824,7 +829,7 @@ AM::get_water (const AttributeList& al)	// [mm]
 void
 AM::set_utilized_weight (AttributeList& am, const double weight)
 {
-  const string syntax = am.name ("syntax");
+  const std::string syntax = am.name ("syntax");
     
   if (syntax == "mineral")
     am.add ("weight", weight);
@@ -900,7 +905,7 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
   for (size_t i = 0; i < impl.om.size (); i++)
     impl.om[i]->initialize (geo.cell_size ());
 
-  const string syntax = alist.name ("syntax");
+  const std::string syntax = alist.name ("syntax");
   
   if (syntax == "state")
     {
@@ -926,10 +931,10 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
     daisy_notreached ();
   else if (syntax == "initial")
     {
-      const vector<AttributeList*>& oms = alist.alist_sequence ("om");
-      const vector<AOM*>& om = impl.om;
+      const std::vector<AttributeList*>& oms = alist.alist_sequence ("om");
+      const std::vector<AOM*>& om = impl.om;
       
-      const vector<AttributeList*>& layers
+      const std::vector<AttributeList*>& layers
 	= alist.alist_sequence ("layers");
       
       double last = 0.0;
@@ -995,7 +1000,7 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
       daisy_assert (depth < 0.0);
 
       // Calculate density.
-      vector<double> density (geo.cell_size (), 0.0);
+      std::vector<double> density (geo.cell_size (), 0.0);
       for (size_t i = 0; i < geo.cell_size (); i++)
         if (geo.z (i) > depth)
           density[i] = k * exp (k * geo.z (i));
@@ -1028,7 +1033,7 @@ static struct AM_Syntax
 	return false;
       }
 
-    const string syntax = al.name ("syntax");
+    const std::string syntax = al.name ("syntax");
     daisy_assert (syntax == "organic");
     return true;
   }
@@ -1042,7 +1047,7 @@ static struct AM_Syntax
     // We need exactly one pool with unspecified OM.
     daisy_assert (al.check ("om"));
     int unspecified = 0;
-    const vector<AttributeList*>& om = al.alist_sequence ("om");
+    const std::vector<AttributeList*>& om = al.alist_sequence ("om");
     for (size_t i = 0; i < om.size (); i++)
       if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
 	unspecified++;
@@ -1062,11 +1067,11 @@ static struct AM_Syntax
 
     // We need exactly one pool with unspecified OM.
     daisy_assert (al.check ("om"));
-    const vector<AttributeList*>& om = al.alist_sequence ("om");
+    const std::vector<AttributeList*>& om = al.alist_sequence ("om");
     for (size_t i = 0; i < om.size (); i++)
       if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
 	{
-	  ostringstream tmp;
+	  std::ostringstream tmp;
 	  tmp << "om[" << i << "]";
 	  Treelog::Open nest (err, tmp.str ());
 	  err.entry ("You must specify C/N for all pools.");
@@ -1228,11 +1233,11 @@ struct ProgramAM_table : public Program
   bool run (Treelog& msg)
   {
     const Library& library = Librarian<AM>::library ();
-    vector<symbol> entries;
+    std::vector<symbol> entries;
     library.entries (entries);
-    ostringstream tmp;
+    std::ostringstream tmp;
     tmp << "Name\tClass\tSuper\tFile\tNH4\tNO3\tvolatilization\tN\tC\tDM";
-    for (vector<symbol>::const_iterator i = entries.begin ();
+    for (std::vector<symbol>::const_iterator i = entries.begin ();
          i != entries.end ();
          i++)
       {

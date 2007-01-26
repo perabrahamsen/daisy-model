@@ -609,8 +609,8 @@ daisy_daisy_tick_column (Daisy* daisy, int col)
   try
     {
       TreelogStream treelog (cerr);
-      daisy->field.find (col)->tick (treelog, daisy->dt, daisy->time, 
-                                     daisy->weather);
+      daisy->field.find (col)->tick (daisy->time, daisy->dt, 
+                                     daisy->weather, treelog);
     }
   catch (const char* error)
     {

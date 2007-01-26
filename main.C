@@ -34,20 +34,18 @@
 #include <iostream>
 #include <time.h>
 
-using namespace std;
-
 int
 main (int argc, char* argv[])
 {
   // We don't use stdio.
-  ios::sync_with_stdio(false);
+  std::ios::sync_with_stdio(false);
 
   time_t start_time = time (NULL);
 #if defined (__unix) || defined (__CYGWIN__)
-  TreelogDual treelog ("daisy.log", cerr);
+  TreelogDual treelog ("daisy.log", std::cerr);
 #else // MSDOS
   // stderr can't be redirected under MSDOS
-  TreelogDual treelog ("daisy.log", cout);
+  TreelogDual treelog ("daisy.log", std::cout);
 #endif // MSDOS
 
   Assertion::Register reg (treelog);
@@ -122,8 +120,9 @@ attributes.");
       if (!run_syntax->check (*run_alist, treelog))
         return 1;
 
-      auto_ptr<Block> block (new Block (syntax, alist, treelog, "Building"));
-      auto_ptr<Program> program (Librarian<Program>::build_alist (*block, 
+      std::auto_ptr<Block> block (new Block (syntax, alist, 
+                                             treelog, "Building"));
+      std::auto_ptr<Program> program (Librarian<Program>::build_alist (*block, 
 								  *run_alist,
  								  "run"));
       if (!block->ok ())
@@ -134,7 +133,8 @@ attributes.");
       if (!program->check (treelog))
 	return 1;
 
-      const string when = string ("Program started ") + ctime (&start_time);
+      const std::string when 
+        = std::string ("Program started ") + ctime (&start_time);
       std::ostringstream start_msg;
       start_msg << when.substr (0, when.size () - 1);
       const time_t time_ago = time (NULL) - start_time;
@@ -175,15 +175,15 @@ attributes.");
     }
   catch (const char* error)
     {
-      treelog.error (string ("Exception: ") + error);
+      treelog.error (std::string ("Exception: ") + error);
     }
-  catch (const string& error)
+  catch (const std::string& error)
     {
-      treelog.error (string ("Exception raised: ") + error);
+      treelog.error (std::string ("Exception raised: ") + error);
     }
-  catch (const exception& e)
+  catch (const std::exception& e)
     {
-      treelog.error (string ("Standard exception: ") + typeid (e).name ()
+      treelog.error (std::string ("Standard exception: ") + typeid (e).name ()
 		     + ": " + e.what ());
     }
   catch (const int error)

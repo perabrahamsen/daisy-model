@@ -42,8 +42,8 @@ struct ActionIrrigate : public Action
   const double temp;
   const IM sm;
   
-  virtual void irrigate (Field&,
-			 double flux, double temp, const IM&) const = 0;
+  virtual void irrigate (Field&, double flux, double temp, const IM&, 
+                         double dt) const = 0;
 
   void doIt (Daisy& daisy, Treelog& out)
   {
@@ -79,7 +79,7 @@ struct ActionIrrigate : public Action
     else 
       remaining_time -= dt;
     daisy_assert (std::isnormal (this_flux));
-    irrigate (daisy.field, this_flux, temp, sm);
+    irrigate (daisy.field, this_flux, temp, sm, daisy.dt);
   }
 
   bool done (const Daisy& daisy, Treelog&) const
@@ -145,12 +145,13 @@ const double ActionIrrigate::at_air_temperature = -500;
 
 struct ActionIrrigateOverhead : public ActionIrrigate
 {
-  void irrigate (Field& f, double flux, double temp, const IM& im) const
+  void irrigate (Field& f, const double flux, const double temp, const IM& im, 
+                 const double dt) const
   { 
     if (approximate (temp, at_air_temperature))
-      f.irrigate_overhead (flux, im); 
+      f.irrigate_overhead (flux, im, dt); 
     else
-      f.irrigate_overhead (flux, temp, im); 
+      f.irrigate_overhead (flux, temp, im, dt); 
   }
   ActionIrrigateOverhead (Block& al)
     : ActionIrrigate (al)
@@ -159,12 +160,13 @@ struct ActionIrrigateOverhead : public ActionIrrigate
 
 struct ActionIrrigateSurface : public ActionIrrigate
 {
-  void irrigate (Field& f, double flux, double temp, const IM& im) const
+  void irrigate (Field& f, const double flux, const double temp, const IM& im, 
+                 const double dt) const
   {
     if (approximate (temp, at_air_temperature))
-      f.irrigate_surface (flux, im);
+      f.irrigate_surface (flux, im, dt);
     else
-      f.irrigate_surface (flux, temp, im); 
+      f.irrigate_surface (flux, temp, im, dt); 
   }
   ActionIrrigateSurface (Block& al)
     : ActionIrrigate (al)
@@ -176,8 +178,9 @@ struct ActionIrrigateSubsoil : public ActionIrrigate
   const double from;
   const double to;
 
-  void irrigate (Field& f, double flux, double /* temp */, const IM& im) const
-  { f.irrigate_subsoil (flux, im, from, to); }
+  void irrigate (Field& f, const double flux, const double /* temp */, 
+                 const IM& im, const double dt) const
+  { f.irrigate_subsoil (flux, im, from, to, dt); }
   ActionIrrigateSubsoil (Block& al)
     : ActionIrrigate (al),
       from (al.number ("from")),

@@ -56,14 +56,15 @@ public:
   void tick (const std::vector<bool>&, const double* turnover_factor,
 	     const double* N_soil, double* N_used,
 	     double* CO2, const std::vector<SMB*>& smb, 
-	     double* som_C, double* som_N, const std::vector<DOM*>& dom);
+	     double* som_C, double* som_N, const std::vector<DOM*>& dom,
+             double dt);
 private:
   // Disallow this OM function.
   void tick (const std::vector<bool>&, const double* turnover_factor, 
 	     const double* N_soil, double* N_used,
 	     double* CO2, 
 	     const std::vector<SMB*>& smb, const std::vector<SOM*>&som,
-	     const std::vector<DOM*>& dom);
+	     const std::vector<DOM*>& dom, double dt);
 
   // Create & Destroy.
 public:

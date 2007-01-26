@@ -45,25 +45,27 @@ struct Field::Implementation
   // Actions.
   void sow (const AttributeList& crop, const Time& time, double dt, Treelog&);
   void ridge (const AttributeList& ridge);
-  void irrigate_overhead (double flux, double temp, const IM&);
-  void irrigate_surface (double flux, double temp, const IM&);
-  void irrigate_overhead (double flux, const IM&);
-  void irrigate_surface (double flux, const IM&);
-  void irrigate_subsoil (double flux, const IM&, double from, double to);
-  void fertilize (const AttributeList&, double from, double to);  // Organic.
-  void fertilize (const AttributeList&);
+  void irrigate_overhead (double flux, double temp, const IM&, double dt);
+  void irrigate_surface (double flux, double temp, const IM&, double dt);
+  void irrigate_overhead (double flux, const IM&, double dt);
+  void irrigate_surface (double flux, const IM&, double dt);
+  void irrigate_subsoil (double flux, const IM&, double from, double to, 
+                         double dt);
+  void fertilize (const AttributeList&, double from, double to, double dt);
+  void fertilize (const AttributeList&, double dt);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
-  void harvest (const Time&, symbol name,
+  void harvest (const Time&, double dt, symbol name,
 		double stub_length, 
 		double stem_harvest, 
 		double leaf_harvest, 
 		double sorg_harvest,
                 const bool combine,
 		vector<const Harvest*>&, Treelog&);
-  void mix (Treelog&, const Time&,
-	    double from, double to, double penetration);
-  void swap (Treelog&, const Time&, double from, double middle, double to);
+  void mix (double from, double to, double penetration, 
+            const Time&, double dt, Treelog&);
+  void swap (double from, double middle, double to, 
+             const Time&, double dt, Treelog&);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value);
   void spray (symbol chemical, double amount); // [g/ha]
@@ -88,7 +90,7 @@ public:
   string crop_names () const;
   // Simulation.
   void clear ();
-  void tick (Treelog&, double dt, const Time&, const Weather*);
+  void tick (const Time&, double dt, const Weather*, Treelog&);
   void output (Log&) const;
 
   // Find a specific column.
@@ -165,79 +167,85 @@ Field::Implementation::ridge (const AttributeList& ridge)
 }
 
 void 
-Field::Implementation::irrigate_overhead (double flux, double temp, const IM& im)
+Field::Implementation::irrigate_overhead (const double flux, const double temp,
+                                          const IM& im, const double dt)
 {
   if (selected)
-    selected->irrigate_overhead (flux, temp, im);
+    selected->irrigate_overhead (flux, temp, im, dt);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->irrigate_overhead (flux, temp, im);
+    (*i)->irrigate_overhead (flux, temp, im, dt);
 }
 
 void 
-Field::Implementation::irrigate_surface (double flux, double temp, const IM& im)
+Field::Implementation::irrigate_surface (const double flux, const double temp,
+                                         const IM& im, const double dt)
 {
   if (selected)
-    selected->irrigate_surface (flux, temp, im);
+    selected->irrigate_surface (flux, temp, im, dt);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->irrigate_surface (flux, temp, im);
+    (*i)->irrigate_surface (flux, temp, im, dt);
 }
 
 void 
-Field::Implementation::irrigate_overhead (double flux, const IM& im)
+Field::Implementation::irrigate_overhead (const double flux, const IM& im, 
+                                          const double dt)
 {
   if (selected)
-    selected->irrigate_overhead (flux, im);
+    selected->irrigate_overhead (flux, im, dt);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->irrigate_overhead (flux, im);
+    (*i)->irrigate_overhead (flux, im, dt);
 }
 
 void 
-Field::Implementation::irrigate_surface (double flux, const IM& im)
+Field::Implementation::irrigate_surface (const double flux, const IM& im, 
+                                         const double dt)
 {
   if (selected)
-    selected->irrigate_surface (flux, im);
+    selected->irrigate_surface (flux, im, dt);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->irrigate_surface (flux, im);
+    (*i)->irrigate_surface (flux, im, dt);
 }
 
 void 
-Field::Implementation::irrigate_subsoil (double flux, const IM& im, 
-                                         double from, double to)
+Field::Implementation::irrigate_subsoil (const double flux, const IM& im, 
+                                         const double from, const double to,
+                                         const double dt)
 {
   if (selected)
-    selected->irrigate_subsoil (flux, im, from, to);
+    selected->irrigate_subsoil (flux, im, from, to, dt);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->irrigate_subsoil (flux, im, from, to);
+    (*i)->irrigate_subsoil (flux, im, from, to, dt);
 }
 
 void 
 Field::Implementation::fertilize (const AttributeList& al, 
-				  double from, double to)
+				  const double from, const double to,
+                                  const double dt)
 {
   if (selected)
-    selected->fertilize (al, from, to);
+    selected->fertilize (al, from, to, dt);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->fertilize (al, from, to);
+    (*i)->fertilize (al, from, to, dt);
 }
 
 void 
-Field::Implementation::fertilize (const AttributeList& al)
+Field::Implementation::fertilize (const AttributeList& al, const double dt)
 {
   if (selected)
     {
-      selected->fertilize (al);
+      selected->fertilize (al, dt);
     }
   else 
     {
@@ -245,7 +253,7 @@ Field::Implementation::fertilize (const AttributeList& al)
 	   i != columns.end ();
 	   i++)
 	{
-	  (*i)->fertilize (al);
+	  (*i)->fertilize (al, dt);
 	}
     }
 }
@@ -282,11 +290,12 @@ Field::Implementation::emerge (symbol name, Treelog& out)
 }
 
 void
-Field::Implementation::harvest (const Time& time, symbol name,
-				double stub_length, 
-				double stem_harvest, 
-				double leaf_harvest, 
-				double sorg_harvest,
+Field::Implementation::harvest (const Time& time, const double dt,
+                                const symbol name,
+				const double stub_length, 
+				const double stem_harvest, 
+				const double leaf_harvest, 
+				const double sorg_harvest,
                                 const bool combine,
 				vector<const Harvest*>& total,
 				Treelog& out)
@@ -294,7 +303,7 @@ Field::Implementation::harvest (const Time& time, symbol name,
   if (selected)
     {
       Treelog::Open nest (out, selected->name);
-      selected->harvest (time, name,
+      selected->harvest (time, dt, name,
 			 stub_length,
 			 stem_harvest, leaf_harvest, sorg_harvest, combine, 
                          total, out);
@@ -306,7 +315,7 @@ Field::Implementation::harvest (const Time& time, symbol name,
 	   i++)
 	{
 	  Treelog::Open nest (out, (*i)->name);
-	  (*i)->harvest (time, name,
+	  (*i)->harvest (time, dt, name,
 			 stub_length,
 			 stem_harvest, leaf_harvest, sorg_harvest, combine,
                          total, out);
@@ -315,38 +324,40 @@ Field::Implementation::harvest (const Time& time, symbol name,
 }
 
 void 
-Field::Implementation::mix (Treelog& out, const Time& time,
-			    double from, double to, double penetration)
+Field::Implementation::mix (const double from, const double to,
+                            double penetration, const Time& time,
+			    const double dt, Treelog& msg)
 {
   if (selected)
     {
-      Treelog::Open nest (out, selected->name); 
-      selected->mix (out, time, from, to, penetration);
+      Treelog::Open nest (msg, selected->name); 
+      selected->mix (from, to, penetration, time, dt, msg);
     }
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
     {
-      Treelog::Open nest (out, (*i)->name);
-      (*i)->mix (out, time, from, to, penetration);
+      Treelog::Open nest (msg, (*i)->name);
+      (*i)->mix (from, to, penetration, time, dt, msg);
     }
 }
 
 void 
-Field::Implementation::swap (Treelog& out, const Time& time,
-			     double from, double middle, double to)
+Field::Implementation::swap (const double from, const double middle, 
+                             const double to, 
+                             const Time& time, const double dt, Treelog& msg)
 {
   if (selected)
     {
-      Treelog::Open nest (out, selected->name);
-      selected->swap (out, time, from, middle, to);
+      Treelog::Open nest (msg, selected->name);
+      selected->swap (from, middle, to, time, dt, msg);
     }
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
     {
-      Treelog::Open nest (out, (*i)->name);
-      (*i)->swap (out, time, from, middle, to);
+      Treelog::Open nest (msg, (*i)->name);
+      (*i)->swap (from, middle, to, time, dt, msg);
     }
 }
 
@@ -538,13 +549,13 @@ Field::Implementation::clear ()
 }
 
 void 
-Field::Implementation::tick (Treelog& out, const double dt,
-			     const Time& time, const Weather* weather)
+Field::Implementation::tick (const Time& time, const double dt, 
+                             const Weather* weather, Treelog& msg)
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    (*i)->tick (out, dt, time, weather);
+    (*i)->tick (time, dt, weather, msg);
 }
 
 void 
@@ -724,63 +735,66 @@ Field::ridge (const AttributeList& al)
 { impl.ridge (al); }
 
 void 
-Field::irrigate_overhead (double flux, double temp, const IM& im)
-{ impl.irrigate_overhead (flux, temp, im); }
+Field::irrigate_overhead (double water, double temp, const IM& im, double dt)
+{ impl.irrigate_overhead (water, temp, im, dt); }
 
 void 
-Field::irrigate_surface (double flux, double temp, const IM& im)
-{ impl.irrigate_surface (flux, temp, im); }
+Field::irrigate_surface (double water, double temp, const IM& im, double dt)
+{ impl.irrigate_surface (water, temp, im, dt); }
 
 void 
-Field::irrigate_overhead (double flux, const IM& im)
-{ impl.irrigate_overhead (flux, im); }
+Field::irrigate_overhead (double water, const IM& im, double dt)
+{ impl.irrigate_overhead (water, im, dt); }
 
 void 
-Field::irrigate_surface (double flux, const IM& im)
-{ impl.irrigate_surface (flux, im); }
+Field::irrigate_surface (double water, const IM& im, double dt)
+{ impl.irrigate_surface (water, im, dt); }
 
 void 
-Field::irrigate_subsoil (double flux, const IM& im, double from, double to)
-{ impl.irrigate_subsoil (flux, im, from, to); }
+Field::irrigate_subsoil (double water, const IM& im, 
+                         double from, double to, double dt)
+{ impl.irrigate_subsoil (water, im, from, to, dt); }
 
 void 
-Field::fertilize (const AttributeList& al, double from, double to)
-{ impl.fertilize (al, from, to); }
+Field::fertilize (const AttributeList& al, 
+                  const double from, const double to, const double dt)
+{ impl.fertilize (al, from, to, dt); }
 
 void 
-Field::fertilize (const AttributeList& al)
-{ impl.fertilize (al); }
+Field::fertilize (const AttributeList& al, const double dt)
+{ impl.fertilize (al, dt); }
 
 void 
 Field::clear_second_year_utilization ()
 { impl.clear_second_year_utilization (); }
 
 void
-Field::emerge (symbol name, Treelog& out)
-{ impl.emerge (name, out); }
+Field::emerge (symbol name, Treelog& msg)
+{ impl.emerge (name, msg); }
 
 void
-Field::harvest (const Time& time, symbol name,
-		double stub_length, 
-		double stem_harvest, 
-		double leaf_harvest, 
-		double sorg_harvest,
+Field::harvest (const Time& time, const double dt, const symbol name,
+		const double stub_length, 
+		const double stem_harvest, 
+		const double leaf_harvest, 
+		const double sorg_harvest,
                 const bool combine,
-		vector<const Harvest*>& total, Treelog& out)
-{ impl.harvest (time, name,
+		vector<const Harvest*>& total, Treelog& msg)
+{ impl.harvest (time, dt, name,
 		stub_length,
 		stem_harvest, leaf_harvest, sorg_harvest, combine, 
-                total, out); }
+                total, msg); }
 
 void 
-Field::mix (Treelog& out, const Time& time,
-	    double from, double to, double penetration)
-{ impl.mix (out, time, from, to, penetration); }
+Field::mix (const double from, const double to, 
+            const double penetration, 
+            const Time& time, const double dt, Treelog& msg)
+{ impl.mix (from, to, penetration, time, dt, msg); }
 
 void 
-Field::swap (Treelog& out, const Time& time, 
-	     double from, double middle, double to)
-{ impl.swap (out, time, from, middle, to); }
+Field::swap (const double from, const double middle, const double to, 
+             const Time& time, const double dt, Treelog& msg)
+{ impl.swap (from, middle, to, time, dt, msg); }
 
 void 
 Field::set_porosity (double at, double Theta)
@@ -847,9 +861,9 @@ Field::clear ()
 { impl.clear (); }
 
 void
-Field::tick (Treelog& out, const double dt, 
-             const Time& time, const Weather* weather)
-{ impl.tick (out, dt, time, weather); }
+Field::tick (const Time& time, const double dt, const Weather* weather, 
+             Treelog& msg)
+{ impl.tick (time, dt, weather, msg); }
 
 void 
 Field::output (Log& log) const

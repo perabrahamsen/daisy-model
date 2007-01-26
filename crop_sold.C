@@ -1076,10 +1076,8 @@ CropSold::SoluteUptake (const Geometry& geo,
 		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
 		   - (pow (beta, 2.0 - alpha) - 1.0));
 	    }
-#ifndef __MINGW32__
 	  daisy_assert (std::isfinite (I_zero[i]));
 	  daisy_assert (std::isfinite (B_zero[i]));
-#endif
 	  B += L * geo.volume (i) * B_zero[i];
 	  U_zero += L * geo.volume (i) * std::min (I_zero[i], I_max);
 	}

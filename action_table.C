@@ -159,7 +159,7 @@ ActionTable::doIt (Daisy& daisy, Treelog& msg)
           IM im (fert);
           const double conv = 100 * 100 * 1000; // [g/cm^2] -> [mg/m^2]
           im *= conv / value;   // [mg/l]
-          daisy.field.irrigate_subsoil (value, im, -5.0, -25.0); 
+          daisy.field.irrigate_subsoil (value, im, -5.0, -25.0, daisy.dt); 
           tmp << "Fertigating " << value << " mm, " 
               << im.NO3 << " ppm NO3 and " << im.NH4 << " ppm NH4";
           msg.message (tmp.str ());
@@ -192,9 +192,9 @@ ActionTable::doIt (Daisy& daisy, Treelog& msg)
               daisy.time.set_alist (new_time);
               fert.add ("creation", new_time);
             }
-          daisy.field.fertilize (fert);
+          daisy.field.fertilize (fert, daisy.dt);
           if (water > 0.0)
-            daisy.field.irrigate_surface (water, IM ());
+            daisy.field.irrigate_surface (water, IM (), daisy.dt);
         }
     }
   else if (irrigate_events.find (daisy.time) != irrigate_events.end ())
@@ -202,7 +202,7 @@ ActionTable::doIt (Daisy& daisy, Treelog& msg)
       const double value = irrigate_events[daisy.time];
       std::ostringstream tmp;
       IM im;
-      daisy.field.irrigate_overhead (value, im); 
+      daisy.field.irrigate_overhead (value, im, daisy.dt); 
       tmp << "Irrigating " << value << " mm";
       msg.message (tmp.str ());
     }
