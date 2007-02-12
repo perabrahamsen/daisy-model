@@ -46,6 +46,8 @@ public:
   { return e == 0 ? cell_above : static_cast<int> (e) - 1; };
   inline double edge_area (size_t) const // Area connecting the cells.
   { return 1.0; }
+  inline double edge_center_z (size_t e) const
+  { return (e == 0) ? 0.0 : zplus (e - 1); }
   inline double surface_area () const // Total surface area.
   { return 1.0; }
   inline double zminus (size_t n) const
@@ -61,16 +63,6 @@ public:
 
   size_t interval_plus (double z) const;
   size_t interval_border (double z) const;
-
-  // Vector operations.
-  void swap (std::vector<double>& v,
-             double from, double middle, double to) const;
-
-  // Layers -- Support initializing soil arrays layer by layer.
-  static void add_layer (Syntax& syntax, Syntax::category, 
-                         const std::string& name,
-			 const std::string& dimension,
-                         const std::string& description);
 
   // Creation.
 public:

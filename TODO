@@ -1,8 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Check om boost er i cywin...
+* R2D2 Geometry
 
-* Returner celler der har en edge til en bestemt side.
+** Clean up geometry1d.h
+
+** New corner abstraction
+
+*** edge_corners (edge) -> list of corners
+
+*** cell_corners (cell) -> list of corners.
+
+*** corner_size
+
+*** corner_x (corner)
+
+*** corner_y (corner)
+
+*** corner_z (corner)
 
 * OpenMI Daisy
 

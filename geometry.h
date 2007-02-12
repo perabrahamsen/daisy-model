@@ -46,41 +46,23 @@ public:
 
   // Parameters.
 protected:
-  size_t size_;		// Number of intervals.
+  size_t size_;		// Number of cells.
   
+  // Cell operations.
 public:
-  // Accessors.
   inline size_t cell_size () const // Number of cells.
   { return size_; }
-  virtual size_t edge_size () const = 0; // Number of edges.
   inline bool is_regular_cell (int cell) const
   { return cell >= 0; }
   std::string cell_name (int) const; // For array logging.
-  virtual std::string edge_name (size_t) const;
-  virtual int dimensions () const = 0; // Number of non-trivial dimensions.
-  virtual int edge_index (int from, int to) const; // Find edge between two cells.
-  virtual int edge_from (size_t) const = 0; // Cell where edge originates.
-  virtual int edge_to (size_t) const = 0; // Cell where edge leads.
-  virtual double edge_area (size_t) const = 0; // Area connecting the cells.
-  virtual double surface_area () const = 0; // Total surface area.
   virtual double z (size_t) const = 0; // Cell center depth [cm]
   double z_safe (int) const;    // Same, handles cell_top and cell_bottom.
-  inline double top () const    // Top of highest cell. [cm]
-  { return 0.0; }
-  virtual double bottom () const = 0; // Bottom of deepest cell. [cm]
   virtual double x (size_t) const 
   { return 0.5; }
   double x_safe (int) const;    // Same, handles cell_left and cell_right.
-  inline double left () const    // Left side of leftmost cell. [cm]
-  { return 0.0; }
-  virtual double right () const; // Right side of rightmost cell. [cm]
   virtual double y (size_t) const 
   { return 0.5; }
   double y_safe (int) const;    // Same, handles cell_front and cell_back.
-  inline double front () const    // Front of nearest cell. [cm]
-  { return 0.0; }
-  inline double back () const // Back of farthest cell. [cm]
-  { return 1.0; }
   virtual double volume (size_t) const = 0; // Cell volume [cm^3]
   virtual size_t cell_at (double z, double x, double y) const = 0;
   virtual double fraction_in_z_interval (// The fraction of a cell
@@ -93,15 +75,40 @@ public:
                                      // specific volume.
                                      size_t n, 
                                      const Volume& volume) const = 0;
-  double volume_in_z_interval (double from, double to, 
-                               // Find fractions of all cells in
-                               // interval, as well as the total
-                               // volume.
-                               std::vector<double>& frac) const;
-  bool edge_cross_z (size_t e, double z) const; // Cross depth?
   virtual bool contain_z (size_t n, double z) const = 0; // True iff cell n
                                                          // includes depth z
   bool node_center_in_volume (int c, const Volume& volume) const;
+
+  // Edge operations.
+public:
+  virtual size_t edge_size () const = 0; // Number of edges.
+  virtual std::string edge_name (size_t) const;
+  virtual int edge_index (int from, int to) const; // Find edge between cells.
+  virtual int edge_from (size_t) const = 0; // Cell where edge originates.
+  virtual int edge_to (size_t) const = 0; // Cell where edge leads.
+  virtual double edge_area (size_t) const = 0; // Area connecting the cells.
+  bool edge_cross_z (size_t e, double z) const; // Cross depth?
+  virtual double edge_center_z (size_t e) const = 0;
+  virtual double edge_center_x (size_t) const
+  { return 0.5; }
+  virtual double edge_center_y (size_t) const
+  { return 0.5; }
+
+  // Operations on whole volume.
+public:
+  virtual int dimensions () const = 0; // Number of non-trivial dimensions.
+  virtual double surface_area () const = 0; // Total surface area.
+  inline double top () const    // Top of highest cell. [cm]
+  { return 0.0; }
+  virtual double bottom () const = 0; // Bottom of deepest cell. [cm]
+  inline double left () const    // Left side of leftmost cell. [cm]
+  { return 0.0; }
+  virtual double right () const; // Right side of rightmost cell. [cm]
+  inline double front () const    // Front of nearest cell. [cm]
+  { return 0.0; }
+  inline double back () const // Back of farthest cell. [cm]
+  { return 1.0; }
+
   template<class T> // Here we we calculate a volume weighted average
                     // value at a specific depth.
   double content_at (T& obj, double (T::*content) (size_t),
@@ -124,6 +131,13 @@ public:
   }
 
   // Vector operations.
+private:
+  double volume_in_z_interval (double from, double to, 
+                               // Find fractions of all cells in
+                               // interval, as well as the total
+                               // volume.
+                               std::vector<double>& frac) const;
+public:
   void mix (std::vector<double>& v, double from, double to) const;
   void mix (std::vector<double>& v, double from, double to, 
             std::vector<double>& change, double dt) const;
@@ -154,7 +168,9 @@ public:
   double total_surface (const std::vector<double>& v) const;
   double total_surface (const std::vector<double>& v, 
                         const double from, const double to) const;
+
   // Layers -- Support initializing soil arrays layer by layer.
+public:
   static void add_layer (Syntax& syntax, Syntax::category, 
                          const std::string& name,
 			 const std::string& dimension,

@@ -550,7 +550,7 @@ AttributeList::Implementation::lookup (const string& key) const
   value_map::const_iterator i = values.find (key);
   
   if (i == values.end ())
-    throw (string ("AList: Missing key '") + key + "'");
+   daisy_panic (string ("AList: Missing key '") + key + "'");
 
   return (*i).second;
 }

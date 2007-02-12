@@ -176,7 +176,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
   // Find width of tags.
   const string total_title = "Balance (= In - Out - Increase)";
   const string content_title = "Total increase in content";
-  size_t max_size = max(total_title.size (), content_title.size ());
+  size_t max_size = max (total_title.size (), content_title.size ());
   for (unsigned int i = 0; i < fetch.size (); i++)
     max_size = max (max_size, fetch[i]->name_size ());
 
@@ -186,6 +186,9 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
   const double total_output = find_total (output, max_digits, hours);
   const double total_content = find_total (content, max_digits, hours);
   const double total = total_input - total_output - total_content;
+  max_digits = max (max_digits, Fetch::width (total_input));
+  max_digits = max (max_digits, Fetch::width (total_output));
+  max_digits = max (max_digits, Fetch::width (total_content));
   max_digits = max (max_digits, Fetch::width (total));
 
   // Find total width.

@@ -160,40 +160,123 @@ GeometryRect::GeometryRect (Block& al)
           xplus_.push_back (x_end[column]);
           x_.push_back (x_center[column]);
           dx_.push_back (x_distance[column]);
+          std::vector<int> cc;
+          cc.push_back (corner_index (row,     column    )); // SW
+          cc.push_back (corner_index (row,     column + 1)); // SE
+          cc.push_back (corner_index (row + 1, column + 1)); // NE
+          cc.push_back (corner_index (row + 1, column    )); // NW
+          cell_corners_.push_back (cc);
+
           // Vertical edge.
           edge_from_.push_back (next_cell);
           edge_to_.push_back (last_cell);
           edge_area_.push_back (x_distance[column]);
-          // Next node.
+          edge_center_z_.push_back (row == 0 ? 0.0 : z_end[row - 1]);
+          edge_center_x_.push_back (x_center[column]);
+          std::vector<int> corners;
+          corners.push_back (corner_index (row, column    )); // W
+          corners.push_back (corner_index (row, column + 1)); // E
+          edge_corners_.push_back (corners);
+
+          // Next cell.
           daisy_assert (next_cell == cell_index (row, column));
           last_cell = next_cell;
           next_cell++;
         }
+
       // Bottom edge.
       edge_from_.push_back (cell_below);
       edge_to_.push_back (last_cell);
       edge_area_.push_back (x_distance[column]);
+      edge_center_z_.push_back (z_end[cell_rows () - 1]);
+      edge_center_x_.push_back (x_center[column]);
+      std::vector<int> corners;
+      corners.push_back (corner_index (cell_rows (), column    )); // W
+      corners.push_back (corner_index (cell_rows (), column + 1)); // E
+      edge_corners_.push_back (corners);
     }
   daisy_assert (next_cell == cell_size ());
 
   // Horizontal edges.
   for (size_t row = 0; row < cell_rows (); row++)
     {
+      edge_center_x_.push_back (0.0);
       edge_from_.push_back (cell_left);
       for (size_t column = 0; column < cell_columns (); column++)
         {
           edge_to_.push_back (cell_index (row, column));
+          std::vector<int> corners;
+          corners.push_back (corner_index (row    , column)); // W
+          corners.push_back (corner_index (row + 1, column)); // W
+          edge_corners_.push_back (corners);
+          edge_center_x_.push_back (x_end[column]);
           edge_from_.push_back (cell_index (row, column));
         }
       edge_to_.push_back (cell_right);
+      std::vector<int> corners;
+      corners.push_back (corner_index (row    , cell_columns ())); // W
+      corners.push_back (corner_index (row + 1, cell_columns ())); // W
+      edge_corners_.push_back (corners);
       edge_area_.insert (edge_area_.end (), edge_columns (), z_distance[row]);
+      edge_center_z_.insert (edge_center_z_.end (), edge_columns (), 
+                             z_center[row]);
+    }
+
+  // Corners.
+  corner_x_.insert (corner_x_.end (), corner_rows (), 0.0);
+  for (size_t column = 0; column < cell_columns (); column++)
+    corner_x_.insert (corner_x_.end (), corner_rows (), x_end[column]);
+
+  for (size_t column = 0; column < corner_columns (); column++)
+    {
+      corner_z_.push_back (0.0);
+      for (size_t row = 0; row < cell_rows (); row++)
+        corner_z_.push_back (z_end[row]);
     }
 
   // Done.
-  daisy_assert (edge_area_.size () == edge_to_.size ());
-  daisy_assert (edge_from_.size () == edge_to_.size ());
+  daisy_assert (zplus_.size () == cell_size ());
+  daisy_assert (z_.size () == cell_size ());
+  daisy_assert (dz_.size () == cell_size ());
+  daisy_assert (xplus_.size () == cell_size ());
+  daisy_assert (x_.size () == cell_size ());
+  daisy_assert (dx_.size () == cell_size ());
+  daisy_assert (cell_corners_.size () == cell_size ());
+  daisy_assert (edge_center_z_.size () == edge_size ());
+  daisy_assert (edge_center_x_.size () == edge_size ());
+  daisy_assert (edge_area_.size () == edge_size ());
+  daisy_assert (edge_from_.size () == edge_size ());
+  daisy_assert (edge_to_.size () == edge_size ());
+  daisy_assert (edge_corners_.size () == edge_size ());
   daisy_assert (edge_size () == (edge_rows () * cell_columns () 
                                  + edge_columns () * cell_rows ()));
+  daisy_assert (corner_z_.size () == corner_size ());
+  daisy_assert (corner_x_.size () == corner_size ());
+  for (size_t row = 0; row < cell_rows (); row++)
+    for (size_t column = 0; column < cell_columns (); column++)
+      {
+        const size_t cell = cell_index (row, column);
+        const std::vector<int>& corners = cell_corners (cell);
+        daisy_assert (corners.size () == 4);
+        const double nw_z = corner_z (corners[0]);
+        const double nw_x = corner_x (corners[0]);
+        const double ne_z = corner_z (corners[1]);
+        const double ne_x = corner_x (corners[1]);
+        const double se_z = corner_z (corners[2]);
+        const double se_x = corner_x (corners[2]);
+        const double sw_z = corner_z (corners[3]);
+        const double sw_x = corner_x (corners[3]);
+        const double z = this->z (cell);
+        const double x = this->x (cell);
+        daisy_assert (z < nw_z);
+        daisy_assert (z < ne_z);
+        daisy_assert (z > se_z);
+        daisy_assert (z > sw_z);
+        daisy_assert (x > nw_x);
+        daisy_assert (x < ne_x);
+        daisy_assert (x < se_x);
+        daisy_assert (x > sw_x);
+      }
 }
 
 GeometryRect::~GeometryRect ()

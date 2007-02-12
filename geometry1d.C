@@ -120,6 +120,7 @@ check_alist (const AttributeList&, Treelog&)
   return ok;
 }
 
+#if 0
 void
 Geometry1D::swap (std::vector<double>& v, double from, double middle, double to) const
 {
@@ -138,6 +139,7 @@ Geometry1D::swap (std::vector<double>& v, double from, double middle, double to)
   add_soil (v, new_middle, to, top_content);
   daisy_assert (approximate (old_total, total_soil (v)));
 }
+#endif
 
 void
 Geometry1D::load_syntax (Syntax& syntax, AttributeList& alist)
