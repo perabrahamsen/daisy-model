@@ -28,6 +28,14 @@
 #include "mathlib.h"
 #include "assertion.h"
 #include <sstream>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
+
+using boost::numeric::ublas::matrix;
+
+
+
+
 
 struct UZRectMollerup : public UZRect
 {
@@ -38,9 +46,16 @@ struct UZRectMollerup : public UZRect
              const Surface&, const Groundwater&, double dt, Treelog&);
 
   // Internal functions.
-  void lowerboundary ()    
-  void upperboundary ()
-
+  void lowerboundary (matrix<double>& Dm_mat, 
+			       std::vector<double>& Dm_vec, 
+			       std::vector<double>& Gm, 
+			       std::vector<double>& B, 
+			       const size_t cell_size, 
+			       const Groundwater::bottom_t boundtype,
+			       const std::vector<double>& K);
+  void upperboundary ();
+  void diffusion (const GeometryRect&);
+  void gravitation ();  
 
 
 
@@ -50,6 +65,8 @@ struct UZRectMollerup : public UZRect
   UZRectMollerup (Block& al);
   ~UZRectMollerup ();
 };
+
+
 
 void 
 UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil, 
@@ -72,8 +89,6 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
   std::vector<double> h (cell_size); // matrix pressure
   std::vector<double> h_ice (cell_size); // 
   std::vector<double> S (cell_size); // sink term
-  std::vector<double> dx (cell_size); // width of cells
-  std::vector<double> dz (cell_size); // height of cells 
   std::vector<double> T (cell_size); // temperature 
   std::vector<double> K (cell_size); // hydraulic conductivity
   std::vector<double> Cw (cell_size); // specific water capacity
@@ -126,17 +141,15 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 
   
 void 
-UZRectMollerup::lowerboundary (std::matrix<double>& Dm_mat 
-			       std::vector<double>& Dm_vec 
-			       std::vector<double>& Gm 
-			       std::vector<double>& B 
+UZRectMollerup::lowerboundary (matrix<double>& Dm_mat, 
+			       std::vector<double>& Dm_vec, 
+			       std::vector<double>& Gm, 
+			       std::vector<double>& B, 
 			       const size_t cell_size, 
-			       const Groundwater::bottom_t boundtype
-			       const std::vector<double>& K
-
-)
-
+			       const Groundwater::bottom_t boundtype,
+			       const std::vector<double>& K)
 {
+#if 0
 
 
 
@@ -171,12 +184,42 @@ if neumanntype
 
 
 
-
+#endif
 }
 
 void 
 UZRectMollerup::upperboundary ()
 {}
+
+void 
+UZRectMollerup::diffusion (const GeometryRect& geo)
+{
+  const size_t cell_size = geo.cell_size (); // number of cells 
+  
+
+
+
+
+  //Initialize diffusive matrix
+  matrix<double> diff (cell_size, cell_size); //zeros????
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+void 
+UZRectMollerup::gravitation ()
+{}
+
 
 void 
 UZRectMollerup::has_macropores (const bool)
