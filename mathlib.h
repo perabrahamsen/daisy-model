@@ -65,6 +65,9 @@ single_positive_root_of_square_equation
 
 extern bool approximate (double a, double b, double noise = 0.0001);
 
+inline double sqr (double x)
+{ return x * x; }
+
 inline double bound (double a, double x, double b)
 {
   daisy_assert (a <= b);

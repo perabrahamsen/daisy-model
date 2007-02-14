@@ -62,6 +62,30 @@ GeometryRect::contain_z (const size_t i, const double z) const
   return  zminus (i) > z && z >= zplus (i); 
 }
 
+size_t 
+GeometryRect::cell_pseudo_number (const int n) const
+{
+  switch (n)
+    {
+    case cell_above:
+      return cell_size () + 0;
+    case cell_below:
+      return cell_size () + 1;
+    case cell_left:
+      return cell_size () + 2;
+    case cell_right:
+      return cell_size () + 3;
+    case cell_front:
+      return cell_size () + 4;
+    case cell_back:
+      return cell_size () + 5;
+    default:
+      daisy_assert (n >= 0);
+      daisy_assert (n < cell_size ());
+      return n;
+    }
+}
+
 double 
 GeometryRect::xplus (size_t n) const
 { 
@@ -220,6 +244,38 @@ GeometryRect::GeometryRect (Block& al)
       edge_area_.insert (edge_area_.end (), edge_columns (), z_distance[row]);
       edge_center_z_.insert (edge_center_z_.end (), edge_columns (), 
                              z_center[row]);
+    }
+
+  // Cell edges.
+  cell_edges_.insert (cell_edges_.end (), cell_pseudo_size (),
+                      std::vector<int> ());
+  for (size_t e = 0; e < edge_size (); e++)
+    { 
+      cell_edges_[cell_pseudo_number (edge_from (e))].push_back (e);
+      cell_edges_[cell_pseudo_number (edge_to (e))].push_back (e);
+    }
+
+  // Edges.
+  for (size_t e = 0; e < edge_size (); e++)
+    { 
+      if (edge_is_internal (e))
+        {
+          const int from = edge_from (e);
+          const int to = edge_to (e);
+          const double dz = z (to) - z (from);
+          const double dx = x (to) - x (from);
+          const double length = std::sqrt (sqr (dx) + sqr (dz));
+          daisy_assert (length > 0.0);
+          edge_length_.push_back (length);
+          edge_area_per_length_.push_back (edge_area (e) / length);
+          edge_sin_angle_.push_back (dz / length);
+        }
+      else
+        {
+          edge_length_.push_back (-42.42e42);
+          edge_area_per_length_.push_back (-42.42e42);
+          edge_sin_angle_.push_back (-42.42e42);
+        }
     }
 
   // Corners.

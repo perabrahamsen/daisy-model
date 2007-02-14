@@ -2,21 +2,15 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * R2D2 Geometry
 
-** Clean up geometry1d.h
+** double edge_length (size_t e) const // kun intern
 
-** New corner abstraction
+** double edge_area_per_length (size_t e) const // kun intern
 
-*** edge_corners (edge) -> list of corners
+** double edge_sin_angle (size_t e) const
 
-*** cell_corners (cell) -> list of corners.
+sin_angle = (z_to - z_from) / length
 
-*** corner_size
-
-*** corner_x (corner)
-
-*** corner_y (corner)
-
-*** corner_z (corner)
+* Clean up geometry1d.h
 
 * OpenMI Daisy
 

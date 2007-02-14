@@ -1,3 +1,7 @@
+2007-02-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* time.C (output): Log 'minute' and 'second'.
+
 2007-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* geometry_rect.h (corner_size, corner_rows, corner_columns): 

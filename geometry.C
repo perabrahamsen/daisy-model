@@ -173,7 +173,7 @@ Geometry::edge_cross_z (const size_t e, const double zd) const
 bool 
 Geometry::node_center_in_volume (int c, const Volume& volume) const
 {
-  if (!is_regular_cell (c))
+  if (!cell_is_internal (c))
     return false;
   return volume.contain_point (z (c), x (c), y (c));
 }

@@ -187,9 +187,9 @@ struct SelectFlowTop : public SelectFlow
   { 
     if (outside == Geometry::cell_above)
       return true;
-    if (!geo.is_regular_cell (outside))
+    if (!geo.cell_is_internal (outside))
       return false;
-    daisy_assert (geo.is_regular_cell (inside));
+    daisy_assert (geo.cell_is_internal (inside));
     return geo.z (outside) > geo.z (inside);
   }
 
@@ -246,9 +246,9 @@ struct SelectFlowBottom : public SelectFlow
   { 
     if (outside == Geometry::cell_below)
       return true;
-    if (!geo.is_regular_cell (outside))
+    if (!geo.cell_is_internal (outside))
       return false;
-    daisy_assert (geo.is_regular_cell (inside));
+    daisy_assert (geo.cell_is_internal (inside));
     return geo.z (outside) < geo.z (inside);
   }
 
@@ -305,9 +305,9 @@ struct SelectFlowLeft : public SelectFlow
   { 
     if (outside == Geometry::cell_left)
       return true;
-    if (!geo.is_regular_cell (outside))
+    if (!geo.cell_is_internal (outside))
       return false;
-    daisy_assert (geo.is_regular_cell (inside));
+    daisy_assert (geo.cell_is_internal (inside));
     return geo.x (outside) < geo.x (inside);
   }
 
@@ -339,9 +339,9 @@ struct SelectFlowRight : public SelectFlow
   { 
     if (outside == Geometry::cell_right)
       return true;
-    if (!geo.is_regular_cell (outside))
+    if (!geo.cell_is_internal (outside))
       return false;
-    daisy_assert (geo.is_regular_cell (inside));
+    daisy_assert (geo.cell_is_internal (inside));
     return geo.x (outside) > geo.x (inside);
   }
 
@@ -373,9 +373,9 @@ struct SelectFlowFront : public SelectFlow
   { 
     if (outside == Geometry::cell_front)
       return true;
-    if (!geo.is_regular_cell (outside))
+    if (!geo.cell_is_internal (outside))
       return false;
-    daisy_assert (geo.is_regular_cell (inside));
+    daisy_assert (geo.cell_is_internal (inside));
     return geo.y (outside) < geo.y (inside);
   }
 
@@ -407,9 +407,9 @@ struct SelectFlowBack : public SelectFlow
   { 
     if (outside == Geometry::cell_back)
       return true;
-    if (!geo.is_regular_cell (outside))
+    if (!geo.cell_is_internal (outside))
       return false;
-    daisy_assert (geo.is_regular_cell (inside));
+    daisy_assert (geo.cell_is_internal (inside));
     return geo.y (outside) < geo.y (inside);
   }
 

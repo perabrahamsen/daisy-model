@@ -148,6 +148,8 @@ Time::output (Log& log) const
   output_value (mday (), "mday", log);
   output_value (wday (), "wday", log);
   output_value (hour (), "hour", log);
+  output_value (minute (), "minute", log);
+  output_value (second (), "second", log);
 }
 
 int

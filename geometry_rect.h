@@ -27,16 +27,25 @@
 class GeometryRect : public GeometryVert
 {
   // Parameters.
+private:
   const size_t cell_rows_;
   const size_t cell_columns_;
   std::vector<double> xplus_;	// Right edge of each cell.
   std::vector<double> x_;       // Horizontal center of each cell.
   std::vector<double> dx_;      // Horizontal size of each cell.
+  std::vector<std::vector<int> > cell_corners_; // The corners of cell.
+  std::vector<std::vector<int> > cell_edges_; // Edges connected with cell.
   std::vector<int> edge_from_;
   std::vector<int> edge_to_;
   std::vector<double> edge_area_;
+  std::vector<double> edge_length_;
+  std::vector<double> edge_area_per_length_;
+  std::vector<double> edge_sin_angle_;
   std::vector<double> edge_center_z_;
   std::vector<double> edge_center_x_;
+  std::vector<double> corner_z_;
+  std::vector<double> corner_x_;
+  std::vector<std::vector<int> > edge_corners_;
   
   // Cell operations.
 public:
@@ -62,8 +71,15 @@ public:
   double fraction_in_z_interval (size_t n, double from, double to) const;
   double fraction_in_volume (size_t n, const Volume& volume) const;
   bool contain_z (size_t n, double z) const;
-  const std::vector<int>& cell_corners (size_t n)
+  const std::vector<int>& cell_corners (size_t n) const
   { return cell_corners_[n]; }
+private:
+  size_t cell_pseudo_size () const // Add top, bottom, left, right, front, back
+  { return cell_size () + 6U; }
+  size_t cell_pseudo_number (int n) const;
+public:
+  inline const std::vector<int>& cell_edges (int n) const
+  { return cell_edges_[cell_pseudo_number (n)]; }
 
   // Edge operations.
 public:
@@ -77,21 +93,24 @@ public:
   { return edge_from_[e]; }
   inline int edge_to (size_t e) const   // Cell where edge leads.
   { return edge_to_[e]; }
+  inline int edge_other (size_t e, size_t n) const // Other cell at edge.
+  { return edge_from (e) == n ? edge_to (e) : edge_from (e); }
   inline double edge_area (size_t e) const // Area connecting cells [cm^2]
   { return edge_area_[e]; }
-  double edge_center_z (size_t e) const
+  inline double edge_length (size_t e) const // Distance between c-cent. [cm^2]
+  { return edge_length_[e]; }
+  inline double edge_area_per_length (size_t e) const 
+  { return edge_area_per_length_[e]; }
+  inline double edge_sin_angle (size_t e) const // To horizontal plane -1:1 []
+  { return edge_sin_angle_[e]; }
+  inline double edge_center_z (size_t e) const // Center z-pos [cm]
   { return edge_center_z_[e]; }
-  double edge_center_x (size_t e) const
+  inline double edge_center_x (size_t e) const // Center x-pos [cm]
   { return edge_center_x_[e]; }
-  const std::vector<int>& edge_corners (size_t e)
+  inline const std::vector<int>& edge_corners (size_t e) const
   { return edge_corners_[e]; }
 
   // Corners.
-private:
-  std::vector<double> corner_z_;
-  std::vector<double> corner_x_;
-  std::vector<std::vector<int> > cell_corners_;
-  std::vector<std::vector<int> > edge_corners_;
 public:
   inline size_t corner_size () const
   { return corner_z_.size (); }

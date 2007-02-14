@@ -52,7 +52,7 @@ protected:
 public:
   inline size_t cell_size () const // Number of cells.
   { return size_; }
-  inline bool is_regular_cell (int cell) const
+  inline bool cell_is_internal (int cell) const
   { return cell >= 0; }
   std::string cell_name (int) const; // For array logging.
   virtual double z (size_t) const = 0; // Cell center depth [cm]
@@ -86,6 +86,9 @@ public:
   virtual int edge_index (int from, int to) const; // Find edge between cells.
   virtual int edge_from (size_t) const = 0; // Cell where edge originates.
   virtual int edge_to (size_t) const = 0; // Cell where edge leads.
+  inline bool edge_is_internal (size_t e) // Edge does not lead out of volume.
+  { return cell_is_internal (edge_from (e))
+      && cell_is_internal (edge_from (e)); }
   virtual double edge_area (size_t) const = 0; // Area connecting the cells.
   bool edge_cross_z (size_t e, double z) const; // Cross depth?
   virtual double edge_center_z (size_t e) const = 0;

@@ -42,7 +42,7 @@ public:
 	     std::vector<double>& Theta,
              size_t q_offset,
              std::vector<double>& q_base, 
-             double dt)
+             double /* dt */)
   {
     for (int i = first; i <= last; i++)
       {

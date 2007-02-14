@@ -56,8 +56,8 @@ SMM1D::update (const std::vector<double>& h,
       daisy_assert (edge < geo.edge_size ());
       const int from = geo.edge_from (edge);
       const int to = geo.edge_to (edge);
-      daisy_assert (!geo.is_regular_cell (from)
-                    || !geo.is_regular_cell (to)
+      daisy_assert (!geo.cell_is_internal (from)
+                    || !geo.cell_is_internal (to)
                     || approximate (geo.z (from), geo.z (to)));
       soil_water.set_flux (edge, q[i]);
     }

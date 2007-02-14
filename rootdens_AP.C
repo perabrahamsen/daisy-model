@@ -52,9 +52,6 @@ struct Rootdens_AP : public Rootdens
   Rootdens_AP (Block&);
 };
 
-static inline double sqr (double x)
-{ return x * x; }
-
 void
 Rootdens_AP::set_density (Treelog& /*msg*/,
                           vector<double>& Density,
