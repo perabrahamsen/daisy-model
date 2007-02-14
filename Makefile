@@ -199,8 +199,8 @@ endif
 
 CSHARP = /cygdrive/C/WINDOWS/Microsoft.NET/Framework/v2.0.50727/csc.exe
 
-hello.exe:	hello.cs
-	$(CSHARP) hello.cs
+csdaisy.exe:	csmain.cs
+	$(CSHARP) /out:csdaisy.exe csmain.cs
 
 # Construct the compile command.
 #

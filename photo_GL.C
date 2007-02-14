@@ -82,7 +82,7 @@ PhotoGL::assimilate (const double,  const double,
                      const vector<double>& PAR_height,
                      const double PAR_LAI,
 		     const std::vector<double>&,
-                     const double dt,
+                     const double,
                      CanopyStandard& canopy,
                      Phenology& development,
                      Treelog& msg) 
@@ -121,21 +121,11 @@ PhotoGL::assimilate (const double,  const double,
   // CAI in each interval.
   const double dCAI = PAR_LAI / No;
 
-  // True, if we haven't reached the top of the crop yet.
-  bool top_crop = true;
-
   for (int i = 0; i < No; i++)
     {
       const double height = PAR_height[i+1];
       daisy_assert (height < PAR_height[i]);
 
-      if (top_crop && height <= canopy.Height)
-	{
-	  // We count day hours at the top of the crop.
-	  top_crop = false;
-	  if (PAR[i] > 0.5 * 25.0)
-	    development.light_time (dt);
-	}
       // Leaf Area index for a given leaf layer
       const double LA = prevLA - LAIvsH (height);
       daisy_assert (LA >= 0.0);

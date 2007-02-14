@@ -73,9 +73,9 @@ cropNdistDPF::cropN_distribution (const double LAI,
   const double divisor = 1. - exp(-LAI * kn);
   daisy_assert(divisor > 0.0);
   daisy_assert (std::isnormal(divisor));
+
   double cropN0 = kn * cropN / divisor; // [g/m² area]
   cropN0 = cropN0 / Mw;  // [mol/m² area]
-  //  cropN0 = cropN0 / LAI; // [mol/m² leaf] 
   daisy_assert (cropN0 >= 0.0);
 
   // Fill photosynthetically active N (cummulative) for each canopy layer in vector
@@ -85,6 +85,7 @@ cropNdistDPF::cropN_distribution (const double LAI,
   const double dLAI = (LAI /(No + 0.0));
   for (int i = 0; i < No; i++)
      cropNdist[i] = f_photo * cropN0 * (exp(-kn * dLAI *(i+0.5))); //[mol/m² leaf]
+
   crop_Vmax_total (LAI, cropNdist, cropVm_total);  
 }
 
@@ -112,8 +113,8 @@ static struct cropNdistDPFSyntax
     alist.add ("kn", 0.713);
 
     syntax.add ("f_photo", Syntax::None (), Check::positive (), Syntax::Const,
-                "Fraction of photosynthetically active N in canopy, f_photo = 0.75 (Boegh et al., 2002)");
-    alist.add ("f_photo", 0.75);
+                "Fraction of photosynthetically active N in canopy. According to (Boegh et al., 2002) f_photo = 0.75. However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
+    alist.add ("f_photo", 1.0);
 
     syntax.add ("Xn", "mol/mol/s", Check::positive (), Syntax::Const,
                 "Slope of relationship between leaf nitrogen and Vmax, Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");

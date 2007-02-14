@@ -47,6 +47,7 @@ class PhotoFarquhar : public Photo
 {
   // Parameters.
 private:
+  const PLF& TempEff;	// Temperature effect, photosynthesis   
   const double S;     // Electron transport temperature response parametre 
   const double H;     // Curvature parameter of Jm
   const double Ko25;  // Michaelis-Menten constant of Rubisco for O2 at 25 degrees
@@ -72,7 +73,7 @@ private:
   const double b;     // Stomatal intercept factor, Ball and Berry model
   std::auto_ptr<CropNdist> cropNdist;// Crop N distribution model.
   std::auto_ptr<ABAEffect> ABAeffect;// ABA-xylem effect on photosynthesis.
-   
+
   // Log variable.
   std::vector<double> ci_vector; // Stomata CO2 pressure
   std::vector<double> Vm_vector; // Photosynthetic capacity  
@@ -123,6 +124,7 @@ public:
 public:
   PhotoFarquhar (Block& al)
     : Photo (al),
+      TempEff (al.plf ("TempEff")),
       S (al.number ("S")),
       H (al.number ("H")),
       Ko25 (al.number ("Ko25")),
@@ -191,8 +193,11 @@ PhotoFarquhar::J_m (const double vmax25, const double T/*[degree C]*/) const
   const double a_ = Jm25 * exp((T+273.0-298.0)*Ea_Jm/(298.0*R*(T+273.0)));
   const double b_ = 1.+exp((298.0*S-H)/(298.0*R));
   const double c_ = 1.+exp(S*(T+273.0)-H)/(R*(T+273.0));
-  const double J_m = a_*b_/c_;     //mol/m2/s  
-  return J_m; 
+  double J_m = a_*b_/c_;     //mol/m2/s  
+
+  // Temperature effect and development stage effect of photo_gl
+  const double Teff = TempEff (T);
+  return J_m * Teff; 
 }
 
 inline double pow2 (double x)
@@ -368,7 +373,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 			   const vector<double>& PAR_height,
 			   const double PAR_LAI,
 			   const std::vector<double>& fraction,
-                           const double dt,
+                           const double,
 			   CanopyStandard& canopy,
 			   Phenology& development,
 			   Treelog& msg) 
@@ -376,6 +381,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.
   const PLF& LAIvsH = canopy.LAIvsH;
   const double DS = development.DS;
+
   
   // One crop: daisy_assert (approximate (canopy.CAI, bioclimate.CAI ()));
   if (!approximate (LAIvsH (canopy.Height), canopy.CAI))
@@ -448,21 +454,11 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
   // CAI in each interval.
   const double dCAI = PAR_LAI / No;
   
-  // True, if we haven't reached the top of the crop yet.
-  bool top_crop = true;
-
   for (int i = 0; i < No; i++)
     {
       const double height = PAR_height[i+1];
       daisy_assert (height < PAR_height[i]);
 
-      if (top_crop && height <= canopy.Height)
-	{
-	  // We count day hours at the top of the crop.
-	  top_crop = false;
-	  if (PAR[i] > 0.5 * 25.0)      //W/m2
-	    development.light_time (dt);
-	}
       // Leaf Area index for a given leaf layer
       const double LA = prevLA - LAIvsH (height);
       daisy_assert (LA >= 0.0);
@@ -626,17 +622,21 @@ static struct Photo_FarquharSyntax
 
     alist.add ("description", "Photosynthesis by De Pury & Farquhar (1997) and stomataconductance model by Collatz et al., 1991.");
 
+    syntax.add ("TempEff", "dg C", Syntax::None (), Check::non_negative (),
+                Syntax::Const,
+                "Temperature factor for assimilate production.");
+
     syntax.add ("Kc25", "Pa", Check::positive (), Syntax::Const,
-                "Micahyaelis-Menten constant of Rubisco for CO2. Kc25 = 40.4 Pa for wheat (Collatz et al., ) ");
+                "Micahyaelis-Menten constant of Rubisco for CO2. Kc25 = 40.4 Pa for wheat (Collatz et al.,1991) ");
 
     alist.add ("Kc25", 40.4);
 
     syntax.add ("Ko25", "Pa", Check::positive (), Syntax::Const,
-                "Micahaelis-Menten constant of Rubisco for O2 at 25 degrees. Ko25 = 24800 Pa for wheat (Collatz et al., )");
+                "Micahaelis-Menten constant of Rubisco for O2 at 25 degrees. Ko25 = 24800 Pa for wheat (Collatz et al., 1991)");
     alist.add ("Ko25", 24800.);
 
     syntax.add ("Gamma25", "Pa", Check::positive (), Syntax::Const,
-                "CO2 compensation point of photosynthesis. Gamma25 = 3.69 Pa for wheat? (Collatz et al., )");
+                "CO2 compensation point of photosynthesis. Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
     alist.add ("Gamma25", 3.69);
 
     

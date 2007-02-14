@@ -330,10 +330,14 @@ CropStandard::tick (const Time& time, const double relative_humidity,
       
       const double total_LAI = bioclimate.LAI ();
       const std::vector<double>& fraction_sun_LAI = bioclimate.sun_LAI_fraction ();
-
+      const std::vector<double>& PAR_height = bioclimate.height ();
+      
       std::vector<double> fraction_shadow_LAI;
       std::vector<double> fraction_total_LAI;
       const int No = fraction_sun_LAI.size ();
+
+      // True, if we haven't reached the top of the crop yet.
+      bool top_crop = true;
 
       for(int i = 0; i < No; i++) 
 	{
@@ -342,7 +346,18 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 	  fraction_total_LAI.push_back(1.0);
 	  daisy_assert (f_sun <= 1.0);
 	  daisy_assert (f_sun >= 0.0);
-	}
+
+	  const double height = PAR_height[i+1];
+	  daisy_assert (height < PAR_height[i]);
+
+	  if (top_crop && height <= canopy.Height)
+	    {
+	      // We count day hours at the top of the crop.
+	      top_crop = false;
+	      if (total_PAR[i] > 0.5 * 25.0)      //W/m2
+		development->light_time (dt);
+	    }
+ 	}
       
       const double cropN = std::min (production.NLeaf
 				     -(canopy.corresponding_WLeaf (development->DS)
@@ -361,7 +376,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 	  Ass += photo->assimilate (ABA_xylem, relative_humidity, 
 				    bioclimate.daily_air_temperature (), 
 				    bioclimate.hourly_leaf_temperature(),
-				    cropN, shadow_PAR, bioclimate.height (),
+				    cropN, shadow_PAR, PAR_height,
                                     total_LAI, fraction_shadow_LAI, dt,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
@@ -369,7 +384,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
           Ass += photo->assimilate (ABA_xylem, relative_humidity,
 				    bioclimate.daily_air_temperature (),
 				    bioclimate.hourly_leaf_temperature(),
-				    cropN, sun_PAR, bioclimate.height (),
+				    cropN, sun_PAR,  PAR_height,
                                     total_LAI, fraction_sun_LAI, dt,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
@@ -386,7 +401,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
           Ass += photo->assimilate (ABA_xylem, relative_humidity,
 				    bioclimate.daily_air_temperature (), 
 				    bioclimate.hourly_leaf_temperature(),
-				    cropN, PAR, bioclimate.height (),
+				    cropN, PAR, PAR_height,
 				    bioclimate.LAI (), fraction_total_LAI, dt,
 				    canopy, *development, msg)
             * min_light_fraction;

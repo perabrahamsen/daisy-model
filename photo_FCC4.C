@@ -328,7 +328,7 @@ PhotoFCC4::assimilate (const double ABA_xylem, const double rel_hum,
 		       const vector<double>& PAR_height,
 		       const double PAR_LAI,
 		       const std::vector<double>& fraction,
-                       const double dt,
+                       const double,
 		       CanopyStandard& canopy,
 		       Phenology& development,
 		       Treelog& msg) 
@@ -406,21 +406,11 @@ PhotoFCC4::assimilate (const double ABA_xylem, const double rel_hum,
   // CAI in each interval.
   const double dCAI = PAR_LAI / No;
   
-  // True, if we haven't reached the top of the crop yet.
-  bool top_crop = true;
-
   for (int i = 0; i < No; i++)
     {
       const double height = PAR_height[i+1];
       daisy_assert (height < PAR_height[i]);
 
-      if (top_crop && height <= canopy.Height)
-	{
-	  // We count day hours at the top of the crop.
-	  top_crop = false;
-	  if (PAR[i] > 0.5 * 25.0)      //W/m2
-	    development.light_time (dt);
-	}
       // Leaf Area index for a given leaf layer
       const double LA = prevLA - LAIvsH (height);
       daisy_assert (LA >= 0.0);
