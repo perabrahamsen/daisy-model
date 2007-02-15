@@ -152,7 +152,7 @@ Geometry::volume_in_z_interval (const double from, const double to,
       const double f = fraction_in_z_interval (i, from, to);
       if (f > 0.0)
         {
-          const double rel_vol = f * this->volume (i);
+          const double rel_vol = f * cell_volume (i);
           frac[i] = f;
           volume += rel_vol;
         }
@@ -280,7 +280,7 @@ Geometry::extract_soil (std::vector<double>& v,
       const double f = fraction_in_z_interval (i, from, to);
       if (f > 0.0)
         {
-          amount += f * volume (i) * v[i];
+          amount += f * cell_volume (i) * v[i];
 
 	  if (f < 1.0)
 	    v[i] *= (1.0 - f);
@@ -372,7 +372,7 @@ Geometry::total_soil (const std::vector<double>& v) const
   daisy_assert (v.size () == cell_size);
   double sum = 0.0;
   for (size_t i = 0; i < cell_size; i++)
-    sum += v[i] * volume (i);
+    sum += v[i] * cell_volume (i);
   return sum;
 }
 
@@ -388,7 +388,7 @@ Geometry::total_soil (const std::vector<double>& v,
     {
       const double f = fraction_in_z_interval (i, from, to);
       if (f > 0.0)
-        sum += v[i] * volume (i) * f;
+        sum += v[i] * cell_volume (i) * f;
     }
 
   return sum;

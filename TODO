@@ -2,13 +2,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * R2D2 Geometry
 
-** double edge_length (size_t e) const // kun intern
-
-** double edge_area_per_length (size_t e) const // kun intern
-
-** double edge_sin_angle (size_t e) const
-
-sin_angle = (z_to - z_from) / length
+http://www.cs.colostate.edu/~nate/tutorial/tutorial.xhtml#tab2
 
 * Clean up geometry1d.h
 
@@ -26,9 +20,9 @@ sin_angle = (z_to - z_from) / length
 
 ** stoftransport
 
-** varmetransport.
+** varmetransport
 
-** makroporer.
+** makroporer
 
 * Daisy 2D
 

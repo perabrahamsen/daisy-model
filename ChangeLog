@@ -1,3 +1,7 @@
+2007-02-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.h (cell_volume): Renamed from 'volume'.
+
 2007-02-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* time.C (output): Log 'minute' and 'second'.

@@ -194,7 +194,7 @@ MovementRect::default_heat (const Soil& soil,
       for (size_t column = 0; column < cell_columns; column++)
         {
           const size_t cell = geo->cell_index (row, column);
-          const double volume = geo->volume (cell);
+          const double volume = geo->cell_volume (cell);
           const double Theta_pF_2_0 = soil.Theta (cell, pF_2_0, 0.0);
           k += volume * soil.heat_conductivity (cell, Theta_pF_2_0, 0.0);
           C += volume * soil.heat_capacity (cell, Theta_pF_2_0, 0.0);

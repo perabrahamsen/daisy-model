@@ -498,7 +498,7 @@ ColumnStandard::set_heat_source (double at, double value) // [W/m^2]
  for (size_t i = 0; i < cell_size; i++)
    if (geometry.contain_z (i, at))
      {
-       const double V = geometry.volume (i);
+       const double V = geometry.cell_volume (i);
        value *= 10^3;		// [W/m^2] -> [erg/cm^2/s]
        value *= 3600;		// [erg/cm^2/s] -> [erg/cm^2/h]
        value /= V;              // [erg/cm^2/h] -> [erg/cm^3/h]

@@ -1078,8 +1078,8 @@ CropOld::SoluteUptake (const Geometry& geo,
 	    }
 	  daisy_assert (std::isfinite (I_zero[i]));
 	  daisy_assert (std::isfinite (B_zero[i]));
-	  B += L * geo.volume (i) * B_zero[i];
-	  U_zero += L * geo.volume (i) * std::min (I_zero[i], I_max);
+	  B += L * geo.cell_volume (i) * B_zero[i];
+	  U_zero += L * geo.cell_volume (i) * std::min (I_zero[i], I_max);
 	}
     }
   if (U_zero > PotNUpt)
@@ -1470,7 +1470,7 @@ CropOld::PotentialWaterUptake (const double h_x,
       daisy_assert (std::isnormal (- 0.5 * log (area * L[i])));
       daisy_assert (uptake >= 0.0);
       S[i] = uptake;
-      total += uptake * geo.volume (i) * 10; // mm/cm.
+      total += uptake * geo.cell_volume (i) * 10; // mm/cm.
     }
   return total;
 }

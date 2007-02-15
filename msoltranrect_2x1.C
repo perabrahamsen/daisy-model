@@ -137,7 +137,7 @@ Msoltranrect2x1::flow (const GeometryRect& geo,
       if (geo.edge_to (e) == Geometry::cell_above)
         {
           const size_t n = geo.edge_from (e);
-          M[n] -= J[e] * geo.edge_area (e) / geo.volume (n);
+          M[n] -= J[e] * geo.edge_area (e) / geo.cell_volume (n);
           in -= J[e] * geo.edge_area (e);
         }
       else

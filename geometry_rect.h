@@ -65,7 +65,7 @@ private:
   double xplus (size_t n) const; // Right side of cell [cm].
   double xminus (size_t n) const; // Left side of cell [cm].
 public:
-  inline double volume (size_t n) const // Cell volume [cm^3]
+  inline double cell_volume (size_t n) const // Cell volume [cm^3]
   { return dz (n) * dx (n) * 1.0 /* [cm] */; }
   size_t cell_at (double z, double x, double y) const;
   double fraction_in_z_interval (size_t n, double from, double to) const;

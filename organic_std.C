@@ -2217,7 +2217,7 @@ OrganicStandard::top_summary (const Geometry& geo,
       if (geo.z (lay) < init.end)
         continue;
       
-      const double v = geo.volume (lay);
+      const double v = geo.cell_volume (lay);
       volume += v;
       clay += soil.clay (lay) * v;
 
@@ -2518,8 +2518,8 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
                    init.debug_to_screen);
         if (top_soil)
           {
-            total_delta_C += delta_C * geo.volume (lay);
-            total_delta_N += delta_N * geo.volume (lay);
+            total_delta_C += delta_C * geo.cell_volume (lay);
+            total_delta_N += delta_N * geo.cell_volume (lay);
           }
 
         update_pools (SOM_results, soil.C_per_N (lay), 

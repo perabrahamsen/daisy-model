@@ -51,7 +51,7 @@ SoilHeat::energy (const Geometry& geo, const Soil& soil,
           const double Theta = soil_water.Theta (i);
           const double X_ice = soil_water.X_ice (i);
           const double C = soil.heat_capacity (i, Theta, X_ice);
-          const double V = geo.volume (i) * f;
+          const double V = geo.cell_volume (i) * f;
           amount += C * T (i) * V;
         }
     }
@@ -77,7 +77,7 @@ SoilHeat::set_energy (const Geometry& geo,
           const double Theta = soil_water.Theta (i);
           const double X_ice = soil_water.X_ice (i);
           const double C = soil.heat_capacity (i, Theta, X_ice);
-          const double V = geo.volume (i) * f;
+          const double V = geo.cell_volume (i) * f;
           capacity += C * V;
           volume += V;
         }
@@ -311,7 +311,7 @@ SoilHeat::calculate_freezing_rate (const Geometry& geo,
   const double T_mean = (T[i] + T_old[i]) / 2.0;
   const double dT = T[i] - T_old[i];
   const double dq = q[i] - q[i+1];
-  const double vol = geo.volume (i);
+  const double vol = geo.cell_volume (i);
   const double S 
     = soil_water.S_sum (i) - soil_water.S_ice (i) * rho_ice / rho_water;
   const double Sh

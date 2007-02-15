@@ -419,7 +419,7 @@ Surface::Implementation::albedo (const Geometry& geo, const Soil& soil,
   for (size_t i = 0; i < cell_size; i++)
     if (geo.contain_z (i, 0.0))
       {
-        const double v = geo.volume (i);
+        const double v = geo.cell_volume (i);
         volume += v;
         Theta_pf_3 += soil_water.Theta_ice (soil, i, pF2h (3.0)) * v;
         Theta_pf_1_7 += soil_water.Theta_ice (soil, i, pF2h (1.7)) * v;

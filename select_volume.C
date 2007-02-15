@@ -113,7 +113,7 @@ SelectVolume::BD_convert::set_bulk (const Geometry& geo,
     {
       const double f = geo.fraction_in_volume (i, volume);
       if (f > 1e-10)
-        bulk += soil.dry_bulk_density (i) * geo.volume (i) * f;
+        bulk += soil.dry_bulk_density (i) * geo.cell_volume (i) * f;
     }
   if (density_z)
     bulk /= volume.height (geo.bottom (), geo.top ()); 
@@ -170,7 +170,7 @@ SelectVolume::output_array (const std::vector<double>& array,
           if (f > 1e-10)
             {
               cells.push_back (n);
-              const double vol = geo->volume (n) * f;
+              const double vol = geo->cell_volume (n) * f;
               weight.push_back (vol);
               total_volume += vol;
             }

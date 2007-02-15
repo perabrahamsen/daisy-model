@@ -103,7 +103,7 @@ SelectInterval::BD_convert::set_bulk (const Geometry& geo,
     {
       const double f = geo.fraction_in_volume (i, volume);
       if (f > 1e-10)
-        bulk += soil.dry_bulk_density (i) * geo.volume (i) * f;
+        bulk += soil.dry_bulk_density (i) * geo.cell_volume (i) * f;
     }
   bulk /= volume.width (geo.left (), geo.right ()); 
   bulk /= volume.depth (geo.front (), geo.back ()); 

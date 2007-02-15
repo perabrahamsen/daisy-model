@@ -52,7 +52,7 @@ public:
   { return 1.0; }
   inline double zminus (size_t n) const
   { return (n == 0) ? 0.0 : zplus (n-1U); }
-  inline double volume (size_t n) const
+  inline double cell_volume (size_t n) const
   { return dz (n) * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
   inline double bottom () const // Bottom of deepest cell. [cm]
   { return zplus (cell_size () - 1); }

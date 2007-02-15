@@ -63,7 +63,7 @@ public:
   virtual double y (size_t) const 
   { return 0.5; }
   double y_safe (int) const;    // Same, handles cell_front and cell_back.
-  virtual double volume (size_t) const = 0; // Cell volume [cm^3]
+  virtual double cell_volume (size_t) const = 0; // Cell volume [cm^3]
   virtual size_t cell_at (double z, double x, double y) const = 0;
   virtual double fraction_in_z_interval (// The fraction of a cell
                                          // volume that is within a
@@ -123,7 +123,7 @@ public:
     for (size_t i = 0; i < this->cell_size (); i++)
       if (this->contain_z (i, z))
         {
-          const double volume = this->volume (i);
+          const double volume = cell_volume (i);
           total_volume += volume;
           total_content += volume * (obj.*content) (i);
         }

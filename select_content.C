@@ -54,7 +54,7 @@ struct SelectContent : public SelectValue
         for (size_t i = 0; i < cell_size; i++)
           if (geo->contain_z (i, height))
             {
-              const double volume = geo->volume (i);
+              const double volume = geo->cell_volume (i);
               total_volume += volume;
               weight.push_back (volume);
               cell.push_back (i);

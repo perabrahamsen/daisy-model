@@ -276,8 +276,8 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
             }
 	  daisy_assert (std::isfinite (I_zero[i]));
 	  daisy_assert (std::isfinite (B_zero[i]));
-	  B += L * geo.volume (i) * B_zero[i];
-	  U_zero += L * geo.volume (i) 
+	  B += L * geo.cell_volume (i) * B_zero[i];
+	  U_zero += L * geo.cell_volume (i) 
 	    * bound (0.0, I_zero[i] - B_zero[i] * C_root_min, I_max);
 	}
     }

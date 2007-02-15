@@ -112,8 +112,8 @@ public:
     const int size = geo.cell_size ();
     double largest = 0.0;
     for (unsigned int i = 0; i < size; i++)
-      if (geo.volume (i) > largest)
-	largest = geo.volume (i);
+      if (geo.cell_volume (i) > largest)
+	largest = geo.cell_volume (i);
     if (largest > 10.0)
       {
 	Treelog::Open nest (msg, "Groundwater pipe");
@@ -291,7 +291,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Geometry& geo,
       if (z >= height)
         continue;
 
-      const double volume = geo.volume (i);
+      const double volume = geo.cell_volume (i);
 
       if (z >= pipe_position)
         {

@@ -413,7 +413,7 @@ UZRichard::richard (Treelog& msg,
 	{
 	  // Calculate new water content.
 	  for (unsigned int i = 0; i < size; i++)
-	    Theta[i] = soil.Theta(first + i, h[i], h_ice[first + i]);
+	    Theta[i] = soil.Theta (first + i, h[i], h_ice[first + i]);
 
 	  bool accepted = true;	// Could the top accept the results?
 	  // Amount of water we put into the top this small time step.
