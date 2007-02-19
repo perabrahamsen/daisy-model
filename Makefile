@@ -172,8 +172,9 @@ ifeq ($(COMPILER),gcc)
 	WARNING = -W -Wall -Wno-uninitialized \
 		  -Wconversion -Woverloaded-virtual \
 		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings \
-                  -Wno-sign-compare -Wfloat-equal -Wundef -Wendif-labels \
+                  -Wno-sign-compare  -Wundef -Wendif-labels \
 		  -Wcast-qual -Wcast-align -Wmissing-format-attribute 
+# -Wfloat-equal
 #  -Wold-style-cast: triggered by header files for 2.95/woody
 #  -Wmissing-noreturn: triggered by some virtual functions.
 #  -Wmissing-prototypes -Wstrict-prototypes: Not C++ flags.

@@ -261,7 +261,7 @@ UZRichard::richard (Treelog& msg,
 
 	  internode (soil, soil_heat, first, last, h_ice, K, Kplus);
 
-	  // Calcualte cells.
+	  // Calculate cells.
 	  for (unsigned int i = 0; i < size; i++)
 	    {
 	      const double Cw1 = soil.Cw1 (first + i, h[i], h_ice[first + i]);

@@ -20,42 +20,56 @@
 
 #include "uzrect.h"
 #include "geometry_rect.h"
+#include "soil.h"
 #include "soil_water.h"
+#include "soil_heat.h"
 #include "groundwater.h"
 #include "surface.h"
 #include "syntax.h"
+#include "block.h"
 #include "alist.h"
 #include "mathlib.h"
 #include "assertion.h"
 #include <sstream>
+#include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/triangular.hpp>
+#include <boost/numeric/ublas/banded.hpp>
+#include <boost/numeric/ublas/lu.hpp>
 
-using boost::numeric::ublas::matrix;
-
-
-
-
+namespace ublas = boost::numeric::ublas;
 
 struct UZRectMollerup : public UZRect
 {
-  // Parameters.
+  // Parameters.  
+  const int max_iterations; 
+  const double max_absolute_difference;
+  const double max_relative_difference;  
+
+
 
   // Interface.
   void tick (const GeometryRect&, const Soil&, SoilWater&, const SoilHeat&, 
              const Surface&, const Groundwater&, double dt, Treelog&);
 
   // Internal functions.
-  void lowerboundary (matrix<double>& Dm_mat, 
-			       std::vector<double>& Dm_vec, 
-			       std::vector<double>& Gm, 
-			       std::vector<double>& B, 
+  bool converges (const ublas::vector<double>& previous,
+		  const ublas::vector<double>& current) const;
+  void lowerboundary (ublas::matrix<double>& Dm_mat, 
+			       ublas::vector<double>& Dm_vec, 
+			       ublas::vector<double>& Gm, 
+			       ublas::vector<double>& B, 
 			       const size_t cell_size, 
 			       const Groundwater::bottom_t boundtype,
-			       const std::vector<double>& K);
+			       const ublas::vector<double>& K);
   void upperboundary ();
-  void diffusion (const GeometryRect&);
-  void gravitation ();  
+  void diffusion (const GeometryRect& geo,
+		  const ublas::vector<double>& Kedge,
+		  ublas::matrix<double>& diff);
+  void gravitation (const GeometryRect& geo,
+		    const ublas::vector<double>& Kedge,
+		    ublas::vector<double>& grav);  
 
 
 
@@ -76,78 +90,202 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
                       Treelog& msg)
 
 {
-#if 0
   const size_t edge_size = geo.edge_size (); // number of edges 
-  const size_t edge_rows = geo.edge_rows (); // number of edge rows 
   const size_t cell_size = geo.cell_size (); // number of cells 
-  const size_t cell_rows = geo.cell_rows (); // number of cell rows
-  const size_t cell_columns = geo.cell_columns (); // number of cell columns
 
   // Insert magic here.
   
-  std::vector<double> Theta (cell_size); // water content 
-  std::vector<double> h (cell_size); // matrix pressure
-  std::vector<double> h_ice (cell_size); // 
-  std::vector<double> S (cell_size); // sink term
-  std::vector<double> T (cell_size); // temperature 
-  std::vector<double> K (cell_size); // hydraulic conductivity
-  std::vector<double> Cw (cell_size); // specific water capacity
+  ublas::vector<double> Theta (cell_size); // water content 
+  ublas::vector<double> Theta_previous (cell_size); // at start of small timestep
+  ublas::vector<double> h (cell_size); // matrix pressure
+  ublas::vector<double> h_previous (cell_size); // at start of small timestep
+  ublas::vector<double> h_ice (cell_size); // 
+  ublas::vector<double> S (cell_size); // sink term
+  ublas::vector<double> T (cell_size); // temperature 
+  ublas::vector<double> K (cell_size); // hydraulic conductivity
+  ublas::vector<double> Kedge (edge_size); // edge (inter cell) conductivity     
+
+
+  //Make Qmat area diagonal matrix 
+  ublas::banded_matrix<double> Qmat (cell_size, cell_size, 0, 0);
+  for (int c = 0; c < cell_size; c++)
+    Qmat (c, c) = geo.cell_volume (c);
  
-      
-  std::matrix<double>  Dm_mat (cell_size,0.0); // upper Dir bc  	      
-  std::vector<double>  Dm_vec (cell_size,0.0); // upper Dir bc
-  std::vector<double>  Gm (cell_size,0.0); // upper Dir bc
-  std::vector<double>  B (cell_size,0.0); // upper Neu bc 
 
 
 
 
 
+
+#if 0
+  ublas::matrix<double>  Dm_mat (cell_size,0.0); // upper Dir bc  	      
+  ublas::vector<double>  Dm_vec (cell_size,0.0); // upper Dir bc
+  ublas::vector<double>  Gm (cell_size,0.0); // upper Dir bc
+  ublas::vector<double>  B (cell_size,0.0); // upper Neu bc 
+#endif
 
   // make vectors 
-  for (size_t cell = 0; cell !=cell_size ; ++cell) 
+  for (size_t cell = 0; cell != cell_size ; ++cell) 
     {				
       Theta[cell] = soil_water.Theta (cell);
       h[cell] =  soil_water.h (cell);
       h_ice[cell] = soil_water.h_ice (cell);
       S[cell] =  soil_water.S_sum (cell);
-      dx[cell] = geo.dx (cell);
-      dz[cell] = geo.dz (cell);	
       T[cell] = soil_heat.T (cell); 
-      K[cell] =  soil.K (cell, h[cell], h_ice[cell], T[cell]); 
-      Cw[cell] = soil.Cw2 (cell, h[cell], h_ice[cell]);
+    }
 
-      
-		
-	         }
 
-  // check gaussj.h and gaussj.C to see how it works...
-  // ms = matrixsolve
-  GaussJordan ms (cell_size);	// initialize
-
-    
-  // void set_value (int row, double); 
-  // double get_value (int row) const;
-  // void set_entry (int row, int column, double);
-  // double get_entry (int row, int column) const;
-  // inline double operator() (int row, int column) const
-  // { return get_entry (row, column); }
-  // void solve ();
-  // double result (int row) const;
-  // GaussJordan (int s);  
   
-#endif
+  // Start time loop 
+  double time_left = dt;	// How much of the large time step left.
+  double ddt = dt;		// We start with small == large time step.
+  int number_of_time_step_reductions = 0;
+  int iterations_with_this_time_step = 0;
+
+  
+
+  while (time_left > 0.0)
+    {
+      // Initialization for each small time step.
+      int iterations_used = 0;
+      if (ddt > time_left)
+	ddt = time_left;
+
+      h_previous = h;
+      Theta_previous = Theta;  
+      ublas::vector<double> h_conv;
+
+      do // Start iteration loop
+	{
+	  h_conv = h;
+	  iterations_used++;
+
+	  // Calculate conductivity
+	  for (size_t cell = 0; cell !=cell_size ; ++cell) 
+	    K[cell] =  soil.K (cell, h[cell], h_ice[cell], T[cell]); 
+	    
+	  for (size_t e = 0; e < edge_size; e++)
+	    {
+	      if (geo.edge_is_internal (e))
+		{
+		  const int from = geo.edge_from (e);
+		  const int to = geo.edge_to (e);	   
+		  Kedge[e] = 2.0/(1.0/K[from] + 1.0/K[to]); 
+		} 
+	    }
+	  
+	  //Initialize diffusive matrix
+	  ublas::matrix<double> diff (cell_size, cell_size); //zeros???? - check ublas
+	  diffusion (geo, Kedge, diff);
+
+	  //Initialize gravitational matrix
+	  ublas::vector<double> grav (cell_size); //ublass compatibility
+	  gravitation (geo, Kedge, grav);
+	  	  
+	  //Initialize water capacity  matrix
+	  ublas::banded_matrix<double> Cw (cell_size, cell_size, 0, 0);
+	  for (size_t c = 0; c < cell_size; c++)
+	    Cw (c, c) = soil.Cw2 (c, h[c]);
+	  
+	  //Initialize sum matrix
+	  ublas::matrix<double> summat (cell_size, cell_size);  
+	  summat = diff;
+
+	  //Initialize sum vector
+	  ublas::vector<double> sumvec (cell_size);  
+	  sumvec = grav; 
+
+	  //Initialize A-matrix
+	  ublas::matrix<double> A (cell_size, cell_size);  
+	  A = (1.0 / ddt)*prod(Qmat, Cw)-summat;  
+
+	  //Initialize b-vector
+	  ublas::vector<double> b (cell_size);  
+	  //b = sumvec + (1.0 / ddt) * (Qmatrix * Cw * h + Qmatrix *(Wxx-Wyy));
+	  b = sumvec + (1.0 / ddt) * (prod (prod (Qmat, Cw),  h) + prod (Qmat, Theta_previous-Theta));
+
+	  // Any drain ?
+
+	  // Solve Ax=b (maybe)
+	  ublas::permutation_matrix<double> piv (cell_size);
+	  const bool singular = ublas::lu_factorize(A, piv);
+	  daisy_assert (!singular);
+	  ublas::lu_substitute (A, piv, b); // b now contains solution 
+	  
+	  h = b; // new solution :-)
+	  
+	  for (int c=0; c < cell_size; c++) // update Theta - maybe not neccessary???
+	    Theta (c) = soil.Theta (c, h (c), h_ice (c)); 
+
+	}
+      while (!converges (h_conv, h)
+	     && iterations_used <= max_iterations);
+
+      if (iterations_used > max_iterations)
+	{
+	  number_of_time_step_reductions++;
+
+	  if (number_of_time_step_reductions > max_time_step_reductions)
+	    throw "Could not find solution";
+
+	  ddt /= time_step_reduction;
+	  h = h_previous;
+	  Theta = Theta_previous;
+	}
+      else
+	{
+	  time_left -= ddt;
+	  iterations_with_this_time_step++;
+
+	  if (iterations_with_this_time_step > time_step_reduction)
+	    {
+	      number_of_time_step_reductions--;
+	      iterations_with_this_time_step = 0;
+	      ddt *= time_step_reduction;
+	    }
+
+      // End of small time step.
+    }
+
+  // Make it official.
+  for (size_t cell = 0; cell != cell_size ; ++cell) 
+    soil_water.set_content (cell, h[cell], Theta[cell]);
+
+  // End of large time step.
 }
 
   
+bool
+UZRectMollerup::converges (const ublas::vector<double>& previous,
+			   const ublas::vector<double>& current) const
+{
+  size_t size = previous.size ();
+  daisy_assert (current.size () == size);
+
+  for (unsigned int i = 0; i < size; i++)
+    {
+      if (   fabs (current[i] - previous[i]) > max_absolute_difference
+	  && (   iszero (previous[i])
+              || iszero (current[i])
+	      || (  fabs ((current[i] - previous[i]) / previous[i])
+		  > max_relative_difference)))
+	return false;
+    }
+  return true;
+}
+
+
+
+
+
 void 
-UZRectMollerup::lowerboundary (matrix<double>& Dm_mat, 
-			       std::vector<double>& Dm_vec, 
-			       std::vector<double>& Gm, 
-			       std::vector<double>& B, 
+UZRectMollerup::lowerboundary (ublas::matrix<double>& Dm_mat, 
+			       ublas::vector<double>& Dm_vec, 
+			       ublas::vector<double>& Gm, 
+			       ublas::vector<double>& B, 
 			       const size_t cell_size, 
 			       const Groundwater::bottom_t boundtype,
-			       const std::vector<double>& K)
+			       const ublas::vector<double>& K)
 {
 #if 0
 
@@ -192,45 +330,73 @@ UZRectMollerup::upperboundary ()
 {}
 
 void 
-UZRectMollerup::diffusion (const GeometryRect& geo)
+UZRectMollerup::diffusion (const GeometryRect& geo,
+			   const ublas::vector<double>& Kedge,
+			   ublas::matrix<double>& diff)
 {
-  const size_t cell_size = geo.cell_size (); // number of cells 
-  
-
-
-
-
-  //Initialize diffusive matrix
-  matrix<double> diff (cell_size, cell_size); //zeros????
-
-
-
-
-
-
-
-
+  const size_t edge_size = geo.edge_size (); // number of edges  
+    
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      if (geo.edge_is_internal (e))
+	{
+	  const int from = geo.edge_from (e);
+	  const int to = geo.edge_to (e);	   
+	  const double magnitude = geo.edge_area_per_length (e) * Kedge[e]; 
+	  diff (from, from) -= magnitude;
+	  diff (from, to) += magnitude;
+	  diff (to, to) -= magnitude;
+	  diff (to, from) += magnitude;   
+	} 
+    }
 }
 
-
-
-
-
 void 
-UZRectMollerup::gravitation ()
-{}
+UZRectMollerup::gravitation (const GeometryRect& geo,
+			     const ublas::vector<double>& Kedge,
+			     ublas::vector<double>& grav)
+{
+  const size_t edge_size = geo.edge_size (); // number of edges  
 
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      if (geo.edge_is_internal (e))
+	{
+	  const int from = geo.edge_from (e);
+	  const int to = geo.edge_to (e);	   
+	  const double magnitude = geo.edge_area (e) * Kedge[e];
+	  const double sin_angle =  geo.edge_sin_angle (e);
+	  const double value = magnitude * sin_angle;
+	  grav[from] += value;
+	  grav[to] -= value;
+	} 
+    }
+}
 
 void 
 UZRectMollerup::has_macropores (const bool)
 { /* Ignore for now. */ }
 
 void 
-UZRectMollerup::load_syntax (Syntax&, AttributeList&)
-{ }
+UZRectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
+{ 
+  syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
+Maximum number of iterations when seeking convergence before reducing\n\
+the time step.");
+  alist.add ("max_iterations", 12);
+  syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
+Maximum absolute difference in 'h' values for convergence.");
+  alist.add ("max_absolute_difference", 0.02);
+  syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
+Maximum relative difference in 'h' values for convergence.");
+  alist.add ("max_relative_difference", 0.001); 
+}
 
 UZRectMollerup::UZRectMollerup (Block& al)
-  : UZRect (al)
+  : UZRect (al),
+    max_iterations (al.integer ("max_iterations")),
+    max_absolute_difference (al.number ("max_absolute_difference")),
+    max_relative_difference (al.number ("max_relative_difference"))
 { }
 
 UZRectMollerup::~UZRectMollerup ()
