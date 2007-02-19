@@ -88,7 +88,7 @@ public:
   virtual int edge_to (size_t) const = 0; // Cell where edge leads.
   inline bool edge_is_internal (size_t e) // Edge does not lead out of volume.
   { return cell_is_internal (edge_from (e))
-      && cell_is_internal (edge_from (e)); }
+      && cell_is_internal (edge_to (e)); }
   virtual double edge_area (size_t) const = 0; // Area connecting the cells.
   bool edge_cross_z (size_t e, double z) const; // Cross depth?
   virtual double edge_center_z (size_t e) const = 0;

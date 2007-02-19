@@ -262,6 +262,8 @@ GeometryRect::GeometryRect (Block& al)
         {
           const int from = edge_from (e);
           const int to = edge_to (e);
+          daisy_assert (to >= 0 && to <= z_.size ());
+          daisy_assert (from >= 0 && from <= z_.size ());
           const double dz = z (to) - z (from);
           const double dx = x (to) - x (from);
           const double length = std::sqrt (sqr (dx) + sqr (dz));
