@@ -200,8 +200,14 @@ endif
 
 CSHARP = /cygdrive/C/WINDOWS/Microsoft.NET/Framework/v2.0.50727/csc.exe
 
-csdaisy.exe:	csmain.cs
-	$(CSHARP) /out:csdaisy.exe csmain.cs
+csdaisy.exe:	csmain.cs csdaisy.netmodule
+	$(CSHARP) /out:csdaisy.exe /addmodule:csdaisy.netmodule csmain.cs 
+
+csdaisy.dll: csdaisy.cs
+	$(CSHARP) /target:library csdaisy.cs
+
+csdaisy.netmodule: csdaisy.cs
+	$(CSHARP) /target:module csdaisy.cs
 
 # Construct the compile command.
 #
