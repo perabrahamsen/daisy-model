@@ -37,12 +37,15 @@
 #include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/banded.hpp>
 #include <boost/numeric/ublas/lu.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 namespace ublas = boost::numeric::ublas;
 
 struct UZRectMollerup : public UZRect
 {
   // Parameters.  
+  const int max_time_step_reductions;
+  const int time_step_reduction;
   const int max_iterations; 
   const double max_absolute_difference;
   const double max_relative_difference;  
@@ -155,6 +158,13 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
       Theta_previous = Theta;  
       ublas::vector<double> h_conv;
 
+      std::ostringstream tmp;
+      tmp << "Time left = " << time_left << ", ddt = " << ddt 
+	  << ", iteration = " << iterations_used << "\n";
+      tmp << "h = " << h << "\n";
+      tmp << "Theta = " << Theta;
+      msg.message (tmp.str ());
+
       do // Start iteration loop
 	{
 	  h_conv = h;
@@ -217,6 +227,13 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 	  for (int c=0; c < cell_size; c++) // update Theta - maybe not neccessary???
 	    Theta (c) = soil.Theta (c, h (c), h_ice (c)); 
 
+	  std::ostringstream tmp;
+	  tmp << "Time left = " << time_left << ", ddt = " << ddt 
+	      << ", iteration = " << iterations_used << "\n";
+	  tmp << "h = " << h << "\n";
+	  tmp << "Theta = " << Theta;
+	  msg.message (tmp.str ());
+
 	}
       while (!converges (h_conv, h)
 	     && iterations_used <= max_iterations);
@@ -243,7 +260,7 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 	      iterations_with_this_time_step = 0;
 	      ddt *= time_step_reduction;
 	    }
-
+	}
       // End of small time step.
     }
 
@@ -380,6 +397,13 @@ UZRectMollerup::has_macropores (const bool)
 void 
 UZRectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  syntax.add ("max_time_step_reductions",
+              Syntax::Integer, Syntax::Const, "\
+Number of times we may reduce the time step before giving up");
+  alist.add ("max_time_step_reductions", 4);
+  syntax.add ("time_step_reduction", Syntax::Integer, Syntax::Const, 
+              "Divide the time step with this at each reduction.");
+  alist.add ("time_step_reduction", 4);
   syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
 Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
@@ -394,6 +418,8 @@ Maximum relative difference in 'h' values for convergence.");
 
 UZRectMollerup::UZRectMollerup (Block& al)
   : UZRect (al),
+    max_time_step_reductions (al.integer ("max_time_step_reductions")),
+    time_step_reduction (al.integer ("time_step_reduction")),
     max_iterations (al.integer ("max_iterations")),
     max_absolute_difference (al.number ("max_absolute_difference")),
     max_relative_difference (al.number ("max_relative_difference"))
