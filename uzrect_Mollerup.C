@@ -134,7 +134,7 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
       h[cell] =  soil_water.h (cell);
       h_ice[cell] = soil_water.h_ice (cell);
       S[cell] =  soil_water.S_sum (cell);
-      T[cell] = soil_heat.T (cell); 
+      T[cell] = 20; //soil_heat.T (cell); 
     }
 
 
@@ -154,16 +154,16 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
       if (ddt > time_left)
 	ddt = time_left;
 
-      h_previous = h;
-      Theta_previous = Theta;  
-      ublas::vector<double> h_conv;
-
       std::ostringstream tmp;
       tmp << "Time left = " << time_left << ", ddt = " << ddt 
 	  << ", iteration = " << iterations_used << "\n";
       tmp << "h = " << h << "\n";
-      tmp << "Theta = " << Theta;
-      msg.message (tmp.str ());
+      tmp << "Theta = " << Theta << "\n";
+	  msg.message (tmp.str ());
+
+      h_previous = h;
+      Theta_previous = Theta;  
+      ublas::vector<double> h_conv;
 
       do // Start iteration loop
 	{
@@ -185,11 +185,14 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 	    }
 	  
 	  //Initialize diffusive matrix
-	  ublas::matrix<double> diff (cell_size, cell_size); //zeros???? - check ublas
+	  ublas::matrix<double> diff (cell_size, cell_size);
+	  diff = ublas::zero_matrix<double> (cell_size, cell_size);
 	  diffusion (geo, Kedge, diff);
+
 
 	  //Initialize gravitational matrix
 	  ublas::vector<double> grav (cell_size); //ublass compatibility
+	  grav = ublas::zero_vector<double> (cell_size);
 	  gravitation (geo, Kedge, grav);
 	  	  
 	  //Initialize water capacity  matrix
@@ -214,6 +217,7 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 	  //b = sumvec + (1.0 / ddt) * (Qmatrix * Cw * h + Qmatrix *(Wxx-Wyy));
 	  b = sumvec + (1.0 / ddt) * (prod (prod (Qmat, Cw),  h) + prod (Qmat, Theta_previous-Theta));
 
+
 	  // Any drain ?
 
 	  // Solve Ax=b (maybe)
@@ -231,7 +235,7 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 	  tmp << "Time left = " << time_left << ", ddt = " << ddt 
 	      << ", iteration = " << iterations_used << "\n";
 	  tmp << "h = " << h << "\n";
-	  tmp << "Theta = " << Theta;
+	  tmp << "Theta = " << Theta << "\n";
 	  msg.message (tmp.str ());
 
 	}
@@ -267,6 +271,8 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
   // Make it official.
   for (size_t cell = 0; cell != cell_size ; ++cell) 
     soil_water.set_content (cell, h[cell], Theta[cell]);
+  for (size_t edge = 0; edge != edge_size ; ++edge) 
+    soil_water.set_flux (edge, 0.0);
 
   // End of large time step.
 }
@@ -363,7 +369,7 @@ UZRectMollerup::diffusion (const GeometryRect& geo,
 	  diff (from, from) -= magnitude;
 	  diff (from, to) += magnitude;
 	  diff (to, to) -= magnitude;
-	  diff (to, from) += magnitude;   
+	  diff (to, from) += magnitude; 
 	} 
     }
 }
