@@ -203,6 +203,9 @@ CSHARP = /cygdrive/C/WINDOWS/Microsoft.NET/Framework/v2.0.50727/csc.exe
 csdaisy.exe:	csmain.cs csdaisy.netmodule
 	$(CSHARP) /out:csdaisy.exe /addmodule:csdaisy.netmodule csmain.cs 
 
+csdaisydll.exe:	csmain.cs csdaisy.dll
+	$(CSHARP) /out:csdaisy.exe /r:csdaisy.dll csmain.cs 
+
 csdaisy.dll: csdaisy.cs
 	$(CSHARP) /target:library csdaisy.cs
 
