@@ -59,20 +59,20 @@ struct UZRectMollerup : public UZRect
   // Internal functions.
   bool converges (const ublas::vector<double>& previous,
 		  const ublas::vector<double>& current) const;
-  void lowerboundary (ublas::matrix<double>& Dm_mat, 
-			       ublas::vector<double>& Dm_vec, 
-			       ublas::vector<double>& Gm, 
-			       ublas::vector<double>& B, 
-			       const size_t cell_size, 
-			       const Groundwater::bottom_t boundtype,
-			       const ublas::vector<double>& K);
+  void lowerboundary (const GeometryRect& geo,
+		      const Groundwater::bottom_t boundtype,
+		      const ublas::vector<double>& K,
+		      ublas::matrix<double>& Dm_mat, 
+		      ublas::vector<double>& Dm_vec, 
+		      ublas::vector<double>& Gm, 
+		      ublas::vector<double>& B) const;
   void upperboundary ();
   void diffusion (const GeometryRect& geo,
 		  const ublas::vector<double>& Kedge,
-		  ublas::matrix<double>& diff);
+		  ublas::matrix<double>& diff) const;
   void gravitation (const GeometryRect& geo,
 		    const ublas::vector<double>& Kedge,
-		    ublas::vector<double>& grav);  
+		    ublas::vector<double>& grav) const;  
 
 
 
@@ -106,27 +106,13 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
   ublas::vector<double> S (cell_size); // sink term
   ublas::vector<double> T (cell_size); // temperature 
   ublas::vector<double> K (cell_size); // hydraulic conductivity
-  ublas::vector<double> Kedge (edge_size); // edge (inter cell) conductivity     
-
+  ublas::vector<double> Kedge (edge_size); // edge (inter cell) conductivity
 
   //Make Qmat area diagonal matrix 
   ublas::banded_matrix<double> Qmat (cell_size, cell_size, 0, 0);
   for (int c = 0; c < cell_size; c++)
     Qmat (c, c) = geo.cell_volume (c);
  
-
-
-
-
-
-
-#if 0
-  ublas::matrix<double>  Dm_mat (cell_size,0.0); // upper Dir bc  	      
-  ublas::vector<double>  Dm_vec (cell_size,0.0); // upper Dir bc
-  ublas::vector<double>  Gm (cell_size,0.0); // upper Dir bc
-  ublas::vector<double>  B (cell_size,0.0); // upper Neu bc 
-#endif
-
   // make vectors 
   for (size_t cell = 0; cell != cell_size ; ++cell) 
     {				
@@ -134,7 +120,7 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
       h[cell] =  soil_water.h (cell);
       h_ice[cell] = soil_water.h_ice (cell);
       S[cell] =  soil_water.S_sum (cell);
-      T[cell] = 20; //soil_heat.T (cell); 
+      T[cell] = soil_heat.T (cell); 
     }
 
 
@@ -157,9 +143,10 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
       std::ostringstream tmp;
       tmp << "Time left = " << time_left << ", ddt = " << ddt 
 	  << ", iteration = " << iterations_used << "\n";
+      tmp << "T = " << T << "\n";
       tmp << "h = " << h << "\n";
       tmp << "Theta = " << Theta << "\n";
-	  msg.message (tmp.str ());
+      msg.message (tmp.str ());
 
       h_previous = h;
       Theta_previous = Theta;  
@@ -189,12 +176,23 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 	  diff = ublas::zero_matrix<double> (cell_size, cell_size);
 	  diffusion (geo, Kedge, diff);
 
-
 	  //Initialize gravitational matrix
 	  ublas::vector<double> grav (cell_size); //ublass compatibility
 	  grav = ublas::zero_vector<double> (cell_size);
 	  gravitation (geo, Kedge, grav);
-	  	  
+
+	  // Boundary matrices and vectors
+	  ublas::matrix<double>  Dm_mat (cell_size, cell_size); // Dir bc
+	  Dm_mat = ublas::zero_matrix<double> (cell_size, cell_size);
+	  ublas::vector<double>  Dm_vec (cell_size); // Dir bc
+	  Dm_vec = ublas::zero_vector<double> (cell_size);
+	  ublas::vector<double> Gm (cell_size); // Dir bc
+	  Gm = ublas::zero_vector<double> (cell_size);
+	  ublas::vector<double> B (cell_size); // Neu bc 
+	  B = ublas::zero_vector<double> (cell_size);
+	  lowerboundary (geo, groundwater.bottom_type (), K, 
+			 Dm_mat, Dm_vec, Gm, B);
+
 	  //Initialize water capacity  matrix
 	  ublas::banded_matrix<double> Cw (cell_size, cell_size, 0, 0);
 	  for (size_t c = 0; c < cell_size; c++)
@@ -206,16 +204,17 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 
 	  //Initialize sum vector
 	  ublas::vector<double> sumvec (cell_size);  
-	  sumvec = grav; 
+	  sumvec = grav + B; 
 
 	  //Initialize A-matrix
 	  ublas::matrix<double> A (cell_size, cell_size);  
-	  A = (1.0 / ddt)*prod(Qmat, Cw)-summat;  
+	  A = (1.0 / ddt) * prod (Qmat, Cw) - summat;  
 
 	  //Initialize b-vector
 	  ublas::vector<double> b (cell_size);  
 	  //b = sumvec + (1.0 / ddt) * (Qmatrix * Cw * h + Qmatrix *(Wxx-Wyy));
-	  b = sumvec + (1.0 / ddt) * (prod (prod (Qmat, Cw),  h) + prod (Qmat, Theta_previous-Theta));
+	  b = sumvec + (1.0 / ddt) * (prod (prod (Qmat, Cw),  h) 
+				      + prod (Qmat, Theta_previous-Theta));
 
 
 	  // Any drain ?
@@ -302,50 +301,30 @@ UZRectMollerup::converges (const ublas::vector<double>& previous,
 
 
 void 
-UZRectMollerup::lowerboundary (ublas::matrix<double>& Dm_mat, 
+UZRectMollerup::lowerboundary (const GeometryRect& geo,
+			       const Groundwater::bottom_t boundtype,
+			       const ublas::vector<double>& K,
+			       ublas::matrix<double>& Dm_mat, 
 			       ublas::vector<double>& Dm_vec, 
 			       ublas::vector<double>& Gm, 
-			       ublas::vector<double>& B, 
-			       const size_t cell_size, 
-			       const Groundwater::bottom_t boundtype,
-			       const ublas::vector<double>& K)
+			       ublas::vector<double>& B) const
 {
-#if 0
+  const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
 
-
-
-// Initialise vectors+matrices 
-for (size_t i = 0; i !=cell_size ; ++i) 
-    {				
-      for (size_t j = 0; j !=cell_size ; ++j)
+  switch (boundtype)
+    {
+    case Groundwater::free_drainage:
+      for (size_t e = 0; e < edge_below.size (); e++)
 	{
-	  Dm_mat[i,j] = 0.0;
+	  const int cell = geo.edge_other (e, Geometry::cell_below);
+	  B (cell) = - K[cell] * geo.edge_area (e);
 	}
-      Dm_vec[i] = 0.0; 
-      Gm[i] = 0.0;
-      B[i] = 0.0;
-     }
-
-
-switch boundtype
- 
-case 'pressure' 
-
-case 'lysimeter'
-
-case 'forced_flux'
-
-case 'free_drainage'
-
-
-
-if neumanntype
-
-
-
-
-
-#endif
+      break;
+    case Groundwater::pressure:
+    case Groundwater::lysimeter:
+    case Groundwater::forced_flux:
+      throw "Don't know how to handle this groundwater type";
+    }
 }
 
 void 
@@ -355,7 +334,7 @@ UZRectMollerup::upperboundary ()
 void 
 UZRectMollerup::diffusion (const GeometryRect& geo,
 			   const ublas::vector<double>& Kedge,
-			   ublas::matrix<double>& diff)
+			   ublas::matrix<double>& diff) const
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
     
@@ -377,7 +356,7 @@ UZRectMollerup::diffusion (const GeometryRect& geo,
 void 
 UZRectMollerup::gravitation (const GeometryRect& geo,
 			     const ublas::vector<double>& Kedge,
-			     ublas::vector<double>& grav)
+			     ublas::vector<double>& grav) const
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
 
