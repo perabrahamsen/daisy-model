@@ -46,6 +46,8 @@ struct Surface::Implementation
   const double albedo_wet;
   const double albedo_dry;
   const double lake;
+  const bool use_forced_flux;
+  const double forced_flux_value;
   double pond;
   IM im_flux;
   double EvapSoilSurface;
@@ -92,6 +94,9 @@ Surface::top_type (const Geometry& geo, size_t edge) const
 {
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
 
+  if (impl.use_forced_flux)
+    return forced_flux;
+
   if (impl.ridge_)
     return soil;
 
@@ -109,10 +114,13 @@ Surface::q_top (const Geometry& geo, const size_t edge, const double dt) const
 {
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
 
+  if (impl.use_forced_flux)
+    return impl.forced_flux_value * 0.1; // mm -> cm.
+
   if (impl.ridge_)
     return -impl.ridge_->h () / dt;
   else
-    return -ponding () * 0.1 / dt;		// mm -> cm.
+    return -ponding () * 0.1 / dt; // mm -> cm.
 }
   
 double
@@ -552,11 +560,26 @@ Surface::get_chemical (symbol name) const // [g/cm^2]
   return impl.chemicals_storage.amount (name) * 1.0e-4;		
 }
 
+static bool
+check_alist (const AttributeList& al, Treelog& msg)
+{
+  bool ok = true;
+
+  if (al.check ("forced_flux") && al.number ("lake") >= 0)
+    {
+      msg.error ("Can't have both 'lake' and 'forced_flux'");
+      ok = false;
+    }
+
+  return ok;
+}
+
 void
 Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   alist.add ("submodel", "Surface");
   alist.add ("description", "Keep track of things on the soil surface.");
+  syntax.add_check (check_alist);
   syntax.add ("EpFactor", Syntax::None (), Check::non_negative (), 
 	      Syntax::Const,
 	      "Convertion of reference evapotranspiration to\n\
@@ -581,6 +604,8 @@ soil immediately, even when there is no precipitation.");
   syntax.add ("lake", "mm", Syntax::Const, "\
 Set this to a positive number to force a permanent pressure top.");
   alist.add ("lake", -1.0);
+  syntax.add ("forced_flux", "mm/h", Syntax::OptionalConst, "\
+Set this to force a permanent flux top.  Positive upwards (exfiltration).");
   syntax.add ("pond", "mm", Syntax::State, "\
 Amount of ponding on the surface.\n\
 Negative numbers indicate soil exfiltration.");
@@ -635,6 +660,8 @@ Surface::Implementation::Implementation (const AttributeList& al)
     albedo_wet (al.number ("albedo_wet")),
     albedo_dry (al.number ("albedo_dry")),
     lake (al.number ("lake")),
+    use_forced_flux (al.check ("forced_flux")),
+    forced_flux_value (al.number ("forced_flux", -42.42e42)),
     pond (al.number ("pond")),
     im_flux (),
     EvapSoilSurface (0.0),

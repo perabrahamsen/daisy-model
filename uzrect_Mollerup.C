@@ -59,20 +59,27 @@ struct UZRectMollerup : public UZRect
   // Internal functions.
   bool converges (const ublas::vector<double>& previous,
 		  const ublas::vector<double>& current) const;
-  void lowerboundary (const GeometryRect& geo,
-		      const Groundwater::bottom_t boundtype,
-		      const ublas::vector<double>& K,
-		      ublas::matrix<double>& Dm_mat, 
-		      ublas::vector<double>& Dm_vec, 
-		      ublas::vector<double>& Gm, 
-		      ublas::vector<double>& B) const;
-  void upperboundary ();
-  void diffusion (const GeometryRect& geo,
-		  const ublas::vector<double>& Kedge,
-		  ublas::matrix<double>& diff) const;
-  void gravitation (const GeometryRect& geo,
-		    const ublas::vector<double>& Kedge,
-		    ublas::vector<double>& grav) const;  
+  static void lowerboundary (const GeometryRect& geo,
+			     const Groundwater&,
+			     const ublas::vector<double>& K,
+			     ublas::matrix<double>& Dm_mat, 
+			     ublas::vector<double>& Dm_vec, 
+			     ublas::vector<double>& Gm, 
+			     ublas::vector<double>& B);
+  static void upperboundary (const GeometryRect& geo,
+			     const Surface& surface,
+			     const ublas::vector<double>& K,
+			     ublas::matrix<double>& Dm_mat, 
+			     ublas::vector<double>& Dm_vec, 
+			     ublas::vector<double>& Gm, 
+			     ublas::vector<double>& B,
+			     const double dt);
+  static void diffusion (const GeometryRect& geo,
+			 const ublas::vector<double>& Kedge,
+			 ublas::matrix<double>& diff);
+  static void gravitation (const GeometryRect& geo,
+			   const ublas::vector<double>& Kedge,
+			   ublas::vector<double>& grav);  
 
 
 
@@ -143,7 +150,6 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
       std::ostringstream tmp;
       tmp << "Time left = " << time_left << ", ddt = " << ddt 
 	  << ", iteration = " << iterations_used << "\n";
-      tmp << "T = " << T << "\n";
       tmp << "h = " << h << "\n";
       tmp << "Theta = " << Theta << "\n";
       msg.message (tmp.str ());
@@ -190,8 +196,8 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 	  Gm = ublas::zero_vector<double> (cell_size);
 	  ublas::vector<double> B (cell_size); // Neu bc 
 	  B = ublas::zero_vector<double> (cell_size);
-	  lowerboundary (geo, groundwater.bottom_type (), K, 
-			 Dm_mat, Dm_vec, Gm, B);
+	  lowerboundary (geo, groundwater, K, Dm_mat, Dm_vec, Gm, B);
+	  upperboundary (geo, surface, K, Dm_mat, Dm_vec, Gm, B, dt);
 
 	  //Initialize water capacity  matrix
 	  ublas::banded_matrix<double> Cw (cell_size, cell_size, 0, 0);
@@ -233,6 +239,7 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 	  std::ostringstream tmp;
 	  tmp << "Time left = " << time_left << ", ddt = " << ddt 
 	      << ", iteration = " << iterations_used << "\n";
+	  tmp << "B = " << B << "\n";
 	  tmp << "h = " << h << "\n";
 	  tmp << "Theta = " << Theta << "\n";
 	  msg.message (tmp.str ());
@@ -302,39 +309,82 @@ UZRectMollerup::converges (const ublas::vector<double>& previous,
 
 void 
 UZRectMollerup::lowerboundary (const GeometryRect& geo,
-			       const Groundwater::bottom_t boundtype,
+			       const Groundwater& groundwater,
 			       const ublas::vector<double>& K,
 			       ublas::matrix<double>& Dm_mat, 
 			       ublas::vector<double>& Dm_vec, 
 			       ublas::vector<double>& Gm, 
-			       ublas::vector<double>& B) const
+			       ublas::vector<double>& B)
 {
   const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
+  const size_t edge_below_size = edge_below.size ();
 
-  switch (boundtype)
+  switch (groundwater.bottom_type ())
     {
     case Groundwater::free_drainage:
-      for (size_t e = 0; e < edge_below.size (); e++)
+      for (size_t i = 0; i < edge_below_size; i++)
 	{
-	  const int cell = geo.edge_other (e, Geometry::cell_below);
-	  B (cell) = - K[cell] * geo.edge_area (e);
+	  const int edge = edge_below[i];
+	  const int cell = geo.edge_other (edge, Geometry::cell_below);
+	  B (cell) = - K (cell) * geo.edge_area (edge);
+	}
+      break;
+    case Groundwater::forced_flux:
+      for (size_t i = 0; i < edge_below_size; i++)
+	{
+	  const int edge = edge_below[i];
+	  const int cell = geo.edge_other (edge, Geometry::cell_below);
+	  B (cell) = groundwater.q_bottom () * geo.edge_area (edge);
 	}
       break;
     case Groundwater::pressure:
     case Groundwater::lysimeter:
-    case Groundwater::forced_flux:
       throw "Don't know how to handle this groundwater type";
+    default:
+      daisy_panic ("Unknown groundwater type");
     }
 }
 
 void 
-UZRectMollerup::upperboundary ()
-{}
+UZRectMollerup::upperboundary (const GeometryRect& geo,
+			       const Surface& surface,
+			       const ublas::vector<double>& K,
+			       ublas::matrix<double>& Dm_mat, 
+			       ublas::vector<double>& Dm_vec, 
+			       ublas::vector<double>& Gm, 
+			       ublas::vector<double>& B,
+			       const double dt)
+{
+  const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const int edge = edge_above[i];
+      const int cell = geo.edge_other (edge, Geometry::cell_above);
+
+      switch (surface.top_type (geo, edge))
+	{
+	case Surface::forced_flux: 
+	  const double q = surface.q_top (geo, edge, dt);
+	  B (cell) = - q * geo.edge_area (edge);
+	  break;
+	case Surface::forced_pressure:
+	  
+	  break;
+	case Surface::limited_water:
+	case Surface::soil:
+	  throw "Don't know how to handle this surface type";
+	default:
+	  daisy_panic ("Unknown surface type");
+	}
+    }
+}
 
 void 
 UZRectMollerup::diffusion (const GeometryRect& geo,
 			   const ublas::vector<double>& Kedge,
-			   ublas::matrix<double>& diff) const
+			   ublas::matrix<double>& diff)
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
     
@@ -356,7 +406,7 @@ UZRectMollerup::diffusion (const GeometryRect& geo,
 void 
 UZRectMollerup::gravitation (const GeometryRect& geo,
 			     const ublas::vector<double>& Kedge,
-			     ublas::vector<double>& grav) const
+			     ublas::vector<double>& grav)
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
 

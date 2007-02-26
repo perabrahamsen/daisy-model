@@ -174,9 +174,12 @@ GeometryRect::GeometryRect (Block& al)
     {
       // Top edge.
       size_t last_cell = cell_above;
-      
+      double last_z = -z_center[0];
+
       for (size_t row = 0; row < cell_rows (); row++)
         {
+	  const double next_z = z_center[row];
+
           // Cell
           zplus_.push_back (z_end[row]);
           z_.push_back (z_center[row]);
@@ -195,15 +198,18 @@ GeometryRect::GeometryRect (Block& al)
           edge_from_.push_back (next_cell);
           edge_to_.push_back (last_cell);
           edge_area_.push_back (x_distance[column]);
+	  edge_length_.push_back (last_z - next_z);
+	  daisy_assert (last_z - next_z > 0.0);
           edge_center_z_.push_back (row == 0 ? 0.0 : z_end[row - 1]);
           edge_center_x_.push_back (x_center[column]);
           std::vector<int> corners;
           corners.push_back (corner_index (row, column    )); // W
           corners.push_back (corner_index (row, column + 1)); // E
           edge_corners_.push_back (corners);
-
+	  
           // Next cell.
           daisy_assert (next_cell == cell_index (row, column));
+	  last_z = next_z;
           last_cell = next_cell;
           next_cell++;
         }
@@ -212,6 +218,7 @@ GeometryRect::GeometryRect (Block& al)
       edge_from_.push_back (cell_below);
       edge_to_.push_back (last_cell);
       edge_area_.push_back (x_distance[column]);
+      edge_length_.push_back (2.0 * (last_z - z_end[cell_rows () - 1]));
       edge_center_z_.push_back (z_end[cell_rows () - 1]);
       edge_center_x_.push_back (x_center[column]);
       std::vector<int> corners;
@@ -220,20 +227,25 @@ GeometryRect::GeometryRect (Block& al)
       edge_corners_.push_back (corners);
     }
   daisy_assert (next_cell == cell_size ());
+  edge_sin_angle_.insert (edge_sin_angle_.end (), edge_from_.size (), 1.0);
 
   // Horizontal edges.
   for (size_t row = 0; row < cell_rows (); row++)
     {
       edge_center_x_.push_back (0.0);
+      double last_x = -x_center[0];
       edge_from_.push_back (cell_left);
       for (size_t column = 0; column < cell_columns (); column++)
         {
+	  const double next_x = x_center[row];
           edge_to_.push_back (cell_index (row, column));
           std::vector<int> corners;
           corners.push_back (corner_index (row    , column)); // W
           corners.push_back (corner_index (row + 1, column)); // W
           edge_corners_.push_back (corners);
           edge_center_x_.push_back (x_end[column]);
+	  edge_length_.push_back (next_x - last_x);
+	  last_x = next_x;
           edge_from_.push_back (cell_index (row, column));
         }
       edge_to_.push_back (cell_right);
@@ -241,10 +253,13 @@ GeometryRect::GeometryRect (Block& al)
       corners.push_back (corner_index (row    , cell_columns ())); // W
       corners.push_back (corner_index (row + 1, cell_columns ())); // W
       edge_corners_.push_back (corners);
+      edge_length_.push_back (2.0 * (x_end[cell_columns () - 1] - last_x));
       edge_area_.insert (edge_area_.end (), edge_columns (), z_distance[row]);
       edge_center_z_.insert (edge_center_z_.end (), edge_columns (), 
                              z_center[row]);
     }
+  edge_sin_angle_.insert (edge_sin_angle_.end (),
+			  edge_from_.size () - edge_sin_angle_.size (), 0.0);
 
   // Cell edges.
   cell_edges_.insert (cell_edges_.end (), cell_pseudo_size (),
@@ -256,28 +271,13 @@ GeometryRect::GeometryRect (Block& al)
     }
 
   // Edges.
+  daisy_assert (edge_area_.size () == edge_size ());
+  daisy_assert (edge_length_.size () == edge_size ());
   for (size_t e = 0; e < edge_size (); e++)
     { 
-      if (edge_is_internal (e))
-        {
-          const int from = edge_from (e);
-          const int to = edge_to (e);
-          daisy_assert (to >= 0 && to <= z_.size ());
-          daisy_assert (from >= 0 && from <= z_.size ());
-          const double dz = z (to) - z (from);
-          const double dx = x (to) - x (from);
-          const double length = std::sqrt (sqr (dx) + sqr (dz));
-          daisy_assert (length > 0.0);
-          edge_length_.push_back (length);
-          edge_area_per_length_.push_back (edge_area (e) / length);
-          edge_sin_angle_.push_back (dz / length);
-        }
-      else
-        {
-          edge_length_.push_back (-42.42e42);
-          edge_area_per_length_.push_back (-42.42e42);
-          edge_sin_angle_.push_back (-42.42e42);
-        }
+      const double length = edge_length (e);
+      daisy_assert (length > 0.0);
+      edge_area_per_length_.push_back (edge_area (e) / length);
     }
 
   // Corners.
