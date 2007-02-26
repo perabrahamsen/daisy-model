@@ -69,7 +69,7 @@ static struct GroundwaterFixedSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Fixed high groundwater level.");
     Groundwater::load_syntax (syntax, alist);
-    syntax.add ("table", "cm", Check::negative (), Syntax::Const,
+    syntax.add ("table", "cm", Check::none (), Syntax::Const,
 		"Groundwater level (a negative number).");
     syntax.order ("table");
     Librarian<Groundwater>::add_type ("fixed", alist, syntax, &make);

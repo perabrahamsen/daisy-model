@@ -206,11 +206,11 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 	  
 	  //Initialize sum matrix
 	  ublas::matrix<double> summat (cell_size, cell_size);  
-	  summat = diff;
+	  summat = diff + Dm_mat;
 
 	  //Initialize sum vector
 	  ublas::vector<double> sumvec (cell_size);  
-	  sumvec = grav + B; 
+	  sumvec = grav + B + Gm + Dm_vec; 
 
 	  //Initialize A-matrix
 	  ublas::matrix<double> A (cell_size, cell_size);  
@@ -338,6 +338,17 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 	}
       break;
     case Groundwater::pressure:
+     for (size_t i = 0; i < edge_below_size; i++)
+	{
+	  const int edge = edge_below[i];
+	  const int cell = geo.edge_other (edge, Geometry::cell_below);
+	  const double value = -K (cell) * geo.edge_area_per_length (edge);
+	  Dm_mat (cell, cell) += value;
+	  const double h_bottom =  groundwater.table () - geo.zplus (cell);
+	  Dm_vec (cell) -= value * h_bottom;
+	  Gm (cell) -= K (cell) * geo.edge_area (edge); 
+	}
+      break;
     case Groundwater::lysimeter:
       throw "Don't know how to handle this groundwater type";
     default:
@@ -370,7 +381,10 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	  B (cell) = - q * geo.edge_area (edge);
 	  break;
 	case Surface::forced_pressure:
-	  
+	  const double value = -K (cell) * geo.edge_area_per_length (edge);
+	  Dm_mat (cell, cell) += value;
+	  Dm_vec (cell) -= value *  surface.h_top (geo, edge, dt);
+	  Gm (cell) += K (cell) * geo.edge_area (edge); 
 	  break;
 	case Surface::limited_water:
 	case Surface::soil:
