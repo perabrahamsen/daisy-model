@@ -563,7 +563,7 @@ check_alist (const AttributeList& al, Treelog& msg)
 {
   bool ok = true;
 
-  if (al.check ("forced_flux") && al.number ("forced_pressure") >= 0)
+  if (al.check ("forced_flux") && al.check ("forced_pressure"))
     {
       msg.error ("Can't have both 'forced_pressure' and 'forced_flux'");
       ok = false;
