@@ -174,7 +174,7 @@ GeometryRect::GeometryRect (Block& al)
     {
       // Top edge.
       size_t last_cell = cell_above;
-      double last_z = -z_center[0];
+      double last_z = 0.0;
 
       for (size_t row = 0; row < cell_rows (); row++)
         {
@@ -218,7 +218,8 @@ GeometryRect::GeometryRect (Block& al)
       edge_from_.push_back (cell_below);
       edge_to_.push_back (last_cell);
       edge_area_.push_back (x_distance[column]);
-      edge_length_.push_back (2.0 * (last_z - z_end[cell_rows () - 1]));
+      const double next_z = z_end[cell_rows () - 1];
+      edge_length_.push_back (last_z - next_z);
       daisy_assert (edge_length_[edge_length_.size () - 1U] > 0.0);
       edge_center_z_.push_back (z_end[cell_rows () - 1]);
       edge_center_x_.push_back (x_center[column]);
@@ -234,7 +235,7 @@ GeometryRect::GeometryRect (Block& al)
   for (size_t row = 0; row < cell_rows (); row++)
     {
       edge_center_x_.push_back (0.0);
-      double last_x = -x_center[0];
+      double last_x = 0.0;
       edge_from_.push_back (cell_left);
       for (size_t column = 0; column < cell_columns (); column++)
         {
@@ -255,7 +256,8 @@ GeometryRect::GeometryRect (Block& al)
       corners.push_back (corner_index (row    , cell_columns ())); // W
       corners.push_back (corner_index (row + 1, cell_columns ())); // W
       edge_corners_.push_back (corners);
-      edge_length_.push_back (2.0 * (x_end[cell_columns () - 1] - last_x));
+      const double next_x = x_end[cell_columns () - 1];
+      edge_length_.push_back (next_x - last_x);
       daisy_assert (edge_length_[edge_length_.size () - 1U] > 0.0);
       edge_area_.insert (edge_area_.end (), edge_columns (), z_distance[row]);
       edge_center_z_.insert (edge_center_z_.end (), edge_columns (), 
