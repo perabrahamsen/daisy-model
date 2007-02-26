@@ -45,7 +45,8 @@ struct Surface::Implementation
   const double EpFactor;
   const double albedo_wet;
   const double albedo_dry;
-  const double lake;
+  const bool use_forced_pressure;
+  const double forced_pressure_value;
   const bool use_forced_flux;
   const double forced_flux_value;
   double pond;
@@ -100,7 +101,7 @@ Surface::top_type (const Geometry& geo, size_t edge) const
   if (impl.ridge_)
     return soil;
 
-  if (impl.lake >= 0.0)
+  if (impl.use_forced_pressure)
     return forced_pressure;
   
   if (impl.pond <= 0.0)
@@ -178,7 +179,7 @@ Surface::Implementation::ridge (const Geometry1D& geo,
 				const AttributeList& al)
 {
   // No permanent ponding.
-  daisy_assert (lake < 0.0);
+  daisy_assert (!use_forced_pressure);
 
   // Get rid of old ridge system.
   if (ridge_)
@@ -244,7 +245,7 @@ void
 Surface::Implementation::exfiltrate (const double water /* [mm] */, 
                                      const double dt /* [h] */, Treelog& msg)
 {
-  if (lake >= 0.0)
+  if (use_forced_pressure)
     return;
 
   if (fabs (water) < 1e-99)
@@ -315,13 +316,10 @@ Surface::ponding () const
 double
 Surface::Implementation::ponding () const
 {
-  if (lake < 0.0)
-    {
-      // daisy_assert (!flux_top ());
-      return pond;
-    }
-  else
-    return lake;
+  if (use_forced_pressure)
+    return forced_pressure_value;
+
+  return pond;
 }
 
 const IM& 
@@ -565,9 +563,9 @@ check_alist (const AttributeList& al, Treelog& msg)
 {
   bool ok = true;
 
-  if (al.check ("forced_flux") && al.number ("lake") >= 0)
+  if (al.check ("forced_flux") && al.number ("forced_pressure") >= 0)
     {
-      msg.error ("Can't have both 'lake' and 'forced_flux'");
+      msg.error ("Can't have both 'forced_pressure' and 'forced_flux'");
       ok = false;
     }
 
@@ -601,9 +599,8 @@ to enter the soil.");
 Set this to true to force all inorganic N on the surface to enter the\n\
 soil immediately, even when there is no precipitation.");
   alist.add ("total_matter_flux", false);
-  syntax.add ("lake", "mm", Syntax::Const, "\
-Set this to a positive number to force a permanent pressure top.");
-  alist.add ("lake", -1.0);
+    syntax.add ("forced_pressure", "mm", Syntax::OptionalConst, "\
+Set this to force a permanent pressure top.");
   syntax.add ("forced_flux", "mm/h", Syntax::OptionalConst, "\
 Set this to force a permanent flux top.  Positive upwards (exfiltration).");
   syntax.add ("pond", "mm", Syntax::State, "\
@@ -659,7 +656,8 @@ Surface::Implementation::Implementation (const AttributeList& al)
     EpFactor (al.number ("EpFactor")),
     albedo_wet (al.number ("albedo_wet")),
     albedo_dry (al.number ("albedo_dry")),
-    lake (al.number ("lake")),
+    use_forced_pressure (al.check ("forced_pressure")),
+    forced_pressure_value (al.number ("forced_pressure", -42.42e42)),
     use_forced_flux (al.check ("forced_flux")),
     forced_flux_value (al.number ("forced_flux", -42.42e42)),
     pond (al.number ("pond")),

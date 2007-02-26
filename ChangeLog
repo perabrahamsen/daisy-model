@@ -1,3 +1,7 @@
+2007-02-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C: Replaced 'lake' with 'forced_pressure'.
+
 2007-02-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* geometry.h (cell_volume): Renamed from 'volume'.
