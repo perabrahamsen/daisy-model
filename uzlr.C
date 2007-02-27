@@ -119,7 +119,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       if (top_type == Surface::forced_pressure)
 	{
 	  const double dz = 0.0 - geo.z (first);
-	  const double dh = top.h_top (geo, top_edge, dt) - h_old[first];
+	  const double dh = top.h_top (geo, top_edge) - h_old[first];
 	  q_up = q[first] = -K_sat * (dh/dz + 1.0);
 	}
       else

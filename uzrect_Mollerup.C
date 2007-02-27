@@ -70,6 +70,7 @@ struct UZRectMollerup : public UZRect
   static void upperboundary (const GeometryRect& geo,
 			     const Surface& surface,
 			     const ublas::vector<double>& remaining_water,
+			     const ublas::vector<double>& h,
 			     const ublas::vector<double>& K,
 			     ublas::matrix<double>& Dm_mat, 
 			     ublas::vector<double>& Dm_vec, 
@@ -212,8 +213,8 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 	  B = ublas::zero_vector<double> (cell_size);
 	  lowerboundary (geo, groundwater, active_lysimeter, 
 			 K, Dm_mat, Dm_vec, Gm, B);
-	  upperboundary (geo, surface, remaining_water, 
-			 K, Dm_mat, Dm_vec, Gm, B, dt);
+	  upperboundary (geo, surface, remaining_water, h,
+			 K, Dm_mat, Dm_vec, Gm, B, ddt);
 
 	  //Initialize water capacity  matrix
 	  ublas::banded_matrix<double> Cw (cell_size, cell_size, 0, 0);
@@ -390,6 +391,7 @@ void
 UZRectMollerup::upperboundary (const GeometryRect& geo,
 			       const Surface& surface,
 			       const ublas::vector<double>& remaining_water,
+			       const ublas::vector<double>& h,
 			       const ublas::vector<double>& K,
 			       ublas::matrix<double>& Dm_mat, 
 			       ublas::vector<double>& Dm_vec, 
@@ -414,18 +416,16 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	case Surface::forced_pressure:
 	  const double value = -K (cell) * geo.edge_area_per_length (edge);
 	  Dm_mat (cell, cell) += value;
-	  Dm_vec (cell) -= value *  surface.h_top (geo, edge, dt);
+	  Dm_vec (cell) -= value *  surface.h_top (geo, edge);
 	  Gm (cell) += K (cell) * geo.edge_area (edge); 
 	  break;
 	case Surface::limited_water:
 	  const double h_top = remaining_water (i);
-	  const double dz = geo.length (edge);
-	  const double K = K (cell);
-	  const double h = h (cell);
+	  const double dz = geo.edge_length (edge);
 	  // Postive upwards.
-	  const double q_avail = -remaining_water / dt;
+	  const double q_avail = -h_top / ddt;
 	  daisy_assert (q_avail <= 0.0);
-	  const double q_pot = -K * (h_top - h + dz) / dz;
+	  const double q_pot = - K (cell) * (h_top - h (cell) + dz) / dz;
 	  // Decide type.
 	  const bool is_flux = -q_pot > -q_avail;
 	  if (is_flux)
