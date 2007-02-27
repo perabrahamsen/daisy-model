@@ -123,7 +123,6 @@ Msoltranrect2x1::flow (const GeometryRect& geo,
                        const double dt,
                        Treelog& msg)
 {
-  const size_t edge_size = geo.edge_size ();
   const size_t cell_size = geo.cell_size ();
 
   // Remember old content for checking mass balance later.
@@ -132,16 +131,18 @@ Msoltranrect2x1::flow (const GeometryRect& geo,
   double out = 0.0; 
 
   // Upper border.
-  for (size_t e = 0; e < edge_size; e++)
+  const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+
+  for (size_t i = 0; i < edge_above_size; i++)
     {
-      if (geo.edge_to (e) == Geometry::cell_above)
-        {
-          const size_t n = geo.edge_from (e);
-          M[n] -= J[e] * geo.edge_area (e) / geo.cell_volume (n);
-          in -= J[e] * geo.edge_area (e);
-        }
-      else
-        daisy_assert (iszero (J[e]));
+      const int edge = edge_above[i];
+      const int cell = geo.edge_other (edge, Geometry::cell_above);
+      
+      const double sin_angle = geo.edge_sin_angle (edge);
+      const double value = J[edge] * geo.edge_area (edge) * sin_angle;
+      M[cell] -=  dt * value / geo.cell_volume (cell);
+      in -= value;
     }
 
   // Cell fluxes.
@@ -168,7 +169,7 @@ Msoltranrect2x1::flow (const GeometryRect& geo,
   const double delta_content = new_content - old_content;
   const double source = geo.total_soil (S);
   // BUG: ASSume uniform boundaries.
-  const double expected = source + in - out;
+  const double expected = (source + in - out) * dt;
   if (!approximate (delta_content, expected)
       && new_content < fabs (expected) * 1e10)
     {
@@ -176,7 +177,7 @@ Msoltranrect2x1::flow (const GeometryRect& geo,
       tmp << __FILE__ << ":" << __LINE__ << ": " << name
           << ": mass balance new - old != source + in - out\n"
           << new_content << " - " << old_content << " != " 
-          << source << " + " << in << " - " << out << " (error "
+          << source * dt << " + " << in * dt << " - " << out * dt << " (error "
           << (delta_content - expected) << ")";
       msg.error (tmp.str ());
     }

@@ -4,8 +4,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Nu 
 
-** Få v+h til at virke med små tidsskridt
-
 ** Scope C API 
 
 ** Omskriv C API så (run foo) virker.
