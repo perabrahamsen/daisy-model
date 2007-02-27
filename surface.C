@@ -111,7 +111,7 @@ Surface::top_type (const Geometry& geo, size_t edge) const
 }
 
 double 
-Surface::q_top (const Geometry& geo, const size_t edge, const double dt) const
+Surface::q_top (const Geometry& geo, const size_t edge) const
 {
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
 
@@ -119,15 +119,15 @@ Surface::q_top (const Geometry& geo, const size_t edge, const double dt) const
     return impl.forced_flux_value * 0.1; // mm -> cm.
 
   if (impl.ridge_)
-    return -impl.ridge_->h () / dt;
+    return -impl.ridge_->h () / 1.0 /* [h] */;
   else
-    return -ponding () * 0.1 / dt; // mm -> cm.
+    return -ponding () * 0.1 / 1.0 /* [h] */; // mm -> cm/h.
 }
   
 double
-Surface::h_top (const Geometry& geo, size_t edge, double dt) const
+Surface::h_top (const Geometry& geo, size_t edge) const
 { 
-  return -q_top (geo, edge, dt) * dt; 
+  return -q_top (geo, edge) * 1.0 /* h */; 
 }
 
 void

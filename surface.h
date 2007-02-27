@@ -42,8 +42,8 @@ public:
   // Communication with soil water.
   enum top_t { forced_pressure, forced_flux, limited_water, soil };
   top_t top_type (const Geometry&, size_t edge) const;
-  double q_top (const Geometry&, size_t edge, double dt) const; // [cm]
-  double h_top (const Geometry&, size_t edge, double dt) const; // [cm]
+  double q_top (const Geometry&, size_t edge) const; // [cm]
+  double h_top (const Geometry&, size_t edge) const; // [cm]
   void accept_top (double amount, const Geometry&, size_t edge, 
                    double dt, Treelog&);
   size_t last_cell (const Geometry&, size_t edge) const;

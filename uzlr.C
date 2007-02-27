@@ -124,7 +124,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	}
       else
         // Limited water or forced flux.
-	q_up = q[first] = max (top.q_top (geo, top_edge, dt), -K_sat);
+	q_up = q[first] = max (top.q_top (geo, top_edge), -K_sat);
     }
 
   //  Use darcy for upward movement in the top.

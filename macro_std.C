@@ -119,7 +119,7 @@ MacroStandard::tick (const Geometry1D& geo,
   if (height_start >= 0.0
       && surface.top_type (geo, 0U) == Surface::limited_water)
     {
-      const double surface_q = surface.q_top (geo, 0U, dt);
+      const double surface_q = surface.q_top (geo, 0U);
       // Empty it.
       if (-surface_q * 10.0 * dt > pond_max)
 	{
