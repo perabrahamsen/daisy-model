@@ -27,10 +27,8 @@ ScopeTable::tick (const Scope&, Treelog&)
 { }
 
 bool 
-ScopeTable::has_number (const symbol tag_symbol) const
+ScopeTable::has_number (const symbol tag) const
 {
-  const std::string& tag = tag_symbol.name ();
-
   const int tag_c = lex.find_tag (tag);
   
   if (tag_c < 0)
@@ -43,10 +41,8 @@ ScopeTable::has_number (const symbol tag_symbol) const
 }
 
 double
-ScopeTable::number (const symbol tag_symbol) const
+ScopeTable::number (const symbol tag) const
 {
-  const std::string& tag = tag_symbol.name ();
-
   const int tag_c = lex.find_tag (tag);
   daisy_assert (tag_c >= 0);
   daisy_assert (values.size () > tag_c);
@@ -54,10 +50,8 @@ ScopeTable::number (const symbol tag_symbol) const
 }    
 
 symbol 
-ScopeTable::dimension (const symbol tag_symbol) const
+ScopeTable::dimension (const symbol tag) const
 {
-  const std::string& tag = tag_symbol.name ();
-
   const int tag_c = lex.find_tag (tag);
   daisy_assert (tag_c >= 0);
   return symbol (lex.dimension (tag_c));
@@ -68,7 +62,8 @@ ScopeTable::set (const std::vector<std::string>& entries)
 { values = entries; }
 
 ScopeTable::ScopeTable (const LexerTable& l)
-  : lex (l)
+  : lex (l),
+    all_numbers_ (l.get_tag_names ())
 { }
 
 ScopeTable::~ScopeTable ()

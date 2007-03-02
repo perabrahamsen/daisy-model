@@ -1,6 +1,6 @@
-// scope_sources.h --- A scope based on a time series.
+// scope_id.h -- A name -> value map.
 // 
-// Copyright 2005 Per Abrahamsen and KVL.
+// Copyright 2004 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,47 +19,32 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef SCOPE_SOURCES_H
-#define SCOPE_SOURCES_H
+#ifndef SCOPE_ID_H
+#define SCOPE_ID_H
 
 #include "scope.h"
-#include "time.h"
-#include <vector>
 
-class Treelog;
-class Source;
-
-class ScopeSources : public Scope
+struct ScopeID : public Scope
 {
   // Content.
-private:
+  const symbol tag;
   std::vector<symbol> all_numbers_;
-  const std::vector<Source*> source;
-  std::vector<int> index;
 public:
-  Time now;
+  double value;
+  symbol dim;
 
   // Interface.
-public:
+private:
   void tick (const Scope&, Treelog&);
   const std::vector<symbol>& all_numbers () const;
-  bool has_number (symbol tag) const;
-  double number (symbol tag) const;
-  symbol dimension (symbol tag) const;
+  bool has_number (symbol name) const;
+  double number (symbol) const;
+  symbol dimension (symbol) const;
 
-  // Propagate.
-  bool load (Treelog& msg);
-  std::string with ();
-
-  // Loop.
-  void first ();
-  bool done ();
-  void next ();
-
-  // Create and Destroy.
+  // Create.
 public:
-  ScopeSources (const std::vector<Source*>& s);
-  ~ScopeSources ();
+  ScopeID (const symbol tag, const symbol dim);
+  ~ScopeID ();
 };
 
-#endif // SCOPE_SOURCES_H
+#endif // SCOPE_ID_H

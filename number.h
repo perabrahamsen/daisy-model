@@ -34,7 +34,7 @@ class Number
 public:
   static const char *const description;
   const symbol name;
-  virtual const std::string& title () const;
+  virtual symbol title () const;
 
   // Simulation.
 protected:

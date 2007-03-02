@@ -27,14 +27,14 @@
 struct SourceStandard : public SourceFile
 {
   // Content.
-  const std::string tag;
-  const std::string title_;
+  const symbol tag;
+  const symbol title_;
   symbol dimension_;
   const bool has_factor;
   const double factor;
 
   // Interface.
-  const std::string& title () const
+  symbol title () const
   { return title_; }
   symbol dimension () const 
   { return dimension_; }
@@ -135,9 +135,9 @@ SourceStandard::load (Treelog& msg)
 
 SourceStandard::SourceStandard (Block& al)
   : SourceFile (al),
-    tag (al.name ("tag")),
-    title_ (al.name ("title", tag)),
-    dimension_ (al.name ("dimension", Syntax::Unknown ())),
+    tag (al.identifier ("tag")),
+    title_ (al.identifier ("title", tag)),
+    dimension_ (al.identifier ("dimension", Syntax::unknown ())),
     has_factor (al.check ("factor")),
     factor (al.number ("factor", 1.0))
 { }

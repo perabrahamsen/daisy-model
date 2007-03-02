@@ -46,7 +46,7 @@ struct ConditionExtern : public Condition
 
     if (state == uninitialized)
       {
-        extern_scope = find_extern_scope (extern_name);
+        extern_scope = extern_scope_find (extern_name);
         if (!extern_scope)
           msg.error ("No extern log named '" + extern_name + "' found");
         if (!expr->initialize (msg)

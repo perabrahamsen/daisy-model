@@ -610,7 +610,7 @@ daisy_column_get_temperature_at (const daisy_column* column,
 EXPORT double                            /* [cm³ H2O/cm³/h] */
 daisy_column_get_crop_h2o_uptake_at (const daisy_column* column,
 				     unsigned int index);
-#endif // EXCOM
+#endif /* EXCOM */
 
 /* @ The daisy_chemical Type.
  *
@@ -623,19 +623,30 @@ daisy_chemical_find (const char* name);
 EXPORT double				/* The crop uptake reflection factor. */
 daisy_chemical_reflection_factor (const daisy_chemical* chemical);
 
-// @ The daisy_scope Type.
-//
-// Extract information from the 'extern' log model.
-const daisy_scope* EXPORT		// Return scope named NAME.
-daisy_scope_find_extern (const char* name);
+/* @ The daisy_scope Type.
+ *
+ * Extract information from the 'extern' log model.
+ */
 
-const int EXPORT	// check if NAME is defined in SCOPE.
+EXPORT unsigned int             /* Return number of extern scopes */
+daisy_scope_extern_size ();
+
+EXPORT const daisy_scope*       /* Return extern scope INDEX. */
+daisy_scope_extern_get (const unsigned int index);
+
+EXPORT unsigned int             /* Number of numbers in SCOPE. */
+daisy_scope_number_size (const daisy_scope* scope);
+
+EXPORT const char*              /* Name of number INDEX in SCOPE. */
+daisy_scope_number_name (const daisy_scope* scope, const unsigned int index);
+
+EXPORT const int              /* check if NAME is defined in SCOPE. */
 daisy_scope_has_number (const daisy_scope* scope, const char* name);
 
-const double EXPORT	// Return NUMBER of NAME defined in SCOPE.
+EXPORT const double      /* Return NUMBER of NAME defined in SCOPE. */
 daisy_scope_number (const daisy_scope* scope, const char* name);
 
-const char* EXPORT	// Return UNITS of NAME defined in SCOPE.
+EXPORT const char*        /* Return UNITS of NAME defined in SCOPE. */
 daisy_scope_dimension (const daisy_scope* scope, const char* name);
 
 /* @ Miscellaneous.
@@ -660,14 +671,4 @@ daisy_version (void);
 }
 #endif
   */
-#endif // CDAISY_H
-
-/* @ Emacs Information.
- *
- * Local Variables:
- * mode: C
- * mode: outline-minor
- * outline-regexp: "/\\* @+"
- * outline-level: outline-level
- * End:
- */
+#endif /* CDAISY_H */

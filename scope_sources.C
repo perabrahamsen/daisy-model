@@ -30,11 +30,13 @@ void
 ScopeSources::tick (const Scope&, Treelog&)
 { }
 
-bool 
-ScopeSources::has_number (const symbol tag_symbol) const
-{
-  const std::string& tag = tag_symbol.name ();
+const std::vector<symbol>& 
+ScopeSources::all_numbers () const
+{ return all_numbers_; }
 
+bool 
+ScopeSources::has_number (const symbol tag) const
+{
   for (size_t i = 0; i < source.size (); i++)
     if (source[i]->title () == tag 
         && (index[i] < 0
@@ -46,10 +48,8 @@ ScopeSources::has_number (const symbol tag_symbol) const
 }
 
 double 
-ScopeSources::number (const symbol tag_symbol) const
+ScopeSources::number (const symbol tag) const
 {
-  const std::string& tag = tag_symbol.name ();
-
   for (size_t i = 0; i < source.size (); i++)
     if (source[i]->title () == tag)
       {
@@ -61,10 +61,8 @@ ScopeSources::number (const symbol tag_symbol) const
 }
 
 symbol 
-ScopeSources::dimension (const symbol tag_symbol) const
+ScopeSources::dimension (const symbol tag) const
 {
-  const std::string& tag = tag_symbol.name ();
-
   for (size_t i = 0; i < source.size (); i++)
     if (source[i]->title () == tag)
       return symbol (source[i]->dimension ());
@@ -136,9 +134,12 @@ ScopeSources::next ()
 
 ScopeSources::ScopeSources (const std::vector<Source*>& s)
   : source (s),
-     index (s.size (), -1),
-     now (1, 1, 1, 0)
-{ }
+    index (s.size (), -1),
+    now (1, 1, 1, 0)
+{ 
+  for (size_t i = 0; i < source.size (); i++)
+    all_numbers_.push_back (source[i]->title ());
+}
 
 ScopeSources::~ScopeSources ()
 { sequence_delete (source.begin (), source.end ()); }

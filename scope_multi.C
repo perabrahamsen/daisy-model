@@ -25,6 +25,10 @@ void
 ScopeMulti::tick (const Scope&, Treelog&)
 { daisy_panic ("ScopeMulti should not tick."); }
 
+const std::vector<symbol>& 
+ScopeMulti::all_numbers () const
+{ return all_numbers_; }
+
 bool 
 ScopeMulti::has_number (const symbol tag) const
 {
@@ -59,6 +63,13 @@ ScopeMulti::ScopeMulti (const Scope& first, const Scope& second)
 { 
   scopes.push_back (&first);
   scopes.push_back (&second);
+
+  for (size_t i = 0; i < scopes.size (); i++)
+    {
+      const std::vector<symbol>& child = scopes[i]->all_numbers ();
+      for (size_t j = 0; j < child.size (); j++)
+        all_numbers_.push_back (child[j]);
+    }
 }
 
 ScopeMulti::~ScopeMulti ()

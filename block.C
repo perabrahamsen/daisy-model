@@ -33,10 +33,12 @@ class ScopeBlock : public Scope
   // Content.
 private:
   Block& block;
-  
+
   // Interface.
 public:
   void tick (const Scope&, Treelog&);
+  const std::vector<symbol>& all_numbers () const
+  { return Scope::null ().all_numbers (); }
   bool has_number (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;
@@ -475,6 +477,10 @@ Block::name (const std::string& key, const std::string& default_value)
 symbol 
 Block::identifier (const std::string& key)
 { return symbol (name (key)); }
+
+symbol
+Block::identifier (const std::string& key, const symbol default_value)
+{ return check (key) ? identifier (key) : default_value; }
 
 bool 
 Block::flag (const std::string& key) const

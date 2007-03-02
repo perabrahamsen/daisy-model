@@ -58,6 +58,7 @@ public:
   const std::string name (const std::string&, 
 			  const std::string& default_value);
   symbol identifier (const std::string&);
+  symbol identifier (const std::string&, symbol default_value);
   bool flag (const std::string&) const;
   bool flag (const std::string&, bool default_value) const;
   const PLF& plf (const std::string&) const;

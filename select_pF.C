@@ -31,6 +31,9 @@ using namespace std;
 
 struct SelectPF : public Select
 {
+  type_t type () const
+  { return NumberSequence; }
+
   // Content.
   const double max_h;
   vector<double> value;		// Total array.

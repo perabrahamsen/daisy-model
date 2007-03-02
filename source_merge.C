@@ -33,7 +33,7 @@ struct SourceMerge : public Source
 {
   // Content.
   const std::vector<Source*> source;
-  const std::string title_;
+  const symbol title_;
   symbol dimension_;
   std::string with_;
   const int style_;
@@ -54,7 +54,7 @@ public:
   { return values; }
   const std::vector<double>& ebar () const
   { return ebars; }
-  const std::string& title () const
+  symbol title () const
   { return title_; }
   symbol dimension () const 
   { return dimension_; }

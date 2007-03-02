@@ -53,6 +53,7 @@ struct NumberLet : public Number
     }; 
     std::vector<Clause*> clause;
 
+    std::vector<symbol> all_numbers_;
     typedef std::map<symbol, double> number_map;
     number_map numbers;
     typedef std::map<symbol, symbol> symbol_map;
@@ -78,6 +79,9 @@ struct NumberLet : public Number
             }
         }
     }
+    const std::vector<symbol>& all_numbers () const
+    { return all_numbers_; }
+    
     bool has_number (symbol id) const
     {
       const number_map::const_iterator i = numbers.find (id);
@@ -107,6 +111,7 @@ struct NumberLet : public Number
           Treelog::Open nest (msg, tmp.str ());
           if (!clause[i]->expr->initialize (msg))
             ok = false;
+          all_numbers_.push_back (clause[i]->id);
         }
       return ok;
     }

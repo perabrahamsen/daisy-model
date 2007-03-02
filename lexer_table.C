@@ -32,7 +32,7 @@
 class LexerTable::Filter
 {
 public:
-  const std::string tag;
+  const symbol tag;
 private:
   const std::vector<std::string> allowed;
 public:
@@ -123,14 +123,17 @@ LexerTable::read_header (Treelog& msg)
   lex->skip_space ();
 
   // Read tags.
-  get_entries_raw (tag_names);
-  for (int count = 0; count < tag_names.size (); count++)
+  std::vector<std::string> tag_names_raw;
+  get_entries_raw (tag_names_raw);
+  for (int count = 0; count < tag_names_raw.size (); count++)
     {
-      const std::string candidate = tag_names[count];
+      const std::string name = tag_names_raw[count];
+      const symbol candidate (name);
+      tag_names.push_back (candidate);
       if (tag_pos.find (candidate) == tag_pos.end ())
         tag_pos[candidate] = count;
       else
-	warning ("Duplicate tag: '" + candidate + "'");
+	warning ("Duplicate tag: '" + name + "'");
     }
 
   // Time tags.
@@ -154,12 +157,19 @@ LexerTable::read_header (Treelog& msg)
   
   // Read dimensions.
   if (dim_line)
-    get_entries_raw (dim_names);
+    {
+      std::vector<std::string> dim_names_raw;
+      get_entries_raw (dim_names_raw);
+      dim_names.clear ();
+      for (size_t i = 0; i < dim_names_raw.size (); i++)
+        dim_names.push_back (symbol (dim_names_raw[i]));
+      daisy_assert (dim_names_raw.size () == dim_names.size ());
+    }
   else switch (original.size ())
     {
     case 0:
       dim_names.insert (dim_names.end (), tag_names.size (), 
-                        Syntax::Unknown ());
+                        Syntax::unknown ());
       break;
     case 1:
       dim_names.insert (dim_names.end (), tag_names.size (),
@@ -186,7 +196,7 @@ LexerTable::type () const
 { return type_; }
 
 int
-LexerTable::find_tag (const std::string& tag) const
+LexerTable::find_tag (const symbol tag) const
 {
   if (tag_pos.find (tag) == tag_pos.end ())
     return -1;
@@ -194,13 +204,13 @@ LexerTable::find_tag (const std::string& tag) const
 }
 
 int
-LexerTable::find_tag (const std::string& tag1, const std::string& tag2) const
+LexerTable::find_tag (const symbol tag1, const symbol tag2) const
 {
   int result = find_tag (tag1);
   return result < 0 ? find_tag (tag2) : result;
 }
 
-const std::string& 
+symbol
 LexerTable::dimension (size_t tag_c) const
 { 
   daisy_assert (tag_c < dim_names.size ());
@@ -466,8 +476,8 @@ LexerTable::LexerTable (Block& al)
     hour_c (-42),
     time_c (-42),
     original (al.check ("original")
-	      ? al.name_sequence ("original")
-	      : std::vector<std::string> ()),
+	      ? al.identifier_sequence ("original")
+	      : std::vector<symbol> ()),
     dim_line (al.flag ("dim_line", !al.check ("original")))
 { }
 

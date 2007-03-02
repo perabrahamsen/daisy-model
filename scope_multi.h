@@ -30,10 +30,12 @@ class ScopeMulti : public Scope
   // Content.
 private:
   std::vector<const Scope*> scopes;
-  
+  std::vector<symbol> all_numbers_;
+
   // Interface.
 public:
   void tick (const Scope&, Treelog&);
+  const std::vector<symbol>& all_numbers () const;
   bool has_number (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;

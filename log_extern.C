@@ -33,9 +33,7 @@ struct LogExtern : public LogSelect,
 		   public Scope
 {
   // Global register.
-  typedef std::map<symbol, const Scope*> log_extern_map_type; 
-  static log_extern_map_type* log_extern_map;
-  static int log_extern_count;
+  static std::vector<const LogExtern*> log_extern_table;
 
   // Destination Content.
   typedef enum { Error, Missing, Number, Name, Array } type;
@@ -50,9 +48,10 @@ struct LogExtern : public LogSelect,
   array_map arrays;
   int_map sizes;
   name_map dimensions;
-  
+  std::vector<symbol> all_numbers_;
+
   // Log.
-  symbol tag;
+  symbol last_done;
   void done (const Time&, double dt);
   bool initial_match (const Daisy&, Treelog&)
     // No initial line.
@@ -70,6 +69,7 @@ struct LogExtern : public LogSelect,
 
   // Scope
   void tick (const Scope&, Treelog&);
+  const std::vector<symbol>& all_numbers () const;
   bool has_number (symbol) const;
   double number (symbol) const;
   symbol dimension (symbol) const;
@@ -86,8 +86,7 @@ struct LogExtern : public LogSelect,
   ~LogExtern ();
 };
 
-LogExtern::log_extern_map_type* LogExtern::log_extern_map = NULL;
-int LogExtern::log_extern_count = 0;
+std::vector<const LogExtern*> LogExtern::log_extern_table;
 
 void 
 LogExtern::done (const Time& time, const double dt)
@@ -97,9 +96,9 @@ LogExtern::done (const Time& time, const double dt)
   if (!is_printing)
     return;
 
-  for (unsigned int i = 0; i < entries.size (); i++)
+  for (size_t i = 0; i < entries.size (); i++)
     {
-      tag = entries[i]->tag ();
+      last_done = entries[i]->tag ();
       entries[i]->done (dt);
     }
 }
@@ -126,61 +125,47 @@ LogExtern::output (Log& log) const
 void 
 LogExtern::error ()
 { 
-  types[tag] = Error;
+  types[last_done] = Error;
 }
 
 void 
 LogExtern::missing ()
 { 
-  types[tag] = Missing;
+  types[last_done] = Missing;
 }
 
 void 
 LogExtern::add (const std::vector<double>& value)
 { 
-  types[tag] = Array;
-  arrays[tag] = &value;
+  types[last_done] = Array;
+  arrays[last_done] = &value;
 }
 
 void 
 LogExtern::add (double value)
 { 
-  types[tag] = Number;
-  numbers[tag] = value;
+  types[last_done] = Number;
+  numbers[last_done] = value;
 }
 
 void 
 LogExtern::add (symbol value)
 { 
-  types[tag] = Name;
-  names[tag] = value;
+  types[last_done] = Name;
+  names[last_done] = value;
 }
 
 void 
 LogExtern::tick (const Scope&, Treelog&)
 { }
 
+const std::vector<symbol>&
+LogExtern::all_numbers () const
+{ return all_numbers_; }
+
 bool 
 LogExtern::has_number (symbol tag) const
 { return lookup (tag) == Number; }
-
-#if 0
-bool 
-LogExtern::has_number (symbol tag) const
-{ 
-  const type_map::const_iterator i = types.find (tag);
-  if (i != types.end ())
-    return (*i).second == Number;
-
-  // For initialization, we need to claim we have a number before it is ready.
-
-  const int_map::const_iterator j = sizes.find (tag);
-  if (i != types.end ())
-    return (*i).second == Syntax::Singleton;
-
-  return false; 
-}
-#endif
 
 double 
 LogExtern::number (symbol tag) const
@@ -237,15 +222,15 @@ LogExtern::array (symbol tag) const
 void 
 LogExtern::initialize (Treelog&)
 {
-  for (unsigned int i = 0; i < entries.size (); i++)
+  for (size_t i = 0; i < entries.size (); i++)
     {
-      tag = entries[i]->tag ();
-      sizes[tag] = entries[i]->size ();
+      const Select::type_t type = entries[i]->type ();
+      const symbol tag = entries[i]->tag ();
+      const int size = entries[i]->size ();
+      sizes[tag] = size;
+      if (type == Select::NumberSingleton)
+        all_numbers_.push_back (tag);
       dimensions[tag] = entries[i]->dimension ();
-#if 0
-      if (entries[i]->has_default_value ())
-        numbers[tag] = entries[i]->default_value ();
-#endif 
     }
 }
 
@@ -264,35 +249,15 @@ LogExtern::LogExtern (Block& al)
         }
     }
 
-  for (unsigned int i = 0; i < entries.size (); i++)
+  for (size_t i = 0; i < entries.size (); i++)
     entries[i]->add_dest (this);
 
   // Register extern access.
-  const symbol name = al.check ("where") 
-    ? al.identifier ("where") 
-    : al.identifier ("type");
-
-  if (!log_extern_map)
-    {
-      daisy_assert (log_extern_count == 0);
-      log_extern_map = new log_extern_map_type;
-    }
-  (*log_extern_map)[name] = this;
-  log_extern_count++;
+  log_extern_table.push_back (this);
 }
 
 LogExtern::~LogExtern ()
-{
-  
-  // Unregister extern access.
-  daisy_assert (log_extern_count > 0);
-  log_extern_count--;
-  if (log_extern_count == 0)
-    {
-      delete log_extern_map;
-      log_extern_map = NULL;
-    }
-}
+{ }
 
 static struct LogExternSyntax
 {
@@ -323,12 +288,31 @@ By default, use the model name.");
 } LogExtern_syntax;
 
 // Extern access.
-const Scope*
-find_extern_scope (const symbol name)
+size_t
+extern_scope_size ()
 { 
-  if (!LogExtern::log_extern_map)
-    return NULL;
-  if (LogExtern::log_extern_count < 1)
-    return NULL;
-  return (*LogExtern::log_extern_map)[name];
+  return LogExtern::log_extern_table.size ();
+}
+
+const Scope*
+extern_scope_get (size_t i)
+{ 
+  daisy_assert (i < LogExtern::log_extern_table.size ());
+  return LogExtern::log_extern_table[i];
+}
+
+const Scope*
+extern_scope_find (const symbol target)
+{ 
+  for (size_t i = 0; i < LogExtern::log_extern_table.size (); i++)
+    {
+      const LogExtern* scope = LogExtern::log_extern_table[i];
+      const symbol name = scope->alist.check ("where") 
+        ? scope->alist.identifier ("where") 
+        : scope->alist.identifier ("type");
+
+      if (name == target)
+        return scope;
+    }
+  return NULL;
 }

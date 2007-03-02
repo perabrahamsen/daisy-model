@@ -23,6 +23,7 @@
 #define LEXER_TABLE_H
 
 #include "block.h"
+#include "symbol.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -41,8 +42,8 @@ private:
   std::string field_sep;
   std::string type_;
   const std::vector<std::string> missing;
-  std::vector<std::string> tag_names;
-  std::map<std::string,int> tag_pos;
+  std::vector<symbol> tag_names;
+  std::map<symbol,int> tag_pos;
   std::vector<size_t> fil_col;
   struct Filter;
   std::vector<const Filter*> filter;
@@ -51,19 +52,25 @@ private:
   int mday_c;
   int hour_c;
   int time_c;
-  const std::vector<std::string> original;
+  const std::vector<symbol> original;
   const bool dim_line;
-  std::vector<std::string> dim_names;
+  std::vector<symbol> dim_names;
   
   // Use.
 public:
   bool good ();
   bool read_header (Treelog& msg);
   const std::string& type () const;
-  const std::string& dimension (size_t tag_c) const;
-  int find_tag (const std::string& tag) const;
+  symbol dimension (size_t tag_c) const;
+  const std::vector<symbol>& get_tag_names () const
+  { return tag_names; }
+  int find_tag (const char *const tag) const
+  { return find_tag (symbol (tag)); }
+  int find_tag (const symbol tag) const;
 private:
-  int find_tag (const std::string& tag1, const std::string& tag2) const;
+  int find_tag (const char *const tag1, const char *const tag2) const
+  { return find_tag (symbol (tag1), symbol (tag2)); }
+  int find_tag (const symbol tag1, const symbol tag2) const;
 private:
   std::string get_entry () const;
   void get_entries_raw (std::vector<std::string>& entries) const;

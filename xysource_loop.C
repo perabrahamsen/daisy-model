@@ -22,7 +22,7 @@
 #include "block.h"
 #include "alist.h"
 #include "gnuplot_utils.h"
-#include "scope.h"
+#include "scope_id.h"
 #include "number.h"
 #include "check.h"
 #include "vcheck.h"
@@ -44,29 +44,7 @@ class XYSourceLoop : public XYSource
   const double begin;
   const double end;
   const double step;
-  class ScopeT : public Scope
-  {
-    const symbol tag;
-    const symbol dim;
-  public:
-    double value;
-
-  private:
-    void tick (const Scope&, Treelog&)
-    { }
-    bool has_number (symbol t) const
-    { return tag == t; }
-    double number (symbol) const
-    { return value; }
-    symbol dimension (symbol) const
-    { return dim; }
-
-  public:
-    ScopeT (const std::string& t, const std::string& d)
-      : tag (t),
-        dim (d)
-    { }
-  } scope;
+  ScopeID scope;
   
   // Interface.
 public:
@@ -152,7 +130,7 @@ XYSourceLoop::XYSourceLoop (Block& al)
     begin (al.number ("begin")),
     end (al.number ("end")),
     step (al.number ("step")),
-    scope (al.name ("tag"), al.name ("begin"))
+    scope (al.identifier ("tag"), al.identifier ("begin"))
 { }
 
 XYSourceLoop::~XYSourceLoop ()

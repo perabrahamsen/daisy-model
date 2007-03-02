@@ -26,11 +26,9 @@
 #include "symbol.h"
 
 struct Scope;
-struct Treelog;
 
-extern const Scope* find_extern_scope (symbol name);
-extern const int daisy_scope_has_number (const Scope* scope, symbol name);
-extern const double daisy_scope_number (const Scope* scope, symbol name);
-extern const char* daisy_scope_dimension (const Scope* scope, symbol name);
+extern size_t extern_scope_size ();
+extern const Scope* extern_scope_get (size_t i);
+extern const Scope* extern_scope_find (symbol);
 
 #endif // LOG_EXTERN_H

@@ -53,7 +53,7 @@ struct BooleanExtern : public Boolean
   bool initialize (Treelog& msg)
   {
     Treelog::Open nest (msg, name + ": " + extern_name);
-    extern_scope = find_extern_scope (extern_name);
+    extern_scope = extern_scope_find (extern_name);
     return expr->initialize (msg);
   }
   bool check (const Scope& inherit_scope, Treelog& msg) const

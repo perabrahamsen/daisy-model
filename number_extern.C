@@ -32,8 +32,8 @@ struct NumberExtern : public Number
   const Scope* extern_scope;
   std::auto_ptr<Number> expr;
 
-  const std::string& title () const
-  { return extern_name.name (); }
+  symbol title () const
+  { return extern_name; }
   void tick (const Scope& scope, Treelog& msg)
   { expr->tick (scope, msg); }
   bool missing (const Scope& inherit_scope) const 
@@ -59,7 +59,7 @@ struct NumberExtern : public Number
   bool initialize (Treelog& msg)
   {
     Treelog::Open nest (msg, name + ": " + extern_name);
-    extern_scope = find_extern_scope (extern_name);
+    extern_scope = extern_scope_find (extern_name);
     return expr->initialize (msg);
   }
   bool check (const Scope& inherit_scope, Treelog& msg) const

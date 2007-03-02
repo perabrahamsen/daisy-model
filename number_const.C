@@ -93,8 +93,8 @@ struct NumberGet : public NumberLeaf
 {
   // Parameters.
   const symbol name;
-  const std::string& title () const
-  { return name.name (); }
+  symbol title () const
+  { return name; }
 
   // Simulation.
   bool missing (const Scope& scope) const
@@ -155,8 +155,8 @@ struct NumberFetch : public Number
   const symbol name;
   const double *const default_value;
   const symbol default_dimension;
-  const std::string& title () const
-  { return name.name (); }
+  symbol title () const
+  { return name; }
 
   static double* fetch_default_value (Block& al, const symbol key_symbol)
   {

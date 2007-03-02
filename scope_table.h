@@ -33,11 +33,15 @@ class ScopeTable : public Scope
   // Content.
 private:
   const LexerTable& lex;
+  const std::vector<symbol> all_numbers_;
+
   std::vector<std::string> values;
   
   // Interface.
 public:
   void tick (const Scope&, Treelog&);
+  const std::vector<symbol>& all_numbers () const
+  { return all_numbers_; }
   bool has_number (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;

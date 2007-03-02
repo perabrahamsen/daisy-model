@@ -34,7 +34,7 @@ struct NumberSource : public Number
   enum { uninitialized, error, is_missing, has_value } state;
   double val;
 
-  const std::string& title () const
+  symbol title () const
   {
     daisy_assert (state != uninitialized);
     return source->title ();

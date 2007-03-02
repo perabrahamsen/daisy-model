@@ -27,12 +27,12 @@ struct SourceExpr : public SourceFile
 {
   // Content.
   const std::auto_ptr<Number> expr;
-  const std::string title_;
+  const symbol title_;
   symbol dimension_;
 
   // Interface.
 public:
-  const std::string& title () const
+  symbol title () const
   { return title_; }
   symbol dimension () const 
   { return dimension_; }
@@ -101,7 +101,7 @@ SourceExpr::load (Treelog& msg)
 SourceExpr::SourceExpr (Block& al)
   : SourceFile (al),
     expr (Librarian<Number>::build_item (al, "expr")),
-    title_ (al.name ("title", expr->title ())),
+    title_ (al.identifier ("title", expr->title ())),
     dimension_ ("UNINITIALIZED")
 { }
 

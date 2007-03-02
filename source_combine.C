@@ -31,7 +31,7 @@ struct SourceCombine : public Source
   // Content.
   ScopeSources scope;
   const std::auto_ptr<Number> expr;
-  const std::string title_;
+  const symbol title_;
   symbol dimension_;
   std::string with_;
   const int style_;
@@ -50,7 +50,7 @@ public:
   { return values; }
   const std::vector<double>& ebar () const
   { daisy_notreached (); }
-  const std::string& title () const
+  symbol title () const
   { return title_; }
   symbol dimension () const 
   { return dimension_; }
@@ -107,7 +107,7 @@ SourceCombine::SourceCombine (Block& al)
   : Source (al),
     scope (Librarian<Source>::build_vector (al, "source")),
     expr (Librarian<Number>::build_item (al, "expr")),
-    title_ (al.name ("title", expr->title ())),
+    title_ (al.identifier ("title", expr->title ())),
     dimension_ ("UNINITIALIZED"),
     with_ (al.name ("with", "")),
     style_ (al.integer ("style", -1))

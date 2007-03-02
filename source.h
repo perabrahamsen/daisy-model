@@ -33,7 +33,7 @@ public:
 
   // Interface.
 public:
-  virtual const std::string& title () const = 0;
+  virtual symbol title () const = 0;
   virtual symbol dimension () const = 0;
   virtual const std::string& with () const = 0;
   virtual int style () const = 0;

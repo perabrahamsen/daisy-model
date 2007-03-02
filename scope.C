@@ -27,6 +27,11 @@ struct ScopeNull : public Scope
   // Use.
   void tick (const Scope&, Treelog&)
   { }
+  const std::vector<symbol>& all_numbers () const
+  {
+    static std::vector<symbol> all_numbers_;
+    return all_numbers_; 
+  }
   bool has_number (symbol) const
   { return false; }
   double number (symbol) const
@@ -53,3 +58,5 @@ Scope::Scope ()
 
 Scope::~Scope ()
 { }
+
+// scope.C ends here

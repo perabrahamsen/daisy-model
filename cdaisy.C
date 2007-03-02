@@ -955,11 +955,25 @@ daisy_chemical_reflection_factor (const Chemical* chemical)
 // @ The daisy_scope Type.
 //
 // Extract information from the 'extern' log model.
-extern "C" const Scope* EXPORT		// Return scope named NAME.
-daisy_scope_find_extern (const char* name)
+extern "C" unsigned int EXPORT  // Return number of extern scopes
+daisy_scope_extern_size ()
 {
-  return find_extern_scope (symbol (name));
+  return extern_scope_size ();
 }
+
+extern "C" const Scope* EXPORT  // Return extern scope INDEX.
+daisy_scope_extern_get (const unsigned int index)
+{
+  return extern_scope_get (index);
+}
+
+extern "C" unsigned int EXPORT // Number of numbers in SCOPE.
+daisy_scope_number_size (const Scope *const scope)
+{ return scope->all_numbers ().size (); }
+
+extern const char* EXPORT       // Name of number INDEX in SCOPE.
+daisy_scope_number_name (const Scope *const scope, const unsigned int index)
+{ return scope->all_numbers ()[index].name ().c_str (); }
 
 extern "C" const int EXPORT	// check if NAME is defined in SCOPE.
 daisy_scope_has_number (const Scope* scope, const char* name)

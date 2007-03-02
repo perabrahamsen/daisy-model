@@ -1,4 +1,25 @@
-2007-02-27  mmo  <mmo@mmo203550.agsci.kvl.dk>
+2007-03-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+	
+	* scope_id.C, scope_id.h: New utility.
+	* Makefile (OTHER): Add it.
+	* xysource_loop.C, select.C: Use it.
+
+	* scope.h (all_numbers): New abstract member.
+	* scope.C (ScopeNull): Implement it.
+	* block.C (ScopeBlock): Implement it.
+	* number_lisp.C (NumberLet): Implement it.
+	* select.C (ScopeX): Implement it.
+	* log_extern.C (LogExtern): Implement it.
+
+	* select.h (type): New virtual member function.
+
+	* cdaisy.C, cdaisy.h (daisy_scope_extern_size)
+	(daisy_scope_extern_get): New functions.
+	(daisy_scope_find_extern): Removed.
+	* log_extern.C (extern_scope_size, extern_scope_get): New functions.
+	(find_extern_scope): Removed.
+
+2007-02-27  Mikkel Mollerup  <mmo@life.ku.dk>
 
 	* groundwater_flux.C: New model.
 

@@ -23,6 +23,7 @@
 #define SCOPE_H
 
 #include "symbol.h"
+#include <vector>
 
 class Treelog;
 
@@ -31,6 +32,7 @@ class Scope
   // Use.
 public:
   virtual void tick (const Scope& scope, Treelog& msg) = 0;
+  virtual const std::vector<symbol>& all_numbers () const = 0;
   virtual bool has_number (symbol) const = 0;
   virtual double number (symbol) const = 0;
   virtual symbol dimension (symbol) const = 0;

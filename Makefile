@@ -407,7 +407,7 @@ SPECIALS = geometry_vert.C gnuplot_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = librarian.C scope_multi.C \
+OTHER = scope_id.C librarian.C scope_multi.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
@@ -1110,11 +1110,11 @@ library${OBJ}: library.C library.h symbol.h block.h syntax.h treelog.h plf.h \
   alist.h assertion.h memutils.h options.h
 plf${OBJ}: plf.C plf.h assertion.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
-cdaisy${OBJ}: cdaisy.C block.h syntax.h treelog.h symbol.h plf.h library.h \
-  alist.h daisy.h program.h librarian.h assertion.h time.h parser_file.h \
-  parser.h field.h border.h column.h weather.h im.h action.h horizon.h \
-  printer_file.h printer.h version.h options.h chemical.h log_extern.h \
-  treelog_stream.h
+cdaisy${OBJ}: cdaisy.C scope.h symbol.h block.h syntax.h treelog.h plf.h \
+  library.h alist.h daisy.h program.h librarian.h assertion.h time.h \
+  parser_file.h parser.h field.h border.h column.h weather.h im.h \
+  action.h horizon.h printer_file.h printer.h version.h options.h \
+  chemical.h log_extern.h treelog_stream.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
@@ -1133,8 +1133,8 @@ cropNdist_uniform${OBJ}: cropNdist_uniform.C cropNdist.h librarian.h symbol.h \
   assertion.h alist.h mathlib.h check.h block.h syntax.h treelog.h plf.h
 uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h librarian.h symbol.h \
   assertion.h geometry_rect.h geometry_vert.h geometry.h syntax.h \
-  treelog.h mathlib.h soil_water.h groundwater.h surface.h uzmodel.h \
-  alist.h
+  treelog.h mathlib.h soil.h horizon.h soil_water.h soil_heat.h \
+  groundwater.h surface.h uzmodel.h block.h plf.h alist.h
 uzrect_2x1${OBJ}: uzrect_2x1.C uzrect.h librarian.h symbol.h assertion.h \
   uzmodel.h uz1d.h geometry_rect.h geometry_vert.h geometry.h syntax.h \
   treelog.h mathlib.h soil.h horizon.h soil_water.h soil_heat.h \
@@ -1573,7 +1573,7 @@ bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h symbol.h \
   assertion.h alist.h library.h block.h syntax.h treelog.h plf.h \
   surface.h uzmodel.h weather.h im.h geometry.h mathlib.h soil.h \
   horizon.h soil_heat.h snow.h log.h border.h pet.h difrad.h raddist.h \
-  svat.h vegetation.h chemicals.h time.h
+  svat.h vegetation.h chemicals.h time.h check.h fao.h
 condition_crop${OBJ}: condition_crop.C condition.h librarian.h symbol.h \
   assertion.h block.h syntax.h treelog.h plf.h crop.h time.h alist.h \
   field.h border.h daisy.h program.h check_range.h check.h mathlib.h

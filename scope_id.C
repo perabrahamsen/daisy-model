@@ -1,7 +1,6 @@
-// select_value.h --- Select a state variable.
+// scope_id.C -- A name -> value map.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2004 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,30 +18,40 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef SELECT_VALUE_H
-#define SELECT_VALUE_H
 
-#include "select.h"
+#include "scope_id.h"
+#include "assertion.h"
 
-class SelectValue : public Select
-{
-  // Content.
-private:
-  type_t type () const
-  { return NumberSingleton; }
+void 
+ScopeID::tick (const Scope&, Treelog&)
+{ }
 
-protected:
-  double value;	
-  void add_result (double result);
+const std::vector<symbol>& 
+ScopeID::all_numbers () const
+{ return all_numbers_; }
 
-  // Output routines.
-public:
-  void done (double dt);
+bool 
+ScopeID::has_number (symbol name) const
+{ return name == tag; }
 
-  // Create and Destroy.
-public:
-  static void load_syntax (Syntax&, AttributeList&);
-  SelectValue (Block& al);
-};
+double 
+ScopeID::number (symbol) const
+{ return value; }
 
-#endif /* SELECT_VALUE_H */
+symbol 
+ScopeID::dimension (symbol) const
+{ return dim;}
+
+ScopeID::ScopeID (const symbol name, const symbol d)
+  : tag (name),
+    value (-42.42e42),
+    dim (d)
+{ 
+  if (all_numbers_.size () < 1)
+    all_numbers_.push_back (tag);
+}
+
+ScopeID::~ScopeID ()
+{ daisy_assert (all_numbers_.size () == 1); }
+
+// scope_id.C ends here

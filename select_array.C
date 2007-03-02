@@ -28,6 +28,9 @@
 
 struct SelectArray : public Select
 {
+  type_t type () const
+  { return NumberSequence; }
+
   // Content.
   std::vector<double> value;		// Total array.
   std::vector<double> result;        // For logging (needs to be persistent!).

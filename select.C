@@ -23,7 +23,7 @@
 #include "block.h"
 #include "geometry.h"
 #include "number.h"
-#include "scope.h"
+#include "scope_id.h"
 #include "library.h"
 #include "alist.h"
 #include "check.h"
@@ -97,33 +97,8 @@ struct Select::Implementation
   std::auto_ptr<Spec> spec;
 
   // We need a scope for the expression.
-  mutable struct ScopeX : public Scope
-  {
-    // Content.
-    double value;
-    symbol dim;
-
-    // Interface.
-    void tick (const Scope&, Treelog&)
-    { }
-    bool has_number (symbol name) const
-    {
-      static const symbol x_symbol ("x");
-      return name == x_symbol; 
-    }
-    double number (symbol) const
-    { return value; }
-    symbol dimension (symbol) const
-    { return dim;}
-
-    // Create.
-    ScopeX ()
-      : value (-42.42e42),
-        dim (Syntax::Unknown ())
-    { }
-  } scope;
+  mutable ScopeID scope;
     
-
   // Content.
   const Units::Convert* spec_conv; // Convert value.
   std::auto_ptr<Number> expr;   // - || -
@@ -401,9 +376,9 @@ Select::Implementation::get_expr (Block& al)
     bool missing (const Scope&) const
     { return false; }
     double value (const Scope& scope) const
-    { return static_cast<const ScopeX&> (scope).value * factor; }
+    { return static_cast<const ScopeID&> (scope).value * factor; }
     symbol dimension (const Scope& scope) const
-    { return static_cast<const ScopeX&> (scope).dim; }
+    { return static_cast<const ScopeID&> (scope).dim; }
     bool initialize (Treelog&)
     { return true; }
     bool check (const Scope&, Treelog&) const
@@ -423,9 +398,9 @@ Select::Implementation::get_expr (Block& al)
     bool missing (const Scope&) const
     { return false; }
     double value (const Scope& scope) const
-    { return static_cast<const ScopeX&> (scope).value * factor + offset; }
+    { return static_cast<const ScopeID&> (scope).value * factor + offset; }
     symbol dimension (const Scope& scope) const
-    { return static_cast<const ScopeX&> (scope).dim; }
+    { return static_cast<const ScopeID&> (scope).dim; }
     bool initialize (Treelog&)
     { return true; }
     bool check (const Scope&, Treelog&) const
@@ -453,9 +428,9 @@ Select::Implementation::get_expr (Block& al)
     bool missing (const Scope&) const
     { return false; }
     double value (const Scope& scope) const
-    { return static_cast<const ScopeX&> (scope).value; }
+    { return static_cast<const ScopeID&> (scope).value; }
     symbol dimension (const Scope& scope) const
-    { return static_cast<const ScopeX&> (scope).dim; }
+    { return static_cast<const ScopeID&> (scope).dim; }
     bool initialize (Treelog&)
     { return true; }
     bool check (const Scope&, Treelog&) const
@@ -473,6 +448,7 @@ Select::Implementation::Implementation (Block& al)
   : spec (al.check ("spec")
 	  ? new Spec (al.alist ("spec")) 
 	  : NULL),
+    scope (symbol ("x"), Syntax::unknown ()),
     spec_conv (NULL),
     expr (get_expr (al)),
     negate (al.flag ("negate")

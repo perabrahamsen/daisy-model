@@ -77,6 +77,8 @@ protected:
   int count;			// Number of accumulated values.
 public:
   static const char *const description;
+  enum type_t { NumberSingleton, NumberSequence };
+  virtual type_t type () const = 0;
   virtual symbol dimension () const;
   virtual symbol tag () const;
   virtual const Geometry* geometry () const; // For array tags.
