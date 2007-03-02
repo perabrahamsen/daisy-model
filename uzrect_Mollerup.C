@@ -64,6 +64,7 @@ struct UZRectMollerup : public UZRect
 			     const Groundwater&,
 			     const std::vector<bool>& active_lysimeter,
 			     const ublas::vector<double>& K,
+			     ublas::vector<double>& q,
 			     ublas::matrix<double>& Dm_mat, 
 			     ublas::vector<double>& Dm_vec, 
 			     ublas::vector<double>& Gm, 
@@ -73,6 +74,7 @@ struct UZRectMollerup : public UZRect
 			     const ublas::vector<double>& remaining_water,
 			     const ublas::vector<double>& h,
 			     const ublas::vector<double>& K,
+			     ublas::vector<double>& q,
 			     ublas::matrix<double>& Dm_mat, 
 			     ublas::vector<double>& Dm_vec, 
 			     ublas::vector<double>& Gm, 
@@ -135,6 +137,9 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       const size_t edge = edge_above[i];
       remaining_water (i) = surface.h_top (geo, edge);
     }
+  ublas::vector<double> q;	// Accumulated flux
+  q = ublas::zero_vector<double> (edge_size);
+  ublas::vector<double> dq (edge_size); // Flux in small timestep.
 
   //Make Qmat area diagonal matrix 
   ublas::banded_matrix<double> Qmat (cell_size, cell_size, 0, 0);
@@ -173,6 +178,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       tmp << "Theta = " << Theta << "\n";
       msg.message (tmp.str ());
 
+      dq = ublas::zero_vector<double> (edge_size);
       h_previous = h;
       Theta_previous = Theta;  
       ublas::vector<double> h_conv;
@@ -219,9 +225,9 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  ublas::vector<double> B (cell_size); // Neu bc 
 	  B = ublas::zero_vector<double> (cell_size);
 	  lowerboundary (geo, groundwater, active_lysimeter, 
-			 K, Dm_mat, Dm_vec, Gm, B);
+			 K, dq, Dm_mat, Dm_vec, Gm, B);
 	  upperboundary (geo, surface, remaining_water, h,
-			 K, Dm_mat, Dm_vec, Gm, B, ddt);
+			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt);
 
 	  //Initialize water capacity  matrix
 	  ublas::banded_matrix<double> Cw (cell_size, cell_size, 0, 0);
@@ -281,11 +287,14 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	    throw "Could not find solution";
 
 	  ddt /= time_step_reduction;
+	  dq = ublas::zero_vector<double> (edge_size);
 	  h = h_previous;
 	  Theta = Theta_previous;
 	}
       else
 	{
+	  // TODO: Calculate inner edge flux from Darcy.
+	  q += dq * ddt;
 	  time_left -= ddt;
 	  iterations_with_this_time_step++;
 
@@ -303,7 +312,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   for (size_t cell = 0; cell != cell_size ; ++cell) 
     soil_water.set_content (cell, h (cell), Theta (cell));
   for (size_t edge = 0; edge != edge_size ; ++edge) 
-    soil_water.set_flux (edge, 0.0);
+    soil_water.set_flux (edge, q[edge]);
 
   // End of large time step.
 }
@@ -337,6 +346,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 			       const Groundwater& groundwater,
 			       const std::vector<bool>& active_lysimeter,
 			       const ublas::vector<double>& K,
+			       ublas::vector<double>& dq,
 			       ublas::matrix<double>& Dm_mat, 
 			       ublas::vector<double>& Dm_vec, 
 			       ublas::vector<double>& Gm, 
@@ -353,6 +363,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 	  const int edge = edge_below[i];
 	  const int cell = geo.edge_other (edge, Geometry::cell_below);
 	  B (cell) = - K (cell) * geo.edge_area (edge);
+	  dq (edge) = B (cell);
 	}
       break;
     case Groundwater::forced_flux:
@@ -361,6 +372,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 	  const int edge = edge_below[i];
 	  const int cell = geo.edge_other (edge, Geometry::cell_below);
 	  B (cell) = groundwater.q_bottom () * geo.edge_area (edge);
+	  dq (edge) = B (cell);
 	}
       break;
     case Groundwater::pressure:
@@ -372,6 +384,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 	 Dm_mat (cell, cell) += value;
 	 const double h_bottom =  groundwater.table () - geo.zplus (cell);
 	 Dm_vec (cell) -= value * h_bottom;
+	 dq (edge) = value * h_bottom;
 	 Gm (cell) -= K (cell) * geo.edge_area (edge); 
        }
       break;
@@ -386,6 +399,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 	      Dm_mat (cell, cell) += value;
 	      // const double h_bottom =  0.0;
 	      // Dm_vec (cell) -= value * h_bottom;
+	      dq (edge) = 0.0;
 	      Gm (cell) -= K (cell) * geo.edge_area (edge); 
 	    }
 	}
@@ -401,6 +415,7 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 			       const ublas::vector<double>& remaining_water,
 			       const ublas::vector<double>& h,
 			       const ublas::vector<double>& K,
+			       ublas::vector<double>& dq,
 			       ublas::matrix<double>& Dm_mat, 
 			       ublas::vector<double>& Dm_vec, 
 			       ublas::vector<double>& Gm, 
@@ -420,11 +435,13 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	case Surface::forced_flux: 
 	  const double q = surface.q_top (geo, edge);
 	  B (cell) = - q * geo.edge_area (edge);
+	  dq (edge) = B (cell);
 	  break;
 	case Surface::forced_pressure:
 	  const double value = -K (cell) * geo.edge_area_per_length (edge);
 	  Dm_mat (cell, cell) += value;
 	  Dm_vec (cell) -= value *  surface.h_top (geo, edge);
+	  dq (edge) = value *  surface.h_top (geo, edge);
 	  Gm (cell) += K (cell) * geo.edge_area (edge); 
 	  break;
 	case Surface::limited_water:
@@ -437,12 +454,16 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	  // Decide type.
 	  const bool is_flux = -q_pot > -q_avail;
 	  if (is_flux)
-	    B (cell) = - q_avail * geo.edge_area (edge);
+	    {
+	      B (cell) = - q_avail * geo.edge_area (edge);
+	      dq (edge) = B (cell);
+	    }
 	  else			// Pressure
 	    {
 	      const double value = -K (cell) * geo.edge_area_per_length (edge);
 	      Dm_mat (cell, cell) += value;
 	      Dm_vec (cell) -= value *  h_top;
+	      dq (edge) = value *  h_top;
 	      Gm (cell) += K (cell) * geo.edge_area (edge); 
 	    }
 	  {
