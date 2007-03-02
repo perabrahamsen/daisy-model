@@ -41,7 +41,8 @@ public:
 
   // Simulate.
 public:
-  virtual void tick (const GeometryRect&, const Soil&, SoilWater&, 
+  virtual void tick (const GeometryRect&, std::vector<size_t>& drain_cell, 
+		     const Soil&, SoilWater&, 
                      const SoilHeat&, const Surface&, const Groundwater&, 
                      double dt, Treelog&) = 0;
 

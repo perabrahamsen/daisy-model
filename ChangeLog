@@ -1,3 +1,7 @@
+2007-02-27  mmo  <mmo@mmo203550.agsci.kvl.dk>
+
+	* groundwater_flux.C: New model.
+
 2007-02-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* surface.C: Replaced 'lake' with 'forced_pressure'.

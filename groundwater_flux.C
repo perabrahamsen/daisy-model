@@ -1,4 +1,4 @@
-// groundwater_fixed.C --- Fixed, high groundwater level.
+// groundwater_flux.C --- Forced flux lower boundary.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -21,22 +21,21 @@
 
 
 #include "groundwater.h"
-#include "block.h"
+#include "syntax.h"
 #include "alist.h"
+#include "block.h"
 #include "check.h"
 
-class GroundwaterFixed : public Groundwater
+class GroundwaterFlux : public Groundwater
 {
-  // Content.
-private:
-  const double depth;
-  
   // Groundwater.
+  const double flux;
+
 public:
-  bottom_t bottom_type () const
-  { return pressure; }
+  bottom_t bottom_type() const
+  { return forced_flux; }
   double q_bottom () const
-  { daisy_notreached (); }
+  { return flux; }
 
   // Simulation.
 public:
@@ -45,35 +44,34 @@ public:
 	     const SoilHeat&, const Time&, Treelog&)
   { }
   double table () const
-  { return depth; }
+  { return 42.42e42; }
 
   // Create and Destroy.
 public:
   void initialize (const Geometry&, const Time&, Treelog&)
   { }
-  GroundwaterFixed (Block& al)
+  GroundwaterFlux (Block& al)
     : Groundwater (al),
-      depth (al.number ("table"))
+      flux (al.number ("flux"))
   { }
-  ~GroundwaterFixed ()
+  ~GroundwaterFlux ()
   { }
 };
 
-static struct GroundwaterFixedSyntax
+static struct GroundwaterFluxSyntax
 {
   static Groundwater& make (Block& al)
-  { return *new GroundwaterFixed (al); }
-  GroundwaterFixedSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Fixed high groundwater level.");
-    Groundwater::load_syntax (syntax, alist);
-    syntax.add ("table", "cm", Check::none (), Syntax::Const,
-		"Groundwater level (negative number below surface).");
-    syntax.order ("table");
-    Librarian<Groundwater>::add_type ("fixed", alist, syntax, &make);
-  }
-} GroundwaterFixed_syntax;
+  { return *new GroundwaterFlux (al); }
 
-
+  GroundwaterFluxSyntax ()
+    { 
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "Flux groundwater, free drainage.");
+      Groundwater::load_syntax (syntax, alist);
+      syntax.add ("flux", "cm/h", Check::none (), Syntax::Const,
+		  "Constant flux to groundwater.");
+      syntax.order ("flux");
+      Librarian<Groundwater>::add_type ("flux", alist, syntax, &make);
+    }
+} GroundwaterFlux_syntax;

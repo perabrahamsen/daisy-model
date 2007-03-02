@@ -24,6 +24,7 @@
 #include "surface.h"
 #include "weather.h"
 #include "uzrect.h"
+#include "check.h"
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -33,6 +34,11 @@ struct MovementRect : public Movement
   // Geometry.
   std::auto_ptr<GeometryRect> geo;
   Geometry& geometry () const;
+
+  // Drains
+  struct Point;
+  const std::vector<const Point*> drain_position;
+  std::vector<size_t> drain_cell;
 
   // Water.
   const std::vector<UZRect*> matrix_water;
@@ -76,6 +82,24 @@ struct MovementRect : public Movement
 Geometry& 
 MovementRect::geometry () const
 { return *geo; }
+
+struct MovementRect::Point 
+{
+  const double z;
+  const double x;
+  static void load_syntax (Syntax& syntax, AttributeList&)
+  {
+    syntax.add ("z", "cm", Check::negative (), Syntax::Const, 
+		"Vertical position.");
+    syntax.add ("x", "cm", Check::positive (), Syntax::Const,
+		"Horizontal position.");
+    syntax.order ("z", "x");
+  }
+  Point (const AttributeList& al)
+    : z (al.number ("z")),
+      x (al.number ("x"))
+  { }
+};
 
 void
 MovementRect::macro_tick (const Soil&, SoilWater&, Surface&, 
@@ -227,7 +251,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       Treelog::Open nest (msg, matrix_water[i]->name);
       try
         {
-          matrix_water[i]->tick (*geo, soil, soil_water, soil_heat,
+          matrix_water[i]->tick (*geo, drain_cell, soil, soil_water, soil_heat,
                                  surface, groundwater, dt, msg);
           goto update_borders;
         }
@@ -276,12 +300,28 @@ MovementRect::initialize (const AttributeList&,
 MovementRect::MovementRect (Block& al)
   : Movement (al),
     geo (submodel<GeometryRect> (al, "Geometry")),
+    drain_position (map_construct_const<Point> (al.alist_sequence ("drain"))),
     matrix_water (Librarian<UZRect>::build_vector (al, "matrix_water")),
     matrix_solute (Librarian<Msoltranrect>::build_vector (al, "matrix_solute"))
-{ }
+{ 
+  for (size_t i = 0; i < drain_position.size (); i++)
+    {
+      const Point& point = *drain_position[i];
+      const double z = point.z;
+      const double x = point.x;
+      const double y = 0.5;
+      if (z >= geo->top () || z <= geo->bottom ()
+	  || x <= geo->left () || x >= geo->right ()
+	  || y < geo->front () || y >= geo->back ())
+	al.error ("Drain cell placed at or outside soil boundary");
+      else
+	drain_cell.push_back (geo->cell_at (z, x, y));
+    }
+}
 
 MovementRect::~MovementRect ()
 { 
+  sequence_delete (drain_position.begin (), drain_position.end ());
   sequence_delete (matrix_water.begin (), matrix_water.end ());
   sequence_delete (matrix_solute.begin (), matrix_solute.end ());
 }
@@ -300,6 +340,10 @@ static struct MovementRectSyntax
     syntax.add_submodule ("Geometry", alist, Syntax::State,
                           "Discretization of the soil.",
                           GeometryRect::load_syntax);
+    syntax.add_submodule_sequence ("drain", Syntax::Const,
+				   "Location of cells with drain pipes.",
+				   MovementRect::Point::load_syntax);
+    alist.add ("drain", std::vector<AttributeList*> ());
     syntax.add ("matrix_water", Librarian<UZRect>::library (), 
                 Syntax::Const, Syntax::Sequence,
                 "Matrix water transport models.\n\

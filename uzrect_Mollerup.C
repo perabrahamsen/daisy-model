@@ -53,7 +53,8 @@ struct UZRectMollerup : public UZRect
 
 
   // Interface.
-  void tick (const GeometryRect&, const Soil&, SoilWater&, const SoilHeat&, 
+  void tick (const GeometryRect&, std::vector<size_t>& drain_cell,
+	     const Soil&, SoilWater&, const SoilHeat&, 
              const Surface&, const Groundwater&, double dt, Treelog&);
 
   // Internal functions.
@@ -77,6 +78,11 @@ struct UZRectMollerup : public UZRect
 			     ublas::vector<double>& Gm, 
 			     ublas::vector<double>& B,
 			     const double dt);
+  static void drain (const GeometryRect& geo,
+		     const std::vector<size_t>& drain_cell,
+		     const ublas::vector<double>& h,
+		     ublas::matrix<double>& A,
+		     ublas::vector<double>& b);
   static void diffusion (const GeometryRect& geo,
 			 const ublas::vector<double>& Kedge,
 			 ublas::matrix<double>& diff);
@@ -96,7 +102,8 @@ struct UZRectMollerup : public UZRect
 
 
 void 
-UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil, 
+UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
+		      const Soil& soil, 
                       SoilWater& soil_water, const SoilHeat& soil_heat,
                       const Surface& surface, const Groundwater& groundwater,
                       const double dt,
@@ -114,6 +121,7 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
   ublas::vector<double> h_previous (cell_size); // at start of small timestep
   ublas::vector<double> h_ice (cell_size); // 
   ublas::vector<double> S (cell_size); // sink term
+  ublas::vector<double> S_vol (cell_size); // sink term
   ublas::vector<double> T (cell_size); // temperature 
   ublas::vector<double> K (cell_size); // hydraulic conductivity
   ublas::vector<double> Kedge (edge_size); // edge (inter cell) conductivity
@@ -125,7 +133,7 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
   for (size_t i = 0; i < edge_above_size; i++)
     {
       const size_t edge = edge_above[i];
-      remaining_water (edge) = surface.h_top (geo, edge);
+      remaining_water (i) = surface.h_top (geo, edge);
     }
 
   //Make Qmat area diagonal matrix 
@@ -136,12 +144,13 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
   // make vectors 
   for (size_t cell = 0; cell != cell_size ; ++cell) 
     {				
-      Theta[cell] = soil_water.Theta (cell);
-      h[cell] =  soil_water.h (cell);
-      h_ice[cell] = soil_water.h_ice (cell);
-      S[cell] =  soil_water.S_sum (cell);
-      T[cell] = soil_heat.T (cell); 
-      h_lysimeter[cell] = geo.zplus (cell) - geo.z (cell);
+      Theta (cell) = soil_water.Theta (cell);
+      h (cell) =  soil_water.h (cell);
+      h_ice (cell) = soil_water.h_ice (cell);
+      S (cell) =  soil_water.S_sum (cell);
+      S_vol (cell) = S (cell) * geo.cell_volume (cell);
+      T (cell) = soil_heat.T (cell); 
+      h_lysimeter (cell) = geo.zplus (cell) - geo.z (cell);
     }
 
   // Start time loop 
@@ -149,8 +158,6 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
   double ddt = dt;		// We start with small == large time step.
   int number_of_time_step_reductions = 0;
   int iterations_with_this_time_step = 0;
-
-  
 
   while (time_left > 0.0)
     {
@@ -180,7 +187,7 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 
 	  // Calculate conductivity
 	  for (size_t cell = 0; cell !=cell_size ; ++cell) 
-	    K[cell] =  soil.K (cell, h[cell], h_ice[cell], T[cell]); 
+	    K (cell) =  soil.K (cell, h (cell), h_ice (cell), T (cell)); 
 	    
 	  for (size_t e = 0; e < edge_size; e++)
 	    {
@@ -227,7 +234,7 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 
 	  //Initialize sum vector
 	  ublas::vector<double> sumvec (cell_size);  
-	  sumvec = grav + B + Gm + Dm_vec; 
+	  sumvec = grav + B + Gm + Dm_vec - S_vol; 
 
 	  //Initialize A-matrix
 	  ublas::matrix<double> A (cell_size, cell_size);  
@@ -240,7 +247,8 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 				      + prod (Qmat, Theta_previous-Theta));
 
 
-	  // Any drain ?
+	  // Force active drains to zero h.
+	  drain (geo, drain_cell, h, A, b);
 
 	  // Solve Ax=b (maybe)
 	  ublas::permutation_matrix<double> piv (cell_size);
@@ -293,7 +301,7 @@ UZRectMollerup::tick (const GeometryRect& geo, const Soil& soil,
 
   // Make it official.
   for (size_t cell = 0; cell != cell_size ; ++cell) 
-    soil_water.set_content (cell, h[cell], Theta[cell]);
+    soil_water.set_content (cell, h (cell), Theta (cell));
   for (size_t edge = 0; edge != edge_size ; ++edge) 
     soil_water.set_flux (edge, 0.0);
 
@@ -432,8 +440,18 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	    B (cell) = - q_avail * geo.edge_area (edge);
 	  else			// Pressure
 	    {
-	      B (cell) = - q_pot * geo.edge_area (edge);
+	      const double value = -K (cell) * geo.edge_area_per_length (edge);
+	      Dm_mat (cell, cell) += value;
+	      Dm_vec (cell) -= value *  h_top;
+	      Gm (cell) += K (cell) * geo.edge_area (edge); 
 	    }
+	  {
+	    std::ostringstream tmp;
+	    tmp << "edge = " << edge << ", K = " << K (cell) << ", h_top = "
+		<< h_top << ", dz = " << dz << ", q_avail = " << q_avail
+		<< ", q_pot = " << q_pot << ", is_flux = " << is_flux;
+	    Assertion::message (tmp.str ());
+	  }
 	  break;
 	case Surface::soil:
 	  throw "Don't know how to handle this surface type";
@@ -442,6 +460,74 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	}
     }
 }
+
+void 
+UZRectMollerup::drain (const GeometryRect& geo,
+		       const std::vector<size_t>& drain_cell,
+		       const ublas::vector<double>& h,
+		       ublas::matrix<double>& A,
+		       ublas::vector<double>& b)
+{
+  const size_t drain_size  = drain_cell.size (); // // number of drains   
+    
+  std::ostringstream tmp;
+
+  for (size_t d = 0; d < drain_size; d++)
+    {
+      const size_t cell = drain_cell[d];
+
+      // Guestimate pressure in cell from surrounding cells.
+      const std::vector<int>& edges = geo.cell_edges (cell);
+      const size_t edge_size = edges.size ();
+      const double z_drain = geo.z (cell);      
+      double h_sum = h (cell);
+
+      for (size_t i = 0; i < edge_size; i++)
+	{
+	  const size_t edge =  edges[i];
+	  if (!geo.edge_is_internal (edge))
+	    continue;
+	  const size_t other = geo.edge_other (edge, cell);
+	  const double z_other = geo.z (other);	// Compensate for z difference.
+	  h_sum += h (other) + (z_other - z_drain);  
+	}
+
+      tmp << "drain[" << d << "], cell " << cell << ", has h_sum = " 
+	  << h_sum << "\n";
+
+      if (h_sum < 0)
+	// Drain not active, treat as normal cell.
+	continue;
+
+      // Force pressure to be zero.
+      for (size_t i = 0; i < edge_size; i++)
+	{
+	  const size_t edge =  edges[i];
+	  if (!geo.edge_is_internal (edge))
+	    continue;
+
+	  const size_t other = geo.edge_other (edge, cell);
+	  A (cell, other) = 0.0;
+	}
+      A (cell, cell) = 1.0;
+      b (cell) = 0.0;
+
+      const size_t cell_size = geo.cell_size ();
+      for (size_t other = 0; other < cell_size; other++)
+	daisy_assert (cell == other 
+		      ? approximate (A (cell, other), 1.0)
+		      : iszero (A (cell, other)));
+    }
+  Assertion::message (tmp.str ());
+}
+
+
+
+
+
+
+
+
 
 void 
 UZRectMollerup::diffusion (const GeometryRect& geo,
