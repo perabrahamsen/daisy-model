@@ -1,6 +1,6 @@
-// scope_table.h --- A scope based on a table.
+// scope_block.h -- Treat a block as a scope.
 // 
-// Copyright 2005 Per Abrahamsen and KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,45 +19,39 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef SCOPE_TABLE_H
-#define SCOPE_TABLE_H
+#ifndef SCOPE_BLOCK_H
+#define SCOPE_BLOCK_H
 
 #include "scope.h"
-#include <string>
-#include <vector>
+#include "block.h"
 
-class LexerTable;
-
-class ScopeTable : public Scope
+class ScopeBlock : public Scope
 {
   // Content.
 private:
-  const LexerTable& lex;
-  const std::vector<symbol> all_numbers_;
+  Block& block;
 
-  std::vector<std::string> values;
-  
   // Interface.
 public:
   void tick (const Scope&, Treelog&);
-  const std::vector<symbol>& all_numbers () const
-  { return all_numbers_; }
+  const std::vector<symbol>& all_numbers () const;
   bool has_number (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;
-  symbol get_description (symbol tag) const;
-
-  // Use.
-public:
-  void set (const std::vector<std::string>& entries);
+  virtual bool has_identifier (symbol) const;
+  virtual symbol identifier (symbol) const;
+  symbol get_description (symbol) const;
 
   // Create and Destroy.
 private:
-  ScopeTable (const ScopeTable&);
-  ScopeTable ();
+  ScopeBlock (const ScopeBlock&);
+  ScopeBlock ();
 public:
-  explicit ScopeTable (const LexerTable& l);
-  ~ScopeTable ();
+  explicit ScopeBlock (Block& b)
+    : block (b)
+  { }
+  ~ScopeBlock ()
+  { }
 };
 
-#endif // SCOPE_TABLE_H
+#endif // SCOPE_BLOCK_H

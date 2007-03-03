@@ -38,6 +38,8 @@ struct ScopeNull : public Scope
   { daisy_notreached (); }
   symbol dimension (symbol) const
   { daisy_notreached (); }
+  symbol get_description (symbol) const
+  { daisy_notreached (); }
 
   // Create and Destroy.
   ScopeNull ()
@@ -52,6 +54,14 @@ Scope::null ()
   static ScopeNull nullscope;
   return nullscope; 
 }
+
+bool
+Scope::has_identifier (symbol) const
+{ return false; }
+
+symbol
+Scope::identifier (symbol) const
+{ daisy_notreached (); }
 
 Scope::Scope ()
 { }

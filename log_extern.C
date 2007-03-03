@@ -23,7 +23,7 @@
 
 #include "log_extern.h"
 #include "log_select.h"
-#include "scope.h"
+#include "scope_block.h"
 #include "block.h"
 #include <map>
 #include <vector>
@@ -73,10 +73,12 @@ struct LogExtern : public LogSelect,
   bool has_number (symbol) const;
   double number (symbol) const;
   symbol dimension (symbol) const;
+  bool has_identifier (symbol tag) const;
+  symbol identifier (symbol tag) const;
+  symbol get_description (symbol) const;
 
   // Scope to be?
   type lookup (symbol tag) const;
-  symbol name (symbol tag) const;
   const std::vector<double>& array (symbol tag) const;
   int size (symbol tag) const;
 
@@ -192,6 +194,16 @@ LogExtern::dimension (symbol tag) const
   return (*i).second;
 }
 
+symbol
+LogExtern::get_description (const symbol tag) const
+{
+  for (size_t i = 0; i < entries.size (); i++)
+    if (entries[i]->tag () == tag)
+      return symbol (entries[i]->get_description ());
+
+  daisy_notreached ();
+}
+
 LogExtern::type 
 LogExtern::lookup (symbol tag) const
 { 
@@ -203,8 +215,13 @@ LogExtern::lookup (symbol tag) const
   return (*i).second;
 }
 
+bool 
+LogExtern::has_identifier (symbol tag) const
+{ return lookup (tag) == Name; }
+
+
 symbol
-LogExtern::name (symbol tag) const
+LogExtern::identifier (symbol tag) const
 { 
   const name_map::const_iterator i = names.find (tag);
   daisy_assert (i != names.end ());
@@ -237,6 +254,21 @@ LogExtern::initialize (Treelog&)
 LogExtern::LogExtern (Block& al)
   : LogSelect (al)
 { 
+  std::vector<symbol> par_names = al.identifier_sequence ("parameter_names");
+  ScopeBlock scope_block (al);
+
+  for (size_t i = 0; i < par_names.size (); i++)
+    {
+      const symbol id = par_names[i];
+      if (scope_block.has_identifier (id))
+        {
+          types[id] = Name;
+          names[id] = scope_block.identifier (id);
+        }
+      else
+        al.msg ().warning ("Parameter name " + id + " not found"); 
+    }
+
   if (al.check ("numbers"))
     {
       const std::vector<AttributeList*>& alists 
@@ -271,18 +303,25 @@ Name to refer to number with.");
     syntax.add ("value", Syntax::Unknown (), Syntax::State, "\
 Numeric value.");
   }
-
   LogExternSyntax ()
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       LogSelect::load_syntax (syntax, alist);
+
       syntax.add_submodule_sequence ("numbers", Syntax::OptionalState, "\
 Inititial numeric values.  By default, none.", load_numbers);
       syntax.add ("where", Syntax::String, Syntax::OptionalConst,
 		  "Name of the extern log to use.\n\
 By default, use the model name.");
-
+      syntax.add ("parameter_names", Syntax::String, 
+                  Syntax::Const, Syntax::Sequence, "\
+List of parameters that to export.\n\
+\n\
+For example, if you have defined 'column' and 'crop' parameters for\n\
+this extern log parameterization, you can export them to through the\n\
+API interface by specifying '(names column crop)'.");
+      alist.add ("parameter_names", std::vector<symbol> ());
       Librarian<Log>::add_type ("extern", alist, syntax, &make);
     }
 } LogExtern_syntax;

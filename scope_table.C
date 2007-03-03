@@ -57,6 +57,10 @@ ScopeTable::dimension (const symbol tag) const
   return symbol (lex.dimension (tag_c));
 }
 
+symbol
+ScopeTable::get_description (const symbol) const
+{ return symbol ("Descriptions not implemented yet"); }
+
 void 
 ScopeTable::set (const std::vector<std::string>& entries)
 { values = entries; }

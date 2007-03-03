@@ -984,7 +984,7 @@ daisy_scope_has_number (const Scope* scope, const char* name)
     return 0; 
 }
 
-extern "C" const double EXPORT	// Return NUMBER of NAME defined in SCOPE.
+extern "C" const double EXPORT	// Return numeric value of NAME in SCOPE.
 daisy_scope_number (const Scope* scope, const char* name)
 { 
   return (scope->number (symbol (name)));
@@ -996,6 +996,24 @@ daisy_scope_dimension (const Scope* scope, const char* name)
   return scope->dimension (symbol (name)).name ().c_str ();
 }
 
+extern "C" const int EXPORT	// check if NAME is defined in SCOPE.
+daisy_scope_has_string (const Scope* scope, const char* name)
+{ 
+  if (scope->has_identifier (symbol (name)))
+    return 1;
+  else 
+    return 0; 
+}
+
+extern "C" const char* EXPORT	// Return string value of NAME in SCOPE.
+daisy_scope_string (const Scope* scope, const char* name)
+{ 
+  return scope->identifier (symbol (name)).name ().c_str ();
+}
+
+extern "C" const char* EXPORT	// Return UNITS of NAME defined in SCOPE.
+daisy_scope_description (const Scope* scope, const char* name)
+{ return scope->get_description (symbol (name)).name().c_str (); }
 
 // @ Miscellaneous.
 //

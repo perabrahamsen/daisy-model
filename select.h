@@ -77,6 +77,7 @@ protected:
   int count;			// Number of accumulated values.
 public:
   static const char *const description;
+  std::string get_description () const;
   enum type_t { NumberSingleton, NumberSequence };
   virtual type_t type () const = 0;
   virtual symbol dimension () const;

@@ -407,7 +407,7 @@ SPECIALS = geometry_vert.C gnuplot_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = scope_id.C librarian.C scope_multi.C \
+OTHER = scope_block.C scope_id.C librarian.C scope_multi.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
@@ -831,8 +831,8 @@ rootdens${OBJ}: rootdens.C rootdens.h librarian.h symbol.h assertion.h \
   block.h syntax.h treelog.h plf.h alist.h check.h
 select${OBJ}: select.C select.h destination.h symbol.h condition.h \
   librarian.h assertion.h number.h units.h volume.h bound.h block.h \
-  syntax.h treelog.h plf.h geometry.h mathlib.h scope.h library.h alist.h \
-  check.h vcheck.h format.h submodel.h
+  syntax.h treelog.h plf.h geometry.h mathlib.h scope_id.h scope.h \
+  library.h alist.h check.h vcheck.h format.h submodel.h
 average${OBJ}: average.C average.h librarian.h symbol.h assertion.h block.h \
   syntax.h treelog.h plf.h alist.h mathlib.h
 mactrans${OBJ}: mactrans.C mactrans.h librarian.h symbol.h assertion.h \
@@ -1021,8 +1021,8 @@ weather_old${OBJ}: weather_old.C weather_old.h weather.h librarian.h symbol.h \
   assertion.h im.h block.h syntax.h treelog.h plf.h alist.h fao.h time.h
 log_extern${OBJ}: log_extern.C log_extern.h symbol.h log_select.h log.h \
   border.h librarian.h assertion.h alist.h select.h destination.h \
-  condition.h number.h units.h volume.h bound.h scope.h block.h syntax.h \
-  treelog.h plf.h
+  condition.h number.h units.h volume.h bound.h scope_block.h scope.h \
+  block.h syntax.h treelog.h plf.h
 log_select${OBJ}: log_select.C log_select.h log.h border.h librarian.h \
   symbol.h assertion.h alist.h select.h destination.h condition.h \
   number.h units.h volume.h bound.h library.h block.h syntax.h treelog.h \
@@ -1044,6 +1044,10 @@ log_alist${OBJ}: log_alist.C log_alist.h log.h border.h librarian.h symbol.h \
 log_clone${OBJ}: log_clone.C log_clone.h log_alist.h log.h border.h \
   librarian.h symbol.h assertion.h alist.h block.h syntax.h treelog.h \
   plf.h
+scope_block${OBJ}: scope_block.C scope_block.h scope.h symbol.h block.h \
+  syntax.h treelog.h plf.h number.h librarian.h assertion.h stringer.h \
+  alist.h
+scope_id${OBJ}: scope_id.C scope_id.h scope.h symbol.h assertion.h
 librarian${OBJ}: librarian.C librarian.h symbol.h assertion.h library.h \
   block.h syntax.h treelog.h plf.h alist.h
 scope_multi${OBJ}: scope_multi.C scope_multi.h scope.h symbol.h assertion.h
@@ -1057,7 +1061,8 @@ lexer_table${OBJ}: lexer_table.C lexer_table.h block.h syntax.h treelog.h \
   symbol.h plf.h lexer_data.h lexer.h alist.h assertion.h mathlib.h \
   submodeler.h memutils.h time.h vcheck.h
 block${OBJ}: block.C block.h syntax.h treelog.h symbol.h plf.h library.h \
-  alist.h librarian.h assertion.h stringer.h number.h scope.h
+  alist.h librarian.h assertion.h stringer.h number.h scope_block.h \
+  scope.h
 dlf${OBJ}: dlf.C dlf.h symbol.h volume.h librarian.h assertion.h bound.h \
   alist.h version.h daisy.h program.h time.h
 scope${OBJ}: scope.C scope.h symbol.h assertion.h
@@ -1118,6 +1123,8 @@ cdaisy${OBJ}: cdaisy.C scope.h symbol.h block.h syntax.h treelog.h plf.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
+groundwater_flux${OBJ}: groundwater_flux.C groundwater.h librarian.h symbol.h \
+  assertion.h syntax.h treelog.h alist.h block.h plf.h check.h
 msoltranrect_2x1${OBJ}: msoltranrect_2x1.C msoltranrect.h librarian.h \
   symbol.h assertion.h uzmodel.h uz1d.h geometry_rect.h geometry_vert.h \
   geometry.h syntax.h treelog.h mathlib.h soil.h horizon.h soil_water.h \
@@ -1192,7 +1199,8 @@ movement_rect${OBJ}: movement_rect.C movement.h librarian.h symbol.h \
   assertion.h uzmodel.h uz1d.h geometry_rect.h geometry_vert.h geometry.h \
   syntax.h treelog.h mathlib.h soil.h horizon.h soil_water.h soil_heat.h \
   macro.h transport.h mactrans.h msoltranrect.h groundwater.h surface.h \
-  weather.h im.h uzrect.h alist.h submodeler.h block.h plf.h memutils.h
+  weather.h im.h uzrect.h check.h alist.h submodeler.h block.h plf.h \
+  memutils.h
 number_soil${OBJ}: number_soil.C number.h symbol.h librarian.h assertion.h \
   library.h block.h syntax.h treelog.h plf.h column.h alist.h horizon.h \
   hydraulic.h weather.h im.h time.h units.h
@@ -1231,7 +1239,7 @@ xysource_inline${OBJ}: xysource_inline.C xysource.h librarian.h symbol.h \
   number.h vcheck.h
 xysource_loop${OBJ}: xysource_loop.C xysource.h librarian.h symbol.h \
   assertion.h block.h syntax.h treelog.h plf.h alist.h gnuplot_utils.h \
-  scope.h number.h check.h vcheck.h
+  scope_id.h scope.h number.h check.h vcheck.h
 xysource_combine${OBJ}: xysource_combine.C xysource.h librarian.h symbol.h \
   assertion.h block.h syntax.h treelog.h plf.h alist.h gnuplot_utils.h \
   number.h scope_sources.h scope.h time.h

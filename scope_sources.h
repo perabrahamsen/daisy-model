@@ -46,6 +46,7 @@ public:
   bool has_number (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;
+  symbol get_description (symbol tag) const;
 
   // Propagate.
   bool load (Treelog& msg);

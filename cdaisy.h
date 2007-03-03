@@ -643,11 +643,20 @@ daisy_scope_number_name (const daisy_scope* scope, const unsigned int index);
 EXPORT const int              /* check if NAME is defined in SCOPE. */
 daisy_scope_has_number (const daisy_scope* scope, const char* name);
 
-EXPORT const double      /* Return NUMBER of NAME defined in SCOPE. */
+EXPORT const double      /* Return numeric value of NAME in SCOPE. */
 daisy_scope_number (const daisy_scope* scope, const char* name);
 
 EXPORT const char*        /* Return UNITS of NAME defined in SCOPE. */
 daisy_scope_dimension (const daisy_scope* scope, const char* name);
+
+EXPORT const int              /* check if NAME is defined in SCOPE. */
+daisy_scope_has_string (const daisy_scope* scope, const char* name);
+
+EXPORT const char*       /* Return string value of NAME in SCOPE. */
+daisy_scope_string (const daisy_scope* scope, const char* name);
+
+EXPORT const char*        /* Return UNITS of NAME defined in SCOPE. */
+daisy_scope_description (const daisy_scope* scope, const char* name);
 
 /* @ Miscellaneous.
  *

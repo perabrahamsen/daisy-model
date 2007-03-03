@@ -59,6 +59,16 @@ ScopeMulti::dimension (const symbol tag) const
   daisy_panic ("'" + tag + "' not found in any scope");
 }
 
+symbol
+ScopeMulti::get_description (symbol tag) const
+{
+  for (size_t i = 0; i < scopes.size (); i++)
+    if (scopes[i]->has_number (tag))
+      return scopes[i]->get_description (tag);
+  
+  daisy_panic ("'" + tag + "' not found in any scope");
+}
+
 ScopeMulti::ScopeMulti (const Scope& first, const Scope& second)
 { 
   scopes.push_back (&first);

@@ -23,6 +23,7 @@
 #define SCOPE_ID_H
 
 #include "scope.h"
+#include <string>
 
 struct ScopeID : public Scope
 {
@@ -40,6 +41,7 @@ private:
   bool has_number (symbol name) const;
   double number (symbol) const;
   symbol dimension (symbol) const;
+  symbol get_description (symbol) const;
 
   // Create.
 public:

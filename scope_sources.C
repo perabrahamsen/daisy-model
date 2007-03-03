@@ -69,6 +69,10 @@ ScopeSources::dimension (const symbol tag) const
   daisy_notreached ();
 }
 
+symbol
+ScopeSources::get_description (const symbol) const
+{ return symbol ("Descriptions not implemented yet"); }
+
 bool 
 ScopeSources::load (Treelog& msg)
 {

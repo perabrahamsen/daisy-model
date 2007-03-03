@@ -99,6 +99,8 @@ struct NumberLet : public Number
       daisy_assert (i != dimensions.end ());
       return (*i).second;
     }
+    symbol get_description (symbol) const
+    { return symbol ("Descriptions not implemented yet"); }
 
     // Create and Destroy.
     bool initialize (Treelog& msg)

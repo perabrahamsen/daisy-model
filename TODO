@@ -1,28 +1,19 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Mollerup: få beregnet dq rigtigt.
+
 * OpenMI: Nedre rand skal virke med negativt tryk
 
-** Scope C API 
+* Scope C API 
 
-DONE antal scopes
-
-DONE Slå et scope op efter nummer
-
-Find entries i scope.
-
-CHECK spørg om entry dim før start
-CHECK spørg om entry navn før start
-spørg om entry desc før start
-
-spørg om "column" værdi for scope
-
-dim to si power base?
+** dim to si power base?
 
 ** end_time
 
 ** søjle polygon
 
-** 
+* TUT?
+
 * Nu 
 
 ** Omskriv C API så (run foo) virker.

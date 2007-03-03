@@ -42,6 +42,10 @@ symbol
 ScopeID::dimension (symbol) const
 { return dim;}
 
+symbol
+ScopeID::get_description (symbol tag) const
+{ return symbol ("Use '" + tag.name () + "' as a free variable"); }
+
 ScopeID::ScopeID (const symbol name, const symbol d)
   : tag (name),
     value (-42.42e42),

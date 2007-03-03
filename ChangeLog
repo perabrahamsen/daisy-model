@@ -1,3 +1,9 @@
+2007-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* scope_block.C, scope_block.h: New utility.
+	* Makefile (OTHER): Add it.
+	* block.C: Use it.
+
 2007-03-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 	
 	* scope_id.C, scope_id.h: New utility.

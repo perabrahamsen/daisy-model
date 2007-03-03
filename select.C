@@ -468,6 +468,21 @@ double
 Select::convert (double value) const
 { return impl->convert (value); }
 
+std::string
+Select::get_description () const
+{
+  if (impl->description != "")
+    return impl->description;
+  if (impl->spec.get ())
+    {
+      std::string d = impl->spec->description ();
+      if (impl->negate)
+        d += " (reversed)";
+      return d;
+    }
+  return description;
+}
+
 symbol
 Select::dimension () const
 { return impl->dimension; }
