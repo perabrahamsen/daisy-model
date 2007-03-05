@@ -39,6 +39,8 @@ public:
   void usage (Treelog&) const;
   void copyright (Treelog&);
   static void load_syntax (Syntax&, AttributeList&);
+  int parse (int& argc, char**& argv, 
+             Syntax& syntax, AttributeList& alist, Treelog&);
   Options (int& argc, char**& argv, 
 	   Syntax& syntax, AttributeList& alist, Treelog&);
 };

@@ -21,6 +21,7 @@
 
 
 #include "options.h"
+#include "daisy.h"
 #include "library.h"
 #include "block.h"
 #include "parser_file.h"
@@ -135,56 +136,69 @@ attributes.");
 }
 
 Options::Options (int& argc, char**& argv,
-		  Syntax& syntax, AttributeList& alist, Treelog& out)
+		  Syntax& syntax, AttributeList& alist, Treelog& msg)
   : has_printed_copyright (false),
     program_name (argv[0])
 {
-  std::string command_line;
-  for (unsigned int i = 0; i < argc; i++)
+  argc = parse (argc, argv, syntax, alist, msg);
+}
+
+int
+Options::parse (int& argc, char**& argv,
+                Syntax& syntax, AttributeList& alist, Treelog& msg)
+{
+  // Create original command line string first, we modify argc and argv later.
+  // However we only want to print it after we have parsed "(directory ...)".
+  const struct CommandLine : public std::string
+  {
+    Treelog& msg;
+    CommandLine (const int argc, char**const argv, Treelog& m)
+      : msg (m)
     {
-      if (i > 0)
-	command_line += " ";
-      command_line += argv[i];
+      for (size_t i = 0; i < argc; i++)
+        {
+          if (i > 0)
+            *this += " ";
+          *this += argv[i];
+        }
     }
+    ~CommandLine ()
+    { msg.debug (*this); }
+  } command_line (argc, argv, msg);
   
+  // We need at least one argument.
   if (argc < 2)
-    {
-      // Usage.
-      argc = -2;
-      return;
-    }
+    return -2;                  // Usage.
+
+  // Parse DAISYPATH.
   initialize_path ();
-  bool file_found = false;
-  bool options_finished = false;
-  bool prevent_run = false;
+
+  // Loop over all arguments.
+  bool file_found = false;      // We only run the program if we find a file. 
+  bool options_finished = false; // "--" ends command line options.
+  bool prevent_run = false;     // We might already have run the program.
   int errors_found = 0;
-  while (argc > 1)
+
+  while (argc > 1)              // argc and argv updated as args are parsed.
     {
       const std::string arg = get_arg (argc, argv);
 
-      if (arg.size () < 1)
-	{
-	  argc = -2;
-	  return;
-	}
+      if (arg.size () < 1)      
+        return -2;              // No zero sized args.
       else if (options_finished || arg[0] != '-')
-	{
-          copyright (out);
+	{                       // Not an option, but a setup file.
+          copyright (msg);
 	  // Parse the file.
-	  Treelog::Open nest (out, "Parsing file");
-	  ParserFile parser (syntax, arg, out);
+	  Treelog::Open nest (msg, "Parsing file");
+	  ParserFile parser (syntax, arg, msg);
 	  parser.load (alist);
 	  file_found = true;
 	  errors_found += parser.error_count ();
 	}
       else if (arg.size () < 1)
-	{
-	  argc = -2;
-	  return;
-	}
+        return -2;              // We don't allow a lone '-'.
       else
-	{ 
-	  // Parse options.
+	{                       // Parse options.
 	  switch (arg[1])
 	    {
 	    case 'd':
@@ -193,37 +207,33 @@ Options::Options (int& argc, char**& argv,
 		{
 		  const std::string dir = get_arg (argc, argv);
 		  if (!Path::set_directory (dir))
-		    out.error (program_name + ": chdir (" + dir + ") failed");
+		    msg.error (program_name + ": chdir (" + dir + ") failed");
 		}
 	      else
 		// Usage.
-		argc = -2;
+		return -2;
               break;
 	    case 'p':
-              {
+              {                 // Run a named program.
                 if (argc < 2)
-                  {
-                    // We need a library name.
-                    argc = -2;
-                    break;
-                  }
+                  // We need a program name.
+                  return -2;
                 const Library& library 
                   = Librarian<Program>::library ();
                 const symbol name = symbol (get_arg (argc, argv));
                 if (!library.check (name))
                   {
-                    out.error (program_name + ": '" + name 
+                    msg.error (program_name + ": '" + name 
                                + "' unknown program");
-                    argc = -2;
-                    break;
+                    return -2;
                   }
                 const Syntax& p_syntax = library.syntax (name);
                 AttributeList p_alist (library.lookup (name));
                 p_alist.add ("type", name);
-                Treelog::Open nest (out, name);
-                if (p_syntax.check (p_alist, out))
+                Treelog::Open nest (msg, name);
+                if (p_syntax.check (p_alist, msg))
                   {
-		    std::auto_ptr<Block> block (new Block (syntax, alist, out, 
+		    std::auto_ptr<Block> block (new Block (syntax, alist, msg, 
                                                            "Building"));
                     std::auto_ptr<Program> program
                       (Librarian<Program>::build_alist (*block, p_alist, 
@@ -231,14 +241,14 @@ Options::Options (int& argc, char**& argv,
 		    const bool block_ok = block->ok ();
                     block.reset ();
 		    if (block_ok)
-		      program->run (out);
+		      program->run (msg);
                   }
                 prevent_run = true;
               }
               break;
             case 'v':
 	      // Print version.
-	      copyright (out);
+	      copyright (msg);
 	      break;
 	    case '-':
 	      // Finish option list.
@@ -246,19 +256,19 @@ Options::Options (int& argc, char**& argv,
 	      break;
 	    default:
 	      // Usage.
-	      argc = -2;
-	      break;
+	      return -2;
 	    }
 	}
     }
   if (errors_found > 0)
-    argc = -1;
+    return -1;
 
-  if (argc > 0 && (!file_found || prevent_run))
+  if (!file_found || prevent_run)
     // Done.
-    argc = 0;
+    return 0;
 
-  out.debug (command_line);
+  // Done.
+  return argc;
 }
 
 // options.C ends here.
