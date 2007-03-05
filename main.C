@@ -50,11 +50,8 @@ main (int argc, char* argv[])
 
   Assertion::Register reg (treelog);
 
-#define CATCH_EXCEPTIONS
-#ifdef CATCH_EXCEPTIONS
   try
     {
-#endif // CATCH_EXCEPTIONS
       // Initialize syntax and attribute list.
       Syntax syntax;
       AttributeList alist;
@@ -171,7 +168,6 @@ attributes.");
       // All is well.
       return 0;
 
-#ifdef CATCH_EXCEPTIONS
     }
   catch (const char* error)
     {
@@ -194,7 +190,6 @@ attributes.");
     {
       treelog.error ("Unknown exception");
     }
-#endif // CATCH_EXCEPTIONS
   return 1;
 }
       

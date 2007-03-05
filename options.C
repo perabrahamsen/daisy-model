@@ -32,8 +32,6 @@
 #include "path.h"
 #include <memory>
 
-using namespace std;
-
 #if defined (__unix) 
 #define PATH_SEPARATOR ":"
 #else
