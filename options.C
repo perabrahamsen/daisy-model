@@ -38,8 +38,6 @@
 #define PATH_SEPARATOR ";"
 #endif
 
-const char *const Options::log_name = "DAISY_LOG";
-
 std::string
 Options::get_arg (int& argc, char**& argv)
 {
@@ -106,6 +104,34 @@ Options::initialize_path ()
   path.push_back (colon_path.substr (last));
   daisy_assert (path.size () > 0);
   Path::set_path (path);
+}
+
+void
+Options::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  // Top level Daisy syntax.
+  Daisy::load_syntax (syntax, alist);
+  alist.add ("type", "Daisy");
+  Library::load_syntax (syntax, alist);
+      
+  syntax.add ("directory", Syntax::String, Syntax::OptionalConst,
+              "Run program in this directory.\n\
+This can affect both where input files are found and where log files\n\
+are generated.");
+  syntax.add ("path", Syntax::String,
+              Syntax::OptionalConst, Syntax::Sequence,
+              "List of directories to search for input files in.\n\
+The special value \".\" means the current directory.");
+  syntax.add ("input", Librarian<Parser>::library (),
+              Syntax::OptionalConst, Syntax::Singleton,
+              "Command to add more information about the simulation.");
+  syntax.add ("run", Librarian<Program>::library (), 
+              Syntax::OptionalState, Syntax::Singleton, 
+              "Program to run.\n\
+\n\
+If this option is specified, all the 'Daisy' specific top-level attributes\n\
+will be ignored.  If unspecified, run 'Daisy' on the current top-level\n\
+attributes.");
 }
 
 Options::Options (int& argc, char**& argv,

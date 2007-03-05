@@ -55,28 +55,7 @@ main (int argc, char* argv[])
       // Initialize syntax and attribute list.
       Syntax syntax;
       AttributeList alist;
-      Daisy::load_syntax (syntax, alist);
-      alist.add ("type", "Daisy");
-      Library::load_syntax (syntax, alist);
-      
-      syntax.add ("directory", Syntax::String, Syntax::OptionalConst,
-                  "Run program in this directory.\n\
-This can affect both where input files are found and where log files\n\
-are generated.");
-      syntax.add ("path", Syntax::String,
-                  Syntax::OptionalConst, Syntax::Sequence,
-                  "List of directories to search for input files in.\n\
-The special value \".\" means the current directory.");
-      syntax.add ("input", Librarian<Parser>::library (),
-                  Syntax::OptionalConst, Syntax::Singleton,
-                  "Command to add more information about the simulation.");
-      syntax.add ("run", Librarian<Program>::library (), 
-                  Syntax::OptionalState, Syntax::Singleton, 
-                  "Program to run.\n\
-\n\
-If this option is specified, all the 'Daisy' specific top-level attributes\n\
-will be ignored.  If unspecified, run 'Daisy' on the current top-level\n\
-attributes.");
+      Options::load_syntax (syntax, alist);
       Options options (argc, argv, syntax, alist, treelog);
 
       switch (argc)

@@ -35,10 +35,10 @@ class Options
 public: 
   static std::string get_arg (int& argc, char**& argv);
   static void initialize_path ();
-  static const char *const log_name;
   const std::string program_name;
   void usage (Treelog&) const;
   void copyright (Treelog&);
+  static void load_syntax (Syntax&, AttributeList&);
   Options (int& argc, char**& argv, 
 	   Syntax& syntax, AttributeList& alist, Treelog&);
 };
