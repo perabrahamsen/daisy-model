@@ -40,11 +40,11 @@
 
 const char *const Options::log_name = "DAISY_LOG";
 
-string
+std::string
 Options::get_arg (int& argc, char**& argv)
 {
   daisy_assert (argc > 1);
-  const string arg = argv[1];
+  const std::string arg = argv[1];
 
   // Update argc and argv.
   for (int i = 2; i < argc; i++)
@@ -58,11 +58,11 @@ Options::get_arg (int& argc, char**& argv)
 void
 Options::usage (Treelog& out) const
 {
-  string s = "Usage: ";
+  std::string s = "Usage: ";
   s += program_name;
   s += " [-v] [-d dir] file... [-p ";
   const Library& library = Librarian<Program>::library ();
-  vector<symbol> entries;
+  std::vector<symbol> entries;
   library.entries (entries);
   for (size_t i = 0; i < entries.size (); i++)
     {
@@ -80,7 +80,7 @@ Options::copyright (Treelog& out)
   if (has_printed_copyright)
     return;
   has_printed_copyright = true;
-  out.lazy (string ("Daisy crop/soil simulation version ")
+  out.lazy (std::string ("Daisy crop/soil simulation version ")
 	    + version + ". (" + version_date + ")\n"
 	    "Copyright 1996 - 2006 Per Abrahamsen, "
 	    "Søren Hansen and KVL.");
@@ -89,10 +89,10 @@ Options::copyright (Treelog& out)
 void 
 Options::initialize_path ()
 {
-  vector<string> path;
+  std::vector<std::string> path;
 
   // Initialize path.
-  const string colon_path
+  const std::string colon_path
     = getenv ("DAISYPATH") ? getenv ("DAISYPATH") : ".";
   int last = 0;
   for (;;)
@@ -113,7 +113,7 @@ Options::Options (int& argc, char**& argv,
   : has_printed_copyright (false),
     program_name (argv[0])
 {
-  string command_line;
+  std::string command_line;
   for (unsigned int i = 0; i < argc; i++)
     {
       if (i > 0)
@@ -134,7 +134,7 @@ Options::Options (int& argc, char**& argv,
   int errors_found = 0;
   while (argc > 1)
     {
-      const string arg = get_arg (argc, argv);
+      const std::string arg = get_arg (argc, argv);
 
       if (arg.size () < 1)
 	{
@@ -165,7 +165,7 @@ Options::Options (int& argc, char**& argv,
 	      if (argc > 1)
 		// Change directory.
 		{
-		  const string dir = get_arg (argc, argv);
+		  const std::string dir = get_arg (argc, argv);
 		  if (!Path::set_directory (dir))
 		    out.error (program_name + ": chdir (" + dir + ") failed");
 		}
@@ -197,9 +197,9 @@ Options::Options (int& argc, char**& argv,
                 Treelog::Open nest (out, name);
                 if (p_syntax.check (p_alist, out))
                   {
-		    auto_ptr<Block> block (new Block (syntax, alist, out, 
-                                                      "Building"));
-                    auto_ptr<Program> program
+		    std::auto_ptr<Block> block (new Block (syntax, alist, out, 
+                                                           "Building"));
+                    std::auto_ptr<Program> program
                       (Librarian<Program>::build_alist (*block, p_alist, 
                                                         "Command line"));
 		    const bool block_ok = block->ok ();
