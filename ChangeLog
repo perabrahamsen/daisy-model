@@ -1,9 +1,13 @@
 2007-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* scope.C (identifier, has_identifier): New virtual members.
+	* scope_block.C, scope_block.h: Define them.
+	* block.C, log_extern.C: Use them.
+
 	* scope_block.C, scope_block.h: New utility.
 	* Makefile (OTHER): Add it.
-	* block.C: Use it.
-
+	* block.C, log_extern.C: Use it.
+	
 2007-03-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 	
 	* scope_id.C, scope_id.h: New utility.
