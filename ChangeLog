@@ -1,6 +1,7 @@
 2007-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* toplevel.C, toplevel.h: New submodel.
+	* main.C (main): Use it.
 
 2007-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 

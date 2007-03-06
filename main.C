@@ -20,18 +20,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "toplevel.h"
-#include "program.h"
-#include "parser.h"
-#include "block.h"
+#include "syntax.h"
 #include "alist.h"
-#include "library.h"
-#include "block.h"
 #include "treelog_dual.h"
 #include "options.h"
 #include "assertion.h"
-#include <sstream>
 #include <stdexcept>
-#include <typeinfo>
 #include <iostream>
 #include <time.h>
 
