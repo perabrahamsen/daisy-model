@@ -19,6 +19,7 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "toplevel.h"
 #include "program.h"
 #include "parser.h"
 #include "block.h"
@@ -38,76 +39,27 @@ int
 main (int argc, char* argv[])
 {
   // We don't use stdio.
-  std::ios::sync_with_stdio(false);
+  std::ios::sync_with_stdio (false);
 
   time_t start_time = time (NULL);
 #if defined (__unix) || defined (__CYGWIN__)
-  TreelogDual treelog ("daisy.log", std::cerr);
+  TreelogDual msg ("daisy.log", std::cerr);
 #else // MSDOS
   // stderr can't be redirected under MSDOS
-  TreelogDual treelog ("daisy.log", std::cout);
+  TreelogDual msg ("daisy.log", std::cout);
 #endif // MSDOS
 
-  Assertion::Register reg (treelog);
+  Assertion::Register reg (msg);
 
   try
     {
       // Initialize syntax and attribute list.
       Syntax syntax;
       AttributeList alist;
-      Options::load_syntax (syntax, alist);
-      Options options (argc, argv, syntax, alist, treelog);
-
-      switch (argc)
-	{
-	case -2:
-	  options.usage (treelog);
-	  return 2;
-	case -1:
-	  return 1;
-	case 0:
-	  return 0;
-	case 1:
-	  // Do nothing.
-	  break;
-	default:
-	  daisy_notreached ();
-	}
-
-      // Explicit or implicit program?
-      const Library& library = Librarian<Program>::library ();
-      const Syntax* run_syntax;
-      const AttributeList* run_alist;
-
-      if (alist.check ("run"))
-        {
-          run_alist = &alist.alist ("run");
-          daisy_assert (run_alist->check ("type"));
-          run_syntax = &library.syntax (run_alist->identifier ("type"));
-        }
-      else
-        {
-          run_alist = &alist;
-          run_syntax = &syntax;
-        }
-
-      // Create, check and run the program.
-      options.copyright (treelog);
-      if (!run_syntax->check (*run_alist, treelog))
-        return 1;
-
-      std::auto_ptr<Block> block (new Block (syntax, alist, 
-                                             treelog, "Building"));
-      std::auto_ptr<Program> program (Librarian<Program>::build_alist (*block, 
-								  *run_alist,
- 								  "run"));
-      if (!block->ok ())
-	return 1;
-      block.reset ();
-    
-      program->initialize (&syntax, &alist, treelog);
-      if (!program->check (treelog))
-	return 1;
+      Toplevel::load_syntax (syntax, alist);
+      Options options (argc, argv, syntax, alist, msg);
+      options.copyright (msg);
+      Toplevel toplevel (syntax, alist, msg);
 
       const std::string when 
         = std::string ("Program started ") + ctime (&start_time);
@@ -120,9 +72,9 @@ main (int argc, char* argv[])
 	start_msg << ", 1 second ago.";
       else
 	start_msg << ", " << time_ago << " seconds ago.";
-      treelog.message (start_msg.str ());
+      msg.message (start_msg.str ());
 
-      program->run (treelog);
+      toplevel.run (msg);
 
       const time_t time_used = time (NULL) - start_time;
       const int hours = time_used / 3600;
@@ -142,33 +94,34 @@ main (int argc, char* argv[])
 	end_msg << "1 second.";
       else
 	end_msg << seconds << " seconds.";
-      treelog.message (end_msg.str ());
+      msg.message (end_msg.str ());
       
       // All is well.
-      return 0;
+      throw EXIT_SUCCESS;
 
     }
   catch (const char* error)
     {
-      treelog.error (std::string ("Exception: ") + error);
+      msg.error (std::string ("Exception: ") + error);
     }
   catch (const std::string& error)
     {
-      treelog.error (std::string ("Exception raised: ") + error);
+      msg.error (std::string ("Exception raised: ") + error);
     }
   catch (const std::exception& e)
     {
-      treelog.error (std::string ("Standard exception: ") + typeid (e).name ()
+      msg.error (std::string ("Standard exception: ") + typeid (e).name ()
 		     + ": " + e.what ());
     }
-  catch (const int error)
+  catch (const int exit_code)
     {
-      return error;
+      // The program already reported the error, just exit.
+      return exit_code;
     }
   catch (...)
     {
-      treelog.error ("Unknown exception");
+      msg.error ("Unknown exception");
     }
-  return 1;
+  return EXIT_FAILURE;
 }
       

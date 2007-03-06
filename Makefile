@@ -387,7 +387,7 @@ COMPONENTS = ABAeffect.C msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = timestep.C geometry_rect.C element.C \
+SUBMODELS = toplevel.C timestep.C geometry_rect.C element.C \
         geometry1d.C fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \
@@ -890,6 +890,9 @@ svat${OBJ}: svat.C svat.h librarian.h symbol.h assertion.h log.h border.h \
   alist.h block.h syntax.h treelog.h plf.h
 vegetation${OBJ}: vegetation.C vegetation.h librarian.h symbol.h assertion.h \
   log.h border.h alist.h syntax.h treelog.h block.h plf.h
+toplevel${OBJ}: toplevel.C toplevel.h daisy.h program.h librarian.h symbol.h \
+  assertion.h time.h library.h parser.h submodel.h block.h syntax.h \
+  treelog.h plf.h alist.h
 timestep${OBJ}: timestep.C timestep.h time.h vcheck.h syntax.h treelog.h \
   symbol.h alist.h block.h plf.h assertion.h mathlib.h
 geometry_rect${OBJ}: geometry_rect.C geometry_rect.h geometry_vert.h \
@@ -1085,9 +1088,9 @@ units${OBJ}: units.C units.h symbol.h syntax.h treelog.h mathlib.h \
 check${OBJ}: check.C check.h mathlib.h assertion.h
 check_range${OBJ}: check_range.C check_range.h check.h
 path${OBJ}: path.C path.h assertion.h
-options${OBJ}: options.C options.h library.h symbol.h block.h syntax.h \
-  treelog.h plf.h parser_file.h parser.h librarian.h assertion.h \
-  program.h alist.h treelog_stream.h version.h path.h
+options${OBJ}: options.C options.h daisy.h program.h librarian.h symbol.h \
+  assertion.h time.h library.h block.h syntax.h treelog.h plf.h \
+  parser_file.h parser.h alist.h treelog_stream.h version.h path.h
 traverse_delete${OBJ}: traverse_delete.C traverse_delete.h symbol.h \
   traverse.h library.h syntax.h treelog.h alist.h assertion.h
 depend${OBJ}: depend.C depend.h symbol.h traverse.h library.h syntax.h \
@@ -1629,7 +1632,7 @@ action_divide${OBJ}: action_divide.C action.h librarian.h symbol.h \
 action_surface${OBJ}: action_surface.C action.h librarian.h symbol.h \
   assertion.h alist.h block.h syntax.h treelog.h plf.h daisy.h program.h \
   time.h field.h border.h check.h
-main${OBJ}: main.C daisy.h program.h librarian.h symbol.h assertion.h time.h \
+main${OBJ}: main.C toplevel.h program.h librarian.h symbol.h assertion.h \
   parser.h block.h syntax.h treelog.h plf.h alist.h library.h \
   treelog_dual.h options.h
 qmain_edit_moc${OBJ}: qmain_edit_moc.C

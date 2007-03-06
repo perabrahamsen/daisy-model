@@ -29,20 +29,28 @@ class Syntax;
 class AttributeList;
 class Treelog;
 
+#ifdef __GNUC__
+#define NORETURN __attribute__ ((noreturn))
+#elif defined (_MSC_VER)
+#define NORETURN __declspec(noreturn)
+#else
+#define NORETURN
+#endif
+
 class Options
 {
   bool has_printed_copyright;
-public: 
-  static std::string get_arg (int& argc, char**& argv);
-  static void initialize_path ();
   const std::string program_name;
-  void usage (Treelog&) const;
+  static std::string get_arg (int& argc, char**& argv);
+  NORETURN void usage (Treelog&) const;
+public: 
+  static void initialize_path ();
   void copyright (Treelog&);
-  static void load_syntax (Syntax&, AttributeList&);
-  int parse (int& argc, char**& argv, 
-             Syntax& syntax, AttributeList& alist, Treelog&);
-  Options (int& argc, char**& argv, 
-	   Syntax& syntax, AttributeList& alist, Treelog&);
+Options (int& argc, char**& argv, 
+           Syntax& syntax, AttributeList& alist, Treelog&);
+private:                        // Disable.
+  Options (const Options&);
+  Options& operator= (const Options&);
 };
 
 #endif // OPTIONS_H

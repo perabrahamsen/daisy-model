@@ -71,6 +71,7 @@ Options::usage (Treelog& out) const
     }
   s += "]";
   out.error (s);
+  throw 2;
 }
 
 void
@@ -81,7 +82,7 @@ Options::copyright (Treelog& out)
   has_printed_copyright = true;
   out.lazy (std::string ("Daisy crop/soil simulation version ")
 	    + version + ". (" + version_date + ")\n"
-	    "Copyright 1996 - 2006 Per Abrahamsen, "
+	    "Copyright 1996 - 2007 Per Abrahamsen, "
 	    "Søren Hansen and KVL.");
 }
 
@@ -107,46 +108,11 @@ Options::initialize_path ()
   Path::set_path (path);
 }
 
-void
-Options::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  // Top level Daisy syntax.
-  Daisy::load_syntax (syntax, alist);
-  alist.add ("type", "Daisy");
-  Library::load_syntax (syntax, alist);
-      
-  syntax.add ("directory", Syntax::String, Syntax::OptionalConst,
-              "Run program in this directory.\n\
-This can affect both where input files are found and where log files\n\
-are generated.");
-  syntax.add ("path", Syntax::String,
-              Syntax::OptionalConst, Syntax::Sequence,
-              "List of directories to search for input files in.\n\
-The special value \".\" means the current directory.");
-  syntax.add ("input", Librarian<Parser>::library (),
-              Syntax::OptionalConst, Syntax::Singleton,
-              "Command to add more information about the simulation.");
-  syntax.add ("run", Librarian<Program>::library (), 
-              Syntax::OptionalState, Syntax::Singleton, 
-              "Program to run.\n\
-\n\
-If this option is specified, all the 'Daisy' specific top-level attributes\n\
-will be ignored.  If unspecified, run 'Daisy' on the current top-level\n\
-attributes.");
-}
-
 Options::Options (int& argc, char**& argv,
 		  Syntax& syntax, AttributeList& alist, Treelog& msg)
   : has_printed_copyright (false),
     program_name (argv[0])
-{
-  argc = parse (argc, argv, syntax, alist, msg);
-}
-
-int
-Options::parse (int& argc, char**& argv,
-                Syntax& syntax, AttributeList& alist, Treelog& msg)
-{
+{ 
   // Create original command line string first, we modify argc and argv later.
   // However we only want to print it after we have parsed "(directory ...)".
   const struct CommandLine : public std::string
@@ -168,7 +134,7 @@ Options::parse (int& argc, char**& argv,
   
   // We need at least one argument.
   if (argc < 2)
-    return -2;                  // Usage.
+    usage (msg);                  // Usage.
 
   // Parse DAISYPATH.
   initialize_path ();
@@ -184,7 +150,7 @@ Options::parse (int& argc, char**& argv,
       const std::string arg = get_arg (argc, argv);
 
       if (arg.size () < 1)      
-        return -2;              // No zero sized args.
+        usage (msg);              // No zero sized args.
       else if (options_finished || arg[0] != '-')
 	{                       // Not an option, but a setup file.
           copyright (msg);
@@ -196,7 +162,7 @@ Options::parse (int& argc, char**& argv,
 	  errors_found += parser.error_count ();
 	}
       else if (arg.size () < 1)
-        return -2;              // We don't allow a lone '-'.
+        usage (msg);              // We don't allow a lone '-'.
       else
 	{                       // Parse options.
 	  switch (arg[1])
@@ -211,13 +177,13 @@ Options::parse (int& argc, char**& argv,
 		}
 	      else
 		// Usage.
-		return -2;
+		usage (msg);
               break;
 	    case 'p':
               {                 // Run a named program.
                 if (argc < 2)
                   // We need a program name.
-                  return -2;
+                  usage (msg);
                 const Library& library 
                   = Librarian<Program>::library ();
                 const symbol name = symbol (get_arg (argc, argv));
@@ -225,7 +191,7 @@ Options::parse (int& argc, char**& argv,
                   {
                     msg.error (program_name + ": '" + name 
                                + "' unknown program");
-                    return -2;
+                    usage (msg);
                   }
                 const Syntax& p_syntax = library.syntax (name);
                 AttributeList p_alist (library.lookup (name));
@@ -256,19 +222,19 @@ Options::parse (int& argc, char**& argv,
 	      break;
 	    default:
 	      // Usage.
-	      return -2;
+	      usage (msg);
 	    }
 	}
     }
   if (errors_found > 0)
-    return -1;
+    throw EXIT_FAILURE;
 
   if (!file_found || prevent_run)
     // Done.
-    return 0;
+    throw EXIT_SUCCESS;
 
   // Done.
-  return argc;
+  daisy_assert (argc == 1);     // Only the program name remains.
 }
 
 // options.C ends here.
