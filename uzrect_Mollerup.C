@@ -294,7 +294,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       else
 	{
 	  // TODO: Calculate inner edge flux from Darcy.
-	  q += dq * ddt / dt;
+	  q += dq * ddt;
 	  time_left -= ddt;
 	  iterations_with_this_time_step++;
 
