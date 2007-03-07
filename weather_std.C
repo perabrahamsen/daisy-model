@@ -79,7 +79,7 @@ struct WeatherStandard : public Weather
     static void load_syntax (Syntax&, AttributeList&);
     YearMap (Block&);
   };
-  const vector<const YearMap*> missing_years;
+  const auto_vector<const YearMap*> missing_years;
   int active_map;
   int find_map (const Time& time) const;
 
@@ -145,7 +145,7 @@ struct WeatherStandard : public Weather
 
   // Parsing.
   const string where;
-  LexerData* lex;
+  std::auto_ptr<LexerData> lex;
   Lexer::Position end_of_header;
 
   // These are the last read values for today.
@@ -536,7 +536,7 @@ WeatherStandard::tick (const Time& time, Treelog& msg)
 void 
 WeatherStandard::read_line ()
 {
-  daisy_assert (lex);
+  daisy_assert (lex.get ());
 
   if (!lex->good ())
     {
@@ -650,6 +650,7 @@ WeatherStandard::read_line ()
 void 
 WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 { 
+  daisy_assert (lex.get ());
   daisy_assert (time.hour () == 0);
 
   // Handle missing years.
@@ -867,12 +868,13 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 }
 
 bool
-WeatherStandard::initialize (const Time& time, Treelog& err)
+WeatherStandard::initialize (const Time& time, Treelog& msg)
 { 
-  Treelog::Open nest (err, "Weather: " + name);
+  Treelog::Open nest (msg, "Weather: " + name);
 
-  daisy_assert (lex == NULL);
-  lex = new LexerData (where, err);
+  daisy_assert (!lex.get ());
+  lex.reset (new LexerData (where, msg));
+  daisy_assert (lex.get ());
   // Open errors?
   if (!lex->good ())
     return false;
@@ -1184,7 +1186,7 @@ but not both");
 NH4DryDep: " << DryDeposit.NH4 << " kgN/ha/year\n\
 NO3WetDep: " << WetDeposit.NO3 << " ppm\n\
 NO3DryDep: " << DryDeposit.NO3 << " kgN/ha/year";
-      err.debug (tmp.str ());
+      msg.debug (tmp.str ());
     }
 
   // BC5 sucks // if (begin >= end)
@@ -1261,7 +1263,7 @@ NO3DryDep: " << DryDeposit.NO3 << " kgN/ha/year";
   // Start reading.
   Time previous (time);
   previous.tick_hour (-1);
-  tick (previous, err);
+  tick (previous, msg);
   return true;
 }
 
@@ -1330,17 +1332,14 @@ WeatherStandard::WeatherStandard (Block& al)
 { }
 
 WeatherStandard::~WeatherStandard ()
-{ 
-  sequence_delete (missing_years.begin (), missing_years.end ());
-  delete lex; 
-}
+{ }
 
 bool
 WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 { 
   Treelog::Open nest (err, name);
 
-  daisy_assert (lex);
+  daisy_assert (lex.get ());
   bool ok = true;
   if (!lex->good ())
     {

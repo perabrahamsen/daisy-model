@@ -19,11 +19,13 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#error "This file is no longer used"
 
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
 #include <string>
+#include <ctime>
 
 class Syntax;
 class AttributeList;
@@ -39,6 +41,7 @@ class Treelog;
 
 class Options
 {
+  std::time_t start_time;
   bool has_printed_copyright;
   const std::string program_name;
   static std::string get_arg (int& argc, char**& argv);
@@ -46,7 +49,9 @@ class Options
 public: 
   static void initialize_path ();
   void copyright (Treelog&);
-Options (int& argc, char**& argv, 
+  void start_message (Treelog&) const;
+  void end_message (Treelog&) const;
+  Options (int& argc, char**& argv, 
            Syntax& syntax, AttributeList& alist, Treelog&);
 private:                        // Disable.
   Options (const Options&);

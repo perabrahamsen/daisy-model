@@ -29,7 +29,6 @@
 #include "assertion.h"
 #include "symbol.h"
 #include "memutils.h"
-#include "options.h"
 #include <map>
 #include <set>
 

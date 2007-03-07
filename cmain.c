@@ -92,8 +92,7 @@ main (int argc, char* argv[])
 
     while (daisy_daisy_is_running (daisy))
       {
-        daisy_daisy_tick_action (daisy);
-        daisy_daisy_tick_weather (daisy);
+        daisy_daisy_tick_before (daisy);
         
         for (i = 0; i < columns; i++)
           {
@@ -101,8 +100,7 @@ main (int argc, char* argv[])
             daisy_daisy_tick_column (daisy, i);
           }
 
-        daisy_daisy_tick_logs (daisy);
-        daisy_daisy_tick_time (daisy);
+        daisy_daisy_tick_after (daisy);
 	
         if (daisy_time_get_hour (time) == 0)
 	  printf ("%04d-%02d-%02d\n", 

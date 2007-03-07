@@ -23,7 +23,8 @@
 #include "weather.h"
 #include "groundwater.h"
 #include "horizon.h"
-#include "log_all.h"
+#include "output.h"
+#include "log.h"
 #include "parser.h"
 #include "nitrification.h"
 #include "bioclimate.h"
@@ -44,181 +45,6 @@
 
 const char *const Daisy::default_description = "\
 The Daisy crop/soil/atmosphere model.";
-
-const std::vector<Log*> 
-Daisy::find_active_logs (const std::vector<Log*>& logs, LogAll& log_all)
-{
-  std::vector<Log*> result;
-
-  for (size_t i = 0; i < logs.size (); i++)
-    if (!dynamic_cast<LogSelect*> (logs[i]))
-      result.push_back (logs[i]);
-  
-  result.push_back (&log_all);
-  
-  return result;
-}
-
-Daisy::Daisy (Block& al)
-  : Program (al),
-    global_syntax (NULL),
-    global_alist (NULL),
-    running (false),
-    logging (false),
-    logs (Librarian<Log>::build_vector (al, "output")),
-    log_all (*new LogAll (logs)),
-    active_logs (find_active_logs (logs, log_all)),
-    activate_output (Librarian<Condition>::build_item (al, "activate_output")),
-    print_time (Librarian<Condition>::build_item (al, "print_time")),
-    time (al.alist ("time")),
-    timestep (al.check ("timestep") 
-              ? submodel<Timestep> (al, "timestep")
-              : new Timestep (0, 0, 1, 0, 0)),
-    dt (timestep->total_hours ()),
-    stop (al.check ("stop")
-	  ? Time (al.alist ("stop")) 
-	  : Time (9999, 1, 1, 1)),
-    action (Librarian<Action>::build_item (al, "manager")),
-    weather (al.check ("weather") 
-	     ? Librarian<Weather>::build_item (al, "weather")
-	     : NULL), 
-    field (*new Field (al, "column")),
-    harvest (map_submodel_const<Harvest> (al, "harvest"))
-{ }
-
-bool
-Daisy::check (Treelog& err)
-{
-  daisy_assert (global_syntax);
-  daisy_assert (global_alist);
-  bool ok = true;
-
-  if (!approximate (dt, 1.0))
-    {
-      std::ostringstream tmp;
-      tmp << "Daisy only works with a timestep of 1 hour, you specified " 
-          << dt << " hours";
-      err.warning (tmp.str ());
-    }
-
-  // Check weather.
-  {
-    Treelog::Open nest (err, "weather");
-    if (weather && !weather->check (time, stop, err))
-      ok = false;
-  }
-
-  // Check field.
-  {
-    Treelog::Open nest (err, "column");
-    if (!field.check (weather == NULL, time, stop, err))
-      ok = false;
-  }
-  // Check logs.
-  {
-    Treelog::Open nest (err, "output");
-    for (std::vector<Log*>::const_iterator i = logs.begin ();
-	 i != logs.end ();
-	 i++)
-      {
-	if (*i == NULL || !(*i)-> check (field, err))
-	  ok = false;
-      }
-  }
-  // Check actions.
-  {
-    Treelog::Open nest (err, "manager");
-    if (!action->check (*this, err))
-      ok = false;
-  }
-  return ok;
-}
-
-void
-Daisy::tick_columns (Treelog& msg)
-{ field.tick (time, dt, weather, msg); }
-
-void
-Daisy::initial_logs (Treelog& msg)
-{
-  activate_output->tick (*this, msg);
-
-  if (activate_output->match (*this, msg))
-    {
-      if (!logging)
-	{
-	  msg.message ("Start logging");
-	  // get initial values for previous day.
-	  Time previous = time - *timestep;
-	  for (size_t i = 0; i < active_logs.size (); i++)
-	    {
-	      Log& log = *active_logs[i];
-	      if (log.initial_match (*this, msg))
-		{
-		  output_submodule (previous, "time", log);
-		  if (weather)
-		    output_derived (weather, "weather", log);
-		  output_submodule (field, "column", log);
-		  output_vector (harvest, "harvest", log);
-		  output_derived (action, "manager", log);
-                  output_list (logs, "output", log, 
-                               Librarian<Log>::library ());
-		  log.initial_done (previous, dt);
-		}
-	    }
-	}
-      logging = true;
-    }
-  else if (logging)
-    {
-      msg.message ("End logging");
-      logging = false;
-    }
-}
-
-void
-Daisy::tick_logs (Treelog& msg)
-{
-  if (logging)
-    {
-      for (size_t i = 0; i < active_logs.size (); i++)
-	{
-	  Log& log = *active_logs[i];
-	  if (log.match (*this, msg))
-	    {
-	      output_submodule (time, "time", log);
-	      if (weather)
-		output_derived (weather, "weather", log);
-	      output_submodule (field, "column", log);
-	      output_vector (harvest, "harvest", log);
-	      output_derived (action, "manager", log);
-              output_list (logs, "output", log, Librarian<Log>::library ());
-	      log.done (time, dt);
-	    }
-	}
-    }
-
-  // KLUDGE: Clean up field *after* log.
-  // Should be moved to separate function, but consider C interface.
-  field.clear ();
-}
-
-void
-Daisy::tick (Treelog& msg)
-{ 
-  initial_logs (msg);
-  if (weather)
-    weather->tick (time, msg);
-  action->tick (*this, msg);
-  action->doIt (*this, msg);
-
-  tick_columns (msg);
-  tick_logs (msg);
-  time += *timestep;
-  
-  if (time >= stop)
-    running = false;
-}
 
 bool
 Daisy::run (Treelog& msg)
@@ -252,30 +78,137 @@ Daisy::run (Treelog& msg)
       }
     while (running);
   }
-  // Print log file summaries at end of simulation.
-  {
-    Treelog::Open nest (msg, "Summary");
-    for (size_t i = 0; i < logs.size (); i++)
-      logs[i]->summarize (msg);
-  }
+  output_log->summarize (msg);
   return true;
 }
 
 void
+Daisy::tick (Treelog& msg)
+{ 
+  tick_before (msg);
+  tick_columns (msg);
+  tick_after (msg);
+}
+
+void
+Daisy::tick_before (Treelog& msg)
+{ 
+  output_log->initial_logs (*this, msg);
+  if (weather)
+    weather->tick (time, msg);
+  action->tick (*this, msg);
+  action->doIt (*this, msg);
+}
+
+void
+Daisy::tick_columns (Treelog& msg)
+{ field.tick_all (time, dt, weather, msg); }
+
+void
+Daisy::tick_column (const size_t col, Treelog& msg)
+{ field.tick_one (col, time, dt, weather, msg); }
+
+void
+Daisy::tick_after (Treelog& msg)
+{ 
+  output_log->tick (*this, msg);
+  field.clear ();
+  time += *timestep;
+  
+  if (time >= stop)
+    running = false;
+}
+
+void
+Daisy::output (Log& log) const
+{
+  if (weather)
+    output_derived (weather, "weather", log);
+  output_submodule (field, "column", log);
+  output_vector (harvest, "harvest", log);
+  output_derived (action, "manager", log);
+}
+
+void
 Daisy::initialize (const Syntax* glob_syn, const AttributeList* glob_al,
-                   Treelog& err)
+                   Treelog& msg)
 { 
   global_syntax = glob_syn; 
   global_alist = glob_al;
-  if (weather && !weather->initialize (time, err))
+  if (weather && !weather->initialize (time, msg))
     return;
-  field.initialize (time, err, weather);
+  field.initialize (time, msg, weather);
   {
-    Treelog::Open nest (err, "output");
-    for (size_t i = 0; i < logs.size (); i++)
-      logs[i]->initialize (err);
+    Treelog::Open nest (msg, "output");
+    output_log->initialize (msg);
   }
 }
+
+bool
+Daisy::check (Treelog& msg)
+{
+  daisy_assert (global_syntax);
+  daisy_assert (global_alist);
+  bool ok = true;
+
+  if (!approximate (dt, 1.0))
+    {
+      std::ostringstream tmp;
+      tmp << "Daisy only works with a timestep of 1 hour, you specified " 
+          << dt << " hours";
+      msg.warning (tmp.str ());
+    }
+
+  // Check weather.
+  {
+    Treelog::Open nest (msg, "weather");
+    if (weather && !weather->check (time, stop, msg))
+      ok = false;
+  }
+
+  // Check field.
+  {
+    Treelog::Open nest (msg, "column");
+    if (!field.check (weather == NULL, time, stop, msg))
+      ok = false;
+  }
+  // Check logs.
+  {
+    Treelog::Open nest (msg, "output");
+    if (!output_log->check (field, msg))
+      ok = false;
+  }
+  // Check actions.
+  {
+    Treelog::Open nest (msg, "manager");
+    if (!action->check (*this, msg))
+      ok = false;
+  }
+  return ok;
+}
+
+Daisy::Daisy (Block& al)
+  : Program (al),
+    global_syntax (NULL),
+    global_alist (NULL),
+    running (false),
+    output_log (new Output (al)),
+    print_time (Librarian<Condition>::build_item (al, "print_time")),
+    time (al.alist ("time")),
+    timestep (al.check ("timestep") 
+              ? submodel<Timestep> (al, "timestep")
+              : new Timestep (0, 0, 1, 0, 0)),
+    dt (timestep->total_hours ()),
+    stop (al.check ("stop")
+	  ? Time (al.alist ("stop")) 
+	  : Time (9999, 1, 1, 1)),
+    action (Librarian<Action>::build_item (al, "manager")),
+    weather (al.check ("weather") 
+	     ? Librarian<Weather>::build_item (al, "weather")
+	     : NULL), 
+    field (*new Field (al, "column")),
+    harvest (map_submodel_const<Harvest> (al, "harvest"))
+{ }
 
 void
 Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
@@ -333,8 +266,6 @@ the simulation.  Can be overwritten by column specific weather.");
 
 Daisy::~Daisy ()
 {
-  sequence_delete (logs.begin (), logs.end ());
-  delete &log_all;
   if (weather)
     delete weather;
   delete &field;

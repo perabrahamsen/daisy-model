@@ -90,7 +90,8 @@ public:
   string crop_names () const;
   // Simulation.
   void clear ();
-  void tick (const Time&, double dt, const Weather*, Treelog&);
+  void tick_all (const Time&, double dt, const Weather*, Treelog&);
+  void tick_one (size_t, const Time&, double dt, const Weather*, Treelog&);
   void output (Log&) const;
 
   // Find a specific column.
@@ -549,13 +550,22 @@ Field::Implementation::clear ()
 }
 
 void 
-Field::Implementation::tick (const Time& time, const double dt, 
-                             const Weather* weather, Treelog& msg)
+Field::Implementation::tick_all (const Time& time, const double dt, 
+                                 const Weather* weather, Treelog& msg)
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
     (*i)->tick (time, dt, weather, msg);
+}
+
+void 
+Field::Implementation::tick_one (const size_t col,
+                                 const Time& time, const double dt, 
+                                 const Weather* weather, Treelog& msg)
+{
+  daisy_assert (columns.size () > 0);
+  columns[col]->tick (time, dt, weather, msg);
 }
 
 void 
@@ -861,9 +871,15 @@ Field::clear ()
 { impl.clear (); }
 
 void
-Field::tick (const Time& time, const double dt, const Weather* weather, 
-             Treelog& msg)
-{ impl.tick (time, dt, weather, msg); }
+Field::tick_all (const Time& time, const double dt, const Weather* weather, 
+                 Treelog& msg)
+{ impl.tick_all (time, dt, weather, msg); }
+
+void
+Field::tick_one (const size_t col,
+                 const Time& time, const double dt, const Weather* weather, 
+                 Treelog& msg)
+{ impl.tick_one (col, time, dt, weather, msg); }
 
 void 
 Field::output (Log& log) const

@@ -1,14 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Mollerup: få beregnet dq rigtigt.
-
-* OpenMI: Nedre rand skal virke med negativt tryk
-
 * Scope C API 
 
-** dim to si power base?
+** extern log skal ind under daisy output
 
-** end_time
+* Mollerup: få beregnet dq rigtigt.
+
+* OpenMI
+
+** Nedre rand skal virke med negativt tryk
+
+** dim to si power base?
 
 ** søjle polygon
 

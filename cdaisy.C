@@ -28,6 +28,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "daisy.h"
+#include "toplevel.h"
 #include "parser_file.h"
 #include "time.h"
 #include "field.h"
@@ -37,7 +38,6 @@
 #include "horizon.h"
 #include "printer_file.h"
 #include "version.h"
-#include "options.h"
 #include "chemical.h"
 #include "log_extern.h"
 #include "treelog_stream.h"
@@ -69,6 +69,78 @@ using namespace std;
 #endif
 
 typedef int daisy_bool;
+
+// @ The daisy_toplevel Type.
+
+extern "C" EXPORT Toplevel*
+daisy_toplevel_create_with_log (const char* logname)
+{
+  try 
+    { return new Toplevel (logname); }
+  catch (...)
+    { return NULL; }
+}
+
+extern "C" EXPORT void
+daisy_toplevel_parse_command_line (Toplevel* toplevel,
+                                   int argc, char** argv)
+{
+  try
+    { toplevel->command_line (argc, argv); }
+  catch (...)
+    { toplevel->error ("Command line parsing failed"); }
+}
+
+extern "C" EXPORT void
+daisy_toplevel_parse_file (Toplevel* toplevel, char* filename)
+{
+  try 
+    { toplevel->parse_file (filename); }
+  catch (...)
+    { toplevel->error ("Error while parsing '" + string (filename) + "'"); }
+}
+
+extern "C" EXPORT const Syntax*
+daisy_toplevel_get_program_syntax (Toplevel* toplevel)
+{ return &toplevel->program_syntax (); }
+
+extern "C" EXPORT const AttributeList*
+daisy_toplevel_get_program_alist (Toplevel* toplevel)
+{ return &toplevel->program_alist (); }
+
+extern "C" EXPORT void
+daisy_toplevel_initialize (Toplevel* toplevel)
+{ 
+  try 
+    { toplevel->initialize (); }
+  catch (...)
+    { toplevel->error ("Error while initializing"); }
+}
+
+extern "C" EXPORT Daisy*
+daisy_toplevel_get_daisy (Toplevel* toplevel)
+{ return dynamic_cast<Daisy*> (&toplevel->program ()); }
+
+extern "C" EXPORT void
+daisy_toplevel_run (Toplevel* toplevel)
+{
+  try 
+    { toplevel->run (); }
+  catch (...)
+    { toplevel->error ("Error while running program"); }
+}
+
+extern "C" EXPORT void
+daisy_toplevel_error (Toplevel* toplevel, char* message)
+{ toplevel->error (message); }
+
+extern "C" EXPORT bool
+daisy_toplevel_ok (Toplevel* toplevel)
+{ return toplevel->ok (); }
+
+extern "C" EXPORT void     
+daisy_toplevel_delete (Toplevel* toplevel)
+{ delete toplevel; }
 
 // @ The daisy_syntax Type.
 
@@ -540,36 +612,12 @@ daisy_daisy_tick (Daisy* daisy)
 }
 
 extern "C" void EXPORT
-daisy_daisy_tick_action (Daisy* daisy)
+daisy_daisy_tick_before (Daisy* daisy)
 {
   try
     {
-      TreelogStream treelog (cerr);
-      daisy->action->tick (*daisy, treelog);
-      daisy->action->doIt (*daisy, treelog);
-    }
-  catch (const char* error)
-    {
-      cerr << "Exception: " << error << "\n";
-      exit (1);
-    }
-  catch (...)
-    {
-      cerr << "Unhandled exception\n";
-      exit (1);
-    }
-}
-
-extern "C" void EXPORT
-daisy_daisy_tick_weather (Daisy* daisy)
-{
-  if (!daisy->weather)
-    return;
-
-  try
-    {
-      TreelogStream treelog (cerr);
-      daisy->weather->tick (daisy->time, treelog); 
+      TreelogStream msg (cerr);
+      daisy->tick_before (msg);
     }
   catch (const char* error)
     {
@@ -608,9 +656,8 @@ daisy_daisy_tick_column (Daisy* daisy, int col)
 {
   try
     {
-      TreelogStream treelog (cerr);
-      daisy->field.find (col)->tick (daisy->time, daisy->dt, 
-                                     daisy->weather, treelog);
+      TreelogStream msg (cerr);
+      daisy->tick_column (col, msg);
     }
   catch (const char* error)
     {
@@ -625,33 +672,12 @@ daisy_daisy_tick_column (Daisy* daisy, int col)
 }
 
 extern "C" void EXPORT
-daisy_daisy_tick_logs (Daisy* daisy)
+daisy_daisy_tick_after (Daisy* daisy)
 {
   try
     {
       TreelogStream treelog (cerr);
-      daisy->tick_logs (treelog); 
-    }
-  catch (const char* error)
-    {
-      cerr << "Exception: " << error << "\n";
-      exit (1);
-    }
-  catch (...)
-    {
-      cerr << "Unhandled exception\n";
-      exit (1);
-    }
-}
-
-extern "C" void EXPORT		// Run time a single time step.
-daisy_daisy_tick_time (Daisy* daisy)
-{
-  try
-    {
-      daisy->time.tick_hour (); 
-      TreelogStream treelog (cerr);
-      daisy->initial_logs (treelog); // BUG: We lose first hour.
+      daisy->tick_after (treelog);
     }
   catch (const char* error)
     {
@@ -1048,7 +1074,7 @@ attributes.");
 extern "C" void EXPORT
 daisy_initialize ()
 {
-  Options::initialize_path ();
+  // Options::initialize_path ();
 
 #ifdef __unix
   // We should do the appropriate magic on Unix.

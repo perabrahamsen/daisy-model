@@ -104,7 +104,8 @@ public:
   std::string crop_names () const;
   // Simulation.
   void clear ();
-  void tick (const Time&, double dt, const Weather*, Treelog&);
+  void tick_all (const Time&, double dt, const Weather*, Treelog&);
+  void tick_one (size_t, const Time&, double dt, const Weather*, Treelog&);
   void output (Log&) const;
 
   // Find a specific column.

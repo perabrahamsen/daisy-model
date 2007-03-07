@@ -32,6 +32,7 @@
 #include "version.h"
 #include "path.h"
 #include <memory>
+#include <sstream>
 
 #if defined (__unix) 
 #define PATH_SEPARATOR ":"
@@ -86,6 +87,47 @@ Options::copyright (Treelog& out)
 	    "Søren Hansen and KVL.");
 }
 
+void
+Options::start_message (Treelog& msg) const
+{
+  const std::string when 
+    = std::string ("Program started ") + ctime (&start_time);
+  std::ostringstream start_msg;
+  start_msg << when.substr (0, when.size () - 1);
+  const time_t time_ago = time (NULL) - start_time;
+  if (time_ago == 0)
+    start_msg << ".";
+  if (time_ago == 1)
+    start_msg << ", 1 second ago.";
+  else
+    start_msg << ", " << time_ago << " seconds ago.";
+  msg.message (start_msg.str ());
+}
+
+void
+Options::end_message (Treelog& msg) const
+{
+  const std::time_t time_used = std::time (NULL) - start_time;
+  const int hours = time_used / 3600;
+  const int minutes = (time_used % 3600) / 60;
+  const int seconds = time_used % 60;
+  std::ostringstream end_msg;
+  end_msg << "Program finished after ";
+  if (hours == 1)
+    end_msg << "1 hour, ";
+  else if (hours > 0)
+    end_msg << hours << " hours, ";
+  if (minutes == 1)
+    end_msg << " 1 minute and ";
+  else if (hours > 0 || minutes > 0)
+    end_msg << minutes << " minutes and ";
+  if (seconds == 1)
+    end_msg << "1 second.";
+  else
+    end_msg << seconds << " seconds.";
+  msg.message (end_msg.str ());
+}
+
 void 
 Options::initialize_path ()
 {
@@ -110,7 +152,8 @@ Options::initialize_path ()
 
 Options::Options (int& argc, char**& argv,
 		  Syntax& syntax, AttributeList& alist, Treelog& msg)
-  : has_printed_copyright (false),
+  : start_time (std::time (NULL)),
+    has_printed_copyright (false),
     program_name (argv[0])
 { 
   // Create original command line string first, we modify argc and argv later.

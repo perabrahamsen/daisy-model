@@ -35,9 +35,9 @@ class Log;
 class Field;
 class Syntax;
 class AttributeList;
-class Condition;
 class Treelog;
-class LogAll;
+class Output;
+class Condition;
 class Timestep;
 
 class Daisy : public Program
@@ -50,16 +50,11 @@ public:
 
   // Content.
   const std::string directory;  // Initialize, check and run here.
-public:
   bool running;
-  bool logging;
-  const std::vector<Log*> logs;
-  LogAll& log_all;
-  static const std::vector<Log*> 
-  /**/ find_active_logs (const std::vector<Log*>& logs, LogAll& log_all);
-  const std::vector<Log*> active_logs;
-  const std::auto_ptr<Condition> activate_output;
+private:
+  const std::auto_ptr<Output> output_log;
   const std::auto_ptr<Condition> print_time;
+public:
   Time time;
   const std::auto_ptr<Timestep> timestep;
   const double dt;
@@ -68,16 +63,19 @@ private:
 public:
   std::auto_ptr<Action> action;
   Weather* weather;
+public:
   Field& field;
   std::vector<const Harvest*> harvest;
 
   // Simulation.
 public:
-  void tick_columns (Treelog&);
-  void initial_logs (Treelog&);
-  void tick_logs (Treelog&);
-  void tick (Treelog&);
   bool run (Treelog&);
+  void tick (Treelog&);
+  void tick_before (Treelog&);
+  void tick_columns (Treelog&);
+  void tick_column (size_t, Treelog&);
+  void tick_after (Treelog&);
+  void output (Log&) const;
 
   // Create and Destroy.
 public:

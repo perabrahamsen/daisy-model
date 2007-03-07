@@ -407,11 +407,11 @@ SPECIALS = geometry_vert.C gnuplot_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = scope_block.C scope_id.C librarian.C scope_multi.C \
+OTHER = output.C scope_block.C scope_id.C librarian.C scope_multi.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
-	check.C check_range.C path.C options.C traverse_delete.C \
+	check.C check_range.C path.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	mathlib.C cdaisy.C nrutil.C \
@@ -457,8 +457,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
-
+REMOVE = options.C options.h select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
 
 # These are the file extensions we deal with.
 # 
@@ -472,6 +471,7 @@ all:	#(EXECUTABLES)
 # Create the main executable.
 #
 daisy${EXE}:	main${OBJ} $(LIBOBJ)
+	(rm -f version${OBJ}; $(MAKE) version${OBJ})
 	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
 
 exp:	
@@ -534,11 +534,13 @@ cdaisy_test${EXE}:  cmain_test${OBJ} daisy.so
 # Create a DLL.
 #
 daisy.dll:	$(LIBOBJ)
+	(rm -f version${OBJ}; $(MAKE) version${OBJ})
 	$(CC) -shared -o daisy.dll $^ $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
 
 # Create a shared library.
 #
 daisy.so: $(LIBOBJ)
+	(rm -f version${OBJ}; $(MAKE) version${OBJ})
 	$(CC) -shared -o daisy.so $^ $(MATHLIB)
 
 cdaisy.o:
@@ -890,9 +892,10 @@ svat${OBJ}: svat.C svat.h librarian.h symbol.h assertion.h log.h border.h \
   alist.h block.h syntax.h treelog.h plf.h
 vegetation${OBJ}: vegetation.C vegetation.h librarian.h symbol.h assertion.h \
   log.h border.h alist.h syntax.h treelog.h block.h plf.h
-toplevel${OBJ}: toplevel.C toplevel.h daisy.h program.h librarian.h symbol.h \
-  assertion.h time.h library.h parser.h submodel.h block.h syntax.h \
-  treelog.h plf.h alist.h
+toplevel${OBJ}: toplevel.C toplevel.h program.h librarian.h symbol.h \
+  assertion.h syntax.h treelog.h alist.h daisy.h time.h library.h \
+  parser_file.h parser.h submodel.h block.h plf.h path.h version.h \
+  treelog_dual.h
 timestep${OBJ}: timestep.C timestep.h time.h vcheck.h syntax.h treelog.h \
   symbol.h alist.h block.h plf.h assertion.h mathlib.h
 geometry_rect${OBJ}: geometry_rect.C geometry_rect.h geometry_vert.h \
@@ -1047,6 +1050,10 @@ log_alist${OBJ}: log_alist.C log_alist.h log.h border.h librarian.h symbol.h \
 log_clone${OBJ}: log_clone.C log_clone.h log_alist.h log.h border.h \
   librarian.h symbol.h assertion.h alist.h block.h syntax.h treelog.h \
   plf.h
+output${OBJ}: output.C output.h condition.h librarian.h symbol.h assertion.h \
+  memutils.h daisy.h program.h time.h log_all.h log_select.h log.h \
+  border.h alist.h select.h destination.h number.h units.h volume.h \
+  bound.h treelog.h timestep.h vcheck.h
 scope_block${OBJ}: scope_block.C scope_block.h scope.h symbol.h block.h \
   syntax.h treelog.h plf.h number.h librarian.h assertion.h stringer.h \
   alist.h
@@ -1088,9 +1095,6 @@ units${OBJ}: units.C units.h symbol.h syntax.h treelog.h mathlib.h \
 check${OBJ}: check.C check.h mathlib.h assertion.h
 check_range${OBJ}: check_range.C check_range.h check.h
 path${OBJ}: path.C path.h assertion.h
-options${OBJ}: options.C options.h daisy.h program.h librarian.h symbol.h \
-  assertion.h time.h library.h block.h syntax.h treelog.h plf.h \
-  parser_file.h parser.h alist.h treelog_stream.h version.h path.h
 traverse_delete${OBJ}: traverse_delete.C traverse_delete.h symbol.h \
   traverse.h library.h syntax.h treelog.h alist.h assertion.h
 depend${OBJ}: depend.C depend.h symbol.h traverse.h library.h syntax.h \
@@ -1104,25 +1108,24 @@ lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h time.h mathlib.h \
   assertion.h
 lexer${OBJ}: lexer.C lexer.h treelog.h symbol.h path.h
 daisy${OBJ}: daisy.C daisy.h program.h librarian.h symbol.h assertion.h \
-  time.h weather.h im.h groundwater.h horizon.h log_all.h log_select.h \
-  log.h border.h alist.h select.h destination.h condition.h number.h \
-  units.h volume.h bound.h parser.h nitrification.h bioclimate.h \
+  time.h weather.h im.h groundwater.h horizon.h output.h condition.h \
+  memutils.h log.h border.h alist.h parser.h nitrification.h bioclimate.h \
   hydraulic.h field.h harvest.h chemicals.h syntax.h treelog.h block.h \
   plf.h action.h timestep.h vcheck.h library.h submodeler.h column.h \
-  mathlib.h memutils.h
+  mathlib.h
 alist${OBJ}: alist.C plf.h library.h symbol.h alist.h syntax.h treelog.h \
   time.h mathlib.h assertion.h memutils.h
 syntax${OBJ}: syntax.C syntax.h treelog.h symbol.h alist.h library.h check.h \
   vcheck.h assertion.h memutils.h
 library${OBJ}: library.C library.h symbol.h block.h syntax.h treelog.h plf.h \
-  alist.h assertion.h memutils.h options.h
+  alist.h assertion.h memutils.h
 plf${OBJ}: plf.C plf.h assertion.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
 cdaisy${OBJ}: cdaisy.C scope.h symbol.h block.h syntax.h treelog.h plf.h \
   library.h alist.h daisy.h program.h librarian.h assertion.h time.h \
-  parser_file.h parser.h field.h border.h column.h weather.h im.h \
-  action.h horizon.h printer_file.h printer.h version.h options.h \
-  chemical.h log_extern.h treelog_stream.h
+  toplevel.h parser_file.h parser.h field.h border.h column.h weather.h \
+  im.h action.h horizon.h printer_file.h printer.h version.h chemical.h \
+  log_extern.h treelog_stream.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
@@ -1633,8 +1636,7 @@ action_surface${OBJ}: action_surface.C action.h librarian.h symbol.h \
   assertion.h alist.h block.h syntax.h treelog.h plf.h daisy.h program.h \
   time.h field.h border.h check.h
 main${OBJ}: main.C toplevel.h program.h librarian.h symbol.h assertion.h \
-  parser.h block.h syntax.h treelog.h plf.h alist.h library.h \
-  treelog_dual.h options.h
+  syntax.h treelog.h alist.h
 qmain_edit_moc${OBJ}: qmain_edit_moc.C
 cmain${OBJ}: cmain.c cdaisy.h
 bugmain${OBJ}: bugmain.c cdaisy.h

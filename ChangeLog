@@ -1,6 +1,14 @@
+2007-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (OTHER, REMOVE): Removed options.C and options.h.
+
 2007-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* output.C, output.h: New utility submodel.
+	* Makefile (OTHER): Add it.
+
 	* toplevel.C, toplevel.h: New submodel.
+	* Makefile (SUBMODEL): Add it.
 	* main.C (main): Use it.
 
 2007-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>

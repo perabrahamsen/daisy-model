@@ -1,4 +1,4 @@
-/* @ cdaisy.h --- C interface to daisy.
+/* @ cdaisy.h --- -*- C -*- interface to daisy. 
  *
  * This file describes the C interface to the Daisy soil/crop
  * simulation model.
@@ -32,6 +32,7 @@ extern "C" {
 #endif
 */
 
+typedef struct daisy_toplevel daisy_toplevel;
 typedef struct daisy_syntax daisy_syntax;
 typedef struct daisy_alist daisy_alist;
 typedef struct daisy_library daisy_library;
@@ -54,11 +55,51 @@ typedef struct daisy_scope daisy_scope;
 /* @@ The daisy_bool Type.
  * 
  * The daisy_bool type indicate that a variable only can have two
- * different states.  Since C doesn't have a bool type, we use an int
+ * different states.  Since C89 doesn't have a bool type, we use an int
  * instead. 
  */
 
 typedef int daisy_bool;
+
+/* @ The daisy_toplevel Type
+ *
+ * The daisy_toplevel is an environment for reading files and running
+ * programs. 
+ */
+
+EXPORT daisy_toplevel*          /* Create a toplevel with a log file. */
+daisy_toplevel_create_with_log (const char* logname);
+
+EXPORT void                     /* Parse command arguments. */
+daisy_toplevel_parse_command_line (daisy_toplevel* toplevel,
+                                   int argc, char** argv);
+
+EXPORT void                     /* Parse command arguments. */
+daisy_toplevel_parse_file (daisy_toplevel* toplevel, char* filename);
+
+EXPORT daisy_syntax*            /* Extract program syntax. */
+daisy_toplevel_get_program_syntax (daisy_toplevel* toplevel);
+
+EXPORT daisy_alist*             /* Extract program alist. */
+daisy_toplevel_get_program_alist (daisy_toplevel* toplevel);
+
+EXPORT void                     /* Initialize toplevel object. */
+daisy_toplevel_initialize (daisy_toplevel* toplevel);
+
+EXPORT daisy_daisy*             /* Extract daisy object, if any. */
+daisy_toplevel_get_daisy (daisy_toplevel* toplevel);
+
+EXPORT void                     /* Run program. */
+daisy_toplevel_run (daisy_toplevel* toplevel);
+
+EXPORT void                     /* Signal an error. */
+daisy_toplevel_error (daisy_toplevel* toplevel, char* message);
+
+EXPORT bool                     /* Is toplevel object ok? */
+daisy_toplevel_ok (daisy_toplevel* toplevel);
+
+EXPORT void                     /* Delete toplevel object. */
+daisy_toplevel_delete (daisy_toplevel* toplevel);
 
 /* @ The daisy_syntax Type.
  * 
@@ -374,25 +415,19 @@ daisy_daisy_start (daisy_daisy* daisy);
 EXPORT void                            /* Run all processes a single time step. */
 daisy_daisy_tick (daisy_daisy* daisy);
 
-EXPORT void                            /* Run manager a single time step. */
-daisy_daisy_tick_action (daisy_daisy* daisy);
+EXPORT void                            /* Timestep before colums. */
+daisy_daisy_tick_before (daisy_daisy* daisy);
 
-EXPORT void                            /* Run weather a single time step. */
-daisy_daisy_tick_weather (daisy_daisy* daisy);
-
-EXPORT void                            /* Run all columns a single time step. */
+EXPORT void                  /* Run all columns a single time step. */
 daisy_daisy_tick_columns (daisy_daisy* daisy);
 
-EXPORT void                            /* Run column #col a single time step. */
+EXPORT void                  /* Run column #col a single time step. */
 daisy_daisy_tick_column (daisy_daisy* daisy, int col);
 
-EXPORT void                            /* Write all log files for this time step. */
-daisy_daisy_tick_logs (daisy_daisy* daisy);
+EXPORT void              /* Timestep after columns */
+daisy_daisy_tick_after (daisy_daisy* daisy);
 
-EXPORT void                            /* Run time a single time step. */
-daisy_daisy_tick_time (daisy_daisy* daisy);
-
-EXPORT daisy_bool                      /* Check if simulation is still active. */
+EXPORT daisy_bool           /* Check if simulation is still active. */
 daisy_daisy_is_running (daisy_daisy* daisy);
 
 /* @@ Manipulating the simulation.

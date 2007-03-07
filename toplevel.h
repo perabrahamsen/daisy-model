@@ -22,33 +22,75 @@
 #ifndef TOPLEVEL_H
 #define TOPLEVEL_H
 
+#include "program.h"
+#include "syntax.h"
+#include "alist.h"
+#include <string>
 #include <memory>
+#include <ctime>
 
 class Syntax;
 class AttributeList;
 class Treelog;
-class Program;
+
+#ifdef __GNUC__
+#define NORETURN __attribute__ ((noreturn))
+#elif defined (_MSC_VER)
+#define NORETURN __declspec(noreturn)
+#else
+#define NORETURN
+#endif
 
 class Toplevel
 {
   //Content.
 private:
-  const std::auto_ptr<Program> program;
+  std::string program_name;
+  std::auto_ptr<Program> program_;
+  const std::auto_ptr<Treelog> msg;
+  Syntax top_syntax;
+  AttributeList top_alist;
+  std::time_t start_time;
+  bool has_printed_copyright;
+  bool is_ok;
+
+  // Accessors.
+private:
+  Syntax& syntax ();
+  AttributeList& alist ();
+public:
+  const Syntax& program_syntax () const;
+  const AttributeList& program_alist () const;
+  Program& program () const;
+
+  // Messages.
+private:
+  NORETURN void usage ();
+  void copyright ();
+  void start_message () const;
+  void end_message () const;
 
   // Use.
 public:
-  void run (Treelog& msg);
+  void run ();
+  void error (const std::string&);
+  bool ok () const;
 
-  // Build.
+  // Create and Destroy.
+private:  
+  static void initialize_once ();
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  void initialize ();
 private:
-  static std::auto_ptr<Program> build_program (const Syntax&, 
-                                               const AttributeList&,
-                                               Treelog&);
+  static std::string get_arg (int& argc, char**& argv);
 public:
-  Toplevel (const Syntax& top_syntax, const AttributeList& top_alist,
-            Treelog& msg);
+  void command_line (int& argc, char**& argv);
+  void parse_file (const std::string&);
+  static void load_run (Syntax&, AttributeList&);
+private:
+  static void load_syntax (Syntax&, AttributeList&);
+public:
+  Toplevel (const std::string& logname);
 private:                        // Disable defaults.
   Toplevel(const Toplevel&);
 };

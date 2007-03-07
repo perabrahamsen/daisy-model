@@ -294,9 +294,7 @@ HydraulicHypres::~HydraulicHypres ()
 
 Hydraulic&
 HydraulicHypres::make (Block& al)
-{
-  return *new HydraulicHypres (al);
-}
+{ return *new HydraulicHypres (al); }
 
 static struct HydraulicHypresSyntax
 {
