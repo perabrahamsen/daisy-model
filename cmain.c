@@ -24,16 +24,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
+
+void
+exit_on_failure (daisy_toplevel* toplevel)
+{
+  if (daisy_toplevel_done (toplevel))
+    {
+      daisy_toplevel_delete (toplevel);
+      exit (EXIT_FAILURE);
+    }
+}
 
 int 
 main (int argc, char* argv[])
 {
   /* Declarations. */
-  daisy_syntax* syntax;
-  daisy_alist* alist;
-  daisy_parser* parser;
+  daisy_toplevel* toplevel;
   daisy_daisy* daisy;
-  const daisy_scope* scope;
+  const daisy_scope* scope = NULL;
 
   /* We need exactly one argument. */
   if (argc != 2)
@@ -42,38 +51,33 @@ main (int argc, char* argv[])
       exit (2);
     }
 
-  /* Link and initialize the daisy subsystem. */
-  daisy_initialize ();
+  /* Create a top level that logs to a daisy.log file. */
+  toplevel = daisy_toplevel_create_with_log ("daisy.log");
+  assert (toplevel);
 
-  /* Check for -v */
-  if (strcmp (argv[1], "-v") == 0)
-    {
-      fprintf (stderr, "Version %s\n", daisy_version ());
-      exit (0);
+  /* Parse thecommand line. */
+  daisy_toplevel_parse_command_line (toplevel, argc, argv);
+  if (daisy_toplevel_done (toplevel))
+    {                           /* We might be done now. */
+      daisy_toplevel_delete (toplevel);
+      exit (EXIT_SUCCESS);
     }
+  exit_on_failure (toplevel);
 
-  /* Initialize syntax and attribute list. */
-  syntax = daisy_syntax_create ();
-  alist = daisy_alist_create ();
-  daisy_load (syntax, alist);
-  
-  /* Parse the file. */
-  parser = daisy_parser_create_file (syntax, argv[1]);
-  daisy_parser_load (parser, alist);
-  
-  /* Check the result. */
-  if (!daisy_syntax_check (syntax, alist, "daisy")
-      || daisy_parser_error_count (parser) > 0)
-    exit (1);
+  /* Initialize */
+  daisy_toplevel_initialize (toplevel);
+  exit_on_failure (toplevel);
 
-  /* Create, check and run the simulation. */
-  daisy = daisy_daisy_create (syntax, alist);
-  if (!daisy_daisy_check (daisy))
-    exit (1);
+  daisy = daisy_toplevel_get_daisy (toplevel);
 
+  if (!daisy)
+    {
+      /* Not a Daisy simulation, just run it. */
+      daisy_toplevel_run (toplevel);
+      exit (daisy_toplevel_done (toplevel) ? EXIT_SUCCESS : EXIT_FAILURE);
+    }
   /* Run the simulation. */
   {
-    
     const daisy_time *const time = daisy_daisy_get_time (daisy);
     const int columns = daisy_daisy_count_columns (daisy);
     int i;
@@ -81,14 +85,12 @@ main (int argc, char* argv[])
     printf ("Starting simulation.\n");
     daisy_daisy_start (daisy);
 
-    //
-    scope = daisy_scope_find_extern ("check");
-    if (scope)
-      {
-	printf ("check OK end.\n");
-      }
-    else printf ("check not recognized.\n");
+    // Find a scope named 'check'.
     
+    if (daisy_scope_extern_size () < 1)
+      printf ("No scope found not recognized.\n");
+    else
+      scope = daisy_scope_extern_get(0);
 
     while (daisy_daisy_is_running (daisy))
       {
@@ -123,10 +125,7 @@ main (int argc, char* argv[])
   }
 
   /* Cleanup. */
-  daisy_syntax_delete (syntax);
-  daisy_alist_delete (alist);
-  daisy_parser_delete (parser);
-  daisy_daisy_delete (daisy);
+  daisy_toplevel_delete (toplevel);
 
   /* All is well. */
   exit (0);

@@ -118,6 +118,8 @@ else
 	endif
 endif
 
+DAISYDYN = daisy.dll
+
 # Do we want to create a dynamic library?
 #
 ifeq ($(HOSTTYPE),i386-linux)
@@ -520,8 +522,8 @@ qmain_edit_moc.C:	qmain_edit.h
 
 # Create the C main executable.
 #
-cdaisy${EXE}:  cmain${OBJ} daisy.so
-	$(LINK)$@ cmain${OBJ} `pwd`/daisy.so $(MATHLIB)
+cdaisy${EXE}:  cmain${OBJ} $(DAISYDYN)
+	gcc -o $@ $^ 
 
 cdaisy-mshe${EXE}:  cmain-mshe${OBJ} daisy.so
 	$(LINK)$@ cmain-mshe${OBJ} `pwd`/daisy.so $(MATHLIB)
@@ -551,9 +553,6 @@ cdaisy.o:
 pdaisy${EXE}: pmain${OBJ} time.o
 	$(LINK)$@ $^ $(GTKMMDRAWLIB) $(MATHLIB)
 
-
-dlldaisy.exe:	cmain${OBJ} daisy.dll
-	gcc -o $@ $^ 
 
 # Boost test
 

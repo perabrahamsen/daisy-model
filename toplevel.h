@@ -52,7 +52,10 @@ private:
   AttributeList top_alist;
   std::time_t start_time;
   bool has_printed_copyright;
-  bool is_ok;
+public:
+  enum state_t { is_uninitialized, is_ready, is_running, is_done, is_error };
+private:
+  state_t state_;
 
   // Accessors.
 private:
@@ -74,7 +77,7 @@ private:
 public:
   void run ();
   void error (const std::string&);
-  bool ok () const;
+  state_t state () const;
 
   // Create and Destroy.
 private:  

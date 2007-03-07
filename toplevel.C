@@ -72,7 +72,19 @@ Toplevel::program_alist () const
  
 Program& 
 Toplevel::program () const
-{ return *program_; }
+{
+  switch (state_)
+    {
+    case is_ready:
+    case is_running:
+    case is_done:
+      break;
+    case is_uninitialized:
+    case is_error:
+      daisy_notreached ();
+    }
+  return *program_;
+}
 
 void
 Toplevel::usage ()
@@ -150,30 +162,32 @@ Toplevel::end_message () const
 void
 Toplevel::run ()
 {
+  daisy_assert (state_ == is_ready);
   start_message ();
   program_->run (*msg);
   end_message ();
+  state_ = is_done;
 }
 
 void 
 Toplevel::error (const std::string& s)
 {
-  is_ok = false;
+  state_ = is_error;
   msg->error (s); 
 }
 
-bool 
-Toplevel::ok () const
-{ return is_ok; }
+Toplevel::state_t
+Toplevel::state () const
+{ return state_ ; }
 
 void 
 Toplevel::initialize_once ()
 {
   // Only run once.
-  static bool is_initialized = false;
-  if (is_initialized)
+  static bool first_time = true;
+  if (!first_time)
     return;
-  is_initialized = true;
+  first_time = false;
 
   // We don't use stdio.
   std::ios::sync_with_stdio (false);
@@ -200,6 +214,8 @@ Toplevel::initialize_once ()
 void
 Toplevel::initialize ()
 {
+  daisy_assert (state_ == is_uninitialized);
+
   copyright ();
   if (!program_syntax ().check (program_alist (), *msg))
     throw EXIT_FAILURE;
@@ -213,6 +229,8 @@ Toplevel::initialize ()
   program_->initialize (&top_syntax, &top_alist, *msg);
   if (!program_->check (*msg))
     throw EXIT_FAILURE;
+
+  state_ = is_ready;
 }
 
 std::string
@@ -233,6 +251,8 @@ Toplevel::get_arg (int& argc, char**& argv)
 void
 Toplevel::command_line (int& argc, char**& argv)
 { 
+  daisy_assert (state_ == is_uninitialized);
+
   // Create original command line string first, we modify argc and argv later.
   // However we only want to print it after we have parsed "(directory ...)".
   const struct CommandLine : public std::string
@@ -364,6 +384,7 @@ Toplevel::command_line (int& argc, char**& argv)
 void
 Toplevel::parse_file (const std::string& filename)
 { 
+  daisy_assert (state_ == is_uninitialized);
   copyright ();
   Treelog::Open nest (*msg, "Parsing file");
   ParserFile parser (top_syntax, filename, *msg);
@@ -456,7 +477,7 @@ Toplevel::Toplevel (const std::string& logname)
 #endif // MSDOS
     start_time (std::time (NULL)),
     has_printed_copyright (false),
-    is_ok (true)
+    state_ (is_uninitialized)
 { 
   Assertion::Register reg (*msg);
   load_syntax (top_syntax, top_alist); 

@@ -95,8 +95,11 @@ daisy_toplevel_run (daisy_toplevel* toplevel);
 EXPORT void                     /* Signal an error. */
 daisy_toplevel_error (daisy_toplevel* toplevel, char* message);
 
-EXPORT bool                     /* Is toplevel object ok? */
+EXPORT daisy_bool               /* Is toplevel object ok? */
 daisy_toplevel_ok (daisy_toplevel* toplevel);
+
+EXPORT daisy_bool               /* Is toplevel object finished? */
+daisy_toplevel_done (daisy_toplevel* toplevel);
 
 EXPORT void                     /* Delete toplevel object. */
 daisy_toplevel_delete (daisy_toplevel* toplevel);

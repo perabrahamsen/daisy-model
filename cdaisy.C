@@ -87,6 +87,11 @@ daisy_toplevel_parse_command_line (Toplevel* toplevel,
 {
   try
     { toplevel->command_line (argc, argv); }
+  catch (int i)
+    { 
+      if (i != EXIT_SUCCESS)
+        toplevel->error ("Command line parsing failure");
+    }
   catch (...)
     { toplevel->error ("Command line parsing failed"); }
 }
@@ -136,7 +141,11 @@ daisy_toplevel_error (Toplevel* toplevel, char* message)
 
 extern "C" EXPORT bool
 daisy_toplevel_ok (Toplevel* toplevel)
-{ return toplevel->ok (); }
+{ return toplevel->state () != Toplevel::is_error; }
+
+extern "C" EXPORT bool
+daisy_toplevel_done (Toplevel* toplevel)
+{ return toplevel->state () == Toplevel::is_done; }
 
 extern "C" EXPORT void     
 daisy_toplevel_delete (Toplevel* toplevel)

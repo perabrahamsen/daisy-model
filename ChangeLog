@@ -1,5 +1,7 @@
 2007-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* cdaisy.h, cdaisy.C: Support 'Toplevel'.
+
 	* Makefile (OTHER, REMOVE): Removed options.C and options.h.
 
 2007-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
