@@ -216,7 +216,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  gravitation (geo, Kedge, grav);
 
 	  // Boundary matrices and vectors
-	  ublas::matrix<double>  Dm_mat (cell_size, cell_size); // Dir bc
+	  ublas::banded_matrix<double>  Dm_mat (cell_size, cell_size, 
+                                                0, 0); // Dir bc
 	  Dm_mat = ublas::zero_matrix<double> (cell_size, cell_size);
 	  ublas::vector<double>  Dm_vec (cell_size); // Dir bc
 	  Dm_vec = ublas::zero_vector<double> (cell_size);
@@ -386,6 +387,8 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 	 Dm_vec (cell) -= value * h_bottom;
 	 dq (edge) = value * h_bottom;
 	 Gm (cell) -= K (cell) * geo.edge_area (edge); 
+         // dir = -1 eller 1
+         // dq (edge) = dir * (value * h (cell) + Dm_vec (cell) + Gm (cell))
        }
       break;
     case Groundwater::lysimeter:
