@@ -473,7 +473,6 @@ all:	#(EXECUTABLES)
 # Create the main executable.
 #
 daisy${EXE}:	main${OBJ} $(LIBOBJ)
-	(rm -f version${OBJ}; $(MAKE) version${OBJ})
 	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
 
 exp:	
@@ -482,12 +481,14 @@ exp:
 
 native:	
 	(cd $(OBJHOME)/$(HOSTTYPE) \
-         && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy)
+	 && rm -f version${OBJ} \
+         && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy${EXE})
 
 cross:
 	(cd $(OBJHOME)/$(TARGETTYPE) \
+	 && rm -f version${OBJ} \
          && $(MAKE) GCC=$(CROSSGCC) DEBUG= VPATH=$(SRCDIR) \
-                    -f $(SRCDIR)/Makefile daisy)
+                    -f $(SRCDIR)/Makefile daisy${EXE})
 
 # Create manager test executable.
 #
