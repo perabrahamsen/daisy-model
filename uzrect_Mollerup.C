@@ -60,12 +60,25 @@ struct UZRectMollerup : public UZRect
   // Internal functions.
   bool converges (const ublas::vector<double>& previous,
 		  const ublas::vector<double>& current) const;
+  static void Neumann (const size_t edge, const size_t cell, 
+                       const double area, const double in_sign,
+                       const double flux, 
+                       ublas::vector<double>& dq, ublas::vector<double>& B);
+  static void Dirichlet (const size_t edge, const size_t cell, 
+                         const double area, const double in_sign,
+                         const double K_cell, const double h_old,
+                         const double K_area_per_length, const double pressure,
+                         ublas::vector<double>& dq,
+                         ublas::banded_matrix<double>& Dm_mat, 
+                         ublas::vector<double>& Dm_vec, 
+                         ublas::vector<double>& Gm);
   static void lowerboundary (const GeometryRect& geo,
 			     const Groundwater&,
 			     const std::vector<bool>& active_lysimeter,
+			     const ublas::vector<double>& h,
 			     const ublas::vector<double>& K,
 			     ublas::vector<double>& q,
-			     ublas::matrix<double>& Dm_mat, 
+			     ublas::banded_matrix<double>& Dm_mat, 
 			     ublas::vector<double>& Dm_vec, 
 			     ublas::vector<double>& Gm, 
 			     ublas::vector<double>& B);
@@ -75,7 +88,7 @@ struct UZRectMollerup : public UZRect
 			     const ublas::vector<double>& h,
 			     const ublas::vector<double>& K,
 			     ublas::vector<double>& q,
-			     ublas::matrix<double>& Dm_mat, 
+			     ublas::banded_matrix<double>& Dm_mat, 
 			     ublas::vector<double>& Dm_vec, 
 			     ublas::vector<double>& Gm, 
 			     ublas::vector<double>& B,
@@ -91,7 +104,10 @@ struct UZRectMollerup : public UZRect
   static void gravitation (const GeometryRect& geo,
 			   const ublas::vector<double>& Kedge,
 			   ublas::vector<double>& grav);  
-
+  static void Darcy (const GeometryRect& geo,
+                     const ublas::vector<double>& Kedge,
+                     const ublas::vector<double>& h,
+                     ublas::vector<double>& dq);
 
 
   // Create and Destroy.
@@ -225,7 +241,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  Gm = ublas::zero_vector<double> (cell_size);
 	  ublas::vector<double> B (cell_size); // Neu bc 
 	  B = ublas::zero_vector<double> (cell_size);
-	  lowerboundary (geo, groundwater, active_lysimeter, 
+	  lowerboundary (geo, groundwater, active_lysimeter, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B);
 	  upperboundary (geo, surface, remaining_water, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt);
@@ -294,7 +310,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	}
       else
 	{
-	  // TODO: Calculate inner edge flux from Darcy.
+          Darcy (geo, Kedge, h, dq);
 	  q += dq * ddt / dt;
 	  time_left -= ddt;
 	  iterations_with_this_time_step++;
@@ -338,17 +354,44 @@ UZRectMollerup::converges (const ublas::vector<double>& previous,
   return true;
 }
 
+void 
+UZRectMollerup::Neumann (const size_t edge, const size_t cell,
+                         const double area, const double in_sign,
+                         const double flux, 
+                         ublas::vector<double>& dq, ublas::vector<double>& B)
+{
+  B (cell) = flux * area;
+  dq (edge) = in_sign * B (cell);
+}
 
-
-
+void 
+UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
+                           const double area, const double in_sign,
+                           const double K_cell,
+                           const double h_old,
+                           const double K_area_per_length, 
+                           const double pressure,
+                           ublas::vector<double>& dq,
+                           ublas::banded_matrix<double>& Dm_mat, 
+                           ublas::vector<double>& Dm_vec, 
+                           ublas::vector<double>& Gm)
+{
+  Dm_mat (cell, cell) += K_area_per_length;
+  Dm_vec (cell) -= K_area_per_length * pressure;
+  dq (edge) = K_area_per_length * pressure;
+  Gm (cell) -= K_cell * area; 
+  dq (edge) = in_sign * (K_area_per_length * h_old 
+                         + Dm_vec (cell) + Gm (cell));
+}
 
 void 
 UZRectMollerup::lowerboundary (const GeometryRect& geo,
 			       const Groundwater& groundwater,
 			       const std::vector<bool>& active_lysimeter,
+			       const ublas::vector<double>& h,
 			       const ublas::vector<double>& K,
 			       ublas::vector<double>& dq,
-			       ublas::matrix<double>& Dm_mat, 
+			       ublas::banded_matrix<double>& Dm_mat, 
 			       ublas::vector<double>& Dm_vec, 
 			       ublas::vector<double>& Gm, 
 			       ublas::vector<double>& B)
@@ -356,59 +399,50 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
   const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
   const size_t edge_below_size = edge_below.size ();
 
-  switch (groundwater.bottom_type ())
+  for (size_t i = 0; i < edge_below_size; i++)
     {
-    case Groundwater::free_drainage:
-      for (size_t i = 0; i < edge_below_size; i++)
-	{
-	  const int edge = edge_below[i];
-	  const int cell = geo.edge_other (edge, Geometry::cell_below);
-	  B (cell) = - K (cell) * geo.edge_area (edge);
-	  dq (edge) = B (cell);
-	}
-      break;
-    case Groundwater::forced_flux:
-      for (size_t i = 0; i < edge_below_size; i++)
-	{
-	  const int edge = edge_below[i];
-	  const int cell = geo.edge_other (edge, Geometry::cell_below);
-	  B (cell) = groundwater.q_bottom () * geo.edge_area (edge);
-	  dq (edge) = B (cell);
-	}
-      break;
-    case Groundwater::pressure:
-     for (size_t i = 0; i < edge_below_size; i++)
-       {
-	 const int edge = edge_below[i];
-	 const int cell = geo.edge_other (edge, Geometry::cell_below);
-	 const double value = -K (cell) * geo.edge_area_per_length (edge);
-	 Dm_mat (cell, cell) += value;
-	 const double h_bottom =  groundwater.table () - geo.zplus (cell);
-	 Dm_vec (cell) -= value * h_bottom;
-	 dq (edge) = value * h_bottom;
-	 Gm (cell) -= K (cell) * geo.edge_area (edge); 
-         // dir = -1 eller 1
-         // dq (edge) = dir * (value * h (cell) + Dm_vec (cell) + Gm (cell))
-       }
-      break;
-    case Groundwater::lysimeter:
-      for (size_t i = 0; i < edge_below_size; i++)
-	{
-	  const int edge = edge_below[i];
-	  const int cell = geo.edge_other (edge, Geometry::cell_below);
-	  if (active_lysimeter[cell])
-	    {
-	      const double value = -K (cell) * geo.edge_area_per_length (edge);
-	      Dm_mat (cell, cell) += value;
-	      // const double h_bottom =  0.0;
-	      // Dm_vec (cell) -= value * h_bottom;
-	      dq (edge) = 0.0;
-	      Gm (cell) -= K (cell) * geo.edge_area (edge); 
-	    }
-	}
-      break;
-    default:
-      daisy_panic ("Unknown groundwater type");
+      const int edge = edge_below[i];
+      const int cell = geo.edge_other (edge, Geometry::cell_below);
+      const double in_sign 
+        = geo.cell_is_internal (geo.edge_to (cell)) ? 1.0 : -1.0;
+      const double area = geo.edge_area (edge);
+
+      switch (groundwater.bottom_type ())
+        {
+        case Groundwater::free_drainage:
+          {
+            const double sin_angle = geo.edge_sin_angle (edge);
+            const double flux = sin_angle * K (cell) * area;
+            Neumann (edge, cell, area, in_sign, flux, dq, B);
+          }
+          break;
+        case Groundwater::forced_flux:
+          {
+            const double flux = groundwater.q_bottom () * area;
+            Neumann (edge, cell, area, in_sign, flux, dq, B);
+          }
+          break;
+        case Groundwater::pressure:
+          {
+            const double value = -K (cell) * geo.edge_area_per_length (edge);
+            const double pressure =  groundwater.table () - geo.zplus (cell);
+            Dirichlet (edge, cell, area, in_sign, K (cell), h (cell),
+                       value, pressure,
+                       dq, Dm_mat, Dm_vec, Gm);
+          }
+          break;
+        case Groundwater::lysimeter:
+          if (active_lysimeter[cell])
+            {
+              const double value = -K (cell) * geo.edge_area_per_length (edge);
+              const double pressure =  0.0;
+              Dirichlet (edge, cell, area, in_sign, K (cell), h (cell),
+                         value, pressure, dq, Dm_mat, Dm_vec, Gm);
+            }
+          break;
+        default:
+          daisy_panic ("Unknown groundwater type");
+        }
     }
 }
 
@@ -419,7 +453,7 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 			       const ublas::vector<double>& h,
 			       const ublas::vector<double>& K,
 			       ublas::vector<double>& dq,
-			       ublas::matrix<double>& Dm_mat, 
+			       ublas::banded_matrix<double>& Dm_mat, 
 			       ublas::vector<double>& Dm_vec, 
 			       ublas::vector<double>& Gm, 
 			       ublas::vector<double>& B,
@@ -432,42 +466,39 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
     {
       const int edge = edge_above[i];
       const int cell = geo.edge_other (edge, Geometry::cell_above);
+      const double in_sign 
+        = geo.cell_is_internal (geo.edge_to (cell)) ? 1.0 : -1.0;
+      const double area = geo.edge_area (edge);
 
       switch (surface.top_type (geo, edge))
 	{
 	case Surface::forced_flux: 
-	  const double q = surface.q_top (geo, edge);
-	  B (cell) = - q * geo.edge_area (edge);
-	  dq (edge) = B (cell);
+	  const double flux = surface.q_top (geo, edge);
+          Neumann (edge, cell, area, in_sign, flux, dq, B);
 	  break;
 	case Surface::forced_pressure:
 	  const double value = -K (cell) * geo.edge_area_per_length (edge);
-	  Dm_mat (cell, cell) += value;
-	  Dm_vec (cell) -= value *  surface.h_top (geo, edge);
-	  dq (edge) = value *  surface.h_top (geo, edge);
-	  Gm (cell) += K (cell) * geo.edge_area (edge); 
+          const double pressure = surface.h_top (geo, edge);
+          Dirichlet (edge, cell, area, in_sign, K (cell), h (cell),
+                     value, pressure, dq, Dm_mat, Dm_vec, Gm);
 	  break;
 	case Surface::limited_water:
 	  const double h_top = remaining_water (i);
 	  const double dz = geo.edge_length (edge);
-	  // Postive upwards.
-	  const double q_avail = -h_top / ddt;
+          const double sin_angle = geo.edge_sin_angle (edge);
+	  const double q_avail = sin_angle * h_top / ddt;
 	  daisy_assert (q_avail <= 0.0);
 	  const double q_pot = - K (cell) * (h_top - h (cell) + dz) / dz;
 	  // Decide type.
 	  const bool is_flux = -q_pot > -q_avail;
 	  if (is_flux)
-	    {
-	      B (cell) = - q_avail * geo.edge_area (edge);
-	      dq (edge) = B (cell);
-	    }
+            Neumann (edge, cell, area, in_sign, q_avail, dq, B);
 	  else			// Pressure
 	    {
 	      const double value = -K (cell) * geo.edge_area_per_length (edge);
-	      Dm_mat (cell, cell) += value;
-	      Dm_vec (cell) -= value *  h_top;
-	      dq (edge) = value *  h_top;
-	      Gm (cell) += K (cell) * geo.edge_area (edge); 
+              const double pressure = h_top;
+              Dirichlet (edge, cell, area, in_sign, K (cell), h (cell),
+                         value, pressure, dq, Dm_mat, Dm_vec, Gm);
 	    }
 	  {
 	    std::ostringstream tmp;
@@ -593,6 +624,32 @@ UZRectMollerup::gravitation (const GeometryRect& geo,
 	  const double value = magnitude * sin_angle;
 	  grav[from] += value;
 	  grav[to] -= value;
+	} 
+    }
+}
+
+void 
+UZRectMollerup::Darcy (const GeometryRect& geo,
+                       const ublas::vector<double>& Kedge,
+                       const ublas::vector<double>& h,
+                       ublas::vector<double>& dq)
+{
+  const size_t edge_size = geo.edge_size (); // number of edges  
+    
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      if (geo.edge_is_internal (e))
+	{
+	  const int from = geo.edge_from (e);
+	  const int to = geo.edge_to (e);	   
+          const double area_per_length = geo.edge_area_per_length (e);
+          const double area = geo.edge_area (e);
+          const double sin_angle = geo.edge_sin_angle (e);
+          const double K = Kedge (e);
+          const double dh = h (to) - h (from);
+          const double dq_diff = -K * area_per_length * dh;   
+          const double dq_grav = -K * area * sin_angle; 
+          dq (e) = dq_diff + dq_grav;
 	} 
     }
 }
