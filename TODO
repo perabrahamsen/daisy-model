@@ -1,10 +1,28 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Scope C API 
+* Syncroniser CVS
+
+* R2D2
+
+** boost på dirac
+
+** inkluder uzrect_Mollerup
+
+** trykrand q
+
+** dq for indre faces
+
+** massebalance som check 
+
+* C API: Fjern Treelog
 
 ** extern log skal ind under daisy output
 
-* Mollerup: få beregnet dq rigtigt.
+* DJVF/Farquhar
+
+** Ndist komponent
+
+** Flyt net_radiation ud af PET og ind i Bioclimate
 
 * OpenMI
 

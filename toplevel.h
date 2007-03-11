@@ -47,7 +47,9 @@ class Toplevel
 private:
   std::string program_name;
   std::auto_ptr<Program> program_;
+public:
   const std::auto_ptr<Treelog> msg;
+private:
   Syntax top_syntax;
   AttributeList top_alist;
   std::time_t start_time;

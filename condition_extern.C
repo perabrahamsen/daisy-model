@@ -21,10 +21,11 @@
 // Interface to generic boolean library.
 
 #include "condition.h"
+#include "daisy.h"
 #include "block.h"
 #include "alist.h"
 #include "boolean.h"
-#include "log_extern.h"
+#include "output.h"
 #include "scope.h"
 #include <memory>
 
@@ -40,13 +41,13 @@ struct ConditionExtern : public Condition
   void tick (const Daisy&, Treelog&)
   { }
 
-  bool match (const Daisy&, Treelog& msg) const
+  bool match (const Daisy& daisy, Treelog& msg) const
   { 
     Treelog::Open nest (msg, name);
 
     if (state == uninitialized)
       {
-        extern_scope = extern_scope_find (extern_name);
+        extern_scope = daisy.output_log->scope (extern_name);
         if (!extern_scope)
           msg.error ("No extern log named '" + extern_name + "' found");
         if (!expr->initialize (msg)

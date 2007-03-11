@@ -14,8 +14,8 @@ release.
 
 * 4.11
 
-More work on 2D transport and Farquhar photosynthesis.  Code cleanup
-and bug fixes.
+More work on 2D transport and Farquhar photosynthesis, as well as C DLL,
+C#, and OpenMI interfaces.  Code cleanup and bug fixes.
 
 * 4.10
 

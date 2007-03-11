@@ -21,6 +21,7 @@
 #include "output.h"
 #include "daisy.h"
 #include "log_all.h"
+#include "log_extern.h"
 #include "treelog.h"
 #include "time.h"
 #include "timestep.h"
@@ -89,6 +90,33 @@ Output::summarize (Treelog& msg) const
   }
 }
 
+size_t
+Output::scope_size () const
+{ return scopes.size (); }
+
+const Scope* 
+Output::scope (size_t i) const
+{ 
+  daisy_assert (i < scopes.size ());
+  return scopes[i];
+}
+
+const Scope*
+Output::scope (const symbol target) const
+{
+  for (size_t i = 0; i < scopes.size (); i++)
+    {
+      const LogExtern* scope = scopes[i];
+      const symbol name = scope->alist.check ("where") 
+        ? scope->alist.identifier ("where") 
+        : scope->alist.identifier ("type");
+
+      if (name == target)
+        return scope;
+    }
+  return NULL;
+}
+
 bool
 Output::check (const Border& field, Treelog& msg)
 {
@@ -126,11 +154,24 @@ const std::vector<Log*>
   return result;
 }
 
+const std::vector<const LogExtern*> 
+/**/ Output::find_extern_logs (const std::vector<Log*>& logs)
+{
+  std::vector<const LogExtern*> result;
+
+  for (size_t i = 0; i < logs.size (); i++)
+    if (const LogExtern* log = dynamic_cast<const LogExtern*> (logs[i]))
+      result.push_back (log);
+  
+  return result;
+}
+
 Output::Output (Block& al)
   : logging (false),
     logs (Librarian<Log>::build_vector (al, "output")),
     log_all (new LogAll (logs)),
     active_logs (find_active_logs (logs, *log_all)),
+    scopes (find_extern_logs (logs)),
     activate_output (Librarian<Condition>::build_item (al, "activate_output"))
 { }
 

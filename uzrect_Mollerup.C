@@ -1,6 +1,6 @@
 // uzrect_Mollerup.C --- A 2D solution to Richard's equation in a rect. grid.
 // 
-// Copyright 2006 Mikkel Mollerup and KVL.
+// Copyright 2006, 2007 Mikkel Mollerup, Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -194,7 +194,6 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       tmp << "Theta = " << Theta << "\n";
       msg.message (tmp.str ());
 
-      dq = ublas::zero_vector<double> (edge_size);
       h_previous = h;
       Theta_previous = Theta;  
       ublas::vector<double> h_conv;
@@ -304,7 +303,6 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	    throw "Could not find solution";
 
 	  ddt /= time_step_reduction;
-	  dq = ublas::zero_vector<double> (edge_size);
 	  h = h_previous;
 	  Theta = Theta_previous;
 	}

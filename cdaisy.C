@@ -28,6 +28,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "daisy.h"
+#include "output.h"
 #include "toplevel.h"
 #include "parser_file.h"
 #include "time.h"
@@ -39,22 +40,9 @@
 #include "printer_file.h"
 #include "version.h"
 #include "chemical.h"
-#include "log_extern.h"
-#include "treelog_stream.h"
-#include <fstream>
-#include <iostream>
+#include "scope.h"
 #include <string>
-
-using namespace std;
-/*bgj
-#ifdef __BORLANDC__
-#define EXPORT _export
-#define IMPORT _import
-#else
-#define EXPORT
-#define IMPORT
-#endif
-*/
+#include <typeinfo>
 
 #ifdef MINGW
 #ifdef BUILD_DLL
@@ -68,88 +56,18 @@ using namespace std;
 #define EXPORT
 #endif
 
+#define DAISY_CATCH_BLOCK(toplevel) \
+  catch (const char* error) \
+    { toplevel->error ("Exception: " + std::string (error)); } \
+  catch (const std::string& error) \
+    { toplevel->error ("Exception raised: " + error); } \
+  catch (const std::exception& e) \
+    { toplevel->error (std::string ("Standard exception: ") \
+                      + typeid (e).name () + ": " + e.what ()); } \
+  catch (...) \
+    { toplevel->error ("Unhandled exception"); }
+
 typedef int daisy_bool;
-
-// @ The daisy_toplevel Type.
-
-extern "C" EXPORT Toplevel*
-daisy_toplevel_create_with_log (const char* logname)
-{
-  try 
-    { return new Toplevel (logname); }
-  catch (...)
-    { return NULL; }
-}
-
-extern "C" EXPORT void
-daisy_toplevel_parse_command_line (Toplevel* toplevel,
-                                   int argc, char** argv)
-{
-  try
-    { toplevel->command_line (argc, argv); }
-  catch (int i)
-    { 
-      if (i != EXIT_SUCCESS)
-        toplevel->error ("Command line parsing failure");
-    }
-  catch (...)
-    { toplevel->error ("Command line parsing failed"); }
-}
-
-extern "C" EXPORT void
-daisy_toplevel_parse_file (Toplevel* toplevel, char* filename)
-{
-  try 
-    { toplevel->parse_file (filename); }
-  catch (...)
-    { toplevel->error ("Error while parsing '" + string (filename) + "'"); }
-}
-
-extern "C" EXPORT const Syntax*
-daisy_toplevel_get_program_syntax (Toplevel* toplevel)
-{ return &toplevel->program_syntax (); }
-
-extern "C" EXPORT const AttributeList*
-daisy_toplevel_get_program_alist (Toplevel* toplevel)
-{ return &toplevel->program_alist (); }
-
-extern "C" EXPORT void
-daisy_toplevel_initialize (Toplevel* toplevel)
-{ 
-  try 
-    { toplevel->initialize (); }
-  catch (...)
-    { toplevel->error ("Error while initializing"); }
-}
-
-extern "C" EXPORT Daisy*
-daisy_toplevel_get_daisy (Toplevel* toplevel)
-{ return dynamic_cast<Daisy*> (&toplevel->program ()); }
-
-extern "C" EXPORT void
-daisy_toplevel_run (Toplevel* toplevel)
-{
-  try 
-    { toplevel->run (); }
-  catch (...)
-    { toplevel->error ("Error while running program"); }
-}
-
-extern "C" EXPORT void
-daisy_toplevel_error (Toplevel* toplevel, char* message)
-{ toplevel->error (message); }
-
-extern "C" EXPORT bool
-daisy_toplevel_ok (Toplevel* toplevel)
-{ return toplevel->state () != Toplevel::is_error; }
-
-extern "C" EXPORT bool
-daisy_toplevel_done (Toplevel* toplevel)
-{ return toplevel->state () == Toplevel::is_done; }
-
-extern "C" EXPORT void     
-daisy_toplevel_delete (Toplevel* toplevel)
-{ delete toplevel; }
 
 // @ The daisy_syntax Type.
 
@@ -163,11 +81,10 @@ daisy_syntax_delete (Syntax* syntax)
 
 extern "C" int EXPORT
 daisy_syntax_check (const Syntax* syntax, const AttributeList* alist, 
-		    const char* name)
+		    const char* name, Toplevel* toplevel)
 { 
-  TreelogStream treelog (cerr);
-  Treelog::Open nest (treelog, name);
-  return syntax->check (*alist, treelog); 
+  Treelog::Open nest (*toplevel->msg, name);
+  return syntax->check (*alist, *toplevel->msg); 
 }
 
 extern "C" void EXPORT
@@ -221,74 +138,49 @@ daisy_alist_delete (AttributeList* alist)
 
 extern "C" daisy_bool EXPORT
 daisy_alist_check (const AttributeList* alist, const char* name)
-{ 
-  return alist->check (name);
-}
+{ return alist->check (name); }
 
 extern "C" int EXPORT
 daisy_alist_get_integer (const AttributeList* alist, const char* name)
-{ 
-  return alist->integer (name);
-}
+{ return alist->integer (name); }
 
 extern "C" double EXPORT
 daisy_alist_get_number (const AttributeList* alist, const char* name)
-{ 
-  return alist->number (name);
-}
+{ return alist->number (name); }
 
 extern "C" const char* EXPORT
 daisy_alist_get_string (const AttributeList* alist, const char* name)
-{ 
-  return alist->name (name).c_str ();
-}
+{ return alist->name (name).c_str (); }
 
 extern "C" daisy_bool EXPORT
 daisy_alist_get_flag (const AttributeList* alist, const char* name)
-{ 
-  return alist->flag (name);
-}
+{ return alist->flag (name); }
 
 extern "C" const AttributeList* EXPORT
 daisy_alist_get_alist (const AttributeList* alist, const char* name)
-{ 
-  return &alist->alist (name);
-}
+{ return &alist->alist (name); }
 
 extern "C" void EXPORT
-daisy_alist_set_integer (AttributeList* alist, const char* name,
-			 int value)
-{ 
-  alist->add (name, value);
-}
+daisy_alist_set_integer (AttributeList* alist, const char* name, int value)
+{ alist->add (name, value); }
 
 extern "C" void EXPORT
-daisy_alist_set_number (AttributeList* alist, const char* name,
-			double value)
-{
-  alist->add (name, value);
-}
+daisy_alist_set_number (AttributeList* alist, const char* name, double value)
+{ alist->add (name, value); }
 
 extern "C" void EXPORT
-daisy_alist_set_string (AttributeList* alist, const char* name,
-			const char* value)
-{ 
-  alist->add (name, value);
-}
+daisy_alist_set_string (AttributeList* alist, const char* name, 
+                        const char* value)
+{ alist->add (name, value); }
 
 extern "C" void EXPORT
-daisy_alist_set_flag (AttributeList* alist, const char* name,
-		      daisy_bool value)
-{ 
-  alist->add (name, bool (value));
-}
+daisy_alist_set_flag (AttributeList* alist, const char* name, daisy_bool value)
+{ alist->add (name, bool (value)); }
 
 extern "C" void EXPORT
 daisy_alist_set_alist (AttributeList* alist, const char* name,
 		       AttributeList* value)
-{ 
-  alist->add (name, *value);
-}
+{ alist->add (name, *value); }
 
 #ifdef UNINPLEMENTED
 extern "C" unsigned int EXPORT
@@ -366,7 +258,7 @@ extern "C" void EXPORT
 daisy_alist_set_string_at (AttributeList* alist, const char* name,
 			   const char* value, unsigned int index)
 {
-  vector<symbol> v;
+  std::vector<symbol> v;
   if (alist->check (name))
     v = alist->identifier_sequence (name);
   if (v.size () <= index)
@@ -398,9 +290,9 @@ extern "C" void EXPORT
 daisy_alist_set_number_at (AttributeList* alist, const char* name,
 			   double value, unsigned int index)
 {
-  vector<double>& v= alist->check (name)
-    ? *new vector<double> (alist->number_sequence (name))
-    : *new vector<double>;
+  std::vector<double>& v= alist->check (name)
+    ? *new std::vector<double> (alist->number_sequence (name))
+    : *new std::vector<double>;
   if (v.size () <= index)
     while (v.size () <= index)
       v.push_back (value);
@@ -413,9 +305,9 @@ extern "C" void EXPORT
 daisy_alist_set_alist_at (AttributeList* alist, const char* name,
 			  AttributeList* value, unsigned int index)
 { 
-  vector<AttributeList*>& v = alist->check (name)
-    ? *new vector<AttributeList*> (alist->alist_sequence (name))
-    : *new vector<AttributeList*>;
+  std::vector<AttributeList*>& v = alist->check (name)
+    ? *new std::vector<AttributeList*> (alist->alist_sequence (name))
+    : *new std::vector<AttributeList*>;
   if (v.size () <= index)
     while (v.size () <= index)
       v.push_back (value);
@@ -443,7 +335,7 @@ daisy_library_find (const char* name)
 extern "C" int EXPORT
 daisy_library_size (const Library* library)
 {
-  vector<symbol> entries;
+  std::vector<symbol> entries;
   library->entries (entries);
   return entries.size ();
 }
@@ -451,7 +343,7 @@ daisy_library_size (const Library* library)
 extern "C" const char* EXPORT
 daisy_library_name (const Library* library, const unsigned int index)
 {
-  vector<symbol> entries;
+  std::vector<symbol> entries;
   library->entries (entries);
   return entries[index].name ().c_str ();
 }
@@ -491,28 +383,6 @@ extern "C" void EXPORT
 daisy_library_remove (Library* library, const char* name)
 { library->remove (symbol (name)); }
 
-// @ The daisy_parser Type.
-
-extern "C" Parser* EXPORT
-daisy_parser_create_file (Syntax* syntax, const char* filename)
-{ 
-  static TreelogStream treelog (cerr);
-  static Treelog::Open nest (treelog, "parser");
-  return new ParserFile (*syntax, filename, treelog); 
-}
-
-extern "C" void EXPORT
-daisy_parser_delete (Parser* parser)
-{ delete parser; }
-
-extern "C" void EXPORT
-daisy_parser_load (Parser* parser, AttributeList* alist)
-{ parser->load (*alist); }
-
-extern "C" unsigned int EXPORT
-daisy_parser_error_count (Parser* parser)
-{ return parser->error_count (); }
-
 // @ The daisy_printer Type.
 
 extern "C" Printer* EXPORT
@@ -545,190 +415,227 @@ daisy_printer_good (Printer* printer)
 
 // @ The daisy_daisy Type.
 
-extern "C" Daisy* EXPORT
-daisy_daisy_create (const Syntax* syntax, const AttributeList* alist)
-{ 
-  static TreelogStream treelog (cerr);
-  static Treelog::Open nest (treelog, "daisy");
-  Block block (*syntax, *alist, treelog, "Daisy");
-  Daisy* daisy = new Daisy (block); 
-  daisy_assert (block.ok ());
-  daisy_assert (daisy);
-  daisy->initialize (syntax, alist, treelog);
-  return daisy;
+// @@ Building the environment.
+
+extern "C" EXPORT Toplevel*
+daisy_daisy_create_with_log (const char* logname)
+{
+  try 
+    { return new Toplevel (logname); }
+  catch (...)
+    { return NULL; }
 }
 
-extern "C" void EXPORT
-daisy_daisy_delete (Daisy* daisy)
-{ delete daisy; }
-
-extern "C" daisy_bool EXPORT	// Check context.
-daisy_daisy_check (Daisy* daisy)
-{ 
-  TreelogStream treelog (cerr);
-  Treelog::Open nest (treelog, "Daisy");
-  return daisy->check (treelog); 
+extern "C" EXPORT void
+daisy_daisy_parse_command_line (Toplevel* toplevel,
+                                   int argc, char** argv)
+{
+  try
+    { toplevel->command_line (argc, argv); }
+  catch (int i)
+    { 
+      if (i != EXIT_SUCCESS)
+        toplevel->error ("Command line parsing failure");
+    }
+  DAISY_CATCH_BLOCK(toplevel);
 }
+
+extern "C" EXPORT void
+daisy_daisy_parse_file (Toplevel* toplevel, char* filename)
+{
+  try 
+    {
+      toplevel->parse_file (filename); 
+      return;
+    }
+  DAISY_CATCH_BLOCK(toplevel);
+  toplevel->error ("While parsing '" + std::string (filename) + "'");
+}
+
+extern "C" EXPORT const Syntax*
+daisy_daisy_get_program_syntax (Toplevel* toplevel)
+{ return &toplevel->program_syntax (); }
+
+extern "C" EXPORT const AttributeList*
+daisy_daisy_get_program_alist (Toplevel* toplevel)
+{ return &toplevel->program_alist (); }
+
+extern "C" EXPORT void
+daisy_daisy_initialize (Toplevel* toplevel)
+{ 
+  try 
+    { toplevel->initialize (); }
+  catch (...)
+    { toplevel->error ("Error while initializing"); }
+}
+
+extern "C" EXPORT int
+daisy_daisy_is_daisy (Toplevel* toplevel)
+{ return dynamic_cast<Daisy*> (&toplevel->program ()) != NULL; }
+
+extern "C" EXPORT void
+daisy_daisy_run (Toplevel* toplevel)
+{
+  try 
+    { toplevel->run (); }
+  catch (...)
+    { toplevel->error ("Error while running program"); }
+}
+
+extern "C" EXPORT void
+daisy_daisy_error (Toplevel* toplevel, char* message)
+{ toplevel->error (message); }
+
+extern "C" EXPORT bool
+daisy_daisy_ok (Toplevel* toplevel)
+{ return toplevel->state () != Toplevel::is_error; }
+
+extern "C" EXPORT bool
+daisy_daisy_done (Toplevel* toplevel)
+{ return toplevel->state () == Toplevel::is_done; }
+
+extern "C" EXPORT void     
+daisy_daisy_delete (Toplevel* toplevel)
+{ delete toplevel; }
 
 // @@ Running the simulation.
 
-extern "C" void EXPORT	
-daisy_daisy_run (Daisy* daisy)
+extern "C" void EXPORT
+daisy_daisy_start (Toplevel* toplevel)
 {
   try
     {
-      TreelogStream treelog (cerr);
-      daisy->run (treelog); 
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      daisy.running = true; 
     }
-  catch (const char* error)
-    {
-      cerr << "Exception: " << error << "\n";
-      exit (1);
-    }
-  catch (...)
-    {
-      cerr << "Unhandled exception\n";
-      exit (1);
-    }
+  DAISY_CATCH_BLOCK(toplevel);
 }
-
-extern "C" void EXPORT
-daisy_daisy_start (Daisy* daisy)
-{ daisy->running = true; }
 
 extern "C" daisy_bool EXPORT
-daisy_daisy_is_running (Daisy* daisy)
-{ return daisy->running; }
-
-extern "C" void EXPORT
-daisy_daisy_tick (Daisy* daisy)
-{
+daisy_daisy_is_running (Toplevel* toplevel)
+{ 
   try
     {
-      TreelogStream treelog (cerr);
-      daisy->tick (treelog); 
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      return daisy.running; 
     }
-  catch (const char* error)
-    {
-      cerr << "Exception: " << error << "\n";
-      exit (1);
-    }
-  catch (...)
-    {
-      cerr << "Unhandled exception\n";
-      exit (1);
-    }
+  DAISY_CATCH_BLOCK(toplevel);
+  return false;
 }
 
 extern "C" void EXPORT
-daisy_daisy_tick_before (Daisy* daisy)
+daisy_daisy_tick (Toplevel* toplevel)
 {
   try
     {
-      TreelogStream msg (cerr);
-      daisy->tick_before (msg);
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      daisy.tick (*toplevel->msg); 
     }
-  catch (const char* error)
-    {
-      cerr << "Exception: " << error << "\n";
-      exit (1);
-    }
-  catch (...)
-    {
-      cerr << "Unhandled exception\n";
-      exit (1);
-    }
+  DAISY_CATCH_BLOCK(toplevel);
 }
 
 extern "C" void EXPORT
-daisy_daisy_tick_columns (Daisy* daisy)
+daisy_daisy_tick_before (Toplevel* toplevel)
 {
   try
     {
-      TreelogStream treelog (cerr);
-      daisy->tick_columns (treelog);
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      daisy.tick_before (*toplevel->msg);
     }
-  catch (const char* error)
-    {
-      cerr << "Exception: " << error << "\n";
-      exit (1);
-    }
-  catch (...)
-    {
-      cerr << "Unhandled exception\n";
-      exit (1);
-    }
+  DAISY_CATCH_BLOCK(toplevel);
 }
 
 extern "C" void EXPORT
-daisy_daisy_tick_column (Daisy* daisy, int col)
+daisy_daisy_tick_columns (Toplevel* toplevel)
 {
   try
     {
-      TreelogStream msg (cerr);
-      daisy->tick_column (col, msg);
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      daisy.tick_columns (*toplevel->msg);
     }
-  catch (const char* error)
-    {
-      cerr << "Exception: " << error << "\n";
-      exit (1);
-    }
-  catch (...)
-    {
-      cerr << "Unhandled exception\n";
-      exit (1);
-    }
+  DAISY_CATCH_BLOCK(toplevel);
 }
 
 extern "C" void EXPORT
-daisy_daisy_tick_after (Daisy* daisy)
+daisy_daisy_tick_column (Toplevel* toplevel, int col)
 {
   try
     {
-      TreelogStream treelog (cerr);
-      daisy->tick_after (treelog);
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      daisy.tick_column (col, *toplevel->msg);
     }
-  catch (const char* error)
+  DAISY_CATCH_BLOCK(toplevel);
+}
+
+extern "C" void EXPORT
+daisy_daisy_tick_after (Toplevel* toplevel)
+{
+  try
     {
-      cerr << "Exception: " << error << "\n";
-      exit (1);
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      daisy.tick_after (*toplevel->msg);
     }
-  catch (...)
-    {
-      cerr << "Unhandled exception\n";
-      exit (1);
-    }
+  DAISY_CATCH_BLOCK(toplevel);
 }
 
 // @@ Manipulating the simulation.
 
 extern "C" Time* EXPORT
-daisy_daisy_get_time (Daisy* daisy)
-{ return &daisy->time; }
+daisy_daisy_get_time (Toplevel* toplevel)
+{
+  try
+    {
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      return &daisy.time; 
+    }
+  DAISY_CATCH_BLOCK(toplevel);
+  return NULL;
+}
 
 extern "C" Weather* EXPORT
-daisy_daisy_get_weather (Daisy* daisy)
-{ return daisy->weather; }
+daisy_daisy_get_weather (Toplevel* toplevel)
+{ 
+  try
+    {
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      return daisy.weather; 
+    }
+  DAISY_CATCH_BLOCK(toplevel);
+  return NULL;
+}
 
 extern "C" unsigned int EXPORT
-daisy_daisy_count_columns (const Daisy* daisy)
-{ return daisy->field.size (); }
+daisy_daisy_count_columns (Toplevel *const toplevel)
+{ 
+  try
+    {
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      return daisy.field.size (); 
+    }
+  DAISY_CATCH_BLOCK(toplevel);
+  return 0;
+}
 
 extern "C" Column* EXPORT
-daisy_daisy_get_column (Daisy* daisy, const int col)
+daisy_daisy_get_column (Toplevel* toplevel, const int col)
 { 
-  daisy_assert (daisy);
-  daisy_assert (col >= 0 && col < daisy->field.size ()); 
-  return daisy->field.find (col); 
+  try
+    {
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      daisy_assert (col >= 0 && col < daisy.field.size ()); 
+      return daisy.field.find (col); 
+    }
+  DAISY_CATCH_BLOCK(toplevel)
+  return NULL;
 }
 
 extern "C" void EXPORT
-daisy_daisy_append_column (Daisy* /* daisy */, Column* /*column*/)
-{ /* BUG: unimplemented */ }
+daisy_daisy_append_column (const Toplevel*, Column*)
+{ daisy_notreached (); }
 
 extern "C" void EXPORT
-daisy_daisy_remove_column (Daisy* /*daisy*/, Column* /*column*/)
-{ /* BUG: unimplemented */ }
+daisy_daisy_remove_column (const Toplevel*, Column*)
+{ daisy_notreached (); }
 
 // @ The daisy_time Type.
 
@@ -780,11 +687,11 @@ daisy_weather_put_global_radiation (Weather* weather, double radiation)
 
 extern "C" Column* EXPORT
 daisy_column_clone (const Column* /*column*/, const char* /*name*/)
-{ /* BUG: unimplemented */ return NULL; }
+{ daisy_notreached (); }
 
 extern "C" void EXPORT
 daisy_column_merge (Column* /*column*/, const Column* /*other*/, double /*weight*/)
-{ /* BUG: unimplemented */ }
+{ daisy_notreached (); }
 
 // @@ Manipulating the column state.
 
@@ -968,7 +875,7 @@ daisy_column_get_crop_h2o_uptake_at (Column* column, unsigned int index)
 // Contains information about chemicals known by Daisy.
 
 extern "C" Chemical* EXPORT		// Return the chemical named NAME.
-daisy_chemical_find (const char* name)
+daisy_chemical_find (const char* name, Toplevel* toplevel)
 {
   const Library& chemlib = Library::find (symbol ("chemical"));
   const symbol sym (name);
@@ -976,7 +883,7 @@ daisy_chemical_find (const char* name)
     {
       Syntax parent_syntax;
       AttributeList parent_alist;
-      Block block (parent_syntax, parent_alist, Treelog::null (), "chemical");
+      Block block (parent_syntax, parent_alist, *toplevel->msg, "chemical");
       return Librarian<Chemical>::build_alist (block, chemlib.lookup (sym), 
 					       name);
     }
@@ -991,15 +898,28 @@ daisy_chemical_reflection_factor (const Chemical* chemical)
 //
 // Extract information from the 'extern' log model.
 extern "C" unsigned int EXPORT  // Return number of extern scopes
-daisy_scope_extern_size ()
+daisy_daisy_scope_extern_size (Toplevel *const toplevel)
 {
-  return extern_scope_size ();
+  try
+    {
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      return daisy.output_log->scope_size ();
+    }
+  DAISY_CATCH_BLOCK(toplevel);
+  return 0;
 }
 
 extern "C" const Scope* EXPORT  // Return extern scope INDEX.
-daisy_scope_extern_get (const unsigned int index)
+daisy_daisy_scope_extern_get (Toplevel *const toplevel,
+                              const unsigned int index)
 {
-  return extern_scope_get (index);
+  try
+    {
+      Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      return daisy.output_log->scope (index); 
+    }
+  DAISY_CATCH_BLOCK(toplevel);
+  return NULL;
 }
 
 extern "C" unsigned int EXPORT // Number of numbers in SCOPE.
@@ -1051,46 +971,10 @@ daisy_scope_description (const Scope* scope, const char* name)
 { return scope->get_description (symbol (name)).name().c_str (); }
 
 // @ Miscellaneous.
-//
-// Other functions which doesn't fit nicely into the above categories.
-
-extern "C" void EXPORT
-daisy_load (Syntax* syntax, AttributeList* alist)
-{ 
-  Daisy::load_syntax (*syntax, *alist); 
-  alist->add ("type", "Daisy");
-  Library::load_syntax (*syntax, *alist); 
-  syntax->add ("directory", Syntax::String, Syntax::OptionalConst,
-	      "Run program in this directory.\n\
-This can affect both where input files are found and where log files\n\
-are generated.");
-  syntax->add ("path", Syntax::String,
-	      Syntax::OptionalConst, Syntax::Sequence,
-	      "List of directories to search for input files in.\n\
-The special value \".\" means the current directory.");
-  syntax->add ("input", Librarian<Parser>::library (),
-	      Syntax::OptionalConst, Syntax::Singleton,
-	      "Command to add more information about the simulation.");
-  syntax->add ("run", Librarian<Program>::library (), 
-	      Syntax::OptionalState, Syntax::Singleton, 
-	      "Program to run.\n\
-\n\
-If this option is specified, all the 'Daisy' specific top-level attributes\n\
-will be ignored.  If unspecified, run 'Daisy' on the current top-level\n\
-attributes.");
-}
 
 extern "C" void EXPORT
 daisy_initialize ()
-{
-  // Options::initialize_path ();
-
-#ifdef __unix
-  // We should do the appropriate magic on Unix.
-#else
-  // We should load the DLL here on MSDOS.
-#endif
-}
+{ }
 
 extern "C" const char* EXPORT
 daisy_version ()

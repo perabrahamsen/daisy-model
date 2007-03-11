@@ -2,7 +2,7 @@
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
-// Copyright 2006 Per Abrahamsen and KVL.
+// Copyright 2006-2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -22,73 +22,8 @@
 
 
 #include "log_extern.h"
-#include "log_select.h"
 #include "scope_block.h"
 #include "block.h"
-#include <map>
-#include <vector>
-
-struct LogExtern : public LogSelect,
-		   public Destination, 
-		   public Scope
-{
-  // Global register.
-  static std::vector<const LogExtern*> log_extern_table;
-
-  // Destination Content.
-  typedef enum { Error, Missing, Number, Name, Array } type;
-  typedef std::map<symbol, type> type_map;
-  typedef std::map<symbol, double> number_map;
-  typedef std::map<symbol, symbol> name_map;
-  typedef std::map<symbol, int> int_map;
-  typedef std::map<symbol, const std::vector<double>*> array_map;
-  type_map types;
-  number_map numbers;
-  name_map names;
-  array_map arrays;
-  int_map sizes;
-  name_map dimensions;
-  std::vector<symbol> all_numbers_;
-
-  // Log.
-  symbol last_done;
-  void done (const Time&, double dt);
-  bool initial_match (const Daisy&, Treelog&)
-    // No initial line.
-  { return false; }
-
-  // Self use.
-  void output (Log&) const;
-
-  // Select::Destination
-  void error ();
-  void missing ();
-  void add (const std::vector<double>& value);
-  void add (const double value);
-  void add (const symbol value);
-
-  // Scope
-  void tick (const Scope&, Treelog&);
-  const std::vector<symbol>& all_numbers () const;
-  bool has_number (symbol) const;
-  double number (symbol) const;
-  symbol dimension (symbol) const;
-  bool has_identifier (symbol tag) const;
-  symbol identifier (symbol tag) const;
-  symbol get_description (symbol) const;
-
-  // Scope to be?
-  type lookup (symbol tag) const;
-  const std::vector<double>& array (symbol tag) const;
-  int size (symbol tag) const;
-
-  // Create and destroy.
-  void initialize (Treelog&);
-  LogExtern (Block&);
-  ~LogExtern ();
-};
-
-std::vector<const LogExtern*> LogExtern::log_extern_table;
 
 void 
 LogExtern::done (const Time& time, const double dt)
@@ -283,9 +218,6 @@ LogExtern::LogExtern (Block& al)
 
   for (size_t i = 0; i < entries.size (); i++)
     entries[i]->add_dest (this);
-
-  // Register extern access.
-  log_extern_table.push_back (this);
 }
 
 LogExtern::~LogExtern ()
@@ -325,33 +257,3 @@ API interface by specifying '(names column crop)'.");
       Librarian<Log>::add_type ("extern", alist, syntax, &make);
     }
 } LogExtern_syntax;
-
-// Extern access.
-size_t
-extern_scope_size ()
-{ 
-  return LogExtern::log_extern_table.size ();
-}
-
-const Scope*
-extern_scope_get (size_t i)
-{ 
-  daisy_assert (i < LogExtern::log_extern_table.size ());
-  return LogExtern::log_extern_table[i];
-}
-
-const Scope*
-extern_scope_find (const symbol target)
-{ 
-  for (size_t i = 0; i < LogExtern::log_extern_table.size (); i++)
-    {
-      const LogExtern* scope = LogExtern::log_extern_table[i];
-      const symbol name = scope->alist.check ("where") 
-        ? scope->alist.identifier ("where") 
-        : scope->alist.identifier ("type");
-
-      if (name == target)
-        return scope;
-    }
-  return NULL;
-}

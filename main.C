@@ -40,13 +40,9 @@ main (int argc, char* argv[])
 
     }
   catch (const char* error)
-    {
-      toplevel.error (std::string ("Exception: ") + error);
-    }
+    { toplevel.error (std::string ("Exception: ") + error); }
   catch (const std::string& error)
-    {
-      toplevel.error (std::string ("Exception raised: ") + error);
-    }
+    { toplevel.error (std::string ("Exception raised: ") + error); }
   catch (const std::exception& e)
     {
       toplevel.error (std::string ("Standard exception: ") + typeid (e).name ()

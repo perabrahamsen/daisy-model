@@ -19,17 +19,6 @@
 SHELL = /bin/sh
 MAKEFLAGS =
 
-# Some non-local files and directories.
-
-SRCDIR = $(HOME)/daisy
-OBJHOME = /usr/local/daisy
-FTPDIR = /home/ftp/pub/daisy
-WWWINDEX = /home/user_3/daisy/.public_html/index.html
-BOOSTINC = -isystem /usr/include/boost-1_33_1/
-
-BORLAND = "e:/Program Files/Borland/CBuilder5/"
-TARGETTYPE = i586-mingw32msvc
-
 # HOSTTYPE is not defined in the native win32 Emacs.
 #
 ifeq ($(OS),Windows_NT)
@@ -37,6 +26,26 @@ ifeq ($(OS),Windows_NT)
 	HOSTTYPE = mingw
 #	HOSTTYPE = win32
 endif
+
+# Some non-local files and directories.
+
+SRCDIR = $(HOME)/daisy
+
+ifeq ($(HOSTTYPE),i386-linux)
+OBJHOME = /usr/local/daisy
+NATIVEHOME = $(OBJHOME)/$(HOSTTYPE)
+else
+OBJHOME = $(HOME)/daisy/obj
+NATIVEHOME = $(OBJHOME)
+endif
+
+
+FTPDIR = /home/ftp/pub/daisy
+WWWINDEX = /home/user_3/daisy/.public_html/index.html
+BOOSTINC = -isystem /usr/include/boost-1_33_1/
+
+BORLAND = "e:/Program Files/Borland/CBuilder5/"
+TARGETTYPE = i586-mingw32msvc
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
@@ -316,14 +325,16 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
+LATER = boolean_extern.C number_extern.C 
+
 MODELS = uzrect_Mollerup.C groundwater_flux.C \
 	msoltranrect_2x1.C photo_FCC4.C ABAeffect_exp.C cropNdist_uniform.C \
 	uzrect_2x1.C select_flow.C volume_box.C \
 	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
 	cropNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \
         difrad_weather.C number_lisp.C condition_extern.C condition_boolean.C \
-	boolean_extern.C boolean_number.C boolean_string.C \
-	number_extern.C movement_rect.C number_soil.C organic_none.C \
+	boolean_number.C boolean_string.C \
+	movement_rect.C number_soil.C organic_none.C \
 	organic_std.C movement_1D.C integer_arit.C \
 	source_merge.C number_source.C program_file.C action_table.C \
 	xysource_merge.C xysource_inline.C xysource_loop.C \
@@ -411,7 +422,7 @@ SPECIALS = geometry_vert.C gnuplot_base.C \
 #
 OTHER = output.C scope_block.C scope_id.C librarian.C scope_multi.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
-	block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
+	block.C dlf.C scope.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C \
@@ -420,7 +431,7 @@ OTHER = output.C scope_block.C scope_id.C librarian.C scope_multi.C \
 	submodel.C
 
 # Utilities in header alone.
-HEADONLY = submodeler.h border.h memutils.h
+HEADONLY = submodeler.h border.h memutils.h version.h
 
 # Everything that has an interface.
 #
@@ -441,9 +452,9 @@ LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SPARCOBJ)
 
 # Find all object files, header files, and source files.
 #
-OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
+OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o version${OBJ}
 SOURCES = $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN) $(QTSOURCES) \
-	cmain.c bugmain.c $(DISABLED) $(MSSRC)
+	cmain.c bugmain.c $(DISABLED) $(MSSRC) version.C
 HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) $(HEADONLY)
 
 # Find all printable files.
@@ -468,25 +479,26 @@ REMOVE = options.C options.h select_interval.C select_utils.h select_utils.C sel
 # Create all the executables.
 #
 all:	#(EXECUTABLES)
-	@echo Please be specific.
+	@echo 'Use "make native" to create a native Daisy executable.'
 
 # Create the main executable.
 #
 daisy${EXE}:	main${OBJ} $(LIBOBJ)
-	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
+	@rm -f version${OBJ}
+	$(MAKE) version${OBJ}
+	$(LINK)$@ $^ version${OBJ} $(CPPLIB) $(MATHLIB)
 
 exp:	
 	(cd $(OBJHOME)/exp \
          && $(MAKE) VPATH=$(SRCDIR) USE_PROFILE=true -f $(SRCDIR)/Makefile daisy)
 
 native:	
-	(cd $(OBJHOME)/$(HOSTTYPE) \
-	 && rm -f version${OBJ} \
+	(mkdir -p $(NATIVEHOME) \
+	 && cd $(NATIVEHOME) \
          && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy${EXE})
 
 cross:
 	(cd $(OBJHOME)/$(TARGETTYPE) \
-	 && rm -f version${OBJ} \
          && $(MAKE) GCC=$(CROSSGCC) DEBUG= VPATH=$(SRCDIR) \
                     -f $(SRCDIR)/Makefile daisy${EXE})
 
@@ -537,14 +549,14 @@ cdaisy_test${EXE}:  cmain_test${OBJ} daisy.so
 # Create a DLL.
 #
 daisy.dll:	$(LIBOBJ)
-	(rm -f version${OBJ}; $(MAKE) version${OBJ})
-	$(CC) -shared -o daisy.dll $^ $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
+	($(MAKE) version${OBJ})
+	$(CC) -shared -o daisy.dll $^ version${OBJ} $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
 
 # Create a shared library.
 #
 daisy.so: $(LIBOBJ)
-	(rm -f version${OBJ}; $(MAKE) version${OBJ})
-	$(CC) -shared -o daisy.so $^ $(MATHLIB)
+	($(MAKE) version${OBJ})
+	$(CC) -shared -o daisy.so $^ version${OBJ} $(MATHLIB)
 
 cdaisy.o:
 	$(CC) $(NOLINK) -DBUILD_DLL $<

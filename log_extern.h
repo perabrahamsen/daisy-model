@@ -23,12 +23,71 @@
 #ifndef LOG_EXTERN_H
 #define LOG_EXTERN_H
 
+#include "log_select.h"
+#include "scope.h"
 #include "symbol.h"
+#include <map>
+#include <vector>
 
-struct Scope;
+class Daisy;
 
-extern size_t extern_scope_size ();
-extern const Scope* extern_scope_get (size_t i);
-extern const Scope* extern_scope_find (symbol);
+class LogExtern : public LogSelect,
+                  public Destination, 
+                  public Scope
+{
+  // Destination Content.
+  typedef enum { Error, Missing, Number, Name, Array } type;
+  typedef std::map<symbol, type> type_map;
+  typedef std::map<symbol, double> number_map;
+  typedef std::map<symbol, symbol> name_map;
+  typedef std::map<symbol, int> int_map;
+  typedef std::map<symbol, const std::vector<double>*> array_map;
+  type_map types;
+  number_map numbers;
+  name_map names;
+  array_map arrays;
+  int_map sizes;
+  name_map dimensions;
+  std::vector<symbol> all_numbers_;
+
+  // Log.
+  symbol last_done;
+  void done (const Time&, double dt);
+  bool initial_match (const Daisy&, Treelog&)
+    // No initial line.
+  { return false; }
+
+  // Self use.
+  void output (Log&) const;
+
+  // Select::Destination
+  void error ();
+  void missing ();
+  void add (const std::vector<double>& value);
+  void add (const double value);
+  void add (const symbol value);
+
+  // Scope
+  void tick (const Scope&, Treelog&);
+  const std::vector<symbol>& all_numbers () const;
+  bool has_number (symbol) const;
+  double number (symbol) const;
+  symbol dimension (symbol) const;
+  bool has_identifier (symbol tag) const;
+  symbol identifier (symbol tag) const;
+  symbol get_description (symbol) const;
+
+  // Scope to be?
+  type lookup (symbol tag) const;
+  const std::vector<double>& array (symbol tag) const;
+  int size (symbol tag) const;
+
+  // Create and destroy.
+  void initialize (Treelog&);
+public:
+  LogExtern (Block&);
+private:
+  ~LogExtern ();
+};
 
 #endif // LOG_EXTERN_H

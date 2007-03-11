@@ -1,11 +1,17 @@
 2007-03-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* log_extern.h, log_extern.C: Export interface.
+	* output.C, output.h: Made LogExtern a member.
+
+2007-03-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* Version 4.11 released.
 
 2007-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* cdaisy.h, cdaisy.C: Support 'Toplevel'.
-
+	* cmain.c: Use it.
+	
 	* Makefile (OTHER, REMOVE): Removed options.C and options.h.
 
 2007-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -51,8 +51,8 @@ public:
   // Content.
   const std::string directory;  // Initialize, check and run here.
   bool running;
-private:
   const std::auto_ptr<Output> output_log;
+private:
   const std::auto_ptr<Condition> print_time;
 public:
   Time time;

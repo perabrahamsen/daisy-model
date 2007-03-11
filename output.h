@@ -28,6 +28,8 @@
 
 struct Log;
 struct LogAll;
+struct LogExtern;
+struct Scope;
 struct Border;
 struct Block;
 struct Daisy;
@@ -40,6 +42,7 @@ private:
   const auto_vector<Log*> logs;
   const std::auto_ptr<LogAll> log_all;
   const std::vector<Log*> active_logs;
+  const std::vector<const LogExtern*> scopes;
   const std::auto_ptr<Condition> activate_output;
 
   // Use.
@@ -47,6 +50,9 @@ public:
   void initial_logs (const Daisy&, Treelog&);
   void tick (const Daisy&, Treelog&);
   void summarize (Treelog&) const;
+  size_t scope_size () const;
+  const Scope* scope (size_t) const;
+  const Scope* scope (symbol) const;
 
   // Create and Destroy.
 public:
@@ -55,6 +61,8 @@ public:
 private:
   static const std::vector<Log*> 
   /**/ find_active_logs (const std::vector<Log*>& logs, LogAll& log_all);
+  static const std::vector<const LogExtern*> 
+  /**/ find_extern_logs (const std::vector<Log*>& logs);
 public:
   explicit Output (Block&);
   ~Output ();

@@ -32,12 +32,10 @@ extern "C" {
 #endif
 */
 
-typedef struct daisy_toplevel daisy_toplevel;
 typedef struct daisy_syntax daisy_syntax;
 typedef struct daisy_alist daisy_alist;
 typedef struct daisy_library daisy_library;
 typedef struct daisy_daisy daisy_daisy;
-typedef struct daisy_parser daisy_parser;
 typedef struct daisy_printer daisy_printer;
 typedef struct daisy_time daisy_time;
 typedef struct daisy_column daisy_column;
@@ -61,49 +59,6 @@ typedef struct daisy_scope daisy_scope;
 
 typedef int daisy_bool;
 
-/* @ The daisy_toplevel Type
- *
- * The daisy_toplevel is an environment for reading files and running
- * programs. 
- */
-
-EXPORT daisy_toplevel*          /* Create a toplevel with a log file. */
-daisy_toplevel_create_with_log (const char* logname);
-
-EXPORT void                     /* Parse command arguments. */
-daisy_toplevel_parse_command_line (daisy_toplevel* toplevel,
-                                   int argc, char** argv);
-
-EXPORT void                     /* Parse command arguments. */
-daisy_toplevel_parse_file (daisy_toplevel* toplevel, char* filename);
-
-EXPORT daisy_syntax*            /* Extract program syntax. */
-daisy_toplevel_get_program_syntax (daisy_toplevel* toplevel);
-
-EXPORT daisy_alist*             /* Extract program alist. */
-daisy_toplevel_get_program_alist (daisy_toplevel* toplevel);
-
-EXPORT void                     /* Initialize toplevel object. */
-daisy_toplevel_initialize (daisy_toplevel* toplevel);
-
-EXPORT daisy_daisy*             /* Extract daisy object, if any. */
-daisy_toplevel_get_daisy (daisy_toplevel* toplevel);
-
-EXPORT void                     /* Run program. */
-daisy_toplevel_run (daisy_toplevel* toplevel);
-
-EXPORT void                     /* Signal an error. */
-daisy_toplevel_error (daisy_toplevel* toplevel, char* message);
-
-EXPORT daisy_bool               /* Is toplevel object ok? */
-daisy_toplevel_ok (daisy_toplevel* toplevel);
-
-EXPORT daisy_bool               /* Is toplevel object finished? */
-daisy_toplevel_done (daisy_toplevel* toplevel);
-
-EXPORT void                     /* Delete toplevel object. */
-daisy_toplevel_delete (daisy_toplevel* toplevel);
-
 /* @ The daisy_syntax Type.
  * 
  * A syntax describes what attributes that are associated with an
@@ -119,7 +74,8 @@ daisy_syntax_delete (daisy_syntax* syntax);
 EXPORT daisy_bool                      /* Check that alist match the syntax. */
 daisy_syntax_check (const daisy_syntax* syntax, 
                     const daisy_alist* alist,
-                    const char* name);
+                    const char* name,
+                    const daisy_topevel* toplevel);
 
 /* Elements in the syntax table have the following properties.
    
@@ -340,23 +296,6 @@ daisy_library_derive (daisy_library* library,
 EXPORT void                            /* Remove object NAME from LIBRARY */
 daisy_library_remove (daisy_library* library, const char* name);
 
-/* @ The daisy_parser Type.
- *
- * A parser fills an alist based on a syntax.  
- */
-
-EXPORT daisy_parser*                   /* Create a file parser. */
-daisy_parser_create_file (const daisy_syntax* syntax, const char* filename);
-
-EXPORT void                            /* Delete parser object. */
-daisy_parser_delete (daisy_parser* parser);
-
-EXPORT void                            /* Load file. */
-daisy_parser_load (daisy_parser* parser, daisy_alist* alist);
-
-EXPORT unsigned int                    /* Return number of errors encountered. */
-daisy_parser_error_count (daisy_parser* parser);
-
 /* @ The daisy_printer Type.
  *
  * A printer pretty print the content of alists and library objects.
@@ -385,22 +324,60 @@ daisy_printer_good (daisy_printer* printer);
 EXPORT void                            /* Delete the PRINTER object. */
 daisy_printer_delete (daisy_printer* printer);
 
-/* @ The daisy_daisy Type.
+/* @ The daisy_daisy Type
  *
- * The daisy_daisy object contains the entire simulation.
+ * The daisy_daisy is an environment for reading files and running
+ * programs, and also act as the interface to the Daisy simulation.
  */
 
-EXPORT daisy_daisy*                    /* Create the daisy object. */
-daisy_daisy_create (const daisy_syntax* syntax, const daisy_alist* alist);
+/* @@ Building the environment.
+ *
+ * These commands build and test the environment, which may or may not
+ * describe a Daisy simulation. 
+ */
 
-EXPORT void                            /* Delete the daisy object. */
-daisy_daisy_delete (daisy_daisy* daisy);
+EXPORT daisy_daisy*          /* Create a toplevel with a log file. */
+daisy_daisy_create_with_log (const char* logname);
 
-EXPORT daisy_bool                      /* Check context. */
-daisy_daisy_check (const daisy_daisy* daisy);
+EXPORT void                     /* Parse command arguments. */
+daisy_daisy_parse_command_line (daisy_daisy* toplevel,
+                                   int argc, char** argv);
+
+EXPORT void                     /* Parse command arguments. */
+daisy_daisy_parse_file (daisy_daisy* toplevel, char* filename);
+
+EXPORT daisy_syntax*            /* Extract program syntax. */
+daisy_daisy_get_program_syntax (daisy_daisy* toplevel);
+
+EXPORT daisy_alist*             /* Extract program alist. */
+daisy_daisy_get_program_alist (daisy_daisy* toplevel);
+
+EXPORT void                     /* Initialize toplevel object. */
+daisy_daisy_initialize (daisy_daisy* toplevel);
+
+EXPORT daisy_bool               /* True, if  TOPLEVEL conatin a Daisy sim. */
+daisy_daisy_is_daisy (daisy_daisy* toplevel);
+
+EXPORT void                     /* Run program. */
+daisy_daisy_run (daisy_daisy* toplevel);
+
+EXPORT void                     /* Signal an error. */
+daisy_daisy_error (daisy_daisy* toplevel, char* message);
+
+EXPORT daisy_bool               /* Is toplevel object ok? */
+daisy_daisy_ok (daisy_daisy* toplevel);
+
+EXPORT daisy_bool               /* Is toplevel object finished? */
+daisy_daisy_done (daisy_daisy* toplevel);
+
+EXPORT void                     /* Delete toplevel object. */
+daisy_daisy_delete (daisy_daisy* toplevel);
 
 /* @@ Running the simulation.
  * 
+ * These operations are only valid for a Daisy simulation.  Use
+ * 'daisy_daisy_is_daisy' to test first.
+ *
  * There are three basic ways to run the simulation.  Run the entire
  * simulation to end, run a the entire simulation for a single time
  * step, or manually run each component of the simulation.  Running
@@ -409,16 +386,13 @@ daisy_daisy_check (const daisy_daisy* daisy);
  * 'tick' function.   
  */
 
-EXPORT void                            /* Run the Daisy simulation to the end. */
-daisy_daisy_run (daisy_daisy* daisy);
-
-EXPORT void                            /* Start the simulation. */
+EXPORT void                     /* Start the simulation. */
 daisy_daisy_start (daisy_daisy* daisy);
 
-EXPORT void                            /* Run all processes a single time step. */
+EXPORT void                /* Run all processes a single time step. */
 daisy_daisy_tick (daisy_daisy* daisy);
 
-EXPORT void                            /* Timestep before colums. */
+EXPORT void                     /* Timestep before colums. */
 daisy_daisy_tick_before (daisy_daisy* daisy);
 
 EXPORT void                  /* Run all columns a single time step. */
@@ -667,10 +641,10 @@ daisy_chemical_reflection_factor (const daisy_chemical* chemical);
  */
 
 EXPORT unsigned int             /* Return number of extern scopes */
-daisy_scope_extern_size ();
+daisy_daisy_scope_extern_size (daisy_daisy* daisy);
 
 EXPORT const daisy_scope*       /* Return extern scope INDEX. */
-daisy_scope_extern_get (const unsigned int index);
+daisy_daisy_scope_extern_get (daisy_daisy* daisy, const unsigned int index);
 
 EXPORT unsigned int             /* Number of numbers in SCOPE. */
 daisy_scope_number_size (const daisy_scope* scope);
@@ -700,9 +674,6 @@ daisy_scope_description (const daisy_scope* scope, const char* name);
  *
  * Other functions which doesn't fit nicely into the above categories.
  */
-
-EXPORT void                            /* Initialize syntax and alist for daisy. */
-daisy_load (daisy_syntax* syntax, daisy_alist* alist);
 
 EXPORT void                            /* Initialize the Daisy subsystem. */
 daisy_initialize (void);

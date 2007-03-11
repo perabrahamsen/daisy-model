@@ -87,10 +87,10 @@ main (int argc, char* argv[])
 
     // Find a scope named 'check'.
     
-    if (daisy_scope_extern_size () < 1)
+    if (daisy_daisy_scope_extern_size (daisy) < 1)
       printf ("No scope found not recognized.\n");
     else
-      scope = daisy_scope_extern_get(0);
+      scope = daisy_daisy_scope_extern_get(daisy, 0);
 
     while (daisy_daisy_is_running (daisy))
       {
@@ -118,7 +118,6 @@ main (int argc, char* argv[])
 			daisy_scope_number(scope, "height"),
 			daisy_scope_dimension (scope, "height"));
 	      }
-	    else  printf ("height not recognized.\n");
 	  }
       }
     printf ("Simulation end.\n");
