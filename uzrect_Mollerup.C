@@ -359,7 +359,7 @@ UZRectMollerup::Neumann (const size_t edge, const size_t cell,
                          ublas::vector<double>& dq, ublas::vector<double>& B)
 {
   B (cell) = flux * area;
-  dq (edge) = in_sign * B (cell);
+  dq (edge) = in_sign * flux;
 }
 
 void 
@@ -375,11 +375,12 @@ UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
                            ublas::vector<double>& Gm)
 {
   Dm_mat (cell, cell) += K_area_per_length;
-  Dm_vec (cell) -= K_area_per_length * pressure;
-  dq (edge) = K_area_per_length * pressure;
-  Gm (cell) -= K_cell * area; 
+  const double Dm_vec_val = -K_area_per_length * pressure;
+  Dm_vec (cell) += Dm_vec_val;
+  const double Gm_val = -K_cell * area;
+  Gm (cell) += Gm_val;
   dq (edge) = in_sign * (K_area_per_length * h_old 
-                         + Dm_vec (cell) + Gm (cell));
+                         + Dm_vec_val + Gm_val) / area;
 }
 
 void 
@@ -640,13 +641,14 @@ UZRectMollerup::Darcy (const GeometryRect& geo,
 	{
 	  const int from = geo.edge_from (e);
 	  const int to = geo.edge_to (e);	   
-          const double area_per_length = geo.edge_area_per_length (e);
-          const double area = geo.edge_area (e);
+          const double length = geo.edge_length (e);
+          // const double area_per_length = geo.edge_area_per_length (e);
+          // const double area = geo.edge_area (e);
           const double sin_angle = geo.edge_sin_angle (e);
           const double K = Kedge (e);
           const double dh = h (to) - h (from);
-          const double dq_diff = -K * area_per_length * dh;   
-          const double dq_grav = -K * area * sin_angle; 
+          const double dq_diff = -(K / length) * dh;   
+          const double dq_grav = -K * sin_angle; 
           dq (e) = dq_diff + dq_grav;
 	} 
     }
