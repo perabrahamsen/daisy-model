@@ -269,15 +269,19 @@ GeometryRect::GeometryRect (Block& al)
   // Cell edges.
   cell_edges_.insert (cell_edges_.end (), cell_pseudo_size (),
                       std::vector<int> ());
+  std::ostringstream tmp;
   for (size_t e = 0; e < edge_size (); e++)
     { 
+      tmp << edge_from (e) << " -> " << edge_to (e) << "\n";
       cell_edges_[cell_pseudo_number (edge_from (e))].push_back (e);
       cell_edges_[cell_pseudo_number (edge_to (e))].push_back (e);
     }
+  Assertion::message (tmp.str ());
 
   // Edges.
   daisy_assert (edge_area_.size () == edge_size ());
   daisy_assert (edge_length_.size () == edge_size ());
+
   for (size_t e = 0; e < edge_size (); e++)
     { 
       const double length = edge_length (e);
