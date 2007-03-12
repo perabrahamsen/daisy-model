@@ -403,7 +403,8 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
       const int edge = edge_below[i];
       const int cell = geo.edge_other (edge, Geometry::cell_below);
       const double in_sign 
-        = geo.cell_is_internal (geo.edge_to (cell)) ? 1.0 : -1.0;
+        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+      daisy_assert (in_sign > 0);
       const double area = geo.edge_area (edge);
 
       switch (groundwater.bottom_type ())
@@ -466,7 +467,8 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
       const int edge = edge_above[i];
       const int cell = geo.edge_other (edge, Geometry::cell_above);
       const double in_sign 
-        = geo.cell_is_internal (geo.edge_to (cell)) ? 1.0 : -1.0;
+        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+      daisy_assert (in_sign < 0);
       const double area = geo.edge_area (edge);
 
       switch (surface.top_type (geo, edge))
