@@ -1,30 +1,20 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Syncroniser CVS
-
 * R2D2
+
+** Find ud af hvorfor boost-sandbox ikke vil installeres
 
 ** boost på dirac
 
 ** inkluder uzrect_Mollerup
 
-** trykrand q
-
-** dq for indre faces
-
 ** massebalance som check 
 
-* C API: Fjern Treelog
-
-** extern log skal ind under daisy output
-
-* DJVF/Farquhar
-
-** Ndist komponent
-
-** Flyt net_radiation ud af PET og ind i Bioclimate
+** msoltranrect_Mollerup
 
 * OpenMI
+
+** Installer C# på x40
 
 ** Nedre rand skal virke med negativt tryk
 
@@ -33,16 +23,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 ** søjle polygon
 
 * TUT?
-
-* Nu 
-
-** Omskriv C API så (run foo) virker.
-
-** Installer C# på x40
-
-** Find ud af hvorfor boost-sandbox ikke vil installeres
-
-* Clean up geometry1d.h
 
 * Brug Rect2x1 stoftransport komponent.
 
