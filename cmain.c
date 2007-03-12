@@ -27,21 +27,22 @@
 #include <assert.h>
 
 void
-exit_on_failure (daisy_toplevel* toplevel)
+exit_on_failure (daisy_daisy* toplevel)
 {
-  if (daisy_toplevel_done (toplevel))
+  if (!daisy_daisy_ok (toplevel))
     {
-      daisy_toplevel_delete (toplevel);
+      daisy_daisy_delete (toplevel);
       exit (EXIT_FAILURE);
     }
 }
+
+static const int one_column_a_time = 0;
 
 int 
 main (int argc, char* argv[])
 {
   /* Declarations. */
-  daisy_toplevel* toplevel;
-  daisy_daisy* daisy;
+  daisy_daisy* toplevel;
   const daisy_scope* scope = NULL;
 
   /* We need exactly one argument. */
@@ -52,58 +53,71 @@ main (int argc, char* argv[])
     }
 
   /* Create a top level that logs to a daisy.log file. */
-  toplevel = daisy_toplevel_create_with_log ("daisy.log");
+  toplevel = daisy_daisy_create_with_log ("daisy.log");
   assert (toplevel);
 
   /* Parse thecommand line. */
-  daisy_toplevel_parse_command_line (toplevel, argc, argv);
-  if (daisy_toplevel_done (toplevel))
+  daisy_daisy_parse_command_line (toplevel, argc, argv);
+  if (daisy_daisy_done (toplevel))
     {                           /* We might be done now. */
-      daisy_toplevel_delete (toplevel);
+      daisy_daisy_delete (toplevel);
       exit (EXIT_SUCCESS);
     }
   exit_on_failure (toplevel);
 
   /* Initialize */
-  daisy_toplevel_initialize (toplevel);
+  daisy_daisy_initialize (toplevel);
   exit_on_failure (toplevel);
 
-  daisy = daisy_toplevel_get_daisy (toplevel);
-
-  if (!daisy)
+  if (!daisy_daisy_is_daisy (toplevel))
     {
       /* Not a Daisy simulation, just run it. */
-      daisy_toplevel_run (toplevel);
-      exit (daisy_toplevel_done (toplevel) ? EXIT_SUCCESS : EXIT_FAILURE);
+      daisy_daisy_run (toplevel);
+      exit (daisy_daisy_done (toplevel) ? EXIT_SUCCESS : EXIT_FAILURE);
     }
   /* Run the simulation. */
   {
-    const daisy_time *const time = daisy_daisy_get_time (daisy);
-    const int columns = daisy_daisy_count_columns (daisy);
+    const daisy_time *const time = daisy_daisy_get_time (toplevel);
+    const int columns = daisy_daisy_count_columns (toplevel);
     int i;
 
     printf ("Starting simulation.\n");
-    daisy_daisy_start (daisy);
+    daisy_daisy_start (toplevel);
+    exit_on_failure (toplevel);
 
     // Find a scope named 'check'.
     
-    if (daisy_daisy_scope_extern_size (daisy) < 1)
+    if (daisy_daisy_scope_extern_size (toplevel) < 1)
       printf ("No scope found not recognized.\n");
     else
-      scope = daisy_daisy_scope_extern_get(daisy, 0);
+      scope = daisy_daisy_scope_extern_get(toplevel, 0);
+    exit_on_failure (toplevel);
 
-    while (daisy_daisy_is_running (daisy))
+    while (daisy_daisy_is_running (toplevel))
       {
-        daisy_daisy_tick_before (daisy);
-        
-        for (i = 0; i < columns; i++)
+        if (one_column_a_time)
           {
-            /* daisy_column* column = daisy_daisy_get_column (daisy, i); */
-            daisy_daisy_tick_column (daisy, i);
-          }
+            daisy_daisy_tick_before (toplevel);
+            exit_on_failure (toplevel);
+        
+            for (i = 0; i < columns; i++)
+              {
+#if 0
+                daisy_column* column = daisy_daisy_get_column (toplevel, i);
+#endif
 
-        daisy_daisy_tick_after (daisy);
-	
+                daisy_daisy_tick_column (toplevel, i);
+                exit_on_failure (toplevel);
+              }
+
+            daisy_daisy_tick_after (toplevel);
+          }
+	else
+          // Just do all everything at once.
+          daisy_daisy_tick (toplevel);
+
+        exit_on_failure (toplevel);
+        
         if (daisy_time_get_hour (time) == 0)
 	  printf ("%04d-%02d-%02d\n", 
 		  daisy_time_get_year (time),
@@ -112,20 +126,22 @@ main (int argc, char* argv[])
 
 	if (scope)
 	  {
-	    if(daisy_scope_has_number (scope, "height"))
+	    if (daisy_scope_has_number (scope, "height"))
 	      {
 		printf ("Height %g [%s]\n", 
 			daisy_scope_number(scope, "height"),
 			daisy_scope_dimension (scope, "height"));
 	      }
+            exit_on_failure (toplevel);
 	  }
       }
     printf ("Simulation end.\n");
   }
+  exit_on_failure (toplevel);
 
   /* Cleanup. */
-  daisy_toplevel_delete (toplevel);
+  daisy_daisy_delete (toplevel);
 
   /* All is well. */
-  exit (0);
+  exit (EXIT_SUCCESS);
 }

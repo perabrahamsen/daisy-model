@@ -497,6 +497,11 @@ native:
 	 && cd $(NATIVEHOME) \
          && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy${EXE})
 
+cnative:
+	(mkdir -p $(NATIVEHOME) \
+	 && cd $(NATIVEHOME) \
+         && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile cdaisy${EXE})
+
 cross:
 	(cd $(OBJHOME)/$(TARGETTYPE) \
          && $(MAKE) GCC=$(CROSSGCC) DEBUG= VPATH=$(SRCDIR) \

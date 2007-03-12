@@ -75,7 +75,7 @@ EXPORT daisy_bool                      /* Check that alist match the syntax. */
 daisy_syntax_check (const daisy_syntax* syntax, 
                     const daisy_alist* alist,
                     const char* name,
-                    const daisy_topevel* toplevel);
+                    const daisy_daisy* toplevel);
 
 /* Elements in the syntax table have the following properties.
    
