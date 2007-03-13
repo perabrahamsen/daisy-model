@@ -416,7 +416,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
         case Groundwater::free_drainage:
           {
             const double sin_angle = geo.edge_sin_angle (edge);
-            const double flux = -sin_angle * K (cell) * area;
+            const double flux = -in_sign * sin_angle * K (cell) * area;
             Neumann (edge, cell, area, in_sign, flux, dq, B);
           }
           break;
