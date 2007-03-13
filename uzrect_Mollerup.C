@@ -478,7 +478,7 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
       switch (surface.top_type (geo, edge))
 	{
 	case Surface::forced_flux: 
-	  const double flux = surface.q_top (geo, edge);
+	  const double flux = -surface.q_top (geo, edge);
           Neumann (edge, cell, area, in_sign, flux, dq, B);
 	  break;
 	case Surface::forced_pressure:
@@ -496,7 +496,7 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	  // Decide type.
 	  const bool is_flux = -q_pot > -q_avail;
 	  if (is_flux)
-            Neumann (edge, cell, area, in_sign, q_avail, dq, B);
+            Neumann (edge, cell, area, in_sign, -q_avail, dq, B);
 	  else			// Pressure
 	    {
 	      const double value = -K (cell) * geo.edge_area_per_length (edge);

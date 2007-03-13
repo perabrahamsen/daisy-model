@@ -41,6 +41,8 @@ static const int one_column_a_time = 0;
 int 
 main (int argc, char* argv[])
 {
+  printf ("Daisy version %s\n", daisy_version ());
+
   /* Declarations. */
   daisy_daisy* toplevel;
   const daisy_scope* scope = NULL;
