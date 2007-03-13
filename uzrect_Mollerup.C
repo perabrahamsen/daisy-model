@@ -416,7 +416,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
         case Groundwater::free_drainage:
           {
             const double sin_angle = geo.edge_sin_angle (edge);
-            const double flux = sin_angle * K (cell) * area;
+            const double flux = -sin_angle * K (cell) * area;
             Neumann (edge, cell, area, in_sign, flux, dq, B);
           }
           break;
@@ -726,7 +726,7 @@ static struct UZRectMollerupSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 A finite volume solution to matrix water transport.\n\
-See Mollerup, 2007 for details.");
+See Mollerup 2007 for details.");
     UZRectMollerup::load_syntax (syntax, alist);
     Librarian<UZRect>::add_type ("Mollerup", alist, syntax, &make);
   }

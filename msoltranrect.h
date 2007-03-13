@@ -24,16 +24,18 @@
 
 #include "librarian.h"
 
+#if 0
 // Needed for initialization order.
 #include "uzmodel.h"
 #include "uz1d.h"
 #include "macro.h"
 #include "transport.h"
 #include "mactrans.h"
+#endif
 
 #include <vector>
 
-class Geometry;
+class GeometryRect;
 class Soil;
 class SoilWater;
 class Element;
@@ -64,7 +66,9 @@ public:
 
   // Create and Destroy.
 public:
+  static const AttributeList& none_model ();
   static const AttributeList& reserve_model ();
+  static const AttributeList& default_model ();
 protected:
   Msoltranrect (Block&);
 public:

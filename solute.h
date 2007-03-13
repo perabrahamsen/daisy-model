@@ -81,6 +81,11 @@ public:
   double total_surface (const Geometry&, double from, double to) 
     const; // [g/cm^2]
 
+  // Transport.
+public:
+  void set_macro_flux (size_t e, double value);
+  void set_matrix_flux (size_t e, double value);
+
   // Sink.
 public:
   void clear ();

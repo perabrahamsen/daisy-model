@@ -1,3 +1,10 @@
+2007-03-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* msoltranrect_none.C: New model.
+
+	* msoltranrect_Mollerup.C: New model.
+	* Makefile (MODELS): Added it.
+
 2007-03-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log_extern.h, log_extern.C: Export interface.

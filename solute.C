@@ -31,8 +31,17 @@
 #include <sstream>
 
 double
-Solute::total_surface (const Geometry& geo, double from, double to) const
+Solute::total_surface (const Geometry& geo, 
+                       const double from, const double to) const
 { return geo.total_surface (M_, from, to); }
+
+void 
+Solute::set_macro_flux (const size_t e, const double value)
+{ J[e] = value; }
+
+void
+Solute::set_matrix_flux (const size_t e, const double value)
+{ J_p[e] = value; }
 
 void
 Solute::clear ()

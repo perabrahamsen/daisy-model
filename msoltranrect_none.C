@@ -1,6 +1,6 @@
-// msoltranrect_2x1.C --- Decoupled vertical and horizontal transport.
+// msoltranrect_none.C --- No transport.
 // 
-// Copyright 2006 Per Abrahamsen and KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,7 +20,6 @@
 
 #include "msoltranrect.h"
 #include "geometry_rect.h"
-#include "transport.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "solute.h"
@@ -30,13 +29,9 @@
 #include "memutils.h"
 #include <sstream>
 
-struct Msoltranrect2x1 : public Msoltranrect
+struct MsoltranrectNone : public Msoltranrect
 {
   // Solute.
-  std::auto_ptr<Transport> transport; // Solute transport model in matrix.
-  std::auto_ptr<Transport> reserve; // Reserve solute transport model in matr.
-  std::auto_ptr<Transport> last_resort; // Last resort solute transport model.
-  std::auto_ptr<Transport> transport_solid; // Pseudo transport for non-solutes
   void solute (const GeometryRect&, const Soil&, const SoilWater&,
                const double J_in, Solute&, double dt, Treelog& msg);
   void element (const GeometryRect&, const Soil&, const SoilWater&,
@@ -59,12 +54,12 @@ struct Msoltranrect2x1 : public Msoltranrect
 
   // Create.
   static void load_syntax (Syntax& syntax, AttributeList& alist);
-  Msoltranrect2x1 (Block& al);
-  ~Msoltranrect2x1 ();
+  MsoltranrectNone (Block& al);
+  ~MsoltranrectNone ();
 };
 
 void
-Msoltranrect2x1::solute (const GeometryRect& geo,
+MsoltranrectNone::solute (const GeometryRect& geo,
                          const Soil& soil, const SoilWater& soil_water,
                          const double J_in, Solute& solute, const double dt,
                          Treelog& msg)
@@ -73,7 +68,23 @@ Msoltranrect2x1::solute (const GeometryRect& geo,
   const size_t edge_size = geo.edge_size ();
   const size_t cell_size = geo.cell_size ();
 
+  std::vector<double> M (cell_size);
+  std::vector<double> C (cell_size);
+  std::vector<double> S (cell_size);
+  std::vector<double> S_p (cell_size);
+  std::vector<double> J (edge_size, 0.0);
+  std::vector<double> J_p (edge_size, 0.0);
+  
   solute.tick (cell_size, soil_water, dt);
+
+  // Initialize cells.
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      M[c] = solute.M (c);
+      C[c] = solute.C (c);
+      S[c] = solute.S (c);
+      S_p[c] = solute.S_p (c);
+    }
 
   // Upper border.
   for (size_t e = 0; e < edge_size; e++)
@@ -81,21 +92,29 @@ Msoltranrect2x1::solute (const GeometryRect& geo,
       if (geo.edge_to (e) != Geometry::cell_above)
         continue;
 
-      solute.J_p[e] = 0.0;
-      solute.J[e] = J_in;
+      J_p[e] = 0.0;
+      J[e] = J_in;
     }
 
   // Flow.
   flow (geo, soil, soil_water, solute.submodel, 
-        solute.M_, solute.C_, 
-        solute.S, solute.S_p,
-        solute.J, solute.J_p, 
+        M_, C_, S, S_p, J, J_p, 
         *solute.adsorption, solute.diffusion_coefficient (), 
         dt, msg);
+
+  // Update solute.
+  for (size_t c = 0; e < cell_size; c++)
+    solute.set_content (c, M[c], C[c]);
+
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      solute.set_matrix_flux (J[e]);
+      solute.set_macro_flux (J_p[e]);
+    }
 }
 
 void 
-Msoltranrect2x1::element (const GeometryRect& geo, 
+MsoltranrectNone::element (const GeometryRect& geo, 
                           const Soil& soil, const SoilWater& soil_water,
                           Element& element, Adsorption& adsorption,
                           const double diffusion_coefficient, 
@@ -109,7 +128,7 @@ Msoltranrect2x1::element (const GeometryRect& geo,
 }
 
 void
-Msoltranrect2x1::flow (const GeometryRect& geo, 
+MsoltranrectNone::flow (const GeometryRect& geo, 
                        const Soil& soil, 
                        const SoilWater& soil_water, 
                        const std::string& name,
@@ -185,66 +204,47 @@ Msoltranrect2x1::flow (const GeometryRect& geo,
 }
 
 void 
-Msoltranrect2x1::output (Log&) const
+MsoltranrectNone::output (Log&) const
 { }
 
-Msoltranrect2x1::Msoltranrect2x1 (Block& al)
-  : Msoltranrect (al),
-    transport (Librarian<Transport>::build_item (al, "transport")),
-    reserve (Librarian<Transport>::build_item (al, "transport_reserve")),
-    last_resort (Librarian<Transport>::build_item (al, 
-                                                   "transport_last_resort")),
-    transport_solid (Librarian<Transport>::build_item (al, "transport_solid"))
+MsoltranrectNone::MsoltranrectNone (Block& al)
+  : Msoltranrect (al)
 { }
 
-Msoltranrect2x1::~Msoltranrect2x1 ()
+MsoltranrectNone::~MsoltranrectNone ()
 { }
 
 void 
-Msoltranrect2x1::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  syntax.add ("transport", Librarian<Transport>::library (),
-              "Primary solute transport model.");
-  alist.add ("transport", Transport::default_model ());
-  syntax.add ("transport_reserve", Librarian<Transport>::library (),
-              "Reserve solute transport if the primary model fails.");
-  alist.add ("transport_reserve", Transport::reserve_model ());
-  syntax.add ("transport_last_resort", Librarian<Transport>::library (),
-              "Last resort solute transport if the reserve model fails.");
-  alist.add ("transport_last_resort", Transport::none_model ());
-  syntax.add ("transport_solid", Librarian<Transport>::library (),
-              "Transport model for non-dissolvable chemicals.\n\
-Should be 'none'.");
-  alist.add ("transport_solid", Transport::none_model ());
-}
+MsoltranrectNone::load_syntax (Syntax&, AttributeList&)
+{ }
 
 const AttributeList& 
-Msoltranrect::reserve_model ()
+Msoltranrect::none_model ()
 {
   static AttributeList alist;
 
   if (!alist.check ("type"))
     {
       Syntax dummy;
-      Msoltranrect2x1::load_syntax (dummy, alist);
-      alist.add ("type", "v+h");
+      MsoltranrectNone::load_syntax (dummy, alist);
+      alist.add ("type", "none");
     }
   return alist;
 }
 
-static struct Msoltranrect2x1Syntax
+static struct MsoltranrectNoneSyntax
 {
   static Msoltranrect& make (Block& al)
-  { return *new Msoltranrect2x1 (al); }
+  { return *new MsoltranrectNone (al); }
 
-  Msoltranrect2x1Syntax ()
+  MsoltranrectNoneSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
-               "Decoupled vertical and horizontal transport.");
-    Msoltranrect2x1::load_syntax (syntax, alist);
+               "Disable all transport except through boundaries.");
+    MsoltranrectNone::load_syntax (syntax, alist);
  
-    Librarian<Msoltranrect>::add_type ("v+h", alist, syntax, &make);
+    Librarian<Msoltranrect>::add_type ("none", alist, syntax, &make);
   }
-} Msoltranrect2x1_syntax;
+} MsoltranrectNone_syntax;
