@@ -187,12 +187,14 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       if (ddt > time_left)
 	ddt = time_left;
 
+#if 0
       std::ostringstream tmp;
       tmp << "Time left = " << time_left << ", ddt = " << ddt 
 	  << ", iteration = " << iterations_used << "\n";
       tmp << "h = " << h << "\n";
       tmp << "Theta = " << Theta << "\n";
       msg.message (tmp.str ());
+#endif       
 
       h_previous = h;
       Theta_previous = Theta;  
@@ -283,6 +285,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  for (int c=0; c < cell_size; c++) // update Theta - maybe not neccessary???
 	    Theta (c) = soil.Theta (c, h (c), h_ice (c)); 
 
+#if 0
 	  std::ostringstream tmp;
 	  tmp << "Time left = " << time_left << ", ddt = " << ddt 
 	      << ", iteration = " << iterations_used << "\n";
@@ -290,6 +293,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  tmp << "h = " << h << "\n";
 	  tmp << "Theta = " << Theta << "\n";
 	  msg.message (tmp.str ());
+#endif
 
 	}
       while (!converges (h_conv, h)
@@ -488,7 +492,6 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	  const double dz = geo.edge_length (edge);
           const double sin_angle = geo.edge_sin_angle (edge);
 	  const double q_avail = sin_angle * h_top / ddt;
-	  daisy_assert (q_avail <= 0.0);
 	  const double q_pot = - K (cell) * (h_top - h (cell) + dz) / dz;
 	  // Decide type.
 	  const bool is_flux = -q_pot > -q_avail;
@@ -502,11 +505,13 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
                          value, pressure, dq, Dm_mat, Dm_vec, Gm);
 	    }
 	  {
+#if 0
 	    std::ostringstream tmp;
 	    tmp << "edge = " << edge << ", K = " << K (cell) << ", h_top = "
 		<< h_top << ", dz = " << dz << ", q_avail = " << q_avail
 		<< ", q_pot = " << q_pot << ", is_flux = " << is_flux;
 	    Assertion::message (tmp.str ());
+#endif 
 	  }
 	  break;
 	case Surface::soil:
@@ -548,8 +553,10 @@ UZRectMollerup::drain (const GeometryRect& geo,
 	  h_sum += h (other) + (z_other - z_drain);  
 	}
 
+#if 0
       tmp << "drain[" << d << "], cell " << cell << ", has h_sum = " 
 	  << h_sum << "\n";
+#endif 
 
       if (h_sum < 0)
 	// Drain not active, treat as normal cell.
