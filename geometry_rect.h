@@ -70,7 +70,6 @@ public:
   size_t cell_at (double z, double x, double y) const;
   double fraction_in_z_interval (size_t n, double from, double to) const;
   double fraction_in_volume (size_t n, const Volume& volume) const;
-  bool contain_z (size_t n, double z) const;
   const std::vector<int>& cell_corners (size_t n) const
   { return cell_corners_[n]; }
 private:

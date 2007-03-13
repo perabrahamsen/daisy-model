@@ -43,6 +43,8 @@ public:
   { return z_[n]; }
   inline double dz (size_t n) const
   { return dz_[n]; }
+  virtual double zminus (size_t n) const = 0;
+  bool contain_z (size_t i, double z) const;
 
   // Creation.
   bool check_z_border (const double value, Treelog& err) const;

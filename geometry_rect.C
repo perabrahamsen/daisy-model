@@ -55,13 +55,6 @@ GeometryRect::fraction_in_volume (size_t n, const Volume& volume) const
                               xminus (n), xplus (n));
 }
 
-bool 
-GeometryRect::contain_z (const size_t i, const double z) const
-{ 
-  daisy_assert (zminus (i) > zplus (i));
-  return  zminus (i) > z && z >= zplus (i); 
-}
-
 size_t 
 GeometryRect::cell_pseudo_number (const int n) const
 {
