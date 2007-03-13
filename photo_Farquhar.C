@@ -80,7 +80,6 @@ private:
   std::vector<double> Nleaf_vector; // Distribution of photosynthetic N-leaf  
   std::vector<double> Ass_vector; // Brutto assimilate  
   std::vector<double> Jm_vector; // Potential rate of electron transport
-  std::vector<double> resis_vector; // Stomata resistance  
   std::vector<double> gs_vector; // Stomata cunductance
   std::vector<double> sun_LAI_vector; // sunlit LAI
   double ci_middel;              // Average stomata CO2 pressure per LAI units
@@ -90,7 +89,6 @@ private:
   double sun_LAI;                // Leaf Area index for the sunlit fraction
   double PAR_;                   // Photosynthetic active radiation
   double gs;                     // Stomata conductance
-  double resis;                  // Stomata resistance
   double Vmax;                   // Photosynthetic Rubisco capacity
   double jm;                     // Potential rate of electron transport 
   double leafPhotN;              // Content of photosynthetic active leaf N
@@ -443,9 +441,6 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
   while (ci_vector.size () < No)
     ci_vector.push_back (0.0);//[Pa]
 
-  // Stomata resistance (for logging)
-  while (resis_vector.size () < No)
-    resis_vector.push_back (0.0);//[m/s]
 
   // Stomata conductance (for logging)
   while (gs_vector.size () < No)
@@ -528,7 +523,6 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	  //log variables:
 	  Ass_vector[i]+= pn_* (molWeightCH2O / molWeightCO2) * LA;//[g CH2O/m²area/h]
 	  Nleaf_vector[i]+= crop_Ndist[i] * LA * fraction[i]; //[mol N/m²area]OK
-	  resis_vector[i]+= 1.0 /(gsw * LA * fraction[i]); //[s/m² area/mol]
 	  gs_vector[i]+= gsw * LA * fraction[i];    //[mol/m² area/s]
 	  ci_vector[i]+= ci * fraction[i];  //[Pa] OK
 	  Vm_vector[i]+= Vm_ * 1000.0 * LA * fraction[i]; //[mmol/m² area/s]OK
@@ -537,7 +531,6 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 
 	  ci_middel += ci * fraction[i]/(No + 0.0);// [Pa]   OK
 	  gs += LA * gsw * fraction[i]; 
-	  resis += 1.0/(LA * gsw * fraction[i]); 
 	  Ass += LA * pn_ * (molWeightCH2O / molWeightCO2);//[g CH2O/m2 area/h] OK
 	  sun_LAI += LA * fraction[i];//OK
 	  LAI += LA * fraction[i];//OK
@@ -557,7 +550,6 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 void
 PhotoFarquhar::clear ()
 {
-  std::fill(resis_vector.begin (), resis_vector.end (), 0.0);
   std::fill(gs_vector.begin (), gs_vector.end (), 0.0);
   std::fill(ci_vector.begin (), ci_vector.end (), 0.0);
   std::fill(Vm_vector.begin (), Vm_vector.end (), 0.0);
@@ -566,7 +558,6 @@ PhotoFarquhar::clear ()
   std::fill(Ass_vector.begin (), Ass_vector.end (), 0.0);
   std::fill(sun_LAI_vector.begin (), sun_LAI_vector.end (), 0.0);
   ci_middel = 0.0;
-  resis = 0.0;
   gs = 0.0;
   Ass = 0.0;
   Res = 0.0;
@@ -586,13 +577,11 @@ PhotoFarquhar::output(Log& log) const
   output_variable (Ass_vector, log);
   output_variable (Nleaf_vector, log);
   output_variable (gs_vector, log);
-  output_variable (resis_vector, log);
-  output_variable (ci_vector, log);
+   output_variable (ci_vector, log);
   output_variable (Vm_vector, log);
   output_variable (Jm_vector, log);
   output_variable (ci_middel, log);
-  output_variable (resis, log);
-  output_variable (gs, log);
+   output_variable (gs, log);
   output_variable (Ass, log);
   output_variable (Res, log);
   output_variable (LAI, log);
@@ -724,7 +713,6 @@ static struct Photo_FarquharSyntax
     syntax.add ("ci_vector", "Pa", Syntax::LogOnly, Syntax::Sequence, "CO2 pressure in Stomatal in each layer.");
     syntax.add ("Vm_vector", "mmol/m2/s", Syntax::LogOnly, Syntax::Sequence, "Photosynthetic capacity in each layer.");
     syntax.add ("Jm_vector", "mmol/m2/s", Syntax::LogOnly, Syntax::Sequence, "Potential rate of electron transport in each layer.");
-    syntax.add ("resis_vector", "s/mol/m2", Syntax::LogOnly, Syntax::Sequence, "Stomata resistance in each layer.");
     syntax.add ("gs_vector", "mol/m2/s", Syntax::LogOnly, Syntax::Sequence, "Stomata cunductance in each layer.");
     syntax.add ("Nleaf_vector", "mol N/m2", Syntax::LogOnly, Syntax::Sequence, "Distribution of photosynthetic N-leaf.");
     syntax.add ("Ass_vector", "mol CH2O/m2/s", Syntax::LogOnly, Syntax::Sequence, "Brutto assimilate.");
@@ -732,7 +720,6 @@ static struct Photo_FarquharSyntax
 
     syntax.add ("ci_middel", "Pa", Syntax::LogOnly, "Stomata average CO2 pressure.");
     syntax.add ("gs", "mol/m2/s", Syntax::LogOnly, "Stomata conductance.");
-    syntax.add ("resis", "s/mol/m2", Syntax::LogOnly, "Stomata resistance.");
     syntax.add ("Ass", "g CH2O/m2", Syntax::LogOnly, "'Net' leaf assimilate of CO2.");
     syntax.add ("Res", "g CH2O/m2", Syntax::LogOnly, "Farquhar leaf respiration.");
     syntax.add ("LAI", "", Syntax::LogOnly, "Leaf area index for the canopy used in photosynthesis.");

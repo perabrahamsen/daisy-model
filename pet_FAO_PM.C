@@ -28,7 +28,6 @@
 #include "surface.h"
 #include "soil_heat.h"
 #include "fao.h"
-#include "net_radiation.h"
 #include "vegetation.h"
 #include "log.h"
 #include <sstream>
@@ -43,11 +42,9 @@ public:
   double potential_evapotranspiration_wet;
   double potential_evapotranspiration_dry;
 
-  // Net radiation.
-  std::auto_ptr<NetRadiation> net_radiation;
-
   // Simulation.
-  void tick (const Time&, const Weather& weather, const Vegetation& crops,
+  void tick (const Time&, const Weather& weather, const double Rn,
+	     const Vegetation& crops,
 	     const Surface& surface, const Geometry& geo,
              const Soil& soil,
 	     const SoilHeat& soil_heat, const SoilWater& soil_water, Treelog&);
@@ -57,7 +54,6 @@ public:
     Pet::output (log);
     output_value (reference_evapotranspiration_dry,
                   "reference_evapotranspiration", log);
-    output_derived (net_radiation, "net_radiation", log);
   }
 
   double wet () const
@@ -68,34 +64,25 @@ public:
 
   // Create & Destroy.
   PetFAO_PM (Block& al)
-    : Pet (al),
-      net_radiation (Librarian<NetRadiation>::build_item (al, "net_radiation"))
+    : Pet (al)
   { }
   ~PetFAO_PM ()
   { }
 };
 
 void
-PetFAO_PM::tick (const Time&, const Weather& weather, const Vegetation& crops,
+PetFAO_PM::tick (const Time&, const Weather& weather, const double Rn,
+		 const Vegetation& crops,
                  const Surface& surface, const Geometry& geo, const Soil& soil,
                  const SoilHeat& soil_heat, const SoilWater& soil_water,
-                 Treelog& out)
+                 Treelog&)
 {
   // Weather.
-  const double Cloudiness = weather.hourly_cloudiness ();
   const double Temp = weather.hourly_air_temperature ();
   const double VaporPressure = weather.vapor_pressure ();
-  const double Si = weather.hourly_global_radiation ();
   const double U2 = weather.wind ();
   const double elevation = weather.elevation ();
   const double AtmPressure = FAO::AtmosphericPressure (elevation);
-
-  // Albedo.
-  const double Albedo = albedo (crops, surface, geo, soil, soil_water);
-
-  // Net Radiation.
-  net_radiation->tick (Cloudiness, Temp, VaporPressure, Si, Albedo, out);
-  const double Rn = net_radiation->net_radiation ();
 
   // Ground heat flux.
   const double G = soil_heat.top_flux (geo, soil, soil_water);
@@ -131,12 +118,6 @@ static struct PetFAO_PMSyntax
     alist.add ("description",
 	       "Potential evopotranspiration using Penman-Monteith.");
     Pet::load_syntax (syntax, alist);
-    Syntax Rn_syntax;
-    AttributeList Rn_alist;
-    Rn_alist.add ("type", "brunt");
-    syntax.add ("net_radiation", Librarian<NetRadiation>::library (),
-		"Net radiation.");
-    alist.add ("net_radiation", Rn_alist);
     Librarian<Pet>::add_type ("FAO_PM", alist, syntax, &make);
   }
 } PetFAO_PM_syntax;

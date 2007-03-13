@@ -34,6 +34,7 @@
 #include "snow.h"
 #include "log.h"
 #include "mathlib.h"
+#include "net_radiation.h"
 #include "pet.h"
 #include "difrad.h"
 #include "raddist.h"
@@ -61,6 +62,7 @@ struct BioclimateStandard : public Bioclimate
   void CanopyStructure (const Vegetation&);
 
   // External water sinks and sources.
+  std::auto_ptr<NetRadiation> net_radiation;
   std::auto_ptr<Pet> pet;       // Potential Evapotranspiration model.
   double total_ep;		// Potential evapotranspiration [mm/h]
   double total_ea;		// Actual evapotranspiration [mm/h]
@@ -116,9 +118,7 @@ struct BioclimateStandard : public Bioclimate
   double production_stress;	// Stress calculated by SVAT module.
 
   // Bioclimate leaf
-  double r_ae;                  // Atmospheric resistance
   double LeafTemperature;       // Leaf temperature
-  double AirTemperature;        // Air temperature
 
 
   void WaterDistribution (const Time&,
@@ -146,6 +146,8 @@ struct BioclimateStandard : public Bioclimate
                              const double dt);
 
   // Radiation.
+  static double albedo (const Vegetation& crops, const Surface& surface, 
+                        const Geometry&, const Soil&, const SoilWater&);
   std::auto_ptr<Raddist> raddist;// Radiation distribution model.
   void RadiationDistribution (const Vegetation&, double sin_beta, Treelog&);
   std::auto_ptr<Difrad> difrad;  // Diffuse radiation model.
@@ -286,8 +288,15 @@ BioclimateStandard::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("NoOfIntervals", Syntax::Integer, Syntax::Const, "\
 Number of vertical intervals in which we partition the canopy.");
   alist.add ("NoOfIntervals", 30);
-
+  syntax.add ("Height", "cm", Syntax::LogOnly, Syntax::Sequence, "\
+End points of canopy layers, first entry is top of canopy, last is soil surface.");
   // External water sources and sinks.
+  Syntax Rn_syntax;
+  AttributeList Rn_alist;
+  Rn_alist.add ("type", "brunt");
+  syntax.add ("net_radiation", Librarian<NetRadiation>::library (),
+	      "Net radiation.");
+  alist.add ("net_radiation", Rn_alist);
   syntax.add ("pet", Librarian<Pet>::library (), 
               Syntax::OptionalState, Syntax::Singleton, 
               "Potential Evapotranspiration component.\n\
@@ -401,8 +410,6 @@ As a last resort,  Makkink (makkink) will be used.");
   alist.add ("r_ae", 53.);
   syntax.add ("LeafTemperature", "dg C", Syntax::LogOnly,
               "Actual leaf temperature.");
-  syntax.add ("AirTemperature", "dg C", Syntax::LogOnly,
-              "Actual air temperature.");
 
   // Chemicals.
   Chemicals::add_syntax  ("spray", syntax, alist, Syntax::LogOnly,
@@ -479,6 +486,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
     sun_PAR_ (No + 1),
     sun_LAI_fraction_ (No),
     shared_light_fraction_ (1.0),
+    net_radiation (Librarian<NetRadiation>::build_item (al, "net_radiation")),
     pet (al.check ("pet") 
          ? Librarian<Pet>::build_item (al, "pet")
          : NULL),
@@ -521,7 +529,6 @@ BioclimateStandard::BioclimateStandard (Block& al)
     crop_ep (0.0),
     crop_ea (0.0),
     production_stress (-1.0),
-    r_ae (al.number ("r_ae")),
     spray_ (),
     snow_chemicals_storage (al.alist_sequence ("snow_chemicals_storage")),
     snow_chemicals_in (),
@@ -575,6 +582,25 @@ BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
       //  daisy_assert (approximate (Height[0], MxH));
       Height[0] = vegetation.height ();
     }
+}
+
+double 
+BioclimateStandard::albedo (const Vegetation& crops, const Surface& surface, 
+			    const Geometry& geo,
+			    const Soil& soil, const SoilWater& soil_water)
+{
+  const double litter_albedo = crops.litter_albedo ();
+  const double surface_albedo = (litter_albedo < 0.0) 
+    ? surface.albedo (geo, soil, soil_water)
+    : litter_albedo;
+
+  const double LAI = crops.LAI ();
+  if (LAI <= 0.0)
+    return surface_albedo;
+
+  const double crop_cover = crops.cover ();
+  return crops.albedo () * crop_cover
+    + surface_albedo * (1.0 - crop_cover);
 }
 
 void 
@@ -633,10 +659,20 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 
   // 1 External water sinks and sources. 
 
+  // Net Radiation.
+  const double Cloudiness = weather.hourly_cloudiness ();
+  const double AirTemperature = weather.hourly_air_temperature ();//[dg C]
+  const double VaporPressure = weather.vapor_pressure ();
+  const double Si = weather.hourly_global_radiation ();
+  const double Albedo = albedo (vegetation, surface, geo, soil, soil_water);
+  net_radiation->tick (Cloudiness, AirTemperature, VaporPressure, Si, Albedo, msg);
+  const double Rn = net_radiation->net_radiation ();
+
   // 1.1 Evapotranspiration
+
   daisy_assert (pet.get () != NULL);
   pet->tick (time, 
-             weather, vegetation, surface, 
+             weather, Rn, vegetation, surface, 
              geo, soil, soil_heat, soil_water, msg);
   total_ep = pet->wet ();
   daisy_assert (total_ep >= 0.0);
@@ -910,26 +946,27 @@ BioclimateStandard::tick (const Time& time,
 
   // Calculate leaf temperature of canopy
   static const double rho_water = 1.0; // [kg/dm^3]
-  AirTemperature = weather.hourly_air_temperature ();//[dg C]
+  const double AirTemperature = weather.hourly_air_temperature ();//[dg C]
   const double LatentHeatVapor = FAO::LatentHeatVaporization (AirTemperature); //[J/kg]
   const double LeafTranspirationRate = 
     crop_ea /*[mm/h]*/* rho_water * LatentHeatVapor / 3600. /*[s/h]*/; //[W/m^2] 
 
-  const double ex = weather.HourlyExtraterrestrialRadiation (time);
-  const double hr = weather.hourly_global_radiation ();
-  const double vap = weather.vapor_pressure ();
-  const double NetRadiation = FAO::RefNetRadiation (hr, ex, AirTemperature, vap, msg);//[W/m^2] 
+  const double NetRadiation = net_radiation->net_radiation ();
   const double SensibleHeatFlux = NetRadiation - LeafTranspirationRate;//[W/m^2] 
   
   const double AirPressure = FAO::AtmosphericPressure (weather.elevation ());//[Pa]
   const double pa = FAO::AirDensity(AirPressure, AirTemperature);//[kg/m3]
   const double gamma = FAO::PsychrometricConstant (AirPressure, AirTemperature);//[Pa/dgC]
-  const double epsilon = 0.622; //[]
+  const double epsilon = 0.622; // Ration molecular weight of water vapor / dry air []
   const double cp = gamma * epsilon * LatentHeatVapor / AirPressure;//[J/kg/dg C]
-  LeafTemperature = SensibleHeatFlux * r_ae / (pa * cp) + AirTemperature;//[dg C]
+  
+  const double ScreenHeight = weather.screen_height (); //[m]
+  const double wind_speed =  weather.wind ();//[m/s] 
+  const double ra_e =  FAO::AerodynamicResistance (Height[0], ScreenHeight, wind_speed); // [s m-1]
+
+  LeafTemperature = SensibleHeatFlux * ra_e / (pa * cp) + AirTemperature;//[dg C]
 
 }
-
 void 
 BioclimateStandard::ChemicalDistribution (Surface& surface, 
 					  const Vegetation& vegetation,
@@ -973,6 +1010,8 @@ BioclimateStandard::ChemicalDistribution (Surface& surface,
 void 
 BioclimateStandard::output (Log& log) const
 {
+  output_variable (Height, log);
+  output_derived (net_radiation, "net_radiation", log);
   daisy_assert (pet.get () != NULL);
   output_object (pet.get (), "pet", log);
   output_variable (total_ep, log);
@@ -1019,7 +1058,6 @@ BioclimateStandard::output (Log& log) const
   output_variable (crop_ea, log);
   output_variable (production_stress, log);
   output_variable (LeafTemperature, log);
-  output_variable (AirTemperature, log);
 
   // Note: We use snow_chemicals_in instead of spray, since the former
   // is reset after each time step.

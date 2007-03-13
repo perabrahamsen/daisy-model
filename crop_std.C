@@ -194,7 +194,8 @@ CropStandard::initialize (const Geometry& geo,
   root_system->initialize (geo.cell_size ());
   production.initialize (nitrogen.SeedN);
 
-  if (development->DS >= 0)
+  const double DS = development->DS;
+  if (DS >= 0)
     {
       // Dead organic matter.
       production.initialize (name, harvesting.Root, harvesting.Dead,
@@ -202,12 +203,12 @@ CropStandard::initialize (const Geometry& geo,
       
       // Update derived state content.
       canopy.tick (production.WLeaf, production.WSOrg, 
-		   production.WStem, development->DS, 
+		   production.WStem, DS, 
 		   // We don't save the forced CAI, use simulated CAI
 		   //  until midnight (small error).
 		   -1.0);
-      root_system->set_density (geo, production.WRoot, development->DS, msg);
-      nitrogen.content (development->DS, production, msg);
+      root_system->set_density (geo, production.WRoot, DS, msg);
+      nitrogen.content (DS, production, msg);
     }
 }
 
@@ -233,6 +234,8 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 
   Treelog::Open nest (msg, name);
 
+  const double& DS = development->DS;
+
   // Update cut stress.
   harvesting.tick (time);
 
@@ -257,22 +260,25 @@ CropStandard::tick (const Time& time, const double relative_humidity,
     *last_time = time;
 
   // Emergence.
-  if (new_day && development->DS <= 0)
+  if (DS <= 0)
     {
+      if (!new_day)
+	return;
+
       daisy_assert (ForcedCAI < 0.0);
 
       const double h_middle = geo.content_at (soil_water, &SoilWater::h,
                                               -root_system->Depth/2.);
       development->emergence (h_middle, root_system->soil_temperature, 
                               daystep.total_hours ());
-      if (development->DS >= 0)
+      if (DS >= 0)
 	{
 	  msg.message ("Emerging");
 	  canopy.tick (production.WLeaf, production.WSOrg,
-		       production.WStem, development->DS, -1.0);
-	  nitrogen.content (development->DS, production, msg);
+		       production.WStem, DS, -1.0);
+	  nitrogen.content (DS, production, msg);
 	  root_system->tick_daily (geo, soil, production.WRoot, 0.0,
-                                   development->DS, msg);
+                                   DS, msg);
 
 	  static const symbol root_symbol ("root");
 	  static const symbol dead_symbol ("dead");
@@ -305,10 +311,13 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 	}
       return;
     }
-  if (development->DS <= 0 || development->mature ())
+  if (development->mature ())
     return;
 
-  nitrogen.update (production.NCrop, development->DS, enable_N_stress,
+  daisy_assert (production.AM_root);
+  daisy_assert (production.AM_leaf);
+  
+  nitrogen.update (production.NCrop, DS, enable_N_stress,
                    geo, soil, soil_water, soil_NH4, soil_NO3,
                    bioclimate.day_fraction (),
                    *root_system, dt);
@@ -358,14 +367,14 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 		development->light_time (dt);
 	    }
  	}
-      
-      const double cropN = std::min (production.NLeaf
-				     -(canopy.corresponding_WLeaf (development->DS)
-				     * nitrogen.NfLeafCnc (development->DS)),
-				     canopy.corresponding_WLeaf (development->DS)
-				     * nitrogen.CrLeafCnc (development->DS) 
-				     -(canopy.corresponding_WLeaf (development->DS)
-				     * nitrogen.NfLeafCnc (development->DS)));
+      const double cropN = std::max (0.0,
+				     std::min (production.NLeaf
+					       -(canopy.corresponding_WLeaf (DS)
+						 * nitrogen.NfLeafCnc (DS)),
+					       canopy.corresponding_WLeaf (DS)
+					       * nitrogen.CrLeafCnc (DS) 
+					       -(canopy.corresponding_WLeaf (DS)
+						 * nitrogen.NfLeafCnc (DS))));
       daisy_assert (cropN >= 0.0);
       
       const double ABA_xylem = 0.0;
@@ -424,23 +433,23 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   const double T_soil_3 = geo.content_at (soil_heat, &SoilHeat::T,
                                           -root_system->Depth/3.0);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
-		   root_system->Density, geo, development->DS, 
+		   root_system->Density, geo, DS, 
 		   canopy.CAImRat, nitrogen, nitrogen_stress, partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, dt, msg);
-  nitrogen.content (development->DS, production, msg);
+  nitrogen.content (DS, production, msg);
   if (!new_day)
     return;
 
   canopy.tick (production.WLeaf, production.WSOrg,
-	       production.WStem, development->DS, ForcedCAI);
+	       production.WStem, DS, ForcedCAI);
 
   development->tick_daily (bioclimate.daily_air_temperature (), 
                            production.leaf_growth (), production, 
                            vernalization, harvesting.cut_stress, msg);
   root_system->tick_daily (geo, soil, 
                            production.WRoot, production.root_growth (),
-                           development->DS, msg);
+                           DS, msg);
   production.tick_daily ();
 }
 

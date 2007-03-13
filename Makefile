@@ -303,7 +303,7 @@ else
 endif
 
 ifeq ($(HOSTTYPE),mingw)
-	DAISYEXE = /home/abraham/daisy/daisy.exe
+	DAISYEXE = daisy.exe
 else
 	DAISYEXE = /usr/local/daisy/$(HOSTTYPE)/daisy
 endif
@@ -428,10 +428,10 @@ OTHER = output.C scope_block.C scope_id.C librarian.C scope_multi.C \
 	depend.C traverse.C treelog.C treelog_stream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	mathlib.C cdaisy.C nrutil.C \
-	submodel.C
+	submodel.C version.C
 
 # Utilities in header alone.
-HEADONLY = submodeler.h border.h memutils.h version.h
+HEADONLY = submodeler.h border.h memutils.h 
 
 # Everything that has an interface.
 #
@@ -452,9 +452,9 @@ LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SPARCOBJ)
 
 # Find all object files, header files, and source files.
 #
-OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o version${OBJ}
+OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
 SOURCES = $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN) $(QTSOURCES) \
-	cmain.c bugmain.c $(DISABLED) $(MSSRC) version.C
+	cmain.c bugmain.c $(DISABLED) $(MSSRC)
 HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) $(HEADONLY)
 
 # Find all printable files.
@@ -484,9 +484,7 @@ all:	#(EXECUTABLES)
 # Create the main executable.
 #
 daisy${EXE}:	main${OBJ} $(LIBOBJ)
-	@rm -f version${OBJ}
-	$(MAKE) version${OBJ}
-	$(LINK)$@ $^ version${OBJ} $(CPPLIB) $(MATHLIB)
+	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
 
 exp:	
 	(cd $(OBJHOME)/exp \
@@ -554,14 +552,12 @@ cdaisy_test${EXE}:  cmain_test${OBJ} daisy.so
 # Create a DLL.
 #
 daisy.dll:	$(LIBOBJ)
-	($(MAKE) version${OBJ})
-	$(CC) -shared -o daisy.dll $^ version${OBJ} $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
+	$(CC) -shared -o daisy.dll $^ $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
 
 # Create a shared library.
 #
 daisy.so: $(LIBOBJ)
-	($(MAKE) version${OBJ})
-	$(CC) -shared -o daisy.so $^ version${OBJ} $(MATHLIB)
+	$(CC) -shared -o daisy.so $^ $(MATHLIB)
 
 cdaisy.o:
 	$(CC) $(NOLINK) -DBUILD_DLL $<
@@ -646,7 +642,7 @@ txt/reference.pdf:	txt/components.tex
 	 && makeindex reference \
 	 && pdflatex reference.tex < /dev/null )
 
-txt/components.tex:	$(DAISYEXE)
+txt/components.tex:
 	(cd txt && $(DAISYEXE) all.dai -p document > components.tex)
 
 # Remove all the temporary files.

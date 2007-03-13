@@ -139,6 +139,7 @@ Production::tick (const double AirT, const double SoilT,
                   const double dt,
 		  Treelog& msg)
 {
+  daisy_assert (DS >= 0.0);
   const double LeafGrowthRespCoef = GrowthRespCoef (E_Leaf);
   const double StemGrowthRespCoef = GrowthRespCoef (E_Stem);
   const double SOrgGrowthRespCoef = GrowthRespCoef (E_SOrg);
@@ -402,6 +403,7 @@ Production::tick (const double AirT, const double SoilT,
       IncWRoot -= DeadWRoot;
       const double C_Root = DM_to_C_factor (E_Root) * DeadWRoot;
       C_Loss += C_Root;
+      daisy_assert (AM_root);
       AM_root->add_surface (geo, dt * C_Root * m2_per_cm2,
                             dt * DeadNRoot * m2_per_cm2,
                             Density);
@@ -728,6 +730,8 @@ Production::initialize (const symbol name,
 			     name, dead_symbol, AM::Locked);
       organic_matter.add (*AM_leaf);
     }
+  daisy_assert (AM_root);
+  daisy_assert (AM_leaf);
 }
 
 Production::Production (const AttributeList& al)

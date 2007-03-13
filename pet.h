@@ -47,12 +47,10 @@ public:
 public:
   static double reference_to_potential (const Vegetation&, const Surface&, 
 					double ref);
-  static double albedo (const Vegetation& crops, const Surface& surface, 
-                        const Geometry&, const Soil&, const SoilWater&);
 
   // Simulation.
 public:
-  virtual void tick (const Time&, const Weather&, const Vegetation&,
+  virtual void tick (const Time&, const Weather&, const double Rn, const Vegetation&,
 		     const Surface&, const Geometry& geo,
                      const Soil&, const SoilHeat&, 
 		     const SoilWater&, Treelog&) = 0;
