@@ -37,6 +37,7 @@ struct SoilWater;
 
 class Solute
 {
+public:
   const std::string submodel;	// Derived submodel.
 
   friend class Movement1D;
@@ -50,14 +51,15 @@ protected:
 
   // Flux variables.
 protected:
-  std::vector<double> S;		// Combined source term.
-  std::vector<double> S_p;		// Source term for macropores only.
+  std::vector<double> S_;		// Combined source term.
+  std::vector<double> S_p_;		// Source term for macropores only.
   std::vector<double> S_drain;	// Source term for soil drainage only.
   std::vector<double> S_external;	// External source term, e.g. incorp. fert.
   std::vector<double> S_permanent;	// Permanent external source term.
   std::vector<double> S_root;	// Root uptake source term (negative).
   std::vector<double> J;		// Solute transport log in matrix.
   std::vector<double> J_p;		// Solute transport log in macropores.
+public:
   std::auto_ptr<Adsorption> adsorption;	// Solute adsorption.
 private:
   std::vector<double> tillage;       // Changes during tillage.
@@ -77,14 +79,19 @@ public:
   double C (size_t i) const
   { return C_[i]; }
   double M_left (size_t i, double dt) const
-  { return M_[i] + S[i] * dt; }
+  { return M_[i] + S_[i] * dt; }
   double total_surface (const Geometry&, double from, double to) 
     const; // [g/cm^2]
-
+  double S (size_t i) const
+  { return S_[i]; }
+  double S_p (size_t i) const
+  { return S_p_[i]; }
+  
   // Transport.
 public:
   void set_macro_flux (size_t e, double value);
   void set_matrix_flux (size_t e, double value);
+  void set_content (size_t c, double M, double C);
 
   // Sink.
 public:

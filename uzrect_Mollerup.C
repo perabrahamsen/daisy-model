@@ -25,6 +25,7 @@
 #include "soil_heat.h"
 #include "groundwater.h"
 #include "surface.h"
+#include "log.h"
 #include "syntax.h"
 #include "block.h"
 #include "alist.h"
@@ -50,13 +51,15 @@ struct UZRectMollerup : public UZRect
   const double max_absolute_difference;
   const double max_relative_difference;  
 
-
+  // Log variable.
+  ublas::vector<double> Theta_error;
 
   // Interface.
   void tick (const GeometryRect&, std::vector<size_t>& drain_cell,
 	     const Soil&, SoilWater&, const SoilHeat&, 
              const Surface&, const Groundwater&, double dt, Treelog&);
-
+  void output (Log&) const;
+  
   // Internal functions.
   bool converges (const ublas::vector<double>& previous,
 		  const ublas::vector<double>& current) const;
@@ -173,6 +176,9 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       T (cell) = soil_heat.T (cell); 
       h_lysimeter (cell) = geo.zplus (cell) - geo.z (cell);
     }
+
+  // Remember old value.
+  Theta_error = -Theta;
 
   // Start time loop 
   double time_left = dt;	// How much of the large time step left.
@@ -326,17 +332,58 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	}
       // End of small time step.
     }
-
+  
+  // New = Old - S * dt + q_in * dt - q_out * dt+ Error
+  // New - Old + S * dt - q_in * dt + q_out * dt = Error
+  Theta_error += Theta;
+  Theta_error += S * dt;
+  for (size_t edge = 0; edge != edge_size; ++edge) 
+    {
+      const int from = geo.edge_from (edge);
+      const int to = geo.edge_from (edge);
+      const double flux = q (edge) * dt;
+      if (geo.cell_is_internal (from))
+        Theta_error (from) += flux * dt;
+      if (geo.cell_is_internal (to))
+        Theta_error (to) -= flux * dt;
+    }
+  double total_error = 0.0;
+  double total_abs_error = 0.0;
+  double max_error = 0.0;
+  int max_cell = -1;
+  for (size_t cell = 0; cell != cell_size; ++cell) 
+    {
+      const double volume = geo.cell_volume (cell);
+      const double error = Theta_error (cell);
+      total_error += volume * error;
+      total_abs_error += std::fabs (volume * error);
+      if (std::fabs (error) > std::fabs (max_error))
+        {
+          max_error = error;
+          max_cell = cell;
+        }
+    }
+  std::ostringstream tmp;
+  tmp << "Total error = " << total_error << " [cm^3], abs = " 
+      << total_abs_error << " [cm^3], max = " << max_error << " [] in cell " 
+      << max_cell;
+  msg.message (tmp.str ());
+  
   // Make it official.
-  for (size_t cell = 0; cell != cell_size ; ++cell) 
+  for (size_t cell = 0; cell != cell_size; ++cell) 
     soil_water.set_content (cell, h (cell), Theta (cell));
-  for (size_t edge = 0; edge != edge_size ; ++edge) 
+  for (size_t edge = 0; edge != edge_size; ++edge) 
     soil_water.set_flux (edge, q[edge]);
 
   // End of large time step.
 }
 
-  
+void
+UZRectMollerup::output (Log& log) const
+{
+  output_variable ("Theta_error", log);
+}
+
 bool
 UZRectMollerup::converges (const ublas::vector<double>& previous,
 			   const ublas::vector<double>& current) const
@@ -687,6 +734,10 @@ Maximum absolute difference in 'h' values for convergence.");
   syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
 Maximum relative difference in 'h' values for convergence.");
   alist.add ("max_relative_difference", 0.001); 
+
+  syntax.add ("Theta_error",
+              Syntax::None (), Syntax::LogOnly, Syntax::Sequence, "\
+Water mass balance error per cell.");
 }
 
 UZRectMollerup::UZRectMollerup (Block& al)

@@ -43,10 +43,17 @@ void
 Solute::set_matrix_flux (const size_t e, const double value)
 { J_p[e] = value; }
 
+void 
+Solute::set_content (size_t c, double M, double C)
+{ 
+  M_[c] = M; 
+  C_[c] = C; 
+}
+
 void
 Solute::clear ()
 {
-  std::fill (S.begin (), S.end (), 0.0);
+  std::fill (S_.begin (), S_.end (), 0.0);
   std::fill (S_external.begin (), S_external.end (), 0.0);
   std::fill (S_root.begin (), S_root.end (), 0.0);
   std::fill (tillage.begin (), tillage.end (), 0.0);
@@ -55,11 +62,11 @@ Solute::clear ()
 void
 Solute::add_to_source (const std::vector<double>& v, const double dt)
 {
-  daisy_assert (S.size () >= v.size ());
+  daisy_assert (S_.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
-      S[i] += v[i];
-      daisy_assert (std::isfinite (S[i]));
+      S_[i] += v[i];
+      daisy_assert (std::isfinite (S_[i]));
       daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
@@ -67,11 +74,11 @@ Solute::add_to_source (const std::vector<double>& v, const double dt)
 void
 Solute::add_to_sink (const std::vector<double>& v, const double dt)
 {
-  daisy_assert (S.size () >= v.size ());
+  daisy_assert (S_.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
-      S[i] -= v[i];
-      daisy_assert (std::isfinite (S[i]));
+      S_[i] -= v[i];
+      daisy_assert (std::isfinite (S_[i]));
       daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
@@ -94,14 +101,14 @@ Solute::tick (const size_t cell_size,
     daisy_assert (M_left (i, dt) >= 0.0);
 
   // Initialize.
-  std::fill (S_p.begin (), S_p.end (), 0.0);
+  std::fill (S_p_.begin (), S_p_.end (), 0.0);
   std::fill (J_p.begin (), J_p.end (), 0.0);
 
   // Permanent source.
   for (size_t i = 0; i < cell_size; i++)
     {
       S_external[i] += S_permanent[i];
-      S[i] += S_external[i];
+      S_[i] += S_external[i];
       daisy_assert (M_left (i, dt) >= 0.0);
     }
 
@@ -109,7 +116,7 @@ Solute::tick (const size_t cell_size,
   for (size_t i = 0; i < cell_size; i++)
     {
       S_drain[i] = -soil_water.S_drain (i) * C (i);
-      S[i] += S_drain[i];
+      S_[i] += S_drain[i];
       daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
@@ -127,8 +134,8 @@ Solute::output (Log& log) const
   output_derived (adsorption, "adsorption", log);
   output_value (C_, "C", log);
   output_value (M_, "M", log);
-  output_variable (S, log);
-  output_variable (S_p, log);
+  output_value (S_, "S", log);
+  output_value (S_p_, "S_p", log);
   output_variable (S_drain, log);
   output_variable (S_external, log);
   output_variable (S_permanent, log);
@@ -326,8 +333,8 @@ Solute::initialize (const AttributeList& al,
 	}
     }
 
-  S.insert (S.begin (), geo.cell_size (), 0.0);
-  S_p.insert (S_p.begin (), geo.cell_size (), 0.0);
+  S_.insert (S_.begin (), geo.cell_size (), 0.0);
+  S_p_.insert (S_p_.begin (), geo.cell_size (), 0.0);
   S_drain.insert (S_drain.begin (), geo.cell_size (), 0.0);
   S_external.insert (S_external.begin (), geo.cell_size (), 0.0);
   if (S_permanent.size () < geo.cell_size ())

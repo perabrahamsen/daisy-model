@@ -98,18 +98,18 @@ MsoltranrectNone::solute (const GeometryRect& geo,
 
   // Flow.
   flow (geo, soil, soil_water, solute.submodel, 
-        M_, C_, S, S_p, J, J_p, 
+        M, C, S, S_p, J, J_p, 
         *solute.adsorption, solute.diffusion_coefficient (), 
         dt, msg);
 
   // Update solute.
-  for (size_t c = 0; e < cell_size; c++)
+  for (size_t c = 0; c < cell_size; c++)
     solute.set_content (c, M[c], C[c]);
 
   for (size_t e = 0; e < edge_size; e++)
     {
-      solute.set_matrix_flux (J[e]);
-      solute.set_macro_flux (J_p[e]);
+      solute.set_matrix_flux (e, J[e]);
+      solute.set_macro_flux (e, J_p[e]);
     }
 }
 

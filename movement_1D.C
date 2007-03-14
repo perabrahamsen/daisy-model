@@ -282,7 +282,7 @@ Movement1D::solute (const Soil& soil,
   // Flow.
   flow (soil, soil_water, solute.submodel, 
         solute.M_, solute.C_, 
-        solute.S, solute.S_p,
+        solute.S_, solute.S_p_,
         solute.J, solute.J_p, 
         *solute.adsorption, solute.diffusion_coefficient (), dt, msg);
 }
