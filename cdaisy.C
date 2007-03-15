@@ -926,7 +926,7 @@ extern "C" unsigned int EXPORT // Number of numbers in SCOPE.
 daisy_scope_number_size (const Scope *const scope)
 { return scope->all_numbers ().size (); }
 
-extern const char* EXPORT       // Name of number INDEX in SCOPE.
+extern "C" const char* EXPORT       // Name of number INDEX in SCOPE.
 daisy_scope_number_name (const Scope *const scope, const unsigned int index)
 { return scope->all_numbers ()[index].name ().c_str (); }
 

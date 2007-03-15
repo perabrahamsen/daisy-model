@@ -603,7 +603,7 @@ daisy_column_get_smb_c_at (const daisy_column* column, unsigned int index);
 
 EXPORT double                            /* [g C/cm³] */
 daisy_column_get_co2_at (const daisy_column* column, unsigned int index);
-
+ 
 /* @@@ Soil Heat.
  * 
  * Temperature of soil.
@@ -652,7 +652,7 @@ daisy_scope_number_size (const daisy_scope* scope);
 EXPORT const char*              /* Name of number INDEX in SCOPE. */
 daisy_scope_number_name (const daisy_scope* scope, const unsigned int index);
 
-EXPORT const int              /* check if NAME is defined in SCOPE. */
+EXPORT daisy_bool              /* check if NAME is defined in SCOPE. */
 daisy_scope_has_number (const daisy_scope* scope, const char* name);
 
 EXPORT const double      /* Return numeric value of NAME in SCOPE. */
@@ -661,7 +661,7 @@ daisy_scope_number (const daisy_scope* scope, const char* name);
 EXPORT const char*        /* Return UNITS of NAME defined in SCOPE. */
 daisy_scope_dimension (const daisy_scope* scope, const char* name);
 
-EXPORT const int              /* check if NAME is defined in SCOPE. */
+EXPORT daisy_bool              /* check if NAME is defined in SCOPE. */
 daisy_scope_has_string (const daisy_scope* scope, const char* name);
 
 EXPORT const char*       /* Return string value of NAME in SCOPE. */
