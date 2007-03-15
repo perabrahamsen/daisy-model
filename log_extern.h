@@ -48,6 +48,7 @@ class LogExtern : public LogSelect,
   array_map arrays;
   int_map sizes;
   name_map dimensions;
+  name_map descriptions;
   std::vector<symbol> all_numbers_;
 
   // Log.

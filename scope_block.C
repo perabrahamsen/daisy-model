@@ -218,7 +218,18 @@ ScopeBlock::identifier (const symbol tag_symbol) const
 }
 
 symbol 
-ScopeBlock::get_description (symbol) const
-{ return symbol ("Descriptions not implemented yet"); }
+ScopeBlock::get_description (symbol tag_symbol) const
+{ 
+  static const symbol no_symbol ("No such symbol");
+  
+  const std::string& tag = tag_symbol.name ();
+
+  Syntax::type type = block.lookup (tag);
+  if (type == Syntax::Error)
+    return no_symbol;
+
+  const Syntax& syntax = block.find_syntax (tag);
+  return symbol (syntax.description (tag));
+}
 
 // scope_block.C ends here

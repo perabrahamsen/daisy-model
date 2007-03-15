@@ -136,7 +136,11 @@ LogExtern::get_description (const symbol tag) const
     if (entries[i]->tag () == tag)
       return symbol (entries[i]->get_description ());
 
-  daisy_notreached ();
+  const name_map::const_iterator i = descriptions.find (tag);
+  if (i == dimensions.end ())
+    return symbol ("No such tag");
+
+  return (*i).second;
 }
 
 LogExtern::type 
@@ -199,6 +203,7 @@ LogExtern::LogExtern (Block& al)
         {
           types[id] = Name;
           names[id] = scope_block.identifier (id);
+          descriptions[id] = scope_block.get_description (id);
         }
       else
         al.msg ().warning ("Parameter name " + id + " not found"); 
