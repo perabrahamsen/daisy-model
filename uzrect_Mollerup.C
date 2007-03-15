@@ -340,7 +340,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   for (size_t edge = 0; edge != edge_size; ++edge) 
     {
       const int from = geo.edge_from (edge);
-      const int to = geo.edge_from (edge);
+      const int to = geo.edge_to (edge);
       const double flux = q (edge) * geo.edge_area (edge) * dt;
       if (geo.cell_is_internal (from))
         Theta_error (from) -= flux / geo.cell_volume (from);
