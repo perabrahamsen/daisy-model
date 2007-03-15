@@ -69,6 +69,7 @@ struct UZRectMollerup : public UZRect
                        ublas::vector<double>& dq, ublas::vector<double>& B);
   static void Dirichlet (const size_t edge, const size_t cell, 
                          const double area, const double in_sign,
+                         const double sin_angle, 
                          const double K_cell, const double h_old,
                          const double K_area_per_length, const double pressure,
                          ublas::vector<double>& dq,
@@ -416,6 +417,7 @@ UZRectMollerup::Neumann (const size_t edge, const size_t cell,
 void 
 UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
                            const double area, const double in_sign,
+                           const double sin_angle,
                            const double K_cell,
                            const double h_old,
                            const double K_area_per_length, 
@@ -428,10 +430,12 @@ UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
   Dm_mat (cell, cell) += K_area_per_length;
   const double Dm_vec_val = -K_area_per_length * pressure;
   Dm_vec (cell) += Dm_vec_val;
-  const double Gm_val = -K_cell * area;
-  Gm (cell) += Gm_val;
+  const double Gm_val = K_cell * area;
+  // Entry is 1 for upper boundary, and -1 for lower boundary.
+  double entry = -sin_angle * in_sign;
+  Gm (cell) += entry * Gm_val;
   dq (edge) = in_sign * (K_area_per_length * h_old 
-                         + Dm_vec_val + Gm_val) / area;
+                         + Dm_vec_val - Gm_val) / area;
 }
 
 void 
@@ -457,6 +461,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       daisy_assert (in_sign > 0);
       const double area = geo.edge_area (edge);
+      const double sin_angle = geo.edge_sin_angle (edge);
 
       switch (groundwater.bottom_type ())
         {
@@ -477,7 +482,8 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
           {
             const double value = -K (cell) * geo.edge_area_per_length (edge);
             const double pressure =  groundwater.table () - geo.zplus (cell);
-            Dirichlet (edge, cell, area, in_sign, K (cell), h (cell),
+            Dirichlet (edge, cell, area, in_sign, sin_angle, 
+                       K (cell), h (cell),
                        value, pressure,
                        dq, Dm_mat, Dm_vec, Gm);
           }
@@ -487,7 +493,8 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
             {
               const double value = -K (cell) * geo.edge_area_per_length (edge);
               const double pressure =  0.0;
-              Dirichlet (edge, cell, area, in_sign, K (cell), h (cell),
+              Dirichlet (edge, cell, area, in_sign, sin_angle,
+                         K (cell), h (cell),
                          value, pressure, dq, Dm_mat, Dm_vec, Gm);
             }
           break;
@@ -521,6 +528,7 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       daisy_assert (in_sign < 0);
       const double area = geo.edge_area (edge);
+      const double sin_angle = geo.edge_sin_angle (edge);
 
       switch (surface.top_type (geo, edge))
 	{
@@ -531,13 +539,12 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	case Surface::forced_pressure:
 	  const double value = -K (cell) * geo.edge_area_per_length (edge);
           const double pressure = surface.h_top (geo, edge);
-          Dirichlet (edge, cell, area, in_sign, K (cell), h (cell),
+          Dirichlet (edge, cell, area, in_sign, sin_angle, K (cell), h (cell),
                      value, pressure, dq, Dm_mat, Dm_vec, Gm);
 	  break;
 	case Surface::limited_water:
 	  const double h_top = remaining_water (i);
 	  const double dz = geo.edge_length (edge);
-          const double sin_angle = geo.edge_sin_angle (edge);
 	  const double q_avail = sin_angle * h_top / ddt;
 	  const double q_pot = - K (cell) * (h_top - h (cell) + dz) / dz;
 	  // Decide type.
@@ -548,7 +555,8 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	    {
 	      const double value = -K (cell) * geo.edge_area_per_length (edge);
               const double pressure = h_top;
-              Dirichlet (edge, cell, area, in_sign, K (cell), h (cell),
+              Dirichlet (edge, cell, area, in_sign, sin_angle, 
+                         K (cell), h (cell),
                          value, pressure, dq, Dm_mat, Dm_vec, Gm);
 	    }
 	  {
