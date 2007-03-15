@@ -333,19 +333,19 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       // End of small time step.
     }
   
-  // New = Old - S * dt + q_in * dt - q_out * dt+ Error =>
-  // 0 = New - Old - S * dt + q_in * dt - q_out * dt+ Error
+  // New = Old - S * dt + q_in * dt - q_out * dt + Error =>
+  // 0 = Old - New - S * dt + q_in * dt - q_out * dt + Error
   Theta_error -= Theta;         // Old - New
   Theta_error -= S * dt;
   for (size_t edge = 0; edge != edge_size; ++edge) 
     {
       const int from = geo.edge_from (edge);
       const int to = geo.edge_from (edge);
-      const double flux = q (edge) * dt;
+      const double flux = q (edge) * geo.edge_area (edge) * dt;
       if (geo.cell_is_internal (from))
-        Theta_error (from) -= flux * dt;
+        Theta_error (from) -= flux / geo.cell_volume (from);
       if (geo.cell_is_internal (to))
-        Theta_error (to) += flux * dt;
+        Theta_error (to) += flux / geo.cell_volume (to);
     }
   double total_error = 0.0;
   double total_abs_error = 0.0;
