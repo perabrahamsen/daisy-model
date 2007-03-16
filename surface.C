@@ -536,6 +536,7 @@ void
 Surface::put_ponding (double p)	// [mm]
 { impl.pond = p; }
   
+#if 0
 void
 Surface::put_no3 (double no3) // [g/cm^2]
 { impl.im.NO3 = no3; }
@@ -557,6 +558,8 @@ Surface::get_chemical (symbol name) const // [g/cm^2]
   // [g/m^2] -> [g/cm^2]
   return impl.chemicals_storage.amount (name) * 1.0e-4;		
 }
+
+#endif
 
 static bool
 check_alist (const AttributeList& al, Treelog& msg)

@@ -430,12 +430,12 @@ UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
   Dm_mat (cell, cell) += K_area_per_length;
   const double Dm_vec_val = -K_area_per_length * pressure;
   Dm_vec (cell) += Dm_vec_val;
-  const double Gm_val = K_cell * area;
   // Entry is 1 for upper boundary, and -1 for lower boundary.
   double entry = -sin_angle * in_sign;
-  Gm (cell) += entry * Gm_val;
+  const double Gm_val = entry * K_cell * area;
+  Gm (cell) += Gm_val;
   dq (edge) = in_sign * (K_area_per_length * h_old 
-                         + Dm_vec_val - Gm_val) / area;
+                         + Dm_vec_val + Gm_val) / area;
 }
 
 void 

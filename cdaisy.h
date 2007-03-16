@@ -39,8 +39,6 @@ typedef struct daisy_daisy daisy_daisy;
 typedef struct daisy_printer daisy_printer;
 typedef struct daisy_time daisy_time;
 typedef struct daisy_column daisy_column;
-typedef struct daisy_weather daisy_weather;
-typedef struct daisy_chemical daisy_chemical;
 typedef struct daisy_scope daisy_scope;
 
 
@@ -416,20 +414,14 @@ daisy_daisy_is_running (daisy_daisy* daisy);
 EXPORT daisy_time*                     /* Extract time. */
 daisy_daisy_get_time (daisy_daisy* daisy);
 
-EXPORT daisy_weather*                  /* Extract weather. */
-daisy_daisy_get_weather (const daisy_daisy* daisy);
-
-EXPORT unsigned int                    /* Count the number of columns in daisy. */
+EXPORT unsigned int        /* Count the number of columns in daisy. */
 daisy_daisy_count_columns (const daisy_daisy* daisy);
 
-EXPORT daisy_column*                   /* Extract a column, [0 <= col < size]. */
+EXPORT daisy_column*        /* Extract a column, [0 <= col < size]. */
 daisy_daisy_get_column (const daisy_daisy* daisy, int col);
 
-EXPORT void                            /* Append an extra column to the simulation. */
-daisy_daisy_append_column (daisy_daisy* daisy, daisy_column* column);
-
-EXPORT void                            /* Remove column from simulation. */
-daisy_daisy_remove_column (daisy_daisy* daisy, daisy_column* column);
+EXPORT const char*              /* The name of the column. */
+daisy_column_get_name (const daisy_column* column);
 
 /* @ The daisy_time Type.
  *
@@ -454,186 +446,6 @@ daisy_time_get_month (const daisy_time* time);
 EXPORT int                             /* Year, four digits. */
 daisy_time_get_year (const daisy_time* time);
 
-
-/* @ The daisy_weather Type. */
-
-EXPORT void                            /* [mm/d] */
-daisy_weather_put_precipitation (daisy_weather* weather, double prec);
-
-EXPORT void                            /* [degree C] */
-daisy_weather_put_air_temperature (daisy_weather* weather, double T);
-
-EXPORT void                            /* [mm/d] */
-daisy_weather_put_reference_evapotranspiration (daisy_weather* weather,
-                                                double ref);
-
-EXPORT void                            /* [W/m²] (daily average) */
-daisy_weather_put_global_radiation (daisy_weather* weather, double radiation);
-
-/* @ The daisy_column Type.
- * 
- * The daisy_column type keeps track of all information within a single
- * column in the simulation. 
- */
-
-/* @@ Cloning and merging columns.
- * 
- * The general idea is to save calculations.  If you know that two
- * columns have an identical start, you can limit the calculations to
- * just one of them until the point where some action separates them.
- * At that point you clone the column, giving you an identical copy
- * (except for the name) of the column.  Similarly, you can merge two
- * columns when you judge that the difference between them is
- * sufficiently small.  The result is an "average" column.  If one
- * daisy column actually represent a larger field area than the other,
- * you can specify this by giving a weight.  A weight of '0.9' means
- * that the first column represents the conditions on 90% of the area,
- * and the second column the remaining 10%. 
- */
-
-EXPORT daisy_column*                   /* Create new column by cloning. */
-daisy_column_clone (const daisy_column* column, const char* name);
-
-EXPORT void                            /* Merge 'other' into 'column'. */
-daisy_column_merge (daisy_column* column, const daisy_column* other, 
-                    double weight);
-
-/* @@ Manipulating the column state.
- * 
- * The idea behind these functions is that an external model can both
- * query and replace the state within a column.
- */
-
-EXPORT const char*                     /* The name of the column. */
-daisy_column_get_name (const daisy_column* column);
-
-#if 0
-
-/* @@@ Soil Geometry.
- *
- * The numeric layers used in the soil.
- * 
- * The top layer is numbered '0'.   The bottom layer is 'count - 1'.
- */
-
-EXPORT unsigned int                    /* The number of numeric layers. */
-daisy_column_count_layers (const daisy_column* column);
-
-EXPORT double                          /* Heigh of numeric lay 'lay' in cm. */
-daisy_column_get_dz (const daisy_column* column, int lay);
-
-/* @@@ Soil Water. 
- *
- * Water content of the soil.
- */
-
-EXPORT void                            /* [cm] */
-daisy_column_put_water_pressure (daisy_column* column, const double h[]);
-
-EXPORT void                            /* [cm^3/cm^3/h] */
-daisy_column_get_water_sink (const daisy_column* column, double sink[]);
-
-EXPORT double				/* [cm^3/cm^3] */
-daisy_column_get_water_content_at (const daisy_column* column, 
-				   unsigned int index);
-
-/* @@@ Soil Nitrate. 
- * 
- * Nitrate solution in the soil.
- */
-
-EXPORT void                            /* [g/cm^3] */
-daisy_column_put_no3_m (daisy_column* column, const double M[]);
-
-EXPORT void                            /* [g/cm^3] */
-daisy_column_get_no3_m (daisy_column* column, double M[]);
-
-/* @@@ Bioclimate. 
- *
- * What happens in the canopy?
- */
-
-EXPORT double                          /* [mm/h] */
-daisy_column_get_evap_interception (const daisy_column* column);
-
-EXPORT double                          /* [mm] */
-daisy_column_get_intercepted_water (const daisy_column* column);
-
-EXPORT double                          /* [mm/h] */
-daisy_column_get_net_throughfall (const daisy_column* column);
-
-/* @@@ Surface.
- * 
- * The surface manages anything that lies on top of the soil.
- */
-
-EXPORT double                          /* [mm/h] */
-daisy_column_get_evap_soil_surface (const daisy_column* column);
-
-EXPORT double                          /* [mm/h] */
-daisy_column_get_exfiltration (const daisy_column* column);
-
-EXPORT void                            /* [mm] */
-daisy_column_put_ponding (daisy_column* column, double pond);
-
-EXPORT void                            /* [g/cm^2] */
-daisy_column_put_surface_no3 (daisy_column* column, double no3);
-
-EXPORT double                          /* [g/cm^2] */
-daisy_column_get_surface_no3 (const daisy_column* column);
-
-EXPORT double                          /* [mm] */
-daisy_column_get_snow_storage (const daisy_column* column);
-
-EXPORT void                            /* [g/cm^2] */
-daisy_column_put_surface_chemical (daisy_column* column, 
-				   const char* name, double amount);
-
-EXPORT double                          /* [g/cm^2] */
-daisy_column_get_surface_chemical (const daisy_column* column,
-				   const char* name);
-
-/* @@@ Organic Matter.
- * 
- * The organic content of the soil.
- */
-
-EXPORT double				/* [g C/cm³] */
-daisy_column_get_smb_c_at (const daisy_column* column, unsigned int index);
-
-EXPORT double                            /* [g C/cm³] */
-daisy_column_get_co2_at (const daisy_column* column, unsigned int index);
- 
-/* @@@ Soil Heat.
- * 
- * Temperature of soil.
- */
-
-EXPORT double                            /* [°C] */
-daisy_column_get_temperature_at (const daisy_column* column,
-				 unsigned int index);
-
-
-/* @@@ Crops.
- *
- * What grows in the column.
- */
-
-EXPORT double                            /* [cm³ H2O/cm³/h] */
-daisy_column_get_crop_h2o_uptake_at (const daisy_column* column,
-				     unsigned int index);
-#endif /* EXCOM */
-
-/* @ The daisy_chemical Type.
- *
- * Contains information about chemicals known by Daisy.
- */
-
-EXPORT daisy_chemical*			/* Return the chemical named NAME. */
-daisy_chemical_find (const char* name);
-
-EXPORT double				/* The crop uptake reflection factor. */
-daisy_chemical_reflection_factor (const daisy_chemical* chemical);
 
 /* @ The daisy_scope Type.
  *

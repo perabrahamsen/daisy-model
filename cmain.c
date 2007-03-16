@@ -90,7 +90,7 @@ main (int argc, char* argv[])
     // Find a scope named 'check'.
     
     if (daisy_daisy_scope_extern_size (toplevel) < 1)
-      printf ("No scope found not recognized.\n");
+      printf ("No scope found\n");
     else
       scope = daisy_daisy_scope_extern_get(toplevel, 0);
     exit_on_failure (toplevel);

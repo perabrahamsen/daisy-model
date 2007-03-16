@@ -86,13 +86,7 @@ public:
   double exfiltration () const; // [mm/h]
   double evap_soil_surface () const; // [mm/h]
   double evap_pond (Treelog&) const; // [mm/h]
-
-  // Communication with external model.
   void put_ponding (double pond);	// [mm]
-  void put_no3 (double no3); // [g/cm^2]
-  double get_no3 () const; // [g/cm^2]
-  void put_chemical (symbol, double); // [g/cm^2]
-  double get_chemical (symbol) const; // [g/cm^2]
 
   // Create.
   static void load_syntax (Syntax&, AttributeList&);
