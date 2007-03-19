@@ -1,9 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-
 * OpenMI
 
-** Lav test setup med exchange.
+** Parameterizationer skal være en Toplevel attribut!
+
+Factory<T>, Industry
+
+Build in (shared) vs loaded (per toplevel)
+
+Shared base class?
+
+
 
 ** Groundwater external
 

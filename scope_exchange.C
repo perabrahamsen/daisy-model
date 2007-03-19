@@ -204,6 +204,18 @@ public:
     daisy_assert (i != named.end ());
     return (*i).second->dimension (); 
   }
+  bool has_identifier (symbol tag) const
+  {
+    const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
+    daisy_assert (i != named.end ());
+    return (*i).second->has_identifier (); 
+  }
+  symbol identifier (symbol tag) const
+  {
+    const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
+    daisy_assert (i != named.end ());
+    return (*i).second->identifier (); 
+  }
   symbol get_description (symbol tag) const
   { 
     const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
