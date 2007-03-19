@@ -529,6 +529,7 @@ daisy_daisy_tick (Toplevel* toplevel)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
+      Treelog::Open nest (*toplevel->msg, daisy.time.print ());
       daisy.tick (*toplevel->msg); 
     }
   DAISY_CATCH_BLOCK(toplevel);

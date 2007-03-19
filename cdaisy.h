@@ -483,7 +483,7 @@ daisy_scope_string (const daisy_scope* scope, const char* name);
 EXPORT const char*        /* Return UNITS of NAME defined in SCOPE. */
 daisy_scope_description (const daisy_scope* scope, const char* name);
 
-EXPORT daisy_bool               /* True, iff SCOPE is writable. */
+EXPORT daisy_bool               /* True, if SCOPE is writable. */
 daisy_scope_writable (const daisy_scope* scope);
 
 EXPORT void                     /* In SCOPE, set NAME to VALUE. */
