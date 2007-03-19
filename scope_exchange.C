@@ -188,7 +188,8 @@ public:
   bool has_number (symbol tag) const
   {
     const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
-    daisy_assert (i != named.end ());
+    if (i == named.end ())
+      return false;
     return (*i).second->has_number (); 
   }
   double number (symbol tag) const
