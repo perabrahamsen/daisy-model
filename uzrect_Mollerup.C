@@ -50,6 +50,8 @@ struct UZRectMollerup : public UZRect
   const int max_iterations; 
   const double max_absolute_difference;
   const double max_relative_difference;  
+  const bool use_forced_T;
+  const double forced_T;
 
   // Log variable.
   ublas::vector<double> Theta_error;
@@ -174,7 +176,10 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       h_ice (cell) = soil_water.h_ice (cell);
       S (cell) =  soil_water.S_sum (cell);
       S_vol (cell) = S (cell) * geo.cell_volume (cell);
-      T (cell) = soil_heat.T (cell); 
+      if (use_forced_T)
+	T (cell) = forced_T;
+      else 
+	T (cell) = soil_heat.T (cell); 
       h_lysimeter (cell) = geo.zplus (cell) - geo.z (cell);
     }
 
@@ -194,7 +199,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       if (ddt > time_left)
 	ddt = time_left;
 
-#if 0
+#if 1
       std::ostringstream tmp;
       tmp << "Time left = " << time_left << ", ddt = " << ddt 
 	  << ", iteration = " << iterations_used << "\n";
@@ -434,8 +439,11 @@ UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
   double entry = -sin_angle * in_sign;
   const double Gm_val = entry * K_cell * area;
   Gm (cell) += Gm_val;
+  //dq (edge) = in_sign * (K_area_per_length * h_old 
+  //                       + Dm_vec_val + Gm_val) / area;
   dq (edge) = in_sign * (K_area_per_length * h_old 
-                         + Dm_vec_val + Gm_val) / area;
+                      + Dm_vec_val + Gm_val) / area;
+
 }
 
 void 
@@ -742,6 +750,8 @@ Maximum absolute difference in 'h' values for convergence.");
   syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
 Maximum relative difference in 'h' values for convergence.");
   alist.add ("max_relative_difference", 0.001); 
+  syntax.add ("forced_T", "dg C", Syntax::Const, "\
+Force transport equations to use this water temperature.");
 
   syntax.add ("Theta_error",
               Syntax::None (), Syntax::LogOnly, Syntax::Sequence, "\
@@ -754,7 +764,9 @@ UZRectMollerup::UZRectMollerup (Block& al)
     time_step_reduction (al.integer ("time_step_reduction")),
     max_iterations (al.integer ("max_iterations")),
     max_absolute_difference (al.number ("max_absolute_difference")),
-    max_relative_difference (al.number ("max_relative_difference"))
+    max_relative_difference (al.number ("max_relative_difference")),
+    use_forced_T (al.check ("forced_T")),
+    forced_T (al.number ("forced_T", -42.42e42))
 { }
 
 UZRectMollerup::~UZRectMollerup ()
