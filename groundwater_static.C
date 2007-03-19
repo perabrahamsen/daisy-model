@@ -45,7 +45,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry&, const Time&, Treelog&)
+  void initialize (const Output&, const Geometry&, const Time&, Treelog&)
   { }
   GroundwaterStatic (Block&);
   ~GroundwaterStatic ();

@@ -228,4 +228,12 @@ ScopeBlock::get_description (symbol tag_symbol) const
   return symbol (syntax.description (tag));
 }
 
+ScopeBlock::ScopeBlock (Block& b)
+  : Scope (b),
+    block (b)
+{ }
+
+ScopeBlock::~ScopeBlock ()
+{ }
+
 // scope_block.C ends here

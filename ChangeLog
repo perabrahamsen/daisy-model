@@ -1,5 +1,9 @@
 2007-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* groundwater_extern.C: New model.
+	* scopesel.C, scopesel.h: New component.
+	* Makefile (COMPONENTS, MODELS): Add them.
+
 	* scope_multi.C: Made it a model.
 	* Makefile (OTHER): Removed.
 	(SPECIALS): Added.

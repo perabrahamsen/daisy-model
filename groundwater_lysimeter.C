@@ -48,7 +48,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geo, const Time&, Treelog&)
+  void initialize (const Output&, const Geometry& geo, const Time&, Treelog&)
   { location = geo.bottom (); }
 
   GroundwaterLysimeter (Block& al)

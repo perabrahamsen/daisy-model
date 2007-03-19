@@ -54,13 +54,15 @@ ScopeID::set_dimension (symbol, symbol d)
 { dim = d; }
 
 ScopeID::ScopeID (const symbol name, const symbol d)
-  : tag (name),
+  : WScope (name),
+    tag (name),
     value (-42.42e42),
     dim (d)
 { all_numbers_.push_back (tag); }
 
 ScopeID::ScopeID (Block& al)
-  : tag (al.identifier ("name")), 
+  : WScope (al),
+    tag (al.identifier ("name")), 
     value (al.number ("value")),
     dim (al.identifier ("value"))
 { all_numbers_.push_back (tag); }

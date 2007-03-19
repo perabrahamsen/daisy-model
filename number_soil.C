@@ -26,6 +26,7 @@
 #include "horizon.h"
 #include "hydraulic.h"
 #include "weather.h"
+#include "output.h"
 #include "time.h"
 #include "units.h"
 #include <memory>
@@ -111,6 +112,7 @@ The height we want to compare with.");
       h (Librarian<Number>::build_item (al, "h")),
       z (Librarian<Number>::build_item (al, "z"))
   { 
+    Output output;
     Time time (9999, 1, 1, 0);
     const Library& wlib = Librarian<Weather>::library ();
     const double T = 10.0;
@@ -121,7 +123,7 @@ The height we want to compare with.");
     alist.add ("type", "none");
     std::auto_ptr<Weather> weather (Librarian<Weather>::build_alist
                                     (al, alist, "initialize"));
-    column->initialize (time, al.msg (), weather.get ());
+    column->initialize (output, time, al.msg (), weather.get ());
     max_depth = column->bottom ();
   }
 };

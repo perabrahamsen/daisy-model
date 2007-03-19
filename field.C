@@ -98,7 +98,7 @@ public:
   Column* find (symbol name) const;
 
   // Changing the field.
-  void divide (symbol original, symbol copy, double copy_size, 
+  void divide (const Output&, symbol original, symbol copy, double copy_size, 
 	       const Time&, const Weather*);
   void merge (symbol combine, symbol remove);
 
@@ -109,7 +109,7 @@ public:
   bool check_z_border (double, Treelog& err) const;
   bool check_x_border (double, Treelog& err) const;
   bool check_y_border (double, Treelog& err) const;
-  void initialize (const Time&, Treelog& err, const Weather*);
+  void initialize (const Output&, const Time&, Treelog& err, const Weather*);
   Implementation (Block& parent, const std::string& key);
   ~Implementation ();
 };
@@ -599,7 +599,8 @@ Field::Implementation::find (symbol name) const
 }
 
 void 
-Field::Implementation::divide (symbol original, symbol copy,
+Field::Implementation::divide (const Output& output,
+                               symbol original, symbol copy,
 			       double copy_size,
 			       const Time& time, const Weather* weather)
 { 
@@ -625,7 +626,7 @@ Field::Implementation::divide (symbol original, symbol copy,
   copy_alist.add ("size", copy_size);
   Column* result = Librarian<Column>::build_free (block.msg (), 
                                                   copy_alist, "clone");
-  result->initialize (time, Treelog::null (), weather);
+  result->initialize (output, time, Treelog::null (), weather);
   columns.push_back (result);
 }
   
@@ -705,13 +706,14 @@ Field::Implementation::check_y_border (const double value, Treelog& err) const
 }
 
 void 
-Field::Implementation::initialize (const Time& time, Treelog& err, 
+Field::Implementation::initialize (const Output& output,
+                                   const Time& time, Treelog& err, 
 				   const Weather* weather)
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    (*i)->initialize (time, err, weather);
+    (*i)->initialize (output, time, err, weather);
 }
 
 Field::Implementation::Implementation (Block& parent, 
@@ -898,9 +900,10 @@ Field::size () const
 { return impl.columns.size (); }
 
 void 
-Field::divide (symbol original, symbol copy, double copy_size,
+Field::divide (const Output& output,
+               symbol original, symbol copy, double copy_size,
 	       const Time& time, const Weather* weather)
-{ impl.divide (original, copy, copy_size, time, weather); }
+{ impl.divide (output, original, copy, copy_size, time, weather); }
 
 void 
 Field::merge (symbol combine, symbol remove)
@@ -928,8 +931,9 @@ Field::check_y_border (const double value, Treelog& err) const
 { return impl.check_y_border (value, err); }
 
 void 
-Field::initialize (const Time& time, Treelog& err, const Weather* weather)
-{ impl.initialize (time, err, weather); }
+Field::initialize (const Output& output,
+                   const Time& time, Treelog& err, const Weather* weather)
+{ impl.initialize (output, time, err, weather); }
 
 Field::Field (Block& parent, const std::string& key)
   : impl (*new Implementation (parent, key))

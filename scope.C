@@ -20,6 +20,7 @@
 
 
 #include "scope.h"
+#include "block.h"
 #include "assertion.h"
 
 template<>
@@ -27,6 +28,18 @@ Librarian<Scope>::Content* Librarian<Scope>::content = NULL;
 
 const char *const Scope::description = "\
 A scope maps identifiers to values.";
+
+symbol 
+Scope::title () const
+{ return title_; }
+
+bool
+Scope::has_identifier (symbol) const
+{ return false; }
+
+symbol
+Scope::identifier (symbol) const
+{ daisy_notreached (); }
 
 struct ScopeNull : public Scope
 {
@@ -47,6 +60,7 @@ struct ScopeNull : public Scope
 
   // Create and Destroy.
   ScopeNull ()
+    : Scope ("null")
   { }
   ~ScopeNull ()
   { }
@@ -59,21 +73,31 @@ Scope::null ()
   return nullscope; 
 }
 
-bool
-Scope::has_identifier (symbol) const
-{ return false; }
+Scope::Scope (symbol t)
+  : title_ (t)
+{ }
 
-symbol
-Scope::identifier (symbol) const
-{ daisy_notreached (); }
+Scope::Scope (const char *const t)
+  : title_ (t)
+{ }
 
-Scope::Scope ()
+Scope::Scope (Block& al)
+  : title_ (al.identifier ("where", al.identifier ("type")))
 { }
 
 Scope::~Scope ()
 { }
 
-WScope::WScope ()
+WScope::WScope (const symbol t)
+  : Scope (t)
+{ }
+
+WScope::WScope (const char *const t)
+  : Scope (t)
+{ }
+
+WScope::WScope (Block& al)
+  : Scope (al)
 { }
 
 WScope::~WScope ()

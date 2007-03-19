@@ -95,11 +95,11 @@ size_t
 Output::scope_size () const
 { return scopes.size (); }
 
-Scope* 
+Scope&
 Output::scope (size_t i) const
 { 
   daisy_assert (i < scopes.size ());
-  return scopes[i];
+  return *scopes[i];
 }
 
 const Scope*
@@ -188,6 +188,15 @@ Output::Output (Block& al)
     scopes (find_extern_logs (logs, exchanges)),
     scope_by_name (find_scope_by_name (logs)),
     activate_output (Librarian<Condition>::build_item (al, "activate_output"))
+{ }
+
+Output::Output ()
+  : logging (false),
+    exchanges (std::vector<Scope*> ()),
+    logs (std::vector<Log*> ()),
+    active_logs (std::vector<Log*> ()),
+    scopes (std::vector<Scope*> ()),
+    scope_by_name (std::map<symbol, Scope*> ())
 { }
 
 Output::~Output ()

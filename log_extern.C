@@ -191,7 +191,8 @@ LogExtern::initialize (Treelog&)
 }
 
 LogExtern::LogExtern (Block& al)
-  : LogSelect (al)
+  : LogSelect (al),
+    Scope (al)
 { 
   std::vector<symbol> par_names = al.identifier_sequence ("parameter_names");
   ScopeBlock scope_block (al);

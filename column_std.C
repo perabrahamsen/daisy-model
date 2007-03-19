@@ -180,7 +180,7 @@ public:
 		 Treelog::null (), "clone");
     return *new ColumnStandard (block); 
   }
-  void initialize (const Time&, Treelog&, const Weather*);
+  void initialize (const Output&, const Time&, Treelog&, const Weather*);
   ~ColumnStandard ();
 };
 
@@ -932,7 +932,8 @@ ColumnStandard::ColumnStandard (Block& al)
 { }
 
 void 
-ColumnStandard::initialize (const Time& time, Treelog& msg, 
+ColumnStandard::initialize (const Output& output,
+                            const Time& time, Treelog& msg, 
 			    const Weather* global_weather)
 {
   Treelog::Open nest (msg, name);
@@ -943,7 +944,7 @@ ColumnStandard::initialize (const Time& time, Treelog& msg,
   residuals_C_soil.insert (residuals_C_soil.begin (), soil->size (), 0.0);
   daisy_assert (residuals_C_soil.size () == soil->size ());
 
-  groundwater->initialize (geometry, time, msg);
+  groundwater->initialize (output, geometry, time, msg);
   soil_water->initialize (alist.alist ("SoilWater"), 
                           geometry, *soil, *groundwater, msg);
   if (alist.check ("Movement"))

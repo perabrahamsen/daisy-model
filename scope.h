@@ -31,11 +31,14 @@ class Treelog;
 class Scope
 {
   // Content.
+private:
+  const symbol title_;
 public:
   static const char *const description;
 
   // Use.
 public:
+  symbol title () const;
   virtual const std::vector<symbol>& all_numbers () const = 0;
   virtual bool has_number (symbol) const = 0;
   virtual double number (symbol) const = 0;
@@ -48,9 +51,12 @@ public:
   // Create and Destroy.
 private:
   Scope (const Scope&);
+  Scope ();
 public:
   static Scope& null ();
-  Scope ();
+  explicit Scope (symbol title);
+  explicit Scope (const char* title);
+  explicit Scope (Block&);
   virtual ~Scope ();
 };
 
@@ -63,9 +69,12 @@ public:
   // Create and Destroy.
 private:
   WScope (const WScope&);
-public:
   WScope ();
-  virtual ~WScope ();
+public:
+  explicit WScope (symbol title);
+  explicit WScope (const char* title);
+  explicit WScope (Block&);
+  ~WScope ();
 };
 
 #ifdef FORWARD_TEMPLATES

@@ -34,7 +34,8 @@ struct ActionDivide : public Action
   void doIt (Daisy& daisy, Treelog& out)
     {
       out.message ("[Dividing " + original + " into " + copy + "]");
-      daisy.field->divide (original, copy, size, daisy.time, 
+      daisy.field->divide (*daisy.output_log,
+                           original, copy, size, daisy.time, 
                            daisy.weather.get ());
     }
 

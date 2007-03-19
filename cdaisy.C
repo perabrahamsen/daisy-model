@@ -669,7 +669,7 @@ daisy_daisy_scope_extern_get (Toplevel *const toplevel,
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      return daisy.output_log->scope (index); 
+      return &daisy.output_log->scope (index); 
     }
   DAISY_CATCH_BLOCK(toplevel);
   return NULL;

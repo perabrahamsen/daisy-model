@@ -253,7 +253,8 @@ private:
   }
 public:
   ScopeExchange (Block& al)
-    : entries (Librarian<Exchange>::build_vector (al, "entries")),
+    : WScope (al),
+      entries (Librarian<Exchange>::build_vector (al, "entries")),
       all_numbers_ (find_all_numbers (entries)),
       named (find_named (entries))
   { }

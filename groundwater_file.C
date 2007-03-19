@@ -60,7 +60,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry&, const Time& time, Treelog&);
+  void initialize (const Output&, const Geometry&, const Time& time, Treelog&);
   GroundwaterFile (Block&);
   ~GroundwaterFile ();
 };
@@ -141,7 +141,7 @@ GroundwaterFile::table () const
 }
 
 void
-GroundwaterFile::initialize (const Geometry&, const Time& time,
+GroundwaterFile::initialize (const Output&, const Geometry&, const Time& time,
 			     Treelog& err)
 {
   daisy_assert (lex == NULL);

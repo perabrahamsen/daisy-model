@@ -62,7 +62,8 @@ ScopeTable::set (const std::vector<std::string>& entries)
 { values = entries; }
 
 ScopeTable::ScopeTable (const LexerTable& l)
-  : lex (l),
+  : Scope ("table"),
+    lex (l),
     all_numbers_ (l.get_tag_names ())
 { }
 

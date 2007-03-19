@@ -1,6 +1,6 @@
-// scope_block.h -- Treat a block as a scope.
+// scopesel.h -- Select a scope.
 // 
-// Copyright 2006 Per Abrahamsen and KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,35 +19,37 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef SCOPE_BLOCK_H
-#define SCOPE_BLOCK_H
+#ifndef SCOPESEL_H
+#define SCOPESEL_H
 
-#include "scope.h"
-#include "block.h"
+#include "librarian.h"
 
-class ScopeBlock : public Scope
+class Output;
+class Scope;
+
+class Scopesel
 {
   // Content.
-private:
-  Block& block;
-
-  // Interface.
 public:
-  const std::vector<symbol>& all_numbers () const;
-  bool has_number (symbol tag) const;
-  double number (symbol tag) const;
-  symbol dimension (symbol tag) const;
-  virtual bool has_identifier (symbol) const;
-  virtual symbol identifier (symbol) const;
-  symbol get_description (symbol) const;
+  static const char *const description;
+
+  // Use.
+public:
+  virtual Scope* lookup (const Output&, Treelog& msg) const = 0;
 
   // Create and Destroy.
 private:
-  ScopeBlock (const ScopeBlock&);
-  ScopeBlock ();
+  Scopesel (const Scopesel&);
 public:
-  explicit ScopeBlock (Block&);
-  ~ScopeBlock ();
+  explicit Scopesel ();
+  virtual ~Scopesel ();
 };
 
-#endif // SCOPE_BLOCK_H
+#ifdef FORWARD_TEMPLATES
+template<>
+Librarian<Scopesel>::Content* Librarian<Scopesel>::content;
+#endif
+
+static Librarian<Scopesel> Scopesel_init ("scopesel");
+
+#endif // SCOPESEL_H

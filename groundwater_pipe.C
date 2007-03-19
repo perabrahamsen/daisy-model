@@ -107,7 +107,8 @@ private:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geo, const Time& time, Treelog& msg)
+  void initialize (const Output&, 
+                   const Geometry& geo, const Time& time, Treelog& msg)
   {
     const int size = geo.cell_size ();
     double largest = 0.0;

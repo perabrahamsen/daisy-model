@@ -136,7 +136,8 @@ struct NumberLet : public Number
 List of identifiers and values to bind in this scope.", Clause::load_syntax);
     }
     ScopeClause (Block& al)
-      : clause (map_submodel<Clause> (al, "clauses"))
+      : Scope ("clauses"),
+        clause (map_submodel<Clause> (al, "clauses"))
     { }
     ~ScopeClause ()
     { sequence_delete (clause.begin (), clause.end ()); }

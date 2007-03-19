@@ -89,12 +89,14 @@ ScopeMulti::vectorize (const Scope* first, const Scope* second)
 }
 
 ScopeMulti::ScopeMulti (const Scope& first, const Scope& second)
-  : scopes (vectorize (&first, &second)),
+  : Scope ("multi"),
+    scopes (vectorize (&first, &second)),
     all_numbers_ (find_numbers (scopes))
 { }
 
 ScopeMulti::ScopeMulti (Block& al)
-  : scopes (Librarian<Scope>::build_vector_const (al, "scope")),
+  : Scope (al),
+    scopes (Librarian<Scope>::build_vector_const (al, "scope")),
     all_numbers_ (find_numbers (scopes))
 { }
 

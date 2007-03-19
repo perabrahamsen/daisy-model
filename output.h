@@ -52,7 +52,7 @@ public:
   void tick (const Daisy&, Treelog&);
   void summarize (Treelog&) const;
   size_t scope_size () const;
-  Scope* scope (size_t) const;
+  Scope& scope (size_t) const;
   const Scope* scope (symbol) const;
 
   // Create and Destroy.
@@ -71,8 +71,8 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   explicit Output (Block&);
   ~Output ();
-private:
   Output ();
+private:
   Output (const Output&);
 };
 

@@ -137,7 +137,7 @@ Daisy::initialize (const Syntax* glob_syn, const AttributeList* glob_al,
   global_alist = glob_al;
   if (weather.get () && !weather->initialize (time, msg))
     return;
-  field->initialize (time, msg, weather.get ());
+  field->initialize (*output_log, time, msg, weather.get ());
   {
     Treelog::Open nest (msg, "output");
     output_log->initialize (msg);
