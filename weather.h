@@ -129,13 +129,6 @@ public:
 public:
   double average_temperature () const;
 
-  // Communication with external model.
-public:
-  virtual void put_precipitation (double prec) = 0;// [mm/d]
-  virtual void put_air_temperature (double T) = 0; // [°C]
-  virtual void put_reference_evapotranspiration (double ref) = 0; // [mm/d]
-  virtual void put_global_radiation (double radiation) = 0; // [W/m^2]
-
   // Astronomic utilities.
 public:
   static double SolarDeclination (const Time& time); // [rad]

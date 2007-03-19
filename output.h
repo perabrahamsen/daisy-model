@@ -28,7 +28,6 @@
 
 struct Log;
 struct LogAll;
-struct LogExtern;
 struct Scope;
 struct Border;
 struct Block;
@@ -39,10 +38,12 @@ class Output
   // Content.
 private:
   bool logging;
+  const auto_vector<Scope*> exchanges;
   const auto_vector<Log*> logs;
   const std::auto_ptr<LogAll> log_all;
   const std::vector<Log*> active_logs;
-  const std::vector<const LogExtern*> scopes;
+  const std::vector<Scope*> scopes;
+  const std::map<symbol, Scope*> scope_by_name;
   const std::auto_ptr<Condition> activate_output;
 
   // Use.
@@ -51,7 +52,7 @@ public:
   void tick (const Daisy&, Treelog&);
   void summarize (Treelog&) const;
   size_t scope_size () const;
-  const Scope* scope (size_t) const;
+  Scope* scope (size_t) const;
   const Scope* scope (symbol) const;
 
   // Create and Destroy.
@@ -61,9 +62,13 @@ public:
 private:
   static const std::vector<Log*> 
   /**/ find_active_logs (const std::vector<Log*>& logs, LogAll& log_all);
-  static const std::vector<const LogExtern*> 
-  /**/ find_extern_logs (const std::vector<Log*>& logs);
+  static const std::vector<Scope*> 
+  /**/ find_extern_logs (const std::vector<Log*>& logs, 
+                         const std::vector<Scope*>& exchanges);
+  static const std::map<symbol, Scope*> 
+  /**/ find_scope_by_name (const std::vector<Log*>& logs);
 public:
+  static void load_syntax (Syntax&, AttributeList&);
   explicit Output (Block&);
   ~Output ();
 private:

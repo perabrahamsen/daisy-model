@@ -598,7 +598,7 @@ daisy_daisy_count_columns (Toplevel *const toplevel)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      return daisy.field.size (); 
+      return daisy.field->size (); 
     }
   DAISY_CATCH_BLOCK(toplevel);
   return 0;
@@ -610,8 +610,8 @@ daisy_daisy_get_column (Toplevel* toplevel, const int col)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      daisy_assert (col >= 0 && col < daisy.field.size ()); 
-      return daisy.field.find (col); 
+      daisy_assert (col >= 0 && col < daisy.field->size ()); 
+      return daisy.field->find (col); 
     }
   DAISY_CATCH_BLOCK(toplevel)
   return NULL;
@@ -662,7 +662,7 @@ daisy_daisy_scope_extern_size (Toplevel *const toplevel)
   return 0;
 }
 
-extern "C" const Scope* EXPORT  // Return extern scope INDEX.
+extern "C" Scope* EXPORT  // Return extern scope INDEX.
 daisy_daisy_scope_extern_get (Toplevel *const toplevel,
                               const unsigned int index)
 {
@@ -722,6 +722,24 @@ daisy_scope_string (const Scope* scope, const char* name)
 extern "C" const char* EXPORT	// Return UNITS of NAME defined in SCOPE.
 daisy_scope_description (const Scope* scope, const char* name)
 { return scope->get_description (symbol (name)).name().c_str (); }
+
+extern "C" int EXPORT           // True, iff SCOPE is writable.
+daisy_scope_writable (Scope* scope)
+{ 
+  if (dynamic_cast<WScope*> (scope))
+    return 1; 
+
+  return 0;
+}
+
+extern "C" void EXPORT          // In SCOPE, set NAME to VALUE.
+daisy_scope_set_number (Scope* scope, 
+                        const char *const name, const double value)
+{ 
+  WScope* wscope = dynamic_cast<WScope*> (scope);
+  daisy_assert (wscope);
+  wscope->set_number (symbol (name), value);
+}
 
 // @ Miscellaneous.
 

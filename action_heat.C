@@ -36,7 +36,7 @@ struct ActionSetHeatSource : public Action
   void doIt (Daisy& daisy, Treelog& out)
   {
     out.message ("Adjusting heat source");
-    daisy.field.set_heat_source (height, value);
+    daisy.field->set_heat_source (height, value);
   }
 
   ActionSetHeatSource (Block& al)

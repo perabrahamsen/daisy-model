@@ -39,7 +39,7 @@ struct ActionWithColumn : public Action
 public:
   void tick (const Daisy& daisy, Treelog& out)
   { 
-    Field::Restrict restriction (daisy.field, column);
+    Field::Restrict restriction (*daisy.field, column);
     Treelog::Open nest (out, column);
     for (vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
@@ -51,7 +51,7 @@ public:
 
   void doIt (Daisy& daisy, Treelog& out)
   { 
-    Field::Restrict restriction (daisy.field, column);
+    Field::Restrict restriction (*daisy.field, column);
     Treelog::Open nest (out, column);
     for (vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
@@ -77,7 +77,7 @@ public:
 	if (!(*i)->check (daisy, err))
 	  ok = false;
       }
-    if (!daisy.field.find (column))
+    if (!daisy.field->find (column))
       {
 	err.entry (string ("No column '") + column + "'");
 	ok = false;

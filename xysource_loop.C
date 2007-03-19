@@ -44,6 +44,7 @@ class XYSourceLoop : public XYSource
   const double begin;
   const double end;
   const double step;
+  const symbol tag;
   ScopeID scope;
   
   // Interface.
@@ -100,9 +101,9 @@ XYSourceLoop::load (Treelog& msg)
 
   // Read data.
   daisy_assert (xs.size () == ys.size ());
-  for (scope.value = begin; 
-       (step > 0.0) ? (scope.value < end) : (scope.value > end); 
-       scope.value += step)
+  for (scope.set_number (tag, begin); 
+       (step > 0.0) ? (scope.number (tag) < end) : (scope.number (tag) > end); 
+       scope.set_number (tag, scope.number (tag) + step))
     {
       // Missing value.
       if (x_expr->missing (scope) || y_expr->missing (scope))
@@ -130,7 +131,8 @@ XYSourceLoop::XYSourceLoop (Block& al)
     begin (al.number ("begin")),
     end (al.number ("end")),
     step (al.number ("step")),
-    scope (al.identifier ("tag"), al.identifier ("begin"))
+    tag (al.identifier ("tag")),
+    scope (tag, al.identifier ("begin"))
 { }
 
 XYSourceLoop::~XYSourceLoop ()

@@ -25,6 +25,7 @@
 
 #include "program.h"
 #include "time.h"
+#include "memutils.h"
 #include <vector>
 #include <memory>
 
@@ -62,10 +63,10 @@ private:
   const Time stop;
 public:
   std::auto_ptr<Action> action;
-  Weather* weather;
+  std::auto_ptr<Weather> weather;
 public:
-  Field& field;
-  std::vector<const Harvest*> harvest;
+  std::auto_ptr<Field> field;
+  auto_vector<const Harvest*> harvest;
 
   // Simulation.
 public:

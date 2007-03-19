@@ -20,11 +20,9 @@
 
 
 #include "scope_id.h"
+#include "block.h"
+#include "alist.h"
 #include "assertion.h"
-
-void 
-ScopeID::tick (const Scope&, Treelog&)
-{ }
 
 const std::vector<symbol>& 
 ScopeID::all_numbers () const
@@ -46,16 +44,49 @@ symbol
 ScopeID::get_description (symbol tag) const
 { return symbol ("Use '" + tag.name () + "' as a free variable"); }
 
+  // WScope interface.
+void
+ScopeID::set_number (symbol, double val)
+{ value = val; }
+
+void
+ScopeID::set_dimension (symbol, symbol d)
+{ dim = d; }
+
 ScopeID::ScopeID (const symbol name, const symbol d)
   : tag (name),
     value (-42.42e42),
     dim (d)
-{ 
-  if (all_numbers_.size () < 1)
-    all_numbers_.push_back (tag);
-}
+{ all_numbers_.push_back (tag); }
+
+ScopeID::ScopeID (Block& al)
+  : tag (al.identifier ("name")), 
+    value (al.number ("value")),
+    dim (al.identifier ("value"))
+{ all_numbers_.push_back (tag); }
 
 ScopeID::~ScopeID ()
 { daisy_assert (all_numbers_.size () == 1); }
+
+static struct ScopeIDSyntax
+{
+  static Scope&
+  make (Block& al)
+  { return *new ScopeID (al); }
+
+  ScopeIDSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+               "A scope containing just a single number.");
+    syntax.add ("name", Syntax::String, Syntax::Const, 
+                "Identifier name.");
+    syntax.add ("value", Syntax::User (), Syntax::Const, 
+                "Initial value and dimension.");
+    Librarian<Scope>::add_type ("id", alist, syntax, &make);
+  }
+} ScopeID_syntax;
 
 // scope_id.C ends here

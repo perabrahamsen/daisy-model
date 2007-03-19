@@ -94,7 +94,7 @@ void
 Daisy::tick_before (Treelog& msg)
 { 
   output_log->initial_logs (*this, msg);
-  if (weather)
+  if (weather.get ())
     weather->tick (time, msg);
   action->tick (*this, msg);
   action->doIt (*this, msg);
@@ -102,17 +102,17 @@ Daisy::tick_before (Treelog& msg)
 
 void
 Daisy::tick_columns (Treelog& msg)
-{ field.tick_all (time, dt, weather, msg); }
+{ field->tick_all (time, dt, weather.get (), msg); }
 
 void
 Daisy::tick_column (const size_t col, Treelog& msg)
-{ field.tick_one (col, time, dt, weather, msg); }
+{ field->tick_one (col, time, dt, weather.get (), msg); }
 
 void
 Daisy::tick_after (Treelog& msg)
 { 
   output_log->tick (*this, msg);
-  field.clear ();
+  field->clear ();
   time += *timestep;
   
   if (time >= stop)
@@ -122,9 +122,9 @@ Daisy::tick_after (Treelog& msg)
 void
 Daisy::output (Log& log) const
 {
-  if (weather)
+  if (weather.get ())
     output_derived (weather, "weather", log);
-  output_submodule (field, "column", log);
+  output_submodule (*field, "column", log);
   output_vector (harvest, "harvest", log);
   output_derived (action, "manager", log);
 }
@@ -135,9 +135,9 @@ Daisy::initialize (const Syntax* glob_syn, const AttributeList* glob_al,
 { 
   global_syntax = glob_syn; 
   global_alist = glob_al;
-  if (weather && !weather->initialize (time, msg))
+  if (weather.get () && !weather->initialize (time, msg))
     return;
-  field.initialize (time, msg, weather);
+  field->initialize (time, msg, weather.get ());
   {
     Treelog::Open nest (msg, "output");
     output_log->initialize (msg);
@@ -162,20 +162,20 @@ Daisy::check (Treelog& msg)
   // Check weather.
   {
     Treelog::Open nest (msg, "weather");
-    if (weather && !weather->check (time, stop, msg))
+    if (weather.get () && !weather->check (time, stop, msg))
       ok = false;
   }
 
   // Check field.
   {
     Treelog::Open nest (msg, "column");
-    if (!field.check (weather == NULL, time, stop, msg))
+    if (!field->check (!weather.get (), time, stop, msg))
       ok = false;
   }
   // Check logs.
   {
     Treelog::Open nest (msg, "output");
-    if (!output_log->check (field, msg))
+    if (!output_log->check (*field, msg))
       ok = false;
   }
   // Check actions.
@@ -206,7 +206,7 @@ Daisy::Daisy (Block& al)
     weather (al.check ("weather") 
 	     ? Librarian<Weather>::build_item (al, "weather")
 	     : NULL), 
-    field (*new Field (al, "column")),
+    field (new Field (al, "column")),
     harvest (map_submodel_const<Harvest> (al, "harvest"))
 { }
 
@@ -216,16 +216,8 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 	      "Description of this simulation setup.");
   alist.add ("description", default_description);
-  syntax.add ("output", Librarian<Log>::library (),
-	      Syntax::State, Syntax::Sequence,
-	      "List of logs for output during the simulation.");
-  syntax.add ("activate_output", Librarian<Condition>::library (),
-	      "Activate output logs when this condition is true.\n\
-You can use the 'after' condition to avoid logging during an initialization\n\
-period.");
-  AttributeList true_alist;
-  true_alist.add ("type", "true");
-  alist.add ("activate_output", true_alist);
+  
+  Output::load_syntax (syntax, alist);
   syntax.add ("print_time", Librarian<Condition>::library (),
 	      "Print simulation time whenever this condition is true.\n\
 The simulation time will also be printed whenever there are any news\n\
@@ -265,12 +257,7 @@ the simulation.  Can be overwritten by column specific weather.");
 }
 
 Daisy::~Daisy ()
-{
-  if (weather)
-    delete weather;
-  delete &field;
-  sequence_delete (harvest.begin (), harvest.end ());
-}
+{ }
 
 static struct ProgramDaisySyntax
 {

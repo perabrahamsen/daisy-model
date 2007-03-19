@@ -57,20 +57,6 @@ public:
   double snow () const
   { return snow_; }
 
-  // Communication with external model.
-  void put_precipitation (double prec)
-  { 
-    WeatherOld::distribute (prec / 24.0); 
-    rain_ = WeatherOld::rain ();
-    snow_ = WeatherOld::snow ();
-  }
-  void put_air_temperature (double T)
-  { air_temperature = T; }
-  void put_reference_evapotranspiration (double ref)
-  { reference_evapotranspiration_ = ref; }
-  void put_global_radiation (double rad)
-  { global_radiation = rad; }
-
   // Create and Destroy.
 private:
   friend class WeatherNoneSyntax;

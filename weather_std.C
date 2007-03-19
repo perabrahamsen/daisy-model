@@ -301,25 +301,6 @@ struct WeatherStandard : public Weather
   bool has_min_max_temperature () const
   { return has_min_temperature && has_max_temperature; }
 
-  // Communication with external model.
-  void put_precipitation (double prec) // [mm/d]
-  { 
-    precipitation_[hour] = prec / 24.0; 
-    daily_precipitation_ = prec;
-  }
-  void put_air_temperature (double T) // [°C]
-  { 
-    air_temperature_[hour] = T; 
-    daily_air_temperature_ = T;
-  }
-  void put_reference_evapotranspiration (double ref) // [mm/d]
-  { reference_evapotranspiration_[hour] = ref; }
-  void put_global_radiation (double radiation) // [W/m²]
-  { 
-    global_radiation_[hour] = radiation;
-    daily_global_radiation_ = radiation; 
-  }
-
   // Create and Destroy.
   bool initialize (const Time& time, Treelog& err);
   WeatherStandard (Block&);

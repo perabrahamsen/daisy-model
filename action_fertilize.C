@@ -124,7 +124,7 @@ ActionFertilize::doIt (Daisy& daisy, Treelog& out)
     {
       const double weight 
 	= precision->target
-	- daisy.field.soil_inorganic_nitrogen (precision->from, precision->to);
+	- daisy.field->soil_inorganic_nitrogen (precision->from, precision->to);
       
       if (weight <= minimum_weight)
 	{
@@ -136,8 +136,8 @@ ActionFertilize::doIt (Daisy& daisy, Treelog& out)
   else if (second_year_compensation)
     {
       const double weight = AM::utilized_weight (am);
-      const double compensation = daisy.field.second_year_utilization ();
-      daisy.field.clear_second_year_utilization ();
+      const double compensation = daisy.field->second_year_utilization ();
+      daisy.field->clear_second_year_utilization ();
 
       if (weight - compensation <= minimum_weight)
 	{
@@ -184,15 +184,15 @@ ActionFertilize::doIt (Daisy& daisy, Treelog& out)
 
   if (to < from)
     {
-      daisy.field.fertilize (am, from, to, daisy.dt);
+      daisy.field->fertilize (am, from, to, daisy.dt);
       if (water > 0.0)
-        daisy.field.irrigate_subsoil (water, IM (), from, to, daisy.dt);
+        daisy.field->irrigate_subsoil (water, IM (), from, to, daisy.dt);
     }
   else
     {
-      daisy.field.fertilize (am, daisy.dt);
+      daisy.field->fertilize (am, daisy.dt);
       if (water > 0.0)
-        daisy.field.irrigate_surface (water, IM (), daisy.dt);
+        daisy.field->irrigate_surface (water, IM (), daisy.dt);
     }
 }
 
@@ -200,7 +200,7 @@ bool
 ActionFertilize::check (const Daisy& daisy, Treelog& err) const
 {
   bool ok = true;
-  if (am.name ("syntax") != "mineral" && !daisy.field.check_am (am, err))
+  if (am.name ("syntax") != "mineral" && !daisy.field->check_am (am, err))
     ok = false;
   return ok;
 }

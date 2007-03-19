@@ -1,3 +1,19 @@
+2007-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* scope_multi.C: Made it a model.
+	* Makefile (OTHER): Removed.
+	(SPECIALS): Added.
+
+2007-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* scope_exchange.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* scope.h, scope.C: Made it a library.
+	* scope_id.h, scope_id.C: Made it a model.
+	* Makefile (OTHER): Removed.
+	(COMPONENTS, SPECIALS): Added.
+
 2007-03-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* msoltranrect_none.C: New model.

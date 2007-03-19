@@ -22,10 +22,6 @@
 #include "lexer_table.h"
 #include "assertion.h"
 
-void 
-ScopeTable::tick (const Scope&, Treelog&)
-{ }
-
 bool 
 ScopeTable::has_number (const symbol tag) const
 {

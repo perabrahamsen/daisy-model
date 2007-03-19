@@ -23,10 +23,6 @@
 #include "stringer.h"
 #include "alist.h"
 
-void 
-ScopeBlock::tick (const Scope&, Treelog&)
-{ }
-
 const std::vector<symbol>& 
 ScopeBlock::all_numbers () const
 { return Scope::null ().all_numbers (); }

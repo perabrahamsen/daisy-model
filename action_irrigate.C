@@ -79,7 +79,7 @@ struct ActionIrrigate : public Action
     else 
       remaining_time -= dt;
     daisy_assert (std::isnormal (this_flux));
-    irrigate (daisy.field, this_flux, temp, sm, daisy.dt);
+    irrigate (*daisy.field, this_flux, temp, sm, daisy.dt);
   }
 
   bool done (const Daisy& daisy, Treelog&) const

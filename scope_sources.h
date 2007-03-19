@@ -41,7 +41,6 @@ public:
 
   // Interface.
 public:
-  void tick (const Scope&, Treelog&);
   const std::vector<symbol>& all_numbers () const;
   bool has_number (symbol tag) const;
   double number (symbol tag) const;

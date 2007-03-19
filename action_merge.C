@@ -33,7 +33,7 @@ struct ActionMerge : public Action
   void doIt (Daisy& daisy, Treelog& out)
   {
     out.message ("Merging " + remove + " into " + combine);
-    daisy.field.merge (combine, remove);
+    daisy.field->merge (combine, remove);
   }
   
   ActionMerge (Block& al)

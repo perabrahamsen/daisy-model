@@ -535,31 +535,6 @@ Surface::evap_pond (Treelog& msg) const	// [mm/h]
 void
 Surface::put_ponding (double p)	// [mm]
 { impl.pond = p; }
-  
-#if 0
-void
-Surface::put_no3 (double no3) // [g/cm^2]
-{ impl.im.NO3 = no3; }
-
-double
-Surface::get_no3 () const // [g/cm^2]
-{ return impl.im.NO3; }
-
-void 
-Surface::put_chemical (symbol name , double amount) // [g/cm^2]
-{
-  // [g/cm^2] -> [g/m^2]
-  impl.chemicals_storage.set_to (name, amount * 1.0e4);
-}
-
-double 
-Surface::get_chemical (symbol name) const // [g/cm^2]
-{ 
-  // [g/m^2] -> [g/cm^2]
-  return impl.chemicals_storage.amount (name) * 1.0e-4;		
-}
-
-#endif
 
 static bool
 check_alist (const AttributeList& al, Treelog& msg)

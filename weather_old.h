@@ -52,12 +52,6 @@ public:
   double relative_humidity () const; // []
   double wind () const;	// [m/s]
 
-  // Communication with external model.
-  void put_precipitation (double prec);// [mm/d]
-  void put_air_temperature (double T); // [°C]
-  void put_reference_evapotranspiration (double ref); // [mm/d]
-  void put_global_radiation (double radiation); // [W/m²]
-
   // Create and Destroy.
 protected:
   WeatherOld (Block&);

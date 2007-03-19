@@ -25,6 +25,7 @@
 #include "treelog.h"
 #include "time.h"
 #include "timestep.h"
+#include "syntax.h"
 
 void
 Output::initial_logs (const Daisy& daisy, Treelog& msg)
@@ -94,7 +95,7 @@ size_t
 Output::scope_size () const
 { return scopes.size (); }
 
-const Scope* 
+Scope* 
 Output::scope (size_t i) const
 { 
   daisy_assert (i < scopes.size ());
@@ -104,17 +105,11 @@ Output::scope (size_t i) const
 const Scope*
 Output::scope (const symbol target) const
 {
-  for (size_t i = 0; i < scopes.size (); i++)
-    {
-      const LogExtern* scope = scopes[i];
-      const symbol name = scope->alist.check ("where") 
-        ? scope->alist.identifier ("where") 
-        : scope->alist.identifier ("type");
-
-      if (name == target)
-        return scope;
-    }
-  return NULL;
+  const std::map<symbol, Scope*>::const_iterator i 
+    = scope_by_name.find (target);
+  if (i == scope_by_name.end ())
+    return NULL;
+  return (*i).second;
 }
 
 bool
@@ -154,26 +149,66 @@ const std::vector<Log*>
   return result;
 }
 
-const std::vector<const LogExtern*> 
-/**/ Output::find_extern_logs (const std::vector<Log*>& logs)
+const std::vector<Scope*> 
+/**/ Output::find_extern_logs (const std::vector<Log*>& logs, 
+                               const std::vector<Scope*>& exchanges)
 {
-  std::vector<const LogExtern*> result;
+  std::vector<Scope*> result = exchanges;
 
   for (size_t i = 0; i < logs.size (); i++)
-    if (const LogExtern* log = dynamic_cast<const LogExtern*> (logs[i]))
+    if (LogExtern* log = dynamic_cast<LogExtern*> (logs[i]))
       result.push_back (log);
   
   return result;
 }
 
+
+const std::map<symbol, Scope*>
+Output::find_scope_by_name (const std::vector<Log*>& logs)
+{
+  std::map<symbol, Scope*> scope_by_name;
+
+  for (size_t i = 0; i < logs.size (); i++)
+    if (LogExtern* scope = dynamic_cast<LogExtern*> (logs[i]))
+      {
+        const symbol name = scope->alist.check ("where") 
+          ? scope->alist.identifier ("where") 
+          : scope->alist.identifier ("type");
+        scope_by_name[name] = scope;
+      }
+  return scope_by_name;
+}
+
 Output::Output (Block& al)
   : logging (false),
+    exchanges (Librarian<Scope>::build_vector (al, "exchange")),
     logs (Librarian<Log>::build_vector (al, "output")),
     log_all (new LogAll (logs)),
     active_logs (find_active_logs (logs, *log_all)),
-    scopes (find_extern_logs (logs)),
+    scopes (find_extern_logs (logs, exchanges)),
+    scope_by_name (find_scope_by_name (logs)),
     activate_output (Librarian<Condition>::build_item (al, "activate_output"))
 { }
 
 Output::~Output ()
 { }
+
+void
+Output::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add ("output", Librarian<Log>::library (),
+	      Syntax::State, Syntax::Sequence,
+	      "List of logs for output during the simulation.");
+  syntax.add ("activate_output", Librarian<Condition>::library (),
+	      "Activate output logs when this condition is true.\n\
+You can use the 'after' condition to avoid logging during an initialization\n\
+period.");
+  AttributeList true_alist;
+  true_alist.add ("type", "true");
+  alist.add ("activate_output", true_alist);
+
+  syntax.add ("exchange", Librarian<Scope>::library (),
+              Syntax::Const, Syntax::Sequence, "\
+List of exchange items for communicating with external models.");
+  alist.add ("exchange", std::vector<AttributeList*> ());
+}

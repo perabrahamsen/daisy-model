@@ -128,22 +128,6 @@ double
 WeatherOld::wind () const
 { return 3.0; }
 
-void 
-WeatherOld::put_precipitation (double prec)
-{ distribute (prec / 24.0); }
-
-void 
-WeatherOld::put_air_temperature (double)
-{ daisy_notreached (); }
-
-void 
-WeatherOld::put_reference_evapotranspiration (double)
-{ daisy_notreached (); }
-
-void
-WeatherOld::put_global_radiation (double radiation) // [W/m²]
-{ impl.daily_global_radiation = radiation; }
-
 WeatherOld::WeatherOld (Block& al)
   : Weather (al),
     impl (*new Implementation (al))

@@ -294,7 +294,7 @@ ActionCrop::Sow::doIt (Daisy& daisy, Treelog& out)
   if (!done && date.match (daisy.time))
     {
       out.message ("Sowing " + crop.name ("type"));      
-      daisy.field.sow (crop, daisy.time, daisy.dt, out); 
+      daisy.field->sow (crop, daisy.time, daisy.dt, out); 
       done = true;
     }
 }
@@ -335,7 +335,7 @@ ActionCrop::Sow::~Sow ()
 bool
 ActionCrop::Annual::doIt (Daisy& daisy, Treelog& out, symbol name)
 {
-  if (!done && (daisy.field.crop_ds (name) >= 2.0
+  if (!done && (daisy.field->crop_ds (name) >= 2.0
 		|| latest.match (daisy.time)))
     {
       const double stub = 8.0;
@@ -343,7 +343,7 @@ ActionCrop::Annual::doIt (Daisy& daisy, Treelog& out, symbol name)
       const double leaf = remove_residuals ? 1.0 : 0.0;
       const double sorg = (1.0 - loss);
       static const symbol all_symbol ("all");
-      daisy.field.harvest (daisy.time, daisy.dt, 
+      daisy.field->harvest (daisy.time, daisy.dt, 
                            all_symbol, stub, stem, leaf, sorg, 
 			   false, daisy.harvest, out);
       out.message ("Annual harvest of " + name);
@@ -400,7 +400,7 @@ ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& out)
   const double leaf = 1.0;
   const double sorg = 1.0;
   static const symbol all_symbol ("all");
-  daisy.field.harvest (daisy.time, daisy.dt,
+  daisy.field->harvest (daisy.time, daisy.dt,
                        all_symbol, stub, stem, leaf, sorg, 
 		       false, daisy.harvest, out);
   out.message ("Perennial harvest");
@@ -414,8 +414,8 @@ ActionCrop::Perennial::doIt (Daisy& daisy, Treelog& out, symbol name)
   if (year_of_last_harvest < 0)
     year_of_last_harvest = daisy.time.year () + seasons - 1;
 
-  if (daisy.field.crop_ds (name) >= DS 
-      || daisy.field.crop_dm (name, stub) >= DM)
+  if (daisy.field->crop_ds (name) >= DS 
+      || daisy.field->crop_dm (name, stub) >= DM)
     {
       harvest (daisy, out);
       return true;
@@ -432,10 +432,10 @@ ActionCrop::Perennial::doIt (Daisy& daisy, Treelog& out,
   if (year_of_last_harvest < 0)
     year_of_last_harvest = daisy.time.year () + seasons - 1;
 
-  if (daisy.field.crop_ds (primary) >= DS 
-      || daisy.field.crop_ds (secondary) >= DS 
-      || (daisy.field.crop_dm (primary, stub)
-	  + daisy.field.crop_dm (secondary, stub)) >= DM)
+  if (daisy.field->crop_ds (primary) >= DS 
+      || daisy.field->crop_ds (secondary) >= DS 
+      || (daisy.field->crop_dm (primary, stub)
+	  + daisy.field->crop_dm (secondary, stub)) >= DM)
     {
       harvest (daisy, out);
       return true;
@@ -602,9 +602,9 @@ ActionCrop::fertilize (Daisy& daisy, Treelog& out,
   const double to = -18.0;
       
   if (fertilize_incorporate)
-    daisy.field.fertilize (am, from, to, daisy.dt);
+    daisy.field->fertilize (am, from, to, daisy.dt);
   else
-    daisy.field.fertilize (am, daisy.dt);
+    daisy.field->fertilize (am, daisy.dt);
 }
 
 void 
@@ -723,13 +723,13 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, Treelog& out) const
 
   const double depth = -20;
 
-  if (daisy.field.soil_water_potential (depth) >= potential)
+  if (daisy.field->soil_water_potential (depth) >= potential)
     return false;
 
   ostringstream tmp;
   tmp << "Irrigating " << amount << " mm";
   out.message (tmp.str ());
-  daisy.field.irrigate_overhead (amount, IM (), daisy.dt);
+  daisy.field->irrigate_overhead (amount, IM (), daisy.dt);
   return true;
 }
 
@@ -888,7 +888,7 @@ ActionCrop::doIt (Daisy& daisy, Treelog& out)
       symbol chemical = spray[spray_index]->name;
       const double amount = spray[spray_index]->amount;
       out.message ("Spraying " + chemical);
-      daisy.field.spray (chemical, amount); 
+      daisy.field->spray (chemical, amount); 
 
       spray_index++;
     }

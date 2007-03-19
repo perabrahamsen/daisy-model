@@ -453,10 +453,11 @@ daisy_time_get_year (const daisy_time* time);
  */
 
 EXPORT unsigned int             /* Return number of extern scopes */
-daisy_daisy_scope_extern_size (daisy_daisy* daisy);
+daisy_daisy_scope_extern_size (const daisy_daisy* daisy); /*  */
 
-EXPORT const daisy_scope*       /* Return extern scope INDEX. */
-daisy_daisy_scope_extern_get (daisy_daisy* daisy, const unsigned int index);
+EXPORT daisy_scope*             /* Return extern scope INDEX. */
+daisy_daisy_scope_extern_get (const daisy_daisy* daisy,
+                              const unsigned int index);
 
 EXPORT unsigned int             /* Number of numbers in SCOPE. */
 daisy_scope_number_size (const daisy_scope* scope);
@@ -464,7 +465,7 @@ daisy_scope_number_size (const daisy_scope* scope);
 EXPORT const char*              /* Name of number INDEX in SCOPE. */
 daisy_scope_number_name (const daisy_scope* scope, const unsigned int index);
 
-EXPORT daisy_bool              /* check if NAME is defined in SCOPE. */
+EXPORT daisy_bool             /* Check if NAME is defined in SCOPE. */
 daisy_scope_has_number (const daisy_scope* scope, const char* name);
 
 EXPORT const double      /* Return numeric value of NAME in SCOPE. */
@@ -473,7 +474,7 @@ daisy_scope_number (const daisy_scope* scope, const char* name);
 EXPORT const char*        /* Return UNITS of NAME defined in SCOPE. */
 daisy_scope_dimension (const daisy_scope* scope, const char* name);
 
-EXPORT daisy_bool              /* check if NAME is defined in SCOPE. */
+EXPORT daisy_bool             /* Check if NAME is defined in SCOPE. */
 daisy_scope_has_string (const daisy_scope* scope, const char* name);
 
 EXPORT const char*       /* Return string value of NAME in SCOPE. */
@@ -481,6 +482,13 @@ daisy_scope_string (const daisy_scope* scope, const char* name);
 
 EXPORT const char*        /* Return UNITS of NAME defined in SCOPE. */
 daisy_scope_description (const daisy_scope* scope, const char* name);
+
+EXPORT daisy_bool               /* True, iff SCOPE is writable. */
+daisy_scope_writable (const daisy_scope* scope);
+
+EXPORT void                     /* In SCOPE, set NAME to VALUE. */
+daisy_scope_set_number (daisy_scope* scope, const char* name, 
+                        double value);
 
 /* @ Miscellaneous.
  *

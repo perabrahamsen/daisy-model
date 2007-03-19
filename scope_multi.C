@@ -19,11 +19,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "scope_multi.h"
+#include "syntax.h"
+#include "alist.h"
 #include "assertion.h"
-
-void 
-ScopeMulti::tick (const Scope&, Treelog&)
-{ daisy_panic ("ScopeMulti should not tick."); }
 
 const std::vector<symbol>& 
 ScopeMulti::all_numbers () const
@@ -69,20 +67,57 @@ ScopeMulti::get_description (symbol tag) const
   daisy_panic ("'" + tag + "' not found in any scope");
 }
 
-ScopeMulti::ScopeMulti (const Scope& first, const Scope& second)
-{ 
-  scopes.push_back (&first);
-  scopes.push_back (&second);
-
+std::vector<symbol>
+ScopeMulti::find_numbers (const std::vector<const Scope*>& scopes)
+{
+  std::vector<symbol> result;
   for (size_t i = 0; i < scopes.size (); i++)
     {
       const std::vector<symbol>& child = scopes[i]->all_numbers ();
-      for (size_t j = 0; j < child.size (); j++)
-        all_numbers_.push_back (child[j]);
+      result.insert (result.end (), child.begin (), child.end ());
     }
+  return result;
 }
+
+std::vector<const Scope*>
+ScopeMulti::vectorize (const Scope* first, const Scope* second)
+{
+  std::vector<const Scope*> result;
+  result.push_back (first);
+  result.push_back (second);
+  return result;
+}
+
+ScopeMulti::ScopeMulti (const Scope& first, const Scope& second)
+  : scopes (vectorize (&first, &second)),
+    all_numbers_ (find_numbers (scopes))
+{ }
+
+ScopeMulti::ScopeMulti (Block& al)
+  : scopes (Librarian<Scope>::build_vector_const (al, "scope")),
+    all_numbers_ (find_numbers (scopes))
+{ }
 
 ScopeMulti::~ScopeMulti ()
 { }
+
+static struct ScopeMultiSyntax
+{
+  static Scope& make (Block& al)
+  { return *new ScopeMulti (al); }
+
+  ScopeMultiSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+               "A scope combining other scopes.");
+    syntax.add ("scope", Librarian<Scope>::library (),
+                Syntax::Const, Syntax::Sequence, 
+                "List of scopes to combine, first one takes precedence.");
+    Librarian<Scope>::add_type ("multi", alist, syntax, &make);
+  }
+} ScopeMulti_syntax;
 
 // scope_multi.C ends here.

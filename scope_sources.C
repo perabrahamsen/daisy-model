@@ -26,10 +26,6 @@
 #include "memutils.h"
 #include <sstream>
 
-void 
-ScopeSources::tick (const Scope&, Treelog&)
-{ }
-
 const std::vector<symbol>& 
 ScopeSources::all_numbers () const
 { return all_numbers_; }

@@ -29,12 +29,11 @@ class ScopeMulti : public Scope
 {
   // Content.
 private:
-  std::vector<const Scope*> scopes;
-  std::vector<symbol> all_numbers_;
+  const std::vector<const Scope*> scopes;
+  const std::vector<symbol> all_numbers_;
 
   // Interface.
 public:
-  void tick (const Scope&, Treelog&);
   const std::vector<symbol>& all_numbers () const;
   bool has_number (symbol tag) const;
   double number (symbol tag) const;
@@ -45,8 +44,13 @@ public:
 private:
   ScopeMulti (const ScopeMulti&);
   ScopeMulti ();
+  static std::vector<symbol> 
+  /**/ find_numbers (const std::vector<const Scope*>& scopes);
+  static std::vector<const Scope*> 
+  /**/ vectorize (const Scope* first, const Scope* second);
 public:
   explicit ScopeMulti (const Scope& first, const Scope& second);
+  explicit ScopeMulti (Block&);
   ~ScopeMulti ();
 };
 

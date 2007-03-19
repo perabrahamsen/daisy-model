@@ -22,11 +22,15 @@
 #include "scope.h"
 #include "assertion.h"
 
+template<>
+Librarian<Scope>::Content* Librarian<Scope>::content = NULL;
+
+const char *const Scope::description = "\
+A scope maps identifiers to values.";
+
 struct ScopeNull : public Scope
 {
   // Use.
-  void tick (const Scope&, Treelog&)
-  { }
   const std::vector<symbol>& all_numbers () const
   {
     static std::vector<symbol> all_numbers_;
@@ -67,6 +71,12 @@ Scope::Scope ()
 { }
 
 Scope::~Scope ()
+{ }
+
+WScope::WScope ()
+{ }
+
+WScope::~WScope ()
 { }
 
 // scope.C ends here

@@ -35,7 +35,7 @@ struct ActionSetSurfaceDetentionCapacity : public Action
   void doIt (Daisy& daisy, Treelog& out)
   {
     out.message ("Adjusting surface detention capacity");
-    daisy.field.set_surface_detention_capacity (height);
+    daisy.field->set_surface_detention_capacity (height);
   }
 
   ActionSetSurfaceDetentionCapacity (Block& al)

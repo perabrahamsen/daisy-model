@@ -326,7 +326,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = boolean_extern.C number_extern.C msoltranrect_Mollerup.C
-MODELS = msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
+MODELS = scope_exchange.C \
+	msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
 	msoltranrect_2x1.C photo_FCC4.C ABAeffect_exp.C cropNdist_uniform.C \
 	uzrect_2x1.C select_flow.C volume_box.C \
 	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
@@ -385,7 +386,8 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = ABAeffect.C msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
+COMPONENTS = scope.C \
+	ABAeffect.C msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
 	cropNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C \
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
@@ -412,16 +414,16 @@ SUBMODELS = toplevel.C timestep.C geometry_rect.C element.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = geometry_vert.C gnuplot_base.C \
+SPECIALS = scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 	geometry.C printer_file.C log_alist.C log_clone.C 
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = output.C scope_block.C scope_id.C librarian.C scope_multi.C \
+OTHER = output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
-	block.C dlf.C scope.C texture.C destination.C symbol.C \
+	block.C dlf.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C \

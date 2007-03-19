@@ -51,14 +51,6 @@ struct WeatherFile : public WeatherOld
       return reference_evapotranspiration_ * day_cycle (); 
     }
 
-  // Communication with external model.
-  void put_precipitation (double prec)
-    { WeatherOld::distribute (prec / 24.0); }
-  void put_air_temperature (double T)
-    { air_temperature = T; }
-  void put_reference_evapotranspiration (double ref)
-    { reference_evapotranspiration_ = ref; }
-
   // Create and Destroy.
   WeatherFile (Block& al)
     : WeatherOld (al),

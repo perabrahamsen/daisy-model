@@ -25,27 +25,36 @@
 #include "scope.h"
 #include <string>
 
-struct ScopeID : public Scope
+class ScopeID : public WScope
 {
   // Content.
   const symbol tag;
   std::vector<symbol> all_numbers_;
-public:
   double value;
   symbol dim;
 
-  // Interface.
-private:
-  void tick (const Scope&, Treelog&);
+  // Scope interface.
+public:
   const std::vector<symbol>& all_numbers () const;
   bool has_number (symbol name) const;
   double number (symbol) const;
   symbol dimension (symbol) const;
   symbol get_description (symbol) const;
 
-  // Create.
+  // WScope interface.
 public:
-  ScopeID (const symbol tag, const symbol dim);
+  void set_number (symbol, double);
+
+  // ScopeID interface.
+public:
+  void set_dimension (symbol name, symbol dim);
+
+  // Create.
+private:
+  ScopeID (const ScopeID&);
+public:
+  explicit ScopeID (const symbol tag, const symbol dim);
+  explicit ScopeID (Block&);
   ~ScopeID ();
 };
 

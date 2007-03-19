@@ -1,5 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+
+* OpenMI
+
+** Lav test setup med exchange.
+
+** Groundwater external
+
+** Installer C# på x40
+
+** søjle polygon
+
 * R2D2
 
 ** Find ud af hvorfor boost-sandbox ikke vil installeres
@@ -8,19 +19,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** inkluder uzrect_Mollerup
 
-** massebalance som check 
-
 ** msoltranrect_Mollerup
-
-* OpenMI
-
-** Import values?  Similar to export?  Submodels register imports?
-
-** Installer C# på x40
-
-** Nedre rand skal virke med negativt tryk
-
-** søjle polygon
 
 * TUT?
 

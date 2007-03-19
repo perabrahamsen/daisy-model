@@ -36,13 +36,13 @@ struct ActionEmerge : public Action
     static const symbol all_symbol ("all");
     if (crop != all_symbol)
       {
-        if (daisy.field.crop_ds (crop) < -1.0)
+        if (daisy.field->crop_ds (crop) < -1.0)
           {
             out.warning ("Attempted forced emerge of " 
                          + crop + " which is not on the field");
             return;
           }
-        if (daisy.field.crop_ds (crop) >= 0.0)
+        if (daisy.field->crop_ds (crop) >= 0.0)
           {
             out.warning ("Forced emerge of " + crop
                          + " which is already emerged");
@@ -50,7 +50,7 @@ struct ActionEmerge : public Action
           }
       }
     out.message ("Forcing emergence of " + crop);
-    daisy.field.emerge (crop, out);
+    daisy.field->emerge (crop, out);
   }
 
   ActionEmerge (Block& al)
@@ -93,7 +93,7 @@ struct ActionHarvest : public Action
   void doIt (Daisy& daisy, Treelog& msg)
   {
     static const symbol all_symbol ("all");
-    if (crop != all_symbol && daisy.field.crop_ds (crop) < 0.0)
+    if (crop != all_symbol && daisy.field->crop_ds (crop) < 0.0)
       {
 	msg.warning ("Attempting to harvest " + crop 
 		     + " which has not emerged on the field");
@@ -102,14 +102,14 @@ struct ActionHarvest : public Action
     double old_DM = 0.0;
     for (size_t i = 0; i < daisy.harvest.size (); i++)
       old_DM += daisy.harvest[i]->total_DM ();
-    daisy.field.harvest (daisy.time, daisy.dt, 
+    daisy.field->harvest (daisy.time, daisy.dt, 
                          crop, stub, stem, leaf, sorg, combine,
 			 daisy.harvest, msg);
     double new_DM = 0.0;
     for (size_t i = 0; i < daisy.harvest.size (); i++)
       new_DM += daisy.harvest[i]->total_DM ();
     std::ostringstream tmp;
-    if (daisy.field.crop_ds (crop) < 0.0)
+    if (daisy.field->crop_ds (crop) < 0.0)
       tmp << "Harvesting ";
     else
       tmp << "Cutting ";

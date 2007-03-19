@@ -97,6 +97,7 @@ struct Select::Implementation
   std::auto_ptr<Spec> spec;
 
   // We need a scope for the expression.
+  static const symbol x_symbol;
   mutable ScopeID scope;
     
   // Content.
@@ -325,11 +326,14 @@ Select::Implementation::Spec::Spec (const AttributeList& al)
 Select::Implementation::Spec::~Spec ()
 { }
 
+const symbol
+Select::Implementation::x_symbol ("x");
+
 double 
 Select::Implementation::convert (double value) const
 { 
 
-  scope.value = value;
+  scope.set_number (x_symbol, value);
   value = expr->value (scope);
 
   if (spec_conv)
@@ -376,9 +380,9 @@ Select::Implementation::get_expr (Block& al)
     bool missing (const Scope&) const
     { return false; }
     double value (const Scope& scope) const
-    { return static_cast<const ScopeID&> (scope).value * factor; }
+    { return scope.number (x_symbol) * factor; }
     symbol dimension (const Scope& scope) const
-    { return static_cast<const ScopeID&> (scope).dim; }
+    { return scope.dimension (x_symbol); }
     bool initialize (Treelog&)
     { return true; }
     bool check (const Scope&, Treelog&) const
@@ -398,9 +402,9 @@ Select::Implementation::get_expr (Block& al)
     bool missing (const Scope&) const
     { return false; }
     double value (const Scope& scope) const
-    { return static_cast<const ScopeID&> (scope).value * factor + offset; }
+    { return scope.number (x_symbol) * factor + offset; }
     symbol dimension (const Scope& scope) const
-    { return static_cast<const ScopeID&> (scope).dim; }
+    { return scope.dimension (x_symbol); }
     bool initialize (Treelog&)
     { return true; }
     bool check (const Scope&, Treelog&) const
@@ -428,9 +432,9 @@ Select::Implementation::get_expr (Block& al)
     bool missing (const Scope&) const
     { return false; }
     double value (const Scope& scope) const
-    { return static_cast<const ScopeID&> (scope).value; }
+    { return scope.number (x_symbol); }
     symbol dimension (const Scope& scope) const
-    { return static_cast<const ScopeID&> (scope).dim; }
+    { return scope.dimension (x_symbol); }
     bool initialize (Treelog&)
     { return true; }
     bool check (const Scope&, Treelog&) const
@@ -448,7 +452,7 @@ Select::Implementation::Implementation (Block& al)
   : spec (al.check ("spec")
 	  ? new Spec (al.alist ("spec")) 
 	  : NULL),
-    scope (symbol ("x"), Syntax::unknown ()),
+    scope (x_symbol, Syntax::unknown ()),
     spec_conv (NULL),
     expr (get_expr (al)),
     negate (al.flag ("negate")
@@ -738,7 +742,7 @@ Select::initialize (const Volume&,
     spec_dim = Syntax::unknown ();
 
   // Let the expression modify the dimension.
-  impl->scope.dim = spec_dim;
+  impl->scope.set_dimension (Implementation::x_symbol, spec_dim);
   if (impl->expr.get ())
     { 
       if (!impl->expr->initialize (msg) 
@@ -797,7 +801,7 @@ Select::check (Treelog& err) const
   if (impl->expr.get ())
     spec_dim = impl->expr->dimension (impl->scope);
   else 
-    spec_dim = impl->scope.dim;
+    spec_dim = impl->scope.dimension (Implementation::x_symbol);
   
   return impl->check (spec_dim, err); 
 }
@@ -840,3 +844,4 @@ static struct SelectSyntax
     Librarian<Select>::add_base (alist, syntax);
   }
 } Select_syntax;
+

@@ -23,16 +23,19 @@
 #define SCOPE_H
 
 #include "symbol.h"
+#include "librarian.h"
 #include <vector>
 
 class Treelog;
 
 class Scope
 {
+  // Content.
+public:
+  static const char *const description;
+
   // Use.
 public:
-  virtual void tick (const Scope& scope, Treelog& msg) = 0;
-
   virtual const std::vector<symbol>& all_numbers () const = 0;
   virtual bool has_number (symbol) const = 0;
   virtual double number (symbol) const = 0;
@@ -43,10 +46,33 @@ public:
   virtual symbol get_description (symbol) const = 0;
 
   // Create and Destroy.
+private:
+  Scope (const Scope&);
 public:
   static Scope& null ();
   Scope ();
   virtual ~Scope ();
 };
+
+class WScope : public Scope     // Writable scope.
+{
+  // Use.
+public:
+  virtual void set_number (symbol, double) = 0;
+
+  // Create and Destroy.
+private:
+  WScope (const WScope&);
+public:
+  WScope ();
+  virtual ~WScope ();
+};
+
+#ifdef FORWARD_TEMPLATES
+template<>
+Librarian<Scope>::Content* Librarian<Scope>::content;
+#endif
+
+static Librarian<Scope> Scope_init ("scope");
 
 #endif // SCOPE_H
