@@ -115,7 +115,7 @@ struct NumberGet : public NumberLeaf
     Treelog::Open nest (err, name);
 
     bool ok = true;
-    if (!scope.has_number (name))
+    if (!scope.is_number (name))
       {
         err.error ("'" + name + "' not in scope");
         ok = false;
@@ -205,7 +205,7 @@ struct NumberFetch : public Number
   }
   symbol dimension (const Scope& scope) const
   { 
-    if (scope.has_number (name))
+    if (scope.is_number (name))
       return scope.dimension (name); 
     return default_dimension;
   }
@@ -218,7 +218,7 @@ struct NumberFetch : public Number
     Treelog::Open nest (err, "Fetch: " + name);
 
     bool ok = true;
-    if (!default_value && !scope.has_number (name))
+    if (!default_value && !scope.is_number (name))
       {
         err.error ("'" + name + "' not in scope");
         ok = false;

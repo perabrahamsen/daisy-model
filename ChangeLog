@@ -1,7 +1,10 @@
 2007-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* boolean_extern.C, number_extern.C: Removed.
+	
 	* groundwater_extern.C: New model.
 	* scopesel.C, scopesel.h: New component.
+	* condition_extern.C: Use it.
 	* Makefile (COMPONENTS, MODELS): Add them.
 
 	* scope_multi.C: Made it a model.

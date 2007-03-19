@@ -43,7 +43,6 @@ private:
   const std::auto_ptr<LogAll> log_all;
   const std::vector<Log*> active_logs;
   const std::vector<Scope*> scopes;
-  const std::map<symbol, Scope*> scope_by_name;
   const std::auto_ptr<Condition> activate_output;
 
   // Use.
@@ -53,7 +52,6 @@ public:
   void summarize (Treelog&) const;
   size_t scope_size () const;
   Scope& scope (size_t) const;
-  const Scope* scope (symbol) const;
 
   // Create and Destroy.
 public:
@@ -65,8 +63,6 @@ private:
   static const std::vector<Scope*> 
   /**/ find_extern_logs (const std::vector<Log*>& logs, 
                          const std::vector<Scope*>& exchanges);
-  static const std::map<symbol, Scope*> 
-  /**/ find_scope_by_name (const std::vector<Log*>& logs);
 public:
   static void load_syntax (Syntax&, AttributeList&);
   explicit Output (Block&);

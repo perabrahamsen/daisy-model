@@ -33,6 +33,18 @@ symbol
 Scope::title () const
 { return title_; }
 
+bool 
+Scope::is_number (symbol tag) const
+{
+  const std::vector<symbol>& all = all_numbers ();
+
+  for (size_t i = 0; i < all.size (); i++)
+    if (all[i] == tag)
+      return true;
+
+  return false;
+}
+
 bool
 Scope::has_identifier (symbol) const
 { return false; }

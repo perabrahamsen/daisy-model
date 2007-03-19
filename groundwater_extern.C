@@ -23,15 +23,18 @@
 #include "output.h"
 #include "scopesel.h"
 #include "scope.h"
+#include "number.h"
 #include "block.h"
 #include "alist.h"
+#include "units.h"
+#include <sstream>
 
 class GroundwaterExtern : public Groundwater
 {
   // Content.
 private:
   const std::auto_ptr<Scopesel> scopesel;
-  const symbol tag;
+  const std::auto_ptr<Number> expr;
   Scope* scope;
   bool has_table;
   double depth;
@@ -47,15 +50,30 @@ public:
 public:
   void tick (const Geometry&,
              const Soil&, SoilWater&, double, 
-	     const SoilHeat&, const Time&, Treelog&)
+	     const SoilHeat&, const Time&, Treelog& msg)
   { 
-    if (scope->has_number (tag))
-      {
-        has_table = true;
-        depth = scope->number (tag);
-      }
-    else
+    expr->tick (*scope, msg);
+    
+    if (expr->missing (*scope))
       has_table = false;
+    else 
+      {
+        depth = expr->value (*scope);
+        const symbol dim = expr->dimension (*scope);
+
+        if (!Units::can_convert (dim.name (), "cm", depth))
+          {
+            std::ostringstream tmp;
+            tmp << "Cannot convert " << depth << " [" << dim << "] to [cm]";
+            msg.warning (tmp.str ());
+            has_table = false;
+          }
+        else
+          {
+            depth = Units::convert (dim.name (), "cm", depth);
+            has_table = true;
+          }
+      }
   }
   double table () const
   { return depth; }
@@ -64,14 +82,24 @@ public:
 public:
   void initialize (const Output& output, 
                    const Geometry&, const Time&, Treelog& msg)
-  { scope = scopesel->lookup (output, msg); }
+  {
+    scope = scopesel->lookup (output, msg);
+    expr->initialize (msg);
+  }
   bool check (Treelog& msg) const
   {
     bool ok = true;
-    
     if (!scope)
       {
         msg.error ("No matching scope found");
+        ok = false;
+      }
+    else if (!expr->check (*scope, msg))
+      ok = false;
+    else if (!Units::can_convert (expr->dimension (*scope).name (), "cm"))
+      {
+        msg.error ("Cannot convert [" + expr->dimension (*scope).name ()
+                   + "] to [cm]");
         ok = false;
       }
     return ok;
@@ -80,6 +108,7 @@ public:
   GroundwaterExtern (Block& al)
     : Groundwater (al),
       scopesel (Librarian<Scopesel>::build_item (al, "scope")),
+      expr (Librarian<Number>::build_item (al, "table")),
       has_table (false),
       depth (-42.42e42)
   { }
@@ -100,12 +129,10 @@ Look up groundwater table in an scope.  ");
     Groundwater::load_syntax (syntax, alist);
     syntax.add ("scope", Librarian<Scopesel>::library (), 
                 Syntax::Const, Syntax::Singleton, "\
-Scope to look up groundtable in.");
-    syntax.add ("tag", Syntax::String, Syntax::Const, "\
-Tag to look up groundwater table in scope.");
-    alist.add ("tag", "table");
+Scope to look up groundwater table in.");
+    syntax.add ("table", Librarian<Number>::library (), 
+                Syntax::Const, Syntax::Singleton, "\
+Expression that evaluates to groundwate table in.");
     Librarian<Groundwater>::add_type ("extern", alist, syntax, &make);
   }
 } GroundwaterExtern_syntax;
-
-

@@ -27,11 +27,12 @@
 #include "boolean.h"
 #include "output.h"
 #include "scope.h"
+#include "scopesel.h"
 #include <memory>
 
 struct ConditionExtern : public Condition
 {
-  const symbol extern_name;
+  const std::auto_ptr<Scopesel> scopesel;
   mutable const Scope* extern_scope;
   std::auto_ptr<Boolean> expr;
   
@@ -47,9 +48,7 @@ struct ConditionExtern : public Condition
 
     if (state == uninitialized)
       {
-        extern_scope = daisy.output_log->scope (extern_name);
-        if (!extern_scope)
-          msg.error ("No extern log named '" + extern_name + "' found");
+        extern_scope = scopesel->lookup (*daisy.output_log, msg);
         if (!expr->initialize (msg)
             || !extern_scope
             || !expr->check (*extern_scope, msg))
@@ -74,7 +73,7 @@ struct ConditionExtern : public Condition
 
   ConditionExtern (Block& al)
     : Condition (al),
-      extern_name (al.identifier ("name")),
+      scopesel (Librarian<Scopesel>::build_item (al, "scope")),
       extern_scope (NULL),
       expr (Librarian<Boolean>::build_item (al, "expr")),
       state (uninitialized)
@@ -93,13 +92,16 @@ static struct ConditionExternSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Test if a boolean expression is true,using extern log.");
-      syntax.add ("name", Syntax::String, Syntax::Const, "\
-Name of extern log to fecth values from.");
+      syntax.add ("scope", Librarian<Scopesel>::library (), 
+                  Syntax::Const, Syntax::Singleton, "\
+Scope to evaluate expession in.");
       syntax.add ("expr", Librarian<Boolean>::library (), "\
 Expression to evaluate.");
-      syntax.order ("name", "expr");
+      syntax.order ("scope", "expr");
       Librarian<Condition>::add_type ("extern",
 				      alist, syntax, &make);
     }
   }
 } ConditionExtern_syntax;
+
+// condition_extern.C ends here.

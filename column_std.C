@@ -727,19 +727,19 @@ ColumnStandard::check (bool require_weather,
       ok = false;
   }
   {
-    Treelog::Open nest (err, "Movement");
+    Treelog::Open nest (err, "Movement: " + movement->name);
     if (!movement->check (err))
       ok = false;
   }
   {
-    Treelog::Open nest (err, "Groundwater");
+    Treelog::Open nest (err, "Groundwater: " + groundwater->name);
     if (!groundwater->check (err))
       ok = false;
   }
   {
-    Treelog::Open nest (err, "Weather");
     if (weather)
       {
+        Treelog::Open nest (err, "Weather: " + weather->name);
 	if (!weather->check (from, to, err))
 	  ok = false;
       }

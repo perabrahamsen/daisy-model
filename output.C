@@ -102,16 +102,6 @@ Output::scope (size_t i) const
   return *scopes[i];
 }
 
-const Scope*
-Output::scope (const symbol target) const
-{
-  const std::map<symbol, Scope*>::const_iterator i 
-    = scope_by_name.find (target);
-  if (i == scope_by_name.end ())
-    return NULL;
-  return (*i).second;
-}
-
 bool
 Output::check (const Border& field, Treelog& msg)
 {
@@ -162,23 +152,6 @@ const std::vector<Scope*>
   return result;
 }
 
-
-const std::map<symbol, Scope*>
-Output::find_scope_by_name (const std::vector<Log*>& logs)
-{
-  std::map<symbol, Scope*> scope_by_name;
-
-  for (size_t i = 0; i < logs.size (); i++)
-    if (LogExtern* scope = dynamic_cast<LogExtern*> (logs[i]))
-      {
-        const symbol name = scope->alist.check ("where") 
-          ? scope->alist.identifier ("where") 
-          : scope->alist.identifier ("type");
-        scope_by_name[name] = scope;
-      }
-  return scope_by_name;
-}
-
 Output::Output (Block& al)
   : logging (false),
     exchanges (Librarian<Scope>::build_vector (al, "exchange")),
@@ -186,7 +159,6 @@ Output::Output (Block& al)
     log_all (new LogAll (logs)),
     active_logs (find_active_logs (logs, *log_all)),
     scopes (find_extern_logs (logs, exchanges)),
-    scope_by_name (find_scope_by_name (logs)),
     activate_output (Librarian<Condition>::build_item (al, "activate_output"))
 { }
 
@@ -195,8 +167,7 @@ Output::Output ()
     exchanges (std::vector<Scope*> ()),
     logs (std::vector<Log*> ()),
     active_logs (std::vector<Log*> ()),
-    scopes (std::vector<Scope*> ()),
-    scope_by_name (std::map<symbol, Scope*> ())
+    scopes (std::vector<Scope*> ())
 { }
 
 Output::~Output ()

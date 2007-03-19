@@ -325,7 +325,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-LATER = boolean_extern.C number_extern.C msoltranrect_Mollerup.C
+LATER = msoltranrect_Mollerup.C
 MODELS = groundwater_extern.C scope_exchange.C \
 	msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
 	msoltranrect_2x1.C photo_FCC4.C ABAeffect_exp.C cropNdist_uniform.C \
@@ -471,7 +471,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = options.C options.h select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
+REMOVE = boolean_extern.C number_extern.C options.C options.h select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
 
 # These are the file extensions we deal with.
 # 
@@ -1150,7 +1150,7 @@ submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
 version${OBJ}: version.C
 groundwater_extern${OBJ}: groundwater_extern.C groundwater.h librarian.h \
   symbol.h assertion.h output.h condition.h memutils.h scopesel.h scope.h \
-  block.h syntax.h treelog.h plf.h alist.h
+  number.h block.h syntax.h treelog.h plf.h alist.h units.h
 scope_exchange${OBJ}: scope_exchange.C scope.h symbol.h librarian.h \
   assertion.h block.h syntax.h treelog.h plf.h alist.h memutils.h
 msoltranrect_none${OBJ}: msoltranrect_none.C msoltranrect.h librarian.h \
@@ -1216,7 +1216,7 @@ number_lisp${OBJ}: number_lisp.C number.h symbol.h librarian.h assertion.h \
   plf.h memutils.h
 condition_extern${OBJ}: condition_extern.C condition.h librarian.h symbol.h \
   assertion.h daisy.h program.h time.h memutils.h block.h syntax.h \
-  treelog.h plf.h alist.h boolean.h output.h scope.h
+  treelog.h plf.h alist.h boolean.h output.h scope.h scopesel.h
 condition_boolean${OBJ}: condition_boolean.C condition.h librarian.h symbol.h \
   assertion.h syntax.h treelog.h alist.h boolean.h scope.h
 boolean_number${OBJ}: boolean_number.C boolean.h librarian.h symbol.h \

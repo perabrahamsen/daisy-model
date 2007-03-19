@@ -1,5 +1,13 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Groundwater external
+
+Skal konvertere (og checke) dim.
+
+Kan evt. tage en expression, som gør det automatisk.
+
+
+
 * OpenMI
 
 ** Parameterizationer skal være en Toplevel attribut!
@@ -9,10 +17,6 @@ Factory<T>, Industry
 Build in (shared) vs loaded (per toplevel)
 
 Shared base class?
-
-
-
-** Groundwater external
 
 ** Installer C# på x40
 
