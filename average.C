@@ -29,7 +29,7 @@
 // average component.
 
 template<>
-Librarian<Average>::Content* Librarian<Average>::content = NULL;
+BuildBase* Librarian<Average>::content = NULL;
 
 const char *const Average::description = "\
 Find the average of two numbers.";

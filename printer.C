@@ -25,7 +25,7 @@
 #include "block.h"
 
 template<>
-Librarian<Printer>::Content* Librarian<Printer>::content = NULL;
+BuildBase* Librarian<Printer>::content = NULL;
 
 const char *const Printer::description = "\
 The 'printer' component is responsible for converting the internal\n\

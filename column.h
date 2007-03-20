@@ -128,7 +128,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Column>::Content* Librarian<Column>::content;
+BuildBase* Librarian<Column>::content;
 #endif
 
 static Librarian<Column> Column_init ("column");

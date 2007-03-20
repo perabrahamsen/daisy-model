@@ -55,7 +55,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Program>::Content* Librarian<Program>::content;
+BuildBase* Librarian<Program>::content;
 #endif
 
 static Librarian<Program> Program_init ("program");

@@ -24,7 +24,7 @@
 #include "block.h"
 
 template<>
-Librarian<Action>::Content* Librarian<Action>::content = NULL;
+BuildBase* Librarian<Action>::content = NULL;
 
 const char *const Action::description = "\
 The 'action' component represents management on different abstraction\n\

@@ -23,7 +23,7 @@
 #include "block.h"
 
 template<>
-Librarian<Summary>::Content* Librarian<Summary>::content = NULL;
+BuildBase* Librarian<Summary>::content = NULL;
 
 const char *const Summary::description = "\
 Summary reports for log parameterizations.";

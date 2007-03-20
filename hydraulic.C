@@ -36,7 +36,7 @@
 #include <sstream>
 
 template<>
-Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content = NULL;
+BuildBase* Librarian<Hydraulic>::content = NULL;
 
 const char *const Hydraulic::description = "\
 This component is responsible for specifying the soils hydraulic\n\

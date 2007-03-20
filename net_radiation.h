@@ -54,7 +54,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<NetRadiation>::Content* Librarian<NetRadiation>::content;
+BuildBase* Librarian<NetRadiation>::content;
 #endif
 
 static Librarian<NetRadiation> NetRadiation_init ("net_radiation");

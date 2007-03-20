@@ -72,7 +72,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<UZmodel>::Content* Librarian<UZmodel>::content;
+BuildBase* Librarian<UZmodel>::content;
 #endif
 
 static Librarian<UZmodel> UZmodel_init ("uzmodel");

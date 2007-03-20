@@ -80,7 +80,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content;
+BuildBase* Librarian<Hydraulic>::content;
 #endif
 
 static Librarian<Hydraulic> Hydraulic_init ("hydraulic");

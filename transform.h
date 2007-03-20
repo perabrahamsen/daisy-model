@@ -59,7 +59,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Transform>::Content* Librarian<Transform>::content;
+BuildBase* Librarian<Transform>::content;
 #endif
 
 static Librarian<Transform> Transform_init ("transform");

@@ -52,7 +52,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Depth>::Content* Librarian<Depth>::content;
+BuildBase* Librarian<Depth>::content;
 #endif
 
 static Librarian<Depth> Depth_init ("depth");

@@ -30,7 +30,7 @@
 #include <memory>
 
 template<>
-Librarian<Stringer>::Content* Librarian<Stringer>::content = NULL;
+BuildBase* Librarian<Stringer>::content = NULL;
 
 const char *const Stringer::description = "\
 Generic representation of strings.";

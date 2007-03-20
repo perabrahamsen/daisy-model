@@ -288,7 +288,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Log>::Content* Librarian<Log>::content;
+BuildBase* Librarian<Log>::content;
 #endif
 
 static Librarian<Log> Log_init ("log");

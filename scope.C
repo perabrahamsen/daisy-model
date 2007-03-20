@@ -24,7 +24,7 @@
 #include "assertion.h"
 
 template<>
-Librarian<Scope>::Content* Librarian<Scope>::content = NULL;
+BuildBase* Librarian<Scope>::content = NULL;
 
 const char *const Scope::description = "\
 A scope maps identifiers to values.";

@@ -64,7 +64,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Macro>::Content* Librarian<Macro>::content;
+BuildBase* Librarian<Macro>::content;
 #endif
 
 static Librarian<Macro> Macro_init ("macro");

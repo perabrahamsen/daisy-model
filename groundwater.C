@@ -27,7 +27,7 @@
 #include "assertion.h"
 
 template<>
-Librarian<Groundwater>::Content* Librarian<Groundwater>::content = NULL;
+BuildBase* Librarian<Groundwater>::content = NULL;
 
 const char *const Groundwater::description = "\
 The 'groundwater' component is responsible for specifying the\n\

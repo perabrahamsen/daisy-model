@@ -23,7 +23,7 @@
 #include "block.h"
 
 template<>
-Librarian<Transform>::Content* Librarian<Transform>::content = NULL;
+BuildBase* Librarian<Transform>::content = NULL;
 
 const char *const Transform::description = "\
 Generic transformations between soil components.";

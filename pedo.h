@@ -59,7 +59,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Pedotransfer>::Content* Librarian<Pedotransfer>::content;
+BuildBase* Librarian<Pedotransfer>::content;
 #endif
 
 static Librarian<Pedotransfer> Pedotransfer_init ("pedotransfer");

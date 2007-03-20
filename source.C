@@ -22,7 +22,7 @@
 #include "block.h"
 
 template<>
-Librarian<Source>::Content* Librarian<Source>::content = NULL;
+BuildBase* Librarian<Source>::content = NULL;
 
 const char *const Source::description = "\
 Time series, with possible error bars and formatting information.";

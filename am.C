@@ -38,7 +38,7 @@
 #include <sstream>
 
 template<>
-Librarian<AM>::Content* Librarian<AM>::content = NULL;
+BuildBase* Librarian<AM>::content = NULL;
 
 const char *const AM::description = "\
 The 'am' component describes various kinds of fertilizer and other\n\

@@ -77,7 +77,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Msoltranrect>::Content* Librarian<Msoltranrect>::content;
+BuildBase* Librarian<Msoltranrect>::content;
 #endif
 
 static Librarian<Msoltranrect> Msoltranrect_init ("msoltranrect");

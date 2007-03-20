@@ -23,7 +23,7 @@
 #include "block.h"
 
 template<>
-Librarian<Equilibrium>::Content* Librarian<Equilibrium>::content = NULL;
+BuildBase* Librarian<Equilibrium>::content = NULL;
 
 const char *const Equilibrium::description = "\
 Find equilibrium between two soil chemicals.";

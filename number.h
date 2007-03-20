@@ -58,7 +58,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Number>::Content* Librarian<Number>::content;
+BuildBase* Librarian<Number>::content;
 #endif
 
 static Librarian<Number> Number_init ("number");

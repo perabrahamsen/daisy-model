@@ -51,7 +51,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Difrad>::Content* Librarian<Difrad>::content;
+BuildBase* Librarian<Difrad>::content;
 #endif
 
 static Librarian<Difrad> Difrad_init ("difrad");

@@ -50,7 +50,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Condition>::Content* Librarian<Condition>::content;
+BuildBase* Librarian<Condition>::content;
 #endif
 
 static Librarian<Condition> Condition_init ("condition");

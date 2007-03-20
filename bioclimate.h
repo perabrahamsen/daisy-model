@@ -116,7 +116,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Bioclimate>::Content* Librarian<Bioclimate>::content;
+BuildBase* Librarian<Bioclimate>::content;
 #endif
 
 static Librarian<Bioclimate> Bioclimate_init ("bioclimate");

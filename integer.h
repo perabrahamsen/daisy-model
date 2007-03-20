@@ -53,7 +53,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Integer>::Content* Librarian<Integer>::content;
+BuildBase* Librarian<Integer>::content;
 #endif
 
 static Librarian<Integer> Integer_init ("integer");

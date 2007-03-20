@@ -60,7 +60,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<XYSource>::Content* Librarian<XYSource>::content;
+BuildBase* Librarian<XYSource>::content;
 #endif
 
 static Librarian<XYSource> XYSource_init ("xysource");

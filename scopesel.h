@@ -47,7 +47,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Scopesel>::Content* Librarian<Scopesel>::content;
+BuildBase* Librarian<Scopesel>::content;
 #endif
 
 static Librarian<Scopesel> Scopesel_init ("scopesel");

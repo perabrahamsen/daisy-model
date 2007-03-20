@@ -111,7 +111,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<AM>::Content* Librarian<AM>::content;
+BuildBase* Librarian<AM>::content;
 #endif
 
 static Librarian<AM> AM_init ("am");

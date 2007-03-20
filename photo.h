@@ -61,7 +61,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Photo>::Content* Librarian<Photo>::content;
+BuildBase* Librarian<Photo>::content;
 #endif
 
 static Librarian<Photo> Photo_init ("photosynthesis");

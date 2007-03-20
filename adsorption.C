@@ -24,7 +24,7 @@
 #include "block.h"
 
 template<>
-Librarian<Adsorption>::Content* Librarian<Adsorption>::content = NULL;
+BuildBase* Librarian<Adsorption>::content = NULL;
 
 const char *const Adsorption::description = "\
 This component describes the adsorption of a chemical to the soil,\n\

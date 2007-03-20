@@ -55,7 +55,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Gnuplot>::Content* Librarian<Gnuplot>::content;
+BuildBase* Librarian<Gnuplot>::content;
 #endif
 
 static Librarian<Gnuplot> Gnuplot_init ("gnuplot");

@@ -23,7 +23,7 @@
 #include "block.h"
 
 template<>
-Librarian<Format>::Content* Librarian<Format>::content = NULL;
+BuildBase* Librarian<Format>::content = NULL;
 
 const char *const Format::description = "\
 Text formatting component.";

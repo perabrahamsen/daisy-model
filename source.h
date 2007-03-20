@@ -61,7 +61,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Source>::Content* Librarian<Source>::content;
+BuildBase* Librarian<Source>::content;
 #endif
 
 static Librarian<Source> Source_init ("source");

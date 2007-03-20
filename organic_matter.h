@@ -100,7 +100,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<OrganicMatter>::Content* Librarian<OrganicMatter>::content;
+BuildBase* Librarian<OrganicMatter>::content;
 #endif
 
 static Librarian<OrganicMatter> Organic_init ("organic");

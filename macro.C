@@ -24,7 +24,7 @@
 #include "block.h"
 
 template<>
-Librarian<Macro>::Content* Librarian<Macro>::content = NULL;
+BuildBase* Librarian<Macro>::content = NULL;
 
 const char *const Macro::description = "\
 Preferention flow in soil macro pores.";

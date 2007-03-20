@@ -48,7 +48,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<ABAEffect>::Content* Librarian<ABAEffect>::content;
+BuildBase* Librarian<ABAEffect>::content;
 #endif
 
 static Librarian<ABAEffect> ABAEffect_init ("ABAeffect");

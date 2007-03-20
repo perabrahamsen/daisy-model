@@ -72,7 +72,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Raddist>::Content* Librarian<Raddist>::content;
+BuildBase* Librarian<Raddist>::content;
 #endif
 
 static Librarian<Raddist> Raddist_init ("raddist");

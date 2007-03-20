@@ -63,7 +63,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Phenology>::Content* Librarian<Phenology>::content;
+BuildBase* Librarian<Phenology>::content;
 #endif
 
 static Librarian<Phenology> Phenology_init ("phenology");

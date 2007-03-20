@@ -58,7 +58,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Action>::Content* Librarian<Action>::content;
+BuildBase* Librarian<Action>::content;
 #endif
 
 static Librarian<Action> Action_init ("action");

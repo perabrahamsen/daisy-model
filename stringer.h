@@ -52,7 +52,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Stringer>::Content* Librarian<Stringer>::content;
+BuildBase* Librarian<Stringer>::content;
 #endif
 
 static Librarian<Stringer> Stringer_init ("string");

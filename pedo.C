@@ -30,7 +30,7 @@
 using namespace std;
 
 template<>
-Librarian<Pedotransfer>::Content* Librarian<Pedotransfer>::content = NULL;
+BuildBase* Librarian<Pedotransfer>::content = NULL;
 
 const char *const Pedotransfer::description = "\
 Pedotransfer functions based on soil attributes.";

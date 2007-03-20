@@ -145,7 +145,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Crop>::Content* Librarian<Crop>::content;
+BuildBase* Librarian<Crop>::content;
 #endif
 
 static Librarian<Crop> Crop_init ("crop");

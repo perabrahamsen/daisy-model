@@ -63,7 +63,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<UZRect>::Content* Librarian<UZRect>::content;
+BuildBase* Librarian<UZRect>::content;
 #endif
 
 static Librarian<UZRect> UZRect_init ("uzrect");

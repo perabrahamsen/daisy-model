@@ -24,7 +24,7 @@
 #include "alist.h"
 
 template<>
-Librarian<Chemical>::Content* Librarian<Chemical>::content = NULL;
+BuildBase* Librarian<Chemical>::content = NULL;
 
 const char *const Chemical::description = "\
 This component should, for a specific chemical (typically a pesticide),\n\

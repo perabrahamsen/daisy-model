@@ -22,7 +22,7 @@
 #include "block.h"
 
 template<>
-Librarian<UZRect>::Content* Librarian<UZRect>::content = NULL;
+BuildBase* Librarian<UZRect>::content = NULL;
 
 const char *const UZRect::description = "\
 2D water movement in a rectangular grid.";

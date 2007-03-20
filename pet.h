@@ -68,7 +68,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Pet>::Content* Librarian<Pet>::content;
+BuildBase* Librarian<Pet>::content;
 #endif
 
 static Librarian<Pet> Pet_init ("pet");

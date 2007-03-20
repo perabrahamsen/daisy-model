@@ -35,7 +35,7 @@
 // depth component.
 
 template<>
-Librarian<Depth>::Content* Librarian<Depth>::content = NULL;
+BuildBase* Librarian<Depth>::content = NULL;
 
 const char *const Depth::description = "\
 Find the depth of two numbers.";

@@ -23,7 +23,7 @@
 #include "block.h"
 
 template<>
-Librarian<Domsorp>::Content* Librarian<Domsorp>::content = NULL;
+BuildBase* Librarian<Domsorp>::content = NULL;
 
 const char *const Domsorp::description = "\
 Sorption and desorption of DOM to SOM.";

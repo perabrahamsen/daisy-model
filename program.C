@@ -23,7 +23,7 @@
 #include "block.h"
 
 template<>
-Librarian<Program>::Content* Librarian<Program>::content = NULL;
+BuildBase* Librarian<Program>::content = NULL;
 
 const char *const Program::description = "\
 Run a program.";

@@ -28,7 +28,7 @@
 #include <vector>
 
 template<>
-Librarian<Boolean>::Content* Librarian<Boolean>::content = NULL;
+BuildBase* Librarian<Boolean>::content = NULL;
 
 const char *const Boolean::description = "\
 Generic representation of booleans.";

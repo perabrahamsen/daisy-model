@@ -23,7 +23,7 @@
 #include "block.h"
 
 template<>
-Librarian<Number>::Content* Librarian<Number>::content = NULL;
+BuildBase* Librarian<Number>::content = NULL;
 
 const char *const Number::description = "\
 Generic representation of numbers.";

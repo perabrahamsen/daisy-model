@@ -50,7 +50,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Adsorption>::Content* Librarian<Adsorption>::content;
+BuildBase* Librarian<Adsorption>::content;
 #endif
 
 static Librarian<Adsorption> Adsorption_init ("adsorption");

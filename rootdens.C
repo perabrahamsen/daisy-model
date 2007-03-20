@@ -27,7 +27,7 @@
 #include "check.h"
 
 template<>
-Librarian<Rootdens>::Content* Librarian<Rootdens>::content = NULL;
+BuildBase* Librarian<Rootdens>::content = NULL;
 
 const char *const Rootdens::description = "\
 Root density calculations.";

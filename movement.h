@@ -95,7 +95,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Movement>::Content* Librarian<Movement>::content;
+BuildBase* Librarian<Movement>::content;
 #endif
 
 static Librarian<Movement> Movement_init ("movement");

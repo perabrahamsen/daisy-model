@@ -23,7 +23,7 @@
 #include "block.h"
 
 template<>
-Librarian<Difrad>::Content* Librarian<Difrad>::content = NULL;
+BuildBase* Librarian<Difrad>::content = NULL;
 
 const char *const Difrad::description = "\
 The 'difrad' component should calculate the diffuse radiation from\n\

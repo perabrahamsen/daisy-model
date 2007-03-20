@@ -55,7 +55,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Bound>::Content* Librarian<Bound>::content;
+BuildBase* Librarian<Bound>::content;
 #endif
 
 static Librarian<Bound> Bound_init ("bound");

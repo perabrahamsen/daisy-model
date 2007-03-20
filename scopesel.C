@@ -27,7 +27,7 @@
 #include "alist.h"
 
 template<>
-Librarian<Scopesel>::Content* Librarian<Scopesel>::content = NULL;
+BuildBase* Librarian<Scopesel>::content = NULL;
 
 const char *const Scopesel::description = "\
 A method to choose a scope in a Daisy simulation.";

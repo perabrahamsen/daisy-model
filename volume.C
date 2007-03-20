@@ -22,7 +22,7 @@
 #include "block.h"
 
 template<>
-Librarian<Volume>::Content* Librarian<Volume>::content = NULL;
+BuildBase* Librarian<Volume>::content = NULL;
 
 const char *const Volume::description = "\
 A subset of 3D space.";

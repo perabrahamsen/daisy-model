@@ -153,7 +153,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
   template<>
-Librarian<Weather>::Content* Librarian<Weather>::content;
+BuildBase* Librarian<Weather>::content;
 #endif
 
 static Librarian<Weather> Weather_init ("weather");

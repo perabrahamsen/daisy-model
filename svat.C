@@ -25,7 +25,7 @@
 #include "block.h"
 
 template<>
-Librarian<SVAT>::Content* Librarian<SVAT>::content = NULL;
+BuildBase* Librarian<SVAT>::content = NULL;
 
 const char *const SVAT::description = "\
 The task of the 'svat' component is to calculate the production\n\

@@ -57,7 +57,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Equilibrium>::Content* Librarian<Equilibrium>::content;
+BuildBase* Librarian<Equilibrium>::content;
 #endif
 
 static Librarian<Equilibrium> Equilibrium_init ("equilibrium");

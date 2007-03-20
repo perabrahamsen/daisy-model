@@ -28,7 +28,7 @@
 using namespace std;
 
 template<>
-Librarian<Bioclimate>::Content* Librarian<Bioclimate>::content = NULL;
+BuildBase* Librarian<Bioclimate>::content = NULL;
 
 const char *const Bioclimate::description = "\
 The 'bioclimate' component is responsible for distributing the water\n\

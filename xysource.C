@@ -22,7 +22,7 @@
 #include "block.h"
 
 template<>
-Librarian<XYSource>::Content* Librarian<XYSource>::content = NULL;
+BuildBase* Librarian<XYSource>::content = NULL;
 
 const char *const XYSource::description = "\
 XY data series.";

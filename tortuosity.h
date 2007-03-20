@@ -47,7 +47,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Tortuosity>::Content* Librarian<Tortuosity>::content;
+BuildBase* Librarian<Tortuosity>::content;
 #endif
 
 static Librarian<Tortuosity> Tortuosity_init ("tortuosity");

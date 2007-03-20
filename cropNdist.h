@@ -55,7 +55,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<CropNdist>::Content* Librarian<CropNdist>::content;
+BuildBase* Librarian<CropNdist>::content;
 #endif
 
 static Librarian<CropNdist> CropNdist_init ("cropNdist");

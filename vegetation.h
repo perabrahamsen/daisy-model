@@ -142,7 +142,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Vegetation>::Content* Librarian<Vegetation>::content;
+BuildBase* Librarian<Vegetation>::content;
 #endif
 
 static Librarian<Vegetation> Vegetation_init ("vegetation");

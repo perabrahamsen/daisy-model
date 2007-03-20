@@ -28,7 +28,7 @@
 // bound component.
 
 template<>
-Librarian<Bound>::Content* Librarian<Bound>::content = NULL;
+BuildBase* Librarian<Bound>::content = NULL;
 
 const char *const Bound::description = "\
 Specify one end of an interval boundary.";

@@ -45,7 +45,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<WSE>::Content* Librarian<WSE>::content;
+BuildBase* Librarian<WSE>::content;
 #endif
 
 static Librarian<WSE> WSE_init ("wse");

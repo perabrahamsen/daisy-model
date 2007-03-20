@@ -57,7 +57,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Domsorp>::Content* Librarian<Domsorp>::content;
+BuildBase* Librarian<Domsorp>::content;
 #endif
 
 static Librarian<Domsorp> Domsorp_init ("domsorp");

@@ -80,7 +80,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Scope>::Content* Librarian<Scope>::content;
+BuildBase* Librarian<Scope>::content;
 #endif
 
 static Librarian<Scope> Scope_init ("scope");

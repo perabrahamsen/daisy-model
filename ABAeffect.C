@@ -24,7 +24,7 @@
 #include "block.h"
 
 template<>
-Librarian<ABAEffect>::Content* Librarian<ABAEffect>::content = NULL;
+BuildBase* Librarian<ABAEffect>::content = NULL;
 
 const char *const ABAEffect::description = "\
 The 'ABAeffect' component calculates the effect of ABA on photosynthesis.";

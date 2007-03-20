@@ -47,7 +47,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Average>::Content* Librarian<Average>::content;
+BuildBase* Librarian<Average>::content;
 #endif
 
 static Librarian<Average> Average_init ("average");

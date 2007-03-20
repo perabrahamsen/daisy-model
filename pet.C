@@ -30,7 +30,7 @@
 using namespace std;
 
 template<>
-Librarian<Pet>::Content* Librarian<Pet>::content = NULL;
+BuildBase* Librarian<Pet>::content = NULL;
 
 const char *const Pet::description = "\
 The 'pet' component should calculate the potential evapotranspiration\n\

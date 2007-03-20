@@ -24,7 +24,7 @@
 #include "block.h"
 
 template<>
-Librarian<Parser>::Content* Librarian<Parser>::content = NULL;
+BuildBase* Librarian<Parser>::content = NULL;
 
 const char *const Parser::description = "\
 To start the simulation, many parameters must be specified and state\n\

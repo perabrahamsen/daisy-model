@@ -48,7 +48,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Summary>::Content* Librarian<Summary>::content;
+BuildBase* Librarian<Summary>::content;
 #endif
 
 static Librarian<Summary> Summary_init ("summary");

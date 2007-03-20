@@ -97,7 +97,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Horizon>::Content* Librarian<Horizon>::content;
+BuildBase* Librarian<Horizon>::content;
 #endif
 
 static Librarian<Horizon> Horizon_init ("horizon");

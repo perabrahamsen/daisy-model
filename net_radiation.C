@@ -28,7 +28,7 @@
 #include "mathlib.h"
 
 template<>
-Librarian<NetRadiation>::Content* Librarian<NetRadiation>::content = NULL;
+BuildBase* Librarian<NetRadiation>::content = NULL;
 
 const char *const NetRadiation::description = "\
 The purpose of this component is to calculate the net radiation from\n\

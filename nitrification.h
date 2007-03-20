@@ -64,7 +64,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Nitrification>::Content* Librarian<Nitrification>::content;
+BuildBase* Librarian<Nitrification>::content;
 #endif
 
 static Librarian<Nitrification> Nitrification_init ("nitrification");

@@ -66,7 +66,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Volume>::Content* Librarian<Volume>::content;
+BuildBase* Librarian<Volume>::content;
 #endif
 
 static Librarian<Volume> Volume_init ("volume");

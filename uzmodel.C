@@ -31,7 +31,7 @@ UZmodel::~UZmodel ()
 { }
 
 template<>
-Librarian<UZmodel>::Content* Librarian<UZmodel>::content = NULL;
+BuildBase* Librarian<UZmodel>::content = NULL;
 
 const char *const UZmodel::description = "\
 The 'uzmodel' component handles the vertical water movement in the\n\

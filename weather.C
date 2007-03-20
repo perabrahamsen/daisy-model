@@ -31,7 +31,7 @@
 using namespace std;
 
 template<>
-Librarian<Weather>::Content* Librarian<Weather>::content = NULL;
+BuildBase* Librarian<Weather>::content = NULL;
 
 const char *const Weather::description = "\
 Meteorological data, as well as the global positioning, are the\n\

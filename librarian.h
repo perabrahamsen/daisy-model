@@ -43,15 +43,15 @@ struct BuildBase
                               AttributeList& al, symbol super);
   typedef Model& (*builder) (Block&);
   typedef std::map<symbol, builder> bmap_type;
+  bmap_type builders;
 
   // Content.
   std::auto_ptr<Library> lib;
   int count;
-  bmap_type builders;
 
 
   // Build.
-  virtual Model* build_raw (symbol type, Block&) const = 0;
+  Model* build_raw (const symbol type, Block& block) const;
   Model* build_free (Treelog& msg, const AttributeList& alist, 
                     const std::string& scope_id) const;
   Model* build_cheat (const AttributeList& parent, 
@@ -69,11 +69,9 @@ struct BuildBase
                  const Syntax& syntax) const;
 
   // Create and destroy.
-protected:
   BuildBase (const char *const name, derive_fun derive, 
 	     const char *const description);
-public:
-  virtual ~BuildBase ();
+  ~BuildBase ();
 };
 
 template <class T>
@@ -84,18 +82,7 @@ class Librarian
 
   // Content.
 private:
-  static struct Content : BuildBase
-  {
-    Model* build_raw (const symbol type, Block& block) const
-    { 
-      daisy_assert (builders.find (type) != builders.end ());
-      return &(content->builders)[type] (block);
-    }
-    Content (const char *const name, BuildBase::derive_fun derive, 
-	     const char *const description)
-      : BuildBase (name, derive, description)
-    { }
-  } *content;
+  static BuildBase *content;
 
   // Functions.
 public:
@@ -172,7 +159,7 @@ public:
   Librarian (const char *const name)
   { 
     if (!content)
-      content = new Content (name, &derive_type, T::description);
+      content = new BuildBase (name, &derive_type, T::description);
     content->count++;
 
   }

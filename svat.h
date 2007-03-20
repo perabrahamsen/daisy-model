@@ -61,7 +61,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<SVAT>::Content* Librarian<SVAT>::content;
+BuildBase* Librarian<SVAT>::content;
 #endif
 
 static Librarian<SVAT> SVAT_init ("svat");

@@ -33,7 +33,7 @@
 #include "mathlib.h"
 
 template<>
-Librarian<Nitrification>::Content* Librarian<Nitrification>::content = NULL;
+BuildBase* Librarian<Nitrification>::content = NULL;
 
 const char *const Nitrification::description = "\
 The nitrification process, transforming ammonium into nitrate and\n\

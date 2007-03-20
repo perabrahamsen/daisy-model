@@ -56,7 +56,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Chemical>::Content* Librarian<Chemical>::content;
+BuildBase* Librarian<Chemical>::content;
 #endif
 
 static Librarian<Chemical> Chemical_init ("chemical");

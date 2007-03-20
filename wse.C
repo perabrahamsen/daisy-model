@@ -29,7 +29,7 @@
 #include <memory>
 
 template<>
-Librarian<WSE>::Content* Librarian<WSE>::content = NULL;
+BuildBase* Librarian<WSE>::content = NULL;
 
 const char *const WSE::description = "\
 The water stress effect on crop growth.";

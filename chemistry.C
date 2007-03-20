@@ -23,7 +23,7 @@
 #include "block.h"
 
 template<>
-Librarian<Chemistry>::Content* Librarian<Chemistry>::content = NULL;
+BuildBase* Librarian<Chemistry>::content = NULL;
 
 const char *const Chemistry::description = "\
 Generic transformations between soil chemicals.";

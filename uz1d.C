@@ -156,7 +156,7 @@ SMM1D::SMM1D (const GeometryRect& geo_, const Soil& soil_,
 }
 
 template<>
-Librarian<UZ1D>::Content* Librarian<UZ1D>::content = NULL;
+BuildBase* Librarian<UZ1D>::content = NULL;
 
 const char *const UZ1D::description = "\
 The 'uz1d' component handles the horizontal water movement in the\n\

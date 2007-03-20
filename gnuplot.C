@@ -23,7 +23,7 @@
 #include "block.h"
 
 template<>
-Librarian<Gnuplot>::Content* Librarian<Gnuplot>::content = NULL;
+BuildBase* Librarian<Gnuplot>::content = NULL;
 
 const char *const Gnuplot::description = "\
 Plot a graph with gnuplot.";

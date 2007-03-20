@@ -52,7 +52,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Boolean>::Content* Librarian<Boolean>::content;
+BuildBase* Librarian<Boolean>::content;
 #endif
 
 static Librarian<Boolean> Boolean_init ("boolean");

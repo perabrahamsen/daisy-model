@@ -26,7 +26,7 @@
 #include "alist.h"
 
 template<>
-Librarian<Phenology>::Content* Librarian<Phenology>::content = NULL;
+BuildBase* Librarian<Phenology>::content = NULL;
 
 const char *const Phenology::description = "\
 The development process.";

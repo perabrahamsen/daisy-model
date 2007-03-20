@@ -27,7 +27,7 @@
 #include <map>
 
 template<>
-Librarian<Column>::Content* Librarian<Column>::content = NULL;
+BuildBase* Librarian<Column>::content = NULL;
 
 const char *const Column::description = "\
 A 'column' is an one-dimensional vertical description of the\n\

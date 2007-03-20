@@ -22,7 +22,7 @@
 #include "block.h"
 
 template<>
-Librarian<OrganicMatter>::Content* Librarian<OrganicMatter>::content = NULL;
+BuildBase* Librarian<OrganicMatter>::content = NULL;
 
 const char *const OrganicMatter::description = "\
 Turnover of organic matter in the soil.";

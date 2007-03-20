@@ -160,7 +160,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Select>::Content* Librarian<Select>::content;
+BuildBase* Librarian<Select>::content;
 #endif
 
 static Librarian<Select> Select_init ("select");

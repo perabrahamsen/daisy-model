@@ -9,7 +9,7 @@
 const double Crop::DSremove = -5001.0;
 
 template<>
-Librarian<Crop>::Content* Librarian<Crop>::content = NULL;
+BuildBase* Librarian<Crop>::content = NULL;
 
 const char *const Crop::description = "\
 The 'crop' component simulates a specific crop on the field, typically\n\

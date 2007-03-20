@@ -52,7 +52,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Parser>::Content* Librarian<Parser>::content;
+BuildBase* Librarian<Parser>::content;
 #endif
 
 static Librarian<Parser> Parser_init ("parser");

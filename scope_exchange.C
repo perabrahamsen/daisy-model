@@ -57,13 +57,13 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Exchange>::Content* Librarian<Exchange>::content;
+BuildBase* Librarian<Exchange>::content;
 #endif
 
 static Librarian<Exchange> Exchange_init ("exchange");
 
 template<>
-Librarian<Exchange>::Content* Librarian<Exchange>::content = NULL;
+BuildBase* Librarian<Exchange>::content = NULL;
 
 const char *const 
 Exchange::description = "\

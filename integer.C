@@ -28,7 +28,7 @@
 #include <sstream>
 
 template<>
-Librarian<Integer>::Content* Librarian<Integer>::content = NULL;
+BuildBase* Librarian<Integer>::content = NULL;
 
 const char *const Integer::description = "\
 Generic representation of integers.";

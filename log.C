@@ -29,7 +29,7 @@
 using namespace std;
 
 template<>
-Librarian<Log>::Content* Librarian<Log>::content = NULL;
+BuildBase* Librarian<Log>::content = NULL;
 
 const char *const Log::description = "\
 Running a simulation is uninteresting, unless you can get access to\n\

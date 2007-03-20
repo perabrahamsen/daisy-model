@@ -24,7 +24,7 @@
 #include "mathlib.h"
 
 template<>
-Librarian<CropNdist>::Content* Librarian<CropNdist>::content = NULL;
+BuildBase* Librarian<CropNdist>::content = NULL;
 
 const char *const CropNdist::description = "\
 The 'cropNdist' component calculates the crop N distribution for photosynthesis in the canopy.";

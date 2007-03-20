@@ -24,7 +24,7 @@
 #include "block.h"
 
 template<>
-Librarian<Tortuosity>::Content* Librarian<Tortuosity>::content = NULL;
+BuildBase* Librarian<Tortuosity>::content = NULL;
 
 const char *const Tortuosity::description = "\
 Solutes in the soil can't move the shortest way between two points.\n\

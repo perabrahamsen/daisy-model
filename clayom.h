@@ -57,7 +57,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<ClayOM>::Content* Librarian<ClayOM>::content;
+BuildBase* Librarian<ClayOM>::content;
 #endif
 
 static Librarian<ClayOM> ClayOM_init ("ClayOM");

@@ -57,7 +57,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Rootdens>::Content* Librarian<Rootdens>::content;
+BuildBase* Librarian<Rootdens>::content;
 #endif
 
 static Librarian<Rootdens> Rootdens_init ("rootdens");

@@ -60,7 +60,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Printer>::Content* Librarian<Printer>::content;
+BuildBase* Librarian<Printer>::content;
 #endif
 
 static Librarian<Printer> Printer_init ("printer");

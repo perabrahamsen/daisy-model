@@ -27,6 +27,14 @@
 #include <sstream>
 
 Model* 
+BuildBase::build_raw (const symbol type, Block& block) const
+{ 
+  const bmap_type::const_iterator i = builders.find (type);
+  daisy_assert (i != builders.end ());
+  return &(*i).second (block);
+}
+
+Model* 
 BuildBase::build_free (Treelog& msg, const AttributeList& alist, 
                        const std::string& scope_id) const
 {

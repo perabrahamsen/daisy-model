@@ -23,7 +23,7 @@
 #include "block.h"
 
 template<>
-Librarian<Movement>::Content* Librarian<Movement>::content = NULL;
+BuildBase* Librarian<Movement>::content = NULL;
 
 const char *const Movement::description = "\
 This component handles the movement in the soil.";

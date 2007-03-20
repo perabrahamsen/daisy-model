@@ -78,7 +78,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Groundwater>::Content* Librarian<Groundwater>::content;
+BuildBase* Librarian<Groundwater>::content;
 #endif
 
 static Librarian<Groundwater> Groundwater_init ("groundwater");

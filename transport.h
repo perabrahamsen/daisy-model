@@ -61,7 +61,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Transport>::Content* Librarian<Transport>::content;
+BuildBase* Librarian<Transport>::content;
 #endif
 
 static Librarian<Transport> Transport_init ("transport");

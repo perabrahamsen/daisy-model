@@ -128,7 +128,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<UZ1D>::Content* Librarian<UZ1D>::content;
+BuildBase* Librarian<UZ1D>::content;
 #endif
 
 static Librarian<UZ1D> UZ1D_init ("uz1d");

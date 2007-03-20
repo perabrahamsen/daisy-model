@@ -57,7 +57,7 @@ public:
 
 #ifdef FORWARD_TEMPLATES
 template<>
-Librarian<Mactrans>::Content* Librarian<Mactrans>::content;
+BuildBase* Librarian<Mactrans>::content;
 #endif
 
 static Librarian<Mactrans> Mactrans_init ("mactrans");
