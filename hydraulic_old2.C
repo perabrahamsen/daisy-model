@@ -58,7 +58,7 @@ public:
   // Create and Destroy.
 private:
   friend class HydraulicOld2Syntax;
-  static Hydraulic& make (Block& al);
+  static Model& make (Block& al);
   HydraulicOld2 (Block&);
 public:
   virtual ~HydraulicOld2 ();
@@ -162,8 +162,7 @@ HydraulicOld2::~HydraulicOld2 ()
 
 // Add the HydraulicOld2 syntax to the syntax table.
 
-Hydraulic&
-HydraulicOld2::make (Block& al)
+Model& make (Block& al)
 {
   return *new HydraulicOld2 (al);
 }

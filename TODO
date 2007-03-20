@@ -1,13 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Groundwater external
-
-Skal konvertere (og checke) dim.
-
-Kan evt. tage en expression, som gør det automatisk.
-
-
-
 * OpenMI
 
 ** Parameterizationer skal være en Toplevel attribut!
@@ -17,6 +9,22 @@ Factory<T>, Industry
 Build in (shared) vs loaded (per toplevel)
 
 Shared base class?
+
+---
+
+Model, base class for all models.
+
+Component:  Collection of models  <T>?
+
+Parlib:  Collection of components
+
+Parlib ::built_in:  Build in models & parameterizations 
+
+Parlib Toplevel::parlib Parameterizations in this toplevel
+
+---
+
+Før: 80,1 MiB
 
 ** Installer C# på x40
 

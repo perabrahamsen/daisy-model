@@ -26,7 +26,7 @@
 
 class Scope;
 
-class Boolean
+class Boolean : public Model
 {
   // Content.
 public:
@@ -47,7 +47,7 @@ public:
 protected:
   explicit Boolean (Block&);
 public:
-  virtual ~Boolean ();
+  ~Boolean ();
 };
 
 #ifdef FORWARD_TEMPLATES

@@ -27,7 +27,7 @@
 
 class Weather;
 
-class NetRadiation
+class NetRadiation : public Model
 {
   // Content.
 public:
@@ -49,7 +49,7 @@ public:
 protected:
   NetRadiation (Block&);
 public:
-  virtual ~NetRadiation ();
+  ~NetRadiation ();
 };
 
 #ifdef FORWARD_TEMPLATES

@@ -707,7 +707,7 @@ VegetationCrops::~VegetationCrops ()
 static struct
 VegetationCropsSyntax
 {
-  static Vegetation& make (Block& al)
+  static Model& make (Block& al)
   { return *new VegetationCrops (al); }
 
   VegetationCropsSyntax ()

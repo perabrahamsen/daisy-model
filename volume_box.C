@@ -298,7 +298,7 @@ VolumeBox::load_syntax (Syntax& syntax, AttributeList& alist)
 
 static struct Volume_BoxSyntax
 {
-  static Volume& make (Block& al)
+  static Model& make (Block& al)
   { return *new VolumeBox (al); }
   Volume_BoxSyntax ()
   {

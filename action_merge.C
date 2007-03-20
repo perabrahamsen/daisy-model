@@ -45,7 +45,7 @@ struct ActionMerge : public Action
 
 static struct ActionMergeSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
     { return *new ActionMerge (al); }
   ActionMergeSyntax ()
     { 

@@ -78,7 +78,7 @@ struct BooleanExtern : public Boolean
 
 static struct BooleanExternSyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanExtern (al); }
   BooleanExternSyntax ()
   {

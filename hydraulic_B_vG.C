@@ -49,11 +49,8 @@ private:
   double Se (double h) const;
   
   // Create and Destroy.
-private:
-  friend class HydraulicB_vGSyntax;
-  static Hydraulic& make (Block& al);
-  HydraulicB_vG (Block&);
 public:
+  HydraulicB_vG (Block&);
   ~HydraulicB_vG ();
 };
 
@@ -127,14 +124,11 @@ HydraulicB_vG::~HydraulicB_vG ()
 
 // Add the HydraulicB_vG syntax to the syntax table.
 
-Hydraulic&
-HydraulicB_vG::make (Block& al)
-{
-  return *new HydraulicB_vG (al);
-}
-
 static struct HydraulicB_vGSyntax
 {
+  static Model& make (Block& al) 
+  { return *new HydraulicB_vG (al); }
+
   HydraulicB_vGSyntax ();
 } hydraulicB_vG_syntax;
 
@@ -154,5 +148,5 @@ HydraulicB_vGSyntax::HydraulicB_vGSyntax ()
 	      "tortuosity parameter.");
   alist.add ("l", 2.0);
 
-  Librarian<Hydraulic>::add_type ("B_vG", alist, syntax, &HydraulicB_vG::make);
+  Librarian<Hydraulic>::add_type ("B_vG", alist, syntax, make);
 }

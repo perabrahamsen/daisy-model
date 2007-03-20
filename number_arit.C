@@ -77,7 +77,7 @@ struct NumberLog10 : public NumberOperand
 
 static struct NumberLog10Syntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberLog10 (al); }
   NumberLog10Syntax ()
   {
@@ -111,7 +111,7 @@ struct NumberLn : public NumberOperand
 
 static struct NumberLnSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberLn (al); }
   NumberLnSyntax ()
   {
@@ -145,7 +145,7 @@ struct NumberSqrt : public NumberOperand
 
 static struct NumberSqrtSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSqrt (al); }
   NumberSqrtSyntax ()
   {
@@ -178,7 +178,7 @@ struct NumberSqr : public NumberOperand
 
 static struct NumberSqrSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSqr (al); }
   NumberSqrSyntax ()
   {
@@ -248,7 +248,7 @@ struct NumberPow : public Number
 
 static struct NumberPowSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberPow (al); }
   NumberPowSyntax ()
   {
@@ -407,7 +407,7 @@ struct NumberMax : public NumberOperands
 
 static struct NumberMaxSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberMax (al); }
   NumberMaxSyntax ()
   {
@@ -455,7 +455,7 @@ struct NumberMin : public NumberOperands
 
 static struct NumberMinSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberMin (al); }
   NumberMinSyntax ()
   {
@@ -500,7 +500,7 @@ struct NumberProduct : public NumberOperands
 
 static struct NumberProductSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberProduct (al); }
   NumberProductSyntax ()
   {
@@ -538,7 +538,7 @@ struct NumberSum : public NumberOperands
 
 static struct NumberSumSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSum (al); }
   NumberSumSyntax ()
   {
@@ -582,7 +582,7 @@ struct NumberSubtract : public NumberOperands
 
 static struct NumberSubtractSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSubtract (al); }
   NumberSubtractSyntax ()
   {
@@ -628,7 +628,7 @@ struct NumberDivide : public NumberOperands
 
 static struct NumberDivideSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberDivide (al); }
   NumberDivideSyntax ()
   {

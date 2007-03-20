@@ -27,7 +27,7 @@
 class Time;
 class Treelog;
 
-class Depth
+class Depth : public Model
 {
   // Content.
 public:
@@ -47,7 +47,7 @@ protected:
   Depth (symbol name);
   Depth (Block& al);
 public:
-  virtual ~Depth ();
+  ~Depth ();
 };
 
 #ifdef FORWARD_TEMPLATES

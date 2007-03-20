@@ -87,7 +87,7 @@ struct ActionActivity : public Action
 
 static struct ActionActivitySyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionActivity (al); }
 
   ActionActivitySyntax ()

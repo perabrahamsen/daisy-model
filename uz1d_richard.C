@@ -329,7 +329,7 @@ UZ1D::default_model ()
 
 static struct UZ1DRichardSyntax
 {
-  static UZ1D& make (Block& al)
+  static Model& make (Block& al)
   { return *new UZ1DRichard (al); }
   UZ1DRichardSyntax ()
   {

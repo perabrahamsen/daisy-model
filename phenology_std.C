@@ -127,8 +127,7 @@ PhenologyStandard::PhenologyStandard (Block& al)
 
 static struct PhenologyStandardSyntax
 {
-  static Phenology&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new PhenologyStandard (al); }
 
   PhenologyStandardSyntax ()

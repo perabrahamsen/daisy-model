@@ -181,7 +181,7 @@ WeatherHourly::tick (const Time& time, Treelog& out)
 
 static struct WeatherHourlySyntax
 {
-  static Weather& make (Block& al)
+  static Model& make (Block& al)
     { return *new WeatherHourly (al); }
 
   WeatherHourlySyntax ()

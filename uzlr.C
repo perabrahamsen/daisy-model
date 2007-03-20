@@ -389,7 +389,7 @@ UZmodel::reserve_model ()
 
 static struct UZlrSyntax
 {
-  static UZmodel& make (Block& al)
+  static Model& make (Block& al)
   { return *new UZlr (al); }
 
   UZlrSyntax ()

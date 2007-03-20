@@ -26,7 +26,7 @@
 #include <iosfwd>
 #include <stack>
 
-class Format
+class Format : public Model
 {
   // Content.
 public:
@@ -215,7 +215,7 @@ public:
 protected:
   Format (Block& al);
 public:
-  virtual ~Format ();
+  ~Format ();
 };
 
 #ifdef FORWARD_TEMPLATES

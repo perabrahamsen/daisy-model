@@ -82,7 +82,7 @@ struct ActionWhile : public Action
 
 static struct ActionWhileSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionWhile (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

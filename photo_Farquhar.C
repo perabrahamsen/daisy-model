@@ -597,8 +597,7 @@ PhotoFarquhar::output(Log& log) const
 
 static struct Photo_FarquharSyntax
 {
-  static Photo&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new PhotoFarquhar (al); }
   Photo_FarquharSyntax ()
   {

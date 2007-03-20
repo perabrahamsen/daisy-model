@@ -109,13 +109,13 @@ struct ActionError : public Action
 
 static struct ActionMessageSyntax
 {
-  static Action& make_assert (Block& al)
+  static Model& make_assert (Block& al)
   { return *new ActionAssert (al); }
-  static Action& make_message (Block& al)
+  static Model& make_message (Block& al)
   { return *new ActionMessage (al); }
-  static Action& make_warning (Block& al)
+  static Model& make_warning (Block& al)
   { return *new ActionWarning (al); }
-  static Action& make_error (Block& al)
+  static Model& make_error (Block& al)
   { return *new ActionError (al); }
 
   ActionMessageSyntax ()

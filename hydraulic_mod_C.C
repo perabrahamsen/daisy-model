@@ -45,11 +45,8 @@ private:
   double Sr (double h) const;
   
   // Create and Destroy.
-private:
-  friend class Hydraulic_mod_CSyntax;
-  static Hydraulic& make (Block& al);
-  Hydraulic_mod_C (Block&);
 public:
+  Hydraulic_mod_C (Block&);
   ~Hydraulic_mod_C ();
 };
 
@@ -124,14 +121,11 @@ Hydraulic_mod_C::~Hydraulic_mod_C ()
 
 // Add the Hydraulic_mod_C syntax to the syntax table.
 
-Hydraulic&
-Hydraulic_mod_C::make (Block& al)
-{
-  return *new Hydraulic_mod_C (al);
-}
-
 static struct Hydraulic_mod_CSyntax
 {
+  static Model& make (Block& al)
+  { return *new Hydraulic_mod_C (al); }
+
   Hydraulic_mod_CSyntax ();
 } hydraulic_mod_C_syntax;
 
@@ -148,6 +142,5 @@ Modified Campbell retention curve model with Burdine theory.");
   syntax.add ("b", Syntax::None (), Check::positive (), Syntax::Const,
 	      "Campbell parameter.");
 
-  Librarian<Hydraulic>::add_type ("mod_C", alist, syntax,
-				  &Hydraulic_mod_C::make);
+  Librarian<Hydraulic>::add_type ("mod_C", alist, syntax, make);
 }

@@ -74,9 +74,9 @@ struct ConditionDMOver : public Condition
 
 static struct ConditionCropSyntax
 {
-  static Condition& make_ds (Block& al)
+  static Model& make_ds (Block& al)
   { return *new ConditionDSAfter (al); }
-  static Condition& make_dm (Block& al)
+  static Model& make_dm (Block& al)
   { return *new ConditionDMOver (al); }
 
   ConditionCropSyntax ()

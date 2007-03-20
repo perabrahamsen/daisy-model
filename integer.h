@@ -27,7 +27,7 @@
 
 class Scope;
 
-class Integer
+class Integer : public Model
 {
   // Content.
 public:
@@ -48,7 +48,7 @@ public:
 protected:
   explicit Integer (Block&);
 public:
-  virtual ~Integer ();
+  ~Integer ();
 };
 
 #ifdef FORWARD_TEMPLATES

@@ -27,7 +27,7 @@
 
 class Daisy;
 
-class Condition
+class Condition : public Model
 {  
   // Content.
 public:
@@ -45,7 +45,7 @@ public:
 protected:
   Condition (Block& al);
 public:
-  virtual ~Condition ();
+  ~Condition ();
 };
 
 #ifdef FORWARD_TEMPLATES

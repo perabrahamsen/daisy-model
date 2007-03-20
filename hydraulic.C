@@ -270,8 +270,7 @@ static const class CheckNoPedo : public VCheck
 
 static struct ProgramHydraulic_tableSyntax
 {
-  static Program&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ProgramHydraulic_table (al); }
   ProgramHydraulic_tableSyntax ()
   {

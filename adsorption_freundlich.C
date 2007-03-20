@@ -109,7 +109,7 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
 
 static struct AdsorptionFreundlichSyntax
 {
-  static Adsorption& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new AdsorptionFreundlich (al);
   }

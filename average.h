@@ -25,7 +25,7 @@
 
 #include "librarian.h"
 
-class Average
+class Average : public Model
 {
   // Content.
 public:
@@ -42,7 +42,7 @@ public:
 protected:
   Average (Block& al);
 public:
-  virtual ~Average ();
+  ~Average ();
 };
 
 #ifdef FORWARD_TEMPLATES

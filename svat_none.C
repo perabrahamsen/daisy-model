@@ -45,8 +45,7 @@ struct SVAT_none : public SVAT
 
 static struct SVAT_NoneSyntax
 {
-  static SVAT&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new SVAT_none (al); }
   SVAT_NoneSyntax ()
   {

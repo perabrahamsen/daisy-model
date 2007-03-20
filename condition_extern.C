@@ -82,7 +82,7 @@ struct ConditionExtern : public Condition
 
 static struct ConditionExternSyntax
 {
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionExtern (al); }
 
   ConditionExternSyntax ()

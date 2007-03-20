@@ -84,7 +84,7 @@ struct NumberExtern : public Number
 
 static struct NumberExternSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberExtern (al); }
   NumberExternSyntax ()
   {

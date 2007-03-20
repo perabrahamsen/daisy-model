@@ -45,7 +45,7 @@ public:
 
 static struct TortuosityM_QSyntax
 {
-  static Tortuosity& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new TortuosityM_Q (al);
   }

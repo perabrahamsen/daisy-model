@@ -111,7 +111,7 @@ SourceExpr::~SourceExpr ()
 
 static struct SourceExprSyntax
 {
-  static Source& make (Block& al)
+  static Model& make (Block& al)
   { return *new SourceExpr (al); }
 
   SourceExprSyntax ()

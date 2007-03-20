@@ -31,7 +31,7 @@ class Treelog;
 
 #include <vector>
 
-class Photo 
+class Photo : public Model 
 {
   // Content.
 public:
@@ -56,7 +56,7 @@ public:
 public:
   static const AttributeList& default_model ();
   Photo (Block&);
-  virtual ~Photo ();
+  ~Photo ();
 };
 
 #ifdef FORWARD_TEMPLATES

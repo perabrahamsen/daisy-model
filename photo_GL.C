@@ -168,8 +168,7 @@ Photo::default_model ()
 
 static struct Photo_GLSyntax
 {
-  static Photo&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new PhotoGL (al); }
   Photo_GLSyntax ()
   {

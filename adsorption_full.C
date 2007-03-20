@@ -49,7 +49,7 @@ public:
 
 static struct AdsorptionFullSyntax
 {
-  static Adsorption& make (Block& al)
+  static Model& make (Block& al)
   { return *new AdsorptionFull (al); }
 
   AdsorptionFullSyntax ()

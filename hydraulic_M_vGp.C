@@ -54,11 +54,8 @@ private:
   double Se (double h) const;
   
   // Create and Destroy.
-private:
-  friend class HydraulicM_vGpSyntax;
-  static Hydraulic& make (Block& al);
-  HydraulicM_vGp (Block&);
 public:
+  HydraulicM_vGp (Block&);
   ~HydraulicM_vGp ();
 };
 
@@ -151,14 +148,11 @@ HydraulicM_vGp::~HydraulicM_vGp ()
 
 // Add the HydraulicM_vGp syntax to the syntax table.
 
-Hydraulic&
-HydraulicM_vGp::make (Block& al)
-{
-  return *new HydraulicM_vGp (al);
-}
-
 static struct HydraulicM_vGpSyntax
 {
+  static Model& make (Block& al)
+  { return *new HydraulicM_vGp (al); }
+
   HydraulicM_vGpSyntax ();
 } hydraulicM_vGp_syntax;
 
@@ -193,6 +187,5 @@ Water Resources Research 2003.");
   syntax.add ("f", Syntax::None (), Check::non_negative (), Syntax::Const,
 	      "Macropores conductivity curve shape parameter.");
     
-  Librarian<Hydraulic>::add_type ("M_vGp", alist, syntax,
-				  &HydraulicM_vGp::make);
+  Librarian<Hydraulic>::add_type ("M_vGp", alist, syntax, make);
 }

@@ -46,7 +46,7 @@ struct ActionSetSurfaceDetentionCapacity : public Action
 
 static struct ActionSurfaceSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionSetSurfaceDetentionCapacity (al); }
   
   ActionSurfaceSyntax ()

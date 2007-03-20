@@ -127,11 +127,11 @@ struct ActionWaitMMDD : public Action
 
 static struct ActionWaitSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionWait (al); }
-  static Action& make_days (Block& al)
+  static Model& make_days (Block& al)
   { return *new ActionWaitDays (al); }
-  static Action& make_mm_dd (Block& al)
+  static Model& make_mm_dd (Block& al)
   { return *new ActionWaitMMDD (al); }
 
   static bool check_mm_dd (const AttributeList& alist, Treelog& err)

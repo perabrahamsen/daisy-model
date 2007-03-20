@@ -107,7 +107,7 @@ EquilibriumLinear::check (const Soil&, Treelog& err) const
 
 static struct EquilibriumLinearSyntax
 {
-  static Equilibrium& make (Block& al)
+  static Model& make (Block& al)
   { return *new EquilibriumLinear (al); }
 
   EquilibriumLinearSyntax ()

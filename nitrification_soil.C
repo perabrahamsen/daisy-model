@@ -86,8 +86,7 @@ NitrificationSoil::NitrificationSoil (Block& al)
 
 static struct NitrificationSoilSyntax
 {
-  static Nitrification&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new NitrificationSoil (al); }
   NitrificationSoilSyntax ()
   {

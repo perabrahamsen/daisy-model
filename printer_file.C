@@ -853,7 +853,7 @@ PrinterFile::~PrinterFile ()
 
 static struct PrinterFileSyntax
 {
-  static Printer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PrinterFile (al); }
 
   PrinterFileSyntax ()

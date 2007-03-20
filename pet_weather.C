@@ -62,8 +62,7 @@ struct PetWeather : public Pet
 
 static struct PetWeatherSyntax
 {
-  static Pet&
-  make (Block& al)
+  static Model& make (Block& al)
     { return *new PetWeather (al); }
   PetWeatherSyntax ()
     {

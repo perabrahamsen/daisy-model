@@ -1,3 +1,8 @@
+2007-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* model.C, model.h: New file.
+	* Makefile (OTHER): Added.
+
 2007-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* boolean_extern.C, number_extern.C: Removed.

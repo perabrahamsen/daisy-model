@@ -104,13 +104,13 @@ struct ConditionSoilN_min : public Condition
 
 static struct ConditionSoilSyntax
 {
-  static Condition& make_temperature (Block& al)
+  static Model& make_temperature (Block& al)
   { return *new ConditionSoilTemperature (al); }
-  static Condition& make_potential (Block& al)
+  static Model& make_potential (Block& al)
   { return *new ConditionSoilPotential (al); }
-  static Condition& make_water (Block& al)
+  static Model& make_water (Block& al)
   { return *new ConditionSoilWater (al); }
-  static Condition& make_N_min (Block& al)
+  static Model& make_N_min (Block& al)
   { return *new ConditionSoilN_min (al); }
 
   static bool check_water_content (const AttributeList& al, Treelog& err)

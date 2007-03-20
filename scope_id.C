@@ -72,8 +72,7 @@ ScopeID::~ScopeID ()
 
 static struct ScopeIDSyntax
 {
-  static Scope&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ScopeID (al); }
 
   ScopeIDSyntax ()

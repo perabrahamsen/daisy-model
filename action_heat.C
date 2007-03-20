@@ -48,7 +48,7 @@ struct ActionSetHeatSource : public Action
 
 static struct ActionHeatSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionSetHeatSource (al); }
   
   ActionHeatSyntax ()

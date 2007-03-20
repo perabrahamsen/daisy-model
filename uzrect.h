@@ -32,7 +32,7 @@ struct Surface;
 struct Groundwater;
 struct Treelog;
 
-class UZRect
+class UZRect : public Model
 {
   // Content.
 public: 
@@ -58,7 +58,7 @@ private:
 protected:
   explicit UZRect (Block&);
 public:
-  virtual ~UZRect ();
+  ~UZRect ();
 };
 
 #ifdef FORWARD_TEMPLATES

@@ -640,7 +640,7 @@ CropSold::initialize (const Geometry& geo, OrganicMatter&, const Time&,
 
 static struct CropSoldSyntax
 {
-  static Crop& make (Block& al)
+  static Model& make (Block& al)
     { return *new CropSold (al); }
   CropSoldSyntax ();
 } old_crop_syntax;

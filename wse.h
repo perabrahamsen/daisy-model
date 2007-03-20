@@ -25,7 +25,7 @@
 #include "librarian.h"
 
 
-class WSE
+class WSE : public Model
 {
   // Content.
 public:
@@ -40,7 +40,7 @@ public:
 public:
   static const AttributeList& default_model ();
   WSE (Block& al);
-  virtual ~WSE ();
+  ~WSE ();
 };
 
 #ifdef FORWARD_TEMPLATES

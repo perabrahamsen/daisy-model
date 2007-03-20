@@ -48,7 +48,7 @@ class Column;
 class Harvest;
 class AM;
 
-class Crop 
+class Crop : public Model 
 {
   // Content.
 public:
@@ -140,7 +140,7 @@ public:
 protected:
   Crop (Block&);
 public:
-  virtual ~Crop ();
+  ~Crop ();
 };
 
 #ifdef FORWARD_TEMPLATES

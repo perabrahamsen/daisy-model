@@ -254,7 +254,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
 
 static struct SummaryBalanceSyntax
 {
-  static Summary& make (Block& al)
+  static Model& make (Block& al)
   { return *new SummaryBalance (al); }
   SummaryBalanceSyntax ()
     {

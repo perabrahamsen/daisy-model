@@ -339,7 +339,7 @@ GnuplotTime::~GnuplotTime ()
 
 static struct GnuplotTimeSyntax
 {
-  static Gnuplot& make (Block& al)
+  static Model& make (Block& al)
   { return *new GnuplotTime (al); }
   GnuplotTimeSyntax ()
   {

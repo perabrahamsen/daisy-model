@@ -37,7 +37,7 @@ class Soil;
 class Time;
 class Treelog;
 
-class Log
+class Log : public Model
 {
   // Content.
 private:
@@ -283,7 +283,7 @@ protected:
   Log (Block& al);
 public:
   virtual void summarize (Treelog& out);
-  virtual ~Log ();
+  ~Log ();
 };
 
 #ifdef FORWARD_TEMPLATES

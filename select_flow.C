@@ -201,7 +201,7 @@ struct SelectFlowTop : public SelectFlow
 
 static struct SelectFlowTopSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectFlowTop (al); }
 
   SelectFlowTopSyntax ()
@@ -221,7 +221,7 @@ OBSOLETE: Use (volume box (top FROM)) instead.");
 
 static struct SelectFluxTopSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectFlowTop (al); }
 
   SelectFluxTopSyntax ()
@@ -260,7 +260,7 @@ struct SelectFlowBottom : public SelectFlow
 
 static struct SelectFlowBottomSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectFlowBottom (al); }
 
   SelectFlowBottomSyntax ()
@@ -280,7 +280,7 @@ OBSOLETE: Use (volume box (bottom TO)) instead.");
 
 static struct SelectFluxBottomSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectFlowBottom (al); }
 
   SelectFluxBottomSyntax ()
@@ -319,7 +319,7 @@ struct SelectFlowLeft : public SelectFlow
 
 static struct SelectFlowLeftSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectFlowLeft (al); }
 
   SelectFlowLeftSyntax ()
@@ -353,7 +353,7 @@ struct SelectFlowRight : public SelectFlow
 
 static struct SelectFlowRightSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectFlowRight (al); }
 
   SelectFlowRightSyntax ()
@@ -387,7 +387,7 @@ struct SelectFlowFront : public SelectFlow
 
 static struct SelectFlowFrontSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectFlowFront (al); }
 
   SelectFlowFrontSyntax ()
@@ -421,7 +421,7 @@ struct SelectFlowBack : public SelectFlow
 
 static struct SelectFlowBackSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectFlowBack (al); }
 
   SelectFlowBackSyntax ()

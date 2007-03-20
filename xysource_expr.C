@@ -170,7 +170,7 @@ XYSourceExpr::~XYSourceExpr ()
 
 static struct XYSourceExprSyntax
 {
-  static XYSource& make (Block& al)
+  static Model& make (Block& al)
   { return *new XYSourceExpr (al); }
 
   XYSourceExprSyntax ()

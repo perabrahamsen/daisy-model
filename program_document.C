@@ -1251,8 +1251,7 @@ standard parameterizations for the model.");
 
 static struct ProgramDocumentSyntax
 {
-  static Program&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ProgramDocument (al); }
   ProgramDocumentSyntax ()
   {

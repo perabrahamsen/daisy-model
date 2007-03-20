@@ -257,15 +257,15 @@ struct ActionIf : public Action
 
 static struct ActionLispSyntax
 {
-  static Action& make_nil (Block& al)
+  static Model& make_nil (Block& al)
   { return *new ActionNil (al); }
-  static Action& make_t (Block& al)
+  static Model& make_t (Block& al)
   { return *new ActionT (al); }
-  static Action& make_progn (Block& al)
+  static Model& make_progn (Block& al)
   { return *new ActionProgn (al); }
-  static Action& make_cond (Block& al)
+  static Model& make_cond (Block& al)
   { return *new ActionCond (al); }
-  static Action& make_if (Block& al)
+  static Model& make_if (Block& al)
   { return *new ActionIf (al); }
   ActionLispSyntax ();
 } ActionLisp_syntax;

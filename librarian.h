@@ -23,6 +23,7 @@
 #ifndef LIBRARIAN_H
 #define LIBRARIAN_H
 
+#include "model.h"
 #include "symbol.h"
 #include "assertion.h"
 #include <map>
@@ -37,25 +38,29 @@ class Library;
 
 struct BuildBase 
 {
+  // Types.
+  typedef void (*derive_fun) (symbol name, const Syntax& syn,
+                              AttributeList& al, symbol super);
+  typedef Model& (*builder) (Block&);
+  typedef std::map<symbol, builder> bmap_type;
+
   // Content.
   std::auto_ptr<Library> lib;
   int count;
+  bmap_type builders;
 
-  // Type.
-  typedef void (*derive_fun) (symbol name, const Syntax& syn,
-                              AttributeList& al, symbol super);
 
   // Build.
-  virtual void* build_raw (symbol type, Block&) const = 0;
-  void* build_free (Treelog& msg, const AttributeList& alist, 
+  virtual Model* build_raw (symbol type, Block&) const = 0;
+  Model* build_free (Treelog& msg, const AttributeList& alist, 
                     const std::string& scope_id) const;
-  void* build_cheat (const AttributeList& parent, 
+  Model* build_cheat (const AttributeList& parent, 
                      const std::string& key) const;
-  void* build_alist (Block& parent, const AttributeList& alist, 
+  Model* build_alist (Block& parent, const AttributeList& alist, 
                      const std::string& scope_id) const;
-  void* build_item (Block& parent, const std::string& key) const;
-  std::vector<void*> build_vector (Block& al, const std::string& key) const;
-  std::vector<const void*> build_vector_const (Block& al, 
+  Model* build_item (Block& parent, const std::string& key) const;
+  std::vector<Model*> build_vector (Block& al, const std::string& key) const;
+  std::vector<const Model*> build_vector_const (Block& al, 
                                                const std::string& key) const;
 
   // Library.
@@ -74,26 +79,21 @@ public:
 template <class T>
 class Librarian
 {
-  // Types.
-private:
-  typedef T& (*builder) (Block&);
-  typedef std::map<symbol, builder> bmap_type;
+  // Class specific builder
+  typedef BuildBase::builder builder;
 
   // Content.
 private:
   static struct Content : BuildBase
   {
-    bmap_type builders;
-
-    void* build_raw (const symbol type, Block& block) const
+    Model* build_raw (const symbol type, Block& block) const
     { 
       daisy_assert (builders.find (type) != builders.end ());
       return &(content->builders)[type] (block);
     }
     Content (const char *const name, BuildBase::derive_fun derive, 
 	     const char *const description)
-      : BuildBase (name, derive, description),
-        builders ()
+      : BuildBase (name, derive, description)
     { }
   } *content;
 
@@ -103,41 +103,41 @@ public:
 			const std::string& scope_id)
   {
     daisy_assert (content);
-    return static_cast<T*> (content->build_free (msg, alist, scope_id)); 
+    return dynamic_cast<T*> (content->build_free (msg, alist, scope_id)); 
   }
   static T* build_cheat (const AttributeList& parent, const std::string& key)
   {
     daisy_assert (content);
-    return static_cast<T*> (content->build_cheat (parent, key)); 
+    return dynamic_cast<T*> (content->build_cheat (parent, key)); 
   }
   static T* build_alist (Block& parent, const AttributeList& alist, 
 			 const std::string& scope_id)
   {
     daisy_assert (content);
-    return static_cast<T*> (content->build_alist (parent, alist, scope_id)); 
+    return dynamic_cast<T*> (content->build_alist (parent, alist, scope_id)); 
   }
   static T* build_item (Block& parent, const std::string& key)
   { 
     daisy_assert (content);
-    return static_cast<T*> (content->build_item (parent, key)); 
+    return dynamic_cast<T*> (content->build_item (parent, key)); 
   }
   static std::vector<T*> build_vector (Block& al, const std::string& key)
   {  
     daisy_assert (content);
-    std::vector<void*> c = content->build_vector (al, key);
+    std::vector<Model*> c = content->build_vector (al, key);
     std::vector<T*> t;
     for (size_t i = 0; i < c.size (); i++)
-      t.push_back (static_cast<T*> (c[i]));
+      t.push_back (dynamic_cast<T*> (c[i]));
     return t;
   }
   static std::vector<const T*> build_vector_const (Block& al,
 						   const std::string& key)
   {  
     daisy_assert (content);
-    std::vector<const void*> c = content->build_vector_const (al, key);
+    std::vector<const Model*> c = content->build_vector_const (al, key);
     std::vector<const T*> t;
     for (size_t i = 0; i < c.size (); i++)
-      t.push_back (static_cast<const T*> (c[i]));
+     t.push_back (dynamic_cast<const T*> (c[i]));
     return t;
   }
 

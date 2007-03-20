@@ -26,7 +26,7 @@
 #include "treelog.h"
 #include <sstream>
 
-void* 
+Model* 
 BuildBase::build_free (Treelog& msg, const AttributeList& alist, 
                        const std::string& scope_id) const
 {
@@ -44,7 +44,7 @@ BuildBase::build_free (Treelog& msg, const AttributeList& alist,
   daisy_assert (syntax.check (alist, msg));
   try
     {  
-      void* result = build_raw (type, block); 
+      Model* result = build_raw (type, block); 
       daisy_assert (block.ok () && result);
       return result;
     }
@@ -55,12 +55,12 @@ BuildBase::build_free (Treelog& msg, const AttributeList& alist,
   return NULL;
 }
 
-void* 
+Model* 
 BuildBase::build_cheat (const AttributeList& parent, 
                         const std::string& key) const
 { return build_free (Treelog::null (), parent.alist (key), key); }
 
-void* 
+Model* 
 BuildBase::build_alist (Block& parent, const AttributeList& alist, 
                         const std::string& scope_id) const
 {
@@ -85,24 +85,24 @@ BuildBase::build_alist (Block& parent, const AttributeList& alist,
   return NULL;
 }
 
-void* 
+Model* 
 BuildBase::build_item (Block& parent, const std::string& key) const
 { return build_alist (parent, parent.alist (key), key); }
 
-std::vector<void*> 
+std::vector<Model*> 
 BuildBase::build_vector (Block& al, const std::string& key) const
 { 
-  std::vector<void*> t;
+  std::vector<Model*> t;
   const std::vector<AttributeList*>& f (al.alist_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
     t.push_back (build_alist (al, *f[i], sequence_id (key, i)));
   return t;
 }
 
-std::vector<const void*> 
+std::vector<const Model*> 
 BuildBase::build_vector_const (Block& al, const std::string& key) const
 { 
-  std::vector<const void*> t;
+  std::vector<const Model*> t;
   const std::vector<AttributeList*>& f (al.alist_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
     t.push_back (build_alist (al, *f[i], sequence_id (key, i)));

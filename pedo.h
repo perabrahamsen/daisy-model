@@ -27,7 +27,7 @@
 
 class Soil;
 
-class Pedotransfer
+class Pedotransfer : public Model
 {
   // Content.
 public:
@@ -54,7 +54,7 @@ public:
               Treelog& err) const;
   virtual bool check_nested (const Soil&, Treelog& err) const = 0;
   Pedotransfer (Block&);
-  virtual ~Pedotransfer ();
+  ~Pedotransfer ();
 };
 
 #ifdef FORWARD_TEMPLATES

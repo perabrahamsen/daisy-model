@@ -25,7 +25,7 @@
 
 #include "librarian.h"
 
-class Printer
+class Printer : public Model
 {
   // Content.
 public:
@@ -55,7 +55,7 @@ public:
 protected:
   Printer (const AttributeList& name);
 public:
-  virtual ~Printer ();
+  ~Printer ();
 };
 
 #ifdef FORWARD_TEMPLATES

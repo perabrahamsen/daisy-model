@@ -33,7 +33,7 @@ class Vegetation;
 class Surface;
 class Pet;
 
-class SVAT
+class SVAT : public Model
 {
   // Content.
 public:
@@ -56,7 +56,7 @@ public:
 protected:
   SVAT (Block&);
 public:
-  virtual ~SVAT ();
+  ~SVAT ();
 };
 
 #ifdef FORWARD_TEMPLATES

@@ -72,7 +72,7 @@ struct IntegerSqr : public IntegerOperand
 
 static struct IntegerSqrSyntax
 {
-  static Integer& make (Block& al)
+  static Model& make (Block& al)
   { return *new IntegerSqr (al); }
   IntegerSqrSyntax ()
   {
@@ -163,7 +163,7 @@ struct IntegerMax : public IntegerOperands
 
 static struct IntegerMaxSyntax
 {
-  static Integer& make (Block& al)
+  static Model& make (Block& al)
   { return *new IntegerMax (al); }
   IntegerMaxSyntax ()
   {
@@ -205,7 +205,7 @@ struct IntegerMin : public IntegerOperands
 
 static struct IntegerMinSyntax
 {
-  static Integer& make (Block& al)
+  static Model& make (Block& al)
   { return *new IntegerMin (al); }
   IntegerMinSyntax ()
   {
@@ -242,7 +242,7 @@ struct IntegerProduct : public IntegerOperands
 
 static struct IntegerProductSyntax
 {
-  static Integer& make (Block& al)
+  static Model& make (Block& al)
   { return *new IntegerProduct (al); }
   IntegerProductSyntax ()
   {
@@ -278,7 +278,7 @@ struct IntegerSum : public IntegerOperands
 
 static struct IntegerSumSyntax
 {
-  static Integer& make (Block& al)
+  static Model& make (Block& al)
   { return *new IntegerSum (al); }
   IntegerSumSyntax ()
   {
@@ -320,7 +320,7 @@ struct IntegerSubtract : public IntegerOperands
 
 static struct IntegerSubtractSyntax
 {
-  static Integer& make (Block& al)
+  static Model& make (Block& al)
   { return *new IntegerSubtract (al); }
   IntegerSubtractSyntax ()
   {
@@ -398,9 +398,9 @@ struct IntegerModulo : public IntegerDivide
 
 static struct IntegerModuloSyntax
 {
-  static Integer& make_mod (Block& al)
+  static Model& make_mod (Block& al)
   { return *new IntegerModulo (al); }
-  static Integer& make_div (Block& al)
+  static Model& make_div (Block& al)
   { return *new IntegerDivide (al); }
   IntegerModuloSyntax ()
   {

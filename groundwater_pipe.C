@@ -340,7 +340,7 @@ GroundwaterPipe::output (Log& log) const
 
 static struct GroundwaterPipeSyntax
 {
-  static Groundwater& make (Block& al)
+  static Model& make (Block& al)
     {
       return *new GroundwaterPipe (al);
     }

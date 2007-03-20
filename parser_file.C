@@ -1448,7 +1448,7 @@ ParserFile::~ParserFile ()
 
 static struct ParserFileSyntax
 {
-  static Parser& make (Block& al)
+  static Model& make (Block& al)
   { return *new ParserFile (al); }
 
   ParserFileSyntax ()

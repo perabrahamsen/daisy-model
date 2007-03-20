@@ -140,7 +140,7 @@ WeatherFile::tick (const Time& time, Treelog& out)
 
 static struct WeatherFileSyntax
 {
-  static Weather& make (Block& al)
+  static Model& make (Block& al)
     { return *new WeatherFile (al); }
 
   WeatherFileSyntax ()

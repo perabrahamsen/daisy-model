@@ -24,6 +24,7 @@
 #include "gnuplot_utils.h"
 #include "number.h"
 #include "scope_sources.h"
+#include "source.h"
 
 struct XYSourceCombine : public XYSource
 {
@@ -123,7 +124,7 @@ XYSourceCombine::XYSourceCombine (Block& al)
 
 static struct XYSourceCombineSyntax
 {
-  static XYSource& make (Block& al)
+  static Model& make (Block& al)
   { return *new XYSourceCombine (al); }
 
   XYSourceCombineSyntax ()

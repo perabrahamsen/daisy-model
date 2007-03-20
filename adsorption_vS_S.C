@@ -105,7 +105,7 @@ Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M) const
 
 static struct Adsorption_vS_SSyntax
 {
-  static Adsorption& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new Adsorption_vS_S (al);
   }

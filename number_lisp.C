@@ -190,7 +190,7 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
 
 static struct NumberLetSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberLet (al); }
   NumberLetSyntax ()
   {

@@ -190,21 +190,16 @@ struct NetRadiationSatterlund : public NetRadiationParent
 
 static struct NetRadiationSyntax
 {
-  static NetRadiation&
-  make_brunt (Block& al)
-    { return *new NetRadiationBrunt (al); }
-  static NetRadiation&
-  make_idso_jackson (Block& al)
-    { return *new NetRadiationIdsoJackson (al); }
-  static NetRadiation&
-  make_brutsaert (Block& al)
-    { return *new NetRadiationBrutsaert (al); }
-  static NetRadiation&
-  make_swinbank (Block& al)
-    { return *new NetRadiationSwinbank (al); }
-  static NetRadiation&
-  make_satterlund (Block& al)
-    { return *new NetRadiationSatterlund (al); }
+  static Model& make_brunt (Block& al)
+  { return *new NetRadiationBrunt (al); }
+  static Model& make_idso_jackson (Block& al)
+  { return *new NetRadiationIdsoJackson (al); }
+  static Model& make_brutsaert (Block& al)
+  { return *new NetRadiationBrutsaert (al); }
+  static Model& make_swinbank (Block& al)
+  { return *new NetRadiationSwinbank (al); }
+  static Model& make_satterlund (Block& al)
+  { return *new NetRadiationSatterlund (al); }
 
   NetRadiationSyntax ()
     {

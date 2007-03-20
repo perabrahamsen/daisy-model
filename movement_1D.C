@@ -787,7 +787,7 @@ Movement::build_vertical (Block& al)
 
 static struct Movement1DSyntax
 {
-  static Movement& make (Block& al)
+  static Model& make (Block& al)
   { return *new Movement1D (al); }
 
   Movement1DSyntax ()

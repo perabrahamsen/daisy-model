@@ -26,7 +26,7 @@
 
 class Treelog;
 
-class Program
+class Program : public Model
 {
   // Content.
 public:
@@ -50,7 +50,7 @@ private:
   explicit Program ();
   explicit Program (const Program&);
 public:
-  virtual ~Program ();
+  ~Program ();
 };
 
 #ifdef FORWARD_TEMPLATES

@@ -49,7 +49,7 @@ struct ActionSpray : public Action
 // Add the ActionSpray syntax to the syntax table.
 static struct ActionSpraySyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionSpray (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

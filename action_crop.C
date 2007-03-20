@@ -985,7 +985,7 @@ ActionCrop::~ActionCrop ()
 // Add the ActionCrop syntax to the syntax table.
 static struct ActionCropSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionCrop (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

@@ -82,7 +82,7 @@ Depth::create (const double height)
 
 static struct DepthConstSyntax
 {
-  static Depth& make (Block& al)
+  static Model& make (Block& al)
   { return *new DepthConst (al); }
   DepthConstSyntax ()
   {
@@ -164,7 +164,7 @@ static struct DepthPLFSyntax
                 "Depth.");
     syntax.order ("time", "value");
   }
-  static Depth& make (Block& al)
+  static Model& make (Block& al)
   { return *new DepthPLF (al); }
   DepthPLFSyntax ()
   {
@@ -297,7 +297,7 @@ struct DepthFile : public Depth
 
 static struct DepthFileSyntax
 {
-  static Depth& make (Block& al)
+  static Model& make (Block& al)
   { return *new DepthFile (al); }
 
   DepthFileSyntax ()

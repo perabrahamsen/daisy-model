@@ -26,7 +26,7 @@
 #include "alist.h"
 #include <vector>
 
-class CropNdist
+class CropNdist : public Model
 {
   // Content.
 public:
@@ -50,7 +50,7 @@ protected:
 
 public:
   static const AttributeList& default_model ();
-  virtual ~CropNdist ();
+  ~CropNdist ();
 };
 
 #ifdef FORWARD_TEMPLATES

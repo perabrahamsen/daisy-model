@@ -329,7 +329,7 @@ FormatLaTeX::FormatLaTeX (Block& al)
 
 static struct FormatLaTeXSyntax
 {
-  static Format& make (Block& al)
+  static Model& make (Block& al)
   { return *new FormatLaTeX (al); }
   FormatLaTeXSyntax ()
   {

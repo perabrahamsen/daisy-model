@@ -60,9 +60,7 @@ private:
   double Se (double h) const;
   
   // Create and Destroy.
-private:
-  friend class HydraulicHypresSyntax;
-  static Hydraulic& make (Block& al);
+public:
   HydraulicHypres (Block&);
   void initialize (const Texture&, double rho_b, bool top_soil,
 		   Treelog& msg);
@@ -292,12 +290,11 @@ HydraulicHypres::~HydraulicHypres ()
 
 // Add the HydraulicHypres syntax to the syntax table.
 
-Hydraulic&
-HydraulicHypres::make (Block& al)
-{ return *new HydraulicHypres (al); }
-
 static struct HydraulicHypresSyntax
 {
+  static Model& make (Block& al)
+  { return *new HydraulicHypres (al); }
+
   static bool check_alist (const AttributeList&, Treelog&)
   {
     bool ok = true;
@@ -318,8 +315,7 @@ If set true this horizon will be initialized as a topsoil (i.e. the\n\
 plowing layer), if set false it will be initialized as a subsoil.\n\
 By default, the horizon will be initialized as a topsoil if and only if\n\
 it is the topmost horison in the soil profile.");
-    Librarian<Hydraulic>::add_type ("hypres", alist, syntax, 
-				    &HydraulicHypres::make);
+    Librarian<Hydraulic>::add_type ("hypres", alist, syntax, make);
   }
 } hydraulicHypres_syntax;
 

@@ -1006,7 +1006,7 @@ ColumnStandard::~ColumnStandard ()
 
 static struct ColumnStandardSyntax
 {
-  static Column& make (Block& al)
+  static Model& make (Block& al)
   { return *new ColumnStandard (al); }
 
   static void load_water_and_macro (Syntax& syntax, AttributeList& alist)

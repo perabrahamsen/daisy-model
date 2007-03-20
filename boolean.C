@@ -66,7 +66,7 @@ struct BooleanTrue : public Boolean
 
 static struct BooleanTrueSyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanTrue (al); }
   BooleanTrueSyntax ()
   {
@@ -102,7 +102,7 @@ struct BooleanFalse : public Boolean
 
 static struct BooleanFalseSyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanFalse (al); }
   BooleanFalseSyntax ()
   {
@@ -191,7 +191,7 @@ struct BooleanAnd : public BooleanOperands
 
 static struct BooleanAndSyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanAnd (al); }
   BooleanAndSyntax ()
   {
@@ -221,7 +221,7 @@ struct BooleanOr : public BooleanOperands
 
 static struct BooleanOrSyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanOr (al); }
   BooleanOrSyntax ()
   {
@@ -248,7 +248,7 @@ struct BooleanXOr : public BooleanOperands
 
 static struct BooleanXOrSyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanXOr (al); }
   BooleanXOrSyntax ()
   {
@@ -278,7 +278,7 @@ struct BooleanNot : public BooleanOperands
 
 static struct BooleanNotSyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanNot (al); }
   BooleanNotSyntax ()
   {

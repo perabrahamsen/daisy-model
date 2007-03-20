@@ -36,7 +36,7 @@ struct ActionStop : public Action
 
 static struct ActionStopSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new ActionStop (al);
   }

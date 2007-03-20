@@ -105,7 +105,7 @@ ScopeMulti::~ScopeMulti ()
 
 static struct ScopeMultiSyntax
 {
-  static Scope& make (Block& al)
+  static Model& make (Block& al)
   { return *new ScopeMulti (al); }
 
   ScopeMultiSyntax ()

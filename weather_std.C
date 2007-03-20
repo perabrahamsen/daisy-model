@@ -1382,7 +1382,7 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 
 static struct WeatherStandardSyntax
 {
-  static Weather& make (Block& al)
+  static Model& make (Block& al)
   { return *new WeatherStandard (al); }
 
   WeatherStandardSyntax ()

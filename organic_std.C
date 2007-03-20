@@ -3188,7 +3188,7 @@ OrganicMatter::default_model ()
 
 static struct OrganicStandardSyntax
 {
-  static OrganicMatter& make (Block& al)
+  static Model& make (Block& al)
   { return *new OrganicStandard (al); }
 
   OrganicStandardSyntax ()

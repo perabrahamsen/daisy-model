@@ -139,8 +139,7 @@ PetPM::tick (const Time&, const Weather& weather, const double Rn,
 
 static struct PetPMSyntax
 {
-  static Pet&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new PetPM (al); }
   PetPMSyntax ()
   {

@@ -36,7 +36,7 @@ class Harvest;
 class Output;
 class Treelog;
 
-class Column
+class Column : public Model
 {
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
@@ -123,7 +123,7 @@ public:
   virtual void initialize (const Output&, 
                            const Time&, Treelog& err, const Weather*) = 0;
 
-  virtual ~Column ();
+  ~Column ();
 };
 
 #ifdef FORWARD_TEMPLATES

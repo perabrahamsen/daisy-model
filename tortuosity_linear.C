@@ -56,7 +56,7 @@ public:
 
 static struct TortuosityLinearSyntax
 {
-  static Tortuosity& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new TortuosityLinear (al);
   }

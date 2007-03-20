@@ -231,8 +231,8 @@ LogExtern::~LogExtern ()
 
 static struct LogExternSyntax
 {
-  static Log& make (Block& al)
-  { return *new LogExtern (al); }
+  static Model& make (Block& al)
+  { return dynamic_cast<Log&> (*new LogExtern (al)); }
 
   static void load_numbers (Syntax& syntax, AttributeList&)
   {

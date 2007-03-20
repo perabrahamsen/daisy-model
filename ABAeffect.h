@@ -25,7 +25,7 @@
 #include "alist.h"
 #include <vector>
 
-class ABAEffect
+class ABAEffect : public Model
 {
   // Content.
 public:
@@ -43,7 +43,7 @@ protected:
 
 public:
   static const AttributeList& default_model ();
-  virtual ~ABAEffect ();
+  ~ABAEffect ();
 };
 
 #ifdef FORWARD_TEMPLATES

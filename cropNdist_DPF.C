@@ -103,8 +103,7 @@ cropNdistDPF::crop_Vmax_total (const double,
 
 static struct cropNdistDPFSyntax
 {
-  static CropNdist&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new cropNdistDPF (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {

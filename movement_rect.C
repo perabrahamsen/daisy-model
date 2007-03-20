@@ -328,7 +328,7 @@ MovementRect::~MovementRect ()
 
 static struct MovementRectSyntax
 {
-  static Movement& make (Block& al)
+  static Model& make (Block& al)
   { return *new MovementRect (al); }
 
   MovementRectSyntax ()

@@ -306,7 +306,7 @@ UZRect::reserve_model ()
 
 static struct UZRect2x1Syntax
 {
-  static UZRect& make (Block& al)
+  static Model& make (Block& al)
   { return *new UZRect2x1 (al); }
   UZRect2x1Syntax ()
   {

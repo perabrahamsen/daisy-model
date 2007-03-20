@@ -60,8 +60,7 @@ struct DifradWeather : public Difrad
 
 static struct DifradWeatherSyntax
 {
-  static Difrad&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new DifradWeather (al); }
   DifradWeatherSyntax ()
   {

@@ -234,7 +234,7 @@ Msoltranrect::reserve_model ()
 
 static struct Msoltranrect2x1Syntax
 {
-  static Msoltranrect& make (Block& al)
+  static Model& make (Block& al)
   { return *new Msoltranrect2x1 (al); }
 
   Msoltranrect2x1Syntax ()

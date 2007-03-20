@@ -188,8 +188,7 @@ Mactrans::default_model ()
 
 static struct MactransStandardSyntax
 {
-  static Mactrans&
-  make (Block& al)
+  static Model& make (Block& al)
     { return *new MactransStandard (al); }
   MactransStandardSyntax ()
     {

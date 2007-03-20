@@ -26,7 +26,7 @@
 
 class Treelog;
 
-class Gnuplot
+class Gnuplot : public Model
 {
   // Content.
 public:
@@ -50,7 +50,7 @@ private:
   explicit Gnuplot ();
   explicit Gnuplot (const Gnuplot&);
 public:
-  virtual ~Gnuplot ();
+  ~Gnuplot ();
 };
 
 #ifdef FORWARD_TEMPLATES

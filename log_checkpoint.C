@@ -184,7 +184,7 @@ LogCheckpoint::~LogCheckpoint ()
 
 static struct LogCheckpointSyntax
 {
-  static Log& make (Block& al)
+  static Model& make (Block& al)
   { return *new LogCheckpoint (al); }
 
   LogCheckpointSyntax ()

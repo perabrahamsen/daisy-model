@@ -28,7 +28,7 @@
 
 class Geometry;
 
-class Rootdens
+class Rootdens : public Model
 {
   // Content.
 public:
@@ -52,7 +52,7 @@ public:
 protected:
   Rootdens (Block&);
 public:
-  virtual ~Rootdens ();
+  ~Rootdens ();
 };
 
 #ifdef FORWARD_TEMPLATES

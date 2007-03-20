@@ -231,8 +231,7 @@ Rootdens::default_model ()
 
 static struct Rootdens_G_PSyntax
 {
-  static Rootdens&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new Rootdens_G_P (al); }
   Rootdens_G_PSyntax ()
   {

@@ -376,7 +376,7 @@ VegetationPermanent::~VegetationPermanent ()
 static struct
 VegetationPermanentSyntax
 {
-  static Vegetation& make (Block& al)
+  static Model& make (Block& al)
   { return *new VegetationPermanent (al); }
 
   VegetationPermanentSyntax ()

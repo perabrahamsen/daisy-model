@@ -90,8 +90,7 @@ ClayOMOld::~ClayOMOld ()
 
 static struct ClayOMOldSyntax
 {
-  static ClayOM&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ClayOMOld (al); }
 
   ClayOMOldSyntax ()

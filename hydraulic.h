@@ -29,7 +29,7 @@ class PLF;
 class Treelog;
 class Texture;
 
-class Hydraulic 
+class Hydraulic : public Model 
 {
   // Content.
 public:
@@ -75,7 +75,7 @@ public:
   virtual void initialize (const Texture&, double rho_b, bool top_soil,
 			   Treelog&);
   Hydraulic (Block&);
-  virtual ~Hydraulic ();
+  ~Hydraulic ();
 };
 
 #ifdef FORWARD_TEMPLATES

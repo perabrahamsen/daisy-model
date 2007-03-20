@@ -1124,7 +1124,7 @@ BioclimateStandard::set_subsoil_irrigation (double flux)
 
 static struct BioclimateStandardSyntax
 {
-  static Bioclimate& make (Block& al)
+  static Model& make (Block& al)
   { return *new BioclimateStandard (al); }
   
   BioclimateStandardSyntax ()

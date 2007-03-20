@@ -30,7 +30,7 @@ class Geometry1D;
 class SoilWater;
 class Log;
 
-class Mactrans
+class Mactrans : public Model
 {
   // Content.
 public:
@@ -51,7 +51,7 @@ public:
 protected:
   Mactrans (Block& al);
 public:
-  virtual ~Mactrans ();
+  ~Mactrans ();
   static const AttributeList& default_model ();
 };
 

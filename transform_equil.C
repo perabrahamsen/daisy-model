@@ -163,7 +163,7 @@ TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
 
 static struct TransformEquilibriumSyntax
 {
-  static Transform& make (Block& al)
+  static Model& make (Block& al)
   { return *new TransformEquilibrium (al); }
   TransformEquilibriumSyntax ()
   {

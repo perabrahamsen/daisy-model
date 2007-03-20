@@ -35,7 +35,7 @@ class Syntax;
 class AttributeList;
 class Log;
 
-class UZmodel
+class UZmodel : public Model
 {
   // Content.
 public: 
@@ -67,7 +67,7 @@ public:
 protected:
   UZmodel (Block&);
 public:
-  virtual ~UZmodel ();
+  ~UZmodel ();
 };
 
 #ifdef FORWARD_TEMPLATES

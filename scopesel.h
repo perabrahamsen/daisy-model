@@ -27,7 +27,7 @@
 class Output;
 class Scope;
 
-class Scopesel
+class Scopesel : public Model
 {
   // Content.
 public:
@@ -42,7 +42,7 @@ private:
   Scopesel (const Scopesel&);
 public:
   explicit Scopesel ();
-  virtual ~Scopesel ();
+  ~Scopesel ();
 };
 
 #ifdef FORWARD_TEMPLATES

@@ -153,8 +153,7 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
 
 static struct RaddistDPFSyntax
 {
-  static Raddist&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new RaddistDPF (al); }
   RaddistDPFSyntax ()
   {

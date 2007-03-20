@@ -29,7 +29,7 @@
 class Time;
 class Treelog;
 
-class Weather
+class Weather : public Model
 {
   // Content.
 public: 
@@ -148,7 +148,7 @@ protected:
 public:
   virtual bool check (const Time& from, const Time& to, Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);
-  virtual ~Weather ();
+  ~Weather ();
 };
 
 #ifdef FORWARD_TEMPLATES

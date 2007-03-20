@@ -70,7 +70,7 @@ struct ChemistryStandard : public Chemistry
 
 static struct ChemistryStandardSyntax
 {
-  static Chemistry& make (Block& al)
+  static Model& make (Block& al)
   { return *new ChemistryStandard (al); }
   ChemistryStandardSyntax ()
   {

@@ -28,7 +28,7 @@
 
 class Vegetation;
 
-class Raddist
+class Raddist : public Model
 {
   // Content.
 public:
@@ -67,7 +67,7 @@ protected:
 public:
   static const AttributeList& default_model ();
   static void load_syntax (Syntax&, AttributeList&);
-  virtual ~Raddist ();
+  ~Raddist ();
 };
 
 #ifdef FORWARD_TEMPLATES

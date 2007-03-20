@@ -97,7 +97,7 @@ public:
 
 static struct ActionWithColumnSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionWithColumn (al); }
 
   ActionWithColumnSyntax ()

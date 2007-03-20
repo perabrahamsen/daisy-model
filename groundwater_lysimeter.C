@@ -61,7 +61,7 @@ public:
 
 static struct GroundwaterLysimeterSyntax
 {
-  static Groundwater& make (Block& al)
+  static Model& make (Block& al)
   { return *new GroundwaterLysimeter (al); }
 
   GroundwaterLysimeterSyntax ()

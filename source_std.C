@@ -148,7 +148,7 @@ SourceStandard::~SourceStandard ()
 
 static struct SourceStandardSyntax
 {
-  static Source& make (Block& al)
+  static Model& make (Block& al)
   { return *new SourceStandard (al); }
 
   SourceStandardSyntax ()

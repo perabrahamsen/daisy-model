@@ -152,7 +152,7 @@ WeatherSimple::~WeatherSimple ()
 // Add the WeatherSimple syntax to the syntax table.
 static struct WeatherSimpleSyntax
 {
-  static Weather& make (Block& al)
+  static Model& make (Block& al)
     {
       return *new WeatherSimple (al);
     }

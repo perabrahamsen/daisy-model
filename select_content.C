@@ -81,7 +81,7 @@ struct SelectContent : public SelectValue
 
 static struct SelectContentSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
     { return *new SelectContent (al); }
 
   SelectContentSyntax ()

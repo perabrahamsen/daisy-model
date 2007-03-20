@@ -95,8 +95,7 @@ cropNdistUniform::crop_Vmax_total (const double,
 
 static struct cropNdistUniformSyntax
 {
-  static CropNdist&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new cropNdistUniform (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {

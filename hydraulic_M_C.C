@@ -111,7 +111,7 @@ HydraulicM_C::~HydraulicM_C ()
 
 static struct HydraulicM_CSyntax
 {
-  static Hydraulic& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new HydraulicM_C (al);
   }

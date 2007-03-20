@@ -443,7 +443,7 @@ CropSimple::~CropSimple ()
 
 static struct CropSimpleSyntax
 {
-  static Crop& make (Block& al)
+  static Model& make (Block& al)
   { return *new CropSimple (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

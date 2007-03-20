@@ -90,8 +90,7 @@ struct ProgramBatch : public Program
 
 static struct ProgramBatchSyntax
 {
-  static Program&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ProgramBatch (al); }
   ProgramBatchSyntax ()
   {

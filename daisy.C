@@ -261,8 +261,7 @@ Daisy::~Daisy ()
 
 static struct ProgramDaisySyntax
 {
-  static Program&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new Daisy (al); }
   ProgramDaisySyntax ()
   {

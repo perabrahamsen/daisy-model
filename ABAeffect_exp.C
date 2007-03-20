@@ -53,8 +53,7 @@ ABAEffect_exp::ABA_effect (const double ABA_xylem /*[]*/, Treelog&)
 
 static struct ABAEffectexpSyntax
 {
-  static ABAEffect&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ABAEffect_exp (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {

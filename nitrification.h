@@ -31,7 +31,7 @@ class SoilHeat;
 class SoilNO3;
 class SoilNH4;
 
-class Nitrification
+class Nitrification : public Model
 {
   // Content.
 public:
@@ -59,7 +59,7 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   Nitrification (Block& al);
 public:
-  virtual ~Nitrification ();
+  ~Nitrification ();
 };
 
 #ifdef FORWARD_TEMPLATES

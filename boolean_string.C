@@ -58,7 +58,7 @@ struct BooleanStringEqual : public Boolean
 
 static struct BooleanStringEqualSyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanStringEqual (al); }
   BooleanStringEqualSyntax ()
   {

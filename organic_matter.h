@@ -44,7 +44,7 @@ class SoilNH4;
 class Time;
 class Treelog;
 
-class OrganicMatter
+class OrganicMatter : public Model
 {
   // Content.
 public:
@@ -95,7 +95,7 @@ private:
   OrganicMatter& operator= (const OrganicMatter&);
 public:
   explicit OrganicMatter (Block&);
-  virtual ~OrganicMatter ();
+  ~OrganicMatter ();
 };
 
 #ifdef FORWARD_TEMPLATES

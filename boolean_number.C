@@ -129,7 +129,7 @@ struct BooleanNumGT : public BooleanNumbers
 
 static struct BooleanNumGTSyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanNumGT (al); }
   BooleanNumGTSyntax ()
   {
@@ -166,7 +166,7 @@ struct BooleanNumGTE : public BooleanNumbers
 
 static struct BooleanNumGTESyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanNumGTE (al); }
   BooleanNumGTESyntax ()
   {
@@ -203,7 +203,7 @@ struct BooleanNumLT : public BooleanNumbers
 
 static struct BooleanNumLTSyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanNumLT (al); }
   BooleanNumLTSyntax ()
   {
@@ -240,7 +240,7 @@ struct BooleanNumLTE : public BooleanNumbers
 
 static struct BooleanNumLTESyntax
 {
-  static Boolean& make (Block& al)
+  static Model& make (Block& al)
   { return *new BooleanNumLTE (al); }
   BooleanNumLTESyntax ()
   {

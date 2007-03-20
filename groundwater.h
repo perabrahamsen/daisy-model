@@ -33,7 +33,7 @@ class SoilWater;
 class SoilHeat;
 class Output;
 
-class Groundwater
+class Groundwater : public Model
 {
   // Content.
 public:
@@ -73,7 +73,7 @@ public:
 protected:
   Groundwater (Block& al);
 public:
-  virtual ~Groundwater ();
+  ~Groundwater ();
 };
 
 #ifdef FORWARD_TEMPLATES

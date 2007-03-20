@@ -172,7 +172,7 @@ XYSourceMerge::XYSourceMerge (Block& al)
 
 static struct XYSourceMergeSyntax
 {
-  static XYSource& make (Block& al)
+  static Model& make (Block& al)
   { return *new XYSourceMerge (al); }
 
   XYSourceMergeSyntax ()

@@ -30,7 +30,7 @@ class Soil;
 class SoilWater;
 class Adsorption;
 
-class Transport
+class Transport : public Model
 {
   // Content.
 public:
@@ -56,7 +56,7 @@ public:
 protected:
   Transport (Block&);
 public:
-  virtual ~Transport ();
+  ~Transport ();
 };
 
 #ifdef FORWARD_TEMPLATES

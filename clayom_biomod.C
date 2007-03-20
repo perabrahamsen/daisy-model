@@ -244,8 +244,7 @@ ClayOMBiomod::~ClayOMBiomod ()
 
 static struct ClayOMBiomodSyntax
 {
-  static ClayOM&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ClayOMBiomod (al); }
 
   ClayOMBiomodSyntax ()

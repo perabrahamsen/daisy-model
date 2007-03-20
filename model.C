@@ -1,6 +1,6 @@
-// summary.h
+// model.C -- Base class for all model in Daisy.
 // 
-// Copyright 2003 Per Abrahamsen and KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -18,39 +18,12 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "model.h"
 
-#ifndef SUMMARY_H
-#define SUMMARY_H
+Model::Model ()
+{ }
 
-#include "librarian.h"
-#include <vector>
+Model::~Model ()
+{ }
 
-struct Select;
-struct Treelog;
-
-class Summary : public Model
-{
-  // Content.
-public:
-  const symbol name;
-  static const char *const description;
-
-  // Create and Destroy.
-public:
-  virtual void clear () = 0;
-  virtual void initialize (std::vector<Select*>&, Treelog&) = 0;
-protected:
-  Summary (Block& al);
-public:
-  virtual void summarize (int hours, Treelog&) const = 0;
-  ~Summary ();
-};
-
-#ifdef FORWARD_TEMPLATES
-template<>
-Librarian<Summary>::Content* Librarian<Summary>::content;
-#endif
-
-static Librarian<Summary> Summary_init ("summary");
-
-#endif // SUMMARY_H
+// model.C ends here.

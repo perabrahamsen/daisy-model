@@ -49,7 +49,7 @@ struct ActionDivide : public Action
 
 static struct ActionDivideSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
     { return *new ActionDivide (al); }
   ActionDivideSyntax ()
     { 

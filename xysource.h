@@ -23,7 +23,7 @@
 
 #include "librarian.h"
 
-class XYSource
+class XYSource : public Model
 {
   // Content.
 public:
@@ -55,7 +55,7 @@ protected:
 private:
   XYSource (const XYSource&);
 public:
-  virtual ~XYSource ();
+  ~XYSource ();
 };
 
 #ifdef FORWARD_TEMPLATES

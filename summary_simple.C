@@ -140,7 +140,7 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
 
 static struct SummarySimpleSyntax
 {
-  static Summary& make (Block& al)
+  static Model& make (Block& al)
   { return *new SummarySimple (al); }
   SummarySimpleSyntax ()
     {

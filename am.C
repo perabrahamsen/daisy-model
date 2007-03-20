@@ -1015,8 +1015,7 @@ AM::~AM ()
 
 static struct AM_Syntax
 {
-  static AM&
-  make (Block& al1)
+  static Model& make (Block& al1)
   { 
     AttributeList al2 (al1.alist ());
     al2.add ("type", "state");
@@ -1292,8 +1291,7 @@ struct ProgramAM_table : public Program
 
 static struct ProgramAM_tableSyntax
 {
-  static Program&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ProgramAM_table (al); }
   ProgramAM_tableSyntax ()
   {

@@ -82,7 +82,7 @@ GroundwaterStatic::~GroundwaterStatic ()
 
 static struct GroundwaterStaticSyntax
 {
-  static Groundwater& make (Block& al)
+  static Model& make (Block& al)
   { 
     return *new GroundwaterStatic (al);
   }

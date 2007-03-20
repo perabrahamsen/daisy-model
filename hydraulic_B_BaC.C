@@ -44,11 +44,8 @@ private:
   double Se (double h) const;
   
   // Create and Destroy.
-private:
-  friend class HydraulicB_BaCSyntax;
-  static Hydraulic& make (Block& al);
-  HydraulicB_BaC (Block&);
 public:
+  HydraulicB_BaC (Block&);
   ~HydraulicB_BaC ();
 };
 
@@ -112,14 +109,11 @@ HydraulicB_BaC::~HydraulicB_BaC ()
 
 // Add the HydraulicB_BaC syntax to the syntax table.
 
-Hydraulic&
-HydraulicB_BaC::make (Block& al)
-{
-  return *new HydraulicB_BaC (al);
-}
-
 static struct HydraulicB_BaCSyntax
 {
+  static Model& make (Block& al) 
+  { return *new HydraulicB_BaC (al); }
+
   HydraulicB_BaCSyntax ();
 } hydraulicB_BaC_syntax;
 
@@ -136,6 +130,5 @@ HydraulicB_BaCSyntax::HydraulicB_BaCSyntax ()
   syntax.add ("h_b", "cm", Syntax::Const,
 	      "Bubbling pressure.");
 
-  Librarian<Hydraulic>::add_type ("B_BaC", alist, syntax, 
-				  &HydraulicB_BaC::make);
+  Librarian<Hydraulic>::add_type ("B_BaC", alist, syntax, make);
 }

@@ -31,7 +31,7 @@ class Soil;
 class Log;
 class Surface;
 
-class Macro
+class Macro : public Model
 {
   // Content.
 public:
@@ -59,7 +59,7 @@ public:
 protected:
   Macro (Block& al);
 public:
-  virtual ~Macro ();
+  ~Macro ();
 };
 
 #ifdef FORWARD_TEMPLATES

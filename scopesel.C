@@ -76,7 +76,7 @@ public:
 
 static struct ScopeselNameSyntax
 {
-  static Scopesel& make (Block& al)
+  static Model& make (Block& al)
   { return *new ScopeselName (al); }
 
   ScopeselNameSyntax ()

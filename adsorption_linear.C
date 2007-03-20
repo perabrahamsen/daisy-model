@@ -60,7 +60,7 @@ public:
 
 static struct AdsorptionLinearSyntax
 {
-  static Adsorption& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new AdsorptionLinear (al);
   }

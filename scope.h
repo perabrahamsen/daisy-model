@@ -28,7 +28,7 @@
 
 class Treelog;
 
-class Scope
+class Scope : public Model
 {
   // Content.
 private:
@@ -58,7 +58,7 @@ public:
   explicit Scope (symbol title);
   explicit Scope (const char* title);
   explicit Scope (Block&);
-  virtual ~Scope ();
+  ~Scope ();
 };
 
 class WScope : public Scope     // Writable scope.

@@ -30,7 +30,7 @@ class PLF;
 class Production;
 class Vernalization;
 
-class Phenology 
+class Phenology : public Model 
 {
   // Content.
 public:
@@ -58,7 +58,7 @@ public:
 public:
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   Phenology (Block&);
-  virtual ~Phenology ();
+  ~Phenology ();
 };
 
 #ifdef FORWARD_TEMPLATES

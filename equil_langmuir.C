@@ -131,7 +131,7 @@ EquilibriumLangmuir::check (const Soil&, Treelog& err) const
 
 static struct EquilibriumLangmuirSyntax
 {
-  static Equilibrium& make (Block& al)
+  static Model& make (Block& al)
   { return *new EquilibriumLangmuir (al); }
 
   EquilibriumLangmuirSyntax ()

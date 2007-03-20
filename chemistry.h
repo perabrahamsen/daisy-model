@@ -29,7 +29,7 @@ class Soil;
 class SoilWater;
 class SoilChemicals;
 
-class Chemistry
+class Chemistry : public Model
 {
   // Content.
 public:
@@ -52,7 +52,7 @@ public:
 protected:
   Chemistry (Block& al);
 public:
-  virtual ~Chemistry ();
+  ~Chemistry ();
 };
 
 #ifdef FORWARD_TEMPLATES

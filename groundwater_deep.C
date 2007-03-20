@@ -55,7 +55,7 @@ public:
 
 static struct GroundwaterDeepSyntax
 {
-  static Groundwater& make (Block& al)
+  static Model& make (Block& al)
   { return *new GroundwaterDeep (al); }
 
   GroundwaterDeepSyntax ()

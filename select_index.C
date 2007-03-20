@@ -43,7 +43,7 @@ struct SelectIndex : public SelectValue
 
 static struct SelectIndexSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectIndex (al); }
 
   SelectIndexSyntax ()

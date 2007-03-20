@@ -218,8 +218,7 @@ struct Rootdens_DS_Depth : public Rootdens_PLF
 
 static struct Rootdens_DS_Depth_Syntax
 {
-  static Rootdens&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new Rootdens_DS_Depth (al); }
 
   Rootdens_DS_Depth_Syntax ()
@@ -268,8 +267,7 @@ struct Rootdens_DS_Rel : public Rootdens_PLF
 
 static struct Rootdens_DS_Rel_Syntax
 {
-  static Rootdens&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new Rootdens_DS_Rel (al); }
 
   Rootdens_DS_Rel_Syntax ()
@@ -318,8 +316,7 @@ struct Rootdens_Depth_Depth : public Rootdens_PLF
 
 static struct Rootdens_Depth_Depth_Syntax
 {
-  static Rootdens&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new Rootdens_Depth_Depth (al); }
 
   Rootdens_Depth_Depth_Syntax ()

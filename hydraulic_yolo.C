@@ -41,11 +41,8 @@ public:
   double M (double h) const;
 
   // Create and Destroy.
-private:
-  friend class HydraulicYoloSyntax;
-  static Hydraulic& make (Block& al);
-  HydraulicYolo (Block&);
 public:
+  HydraulicYolo (Block&);
   virtual ~HydraulicYolo ();
 };
 
@@ -106,14 +103,10 @@ HydraulicYolo::~HydraulicYolo ()
 
 // Add the HydraulicYolo syntax to the syntax table.
 
-Hydraulic&
-HydraulicYolo::make (Block& al)
-{
-  return *new HydraulicYolo (al);
-}
-
 static struct HydraulicYoloSyntax
 {
+  static Model& make (Block& al)
+  { return *new HydraulicYolo (al); }
   HydraulicYoloSyntax ();
 } hydraulicYolo_syntax;
 
@@ -125,5 +118,5 @@ HydraulicYoloSyntax::HydraulicYoloSyntax ()
   syntax.add ("M_intervals", Syntax::Integer, Syntax::Const,
 	      "Number of intervals for numeric integration of K.");
   alist.add ("M_intervals", 500);
-  Librarian<Hydraulic>::add_type ("yolo", alist, syntax, &HydraulicYolo::make);
+  Librarian<Hydraulic>::add_type ("yolo", alist, syntax, make);
 }

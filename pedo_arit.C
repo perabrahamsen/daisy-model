@@ -72,7 +72,7 @@ struct PedotransferIdentity : public Pedotransfer
 
 static struct PedotransferIdentitySyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferIdentity (al); }
   PedotransferIdentitySyntax ()
   {
@@ -127,7 +127,7 @@ struct PedotransferLog10 : public PedotransferOperand
 
 static struct PedotransferLog10Syntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferLog10 (al); }
   PedotransferLog10Syntax ()
   {
@@ -161,7 +161,7 @@ struct PedotransferLn : public PedotransferOperand
 
 static struct PedotransferLnSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferLn (al); }
   PedotransferLnSyntax ()
   {
@@ -195,7 +195,7 @@ struct PedotransferSqrt : public PedotransferOperand
 
 static struct PedotransferSqrtSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferSqrt (al); }
   PedotransferSqrtSyntax ()
   {
@@ -228,7 +228,7 @@ struct PedotransferSqr : public PedotransferOperand
 
 static struct PedotransferSqrSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferSqr (al); }
   PedotransferSqrSyntax ()
   {
@@ -281,7 +281,7 @@ struct PedotransferPow : public Pedotransfer
 
 static struct PedotransferPowSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferPow (al); }
   PedotransferPowSyntax ()
   {
@@ -414,7 +414,7 @@ struct PedotransferMax : public PedotransferOperands
 
 static struct PedotransferMaxSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferMax (al); }
   PedotransferMaxSyntax ()
   {
@@ -460,7 +460,7 @@ struct PedotransferMin : public PedotransferOperands
 
 static struct PedotransferMinSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferMin (al); }
   PedotransferMinSyntax ()
   {
@@ -501,7 +501,7 @@ struct PedotransferProduct : public PedotransferOperands
 
 static struct PedotransferProductSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferProduct (al); }
   PedotransferProductSyntax ()
   {
@@ -539,7 +539,7 @@ struct PedotransferSum : public PedotransferOperands
 
 static struct PedotransferSumSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferSum (al); }
   PedotransferSumSyntax ()
   {
@@ -583,7 +583,7 @@ struct PedotransferSubtract : public PedotransferOperands
 
 static struct PedotransferSubtractSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferSubtract (al); }
   PedotransferSubtractSyntax ()
   {
@@ -627,7 +627,7 @@ struct PedotransferDivide : public PedotransferOperands
 
 static struct PedotransferDivideSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferDivide (al); }
   PedotransferDivideSyntax ()
   {

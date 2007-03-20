@@ -45,7 +45,7 @@ struct ActionRidge : public Action
 // Add the ActionRidge syntax to the syntax table.
 static struct ActionRidgeSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionRidge (al); }
 
   ActionRidgeSyntax ()

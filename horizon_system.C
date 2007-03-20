@@ -52,7 +52,7 @@ struct HorizonSystem : public Horizon
     System (const string n)
       : name (n)
     { }
-    void add_to_lib (Horizon& (*make)(Block&),
+    void add_to_lib (Model& (*make)(Block&),
                      Syntax::check_fun check_list) const;
   };
 
@@ -130,7 +130,7 @@ HorizonSystem::System::add (const string& name, double limit)
 }
 
 void
-HorizonSystem::System::add_to_lib (Horizon& (make)(Block&),
+HorizonSystem::System::add_to_lib (Model& (make)(Block&),
                                    Syntax::check_fun check_alist) const
 {
     Syntax& syntax = *new Syntax ();
@@ -275,47 +275,47 @@ static const struct DIN5_type : public HorizonSystem::System
 
 static struct HorizonSystemSyntax
 {
-  static Horizon& make_USDA3 (Block& al)
+  static Model& make_USDA3 (Block& al)
   { return *new HorizonSystem (USDA3, al); }
   static bool check_USDA3 (const AttributeList& al, Treelog& err)
   { return USDA3.check_alist (al, err); }
 
-  static Horizon& make_USDA7 (Block& al)
+  static Model& make_USDA7 (Block& al)
   { return *new HorizonSystem (USDA7, al); }
   static bool check_USDA7 (const AttributeList& al, Treelog& err)
   { return USDA7.check_alist (al, err); }
 
-  static Horizon& make_ISSS3 (Block& al)
+  static Model& make_ISSS3 (Block& al)
   { return *new HorizonSystem (ISSS3, al); }
   static bool check_ISSS3 (const AttributeList& al, Treelog& err)
   { return ISSS3.check_alist (al, err); }
 
-  static Horizon& make_ISSS4 (Block& al)
+  static Model& make_ISSS4 (Block& al)
   { return *new HorizonSystem (ISSS4, al); }
   static bool check_ISSS4 (const AttributeList& al, Treelog& err)
   { return ISSS4.check_alist (al, err); }
 
-  static Horizon& make_USPRA3 (Block& al)
+  static Model& make_USPRA3 (Block& al)
   { return *new HorizonSystem (USPRA3, al); }
   static bool check_USPRA3 (const AttributeList& al, Treelog& err)
   { return USPRA3.check_alist (al, err); }
 
-  static Horizon& make_USPRA4 (Block& al)
+  static Model& make_USPRA4 (Block& al)
   { return *new HorizonSystem (USPRA4, al); }
   static bool check_USPRA4 (const AttributeList& al, Treelog& err)
   { return USPRA4.check_alist (al, err); }
 
-  static Horizon& make_BSI3 (Block& al)
+  static Model& make_BSI3 (Block& al)
   { return *new HorizonSystem (BSI3, al); }
   static bool check_BSI3 (const AttributeList& al, Treelog& err)
   { return BSI3.check_alist (al, err); }
 
-  static Horizon& make_BSI7 (Block& al)
+  static Model& make_BSI7 (Block& al)
   { return *new HorizonSystem (BSI7, al); }
   static bool check_BSI7 (const AttributeList& al, Treelog& err)
   { return BSI7.check_alist (al, err); }
 
-  static Horizon& make_DIN5 (Block& al)
+  static Model& make_DIN5 (Block& al)
   { return *new HorizonSystem (DIN5, al); }
   static bool check_DIN5 (const AttributeList& al, Treelog& err)
   { return DIN5.check_alist (al, err); }

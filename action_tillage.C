@@ -48,7 +48,7 @@ struct ActionMix : public Action
 
 static struct ActionMixSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
     { return *new ActionMix (al); }
 
   ActionMixSyntax ()
@@ -92,7 +92,7 @@ struct ActionSwap : public Action
 
 static struct ActionSwapSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
     { return *new ActionSwap (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
@@ -150,7 +150,7 @@ struct ActionSetPorosity : public Action
 
 static struct ActionSetPorositySyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
     { return *new ActionSetPorosity (al); }
 
   ActionSetPorositySyntax ()

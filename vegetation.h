@@ -40,7 +40,7 @@ class PLF;
 class Harvest;
 class AM;
 
-class Vegetation
+class Vegetation : public Model
 { 
   // Content.
 public:
@@ -137,7 +137,7 @@ public:
                            Treelog&) = 0;
   static void load_syntax (Syntax&, AttributeList&);
   explicit Vegetation (Block&);
-  virtual ~Vegetation ();
+  ~Vegetation ();
 };
 
 #ifdef FORWARD_TEMPLATES

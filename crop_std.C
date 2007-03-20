@@ -602,7 +602,7 @@ CropStandard::~CropStandard ()
 
 static struct CropStandardSyntax
 {
-  static Crop& make (Block& al)
+  static Model& make (Block& al)
   { return *new CropStandard (al); }
   CropStandardSyntax ();
 } standard_crop_syntax;

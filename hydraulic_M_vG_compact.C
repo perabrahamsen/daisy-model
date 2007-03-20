@@ -159,7 +159,7 @@ HydraulicM_vG_compact::~HydraulicM_vG_compact ()
 // Register the HydraulicM_vG_compact syntax.
 static struct HydraulicM_vG_compactSyntax
 {
-  static Hydraulic& make (Block& al)
+  static Model& make (Block& al)
   { return *new HydraulicM_vG_compact (al); }
 
   HydraulicM_vG_compactSyntax ()

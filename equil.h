@@ -27,7 +27,7 @@
 class Soil;
 class SoilWater;
 
-class Equilibrium
+class Equilibrium : public Model
 {
   // Content.
 public:
@@ -52,7 +52,7 @@ private:
 protected:
   explicit Equilibrium (Block& al);
 public:
-  virtual ~Equilibrium ();
+  ~Equilibrium ();
 };
 
 #ifdef FORWARD_TEMPLATES

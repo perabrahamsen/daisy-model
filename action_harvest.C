@@ -61,7 +61,7 @@ struct ActionEmerge : public Action
 
 static struct ActionEmergeSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionEmerge (al); }
   ActionEmergeSyntax ();
 } ActionEmerge_syntax;
@@ -130,7 +130,7 @@ struct ActionHarvest : public Action
 
 static struct ActionHarvestSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
     { return *new ActionHarvest (al); }
   ActionHarvestSyntax ();
 } ActionHarvest_syntax;

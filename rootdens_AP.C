@@ -122,8 +122,7 @@ Rootdens_AP::Rootdens_AP (Block& al)
 
 static struct Rootdens_APSyntax
 {
-  static Rootdens&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new Rootdens_AP (al); }
   Rootdens_APSyntax ()
   {

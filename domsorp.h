@@ -28,7 +28,7 @@ class Soil;
 class SoilWater;
 class SOM;
 class DOM;
-class Domsorp
+class Domsorp : public Model
 {
   // Content.
 public:
@@ -52,7 +52,7 @@ public:
 protected:
   Domsorp (Block& al);
 public:
-  virtual ~Domsorp ();
+  ~Domsorp ();
 };
 
 #ifdef FORWARD_TEMPLATES

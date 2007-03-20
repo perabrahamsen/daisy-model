@@ -152,7 +152,7 @@ struct NumberDepthTheta : public NumberByDepth
 
 static struct NumberDepthThetaSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberDepthTheta (al); }
   NumberDepthThetaSyntax ()
   {
@@ -190,7 +190,7 @@ struct NumberDepthK : public NumberByDepth
 
 static struct NumberDepthKSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberDepthK (al); }
   NumberDepthKSyntax ()
   {
@@ -278,7 +278,7 @@ struct NumberSoilTheta : public NumberByTension
 
 static struct NumberSoilThetaSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSoilTheta (al); }
   NumberSoilThetaSyntax ()
   {
@@ -312,7 +312,7 @@ struct NumberSoilK : public NumberByTension
 
 static struct NumberSoilKSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSoilK (al); }
   NumberSoilKSyntax ()
   {
@@ -351,7 +351,7 @@ struct NumberSoilHeatCapacity : public NumberByTension
 
 static struct NumberSoilHeatCapacitySyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSoilHeatCapacity (al); }
   NumberSoilHeatCapacitySyntax ()
   {
@@ -390,7 +390,7 @@ struct NumberSoilHeatConductivity : public NumberByTension
 
 static struct NumberSoilHeatConductivitySyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSoilHeatConductivity (al); }
   NumberSoilHeatConductivitySyntax ()
   {
@@ -454,7 +454,7 @@ struct NumberTensionByTheta : public Number
 
 static struct NumberTensionByThetaSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberTensionByTheta (al); }
   NumberTensionByThetaSyntax()
   {

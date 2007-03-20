@@ -93,7 +93,7 @@ struct OrganicNone : public OrganicMatter
 
 static struct OrganicNoneSyntax
 {
-  static OrganicMatter& make (Block& al)
+  static Model& make (Block& al)
   { return *new OrganicNone (al); }
 
   OrganicNoneSyntax ()

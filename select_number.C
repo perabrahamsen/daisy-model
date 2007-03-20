@@ -40,7 +40,7 @@ struct SelectNumber : public SelectValue
 
 static struct SelectNumberSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectNumber (al); }
 
   SelectNumberSyntax ()

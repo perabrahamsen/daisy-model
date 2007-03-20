@@ -24,7 +24,7 @@
 
 #include "librarian.h"
 
-class Bound
+class Bound : public Model
 {
   // Identity.
 public:

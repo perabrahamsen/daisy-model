@@ -102,7 +102,7 @@ Transport::none_model ()
 
 static struct TransportNoneSyntax
 {
-  static Transport& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new TransportNone (al);
   }

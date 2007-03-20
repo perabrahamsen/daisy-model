@@ -58,7 +58,7 @@ UZ1D::none_model ()
 
 static struct UZ1DNoneSyntax
 {
-  static UZ1D& make (Block& al)
+  static Model& make (Block& al)
   { return *new UZ1DNone (al); }
   UZ1DNoneSyntax ()
   {

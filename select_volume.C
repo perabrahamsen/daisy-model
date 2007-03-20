@@ -290,7 +290,7 @@ SelectVolume::~SelectVolume ()
 
 static struct SelectVolumeSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectVolume (al); }
 
   static void load_syntax (Syntax& syntax, AttributeList& alist)

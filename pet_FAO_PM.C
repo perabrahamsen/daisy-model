@@ -108,8 +108,7 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double Rn,
 
 static struct PetFAO_PMSyntax
 {
-  static Pet&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new PetFAO_PM (al); }
   PetFAO_PMSyntax ()
   {

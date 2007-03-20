@@ -57,8 +57,7 @@ struct ProgramCD : public Program
 
 static struct ProgramCDSyntax
 {
-  static Program&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ProgramCD (al); }
   ProgramCDSyntax ()
   {
@@ -112,8 +111,7 @@ struct ProgramWrite : public Program
 
 static struct ProgramWriteSyntax
 {
-  static Program&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ProgramWrite (al); }
   ProgramWriteSyntax ()
   {

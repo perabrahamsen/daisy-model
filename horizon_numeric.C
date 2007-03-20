@@ -81,7 +81,7 @@ HorizonNumeric::normalize (const vector<double>& original)
 
 static struct HorizonNumericSyntax
 {
-  static Horizon& make (Block& al)
+  static Model& make (Block& al)
   { return *new HorizonNumeric (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

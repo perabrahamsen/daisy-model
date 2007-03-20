@@ -141,7 +141,7 @@ struct SelectArray : public Select
 
 static struct SelectArraySyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectArray (al); }
 
   SelectArraySyntax ()

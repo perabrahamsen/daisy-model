@@ -1,7 +1,6 @@
-// parser.h
+// model.h -- Base class for all model in Daisy.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,41 +19,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef MODEL_H
+#define MODEL_H
 
-#include "librarian.h"
-
-class Treelog;
-
-class Parser : public Model
+class Model
 {
-  // Content.
-public:
-  const symbol name;
-  static const char *const description;
-
-  // Interface.
-public:
-  virtual void load_nested (AttributeList&) = 0;
-  virtual void load (AttributeList&) = 0;
-  virtual int error_count () const = 0;
- 
   // Create and Destroy.
-public:
-  virtual void initialize (Syntax&, Treelog&) = 0;
-  virtual bool check () const = 0;
+private:
+  Model (const Model&);
 protected:
-  explicit Parser (Block&);
-public:
-  ~Parser ();
+  Model ();
+  virtual ~Model ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-Librarian<Parser>::Content* Librarian<Parser>::content;
-#endif
-
-static Librarian<Parser> Parser_init ("parser");
-
-#endif // PARSER_H
+#endif // MODEL_H

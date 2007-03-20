@@ -184,9 +184,10 @@ ifeq ($(COMPILER),gcc)
 		  -Wconversion -Woverloaded-virtual \
 		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings \
                   -Wno-sign-compare  -Wundef -Wendif-labels \
-		  -Wcast-qual -Wcast-align -Wmissing-format-attribute 
+		  -Wcast-qual -Wcast-align -Wmissing-format-attribute \
+		  -Wold-style-cast
 # -Wfloat-equal
-#  -Wold-style-cast: triggered by header files for 2.95/woody
+#  : triggered by header files for 2.95/woody
 #  -Wmissing-noreturn: triggered by some virtual functions.
 #  -Wmissing-prototypes -Wstrict-prototypes: Not C++ flags.
 #  -Wuninitialized: triggered in 3.4 in initializations!
@@ -421,7 +422,7 @@ SPECIALS = scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = output.C scope_block.C librarian.C \
+OTHER = model.C output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \

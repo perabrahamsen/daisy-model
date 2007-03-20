@@ -1,4 +1,4 @@
-// toplevel.h -- The top level syntax for .dai files.
+// toplevel.C -- The top level syntax for .dai files.
 // 
 // Copyright 2007 Per Abrahamsen and KVL.
 //

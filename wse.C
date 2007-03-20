@@ -56,7 +56,7 @@ struct WSE_full : public WSE
 
 static struct WSE_fullSyntax
 {
-  static WSE& make (Block& al)
+  static Model& make (Block& al)
   { return *new WSE_full (al); }
   WSE_fullSyntax ()
   {
@@ -108,7 +108,7 @@ struct WSE_partial : public WSE
 
 static struct WSE_partialSyntax
 {
-  static WSE& make (Block& al)
+  static Model& make (Block& al)
   { return *new WSE_partial (al); }
   WSE_partialSyntax ()
   {
@@ -146,7 +146,7 @@ struct WSE_none : public WSE
 
 static struct WSE_noneSyntax
 {
-  static WSE& make (Block& al)
+  static Model& make (Block& al)
   { return *new WSE_none (al); }
   WSE_noneSyntax ()
   {
@@ -195,8 +195,7 @@ struct ProgramWSE_table : public Program
 
 static struct ProgramWSE_tableSyntax
 {
-  static Program&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ProgramWSE_table (al); }
   ProgramWSE_tableSyntax ()
   {

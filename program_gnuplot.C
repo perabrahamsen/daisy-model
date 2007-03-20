@@ -122,8 +122,7 @@ ProgramGnuplot::~ProgramGnuplot ()
 
 static struct ProgramGnuplotSyntax
 {
-  static Program&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ProgramGnuplot (al); }
   ProgramGnuplotSyntax ()
   {

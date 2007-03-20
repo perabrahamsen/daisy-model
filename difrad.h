@@ -28,7 +28,7 @@
 class Weather;
 class Time;
 
-class Difrad
+class Difrad : public Model
 {
   // Content.
 public:
@@ -46,7 +46,7 @@ public:
 protected:
   Difrad (Block&);
 public:
-  virtual ~Difrad ();
+  ~Difrad ();
 };
 
 #ifdef FORWARD_TEMPLATES

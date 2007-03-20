@@ -79,8 +79,7 @@ void RaddistStandard::tick (std::vector <double>& sun_LAI_fraction,
 
 static struct RaddistStandardSyntax
 {
-  static Raddist&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new RaddistStandard (al); }
   RaddistStandardSyntax ()
   {

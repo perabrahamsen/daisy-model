@@ -27,7 +27,7 @@
 
 class Hydraulic;
 
-class Tortuosity
+class Tortuosity : public Model
 {
   // Content.
 public:
@@ -42,7 +42,7 @@ public:
 protected:
   Tortuosity (Block&);
 public:
-  virtual ~Tortuosity ();
+  ~Tortuosity ();
 };
 
 #ifdef FORWARD_TEMPLATES

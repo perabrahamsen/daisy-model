@@ -92,7 +92,7 @@ Bound::~Bound ()
 // "none" model.
 static struct BoundNoneSyntax
 {
-  static Bound& make (Block& al)
+  static Model& make (Block& al)
   { return *new Bound (al, Bound::none, -42.42e42); }
   BoundNoneSyntax ()
   {
@@ -117,7 +117,7 @@ Bound::none_model ()
 // "full" model.
 static struct BoundFullSyntax
 {
-  static Bound& make (Block& al)
+  static Model& make (Block& al)
   { return *new Bound (al, Bound::full, 69.69e69); }
   BoundFullSyntax ()
   {
@@ -131,7 +131,7 @@ static struct BoundFullSyntax
 // finite model.
 static struct BoundFiniteSyntax
 {
-  static Bound& make (Block& al)
+  static Model& make (Block& al)
   { return *new Bound (al, Bound::finite, al.number ("bound")); }
   BoundFiniteSyntax ()
   {

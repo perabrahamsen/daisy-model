@@ -642,7 +642,7 @@ CropOld::initialize (const Geometry& geo,
 
 static struct CropOldSyntax
 {
-  static Crop& make (Block& al)
+  static Model& make (Block& al)
   { return *new CropOld (al); }
   CropOldSyntax ();
 } old_crop_syntax;

@@ -789,7 +789,7 @@ UZRect::default_model ()
 
 static struct UZRectMollerupSyntax
 {
-  static UZRect& make (Block& al)
+  static Model& make (Block& al)
   { return *new UZRectMollerup (al); }
   UZRectMollerupSyntax ()
   {

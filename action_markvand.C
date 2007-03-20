@@ -37,7 +37,7 @@
 
 // MV_Soil
 
-struct MV_Soil
+struct MV_Soil : public Model
 {
   // Content.
   const symbol name;
@@ -103,8 +103,7 @@ Description of a soil for use by the MARKVAND model.";
 
 static struct MV_SoilSyntax
 {
-  static MV_Soil&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new MV_Soil (al); }
   MV_SoilSyntax ()
   {
@@ -143,7 +142,7 @@ static struct MV_SoilSyntax
 
 // MV_Crop
 
-struct MV_Crop
+struct MV_Crop : public Model
 {
   // Content.
   const symbol name;
@@ -260,7 +259,7 @@ Description of a crop for use by the MARKVAND model.";
 
 static struct MV_CropSyntax
 {
-  static MV_Crop& make (Block& al)
+  static Model& make (Block& al)
   { return *new MV_Crop (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& msg)
@@ -637,7 +636,7 @@ ActionMarkvand::~ActionMarkvand ()
 
 static struct ActionMarkvandSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionMarkvand (al); }
   static bool check_alist (const AttributeList&, Treelog&)
   {

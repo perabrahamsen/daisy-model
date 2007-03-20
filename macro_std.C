@@ -403,7 +403,7 @@ Macro::create (double depth)
 
 static struct MacroStandardSyntax
 {
-  static Macro& make (Block& al)
+  static Model& make (Block& al)
   { return *new MacroStandard (al); }
 
   MacroStandardSyntax ()

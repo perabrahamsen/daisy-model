@@ -115,7 +115,7 @@ HorizonStandard::~HorizonStandard ()
 
 static struct HorizonStandardSyntax
 {
-  static Horizon& make (Block& al)
+  static Model& make (Block& al)
   { return *new HorizonStandard (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

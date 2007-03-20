@@ -29,7 +29,7 @@
 class Border;
 class Treelog;
 
-class Volume 
+class Volume : public Model 
 {
   // Content.
 public:
@@ -61,7 +61,7 @@ public:
   static Volume* build_obsolete (Block&);
   static const AttributeList& infinite_box ();
   Volume (Block&);
-  virtual ~Volume ();
+  ~Volume ();
 };
 
 #ifdef FORWARD_TEMPLATES

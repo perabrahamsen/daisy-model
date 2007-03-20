@@ -107,8 +107,7 @@ PhenologyTSum::PhenologyTSum (Block& al)
 
 static struct PhenologyTSumSyntax
 {
-  static Phenology&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new PhenologyTSum (al); }
 
   PhenologyTSumSyntax ()

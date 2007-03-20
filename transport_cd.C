@@ -378,7 +378,7 @@ Number of times we may reduce the time step before giving up");
 
 static struct TransportCDSyntax
 {
-  static Transport& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new TransportCD (al);
   }

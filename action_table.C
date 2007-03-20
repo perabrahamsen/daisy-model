@@ -288,7 +288,7 @@ ActionTable::ActionTable (Block& al)
 // Add the ActionTable syntax to the syntax table.
 static struct ActionTableSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionTable (al); }
 
   ActionTableSyntax ()

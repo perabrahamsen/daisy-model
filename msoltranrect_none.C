@@ -234,7 +234,7 @@ Msoltranrect::none_model ()
 
 static struct MsoltranrectNoneSyntax
 {
-  static Msoltranrect& make (Block& al)
+  static Model& make (Block& al)
   { return *new MsoltranrectNone (al); }
 
   MsoltranrectNoneSyntax ()

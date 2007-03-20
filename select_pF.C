@@ -94,7 +94,7 @@ struct SelectPF : public Select
 
 static struct SelectPFSyntax
 {
-  static Select& make (Block& al)
+  static Model& make (Block& al)
   { return *new SelectPF (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

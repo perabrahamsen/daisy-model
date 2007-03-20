@@ -118,7 +118,7 @@ public:
 
 static struct GroundwaterExternSyntax
 {
-  static Groundwater& make (Block& al)
+  static Model& make (Block& al)
   { return *new GroundwaterExtern (al); }
   GroundwaterExternSyntax ()
   { 

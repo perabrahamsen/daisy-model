@@ -90,7 +90,7 @@ NitrificationSolute::NitrificationSolute (Block& al)
 
 static struct NitrificationSoluteSyntax
 {
-  static Nitrification& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new NitrificationSolute (al);
   }

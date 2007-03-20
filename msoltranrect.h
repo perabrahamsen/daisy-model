@@ -47,7 +47,7 @@ class Weather;
 class Time;
 class Treelog;
 
-class Msoltranrect
+class Msoltranrect : public Model
 {
   // Content.
 public:
@@ -72,7 +72,7 @@ public:
 protected:
   Msoltranrect (Block&);
 public:
-  virtual ~Msoltranrect ();
+  ~Msoltranrect ();
 };
 
 #ifdef FORWARD_TEMPLATES

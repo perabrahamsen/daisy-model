@@ -122,7 +122,7 @@ struct DomsorpStandard : public Domsorp
 
 static struct DomsorpStandardSyntax
 {
-  static Domsorp& make (Block& al)
+  static Model& make (Block& al)
   { return *new DomsorpStandard (al); }
   DomsorpStandardSyntax ()
   {

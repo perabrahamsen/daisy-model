@@ -70,7 +70,7 @@ struct ConditionTSum : public Condition
 };
 static struct ConditionWeatherSyntax
 {
-  static Condition& make_TSum (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionTSum (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
@@ -121,7 +121,7 @@ Temeperature sum above which the condition becomes true.");
 Current temeprature sum since last reset.");
       syntax.order ("TSum_limit");
       Librarian<Condition>::add_type ("TSum_above",
-				      alist, syntax, &make_TSum);
+				      alist, syntax, &make);
     }
   }
 } ConditionWeather_syntax;

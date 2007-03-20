@@ -134,7 +134,7 @@ struct NumberSourceUnique : public NumberSource
 
 static struct NumberSourceUniqueSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSourceUnique (al); }
   NumberSourceUniqueSyntax ()
   {
@@ -181,7 +181,7 @@ struct NumberSourceAverage : public NumberSource
 
 static struct NumberSourceAverageSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSourceAverage (al); }
   NumberSourceAverageSyntax ()
   {
@@ -214,7 +214,7 @@ struct NumberSourceSum : public NumberSource
 
 static struct NumberSourceSumSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSourceSum (al); }
   NumberSourceSumSyntax ()
   {
@@ -260,7 +260,7 @@ struct NumberSourceIncrease : public NumberSource
 
 static struct NumberSourceIncreaseSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberSourceIncrease (al); }
   NumberSourceIncreaseSyntax ()
   {

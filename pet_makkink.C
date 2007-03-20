@@ -64,8 +64,7 @@ struct PetMakkink : public Pet
 
 static struct PetMakkinkSyntax
 {
-  static Pet&
-  make (Block& al)
+  static Model& make (Block& al)
     { return *new PetMakkink (al); }
   PetMakkinkSyntax ()
     {

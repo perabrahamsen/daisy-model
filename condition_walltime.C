@@ -50,7 +50,7 @@ public:
 
 static struct ConditionPeriodicSyntax
 {
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionPeriodic (al); }
   ConditionPeriodicSyntax ()
   {

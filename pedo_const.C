@@ -173,7 +173,7 @@ struct PedotransferGet : public PedotransferLeaf
 
 static struct PedotransferConstSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferConst (al); }
   PedotransferConstSyntax ()
   {
@@ -191,7 +191,7 @@ static struct PedotransferConstSyntax
 
 static struct PedotransferHumusSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferHumus (al); }
   PedotransferHumusSyntax ()
   {
@@ -210,7 +210,7 @@ static struct PedotransferHumusSyntax
 
 static struct PedotransferMineralSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferMineral (al); }
   PedotransferMineralSyntax ()
   {
@@ -229,7 +229,7 @@ static struct PedotransferMineralSyntax
 
 static struct PedotransferRho_BSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferRho_B (al); }
   PedotransferRho_BSyntax ()
   {
@@ -249,7 +249,7 @@ static struct PedotransferRho_BSyntax
 
 static struct PedotransferBelowSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferBelow (al); }
   PedotransferBelowSyntax ()
   {
@@ -270,7 +270,7 @@ static struct PedotransferBelowSyntax
 
 static struct PedotransferGetSyntax
 {
-  static Pedotransfer& make (Block& al)
+  static Model& make (Block& al)
   { return *new PedotransferGet (al); }
   PedotransferGetSyntax ()
   {

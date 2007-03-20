@@ -25,7 +25,7 @@
 
 #include "librarian.h"
 
-class Chemical
+class Chemical : public Model
 {
   // Content.
 public:
@@ -51,7 +51,7 @@ public:
 protected:
   Chemical (const AttributeList&);
 public:
-  virtual ~Chemical ();
+  ~Chemical ();
 };
 
 #ifdef FORWARD_TEMPLATES

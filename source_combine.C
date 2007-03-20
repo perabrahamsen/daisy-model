@@ -115,7 +115,7 @@ SourceCombine::SourceCombine (Block& al)
 
 static struct SourceCombineSyntax
 {
-  static Source& make (Block& al)
+  static Model& make (Block& al)
   { return *new SourceCombine (al); }
 
   SourceCombineSyntax ()

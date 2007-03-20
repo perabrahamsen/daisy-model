@@ -79,7 +79,7 @@ public:
 
 static struct AdsorptionLangmuirSyntax
 {
-  static Adsorption& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new AdsorptionLangmuir (al);
   }

@@ -28,7 +28,7 @@
 
 class Daisy;
 
-class Action
+class Action : public Model
 {
   // Content.
 public:
@@ -53,7 +53,7 @@ protected:
   explicit Action (Block&, const AttributeList& al);
   explicit Action (Block& al);
 public:
-  virtual ~Action ();
+  ~Action ();
 };
 
 #ifdef FORWARD_TEMPLATES

@@ -197,7 +197,7 @@ SourceMerge::SourceMerge (Block& al)
 
 static struct SourceMergeSyntax
 {
-  static Source& make (Block& al)
+  static Model& make (Block& al)
   { return *new SourceMerge (al); }
 
   SourceMergeSyntax ()

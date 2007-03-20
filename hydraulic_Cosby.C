@@ -170,7 +170,7 @@ Hydraulic_Cosby::~Hydraulic_Cosby ()
 // Add the Hydraulic_Cosby syntax to the syntax table.
 static struct Hydraulic_CosbySyntax
 {
-  static Hydraulic& make (Block& al)
+  static Model& make (Block& al)
   { return *new Hydraulic_Cosby (al); }
 
   Hydraulic_CosbySyntax ()

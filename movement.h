@@ -46,7 +46,7 @@ class Weather;
 class Time;
 class Treelog;
 
-class Movement
+class Movement : public Model
 {
   // Content.
 public:
@@ -90,7 +90,7 @@ public:
 protected:
   Movement (Block&);
 public:
-  virtual ~Movement ();
+  ~Movement ();
 };
 
 #ifdef FORWARD_TEMPLATES

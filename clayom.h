@@ -30,7 +30,7 @@ class SMB;
 class Soil;
 class Treelog;
 
-class ClayOM
+class ClayOM : public Model
 {
   // Content.
 public:
@@ -52,7 +52,7 @@ public:
 protected:
   ClayOM (Block& al);
 public:
-  virtual ~ClayOM ();
+  ~ClayOM ();
 };
 
 #ifdef FORWARD_TEMPLATES

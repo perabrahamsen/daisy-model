@@ -82,8 +82,7 @@ struct PetHargreaves : public Pet
 
 static struct PetHargreavesSyntax
 {
-  static Pet&
-  make (Block& al)
+  static Model& make (Block& al)
     { return *new PetHargreaves (al); }
   PetHargreavesSyntax ()
     {

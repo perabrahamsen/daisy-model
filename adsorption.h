@@ -27,7 +27,7 @@
 
 class Soil;
 
-class Adsorption
+class Adsorption : public Model
 {
   // Content.
 public:
@@ -45,7 +45,7 @@ public:
 protected:
   Adsorption (Block& al);
 public:
-  virtual ~Adsorption ();
+  ~Adsorption ();
 };
 
 #ifdef FORWARD_TEMPLATES

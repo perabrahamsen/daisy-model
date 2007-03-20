@@ -68,7 +68,7 @@ struct IntegerConst : public Integer
 
 static struct IntegerConstSyntax
 {
-  static Integer& make (Block& al)
+  static Model& make (Block& al)
   { return *new IntegerConst (al); }
   IntegerConstSyntax ()
   {
@@ -151,7 +151,7 @@ Value to return.");
 
 static struct IntegerCondSyntax
 {
-  static Integer& make (Block& al)
+  static Model& make (Block& al)
   { return *new IntegerCond (al); }
   IntegerCondSyntax ()
   {

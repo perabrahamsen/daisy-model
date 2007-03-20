@@ -752,7 +752,7 @@ UZmodel::default_model ()
 // Add the UZRichard syntax to the syntax table.
 static struct UZRichardSyntax
 {
-  static UZmodel& make (Block& al)
+  static Model& make (Block& al)
     {
       return *new UZRichard (al);
     }

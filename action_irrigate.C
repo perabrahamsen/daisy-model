@@ -190,7 +190,7 @@ struct ActionIrrigateSubsoil : public ActionIrrigate
 
 static struct ActionIrrigateOverheadSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionIrrigateOverhead (al); }
   ActionIrrigateOverheadSyntax ()
   { 
@@ -205,7 +205,7 @@ Irrigate the field from above.");
 
 static struct ActionIrrigateSurfaceSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionIrrigateSurface (al); }
   ActionIrrigateSurfaceSyntax ()
   { 
@@ -220,7 +220,7 @@ Irrigate the field directly on the soil surface, bypassing the canopy.");
 
 static struct ActionIrrigateTopSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionIrrigateOverhead (al); }
   static bool check_alist (const AttributeList&, Treelog& err)
   {
@@ -245,7 +245,7 @@ OBSOLETE.  Use 'irrigate_overhead' instead.");
 
 static struct ActionIrrigateSubsoilSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionIrrigateSubsoil (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

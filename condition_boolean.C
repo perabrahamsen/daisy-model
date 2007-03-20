@@ -70,7 +70,7 @@ struct ConditionBoolean : public Condition
 
 static struct ConditionBooleanSyntax
 {
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionBoolean (al); }
 
   ConditionBooleanSyntax ()

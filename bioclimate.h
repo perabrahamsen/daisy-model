@@ -41,7 +41,7 @@ class Log;
 class Chemicals;
 class Time;
 
-class Bioclimate
+class Bioclimate : public Model
 { 
   // Content.
 public:
@@ -111,7 +111,7 @@ public:
 protected:
   explicit Bioclimate (Block&);
 public:
-  virtual ~Bioclimate ();
+  ~Bioclimate ();
 };
 
 #ifdef FORWARD_TEMPLATES

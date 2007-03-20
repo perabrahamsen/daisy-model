@@ -24,7 +24,7 @@
 #include "librarian.h"
 #include "time.h"
 
-class Source
+class Source : public Model
 {
   // Content.
 public:
@@ -56,7 +56,7 @@ protected:
 private:
   Source (const Source&);
 public:
-  virtual ~Source ();
+  ~Source ();
 };
 
 #ifdef FORWARD_TEMPLATES

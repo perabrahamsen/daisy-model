@@ -50,7 +50,7 @@ public:
       day (al.integer ("day")),
       hour (al.integer ("hour"))
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionMMDD (al); }
 };
 
@@ -77,7 +77,7 @@ public:
       day (al.integer ("day")),
       hour (al.integer ("hour"))
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionBeforeMMDD (al); }
 };
 
@@ -104,7 +104,7 @@ public:
       day (al.integer ("day")),
       hour (al.integer ("hour"))
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionAfterMMDD (al); }
 };
 
@@ -120,7 +120,7 @@ public:
     : Condition (al),
       time (al.alist ("time"))
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionAt (al); }
 };
 
@@ -136,7 +136,7 @@ public:
     : Condition (al),
       time (al.alist ("time"))
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionBefore (al); }
 };
 
@@ -152,7 +152,7 @@ public:
     : Condition (al),
       time (al.alist ("time"))
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionAfter (al); }
 };
 
@@ -176,7 +176,7 @@ struct ConditionHourly : public Condition
     : Condition (al),
       step (al.integer ("step"))
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionHourly (al); }
 };
 
@@ -197,7 +197,7 @@ struct ConditionDaily : public Condition
     : Condition (al),
       step (al.integer ("step"))
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionDaily (al); }
 };
 
@@ -220,7 +220,7 @@ struct ConditionWeekly : public Condition
     : Condition (al),
       step (al.integer ("step"))
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionWeekly (al); }
 };
 
@@ -248,7 +248,7 @@ struct ConditionMonthly : public Condition
     : Condition (al),
       step (al.integer ("step"))
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionMonthly (al); }
 };
 
@@ -277,7 +277,7 @@ struct ConditionYearly : public Condition
     : Condition (al),
       step (al.integer ("step"))
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionYearly (al); }
 };
 
@@ -294,7 +294,7 @@ struct ConditionHour : public Condition
     : Condition (al),
       at (al.integer ("at"))
     { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
     { return *new ConditionHour (al); }
 };
 
@@ -309,7 +309,7 @@ struct ConditionMDay : public Condition
     : Condition (al),
       at (al.integer ("at"))
     { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
     { return *new ConditionMDay (al); }
 };
 
@@ -325,7 +325,7 @@ public:
     : Condition (al),
       at (al.integer ("at"))
     { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
     { return *new ConditionYDay (al); }
 };
 
@@ -341,7 +341,7 @@ public:
     : Condition (al),
       at (al.integer ("at"))
     { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
     { return *new ConditionMonth (al); }
 };
 
@@ -357,7 +357,7 @@ public:
     : Condition (al),
       at (al.integer ("at"))
     { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
     { return *new ConditionYear (al); }
 };
 
@@ -385,7 +385,7 @@ struct ConditionTimestep : public Condition
   { }
   ~ConditionTimestep ()
   { }
-  static Condition& make (Block& al)
+  static Model& make (Block& al)
   { return *new ConditionTimestep (al); }
 };
 

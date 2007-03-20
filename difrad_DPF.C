@@ -86,8 +86,7 @@ struct DifradDPF : public Difrad
 
 static struct DifradDPFSyntax
 {
-  static Difrad&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new DifradDPF (al); }
   DifradDPFSyntax ()
   {

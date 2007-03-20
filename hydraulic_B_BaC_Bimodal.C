@@ -48,11 +48,8 @@ private:
   double Se (double h) const;
 
   // Create and Destroy.
-private:
-  friend class HydraulicB_BaC_BimodalSyntax;
-  static Hydraulic& make (Block& al);
-  HydraulicB_BaC_Bimodal (Block&);
 public:
+  HydraulicB_BaC_Bimodal (Block&);
   ~HydraulicB_BaC_Bimodal ();
 };
 
@@ -131,14 +128,11 @@ HydraulicB_BaC_Bimodal::~HydraulicB_BaC_Bimodal ()
 
 // Add the HydraulicB_BaC_Bimodal syntax to the syntax table.
 
-Hydraulic&
-HydraulicB_BaC_Bimodal::make (Block& al)
-{
-  return *new HydraulicB_BaC_Bimodal (al);
-}
-
 static struct HydraulicB_BaC_BimodalSyntax
 {
+  static Model& make (Block& al)
+  { return *new HydraulicB_BaC_Bimodal (al); }
+
   HydraulicB_BaC_BimodalSyntax ();
 } HydraulicB_BaC_Bimodal_syntax;
 
@@ -161,6 +155,5 @@ Bimodal hydraulic conductivity curve.");
   syntax.add ("K_b", "cm/h", Syntax::Const,
 	      "Water conductivity at 'h_b'.");
 
-  Librarian<Hydraulic>::add_type ("B_BaC_Bimodal", alist, syntax,
-				  &HydraulicB_BaC_Bimodal::make);
+  Librarian<Hydraulic>::add_type ("B_BaC_Bimodal", alist, syntax, make);
 }

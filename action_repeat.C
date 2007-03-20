@@ -86,7 +86,7 @@ struct ActionRepeat : public Action
 
 static struct ActionRepeatSyntax
 {
-  static Action& make (Block& al)
+  static Model& make (Block& al)
   { return *new ActionRepeat (al); }
 
   ActionRepeatSyntax ()

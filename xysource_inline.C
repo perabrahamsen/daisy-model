@@ -101,7 +101,7 @@ XYSourceInline::~XYSourceInline ()
 
 static struct XYSourceInlineSyntax
 {
-  static XYSource& make (Block& al)
+  static Model& make (Block& al)
   { return *new XYSourceInline (al); }
 
   XYSourceInlineSyntax ()

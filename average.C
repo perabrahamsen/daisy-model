@@ -58,8 +58,7 @@ struct AverageArithmetic : public Average
 
 static struct AverageArithmeticSyntax
 {
-  static Average&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new AverageArithmetic (al); }
   AverageArithmeticSyntax ()
   {
@@ -103,8 +102,7 @@ struct AverageHarmonic : public Average
 
 static struct AverageHarmonicSyntax
 {
-  static Average&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new AverageHarmonic (al); }
   AverageHarmonicSyntax ()
   {
@@ -132,8 +130,7 @@ struct AverageGeometric : public Average
 
 static struct AverageGeometricSyntax
 {
-  static Average&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new AverageGeometric (al); }
   AverageGeometricSyntax ()
   {

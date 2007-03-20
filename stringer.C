@@ -118,7 +118,7 @@ Value to return.");
 
 static struct StringerCondSyntax
 {
-  static Stringer& make (Block& al)
+  static Model& make (Block& al)
   { return *new StringerCond (al); }
   StringerCondSyntax ()
   {
@@ -194,7 +194,7 @@ struct StringerValue : public StringerNumber
 
 static struct StringerValueSyntax
 {
-  static Stringer& make (Block& al)
+  static Model& make (Block& al)
   { return *new StringerValue (al); }
   StringerValueSyntax ()
   {
@@ -221,7 +221,7 @@ struct StringerDimension : public StringerNumber
 
 static struct StringerDimensionSyntax
 {
-  static Stringer& make (Block& al)
+  static Model& make (Block& al)
   { return *new StringerDimension (al); }
   StringerDimensionSyntax ()
   {
@@ -262,7 +262,7 @@ struct StringerIdentity : public Stringer
 
 static struct StringerIdentitySyntax
 {
-  static Stringer& make (Block& al)
+  static Model& make (Block& al)
   { return *new StringerIdentity (al); }
   StringerIdentitySyntax ()
   {

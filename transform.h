@@ -28,7 +28,7 @@
 class Soil;
 class SoilWater;
 
-class Transform
+class Transform : public Model
 {
   // Content.
 public:
@@ -54,7 +54,7 @@ private:
 protected:
   explicit Transform (Block&);
 public:
-  virtual ~Transform ();
+  ~Transform ();
 };
 
 #ifdef FORWARD_TEMPLATES

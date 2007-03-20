@@ -555,8 +555,7 @@ PhotoFCC4::output(Log& log) const
 
 static struct Photo_FQC4Syntax
 {
-  static Photo&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new PhotoFCC4 (al); }
   Photo_FQC4Syntax ()
   {

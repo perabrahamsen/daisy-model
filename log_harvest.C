@@ -210,7 +210,7 @@ struct LogHarvest : public Log
 
 static struct LogHarvestSyntax
 {
-  static Log& make (Block& al)
+  static Model& make (Block& al)
   { return *new LogHarvest (al); }
 
   LogHarvestSyntax ()

@@ -55,8 +55,7 @@ struct MacroNone : public Macro
 
 static struct MacroNoneSyntax
 {
-  static Macro&
-  make (Block& al)
+  static Model& make (Block& al)
     { return *new MacroNone (al); }
   MacroNoneSyntax ()
     {

@@ -430,7 +430,7 @@ LogTable::~LogTable ()
 
 static struct LogTableSyntax
 {
-  static Log& make (Block& al)
+  static Model& make (Block& al)
   { return *new LogTable (al); }
 
   LogTableSyntax ()

@@ -42,7 +42,7 @@ public:
 
 static struct AdsorptionNoneSyntax
 {
-  static Adsorption& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new AdsorptionNone (al);
   }

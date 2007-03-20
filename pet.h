@@ -35,7 +35,7 @@ class Vegetation;
 class Surface;
 class Time;
 
-class Pet
+class Pet : public Model
 {
   // Content.
 public:
@@ -63,7 +63,7 @@ public:
 protected:
   Pet (Block&);
 public:
-  virtual ~Pet ();
+  ~Pet ();
 };
 
 #ifdef FORWARD_TEMPLATES

@@ -154,8 +154,7 @@ ChemicalStandard::ChemicalStandard (Block& al)
 
 static struct ChemicalStandardSyntax
 {
-  static Chemical&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ChemicalStandard (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)

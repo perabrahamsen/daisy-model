@@ -58,11 +58,8 @@ public:
   { return snow_; }
 
   // Create and Destroy.
-private:
-  friend class WeatherNoneSyntax;
-  static Weather& make (Block&);
-  WeatherNone (Block&);
 public:
+  WeatherNone (Block&);
   ~WeatherNone ();
 };
 
@@ -79,14 +76,10 @@ WeatherNone::~WeatherNone ()
 { }
 
 // Add the WeatherNone syntax to the syntax table.
-Weather&
-WeatherNone::make (Block& al)
-{
-  return *new WeatherNone (al);
-}
-
 static struct WeatherNoneSyntax
 {
+  static Model& make (Block& al)
+  { return *new WeatherNone (al); }
   WeatherNoneSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
@@ -109,6 +102,6 @@ static struct WeatherNoneSyntax
     alist.add ("rain_value", 0.0);
     syntax.add ("snow_value", "mm/h", Syntax::Const, "Constant snow.");
     alist.add ("snow_value", 0.0);
-    Librarian<Weather>::add_type ("none", alist, syntax, &WeatherNone::make);
+    Librarian<Weather>::add_type ("none", alist, syntax, make);
   }
 } WeatherNone_syntax;

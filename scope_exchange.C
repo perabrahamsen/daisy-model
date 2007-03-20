@@ -23,7 +23,7 @@
 #include "alist.h"
 #include "memutils.h"
 
-class Exchange
+class Exchange : public Model
 {
   // Content.
 public:
@@ -51,7 +51,7 @@ public:
 public:
   Exchange ()
   { }
-  virtual ~Exchange ()
+  ~Exchange ()
   { }
 };
 
@@ -108,7 +108,7 @@ struct ExchangeNumber : public Exchange
 
 static struct ExchangeNumberSyntax
 {
-  static Exchange& make (Block& al)
+  static Model& make (Block& al)
   { return *new ExchangeNumber (al); }
   ExchangeNumberSyntax ()
   {
@@ -156,7 +156,7 @@ struct ExchangeName : public Exchange
 
 static struct ExchangeNameSyntax
 {
-  static Exchange& make (Block& al)
+  static Model& make (Block& al)
   { return *new ExchangeName (al); }
   ExchangeNameSyntax ()
   {
@@ -262,8 +262,7 @@ public:
 
 static struct ScopeExchangeSyntax
 {
-  static Scope&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new ScopeExchange (al); }
   ScopeExchangeSyntax ()
   {

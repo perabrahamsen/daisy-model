@@ -33,7 +33,7 @@ class AOM;
 class Treelog;
 class VCheck;
 
-class AM
+class AM : public Model
 {
   // Content.
   struct Implementation;
@@ -106,7 +106,7 @@ private:
   friend class AM_Syntax;
   AM (const AttributeList&);
 public:
-  virtual ~AM ();
+  ~AM ();
 };
 
 #ifdef FORWARD_TEMPLATES

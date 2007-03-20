@@ -55,7 +55,7 @@ struct NumberConst : public Number
 
 static struct NumberConstSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberConst (al); }
   NumberConstSyntax ()
   {
@@ -131,7 +131,7 @@ struct NumberGet : public NumberLeaf
 
 static struct NumberGetSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberGet (al); }
   NumberGetSyntax ()
   {
@@ -237,7 +237,7 @@ struct NumberFetch : public Number
 
 static struct NumberFetchSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberFetch (al); }
   NumberFetchSyntax ()
   {
@@ -327,7 +327,7 @@ struct NumberIdentity : public NumberChild
 
 static struct NumberIdentitySyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberIdentity (al); }
   NumberIdentitySyntax ()
   {
@@ -384,7 +384,7 @@ struct NumberConvert : public NumberChild
 
 static struct NumberConvertSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberConvert (al); }
   NumberConvertSyntax ()
   {
@@ -439,7 +439,7 @@ struct NumberDim : public NumberChild
 
 static struct NumberDimSyntax
 {
-  static Number& make (Block& al)
+  static Model& make (Block& al)
   { return *new NumberDim (al); }
   NumberDimSyntax ()
   {

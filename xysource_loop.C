@@ -141,7 +141,7 @@ XYSourceLoop::~XYSourceLoop ()
 
 static struct XYSourceLoopSyntax
 {
-  static XYSource& make (Block& al)
+  static Model& make (Block& al)
   { return *new XYSourceLoop (al); }
 
   static bool check_alist (const AttributeList& alist, Treelog& msg)

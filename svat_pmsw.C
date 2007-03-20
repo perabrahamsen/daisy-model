@@ -1972,8 +1972,7 @@ SVAT_PMSW::~SVAT_PMSW() // destructor
 
 static struct SVAT_PMSWSyntax
 {
-  static SVAT&
-  make (Block& al)
+  static Model& make (Block& al)
   { return *new SVAT_PMSW (al); }
   SVAT_PMSWSyntax ()
   {

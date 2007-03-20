@@ -380,7 +380,7 @@ FormatPlain::see_page (const std::string& scope, const std::string& id)
 
 static struct FormatPlainSyntax
 {
-  static Format& make (Block& al)
+  static Model& make (Block& al)
   { return *new FormatPlain (al); }
   FormatPlainSyntax ()
   {

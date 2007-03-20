@@ -160,7 +160,7 @@ EquilibriumGoal_A::check (const Soil&, Treelog& err) const
 
 static struct EquilibriumGoal_ASyntax
 {
-  static Equilibrium& make (Block& al)
+  static Model& make (Block& al)
   { return *new EquilibriumGoal_A (al); }
 
   EquilibriumGoal_ASyntax ()

@@ -26,7 +26,7 @@
 
 class Scope;
 
-class Stringer
+class Stringer : public Model
 {
   // Content.
 public:
@@ -47,7 +47,7 @@ public:
 protected:
   explicit Stringer (Block&);
 public:
-  virtual ~Stringer ();
+  ~Stringer ();
 };
 
 #ifdef FORWARD_TEMPLATES

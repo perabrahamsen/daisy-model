@@ -204,7 +204,7 @@ Number of times we may reduce the time step before giving up");
 
 static struct TransportConvectionSyntax
 {
-  static Transport& make (Block& al)
+  static Model& make (Block& al)
   {
     return *new TransportConvection (al);
   }

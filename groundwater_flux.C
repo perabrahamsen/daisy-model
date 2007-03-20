@@ -60,7 +60,7 @@ public:
 
 static struct GroundwaterFluxSyntax
 {
-  static Groundwater& make (Block& al)
+  static Model& make (Block& al)
   { return *new GroundwaterFlux (al); }
 
   GroundwaterFluxSyntax ()

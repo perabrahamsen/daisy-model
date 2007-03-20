@@ -40,7 +40,7 @@ class Format;
 class Border;
 class Volume;
 
-struct Handle 
+struct Handle
 {
   // Enum in a namespace.
   enum handle_t { min, max, average, geometric, sum, current };
@@ -58,7 +58,7 @@ public:
   { }
 };
 
-class Select
+class Select : public Model 
 {
   // Content.
 public:
@@ -155,7 +155,7 @@ public:
 protected:
   Select (Block& al);
 public:
-  virtual ~Select ();
+  ~Select ();
 };
 
 #ifdef FORWARD_TEMPLATES

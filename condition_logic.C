@@ -189,17 +189,17 @@ struct ConditionIf : public Condition
 
 static struct ConditionLogicSyntax
 {
-  static Condition& make_false (Block& al)
+  static Model& make_false (Block& al)
   { return *new ConditionFalse (al); }
-  static Condition& make_true (Block& al)
+  static Model& make_true (Block& al)
   { return *new ConditionTrue (al); }
-  static Condition& make_or (Block& al)
+  static Model& make_or (Block& al)
   { return *new ConditionOr (al); }
-  static Condition& make_and (Block& al)
+  static Model& make_and (Block& al)
   { return *new ConditionAnd (al); }
-  static Condition& make_not (Block& al)
+  static Model& make_not (Block& al)
   { return *new ConditionNot (al); }
-  static Condition& make_if (Block& al)
+  static Model& make_if (Block& al)
   { return *new ConditionIf (al); }
   ConditionLogicSyntax ();
 } ConditionLogic_syntax;

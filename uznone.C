@@ -67,7 +67,7 @@ public:
 // Add the UZNone syntax to the syntax table.
 static struct UZNoneSyntax
 {
-  static UZmodel& make (Block& al)
+  static Model& make (Block& al)
     {
       return *new UZNone (al);
     }

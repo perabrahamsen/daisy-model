@@ -101,7 +101,7 @@ public:
          const std::vector<size_t>& cells, const std::vector<int>& edges);
 };
 
-class UZ1D
+class UZ1D  : public Model
 {
   // Content.
 public: 
@@ -123,7 +123,7 @@ private:
 protected:
   explicit UZ1D (Block&);
 public:
-  virtual ~UZ1D ();
+  ~UZ1D ();
 };
 
 #ifdef FORWARD_TEMPLATES

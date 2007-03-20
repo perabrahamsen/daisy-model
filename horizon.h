@@ -32,7 +32,7 @@ class Tortuosity;
 class Texture;
 class Treelog;
 
-class Horizon 
+class Horizon : public Model 
 {
   // Content.
 private:
@@ -92,7 +92,7 @@ protected:
   void initialize_base (bool top_soil, int som_size, const Texture& texture, 
                         Treelog&);
 public:
-  virtual ~Horizon ();
+  ~Horizon ();
 };
 
 #ifdef FORWARD_TEMPLATES
