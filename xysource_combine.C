@@ -25,6 +25,7 @@
 #include "number.h"
 #include "scope_sources.h"
 #include "source.h"
+#include "assertion.h"
 
 struct XYSourceCombine : public XYSource
 {

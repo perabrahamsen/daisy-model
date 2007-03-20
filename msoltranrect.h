@@ -35,6 +35,7 @@
 
 #include <vector>
 
+class Log;
 class GeometryRect;
 class Soil;
 class SoilWater;

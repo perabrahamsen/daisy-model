@@ -2,6 +2,7 @@
 
 	* model.C, model.h: New file.
 	* Makefile (OTHER): Added.
+	* all: Use it.
 
 2007-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 

@@ -24,6 +24,7 @@
 #include "library.h"
 #include "block.h"
 #include "daisy.h"
+#include "assertion.h"
 #include <sstream>
 
 using namespace std;

@@ -26,6 +26,8 @@
 #include "alist.h"
 #include <vector>
 
+class Log;
+
 class CropNdist : public Model
 {
   // Content.

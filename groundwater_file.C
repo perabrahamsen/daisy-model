@@ -24,6 +24,7 @@
 #include "block.h"
 #include "alist.h"
 #include "lexer_data.h"
+#include "assertion.h"
 #include "time.h"
 #include <fstream>
 

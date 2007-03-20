@@ -26,6 +26,7 @@
 #include "alist.h"
 #include <vector>
 
+class Log;
 class Vegetation;
 
 class Raddist : public Model

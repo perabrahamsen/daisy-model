@@ -25,6 +25,7 @@
 
 #include "librarian.h"
 
+class Log;
 class Time;
 class Treelog;
 class Geometry;

@@ -25,52 +25,44 @@
 
 #include "model.h"
 #include "symbol.h"
-#include "assertion.h"
-#include <map>
 #include <vector>
 
-class Log;
 class Block;
 class AttributeList;
 class Syntax;
-class Treeelog;
+class Treelog;
 class Library;
 
 struct BuildBase 
 {
+  // Avoid calls to daisy_assert
+  static void non_null (void*);
+
   // Types.
-  typedef void (*derive_fun) (symbol name, const Syntax& syn,
-                              AttributeList& al, symbol super);
   typedef Model& (*builder) (Block&);
-  typedef std::map<symbol, builder> bmap_type;
-  bmap_type builders;
 
   // Content.
   std::auto_ptr<Library> lib;
   int count;
 
-
   // Build.
-  Model* build_raw (const symbol type, Block& block) const;
-  Model* build_free (Treelog& msg, const AttributeList& alist, 
-                    const std::string& scope_id) const;
   Model* build_cheat (const AttributeList& parent, 
-                     const std::string& key) const;
-  Model* build_alist (Block& parent, const AttributeList& alist, 
+                      const std::string& key) const;
+  Model* build_free (Treelog&, const AttributeList&, 
                      const std::string& scope_id) const;
+  Model* build_alist (Block& parent, const AttributeList&, 
+                      const std::string& scope_id) const;
   Model* build_item (Block& parent, const std::string& key) const;
   std::vector<Model*> build_vector (Block& al, const std::string& key) const;
   std::vector<const Model*> build_vector_const (Block& al, 
                                                const std::string& key) const;
-
   // Library.
   void add_base (AttributeList& al, const Syntax& syntax) const;
   void add_type (const symbol name, AttributeList& al,
-                 const Syntax& syntax) const;
+                 const Syntax& syntax, builder build) const;
 
   // Create and destroy.
-  BuildBase (const char *const name, derive_fun derive, 
-	     const char *const description);
+  BuildBase (const char *const name, const char *const description);
   ~BuildBase ();
 };
 
@@ -89,28 +81,28 @@ public:
   static T* build_free (Treelog& msg, const AttributeList& alist, 
 			const std::string& scope_id)
   {
-    daisy_assert (content);
+    BuildBase::non_null (content);
     return dynamic_cast<T*> (content->build_free (msg, alist, scope_id)); 
   }
   static T* build_cheat (const AttributeList& parent, const std::string& key)
   {
-    daisy_assert (content);
+    BuildBase::non_null (content);
     return dynamic_cast<T*> (content->build_cheat (parent, key)); 
   }
   static T* build_alist (Block& parent, const AttributeList& alist, 
 			 const std::string& scope_id)
   {
-    daisy_assert (content);
+    BuildBase::non_null (content);
     return dynamic_cast<T*> (content->build_alist (parent, alist, scope_id)); 
   }
   static T* build_item (Block& parent, const std::string& key)
   { 
-    daisy_assert (content);
+    BuildBase::non_null (content);
     return dynamic_cast<T*> (content->build_item (parent, key)); 
   }
   static std::vector<T*> build_vector (Block& al, const std::string& key)
   {  
-    daisy_assert (content);
+    BuildBase::non_null (content);
     std::vector<Model*> c = content->build_vector (al, key);
     std::vector<T*> t;
     for (size_t i = 0; i < c.size (); i++)
@@ -120,7 +112,7 @@ public:
   static std::vector<const T*> build_vector_const (Block& al,
 						   const std::string& key)
   {  
-    daisy_assert (content);
+    BuildBase::non_null (content);
     std::vector<const Model*> c = content->build_vector_const (al, key);
     std::vector<const T*> t;
     for (size_t i = 0; i < c.size (); i++)
@@ -130,27 +122,24 @@ public:
 
   static void add_base (AttributeList& al, const Syntax& syntax)
   { 
-    daisy_assert (content);
+    BuildBase::non_null (content);
     content->add_base (al, syntax); 
   }
   static void add_type (const symbol name, AttributeList& al,
 			const Syntax& syntax,
 			builder build)
   {
-    daisy_assert (content);
-    content->add_type (name, al, syntax);
-    content->builders.insert (std::make_pair (name, build));
+    BuildBase::non_null (content);
+    content->add_type (name, al, syntax, build);
   }
   static void add_type (const char *const name, AttributeList& al,
 			const Syntax& syntax,
 			builder build)
   { add_type (symbol (name), al, syntax, build); }
-  static void derive_type (symbol name, const Syntax& syn, 
-			   AttributeList& al, symbol super)
-  { add_type (name, al, syn, (content->builders)[super]); }
+
   static Library& library ()
   {
-    daisy_assert (content);
+    BuildBase::non_null (content);
     return *(content->lib);
   }
 
@@ -159,21 +148,19 @@ public:
   Librarian (const char *const name)
   { 
     if (!content)
-      content = new BuildBase (name, &derive_type, T::description);
+      content = new BuildBase (name, T::description);
     content->count++;
 
   }
   ~Librarian ()
   { 
-    daisy_assert (content);
+    BuildBase::non_null (content);
     content->count--;
     if (content->count == 0)
       {
 	delete content;
 	content = 0;
       }
-    else
-      daisy_assert (content->count > 0);
   }
 };
 

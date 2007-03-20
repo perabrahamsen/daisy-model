@@ -26,6 +26,7 @@
 #include "som.h"
 #include "soil.h"
 #include "log.h"
+#include "assertion.h"
 #include <memory>
 
 using namespace std;

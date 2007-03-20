@@ -25,6 +25,7 @@
 #include "condition.h"
 #include "daisy.h"
 #include "printer_file.h"
+#include "assertion.h"
 #include <sstream>
 
 using namespace std;

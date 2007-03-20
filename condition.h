@@ -26,6 +26,7 @@
 #include "librarian.h"
 
 class Daisy;
+class Log;
 
 class Condition : public Model
 {  

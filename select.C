@@ -34,7 +34,7 @@
 #include "submodel.h"
 #include "mathlib.h"
 #include <numeric>
-#include <set>
+#include <map>
 
 Handle::handle_t
 Handle::symbol2handle (symbol s)

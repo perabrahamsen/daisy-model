@@ -26,7 +26,7 @@
 #include "number.h"
 #include "check.h"
 #include "vcheck.h"
-
+#include "assertion.h"
 
 class XYSourceLoop : public XYSource
 {

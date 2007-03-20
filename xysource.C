@@ -20,6 +20,7 @@
 
 #include "xysource.h"
 #include "block.h"
+#include "assertion.h"
 
 template<>
 BuildBase* Librarian<XYSource>::content = NULL;

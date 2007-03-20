@@ -41,6 +41,7 @@
 #include "version.h"
 #include "chemical.h"
 #include "scope.h"
+#include "assertion.h"
 #include <string>
 #include <typeinfo>
 

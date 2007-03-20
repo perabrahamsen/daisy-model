@@ -25,6 +25,7 @@
 #include "gnuplot_utils.h"
 #include "number.h"
 #include "vcheck.h"
+#include "assertion.h"
 
 class XYSourceExpr : public XYSource
 {

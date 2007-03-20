@@ -25,6 +25,7 @@
 #include "scope_sources.h"
 #include "gnuplot_utils.h"
 #include "vcheck.h"
+#include "assertion.h"
 
 struct SourceCombine : public Source
 {

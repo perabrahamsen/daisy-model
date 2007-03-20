@@ -23,6 +23,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "version.h"
+#include "assertion.h"
 // GCC 2.95 lack ostream.
 #include <iostream>
 #include <map>

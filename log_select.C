@@ -26,6 +26,7 @@
 #include "field.h"
 #include "format.h"
 #include "volume.h"
+#include "assertion.h"
 #include "memutils.h"
 #include <sstream>
 

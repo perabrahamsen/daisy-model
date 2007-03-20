@@ -26,6 +26,7 @@
 #include "time.h"
 #include "timestep.h"
 #include "syntax.h"
+#include "assertion.h"
 
 void
 Output::initial_logs (const Daisy& daisy, Treelog& msg)

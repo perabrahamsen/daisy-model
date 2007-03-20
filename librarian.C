@@ -24,15 +24,12 @@
 #include "block.h"
 #include "alist.h"
 #include "treelog.h"
+#include "assertion.h"
 #include <sstream>
 
-Model* 
-BuildBase::build_raw (const symbol type, Block& block) const
-{ 
-  const bmap_type::const_iterator i = builders.find (type);
-  daisy_assert (i != builders.end ());
-  return &(*i).second (block);
-}
+void 
+BuildBase::non_null (void* p)
+{ daisy_assert (p); }
 
 Model* 
 BuildBase::build_free (Treelog& msg, const AttributeList& alist, 
@@ -52,7 +49,7 @@ BuildBase::build_free (Treelog& msg, const AttributeList& alist,
   daisy_assert (syntax.check (alist, msg));
   try
     {  
-      Model* result = build_raw (type, block); 
+      Model* result = lib->build_raw (type, block); 
       daisy_assert (block.ok () && result);
       return result;
     }
@@ -85,7 +82,7 @@ BuildBase::build_alist (Block& parent, const AttributeList& alist,
   Block nested (parent, syntax, alist, scope_id + ": " + type.name ());
   daisy_assert (syntax.check (alist, nested.msg ()));
   try
-    {  return build_raw (type, nested); }
+    {  return lib->build_raw (type, nested); }
   catch (const std::string& err)
     { nested.error ("Build failed: " + err); }
   catch (const char *const err)
@@ -123,12 +120,12 @@ BuildBase::add_base (AttributeList& al, const Syntax& syntax) const
 
 void 
 BuildBase::add_type (const symbol name, AttributeList& al,
-                     const Syntax& syntax) const
-{ lib->add (name, al, syntax); }
+                     const Syntax& syntax, builder build) const
+{ lib->add (name, al, syntax, build); }
 
-BuildBase::BuildBase (const char *const name, Library::derive_fun derive, 
+BuildBase::BuildBase (const char *const name,
                       const char *const description)
-  : lib (new Library (name, derive, description)),
+  : lib (new Library (name, description)),
     count (0)
 { daisy_assert (lib.get ()); }
 

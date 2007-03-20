@@ -25,6 +25,7 @@
 #include "soil.h"
 #include "units.h"
 #include "vcheck.h"
+#include "assertion.h"
 
 using namespace std;
 

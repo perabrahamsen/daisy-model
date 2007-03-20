@@ -25,6 +25,7 @@
 #include "condition.h"
 #include "log.h"
 #include "daisy.h"
+#include "assertion.h"
 #include <memory>
 #include <sstream>
 

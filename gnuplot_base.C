@@ -23,6 +23,7 @@
 #include "block.h"
 #include "syntax.h"
 #include "alist.h"
+#include "assertion.h"
 
 void 
 GnuplotBase::Size::load_syntax (Syntax& syntax, AttributeList&)

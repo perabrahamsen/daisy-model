@@ -24,6 +24,7 @@
 
 #include "log_clone.h"
 #include "block.h"
+#include "assertion.h"
 
 bool
 LogClone::match (const Daisy&, Treelog&)

@@ -27,6 +27,7 @@
 #include "block.h"
 #include "alist.h"
 #include "units.h"
+#include "assertion.h"
 #include <sstream>
 
 class GroundwaterExtern : public Groundwater

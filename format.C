@@ -20,6 +20,7 @@
 
 
 #include "format.h"
+#include "assertion.h"
 #include "block.h"
 
 template<>

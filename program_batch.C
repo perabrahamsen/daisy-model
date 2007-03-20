@@ -24,6 +24,7 @@
 #include "alist.h"
 #include "treelog.h"
 #include "path.h"
+#include "assertion.h"
 #include "memutils.h"
 #include <vector>
 #include <sstream>

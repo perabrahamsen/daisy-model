@@ -26,6 +26,7 @@
 #include "dlf.h"
 #include "vcheck.h"
 #include "version.h"
+#include "assertion.h"
 #include <sstream>
 #include <fstream>
 #include <time.h>

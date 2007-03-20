@@ -25,6 +25,7 @@
 #include "plf.h"
 #include "smb.h"
 #include "soil.h"
+#include "assertion.h"
 
 using namespace std;
 

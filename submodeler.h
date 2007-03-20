@@ -23,6 +23,7 @@
 #define SUBMODELER_H
 
 #include "block.h"
+#include "assertion.h"
 #include <vector>
 
 // Old style (no block scope).

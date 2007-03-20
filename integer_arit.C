@@ -23,6 +23,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "vcheck.h"
+#include "assertion.h"
 #include "memutils.h"
 #include <sstream>
 #include <memory>

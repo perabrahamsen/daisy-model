@@ -32,14 +32,15 @@ class Syntax;
 class AttributeList;
 class Treelog;
 class Format;
+class Model;
 
 class Library
 {
   // Types.
 public:
-  typedef void (*derive_fun) (symbol name, const Syntax& syn,
-                              AttributeList& al, symbol super);
   typedef void (*doc_fun) (Format&, const AttributeList& al);
+
+  typedef Model& (*builder) (Block&);
 
   // Content.
 public:
@@ -60,7 +61,7 @@ public:
   AttributeList& lookup (symbol) const;
   bool check (symbol) const;
   void add_base (AttributeList&, const Syntax&);
-  void add (symbol, AttributeList&, const Syntax&);
+  void add (symbol, AttributeList&, const Syntax&, builder);
   void add_derived (symbol name, AttributeList& al,
 		    symbol super);
   void add_derived (symbol name, const Syntax&, AttributeList& al,
@@ -80,12 +81,15 @@ public:
   static void clear_all_parsed ();
   static void refile_parsed (const std::string& from, const std::string& to);
 
+  // Build a model.
+  Model* build_raw (const symbol type, Block& block) const;
+
   // Create and destroy.
   static void load_syntax (Syntax&, AttributeList&);
 private: 
   Library (const Library&);
 public:
-  Library (const char* name, derive_fun derive, const char* description);
+  Library (const char* name, const char* description);
   ~Library ();
 };
 

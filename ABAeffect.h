@@ -25,6 +25,8 @@
 #include "alist.h"
 #include <vector>
 
+class Log;
+
 class ABAEffect : public Model
 {
   // Content.

@@ -28,6 +28,7 @@
 #include "library.h"
 #include "block.h"
 #include "memutils.h"
+#include "assertion.h"
 
 using namespace std;
 
@@ -620,7 +621,8 @@ Field::Implementation::divide (const Output& output,
   lib_alist.add ("parsed_from_file", "*clone*");
   lib_alist.add ("parsed_sequence", Library::get_sequence ());
   lib_alist.add ("type", original.name ());
-  Librarian<Column>::derive_type (copy, syntax, lib_alist, original);
+  Librarian<Column>::library ().add_derived (copy, syntax, lib_alist,
+                                             original);
   AttributeList copy_alist (log_clone.result ());
   copy_alist.add ("type", copy.name ());
   copy_alist.add ("size", copy_size);

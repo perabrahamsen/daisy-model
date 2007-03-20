@@ -23,6 +23,7 @@
 #include "block.h"
 #include "alist.h"
 #include "source.h"
+#include "assertion.h"
 #include <sstream>
 #include <memory>
 

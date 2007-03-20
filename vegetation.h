@@ -26,6 +26,7 @@
 #include "librarian.h"
 #include <vector>
 
+class Log;
 class Time;
 class Weather;
 class Bioclimate;

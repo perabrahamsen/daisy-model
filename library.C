@@ -31,6 +31,7 @@
 #include "memutils.h"
 #include <map>
 #include <set>
+#include <sstream>
 
 using namespace std;
 
@@ -39,12 +40,13 @@ struct Library::Implementation
   typedef map<symbol, Library*> library_map;
   static library_map* all;
   static size_t all_count;
+  typedef std::map<symbol, builder> bmap_type;
+  bmap_type builders;
 
   // We give each parsed object an increasing sequence number.
   static int sequence;
 
   const symbol name;
-  derive_fun derive;
   const char *const description;
   typedef map<symbol, AttributeList*> alist_map;
   typedef map<symbol, const Syntax*> syntax_map;
@@ -55,14 +57,14 @@ struct Library::Implementation
   AttributeList& lookup (symbol) const;
   bool check (symbol) const;
   void add_base (AttributeList&, const Syntax&);
-  void add (symbol, AttributeList&, const Syntax&);
+  void add (symbol, AttributeList&, const Syntax&, builder);
   const Syntax& syntax (symbol) const;
   void entries (vector<symbol>&) const;
   void remove (symbol);
   void clear_parsed ();
   void refile_parsed (const string& from, const string& to);
   static void load_syntax (Syntax&, AttributeList&);
-  Implementation (const char* n, derive_fun d, const char* des);
+  Implementation (const char* n, const char* des);
   ~Implementation ();
 };
 
@@ -113,10 +115,12 @@ Library::Implementation::add_base (AttributeList& value,
 
 void
 Library::Implementation::add (const symbol key, AttributeList& value,
-			      const Syntax& syntax)
+			      const Syntax& syntax, builder build)
 {
   alists[key] = &value;
   syntaxen[key] = &syntax;
+  // builders.insert (std::make_pair (key, build));
+  builders[key] = build;
 }
 
 const Syntax& 
@@ -197,10 +201,8 @@ Library::Implementation::load_syntax (Syntax& syntax, AttributeList&)
     }
 }
 
-Library::Implementation::Implementation (const char* n, derive_fun d,
-					 const char* des) 
+Library::Implementation::Implementation (const char* n, const char* des) 
   : name (symbol (n)),
-    derive (d),
     description (des)
 {
   if (all == NULL)
@@ -283,8 +285,9 @@ Library::add_base (AttributeList& value, const Syntax& syntax)
 { impl.add_base (value, syntax); }
 
 void
-Library::add (const symbol key, AttributeList& value, const Syntax& syntax)
-{ impl.add (key, value, syntax); }
+Library::add (const symbol key, AttributeList& value, const Syntax& syntax,
+              builder build)
+{ impl.add (key, value, syntax, build); }
 
 void 
 Library::add_derived (const symbol name, AttributeList& al,
@@ -298,7 +301,7 @@ Library::add_derived (const symbol name, const Syntax& syn, AttributeList& al,
 		      const symbol super)
 { 
   al.add ("type", super);
-  impl.derive (name, syn, al, super); 
+  add (name, al, syn, impl.builders[super]); 
 }
 
 const Syntax& 
@@ -418,13 +421,27 @@ Library::refile_parsed (const string& from, const string& to)
     }
 }
 
+Model* 
+Library::build_raw (const symbol type, Block& block) const
+{ 
+  const Implementation::bmap_type::const_iterator i 
+    = impl.builders.find (type);
+  if  (i == impl.builders.end ())
+    {
+      ostringstream tmp;
+      tmp << "No '" << type.name () << "' found in '"  << impl.name.name()
+          << "' library";
+      daisy_panic (tmp.str ());
+    }
+  return &(*i).second (block);
+}
+
 void 
 Library::load_syntax (Syntax& syntax, AttributeList& alist)
 { Implementation::load_syntax (syntax, alist); }
 
-Library::Library (const char* name, derive_fun derive, 
-		  const char* description) 
-  : impl (*new Implementation (name, derive, description))
+Library::Library (const char* name, const char* description) 
+  : impl (*new Implementation (name, description))
 { 
   (*Implementation::all)[symbol (name)] = this; 
   daisy_assert (Implementation::all->size () == Implementation::all_count);

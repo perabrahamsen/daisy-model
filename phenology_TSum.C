@@ -26,6 +26,7 @@
 #include "production.h"
 #include "vernalization.h"
 #include "plf.h"
+#include "assertion.h"
 
 class PhenologyTSum : public Phenology
 {

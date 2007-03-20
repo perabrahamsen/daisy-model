@@ -25,6 +25,7 @@
 #include "log_alist.h"
 #include "library.h"
 #include "syntax.h"
+#include "assertion.h"
 
 using namespace std;
 

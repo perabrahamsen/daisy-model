@@ -26,6 +26,7 @@
 #include "librarian.h"
 #include "alist.h"
 
+class Log;
 class Daisy;
 
 class Action : public Model

@@ -24,6 +24,7 @@
 #include "block.h"
 #include "alist.h"
 #include "check.h"
+#include "assertion.h"
 
 class GroundwaterFixed : public Groundwater
 {

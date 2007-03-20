@@ -24,6 +24,7 @@
 #include "alist.h"
 #include "scope.h"
 #include "units.h"
+#include "assertion.h"
 
 struct NumberConst : public Number
 {

@@ -23,6 +23,7 @@
 #include "groundwater.h"
 #include "block.h"
 #include "alist.h"
+#include "assertion.h"
 
 class GroundwaterStatic : public Groundwater
 {

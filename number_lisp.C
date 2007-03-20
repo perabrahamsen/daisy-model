@@ -26,6 +26,7 @@
 #include "memutils.h"
 #include <sstream>
 #include <memory>
+#include <map>
 
 struct NumberLet : public Number
 {

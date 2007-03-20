@@ -25,6 +25,7 @@
 #include "soil_water.h"
 #include "submodel.h"
 #include "alist.h"
+#include "assertion.h"
 
 double 
 SoilNH4::diffusion_coefficient () const

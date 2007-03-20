@@ -24,6 +24,7 @@
 
 #include "librarian.h"
 
+class Log;
 class Soil;
 class SoilWater;
 class SOM;

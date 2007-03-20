@@ -27,6 +27,7 @@
 #include "am.h"
 #include "im.h"
 #include "check.h"
+#include "assertion.h"
 #include <sstream>
 
 using namespace std;

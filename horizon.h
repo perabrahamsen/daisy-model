@@ -27,6 +27,7 @@
 #include <vector>
 #include <memory>
 
+class Log;
 class Hydraulic;
 class Tortuosity;
 class Texture;

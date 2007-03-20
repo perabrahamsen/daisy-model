@@ -26,6 +26,7 @@
 #include "librarian.h"
 #include "alist.h"
 
+class Log;
 class Geometry;
 class Soil;
 class SoilHeat;

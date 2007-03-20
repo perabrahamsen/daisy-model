@@ -21,7 +21,9 @@
 #include "scope.h"
 #include "block.h"
 #include "alist.h"
+#include "assertion.h"
 #include "memutils.h"
+#include <map>
 
 class Exchange : public Model
 {

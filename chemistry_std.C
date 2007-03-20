@@ -25,6 +25,7 @@
 #include "soil_chemicals.h"
 #include "soil.h"
 #include "log.h"
+#include "assertion.h"
 #include <memory>
 
 struct ChemistryStandard : public Chemistry

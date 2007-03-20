@@ -25,6 +25,7 @@
 
 #include "librarian.h"
 
+class Log;
 class Soil;
 
 class Adsorption : public Model

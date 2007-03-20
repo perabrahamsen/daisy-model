@@ -24,6 +24,7 @@
 #include "log_extern.h"
 #include "scope_block.h"
 #include "block.h"
+#include "assertion.h"
 
 void 
 LogExtern::done (const Time& time, const double dt)

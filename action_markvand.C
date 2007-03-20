@@ -30,10 +30,12 @@
 #include "mathlib.h"
 #include "check.h"
 #include "vcheck.h"
+#include "assertion.h"
 #include "memutils.h"
 #include <vector>
 #include <memory>
 #include <sstream>
+#include <map>
 
 // MV_Soil
 

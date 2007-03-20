@@ -25,6 +25,7 @@
 
 #include "librarian.h"
 
+class Log;
 class PLF;
 class Treelog;
 class Texture;

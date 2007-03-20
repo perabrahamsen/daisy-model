@@ -27,6 +27,7 @@
 #include "alist.h"
 #include <vector>
 
+class Log;
 class Geometry;
 class Time;
 class AOM;

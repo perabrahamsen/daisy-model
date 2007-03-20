@@ -31,6 +31,7 @@
 #include "plf.h"
 #include "format.h"
 #include "treelog.h"
+#include "assertion.h"
 #include <sstream>
 #include <iostream>
 #include <memory>

@@ -23,6 +23,7 @@
 #include "action.h"
 #include "syntax.h"
 #include "log.h"
+#include "assertion.h"
 #include "memutils.h"
 
 using namespace std;

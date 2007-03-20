@@ -20,6 +20,9 @@
 
 #include "volume.h"
 #include "block.h"
+#include "assertion.h"
+
+class Log;
 
 template<>
 BuildBase* Librarian<Volume>::content = NULL;

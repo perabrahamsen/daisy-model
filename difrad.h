@@ -25,6 +25,7 @@
 #include "librarian.h"
 #include "alist.h"
 
+class Log;
 class Weather;
 class Time;
 

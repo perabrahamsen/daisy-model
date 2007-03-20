@@ -22,6 +22,7 @@
 #include "number.h"
 #include "stringer.h"
 #include "alist.h"
+#include "assertion.h"
 
 const std::vector<symbol>& 
 ScopeBlock::all_numbers () const

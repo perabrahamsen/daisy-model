@@ -28,6 +28,7 @@
 #include "time.h"
 #include "parser.h"
 #include "path.h"
+#include "assertion.h"
 #include <sstream>
 #include <fstream>
 #include <algorithm>

@@ -24,6 +24,7 @@
 #include "gnuplot_utils.h"
 #include "number.h"
 #include "vcheck.h"
+#include "assertion.h"
 
 
 class XYSourceInline : public XYSource
