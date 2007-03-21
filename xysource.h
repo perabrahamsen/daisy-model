@@ -29,6 +29,7 @@ class XYSource : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Interface.
 public:
@@ -63,6 +64,6 @@ template<>
 BuildBase* Librarian<XYSource>::content;
 #endif
 
-static Librarian<XYSource> XYSource_init ("xysource");
+static Librarian<XYSource> XYSource_init;
 
 #endif // XYSOURCE_H

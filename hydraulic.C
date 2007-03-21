@@ -42,6 +42,8 @@ const char *const Hydraulic::description = "\
 This component is responsible for specifying the soils hydraulic\n\
 properties.";
 
+const char *const Hydraulic::component = "hydraulic";
+
 struct Hydraulic::K_at_h
 {
   // Parameters.

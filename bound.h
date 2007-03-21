@@ -30,6 +30,7 @@ class Bound : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
   std::string describe () const;
 
   // Content.
@@ -58,6 +59,6 @@ template<>
 BuildBase* Librarian<Bound>::content;
 #endif
 
-static Librarian<Bound> Bound_init ("bound");
+static Librarian<Bound> Bound_init;
 
 #endif // BOUND_H

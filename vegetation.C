@@ -31,6 +31,8 @@ BuildBase* Librarian<Vegetation>::content = NULL;
 const char *const Vegetation::description = "\
 That green stuff.";
 
+const char *const Vegetation::component = "vegetation";
+
 double 
 Vegetation::shared_light_fraction () const
 { return 1.0; }

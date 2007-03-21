@@ -38,6 +38,8 @@ the results in one way or another.  The purpose of the 'log' component\n\
 is to provide this access.  Most 'log' models does this by writing a\n\
 summary of the state to a log file.";
 
+const char *const Log::component = "log";
+
 struct Log::Implementation
 {
   list<const Soil*> soils;

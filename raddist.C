@@ -29,6 +29,8 @@ BuildBase* Librarian<Raddist>::content = NULL;
 const char *const Raddist::description = "\
 The 'raddist' component calculates the radiation distribution in the canopy.";
 
+const char *const Raddist::component = "raddist";
+
 void
 Raddist::output (Log&) const
 { }

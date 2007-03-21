@@ -31,6 +31,7 @@ class WSE : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulation.
 public:
@@ -48,6 +49,6 @@ template<>
 BuildBase* Librarian<WSE>::content;
 #endif
 
-static Librarian<WSE> WSE_init ("wse");
+static Librarian<WSE> WSE_init;
 
 #endif // WSE_H

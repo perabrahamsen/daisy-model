@@ -39,6 +39,8 @@ const char *const Nitrification::description = "\
 The nitrification process, transforming ammonium into nitrate and\n\
 nitrous oxide.";
 
+const char *const Nitrification::component = "nitrification";
+
 double 
 Nitrification::f_h (double h)
 {

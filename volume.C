@@ -30,6 +30,8 @@ BuildBase* Librarian<Volume>::content = NULL;
 const char *const Volume::description = "\
 A subset of 3D space.";
 
+const char *const Volume::component = "volume";
+
 Volume*
 Volume::build_obsolete (Block& al)
 {

@@ -35,6 +35,7 @@ class Difrad : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
   const AttributeList alist;	// Remember attributes for checkpoint.
 
   // Simulation.
@@ -55,6 +56,6 @@ template<>
 BuildBase* Librarian<Difrad>::content;
 #endif
 
-static Librarian<Difrad> Difrad_init ("difrad");
+static Librarian<Difrad> Difrad_init;
 
 #endif // DIFRAD_H

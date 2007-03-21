@@ -34,6 +34,8 @@ BuildBase* Librarian<Boolean>::content = NULL;
 const char *const Boolean::description = "\
 Generic representation of booleans.";
 
+const char *const Boolean::component = "boolean";
+
 const std::string& 
 Boolean::title () const
 { return name.name (); }

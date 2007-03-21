@@ -77,6 +77,7 @@ protected:
   int count;			// Number of accumulated values.
 public:
   static const char *const description;
+  static const char *const component;
   std::string get_description () const;
   enum type_t { NumberSingleton, NumberSequence };
   virtual type_t type () const = 0;
@@ -163,6 +164,6 @@ template<>
 BuildBase* Librarian<Select>::content;
 #endif
 
-static Librarian<Select> Select_init ("select");
+static Librarian<Select> Select_init;
 
 #endif // SELECT_H

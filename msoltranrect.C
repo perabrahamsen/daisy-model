@@ -28,6 +28,8 @@ BuildBase* Librarian<Msoltranrect>::content = NULL;
 const char *const Msoltranrect::description = "\
 Matrix solute transport in rectangular grid.";
 
+const char *const Msoltranrect::component = "msoltranrect";
+
 Msoltranrect::Msoltranrect (Block& al)
   : name (al.identifier ("type"))
 { }

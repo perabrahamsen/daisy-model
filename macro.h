@@ -37,6 +37,7 @@ class Macro : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
   virtual bool none () const;
 
   // Simulation.
@@ -67,6 +68,6 @@ template<>
 BuildBase* Librarian<Macro>::content;
 #endif
 
-static Librarian<Macro> Macro_init ("macro");
+static Librarian<Macro> Macro_init;
 
 #endif // MACRO_H

@@ -35,6 +35,7 @@ private:
   const symbol title_;
 public:
   static const char *const description;
+  static const char *const component;
 
   // Use.
 public:
@@ -83,6 +84,6 @@ template<>
 BuildBase* Librarian<Scope>::content;
 #endif
 
-static Librarian<Scope> Scope_init ("scope");
+static Librarian<Scope> Scope_init;
 
 #endif // SCOPE_H

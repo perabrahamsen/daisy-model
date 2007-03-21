@@ -40,6 +40,8 @@ BuildBase* Librarian<Depth>::content = NULL;
 const char *const Depth::description = "\
 Find the depth of two numbers.";
 
+const char *const Depth::component = "depth";
+
 Depth::Depth (Block& al)
   : name (al.identifier ("type"))
 { }

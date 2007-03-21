@@ -29,6 +29,8 @@ BuildBase* Librarian<Scope>::content = NULL;
 const char *const Scope::description = "\
 A scope maps identifiers to values.";
 
+const char *const Scope::component = "scope";
+
 symbol 
 Scope::title () const
 { return title_; }

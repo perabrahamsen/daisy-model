@@ -29,6 +29,8 @@ BuildBase* Librarian<Format>::content = NULL;
 const char *const Format::description = "\
 Text formatting component.";
 
+const char *const Format::component = "format";
+
 std::ostream&
 Format::out ()
 { 

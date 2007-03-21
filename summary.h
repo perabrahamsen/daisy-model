@@ -34,6 +34,7 @@ class Summary : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Create and Destroy.
 public:
@@ -51,6 +52,6 @@ template<>
 BuildBase* Librarian<Summary>::content;
 #endif
 
-static Librarian<Summary> Summary_init ("summary");
+static Librarian<Summary> Summary_init;
 
 #endif // SUMMARY_H

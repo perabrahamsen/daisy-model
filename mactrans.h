@@ -36,6 +36,7 @@ class Mactrans : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulation.
 public:
@@ -60,6 +61,6 @@ template<>
 BuildBase* Librarian<Mactrans>::content;
 #endif
 
-static Librarian<Mactrans> Mactrans_init ("mactrans");
+static Librarian<Mactrans> Mactrans_init;
 
 #endif // MACTRANS_H

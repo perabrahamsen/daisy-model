@@ -34,6 +34,7 @@ class Domsorp : public Model
   // Content.
 public:
   static const char *const description;
+  static const char *const component;
   const symbol name;
   const AttributeList& alist;
 
@@ -61,6 +62,6 @@ template<>
 BuildBase* Librarian<Domsorp>::content;
 #endif
 
-static Librarian<Domsorp> Domsorp_init ("domsorp");
+static Librarian<Domsorp> Domsorp_init;
 
 #endif // DOMSORP_H

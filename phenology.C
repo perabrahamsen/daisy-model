@@ -31,6 +31,8 @@ BuildBase* Librarian<Phenology>::content = NULL;
 const char *const Phenology::description = "\
 The development process.";
 
+const char *const Phenology::component = "phenology";
+
 void
 Phenology::light_time (const double dt)
 { partial_day_length += dt; }

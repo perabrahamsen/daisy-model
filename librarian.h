@@ -145,10 +145,10 @@ public:
 
   // Create and Destroy.
 public:
-  Librarian (const char *const name)
+  Librarian ()
   { 
     if (!content)
-      content = new BuildBase (name, T::description);
+      content = new BuildBase (T::component, T::description);
     content->count++;
 
   }

@@ -33,6 +33,8 @@ BuildBase* Librarian<Integer>::content = NULL;
 const char *const Integer::description = "\
 Generic representation of integers.";
 
+const char *const Integer::component = "integer";
+
 const std::string& 
 Integer::title () const
 { return name.name (); }

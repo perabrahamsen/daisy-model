@@ -35,6 +35,7 @@ class Rootdens : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 protected:
   const double SpRtLength;	// Specific root length [m/g]
 
@@ -61,6 +62,6 @@ template<>
 BuildBase* Librarian<Rootdens>::content;
 #endif
 
-static Librarian<Rootdens> Rootdens_init ("rootdens");
+static Librarian<Rootdens> Rootdens_init;
 
 #endif // ROOTDENS_H

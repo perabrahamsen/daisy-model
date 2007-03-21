@@ -40,6 +40,7 @@ class SVAT : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulation.
 public:
@@ -65,7 +66,7 @@ template<>
 BuildBase* Librarian<SVAT>::content;
 #endif
 
-static Librarian<SVAT> SVAT_init ("svat");
+static Librarian<SVAT> SVAT_init;
 
 #endif // SVAT_H
 

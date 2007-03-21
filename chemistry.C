@@ -28,6 +28,8 @@ BuildBase* Librarian<Chemistry>::content = NULL;
 const char *const Chemistry::description = "\
 Generic transformations between soil chemicals.";
 
+const char *const Chemistry::component = "chemistry";
+
 bool
 Chemistry::check (const Soil&, Treelog&) const
 { return true; }

@@ -33,6 +33,7 @@ class Transform : public Model
   // Content.
 public:
   static const char *const description;
+  static const char *const component;
   const symbol name;
   const AttributeList& alist;
 
@@ -62,6 +63,6 @@ template<>
 BuildBase* Librarian<Transform>::content;
 #endif
 
-static Librarian<Transform> Transform_init ("transform");
+static Librarian<Transform> Transform_init;
 
 #endif // TRANSFORM_H

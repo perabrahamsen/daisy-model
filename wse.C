@@ -34,6 +34,8 @@ BuildBase* Librarian<WSE>::content = NULL;
 const char *const WSE::description = "\
 The water stress effect on crop growth.";
 
+const char *const WSE::component = "wse";
+
 WSE::WSE (Block& al)
   : name (al.identifier ("type"))
 { }

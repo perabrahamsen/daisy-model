@@ -29,6 +29,8 @@ BuildBase* Librarian<ABAEffect>::content = NULL;
 const char *const ABAEffect::description = "\
 The 'ABAeffect' component calculates the effect of ABA on photosynthesis.";
 
+const char *const ABAEffect::component = "ABAeffect";
+
 ABAEffect::ABAEffect (Block& al)
   : name (al.identifier ("type")),
     alist (al.alist ())

@@ -33,6 +33,8 @@ class ABAEffect : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
+
   const AttributeList alist;	// Remember attributes for checkpoint.
 
   // Simulation.
@@ -53,6 +55,6 @@ template<>
 BuildBase* Librarian<ABAEffect>::content;
 #endif
 
-static Librarian<ABAEffect> ABAEffect_init ("ABAeffect");
+static Librarian<ABAEffect> ABAEffect_init;
 
 #endif // ABAEFFECT_H

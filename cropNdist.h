@@ -34,6 +34,7 @@ class CropNdist : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
   const AttributeList alist;	// Remember attributes for checkpoint.
 
   // Simulation.
@@ -60,6 +61,6 @@ template<>
 BuildBase* Librarian<CropNdist>::content;
 #endif
 
-static Librarian<CropNdist> CropNdist_init ("cropNdist");
+static Librarian<CropNdist> CropNdist_init;
 
 #endif // CROPNDIST_H

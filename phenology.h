@@ -36,6 +36,7 @@ class Phenology : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // State.
 public:
@@ -66,6 +67,6 @@ template<>
 BuildBase* Librarian<Phenology>::content;
 #endif
 
-static Librarian<Phenology> Phenology_init ("phenology");
+static Librarian<Phenology> Phenology_init;
 
 #endif // PHENOLOGY_H

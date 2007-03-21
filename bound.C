@@ -33,6 +33,8 @@ BuildBase* Librarian<Bound>::content = NULL;
 const char *const Bound::description = "\
 Specify one end of an interval boundary.";
 
+const char *const Bound::component = "bound";
+
 std::string
 Bound::describe () const
 {

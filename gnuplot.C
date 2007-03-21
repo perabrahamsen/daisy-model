@@ -28,6 +28,8 @@ BuildBase* Librarian<Gnuplot>::content = NULL;
 const char *const Gnuplot::description = "\
 Plot a graph with gnuplot.";
 
+const char *const Gnuplot::component = "gnuplot";
+
 std::string 
 Gnuplot::quote (const std::string& value)
 { return "'" + value + "'"; }

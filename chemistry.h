@@ -35,6 +35,7 @@ class Chemistry : public Model
   // Content.
 public:
   static const char *const description;
+  static const char *const component;
   const symbol name;
   const AttributeList& alist;
 
@@ -61,6 +62,6 @@ template<>
 BuildBase* Librarian<Chemistry>::content;
 #endif
 
-static Librarian<Chemistry> Chemistry_init ("chemistry");
+static Librarian<Chemistry> Chemistry_init;
 
 #endif // CHEMISTRY_H

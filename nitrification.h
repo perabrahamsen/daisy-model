@@ -1,6 +1,6 @@
 // nitrification.h
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
+// Copyright 1996-2001 Per Abrahamsen and SÃ¸ren Hansen
 // Copyright 2000-2001 KVL.
 //
 // This file is part of Daisy.
@@ -37,6 +37,7 @@ class Nitrification : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Parameters.
 protected:
@@ -67,6 +68,6 @@ template<>
 BuildBase* Librarian<Nitrification>::content;
 #endif
 
-static Librarian<Nitrification> Nitrification_init ("nitrification");
+static Librarian<Nitrification> Nitrification_init;
 
 #endif // NITRIFICATION_H

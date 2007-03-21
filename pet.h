@@ -42,6 +42,7 @@ class Pet : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
   const AttributeList alist;	// Remember attributes for checkpoint.
 
   // Utilities.
@@ -72,6 +73,6 @@ template<>
 BuildBase* Librarian<Pet>::content;
 #endif
 
-static Librarian<Pet> Pet_init ("pet");
+static Librarian<Pet> Pet_init;
 
 #endif // PET_H

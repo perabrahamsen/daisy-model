@@ -33,6 +33,7 @@ class Tortuosity : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulation.
 public:
@@ -50,6 +51,6 @@ template<>
 BuildBase* Librarian<Tortuosity>::content;
 #endif
 
-static Librarian<Tortuosity> Tortuosity_init ("tortuosity");
+static Librarian<Tortuosity> Tortuosity_init;
 
 #endif // TORTUOSITY_H

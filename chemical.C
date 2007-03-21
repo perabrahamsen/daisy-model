@@ -30,6 +30,8 @@ const char *const Chemical::description = "\
 This component should, for a specific chemical (typically a pesticide),\n\
 provide a description of the properties of interest to Daisy.";
 
+const char *const Chemical::component = "chemical";
+
 Chemical::Chemical (const AttributeList& al)
   : name (al.identifier ("type"))
 { }

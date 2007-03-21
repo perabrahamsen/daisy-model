@@ -34,6 +34,8 @@ const char *const NetRadiation::description = "\
 The purpose of this component is to calculate the net radiation from\n\
 other meteorological data.";
 
+const char *const NetRadiation::component = "net_radiation";
+
 // Interface class.
 
 void

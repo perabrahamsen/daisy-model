@@ -40,6 +40,7 @@ class Groundwater : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Lower boundary.
   enum bottom_t { pressure, lysimeter, forced_flux, free_drainage };
@@ -82,6 +83,6 @@ template<>
 BuildBase* Librarian<Groundwater>::content;
 #endif
 
-static Librarian<Groundwater> Groundwater_init ("groundwater");
+static Librarian<Groundwater> Groundwater_init;
 
 #endif // GROUNDWATER_H

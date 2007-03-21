@@ -32,6 +32,7 @@ class Format : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 private:
   std::ostream* output;
 protected:
@@ -223,6 +224,6 @@ template<>
 BuildBase* Librarian<Format>::content;
 #endif
 
-static Librarian<Format> Format_init ("format");
+static Librarian<Format> Format_init;
 
 #endif // FORMAT_H

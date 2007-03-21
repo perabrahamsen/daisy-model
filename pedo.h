@@ -32,6 +32,7 @@ class Pedotransfer : public Model
   // Content.
 public:
   static const char *const description;
+  static const char *const component;
   const symbol name;
 
   // Simulation.
@@ -62,6 +63,6 @@ template<>
 BuildBase* Librarian<Pedotransfer>::content;
 #endif
 
-static Librarian<Pedotransfer> Pedotransfer_init ("pedotransfer");
+static Librarian<Pedotransfer> Pedotransfer_init;
 
 #endif // PEDOTRANSFER_H

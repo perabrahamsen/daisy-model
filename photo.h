@@ -37,6 +37,7 @@ class Photo : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulation.
 public:
@@ -64,6 +65,6 @@ template<>
 BuildBase* Librarian<Photo>::content;
 #endif
 
-static Librarian<Photo> Photo_init ("photosynthesis");
+static Librarian<Photo> Photo_init;
 
 #endif // PHOTO_H

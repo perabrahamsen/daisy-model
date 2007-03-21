@@ -34,6 +34,7 @@ class Condition : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
   virtual const std::string timestep ();
 
   // Simulation.
@@ -54,6 +55,6 @@ template<>
 BuildBase* Librarian<Condition>::content;
 #endif
 
-static Librarian<Condition> Condition_init ("condition");
+static Librarian<Condition> Condition_init;
 
 #endif // CONDITION_H

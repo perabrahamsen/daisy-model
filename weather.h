@@ -35,6 +35,7 @@ class Weather : public Model
 public: 
   const symbol name;
   static const char *const description;
+  static const char *const component;
   
   // Location.
 protected:
@@ -156,6 +157,6 @@ public:
 BuildBase* Librarian<Weather>::content;
 #endif
 
-static Librarian<Weather> Weather_init ("weather");
+static Librarian<Weather> Weather_init;
 
 #endif // WEATHER_H

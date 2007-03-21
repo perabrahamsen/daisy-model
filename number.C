@@ -28,6 +28,8 @@ BuildBase* Librarian<Number>::content = NULL;
 const char *const Number::description = "\
 Generic representation of numbers.";
 
+const char *const Number::component = "number";
+
 symbol
 Number::title () const
 { return name; }

@@ -27,6 +27,8 @@ BuildBase* Librarian<UZRect>::content = NULL;
 const char *const UZRect::description = "\
 2D water movement in a rectangular grid.";
 
+const char *const UZRect::component = "uzrect";
+
 UZRect::UZRect (Block& al)
   : name (al.identifier ("type"))
 { }

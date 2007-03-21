@@ -32,6 +32,7 @@ class Scopesel : public Model
   // Content.
 public:
   static const char *const description;
+  static const char *const component;
 
   // Use.
 public:
@@ -50,6 +51,6 @@ template<>
 BuildBase* Librarian<Scopesel>::content;
 #endif
 
-static Librarian<Scopesel> Scopesel_init ("scopesel");
+static Librarian<Scopesel> Scopesel_init;
 
 #endif // SCOPESEL_H

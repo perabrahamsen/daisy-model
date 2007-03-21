@@ -44,6 +44,7 @@ private:
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Water.
 public:
@@ -101,6 +102,6 @@ template<>
 BuildBase* Librarian<Horizon>::content;
 #endif
 
-static Librarian<Horizon> Horizon_init ("horizon");
+static Librarian<Horizon> Horizon_init;
 
 #endif // HORIZON_H

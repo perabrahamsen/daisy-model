@@ -28,6 +28,8 @@ BuildBase* Librarian<XYSource>::content = NULL;
 const char *const XYSource::description = "\
 XY data series.";
 
+const char *const XYSource::component = "xysource";
+
 void 
 XYSource::limit (double& xmin, double& xmax, double& ymin, double& ymax) const
 {

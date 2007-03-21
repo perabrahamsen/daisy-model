@@ -30,6 +30,7 @@ class Exchange : public Model
   // Content.
 public:
   static const char *const description;
+  static const char *const component;
 
   // Use.
   virtual bool is_number () const
@@ -62,7 +63,7 @@ template<>
 BuildBase* Librarian<Exchange>::content;
 #endif
 
-static Librarian<Exchange> Exchange_init ("exchange");
+static Librarian<Exchange> Exchange_init;
 
 template<>
 BuildBase* Librarian<Exchange>::content = NULL;
@@ -70,6 +71,8 @@ BuildBase* Librarian<Exchange>::content = NULL;
 const char *const 
 Exchange::description = "\
 A named value to exchange with external models.";
+
+const char *const Exchange::component = "exchange";
 
 struct ExchangeNumber : public Exchange
 {

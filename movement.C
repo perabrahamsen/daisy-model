@@ -28,6 +28,8 @@ BuildBase* Librarian<Movement>::content = NULL;
 const char *const Movement::description = "\
 This component handles the movement in the soil.";
 
+const char *const Movement::component = "movement";
+
 Movement::Movement (Block& al)
   : name (al.identifier ("type"))
 { }

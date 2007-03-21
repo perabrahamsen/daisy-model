@@ -29,6 +29,8 @@ BuildBase* Librarian<Macro>::content = NULL;
 const char *const Macro::description = "\
 Preferention flow in soil macro pores.";
 
+const char *const Macro::component = "macro";
+
 bool 
 Macro::none () const 
 { return false; }

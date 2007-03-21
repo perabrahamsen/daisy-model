@@ -31,6 +31,7 @@ class Average : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulation.
 public:
@@ -50,6 +51,6 @@ template<>
 BuildBase* Librarian<Average>::content;
 #endif
 
-static Librarian<Average> Average_init ("average");
+static Librarian<Average> Average_init;
 
 #endif // AVERAGE_H

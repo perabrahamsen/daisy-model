@@ -32,6 +32,8 @@ BuildBase* Librarian<Scopesel>::content = NULL;
 const char *const Scopesel::description = "\
 A method to choose a scope in a Daisy simulation.";
 
+const char *const Scopesel::component = "scopesel";
+
 Scopesel::Scopesel ()
 { }
 

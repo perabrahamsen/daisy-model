@@ -28,6 +28,8 @@ BuildBase* Librarian<Summary>::content = NULL;
 const char *const Summary::description = "\
 Summary reports for log parameterizations.";
 
+const char *const Summary::component = "summary";
+
 Summary::Summary (Block& al)
   : name (al.identifier ("type"))
 { }

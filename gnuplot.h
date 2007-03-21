@@ -32,6 +32,7 @@ class Gnuplot : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Utilities.
 public:
@@ -58,6 +59,6 @@ template<>
 BuildBase* Librarian<Gnuplot>::content;
 #endif
 
-static Librarian<Gnuplot> Gnuplot_init ("gnuplot");
+static Librarian<Gnuplot> Gnuplot_init;
 
 #endif // GNUPLOT_H

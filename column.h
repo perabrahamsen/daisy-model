@@ -44,6 +44,7 @@ public:
   const symbol name;
   double size;
   static const char *const description;
+  static const char *const component;
 
   virtual const Horizon& horizon_at (double z, double x, double y) const = 0;
 
@@ -132,6 +133,6 @@ template<>
 BuildBase* Librarian<Column>::content;
 #endif
 
-static Librarian<Column> Column_init ("column");
+static Librarian<Column> Column_init;
 
 #endif // COLUMN_H

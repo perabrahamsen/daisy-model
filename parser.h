@@ -33,6 +33,7 @@ class Parser : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Interface.
 public:
@@ -55,6 +56,6 @@ template<>
 BuildBase* Librarian<Parser>::content;
 #endif
 
-static Librarian<Parser> Parser_init ("parser");
+static Librarian<Parser> Parser_init;
 
 #endif // PARSER_H

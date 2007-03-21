@@ -32,6 +32,8 @@ levels, from a single tillage operation to strategies of how to manage\n\
 a farm.  Typically, but not necessarily, the high level management\n\
 strategies are build by combining low level management operations.";
 
+const char *const Action::component = "action";
+
 void
 Action::tick (const Daisy&, Treelog&)
 { }

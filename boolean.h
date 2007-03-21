@@ -31,6 +31,7 @@ class Boolean : public Model
   // Content.
 public:
   static const char *const description;
+  static const char *const component;
   const symbol name;
   virtual const std::string& title () const;
 
@@ -55,6 +56,6 @@ template<>
 BuildBase* Librarian<Boolean>::content;
 #endif
 
-static Librarian<Boolean> Boolean_init ("boolean");
+static Librarian<Boolean> Boolean_init;
 
 #endif // BOOLEAN_H

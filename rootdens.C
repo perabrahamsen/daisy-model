@@ -32,6 +32,8 @@ BuildBase* Librarian<Rootdens>::content = NULL;
 const char *const Rootdens::description = "\
 Root density calculations.";
 
+const char *const Rootdens::component = "rootdens";
+
 void
 Rootdens::load_syntax (Syntax& syntax, AttributeList& alist)
 {

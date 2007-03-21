@@ -35,6 +35,8 @@ BuildBase* Librarian<Stringer>::content = NULL;
 const char *const Stringer::description = "\
 Generic representation of strings.";
 
+const char *const Stringer::component = "string";
+
 const std::string& 
 Stringer::title () const
 { return name.name (); }

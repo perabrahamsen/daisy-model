@@ -33,6 +33,8 @@ const char *const Groundwater::description = "\
 The 'groundwater' component is responsible for specifying the\n\
 groundwater table at each timestep.";
 
+const char *const Groundwater::component = "groundwater";
+
 void
 Groundwater::accept_bottom (double, const Geometry& geo, size_t edge)
 { daisy_assert (geo.edge_from (edge) == Geometry::cell_below); }

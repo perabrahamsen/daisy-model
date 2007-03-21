@@ -47,6 +47,7 @@ public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Filter
 public:
@@ -291,7 +292,7 @@ template<>
 BuildBase* Librarian<Log>::content;
 #endif
 
-static Librarian<Log> Log_init ("log");
+static Librarian<Log> Log_init;
 
 // Output atom.
 #define output_value(value, key, log)\

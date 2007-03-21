@@ -34,6 +34,8 @@ BuildBase* Librarian<Average>::content = NULL;
 const char *const Average::description = "\
 Find the average of two numbers.";
 
+const char *const Average::component = "average";
+
 Average::Average (Block& al)
   : name (al.identifier ("type"))
 { }

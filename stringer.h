@@ -31,6 +31,7 @@ class Stringer : public Model
   // Content.
 public:
   static const char *const description;
+  static const char *const component;
   const symbol name;
   virtual const std::string& title () const;
 
@@ -55,6 +56,6 @@ template<>
 BuildBase* Librarian<Stringer>::content;
 #endif
 
-static Librarian<Stringer> Stringer_init ("string");
+static Librarian<Stringer> Stringer_init;
 
 #endif // STRINGER_H

@@ -50,6 +50,7 @@ class OrganicMatter : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulation.
 public:
@@ -103,6 +104,6 @@ template<>
 BuildBase* Librarian<OrganicMatter>::content;
 #endif
 
-static Librarian<OrganicMatter> Organic_init ("organic");
+static Librarian<OrganicMatter> Organic_init;
 
 #endif // ORGANIC_MATTER_H

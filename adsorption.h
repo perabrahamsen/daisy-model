@@ -33,6 +33,7 @@ class Adsorption : public Model
   // Content.
 public:
   static const char *const description;
+  static const char *const component;
   const symbol name;
 
   // Simulation.
@@ -54,6 +55,6 @@ template<>
 BuildBase* Librarian<Adsorption>::content;
 #endif
 
-static Librarian<Adsorption> Adsorption_init ("adsorption");
+static Librarian<Adsorption> Adsorption_init;
 
 #endif // ADSORPTION_H

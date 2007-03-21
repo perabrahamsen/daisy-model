@@ -31,6 +31,7 @@ class Printer : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Interface.
 public:
@@ -63,6 +64,6 @@ template<>
 BuildBase* Librarian<Printer>::content;
 #endif
 
-static Librarian<Printer> Printer_init ("printer");
+static Librarian<Printer> Printer_init;
 
 #endif // PRINTER_H

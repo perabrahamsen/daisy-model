@@ -41,6 +41,7 @@ class UZmodel : public Model
 public: 
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulate.
 public:
@@ -75,6 +76,6 @@ template<>
 BuildBase* Librarian<UZmodel>::content;
 #endif
 
-static Librarian<UZmodel> UZmodel_init ("uzmodel");
+static Librarian<UZmodel> UZmodel_init;
 
 #endif // UZMODEL_H

@@ -4,6 +4,43 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** Parameterizationer skal være en Toplevel attribut!
 
+*** 
+
+class Parlib
+{
+  map<libname,Library*> all;
+};
+
+static class Intrinsic
+{
+  // Content.   
+private:
+  class Content;
+  static Content* content;
+
+  // Access.
+public
+  static const Parlib& parlib ();
+
+  // Add new build-ins.
+public:
+  static add (libname, name, syntax, alist, build);
+  static derive (libname, name, alist, super);
+
+  // Create and destroy.
+public:
+  Intrinsic ();
+  ~Intrinsic ();
+} intrinsic;
+
+class Intrinsic::Content : public Parlib
+{
+public:
+  int count;
+};
+
+---
+
 Factory<T>, Industry
 
 Build in (shared) vs loaded (per toplevel)
@@ -26,6 +63,7 @@ Parlib Toplevel::parlib Parameterizations in this toplevel
 
 Før: 80,1 MiB
 Nu:  50,4 MiB
+Nu:  44,3 MiB
 
 ** Installer C# på x40
 

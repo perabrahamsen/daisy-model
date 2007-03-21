@@ -28,6 +28,8 @@ BuildBase* Librarian<Program>::content = NULL;
 const char *const Program::description = "\
 Run a program.";
 
+const char *const Program::component = "program";
+
 Program::Program (Block& al)
   : alist (al.alist ()),
     name (al.identifier ("type"))

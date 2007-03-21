@@ -52,6 +52,7 @@ class Movement : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   virtual Geometry& geometry () const = 0;
 
@@ -98,6 +99,6 @@ template<>
 BuildBase* Librarian<Movement>::content;
 #endif
 
-static Librarian<Movement> Movement_init ("movement");
+static Librarian<Movement> Movement_init;
 
 #endif // MOVEMENT_H

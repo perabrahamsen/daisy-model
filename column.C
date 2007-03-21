@@ -34,6 +34,8 @@ A 'column' is an one-dimensional vertical description of the\n\
 soil/crop/atmosphere system.  The column component contains most of\n\
 the other processes in Daisy as submodels.";
 
+const char *const Column::component = "column";
+
 void
 Column::output (Log& log) const
 {

@@ -33,6 +33,7 @@ class Depth : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulation.
 public:
@@ -55,6 +56,6 @@ template<>
 BuildBase* Librarian<Depth>::content;
 #endif
 
-static Librarian<Depth> Depth_init ("depth");
+static Librarian<Depth> Depth_init;
 
 #endif // DEPTH_H

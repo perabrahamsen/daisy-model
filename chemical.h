@@ -31,6 +31,7 @@ class Chemical : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Queries.
 public:
@@ -59,6 +60,6 @@ template<>
 BuildBase* Librarian<Chemical>::content;
 #endif
 
-static Librarian<Chemical> Chemical_init ("chemical");
+static Librarian<Chemical> Chemical_init;
 
 #endif // CHEMICAL_H

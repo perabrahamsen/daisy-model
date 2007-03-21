@@ -45,6 +45,8 @@ The 'am' component describes various kinds of fertilizer and other\n\
 added matter such as crop residues.  In particular, it describes how\n\
 they decompose.";
 
+const char *const AM::component = "am";
+
 struct AM::Implementation
 {
   // Check.

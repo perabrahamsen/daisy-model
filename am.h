@@ -45,6 +45,7 @@ public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
   static const char *const description;
+  static const char *const component;
   void append_to (std::vector<AOM*>& added);
   symbol real_name () const;
 
@@ -115,6 +116,6 @@ template<>
 BuildBase* Librarian<AM>::content;
 #endif
 
-static Librarian<AM> AM_init ("am");
+static Librarian<AM> AM_init;
 
 #endif // AM_H

@@ -162,6 +162,8 @@ const char *const UZ1D::description = "\
 The 'uz1d' component handles the horizontal water movement in the\n\
 unsaturated zone soil matrix.";
 
+const char *const UZ1D::component = "uz1d";
+
 UZ1D::UZ1D (Block& al)
   : name (al.identifier ("type"))
 { }

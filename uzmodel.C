@@ -36,3 +36,5 @@ BuildBase* Librarian<UZmodel>::content = NULL;
 const char *const UZmodel::description = "\
 The 'uzmodel' component handles the vertical water movement in the\n\
 unsaturated zone soil matrix.";
+
+const char *const UZmodel::component = "uzmodel";

@@ -36,6 +36,7 @@ class Hydraulic : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
   //
 private:
   struct K_at_h;
@@ -84,6 +85,6 @@ template<>
 BuildBase* Librarian<Hydraulic>::content;
 #endif
 
-static Librarian<Hydraulic> Hydraulic_init ("hydraulic");
+static Librarian<Hydraulic> Hydraulic_init;
 
 #endif // HYDRAULIC_H

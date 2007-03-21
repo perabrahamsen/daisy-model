@@ -28,6 +28,8 @@ BuildBase* Librarian<Transform>::content = NULL;
 const char *const Transform::description = "\
 Generic transformations between soil components.";
 
+const char *const Transform::component = "transform";
+
 bool
 Transform::check (const Soil&, Treelog&) const
 { return true; }

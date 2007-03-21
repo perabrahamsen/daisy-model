@@ -33,6 +33,8 @@ moved in absolute coordinates, when it has moved a given distance\n\
 along the curved line.  This component is responsible for calculating\n\
 the soils tortuosity factor.";
 
+const char *const Tortuosity::component = "tortuosity";
+
 Tortuosity::Tortuosity (Block& al)
   : name (al.identifier ("type"))
 { }

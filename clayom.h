@@ -36,6 +36,7 @@ class ClayOM : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
 
   // Simulation.
@@ -60,6 +61,6 @@ template<>
 BuildBase* Librarian<ClayOM>::content;
 #endif
 
-static Librarian<ClayOM> ClayOM_init ("ClayOM");
+static Librarian<ClayOM> ClayOM_init;
 
 #endif // CLAYOM_H

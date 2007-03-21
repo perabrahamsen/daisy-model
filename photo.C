@@ -28,6 +28,8 @@ BuildBase* Librarian<Photo>::content = NULL;
 const char *const Photo::description = "\
 Leaf photosynthesis.";
 
+const char *const Photo::component = "photosynthesis";
+
 void
 Photo::clear ()
 { }

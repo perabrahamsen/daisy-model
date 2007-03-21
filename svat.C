@@ -33,6 +33,8 @@ stress, given the potential evapotranspiration, the actual\n\
 evaporation from the surface, meteorological data, and the vegetation\n\
 and soil state.";
 
+const char *const SVAT::component = "svat";
+
 void
 SVAT::output (Log&) const
 { }

@@ -55,6 +55,7 @@ public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Communication with Bioclimate.
 public:
@@ -148,6 +149,6 @@ template<>
 BuildBase* Librarian<Crop>::content;
 #endif
 
-static Librarian<Crop> Crop_init ("crop");
+static Librarian<Crop> Crop_init;
 
 #endif // CROP_H

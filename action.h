@@ -47,6 +47,7 @@ public:
 public: 
   virtual bool check (const Daisy&, Treelog& err) const;
   static const char *const description;
+  static const char *const component;
 private:
   Action (const Action&);
   Action& operator= (const Action&);
@@ -62,6 +63,6 @@ template<>
 BuildBase* Librarian<Action>::content;
 #endif
 
-static Librarian<Action> Action_init ("action");
+static Librarian<Action> Action_init;
 
 #endif // ACTION_H

@@ -47,6 +47,7 @@ class Bioclimate : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
   const AttributeList alist;	// Remember attributes for checkpoint.
 
   // Simulation.
@@ -119,6 +120,6 @@ template<>
 BuildBase* Librarian<Bioclimate>::content;
 #endif
 
-static Librarian<Bioclimate> Bioclimate_init ("bioclimate");
+static Librarian<Bioclimate> Bioclimate_init;
 
 #endif // BIOCLIMATE_H

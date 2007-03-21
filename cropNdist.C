@@ -29,6 +29,8 @@ BuildBase* Librarian<CropNdist>::content = NULL;
 const char *const CropNdist::description = "\
 The 'cropNdist' component calculates the crop N distribution for photosynthesis in the canopy.";
 
+const char *const CropNdist::component = "cropNdist";
+
 CropNdist::CropNdist (Block& al)
   : name (al.identifier ("type")),
     alist (al.alist ())

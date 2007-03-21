@@ -35,6 +35,7 @@ class Raddist : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
   const AttributeList alist;	// Remember attributes for checkpoint.
 
   // Simulation.
@@ -76,6 +77,6 @@ template<>
 BuildBase* Librarian<Raddist>::content;
 #endif
 
-static Librarian<Raddist> Raddist_init ("raddist");
+static Librarian<Raddist> Raddist_init;
 
 #endif // RADDIST_H

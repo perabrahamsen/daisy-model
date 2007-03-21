@@ -33,6 +33,7 @@ class Number : public Model
   // Content.
 public:
   static const char *const description;
+  static const char *const component;
   const symbol name;
   virtual symbol title () const;
 
@@ -61,6 +62,6 @@ template<>
 BuildBase* Librarian<Number>::content;
 #endif
 
-static Librarian<Number> Number_init ("number");
+static Librarian<Number> Number_init;
 
 #endif // NUMBER_H

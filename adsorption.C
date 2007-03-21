@@ -31,6 +31,8 @@ This component describes the adsorption of a chemical to the soil,\n\
 which among other things affects how large a fraction can be\n\
 transported with the water.";
 
+const char *const Adsorption::component = "adsorption";
+
 bool
 Adsorption::full () const
 { return false; }

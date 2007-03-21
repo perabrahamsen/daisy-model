@@ -38,6 +38,7 @@ class UZRect : public Model
 public: 
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulate.
 public:
@@ -66,6 +67,6 @@ template<>
 BuildBase* Librarian<UZRect>::content;
 #endif
 
-static Librarian<UZRect> UZRect_init ("uzrect");
+static Librarian<UZRect> UZRect_init;
 
 #endif // UZRect_H

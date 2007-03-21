@@ -400,6 +400,8 @@ A `horizon' is a soil type with specific physical properties.  It is\n\
 the responsibility of the `horizon' component to specify these\n\
 properties.";
 
+const char *const Horizon::component = "horizon";
+
 static struct HorizonSyntax
 {
   HorizonSyntax ()

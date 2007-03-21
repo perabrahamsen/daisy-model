@@ -107,6 +107,7 @@ class UZ1D  : public Model
 public: 
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulate.
 public:
@@ -131,6 +132,6 @@ template<>
 BuildBase* Librarian<UZ1D>::content;
 #endif
 
-static Librarian<UZ1D> UZ1D_init ("uz1d");
+static Librarian<UZ1D> UZ1D_init;
 
 #endif // UZ1D_H

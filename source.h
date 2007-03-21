@@ -30,6 +30,7 @@ class Source : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Interface.
 public:
@@ -64,6 +65,6 @@ template<>
 BuildBase* Librarian<Source>::content;
 #endif
 
-static Librarian<Source> Source_init ("source");
+static Librarian<Source> Source_init;
 
 #endif // SOURCE_H

@@ -34,6 +34,7 @@ class NetRadiation : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulation.
 public:
@@ -58,6 +59,6 @@ template<>
 BuildBase* Librarian<NetRadiation>::content;
 #endif
 
-static Librarian<NetRadiation> NetRadiation_init ("net_radiation");
+static Librarian<NetRadiation> NetRadiation_init;
 
 #endif // NET_RADIATION_H

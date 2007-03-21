@@ -29,6 +29,8 @@ const char *const Difrad::description = "\
 The 'difrad' component should calculate the diffuse radiation from\n\
 meterological data.";
 
+const char *const Difrad::component = "difrad";
+
 void
 Difrad::output (Log&) const
 { }

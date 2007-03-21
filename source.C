@@ -27,6 +27,8 @@ BuildBase* Librarian<Source>::content = NULL;
 const char *const Source::description = "\
 Time series, with possible error bars and formatting information.";
 
+const char *const Source::component = "source";
+
 void 
 Source::limit (Time& begin, Time& end, double& ymin, double& ymax) const
 {

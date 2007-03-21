@@ -36,6 +36,7 @@ class Transport : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
 
   // Simulation.
 public:
@@ -64,6 +65,6 @@ template<>
 BuildBase* Librarian<Transport>::content;
 #endif
 
-static Librarian<Transport> Transport_init ("transport");
+static Librarian<Transport> Transport_init;
 
 #endif // TRANSPORT_H

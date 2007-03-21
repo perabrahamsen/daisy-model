@@ -35,6 +35,7 @@ class Volume : public Model
 public:
   const symbol name;
   static const char *const description;
+  static const char *const component;
   virtual std::string one_line_description () const = 0;
 
   // Use.
@@ -69,6 +70,6 @@ template<>
 BuildBase* Librarian<Volume>::content;
 #endif
 
-static Librarian<Volume> Volume_init ("volume");
+static Librarian<Volume> Volume_init;
 
 #endif // VOLUME_H

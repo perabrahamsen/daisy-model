@@ -32,6 +32,7 @@ class Equilibrium : public Model
   // Content.
 public:
   static const char *const description;
+  static const char *const component;
   const symbol name;
   const AttributeList& alist;
   
@@ -60,6 +61,6 @@ template<>
 BuildBase* Librarian<Equilibrium>::content;
 #endif
 
-static Librarian<Equilibrium> Equilibrium_init ("equilibrium");
+static Librarian<Equilibrium> Equilibrium_init;
 
 #endif // EQUILIBRIUM_H

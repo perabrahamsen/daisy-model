@@ -35,6 +35,8 @@ BuildBase* Librarian<Pedotransfer>::content = NULL;
 const char *const Pedotransfer::description = "\
 Pedotransfer functions based on soil attributes.";
 
+const char *const Pedotransfer::component = "pedotransfer";
+
 void 
 Pedotransfer::set (const Soil& soil, vector<double>& array,
                    const string& dim) const

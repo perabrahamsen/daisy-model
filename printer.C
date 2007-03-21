@@ -33,6 +33,8 @@ format into various internal format.  I.e., it performs the\n\
 opposite function of the 'parser' component.  This is used for --\n\
 among other things -- creating checkpoints of the state.";
 
+const char *const Printer::component = "printer";
+
 Printer::Printer (const AttributeList& al)
   : name (al.identifier ("type"))
 { }

@@ -28,6 +28,8 @@ BuildBase* Librarian<Equilibrium>::content = NULL;
 const char *const Equilibrium::description = "\
 Find equilibrium between two soil chemicals.";
 
+const char *const Equilibrium::component = "equilibrium";
+
 void
 Equilibrium::load_syntax (Syntax& syntax, AttributeList&)
 {
