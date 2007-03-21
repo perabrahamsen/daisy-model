@@ -33,135 +33,145 @@ class Syntax;
 class Treelog;
 class Library;
 
-struct BuildBase 
+class BuildBase 
 {
   // Avoid calls to daisy_assert
-  static void non_null (void*);
+protected:
+  static void non_null (const void*);
 
   // Types.
+protected:
   typedef Model& (*builder) (Block&);
 
   // Content.
-  std::auto_ptr<Library> lib;
-  int count;
+protected:
+  class Content;
+  static Content* content;
 
   // Build.
-  Model* build_cheat (const AttributeList& parent, 
-                      const std::string& key) const;
-  Model* build_free (Treelog&, const AttributeList&, 
-                     const std::string& scope_id) const;
-  Model* build_alist (Block& parent, const AttributeList&, 
-                      const std::string& scope_id) const;
-  Model* build_item (Block& parent, const std::string& key) const;
-  std::vector<Model*> build_vector (Block& al, const std::string& key) const;
-  std::vector<const Model*> build_vector_const (Block& al, 
-                                               const std::string& key) const;
-  // Library.
-  void add_base (AttributeList& al, const Syntax& syntax) const;
-  void add_type (const symbol name, AttributeList& al,
-                 const Syntax& syntax, builder build) const;
+protected:
+  static Model* build_cheat (const char* component,
+                             const AttributeList& parent, 
+                             const std::string& key);
+  static Model* build_free (const char* component,
+                            Treelog&, const AttributeList&, 
+                            const std::string& scope_id);
+  static Model* build_alist (const char* component,
+                             Block& parent, const AttributeList&, 
+                             const std::string& scope_id);
+  static Model* build_item (const char* component,
+                            Block& parent, const std::string& key);
+  static std::vector<Model*> build_vector (const char* component,
+                                           Block& al, 
+                                           const std::string& key);
+  static std::vector<const Model*>
+  /**/ build_vector_const (const char* component,
+                           Block& al, const std::string& key);
 
+  // Library.
+protected:
+  static void add_base (const char* component,
+                        AttributeList& al, const Syntax& syntax);
+  static void add_type (const char* component,
+                        const symbol name, AttributeList& al,
+                        const Syntax& syntax, builder build);
+  static void add_type (const char* component,
+                        const char* name, AttributeList& al,
+                        const Syntax& syntax, builder build);
+  static Library& library (const char* component);
+                      
   // Create and destroy.
-  BuildBase (const char *const name, const char *const description);
+protected:
+  BuildBase (const char *const component, const char *const description);
   ~BuildBase ();
 };
 
 template <class T>
-class Librarian
+class Librarian : private BuildBase
 {
-  // Class specific builder
-  typedef BuildBase::builder builder;
-
-  // Content.
-private:
-  static BuildBase *content;
-
   // Functions.
 public:
   static T* build_free (Treelog& msg, const AttributeList& alist, 
 			const std::string& scope_id)
-  {
-    BuildBase::non_null (content);
-    return dynamic_cast<T*> (content->build_free (msg, alist, scope_id)); 
+  { 
+    T* x = dynamic_cast<T*> (BuildBase::build_free (T::component, 
+                                                    msg, alist, scope_id)); 
+    non_null (x);
+    return x;
   }
   static T* build_cheat (const AttributeList& parent, const std::string& key)
-  {
-    BuildBase::non_null (content);
-    return dynamic_cast<T*> (content->build_cheat (parent, key)); 
+  { 
+    T* x = dynamic_cast<T*> (BuildBase::build_cheat (T::component,
+                                                     parent, key));
+    non_null (x);
+    return x;
   }
   static T* build_alist (Block& parent, const AttributeList& alist, 
 			 const std::string& scope_id)
-  {
-    BuildBase::non_null (content);
-    return dynamic_cast<T*> (content->build_alist (parent, alist, scope_id)); 
+  { 
+    T* x = dynamic_cast<T*> (BuildBase::build_alist (T::component, 
+                                                     parent, alist, scope_id));
+    non_null (x);
+    return x;
   }
   static T* build_item (Block& parent, const std::string& key)
   { 
-    BuildBase::non_null (content);
-    return dynamic_cast<T*> (content->build_item (parent, key)); 
+    T* x = dynamic_cast<T*> (BuildBase::build_item (T::component, 
+                                                    parent, key)); 
+    non_null (x);
+    return x;
   }
   static std::vector<T*> build_vector (Block& al, const std::string& key)
   {  
-    BuildBase::non_null (content);
-    std::vector<Model*> c = content->build_vector (al, key);
+    const std::vector<Model*> c 
+      = BuildBase::build_vector (T::component, al, key);
     std::vector<T*> t;
     for (size_t i = 0; i < c.size (); i++)
-      t.push_back (dynamic_cast<T*> (c[i]));
+      {
+        T* x = dynamic_cast<T*> (c[i]);
+        non_null (x);
+        t.push_back (x);
+      }
     return t;
   }
   static std::vector<const T*> build_vector_const (Block& al,
 						   const std::string& key)
   {  
-    BuildBase::non_null (content);
-    std::vector<const Model*> c = content->build_vector_const (al, key);
+    const std::vector<const Model*> c
+      = BuildBase::build_vector_const (T::component, al, key);
     std::vector<const T*> t;
     for (size_t i = 0; i < c.size (); i++)
-     t.push_back (dynamic_cast<const T*> (c[i]));
+      {
+        const T* x = dynamic_cast<const T*> (c[i]);
+        non_null (x);
+        t.push_back (x);
+      }
     return t;
   }
-
   static void add_base (AttributeList& al, const Syntax& syntax)
-  { 
-    BuildBase::non_null (content);
-    content->add_base (al, syntax); 
-  }
+  { BuildBase::add_base (T::component, al, syntax); }
   static void add_type (const symbol name, AttributeList& al,
 			const Syntax& syntax,
 			builder build)
-  {
-    BuildBase::non_null (content);
-    content->add_type (name, al, syntax, build);
-  }
+  { BuildBase::add_type (T::component, name, al, syntax, build); }
   static void add_type (const char *const name, AttributeList& al,
 			const Syntax& syntax,
 			builder build)
-  { add_type (symbol (name), al, syntax, build); }
+  { BuildBase::add_type (T::component, name, al, syntax, build); }
 
   static Library& library ()
-  {
-    BuildBase::non_null (content);
-    return *(content->lib);
-  }
+  { return BuildBase::library (T::component); }
 
   // Create and Destroy.
+private:                        // Disable.
+  Librarian (const Librarian&);
+  Librarian& operator= (const Librarian&);
 public:
-  Librarian ()
-  { 
-    if (!content)
-      content = new BuildBase (T::component, T::description);
-    content->count++;
-
-  }
+  explicit Librarian ()
+    : BuildBase (T::component, T::description)
+  { }
   ~Librarian ()
-  { 
-    BuildBase::non_null (content);
-    content->count--;
-    if (content->count == 0)
-      {
-	delete content;
-	content = 0;
-      }
-  }
+  { }
 };
 
 #endif // LIBRARIAN_H

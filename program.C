@@ -22,9 +22,6 @@
 #include "program.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Program>::content = NULL;
-
 const char *const Program::description = "\
 Run a program.";
 

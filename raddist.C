@@ -23,9 +23,6 @@
 #include "block.h"
 #include "mathlib.h"
 
-template<>
-BuildBase* Librarian<Raddist>::content = NULL;
-
 const char *const Raddist::description = "\
 The 'raddist' component calculates the radiation distribution in the canopy.";
 

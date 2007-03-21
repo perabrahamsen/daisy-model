@@ -29,9 +29,6 @@
 
 using namespace std;
 
-template<>
-BuildBase* Librarian<Pet>::content = NULL;
-
 const char *const Pet::description = "\
 The 'pet' component should calculate the potential evapotranspiration\n\
 from meteorological data, as well as the crop and soil state.";

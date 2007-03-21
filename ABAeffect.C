@@ -23,9 +23,6 @@
 #include "mathlib.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<ABAEffect>::content = NULL;
-
 const char *const ABAEffect::description = "\
 The 'ABAeffect' component calculates the effect of ABA on photosynthesis.";
 

@@ -32,9 +32,6 @@
 #include "log.h"
 #include "mathlib.h"
 
-template<>
-BuildBase* Librarian<Nitrification>::content = NULL;
-
 const char *const Nitrification::description = "\
 The nitrification process, transforming ammonium into nitrate and\n\
 nitrous oxide.";

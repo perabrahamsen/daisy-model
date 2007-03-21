@@ -95,9 +95,6 @@ struct MV_Soil : public Model
   { }
 };
 
-template<>
-BuildBase* Librarian<MV_Soil>::content = NULL;
-
 static Librarian<MV_Soil> MV_Soil_init;
 
 
@@ -254,9 +251,6 @@ struct MV_Crop : public Model
   ~MV_Crop ()
   { }
 };
-
-template<>
-BuildBase* Librarian<MV_Crop>::content = NULL;
 
 static Librarian<MV_Crop> MV_Crop_init;
 

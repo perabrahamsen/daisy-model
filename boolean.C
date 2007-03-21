@@ -28,9 +28,6 @@
 #include <sstream>
 #include <vector>
 
-template<>
-BuildBase* Librarian<Boolean>::content = NULL;
-
 const char *const Boolean::description = "\
 Generic representation of booleans.";
 

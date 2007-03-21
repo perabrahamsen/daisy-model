@@ -23,9 +23,6 @@
 #include "assertion.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Format>::content = NULL;
-
 const char *const Format::description = "\
 Text formatting component.";
 

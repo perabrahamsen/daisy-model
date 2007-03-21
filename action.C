@@ -23,9 +23,6 @@
 #include "action.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Action>::content = NULL;
-
 const char *const Action::description = "\
 The 'action' component represents management on different abstraction\n\
 levels, from a single tillage operation to strategies of how to manage\n\

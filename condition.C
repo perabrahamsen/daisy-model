@@ -23,9 +23,6 @@
 #include "condition.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Condition>::content = NULL;
-
 const char *const Condition::description = "\
 A 'condition' component tests the state of the simulation, like\n\
 whether the water pressure in a specific depth is above a given\n\

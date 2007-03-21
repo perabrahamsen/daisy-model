@@ -21,9 +21,6 @@
 #include "organic_matter.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<OrganicMatter>::content = NULL;
-
 const char *const OrganicMatter::description = "\
 Turnover of organic matter in the soil.";
 

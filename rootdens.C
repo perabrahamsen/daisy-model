@@ -26,9 +26,6 @@
 #include "alist.h"
 #include "check.h"
 
-template<>
-BuildBase* Librarian<Rootdens>::content = NULL;
-
 const char *const Rootdens::description = "\
 Root density calculations.";
 

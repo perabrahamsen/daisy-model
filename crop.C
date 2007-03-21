@@ -8,9 +8,6 @@
 
 const double Crop::DSremove = -5001.0;
 
-template<>
-BuildBase* Librarian<Crop>::content = NULL;
-
 const char *const Crop::description = "\
 The 'crop' component simulates a specific crop on the field, typically\n\
 averaged over one square meter, not individual plants.  Of particular\n\

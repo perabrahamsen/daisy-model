@@ -22,9 +22,6 @@
 #include "movement.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Movement>::content = NULL;
-
 const char *const Movement::description = "\
 This component handles the movement in the soil.";
 

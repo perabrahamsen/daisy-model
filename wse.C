@@ -28,9 +28,6 @@
 #include "mathlib.h"
 #include <memory>
 
-template<>
-BuildBase* Librarian<WSE>::content = NULL;
-
 const char *const WSE::description = "\
 The water stress effect on crop growth.";
 

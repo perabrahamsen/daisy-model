@@ -29,9 +29,6 @@
 #include <vector>
 #include <memory>
 
-template<>
-BuildBase* Librarian<Stringer>::content = NULL;
-
 const char *const Stringer::description = "\
 Generic representation of strings.";
 

@@ -25,9 +25,6 @@
 #include "syntax.h"
 #include "alist.h"
 
-template<>
-BuildBase* Librarian<Phenology>::content = NULL;
-
 const char *const Phenology::description = "\
 The development process.";
 

@@ -58,15 +58,7 @@ public:
   { }
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Exchange>::content;
-#endif
-
 static Librarian<Exchange> Exchange_init;
-
-template<>
-BuildBase* Librarian<Exchange>::content = NULL;
 
 const char *const 
 Exchange::description = "\

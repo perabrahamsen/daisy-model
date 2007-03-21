@@ -22,9 +22,6 @@
 #include "summary.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Summary>::content = NULL;
-
 const char *const Summary::description = "\
 Summary reports for log parameterizations.";
 

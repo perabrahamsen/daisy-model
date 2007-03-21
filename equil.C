@@ -22,9 +22,6 @@
 #include "equil.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Equilibrium>::content = NULL;
-
 const char *const Equilibrium::description = "\
 Find equilibrium between two soil chemicals.";
 

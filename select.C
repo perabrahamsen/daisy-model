@@ -62,9 +62,6 @@ Handle::symbol2handle (symbol s)
   return (*i).second;
 }  
 
-template<>
-BuildBase* Librarian<Select>::content = NULL;
-
 const char *const Select::description = "Select part of state.";
 
 const char *const Select::component = "select";

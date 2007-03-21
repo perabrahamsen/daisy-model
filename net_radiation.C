@@ -27,9 +27,6 @@
 #include "syntax.h"
 #include "mathlib.h"
 
-template<>
-BuildBase* Librarian<NetRadiation>::content = NULL;
-
 const char *const NetRadiation::description = "\
 The purpose of this component is to calculate the net radiation from\n\
 other meteorological data.";

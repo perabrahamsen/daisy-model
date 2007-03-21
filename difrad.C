@@ -22,9 +22,6 @@
 #include "difrad.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Difrad>::content = NULL;
-
 const char *const Difrad::description = "\
 The 'difrad' component should calculate the diffuse radiation from\n\
 meterological data.";

@@ -392,9 +392,6 @@ Horizon::~Horizon ()
 { }
 
 // Create Horizon library.
-template<>
-BuildBase* Librarian<Horizon>::content = NULL;
-
 const char *const Horizon::description = "\
 A `horizon' is a soil type with specific physical properties.  It is\n\
 the responsibility of the `horizon' component to specify these\n\

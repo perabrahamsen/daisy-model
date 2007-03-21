@@ -23,9 +23,6 @@
 #include "chemical.h"
 #include "alist.h"
 
-template<>
-BuildBase* Librarian<Chemical>::content = NULL;
-
 const char *const Chemical::description = "\
 This component should, for a specific chemical (typically a pesticide),\n\
 provide a description of the properties of interest to Daisy.";

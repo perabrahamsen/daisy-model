@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <stdio.h>
 
 namespace Assertion
 {
@@ -47,9 +48,13 @@ Assertion::message (const std::string& msg)
 void 
 Assertion::error (const std::string& msg)
 {
+#if 0
   if (logs.size () == 0)
     std::cerr << msg;
-
+#else
+  (void) fprintf (stdout, "%s\n", msg.c_str ());
+#endif
+  
   for (unsigned int i = 0; i < logs.size (); i++)
     {
       logs[i]->error (msg);

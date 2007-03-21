@@ -22,9 +22,6 @@
 #include "number.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Number>::content = NULL;
-
 const char *const Number::description = "\
 Generic representation of numbers.";
 

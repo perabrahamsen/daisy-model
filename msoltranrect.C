@@ -22,9 +22,6 @@
 #include "msoltranrect.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Msoltranrect>::content = NULL;
-
 const char *const Msoltranrect::description = "\
 Matrix solute transport in rectangular grid.";
 

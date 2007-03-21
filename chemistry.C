@@ -22,9 +22,6 @@
 #include "chemistry.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Chemistry>::content = NULL;
-
 const char *const Chemistry::description = "\
 Generic transformations between soil chemicals.";
 

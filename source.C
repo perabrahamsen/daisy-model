@@ -21,9 +21,6 @@
 #include "source.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Source>::content = NULL;
-
 const char *const Source::description = "\
 Time series, with possible error bars and formatting information.";
 

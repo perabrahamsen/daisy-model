@@ -22,9 +22,6 @@
 #include "block.h"
 #include "assertion.h"
 
-template<>
-BuildBase* Librarian<XYSource>::content = NULL;
-
 const char *const XYSource::description = "\
 XY data series.";
 

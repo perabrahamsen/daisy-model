@@ -21,9 +21,6 @@
 #include "uzrect.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<UZRect>::content = NULL;
-
 const char *const UZRect::description = "\
 2D water movement in a rectangular grid.";
 

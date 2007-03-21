@@ -24,9 +24,6 @@
 #include "log.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<SVAT>::content = NULL;
-
 const char *const SVAT::description = "\
 The task of the 'svat' component is to calculate the production\n\
 stress, given the potential evapotranspiration, the actual\n\

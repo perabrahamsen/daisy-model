@@ -23,9 +23,6 @@
 #include "adsorption.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Adsorption>::content = NULL;
-
 const char *const Adsorption::description = "\
 This component describes the adsorption of a chemical to the soil,\n\
 which among other things affects how large a fraction can be\n\

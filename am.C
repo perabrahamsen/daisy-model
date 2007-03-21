@@ -37,9 +37,6 @@
 #include <numeric>
 #include <sstream>
 
-template<>
-BuildBase* Librarian<AM>::content = NULL;
-
 const char *const AM::description = "\
 The 'am' component describes various kinds of fertilizer and other\n\
 added matter such as crop residues.  In particular, it describes how\n\

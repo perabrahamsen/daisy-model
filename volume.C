@@ -24,9 +24,6 @@
 
 class Log;
 
-template<>
-BuildBase* Librarian<Volume>::content = NULL;
-
 const char *const Volume::description = "\
 A subset of 3D space.";
 

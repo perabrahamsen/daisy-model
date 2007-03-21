@@ -26,9 +26,6 @@
 #include "log.h"
 #include <map>
 
-template<>
-BuildBase* Librarian<Column>::content = NULL;
-
 const char *const Column::description = "\
 A 'column' is an one-dimensional vertical description of the\n\
 soil/crop/atmosphere system.  The column component contains most of\n\

@@ -22,9 +22,6 @@
 #include "transform.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Transform>::content = NULL;
-
 const char *const Transform::description = "\
 Generic transformations between soil components.";
 

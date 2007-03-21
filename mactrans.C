@@ -23,9 +23,6 @@
 #include "mactrans.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Mactrans>::content = NULL;
-
 const char *const Mactrans::description = "\
 Macropore transportation of solutes.";
 

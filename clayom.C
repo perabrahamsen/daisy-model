@@ -22,9 +22,6 @@
 #include "clayom.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<ClayOM>::content = NULL;
-
 const char *const ClayOM::description = "\
 Find the effect of clay on organic matter processing.";
 

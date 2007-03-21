@@ -30,9 +30,6 @@ UZmodel::UZmodel (Block& al)
 UZmodel::~UZmodel ()
 { }
 
-template<>
-BuildBase* Librarian<UZmodel>::content = NULL;
-
 const char *const UZmodel::description = "\
 The 'uzmodel' component handles the vertical water movement in the\n\
 unsaturated zone soil matrix.";

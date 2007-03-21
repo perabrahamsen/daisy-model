@@ -24,9 +24,6 @@
 #include "alist.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Printer>::content = NULL;
-
 const char *const Printer::description = "\
 The 'printer' component is responsible for converting the internal\n\
 format into various internal format.  I.e., it performs the\n\

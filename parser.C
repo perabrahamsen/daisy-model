@@ -23,9 +23,6 @@
 #include "parser.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Parser>::content = NULL;
-
 const char *const Parser::description = "\
 To start the simulation, many parameters must be specified and state\n\
 variables must be given an initial value.  It is the responsibility of\n\

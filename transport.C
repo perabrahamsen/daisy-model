@@ -23,9 +23,6 @@
 #include "transport.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Transport>::content = NULL;
-
 const char *const Transport::description = "\
 This component handles the transportation of solute in the soil with\n\
 the water.";

@@ -26,30 +26,82 @@
 #include "treelog.h"
 #include "assertion.h"
 #include <sstream>
+#include <map>
 
 void 
-BuildBase::non_null (void* p)
+BuildBase::non_null (const void *const p)
 { daisy_assert (p); }
 
+class BuildBase::Content 
+{
+  // Content.
+private:
+  std::map<symbol, Library*> metalib;
+public:
+  int count;
+
+  // Use.
+public:
+  void add (const char *const component, const char *const description);
+  Library& library (const char *const component) const;
+
+  // Create and Destroy.
+public:
+  Content ()
+    : count (1)
+  { }
+  ~Content ()
+  { daisy_assert (count == 0); }
+};
+
+void 
+BuildBase::Content::add (const char *const component, 
+                         const char *const description)
+{
+  const std::map<symbol, Library*>::const_iterator i
+    = metalib.find (symbol (component));
+  
+  if (i != metalib.end ())
+    return;
+
+  metalib[symbol (component)] = new Library (component, description);
+}
+
+Library&
+BuildBase::Content::library (const char *const component) const
+{
+  const std::map<symbol, Library*>::const_iterator i
+    = metalib.find (symbol (component));
+  if (i == metalib.end ())
+    daisy_panic ("Component '" + std::string (component) + "' not found");
+  
+  return *(*i).second;
+}
+
+BuildBase::Content* BuildBase::content = 0;  
+
 Model* 
-BuildBase::build_free (Treelog& msg, const AttributeList& alist, 
-                       const std::string& scope_id) const
+BuildBase::build_free (const char *const component,
+                       Treelog& msg, const AttributeList& alist, 
+                       const std::string& scope_id)
 {
   daisy_assert (alist.check ("type"));
   const symbol type = alist.identifier ("type");
-  if (!lib->check (type))
+  const Library& lib = library (component);
+
+  if (!lib.check (type))
     {
       std::ostringstream tmp;
-      tmp << "Library '" << lib->name () << "' contains no model '"
+      tmp << "Library '" << lib.name () << "' contains no model '"
           << type << "'";
       daisy_panic (tmp.str ());
     }
-  const Syntax& syntax = lib->syntax (type);
+  const Syntax& syntax = lib.syntax (type);
   Block block (syntax, alist, msg, scope_id + ": " + type.name ());
   daisy_assert (syntax.check (alist, msg));
   try
     {  
-      Model* result = lib->build_raw (type, block); 
+      Model* result = lib.build_raw (type, block); 
       daisy_assert (block.ok () && result);
       return result;
     }
@@ -61,28 +113,31 @@ BuildBase::build_free (Treelog& msg, const AttributeList& alist,
 }
 
 Model* 
-BuildBase::build_cheat (const AttributeList& parent, 
-                        const std::string& key) const
-{ return build_free (Treelog::null (), parent.alist (key), key); }
+BuildBase::build_cheat (const char *const component,
+                        const AttributeList& parent, 
+                        const std::string& key)
+{ return build_free (component, Treelog::null (), parent.alist (key), key); }
 
 Model* 
-BuildBase::build_alist (Block& parent, const AttributeList& alist, 
-                        const std::string& scope_id) const
+BuildBase::build_alist (const char *const component,
+                        Block& parent, const AttributeList& alist, 
+                        const std::string& scope_id)
 {
   daisy_assert (alist.check ("type"));
   const symbol type = alist.identifier ("type");
-  if (!lib->check (type))
+  const Library& lib = library (component);
+  if (!lib.check (type))
     {
       std::ostringstream tmp;
-      tmp << "Component '" << lib->name () << "' contains no model '"
+      tmp << "Component '" << lib.name () << "' contains no model '"
           << type << "'";
       daisy_panic (tmp.str ());
     }
-  const Syntax& syntax = lib->syntax (type);
+  const Syntax& syntax = lib.syntax (type);
   Block nested (parent, syntax, alist, scope_id + ": " + type.name ());
   daisy_assert (syntax.check (alist, nested.msg ()));
   try
-    {  return lib->build_raw (type, nested); }
+    {  return lib.build_raw (type, nested); }
   catch (const std::string& err)
     { nested.error ("Build failed: " + err); }
   catch (const char *const err)
@@ -91,46 +146,79 @@ BuildBase::build_alist (Block& parent, const AttributeList& alist,
 }
 
 Model* 
-BuildBase::build_item (Block& parent, const std::string& key) const
-{ return build_alist (parent, parent.alist (key), key); }
+BuildBase::build_item (const char *const component,
+                       Block& parent, const std::string& key)
+{ return build_alist (component, parent, parent.alist (key), key); }
 
 std::vector<Model*> 
-BuildBase::build_vector (Block& al, const std::string& key) const
+BuildBase::build_vector (const char *const component,
+                         Block& al, const std::string& key)
 { 
   std::vector<Model*> t;
   const std::vector<AttributeList*>& f (al.alist_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
-    t.push_back (build_alist (al, *f[i], sequence_id (key, i)));
+    t.push_back (build_alist (component, al, *f[i], sequence_id (key, i)));
   return t;
 }
 
 std::vector<const Model*> 
-BuildBase::build_vector_const (Block& al, const std::string& key) const
+BuildBase::build_vector_const (const char *const component,
+                               Block& al, const std::string& key)
 { 
   std::vector<const Model*> t;
   const std::vector<AttributeList*>& f (al.alist_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
-    t.push_back (build_alist (al, *f[i], sequence_id (key, i)));
+    t.push_back (build_alist (component, al, *f[i], sequence_id (key, i)));
   return t;
 }
 
 void 
-BuildBase::add_base (AttributeList& al, const Syntax& syntax) const
-{ lib->add_base (al, syntax); }
+BuildBase::add_base (const char *const component,
+                     AttributeList& al, const Syntax& syntax)
+{ library (component).add_base (al, syntax); }
 
 void 
-BuildBase::add_type (const symbol name, AttributeList& al,
-                     const Syntax& syntax, builder build) const
-{ lib->add (name, al, syntax, build); }
+BuildBase::add_type (const char *const component,
+                     const symbol name, AttributeList& al,
+                     const Syntax& syntax, builder build)
+{ library (component).add (name, al, syntax, build); }
 
-BuildBase::BuildBase (const char *const name,
+void
+BuildBase::add_type (const char *const component,
+                     const char *const name, AttributeList& al,
+                     const Syntax& syntax, builder build)
+{ library (component).add (symbol (name), al, syntax, build); }
+
+Library& 
+BuildBase::library (const char* component)
+{
+  daisy_assert (content);
+  return content->library (component);
+}
+
+
+BuildBase::BuildBase (const char *const component,
                       const char *const description)
-  : lib (new Library (name, description)),
-    count (0)
-{ daisy_assert (lib.get ()); }
+{
+  if (!content)
+    content = new Content ();
+  else
+    content->count++;
+
+  content->add (component, description);
+}
 
 BuildBase::~BuildBase ()
-{ }
+{ 
+  daisy_assert (content);
+  daisy_assert (content->count > 0);
+  content->count--;
+
+  if (content->count == 0)
+    {
+      delete content;
+      content = NULL;
+    }
+}
 
 // librarian.C ends here
-

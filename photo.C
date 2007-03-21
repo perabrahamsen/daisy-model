@@ -22,9 +22,6 @@
 #include "photo.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Photo>::content = NULL;
-
 const char *const Photo::description = "\
 Leaf photosynthesis.";
 

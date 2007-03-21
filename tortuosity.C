@@ -23,9 +23,6 @@
 #include "tortuosity.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Tortuosity>::content = NULL;
-
 const char *const Tortuosity::description = "\
 Solutes in the soil can't move the shortest way between two points.\n\
 The tortuosity factor indicates how far the average solute have\n\

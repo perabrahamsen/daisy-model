@@ -29,9 +29,6 @@
 
 using namespace std;
 
-template<>
-BuildBase* Librarian<Pedotransfer>::content = NULL;
-
 const char *const Pedotransfer::description = "\
 Pedotransfer functions based on soil attributes.";
 

@@ -25,9 +25,6 @@
 #include "syntax.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Vegetation>::content = NULL;
-
 const char *const Vegetation::description = "\
 That green stuff.";
 

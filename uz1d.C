@@ -155,9 +155,6 @@ SMM1D::SMM1D (const GeometryRect& geo_, const Soil& soil_,
     }
 }
 
-template<>
-BuildBase* Librarian<UZ1D>::content = NULL;
-
 const char *const UZ1D::description = "\
 The 'uz1d' component handles the horizontal water movement in the\n\
 unsaturated zone soil matrix.";

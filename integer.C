@@ -27,9 +27,6 @@
 #include "memutils.h"
 #include <sstream>
 
-template<>
-BuildBase* Librarian<Integer>::content = NULL;
-
 const char *const Integer::description = "\
 Generic representation of integers.";
 

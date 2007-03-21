@@ -22,9 +22,6 @@
 #include "gnuplot.h"
 #include "block.h"
 
-template<>
-BuildBase* Librarian<Gnuplot>::content = NULL;
-
 const char *const Gnuplot::description = "\
 Plot a graph with gnuplot.";
 

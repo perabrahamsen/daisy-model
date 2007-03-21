@@ -305,7 +305,6 @@ Surface::Implementation::exfiltrate (const double water /* [mm] */,
         Chemicals::move_fraction (chemicals_storage, chemicals_out,
                                   -water / pond);
     }
-
   pond += water;
 }
 
