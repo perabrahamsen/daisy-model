@@ -47,7 +47,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Soil&, Treelog& err);
+  virtual void initialize (Block&, const Soil&);
   virtual bool check (const Soil&, size_t dom_size, size_t som_size, 
                       Treelog& err) const = 0;
   static void load_syntax (Syntax&, AttributeList&);
@@ -56,11 +56,6 @@ protected:
 public:
   ~Domsorp ();
 };
-
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Domsorp>::content;
-#endif
 
 static Librarian<Domsorp> Domsorp_init;
 

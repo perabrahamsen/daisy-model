@@ -62,11 +62,6 @@ public:
   ~Phenology ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Phenology>::content;
-#endif
-
 static Librarian<Phenology> Phenology_init;
 
 #endif // PHENOLOGY_H

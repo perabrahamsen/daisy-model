@@ -159,11 +159,6 @@ public:
   ~Select ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Select>::content;
-#endif
-
 static Librarian<Select> Select_init;
 
 #endif // SELECT_H

@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "block.h"
+#include "metalib.h"
 #include "library.h"
 #include "alist.h"
 #include "librarian.h"
@@ -31,6 +32,7 @@
 struct Block::Implementation
 {
   static const Syntax empty_syntax;
+  const Metalib *const metalib;
   Block *const parent;
   const Syntax& syntax;
   const AttributeList& alist;
@@ -47,10 +49,11 @@ struct Block::Implementation
   void error (const std::string& msg);
   void set_error ();
 
-  Implementation (Block *const p, Treelog& m,
+  Implementation (const Metalib *const lib, Block *const p, Treelog& m,
 		  const Syntax& s, const AttributeList& a,
 		  const std::string& scope_id)
-    : parent (p),
+    : metalib (lib),
+      parent (p),
       syntax (s),
       alist (a),
       msg (m),
@@ -478,20 +481,26 @@ Block::alist_sequence (const std::string& key) const
   return impl->find_alist (var).alist_sequence (var); 
 }
 
+Block::Block (const Metalib& metalib, Treelog& msg, 
+              const std::string& scope_id)
+  : impl (new Implementation (&metalib, NULL, msg, 
+                              metalib.syntax (), metalib.alist (), scope_id))
+{ }
+
 Block::Block (const Syntax& syntax, const AttributeList& alist, Treelog& msg, 
-	      const std::string& scope_id)
-  : impl (new Implementation (NULL, msg, syntax, alist, scope_id))
+ 	      const std::string& scope_id)
+  : impl (new Implementation (NULL, NULL, msg, syntax, alist, scope_id))
 { }
 
 Block::Block (Block& block,
 	      const Syntax& syntax, const AttributeList& alist, 
 	      const std::string& scope_id)
-  : impl (new Implementation (&block, block.msg (), syntax, alist,
+  : impl (new Implementation (NULL, &block, block.msg (), syntax, alist,
 			      scope_id))
 { }
 
 Block::Block (Block& block, const std::string& key)
-  : impl (new Implementation (&block, block.msg (), 
+  : impl (new Implementation (NULL, &block, block.msg (), 
                               block.syntax ().syntax (key), 
                               block.alist ().alist (key),
 			      key))
@@ -500,13 +509,13 @@ Block::Block (Block& block, const std::string& key)
 Block::Block (Block& block,
 	      const Syntax& syntax, const AttributeList& alist, 
 	      const std::string& scope_id, size_t index)
-  : impl (new Implementation (&block, block.msg (),
+  : impl (new Implementation (NULL, &block, block.msg (),
 			      syntax, alist, 
 			      sequence_id (scope_id, index)))
 { }
 
 Block::Block (const AttributeList& alist)
-  : impl (new Implementation (NULL, Treelog::null (),
+  : impl (new Implementation (NULL, NULL, Treelog::null (),
                               Implementation::empty_syntax, alist,
                               "Plain AttributeList"))
 { }

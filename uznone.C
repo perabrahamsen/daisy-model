@@ -54,7 +54,7 @@ public:
   }
 
   // Create and Destroy.
-  void has_macropores (bool)
+  void has_macropores (Block&, bool)
   { }
 public:
   UZNone (Block& al)

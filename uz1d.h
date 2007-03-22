@@ -127,11 +127,6 @@ public:
   ~UZ1D ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<UZ1D>::content;
-#endif
-
 static Librarian<UZ1D> UZ1D_init;
 
 #endif // UZ1D_H

@@ -57,11 +57,6 @@ public:
   ~Rootdens ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Rootdens>::content;
-#endif
-
 static Librarian<Rootdens> Rootdens_init;
 
 #endif // ROOTDENS_H

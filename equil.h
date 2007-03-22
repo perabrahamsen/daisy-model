@@ -44,8 +44,8 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Soil&, Treelog&) = 0;
-  virtual bool check (const Soil&, Treelog& err) const = 0;
+  virtual void initialize (Block&, const Soil&) = 0;
+  virtual bool check (const Soil&, Treelog&) const = 0;
   static void load_syntax (Syntax&, AttributeList&);
 private:
   Equilibrium ();
@@ -55,11 +55,6 @@ protected:
 public:
   ~Equilibrium ();
 };
-
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Equilibrium>::content;
-#endif
 
 static Librarian<Equilibrium> Equilibrium_init;
 

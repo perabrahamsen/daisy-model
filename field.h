@@ -117,9 +117,6 @@ public:
   unsigned int size () const;
 
   // Create and destroy.
-  void divide (const Output&, symbol original, symbol copy, double copy_size,
-	       const Time&, const Weather*);
-  void merge (symbol combine, symbol remove);
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
@@ -127,7 +124,7 @@ public:
   bool check_x_border (double, Treelog& err) const;
   bool check_y_border (double, Treelog& err) const;
 
-  void initialize (const Output&, const Time&, Treelog& err, const Weather*);
+  void initialize (Block&, const Output&, const Time&, const Weather*);
   Field (Block&, const std::string& key);
   virtual ~Field ();
 };

@@ -51,11 +51,6 @@ public:
   ~Boolean ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Boolean>::content;
-#endif
-
 static Librarian<Boolean> Boolean_init;
 
 #endif // BOOLEAN_H

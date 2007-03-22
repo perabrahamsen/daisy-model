@@ -54,11 +54,6 @@ public:
   ~NetRadiation ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<NetRadiation>::content;
-#endif
-
 static Librarian<NetRadiation> NetRadiation_init;
 
 #endif // NET_RADIATION_H

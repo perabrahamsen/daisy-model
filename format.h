@@ -219,11 +219,6 @@ public:
   ~Format ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Format>::content;
-#endif
-
 static Librarian<Format> Format_init;
 
 #endif // FORMAT_H

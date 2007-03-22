@@ -46,11 +46,6 @@ public:
   ~Tortuosity ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Tortuosity>::content;
-#endif
-
 static Librarian<Tortuosity> Tortuosity_init;
 
 #endif // TORTUOSITY_H

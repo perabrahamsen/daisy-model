@@ -46,11 +46,6 @@ public:
   ~Scopesel ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Scopesel>::content;
-#endif
-
 static Librarian<Scopesel> Scopesel_init;
 
 #endif // SCOPESEL_H

@@ -107,18 +107,13 @@ private:
 
   // Create.
 public:
-  virtual void initialize (const Weather&, Treelog&) = 0;
+  virtual void initialize (Block&, const Weather&) = 0;
   static const AttributeList& default_model ();
 protected:
   explicit Bioclimate (Block&);
 public:
   ~Bioclimate ();
 };
-
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Bioclimate>::content;
-#endif
 
 static Librarian<Bioclimate> Bioclimate_init;
 

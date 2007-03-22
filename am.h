@@ -111,11 +111,6 @@ public:
   ~AM ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<AM>::content;
-#endif
-
 static Librarian<AM> AM_init;
 
 #endif // AM_H

@@ -59,11 +59,6 @@ public:
   ~Printer ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Printer>::content;
-#endif
-
 static Librarian<Printer> Printer_init;
 
 #endif // PRINTER_H

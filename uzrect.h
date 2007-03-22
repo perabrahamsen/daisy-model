@@ -49,7 +49,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void has_macropores (bool) = 0;
+  virtual void has_macropores (Block&, bool) = 0;
   static const AttributeList& default_model ();
   static const AttributeList& reserve_model ();
 private:
@@ -61,11 +61,6 @@ protected:
 public:
   ~UZRect ();
 };
-
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<UZRect>::content;
-#endif
 
 static Librarian<UZRect> UZRect_init;
 

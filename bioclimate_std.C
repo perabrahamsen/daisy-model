@@ -220,16 +220,16 @@ struct BioclimateStandard : public Bioclimate
   double get_snow_storage () const // [mm]
   { return snow.storage (); }
   // Create.
-  void initialize (const Weather&, Treelog&);
+  void initialize (Block&, const Weather&);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   BioclimateStandard (Block&);
   ~BioclimateStandard ();
 };
 
 void 
-BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
+BioclimateStandard::initialize (Block& block, const Weather& weather)
 {
-  Treelog::Open nest (msg, "Bioclimate: " + name);
+  Treelog::Open nest (block.msg (), "Bioclimate: " + name);
 
   if (!pet.get ())                      // Explicit.
     {
@@ -249,15 +249,15 @@ BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
       else
 	type = symbol ("makkink");
 
-      msg.debug ("Pet choosen: " + type);
+      block.msg ().debug ("Pet choosen: " + type);
 
       const Library& library = Librarian<Pet>::library ();
       daisy_assert (library.check (type));
   
       AttributeList alist (library.lookup (type));
       alist.add ("type", type);
-      daisy_assert (library.syntax (type).check (alist, msg));
-      pet.reset (Librarian<Pet>::build_free (msg, alist, "pet"));
+      daisy_assert (library.syntax (type).check (alist, block.msg ()));
+      pet.reset (Librarian<Pet>::build_alist (block, alist, "pet"));
     }
 
   if (!difrad.get ())                      // Explicit.
@@ -269,15 +269,15 @@ BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
       else
 	type = symbol ("DPF");
 
-      msg.debug ("Difrad choosen: " + type);
+      block.msg ().debug ("Difrad choosen: " + type);
 
       const Library& library = Librarian<Difrad>::library ();
       daisy_assert (library.check (type));
   
       AttributeList alist (library.lookup (type));
       alist.add ("type", type);
-      daisy_assert (library.syntax (type).check (alist, msg));
-      difrad.reset (Librarian<Difrad>::build_free (msg, alist, "difrad"));
+      daisy_assert (library.syntax (type).check (alist, block.msg ()));
+      difrad.reset (Librarian<Difrad>::build_alist (block, alist, "difrad"));
     }
 }
 

@@ -58,11 +58,6 @@ public:
   ~Pedotransfer ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Pedotransfer>::content;
-#endif
-
 static Librarian<Pedotransfer> Pedotransfer_init;
 
 #endif // PEDOTRANSFER_H

@@ -86,9 +86,9 @@ public:
                           double from, double to, double dt) = 0;
   virtual AM* find_am (symbol sort, symbol part) const = 0;
 public:
-  virtual void initialize (const AttributeList&, const Geometry& geo,
+  virtual void initialize (Block&, const AttributeList&, const Geometry& geo,
                            const Soil&, const SoilWater&, 
-                           double T_avg, Treelog&) = 0;
+                           double T_avg) = 0;
   static const AttributeList& default_model ();
 private:
   OrganicMatter ();
@@ -98,11 +98,6 @@ public:
   explicit OrganicMatter (Block&);
   ~OrganicMatter ();
 };
-
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<OrganicMatter>::content;
-#endif
 
 static Librarian<OrganicMatter> Organic_init;
 

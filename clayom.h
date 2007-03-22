@@ -56,11 +56,6 @@ public:
   ~ClayOM ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<ClayOM>::content;
-#endif
-
 static Librarian<ClayOM> ClayOM_init;
 
 #endif // CLAYOM_H

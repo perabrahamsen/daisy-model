@@ -59,11 +59,6 @@ public:
   ~XYSource ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<XYSource>::content;
-#endif
-
 static Librarian<XYSource> XYSource_init;
 
 #endif // XYSOURCE_H

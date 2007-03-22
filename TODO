@@ -2,69 +2,21 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * OpenMI
 
-** Parameterizationer skal være en Toplevel attribut!
+** Parlib skal være en Toplevel attribut!
 
-*** 
+*** Librarian<Model>::build  skal have en block for at finde et parlib.
 
-class Parlib
-{
-  map<libname,Library*> all;
-};
+**** Get rid of build_free
 
-static class Intrinsic
-{
-  // Content.   
-private:
-  class Content;
-  static Content* content;
+=> Initialize skal have en block
 
-  // Access.
-public
-  static const Parlib& parlib ();
+**** Slip af med andre tvivlsomme build varianter
 
-  // Add new build-ins.
-public:
-  static add (libname, name, syntax, alist, build);
-  static derive (libname, name, alist, super);
+**** Er alle typer af "block" ok?
 
-  // Create and destroy.
-public:
-  Intrinsic ();
-  ~Intrinsic ();
-} intrinsic;
+** Parlib skal indeholde global syntax og alist
 
-class Intrinsic::Content : public Parlib
-{
-public:
-  int count;
-};
-
----
-
-Factory<T>, Industry
-
-Build in (shared) vs loaded (per toplevel)
-
-Shared base class?
-
----
-
-Model, base class for all models.
-
-Component:  Collection of models  <T>?
-
-Parlib:  Collection of components
-
-Parlib ::built_in:  Build in models & parameterizations 
-
-Parlib Toplevel::parlib Parameterizations in this toplevel
-
----
-
-Før: 80,1 MiB
-Nu:  50,4 MiB
-Nu:  44,3 MiB
-Nu:  44,0 MiB
+Block (parlib, "scope_id");
 
 ** Installer C# på x40
 

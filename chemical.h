@@ -55,11 +55,6 @@ public:
   ~Chemical ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Chemical>::content;
-#endif
-
 static Librarian<Chemical> Chemical_init;
 
 #endif // CHEMICAL_H

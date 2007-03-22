@@ -51,11 +51,6 @@ public:
   ~Depth ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Depth>::content;
-#endif
-
 static Librarian<Depth> Depth_init;
 
 #endif // DEPTH_H

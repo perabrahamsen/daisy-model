@@ -60,11 +60,6 @@ public:
   ~Source ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Source>::content;
-#endif
-
 static Librarian<Source> Source_init;
 
 #endif // SOURCE_H

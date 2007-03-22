@@ -63,11 +63,6 @@ public:
   ~Macro ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Macro>::content;
-#endif
-
 static Librarian<Macro> Macro_init;
 
 #endif // MACRO_H

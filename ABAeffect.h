@@ -50,11 +50,6 @@ public:
   ~ABAEffect ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<ABAEffect>::content;
-#endif
-
 static Librarian<ABAEffect> ABAEffect_init;
 
 #endif // ABAEFFECT_H

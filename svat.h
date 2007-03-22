@@ -61,11 +61,6 @@ public:
   ~SVAT ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<SVAT>::content;
-#endif
-
 static Librarian<SVAT> SVAT_init;
 
 #endif // SVAT_H

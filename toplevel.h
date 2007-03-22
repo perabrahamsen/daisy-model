@@ -22,13 +22,12 @@
 #ifndef TOPLEVEL_H
 #define TOPLEVEL_H
 
-#include "program.h"
-#include "syntax.h"
-#include "alist.h"
+#include "metalib.h"
 #include <string>
 #include <memory>
 #include <ctime>
 
+class Program;
 class Syntax;
 class AttributeList;
 class Treelog;
@@ -50,8 +49,7 @@ private:
 public:
   const std::auto_ptr<Treelog> msg;
 private:
-  Syntax top_syntax;
-  AttributeList top_alist;
+  Metalib metalib;
   std::time_t start_time;
   bool has_printed_copyright;
 public:

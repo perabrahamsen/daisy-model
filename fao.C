@@ -128,6 +128,7 @@ FAO::CloudinessFactor_Humid (double Si, double rad)
   return cfh;
 }
 
+#if 0
 double
 FAO::RefNetRadiation (double Si, double rad,
 		      double Temp, double ea, Treelog& out)
@@ -147,6 +148,7 @@ FAO::RefNetRadiation (double Si, double rad,
 		       Temp, ea, Si, albedo, out);
   return net_radiation->net_radiation ();
 }
+#endif
 
 double
 FAO::Makkink (double air_temperature /* dg C */,

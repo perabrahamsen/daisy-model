@@ -58,11 +58,6 @@ public:
   ~Action ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Action>::content;
-#endif
-
 static Librarian<Action> Action_init;
 
 #endif // ACTION_H

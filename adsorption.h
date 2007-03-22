@@ -50,11 +50,6 @@ public:
   ~Adsorption ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Adsorption>::content;
-#endif
-
 static Librarian<Adsorption> Adsorption_init;
 
 #endif // ADSORPTION_H

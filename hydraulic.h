@@ -80,11 +80,6 @@ public:
   ~Hydraulic ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Hydraulic>::content;
-#endif
-
 static Librarian<Hydraulic> Hydraulic_init;
 
 #endif // HYDRAULIC_H

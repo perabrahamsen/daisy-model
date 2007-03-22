@@ -1,3 +1,8 @@
+2007-03-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* metalib.C: New utility..
+	* Makefile (OTHER): Added it.
+
 2007-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* model.C, model.h: New file.

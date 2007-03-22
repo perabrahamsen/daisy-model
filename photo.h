@@ -60,11 +60,6 @@ public:
   ~Photo ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Photo>::content;
-#endif
-
 static Librarian<Photo> Photo_init;
 
 #endif // PHOTO_H

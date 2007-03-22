@@ -144,11 +144,6 @@ public:
   ~Crop ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Crop>::content;
-#endif
-
 static Librarian<Crop> Crop_init;
 
 #endif // CROP_H

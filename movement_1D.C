@@ -134,9 +134,8 @@ struct Movement1D : public Movement
 
   // Create.
   bool check (Treelog& err) const;
-  void initialize (const AttributeList& alist,
-                   const Soil& soil, const Groundwater& groundwater,
-                   Treelog& msg);
+  void initialize (Block&, const AttributeList& alist,
+                   const Soil& soil, const Groundwater& groundwater);
   Movement1D (Block& al);
   ~Movement1D ();
 };
@@ -668,18 +667,17 @@ Movement1D::check (Treelog&) const
 { return true; }
 
 void 
-Movement1D::initialize (const AttributeList& al,
-                        const Soil& soil, const Groundwater& groundwater,
-                        Treelog& msg)
+Movement1D::initialize (Block& block, const AttributeList& al,
+                        const Soil& soil, const Groundwater& groundwater)
 {
-  Treelog::Open nest (msg, "Movement: " + name.name ());
+  Treelog::Open nest (block.msg (), "Movement: " + name.name ());
 
   const size_t cell_size = geo->cell_size ();
 
   // Macropores.
   if (al.check ("macro"))
-    macro.reset (Librarian<Macro>::build_free (msg, al.alist ("macro"), 
-                                               "macro"));
+    macro.reset (Librarian<Macro>::build_alist (block, al.alist ("macro"), 
+                                                "macro"));
   else if (soil.humus (0) + soil.clay (0) > 0.05)
     // More than 5% clay (and humus) in first horizon.
     {
@@ -698,13 +696,13 @@ Movement1D::initialize (const AttributeList& al,
       // Add them.
       macro = Macro::create (height);
 
-      msg.debug ("Adding macropores");
+      block.msg ().debug ("Adding macropores");
     }
 
   // Let 'macro' choose the default method to average K values in 'uz'.
   const bool has_macropores = (macro.get () && !macro->none ());
   for (size_t i = 0; i < matrix_water.size (); i++)
-    matrix_water[i]->has_macropores (has_macropores);
+    matrix_water[i]->has_macropores (block, has_macropores);
 }
 
 Movement1D::Movement1D (Block& al)

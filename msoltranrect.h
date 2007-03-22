@@ -77,11 +77,6 @@ public:
   ~Msoltranrect ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Msoltranrect>::content;
-#endif
-
 static Librarian<Msoltranrect> Msoltranrect_init;
 
 #endif // MSOLTRANRECT_H

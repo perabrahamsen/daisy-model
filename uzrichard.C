@@ -95,7 +95,7 @@ public:
   
   // Create and Destroy.
 public:
-  void has_macropores (bool); // Tell UZ that there is macropores.
+  void has_macropores (Block&, bool); // Tell UZ that there is macropores.
   UZRichard (Block& par);
   ~UZRichard ();
   static void load_syntax (Syntax& syntax, AttributeList& alist);
@@ -665,7 +665,7 @@ UZRichard::tick (Treelog& msg, const GeometryVert& geo,
 }
 
 void
-UZRichard::has_macropores (bool has_them)
+UZRichard::has_macropores (Block& block, bool has_them)
 { 
   if (!K_average.get ())
     {
@@ -675,8 +675,7 @@ UZRichard::has_macropores (bool has_them)
 	  if (!geometric.check ("type"))
 	    geometric.add ("type", "geometric");
 	  K_average.reset (Librarian<Average>
-                           ::build_free (Treelog::null (),
-                                         geometric, "has macro"));
+                           ::build_alist (block, geometric, "has macro"));
 	}
       else
 	{
@@ -684,8 +683,7 @@ UZRichard::has_macropores (bool has_them)
 	  if (!arithmetic.check ("type"))
 	    arithmetic.add ("type", "arithmetic");
 	  K_average.reset (Librarian<Average>
-                           ::build_free (Treelog::null (),
-                                         arithmetic, "no macro"));
+                           ::build_alist (block, arithmetic, "no macro"));
 	}
     }
   daisy_assert (K_average.get ());

@@ -152,11 +152,6 @@ public:
   ~Weather ();
 };
 
-#ifdef FORWARD_TEMPLATES
-  template<>
-BuildBase* Librarian<Weather>::content;
-#endif
-
 static Librarian<Weather> Weather_init;
 
 #endif // WEATHER_H

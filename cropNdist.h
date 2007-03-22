@@ -56,11 +56,6 @@ public:
   ~CropNdist ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<CropNdist>::content;
-#endif
-
 static Librarian<CropNdist> CropNdist_init;
 
 #endif // CROPNDIST_H

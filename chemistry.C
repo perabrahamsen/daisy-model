@@ -32,7 +32,7 @@ Chemistry::check (const Soil&, Treelog&) const
 { return true; }
 
 void
-Chemistry::initialize (const Soil&, Treelog&)
+Chemistry::initialize (Block&, const Soil&)
 { }
 
 void

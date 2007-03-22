@@ -56,7 +56,12 @@ struct ProgramBatch : public Program
         tmp << name << "[" << i << "]: " << program[0]->name;
         Treelog::Open nest (msg, tmp.str ());
         msg.touch ();
-        program[0]->initialize (global_syntax, global_alist, msg);
+        {
+          Block block (*global_syntax, *global_alist, msg, "Initializing");
+          program[0]->initialize (block);
+          if (!block.ok ())
+            throw EXIT_FAILURE;
+        }
         if (!program[0]->check (msg))
           return false;
         if (!program[0]->run (msg))
@@ -68,11 +73,10 @@ struct ProgramBatch : public Program
   }
 
   // Create and Destroy.
-  void initialize (const Syntax *const gs, const AttributeList *const gal,
-                   Treelog&)
+  void initialize (Block& block)
   { 
-    global_syntax = gs;
-    global_alist = gal;
+    global_syntax = &block.syntax ();
+    global_alist = &block.alist ();
   }
   bool check (Treelog&)
   { return true; }

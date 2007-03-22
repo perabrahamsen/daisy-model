@@ -44,11 +44,6 @@ public:
   ~WSE ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<WSE>::content;
-#endif
-
 static Librarian<WSE> WSE_init;
 
 #endif // WSE_H

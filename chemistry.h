@@ -48,7 +48,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Soil&, Treelog& err);
+  virtual void initialize (Block&, const Soil&);
   virtual bool check (const Soil&, Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);
 protected:
@@ -56,11 +56,6 @@ protected:
 public:
   ~Chemistry ();
 };
-
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Chemistry>::content;
-#endif
 
 static Librarian<Chemistry> Chemistry_init;
 

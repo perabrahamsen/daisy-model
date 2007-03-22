@@ -72,11 +72,6 @@ public:
   ~Raddist ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Raddist>::content;
-#endif
-
 static Librarian<Raddist> Raddist_init;
 
 #endif // RADDIST_H

@@ -80,8 +80,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Syntax* glob_syn, const AttributeList* glob_al,
-                   Treelog& err);
+  void initialize (Block&);
   bool check (Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
   explicit Daisy (Block&);

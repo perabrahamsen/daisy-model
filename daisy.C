@@ -130,17 +130,16 @@ Daisy::output (Log& log) const
 }
 
 void
-Daisy::initialize (const Syntax* glob_syn, const AttributeList* glob_al,
-                   Treelog& msg)
+Daisy::initialize (Block& block)
 { 
-  global_syntax = glob_syn; 
-  global_alist = glob_al;
-  if (weather.get () && !weather->initialize (time, msg))
+  global_syntax = &block.syntax (); 
+  global_alist = &block.alist ();
+  if (weather.get () && !weather->initialize (time, block.msg ()))
     return;
-  field->initialize (*output_log, time, msg, weather.get ());
+  field->initialize (block, *output_log, time, weather.get ());
   {
-    Treelog::Open nest (msg, "output");
-    output_log->initialize (msg);
+    Treelog::Open nest (block.msg (), "output");
+    output_log->initialize (block.msg ());
   }
 }
 

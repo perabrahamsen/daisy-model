@@ -64,17 +64,12 @@ public:
 public:
   static const AttributeList& default_model ();
   static const AttributeList& reserve_model ();
-  virtual void has_macropores (bool) = 0; // Tell UZ that there are macropores.
+  virtual void has_macropores (Block&, bool) = 0; // Tell UZ about macropores.
 protected:
   UZmodel (Block&);
 public:
   ~UZmodel ();
 };
-
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<UZmodel>::content;
-#endif
 
 static Librarian<UZmodel> UZmodel_init;
 

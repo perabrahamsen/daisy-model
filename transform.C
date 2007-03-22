@@ -32,7 +32,7 @@ Transform::check (const Soil&, Treelog&) const
 { return true; }
 
 void
-Transform::initialize (const Soil&, Treelog&)
+Transform::initialize (Block&, const Soil&)
 { }
 
 void

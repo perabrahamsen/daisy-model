@@ -1,6 +1,6 @@
-// summary.h
+// metalib.C -- A library of libraries.
 // 
-// Copyright 2003 Per Abrahamsen and KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -18,35 +18,33 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "metalib.h"
+#include "syntax.h"
+#include "alist.h"
 
-#ifndef SUMMARY_H
-#define SUMMARY_H
-
-#include "librarian.h"
-#include <vector>
-
-struct Select;
-struct Treelog;
-
-class Summary : public Model
+struct Metalib::Implementation
 {
-  // Content.
-public:
-  const symbol name;
-  static const char *const description;
-  static const char *const component;
+  Syntax syntax_;
+  AttributeList alist_;
 
-  // Create and Destroy.
-public:
-  virtual void clear () = 0;
-  virtual void initialize (std::vector<Select*>&, Treelog&) = 0;
-protected:
-  Summary (Block& al);
-public:
-  virtual void summarize (int hours, Treelog&) const = 0;
-  ~Summary ();
+  Implementation ()
+  { }
 };
+  
+Syntax& 
+Metalib::syntax () const
+{ return impl->syntax_; }
 
-static Librarian<Summary> Summary_init;
+AttributeList&
+Metalib::alist () const
+{ return impl->alist_; }
 
-#endif // SUMMARY_H
+Metalib::Metalib ()
+  : impl (new Implementation ())
+{ }
+
+Metalib::~Metalib ()
+{ }
+
+// metalib.C ends here
+

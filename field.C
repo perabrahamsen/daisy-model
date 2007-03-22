@@ -98,11 +98,6 @@ public:
   // Find a specific column.
   Column* find (symbol name) const;
 
-  // Changing the field.
-  void divide (const Output&, symbol original, symbol copy, double copy_size, 
-	       const Time&, const Weather*);
-  void merge (symbol combine, symbol remove);
-
   // Create and destroy.
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
@@ -110,7 +105,7 @@ public:
   bool check_z_border (double, Treelog& err) const;
   bool check_x_border (double, Treelog& err) const;
   bool check_y_border (double, Treelog& err) const;
-  void initialize (const Output&, const Time&, Treelog& err, const Weather*);
+  void initialize (Block&, const Output&, const Time&, const Weather*);
   Implementation (Block& parent, const std::string& key);
   ~Implementation ();
 };
@@ -599,44 +594,6 @@ Field::Implementation::find (symbol name) const
   return NULL;
 }
 
-void 
-Field::Implementation::divide (const Output& output,
-                               symbol original, symbol copy,
-			       double copy_size,
-			       const Time& time, const Weather* weather)
-{ 
-  Column* old = find (original);
-  if (!old)
-    throw ("Attempt to divide non-existing column"); 
-  if (old->size <= copy_size)
-    throw ("Attempt to divide column into fraction larger than the original");
-  old->size -= copy_size;
-  const Library& library = Librarian<Column>::library ();
-  const Syntax& syntax = library.syntax (old->alist.identifier ("type"));
-  Block block (syntax, old->alist, Treelog::null (), "divide");
-  LogClone log_clone ("column", block);
-  old->output (log_clone);
-  AttributeList& lib_alist = *new AttributeList ();
-  // Remember where we got this object.
-  lib_alist.add ("parsed_from_file", "*clone*");
-  lib_alist.add ("parsed_sequence", Library::get_sequence ());
-  lib_alist.add ("type", original.name ());
-  Librarian<Column>::library ().add_derived (copy, syntax, lib_alist,
-                                             original);
-  AttributeList copy_alist (log_clone.result ());
-  copy_alist.add ("type", copy.name ());
-  copy_alist.add ("size", copy_size);
-  Column* result = Librarian<Column>::build_free (block.msg (), 
-                                                  copy_alist, "clone");
-  result->initialize (output, time, Treelog::null (), weather);
-  columns.push_back (result);
-}
-  
-void
-Field::Implementation::merge (symbol /*combine*/,
-			      symbol /*remove*/)
-{ throw ("Merge is not yet implemented"); } 
-
 bool 
 Field::Implementation::check (bool require_weather,
 			      const Time& from, const Time& to, 
@@ -708,14 +665,13 @@ Field::Implementation::check_y_border (const double value, Treelog& err) const
 }
 
 void 
-Field::Implementation::initialize (const Output& output,
-                                   const Time& time, Treelog& err, 
-				   const Weather* weather)
+Field::Implementation::initialize (Block& block, const Output& output,
+                                   const Time& time, const Weather* weather)
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    (*i)->initialize (output, time, err, weather);
+    (*i)->initialize (block, output, time, weather);
 }
 
 Field::Implementation::Implementation (Block& parent, 
@@ -901,16 +857,6 @@ unsigned int
 Field::size () const
 { return impl.columns.size (); }
 
-void 
-Field::divide (const Output& output,
-               symbol original, symbol copy, double copy_size,
-	       const Time& time, const Weather* weather)
-{ impl.divide (output, original, copy, copy_size, time, weather); }
-
-void 
-Field::merge (symbol combine, symbol remove)
-{ impl.merge (combine, remove); }
-
 bool 
 Field::check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const
@@ -933,9 +879,9 @@ Field::check_y_border (const double value, Treelog& err) const
 { return impl.check_y_border (value, err); }
 
 void 
-Field::initialize (const Output& output,
-                   const Time& time, Treelog& err, const Weather* weather)
-{ impl.initialize (output, time, err, weather); }
+Field::initialize (Block& block, const Output& output,
+                   const Time& time, const Weather* weather)
+{ impl.initialize (block, output, time, weather); }
 
 Field::Field (Block& parent, const std::string& key)
   : impl (*new Implementation (parent, key))

@@ -245,9 +245,9 @@ struct OrganicStandard : public OrganicMatter
   void fertilize (const AttributeList&, const Geometry&,
                   double from, double to, double dt);
   AM* find_am (symbol sort, symbol part) const;
-  void initialize (const AttributeList&, const Geometry& geo,
+  void initialize (Block&, const AttributeList&, const Geometry& geo,
                    const Soil&, const SoilWater&, 
-		   double T_avg, Treelog&);
+		   double T_avg);
   static void load_syntax (Syntax&, AttributeList&);
   OrganicStandard ();
   OrganicStandard (const OrganicStandard&);
@@ -2334,13 +2334,13 @@ OrganicStandard::update_pools
 }
 
 void
-OrganicStandard::initialize (const AttributeList& al,
+OrganicStandard::initialize (Block& block, const AttributeList& al,
                              const Geometry& geo,
                              const Soil& soil, 
                              const SoilWater& soil_water,
-                             double T_avg, Treelog& err)
+                             double T_avg)
 { 
-  Treelog::Open nest (err, "OrganicStandard");
+  Treelog::Open nest (block.msg (), "OrganicStandard");
 
   // Sizes.
   const size_t cell_size = geo.cell_size ();
@@ -2414,24 +2414,24 @@ OrganicStandard::initialize (const AttributeList& al,
     {
       std::ostringstream tmp;
       tmp << "som[" << pool << "]";
-      Treelog::Open nest (err, tmp.str ());
+      Treelog::Open nest (block.msg (), tmp.str ());
       if (som[pool]->C.size () > 0 && som[pool]->C.size () < cell_size)
-	err.warning ("C partially initialized.\n\
+	block.msg ().warning ("C partially initialized.\n\
 Using humus for remaining entries");
       if (som[pool]->N.size () > 0 && som[pool]->N.size () < cell_size)
-	err.warning ("N partially initialized.\n\
+	block.msg ().warning ("N partially initialized.\n\
 Using humus for remaining entries");
     }
   for (size_t pool = 0; pool < smb_size; pool++)
     {
       std::ostringstream tmp;
       tmp << "smb[" << pool << "]";
-      Treelog::Open nest (err, tmp.str ());
+      Treelog::Open nest (block.msg (), tmp.str ());
       if (smb[pool]->C.size () > 0 && smb[pool]->C.size () < cell_size)
-	err.warning ("C partially initialized.\n\
+	block.msg ().warning ("C partially initialized.\n\
 Using equilibrium for remaining entries");
       if (smb[pool]->N.size () > 0 && smb[pool]->N.size () < cell_size)
-	err.warning ("N partially initialized.\n\
+	block.msg ().warning ("N partially initialized.\n\
 Using initial C per N for remaining entries");
     }
 
@@ -2453,7 +2453,7 @@ Using initial C per N for remaining entries");
 	  daisy_assert (end < last);
 	  if (end < soil_end)
 	    {
-	      err.warning ("\
+	      block.msg ().warning ("\
 An 'initial_SOM' layer in OrganicStandard ends below the last cell");
 	      weight *= (last - soil_end) / (last - end);
 	      end = soil_end;
@@ -2513,7 +2513,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
                    SOM_results, SMB_results,
                    delta_C, delta_N,
                    soil.dry_bulk_density (lay),
-                   err,
+                   block.msg (),
                    init.print_equations (lay), init.debug_rows, 
                    init.debug_to_screen);
         if (top_soil)
@@ -2532,15 +2532,15 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
 
   // Initialize DOM.
   for (size_t pool = 0; pool < dom_size; pool++)
-    dom[pool]->initialize (geo, soil, soil_water, err);
+    dom[pool]->initialize (geo, soil, soil_water, block.msg ());
 
   // Initialize domsorp
   for (size_t i = 0; i < domsorp.size (); i++)
-    domsorp[i]->initialize (soil, err);
+    domsorp[i]->initialize (block, soil);
 
   // Summary.
   {
-    Treelog::Open nest (err, "Total soil summary");
+    Treelog::Open nest (block.msg (), "Total soil summary");
     std::ostringstream total;
     total << "Expected humus change: " 
           << total_delta_C * g_per_cm2_per_h_to_kg_per_ha_per_y 
@@ -2554,9 +2554,9 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
           << -total_delta_N * g_per_cm2_per_h_to_kg_per_ha_per_y 
           << " [kg N/ha/y].";
     if (init.debug_to_screen)
-      err.message (total.str ());
+      block.msg ().message (total.str ());
     else
-      err.debug (total.str ());  
+      block.msg ().debug (total.str ());  
   }
 
   // Print top summary.
@@ -2564,18 +2564,18 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
     const std::string summary 
       = top_summary (geo, soil, init, zone_delta_N, zone_delta_C);
 
-    Treelog::Open nest (err, "Top soil summary");
+    Treelog::Open nest (block.msg (), "Top soil summary");
     if (init.debug_to_screen)
-      err.message (summary);
+      block.msg ().message (summary);
     else
-      err.debug (summary);
+      block.msg ().debug (summary);
     
     if (init.top_summary != "")
       {
         std::ofstream out (init.top_summary.c_str ());
         out << summary;
         if (!out.good ())
-          err.error ("Problems writing to '" + init.top_summary + "'");
+          block.error ("Problems writing to '" + init.top_summary + "'");
       }
   }  
 

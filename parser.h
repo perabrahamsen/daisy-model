@@ -51,11 +51,6 @@ public:
   ~Parser ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Parser>::content;
-#endif
-
 static Librarian<Parser> Parser_init;
 
 #endif // PARSER_H

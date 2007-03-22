@@ -60,11 +60,6 @@ public:
   ~Transport ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Transport>::content;
-#endif
-
 static Librarian<Transport> Transport_init;
 
 #endif // TRANSPORT_H

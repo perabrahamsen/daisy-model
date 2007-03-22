@@ -55,9 +55,9 @@ struct ChemistryStandard : public Chemistry
   // Create.
   bool check (const Soil& soil, Treelog& msg) const
   { return transform->check (soil, msg); }
-  void initialize (const Soil& soil, Treelog& msg)
+  void initialize (Block& block, const Soil& soil)
   { 
-    transform->initialize (soil, msg); 
+    transform->initialize (block, soil); 
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);
     daisy_assert (S_AB.size () == soil.size ());
   }

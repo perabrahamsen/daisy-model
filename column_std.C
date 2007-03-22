@@ -171,16 +171,7 @@ public:
   // Create and Destroy.
   static Movement* build_vertical (Block& al);
   ColumnStandard (Block& al);
-  Column& clone (symbol name) const
-  { 
-    AttributeList new_alist (alist);
-    // BUG: TODO: Log state of 'this' to new_alist.
-    new_alist.add ("type", name.name ());
-    Block block (Librarian<Column>::library ().syntax (name), new_alist,
-		 Treelog::null (), "clone");
-    return *new ColumnStandard (block); 
-  }
-  void initialize (const Output&, const Time&, Treelog&, const Weather*);
+  void initialize (Block&, const Output&, const Time&, const Weather*);
   ~ColumnStandard ();
 };
 
@@ -932,21 +923,22 @@ ColumnStandard::ColumnStandard (Block& al)
 { }
 
 void 
-ColumnStandard::initialize (const Output& output,
-                            const Time& time, Treelog& msg, 
+ColumnStandard::initialize (Block& block, 
+                            const Output& output,
+                            const Time& time, 
 			    const Weather* global_weather)
 {
-  Treelog::Open nest (msg, name);
-  soil->initialize (geometry, *groundwater,
-                    organic_matter->som_pools (), msg);
+  Treelog::Open nest (block.msg (), name);
+  soil->initialize (block, geometry, *groundwater,
+                    organic_matter->som_pools ());
   residuals_N_soil.insert (residuals_N_soil.begin (), soil->size (), 0.0);
   daisy_assert (residuals_N_soil.size () == soil->size ());
   residuals_C_soil.insert (residuals_C_soil.begin (), soil->size (), 0.0);
   daisy_assert (residuals_C_soil.size () == soil->size ());
 
-  groundwater->initialize (output, geometry, time, msg);
+  groundwater->initialize (output, geometry, time, block.msg ());
   soil_water->initialize (alist.alist ("SoilWater"), 
-                          geometry, *soil, *groundwater, msg);
+                          geometry, *soil, *groundwater, block.msg ());
   if (alist.check ("Movement"))
     {
       AttributeList move_alist (alist.alist ("Movement"));
@@ -954,47 +946,46 @@ ColumnStandard::initialize (const Output& output,
       if (water_alist.check ("macro")
           && !move_alist.check ("macro"))
         move_alist.add ("macro", water_alist.alist ("macro"));
-      movement->initialize (move_alist, *soil, *groundwater, msg);
+      movement->initialize (block, move_alist, *soil, *groundwater);
     }
   else
     {
       AttributeList al;
-      movement->initialize (al, *soil, *groundwater, msg);
+      movement->initialize (block, al, *soil, *groundwater);
     }
 
   // Solutes depends on water.
   soil_chemicals.initialize (alist.alist ("SoilChemicals"),
-                             geometry, *soil, *soil_water, msg);
+                             geometry, *soil, *soil_water, block.msg ());
   for (std::vector<Chemistry*>::const_iterator i = chemistry.begin ();
        i != chemistry.end ();
        i++)
-    (*i)->initialize (*soil, msg);
+    (*i)->initialize (block, *soil);
   soil_NH4.initialize (alist.alist ("SoilNH4"),
-                       geometry, *soil, *soil_water, msg);
+                       geometry, *soil, *soil_water, block.msg ());
   soil_NO3.initialize (alist.alist ("SoilNO3"), 
-                       geometry, *soil, *soil_water, msg);
+                       geometry, *soil, *soil_water, block.msg ());
   nitrification.initialize (soil->size ());
   denitrification.initialize (soil->size ());
 
   // Bioclimate and heat depends on weather.
-  if (weather && !weather->initialize (time, msg))
+  if (weather && !weather->initialize (time, block.msg ()))
     return;
   if (!global_weather && !weather)
     return;
   const Weather& my_weather = *(weather ? weather : global_weather);
-  bioclimate->initialize (my_weather, msg);
+  bioclimate->initialize (block, my_weather);
   soil_heat->initialize (alist.alist ("SoilHeat"), geometry, 
-                         movement->default_heat (*soil, time, my_weather), msg);
+                         movement->default_heat (*soil, time, my_weather), block.msg ());
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
-  organic_matter->initialize (alist.alist ("OrganicMatter"), 
-                              geometry, *soil, *soil_water, 
-                              T_avg, msg);
-  vegetation->initialize (time, geometry, *soil, *organic_matter, msg);
+  organic_matter->initialize (block, alist.alist ("OrganicMatter"), 
+                              geometry, *soil, *soil_water, T_avg);
+  vegetation->initialize (time, geometry, *soil, *organic_matter, block.msg ());
   
   // Soil conductivity and capacity logs.
-  soil_water->tick_after (geometry.cell_size (), *soil, *soil_heat, msg);
-  soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
+  soil_water->tick_after (geometry.cell_size (), *soil, *soil_heat, block.msg ());
+  soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, block.msg ());
 }
 
 ColumnStandard::~ColumnStandard ()

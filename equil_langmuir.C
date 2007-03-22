@@ -20,6 +20,7 @@
 
 
 #include "equil.h"
+#include "block.h"
 #include "syntax.h"
 #include "alist.h"
 #include "pedo.h"
@@ -44,7 +45,7 @@ struct EquilibriumLangmuir : public Equilibrium
 
   // Create and Destroy.
   enum { uninitialized, init_succes, init_failure } initialize_state;
-  void initialize (const Soil&, Treelog&);
+  void initialize (Block&, const Soil&);
   bool check (const Soil&, Treelog& err) const;
   EquilibriumLangmuir (Block& al)
     : Equilibrium (al),
@@ -90,7 +91,7 @@ EquilibriumLangmuir::find (const Soil&, const SoilWater&, unsigned int i,
 }
 
 void
-EquilibriumLangmuir::initialize (const Soil& soil, Treelog& err)
+EquilibriumLangmuir::initialize (Block& block, const Soil& soil)
 { 
   daisy_assert (initialize_state == uninitialized);
   initialize_state = init_succes;
@@ -98,23 +99,23 @@ EquilibriumLangmuir::initialize (const Soil& soil, Treelog& err)
   // K
   {
     auto_ptr<Pedotransfer> pedo_K 
-      (Librarian<Pedotransfer>::build_free (err, alist, "K"));
-    if (pedo_K->check (soil, "g/cm^3", err))
+      (Librarian<Pedotransfer>::build_alist (block, alist, "K"));
+    if (pedo_K->check (soil, "g/cm^3", block.msg ()))
       pedo_K->set (soil, K, "g/cm^3");
     else 
       initialize_state = init_failure;
-    Pedotransfer::debug_message ("K", K, "g/cm^3", err);
+    Pedotransfer::debug_message ("K", K, "g/cm^3", block.msg ());
   }
 
   // my_max
   {
     auto_ptr<Pedotransfer> pedo_my_max 
-      (Librarian<Pedotransfer>::build_free (err, alist, "my_max"));
-    if (pedo_my_max->check (soil, "g/cm^3", err))
+      (Librarian<Pedotransfer>::build_alist (block, alist, "my_max"));
+    if (pedo_my_max->check (soil, "g/cm^3", block.msg ()))
       pedo_my_max->set (soil, my_max, "g/cm^3");
     else 
       initialize_state = init_failure;
-    Pedotransfer::debug_message ("my_max", my_max, "g/cm^3", err);
+    Pedotransfer::debug_message ("my_max", my_max, "g/cm^3", block.msg ());
   }
 }
 

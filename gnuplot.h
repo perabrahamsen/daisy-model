@@ -54,11 +54,6 @@ public:
   ~Gnuplot ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Gnuplot>::content;
-#endif
-
 static Librarian<Gnuplot> Gnuplot_init;
 
 #endif // GNUPLOT_H

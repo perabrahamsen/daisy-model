@@ -52,11 +52,6 @@ public:
   ~Integer ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Integer>::content;
-#endif
-
 static Librarian<Integer> Integer_init;
 
 #endif // INTEGER_H

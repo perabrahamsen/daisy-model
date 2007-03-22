@@ -97,11 +97,6 @@ public:
   ~Horizon ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Horizon>::content;
-#endif
-
 static Librarian<Horizon> Horizon_init;
 
 #endif // HORIZON_H

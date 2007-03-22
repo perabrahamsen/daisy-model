@@ -79,11 +79,6 @@ public:
   ~WScope ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Scope>::content;
-#endif
-
 static Librarian<Scope> Scope_init;
 
 #endif // SCOPE_H

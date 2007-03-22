@@ -65,11 +65,6 @@ public:
   ~Volume ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Volume>::content;
-#endif
-
 static Librarian<Volume> Volume_init;
 
 #endif // VOLUME_H

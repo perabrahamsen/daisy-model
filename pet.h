@@ -68,11 +68,6 @@ public:
   ~Pet ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Pet>::content;
-#endif
-
 static Librarian<Pet> Pet_init;
 
 #endif // PET_H

@@ -142,11 +142,6 @@ public:
   ~Vegetation ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Vegetation>::content;
-#endif
-
 static Librarian<Vegetation> Vegetation_init;
 
 #endif // VEGETATION_H

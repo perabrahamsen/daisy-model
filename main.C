@@ -21,6 +21,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "toplevel.h"
+#include "program.h"
+#include "treelog.h"
 #include <stdexcept>
 #include <typeinfo>
 

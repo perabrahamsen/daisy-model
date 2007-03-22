@@ -20,6 +20,7 @@
 
 
 #include "equil.h"
+#include "block.h"
 #include "syntax.h"
 #include "alist.h"
 #include "pedo.h"
@@ -43,7 +44,7 @@ struct EquilibriumLinear : public Equilibrium
 
   // Create and Destroy.
   enum { uninitialized, init_succes, init_failure } initialize_state;
-  void initialize (const Soil&, Treelog& err);
+  void initialize (Block&, const Soil&);
   bool check (const Soil&, Treelog& err) const;
   EquilibriumLinear (Block& al)
     : Equilibrium (al),
@@ -80,18 +81,18 @@ EquilibriumLinear::find (const Soil&, const SoilWater&, unsigned int i,
 }
 
 void
-EquilibriumLinear::initialize (const Soil& soil, Treelog& err)
+EquilibriumLinear::initialize (Block& block, const Soil& soil)
 { 
   daisy_assert (initialize_state == uninitialized);
   initialize_state = init_succes;
 
   auto_ptr<Pedotransfer> pedo_K 
-    (Librarian<Pedotransfer>::build_free (err, alist, "K"));
-  if (pedo_K->check (soil, Syntax::None (), err))
+    (Librarian<Pedotransfer>::build_alist (block, alist, "K"));
+  if (pedo_K->check (soil, Syntax::None (), block.msg ()))
     pedo_K->set (soil, K, Syntax::None ());
   else
     initialize_state = init_failure;
-  Pedotransfer::debug_message ("K", K, "", err);
+  Pedotransfer::debug_message ("K", K, "", block.msg ());
 }
 
 bool 

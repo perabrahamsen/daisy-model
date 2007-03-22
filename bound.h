@@ -54,11 +54,6 @@ public:
   ~Bound ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Bound>::content;
-#endif
-
 static Librarian<Bound> Bound_init;
 
 #endif // BOUND_H

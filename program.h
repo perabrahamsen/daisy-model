@@ -41,9 +41,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Syntax* glob_syn,
-                           const AttributeList* glob_al,
-                           Treelog& err) = 0;
+  virtual void initialize (Block&) = 0;
   virtual bool check (Treelog& err) = 0;
 protected:
   explicit Program (Block&);
@@ -53,11 +51,6 @@ private:
 public:
   ~Program ();
 };
-
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Program>::content;
-#endif
 
 static Librarian<Program> Program_init;
 

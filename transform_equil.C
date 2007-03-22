@@ -21,6 +21,7 @@
 
 
 #include "transform.h"
+#include "block.h"
 #include "syntax.h"
 #include "alist.h"
 #include "soil.h"
@@ -47,7 +48,7 @@ struct TransformEquilibrium : public Transform
 
   // Create.
   enum { uninitialized, init_succes, init_failure } initialize_state;
-  void initialize (const Soil&, Treelog&);
+  void initialize (Block&, const Soil&);
   bool check (const Soil&, Treelog& err) const;
   TransformEquilibrium (Block& al)
     : Transform (al),
@@ -103,60 +104,60 @@ TransformEquilibrium::check (const Soil& soil, Treelog& err) const
 }
 
 void
-TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
+TransformEquilibrium::initialize (Block& block, const Soil& soil)
 { 
-  Treelog::Open nest (err, name);
-  equilibrium->initialize (soil, err);
+  Treelog::Open nest (block.msg (), name);
+  equilibrium->initialize (block, soil);
 
   daisy_assert (initialize_state == uninitialized);
   initialize_state = init_succes;
 
   // k_AB
   {
-    Treelog::Open nest (err, "k_AB");
+    Treelog::Open nest (block.msg (), "k_AB");
     auto_ptr<Pedotransfer> pedo_AB 
-      (Librarian<Pedotransfer>::build_free (err, alist.alist ("k_AB"), 
-                                            "k_AB"));
-    if (pedo_AB->check (soil, "h^-1", err))
+      (Librarian<Pedotransfer>::build_alist (block, alist.alist ("k_AB"), 
+                                             "k_AB"));
+    if (pedo_AB->check (soil, "h^-1", block.msg ()))
       pedo_AB->set (soil, k_AB, "h^-1");
     else
       initialize_state = init_failure;
 
-    Pedotransfer::debug_message ("k_AB", k_AB, "h^-1", err);
+    Pedotransfer::debug_message ("k_AB", k_AB, "h^-1", block.msg ());
   }
   
   // k_BA
   if (alist.check ("k_BA"))
     {
-      Treelog::Open nest (err, "k_BA");
+      Treelog::Open nest (block.msg (), "k_BA");
       auto_ptr<Pedotransfer> pedo_BA 
-        (Librarian<Pedotransfer>::build_free (err, alist.alist ("k_BA"),
-                                              "k_BA"));
-      if (pedo_BA->check (soil, "h^-1", err))
+        (Librarian<Pedotransfer>::build_alist (block, alist.alist ("k_BA"),
+                                               "k_BA"));
+      if (pedo_BA->check (soil, "h^-1", block.msg ()))
         pedo_BA->set (soil, k_BA, "h^-1");
       else
         initialize_state = init_failure;
-      Pedotransfer::debug_message ("k_BA", k_BA, "h^-1", err);
+      Pedotransfer::debug_message ("k_BA", k_BA, "h^-1", block.msg ());
     }
   else
     k_BA = k_AB;
   
   if (alist.check ("debug"))
     {
-      Treelog::Open nest (err, "debug");
+      Treelog::Open nest (block.msg (), "debug");
       const vector<AttributeList*> alists = alist.alist_sequence ("debug");
       for (unsigned int i = 0; i < alists.size (); i++)
         {
           vector<double> debug;
           auto_ptr<Pedotransfer> pedo_debug 
-            (Librarian<Pedotransfer>::build_free (err, *alists[i],
-                                                  sequence_id ("debug", i)));
-          if (pedo_debug->check (soil, pedo_debug->dimension (), err))
+            (Librarian<Pedotransfer>::build_alist (block, *alists[i],
+                                                   sequence_id ("debug", i)));
+          if (pedo_debug->check (soil, pedo_debug->dimension (), block.msg ()))
             pedo_debug->set (soil, debug, pedo_debug->dimension ());
           else
             initialize_state = init_failure;
           Pedotransfer::debug_message (pedo_debug->name.name (), 
-                                       debug, pedo_debug->dimension (), err);
+                                       debug, pedo_debug->dimension (), block.msg ());
         }
     }
 }

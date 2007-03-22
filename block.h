@@ -28,6 +28,7 @@
 #include <string>
 
 class Treelog;
+class Metalib;
 
 class Block
 {
@@ -80,8 +81,9 @@ private:
   Block (const Block&);
   Block& operator= (const Block&);
 public:
+  explicit Block (const Metalib&, Treelog& msg, const std::string& scope_id);
   explicit Block (const Syntax&, const AttributeList&, Treelog& msg, 
-		  const std::string& scope_id);
+ 		  const std::string& scope_id);
   explicit Block (Block&, const Syntax&, const AttributeList&, 
 		  const std::string& scope_tag);
   explicit Block (Block&, const std::string&);

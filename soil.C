@@ -431,8 +431,8 @@ Soil::Soil (Block& al)
 { }
 
 double
-Soil::initialize_aquitard (const double Z_aquitard, const double K_aquitard,
-                           Treelog& msg)
+Soil::initialize_aquitard (Block& top,
+                           const double Z_aquitard, const double K_aquitard)
 {
   const double old_end = impl.layers[impl.layers.size () - 1]->end;
   const double Z_horizon
@@ -462,14 +462,14 @@ Soil::initialize_aquitard (const double Z_aquitard, const double K_aquitard,
   hydraulic_alist.add ("K_sat", K_aquitard);
   horizon_alist.add ("hydraulic", hydraulic_alist);
   daisy_assert (library.syntax (aquitard_symbol).check (horizon_alist,
-                                                        msg));
+                                                        top.msg ()));
   Syntax layer_syntax;
   AttributeList layer_alist;
   Implementation::Layer::load_syntax (layer_syntax, layer_alist);
   layer_alist.add ("end", new_end);
   layer_alist.add ("horizon", horizon_alist);
-  daisy_assert (layer_syntax.check (layer_alist, msg));
-  Block block (layer_syntax, layer_alist, msg, "aquitard layer");
+  daisy_assert (layer_syntax.check (layer_alist, top.msg ()));
+  Block block (top, layer_syntax, layer_alist, "aquitard layer");
   impl.layers.push_back (new Implementation::Layer (block));
 
   // Return the new value of Z_aquitard.
@@ -477,11 +477,11 @@ Soil::initialize_aquitard (const double Z_aquitard, const double K_aquitard,
 }
 
 void
-Soil::initialize (Geometry& geo,
+Soil::initialize (Block& block, Geometry& geo,
                   Groundwater& groundwater,
-                  const int som_size, Treelog& msg)
+                  const int som_size)
 {
-  Treelog::Open nest (msg, "Soil");
+  Treelog::Open nest (block.msg (), "Soil");
 
   // Extra aquitard layer.
   if (groundwater.is_pipe ())
@@ -490,7 +490,7 @@ Soil::initialize (Geometry& geo,
       const double Z_aquitard = groundwater.Z_aquitard ();
       const double K_aquitard = groundwater.K_aquitard ();
       const double new_Z_aq 
-        = initialize_aquitard (Z_aquitard, K_aquitard, msg);
+        = initialize_aquitard (block, Z_aquitard, K_aquitard);
       groundwater.set_Z_aquitard (new_Z_aq);
     }
   const bool volatile_bottom =
@@ -507,7 +507,7 @@ Soil::initialize (Geometry& geo,
   // Initialize geometry.
   std::vector<double> fixed;
   {
-    Treelog::Open nest (msg, "Horizons");
+    Treelog::Open nest (block.msg (), "Horizons");
     double last = 0.0;
     size_t next_border = 0;
     for (layer = begin; layer != end; layer++)
@@ -516,7 +516,7 @@ Soil::initialize (Geometry& geo,
 	daisy_assert (current < last);
 
 	const bool top_soil = (layer == begin);
-	(*layer)->horizon->initialize (top_soil, som_size, msg);
+	(*layer)->horizon->initialize (top_soil, som_size, block.msg ());
 
         while (next_border < impl.border.size ()
                && current < impl.border[next_border])
@@ -533,7 +533,7 @@ Soil::initialize (Geometry& geo,
       impl.MaxRootingDepth = -last;
   }
   geo.initialize_zplus (volatile_bottom, fixed, -impl.MaxRootingDepth, 
-                        2 * impl.dispersivity, msg);
+                        2 * impl.dispersivity, block.msg ());
 
   // Initialize horizons.
   horizon_.insert (horizon_.end (), geo.cell_size (), NULL);
@@ -560,7 +560,7 @@ Soil::initialize (Geometry& geo,
     {
       std::ostringstream tmp;
       tmp << "cell[" << i << "] of " << geo.cell_size () << " z = " << geo.z (i) << ", last = " << last;
-      Treelog::Open nest (msg, tmp.str ());
+      Treelog::Open nest (block.msg (), tmp.str ());
       daisy_assert (horizon_[i] != NULL);
     }
 }

@@ -80,9 +80,8 @@ struct OrganicNone : public OrganicMatter
   { }
   AM* find_am (symbol, symbol) const
   { return NULL; }
-  void initialize (const AttributeList&, const Geometry& geo,
-                   const Soil&, const SoilWater&, 
-		   double, Treelog&)
+  void initialize (Block&, const AttributeList&, const Geometry& geo,
+                   const Soil&, const SoilWater&, double)
   { active_.insert (active_.end (), geo.cell_size (), false); }
   explicit OrganicNone (Block& al)
     : OrganicMatter (al)

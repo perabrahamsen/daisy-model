@@ -83,8 +83,8 @@ public:
   // Create and Destroy.
 public:
   virtual bool check (Treelog& err) const = 0;
-  virtual void initialize (const AttributeList&,
-                           const Soil&, const Groundwater&, Treelog&) = 0;
+  virtual void initialize (Block&, const AttributeList&,
+                           const Soil&, const Groundwater&) = 0;
   static const AttributeList& default_model ();
   static void load_vertical (Syntax& syntax, AttributeList& alist);
   static Movement* build_vertical (Block& al);
@@ -93,11 +93,6 @@ protected:
 public:
   ~Movement ();
 };
-
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Movement>::content;
-#endif
 
 static Librarian<Movement> Movement_init;
 

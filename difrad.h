@@ -51,11 +51,6 @@ public:
   ~Difrad ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Difrad>::content;
-#endif
-
 static Librarian<Difrad> Difrad_init;
 
 #endif // DIFRAD_H

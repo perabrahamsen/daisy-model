@@ -63,11 +63,6 @@ public:
   ~Nitrification ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Nitrification>::content;
-#endif
-
 static Librarian<Nitrification> Nitrification_init;
 
 #endif // NITRIFICATION_H

@@ -50,11 +50,6 @@ public:
   ~Condition ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Condition>::content;
-#endif
-
 static Librarian<Condition> Condition_init;
 
 #endif // CONDITION_H

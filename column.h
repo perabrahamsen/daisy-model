@@ -121,17 +121,11 @@ protected:
   explicit Column (Block&);
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  virtual Column& clone (symbol) const = 0;
-  virtual void initialize (const Output&, 
-                           const Time&, Treelog& err, const Weather*) = 0;
+  virtual void initialize (Block&, const Output&, const Time&,
+                           const Weather*) = 0;
 
   ~Column ();
 };
-
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Column>::content;
-#endif
 
 static Librarian<Column> Column_init;
 

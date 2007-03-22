@@ -287,11 +287,6 @@ public:
   ~Log ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Log>::content;
-#endif
-
 static Librarian<Log> Log_init;
 
 // Output atom.

@@ -43,31 +43,31 @@
 
 Syntax& 
 Toplevel::syntax () 
-{ return top_syntax; }
+{ return metalib.syntax (); }
 
 AttributeList&
 Toplevel::alist ()
-{ return top_alist; }
+{ return metalib.alist (); }
 
 const Syntax& 
 Toplevel::program_syntax () const
 {
-  if (top_alist.check ("run"))
+  if (metalib.alist ().check ("run"))
     {
       daisy_assert (program_alist ().check ("type"));
       const Library& library = Librarian<Program>::library ();
       return library.syntax (program_alist ().identifier ("type"));
     }
-  return top_syntax;
+  return metalib.syntax ();
 }
 
 const AttributeList& 
 Toplevel::program_alist () const
 {
-  if (top_alist.check ("run"))
-    return top_alist.alist ("run");
+  if (metalib.alist ().check ("run"))
+    return metalib.alist ().alist ("run");
 
-  return top_alist;
+  return metalib.alist ();
 }
  
 Program& 
@@ -220,13 +220,18 @@ Toplevel::initialize ()
   if (!program_syntax ().check (program_alist (), *msg))
     throw EXIT_FAILURE;
   {                             // Limit lifetime of block.
-    Block block (top_syntax, top_alist, *msg, "Building");
+    Block block (metalib, *msg, "Building");
     program_.reset (Librarian<Program>::build_alist (block,
                                                      program_alist (), "run"));
     if (!block.ok ())
       throw EXIT_FAILURE;
   }
-  program_->initialize (&top_syntax, &top_alist, *msg);
+  {
+    Block block (metalib, *msg, "Initializing");
+    program_->initialize (block);
+    if (!block.ok ())
+      throw EXIT_FAILURE;
+  }
   if (!program_->check (*msg))
     throw EXIT_FAILURE;
 
@@ -293,8 +298,8 @@ Toplevel::command_line (int& argc, char**& argv)
           copyright ();
 	  // Parse the file.
 	  Treelog::Open nest (*msg, "Parsing file");
-	  ParserFile parser (top_syntax, arg, *msg);
-	  parser.load (top_alist);
+	  ParserFile parser (metalib.syntax (), arg, *msg);
+	  parser.load (metalib.alist ());
 	  file_found = true;
 	  errors_found += parser.error_count ();
 	}
@@ -336,22 +341,28 @@ Toplevel::command_line (int& argc, char**& argv)
                 Treelog::Open nest (*msg, name);
                 if (p_syntax.check (p_alist, *msg))
                   {
-		    std::auto_ptr<Block> block (new Block (top_syntax, 
-                                                           top_alist, *msg, 
+                    // Build.
+		    std::auto_ptr<Block> block (new Block (metalib, *msg, 
                                                            "Building"));
                     std::auto_ptr<Program> program
                       (Librarian<Program>::build_alist (*block, p_alist, 
                                                         "Command line"));
-		    const bool block_ok = block->ok ();
+		    if (!block->ok ())
+                      throw EXIT_FAILURE;
+
+                    // Initialize.
+                    block.reset (new Block (metalib, *msg, "Initializing"));
+                    program->initialize (*block);
+		    if (!block->ok ())
+                      throw EXIT_FAILURE;
+                    
+                    // Check.
                     block.reset ();
-		    if (block_ok)
-                      {
-                        program->initialize (&top_syntax, &top_alist, *msg);
-                        if (!program->check (*msg))
-                          throw EXIT_FAILURE;
-                       
-                        program->run (*msg);
-                      }
+                    if (!program->check (*msg))
+                      throw EXIT_FAILURE;
+                    
+                    // Run.
+                    program->run (*msg);
                   }
                 prevent_run = true;
               }
@@ -387,8 +398,8 @@ Toplevel::parse_file (const std::string& filename)
   daisy_assert (state_ == is_uninitialized);
   copyright ();
   Treelog::Open nest (*msg, "Parsing file");
-  ParserFile parser (top_syntax, filename, *msg);
-  parser.load (top_alist);
+  ParserFile parser (metalib.syntax (), filename, *msg);
+  parser.load (metalib.alist ());
   if (parser.error_count () > 0)
     throw EXIT_FAILURE;
 }
@@ -480,7 +491,7 @@ Toplevel::Toplevel (const std::string& logname)
     state_ (is_uninitialized)
 { 
   Assertion::Register reg (*msg);
-  load_syntax (top_syntax, top_alist); 
+  load_syntax (metalib.syntax (), metalib.alist ()); 
   initialize_once ();
 }
 

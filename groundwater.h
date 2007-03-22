@@ -78,11 +78,6 @@ public:
   ~Groundwater ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Groundwater>::content;
-#endif
-
 static Librarian<Groundwater> Groundwater_init;
 
 #endif // GROUNDWATER_H

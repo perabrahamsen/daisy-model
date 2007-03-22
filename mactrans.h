@@ -56,11 +56,6 @@ public:
   static const AttributeList& default_model ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Mactrans>::content;
-#endif
-
 static Librarian<Mactrans> Mactrans_init;
 
 #endif // MACTRANS_H

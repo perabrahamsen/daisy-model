@@ -123,7 +123,7 @@ The height we want to compare with.");
     alist.add ("type", "none");
     std::auto_ptr<Weather> weather (Librarian<Weather>::build_alist
                                     (al, alist, "initialize"));
-    column->initialize (output, time, al.msg (), weather.get ());
+    column->initialize (al, output, time, weather.get ());
     max_depth = column->bottom ();
   }
 };

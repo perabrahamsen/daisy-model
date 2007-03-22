@@ -57,11 +57,6 @@ public:
   ~Number ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Number>::content;
-#endif
-
 static Librarian<Number> Number_init;
 
 #endif // NUMBER_H

@@ -379,11 +379,10 @@ MODELS = groundwater_extern.C scope_exchange.C \
 	uznone.C condition_daisy.C chemical_std.C \
 	hydraulic_M_BaC_Bimodal.C hydraulic_B_BaC_Bimodal.C \
 	pet_makkink.C pet_weather.C svat_none.C action_spray.C pet_PM.C \
-	svat_pmsw.C action_merge.C action_divide.C \
-	action_surface.C
+	svat_pmsw.C action_surface.C
 
-DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
-
+DISABLED = log_clone.C action_merge.C action_divide.C \
+	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 
 # A component is a common interface to a number of models.
 #
@@ -418,11 +417,11 @@ SUBMODELS = toplevel.C timestep.C geometry_rect.C element.C \
 SPECIALS = scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C solute.C \
-	geometry.C printer_file.C log_alist.C log_clone.C 
+	geometry.C printer_file.C log_alist.C
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = model.C output.C scope_block.C librarian.C \
+OTHER = metalib.C model.C output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \

@@ -28,7 +28,7 @@ Sorption and desorption of DOM to SOM.";
 const char *const Domsorp::component = "domsorp";
 
 void
-Domsorp::initialize (const Soil&, Treelog&)
+Domsorp::initialize (Block&, const Soil&)
 { }
 
 void

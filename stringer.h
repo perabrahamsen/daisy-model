@@ -51,11 +51,6 @@ public:
   ~Stringer ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Stringer>::content;
-#endif
-
 static Librarian<Stringer> Stringer_init;
 
 #endif // STRINGER_H

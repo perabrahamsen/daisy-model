@@ -50,7 +50,7 @@ struct EquilibriumGoal_A : public Equilibrium
 
   // Create and Destroy.
   enum { uninitialized, init_succes, init_failure } initialize_state;
-  void initialize (const Soil&, Treelog& err);
+  void initialize (Block&, const Soil&);
   bool check (const Soil&, Treelog& err) const;
   EquilibriumGoal_A (Block& al)
     : Equilibrium (al),
@@ -119,28 +119,28 @@ EquilibriumGoal_A::find (const Soil&, const SoilWater& soil_water,
 }
 
 void
-EquilibriumGoal_A::initialize (const Soil& soil, Treelog& err)
+EquilibriumGoal_A::initialize (Block& block, const Soil& soil)
 { 
   daisy_assert (initialize_state == uninitialized);
   initialize_state = init_succes;
 
   auto_ptr<Pedotransfer> pedo_goal_A 
-    (Librarian<Pedotransfer>::build_free (err, alist.alist ("goal_A"),
+    (Librarian<Pedotransfer>::build_alist (block, alist.alist ("goal_A"),
                                           "goal_A"));
-  if (pedo_goal_A->check (soil, "g/cm^3", err))
+  if (pedo_goal_A->check (soil, "g/cm^3", block.msg ()))
     pedo_goal_A->set (soil, goal_A, "g/cm^3");
   else
     initialize_state = init_failure;
-  Pedotransfer::debug_message ("goal_A", goal_A, "g/cm^3", err);
+  Pedotransfer::debug_message ("goal_A", goal_A, "g/cm^3", block.msg ());
 
   auto_ptr<Pedotransfer> pedo_min_B 
-    (Librarian<Pedotransfer>::build_free (err, alist.alist ("min_B"),
+    (Librarian<Pedotransfer>::build_alist (block, alist.alist ("min_B"),
                                           "min_B"));
-  if (pedo_min_B->check (soil, "g/cm^3", err))
+  if (pedo_min_B->check (soil, "g/cm^3", block.msg ()))
     pedo_min_B->set (soil, min_B, "g/cm^3");
   else
     initialize_state = init_failure;
-  Pedotransfer::debug_message ("min_B", min_B, "g/cm^3",err);
+  Pedotransfer::debug_message ("min_B", min_B, "g/cm^3",block.msg ());
 
   if (debug_cell >= 0 && debug_cell < soil.size ())
     cout << "type\thas_A\tgoal_A\twant_A\thas_B\tgoal_B\twant_B\ttotal\n"

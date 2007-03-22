@@ -46,11 +46,6 @@ public:
   ~Average ();
 };
 
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Average>::content;
-#endif
-
 static Librarian<Average> Average_init;
 
 #endif // AVERAGE_H

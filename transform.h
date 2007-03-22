@@ -47,7 +47,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Soil&, Treelog& err);
+  virtual void initialize (Block&, const Soil&);
   static void load_syntax (Syntax&, AttributeList&);
 private:
   Transform ();
@@ -57,11 +57,6 @@ protected:
 public:
   ~Transform ();
 };
-
-#ifdef FORWARD_TEMPLATES
-template<>
-BuildBase* Librarian<Transform>::content;
-#endif
 
 static Librarian<Transform> Transform_init;
 
