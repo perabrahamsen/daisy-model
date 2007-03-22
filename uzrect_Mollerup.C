@@ -52,6 +52,7 @@ struct UZRectMollerup : public UZRect
   const double max_relative_difference;  
   const bool use_forced_T;
   const double forced_T;
+  const int debug;
 
   // Log variable.
   ublas::vector<double> Theta_error;
@@ -98,12 +99,14 @@ struct UZRectMollerup : public UZRect
 			     ublas::vector<double>& Dm_vec, 
 			     ublas::vector<double>& Gm, 
 			     ublas::vector<double>& B,
-			     const double dt);
+			     const double dt,
+			     const int debug);
   static void drain (const GeometryRect& geo,
 		     const std::vector<size_t>& drain_cell,
 		     const ublas::vector<double>& h,
 		     ublas::matrix<double>& A,
-		     ublas::vector<double>& b);
+		     ublas::vector<double>& b, 
+		     const int debug);
   static void diffusion (const GeometryRect& geo,
 			 const ublas::vector<double>& Kedge,
 			 ublas::matrix<double>& diff);
@@ -199,17 +202,26 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       if (ddt > time_left)
 	ddt = time_left;
 
-#if 1
-      std::ostringstream tmp;
-      tmp << "Time left = " << time_left << ", ddt = " << ddt 
-	  << ", iteration = " << iterations_used << "\n";
-      tmp << "h = " << h << "\n";
-      tmp << "Theta = " << Theta << "\n";
-      msg.message (tmp.str ());
-#endif       
+      if (debug > 0)
+	{
+	  std::ostringstream tmp;
+	  tmp << "Time left = " << time_left << ", ddt = " << ddt 
+	      << ", iteration = " << iterations_used << "\n";
+	  tmp << "h = " << h << "\n";
+	  tmp << "Theta = " << Theta << "\n";
+	  msg.message (tmp.str ());
+	}
 
       h_previous = h;
-      Theta_previous = Theta;  
+      Theta_previous = Theta;
+
+      if (debug == 5)
+	{
+	  std::ostringstream tmp;
+	  tmp << "Remaining water at start: " << remaining_water;
+	  msg.message (tmp.str ());
+	}
+
       ublas::vector<double> h_conv;
 
       for (size_t cell = 0; cell != cell_size ; ++cell)
@@ -257,7 +269,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  lowerboundary (geo, groundwater, active_lysimeter, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B);
 	  upperboundary (geo, surface, remaining_water, h,
-			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt);
+			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug);
 
 	  //Initialize water capacity  matrix
 	  ublas::banded_matrix<double> Cw (cell_size, cell_size, 0, 0);
@@ -284,7 +296,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
 
 	  // Force active drains to zero h.
-	  drain (geo, drain_cell, h, A, b);
+	  drain (geo, drain_cell, h, A, b, debug);
 
 	  // Solve Ax=b (maybe)
 	  ublas::permutation_matrix<double> piv (cell_size);
@@ -294,19 +306,19 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  
 	  h = b; // new solution :-)
 	  
-	  for (int c=0; c < cell_size; c++) // update Theta - maybe not neccessary???
+	  for (int c=0; c < cell_size; c++) // update Theta - not neccessary???
 	    Theta (c) = soil.Theta (c, h (c), h_ice (c)); 
 
-#if 0
-	  std::ostringstream tmp;
-	  tmp << "Time left = " << time_left << ", ddt = " << ddt 
-	      << ", iteration = " << iterations_used << "\n";
-	  tmp << "B = " << B << "\n";
-	  tmp << "h = " << h << "\n";
-	  tmp << "Theta = " << Theta << "\n";
-	  msg.message (tmp.str ());
-#endif
-
+	  if (debug > 1)
+	    {
+	      std::ostringstream tmp;
+	      tmp << "Time left = " << time_left << ", ddt = " << ddt 
+		  << ", iteration = " << iterations_used << "\n";
+	      tmp << "B = " << B << "\n";
+	      tmp << "h = " << h << "\n";
+	      tmp << "Theta = " << Theta << "\n";
+	      msg.message (tmp.str ());
+	    }
 	}
       while (!converges (h_conv, h)
 	     && iterations_used <= max_iterations);
@@ -324,8 +336,42 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	}
       else
 	{
+	  // Update dq for new h.
+	  ublas::banded_matrix<double>  Dm_mat (cell_size, cell_size, 
+                                                0, 0); // Dir bc
+	  Dm_mat = ublas::zero_matrix<double> (cell_size, cell_size);
+	  ublas::vector<double>  Dm_vec (cell_size); // Dir bc
+	  Dm_vec = ublas::zero_vector<double> (cell_size);
+	  ublas::vector<double> Gm (cell_size); // Dir bc
+	  Gm = ublas::zero_vector<double> (cell_size);
+	  ublas::vector<double> B (cell_size); // Neu bc 
+	  B = ublas::zero_vector<double> (cell_size);
+	  lowerboundary (geo, groundwater, active_lysimeter, h,
+			 K, dq, Dm_mat, Dm_vec, Gm, B);
+	  upperboundary (geo, surface, remaining_water, h,
+			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug);
           Darcy (geo, Kedge, h, dq);
+
+	  // Update remaining_water.
+	  for (size_t i = 0; i < edge_above.size (); i++)
+	    {
+	      const int edge = edge_above[i];
+	      const int cell = geo.edge_other (edge, Geometry::cell_above);
+	      const double out_sign = (cell == geo.edge_from (edge))
+		? 1.0 : -1.0;
+	      remaining_water[i] += out_sign * dq (edge) * ddt;
+	    }
+
+	  if (debug == 5)
+	    {
+	      std::ostringstream tmp;
+	      tmp << "Remaining water at end: " << remaining_water;
+	      msg.message (tmp.str ());
+	    }
+
+	  // Contribution to large time step.
 	  q += dq * ddt / dt;
+
 	  time_left -= ddt;
 	  iterations_with_this_time_step++;
 
@@ -369,11 +415,14 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
           max_cell = cell;
         }
     }
-  std::ostringstream tmp;
-  tmp << "Total error = " << total_error << " [cm^3], abs = " 
-      << total_abs_error << " [cm^3], max = " << max_error << " [] in cell " 
-      << max_cell;
-  msg.message (tmp.str ());
+  if (debug == 2)
+    {
+      std::ostringstream tmp;
+      tmp << "Total error = " << total_error << " [cm^3], abs = " 
+	  << total_abs_error << " [cm^3], max = " << max_error << " [] in cell " 
+	  << max_cell;
+      msg.message (tmp.str ());
+    }
   
   // Make it official.
   for (size_t cell = 0; cell != cell_size; ++cell) 
@@ -523,7 +572,8 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 			       ublas::vector<double>& Dm_vec, 
 			       ublas::vector<double>& Gm, 
 			       ublas::vector<double>& B,
-			       const double ddt)
+			       const double ddt,
+			       const int debug)
 {
   const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
@@ -553,29 +603,39 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	case Surface::limited_water:
 	  const double h_top = remaining_water (i);
 	  const double dz = geo.edge_length (edge);
-	  const double q_avail = sin_angle * h_top / ddt;
-	  const double q_pot = - K (cell) * (h_top - h (cell) + dz) / dz;
+	  daisy_assert (approximate (dz, -geo.z (cell)));
+	  const double q_in_avail = h_top / ddt;
+	  const double q_in_pot = K (cell) * (h_top - h (cell) + dz) / dz;
 	  // Decide type.
-	  const bool is_flux = -q_pot > -q_avail;
+	  const bool is_flux = h_top <= 0.0 || q_in_pot > q_in_avail;
 	  if (is_flux)
-            Neumann (edge, cell, area, in_sign, -q_avail, dq, B);
+            Neumann (edge, cell, area, in_sign, q_in_avail, dq, B);
 	  else			// Pressure
 	    {
+	      if (q_in_pot < 0.0)
+		{
+		  std::ostringstream tmp;
+		  tmp << "q_in_pot = " << q_in_pot << ", q_avail = " 
+		      << q_in_avail << ", h_top = " << h_top 
+		      << ", h (cell) = " << h (cell) << " K (cell) = " 
+		      << K (cell) << ", dz = " << dz << ", ddt = " << ddt
+		      << ", is_flux = " << is_flux << "\n";
+		  Assertion::message (tmp.str ());
+		}
 	      const double value = -K (cell) * geo.edge_area_per_length (edge);
               const double pressure = h_top;
               Dirichlet (edge, cell, area, in_sign, sin_angle, 
                          K (cell), h (cell),
                          value, pressure, dq, Dm_mat, Dm_vec, Gm);
 	    }
-	  {
-#if 0
-	    std::ostringstream tmp;
-	    tmp << "edge = " << edge << ", K = " << K (cell) << ", h_top = "
-		<< h_top << ", dz = " << dz << ", q_avail = " << q_avail
-		<< ", q_pot = " << q_pot << ", is_flux = " << is_flux;
-	    Assertion::message (tmp.str ());
-#endif 
-	  }
+	  if (debug == 3)
+	    {
+	      std::ostringstream tmp;
+	      tmp << "edge = " << edge << ", K = " << K (cell) << ", h_top = "
+		  << h_top << ", dz = " << dz << ", q_avail = " << q_in_avail
+		  << ", q_pot = " << q_in_pot << ", is_flux = " << is_flux;
+	      Assertion::message (tmp.str ());
+	    }
 	  break;
 	case Surface::soil:
 	  throw "Don't know how to handle this surface type";
@@ -590,7 +650,8 @@ UZRectMollerup::drain (const GeometryRect& geo,
 		       const std::vector<size_t>& drain_cell,
 		       const ublas::vector<double>& h,
 		       ublas::matrix<double>& A,
-		       ublas::vector<double>& b)
+		       ublas::vector<double>& b,
+		       const int debug)
 {
   const size_t drain_size  = drain_cell.size (); // // number of drains   
     
@@ -616,10 +677,9 @@ UZRectMollerup::drain (const GeometryRect& geo,
 	  h_sum += h (other) + (z_other - z_drain);  
 	}
 
-#if 0
-      tmp << "drain[" << d << "], cell " << cell << ", has h_sum = " 
-	  << h_sum << "\n";
-#endif 
+      if (debug == 4)
+	tmp << "drain[" << d << "], cell " << cell << ", has h_sum = " 
+	    << h_sum << "\n";
 
       if (h_sum < 0)
 	// Drain not active, treat as normal cell.
@@ -750,9 +810,18 @@ Maximum absolute difference in 'h' values for convergence.");
   syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
 Maximum relative difference in 'h' values for convergence.");
   alist.add ("max_relative_difference", 0.001); 
-  syntax.add ("forced_T", "dg C", Syntax::Const, "\
+  syntax.add ("forced_T", "dg C", Syntax::OptionalConst, "\
 Force transport equations to use this water temperature.");
-
+  syntax.add ("debug", Syntax::Integer, Syntax::Const, "\
+Level of debug messages:\n\
+ \n\
+= 0: no debug messages.\n\
+> 0: Initial h and Theta per time step.\n\
+> 1: Same, per iteration.\n\
+= 3: Upper boundary extra info.\n\
+= 4: Drain extra info.\n\
+= 5: Remaining water.");
+  alist.add ("debug", 0);
   syntax.add ("Theta_error",
               Syntax::None (), Syntax::LogOnly, Syntax::Sequence, "\
 Water mass balance error per cell.");
@@ -766,7 +835,8 @@ UZRectMollerup::UZRectMollerup (Block& al)
     max_absolute_difference (al.number ("max_absolute_difference")),
     max_relative_difference (al.number ("max_relative_difference")),
     use_forced_T (al.check ("forced_T")),
-    forced_T (al.number ("forced_T", -42.42e42))
+    forced_T (al.number ("forced_T", -42.42e42)),
+    debug (al.integer ("debug"))
 { }
 
 UZRectMollerup::~UZRectMollerup ()
