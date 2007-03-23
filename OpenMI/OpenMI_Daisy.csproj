@@ -22,12 +22,16 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="org.OpenMI.Backbone, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
+    <Reference Include="org.OpenMI.DevelopmentSupport, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
+    <Reference Include="org.OpenMI.Standard, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
+    <Reference Include="org.OpenMI.Utilities.Wrapper, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
