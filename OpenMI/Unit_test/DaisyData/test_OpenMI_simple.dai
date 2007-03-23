@@ -1,0 +1,79 @@
+;;; test_OpenMI_simple.dai -- Testfile for OpenMI coupling 
+
+(description "Simulation for use in simple OpenMI coupling.")
+;; Location of input files:
+(path "." "C:/Programmer/Daisy/daisy-src/lib/" )
+
+
+;; Weather data - no weather.
+(weather none)
+
+;; We have some very sandy soil.
+(defhorizon Ap FAO3
+  "Andeby top soil."
+  (clay 8.0 [%])
+  (silt 10.5 [%])
+  (sand 81.5 [%])
+  (humus 1.12 [%])
+  (C_per_N 11.0 [g C/g N])
+  (dry_bulk_density 1.5 [g/cm^3]))
+
+
+;; We build the column from the horizons.
+(defcolumn Andeby default
+  "The B.And farm, Andeby, 2002."
+  (Soil (horizons (-2.50 [m] Ap))
+    	(MaxRootingDepth 60.0 [cm]))
+  (Groundwater deep)
+  ;; Daisy does not use groundwater table from OpenMI unless you choose the model below,
+  ;; which may not work fully yet.
+  ;;(Groundwater extern (scope name "Groundwater_table") (table "GroundWaterTable")) 
+  (Bioclimate default))
+
+;; Use it.
+(column Andeby)
+
+;; Simulation period.
+(time 1986 12 1 1)
+(stop 1988 4 1 1)
+
+;; Simulation of bare soil 
+(manager activity)
+
+;; Output exchange items
+(deflog OpenMI_output extern
+  (parameter_names column)
+  (declare column String "Name of column to log output")
+  (when (hourly)))
+
+(deflog Matrix_percolation OpenMI_output
+  (entries (flux_bottom (tag "Matrix percolation")
+	  	    	(description "This is the amount of water leaving Daisy through the soil bottom.")
+	                (path column "${column}" SoilWater q)
+	                (spec fixed SoilWater q)
+	                (negate true)) ; positive flux downwards
+))
+
+
+;; Export these items through OpenMI.
+(output (Matrix_percolation (column Andeby)))
+        
+
+;; Input exchange items
+(defscope OpenMI_input exchange
+   "An exchange table for a specific column."
+   (declare column String "Name of column to log input.")
+   (column "*")
+   (entries (name (name column) (value "${column}"))))
+ 
+(defscope Groundwater_table OpenMI_input
+   (entries &old
+            (number (name "GroundWaterTable")
+                    (dimension [cm])
+                    (description "Ground water table. Value zero corresponds to soil surface, negative values are below surface."))))
+ 
+;; Import these items through OpenMI.
+(exchange (Groundwater_table (column Andeby)))
+
+
+;;; testOpenMI_simple.dai ends here.
