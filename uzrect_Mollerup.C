@@ -44,6 +44,9 @@ namespace ublas = boost::numeric::ublas;
 
 struct UZRectMollerup : public UZRect
 {
+  // Types.
+  enum top_state { top_undecided, top_flux, top_pressure };
+
   // Parameters.  
   const int max_time_step_reductions;
   const int time_step_reduction;
@@ -90,7 +93,10 @@ struct UZRectMollerup : public UZRect
 			     ublas::vector<double>& Gm, 
 			     ublas::vector<double>& B);
   static void upperboundary (const GeometryRect& geo,
+                             const Soil& soil, 
+                             const ublas::vector<double>& T,
 			     const Surface& surface,
+                             std::vector<top_state>& state,
 			     const ublas::vector<double>& remaining_water,
 			     const ublas::vector<double>& h,
 			     const ublas::vector<double>& K,
@@ -100,7 +106,8 @@ struct UZRectMollerup : public UZRect
 			     ublas::vector<double>& Gm, 
 			     ublas::vector<double>& B,
 			     const double dt,
-			     const int debug);
+			     const int debug,
+                             Treelog& msg);
   static void drain (const GeometryRect& geo,
 		     const std::vector<size_t>& drain_cell,
 		     const ublas::vector<double>& h,
@@ -227,6 +234,9 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       for (size_t cell = 0; cell != cell_size ; ++cell)
 	active_lysimeter[cell] = h (cell) > h_lysimeter (cell);
       
+      std::vector<top_state> state (edge_above.size (), top_undecided);
+
+      try {
       do // Start iteration loop
 	{
 	  h_conv = h;
@@ -268,8 +278,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  B = ublas::zero_vector<double> (cell_size);
 	  lowerboundary (geo, groundwater, active_lysimeter, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B);
-	  upperboundary (geo, surface, remaining_water, h,
-			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug);
+	  upperboundary (geo, soil, T, surface, state, remaining_water, h,
+			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg);
 
 	  //Initialize water capacity  matrix
 	  ublas::banded_matrix<double> Cw (cell_size, cell_size, 0, 0);
@@ -323,6 +333,12 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       while (!converges (h_conv, h)
 	     && iterations_used <= max_iterations);
 
+      }
+      catch (top_state)
+        {
+          iterations_used = 999999;
+        }
+
       if (iterations_used > max_iterations)
 	{
 	  number_of_time_step_reductions++;
@@ -348,8 +364,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  B = ublas::zero_vector<double> (cell_size);
 	  lowerboundary (geo, groundwater, active_lysimeter, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B);
-	  upperboundary (geo, surface, remaining_water, h,
-			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug);
+	  upperboundary (geo, soil, T, surface, state, remaining_water, h,
+			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg);
           Darcy (geo, Kedge, h, dq);
 
 	  // Update remaining_water.
@@ -563,7 +579,10 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 
 void 
 UZRectMollerup::upperboundary (const GeometryRect& geo,
+                               const Soil& soil,
+                               const ublas::vector<double>& T,
 			       const Surface& surface,
+                               std::vector<top_state>& state,
 			       const ublas::vector<double>& remaining_water,
 			       const ublas::vector<double>& h,
 			       const ublas::vector<double>& K,
@@ -573,7 +592,8 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 			       ublas::vector<double>& Gm, 
 			       ublas::vector<double>& B,
 			       const double ddt,
-			       const int debug)
+			       const int debug,
+                               Treelog& msg)
 {
   const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
@@ -602,39 +622,84 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	  break;
 	case Surface::limited_water:
 	  const double h_top = remaining_water (i);
+
+          // We pretend that the surface is particlaly saturated.
+          const double K_sat = soil.K (cell, 0.0, 0.0, T (cell));
+          const double K_cell = K (cell);
+
+#if 0
+          // Harmonic average of saturated top and dry cell.
+          const double K_edge = h_top <= 0
+            ? K_cell 
+            : 2.0/(1.0/K_sat + 1.0/K_cell);
+#elif 0
+          const double K_edge = h_top <= 0 ? K_cell : (K_sat + K_cell) / 2.0;
+#else
+          const double K_edge = K_cell;
+#endif
+
 	  const double dz = geo.edge_length (edge);
 	  daisy_assert (approximate (dz, -geo.z (cell)));
-	  const double q_in_avail = h_top / ddt;
-	  const double q_in_pot = K (cell) * (h_top - h (cell) + dz) / dz;
+	  double q_in_avail = h_top / ddt;
+	  const double q_in_pot = K_edge * (h_top - h (cell) + dz) / dz;
 	  // Decide type.
-	  const bool is_flux = h_top <= 0.0 || q_in_pot > q_in_avail;
+	  bool is_flux = h_top <= 0.0 || q_in_pot > q_in_avail;
+
+#if 0
+          if (!is_flux && q_in_pot < 0.0)
+            {
+              q_in_avail = 0.0;
+              is_flux = true;
+            }
+#elif 0
+          if (!is_flux)
+            {
+              is_flux = true;
+              q_in_avail = q_in_pot;
+            }
+#endif
 	  if (is_flux)
-            Neumann (edge, cell, area, in_sign, q_in_avail, dq, B);
+            {
+#if 0
+              if (state[i] == top_pressure)
+                throw top_pressure;
+#endif
+              state[i] = top_flux;
+
+              Neumann (edge, cell, area, in_sign, q_in_avail, dq, B);
+            }
 	  else			// Pressure
 	    {
-	      if (q_in_pot < 0.0)
+#if 0
+              if (state[i] == top_flux)
+                throw top_flux;
+#endif
+              state[i] = top_pressure;
+
+              if (debug > 0 && q_in_pot < 0.0)
 		{
 		  std::ostringstream tmp;
 		  tmp << "q_in_pot = " << q_in_pot << ", q_avail = " 
 		      << q_in_avail << ", h_top = " << h_top 
 		      << ", h (cell) = " << h (cell) << " K (cell) = " 
-		      << K (cell) << ", dz = " << dz << ", ddt = " << ddt
+                      << K (cell) << ", K_sat = " << K_sat << ", K_edge = "
+                      << K_edge <<", dz = " << dz << ", ddt = " << ddt
 		      << ", is_flux = " << is_flux << "\n";
-		  Assertion::message (tmp.str ());
+		  msg.message (tmp.str ());
 		}
-	      const double value = -K (cell) * geo.edge_area_per_length (edge);
+	      const double value = -K_edge * geo.edge_area_per_length (edge);
               const double pressure = h_top;
               Dirichlet (edge, cell, area, in_sign, sin_angle, 
-                         K (cell), h (cell),
+                         K_edge, h (cell),
                          value, pressure, dq, Dm_mat, Dm_vec, Gm);
 	    }
 	  if (debug == 3)
 	    {
 	      std::ostringstream tmp;
-	      tmp << "edge = " << edge << ", K = " << K (cell) << ", h_top = "
+	      tmp << "edge = " << edge << ", K_edge = " << K_edge << ", h_top = "
 		  << h_top << ", dz = " << dz << ", q_avail = " << q_in_avail
 		  << ", q_pot = " << q_in_pot << ", is_flux = " << is_flux;
-	      Assertion::message (tmp.str ());
+              msg.message (tmp.str ());
 	    }
 	  break;
 	case Surface::soil:
