@@ -1,0 +1,64 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B7416E01-1749-4D15-A91D-23FA0FFA6B2A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Unit_test</RootNamespace>
+    <AssemblyName>Unit_test</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.2.9.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
+    <Reference Include="org.OpenMI.Backbone, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
+    <Reference Include="org.OpenMI.DevelopmentSupport, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
+    <Reference Include="org.OpenMI.Standard, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
+    <Reference Include="org.OpenMI.Utilities.Wrapper, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="alist_test.cs" />
+    <Compile Include="daisyDotNetAccess_test.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="daisyWrapper_test.cs" />
+    <Compile Include="daisy_test.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="scope_test.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenMI_Daisy\OpenMI_Daisy.csproj">
+      <Project>{128AF31D-4EF6-444C-812E-92B196DE4E44}</Project>
+      <Name>OpenMI_Daisy</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
