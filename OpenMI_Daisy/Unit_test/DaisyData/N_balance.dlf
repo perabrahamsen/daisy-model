@@ -1,0 +1,10 @@
+dlf-0.0 -- N Balance (defined in 'log.dai').
+
+VERSION: 4.11
+LOGFILE: N_balance.dlf
+RUN: Wed Mar 21 15:46:41 2007
+
+INTERVAL: box [-100; none]
+
+LOG: Enough information to create a balance for the soil nitrogen.
+
