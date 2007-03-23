@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<LinkableComponent Type="dk.ku.life.Daisy.OpenMI.DaisyOpenMIComponent" Assembly="..\..\..\OpenMI_Daisy.dll">
-  <Arguments>
-    <Argument Key="FilePath" ReadOnly="true" Value="test_OpenMI_simple.dai" />
-   </Arguments>
-</LinkableComponent>
