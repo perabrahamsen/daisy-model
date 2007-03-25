@@ -56,9 +56,17 @@ struct ConditionTrue : public Condition
     : Condition (al)
   { }
 
+  ConditionTrue (const char* const id)
+    : Condition (id)
+  { }
+
   ~ConditionTrue ()
   { }
 };
+
+std::auto_ptr<Condition> 
+Condition::create_true ()
+{ return std::auto_ptr<Condition> (new ConditionTrue (__FUNCTION__)); }
 
 struct ConditionOr : public Condition
 {

@@ -298,7 +298,7 @@ Toplevel::command_line (int& argc, char**& argv)
           copyright ();
 	  // Parse the file.
 	  Treelog::Open nest (*msg, "Parsing file");
-	  ParserFile parser (metalib.syntax (), arg, *msg);
+	  ParserFile parser (metalib, arg, *msg);
 	  parser.load (metalib.alist ());
 	  file_found = true;
 	  errors_found += parser.error_count ();
@@ -398,7 +398,7 @@ Toplevel::parse_file (const std::string& filename)
   daisy_assert (state_ == is_uninitialized);
   copyright ();
   Treelog::Open nest (*msg, "Parsing file");
-  ParserFile parser (metalib.syntax (), filename, *msg);
+  ParserFile parser (metalib, filename, *msg);
   parser.load (metalib.alist ());
   if (parser.error_count () > 0)
     throw EXIT_FAILURE;

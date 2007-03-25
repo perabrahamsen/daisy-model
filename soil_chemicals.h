@@ -77,7 +77,7 @@ public:
 		   Treelog&);
   bool check (unsigned n, Treelog&) const;
   static void load_syntax (Syntax&, AttributeList&);
-  SoilChemicals (const AttributeList&);
+  SoilChemicals (Block&);
   ~SoilChemicals ();
 };
 

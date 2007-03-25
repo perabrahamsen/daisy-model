@@ -157,7 +157,8 @@ struct VegetationCrops : public Vegetation
 		std::vector<double>& residuals_C_soil,
                 const bool combine,
 		Treelog&);
-  void sow (const AttributeList& al, const Geometry&, OrganicMatter&, 
+  void sow (Metalib&, const AttributeList& al, 
+            const Geometry&, OrganicMatter&, 
             double& seed_N /* kg/ha/h */, double& seed_C /* kg/ha/h */,
             const Time&, double dt, Treelog&);
   void output (Log&) const;
@@ -626,14 +627,14 @@ VegetationCrops::harvest (const symbol column_name,
 }
 
 void
-VegetationCrops::sow (const AttributeList& al,
+VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
 		      const Geometry& geo,
 		      OrganicMatter& organic_matter, 
                       double& seed_N, double& seed_C, const Time& time, 
                       const double dt,
                       Treelog& msg)
 {
-  Crop *const crop = Librarian<Crop>::build_free (msg, al, "sow");
+  Crop *const crop = Librarian<Crop>::build_free (metalib, msg, al, "sow");
   const symbol name = crop->name;
   for (CropList::iterator i = crops.begin();
        i != crops.end();
@@ -667,15 +668,10 @@ VegetationCrops::initialize (const Time& time, const Geometry& geo,
 }
 
 VegetationCrops::CropList
-VegetationCrops::build_crops (Block& block, const std::string& key)
+VegetationCrops::build_crops (Block& al, const std::string& key)
 {
-  CropList t;
-  const std::vector<AttributeList*>& f = block.alist_sequence (key);
-  for (size_t i = 0; i < f.size (); i++)
-    t.push_back (Librarian<Crop>::build_alist (block, *f[i],
-					       sequence_id (key, i)));
-  
-  return t;
+  const std::vector<Crop*> v = Librarian<Crop>::build_vector (al, key);
+  return CropList (v.begin (), v.end ());
 }
 
 VegetationCrops::VegetationCrops (Block& al)

@@ -159,7 +159,8 @@ struct VegetationPermanent : public Vegetation
                 const bool,
 		Treelog&)
   { }
-  void sow (const AttributeList&, const Geometry&, OrganicMatter&, 
+  void sow (Metalib&, const AttributeList&, 
+            const Geometry&, OrganicMatter&, 
             double&, double&, const Time&, double, Treelog&)
   { throw "Can't sow on permanent vegetation"; }
   void output (Log&) const;

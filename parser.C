@@ -31,6 +31,10 @@ the 'parser' component to read these data from an external source\n\
 
 const char *const Parser::component = "parser";
 
+Parser::Parser (const symbol id)
+  : name (id)
+{ }
+
 Parser::Parser (Block& al)
   : name (al.identifier ("type"))
 { }

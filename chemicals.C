@@ -92,6 +92,7 @@ struct Chemicals::Implementation
 Chemicals::Implementation::chemistry_map* 
 Chemicals::Implementation::chemistry = NULL;
 
+#ifdef COMPOUNDS
 const Chemical* 
 Chemicals::Implementation::lookup (symbol name)
 {
@@ -122,6 +123,11 @@ Chemicals::Implementation::lookup (symbol name)
   (*chemistry)[name] = chemical;
   return chemical;
 }
+#else
+const Chemical* 
+Chemicals::Implementation::lookup (symbol)
+{ return NULL; }
+#endif
 
 void 
 Chemicals::Implementation::move_fraction (Implementation& from,

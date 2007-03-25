@@ -21,6 +21,7 @@
 
 
 #include "log_alist.h"
+#include "metalib.h"
 #include "block.h"
 #include "condition.h"
 #include "daisy.h"
@@ -73,8 +74,8 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& out)
   if (is_active)
     {
       static const symbol daisy_symbol ("daisy");
-      push (daisy_symbol, *daisy.global_syntax, daisy.alist);
-      global_alist = daisy.global_alist;
+      push (daisy_symbol, daisy.metalib.syntax (), daisy.metalib.alist ());
+      global_alist = &daisy.metalib.alist ();
       time = daisy.time;
     }
   return is_active;

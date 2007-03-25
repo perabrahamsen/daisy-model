@@ -282,6 +282,7 @@ public:
   virtual void initialize (Treelog& out) = 0;
 protected:
   Log (Block& al);
+  Log (const char* id);
 public:
   virtual void summarize (Treelog& out);
   ~Log ();

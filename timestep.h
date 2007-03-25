@@ -66,6 +66,8 @@ public:
   ~Timestep ();
   Timestep (const Timestep&);
 private:                    
+  explicit Timestep ();
+  explicit Timestep (const AttributeList&);
   const Timestep& operator= (const Timestep&);
 };
 

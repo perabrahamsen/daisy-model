@@ -40,6 +40,7 @@ class SoilNO3;
 class PLF;
 class Harvest;
 class AM;
+class Metalib;
 
 class Vegetation : public Model
 { 
@@ -120,7 +121,7 @@ public:
 			std::vector<double>& residuals_C_soil,
                         const bool combine,
 			Treelog&) = 0;
-  virtual void sow (const AttributeList& al, 
+  virtual void sow (Metalib&, const AttributeList& al, 
                     const Geometry&, OrganicMatter&, 
                     double& seed_N /* kg/ha/h */,
                     double& seed_C /* kg/ha/h */,

@@ -24,13 +24,14 @@
 #define PARSER_FILE_H
 
 #include "parser.h"
+#include <memory>
 
 class ParserFile : public Parser
 {
   // Content.
 private:
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
 
   // Use.
 public:
@@ -40,10 +41,9 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (Syntax&, Treelog&);
   bool check () const;
   ParserFile (Block&);
-  ParserFile (Syntax& syntax, const std::string& n, Treelog&);
+  ParserFile (Metalib&, const std::string& n, Treelog&);
   ~ParserFile ();
 };
 

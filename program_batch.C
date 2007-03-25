@@ -34,14 +34,11 @@ struct ProgramBatch : public Program
   // Content.
   const std::string directory;
   std::vector<Program*> program;
-  const Syntax* global_syntax;
-  const AttributeList* global_alist;
+  Metalib& metalib;
 
   // Use.
   bool run (Treelog& msg)
   { 
-    daisy_assert (global_syntax);
-    daisy_assert (global_alist);
 
     Path::InDirectory cwd (directory);
     if (!cwd.check ())
@@ -57,7 +54,7 @@ struct ProgramBatch : public Program
         Treelog::Open nest (msg, tmp.str ());
         msg.touch ();
         {
-          Block block (*global_syntax, *global_alist, msg, "Initializing");
+          Block block (metalib, msg, "Initializing");
           program[0]->initialize (block);
           if (!block.ok ())
             throw EXIT_FAILURE;
@@ -73,11 +70,8 @@ struct ProgramBatch : public Program
   }
 
   // Create and Destroy.
-  void initialize (Block& block)
-  { 
-    global_syntax = &block.syntax ();
-    global_alist = &block.alist ();
-  }
+  void initialize (Block&)
+  { }
   bool check (Treelog&)
   { return true; }
 
@@ -85,8 +79,7 @@ struct ProgramBatch : public Program
     : Program (al),
       directory (al.name ("directory")),
       program (Librarian<Program>::build_vector (al, "run")),
-      global_syntax (NULL),
-      global_alist (NULL)
+      metalib (al.metalib ())
   { }
 
   ~ProgramBatch ()

@@ -36,6 +36,7 @@ class Crop;
 class Harvest;
 class Output;
 class Treelog;
+class Metalib;
 
 class Column : public Model
 {
@@ -50,7 +51,7 @@ public:
 
   // Actions.
 public:
-  virtual void sow (const AttributeList& crop, 
+  virtual void sow (Metalib&, const AttributeList& crop, 
                     const Time&, double dt, Treelog&) = 0;
   virtual void ridge (const AttributeList& ridge) = 0;
   virtual void irrigate_overhead (double flux, double temp, const IM&, 

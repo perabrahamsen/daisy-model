@@ -36,7 +36,7 @@ private:
   SoilNH4 (const SoilNH4&);
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  SoilNH4 (const AttributeList&);
+  SoilNH4 (Block&);
 };
 
 #endif // SOIL_NH4_H

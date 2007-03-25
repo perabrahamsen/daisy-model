@@ -38,6 +38,7 @@ class Output;
 class Treelog;
 class Log;
 class Block;
+class Metalib;
 
 class Field : public Border
 { 
@@ -59,7 +60,8 @@ public:
 
   // Actions.
 public:
-  void sow (const AttributeList& crop, const Time&, double dt, Treelog&);
+  void sow (Metalib&, const AttributeList& crop,
+            const Time&, double dt, Treelog&);
   void ridge (const AttributeList& ridge);
   void irrigate_overhead (double water, double temp, const IM&, double dt);
   void irrigate_surface (double water, double temp, const IM&, double dt);

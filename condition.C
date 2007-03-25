@@ -43,6 +43,10 @@ Condition::Condition (Block& al)
   : name (al.identifier ("type"))
 { }
 
+Condition::Condition (const char *const id)
+  : name (id)
+{ }
+
 Condition::~Condition ()
 { }
 

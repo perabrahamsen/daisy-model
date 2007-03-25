@@ -21,6 +21,7 @@
 
 
 #include "parser_file.h"
+#include "metalib.h"
 #include "library.h"
 #include "block.h"
 #include "alist.h"
@@ -40,17 +41,15 @@
 #include <memory>
 #include <sstream>
 
-using namespace std;
-
 struct ParserFile::Implementation
 {
   // Inputs.
-  vector<AttributeList*> inputs;
+  auto_vector<AttributeList*> inputs;
 
   // Lexer.
-  string file;
-  Lexer* lexer;
-  Treelog::Open* nest;
+  std::string file;
+  std::auto_ptr<Lexer> lexer;
+  std::auto_ptr<Treelog::Open> nest;
 
   int get ()
   { return lexer->get (); }
@@ -58,25 +57,25 @@ struct ParserFile::Implementation
   { return lexer->peek (); }
   bool good ()
   { return lexer->good (); }
-  void error (const string& str)
+  void error (const std::string& str)
   { lexer->error (str); }
-  void error (const string& str, const Lexer::Position& pos)
+  void error (const std::string& str, const Lexer::Position& pos)
   { lexer->error (str, pos); }
-  void warning (const string& str)
+  void warning (const std::string& str)
   { lexer->warning (str); }
   void eof ()
   { lexer->eof (); }
 
   // Lisp lexer.
-  string get_string ();
+  std::string get_string ();
   symbol get_symbol ()
   { return symbol (get_string ()); }
   int get_integer ();
   double get_number ();
-  string get_dimension ();
-  double get_number (const string& dim);
-  bool check_dimension (const string& syntax, const string& read);
-  double convert (double value, const string& syntax, const string& read, 
+  std::string get_dimension ();
+  double get_number (const std::string& dim);
+  bool check_dimension (const std::string& syntax, const std::string& read);
+  double convert (double value, const std::string& syntax, const std::string& read, 
 		  const Lexer::Position&);
   void skip (const char*);
   void skip ();
@@ -103,20 +102,18 @@ struct ParserFile::Implementation
     }
   };
   // Parser.
-  void check_value (const Syntax& syntax, const string& name,  double value);
+  void check_value (const Syntax& syntax, const std::string& name,  double value);
   void add_derived (Library&);
   AttributeList& load_derived (const Library& lib, bool in_sequence,
 			       const AttributeList* original);
   void load_list (Syntax&, AttributeList&);
-  Syntax* global_syntax_table;
+  Metalib& metalib;
 
   // Create and destroy.
-  void initialize (Syntax&, Treelog&);
-  Implementation (const string&);
-  ~Implementation ();
+  Implementation (Metalib&, const std::string&, Treelog&);
 };
 
-string
+std::string
 ParserFile::Implementation::get_string ()
 {
   static const struct IdExtra : public std::set<int>
@@ -141,7 +138,7 @@ ParserFile::Implementation::get_string ()
   if (c == '"')
     {
       // Get a string.
-      string str ("");
+      std::string str ("");
       skip ("\"");
 
       for (c = get (); good () && c != '"'; c = get ())
@@ -163,7 +160,7 @@ ParserFile::Implementation::get_string ()
 		case '"':
 		  break;
 		default:
-		  error (string ("Unknown character escape '")
+		  error (std::string ("Unknown character escape '")
 			 + char (c) + "'");
 		}
 	    }
@@ -182,7 +179,7 @@ ParserFile::Implementation::get_string ()
   else
     {
       // Get an identifier.
-      string str ("");
+      std::string str ("");
       do
 	{
 	  str += char (c);
@@ -204,7 +201,7 @@ ParserFile::Implementation::get_integer ()
   // Check for number literals first.
   if (isdigit (c) || c == '-')
     {
-      string str;
+      std::string str;
 
       while (good () && (isdigit (c) || c == '-' || c == '+'))
         {
@@ -223,13 +220,13 @@ ParserFile::Implementation::get_integer ()
     }
   // Then try an integer object.
   const Library& lib = Librarian<Integer>::library ();
-  auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
+  std::auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
   const symbol obj = al->identifier ("type");
   static const symbol error_sym ("error");
   if (obj == error_sym)
     return -42;
   // Check for completness.
-  ostringstream tmp;
+  std::ostringstream tmp;
   TreelogStream treelog (tmp);
   Treelog::Open nest (treelog, obj);
   if (!lib.syntax (obj).check (*al, treelog))
@@ -238,11 +235,9 @@ ParserFile::Implementation::get_integer ()
              + tmp.str () + "---");
       return -42;
     }
-  Syntax parent_syntax;
-  AttributeList parent_alist;
-  Block block (parent_syntax, parent_alist, treelog, "integer");
-  auto_ptr<Integer> integer (Librarian<Integer>::build_alist (block, *al,
-                                                              "integer"));
+  Block block (metalib, treelog, "integer");
+  std::auto_ptr<Integer> integer 
+    (Librarian<Integer>::build_alist (block, *al, "integer"));
   if (!block.ok ()
       || !integer->initialize (treelog)
       || !integer->check (Scope::null (), treelog))
@@ -266,7 +261,7 @@ double
 ParserFile::Implementation::get_number ()
 {
   skip ();
-  string str;
+  std::string str;
   int c = peek ();
 
   while (good () && (isdigit (c) 
@@ -289,16 +284,16 @@ ParserFile::Implementation::get_number ()
   const double value = strtod (c_str, const_cast<char**> (&endptr));
   
   if (*endptr != '\0')
-    error (string ("Junk at end of number '") + endptr + "'");
+    error (std::string ("Junk at end of number '") + endptr + "'");
 
   return value;
 }
 
-string
+std::string
 ParserFile::Implementation::get_dimension ()
 {
   skip ("[");
-  string str;
+  std::string str;
   int c = peek ();
 
   while (good () && c != ']' && c != '\n')
@@ -312,7 +307,7 @@ ParserFile::Implementation::get_dimension ()
 }
 
 double
-ParserFile::Implementation::get_number (const string& syntax_dim)
+ParserFile::Implementation::get_number (const std::string& syntax_dim)
 {
   skip ();
 
@@ -324,7 +319,7 @@ ParserFile::Implementation::get_number (const string& syntax_dim)
 
       if (looking_at ('['))
         {
-          const string read_dim = get_dimension ();
+          const std::string read_dim = get_dimension ();
           if (check_dimension (syntax_dim, read_dim))
             value = convert (value, syntax_dim, read_dim, pos);
         }
@@ -333,13 +328,13 @@ ParserFile::Implementation::get_number (const string& syntax_dim)
   
   // Then try a number object.
   const Library& lib = Librarian<Number>::library ();
-  auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
+  std::auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
   const symbol obj = al->identifier ("type");
   static const symbol error_sym ("error");
   if (obj == error_sym)
     return -42.42e42;
   // Check for completness.
-  ostringstream tmp;
+  std::ostringstream tmp;
   TreelogStream treelog (tmp);
   Treelog::Open nest (treelog, obj);
   if (!lib.syntax (obj).check (*al, treelog))
@@ -348,11 +343,9 @@ ParserFile::Implementation::get_number (const string& syntax_dim)
              + tmp.str () + "---");
       return -42.42e42;
     }
-  Syntax parent_syntax;
-  AttributeList parent_alist;
-  Block block (parent_syntax, parent_alist, treelog, "number");
-  auto_ptr<Number> number (Librarian<Number>::build_alist (block, *al,
-							   "number"));
+  Block block (metalib, treelog, "number");
+  std::auto_ptr<Number> number 
+    (Librarian<Number>::build_alist (block, *al, "number"));
   if (!block.ok ()
       || !number->initialize (treelog)
       || !number->check (Scope::null (), treelog))
@@ -371,15 +364,15 @@ ParserFile::Implementation::get_number (const string& syntax_dim)
       return -42.42e42;
     }
   double value = number->value (Scope::null ());
-  const string read_dim = number->dimension (Scope::null ()).name ();
+  const std::string read_dim = number->dimension (Scope::null ()).name ();
   if (check_dimension (syntax_dim, read_dim))
     value = convert (value, syntax_dim, read_dim, lexer->position ());
   return value;
 }
 
 bool 
-ParserFile::Implementation::check_dimension (const string& syntax,
-					     const string& read)
+ParserFile::Implementation::check_dimension (const std::string& syntax,
+					     const std::string& read)
 {
   if (syntax != read)
     {
@@ -390,7 +383,7 @@ ParserFile::Implementation::check_dimension (const string& syntax,
 	}
       else if (!Units::can_convert (read, syntax))
 	{
-	  error (string ("expected [") 
+	  error (std::string ("expected [") 
                  + ((syntax == Syntax::Fraction ()
                      || syntax == Syntax::None ())
                     ? "" : syntax) + "] got [" + read + "]");
@@ -402,8 +395,8 @@ ParserFile::Implementation::check_dimension (const string& syntax,
 
 double 
 ParserFile::Implementation::convert (double value,
-				     const string& syntax, 
-				     const string& read, 
+				     const std::string& syntax, 
+				     const std::string& read, 
 				     const Lexer::Position& pos)
 { 
   if (syntax == Syntax::Unknown ())
@@ -422,7 +415,7 @@ ParserFile::Implementation::convert (double value,
 	  return Units::convert (read, "", value);
       return Units::convert (read, syntax, value);
     }
-  catch (const string& message)
+  catch (const std::string& message)
     { 
       error (message, pos); 
       return value;
@@ -436,7 +429,7 @@ ParserFile::Implementation::skip (const char* str)
   for (const char* p = str; *p; p++)
     if (*p != peek ())
       {
-	error (string("Expected '") + str + "'");
+	error (std::string("Expected '") + str + "'");
 	skip_token ();
 	break;
       }
@@ -501,14 +494,14 @@ ParserFile::Implementation::looking_at (char c)
 
 void
 ParserFile::Implementation::check_value (const Syntax& syntax, 
-                                         const string& name,
+                                         const std::string& name,
                                          const double value)
 {
   try
     {
       syntax.check (name, value);
     }
-  catch (const string& message)
+  catch (const std::string& message)
     {
       error (name + ": " + message);
     }
@@ -539,7 +532,7 @@ ParserFile::Implementation::add_derived (Library& lib)
     : get_symbol ();
   if (!lib.check (super))
     {
-      error (string ("Unknown '") + lib.name () + "' model '" + super + "'");
+      error (std::string ("Unknown '") + lib.name () + "' model '" + super + "'");
       skip_to_end ();
       return;
     }
@@ -571,7 +564,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
   bool skipped = false;
 
   static const symbol original_symbol ("original");
-  static const string compatibility_symbol ("used_to_be_a_submodel");
+  static const std::string compatibility_symbol ("used_to_be_a_submodel");
 
   symbol type;
   skip ();
@@ -597,7 +590,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
         {
           alist->add ("type", "const");
           const double value = get_number ();
-          const string dim = get_dimension ();
+          const std::string dim = get_dimension ();
           alist->add ("value", value, dim);
         }
       else if (&lib == &Librarian<Integer>::library ())
@@ -627,7 +620,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
       if (type == original_symbol)
 	{
 	  if (!original)
-	    throw (string ("No original value"));
+	    throw (std::string ("No original value"));
 	  alist = new AttributeList (*original);
 	  daisy_assert (alist->check ("type"));
 	  type = alist->identifier ("type");
@@ -646,7 +639,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
                   alist->add ("name", type);
                   goto skip_it;
                 }
-              throw (string ("Unknown '") + lib.name () + "' model '"
+              throw (std::string ("Unknown '") + lib.name () + "' model '"
                      + type + "'");
             }
 	  alist = new AttributeList (lib.lookup (type));
@@ -660,7 +653,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
 	}
     skip_it:;
     }
-  catch (const string& msg)
+  catch (const std::string& msg)
     {
       error (msg);
       skip_to_end ();
@@ -676,15 +669,15 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
 void
 ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 { 
-  vector<string>::const_iterator current = syntax.order ().begin ();
-  const vector<string>::const_iterator end = syntax.order ().end ();
-  set<string> found;
+  std::vector<std::string>::const_iterator current = syntax.order ().begin ();
+  const std::vector<std::string>::const_iterator end = syntax.order ().end ();
+  std::set<std::string> found;
 
   while ( good () && !looking_at (')'))
     {
       bool skipped = false;
       bool in_order = false;
-      string name = "";
+      std::string name = "";
       if (current == end)
 	// Unordered association list, get name.
 	{
@@ -822,7 +815,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
               if (syntax.dimension (name) == Syntax::User ())
                 {
                   const double value = get_number ();
-                  const string dim = get_dimension ();
+                  const std::string dim = get_dimension ();
                   check_value (syntax, name, value);
                   atts.add (name, value, dim);
                   break;
@@ -863,8 +856,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      PLF plf;
 	      double last_x = -42;
 	      int count = 0;
-	      const string domain = syntax.domain (name);
-	      const string range = syntax.range (name);
+	      const std::string domain = syntax.domain (name);
+	      const std::string range = syntax.range (name);
 	      bool ok = true;
 	      while (!looking_at (')') && good ())
 		{
@@ -884,7 +877,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		    {
 		      syntax.check (name, y);
 		    }
-		  catch (const string& message)
+		  catch (const std::string& message)
 		    {
 		      error (name + ": " + message);
 		      ok = false;
@@ -904,14 +897,14 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	  case Syntax::String:
 	    atts.add (name, get_string ());
 	    // Handle "directory" immediately.
-	    if (&syntax == global_syntax_table && name == "directory")
+	    if (&syntax == &metalib.syntax () && name == "directory")
 	      if (!Path::set_directory (atts.name (name)))
-		error (string ("Could not set directory '") + atts.name (name)
+		error (std::string ("Could not set directory '") + atts.name (name)
 		       + "'");
 	    break;
 	  case Syntax::Boolean:
 	    {
-	      const string flag = get_string ();
+	      const std::string flag = get_string ();
 
 	      if (flag == "true")
 		atts.add (name, true);
@@ -946,11 +939,10 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 #endif // !SLOPPY_PARENTHESES						   
 	      if (&lib == &Librarian<Parser>::library ())
 		{
-		  std::auto_ptr<Parser> 
-                    parser (Librarian<Parser>::build_free (lexer->err, al,
-                                                           "input"));
-		  parser->initialize (*global_syntax_table, lexer->err);
-                  if (!parser->check ())
+                  Block block (metalib, lexer->err, "input");
+		  std::auto_ptr<Parser> parser 
+                    (Librarian<Parser>::build_alist (block, al, "input"));
+                  if (!block.ok () || !parser->check ())
                     error ("file error");
                   else
                     parser->load_nested (atts);
@@ -959,7 +951,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		}
 	      else
 		{
-		  const string obj = al.name ("type");
+		  const std::string obj = al.name ("type");
 		  if (obj != "error")
                     atts.add (name, al);
 		  delete &al;
@@ -967,7 +959,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    }
 	    break;
 	  case Syntax::Error:
-	    error (string("Unknown singleton '") + name + "'");
+	    error (std::string("Unknown singleton '") + name + "'");
 	    skip_to_end ();
 	    break;
 	  default:
@@ -998,9 +990,9 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    case Syntax::Object:
 	      {
 		const Library& lib = syntax.library (name);
-		static const vector<AttributeList*> no_sequence;
-		vector<AttributeList*> sequence;
-		const vector<AttributeList*>& old_sequence
+		static const std::vector<AttributeList*> no_sequence;
+		std::vector<AttributeList*> sequence;
+		const std::vector<AttributeList*>& old_sequence
 		  = atts.check (name) 
 		  ? atts.alist_sequence (name) 
 		  : no_sequence;
@@ -1029,7 +1021,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		      = (old_sequence.size () > element
 			 ? load_derived (lib, true, old_sequence[element])
 			 : load_derived (lib, true, NULL));
-		    const string obj = al.name ("type");
+		    const std::string obj = al.name ("type");
 		    if (obj == "error")
                       delete &al;
                     else
@@ -1042,13 +1034,13 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    case Syntax::AList:
 	      {
 		const size_t size = syntax.size (name);
-		static const vector<AttributeList*> no_sequence;
+		static const std::vector<AttributeList*> no_sequence;
 		const Syntax& syn = syntax.syntax (name);
-		const vector<AttributeList*>& old_sequence
+		const std::vector<AttributeList*>& old_sequence
 		  = atts.check (name) 
 		  ? atts.alist_sequence (name) 
 		  : no_sequence;
-		vector<AttributeList*> sequence;
+		std::vector<AttributeList*> sequence;
 		bool skipped = false;
 		// We do not force parentheses around the alist if it
 		// is the last member of a fully ordered list.
@@ -1086,7 +1078,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  skip (")");
 		if (size != Syntax::Sequence && sequence.size () != size)
 		  {
-		    ostringstream str;
+		    std::ostringstream str;
 		    str << "Got " << sequence.size ()
                         << " array members, expected " << size;
 		    error (str.str ());
@@ -1097,7 +1089,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      }
 	    case Syntax::PLF:
 	      {
-		vector<const PLF*> plfs;
+		std::vector<const PLF*> plfs;
 		int total = 0;
 		const int size = syntax.size (name);
 		while (good () && !looking_at (')'))
@@ -1106,8 +1098,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		    PLF& plf = *new PLF ();
 		    double last_x = -42;
 		    int count = 0;
-		    const string domain = syntax.domain (name);
-		    const string range = syntax.range (name);
+		    const std::string domain = syntax.domain (name);
+		    const std::string range = syntax.range (name);
 		    while (!looking_at (')') && good ())
 		      {
                         if (looking_at ('&'))
@@ -1134,7 +1126,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 			  {
 			    syntax.check (name, y);
 			  }
-			catch (const string& message)
+			catch (const std::string& message)
 			  {
 			    error (name + ": " + message);
 			  }
@@ -1147,7 +1139,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  }
 		if (size != Syntax::Sequence && total != size)
 		  {
-		    ostringstream str;
+		    std::ostringstream str;
 		    str << "Got " << total
                         << " array members, expected " << size;
 		    error (str.str ());
@@ -1161,11 +1153,11 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      }
 	    case Syntax::Number:
 	      {
-		vector<double> array;
-		vector<Lexer::Position> positions;
+		std::vector<double> array;
+		std::vector<Lexer::Position> positions;
 		int count = 0;
 		const int size = syntax.size (name);
-		const string syntax_dim = syntax.dimension (name);
+		const std::string syntax_dim = syntax.dimension (name);
 		unsigned int first_unchecked = 0;
 		while (good () && !looking_at (')'))
 		  {
@@ -1199,7 +1191,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		      }
                     else if (looking_at ('['))
                       {
-                        const string read_dim = get_dimension ();
+                        const std::string read_dim = get_dimension ();
                         if (check_dimension (syntax_dim, read_dim))
                           {
                             daisy_assert (positions.size () == array.size ());
@@ -1229,16 +1221,16 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 			{
 			  syntax.check (name, array[i]);
 			}
-		      catch (const string& message)
+		      catch (const std::string& message)
 			{
-			  ostringstream str;
+			  std::ostringstream str;
 			  str << name << "[" << i << "]: " << message;
 			  error (str.str (), positions[i]);
 			}
 		  }
 		if (size != Syntax::Sequence && count != size)
 		  {
-		    ostringstream str;
+		    std::ostringstream str;
 		    str << "Got " << count 
                         << " array members, expected " << size;
 		    error (str.str ());
@@ -1251,7 +1243,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      }
 	    case Syntax::String:
 	      {
-		vector<symbol> array;
+		std::vector<symbol> array;
 		int count = 0;
 		const int size = syntax.size (name);
 
@@ -1273,7 +1265,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  }
 		if (size != Syntax::Sequence && count != size)
 		  {
-		    ostringstream str;
+		    std::ostringstream str;
 		    str << "Got " << count 
                         << " array members, expected " << size;
 		    error (str.str ());
@@ -1283,11 +1275,11 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  }
 		atts.add (name, array);
 		// Handle "path" immediately.
-		if (&syntax == global_syntax_table && name == "path")
+		if (&syntax == &metalib.syntax () && name == "path")
 		  {
-		    const vector<symbol>& symbols 
+		    const std::vector<symbol>& symbols 
 		      = atts.identifier_sequence (name);
-		    vector<string> names;
+		    std::vector<std::string> names;
 		    for (unsigned int i = 0; i < symbols.size (); i++)
 		      names.push_back (symbols[i].name ());
 		    Path::set_path (names);
@@ -1296,7 +1288,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      }
 	    case Syntax::Integer:
 	      {
-		vector<int> array;
+		std::vector<int> array;
 		int count = 0;
 		const int size = syntax.size (name);
 
@@ -1318,7 +1310,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  }
 		if (size != Syntax::Sequence && count != size)
 		  {
-		    ostringstream str;
+		    std::ostringstream str;
 		    str << "Got " << count 
                         << " array members, expected " << size;
 		    error (str.str ());
@@ -1331,11 +1323,11 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		break;
 	      }
 	    case Syntax::Error:
-	      error (string("Unknown attribute '") + name + "'");
+	      error (std::string("Unknown attribute '") + name + "'");
 	      skip_to_end ();
 	      break;
 	    default:
-	      error (string("Unsupported sequence '") + name + "'");
+	      error (std::string("Unsupported sequence '") + name + "'");
 	      skip_to_end ();
 	    }
 	}
@@ -1343,7 +1335,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
       // Value check.
       if (atts.check (name))
 	{
-	  ostringstream tmp;
+	  std::ostringstream tmp;
 	  TreelogStream treelog (tmp);
 	  Treelog::Open nest (treelog, name);
 	  if (!syntax.check (atts, name, treelog))
@@ -1357,34 +1349,23 @@ done:
     }
 }
 
-void
-ParserFile::Implementation::initialize (Syntax& syntax, Treelog& out)
-{ 
-  global_syntax_table = &syntax; 
-  lexer = new Lexer (file, out);
-  nest = new Treelog::Open (out, file);
-}
-
-ParserFile::Implementation::Implementation (const string& name)
-  : file (name),
-    lexer (NULL),
-    nest (NULL)
+ParserFile::Implementation::Implementation (Metalib& mlib,
+                                            const std::string& name,
+                                            Treelog& msg)
+  : inputs (std::vector<AttributeList*> ()),
+    file (name),
+    lexer (new Lexer (file, msg)),
+    nest (new Treelog::Open (msg, file)),
+    metalib (mlib)
 { }
-
-ParserFile::Implementation::~Implementation ()
-{ 
-  sequence_delete (inputs.begin (), inputs.end ());
-  delete lexer; 
-  delete nest;
-}
 
 void
 ParserFile::load_nested (AttributeList& alist)
 {
-  impl.skip ();
-  impl.load_list (*impl.global_syntax_table, alist);
-  impl.skip ();
-  impl.eof ();
+  impl->skip ();
+  impl->load_list (impl->metalib.syntax (), alist);
+  impl->skip ();
+  impl->eof ();
 }
 
 void
@@ -1393,58 +1374,41 @@ ParserFile::load (AttributeList& alist)
   load_nested (alist);
   
   // Add inputs.
-  alist.add ("parser_inputs", impl.inputs);
-  sequence_delete (impl.inputs.begin (), impl.inputs.end ());
-  impl.inputs.erase (impl.inputs.begin (), impl.inputs.end ());
+  alist.add ("parser_inputs", impl->inputs);
+  sequence_delete (impl->inputs.begin (), impl->inputs.end ());
+  impl->inputs.erase (impl->inputs.begin (), impl->inputs.end ());
 
   // Remember filename.
-  vector<symbol> files;
+  std::vector<symbol> files;
   if (alist.check ("parser_files"))
     files = alist.identifier_sequence ("parser_files");
-  files.push_back (symbol (impl.file));
+  files.push_back (symbol (impl->file));
   alist.add ("parser_files", files);
 }
 
 int
 ParserFile::error_count () const
 {
- return impl.lexer->error_count; 
+ return impl->lexer->error_count; 
 }
-
-void
-ParserFile::initialize (Syntax& syntax, Treelog& out)
-{ impl.initialize (syntax, out); }
 
 bool
 ParserFile::check () const
-{ return impl.lexer->good (); }
+{ return impl->lexer->good (); }
 
-static Block& 
-get_block ()
-{
-  static Syntax syntax;
-  static AttributeList alist;
-  static std::auto_ptr<Block> block (NULL);
-  if (!block.get ())
-    {
-      alist.add ("type", "file");
-      block.reset (new Block (syntax, alist, Treelog::null (), "input file"));
-    }
-  return *block;
-}
-    
-ParserFile::ParserFile (Syntax& syntax, const string& name, Treelog& out)
-  : Parser (get_block ()),
-    impl (*new Implementation (name))
-{ initialize (syntax, out); }
+ParserFile::ParserFile (Metalib& metalib, 
+                        const std::string& name, Treelog& msg)
+  : Parser (symbol ("file")),
+    impl (new Implementation (metalib, name, msg))
+{ }
 
 ParserFile::ParserFile (Block& al)
   : Parser (al),
-    impl (*new Implementation (al.name ("where")))
+    impl (new Implementation (al.metalib (), al.name ("where"), al.msg ()))
 {  }
 
 ParserFile::~ParserFile ()
-{ delete &impl; }
+{ }
 
 static struct ParserFileSyntax
 {

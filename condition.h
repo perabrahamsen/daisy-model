@@ -44,8 +44,11 @@ public:
   virtual void output (Log&) const = 0;
 
   // Create & Destroy.
+public:
+  static std::auto_ptr<Condition> create_true ();
 protected:
   Condition (Block& al);
+  Condition (const char* id);
 public:
   ~Condition ();
 };

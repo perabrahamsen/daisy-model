@@ -29,7 +29,7 @@ A subset of 3D space.";
 
 const char *const Volume::component = "volume";
 
-Volume*
+std::auto_ptr<Volume>
 Volume::build_obsolete (Block& al)
 {
   Volume *const vol = Librarian<Volume>::build_item (al, "volume");
@@ -46,11 +46,15 @@ Volume::build_obsolete (Block& al)
       if (to < 0)
         vol->limit_bottom (to);
     }
-  return vol;
+  return std::auto_ptr<Volume> (vol);
 }
 
 Volume::Volume (Block& al)
   : name (al.identifier ("type"))
+{ }
+
+Volume::Volume (const char *const id)
+  : name (id)
 { }
 
 Volume::~Volume ()

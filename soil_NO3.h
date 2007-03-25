@@ -36,7 +36,7 @@ private:
   SoilNO3 (const SoilNO3&);
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  SoilNO3 (const AttributeList&);
+  SoilNO3 (Block&);
 };
 
 #endif // SOIL_NO3_H

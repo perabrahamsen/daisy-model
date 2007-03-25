@@ -32,6 +32,7 @@ class AttributeList;
 class Syntax;
 class Treelog;
 class Library;
+class Metalib;
 
 class BuildBase 
 {
@@ -50,11 +51,8 @@ protected:
 
   // Build.
 protected:
-  static Model* build_cheat (const char* component,
-                             const AttributeList& parent, 
-                             const std::string& key);
   static Model* build_free (const char* component,
-                            Treelog&, const AttributeList&, 
+                            Metalib&, Treelog&, const AttributeList&, 
                             const std::string& scope_id);
   static Model* build_alist (const char* component,
                              Block& parent, const AttributeList&, 
@@ -91,18 +89,12 @@ class Librarian : private BuildBase
 {
   // Functions.
 public:
-  static T* build_free (Treelog& msg, const AttributeList& alist, 
+  static T* build_free (Metalib& metalib, Treelog& msg,
+                        const AttributeList& alist, 
 			const std::string& scope_id)
   { 
-    T* x = dynamic_cast<T*> (BuildBase::build_free (T::component, 
-                                                    msg, alist, scope_id)); 
-    non_null (x);
-    return x;
-  }
-  static T* build_cheat (const AttributeList& parent, const std::string& key)
-  { 
-    T* x = dynamic_cast<T*> (BuildBase::build_cheat (T::component,
-                                                     parent, key));
+    T* x = dynamic_cast<T*> (BuildBase::build_free (T::component, metalib, msg,
+                                                    alist, scope_id)); 
     non_null (x);
     return x;
   }

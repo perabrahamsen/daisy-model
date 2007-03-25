@@ -24,7 +24,9 @@
 #include "alist.h"
 #include "mathlib.h"
 #include "plf.h"
+#ifdef COMPOUNDS
 #include "soil_chemical.h"
+#endif
 #include "check.h"
 
 static double
@@ -231,9 +233,11 @@ You must specify it with either 'canopy_dissipation_halftime' or\n\
 Fracxftion of the chemical that follows the water off the canopy.");
     syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
 		Syntax::Const, "Diffusion coefficient.");
+#ifdef COMPOUNDS
     syntax.add_submodule ("solute", alist, Syntax::Const,
 			  "Description of chemical in soil.",
 			  SoilChemical::load_syntax);
+#endif
     syntax.add ("decompose_rate", "h^-1", Check::fraction (),
 		Syntax::OptionalConst,
 		"How fast the solute is being decomposed in the soil.\n\

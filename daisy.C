@@ -132,8 +132,6 @@ Daisy::output (Log& log) const
 void
 Daisy::initialize (Block& block)
 { 
-  global_syntax = &block.syntax (); 
-  global_alist = &block.alist ();
   if (weather.get () && !weather->initialize (time, block.msg ()))
     return;
   field->initialize (block, *output_log, time, weather.get ());
@@ -146,8 +144,6 @@ Daisy::initialize (Block& block)
 bool
 Daisy::check (Treelog& msg)
 {
-  daisy_assert (global_syntax);
-  daisy_assert (global_alist);
   bool ok = true;
 
   if (!approximate (dt, 1.0))
@@ -188,8 +184,7 @@ Daisy::check (Treelog& msg)
 
 Daisy::Daisy (Block& al)
   : Program (al),
-    global_syntax (NULL),
-    global_alist (NULL),
+    metalib (al.metalib ()),
     running (false),
     output_log (new Output (al)),
     print_time (Librarian<Condition>::build_item (al, "print_time")),

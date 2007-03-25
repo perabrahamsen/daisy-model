@@ -168,6 +168,11 @@ Log::Log (Block& al)
     name (al.identifier ("type"))
 { }
 
+Log::Log (const char *const id)
+  : impl (new Implementation ()),
+    name (id)
+{ }
+
 void
 Log::summarize (Treelog&)
 { }

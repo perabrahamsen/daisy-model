@@ -26,6 +26,7 @@
 #include "log.h"
 #include "select.h"		// Need to be here to ensure proper
 #include "condition.h"		// initialization in derived classes.
+#include "memutils.h"
 #include <map>
 #include <vector>
 #include <stack>
@@ -41,7 +42,7 @@ struct LogSelect : public Log
   // Parameters.
   const std::string description;	// Description of log file.
   std::auto_ptr<Condition> condition;	// Should we print a log now?
-  std::vector<Select*> entries;
+  auto_vector<Select*> entries;
   std::auto_ptr<const Volume> volume;
 
   // State. 
@@ -103,9 +104,11 @@ struct LogSelect : public Log
 
   // Create and Destroy.
   bool check (const Border&, Treelog& err) const;
-  static void document_entries (Format& format, const AttributeList& alist);
+  static void document_entries (Format& format, Metalib&, Treelog&, 
+                                const AttributeList& alist);
   static void load_syntax (Syntax&, AttributeList&);
   LogSelect (Block& al);
+  LogSelect (const char* id);
   ~LogSelect ();
 };
 

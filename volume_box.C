@@ -249,9 +249,22 @@ struct VolumeBox : public Volume
       front (Librarian<Bound>::build_item (al, "front")),
       back (Librarian<Bound>::build_item (al, "back"))
   { }
+  VolumeBox (const char *const id)
+    : Volume (id),
+      bottom (new Bound ("none", Bound::none, -42.42e42)),
+      top (new Bound ("none", Bound::none, -42.42e42)),
+      left (new Bound ("none", Bound::none, -42.42e42)),
+      right (new Bound ("none", Bound::none, -42.42e42)),
+      front (new Bound ("none", Bound::none, -42.42e42)),
+      back (new Bound ("none", Bound::none, -42.42e42))
+  { }
   ~VolumeBox ()
   { }
 };
+
+std::auto_ptr<Volume> 
+Volume::build_none ()
+{ return std::auto_ptr<Volume> (new VolumeBox ("none")); }
 
 const VolumeBox::bounds_t 
 VolumeBox::bounds[] = {

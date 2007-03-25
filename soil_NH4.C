@@ -59,7 +59,7 @@ If unspecified, initial value will be 5 mg NH4/l (including adsorbed).");
   alist.add ("adsorption", linear);
 }
 
-SoilNH4::SoilNH4 (const AttributeList& al)
+SoilNH4::SoilNH4 (Block& al)
   : Solute (al)
 { }
 

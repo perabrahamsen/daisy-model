@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 
+class Metalib;
 class Block;
 class Syntax;
 class AttributeList;
@@ -38,7 +39,8 @@ class Library
 {
   // Types.
 public:
-  typedef void (*doc_fun) (Format&, const AttributeList& al);
+  typedef void (*doc_fun) (Format&, Metalib&, Treelog&, 
+                           const AttributeList& al);
 
   typedef Model& (*builder) (Block&);
 

@@ -211,9 +211,17 @@ LogSelect::LogSelect (Block& al)
       al.set_error ();
 }
 
+LogSelect::LogSelect (const char *const id)
+  : Log (id),
+    description ("Build in log select use."),
+    condition (Condition::create_true ()),
+    entries (std::vector<Select*> ()),
+    volume (Volume::build_none ())
+{ }
+
   
 LogSelect::~LogSelect ()
-{ sequence_delete (entries.begin (), entries.end ()); }
+{ }
 
 static bool check_alist (const AttributeList&, Treelog&)
 {
@@ -232,7 +240,9 @@ struct DocSelect : public LogSelect
 };
 
 void
-LogSelect::document_entries (Format& format, const AttributeList& alist)
+LogSelect::document_entries (Format& format, Metalib& metalib, 
+                             Treelog& msg,
+                             const AttributeList& alist)
 {
   Syntax syntax;
   AttributeList dummy_alist;
@@ -282,7 +292,7 @@ LogSelect::document_entries (Format& format, const AttributeList& alist)
       return;
     }
   // Complete log.
-  Block block (syntax, alist, Treelog::null (), "docselect");
+  Block block (metalib, msg, syntax, alist, "docselect");
   DocSelect select (block);
   daisy_assert (block.ok ());
 

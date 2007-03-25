@@ -59,6 +59,7 @@ public:
   static std::auto_ptr<Macro> create (double depth); // Defined in macro_std.C.
 protected:
   Macro (Block& al);
+  Macro (symbol id);
 public:
   ~Macro ();
 };

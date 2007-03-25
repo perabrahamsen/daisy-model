@@ -122,7 +122,7 @@ public:
   // Create and destroy.
 protected:
   static void load_syntax (Syntax&, AttributeList&);
-  Solute (const AttributeList& al);
+  Solute (Block& al);
 private:
   virtual void default_initialize (const Soil& soil, const SoilWater&);
 public:

@@ -40,6 +40,7 @@
 struct ProgramDocument : public Program
 {
   // Content.
+  Metalib& metalib;
   XRef xref;
   std::auto_ptr<Format> format;
   const bool print_parameterizations;
@@ -107,20 +108,20 @@ struct ProgramDocument : public Program
                              const Syntax& syntax,
                              const AttributeList& alist, bool& first, 
 			     const std::string& aref);
-  void print_model (symbol name, const Library& library);
+  void print_model (symbol name, const Library& library, Treelog&);
   void print_fixed (const std::string& name, 
 		    const Syntax& syntax,
 		    const AttributeList& alist);
-  void print_component (const Library& library);
+  void print_component (const Library& library, Treelog& msg);
 
   // Print it.
-  void print_document ();
+  void print_document (Treelog&);
 
   // Program.
-  bool run (Treelog&)
+  bool run (Treelog& msg)
   {
     format->initialize (std::cout);
-    print_document (); 
+    print_document (msg); 
     return true;
   }
 
@@ -131,6 +132,7 @@ struct ProgramDocument : public Program
   { return true; }
   ProgramDocument (Block& al)
     : Program (al),
+      metalib (al.metalib ()),
       format (Librarian<Format>::build_item (al, "format")),
       print_parameterizations (al.flag ("print_parameterizations"))
   { }
@@ -1053,7 +1055,8 @@ ProgramDocument::print_submodel_entry (const std::string& name, int level,
 
 
 void
-ProgramDocument::print_model (const symbol name, const Library& library)
+ProgramDocument::print_model (const symbol name, const Library& library,
+                              Treelog& msg)
 {
   
   const Syntax& syntax = library.syntax (name);
@@ -1089,7 +1092,7 @@ ProgramDocument::print_model (const symbol name, const Library& library)
       for (size_t i = 0; i < doc_funs.size ();i++)
 	{
 	  format->soft_linebreak ();
-	  doc_funs[i](*format, alist);
+	  doc_funs[i](*format, metalib, msg, alist);
 	}
       if (print_parameterizations)
 	{
@@ -1191,7 +1194,7 @@ public:
 };
 
 void
-ProgramDocument::print_component (const Library& library)
+ProgramDocument::print_component (const Library& library, Treelog& msg)
 {
 
   const symbol name = library.name ();
@@ -1213,14 +1216,14 @@ ProgramDocument::print_component (const Library& library)
   ModelCompare model_compare (library);
   sort (entries.begin (), entries.end (), model_compare);
   for (unsigned int i = 0; i < entries.size (); i++)
-    print_model (entries[i], library);
+    print_model (entries[i], library, msg);
 
   static const symbol Daisy_symbol ("Daisy");
   current_component = Daisy_symbol;
 }
 
 void
-ProgramDocument::print_document ()
+ProgramDocument::print_document (Treelog& msg)
 {
   Format::Document dummy (*format);
 
@@ -1229,7 +1232,7 @@ ProgramDocument::print_document ()
   Library::all (entries);
   sort (entries.begin (), entries.end (), symbol::alphabetical);
   for (unsigned int i = 0; i < entries.size (); i++)
-    print_component (Library::find (entries[i]));
+    print_component (Library::find (entries[i]), msg);
 
   // Fixed components.
   Format::Section d2 (*format, "chapter", "Fixed Components", "cha", "fixed");

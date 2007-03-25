@@ -33,12 +33,15 @@
 #include "vcheck.h"
 #include <sstream>
 
-using namespace std;
-
 struct MacroStandard : public Macro
 {
+  // Default values.
+  static const double defaut_pressure_initiate;
+  static const double default_pressure_end;
+  static const double default_pond_max;
+
   // Parameters.
-  const PLF distribution;		// Where they end [cm ->]
+  const PLF distribution;       // Where they end [cm ->]
   const double height_start;	// Height macropores start [cm]
   const double height_end;	// Height macropores end [cm]
   const double pressure_initiate; // Pressure needed to init pref.flow [cm]
@@ -46,17 +49,17 @@ struct MacroStandard : public Macro
   const double pond_max;	// Pond height before activating pref.flow [mm]
 
   // Simulation.
- void tick (const Geometry1D& geo,
-            const Soil& soil, unsigned int first, unsigned int last,
-	    Surface& surface,
-	    const vector<double>& h_ice,
-	    const vector<double>& h,
-	    const vector<double>& Theta,
-	    vector<double>& S_m,
-	    vector<double>& S_p,
-	    vector<double>& q_p, double dt, Treelog&);
+  void tick (const Geometry1D& geo,
+             const Soil& soil, unsigned int first, unsigned int last,
+             Surface& surface,
+             const std::vector<double>& h_ice,
+             const std::vector<double>& h,
+             const std::vector<double>& Theta,
+             std::vector<double>& S_m,
+             std::vector<double>& S_p,
+             std::vector<double>& q_p, double dt, Treelog&);
   void output (Log&) const
-    { }
+  { }
 
   // Create and Destroy.
   static bool check_alist (const AttributeList& al, Treelog& err);
@@ -73,22 +76,40 @@ struct MacroStandard : public Macro
       pressure_initiate (al.number ("pressure_initiate")),
       pressure_end (al.number ("pressure_end")),
       pond_max (al.number ("pond_max"))
-    { }
+  { }
+  MacroStandard (const PLF& dist)
+    : Macro (symbol ("Macro::create")),
+      distribution (dist),
+      height_start (distribution.x (distribution.size () - 1)),
+      height_end (distribution.x (0)),
+      pressure_initiate (defaut_pressure_initiate),
+      pressure_end (default_pressure_end),
+      pond_max (default_pond_max)
+  { }
   ~MacroStandard ()
-    { }
+  { }
 };
+
+const double
+MacroStandard::defaut_pressure_initiate = -3.0;
+
+const double
+MacroStandard::default_pressure_end = -30.0;
+
+const double
+MacroStandard::default_pond_max = 0.5;
 
 void 
 MacroStandard::tick (const Geometry1D& geo,
                      const Soil& soil, 
 		     const unsigned int first, const unsigned int last,
 		     Surface& surface,
-		     const vector<double>& h_ice,
-		     const vector<double>& h,
-		     const vector<double>& Theta,
-		     vector<double>& S_m,
-		     vector<double>& S_p,
-		     vector<double>& q_p,
+		     const std::vector<double>& h_ice,
+		     const std::vector<double>& h,
+		     const std::vector<double>& Theta,
+		     std::vector<double>& S_m,
+		     std::vector<double>& S_p,
+		     std::vector<double>& q_p,
 		     const double dt, 
                      Treelog& msg)
 { 
@@ -107,12 +128,11 @@ MacroStandard::tick (const Geometry1D& geo,
   const double soil_end = geo.zplus (geo.cell_size () - 1);
 
   // Start and end of macro intervals.
-  const unsigned int from = max (double2int (geo.interval_plus 
-					     (height_start)) - 1,
-				 /* not unsigned, or -1 fails */
-				 double2int (first));
+  const unsigned int from 
+    = std::max (double2int (geo.interval_plus (height_start)) - 1,
+                /* not unsigned, or -1 fails */ double2int (first));
   const unsigned int to 
-    = min (geo.interval_plus (max (height_end, soil_end)), last);
+    = std::min (geo.interval_plus (std::max (height_end, soil_end)), last);
 
   // Check if macropores reach surface, and there is ponding there.
   double q_top = 0.0;
@@ -156,7 +176,7 @@ MacroStandard::tick (const Geometry1D& geo,
 	{
 	  // Find fraction ending in this layer.
 	  /* const */ double this_layer 
-	    = distribution (geo.zplus (i)) - distribution (previous_end);
+                        = distribution (geo.zplus (i)) - distribution (previous_end);
 	  const double rest
 	    = distribution (last_end) - distribution (previous_end);
 	  daisy_assert (rest > 0.0);
@@ -189,8 +209,8 @@ MacroStandard::tick (const Geometry1D& geo,
     {
       std::ostringstream tmp;
       tmp << __FILE__ << ":" <<  __LINE__
-	     << ": BUG: Total S_p = '" << (geo.total_surface (S_p) - q_top)
-	     << "' first pass";
+          << ": BUG: Total S_p = '" << (geo.total_surface (S_p) - q_top)
+          << "' first pass";
       msg.error (tmp.str ());
     }
 
@@ -246,7 +266,7 @@ MacroStandard::tick (const Geometry1D& geo,
 
 	      // Check that we got it right.
 	      daisy_assert (approximate (Theta[i] - (S_m[i] + S_p[i]) * dt,
-				   Theta_sat));
+                                         Theta_sat));
 	    }
 	}
 
@@ -360,28 +380,23 @@ where all macropores is assumed to start at the top.");
   syntax.add_check ("distribution", distcheck);
   syntax.add ("pressure_initiate", "cm", Syntax::Const, 
 	      "Pressure needed to init pref.flow");
-  alist.add ("pressure_initiate", -3.0);
+  alist.add ("pressure_initiate", defaut_pressure_initiate);
   syntax.add ("pressure_end", "cm", Syntax::Const, 
 	      "Pressure after pref.flow has been init");
-  alist.add ("pressure_end", -30.0);
-  syntax.add ("S_p", "h-1", Syntax::LogOnly,
+  alist.add ("pressure_end", default_pressure_end);
+  syntax.add ("S_p", "h^-1", Syntax::LogOnly,
 	      "Macropore sink term.");
   syntax.add ("pond_max", "mm", Check::non_negative (), Syntax::Const, "\
 Maximum height of ponding before spilling into macropores.\n\
 After macropores are activated pond will havethis height.");
-  alist.add ("pond_max", 0.5);
+  alist.add ("pond_max", default_pond_max);
 
 }
 
 std::auto_ptr<Macro> 
-Macro::create (double depth)
+Macro::create (const double depth)
 { 
   daisy_assert (depth < 0.0);
-
-  Syntax syntax;
-  AttributeList alist;
-  MacroStandard::load_syntax (syntax, alist);
-  alist.add ("type", "default");
 
   PLF distribution;
   distribution.add (depth, 1.0);
@@ -392,12 +407,8 @@ Macro::create (double depth)
   else
     distribution.add (depth * 0.99, 0.0);
   distribution.add (0.0, 0.0);
-  alist.add ("distribution", distribution);
 
-  daisy_assert (syntax.check (alist, Treelog::null ()));
-  Block block (syntax, alist, Treelog::null (), "macro");
-
-  return std::auto_ptr<Macro> (new MacroStandard (block)); 
+  return std::auto_ptr<Macro> (new MacroStandard (distribution)); 
 }
 
 

@@ -40,14 +40,14 @@ class Treelog;
 class Output;
 class Condition;
 class Timestep;
+class Metalib;
 
 class Daisy : public Program
 {
   // Initial content.
 public:
   static const char *const default_description;
-  const Syntax* global_syntax;
-  const AttributeList* global_alist;
+  Metalib& metalib;
 
   // Content.
   const std::string directory;  // Initialize, check and run here.
@@ -79,15 +79,15 @@ public:
   void output (Log&) const;
 
   // Create and Destroy.
+private:
+  Daisy ();
+  Daisy (const Daisy&);
 public:
   void initialize (Block&);
   bool check (Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
   explicit Daisy (Block&);
   ~Daisy ();
-private:
-  Daisy ();
-  Daisy (const Daisy&);
 };
 
 #endif // DAISY_H

@@ -22,6 +22,7 @@
 
 #include "solute.h"
 #include "log.h"
+#include "block.h"
 #include "syntax.h"
 #include "alist.h"
 #include "geometry.h"
@@ -190,10 +191,10 @@ Only for initialization of the 'M' parameter.");
 	      "Changes during tillage.");
 }
 
-Solute::Solute (const AttributeList& al)
+Solute::Solute (Block& al)
   : submodel (al.name ("submodel")),
     S_permanent (al.number_sequence ("S_permanent")),
-    adsorption (Librarian<Adsorption>::build_cheat (al, "adsorption"))
+    adsorption (Librarian<Adsorption>::build_item (al, "adsorption"))
 { }
 
 Solute::~Solute ()

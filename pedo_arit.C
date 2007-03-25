@@ -324,6 +324,7 @@ struct PedotransferOperands : public Pedotransfer
   // Create.
   static const struct Unique : public VCheck
   {
+#if 0
     void check (const Syntax& syn, const AttributeList& al,
                 const std::string&) const throw (std::string)
     {
@@ -362,6 +363,11 @@ struct PedotransferOperands : public Pedotransfer
           else
             found = &operands[i]->dimension ();
     }
+#else
+    void check (const Syntax&, const AttributeList&,
+                const std::string&) const throw (std::string)
+    { }
+#endif
   } unique;
 
   bool check_nested (const Soil& soil, Treelog& err) const

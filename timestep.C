@@ -79,8 +79,7 @@ Timestep::GenCheck::check (const Syntax& syntax,
   daisy_assert (!syntax.is_log (key));
   daisy_assert (syntax.size (key) == Syntax::Singleton);
 
-  Block block (alist.alist (key));
-  Timestep timestep (block);
+  Timestep timestep (alist.alist (key));
   check_dt (timestep.total_hours ());
 }
 
@@ -133,6 +132,14 @@ Timestep::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 Timestep::Timestep (Block& al)
+  : impl (new Implementation (al.integer ("years"), 
+                              al.integer ("days"),
+                              al.integer ("hours"),
+                              al.integer ("minutes"),
+                              al.integer ("seconds")))
+{ }
+
+Timestep::Timestep (const AttributeList& al)
   : impl (new Implementation (al.integer ("years"), 
                               al.integer ("days"),
                               al.integer ("hours"),

@@ -35,6 +35,7 @@ class Block
   struct Implementation;
   std::auto_ptr<Implementation> impl;
 public:
+  Metalib& metalib ();
   const AttributeList& alist () const;
   const Syntax& syntax () const;
   Treelog& msg () const;
@@ -81,15 +82,19 @@ private:
   Block (const Block&);
   Block& operator= (const Block&);
 public:
-  explicit Block (const Metalib&, Treelog& msg, const std::string& scope_id);
-  explicit Block (const Syntax&, const AttributeList&, Treelog& msg, 
+  // Toplevel.
+  explicit Block (Metalib&, Treelog& msg, const Syntax&, const AttributeList&,
  		  const std::string& scope_id);
+  // build_free
+  explicit Block (Metalib&, Treelog& msg, const std::string& scope_id);
+  // build_item
   explicit Block (Block&, const Syntax&, const AttributeList&, 
 		  const std::string& scope_tag);
-  explicit Block (Block&, const std::string&);
+  // build_vector
   explicit Block (Block&, const Syntax&, const AttributeList&, 
 		  const std::string& scope_tag, size_t index);
-  explicit Block (const AttributeList&);
+  // submodel
+  explicit Block (Block&, const std::string&);
   ~Block ();
 };
 

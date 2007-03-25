@@ -29,20 +29,20 @@
 #include "chemical.h"
 #include "chemicals.h"
 #include "log.h"
+
 #include "syntax.h"
+#include "block.h"
 #include "alist.h"
 #include "soil_chemical.h"
 #include "submodel.h"
 #include "memutils.h"
 #include <set>
 
-using namespace std;
-
 struct SoilChemicals::Implementation
 {
   // Content
   SoluteMap solutes;
-  typedef set<symbol> symbol_set;
+  typedef std::set<symbol> symbol_set;
   symbol_set all;
 
   // Utilities
@@ -72,11 +72,11 @@ struct SoilChemicals::Implementation
 
   // Create & Destroy
   void clear ();
-  void initialize (const vector<AttributeList*>,
+  void initialize (const std::vector<AttributeList*>,
 		   const Geometry& geo,
                    const Soil&, const SoilWater&, Treelog&);
   bool check (unsigned n, Treelog&) const;
-  Implementation (const vector<AttributeList*>&);
+  Implementation (const std::vector<AttributeList*>&);
   ~Implementation ();
 };
 
@@ -138,7 +138,7 @@ SoilChemicals::Implementation::tick (const Geometry& geo,
   // Allow 'flux_in' to create new solutes.
   add_missing (geo, soil, soil_water, flux_in, out);
 
-  // Crop Uptake.
+  // Crop uptake.
   for (SoluteMap::const_iterator i = solutes.begin ();
        i != solutes.end ();
        i++)
@@ -180,7 +180,7 @@ SoilChemicals::Implementation::mixture (const Geometry& geo,
       const double storage_amount = storage.amount (name); // [g/cm^2]
       const double storage_conc = storage_amount / pond;// [g/cm^2/mm]
       const double up_amount  // [g/cm^2/h]
-	= max (-storage_amount / dt, (soil_conc - storage_conc) / rate);
+	= std::max (-storage_amount / dt, (soil_conc - storage_conc) / rate);
       up.set_to (name, up_amount);
       storage.add (name, up_amount * dt);
     }
@@ -258,11 +258,12 @@ SoilChemicals::Implementation::clear ()
 }
 
 void 
-SoilChemicals::Implementation::initialize (const vector<AttributeList*> al,
-					   const Geometry& geo,
-                                           const Soil& soil, 
-					   const SoilWater& soil_water, 
-					   Treelog& out)
+SoilChemicals::Implementation::initialize
+/**/ (const std::vector<AttributeList*> al,
+      const Geometry& geo,
+      const Soil& soil, 
+      const SoilWater& soil_water, 
+      Treelog& out)
 {
   for (unsigned int i = 0; i < al.size (); i++)
     {
@@ -288,8 +289,8 @@ SoilChemicals::Implementation::check (unsigned n, Treelog& err) const
   return ok;
 }
 
-SoilChemicals::Implementation::Implementation (const
-					       vector<AttributeList*>& al)
+SoilChemicals::Implementation::Implementation
+/**/ (const std::vector<AttributeList*>& al)
 {
   for (unsigned int i = 0; i < al.size (); i++)
     {
@@ -379,10 +380,10 @@ SoilChemicals::load_syntax (Syntax& syntax, AttributeList& alist)
 			      SoilChemical::load_syntax);
   syntax.add ("solutes", entry_syntax, entry_alist, Syntax::State,
 	      Syntax::Sequence, "List of chemical solutes in the soil.");
-  alist.add ("solutes", vector<AttributeList*> ());
+  alist.add ("solutes", std::vector<AttributeList*> ());
 }
   
-SoilChemicals::SoilChemicals (const AttributeList& al)
+SoilChemicals::SoilChemicals (Block& al)
   : impl (*new Implementation (al.alist_sequence ("solutes")))
 { }
   

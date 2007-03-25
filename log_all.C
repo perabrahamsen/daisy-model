@@ -249,33 +249,12 @@ void
 LogAll::output_entry (symbol, const PLF&)
 { }
 
-Block& 
-LogAll::get_block ()
-{
-  static AttributeList alist;
-  static Syntax syntax;
-  if (!alist.check ("type"))
-    {
-      LogSelect::load_syntax (syntax, alist);
-      alist.add ("type", "all");
-      AttributeList when;
-
-
-      when.add ("type", "true");
-      alist.add ("when", when);
-      alist.add ("entries", vector<AttributeList*> ());
-      daisy_assert (syntax.check (alist, Treelog::null ()));
-    }
-  static Block block (syntax, alist, Treelog::null (), "log_all");
-  return block;
-}
-
 void
 LogAll::initialize (Treelog&)
 { }
 
 LogAll::LogAll (const vector<Log*>& logs)
-  : LogSelect (get_block ()),
+  : LogSelect ("LogAll"),
     msg (NULL)
 {
   // Combine entries.

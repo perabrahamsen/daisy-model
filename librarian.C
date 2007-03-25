@@ -81,7 +81,7 @@ BuildBase::Content::library (const char *const component) const
 BuildBase::Content* BuildBase::content = 0;  
 
 Model* 
-BuildBase::build_free (const char *const component,
+BuildBase::build_free (const char *const component, Metalib& metalib,
                        Treelog& msg, const AttributeList& alist, 
                        const std::string& scope_id)
 {
@@ -97,26 +97,16 @@ BuildBase::build_free (const char *const component,
       daisy_panic (tmp.str ());
     }
   const Syntax& syntax = lib.syntax (type);
-  Block block (syntax, alist, msg, scope_id + ": " + type.name ());
+  Block block (metalib, msg, syntax, alist, scope_id + ": " + type.name ());
   daisy_assert (syntax.check (alist, msg));
   try
-    {  
-      Model* result = lib.build_raw (type, block); 
-      daisy_assert (block.ok () && result);
-      return result;
-    }
+    { return lib.build_raw (type, block); }
   catch (const std::string& err)
     { block.error ("Build failed: " + err); }
   catch (const char *const err)
     { block.error ("Build failure: " + std::string (err)); }
   return NULL;
 }
-
-Model* 
-BuildBase::build_cheat (const char *const component,
-                        const AttributeList& parent, 
-                        const std::string& key)
-{ return build_free (component, Treelog::null (), parent.alist (key), key); }
 
 Model* 
 BuildBase::build_alist (const char *const component,

@@ -25,6 +25,7 @@
 
 #include "librarian.h"
 #include "bound.h" // Needed for static initialization order.
+#include <memory>
 
 class Border;
 class Treelog;
@@ -59,9 +60,11 @@ public:
 
   // Create and Destroy.
 public:
-  static Volume* build_obsolete (Block&);
+  static std::auto_ptr<Volume> build_obsolete (Block&);
   static const AttributeList& infinite_box ();
+  static std::auto_ptr<Volume> build_none ();
   Volume (Block&);
+  Volume (const char* id);
   ~Volume ();
 };
 

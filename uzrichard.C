@@ -665,27 +665,16 @@ UZRichard::tick (Treelog& msg, const GeometryVert& geo,
 }
 
 void
-UZRichard::has_macropores (Block& block, bool has_them)
+UZRichard::has_macropores (Block&, bool has_them)
 { 
-  if (!K_average.get ())
-    {
-      if (has_them)
-	{
-	  static AttributeList geometric;
-	  if (!geometric.check ("type"))
-	    geometric.add ("type", "geometric");
-	  K_average.reset (Librarian<Average>
-                           ::build_alist (block, geometric, "has macro"));
-	}
-      else
-	{
-	  static AttributeList arithmetic;
-	  if (!arithmetic.check ("type"))
-	    arithmetic.add ("type", "arithmetic");
-	  K_average.reset (Librarian<Average>
-                           ::build_alist (block, arithmetic, "no macro"));
-	}
-    }
+  if (K_average.get ())
+    return;
+
+  if (has_them)
+    K_average = Average::build_geometric ();
+  else
+    K_average = Average::build_arithmetic ();
+
   daisy_assert (K_average.get ());
 }
 
@@ -764,3 +753,5 @@ static struct UZRichardSyntax
       Librarian<UZmodel>::add_type ("richards", alist, syntax, &make);
     }
 } UZRichard_syntax;
+
+// uzrichards.C ends here.

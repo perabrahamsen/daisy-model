@@ -31,7 +31,9 @@
 #include "mathlib.h"
 #include "submodel.h"
 #include "chemicals.h"
+#ifdef COMPOUNDS
 #include "soil_chemicals.h"
+#endif
 #include "plf.h"
 #include "ridge.h"
 #include <sstream>
@@ -227,6 +229,7 @@ Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */,
     im_flux.clear ();
 }
 
+#ifdef COMPOUNDS
 void
 Surface::Implementation::mixture (const Geometry& geo,
                                   const SoilChemicals& soil_chemicals,
@@ -235,11 +238,17 @@ Surface::Implementation::mixture (const Geometry& geo,
   if (chemicals_can_enter_soil)
     {
       chemicals_out.clear ();
-
       soil_chemicals.mixture (geo, chemicals_storage, chemicals_out,
 			      pond, R_mixing, dt);
     }
 }
+#else
+void
+Surface::Implementation::mixture (const Geometry&,
+                                  const SoilChemicals&,
+                                  const double)
+{ }
+#endif
 
 void
 Surface::Implementation::exfiltrate (const double water /* [mm] */, 

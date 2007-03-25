@@ -36,6 +36,10 @@ Macro::Macro (Block& al)
   : name (al.identifier ("type"))
 { }
 
+Macro::Macro (const symbol id)
+  : name (id)
+{ }
+
 Macro::~Macro ()
 { }
 

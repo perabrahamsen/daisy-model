@@ -21,6 +21,7 @@
 
 
 #include "action.h"
+#include "daisy.h"
 #include "block.h"
 #include "log.h"
 
@@ -29,20 +30,21 @@ struct ActionRepeat : public Action
   const AttributeList repeat;
   Action* action;
 
-  void tick (const Daisy& daisy, Treelog& out)
-  { action->tick (daisy, out); }
+  void tick (const Daisy& daisy, Treelog& msg)
+  { action->tick (daisy, msg); }
     
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, Treelog& msg)
   { 
-    if (action && action->done (daisy, out))
+    if (action && action->done (daisy, msg))
       {
 	delete action;
 	action = NULL;
       }
     if (action == NULL)
-      action = Librarian<Action>::build_free (out, repeat, "repeat");
+      action = Librarian<Action>::build_free (daisy.metalib, 
+                                              msg, repeat, "repeat");
     if (action != NULL)         // Build free may fail.
-      action->doIt (daisy, out);
+      action->doIt (daisy, msg);
   }
 
   bool done (const Daisy&, Treelog&) const

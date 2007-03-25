@@ -85,6 +85,12 @@ Bound::Bound (Block& al, const type_t type, const double value)
     value_ (value)
 { }
 
+Bound::Bound (const char *const id, const type_t type, const double value)
+  : name (id),
+    type_ (type),
+    value_ (value)
+{ }
+
 Bound::~Bound ()
 { }
 

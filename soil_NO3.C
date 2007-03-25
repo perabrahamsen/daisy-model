@@ -55,7 +55,7 @@ If unspecified, initial value will be 50 mg NO3/l.");
   alist.add ("adsorption", none);
 }
 
-SoilNO3::SoilNO3 (const AttributeList& al)
+SoilNO3::SoilNO3 (Block& al)
   : Solute (al)
 { }
 

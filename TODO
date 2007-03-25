@@ -1,22 +1,27 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Genskab kemi
+
+CropStandard: List af kemikalier
+
+Både jord og overflade
+
+Kemikalier skal vælges på forhånd
+
+spray skal kun tage navn på kemikalie.
+
+* Metalib
+
+** Slip af med flere build_alist og build_free
+
+** omdøb Syntax::add til Syntax::add_object
+
+** Slip af med Librarian<T>::library (), brug T::component i stedet
+
+*** Syntax skal kun gemme Model::component, ikke Library.
+
+
 * OpenMI
-
-** Parlib skal være en Toplevel attribut!
-
-*** Librarian<Model>::build  skal have en block for at finde et parlib.
-
-**** Get rid of build_free
-
-=> Initialize skal have en block
-
-**** Slip af med andre tvivlsomme build varianter
-
-**** Er alle typer af "block" ok?
-
-** Parlib skal indeholde global syntax og alist
-
-Block (parlib, "scope_id");
 
 ** Installer C# på x40
 

@@ -37,6 +37,10 @@ Average::Average (Block& al)
   : name (al.identifier ("type"))
 { }
 
+Average::Average (const char *const id)
+  : name (id)
+{ }
+
 Average::~Average ()
 { }
 
@@ -50,6 +54,9 @@ struct AverageArithmetic : public Average
   // Create and Destroy.
   AverageArithmetic (Block& al)
     : Average (al)
+  { }
+  AverageArithmetic (const char *const id)
+    : Average (id)
   { }
   ~AverageArithmetic ()
   { }
@@ -83,6 +90,10 @@ Average::arithmetic_model ()
     }
   return alist;
 }
+
+std::auto_ptr<const Average>
+Average::build_arithmetic ()
+{ return std::auto_ptr<const Average> (new AverageArithmetic (__FUNCTION__)); }
 
 // harmonic model.
 
@@ -123,6 +134,9 @@ struct AverageGeometric : public Average
   AverageGeometric (Block& al)
     : Average (al)
   { }
+  AverageGeometric (const char *const id)
+    : Average (id)
+  { }
   ~AverageGeometric ()
   { }
 };
@@ -139,5 +153,9 @@ static struct AverageGeometricSyntax
     Librarian<Average>::add_type ("geometric", alist, syntax, &make);
   }
 } AverageGeometric_syntax;
+
+std::auto_ptr<const Average>
+Average::build_geometric ()
+{ return std::auto_ptr<const Average> (new AverageGeometric (__FUNCTION__)); }
 
 // average.C ends here.

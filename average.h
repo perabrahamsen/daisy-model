@@ -24,6 +24,7 @@
 #define AVERAGE_H
 
 #include "librarian.h"
+#include <memory>
 
 class Average : public Model
 {
@@ -39,9 +40,12 @@ public:
 
   // Create and Destroy.
 public:
+  static std::auto_ptr<const Average> build_arithmetic ();
+  static std::auto_ptr<const Average> build_geometric ();
   static const AttributeList& arithmetic_model ();
 protected:
   Average (Block& al);
+  Average (const char*);
 public:
   ~Average ();
 };
