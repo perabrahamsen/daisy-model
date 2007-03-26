@@ -242,17 +242,21 @@ SoilWater::MaxExfiltration (const Geometry& geo,
 {
   const size_t edge_size = geo.edge_size ();
   
+  double total_area = 0.0;
   double sum = 0.0;
 
   for (size_t e = 0; e < edge_size; e++)
     if (geo.edge_to (e) == Geometry::cell_above)
       {
         const size_t n = geo.edge_from (e);
+        const double area = geo.edge_area (e);
+        total_area += area;
         sum += (soil.K (n, h (n), h_ice (n), T) / soil.Cw2 (n, h (n))) 
           * ((Theta (n) - soil.Theta_res (n)) / geo.z (n))
-          * geo.edge_area (e);
+          * area;
       }
-  return - sum / geo.surface_area ();
+  daisy_assert (approximate (total_area, geo.surface_area ()));
+  return - sum / total_area;
 }
 
 bool 

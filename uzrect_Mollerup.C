@@ -158,6 +158,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   ublas::vector<double> S_vol (cell_size); // sink term
   ublas::vector<double> T (cell_size); // temperature 
   ublas::vector<double> K (cell_size); // hydraulic conductivity
+  ublas::vector<double> Kold (cell_size); // old hydraulic conductivity
+  ublas::vector<double> Ksum (cell_size); // Hansen hydraulic conductivity
   ublas::vector<double> Kedge (edge_size); // edge (inter cell) conductivity
   ublas::vector<double> h_lysimeter (cell_size);
   std::vector<bool> active_lysimeter (cell_size);
@@ -232,8 +234,12 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       ublas::vector<double> h_conv;
 
       for (size_t cell = 0; cell != cell_size ; ++cell)
-	active_lysimeter[cell] = h (cell) > h_lysimeter (cell);
-      
+        {
+          active_lysimeter[cell] = h (cell) > h_lysimeter (cell);
+          Kold [cell] = soil.K (cell, h (cell), h_ice (cell), T (cell));
+          Ksum [cell] = 0.0;
+        }
+
       std::vector<top_state> state (edge_above.size (), top_undecided);
 
       try {
@@ -242,17 +248,24 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  h_conv = h;
 	  iterations_used++;
 
-	  // Calculate conductivity
-	  for (size_t cell = 0; cell !=cell_size ; ++cell) 
-	    K (cell) =  soil.K (cell, h (cell), h_ice (cell), T (cell)); 
-	    
+	  // Calculate conductivity - The Hansen method
+	  for (size_t cell = 0; cell !=cell_size ; ++cell)
+            {  
+              Ksum[cell] += soil.K (cell, h (cell), h_ice (cell), T (cell));
+              K[cell] = (Ksum[cell] / iterations_used + Kold[cell]) / 2.0;
+	    }
+
 	  for (size_t e = 0; e < edge_size; e++)
 	    {
 	      if (geo.edge_is_internal (e))
 		{
 		  const int from = geo.edge_from (e);
 		  const int to = geo.edge_to (e);	   
+#if 0
 		  Kedge[e] = 2.0/(1.0/K[from] + 1.0/K[to]); 
+#else
+		  Kedge[e] = (K[from] + K[to]) / 2.0; 
+#endif
 		} 
 	    }
 	  
