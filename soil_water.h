@@ -126,7 +126,8 @@ public:
   // Communication with surface.
 public:
   double MaxExfiltration (const Geometry&, const Soil&, double T) const;
-  
+  double infiltration (const Geometry&) const; // [mm/h]
+
   // Creation.
 public:
   static void load_syntax (Syntax&, AttributeList&);

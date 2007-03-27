@@ -29,8 +29,6 @@ class SoilWater;
 class Soil;
 class Geometry;
 class Geometry1D;
-class Chemicals;
-class SoilChemicals;
 class Treelog;
 
 class Surface
@@ -50,7 +48,8 @@ public:
 
   // Column.
   const IM& matter_flux ();
-  const Chemicals&  chemicals_down () const;
+  double runoff_rate (double dt) const; // [h^-1]
+  double mixing_resistance () const; // [h/mm]
 
   // Ridge.
   void update_water (const Geometry1D& geo,
@@ -61,7 +60,6 @@ public:
 
   // Manager.
   void fertilize (const IM& /* [g/cm^2] */);
-  void spray (const Chemicals& chemicals_in);
   void set_detention_capacity (double);
   void ridge (const Geometry1D& geo,
               const Soil& soil, const SoilWater& soil_water,
@@ -69,9 +67,8 @@ public:
   void unridge ();
 
   // Simulation.
-  void mixture (const IM& soil_im /* [g/cm^2/mm] */, double dt);
-  void mixture (const Geometry& geo,
-                const SoilChemicals& soil_chemicals, double dt);
+  void mixture (const IM& soil_im /* [g/cm^2/mm] */, 
+                double dt);
   void output (Log&) const;
   void tick (Treelog&, double PotSoilEvaporation, double flux_in /* [mm/h] */,
              double temp /* [dg C] */, const Geometry& geo,

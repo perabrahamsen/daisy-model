@@ -117,7 +117,6 @@ public:
   void emerge ();
   const Harvest& harvest (symbol column_name, const Time&,
 			  const Geometry& geo, 
-			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
 			  bool kill_off,
@@ -1847,7 +1846,6 @@ CropSold::tick (const Time& time, const double,
 const Harvest&
 CropSold::harvest (const symbol column_name,
 		   const Time& time, const Geometry& geo,
-		   Bioclimate&,
 		   double,
 		   double, double leaf_harvest, double sorg_harvest, 
 		   bool, std::vector<AM*>& residuals, 
@@ -1957,7 +1955,6 @@ CropSold::harvest (const symbol column_name,
 	}	  
       residuals.push_back (&am);
     }
-  Chemicals chemicals;
   double wsd = -1.0;
   double nsd = -1.0;
   return *new Harvest (column_name, time, name, 
@@ -1965,7 +1962,7 @@ CropSold::harvest (const symbol column_name,
 		       0.0, 0.0, 0.0,
 		       0.0, 0.0, 0.0,
 		       WSOrg * sorg_harvest, NSOrg * sorg_harvest, 0.0,
-		       wsd, nsd, chemicals);
+		       wsd, nsd);
 }
 
 void

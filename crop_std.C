@@ -20,7 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "crop.h"
-#include "chemicals.h"
+#include "chemistry.h"
 #include "root_system.h"
 #include "canopy_std.h"
 #include "harvesting.h"
@@ -134,7 +134,6 @@ public:
   { development->DS = -1e-10; }
   const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&,
-			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
 			  bool kill_off,
@@ -457,7 +456,6 @@ const Harvest&
 CropStandard::harvest (const symbol column_name,
 		       const Time& time,
 		       const Geometry& geometry,
-		       Bioclimate& bioclimate,
 		       const double stub_length,
 		       const double stem_harvest_frac,
 		       const double leaf_harvest_frac,
@@ -476,9 +474,6 @@ CropStandard::harvest (const symbol column_name,
   // Update nitrogen content.
   nitrogen.content (development->DS, production, msg);
 
-  // Removed chemicals.
-  Chemicals chemicals;
-  
   // Leave stem and leaf below stub alone.
   double stem_harvest;
   double leaf_harvest;
@@ -490,7 +485,6 @@ CropStandard::harvest (const symbol column_name,
 	{
 	  const double stub_CAI = canopy.LAIvsH (stub_length);
 	  leaf_harvest = (1.0 - stub_CAI / canopy.CAI);
-	  bioclimate.harvest_chemicals (chemicals, canopy.CAI - stub_CAI);
 	}
       else 
 	leaf_harvest = 0.0;
@@ -505,7 +499,7 @@ CropStandard::harvest (const symbol column_name,
     = harvesting (column_name, name, 
 		  root_system->Density,
 		  time, geometry, production, development->DS,
-		  stem_harvest, leaf_harvest, chemicals,
+		  stem_harvest, leaf_harvest, 
 		  stem_harvest_frac, leaf_harvest_frac, sorg_harvest_frac,
 		  kill_off, residuals, residuals_DM,
 		  residuals_N_top, residuals_C_top, 

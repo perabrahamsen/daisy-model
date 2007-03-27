@@ -54,7 +54,6 @@ Harvesting::operator() (const symbol column_name,
 			double& DS,
 			const double stem_harvest,
 			const double leaf_harvest,
-			const Chemicals& chemicals,
 			const double stem_harvest_frac,
 			const double leaf_harvest_frac,
 			const double sorg_harvest_frac,
@@ -459,13 +458,13 @@ Harvesting::operator() (const symbol column_name,
                          0.0, 0.0, 0.0,
                          0.0, 0.0, 0.0,
                          0.0, 0.0, 0.0,
-                         wsd, nsd, chemicals);
+                         wsd, nsd);
   else
     return *new Harvest (column_name, time, crop_name,
                          Stem_W_Yield, Stem_N_Yield, Stem_C_Yield,
                          Dead_W_Yield, Dead_N_Yield, Dead_C_Yield,
                          Leaf_W_Yield, Leaf_N_Yield, Leaf_C_Yield,
-                         WEYRm, NEYRm, CEYRm, wsd, nsd, chemicals);
+                         WEYRm, NEYRm, CEYRm, wsd, nsd);
   
 }
 

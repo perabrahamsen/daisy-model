@@ -38,7 +38,6 @@ class Syntax;
 class SoilWater;
 class SoilHeat;
 class Log;
-class Chemicals;
 class Time;
 
 class Bioclimate : public Model
@@ -59,6 +58,8 @@ public:
   virtual void output (Log&) const = 0;
   virtual double get_intercepted_water () const = 0; // [mm]
   virtual double get_snow_storage () const = 0; // [mm]
+  virtual double snow_leak_rate (double dt) const = 0; // [h^-1]
+  virtual double canopy_leak_rate (double dt) const = 0; // [h^-1]
 
   // Canopy.
 public:
@@ -86,8 +87,6 @@ public:
   virtual void irrigate_surface (double flux) = 0;
   virtual void irrigate_subsoil (double flux) = 0;
   virtual void set_subsoil_irrigation (double flux) = 0;
-  virtual void spray (symbol chemical, double amount) = 0; // [g/m^2]
-  virtual void harvest_chemicals (Chemicals& chemicals, double LAI) = 0;
 		       
   // Communication with external model.
   virtual double get_evap_interception () const = 0; // [mm/h]

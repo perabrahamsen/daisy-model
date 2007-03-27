@@ -1,6 +1,15 @@
+2007-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction.h, reaction.C, reaction_std.C: Renamed from chemistry.
+	* chemistry.h, chemistry.C, chemistry_std.C: Now models.
+	* soil_chemical.h, soil_chemical.C: Merged into chemical.
+	* soil_chemicals.h, soil_chemicals.C: Merged into chemistry.
+	* chemicals.h, chemicals.C: Merged into chemistry.
+	* Makefile (COMPONENTS, MODELS): Updated.
+
 2007-03-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* metalib.C: New utility..
+	* metalib.C, metalib.h: New utility..
 	* Makefile (OTHER): Added it.
 
 2007-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>

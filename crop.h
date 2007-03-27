@@ -101,7 +101,6 @@ public:
   virtual void emerge () = 0;
   virtual const Harvest& harvest (symbol column_name,
 				  const Time&, const Geometry&, 
-				  Bioclimate& bioclimate,
 				  double stub_length,
 				  double stem_harvest,
 				  double leaf_harvest, 
@@ -115,7 +114,7 @@ public:
 				  std::vector<double>& residuals_C_soil,
                                   bool combine,
 				  Treelog&) = 0;
-  void kill (symbol, const Time&, const Geometry&, Bioclimate&,
+  void kill (symbol, const Time&, const Geometry&,
 	     std::vector<AM*>& residuals, 
 	     double& residuals_DM, 
 	     double& residuals_N_top, double& residuals_C_top,

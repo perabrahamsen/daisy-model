@@ -2,13 +2,15 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Genskab kemi
 
-CropStandard: List af kemikalier
+** Få den til at køre
 
-Både jord og overflade
+** Lav nye logs
 
-Kemikalier skal vælges på forhånd
+** Få dem til at virke
 
-spray skal kun tage navn på kemikalie.
+** Fjern chemicals fra "mixture".
+
+** Evt. gør NO3 og NH4 til chemicals. 
 
 * Metalib
 
@@ -19,7 +21,6 @@ spray skal kun tage navn på kemikalie.
 ** Slip af med Librarian<T>::library (), brug T::component i stedet
 
 *** Syntax skal kun gemme Model::component, ikke Library.
-
 
 * OpenMI
 

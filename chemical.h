@@ -2,6 +2,7 @@
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -24,33 +25,52 @@
 #define CHEMICAL_H
 
 #include "librarian.h"
+#include "solute.h"
+#include "alist.h"
 
-class Chemical : public Model
+class SoilHeat;
+class OrganicMatter;
+
+class Chemical : public Model, public Solute
 {
   // Content.
 public:
   const symbol name;
+  const AttributeList alist;
   static const char *const description;
   static const char *const component;
 
-  // Queries.
+  // Management.
 public:
-  virtual double crop_uptake_reflection_factor () const	= 0; // [0-1]
-  virtual double canopy_dissipation_rate () const = 0; // [h^-1]
-  virtual double canopy_washoff_coefficient () const = 0; // [mm]
-  virtual double diffusion_coefficient () const = 0; // in free solu. [cm² / h]
-  virtual const AttributeList& solute_alist () const = 0;
-  virtual double decompose_rate () const = 0; // [h^-1]
-  virtual double decompose_heat_factor (double T) const = 0; // [dg C ->]
-  virtual double decompose_water_factor (double h) const = 0 ; // [cm ->]
-  virtual double decompose_CO2_factor (double CO2) const = 0; // [g C/cm^3 ->]
-  virtual double decompose_conc_factor (double conc) const = 0; // [g X/cm^3 H2O->]
-  virtual double decompose_depth_factor (double depth) const = 0; // [cm->]
-  virtual double decompose_lag_increment (double conc) const = 0; // [g X/cm^3 H2O->]
+  virtual void spray (double amount, double dt) = 0;
+  virtual void harvest (double removed, double surface, double dt) = 0;
+
+  // Simulation.
+public:
+  virtual void tick_top (double snow_leak_rate /* [h^-1] */,
+                         double cover /* [] */,
+                         double canopy_leak_rate /* [h^-1] */,
+                         double surface_runoff_rate /* [h^-1] */,
+                         double dt /* [h] */) = 0;
+  virtual void mixture (const Geometry& geo,
+                        const double pond /* [mm] */, 
+                        const double rate /* [h/mm] */,
+                        const double dt /* [h]*/) = 0;
+  virtual void infiltrate (const double rate, const double dt) = 0;
+  virtual double down () = 0;     // [g/m^2/h]
+  virtual void uptake (const Soil&, const SoilWater&, double dt) = 0;
+  virtual void decompose (const Geometry& geo,
+                          const Soil&, const SoilWater&, const SoilHeat&, 
+                          const OrganicMatter&, double dt) = 0;
+  virtual void output (Log&) const = 0;
 
   // Create and Destroy.
+private:
+  Chemical ();
+  explicit Chemical (const Chemical&);
+  Chemical& operator= (const Chemical&);
 protected:
-  Chemical (const AttributeList&);
+  explicit Chemical (Block&);
 public:
   ~Chemical ();
 };

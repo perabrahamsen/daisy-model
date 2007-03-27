@@ -35,8 +35,7 @@
 struct Chemicals::Implementation
 { 
   // Types.
-  typedef std::map<const Chemical*,
-                   double, std::less<const Chemical*>/**/> chemical_map;
+  typedef std::map<const Chemical*, double> chemical_map;
   typedef std::map<symbol, const Chemical*> chemistry_map;
   
   // Class variables.
@@ -126,7 +125,7 @@ Chemicals::Implementation::lookup (symbol name)
 #else
 const Chemical* 
 Chemicals::Implementation::lookup (symbol)
-{ return NULL; }
+{ daisy_notreached (); }
 #endif
 
 void 

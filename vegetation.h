@@ -95,7 +95,7 @@ public:
 				double day_fraction, double dt, Treelog&) = 0;
   virtual void force_production_stress  (double pstress) = 0;
   virtual void kill_all (symbol, const Time&, const Geometry&,
-			 Bioclimate&, std::vector<AM*>& residuals, 
+			 std::vector<AM*>& residuals, 
 			 double& residuals_DM,
 			 double& residuals_N_top, double& residuals_C_top,
 			 std::vector<double>& residuals_N_soil,
@@ -105,7 +105,6 @@ public:
   virtual void harvest (symbol column_name,
 			symbol crop_name,
 			const Time&, const Geometry&, 
-			Bioclimate& bioclimate,
 			double stub_length,
 			double stem_harvest,
 			double leaf_harvest, 

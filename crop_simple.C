@@ -46,7 +46,6 @@ using namespace std;
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
 
-// Chemical constants affecting the crop.
 class CropSimple : public Crop
 {
 public:
@@ -139,7 +138,6 @@ public:
   }
   const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&, 
-			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
 			  bool kill_off, vector<AM*>& residuals,
@@ -300,7 +298,6 @@ const Harvest&
 CropSimple::harvest (const symbol column_name,
 		     const Time& time,
 		     const Geometry& geo,
-		     Bioclimate& bioclimate,
 		     double /* stub_length */,
 		     double /* stem_harvest */,
 		     double /* leaf_harvest */,
@@ -338,11 +335,6 @@ CropSimple::harvest (const symbol column_name,
                        this_far * WRoot * 0.420 * m2_per_cm2);
     }
 
-  // Yield.
-  Chemicals chemicals;
-  if (canopy.CAI > 0.0)
-    bioclimate.harvest_chemicals (chemicals, canopy.CAI);
-  
   // Water and nitrogen stress.
   double wsd = -1.0;
   double nsd = -1.0;
@@ -352,7 +344,7 @@ CropSimple::harvest (const symbol column_name,
 		       0.0, 0.0, 0.0, 
 		       0.0, 0.0, 0.0, 
 		       0.0, N_actual - NRoot, 0.0,
-		       wsd, nsd, chemicals);
+		       wsd, nsd);
 }
 
 void

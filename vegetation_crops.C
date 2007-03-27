@@ -136,8 +136,8 @@ struct VegetationCrops : public Vegetation
 			const Soil& soil, SoilWater& soil_water, 
 			double day_fraction, double dt, Treelog&);
   void force_production_stress  (double pstress);
-  void kill_all (symbol, const Time&, const Geometry&, 
-		 Bioclimate&, std::vector<AM*>& residuals, 			 
+  void kill_all (symbol, const Time&, const Geometry&,
+                 std::vector<AM*>& residuals, 			 
 		 double& residuals_DM,
 		 double& residuals_N_top, double& residuals_C_top,
 		 std::vector<double>& residuals_N_soil,
@@ -145,7 +145,7 @@ struct VegetationCrops : public Vegetation
 		 Treelog&);
   void emerge (symbol crop_name, Treelog&);
   void harvest (symbol column_name, symbol crop_name,
-		const Time&, const Geometry&, Bioclimate&,
+		const Time&, const Geometry&,
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
 		std::vector<const Harvest*>& harvest, double& min_height,
@@ -488,9 +488,8 @@ VegetationCrops::force_production_stress (double pstress)
 
 void
 VegetationCrops::kill_all (symbol name, const Time& time, 
-
 			   const Geometry& geo, 
-			   Bioclimate& bioclimate, std::vector<AM*>& residuals,
+			   std::vector<AM*>& residuals,
 			   double& residuals_DM,
 			   double& residuals_N_top, double& residuals_C_top,
 			   std::vector<double>& residuals_N_soil,
@@ -501,7 +500,7 @@ VegetationCrops::kill_all (symbol name, const Time& time,
        crop != crops.end(); 
        crop++)
     {
-      (*crop)->kill (name, time, geo, bioclimate, residuals, 
+      (*crop)->kill (name, time, geo, residuals, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
 		     residuals_N_soil, residuals_C_soil, msg);
       delete *crop;
@@ -531,7 +530,6 @@ VegetationCrops::harvest (const symbol column_name,
 			  const symbol crop_name,
 			  const Time& time, 
 			  const Geometry& geo, 
-			  Bioclimate& bioclimate,
 			  double stub_length,
 			  double stem_harvest, double leaf_harvest, 
 			  double sorg_harvest, 
@@ -566,7 +564,6 @@ VegetationCrops::harvest (const symbol column_name,
 	const Harvest& mine = 
 	  (*crop)->harvest (column_name, time, 
 			    geo, 
-			    bioclimate,
 			    stub_length, stem_harvest,
 			    leaf_harvest, sorg_harvest, 
 			    root_fruit, residuals, 

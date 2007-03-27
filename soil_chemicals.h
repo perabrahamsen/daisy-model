@@ -23,6 +23,10 @@
 #ifndef SOIL_CHEMICALS_H
 #define SOIL_CHEMICALS_H
 
+#ifndef COMPOUNDS
+#error "don't use this file"
+#endif
+
 // These must be included in the header file, for 'load_syntax' to work.
 #include "soil_chemical.h"
 #include <map>

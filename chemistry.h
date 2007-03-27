@@ -1,6 +1,6 @@
-// chemistry.h --- Tranformation between soil chemicals.
+// chemistry.h --- Pesticides and other chemicals.
 // 
-// Copyright 2004 Per Abrahamsen and KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -24,37 +24,63 @@
 
 #include "librarian.h"
 
+#include "reaction.h"           // Needed for initialization order.
+#include "chemical.h"
+
 class Log;
 class Geometry;
 class Soil;
 class SoilWater;
-class SoilChemicals;
+class SoilHeat;
+class OrganicMatter;
+class Movement;
 
 class Chemistry : public Model
 {
   // Content.
 public:
+  const symbol name;
   static const char *const description;
   static const char *const component;
-  const symbol name;
-  const AttributeList& alist;
+
+  // Query.
+  virtual bool know (symbol chem) = 0;
+  virtual Chemical& find (symbol chem) = 0;
+
+  // Management.
+public:
+  virtual void spray (symbol chem, double amount, double dt) = 0;
+  virtual void harvest (double removed, double surface, double dt) = 0;
+  virtual void mix (const Geometry&, const Soil&, const SoilWater&, 
+                    double from, double to, double dt) = 0;
+  virtual void swap (const Geometry&, const Soil&, const SoilWater&,
+                     double from, double middle, double to, double dt) = 0;
 
   // Simulation.
 public:
-  virtual void tick (const Geometry& geo,
-                     const Soil&, const SoilWater&, 
-                     SoilChemicals&, const double dt, Treelog&) = 0;
+  virtual void tick_top (double snow_leak_rate /* [h^-1] */,
+                         double cover /* [] */,
+                         double canopy_leak_rate /* [h^-1] */,
+                         double surface_runoff_rate /* [h^-1] */,
+                         double dt /* [h] */) = 0;
+  virtual void tick_soil (const Geometry& geo, double ponding /* [mm] */,
+                          double R_mixing /* [h/mm] */,
+                          const Soil&, const SoilWater&, const SoilHeat&, 
+                          Movement&, const OrganicMatter&,
+                          double dt, Treelog&) = 0;
+  virtual void clear () = 0;
   virtual void output (Log&) const = 0;
 
-  // Create and Destroy.
+  // Create & Destroy.
 public:
-  virtual void initialize (Block&, const Soil&);
-  virtual bool check (const Soil&, Treelog& err) const;
-  static void load_syntax (Syntax&, AttributeList&);
+  static const AttributeList& default_model ();
+  virtual void initialize (Block&, const AttributeList&, const Geometry& geo,
+                           const Soil&, const SoilWater&) = 0;
+  virtual bool check (const Soil&, Treelog&) const = 0;
 protected:
-  Chemistry (Block& al);
+  explicit Chemistry (Block& al);
 public:
-  ~Chemistry ();
+  virtual ~Chemistry ();
 };
 
 static Librarian<Chemistry> Chemistry_init;

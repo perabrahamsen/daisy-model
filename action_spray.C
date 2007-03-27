@@ -36,7 +36,7 @@ struct ActionSpray : public Action
   void doIt (Daisy& daisy, Treelog& out)
     {
       out.message ("Spraying " + chemical);
-      daisy.field->spray (chemical, amount); 
+      daisy.field->spray (chemical, amount, daisy.dt); 
     }
 
   ActionSpray (Block& al)

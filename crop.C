@@ -1,7 +1,9 @@
  // crop.C
 
 #include "crop.h"
+#ifdef COMPOUNDS
 #include "chemicals.h"
+#endif
 #include "om.h"
 #include "block.h"
 #include "mathlib.h"
@@ -49,8 +51,7 @@ Crop::albedo () const
 
 void
 Crop::kill (const symbol name, const Time& time, const Geometry& geo,
-	    Bioclimate& bioclimate, std::vector<AM*>& residuals,
-	    double& residuals_DM,
+	    std::vector<AM*>& residuals, double& residuals_DM,
 	    double& residuals_N_top, double& residuals_C_top,
 	    std::vector<double>& residuals_N_soil, 
             std::vector<double>& residuals_C_soil,
@@ -59,7 +60,7 @@ Crop::kill (const symbol name, const Time& time, const Geometry& geo,
 #if defined (_MSC_VER)  
   const Harvest& dummy = // MS Visual C++ 2003 sucks.
 #endif 
-    harvest (name, time, geo, bioclimate,
+    harvest (name, time, geo, 
              0.0, 0.0, 0.0, 0.0, true, residuals, 
              residuals_DM, residuals_N_top, residuals_C_top, 
              residuals_N_soil, residuals_C_soil, false, out); 

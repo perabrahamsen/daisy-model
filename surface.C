@@ -30,10 +30,6 @@
 #include "im.h"
 #include "mathlib.h"
 #include "submodel.h"
-#include "chemicals.h"
-#ifdef COMPOUNDS
-#include "soil_chemicals.h"
-#endif
 #include "plf.h"
 #include "ridge.h"
 #include <sstream>
@@ -60,29 +56,24 @@ struct Surface::Implementation
   double DetentionCapacity;
   const double ReservoirConstant;
   double runoff;
+  double runoff_fraction;
   IM im_runoff;
   const double R_mixing;
-  Chemicals chemicals_storage;
-  Chemicals chemicals_out;
-  Chemicals chemicals_runoff;
-  const bool chemicals_can_enter_soil;
   Ridge* ridge_;
 
   // Functions.
   void ridge (const Geometry1D& geo,
               const Soil& soil, const SoilWater& soil_water,
 	      const AttributeList&);
-  void mixture (const IM& soil_im /* g/cm^2/mm */, double dt);
-  void mixture (const Geometry& geo,
-                const SoilChemicals& soil_chemicals, double dt);
+  void mixture (const IM& soil_im /* g/cm^2/mm */,
+                double dt);
   void exfiltrate (double water, double dt, Treelog&);
   double ponding () const;
   void tick (Treelog&, double PotSoilEvaporation, double water, double temp,
-	     const Geometry&, const Soil&, const SoilWater&, double T, 
-             double dt);
+	     const Geometry&, const Soil&, const SoilWater&,
+             double T, double dt);
   double albedo (const Geometry&, const Soil&, const SoilWater&) const;
   void fertilize (const IM& n);
-  void spray (const Chemicals& chemicals_in);
   void output (Log& log) const;
   double exfiltration () const; // [mm/h]
   
@@ -134,7 +125,7 @@ Surface::h_top (const Geometry& geo, size_t edge) const
 
 void
 Surface::accept_top (double water /* [cm] */,
-                     const Geometry& geo, size_t edge, 
+                     const Geometry& geo, size_t edge,
                      double dt, Treelog& msg)
 { 
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
@@ -200,16 +191,10 @@ Surface::unridge ()
 }
 
 void
-Surface::mixture (const IM& soil_im /* g/cm^2/mm */, const double dt)
+Surface::mixture (const IM& soil_im /* g/cm^2/mm */, 
+                  const double dt /* [h] */)
 {
   impl.mixture (soil_im, dt);
-}
-
-void
-Surface::mixture (const Geometry& geo,
-                  const SoilChemicals& soil_chemicals, const double dt)
-{
-  impl.mixture (geo, soil_chemicals, dt);
 }
 
 void
@@ -228,27 +213,6 @@ Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */,
   else
     im_flux.clear ();
 }
-
-#ifdef COMPOUNDS
-void
-Surface::Implementation::mixture (const Geometry& geo,
-                                  const SoilChemicals& soil_chemicals,
-                                  const double dt)
-{
-  if (chemicals_can_enter_soil)
-    {
-      chemicals_out.clear ();
-      soil_chemicals.mixture (geo, chemicals_storage, chemicals_out,
-			      pond, R_mixing, dt);
-    }
-}
-#else
-void
-Surface::Implementation::mixture (const Geometry&,
-                                  const SoilChemicals&,
-                                  const double)
-{ }
-#endif
 
 void
 Surface::Implementation::exfiltrate (const double water /* [mm] */, 
@@ -298,11 +262,6 @@ Surface::Implementation::exfiltrate (const double water /* [mm] */,
       delta_matter /= dt;
       im_flux -= delta_matter;
       im.clear ();
-      if (chemicals_can_enter_soil)
-        {
-          chemicals_out += chemicals_storage;
-          chemicals_storage.clear ();
-        }
     }
   else if (-water / dt > minimal_matter_flux)
     {
@@ -310,9 +269,6 @@ Surface::Implementation::exfiltrate (const double water /* [mm] */,
       im -= delta_matter;
       delta_matter /= dt;
       im_flux -= delta_matter;
-      if (chemicals_can_enter_soil)
-        Chemicals::move_fraction (chemicals_storage, chemicals_out,
-                                  -water / pond);
     }
   pond += water;
 }
@@ -334,9 +290,13 @@ const IM&
 Surface::matter_flux ()
 { return impl.im_flux; }
 
-const Chemicals& 
-Surface::chemicals_down () const
-{ return impl.chemicals_out; }
+double
+Surface::runoff_rate (const double dt) const
+{ return impl.runoff_fraction / dt; }
+
+double
+Surface::mixing_resistance () const
+{ return impl.R_mixing; }
 
 double
 Surface::temperature () const
@@ -365,17 +325,16 @@ Surface::Implementation::tick (Treelog& msg,
   if (pond > DetentionCapacity)
     {
       runoff = (pond - DetentionCapacity) * ReservoirConstant;
-      Chemicals::move_fraction (chemicals_storage, chemicals_runoff, 
-				runoff / pond);
+      runoff_fraction = runoff / pond;
       im_runoff = im * (runoff / pond);
-      pond -= runoff;
+      pond -= runoff * dt;
       im -= im_runoff;
     }
   else
     {
-      im_runoff.clear ();
-      chemicals_runoff.clear ();
       runoff = 0.0;
+      runoff_fraction = 0.0;
+      im_runoff.clear ();
     }
 
   const double MaxExfiltration
@@ -469,18 +428,8 @@ Surface::Implementation::fertilize (const IM& n)
 }
 
 void
-Surface::spray (const Chemicals& chemicals_in)
-{ impl.spray (chemicals_in); }
-
-void
 Surface::set_detention_capacity (const double height)
 { impl.DetentionCapacity = height; }
-
-void
-Surface::Implementation::spray (const Chemicals& chemicals_in)
-{
-  chemicals_storage += chemicals_in;
-}
 
 void
 Surface::output (Log& log) const
@@ -496,9 +445,6 @@ Surface::Implementation::output (Log& log) const
   output_variable (runoff, log);
   output_submodule (im, "IM", log);
   output_submodule (im_runoff, "IM_runoff", log);
-  output_submodule (chemicals_storage, "chemicals_storage", log);
-  output_submodule (chemicals_out, "chemicals_out", log);
-  output_submodule (chemicals_runoff, "chemicals_runoff", log);
   if (ridge_)
     output_submodule (*ridge_, "ridge", log);
 }
@@ -617,16 +563,6 @@ Inorganic nitrogen on the runoff water this hour [g/cm^2/h].",
   syntax.add ("R_mixing", "h/mm", Check::non_negative (), Syntax::Const, "\
 Resistance to mixing inorganic N between soil and ponding.");
   alist.add ("R_mixing", 1.0e9);
-  Chemicals::add_syntax  ("chemicals_storage", syntax, alist, Syntax::State,
-			  "Chemicals on the soil surface.");
-  Chemicals::add_syntax  ("chemicals_out", syntax, alist, Syntax::LogOnly,
-			  "Chemicals entering the soil.");
-  Chemicals::add_syntax  ("chemicals_runoff", syntax, alist, Syntax::LogOnly,
-			  "Chemicals in the runoff water this hour.");
-  syntax.add ("chemicals_can_enter_soil",
-	      Syntax::Boolean, Syntax::Const, "\
-If this is set to false, the chemicals will stay on the surface.");
-  alist.add ("chemicals_can_enter_soil", true);
   syntax.add_submodule ("ridge", alist, Syntax::OptionalState, "\
 Active ridge system, if any.",
 			Ridge::load_syntax);
@@ -655,12 +591,9 @@ Surface::Implementation::Implementation (const AttributeList& al)
     DetentionCapacity (al.number ("DetentionCapacity")),
     ReservoirConstant (al.number ("ReservoirConstant")),
     runoff (0.0),
+    runoff_fraction (0.0),
     im_runoff (),
     R_mixing (al.number ("R_mixing")),
-    chemicals_storage (al.alist_sequence ("chemicals_storage")),
-    chemicals_out (),
-    chemicals_runoff (),
-    chemicals_can_enter_soil (al.flag ("chemicals_can_enter_soil")),
     ridge_ (al.check ("ridge") ? new Ridge (al.alist ("ridge")) : NULL)
 {
   daisy_assert (iszero (im_flux.NO3));

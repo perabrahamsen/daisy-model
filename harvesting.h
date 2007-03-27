@@ -35,7 +35,6 @@ class Log;
 class Time;
 class Geometry;
 class Production;
-class Chemicals;
 class AM;
 class Harvest;
 
@@ -80,7 +79,6 @@ public:
 			     double& DS,
 			     const double stem_harvest,
 			     const double leaf_harvest,
-			     const Chemicals& chemicals,
 			     const double stem_harvest_frac,
 			     const double leaf_harvest_frac,
 			     const double sorg_harvest_frac,

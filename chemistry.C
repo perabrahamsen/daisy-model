@@ -1,6 +1,6 @@
-// chemistry.C --- Transformation between two soil chemicals.
+// chemistry.C --- Pesticedes and other chemicals.
 // 
-// Copyright 2002 Per Abrahamsen and KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -23,26 +23,15 @@
 #include "block.h"
 
 const char *const Chemistry::description = "\
-Generic transformations between soil chemicals.";
+Pesticides and other chemicals.";
 
 const char *const Chemistry::component = "chemistry";
 
-bool
-Chemistry::check (const Soil&, Treelog&) const
-{ return true; }
-
-void
-Chemistry::initialize (Block&, const Soil&)
-{ }
-
-void
-Chemistry::load_syntax (Syntax&, AttributeList&)
-{ }
-
 Chemistry::Chemistry (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : name (al.identifier ("type"))
 { }
 
 Chemistry::~Chemistry ()
 { }
+
+// chemistry.C ends here.

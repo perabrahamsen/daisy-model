@@ -1,7 +1,6 @@
-// chemical.C
+// reaction.C --- Transformation between two soil chemicals.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2002 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,21 +19,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "chemical.h"
+#include "reaction.h"
 #include "block.h"
 
-const char *const Chemical::description = "\
-This component should, for a specific chemical (typically a pesticide),\n\
-provide a description of the properties of interest to Daisy.";
+const char *const Reaction::description = "\
+Generic transformations between soil chemicals.";
 
-const char *const Chemical::component = "chemical";
+const char *const Reaction::component = "reaction";
 
-Chemical::Chemical (Block& al)
-  : Solute (al),
-    name (al.identifier ("type")),
+Reaction::Reaction (Block& al)
+  : name (al.identifier ("type")),
     alist (al.alist ())
 { }
 
-Chemical::~Chemical ()
+Reaction::~Reaction ()
 { }
-

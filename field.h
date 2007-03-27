@@ -85,7 +85,7 @@ public:
              const Time&, double dt, Treelog&);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]
-  void spray (symbol chemical, double amount); // [g/ha]
+  void spray (symbol chemical, double amount, double dt); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.

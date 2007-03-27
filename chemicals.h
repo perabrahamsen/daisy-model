@@ -19,11 +19,11 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#error "Fy fy nej nej skamme skamme, det må vi ikke!"
 
 #ifndef CHEMICALS_H
 #define CHEMICALS_H
 
-#include "symbol.h"
 #include "syntax.h"
 #include <vector>
 #include <set>

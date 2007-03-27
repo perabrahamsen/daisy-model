@@ -144,12 +144,12 @@ struct VegetationPermanent : public Vegetation
   { }
   void emerge (const symbol, Treelog&)
   { }
-  void kill_all (symbol, const Time&, const Geometry&, Bioclimate&,
+  void kill_all (symbol, const Time&, const Geometry&,
 		 vector<AM*>&, double&, double&, double&, 
 		 vector<double>&, vector<double>&, Treelog&)
   { }
   void harvest (symbol, symbol,
-		const Time&, const Geometry&, Bioclimate&,
+		const Time&, const Geometry&, 
 		double, double, double, double, 
 		vector<const Harvest*>&,
                 double&,

@@ -23,6 +23,10 @@
 #ifndef SOIL_CHEMICAL_H
 #define SOIL_CHEMICAL_H
 
+#ifndef COMPOUNDS
+#error "don't use this file"
+#endif
+
 #include "solute.h"
 #include "plf.h"
 #include <vector>

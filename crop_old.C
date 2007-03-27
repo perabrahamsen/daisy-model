@@ -114,7 +114,6 @@ public:
   void emerge ();
   const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&,
-			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest, 
 			  bool kill_off,
@@ -1848,7 +1847,6 @@ CropOld::tick (const Time& time, const double,
 const Harvest&
 CropOld::harvest (const symbol column_name,
 		  const Time& time, const Geometry& geo, 
-		  Bioclimate&,
 		  double stub_length,
 		  double stem_harvest, double, double sorg_harvest, 
 		  bool kill_off,
@@ -2003,7 +2001,6 @@ CropOld::harvest (const symbol column_name,
       << "\n\tRoot N = " << NRoot << " W = " << WRoot;
   out.message (tmp.str ());
 
-  Chemicals chemicals;
   double wsd = -1.0;
   double nsd = -1.0;
   return *new Harvest (column_name, time, name, 
@@ -2011,7 +2008,7 @@ CropOld::harvest (const symbol column_name,
 		       0.0, 0.0, 0.0,
 		       0.0, 0.0, 0.0,
 		       WSOrg * sorg_harvest, NSOrg * sorg_harvest, 0.0,
-                       wsd, nsd, chemicals);
+                       wsd, nsd);
 }
 
 void

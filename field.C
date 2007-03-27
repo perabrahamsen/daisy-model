@@ -70,7 +70,7 @@ struct Field::Implementation
              const Time&, double dt, Treelog&);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value);
-  void spray (symbol chemical, double amount); // [g/ha]
+  void spray (symbol chemical, double amount, double dt); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.
@@ -382,14 +382,15 @@ Field::Implementation::set_heat_source (double at, double value)
 }
 
 void 
-Field::Implementation::spray (symbol chemical, double amount) // [g/ha]
+Field::Implementation::spray (const symbol chemical, 
+                              const double amount, const double dt) // [g/ha]
 {
   if (selected)
-    selected->spray (chemical, amount);
+    selected->spray (chemical, amount, dt);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->spray (chemical, amount);
+    (*i)->spray (chemical, amount, dt);
 }
 
 void 
@@ -776,8 +777,9 @@ Field::set_heat_source (double at, double value)
 { impl.set_heat_source (at, value); }
 
 void 
-Field::spray (symbol chemical, double amount) // [g/ha]
-{ impl.spray (chemical, amount); }
+Field::spray (const symbol chemical, 
+              const double amount, const double dt) // [g/ha]
+{ impl.spray (chemical, amount, dt); }
 
 void 
 Field::set_surface_detention_capacity (double height) // [mm]

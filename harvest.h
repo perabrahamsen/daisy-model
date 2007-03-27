@@ -23,7 +23,6 @@
 #ifndef HARVEST_H
 #define HARVEST_H
 
-#include "chemicals.h"
 #include "time.h"
 #include "symbol.h"
 #include "block.h"
@@ -53,7 +52,6 @@ public:
   const double sorg_C;
   const double water_stress_days;
   const double nitrogen_stress_days;
-  const Chemicals chemicals;
   double total_N () const;
   double total_C () const;
   double total_DM () const;
@@ -69,8 +67,7 @@ public:
   Harvest (symbol col, Time t, symbol crp, 
 	   double sDM, double sN, double sC, double dDM, double dN, double dC,
 	   double lDM, double lN, double lC, double oDM, double oN, double oC,
-           double wsd, double nsd,
-	   const Chemicals& chem);
+           double wsd, double nsd);
 };      
 
 #endif // HARVEST_H

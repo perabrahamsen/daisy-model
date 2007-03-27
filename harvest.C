@@ -58,7 +58,6 @@ Harvest::output (Log& log) const
   output_variable (sorg_C, log);
   output_variable (water_stress_days, log);
   output_variable (nitrogen_stress_days, log);
-  output_submodule (chemicals, "chemicals", log);
 }
 
 void 
@@ -100,8 +99,6 @@ Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
               "Production days lost due to water stress.");
   syntax.add ("nitrogen_stress_days", "d", Syntax::State, 
               "Production days lost due to water stress.");
-  Chemicals::add_syntax  ("chemicals", syntax, alist, Syntax::State,
-			  "Chemicals in harvest.");
 }
 
 Harvest::Harvest (Block& alist)
@@ -121,8 +118,7 @@ Harvest::Harvest (Block& alist)
     sorg_N (alist.number ("sorg_N")),
     sorg_C (alist.number ("sorg_C")),
     water_stress_days (alist.number ("water_stress_days")),
-    nitrogen_stress_days (alist.number ("nitrogen_stress_days")),
-    chemicals (alist.alist_sequence ("chemicals"))
+    nitrogen_stress_days (alist.number ("nitrogen_stress_days"))
 { }
   
 
@@ -131,7 +127,7 @@ Harvest::Harvest (const symbol col, Time t, const symbol crp,
 		  double dDM, double dN, double dC,
 		  double lDM, double lN, double lC, 
 		  double oDM, double oN, double oC, 
-                  double wsd, double nsd, const Chemicals& chem)
+                  double wsd, double nsd)
   : column (col),
     time (t),
     crop (crp),
@@ -148,8 +144,7 @@ Harvest::Harvest (const symbol col, Time t, const symbol crp,
     sorg_N (oN),
     sorg_C (oC),
     water_stress_days (wsd),
-    nitrogen_stress_days (nsd),
-    chemicals (chem)
+    nitrogen_stress_days (nsd)
 { }
 
 static Submodel::Register 

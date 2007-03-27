@@ -20,17 +20,100 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "chemical.h"
+#include "organic_matter.h"
+#include "soil_heat.h"
+#include "soil_water.h"
+#include "soil.h"
+#include "geometry.h"
+#include "log.h"
 #include "block.h"
 #include "alist.h"
 #include "mathlib.h"
 #include "plf.h"
-#ifdef COMPOUNDS
-#include "soil_chemical.h"
-#endif
 #include "check.h"
 
-static double
-heat_turnover_factor (double T)
+struct ChemicalStandard : public Chemical
+{
+  // Parameters.
+  const double crop_uptake_reflection_factor;
+  const double canopy_dissipation_rate;
+  const double canopy_washoff_coefficient;
+  const double diffusion_coefficient_; 
+  const double decompose_rate;
+  const PLF decompose_heat_factor_;
+  const PLF decompose_water_factor_;
+  const PLF decompose_CO2_factor;
+  const PLF decompose_conc_factor;
+  const PLF decompose_depth_factor;
+  const PLF decompose_lag_increment;
+
+  // Management.
+  double spray_;
+  double harvest_;
+  double residuals;
+
+  // Surface state and log.
+  double snow_storage;
+  double snow_in;
+  double snow_out;
+  
+  double canopy_storage;
+  double canopy_in;
+  double canopy_dissipate;
+  double canopy_harvest;
+  double canopy_out;
+
+  double surface_storage;
+  double surface_in;
+  double surface_out;
+  double surface_mixture;
+  double surface_runoff;
+
+  // Soil state and log.
+  std::vector<double> decomposed;
+  std::vector<double> uptaken;
+  std::vector<double> lag;
+
+  // Utlities.
+  static double heat_turnover_factor (double T);
+  static double water_turnover_factor (double h);
+  double decompose_heat_factor (const double T) const;
+  double decompose_water_factor (const double h) const;
+
+  // Solute.
+  double diffusion_coefficient () const;
+
+  // Management.
+  void spray (const double amount, const double dt); // [g/m^2]
+  void harvest (const double removed, const double surface, const double dt);
+  
+  // Simulation.
+  void tick_top (const double snow_leak_rate, // [h^-1]
+                 const double cover, // [],
+                 const double canopy_leak_rate, // [h^-1]
+                 const double surface_runoff_rate, // [h^-1]
+                 const double dt); // [h]
+  void mixture (const Geometry& geo,
+                const double pond /* [mm] */, 
+                const double rate /* [h/mm] */,
+                const double dt /* [h]*/);
+  void infiltrate (const double rate, const double dt);
+  double down ();                 // [g/m^2/h]
+  void uptake (const Soil&, const SoilWater&, double dt);
+  void decompose (const Geometry& geo,
+                  const Soil&, const SoilWater&, const SoilHeat&, 
+                  const OrganicMatter&, double dt);
+  void output (Log&) const;
+
+  // Create.
+  void initialize (const AttributeList&, const Geometry&,
+                   const Soil&, const SoilWater&, Treelog&);
+  ChemicalStandard (Block&);
+};
+
+
+double
+ChemicalStandard::heat_turnover_factor (const double T)
 {
   if (T < 0.0)
     return 0.0;
@@ -48,8 +131,8 @@ heat_turnover_factor (double T)
   return 0.0;
 }
 
-static double
-water_turnover_factor (double h)
+double
+ChemicalStandard::water_turnover_factor (const double h)
 {
   if (h >= 0.0)
     return 0.6;
@@ -68,90 +151,276 @@ water_turnover_factor (double h)
   return 0;
 }
 
-class ChemicalStandard : public Chemical
+double
+ChemicalStandard::decompose_heat_factor (const double T) const
 {
-  // Parameters.
-private:
-  const double crop_uptake_reflection_factor_;
-  const double canopy_dissipation_rate_;
-  const double canopy_washoff_coefficient_;
-  const double diffusion_coefficient_; // [cm^2/h]
-  const AttributeList solute_alist_;
-  const double decompose_rate_;
-  const PLF decompose_heat_factor_;
-  const PLF decompose_water_factor_;
-  const PLF decompose_CO2_factor_;
-  const PLF decompose_conc_factor_;
-  const PLF decompose_depth_factor_;
-  const PLF decompose_lag_increment_;
+  if (decompose_heat_factor_.size () < 1)
+    return heat_turnover_factor (T);
+  else
+    return decompose_heat_factor_ (T);
+}
+double 
 
-  // Queries.
-public:
-  double crop_uptake_reflection_factor () const	// [0-1]
-    { return crop_uptake_reflection_factor_; }
-  double canopy_dissipation_rate () const	// [h^-1]
-    { return canopy_dissipation_rate_; }
-  double canopy_washoff_coefficient () const	// [mm]
-    { return canopy_washoff_coefficient_; }
-  double diffusion_coefficient () const	// [cm^2/h]
-    { return diffusion_coefficient_; }
-  const AttributeList& solute_alist () const
-    { 
-      return solute_alist_; 
-    }
-  double decompose_rate () const// [h^-1]
-    { return decompose_rate_; }
-  double decompose_heat_factor (double T) const
+ChemicalStandard::decompose_water_factor (const double h) const
+{
+  if (decompose_water_factor_.size () < 1)
+    return water_turnover_factor (h);
+  else
+    return decompose_water_factor_ (h);
+}
+
+double
+ChemicalStandard::diffusion_coefficient () const
+{ return diffusion_coefficient_; }
+
+void 
+ChemicalStandard::spray (const double amount, const double dt) // [g/m^2]
+{ spray_ += amount / dt; }
+
+void 
+ChemicalStandard::harvest (const double removed, const double surface,
+                           const double dt)
+{ 
+  const double new_storage 
+    = canopy_storage + (spray_ - harvest_ - residuals) * dt;
+  const double gone_rate = new_storage * removed / dt;
+  harvest_ += gone_rate * (1.0 - surface); 
+  residuals += gone_rate * surface;
+}
+
+void 
+ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
+                            const double cover, // [],
+                            const double canopy_leak_rate, // [h^-1]
+                            const double surface_runoff_rate, // [h^-1]
+                            const double dt) // [h]
+{
+  const double old_storage = snow_storage + canopy_storage;
+
+  // Snow pack
+  snow_in = spray_;
+  snow_storage += snow_in * dt;
+
+  snow_out = snow_storage * snow_leak_rate;
+  snow_storage -= snow_out * dt;
+
+  // Canopy.
+  canopy_in = snow_out * cover;
+  canopy_harvest = harvest_;
+  canopy_storage += (canopy_in - canopy_harvest - residuals) * dt;
+
+  const double old_canopy = canopy_storage;
+  const double washoff_rate 
+    = canopy_washoff_coefficient * canopy_leak_rate;
+  canopy_storage // Implicit solution: new = old - new * rate =>
+    = old_canopy / (1.0 + dt * (canopy_dissipation_rate + washoff_rate));
+  canopy_dissipate = canopy_dissipation_rate * canopy_storage;
+  canopy_out = canopy_storage * washoff_rate + residuals;
+  daisy_assert (approximate (canopy_storage - old_canopy, 
+                             - dt * (canopy_out + canopy_dissipate)));
+  if (canopy_storage < 1e-18)
     {
-      if (decompose_heat_factor_.size () < 1)
-	return heat_turnover_factor (T);
-      else
-	return decompose_heat_factor_ (T);
+      canopy_out += canopy_storage / dt;
+      canopy_storage = 0.0;
     }
-  double decompose_water_factor (double h) const
+
+  // Surface
+  surface_in = canopy_out + (snow_out - canopy_in);
+  surface_runoff = surface_storage * surface_runoff_rate; 
+  surface_storage += (surface_in - surface_runoff) * dt;
+      
+  // Reset manangement information.
+  spray_ = 0.0;
+  harvest_ = 0.0;
+  residuals = 0.0;
+
+  // Mass balance.
+  const double new_storage = snow_storage + canopy_storage;
+  const double input = snow_in;
+  const double output = surface_in + canopy_harvest + canopy_dissipate;
+  daisy_assert (approximate (new_storage - old_storage, 
+                             (input - output) * dt));
+}
+
+void 
+ChemicalStandard::mixture (const Geometry& geo,
+                           const double pond /* [mm] */, 
+                           const double rate /* [h/mm] */,
+                           const double dt /* [h]*/)
+{
+  // Make sure we have something to mix.
+  if (pond < 1e-6 || rate < 1e-99)
     {
-      if (decompose_water_factor_.size () < 1)
-	return water_turnover_factor (h);
-      else
-	return decompose_water_factor_ (h);
+      surface_mixture = 0.0;
+      return;
     }
-  double decompose_CO2_factor (double CO2) const
-    { return decompose_CO2_factor_ (CO2); }
-  double decompose_conc_factor (double conc) const
-    { return decompose_conc_factor_ (conc); }
-  double decompose_depth_factor (double depth) const
-    { return decompose_depth_factor_ (depth); }
-  double decompose_lag_increment (double conc) const
-    { return decompose_lag_increment_ (conc); }
 
-  // Create.
-public:
-  ChemicalStandard (Block&);
-};
+  // Mix them.
+  const double soil_conc
+    = geo.content_at (static_cast<const Solute&> (*this), &Solute::C, 0.0)
+    * (100.0 * 100.0) / 10.0; // [g/cm^3/] -> [g/m^2/mm]
+  const double storage_conc = surface_storage / pond;// [g/m^2/mm]
+  
+  surface_mixture // [g/m^2/h]
+    = std::min (surface_storage / dt, (storage_conc - soil_conc) / rate);
+  surface_storage -= surface_mixture * dt;
+}
 
+void 
+ChemicalStandard::infiltrate (const double rate, const double dt)
+{
+  surface_out = surface_storage * rate;
+  surface_storage -= surface_out * dt;
+}
+
+double
+ChemicalStandard::down ()                 // [g/m^2/h]
+{ return surface_out; }
+
+void 
+ChemicalStandard::uptake (const Soil& soil, 
+                          const SoilWater& soil_water,
+                          const double dt)
+{
+  daisy_assert (uptaken.size () == soil.size ());
+
+  const double rate = 1.0 - crop_uptake_reflection_factor;
+  
+  for (unsigned int i = 0; i < soil.size (); i++)
+    uptaken[i] = C (i) * soil_water.S_root (i) * rate;
+  
+  add_to_root_sink (uptaken, dt);
+}
+
+void 
+ChemicalStandard::decompose (const Geometry& geo,
+                             const Soil& soil, 
+                             const SoilWater& soil_water,
+                             const SoilHeat& soil_heat,
+                             const OrganicMatter& organic_matter,
+                             const double dt)
+{
+  daisy_assert (decomposed.size () == soil.size ());
+
+  unsigned int size = soil.size ();
+
+  // Update lag time.
+  bool found = false;
+  for (unsigned int i = 0; i < size; i++)
+    {
+      lag[i] += this->decompose_lag_increment (C_[i]) * dt;
+      
+      if (lag[i] >= 1.0)
+	{
+	  lag[i] = 1.0;
+	  found = true;
+	}
+      else if (lag[i] < 0.0)
+	{
+	  lag[i] = 0.0;
+	}
+    }
+
+  // No decomposition.
+  if (!found)
+    size = 0;
+
+  for (unsigned int i = 0; i < size; i++)
+    {
+      const double heat_factor 
+	= this->decompose_heat_factor (soil_heat.T (i));
+      const double water_factor 
+	= this->decompose_water_factor (soil_water.h (i));
+      const double CO2_factor 
+	= this->decompose_CO2_factor (organic_matter.CO2 (i));
+      const double conc_factor
+	= this->decompose_conc_factor (C_[i]);
+      const double depth_factor
+	= this->decompose_depth_factor (geo.z (i));
+      const double rate
+	= decompose_rate * heat_factor * water_factor * CO2_factor
+	* conc_factor * depth_factor;
+      decomposed[i] = M_left (i, dt) * rate;
+    }
+  for (unsigned int i = size; i < soil.size (); i++)
+    decomposed[i] = 0.0;
+
+  add_to_sink (decomposed, dt);
+}
+
+void
+ChemicalStandard::output (Log& log) const
+{
+  Solute::output (log);
+
+  // Surface.
+  output_variable (snow_storage, log);
+  output_variable (snow_in, log);
+  output_variable (snow_out, log);
+  output_variable (canopy_storage, log);
+  output_variable (canopy_in, log);
+  output_variable (canopy_dissipate, log);
+  output_variable (canopy_harvest, log);
+  output_variable (canopy_out, log);
+  output_variable (surface_storage, log);
+  output_variable (surface_in, log);
+  output_variable (surface_runoff, log);
+  output_variable (surface_mixture, log);
+  output_variable (surface_out, log);
+
+  // Soil.
+  output_variable (uptaken, log);
+  output_variable (decomposed, log);
+}
+
+void
+ChemicalStandard::initialize (const AttributeList& al,
+                              const Geometry& geo,
+                              const Soil& soil, const SoilWater& soil_water, 
+                              Treelog& out)
+{
+  Solute::initialize (al, geo, soil, soil_water, out);
+  uptaken.insert (uptaken.begin (), soil.size (), 0.0);
+  decomposed.insert (decomposed.begin (), soil.size (), 0.0);
+  lag.insert (lag.end (), soil.size () - lag.size (), 0.0);
+}
 
 ChemicalStandard::ChemicalStandard (Block& al)
-  : Chemical (al.alist ()),
-    crop_uptake_reflection_factor_ 
-  (al.number ("crop_uptake_reflection_factor")),
-    canopy_dissipation_rate_ 
-  (al.check ("canopy_dissipation_rate")
-   ? al.number ("canopy_dissipation_rate")
-   : (al.check ("canopy_dissipation_halftime")
-      ? halftime_to_rate (al.number ("canopy_dissipation_halftime"))
-      : al.number ("canopy_dissipation_rate_coefficient"))),
-    canopy_washoff_coefficient_ (al.number ("canopy_washoff_coefficient")),
+  : Chemical (al),
+    crop_uptake_reflection_factor 
+  /**/ (al.number ("crop_uptake_reflection_factor")),
+    canopy_dissipation_rate 
+  /**/ (al.check ("canopy_dissipation_rate")
+        ? al.number ("canopy_dissipation_rate")
+        : (al.check ("canopy_dissipation_halftime")
+           ? halftime_to_rate (al.number ("canopy_dissipation_halftime"))
+           : al.number ("canopy_dissipation_rate_coefficient"))),
+    canopy_washoff_coefficient (al.number ("canopy_washoff_coefficient")),
     diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
-    solute_alist_ (al.alist ("solute")),
-    decompose_rate_ (al.check ("decompose_rate")
-	     ? al.number ("decompose_rate")
-		     : halftime_to_rate (al.number ("decompose_halftime"))),
+    decompose_rate (al.check ("decompose_rate")
+                    ? al.number ("decompose_rate")
+                    : halftime_to_rate (al.number ("decompose_halftime"))),
     decompose_heat_factor_ (al.plf ("decompose_heat_factor")),
     decompose_water_factor_ (al.plf ("decompose_water_factor")),
-    decompose_CO2_factor_ (al.plf ("decompose_CO2_factor")),
-    decompose_conc_factor_ (al.plf ("decompose_conc_factor")),
-    decompose_depth_factor_ (al.plf ("decompose_depth_factor")),
-    decompose_lag_increment_ (al.plf ("decompose_lag_increment"))
+    decompose_CO2_factor (al.plf ("decompose_CO2_factor")),
+    decompose_conc_factor (al.plf ("decompose_conc_factor")),
+    decompose_depth_factor (al.plf ("decompose_depth_factor")),
+    decompose_lag_increment (al.plf ("decompose_lag_increment")),
+    spray_ (0.0),
+    harvest_ (0.0),
+    residuals (0.0),
+    snow_storage (al.number ("snow_storage")),
+    snow_in (0.0),
+    snow_out (0.0),
+    canopy_storage (al.number ("canopy_storage")),
+    canopy_in (0.0),
+    canopy_dissipate (0.0),
+    canopy_harvest (0.0),
+    canopy_out (0.0),
+    surface_in (0.0),
+    lag (al.check ("lag") 
+         ? al.number_sequence ("lag") 
+         : std::vector<double> ())
 { }
 
 static struct ChemicalStandardSyntax
@@ -209,10 +478,17 @@ You may not specify both 'decompose_rate' and 'decompose_halftime'");
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     syntax.add_check (check_alist);
+
+    syntax.add_submodule ("solute", alist, Syntax::Const,
+			  "Description of chemical in soil.",
+                          Solute::load_syntax);
+
     syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 		"Description of this parameterization."); 
     alist.add ("description", "\
 Read chemical properties as normal Daisy parameters.");
+
+    // Parameters.
     syntax.add_fraction ("crop_uptake_reflection_factor", Syntax::Const, "\
 How much of the chemical is reflected at crop uptake.");
     alist.add ("crop_uptake_reflection_factor", 1.0);
@@ -230,14 +506,9 @@ You must specify it with either 'canopy_dissipation_halftime' or\n\
 		Check::fraction (), Syntax::OptionalConst,
 		"Obsolete alias for 'canopy_dissipation_rate'.");
     syntax.add_fraction ("canopy_washoff_coefficient", Syntax::Const, "\
-Fracxftion of the chemical that follows the water off the canopy.");
+Fraction of the chemical that follows the water off the canopy.");
     syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
 		Syntax::Const, "Diffusion coefficient.");
-#ifdef COMPOUNDS
-    syntax.add_submodule ("solute", alist, Syntax::Const,
-			  "Description of chemical in soil.",
-			  SoilChemical::load_syntax);
-#endif
     syntax.add ("decompose_rate", "h^-1", Check::fraction (),
 		Syntax::OptionalConst,
 		"How fast the solute is being decomposed in the soil.\n\
@@ -274,6 +545,53 @@ You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
 concentration each hour.  When lag in any cell reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.");
     alist.add ("decompose_lag_increment", no_factor);
+    
+    // Surface variables.
+    syntax.add ("snow_storage", "g/m^2", Syntax::State, 
+                "Stored in the snow pack.");
+    alist.add ("snow_storage", 0.0);
+    syntax.add ("snow_in", "g/m^2/h", Syntax::LogOnly, 
+                "Entering snow pack..");
+    syntax.add ("snow_out", "g/m^2/h", Syntax::LogOnly, 
+                "Leaking from snow pack.");
+
+    syntax.add ("canopy_storage", "g/m^2", Syntax::State, 
+                "Stored on the canopy.");
+    alist.add ("canopy_storage", 0.0);
+    syntax.add ("canopy_in", "g/m^2/h", Syntax::LogOnly, 
+                "Entering canopy.");
+    syntax.add ("canopy_dissipate", "g/m^2/h", Syntax::LogOnly, 
+                "Dissipating from canopy.");
+    syntax.add ("canopy_out", "g/m^2/h", Syntax::LogOnly, 
+                "Falling through or off the canopy.");
+    syntax.add ("canopy_harvest", "g/m^2/h", Syntax::LogOnly, 
+                "Amount removed with crop harvest.");
+
+    syntax.add ("surface_storage", "g/m^2", Syntax::State, 
+                "Stored on the soil surface.");
+    alist.add ("canopy_storage", 0.0);
+    syntax.add ("surface_in", "g/m^2/h", Syntax::LogOnly, 
+                "Falling on the bare soil surface.");
+    syntax.add ("surface_runoff", "g/m^2/h", Syntax::LogOnly, 
+                "Removed through lateral movement on the soil.");
+    syntax.add ("surface_mixture", "g/m^2/h", Syntax::LogOnly, 
+                "Entering the soil through mixture with ponded water.");
+    syntax.add ("surface_out", "g/m^2/h", Syntax::LogOnly, 
+                "Entering the soil with water infiltration.");
+
+    // Soil solute.
+    syntax.add ("uptaken", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+                "Amount uptaken by crops in this time step.");
+    syntax.add ("decomposed", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+                "Amount decomposed in this time step.");
+    syntax.add ("lag", Syntax::None (), Syntax::OptionalState,
+                "This state variable grows with lag_increment (C) each hour.\n\
+When it reached 1.0, decomposition begins.");
+    // Use "none" adsorption by default.
+    AttributeList none;
+    none.add ("type", "none");
+    alist.add ("adsorption", none);
+
     Librarian<Chemical>::add_type ("default", alist, syntax, &make);
   }
 } ChemicalStandard_syntax;

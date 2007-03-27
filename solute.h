@@ -120,8 +120,9 @@ public:
 	      const std::vector<double>& v);
 
   // Create and destroy.
-protected:
+public:
   static void load_syntax (Syntax&, AttributeList&);
+protected:
   Solute (Block& al);
 private:
   virtual void default_initialize (const Soil& soil, const SoilWater&);

@@ -40,7 +40,6 @@
 #include "raddist.h"
 #include "svat.h"
 #include "vegetation.h"
-#include "chemicals.h"
 #include "time.h"
 #include "check.h"
 #include "fao.h"
@@ -128,23 +127,6 @@ struct BioclimateStandard : public Bioclimate
 			  SoilWater& soil_water, const SoilHeat&, 
                           double dt, Treelog&);
 
-  // Chemicals.
-  Chemicals spray_;
-
-  Chemicals snow_chemicals_storage;
-  Chemicals snow_chemicals_in;
-  Chemicals snow_chemicals_out;
-  
-  Chemicals canopy_chemicals_storage;
-  Chemicals canopy_chemicals_in;
-  Chemicals canopy_chemicals_dissipate;
-  Chemicals canopy_chemicals_out;
-
-  Chemicals surface_chemicals_in;
-
-  void ChemicalDistribution (Surface& surface, const Vegetation&, 
-                             const double dt);
-
   // Radiation.
   static double albedo (const Vegetation& crops, const Surface& surface, 
                         const Geometry&, const Soil&, const SoilWater&);
@@ -201,15 +183,7 @@ struct BioclimateStandard : public Bioclimate
   void irrigate_surface (double flux);
   void irrigate_subsoil (double flux);
   void set_subsoil_irrigation (double flux);
-  void spray (symbol chemical, double amount) // [g/m^2]
-  { spray_.add (chemical, amount); }
-  void harvest_chemicals (Chemicals& chemicals, double LAI)
-  { 
-    if (LAI_ > 0.0)
-      Chemicals::move_fraction (canopy_chemicals_storage, chemicals,
-                                LAI / LAI_);
-  }
-  
+
   // Communication with external model.
   double get_evap_interception () const // [mm/h]
   { return canopy_ea; }
@@ -219,6 +193,29 @@ struct BioclimateStandard : public Bioclimate
   { return litter_water_out; }
   double get_snow_storage () const // [mm]
   { return snow.storage (); }
+  double snow_leak_rate (const double dt) const
+  {
+    const double snow_new = snow.storage ();
+    if (snow_new < 1e-5)
+      return 1.0 / dt;
+    if (snow_water_out < 1e-8)
+      return 0.0;
+    const double snow_old = snow_new + snow_water_out * dt;
+    
+    return snow_water_out / snow_old;
+  }
+  double canopy_leak_rate (const double dt) const
+  {
+    if (canopy_water_storage < 1e-5)
+      return 1.0 / dt;
+    if (canopy_water_out < 1e-8)
+      return 0.0;
+    const double canopy_water_old
+      = canopy_water_storage + canopy_water_out * dt;
+    
+    return canopy_water_out / canopy_water_old;
+  }
+
   // Create.
   void initialize (Block&, const Weather&);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
@@ -411,36 +408,6 @@ As a last resort,  Makkink (makkink) will be used.");
   syntax.add ("LeafTemperature", "dg C", Syntax::LogOnly,
               "Actual leaf temperature.");
 
-  // Chemicals.
-  Chemicals::add_syntax  ("spray", syntax, alist, Syntax::LogOnly,
-                          "Chemicals sprayed on field this time step.");
-
-  Chemicals::add_syntax  ("snow_chemicals_storage", 
-                          syntax, alist, Syntax::State,
-                          "Chemicals stored in the snow pack.");
-  Chemicals::add_syntax  ("snow_chemicals_in",
-                          syntax, alist, Syntax::LogOnly,
-                          "Chemicals entering snow pack.");
-  Chemicals::add_syntax  ("snow_chemicals_out",
-                          syntax, alist, Syntax::LogOnly,
-                          "Chemicals leaking from snow pack.");
-
-  Chemicals::add_syntax  ("canopy_chemicals_storage", 
-                          syntax, alist, Syntax::State,
-                          "Chemicals stored on canopy.");
-  Chemicals::add_syntax  ("canopy_chemicals_in",
-                          syntax, alist, Syntax::LogOnly,
-                          "Chemicals entering canopy.");
-  Chemicals::add_syntax  ("canopy_chemicals_dissipate",
-                          syntax, alist, Syntax::LogOnly,
-                          "Chemicals dissipating from canopy.");
-  Chemicals::add_syntax  ("canopy_chemicals_out",
-                          syntax, alist, Syntax::LogOnly,
-                          "Chemicals falling through canopy.");
-
-  Chemicals::add_syntax  ("surface_chemicals_in",
-                          syntax, alist, Syntax::LogOnly,
-                          "Chemicals entering soil surface.");
   //Radiation
   syntax.add ("raddist", Librarian<Raddist>::library (), 
               "Radiation distribution model.");
@@ -529,17 +496,6 @@ BioclimateStandard::BioclimateStandard (Block& al)
     crop_ep (0.0),
     crop_ea (0.0),
     production_stress (-1.0),
-    spray_ (),
-    snow_chemicals_storage (al.alist_sequence ("snow_chemicals_storage")),
-    snow_chemicals_in (),
-    snow_chemicals_out (),
-
-    canopy_chemicals_storage (al.alist_sequence ("canopy_chemicals_storage")),
-    canopy_chemicals_in (),
-    canopy_chemicals_dissipate (),
-    canopy_chemicals_out (),
-
-    surface_chemicals_in (),
     raddist (Librarian<Raddist>::build_item (al, "raddist")),
     difrad (al.check ("difrad") 
          ? Librarian<Difrad>::build_item (al, "difrad")
@@ -941,9 +897,6 @@ BioclimateStandard::tick (const Time& time,
   WaterDistribution (time, surface, weather, vegetation, 
 		     movement, geo, soil, soil_water, soil_heat, dt, msg);
 
-  // Let the chemicals follow the water.
-  ChemicalDistribution (surface, vegetation, dt);
-
   // Calculate leaf temperature of canopy
   static const double rho_water = 1.0; // [kg/dm^3]
   const double AirTemperature = weather.hourly_air_temperature ();//[dg C]
@@ -966,45 +919,6 @@ BioclimateStandard::tick (const Time& time,
 
   LeafTemperature = SensibleHeatFlux * ra_e / (pa * cp) + AirTemperature;//[dg C]
 
-}
-void 
-BioclimateStandard::ChemicalDistribution (Surface& surface, 
-					  const Vegetation& vegetation,
-                                          double dt)
-{
-  const double cover = vegetation.cover ();
-
-  // Snow pack
-  snow_chemicals_in = spray_;
-  snow_chemicals_storage += snow_chemicals_in;
-  const double snow_water_storage = snow.storage ();
-  const double snow_chemicals_out_fraction
-    = (snow_water_storage > 0.01)
-    ? snow_water_out / (snow_water_out + snow_water_storage)
-    : 1.0;
-  snow_chemicals_out.clear ();
-  Chemicals::move_fraction (snow_chemicals_storage,
-			    snow_chemicals_out, 
-			    snow_chemicals_out_fraction);
-  
-  // Canopy
-  canopy_chemicals_in.clear ();
-  Chemicals::copy_fraction (snow_chemicals_out, canopy_chemicals_in, cover);
-  canopy_chemicals_storage.canopy_update (dt, canopy_chemicals_in, 
-					  canopy_water_storage,
-					  canopy_water_out,
-					  canopy_chemicals_dissipate,
-					  canopy_chemicals_out);
-  
-  // Surface
-  surface_chemicals_in.clear ();
-  Chemicals::copy_fraction (snow_chemicals_out, surface_chemicals_in, 
-			    1.0 - cover);
-  surface_chemicals_in += canopy_chemicals_out;
-  surface.spray (surface_chemicals_in);
-
-  // Reset spray.
-  spray_.clear ();
 }
 
 void 
@@ -1059,18 +973,6 @@ BioclimateStandard::output (Log& log) const
   output_variable (production_stress, log);
   output_variable (LeafTemperature, log);
 
-  // Note: We use snow_chemicals_in instead of spray, since the former
-  // is reset after each time step.
-  output_submodule (snow_chemicals_in, "spray", log);
-  output_submodule (snow_chemicals_storage, "snow_chemicals_storage", log);
-  output_submodule (snow_chemicals_in, "snow_chemicals_in", log);
-  output_submodule (snow_chemicals_out, "snow_chemicals_out", log);
-  output_submodule (canopy_chemicals_storage, "canopy_chemicals_storage", log);
-  output_submodule (canopy_chemicals_in, "canopy_chemicals_in", log);
-  output_submodule (canopy_chemicals_dissipate, "canopy_chemicals_dissipate",
-		    log);
-  output_submodule (canopy_chemicals_out, "canopy_chemicals_out", log);
-  output_submodule (surface_chemicals_in, "surface_chemicals_in", log);
   //radiation
   output_derived (raddist, "raddist", log);
   daisy_assert (difrad.get () != NULL);
