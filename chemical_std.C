@@ -479,10 +479,13 @@ You may not specify both 'decompose_rate' and 'decompose_halftime'");
     AttributeList& alist = *new AttributeList ();
     syntax.add_check (check_alist);
 
+#if 0
     syntax.add_submodule ("solute", alist, Syntax::Const,
 			  "Description of chemical in soil.",
                           Solute::load_syntax);
-
+#endif
+    Solute::load_syntax (syntax, alist);
+    
     syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 		"Description of this parameterization."); 
     alist.add ("description", "\
@@ -569,7 +572,7 @@ decomposition begins.  It can never be more than 1.0 or less than 0.0.");
 
     syntax.add ("surface_storage", "g/m^2", Syntax::State, 
                 "Stored on the soil surface.");
-    alist.add ("canopy_storage", 0.0);
+    alist.add ("surface_storage", 0.0);
     syntax.add ("surface_in", "g/m^2/h", Syntax::LogOnly, 
                 "Falling on the bare soil surface.");
     syntax.add ("surface_runoff", "g/m^2/h", Syntax::LogOnly, 

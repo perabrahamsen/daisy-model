@@ -12,6 +12,48 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.12
+
+** Reorganized pesticide handling
+
+*** Tracing changes
+
+In order for Daisy to track pesticides, they must now be explicitly
+listed in the new Chemistry parameter in the column.  For example, 
+
+  (defcolumn Andeby default
+    "The B.And farm, Andeby, 2002."
+    (Chemistry default 
+               (trace Ioxynil DDT)))
+
+will trace any Ioxynil and DDT sprayed on the field.  Earlier, this
+happened automatically.  You can still spray other pesticides on the
+field, they will just not be traced.
+
+*** Definition changes
+
+Parameters earlier placed in the 'solute' submodel is now placed
+directly under chemical.  For example, instead of
+
+  (defchemical DDT insecticide
+    (decompose_halftime 2000 [d])
+    (solute (adsorption linear (K_OC 2e6 [cm^3/g]))))
+
+use this
+
+  (defchemical DDT insecticide
+    (decompose_halftime 2000 [d])
+    (adsorption linear (K_OC 2e6 [cm^3/g])))
+
+The paramterizations found in 'chemistry.dai' have been updated.
+
+*** Loging changes
+
+The standard log files in log.dai have been updated, look there for
+inspiration for your own log files.
+
+** More work on 2D transport, and the C, C# and  OpenMI interfaces.
+
 * 4.11
 
 More work on 2D transport and Farquhar photosynthesis, as well as C DLL,

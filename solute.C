@@ -158,7 +158,7 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_check (check_alist);
   syntax.add ("adsorption", Librarian<Adsorption>::library (), 
 	      "Soil adsorption properties.");
-  Geometry::add_layer (syntax, Syntax::OptionalState, "C", Syntax::Fraction (),
+  Geometry::add_layer (syntax, Syntax::OptionalState, "C", "g/cm^3",
                        "Concentration in water.\n\
 This number does not include adsorped matter.");
   Geometry::add_layer (syntax, Syntax::OptionalState, "M", "g/cm^3", 
@@ -192,7 +192,7 @@ Only for initialization of the 'M' parameter.");
 }
 
 Solute::Solute (Block& al)
-  : submodel (al.name ("submodel")),
+  : submodel (al.check ("type") ? al.name ("type") : al.name ("submodel")),
     S_permanent (al.number_sequence ("S_permanent")),
     adsorption (Librarian<Adsorption>::build_item (al, "adsorption"))
 { }

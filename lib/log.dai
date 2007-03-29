@@ -1246,149 +1246,173 @@ Note that a negative delta content means that the amount increases."
   (declare chemical String
 	   "Name of chemical to log.  Use \"*\" to log all chemicals.")
   (chemical "*"))
-  
+
 (deflog "Surface Chemicals" chemical
   "Summary information about a specific chemical on the soil surface.
 Use like (\"Surface Chemicals\" (chemical Atrazine)) to log the 
 content of 'Atrazine' on the soil.  If you don't specify chemical, the 
 sum of all chemicals will be logged."
   (where "surface_chemicals.dlf")
+  (summary (balance (precision 3)
+                    (input snow_in)
+                    (output canopy_dissipate surface_runoff surface_out)
+                    (content snow_storage canopy_storage surface_storage)))
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (number (path column "${column}" Bioclimate "*" snow_chemicals_in "${chemical}"
-                         amount)
-                   (tag snow_chemicals_in)
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         snow_in)
                    (handle sum)
-                   (dimension "g/m^2/&"))
-           (number (path column "${column}" Bioclimate "*"
-                         snow_chemicals_storage "${chemical}" amount)
-                   (tag snow_chemicals_storage)
-                   (dimension "g/m^2"))
-           (number (path column "${column}" Bioclimate "*"
-                         snow_chemicals_out "${chemical}" amount)
-                   (tag snow_chemicals_out)
+                   (dimension "g/ha/&")
+                   (spec chemical default snow_in))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         snow_storage)
+                   (handle current)
+                   (dimension "g/ha")
+                   (spec chemical default snow_storage))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         snow_out)
                    (handle sum)
-                   (dimension "g/m^2/&"))
-           (number (path column "${column}" Bioclimate "*"
-                         canopy_chemicals_in "${chemical}" amount)
-                   (tag canopy_chemicals_in)
+                   (dimension "g/ha/&")
+                   (spec chemical default snow_out))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_in)
                    (handle sum)
-                   (dimension "g/m^2/&"))
-           (number (path column "${column}" Bioclimate "*"
-                         canopy_chemicals_storage "${chemical}" amount)
-                   (tag canopy_chemicals_storage)
-                   (dimension "g/m^2"))
-           (number (path column "${column}" Bioclimate "*"
-                         canopy_chemicals_dissipate "${chemical}" amount)
-                   (tag canopy_chemicals_dissipate)
+                   (dimension "g/ha/&")
+                   (spec chemical default canopy_in))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_storage)
+                   (handle current)
+                   (dimension "g/ha")
+                   (spec chemical default canopy_storage))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_dissipate)
                    (handle sum)
-                   (dimension "g/m^2/&"))
-           (number (path column "${column}" Bioclimate "*"
-                         canopy_chemicals_out "${chemical}" amount)
-                   (tag canopy_chemicals_out)
+                   (dimension "g/ha/&")
+                   (spec chemical default canopy_dissipate))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_out)
                    (handle sum)
-                   (dimension "g/m^2/&"))
-           (number (path column "${column}" Bioclimate "*"
-                         surface_chemicals_in "${chemical}" amount)
-                   (tag surface_chemicals_in)
+                   (dimension "g/ha/&")
+                   (spec chemical default canopy_out))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_in)
                    (handle sum)
-                   (dimension "g/m^2/&"))
-           (number (path column "${column}" Surface chemicals_storage "${chemical}" 
-                         amount)
-                   (tag surface_chemicals_storage)
-                   (dimension "g/m^2"))
-           (number (path column "${column}" Surface chemicals_out "${chemical}" amount)
-                   (tag surface_chemicals_out)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_in))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_storage)
+                   (handle current)
+                   (dimension "g/ha")
+                   (spec chemical default surface_storage))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_out)
                    (handle sum)
-                   (dimension "g/m^2/&"))
-           (number (path column "${column}" Surface chemicals_runoff "${chemical}" amount)
-                   (tag surface_chemicals_runoff)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_out))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_runoff)
                    (handle sum)
-                   (dimension "g/m^2/&"))))
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_runoff))))
 
 (deflog "Soil Chemicals" chemical
   "Summary information about chemicals in the soil."
   (where "soil_chemical.dlf")
+  (summary (balance (precision 3)
+                    (input "In" "External")
+                    (output "Leak-Matrix" "Leak-Macro" "Drain" 
+                            "Uptake" "Decompose")
+                    (content "Content")))
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (flux_top (path column "${column}" SoilChemicals solutes "${chemical}" 
-                           solute J)
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J)
                      (tag "In")
                      (handle sum)
+                     (negate true)
                      (dimension "g/ha/&")
-                     (factor -1e8))     ;g/cm^2 -> g/ha
-           (flux_bottom (path column "${column}" SoilChemicals solutes "${chemical}"
-                              solute J)
+                     (spec chemical default J))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J)
                         (tag "Leak-Matrix")
+                        (negate true)
                         (handle sum)
                         (dimension "g/ha/&")
-                        (factor -1e8))  ;g/cm^2 -> g/ha
-           (flux_bottom (path column "${column}" SoilChemicals solutes "${chemical}"
-                              solute J_p)
+                        (spec chemical default J))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_p)
                         (tag "Leak-Macro")
+                        (negate true)
                         (handle sum)
                         (dimension "g/ha/&")
-                        (factor -1e8))  ;g/cm^2 -> g/ha
-           (interval (path column "${column}" SoilChemicals solutes "${chemical}"
-                           solute S_drain)
+                        (spec chemical default J_p))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_drain)
                      (tag "Drain")
+                     (negate true)
                      (handle sum)
                      (dimension "g/ha/&")
-                     (factor -1e8))      ;g/cm^2 -> g/ha
-           (interval (path column "${column}" SoilChemicals solutes "${chemical}"
-                           solute S_external)
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_external)
                      (tag "External")
                      (handle sum)
                      (dimension "g/ha/&")
-                     (factor 1e8))      ;g/cm^2 -> g/ha
-           (interval (path column "${column}" SoilChemicals solutes "${chemical}"
-                           solute uptaken)
+                     (spec chemical default S_external))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" uptaken)
                      (tag "Uptake")
                      (handle sum)
                      (dimension "g/ha/&")
-                     (factor 1e8))      ;g/cm^2 -> g/ha
-           (interval (path column "${column}" SoilChemicals solutes "${chemical}"
-                           solute decomposed)
+                     (spec chemical default uptaken))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" decomposed)
                      (tag "Decompose")
                      (handle sum)
                      (dimension "g/ha/&")
-                     (factor 1e8))      ;g/cm^2 -> g/ha
-           (interval (path column "${column}" SoilChemicals solutes "${chemical}"
-                           solute M)
+                     (spec chemical default decomposed))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
                      (tag "Content")
                      (dimension "g/ha")
-                     (factor 1e8))))    ;g/cm^2 -> g/ha
+                     (spec chemical default M))))
 
 ;; We need two new log models.
 (deflog "Chemical Content" chemical
   "Amount of chemicals in each numeric soil layer."
   (where "chemical_content.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilChemicals solutes "${chemical}" solute M)
-                  (handle sum)
-                  (factor 1e12); g/cm^3 -> ug/m^3
-                  (dimension "ug/m^3"))))
+  (entries Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*"
+                        trace "${chemical}" M)
+                  (handle current)
+                  (dimension "ug/m^3")
+                  (spec chemical default M))))
 
 (deflog "Chemical Concentration" chemical
   "Concentration in water of chemicals in each numeric soil layer.  "
   (where "chemical_conc.dlf")
   (when hourly)
-  (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilChemicals solutes "${chemical}" solute C)
-                  (handle sum)
-                  (factor 1e12); g/cm^3 -> ng/l
-                  (dimension "ng/l"))))
+  (entries  Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace "${chemical}" C)
+                  (handle current)
+                  (dimension "ng/l")
+                  (spec chemical default C))))
 
-(deflog "Chemistry" chemical
+(deflog reaction column 
+  "A log table for a specific reaction."
+  (declare reaction String
+	   "Name of reaction to log.  Use \"*\" to log all reactions.")
+  (reaction "*"))
+
+(deflog "Chemistry" reaction
   (where "chemistry.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "${chemical}" S_AB)
+           (array (path column "${column}" Chemistry
+                        reaction "${reaction}" S_AB)
                   (handle sum)
-                  (dimension "g/ha/&")
-                  (factor 1e8))        ;g/cm^2 -> g/ha
-           ))
+                  (spec reaction default S_AB))))
 
 (deflog "Weather" column
   (where "weather.dlf")

@@ -49,7 +49,7 @@ public:
   // Create and Destroy.
 public:
   virtual void initialize (Block&, const Soil&) = 0;
-  virtual bool check (const Soil&, Treelog& err) const = 0;
+  virtual bool check (const Soil&, const Chemistry&, Treelog& err) const = 0;
 protected:
   Reaction (Block& al);
 public:

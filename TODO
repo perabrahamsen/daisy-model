@@ -1,17 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Genskab kemi
-
-** Få den til at køre
-
-** Lav nye logs
-
-** Få dem til at virke
-
-** Fjern chemicals fra "mixture".
-
-** Evt. gør NO3 og NH4 til chemicals. 
-
 * Metalib
 
 ** Slip af med flere build_alist og build_free
@@ -71,6 +59,8 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 ** Ny plone baseret web side!
 
 * Programmering
+
+** NO3 og NH4 til chemical parameteriseringer.
 
 ** Håndter domain errors i expr i select.
 

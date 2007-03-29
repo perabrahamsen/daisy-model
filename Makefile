@@ -1158,8 +1158,8 @@ chemistry_std${OBJ}: chemistry_std.C chemistry.h librarian.h model.h symbol.h \
   reaction.h alist.h chemical.h solute.h adsorption.h movement.h \
   uzmodel.h uz1d.h geometry_rect.h geometry_vert.h geometry.h syntax.h \
   treelog.h mathlib.h assertion.h soil.h horizon.h soil_water.h \
-  soil_heat.h macro.h transport.h mactrans.h block.h plf.h log.h border.h \
-  memutils.h
+  soil_heat.h macro.h transport.h mactrans.h block.h plf.h vcheck.h log.h \
+  border.h memutils.h
 groundwater_extern${OBJ}: groundwater_extern.C groundwater.h librarian.h \
   model.h symbol.h output.h condition.h memutils.h scopesel.h scope.h \
   number.h block.h syntax.h treelog.h plf.h alist.h units.h assertion.h

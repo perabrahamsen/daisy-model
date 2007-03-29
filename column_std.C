@@ -137,7 +137,7 @@ public:
              const Time&, double dt, Treelog&);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]
-  void spray (symbol chemical, double amount, double dt); // [g/ha]
+  void spray (symbol chemical, double amount, double dt, Treelog&); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.
@@ -510,8 +510,9 @@ ColumnStandard::set_heat_source (double at, double value) // [W/m^2]
 void 
 ColumnStandard::spray (const symbol chemical, 
                        const double amount /* [g/ha] */,
-                       const double dt)
-{ chemistry->spray (chemical, amount / (100.0 * 100.0 /* ha->m^2 */), dt); }
+                       const double dt, Treelog& msg)
+{ chemistry->spray (chemical, amount / (100.0 * 100.0 /* ha->m^2 */),
+                    dt, msg); }
 
 void 
 ColumnStandard::set_surface_detention_capacity (double height) // [mm]

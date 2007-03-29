@@ -438,6 +438,12 @@ Units::standard_conversions ()
   // Log.
   add ("cm", "mm", 10.0);
   add ("g/cm^2", "kg/ha", 1e5);	// Pesticides.
+  add ("g/cm^2", "g/ha", 1e5 * 1000);
+  add ("g/m^2", "g/ha", 10000.0);
+  add ("g/m^2/h", "g/ha/h", 10000.0);
+  add ("g/cm^3", "ug/m^3", 1e12); 
+  add ("g/cm^3", "ng/l", 1e12); 
+
   add ("g/cm^2", "kg N/ha", 1e5); // Inorganic N.
   add ("g N/cm^2/h", "kg N/ha/h", 1e5); 
   add ("g N/m^2", "kg N/ha", 10.0); // Crop N.

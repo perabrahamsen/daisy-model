@@ -44,12 +44,12 @@ public:
   static const char *const component;
 
   // Query.
-  virtual bool know (symbol chem) = 0;
+  virtual bool know (symbol chem) const = 0;
   virtual Chemical& find (symbol chem) = 0;
 
   // Management.
 public:
-  virtual void spray (symbol chem, double amount, double dt) = 0;
+  virtual void spray (symbol chem, double amount, double dt, Treelog&) = 0;
   virtual void harvest (double removed, double surface, double dt) = 0;
   virtual void mix (const Geometry&, const Soil&, const SoilWater&, 
                     double from, double to, double dt) = 0;

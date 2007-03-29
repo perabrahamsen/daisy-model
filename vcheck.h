@@ -73,6 +73,10 @@ public:
   static const VCheck& fraction ();
   class Enum;
 
+  // Sequence.
+public:
+  static const VCheck& unique ();
+
   // Logic.
 public:
   class All;

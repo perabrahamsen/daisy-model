@@ -53,8 +53,24 @@ struct ReactionStandard : public Reaction
   }
 
   // Create.
-  bool check (const Soil& soil, Treelog& msg) const
-  { return transform->check (soil, msg); }
+  bool check (const Soil& soil, const Chemistry& chemistry, Treelog& msg) const
+  { 
+    bool ok = true;
+    if (!chemistry.know (name_A))
+      {
+        msg.error ("'" + name_A.name () + "' not traced");
+        ok = false;
+      }
+    if (!chemistry.know (name_B))
+      {
+        msg.error ("'" + name_B.name () + "' not traced");
+        ok = false;
+      }
+    if (!transform->check (soil, msg))
+      ok = false;
+
+    return ok;
+  }
   void initialize (Block& block, const Soil& soil)
   { 
     transform->initialize (block, soil); 
