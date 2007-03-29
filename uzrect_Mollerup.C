@@ -624,96 +624,103 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
       switch (surface.top_type (geo, edge))
 	{
 	case Surface::forced_flux: 
-	  const double flux = -surface.q_top (geo, edge);
-          Neumann (edge, cell, area, in_sign, flux, dq, B);
+          {
+            const double flux = -surface.q_top (geo, edge);
+            Neumann (edge, cell, area, in_sign, flux, dq, B);
+          }
 	  break;
 	case Surface::forced_pressure:
-	  const double value = -K (cell) * geo.edge_area_per_length (edge);
-          const double pressure = surface.h_top (geo, edge);
-          Dirichlet (edge, cell, area, in_sign, sin_angle, K (cell), h (cell),
-                     value, pressure, dq, Dm_mat, Dm_vec, Gm);
+          {
+            const double value = -K (cell) * geo.edge_area_per_length (edge);
+            const double pressure = surface.h_top (geo, edge);
+            Dirichlet (edge, cell, area, in_sign, sin_angle, K (cell),
+                       h (cell), value, pressure, dq, Dm_mat, Dm_vec, Gm);
+          }
 	  break;
 	case Surface::limited_water:
-	  const double h_top = remaining_water (i);
+          {
+            const double h_top = remaining_water (i);
 
-          // We pretend that the surface is particlaly saturated.
-          const double K_sat = soil.K (cell, 0.0, 0.0, T (cell));
-          const double K_cell = K (cell);
+            // We pretend that the surface is particlaly saturated.
+            const double K_sat = soil.K (cell, 0.0, 0.0, T (cell));
+            const double K_cell = K (cell);
 
 #if 0
-          // Harmonic average of saturated top and dry cell.
-          const double K_edge = h_top <= 0
-            ? K_cell 
-            : 2.0/(1.0/K_sat + 1.0/K_cell);
+            // Harmonic average of saturated top and dry cell.
+            const double K_edge = h_top <= 0
+              ? K_cell 
+              : 2.0/(1.0/K_sat + 1.0/K_cell);
 #elif 0
-          const double K_edge = h_top <= 0 ? K_cell : (K_sat + K_cell) / 2.0;
+            const double K_edge = h_top <= 0 ? K_cell : (K_sat + K_cell) / 2.0;
 #else
-          const double K_edge = K_cell;
+            const double K_edge = K_cell;
 #endif
 
-	  const double dz = geo.edge_length (edge);
-	  daisy_assert (approximate (dz, -geo.z (cell)));
-	  double q_in_avail = h_top / ddt;
-	  const double q_in_pot = K_edge * (h_top - h (cell) + dz) / dz;
-	  // Decide type.
-	  bool is_flux = h_top <= 0.0 || q_in_pot > q_in_avail;
+            const double dz = geo.edge_length (edge);
+            daisy_assert (approximate (dz, -geo.z (cell)));
+            double q_in_avail = h_top / ddt;
+            const double q_in_pot = K_edge * (h_top - h (cell) + dz) / dz;
+            // Decide type.
+            bool is_flux = h_top <= 0.0 || q_in_pot > q_in_avail;
 
 #if 0
-          if (!is_flux && q_in_pot < 0.0)
-            {
-              q_in_avail = 0.0;
-              is_flux = true;
-            }
+            if (!is_flux && q_in_pot < 0.0)
+              {
+                q_in_avail = 0.0;
+                is_flux = true;
+              }
 #elif 0
-          if (!is_flux)
-            {
-              is_flux = true;
-              q_in_avail = q_in_pot;
-            }
+            if (!is_flux)
+              {
+                is_flux = true;
+                q_in_avail = q_in_pot;
+              }
 #endif
-	  if (is_flux)
-            {
+            if (is_flux)
+              {
 #if 0
-              if (state[i] == top_pressure)
-                throw top_pressure;
+                if (state[i] == top_pressure)
+                  throw top_pressure;
 #endif
-              state[i] = top_flux;
+                state[i] = top_flux;
 
-              Neumann (edge, cell, area, in_sign, q_in_avail, dq, B);
-            }
-	  else			// Pressure
-	    {
+                Neumann (edge, cell, area, in_sign, q_in_avail, dq, B);
+              }
+            else			// Pressure
+              {
 #if 0
-              if (state[i] == top_flux)
-                throw top_flux;
+                if (state[i] == top_flux)
+                  throw top_flux;
 #endif
-              state[i] = top_pressure;
+                state[i] = top_pressure;
 
-              if (debug > 0 && q_in_pot < 0.0)
-		{
-		  std::ostringstream tmp;
-		  tmp << "q_in_pot = " << q_in_pot << ", q_avail = " 
-		      << q_in_avail << ", h_top = " << h_top 
-		      << ", h (cell) = " << h (cell) << " K (cell) = " 
-                      << K (cell) << ", K_sat = " << K_sat << ", K_edge = "
-                      << K_edge <<", dz = " << dz << ", ddt = " << ddt
-		      << ", is_flux = " << is_flux << "\n";
-		  msg.message (tmp.str ());
-		}
-	      const double value = -K_edge * geo.edge_area_per_length (edge);
-              const double pressure = h_top;
-              Dirichlet (edge, cell, area, in_sign, sin_angle, 
-                         K_edge, h (cell),
-                         value, pressure, dq, Dm_mat, Dm_vec, Gm);
-	    }
-	  if (debug == 3)
-	    {
-	      std::ostringstream tmp;
-	      tmp << "edge = " << edge << ", K_edge = " << K_edge << ", h_top = "
-		  << h_top << ", dz = " << dz << ", q_avail = " << q_in_avail
-		  << ", q_pot = " << q_in_pot << ", is_flux = " << is_flux;
-              msg.message (tmp.str ());
-	    }
+                if (debug > 0 && q_in_pot < 0.0)
+                  {
+                    std::ostringstream tmp;
+                    tmp << "q_in_pot = " << q_in_pot << ", q_avail = " 
+                        << q_in_avail << ", h_top = " << h_top 
+                        << ", h (cell) = " << h (cell) << " K (cell) = " 
+                        << K (cell) << ", K_sat = " << K_sat << ", K_edge = "
+                        << K_edge <<", dz = " << dz << ", ddt = " << ddt
+                        << ", is_flux = " << is_flux << "\n";
+                    msg.message (tmp.str ());
+                  }
+                const double value = -K_edge * geo.edge_area_per_length (edge);
+                const double pressure = h_top;
+                Dirichlet (edge, cell, area, in_sign, sin_angle, 
+                           K_edge, h (cell),
+                           value, pressure, dq, Dm_mat, Dm_vec, Gm);
+              }
+            if (debug == 3)
+              {
+                std::ostringstream tmp;
+                tmp << "edge = " << edge << ", K_edge = " << K_edge 
+                    << ", h_top = "
+                    << h_top << ", dz = " << dz << ", q_avail = " << q_in_avail
+                    << ", q_pot = " << q_in_pot << ", is_flux = " << is_flux;
+                msg.message (tmp.str ());
+              }
+          }
 	  break;
 	case Surface::soil:
 	  throw "Don't know how to handle this surface type";

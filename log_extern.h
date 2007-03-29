@@ -87,7 +87,6 @@ class LogExtern : public LogSelect,
   void initialize (Treelog&);
 public:
   LogExtern (Block&);
-private:
   ~LogExtern ();
 };
 

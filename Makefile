@@ -34,15 +34,16 @@ SRCDIR = $(HOME)/daisy
 ifeq ($(HOSTTYPE),i386-linux)
 OBJHOME = /usr/local/daisy
 NATIVEHOME = $(OBJHOME)/$(HOSTTYPE)
+BOOSTINC = -isystem $(HOME)/boost/include/boost-1_35/
 else
 OBJHOME = $(HOME)/daisy/obj
 NATIVEHOME = $(OBJHOME)
+BOOSTINC = -isystem /usr/include/boost-1_33_1/
 endif
 
 
 FTPDIR = /home/ftp/pub/daisy
 WWWINDEX = /home/user_3/daisy/.public_html/index.html
-BOOSTINC = -isystem /usr/include/boost-1_33_1/
 
 BORLAND = "e:/Program Files/Borland/CBuilder5/"
 TARGETTYPE = i586-mingw32msvc

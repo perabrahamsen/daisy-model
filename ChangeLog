@@ -1,5 +1,9 @@
 2007-03-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.12 released.
+
+2007-03-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* lib/log.dai: Updated log parameterizations for new chemistry.
 
 2007-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
