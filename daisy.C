@@ -137,7 +137,7 @@ Daisy::initialize (Block& block)
   field->initialize (block, *output_log, time, weather.get ());
   {
     Treelog::Open nest (block.msg (), "output");
-    output_log->initialize (block.msg ());
+    output_log->initialize (metalib, block.msg ());
   }
 }
 

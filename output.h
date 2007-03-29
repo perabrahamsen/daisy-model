@@ -31,6 +31,7 @@ struct LogAll;
 struct Scope;
 struct Border;
 struct Block;
+struct Metalib;
 struct Daisy;
 
 class Output
@@ -56,7 +57,7 @@ public:
   // Create and Destroy.
 public:
   bool check (const Border& field, Treelog& msg);
-  void initialize (Treelog&);
+  void initialize (const Metalib&, Treelog&);
 private:
   static const std::vector<Log*> 
   /**/ find_active_logs (const std::vector<Log*>& logs, LogAll& log_all);

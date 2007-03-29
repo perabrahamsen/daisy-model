@@ -27,8 +27,6 @@
 #include "assertion.h"
 #include <sstream>
 
-using namespace std;
-
 const char *const Log::description = "\
 Running a simulation is uninteresting, unless you can get access to\n\
 the results in one way or another.  The purpose of the 'log' component\n\
@@ -39,19 +37,20 @@ const char *const Log::component = "log";
 
 struct Log::Implementation
 {
-  list<const Soil*> soils;
-  list<const Geometry*> geometries;
+  std::list<const Soil*> soils;
+  std::list<const Geometry*> geometries;
+  const Metalib* metalib;
+  Implementation ()
+    : metalib (NULL)
+  { }
 };
 
-#if 0
-bool 
-Log::initial_match (const Daisy&, Treelog&)
-{ return false; }
-
-void
-Log::initial_done (const Time&, double)
-{ }
-#endif
+const Metalib&
+Log::metalib () const
+{
+  daisy_assert (impl->metalib);
+  return *impl->metalib;
+}
 
 bool
 Log::check_entry (symbol name, const Library& library) const
@@ -139,12 +138,12 @@ Log::print_dlf_header (std::ostream& out, const AttributeList& al)
 {
   if (al.check ("parser_files"))
   {
-    const vector<symbol>& files = al.identifier_sequence ("parser_files");
+    const std::vector<symbol>& files = al.identifier_sequence ("parser_files");
     for (unsigned int i = 0; i < files.size (); i++)
       out << "SIMFILE: " << files[i] << "\n";
   }
 
-  const string sim_description = al.name ("description");
+  const std::string sim_description = al.name ("description");
   if (sim_description != Daisy::default_description)
     {
       out << "SIM: ";
@@ -161,6 +160,14 @@ Log::print_dlf_header (std::ostream& out, const AttributeList& al)
 void
 Log::output (Log&) const
 { }
+
+void
+Log::initialize_common (const Metalib& metalib, Treelog& msg)
+{
+  daisy_assert (!impl->metalib);
+  impl->metalib = &metalib;
+  initialize (msg);
+}
 
 Log::Log (Block& al)
   : impl (new Implementation ()),

@@ -35,6 +35,7 @@ class PLF;
 class Geometry;
 class Soil;
 class Time;
+class Metalib;
 class Treelog;
 
 class Log : public Model
@@ -48,6 +49,7 @@ public:
   const symbol name;
   static const char *const description;
   static const char *const component;
+  const Metalib& metalib () const;
 
   // Filter
 public:
@@ -279,7 +281,10 @@ public:
   // Create and Destroy.
 public:
   virtual bool check (const Border&, Treelog& err) const = 0;
+protected:
   virtual void initialize (Treelog& out) = 0;
+public:
+  void initialize_common (const Metalib&, Treelog& out);
 protected:
   Log (Block& al);
   Log (const char* id);

@@ -1,7 +1,11 @@
 2007-03-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* syntax.C (add_object): Renamed from 'add'.
+	* log.C, log.h (metalib, initialize_common): New functions.
+	* output.C (initialize): Update caller..
 
+	* syntax.C (add_object): Renamed from 'add'.
+	* all: Update callers.
+	
 	* Version 4.12 released.
 
 	* lib/log.dai: Updated log parameterizations for new chemistry.
