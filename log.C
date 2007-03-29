@@ -22,6 +22,7 @@
 
 #include "log.h"
 #include "library.h"
+#include "metalib.h"
 #include "block.h"
 #include "daisy.h"
 #include "assertion.h"
@@ -53,9 +54,10 @@ Log::metalib () const
 }
 
 bool
-Log::check_entry (symbol name, const Library& library) const
+Log::check_entry (symbol name, const char *const component) const
 {
   bool looking = true;
+  const Library& library = metalib ().library (symbol (component));
 
   while (looking && !check_interior (name))
     {

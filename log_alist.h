@@ -29,8 +29,8 @@
 struct LogAList : public Log
 {
   // Filter functions.
-  bool check_entry (symbol, const Library&) const;
-  bool check_derived (symbol, symbol, const Library&) const;
+  bool check_entry (symbol, const char* component) const;
+  bool check_derived (symbol, symbol, const char* component) const;
 
   // Content.
   bool is_active;		// ... store the answer here.

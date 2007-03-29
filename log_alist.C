@@ -30,11 +30,11 @@
 using namespace std;
 
 bool
-LogAList::check_entry (symbol, const Library&) const
+LogAList::check_entry (symbol, const char*) const
 { return is_active; }
 
 bool
-LogAList::check_derived (symbol, symbol, const Library&) const
+LogAList::check_derived (symbol, symbol, const char*) const
 { return is_active; }
 
 symbol

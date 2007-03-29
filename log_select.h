@@ -52,7 +52,7 @@ struct LogSelect : public Log
   // Filter functions.
   bool check_leaf (symbol) const;
   bool check_interior (symbol) const;
-  bool check_derived (symbol field, symbol name, const Library&) const;
+  bool check_derived (symbol field, symbol name, const char* component) const;
 
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog&);

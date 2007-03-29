@@ -213,8 +213,8 @@ ChemistryStandard::clear ()
 void 
 ChemistryStandard::output (Log& log) const
 {
-  output_list (chemicals, "trace", log, Librarian<Chemical>::library ());
-  output_list (reactions, "reaction", log, Librarian<Reaction>::library ());
+  output_list (chemicals, "trace", log, Chemical::component);
+  output_list (reactions, "reaction", log, Reaction::component);
   // We can't log identifier_sequence yet.
   // output_variable (ignore, log);
 }

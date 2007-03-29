@@ -40,7 +40,7 @@ LogSelect::check_interior (symbol) const
 
 bool 
 LogSelect::check_derived (symbol field, symbol /* name */,
-			  const Library& /* library */) const
+			  const char *const /* component */) const
 { return check_interior (field); }
 
 bool 

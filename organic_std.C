@@ -829,15 +829,13 @@ OrganicStandard::output (Log& log) const
   static const symbol am_symbol ("am");
   if (log.check_interior (am_symbol))
     {
-      const Library& library = Librarian<AM>::library ();
-      
       Log::Open open (log, am_symbol);
       for (std::vector<AM*>::const_iterator item = am.begin(); 
 	   item != am.end();
 	   item++)
 	{
 	  const symbol name = (*item)->real_name ();
-	  if (log.check_entry (name, library))
+	  if (log.check_entry (name, AM::component))
 	    {
 	      Log::NamedEntry named_entry (log, name, (*item)->name,
 					   (*item)->alist);
@@ -848,7 +846,7 @@ OrganicStandard::output (Log& log) const
   output_ordered (smb, "smb", log);
   output_ordered (som, "som", log);
   output_ordered (dom, "dom", log);
-  output_list (domsorp, "domsorp", log, Librarian<Domsorp>::library ());
+  output_list (domsorp, "domsorp", log, Domsorp::component);
   output_submodule (buffer, "buffer", log);
   output_submodule (bioincorporation, "Bioincorporation", log);
   output_variable (NO3_source, log);

@@ -51,10 +51,7 @@ struct ActionWhile : public Action
   }
 
   void output (Log& log) const
-  { 
-    output_list (actions, "actions", log, 
-		 Librarian<Action>::library ());
-  }
+  { output_list (actions, "actions", log, Action::component); }
 
   bool check (const Daisy& daisy, Treelog& err) const
   { 

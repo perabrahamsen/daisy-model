@@ -47,8 +47,7 @@ Output::initial_logs (const Daisy& daisy, Treelog& msg)
 		{
 		  output_submodule (previous, "time", log);
                   daisy.output (log);
-                  output_list (logs, "output", log, 
-                               Librarian<Log>::library ());
+                  output_list (logs, "output", log, Log::component);
 		  log.initial_done (previous, daisy.dt);
 		}
 	    }
@@ -74,7 +73,7 @@ Output::tick (const Daisy& daisy, Treelog& msg)
 	    {
 	      output_submodule (daisy.time, "time", log);
               daisy.output (log);
-              output_list (logs, "output", log, Librarian<Log>::library ());
+              output_list (logs, "output", log, Log::component);
 	      log.done (daisy.time, daisy.dt);
 	    }
 	}
@@ -124,6 +123,7 @@ Output::initialize (const Metalib& metalib, Treelog& msg)
 {
   for (size_t i = 0; i < logs.size (); i++)
     logs[i]->initialize_common (metalib, msg);
+  log_all->initialize_common (metalib, msg);
 }
 
 const std::vector<Log*> 

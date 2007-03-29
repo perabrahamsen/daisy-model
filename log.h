@@ -55,9 +55,9 @@ public:
 public:
   virtual bool check_leaf (symbol) const = 0;
   virtual bool check_interior (symbol) const = 0;
-  virtual bool check_entry (symbol, const Library& library) const;
+  virtual bool check_entry (symbol, const char* library) const;
   virtual bool check_derived (symbol field, symbol name, 
-			      const Library& library) const = 0;
+			      const char* library) const = 0;
 
   // Use.  
 public:
@@ -334,9 +334,7 @@ do { \
 template <class T> void
 output_derived_ (const T& submodule, const symbol name, Log& log)
 {
-  const Library& library = Librarian<T>::library ();
-
-  if (log.check_derived (name, submodule.name, library))
+  if (log.check_derived (name, submodule.name, T::component))
     {
       Log::Derived derived (log, name, submodule.name);
       submodule.output (log);
@@ -355,9 +353,7 @@ do { \
 template <class T> void
 output_object_ (const T& submodule, const symbol name, Log& log)
 {
-  const Library& library = Librarian<T>::library ();
-
-  if (log.check_derived (name, submodule.name, library))
+  if (log.check_derived (name, submodule.name, T::component))
     {
       Log::Object object (log, name, submodule.name, submodule.alist);
       submodule.output (log);
@@ -372,7 +368,8 @@ do { \
 } while (false)
 
 template <class T> void
-output_list_ (T const& items, const symbol name, Log& log, const Library& library)
+output_list_ (T const& items, const symbol name, Log& log,
+              const char *const library)
 {
   if (log.check_interior (name))
     {

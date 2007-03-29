@@ -570,13 +570,11 @@ Field::Implementation::tick_one (const size_t col,
 void 
 Field::Implementation::output (Log& log) const
 {
-  const Library& library = Librarian<Column>::library ();
-
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
     {
-      if (log.check_entry ((*i)->name, library))
+      if (log.check_entry ((*i)->name, Column::component))
 	{
 	  Log::Entry open_entry (log, symbol ((*i)->name), (*i)->alist);
 	  (*i)->output (log);

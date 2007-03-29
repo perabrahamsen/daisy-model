@@ -40,7 +40,7 @@ struct LogHarvest : public Log
   { return false; }
   bool check_interior (symbol) const
   { return false; }
-  bool check_derived (symbol, symbol, const Library&) const
+  bool check_derived (symbol, symbol, const char*) const
   { return false; }
 
   // Content.

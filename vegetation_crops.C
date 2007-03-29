@@ -650,7 +650,7 @@ void
 VegetationCrops::output (Log& log) const
 {
   Vegetation::output (log);
-  output_list (crops, "crops", log, Librarian<Crop>::library ());
+  output_list (crops, "crops", log, Crop::component);
 }
 
 void

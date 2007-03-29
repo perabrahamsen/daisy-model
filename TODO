@@ -2,13 +2,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Metalib
 
-** Få daisy til at compile
-
-** Få daisy til at køre
+** Get rid of Librarian<T>::library 
 
 ** Fjern metalib funktionalitet fra Library.
-
-** Get rid of Librarian<T>::library 
 
 * OpenMI
 

@@ -79,10 +79,7 @@ struct ActionProgn : public Action
   }
 
   void output (Log& log) const
-  { 
-    output_list (actions, "actions", log,
-		 Librarian<Action>::library ());
-  }
+  { output_list (actions, "actions", log, Action::component); }
 
   bool check (const Daisy& daisy, Treelog& err) const
   { 
@@ -116,7 +113,7 @@ struct ActionCond : public Action
     void output (Log& log) const
     { 
       output_derived (condition, "condition", log);
-      output_list (actions, "actions", log, Librarian<Action>::library ());
+      output_list (actions, "actions", log, Action::component);
     }
     static void load_syntax (Syntax& syntax, AttributeList&)
     {
