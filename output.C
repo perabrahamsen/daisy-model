@@ -177,19 +177,19 @@ Output::~Output ()
 void
 Output::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("output", Librarian<Log>::library (),
-	      Syntax::State, Syntax::Sequence,
-	      "List of logs for output during the simulation.");
-  syntax.add ("activate_output", Librarian<Condition>::library (),
-	      "Activate output logs when this condition is true.\n\
+  syntax.add_object ("output", Librarian<Log>::library (),
+                     Syntax::State, Syntax::Sequence,
+                     "List of logs for output during the simulation.");
+  syntax.add_object ("activate_output", Librarian<Condition>::library (),
+                     "Activate output logs when this condition is true.\n\
 You can use the 'after' condition to avoid logging during an initialization\n\
 period.");
   AttributeList true_alist;
   true_alist.add ("type", "true");
   alist.add ("activate_output", true_alist);
 
-  syntax.add ("exchange", Librarian<Scope>::library (),
-              Syntax::Const, Syntax::Sequence, "\
+  syntax.add_object ("exchange", Librarian<Scope>::library (),
+                     Syntax::Const, Syntax::Sequence, "\
 List of exchange items for communicating with external models.");
   alist.add ("exchange", std::vector<AttributeList*> ());
 }

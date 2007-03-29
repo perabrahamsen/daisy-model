@@ -174,17 +174,17 @@ static struct TransformEquilibriumSyntax
 
     alist.add ("description", 
 	       "Two soil components reching for equilibrium.");
-    syntax.add ("equilibrium", Librarian<Equilibrium>::library (),
-		"Function for calculating equilibrioum between A and B.");
-    syntax.add ("k_AB", Librarian<Pedotransfer>::library (),
-		Syntax::Const, Syntax::Singleton, 
-		"Tranformation rate from soil component 'A' to 'B' [h^-1].");
-    syntax.add ("k_BA", Librarian<Pedotransfer>::library (),
-		Syntax::OptionalConst, Syntax::Singleton,
-		"Tranformation rate from soil component 'B' to 'A' [h^-1].\n\
+    syntax.add_object ("equilibrium", Librarian<Equilibrium>::library (),
+                       "Function for calculating equilibrioum between A and B.");
+    syntax.add_object ("k_AB", Librarian<Pedotransfer>::library (),
+                       Syntax::Const, Syntax::Singleton, 
+                       "Tranformation rate from soil component 'A' to 'B' [h^-1].");
+    syntax.add_object ("k_BA", Librarian<Pedotransfer>::library (),
+                       Syntax::OptionalConst, Syntax::Singleton,
+                       "Tranformation rate from soil component 'B' to 'A' [h^-1].\n\
 By default, this is identical to 'k_AB'.");
-    syntax.add ("debug", Librarian<Pedotransfer>::library (),
-		Syntax::OptionalConst, Syntax::Sequence, "\
+    syntax.add_object ("debug", Librarian<Pedotransfer>::library (),
+                       Syntax::OptionalConst, Syntax::Sequence, "\
 Extra pedotransfer function to include in 'daisy.log' for debugging.");
     Librarian<Transform>::add_type ("equilibrium", alist, syntax, &make);
   }

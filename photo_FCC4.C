@@ -655,12 +655,12 @@ static struct Photo_FQC4Syntax
     syntax.add ("fraction_total", "", Syntax::LogOnly, "Fraction of leaf contributing to the photosynthesis.");
 
     // Models
-    syntax.add ("N-dist", Librarian<CropNdist>::library (), 
-		"N-distribution in the canopy layer.");
+    syntax.add_object ("N-dist", Librarian<CropNdist>::library (), 
+                       "N-distribution in the canopy layer.");
     alist.add ("N-dist", CropNdist::default_model ());
 
-    syntax.add ("ABAeffect", Librarian<ABAEffect>::library (), 
-		"The effect of xylem ABA on stomata conductivity.");
+    syntax.add_object ("ABAeffect", Librarian<ABAEffect>::library (), 
+                       "The effect of xylem ABA on stomata conductivity.");
     alist.add ("ABAeffect", ABAEffect::default_model ());
 
     Librarian<Photo>::add_type ("FC_C4", alist, syntax, &make);

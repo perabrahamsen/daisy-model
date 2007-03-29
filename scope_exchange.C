@@ -268,9 +268,9 @@ static struct ScopeExchangeSyntax
     alist.add ("description", 
                "Exchange values with an external model.");
 
-    syntax.add ("entries", Librarian<Exchange>::library (), 
-                Syntax::Const, Syntax::Sequence,
-                "List of items to exchange.");
+    syntax.add_object ("entries", Librarian<Exchange>::library (), 
+                       Syntax::Const, Syntax::Sequence,
+                       "List of items to exchange.");
     Librarian<Scope>::add_type ("exchange", alist, syntax, &make);
   }
 } ScopeExchange_syntax;

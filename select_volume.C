@@ -311,9 +311,9 @@ This parameter is ignored if 'density' is true.");
     syntax.add ("density_y", Syntax::Boolean, Syntax::Const, 
 		"If true, divide total content with volume depth.\n\
 This parameter is ignored if 'density' is true.");
-    syntax.add ("volume", Librarian<Volume>::library (), 
-                Syntax::Const, Syntax::Singleton,
-                "Soil volume to log.");
+    syntax.add_object ("volume", Librarian<Volume>::library (), 
+                       Syntax::Const, Syntax::Singleton,
+                       "Soil volume to log.");
     alist.add ("volume", Volume::infinite_box ());
   }
   void add_volume ()

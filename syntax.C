@@ -647,8 +647,8 @@ Syntax::add (const string& key, const Syntax& s, const AttributeList& al,
 }
 
 void 
-Syntax::add (const string& key, ::Library& l, category req, int s,
-	     const string& d)
+Syntax::add_object (const string& key, ::Library& l, category req, int s,
+                    const string& d)
 {
   add (key, Object, req, s, d);
   impl.libraries[key] = &l;

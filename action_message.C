@@ -125,8 +125,8 @@ static struct ActionMessageSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Assert that condition is true, if not, stop the simulation.");
-      syntax.add ("condition", Librarian<Condition>::library (), 
-		  "Condition to check.");
+      syntax.add_object ("condition", Librarian<Condition>::library (), 
+                         "Condition to check.");
       syntax.order ("condition");
       syntax.add ("message", Syntax::String, Syntax::Const,
 		  "Error message to give iff assertion fails.");

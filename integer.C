@@ -94,7 +94,7 @@ struct IntegerCond : public Integer
     {
       alist.add ("description", "\
 If condition is true, return value.");
-      syntax.add ("condition", Librarian<Boolean>::library (), "\
+      syntax.add_object ("condition", Librarian<Boolean>::library (), "\
 Condition to test for.");
       syntax.add ("value", Syntax::Integer, Syntax::Const, "\
 Value to return.");

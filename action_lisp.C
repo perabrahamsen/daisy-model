@@ -120,12 +120,11 @@ struct ActionCond : public Action
     }
     static void load_syntax (Syntax& syntax, AttributeList&)
     {
-      syntax.add ("condition",
-                  Librarian<Condition>::library (), 
+      syntax.add_object ("condition", Librarian<Condition>::library (), 
                   "Condition for performing the actions.");
-      syntax.add ("actions", Librarian<Action>::library (),
-                  Syntax::State, Syntax::Sequence, 
-                  "Actions to perform when condition is meet.");
+      syntax.add_object ("actions", Librarian<Action>::library (),
+                         Syntax::State, Syntax::Sequence, 
+                         "Actions to perform when condition is meet.");
       syntax.order ("condition", "actions");
     }
     clause (Block& al) 
@@ -293,9 +292,9 @@ ActionLispSyntax::ActionLispSyntax ()
     alist.add ("description", "\
 Perform all the specified actions in the sequence listed.\n\
 All the actions will be performed in the same time step.");
-    syntax.add ("actions", Librarian<Action>::library (), 
-                Syntax::State, Syntax::Sequence,
-		"List of actions to perform.");
+    syntax.add_object ("actions", Librarian<Action>::library (), 
+                       Syntax::State, Syntax::Sequence,
+                       "List of actions to perform.");
     syntax.order ("actions");
     Librarian<Action>::add_type ("progn", alist, syntax, &make_progn);
   }
@@ -319,12 +318,12 @@ The first clause whose condition is true, will have its actions activated.",
     alist.add ("description", "\
 If the condition is true, perform the first action,\n\
 otherwise perform the second action.");
-    syntax.add ("if", Librarian<Condition>::library (), 
-		"Condition determining which action to perform.");
-    syntax.add ("then", Librarian<Action>::library (), 
-		"Action to perform if the condition is true.");
-    syntax.add ("else", Librarian<Action>::library (), 
-		"Action to perform if the condition is false.");
+    syntax.add_object ("if", Librarian<Condition>::library (), 
+                       "Condition determining which action to perform.");
+    syntax.add_object ("then", Librarian<Action>::library (), 
+                       "Action to perform if the condition is true.");
+    syntax.add_object ("else", Librarian<Action>::library (), 
+                       "Action to perform if the condition is false.");
     syntax.order ("if", "then", "else");
     AttributeList nilAlist;
     nilAlist.add ("type", "nil");

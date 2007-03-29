@@ -383,8 +383,8 @@ The aquitard begins below the bottommost soil horizon.");
 By default. this is Z_aquitard.\n\
 You can alternatively specify the pressure as a virtual groundwater level.\n\
 See 'pressure_table'.");
-      syntax.add ("pressure_table", Librarian<Depth>::library (),
-                  Syntax::OptionalConst, Syntax::Singleton, "\
+      syntax.add_object ("pressure_table", Librarian<Depth>::library (),
+                         Syntax::OptionalConst, Syntax::Singleton, "\
 Height of groundwater the corresponds to the pressure in the aquifer.  \n\
 \n\
 If you drilled a well down to the aquifer, this is number what the\n\

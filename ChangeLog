@@ -1,8 +1,8 @@
 2007-03-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 4.12 released.
+	* syntax.C (add_object): Renamed from 'add'.
 
-2007-03-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+	* Version 4.12 released.
 
 	* lib/log.dai: Updated log parameterizations for new chemistry.
 

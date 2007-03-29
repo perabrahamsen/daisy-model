@@ -124,8 +124,8 @@ By default the name of the 'expr' object.");
 	       "Read a daisy log, weather or data file.\n\
 Calculate a single value for each time step, based on the value\n\
 in the various columns.");
-    syntax.add ("expr", Librarian<Number>::library (), 
-		Syntax::Const, Syntax::Singleton, "\
+    syntax.add_object ("expr", Librarian<Number>::library (), 
+                       Syntax::Const, Syntax::Singleton, "\
 Expression for calculating the value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");

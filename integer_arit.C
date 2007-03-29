@@ -82,8 +82,8 @@ static struct IntegerSqrSyntax
 
     alist.add ("description", 
 	       "Take the square of its argument.");
-    syntax.add ("operand", Librarian<Integer>::library (),
-		"Operand for this function.");
+    syntax.add_object ("operand", Librarian<Integer>::library (),
+                       "Operand for this function.");
     syntax.order ("operand");
     Librarian<Integer>::add_type ("sqr", alist, syntax, &make);
   }
@@ -173,9 +173,9 @@ static struct IntegerMaxSyntax
 
     alist.add ("description", 
 	       "Use the largest value of its operands.");
-    syntax.add ("operands", Librarian<Integer>::library (),
-                Syntax::Const, Syntax::Sequence,
-		"The operands for this function.");
+    syntax.add_object ("operands", Librarian<Integer>::library (),
+                       Syntax::Const, Syntax::Sequence,
+                       "The operands for this function.");
     syntax.add_check ("operands", VCheck::min_size_1 ());
     syntax.order ("operands");
     Librarian<Integer>::add_type ("max", alist, syntax, &make);
@@ -215,9 +215,9 @@ static struct IntegerMinSyntax
 
     alist.add ("description", 
 	       "Use the smallest value of its operands.");
-    syntax.add ("operands", Librarian<Integer>::library (),
-                Syntax::Const, Syntax::Sequence,
-		"The operands for this function.");
+    syntax.add_object ("operands", Librarian<Integer>::library (),
+                       Syntax::Const, Syntax::Sequence,
+                       "The operands for this function.");
     syntax.add_check ("operands", VCheck::min_size_1 ());
     syntax.order ("operands");
     Librarian<Integer>::add_type ("min", alist, syntax, &make);
@@ -252,9 +252,9 @@ static struct IntegerProductSyntax
 
     alist.add ("description", 
 	       "Use the product of its operands.");
-    syntax.add ("operands", Librarian<Integer>::library (),
-                Syntax::Const, Syntax::Sequence,
-		"The operands for this function.");
+    syntax.add_object ("operands", Librarian<Integer>::library (),
+                       Syntax::Const, Syntax::Sequence,
+                       "The operands for this function.");
     syntax.order ("operands");
     Librarian<Integer>::add_type ("*", alist, syntax, &make);
   }
@@ -288,9 +288,9 @@ static struct IntegerSumSyntax
 
     alist.add ("description", 
 	       "Use the sum of its operands.");
-    syntax.add ("operands", Librarian<Integer>::library (),
-                Syntax::Const, Syntax::Sequence,
-		"The operands for this function.");
+    syntax.add_object ("operands", Librarian<Integer>::library (),
+                       Syntax::Const, Syntax::Sequence,
+                       "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     syntax.add_check ("operands", IntegerOperands::unique);
 #endif // CHECK_OPERANDS_DIM
@@ -332,9 +332,9 @@ static struct IntegerSubtractSyntax
 	       "Negate integer or subtract integers.\n\
 With one operand, negates it.  With more than one operand,\n\
 subtracts all but the first from the first.");
-    syntax.add ("operands", Librarian<Integer>::library (),
-                Syntax::Const, Syntax::Sequence,
-		"The operands for this function.");
+    syntax.add_object ("operands", Librarian<Integer>::library (),
+                       Syntax::Const, Syntax::Sequence,
+                       "The operands for this function.");
     syntax.order ("operands");
     Librarian<Integer>::add_type ("-", alist, syntax, &make);
   }
@@ -412,9 +412,9 @@ static struct IntegerModuloSyntax
 
       alist.add ("description", 
                  "Modulo the first operand by the rest.");
-      syntax.add ("operands", Librarian<Integer>::library (),
-                  Syntax::Const, 2,
-                  "The operands for this function.");
+      syntax.add_object ("operands", Librarian<Integer>::library (),
+                         Syntax::Const, 2,
+                         "The operands for this function.");
       syntax.order ("operands");
       Librarian<Integer>::add_type ("mod", alist, syntax, &make_div);
     }
@@ -425,9 +425,9 @@ static struct IntegerModuloSyntax
 
       alist.add ("description", 
                  "Divide the first operand by the rest.");
-      syntax.add ("operands", Librarian<Integer>::library (),
-                  Syntax::Const, 2,
-                  "The operands for this function.");
+      syntax.add_object ("operands", Librarian<Integer>::library (),
+                         Syntax::Const, 2,
+                         "The operands for this function.");
       syntax.order ("operands");
       Librarian<Integer>::add_type ("div", alist, syntax, &make_mod);
     }

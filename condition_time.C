@@ -579,8 +579,8 @@ plus one modulo 'step' is 0.");
 It is true whenever 'operand' is true, but will let Daisy know what\n\
 'timestep' it represents.  The timestep is used for the dimension\n\
 in log files.");
-    syntax.add ("operand", Librarian<Condition>::library (), 
-		"Condition to use.");
+    syntax.add_object ("operand", Librarian<Condition>::library (), 
+                       "Condition to use.");
     syntax.add ("timestep", Syntax::String, Syntax::Const, "\
 Timestep to use.");
     syntax.order ("operand", "timestep");

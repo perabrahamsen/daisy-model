@@ -80,7 +80,7 @@ struct NumberSource : public Number
 
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("source", Librarian<Source>::library (), "\
+    syntax.add_object ("source", Librarian<Source>::library (), "\
 The time series we want to extract a number from.");
     syntax.add_submodule ("begin", alist, Syntax::OptionalConst,
 			  "Ignore values before or at this date.", 

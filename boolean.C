@@ -162,8 +162,8 @@ struct BooleanOperands : public Boolean
   }
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
-    syntax.add ("operands", Librarian<Boolean>::library (), 
-                Syntax::Const, Syntax::Sequence, "\
+    syntax.add_object ("operands", Librarian<Boolean>::library (), 
+                       Syntax::Const, Syntax::Sequence, "\
 List of operands to compare.");
     syntax.order ("operands");
   }
@@ -254,8 +254,8 @@ static struct BooleanXOrSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("operands", Librarian<Boolean>::library (), 
-                Syntax::Const, 2, "\
+    syntax.add_object ("operands", Librarian<Boolean>::library (), 
+                       Syntax::Const, 2, "\
 The two operands to compare.");
     syntax.order ("operands");
     alist.add ("description", 
@@ -284,8 +284,8 @@ static struct BooleanNotSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("operands", Librarian<Boolean>::library (), 
-                Syntax::Const, 1, "\
+    syntax.add_object ("operands", Librarian<Boolean>::library (), 
+                       Syntax::Const, 1, "\
 The operand to check.");
     syntax.order ("operands");
     alist.add ("description", 

@@ -212,8 +212,8 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", default_description);
   
   Output::load_syntax (syntax, alist);
-  syntax.add ("print_time", Librarian<Condition>::library (),
-	      "Print simulation time whenever this condition is true.\n\
+  syntax.add_object ("print_time", Librarian<Condition>::library (),
+                     "Print simulation time whenever this condition is true.\n\
 The simulation time will also be printed whenever there are any news\n\
 to report, like emergence of crop or various management operations.\n\
 Good values for this parameter would be hourly, daily or monthly.");
@@ -221,9 +221,9 @@ Good values for this parameter would be hourly, daily or monthly.");
   false_alist.add ("type", "false");
   alist.add ("print_time", false_alist);
 
-  syntax.add ("manager", Librarian<Action>::library (), Syntax::State,
-	      Syntax::Singleton,
-	      "Specify the management operations to perform during\n\
+  syntax.add_object ("manager", Librarian<Action>::library (), Syntax::State,
+                     Syntax::Singleton,
+                     "Specify the management operations to perform during\n\
 the simulation.");
   syntax.add_submodule ("time", alist, Syntax::State,
 			"Current time in the simulation.", Time::load_syntax);
@@ -236,13 +236,12 @@ The default value is 1 hour, anything else is unlikely to work.",
 			"Latest time where the simulation stops.\n\
 By default, the simulation will run until the manager request it to stop.",
                         Time::load_syntax);
-  syntax.add ("column",
-	      Librarian<Column>::library (), 
-	      Syntax::State, Syntax::Sequence,
-	      "List of columns to use in this simulation.");
-  syntax.add ("weather", Librarian<Weather>::library (),
-	      Syntax::OptionalState, Syntax::Singleton,
-	      "Weather model for providing climate information during\n\
+  syntax.add_object ("column", Librarian<Column>::library (), 
+                     Syntax::State, Syntax::Sequence,
+                     "List of columns to use in this simulation.");
+  syntax.add_object ("weather", Librarian<Weather>::library (),
+                     Syntax::OptionalState, Syntax::Singleton,
+                     "Weather model for providing climate information during\n\
 the simulation.  Can be overwritten by column specific weather.");
   syntax.add_submodule_sequence ("harvest", Syntax::State, 
 				 "Total list of all crop yields.",

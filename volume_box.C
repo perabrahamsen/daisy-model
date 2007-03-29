@@ -283,29 +283,29 @@ VolumeBox::bounds_size = sizeof (VolumeBox::bounds)
 void 
 VolumeBox::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("bottom", Librarian<Bound>::library (), 
-              Syntax::Const, Syntax::Singleton,
-              "Lower boundary on the z-axis.");
+  syntax.add_object ("bottom", Librarian<Bound>::library (), 
+                     Syntax::Const, Syntax::Singleton,
+                     "Lower boundary on the z-axis.");
   alist.add ("bottom", Bound::none_model ());
-  syntax.add ("top", Librarian<Bound>::library (),
-              Syntax::Const, Syntax::Singleton,
-              "Upper boundary on the z-axis.");
+  syntax.add_object ("top", Librarian<Bound>::library (),
+                     Syntax::Const, Syntax::Singleton,
+                     "Upper boundary on the z-axis.");
   alist.add ("top", Bound::none_model ());
-  syntax.add ("left", Librarian<Bound>::library (),
-              Syntax::Const, Syntax::Singleton,
-              "Lower boundary on the x-axis.");
+  syntax.add_object ("left", Librarian<Bound>::library (),
+                     Syntax::Const, Syntax::Singleton,
+                     "Lower boundary on the x-axis.");
   alist.add ("left", Bound::none_model ());
-  syntax.add ("right", Librarian<Bound>::library (),
-              Syntax::Const, Syntax::Singleton,
-              "Upper boundary on the x-axis.");
+  syntax.add_object ("right", Librarian<Bound>::library (),
+                     Syntax::Const, Syntax::Singleton,
+                     "Upper boundary on the x-axis.");
   alist.add ("right", Bound::none_model ());
-  syntax.add ("front", Librarian<Bound>::library (),
-              Syntax::Const, Syntax::Singleton,
-              "Lower boundary on the y-axis.");
+  syntax.add_object ("front", Librarian<Bound>::library (),
+                     Syntax::Const, Syntax::Singleton,
+                     "Lower boundary on the y-axis.");
   alist.add ("front", Bound::none_model ());
-  syntax.add ("back", Librarian<Bound>::library (),
-              Syntax::Const, Syntax::Singleton,
-              "Upper boundary on the y-axis.");
+  syntax.add_object ("back", Librarian<Bound>::library (),
+                     Syntax::Const, Syntax::Singleton,
+                     "Upper boundary on the y-axis.");
   alist.add ("back", Bound::none_model ());
 }
 

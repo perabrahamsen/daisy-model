@@ -714,9 +714,9 @@ Maximum absolute difference in 'h' values for convergence.");
   syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
 Maximum relative difference in 'h' values for convergence.");
   alist.add ("max_relative_difference", 0.001);
-  syntax.add ("K_average", Librarian<Average>::library (),
-              Syntax::OptionalConst, Syntax::Singleton,
-              "Model for calculating average K between cells.\n\
+  syntax.add_object ("K_average", Librarian<Average>::library (),
+                     Syntax::OptionalConst, Syntax::Singleton,
+                     "Model for calculating average K between cells.\n\
 The default model is 'geometric' if there are macropores, and\n\
 'arithmetic' otherwise.");
 }

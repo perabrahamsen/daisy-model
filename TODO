@@ -1,14 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Metalib
+* Installer boost fra cvs på dirac/sheridan
 
-** Slip af med flere build_alist og build_free
+* Metalib
 
 ** omdøb Syntax::add til Syntax::add_object
 
 ** Slip af med Librarian<T>::library (), brug T::component i stedet
 
 *** Syntax skal kun gemme Model::component, ikke Library.
+
+** Log skal tage et metalib, for nedarvning
 
 * OpenMI
 

@@ -156,8 +156,8 @@ void
 Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
-  syntax.add ("adsorption", Librarian<Adsorption>::library (), 
-	      "Soil adsorption properties.");
+  syntax.add_object ("adsorption", Librarian<Adsorption>::library (), 
+                     "Soil adsorption properties.");
   Geometry::add_layer (syntax, Syntax::OptionalState, "C", "g/cm^3",
                        "Concentration in water.\n\
 This number does not include adsorped matter.");

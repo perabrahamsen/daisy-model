@@ -61,8 +61,8 @@ struct Soil::Implementation
 A location and content of a soil layer.");
       syntax.add ("end", "cm", Check::negative (), Syntax::Const,
 		  "End point of this layer (a negative number).");
-      syntax.add ("horizon", Librarian<Horizon>::library (), 
-		  "Soil properties of this layer.");
+      syntax.add_object ("horizon", Librarian<Horizon>::library (), 
+                         "Soil properties of this layer.");
       syntax.order ("end", "horizon");
     }
     Layer (Block& al)

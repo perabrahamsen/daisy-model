@@ -477,9 +477,9 @@ no crops on the field.");
       syntax.add ("array_separator", Syntax::String, Syntax::Const, "\
 String to print between array entries.");
       alist.add ("array_separator", "\t");
-      syntax.add ("summary", Librarian<Summary>::library (),
-		  Syntax::Const, Syntax::Sequence,
-		  "Summaries for this log file.");
+      syntax.add_object ("summary", Librarian<Summary>::library (),
+                         Syntax::Const, Syntax::Sequence,
+                         "Summaries for this log file.");
       alist.add ("summary", vector<AttributeList*> ());
       Librarian<Log>::add_type ("table", alist, syntax, &make);
       Librarian<Log>::library ().add_doc_fun (LogSelect::document_entries);

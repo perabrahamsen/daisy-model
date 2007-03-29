@@ -193,8 +193,8 @@ A single Dissolved Organic Matter pool.");
 			Element::load_syntax);
 
   // Transport
-  syntax.add ("adsorption", Librarian<Adsorption>::library (), 
-	      "Soil adsorption properties.");
+  syntax.add_object ("adsorption", Librarian<Adsorption>::library (), 
+                     "Soil adsorption properties.");
   syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
 	      Syntax::Const, "Diffusion coefficient.");
 

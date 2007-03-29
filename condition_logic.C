@@ -238,8 +238,8 @@ or the end of the list is reached.");
 True iff all the listed conditions are true.\n\
 The conditions are tested in the sequence listed, until a false is found,\n\
 or the end of the list is reached.");
-    syntax.add ("operands", Librarian<Condition>::library (), 
-		Syntax::State, Syntax::Sequence, "Conditions to test.");
+    syntax.add_object ("operands", Librarian<Condition>::library (), 
+                       Syntax::State, Syntax::Sequence, "Conditions to test.");
     syntax.order ("operands");
     Librarian<Condition>::add_type ("or", alist_or, syntax, &make_or);
     Librarian<Condition>::add_type ("and", alist_and, syntax, &make_and);
@@ -249,8 +249,8 @@ or the end of the list is reached.");
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "True iff the operand is not true.");
-    syntax.add ("operand", Librarian<Condition>::library (), 
-		"Condition to test.");
+    syntax.add_object ("operand", Librarian<Condition>::library (), 
+                       "Condition to test.");
     syntax.order ("operand");
     Librarian<Condition>::add_type ("not", alist, syntax, &make_not);
   }
@@ -261,12 +261,12 @@ or the end of the list is reached.");
     alist.add ("description", "\
 If the first condition is true, return the value of the second condition,\n\
 else return the value of the third condition.");
-    syntax.add ("if", Librarian<Condition>::library (), 
-		"Condition to test for.");
-    syntax.add ("then", Librarian<Condition>::library (), 
-		"Condition to use of the 'if' test was true.");
-    syntax.add ("else", Librarian<Condition>::library (), 
-		"Condition to use if the 'if' test was false.");
+    syntax.add_object ("if", Librarian<Condition>::library (), 
+                       "Condition to test for.");
+    syntax.add_object ("then", Librarian<Condition>::library (), 
+                       "Condition to use of the 'if' test was true.");
+    syntax.add_object ("else", Librarian<Condition>::library (), 
+                       "Condition to use if the 'if' test was false.");
     syntax.order ("if", "then", "else");
     Librarian<Condition>::add_type ("if", alist, syntax, &make_if);
   }

@@ -287,12 +287,12 @@ ChemistryStandard::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
 
-  syntax.add ("trace", Librarian<Chemical>::library (), 
-              Syntax::State, Syntax::Sequence, "\
+  syntax.add_object ("trace", Librarian<Chemical>::library (), 
+                     Syntax::State, Syntax::Sequence, "\
 List of chemicals you want to trace in the simulation.");
   alist.add ("trace", std::vector<AttributeList*> ());
-  syntax.add ("reaction", Librarian<Reaction>::library (), 
-              Syntax::State, Syntax::Sequence, "\
+  syntax.add_object ("reaction", Librarian<Reaction>::library (), 
+                     Syntax::State, Syntax::Sequence, "\
 List of chemical reactions you want to simulate.");
 
   syntax.add ("ignore", Syntax::String, Syntax::State, Syntax::Sequence,

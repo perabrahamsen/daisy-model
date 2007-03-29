@@ -129,13 +129,13 @@ By default, let the first source decide.", "\
 By default the name of the 'expr' object.");
     alist.add ("description", 
 	       "Combine data from multiple sources with a single expression.");
-    syntax.add ("source", Librarian<Source>::library (), 
-		Syntax::State, Syntax::Sequence, "\
+    syntax.add_object ("source", Librarian<Source>::library (), 
+                       Syntax::State, Syntax::Sequence, "\
 List of sources for data.  The style information for the sources is\n\
 ignored, but the dates, title and value is used as specified by\n\
 'expr' to calculate the combines date and value pairs.");
-    syntax.add ("expr", Librarian<Number>::library (), 
-		Syntax::Const, Syntax::Singleton, "\
+    syntax.add_object ("expr", Librarian<Number>::library (), 
+                       Syntax::Const, Syntax::Singleton, "\
 Expression for calculating the value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");

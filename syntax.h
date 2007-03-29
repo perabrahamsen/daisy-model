@@ -209,12 +209,12 @@ public:
 	    // Alist sequence with default element.
 	    category, int size, const std::string& description);
 
-  void add (const std::string& key,// Object
-	    ::Library& lib, 
-	    const std::string& description)
-  { add (key, lib, State, Singleton, description); }
-  void add (const std::string&, ::Library&,
-	    category, int size, const std::string& description);
+  void add_object (const std::string& key,// Object
+                   ::Library& lib, 
+                   const std::string& description)
+  { add_object (key, lib, State, Singleton, description); }
+  void add_object (const std::string&, ::Library&,
+                   category, int size, const std::string& description);
 
   void add_library (const std::string&, ::Library&);
 

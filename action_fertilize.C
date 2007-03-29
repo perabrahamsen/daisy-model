@@ -303,7 +303,7 @@ static struct ActionFertilizeSyntax
 If you want to incorporate the fertilizer directly in the soil, specify\n\
 the 'from' and 'to' parameters.  By default, the fertilizer will be\n\
 left on the surface.");
-    syntax.add ("am", Librarian<AM>::library (), "\
+    syntax.add_object ("am", Librarian<AM>::library (), "\
 The fertilizer you want to apply.");
     syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
 Height where you want to start the incorporation (a negative number).");

@@ -185,15 +185,15 @@ By default the name of the 'x' and 'y' objects.");
 The variable cover an interval from 'begin' to 'end' in fixed steps\n\
 'step'.  The name of the variable is specified by 'tag'.  The x and y\n\
 expressions may refer to the variable.");
-    syntax.add ("x", Librarian<Number>::library (), 
-		Syntax::Const, Syntax::Singleton, "\
+    syntax.add_object ("x", Librarian<Number>::library (), 
+                       Syntax::Const, Syntax::Singleton, "\
 Expression for calculating the x value.");
     AttributeList x_alist;
     x_alist.add ("type", "fetch");
     x_alist.add ("name", "x");
     alist.add ("x", x_alist);
-    syntax.add ("y", Librarian<Number>::library (), 
-		Syntax::Const, Syntax::Singleton, "\
+    syntax.add_object ("y", Librarian<Number>::library (), 
+                       Syntax::Const, Syntax::Singleton, "\
 Expression for calculating the y value.");
     syntax.add ("begin", Syntax::User (), Syntax::Const, "\
 Start of interval.");

@@ -115,9 +115,9 @@ static struct ScopeMultiSyntax
 
     alist.add ("description", 
                "A scope combining other scopes.");
-    syntax.add ("scope", Librarian<Scope>::library (),
-                Syntax::Const, Syntax::Sequence, 
-                "List of scopes to combine, first one takes precedence.");
+    syntax.add_object ("scope", Librarian<Scope>::library (),
+                       Syntax::Const, Syntax::Sequence, 
+                       "List of scopes to combine, first one takes precedence.");
     Librarian<Scope>::add_type ("multi", alist, syntax, &make);
   }
 } ScopeMulti_syntax;

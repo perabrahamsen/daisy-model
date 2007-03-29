@@ -109,8 +109,8 @@ The commands will be inserted right before the first graph.");
                 Syntax::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right after the last graph.");
     alist.add ("after", std::vector<symbol> ());
-    syntax.add ("graph", Librarian<Gnuplot>::library (), Syntax::State, 
-		Syntax::Sequence, "Graphs to plot.");
+    syntax.add_object ("graph", Librarian<Gnuplot>::library (), Syntax::State, 
+                       Syntax::Sequence, "Graphs to plot.");
 
     Librarian<Gnuplot>::add_type ("multi", alist, syntax, &make);
   }

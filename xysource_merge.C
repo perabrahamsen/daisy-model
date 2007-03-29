@@ -185,8 +185,9 @@ By default, let the first source decide.", "");
     alist.add ("description", 
 	       "Merge multiple xy data series into one.");
 
-    syntax.add ("source", Librarian<XYSource>::library (), Syntax::State, 
-		Syntax::Sequence, "XY data series to merge.");
+    syntax.add_object ("source", Librarian<XYSource>::library (),
+                       Syntax::State, Syntax::Sequence,
+                       "XY data series to merge.");
     syntax.add_check ("source", VCheck::min_size_1 ());
     syntax.add ("x_dimension", Syntax::String, Syntax::Const, "\
 Dimension for x points.");

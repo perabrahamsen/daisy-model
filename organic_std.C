@@ -2980,9 +2980,9 @@ Turnover rate above which pools will contribute to 'CO2_fast'.");
   alist.add ("CO2_threshold", 1e-4); // SMB2 and default AOM pools.
   syntax.add ("top_CO2", "g CO_2-C/cm^2/h", Syntax::LogOnly,
 	      "CO2 evolution at surface.");
-  syntax.add ("am", Librarian<AM>::library (), 
-              Syntax::State, Syntax::Sequence, 
-	      "Added organic matter pools.");
+  syntax.add_object ("am", Librarian<AM>::library (), 
+                     Syntax::State, Syntax::Sequence, 
+                     "Added organic matter pools.");
   std::vector<AttributeList*> am;
   AttributeList root (AM::default_root ());
   am.push_back (&root);
@@ -3108,9 +3108,9 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
 				 "Dissolved Organic Matter pools.",
 				 DOM::load_syntax);
   alist.add ("dom", std::vector<AttributeList*> ());
-  syntax.add ("domsorp", Librarian<Domsorp>::library (), 
-              Syntax::State, Syntax::Sequence, 
-	      "Interchange between DOM and SOM pools.");
+  syntax.add_object ("domsorp", Librarian<Domsorp>::library (), 
+                     Syntax::State, Syntax::Sequence, 
+                     "Interchange between DOM and SOM pools.");
   alist.add ("domsorp", std::vector<AttributeList*> ());
 
   syntax.add ("heat_factor", "dg C", Syntax::None (), Check::non_negative (),
@@ -3126,7 +3126,7 @@ It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
   syntax.add ("abiotic_factor", Syntax::None (), 
               Syntax::LogOnly, Syntax::Sequence,
 	      "Product of current heat and water factors."); 
-  syntax.add ("ClayOM", Librarian<ClayOM>::library (), "Clay effect model.");
+  syntax.add_object ("ClayOM", Librarian<ClayOM>::library (), "Clay effect model.");
   AttributeList clay_alist;
   clay_alist.add ("type", "old");
   PLF clay_factor;

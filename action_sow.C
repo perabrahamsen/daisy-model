@@ -55,7 +55,7 @@ static struct ActionSowSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Sow a crop on the field.");
-    syntax.add ("crop", Librarian<Crop>::library (), "Crop to sow.");
+    syntax.add_object ("crop", Librarian<Crop>::library (), "Crop to sow.");
     syntax.order ("crop");
     Librarian<Action>::add_type ("sow", alist, syntax, &make);
   }

@@ -325,17 +325,17 @@ The fertilizer type will be either the one specified in the\n\
 it with the 'enable_fertilization' attribute.\n\
 \n\
 Fertilizer [name]: The type of fertilizer to be applied.");
-    syntax.add ("sow", Librarian<Action>::library (), 
-                Syntax::OptionalConst, Syntax::Singleton, 
-                "Sow action.");
-    syntax.add ("emerge", Librarian<Action>::library (), 
-                Syntax::OptionalConst, Syntax::Singleton, 
-                "Emerge action.");
-    syntax.add ("harvest", Librarian<Action>::library (), 
-                Syntax::OptionalConst, Syntax::Singleton, 
-                "Harvest action.");
-    syntax.add ("fertilizer", Librarian<AM>::library (),
-                Syntax::OptionalConst, Syntax::Singleton, "\
+    syntax.add_object ("sow", Librarian<Action>::library (), 
+                       Syntax::OptionalConst, Syntax::Singleton, 
+                       "Sow action.");
+    syntax.add_object ("emerge", Librarian<Action>::library (), 
+                       Syntax::OptionalConst, Syntax::Singleton, 
+                       "Emerge action.");
+    syntax.add_object ("harvest", Librarian<Action>::library (), 
+                       Syntax::OptionalConst, Syntax::Singleton, 
+                       "Harvest action.");
+    syntax.add_object ("fertilizer", Librarian<AM>::library (),
+                       Syntax::OptionalConst, Syntax::Singleton, "\
 The fertilizer you want to apply.");
     syntax.add ("enable_irrigation", Syntax::Boolean, Syntax::Const, "\
 Set this to false to ignore any irrigation information in the file.");

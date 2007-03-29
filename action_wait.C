@@ -185,8 +185,8 @@ static struct ActionWaitSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Wait until the specified condition is true.");
-      syntax.add ("condition", Librarian<Condition>::library (), 
-		  "Condition to wait for.");
+      syntax.add_object ("condition", Librarian<Condition>::library (), 
+                         "Condition to wait for.");
       syntax.order ("condition");
       Librarian<Action>::add_type ("wait", alist, syntax, &make);
     }

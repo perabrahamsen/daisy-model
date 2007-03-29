@@ -206,8 +206,8 @@ The time will be appended, together with the '.dai' suffix.");
     alist.add ("description", "\
 Create a checkpoint of the entire simulation state, suitable for later\n\
 hot start.");
-    syntax.add ("when", Librarian<Condition>::library (),
-                "Make a checkpoint every time this condition is true.");
+    syntax.add_object ("when", Librarian<Condition>::library (),
+                       "Make a checkpoint every time this condition is true.");
     AttributeList finished_alist;
     finished_alist.add ("type", "finished");
     alist.add ("when", finished_alist);

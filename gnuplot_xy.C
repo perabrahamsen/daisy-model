@@ -433,8 +433,8 @@ By default determine this from the data.");
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
-    syntax.add ("source", Librarian<XYSource>::library (), Syntax::State, 
-		Syntax::Sequence, "\
+    syntax.add_object ("source", Librarian<XYSource>::library (), Syntax::State, 
+                       Syntax::Sequence, "\
 XY series to plot.");
     Librarian<Gnuplot>::add_type ("xy", alist, syntax, &make);
   }

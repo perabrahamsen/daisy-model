@@ -74,9 +74,9 @@ struct ActionRepeat : public Action
   ActionRepeat (Block& al)
     : Action (al, add_do (al.alist ())),
       repeat (al.alist ("repeat")),
-      action (Librarian<Action>::build_alist (al, (al.check ("do") 
-                                                   ? al.alist ("do")
-                                                   : repeat), "do"))
+      action (al.check ("do") 
+              ? Librarian<Action>::build_item (al, "do")
+              : Librarian<Action>::build_item (al, "repeat"))
   { }
 
   ~ActionRepeat ()
@@ -98,12 +98,12 @@ static struct ActionRepeatSyntax
       alist.add ("description", "\
 Perform all of the specified action.  When done, repeat the action.\n\
 The action may take several timesteps.");
-      syntax.add ("repeat", Librarian<Action>::library (),
-		  Syntax::Const, Syntax::Singleton,
-		  "Action to perform repeatedly.");
-      syntax.add ("do", Librarian<Action>::library (), 
-		  Syntax::OptionalState, Syntax::Singleton,
-		  "Action currently being performed.");
+      syntax.add_object ("repeat", Librarian<Action>::library (),
+                         Syntax::Const, Syntax::Singleton,
+                         "Action to perform repeatedly.");
+      syntax.add_object ("do", Librarian<Action>::library (), 
+                         Syntax::OptionalState, Syntax::Singleton,
+                         "Action currently being performed.");
       syntax.order ("repeat");
       Librarian<Action>::add_type ("repeat", alist, syntax, &make);
     }

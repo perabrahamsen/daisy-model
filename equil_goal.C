@@ -169,14 +169,14 @@ static struct EquilibriumGoal_ASyntax
     AttributeList& alist = *new AttributeList ();
     Equilibrium::load_syntax (syntax, alist);
     alist.add ("description", "Attempt to maintain A at at fixed level.");
-    syntax.add ("goal_A", Librarian<Pedotransfer>::library (), Syntax::Const, 
-                Syntax::Singleton, "The desired level of A [g/cm^3].");
+    syntax.add_object ("goal_A", Librarian<Pedotransfer>::library (), Syntax::Const, 
+                       Syntax::Singleton, "The desired level of A [g/cm^3].");
     syntax.add ("A_solute", Syntax::Boolean, Syntax::Const, 
                 "True iff 'goal_A' is in solute (mass per volume water).\n\
 If false, the unit is assumed to be mass per volume space.");
-    syntax.add ("min_B", Librarian<Pedotransfer>::library (), Syntax::Const, 
-                Syntax::Singleton, 
-                "Do not convert B to A if B is smaller than this [g/cm^3].");
+    syntax.add_object ("min_B", Librarian<Pedotransfer>::library (), Syntax::Const, 
+                       Syntax::Singleton, 
+                       "Do not convert B to A if B is smaller than this [g/cm^3].");
     syntax.add ("B_solute", Syntax::Boolean, Syntax::Const, 
                 "True iff 'min_B' is in solute (mass per volume water).\n\
 If false, the unit is assumed to be mass per volume space.");

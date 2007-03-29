@@ -291,12 +291,12 @@ End points of canopy layers, first entry is top of canopy, last is soil surface.
   Syntax Rn_syntax;
   AttributeList Rn_alist;
   Rn_alist.add ("type", "brunt");
-  syntax.add ("net_radiation", Librarian<NetRadiation>::library (),
-	      "Net radiation.");
+  syntax.add_object ("net_radiation", Librarian<NetRadiation>::library (),
+                     "Net radiation.");
   alist.add ("net_radiation", Rn_alist);
-  syntax.add ("pet", Librarian<Pet>::library (), 
-              Syntax::OptionalState, Syntax::Singleton, 
-              "Potential Evapotranspiration component.\n\
+  syntax.add_object ("pet", Librarian<Pet>::library (), 
+                     Syntax::OptionalState, Syntax::Singleton, 
+                     "Potential Evapotranspiration component.\n\
 \n\
 By default, choose depending on available climate date.\n\
 \n\
@@ -385,8 +385,8 @@ As a last resort,  Makkink (makkink) will be used.");
               "Actual evaporation from pond.");
 
   // Water going through soil surface.
-  syntax.add ("svat", Librarian<SVAT>::library (), 
-              "Soil Vegetation Atmosphere component.");
+  syntax.add_object ("svat", Librarian<SVAT>::library (), 
+                     "Soil Vegetation Atmosphere component.");
   AttributeList svat_alist;
   svat_alist.add ("type", "none");
   alist.add ("svat", svat_alist);
@@ -409,12 +409,12 @@ As a last resort,  Makkink (makkink) will be used.");
               "Actual leaf temperature.");
 
   //Radiation
-  syntax.add ("raddist", Librarian<Raddist>::library (), 
-              "Radiation distribution model.");
+  syntax.add_object ("raddist", Librarian<Raddist>::library (), 
+                     "Radiation distribution model.");
   alist.add ("raddist", Raddist::default_model ());
-  syntax.add ("difrad", Librarian<Difrad>::library (), 
-              Syntax::OptionalState, Syntax::Singleton, 
-              "Diffuse radiation component.\n\
+  syntax.add_object ("difrad", Librarian<Difrad>::library (), 
+                     Syntax::OptionalState, Syntax::Singleton, 
+                     "Diffuse radiation component.\n\
 \n\
 By default, choose depending on available climate date.\n\
 \n\

@@ -107,9 +107,9 @@ static struct ActionWhileSyntax
 Perform all the specified actions in the sequence listed, but in the\n\
 same timestep.  The 'while' action is done when the first action in the\n\
 list is done.");
-    syntax.add ("actions", Librarian<Action>::library (), 
-                Syntax::State, Syntax::Sequence,
-		"List of actions to perform.");
+    syntax.add_object ("actions", Librarian<Action>::library (), 
+                       Syntax::State, Syntax::Sequence,
+                       "List of actions to perform.");
     syntax.order ("actions");
     Librarian<Action>::add_type ("while", alist, syntax, &make);
   }

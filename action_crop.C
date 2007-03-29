@@ -317,7 +317,7 @@ ActionCrop::Sow::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_check (check_alist);
   syntax.add_submodule ("date", alist, Syntax::Const, "Date to sow.",
 			MM_DD::load_syntax);
-  syntax.add ("crop", Librarian<Crop>::library (), "Crop to sow.");
+  syntax.add_object ("crop", Librarian<Crop>::library (), "Crop to sow.");
   syntax.add ("done", Syntax::Boolean, Syntax::State, 
 	      "True iff the crop has been sowed.");
   alist.add ("done", false);
@@ -501,15 +501,15 @@ The first season is the year the crop management starts.");
 	      "Dry matter at or above which to initiate harvest.");
   syntax.add ("year_of_last_harvest", Syntax::Integer, Syntax::OptionalState, 
 	      "Year of last season.");
-  syntax.add ("fertilize", Librarian<AM>::library (),
-	      Syntax::OptionalConst, Syntax::Sequence,"\
+  syntax.add_object ("fertilize", Librarian<AM>::library (),
+                     Syntax::OptionalConst, Syntax::Sequence,"\
 Fertilizer applications after harvest first season.\n\
 First season is defined as the year where the first harvest occurs.");
   syntax.add ("fertilize_index", Syntax::Integer, Syntax::State,
 	      "Next entry in 'fertilize' to execute.");
   alist.add ("fertilize_index", 0);
-  syntax.add ("fertilize_rest", Librarian<AM>::library (),
-	      Syntax::OptionalConst, Syntax::Sequence,"\
+  syntax.add_object ("fertilize_rest", Librarian<AM>::library (),
+                     Syntax::OptionalConst, Syntax::Sequence,"\
 Fertilizer applications after harvest remaining seasons.\n\
 If missing, use the same fertilizer as first season.");
   syntax.add ("fertilize_rest_index", Syntax::Integer, Syntax::State,
@@ -574,7 +574,7 @@ ActionCrop::Fertilize::load_syntax (Syntax& syntax, AttributeList&)
 	      "Month in the year.");
   syntax.add ("day", Syntax::Integer, Syntax::Const, 
 	      "Day in the month.");
-  syntax.add ("what", Librarian<AM>::library (), "Fertilizer to apply.");
+  syntax.add_object ("what", Librarian<AM>::library (), "Fertilizer to apply.");
   syntax.order ("month", "day", "what");
 }
 
@@ -640,8 +640,8 @@ ActionCrop::Tillage::load_syntax (Syntax& syntax, AttributeList&)
   syntax.add ("day", Syntax::Integer, Syntax::Const, 
 	      "Day in the month.");
   syntax.add_check ("mday", VCheck::valid_mday ());
-  syntax.add ("operation", Librarian<Action>::library (), 
-	      "Tillage operation.");
+  syntax.add_object ("operation", Librarian<Action>::library (), 
+                     "Tillage operation.");
   syntax.order ("month", "day", "operation");
 }
 

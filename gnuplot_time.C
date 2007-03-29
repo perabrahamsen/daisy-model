@@ -367,8 +367,8 @@ By default determine this from the data.");
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
-    syntax.add ("source", Librarian<Source>::library (), Syntax::State, 
-		Syntax::Sequence, "\
+    syntax.add_object ("source", Librarian<Source>::library (), Syntax::State, 
+                       Syntax::Sequence, "\
 Time series to plot.");
     Librarian<Gnuplot>::add_type ("time", alist, syntax, &make);
   }

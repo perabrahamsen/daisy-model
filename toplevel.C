@@ -456,12 +456,12 @@ are generated.");
               Syntax::OptionalConst, Syntax::Sequence,
               "List of directories to search for input files in.\n\
 The special value \".\" means the current directory.");
-  syntax.add ("input", Librarian<Parser>::library (),
-              Syntax::OptionalConst, Syntax::Singleton,
-              "Command to add more information about the simulation.");
-  syntax.add ("run", Librarian<Program>::library (), 
-              Syntax::OptionalState, Syntax::Singleton, 
-              "Program to run.\n\
+  syntax.add_object ("input", Librarian<Parser>::library (),
+                     Syntax::OptionalConst, Syntax::Singleton,
+                     "Command to add more information about the simulation.");
+  syntax.add_object ("run", Librarian<Program>::library (), 
+                     Syntax::OptionalState, Syntax::Singleton, 
+                     "Program to run.\n\
 \n\
 If this option is specified, all the 'Daisy' specific top-level attributes\n\
 will be ignored.  If unspecified, run 'Daisy' on the current top-level\n\
