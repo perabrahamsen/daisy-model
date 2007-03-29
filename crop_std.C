@@ -620,20 +620,20 @@ CropStandardSyntax::CropStandardSyntax ()
   syntax.add_submodule ("last_time", alist, Syntax::OptionalState,
 			"The time of the previous timestep.",
                         Time::load_syntax);
-  syntax.add_object ("Devel", Librarian<Phenology>::library (), 
+  syntax.add_object ("Devel", Phenology::component, 
                      "Development and phenology.");
   syntax.add_submodule ("Partit", alist, Syntax::Const,
 			"Assimilate partitioning.", Partition::load_syntax);
   syntax.add_submodule ("Vernal", alist, Syntax::OptionalState, 
 			"Vernalization.", Vernalization::load_syntax);
-  syntax.add_object ("LeafPhot", Librarian<Photo>::library (),
+  syntax.add_object ("LeafPhot", Photo::component,
                      Syntax::Const, Syntax::Singleton,
                      "Leaf photosynthesis.");
   alist.add ("LeafPhot", Photo::default_model ());
   syntax.add_submodule ("CrpN", alist, Syntax::State,
 			"Nitrogen parameters.", CrpN::load_syntax);
 
-  syntax.add_object ("water_stress_effect", Librarian<WSE>::library (), 
+  syntax.add_object ("water_stress_effect", WSE::component, 
                      Syntax::Const, Syntax::Singleton,
                      "Effect of water stress on production.");
   alist.add ("water_stress_effect", WSE::default_model ());

@@ -185,7 +185,7 @@ By default, let the first source decide.", "");
     alist.add ("description", 
 	       "Merge multiple xy data series into one.");
 
-    syntax.add_object ("source", Librarian<XYSource>::library (),
+    syntax.add_object ("source", XYSource::component,
                        Syntax::State, Syntax::Sequence,
                        "XY data series to merge.");
     syntax.add_check ("source", VCheck::min_size_1 ());

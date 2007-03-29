@@ -456,10 +456,10 @@ are generated.");
               Syntax::OptionalConst, Syntax::Sequence,
               "List of directories to search for input files in.\n\
 The special value \".\" means the current directory.");
-  syntax.add_object ("input", Librarian<Parser>::library (),
+  syntax.add_object ("input", Parser::component,
                      Syntax::OptionalConst, Syntax::Singleton,
                      "Command to add more information about the simulation.");
-  syntax.add_object ("run", Librarian<Program>::library (), 
+  syntax.add_object ("run", Program::component, 
                      Syntax::OptionalState, Syntax::Singleton, 
                      "Program to run.\n\
 \n\

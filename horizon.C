@@ -285,12 +285,12 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
               "Description of this soil type.");
   alist.add ("description", "\
 This is not a model, but a list of parameters shared by all horizon models.");
-  syntax.add_object ("hydraulic", Librarian<Hydraulic>::library (), 
+  syntax.add_object ("hydraulic", Hydraulic::component, 
                      "The hydraulic propeties of the soil.");
   AttributeList hydraulic_alist;
   hydraulic_alist.add ("type", "hypres");
   alist.add ("hydraulic", hydraulic_alist);
-  syntax.add_object ("tortuosity", Librarian<Tortuosity>::library (), 
+  syntax.add_object ("tortuosity", Tortuosity::component, 
                      "The soil tortuosity.");
   AttributeList tortuosity;
   tortuosity.add ("type", "M_Q");
@@ -337,7 +337,7 @@ Negative numbers mean unspecified, let Daisy find appropriate values.");
 Factor multiplied to the turnover rate for all organic matter pools in\n\
 this horizon.");
   alist.add ("turnover_factor", 1.0);
-  syntax.add_object ("Nitrification", Librarian<Nitrification>::library (),
+  syntax.add_object ("Nitrification", Nitrification::component,
                      "The soil nitrification process.");
   AttributeList nitrification_alist;
   nitrification_alist.add ("type", "soil");

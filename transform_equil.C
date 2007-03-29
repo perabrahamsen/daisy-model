@@ -174,16 +174,16 @@ static struct TransformEquilibriumSyntax
 
     alist.add ("description", 
 	       "Two soil components reching for equilibrium.");
-    syntax.add_object ("equilibrium", Librarian<Equilibrium>::library (),
+    syntax.add_object ("equilibrium", Equilibrium::component,
                        "Function for calculating equilibrioum between A and B.");
-    syntax.add_object ("k_AB", Librarian<Pedotransfer>::library (),
+    syntax.add_object ("k_AB", Pedotransfer::component,
                        Syntax::Const, Syntax::Singleton, 
                        "Tranformation rate from soil component 'A' to 'B' [h^-1].");
-    syntax.add_object ("k_BA", Librarian<Pedotransfer>::library (),
+    syntax.add_object ("k_BA", Pedotransfer::component,
                        Syntax::OptionalConst, Syntax::Singleton,
                        "Tranformation rate from soil component 'B' to 'A' [h^-1].\n\
 By default, this is identical to 'k_AB'.");
-    syntax.add_object ("debug", Librarian<Pedotransfer>::library (),
+    syntax.add_object ("debug", Pedotransfer::component,
                        Syntax::OptionalConst, Syntax::Sequence, "\
 Extra pedotransfer function to include in 'daisy.log' for debugging.");
     Librarian<Transform>::add_type ("equilibrium", alist, syntax, &make);

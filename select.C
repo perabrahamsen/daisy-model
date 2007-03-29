@@ -656,7 +656,7 @@ simulation, if the model is used at several places.  Also, there is no\n\
 wildcards, so only a single model can be matches.  The spec is used for\n\
 helping Daisy establish a unique dimension and description for the\n\
 attribute.", Select::Implementation::Spec::load_syntax);
-  syntax.add_object ("when", Librarian<Condition>::library (),
+  syntax.add_object ("when", Condition::component,
                      Syntax::OptionalConst, Syntax::Singleton,
                      "\
 OBSOLETE.  If you set this variable, 'flux' will be set to true.\n\
@@ -693,7 +693,7 @@ If 'accumulate' is true, the printed values will be accumulated..");
 True if the content of this column is interesting enough to warrent an\n\
 initial line in the log file.  This only affects non-flux variables.");
   alist.add ("interesting_content", true);
-  syntax.add_object ("expr", Librarian<Number>::library (), 
+  syntax.add_object ("expr", Number::component, 
                      Syntax::OptionalConst, Syntax::Singleton, "\
 Expression for findig the value for the log file, given the internal\n\
 value 'x'.  For example '(expr (ln x))' will give you the natural\n\

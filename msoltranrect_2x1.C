@@ -203,16 +203,16 @@ Msoltranrect2x1::~Msoltranrect2x1 ()
 void 
 Msoltranrect2x1::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add_object ("transport", Librarian<Transport>::library (),
+  syntax.add_object ("transport", Transport::component,
                      "Primary solute transport model.");
   alist.add ("transport", Transport::default_model ());
-  syntax.add_object ("transport_reserve", Librarian<Transport>::library (),
+  syntax.add_object ("transport_reserve", Transport::component,
                      "Reserve solute transport if the primary model fails.");
   alist.add ("transport_reserve", Transport::reserve_model ());
-  syntax.add_object ("transport_last_resort", Librarian<Transport>::library (),
+  syntax.add_object ("transport_last_resort", Transport::component,
                      "Last resort solute transport if the reserve model fails.");
   alist.add ("transport_last_resort", Transport::none_model ());
-  syntax.add_object ("transport_solid", Librarian<Transport>::library (),
+  syntax.add_object ("transport_solid", Transport::component,
                      "Transport model for non-dissolvable chemicals.\n\
 Should be 'none'.");
   alist.add ("transport_solid", Transport::none_model ());

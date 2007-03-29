@@ -291,10 +291,10 @@ End points of canopy layers, first entry is top of canopy, last is soil surface.
   Syntax Rn_syntax;
   AttributeList Rn_alist;
   Rn_alist.add ("type", "brunt");
-  syntax.add_object ("net_radiation", Librarian<NetRadiation>::library (),
+  syntax.add_object ("net_radiation", NetRadiation::component,
                      "Net radiation.");
   alist.add ("net_radiation", Rn_alist);
-  syntax.add_object ("pet", Librarian<Pet>::library (), 
+  syntax.add_object ("pet", Pet::component, 
                      Syntax::OptionalState, Syntax::Singleton, 
                      "Potential Evapotranspiration component.\n\
 \n\
@@ -385,7 +385,7 @@ As a last resort,  Makkink (makkink) will be used.");
               "Actual evaporation from pond.");
 
   // Water going through soil surface.
-  syntax.add_object ("svat", Librarian<SVAT>::library (), 
+  syntax.add_object ("svat", SVAT::component, 
                      "Soil Vegetation Atmosphere component.");
   AttributeList svat_alist;
   svat_alist.add ("type", "none");
@@ -409,10 +409,10 @@ As a last resort,  Makkink (makkink) will be used.");
               "Actual leaf temperature.");
 
   //Radiation
-  syntax.add_object ("raddist", Librarian<Raddist>::library (), 
+  syntax.add_object ("raddist", Raddist::component, 
                      "Radiation distribution model.");
   alist.add ("raddist", Raddist::default_model ());
-  syntax.add_object ("difrad", Librarian<Difrad>::library (), 
+  syntax.add_object ("difrad", Difrad::component, 
                      Syntax::OptionalState, Syntax::Singleton, 
                      "Diffuse radiation component.\n\
 \n\

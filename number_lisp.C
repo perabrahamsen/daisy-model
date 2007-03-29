@@ -43,7 +43,7 @@ struct NumberLet : public Number
         alist.add ("description", "Bind an identifier to an expression.");
         syntax.add ("identifier", Syntax::String, Syntax::Const, 
                     "Identifier to bind.");
-        syntax.add_object ("expr", Librarian<Number>::library (), 
+        syntax.add_object ("expr", Number::component, 
                            " Value to give it.");
         syntax.order ("identifier", "expr");
       }
@@ -200,7 +200,7 @@ static struct NumberLetSyntax
     alist.add ("description", "\
 Bind symbols in 'clauses' in a new scope, and evaluate 'expr' in that scope.");
     NumberLet::ScopeClause::load_syntax (syntax, alist);
-    syntax.add_object ("expr", Librarian<Number>::library (), "\
+    syntax.add_object ("expr", Number::component, "\
 Expression to evaluate.");
     syntax.order ("clauses", "expr");
     Librarian<Number>::add_type ("let", alist, syntax, &make);

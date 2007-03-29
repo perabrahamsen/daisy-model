@@ -362,7 +362,7 @@ ActionMarkvand::crop_map_t::load_syntax (Syntax& syntax, AttributeList&)
 { 
   syntax.add ("Daisy", Syntax::String, Syntax::Const, 
 	      "Name of Daisy crop.");
-  syntax.add_object ("MARKVAND", Librarian<MV_Crop>::library (), 
+  syntax.add_object ("MARKVAND", MV_Crop::component, 
                      Syntax::Const, Syntax::Singleton,
                      "MARKVAND crop description.");
   syntax.order ("Daisy", "MARKVAND");
@@ -650,7 +650,7 @@ static struct ActionMarkvandSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     syntax.add_check (check_alist);	
-    syntax.add_object ("soil", Librarian<MV_Soil>::library (), Syntax::Const, 
+    syntax.add_object ("soil", MV_Soil::component, Syntax::Const, 
                        Syntax::Singleton,
                        "Soil type to schedule irrigation on.");
     syntax.add_submodule_sequence ("map", Syntax::Const, "\

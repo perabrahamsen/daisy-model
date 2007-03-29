@@ -210,13 +210,15 @@ public:
 	    category, int size, const std::string& description);
 
   void add_object (const std::string& key,// Object
-                   ::Library& lib, 
+                   const char *const lib, 
                    const std::string& description)
   { add_object (key, lib, State, Singleton, description); }
-  void add_object (const std::string&, ::Library&,
+  void add_object (const std::string&, const char* lib,
+                   category, int size, const std::string& description);
+  void add_object (const std::string&, symbol lib,
                    category, int size, const std::string& description);
 
-  void add_library (const std::string&, ::Library&);
+  void add_library (const std::string&, symbol lib);
 
   typedef void (*load_syntax_fun) (Syntax& syntax, AttributeList& alist);
   void add_submodule (const std::string& name, AttributeList& alist,

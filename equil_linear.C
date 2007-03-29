@@ -117,7 +117,7 @@ static struct EquilibriumLinearSyntax
     AttributeList& alist = *new AttributeList ();
     Equilibrium::load_syntax (syntax, alist);
     alist.add ("description", "A = K B");
-    syntax.add_object ("K", Librarian<Pedotransfer>::library (), Syntax::Const, 
+    syntax.add_object ("K", Pedotransfer::component, Syntax::Const, 
                        Syntax::Singleton, "The ratio A/B at equilibrium [].");
 
     Librarian<Equilibrium>::add_type ("linear", alist, syntax, &make);

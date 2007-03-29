@@ -92,7 +92,7 @@ struct BooleanNumbers : public Boolean
   }
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
-    syntax.add_object ("operands", Librarian<Number>::library (), 
+    syntax.add_object ("operands", Number::component, 
                        Syntax::Const, Syntax::Sequence, "\
 List of operands to compare.");
     syntax.order ("operands");

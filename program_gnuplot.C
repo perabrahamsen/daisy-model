@@ -146,7 +146,7 @@ This is useful under MS Windows when dragging the file to a gnuplot icon.");
 The commands will be inserted right before the list of graphs.");
     alist.add ("extra", std::vector<symbol> ());
                 
-    syntax.add_object ("graph", Librarian<Gnuplot>::library (), Syntax::State, 
+    syntax.add_object ("graph", Gnuplot::component, Syntax::State, 
                        Syntax::Sequence, "Graphs to plot.");
     Librarian<Program>::add_type ("gnuplot", alist, syntax, &make);
   }

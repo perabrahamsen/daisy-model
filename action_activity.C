@@ -98,7 +98,7 @@ static struct ActionActivitySyntax
 Perform all the specified actions in the sequence listed.  Each\n\
 action is performed until done.  At most one action can be performed\n\
 at each time step.");
-    syntax.add_object ("actions", Librarian<Action>::library (), 
+    syntax.add_object ("actions", Action::component, 
                        Syntax::State, Syntax::Sequence,
                        "Sequence of actions to perform.");
     alist.add ("actions", vector<AttributeList*> ());

@@ -86,7 +86,7 @@ static struct NumberLog10Syntax
 
     alist.add ("description", 
 	       "Take the base 10 logarithm of its argument.");
-    syntax.add_object ("operand", Librarian<Number>::library (),
+    syntax.add_object ("operand", Number::component,
                        "Operand for this function.");
     syntax.order ("operand");
     Librarian<Number>::add_type ("log10", alist, syntax, &make);
@@ -120,7 +120,7 @@ static struct NumberLnSyntax
 
     alist.add ("description", 
 	       "Take the natural logarithm of its argument.");
-    syntax.add_object ("operand", Librarian<Number>::library (),
+    syntax.add_object ("operand", Number::component,
                        "Operand for this function.");
     syntax.order ("operand");
     Librarian<Number>::add_type ("ln", alist, syntax, &make);
@@ -154,7 +154,7 @@ static struct NumberSqrtSyntax
 
     alist.add ("description", 
 	       "Take the square root of its argument.");
-    syntax.add_object ("operand", Librarian<Number>::library (),
+    syntax.add_object ("operand", Number::component,
                        "Operand for this function.");
     syntax.order ("operand");
     Librarian<Number>::add_type ("sqrt", alist, syntax, &make);
@@ -187,7 +187,7 @@ static struct NumberSqrSyntax
 
     alist.add ("description", 
 	       "Take the square of its argument.");
-    syntax.add_object ("operand", Librarian<Number>::library (),
+    syntax.add_object ("operand", Number::component,
                        "Operand for this function.");
     syntax.order ("operand");
     Librarian<Number>::add_type ("sqr", alist, syntax, &make);
@@ -257,9 +257,9 @@ static struct NumberPowSyntax
 
     alist.add ("description", 
 	       "Raise 'base' to the power of 'exponent'.");
-    syntax.add_object ("base", Librarian<Number>::library (),
+    syntax.add_object ("base", Number::component,
                        "The base operand for this function.");
-    syntax.add_object ("exponent", Librarian<Number>::library (),
+    syntax.add_object ("exponent", Number::component,
                        "The exponent operand for this function.");
     syntax.order ("base", "exponent");
     Librarian<Number>::add_type ("pow", alist, syntax, &make);
@@ -416,7 +416,7 @@ static struct NumberMaxSyntax
 
     alist.add ("description", 
 	       "Use the largest value of its operands.");
-    syntax.add_object ("operands", Librarian<Number>::library (),
+    syntax.add_object ("operands", Number::component,
                        Syntax::Const, Syntax::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
@@ -464,7 +464,7 @@ static struct NumberMinSyntax
 
     alist.add ("description", 
 	       "Use the smallest value of its operands.");
-    syntax.add_object ("operands", Librarian<Number>::library (),
+    syntax.add_object ("operands", Number::component,
                        Syntax::Const, Syntax::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
@@ -509,7 +509,7 @@ static struct NumberProductSyntax
 
     alist.add ("description", 
 	       "Use the product of its operands.");
-    syntax.add_object ("operands", Librarian<Number>::library (),
+    syntax.add_object ("operands", Number::component,
                        Syntax::Const, Syntax::Sequence,
                        "The operands for this function.");
     syntax.order ("operands");
@@ -547,7 +547,7 @@ static struct NumberSumSyntax
 
     alist.add ("description", 
 	       "Use the sum of its operands.");
-    syntax.add_object ("operands", Librarian<Number>::library (),
+    syntax.add_object ("operands", Number::component,
                        Syntax::Const, Syntax::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
@@ -593,7 +593,7 @@ static struct NumberSubtractSyntax
 	       "Negate number or subtract numbers.\n\
 With one operand, negates it.  With more than one operand,\n\
 subtracts all but the first from the first.");
-    syntax.add_object ("operands", Librarian<Number>::library (),
+    syntax.add_object ("operands", Number::component,
                        Syntax::Const, Syntax::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
@@ -637,7 +637,7 @@ static struct NumberDivideSyntax
 
     alist.add ("description", 
 	       "Divide the first operand by the rest.");
-    syntax.add_object ("operands", Librarian<Number>::library (),
+    syntax.add_object ("operands", Number::component,
                        Syntax::Const, Syntax::Sequence,
                        "The operands for this function.");
     syntax.add_check ("operands", VCheck::min_size_1 ());

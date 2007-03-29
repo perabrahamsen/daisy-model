@@ -727,7 +727,7 @@ Movement::load_vertical (Syntax& syntax, AttributeList& alist)
    syntax.add_submodule ("Geometry", alist, Syntax::State,
                          "Discretization of the soil.",
                          Geometry1D::load_syntax);
-   syntax.add_object ("matrix_water", Librarian<UZmodel>::library (), 
+   syntax.add_object ("matrix_water", UZmodel::component, 
                       Syntax::Const, Syntax::Sequence,
                       "Vertical matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
@@ -738,7 +738,7 @@ If none succeeds, the simulation ends.");
    AttributeList vertical_reserve (UZmodel::reserve_model ());
    vertical_models.push_back (&vertical_reserve);
    alist.add ("matrix_water", vertical_models);
-   syntax.add_object ("matrix_solute", Librarian<Transport>::library (), 
+   syntax.add_object ("matrix_solute", Transport::component, 
                       Syntax::Const, Syntax::Sequence,
                       "Vertical matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
@@ -751,16 +751,16 @@ If none succeeds, the simulation ends.");
    AttributeList transport_last_resort (Transport::none_model ());
    transport_models.push_back (&transport_last_resort);
    alist.add ("matrix_solute", transport_models);
-   syntax.add_object ("transport_solid", Librarian<Transport>::library (),
+   syntax.add_object ("transport_solid", Transport::component,
                       "Transport model for non-dissolvable chemicals.\n\
 Should be 'none'.");
    alist.add ("transport_solid", Transport::none_model ());
-   syntax.add_object ("macro", Librarian<Macro>::library (),
+   syntax.add_object ("macro", Macro::component,
                       Syntax::OptionalState, Syntax::Singleton,
                       "Preferential flow model.\n\
 By default, preferential flow is enabled if and only if the combined\n\
 amount of humus and clay in the top horizon is above 5%.");
-   syntax.add_object ("mactrans", Librarian<Mactrans>::library (), 
+   syntax.add_object ("mactrans", Mactrans::component, 
                       "Solute transport model in macropores.");
    alist.add ("mactrans", Mactrans::default_model ());
 }

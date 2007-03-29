@@ -100,7 +100,7 @@ static struct ProgramBatchSyntax
     syntax.add ("directory", Syntax::String, Syntax::Const, "\
 Directory in which to initialize, check and run the programs.");
     alist.add ("directory", ".");
-    syntax.add_object ("run", Librarian<Program>::library (), 
+    syntax.add_object ("run", Program::component, 
                        Syntax::State, Syntax::Sequence, "\
 List of programs to run.  The programs will be run in the sequence listed.");
    

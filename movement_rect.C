@@ -343,7 +343,7 @@ static struct MovementRectSyntax
 				   "Location of cells with drain pipes.",
 				   MovementRect::Point::load_syntax);
     alist.add ("drain", std::vector<AttributeList*> ());
-    syntax.add_object ("matrix_water", Librarian<UZRect>::library (), 
+    syntax.add_object ("matrix_water", UZRect::component, 
                        Syntax::Const, Syntax::Sequence,
                        "Matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
@@ -352,7 +352,7 @@ If none succeeds, the simulation ends.");
     AttributeList matrix_water_reserve (UZRect::reserve_model ());
     matrix_water_models.push_back (&matrix_water_reserve);
     alist.add ("matrix_water", matrix_water_models);
-    syntax.add_object ("matrix_solute", Librarian<Msoltranrect>::library (), 
+    syntax.add_object ("matrix_solute", Msoltranrect::component, 
                        Syntax::Const, Syntax::Sequence,
                        "Matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\

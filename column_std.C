@@ -975,7 +975,7 @@ static struct ColumnStandardSyntax
   static void load_water_and_macro (Syntax& syntax, AttributeList& alist)
   {
     SoilWater::load_syntax (syntax, alist);
-    syntax.add_object ("macro", Librarian<Macro>::library (),
+    syntax.add_object ("macro", Macro::component,
                        Syntax::OptionalState, Syntax::Singleton,
                        "Preferential flow model.\n\
 By default, preferential flow is enabled if and only if the combined\n\
@@ -1001,15 +1001,15 @@ Hansen et.al. 1990. with generic movement in soil.");
     syntax.add_submodule ("SoilHeat", alist, Syntax::State,
                           "Soil heat capacity and transportation.",
                           SoilHeat::load_syntax);
-    syntax.add_object ("Movement", Librarian<Movement>::library (),
+    syntax.add_object ("Movement", Movement::component,
                        Syntax::State, Syntax::Singleton, "\
 Discretization and movement of water, heat and solutes in the soil.");
     alist.add ("Movement", Movement::default_model ());
-    syntax.add_object ("weather", Librarian<Weather>::library (),
+    syntax.add_object ("weather", Weather::component,
                        Syntax::OptionalState, Syntax::Singleton,
                        "Weather model for providing climate information during\n\
 the simulation.  If unspecified, used global weather.");
-    syntax.add_object ("Vegetation", Librarian<Vegetation>::library (),
+    syntax.add_object ("Vegetation", Vegetation::component,
                        Syntax::State, Syntax::Singleton,
                        "The crops on the field.");
     AttributeList vegetation_alist;
@@ -1019,16 +1019,16 @@ the simulation.  If unspecified, used global weather.");
     vegetation_alist.add ("EpInterchange", 0.6);
     alist.add ("Vegetation", vegetation_alist);
 
-    syntax.add_object ("Bioclimate", Librarian<Bioclimate>::library (), 
+    syntax.add_object ("Bioclimate", Bioclimate::component, 
                        Syntax::State, Syntax::Singleton,
                        "The water and energy distribution among the crops.");
     alist.add ("Bioclimate", Bioclimate::default_model ());
     syntax.add_submodule ("Surface", alist, Syntax::State,
                           "The upper border of the soil.",
                           Surface::load_syntax);
-    syntax.add_object ("Groundwater", Librarian<Groundwater>::library (),
+    syntax.add_object ("Groundwater", Groundwater::component,
                        "The groundwater level.");
-    syntax.add_object ("Chemistry", Librarian<Chemistry>::library (), 
+    syntax.add_object ("Chemistry", Chemistry::component, 
                        Syntax::State, Syntax::Singleton,
                        "Chemical compounds in the system.");
     alist.add ("Chemistry", Chemistry::default_model ());
@@ -1068,7 +1068,7 @@ This include ponded water, intercepted water and the snow pack.");
     syntax.add_submodule ("SoilNO3", alist, Syntax::State,
 			  "Nitrate content in soil.",
 			  SoilNO3::load_syntax);
-    syntax.add_object ("OrganicMatter", Librarian<OrganicMatter>::library (),
+    syntax.add_object ("OrganicMatter", OrganicMatter::component,
                        Syntax::State, Syntax::Singleton, "\
 The organic matter in the soil and on the surface.");
     alist.add ("OrganicMatter", OrganicMatter::default_model ());

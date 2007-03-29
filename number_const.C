@@ -268,7 +268,7 @@ struct NumberChild : public Number
   { return child->initialize (msg); }
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
-    syntax.add_object ("value", Librarian<Number>::library (),
+    syntax.add_object ("value", Number::component,
                        "Operand for this function.");
   }
   NumberChild (Block& al)

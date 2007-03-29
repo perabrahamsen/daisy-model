@@ -418,7 +418,7 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "RootSystem");
   alist.add ("description", "Standard root system model.");
 
-  syntax.add_object ("rootdens", Librarian<Rootdens>::library (),
+  syntax.add_object ("rootdens", Rootdens::component,
                      "Root density model.");
   alist.add ("rootdens", Rootdens::default_model ());
 

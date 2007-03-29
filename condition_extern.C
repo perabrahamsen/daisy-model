@@ -92,10 +92,10 @@ static struct ConditionExternSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Test if a boolean expression is true,using extern log.");
-      syntax.add_object ("scope", Librarian<Scopesel>::library (), 
+      syntax.add_object ("scope", Scopesel::component, 
                          Syntax::Const, Syntax::Singleton, "\
 Scope to evaluate expession in.");
-      syntax.add_object ("expr", Librarian<Boolean>::library (), "\
+      syntax.add_object ("expr", Boolean::component, "\
 Expression to evaluate.");
       syntax.order ("scope", "expr");
       Librarian<Condition>::add_type ("extern",

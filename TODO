@@ -4,11 +4,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Metalib
 
-** omdøb Syntax::add til Syntax::add_object
-
-** Slip af med Librarian<T>::library (), brug T::component i stedet
-
-*** Syntax skal kun gemme Model::component, ikke Library.
+** Get rid of Librarian<T>::library && Library::find 
 
 ** Log skal tage et metalib, for nedarvning
 

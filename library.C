@@ -196,8 +196,7 @@ Library::Implementation::load_syntax (Syntax& syntax, AttributeList&)
        i++)
     { 
       const symbol name = (*i).first;
-      Library& library = *((*i).second);
-      syntax.add_library (def + name, library);
+      syntax.add_library (def + name, name);
     }
 }
 

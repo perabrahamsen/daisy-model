@@ -139,18 +139,18 @@ By default a combination of the x and y objects.");
     alist.add ("description", "\
 Combine data from multiple time series with a single expression.\n\
 Data from times series are matched by date.");
-    syntax.add_object ("source", Librarian<Source>::library (), 
+    syntax.add_object ("source", Source::component, 
                        Syntax::State, Syntax::Sequence, "\
 List of sources for data.\n\
 The style information for the sources is ignored, but the dates, title\n\
 and value is used as specified by 'expr' to calculate the combined\n\
 date and value pairs.");
-    syntax.add_object ("x", Librarian<Number>::library (), 
+    syntax.add_object ("x", Number::component, 
                        Syntax::Const, Syntax::Singleton, "\
 Expression for calculating the x value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");
-    syntax.add_object ("y", Librarian<Number>::library (), 
+    syntax.add_object ("y", Number::component, 
                        Syntax::Const, Syntax::Singleton, "\
 Expression for calculating the y value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\

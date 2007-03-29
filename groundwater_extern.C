@@ -128,10 +128,10 @@ static struct GroundwaterExternSyntax
     alist.add ("description", "\
 Look up groundwater table in an scope.  ");
     Groundwater::load_syntax (syntax, alist);
-    syntax.add_object ("scope", Librarian<Scopesel>::library (), 
+    syntax.add_object ("scope", Scopesel::component, 
                        Syntax::Const, Syntax::Singleton, "\
 Scope to look up groundwater table in.");
-    syntax.add_object ("table", Librarian<Number>::library (), 
+    syntax.add_object ("table", Number::component, 
                        Syntax::Const, Syntax::Singleton, "\
 Expression that evaluates to groundwate table in.");
     Librarian<Groundwater>::add_type ("extern", alist, syntax, &make);

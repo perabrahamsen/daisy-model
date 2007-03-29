@@ -107,7 +107,7 @@ static struct ActionWithColumnSyntax
     alist.add ("description", "Perform actions on a specific column.");
     syntax.add ("column", Syntax::String, Syntax::Const, 
 		"Name of column to perform actions on.");
-    syntax.add_object ("actions", Librarian<Action>::library (), 
+    syntax.add_object ("actions", Action::component, 
                        Syntax::State, Syntax::Sequence,
                        "Actions to perform on the specified column.");
     syntax.order ("column", "actions");

@@ -133,7 +133,7 @@ static struct DomsorpStandardSyntax
 
     alist.add ("description", 
 	       "Transformation between two soil chemicals.");
-    syntax.add_object ("transform", Librarian<Transform>::library (),
+    syntax.add_object ("transform", Transform::component,
                        "Tranformation process between DOM and SOM.");
     syntax.add ("dom_pool", Syntax::Integer, Syntax::Const,
 		"Number of the DOM pool affected by the transformation.");

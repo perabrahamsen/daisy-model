@@ -141,10 +141,10 @@ static struct EquilibriumLangmuirSyntax
     AttributeList& alist = *new AttributeList ();
     Equilibrium::load_syntax (syntax, alist);
     alist.add ("description", "A = (my_max B) / (K + B)");
-    syntax.add_object ("K", Librarian<Pedotransfer>::library (), 
+    syntax.add_object ("K", Pedotransfer::component, 
                        Syntax::Const, Syntax::Singleton,
                        "Half saturation constant [g/cm^3].");
-    syntax.add_object ("my_max", Librarian<Pedotransfer>::library (), 
+    syntax.add_object ("my_max", Pedotransfer::component, 
                        Syntax::Const, Syntax::Singleton,
                        "Max equilibrium capacity [g/cm^3].");
     Librarian<Equilibrium>::add_type ("Langmuir", alist, syntax, &make);

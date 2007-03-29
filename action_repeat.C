@@ -98,10 +98,10 @@ static struct ActionRepeatSyntax
       alist.add ("description", "\
 Perform all of the specified action.  When done, repeat the action.\n\
 The action may take several timesteps.");
-      syntax.add_object ("repeat", Librarian<Action>::library (),
+      syntax.add_object ("repeat", Action::component,
                          Syntax::Const, Syntax::Singleton,
                          "Action to perform repeatedly.");
-      syntax.add_object ("do", Librarian<Action>::library (), 
+      syntax.add_object ("do", Action::component, 
                          Syntax::OptionalState, Syntax::Singleton,
                          "Action currently being performed.");
       syntax.order ("repeat");

@@ -56,7 +56,7 @@ struct StringerCond : public Stringer
     {
       alist.add ("description", "\
 If condition is true, return value.");
-      syntax.add_object ("condition", Librarian<Boolean>::library (), "\
+      syntax.add_object ("condition", Boolean::component, "\
 Condition to test for.");
       syntax.add ("value", Syntax::String, Syntax::Const, "\
 Value to return.");
@@ -148,7 +148,7 @@ struct StringerNumber : public Stringer
   // Create.
   static void load_syntax (Syntax& syntax, AttributeList&)
   { 
-    syntax.add_object ("number", Librarian<Number>::library (), "\
+    syntax.add_object ("number", Number::component, "\
 Number to manipulate."); 
   }
   bool initialize (Treelog& msg)

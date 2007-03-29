@@ -311,16 +311,16 @@ LogSelect::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Description of this log file format.");
   alist.add ("description", "\
 Each selected variable is represented by a column in the log.");
-  syntax.add_object ("when", Librarian<Condition>::library (), 
+  syntax.add_object ("when", Condition::component, 
                      "Add entries to the log file when this condition is true.");
-  syntax.add_object ("entries", Librarian<Select>::library (), 
+  syntax.add_object ("entries", Select::component, 
                      Syntax::State, Syntax::Sequence,
                      "What to log in each column.");
   syntax.add ("time_columns", Syntax::Boolean, Syntax::OptionalConst, "\
 Iff true, add columns for year, month, mday and hour in the begining of\n\
 the lines.  By default, this will be true of you have not specified any\n\
 time entries yourself.");
-  syntax.add_object ("volume", Librarian<Volume>::library (), 
+  syntax.add_object ("volume", Volume::component, 
                      Syntax::Const, Syntax::Singleton,
                      "Soil volume to log.");
   alist.add ("volume", Volume::infinite_box ());

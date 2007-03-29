@@ -277,7 +277,7 @@ static struct ProgramHydraulic_tableSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Generate a table of the rentention curve and hydraulic conductivity.");
-    syntax.add_object ("hydraulic", Librarian<Hydraulic>::library (), 
+    syntax.add_object ("hydraulic", Hydraulic::component, 
                        Syntax::Const, Syntax::Singleton, "\
 The hydraulic model to show in the table.");
     syntax.add_check ("hydraulic", no_pedo);

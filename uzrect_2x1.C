@@ -253,7 +253,7 @@ UZRect2x1::has_macropores (Block& block, const bool has_them)
 void 
 UZRect2x1::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add_object ("vertical", Librarian<UZmodel>::library (), 
+  syntax.add_object ("vertical", UZmodel::component, 
                      Syntax::Const, Syntax::Sequence,
                      "Vertical matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
@@ -264,7 +264,7 @@ If none succeeds, the simulation ends.");
   AttributeList vertical_reserve (UZmodel::reserve_model ());
   vertical_models.push_back (&vertical_reserve);
   alist.add ("vertical", vertical_models);
-  syntax.add_object ("horizontal", Librarian<UZmodel>::library (),
+  syntax.add_object ("horizontal", UZmodel::component,
                      Syntax::Const, Syntax::Sequence,
                      "Horizontal matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\

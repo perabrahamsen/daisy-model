@@ -201,7 +201,7 @@ static struct ProgramWSE_tableSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Generate a table of the water stress effect.");
-    syntax.add_object ("wse", Librarian<WSE>::library (), 
+    syntax.add_object ("wse", WSE::component, 
                        Syntax::Const, Syntax::Singleton, "\
 The water stress effect to show in the table.");
     syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\

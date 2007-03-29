@@ -80,7 +80,7 @@ static struct ConditionBooleanSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Test if a boolean expression is true.");
-      syntax.add_object ("expr", Librarian<Boolean>::library (), "\
+      syntax.add_object ("expr", Boolean::component, "\
 Expression to evaluate.");
       syntax.order ("expr");
       Librarian<Condition>::add_type ("check",

@@ -96,7 +96,7 @@ static struct ReactionStandardSyntax
 
     alist.add ("description", 
 	       "Transformation between two soil chemicals.");
-    syntax.add_object ("transform", Librarian<Transform>::library (),
+    syntax.add_object ("transform", Transform::component,
                        "Tranformation process between 'A' to 'B'.");
     syntax.add ("A", Syntax::String, Syntax::Const,
 		"Name of first soil component in equilibrium.");

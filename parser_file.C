@@ -771,7 +771,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                         if (!looking_at ('('))
                           doc = get_string ();
                         if (ok)
-                          syntax.add_object (var, Library::find (type_symbol), 
+                          syntax.add_object (var, type_symbol, 
                                              Syntax::Const, size, doc);
                         break;
                       }

@@ -212,7 +212,7 @@ By default, let the first source decide.", "");
 Any errorbars on the original timeseries are ignored, but the merged\n\
 timeseries may have errorbars if there are multiple values for the\n\
 same time.");
-    syntax.add_object ("source", Librarian<Source>::library (), 
+    syntax.add_object ("source", Source::component, 
                        Syntax::State, Syntax::Sequence, "\
 List of timeseries to merge.");
     syntax.add_check ("source", VCheck::min_size_1 ());

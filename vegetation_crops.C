@@ -723,7 +723,7 @@ field, and want to force the model to confirm to the measurements.  \n\
 emerged.  If no crops have emerged on the field, it will be ignored.",
 				  VegetationCrops::ForcedLAI::load_syntax);
     alist.add ("ForcedLAI", std::vector<AttributeList*> ());
-    syntax.add_object ("crops", Librarian<Crop>::library (), 
+    syntax.add_object ("crops", Crop::component, 
                        Syntax::State, Syntax::Sequence,
                        "List of crops growing in the field");
     alist.add ("crops", std::vector<AttributeList*> ());

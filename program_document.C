@@ -1263,7 +1263,7 @@ static struct ProgramDocumentSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Generate the components part of the reference manual.");
-    syntax.add_object ("format", Librarian<Format>::library (), 
+    syntax.add_object ("format", Format::component, 
                        Syntax::Const, Syntax::Singleton,
                        "Text format used for the document.");
     AttributeList LaTeX_alist;

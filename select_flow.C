@@ -69,7 +69,7 @@ SelectFlow::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("density", Syntax::Boolean, Syntax::Const, 
               "If true, divide value with volume height.");
   alist.add ("density", false);
-  syntax.add_object ("volume", Librarian<Volume>::library (), 
+  syntax.add_object ("volume", Volume::component, 
                      Syntax::Const, Syntax::Singleton,
                      "Soil volume to log flow into.");
   alist.add ("volume", Volume::infinite_box ());

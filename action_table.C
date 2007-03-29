@@ -325,16 +325,16 @@ The fertilizer type will be either the one specified in the\n\
 it with the 'enable_fertilization' attribute.\n\
 \n\
 Fertilizer [name]: The type of fertilizer to be applied.");
-    syntax.add_object ("sow", Librarian<Action>::library (), 
+    syntax.add_object ("sow", Action::component, 
                        Syntax::OptionalConst, Syntax::Singleton, 
                        "Sow action.");
-    syntax.add_object ("emerge", Librarian<Action>::library (), 
+    syntax.add_object ("emerge", Action::component, 
                        Syntax::OptionalConst, Syntax::Singleton, 
                        "Emerge action.");
-    syntax.add_object ("harvest", Librarian<Action>::library (), 
+    syntax.add_object ("harvest", Action::component, 
                        Syntax::OptionalConst, Syntax::Singleton, 
                        "Harvest action.");
-    syntax.add_object ("fertilizer", Librarian<AM>::library (),
+    syntax.add_object ("fertilizer", AM::component,
                        Syntax::OptionalConst, Syntax::Singleton, "\
 The fertilizer you want to apply.");
     syntax.add ("enable_irrigation", Syntax::Boolean, Syntax::Const, "\

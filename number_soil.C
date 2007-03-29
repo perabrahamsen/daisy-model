@@ -99,11 +99,11 @@ struct NumberByDepth : public Number
   }
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
-    syntax.add_object ("column", Librarian<Column>::library (), "\
+    syntax.add_object ("column", Column::component, "\
 The soil column whose properties we want to examine.");
-    syntax.add_object ("h", Librarian<Number>::library (), "\
+    syntax.add_object ("h", Number::component, "\
 The tension we want to compare with.");
-    syntax.add_object ("z", Librarian<Number>::library (), "\
+    syntax.add_object ("z", Number::component, "\
 The height we want to compare with.");
   }
   NumberByDepth (Block& al)
@@ -242,9 +242,9 @@ struct NumberByTension : public Number
   }
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
-    syntax.add_object ("horizon", Librarian<Horizon>::library (), "\
+    syntax.add_object ("horizon", Horizon::component, "\
 The soil horizon whose properties we want to examine.");
-    syntax.add_object ("h", Librarian<Number>::library (), "\
+    syntax.add_object ("h", Number::component, "\
 The tension we want to compare with.");
     syntax.add ("top_soil", Syntax::Boolean, Syntax::Const, "\
 Set this to true for the A horizon.");
@@ -463,9 +463,9 @@ static struct NumberTensionByThetaSyntax
 
     alist.add ("description", 
 	       "Find pressure (h) for a given water content (Theta).");
-    syntax.add_object ("horizon", Librarian<Horizon>::library (), "\
+    syntax.add_object ("horizon", Horizon::component, "\
 The soil horizon whose properties we want to examine.");
-    syntax.add_object ("Theta", Librarian<Number>::library (), "\
+    syntax.add_object ("Theta", Number::component, "\
 The water content we want to compare with.");
     syntax.add ("top_soil", Syntax::Boolean, Syntax::Const, "\
 Set this to true for the A horizon.");
