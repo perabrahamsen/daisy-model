@@ -27,12 +27,13 @@
 
 class Syntax;
 class AttributeList;
+class Metalib;
 
 void
-remove_dependencies (symbol component, symbol parameterization);
+remove_dependencies (const Metalib&, symbol component, symbol par);
 
 void
-remove_dependencies (symbol component, symbol parameterization, 
+remove_dependencies (const Metalib&, symbol component, symbol par,
 		     const Syntax& syntax, AttributeList& alist);
 
 #endif // TRAVERSE_DELETE_H

@@ -72,7 +72,8 @@ struct Value
   bool is_sequence;
   int* ref_count;
 
-  bool subset (const Value& other, const Syntax&, const string& key) const;
+  bool subset (const Metalib&, 
+               const Value& other, const Syntax&, const string& key) const;
 
   void expect (const std::string& key, Syntax::type expected) const;
   void singleton (const std::string& key) const;
@@ -221,7 +222,7 @@ struct Value
 };
 
 bool
-Value::subset (const Value& v, const Syntax& syntax, 
+Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax, 
 	       const string& key) const
 {
   daisy_assert (type == v.type);
@@ -242,9 +243,9 @@ Value::subset (const Value& v, const Syntax& syntax,
 	  const AttributeList& other = *v.alist;
 	  const Syntax::type type = syntax.lookup (key);
 	  if (type == Syntax::AList)
-	    return value.subset (other, syntax.syntax (key));
+	    return value.subset (metalib, other, syntax.syntax (key));
 	  daisy_assert (type == Syntax::Object);
-	  const Library& library = syntax.library (key);
+	  const Library& library = syntax.library (metalib, key);
 
 	  daisy_assert (value.check ("type"));
 	  if (!other.check ("type"))
@@ -254,7 +255,7 @@ Value::subset (const Value& v, const Syntax& syntax,
 	    return false;
 	  if (!library.check (element))
 	    return false;
-	  return value.subset (other, library.syntax (element));
+	  return value.subset (metalib, other, library.syntax (element));
 	}
       case Syntax::PLF:
 	return *plf == *v.plf;
@@ -300,13 +301,13 @@ Value::subset (const Value& v, const Syntax& syntax,
 	    {
 	      const Syntax& nested = syntax.syntax (key);
 	      for (unsigned int i = 0; i < size; i++)
-		if (!value[i]->subset (*other[i], nested))
+		if (!value[i]->subset (metalib, *other[i], nested))
 		  return false;
 	      return true;
 		
 	    }
 	  daisy_assert (type == Syntax::Object);
-	  const Library& library = syntax.library (key);
+	  const Library& library = syntax.library (metalib, key);
 	  for (unsigned int i = 0; i < size; i++)
 	    {
 	      daisy_assert (value[i]->check ("type"));
@@ -317,7 +318,8 @@ Value::subset (const Value& v, const Syntax& syntax,
 		return false;
 	      if (!library.check (element))
 		return false;
-	      if (!value[i]->subset (*other[i], library.syntax (element)))
+	      if (!value[i]->subset (metalib, 
+                                     *other[i], library.syntax (element)))
 		return false;
 	    }
 	  return true;
@@ -582,7 +584,8 @@ AttributeList::check (const string& key) const
 }
 
 bool
-AttributeList::subset (const AttributeList& other, const Syntax& syntax) const
+AttributeList::subset (const Metalib& metalib, 
+                       const AttributeList& other, const Syntax& syntax) const
 { 
   // Find syntax entries.
   vector<string> entries;
@@ -593,21 +596,23 @@ AttributeList::subset (const AttributeList& other, const Syntax& syntax) const
   for (unsigned int i = 0; i < size; i++)
     {
       const string& key = entries[i];
-      if (!subset (other, syntax, key))
+      if (!subset (metalib, other, syntax, key))
 	return false;
     }
   return true;
 }
 
 bool 
-AttributeList::subset (const AttributeList& other, const Syntax& syntax,
+AttributeList::subset (const Metalib& metalib, 
+                       const AttributeList& other, const Syntax& syntax,
 		       const string& key) const
 {
   if (check (key))
     {
       if (other.check (key))
 	{
-	  if (!impl.values[key].subset (other.impl.values[key], syntax, key))
+	  if (!impl.values[key].subset (metalib, 
+                                        other.impl.values[key], syntax, key))
 	    return false;
 	}
       else
@@ -889,11 +894,12 @@ AttributeList::remove (const string& key)
 { impl.remove (key); }
 
 bool
-AttributeList::revert (const string& key, 
+AttributeList::revert (const Metalib& metalib,
+                       const string& key, 
 		       const AttributeList& default_alist, 
 		       const Syntax& syntax)
 {
-  if (subset (default_alist, syntax, key))
+  if (subset (metalib, default_alist, syntax, key))
     return false;
 
   if (!default_alist.check (key))

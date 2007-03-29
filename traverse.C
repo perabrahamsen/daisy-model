@@ -21,6 +21,7 @@
 
 
 #include "traverse.h"
+#include "metalib.h"
 #include "library.h"
 #include "syntax.h"
 #include "alist.h"
@@ -34,7 +35,7 @@ Traverse::traverse_all_libraries ()
   // Traverse through all libraries.
 {
   vector<symbol> components;
-  Library::all (components);
+  metalib.all (components);
 
   for (unsigned int i = 0; i < components.size (); i++)
     {
@@ -64,7 +65,7 @@ void
 Traverse::traverse_library (const symbol component)
   // Traverse through a specific library.
 {
-  Library& library = Library::find (component);
+  Library& library = metalib.library (component);
 
   if (enter_library (library, component))
     {
@@ -84,7 +85,7 @@ void
 Traverse::traverse_model (const symbol component, const symbol model)
   // Traverse through a specific library member.
 {
-  Library& library = Library::find (component);
+  Library& library = metalib.library (component);
   const Syntax& syntax = library.syntax (model);
   AttributeList& alist = library.lookup (model);
 
@@ -287,7 +288,8 @@ Traverse::traverse_parameter (const Syntax& syntax, AttributeList& alist,
 		    AttributeList& entry_alist = alist.alist (parameter);
 		    daisy_assert (entry_alist.check ("type"));
 		    const symbol type = entry_alist.identifier ("type");
-		    const Library& library = syntax.library (parameter);
+		    const Library& library = syntax.library (metalib,
+                                                             parameter);
 		    const AttributeList& entry_default_alist 
 		      = library.lookup (type);
 		    const Syntax& entry_syntax = library.syntax (type);
@@ -305,7 +307,8 @@ Traverse::traverse_parameter (const Syntax& syntax, AttributeList& alist,
 			AttributeList& entry_alist = *sequence[i];
 			daisy_assert (entry_alist.check ("type"));
 			const symbol type = entry_alist.identifier ("type");
-			const Library& library = syntax.library (parameter);
+			const Library& library = syntax.library (metalib,
+                                                                 parameter);
 			const AttributeList& entry_default_alist 
 			  = library.lookup (type);
 			const Syntax& entry_syntax = library.syntax (type);
@@ -327,7 +330,8 @@ Traverse::traverse_parameter (const Syntax& syntax, AttributeList& alist,
     }
 }
 
-Traverse::Traverse ()
+Traverse::Traverse (const Metalib& mlib)
+  : metalib (mlib)
 { }
 
 Traverse::~Traverse ()

@@ -253,7 +253,8 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
   
       AttributeList alist (library.lookup (type));
       alist.add ("type", type);
-      daisy_assert (library.syntax (type).check (alist, block.msg ()));
+      daisy_assert (library.syntax (type).check (block.metalib (),
+                                                 alist, block.msg ()));
       pet.reset (Librarian<Pet>::build_alist (block, alist, "pet"));
     }
 
@@ -273,7 +274,8 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
   
       AttributeList alist (library.lookup (type));
       alist.add ("type", type);
-      daisy_assert (library.syntax (type).check (alist, block.msg ()));
+      daisy_assert (library.syntax (type).check (block.metalib (),
+                                                 alist, block.msg ()));
       difrad.reset (Librarian<Difrad>::build_alist (block, alist, "difrad"));
     }
 }

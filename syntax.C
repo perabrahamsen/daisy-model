@@ -23,6 +23,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
+#include "metalib.h"
 #include "symbol.h"
 #include "check.h"
 #include "vcheck.h"
@@ -39,6 +40,7 @@ const int Syntax::Unspecified = -666;
 struct Syntax::Implementation
 {
   std::vector<check_fun> checker;
+  std::vector<check_object> object_checker;
   std::vector<std::string> order;
   typedef std::map<std::string, type> type_map;
   typedef std::map<std::string, category> status_map;
@@ -62,7 +64,7 @@ struct Syntax::Implementation
   string_map descriptions;
   alist_map alists;
 
-  bool check (const AttributeList& vl, Treelog& err);
+  bool check (const Metalib&, const AttributeList& vl, Treelog& err);
   void check (const std::string& key, double value) const;
   Syntax::type lookup (const std::string& key) const;
   int order_number (const std::string& name) const;
@@ -71,6 +73,7 @@ struct Syntax::Implementation
   { }
   Implementation (const Implementation& old)
     : checker (old.checker),
+      object_checker (old.object_checker),
       order (old.order),
       types (old.types),
       status (old.status),
@@ -101,7 +104,8 @@ struct Syntax::Implementation
 };    
 
 bool 
-Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
+Syntax::Implementation::check (const Metalib& metalib,
+                               const AttributeList& vl, Treelog& msg)
 {
   bool error = false;
 
@@ -116,7 +120,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 	{
 	  if (status[key] == Const || status[key] == State)
 	    {
-	      err.error (key + " missing");
+	      msg.error (key + " missing");
 	      error = true;
 	    }
 	  continue;
@@ -149,7 +153,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		      {
 			std::ostringstream str;
 			str << key << "[" << i << "]: " << message;
-			err.error (str.str ());
+			msg.error (str.str ());
 			error = true;
 		      }
 		}
@@ -157,7 +161,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		{ check->check (vl.number (key)); }
 	      catch (const std::string& message)
 		{
-		  err.error (key + ": " + message);
+		  msg.error (key + ": " + message);
 		  error = true;
 		}
 	    }
@@ -165,7 +169,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
       else if (types[key] == Object)
 	if (size[key] != Singleton)
 	  {
-	    const ::Library& lib = ::Library::find (libraries[key]);
+	    const ::Library& lib = metalib.library (libraries[key]);
 	    const std::vector<AttributeList*>& seq = vl.alist_sequence (key);
 	    int j_index = 0;
 	    for (std::vector<AttributeList*>::const_iterator j = seq.begin ();
@@ -179,45 +183,46 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		if (!al.check ("type"))
 		  {
 		    tmp << "Non object found";
-		    err.error (tmp.str ());
+		    msg.error (tmp.str ());
 		    error = true;
 		  }
 		else if (al.name ("type") == "error")
 		  {
 		    tmp << "Error cell found";
 		    error = true;
-		    err.error (tmp.str ());
+		    msg.error (tmp.str ());
 		  }
 		else if (!lib.check (al.identifier ("type")))
 		  {
 		    tmp << "Unknown library member '"
 			   << al.name ("type") << "'";
-		    err.error (tmp.str ());
+		    msg.error (tmp.str ());
 		    error = true;
 		  }
 		else 
 		  {
 		    tmp << al.name ("type");
-		    Treelog::Open nest (err, tmp.str ());
-		    if (!lib.syntax (al.identifier ("type")).impl.check (al,
-									 err))
+		    Treelog::Open nest (msg, tmp.str ());
+                    const Syntax& ssyn = lib.syntax (al.identifier ("type"));
+		    if (!ssyn.impl.check (metalib, al, msg))
 		      error = true;
 		  }
 	      }
 	  }
 	else 
 	  {
-	    const ::Library& lib = ::Library::find (libraries[key]);
+	    const ::Library& lib = metalib.library (libraries[key]);
 	    const AttributeList& al = vl.alist (key);
 	    if (!al.check ("type"))
 	      {
-		err.error (key + "Non object found");
+		msg.error (key + "Non object found");
 		error = true;
 	      }
 	    else 
 	      {
-		Treelog::Open nest (err, key + ": " + al.name ("type"));
-		if (!lib.syntax (al.identifier ("type")).check (al, err))
+		Treelog::Open nest (msg, key + ": " + al.name ("type"));
+		if (!lib.syntax (al.identifier ("type")).check (metalib, 
+                                                                al, msg))
 		  error = true;
 	      }
 	  }
@@ -233,17 +238,17 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 	      {
 		std::ostringstream tmp;
 		tmp << key << " [" << j_index << "]";
-		Treelog::Open nest (err, tmp.str ());
+		Treelog::Open nest (msg, tmp.str ());
 		j_index++;
 		const AttributeList& al = **j;
-		if (!syntax[key]->impl.check (al, err))
+		if (!syntax[key]->impl.check (metalib, al, msg))
 		  error = true;
 	      }
 	  }
 	else 
 	  {
-	    Treelog::Open nest (err, key);
-	    if (!syntax[key]->impl.check (vl.alist (key), err))
+	    Treelog::Open nest (msg, key);
+	    if (!syntax[key]->impl.check (metalib , vl.alist (key), msg))
 	      error = true;
 	  }
     }
@@ -251,7 +256,18 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
     {
       for (unsigned int j = 0; j < checker.size (); j++)
 	{
-	  if (!checker[j] (vl, err))
+	  if (!checker[j] (vl, msg))
+	    {
+	      error = true;
+	      break;
+	    }
+	}
+    }
+  if (!error)
+    {
+      for (unsigned int j = 0; j < object_checker.size (); j++)
+	{
+	  if (!object_checker[j] (metalib, vl, msg))
 	    {
 	      error = true;
 	      break;
@@ -387,8 +403,9 @@ Syntax::category_number (const std::string& name)
 }
 
 bool
-Syntax::check (const AttributeList& vl, Treelog& err) const
-{ return impl.check (vl, err);}
+Syntax::check (const Metalib& metalib, 
+               const AttributeList& vl, Treelog& err) const
+{ return impl.check (metalib, vl, err);}
 
 void
 Syntax::check (const std::string& key, const double value) const
@@ -469,10 +486,10 @@ Syntax::syntax (const std::string& key) const
 }
 
 ::Library&
-Syntax::library (const std::string& key) const
+Syntax::library (const Metalib& metalib, const std::string& key) const
 {
   daisy_assert (impl.libraries.find (key) != impl.libraries.end ());
-  return ::Library::find (impl.libraries[key]);
+  return metalib.library (impl.libraries[key]);
 }
 
 int
@@ -802,6 +819,10 @@ Syntax::entries () const
 void 
 Syntax::add_check (check_fun fun)
 { impl.checker.push_back (fun); }
+
+void 
+Syntax::add_object_check (check_object fun)
+{ impl.object_checker.push_back (fun); }
 
 Syntax::Syntax ()
   : impl (*new Implementation ())

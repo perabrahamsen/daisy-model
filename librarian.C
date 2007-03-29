@@ -98,7 +98,7 @@ BuildBase::build_free (const char *const component, Metalib& metalib,
     }
   const Syntax& syntax = lib.syntax (type);
   Block block (metalib, msg, syntax, alist, scope_id + ": " + type.name ());
-  daisy_assert (syntax.check (alist, msg));
+  daisy_assert (syntax.check (metalib, alist, Treelog::null ()));
   try
     { return lib.build_raw (type, block); }
   catch (const std::string& err)
@@ -125,7 +125,7 @@ BuildBase::build_alist (const char *const component,
     }
   const Syntax& syntax = lib.syntax (type);
   Block nested (parent, syntax, alist, scope_id + ": " + type.name ());
-  daisy_assert (syntax.check (alist, nested.msg ()));
+  daisy_assert (syntax.check (parent.metalib (), alist, Treelog::null ()));
   try
     {  return lib.build_raw (type, nested); }
   catch (const std::string& err)

@@ -1,12 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Installer boost fra cvs på dirac/sheridan
-
 * Metalib
 
-** Get rid of Librarian<T>::library && Library::find 
+** Få daisy til at compile
 
-** Log skal tage et metalib, for nedarvning
+** Få daisy til at køre
+
+** Fjern metalib funktionalitet fra Library.
+
+** Get rid of Librarian<T>::library 
 
 * OpenMI
 

@@ -101,7 +101,7 @@ LogCheckpoint::done (const Time&, double)
       const string filename (scratch.str ());
 
       // Open log file.
-      PrinterFile printer (filename);
+      PrinterFile printer (metalib (), filename);
       printer.print_comment (description);
 
       // Print "directory" and "path" before inputs.

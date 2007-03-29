@@ -260,7 +260,7 @@ daisy_alist_set_alist_at (daisy_alist* alist, const char* name,
  */
 
 EXPORT daisy_library*                  /* Return the library named NAME. */
-daisy_library_find (const char* name);
+daisy_library_find (daisy_daisy* daisy, const char* name);
 
 EXPORT int                             /* Number of objects in LIBRARY. */
 daisy_library_size (const daisy_library* library);
@@ -287,7 +287,7 @@ daisy_library_file (const daisy_library* library, const char* name);
    Currently, only the Horizon and Column libraries are supported.
 */
 EXPORT void
-daisy_library_derive (daisy_library* library, 
+daisy_library_derive (daisy_daisy* daisy, daisy_library* library, 
                       const char* super, const daisy_alist* alist, 
                       const char* name, const char* filename);
 
@@ -300,7 +300,7 @@ daisy_library_remove (daisy_library* library, const char* name);
  */
 
 EXPORT daisy_printer*                  /* Print to FILENAME. */
-daisy_printer_create_file (const char* filename);
+daisy_printer_create_file (daisy_daisy* daisy, const char* filename);
 
 EXPORT void                            /* Print COMMENT */
 daisy_printer_comment (daisy_printer* printer, const char* comment);

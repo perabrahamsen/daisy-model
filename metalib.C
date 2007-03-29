@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "metalib.h"
+#include "library.h"
 #include "syntax.h"
 #include "alist.h"
 
@@ -38,6 +39,30 @@ Metalib::syntax () const
 AttributeList&
 Metalib::alist () const
 { return impl->alist_; }
+
+bool
+Metalib::exist (symbol name) const
+{ return Library::metalib_exist (name); }
+
+Library& 
+Metalib::library (const symbol name) const
+{ return Library::metalib_find (name); }
+
+void 
+Metalib::all (std::vector<symbol>& libraries) const
+{ Library::metalib_all (libraries); }
+
+int 
+Metalib::get_sequence ()
+{ return Library::metalib_get_sequence (); }
+
+void 
+Metalib::clear_all_parsed ()
+{ Library::metalib_clear_all_parsed (); }
+
+void 
+Metalib::refile_parsed (const std::string& from, const std::string& to)
+{ Library::metalib_refile_parsed (from, to); }
 
 Metalib::Metalib ()
   : impl (new Implementation ())

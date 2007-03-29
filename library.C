@@ -33,11 +33,9 @@
 #include <set>
 #include <sstream>
 
-using namespace std;
-
 struct Library::Implementation
 {
-  typedef map<symbol, Library*> library_map;
+  typedef std::map<symbol, Library*> library_map;
   static library_map* all;
   static size_t all_count;
   typedef std::map<symbol, builder> bmap_type;
@@ -48,21 +46,21 @@ struct Library::Implementation
 
   const symbol name;
   const char *const description;
-  typedef map<symbol, AttributeList*> alist_map;
-  typedef map<symbol, const Syntax*> syntax_map;
+  typedef std::map<symbol, AttributeList*> alist_map;
+  typedef std::map<symbol, const Syntax*> syntax_map;
   alist_map alists;
   syntax_map syntaxen;
-  vector<doc_fun> doc_funs;
-  static void all_entries (vector<symbol>& libraries);
+  std::vector<doc_fun> doc_funs;
+  static void all_entries (std::vector<symbol>& libraries);
   AttributeList& lookup (symbol) const;
   bool check (symbol) const;
   void add_base (AttributeList&, const Syntax&);
   void add (symbol, AttributeList&, const Syntax&, builder);
   const Syntax& syntax (symbol) const;
-  void entries (vector<symbol>&) const;
+  void entries (std::vector<symbol>&) const;
   void remove (symbol);
   void clear_parsed ();
-  void refile_parsed (const string& from, const string& to);
+  void refile_parsed (const std::string& from, const std::string& to);
   static void load_syntax (Syntax&, AttributeList&);
   Implementation (const char* n, const char* des);
   ~Implementation ();
@@ -73,7 +71,7 @@ size_t Library::Implementation::all_count = 0;
 int Library::Implementation::sequence = 0;
 
 void
-Library::Implementation::all_entries (vector<symbol>& libraries)
+Library::Implementation::all_entries (std::vector<symbol>& libraries)
 { 
   for (library_map::const_iterator i = all->begin (); 
        i != all->end ();
@@ -135,7 +133,7 @@ Library::Implementation::syntax (const symbol key) const
 }
 
 void
-Library::Implementation::entries (vector<symbol>& result) const
+Library::Implementation::entries (std::vector<symbol>& result) const
 {
   for (syntax_map::const_iterator i = syntaxen.begin ();
        i != syntaxen.end ();
@@ -173,7 +171,7 @@ Library::Implementation::clear_parsed ()
 }
 
 void
-Library::Implementation::refile_parsed (const string& from, const string& to)
+Library::Implementation::refile_parsed (const std::string& from, const std::string& to)
 {
   daisy_assert (from != to);
   for (alist_map::iterator i = alists.begin (); i != alists.end (); i++)
@@ -190,7 +188,7 @@ Library::Implementation::refile_parsed (const string& from, const string& to)
 void
 Library::Implementation::load_syntax (Syntax& syntax, AttributeList&)
 {
-  const string def = "def";
+  const std::string def = "def";
   for (library_map::const_iterator i = all->begin (); 
        i != all->end ();
        i++)
@@ -218,7 +216,7 @@ Library::Implementation::~Implementation ()
   map_delete (alists.begin (), alists.end ());
 
   // Delete unique syntaxen.
-  set<const Syntax*, less<const Syntax*>/**/> unique;
+  std::set<const Syntax*> unique;
   for (syntax_map::iterator i = syntaxen.begin ();
        i != syntaxen.end ();
        i++)
@@ -241,26 +239,56 @@ Library::Implementation::~Implementation ()
 }
 
 bool
-Library::exist (const symbol name)
+Library::metalib_exist (const symbol name)
 { return Implementation::all->find (name) != Implementation::all->end (); }
 
 Library& 
-Library::find (const symbol name)
+Library::metalib_find (const symbol name)
 { return *(*Implementation::all)[name]; }
 
 void
-Library::all (vector<symbol>& libraries)
+Library::metalib_all (std::vector<symbol>& libraries)
 { 
   Implementation::all_entries (libraries);
 }
 
 int
-Library::get_sequence ()
+Library::metalib_get_sequence ()
 { 
   Implementation::sequence++;
   // Nobody will ever need more than two billion objects --- Per 1998.
   daisy_assert (Implementation::sequence > 0);
   return Implementation::sequence;
+}
+
+void 
+Library::metalib_clear_all_parsed ()
+{
+  std::vector<symbol> components;
+  Library::metalib_all (components);
+
+  for (unsigned int i = 0; i < components.size (); i++)
+    {
+      const symbol component = components[i];
+      const Library& library = Library::metalib_find (component);
+      
+      library.impl.clear_parsed ();
+    }
+}
+
+void 
+Library::metalib_refile_parsed (const std::string& from, const std::string& to)
+{
+  std::vector<symbol> components;
+  Library::metalib_all (components);
+
+  for (unsigned int i = 0; i < components.size (); i++)
+    {
+      const symbol component = components[i];
+      const Library& library = Library::metalib_find (component);
+      
+      library.impl.refile_parsed (from, to);
+    }
 }
 
 symbol
@@ -308,7 +336,7 @@ Library::syntax (const symbol key) const
 { return impl.syntax (key); }
 
 void
-Library::entries (vector<symbol>& result) const
+Library::entries (std::vector<symbol>& result) const
 { impl.entries (result); }
 
 bool 
@@ -382,43 +410,13 @@ void
 Library::add_doc_fun (doc_fun fun) 
 { impl.doc_funs.push_back (fun); }
 
-vector<Library::doc_fun>& 
+std::vector<Library::doc_fun>& 
 Library::doc_funs () const
 { return impl.doc_funs; }
 
 void
 Library::remove (const symbol key)
 { impl.remove (key); }
-
-void 
-Library::clear_all_parsed ()
-{
-  vector<symbol> components;
-  Library::all (components);
-
-  for (unsigned int i = 0; i < components.size (); i++)
-    {
-      const symbol component = components[i];
-      const Library& library = Library::find (component);
-      
-      library.impl.clear_parsed ();
-    }
-}
-
-void 
-Library::refile_parsed (const string& from, const string& to)
-{
-  vector<symbol> components;
-  Library::all (components);
-
-  for (unsigned int i = 0; i < components.size (); i++)
-    {
-      const symbol component = components[i];
-      const Library& library = Library::find (component);
-      
-      library.impl.refile_parsed (from, to);
-    }
-}
 
 Model* 
 Library::build_raw (const symbol type, Block& block) const
@@ -427,7 +425,7 @@ Library::build_raw (const symbol type, Block& block) const
     = impl.builders.find (type);
   if  (i == impl.builders.end ())
     {
-      ostringstream tmp;
+      std::ostringstream tmp;
       tmp << "No '" << type.name () << "' found in '"  << impl.name.name()
           << "' library";
       daisy_panic (tmp.str ());

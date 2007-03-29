@@ -49,7 +49,7 @@ private:
 public:
   const std::auto_ptr<Treelog> msg;
 private:
-  Metalib metalib;
+  Metalib metalib_;
   std::time_t start_time;
   bool has_printed_copyright;
 public:
@@ -65,6 +65,7 @@ public:
   const Syntax& program_syntax () const;
   const AttributeList& program_alist () const;
   Program& program () const;
+  Metalib& metalib ();
 
   // Messages.
 private:

@@ -24,6 +24,7 @@
 #include "geometry.h"
 #include "number.h"
 #include "scope_id.h"
+#include "metalib.h"
 #include "library.h"
 #include "alist.h"
 #include "check.h"
@@ -32,6 +33,7 @@
 #include "symbol.h"
 #include "format.h"
 #include "submodel.h"
+#include "submodeler.h"
 #include "mathlib.h"
 #include <numeric>
 #include <map>
@@ -72,6 +74,7 @@ struct Select::Implementation
   struct Spec
   {
     // Content.
+    const Metalib& metalib;
     const symbol library_name;
     const symbol model_name;
     const std::vector<symbol> submodels_and_attribute;
@@ -88,9 +91,9 @@ struct Select::Implementation
 			    const Syntax& syntax,
 			    const AttributeList& alist,
 			    Treelog& err);
-    static bool check_alist (const AttributeList& al, Treelog& err);
+    static bool check_alist (const Metalib&, const AttributeList&, Treelog&);
     static void load_syntax (Syntax& syntax, AttributeList&);
-    Spec (const AttributeList&);
+    Spec (Block&);
     ~Spec ();
   };
   std::auto_ptr<Spec> spec;
@@ -129,7 +132,7 @@ Select::Implementation::Spec::leaf_syntax (Syntax& buffer) const
     }
   else
     {
-      const Library& library = Library::find (library_name);
+      const Library& library = metalib.library (library_name);
       syntax = &library.syntax (model_name);
     }
 
@@ -244,7 +247,8 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
 }
 
 bool 
-Select::Implementation::Spec::check_alist (const AttributeList& al,
+Select::Implementation::Spec::check_alist (const Metalib& metalib,
+                                           const AttributeList& al,
 					   Treelog& err)
 {
   bool ok = true;
@@ -275,14 +279,14 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
 	    ok = false;
 	}
     }
-  else if (!Library::exist (library_name))
+  else if (!metalib.exist (library_name))
     {
       err.entry ("'" + library_name + "': no such library");
       ok = false;
     }
   else
     {
-      const Library& library = Library::find (library_name);
+      const Library& library = metalib.library (library_name);
       
       if (!library.check (model_name))
 	{
@@ -303,7 +307,7 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
 void 
 Select::Implementation::Spec::load_syntax (Syntax& syntax, AttributeList&)
 { 
-  syntax.add_check (check_alist);
+  syntax.add_object_check (check_alist);
   syntax.add ("library", Syntax::String, Syntax::Const, "\
 Name of library where the attribute belong.\n\
 Use 'fixed' to denote a fixed component.");
@@ -315,8 +319,9 @@ Name of submodels and attribute.");
   syntax.order ("library", "model", "submodels_and_attribute");
 }
 
-Select::Implementation::Spec::Spec (const AttributeList& al)
-  : library_name (al.identifier ("library")),
+Select::Implementation::Spec::Spec (Block& al)
+  : metalib (al.metalib ()),
+    library_name (al.identifier ("library")),
     model_name (al.identifier ("model")),
     submodels_and_attribute (al.identifier_sequence
 			     ("submodels_and_attribute"))
@@ -449,7 +454,7 @@ static const symbol flux_top_symbol ("flux_top");
 
 Select::Implementation::Implementation (Block& al)
   : spec (al.check ("spec")
-	  ? new Spec (al.alist ("spec")) 
+	  ? submodel<Spec> (al, "spec")
 	  : NULL),
     scope (x_symbol, Syntax::unknown ()),
     spec_conv (NULL),

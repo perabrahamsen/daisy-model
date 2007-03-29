@@ -30,9 +30,13 @@
 class Library;
 class Syntax;
 class AttributeList;
+class Metalib;
 
 class Traverse
 {
+public:
+  const Metalib& metalib;
+
   // Major calls.
 public:
   void traverse_all_libraries ();
@@ -114,7 +118,7 @@ protected:
 
   // Create and destroy.
 protected:
-  Traverse ();
+  Traverse (const Metalib&);
   virtual ~Traverse ();
 };
 

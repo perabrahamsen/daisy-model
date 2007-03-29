@@ -43,31 +43,31 @@
 
 Syntax& 
 Toplevel::syntax () 
-{ return metalib.syntax (); }
+{ return metalib_.syntax (); }
 
 AttributeList&
 Toplevel::alist ()
-{ return metalib.alist (); }
+{ return metalib_.alist (); }
 
 const Syntax& 
 Toplevel::program_syntax () const
 {
-  if (metalib.alist ().check ("run"))
+  if (metalib_.alist ().check ("run"))
     {
       daisy_assert (program_alist ().check ("type"));
       const Library& library = Librarian<Program>::library ();
       return library.syntax (program_alist ().identifier ("type"));
     }
-  return metalib.syntax ();
+  return metalib_.syntax ();
 }
 
 const AttributeList& 
 Toplevel::program_alist () const
 {
-  if (metalib.alist ().check ("run"))
-    return metalib.alist ().alist ("run");
+  if (metalib_.alist ().check ("run"))
+    return metalib_.alist ().alist ("run");
 
-  return metalib.alist ();
+  return metalib_.alist ();
 }
  
 Program& 
@@ -85,6 +85,10 @@ Toplevel::program () const
     }
   return *program_;
 }
+
+Metalib& 
+Toplevel::metalib ()
+{ return metalib_; }
 
 void
 Toplevel::usage ()
@@ -217,17 +221,17 @@ Toplevel::initialize ()
   daisy_assert (state_ == is_uninitialized);
 
   copyright ();
-  if (!program_syntax ().check (program_alist (), *msg))
+  if (!program_syntax ().check (metalib_, program_alist (), *msg))
     throw EXIT_FAILURE;
   {                             // Limit lifetime of block.
-    Block block (metalib, *msg, "Building");
+    Block block (metalib_, *msg, "Building");
     program_.reset (Librarian<Program>::build_alist (block,
                                                      program_alist (), "run"));
     if (!block.ok ())
       throw EXIT_FAILURE;
   }
   {
-    Block block (metalib, *msg, "Initializing");
+    Block block (metalib_, *msg, "Initializing");
     program_->initialize (block);
     if (!block.ok ())
       throw EXIT_FAILURE;
@@ -298,8 +302,8 @@ Toplevel::command_line (int& argc, char**& argv)
           copyright ();
 	  // Parse the file.
 	  Treelog::Open nest (*msg, "Parsing file");
-	  ParserFile parser (metalib, arg, *msg);
-	  parser.load (metalib.alist ());
+	  ParserFile parser (metalib_, arg, *msg);
+	  parser.load (metalib_.alist ());
 	  file_found = true;
 	  errors_found += parser.error_count ();
 	}
@@ -339,10 +343,10 @@ Toplevel::command_line (int& argc, char**& argv)
                 AttributeList p_alist (library.lookup (name));
                 p_alist.add ("type", name);
                 Treelog::Open nest (*msg, name);
-                if (p_syntax.check (p_alist, *msg))
+                if (p_syntax.check (metalib_, p_alist, *msg))
                   {
                     // Build.
-		    std::auto_ptr<Block> block (new Block (metalib, *msg, 
+		    std::auto_ptr<Block> block (new Block (metalib_, *msg, 
                                                            "Building"));
                     std::auto_ptr<Program> program
                       (Librarian<Program>::build_alist (*block, p_alist, 
@@ -351,7 +355,7 @@ Toplevel::command_line (int& argc, char**& argv)
                       throw EXIT_FAILURE;
 
                     // Initialize.
-                    block.reset (new Block (metalib, *msg, "Initializing"));
+                    block.reset (new Block (metalib_, *msg, "Initializing"));
                     program->initialize (*block);
 		    if (!block->ok ())
                       throw EXIT_FAILURE;
@@ -398,8 +402,8 @@ Toplevel::parse_file (const std::string& filename)
   daisy_assert (state_ == is_uninitialized);
   copyright ();
   Treelog::Open nest (*msg, "Parsing file");
-  ParserFile parser (metalib, filename, *msg);
-  parser.load (metalib.alist ());
+  ParserFile parser (metalib_, filename, *msg);
+  parser.load (metalib_.alist ());
   if (parser.error_count () > 0)
     throw EXIT_FAILURE;
 }
@@ -491,7 +495,7 @@ Toplevel::Toplevel (const std::string& logname)
     state_ (is_uninitialized)
 { 
   Assertion::Register reg (*msg);
-  load_syntax (metalib.syntax (), metalib.alist ()); 
+  load_syntax (metalib_.syntax (), metalib_.alist ()); 
   initialize_once ();
 }
 

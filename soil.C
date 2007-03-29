@@ -461,14 +461,15 @@ Soil::initialize_aquitard (Block& top,
   AttributeList hydraulic_alist (horizon_alist.alist ("hydraulic"));
   hydraulic_alist.add ("K_sat", K_aquitard);
   horizon_alist.add ("hydraulic", hydraulic_alist);
-  daisy_assert (library.syntax (aquitard_symbol).check (horizon_alist,
+  daisy_assert (library.syntax (aquitard_symbol).check (top.metalib (),
+                                                        horizon_alist,
                                                         top.msg ()));
   Syntax layer_syntax;
   AttributeList layer_alist;
   Implementation::Layer::load_syntax (layer_syntax, layer_alist);
   layer_alist.add ("end", new_end);
   layer_alist.add ("horizon", horizon_alist);
-  daisy_assert (layer_syntax.check (layer_alist, top.msg ()));
+  daisy_assert (layer_syntax.check (top.metalib (), layer_alist, top.msg ()));
   Block block (top, layer_syntax, layer_alist, "aquitard layer");
   impl.layers.push_back (new Implementation::Layer (block));
 

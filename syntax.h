@@ -30,6 +30,7 @@
 
 class AttributeList;
 class Library;
+class Metalib;
 class Check;
 class VCheck;
 
@@ -91,7 +92,7 @@ public:
   static int category_number (const std::string& name);
 
   // This function will check that an alist conform to the syntax.
-  bool check (const AttributeList&, Treelog& err) const;
+  bool check (const Metalib&, const AttributeList&, Treelog& err) const;
   
   // Check that a numeric value is within the allowed range.
   void check (const std::string& key, double value) const;
@@ -108,7 +109,7 @@ public:
 
   type lookup (const std::string&) const;
   const Syntax& syntax (const std::string&) const;
-  ::Library& library (const std::string&) const;
+  ::Library& library (const Metalib&, const std::string&) const;
   int  size (const std::string&) const;
   const std::string& dimension (const std::string&) const;
   const std::string& domain (const std::string&) const;
@@ -249,9 +250,10 @@ public:
 
   // A check_fun is a function used for extra syntax checking.
   typedef bool (*check_fun)(const AttributeList&, Treelog& err);
-  typedef bool (*check_list_fun)(const std::vector<AttributeList*>&,
-				 Treelog& err);
+  typedef bool (*check_object)(const Metalib&, 
+                               const AttributeList&, Treelog& err);
   void add_check (check_fun);
+  void add_object_check (check_object);
 
   explicit Syntax ();
   explicit Syntax (const Syntax&);

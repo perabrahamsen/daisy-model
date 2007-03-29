@@ -28,6 +28,8 @@
 #include <vector>
 #include <set>
 
+class Metalib;
+
 class XRef
 {
   // Content.
@@ -71,7 +73,7 @@ public:
 
   // Create and Destroy.
 public:
-  XRef ();
+  XRef (const Metalib& mlib);
   ~XRef ();
 };
 

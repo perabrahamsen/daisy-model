@@ -253,12 +253,13 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
     {
       const symbol parent = alist.identifier ("type");
       if (log_lib.check (parent)
-          && alist.subset (log_lib.lookup (parent), log_lib.syntax (parent),
+          && alist.subset (metalib, 
+                           log_lib.lookup (parent), log_lib.syntax (parent),
                            "entries"))
         return;
     }
 
-  if (!syntax.check (alist, Treelog::null ()))
+  if (!syntax.check (metalib, alist, Treelog::null ()))
     {
       // Incomplete log.
       if (!alist.check ("entries"))

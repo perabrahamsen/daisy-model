@@ -50,14 +50,19 @@ public:
 private:
   Implementation& impl;
 
+  // Metalib
 public:
-  // Find a specific library.
-  static bool exist (symbol name);
-  static Library& find (symbol name);
-  static void all (std::vector<symbol>& libraries);
-  static int get_sequence ();
+  static bool metalib_exist (symbol name);
+  static Library& metalib_find (symbol name);
+  static void metalib_all (std::vector<symbol>& libraries);
+  static int metalib_get_sequence ();
+  static void metalib_clear_all_parsed ();
+  static void metalib_refile_parsed (const std::string& from,
+                                     const std::string& to);
+
 
   // Use.
+public:
   symbol name () const;
   const char* description () const;
   AttributeList& lookup (symbol) const;
@@ -78,10 +83,6 @@ public:
 
   // Dependencies.
   void remove (symbol);
-
-  // File handling.
-  static void clear_all_parsed ();
-  static void refile_parsed (const std::string& from, const std::string& to);
 
   // Build a model.
   Model* build_raw (const symbol type, Block& block) const;

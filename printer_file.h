@@ -63,8 +63,8 @@ public:
  // Create and Destroy.
 public:
   PrinterFile (Block& al);
-  PrinterFile (const std::string& filename);
-  PrinterFile (std::ostream& out);
+  PrinterFile (const Metalib&, const std::string& filename);
+  PrinterFile (const Metalib&, std::ostream& out);
   ~PrinterFile ();
 };
 

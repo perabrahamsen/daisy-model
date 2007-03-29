@@ -159,7 +159,7 @@ Block::Implementation::expand_string (Block& block,
                         Treelog::Open nest (msg, "${" + key + "}");
                         const AttributeList& obj = alist.alist (key);
                         const std::string type = obj.name ("type");
-                        const Library& library = syntax.library (key);
+                        const Library& library = syntax.library (metalib, key);
                         const ScopeBlock scope (block);
                         if (&library == &Librarian<Stringer>::library ())
                           {

@@ -23,6 +23,7 @@
 
 #include "program.h"
 #include "library.h"
+#include "metalib.h"
 #include "block.h"
 #include "alist.h"
 #include "submodel.h"
@@ -76,9 +77,10 @@ struct ProgramDocument : public Program
 			   bool last);
 
   // Print parts of it.
-  static void own_entries (const Library& library, const symbol name, 
+  static void own_entries (const Metalib&,
+                           const Library& library, const symbol name, 
                            std::vector<std::string>& entries);
-  static void inherited_entries (const Library& library,
+  static void inherited_entries (const Metalib&, const Library& library,
                                  const symbol name, 
                                  std::vector<std::string>& entries);
   void print_sample (const std::string& name,
@@ -133,6 +135,7 @@ struct ProgramDocument : public Program
   ProgramDocument (Block& al)
     : Program (al),
       metalib (al.metalib ()),
+      xref (metalib),
       format (Librarian<Format>::build_item (al, "format")),
       print_parameterizations (al.flag ("print_parameterizations"))
   { }
@@ -220,7 +223,7 @@ ProgramDocument::print_entry_type (const std::string& name,
       break;
     case Syntax::Object:
       {
-	const symbol component = syntax.library (name).name ();
+	const symbol component = syntax.library (metalib, name).name ();
 	format->bold (component.name ());
 	format->text (" component ");
 	format->see ("chapter", "component",  component.name ());
@@ -358,7 +361,7 @@ ProgramDocument::print_entry_value (const std::string& name,
 	  case Syntax::AList:
 	    {
 	      const bool has_errors
-		= !syntax.syntax (name).check (alist.alist (name), 
+		= !syntax.syntax (name).check (metalib, alist.alist (name), 
 					       Treelog::null ());
 	      if (has_errors)
 		format->text (" (has partially specified default value)");
@@ -374,7 +377,7 @@ ProgramDocument::print_entry_value (const std::string& name,
 		  Submodel::load_syntax (submodel, 
 					 nested_syntax, default_alist);
 		  
-		  if (!nested.subset (default_alist, nested_syntax))
+		  if (!nested.subset (metalib, default_alist, nested_syntax))
 		    print_default_value = true;
 		}
 	      else
@@ -427,9 +430,9 @@ ProgramDocument::print_entry_value (const std::string& name,
 	      daisy_assert (object.check ("type"));
 	      const symbol type = object.identifier ("type");
 	      format->text (" (default `" + type.name () + "')");
-	      const Library& library = syntax.library (name);
+	      const Library& library = syntax.library (metalib, name);
 	      const AttributeList& super = library.lookup (type);
-	      if (!object.subset (super, library.syntax (type)))
+	      if (!object.subset (metalib, super, library.syntax (type)))
 		print_default_value = true;
 	    }
 	    break;
@@ -466,7 +469,7 @@ ProgramDocument::print_entry_value (const std::string& name,
       if (print_default_value)
 	{
 	  std::ostringstream tmp;
-	  PrinterFile printer (tmp);
+	  PrinterFile printer (metalib, tmp);
 	  printer.print_entry (alist, syntax, name);
 	  format->soft_linebreak ();
 	  format->verbatim (tmp.str ());
@@ -583,7 +586,8 @@ ProgramDocument::print_sample_entry (const std::string& name,
 	    case Syntax::AList:
 	      {
 		const bool has_errors
-		  = !syntax.syntax (name).check (alist.alist (name), 
+		  = !syntax.syntax (name).check (metalib,
+                                                 alist.alist (name), 
 						 Treelog::null ());
 		if (has_errors)
 		  comment = "Has partial value.";
@@ -705,7 +709,8 @@ ProgramDocument::print_sample_entry (const std::string& name,
     }
 }
 void
-ProgramDocument::own_entries (const Library& library, const symbol name, 
+ProgramDocument::own_entries (const Metalib& metalib,
+                              const Library& library, const symbol name, 
 			      std::vector<std::string>& entries)
 {
   const Syntax& syntax = library.syntax (name);
@@ -728,7 +733,7 @@ ProgramDocument::own_entries (const Library& library, const symbol name,
             {
               const std::string& key = base_entries[i];
               if (key == "description"
-                  || alist.subset (base_alist, base_syntax, key))
+                  || alist.subset (metalib, base_alist, base_syntax, key))
                 entries.erase (find (entries.begin (), entries.end (), key));
             }
         }
@@ -736,7 +741,8 @@ ProgramDocument::own_entries (const Library& library, const symbol name,
 }
 
 void
-ProgramDocument::inherited_entries (const Library& library, const symbol name, 
+ProgramDocument::inherited_entries (const Metalib& metalib,
+                                    const Library& library, const symbol name, 
 				    std::vector<std::string>& entries)
 {
   const AttributeList& alist = library.lookup (name);
@@ -754,7 +760,7 @@ ProgramDocument::inherited_entries (const Library& library, const symbol name,
             {
               const std::string& key = entries[i];
               if (key != "description" 
-                  && !alist.subset (base_alist, base_syntax, key))
+                  && !alist.subset (metalib, base_alist, base_syntax, key))
                 entries.erase (find (entries.begin (), entries.end (), key));
             }
         }
@@ -783,9 +789,9 @@ ProgramDocument::print_sample (const symbol name, const Library& library)
 
   const std::vector<std::string>& order = syntax.order ();
   std::vector<std::string> own;
-  own_entries (library, name, own);
+  own_entries (metalib, library, name, own);
   std::vector<std::string> base;
-  inherited_entries (library, name, base);
+  inherited_entries (metalib, library, name, base);
 
   print_sample_entries (name.name (), syntax, alist, order, own, 
                         library.name ().name (), base, true);
@@ -1097,7 +1103,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       if (print_parameterizations)
 	{
 	  std::ostringstream tmp;
-	  PrinterFile printer (tmp);
+	  PrinterFile printer (metalib, tmp);
 	  printer.print_parameterization (library.name (), name, false);
 	  format->soft_linebreak ();
 	  format->verbatim (tmp.str ());
@@ -1119,7 +1125,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       
       // Print own entries.
       std::vector<std::string> entries;
-      own_entries (library, name, entries);
+      own_entries (metalib, library, name, entries);
       print_submodel_entries (name.name (), 0, syntax, alist, entries, 
 			      library.name ().name ());
     }
@@ -1229,10 +1235,10 @@ ProgramDocument::print_document (Treelog& msg)
 
   // For all components...
   std::vector<symbol> entries;
-  Library::all (entries);
+  metalib.all (entries);
   sort (entries.begin (), entries.end (), symbol::alphabetical);
   for (unsigned int i = 0; i < entries.size (); i++)
-    print_component (Library::find (entries[i]), msg);
+    print_component (metalib.library (entries[i]), msg);
 
   // Fixed components.
   Format::Section d2 (*format, "chapter", "Fixed Components", "cha", "fixed");

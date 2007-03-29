@@ -85,7 +85,7 @@ daisy_syntax_check (const Syntax* syntax, const AttributeList* alist,
 		    const char* name, Toplevel* toplevel)
 { 
   Treelog::Open nest (*toplevel->msg, name);
-  return syntax->check (*alist, *toplevel->msg); 
+  return syntax->check (toplevel->metalib (), *alist, *toplevel->msg); 
 }
 
 extern "C" void EXPORT
@@ -330,8 +330,8 @@ daisy_alist_set_alist_at (AttributeList* alist, const char* name,
  */
 
 extern "C" Library* EXPORT
-daisy_library_find (const char* name)
-{ return &Library::find (symbol (name)); }
+daisy_library_find (Toplevel *const toplevel, const char *const name)
+{ return &toplevel->metalib ().library (symbol (name)); }
 
 extern "C" int EXPORT
 daisy_library_size (const Library* library)
@@ -368,14 +368,14 @@ daisy_library_file (const Library* library, const char* name)
 }
 
 extern "C" void EXPORT
-daisy_library_derive (Library* library, 
+daisy_library_derive (Toplevel *const toplevel, Library* library, 
 		      const char* super, AttributeList* alist, 
 		      const char* name, const char* filename)
 { 
   if (filename)
     {
       alist->add ("parsed_from_file", filename);
-      alist->add ("parsed_sequence", Library::get_sequence ());
+      alist->add ("parsed_sequence", toplevel->metalib ().get_sequence ());
     }
   library->add_derived (symbol (name), *alist, symbol (super));
 }
@@ -387,8 +387,9 @@ daisy_library_remove (Library* library, const char* name)
 // @ The daisy_printer Type.
 
 extern "C" Printer* EXPORT
-daisy_printer_create_file (const char* filename)
-{ return new PrinterFile (filename); }
+daisy_printer_create_file (Toplevel *const toplevel,
+                           const char *const filename)
+{ return new PrinterFile (toplevel->metalib (), filename); }
 
 extern "C" void EXPORT
 daisy_printer_comment (Printer* printer, const char* comment)

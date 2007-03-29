@@ -192,7 +192,7 @@ LogAList::open (const symbol name)
 	    case Syntax::Object:
 	      daisy_assert (size != Syntax::Singleton);
 	      push (name, 
-		    syntax ().library (sname), 
+		    syntax ().library (metalib (), sname), 
 		    syntax ().default_alist (sname));
 	      break;
 	    default:
@@ -345,7 +345,7 @@ LogAList::open_object (symbol field, symbol type,
       const string& sfield = field.name ();
       daisy_assert (syntax ().lookup (sfield) == Syntax::Object);
       daisy_assert (syntax ().size (sfield) == Syntax::Singleton);
-      const Library& library = syntax ().library (sfield);
+      const Library& library = syntax ().library (metalib (), sfield);
       if (!library.check (type))
         daisy_panic ("Field '" + sfield + "' containing component '"
                      + library.name () + "' has unknown model '" + type + "'");

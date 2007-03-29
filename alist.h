@@ -32,6 +32,7 @@
 class PLF;
 class AttributeList;
 class Syntax;
+class Metalib;
 
 class AttributeList
 {
@@ -43,9 +44,11 @@ public:
   // Is 'key' an element of this alist?
   bool check (const std::string& key) const;
   // Is this alist a subset of 'other'?
-  bool subset (const AttributeList& other, const Syntax& syntax) const;
+  bool subset (const Metalib&, 
+               const AttributeList& other, const Syntax& syntax) const;
   // Is the element 'key' in this alist a subset of the correspi
-  bool subset (const AttributeList& other, const Syntax& syntax,
+  bool subset (const Metalib&,
+               const AttributeList& other, const Syntax& syntax,
 	       const std::string& key) const;
   int size (const std::string& key) const;
 
@@ -95,7 +98,8 @@ public:
   void add (const std::string&, const std::vector<const PLF*>&);
 
   void remove (const std::string&);
-  bool revert (const std::string&, const AttributeList&, const Syntax&);
+  bool revert (const Metalib&,
+               const std::string&, const AttributeList&, const Syntax&);
   void operator += (const AttributeList&);
   void operator = (const AttributeList&);
   void clear ();

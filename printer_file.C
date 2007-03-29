@@ -21,6 +21,7 @@
 
 
 #include "printer_file.h"
+#include "metalib.h"
 #include "library.h"
 #include "block.h"
 #include "alist.h"
@@ -38,6 +39,7 @@
 struct PrinterFile::Implementation
 {
   // Data.
+  const Metalib& metalib;
   Path::Output* output;
   std::ostream& out;
 
@@ -82,8 +84,8 @@ struct PrinterFile::Implementation
   bool good ();
 
   // Creation.
-  Implementation (const std::string& name);
-  Implementation (std::ostream& stream);
+  Implementation (const Metalib&, const std::string& name);
+  Implementation (const Metalib&, std::ostream& stream);
   ~Implementation ();
 };
 
@@ -94,7 +96,7 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
 					 const std::string& key) const
 {
   // Subsets are never complex.
-  if (alist.subset (super, syntax, key))
+  if (alist.subset (metalib, super, syntax, key))
     return false;
 
   // Sequences are complex...
@@ -119,7 +121,8 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
       return false;
     case Syntax::Object:
       return syntax.order (key) >= 0
-	|| is_complex_object (alist.alist (key), syntax.library (key));
+	|| is_complex_object (alist.alist (key), 
+                              syntax.library (metalib, key));
     case Syntax::AList:
     case Syntax::PLF:
       return true;
@@ -143,7 +146,7 @@ PrinterFile::Implementation::is_complex_object (const AttributeList& value,
   const AttributeList& element_alist = library.lookup (element);
 
 	// Check if we added something over the library.
-  if (value.subset (element_alist, element_syntax))
+  if (value.subset (metalib, element_alist, element_syntax))
     // We didn't.
     return false;
   return true;
@@ -254,10 +257,10 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	  break;
 	case Syntax::Object:
 	  if (super_alist.check (key))
-	    print_object (alist.alist (key), syntax.library (key), 
+	    print_object (alist.alist (key), syntax.library (metalib, key), 
                           super_alist.alist (key), indent);
 	  else
-            print_object (alist.alist (key), syntax.library (key), 
+            print_object (alist.alist (key), syntax.library (metalib, key), 
                           AttributeList (), indent);
 	  break;
 	case Syntax::Library:
@@ -354,7 +357,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	  break;
 	case Syntax::Object:
 	  {
-	    const Library& library = syntax.library (key);
+	    const Library& library = syntax.library (metalib, key);
 	    const std::vector<AttributeList*>& value = alist.alist_sequence (key);
 
 	    for (unsigned int i = 0; i < value.size (); i++)
@@ -528,7 +531,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
               }
               break;
             case Syntax::Object:
-              out << syntax.library (key).name ();
+              out << syntax.library (metalib, key).name ();
               break;
             case Syntax::PLF: 
             case Syntax::Library:
@@ -542,7 +545,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
         }
 
       // Skip subset members.
-      if (alist.subset (super_alist, syntax, key))
+      if (alist.subset (metalib, super_alist, syntax, key))
 	continue;
 
       if (!skip)
@@ -575,7 +578,7 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
   const AttributeList& element_alist = library.lookup (element);
 
   // Check if we added something over the library.
-  if (value.subset (element_alist, element_syntax))
+  if (value.subset (metalib, element_alist, element_syntax))
     {
       // We didn't.
       print_symbol (element);
@@ -587,7 +590,7 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
     {
       out << "original";
       // Check if we added something over the original.
-      if (value.subset (original, element_syntax))
+      if (value.subset (metalib, original, element_syntax))
         return;
       out << " ";
       print_alist (value, element_syntax, original, element_syntax,
@@ -612,7 +615,7 @@ PrinterFile::Implementation
 /**/::print_parameterization (const symbol library_name, const symbol name,
                               bool print_description)
 {
-  Library& library = Library::find (library_name);
+  Library& library = metalib.library (library_name);
   AttributeList alist (library.lookup (name));
   if (!print_description)
     alist.remove ("description");
@@ -677,12 +680,12 @@ PrinterFile::Implementation::print_library_file (const std::string& filename)
   // Search all the libraries for matching entries.
   {
     std::vector<symbol> all;
-    Library::all (all);
+    metalib.all (all);
 
     for (unsigned int i = 0; i < all.size (); i++)
       {
 	const symbol library_name = all[i];
-	Library& library = Library::find (library_name);
+	Library& library = metalib.library (library_name);
 	std::vector<symbol> elements;
 	library.entries (elements);
       
@@ -722,13 +725,17 @@ bool
 PrinterFile::Implementation::good ()
 { return out.good (); }
 
-PrinterFile::Implementation::Implementation (const std::string& name)
-  : output (new Path::Output (name)),
+PrinterFile::Implementation::Implementation (const Metalib& mlib,
+                                             const std::string& name)
+  : metalib (mlib),
+    output (new Path::Output (name)),
     out (output->stream ())
 { }
 
-PrinterFile::Implementation::Implementation (std::ostream& stream)
-  : output (NULL),
+PrinterFile::Implementation::Implementation (const Metalib& mlib,
+                                             std::ostream& stream)
+  : metalib (mlib),
+    output (NULL),
     out (stream)
 { }
 
@@ -826,9 +833,11 @@ get_file_alist ()
   return alist;
 }
     
-PrinterFile::PrinterFile (const std::string& filename)
+PrinterFile::PrinterFile (const Metalib& mlib,
+                          const std::string& filename)
   : Printer (get_file_alist ()),
-    impl (new Implementation (filename))
+    impl (new Implementation (mlib,
+                              filename))
 { }
     
 static const AttributeList& 
@@ -839,14 +848,15 @@ get_stream_alist ()
     alist.add ("type", "stream");
   return alist;
 }
-PrinterFile::PrinterFile (std::ostream& stream)
+PrinterFile::PrinterFile (const Metalib& mlib,
+                          std::ostream& stream)
   : Printer (get_stream_alist ()),
-    impl (new Implementation (stream))
+    impl (new Implementation (mlib, stream))
 { }
     
 PrinterFile::PrinterFile (Block& al)
   : Printer (al.alist ()),
-    impl (new Implementation (al.name ("where")))
+    impl (new Implementation (al.metalib (), al.name ("where")))
 { }
     
 PrinterFile::~PrinterFile ()

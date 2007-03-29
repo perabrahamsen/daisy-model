@@ -23,6 +23,7 @@
 #include "depend.h"
 #include "traverse.h"
 #include "library.h"
+#include "metalib.h"
 #include "syntax.h"
 #include "alist.h"
 #include "treelog.h"
@@ -54,7 +55,7 @@ public:
 
   // Create & Destroy.
 public:
-  TraverseDepend (symbol component, symbol parameterization, 
+  TraverseDepend (const Metalib&, symbol component, symbol parameterization, 
 		  Treelog& treelog, dep_map& dependencies, bool find_all);
   ~TraverseDepend ();
 
@@ -130,7 +131,7 @@ TraverseDepend::enter_model (const Syntax&, AttributeList& alist,
 	  // Find stuff dependend on this model.
 	  Treelog::Open nest2 (treelog, "Recursive dependencies");
 	  dependencies[component].insert (name);
-	  TraverseDepend recurse (component, name, 
+	  TraverseDepend recurse (metalib, component, name, 
 				  treelog, dependencies, find_all);
 	  recurse.traverse_all_libraries ();
 	}
@@ -150,7 +151,7 @@ TraverseDepend::leave_model (const symbol component, const symbol name)
       // Found, search for stuff dependend on this model.
       Treelog::Open nest (treelog, "Recursive dependencies");
       dependencies[component].insert (name);
-      TraverseDepend recurse (component, name,
+      TraverseDepend recurse (metalib, component, name,
 			      treelog, dependencies, find_all);
       recurse.traverse_all_libraries ();
 
@@ -258,11 +259,13 @@ void
 TraverseDepend::leave_parameter ()
 { }
 
-TraverseDepend::TraverseDepend (const symbol component,
+TraverseDepend::TraverseDepend (const Metalib& mlib,
+                                const symbol component,
 				const symbol parameterization,
 				Treelog& tlog,
 				dep_map& deps, bool fa)
-  : treelog (tlog),
+  : Traverse (mlib),
+    treelog (tlog),
     dependencies (deps),
     dep_lib (component),
     dep_par (parameterization),
@@ -275,10 +278,11 @@ TraverseDepend::~TraverseDepend ()
 { }
 
 bool
-has_dependencies (const symbol component, const symbol parameterization)
+has_dependencies (const Metalib& metalib,
+                  const symbol component, const symbol parameterization)
 {
   dep_map dependencies;
-  TraverseDepend depend (component, parameterization,
+  TraverseDepend depend (metalib, component, parameterization,
 			 Treelog::null (), dependencies, false);
   depend.traverse_all_libraries ();
 
@@ -286,12 +290,13 @@ has_dependencies (const symbol component, const symbol parameterization)
 }
 
 bool
-has_dependencies (const symbol component, const symbol parameterization, 
+has_dependencies (const Metalib& metalib,
+                  const symbol component, const symbol parameterization, 
 		  const Syntax& syntax, AttributeList& alist,
 		  const string& name)
 {
   dep_map dependencies;
-  TraverseDepend depend (component, parameterization,
+  TraverseDepend depend (metalib, component, parameterization,
 			 Treelog::null (), dependencies, false);
   depend.traverse_submodel (syntax, alist, AttributeList (), name);
 
@@ -299,11 +304,12 @@ has_dependencies (const symbol component, const symbol parameterization,
 }
 
 bool
-check_dependencies (const symbol component, const symbol parameterization, 
+check_dependencies (const Metalib& metalib,
+                    const symbol component, const symbol parameterization, 
 		    Treelog& treelog)
 {
   dep_map dependencies;
-  TraverseDepend depend (component, parameterization, 
+  TraverseDepend depend (metalib, component, parameterization, 
 			 treelog, dependencies, true);
   depend.traverse_all_libraries ();
 
@@ -311,12 +317,13 @@ check_dependencies (const symbol component, const symbol parameterization,
 }
 
 bool
-check_dependencies (const symbol component, const symbol parameterization, 
+check_dependencies (const Metalib& metalib,
+                    const symbol component, const symbol parameterization, 
 		    const Syntax& syntax, AttributeList& alist,
 		    const string& name, Treelog& treelog)
 {
   dep_map dependencies;
-  TraverseDepend depend (component, parameterization, 
+  TraverseDepend depend (metalib, component, parameterization, 
 			 treelog, dependencies, true);
   depend.traverse_submodel (syntax, alist, AttributeList (), name);
 
@@ -324,10 +331,11 @@ check_dependencies (const symbol component, const symbol parameterization,
 }
 
 bool
-find_dependencies (const symbol component, const symbol parameterization, 
+find_dependencies (const Metalib& metalib,
+                   const symbol component, const symbol parameterization, 
 		   dep_map& dependencies)
 {
-  TraverseDepend depend (component, parameterization, 
+  TraverseDepend depend (metalib, component, parameterization, 
 			 Treelog::null (), dependencies, true);
   depend.traverse_all_libraries ();
 
@@ -335,9 +343,10 @@ find_dependencies (const symbol component, const symbol parameterization,
 }
 
 static int
-sequence_number (const symbol component, const symbol parameterization)
+sequence_number (const Metalib& metalib,
+                 const symbol component, const symbol parameterization)
 {
-  const Library& library = Library::find (component);
+  const Library& library = metalib.library (component);
   daisy_assert (library.check (parameterization));
   const AttributeList& alist = library.lookup (parameterization);
   if (alist.check ("parsed_sequence"))
@@ -366,13 +375,21 @@ struct object_desc
 };
 
 
-static bool
-sort_by_sequence (const object_desc& one, const object_desc& two)
-{ return sequence_number (one.comp, one.par) 
-    < sequence_number (two.comp, two.par); }
+struct sort_by_sequence 
+{
+  const Metalib& metalib;
+  
+  int operator()(const object_desc& one, const object_desc& two)
+  { return sequence_number (metalib, one.comp, one.par) 
+      < sequence_number (metalib, two.comp, two.par); }
+  sort_by_sequence (const Metalib& mlib)
+    : metalib (mlib)
+  { }
+};
 
 void
-resequence (const symbol component, const symbol parameterization, 
+resequence (Metalib& metalib,
+            const symbol component, const symbol parameterization, 
 	    const dep_map& dependencies)
 { 
   // Vector with all object to resequence.
@@ -395,7 +412,7 @@ resequence (const symbol component, const symbol parameterization,
     }
 
   // Sort them.
-  sort (deps.begin (), deps.end (), sort_by_sequence);
+  sort (deps.begin (), deps.end (), sort_by_sequence (metalib));
 
   // Resequence them.
   for (unsigned int i = 0; i < deps.size (); i++)
@@ -403,9 +420,9 @@ resequence (const symbol component, const symbol parameterization,
       const symbol component = deps[i].comp;
       const symbol parameterization = deps[i].par;
        
-       Library& library = Library::find (component);
-       daisy_assert (library.check (parameterization));
-       AttributeList& alist = library.lookup (parameterization);
-       alist.add ("parsed_sequence", Library::get_sequence ());
+      Library& library = metalib.library (component);
+      daisy_assert (library.check (parameterization));
+      AttributeList& alist = library.lookup (parameterization);
+      alist.add ("parsed_sequence", metalib.get_sequence ());
     }
 }

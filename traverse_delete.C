@@ -22,6 +22,7 @@
 
 #include "traverse_delete.h"
 #include "traverse.h"
+#include "metalib.h"
 #include "library.h"
 #include "syntax.h"
 #include "alist.h"
@@ -42,7 +43,7 @@ private:
 
   // Create & Destroy.
 public:
-  TraverseDelete (symbol component, symbol parameterization);
+  TraverseDelete (const Metalib&, symbol component, symbol parameterization);
   ~TraverseDelete ();
 
 private:
@@ -192,9 +193,10 @@ TraverseDelete::leave_parameter ()
 { }
 
 static symbol
-find_super (const symbol component, const symbol parameterization)
+find_super (const Metalib& metalib,
+            const symbol component, const symbol parameterization)
 { 
-  const Library& library = Library::find (component);
+  const Library& library = metalib.library (component);
   daisy_assert (library.check (parameterization));
   const AttributeList& alist = library.lookup (parameterization);
   daisy_assert (alist.check ("type"));
@@ -203,11 +205,13 @@ find_super (const symbol component, const symbol parameterization)
   return super;
 }
 
-TraverseDelete::TraverseDelete (const symbol component,
+TraverseDelete::TraverseDelete (const Metalib& mlib,
+                                const symbol component,
 				const symbol parameterization)
-  : dep_lib (component),
+  : Traverse (mlib),
+    dep_lib (component),
     dep_par (parameterization),
-    dep_super (find_super (component, parameterization)),
+    dep_super (find_super (mlib, component, parameterization)),
     found (false)
 { }
 
@@ -215,16 +219,18 @@ TraverseDelete::~TraverseDelete ()
 { }
 
 void
-remove_dependencies (symbol component, symbol parameterization)
+remove_dependencies (const Metalib& mlib,
+                     symbol component, symbol parameterization)
 {
-  TraverseDelete depend (component, parameterization);
+  TraverseDelete depend (mlib, component, parameterization);
   depend.traverse_all_libraries ();
 }
 
 void
-remove_dependencies (symbol component, symbol parameterization, 
+remove_dependencies (const Metalib& mlib,
+                     symbol component, symbol parameterization, 
 		     const Syntax& syntax, AttributeList& alist)
 {
-  TraverseDelete depend (component, parameterization);
+  TraverseDelete depend (mlib, component, parameterization);
   depend.traverse_submodel (syntax, alist, AttributeList (), "dummy");
 }

@@ -52,7 +52,8 @@ static struct ActionSpraySyntax
   static Model& make (Block& al)
   { return *new ActionSpray (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (const Metalib& metalib,
+                           const AttributeList& al, Treelog& err)
     {
       bool ok = true;
       const symbol chemical = al.identifier ("chemical");
@@ -67,7 +68,7 @@ static struct ActionSpraySyntax
 	{
 	  const Syntax& syntax = library.syntax (chemical);
 	  const AttributeList& alist = library.lookup (chemical);
-	  if (!syntax.check (alist, err))
+	  if (!syntax.check (metalib, alist, err))
 	    {
 	      err.entry ("Incomplete chemical '" + chemical + "'");
 	      ok = false;
@@ -78,7 +79,7 @@ static struct ActionSpraySyntax
   ActionSpraySyntax ()
   { 
     Syntax& syntax = *new Syntax ();
-    syntax.add_check (check_alist);
+    syntax.add_object_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Spray a chemical (typically a pesticide) on the field.");

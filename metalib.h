@@ -22,10 +22,13 @@
 #ifndef METALIB_H
 #define METALIB_H
 
+#include "symbol.h"
 #include <memory>
+#include <vector>
 
 class Syntax;
 class AttributeList;
+class Library;
 
 class Metalib
 {
@@ -37,6 +40,12 @@ class Metalib
 public:
   Syntax& syntax () const;
   AttributeList& alist () const;
+  bool exist (symbol name) const;
+  Library& library (symbol name) const;
+  void all (std::vector<symbol>& libraries) const;
+  int get_sequence ();
+  void clear_all_parsed ();
+  void refile_parsed (const std::string& from, const std::string& to);
 
   // Create and Destroy.
 private:

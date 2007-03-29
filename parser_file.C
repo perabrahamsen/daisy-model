@@ -229,7 +229,7 @@ ParserFile::Implementation::get_integer ()
   std::ostringstream tmp;
   TreelogStream treelog (tmp);
   Treelog::Open nest (treelog, obj);
-  if (!lib.syntax (obj).check (*al, treelog))
+  if (!lib.syntax (obj).check (metalib, *al, treelog))
     {
       error ("Bogus integer '" + obj + "'\n--- details:\n"
              + tmp.str () + "---");
@@ -337,7 +337,7 @@ ParserFile::Implementation::get_number (const std::string& syntax_dim)
   std::ostringstream tmp;
   TreelogStream treelog (tmp);
   Treelog::Open nest (treelog, obj);
-  if (!lib.syntax (obj).check (*al, treelog))
+  if (!lib.syntax (obj).check (metalib, *al, treelog))
     {
       error ("Bogus number '" + obj + "'\n--- details:\n"
              + tmp.str () + "---");
@@ -542,7 +542,7 @@ ParserFile::Implementation::add_derived (Library& lib)
   AttributeList& atts = *new AttributeList (sl);
   // Remember where we got this object.
   atts.add ("parsed_from_file", file);
-  atts.add ("parsed_sequence", Library::get_sequence ());
+  atts.add ("parsed_sequence", metalib.get_sequence ());
   // Doc string.
   daisy_assert (!syntax.ordered () 
                 || syntax.order ().begin () != syntax.order ().end ());
@@ -766,7 +766,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                 else
                   {
                     const symbol type_symbol (type_name);
-                    if (Library::exist (type_symbol))
+                    if (metalib.exist (type_symbol))
                       {
                         if (!looking_at ('('))
                           doc = get_string ();
@@ -790,7 +790,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	warning (name + " specified twice, last takes precedence");
       else if (syntax.lookup (name) != Syntax::Library // (deffoo ...)
 	       && (syntax.lookup (name) != Syntax::Object
-		   || (&syntax.library (name) // (input file ...)
+		   || (&syntax.library (metalib, name) // (input file ...)
 		       != &Librarian<Parser>::library ())))
 	found.insert (name);
 
@@ -921,11 +921,11 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    break;
 	  case Syntax::Library:
 	    // Handled specially: Put directly in global library.
-	    add_derived (syntax.library (name));
+	    add_derived (syntax.library (metalib, name));
 	    break;
 	  case Syntax::Object:
 	    {
-	      const Library& lib = syntax.library (name);
+	      const Library& lib = syntax.library (metalib, name);
 #ifdef SLOPPY_PARENTHESES
 	      AttributeList& al = (atts.check (name) 
 				   ? load_derived (lib, current != end,
@@ -989,7 +989,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    {
 	    case Syntax::Object:
 	      {
-		const Library& lib = syntax.library (name);
+		const Library& lib = syntax.library (metalib, name);
 		static const std::vector<AttributeList*> no_sequence;
 		std::vector<AttributeList*> sequence;
 		const std::vector<AttributeList*>& old_sequence

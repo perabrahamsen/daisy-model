@@ -21,6 +21,7 @@
 
 #include "xref.h"
 #include "traverse.h"
+#include "metalib.h"
 #include "library.h"
 #include "syntax.h"
 #include "alist.h"
@@ -50,7 +51,7 @@ private:
 
   // Create & Destroy.
 public:
-  TraverseXRef (XRef&);
+  TraverseXRef (const Metalib&, XRef&);
   ~TraverseXRef ();
 
 private:
@@ -304,13 +305,13 @@ TraverseXRef::enter_parameter (const Syntax& syntax, AttributeList& alist,
   if (type == is_parameterization)
     {
       // Ignore inherited values.
-      if (alist.subset (default_alist, syntax, name))
+      if (alist.subset (metalib, default_alist, syntax, name))
         return false;
     }
   else if (type == is_model && alist.check ("base_model"))
     {
       // Ignore base parameters.
-      const Library& library = Library::find (current_component);
+      const Library& library = metalib.library (current_component);
       const symbol base_model = alist.identifier ("base_model");
       if (base_model != current_model)
         {
@@ -318,7 +319,7 @@ TraverseXRef::enter_parameter (const Syntax& syntax, AttributeList& alist,
           if (base_syntax.lookup (name) != Syntax::Error)
             {
               const AttributeList& base_alist = library.lookup (base_model);
-              if (alist.subset (base_alist, syntax, name))
+              if (alist.subset (metalib, base_alist, syntax, name))
                 return false;
             }
         }
@@ -328,7 +329,7 @@ TraverseXRef::enter_parameter (const Syntax& syntax, AttributeList& alist,
   if (syntax.lookup (name) == Syntax::Object)
     // We always use the component, even if it has no value, or a
     // value that is an empty sequence.
-    use_component (syntax.library (name));
+    use_component (syntax.library (metalib, name));
 
   return true; 
 }
@@ -337,8 +338,9 @@ void
 TraverseXRef::leave_parameter ()
 { path.pop_back (); }
 
-TraverseXRef::TraverseXRef (XRef& xr)
-  : xref (xr),
+TraverseXRef::TraverseXRef (const Metalib& mlib, XRef& xr)
+  : Traverse (mlib),
+    xref (xr),
     current_component ("Daisy"),
     current_model ("invalid"),
     type (is_invalid)
@@ -392,9 +394,9 @@ XRef::SubmodelUser::SubmodelUser ()
 XRef::Users::Users ()
 { }
 
-XRef::XRef ()
+XRef::XRef (const Metalib& mlib)
 { 
-  TraverseXRef traverse (*this);
+  TraverseXRef traverse (mlib, *this);
 }
 
 XRef::~XRef ()
