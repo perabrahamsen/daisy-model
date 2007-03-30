@@ -813,7 +813,8 @@ PrinterFile::print_input (const AttributeList& alist)
 {
   daisy_assert (alist.check ("type"));
   const symbol type = alist.identifier ("type");
-  const Syntax& syntax = Librarian<Parser>::library ().syntax (type);
+  const Syntax& syntax 
+    = impl->metalib.library (Parser::component).syntax (type);
 
   impl->out << "(input " << type << " ";
   impl->print_alist (alist, syntax, AttributeList (), syntax, 7, false);

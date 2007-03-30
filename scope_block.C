@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "scope_block.h"
+#include "library.h"
 #include "number.h"
 #include "stringer.h"
 #include "alist.h"
@@ -53,7 +54,7 @@ ScopeBlock::has_number (const symbol tag_symbol) const
   if (type != Syntax::Object)
     return false;
   const Library& library = syntax.library (block.metalib (), tag);
-  if (&library != &Librarian<Number>::library ())
+  if (library.name () != symbol (Number::component))
     return false;
   if (!syntax.check (block.metalib (), alist, block.msg ()))
     return false;
@@ -88,8 +89,8 @@ ScopeBlock::number (const symbol tag_symbol) const
 
   // Handle number objects.
   daisy_assert (type == Syntax::Object);
-  daisy_assert (&syntax.library (block.metalib (), tag)
-                == &Librarian<Number>::library ());
+  daisy_assert (syntax.library (block.metalib (), tag).name ()
+                == symbol (Number::component));
   daisy_assert (syntax.check (block.metalib (), alist, block.msg ()));
   std::auto_ptr<Number> number (Librarian<Number>::build_alist 
                                 (block, alist.alist (tag), tag));
@@ -128,7 +129,8 @@ ScopeBlock::dimension (symbol tag_symbol) const
   // Handle number objects.
   if (type != Syntax::Object)
     return Syntax::unknown ();
-  if (&syntax.library (block.metalib (), tag) != &Librarian<Number>::library ())
+  if (syntax.library (block.metalib (), tag).name () 
+      != symbol (Number::component))
     return Syntax::unknown ();
   if (!syntax.check (block.metalib (), alist, block.msg ()))
     return Syntax::unknown ();
@@ -168,7 +170,7 @@ ScopeBlock::has_identifier (const symbol tag_symbol) const
   if (type != Syntax::Object)
     return false;
   const Library& library = syntax.library (block.metalib (), tag);
-  if (&library != &Librarian<Stringer>::library ())
+  if (library.name () != symbol (Stringer::component))
     return false;
   if (!syntax.check (block.metalib (), alist, block.msg ()))
     return false;
@@ -203,8 +205,8 @@ ScopeBlock::identifier (const symbol tag_symbol) const
 
   // Handle number objects.
   daisy_assert (type == Syntax::Object);
-  daisy_assert (&syntax.library (block.metalib (), tag)
-                == &Librarian<Stringer>::library ());
+  daisy_assert (syntax.library (block.metalib (), tag).name ()
+                == symbol (Stringer::component));
   daisy_assert (syntax.check (block.metalib (), alist, block.msg ()));
   std::auto_ptr<Stringer> stringer (Librarian<Stringer>::build_alist 
                                 (block, alist.alist (tag), tag));

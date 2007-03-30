@@ -55,7 +55,7 @@ Toplevel::program_syntax () const
   if (metalib_.alist ().check ("run"))
     {
       daisy_assert (program_alist ().check ("type"));
-      const Library& library = Librarian<Program>::library ();
+      const Library& library = metalib_.library (Program::component);
       return library.syntax (program_alist ().identifier ("type"));
     }
   return metalib_.syntax ();
@@ -96,7 +96,7 @@ Toplevel::usage ()
   std::string s = "Usage: ";
   s += program_name;
   s += " [-v] [-d dir] file... [-p ";
-  const Library& library = Librarian<Program>::library ();
+  const Library& library = metalib_.library (Program::component);
   std::vector<symbol> entries;
   library.entries (entries);
   for (size_t i = 0; i < entries.size (); i++)
@@ -330,8 +330,7 @@ Toplevel::command_line (int& argc, char**& argv)
                 if (argc < 2)
                   // We need a program name.
                   usage ();
-                const Library& library 
-                  = Librarian<Program>::library ();
+                const Library& library = metalib_.library (Program::component);
                 const symbol name = symbol (get_arg (argc, argv));
                 if (!library.check (name))
                   {

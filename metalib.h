@@ -42,6 +42,7 @@ public:
   AttributeList& alist () const;
   bool exist (symbol name) const;
   Library& library (symbol name) const;
+  Library& library (const char*) const;
   void all (std::vector<symbol>& libraries) const;
   int get_sequence ();
   void clear_all_parsed ();

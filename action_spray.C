@@ -21,6 +21,7 @@
 
 
 #include "action.h"
+#include "metalib.h"
 #include "library.h"
 #include "block.h"
 #include "daisy.h"
@@ -58,7 +59,7 @@ static struct ActionSpraySyntax
       bool ok = true;
       const symbol chemical = al.identifier ("chemical");
 
-      const Library& library = Librarian<Chemical>::library ();
+      const Library& library = metalib.library (Chemical::component);
       if (!library.check (chemical))
 	{
 	  err.entry ("Unknown chemical '" + chemical + "'");

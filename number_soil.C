@@ -20,6 +20,7 @@
 
 
 #include "number.h"
+#include "metalib.h"
 #include "library.h"
 #include "block.h"
 #include "column.h"
@@ -114,7 +115,7 @@ The height we want to compare with.");
   { 
     Output output;
     Time time (9999, 1, 1, 0);
-    const Library& wlib = Librarian<Weather>::library ();
+    const Library& wlib = al.metalib ().library (Weather::component);
     const double T = 10.0;
     AttributeList alist = wlib.lookup (symbol ("none"));
     alist.add ("average", T);

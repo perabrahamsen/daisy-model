@@ -22,6 +22,7 @@
 #include "am.h"
 #include "aom.h"
 #include "im.h"
+#include "metalib.h"
 #include "library.h"
 #include "submodeler.h"
 #include "syntax.h"
@@ -1227,10 +1228,11 @@ original.");
 
 struct ProgramAM_table : public Program
 {
+  const Library& library;
+
   // Use.
   bool run (Treelog& msg)
   {
-    const Library& library = Librarian<AM>::library ();
     std::vector<symbol> entries;
     library.entries (entries);
     std::ostringstream tmp;
@@ -1282,7 +1284,8 @@ struct ProgramAM_table : public Program
   bool check (Treelog&)
   { return true; }
   ProgramAM_table (Block& al)
-    : Program (al)
+    : Program (al),
+      library (al.metalib ().library (AM::component))
   { }
   ~ProgramAM_table ()
   { }

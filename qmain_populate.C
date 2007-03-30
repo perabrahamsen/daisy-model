@@ -636,7 +636,7 @@ populate_tree (MainWindow* main, bool check_alists,
     = alist.alist_sequence ("parser_inputs");
   InputsItem* item = new InputsItem (inputs, main->tree, "Inputs");
   build.enter (item);
-  const Library& library = Librarian<Parser>::library ();
+  const Library& library = metalib.library (Parser::component);
   for (unsigned int i = 0; i < inputs.size (); i++)
     {
       QString name;

@@ -113,7 +113,7 @@ struct Select::Implementation
 
   // Create and Destroy.
   bool check (symbol spec_dim, Treelog& err) const;
-  static std::string find_description (const AttributeList&);
+  static std::string find_description (const Metalib&, const AttributeList&);
   static Number* get_expr (Block& al);
   Implementation (Block&);
   ~Implementation ();
@@ -361,9 +361,10 @@ Select::Implementation::check (const symbol spec_dim, Treelog& err) const
 }
   
 std::string 
-Select::Implementation::find_description (const AttributeList& al)
+Select::Implementation::find_description (const Metalib& metalib, 
+                                          const AttributeList& al)
 {
-  const Library& library = Librarian<Select>::library ();
+  const Library& library = metalib.library (Select::component);
   if (library.has_interesting_description (al))
     return al.name ("description");
   return "";
@@ -461,12 +462,12 @@ Select::Implementation::Implementation (Block& al)
     expr (get_expr (al)),
     negate (al.flag ("negate")
             // Kludge to negate the meaning of negate for "flux_top".
-            != Librarian<Select>::library ()
+            != al.metalib ().library (Select::component)
             /**/ .is_derived_from (al.identifier ("type"), flux_top_symbol)),
     tag (Select::select_get_tag (al.alist ())),
     dimension (al.check ("dimension")
 	       ? al.name ("dimension") : Syntax::Unknown ()),
-    description (find_description (al.alist ()))
+    description (find_description (al.metalib (), al.alist ()))
 { }
   
 Select::Implementation::~Implementation ()

@@ -219,7 +219,7 @@ ParserFile::Implementation::get_integer ()
       return atoi (str.c_str ());
     }
   // Then try an integer object.
-  const Library& lib = Librarian<Integer>::library ();
+  const Library& lib = metalib.library (Integer::component);
   std::auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
   const symbol obj = al->identifier ("type");
   static const symbol error_sym ("error");
@@ -327,7 +327,7 @@ ParserFile::Implementation::get_number (const std::string& syntax_dim)
     }
   
   // Then try a number object.
-  const Library& lib = Librarian<Number>::library ();
+  const Library& lib = metalib.library (Number::component);
   std::auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
   const symbol obj = al->identifier ("type");
   static const symbol error_sym ("error");
@@ -586,14 +586,14 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
   else if (isdigit (c) || c == '.' || c == '-')
     {                          
       alist = new AttributeList ();
-      if (&lib == &Librarian<Number>::library ())
+      if (lib.name () == symbol (Number::component))
         {
           alist->add ("type", "const");
           const double value = get_number ();
           const std::string dim = get_dimension ();
           alist->add ("value", value, dim);
         }
-      else if (&lib == &Librarian<Integer>::library ())
+      else if (lib.name () == symbol (Integer::component))
         {
           alist->add ("type", "const");
           alist->add ("value", get_integer ());
@@ -631,7 +631,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
 	  if (!lib.check (type))
             {
               // Special hack to handle numbers in scopes.
-              if (&lib == &Librarian<Number>::library ())
+              if (lib.name () == symbol (Number::component))
                 {
                   static const symbol fetch ("fetch");
                   alist = new AttributeList (lib.lookup (fetch));
@@ -790,8 +790,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	warning (name + " specified twice, last takes precedence");
       else if (syntax.lookup (name) != Syntax::Library // (deffoo ...)
 	       && (syntax.lookup (name) != Syntax::Object
-		   || (&syntax.library (metalib, name) // (input file ...)
-		       != &Librarian<Parser>::library ())))
+		   || (syntax.library (metalib, name).name () // (input file )
+		       != symbol (Parser::component))))
 	found.insert (name);
 
       // Log variable warning.
@@ -937,7 +937,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 						   &atts.alist (name))
 				   : load_derived (lib, in_order, NULL));
 #endif // !SLOPPY_PARENTHESES						   
-	      if (&lib == &Librarian<Parser>::library ())
+	      if (lib.name () == symbol (Parser::component))
 		{
                   Block block (metalib, lexer->err, "input");
 		  std::auto_ptr<Parser> parser 

@@ -24,6 +24,7 @@
 #include "hydraulic.h"
 #include "tortuosity.h"
 #include "groundwater.h"
+#include "metalib.h"
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
@@ -440,7 +441,7 @@ Soil::initialize_aquitard (Block& top,
   const double new_end = old_end - Z_horizon;
 
   // Add layer.
-  Library& library = Librarian<Horizon>::library ();
+  Library& library = top.metalib ().library (Horizon::component);
   static const symbol aquitard_symbol ("aquitard");
   static const symbol default_symbol ("default");
   if (!library.check (aquitard_symbol))

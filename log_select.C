@@ -21,6 +21,7 @@
 
 
 #include "log_select.h"
+#include "metalib.h"
 #include "library.h"
 #include "block.h"
 #include "field.h"
@@ -248,7 +249,7 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
   AttributeList dummy_alist;
   LogSelect::load_syntax (syntax, dummy_alist);
 
-  const Library& log_lib = Librarian<Log>::library ();
+  const Library& log_lib = metalib.library (Log::component);
   if (alist.check ("type"))
     {
       const symbol parent = alist.identifier ("type");
@@ -271,7 +272,7 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
 	return;
 
       // At least one interesting description required.
-      const Library& library = Librarian<Select>::library ();
+      const Library& library = metalib.library (Select::component);
       int interesting = 0;
       for (size_t i = 0; i < entries.size (); i++)
 	if (library.has_interesting_description (*entries[i]))

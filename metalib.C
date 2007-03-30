@@ -48,6 +48,10 @@ Library&
 Metalib::library (const symbol name) const
 { return Library::metalib_find (name); }
 
+Library& 
+Metalib::library (const char *const name) const
+{ return library (symbol (name)); }
+
 void 
 Metalib::all (std::vector<symbol>& libraries) const
 { Library::metalib_all (libraries); }

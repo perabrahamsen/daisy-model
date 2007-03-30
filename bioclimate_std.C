@@ -21,6 +21,7 @@
 
 
 #include "bioclimate.h"
+#include "metalib.h"
 #include "library.h"
 #include "block.h"
 #include "surface.h"
@@ -228,6 +229,8 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
 {
   Treelog::Open nest (block.msg (), "Bioclimate: " + name);
 
+  const Metalib& metalib = block.metalib ();
+
   if (!pet.get ())                      // Explicit.
     {
       symbol type;
@@ -248,13 +251,13 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
 
       block.msg ().debug ("Pet choosen: " + type);
 
-      const Library& library = Librarian<Pet>::library ();
+      const Library& library = metalib.library (Pet::component);
       daisy_assert (library.check (type));
   
       AttributeList alist (library.lookup (type));
       alist.add ("type", type);
-      daisy_assert (library.syntax (type).check (block.metalib (),
-                                                 alist, block.msg ()));
+      const Syntax& syntax  = library.syntax (type);
+      daisy_assert (syntax.check (metalib, alist, block.msg ()));
       pet.reset (Librarian<Pet>::build_alist (block, alist, "pet"));
     }
 
@@ -269,13 +272,13 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
 
       block.msg ().debug ("Difrad choosen: " + type);
 
-      const Library& library = Librarian<Difrad>::library ();
+      const Library& library = metalib.library (Difrad::component);
       daisy_assert (library.check (type));
   
       AttributeList alist (library.lookup (type));
       alist.add ("type", type);
-      daisy_assert (library.syntax (type).check (block.metalib (),
-                                                 alist, block.msg ()));
+      const Syntax& syntax = library.syntax (type);
+      daisy_assert (syntax.check (metalib, alist, block.msg ()));
       difrad.reset (Librarian<Difrad>::build_alist (block, alist, "difrad"));
     }
 }

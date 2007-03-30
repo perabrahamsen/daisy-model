@@ -161,7 +161,7 @@ Block::Implementation::expand_string (Block& block,
                         const std::string type = obj.name ("type");
                         const Library& library = syntax.library (metalib, key);
                         const ScopeBlock scope (block);
-                        if (&library == &Librarian<Stringer>::library ())
+                        if (library.name () == symbol (Stringer::component))
                           {
                             const std::auto_ptr<Stringer> stringer 
                               (Librarian<Stringer>::build_alist (block,
@@ -173,10 +173,11 @@ Block::Implementation::expand_string (Block& block,
                               throw "Bad string: '" + type + "'";
                             result << stringer->value (scope);
                           }
-                        else if (&library == &Librarian<Number>::library ())
+                        else if (library.name () == symbol (Number::component))
                           {
                             const std::auto_ptr<Number> number 
-                              (Librarian<Number>::build_alist (block, obj, key));
+                              (Librarian<Number>::build_alist (block, 
+                                                               obj, key));
                             if (!block.ok () 
                                 || !number->initialize (msg)
                                 || !number->check (scope, msg))

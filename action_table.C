@@ -20,6 +20,7 @@
 
 
 #include "action.h"
+#include "metalib.h"
 #include "library.h"
 #include "daisy.h"
 #include "field.h"
@@ -270,7 +271,8 @@ ActionTable::ActionTable (Block& al)
 
       read_event (lex, entries, irrigate_c, irrigate_events);
       read_event (lex, entries, fertilize_c, fertilize_events);
-      read_alist (lex, entries, fertilizer_c, Librarian<AM>::library (),
+      read_alist (lex, entries, fertilizer_c, 
+                  al.metalib ().library (AM::component),
                   fertilizers);
       read_date (lex, entries, sow_c, sow_dates);
       read_date (lex, entries, emerge_c, emerge_dates);
