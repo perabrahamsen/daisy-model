@@ -22,6 +22,7 @@
 #include "intrinsics.h"
 #include "assertion.h"
 #include "library.h"
+#include "memutils.h"
 
 std::map<symbol, Library*> 
 Intrinsics::clone () const
@@ -69,7 +70,10 @@ Intrinsics::Intrinsics ()
 { }
 
 Intrinsics::~Intrinsics ()
-{ daisy_assert (count == 0); }
+{ 
+  map_delete (all.begin (), all.end ());
+  daisy_assert (count == 0); 
+}
 
 
 // intrinsics.C ends here

@@ -25,6 +25,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "assertion.h"
+#include "memutils.h"
 #include <map>
 
 struct Metalib::Implementation
@@ -41,7 +42,10 @@ struct Metalib::Implementation
     : all (BuildBase::intrinsics ().clone ()),
       sequence (0)
   { }
+  ~Implementation ()
+  { map_delete (all.begin (), all.end ()); }
 };
+
   
 Syntax& 
 Metalib::syntax () const

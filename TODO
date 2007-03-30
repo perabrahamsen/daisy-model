@@ -2,11 +2,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Metalib
 
-** Hvert metalib skal have egne Libraries, ikke blot links til Intrinsics
-
-** Konverter Librarian::add_type til BuildBase::add_type
-
 ** Evt. prøv at fjerne Librarian constructor fra headerfiler.
+
+*** Library::set_description
 
 * Generer DLL i make dist?
 

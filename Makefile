@@ -1073,9 +1073,10 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h librarian.h \
   alist.h time.h parser.h path.h assertion.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h border.h librarian.h model.h \
   symbol.h alist.h library.h syntax.h treelog.h assertion.h
-intrinsics${OBJ}: intrinsics.C intrinsics.h symbol.h assertion.h library.h
+intrinsics${OBJ}: intrinsics.C intrinsics.h symbol.h assertion.h library.h \
+  memutils.h
 metalib${OBJ}: metalib.C metalib.h symbol.h intrinsics.h librarian.h model.h \
-  library.h syntax.h treelog.h alist.h assertion.h
+  library.h syntax.h treelog.h alist.h assertion.h memutils.h
 model${OBJ}: model.C model.h
 output${OBJ}: output.C output.h condition.h librarian.h model.h symbol.h \
   memutils.h daisy.h program.h time.h log_all.h log_select.h log.h \
@@ -1085,7 +1086,7 @@ output${OBJ}: output.C output.h condition.h librarian.h model.h symbol.h \
 scope_block${OBJ}: scope_block.C scope_block.h scope.h symbol.h librarian.h \
   model.h block.h syntax.h treelog.h plf.h library.h number.h stringer.h \
   alist.h assertion.h
-librarian${OBJ}: librarian.C librarian.h model.h symbol.h library.h \
+librarian${OBJ}: librarian.C librarian.h model.h symbol.h library.h metalib.h \
   intrinsics.h block.h syntax.h treelog.h plf.h alist.h assertion.h
 gnuplot_utils${OBJ}: gnuplot_utils.C gnuplot_utils.h syntax.h treelog.h \
   symbol.h alist.h
