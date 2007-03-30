@@ -138,7 +138,7 @@ static struct BooleanNumGTSyntax
     BooleanNumbers::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "True iff each operand is larger than the next.");
-    Librarian<Boolean>::add_type (">", alist, syntax, &make);
+    BuildBase::add_type (Boolean::component, ">", alist, syntax, &make);
   }
 } BooleanNumGT_syntax;
 
@@ -175,7 +175,7 @@ static struct BooleanNumGTESyntax
     BooleanNumbers::load_syntax (syntax, alist);
     alist.add ("description", "\
 True iff each operand is at least as large as the next.");
-    Librarian<Boolean>::add_type (">=", alist, syntax, &make);
+    BuildBase::add_type (Boolean::component, ">=", alist, syntax, &make);
   }
 } BooleanNumGTE_syntax;
 
@@ -212,7 +212,7 @@ static struct BooleanNumLTSyntax
     BooleanNumbers::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "True iff each operand is smaller than the next.");
-    Librarian<Boolean>::add_type ("<", alist, syntax, &make);
+    BuildBase::add_type (Boolean::component, "<", alist, syntax, &make);
   }
 } BooleanNumLT_syntax;
 
@@ -249,7 +249,7 @@ static struct BooleanNumLTESyntax
     BooleanNumbers::load_syntax (syntax, alist);
     alist.add ("description", "\
 True iff each operand is smaller than or equal to the next.");
-    Librarian<Boolean>::add_type ("<=", alist, syntax, &make);
+    BuildBase::add_type (Boolean::component, "<=", alist, syntax, &make);
   }
 } BooleanNumLTE_syntax;
 

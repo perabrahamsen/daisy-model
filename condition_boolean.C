@@ -83,7 +83,7 @@ Test if a boolean expression is true.");
       syntax.add_object ("expr", Boolean::component, "\
 Expression to evaluate.");
       syntax.order ("expr");
-      Librarian<Condition>::add_type ("check",
+      BuildBase::add_type (Condition::component, "check",
 				      alist, syntax, &make);
     }
   }

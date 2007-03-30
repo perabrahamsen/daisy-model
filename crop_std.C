@@ -648,5 +648,5 @@ by this parameter, and in these patches the crop will not have to\n\
 compete for light.  The crop still needs LAI in order to catch the\n\
 light though.  Competition for water and nutrients are unaffected.");
   alist.add ("min_light_fraction", 0.0);
-  Librarian<Crop>::add_type ("default", alist, syntax, &make);
+  BuildBase::add_type (Crop::component, "default", alist, syntax, &make);
 }

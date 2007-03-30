@@ -70,7 +70,7 @@ static struct GroundwaterLysimeterSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("descriptions", "Lysimeter bottom.");
     Groundwater::load_syntax (syntax, alist);
-    Librarian<Groundwater>::add_type ("lysimeter", alist, syntax, &make);
+    BuildBase::add_type (Groundwater::component, "lysimeter", alist, syntax, &make);
   }
 } GroundwaterLysimeter_syntax;
 

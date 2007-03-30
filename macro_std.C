@@ -422,6 +422,6 @@ static struct MacroStandardSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     MacroStandard::load_syntax (syntax, alist);
-    Librarian<Macro>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (Macro::component, "default", alist, syntax, &make);
   }
 } MacroStandard_syntax;

@@ -58,6 +58,6 @@ static struct AdsorptionFullSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Full adsorption.\n\
 Used for non-solutes, fully adsorped in the soil.");
-    Librarian<Adsorption>::add_type ("full", alist, syntax, &make);
+    BuildBase::add_type (Adsorption::component, "full", alist, syntax, &make);
   }
 } AdsorptionFull_syntax;

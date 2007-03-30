@@ -95,6 +95,6 @@ static struct SelectContentSyntax
 		  "Specify height (negative) to measure content.\n\
 The value willbe a weighted average of all cells containing height.");
 
-      Librarian<Select>::add_type ("content", alist, syntax, &make);
+      BuildBase::add_type (Select::component, "content", alist, syntax, &make);
     }
 } Select_syntax;

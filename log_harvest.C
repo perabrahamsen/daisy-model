@@ -243,7 +243,7 @@ If this is set to 'fixed', a small fixed size header is printed.");
     alist.add ("print_dimension", true);
     alist.add ("flush", true);
 
-    Librarian<Log>::add_type ("harvest", alist, syntax, &make); 
+    BuildBase::add_type (Log::component, "harvest", alist, syntax, &make); 
   }
 } LogHarvest_syntax;
 

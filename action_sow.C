@@ -57,7 +57,7 @@ static struct ActionSowSyntax
     alist.add ("description", "Sow a crop on the field.");
     syntax.add_object ("crop", Crop::component, "Crop to sow.");
     syntax.order ("crop");
-    Librarian<Action>::add_type ("sow", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "sow", alist, syntax, &make);
   }
 } ActionSow_syntax;
 

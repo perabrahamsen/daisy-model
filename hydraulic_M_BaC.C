@@ -136,5 +136,5 @@ HydraulicM_BaCSyntax::HydraulicM_BaCSyntax ()
   syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
 	      "Bubbling pressure.");
 
-  Librarian<Hydraulic>::add_type ("M_BaC", alist, syntax, make);
+  BuildBase::add_type (Hydraulic::component, "M_BaC", alist, syntax, make);
 }

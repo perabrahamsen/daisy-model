@@ -67,7 +67,7 @@ static struct ProgramCDSyntax
     syntax.add ("directory", Syntax::String, Syntax::Const, "\
 Name of directory to change into.");
     syntax.order ("directory");
-    Librarian<Program>::add_type ("cd", alist, syntax, &make);
+    BuildBase::add_type (Program::component, "cd", alist, syntax, &make);
   }
 } ProgramCD_syntax;
 
@@ -124,6 +124,6 @@ String to write.");
 File to write it in.\n\
 If the value is 'screen', write the string to the screen.");
     alist.add ("where", "screen");
-    Librarian<Program>::add_type ("write", alist, syntax, &make);
+    BuildBase::add_type (Program::component, "write", alist, syntax, &make);
   }
 } ProgramWrite_syntax;

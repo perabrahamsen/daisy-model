@@ -388,6 +388,6 @@ static struct FormatPlainSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Format as plain text.\n\
 UNDER CONSTRUCTION! DO NOT USE!");
-    Librarian<Format>::add_type ("plain", alist, syntax, &make);
+    BuildBase::add_type (Format::component, "plain", alist, syntax, &make);
   }
 } FormatPlain_syntax;

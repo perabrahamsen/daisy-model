@@ -86,7 +86,7 @@ static struct ScopeselNameSyntax
     syntax.add ("name", Syntax::String, Syntax::Const,
                 "Name of scope to select.");
     syntax.order ("name");
-    Librarian<Scopesel>::add_type ("name", alist, syntax, &make);
+    BuildBase::add_type (Scopesel::component, "name", alist, syntax, &make);
   }
 } ScopeselName_syntax;
 

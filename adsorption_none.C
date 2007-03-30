@@ -53,6 +53,6 @@ static struct AdsorptionNoneSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "No adsorption.\n\
 Used for solutes that are not adsorped to the soil.");
-    Librarian<Adsorption>::add_type ("none", alist, syntax, &make);
+    BuildBase::add_type (Adsorption::component, "none", alist, syntax, &make);
   }
 } AdsorptionNone_syntax;

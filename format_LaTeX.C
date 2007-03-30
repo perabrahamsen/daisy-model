@@ -337,6 +337,6 @@ static struct FormatLaTeXSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Format text as LaTeX.");
-    Librarian<Format>::add_type ("LaTeX", alist, syntax, &make);
+    BuildBase::add_type (Format::component, "LaTeX", alist, syntax, &make);
   }
 } FormatLaTeX_syntax;

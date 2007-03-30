@@ -160,5 +160,5 @@ HydraulicM_vGSyntax::HydraulicM_vGSyntax ()
 	      "tortuosity parameter.");
   alist.add ("l", 0.5);
 
-  Librarian<Hydraulic>::add_type ("M_vG", alist, syntax, make);
+  BuildBase::add_type (Hydraulic::component, "M_vG", alist, syntax, make);
 }

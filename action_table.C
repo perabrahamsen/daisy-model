@@ -345,7 +345,7 @@ Set this to false to ignore any irrigation information in the file.");
     syntax.add ("enable_fertilization", Syntax::Boolean, Syntax::Const, "\
 Set this to false to ignore any fertilization information in the file.");
     alist.add ("enable_fertilization", true);
-    Librarian<Action>::add_type ("table", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "table", alist, syntax, &make);
   }
 } ActionTable_syntax;
 

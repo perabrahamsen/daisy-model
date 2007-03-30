@@ -117,6 +117,6 @@ static struct PetFAO_PMSyntax
     alist.add ("description",
 	       "Potential evopotranspiration using Penman-Monteith.");
     Pet::load_syntax (syntax, alist);
-    Librarian<Pet>::add_type ("FAO_PM", alist, syntax, &make);
+    BuildBase::add_type (Pet::component, "FAO_PM", alist, syntax, &make);
   }
 } PetFAO_PM_syntax;

@@ -258,6 +258,6 @@ all the way down.");
 Calculated from 'DensRtTip'.");
     syntax.add ("L0", "cm/cm^3", Syntax::LogOnly,
                 "Root density at soil surface.");
-    Librarian<Rootdens>::add_type ("Gerwitz+Page74", alist, syntax, &make);
+    BuildBase::add_type (Rootdens::component, "Gerwitz+Page74", alist, syntax, &make);
   }
 } Rootdens_G_P_syntax;

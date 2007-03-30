@@ -118,5 +118,5 @@ HydraulicYoloSyntax::HydraulicYoloSyntax ()
   syntax.add ("M_intervals", Syntax::Integer, Syntax::Const,
 	      "Number of intervals for numeric integration of K.");
   alist.add ("M_intervals", 500);
-  Librarian<Hydraulic>::add_type ("yolo", alist, syntax, make);
+  BuildBase::add_type (Hydraulic::component, "yolo", alist, syntax, make);
 }

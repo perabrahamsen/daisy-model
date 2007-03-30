@@ -102,6 +102,6 @@ static struct OrganicNoneSyntax
     alist.add ("description", "\
 Ignore all soil organic matter dynamics.");
  
-    Librarian<OrganicMatter>::add_type ("none", alist, syntax, &make);
+    BuildBase::add_type (OrganicMatter::component, "none", alist, syntax, &make);
   }
 } OrganicNone_syntax;

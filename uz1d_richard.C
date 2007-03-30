@@ -337,7 +337,7 @@ static struct UZ1DRichardSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "A numerical solution to Richard's Equation.");
     UZ1DRichard::load_syntax (syntax, alist);
-    Librarian<UZ1D>::add_type ("richards", alist, syntax, &make);
+    BuildBase::add_type (UZ1D::component, "richards", alist, syntax, &make);
   }
 } UZ1DRichard_syntax;
 

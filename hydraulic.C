@@ -278,6 +278,6 @@ The hydraulic model to show in the table.");
 Number of intervals in the table.");
     alist.add ("intervals", 50);
     syntax.order ("hydraulic");
-    Librarian<Program>::add_type ("hydraulic", alist, syntax, &make);
+    BuildBase::add_type (Program::component, "hydraulic", alist, syntax, &make);
   }
 } ProgramHydraulic_table_syntax;

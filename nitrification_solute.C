@@ -114,6 +114,6 @@ with nitrification based on ammonium solute.");
     syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const,
 		"Water potential factor.");
     alist.add ("water_factor", PLF::empty ());
-    Librarian<Nitrification>::add_type ("solute", alist, syntax, &make);
+    BuildBase::add_type (Nitrification::component, "solute", alist, syntax, &make);
   }
 } NitrificationSolute_syntax;

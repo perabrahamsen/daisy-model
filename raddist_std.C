@@ -88,7 +88,7 @@ static struct RaddistStandardSyntax
     alist.add ("description", 
 	       "Default model of radiation distribution in the canopy.");
     Raddist::load_syntax (syntax, alist);
-    Librarian<Raddist>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (Raddist::component, "default", alist, syntax, &make);
   }
 } RaddistStandard_syntax;
 

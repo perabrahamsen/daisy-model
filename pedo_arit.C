@@ -84,7 +84,7 @@ static struct PedotransferIdentitySyntax
                        "Operand for this function.");
     syntax.add ("dimension", Syntax::String, Syntax::OptionalConst,
 		"Dimension of this value.");
-    Librarian<Pedotransfer>::add_type ("identity", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "identity", alist, syntax, &make);
   }
 } PedotransferIdentity_syntax;
 
@@ -139,7 +139,7 @@ static struct PedotransferLog10Syntax
     syntax.add_object ("operand", Pedotransfer::component,
                        "Operand for this function.");
     syntax.order ("operand");
-    Librarian<Pedotransfer>::add_type ("log10", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "log10", alist, syntax, &make);
   }
 } PedotransferLog10_syntax;
 
@@ -173,7 +173,7 @@ static struct PedotransferLnSyntax
     syntax.add_object ("operand", Pedotransfer::component,
                        "Operand for this function.");
     syntax.order ("operand");
-    Librarian<Pedotransfer>::add_type ("ln", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "ln", alist, syntax, &make);
   }
 } PedotransferLn_syntax;
 
@@ -207,7 +207,7 @@ static struct PedotransferSqrtSyntax
     syntax.add_object ("operand", Pedotransfer::component,
                        "Operand for this function.");
     syntax.order ("operand");
-    Librarian<Pedotransfer>::add_type ("sqrt", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "sqrt", alist, syntax, &make);
   }
 } PedotransferSqrt_syntax;
 
@@ -240,7 +240,7 @@ static struct PedotransferSqrSyntax
     syntax.add_object ("operand", Pedotransfer::component,
                        "Operand for this function.");
     syntax.order ("operand");
-    Librarian<Pedotransfer>::add_type ("sqr", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "sqr", alist, syntax, &make);
   }
 } PedotransferSqr_syntax;
 
@@ -295,7 +295,7 @@ static struct PedotransferPowSyntax
     syntax.add_object ("exponent", Pedotransfer::component,
                        "The exponent operand for this function.");
     syntax.order ("base", "exponent");
-    Librarian<Pedotransfer>::add_type ("pow", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "pow", alist, syntax, &make);
   }
 } PedotransferPow_syntax;
 
@@ -436,7 +436,7 @@ static struct PedotransferMaxSyntax
                             PedotransferOperands::unique);
     syntax.add_check ("operands", all);
     syntax.order ("operands");
-    Librarian<Pedotransfer>::add_type ("max", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "max", alist, syntax, &make);
   }
 } PedotransferMax_syntax;
 
@@ -482,7 +482,7 @@ static struct PedotransferMinSyntax
                             PedotransferOperands::unique);
     syntax.add_check ("operands", all);
     syntax.order ("operands");
-    Librarian<Pedotransfer>::add_type ("min", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "min", alist, syntax, &make);
   }
 } PedotransferMin_syntax;
 
@@ -520,7 +520,7 @@ static struct PedotransferProductSyntax
                        Syntax::Const, Syntax::Sequence,
                        "The operands for this function.");
     syntax.order ("operands");
-    Librarian<Pedotransfer>::add_type ("*", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "*", alist, syntax, &make);
   }
 } PedotransferProduct_syntax;
 
@@ -561,7 +561,7 @@ static struct PedotransferSumSyntax
                             PedotransferOperands::unique);
     syntax.add_check ("operands", PedotransferOperands::unique);
     syntax.order ("operands");
-    Librarian<Pedotransfer>::add_type ("+", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "+", alist, syntax, &make);
   }
 } PedotransferSum_syntax;
 
@@ -607,7 +607,7 @@ subtracts all but the first from the first.");
                             PedotransferOperands::unique);
     syntax.add_check ("operands", all);
     syntax.order ("operands");
-    Librarian<Pedotransfer>::add_type ("-", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "-", alist, syntax, &make);
   }
 } PedotransferSubtract_syntax;
 
@@ -647,7 +647,7 @@ static struct PedotransferDivideSyntax
                        "The operands for this function.");
     syntax.add_check ("operands", VCheck::min_size_1 ());
     syntax.order ("operands");
-    Librarian<Pedotransfer>::add_type ("/", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "/", alist, syntax, &make);
   }
 } PedotransferDivide_syntax;
 

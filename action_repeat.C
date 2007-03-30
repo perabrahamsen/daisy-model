@@ -105,6 +105,6 @@ The action may take several timesteps.");
                          Syntax::OptionalState, Syntax::Singleton,
                          "Action currently being performed.");
       syntax.order ("repeat");
-      Librarian<Action>::add_type ("repeat", alist, syntax, &make);
+      BuildBase::add_type (Action::component, "repeat", alist, syntax, &make);
     }
 } ActionRepeat_syntax;

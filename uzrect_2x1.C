@@ -316,7 +316,7 @@ static struct UZRect2x1Syntax
 Transport water in the matrix in two phases, first vertical, then\n\
 horizontal.");
     UZRect2x1::load_syntax (syntax, alist);
-    Librarian<UZRect>::add_type ("v+h", alist, syntax, &make);
+    BuildBase::add_type (UZRect::component, "v+h", alist, syntax, &make);
   }
 } UZRect2x1_syntax;
 

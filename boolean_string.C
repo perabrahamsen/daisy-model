@@ -70,7 +70,7 @@ static struct BooleanStringEqualSyntax
     syntax.add ("values", Syntax::String, Syntax::Const, Syntax::Sequence,
 		"Strings to compare.");
     syntax.order ("values");
-    Librarian<Boolean>::add_type ("string-equal", alist, syntax, &make);
+    BuildBase::add_type (Boolean::component, "string-equal", alist, syntax, &make);
   }
 } BooleanStringEqual_syntax;
 

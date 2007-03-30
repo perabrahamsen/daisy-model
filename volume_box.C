@@ -323,7 +323,7 @@ static struct Volume_BoxSyntax
 By default, the intervals fill the entire axis.  You can modify this by\n\
 setting the parameters.");
 
-    Librarian<Volume>::add_type ("box", alist, syntax, &make);
+    BuildBase::add_type (Volume::component, "box", alist, syntax, &make);
   }
 } VolumeBox_syntax;
 

@@ -954,7 +954,7 @@ static struct UZRectMollerupSyntax
 A finite volume solution to matrix water transport.\n\
 See Mollerup 2007 for details.");
     UZRectMollerup::load_syntax (syntax, alist);
-    Librarian<UZRect>::add_type ("Mollerup", alist, syntax, &make);
+    BuildBase::add_type (UZRect::component, "Mollerup", alist, syntax, &make);
   }
 } UZRectMollerup_syntax;
 

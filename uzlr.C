@@ -401,7 +401,7 @@ Use gravitational water movement for wet soil, where h > h_fc.\n\
 There are no water movement when h < h_fc, except at the layers down\n\
 to z_top, where there can be Darcy movement.");
     UZlr::load_syntax (syntax, alist);
-    Librarian<UZmodel>::add_type ("lr", alist, syntax, &make);
+    BuildBase::add_type (UZmodel::component, "lr", alist, syntax, &make);
   }
 } UZlr_syntax;
 

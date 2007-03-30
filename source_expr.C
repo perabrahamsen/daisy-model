@@ -130,7 +130,7 @@ Expression for calculating the value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
 
-    Librarian<Source>::add_type ("arithmetic", alist, syntax, &make);
+    BuildBase::add_type (Source::component, "arithmetic", alist, syntax, &make);
   }
 } SourceExpr_syntax;
 

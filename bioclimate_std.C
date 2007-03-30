@@ -1041,7 +1041,8 @@ static struct BioclimateStandardSyntax
  
     BioclimateStandard::load_syntax (syntax, alist);
     // Add to library.
-    Librarian<Bioclimate>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (Bioclimate::component, 
+                         "default", alist, syntax, &make);
   }
 } BioclimateStandard_syntax;
 

@@ -155,7 +155,7 @@ expression may refer to the value of each source by its title.");
 Expression for calculating the y value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");
-    Librarian<XYSource>::add_type ("combine", alist, syntax, &make);
+    BuildBase::add_type (XYSource::component, "combine", alist, syntax, &make);
   }
 } XYSourceCombine_syntax;
 

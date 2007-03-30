@@ -148,6 +148,6 @@ carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.\n\
 The dimension depends on the 'm' parameter.");
     syntax.add ("m", Syntax::None (), Check::non_negative (), Syntax::Const,
 		"Freundlich parameter");
-    Librarian<Adsorption>::add_type ("Freundlich", alist, syntax, &make);
+    BuildBase::add_type (Adsorption::component, "Freundlich", alist, syntax, &make);
   }
 } AdsorptionFreundlich_syntax;

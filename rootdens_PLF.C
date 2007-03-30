@@ -241,7 +241,7 @@ the current development stage, and scale them to match the current\n\
 total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
     syntax.add_check ("entries", check_indexes);
-    Librarian<Rootdens>::add_type ("DS_Depth", alist, syntax, make);
+    BuildBase::add_type (Rootdens::component, "DS_Depth", alist, syntax, make);
   }
 } Rootdens_DS_Depth_syntax;
 
@@ -291,7 +291,7 @@ total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
     syntax.add_check ("entries", check_indexes);
 
-    Librarian<Rootdens>::add_type ("DS_Rel", alist, syntax, make);
+    BuildBase::add_type (Rootdens::component, "DS_Rel", alist, syntax, make);
   }
 } Rootdens_DS_Rel_syntax;
 
@@ -339,7 +339,7 @@ total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
     syntax.add_check ("entries", check_indexes);
 
-    Librarian<Rootdens>::add_type ("Depth_Depth", alist, syntax, make);
+    BuildBase::add_type (Rootdens::component, "Depth_Depth", alist, syntax, make);
   }
 } Rootdens_Depth_Depth_syntax;
 

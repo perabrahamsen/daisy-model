@@ -62,6 +62,6 @@ static struct MacroNoneSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "No macropores.");
-      Librarian<Macro>::add_type ("none", alist, syntax, &make);
+      BuildBase::add_type (Macro::component, "none", alist, syntax, &make);
     }
 } MacroNone_syntax;

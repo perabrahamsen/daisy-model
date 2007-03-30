@@ -273,14 +273,14 @@ ActionLispSyntax::ActionLispSyntax ()
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "This action does nothing, always done.");
-    Librarian<Action>::add_type ("nil", alist, syntax, &make_nil);
+    BuildBase::add_type (Action::component, "nil", alist, syntax, &make_nil);
   }
   // "t"
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "This action does nothing, never done.");
-    Librarian<Action>::add_type ("t", alist, syntax, &make_nil);
+    BuildBase::add_type (Action::component, "t", alist, syntax, &make_nil);
   }
   // "progn"
   {
@@ -293,7 +293,7 @@ All the actions will be performed in the same time step.");
                        Syntax::State, Syntax::Sequence,
                        "List of actions to perform.");
     syntax.order ("actions");
-    Librarian<Action>::add_type ("progn", alist, syntax, &make_progn);
+    BuildBase::add_type (Action::component, "progn", alist, syntax, &make_progn);
   }
   // "cond"
   {
@@ -306,7 +306,7 @@ Each clause consist of a condition and a sequence of actions.\n\
 The first clause whose condition is true, will have its actions activated.",
                                    ActionCond::clause::load_syntax);
     syntax.order ("clauses");
-    Librarian<Action>::add_type ("cond", alist, syntax, &make_cond);
+    BuildBase::add_type (Action::component, "cond", alist, syntax, &make_cond);
   }
   // "if"
   {
@@ -325,6 +325,6 @@ otherwise perform the second action.");
     AttributeList nilAlist;
     nilAlist.add ("type", "nil");
     alist.add ("else", nilAlist);
-    Librarian<Action>::add_type ("if", alist, syntax, &make_if);
+    BuildBase::add_type (Action::component, "if", alist, syntax, &make_if);
   }
 }

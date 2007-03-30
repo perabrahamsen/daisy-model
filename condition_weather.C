@@ -120,7 +120,7 @@ Temeperature sum above which the condition becomes true.");
       syntax.add ("TSum_now", "dg C d", Syntax::OptionalState, "\
 Current temeprature sum since last reset.");
       syntax.order ("TSum_limit");
-      Librarian<Condition>::add_type ("TSum_above",
+      BuildBase::add_type (Condition::component, "TSum_above",
 				      alist, syntax, &make);
     }
   }

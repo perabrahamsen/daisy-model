@@ -142,5 +142,5 @@ Modified Campbell retention curve model with Burdine theory.");
   syntax.add ("b", Syntax::None (), Check::positive (), Syntax::Const,
 	      "Campbell parameter.");
 
-  Librarian<Hydraulic>::add_type ("mod_C", alist, syntax, make);
+  BuildBase::add_type (Hydraulic::component, "mod_C", alist, syntax, make);
 }

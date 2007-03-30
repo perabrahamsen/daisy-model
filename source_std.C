@@ -170,7 +170,7 @@ If 'factor' is not specified, Daisy will attempt to convert the data.");
 Multiply all data by this number.\n\
 By default Daisy will convert from 'original' to 'dimension'.");
 
-    Librarian<Source>::add_type ("column", alist, syntax, &make);
+    BuildBase::add_type (Source::component, "column", alist, syntax, &make);
   }
 } SourceStandard_syntax;
 

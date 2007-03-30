@@ -57,7 +57,7 @@ static struct ActionRidgeSyntax
 			  "Ridge parameters",
 			  Ridge::load_syntax);
     syntax.order ("ridge");
-    Librarian<Action>::add_type ("ridge", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "ridge", alist, syntax, &make);
   }
 } ActionRidge_syntax;
 

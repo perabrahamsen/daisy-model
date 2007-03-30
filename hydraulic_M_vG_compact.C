@@ -185,7 +185,7 @@ and compaction.");
 		Syntax::Const,
 		"Porosity modifier for water conductivity of saturated soil.");
 
-    Librarian<Hydraulic>::add_type ("M_vG_compact", alist, syntax, &make);
+    BuildBase::add_type (Hydraulic::component, "M_vG_compact", alist, syntax, &make);
   }
 } hydraulicM_vG_compact_syntax;
 

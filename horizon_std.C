@@ -207,7 +207,7 @@ NOTE: Not a real texture class, use 'sand' instead.");
                 Syntax::Const,
                 "Relative fraction of humus in soil.");
 
-    Librarian<Horizon>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (Horizon::component, "default", alist, syntax, &make);
   }
 } HorizonStandard_syntax;
 

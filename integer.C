@@ -79,7 +79,7 @@ static struct IntegerConstSyntax
     syntax.add ("value", Syntax::Integer, Syntax::Const,
 		"Fixed value for this integer.");
     syntax.order ("value");
-    Librarian<Integer>::add_type ("const", alist, syntax, &make);
+    BuildBase::add_type (Integer::component, "const", alist, syntax, &make);
   }
 } IntegerConst_syntax;
 
@@ -163,7 +163,7 @@ Return the value of the first clause whose condition is true.");
 List of clauses to match for.",
                                    IntegerCond::Clause::load_syntax);
     syntax.order ("clauses");
-    Librarian<Integer>::add_type ("cond", alist, syntax, &make);
+    BuildBase::add_type (Integer::component, "cond", alist, syntax, &make);
   }
 } IntegerCond_syntax;
 

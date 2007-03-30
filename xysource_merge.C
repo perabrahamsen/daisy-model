@@ -194,7 +194,7 @@ Dimension for x points.");
     syntax.add ("y_dimension", Syntax::String, Syntax::Const, "\
 Dimension for y points.");
 
-    Librarian<XYSource>::add_type ("merge", alist, syntax, &make);
+    BuildBase::add_type (XYSource::component, "merge", alist, syntax, &make);
   }
 } XYSourceMerge_syntax;
 

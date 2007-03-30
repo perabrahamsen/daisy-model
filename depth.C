@@ -91,7 +91,7 @@ static struct DepthConstSyntax
     syntax.add ("value", "cm", Check::non_positive (), Syntax::Const, 
                 "Constant depth.");
     syntax.order ("value");
-    Librarian<Depth>::add_type ("const", alist, syntax, &make);
+    BuildBase::add_type (Depth::component, "const", alist, syntax, &make);
   }
 } DepthConst_syntax;
 
@@ -179,7 +179,7 @@ the depth for other times, linear interpolation between the entries\n\
 in the list will be used.", entry_syntax);
     syntax.add_check ("table", check_table);
     syntax.order ("table");
-    Librarian<Depth>::add_type ("PLF", alist, syntax, &make);
+    BuildBase::add_type (Depth::component, "PLF", alist, syntax, &make);
   }
 } DepthPLF_syntax;
 
@@ -310,7 +310,7 @@ The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\
 Linear interpolation is used between the datapoints.");
     syntax.order ("file");
-    Librarian<Depth>::add_type ("file", alist, syntax, &make);
+    BuildBase::add_type (Depth::component, "file", alist, syntax, &make);
   }
 } DepthFile_syntax;
 

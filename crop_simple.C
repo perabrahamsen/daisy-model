@@ -536,7 +536,7 @@ Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
 Fraction of potential N uptake reached at flowering.");
     alist.add ("N_flowering", 0.9);
 
-    Librarian<Crop>::add_type ("simple", alist, syntax, &make);
+    BuildBase::add_type (Crop::component, "simple", alist, syntax, &make);
   }
 } simple_crop_syntax;
 

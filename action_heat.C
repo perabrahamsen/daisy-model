@@ -62,7 +62,7 @@ Set external point heat source at height to value.");
     syntax.add ("value", "W/m^2", Check::non_negative (), Syntax::Const,
 		"Value of heat source.");
     syntax.order ("height", "value");
-    Librarian<Action>::add_type ("set_heat_source", 
+    BuildBase::add_type (Action::component, "set_heat_source", 
 				 alist, syntax, &make);
   }
 } ActionHeat_syntax;

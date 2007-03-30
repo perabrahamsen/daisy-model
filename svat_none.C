@@ -52,6 +52,6 @@ static struct SVAT_NoneSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     SVAT::load_syntax (syntax, alist);
-    Librarian<SVAT>::add_type ("none", alist, syntax, &make);
+    BuildBase::add_type (SVAT::component, "none", alist, syntax, &make);
   }
 } SVAT_none_syntax;

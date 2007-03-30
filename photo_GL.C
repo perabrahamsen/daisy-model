@@ -197,6 +197,6 @@ Development stage factor for assimilate production.");
 Age is given as day after planting.");
     alist.add ("DAPEff",DS_null_eff);
 
-    Librarian<Photo>::add_type ("GL", alist, syntax, &make);
+    BuildBase::add_type (Photo::component, "GL", alist, syntax, &make);
   }
 } PhotoGL_syntax;

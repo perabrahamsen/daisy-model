@@ -370,6 +370,6 @@ static struct WeatherSyntax
     AttributeList& alist = *new AttributeList ();
     Weather::load_syntax (syntax, alist);
 
-    Librarian<Weather>::add_base (alist, syntax);
+    BuildBase::add_base (Weather::component, alist, syntax);
   }
 } Weather_syntax;

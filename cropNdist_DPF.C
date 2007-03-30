@@ -128,7 +128,7 @@ static struct cropNdistDPFSyntax
 	       "Boegh et al.(2002) crop N-distribution model in the canopy for photosynthesis and distribution of photosynthetical capacity.");
 
     load_syntax (syntax, alist);
-    Librarian<CropNdist>::add_type ("N-exp", alist, syntax, &make);
+    BuildBase::add_type (CropNdist::component, "N-exp", alist, syntax, &make);
   }
 } cropNdistDPF_syntax;
 

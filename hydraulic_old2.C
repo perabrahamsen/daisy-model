@@ -189,5 +189,5 @@ increasing with 0.01 on each line.");
   alist.add ("M_intervals", 500);
   syntax.add ("file", Syntax::String, Syntax::Const, "The file to read.");
   syntax.order ("file");
-  Librarian<Hydraulic>::add_type ("old2", alist, syntax, &HydraulicOld2::make);
+  BuildBase::add_type (Hydraulic::component, "old2", alist, syntax, &HydraulicOld2::make);
 }

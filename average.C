@@ -71,7 +71,7 @@ static struct AverageArithmeticSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Arithmetic average '(a+b)/2'.");
-    Librarian<Average>::add_type ("arithmetic", alist, syntax, &make);
+    BuildBase::add_type (Average::component, "arithmetic", alist, syntax, &make);
   }
 } AverageArithmetic_syntax;
 
@@ -119,7 +119,7 @@ static struct AverageHarmonicSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Harmonic average '2ab/(a+b)'.");
-    Librarian<Average>::add_type ("harmonic", alist, syntax, &make);
+    BuildBase::add_type (Average::component, "harmonic", alist, syntax, &make);
   }
 } AverageHarmonic_syntax;
 
@@ -150,7 +150,7 @@ static struct AverageGeometricSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Geometric average 'sqrt(a*b)'.");
-    Librarian<Average>::add_type ("geometric", alist, syntax, &make);
+    BuildBase::add_type (Average::component, "geometric", alist, syntax, &make);
   }
 } AverageGeometric_syntax;
 

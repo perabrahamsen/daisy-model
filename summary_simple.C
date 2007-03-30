@@ -169,6 +169,6 @@ List of columns to fetch for the summary.", Fetch::load_syntax);
       syntax.add ("precision", Syntax::Integer, Syntax::Const,
 		  "Number of digits to print after decimal point.");
       alist.add ("precision", 2);
-      Librarian<Summary>::add_type ("simple", alist, syntax, &make);
+      BuildBase::add_type (Summary::component, "simple", alist, syntax, &make);
     }
 } SummarySimple_syntax;

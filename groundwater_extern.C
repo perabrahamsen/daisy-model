@@ -134,6 +134,6 @@ Scope to look up groundwater table in.");
     syntax.add_object ("table", Number::component, 
                        Syntax::Const, Syntax::Singleton, "\
 Expression that evaluates to groundwate table in.");
-    Librarian<Groundwater>::add_type ("extern", alist, syntax, &make);
+    BuildBase::add_type (Groundwater::component, "extern", alist, syntax, &make);
   }
 } GroundwaterExtern_syntax;

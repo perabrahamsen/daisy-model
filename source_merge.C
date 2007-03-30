@@ -221,7 +221,7 @@ Dimension of data to plot.\n\
 By default use the first source with a known dimension.");
 
     
-    Librarian<Source>::add_type ("merge", alist, syntax, &make);
+    BuildBase::add_type (Source::component, "merge", alist, syntax, &make);
   }
 } SourceMerge_syntax;
 

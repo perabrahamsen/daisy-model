@@ -727,6 +727,6 @@ emerged.  If no crops have emerged on the field, it will be ignored.",
                        Syntax::State, Syntax::Sequence,
                        "List of crops growing in the field");
     alist.add ("crops", std::vector<AttributeList*> ());
-    Librarian<Vegetation>::add_type ("crops", alist, syntax, &make);
+    BuildBase::add_type (Vegetation::component, "crops", alist, syntax, &make);
   }
 } VegetationCrops_syntax;

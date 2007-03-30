@@ -70,7 +70,7 @@ static struct ABAEffectexpSyntax
 
     load_syntax (syntax, alist);
 
-    Librarian<ABAEffect>::add_type ("ABA-exp", alist, syntax, &make);
+    BuildBase::add_type (ABAEffect::component, "ABA-exp", alist, syntax, &make);
   }
 } ABAEffectexpsyntax;
 

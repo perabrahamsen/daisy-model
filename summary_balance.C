@@ -285,6 +285,6 @@ If the balance only hold true when logging the top of the soil, i.e. the\n\
                   "Tags of columns in log file representing outputs.");
       syntax.add ("content", Syntax::String, Syntax::Const, Syntax::Sequence,
                   "Tags of columns in log file representing content.");
-      Librarian<Summary>::add_type ("balance", alist, syntax, &make);
+      BuildBase::add_type (Summary::component, "balance", alist, syntax, &make);
     }
 } SummaryBalance_syntax;

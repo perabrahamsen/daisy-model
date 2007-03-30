@@ -147,6 +147,6 @@ static struct EquilibriumLangmuirSyntax
     syntax.add_object ("my_max", Pedotransfer::component, 
                        Syntax::Const, Syntax::Singleton,
                        "Max equilibrium capacity [g/cm^3].");
-    Librarian<Equilibrium>::add_type ("Langmuir", alist, syntax, &make);
+    BuildBase::add_type (Equilibrium::component, "Langmuir", alist, syntax, &make);
   }
 } EquilibriumLangmuir_syntax;

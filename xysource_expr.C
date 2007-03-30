@@ -199,7 +199,7 @@ Expression for calculating the y value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
 
-    Librarian<XYSource>::add_type ("arithmetic", alist, syntax, &make);
+    BuildBase::add_type (XYSource::component, "arithmetic", alist, syntax, &make);
   }
 } XYSourceExpr_syntax;
 

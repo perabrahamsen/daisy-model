@@ -1110,6 +1110,6 @@ The nitrification log.\n\
 Note that the nitrification parameters are found in the horizons.",
 			  ColumnStandard::NitLog::load_syntax);
     
-    Librarian<Column>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (Column::component, "default", alist, syntax, &make);
   }
 } column_syntax;

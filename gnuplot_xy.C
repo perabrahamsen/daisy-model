@@ -436,6 +436,6 @@ By default determine this from the data.");
     syntax.add_object ("source", XYSource::component, Syntax::State, 
                        Syntax::Sequence, "\
 XY series to plot.");
-    Librarian<Gnuplot>::add_type ("xy", alist, syntax, &make);
+    BuildBase::add_type (Gnuplot::component, "xy", alist, syntax, &make);
   }
 } GnuplotXY_syntax;

@@ -162,5 +162,5 @@ that pressure [m/s].");
   alist.add ("M_intervals", 500);
   syntax.add ("file", Syntax::String, Syntax::Const, "The file to read.");
   syntax.order ("file");
-  Librarian<Hydraulic>::add_type ("old", alist, syntax, &HydraulicOld::make);
+  BuildBase::add_type (Hydraulic::component, "old", alist, syntax, &HydraulicOld::make);
 }

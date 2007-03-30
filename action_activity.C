@@ -102,6 +102,6 @@ at each time step.");
                        "Sequence of actions to perform.");
     alist.add ("actions", vector<AttributeList*> ());
     syntax.order ("actions");
-    Librarian<Action>::add_type ("activity", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "activity", alist, syntax, &make);
   }
 } ActionActivity_syntax;

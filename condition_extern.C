@@ -98,7 +98,7 @@ Scope to evaluate expession in.");
       syntax.add_object ("expr", Boolean::component, "\
 Expression to evaluate.");
       syntax.order ("scope", "expr");
-      Librarian<Condition>::add_type ("extern",
+      BuildBase::add_type (Condition::component, "extern",
 				      alist, syntax, &make);
     }
   }

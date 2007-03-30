@@ -66,6 +66,6 @@ smaller than the size of the original column.");
       syntax.add ("size", Syntax::Unknown (), Syntax::Const,
 		  "Size of the partition to remove.");
       syntax.order ("original", "copy", "size");
-      Librarian<Action>::add_type ("divide", alist, syntax, &make);
+      BuildBase::add_type (Action::component, "divide", alist, syntax, &make);
     }
 } ActionDivide_syntax;

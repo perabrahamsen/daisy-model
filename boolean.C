@@ -75,7 +75,7 @@ static struct BooleanTrueSyntax
 
     alist.add ("description", 
 	       "Always true.");
-    Librarian<Boolean>::add_type ("true", alist, syntax, &make);
+    BuildBase::add_type (Boolean::component, "true", alist, syntax, &make);
   }
 } BooleanTrue_syntax;
 
@@ -111,7 +111,7 @@ static struct BooleanFalseSyntax
 
     alist.add ("description", 
 	       "Always false.");
-    Librarian<Boolean>::add_type ("false", alist, syntax, &make);
+    BuildBase::add_type (Boolean::component, "false", alist, syntax, &make);
   }
 } BooleanFalse_syntax;
 
@@ -200,7 +200,7 @@ static struct BooleanAndSyntax
     BooleanOperands::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "True if and only if all operands are true.");
-    Librarian<Boolean>::add_type ("and", alist, syntax, &make);
+    BuildBase::add_type (Boolean::component, "and", alist, syntax, &make);
   }
 } BooleanAnd_syntax;
 
@@ -230,7 +230,7 @@ static struct BooleanOrSyntax
     BooleanOperands::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "True if and only if any operand is true.");
-    Librarian<Boolean>::add_type ("or", alist, syntax, &make);
+    BuildBase::add_type (Boolean::component, "or", alist, syntax, &make);
   }
 } BooleanOr_syntax;
 
@@ -260,7 +260,7 @@ The two operands to compare.");
     syntax.order ("operands");
     alist.add ("description", 
 	       "True if and only if one operand is true, and one false.");
-    Librarian<Boolean>::add_type ("xor", alist, syntax, &make);
+    BuildBase::add_type (Boolean::component, "xor", alist, syntax, &make);
   }
 } BooleanXOr_syntax;
 
@@ -290,6 +290,6 @@ The operand to check.");
     syntax.order ("operands");
     alist.add ("description", 
 	       "True if and only if the operand is not true.");
-    Librarian<Boolean>::add_type ("not", alist, syntax, &make);
+    BuildBase::add_type (Boolean::component, "not", alist, syntax, &make);
   }
 } BooleanNot_syntax;

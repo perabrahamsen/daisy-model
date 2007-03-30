@@ -430,6 +430,6 @@ Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
     syntax.add_submodule("Litter", alist, Syntax::State, "Dead stuff.",
 			 Litter::load_syntax);
     
-    Librarian<Vegetation>::add_type ("permanent", alist, syntax, &make);
+    BuildBase::add_type (Vegetation::component, "permanent", alist, syntax, &make);
   }
 } VegetationPermanent_syntax;

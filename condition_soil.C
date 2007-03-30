@@ -139,7 +139,7 @@ Test if the soil is warmer than the specified temperature.");
 Lowest soil temperature for which the condition is true.");
       syntax.add ("height", "cm", Check::non_positive (), Syntax::Const, "\
 Soil depth in which to test the temperature.");
-      Librarian<Condition>::add_type ("soil_temperature_above",
+      BuildBase::add_type (Condition::component, "soil_temperature_above",
 				      alist, syntax, &make_temperature);
     }
     {
@@ -151,7 +151,7 @@ Test if the soil is wetter than the specified pressure potential.");
 The soil should be wetter than this for the condition to be true.");
       syntax.add ("height", "cm", Check::non_positive (), Syntax::Const, "\
 Depth at which to example the pressure potential.");
-      Librarian<Condition>::add_type ("soil_water_pressure_above",
+      BuildBase::add_type (Condition::component, "soil_water_pressure_above",
 				      alist, syntax, &make_potential);
     }
     {
@@ -168,7 +168,7 @@ Top of interval to measure soil water content in.");
       syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
 Bottom of interval to measure soil water content in.");
       syntax.order ("water");
-      Librarian<Condition>::add_type ("soil_water_content_above",
+      BuildBase::add_type (Condition::component, "soil_water_content_above",
 				      alist, syntax, &make_water);
     }
     {
@@ -187,7 +187,7 @@ Top of interval to measure soil content in.");
       syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
 Bottom of interval to measure soil content in.");
       syntax.order ("amount");
-      Librarian<Condition>::add_type ("soil_inorganic_N_above",
+      BuildBase::add_type (Condition::component, "soil_inorganic_N_above",
 				      alist, syntax, &make_N_min);
     }
   }

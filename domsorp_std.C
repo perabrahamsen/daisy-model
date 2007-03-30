@@ -144,6 +144,6 @@ static struct DomsorpStandardSyntax
     syntax.add ("S_N", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 		"Carbon converted from DOM to SOM (may be negative).");
 
-    Librarian<Domsorp>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (Domsorp::component, "default", alist, syntax, &make);
   }
 } DomsorpStandard_syntax;

@@ -154,5 +154,5 @@ Bimodal hydraulic conductivity curve.");
   syntax.add ("K_b", "cm/h", Syntax::Const,
 	      "Water conductivity at 'h_b'.");
 
-  Librarian<Hydraulic>::add_type ("M_BaC_Bimodal", alist, syntax, make);
+  BuildBase::add_type (Hydraulic::component, "M_BaC_Bimodal", alist, syntax, make);
 }

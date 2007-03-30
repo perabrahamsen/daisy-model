@@ -595,6 +595,6 @@ When it reached 1.0, decomposition begins.");
     none.add ("type", "none");
     alist.add ("adsorption", none);
 
-    Librarian<Chemical>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (Chemical::component, "default", alist, syntax, &make);
   }
 } ChemicalStandard_syntax;

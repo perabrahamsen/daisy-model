@@ -187,5 +187,5 @@ Water Resources Research 2003.");
   syntax.add ("f", Syntax::None (), Check::non_negative (), Syntax::Const,
 	      "Macropores conductivity curve shape parameter.");
     
-  Librarian<Hydraulic>::add_type ("M_vGp", alist, syntax, make);
+  BuildBase::add_type (Hydraulic::component, "M_vGp", alist, syntax, make);
 }

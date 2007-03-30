@@ -159,7 +159,7 @@ HorizonSystem::System::add_to_lib (Model& (make)(Block&),
 If this is true, normalize the mineral fraction to 1.0.\n\
 Otherwise, give an error if the sum is not 1.0.");
     alist.add ("normalize", false);
-    Librarian<Horizon>::add_type (symbol (name), alist, syntax, make);
+    BuildBase::add_type (Horizon::component, symbol (name), alist, syntax, make);
 }
 
 static const struct USDA3_type : public HorizonSystem::System

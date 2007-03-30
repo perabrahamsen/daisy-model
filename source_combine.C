@@ -140,7 +140,7 @@ Expression for calculating the value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");
     
-    Librarian<Source>::add_type ("combine", alist, syntax, &make);
+    BuildBase::add_type (Source::component, "combine", alist, syntax, &make);
   }
 } SourceCombine_syntax;
 

@@ -1459,6 +1459,6 @@ month.  The first number corresponds to January, the second to\n\
 February, etc.");
     alist.add ("TempOffset", vector<double> (12, 0.0));
 
-    Librarian<Weather>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (Weather::component, "default", alist, syntax, &make);
   }
 } WeatherStandard_syntax;

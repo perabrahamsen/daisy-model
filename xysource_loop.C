@@ -206,7 +206,7 @@ Disretization within interval.");
 Name of free variable to calculate the 'x' and 'y' expressions from.");
     alist.add ("tag", "x");
 
-    Librarian<XYSource>::add_type ("loop", alist, syntax, &make);
+    BuildBase::add_type (XYSource::component, "loop", alist, syntax, &make);
   }
 } XYSourceLoop_syntax;
 

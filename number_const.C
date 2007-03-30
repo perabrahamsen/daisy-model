@@ -68,7 +68,7 @@ static struct NumberConstSyntax
     syntax.add ("value", Syntax::User (), Syntax::Const,
 		"Fixed value for this number.");
     syntax.order ("value");
-    Librarian<Number>::add_type ("const", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "const", alist, syntax, &make);
   }
 } NumberConst_syntax;
 
@@ -146,7 +146,7 @@ static struct NumberGetSyntax
     syntax.add ("dimension", Syntax::String, Syntax::Const, 
                 "Expected dimension for the symbol.");
     syntax.order ("name", "dimension");
-    Librarian<Number>::add_type ("get", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "get", alist, syntax, &make);
   }
 } NumberGet_syntax;
 
@@ -250,7 +250,7 @@ static struct NumberFetchSyntax
     syntax.add ("name", Syntax::String, Syntax::Const, 
                 "Name of a the symbol.");
     syntax.order ("name");
-    Librarian<Number>::add_type ("fetch", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "fetch", alist, syntax, &make);
   }
 } NumberFetch_syntax;
 
@@ -338,7 +338,7 @@ static struct NumberIdentitySyntax
     NumberChild::load_syntax (syntax, alist);
     syntax.add ("dimension", Syntax::String, Syntax::OptionalConst,
 		"Dimension of this value.");
-    Librarian<Number>::add_type ("identity", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "identity", alist, syntax, &make);
   }
 } NumberIdentity_syntax;
 
@@ -397,7 +397,7 @@ static struct NumberConvertSyntax
     syntax.add ("dimension", Syntax::String, Syntax::Const,
 		"Dimension to convert to.");
     syntax.order ("value", "dimension");
-    Librarian<Number>::add_type ("convert", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "convert", alist, syntax, &make);
   }
 } NumberConvert_syntax;
 
@@ -455,7 +455,7 @@ static struct NumberDimSyntax
     syntax.add ("dimension", Syntax::String, Syntax::Const,
 		"Dimension to use.");
     syntax.order ("value", "dimension");
-    Librarian<Number>::add_type ("dim", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "dim", alist, syntax, &make);
   }
 } NumberDim_syntax;
 

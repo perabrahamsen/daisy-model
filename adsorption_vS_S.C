@@ -117,6 +117,6 @@ static struct Adsorption_vS_SSyntax
     alist.add ("description", "\
 Model by van Schouwenberg and Schuffelen, 1963, with\n\
 parameterization by Hansen et.al., 1990.");
-    Librarian<Adsorption>::add_type ("vS_S", alist, syntax, &make);
+    BuildBase::add_type (Adsorption::component, "vS_S", alist, syntax, &make);
   }
 } Adsorption_vS_S_syntax;

@@ -104,6 +104,6 @@ Diffuse radiation calculated using the model of De Pury and Farquhar, 1997.");
                 "Atmospheric transmission coefficient of PAR. Value around 0.6-0.9 depending on dustparticles");
     alist.add ("a", 0.84);
     
-    Librarian<Difrad>::add_type ("DPF", alist, syntax, &make);
+    BuildBase::add_type (Difrad::component, "DPF", alist, syntax, &make);
   }
 } DifradDPF_syntax;

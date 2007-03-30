@@ -188,7 +188,7 @@ Wait until the specified condition is true.");
       syntax.add_object ("condition", Condition::component, 
                          "Condition to wait for.");
       syntax.order ("condition");
-      Librarian<Action>::add_type ("wait", alist, syntax, &make);
+      BuildBase::add_type (Action::component, "wait", alist, syntax, &make);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -205,7 +205,7 @@ Waits the specified number of days.");
 		  "Wait until this date.\
 Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
       syntax.order ("days");
-      Librarian<Action>::add_type ("wait_days", alist, syntax, &make_days);
+      BuildBase::add_type (Action::component, "wait_days", alist, syntax, &make_days);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -222,7 +222,7 @@ Waits the specified number of hours.");
 		  "Wait until this date.\
 Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
       syntax.order ("hours");
-      Librarian<Action>::add_type ("wait_hours", alist, syntax, &make_days);
+      BuildBase::add_type (Action::component, "wait_hours", alist, syntax, &make_days);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -238,7 +238,7 @@ Wait until a specific month and day in the year.");
 		  "Wait until this hour.");
       alist.add ("hour", 8);
       syntax.order ("month", "day");
-      Librarian<Action>::add_type ("wait_mm_dd", alist, syntax, &make_mm_dd);
+      BuildBase::add_type (Action::component, "wait_mm_dd", alist, syntax, &make_mm_dd);
     }
   }
 } ActionWait_syntax;

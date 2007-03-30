@@ -66,9 +66,9 @@ static struct ConditionDaisySyntax
     AttributeList& alist_finished = *new AttributeList ();
     alist_finished.add ("description", 
                         "True iff the simulation has finished.");
-    Librarian<Condition>::add_type ("running",
+    BuildBase::add_type (Condition::component, "running",
                                     alist_running, syntax, &make_running);
-    Librarian<Condition>::add_type ("finished",
+    BuildBase::add_type (Condition::component, "finished",
                                     alist_finished, syntax, &make_finished);
   }
 } ConditionDaisy_syntax;

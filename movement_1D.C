@@ -795,6 +795,6 @@ static struct Movement1DSyntax
     alist.add ("description", "One dimensional movement.");
     Movement::load_vertical (syntax, alist);
  
-    Librarian<Movement>::add_type ("vertical", alist, syntax, &make);
+    BuildBase::add_type (Movement::component, "vertical", alist, syntax, &make);
   }
 } Movement1D_syntax;

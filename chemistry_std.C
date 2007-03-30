@@ -327,6 +327,6 @@ static struct ChemistryStandardSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     ChemistryStandard::load_syntax (syntax, alist);
-    Librarian<Chemistry>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (Chemistry::component, "default", alist, syntax, &make);
   }
 } ChemistryStandard_syntax;

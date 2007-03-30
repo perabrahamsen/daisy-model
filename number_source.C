@@ -144,7 +144,7 @@ static struct NumberSourceUniqueSyntax
     alist.add ("description", 
 	       "Find unique number in time series.");
     NumberSource::load_syntax (syntax, alist);
-    Librarian<Number>::add_type ("source_unique", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "source_unique", alist, syntax, &make);
   }
 } NumberSourceUnique_syntax;
 
@@ -191,7 +191,7 @@ static struct NumberSourceAverageSyntax
     alist.add ("description", 
 	       "Find average number in time series.");
     NumberSource::load_syntax (syntax, alist);
-    Librarian<Number>::add_type ("source_average", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "source_average", alist, syntax, &make);
   }
 } NumberSourceAverage_syntax;
 
@@ -224,7 +224,7 @@ static struct NumberSourceSumSyntax
     alist.add ("description", 
 	       "Calculate the sum of the values in a time series.");
     NumberSource::load_syntax (syntax, alist);
-    Librarian<Number>::add_type ("source_sum", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "source_sum", alist, syntax, &make);
   }
 } NumberSourceSum_syntax;
 
@@ -270,7 +270,7 @@ static struct NumberSourceIncreaseSyntax
     alist.add ("description", 
 	       "Find increase in value during time series.");
     NumberSource::load_syntax (syntax, alist);
-    Librarian<Number>::add_type ("source_increase", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "source_increase", alist, syntax, &make);
   }
 } NumberSourceIncrease_syntax;
 

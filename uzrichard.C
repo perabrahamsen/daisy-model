@@ -750,7 +750,7 @@ static struct UZRichardSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "A numerical solution to Richard's Equation.");
       UZRichard::load_syntax (syntax, alist);
-      Librarian<UZmodel>::add_type ("richards", alist, syntax, &make);
+      BuildBase::add_type (UZmodel::component, "richards", alist, syntax, &make);
     }
 } UZRichard_syntax;
 

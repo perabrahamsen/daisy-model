@@ -58,7 +58,7 @@ Set amount of ponding the surface can retain.");
     syntax.add ("height", "cm", Check::non_negative (), Syntax::Const,
 		"Max ponding height before runoff.");
     syntax.order ("height");
-    Librarian<Action>::add_type ("set_surface_detention_capacity", 
+    BuildBase::add_type (Action::component, "set_surface_detention_capacity", 
 				 alist, syntax, &make);
   }
 } ActionSurface_syntax;

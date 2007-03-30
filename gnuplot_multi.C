@@ -112,6 +112,6 @@ The commands will be inserted right after the last graph.");
     syntax.add_object ("graph", Gnuplot::component, Syntax::State, 
                        Syntax::Sequence, "Graphs to plot.");
 
-    Librarian<Gnuplot>::add_type ("multi", alist, syntax, &make);
+    BuildBase::add_type (Gnuplot::component, "multi", alist, syntax, &make);
   }
 } GnuplotMulti_syntax;

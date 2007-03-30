@@ -1067,6 +1067,6 @@ Negative number means it hasn't started yet.");
 		"Hours we test for irrigation again.\n\
 This is set at each irrigation, to avoid multiple applications.");
       
-    Librarian<Action>::add_type ("crop", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "crop", alist, syntax, &make);
   }
 } ActionCrop_syntax;

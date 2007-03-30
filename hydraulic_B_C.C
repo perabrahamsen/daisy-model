@@ -126,7 +126,7 @@ static struct HydraulicB_CSyntax
       syntax.add ("b", Syntax::None (), Check::positive (), Syntax::Const,
 		  "Campbell parameter.");
 
-      Librarian<Hydraulic>::add_type ("B_C", alist, syntax, &make);
+      BuildBase::add_type (Hydraulic::component, "B_C", alist, syntax, &make);
     }
 } hydraulicB_C_syntax;
 

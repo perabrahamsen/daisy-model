@@ -202,6 +202,6 @@ static struct GnuplotSyntax
     AttributeList& alist = *new AttributeList ();
     GnuplotBase::load_syntax (syntax, alist);
 
-    Librarian<Gnuplot>::add_base (alist, syntax);
+    BuildBase::add_base (Gnuplot::component, alist, syntax);
   }
 } Gnuplot_syntax;

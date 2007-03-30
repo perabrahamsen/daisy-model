@@ -70,7 +70,8 @@ protected:
                            Block& al, const std::string& key);
 
   // Library.
-protected:
+  static Library& library (const char* component);
+public:
   static void add_base (const char* component,
                         AttributeList& al, const Syntax& syntax);
   static void add_type (const char* component,
@@ -79,13 +80,9 @@ protected:
   static void add_type (const char* component,
                         const char* name, AttributeList& al,
                         const Syntax& syntax, builder build);
-  static Library& library (const char* component);
-                      
-private:
+  static void add_alias (const char* component, symbol derived, symbol base);
   typedef void (*doc_fun) (Format&, Metalib&, Treelog&, 
                            const AttributeList& al);
-public:
-  static void add_alias (const char* component, symbol derived, symbol base);
   static void add_doc_fun (const char* component, doc_fun);
   static void load_syntax (Syntax&, AttributeList&);
 
@@ -151,16 +148,6 @@ public:
       }
     return t;
   }
-  static void add_base (AttributeList& al, const Syntax& syntax)
-  { BuildBase::add_base (T::component, al, syntax); }
-  static void add_type (const symbol name, AttributeList& al,
-			const Syntax& syntax,
-			builder build)
-  { BuildBase::add_type (T::component, name, al, syntax, build); }
-  static void add_type (const char *const name, AttributeList& al,
-			const Syntax& syntax,
-			builder build)
-  { BuildBase::add_type (T::component, name, al, syntax, build); }
 
   // Create and Destroy.
 private:                        // Disable.

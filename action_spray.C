@@ -89,7 +89,7 @@ Spray a chemical (typically a pesticide) on the field.");
     syntax.add ("amount", "g/ha", Check::non_negative (), Syntax::Const,
 		"Amount of pesticide to spray.");
     syntax.order ("chemical", "amount");
-    Librarian<Action>::add_type ("spray", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "spray", alist, syntax, &make);
   }
 } ActionSpray_syntax;
 

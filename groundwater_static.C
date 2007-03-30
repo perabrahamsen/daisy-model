@@ -111,7 +111,7 @@ Provided for backward compatibility, use 'deep' or 'fixed' instead.");
 		"Groundwater level.\n\
 Positive numbers indicate free drainage.");
     alist.add ("table", 1.0);
-    Librarian<Groundwater>::add_type ("static", alist, syntax, &make);
+    BuildBase::add_type (Groundwater::component, "static", alist, syntax, &make);
   }
 } GroundwaterStatic_syntax;
 

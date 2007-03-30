@@ -77,6 +77,6 @@ static struct UZNoneSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "No water movement, and no sink.");
-      Librarian<UZmodel>::add_type ("none", alist, syntax, &make);
+      BuildBase::add_type (UZmodel::component, "none", alist, syntax, &make);
     }
 } UZNone_syntax;

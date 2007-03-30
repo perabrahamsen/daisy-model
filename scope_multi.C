@@ -118,7 +118,7 @@ static struct ScopeMultiSyntax
     syntax.add_object ("scope", Scope::component,
                        Syntax::Const, Syntax::Sequence, 
                        "List of scopes to combine, first one takes precedence.");
-    Librarian<Scope>::add_type ("multi", alist, syntax, &make);
+    BuildBase::add_type (Scope::component, "multi", alist, syntax, &make);
   }
 } ScopeMulti_syntax;
 

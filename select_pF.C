@@ -130,6 +130,6 @@ Pressure above this value will be represented as this value.");
     alist.add ("value", empty);
     alist.add ("dimension", "pF");
 
-    Librarian<Select>::add_type ("pF", alist, syntax, &make);
+    BuildBase::add_type (Select::component, "pF", alist, syntax, &make);
   }
 } Select_syntax;

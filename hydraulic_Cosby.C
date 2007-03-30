@@ -180,6 +180,6 @@ static struct Hydraulic_CosbySyntax
     alist.add ("description", "\
 Modified Campbell retention curve model with Burdine theory.\n\
 Parameters estimated from soil texture as specified by Cosby et at.");
-    Librarian<Hydraulic>::add_type ("Cosby_et_al", alist, syntax, &make);
+    BuildBase::add_type (Hydraulic::component, "Cosby_et_al", alist, syntax, &make);
   }
 } hydraulic_Cosby_syntax;

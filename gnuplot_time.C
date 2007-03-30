@@ -370,6 +370,6 @@ By default determine this from the data.");
     syntax.add_object ("source", Source::component, Syntax::State, 
                        Syntax::Sequence, "\
 Time series to plot.");
-    Librarian<Gnuplot>::add_type ("time", alist, syntax, &make);
+    BuildBase::add_type (Gnuplot::component, "time", alist, syntax, &make);
   }
 } GnuplotTime_syntax;

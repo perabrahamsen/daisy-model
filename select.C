@@ -845,7 +845,7 @@ static struct SelectSyntax
     AttributeList& alist = *new AttributeList ();
     Select::load_syntax (syntax, alist);
 
-    Librarian<Select>::add_base (alist, syntax);
+    BuildBase::add_base (Select::component, alist, syntax);
   }
 } Select_syntax;
 

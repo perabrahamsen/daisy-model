@@ -130,5 +130,5 @@ HydraulicB_BaCSyntax::HydraulicB_BaCSyntax ()
   syntax.add ("h_b", "cm", Syntax::Const,
 	      "Bubbling pressure.");
 
-  Librarian<Hydraulic>::add_type ("B_BaC", alist, syntax, make);
+  BuildBase::add_type (Hydraulic::component, "B_BaC", alist, syntax, make);
 }

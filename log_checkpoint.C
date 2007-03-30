@@ -211,7 +211,7 @@ hot start.");
     AttributeList finished_alist;
     finished_alist.add ("type", "finished");
     alist.add ("when", finished_alist);
-    Librarian<Log>::add_type ("checkpoint", alist, syntax, &make);
+    BuildBase::add_type (Log::component, "checkpoint", alist, syntax, &make);
   }
 } LogCheckpoint_syntax;
 

@@ -59,6 +59,6 @@ but its state will be a average of the the columns, weighted after size.");
       syntax.add ("remove", Syntax::String, Syntax::Const,
 		  "Column to remove after merge.");
       syntax.order ("combine", "remove");
-      Librarian<Action>::add_type ("merge", alist, syntax, &make);
+      BuildBase::add_type (Action::component, "merge", alist, syntax, &make);
     }
 } ActionMerge_syntax;

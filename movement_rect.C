@@ -361,6 +361,6 @@ If none succeeds, the simulation ends.");
     AttributeList matrix_solute_reserve (Msoltranrect::reserve_model ());
     matrix_solute_models.push_back (&matrix_solute_reserve);
     alist.add ("matrix_solute", matrix_solute_models);
-    Librarian<Movement>::add_type ("rectangle", alist, syntax, &make);
+    BuildBase::add_type (Movement::component, "rectangle", alist, syntax, &make);
   }
 } MovementRect_syntax;

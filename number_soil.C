@@ -163,7 +163,7 @@ static struct NumberDepthThetaSyntax
     alist.add ("description", 
 	       "Find water content (Theta) for a given pressure (h).");
     NumberByDepth::load_syntax (syntax, alist);
-    Librarian<Number>::add_type ("depth_Theta", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "depth_Theta", alist, syntax, &make);
   }
 } NumberDepthTheta_syntax;
 
@@ -201,7 +201,7 @@ static struct NumberDepthKSyntax
     alist.add ("description", 
 	       "Find water conductivity (K) for a given pressure (h).");
     NumberByDepth::load_syntax (syntax, alist);
-    Librarian<Number>::add_type ("depth_K", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "depth_K", alist, syntax, &make);
   }
 } NumberDepthK_syntax;
 
@@ -289,7 +289,7 @@ static struct NumberSoilThetaSyntax
     alist.add ("description", 
 	       "Find water content (Theta) for a given pressure (h).");
     NumberByTension::load_syntax (syntax, alist);
-    Librarian<Number>::add_type ("soil_Theta", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "soil_Theta", alist, syntax, &make);
   }
 } NumberSoilTheta_syntax;
 
@@ -323,7 +323,7 @@ static struct NumberSoilKSyntax
     alist.add ("description", 
 	       "Find hydraulic conductivity (K) for a given pressure (h).");
     NumberByTension::load_syntax (syntax, alist);
-    Librarian<Number>::add_type ("soil_K", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "soil_K", alist, syntax, &make);
   }
 } NumberSoilK_syntax;
 
@@ -362,7 +362,7 @@ static struct NumberSoilHeatCapacitySyntax
     alist.add ("description", 
 	       "Find heat capacity for a given pressure (h).");
     NumberByTension::load_syntax (syntax, alist);
-    Librarian<Number>::add_type ("soil_heat_capacity", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "soil_heat_capacity", alist, syntax, &make);
   }
 } NumberSoilHeatCapacity_syntax;
 
@@ -401,7 +401,7 @@ static struct NumberSoilHeatConductivitySyntax
     alist.add ("description", 
 	       "Find heat conductivity for a given pressure (h).");
     NumberByTension::load_syntax (syntax, alist);
-    Librarian<Number>::add_type ("soil_heat_conductivity", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "soil_heat_conductivity", alist, syntax, &make);
   }
 } NumberSoilHeatConductivity_syntax;
 
@@ -470,7 +470,7 @@ The soil horizon whose properties we want to examine.");
 The water content we want to compare with.");
     syntax.add ("top_soil", Syntax::Boolean, Syntax::Const, "\
 Set this to true for the A horizon.");
-    Librarian<Number>::add_type ("soil_h", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "soil_h", alist, syntax, &make);
   }
 } NumberTensionByTheta_syntax;
 

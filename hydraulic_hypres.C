@@ -315,7 +315,7 @@ If set true this horizon will be initialized as a topsoil (i.e. the\n\
 plowing layer), if set false it will be initialized as a subsoil.\n\
 By default, the horizon will be initialized as a topsoil if and only if\n\
 it is the topmost horison in the soil profile.");
-    Librarian<Hydraulic>::add_type ("hypres", alist, syntax, make);
+    BuildBase::add_type (Hydraulic::component, "hypres", alist, syntax, make);
   }
 } hydraulicHypres_syntax;
 

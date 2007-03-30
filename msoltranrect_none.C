@@ -245,6 +245,6 @@ static struct MsoltranrectNoneSyntax
                "Disable all transport except through boundaries.");
     MsoltranrectNone::load_syntax (syntax, alist);
  
-    Librarian<Msoltranrect>::add_type ("none", alist, syntax, &make);
+    BuildBase::add_type (Msoltranrect::component, "none", alist, syntax, &make);
   }
 } MsoltranrectNone_syntax;

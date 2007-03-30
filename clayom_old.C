@@ -111,6 +111,6 @@ of SMB1 and all SOM pools.");
     factor.add (1.00, 0.5);
     alist.add ("factor", factor);
 
-    Librarian<ClayOM>::add_type ("old", alist, syntax, &make);
+    BuildBase::add_type (ClayOM::component, "old", alist, syntax, &make);
   }
 } ClayOMOld_syntax;

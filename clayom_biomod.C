@@ -281,6 +281,6 @@ Only the fraction of AOM going to a SMB pool count, so this is really\n\
 a fraction of the fraction coing to the SMB pools.\n\
 Note that you must set the 'fraction' parameter of all AOM pools to\n\
 reflect this for the BIOMOD clay response model to work correctly.");
-    Librarian<ClayOM>::add_type ("biomod", alist, syntax, &make);
+    BuildBase::add_type (ClayOM::component, "biomod", alist, syntax, &make);
   }
 } ClayOMBiomod_syntax;

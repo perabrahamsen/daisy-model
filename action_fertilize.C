@@ -336,6 +336,6 @@ time, but is zeroed once you fertilize with this flag set.");
     alist.add ("second_year_compensation", false);
 
     syntax.order ("am");
-    Librarian<Action>::add_type ("fertilize", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "fertilize", alist, syntax, &make);
   }
 } ActionFertilize_syntax;

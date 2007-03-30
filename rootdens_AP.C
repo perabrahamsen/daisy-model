@@ -146,6 +146,6 @@ at max rooting depth to zero 'q' further down.");
 Calculated from 'a_DS'.");
     syntax.add ("L0", "cm/cm^3", Syntax::LogOnly,
                 "Root density at soil surface.");
-    Librarian<Rootdens>::add_type ("Anders Pedersen", alist, syntax, &make);
+    BuildBase::add_type (Rootdens::component, "Anders Pedersen", alist, syntax, &make);
   }
 } Rootdens_AP_syntax;

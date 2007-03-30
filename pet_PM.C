@@ -152,6 +152,6 @@ static struct PetPMSyntax
     AttributeList Rn_alist;
     Rn_alist.add ("type", "brunt");
     alist.add ("net_radiation", Rn_alist);
-    Librarian<Pet>::add_type ("PM", alist, syntax, &make);
+    BuildBase::add_type (Pet::component, "PM", alist, syntax, &make);
   }
 } PetPM_syntax;

@@ -131,7 +131,7 @@ Assert that condition is true, if not, stop the simulation.");
       syntax.add ("message", Syntax::String, Syntax::Const,
 		  "Error message to give iff assertion fails.");
       alist.add ("message", "Required condition not fulfiled");
-      Librarian<Action>::add_type ("assert", alist, syntax, &make_assert);
+      BuildBase::add_type (Action::component, "assert", alist, syntax, &make_assert);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -142,7 +142,7 @@ Write a message to the user.");
 		  "Message to give to the user.");
       syntax.order ("message");
 
-      Librarian<Action>::add_type ("message", alist, syntax, &make_message);
+      BuildBase::add_type (Action::component, "message", alist, syntax, &make_message);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -153,7 +153,7 @@ Write a warning to the user.");
 		  "Warning to give to the user.");
       syntax.order ("message");
 
-      Librarian<Action>::add_type ("warning", alist, syntax, &make_warning);
+      BuildBase::add_type (Action::component, "warning", alist, syntax, &make_warning);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -163,7 +163,7 @@ Write a error message to the user and stop the simulation.");
       syntax.add ("message", Syntax::String, Syntax::Const,
 		  "Error message to give.");
       syntax.order ("message");
-      Librarian<Action>::add_type ("error", alist, syntax, &make_error);
+      BuildBase::add_type (Action::component, "error", alist, syntax, &make_error);
     }
   }
 } ActionMessage_syntax;

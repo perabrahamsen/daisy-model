@@ -195,6 +195,6 @@ static struct MactransStandardSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "Solute follows water.");
-      Librarian<Mactrans>::add_type ("default", alist, syntax, &make);
+      BuildBase::add_type (Mactrans::component, "default", alist, syntax, &make);
     }
 } MactransStandard_syntax;

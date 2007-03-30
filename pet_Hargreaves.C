@@ -99,6 +99,6 @@ Hargreaves, G.H., and Samani, Z.A. (1985) Reference crop\n\
 evapotranspiration from temperature. Appl. Engrg. in Agric.,\n\
 1(2):96-99.");
       Pet::load_syntax (syntax, alist);
-      Librarian<Pet>::add_type ("Hargreaves", alist, syntax, &make);
+      BuildBase::add_type (Pet::component, "Hargreaves", alist, syntax, &make);
     }
 } PetHargreaves_syntax;

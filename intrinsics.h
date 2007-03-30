@@ -1,7 +1,6 @@
-// action_stop.C
+// intrinsics.h -- The build in models of Daisy.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,31 +19,30 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "action.h"
-#include "syntax.h"
-#include "daisy.h"
+#ifndef INTRINSICS_H
+#define INTRINSICS_H
 
-struct ActionStop : public Action
+#include "symbol.h"
+#include <map>
+
+class Library;
+
+class Intrinsics 
 {
-  void doIt (Daisy& daisy, Treelog&)
-    { daisy.running = false; }
+  // Content.
+public:
+  std::map<symbol, Library*> all;
+  int count;
 
-  ActionStop (Block& al)
-    : Action (al)
-    { }
+  // Use.
+public:
+  void add (const char *const component, const char *const description);
+  Library& library (const char *const component) const;
+
+  // Create and Destroy.
+public:
+  Intrinsics ();
+  ~Intrinsics ();
 };
 
-static struct ActionStopSyntax
-{
-  static Model& make (Block& al)
-  {
-    return *new ActionStop (al);
-  }
-  ActionStopSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Stop the simulation.");
-    BuildBase::add_type (Action::component, "stop", alist, syntax, &make);
-  }
-} ActionStop_syntax;
+#endif // INTRINSICS_H

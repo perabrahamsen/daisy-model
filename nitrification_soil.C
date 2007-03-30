@@ -107,6 +107,6 @@ with nitrification based on total ammonium content.");
     syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const,
                 "Water potential factor.");
     alist.add ("water_factor", PLF::empty ());
-    Librarian<Nitrification>::add_type ("soil", alist, syntax, &make);
+    BuildBase::add_type (Nitrification::component, "soil", alist, syntax, &make);
   }
 } NitrificationSoil_syntax;

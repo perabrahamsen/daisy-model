@@ -157,6 +157,6 @@ model in the 'pet' component");
       syntax.add ("file", Syntax::String, Syntax::Const,
 		  "File to read weather data from.");
       syntax.order ("file");
-      Librarian<Weather>::add_type ("file", alist, syntax, &make);
+      BuildBase::add_type (Weather::component, "file", alist, syntax, &make);
     }
 } WeatherFile_syntax;

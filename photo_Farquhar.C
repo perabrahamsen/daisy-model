@@ -739,7 +739,7 @@ static struct Photo_FarquharSyntax
                        "The effect of xylem ABA on stomata conductivity.");
     alist.add ("ABAeffect", ABAEffect::default_model ());
 
-    Librarian<Photo>::add_type ("FC_C3", alist, syntax, &make);
+    BuildBase::add_type (Photo::component, "FC_C3", alist, syntax, &make);
   }
 
 } PhotoFarquhar_syntax;

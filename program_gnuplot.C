@@ -148,6 +148,6 @@ The commands will be inserted right before the list of graphs.");
                 
     syntax.add_object ("graph", Gnuplot::component, Syntax::State, 
                        Syntax::Sequence, "Graphs to plot.");
-    Librarian<Program>::add_type ("gnuplot", alist, syntax, &make);
+    BuildBase::add_type (Program::component, "gnuplot", alist, syntax, &make);
   }
 } ProgramGnuplot_syntax;

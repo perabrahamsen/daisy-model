@@ -120,7 +120,7 @@ Name of value to exchange.");
 Dimension of value to exchange.");
     syntax.add ("value", Syntax::Unknown (), Syntax::OptionalState, "\
 Current value to exchange.");
-    Librarian<Exchange>::add_type ("number", alist, syntax, &make);
+    BuildBase::add_type (Exchange::component, "number", alist, syntax, &make);
   }
 } ExchangeNumber_syntax;
 
@@ -166,7 +166,7 @@ Description of value to exchange.");
 Name of value to exchange.");
     syntax.add ("value", Syntax::String, Syntax::Const, "\
 Current value to exchange.");
-    Librarian<Exchange>::add_type ("name", alist, syntax, &make);
+    BuildBase::add_type (Exchange::component, "name", alist, syntax, &make);
   }
 } ExchangeName_syntax;
 
@@ -271,6 +271,6 @@ static struct ScopeExchangeSyntax
     syntax.add_object ("entries", Exchange::component, 
                        Syntax::Const, Syntax::Sequence,
                        "List of items to exchange.");
-    Librarian<Scope>::add_type ("exchange", alist, syntax, &make);
+    BuildBase::add_type (Scope::component, "exchange", alist, syntax, &make);
   }
 } ScopeExchange_syntax;

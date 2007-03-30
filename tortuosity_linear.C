@@ -70,7 +70,7 @@ static struct TortuosityLinearSyntax
 Theta offset.  By default, this corresponds to the wilting point.");
     syntax.add ("b", Syntax::None (), Syntax::Const, "Theta factor.");
     alist.add ("b", 2.0);
-    Librarian<Tortuosity>::add_type ("linear", alist, syntax, &make);
+    BuildBase::add_type (Tortuosity::component, "linear", alist, syntax, &make);
   }
 } TortuosityLinear_syntax;
 

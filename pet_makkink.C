@@ -73,6 +73,6 @@ static struct PetMakkinkSyntax
       alist.add ("description", 
 		 "Potential evopotranspiration using Makkink's Equation.");
       Pet::load_syntax (syntax, alist);
-      Librarian<Pet>::add_type ("makkink", alist, syntax, &make);
+      BuildBase::add_type (Pet::component, "makkink", alist, syntax, &make);
     }
 } PetMakkink_syntax;

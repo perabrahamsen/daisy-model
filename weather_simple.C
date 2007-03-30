@@ -173,6 +173,6 @@ A weather model with precipitation at regular intervals.");
       syntax.add ("reference_evapotranspiration_value", "mm/h", Syntax::Const,
 		  "Constant reference evapotranspiration.");
       alist.add ("reference_evapotranspiration_value", -1.0);
-      Librarian<Weather>::add_type ("simple", alist, syntax, &make);
+      BuildBase::add_type (Weather::component, "simple", alist, syntax, &make);
     }
 } WeatherSimple_syntax;

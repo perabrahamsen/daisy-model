@@ -203,7 +203,7 @@ Bind symbols in 'clauses' in a new scope, and evaluate 'expr' in that scope.");
     syntax.add_object ("expr", Number::component, "\
 Expression to evaluate.");
     syntax.order ("clauses", "expr");
-    Librarian<Number>::add_type ("let", alist, syntax, &make);
+    BuildBase::add_type (Number::component, "let", alist, syntax, &make);
   }
 } NumberLet_syntax;
 

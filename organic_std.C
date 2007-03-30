@@ -3198,6 +3198,6 @@ Mineralization and immobilization in soil.  Hansen et.al. 1991.\n\
 Recalibrated by Bruun et.al. 2002.");
     OrganicStandard::load_syntax (syntax, alist);
  
-    Librarian<OrganicMatter>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (OrganicMatter::component, "default", alist, syntax, &make);
   }
 } OrganicStandard_syntax;

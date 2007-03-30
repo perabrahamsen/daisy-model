@@ -196,6 +196,6 @@ precipitation [mm/h], cloudiness [0-1] and vapor pressure [Pa].");
       syntax.add ("file", Syntax::String, Syntax::Const,
 		  "File to read weather data from.");
       syntax.order ("file");
-      Librarian<Weather>::add_type ("hourly", alist, syntax, &make);
+      BuildBase::add_type (Weather::component, "hourly", alist, syntax, &make);
     }
 } WeatherHourly_syntax;

@@ -109,6 +109,6 @@ static struct ActionWithColumnSyntax
                        Syntax::State, Syntax::Sequence,
                        "Actions to perform on the specified column.");
     syntax.order ("column", "actions");
-    Librarian<Action>::add_type ("with-column", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "with-column", alist, syntax, &make);
   }
 } ActionWithColumn_syntax;

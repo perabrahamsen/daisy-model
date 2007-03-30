@@ -96,6 +96,6 @@ the 'K' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.");
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.");
 
-    Librarian<Adsorption>::add_type ("linear", alist, syntax, &make);
+    BuildBase::add_type (Adsorption::component, "linear", alist, syntax, &make);
   }
 } AdsorptionLinear_syntax;

@@ -969,7 +969,7 @@ Daisy v1 crop model, for crops with storage organ in the shoot.");
   syntax.add ("CrpAux", CrpAux, "Miscellaneous crop state variables.");
   alist.add ("CrpAux", vCrpAux);
 
-  Librarian<Crop>::add_type ("old", alist, syntax, &make);
+  BuildBase::add_type (Crop::component, "old", alist, syntax, &make);
 }
 
 double

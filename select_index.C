@@ -56,6 +56,6 @@ static struct SelectIndexSyntax
     syntax.add ("index", Syntax::Integer, Syntax::Const,
 		"Specify array index to select.");
 
-    Librarian<Select>::add_type ("index", alist, syntax, &make);
+    BuildBase::add_type (Select::component, "index", alist, syntax, &make);
   }
 } Select_syntax;

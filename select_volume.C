@@ -325,7 +325,7 @@ This parameter is ignored if 'density' is true.");
     alist.add ("density_z", false);
     alist.add ("density_x", false);
     alist.add ("density_y", false);
-    Librarian<Select>::add_type ("volume", alist, syntax, &make);
+    BuildBase::add_type (Select::component, "volume", alist, syntax, &make);
   }    
   void add_interval ()
   {
@@ -346,7 +346,7 @@ OBSOLETE: Use (volume box (top FROM)) instead.");
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
-    Librarian<Select>::add_type ("interval", alist, syntax, &make);
+    BuildBase::add_type (Select::component, "interval", alist, syntax, &make);
   }    
   SelectVolumeSyntax ()
   { 

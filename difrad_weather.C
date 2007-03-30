@@ -69,6 +69,6 @@ static struct DifradWeatherSyntax
     alist.add ("description", 
 	       "Diffuse radiation using weather data.");
     Difrad::load_syntax (syntax, alist);
-    Librarian<Difrad>::add_type ("weather", alist, syntax, &make);
+    BuildBase::add_type (Difrad::component, "weather", alist, syntax, &make);
   }
 } DifradWeather_syntax;

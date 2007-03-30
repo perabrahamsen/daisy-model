@@ -1279,6 +1279,6 @@ Generate the components part of the reference manual.");
 		"Include a copy of all loaded parameterizations in document.");
     alist.add ("print_parameterizations", false);
 
-    Librarian<Program>::add_type ("document", alist, syntax, &make);
+    BuildBase::add_type (Program::component, "document", alist, syntax, &make);
   }
 } ProgramDocument_syntax;

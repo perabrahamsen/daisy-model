@@ -85,7 +85,7 @@ static struct IntegerSqrSyntax
     syntax.add_object ("operand", Integer::component,
                        "Operand for this function.");
     syntax.order ("operand");
-    Librarian<Integer>::add_type ("sqr", alist, syntax, &make);
+    BuildBase::add_type (Integer::component, "sqr", alist, syntax, &make);
   }
 } IntegerSqr_syntax;
 
@@ -178,7 +178,7 @@ static struct IntegerMaxSyntax
                        "The operands for this function.");
     syntax.add_check ("operands", VCheck::min_size_1 ());
     syntax.order ("operands");
-    Librarian<Integer>::add_type ("max", alist, syntax, &make);
+    BuildBase::add_type (Integer::component, "max", alist, syntax, &make);
   }
 } IntegerMax_syntax;
 
@@ -220,7 +220,7 @@ static struct IntegerMinSyntax
                        "The operands for this function.");
     syntax.add_check ("operands", VCheck::min_size_1 ());
     syntax.order ("operands");
-    Librarian<Integer>::add_type ("min", alist, syntax, &make);
+    BuildBase::add_type (Integer::component, "min", alist, syntax, &make);
   }
 } IntegerMin_syntax;
 
@@ -256,7 +256,7 @@ static struct IntegerProductSyntax
                        Syntax::Const, Syntax::Sequence,
                        "The operands for this function.");
     syntax.order ("operands");
-    Librarian<Integer>::add_type ("*", alist, syntax, &make);
+    BuildBase::add_type (Integer::component, "*", alist, syntax, &make);
   }
 } IntegerProduct_syntax;
 
@@ -295,7 +295,7 @@ static struct IntegerSumSyntax
     syntax.add_check ("operands", IntegerOperands::unique);
 #endif // CHECK_OPERANDS_DIM
     syntax.order ("operands");
-    Librarian<Integer>::add_type ("+", alist, syntax, &make);
+    BuildBase::add_type (Integer::component, "+", alist, syntax, &make);
   }
 } IntegerSum_syntax;
 
@@ -336,7 +336,7 @@ subtracts all but the first from the first.");
                        Syntax::Const, Syntax::Sequence,
                        "The operands for this function.");
     syntax.order ("operands");
-    Librarian<Integer>::add_type ("-", alist, syntax, &make);
+    BuildBase::add_type (Integer::component, "-", alist, syntax, &make);
   }
 } IntegerSubtract_syntax;
 
@@ -416,7 +416,7 @@ static struct IntegerModuloSyntax
                          Syntax::Const, 2,
                          "The operands for this function.");
       syntax.order ("operands");
-      Librarian<Integer>::add_type ("mod", alist, syntax, &make_div);
+      BuildBase::add_type (Integer::component, "mod", alist, syntax, &make_div);
     }
     // mod
     {
@@ -429,7 +429,7 @@ static struct IntegerModuloSyntax
                          Syntax::Const, 2,
                          "The operands for this function.");
       syntax.order ("operands");
-      Librarian<Integer>::add_type ("div", alist, syntax, &make_mod);
+      BuildBase::add_type (Integer::component, "div", alist, syntax, &make_mod);
     }
   }
 } IntegerDivide_syntax;

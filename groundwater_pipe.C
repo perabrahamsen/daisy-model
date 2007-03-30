@@ -405,7 +405,7 @@ You can alternatively specify the pressure directly, with 'h_aquifer'.");
 		  "Deep percolation to aquifer.");
       syntax.add ("S", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 		  "Pipe drainage.");
-      Librarian<Groundwater>::add_type ("pipe", alist, syntax, &make);
+      BuildBase::add_type (Groundwater::component, "pipe", alist, syntax, &make);
     }
 } GroundwaterPipe_syntax;
 

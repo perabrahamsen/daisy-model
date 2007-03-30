@@ -175,6 +175,6 @@ static struct PhenologyStandardSyntax
 This parameterization is only valid until the specified development state.");
     alist.add ("defined_until_ds", 2.0);
 
-    Librarian<Phenology>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (Phenology::component, "default", alist, syntax, &make);
   }
 } PhenologyStandard_syntax;

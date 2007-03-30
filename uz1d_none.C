@@ -65,7 +65,7 @@ static struct UZ1DNoneSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Disable transport");
-    Librarian<UZ1D>::add_type ("none", alist, syntax, &make);
+    BuildBase::add_type (UZ1D::component, "none", alist, syntax, &make);
   }
 } UZ1DNone_syntax;
 

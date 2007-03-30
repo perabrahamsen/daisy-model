@@ -407,6 +407,6 @@ static struct HorizonSyntax
     AttributeList& alist = *new AttributeList ();
     Horizon::load_syntax (syntax, alist);
 
-    Librarian<Horizon>::add_base (alist, syntax);
+    BuildBase::add_base (Horizon::component, alist, syntax);
   }
 } Horizon_syntax;

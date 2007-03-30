@@ -215,6 +215,6 @@ static struct TransportConvectionSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Transport using convection alone.");
     TransportConvection::load_syntax (syntax, alist);
-    Librarian<Transport>::add_type ("convection", alist, syntax, &make);
+    BuildBase::add_type (Transport::component, "convection", alist, syntax, &make);
   }
 } TransportConvection_syntax;

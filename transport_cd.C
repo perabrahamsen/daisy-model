@@ -390,6 +390,6 @@ static struct TransportCDSyntax
     alist.add ("description", 
 	       "Solute transport using convection-dispersion.");
     TransportCD::load_syntax (syntax, alist);
-    Librarian<Transport>::add_type ("cd", alist, syntax, &make);
+    BuildBase::add_type (Transport::component, "cd", alist, syntax, &make);
   }
 } TransportCD_syntax;

@@ -1102,7 +1102,7 @@ This AM belongs to a still living plant",
 	syntax.add_submodule_sequence ("om", Syntax::State, 
 				       "The individual AOM pools.",
 				       AOM::load_syntax);
-	Librarian<AM>::add_type ("state", alist, syntax, &make);
+	BuildBase::add_type (AM::component, "state", alist, syntax, &make);
       }
       // Organic fertilizer.
       {
@@ -1149,7 +1149,7 @@ The remaining nitrogen is assumed to be nitrate or organic.");
 	syntax.add_fraction ("volatilization", Syntax::Const, "\
 Fraction of NH4 that evaporates on application.");
 	alist.add ("volatilization", 0.0);
-	Librarian<AM>::add_type ("organic", alist, syntax, &make);
+	BuildBase::add_type (AM::component, "organic", alist, syntax, &make);
       }
       // Mineral fertilizer.
       {
@@ -1170,7 +1170,7 @@ The remaining nitrogen is assumed to be nitrate.");
 Fraction of NH4 that evaporates on application.");
 	alist.add ("volatilization", 0.0);
 	alist.add ("syntax", "mineral");
-	Librarian<AM>::add_type ("mineral", alist, syntax, &make);
+	BuildBase::add_type (AM::component, "mineral", alist, syntax, &make);
       }
       // Initialization.
       {
@@ -1195,7 +1195,7 @@ uniformly distributed in each layer.");
 	syntax.add_submodule_sequence ("om", Syntax::State,
 				       "The individual AOM pools.",
 				       AOM::load_syntax);
-	Librarian<AM>::add_type ("initial", alist, syntax, &make);
+	BuildBase::add_type (AM::component, "initial", alist, syntax, &make);
       }
       // Root initialization,
       {
@@ -1221,7 +1221,7 @@ original.");
 	syntax.add_submodule_sequence ("om", Syntax::State,
 				       "The individual AOM pools.",
 				       AOM::load_syntax);
-	Librarian<AM>::add_type ("root", alist, syntax, &make);
+	BuildBase::add_type (AM::component, "root", alist, syntax, &make);
       }
     }
 } am_syntax;
@@ -1300,6 +1300,6 @@ static struct ProgramAM_tableSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Generate a table of fertilizers.");
-    Librarian<Program>::add_type ("AM_table", alist, syntax, &make);
+    BuildBase::add_type (Program::component, "AM_table", alist, syntax, &make);
   }
 } ProgramAM_table_syntax;

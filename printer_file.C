@@ -877,6 +877,6 @@ static struct PrinterFileSyntax
     syntax.add ("where", Syntax::String, Syntax::Const,
                 "File to print in.");
     syntax.order ("where");
-    Librarian<Printer>::add_type ("file", alist, syntax, &make);
+    BuildBase::add_type (Printer::component, "file", alist, syntax, &make);
   }
 } PrinterFile_syntax;

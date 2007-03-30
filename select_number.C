@@ -50,6 +50,6 @@ static struct SelectNumberSyntax
     SelectValue::load_syntax (syntax, alist);
     alist.add ("description", "Extract specified number.");
 
-    Librarian<Select>::add_type ("number", alist, syntax, &make);
+    BuildBase::add_type (Select::component, "number", alist, syntax, &make);
   }
 } Select_syntax;

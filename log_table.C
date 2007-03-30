@@ -481,7 +481,7 @@ String to print between array entries.");
                          Syntax::Const, Syntax::Sequence,
                          "Summaries for this log file.");
       alist.add ("summary", vector<AttributeList*> ());
-      Librarian<Log>::add_type ("table", alist, syntax, &make);
+      BuildBase::add_type (Log::component, "table", alist, syntax, &make);
       BuildBase::add_doc_fun (LogSelect::component, 
                               LogSelect::document_entries);
     }

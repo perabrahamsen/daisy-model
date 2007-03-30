@@ -120,6 +120,6 @@ static struct EquilibriumLinearSyntax
     syntax.add_object ("K", Pedotransfer::component, Syntax::Const, 
                        Syntax::Singleton, "The ratio A/B at equilibrium [].");
 
-    Librarian<Equilibrium>::add_type ("linear", alist, syntax, &make);
+    BuildBase::add_type (Equilibrium::component, "linear", alist, syntax, &make);
   }
 } EquilibriumLinear_syntax;

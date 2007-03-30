@@ -104,6 +104,6 @@ Directory in which to initialize, check and run the programs.");
                        Syntax::State, Syntax::Sequence, "\
 List of programs to run.  The programs will be run in the sequence listed.");
    
-    Librarian<Program>::add_type ("batch", alist, syntax, &make);
+    BuildBase::add_type (Program::component, "batch", alist, syntax, &make);
   }
 } ProgramBatch_syntax;

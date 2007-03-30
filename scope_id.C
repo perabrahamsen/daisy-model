@@ -86,7 +86,7 @@ static struct ScopeIDSyntax
                 "Identifier name.");
     syntax.add ("value", Syntax::User (), Syntax::Const, 
                 "Initial value and dimension.");
-    Librarian<Scope>::add_type ("id", alist, syntax, &make);
+    BuildBase::add_type (Scope::component, "id", alist, syntax, &make);
   }
 } ScopeID_syntax;
 

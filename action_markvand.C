@@ -138,7 +138,7 @@ static struct MV_SoilSyntax
                 "Drainage constant root zone.");
     syntax.add ("k_qb", Syntax::None (), Syntax::Const,
                 "Drainage constant subsone.");
-    Librarian<MV_Soil>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (MV_Soil::component, "default", alist, syntax, &make);
   }
 } MV_Soil_syntax;
 
@@ -318,7 +318,7 @@ Green leaf area index at the time where growth rate become exponential.");
                 "Root depth at maturity.");
     syntax.add ("c_r", "mm/d", Check::non_negative (), Syntax::Const,
                 "Root penetration rate.");
-    Librarian<MV_Crop>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (MV_Crop::component, "default", alist, syntax, &make);
   }
 } MV_Crop_syntax;
 
@@ -683,7 +683,7 @@ Included in 'V_r'.");
 By default, the reservoir will be full at plant emergence.");
     alist.add ("description", "\
 Irrigate the field according to MARKVAND scheduling.");
-    Librarian<Action>::add_type ("markvand", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "markvand", alist, syntax, &make);
   }
 } ActionMarkvand_syntax;
 

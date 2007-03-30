@@ -245,6 +245,6 @@ static struct Msoltranrect2x1Syntax
                "Decoupled vertical and horizontal transport.");
     Msoltranrect2x1::load_syntax (syntax, alist);
  
-    Librarian<Msoltranrect>::add_type ("v+h", alist, syntax, &make);
+    BuildBase::add_type (Msoltranrect::component, "v+h", alist, syntax, &make);
   }
 } Msoltranrect2x1_syntax;

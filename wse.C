@@ -66,7 +66,7 @@ static struct WSE_fullSyntax
 Water stress has full effect on crop growth.\n\
 This means that if there is 50% water stress, assimilate production\n\
 will be cut into half."); 
-    Librarian<WSE>::add_type ("full", alist, syntax, &make);
+    BuildBase::add_type (WSE::component, "full", alist, syntax, &make);
   }
 } WSE_full_syntax;
 
@@ -127,7 +127,7 @@ Effect on assimilate production of water stress.\n\
 This parameter specifies the effect on assimilate production\n(\
 compared to potential) when the amount of available soil water is\n\
 enough to cover exactly half the potential evapotranspiration.");
-    Librarian<WSE>::add_type ("partial", alist, syntax, &make);
+    BuildBase::add_type (WSE::component, "partial", alist, syntax, &make);
   }
 } WSE_partial_syntax;
 
@@ -154,7 +154,7 @@ static struct WSE_noneSyntax
 
     alist.add ("description", 
                "Water stress has no effect on plant growth.");
-    Librarian<WSE>::add_type ("none", alist, syntax, &make);
+    BuildBase::add_type (WSE::component, "none", alist, syntax, &make);
   }
 } WSE_none_syntax;
 
@@ -208,6 +208,6 @@ The water stress effect to show in the table.");
 Number of intervals in the table.");
     alist.add ("intervals", 10);
     syntax.order ("wse");
-    Librarian<Program>::add_type ("wse", alist, syntax, &make);
+    BuildBase::add_type (Program::component, "wse", alist, syntax, &make);
   }
 } ProgramWSE_table_syntax;

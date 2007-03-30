@@ -135,6 +135,6 @@ If this is true, normalize the mineral fraction to 1.0.\n\
 Otherwise, give an error if the sum is not 1.0.");
     alist.add ("normalize", false);
 
-    Librarian<Horizon>::add_type ("numeric", alist, syntax, make);
+    BuildBase::add_type (Horizon::component, "numeric", alist, syntax, make);
   }
 } HorizonNumeric_syntax;

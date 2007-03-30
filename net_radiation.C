@@ -218,7 +218,7 @@ FAO recommendation.");
       // We add the values here so they appear in the manual.
       alist_brunt.add ("a", 0.34);
       alist_brunt.add ("b", 0.14);
-      Librarian<NetRadiation>::add_type ("brunt",
+      BuildBase::add_type (NetRadiation::component, "brunt",
 					 alist_brunt, syntax_brunt,
 					 &make_brunt);
       // Others.
@@ -233,16 +233,16 @@ FAO recommendation.");
       alist_swinbank.add ("description", "Swinbank, 1963");
       AttributeList& alist_satterlund = *new AttributeList ();
       alist_satterlund.add ("description", "Satterlund, 1979");
-      Librarian<NetRadiation>::add_type ("idso_jackson",
+      BuildBase::add_type (NetRadiation::component, "idso_jackson",
 					 alist_idso_jackson, syntax,
 					 &make_idso_jackson);
-      Librarian<NetRadiation>::add_type ("brutsaert",
+      BuildBase::add_type (NetRadiation::component, "brutsaert",
 					 alist_brutsaert, syntax,
 					 &make_brutsaert);
-      Librarian<NetRadiation>::add_type ("swinbank",
+      BuildBase::add_type (NetRadiation::component, "swinbank",
 					 alist_swinbank, syntax,
 					 &make_swinbank);
-      Librarian<NetRadiation>::add_type ("satterlund", 
+      BuildBase::add_type (NetRadiation::component, "satterlund", 
 					 alist_satterlund, syntax,
 					 &make_satterlund);
     }

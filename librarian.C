@@ -124,6 +124,13 @@ BuildBase::build_vector_const (const char *const component,
   return t;
 }
 
+Library& 
+BuildBase::library (const char* component)
+{
+  daisy_assert (content);
+  return content->library (component);
+}
+
 void 
 BuildBase::add_base (const char *const component,
                      AttributeList& al, const Syntax& syntax)
@@ -159,13 +166,6 @@ BuildBase::add_alias (const char *const component,
 void 
 BuildBase::add_doc_fun (const char *const component, const doc_fun fun)
 { library (component).add_doc_fun (fun); } 
-
-Library& 
-BuildBase::library (const char* component)
-{
-  daisy_assert (content);
-  return content->library (component);
-}
 
 void
 BuildBase::load_syntax (Syntax& syntax, AttributeList&)

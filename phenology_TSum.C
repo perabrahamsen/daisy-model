@@ -143,6 +143,6 @@ Temperature below this will not count in the sum.");
 Temperature below this will not count in the sum.");
     alist.add ("RepThrs", 0.0);
 
-    Librarian<Phenology>::add_type ("TSum", alist, syntax, &make);
+    BuildBase::add_type (Phenology::component, "TSum", alist, syntax, &make);
   }
 } PhenologyTSum_syntax;

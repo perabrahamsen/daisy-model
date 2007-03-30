@@ -112,6 +112,6 @@ static struct TransportNoneSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "No solute transport.");
-    Librarian<Transport>::add_type ("none", alist, syntax, &make);
+    BuildBase::add_type (Transport::component, "none", alist, syntax, &make);
   }
 } TransportNone_syntax;

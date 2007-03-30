@@ -186,7 +186,7 @@ static struct PedotransferConstSyntax
     syntax.add ("value", Syntax::User (), Syntax::Const,
 		"Fixed value of this pedotransfer function.");
     syntax.order ("value");
-    Librarian<Pedotransfer>::add_type ("const", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "const", alist, syntax, &make);
   }
 } PedotransferConst_syntax;
 
@@ -205,7 +205,7 @@ static struct PedotransferHumusSyntax
     syntax.add_check ("dimension", VCheck::fraction ());
     syntax.order ("dimension");
 
-    Librarian<Pedotransfer>::add_type ("humus", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "humus", alist, syntax, &make);
   }
 } PedotransferHumus_syntax;
 
@@ -224,7 +224,7 @@ static struct PedotransferMineralSyntax
     syntax.add_check ("dimension", VCheck::fraction ());
     syntax.order ("dimension");
 
-    Librarian<Pedotransfer>::add_type ("mineral", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "mineral", alist, syntax, &make);
   }
 } PedotransferMineral_syntax;
 
@@ -244,7 +244,7 @@ static struct PedotransferRho_BSyntax
     syntax.add_check ("dimension", rho_b_dim);
     syntax.order ("dimension");
 
-    Librarian<Pedotransfer>::add_type ("rho_b", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "rho_b", alist, syntax, &make);
   }
 } PedotransferRho_B_syntax;
 
@@ -265,7 +265,7 @@ static struct PedotransferBelowSyntax
                 "Unit used for the particle fraction.");
     syntax.add_check ("dimension", VCheck::fraction ());
     syntax.order ("dimension", "size");
-    Librarian<Pedotransfer>::add_type ("below", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "below", alist, syntax, &make);
   }
 } PedotransferBelow_syntax;
 
@@ -285,7 +285,7 @@ static struct PedotransferGetSyntax
     syntax.add ("dimension", Syntax::String, Syntax::Const, 
                 "Expected dimension for the soil attribute.");
     syntax.order ("name", "dimension");
-    Librarian<Pedotransfer>::add_type ("get", alist, syntax, &make);
+    BuildBase::add_type (Pedotransfer::component, "get", alist, syntax, &make);
   }
 } PedotransferGet_syntax;
 

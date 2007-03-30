@@ -155,6 +155,6 @@ static struct SelectArraySyntax
     std::vector<double> empty;
     alist.add ("value", empty);
 
-    Librarian<Select>::add_type ("array", alist, syntax, &make);
+    BuildBase::add_type (Select::component, "array", alist, syntax, &make);
   }
 } Select_syntax;

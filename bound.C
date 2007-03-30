@@ -104,7 +104,7 @@ static struct BoundNoneSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "No boundary specified.");
-    Librarian<Bound>::add_type ("none", alist, syntax, &make);
+    BuildBase::add_type (Bound::component, "none", alist, syntax, &make);
   }
 } BoundNone_syntax;
 
@@ -129,7 +129,7 @@ static struct BoundFullSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Maximum value for the interval boundary.");
-    Librarian<Bound>::add_type ("full", alist, syntax, &make);
+    BuildBase::add_type (Bound::component, "full", alist, syntax, &make);
   }
 } BoundFull_syntax;
 
@@ -147,7 +147,7 @@ static struct BoundFiniteSyntax
     syntax.add ("bound", "cm", Syntax::Const, "Interval bound to use.");
     syntax.order ("bound");
 
-    Librarian<Bound>::add_type ("finite", alist, syntax, &make);
+    BuildBase::add_type (Bound::component, "finite", alist, syntax, &make);
   }
 } BoundFinite_syntax;
 

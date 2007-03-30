@@ -105,6 +105,6 @@ static struct ReactionStandardSyntax
     syntax.add ("S_AB", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 		"Converted from A to B this timestep (may be negative).");
 
-    Librarian<Reaction>::add_type ("default", alist, syntax, &make);
+    BuildBase::add_type (Reaction::component, "default", alist, syntax, &make);
   }
 } ReactionStandard_syntax;

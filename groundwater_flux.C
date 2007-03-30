@@ -72,6 +72,6 @@ static struct GroundwaterFluxSyntax
       syntax.add ("flux", "cm/h", Check::none (), Syntax::Const,
 		  "Constant flux to groundwater.");
       syntax.order ("flux");
-      Librarian<Groundwater>::add_type ("flux", alist, syntax, &make);
+      BuildBase::add_type (Groundwater::component, "flux", alist, syntax, &make);
     }
 } GroundwaterFlux_syntax;

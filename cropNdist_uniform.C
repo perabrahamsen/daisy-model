@@ -116,7 +116,7 @@ static struct cropNdistUniformSyntax
 
     load_syntax (syntax, alist);
 
-    Librarian<CropNdist>::add_type ("N-uniform", alist, syntax, &make);
+    BuildBase::add_type (CropNdist::component, "N-uniform", alist, syntax, &make);
   }
 } cropNdistUniform_syntax;
 

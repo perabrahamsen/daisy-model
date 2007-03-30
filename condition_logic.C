@@ -221,8 +221,8 @@ ConditionLogicSyntax::ConditionLogicSyntax ()
     alist_false.add ("description", "Always false.");
     AttributeList& alist_true = *new AttributeList ();
     alist_true.add ("description", "Always true.");
-    Librarian<Condition>::add_type ("false", alist_false, syntax, &make_false);
-    Librarian<Condition>::add_type ("true", alist_true, syntax, &make_true);
+    BuildBase::add_type (Condition::component, "false", alist_false, syntax, &make_false);
+    BuildBase::add_type (Condition::component, "true", alist_true, syntax, &make_true);
   }
 
   // "or", "and".
@@ -241,8 +241,8 @@ or the end of the list is reached.");
     syntax.add_object ("operands", Condition::component, 
                        Syntax::State, Syntax::Sequence, "Conditions to test.");
     syntax.order ("operands");
-    Librarian<Condition>::add_type ("or", alist_or, syntax, &make_or);
-    Librarian<Condition>::add_type ("and", alist_and, syntax, &make_and);
+    BuildBase::add_type (Condition::component, "or", alist_or, syntax, &make_or);
+    BuildBase::add_type (Condition::component, "and", alist_and, syntax, &make_and);
   }
   // "not".
   {
@@ -252,7 +252,7 @@ or the end of the list is reached.");
     syntax.add_object ("operand", Condition::component, 
                        "Condition to test.");
     syntax.order ("operand");
-    Librarian<Condition>::add_type ("not", alist, syntax, &make_not);
+    BuildBase::add_type (Condition::component, "not", alist, syntax, &make_not);
   }
   // "if".
   {
@@ -268,6 +268,6 @@ else return the value of the third condition.");
     syntax.add_object ("else", Condition::component, 
                        "Condition to use if the 'if' test was false.");
     syntax.order ("if", "then", "else");
-    Librarian<Condition>::add_type ("if", alist, syntax, &make_if);
+    BuildBase::add_type (Condition::component, "if", alist, syntax, &make_if);
   }
 }

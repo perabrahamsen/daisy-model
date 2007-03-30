@@ -63,7 +63,7 @@ it was true.");
 		"Number of walltime seconds between success.");
     alist.add ("period", 1);
     syntax.order ("period");
-    Librarian<Condition>::add_type ("periodic", alist, syntax, make);
+    BuildBase::add_type (Condition::component, "periodic", alist, syntax, make);
   }
 } ConditionPeriodic_syntax;
 

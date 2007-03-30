@@ -186,6 +186,6 @@ By default, this is identical to 'k_AB'.");
     syntax.add_object ("debug", Pedotransfer::component,
                        Syntax::OptionalConst, Syntax::Sequence, "\
 Extra pedotransfer function to include in 'daisy.log' for debugging.");
-    Librarian<Transform>::add_type ("equilibrium", alist, syntax, &make);
+    BuildBase::add_type (Transform::component, "equilibrium", alist, syntax, &make);
   }
 } TransformEquilibrium_syntax;

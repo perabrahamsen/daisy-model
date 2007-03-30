@@ -73,7 +73,7 @@ static struct GroundwaterFixedSyntax
     syntax.add ("table", "cm", Check::none (), Syntax::Const,
 		"Groundwater level (negative number below surface).");
     syntax.order ("table");
-    Librarian<Groundwater>::add_type ("fixed", alist, syntax, &make);
+    BuildBase::add_type (Groundwater::component, "fixed", alist, syntax, &make);
   }
 } GroundwaterFixed_syntax;
 

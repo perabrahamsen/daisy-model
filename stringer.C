@@ -130,7 +130,7 @@ Return the value of the first clause whose condition is true.");
 List of clauses to match for.",
                                    StringerCond::Clause::load_syntax);
     syntax.order ("clauses");
-    Librarian<Stringer>::add_type ("cond", alist, syntax, &make);
+    BuildBase::add_type (Stringer::component, "cond", alist, syntax, &make);
   }
 } StringerCond_syntax;
 
@@ -204,7 +204,7 @@ static struct StringerValueSyntax
 Extract the value of a number as a string.");
     syntax.add ("precision", Syntax::Integer, Syntax::OptionalConst, "\
 Number of decimals after point.  By default, use a floating format.");
-    Librarian<Stringer>::add_type ("value", alist, syntax, &make);
+    BuildBase::add_type (Stringer::component, "value", alist, syntax, &make);
   }
 } StringerValue_syntax;
 
@@ -229,7 +229,7 @@ static struct StringerDimensionSyntax
     StringerNumber::load_syntax (syntax, alist);
     alist.add ("description", "\
 Extract the dimension of a number as a string.");
-    Librarian<Stringer>::add_type ("dimension", alist, syntax, &make);
+    BuildBase::add_type (Stringer::component, "dimension", alist, syntax, &make);
   }
 } StringerDimension_syntax;
 
@@ -272,7 +272,7 @@ static struct StringerIdentitySyntax
 Return the specified value.");
     syntax.add ("value", Syntax::String, Syntax::Const, "\
 Constant value.");
-    Librarian<Stringer>::add_type ("identity", alist, syntax, &make);
+    BuildBase::add_type (Stringer::component, "identity", alist, syntax, &make);
   }
 } StringerIdentity_syntax;
 

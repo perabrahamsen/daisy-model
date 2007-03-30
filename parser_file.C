@@ -1424,6 +1424,6 @@ static struct ParserFileSyntax
     syntax.add ("where", Syntax::String, Syntax::Const,
 		"File to read from.");
     syntax.order ("where");
-    Librarian<Parser>::add_type ("file", alist, syntax, &make);
+    BuildBase::add_type (Parser::component, "file", alist, syntax, &make);
   }
 } ParserFile_syntax;

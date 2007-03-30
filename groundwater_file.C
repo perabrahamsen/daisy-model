@@ -182,7 +182,7 @@ The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\
 Linear interpolation is used between the datapoints.");
       syntax.order ("file");
-      Librarian<Groundwater>::add_type ("file", alist, syntax, &make);
+      BuildBase::add_type (Groundwater::component, "file", alist, syntax, &make);
     }
 } GroundwaterFile_syntax;
 

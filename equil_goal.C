@@ -184,7 +184,7 @@ If false, the unit is assumed to be mass per volume space.");
                 "Print debug information for this cell.\n\
 Set it to a negative number to disable it.");
     alist.add ("debug_cell", -1);
-    Librarian<Equilibrium>::add_type ("goal_A", alist, syntax, &make);
+    BuildBase::add_type (Equilibrium::component, "goal_A", alist, syntax, &make);
   }
 } EquilibriumGoal_A_syntax;
 

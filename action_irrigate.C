@@ -199,7 +199,7 @@ static struct ActionIrrigateOverheadSyntax
     ActionIrrigate::load_syntax (syntax, alist);
     alist.add ("description", "\
 Irrigate the field from above.");
-    Librarian<Action>::add_type ("irrigate_overhead", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "irrigate_overhead", alist, syntax, &make);
   }
 } ActionIrrigateOverhead_syntax;
 
@@ -214,7 +214,7 @@ static struct ActionIrrigateSurfaceSyntax
     ActionIrrigate::load_syntax (syntax, alist);
     alist.add ("description", "\
 Irrigate the field directly on the soil surface, bypassing the canopy.");
-    Librarian<Action>::add_type ("irrigate_surface", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "irrigate_surface", alist, syntax, &make);
   }
 } ActionIrrigateSurface_syntax;
 
@@ -239,7 +239,7 @@ static struct ActionIrrigateTopSyntax
     syntax.add_check (&check_alist);
     alist.add ("description", "\
 OBSOLETE.  Use 'irrigate_overhead' instead.");
-    Librarian<Action>::add_type ("irrigate_top", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "irrigate_top", alist, syntax, &make);
   }
 } ActionIrrigateTop_syntax;
 
@@ -276,7 +276,7 @@ Height where you want to start the incorporation (a negative number).");
     syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
 Height where you want to end the incorporation (a negative number).");
 
-    Librarian<Action>::add_type ("irrigate_subsoil", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "irrigate_subsoil", alist, syntax, &make);
   }
 
 } ActionIrrigateSubsoil_syntax;

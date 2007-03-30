@@ -108,6 +108,6 @@ list is done.");
                        Syntax::State, Syntax::Sequence,
                        "List of actions to perform.");
     syntax.order ("actions");
-    Librarian<Action>::add_type ("while", alist, syntax, &make);
+    BuildBase::add_type (Action::component, "while", alist, syntax, &make);
   }
 } ActionWhile_syntax;

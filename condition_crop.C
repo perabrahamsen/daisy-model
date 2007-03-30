@@ -93,7 +93,7 @@ Specify \"all\" to use combined weight of all crops on the field in test.");
       syntax.add ("ds", Syntax::None (), ds_range, Syntax::Const,
                   "Development stage [-1.0:2.0].");
       syntax.order ("crop", "ds");
-      Librarian<Condition>::add_type ("crop_ds_after",
+      BuildBase::add_type (Condition::component, "crop_ds_after",
                                       alist, syntax, &make_ds);
     }
     {
@@ -111,7 +111,7 @@ Amount of non-root dry-matter required for the condition to be true.");
 Height above which we measure the DM weight.");
       alist.add ("height", 0.0);
       syntax.order ("crop", "weight");
-      Librarian<Condition>::add_type ("crop_dm_over",
+      BuildBase::add_type (Condition::component, "crop_dm_over",
                                       alist, syntax, &make_dm);
     }
   }
