@@ -21,6 +21,7 @@
 
 #include "librarian.h"
 #include "library.h"
+#include "intrinsics.h"
 #include "block.h"
 #include "alist.h"
 #include "treelog.h"
@@ -32,53 +33,14 @@ void
 BuildBase::non_null (const void *const p)
 { daisy_assert (p); }
 
-class BuildBase::Content 
-{
-  // Content.
-private:
-  std::map<symbol, Library*> metalib;
-public:
-  int count;
+Intrinsics* BuildBase::content = 0;  
 
-  // Use.
-public:
-  void add (const char *const component, const char *const description);
-  Library& library (const char *const component) const;
-
-  // Create and Destroy.
-public:
-  Content ()
-    : count (1)
-  { }
-  ~Content ()
-  { daisy_assert (count == 0); }
-};
-
-void 
-BuildBase::Content::add (const char *const component, 
-                         const char *const description)
-{
-  const std::map<symbol, Library*>::const_iterator i
-    = metalib.find (symbol (component));
-  
-  if (i != metalib.end ())
-    return;
-
-  metalib[symbol (component)] = new Library (component, description);
+const Intrinsics& 
+BuildBase::intrinsics ()
+{ 
+  daisy_assert (content);
+  return *content;
 }
-
-Library&
-BuildBase::Content::library (const char *const component) const
-{
-  const std::map<symbol, Library*>::const_iterator i
-    = metalib.find (symbol (component));
-  if (i == metalib.end ())
-    daisy_panic ("Component '" + std::string (component) + "' not found");
-  
-  return *(*i).second;
-}
-
-BuildBase::Content* BuildBase::content = 0;  
 
 Model* 
 BuildBase::build_free (const char *const component, Metalib& metalib,
@@ -205,12 +167,24 @@ BuildBase::library (const char* component)
   return content->library (component);
 }
 
+void
+BuildBase::load_syntax (Syntax& syntax, AttributeList&)
+{
+  const std::string def = "def";
+  for (std::map<symbol, Library*>::const_iterator i = content->all.begin (); 
+       i != content->all.end ();
+       i++)
+    { 
+      const symbol name = (*i).first;
+      syntax.add_library (def + name, name);
+    }
+}
 
 BuildBase::BuildBase (const char *const component,
                       const char *const description)
 {
   if (!content)
-    content = new Content ();
+    content = new Intrinsics ();
   else
     content->count++;
 

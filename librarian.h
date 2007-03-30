@@ -34,6 +34,7 @@ class Treelog;
 class Library;
 class Metalib;
 class Format;
+class Intrinsics;
 
 class BuildBase 
 {
@@ -47,8 +48,9 @@ protected:
 
   // Content.
 protected:
-  class Content;
-  static Content* content;
+  static Intrinsics* content;
+public:
+  static const Intrinsics& intrinsics ();
 
   // Build.
 protected:
@@ -85,6 +87,7 @@ private:
 public:
   static void add_alias (const char* component, symbol derived, symbol base);
   static void add_doc_fun (const char* component, doc_fun);
+  static void load_syntax (Syntax&, AttributeList&);
 
   // Create and destroy.
 protected:

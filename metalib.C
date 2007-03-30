@@ -19,16 +19,27 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "metalib.h"
+#include "intrinsics.h"
+#include "librarian.h"
 #include "library.h"
 #include "syntax.h"
 #include "alist.h"
+#include "assertion.h"
+#include <map>
 
 struct Metalib::Implementation
 {
   Syntax syntax_;
   AttributeList alist_;
 
+  typedef std::map<symbol, Library*> library_map;
+  library_map all;
+
+  int sequence;
+
   Implementation ()
+    : all (BuildBase::intrinsics ().all),
+      sequence (0)
   { }
 };
   
@@ -41,32 +52,52 @@ Metalib::alist () const
 { return impl->alist_; }
 
 bool
-Metalib::exist (symbol name) const
-{ return Library::metalib_exist (name); }
+Metalib::exist (const symbol name) const
+{ return impl->all.find (name) != impl->all.end (); }
 
 Library& 
 Metalib::library (const symbol name) const
-{ return Library::metalib_find (name); }
+{ return *impl->all[name]; }
 
 Library& 
 Metalib::library (const char *const name) const
 { return library (symbol (name)); }
 
-void 
+void
 Metalib::all (std::vector<symbol>& libraries) const
-{ Library::metalib_all (libraries); }
-
-int 
-Metalib::get_sequence ()
-{ return Library::metalib_get_sequence (); }
+{ 
+  for (Implementation::library_map::const_iterator i = impl->all.begin (); 
+       i != impl->all.end ();
+       i++)
+    libraries.push_back (symbol ((*i).first)); 
+}
 
 void 
 Metalib::clear_all_parsed ()
-{ Library::metalib_clear_all_parsed (); }
+{
+  for (Implementation::library_map::iterator i = impl->all.begin (); 
+       i != impl->all.end (); 
+       i++)
+    (*i).second->clear_parsed ();
+}
 
 void 
 Metalib::refile_parsed (const std::string& from, const std::string& to)
-{ Library::metalib_refile_parsed (from, to); }
+{
+  for (Implementation::library_map::iterator i = impl->all.begin (); 
+       i != impl->all.end (); 
+       i++)
+    (*i).second->refile_parsed (from, to);
+}
+
+int 
+Metalib::get_sequence ()
+{ 
+  impl->sequence++;
+  // Nobody will ever need more than two billion objects --- Per 1998.
+  daisy_assert (impl->sequence > 0);
+  return impl->sequence;
+}
 
 Metalib::Metalib ()
   : impl (new Implementation ())

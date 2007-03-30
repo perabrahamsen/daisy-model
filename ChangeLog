@@ -1,7 +1,13 @@
+2007-03-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* intrinsics.C, intrinsics.h: New utility.
+	* Makefile (OTHER): Added it.
+	* metalib.C, librarian.C: Use it.
+	
 2007-03-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log.C, log.h (metalib, initialize_common): New functions.
-	* output.C (initialize): Update caller..
+	* output.C (initialize): Update caller.
 
 	* syntax.C (add_object): Renamed from 'add'.
 	* all: Update callers.

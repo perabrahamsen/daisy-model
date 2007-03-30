@@ -477,7 +477,7 @@ Toplevel::load_syntax (Syntax& syntax, AttributeList& alist)
   // Top level Daisy syntax.
   Daisy::load_syntax (syntax, alist);
   alist.add ("type", "Daisy");
-  Library::load_syntax (syntax, alist);
+  BuildBase::load_syntax (syntax, alist);
   load_run (syntax, alist);
 }
 

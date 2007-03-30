@@ -26,6 +26,7 @@
 #include "symbol.h"
 #include <string>
 #include <vector>
+#include <memory>
 
 class Metalib;
 class Block;
@@ -45,21 +46,14 @@ public:
   typedef Model& (*builder) (Block&);
 
   // Content.
-public:
-  struct Implementation;
 private:
-  Implementation& impl;
+  struct Implementation;
+  std::auto_ptr<Implementation> impl;
 
   // Metalib
 public:
-  static bool metalib_exist (symbol name);
-  static Library& metalib_find (symbol name);
-  static void metalib_all (std::vector<symbol>& libraries);
-  static int metalib_get_sequence ();
-  static void metalib_clear_all_parsed ();
-  static void metalib_refile_parsed (const std::string& from,
-                                     const std::string& to);
-
+  void clear_parsed ();
+  void refile_parsed (const std::string& from, const std::string& to);
 
   // Use.
 public:
@@ -87,8 +81,6 @@ public:
   // Build a model.
   Model* build_raw (const symbol type, Block& block) const;
 
-  // Create and destroy.
-  static void load_syntax (Syntax&, AttributeList&);
 private: 
   Library (const Library&);
 public:

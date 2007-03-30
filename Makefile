@@ -421,15 +421,14 @@ SPECIALS = scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = metalib.C model.C output.C scope_block.C librarian.C \
+OTHER = intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
-	mathlib.C cdaisy.C nrutil.C \
-	submodel.C version.C
+	mathlib.C cdaisy.C nrutil.C submodel.C version.C
 
 # Utilities in header alone.
 HEADONLY = submodeler.h border.h memutils.h 
@@ -471,7 +470,9 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = soil_chemical.C soil_chemicals.C chemicals.C soil_chemical.h soil_chemicals.h chemicals.h boolean_extern.C number_extern.C options.C options.h select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
+REMOVE = none
+
+REMOVED = soil_chemical.C soil_chemicals.C chemicals.C soil_chemical.h soil_chemicals.h chemicals.h boolean_extern.C number_extern.C options.C options.h select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
 
 # These are the file extensions we deal with.
 # 
