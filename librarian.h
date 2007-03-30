@@ -33,6 +33,7 @@ class Syntax;
 class Treelog;
 class Library;
 class Metalib;
+class Format;
 
 class BuildBase 
 {
@@ -78,6 +79,13 @@ protected:
                         const Syntax& syntax, builder build);
   static Library& library (const char* component);
                       
+private:
+  typedef void (*doc_fun) (Format&, Metalib&, Treelog&, 
+                           const AttributeList& al);
+public:
+  static void add_alias (const char* component, symbol derived, symbol base);
+  static void add_doc_fun (const char* component, doc_fun);
+
   // Create and destroy.
 protected:
   BuildBase (const char *const component, const char *const description);
@@ -150,9 +158,6 @@ public:
 			const Syntax& syntax,
 			builder build)
   { BuildBase::add_type (T::component, name, al, syntax, build); }
-
-  static Library& library ()
-  { return BuildBase::library (T::component); }
 
   // Create and Destroy.
 private:                        // Disable.

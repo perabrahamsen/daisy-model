@@ -2,9 +2,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Metalib
 
-** Get rid of Librarian<T>::library 
-
 ** Fjern metalib funktionalitet fra Library.
+
+** Evt. prøv at fjerne Librarian constructor fra headerfiler.
+
+* Generer DLL i make dist?
 
 * OpenMI
 

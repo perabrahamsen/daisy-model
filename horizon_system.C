@@ -324,14 +324,7 @@ static struct HorizonSystemSyntax
   {
     const symbol derived = symbol (d);
     const symbol base = symbol (b);
-    Library& library = Librarian<Horizon>::library ();
-
-    daisy_assert (library.check (base));
-    daisy_assert (!library.check (derived));
-    AttributeList& alist = *new AttributeList (library.lookup (base));
-    alist.add ("description", 
-               "The " + d + " horizon is an alias for " + b + ".");
-    library.add_derived (derived, alist, base);
+    BuildBase::add_alias (Horizon::component, derived, base);
   }
 
   HorizonSystemSyntax ()

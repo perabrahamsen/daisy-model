@@ -179,6 +179,25 @@ BuildBase::add_type (const char *const component,
                      const Syntax& syntax, builder build)
 { library (component).add (symbol (name), al, syntax, build); }
 
+void 
+BuildBase::add_alias (const char *const component,
+                      const symbol derived, const symbol base)
+{
+  Library& lib = library (component);
+
+  daisy_assert (lib.check (base));
+  daisy_assert (!lib.check (derived));
+  AttributeList& alist = *new AttributeList (lib.lookup (base));
+  alist.add ("description", 
+             "The " + derived.name ()
+             + " model is an alias for " + base.name () + ".");
+  lib.add_derived (derived, alist, base);
+}
+
+void 
+BuildBase::add_doc_fun (const char *const component, const doc_fun fun)
+{ library (component).add_doc_fun (fun); } 
+
 Library& 
 BuildBase::library (const char* component)
 {

@@ -200,6 +200,18 @@ Hydraulic::initialize (const Texture&,
     }
 }
 
+bool 
+Hydraulic::check (Treelog& msg) const
+{ 
+  bool ok = true;
+  if (K_sat < 0.0)
+    {
+      msg.error ("Not initialized");
+      ok = false;
+    }
+  return ok;
+}
+
 Hydraulic::Hydraulic (Block& al)
   : name (al.identifier ("type")),
     K_init (al.check ("K_at_h")
@@ -238,8 +250,8 @@ struct ProgramHydraulic_table : public Program
   // Create and Destroy.
   void initialize (Block&)
   { };
-  bool check (Treelog&)
-  { return true; }
+  bool check (Treelog& msg)
+  { return hydraulic->check (msg); }
   ProgramHydraulic_table (Block& al)
     : Program (al),
       hydraulic (Librarian<Hydraulic>::build_item (al, "hydraulic")),
@@ -248,24 +260,6 @@ struct ProgramHydraulic_table : public Program
   ~ProgramHydraulic_table ()
   { }
 };
-
-static const class CheckNoPedo : public VCheck
-{
-  void check (const Syntax&, const AttributeList& alist,
-              const std::string& key) const throw (std::string)
-  {
-    daisy_assert (alist.check (key));
-    const AttributeList& hydraulic = alist.alist (key); 
-    daisy_assert (hydraulic.check ("type"));
-    const symbol type = hydraulic.identifier ("type");
-    const Library& library = Librarian<Hydraulic>::library ();
-    daisy_assert (library.check (type));
-
-    if (library.is_derived_from (type, symbol ("hypres"))
-        || library.is_derived_from (type, symbol ("Cosby_et_al")))
-      throw std::string ("You can not print pedotransfer models");
-  }
-} no_pedo;
 
 static struct ProgramHydraulic_tableSyntax
 {
@@ -280,7 +274,6 @@ Generate a table of the rentention curve and hydraulic conductivity.");
     syntax.add_object ("hydraulic", Hydraulic::component, 
                        Syntax::Const, Syntax::Singleton, "\
 The hydraulic model to show in the table.");
-    syntax.add_check ("hydraulic", no_pedo);
     syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\
 Number of intervals in the table.");
     alist.add ("intervals", 50);
