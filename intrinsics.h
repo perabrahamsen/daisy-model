@@ -33,9 +33,11 @@ class Intrinsics
 public:
   std::map<symbol, Library*> all;
   int count;
+  mutable int closed;
 
   // Use.
 public:
+  std::map<symbol, Library*> clone () const;
   void add (const char *const component, const char *const description);
   Library& library (const char *const component) const;
 

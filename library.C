@@ -35,16 +35,22 @@
 
 struct Library::Implementation
 {
-  typedef std::map<symbol, builder> bmap_type;
-  bmap_type builders;
-
+  // Id.
   const symbol name;
   const char *const description;
+
+  // Types.
+  typedef std::map<symbol, builder> bmap_type;
   typedef std::map<symbol, AttributeList*> alist_map;
   typedef std::map<symbol, const Syntax*> syntax_map;
+
+  // Data (remember to update Library::clone if you change this).
+  bmap_type builders;
   alist_map alists;
   syntax_map syntaxen;
   std::vector<doc_fun> doc_funs;
+
+  // Accessors.
   AttributeList& lookup (symbol) const;
   bool check (symbol) const;
   void add_base (AttributeList&, const Syntax&);
@@ -336,6 +342,25 @@ Library::build_raw (const symbol type, Block& block) const
       daisy_panic (tmp.str ());
     }
   return &(*i).second (block);
+}
+
+Library* 
+Library::clone () const
+{ 
+  Library *const lib = new Library (impl->name.name ().c_str (),
+                                    impl->description);
+  lib->impl->builders = impl->builders;
+  for (Implementation::alist_map::const_iterator i = impl->alists.begin ();
+       i != impl->alists.end ();
+       i++)
+    lib->impl->alists[(*i).first] = new AttributeList (*(*i).second);
+  for (Implementation::syntax_map::const_iterator i = impl->syntaxen.begin ();
+       i != impl->syntaxen.end ();
+       i++)
+    lib->impl->syntaxen[(*i).first] = new Syntax (*(*i).second);
+  lib->impl->doc_funs = impl->doc_funs;
+
+  return lib;
 }
 
 Library::Library (const char* name, const char* description) 

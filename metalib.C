@@ -38,7 +38,7 @@ struct Metalib::Implementation
   int sequence;
 
   Implementation ()
-    : all (BuildBase::intrinsics ().all),
+    : all (BuildBase::intrinsics ().clone ()),
       sequence (0)
   { }
 };

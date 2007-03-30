@@ -21,6 +21,7 @@
 
 #include "librarian.h"
 #include "library.h"
+#include "metalib.h"
 #include "intrinsics.h"
 #include "block.h"
 #include "alist.h"
@@ -49,7 +50,7 @@ BuildBase::build_free (const char *const component, Metalib& metalib,
 {
   daisy_assert (alist.check ("type"));
   const symbol type = alist.identifier ("type");
-  const Library& lib = library (component);
+  const Library& lib = metalib.library (component);
 
   if (!lib.check (type))
     {
@@ -77,7 +78,7 @@ BuildBase::build_alist (const char *const component,
 {
   daisy_assert (alist.check ("type"));
   const symbol type = alist.identifier ("type");
-  const Library& lib = library (component);
+  const Library& lib = parent.metalib ().library (component);
   if (!lib.check (type))
     {
       std::ostringstream tmp;
@@ -134,19 +135,28 @@ BuildBase::library (const char* component)
 void 
 BuildBase::add_base (const char *const component,
                      AttributeList& al, const Syntax& syntax)
-{ library (component).add_base (al, syntax); }
+{ 
+  library (component).add_base (al, syntax); 
+  daisy_assert (!content->closed);
+}
 
 void 
 BuildBase::add_type (const char *const component,
                      const symbol name, AttributeList& al,
                      const Syntax& syntax, builder build)
-{ library (component).add (name, al, syntax, build); }
+{
+  library (component).add (name, al, syntax, build); 
+  daisy_assert (!content->closed);
+}
 
 void
 BuildBase::add_type (const char *const component,
                      const char *const name, AttributeList& al,
                      const Syntax& syntax, builder build)
-{ library (component).add (symbol (name), al, syntax, build); }
+{
+  library (component).add (symbol (name), al, syntax, build); 
+  daisy_assert (!content->closed);
+}
 
 void 
 BuildBase::add_alias (const char *const component,
@@ -161,11 +171,15 @@ BuildBase::add_alias (const char *const component,
              "The " + derived.name ()
              + " model is an alias for " + base.name () + ".");
   lib.add_derived (derived, alist, base);
+  daisy_assert (!content->closed);
 }
 
 void 
 BuildBase::add_doc_fun (const char *const component, const doc_fun fun)
-{ library (component).add_doc_fun (fun); } 
+{
+  library (component).add_doc_fun (fun); 
+  daisy_assert (!content->closed);
+} 
 
 void
 BuildBase::load_syntax (Syntax& syntax, AttributeList&)

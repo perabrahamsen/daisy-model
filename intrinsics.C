@@ -23,17 +23,26 @@
 #include "assertion.h"
 #include "library.h"
 
-Intrinsics::Intrinsics ()
-  : count (1)
-{ }
+std::map<symbol, Library*> 
+Intrinsics::clone () const
+{ 
+  closed = true;
 
-Intrinsics::~Intrinsics ()
-{ daisy_assert (count == 0); }
+  std::map<symbol, Library*> result;
+  
+  for (std::map<symbol, Library*>::const_iterator i = all.begin ();
+       i != all.end ();
+       i++)
+    result[(*i).first] = (*i).second->clone ();
+
+  return result;
+}
 
 void 
 Intrinsics::add (const char *const component, 
                  const char *const description)
 {
+  daisy_assert (!closed);
   const std::map<symbol, Library*>::const_iterator i
     = all.find (symbol (component));
   
@@ -53,5 +62,14 @@ Intrinsics::library (const char *const component) const
   
   return *(*i).second;
 }
+
+Intrinsics::Intrinsics ()
+  : count (1),
+    closed (false)
+{ }
+
+Intrinsics::~Intrinsics ()
+{ daisy_assert (count == 0); }
+
 
 // intrinsics.C ends here

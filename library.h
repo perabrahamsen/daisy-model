@@ -81,7 +81,9 @@ public:
   // Build a model.
   Model* build_raw (const symbol type, Block& block) const;
 
-private: 
+  Library* clone () const;
+private:
+  Library ();
   Library (const Library&);
 public:
   Library (const char* name, const char* description);
