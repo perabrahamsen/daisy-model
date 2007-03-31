@@ -114,7 +114,7 @@ ProgramGnuplot::ProgramGnuplot (Block& al)
     command_file (al.name ("command_file")),
     do_cd (al.flag ("cd")),
     extra (al.identifier_sequence ("extra")),
-    graph (Librarian<Gnuplot>::build_vector (al, "graph"))
+    graph (BuildBase::build_vector<Gnuplot> (al, "graph"))
 { }
 
 ProgramGnuplot::~ProgramGnuplot ()

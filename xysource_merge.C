@@ -162,7 +162,7 @@ XYSourceMerge::load (Treelog& msg)
 
 XYSourceMerge::XYSourceMerge (Block& al)
   : XYSource (al),
-    source (Librarian<XYSource>::build_vector (al, "source")),
+    source (BuildBase::build_vector<XYSource> (al, "source")),
     title_ (al.name ("title")),
     x_dimension_ (al.name ("x_dimension")),
     y_dimension_ (al.name ("y_dimension")),

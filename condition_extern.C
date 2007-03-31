@@ -73,9 +73,9 @@ struct ConditionExtern : public Condition
 
   ConditionExtern (Block& al)
     : Condition (al),
-      scopesel (Librarian<Scopesel>::build_item (al, "scope")),
+      scopesel (BuildBase::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
-      expr (Librarian<Boolean>::build_item (al, "expr")),
+      expr (BuildBase::build_item<Boolean> (al, "expr")),
       state (uninitialized)
   { }
 };

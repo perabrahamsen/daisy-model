@@ -676,7 +676,7 @@ Movement1D::initialize (Block& block, const AttributeList& al,
 
   // Macropores.
   if (al.check ("macro"))
-    macro.reset (Librarian<Macro>::build_alist (block, al.alist ("macro"), 
+    macro.reset (BuildBase::build_alist<Macro> (block, al.alist ("macro"), 
                                                 "macro"));
   else if (soil.humus (0) + soil.clay (0) > 0.05)
     // More than 5% clay (and humus) in first horizon.
@@ -708,11 +708,11 @@ Movement1D::initialize (Block& block, const AttributeList& al,
 Movement1D::Movement1D (Block& al)
   : Movement (al),
     geo (submodel<Geometry1D> (al, "Geometry")),
-    matrix_water (Librarian<UZmodel>::build_vector (al, "matrix_water")),
+    matrix_water (BuildBase::build_vector<UZmodel> (al, "matrix_water")),
     macro (NULL), 
-    matrix_solute (Librarian<Transport>::build_vector (al, "matrix_solute")),
-    transport_solid (Librarian<Transport>::build_item (al, "transport_solid")),
-    mactrans  (Librarian<Mactrans>::build_item (al, "mactrans"))
+    matrix_solute (BuildBase::build_vector<Transport> (al, "matrix_solute")),
+    transport_solid (BuildBase::build_item<Transport> (al, "transport_solid")),
+    mactrans  (BuildBase::build_item<Mactrans> (al, "mactrans"))
 { }
 
 Movement1D::~Movement1D ()

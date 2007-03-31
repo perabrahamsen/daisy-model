@@ -864,22 +864,22 @@ ColumnStandard::output (Log& log) const
 
 ColumnStandard::ColumnStandard (Block& al)
   : Column (al),
-    movement (Librarian<Movement>::build_item (al, "Movement")),
-    groundwater (Librarian<Groundwater>::build_item (al, "Groundwater")),
+    movement (BuildBase::build_item<Movement> (al, "Movement")),
+    groundwater (BuildBase::build_item<Groundwater> (al, "Groundwater")),
     weather (al.check ("weather") 
-	     ? Librarian<Weather>::build_item (al, "weather")
+	     ? BuildBase::build_item<Weather> (al, "weather")
 	     : NULL), 
-    vegetation (Librarian<Vegetation>::build_item (al, "Vegetation")),
-    bioclimate (Librarian<Bioclimate>::build_item (al, "Bioclimate")),
+    vegetation (BuildBase::build_item<Vegetation> (al, "Vegetation")),
+    bioclimate (BuildBase::build_item<Bioclimate> (al, "Bioclimate")),
     surface (al.alist ("Surface")),
     geometry (movement->geometry ()),
     soil (submodel<Soil> (al, "Soil")),
     soil_water (submodel<SoilWater> (al, "SoilWater")),
     soil_heat (submodel<SoilHeat> (al, "SoilHeat")),
-    chemistry (Librarian<Chemistry>::build_item (al, "Chemistry")),
+    chemistry (BuildBase::build_item<Chemistry> (al, "Chemistry")),
     soil_NH4 (submodel<SoilNH4> (al, "SoilNH4")),
     soil_NO3 (submodel<SoilNO3> (al, "SoilNO3")),
-    organic_matter (Librarian<OrganicMatter>::build_item 
+    organic_matter (BuildBase::build_item<OrganicMatter> 
                     (al, "OrganicMatter")),
     denitrification (al.alist ("Denitrification")),
     second_year_utilization_ (al.number ("second_year_utilization")),

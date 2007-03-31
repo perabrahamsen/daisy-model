@@ -380,7 +380,7 @@ struct ConditionTimestep : public Condition
 
   ConditionTimestep (Block& al)
     : Condition (al),
-      condition (Librarian<Condition>::build_item (al, "operand")),
+      condition (BuildBase::build_item<Condition> (al, "operand")),
       dt (al.name ("timestep"))
   { }
   ~ConditionTimestep ()

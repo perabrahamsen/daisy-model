@@ -96,7 +96,7 @@ struct ActionProgn : public Action
 
   ActionProgn (Block& al)
     : Action (al),
-      actions (Librarian<Action>::build_vector (al, "actions"))
+      actions (BuildBase::build_vector<Action> (al, "actions"))
   { }
 
   ~ActionProgn ()
@@ -125,8 +125,8 @@ struct ActionCond : public Action
       syntax.order ("condition", "actions");
     }
     clause (Block& al) 
-      : condition (Librarian<Condition>::build_item (al, "condition")),
-        actions (Librarian<Action>::build_vector (al, "actions"))
+      : condition (BuildBase::build_item<Condition> (al, "condition")),
+        actions (BuildBase::build_vector<Action> (al, "actions"))
     { }
     ~clause ()
     { sequence_delete (actions.begin (), actions.end ()); }
@@ -242,9 +242,9 @@ struct ActionIf : public Action
 
   ActionIf (Block& al)
     : Action (al),
-      if_c (Librarian<Condition>::build_item (al, "if")),
-      then_a (Librarian<Action>::build_item (al, "then")),
-      else_a (Librarian<Action>::build_item (al, "else"))
+      if_c (BuildBase::build_item<Condition> (al, "if")),
+      then_a (BuildBase::build_item<Action> (al, "then")),
+      else_a (BuildBase::build_item<Action> (al, "else"))
   { }
 
   ~ActionIf ()

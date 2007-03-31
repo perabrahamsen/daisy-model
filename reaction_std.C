@@ -81,7 +81,7 @@ struct ReactionStandard : public Reaction
     : Reaction (al),
       name_A (al.identifier ("A")),
       name_B (al.identifier ("B")),
-      transform (Librarian<Transform>::build_item (al, "transform"))
+      transform (BuildBase::build_item<Transform> (al, "transform"))
   { }
 };
 

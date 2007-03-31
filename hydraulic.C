@@ -254,7 +254,7 @@ struct ProgramHydraulic_table : public Program
   { return hydraulic->check (msg); }
   ProgramHydraulic_table (Block& al)
     : Program (al),
-      hydraulic (Librarian<Hydraulic>::build_item (al, "hydraulic")),
+      hydraulic (BuildBase::build_item<Hydraulic> (al, "hydraulic")),
       intervals (al.integer ("intervals"))
   { }
   ~ProgramHydraulic_table ()

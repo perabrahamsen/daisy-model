@@ -69,7 +69,7 @@ struct ActionWhile : public Action
 
   ActionWhile (Block& al)
     : Action (al),
-      actions (Librarian<Action>::build_vector (al, "actions"))
+      actions (BuildBase::build_vector<Action> (al, "actions"))
   { }
 
   ~ActionWhile ()

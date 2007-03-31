@@ -101,7 +101,7 @@ Value to return.");
       syntax.order ("condition", "value");
     }
     Clause (Block& al)
-      : condition (Librarian<Boolean>::build_item (al, "condition")),
+      : condition (BuildBase::build_item<Boolean> (al, "condition")),
         value (al.integer ("value"))
     { }
   };

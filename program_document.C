@@ -136,7 +136,7 @@ struct ProgramDocument : public Program
     : Program (al),
       metalib (al.metalib ()),
       xref (metalib),
-      format (Librarian<Format>::build_item (al, "format")),
+      format (BuildBase::build_item<Format> (al, "format")),
       print_parameterizations (al.flag ("print_parameterizations"))
   { }
   ~ProgramDocument ()

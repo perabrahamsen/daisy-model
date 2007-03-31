@@ -109,9 +109,9 @@ The height we want to compare with.");
   }
   NumberByDepth (Block& al)
     : Number (al),
-      column (Librarian<Column>::build_item (al, "column")),
-      h (Librarian<Number>::build_item (al, "h")),
-      z (Librarian<Number>::build_item (al, "z"))
+      column (BuildBase::build_item<Column> (al, "column")),
+      h (BuildBase::build_item<Number> (al, "h")),
+      z (BuildBase::build_item<Number> (al, "z"))
   { 
     Output output;
     Time time (9999, 1, 1, 0);
@@ -122,7 +122,7 @@ The height we want to compare with.");
     alist.add ("amplitude", 0.0);
     alist.add ("air_temperature", T);
     alist.add ("type", "none");
-    std::auto_ptr<Weather> weather (Librarian<Weather>::build_alist
+    std::auto_ptr<Weather> weather (BuildBase::build_alist<Weather>
                                     (al, alist, "initialize"));
     column->initialize (al, output, time, weather.get ());
     max_depth = column->bottom ();
@@ -252,8 +252,8 @@ Set this to true for the A horizon.");
   }
   NumberByTension (Block& al)
     : Number (al),
-      horizon (Librarian<Horizon>::build_item (al, "horizon")),
-      h (Librarian<Number>::build_item (al, "h"))
+      horizon (BuildBase::build_item<Horizon> (al, "horizon")),
+      h (BuildBase::build_item<Number> (al, "h"))
   { horizon->initialize (al.flag ("top_soil"), 2, al.msg ()); }
 };
 
@@ -448,8 +448,8 @@ struct NumberTensionByTheta : public Number
   }
   NumberTensionByTheta (Block& al)
     : Number (al),
-      horizon (Librarian<Horizon>::build_item (al, "horizon")),
-               Theta (Librarian<Number>::build_item (al, "Theta"))
+      horizon (BuildBase::build_item<Horizon> (al, "horizon")),
+               Theta (BuildBase::build_item<Number> (al, "Theta"))
   { horizon->initialize (al.flag ("top_soil"), 2, al.msg ()); }
 };
 

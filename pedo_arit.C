@@ -65,7 +65,7 @@ struct PedotransferIdentity : public Pedotransfer
   }
   PedotransferIdentity (Block& al)
     : Pedotransfer (al),
-      child (Librarian<Pedotransfer>::build_item (al, "value")),
+      child (BuildBase::build_item<Pedotransfer> (al, "value")),
       dim (al.name ("dimension", child->dimension ()))
   { }
 };
@@ -105,7 +105,7 @@ struct PedotransferOperand : public Pedotransfer
   }
   PedotransferOperand (Block& al)
     : Pedotransfer (al),
-      operand (Librarian<Pedotransfer>::build_item (al, "operand"))
+      operand (BuildBase::build_item<Pedotransfer> (al, "operand"))
   { }
 };
 
@@ -274,8 +274,8 @@ struct PedotransferPow : public Pedotransfer
   }
   PedotransferPow (Block& al)
     : Pedotransfer (al),
-      base (Librarian<Pedotransfer>::build_item (al, "base")),
-      exponent (Librarian<Pedotransfer>::build_item (al, "exponent"))
+      base (BuildBase::build_item<Pedotransfer> (al, "base")),
+      exponent (BuildBase::build_item<Pedotransfer> (al, "exponent"))
   { }
 };
 
@@ -337,7 +337,7 @@ struct PedotransferOperands : public Pedotransfer
       const struct Operands : public  op_x
       {
         Operands (Block& bl, const std::string& key)
-          : op_x (Librarian<Pedotransfer>::build_vector_const (bl, key))
+          : op_x (BuildBase::build_vector_const<Pedotransfer> (bl, key))
         { }
         ~Operands ()
         { sequence_delete (begin (), end ()); }
@@ -386,7 +386,7 @@ struct PedotransferOperands : public Pedotransfer
   }
   PedotransferOperands (Block& al)
     : Pedotransfer (al),
-      operands (Librarian<Pedotransfer>::build_vector_const (al, "operands"))
+      operands (BuildBase::build_vector_const<Pedotransfer> (al, "operands"))
   { }
   ~PedotransferOperands ()
   { sequence_delete (operands.begin (), operands.end ()); }

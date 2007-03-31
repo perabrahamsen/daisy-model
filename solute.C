@@ -194,7 +194,7 @@ Only for initialization of the 'M' parameter.");
 Solute::Solute (Block& al)
   : submodel (al.check ("type") ? al.name ("type") : al.name ("submodel")),
     S_permanent (al.number_sequence ("S_permanent")),
-    adsorption (Librarian<Adsorption>::build_item (al, "adsorption"))
+    adsorption (BuildBase::build_item<Adsorption> (al, "adsorption"))
 { }
 
 Solute::~Solute ()

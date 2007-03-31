@@ -2,11 +2,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Metalib
 
-** Gør Librarian<T>::build_* til funktioner
-
-** Omdøb Buildbase til Librarian
+** Omdøb BuildBase til Librarian
 
 ** Fjern librarian.h fra headerfiler.
+
+** Inline Component::description
 
 * Generer DLL i make dist?
 

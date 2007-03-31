@@ -146,8 +146,8 @@ public:
       Ptot (al.number("Ptot")),
       m (al.number("m")),
       b (al.number("b")),
-      cropNdist (Librarian<CropNdist>::build_item (al, "N-dist")),
-      ABAeffect (Librarian<ABAEffect>::build_item (al, "ABAeffect"))
+      cropNdist (BuildBase::build_item<CropNdist> (al, "N-dist")),
+      ABAeffect (BuildBase::build_item<ABAEffect> (al, "ABAeffect"))
   { }
   ~PhotoFarquhar ()
   { }

@@ -228,7 +228,7 @@ DOM::initialize (const Geometry& geo,
 DOM::DOM (Block& al)
   : C (*new Element (al.alist ("C"))),
     N (*new Element (al.alist ("N"))),
-    adsorption (Librarian<Adsorption>::build_item (al, "adsorption")),
+    adsorption (BuildBase::build_item<Adsorption> (al, "adsorption")),
     diffusion_coefficient (al.number ("diffusion_coefficient")),
     turnover_rate (al.check ("turnover_rate")
 		   ? al.number ("turnover_rate")

@@ -185,7 +185,7 @@ struct ProgramWSE_table : public Program
   { return true; }
   ProgramWSE_table (Block& al)
     : Program (al),
-      wse (Librarian<WSE>::build_item (al, "wse")),
+      wse (BuildBase::build_item<WSE> (al, "wse")),
       intervals (al.integer ("intervals"))
   { }
   ~ProgramWSE_table ()

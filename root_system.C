@@ -518,7 +518,7 @@ get_PotRtDpt (Block& al)
 }
 
 RootSystem::RootSystem (Block& al)
-  : rootdens (Librarian<Rootdens>::build_item (al, "rootdens")),
+  : rootdens (BuildBase::build_item<Rootdens> (al, "rootdens")),
     PenPar1 (al.number ("PenPar1")),
     PenPar2 (al.number ("PenPar2")),
     PenClayFac (al.plf ("PenClayFac")),

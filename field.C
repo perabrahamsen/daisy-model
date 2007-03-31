@@ -677,7 +677,7 @@ Field::Implementation::initialize (Block& block, const Output& output,
 
 Field::Implementation::Implementation (Block& parent, 
 				       const std::string& key)
-  : columns (Librarian<Column>::build_vector (parent, key)),
+  : columns (BuildBase::build_vector<Column> (parent, key)),
     selected (NULL)
 { }
 

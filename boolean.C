@@ -169,7 +169,7 @@ List of operands to compare.");
   }
   BooleanOperands (Block& al)
     : Boolean (al),
-      operand (Librarian<Boolean>::build_vector (al, "operands"))
+      operand (BuildBase::build_vector<Boolean> (al, "operands"))
   { }
   ~BooleanOperands ()
   { sequence_delete (operand.begin (), operand.end ()); }

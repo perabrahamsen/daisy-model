@@ -188,7 +188,7 @@ SourceMerge::load (Treelog& msg)
 
 SourceMerge::SourceMerge (Block& al)
   : Source (al),
-    source (Librarian<Source>::build_vector (al, "source")),
+    source (BuildBase::build_vector<Source> (al, "source")),
     title_ (al.name ("title")),
     dimension_ (al.name ("dimension", Syntax::Unknown ())),
     with_ (al.name ("with", "")),

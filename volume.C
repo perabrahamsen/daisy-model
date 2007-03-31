@@ -32,7 +32,7 @@ const char *const Volume::component = "volume";
 std::auto_ptr<Volume>
 Volume::build_obsolete (Block& al)
 {
-  Volume *const vol = Librarian<Volume>::build_item (al, "volume");
+  Volume *const vol = BuildBase::build_item<Volume> (al, "volume");
   daisy_assert (vol);
   if (al.check ("from"))
     {

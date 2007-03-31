@@ -47,7 +47,7 @@ struct ActionWait : public Action
 
   ActionWait (Block& al)
     : Action (al),
-      condition (Librarian<Condition>::build_item (al, "condition"))
+      condition (BuildBase::build_item<Condition> (al, "condition"))
   { }
 
   ~ActionWait ()

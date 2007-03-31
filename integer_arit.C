@@ -52,7 +52,7 @@ struct IntegerOperand : public Integer
   }
   IntegerOperand (Block& al)
     : Integer (al),
-      operand (Librarian<Integer>::build_item (al, "operand"))
+      operand (BuildBase::build_item<Integer> (al, "operand"))
   { }
 };
 
@@ -135,7 +135,7 @@ struct IntegerOperands : public Integer
   }
   IntegerOperands (Block& al)
     : Integer (al),
-      operands (Librarian<Integer>::build_vector (al, "operands"))
+      operands (BuildBase::build_vector<Integer> (al, "operands"))
   { }
   ~IntegerOperands ()
   { sequence_delete (operands.begin (), operands.end ()); }

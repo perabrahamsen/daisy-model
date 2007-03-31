@@ -99,7 +99,7 @@ EquilibriumLangmuir::initialize (Block& block, const Soil& soil)
   // K
   {
     auto_ptr<Pedotransfer> pedo_K 
-      (Librarian<Pedotransfer>::build_alist (block, alist, "K"));
+      (BuildBase::build_alist<Pedotransfer> (block, alist, "K"));
     if (pedo_K->check (soil, "g/cm^3", block.msg ()))
       pedo_K->set (soil, K, "g/cm^3");
     else 
@@ -110,7 +110,7 @@ EquilibriumLangmuir::initialize (Block& block, const Soil& soil)
   // my_max
   {
     auto_ptr<Pedotransfer> pedo_my_max 
-      (Librarian<Pedotransfer>::build_alist (block, alist, "my_max"));
+      (BuildBase::build_alist<Pedotransfer> (block, alist, "my_max"));
     if (pedo_my_max->check (soil, "g/cm^3", block.msg ()))
       pedo_my_max->set (soil, my_max, "g/cm^3");
     else 

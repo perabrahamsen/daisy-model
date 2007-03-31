@@ -108,8 +108,8 @@ public:
       
   GroundwaterExtern (Block& al)
     : Groundwater (al),
-      scopesel (Librarian<Scopesel>::build_item (al, "scope")),
-      expr (Librarian<Number>::build_item (al, "table")),
+      scopesel (BuildBase::build_item<Scopesel> (al, "scope")),
+      expr (BuildBase::build_item<Number> (al, "table")),
       has_table (false),
       depth (-42.42e42)
   { }

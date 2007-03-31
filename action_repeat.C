@@ -41,7 +41,7 @@ struct ActionRepeat : public Action
 	action = NULL;
       }
     if (action == NULL)
-      action = Librarian<Action>::build_free (daisy.metalib, 
+      action = BuildBase::build_free<Action> (daisy.metalib, 
                                               msg, repeat, "repeat");
     if (action != NULL)         // Build free may fail.
       action->doIt (daisy, msg);
@@ -75,8 +75,8 @@ struct ActionRepeat : public Action
     : Action (al, add_do (al.alist ())),
       repeat (al.alist ("repeat")),
       action (al.check ("do") 
-              ? Librarian<Action>::build_item (al, "do")
-              : Librarian<Action>::build_item (al, "repeat"))
+              ? BuildBase::build_item<Action> (al, "do")
+              : BuildBase::build_item<Action> (al, "repeat"))
   { }
 
   ~ActionRepeat ()

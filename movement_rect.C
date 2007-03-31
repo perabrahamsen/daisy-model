@@ -300,8 +300,8 @@ MovementRect::MovementRect (Block& al)
   : Movement (al),
     geo (submodel<GeometryRect> (al, "Geometry")),
     drain_position (map_construct_const<Point> (al.alist_sequence ("drain"))),
-    matrix_water (Librarian<UZRect>::build_vector (al, "matrix_water")),
-    matrix_solute (Librarian<Msoltranrect>::build_vector (al, "matrix_solute"))
+    matrix_water (BuildBase::build_vector<UZRect> (al, "matrix_water")),
+    matrix_solute (BuildBase::build_vector<Msoltranrect> (al, "matrix_solute"))
 { 
   for (size_t i = 0; i < drain_position.size (); i++)
     {

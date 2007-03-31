@@ -99,7 +99,7 @@ List of operands to compare.");
   }
   BooleanNumbers (Block& al)
     : Boolean (al),
-      operand (Librarian<Number>::build_vector (al, "operands"))
+      operand (BuildBase::build_vector<Number> (al, "operands"))
   { }
   ~BooleanNumbers ()
   { sequence_delete (operand.begin (), operand.end ()); }

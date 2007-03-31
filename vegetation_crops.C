@@ -631,7 +631,7 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
                       const double dt,
                       Treelog& msg)
 {
-  Crop *const crop = Librarian<Crop>::build_free (metalib, msg, al, "sow");
+  Crop *const crop = BuildBase::build_free<Crop> (metalib, msg, al, "sow");
   const symbol name = crop->name;
   for (CropList::iterator i = crops.begin();
        i != crops.end();
@@ -667,7 +667,7 @@ VegetationCrops::initialize (const Time& time, const Geometry& geo,
 VegetationCrops::CropList
 VegetationCrops::build_crops (Block& al, const std::string& key)
 {
-  const std::vector<Crop*> v = Librarian<Crop>::build_vector (al, key);
+  const std::vector<Crop*> v = BuildBase::build_vector<Crop> (al, key);
   return CropList (v.begin (), v.end ());
 }
 

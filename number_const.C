@@ -273,7 +273,7 @@ struct NumberChild : public Number
   }
   NumberChild (Block& al)
     : Number (al),
-      child (Librarian<Number>::build_item (al, "value"))
+      child (BuildBase::build_item<Number> (al, "value"))
   { }
 };
 

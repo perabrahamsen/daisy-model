@@ -139,8 +139,8 @@ FAO::RefNetRadiation (double Si, double rad,
       Syntax syntax;
       AttributeList alist;
       alist.add ("type", "brunt");
-      net_radiation.reset (Librarian<NetRadiation>
-                           ::build_free (out, alist, "net_radiation"));
+      net_radiation.reset (BuildBase::build_free<NetRadiation>
+                            (out, alist, "net_radiation"));
     }
 
   const double albedo = 0.23;

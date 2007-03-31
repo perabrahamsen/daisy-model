@@ -90,7 +90,7 @@ The time series we want to extract a number from.");
   }
   NumberSource (Block& al)
     : Number (al),
-      source (Librarian<Source>::build_item (al, "source")),
+      source (BuildBase::build_item<Source> (al, "source")),
       begin (al.check ("begin") ? new Time (al.alist ("begin")) : NULL),
       end (al.check ("end") ? new Time (al.alist ("end")) : NULL),
       state (uninitialized),

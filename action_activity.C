@@ -77,7 +77,7 @@ struct ActionActivity : public Action
 
   ActionActivity (Block& al)
     : Action (al),
-      actions (Librarian<Action>::build_vector (al, "actions"))
+      actions (BuildBase::build_vector<Action> (al, "actions"))
   { }
 
   ~ActionActivity ()

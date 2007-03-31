@@ -329,7 +329,7 @@ GnuplotTime::GnuplotTime (Block& al)
     y2min (al.number ("y2min", 42.42e42)),
     y2max_flag (al.check ("y2max")),
     y2max (al.number ("y2max", 42.42e42)),
-    source (Librarian<Source>::build_vector (al, "source"))
+    source (BuildBase::build_vector<Source> (al, "source"))
 { }
 
 GnuplotTime::~GnuplotTime ()

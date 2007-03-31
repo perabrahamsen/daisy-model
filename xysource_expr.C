@@ -158,8 +158,8 @@ XYSourceExpr::XYSourceExpr (Block& al)
     with_ (al.name ("with", "")),
     explicit_with (al.check ("with")),
     style_ (al.integer ("style", -1)),
-    x_expr (Librarian<Number>::build_item (al, "x")),
-    y_expr (Librarian<Number>::build_item (al, "y")),
+    x_expr (BuildBase::build_item<Number> (al, "x")),
+    y_expr (BuildBase::build_item<Number> (al, "y")),
     title_ (al.name ("title", y_expr->title () + " vs " + x_expr->title ())),
     x_dimension_ ("UNINITIALIZED"),
     y_dimension_ ("UNINITIALIZED")

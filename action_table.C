@@ -219,13 +219,13 @@ ActionTable::check (const Daisy&, Treelog&) const
 ActionTable::ActionTable (Block& al)
   : Action (al),
     sow (al.check ("sow") 
-         ? Librarian<Action>::build_item (al, "sow")
+         ? BuildBase::build_item<Action> (al, "sow")
          : NULL),
     emerge (al.check ("emerge") 
-         ? Librarian<Action>::build_item (al, "emerge")
+         ? BuildBase::build_item<Action> (al, "emerge")
          : NULL),
     harvest (al.check ("harvest") 
-             ? Librarian<Action>::build_item (al, "harvest")
+             ? BuildBase::build_item<Action> (al, "harvest")
              : NULL),
     am (al.check ("fertilizer") 
         ? new AttributeList (al.alist ("fertilizer")) 

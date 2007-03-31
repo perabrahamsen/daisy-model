@@ -374,7 +374,7 @@ Number*
 Select::Implementation::get_expr (Block& al)
 {
   if (al.check ("expr"))
-    return Librarian<Number>::build_item (al, "expr");
+    return BuildBase::build_item<Number> (al, "expr");
 
   // Support for old factor + offset style.
   struct NumberFactor : public Number

@@ -255,8 +255,8 @@ ChemistryStandard::check (const Soil& soil, Treelog& msg) const
 
 ChemistryStandard::ChemistryStandard (Block& al)
   : Chemistry (al),
-    chemicals (Librarian<Chemical>::build_vector (al, "trace")),
-    reactions (Librarian<Reaction>::build_vector (al, "reaction")),
+    chemicals (BuildBase::build_vector<Chemical> (al, "trace")),
+    reactions (BuildBase::build_vector<Reaction> (al, "reaction")),
     ignore (al.identifier_sequence ("ignore"))
 { }
 

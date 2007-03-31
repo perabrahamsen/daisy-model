@@ -96,7 +96,7 @@ ScopeMulti::ScopeMulti (const Scope& first, const Scope& second)
 
 ScopeMulti::ScopeMulti (Block& al)
   : Scope (al),
-    scopes (Librarian<Scope>::build_vector_const (al, "scope")),
+    scopes (BuildBase::build_vector_const<Scope> (al, "scope")),
     all_numbers_ (find_numbers (scopes))
 { }
 

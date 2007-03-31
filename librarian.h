@@ -38,22 +38,16 @@ class Intrinsics;
 
 class BuildBase 
 {
-  // Avoid calls to daisy_assert
-protected:
-  static void non_null (const void*);
-
-  // Types.
-protected:
-  typedef Model& (*builder) (Block&);
-
   // Content.
-protected:
+private:
   static Intrinsics* content;
 public:
   static const Intrinsics& intrinsics ();
 
   // Build.
-protected:
+private:
+  typedef Model& (*builder) (Block&);
+  static void non_null (const void*);
   static Model* build_free (const char* component,
                             Metalib&, Treelog&, const AttributeList&, 
                             const std::string& scope_id);
@@ -69,7 +63,68 @@ protected:
   /**/ build_vector_const (const char* component,
                            Block& al, const std::string& key);
 
+public:
+  template <class T> static T* 
+  build_free (Metalib& metalib, Treelog& msg,
+              const AttributeList& alist, 
+              const std::string& scope_id)
+  { 
+    T* x = dynamic_cast<T*> (BuildBase::build_free (T::component, metalib, msg,
+                                                    alist, scope_id)); 
+    non_null (x);
+    return x;
+  }
+
+  template <class T> static T* 
+  build_alist (Block& parent, const AttributeList& alist, 
+               const std::string& scope_id)
+  { 
+    T* x = dynamic_cast<T*> (BuildBase::build_alist (T::component, 
+                                                     parent, alist, scope_id));
+    non_null (x);
+    return x;
+  }
+
+  template <class T> static T* 
+  build_item (Block& parent, const std::string& key)
+  { 
+    T* x = dynamic_cast<T*> (BuildBase::build_item (T::component, 
+                                                    parent, key)); 
+    non_null (x);
+    return x;
+  }
+
+  template <class T> static std::vector<T*> 
+  build_vector (Block& al, const std::string& key)
+  {  
+    const std::vector<Model*> c 
+      = BuildBase::build_vector (T::component, al, key);
+    std::vector<T*> t;
+    for (size_t i = 0; i < c.size (); i++)
+      {
+        T* x = dynamic_cast<T*> (c[i]);
+        non_null (x);
+        t.push_back (x);
+      }
+    return t;
+  }
+  template <class T> static std::vector<const T*> 
+  build_vector_const (Block& al, const std::string& key)
+  {  
+    const std::vector<const Model*> c
+      = BuildBase::build_vector_const (T::component, al, key);
+    std::vector<const T*> t;
+    for (size_t i = 0; i < c.size (); i++)
+      {
+        const T* x = dynamic_cast<const T*> (c[i]);
+        non_null (x);
+        t.push_back (x);
+      }
+    return t;
+  }
+
   // Library.
+private:
   static Library& library (const char* component);
 public:
   static void add_base (const char* component,
@@ -90,71 +145,6 @@ public:
 public:
   BuildBase (const char *const component, const char *const description);
   ~BuildBase ();
-};
-
-template <class T>
-class Librarian : private BuildBase
-{
-  // Functions.
-public:
-  static T* build_free (Metalib& metalib, Treelog& msg,
-                        const AttributeList& alist, 
-			const std::string& scope_id)
-  { 
-    T* x = dynamic_cast<T*> (BuildBase::build_free (T::component, metalib, msg,
-                                                    alist, scope_id)); 
-    non_null (x);
-    return x;
-  }
-  static T* build_alist (Block& parent, const AttributeList& alist, 
-			 const std::string& scope_id)
-  { 
-    T* x = dynamic_cast<T*> (BuildBase::build_alist (T::component, 
-                                                     parent, alist, scope_id));
-    non_null (x);
-    return x;
-  }
-  static T* build_item (Block& parent, const std::string& key)
-  { 
-    T* x = dynamic_cast<T*> (BuildBase::build_item (T::component, 
-                                                    parent, key)); 
-    non_null (x);
-    return x;
-  }
-  static std::vector<T*> build_vector (Block& al, const std::string& key)
-  {  
-    const std::vector<Model*> c 
-      = BuildBase::build_vector (T::component, al, key);
-    std::vector<T*> t;
-    for (size_t i = 0; i < c.size (); i++)
-      {
-        T* x = dynamic_cast<T*> (c[i]);
-        non_null (x);
-        t.push_back (x);
-      }
-    return t;
-  }
-  static std::vector<const T*> build_vector_const (Block& al,
-						   const std::string& key)
-  {  
-    const std::vector<const Model*> c
-      = BuildBase::build_vector_const (T::component, al, key);
-    std::vector<const T*> t;
-    for (size_t i = 0; i < c.size (); i++)
-      {
-        const T* x = dynamic_cast<const T*> (c[i]);
-        non_null (x);
-        t.push_back (x);
-      }
-    return t;
-  }
-
-  // Create and Destroy.
-private:                        // Disable.
-  explicit Librarian (const Librarian&);
-  explicit Librarian ();
-  Librarian& operator= (const Librarian&);
-  ~Librarian ();
 };
 
 #endif // LIBRARIAN_H

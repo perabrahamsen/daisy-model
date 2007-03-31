@@ -47,7 +47,7 @@ struct ActionAssert : public Action
 
   ActionAssert (Block& al)
     : Action (al),
-      condition (Librarian<Condition>::build_item (al, "condition")),
+      condition (BuildBase::build_item<Condition> (al, "condition")),
       message (al.name ("message"))
   { }
 

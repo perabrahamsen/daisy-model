@@ -117,7 +117,7 @@ struct DomsorpStandard : public Domsorp
     : Domsorp (al),
       dom_pool (al.integer ("dom_pool") - 1),
       som_pool (al.integer ("som_pool") - 1),
-      transform (Librarian<Transform>::build_item (al, "transform"))
+      transform (BuildBase::build_item<Transform> (al, "transform"))
   { }
 };
 

@@ -242,12 +242,12 @@ struct VolumeBox : public Volume
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   VolumeBox (Block& al)
     : Volume (al),
-      bottom (Librarian<Bound>::build_item (al, "bottom")),
-      top (Librarian<Bound>::build_item (al, "top")),
-      left (Librarian<Bound>::build_item (al, "left")),
-      right (Librarian<Bound>::build_item (al, "right")),
-      front (Librarian<Bound>::build_item (al, "front")),
-      back (Librarian<Bound>::build_item (al, "back"))
+      bottom (BuildBase::build_item<Bound> (al, "bottom")),
+      top (BuildBase::build_item<Bound> (al, "top")),
+      left (BuildBase::build_item<Bound> (al, "left")),
+      right (BuildBase::build_item<Bound> (al, "right")),
+      front (BuildBase::build_item<Bound> (al, "front")),
+      back (BuildBase::build_item<Bound> (al, "back"))
   { }
   VolumeBox (const char *const id)
     : Volume (id),

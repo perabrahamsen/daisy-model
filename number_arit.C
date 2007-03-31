@@ -55,7 +55,7 @@ struct NumberOperand : public Number
   }
   NumberOperand (Block& al)
     : Number (al),
-      operand (Librarian<Number>::build_item (al, "operand"))
+      operand (BuildBase::build_item<Number> (al, "operand"))
   { }
 };
 
@@ -241,8 +241,8 @@ struct NumberPow : public Number
   }
   NumberPow (Block& al)
     : Number (al),
-      base (Librarian<Number>::build_item (al, "base")),
-      exponent (Librarian<Number>::build_item (al, "exponent"))
+      base (BuildBase::build_item<Number> (al, "base")),
+      exponent (BuildBase::build_item<Number> (al, "exponent"))
   { }
 };
 
@@ -329,7 +329,7 @@ struct NumberOperands : public Number
       const struct Operands : public  op_x
       {
         Operands (Block& Block, const std::vector<AttributeList*>& as)
-          : op_x (Librarian<Number>:build_vector_const (as))
+          : op_x (BuildBase:build_vector_const<Number> (as))
         { }
         ~Operands ()
         { sequence_delete (begin (), end ()); }
@@ -371,7 +371,7 @@ struct NumberOperands : public Number
   }
   NumberOperands (Block& al)
     : Number (al),
-      operands (Librarian<Number>::build_vector (al, "operands"))
+      operands (BuildBase::build_vector<Number> (al, "operands"))
   { }
   ~NumberOperands ()
   { sequence_delete (operands.begin (), operands.end ()); }

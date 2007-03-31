@@ -578,14 +578,14 @@ CropStandard::CropStandard (Block& al)
     last_time (al.check ("last_time")
                ? new Time (al.alist ("last_time"))
                : NULL),
-    development (Librarian<Phenology>::build_item (al, "Devel")),
+    development (BuildBase::build_item<Phenology> (al, "Devel")),
     partition (al.alist ("Partit")),
     vernalization (al.check ("Vernal")
                    ? al.alist ("Vernal")
                    : Vernalization::no_vernalization ()),
-    photo (Librarian<Photo>::build_item (al, "LeafPhot")),
+    photo (BuildBase::build_item<Photo> (al, "LeafPhot")),
     nitrogen (al.alist ("CrpN")),
-    water_stress_effect (Librarian<WSE>::build_item (al, 
+    water_stress_effect (BuildBase::build_item<WSE> (al, 
                                                      "water_stress_effect")),
     enable_N_stress (al.flag ("enable_N_stress")),
     min_light_fraction (al.number ("min_light_fraction"))

@@ -280,7 +280,7 @@ UZ1DRichard::UZ1DRichard (Block& al)
     max_iterations (al.integer ("max_iterations")),
     max_absolute_difference (al.number ("max_absolute_difference")),
     max_relative_difference (al.number ("max_relative_difference")),
-    K_average (Librarian<Average>::build_item (al, "K_average"))
+    K_average (BuildBase::build_item<Average> (al, "K_average"))
 { }
 
 UZ1DRichard::~UZ1DRichard ()

@@ -127,7 +127,7 @@ Horizon::Implementation::Implementation (Block& al)
     anisotropy (al.number ("anisotropy")),
     attributes (get_attributes (al.alist_sequence ("attributes"))),
     dimensions (get_dimensions (al.alist_sequence ("attributes"))),
-    nitrification (Librarian<Nitrification>::build_item (al, "Nitrification")),
+    nitrification (BuildBase::build_item<Nitrification> (al, "Nitrification")),
     hor_heat (al.alist ("HorHeat"))
 { }
 
@@ -370,8 +370,8 @@ Horizon::Horizon (Block& al)
     fast_clay (-42.42e42),
     fast_humus (-42.42e42),
     name (al.identifier ("type")),
-    hydraulic (Librarian<Hydraulic>::build_item (al, "hydraulic")),
-    tortuosity (Librarian<Tortuosity>::build_item (al, "tortuosity"))
+    hydraulic (BuildBase::build_item<Hydraulic> (al, "hydraulic")),
+    tortuosity (BuildBase::build_item<Tortuosity> (al, "tortuosity"))
 { }
 
 void 

@@ -113,9 +113,9 @@ XYSourceCombine::load (Treelog& msg)
 
 XYSourceCombine::XYSourceCombine (Block& al)
   : XYSource (al),
-    scope (Librarian<Source>::build_vector (al, "source")),
-    x_expr (Librarian<Number>::build_item (al, "x")),
-    y_expr (Librarian<Number>::build_item (al, "y")),
+    scope (BuildBase::build_vector<Source> (al, "source")),
+    x_expr (BuildBase::build_item<Number> (al, "x")),
+    y_expr (BuildBase::build_item<Number> (al, "y")),
     title_ (al.name ("title", y_expr->title () + " vs " + x_expr->title ())),
     x_dimension_ ("UNINITIALIZED"),
     y_dimension_ ("UNINITIALIZED"),

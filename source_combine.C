@@ -106,8 +106,8 @@ SourceCombine::load (Treelog& msg)
 
 SourceCombine::SourceCombine (Block& al)
   : Source (al),
-    scope (Librarian<Source>::build_vector (al, "source")),
-    expr (Librarian<Number>::build_item (al, "expr")),
+    scope (BuildBase::build_vector<Source> (al, "source")),
+    expr (BuildBase::build_item<Number> (al, "expr")),
     title_ (al.identifier ("title", expr->title ())),
     dimension_ ("UNINITIALIZED"),
     with_ (al.name ("with", "")),

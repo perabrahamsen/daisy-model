@@ -68,7 +68,7 @@ A location and content of a soil layer.");
     }
     Layer (Block& al)
       : end (al.number ("end")),
-	horizon (Librarian<Horizon>::build_item (al, "horizon"))
+	horizon (BuildBase::build_item<Horizon> (al, "horizon"))
     { }
     ~Layer ()
     { }

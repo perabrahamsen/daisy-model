@@ -161,7 +161,7 @@ public:
       {
         // GCC 2.95 needs the extra variable for the asignment.
         std::auto_ptr<Depth> depth
-          (Librarian<Depth>::build_item (al, "pressure_table"));
+          (BuildBase::build_item<Depth> (al, "pressure_table"));
         pressure_table = depth;
       }
   }

@@ -190,11 +190,11 @@ Msoltranrect2x1::output (Log&) const
 
 Msoltranrect2x1::Msoltranrect2x1 (Block& al)
   : Msoltranrect (al),
-    transport (Librarian<Transport>::build_item (al, "transport")),
-    reserve (Librarian<Transport>::build_item (al, "transport_reserve")),
-    last_resort (Librarian<Transport>::build_item (al, 
+    transport (BuildBase::build_item<Transport> (al, "transport")),
+    reserve (BuildBase::build_item<Transport> (al, "transport_reserve")),
+    last_resort (BuildBase::build_item<Transport> (al, 
                                                    "transport_last_resort")),
-    transport_solid (Librarian<Transport>::build_item (al, "transport_solid"))
+    transport_solid (BuildBase::build_item<Transport> (al, "transport_solid"))
 { }
 
 Msoltranrect2x1::~Msoltranrect2x1 ()

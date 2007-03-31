@@ -237,7 +237,7 @@ ParserFile::Implementation::get_integer ()
     }
   Block block (metalib, treelog, "integer");
   std::auto_ptr<Integer> integer 
-    (Librarian<Integer>::build_alist (block, *al, "integer"));
+    (BuildBase::build_alist<Integer> (block, *al, "integer"));
   if (!block.ok ()
       || !integer->initialize (treelog)
       || !integer->check (Scope::null (), treelog))
@@ -345,7 +345,7 @@ ParserFile::Implementation::get_number (const std::string& syntax_dim)
     }
   Block block (metalib, treelog, "number");
   std::auto_ptr<Number> number 
-    (Librarian<Number>::build_alist (block, *al, "number"));
+    (BuildBase::build_alist<Number> (block, *al, "number"));
   if (!block.ok ()
       || !number->initialize (treelog)
       || !number->check (Scope::null (), treelog))
@@ -941,7 +941,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		{
                   Block block (metalib, lexer->err, "input");
 		  std::auto_ptr<Parser> parser 
-                    (Librarian<Parser>::build_alist (block, al, "input"));
+                    (BuildBase::build_alist<Parser> (block, al, "input"));
                   if (!block.ok () || !parser->check ())
                     error ("file error");
                   else

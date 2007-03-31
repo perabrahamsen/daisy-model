@@ -125,7 +125,7 @@ EquilibriumGoal_A::initialize (Block& block, const Soil& soil)
   initialize_state = init_succes;
 
   auto_ptr<Pedotransfer> pedo_goal_A 
-    (Librarian<Pedotransfer>::build_alist (block, alist.alist ("goal_A"),
+    (BuildBase::build_alist<Pedotransfer> (block, alist.alist ("goal_A"),
                                           "goal_A"));
   if (pedo_goal_A->check (soil, "g/cm^3", block.msg ()))
     pedo_goal_A->set (soil, goal_A, "g/cm^3");
@@ -134,7 +134,7 @@ EquilibriumGoal_A::initialize (Block& block, const Soil& soil)
   Pedotransfer::debug_message ("goal_A", goal_A, "g/cm^3", block.msg ());
 
   auto_ptr<Pedotransfer> pedo_min_B 
-    (Librarian<Pedotransfer>::build_alist (block, alist.alist ("min_B"),
+    (BuildBase::build_alist<Pedotransfer> (block, alist.alist ("min_B"),
                                           "min_B"));
   if (pedo_min_B->check (soil, "g/cm^3", block.msg ()))
     pedo_min_B->set (soil, min_B, "g/cm^3");

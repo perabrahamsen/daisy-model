@@ -187,7 +187,7 @@ Daisy::Daisy (Block& al)
     metalib (al.metalib ()),
     running (false),
     output_log (new Output (al)),
-    print_time (Librarian<Condition>::build_item (al, "print_time")),
+    print_time (BuildBase::build_item<Condition> (al, "print_time")),
     time (al.alist ("time")),
     timestep (al.check ("timestep") 
               ? submodel<Timestep> (al, "timestep")
@@ -196,9 +196,9 @@ Daisy::Daisy (Block& al)
     stop (al.check ("stop")
 	  ? Time (al.alist ("stop")) 
 	  : Time (9999, 1, 1, 1)),
-    action (Librarian<Action>::build_item (al, "manager")),
+    action (BuildBase::build_item<Action> (al, "manager")),
     weather (al.check ("weather") 
-	     ? Librarian<Weather>::build_item (al, "weather")
+	     ? BuildBase::build_item<Weather> (al, "weather")
 	     : NULL), 
     field (new Field (al, "column")),
     harvest (map_submodel_const<Harvest> (al, "harvest"))

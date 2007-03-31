@@ -258,7 +258,7 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
       alist.add ("type", type);
       const Syntax& syntax  = library.syntax (type);
       daisy_assert (syntax.check (metalib, alist, block.msg ()));
-      pet.reset (Librarian<Pet>::build_alist (block, alist, "pet"));
+      pet.reset (BuildBase::build_alist<Pet> (block, alist, "pet"));
     }
 
   if (!difrad.get ())                      // Explicit.
@@ -279,7 +279,7 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
       alist.add ("type", type);
       const Syntax& syntax = library.syntax (type);
       daisy_assert (syntax.check (metalib, alist, block.msg ()));
-      difrad.reset (Librarian<Difrad>::build_alist (block, alist, "difrad"));
+      difrad.reset (BuildBase::build_alist<Difrad> (block, alist, "difrad"));
     }
 }
 
@@ -458,9 +458,9 @@ BioclimateStandard::BioclimateStandard (Block& al)
     sun_PAR_ (No + 1),
     sun_LAI_fraction_ (No),
     shared_light_fraction_ (1.0),
-    net_radiation (Librarian<NetRadiation>::build_item (al, "net_radiation")),
+    net_radiation (BuildBase::build_item<NetRadiation> (al, "net_radiation")),
     pet (al.check ("pet") 
-         ? Librarian<Pet>::build_item (al, "pet")
+         ? BuildBase::build_item<Pet> (al, "pet")
          : NULL),
     total_ep (0.0),
     total_ea (0.0),
@@ -497,13 +497,13 @@ BioclimateStandard::BioclimateStandard (Block& al)
     pond_ea (0.0),
     soil_ep (0.0),
     soil_ea (0.0),
-    svat (Librarian<SVAT>::build_item (al, "svat")),
+    svat (BuildBase::build_item<SVAT> (al, "svat")),
     crop_ep (0.0),
     crop_ea (0.0),
     production_stress (-1.0),
-    raddist (Librarian<Raddist>::build_item (al, "raddist")),
+    raddist (BuildBase::build_item<Raddist> (al, "raddist")),
     difrad (al.check ("difrad") 
-         ? Librarian<Difrad>::build_item (al, "difrad")
+         ? BuildBase::build_item<Difrad> (al, "difrad")
          : NULL),
     difrad0 (0.0),
 

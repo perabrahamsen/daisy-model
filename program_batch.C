@@ -78,7 +78,7 @@ struct ProgramBatch : public Program
   ProgramBatch (Block& al)
     : Program (al),
       directory (al.name ("directory")),
-      program (Librarian<Program>::build_vector (al, "run")),
+      program (BuildBase::build_vector<Program> (al, "run")),
       metalib (al.metalib ())
   { }
 

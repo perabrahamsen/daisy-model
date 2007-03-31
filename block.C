@@ -164,8 +164,8 @@ Block::Implementation::expand_string (Block& block,
                         if (library.name () == symbol (Stringer::component))
                           {
                             const std::auto_ptr<Stringer> stringer 
-                              (Librarian<Stringer>::build_alist (block,
-                                                                  obj, key));
+                              (BuildBase::build_alist<Stringer> (block,
+                                                                 obj, key));
                             if (!block.ok () 
                                 || !stringer->initialize (msg)
                                 || !stringer->check (scope, msg)
@@ -176,7 +176,7 @@ Block::Implementation::expand_string (Block& block,
                         else if (library.name () == symbol (Number::component))
                           {
                             const std::auto_ptr<Number> number 
-                              (Librarian<Number>::build_alist (block, 
+                              (BuildBase::build_alist<Number> (block, 
                                                                obj, key));
                             if (!block.ok () 
                                 || !number->initialize (msg)

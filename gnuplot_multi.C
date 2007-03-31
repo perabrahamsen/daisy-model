@@ -85,7 +85,7 @@ GnuplotMulti::GnuplotMulti (Block& al)
   : Gnuplot (al),
     before (al.identifier_sequence ("before")),
     after (al.identifier_sequence ("after")),
-    graph (Librarian<Gnuplot>::build_vector (al, "graph"))
+    graph (BuildBase::build_vector<Gnuplot> (al, "graph"))
 { }
 
 GnuplotMulti::~GnuplotMulti ()

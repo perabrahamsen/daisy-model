@@ -86,7 +86,7 @@ public:
   ActionWithColumn (Block& al)
     : Action (al),
       column (al.identifier ("column")),
-      actions (Librarian<Action>::build_vector (al, "actions"))
+      actions (BuildBase::build_vector<Action> (al, "actions"))
   { }
 public:
   ~ActionWithColumn ()

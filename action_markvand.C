@@ -376,7 +376,7 @@ ActionMarkvand::crop_map_t::crop_map_t (Block& al, const std::string& key)
     {
       Block nest (al, syntax, *alists[i], sequence_id (key, i));
       (*this)[alists[i]->name ("Daisy")] 
-	= Librarian<MV_Crop>::build_item (nest, "MARKVAND");
+	= BuildBase::build_item<MV_Crop> (nest, "MARKVAND");
     }
 }
 
@@ -621,7 +621,7 @@ ActionMarkvand::output (Log& log) const
 
 ActionMarkvand::ActionMarkvand (Block& al)
   : Action (al),
-    soil (Librarian<MV_Soil>::build_item (al, "soil")),
+    soil (BuildBase::build_item<MV_Soil> (al, "soil")),
     crop_map (al, "map"),
     T_sum (al.number ("T_sum", -1.0)),
     dt (al.number ("dt", -42.42e42)),

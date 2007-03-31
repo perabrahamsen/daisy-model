@@ -225,7 +225,7 @@ Toplevel::initialize ()
     throw EXIT_FAILURE;
   {                             // Limit lifetime of block.
     Block block (metalib_, *msg, "Building");
-    program_.reset (Librarian<Program>::build_alist (block,
+    program_.reset (BuildBase::build_alist<Program> (block,
                                                      program_alist (), "run"));
     if (!block.ok ())
       throw EXIT_FAILURE;
@@ -348,7 +348,7 @@ Toplevel::command_line (int& argc, char**& argv)
 		    std::auto_ptr<Block> block (new Block (metalib_, *msg, 
                                                            "Building"));
                     std::auto_ptr<Program> program
-                      (Librarian<Program>::build_alist (*block, p_alist, 
+                      (BuildBase::build_alist<Program> (*block, p_alist, 
                                                         "Command line"));
 		    if (!block->ok ())
                       throw EXIT_FAILURE;

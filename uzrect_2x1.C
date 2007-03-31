@@ -279,8 +279,8 @@ If none succeeds, the simulation ends.");
 
 UZRect2x1::UZRect2x1 (Block& al)
   : UZRect (al),
-    vertical (Librarian<UZmodel>::build_vector (al, "vertical")),
-    horizontal (Librarian<UZ1D>::build_vector (al, "horizontal"))
+    vertical (BuildBase::build_vector<UZmodel> (al, "vertical")),
+    horizontal (BuildBase::build_vector<UZ1D> (al, "horizontal"))
 { }
 
 UZRect2x1::~UZRect2x1 ()

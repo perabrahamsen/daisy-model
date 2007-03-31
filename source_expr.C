@@ -100,7 +100,7 @@ SourceExpr::load (Treelog& msg)
 
 SourceExpr::SourceExpr (Block& al)
   : SourceFile (al),
-    expr (Librarian<Number>::build_item (al, "expr")),
+    expr (BuildBase::build_item<Number> (al, "expr")),
     title_ (al.identifier ("title", expr->title ())),
     dimension_ ("UNINITIALIZED")
 { }

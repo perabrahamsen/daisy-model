@@ -97,7 +97,7 @@ struct ConditionOr : public Condition
 
   ConditionOr (Block& al)
     : Condition (al),
-      conditions (Librarian<Condition>::build_vector (al, "operands"))
+      conditions (BuildBase::build_vector<Condition> (al, "operands"))
   { }
 
   ~ConditionOr ()
@@ -133,7 +133,7 @@ struct ConditionAnd : public Condition
 
   ConditionAnd (Block& al)
     : Condition (al),
-      conditions (Librarian<Condition>::build_vector (al, "operands"))
+      conditions (BuildBase::build_vector<Condition> (al, "operands"))
   { }
 
   ~ConditionAnd ()
@@ -155,7 +155,7 @@ struct ConditionNot : public Condition
 
   ConditionNot (Block& al)
     : Condition (al),
-      condition (Librarian<Condition>::build_item (al, "operand"))
+      condition (BuildBase::build_item<Condition> (al, "operand"))
   { }
 
   ~ConditionNot ()
@@ -186,9 +186,9 @@ struct ConditionIf : public Condition
 
   ConditionIf (Block& al)
     : Condition (al),
-      if_c (Librarian<Condition>::build_item (al, "if")),
-      then_c (Librarian<Condition>::build_item (al, "then")),
-      else_c (Librarian<Condition>::build_item (al, "else"))
+      if_c (BuildBase::build_item<Condition> (al, "if")),
+      then_c (BuildBase::build_item<Condition> (al, "then")),
+      else_c (BuildBase::build_item<Condition> (al, "else"))
   { }
 
   ~ConditionIf ()

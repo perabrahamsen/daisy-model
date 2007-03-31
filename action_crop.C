@@ -648,7 +648,7 @@ ActionCrop::Tillage::load_syntax (Syntax& syntax, AttributeList&)
 ActionCrop::Tillage::Tillage (Block& al)
   : month (al.integer ("month")),
     day (al.integer ("day")),
-    operation (Librarian<Action>::build_item (al, "operation"))
+    operation (BuildBase::build_item<Action> (al, "operation"))
 { }
 
 ActionCrop::Tillage::~Tillage ()
