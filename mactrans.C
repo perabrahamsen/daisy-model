@@ -24,9 +24,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Mactrans::description = "\
-Macropore transportation of solutes.";
-
 const char *const Mactrans::component = "mactrans";
 
 Mactrans::Mactrans (Block& al)
@@ -36,4 +33,5 @@ Mactrans::Mactrans (Block& al)
 Mactrans::~Mactrans ()
 { }
 
-static Librarian Mactrans_init (Mactrans::component, Mactrans::description);
+static Librarian Mactrans_init (Mactrans::component, "\
+Macropore transportation of solutes.");

@@ -23,9 +23,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Photo::description = "\
-Leaf photosynthesis.";
-
 const char *const Photo::component = "photosynthesis";
 
 void
@@ -39,5 +36,6 @@ Photo::Photo (Block& al)
 Photo::~Photo ()
 { }
 
-static Librarian Photo_init (Photo::component, Photo::description);
+static Librarian Photo_init (Photo::component, "\
+Leaf photosynthesis.");
 

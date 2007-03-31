@@ -24,9 +24,6 @@
 #include "assertion.h"
 #include "librarian.h"
 
-const char *const Scope::description = "\
-A scope maps identifiers to values.";
-
 const char *const Scope::component = "scope";
 
 symbol 
@@ -115,6 +112,7 @@ WScope::WScope (Block& al)
 WScope::~WScope ()
 { }
 
-static Librarian Scope_init (Scope::component, Scope::description);
+static Librarian Scope_init (Scope::component, "\
+A scope maps identifiers to values.");
 
 // scope.C ends here

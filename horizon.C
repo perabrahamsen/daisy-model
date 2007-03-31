@@ -393,11 +393,6 @@ Horizon::~Horizon ()
 { }
 
 // Create Horizon library.
-const char *const Horizon::description = "\
-A `horizon' is a soil type with specific physical properties.  It is\n\
-the responsibility of the `horizon' component to specify these\n\
-properties.";
-
 const char *const Horizon::component = "horizon";
 
 static struct HorizonSyntax
@@ -412,4 +407,7 @@ static struct HorizonSyntax
   }
 } Horizon_syntax;
 
-static Librarian Horizon_init (Horizon::component, Horizon::description);
+static Librarian Horizon_init (Horizon::component, "\
+A `horizon' is a soil type with specific physical properties.  It is\n\
+the responsibility of the `horizon' component to specify these\n\
+properties.");

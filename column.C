@@ -27,11 +27,6 @@
 #include "librarian.h"
 #include <map>
 
-const char *const Column::description = "\
-A 'column' is an one-dimensional vertical description of the\n\
-soil/crop/atmosphere system.  The column component contains most of\n\
-the other processes in Daisy as submodels.";
-
 const char *const Column::component = "column";
 
 void
@@ -58,5 +53,8 @@ Column::Column (Block& al)
 Column::~Column ()
 { }
 
-static Librarian Column_init (Column::component, Column::description);
+static Librarian Column_init (Column::component, "\
+A 'column' is an one-dimensional vertical description of the\n\
+soil/crop/atmosphere system.  The column component contains most of\n\
+the other processes in Daisy as submodels.");
 

@@ -24,9 +24,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Macro::description = "\
-Preferention flow in soil macro pores.";
-
 const char *const Macro::component = "macro";
 
 bool 
@@ -44,5 +41,6 @@ Macro::Macro (const symbol id)
 Macro::~Macro ()
 { }
 
-static Librarian Macro_init (Macro::component, Macro::description);
+static Librarian Macro_init (Macro::component, "\
+Preferention flow in soil macro pores.");
 

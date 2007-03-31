@@ -45,7 +45,6 @@ public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
   double size;
-  static const char *const description;
   static const char *const component;
 
   virtual const Horizon& horizon_at (double z, double x, double y) const = 0;

@@ -56,7 +56,6 @@ class Crop : public Model
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
-  static const char *const description;
   static const char *const component;
 
   // Communication with Bioclimate.

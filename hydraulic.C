@@ -36,10 +36,6 @@
 #include <memory>
 #include <sstream>
 
-const char *const Hydraulic::description = "\
-This component is responsible for specifying the soils hydraulic\n\
-properties.";
-
 const char *const Hydraulic::component = "hydraulic";
 
 struct Hydraulic::K_at_h
@@ -283,4 +279,6 @@ Number of intervals in the table.");
   }
 } ProgramHydraulic_table_syntax;
 
-static Librarian Hydraulic_init (Hydraulic::component, Hydraulic::description);
+static Librarian Hydraulic_init (Hydraulic::component, "\
+This component is responsible for specifying the soils hydraulic\n\
+properties.");

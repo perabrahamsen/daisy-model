@@ -25,9 +25,6 @@
 
 class Log;
 
-const char *const Volume::description = "\
-A subset of 3D space.";
-
 const char *const Volume::component = "volume";
 
 std::auto_ptr<Volume>
@@ -61,6 +58,7 @@ Volume::Volume (const char *const id)
 Volume::~Volume ()
 { }
 
-static Librarian Volume_init (Volume::component, Volume::description);
+static Librarian Volume_init (Volume::component, "\
+A subset of 3D space.");
 
 // volume.C ends here.

@@ -35,7 +35,6 @@ class Scope : public Model
 private:
   const symbol title_;
 public:
-  static const char *const description;
   static const char *const component;
 
   // Use.

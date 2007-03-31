@@ -22,9 +22,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Source::description = "\
-Time series, with possible error bars and formatting information.";
-
 const char *const Source::component = "source";
 
 void 
@@ -96,4 +93,5 @@ Source::Source (Block& al)
 Source::~Source ()
 { }
 
-static Librarian Source_init (Source::component, Source::description);
+static Librarian Source_init (Source::component, "\
+Time series, with possible error bars and formatting information.");

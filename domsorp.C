@@ -23,9 +23,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Domsorp::description = "\
-Sorption and desorption of DOM to SOM.";
-
 const char *const Domsorp::component = "domsorp";
 
 void
@@ -44,4 +41,5 @@ Domsorp::Domsorp (Block& al)
 Domsorp::~Domsorp ()
 { }
 
-static Librarian Domsorp_init (Domsorp::component, Domsorp::description);
+static Librarian Domsorp_init (Domsorp::component, "\
+Sorption and desorption of DOM to SOM.");

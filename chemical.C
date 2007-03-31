@@ -24,10 +24,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Chemical::description = "\
-This component should, for a specific chemical (typically a pesticide),\n\
-provide a description of the properties of interest to Daisy.";
-
 const char *const Chemical::component = "chemical";
 
 Chemical::Chemical (Block& al)
@@ -39,5 +35,7 @@ Chemical::Chemical (Block& al)
 Chemical::~Chemical ()
 { }
 
-static Librarian Chemical_init (Chemical::component, Chemical::description);
+static Librarian Chemical_init (Chemical::component, "\
+This component should, for a specific chemical (typically a pesticide),\n\
+provide a description of the properties of interest to Daisy.");
 

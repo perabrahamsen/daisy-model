@@ -23,9 +23,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Program::description = "\
-Run a program.";
-
 const char *const Program::component = "program";
 
 Program::Program (Block& al)
@@ -36,4 +33,5 @@ Program::Program (Block& al)
 Program::~Program ()
 { }
 
-static Librarian Program_init (Program::component, Program::description);
+static Librarian Program_init (Program::component, "\
+Run a program.");

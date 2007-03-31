@@ -36,7 +36,6 @@ class Difrad : public Model
   // Content.
 public:
   const symbol name;
-  static const char *const description;
   static const char *const component;
   const AttributeList alist;	// Remember attributes for checkpoint.
 

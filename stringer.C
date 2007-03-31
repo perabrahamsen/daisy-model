@@ -30,9 +30,6 @@
 #include <vector>
 #include <memory>
 
-const char *const Stringer::description = "\
-Generic representation of strings.";
-
 const char *const Stringer::component = "string";
 
 const std::string& 
@@ -277,5 +274,6 @@ Constant value.");
   }
 } StringerIdentity_syntax;
 
-static Librarian Stringer_init (Stringer::component, Stringer::description);
+static Librarian Stringer_init (Stringer::component, "\
+Generic representation of strings.");
 

@@ -24,9 +24,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Format::description = "\
-Text formatting component.";
-
 const char *const Format::component = "format";
 
 std::ostream&
@@ -192,4 +189,5 @@ Format::Format (Block& al)
 Format::~Format ()
 { daisy_assert (nest.empty ()); }
 
-static Librarian Format_init (Format::component, Format::description);
+static Librarian Format_init (Format::component, "\
+Text formatting component.");

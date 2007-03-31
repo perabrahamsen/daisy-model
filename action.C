@@ -24,12 +24,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Action::description = "\
-The 'action' component represents management on different abstraction\n\
-levels, from a single tillage operation to strategies of how to manage\n\
-a farm.  Typically, but not necessarily, the high level management\n\
-strategies are build by combining low level management operations.";
-
 const char *const Action::component = "action";
 
 void
@@ -61,4 +55,8 @@ Action::Action (Block&, const AttributeList& al)
 Action::~Action ()
 { }
 
-static Librarian Action_init (Action::component, Action::description);
+static Librarian Action_init (Action::component, "\
+The 'action' component represents management on different abstraction\n\
+levels, from a single tillage operation to strategies of how to manage\n\
+a farm.  Typically, but not necessarily, the high level management\n\
+strategies are build by combining low level management operations.");

@@ -29,12 +29,6 @@
 #include "librarian.h"
 #include <sstream>
 
-const char *const Log::description = "\
-Running a simulation is uninteresting, unless you can get access to\n\
-the results in one way or another.  The purpose of the 'log' component\n\
-is to provide this access.  Most 'log' models does this by writing a\n\
-summary of the state to a log file.";
-
 const char *const Log::component = "log";
 
 struct Log::Implementation
@@ -190,4 +184,8 @@ Log::summarize (Treelog&)
 Log::~Log ()
 { }
 
-static Librarian Log_init (Log::component, Log::description);
+static Librarian Log_init (Log::component, "\
+Running a simulation is uninteresting, unless you can get access to\n\
+the results in one way or another.  The purpose of the 'log' component\n\
+is to provide this access.  Most 'log' models does this by writing a\n\
+summary of the state to a log file.");

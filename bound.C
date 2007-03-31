@@ -28,9 +28,6 @@
 
 // bound component.
 
-const char *const Bound::description = "\
-Specify one end of an interval boundary.";
-
 const char *const Bound::component = "bound";
 
 std::string
@@ -152,6 +149,7 @@ static struct BoundFiniteSyntax
   }
 } BoundFinite_syntax;
 
-static Librarian Bound_init (Bound::component, Bound::description);
+static Librarian Bound_init (Bound::component, "\
+Specify one end of an interval boundary.");
 
 // bound.C ends here.

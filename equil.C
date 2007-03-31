@@ -23,9 +23,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Equilibrium::description = "\
-Find equilibrium between two soil chemicals.";
-
 const char *const Equilibrium::component = "equilibrium";
 
 void
@@ -43,4 +40,5 @@ Equilibrium::Equilibrium (Block& al)
 Equilibrium::~Equilibrium ()
 { }
 
-static Librarian Equilibrium_init (Equilibrium::component, Equilibrium::description);
+static Librarian Equilibrium_init (Equilibrium::component, "\
+Find equilibrium between two soil chemicals.");

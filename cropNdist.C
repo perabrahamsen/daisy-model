@@ -24,9 +24,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 
-const char *const CropNdist::description = "\
-The 'cropNdist' component calculates the crop N distribution for photosynthesis in the canopy.";
-
 const char *const CropNdist::component = "cropNdist";
 
 CropNdist::CropNdist (Block& al)
@@ -37,5 +34,6 @@ CropNdist::CropNdist (Block& al)
 CropNdist::~CropNdist ()
 { }
 
-static Librarian CropNdist_init (CropNdist::component, CropNdist::description);
+static Librarian CropNdist_init (CropNdist::component, "\
+The 'cropNdist' component calculates the crop N distribution for photosynthesis in the canopy.");
 

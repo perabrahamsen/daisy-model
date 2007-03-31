@@ -29,9 +29,6 @@
 #include "librarian.h"
 #include <memory>
 
-const char *const WSE::description = "\
-The water stress effect on crop growth.";
-
 const char *const WSE::component = "wse";
 
 WSE::WSE (Block& al)
@@ -213,4 +210,5 @@ Number of intervals in the table.");
   }
 } ProgramWSE_table_syntax;
 
-static Librarian WSE_init (WSE::component, WSE::description);
+static Librarian WSE_init (WSE::component, "\
+The water stress effect on crop growth.");

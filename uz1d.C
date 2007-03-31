@@ -156,10 +156,6 @@ SMM1D::SMM1D (const GeometryRect& geo_, const Soil& soil_,
     }
 }
 
-const char *const UZ1D::description = "\
-The 'uz1d' component handles the horizontal water movement in the\n\
-unsaturated zone soil matrix.";
-
 const char *const UZ1D::component = "uz1d";
 
 UZ1D::UZ1D (Block& al)
@@ -169,6 +165,8 @@ UZ1D::UZ1D (Block& al)
 UZ1D::~UZ1D ()
 { }
 
-static Librarian UZ1D_init (UZ1D::component, UZ1D::description);
+static Librarian UZ1D_init (UZ1D::component, "\
+The 'uz1d' component handles the horizontal water movement in the\n\
+unsaturated zone soil matrix.");
 
 // uz1d.C ends here.

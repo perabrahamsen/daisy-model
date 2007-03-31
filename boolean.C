@@ -29,9 +29,6 @@
 #include <sstream>
 #include <vector>
 
-const char *const Boolean::description = "\
-Generic representation of booleans.";
-
 const char *const Boolean::component = "boolean";
 
 const std::string& 
@@ -295,4 +292,5 @@ The operand to check.");
   }
 } BooleanNot_syntax;
 
-static Librarian Boolean_init (Boolean::component, Boolean::description);
+static Librarian Boolean_init (Boolean::component, "\
+Generic representation of booleans.");

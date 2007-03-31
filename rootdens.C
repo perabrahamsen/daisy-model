@@ -27,9 +27,6 @@
 #include "check.h"
 #include "librarian.h"
 
-const char *const Rootdens::description = "\
-Root density calculations.";
-
 const char *const Rootdens::component = "rootdens";
 
 void
@@ -48,5 +45,6 @@ Rootdens::Rootdens (Block& al)
 Rootdens::~Rootdens ()
 { }
 
-static Librarian Rootdens_init (Rootdens::component, Rootdens::description);
+static Librarian Rootdens_init (Rootdens::component, "\
+Root density calculations.");
 

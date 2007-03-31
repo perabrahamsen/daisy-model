@@ -25,12 +25,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const SVAT::description = "\
-The task of the 'svat' component is to calculate the production\n\
-stress, given the potential evapotranspiration, the actual\n\
-evaporation from the surface, meteorological data, and the vegetation\n\
-and soil state.";
-
 const char *const SVAT::component = "svat";
 
 void
@@ -48,6 +42,10 @@ SVAT::SVAT (Block& al)
 SVAT::~SVAT ()
 { }
 
-static Librarian SVAT_init (SVAT::component, SVAT::description);
+static Librarian SVAT_init (SVAT::component, "\
+The task of the 'svat' component is to calculate the production\n\
+stress, given the potential evapotranspiration, the actual\n\
+evaporation from the surface, meteorological data, and the vegetation\n\
+and soil state.");
 
 // svat.C ends here.

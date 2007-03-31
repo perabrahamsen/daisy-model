@@ -23,9 +23,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Chemistry::description = "\
-Pesticides and other chemicals.";
-
 const char *const Chemistry::component = "chemistry";
 
 Chemistry::Chemistry (Block& al)
@@ -35,6 +32,7 @@ Chemistry::Chemistry (Block& al)
 Chemistry::~Chemistry ()
 { }
 
-static Librarian Chemistry_init (Chemistry::component, Chemistry::description);
+static Librarian Chemistry_init (Chemistry::component, "\
+Pesticides and other chemicals.");
 
 // chemistry.C ends here.

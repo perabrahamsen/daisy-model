@@ -39,11 +39,6 @@
 #include <numeric>
 #include <sstream>
 
-const char *const AM::description = "\
-The 'am' component describes various kinds of fertilizer and other\n\
-added matter such as crop residues.  In particular, it describes how\n\
-they decompose.";
-
 const char *const AM::component = "am";
 
 struct AM::Implementation
@@ -1305,5 +1300,8 @@ static struct ProgramAM_tableSyntax
   }
 } ProgramAM_table_syntax;
 
-static Librarian AM_init (AM::component, AM::description);
+static Librarian AM_init (AM::component, "\
+The 'am' component describes various kinds of fertilizer and other\n\
+added matter such as crop residues.  In particular, it describes how\n\
+they decompose.");
 

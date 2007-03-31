@@ -23,9 +23,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const ClayOM::description = "\
-Find the effect of clay on organic matter processing.";
-
 const char *const ClayOM::component = "ClayOM";
 
 ClayOM::ClayOM (Block& al)
@@ -35,4 +32,5 @@ ClayOM::ClayOM (Block& al)
 ClayOM::~ClayOM ()
 { }
 
-static Librarian ClayOM_init (ClayOM::component, ClayOM::description);
+static Librarian ClayOM_init (ClayOM::component, "\
+Find the effect of clay on organic matter processing.");

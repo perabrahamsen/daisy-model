@@ -28,10 +28,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 
-const char *const NetRadiation::description = "\
-The purpose of this component is to calculate the net radiation from\n\
-other meteorological data.";
-
 const char *const NetRadiation::component = "net_radiation";
 
 // Interface class.
@@ -249,6 +245,8 @@ FAO recommendation.");
     }
 } NetRadiation_syntax;
 
-static Librarian NetRadiation_init (NetRadiation::component, NetRadiation::description);
+static Librarian NetRadiation_init (NetRadiation::component, "\
+The purpose of this component is to calculate the net radiation from\n\
+other meteorological data.");
 
 // net_radiation.C ends here

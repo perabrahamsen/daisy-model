@@ -37,7 +37,6 @@ class Volume : public Model
   // Content.
 public:
   const symbol name;
-  static const char *const description;
   static const char *const component;
   virtual std::string one_line_description () const = 0;
 

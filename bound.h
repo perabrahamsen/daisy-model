@@ -33,7 +33,6 @@ class Bound : public Model
   // Identity.
 public:
   const symbol name;
-  static const char *const description;
   static const char *const component;
   std::string describe () const;
 

@@ -27,10 +27,6 @@
 #include "assertion.h"
 #include "librarian.h"
 
-const char *const Groundwater::description = "\
-The 'groundwater' component is responsible for specifying the\n\
-groundwater table at each timestep.";
-
 const char *const Groundwater::component = "groundwater";
 
 void
@@ -81,5 +77,7 @@ Groundwater::Groundwater (Block& al)
 Groundwater::~Groundwater ()
 { }
 
-static Librarian Groundwater_init (Groundwater::component, Groundwater::description);
+static Librarian Groundwater_init (Groundwater::component, "\
+The 'groundwater' component is responsible for specifying the\n\
+groundwater table at each timestep.");
 

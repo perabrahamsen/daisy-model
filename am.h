@@ -44,7 +44,6 @@ class AM : public Model
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
-  static const char *const description;
   static const char *const component;
   void append_to (std::vector<AOM*>& added);
   symbol real_name () const;

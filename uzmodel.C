@@ -31,11 +31,9 @@ UZmodel::UZmodel (Block& al)
 UZmodel::~UZmodel ()
 { }
 
-const char *const UZmodel::description = "\
-The 'uzmodel' component handles the vertical water movement in the\n\
-unsaturated zone soil matrix.";
-
 const char *const UZmodel::component = "uzmodel";
 
-static Librarian UZmodel_init (UZmodel::component, UZmodel::description);
+static Librarian UZmodel_init (UZmodel::component, "\
+The 'uzmodel' component handles the vertical water movement in the\n\
+unsaturated zone soil matrix.");
 

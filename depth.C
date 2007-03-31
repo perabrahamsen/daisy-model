@@ -35,9 +35,6 @@
 
 // depth component.
 
-const char *const Depth::description = "\
-Find the depth of two numbers.";
-
 const char *const Depth::component = "depth";
 
 Depth::Depth (Block& al)
@@ -315,6 +312,7 @@ Linear interpolation is used between the datapoints.");
   }
 } DepthFile_syntax;
 
-static Librarian Depth_init (Depth::component, Depth::description);
+static Librarian Depth_init (Depth::component, "\
+Find the depth of two numbers.");
 
 // depth.C ends here.

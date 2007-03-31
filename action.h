@@ -48,7 +48,6 @@ public:
   // Create and Destroy.
 public: 
   virtual bool check (const Daisy&, Treelog& err) const;
-  static const char *const description;
   static const char *const component;
 private:
   Action (const Action&);

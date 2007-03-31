@@ -35,7 +35,6 @@ class Summary : public Model
   // Content.
 public:
   const symbol name;
-  static const char *const description;
   static const char *const component;
 
   // Create and Destroy.

@@ -24,11 +24,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Adsorption::description = "\
-This component describes the adsorption of a chemical to the soil,\n\
-which among other things affects how large a fraction can be\n\
-transported with the water.";
-
 const char *const Adsorption::component = "adsorption";
 
 bool
@@ -46,4 +41,7 @@ Adsorption::Adsorption (Block& al)
 Adsorption::~Adsorption ()
 { }
 
-static Librarian Adsorption_init (Adsorption::component, Adsorption::description);
+static Librarian Adsorption_init (Adsorption::component, "\
+This component describes the adsorption of a chemical to the soil,\n\
+which among other things affects how large a fraction can be\n\
+transported with the water.");

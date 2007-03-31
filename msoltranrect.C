@@ -23,9 +23,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Msoltranrect::description = "\
-Matrix solute transport in rectangular grid.";
-
 const char *const Msoltranrect::component = "msoltranrect";
 
 Msoltranrect::Msoltranrect (Block& al)
@@ -35,6 +32,7 @@ Msoltranrect::Msoltranrect (Block& al)
 Msoltranrect::~Msoltranrect ()
 { }
 
-static Librarian Msoltranrect_init (Msoltranrect::component, Msoltranrect::description);
+static Librarian Msoltranrect_init (Msoltranrect::component, "\
+Matrix solute transport in rectangular grid.");
 
 // msoltranrect.C ends here

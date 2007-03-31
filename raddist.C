@@ -24,9 +24,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 
-const char *const Raddist::description = "\
-The 'raddist' component calculates the radiation distribution in the canopy.";
-
 const char *const Raddist::component = "raddist";
 
 void
@@ -82,5 +79,6 @@ Raddist::Raddist (Block& al)
 Raddist::~Raddist ()
 { }
 
-static Librarian Raddist_init (Raddist::component, Raddist::description);
+static Librarian Raddist_init (Raddist::component, "\
+The 'raddist' component calculates the radiation distribution in the canopy.");
 

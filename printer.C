@@ -25,12 +25,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Printer::description = "\
-The 'printer' component is responsible for converting the internal\n\
-format into various internal format.  I.e., it performs the\n\
-opposite function of the 'parser' component.  This is used for --\n\
-among other things -- creating checkpoints of the state.";
-
 const char *const Printer::component = "printer";
 
 Printer::Printer (const AttributeList& al)
@@ -40,4 +34,8 @@ Printer::Printer (const AttributeList& al)
 Printer::~Printer ()
 { }
 
-static Librarian Printer_init (Printer::component, Printer::description);
+static Librarian Printer_init (Printer::component, "\
+The 'printer' component is responsible for converting the internal\n\
+format into various internal format.  I.e., it performs the\n\
+opposite function of the 'parser' component.  This is used for --\n\
+among other things -- creating checkpoints of the state.");

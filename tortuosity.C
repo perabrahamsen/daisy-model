@@ -24,13 +24,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Tortuosity::description = "\
-Solutes in the soil can't move the shortest way between two points.\n\
-The tortuosity factor indicates how far the average solute have\n\
-moved in absolute coordinates, when it has moved a given distance\n\
-along the curved line.  This component is responsible for calculating\n\
-the soils tortuosity factor.";
-
 const char *const Tortuosity::component = "tortuosity";
 
 Tortuosity::Tortuosity (Block& al)
@@ -40,4 +33,9 @@ Tortuosity::Tortuosity (Block& al)
 Tortuosity::~Tortuosity ()
 { }
 
-static Librarian Tortuosity_init (Tortuosity::component, Tortuosity::description);
+static Librarian Tortuosity_init (Tortuosity::component, "\
+Solutes in the soil can't move the shortest way between two points.\n\
+The tortuosity factor indicates how far the average solute have\n\
+moved in absolute coordinates, when it has moved a given distance\n\
+along the curved line.  This component is responsible for calculating\n\
+the soils tortuosity factor.");

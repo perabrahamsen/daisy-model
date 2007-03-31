@@ -33,10 +33,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 
-const char *const Nitrification::description = "\
-The nitrification process, transforming ammonium into nitrate and\n\
-nitrous oxide.";
-
 const char *const Nitrification::component = "nitrification";
 
 double 
@@ -104,5 +100,7 @@ Nitrification::Nitrification (Block& al)
 Nitrification::~Nitrification ()
 { }
 
-static Librarian Nitrification_init (Nitrification::component, Nitrification::description);
+static Librarian Nitrification_init (Nitrification::component, "\
+The nitrification process, transforming ammonium into nitrate and\n\
+nitrous oxide.");
 

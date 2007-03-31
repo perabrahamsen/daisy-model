@@ -23,9 +23,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Transform::description = "\
-Generic transformations between soil components.";
-
 const char *const Transform::component = "transform";
 
 bool
@@ -48,4 +45,5 @@ Transform::Transform (Block& al)
 Transform::~Transform ()
 { }
 
-static Librarian Transform_init (Transform::component, Transform::description);
+static Librarian Transform_init (Transform::component, "\
+Generic transformations between soil components.");

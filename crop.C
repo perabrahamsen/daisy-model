@@ -11,13 +11,6 @@
 
 const double Crop::DSremove = -5001.0;
 
-const char *const Crop::description = "\
-The 'crop' component simulates a specific crop on the field, typically\n\
-averaged over one square meter, not individual plants.  Of particular\n\
-interest is water and nitrogen uptake at different depths, and the\n\
-vertical leaf area distribution, which are used for competition with\n\
-other crops.";
-
 const char *const Crop::component = "crop";
 
 double 
@@ -83,4 +76,9 @@ Crop::Crop (Block& al)
 Crop::~Crop ()
 { }
 
-static Librarian Crop_init (Crop::component, Crop::description);
+static Librarian Crop_init (Crop::component, "\
+The 'crop' component simulates a specific crop on the field, typically\n\
+averaged over one square meter, not individual plants.  Of particular\n\
+interest is water and nitrogen uptake at different depths, and the\n\
+vertical leaf area distribution, which are used for competition with\n\
+other crops.");

@@ -59,10 +59,6 @@ public:
   { }
 };
 
-const char *const 
-Exchange::description = "\
-A named value to exchange with external models.";
-
 const char *const Exchange::component = "exchange";
 
 struct ExchangeNumber : public Exchange
@@ -274,4 +270,5 @@ static struct ScopeExchangeSyntax
   }
 } ScopeExchange_syntax;
 
-static Librarian Exchange_init (Exchange::component, Exchange::description);
+static Librarian Exchange_init (Exchange::component, "\
+A named value to exchange with external models.");

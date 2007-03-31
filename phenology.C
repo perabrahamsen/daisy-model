@@ -26,9 +26,6 @@
 #include "alist.h"
 #include "librarian.h"
 
-const char *const Phenology::description = "\
-The development process.";
-
 const char *const Phenology::component = "phenology";
 
 void
@@ -77,5 +74,6 @@ Phenology::Phenology (Block& al)
 Phenology::~Phenology ()
 { }
 
-static Librarian Phenology_init (Phenology::component, Phenology::description);
+static Librarian Phenology_init (Phenology::component, "\
+The development process.");
 

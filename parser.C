@@ -24,12 +24,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Parser::description = "\
-To start the simulation, many parameters must be specified and state\n\
-variables must be given an initial value.  It is the responsibility of\n\
-the 'parser' component to read these data from an external source\n\
-(typically a setup file), and convert them into the internal format.";
-
 const char *const Parser::component = "parser";
 
 Parser::Parser (const symbol id)
@@ -43,4 +37,8 @@ Parser::Parser (Block& al)
 Parser::~Parser ()
 { }
 
-static Librarian Parser_init (Parser::component, Parser::description);
+static Librarian Parser_init (Parser::component, "\
+To start the simulation, many parameters must be specified and state\n\
+variables must be given an initial value.  It is the responsibility of\n\
+the 'parser' component to read these data from an external source\n\
+(typically a setup file), and convert them into the internal format.");

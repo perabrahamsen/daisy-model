@@ -28,9 +28,6 @@
 #include "librarian.h"
 #include <sstream>
 
-const char *const Integer::description = "\
-Generic representation of integers.";
-
 const char *const Integer::component = "integer";
 
 const std::string& 
@@ -168,6 +165,7 @@ List of clauses to match for.",
   }
 } IntegerCond_syntax;
 
-static Librarian Integer_init (Integer::component, Integer::description);
+static Librarian Integer_init (Integer::component, "\
+Generic representation of integers.");
 
 // integer.C ends here

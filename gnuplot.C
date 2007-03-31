@@ -23,9 +23,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Gnuplot::description = "\
-Plot a graph with gnuplot.";
-
 const char *const Gnuplot::component = "gnuplot";
 
 std::string 
@@ -43,4 +40,5 @@ Gnuplot::Gnuplot (Block& al)
 Gnuplot::~Gnuplot ()
 { }
 
-static Librarian Gnuplot_init (Gnuplot::component, Gnuplot::description);
+static Librarian Gnuplot_init (Gnuplot::component, "\
+Plot a graph with gnuplot.");

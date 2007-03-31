@@ -29,9 +29,6 @@
 
 // average component.
 
-const char *const Average::description = "\
-Find the average of two numbers.";
-
 const char *const Average::component = "average";
 
 Average::Average (Block& al)
@@ -159,6 +156,7 @@ std::auto_ptr<const Average>
 Average::build_geometric ()
 { return std::auto_ptr<const Average> (new AverageGeometric (__FUNCTION__)); }
 
-static Librarian Average_init (Average::component, Average::description);
+static Librarian Average_init (Average::component, "\
+Find the average of two numbers.");
 
 // average.C ends here.

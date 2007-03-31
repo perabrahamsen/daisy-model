@@ -47,7 +47,6 @@ private:
   double fast_humus;
 public:
   const symbol name;
-  static const char *const description;
   static const char *const component;
 
   // Water.

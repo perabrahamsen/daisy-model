@@ -30,9 +30,6 @@
 
 using namespace std;
 
-const char *const Pedotransfer::description = "\
-Pedotransfer functions based on soil attributes.";
-
 const char *const Pedotransfer::component = "pedotransfer";
 
 void 
@@ -93,4 +90,5 @@ Pedotransfer::Pedotransfer (Block& al)
 Pedotransfer::~Pedotransfer ()
 { }
 
-static Librarian Pedotransfer_init (Pedotransfer::component, Pedotransfer::description);
+static Librarian Pedotransfer_init (Pedotransfer::component, "\
+Pedotransfer functions based on soil attributes.");

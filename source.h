@@ -36,7 +36,6 @@ class Source : public Model
   // Content.
 public:
   const symbol name;
-  static const char *const description;
   static const char *const component;
 
   // Interface.

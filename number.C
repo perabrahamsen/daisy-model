@@ -23,9 +23,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Number::description = "\
-Generic representation of numbers.";
-
 const char *const Number::component = "number";
 
 symbol
@@ -43,4 +40,5 @@ Number::Number (Block& al)
 Number::~Number ()
 { }
 
-static Librarian Number_init (Number::component, Number::description);
+static Librarian Number_init (Number::component, "\
+Generic representation of numbers.");

@@ -37,7 +37,6 @@ class Chemical : public Model, public Solute
 public:
   const symbol name;
   const AttributeList alist;
-  static const char *const description;
   static const char *const component;
 
   // Management.

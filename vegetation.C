@@ -26,9 +26,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Vegetation::description = "\
-That green stuff.";
-
 const char *const Vegetation::component = "vegetation";
 
 double 
@@ -98,4 +95,5 @@ Vegetation::Vegetation (Block& al)
 Vegetation::~Vegetation ()
 { }
 
-static Librarian Vegetation_init (Vegetation::component, Vegetation::description);
+static Librarian Vegetation_init (Vegetation::component, "\
+That green stuff.");

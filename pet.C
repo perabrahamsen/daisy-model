@@ -30,10 +30,6 @@
 
 using namespace std;
 
-const char *const Pet::description = "\
-The 'pet' component should calculate the potential evapotranspiration\n\
-from meteorological data, as well as the crop and soil state.";
-
 const char *const Pet::component = "pet";
 
 double
@@ -77,5 +73,7 @@ Pet::Pet (Block& al)
 Pet::~Pet ()
 { }
 
-static Librarian Pet_init (Pet::component, Pet::description);
+static Librarian Pet_init (Pet::component, "\
+The 'pet' component should calculate the potential evapotranspiration\n\
+from meteorological data, as well as the crop and soil state.");
 

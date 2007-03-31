@@ -23,10 +23,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const char *const Difrad::description = "\
-The 'difrad' component should calculate the diffuse radiation from\n\
-meterological data.";
-
 const char *const Difrad::component = "difrad";
 
 void
@@ -45,5 +41,7 @@ Difrad::Difrad (Block& al)
 Difrad::~Difrad ()
 { }
 
-static Librarian Difrad_init (Difrad::component, Difrad::description);
+static Librarian Difrad_init (Difrad::component, "\
+The 'difrad' component should calculate the diffuse radiation from\n\
+meterological data.");
 

@@ -23,9 +23,6 @@
 #include "assertion.h"
 #include "librarian.h"
 
-const char *const XYSource::description = "\
-XY data series.";
-
 const char *const XYSource::component = "xysource";
 
 void 
@@ -98,4 +95,5 @@ XYSource::XYSource (Block& al)
 XYSource::~XYSource ()
 { }
 
-static Librarian XYSource_init (XYSource::component, XYSource::description);
+static Librarian XYSource_init (XYSource::component, "\
+XY data series.");

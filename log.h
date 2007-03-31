@@ -48,7 +48,6 @@ private:
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
-  static const char *const description;
   static const char *const component;
   const Metalib& metalib () const;
 

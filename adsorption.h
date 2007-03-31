@@ -34,7 +34,6 @@ class Adsorption : public Model
 {
   // Content.
 public:
-  static const char *const description;
   static const char *const component;
   const symbol name;
 

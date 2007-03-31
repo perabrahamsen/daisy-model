@@ -39,7 +39,6 @@ class Rootdens : public Model
   // Content.
 public:
   const symbol name;
-  static const char *const description;
   static const char *const component;
 protected:
   const double SpRtLength;	// Specific root length [m/g]

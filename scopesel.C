@@ -27,9 +27,6 @@
 #include "alist.h"
 #include "librarian.h"
 
-const char *const Scopesel::description = "\
-A method to choose a scope in a Daisy simulation.";
-
 const char *const Scopesel::component = "scopesel";
 
 Scopesel::Scopesel ()
@@ -91,7 +88,8 @@ static struct ScopeselNameSyntax
   }
 } ScopeselName_syntax;
 
-static Librarian Scopesel_init (Scopesel::component, Scopesel::description);
+static Librarian Scopesel_init (Scopesel::component, "\
+A method to choose a scope in a Daisy simulation.");
 
 // scopesel.C ends here
 
