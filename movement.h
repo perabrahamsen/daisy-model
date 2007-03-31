@@ -23,14 +23,7 @@
 #define MOVEMENT_H
 
 #include "model.h"
-
-// Needed for initialization order.
-#include "uzmodel.h"
-#include "uz1d.h"
-#include "macro.h"
-#include "transport.h"
-#include "mactrans.h"
-
+#include "symbol.h"
 #include <vector>
 
 class Geometry;
@@ -45,6 +38,10 @@ class Groundwater;
 class Weather;
 class Time;
 class Treelog;
+class Block;
+class Syntax;
+class AttributeList;
+class Log;
 
 class Movement : public Model
 {

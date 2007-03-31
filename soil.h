@@ -23,14 +23,16 @@
 #ifndef SOIL_H
 #define SOIL_H
 
-#include "horizon.h" // Needed for initialization order.
+#include <vector>
 
-struct AttributeList;
-struct Log;
-struct Geometry;
-struct Groundwater;
+class AttributeList;
+class Horizon;
+class Log;
+class Geometry;
+class Groundwater;
 class Syntax;
 class Block;
+class Treelog;
 
 class Soil
 {

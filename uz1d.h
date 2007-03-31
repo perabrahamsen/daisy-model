@@ -21,6 +21,7 @@
 #ifndef UZ1D_H
 #define UZ1D_H
 
+#include "model.h"
 #include "geometry_rect.h"
 #include "soil.h"
 #include "soil_water.h"

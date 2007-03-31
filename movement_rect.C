@@ -19,6 +19,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "movement.h"
+#include "geometry_rect.h"
+#include "soil.h"
+#include "soil_water.h"
+#include "soil_heat.h"
 #include "msoltranrect.h"
 #include "groundwater.h"
 #include "surface.h"

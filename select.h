@@ -24,8 +24,6 @@
 #define SELECT_H
 
 #include "destination.h"
-#include "condition.h"		// Needed for proper initialization.
-#include "number.h"             // Ditto.
 #include "model.h"
 #include "symbol.h"
 #include "units.h"

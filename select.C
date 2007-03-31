@@ -20,6 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "select.h"
+#include "condition.h"
 #include "block.h"
 #include "geometry.h"
 #include "number.h"

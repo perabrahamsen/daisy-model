@@ -23,8 +23,7 @@
 #define CHEMISTRY_H
 
 #include "model.h"
-#include "reaction.h"           // Needed for initialization order.
-#include "chemical.h"
+#include "symbol.h"
 
 class Log;
 class Geometry;
@@ -33,6 +32,10 @@ class SoilWater;
 class SoilHeat;
 class OrganicMatter;
 class Movement;
+class Chemical;
+class Treelog;
+class AttributeList;
+class Block;
 
 class Chemistry : public Model
 {

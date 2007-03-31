@@ -20,6 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "soil.h"
+#include "horizon.h"
 #include "geometry.h"
 #include "hydraulic.h"
 #include "tortuosity.h"

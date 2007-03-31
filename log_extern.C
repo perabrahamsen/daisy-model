@@ -22,6 +22,7 @@
 
 
 #include "log_extern.h"
+#include "select.h"
 #include "scope_block.h"
 #include "block.h"
 #include "assertion.h"

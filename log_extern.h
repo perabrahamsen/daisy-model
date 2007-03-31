@@ -24,6 +24,7 @@
 #define LOG_EXTERN_H
 
 #include "log_select.h"
+#include "destination.h"
 #include "scope.h"
 #include "symbol.h"
 #include <map>

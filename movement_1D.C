@@ -29,6 +29,8 @@
 #include "weather.h"
 #include "solute.h"
 #include "element.h"
+#include "transport.h"
+#include "mactrans.h"
 #include "log.h"
 #include "submodeler.h"
 #include "memutils.h"

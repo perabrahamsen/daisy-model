@@ -24,13 +24,13 @@
 #define VOLUME_H
 
 #include "model.h"
-#include "bound.h" // Needed for static initialization order.
 #include "symbol.h"
 #include <memory>
 
 class Border;
 class Treelog;
 class Block;
+class AttributeList;
 
 class Volume : public Model 
 {

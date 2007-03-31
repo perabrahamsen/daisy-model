@@ -26,10 +26,7 @@
 
 #include "model.h"
 #include "symbol.h"
-
-// Needed for initialization order.
-#include "domsorp.h"
-#include "clayom.h"
+#include <vector>
 
 class AttributeList;
 class Syntax;
@@ -44,6 +41,7 @@ class SoilNO3;
 class SoilNH4;
 class Time;
 class Treelog;
+class Block;
 
 class OrganicMatter : public Model
 {

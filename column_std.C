@@ -24,6 +24,7 @@
 #include "library.h"
 #include "surface.h"
 #include "soil_heat.h"
+#include "macro.h"
 #include "movement.h"
 #include "groundwater.h"
 #include "geometry.h"

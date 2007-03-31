@@ -21,6 +21,8 @@
 
 
 #include "log_select.h"
+#include "select.h"
+#include "condition.h"
 #include "metalib.h"
 #include "library.h"
 #include "block.h"
