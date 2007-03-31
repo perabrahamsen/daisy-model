@@ -23,7 +23,13 @@
 #ifndef PRINTER_H
 #define PRINTER_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
+#include <string>
+
+class Block;
+class AttributeList;
+class Syntax;
 
 class Printer : public Model
 {

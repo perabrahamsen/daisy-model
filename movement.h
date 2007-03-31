@@ -22,7 +22,7 @@
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
 
-#include "librarian.h"
+#include "model.h"
 
 // Needed for initialization order.
 #include "uzmodel.h"

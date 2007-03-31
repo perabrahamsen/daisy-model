@@ -21,8 +21,15 @@
 #ifndef SOURCE_H
 #define SOURCE_H
 
-#include "librarian.h"
+#include "model.h"
 #include "time.h"
+#include "source.h"
+#include "symbol.h"
+
+#include <vector>
+
+class Block;
+class Treelog;
 
 class Source : public Model
 {

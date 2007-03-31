@@ -22,11 +22,13 @@
 #ifndef CROPNDIST_H
 #define CROPNDIST_H
 
-#include "librarian.h"
+#include "model.h"
 #include "alist.h"
 #include <vector>
 
 class Log;
+class Treelog;
+class Block;
 
 class CropNdist : public Model
 {

@@ -23,7 +23,7 @@
 #ifndef BIOCLIMATE_H
 #define BIOCLIMATE_H
 
-#include "librarian.h"
+#include "model.h"
 #include "alist.h"
 #include "symbol.h"
 
@@ -39,6 +39,8 @@ class SoilWater;
 class SoilHeat;
 class Log;
 class Time;
+class Treelog;
+class Block;
 
 class Bioclimate : public Model
 { 

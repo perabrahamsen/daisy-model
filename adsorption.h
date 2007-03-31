@@ -23,10 +23,12 @@
 #ifndef ADSORPTION_H
 #define ADSORPTION_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 class Log;
 class Soil;
+class Block;
 
 class Adsorption : public Model
 {

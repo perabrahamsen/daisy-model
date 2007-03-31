@@ -22,9 +22,12 @@
 #ifndef FORMAT_H
 #define FORMAT_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <iosfwd>
 #include <stack>
+
+class Block;
 
 class Format : public Model
 {

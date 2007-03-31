@@ -21,8 +21,9 @@
 #ifndef UZRect_H
 #define UZRect_H
 
-#include "librarian.h"
+#include "model.h"
 #include "symbol.h"
+#include <vector>
 
 struct GeometryRect;
 struct Soil;
@@ -31,6 +32,8 @@ struct SoilHeat;
 struct Surface;
 struct Groundwater;
 struct Treelog;
+class Block;
+class AttributeList;
 
 class UZRect : public Model
 {

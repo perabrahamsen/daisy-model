@@ -22,13 +22,14 @@
 #ifndef CLAYOM_H
 #define CLAYOM_H
 
-#include "librarian.h"
-
+#include "model.h"
+#include "symbol.h"
 #include <vector>
 
 class SMB;
 class Soil;
 class Treelog;
+class Block;
 
 class ClayOM : public Model
 {

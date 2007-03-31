@@ -23,7 +23,7 @@
 #ifndef PET_H
 #define PET_H
 
-#include "librarian.h"
+#include "model.h"
 #include "alist.h"
 
 class Log;
@@ -35,6 +35,8 @@ class Weather;
 class Vegetation;
 class Surface;
 class Time;
+class Treelog;
+class Block;
 
 class Pet : public Model
 {

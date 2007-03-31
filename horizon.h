@@ -23,7 +23,8 @@
 #ifndef HORIZON_H
 #define HORIZON_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <vector>
 #include <memory>
 
@@ -32,6 +33,9 @@ class Hydraulic;
 class Tortuosity;
 class Texture;
 class Treelog;
+class Block;
+class Syntax;
+class AttributeList;
 
 class Horizon : public Model 
 {

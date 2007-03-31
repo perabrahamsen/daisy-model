@@ -22,7 +22,11 @@
 #ifndef BOUND_H
 #define BOUND_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
+
+class Block;
+class AttributeList;
 
 class Bound : public Model
 {

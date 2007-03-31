@@ -23,11 +23,16 @@
 #ifndef ROOTDENS_H
 #define ROOTDENS_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <vector>
 
 class Log;
 class Geometry;
+class Block;
+class Treelog;
+class AttributeList;
+class Syntax;
 
 class Rootdens : public Model
 {

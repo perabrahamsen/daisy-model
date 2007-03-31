@@ -26,7 +26,10 @@
 #include "printer.h"
 #include "symbol.h"
 #include <iosfwd>
+#include <string>
 #include <memory>
+
+class Metalib;
 
 class PrinterFile : public Printer
 {

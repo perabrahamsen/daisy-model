@@ -23,10 +23,13 @@
 #ifndef CONDITION_H
 #define CONDITION_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 class Daisy;
 class Log;
+class Block;
+class Treelog;
 
 class Condition : public Model
 {  

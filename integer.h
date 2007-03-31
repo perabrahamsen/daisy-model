@@ -22,10 +22,13 @@
 #ifndef INTEGER_H
 #define INTEGER_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <vector>
 
 class Scope;
+class Treelog;
+class Block;
 
 class Integer : public Model
 {

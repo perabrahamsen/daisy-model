@@ -23,7 +23,8 @@
 #ifndef VEGETATION_H
 #define VEGETATION_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <vector>
 
 class Log;
@@ -41,6 +42,10 @@ class PLF;
 class Harvest;
 class AM;
 class Metalib;
+class Treelog;
+class Block;
+class AttributeList;
+class Syntax;
 
 class Vegetation : public Model
 { 

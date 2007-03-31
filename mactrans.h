@@ -23,12 +23,16 @@
 #ifndef MACTRANS_H
 #define MACTRANS_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <vector>
 
 class Geometry1D;
 class SoilWater;
 class Log;
+class Treelog;
+class Block;
+class AttributeList;
 
 class Mactrans : public Model
 {

@@ -22,11 +22,16 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <vector>
 
 class Soil;
 class SoilWater;
+class Treelog;
+class Syntax;
+class AttributeList;
+class Block;
 
 class Transform : public Model
 {

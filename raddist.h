@@ -22,12 +22,14 @@
 #ifndef RADDIST_H
 #define RADDIST_H
 
-#include "librarian.h"
+#include "model.h"
 #include "alist.h"
 #include <vector>
 
 class Log;
 class Vegetation;
+class Treelog;
+class Block;
 
 class Raddist : public Model
 {

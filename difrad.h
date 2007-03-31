@@ -22,12 +22,14 @@
 #ifndef DIFRAD_H
 #define DIFRAD_H
 
-#include "librarian.h"
+#include "model.h"
 #include "alist.h"
 
 class Log;
 class Weather;
 class Time;
+class Treelog;
+class Block;
 
 class Difrad : public Model
 {

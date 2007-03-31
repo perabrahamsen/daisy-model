@@ -23,7 +23,8 @@
 #ifndef GROUNDWATER_H
 #define GROUNDWATER_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 class Log;
 class Time;
@@ -33,6 +34,9 @@ class Soil;
 class SoilWater;
 class SoilHeat;
 class Output;
+class Block;
+class Syntax;
+class AttributeList;
 
 class Groundwater : public Model
 {

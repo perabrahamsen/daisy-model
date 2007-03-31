@@ -33,6 +33,8 @@ struct Border;
 struct Block;
 struct Metalib;
 struct Daisy;
+struct Syntax;
+struct AttributeList;
 
 class Output
 {

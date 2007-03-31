@@ -22,9 +22,12 @@
 #ifndef PROGRAM_H
 #define PROGRAM_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 class Treelog;
+class Block;
+class AttributeList;
 
 class Program : public Model
 {

@@ -22,10 +22,13 @@
 #ifndef PEDOTRANSFER_H
 #define PEDOTRANSFER_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <vector>
 
 class Soil;
+class Treelog;
+class Block;
 
 class Pedotransfer : public Model
 {

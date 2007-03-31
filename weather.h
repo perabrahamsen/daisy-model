@@ -23,11 +23,13 @@
 #ifndef WEATHER_H
 #define WEATHER_H
 
-#include "librarian.h"
+#include "model.h"
 #include "im.h"
+#include "symbol.h"
 
 class Time;
 class Treelog;
+class Block;
 
 class Weather : public Model
 {

@@ -23,7 +23,9 @@
 #ifndef UZMODEL_H
 #define UZMODEL_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
+#include <vector>
 
 class Surface;
 class Groundwater;
@@ -34,6 +36,8 @@ class Library;
 class Syntax;
 class AttributeList;
 class Log;
+class Treelog;
+class Block;
 
 class UZmodel : public Model
 {

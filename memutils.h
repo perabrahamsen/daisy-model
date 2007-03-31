@@ -21,6 +21,8 @@
 #ifndef MEMUTILS_H
 #define MEMUTILS_H
 
+#include <vector>
+
 template <class ForwardIterator> // From Mumit's STL newbie guide.
 void sequence_delete (ForwardIterator first, ForwardIterator last) {
   while (first != last)

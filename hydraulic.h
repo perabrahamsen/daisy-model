@@ -23,12 +23,16 @@
 #ifndef HYDRAULIC_H
 #define HYDRAULIC_H
 
-#include "librarian.h"
+#include "model.h"
+#include "syntax.h"
 
 class Log;
 class PLF;
 class Treelog;
 class Texture;
+class Block;
+class Syntax;
+class AttributeList;
 
 class Hydraulic : public Model 
 {

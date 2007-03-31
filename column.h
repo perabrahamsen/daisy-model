@@ -23,7 +23,7 @@
 #ifndef COLUMN_H
 #define COLUMN_H
 
-#include "librarian.h"
+#include "model.h"
 #include "alist.h"
 
 class Log;
@@ -37,6 +37,7 @@ class Harvest;
 class Output;
 class Treelog;
 class Metalib;
+class Block;
 
 class Column : public Model
 {

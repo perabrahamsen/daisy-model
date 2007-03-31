@@ -24,7 +24,8 @@
 #ifndef ORGANIC_MATTER_H
 #define ORGANIC_MATTER_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 // Needed for initialization order.
 #include "domsorp.h"

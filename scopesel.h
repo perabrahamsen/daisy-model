@@ -22,10 +22,11 @@
 #ifndef SCOPESEL_H
 #define SCOPESEL_H
 
-#include "librarian.h"
+#include "model.h"
 
 class Output;
 class Scope;
+class Treelog;
 
 class Scopesel : public Model
 {

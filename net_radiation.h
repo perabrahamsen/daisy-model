@@ -23,10 +23,13 @@
 #ifndef NET_RADIATION_H
 #define NET_RADIATION_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 class Log;
 class Weather;
+class Block;
+class Treelog;
 
 class NetRadiation : public Model
 {

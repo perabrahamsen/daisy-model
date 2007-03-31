@@ -22,10 +22,15 @@
 #ifndef EQUILIBRIUM_H
 #define EQUILIBRIUM_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 class Soil;
 class SoilWater;
+class Block;
+class Syntax;
+class AttributeList;
+class Treelog;
 
 class Equilibrium : public Model
 {

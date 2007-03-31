@@ -23,7 +23,7 @@
 #ifndef AM_H
 #define AM_H
 
-#include "librarian.h"
+#include "model.h"
 #include "alist.h"
 #include <vector>
 

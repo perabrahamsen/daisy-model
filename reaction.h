@@ -22,7 +22,7 @@
 #ifndef REACTION_H
 #define REACTION_H
 
-#include "librarian.h"
+#include "model.h"
 #include "alist.h"
 
 class Log;
@@ -30,6 +30,8 @@ class Geometry;
 class Soil;
 class SoilWater;
 class Chemistry;
+class Treelog;
+class Block;
 
 class Reaction : public Model
 {

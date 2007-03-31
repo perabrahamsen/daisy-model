@@ -23,12 +23,14 @@
 #ifndef VOLUME_H
 #define VOLUME_H
 
-#include "librarian.h"
+#include "model.h"
 #include "bound.h" // Needed for static initialization order.
+#include "symbol.h"
 #include <memory>
 
 class Border;
 class Treelog;
+class Block;
 
 class Volume : public Model 
 {

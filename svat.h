@@ -23,7 +23,8 @@
 #ifndef SVAT_H
 #define SVAT_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 class Log;
 class Soil;
@@ -33,6 +34,9 @@ class Weather;
 class Vegetation;
 class Surface;
 class Pet;
+class Block;
+class Syntax;
+class AttributeList;
 
 class SVAT : public Model
 {

@@ -26,7 +26,7 @@
 #include "destination.h"
 #include "condition.h"		// Needed for proper initialization.
 #include "number.h"             // Ditto.
-#include "librarian.h"
+#include "model.h"
 #include "symbol.h"
 #include "units.h"
 #include "volume.h"
@@ -39,6 +39,8 @@ class Treelog;
 class Format;
 class Border;
 class Volume;
+class Syntax;
+class Block;
 
 struct Handle
 {

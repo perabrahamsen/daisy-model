@@ -22,13 +22,20 @@
 #ifndef DOMSORP_H
 #define DOMSORP_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
+#include <vector>
 
 class Log;
 class Soil;
 class SoilWater;
 class SOM;
 class DOM;
+class AttributeList;
+class Block;
+class Treelog;
+class Syntax;
+
 class Domsorp : public Model
 {
   // Content.

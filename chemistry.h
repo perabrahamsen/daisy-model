@@ -22,8 +22,7 @@
 #ifndef CHEMISTRY_H
 #define CHEMISTRY_H
 
-#include "librarian.h"
-
+#include "model.h"
 #include "reaction.h"           // Needed for initialization order.
 #include "chemical.h"
 

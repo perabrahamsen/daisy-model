@@ -22,9 +22,12 @@
 #ifndef BOOLEAN_H
 #define BOOLEAN_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 class Scope;
+class Treelog;
+class Block;
 
 class Boolean : public Model
 {

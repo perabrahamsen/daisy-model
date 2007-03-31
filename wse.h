@@ -22,8 +22,11 @@
 #ifndef WSE_H
 #define WSE_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
+class Block;
+class AttributeList;
 
 class WSE : public Model
 {

@@ -29,6 +29,8 @@ struct AttributeList;
 struct Log;
 struct Geometry;
 struct Groundwater;
+class Syntax;
+class Block;
 
 class Soil
 {

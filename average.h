@@ -23,8 +23,12 @@
 #ifndef AVERAGE_H
 #define AVERAGE_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <memory>
+
+class Block;
+class AttributeList;
 
 class Average : public Model
 {

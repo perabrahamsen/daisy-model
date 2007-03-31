@@ -37,6 +37,8 @@ struct Element;
 struct Adsorption;
 struct SMB;
 struct OM;
+class Treelog;
+class Block;
 
 class DOM
 { 

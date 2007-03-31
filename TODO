@@ -2,8 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Metalib
 
-** Fjern librarian.h fra headerfiler.
-
 ** Inline Component::description
 
 * Generer DLL i make dist?

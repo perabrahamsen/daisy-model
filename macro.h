@@ -23,13 +23,16 @@
 #ifndef MACRO_H
 #define MACRO_H
 
-#include "librarian.h"
+#include "model.h"
+#include "syntax.h"
 #include <vector>
 
 class Geometry1D;
 class Soil;
 class Log;
 class Surface;
+class Treelog;
+class Block;
 
 class Macro : public Model
 {

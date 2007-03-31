@@ -22,13 +22,18 @@
 #ifndef PHENOLOGY_H
 #define PHENOLOGY_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <string>
 
 class Log;
 class PLF;
 class Production;
 class Vernalization;
+class Treelog;
+class Block;
+class Syntax;
+class AttributeList;
 
 class Phenology : public Model 
 {

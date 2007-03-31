@@ -22,9 +22,13 @@
 #ifndef STRINGER_H
 #define STRINGER_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
+#include <string>
 
 class Scope;
+class Block;
+class Treelog;
 
 class Stringer : public Model
 {

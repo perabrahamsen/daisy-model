@@ -21,10 +21,12 @@
 #ifndef GNUPLOT_H
 #define GNUPLOT_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <ostream>
 
 class Treelog;
+class Block;
 
 class Gnuplot : public Model
 {

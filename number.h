@@ -23,10 +23,12 @@
 #define NUMBER_H
 
 #include "symbol.h"
-#include "librarian.h"
+#include "model.h"
 #include <vector>
 
 class Scope;
+class Treelog;
+class Block;
 
 class Number : public Model
 {

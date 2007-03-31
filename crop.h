@@ -25,7 +25,7 @@
 
 #include "time.h"
 #include "alist.h"
-#include "librarian.h"
+#include "model.h"
 #include <vector>
 
 class Log;
@@ -47,6 +47,8 @@ class SoilNO3;
 class Column;
 class Harvest;
 class AM;
+class Treelog;
+class Block;
 
 class Crop : public Model 
 {

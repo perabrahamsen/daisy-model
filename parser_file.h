@@ -24,7 +24,11 @@
 #define PARSER_FILE_H
 
 #include "parser.h"
+#include <string>
 #include <memory>
+
+class Metalib;
+class Treelog;
 
 class ParserFile : public Parser
 {

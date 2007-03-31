@@ -25,15 +25,18 @@
 
 // These must be included in the header file, for 'load_syntax' to work.
 #include "adsorption.h"
+#include <vector>
 #include <string>
 #include <memory>
 
 struct Log;
 struct Syntax;
 struct AttributeList;
+class Block;
 struct Geometry;
 struct Soil;
 struct SoilWater;
+class Treelog;
 
 class Solute
 {

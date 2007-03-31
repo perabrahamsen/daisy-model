@@ -22,17 +22,8 @@
 #ifndef MSOLTRANRECT_H
 #define MSOLTRANRECT_H
 
-#include "librarian.h"
-
-#if 0
-// Needed for initialization order.
-#include "uzmodel.h"
-#include "uz1d.h"
-#include "macro.h"
-#include "transport.h"
-#include "mactrans.h"
-#endif
-
+#include "model.h"
+#include "symbol.h"
 #include <vector>
 
 class Log;
@@ -47,6 +38,8 @@ class Groundwater;
 class Weather;
 class Time;
 class Treelog;
+class AttributeList;
+class Block;
 
 class Msoltranrect : public Model
 {

@@ -23,9 +23,12 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 class Treelog;
+class AttributeList;
+class Block;
 
 class Parser : public Model
 {

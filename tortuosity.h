@@ -23,9 +23,11 @@
 #ifndef TORTUOSITY_H
 #define TORTUOSITY_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 class Hydraulic;
+class Block;
 
 class Tortuosity : public Model
 {

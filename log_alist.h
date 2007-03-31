@@ -26,6 +26,8 @@
 #include "log.h"
 #include <deque>
 
+class Library;
+
 struct LogAList : public Log
 {
   // Filter functions.

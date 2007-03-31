@@ -24,7 +24,7 @@
 #define LOG_H
 
 #include "border.h"
-#include "librarian.h"
+#include "model.h"
 #include "alist.h"
 #include "symbol.h"
 #include <iosfwd>
@@ -37,6 +37,7 @@ class Soil;
 class Time;
 class Metalib;
 class Treelog;
+class Block;
 
 class Log : public Model
 {

@@ -21,7 +21,14 @@
 #ifndef XYSOURCE_H
 #define XYSOURCE_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
+#include <vector>
+
+class Block;
+class Treelog;
+class Syntax;
+class AttributeList;
 
 class XYSource : public Model
 {

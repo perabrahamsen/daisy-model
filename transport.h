@@ -23,12 +23,17 @@
 #ifndef TRANSPORT_H
 #define TRANSPORT_H
 
-#include "librarian.h"
+#include "model.h"
+#include "syntax.h"
+#include <vector>
 
 class Geometry1D;
 class Soil;
 class SoilWater;
 class Adsorption;
+class Block;
+class AttributeList;
+class Treelog;
 
 class Transport : public Model
 {

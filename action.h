@@ -23,11 +23,13 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#include "librarian.h"
+#include "model.h"
 #include "alist.h"
 
 class Log;
 class Daisy;
+class Treelog;
+class Block;
 
 class Action : public Model
 {

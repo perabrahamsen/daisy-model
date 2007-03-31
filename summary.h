@@ -22,11 +22,13 @@
 #ifndef SUMMARY_H
 #define SUMMARY_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 #include <vector>
 
 struct Select;
 struct Treelog;
+class Block;
 
 class Summary : public Model
 {

@@ -22,8 +22,12 @@
 #define GNUPLOT_BASE_H
 
 #include "gnuplot.h"
+#include <vector>
 #include <string>
 #include <map>
+
+class Syntax;
+class AttributeList;
 
 class GnuplotBase : public Gnuplot
 {

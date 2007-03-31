@@ -23,10 +23,11 @@
 #define SCOPE_H
 
 #include "symbol.h"
-#include "librarian.h"
+#include "model.h"
 #include <vector>
 
 class Treelog;
+class Block;
 
 class Scope : public Model
 {

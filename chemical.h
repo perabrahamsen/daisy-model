@@ -24,7 +24,7 @@
 #ifndef CHEMICAL_H
 #define CHEMICAL_H
 
-#include "librarian.h"
+#include "model.h"
 #include "solute.h"
 #include "alist.h"
 

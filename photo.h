@@ -21,15 +21,16 @@
 #ifndef PHOTO_H
 #define PHOTO_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
+#include <vector>
 
 class CanopyStandard;
 class Phenology;
 class Log;
 class Treelog;
-
-
-#include <vector>
+class Block;
+class AttributeList;
 
 class Photo : public Model 
 {

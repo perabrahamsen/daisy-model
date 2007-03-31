@@ -22,10 +22,12 @@
 #ifndef DEPTH_H
 #define DEPTH_H
 
-#include "librarian.h"
+#include "model.h"
+#include "symbol.h"
 
 class Time;
 class Treelog;
+class Block;
 
 class Depth : public Model
 {
