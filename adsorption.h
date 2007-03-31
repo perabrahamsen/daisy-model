@@ -50,6 +50,4 @@ public:
   ~Adsorption ();
 };
 
-static Librarian<Adsorption> Adsorption_init;
-
 #endif // ADSORPTION_H

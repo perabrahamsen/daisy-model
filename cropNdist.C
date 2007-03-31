@@ -36,3 +36,5 @@ CropNdist::CropNdist (Block& al)
 CropNdist::~CropNdist ()
 { }
 
+static BuildBase CropNdist_init (CropNdist::component, CropNdist::description);
+

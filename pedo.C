@@ -91,3 +91,5 @@ Pedotransfer::Pedotransfer (Block& al)
 
 Pedotransfer::~Pedotransfer ()
 { }
+
+static BuildBase Pedotransfer_init (Pedotransfer::component, Pedotransfer::description);

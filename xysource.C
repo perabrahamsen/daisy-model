@@ -96,3 +96,5 @@ XYSource::XYSource (Block& al)
 
 XYSource::~XYSource ()
 { }
+
+static BuildBase XYSource_init (XYSource::component, XYSource::description);

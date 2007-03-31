@@ -50,3 +50,5 @@ Condition::Condition (const char *const id)
 Condition::~Condition ()
 { }
 
+static BuildBase Condition_init (Condition::component, Condition::description);
+

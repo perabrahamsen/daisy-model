@@ -60,6 +60,4 @@ public:
   ~Source ();
 };
 
-static Librarian<Source> Source_init;
-
 #endif // SOURCE_H

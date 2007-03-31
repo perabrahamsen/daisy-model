@@ -97,6 +97,4 @@ public:
   ~Horizon ();
 };
 
-static Librarian<Horizon> Horizon_init;
-
 #endif // HORIZON_H

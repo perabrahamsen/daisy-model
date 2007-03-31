@@ -71,6 +71,4 @@ public:
   ~UZmodel ();
 };
 
-static Librarian<UZmodel> UZmodel_init;
-
 #endif // UZMODEL_H

@@ -90,6 +90,8 @@ static struct ScopeselNameSyntax
   }
 } ScopeselName_syntax;
 
+static BuildBase Scopesel_init (Scopesel::component, Scopesel::description);
+
 // scopesel.C ends here
 
 

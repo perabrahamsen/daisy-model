@@ -81,3 +81,5 @@ Raddist::Raddist (Block& al)
 Raddist::~Raddist ()
 { }
 
+static BuildBase Raddist_init (Raddist::component, Raddist::description);
+

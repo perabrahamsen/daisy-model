@@ -47,4 +47,6 @@ SVAT::SVAT (Block& al)
 SVAT::~SVAT ()
 { }
 
+static BuildBase SVAT_init (SVAT::component, SVAT::description);
+
 // svat.C ends here.

@@ -41,3 +41,5 @@ Gnuplot::Gnuplot (Block& al)
 
 Gnuplot::~Gnuplot ()
 { }
+
+static BuildBase Gnuplot_init (Gnuplot::component, Gnuplot::description);

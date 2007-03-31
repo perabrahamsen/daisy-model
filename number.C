@@ -41,3 +41,5 @@ Number::Number (Block& al)
 
 Number::~Number ()
 { }
+
+static BuildBase Number_init (Number::component, Number::description);

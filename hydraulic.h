@@ -81,6 +81,4 @@ public:
   ~Hydraulic ();
 };
 
-static Librarian<Hydraulic> Hydraulic_init;
-
 #endif // HYDRAULIC_H

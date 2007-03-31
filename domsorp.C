@@ -42,3 +42,5 @@ Domsorp::Domsorp (Block& al)
 
 Domsorp::~Domsorp ()
 { }
+
+static BuildBase Domsorp_init (Domsorp::component, Domsorp::description);

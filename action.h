@@ -58,6 +58,4 @@ public:
   ~Action ();
 };
 
-static Librarian<Action> Action_init;
-
 #endif // ACTION_H

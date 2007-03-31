@@ -38,3 +38,5 @@ Photo::Photo (Block& al)
 Photo::~Photo ()
 { }
 
+static BuildBase Photo_init (Photo::component, Photo::description);
+

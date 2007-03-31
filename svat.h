@@ -61,8 +61,6 @@ public:
   ~SVAT ();
 };
 
-static Librarian<SVAT> SVAT_init;
-
 #endif // SVAT_H
 
 // svat.h ends here.

@@ -51,6 +51,4 @@ public:
   ~Stringer ();
 };
 
-static Librarian<Stringer> Stringer_init;
-
 #endif // STRINGER_H

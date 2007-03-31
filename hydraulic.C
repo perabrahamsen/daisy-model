@@ -281,3 +281,5 @@ Number of intervals in the table.");
     BuildBase::add_type (Program::component, "hydraulic", alist, syntax, &make);
   }
 } ProgramHydraulic_table_syntax;
+
+static BuildBase Hydraulic_init (Hydraulic::component, Hydraulic::description);

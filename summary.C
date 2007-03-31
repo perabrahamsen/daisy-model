@@ -34,3 +34,5 @@ Summary::Summary (Block& al)
 Summary::~Summary ()
 { }
 
+static BuildBase Summary_init (Summary::component, Summary::description);
+

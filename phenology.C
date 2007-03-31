@@ -75,3 +75,6 @@ Phenology::Phenology (Block& al)
 
 Phenology::~Phenology ()
 { }
+
+static BuildBase Phenology_init (Phenology::component, Phenology::description);
+

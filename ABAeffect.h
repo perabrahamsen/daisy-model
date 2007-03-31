@@ -21,6 +21,7 @@
 
 #ifndef ABAEFFECT_H
 #define ABAEFFECT_H
+
 #include "librarian.h"
 #include "alist.h"
 #include <vector>
@@ -49,7 +50,5 @@ public:
   static const AttributeList& default_model ();
   ~ABAEffect ();
 };
-
-static Librarian<ABAEffect> ABAEffect_init;
 
 #endif // ABAEFFECT_H

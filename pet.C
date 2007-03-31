@@ -76,3 +76,5 @@ Pet::Pet (Block& al)
 Pet::~Pet ()
 { }
 
+static BuildBase Pet_init (Pet::component, Pet::description);
+

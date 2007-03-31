@@ -58,6 +58,4 @@ public:
   ~Pedotransfer ();
 };
 
-static Librarian<Pedotransfer> Pedotransfer_init;
-
 #endif // PEDOTRANSFER_H

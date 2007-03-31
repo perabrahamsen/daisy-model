@@ -34,3 +34,5 @@ Reaction::Reaction (Block& al)
 
 Reaction::~Reaction ()
 { }
+
+static BuildBase Reaction_init (Reaction::component, Reaction::description);

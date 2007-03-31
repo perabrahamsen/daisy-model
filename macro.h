@@ -64,6 +64,4 @@ public:
   ~Macro ();
 };
 
-static Librarian<Macro> Macro_init;
-
 #endif // MACRO_H

@@ -47,6 +47,4 @@ public:
   ~Summary ();
 };
 
-static Librarian<Summary> Summary_init;
-
 #endif // SUMMARY_H

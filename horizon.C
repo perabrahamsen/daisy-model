@@ -410,3 +410,5 @@ static struct HorizonSyntax
     BuildBase::add_base (Horizon::component, alist, syntax);
   }
 } Horizon_syntax;
+
+static BuildBase Horizon_init (Horizon::component, Horizon::description);

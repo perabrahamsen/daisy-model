@@ -211,3 +211,5 @@ Number of intervals in the table.");
     BuildBase::add_type (Program::component, "wse", alist, syntax, &make);
   }
 } ProgramWSE_table_syntax;
+
+static BuildBase WSE_init (WSE::component, WSE::description);

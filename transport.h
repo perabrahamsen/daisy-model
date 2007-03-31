@@ -60,6 +60,4 @@ public:
   ~Transport ();
 };
 
-static Librarian<Transport> Transport_init;
-
 #endif // TRANSPORT_H

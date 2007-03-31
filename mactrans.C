@@ -34,3 +34,5 @@ Mactrans::Mactrans (Block& al)
 
 Mactrans::~Mactrans ()
 { }
+
+static BuildBase Mactrans_init (Mactrans::component, Mactrans::description);

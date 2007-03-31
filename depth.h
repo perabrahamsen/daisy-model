@@ -51,6 +51,4 @@ public:
   ~Depth ();
 };
 
-static Librarian<Depth> Depth_init;
-
 #endif // DEPTH_H

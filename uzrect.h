@@ -62,6 +62,4 @@ public:
   ~UZRect ();
 };
 
-static Librarian<UZRect> UZRect_init;
-
 #endif // UZRect_H

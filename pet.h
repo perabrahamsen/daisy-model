@@ -68,6 +68,4 @@ public:
   ~Pet ();
 };
 
-static Librarian<Pet> Pet_init;
-
 #endif // PET_H

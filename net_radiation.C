@@ -248,4 +248,6 @@ FAO recommendation.");
     }
 } NetRadiation_syntax;
 
+static BuildBase NetRadiation_init (NetRadiation::component, NetRadiation::description);
+
 // net_radiation.C ends here

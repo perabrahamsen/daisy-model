@@ -72,6 +72,4 @@ public:
   ~Raddist ();
 };
 
-static Librarian<Raddist> Raddist_init;
-
 #endif // RADDIST_H

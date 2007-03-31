@@ -128,9 +128,12 @@ BuildBase::build_vector_const (const char *const component,
 Library& 
 BuildBase::library (const char* component)
 {
-  daisy_assert (content);
-  return content->library (component);
+  if (!content)
+    content = new Intrinsics ();
+
+  return content->add (component);
 }
+ 
 
 void 
 BuildBase::add_base (const char *const component,
@@ -197,12 +200,8 @@ BuildBase::load_syntax (Syntax& syntax, AttributeList&)
 BuildBase::BuildBase (const char *const component,
                       const char *const description)
 {
-  if (!content)
-    content = new Intrinsics ();
-  else
-    content->count++;
-
-  content->add (component, description);
+  library (component).set_description (description);
+  content->count++;
 }
 
 BuildBase::~BuildBase ()

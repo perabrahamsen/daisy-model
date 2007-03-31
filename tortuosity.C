@@ -38,3 +38,5 @@ Tortuosity::Tortuosity (Block& al)
 
 Tortuosity::~Tortuosity ()
 { }
+
+static BuildBase Tortuosity_init (Tortuosity::component, Tortuosity::description);

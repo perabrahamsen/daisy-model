@@ -38,3 +38,5 @@ Printer::Printer (const AttributeList& al)
 
 Printer::~Printer ()
 { }
+
+static BuildBase Printer_init (Printer::component, Printer::description);

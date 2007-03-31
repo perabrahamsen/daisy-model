@@ -143,6 +143,4 @@ public:
   ~Crop ();
 };
 
-static Librarian<Crop> Crop_init;
-
 #endif // CROP_H

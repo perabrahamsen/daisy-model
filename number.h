@@ -57,6 +57,4 @@ public:
   ~Number ();
 };
 
-static Librarian<Number> Number_init;
-
 #endif // NUMBER_H

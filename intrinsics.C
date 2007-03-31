@@ -39,18 +39,19 @@ Intrinsics::clone () const
   return result;
 }
 
-void 
-Intrinsics::add (const char *const component, 
-                 const char *const description)
+Library&
+Intrinsics::add (const char *const component)
 {
   daisy_assert (!closed);
   const std::map<symbol, Library*>::const_iterator i
     = all.find (symbol (component));
   
   if (i != all.end ())
-    return;
+    return *(*i).second;
 
-  all[symbol (component)] = new Library (component, description);
+  Library *const lib = new Library (component);
+  all[symbol (component)] = lib;
+  return *lib;
 }
 
 Library&

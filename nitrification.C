@@ -103,3 +103,5 @@ Nitrification::Nitrification (Block& al)
 Nitrification::~Nitrification ()
 { }
 
+static BuildBase Nitrification_init (Nitrification::component, Nitrification::description);
+

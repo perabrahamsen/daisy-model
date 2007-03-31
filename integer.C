@@ -167,3 +167,6 @@ List of clauses to match for.",
   }
 } IntegerCond_syntax;
 
+static BuildBase Integer_init (Integer::component, Integer::description);
+
+// integer.C ends here

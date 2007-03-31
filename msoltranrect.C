@@ -34,4 +34,6 @@ Msoltranrect::Msoltranrect (Block& al)
 Msoltranrect::~Msoltranrect ()
 { }
 
+static BuildBase Msoltranrect_init (Msoltranrect::component, Msoltranrect::description);
+
 // msoltranrect.C ends here

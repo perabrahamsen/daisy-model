@@ -55,6 +55,4 @@ public:
   ~Bound ();
 };
 
-static Librarian<Bound> Bound_init;
-
 #endif // BOUND_H

@@ -33,4 +33,6 @@ UZRect::UZRect (Block& al)
 UZRect::~UZRect ()
 { }
 
+static BuildBase UZRect_init (UZRect::component, UZRect::description);
+
 // uzrect.C ends here.

@@ -46,6 +46,4 @@ public:
   ~Scopesel ();
 };
 
-static Librarian<Scopesel> Scopesel_init;
-
 #endif // SCOPESEL_H

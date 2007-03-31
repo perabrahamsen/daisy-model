@@ -190,3 +190,5 @@ Format::Format (Block& al)
 
 Format::~Format ()
 { daisy_assert (nest.empty ()); }
+
+static BuildBase Format_init (Format::component, Format::description);

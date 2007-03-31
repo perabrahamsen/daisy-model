@@ -849,3 +849,5 @@ static struct SelectSyntax
   }
 } Select_syntax;
 
+static BuildBase Select_init (Select::component, Select::description);
+

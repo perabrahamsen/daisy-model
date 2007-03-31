@@ -99,6 +99,4 @@ public:
   ~OrganicMatter ();
 };
 
-static Librarian<OrganicMatter> Organic_init;
-
 #endif // ORGANIC_MATTER_H

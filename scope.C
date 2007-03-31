@@ -114,4 +114,6 @@ WScope::WScope (Block& al)
 WScope::~WScope ()
 { }
 
+static BuildBase Scope_init (Scope::component, Scope::description);
+
 // scope.C ends here

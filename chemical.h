@@ -75,6 +75,4 @@ public:
   ~Chemical ();
 };
 
-static Librarian<Chemical> Chemical_init;
-
 #endif // CHEMICAL_H

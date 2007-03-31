@@ -96,3 +96,5 @@ Vegetation::Vegetation (Block& al)
 
 Vegetation::~Vegetation ()
 { }
+
+static BuildBase Vegetation_init (Vegetation::component, Vegetation::description);

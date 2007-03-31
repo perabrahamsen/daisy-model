@@ -68,6 +68,4 @@ public:
   ~Volume ();
 };
 
-static Librarian<Volume> Volume_init;
-
 #endif // VOLUME_H

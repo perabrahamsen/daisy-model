@@ -78,6 +78,4 @@ public:
   ~Groundwater ();
 };
 
-static Librarian<Groundwater> Groundwater_init;
-
 #endif // GROUNDWATER_H

@@ -2,9 +2,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Metalib
 
-** Evt. prøv at fjerne Librarian constructor fra headerfiler.
+** Gør Librarian<T>::build_* til funktioner
 
-*** Library::set_description
+** Omdøb Buildbase til Librarian
+
+** Fjern librarian.h fra headerfiler.
 
 * Generer DLL i make dist?
 

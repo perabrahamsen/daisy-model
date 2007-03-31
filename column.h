@@ -129,6 +129,4 @@ public:
   ~Column ();
 };
 
-static Librarian<Column> Column_init;
-
 #endif // COLUMN_H

@@ -276,3 +276,5 @@ Constant value.");
   }
 } StringerIdentity_syntax;
 
+static BuildBase Stringer_init (Stringer::component, Stringer::description);
+

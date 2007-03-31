@@ -114,6 +114,4 @@ public:
   ~Bioclimate ();
 };
 
-static Librarian<Bioclimate> Bioclimate_init;
-
 #endif // BIOCLIMATE_H

@@ -158,4 +158,6 @@ std::auto_ptr<const Average>
 Average::build_geometric ()
 { return std::auto_ptr<const Average> (new AverageGeometric (__FUNCTION__)); }
 
+static BuildBase Average_init (Average::component, Average::description);
+
 // average.C ends here.

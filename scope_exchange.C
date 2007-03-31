@@ -58,8 +58,6 @@ public:
   { }
 };
 
-static Librarian<Exchange> Exchange_init;
-
 const char *const 
 Exchange::description = "\
 A named value to exchange with external models.";
@@ -274,3 +272,5 @@ static struct ScopeExchangeSyntax
     BuildBase::add_type (Scope::component, "exchange", alist, syntax, &make);
   }
 } ScopeExchange_syntax;
+
+static BuildBase Exchange_init (Exchange::component, Exchange::description);

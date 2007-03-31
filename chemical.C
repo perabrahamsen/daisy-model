@@ -38,3 +38,5 @@ Chemical::Chemical (Block& al)
 Chemical::~Chemical ()
 { }
 
+static BuildBase Chemical_init (Chemical::component, Chemical::description);
+

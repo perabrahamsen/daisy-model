@@ -83,6 +83,4 @@ public:
   virtual ~Chemistry ();
 };
 
-static Librarian<Chemistry> Chemistry_init;
-
 #endif // CHEMISTRY_H

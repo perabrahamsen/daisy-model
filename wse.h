@@ -44,6 +44,4 @@ public:
   ~WSE ();
 };
 
-static Librarian<WSE> WSE_init;
-
 #endif // WSE_H

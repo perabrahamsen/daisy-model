@@ -54,6 +54,4 @@ public:
   ~NetRadiation ();
 };
 
-static Librarian<NetRadiation> NetRadiation_init;
-
 #endif // NET_RADIATION_H

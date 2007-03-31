@@ -41,3 +41,5 @@ Parser::Parser (Block& al)
 
 Parser::~Parser ()
 { }
+
+static BuildBase Parser_init (Parser::component, Parser::description);

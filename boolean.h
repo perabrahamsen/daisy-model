@@ -51,6 +51,4 @@ public:
   ~Boolean ();
 };
 
-static Librarian<Boolean> Boolean_init;
-
 #endif // BOOLEAN_H

@@ -43,3 +43,5 @@ Macro::Macro (const symbol id)
 Macro::~Macro ()
 { }
 
+static BuildBase Macro_init (Macro::component, Macro::description);
+

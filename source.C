@@ -94,3 +94,5 @@ Source::Source (Block& al)
 
 Source::~Source ()
 { }
+
+static BuildBase Source_init (Source::component, Source::description);

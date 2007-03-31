@@ -57,3 +57,5 @@ Column::Column (Block& al)
 Column::~Column ()
 { }
 
+static BuildBase Column_init (Column::component, Column::description);
+

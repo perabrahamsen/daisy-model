@@ -52,6 +52,4 @@ public:
   ~Program ();
 };
 
-static Librarian<Program> Program_init;
-
 #endif // PROGRAM_H

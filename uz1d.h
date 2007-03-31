@@ -127,6 +127,4 @@ public:
   ~UZ1D ();
 };
 
-static Librarian<UZ1D> UZ1D_init;
-
 #endif // UZ1D_H

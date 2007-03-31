@@ -32,3 +32,5 @@ OrganicMatter::OrganicMatter (Block& al)
 
 OrganicMatter::~OrganicMatter ()
 { }
+
+static BuildBase Organic_init (OrganicMatter::component, OrganicMatter::description);

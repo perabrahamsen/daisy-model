@@ -59,6 +59,4 @@ public:
   ~Printer ();
 };
 
-static Librarian<Printer> Printer_init;
-
 #endif // PRINTER_H

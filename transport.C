@@ -36,3 +36,5 @@ Transport::Transport (Block& al)
 Transport::~Transport ()
 { }
 
+static BuildBase Transport_init (Transport::component, Transport::description);
+

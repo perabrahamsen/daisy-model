@@ -1303,3 +1303,6 @@ static struct ProgramAM_tableSyntax
     BuildBase::add_type (Program::component, "AM_table", alist, syntax, &make);
   }
 } ProgramAM_table_syntax;
+
+static BuildBase AM_init (AM::component, AM::description);
+

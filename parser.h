@@ -51,6 +51,4 @@ public:
   ~Parser ();
 };
 
-static Librarian<Parser> Parser_init;
-
 #endif // PARSER_H

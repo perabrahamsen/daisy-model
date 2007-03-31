@@ -38,7 +38,7 @@ public:
   // Use.
 public:
   std::map<symbol, Library*> clone () const;
-  void add (const char *const component, const char *const description);
+  Library& add (const char *const component);
   Library& library (const char *const component) const;
 
   // Create and Destroy.

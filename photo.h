@@ -60,6 +60,4 @@ public:
   ~Photo ();
 };
 
-static Librarian<Photo> Photo_init;
-
 #endif // PHOTO_H

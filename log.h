@@ -293,8 +293,6 @@ public:
   ~Log ();
 };
 
-static Librarian<Log> Log_init;
-
 // Output atom.
 #define output_value(value, key, log)\
 do { \

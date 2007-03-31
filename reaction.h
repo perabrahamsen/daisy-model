@@ -56,6 +56,4 @@ public:
   ~Reaction ();
 };
 
-static Librarian<Reaction> Reaction_init;
-
 #endif // REACTION_H

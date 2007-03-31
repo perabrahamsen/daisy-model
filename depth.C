@@ -314,4 +314,6 @@ Linear interpolation is used between the datapoints.");
   }
 } DepthFile_syntax;
 
+static BuildBase Depth_init (Depth::component, Depth::description);
+
 // depth.C ends here.

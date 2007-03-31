@@ -293,3 +293,5 @@ The operand to check.");
     BuildBase::add_type (Boolean::component, "not", alist, syntax, &make);
   }
 } BooleanNot_syntax;
+
+static BuildBase Boolean_init (Boolean::component, Boolean::description);

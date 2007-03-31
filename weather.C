@@ -373,3 +373,5 @@ static struct WeatherSyntax
     BuildBase::add_base (Weather::component, alist, syntax);
   }
 } Weather_syntax;
+
+static BuildBase Weather_init (Weather::component, Weather::description);

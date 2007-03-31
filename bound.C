@@ -151,4 +151,6 @@ static struct BoundFiniteSyntax
   }
 } BoundFinite_syntax;
 
+static BuildBase Bound_init (Bound::component, Bound::description);
+
 // bound.C ends here.

@@ -54,6 +54,4 @@ public:
   ~Gnuplot ();
 };
 
-static Librarian<Gnuplot> Gnuplot_init;
-
 #endif // GNUPLOT_H

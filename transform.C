@@ -46,3 +46,5 @@ Transform::Transform (Block& al)
 
 Transform::~Transform ()
 { }
+
+static BuildBase Transform_init (Transform::component, Transform::description);

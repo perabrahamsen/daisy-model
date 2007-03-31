@@ -53,6 +53,4 @@ public:
   ~Condition ();
 };
 
-static Librarian<Condition> Condition_init;
-
 #endif // CONDITION_H

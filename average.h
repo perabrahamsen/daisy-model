@@ -50,6 +50,4 @@ public:
   ~Average ();
 };
 
-static Librarian<Average> Average_init;
-
 #endif // AVERAGE_H

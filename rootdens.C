@@ -47,3 +47,5 @@ Rootdens::Rootdens (Block& al)
 Rootdens::~Rootdens ()
 { }
 
+static BuildBase Rootdens_init (Rootdens::component, Rootdens::description);
+

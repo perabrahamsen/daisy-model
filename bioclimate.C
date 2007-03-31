@@ -77,3 +77,5 @@ Bioclimate::Bioclimate (Block& al)
 
 Bioclimate::~Bioclimate ()
 { }
+
+static BuildBase Bioclimate_init (Bioclimate::component, Bioclimate::description);

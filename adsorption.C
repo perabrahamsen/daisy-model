@@ -44,3 +44,5 @@ Adsorption::Adsorption (Block& al)
 
 Adsorption::~Adsorption ()
 { }
+
+static BuildBase Adsorption_init (Adsorption::component, Adsorption::description);

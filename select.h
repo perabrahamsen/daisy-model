@@ -159,6 +159,4 @@ public:
   ~Select ();
 };
 
-static Librarian<Select> Select_init;
-
 #endif // SELECT_H

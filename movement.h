@@ -94,6 +94,4 @@ public:
   ~Movement ();
 };
 
-static Librarian<Movement> Movement_init;
-
 #endif // MOVEMENT_H

@@ -77,6 +77,4 @@ public:
   ~Msoltranrect ();
 };
 
-static Librarian<Msoltranrect> Msoltranrect_init;
-
 #endif // MSOLTRANRECT_H

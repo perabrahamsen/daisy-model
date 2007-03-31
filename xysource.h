@@ -59,6 +59,4 @@ public:
   ~XYSource ();
 };
 
-static Librarian<XYSource> XYSource_init;
-
 #endif // XYSOURCE_H

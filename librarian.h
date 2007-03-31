@@ -87,7 +87,7 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
 
   // Create and destroy.
-protected:
+public:
   BuildBase (const char *const component, const char *const description);
   ~BuildBase ();
 };
@@ -151,14 +151,10 @@ public:
 
   // Create and Destroy.
 private:                        // Disable.
-  Librarian (const Librarian&);
+  explicit Librarian (const Librarian&);
+  explicit Librarian ();
   Librarian& operator= (const Librarian&);
-public:
-  explicit Librarian ()
-    : BuildBase (T::component, T::description)
-  { }
-  ~Librarian ()
-  { }
+  ~Librarian ();
 };
 
 #endif // LIBRARIAN_H

@@ -33,3 +33,5 @@ ClayOM::ClayOM (Block& al)
 
 ClayOM::~ClayOM ()
 { }
+
+static BuildBase ClayOM_init (ClayOM::component, ClayOM::description);

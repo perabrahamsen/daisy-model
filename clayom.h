@@ -56,6 +56,4 @@ public:
   ~ClayOM ();
 };
 
-static Librarian<ClayOM> ClayOM_init;
-
 #endif // CLAYOM_H

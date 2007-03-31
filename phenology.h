@@ -62,6 +62,4 @@ public:
   ~Phenology ();
 };
 
-static Librarian<Phenology> Phenology_init;
-
 #endif // PHENOLOGY_H

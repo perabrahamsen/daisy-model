@@ -111,6 +111,4 @@ public:
   ~AM ();
 };
 
-static Librarian<AM> AM_init;
-
 #endif // AM_H

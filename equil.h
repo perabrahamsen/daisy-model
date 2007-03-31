@@ -56,6 +56,4 @@ public:
   ~Equilibrium ();
 };
 
-static Librarian<Equilibrium> Equilibrium_init;
-
 #endif // EQUILIBRIUM_H

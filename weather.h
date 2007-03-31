@@ -152,6 +152,4 @@ public:
   ~Weather ();
 };
 
-static Librarian<Weather> Weather_init;
-
 #endif // WEATHER_H

@@ -56,6 +56,4 @@ public:
   static const AttributeList& default_model ();
 };
 
-static Librarian<Mactrans> Mactrans_init;
-
 #endif // MACTRANS_H

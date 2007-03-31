@@ -37,7 +37,7 @@ struct Library::Implementation
 {
   // Id.
   const symbol name;
-  const char *const description;
+  const char * description;
 
   // Types.
   typedef std::map<symbol, builder> bmap_type;
@@ -61,7 +61,7 @@ struct Library::Implementation
   void clear_parsed ();
   void refile_parsed (const std::string& from, const std::string& to);
   static void load_syntax (Syntax&, AttributeList&);
-  Implementation (const char* n, const char* des);
+  Implementation (const char* n);
   ~Implementation ();
 };
 
@@ -171,9 +171,9 @@ Library::Implementation::refile_parsed (const std::string& from, const std::stri
     }
 }
 
-Library::Implementation::Implementation (const char* n, const char* des) 
+Library::Implementation::Implementation (const char* n) 
   : name (symbol (n)),
-    description (des)
+    description (NULL)
 { }
 
 Library::Implementation::~Implementation ()
@@ -344,11 +344,18 @@ Library::build_raw (const symbol type, Block& block) const
   return &(*i).second (block);
 }
 
+void 
+Library::set_description (const char *const description)
+{
+  daisy_assert (!impl->description);
+  impl->description = description;
+}
+
 Library* 
 Library::clone () const
 { 
-  Library *const lib = new Library (impl->name.name ().c_str (),
-                                    impl->description);
+  Library *const lib = new Library (impl->name.name ().c_str ());
+  lib->set_description (impl->description);
   lib->impl->builders = impl->builders;
   for (Implementation::alist_map::const_iterator i = impl->alists.begin ();
        i != impl->alists.end ();
@@ -363,8 +370,8 @@ Library::clone () const
   return lib;
 }
 
-Library::Library (const char* name, const char* description) 
-  : impl (new Implementation (name, description))
+Library::Library (const char* name) 
+  : impl (new Implementation (name))
 { }
 
 Library::~Library ()

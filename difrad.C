@@ -44,3 +44,5 @@ Difrad::Difrad (Block& al)
 Difrad::~Difrad ()
 { }
 
+static BuildBase Difrad_init (Difrad::component, Difrad::description);
+

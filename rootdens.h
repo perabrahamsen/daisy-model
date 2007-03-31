@@ -57,6 +57,4 @@ public:
   ~Rootdens ();
 };
 
-static Librarian<Rootdens> Rootdens_init;
-
 #endif // ROOTDENS_H

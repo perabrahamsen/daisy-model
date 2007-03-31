@@ -63,6 +63,4 @@ public:
   ~Nitrification ();
 };
 
-static Librarian<Nitrification> Nitrification_init;
-
 #endif // NITRIFICATION_H

@@ -59,3 +59,5 @@ Action::Action (Block&, const AttributeList& al)
 
 Action::~Action ()
 { }
+
+static BuildBase Action_init (Action::component, Action::description);

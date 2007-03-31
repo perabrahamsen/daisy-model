@@ -81,3 +81,5 @@ Crop::Crop (Block& al)
 
 Crop::~Crop ()
 { }
+
+static BuildBase Crop_init (Crop::component, Crop::description);

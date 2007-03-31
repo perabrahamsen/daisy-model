@@ -46,6 +46,4 @@ public:
   ~Tortuosity ();
 };
 
-static Librarian<Tortuosity> Tortuosity_init;
-
 #endif // TORTUOSITY_H

@@ -58,6 +58,4 @@ public:
   ~Transform ();
 };
 
-static Librarian<Transform> Transform_init;
-
 #endif // TRANSFORM_H

@@ -57,6 +57,4 @@ public:
   ~Domsorp ();
 };
 
-static Librarian<Domsorp> Domsorp_init;
-
 #endif // DOMSORP_H

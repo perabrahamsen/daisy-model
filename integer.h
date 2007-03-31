@@ -52,6 +52,4 @@ public:
   ~Integer ();
 };
 
-static Librarian<Integer> Integer_init;
-
 #endif // INTEGER_H

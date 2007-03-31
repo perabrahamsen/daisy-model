@@ -219,6 +219,4 @@ public:
   ~Format ();
 };
 
-static Librarian<Format> Format_init;
-
 #endif // FORMAT_H

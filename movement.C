@@ -34,3 +34,5 @@ Movement::Movement (Block& al)
 Movement::~Movement ()
 { }
 
+static BuildBase Movement_init (Movement::component, Movement::description);
+

@@ -142,6 +142,4 @@ public:
   ~Vegetation ();
 };
 
-static Librarian<Vegetation> Vegetation_init;
-
 #endif // VEGETATION_H

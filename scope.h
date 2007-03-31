@@ -79,6 +79,4 @@ public:
   ~WScope ();
 };
 
-static Librarian<Scope> Scope_init;
-
 #endif // SCOPE_H

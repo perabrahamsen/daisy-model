@@ -34,3 +34,5 @@ Program::Program (Block& al)
 
 Program::~Program ()
 { }
+
+static BuildBase Program_init (Program::component, Program::description);

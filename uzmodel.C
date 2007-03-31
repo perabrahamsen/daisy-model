@@ -35,3 +35,6 @@ The 'uzmodel' component handles the vertical water movement in the\n\
 unsaturated zone soil matrix.";
 
 const char *const UZmodel::component = "uzmodel";
+
+static BuildBase UZmodel_init (UZmodel::component, UZmodel::description);
+

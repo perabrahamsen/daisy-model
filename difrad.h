@@ -51,6 +51,4 @@ public:
   ~Difrad ();
 };
 
-static Librarian<Difrad> Difrad_init;
-
 #endif // DIFRAD_H

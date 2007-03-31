@@ -188,3 +188,5 @@ Log::summarize (Treelog&)
 
 Log::~Log ()
 { }
+
+static BuildBase Log_init (Log::component, Log::description);

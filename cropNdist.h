@@ -56,6 +56,4 @@ public:
   ~CropNdist ();
 };
 
-static Librarian<CropNdist> CropNdist_init;
-
 #endif // CROPNDIST_H

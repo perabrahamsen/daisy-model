@@ -60,4 +60,6 @@ Volume::Volume (const char *const id)
 Volume::~Volume ()
 { }
 
+static BuildBase Volume_init (Volume::component, Volume::description);
+
 // volume.C ends here.

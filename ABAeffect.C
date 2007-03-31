@@ -36,3 +36,5 @@ ABAEffect::ABAEffect (Block& al)
 ABAEffect::~ABAEffect ()
 { }
 
+static BuildBase ABAEffect_init (ABAEffect::component, ABAEffect::description);
+

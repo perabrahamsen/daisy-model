@@ -168,4 +168,6 @@ UZ1D::UZ1D (Block& al)
 UZ1D::~UZ1D ()
 { }
 
+static BuildBase UZ1D_init (UZ1D::component, UZ1D::description);
+
 // uz1d.C ends here.

@@ -41,3 +41,5 @@ Equilibrium::Equilibrium (Block& al)
 
 Equilibrium::~Equilibrium ()
 { }
+
+static BuildBase Equilibrium_init (Equilibrium::component, Equilibrium::description);

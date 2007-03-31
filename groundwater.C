@@ -80,3 +80,5 @@ Groundwater::Groundwater (Block& al)
 Groundwater::~Groundwater ()
 { }
 
+static BuildBase Groundwater_init (Groundwater::component, Groundwater::description);
+
