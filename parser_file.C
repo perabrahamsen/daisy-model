@@ -37,6 +37,7 @@
 #include "units.h"
 #include "mathlib.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <set>
 #include <memory>
 #include <sstream>
@@ -237,7 +238,7 @@ ParserFile::Implementation::get_integer ()
     }
   Block block (metalib, treelog, "integer");
   std::auto_ptr<Integer> integer 
-    (BuildBase::build_alist<Integer> (block, *al, "integer"));
+    (Librarian::build_alist<Integer> (block, *al, "integer"));
   if (!block.ok ()
       || !integer->initialize (treelog)
       || !integer->check (Scope::null (), treelog))
@@ -345,7 +346,7 @@ ParserFile::Implementation::get_number (const std::string& syntax_dim)
     }
   Block block (metalib, treelog, "number");
   std::auto_ptr<Number> number 
-    (BuildBase::build_alist<Number> (block, *al, "number"));
+    (Librarian::build_alist<Number> (block, *al, "number"));
   if (!block.ok ()
       || !number->initialize (treelog)
       || !number->check (Scope::null (), treelog))
@@ -941,7 +942,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		{
                   Block block (metalib, lexer->err, "input");
 		  std::auto_ptr<Parser> parser 
-                    (BuildBase::build_alist<Parser> (block, al, "input"));
+                    (Librarian::build_alist<Parser> (block, al, "input"));
                   if (!block.ok () || !parser->check ())
                     error ("file error");
                   else
@@ -1424,6 +1425,6 @@ static struct ParserFileSyntax
     syntax.add ("where", Syntax::String, Syntax::Const,
 		"File to read from.");
     syntax.order ("where");
-    BuildBase::add_type (Parser::component, "file", alist, syntax, &make);
+    Librarian::add_type (Parser::component, "file", alist, syntax, &make);
   }
 } ParserFile_syntax;

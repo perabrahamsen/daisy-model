@@ -28,6 +28,7 @@
 #include "treelog.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <memory>
 
 using namespace std;
@@ -99,7 +100,7 @@ EquilibriumLangmuir::initialize (Block& block, const Soil& soil)
   // K
   {
     auto_ptr<Pedotransfer> pedo_K 
-      (BuildBase::build_alist<Pedotransfer> (block, alist, "K"));
+      (Librarian::build_alist<Pedotransfer> (block, alist, "K"));
     if (pedo_K->check (soil, "g/cm^3", block.msg ()))
       pedo_K->set (soil, K, "g/cm^3");
     else 
@@ -110,7 +111,7 @@ EquilibriumLangmuir::initialize (Block& block, const Soil& soil)
   // my_max
   {
     auto_ptr<Pedotransfer> pedo_my_max 
-      (BuildBase::build_alist<Pedotransfer> (block, alist, "my_max"));
+      (Librarian::build_alist<Pedotransfer> (block, alist, "my_max"));
     if (pedo_my_max->check (soil, "g/cm^3", block.msg ()))
       pedo_my_max->set (soil, my_max, "g/cm^3");
     else 
@@ -147,6 +148,6 @@ static struct EquilibriumLangmuirSyntax
     syntax.add_object ("my_max", Pedotransfer::component, 
                        Syntax::Const, Syntax::Singleton,
                        "Max equilibrium capacity [g/cm^3].");
-    BuildBase::add_type (Equilibrium::component, "Langmuir", alist, syntax, &make);
+    Librarian::add_type (Equilibrium::component, "Langmuir", alist, syntax, &make);
   }
 } EquilibriumLangmuir_syntax;

@@ -25,6 +25,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "harvest.h"
+#include "librarian.h"
 #include <sstream>
 
 struct ActionEmerge : public Action
@@ -78,7 +79,7 @@ If there are no crop on the field with the specified name,\n\
 nothing will happen.");
   alist.add ("crop", "all");
   syntax.order ("crop");
-  BuildBase::add_type (Action::component, "emerge", alist, syntax, &make);
+  Librarian::add_type (Action::component, "emerge", alist, syntax, &make);
 }
 
 struct ActionHarvest : public Action
@@ -164,5 +165,5 @@ in the harvest log files.\n\
 This is mostly useful for silage.");
   alist.add ("combine", false);
   syntax.order ("crop");
-  BuildBase::add_type (Action::component, "harvest", alist, syntax, &make);
+  Librarian::add_type (Action::component, "harvest", alist, syntax, &make);
 }

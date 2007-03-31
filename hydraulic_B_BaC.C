@@ -26,6 +26,7 @@
 #include "block.h"
 #include "alist.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 class HydraulicB_BaC : public Hydraulic
 {
@@ -130,5 +131,5 @@ HydraulicB_BaCSyntax::HydraulicB_BaCSyntax ()
   syntax.add ("h_b", "cm", Syntax::Const,
 	      "Bubbling pressure.");
 
-  BuildBase::add_type (Hydraulic::component, "B_BaC", alist, syntax, make);
+  Librarian::add_type (Hydraulic::component, "B_BaC", alist, syntax, make);
 }

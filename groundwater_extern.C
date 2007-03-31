@@ -28,6 +28,7 @@
 #include "alist.h"
 #include "units.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <sstream>
 
 class GroundwaterExtern : public Groundwater
@@ -108,8 +109,8 @@ public:
       
   GroundwaterExtern (Block& al)
     : Groundwater (al),
-      scopesel (BuildBase::build_item<Scopesel> (al, "scope")),
-      expr (BuildBase::build_item<Number> (al, "table")),
+      scopesel (Librarian::build_item<Scopesel> (al, "scope")),
+      expr (Librarian::build_item<Number> (al, "table")),
       has_table (false),
       depth (-42.42e42)
   { }
@@ -134,6 +135,6 @@ Scope to look up groundwater table in.");
     syntax.add_object ("table", Number::component, 
                        Syntax::Const, Syntax::Singleton, "\
 Expression that evaluates to groundwate table in.");
-    BuildBase::add_type (Groundwater::component, "extern", alist, syntax, &make);
+    Librarian::add_type (Groundwater::component, "extern", alist, syntax, &make);
   }
 } GroundwaterExtern_syntax;

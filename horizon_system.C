@@ -28,6 +28,7 @@
 #include "hydraulic.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 #include <numeric>
 
@@ -159,7 +160,7 @@ HorizonSystem::System::add_to_lib (Model& (make)(Block&),
 If this is true, normalize the mineral fraction to 1.0.\n\
 Otherwise, give an error if the sum is not 1.0.");
     alist.add ("normalize", false);
-    BuildBase::add_type (Horizon::component, symbol (name), alist, syntax, make);
+    Librarian::add_type (Horizon::component, symbol (name), alist, syntax, make);
 }
 
 static const struct USDA3_type : public HorizonSystem::System
@@ -324,7 +325,7 @@ static struct HorizonSystemSyntax
   {
     const symbol derived = symbol (d);
     const symbol base = symbol (b);
-    BuildBase::add_alias (Horizon::component, derived, base);
+    Librarian::add_alias (Horizon::component, derived, base);
   }
 
   HorizonSystemSyntax ()

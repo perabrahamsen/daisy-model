@@ -27,6 +27,7 @@
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 
 struct MsoltranrectNone : public Msoltranrect
@@ -245,6 +246,6 @@ static struct MsoltranrectNoneSyntax
                "Disable all transport except through boundaries.");
     MsoltranrectNone::load_syntax (syntax, alist);
  
-    BuildBase::add_type (Msoltranrect::component, "none", alist, syntax, &make);
+    Librarian::add_type (Msoltranrect::component, "none", alist, syntax, &make);
   }
 } MsoltranrectNone_syntax;

@@ -26,6 +26,7 @@
 #include "log.h"
 #include "daisy.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <memory>
 #include <sstream>
 
@@ -47,7 +48,7 @@ struct ActionWait : public Action
 
   ActionWait (Block& al)
     : Action (al),
-      condition (BuildBase::build_item<Condition> (al, "condition"))
+      condition (Librarian::build_item<Condition> (al, "condition"))
   { }
 
   ~ActionWait ()
@@ -188,7 +189,7 @@ Wait until the specified condition is true.");
       syntax.add_object ("condition", Condition::component, 
                          "Condition to wait for.");
       syntax.order ("condition");
-      BuildBase::add_type (Action::component, "wait", alist, syntax, &make);
+      Librarian::add_type (Action::component, "wait", alist, syntax, &make);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -205,7 +206,7 @@ Waits the specified number of days.");
 		  "Wait until this date.\
 Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
       syntax.order ("days");
-      BuildBase::add_type (Action::component, "wait_days", alist, syntax, &make_days);
+      Librarian::add_type (Action::component, "wait_days", alist, syntax, &make_days);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -222,7 +223,7 @@ Waits the specified number of hours.");
 		  "Wait until this date.\
 Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
       syntax.order ("hours");
-      BuildBase::add_type (Action::component, "wait_hours", alist, syntax, &make_days);
+      Librarian::add_type (Action::component, "wait_hours", alist, syntax, &make_days);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -238,7 +239,7 @@ Wait until a specific month and day in the year.");
 		  "Wait until this hour.");
       alist.add ("hour", 8);
       syntax.order ("month", "day");
-      BuildBase::add_type (Action::component, "wait_mm_dd", alist, syntax, &make_mm_dd);
+      Librarian::add_type (Action::component, "wait_mm_dd", alist, syntax, &make_mm_dd);
     }
   }
 } ActionWait_syntax;

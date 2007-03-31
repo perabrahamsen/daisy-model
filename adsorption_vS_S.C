@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "soil.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 class Adsorption_vS_S : public Adsorption
 {
@@ -117,6 +118,6 @@ static struct Adsorption_vS_SSyntax
     alist.add ("description", "\
 Model by van Schouwenberg and Schuffelen, 1963, with\n\
 parameterization by Hansen et.al., 1990.");
-    BuildBase::add_type (Adsorption::component, "vS_S", alist, syntax, &make);
+    Librarian::add_type (Adsorption::component, "vS_S", alist, syntax, &make);
   }
 } Adsorption_vS_S_syntax;

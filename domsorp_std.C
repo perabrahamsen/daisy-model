@@ -27,6 +27,7 @@
 #include "soil.h"
 #include "log.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <memory>
 
 using namespace std;
@@ -117,7 +118,7 @@ struct DomsorpStandard : public Domsorp
     : Domsorp (al),
       dom_pool (al.integer ("dom_pool") - 1),
       som_pool (al.integer ("som_pool") - 1),
-      transform (BuildBase::build_item<Transform> (al, "transform"))
+      transform (Librarian::build_item<Transform> (al, "transform"))
   { }
 };
 
@@ -144,6 +145,6 @@ static struct DomsorpStandardSyntax
     syntax.add ("S_N", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 		"Carbon converted from DOM to SOM (may be negative).");
 
-    BuildBase::add_type (Domsorp::component, "default", alist, syntax, &make);
+    Librarian::add_type (Domsorp::component, "default", alist, syntax, &make);
   }
 } DomsorpStandard_syntax;

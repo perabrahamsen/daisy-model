@@ -22,6 +22,7 @@
 
 #include "action.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Action::description = "\
 The 'action' component represents management on different abstraction\n\
@@ -60,4 +61,4 @@ Action::Action (Block&, const AttributeList& al)
 Action::~Action ()
 { }
 
-static BuildBase Action_init (Action::component, Action::description);
+static Librarian Action_init (Action::component, Action::description);

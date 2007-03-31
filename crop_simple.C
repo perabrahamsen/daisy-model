@@ -40,6 +40,7 @@
 #include "submodeler.h"
 #include "mathlib.h"
 #include "check.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -536,7 +537,7 @@ Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
 Fraction of potential N uptake reached at flowering.");
     alist.add ("N_flowering", 0.9);
 
-    BuildBase::add_type (Crop::component, "simple", alist, syntax, &make);
+    Librarian::add_type (Crop::component, "simple", alist, syntax, &make);
   }
 } simple_crop_syntax;
 

@@ -22,6 +22,7 @@
 
 #include "parser.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Parser::description = "\
 To start the simulation, many parameters must be specified and state\n\
@@ -42,4 +43,4 @@ Parser::Parser (Block& al)
 Parser::~Parser ()
 { }
 
-static BuildBase Parser_init (Parser::component, Parser::description);
+static Librarian Parser_init (Parser::component, Parser::description);

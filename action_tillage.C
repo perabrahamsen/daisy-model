@@ -25,6 +25,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "check.h"
+#include "librarian.h"
 
 struct ActionMix : public Action
 {
@@ -66,7 +67,7 @@ the interval.");
 Fraction of organic matter on surface that are incorporated in the soil\n\
 by this operation.");
       alist.add ("penetration", 1.0);
-      BuildBase::add_type (Action::component, "mix", alist, syntax, &make);
+      Librarian::add_type (Action::component, "mix", alist, syntax, &make);
     }
 } ActionMix_syntax;
 
@@ -123,7 +124,7 @@ be placed on top of what used to be the top layer.");
 The end of the first layer and the start of the second layer to swap.");
       syntax.add ("depth", "cm", Check::negative (), Syntax::Const, "\
 The end of the second layer to swap.");
-      BuildBase::add_type (Action::component, "swap", alist, syntax, &make);
+      Librarian::add_type (Action::component, "swap", alist, syntax, &make);
     }
 } ActionSwap_syntax;
 
@@ -165,6 +166,6 @@ Non-solid fraction of soil.");
       syntax.add ("depth", "cm", Check::non_positive (), Syntax::Const, "\
 A point in the horizon to modify.");
       alist.add ("depth", 0.0);
-      BuildBase::add_type (Action::component, "set_porosity", alist, syntax, &make);
+      Librarian::add_type (Action::component, "set_porosity", alist, syntax, &make);
     }
 } ActionSetPorosity_syntax;

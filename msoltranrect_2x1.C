@@ -28,6 +28,7 @@
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 
 struct Msoltranrect2x1 : public Msoltranrect
@@ -190,11 +191,11 @@ Msoltranrect2x1::output (Log&) const
 
 Msoltranrect2x1::Msoltranrect2x1 (Block& al)
   : Msoltranrect (al),
-    transport (BuildBase::build_item<Transport> (al, "transport")),
-    reserve (BuildBase::build_item<Transport> (al, "transport_reserve")),
-    last_resort (BuildBase::build_item<Transport> (al, 
+    transport (Librarian::build_item<Transport> (al, "transport")),
+    reserve (Librarian::build_item<Transport> (al, "transport_reserve")),
+    last_resort (Librarian::build_item<Transport> (al, 
                                                    "transport_last_resort")),
-    transport_solid (BuildBase::build_item<Transport> (al, "transport_solid"))
+    transport_solid (Librarian::build_item<Transport> (al, "transport_solid"))
 { }
 
 Msoltranrect2x1::~Msoltranrect2x1 ()
@@ -245,6 +246,6 @@ static struct Msoltranrect2x1Syntax
                "Decoupled vertical and horizontal transport.");
     Msoltranrect2x1::load_syntax (syntax, alist);
  
-    BuildBase::add_type (Msoltranrect::component, "v+h", alist, syntax, &make);
+    Librarian::add_type (Msoltranrect::component, "v+h", alist, syntax, &make);
   }
 } Msoltranrect2x1_syntax;

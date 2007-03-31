@@ -22,6 +22,7 @@
 #include "scope.h"
 #include "block.h"
 #include "assertion.h"
+#include "librarian.h"
 
 const char *const Scope::description = "\
 A scope maps identifiers to values.";
@@ -114,6 +115,6 @@ WScope::WScope (Block& al)
 WScope::~WScope ()
 { }
 
-static BuildBase Scope_init (Scope::component, Scope::description);
+static Librarian Scope_init (Scope::component, Scope::description);
 
 // scope.C ends here

@@ -28,6 +28,7 @@
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 
 struct TransportCD : public Transport
@@ -390,6 +391,6 @@ static struct TransportCDSyntax
     alist.add ("description", 
 	       "Solute transport using convection-dispersion.");
     TransportCD::load_syntax (syntax, alist);
-    BuildBase::add_type (Transport::component, "cd", alist, syntax, &make);
+    Librarian::add_type (Transport::component, "cd", alist, syntax, &make);
   }
 } TransportCD_syntax;

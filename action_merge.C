@@ -24,6 +24,7 @@
 #include "block.h"
 #include "daisy.h"
 #include "field.h"
+#include "librarian.h"
 
 struct ActionMerge : public Action
 {
@@ -59,6 +60,6 @@ but its state will be a average of the the columns, weighted after size.");
       syntax.add ("remove", Syntax::String, Syntax::Const,
 		  "Column to remove after merge.");
       syntax.order ("combine", "remove");
-      BuildBase::add_type (Action::component, "merge", alist, syntax, &make);
+      Librarian::add_type (Action::component, "merge", alist, syntax, &make);
     }
 } ActionMerge_syntax;

@@ -26,6 +26,7 @@
 #include "vcheck.h"
 #include "mathlib.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <numeric>
 #include <sstream>
 
@@ -188,7 +189,7 @@ SourceMerge::load (Treelog& msg)
 
 SourceMerge::SourceMerge (Block& al)
   : Source (al),
-    source (BuildBase::build_vector<Source> (al, "source")),
+    source (Librarian::build_vector<Source> (al, "source")),
     title_ (al.name ("title")),
     dimension_ (al.name ("dimension", Syntax::Unknown ())),
     with_ (al.name ("with", "")),
@@ -221,7 +222,7 @@ Dimension of data to plot.\n\
 By default use the first source with a known dimension.");
 
     
-    BuildBase::add_type (Source::component, "merge", alist, syntax, &make);
+    Librarian::add_type (Source::component, "merge", alist, syntax, &make);
   }
 } SourceMerge_syntax;
 

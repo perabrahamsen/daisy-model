@@ -28,6 +28,7 @@
 #include "field.h"
 #include "log.h"
 #include "memutils.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -86,7 +87,7 @@ public:
   ActionWithColumn (Block& al)
     : Action (al),
       column (al.identifier ("column")),
-      actions (BuildBase::build_vector<Action> (al, "actions"))
+      actions (Librarian::build_vector<Action> (al, "actions"))
   { }
 public:
   ~ActionWithColumn ()
@@ -109,6 +110,6 @@ static struct ActionWithColumnSyntax
                        Syntax::State, Syntax::Sequence,
                        "Actions to perform on the specified column.");
     syntax.order ("column", "actions");
-    BuildBase::add_type (Action::component, "with-column", alist, syntax, &make);
+    Librarian::add_type (Action::component, "with-column", alist, syntax, &make);
   }
 } ActionWithColumn_syntax;

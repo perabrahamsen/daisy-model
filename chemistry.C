@@ -21,6 +21,7 @@
 
 #include "chemistry.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Chemistry::description = "\
 Pesticides and other chemicals.";
@@ -34,6 +35,6 @@ Chemistry::Chemistry (Block& al)
 Chemistry::~Chemistry ()
 { }
 
-static BuildBase Chemistry_init (Chemistry::component, Chemistry::description);
+static Librarian Chemistry_init (Chemistry::component, Chemistry::description);
 
 // chemistry.C ends here.

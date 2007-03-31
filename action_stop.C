@@ -23,6 +23,7 @@
 #include "action.h"
 #include "syntax.h"
 #include "daisy.h"
+#include "librarian.h"
 
 struct ActionStop : public Action
 {
@@ -45,6 +46,6 @@ static struct ActionStopSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Stop the simulation.");
-    BuildBase::add_type (Action::component, "stop", alist, syntax, &make);
+    Librarian::add_type (Action::component, "stop", alist, syntax, &make);
   }
 } ActionStop_syntax;

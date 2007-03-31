@@ -25,6 +25,7 @@
 #include "weather.h"
 #include "fao.h"
 #include "log.h"
+#include "librarian.h"
 
 struct PetMakkink : public Pet
 {
@@ -73,6 +74,6 @@ static struct PetMakkinkSyntax
       alist.add ("description", 
 		 "Potential evopotranspiration using Makkink's Equation.");
       Pet::load_syntax (syntax, alist);
-      BuildBase::add_type (Pet::component, "makkink", alist, syntax, &make);
+      Librarian::add_type (Pet::component, "makkink", alist, syntax, &make);
     }
 } PetMakkink_syntax;

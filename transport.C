@@ -22,6 +22,7 @@
 
 #include "transport.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Transport::description = "\
 This component handles the transportation of solute in the soil with\n\
@@ -36,5 +37,5 @@ Transport::Transport (Block& al)
 Transport::~Transport ()
 { }
 
-static BuildBase Transport_init (Transport::component, Transport::description);
+static Librarian Transport_init (Transport::component, Transport::description);
 

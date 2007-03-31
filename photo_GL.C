@@ -30,6 +30,7 @@
 #include "mathlib.h"
 #include <sstream>
 #include "check.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -197,6 +198,6 @@ Development stage factor for assimilate production.");
 Age is given as day after planting.");
     alist.add ("DAPEff",DS_null_eff);
 
-    BuildBase::add_type (Photo::component, "GL", alist, syntax, &make);
+    Librarian::add_type (Photo::component, "GL", alist, syntax, &make);
   }
 } PhotoGL_syntax;

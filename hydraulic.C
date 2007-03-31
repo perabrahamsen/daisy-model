@@ -32,6 +32,7 @@
 #include "mathlib.h"
 #include "program.h"
 #include "vcheck.h"
+#include "librarian.h"
 #include <memory>
 #include <sstream>
 
@@ -254,7 +255,7 @@ struct ProgramHydraulic_table : public Program
   { return hydraulic->check (msg); }
   ProgramHydraulic_table (Block& al)
     : Program (al),
-      hydraulic (BuildBase::build_item<Hydraulic> (al, "hydraulic")),
+      hydraulic (Librarian::build_item<Hydraulic> (al, "hydraulic")),
       intervals (al.integer ("intervals"))
   { }
   ~ProgramHydraulic_table ()
@@ -278,8 +279,8 @@ The hydraulic model to show in the table.");
 Number of intervals in the table.");
     alist.add ("intervals", 50);
     syntax.order ("hydraulic");
-    BuildBase::add_type (Program::component, "hydraulic", alist, syntax, &make);
+    Librarian::add_type (Program::component, "hydraulic", alist, syntax, &make);
   }
 } ProgramHydraulic_table_syntax;
 
-static BuildBase Hydraulic_init (Hydraulic::component, Hydraulic::description);
+static Librarian Hydraulic_init (Hydraulic::component, Hydraulic::description);

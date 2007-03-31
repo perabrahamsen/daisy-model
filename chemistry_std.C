@@ -30,6 +30,7 @@
 #include "log.h"
 #include "assertion.h"
 #include "memutils.h"
+#include "librarian.h"
 
 struct ChemistryStandard : public Chemistry
 {
@@ -255,8 +256,8 @@ ChemistryStandard::check (const Soil& soil, Treelog& msg) const
 
 ChemistryStandard::ChemistryStandard (Block& al)
   : Chemistry (al),
-    chemicals (BuildBase::build_vector<Chemical> (al, "trace")),
-    reactions (BuildBase::build_vector<Reaction> (al, "reaction")),
+    chemicals (Librarian::build_vector<Chemical> (al, "trace")),
+    reactions (Librarian::build_vector<Reaction> (al, "reaction")),
     ignore (al.identifier_sequence ("ignore"))
 { }
 
@@ -327,6 +328,6 @@ static struct ChemistryStandardSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     ChemistryStandard::load_syntax (syntax, alist);
-    BuildBase::add_type (Chemistry::component, "default", alist, syntax, &make);
+    Librarian::add_type (Chemistry::component, "default", alist, syntax, &make);
   }
 } ChemistryStandard_syntax;

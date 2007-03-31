@@ -26,6 +26,7 @@
 #include "log.h"
 #include "vegetation.h"
 #include "surface.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -76,5 +77,5 @@ Pet::Pet (Block& al)
 Pet::~Pet ()
 { }
 
-static BuildBase Pet_init (Pet::component, Pet::description);
+static Librarian Pet_init (Pet::component, Pet::description);
 

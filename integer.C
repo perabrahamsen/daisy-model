@@ -25,6 +25,7 @@
 #include "block.h"
 #include "alist.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 
 const char *const Integer::description = "\
@@ -79,7 +80,7 @@ static struct IntegerConstSyntax
     syntax.add ("value", Syntax::Integer, Syntax::Const,
 		"Fixed value for this integer.");
     syntax.order ("value");
-    BuildBase::add_type (Integer::component, "const", alist, syntax, &make);
+    Librarian::add_type (Integer::component, "const", alist, syntax, &make);
   }
 } IntegerConst_syntax;
 
@@ -101,7 +102,7 @@ Value to return.");
       syntax.order ("condition", "value");
     }
     Clause (Block& al)
-      : condition (BuildBase::build_item<Boolean> (al, "condition")),
+      : condition (Librarian::build_item<Boolean> (al, "condition")),
         value (al.integer ("value"))
     { }
   };
@@ -163,10 +164,10 @@ Return the value of the first clause whose condition is true.");
 List of clauses to match for.",
                                    IntegerCond::Clause::load_syntax);
     syntax.order ("clauses");
-    BuildBase::add_type (Integer::component, "cond", alist, syntax, &make);
+    Librarian::add_type (Integer::component, "cond", alist, syntax, &make);
   }
 } IntegerCond_syntax;
 
-static BuildBase Integer_init (Integer::component, Integer::description);
+static Librarian Integer_init (Integer::component, Integer::description);
 
 // integer.C ends here

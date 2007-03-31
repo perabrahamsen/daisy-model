@@ -23,6 +23,7 @@
 #include "svat.h"
 #include "syntax.h"
 #include "alist.h"
+#include "librarian.h"
 
 struct SVAT_none : public SVAT
 {
@@ -52,6 +53,6 @@ static struct SVAT_NoneSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     SVAT::load_syntax (syntax, alist);
-    BuildBase::add_type (SVAT::component, "none", alist, syntax, &make);
+    Librarian::add_type (SVAT::component, "none", alist, syntax, &make);
   }
 } SVAT_none_syntax;

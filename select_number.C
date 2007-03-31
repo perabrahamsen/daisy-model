@@ -23,6 +23,7 @@
 #include "select_value.h"
 #include "syntax.h"
 #include "alist.h"
+#include "librarian.h"
 
 struct SelectNumber : public SelectValue
 {
@@ -50,6 +51,6 @@ static struct SelectNumberSyntax
     SelectValue::load_syntax (syntax, alist);
     alist.add ("description", "Extract specified number.");
 
-    BuildBase::add_type (Select::component, "number", alist, syntax, &make);
+    Librarian::add_type (Select::component, "number", alist, syntax, &make);
   }
 } Select_syntax;

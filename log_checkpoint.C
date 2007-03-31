@@ -27,6 +27,7 @@
 #include "daisy.h"
 #include "printer_file.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <sstream>
 
 using namespace std;
@@ -177,7 +178,7 @@ LogCheckpoint::LogCheckpoint (Block& al)
   : LogAList (al),
     file (al.name ("where")),
     description (al.name ("description")),
-    condition (BuildBase::build_item<Condition> (al, "when")),
+    condition (Librarian::build_item<Condition> (al, "when")),
     time (1, 1, 1, 1)
 { }
 
@@ -211,7 +212,7 @@ hot start.");
     AttributeList finished_alist;
     finished_alist.add ("type", "finished");
     alist.add ("when", finished_alist);
-    BuildBase::add_type (Log::component, "checkpoint", alist, syntax, &make);
+    Librarian::add_type (Log::component, "checkpoint", alist, syntax, &make);
   }
 } LogCheckpoint_syntax;
 

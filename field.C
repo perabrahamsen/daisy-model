@@ -29,6 +29,7 @@
 #include "block.h"
 #include "memutils.h"
 #include "assertion.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -677,7 +678,7 @@ Field::Implementation::initialize (Block& block, const Output& output,
 
 Field::Implementation::Implementation (Block& parent, 
 				       const std::string& key)
-  : columns (BuildBase::build_vector<Column> (parent, key)),
+  : columns (Librarian::build_vector<Column> (parent, key)),
     selected (NULL)
 { }
 

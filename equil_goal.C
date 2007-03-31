@@ -28,6 +28,7 @@
 #include "treelog.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <memory>
 #include <sstream>
 #include <iostream>
@@ -125,7 +126,7 @@ EquilibriumGoal_A::initialize (Block& block, const Soil& soil)
   initialize_state = init_succes;
 
   auto_ptr<Pedotransfer> pedo_goal_A 
-    (BuildBase::build_alist<Pedotransfer> (block, alist.alist ("goal_A"),
+    (Librarian::build_alist<Pedotransfer> (block, alist.alist ("goal_A"),
                                           "goal_A"));
   if (pedo_goal_A->check (soil, "g/cm^3", block.msg ()))
     pedo_goal_A->set (soil, goal_A, "g/cm^3");
@@ -134,7 +135,7 @@ EquilibriumGoal_A::initialize (Block& block, const Soil& soil)
   Pedotransfer::debug_message ("goal_A", goal_A, "g/cm^3", block.msg ());
 
   auto_ptr<Pedotransfer> pedo_min_B 
-    (BuildBase::build_alist<Pedotransfer> (block, alist.alist ("min_B"),
+    (Librarian::build_alist<Pedotransfer> (block, alist.alist ("min_B"),
                                           "min_B"));
   if (pedo_min_B->check (soil, "g/cm^3", block.msg ()))
     pedo_min_B->set (soil, min_B, "g/cm^3");
@@ -184,7 +185,7 @@ If false, the unit is assumed to be mass per volume space.");
                 "Print debug information for this cell.\n\
 Set it to a negative number to disable it.");
     alist.add ("debug_cell", -1);
-    BuildBase::add_type (Equilibrium::component, "goal_A", alist, syntax, &make);
+    Librarian::add_type (Equilibrium::component, "goal_A", alist, syntax, &make);
   }
 } EquilibriumGoal_A_syntax;
 

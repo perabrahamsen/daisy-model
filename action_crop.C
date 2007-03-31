@@ -34,6 +34,7 @@
 #include "vcheck.h"
 #include "memutils.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 
 using namespace std;
@@ -648,7 +649,7 @@ ActionCrop::Tillage::load_syntax (Syntax& syntax, AttributeList&)
 ActionCrop::Tillage::Tillage (Block& al)
   : month (al.integer ("month")),
     day (al.integer ("day")),
-    operation (BuildBase::build_item<Action> (al, "operation"))
+    operation (Librarian::build_item<Action> (al, "operation"))
 { }
 
 ActionCrop::Tillage::~Tillage ()
@@ -1067,6 +1068,6 @@ Negative number means it hasn't started yet.");
 		"Hours we test for irrigation again.\n\
 This is set at each irrigation, to avoid multiple applications.");
       
-    BuildBase::add_type (Action::component, "crop", alist, syntax, &make);
+    Librarian::add_type (Action::component, "crop", alist, syntax, &make);
   }
 } ActionCrop_syntax;

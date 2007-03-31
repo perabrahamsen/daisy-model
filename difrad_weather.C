@@ -23,6 +23,7 @@
 #include "syntax.h"
 #include "weather.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 
 struct DifradWeather : public Difrad
@@ -69,6 +70,6 @@ static struct DifradWeatherSyntax
     alist.add ("description", 
 	       "Diffuse radiation using weather data.");
     Difrad::load_syntax (syntax, alist);
-    BuildBase::add_type (Difrad::component, "weather", alist, syntax, &make);
+    Librarian::add_type (Difrad::component, "weather", alist, syntax, &make);
   }
 } DifradWeather_syntax;

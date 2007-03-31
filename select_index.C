@@ -23,6 +23,7 @@
 #include "select_value.h"
 #include "block.h"
 #include "alist.h"
+#include "librarian.h"
 
 struct SelectIndex : public SelectValue
 {
@@ -56,6 +57,6 @@ static struct SelectIndexSyntax
     syntax.add ("index", Syntax::Integer, Syntax::Const,
 		"Specify array index to select.");
 
-    BuildBase::add_type (Select::component, "index", alist, syntax, &make);
+    Librarian::add_type (Select::component, "index", alist, syntax, &make);
   }
 } Select_syntax;

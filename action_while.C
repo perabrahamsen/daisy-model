@@ -25,6 +25,7 @@
 #include "log.h"
 #include "assertion.h"
 #include "memutils.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -69,7 +70,7 @@ struct ActionWhile : public Action
 
   ActionWhile (Block& al)
     : Action (al),
-      actions (BuildBase::build_vector<Action> (al, "actions"))
+      actions (Librarian::build_vector<Action> (al, "actions"))
   { }
 
   ~ActionWhile ()
@@ -108,6 +109,6 @@ list is done.");
                        Syntax::State, Syntax::Sequence,
                        "List of actions to perform.");
     syntax.order ("actions");
-    BuildBase::add_type (Action::component, "while", alist, syntax, &make);
+    Librarian::add_type (Action::component, "while", alist, syntax, &make);
   }
 } ActionWhile_syntax;

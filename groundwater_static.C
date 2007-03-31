@@ -24,6 +24,7 @@
 #include "block.h"
 #include "alist.h"
 #include "assertion.h"
+#include "librarian.h"
 
 class GroundwaterStatic : public Groundwater
 {
@@ -111,7 +112,7 @@ Provided for backward compatibility, use 'deep' or 'fixed' instead.");
 		"Groundwater level.\n\
 Positive numbers indicate free drainage.");
     alist.add ("table", 1.0);
-    BuildBase::add_type (Groundwater::component, "static", alist, syntax, &make);
+    Librarian::add_type (Groundwater::component, "static", alist, syntax, &make);
   }
 } GroundwaterStatic_syntax;
 

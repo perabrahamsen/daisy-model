@@ -27,6 +27,7 @@
 #include "vernalization.h"
 #include "plf.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 class PhenologyStandard : public Phenology
 {
@@ -175,6 +176,6 @@ static struct PhenologyStandardSyntax
 This parameterization is only valid until the specified development state.");
     alist.add ("defined_until_ds", 2.0);
 
-    BuildBase::add_type (Phenology::component, "default", alist, syntax, &make);
+    Librarian::add_type (Phenology::component, "default", alist, syntax, &make);
   }
 } PhenologyStandard_syntax;

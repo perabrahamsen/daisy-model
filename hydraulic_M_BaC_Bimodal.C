@@ -28,6 +28,7 @@
 #include "alist.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 class HydraulicM_BaC_Bimodal : public Hydraulic
 {
@@ -154,5 +155,5 @@ Bimodal hydraulic conductivity curve.");
   syntax.add ("K_b", "cm/h", Syntax::Const,
 	      "Water conductivity at 'h_b'.");
 
-  BuildBase::add_type (Hydraulic::component, "M_BaC_Bimodal", alist, syntax, make);
+  Librarian::add_type (Hydraulic::component, "M_BaC_Bimodal", alist, syntax, make);
 }

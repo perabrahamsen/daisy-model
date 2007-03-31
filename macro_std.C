@@ -31,6 +31,7 @@
 #include "uzmodel.h"
 #include "check.h"
 #include "vcheck.h"
+#include "librarian.h"
 #include <sstream>
 
 struct MacroStandard : public Macro
@@ -422,6 +423,6 @@ static struct MacroStandardSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     MacroStandard::load_syntax (syntax, alist);
-    BuildBase::add_type (Macro::component, "default", alist, syntax, &make);
+    Librarian::add_type (Macro::component, "default", alist, syntax, &make);
   }
 } MacroStandard_syntax;

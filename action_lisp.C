@@ -25,6 +25,7 @@
 #include "log.h"
 #include "memutils.h"
 #include "submodeler.h"
+#include "librarian.h"
 
 // We need to initialize the Condition library.
 #include "condition.h"
@@ -96,7 +97,7 @@ struct ActionProgn : public Action
 
   ActionProgn (Block& al)
     : Action (al),
-      actions (BuildBase::build_vector<Action> (al, "actions"))
+      actions (Librarian::build_vector<Action> (al, "actions"))
   { }
 
   ~ActionProgn ()
@@ -125,8 +126,8 @@ struct ActionCond : public Action
       syntax.order ("condition", "actions");
     }
     clause (Block& al) 
-      : condition (BuildBase::build_item<Condition> (al, "condition")),
-        actions (BuildBase::build_vector<Action> (al, "actions"))
+      : condition (Librarian::build_item<Condition> (al, "condition")),
+        actions (Librarian::build_vector<Action> (al, "actions"))
     { }
     ~clause ()
     { sequence_delete (actions.begin (), actions.end ()); }
@@ -242,9 +243,9 @@ struct ActionIf : public Action
 
   ActionIf (Block& al)
     : Action (al),
-      if_c (BuildBase::build_item<Condition> (al, "if")),
-      then_a (BuildBase::build_item<Action> (al, "then")),
-      else_a (BuildBase::build_item<Action> (al, "else"))
+      if_c (Librarian::build_item<Condition> (al, "if")),
+      then_a (Librarian::build_item<Action> (al, "then")),
+      else_a (Librarian::build_item<Action> (al, "else"))
   { }
 
   ~ActionIf ()
@@ -273,14 +274,14 @@ ActionLispSyntax::ActionLispSyntax ()
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "This action does nothing, always done.");
-    BuildBase::add_type (Action::component, "nil", alist, syntax, &make_nil);
+    Librarian::add_type (Action::component, "nil", alist, syntax, &make_nil);
   }
   // "t"
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "This action does nothing, never done.");
-    BuildBase::add_type (Action::component, "t", alist, syntax, &make_nil);
+    Librarian::add_type (Action::component, "t", alist, syntax, &make_nil);
   }
   // "progn"
   {
@@ -293,7 +294,7 @@ All the actions will be performed in the same time step.");
                        Syntax::State, Syntax::Sequence,
                        "List of actions to perform.");
     syntax.order ("actions");
-    BuildBase::add_type (Action::component, "progn", alist, syntax, &make_progn);
+    Librarian::add_type (Action::component, "progn", alist, syntax, &make_progn);
   }
   // "cond"
   {
@@ -306,7 +307,7 @@ Each clause consist of a condition and a sequence of actions.\n\
 The first clause whose condition is true, will have its actions activated.",
                                    ActionCond::clause::load_syntax);
     syntax.order ("clauses");
-    BuildBase::add_type (Action::component, "cond", alist, syntax, &make_cond);
+    Librarian::add_type (Action::component, "cond", alist, syntax, &make_cond);
   }
   // "if"
   {
@@ -325,6 +326,6 @@ otherwise perform the second action.");
     AttributeList nilAlist;
     nilAlist.add ("type", "nil");
     alist.add ("else", nilAlist);
-    BuildBase::add_type (Action::component, "if", alist, syntax, &make_if);
+    Librarian::add_type (Action::component, "if", alist, syntax, &make_if);
   }
 }

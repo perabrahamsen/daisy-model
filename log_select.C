@@ -29,6 +29,7 @@
 #include "volume.h"
 #include "assertion.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 
 bool 
@@ -198,8 +199,8 @@ LogSelect::check (const Border& border, Treelog& err) const
 LogSelect::LogSelect (Block& al)
   : Log (al),
     description (al.name ("description")),
-    condition (BuildBase::build_item<Condition> (al, "when")),
-    entries (BuildBase::build_vector<Select> (al, "entries")),
+    condition (Librarian::build_item<Condition> (al, "when")),
+    entries (Librarian::build_vector<Select> (al, "entries")),
     volume (Volume::build_obsolete (al))
 {
   if (!al.ok ())

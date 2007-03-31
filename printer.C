@@ -23,6 +23,7 @@
 #include "printer.h"
 #include "alist.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Printer::description = "\
 The 'printer' component is responsible for converting the internal\n\
@@ -39,4 +40,4 @@ Printer::Printer (const AttributeList& al)
 Printer::~Printer ()
 { }
 
-static BuildBase Printer_init (Printer::component, Printer::description);
+static Librarian Printer_init (Printer::component, Printer::description);

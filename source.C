@@ -20,6 +20,7 @@
 
 #include "source.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Source::description = "\
 Time series, with possible error bars and formatting information.";
@@ -95,4 +96,4 @@ Source::Source (Block& al)
 Source::~Source ()
 { }
 
-static BuildBase Source_init (Source::component, Source::description);
+static Librarian Source_init (Source::component, Source::description);

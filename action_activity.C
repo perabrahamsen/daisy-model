@@ -24,6 +24,7 @@
 #include "syntax.h"
 #include "log.h"
 #include "memutils.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -77,7 +78,7 @@ struct ActionActivity : public Action
 
   ActionActivity (Block& al)
     : Action (al),
-      actions (BuildBase::build_vector<Action> (al, "actions"))
+      actions (Librarian::build_vector<Action> (al, "actions"))
   { }
 
   ~ActionActivity ()
@@ -102,6 +103,6 @@ at each time step.");
                        "Sequence of actions to perform.");
     alist.add ("actions", vector<AttributeList*> ());
     syntax.order ("actions");
-    BuildBase::add_type (Action::component, "activity", alist, syntax, &make);
+    Librarian::add_type (Action::component, "activity", alist, syntax, &make);
   }
 } ActionActivity_syntax;

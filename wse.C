@@ -26,6 +26,7 @@
 #include "program.h"
 #include <sstream>
 #include "mathlib.h"
+#include "librarian.h"
 #include <memory>
 
 const char *const WSE::description = "\
@@ -66,7 +67,7 @@ static struct WSE_fullSyntax
 Water stress has full effect on crop growth.\n\
 This means that if there is 50% water stress, assimilate production\n\
 will be cut into half."); 
-    BuildBase::add_type (WSE::component, "full", alist, syntax, &make);
+    Librarian::add_type (WSE::component, "full", alist, syntax, &make);
   }
 } WSE_full_syntax;
 
@@ -127,7 +128,7 @@ Effect on assimilate production of water stress.\n\
 This parameter specifies the effect on assimilate production\n(\
 compared to potential) when the amount of available soil water is\n\
 enough to cover exactly half the potential evapotranspiration.");
-    BuildBase::add_type (WSE::component, "partial", alist, syntax, &make);
+    Librarian::add_type (WSE::component, "partial", alist, syntax, &make);
   }
 } WSE_partial_syntax;
 
@@ -154,7 +155,7 @@ static struct WSE_noneSyntax
 
     alist.add ("description", 
                "Water stress has no effect on plant growth.");
-    BuildBase::add_type (WSE::component, "none", alist, syntax, &make);
+    Librarian::add_type (WSE::component, "none", alist, syntax, &make);
   }
 } WSE_none_syntax;
 
@@ -185,7 +186,7 @@ struct ProgramWSE_table : public Program
   { return true; }
   ProgramWSE_table (Block& al)
     : Program (al),
-      wse (BuildBase::build_item<WSE> (al, "wse")),
+      wse (Librarian::build_item<WSE> (al, "wse")),
       intervals (al.integer ("intervals"))
   { }
   ~ProgramWSE_table ()
@@ -208,8 +209,8 @@ The water stress effect to show in the table.");
 Number of intervals in the table.");
     alist.add ("intervals", 10);
     syntax.order ("wse");
-    BuildBase::add_type (Program::component, "wse", alist, syntax, &make);
+    Librarian::add_type (Program::component, "wse", alist, syntax, &make);
   }
 } ProgramWSE_table_syntax;
 
-static BuildBase WSE_init (WSE::component, WSE::description);
+static Librarian WSE_init (WSE::component, WSE::description);

@@ -33,6 +33,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -1459,6 +1460,6 @@ month.  The first number corresponds to January, the second to\n\
 February, etc.");
     alist.add ("TempOffset", vector<double> (12, 0.0));
 
-    BuildBase::add_type (Weather::component, "default", alist, syntax, &make);
+    Librarian::add_type (Weather::component, "default", alist, syntax, &make);
   }
 } WeatherStandard_syntax;

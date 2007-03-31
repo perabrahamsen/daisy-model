@@ -44,6 +44,7 @@
 #include "log.h"
 #include "submodeler.h"
 #include "memutils.h"
+#include "librarian.h"
 
 struct ColumnStandard : public Column
 {
@@ -864,22 +865,22 @@ ColumnStandard::output (Log& log) const
 
 ColumnStandard::ColumnStandard (Block& al)
   : Column (al),
-    movement (BuildBase::build_item<Movement> (al, "Movement")),
-    groundwater (BuildBase::build_item<Groundwater> (al, "Groundwater")),
+    movement (Librarian::build_item<Movement> (al, "Movement")),
+    groundwater (Librarian::build_item<Groundwater> (al, "Groundwater")),
     weather (al.check ("weather") 
-	     ? BuildBase::build_item<Weather> (al, "weather")
+	     ? Librarian::build_item<Weather> (al, "weather")
 	     : NULL), 
-    vegetation (BuildBase::build_item<Vegetation> (al, "Vegetation")),
-    bioclimate (BuildBase::build_item<Bioclimate> (al, "Bioclimate")),
+    vegetation (Librarian::build_item<Vegetation> (al, "Vegetation")),
+    bioclimate (Librarian::build_item<Bioclimate> (al, "Bioclimate")),
     surface (al.alist ("Surface")),
     geometry (movement->geometry ()),
     soil (submodel<Soil> (al, "Soil")),
     soil_water (submodel<SoilWater> (al, "SoilWater")),
     soil_heat (submodel<SoilHeat> (al, "SoilHeat")),
-    chemistry (BuildBase::build_item<Chemistry> (al, "Chemistry")),
+    chemistry (Librarian::build_item<Chemistry> (al, "Chemistry")),
     soil_NH4 (submodel<SoilNH4> (al, "SoilNH4")),
     soil_NO3 (submodel<SoilNO3> (al, "SoilNO3")),
-    organic_matter (BuildBase::build_item<OrganicMatter> 
+    organic_matter (Librarian::build_item<OrganicMatter> 
                     (al, "OrganicMatter")),
     denitrification (al.alist ("Denitrification")),
     second_year_utilization_ (al.number ("second_year_utilization")),
@@ -1110,6 +1111,6 @@ The nitrification log.\n\
 Note that the nitrification parameters are found in the horizons.",
 			  ColumnStandard::NitLog::load_syntax);
     
-    BuildBase::add_type (Column::component, "default", alist, syntax, &make);
+    Librarian::add_type (Column::component, "default", alist, syntax, &make);
   }
 } column_syntax;

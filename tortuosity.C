@@ -22,6 +22,7 @@
 
 #include "tortuosity.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Tortuosity::description = "\
 Solutes in the soil can't move the shortest way between two points.\n\
@@ -39,4 +40,4 @@ Tortuosity::Tortuosity (Block& al)
 Tortuosity::~Tortuosity ()
 { }
 
-static BuildBase Tortuosity_init (Tortuosity::component, Tortuosity::description);
+static Librarian Tortuosity_init (Tortuosity::component, Tortuosity::description);

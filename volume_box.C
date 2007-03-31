@@ -24,6 +24,7 @@
 #include "bound.h"
 #include "border.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 
 struct VolumeBox : public Volume
@@ -242,12 +243,12 @@ struct VolumeBox : public Volume
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   VolumeBox (Block& al)
     : Volume (al),
-      bottom (BuildBase::build_item<Bound> (al, "bottom")),
-      top (BuildBase::build_item<Bound> (al, "top")),
-      left (BuildBase::build_item<Bound> (al, "left")),
-      right (BuildBase::build_item<Bound> (al, "right")),
-      front (BuildBase::build_item<Bound> (al, "front")),
-      back (BuildBase::build_item<Bound> (al, "back"))
+      bottom (Librarian::build_item<Bound> (al, "bottom")),
+      top (Librarian::build_item<Bound> (al, "top")),
+      left (Librarian::build_item<Bound> (al, "left")),
+      right (Librarian::build_item<Bound> (al, "right")),
+      front (Librarian::build_item<Bound> (al, "front")),
+      back (Librarian::build_item<Bound> (al, "back"))
   { }
   VolumeBox (const char *const id)
     : Volume (id),
@@ -323,7 +324,7 @@ static struct Volume_BoxSyntax
 By default, the intervals fill the entire axis.  You can modify this by\n\
 setting the parameters.");
 
-    BuildBase::add_type (Volume::component, "box", alist, syntax, &make);
+    Librarian::add_type (Volume::component, "box", alist, syntax, &make);
   }
 } VolumeBox_syntax;
 

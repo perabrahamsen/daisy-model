@@ -27,6 +27,7 @@
 #include "soil.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 struct SelectContent : public SelectValue
 {
@@ -95,6 +96,6 @@ static struct SelectContentSyntax
 		  "Specify height (negative) to measure content.\n\
 The value willbe a weighted average of all cells containing height.");
 
-      BuildBase::add_type (Select::component, "content", alist, syntax, &make);
+      Librarian::add_type (Select::component, "content", alist, syntax, &make);
     }
 } Select_syntax;

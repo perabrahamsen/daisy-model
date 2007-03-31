@@ -22,6 +22,7 @@
 
 #include "condition.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Condition::description = "\
 A 'condition' component tests the state of the simulation, like\n\
@@ -50,5 +51,5 @@ Condition::Condition (const char *const id)
 Condition::~Condition ()
 { }
 
-static BuildBase Condition_init (Condition::component, Condition::description);
+static Librarian Condition_init (Condition::component, Condition::description);
 

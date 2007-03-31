@@ -26,6 +26,7 @@
 #include "smb.h"
 #include "soil.h"
 #include "assertion.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -111,6 +112,6 @@ of SMB1 and all SOM pools.");
     factor.add (1.00, 0.5);
     alist.add ("factor", factor);
 
-    BuildBase::add_type (ClayOM::component, "old", alist, syntax, &make);
+    Librarian::add_type (ClayOM::component, "old", alist, syntax, &make);
   }
 } ClayOMOld_syntax;

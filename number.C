@@ -21,6 +21,7 @@
 
 #include "number.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Number::description = "\
 Generic representation of numbers.";
@@ -42,4 +43,4 @@ Number::Number (Block& al)
 Number::~Number ()
 { }
 
-static BuildBase Number_init (Number::component, Number::description);
+static Librarian Number_init (Number::component, Number::description);

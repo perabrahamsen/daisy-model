@@ -29,6 +29,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 
 double
@@ -194,7 +195,7 @@ Only for initialization of the 'M' parameter.");
 Solute::Solute (Block& al)
   : submodel (al.check ("type") ? al.name ("type") : al.name ("submodel")),
     S_permanent (al.number_sequence ("S_permanent")),
-    adsorption (BuildBase::build_item<Adsorption> (al, "adsorption"))
+    adsorption (Librarian::build_item<Adsorption> (al, "adsorption"))
 { }
 
 Solute::~Solute ()

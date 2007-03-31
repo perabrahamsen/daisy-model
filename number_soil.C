@@ -30,6 +30,7 @@
 #include "output.h"
 #include "time.h"
 #include "units.h"
+#include "librarian.h"
 #include <memory>
 
 struct NumberByDepth : public Number
@@ -109,9 +110,9 @@ The height we want to compare with.");
   }
   NumberByDepth (Block& al)
     : Number (al),
-      column (BuildBase::build_item<Column> (al, "column")),
-      h (BuildBase::build_item<Number> (al, "h")),
-      z (BuildBase::build_item<Number> (al, "z"))
+      column (Librarian::build_item<Column> (al, "column")),
+      h (Librarian::build_item<Number> (al, "h")),
+      z (Librarian::build_item<Number> (al, "z"))
   { 
     Output output;
     Time time (9999, 1, 1, 0);
@@ -122,7 +123,7 @@ The height we want to compare with.");
     alist.add ("amplitude", 0.0);
     alist.add ("air_temperature", T);
     alist.add ("type", "none");
-    std::auto_ptr<Weather> weather (BuildBase::build_alist<Weather>
+    std::auto_ptr<Weather> weather (Librarian::build_alist<Weather>
                                     (al, alist, "initialize"));
     column->initialize (al, output, time, weather.get ());
     max_depth = column->bottom ();
@@ -163,7 +164,7 @@ static struct NumberDepthThetaSyntax
     alist.add ("description", 
 	       "Find water content (Theta) for a given pressure (h).");
     NumberByDepth::load_syntax (syntax, alist);
-    BuildBase::add_type (Number::component, "depth_Theta", alist, syntax, &make);
+    Librarian::add_type (Number::component, "depth_Theta", alist, syntax, &make);
   }
 } NumberDepthTheta_syntax;
 
@@ -201,7 +202,7 @@ static struct NumberDepthKSyntax
     alist.add ("description", 
 	       "Find water conductivity (K) for a given pressure (h).");
     NumberByDepth::load_syntax (syntax, alist);
-    BuildBase::add_type (Number::component, "depth_K", alist, syntax, &make);
+    Librarian::add_type (Number::component, "depth_K", alist, syntax, &make);
   }
 } NumberDepthK_syntax;
 
@@ -252,8 +253,8 @@ Set this to true for the A horizon.");
   }
   NumberByTension (Block& al)
     : Number (al),
-      horizon (BuildBase::build_item<Horizon> (al, "horizon")),
-      h (BuildBase::build_item<Number> (al, "h"))
+      horizon (Librarian::build_item<Horizon> (al, "horizon")),
+      h (Librarian::build_item<Number> (al, "h"))
   { horizon->initialize (al.flag ("top_soil"), 2, al.msg ()); }
 };
 
@@ -289,7 +290,7 @@ static struct NumberSoilThetaSyntax
     alist.add ("description", 
 	       "Find water content (Theta) for a given pressure (h).");
     NumberByTension::load_syntax (syntax, alist);
-    BuildBase::add_type (Number::component, "soil_Theta", alist, syntax, &make);
+    Librarian::add_type (Number::component, "soil_Theta", alist, syntax, &make);
   }
 } NumberSoilTheta_syntax;
 
@@ -323,7 +324,7 @@ static struct NumberSoilKSyntax
     alist.add ("description", 
 	       "Find hydraulic conductivity (K) for a given pressure (h).");
     NumberByTension::load_syntax (syntax, alist);
-    BuildBase::add_type (Number::component, "soil_K", alist, syntax, &make);
+    Librarian::add_type (Number::component, "soil_K", alist, syntax, &make);
   }
 } NumberSoilK_syntax;
 
@@ -362,7 +363,7 @@ static struct NumberSoilHeatCapacitySyntax
     alist.add ("description", 
 	       "Find heat capacity for a given pressure (h).");
     NumberByTension::load_syntax (syntax, alist);
-    BuildBase::add_type (Number::component, "soil_heat_capacity", alist, syntax, &make);
+    Librarian::add_type (Number::component, "soil_heat_capacity", alist, syntax, &make);
   }
 } NumberSoilHeatCapacity_syntax;
 
@@ -401,7 +402,7 @@ static struct NumberSoilHeatConductivitySyntax
     alist.add ("description", 
 	       "Find heat conductivity for a given pressure (h).");
     NumberByTension::load_syntax (syntax, alist);
-    BuildBase::add_type (Number::component, "soil_heat_conductivity", alist, syntax, &make);
+    Librarian::add_type (Number::component, "soil_heat_conductivity", alist, syntax, &make);
   }
 } NumberSoilHeatConductivity_syntax;
 
@@ -448,8 +449,8 @@ struct NumberTensionByTheta : public Number
   }
   NumberTensionByTheta (Block& al)
     : Number (al),
-      horizon (BuildBase::build_item<Horizon> (al, "horizon")),
-               Theta (BuildBase::build_item<Number> (al, "Theta"))
+      horizon (Librarian::build_item<Horizon> (al, "horizon")),
+               Theta (Librarian::build_item<Number> (al, "Theta"))
   { horizon->initialize (al.flag ("top_soil"), 2, al.msg ()); }
 };
 
@@ -470,7 +471,7 @@ The soil horizon whose properties we want to examine.");
 The water content we want to compare with.");
     syntax.add ("top_soil", Syntax::Boolean, Syntax::Const, "\
 Set this to true for the A horizon.");
-    BuildBase::add_type (Number::component, "soil_h", alist, syntax, &make);
+    Librarian::add_type (Number::component, "soil_h", alist, syntax, &make);
   }
 } NumberTensionByTheta_syntax;
 

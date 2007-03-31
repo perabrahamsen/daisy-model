@@ -28,6 +28,7 @@
 #include "treelog.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <memory>
 
 using namespace std;
@@ -87,7 +88,7 @@ EquilibriumLinear::initialize (Block& block, const Soil& soil)
   initialize_state = init_succes;
 
   auto_ptr<Pedotransfer> pedo_K 
-    (BuildBase::build_alist<Pedotransfer> (block, alist, "K"));
+    (Librarian::build_alist<Pedotransfer> (block, alist, "K"));
   if (pedo_K->check (soil, Syntax::None (), block.msg ()))
     pedo_K->set (soil, K, Syntax::None ());
   else
@@ -120,6 +121,6 @@ static struct EquilibriumLinearSyntax
     syntax.add_object ("K", Pedotransfer::component, Syntax::Const, 
                        Syntax::Singleton, "The ratio A/B at equilibrium [].");
 
-    BuildBase::add_type (Equilibrium::component, "linear", alist, syntax, &make);
+    Librarian::add_type (Equilibrium::component, "linear", alist, syntax, &make);
   }
 } EquilibriumLinear_syntax;

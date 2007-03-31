@@ -25,6 +25,7 @@
 #include "output.h"
 #include "block.h"
 #include "alist.h"
+#include "librarian.h"
 
 const char *const Scopesel::description = "\
 A method to choose a scope in a Daisy simulation.";
@@ -86,11 +87,11 @@ static struct ScopeselNameSyntax
     syntax.add ("name", Syntax::String, Syntax::Const,
                 "Name of scope to select.");
     syntax.order ("name");
-    BuildBase::add_type (Scopesel::component, "name", alist, syntax, &make);
+    Librarian::add_type (Scopesel::component, "name", alist, syntax, &make);
   }
 } ScopeselName_syntax;
 
-static BuildBase Scopesel_init (Scopesel::component, Scopesel::description);
+static Librarian Scopesel_init (Scopesel::component, Scopesel::description);
 
 // scopesel.C ends here
 

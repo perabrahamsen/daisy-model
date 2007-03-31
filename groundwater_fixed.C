@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "check.h"
 #include "assertion.h"
+#include "librarian.h"
 
 class GroundwaterFixed : public Groundwater
 {
@@ -73,7 +74,7 @@ static struct GroundwaterFixedSyntax
     syntax.add ("table", "cm", Check::none (), Syntax::Const,
 		"Groundwater level (negative number below surface).");
     syntax.order ("table");
-    BuildBase::add_type (Groundwater::component, "fixed", alist, syntax, &make);
+    Librarian::add_type (Groundwater::component, "fixed", alist, syntax, &make);
   }
 } GroundwaterFixed_syntax;
 

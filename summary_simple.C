@@ -26,6 +26,7 @@
 #include "treelog.h"
 #include "memutils.h"
 #include "submodeler.h"
+#include "librarian.h"
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -169,6 +170,6 @@ List of columns to fetch for the summary.", Fetch::load_syntax);
       syntax.add ("precision", Syntax::Integer, Syntax::Const,
 		  "Number of digits to print after decimal point.");
       alist.add ("precision", 2);
-      BuildBase::add_type (Summary::component, "simple", alist, syntax, &make);
+      Librarian::add_type (Summary::component, "simple", alist, syntax, &make);
     }
 } SummarySimple_syntax;

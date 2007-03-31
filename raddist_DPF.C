@@ -25,6 +25,7 @@
 #include "weather.h"
 #include "mathlib.h"
 #include "check.h"
+#include "librarian.h"
 #include <sstream>
 
 using namespace std;
@@ -179,7 +180,7 @@ static struct RaddistDPFSyntax
     alist.add ("Pcb", 0.029); 
 
     Raddist::load_syntax (syntax, alist);
-    BuildBase::add_type (Raddist::component, "sun-shade", alist, syntax, &make);
+    Librarian::add_type (Raddist::component, "sun-shade", alist, syntax, &make);
   }
 } RaddistDPF_syntax;
 

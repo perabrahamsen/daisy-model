@@ -23,6 +23,7 @@
 #include "weather_old.h"
 #include "block.h"
 #include "alist.h"
+#include "librarian.h"
 
 class WeatherNone : public WeatherOld
 {
@@ -102,6 +103,6 @@ static struct WeatherNoneSyntax
     alist.add ("rain_value", 0.0);
     syntax.add ("snow_value", "mm/h", Syntax::Const, "Constant snow.");
     alist.add ("snow_value", 0.0);
-    BuildBase::add_type (Weather::component, "none", alist, syntax, make);
+    Librarian::add_type (Weather::component, "none", alist, syntax, make);
   }
 } WeatherNone_syntax;

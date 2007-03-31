@@ -24,6 +24,7 @@
 #include "daisy.h"
 #include "block.h"
 #include "log.h"
+#include "librarian.h"
 
 struct ActionRepeat : public Action
 {
@@ -41,7 +42,7 @@ struct ActionRepeat : public Action
 	action = NULL;
       }
     if (action == NULL)
-      action = BuildBase::build_free<Action> (daisy.metalib, 
+      action = Librarian::build_free<Action> (daisy.metalib, 
                                               msg, repeat, "repeat");
     if (action != NULL)         // Build free may fail.
       action->doIt (daisy, msg);
@@ -75,8 +76,8 @@ struct ActionRepeat : public Action
     : Action (al, add_do (al.alist ())),
       repeat (al.alist ("repeat")),
       action (al.check ("do") 
-              ? BuildBase::build_item<Action> (al, "do")
-              : BuildBase::build_item<Action> (al, "repeat"))
+              ? Librarian::build_item<Action> (al, "do")
+              : Librarian::build_item<Action> (al, "repeat"))
   { }
 
   ~ActionRepeat ()
@@ -105,6 +106,6 @@ The action may take several timesteps.");
                          Syntax::OptionalState, Syntax::Singleton,
                          "Action currently being performed.");
       syntax.order ("repeat");
-      BuildBase::add_type (Action::component, "repeat", alist, syntax, &make);
+      Librarian::add_type (Action::component, "repeat", alist, syntax, &make);
     }
 } ActionRepeat_syntax;

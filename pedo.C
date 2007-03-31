@@ -26,6 +26,7 @@
 #include "syntax.h"
 #include <sstream>
 #include "treelog.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -92,4 +93,4 @@ Pedotransfer::Pedotransfer (Block& al)
 Pedotransfer::~Pedotransfer ()
 { }
 
-static BuildBase Pedotransfer_init (Pedotransfer::component, Pedotransfer::description);
+static Librarian Pedotransfer_init (Pedotransfer::component, Pedotransfer::description);

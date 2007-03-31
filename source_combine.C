@@ -26,6 +26,7 @@
 #include "gnuplot_utils.h"
 #include "vcheck.h"
 #include "assertion.h"
+#include "librarian.h"
 
 struct SourceCombine : public Source
 {
@@ -106,8 +107,8 @@ SourceCombine::load (Treelog& msg)
 
 SourceCombine::SourceCombine (Block& al)
   : Source (al),
-    scope (BuildBase::build_vector<Source> (al, "source")),
-    expr (BuildBase::build_item<Number> (al, "expr")),
+    scope (Librarian::build_vector<Source> (al, "source")),
+    expr (Librarian::build_item<Number> (al, "expr")),
     title_ (al.identifier ("title", expr->title ())),
     dimension_ ("UNINITIALIZED"),
     with_ (al.name ("with", "")),
@@ -140,7 +141,7 @@ Expression for calculating the value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");
     
-    BuildBase::add_type (Source::component, "combine", alist, syntax, &make);
+    Librarian::add_type (Source::component, "combine", alist, syntax, &make);
   }
 } SourceCombine_syntax;
 

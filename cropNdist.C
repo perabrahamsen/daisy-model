@@ -22,6 +22,7 @@
 #include "cropNdist.h"
 #include "block.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 const char *const CropNdist::description = "\
 The 'cropNdist' component calculates the crop N distribution for photosynthesis in the canopy.";
@@ -36,5 +37,5 @@ CropNdist::CropNdist (Block& al)
 CropNdist::~CropNdist ()
 { }
 
-static BuildBase CropNdist_init (CropNdist::component, CropNdist::description);
+static Librarian CropNdist_init (CropNdist::component, CropNdist::description);
 

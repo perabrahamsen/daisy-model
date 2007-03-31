@@ -23,6 +23,7 @@
 #include "block.h"
 #include "alist.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 
 // bound component.
@@ -104,7 +105,7 @@ static struct BoundNoneSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "No boundary specified.");
-    BuildBase::add_type (Bound::component, "none", alist, syntax, &make);
+    Librarian::add_type (Bound::component, "none", alist, syntax, &make);
   }
 } BoundNone_syntax;
 
@@ -129,7 +130,7 @@ static struct BoundFullSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Maximum value for the interval boundary.");
-    BuildBase::add_type (Bound::component, "full", alist, syntax, &make);
+    Librarian::add_type (Bound::component, "full", alist, syntax, &make);
   }
 } BoundFull_syntax;
 
@@ -147,10 +148,10 @@ static struct BoundFiniteSyntax
     syntax.add ("bound", "cm", Syntax::Const, "Interval bound to use.");
     syntax.order ("bound");
 
-    BuildBase::add_type (Bound::component, "finite", alist, syntax, &make);
+    Librarian::add_type (Bound::component, "finite", alist, syntax, &make);
   }
 } BoundFinite_syntax;
 
-static BuildBase Bound_init (Bound::component, Bound::description);
+static Librarian Bound_init (Bound::component, Bound::description);
 
 // bound.C ends here.

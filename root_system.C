@@ -33,6 +33,7 @@
 #include "check.h"
 #include "block.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 
 double 
@@ -518,7 +519,7 @@ get_PotRtDpt (Block& al)
 }
 
 RootSystem::RootSystem (Block& al)
-  : rootdens (BuildBase::build_item<Rootdens> (al, "rootdens")),
+  : rootdens (Librarian::build_item<Rootdens> (al, "rootdens")),
     PenPar1 (al.number ("PenPar1")),
     PenPar2 (al.number ("PenPar2")),
     PenClayFac (al.plf ("PenClayFac")),

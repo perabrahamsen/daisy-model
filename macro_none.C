@@ -23,6 +23,7 @@
 #include "macro.h"
 #include "syntax.h"
 #include "alist.h"
+#include "librarian.h"
 
 struct MacroNone : public Macro
 {
@@ -62,6 +63,6 @@ static struct MacroNoneSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "No macropores.");
-      BuildBase::add_type (Macro::component, "none", alist, syntax, &make);
+      Librarian::add_type (Macro::component, "none", alist, syntax, &make);
     }
 } MacroNone_syntax;

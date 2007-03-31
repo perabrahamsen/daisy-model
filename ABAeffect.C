@@ -22,6 +22,7 @@
 #include "ABAeffect.h"
 #include "mathlib.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const ABAEffect::description = "\
 The 'ABAeffect' component calculates the effect of ABA on photosynthesis.";
@@ -36,5 +37,5 @@ ABAEffect::ABAEffect (Block& al)
 ABAEffect::~ABAEffect ()
 { }
 
-static BuildBase ABAEffect_init (ABAEffect::component, ABAEffect::description);
+static Librarian ABAEffect_init (ABAEffect::component, ABAEffect::description);
 

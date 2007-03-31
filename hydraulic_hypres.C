@@ -30,6 +30,7 @@
 #include "treelog.h"
 #include <sstream>
 #include "mathlib.h"
+#include "librarian.h"
 
 class HydraulicHypres : public Hydraulic
 {
@@ -315,7 +316,7 @@ If set true this horizon will be initialized as a topsoil (i.e. the\n\
 plowing layer), if set false it will be initialized as a subsoil.\n\
 By default, the horizon will be initialized as a topsoil if and only if\n\
 it is the topmost horison in the soil profile.");
-    BuildBase::add_type (Hydraulic::component, "hypres", alist, syntax, make);
+    Librarian::add_type (Hydraulic::component, "hypres", alist, syntax, make);
   }
 } hydraulicHypres_syntax;
 

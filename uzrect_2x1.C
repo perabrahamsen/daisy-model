@@ -29,6 +29,7 @@
 #include "mathlib.h"
 #include "assertion.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 
 struct UZRect2x1 : public UZRect
@@ -279,8 +280,8 @@ If none succeeds, the simulation ends.");
 
 UZRect2x1::UZRect2x1 (Block& al)
   : UZRect (al),
-    vertical (BuildBase::build_vector<UZmodel> (al, "vertical")),
-    horizontal (BuildBase::build_vector<UZ1D> (al, "horizontal"))
+    vertical (Librarian::build_vector<UZmodel> (al, "vertical")),
+    horizontal (Librarian::build_vector<UZ1D> (al, "horizontal"))
 { }
 
 UZRect2x1::~UZRect2x1 ()
@@ -316,7 +317,7 @@ static struct UZRect2x1Syntax
 Transport water in the matrix in two phases, first vertical, then\n\
 horizontal.");
     UZRect2x1::load_syntax (syntax, alist);
-    BuildBase::add_type (UZRect::component, "v+h", alist, syntax, &make);
+    Librarian::add_type (UZRect::component, "v+h", alist, syntax, &make);
   }
 } UZRect2x1_syntax;
 

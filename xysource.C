@@ -21,6 +21,7 @@
 #include "xysource.h"
 #include "block.h"
 #include "assertion.h"
+#include "librarian.h"
 
 const char *const XYSource::description = "\
 XY data series.";
@@ -97,4 +98,4 @@ XYSource::XYSource (Block& al)
 XYSource::~XYSource ()
 { }
 
-static BuildBase XYSource_init (XYSource::component, XYSource::description);
+static Librarian XYSource_init (XYSource::component, XYSource::description);

@@ -28,6 +28,7 @@
 #include "texture.h"
 #include "treelog.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 
 class Hydraulic_Cosby : public Hydraulic
@@ -180,6 +181,6 @@ static struct Hydraulic_CosbySyntax
     alist.add ("description", "\
 Modified Campbell retention curve model with Burdine theory.\n\
 Parameters estimated from soil texture as specified by Cosby et at.");
-    BuildBase::add_type (Hydraulic::component, "Cosby_et_al", alist, syntax, &make);
+    Librarian::add_type (Hydraulic::component, "Cosby_et_al", alist, syntax, &make);
   }
 } hydraulic_Cosby_syntax;

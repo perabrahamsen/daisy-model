@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "hydraulic.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 class TortuosityM_Q : public Tortuosity
 {
@@ -55,7 +56,7 @@ static struct TortuosityM_QSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Millington-Quirk.  Theta^(7/3) / Theta_sat^2.");
-    BuildBase::add_type (Tortuosity::component, "M_Q", alist, syntax, &make);
+    Librarian::add_type (Tortuosity::component, "M_Q", alist, syntax, &make);
   }
 } TortuosityM_Q_syntax;
 

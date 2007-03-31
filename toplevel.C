@@ -32,6 +32,7 @@
 #include "version.h"
 #include "assertion.h"
 #include "treelog_dual.h"
+#include "librarian.h"
 #include <sstream>
 #include <iostream>
 
@@ -225,7 +226,7 @@ Toplevel::initialize ()
     throw EXIT_FAILURE;
   {                             // Limit lifetime of block.
     Block block (metalib_, *msg, "Building");
-    program_.reset (BuildBase::build_alist<Program> (block,
+    program_.reset (Librarian::build_alist<Program> (block,
                                                      program_alist (), "run"));
     if (!block.ok ())
       throw EXIT_FAILURE;
@@ -348,7 +349,7 @@ Toplevel::command_line (int& argc, char**& argv)
 		    std::auto_ptr<Block> block (new Block (metalib_, *msg, 
                                                            "Building"));
                     std::auto_ptr<Program> program
-                      (BuildBase::build_alist<Program> (*block, p_alist, 
+                      (Librarian::build_alist<Program> (*block, p_alist, 
                                                         "Command line"));
 		    if (!block->ok ())
                       throw EXIT_FAILURE;
@@ -477,7 +478,7 @@ Toplevel::load_syntax (Syntax& syntax, AttributeList& alist)
   // Top level Daisy syntax.
   Daisy::load_syntax (syntax, alist);
   alist.add ("type", "Daisy");
-  BuildBase::load_syntax (syntax, alist);
+  Librarian::load_syntax (syntax, alist);
   load_run (syntax, alist);
 }
 

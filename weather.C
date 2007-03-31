@@ -27,6 +27,7 @@
 #include "time.h"
 #include "log.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -370,8 +371,8 @@ static struct WeatherSyntax
     AttributeList& alist = *new AttributeList ();
     Weather::load_syntax (syntax, alist);
 
-    BuildBase::add_base (Weather::component, alist, syntax);
+    Librarian::add_base (Weather::component, alist, syntax);
   }
 } Weather_syntax;
 
-static BuildBase Weather_init (Weather::component, Weather::description);
+static Librarian Weather_init (Weather::component, Weather::description);

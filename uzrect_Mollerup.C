@@ -31,6 +31,7 @@
 #include "alist.h"
 #include "mathlib.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <sstream>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -954,7 +955,7 @@ static struct UZRectMollerupSyntax
 A finite volume solution to matrix water transport.\n\
 See Mollerup 2007 for details.");
     UZRectMollerup::load_syntax (syntax, alist);
-    BuildBase::add_type (UZRect::component, "Mollerup", alist, syntax, &make);
+    Librarian::add_type (UZRect::component, "Mollerup", alist, syntax, &make);
   }
 } UZRectMollerup_syntax;
 

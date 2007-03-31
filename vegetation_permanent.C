@@ -35,6 +35,7 @@
 #include "organic_matter.h"
 #include "submodeler.h"
 #include "check.h"
+#include "librarian.h"
 #include <sstream>
 #include <deque>
 
@@ -430,6 +431,6 @@ Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
     syntax.add_submodule("Litter", alist, Syntax::State, "Dead stuff.",
 			 Litter::load_syntax);
     
-    BuildBase::add_type (Vegetation::component, "permanent", alist, syntax, &make);
+    Librarian::add_type (Vegetation::component, "permanent", alist, syntax, &make);
   }
 } VegetationPermanent_syntax;

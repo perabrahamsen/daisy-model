@@ -25,6 +25,7 @@
 #include "border.h"
 #include "geometry.h"
 #include "treelog.h"
+#include "librarian.h"
 #ifdef DEBUG_EDGES
 #include <sstream>
 #endif
@@ -215,7 +216,7 @@ static struct SelectFlowTopSyntax
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
 
-    BuildBase::add_type (Select::component, "flow_top", alist, syntax, &make);
+    Librarian::add_type (Select::component, "flow_top", alist, syntax, &make);
   }
 } Select_flow_top_syntax;
 
@@ -236,7 +237,7 @@ OBSOLETE: Use '(flow_top (negate true) (density true))' instead.");
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
     alist.add ("density", true);
-    BuildBase::add_type (Select::component, "flux_top", alist, syntax, &make);
+    Librarian::add_type (Select::component, "flux_top", alist, syntax, &make);
   }
 } Select_flux_top_syntax;
 
@@ -274,7 +275,7 @@ static struct SelectFlowBottomSyntax
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
 
-    BuildBase::add_type (Select::component, "flow_bottom", alist, syntax, &make);
+    Librarian::add_type (Select::component, "flow_bottom", alist, syntax, &make);
   }
 } Select_flow_bottom_syntax;
 
@@ -295,7 +296,7 @@ OBSOLETE: Use '(flow_bottom (density true))' instead.");
 By default, measure from the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
     alist.add ("density", true);
-    BuildBase::add_type (Select::component, "flux_bottom", alist, syntax, &make);
+    Librarian::add_type (Select::component, "flux_bottom", alist, syntax, &make);
   }
 } Select_flux_bottom_syntax;
 
@@ -329,7 +330,7 @@ static struct SelectFlowLeftSyntax
     alist.add ("description", "Extract flow from left of specified volume.");
     SelectFlow::load_syntax (syntax, alist);
 
-    BuildBase::add_type (Select::component, "flow_left", alist, syntax, &make);
+    Librarian::add_type (Select::component, "flow_left", alist, syntax, &make);
   }
 } Select_flow_left_syntax;
 
@@ -363,7 +364,7 @@ static struct SelectFlowRightSyntax
     alist.add ("description", "Extract flow from right of specified volume.");
     SelectFlow::load_syntax (syntax, alist);
 
-    BuildBase::add_type (Select::component, "flow_right", alist, syntax, &make);
+    Librarian::add_type (Select::component, "flow_right", alist, syntax, &make);
   }
 } Select_flow_right_syntax;
 
@@ -397,7 +398,7 @@ static struct SelectFlowFrontSyntax
     alist.add ("description", "Extract flow from front of specified volume.");
     SelectFlow::load_syntax (syntax, alist);
 
-    BuildBase::add_type (Select::component, "flow_front", alist, syntax, &make);
+    Librarian::add_type (Select::component, "flow_front", alist, syntax, &make);
   }
 } Select_flow_front_syntax;
 
@@ -431,7 +432,7 @@ static struct SelectFlowBackSyntax
     alist.add ("description", "Extract flow from back of specified volume.");
     SelectFlow::load_syntax (syntax, alist);
 
-    BuildBase::add_type (Select::component, "flow_back", alist, syntax, &make);
+    Librarian::add_type (Select::component, "flow_back", alist, syntax, &make);
   }
 } Select_flow_back_syntax;
 

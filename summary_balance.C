@@ -26,6 +26,7 @@
 #include "select.h"
 #include "treelog.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 #include <algorithm>
 #include <fstream>
@@ -285,6 +286,6 @@ If the balance only hold true when logging the top of the soil, i.e. the\n\
                   "Tags of columns in log file representing outputs.");
       syntax.add ("content", Syntax::String, Syntax::Const, Syntax::Sequence,
                   "Tags of columns in log file representing content.");
-      BuildBase::add_type (Summary::component, "balance", alist, syntax, &make);
+      Librarian::add_type (Summary::component, "balance", alist, syntax, &make);
     }
 } SummaryBalance_syntax;

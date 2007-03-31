@@ -21,6 +21,7 @@
 #include "volume.h"
 #include "block.h"
 #include "assertion.h"
+#include "librarian.h"
 
 class Log;
 
@@ -32,7 +33,7 @@ const char *const Volume::component = "volume";
 std::auto_ptr<Volume>
 Volume::build_obsolete (Block& al)
 {
-  Volume *const vol = BuildBase::build_item<Volume> (al, "volume");
+  Volume *const vol = Librarian::build_item<Volume> (al, "volume");
   daisy_assert (vol);
   if (al.check ("from"))
     {
@@ -60,6 +61,6 @@ Volume::Volume (const char *const id)
 Volume::~Volume ()
 { }
 
-static BuildBase Volume_init (Volume::component, Volume::description);
+static Librarian Volume_init (Volume::component, Volume::description);
 
 // volume.C ends here.

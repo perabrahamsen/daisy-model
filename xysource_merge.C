@@ -27,6 +27,7 @@
 #include "units.h"
 #include "vcheck.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 
 struct XYSourceMerge : public XYSource
@@ -162,7 +163,7 @@ XYSourceMerge::load (Treelog& msg)
 
 XYSourceMerge::XYSourceMerge (Block& al)
   : XYSource (al),
-    source (BuildBase::build_vector<XYSource> (al, "source")),
+    source (Librarian::build_vector<XYSource> (al, "source")),
     title_ (al.name ("title")),
     x_dimension_ (al.name ("x_dimension")),
     y_dimension_ (al.name ("y_dimension")),
@@ -194,7 +195,7 @@ Dimension for x points.");
     syntax.add ("y_dimension", Syntax::String, Syntax::Const, "\
 Dimension for y points.");
 
-    BuildBase::add_type (XYSource::component, "merge", alist, syntax, &make);
+    Librarian::add_type (XYSource::component, "merge", alist, syntax, &make);
   }
 } XYSourceMerge_syntax;
 

@@ -27,6 +27,7 @@
 #include "hydraulic.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -207,7 +208,7 @@ NOTE: Not a real texture class, use 'sand' instead.");
                 Syntax::Const,
                 "Relative fraction of humus in soil.");
 
-    BuildBase::add_type (Horizon::component, "default", alist, syntax, &make);
+    Librarian::add_type (Horizon::component, "default", alist, syntax, &make);
   }
 } HorizonStandard_syntax;
 

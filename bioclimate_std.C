@@ -44,6 +44,7 @@
 #include "time.h"
 #include "check.h"
 #include "fao.h"
+#include "librarian.h"
 #include <sstream>
 
 struct BioclimateStandard : public Bioclimate
@@ -258,7 +259,7 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
       alist.add ("type", type);
       const Syntax& syntax  = library.syntax (type);
       daisy_assert (syntax.check (metalib, alist, block.msg ()));
-      pet.reset (BuildBase::build_alist<Pet> (block, alist, "pet"));
+      pet.reset (Librarian::build_alist<Pet> (block, alist, "pet"));
     }
 
   if (!difrad.get ())                      // Explicit.
@@ -279,7 +280,7 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
       alist.add ("type", type);
       const Syntax& syntax = library.syntax (type);
       daisy_assert (syntax.check (metalib, alist, block.msg ()));
-      difrad.reset (BuildBase::build_alist<Difrad> (block, alist, "difrad"));
+      difrad.reset (Librarian::build_alist<Difrad> (block, alist, "difrad"));
     }
 }
 
@@ -458,9 +459,9 @@ BioclimateStandard::BioclimateStandard (Block& al)
     sun_PAR_ (No + 1),
     sun_LAI_fraction_ (No),
     shared_light_fraction_ (1.0),
-    net_radiation (BuildBase::build_item<NetRadiation> (al, "net_radiation")),
+    net_radiation (Librarian::build_item<NetRadiation> (al, "net_radiation")),
     pet (al.check ("pet") 
-         ? BuildBase::build_item<Pet> (al, "pet")
+         ? Librarian::build_item<Pet> (al, "pet")
          : NULL),
     total_ep (0.0),
     total_ea (0.0),
@@ -497,13 +498,13 @@ BioclimateStandard::BioclimateStandard (Block& al)
     pond_ea (0.0),
     soil_ep (0.0),
     soil_ea (0.0),
-    svat (BuildBase::build_item<SVAT> (al, "svat")),
+    svat (Librarian::build_item<SVAT> (al, "svat")),
     crop_ep (0.0),
     crop_ea (0.0),
     production_stress (-1.0),
-    raddist (BuildBase::build_item<Raddist> (al, "raddist")),
+    raddist (Librarian::build_item<Raddist> (al, "raddist")),
     difrad (al.check ("difrad") 
-         ? BuildBase::build_item<Difrad> (al, "difrad")
+         ? Librarian::build_item<Difrad> (al, "difrad")
          : NULL),
     difrad0 (0.0),
 
@@ -1041,7 +1042,7 @@ static struct BioclimateStandardSyntax
  
     BioclimateStandard::load_syntax (syntax, alist);
     // Add to library.
-    BuildBase::add_type (Bioclimate::component, 
+    Librarian::add_type (Bioclimate::component, 
                          "default", alist, syntax, &make);
   }
 } BioclimateStandard_syntax;

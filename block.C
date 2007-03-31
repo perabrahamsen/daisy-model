@@ -27,6 +27,7 @@
 #include "number.h"
 #include "assertion.h"
 #include "scope_block.h"
+#include "librarian.h"
 #include <sstream>
 
 struct Block::Implementation
@@ -164,7 +165,7 @@ Block::Implementation::expand_string (Block& block,
                         if (library.name () == symbol (Stringer::component))
                           {
                             const std::auto_ptr<Stringer> stringer 
-                              (BuildBase::build_alist<Stringer> (block,
+                              (Librarian::build_alist<Stringer> (block,
                                                                  obj, key));
                             if (!block.ok () 
                                 || !stringer->initialize (msg)
@@ -176,7 +177,7 @@ Block::Implementation::expand_string (Block& block,
                         else if (library.name () == symbol (Number::component))
                           {
                             const std::auto_ptr<Number> number 
-                              (BuildBase::build_alist<Number> (block, 
+                              (Librarian::build_alist<Number> (block, 
                                                                obj, key));
                             if (!block.ok () 
                                 || !number->initialize (msg)

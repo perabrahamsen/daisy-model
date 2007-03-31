@@ -26,6 +26,7 @@
 #include "mathlib.h"
 #include "plf.h"
 #include "check.h"
+#include "librarian.h"
 
 class NitrificationSoil : public Nitrification
 {
@@ -107,6 +108,6 @@ with nitrification based on total ammonium content.");
     syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const,
                 "Water potential factor.");
     alist.add ("water_factor", PLF::empty ());
-    BuildBase::add_type (Nitrification::component, "soil", alist, syntax, &make);
+    Librarian::add_type (Nitrification::component, "soil", alist, syntax, &make);
   }
 } NitrificationSoil_syntax;

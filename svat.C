@@ -23,6 +23,7 @@
 #include "svat.h"
 #include "log.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const SVAT::description = "\
 The task of the 'svat' component is to calculate the production\n\
@@ -47,6 +48,6 @@ SVAT::SVAT (Block& al)
 SVAT::~SVAT ()
 { }
 
-static BuildBase SVAT_init (SVAT::component, SVAT::description);
+static Librarian SVAT_init (SVAT::component, SVAT::description);
 
 // svat.C ends here.

@@ -25,6 +25,7 @@
 #include "fao.h"
 #include "log.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -99,6 +100,6 @@ Hargreaves, G.H., and Samani, Z.A. (1985) Reference crop\n\
 evapotranspiration from temperature. Appl. Engrg. in Agric.,\n\
 1(2):96-99.");
       Pet::load_syntax (syntax, alist);
-      BuildBase::add_type (Pet::component, "Hargreaves", alist, syntax, &make);
+      Librarian::add_type (Pet::component, "Hargreaves", alist, syntax, &make);
     }
 } PetHargreaves_syntax;

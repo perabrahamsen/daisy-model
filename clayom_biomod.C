@@ -27,6 +27,7 @@
 #include "soil.h"
 #include "treelog.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 
 using namespace std;
@@ -281,6 +282,6 @@ Only the fraction of AOM going to a SMB pool count, so this is really\n\
 a fraction of the fraction coing to the SMB pools.\n\
 Note that you must set the 'fraction' parameter of all AOM pools to\n\
 reflect this for the BIOMOD clay response model to work correctly.");
-    BuildBase::add_type (ClayOM::component, "biomod", alist, syntax, &make);
+    Librarian::add_type (ClayOM::component, "biomod", alist, syntax, &make);
   }
 } ClayOMBiomod_syntax;

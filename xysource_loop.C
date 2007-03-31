@@ -27,6 +27,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "assertion.h"
+#include "librarian.h"
 
 class XYSourceLoop : public XYSource
 {
@@ -123,8 +124,8 @@ XYSourceLoop::XYSourceLoop (Block& al)
   : XYSource (al),
     with_ (al.name ("with")),
     style_ (al.integer ("style", -1)),
-    x_expr (BuildBase::build_item<Number> (al, "x")),
-    y_expr (BuildBase::build_item<Number> (al, "y")),
+    x_expr (Librarian::build_item<Number> (al, "x")),
+    y_expr (Librarian::build_item<Number> (al, "y")),
     title_ (al.name ("title", y_expr->title () + " vs " + x_expr->title ())),
     x_dimension_ ("UNINITIALIZED"),
     y_dimension_ ("UNINITIALIZED"),
@@ -206,7 +207,7 @@ Disretization within interval.");
 Name of free variable to calculate the 'x' and 'y' expressions from.");
     alist.add ("tag", "x");
 
-    BuildBase::add_type (XYSource::component, "loop", alist, syntax, &make);
+    Librarian::add_type (XYSource::component, "loop", alist, syntax, &make);
   }
 } XYSourceLoop_syntax;
 

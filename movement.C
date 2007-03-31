@@ -21,6 +21,7 @@
 
 #include "movement.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Movement::description = "\
 This component handles the movement in the soil.";
@@ -34,5 +35,5 @@ Movement::Movement (Block& al)
 Movement::~Movement ()
 { }
 
-static BuildBase Movement_init (Movement::component, Movement::description);
+static Librarian Movement_init (Movement::component, Movement::description);
 

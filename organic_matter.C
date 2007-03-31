@@ -20,6 +20,7 @@
 
 #include "organic_matter.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const OrganicMatter::description = "\
 Turnover of organic matter in the soil.";
@@ -33,4 +34,4 @@ OrganicMatter::OrganicMatter (Block& al)
 OrganicMatter::~OrganicMatter ()
 { }
 
-static BuildBase Organic_init (OrganicMatter::component, OrganicMatter::description);
+static Librarian Organic_init (OrganicMatter::component, OrganicMatter::description);

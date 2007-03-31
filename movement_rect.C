@@ -28,6 +28,7 @@
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
+#include "librarian.h"
 
 struct MovementRect : public Movement
 {
@@ -300,8 +301,8 @@ MovementRect::MovementRect (Block& al)
   : Movement (al),
     geo (submodel<GeometryRect> (al, "Geometry")),
     drain_position (map_construct_const<Point> (al.alist_sequence ("drain"))),
-    matrix_water (BuildBase::build_vector<UZRect> (al, "matrix_water")),
-    matrix_solute (BuildBase::build_vector<Msoltranrect> (al, "matrix_solute"))
+    matrix_water (Librarian::build_vector<UZRect> (al, "matrix_water")),
+    matrix_solute (Librarian::build_vector<Msoltranrect> (al, "matrix_solute"))
 { 
   for (size_t i = 0; i < drain_position.size (); i++)
     {
@@ -361,6 +362,6 @@ If none succeeds, the simulation ends.");
     AttributeList matrix_solute_reserve (Msoltranrect::reserve_model ());
     matrix_solute_models.push_back (&matrix_solute_reserve);
     alist.add ("matrix_solute", matrix_solute_models);
-    BuildBase::add_type (Movement::component, "rectangle", alist, syntax, &make);
+    Librarian::add_type (Movement::component, "rectangle", alist, syntax, &make);
   }
 } MovementRect_syntax;

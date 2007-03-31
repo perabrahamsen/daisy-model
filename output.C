@@ -27,6 +27,7 @@
 #include "timestep.h"
 #include "syntax.h"
 #include "assertion.h"
+#include "librarian.h"
 
 void
 Output::initial_logs (const Daisy& daisy, Treelog& msg)
@@ -155,12 +156,12 @@ const std::vector<Scope*>
 
 Output::Output (Block& al)
   : logging (false),
-    exchanges (BuildBase::build_vector<Scope> (al, "exchange")),
-    logs (BuildBase::build_vector<Log> (al, "output")),
+    exchanges (Librarian::build_vector<Scope> (al, "exchange")),
+    logs (Librarian::build_vector<Log> (al, "output")),
     log_all (new LogAll (logs)),
     active_logs (find_active_logs (logs, *log_all)),
     scopes (find_extern_logs (logs, exchanges)),
-    activate_output (BuildBase::build_item<Condition> (al, "activate_output"))
+    activate_output (Librarian::build_item<Condition> (al, "activate_output"))
 { }
 
 Output::Output ()

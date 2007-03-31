@@ -24,6 +24,7 @@
 #include "syntax.h"
 #include <sstream>
 #include "check.h"
+#include "librarian.h"
 
 static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
 
@@ -128,7 +129,7 @@ static struct cropNdistDPFSyntax
 	       "Boegh et al.(2002) crop N-distribution model in the canopy for photosynthesis and distribution of photosynthetical capacity.");
 
     load_syntax (syntax, alist);
-    BuildBase::add_type (CropNdist::component, "N-exp", alist, syntax, &make);
+    Librarian::add_type (CropNdist::component, "N-exp", alist, syntax, &make);
   }
 } cropNdistDPF_syntax;
 

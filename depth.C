@@ -30,6 +30,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <string>
 
 // depth component.
@@ -91,7 +92,7 @@ static struct DepthConstSyntax
     syntax.add ("value", "cm", Check::non_positive (), Syntax::Const, 
                 "Constant depth.");
     syntax.order ("value");
-    BuildBase::add_type (Depth::component, "const", alist, syntax, &make);
+    Librarian::add_type (Depth::component, "const", alist, syntax, &make);
   }
 } DepthConst_syntax;
 
@@ -179,7 +180,7 @@ the depth for other times, linear interpolation between the entries\n\
 in the list will be used.", entry_syntax);
     syntax.add_check ("table", check_table);
     syntax.order ("table");
-    BuildBase::add_type (Depth::component, "PLF", alist, syntax, &make);
+    Librarian::add_type (Depth::component, "PLF", alist, syntax, &make);
   }
 } DepthPLF_syntax;
 
@@ -310,10 +311,10 @@ The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\
 Linear interpolation is used between the datapoints.");
     syntax.order ("file");
-    BuildBase::add_type (Depth::component, "file", alist, syntax, &make);
+    Librarian::add_type (Depth::component, "file", alist, syntax, &make);
   }
 } DepthFile_syntax;
 
-static BuildBase Depth_init (Depth::component, Depth::description);
+static Librarian Depth_init (Depth::component, Depth::description);
 
 // depth.C ends here.

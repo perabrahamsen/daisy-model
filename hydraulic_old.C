@@ -25,6 +25,7 @@
 #include "hydraulic.h"
 #include "mathlib.h"
 #include "plf.h"
+#include "librarian.h"
 #include <fstream>
 
 class HydraulicOld : public Hydraulic
@@ -162,5 +163,5 @@ that pressure [m/s].");
   alist.add ("M_intervals", 500);
   syntax.add ("file", Syntax::String, Syntax::Const, "The file to read.");
   syntax.order ("file");
-  BuildBase::add_type (Hydraulic::component, "old", alist, syntax, &HydraulicOld::make);
+  Librarian::add_type (Hydraulic::component, "old", alist, syntax, &HydraulicOld::make);
 }

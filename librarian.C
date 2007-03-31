@@ -27,24 +27,25 @@
 #include "alist.h"
 #include "treelog.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <sstream>
 #include <map>
 
 void 
-BuildBase::non_null (const void *const p)
+Librarian::non_null (const void *const p)
 { daisy_assert (p); }
 
-Intrinsics* BuildBase::content = 0;  
+Intrinsics* Librarian::content = 0;  
 
 const Intrinsics& 
-BuildBase::intrinsics ()
+Librarian::intrinsics ()
 { 
   daisy_assert (content);
   return *content;
 }
 
 Model* 
-BuildBase::build_free (const char *const component, Metalib& metalib,
+Librarian::build_free (const char *const component, Metalib& metalib,
                        Treelog& msg, const AttributeList& alist, 
                        const std::string& scope_id)
 {
@@ -72,7 +73,7 @@ BuildBase::build_free (const char *const component, Metalib& metalib,
 }
 
 Model* 
-BuildBase::build_alist (const char *const component,
+Librarian::build_alist (const char *const component,
                         Block& parent, const AttributeList& alist, 
                         const std::string& scope_id)
 {
@@ -99,12 +100,12 @@ BuildBase::build_alist (const char *const component,
 }
 
 Model* 
-BuildBase::build_item (const char *const component,
+Librarian::build_item (const char *const component,
                        Block& parent, const std::string& key)
 { return build_alist (component, parent, parent.alist (key), key); }
 
 std::vector<Model*> 
-BuildBase::build_vector (const char *const component,
+Librarian::build_vector (const char *const component,
                          Block& al, const std::string& key)
 { 
   std::vector<Model*> t;
@@ -115,7 +116,7 @@ BuildBase::build_vector (const char *const component,
 }
 
 std::vector<const Model*> 
-BuildBase::build_vector_const (const char *const component,
+Librarian::build_vector_const (const char *const component,
                                Block& al, const std::string& key)
 { 
   std::vector<const Model*> t;
@@ -126,7 +127,7 @@ BuildBase::build_vector_const (const char *const component,
 }
 
 Library& 
-BuildBase::library (const char* component)
+Librarian::library (const char* component)
 {
   if (!content)
     content = new Intrinsics ();
@@ -136,7 +137,7 @@ BuildBase::library (const char* component)
  
 
 void 
-BuildBase::add_base (const char *const component,
+Librarian::add_base (const char *const component,
                      AttributeList& al, const Syntax& syntax)
 { 
   library (component).add_base (al, syntax); 
@@ -144,7 +145,7 @@ BuildBase::add_base (const char *const component,
 }
 
 void 
-BuildBase::add_type (const char *const component,
+Librarian::add_type (const char *const component,
                      const symbol name, AttributeList& al,
                      const Syntax& syntax, builder build)
 {
@@ -153,7 +154,7 @@ BuildBase::add_type (const char *const component,
 }
 
 void
-BuildBase::add_type (const char *const component,
+Librarian::add_type (const char *const component,
                      const char *const name, AttributeList& al,
                      const Syntax& syntax, builder build)
 {
@@ -162,7 +163,7 @@ BuildBase::add_type (const char *const component,
 }
 
 void 
-BuildBase::add_alias (const char *const component,
+Librarian::add_alias (const char *const component,
                       const symbol derived, const symbol base)
 {
   Library& lib = library (component);
@@ -178,14 +179,14 @@ BuildBase::add_alias (const char *const component,
 }
 
 void 
-BuildBase::add_doc_fun (const char *const component, const doc_fun fun)
+Librarian::add_doc_fun (const char *const component, const doc_fun fun)
 {
   library (component).add_doc_fun (fun); 
   daisy_assert (!content->closed);
 } 
 
 void
-BuildBase::load_syntax (Syntax& syntax, AttributeList&)
+Librarian::load_syntax (Syntax& syntax, AttributeList&)
 {
   const std::string def = "def";
   for (std::map<symbol, Library*>::const_iterator i = content->all.begin (); 
@@ -197,14 +198,14 @@ BuildBase::load_syntax (Syntax& syntax, AttributeList&)
     }
 }
 
-BuildBase::BuildBase (const char *const component,
+Librarian::Librarian (const char *const component,
                       const char *const description)
 {
   library (component).set_description (description);
   content->count++;
 }
 
-BuildBase::~BuildBase ()
+Librarian::~Librarian ()
 { 
   daisy_assert (content);
   daisy_assert (content->count > 0);

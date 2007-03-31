@@ -25,6 +25,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "check.h"
+#include "librarian.h"
 
 struct ActionSetHeatSource : public Action
 {
@@ -62,7 +63,7 @@ Set external point heat source at height to value.");
     syntax.add ("value", "W/m^2", Check::non_negative (), Syntax::Const,
 		"Value of heat source.");
     syntax.order ("height", "value");
-    BuildBase::add_type (Action::component, "set_heat_source", 
+    Librarian::add_type (Action::component, "set_heat_source", 
 				 alist, syntax, &make);
   }
 } ActionHeat_syntax;

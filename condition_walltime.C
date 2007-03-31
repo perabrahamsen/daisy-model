@@ -23,6 +23,7 @@
 #include "condition.h"
 #include "block.h"
 #include "alist.h"
+#include "librarian.h"
 
 struct ConditionPeriodic : public Condition
 {
@@ -63,7 +64,7 @@ it was true.");
 		"Number of walltime seconds between success.");
     alist.add ("period", 1);
     syntax.order ("period");
-    BuildBase::add_type (Condition::component, "periodic", alist, syntax, make);
+    Librarian::add_type (Condition::component, "periodic", alist, syntax, make);
   }
 } ConditionPeriodic_syntax;
 

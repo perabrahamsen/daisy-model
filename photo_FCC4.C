@@ -35,6 +35,7 @@
 #include "mathlib.h"
 #include <sstream>
 #include "check.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -131,8 +132,8 @@ public:
       Ptot (al.number("Ptot")),
       m (al.number("m")),
       b (al.number("b")),
-      cropNdist (BuildBase::build_item<CropNdist> (al, "N-dist")),
-      ABAeffect (BuildBase::build_item<ABAEffect> (al, "ABAeffect"))
+      cropNdist (Librarian::build_item<CropNdist> (al, "N-dist")),
+      ABAeffect (Librarian::build_item<ABAEffect> (al, "ABAeffect"))
   { }
   ~PhotoFCC4 ()
   { }
@@ -663,7 +664,7 @@ static struct Photo_FQC4Syntax
                        "The effect of xylem ABA on stomata conductivity.");
     alist.add ("ABAeffect", ABAEffect::default_model ());
 
-    BuildBase::add_type (Photo::component, "FC_C4", alist, syntax, &make);
+    Librarian::add_type (Photo::component, "FC_C4", alist, syntax, &make);
   }
 
 } PhotoFCC4_syntax;

@@ -27,6 +27,7 @@
 #include "daisy.h"
 #include "check.h"
 #include "log.h"
+#include "librarian.h"
 #include <sstream>
 
 struct ConditionTSum : public Condition
@@ -120,7 +121,7 @@ Temeperature sum above which the condition becomes true.");
       syntax.add ("TSum_now", "dg C d", Syntax::OptionalState, "\
 Current temeprature sum since last reset.");
       syntax.order ("TSum_limit");
-      BuildBase::add_type (Condition::component, "TSum_above",
+      Librarian::add_type (Condition::component, "TSum_above",
 				      alist, syntax, &make);
     }
   }

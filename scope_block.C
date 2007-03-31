@@ -24,6 +24,7 @@
 #include "stringer.h"
 #include "alist.h"
 #include "assertion.h"
+#include "librarian.h"
 
 const std::vector<symbol>& 
 ScopeBlock::all_numbers () const
@@ -58,7 +59,7 @@ ScopeBlock::has_number (const symbol tag_symbol) const
     return false;
   if (!syntax.check (block.metalib (), alist, block.msg ()))
     return false;
-  std::auto_ptr<Number> number (BuildBase::build_alist<Number>
+  std::auto_ptr<Number> number (Librarian::build_alist<Number>
                                 (block, alist.alist (tag), tag));
   if (!number.get ())
     return false;
@@ -92,7 +93,7 @@ ScopeBlock::number (const symbol tag_symbol) const
   daisy_assert (syntax.library (block.metalib (), tag).name ()
                 == symbol (Number::component));
   daisy_assert (syntax.check (block.metalib (), alist, block.msg ()));
-  std::auto_ptr<Number> number (BuildBase::build_alist<Number> 
+  std::auto_ptr<Number> number (Librarian::build_alist<Number> 
                                 (block, alist.alist (tag), tag));
   daisy_assert (number.get ());
   daisy_assert (number->initialize (block.msg ()));
@@ -135,7 +136,7 @@ ScopeBlock::dimension (symbol tag_symbol) const
   if (!syntax.check (block.metalib (), alist, block.msg ()))
     return Syntax::unknown ();
     
-  std::auto_ptr<Number> number (BuildBase::build_alist<Number>
+  std::auto_ptr<Number> number (Librarian::build_alist<Number>
                                 (block, alist.alist (tag), tag));
   if (!number.get ())
     return Syntax::unknown ();
@@ -174,7 +175,7 @@ ScopeBlock::has_identifier (const symbol tag_symbol) const
     return false;
   if (!syntax.check (block.metalib (), alist, block.msg ()))
     return false;
-  std::auto_ptr<Stringer> stringer (BuildBase::build_alist<Stringer>
+  std::auto_ptr<Stringer> stringer (Librarian::build_alist<Stringer>
                                     (block, alist.alist (tag), tag));
   if (!stringer.get ())
     return false;
@@ -208,7 +209,7 @@ ScopeBlock::identifier (const symbol tag_symbol) const
   daisy_assert (syntax.library (block.metalib (), tag).name ()
                 == symbol (Stringer::component));
   daisy_assert (syntax.check (block.metalib (), alist, block.msg ()));
-  std::auto_ptr<Stringer> stringer (BuildBase::build_alist<Stringer> 
+  std::auto_ptr<Stringer> stringer (Librarian::build_alist<Stringer> 
                                 (block, alist.alist (tag), tag));
   daisy_assert (stringer.get ());
   daisy_assert (stringer->initialize (block.msg ()));

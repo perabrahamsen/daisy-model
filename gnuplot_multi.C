@@ -24,6 +24,7 @@
 #include "source.h"
 #include "treelog.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 
 struct GnuplotMulti : public Gnuplot
@@ -85,7 +86,7 @@ GnuplotMulti::GnuplotMulti (Block& al)
   : Gnuplot (al),
     before (al.identifier_sequence ("before")),
     after (al.identifier_sequence ("after")),
-    graph (BuildBase::build_vector<Gnuplot> (al, "graph"))
+    graph (Librarian::build_vector<Gnuplot> (al, "graph"))
 { }
 
 GnuplotMulti::~GnuplotMulti ()
@@ -112,6 +113,6 @@ The commands will be inserted right after the last graph.");
     syntax.add_object ("graph", Gnuplot::component, Syntax::State, 
                        Syntax::Sequence, "Graphs to plot.");
 
-    BuildBase::add_type (Gnuplot::component, "multi", alist, syntax, &make);
+    Librarian::add_type (Gnuplot::component, "multi", alist, syntax, &make);
   }
 } GnuplotMulti_syntax;

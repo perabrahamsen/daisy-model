@@ -21,6 +21,7 @@
 #include "organic_matter.h"
 #include "alist.h"
 #include "geometry.h"
+#include "librarian.h"
 
 // Convertions
 
@@ -102,6 +103,6 @@ static struct OrganicNoneSyntax
     alist.add ("description", "\
 Ignore all soil organic matter dynamics.");
  
-    BuildBase::add_type (OrganicMatter::component, "none", alist, syntax, &make);
+    Librarian::add_type (OrganicMatter::component, "none", alist, syntax, &make);
   }
 } OrganicNone_syntax;

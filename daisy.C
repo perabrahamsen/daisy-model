@@ -41,6 +41,7 @@
 #include "column.h"
 #include "mathlib.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 
 const char *const Daisy::default_description = "\
@@ -187,7 +188,7 @@ Daisy::Daisy (Block& al)
     metalib (al.metalib ()),
     running (false),
     output_log (new Output (al)),
-    print_time (BuildBase::build_item<Condition> (al, "print_time")),
+    print_time (Librarian::build_item<Condition> (al, "print_time")),
     time (al.alist ("time")),
     timestep (al.check ("timestep") 
               ? submodel<Timestep> (al, "timestep")
@@ -196,9 +197,9 @@ Daisy::Daisy (Block& al)
     stop (al.check ("stop")
 	  ? Time (al.alist ("stop")) 
 	  : Time (9999, 1, 1, 1)),
-    action (BuildBase::build_item<Action> (al, "manager")),
+    action (Librarian::build_item<Action> (al, "manager")),
     weather (al.check ("weather") 
-	     ? BuildBase::build_item<Weather> (al, "weather")
+	     ? Librarian::build_item<Weather> (al, "weather")
 	     : NULL), 
     field (new Field (al, "column")),
     harvest (map_submodel_const<Harvest> (al, "harvest"))
@@ -262,6 +263,6 @@ static struct ProgramDaisySyntax
     AttributeList& alist = *new AttributeList ();
     Daisy::load_syntax (syntax, alist);
     alist.add ("description", "A soil-crop-atmosphere simulation model.");
-    BuildBase::add_type (Program::component, "Daisy", alist, syntax, &make);
+    Librarian::add_type (Program::component, "Daisy", alist, syntax, &make);
   }
 } ProgramDaisy_syntax;

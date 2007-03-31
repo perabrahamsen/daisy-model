@@ -21,6 +21,7 @@
 
 #include "summary.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Summary::description = "\
 Summary reports for log parameterizations.";
@@ -34,5 +35,5 @@ Summary::Summary (Block& al)
 Summary::~Summary ()
 { }
 
-static BuildBase Summary_init (Summary::component, Summary::description);
+static Librarian Summary_init (Summary::component, Summary::description);
 

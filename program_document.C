@@ -33,6 +33,7 @@
 #include "format.h"
 #include "treelog.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <sstream>
 #include <iostream>
 #include <memory>
@@ -136,7 +137,7 @@ struct ProgramDocument : public Program
     : Program (al),
       metalib (al.metalib ()),
       xref (metalib),
-      format (BuildBase::build_item<Format> (al, "format")),
+      format (Librarian::build_item<Format> (al, "format")),
       print_parameterizations (al.flag ("print_parameterizations"))
   { }
   ~ProgramDocument ()
@@ -1279,6 +1280,6 @@ Generate the components part of the reference manual.");
 		"Include a copy of all loaded parameterizations in document.");
     alist.add ("print_parameterizations", false);
 
-    BuildBase::add_type (Program::component, "document", alist, syntax, &make);
+    Librarian::add_type (Program::component, "document", alist, syntax, &make);
   }
 } ProgramDocument_syntax;

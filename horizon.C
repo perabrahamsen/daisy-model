@@ -35,6 +35,7 @@
 #include "log.h"
 #include "check_range.h"
 #include "vcheck.h"
+#include "librarian.h"
 #include <vector>
 #include <map>
 
@@ -127,7 +128,7 @@ Horizon::Implementation::Implementation (Block& al)
     anisotropy (al.number ("anisotropy")),
     attributes (get_attributes (al.alist_sequence ("attributes"))),
     dimensions (get_dimensions (al.alist_sequence ("attributes"))),
-    nitrification (BuildBase::build_item<Nitrification> (al, "Nitrification")),
+    nitrification (Librarian::build_item<Nitrification> (al, "Nitrification")),
     hor_heat (al.alist ("HorHeat"))
 { }
 
@@ -370,8 +371,8 @@ Horizon::Horizon (Block& al)
     fast_clay (-42.42e42),
     fast_humus (-42.42e42),
     name (al.identifier ("type")),
-    hydraulic (BuildBase::build_item<Hydraulic> (al, "hydraulic")),
-    tortuosity (BuildBase::build_item<Tortuosity> (al, "tortuosity"))
+    hydraulic (Librarian::build_item<Hydraulic> (al, "hydraulic")),
+    tortuosity (Librarian::build_item<Tortuosity> (al, "tortuosity"))
 { }
 
 void 
@@ -407,8 +408,8 @@ static struct HorizonSyntax
     AttributeList& alist = *new AttributeList ();
     Horizon::load_syntax (syntax, alist);
 
-    BuildBase::add_base (Horizon::component, alist, syntax);
+    Librarian::add_base (Horizon::component, alist, syntax);
   }
 } Horizon_syntax;
 
-static BuildBase Horizon_init (Horizon::component, Horizon::description);
+static Librarian Horizon_init (Horizon::component, Horizon::description);

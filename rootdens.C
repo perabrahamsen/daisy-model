@@ -25,6 +25,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "check.h"
+#include "librarian.h"
 
 const char *const Rootdens::description = "\
 Root density calculations.";
@@ -47,5 +48,5 @@ Rootdens::Rootdens (Block& al)
 Rootdens::~Rootdens ()
 { }
 
-static BuildBase Rootdens_init (Rootdens::component, Rootdens::description);
+static Librarian Rootdens_init (Rootdens::component, Rootdens::description);
 

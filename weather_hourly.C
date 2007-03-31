@@ -24,6 +24,7 @@
 #include "time.h"
 #include "log.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <fstream>
 
 struct WeatherHourly : public WeatherOld
@@ -196,6 +197,6 @@ precipitation [mm/h], cloudiness [0-1] and vapor pressure [Pa].");
       syntax.add ("file", Syntax::String, Syntax::Const,
 		  "File to read weather data from.");
       syntax.order ("file");
-      BuildBase::add_type (Weather::component, "hourly", alist, syntax, &make);
+      Librarian::add_type (Weather::component, "hourly", alist, syntax, &make);
     }
 } WeatherHourly_syntax;

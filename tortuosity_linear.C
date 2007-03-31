@@ -24,6 +24,7 @@
 #include "block.h"
 #include "alist.h"
 #include "hydraulic.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -70,7 +71,7 @@ static struct TortuosityLinearSyntax
 Theta offset.  By default, this corresponds to the wilting point.");
     syntax.add ("b", Syntax::None (), Syntax::Const, "Theta factor.");
     alist.add ("b", 2.0);
-    BuildBase::add_type (Tortuosity::component, "linear", alist, syntax, &make);
+    Librarian::add_type (Tortuosity::component, "linear", alist, syntax, &make);
   }
 } TortuosityLinear_syntax;
 

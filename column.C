@@ -24,6 +24,7 @@
 #include "block.h"
 #include "syntax.h"
 #include "log.h"
+#include "librarian.h"
 #include <map>
 
 const char *const Column::description = "\
@@ -57,5 +58,5 @@ Column::Column (Block& al)
 Column::~Column ()
 { }
 
-static BuildBase Column_init (Column::component, Column::description);
+static Librarian Column_init (Column::component, Column::description);
 

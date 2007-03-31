@@ -27,6 +27,7 @@
 #include "alist.h"
 #include "plf.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 class HydraulicM_vG : public Hydraulic
 {
@@ -160,5 +161,5 @@ HydraulicM_vGSyntax::HydraulicM_vGSyntax ()
 	      "tortuosity parameter.");
   alist.add ("l", 0.5);
 
-  BuildBase::add_type (Hydraulic::component, "M_vG", alist, syntax, make);
+  Librarian::add_type (Hydraulic::component, "M_vG", alist, syntax, make);
 }

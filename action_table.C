@@ -28,6 +28,7 @@
 #include "im.h"
 #include "lexer_table.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <set>
 #include <map>
 #include <memory>
@@ -219,13 +220,13 @@ ActionTable::check (const Daisy&, Treelog&) const
 ActionTable::ActionTable (Block& al)
   : Action (al),
     sow (al.check ("sow") 
-         ? BuildBase::build_item<Action> (al, "sow")
+         ? Librarian::build_item<Action> (al, "sow")
          : NULL),
     emerge (al.check ("emerge") 
-         ? BuildBase::build_item<Action> (al, "emerge")
+         ? Librarian::build_item<Action> (al, "emerge")
          : NULL),
     harvest (al.check ("harvest") 
-             ? BuildBase::build_item<Action> (al, "harvest")
+             ? Librarian::build_item<Action> (al, "harvest")
              : NULL),
     am (al.check ("fertilizer") 
         ? new AttributeList (al.alist ("fertilizer")) 
@@ -345,7 +346,7 @@ Set this to false to ignore any irrigation information in the file.");
     syntax.add ("enable_fertilization", Syntax::Boolean, Syntax::Const, "\
 Set this to false to ignore any fertilization information in the file.");
     alist.add ("enable_fertilization", true);
-    BuildBase::add_type (Action::component, "table", alist, syntax, &make);
+    Librarian::add_type (Action::component, "table", alist, syntax, &make);
   }
 } ActionTable_syntax;
 

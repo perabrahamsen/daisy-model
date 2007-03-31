@@ -28,6 +28,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 #include <numeric>
 
@@ -135,6 +136,6 @@ If this is true, normalize the mineral fraction to 1.0.\n\
 Otherwise, give an error if the sum is not 1.0.");
     alist.add ("normalize", false);
 
-    BuildBase::add_type (Horizon::component, "numeric", alist, syntax, make);
+    Librarian::add_type (Horizon::component, "numeric", alist, syntax, make);
   }
 } HorizonNumeric_syntax;

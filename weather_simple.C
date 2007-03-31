@@ -25,6 +25,7 @@
 #include "time.h"
 #include "log.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -173,6 +174,6 @@ A weather model with precipitation at regular intervals.");
       syntax.add ("reference_evapotranspiration_value", "mm/h", Syntax::Const,
 		  "Constant reference evapotranspiration.");
       alist.add ("reference_evapotranspiration_value", -1.0);
-      BuildBase::add_type (Weather::component, "simple", alist, syntax, &make);
+      Librarian::add_type (Weather::component, "simple", alist, syntax, &make);
     }
 } WeatherSimple_syntax;

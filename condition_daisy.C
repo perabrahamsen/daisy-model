@@ -26,6 +26,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "daisy.h"
+#include "librarian.h"
 
 struct ConditionRunning : public Condition
 {
@@ -66,9 +67,9 @@ static struct ConditionDaisySyntax
     AttributeList& alist_finished = *new AttributeList ();
     alist_finished.add ("description", 
                         "True iff the simulation has finished.");
-    BuildBase::add_type (Condition::component, "running",
+    Librarian::add_type (Condition::component, "running",
                                     alist_running, syntax, &make_running);
-    BuildBase::add_type (Condition::component, "finished",
+    Librarian::add_type (Condition::component, "finished",
                                     alist_finished, syntax, &make_finished);
   }
 } ConditionDaisy_syntax;

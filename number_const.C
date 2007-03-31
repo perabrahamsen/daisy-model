@@ -25,6 +25,7 @@
 #include "scope.h"
 #include "units.h"
 #include "assertion.h"
+#include "librarian.h"
 
 struct NumberConst : public Number
 {
@@ -68,7 +69,7 @@ static struct NumberConstSyntax
     syntax.add ("value", Syntax::User (), Syntax::Const,
 		"Fixed value for this number.");
     syntax.order ("value");
-    BuildBase::add_type (Number::component, "const", alist, syntax, &make);
+    Librarian::add_type (Number::component, "const", alist, syntax, &make);
   }
 } NumberConst_syntax;
 
@@ -146,7 +147,7 @@ static struct NumberGetSyntax
     syntax.add ("dimension", Syntax::String, Syntax::Const, 
                 "Expected dimension for the symbol.");
     syntax.order ("name", "dimension");
-    BuildBase::add_type (Number::component, "get", alist, syntax, &make);
+    Librarian::add_type (Number::component, "get", alist, syntax, &make);
   }
 } NumberGet_syntax;
 
@@ -250,7 +251,7 @@ static struct NumberFetchSyntax
     syntax.add ("name", Syntax::String, Syntax::Const, 
                 "Name of a the symbol.");
     syntax.order ("name");
-    BuildBase::add_type (Number::component, "fetch", alist, syntax, &make);
+    Librarian::add_type (Number::component, "fetch", alist, syntax, &make);
   }
 } NumberFetch_syntax;
 
@@ -273,7 +274,7 @@ struct NumberChild : public Number
   }
   NumberChild (Block& al)
     : Number (al),
-      child (BuildBase::build_item<Number> (al, "value"))
+      child (Librarian::build_item<Number> (al, "value"))
   { }
 };
 
@@ -338,7 +339,7 @@ static struct NumberIdentitySyntax
     NumberChild::load_syntax (syntax, alist);
     syntax.add ("dimension", Syntax::String, Syntax::OptionalConst,
 		"Dimension of this value.");
-    BuildBase::add_type (Number::component, "identity", alist, syntax, &make);
+    Librarian::add_type (Number::component, "identity", alist, syntax, &make);
   }
 } NumberIdentity_syntax;
 
@@ -397,7 +398,7 @@ static struct NumberConvertSyntax
     syntax.add ("dimension", Syntax::String, Syntax::Const,
 		"Dimension to convert to.");
     syntax.order ("value", "dimension");
-    BuildBase::add_type (Number::component, "convert", alist, syntax, &make);
+    Librarian::add_type (Number::component, "convert", alist, syntax, &make);
   }
 } NumberConvert_syntax;
 
@@ -455,7 +456,7 @@ static struct NumberDimSyntax
     syntax.add ("dimension", Syntax::String, Syntax::Const,
 		"Dimension to use.");
     syntax.order ("value", "dimension");
-    BuildBase::add_type (Number::component, "dim", alist, syntax, &make);
+    Librarian::add_type (Number::component, "dim", alist, syntax, &make);
   }
 } NumberDim_syntax;
 

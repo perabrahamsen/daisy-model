@@ -22,6 +22,7 @@
 #include "boolean.h"
 #include "block.h"
 #include "alist.h"
+#include "librarian.h"
 #include <vector>
 
 struct BooleanStringEqual : public Boolean
@@ -70,7 +71,7 @@ static struct BooleanStringEqualSyntax
     syntax.add ("values", Syntax::String, Syntax::Const, Syntax::Sequence,
 		"Strings to compare.");
     syntax.order ("values");
-    BuildBase::add_type (Boolean::component, "string-equal", alist, syntax, &make);
+    Librarian::add_type (Boolean::component, "string-equal", alist, syntax, &make);
   }
 } BooleanStringEqual_syntax;
 

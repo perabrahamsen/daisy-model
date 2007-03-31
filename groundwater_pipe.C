@@ -31,6 +31,7 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "check.h"
+#include "librarian.h"
 #include <memory>
 #include <sstream>
 
@@ -161,7 +162,7 @@ public:
       {
         // GCC 2.95 needs the extra variable for the asignment.
         std::auto_ptr<Depth> depth
-          (BuildBase::build_item<Depth> (al, "pressure_table"));
+          (Librarian::build_item<Depth> (al, "pressure_table"));
         pressure_table = depth;
       }
   }
@@ -405,7 +406,7 @@ You can alternatively specify the pressure directly, with 'h_aquifer'.");
 		  "Deep percolation to aquifer.");
       syntax.add ("S", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 		  "Pipe drainage.");
-      BuildBase::add_type (Groundwater::component, "pipe", alist, syntax, &make);
+      Librarian::add_type (Groundwater::component, "pipe", alist, syntax, &make);
     }
 } GroundwaterPipe_syntax;
 

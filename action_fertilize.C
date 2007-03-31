@@ -28,6 +28,7 @@
 #include "im.h"
 #include "check.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <sstream>
 
 using namespace std;
@@ -336,6 +337,6 @@ time, but is zeroed once you fertilize with this flag set.");
     alist.add ("second_year_compensation", false);
 
     syntax.order ("am");
-    BuildBase::add_type (Action::component, "fertilize", alist, syntax, &make);
+    Librarian::add_type (Action::component, "fertilize", alist, syntax, &make);
   }
 } ActionFertilize_syntax;

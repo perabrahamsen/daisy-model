@@ -22,6 +22,7 @@
 
 #include "uz1d.h"
 #include "alist.h"
+#include "librarian.h"
 #include <sstream>
 
 struct UZ1DNone : public UZ1D
@@ -65,7 +66,7 @@ static struct UZ1DNoneSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Disable transport");
-    BuildBase::add_type (UZ1D::component, "none", alist, syntax, &make);
+    Librarian::add_type (UZ1D::component, "none", alist, syntax, &make);
   }
 } UZ1DNone_syntax;
 

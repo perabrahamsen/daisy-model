@@ -22,6 +22,7 @@
 
 #include "uzmodel.h"
 #include "block.h"
+#include "librarian.h"
 
 UZmodel::UZmodel (Block& al)
   : name (al.identifier ("type"))
@@ -36,5 +37,5 @@ unsaturated zone soil matrix.";
 
 const char *const UZmodel::component = "uzmodel";
 
-static BuildBase UZmodel_init (UZmodel::component, UZmodel::description);
+static Librarian UZmodel_init (UZmodel::component, UZmodel::description);
 

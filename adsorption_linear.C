@@ -24,6 +24,7 @@
 #include "alist.h"
 #include "check.h"
 #include "soil.h"
+#include "librarian.h"
 
 static const double c_fraction_in_humus = 0.587;
 
@@ -96,6 +97,6 @@ the 'K' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.");
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.");
 
-    BuildBase::add_type (Adsorption::component, "linear", alist, syntax, &make);
+    Librarian::add_type (Adsorption::component, "linear", alist, syntax, &make);
   }
 } AdsorptionLinear_syntax;

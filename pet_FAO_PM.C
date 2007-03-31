@@ -30,6 +30,7 @@
 #include "fao.h"
 #include "vegetation.h"
 #include "log.h"
+#include "librarian.h"
 #include <sstream>
 #include <memory>
 
@@ -117,6 +118,6 @@ static struct PetFAO_PMSyntax
     alist.add ("description",
 	       "Potential evopotranspiration using Penman-Monteith.");
     Pet::load_syntax (syntax, alist);
-    BuildBase::add_type (Pet::component, "FAO_PM", alist, syntax, &make);
+    Librarian::add_type (Pet::component, "FAO_PM", alist, syntax, &make);
   }
 } PetFAO_PM_syntax;

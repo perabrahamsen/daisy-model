@@ -28,6 +28,7 @@
 #include "check.h"
 #include <sstream>
 #include "mathlib.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -146,6 +147,6 @@ at max rooting depth to zero 'q' further down.");
 Calculated from 'a_DS'.");
     syntax.add ("L0", "cm/cm^3", Syntax::LogOnly,
                 "Root density at soil surface.");
-    BuildBase::add_type (Rootdens::component, "Anders Pedersen", alist, syntax, &make);
+    Librarian::add_type (Rootdens::component, "Anders Pedersen", alist, syntax, &make);
   }
 } Rootdens_AP_syntax;

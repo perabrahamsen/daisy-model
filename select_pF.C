@@ -26,6 +26,7 @@
 #include "mathlib.h"
 #include "check.h"
 #include "vcheck.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -130,6 +131,6 @@ Pressure above this value will be represented as this value.");
     alist.add ("value", empty);
     alist.add ("dimension", "pF");
 
-    BuildBase::add_type (Select::component, "pF", alist, syntax, &make);
+    Librarian::add_type (Select::component, "pF", alist, syntax, &make);
   }
 } Select_syntax;

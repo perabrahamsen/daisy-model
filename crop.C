@@ -7,6 +7,7 @@
 #include "om.h"
 #include "block.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 const double Crop::DSremove = -5001.0;
 
@@ -82,4 +83,4 @@ Crop::Crop (Block& al)
 Crop::~Crop ()
 { }
 
-static BuildBase Crop_init (Crop::component, Crop::description);
+static Librarian Crop_init (Crop::component, Crop::description);

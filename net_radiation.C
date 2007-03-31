@@ -26,6 +26,7 @@
 #include "block.h"
 #include "syntax.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 const char *const NetRadiation::description = "\
 The purpose of this component is to calculate the net radiation from\n\
@@ -218,7 +219,7 @@ FAO recommendation.");
       // We add the values here so they appear in the manual.
       alist_brunt.add ("a", 0.34);
       alist_brunt.add ("b", 0.14);
-      BuildBase::add_type (NetRadiation::component, "brunt",
+      Librarian::add_type (NetRadiation::component, "brunt",
 					 alist_brunt, syntax_brunt,
 					 &make_brunt);
       // Others.
@@ -233,21 +234,21 @@ FAO recommendation.");
       alist_swinbank.add ("description", "Swinbank, 1963");
       AttributeList& alist_satterlund = *new AttributeList ();
       alist_satterlund.add ("description", "Satterlund, 1979");
-      BuildBase::add_type (NetRadiation::component, "idso_jackson",
+      Librarian::add_type (NetRadiation::component, "idso_jackson",
 					 alist_idso_jackson, syntax,
 					 &make_idso_jackson);
-      BuildBase::add_type (NetRadiation::component, "brutsaert",
+      Librarian::add_type (NetRadiation::component, "brutsaert",
 					 alist_brutsaert, syntax,
 					 &make_brutsaert);
-      BuildBase::add_type (NetRadiation::component, "swinbank",
+      Librarian::add_type (NetRadiation::component, "swinbank",
 					 alist_swinbank, syntax,
 					 &make_swinbank);
-      BuildBase::add_type (NetRadiation::component, "satterlund", 
+      Librarian::add_type (NetRadiation::component, "satterlund", 
 					 alist_satterlund, syntax,
 					 &make_satterlund);
     }
 } NetRadiation_syntax;
 
-static BuildBase NetRadiation_init (NetRadiation::component, NetRadiation::description);
+static Librarian NetRadiation_init (NetRadiation::component, NetRadiation::description);
 
 // net_radiation.C ends here

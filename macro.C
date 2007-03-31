@@ -22,6 +22,7 @@
 
 #include "macro.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Macro::description = "\
 Preferention flow in soil macro pores.";
@@ -43,5 +44,5 @@ Macro::Macro (const symbol id)
 Macro::~Macro ()
 { }
 
-static BuildBase Macro_init (Macro::component, Macro::description);
+static Librarian Macro_init (Macro::component, Macro::description);
 

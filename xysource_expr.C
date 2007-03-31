@@ -26,6 +26,7 @@
 #include "number.h"
 #include "vcheck.h"
 #include "assertion.h"
+#include "librarian.h"
 
 class XYSourceExpr : public XYSource
 {
@@ -158,8 +159,8 @@ XYSourceExpr::XYSourceExpr (Block& al)
     with_ (al.name ("with", "")),
     explicit_with (al.check ("with")),
     style_ (al.integer ("style", -1)),
-    x_expr (BuildBase::build_item<Number> (al, "x")),
-    y_expr (BuildBase::build_item<Number> (al, "y")),
+    x_expr (Librarian::build_item<Number> (al, "x")),
+    y_expr (Librarian::build_item<Number> (al, "y")),
     title_ (al.name ("title", y_expr->title () + " vs " + x_expr->title ())),
     x_dimension_ ("UNINITIALIZED"),
     y_dimension_ ("UNINITIALIZED")
@@ -199,7 +200,7 @@ Expression for calculating the y value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
 
-    BuildBase::add_type (XYSource::component, "arithmetic", alist, syntax, &make);
+    Librarian::add_type (XYSource::component, "arithmetic", alist, syntax, &make);
   }
 } XYSourceExpr_syntax;
 

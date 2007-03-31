@@ -24,6 +24,7 @@
 #include "log.h"
 #include "syntax.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Vegetation::description = "\
 That green stuff.";
@@ -97,4 +98,4 @@ Vegetation::Vegetation (Block& al)
 Vegetation::~Vegetation ()
 { }
 
-static BuildBase Vegetation_init (Vegetation::component, Vegetation::description);
+static Librarian Vegetation_init (Vegetation::component, Vegetation::description);

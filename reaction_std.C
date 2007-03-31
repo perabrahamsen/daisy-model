@@ -27,6 +27,7 @@
 #include "soil.h"
 #include "log.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <memory>
 
 struct ReactionStandard : public Reaction
@@ -81,7 +82,7 @@ struct ReactionStandard : public Reaction
     : Reaction (al),
       name_A (al.identifier ("A")),
       name_B (al.identifier ("B")),
-      transform (BuildBase::build_item<Transform> (al, "transform"))
+      transform (Librarian::build_item<Transform> (al, "transform"))
   { }
 };
 
@@ -105,6 +106,6 @@ static struct ReactionStandardSyntax
     syntax.add ("S_AB", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 		"Converted from A to B this timestep (may be negative).");
 
-    BuildBase::add_type (Reaction::component, "default", alist, syntax, &make);
+    Librarian::add_type (Reaction::component, "default", alist, syntax, &make);
   }
 } ReactionStandard_syntax;

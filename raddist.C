@@ -22,6 +22,7 @@
 #include "raddist.h"
 #include "block.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 const char *const Raddist::description = "\
 The 'raddist' component calculates the radiation distribution in the canopy.";
@@ -81,5 +82,5 @@ Raddist::Raddist (Block& al)
 Raddist::~Raddist ()
 { }
 
-static BuildBase Raddist_init (Raddist::component, Raddist::description);
+static Librarian Raddist_init (Raddist::component, Raddist::description);
 

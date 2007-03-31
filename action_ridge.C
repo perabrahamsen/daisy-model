@@ -25,6 +25,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "ridge.h"
+#include "librarian.h"
 
 struct ActionRidge : public Action
 {
@@ -57,7 +58,7 @@ static struct ActionRidgeSyntax
 			  "Ridge parameters",
 			  Ridge::load_syntax);
     syntax.order ("ridge");
-    BuildBase::add_type (Action::component, "ridge", alist, syntax, &make);
+    Librarian::add_type (Action::component, "ridge", alist, syntax, &make);
   }
 } ActionRidge_syntax;
 

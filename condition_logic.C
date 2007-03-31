@@ -26,6 +26,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <memory>
 
 using namespace std;
@@ -97,7 +98,7 @@ struct ConditionOr : public Condition
 
   ConditionOr (Block& al)
     : Condition (al),
-      conditions (BuildBase::build_vector<Condition> (al, "operands"))
+      conditions (Librarian::build_vector<Condition> (al, "operands"))
   { }
 
   ~ConditionOr ()
@@ -133,7 +134,7 @@ struct ConditionAnd : public Condition
 
   ConditionAnd (Block& al)
     : Condition (al),
-      conditions (BuildBase::build_vector<Condition> (al, "operands"))
+      conditions (Librarian::build_vector<Condition> (al, "operands"))
   { }
 
   ~ConditionAnd ()
@@ -155,7 +156,7 @@ struct ConditionNot : public Condition
 
   ConditionNot (Block& al)
     : Condition (al),
-      condition (BuildBase::build_item<Condition> (al, "operand"))
+      condition (Librarian::build_item<Condition> (al, "operand"))
   { }
 
   ~ConditionNot ()
@@ -186,9 +187,9 @@ struct ConditionIf : public Condition
 
   ConditionIf (Block& al)
     : Condition (al),
-      if_c (BuildBase::build_item<Condition> (al, "if")),
-      then_c (BuildBase::build_item<Condition> (al, "then")),
-      else_c (BuildBase::build_item<Condition> (al, "else"))
+      if_c (Librarian::build_item<Condition> (al, "if")),
+      then_c (Librarian::build_item<Condition> (al, "then")),
+      else_c (Librarian::build_item<Condition> (al, "else"))
   { }
 
   ~ConditionIf ()
@@ -221,8 +222,8 @@ ConditionLogicSyntax::ConditionLogicSyntax ()
     alist_false.add ("description", "Always false.");
     AttributeList& alist_true = *new AttributeList ();
     alist_true.add ("description", "Always true.");
-    BuildBase::add_type (Condition::component, "false", alist_false, syntax, &make_false);
-    BuildBase::add_type (Condition::component, "true", alist_true, syntax, &make_true);
+    Librarian::add_type (Condition::component, "false", alist_false, syntax, &make_false);
+    Librarian::add_type (Condition::component, "true", alist_true, syntax, &make_true);
   }
 
   // "or", "and".
@@ -241,8 +242,8 @@ or the end of the list is reached.");
     syntax.add_object ("operands", Condition::component, 
                        Syntax::State, Syntax::Sequence, "Conditions to test.");
     syntax.order ("operands");
-    BuildBase::add_type (Condition::component, "or", alist_or, syntax, &make_or);
-    BuildBase::add_type (Condition::component, "and", alist_and, syntax, &make_and);
+    Librarian::add_type (Condition::component, "or", alist_or, syntax, &make_or);
+    Librarian::add_type (Condition::component, "and", alist_and, syntax, &make_and);
   }
   // "not".
   {
@@ -252,7 +253,7 @@ or the end of the list is reached.");
     syntax.add_object ("operand", Condition::component, 
                        "Condition to test.");
     syntax.order ("operand");
-    BuildBase::add_type (Condition::component, "not", alist, syntax, &make_not);
+    Librarian::add_type (Condition::component, "not", alist, syntax, &make_not);
   }
   // "if".
   {
@@ -268,6 +269,6 @@ else return the value of the third condition.");
     syntax.add_object ("else", Condition::component, 
                        "Condition to use if the 'if' test was false.");
     syntax.order ("if", "then", "else");
-    BuildBase::add_type (Condition::component, "if", alist, syntax, &make_if);
+    Librarian::add_type (Condition::component, "if", alist, syntax, &make_if);
   }
 }

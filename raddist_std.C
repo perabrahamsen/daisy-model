@@ -23,6 +23,7 @@
 #include "syntax.h"
 #include "vegetation.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 
 struct RaddistStandard : public Raddist
@@ -88,7 +89,7 @@ static struct RaddistStandardSyntax
     alist.add ("description", 
 	       "Default model of radiation distribution in the canopy.");
     Raddist::load_syntax (syntax, alist);
-    BuildBase::add_type (Raddist::component, "default", alist, syntax, &make);
+    Librarian::add_type (Raddist::component, "default", alist, syntax, &make);
   }
 } RaddistStandard_syntax;
 

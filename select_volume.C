@@ -28,6 +28,7 @@
 #include "geometry.h"
 #include "soil.h"
 #include "units.h"
+#include "librarian.h"
 #include <memory>
 
 struct SelectVolume : public SelectValue
@@ -325,7 +326,7 @@ This parameter is ignored if 'density' is true.");
     alist.add ("density_z", false);
     alist.add ("density_x", false);
     alist.add ("density_y", false);
-    BuildBase::add_type (Select::component, "volume", alist, syntax, &make);
+    Librarian::add_type (Select::component, "volume", alist, syntax, &make);
   }    
   void add_interval ()
   {
@@ -346,7 +347,7 @@ OBSOLETE: Use (volume box (top FROM)) instead.");
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
-    BuildBase::add_type (Select::component, "interval", alist, syntax, &make);
+    Librarian::add_type (Select::component, "interval", alist, syntax, &make);
   }    
   SelectVolumeSyntax ()
   { 

@@ -23,6 +23,7 @@
 #include "block.h"
 #include "alist.h"
 #include "assertion.h"
+#include "librarian.h"
 
 const std::vector<symbol>& 
 ScopeID::all_numbers () const
@@ -86,7 +87,7 @@ static struct ScopeIDSyntax
                 "Identifier name.");
     syntax.add ("value", Syntax::User (), Syntax::Const, 
                 "Initial value and dimension.");
-    BuildBase::add_type (Scope::component, "id", alist, syntax, &make);
+    Librarian::add_type (Scope::component, "id", alist, syntax, &make);
   }
 } ScopeID_syntax;
 

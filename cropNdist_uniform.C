@@ -23,6 +23,7 @@
 #include <sstream>
 #include "check.h"
 #include "block.h"
+#include "librarian.h"
 
 static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
 
@@ -116,7 +117,7 @@ static struct cropNdistUniformSyntax
 
     load_syntax (syntax, alist);
 
-    BuildBase::add_type (CropNdist::component, "N-uniform", alist, syntax, &make);
+    Librarian::add_type (CropNdist::component, "N-uniform", alist, syntax, &make);
   }
 } cropNdistUniform_syntax;
 

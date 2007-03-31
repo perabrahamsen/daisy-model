@@ -25,6 +25,7 @@
 #include "block.h"
 #include "alist.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 struct SelectArray : public Select
 {
@@ -155,6 +156,6 @@ static struct SelectArraySyntax
     std::vector<double> empty;
     alist.add ("value", empty);
 
-    BuildBase::add_type (Select::component, "array", alist, syntax, &make);
+    Librarian::add_type (Select::component, "array", alist, syntax, &make);
   }
 } Select_syntax;

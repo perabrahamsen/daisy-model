@@ -26,6 +26,7 @@
 #include "units.h"
 #include "vcheck.h"
 #include "assertion.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -186,7 +187,7 @@ static struct PedotransferConstSyntax
     syntax.add ("value", Syntax::User (), Syntax::Const,
 		"Fixed value of this pedotransfer function.");
     syntax.order ("value");
-    BuildBase::add_type (Pedotransfer::component, "const", alist, syntax, &make);
+    Librarian::add_type (Pedotransfer::component, "const", alist, syntax, &make);
   }
 } PedotransferConst_syntax;
 
@@ -205,7 +206,7 @@ static struct PedotransferHumusSyntax
     syntax.add_check ("dimension", VCheck::fraction ());
     syntax.order ("dimension");
 
-    BuildBase::add_type (Pedotransfer::component, "humus", alist, syntax, &make);
+    Librarian::add_type (Pedotransfer::component, "humus", alist, syntax, &make);
   }
 } PedotransferHumus_syntax;
 
@@ -224,7 +225,7 @@ static struct PedotransferMineralSyntax
     syntax.add_check ("dimension", VCheck::fraction ());
     syntax.order ("dimension");
 
-    BuildBase::add_type (Pedotransfer::component, "mineral", alist, syntax, &make);
+    Librarian::add_type (Pedotransfer::component, "mineral", alist, syntax, &make);
   }
 } PedotransferMineral_syntax;
 
@@ -244,7 +245,7 @@ static struct PedotransferRho_BSyntax
     syntax.add_check ("dimension", rho_b_dim);
     syntax.order ("dimension");
 
-    BuildBase::add_type (Pedotransfer::component, "rho_b", alist, syntax, &make);
+    Librarian::add_type (Pedotransfer::component, "rho_b", alist, syntax, &make);
   }
 } PedotransferRho_B_syntax;
 
@@ -265,7 +266,7 @@ static struct PedotransferBelowSyntax
                 "Unit used for the particle fraction.");
     syntax.add_check ("dimension", VCheck::fraction ());
     syntax.order ("dimension", "size");
-    BuildBase::add_type (Pedotransfer::component, "below", alist, syntax, &make);
+    Librarian::add_type (Pedotransfer::component, "below", alist, syntax, &make);
   }
 } PedotransferBelow_syntax;
 
@@ -285,7 +286,7 @@ static struct PedotransferGetSyntax
     syntax.add ("dimension", Syntax::String, Syntax::Const, 
                 "Expected dimension for the soil attribute.");
     syntax.order ("name", "dimension");
-    BuildBase::add_type (Pedotransfer::component, "get", alist, syntax, &make);
+    Librarian::add_type (Pedotransfer::component, "get", alist, syntax, &make);
   }
 } PedotransferGet_syntax;
 

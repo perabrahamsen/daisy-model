@@ -25,6 +25,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "check.h"
+#include "librarian.h"
 
 struct ActionSetSurfaceDetentionCapacity : public Action
 {
@@ -58,7 +59,7 @@ Set amount of ponding the surface can retain.");
     syntax.add ("height", "cm", Check::non_negative (), Syntax::Const,
 		"Max ponding height before runoff.");
     syntax.order ("height");
-    BuildBase::add_type (Action::component, "set_surface_detention_capacity", 
+    Librarian::add_type (Action::component, "set_surface_detention_capacity", 
 				 alist, syntax, &make);
   }
 } ActionSurface_syntax;

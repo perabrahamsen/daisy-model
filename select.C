@@ -35,6 +35,7 @@
 #include "submodel.h"
 #include "submodeler.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <numeric>
 #include <map>
 
@@ -374,7 +375,7 @@ Number*
 Select::Implementation::get_expr (Block& al)
 {
   if (al.check ("expr"))
-    return BuildBase::build_item<Number> (al, "expr");
+    return Librarian::build_item<Number> (al, "expr");
 
   // Support for old factor + offset style.
   struct NumberFactor : public Number
@@ -845,9 +846,9 @@ static struct SelectSyntax
     AttributeList& alist = *new AttributeList ();
     Select::load_syntax (syntax, alist);
 
-    BuildBase::add_base (Select::component, alist, syntax);
+    Librarian::add_base (Select::component, alist, syntax);
   }
 } Select_syntax;
 
-static BuildBase Select_init (Select::component, Select::description);
+static Librarian Select_init (Select::component, Select::description);
 

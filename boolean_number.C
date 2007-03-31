@@ -24,6 +24,7 @@
 #include "alist.h"
 #include "number.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 #include <vector>
 
@@ -99,7 +100,7 @@ List of operands to compare.");
   }
   BooleanNumbers (Block& al)
     : Boolean (al),
-      operand (BuildBase::build_vector<Number> (al, "operands"))
+      operand (Librarian::build_vector<Number> (al, "operands"))
   { }
   ~BooleanNumbers ()
   { sequence_delete (operand.begin (), operand.end ()); }
@@ -138,7 +139,7 @@ static struct BooleanNumGTSyntax
     BooleanNumbers::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "True iff each operand is larger than the next.");
-    BuildBase::add_type (Boolean::component, ">", alist, syntax, &make);
+    Librarian::add_type (Boolean::component, ">", alist, syntax, &make);
   }
 } BooleanNumGT_syntax;
 
@@ -175,7 +176,7 @@ static struct BooleanNumGTESyntax
     BooleanNumbers::load_syntax (syntax, alist);
     alist.add ("description", "\
 True iff each operand is at least as large as the next.");
-    BuildBase::add_type (Boolean::component, ">=", alist, syntax, &make);
+    Librarian::add_type (Boolean::component, ">=", alist, syntax, &make);
   }
 } BooleanNumGTE_syntax;
 
@@ -212,7 +213,7 @@ static struct BooleanNumLTSyntax
     BooleanNumbers::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "True iff each operand is smaller than the next.");
-    BuildBase::add_type (Boolean::component, "<", alist, syntax, &make);
+    Librarian::add_type (Boolean::component, "<", alist, syntax, &make);
   }
 } BooleanNumLT_syntax;
 
@@ -249,7 +250,7 @@ static struct BooleanNumLTESyntax
     BooleanNumbers::load_syntax (syntax, alist);
     alist.add ("description", "\
 True iff each operand is smaller than or equal to the next.");
-    BuildBase::add_type (Boolean::component, "<=", alist, syntax, &make);
+    Librarian::add_type (Boolean::component, "<=", alist, syntax, &make);
   }
 } BooleanNumLTE_syntax;
 

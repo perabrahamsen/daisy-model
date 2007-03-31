@@ -25,6 +25,7 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 
 struct GnuplotXY : public GnuplotBase
@@ -389,7 +390,7 @@ GnuplotXY::GnuplotXY (Block& al)
     y2min (al.number ("y2min", 42.42e42)),
     y2max_flag (al.check ("y2max")),
     y2max (al.number ("y2max", 42.42e42)),
-    source (BuildBase::build_vector<XYSource> (al, "source"))
+    source (Librarian::build_vector<XYSource> (al, "source"))
 { }
 
 GnuplotXY::~GnuplotXY ()
@@ -436,6 +437,6 @@ By default determine this from the data.");
     syntax.add_object ("source", XYSource::component, Syntax::State, 
                        Syntax::Sequence, "\
 XY series to plot.");
-    BuildBase::add_type (Gnuplot::component, "xy", alist, syntax, &make);
+    Librarian::add_type (Gnuplot::component, "xy", alist, syntax, &make);
   }
 } GnuplotXY_syntax;

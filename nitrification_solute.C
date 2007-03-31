@@ -31,6 +31,7 @@
 #include "mathlib.h"
 #include "plf.h"
 #include "check.h"
+#include "librarian.h"
 
 class NitrificationSolute : public Nitrification
 {
@@ -114,6 +115,6 @@ with nitrification based on ammonium solute.");
     syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const,
 		"Water potential factor.");
     alist.add ("water_factor", PLF::empty ());
-    BuildBase::add_type (Nitrification::component, "solute", alist, syntax, &make);
+    Librarian::add_type (Nitrification::component, "solute", alist, syntax, &make);
   }
 } NitrificationSolute_syntax;

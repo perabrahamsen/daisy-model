@@ -26,6 +26,7 @@
 #include "path.h"
 #include "assertion.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <vector>
 #include <sstream>
 
@@ -78,7 +79,7 @@ struct ProgramBatch : public Program
   ProgramBatch (Block& al)
     : Program (al),
       directory (al.name ("directory")),
-      program (BuildBase::build_vector<Program> (al, "run")),
+      program (Librarian::build_vector<Program> (al, "run")),
       metalib (al.metalib ())
   { }
 
@@ -104,6 +105,6 @@ Directory in which to initialize, check and run the programs.");
                        Syntax::State, Syntax::Sequence, "\
 List of programs to run.  The programs will be run in the sequence listed.");
    
-    BuildBase::add_type (Program::component, "batch", alist, syntax, &make);
+    Librarian::add_type (Program::component, "batch", alist, syntax, &make);
   }
 } ProgramBatch_syntax;

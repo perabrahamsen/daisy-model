@@ -24,6 +24,7 @@
 #include "weather.h"
 #include "block.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -78,4 +79,4 @@ Bioclimate::Bioclimate (Block& al)
 Bioclimate::~Bioclimate ()
 { }
 
-static BuildBase Bioclimate_init (Bioclimate::component, Bioclimate::description);
+static Librarian Bioclimate_init (Bioclimate::component, Bioclimate::description);

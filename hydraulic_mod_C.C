@@ -27,6 +27,7 @@
 #include "alist.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 class Hydraulic_mod_C : public Hydraulic
 {
@@ -142,5 +143,5 @@ Modified Campbell retention curve model with Burdine theory.");
   syntax.add ("b", Syntax::None (), Check::positive (), Syntax::Const,
 	      "Campbell parameter.");
 
-  BuildBase::add_type (Hydraulic::component, "mod_C", alist, syntax, make);
+  Librarian::add_type (Hydraulic::component, "mod_C", alist, syntax, make);
 }

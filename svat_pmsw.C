@@ -42,6 +42,7 @@
 #include "fao.h"
 #ifndef NRGAUSS
 #include "gaussj.h"
+#include "librarian.h"
 #include <sstream>
 #endif
 # include "assertion.h"
@@ -2179,6 +2180,6 @@ static struct SVAT_PMSWSyntax
     syntax.add ("acc", Syntax::None (), Syntax::Const,
                 "iteration accuracy in Newton-Raphson method");
     alist.add ("acc", 0.01);
-    BuildBase::add_type (SVAT::component, "PMSW", alist, syntax, &make);
+    Librarian::add_type (SVAT::component, "PMSW", alist, syntax, &make);
   }
 } SVAT_PMSW_syntax;

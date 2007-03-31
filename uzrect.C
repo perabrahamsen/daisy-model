@@ -20,6 +20,7 @@
 
 #include "uzrect.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const UZRect::description = "\
 2D water movement in a rectangular grid.";
@@ -33,6 +34,6 @@ UZRect::UZRect (Block& al)
 UZRect::~UZRect ()
 { }
 
-static BuildBase UZRect_init (UZRect::component, UZRect::description);
+static Librarian UZRect_init (UZRect::component, UZRect::description);
 
 // uzrect.C ends here.

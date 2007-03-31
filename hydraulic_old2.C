@@ -23,6 +23,7 @@
 #include "hydraulic.h"
 #include "mathlib.h"
 #include "plf.h"
+#include "librarian.h"
 #include <fstream>
 
 class HydraulicOld2 : public Hydraulic
@@ -189,5 +190,5 @@ increasing with 0.01 on each line.");
   alist.add ("M_intervals", 500);
   syntax.add ("file", Syntax::String, Syntax::Const, "The file to read.");
   syntax.order ("file");
-  BuildBase::add_type (Hydraulic::component, "old2", alist, syntax, &HydraulicOld2::make);
+  Librarian::add_type (Hydraulic::component, "old2", alist, syntax, &HydraulicOld2::make);
 }

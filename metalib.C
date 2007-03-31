@@ -26,6 +26,7 @@
 #include "alist.h"
 #include "assertion.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <map>
 
 struct Metalib::Implementation
@@ -39,7 +40,7 @@ struct Metalib::Implementation
   int sequence;
 
   Implementation ()
-    : all (BuildBase::intrinsics ().clone ()),
+    : all (Librarian::intrinsics ().clone ()),
       sequence (0)
   { }
   ~Implementation ()

@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "block.h"
 #include "check.h"
+#include "librarian.h"
 
 class GroundwaterFlux : public Groundwater
 {
@@ -72,6 +73,6 @@ static struct GroundwaterFluxSyntax
       syntax.add ("flux", "cm/h", Check::none (), Syntax::Const,
 		  "Constant flux to groundwater.");
       syntax.order ("flux");
-      BuildBase::add_type (Groundwater::component, "flux", alist, syntax, &make);
+      Librarian::add_type (Groundwater::component, "flux", alist, syntax, &make);
     }
 } GroundwaterFlux_syntax;

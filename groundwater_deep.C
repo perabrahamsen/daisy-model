@@ -24,6 +24,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "assertion.h"
+#include "librarian.h"
 
 class GroundwaterDeep : public Groundwater
 {
@@ -65,6 +66,6 @@ static struct GroundwaterDeepSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "Deep groundwater, free drainage.");
       Groundwater::load_syntax (syntax, alist);
-      BuildBase::add_type (Groundwater::component, "deep", alist, syntax, &make);
+      Librarian::add_type (Groundwater::component, "deep", alist, syntax, &make);
     }
 } GroundwaterDeep_syntax;

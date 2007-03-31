@@ -1,7 +1,8 @@
-// librarian.h
+// librarian.h -- Manage components and models.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
+// Copyright 1996-2001 Per Abrahamsen and Søren Hansen.
 // Copyright 2000-2001 KVL.
+// Copyright 2006-2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -36,7 +37,7 @@ class Metalib;
 class Format;
 class Intrinsics;
 
-class BuildBase 
+class Librarian 
 {
   // Content.
 private:
@@ -69,7 +70,7 @@ public:
               const AttributeList& alist, 
               const std::string& scope_id)
   { 
-    T* x = dynamic_cast<T*> (BuildBase::build_free (T::component, metalib, msg,
+    T* x = dynamic_cast<T*> (Librarian::build_free (T::component, metalib, msg,
                                                     alist, scope_id)); 
     non_null (x);
     return x;
@@ -79,7 +80,7 @@ public:
   build_alist (Block& parent, const AttributeList& alist, 
                const std::string& scope_id)
   { 
-    T* x = dynamic_cast<T*> (BuildBase::build_alist (T::component, 
+    T* x = dynamic_cast<T*> (Librarian::build_alist (T::component, 
                                                      parent, alist, scope_id));
     non_null (x);
     return x;
@@ -88,7 +89,7 @@ public:
   template <class T> static T* 
   build_item (Block& parent, const std::string& key)
   { 
-    T* x = dynamic_cast<T*> (BuildBase::build_item (T::component, 
+    T* x = dynamic_cast<T*> (Librarian::build_item (T::component, 
                                                     parent, key)); 
     non_null (x);
     return x;
@@ -98,7 +99,7 @@ public:
   build_vector (Block& al, const std::string& key)
   {  
     const std::vector<Model*> c 
-      = BuildBase::build_vector (T::component, al, key);
+      = Librarian::build_vector (T::component, al, key);
     std::vector<T*> t;
     for (size_t i = 0; i < c.size (); i++)
       {
@@ -112,7 +113,7 @@ public:
   build_vector_const (Block& al, const std::string& key)
   {  
     const std::vector<const Model*> c
-      = BuildBase::build_vector_const (T::component, al, key);
+      = Librarian::build_vector_const (T::component, al, key);
     std::vector<const T*> t;
     for (size_t i = 0; i < c.size (); i++)
       {
@@ -143,8 +144,8 @@ public:
 
   // Create and destroy.
 public:
-  BuildBase (const char *const component, const char *const description);
-  ~BuildBase ();
+  Librarian (const char *const component, const char *const description);
+  ~Librarian ();
 };
 
 #endif // LIBRARIAN_H

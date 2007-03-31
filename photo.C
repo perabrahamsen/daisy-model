@@ -21,6 +21,7 @@
 
 #include "photo.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Photo::description = "\
 Leaf photosynthesis.";
@@ -38,5 +39,5 @@ Photo::Photo (Block& al)
 Photo::~Photo ()
 { }
 
-static BuildBase Photo_init (Photo::component, Photo::description);
+static Librarian Photo_init (Photo::component, Photo::description);
 

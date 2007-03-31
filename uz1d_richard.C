@@ -24,6 +24,7 @@
 #include "block.h"
 #include "alist.h"
 #include "average.h"
+#include "librarian.h"
 #include <sstream>
 
 struct UZ1DRichard : public UZ1D
@@ -280,7 +281,7 @@ UZ1DRichard::UZ1DRichard (Block& al)
     max_iterations (al.integer ("max_iterations")),
     max_absolute_difference (al.number ("max_absolute_difference")),
     max_relative_difference (al.number ("max_relative_difference")),
-    K_average (BuildBase::build_item<Average> (al, "K_average"))
+    K_average (Librarian::build_item<Average> (al, "K_average"))
 { }
 
 UZ1DRichard::~UZ1DRichard ()
@@ -337,7 +338,7 @@ static struct UZ1DRichardSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "A numerical solution to Richard's Equation.");
     UZ1DRichard::load_syntax (syntax, alist);
-    BuildBase::add_type (UZ1D::component, "richards", alist, syntax, &make);
+    Librarian::add_type (UZ1D::component, "richards", alist, syntax, &make);
   }
 } UZ1DRichard_syntax;
 

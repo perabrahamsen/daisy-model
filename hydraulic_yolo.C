@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "plf.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -118,5 +119,5 @@ HydraulicYoloSyntax::HydraulicYoloSyntax ()
   syntax.add ("M_intervals", Syntax::Integer, Syntax::Const,
 	      "Number of intervals for numeric integration of K.");
   alist.add ("M_intervals", 500);
-  BuildBase::add_type (Hydraulic::component, "yolo", alist, syntax, make);
+  Librarian::add_type (Hydraulic::component, "yolo", alist, syntax, make);
 }

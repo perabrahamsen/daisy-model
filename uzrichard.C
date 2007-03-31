@@ -32,6 +32,7 @@
 #include "syntax.h"
 #include "log.h"
 #include "average.h"
+#include "librarian.h"
 #include <sstream>
 #include <memory>
 
@@ -687,7 +688,7 @@ UZRichard::UZRichard (Block& al)
     max_absolute_difference (al.number ("max_absolute_difference")),
     max_relative_difference (al.number ("max_relative_difference")),
     K_average (al.check ("K_average")
-	       ? BuildBase::build_item<Average> (al, "K_average")
+	       ? Librarian::build_item<Average> (al, "K_average")
 	       : NULL)
 { }
 
@@ -750,7 +751,7 @@ static struct UZRichardSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "A numerical solution to Richard's Equation.");
       UZRichard::load_syntax (syntax, alist);
-      BuildBase::add_type (UZmodel::component, "richards", alist, syntax, &make);
+      Librarian::add_type (UZmodel::component, "richards", alist, syntax, &make);
     }
 } UZRichard_syntax;
 

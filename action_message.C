@@ -25,6 +25,7 @@
 #include "condition.h"
 #include "log.h"
 #include "daisy.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -47,7 +48,7 @@ struct ActionAssert : public Action
 
   ActionAssert (Block& al)
     : Action (al),
-      condition (BuildBase::build_item<Condition> (al, "condition")),
+      condition (Librarian::build_item<Condition> (al, "condition")),
       message (al.name ("message"))
   { }
 
@@ -131,7 +132,7 @@ Assert that condition is true, if not, stop the simulation.");
       syntax.add ("message", Syntax::String, Syntax::Const,
 		  "Error message to give iff assertion fails.");
       alist.add ("message", "Required condition not fulfiled");
-      BuildBase::add_type (Action::component, "assert", alist, syntax, &make_assert);
+      Librarian::add_type (Action::component, "assert", alist, syntax, &make_assert);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -142,7 +143,7 @@ Write a message to the user.");
 		  "Message to give to the user.");
       syntax.order ("message");
 
-      BuildBase::add_type (Action::component, "message", alist, syntax, &make_message);
+      Librarian::add_type (Action::component, "message", alist, syntax, &make_message);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -153,7 +154,7 @@ Write a warning to the user.");
 		  "Warning to give to the user.");
       syntax.order ("message");
 
-      BuildBase::add_type (Action::component, "warning", alist, syntax, &make_warning);
+      Librarian::add_type (Action::component, "warning", alist, syntax, &make_warning);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -163,7 +164,7 @@ Write a error message to the user and stop the simulation.");
       syntax.add ("message", Syntax::String, Syntax::Const,
 		  "Error message to give.");
       syntax.order ("message");
-      BuildBase::add_type (Action::component, "error", alist, syntax, &make_error);
+      Librarian::add_type (Action::component, "error", alist, syntax, &make_error);
     }
   }
 } ActionMessage_syntax;

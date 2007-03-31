@@ -32,6 +32,7 @@
 #include "vcheck.h"
 #include "assertion.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <vector>
 #include <memory>
 #include <sstream>
@@ -95,7 +96,7 @@ struct MV_Soil : public Model
   { }
 };
 
-static BuildBase MV_Soil_init (MV_Soil::component, MV_Soil::description);
+static Librarian MV_Soil_init (MV_Soil::component, MV_Soil::description);
 
 
 const char *const MV_Soil::description = "\
@@ -138,7 +139,7 @@ static struct MV_SoilSyntax
                 "Drainage constant root zone.");
     syntax.add ("k_qb", Syntax::None (), Syntax::Const,
                 "Drainage constant subsone.");
-    BuildBase::add_type (MV_Soil::component, "default", alist, syntax, &make);
+    Librarian::add_type (MV_Soil::component, "default", alist, syntax, &make);
   }
 } MV_Soil_syntax;
 
@@ -252,7 +253,7 @@ struct MV_Crop : public Model
   { }
 };
 
-static BuildBase MV_Crop_init (MV_Crop::component, MV_Crop::description);
+static Librarian MV_Crop_init (MV_Crop::component, MV_Crop::description);
 
 const char *const MV_Crop::description = "\
 Description of a crop for use by the MARKVAND model.";
@@ -318,7 +319,7 @@ Green leaf area index at the time where growth rate become exponential.");
                 "Root depth at maturity.");
     syntax.add ("c_r", "mm/d", Check::non_negative (), Syntax::Const,
                 "Root penetration rate.");
-    BuildBase::add_type (MV_Crop::component, "default", alist, syntax, &make);
+    Librarian::add_type (MV_Crop::component, "default", alist, syntax, &make);
   }
 } MV_Crop_syntax;
 
@@ -376,7 +377,7 @@ ActionMarkvand::crop_map_t::crop_map_t (Block& al, const std::string& key)
     {
       Block nest (al, syntax, *alists[i], sequence_id (key, i));
       (*this)[alists[i]->name ("Daisy")] 
-	= BuildBase::build_item<MV_Crop> (nest, "MARKVAND");
+	= Librarian::build_item<MV_Crop> (nest, "MARKVAND");
     }
 }
 
@@ -621,7 +622,7 @@ ActionMarkvand::output (Log& log) const
 
 ActionMarkvand::ActionMarkvand (Block& al)
   : Action (al),
-    soil (BuildBase::build_item<MV_Soil> (al, "soil")),
+    soil (Librarian::build_item<MV_Soil> (al, "soil")),
     crop_map (al, "map"),
     T_sum (al.number ("T_sum", -1.0)),
     dt (al.number ("dt", -42.42e42)),
@@ -683,7 +684,7 @@ Included in 'V_r'.");
 By default, the reservoir will be full at plant emergence.");
     alist.add ("description", "\
 Irrigate the field according to MARKVAND scheduling.");
-    BuildBase::add_type (Action::component, "markvand", alist, syntax, &make);
+    Librarian::add_type (Action::component, "markvand", alist, syntax, &make);
   }
 } ActionMarkvand_syntax;
 

@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "soil.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 class UZNone : public UZmodel
 {
@@ -77,6 +78,6 @@ static struct UZNoneSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "No water movement, and no sink.");
-      BuildBase::add_type (UZmodel::component, "none", alist, syntax, &make);
+      Librarian::add_type (UZmodel::component, "none", alist, syntax, &make);
     }
 } UZNone_syntax;

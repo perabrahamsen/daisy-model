@@ -23,6 +23,7 @@
 #include <sstream>
 #include "check.h"
 #include "block.h"
+#include "librarian.h"
 
 struct ABAEffect_exp : public ABAEffect
 {
@@ -70,7 +71,7 @@ static struct ABAEffectexpSyntax
 
     load_syntax (syntax, alist);
 
-    BuildBase::add_type (ABAEffect::component, "ABA-exp", alist, syntax, &make);
+    Librarian::add_type (ABAEffect::component, "ABA-exp", alist, syntax, &make);
   }
 } ABAEffectexpsyntax;
 

@@ -23,6 +23,7 @@
 #include "weather_old.h"
 #include "time.h"
 #include "log.h"
+#include "librarian.h"
 #include <fstream>
 
 struct WeatherFile : public WeatherOld
@@ -157,6 +158,6 @@ model in the 'pet' component");
       syntax.add ("file", Syntax::String, Syntax::Const,
 		  "File to read weather data from.");
       syntax.order ("file");
-      BuildBase::add_type (Weather::component, "file", alist, syntax, &make);
+      Librarian::add_type (Weather::component, "file", alist, syntax, &make);
     }
 } WeatherFile_syntax;

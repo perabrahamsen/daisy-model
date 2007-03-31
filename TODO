@@ -2,8 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Metalib
 
-** Omdøb BuildBase til Librarian
-
 ** Fjern librarian.h fra headerfiler.
 
 ** Inline Component::description

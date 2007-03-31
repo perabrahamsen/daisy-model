@@ -32,6 +32,7 @@
 #include "log.h"
 #include "submodeler.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]
@@ -676,7 +677,7 @@ Movement1D::initialize (Block& block, const AttributeList& al,
 
   // Macropores.
   if (al.check ("macro"))
-    macro.reset (BuildBase::build_alist<Macro> (block, al.alist ("macro"), 
+    macro.reset (Librarian::build_alist<Macro> (block, al.alist ("macro"), 
                                                 "macro"));
   else if (soil.humus (0) + soil.clay (0) > 0.05)
     // More than 5% clay (and humus) in first horizon.
@@ -708,11 +709,11 @@ Movement1D::initialize (Block& block, const AttributeList& al,
 Movement1D::Movement1D (Block& al)
   : Movement (al),
     geo (submodel<Geometry1D> (al, "Geometry")),
-    matrix_water (BuildBase::build_vector<UZmodel> (al, "matrix_water")),
+    matrix_water (Librarian::build_vector<UZmodel> (al, "matrix_water")),
     macro (NULL), 
-    matrix_solute (BuildBase::build_vector<Transport> (al, "matrix_solute")),
-    transport_solid (BuildBase::build_item<Transport> (al, "transport_solid")),
-    mactrans  (BuildBase::build_item<Mactrans> (al, "mactrans"))
+    matrix_solute (Librarian::build_vector<Transport> (al, "matrix_solute")),
+    transport_solid (Librarian::build_item<Transport> (al, "transport_solid")),
+    mactrans  (Librarian::build_item<Mactrans> (al, "mactrans"))
 { }
 
 Movement1D::~Movement1D ()
@@ -795,6 +796,6 @@ static struct Movement1DSyntax
     alist.add ("description", "One dimensional movement.");
     Movement::load_vertical (syntax, alist);
  
-    BuildBase::add_type (Movement::component, "vertical", alist, syntax, &make);
+    Librarian::add_type (Movement::component, "vertical", alist, syntax, &make);
   }
 } Movement1D_syntax;

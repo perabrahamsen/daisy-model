@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 // average component.
 
@@ -71,7 +72,7 @@ static struct AverageArithmeticSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Arithmetic average '(a+b)/2'.");
-    BuildBase::add_type (Average::component, "arithmetic", alist, syntax, &make);
+    Librarian::add_type (Average::component, "arithmetic", alist, syntax, &make);
   }
 } AverageArithmetic_syntax;
 
@@ -119,7 +120,7 @@ static struct AverageHarmonicSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Harmonic average '2ab/(a+b)'.");
-    BuildBase::add_type (Average::component, "harmonic", alist, syntax, &make);
+    Librarian::add_type (Average::component, "harmonic", alist, syntax, &make);
   }
 } AverageHarmonic_syntax;
 
@@ -150,7 +151,7 @@ static struct AverageGeometricSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Geometric average 'sqrt(a*b)'.");
-    BuildBase::add_type (Average::component, "geometric", alist, syntax, &make);
+    Librarian::add_type (Average::component, "geometric", alist, syntax, &make);
   }
 } AverageGeometric_syntax;
 
@@ -158,6 +159,6 @@ std::auto_ptr<const Average>
 Average::build_geometric ()
 { return std::auto_ptr<const Average> (new AverageGeometric (__FUNCTION__)); }
 
-static BuildBase Average_init (Average::component, Average::description);
+static Librarian Average_init (Average::component, Average::description);
 
 // average.C ends here.

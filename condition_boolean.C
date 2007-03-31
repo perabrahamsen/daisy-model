@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "boolean.h"
 #include "scope.h"
+#include "librarian.h"
 #include <memory>
 
 struct ConditionBoolean : public Condition
@@ -63,7 +64,7 @@ struct ConditionBoolean : public Condition
 
   ConditionBoolean (Block& al)
     : Condition (al),
-      expr (BuildBase::build_item<Boolean> (al, "extern")),
+      expr (Librarian::build_item<Boolean> (al, "extern")),
       state (uninitialized)
   { }
 };
@@ -83,7 +84,7 @@ Test if a boolean expression is true.");
       syntax.add_object ("expr", Boolean::component, "\
 Expression to evaluate.");
       syntax.order ("expr");
-      BuildBase::add_type (Condition::component, "check",
+      Librarian::add_type (Condition::component, "check",
 				      alist, syntax, &make);
     }
   }

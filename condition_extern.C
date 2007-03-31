@@ -28,6 +28,7 @@
 #include "output.h"
 #include "scope.h"
 #include "scopesel.h"
+#include "librarian.h"
 #include <memory>
 
 struct ConditionExtern : public Condition
@@ -73,9 +74,9 @@ struct ConditionExtern : public Condition
 
   ConditionExtern (Block& al)
     : Condition (al),
-      scopesel (BuildBase::build_item<Scopesel> (al, "scope")),
+      scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
-      expr (BuildBase::build_item<Boolean> (al, "expr")),
+      expr (Librarian::build_item<Boolean> (al, "expr")),
       state (uninitialized)
   { }
 };
@@ -98,7 +99,7 @@ Scope to evaluate expession in.");
       syntax.add_object ("expr", Boolean::component, "\
 Expression to evaluate.");
       syntax.order ("scope", "expr");
-      BuildBase::add_type (Condition::component, "extern",
+      Librarian::add_type (Condition::component, "extern",
 				      alist, syntax, &make);
     }
   }

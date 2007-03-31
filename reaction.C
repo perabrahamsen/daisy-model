@@ -21,6 +21,7 @@
 
 #include "reaction.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Reaction::description = "\
 Generic transformations between soil chemicals.";
@@ -35,4 +36,4 @@ Reaction::Reaction (Block& al)
 Reaction::~Reaction ()
 { }
 
-static BuildBase Reaction_init (Reaction::component, Reaction::description);
+static Librarian Reaction_init (Reaction::component, Reaction::description);

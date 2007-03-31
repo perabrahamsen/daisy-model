@@ -25,6 +25,7 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 
 struct GnuplotTime : public GnuplotBase
@@ -329,7 +330,7 @@ GnuplotTime::GnuplotTime (Block& al)
     y2min (al.number ("y2min", 42.42e42)),
     y2max_flag (al.check ("y2max")),
     y2max (al.number ("y2max", 42.42e42)),
-    source (BuildBase::build_vector<Source> (al, "source"))
+    source (Librarian::build_vector<Source> (al, "source"))
 { }
 
 GnuplotTime::~GnuplotTime ()
@@ -370,6 +371,6 @@ By default determine this from the data.");
     syntax.add_object ("source", Source::component, Syntax::State, 
                        Syntax::Sequence, "\
 Time series to plot.");
-    BuildBase::add_type (Gnuplot::component, "time", alist, syntax, &make);
+    Librarian::add_type (Gnuplot::component, "time", alist, syntax, &make);
   }
 } GnuplotTime_syntax;

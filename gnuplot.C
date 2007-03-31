@@ -21,6 +21,7 @@
 
 #include "gnuplot.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Gnuplot::description = "\
 Plot a graph with gnuplot.";
@@ -42,4 +43,4 @@ Gnuplot::Gnuplot (Block& al)
 Gnuplot::~Gnuplot ()
 { }
 
-static BuildBase Gnuplot_init (Gnuplot::component, Gnuplot::description);
+static Librarian Gnuplot_init (Gnuplot::component, Gnuplot::description);

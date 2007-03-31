@@ -38,6 +38,7 @@
 #include "treelog.h"
 #include "memutils.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 #include <iomanip>
 #include <iostream>
@@ -68,7 +69,7 @@ A location and content of a soil layer.");
     }
     Layer (Block& al)
       : end (al.number ("end")),
-	horizon (BuildBase::build_item<Horizon> (al, "horizon"))
+	horizon (Librarian::build_item<Horizon> (al, "horizon"))
     { }
     ~Layer ()
     { }

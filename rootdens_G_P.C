@@ -27,6 +27,7 @@
 #include "check.h"
 #include <sstream>
 #include "mathlib.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -258,6 +259,6 @@ all the way down.");
 Calculated from 'DensRtTip'.");
     syntax.add ("L0", "cm/cm^3", Syntax::LogOnly,
                 "Root density at soil surface.");
-    BuildBase::add_type (Rootdens::component, "Gerwitz+Page74", alist, syntax, &make);
+    Librarian::add_type (Rootdens::component, "Gerwitz+Page74", alist, syntax, &make);
   }
 } Rootdens_G_P_syntax;

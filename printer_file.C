@@ -30,6 +30,7 @@
 #include "parser.h"
 #include "path.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <sstream>
 #include <fstream>
 #include <algorithm>
@@ -877,6 +878,6 @@ static struct PrinterFileSyntax
     syntax.add ("where", Syntax::String, Syntax::Const,
                 "File to print in.");
     syntax.order ("where");
-    BuildBase::add_type (Printer::component, "file", alist, syntax, &make);
+    Librarian::add_type (Printer::component, "file", alist, syntax, &make);
   }
 } PrinterFile_syntax;

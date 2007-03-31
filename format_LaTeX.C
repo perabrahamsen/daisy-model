@@ -24,6 +24,7 @@
 #include "alist.h"
 #include "version.h"
 #include "assertion.h"
+#include "librarian.h"
 // GCC 2.95 lack ostream.
 #include <iostream>
 #include <map>
@@ -337,6 +338,6 @@ static struct FormatLaTeXSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Format text as LaTeX.");
-    BuildBase::add_type (Format::component, "LaTeX", alist, syntax, &make);
+    Librarian::add_type (Format::component, "LaTeX", alist, syntax, &make);
   }
 } FormatLaTeX_syntax;

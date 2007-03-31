@@ -24,6 +24,7 @@
 #include "alist.h"
 #include "source.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <sstream>
 #include <memory>
 
@@ -90,7 +91,7 @@ The time series we want to extract a number from.");
   }
   NumberSource (Block& al)
     : Number (al),
-      source (BuildBase::build_item<Source> (al, "source")),
+      source (Librarian::build_item<Source> (al, "source")),
       begin (al.check ("begin") ? new Time (al.alist ("begin")) : NULL),
       end (al.check ("end") ? new Time (al.alist ("end")) : NULL),
       state (uninitialized),
@@ -144,7 +145,7 @@ static struct NumberSourceUniqueSyntax
     alist.add ("description", 
 	       "Find unique number in time series.");
     NumberSource::load_syntax (syntax, alist);
-    BuildBase::add_type (Number::component, "source_unique", alist, syntax, &make);
+    Librarian::add_type (Number::component, "source_unique", alist, syntax, &make);
   }
 } NumberSourceUnique_syntax;
 
@@ -191,7 +192,7 @@ static struct NumberSourceAverageSyntax
     alist.add ("description", 
 	       "Find average number in time series.");
     NumberSource::load_syntax (syntax, alist);
-    BuildBase::add_type (Number::component, "source_average", alist, syntax, &make);
+    Librarian::add_type (Number::component, "source_average", alist, syntax, &make);
   }
 } NumberSourceAverage_syntax;
 
@@ -224,7 +225,7 @@ static struct NumberSourceSumSyntax
     alist.add ("description", 
 	       "Calculate the sum of the values in a time series.");
     NumberSource::load_syntax (syntax, alist);
-    BuildBase::add_type (Number::component, "source_sum", alist, syntax, &make);
+    Librarian::add_type (Number::component, "source_sum", alist, syntax, &make);
   }
 } NumberSourceSum_syntax;
 
@@ -270,7 +271,7 @@ static struct NumberSourceIncreaseSyntax
     alist.add ("description", 
 	       "Find increase in value during time series.");
     NumberSource::load_syntax (syntax, alist);
-    BuildBase::add_type (Number::component, "source_increase", alist, syntax, &make);
+    Librarian::add_type (Number::component, "source_increase", alist, syntax, &make);
   }
 } NumberSourceIncrease_syntax;
 

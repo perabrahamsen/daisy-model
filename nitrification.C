@@ -31,6 +31,7 @@
 #include "soil_NO3.h"
 #include "log.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 const char *const Nitrification::description = "\
 The nitrification process, transforming ammonium into nitrate and\n\
@@ -103,5 +104,5 @@ Nitrification::Nitrification (Block& al)
 Nitrification::~Nitrification ()
 { }
 
-static BuildBase Nitrification_init (Nitrification::component, Nitrification::description);
+static Librarian Nitrification_init (Nitrification::component, Nitrification::description);
 

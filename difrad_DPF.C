@@ -25,6 +25,7 @@
 #include "fao.h"
 #include "mathlib.h"
 #include "check.h"
+#include "librarian.h"
 #include <sstream>
 
 struct DifradDPF : public Difrad
@@ -104,6 +105,6 @@ Diffuse radiation calculated using the model of De Pury and Farquhar, 1997.");
                 "Atmospheric transmission coefficient of PAR. Value around 0.6-0.9 depending on dustparticles");
     alist.add ("a", 0.84);
     
-    BuildBase::add_type (Difrad::component, "DPF", alist, syntax, &make);
+    Librarian::add_type (Difrad::component, "DPF", alist, syntax, &make);
   }
 } DifradDPF_syntax;

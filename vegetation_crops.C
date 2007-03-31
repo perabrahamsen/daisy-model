@@ -28,6 +28,7 @@
 #include "mathlib.h"
 #include "harvest.h"
 #include "log.h"
+#include "librarian.h"
 #include <sstream>
 #include <deque>
 
@@ -631,7 +632,7 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
                       const double dt,
                       Treelog& msg)
 {
-  Crop *const crop = BuildBase::build_free<Crop> (metalib, msg, al, "sow");
+  Crop *const crop = Librarian::build_free<Crop> (metalib, msg, al, "sow");
   const symbol name = crop->name;
   for (CropList::iterator i = crops.begin();
        i != crops.end();
@@ -667,7 +668,7 @@ VegetationCrops::initialize (const Time& time, const Geometry& geo,
 VegetationCrops::CropList
 VegetationCrops::build_crops (Block& al, const std::string& key)
 {
-  const std::vector<Crop*> v = BuildBase::build_vector<Crop> (al, key);
+  const std::vector<Crop*> v = Librarian::build_vector<Crop> (al, key);
   return CropList (v.begin (), v.end ());
 }
 
@@ -727,6 +728,6 @@ emerged.  If no crops have emerged on the field, it will be ignored.",
                        Syntax::State, Syntax::Sequence,
                        "List of crops growing in the field");
     alist.add ("crops", std::vector<AttributeList*> ());
-    BuildBase::add_type (Vegetation::component, "crops", alist, syntax, &make);
+    Librarian::add_type (Vegetation::component, "crops", alist, syntax, &make);
   }
 } VegetationCrops_syntax;

@@ -30,6 +30,7 @@
 #include "fao.h"
 #include "vegetation.h"
 #include "log.h"
+#include "librarian.h"
 #include <sstream>
 #include <memory>
 
@@ -152,6 +153,6 @@ static struct PetPMSyntax
     AttributeList Rn_alist;
     Rn_alist.add ("type", "brunt");
     alist.add ("net_radiation", Rn_alist);
-    BuildBase::add_type (Pet::component, "PM", alist, syntax, &make);
+    Librarian::add_type (Pet::component, "PM", alist, syntax, &make);
   }
 } PetPM_syntax;

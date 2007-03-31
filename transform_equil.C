@@ -30,6 +30,7 @@
 #include "equil.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <memory>
 
 using namespace std;
@@ -52,7 +53,7 @@ struct TransformEquilibrium : public Transform
   bool check (const Soil&, Treelog& err) const;
   TransformEquilibrium (Block& al)
     : Transform (al),
-      equilibrium (BuildBase::build_item<Equilibrium> (al, "equilibrium")),
+      equilibrium (Librarian::build_item<Equilibrium> (al, "equilibrium")),
       initialize_state (uninitialized)
   { }
 };
@@ -116,7 +117,7 @@ TransformEquilibrium::initialize (Block& block, const Soil& soil)
   {
     Treelog::Open nest (block.msg (), "k_AB");
     auto_ptr<Pedotransfer> pedo_AB 
-      (BuildBase::build_alist<Pedotransfer> (block, alist.alist ("k_AB"), 
+      (Librarian::build_alist<Pedotransfer> (block, alist.alist ("k_AB"), 
                                              "k_AB"));
     if (pedo_AB->check (soil, "h^-1", block.msg ()))
       pedo_AB->set (soil, k_AB, "h^-1");
@@ -131,7 +132,7 @@ TransformEquilibrium::initialize (Block& block, const Soil& soil)
     {
       Treelog::Open nest (block.msg (), "k_BA");
       auto_ptr<Pedotransfer> pedo_BA 
-        (BuildBase::build_alist<Pedotransfer> (block, alist.alist ("k_BA"),
+        (Librarian::build_alist<Pedotransfer> (block, alist.alist ("k_BA"),
                                                "k_BA"));
       if (pedo_BA->check (soil, "h^-1", block.msg ()))
         pedo_BA->set (soil, k_BA, "h^-1");
@@ -150,7 +151,7 @@ TransformEquilibrium::initialize (Block& block, const Soil& soil)
         {
           vector<double> debug;
           auto_ptr<Pedotransfer> pedo_debug 
-            (BuildBase::build_alist<Pedotransfer> (block, *alists[i],
+            (Librarian::build_alist<Pedotransfer> (block, *alists[i],
                                                    sequence_id ("debug", i)));
           if (pedo_debug->check (soil, pedo_debug->dimension (), block.msg ()))
             pedo_debug->set (soil, debug, pedo_debug->dimension ());
@@ -186,6 +187,6 @@ By default, this is identical to 'k_AB'.");
     syntax.add_object ("debug", Pedotransfer::component,
                        Syntax::OptionalConst, Syntax::Sequence, "\
 Extra pedotransfer function to include in 'daisy.log' for debugging.");
-    BuildBase::add_type (Transform::component, "equilibrium", alist, syntax, &make);
+    Librarian::add_type (Transform::component, "equilibrium", alist, syntax, &make);
   }
 } TransformEquilibrium_syntax;

@@ -28,6 +28,7 @@
 #include "plf.h"
 #include "mathlib.h"
 #include "check.h"
+#include "librarian.h"
 
 class HydraulicM_vGp : public Hydraulic
 {
@@ -187,5 +188,5 @@ Water Resources Research 2003.");
   syntax.add ("f", Syntax::None (), Check::non_negative (), Syntax::Const,
 	      "Macropores conductivity curve shape parameter.");
     
-  BuildBase::add_type (Hydraulic::component, "M_vGp", alist, syntax, make);
+  Librarian::add_type (Hydraulic::component, "M_vGp", alist, syntax, make);
 }

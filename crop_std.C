@@ -44,6 +44,7 @@
 #include "am.h"
 #include "submodeler.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 #include <numeric>
 
@@ -578,14 +579,14 @@ CropStandard::CropStandard (Block& al)
     last_time (al.check ("last_time")
                ? new Time (al.alist ("last_time"))
                : NULL),
-    development (BuildBase::build_item<Phenology> (al, "Devel")),
+    development (Librarian::build_item<Phenology> (al, "Devel")),
     partition (al.alist ("Partit")),
     vernalization (al.check ("Vernal")
                    ? al.alist ("Vernal")
                    : Vernalization::no_vernalization ()),
-    photo (BuildBase::build_item<Photo> (al, "LeafPhot")),
+    photo (Librarian::build_item<Photo> (al, "LeafPhot")),
     nitrogen (al.alist ("CrpN")),
-    water_stress_effect (BuildBase::build_item<WSE> (al, 
+    water_stress_effect (Librarian::build_item<WSE> (al, 
                                                      "water_stress_effect")),
     enable_N_stress (al.flag ("enable_N_stress")),
     min_light_fraction (al.number ("min_light_fraction"))
@@ -648,5 +649,5 @@ by this parameter, and in these patches the crop will not have to\n\
 compete for light.  The crop still needs LAI in order to catch the\n\
 light though.  Competition for water and nutrients are unaffected.");
   alist.add ("min_light_fraction", 0.0);
-  BuildBase::add_type (Crop::component, "default", alist, syntax, &make);
+  Librarian::add_type (Crop::component, "default", alist, syntax, &make);
 }

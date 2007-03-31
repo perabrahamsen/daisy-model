@@ -37,6 +37,7 @@
 #include "harvest.h"
 #include "mathlib.h"
 #include "treelog.h"
+#include "librarian.h"
 #include <sstream>
 
 class CropOld : public Crop
@@ -969,7 +970,7 @@ Daisy v1 crop model, for crops with storage organ in the shoot.");
   syntax.add ("CrpAux", CrpAux, "Miscellaneous crop state variables.");
   alist.add ("CrpAux", vCrpAux);
 
-  BuildBase::add_type (Crop::component, "old", alist, syntax, &make);
+  Librarian::add_type (Crop::component, "old", alist, syntax, &make);
 }
 
 double

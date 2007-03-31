@@ -26,6 +26,7 @@
 #include "vcheck.h"
 #include "mathlib.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 #include <memory>
 
@@ -55,7 +56,7 @@ struct NumberOperand : public Number
   }
   NumberOperand (Block& al)
     : Number (al),
-      operand (BuildBase::build_item<Number> (al, "operand"))
+      operand (Librarian::build_item<Number> (al, "operand"))
   { }
 };
 
@@ -89,7 +90,7 @@ static struct NumberLog10Syntax
     syntax.add_object ("operand", Number::component,
                        "Operand for this function.");
     syntax.order ("operand");
-    BuildBase::add_type (Number::component, "log10", alist, syntax, &make);
+    Librarian::add_type (Number::component, "log10", alist, syntax, &make);
   }
 } NumberLog10_syntax;
 
@@ -123,7 +124,7 @@ static struct NumberLnSyntax
     syntax.add_object ("operand", Number::component,
                        "Operand for this function.");
     syntax.order ("operand");
-    BuildBase::add_type (Number::component, "ln", alist, syntax, &make);
+    Librarian::add_type (Number::component, "ln", alist, syntax, &make);
   }
 } NumberLn_syntax;
 
@@ -157,7 +158,7 @@ static struct NumberSqrtSyntax
     syntax.add_object ("operand", Number::component,
                        "Operand for this function.");
     syntax.order ("operand");
-    BuildBase::add_type (Number::component, "sqrt", alist, syntax, &make);
+    Librarian::add_type (Number::component, "sqrt", alist, syntax, &make);
   }
 } NumberSqrt_syntax;
 
@@ -190,7 +191,7 @@ static struct NumberSqrSyntax
     syntax.add_object ("operand", Number::component,
                        "Operand for this function.");
     syntax.order ("operand");
-    BuildBase::add_type (Number::component, "sqr", alist, syntax, &make);
+    Librarian::add_type (Number::component, "sqr", alist, syntax, &make);
   }
 } NumberSqr_syntax;
 
@@ -241,8 +242,8 @@ struct NumberPow : public Number
   }
   NumberPow (Block& al)
     : Number (al),
-      base (BuildBase::build_item<Number> (al, "base")),
-      exponent (BuildBase::build_item<Number> (al, "exponent"))
+      base (Librarian::build_item<Number> (al, "base")),
+      exponent (Librarian::build_item<Number> (al, "exponent"))
   { }
 };
 
@@ -262,7 +263,7 @@ static struct NumberPowSyntax
     syntax.add_object ("exponent", Number::component,
                        "The exponent operand for this function.");
     syntax.order ("base", "exponent");
-    BuildBase::add_type (Number::component, "pow", alist, syntax, &make);
+    Librarian::add_type (Number::component, "pow", alist, syntax, &make);
   }
 } NumberPow_syntax;
 
@@ -329,7 +330,7 @@ struct NumberOperands : public Number
       const struct Operands : public  op_x
       {
         Operands (Block& Block, const std::vector<AttributeList*>& as)
-          : op_x (BuildBase:build_vector_const<Number> (as))
+          : op_x (Librarian:build_vector_const<Number> (as))
         { }
         ~Operands ()
         { sequence_delete (begin (), end ()); }
@@ -371,7 +372,7 @@ struct NumberOperands : public Number
   }
   NumberOperands (Block& al)
     : Number (al),
-      operands (BuildBase::build_vector<Number> (al, "operands"))
+      operands (Librarian::build_vector<Number> (al, "operands"))
   { }
   ~NumberOperands ()
   { sequence_delete (operands.begin (), operands.end ()); }
@@ -425,7 +426,7 @@ static struct NumberMaxSyntax
 #endif // CHECK_OPERANDS_DIM
     syntax.add_check ("operands", VCheck::min_size_1 ());
     syntax.order ("operands");
-    BuildBase::add_type (Number::component, "max", alist, syntax, &make);
+    Librarian::add_type (Number::component, "max", alist, syntax, &make);
   }
 } NumberMax_syntax;
 
@@ -475,7 +476,7 @@ static struct NumberMinSyntax
     syntax.add_check ("operands", VCheck::min_size_1 ());
 #endif // !CHECK_OPERANDS_DIM
     syntax.order ("operands");
-    BuildBase::add_type (Number::component, "min", alist, syntax, &make);
+    Librarian::add_type (Number::component, "min", alist, syntax, &make);
   }
 } NumberMin_syntax;
 
@@ -513,7 +514,7 @@ static struct NumberProductSyntax
                        Syntax::Const, Syntax::Sequence,
                        "The operands for this function.");
     syntax.order ("operands");
-    BuildBase::add_type (Number::component, "*", alist, syntax, &make);
+    Librarian::add_type (Number::component, "*", alist, syntax, &make);
   }
 } NumberProduct_syntax;
 
@@ -554,7 +555,7 @@ static struct NumberSumSyntax
     syntax.add_check ("operands", NumberOperands::unique);
 #endif // CHECK_OPERANDS_DIM
     syntax.order ("operands");
-    BuildBase::add_type (Number::component, "+", alist, syntax, &make);
+    Librarian::add_type (Number::component, "+", alist, syntax, &make);
   }
 } NumberSum_syntax;
 
@@ -602,7 +603,7 @@ subtracts all but the first from the first.");
     syntax.add_check ("operands", all);
 #endif // CHECK_OPERANDS_DIM
     syntax.order ("operands");
-    BuildBase::add_type (Number::component, "-", alist, syntax, &make);
+    Librarian::add_type (Number::component, "-", alist, syntax, &make);
   }
 } NumberSubtract_syntax;
 
@@ -642,7 +643,7 @@ static struct NumberDivideSyntax
                        "The operands for this function.");
     syntax.add_check ("operands", VCheck::min_size_1 ());
     syntax.order ("operands");
-    BuildBase::add_type (Number::component, "/", alist, syntax, &make);
+    Librarian::add_type (Number::component, "/", alist, syntax, &make);
   }
 } NumberDivide_syntax;
 

@@ -22,6 +22,7 @@
 #include "units.h"
 #include "lexer_table.h"
 #include "alist.h"
+#include "librarian.h"
 #include <sstream>
 
 struct SourceStandard : public SourceFile
@@ -170,7 +171,7 @@ If 'factor' is not specified, Daisy will attempt to convert the data.");
 Multiply all data by this number.\n\
 By default Daisy will convert from 'original' to 'dimension'.");
 
-    BuildBase::add_type (Source::component, "column", alist, syntax, &make);
+    Librarian::add_type (Source::component, "column", alist, syntax, &make);
   }
 } SourceStandard_syntax;
 

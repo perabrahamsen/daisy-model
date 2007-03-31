@@ -25,6 +25,7 @@
 #include "scope_block.h"
 #include "block.h"
 #include "assertion.h"
+#include "librarian.h"
 
 void 
 LogExtern::done (const Time& time, const double dt)
@@ -261,6 +262,6 @@ For example, if you have defined 'column' and 'crop' parameters for\n\
 this extern log parameterization, you can export them to through the\n\
 API interface by specifying '(names column crop)'.");
       alist.add ("parameter_names", std::vector<symbol> ());
-      BuildBase::add_type (Log::component, "extern", alist, syntax, &make);
+      Librarian::add_type (Log::component, "extern", alist, syntax, &make);
     }
 } LogExtern_syntax;

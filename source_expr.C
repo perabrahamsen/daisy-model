@@ -22,6 +22,7 @@
 #include "scope_table.h"
 #include "number.h"
 #include "alist.h"
+#include "librarian.h"
 
 struct SourceExpr : public SourceFile
 {
@@ -100,7 +101,7 @@ SourceExpr::load (Treelog& msg)
 
 SourceExpr::SourceExpr (Block& al)
   : SourceFile (al),
-    expr (BuildBase::build_item<Number> (al, "expr")),
+    expr (Librarian::build_item<Number> (al, "expr")),
     title_ (al.identifier ("title", expr->title ())),
     dimension_ ("UNINITIALIZED")
 { }
@@ -130,7 +131,7 @@ Expression for calculating the value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
 
-    BuildBase::add_type (Source::component, "arithmetic", alist, syntax, &make);
+    Librarian::add_type (Source::component, "arithmetic", alist, syntax, &make);
   }
 } SourceExpr_syntax;
 

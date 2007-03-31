@@ -47,6 +47,7 @@
 #include "vcheck.h"
 #include "gaussj.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <algorithm>
 #include <numeric>
 #include <fstream>
@@ -2589,15 +2590,15 @@ OrganicStandard::OrganicStandard (Block& al)
     K_NO3 (al.number ("K_NO3")),
     CO2_threshold (al.number ("CO2_threshold")),
     top_CO2 (0.0),
-    am (BuildBase::build_vector<AM> (al, "am")),
+    am (Librarian::build_vector<AM> (al, "am")),
     smb (map_construct<SMB> (al.alist_sequence ("smb"))),
     som (map_construct<SOM> (al.alist_sequence ("som"))),
     dom (map_submodel<DOM> (al, "dom")),
-    domsorp (BuildBase::build_vector<Domsorp> (al, "domsorp")),
+    domsorp (Librarian::build_vector<Domsorp> (al, "domsorp")),
     buffer (al.alist ("buffer")),
     heat_factor (al.plf ("heat_factor")),
     water_factor (al.plf ("water_factor")),
-    clayom (BuildBase::build_item<ClayOM> (al, "ClayOM")),
+    clayom (Librarian::build_item<ClayOM> (al, "ClayOM")),
     smb_tillage_factor (al.plf_sequence ("smb_tillage_factor")),
     som_tillage_factor (al.plf_sequence ("som_tillage_factor")),
     min_AM_C (al.number ("min_AM_C")),
@@ -3198,6 +3199,6 @@ Mineralization and immobilization in soil.  Hansen et.al. 1991.\n\
 Recalibrated by Bruun et.al. 2002.");
     OrganicStandard::load_syntax (syntax, alist);
  
-    BuildBase::add_type (OrganicMatter::component, "default", alist, syntax, &make);
+    Librarian::add_type (OrganicMatter::component, "default", alist, syntax, &make);
   }
 } OrganicStandard_syntax;

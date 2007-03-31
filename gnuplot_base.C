@@ -24,6 +24,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "assertion.h"
+#include "librarian.h"
 
 void 
 GnuplotBase::Size::load_syntax (Syntax& syntax, AttributeList&)
@@ -202,6 +203,6 @@ static struct GnuplotSyntax
     AttributeList& alist = *new AttributeList ();
     GnuplotBase::load_syntax (syntax, alist);
 
-    BuildBase::add_base (Gnuplot::component, alist, syntax);
+    Librarian::add_base (Gnuplot::component, alist, syntax);
   }
 } Gnuplot_syntax;

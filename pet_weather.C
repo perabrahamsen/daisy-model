@@ -24,6 +24,7 @@
 #include "syntax.h"
 #include "weather.h"
 #include "log.h"
+#include "librarian.h"
 
 struct PetWeather : public Pet
 {
@@ -71,6 +72,6 @@ static struct PetWeatherSyntax
       alist.add ("description", 
 		 "Potential evopotranspiration using weather data.");
       Pet::load_syntax (syntax, alist);
-      BuildBase::add_type (Pet::component, "weather", alist, syntax, &make);
+      Librarian::add_type (Pet::component, "weather", alist, syntax, &make);
     }
 } PetWeather_syntax;

@@ -23,6 +23,7 @@
 #include "adsorption.h"
 #include "syntax.h"
 #include "alist.h"
+#include "librarian.h"
 
 class AdsorptionNone : public Adsorption
 {
@@ -53,6 +54,6 @@ static struct AdsorptionNoneSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "No adsorption.\n\
 Used for solutes that are not adsorped to the soil.");
-    BuildBase::add_type (Adsorption::component, "none", alist, syntax, &make);
+    Librarian::add_type (Adsorption::component, "none", alist, syntax, &make);
   }
 } AdsorptionNone_syntax;

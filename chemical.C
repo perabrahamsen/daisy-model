@@ -22,6 +22,7 @@
 
 #include "chemical.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Chemical::description = "\
 This component should, for a specific chemical (typically a pesticide),\n\
@@ -38,5 +39,5 @@ Chemical::Chemical (Block& al)
 Chemical::~Chemical ()
 { }
 
-static BuildBase Chemical_init (Chemical::component, Chemical::description);
+static Librarian Chemical_init (Chemical::component, Chemical::description);
 

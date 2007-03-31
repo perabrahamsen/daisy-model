@@ -28,6 +28,7 @@
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <vector>
 #include <sstream>
 
@@ -215,6 +216,6 @@ static struct TransportConvectionSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Transport using convection alone.");
     TransportConvection::load_syntax (syntax, alist);
-    BuildBase::add_type (Transport::component, "convection", alist, syntax, &make);
+    Librarian::add_type (Transport::component, "convection", alist, syntax, &make);
   }
 } TransportConvection_syntax;

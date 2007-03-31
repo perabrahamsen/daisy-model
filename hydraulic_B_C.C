@@ -24,6 +24,7 @@
 #include "alist.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 class HydraulicB_C : public Hydraulic
 {
@@ -126,7 +127,7 @@ static struct HydraulicB_CSyntax
       syntax.add ("b", Syntax::None (), Check::positive (), Syntax::Const,
 		  "Campbell parameter.");
 
-      BuildBase::add_type (Hydraulic::component, "B_C", alist, syntax, &make);
+      Librarian::add_type (Hydraulic::component, "B_C", alist, syntax, &make);
     }
 } hydraulicB_C_syntax;
 

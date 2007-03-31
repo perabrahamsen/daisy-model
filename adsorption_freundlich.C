@@ -26,6 +26,7 @@
 #include "soil.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 static const double c_fraction_in_humus = 0.587;
 
@@ -148,6 +149,6 @@ carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.\n\
 The dimension depends on the 'm' parameter.");
     syntax.add ("m", Syntax::None (), Check::non_negative (), Syntax::Const,
 		"Freundlich parameter");
-    BuildBase::add_type (Adsorption::component, "Freundlich", alist, syntax, &make);
+    Librarian::add_type (Adsorption::component, "Freundlich", alist, syntax, &make);
   }
 } AdsorptionFreundlich_syntax;

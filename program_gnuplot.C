@@ -25,6 +25,7 @@
 #include "treelog.h"
 #include "path.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <string>
 #include <set>
 #include <fstream>
@@ -114,7 +115,7 @@ ProgramGnuplot::ProgramGnuplot (Block& al)
     command_file (al.name ("command_file")),
     do_cd (al.flag ("cd")),
     extra (al.identifier_sequence ("extra")),
-    graph (BuildBase::build_vector<Gnuplot> (al, "graph"))
+    graph (Librarian::build_vector<Gnuplot> (al, "graph"))
 { }
 
 ProgramGnuplot::~ProgramGnuplot ()
@@ -148,6 +149,6 @@ The commands will be inserted right before the list of graphs.");
                 
     syntax.add_object ("graph", Gnuplot::component, Syntax::State, 
                        Syntax::Sequence, "Graphs to plot.");
-    BuildBase::add_type (Program::component, "gnuplot", alist, syntax, &make);
+    Librarian::add_type (Program::component, "gnuplot", alist, syntax, &make);
   }
 } ProgramGnuplot_syntax;

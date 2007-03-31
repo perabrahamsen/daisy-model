@@ -27,6 +27,7 @@
 #include "vernalization.h"
 #include "plf.h"
 #include "assertion.h"
+#include "librarian.h"
 
 class PhenologyTSum : public Phenology
 {
@@ -143,6 +144,6 @@ Temperature below this will not count in the sum.");
 Temperature below this will not count in the sum.");
     alist.add ("RepThrs", 0.0);
 
-    BuildBase::add_type (Phenology::component, "TSum", alist, syntax, &make);
+    Librarian::add_type (Phenology::component, "TSum", alist, syntax, &make);
   }
 } PhenologyTSum_syntax;

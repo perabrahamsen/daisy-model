@@ -22,6 +22,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "assertion.h"
+#include "librarian.h"
 
 const std::vector<symbol>& 
 ScopeMulti::all_numbers () const
@@ -96,7 +97,7 @@ ScopeMulti::ScopeMulti (const Scope& first, const Scope& second)
 
 ScopeMulti::ScopeMulti (Block& al)
   : Scope (al),
-    scopes (BuildBase::build_vector_const<Scope> (al, "scope")),
+    scopes (Librarian::build_vector_const<Scope> (al, "scope")),
     all_numbers_ (find_numbers (scopes))
 { }
 
@@ -118,7 +119,7 @@ static struct ScopeMultiSyntax
     syntax.add_object ("scope", Scope::component,
                        Syntax::Const, Syntax::Sequence, 
                        "List of scopes to combine, first one takes precedence.");
-    BuildBase::add_type (Scope::component, "multi", alist, syntax, &make);
+    Librarian::add_type (Scope::component, "multi", alist, syntax, &make);
   }
 } ScopeMulti_syntax;
 

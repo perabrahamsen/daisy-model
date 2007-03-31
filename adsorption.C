@@ -22,6 +22,7 @@
 
 #include "adsorption.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Adsorption::description = "\
 This component describes the adsorption of a chemical to the soil,\n\
@@ -45,4 +46,4 @@ Adsorption::Adsorption (Block& al)
 Adsorption::~Adsorption ()
 { }
 
-static BuildBase Adsorption_init (Adsorption::component, Adsorption::description);
+static Librarian Adsorption_init (Adsorption::component, Adsorption::description);

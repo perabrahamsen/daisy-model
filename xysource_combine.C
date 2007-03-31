@@ -26,6 +26,7 @@
 #include "scope_sources.h"
 #include "source.h"
 #include "assertion.h"
+#include "librarian.h"
 
 struct XYSourceCombine : public XYSource
 {
@@ -113,9 +114,9 @@ XYSourceCombine::load (Treelog& msg)
 
 XYSourceCombine::XYSourceCombine (Block& al)
   : XYSource (al),
-    scope (BuildBase::build_vector<Source> (al, "source")),
-    x_expr (BuildBase::build_item<Number> (al, "x")),
-    y_expr (BuildBase::build_item<Number> (al, "y")),
+    scope (Librarian::build_vector<Source> (al, "source")),
+    x_expr (Librarian::build_item<Number> (al, "x")),
+    y_expr (Librarian::build_item<Number> (al, "y")),
     title_ (al.name ("title", y_expr->title () + " vs " + x_expr->title ())),
     x_dimension_ ("UNINITIALIZED"),
     y_dimension_ ("UNINITIALIZED"),
@@ -155,7 +156,7 @@ expression may refer to the value of each source by its title.");
 Expression for calculating the y value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");
-    BuildBase::add_type (XYSource::component, "combine", alist, syntax, &make);
+    Librarian::add_type (XYSource::component, "combine", alist, syntax, &make);
   }
 } XYSourceCombine_syntax;
 

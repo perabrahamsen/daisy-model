@@ -24,6 +24,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 class AdsorptionFull : public Adsorption
 {
@@ -58,6 +59,6 @@ static struct AdsorptionFullSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Full adsorption.\n\
 Used for non-solutes, fully adsorped in the soil.");
-    BuildBase::add_type (Adsorption::component, "full", alist, syntax, &make);
+    Librarian::add_type (Adsorption::component, "full", alist, syntax, &make);
   }
 } AdsorptionFull_syntax;

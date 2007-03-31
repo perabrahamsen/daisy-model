@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "assertion.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 #include <vector>
 
@@ -75,7 +76,7 @@ static struct BooleanTrueSyntax
 
     alist.add ("description", 
 	       "Always true.");
-    BuildBase::add_type (Boolean::component, "true", alist, syntax, &make);
+    Librarian::add_type (Boolean::component, "true", alist, syntax, &make);
   }
 } BooleanTrue_syntax;
 
@@ -111,7 +112,7 @@ static struct BooleanFalseSyntax
 
     alist.add ("description", 
 	       "Always false.");
-    BuildBase::add_type (Boolean::component, "false", alist, syntax, &make);
+    Librarian::add_type (Boolean::component, "false", alist, syntax, &make);
   }
 } BooleanFalse_syntax;
 
@@ -169,7 +170,7 @@ List of operands to compare.");
   }
   BooleanOperands (Block& al)
     : Boolean (al),
-      operand (BuildBase::build_vector<Boolean> (al, "operands"))
+      operand (Librarian::build_vector<Boolean> (al, "operands"))
   { }
   ~BooleanOperands ()
   { sequence_delete (operand.begin (), operand.end ()); }
@@ -200,7 +201,7 @@ static struct BooleanAndSyntax
     BooleanOperands::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "True if and only if all operands are true.");
-    BuildBase::add_type (Boolean::component, "and", alist, syntax, &make);
+    Librarian::add_type (Boolean::component, "and", alist, syntax, &make);
   }
 } BooleanAnd_syntax;
 
@@ -230,7 +231,7 @@ static struct BooleanOrSyntax
     BooleanOperands::load_syntax (syntax, alist);
     alist.add ("description", 
 	       "True if and only if any operand is true.");
-    BuildBase::add_type (Boolean::component, "or", alist, syntax, &make);
+    Librarian::add_type (Boolean::component, "or", alist, syntax, &make);
   }
 } BooleanOr_syntax;
 
@@ -260,7 +261,7 @@ The two operands to compare.");
     syntax.order ("operands");
     alist.add ("description", 
 	       "True if and only if one operand is true, and one false.");
-    BuildBase::add_type (Boolean::component, "xor", alist, syntax, &make);
+    Librarian::add_type (Boolean::component, "xor", alist, syntax, &make);
   }
 } BooleanXOr_syntax;
 
@@ -290,8 +291,8 @@ The operand to check.");
     syntax.order ("operands");
     alist.add ("description", 
 	       "True if and only if the operand is not true.");
-    BuildBase::add_type (Boolean::component, "not", alist, syntax, &make);
+    Librarian::add_type (Boolean::component, "not", alist, syntax, &make);
   }
 } BooleanNot_syntax;
 
-static BuildBase Boolean_init (Boolean::component, Boolean::description);
+static Librarian Boolean_init (Boolean::component, Boolean::description);

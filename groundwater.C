@@ -25,6 +25,7 @@
 #include "log.h"
 #include "block.h"
 #include "assertion.h"
+#include "librarian.h"
 
 const char *const Groundwater::description = "\
 The 'groundwater' component is responsible for specifying the\n\
@@ -80,5 +81,5 @@ Groundwater::Groundwater (Block& al)
 Groundwater::~Groundwater ()
 { }
 
-static BuildBase Groundwater_init (Groundwater::component, Groundwater::description);
+static Librarian Groundwater_init (Groundwater::component, Groundwater::description);
 

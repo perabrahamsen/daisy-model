@@ -31,6 +31,7 @@
 #include "mathlib.h"
 #include "plf.h"
 #include "check.h"
+#include "librarian.h"
 
 struct ChemicalStandard : public Chemical
 {
@@ -595,6 +596,6 @@ When it reached 1.0, decomposition begins.");
     none.add ("type", "none");
     alist.add ("adsorption", none);
 
-    BuildBase::add_type (Chemical::component, "default", alist, syntax, &make);
+    Librarian::add_type (Chemical::component, "default", alist, syntax, &make);
   }
 } ChemicalStandard_syntax;

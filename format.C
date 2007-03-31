@@ -22,6 +22,7 @@
 #include "format.h"
 #include "assertion.h"
 #include "block.h"
+#include "librarian.h"
 
 const char *const Format::description = "\
 Text formatting component.";
@@ -191,4 +192,4 @@ Format::Format (Block& al)
 Format::~Format ()
 { daisy_assert (nest.empty ()); }
 
-static BuildBase Format_init (Format::component, Format::description);
+static Librarian Format_init (Format::component, Format::description);

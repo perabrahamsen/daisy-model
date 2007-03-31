@@ -31,6 +31,7 @@
 #include "timestep.h"
 #include "vcheck.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 #include <fstream>
 
@@ -389,7 +390,7 @@ LogTable::LogTable (Block& al)
     print_dimension (al.flag ("print_dimension")),
     print_initial (al.flag ("print_initial")),
     time_columns (al.ok () && !contain_time_columns (entries)),
-    summary (BuildBase::build_vector<Summary> (al, "summary")),
+    summary (Librarian::build_vector<Summary> (al, "summary")),
     begin (1, 1, 1, 1),
     end (1, 1, 1, 1),
     type (Error),
@@ -481,8 +482,8 @@ String to print between array entries.");
                          Syntax::Const, Syntax::Sequence,
                          "Summaries for this log file.");
       alist.add ("summary", vector<AttributeList*> ());
-      BuildBase::add_type (Log::component, "table", alist, syntax, &make);
-      BuildBase::add_doc_fun (LogSelect::component, 
+      Librarian::add_type (Log::component, "table", alist, syntax, &make);
+      Librarian::add_doc_fun (LogSelect::component, 
                               LogSelect::document_entries);
     }
 } LogTable_syntax;

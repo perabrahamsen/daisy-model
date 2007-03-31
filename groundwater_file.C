@@ -26,6 +26,7 @@
 #include "lexer_data.h"
 #include "assertion.h"
 #include "time.h"
+#include "librarian.h"
 #include <fstream>
 
 using namespace std;
@@ -182,7 +183,7 @@ The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\
 Linear interpolation is used between the datapoints.");
       syntax.order ("file");
-      BuildBase::add_type (Groundwater::component, "file", alist, syntax, &make);
+      Librarian::add_type (Groundwater::component, "file", alist, syntax, &make);
     }
 } GroundwaterFile_syntax;
 

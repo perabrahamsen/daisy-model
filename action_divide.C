@@ -24,6 +24,7 @@
 #include "block.h"
 #include "daisy.h"
 #include "field.h"
+#include "librarian.h"
 
 struct ActionDivide : public Action
 {
@@ -66,6 +67,6 @@ smaller than the size of the original column.");
       syntax.add ("size", Syntax::Unknown (), Syntax::Const,
 		  "Size of the partition to remove.");
       syntax.order ("original", "copy", "size");
-      BuildBase::add_type (Action::component, "divide", alist, syntax, &make);
+      Librarian::add_type (Action::component, "divide", alist, syntax, &make);
     }
 } ActionDivide_syntax;

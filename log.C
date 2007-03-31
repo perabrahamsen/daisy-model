@@ -26,6 +26,7 @@
 #include "block.h"
 #include "daisy.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <sstream>
 
 const char *const Log::description = "\
@@ -189,4 +190,4 @@ Log::summarize (Treelog&)
 Log::~Log ()
 { }
 
-static BuildBase Log_init (Log::component, Log::description);
+static Librarian Log_init (Log::component, Log::description);

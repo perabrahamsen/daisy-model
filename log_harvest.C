@@ -27,6 +27,7 @@
 #include "vcheck.h"
 #include "version.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <sstream>
 #include <fstream>
 #include <time.h>
@@ -243,7 +244,7 @@ If this is set to 'fixed', a small fixed size header is printed.");
     alist.add ("print_dimension", true);
     alist.add ("flush", true);
 
-    BuildBase::add_type (Log::component, "harvest", alist, syntax, &make); 
+    Librarian::add_type (Log::component, "harvest", alist, syntax, &make); 
   }
 } LogHarvest_syntax;
 

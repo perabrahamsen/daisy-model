@@ -25,6 +25,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "crop.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -57,7 +58,7 @@ static struct ActionSowSyntax
     alist.add ("description", "Sow a crop on the field.");
     syntax.add_object ("crop", Crop::component, "Crop to sow.");
     syntax.order ("crop");
-    BuildBase::add_type (Action::component, "sow", alist, syntax, &make);
+    Librarian::add_type (Action::component, "sow", alist, syntax, &make);
   }
 } ActionSow_syntax;
 

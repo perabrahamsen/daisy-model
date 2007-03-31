@@ -24,6 +24,7 @@
 #include "scope_multi.h"
 #include "submodeler.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <sstream>
 #include <memory>
 #include <map>
@@ -49,7 +50,7 @@ struct NumberLet : public Number
       }
       Clause (Block& al)
         : id (al.identifier ("identifier")),
-          expr (BuildBase::build_item<Number> (al, "expr"))
+          expr (Librarian::build_item<Number> (al, "expr"))
       { }
     }; 
     std::vector<Clause*> clause;
@@ -185,7 +186,7 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
   NumberLet (Block& al)
     : Number (al),
       scope_clause (al),
-      expr (BuildBase::build_item<Number> (al, "expr"))
+      expr (Librarian::build_item<Number> (al, "expr"))
   { }
 };
 
@@ -203,7 +204,7 @@ Bind symbols in 'clauses' in a new scope, and evaluate 'expr' in that scope.");
     syntax.add_object ("expr", Number::component, "\
 Expression to evaluate.");
     syntax.order ("clauses", "expr");
-    BuildBase::add_type (Number::component, "let", alist, syntax, &make);
+    Librarian::add_type (Number::component, "let", alist, syntax, &make);
   }
 } NumberLet_syntax;
 

@@ -32,6 +32,7 @@
 #include "soil_water.h"
 #include "log.h"
 #include "check.h"
+#include "librarian.h"
 
 using namespace std;
 
@@ -228,7 +229,7 @@ DOM::initialize (const Geometry& geo,
 DOM::DOM (Block& al)
   : C (*new Element (al.alist ("C"))),
     N (*new Element (al.alist ("N"))),
-    adsorption (BuildBase::build_item<Adsorption> (al, "adsorption")),
+    adsorption (Librarian::build_item<Adsorption> (al, "adsorption")),
     diffusion_coefficient (al.number ("diffusion_coefficient")),
     turnover_rate (al.check ("turnover_rate")
 		   ? al.number ("turnover_rate")

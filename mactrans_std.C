@@ -26,6 +26,7 @@
 #include "geometry1d.h"
 #include "plf.h"
 #include "mathlib.h"
+#include "librarian.h"
 #include <sstream>
 #include <vector>
 
@@ -195,6 +196,6 @@ static struct MactransStandardSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "Solute follows water.");
-      BuildBase::add_type (Mactrans::component, "default", alist, syntax, &make);
+      Librarian::add_type (Mactrans::component, "default", alist, syntax, &make);
     }
 } MactransStandard_syntax;

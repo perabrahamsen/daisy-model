@@ -23,6 +23,7 @@
 #include "alist.h"
 #include "assertion.h"
 #include "memutils.h"
+#include "librarian.h"
 #include <map>
 
 class Exchange : public Model
@@ -118,7 +119,7 @@ Name of value to exchange.");
 Dimension of value to exchange.");
     syntax.add ("value", Syntax::Unknown (), Syntax::OptionalState, "\
 Current value to exchange.");
-    BuildBase::add_type (Exchange::component, "number", alist, syntax, &make);
+    Librarian::add_type (Exchange::component, "number", alist, syntax, &make);
   }
 } ExchangeNumber_syntax;
 
@@ -164,7 +165,7 @@ Description of value to exchange.");
 Name of value to exchange.");
     syntax.add ("value", Syntax::String, Syntax::Const, "\
 Current value to exchange.");
-    BuildBase::add_type (Exchange::component, "name", alist, syntax, &make);
+    Librarian::add_type (Exchange::component, "name", alist, syntax, &make);
   }
 } ExchangeName_syntax;
 
@@ -249,7 +250,7 @@ private:
 public:
   ScopeExchange (Block& al)
     : WScope (al),
-      entries (BuildBase::build_vector<Exchange> (al, "entries")),
+      entries (Librarian::build_vector<Exchange> (al, "entries")),
       all_numbers_ (find_all_numbers (entries)),
       named (find_named (entries))
   { }
@@ -269,8 +270,8 @@ static struct ScopeExchangeSyntax
     syntax.add_object ("entries", Exchange::component, 
                        Syntax::Const, Syntax::Sequence,
                        "List of items to exchange.");
-    BuildBase::add_type (Scope::component, "exchange", alist, syntax, &make);
+    Librarian::add_type (Scope::component, "exchange", alist, syntax, &make);
   }
 } ScopeExchange_syntax;
 
-static BuildBase Exchange_init (Exchange::component, Exchange::description);
+static Librarian Exchange_init (Exchange::component, Exchange::description);

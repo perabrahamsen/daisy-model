@@ -25,6 +25,7 @@
 #include "number.h"
 #include "vcheck.h"
 #include "assertion.h"
+#include "librarian.h"
 
 
 class XYSourceInline : public XYSource
@@ -122,7 +123,7 @@ Dimension for x points.");
     syntax.add ("y_dimension", Syntax::String, Syntax::Const, "\
 Dimension for y points.");
 
-    BuildBase::add_type (XYSource::component, "inline", alist, syntax, &make);
+    Librarian::add_type (XYSource::component, "inline", alist, syntax, &make);
   }
 } XYSourceInline_syntax;
 

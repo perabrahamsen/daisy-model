@@ -26,6 +26,7 @@
 #include "soil.h"
 #include "check.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 class AdsorptionLangmuir : public Adsorption
 {
@@ -115,6 +116,6 @@ It is multiplied with the soil clay fraction to get the clay part of\n\
 		"Max adsorption capacity (humus).\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of 'my_max'.  By default, 'my_max_OC' is equal to 'my_max_clay'.");
-    BuildBase::add_type (Adsorption::component, "Langmuir", alist, syntax, &make);
+    Librarian::add_type (Adsorption::component, "Langmuir", alist, syntax, &make);
   }
 } AdsorptionLangmuir_syntax;

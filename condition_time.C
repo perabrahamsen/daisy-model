@@ -26,6 +26,7 @@
 #include "time.h"
 #include "daisy.h"
 #include "vcheck.h"
+#include "librarian.h"
 #include <sstream>
 
 using namespace std;
@@ -380,7 +381,7 @@ struct ConditionTimestep : public Condition
 
   ConditionTimestep (Block& al)
     : Condition (al),
-      condition (BuildBase::build_item<Condition> (al, "operand")),
+      condition (Librarian::build_item<Condition> (al, "operand")),
       dt (al.name ("timestep"))
   { }
   ~ConditionTimestep ()
@@ -439,11 +440,11 @@ True after specific month, day and hour in the year.");
     syntax.add_check ("hour", VCheck::valid_hour ());
     syntax.order ("month", "day");
     syntax.add_check (check_mday);
-    BuildBase::add_type (Condition::component, "mm_dd", at_alist, syntax,
+    Librarian::add_type (Condition::component, "mm_dd", at_alist, syntax,
 				    &ConditionMMDD::make);
-    BuildBase::add_type (Condition::component, "before_mm_dd", before_alist, syntax,
+    Librarian::add_type (Condition::component, "before_mm_dd", before_alist, syntax,
 				    &ConditionBeforeMMDD::make);
-    BuildBase::add_type (Condition::component, "after_mm_dd", after_alist, syntax,
+    Librarian::add_type (Condition::component, "after_mm_dd", after_alist, syntax,
 				    &ConditionAfterMMDD::make);
   }
   // At, before, or after a given time.
@@ -462,11 +463,11 @@ True, iff the simulation time is before the specified time.");
     alist_after.add ("description", "\
 True, iff the simulation time is after the specified time.");
     syntax.order ("time");
-    BuildBase::add_type (Condition::component, "at", alist_at, syntax,
+    Librarian::add_type (Condition::component, "at", alist_at, syntax,
 				    &ConditionAt::make);
-    BuildBase::add_type (Condition::component, "before", alist_before, syntax, 
+    Librarian::add_type (Condition::component, "before", alist_before, syntax, 
 				    &ConditionBefore::make);
-    BuildBase::add_type (Condition::component, "after", alist_after, syntax,
+    Librarian::add_type (Condition::component, "after", alist_after, syntax,
 				    &ConditionAfter::make);
   }
   // Every nth something.
@@ -499,15 +500,15 @@ plus one modulo 'step' is 0.");
     alist_week.add ("step", 1);
     alist_month.add ("step", 1);
     alist_year.add ("step", 1);
-    BuildBase::add_type (Condition::component, "hourly", alist_hour, syntax,
+    Librarian::add_type (Condition::component, "hourly", alist_hour, syntax,
 				    &ConditionHourly::make);
-    BuildBase::add_type (Condition::component, "daily", alist_day, syntax,
+    Librarian::add_type (Condition::component, "daily", alist_day, syntax,
 				    &ConditionDaily::make);
-    BuildBase::add_type (Condition::component, "weekly", alist_week, syntax,
+    Librarian::add_type (Condition::component, "weekly", alist_week, syntax,
 				    &ConditionWeekly::make);
-    BuildBase::add_type (Condition::component, "monthly", alist_month, syntax,
+    Librarian::add_type (Condition::component, "monthly", alist_month, syntax,
 				    &ConditionMonthly::make);
-    BuildBase::add_type (Condition::component, "yearly", alist_year, syntax,
+    Librarian::add_type (Condition::component, "yearly", alist_year, syntax,
 				    &ConditionYearly::make);
   }
   // Specific hour.
@@ -519,7 +520,7 @@ plus one modulo 'step' is 0.");
                 "Hour when the condition is true [0-23].");
     syntax.add_check ("at", VCheck::valid_hour ());
     syntax.order ("at");
-    BuildBase::add_type (Condition::component, "hour", alist, syntax,
+    Librarian::add_type (Condition::component, "hour", alist, syntax,
                                     &ConditionHour::make);
   }
   // Every specific day in the month.
@@ -531,7 +532,7 @@ plus one modulo 'step' is 0.");
 		"Day in the month when the condition is true [1-31].");
     syntax.add_check ("at", VCheck::valid_mday ());
     syntax.order ("at");
-    BuildBase::add_type (Condition::component, "mday", alist, syntax,
+    Librarian::add_type (Condition::component, "mday", alist, syntax,
 				    &ConditionMDay::make);
   }
   // Every specific day in the year.
@@ -544,7 +545,7 @@ plus one modulo 'step' is 0.");
     static VCheck::IRange valid_jday (1, 366);
     syntax.add_check ("at", valid_jday);
     syntax.order ("at");
-    BuildBase::add_type (Condition::component, "yday", alist, syntax,
+    Librarian::add_type (Condition::component, "yday", alist, syntax,
 				    &ConditionYDay::make);
   }
   // Every specific month.
@@ -556,7 +557,7 @@ plus one modulo 'step' is 0.");
                 "Month when the condition is true [1-12].");
     syntax.add_check ("at", VCheck::valid_month ());
     syntax.order ("at");
-    BuildBase::add_type (Condition::component, "month", alist, syntax, 
+    Librarian::add_type (Condition::component, "month", alist, syntax, 
                                     &ConditionMonth::make);
   }
   // A specific year.
@@ -568,7 +569,7 @@ plus one modulo 'step' is 0.");
 		"Year when the condition is true.");
     syntax.add_check ("at", VCheck::valid_year ());
     syntax.order ("at");
-    BuildBase::add_type (Condition::component, "year", alist, syntax,
+    Librarian::add_type (Condition::component, "year", alist, syntax,
 				    &ConditionYear::make);
   }
   // Add timestep to condition.
@@ -584,7 +585,7 @@ in log files.");
     syntax.add ("timestep", Syntax::String, Syntax::Const, "\
 Timestep to use.");
     syntax.order ("operand", "timestep");
-    BuildBase::add_type (Condition::component, "timestep", alist, syntax,
+    Librarian::add_type (Condition::component, "timestep", alist, syntax,
 				    &ConditionTimestep::make);
   }
 }
