@@ -633,6 +633,11 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
                       Treelog& msg)
 {
   Crop *const crop = Librarian::build_free<Crop> (metalib, msg, al, "sow");
+  if (!crop)
+    {
+      msg.error ("Sowing failed");
+      return;
+    }
   const symbol name = crop->name;
   for (CropList::iterator i = crops.begin();
        i != crops.end();

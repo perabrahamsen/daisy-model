@@ -29,6 +29,8 @@
 class Syntax;
 class AttributeList;
 class Library;
+class Model;
+class Treelog;
 
 class Metalib
 {

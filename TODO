@@ -1,13 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Metalib
-
-** Bør build flyttes til metalib/block?
-
-** Bør name flyttes til Model?
-
-** Remove "initialize order" includes
-
 * Generer DLL i make dist?
 
 * OpenMI
@@ -59,6 +51,10 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 ** Ny plone baseret web side!
 
 * Programmering
+
+** Metalib
+
+*** Bør build flyttes til metalib/block?
 
 ** NO3 og NH4 til chemical parameteriseringer.
 

@@ -22,12 +22,14 @@
 #include "intrinsics.h"
 #include "librarian.h"
 #include "library.h"
+#include "block.h"
 #include "syntax.h"
 #include "alist.h"
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"
 #include <map>
+#include <sstream>
 
 struct Metalib::Implementation
 {

@@ -69,12 +69,8 @@ public:
   build_free (Metalib& metalib, Treelog& msg,
               const AttributeList& alist, 
               const std::string& scope_id)
-  { 
-    T* x = dynamic_cast<T*> (Librarian::build_free (T::component, metalib, msg,
-                                                    alist, scope_id)); 
-    non_null (x);
-    return x;
-  }
+  { return dynamic_cast<T*> (Librarian::build_free (T::component, metalib, msg,
+                                                    alist, scope_id)); }
 
   template <class T> static T* 
   build_alist (Block& parent, const AttributeList& alist, 

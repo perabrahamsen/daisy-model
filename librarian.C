@@ -61,10 +61,23 @@ Librarian::build_free (const char *const component, Metalib& metalib,
       daisy_panic (tmp.str ());
     }
   const Syntax& syntax = lib.syntax (type);
+  {
+    std::ostringstream ttmp;
+    TreelogStream tlog (ttmp);
+    if (!syntax.check (metalib, alist, tlog))
+      {
+        msg.error (ttmp.str ());
+        return NULL;
+      }
+  }
   Block block (metalib, msg, syntax, alist, scope_id + ": " + type.name ());
-  daisy_assert (syntax.check (metalib, alist, Treelog::null ()));
   try
-    { return lib.build_raw (type, block); }
+    { 
+      std::auto_ptr<Model> m = lib.build_raw (type, block); 
+      if (!block.ok ())
+        return NULL;
+      return m.release ();
+    }
   catch (const std::string& err)
     { block.error ("Build failed: " + err); }
   catch (const char *const err)

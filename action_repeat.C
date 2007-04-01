@@ -32,8 +32,11 @@ struct ActionRepeat : public Action
   Action* action;
 
   void tick (const Daisy& daisy, Treelog& msg)
-  { action->tick (daisy, msg); }
-    
+  { 
+    if (action)
+      action->tick (daisy, msg); 
+  }
+
   void doIt (Daisy& daisy, Treelog& msg)
   { 
     if (action && action->done (daisy, msg))
@@ -53,7 +56,8 @@ struct ActionRepeat : public Action
 
   void output (Log& log) const
   { 
-    output_derived (action, "do", log);
+    if (action)
+      output_derived (action, "do", log);
   }
 
   bool check (const Daisy& daisy, Treelog& err) const
