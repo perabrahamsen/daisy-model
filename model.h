@@ -29,6 +29,7 @@ private:
   Model (const Model&);
 protected:
   Model ();
+public:
   virtual ~Model ();
 };
 

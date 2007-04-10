@@ -25,7 +25,7 @@
 #include "intrinsics.h"
 #include "block.h"
 #include "alist.h"
-#include "treelog.h"
+#include "treelog_stream.h"
 #include "assertion.h"
 #include "librarian.h"
 #include <sstream>
@@ -73,7 +73,7 @@ Librarian::build_free (const char *const component, Metalib& metalib,
   Block block (metalib, msg, syntax, alist, scope_id + ": " + type.name ());
   try
     { 
-      std::auto_ptr<Model> m = lib.build_raw (type, block); 
+      std::auto_ptr<Model> m (lib.build_raw (type, block)); 
       if (!block.ok ())
         return NULL;
       return m.release ();
