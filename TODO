@@ -1,5 +1,21 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* QDaisy 2
+
+** Hent Qt 4 for MingW
+
+** Lav tomt program
+
+** Læs .dai, kør program
+
+** Læs .dlf (.ddf, .dwf), plot data
+
+** Gem opsætning
+
+** Opsætning skal bestemme menuer og vinduer, skal kunne gemmes som lib
+
+** En Toplevel per .dai
+
 * Generer DLL i make dist?
 
 * OpenMI
