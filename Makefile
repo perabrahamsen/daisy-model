@@ -278,6 +278,13 @@ QTLIB		= -L/pack/qt/lib -R/pack/qt/lib -lqt \
 MOC		= /pack/qt/bin/moc
 endif
 
+ifeq ($(HOSTTYPE),mingw)
+QTHOME = /cygdrive/c/Qt/4.2.3
+QTINCLUDE	= -I$(QTHOME)/include
+QTLIB		= -L$(QTHOME)/lib -lqt
+MOC		= $(QTHOME)/bin/moc
+endif
+
 ifeq ($(HOSTTYPE),i386-linux)
 # Locate the Qt library.
 #
@@ -530,7 +537,7 @@ tkdaisy${EXE}:	tkmain${OBJ} daisy.so
 gdaisy${EXE}:	gmain${OBJ} daisy.so
 	$(LINK)$@ $^ $(GTKMMLIB)
 
-# Create executable with Qt.
+# Create executable with Qt 3.
 #
 qdaisy${EXE}:	$(QTOBJECTS) daisy.so
 	$(LINK)$@ $(QTOBJECTS) `pwd`/daisy.so $(QTLIB)
@@ -540,6 +547,11 @@ qmain_moc.C:	qmain.h
 
 qmain_edit_moc.C:	qmain_edit.h
 	$(MOC) $^ > qmain_edit_moc.C
+
+# Create executable with Qt4.
+#
+q4daisy${EXE}:	$(QTOBJECTS) $(LIBOBJ)
+	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB) $(QTLIB)
 
 # Create the C main executable.
 #
