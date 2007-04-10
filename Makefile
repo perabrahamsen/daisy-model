@@ -438,8 +438,11 @@ HEADONLY = submodeler.h border.h memutils.h
 INTERFACES = $(COMPONENTS) $(SUBMODELS) $(SPECIALS) $(OTHER)
 
 # Select the Qt frontend files.
-QTSOURCES = qmain_edit.C qmain_edit_moc.C qmain.C \
-	qmain_moc.C qmain_tree.C qmain_item.C qmain_populate.C 	qmain_busy.C
+
+QTNOMOC = qmain_edit.C \
+	qmain.C qmain_tree.C qmain_item.C qmain_populate.C qmain_busy.C
+QTMOC = qmain_edit_moc.C qmain_moc.C 
+QTSOURCES = $(QTNOMOC) $(QTMOC)
 QTOBJECTS = $(QTSOURCES:.C=${OBJ})
 
 # Select the C files that are not part of the library.
@@ -455,7 +458,7 @@ LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SPARCOBJ)
 OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
 SOURCES = $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN) $(QTSOURCES) \
 	cmain.c bugmain.c $(DISABLED) $(MSSRC)
-HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) $(HEADONLY)
+HEADERS = $(INTERFACES:.C=.h) $(QTNOMOC:.C=.h) $(HEADONLY)
 
 # Find all printable files.
 #
