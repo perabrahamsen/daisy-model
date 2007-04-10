@@ -73,7 +73,6 @@ private:
   std::vector<double> Vm_vector; // Photosynthetic capacity  
   std::vector<double> Nleaf_vector; // Distribution of photosynthetic N-leaf  
   std::vector<double> Ass_vector; // Brutto assimilate  
-  std::vector<double> resis_vector; // Stomata resistance  
   std::vector<double> gs_vector; // Stomata cunductance
   std::vector<double> sun_LAI_vector; // sunlit LAI
   double ci_middel;              // Average stomata CO2 pressure per LAI units
@@ -83,7 +82,6 @@ private:
   double sun_LAI;                // Leaf Area index for the sunlit fraction
   double PAR_;                   // Photosynthetic active radiation
   double gs;                     // Stomata conductance
-  double resis;                  // Stomata resistance
   double Vmax;                   // Photosynthetic Rubisco capacity
   double leafPhotN;              // Content of photosynthetic active leaf N
   double fraction_sun;           // fraction of sunlit in the canopy.
@@ -396,10 +394,6 @@ PhotoFCC4::assimilate (const double ABA_xylem, const double rel_hum,
   while (ci_vector.size () < No)
     ci_vector.push_back (0.0);//[Pa]
 
-  // Stomata resistance (for logging)
-  while (resis_vector.size () < No)
-    resis_vector.push_back (0.0);//[m/s]
-
   // Stomata conductance (for logging)
   while (gs_vector.size () < No)
     gs_vector.push_back (0.0);//[m/s]
@@ -482,7 +476,6 @@ PhotoFCC4::assimilate (const double ABA_xylem, const double rel_hum,
 	  //log variables:
 	  Ass_vector[i]+= pn_* (molWeightCH2O / molWeightCO2) * LA;//[g CH2O/m²area/h]
 	  Nleaf_vector[i]+= crop_Ndist[i] * LA * fraction[i]; //[mol N/m²area]OK
-	  resis_vector[i]+= 1.0 /(gsw * LA * fraction[i]); //[s/m² area/mol]
 	  gs_vector[i]+= gsw * LA * fraction[i];    //[mol/m² area/s]
 	  ci_vector[i]+= ci * fraction[i];  //[Pa] OK
 	  Vm_vector[i]+= Vm_ * 1000.0 * LA * fraction[i]; //[mmol/m² area/s]OK
@@ -490,7 +483,6 @@ PhotoFCC4::assimilate (const double ABA_xylem, const double rel_hum,
 
 	  ci_middel += ci * fraction[i]/(No + 0.0);// [Pa]   OK
 	  gs += LA * gsw * fraction[i]; 
-	  resis += 1.0/(LA * gsw * fraction[i]); 
 	  Ass += LA * pn_ * (molWeightCH2O / molWeightCO2);//[g CH2O/m2 area/h] OK
 	  sun_LAI += LA * fraction[i];//OK
 	  LAI += LA * fraction[i];//OK
@@ -509,7 +501,6 @@ PhotoFCC4::assimilate (const double ABA_xylem, const double rel_hum,
 void
 PhotoFCC4::clear ()
 {
-  std::fill(resis_vector.begin (), resis_vector.end (), 0.0);
   std::fill(gs_vector.begin (), gs_vector.end (), 0.0);
   std::fill(ci_vector.begin (), ci_vector.end (), 0.0);
   std::fill(Vm_vector.begin (), Vm_vector.end (), 0.0);
@@ -517,7 +508,6 @@ PhotoFCC4::clear ()
   std::fill(Ass_vector.begin (), Ass_vector.end (), 0.0);
   std::fill(sun_LAI_vector.begin (), sun_LAI_vector.end (), 0.0);
   ci_middel = 0.0;
-  resis = 0.0;
   gs = 0.0;
   Ass = 0.0;
   Res = 0.0;
@@ -536,11 +526,9 @@ PhotoFCC4::output(Log& log) const
   output_variable (Ass_vector, log);
   output_variable (Nleaf_vector, log);
   output_variable (gs_vector, log);
-  output_variable (resis_vector, log);
   output_variable (ci_vector, log);
   output_variable (Vm_vector, log);
   output_variable (ci_middel, log);
-  output_variable (resis, log);
   output_variable (gs, log);
   output_variable (Ass, log);
   output_variable (Res, log);

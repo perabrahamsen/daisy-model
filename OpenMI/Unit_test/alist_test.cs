@@ -16,6 +16,7 @@ namespace Unit_test
             daisy.Initialize();
             daisy.Start();
             daisy.TickTime();
+
             AList alist = daisy.ProgramAList();
             return alist;
         }

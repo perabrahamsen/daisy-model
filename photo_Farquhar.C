@@ -609,7 +609,7 @@ static struct Photo_FarquharSyntax
     DS_null_eff.add (0.0, 1.00);
     DS_null_eff.add (2.0, 1.00);
 
-    alist.add ("description", "Photosynthesis by De Pury & Farquhar (1997) and stomataconductance model by Collatz et al., 1991.");
+    alist.add ("description", "Faquhar et al. (1980) photosynthesis and Ball et al. (1987) stomataconductance model coupled as described by Collatz et al., 1991.");
 
     syntax.add ("TempEff", "dg C", Syntax::None (), Check::non_negative (),
                 Syntax::Const,
