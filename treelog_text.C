@@ -159,7 +159,10 @@ public:
 
 void 
 TreelogFile::write (const std::string& text)
-{ (*impl) << text; }
+{ 
+  (*impl) << text ; 
+  flush ();
+}
 
 void 
 TreelogFile::debug (const std::string& text) 

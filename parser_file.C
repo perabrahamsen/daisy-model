@@ -42,6 +42,8 @@
 #include <memory>
 #include <sstream>
 
+static const symbol error_symbol ("__PARSER_FILE_ERROR_MAGIC__");
+
 struct ParserFile::Implementation
 {
   // Inputs.
@@ -175,7 +177,7 @@ ParserFile::Implementation::get_string ()
     {
       error ("Identifier or string expected");
       skip_to_end ();
-      return "error";
+      return error_symbol.name ();
     }
   else
     {
@@ -223,8 +225,7 @@ ParserFile::Implementation::get_integer ()
   const Library& lib = metalib.library (Integer::component);
   std::auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
   const symbol obj = al->identifier ("type");
-  static const symbol error_sym ("error");
-  if (obj == error_sym)
+  if (obj == error_symbol)
     return -42;
   // Check for completness.
   TreelogString treelog;
@@ -330,8 +331,7 @@ ParserFile::Implementation::get_number (const std::string& syntax_dim)
   const Library& lib = metalib.library (Number::component);
   std::auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
   const symbol obj = al->identifier ("type");
-  static const symbol error_sym ("error");
-  if (obj == error_sym)
+  if (obj == error_symbol)
     return -42.42e42;
   // Check for completness.
   TreelogString treelog;
@@ -601,7 +601,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
         {
           error ("Number not expected");
           skip_to_end ();
-          alist->add ("type", "error");
+          alist->add ("type", error_symbol);
         }
       return *alist;
     }
@@ -657,7 +657,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
       error (msg);
       skip_to_end ();
       alist = new AttributeList ();
-      alist->add ("type", "error");
+      alist->add ("type", error_symbol);
     }
   if (skipped)
     skip (")");
@@ -950,8 +950,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		}
 	      else
 		{
-		  const std::string obj = al.name ("type");
-		  if (obj != "error")
+		  const symbol obj = al.identifier ("type");
+		  if (obj != error_symbol)
                     atts.add (name, al);
 		  delete &al;
 		}
@@ -1020,8 +1020,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		      = (old_sequence.size () > element
 			 ? load_derived (lib, true, old_sequence[element])
 			 : load_derived (lib, true, NULL));
-		    const std::string obj = al.name ("type");
-		    if (obj == "error")
+		    const symbol obj = al.identifier ("type");
+		    if (obj == error_symbol)
                       delete &al;
                     else
                       sequence.push_back (&al);

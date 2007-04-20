@@ -186,12 +186,6 @@ Syntax::Implementation::check (const Metalib& metalib,
 		    msg.error (tmp.str ());
 		    error = true;
 		  }
-		else if (al.name ("type") == "error")
-		  {
-		    tmp << "Error cell found";
-		    error = true;
-		    msg.error (tmp.str ());
-		  }
 		else if (!lib.check (al.identifier ("type")))
 		  {
 		    tmp << "Unknown library member '"

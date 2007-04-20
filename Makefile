@@ -29,12 +29,13 @@ endif
 
 # Some non-local files and directories.
 
-
 ifeq ($(HOSTTYPE),i386-linux)
 SRCDIR = $(HOME)/daisy
 OBJHOME = /usr/local/daisy
 NATIVEHOME = $(OBJHOME)/$(HOSTTYPE)
 BOOSTINC = -isystem $(HOME)/boost/include/boost-1_35/
+FTPDIR = /home/ftp/pub/daisy
+WWWINDEX = /home/user_3/daisy/.public_html/index.html
 else
 SRCDIR = ..
 OBJHOME = obj
@@ -42,16 +43,11 @@ NATIVEHOME = $(OBJHOME)
 BOOSTINC = -isystem /usr/include/boost-1_33_1/
 endif
 
-
-FTPDIR = /home/ftp/pub/daisy
-WWWINDEX = /home/user_3/daisy/.public_html/index.html
-
-BORLAND = "e:/Program Files/Borland/CBuilder5/"
 TARGETTYPE = i586-mingw32msvc
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
-USE_GUI = none
-#USE_GUI = Q4
+#USE_GUI = none
+USE_GUI = Q4
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
@@ -65,7 +61,7 @@ USE_PROFILE = false
 
 # Set COMPILER according to which compiler you use.
 #	sun		Use the unbundled sun compiler.
-#	gcc		Use the experimental GNU compiler.
+#	gcc		Use the GNU compiler.
 #	borland		Use the Borland compiler.
 #
 ifeq ($(HOSTTYPE),sun4)
@@ -88,14 +84,23 @@ endif
 
 # On SPARC platforms we trap mathematical exception with some assembler code.
 #
+SPARCSRC = set_exceptions.S
+SPARCOBJ = set_exceptions.o
+
+# Microsoft lacks some common Unix functions.
+#
+MSSRC = win32_unistd.C
+
 ifeq ($(HOSTTYPE),sun4) 
-	SPARCSRC = set_exceptions.S
-	SPARCOBJ = set_exceptions.o
+SYSSOURCES = $(SPARCSRC)
+SYSOBJECTS = $(SPARCOBJ)
 endif
 
 ifeq ($(COMPILER),ms)
-        MSSRC = win32_unistd.C
+SYSSOURCES = $(MSSRC)
 endif
+
+ALLSYSSRC = $(SPARCSRC) $(MSSRC)
 
 # Find the profile flags.
 #
@@ -186,7 +191,7 @@ ifeq ($(COMPILER),gcc)
 #		          -I/home/mingw/include -L/home/mingw/lib
 		DEBUG = -g
 	endif
-	WARNING = -W -Wall -Wno-uninitialized \
+	WARNING = -Wextra -Wall -Wno-uninitialized \
 		  -Wconversion -Woverloaded-virtual \
 		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings \
                   -Wno-sign-compare  -Wundef -Wendif-labels \
@@ -255,7 +260,6 @@ ifeq ($(HOSTTYPE),mingw)
 	MATHLIB =
 endif
 
-ifeq ($(HOSTTYPE),sun4)
 # Locate the tk library.
 #
 TKINCLUDE	= -I/pack/tcl+tk-8/include -I/usr/openwin/include
@@ -276,11 +280,18 @@ GTKMMDRAWLIB	= -L$(HOME)/gtk/lib -lgtkmmdraw ${GTKMMLIB}
 
 # Locate the Qt library.
 #
+ifeq ($(HOSTTYPE),i386-linux)
+# Locate the Qt library.
+#
+QTINCLUDE	= -I/usr/include/qt
+QTLIB		= -lqt -L/usr/X11R6/lib -lX11 -lm
+QTMOC		= moc
+else
 QTINCLUDE	= -I/pack/qt/include -I/usr/openwin/include
 QTLIB		= -L/pack/qt/lib -R/pack/qt/lib -lqt \
 		  -L/usr/openwin/lib -R/usr/openwin/lib \
 		  -lXext -lX11 -lsocket -lnsl -lm
-MOC		= /pack/qt/bin/moc
+QTMOC		= /pack/qt/bin/moc
 endif
 
 ifeq ($(HOSTTYPE),mingw)
@@ -288,14 +299,6 @@ Q4HOME = /cygdrive/c/Qt/4.2.3
 Q4INCLUDE	= -isystem $(Q4HOME)/include
 Q4LIB		= -L$(Q4HOME)/lib -lQtGui4 -lQtCore4
 Q4MOC		= $(Q4HOME)/bin/moc
-endif
-
-ifeq ($(HOSTTYPE),i386-linux)
-# Locate the Qt library.
-#
-QTINCLUDE	= -I/usr/include/qt
-QTLIB		= -lqt -L/usr/X11R6/lib -lX11 -lm
-MOC		= moc
 endif
 
 # Find the right file extension.
@@ -451,18 +454,19 @@ INTERFACES = $(COMPONENTS) $(SUBMODELS) $(SPECIALS) $(OTHER)
 
 # Select the Qt frontend files.
 
-QTNOMOCSRC = qmain_edit.C \
-	qmain.C qmain_tree.C qmain_item.C qmain_populate.C qmain_busy.C
-QTMOCSRC = qmain_edit_moc.C qmain_moc.C 
-QTSOURCES = $(QTNOMOCSRC) $(QTMOCSRC)
-QTOBJECTS = $(QTSOURCES:.C=${OBJ})
+QTMOCHDR = qmain_edit.h qmain.h
+QTMOCSRC = $(QTMOCHDR:.h=_moc.C)
+QTSOURCES = $(QTMOCHDR:.h=.C) \
+	qmain_tree.C qmain_item.C qmain_populate.C qmain_busy.C
+QTHEADERS = $(QTSOURCES:.C=.h) 
+QTOBJECTS = $(QTSOURCES:.C=${OBJ}) $(QTMOCHDR:.h=_moc${OBJ}) 
 
 # Select the Qt4 frontend files
 
 Q4MOCHDR = run_Qt.h vis_Qt.h log_Qt.h
 Q4MOCSRC = $(Q4MOCHDR:.h=_moc.C)
-Q4SOURCES = $(Q4MOCHDR:.h=.C) ui_Qt.C 
-Q4HEADERS = $(Q4SOURCES:.C=.h)
+Q4HEADERS = $(Q4MOCHDR) ui_Qt.h
+Q4SOURCES = $(Q4HEADERS:.h=.C) ui_Qt_run.C
 Q4OBJECTS = $(Q4SOURCES:.C=${OBJ}) $(Q4MOCHDR:.h=_moc${OBJ}) 
 
 ifeq ($(USE_GUI),Q4)
@@ -470,6 +474,7 @@ GUISOURCES = $(Q4SOURCES) $(Q4MOCSRC)
 GUIOBJECTS = $(Q4OBJECTS)
 GUILIB = $(Q4LIB)
 GUIINCLUDE = $(Q4INCLUDE)
+MOC = $(Q4MOC)
 else
 GUISOURCES =
 GUIOBJECTS = 
@@ -477,7 +482,7 @@ GUILIB =
 GUIINCLUDE = 
 endif
 
-ALLGUISRC = tkmain.C gmain.C $(QTSOURCES) $(Q4SOURCES)
+ALLGUISRC = tkmain.C gmain.C pmain.C $(QTSOURCES) $(Q4SOURCES)
 ALLGUIHDR = $(QTHEADERS) $(Q4HEADERS)
 
 
@@ -487,20 +492,20 @@ MAIN = main.C
 
 # The object files used in the daisy library.
 #
-LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SPARCOBJ)
+LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SYSOBJECTS)
 
 # Find all object files, header files, and source files.
 #
 OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
-SOURCES = $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN) \
-	 cmain.c bugmain.c $(MSSRC)
-HEADERS = $(INTERFACES:.C=.h) $(QTNOMOC:.C=.h) $(HEADONLY)
+SOURCES = $(INTERFACES) $(MODELS)  $(MAIN) \
+	 cmain.c bugmain.c 
+HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 
 # Find all printable files.
 #
 TEXT =  ChangeLog.2 ChangeLog.1 \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB \
-	$(HEADERS) $(SOURCES) $(DISABLED)
+	$(HEADERS) $(SOURCES) $(DISABLED) $(ALLSYSSRC)
 # The executables.
 #
 EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
@@ -570,12 +575,6 @@ gdaisy${EXE}:	gmain${OBJ} daisy.so
 #
 qdaisy${EXE}:	$(QTOBJECTS) daisy.so
 	$(LINK)$@ $(QTOBJECTS) `pwd`/daisy.so $(QTLIB)
-
-qmain_moc.C:	qmain.h
-	$(MOC) $^ > qmain_moc.C
-
-qmain_edit_moc.C:	qmain_edit.h
-	$(MOC) $^ > qmain_edit_moc.C
 
 # Create the C main executable.
 #
@@ -788,8 +787,10 @@ set_exceptions${OBJ}: set_exceptions.S
 .c${OBJ}:
 	$(CCOMPILE) $(OPTIMIZE) $(PROFILE) $(NOLINK) $<
 
+# How to mock a Qt file.
+#
 %_moc.C: %.h
-	$(Q4MOC) $< -o $@
+	$(MOC) $< -o $@
 
 # Special rule for tkmain.o
 #

@@ -27,12 +27,10 @@
 #include "daisy.h"
 #include "librarian.h"
 
-using namespace std;
-
 struct ActionAssert : public Action
 {
-  auto_ptr<Condition> condition;
-  const string message;
+  std::auto_ptr<Condition> condition;
+  const std::string message;
 
   void tick (const Daisy& daisy, Treelog& out)
   { condition->tick (daisy, out); }
@@ -58,7 +56,7 @@ struct ActionAssert : public Action
 
 struct ActionMessage : public Action
 {
-  const string message;
+  const std::string message;
 
   void doIt (Daisy&, Treelog& out)
   { 
@@ -76,7 +74,7 @@ struct ActionMessage : public Action
 
 struct ActionWarning : public Action
 {
-  const string message;
+  const std::string message;
 
   void doIt (Daisy&, Treelog& out)
   { 
@@ -94,10 +92,12 @@ struct ActionWarning : public Action
 
 struct ActionError : public Action
 {
-  const string message;
+  const std::string message;
 
-  void doIt (Daisy&, Treelog&)
-  { throw (message); }
+  void doIt (Daisy&, Treelog& out)
+  { 
+    out.error (message);
+  }
 
   ActionError (Block& al)
     : Action (al),
@@ -105,6 +105,22 @@ struct ActionError : public Action
   { }
 
   ~ActionError ()
+  { }
+};
+
+struct ActionPanic : public Action
+{
+  const std::string message;
+
+  void doIt (Daisy&, Treelog&)
+  { throw message; }
+
+  ActionPanic (Block& al)
+    : Action (al),
+      message (al.name ("message"))
+  { }
+
+  ~ActionPanic ()
   { }
 };
 
@@ -118,6 +134,8 @@ static struct ActionMessageSyntax
   { return *new ActionWarning (al); }
   static Model& make_error (Block& al)
   { return *new ActionError (al); }
+  static Model& make_panic (Block& al)
+  { return *new ActionPanic (al); }
 
   ActionMessageSyntax ()
   {
@@ -131,8 +149,9 @@ Assert that condition is true, if not, stop the simulation.");
       syntax.order ("condition");
       syntax.add ("message", Syntax::String, Syntax::Const,
 		  "Error message to give iff assertion fails.");
-      alist.add ("message", "Required condition not fulfiled");
-      Librarian::add_type (Action::component, "assert", alist, syntax, &make_assert);
+      alist.add ("message", "Required condition not fulfilled");
+      Librarian::add_type (Action::component, 
+                           "assert", alist, syntax, &make_assert);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -143,7 +162,8 @@ Write a message to the user.");
 		  "Message to give to the user.");
       syntax.order ("message");
 
-      Librarian::add_type (Action::component, "message", alist, syntax, &make_message);
+      Librarian::add_type (Action::component,
+                           "message", alist, syntax, &make_message);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -154,7 +174,19 @@ Write a warning to the user.");
 		  "Warning to give to the user.");
       syntax.order ("message");
 
-      Librarian::add_type (Action::component, "warning", alist, syntax, &make_warning);
+      Librarian::add_type (Action::component, 
+                           "warning", alist, syntax, &make_warning);
+    }
+    {
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "\
+Write a error message to the user.");
+      syntax.add ("message", Syntax::String, Syntax::Const,
+		  "Error message to give.");
+      syntax.order ("message");
+      Librarian::add_type (Action::component,
+                           "error", alist, syntax, &make_error);
     }
     {
       Syntax& syntax = *new Syntax ();
@@ -164,7 +196,8 @@ Write a error message to the user and stop the simulation.");
       syntax.add ("message", Syntax::String, Syntax::Const,
 		  "Error message to give.");
       syntax.order ("message");
-      Librarian::add_type (Action::component, "error", alist, syntax, &make_error);
+      Librarian::add_type (Action::component,
+                           "panic", alist, syntax, &make_panic);
     }
   }
 } ActionMessage_syntax;

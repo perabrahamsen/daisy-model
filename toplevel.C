@@ -65,40 +65,40 @@ struct Toplevel::Implementation
   { 
     add_daisy_log ();
 
-    if (!ui.get ())
-      {
-        const Library& library = metalib.library (UI::component);
-        static const symbol run_symbol ("run");
-        static const symbol read_symbol ("read");
-        static const symbol progress_symbol ("progress");
+    if (ui.get ())
+      return;
 
-        if (metalib.alist ().check ("ui"))
-          /* Do nothing */;
-        else if ((auto_run || files_found.size () > 0)
-                 && library.check (run_symbol))
-          {
-            AttributeList alist (library.lookup (run_symbol));
-            alist.add ("type", run_symbol);
-            metalib.alist ().add ("ui", alist);
-          }
-        else if (library.check (read_symbol))
-          {
-            AttributeList alist (library.lookup (read_symbol));
-            alist.add ("type", read_symbol);
-            metalib.alist ().add ("ui", alist);
-          }
-        else
-          {
-            AttributeList alist (library.lookup (progress_symbol));
-            alist.add ("type", progress_symbol);
-            metalib.alist ().add ("ui", alist);
-          }
-        Block block (metalib, msg, "UI");
-        ui.reset (Librarian::build_item<UI> (block, "ui"));
-        if (!ui.get ())
-          throw "Could not create UI";
-        ui->attach (toplevel);
+    const Library& library = metalib.library (UI::component);
+    static const symbol run_symbol ("run");
+    static const symbol read_symbol ("read");
+    static const symbol progress_symbol ("progress");
+
+    if (metalib.alist ().check ("ui"))
+      /* Do nothing */;
+    else if ((auto_run || files_found.size () > 0)
+             && library.check (run_symbol))
+      {
+        AttributeList alist (library.lookup (run_symbol));
+        alist.add ("type", run_symbol);
+        metalib.alist ().add ("ui", alist);
       }
+    else if (library.check (read_symbol))
+      {
+        AttributeList alist (library.lookup (read_symbol));
+        alist.add ("type", read_symbol);
+        metalib.alist ().add ("ui", alist);
+      }
+    else
+      {
+        AttributeList alist (library.lookup (progress_symbol));
+        alist.add ("type", progress_symbol);
+        metalib.alist ().add ("ui", alist);
+      }
+    Block block (metalib, msg, "UI");
+    ui.reset (Librarian::build_item<UI> (block, "ui"));
+    if (!ui.get ())
+      throw "Could not create UI";
+    ui->attach (toplevel);
   }
   
   bool has_daisy_log;
@@ -406,6 +406,7 @@ Toplevel::initialize_once ()
 void
 Toplevel::user_interface ()
 {
+  daisy_assert (!impl->ran_user_interface);
   impl->ran_user_interface = true;
   impl->add_daisy_ui (*this);
   impl->ui->run (*this);
