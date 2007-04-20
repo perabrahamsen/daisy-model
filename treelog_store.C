@@ -143,7 +143,10 @@ public:
     : level (0)
   { }
   ~Implementation ()
-  { daisy_assert (level == 0); }
+  { 
+    while (level > 0)
+      close (); 
+  }
 };
 
 void 

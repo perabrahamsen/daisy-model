@@ -505,7 +505,7 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 #
 TEXT =  ChangeLog.2 ChangeLog.1 \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
-	$(HEADERS) $(SOURCES) $(ALLSYSSRC) $(ALLGUIHDR) $(ALLGUIHDR)
+	$(HEADERS) $(SOURCES) $(ALLSYSSRC) $(ALLGUIHDR) $(ALLGUISRC)
 # The executables.
 #
 EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
