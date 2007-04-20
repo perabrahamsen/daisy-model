@@ -32,7 +32,7 @@
 #include "integer.h"
 #include "plf.h"
 #include "time.h"
-#include "treelog_stream.h"
+#include "treelog_text.h"
 #include "path.h"
 #include "units.h"
 #include "mathlib.h"
@@ -227,13 +227,12 @@ ParserFile::Implementation::get_integer ()
   if (obj == error_sym)
     return -42;
   // Check for completness.
-  std::ostringstream tmp;
-  TreelogStream treelog (tmp);
+  TreelogString treelog;
   Treelog::Open nest (treelog, obj);
   if (!lib.syntax (obj).check (metalib, *al, treelog))
     {
       error ("Bogus integer '" + obj + "'\n--- details:\n"
-             + tmp.str () + "---");
+             + treelog.str () + "---");
       return -42;
     }
   Block block (metalib, treelog, "integer");
@@ -244,12 +243,12 @@ ParserFile::Implementation::get_integer ()
       || !integer->check (Scope::null (), treelog))
     {
       error ("Bad integer '" + obj + "'\n--- details:\n"
-             + tmp.str () + "---");
+             + treelog.str () + "---");
       return -42;
     }
-  if (treelog.count)
+  if (treelog.str ().length () > 0)
     warning ("Warning for integer '" + obj + "'\n--- details:\n"
-             + tmp.str () + "---");
+             + treelog.str () + "---");
   if (integer->missing (Scope::null ()))
     {
       error ("Missing integer '" + obj + "'");
@@ -335,13 +334,12 @@ ParserFile::Implementation::get_number (const std::string& syntax_dim)
   if (obj == error_sym)
     return -42.42e42;
   // Check for completness.
-  std::ostringstream tmp;
-  TreelogStream treelog (tmp);
+  TreelogString treelog;
   Treelog::Open nest (treelog, obj);
   if (!lib.syntax (obj).check (metalib, *al, treelog))
     {
       error ("Bogus number '" + obj + "'\n--- details:\n"
-             + tmp.str () + "---");
+             + treelog.str () + "---");
       return -42.42e42;
     }
   Block block (metalib, treelog, "number");
@@ -352,13 +350,13 @@ ParserFile::Implementation::get_number (const std::string& syntax_dim)
       || !number->check (Scope::null (), treelog))
     {
       error ("Bad number '" + obj + "'\n--- details:\n"
-             + tmp.str () + "---");
+             + treelog.str () + "---");
       return -42.42e42;
     }
   number->tick (Scope::null (), treelog);
-  if (treelog.count)
+  if (treelog.str ().length () > 0)
     warning ("Warning for number '" + obj + "'\n--- details:\n"
-             + tmp.str () + "---");
+             + treelog.str () + "---");
   if (number->missing (Scope::null ()))
     {
       error ("Missing number '" + obj + "'");
@@ -1336,11 +1334,10 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
       // Value check.
       if (atts.check (name))
 	{
-	  std::ostringstream tmp;
-	  TreelogStream treelog (tmp);
+	  TreelogString treelog;
 	  Treelog::Open nest (treelog, name);
 	  if (!syntax.check (atts, name, treelog))
-	    error (tmp.str ());
+	    error (treelog.str ());
 	}
 
 done:

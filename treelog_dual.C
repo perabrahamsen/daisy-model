@@ -194,7 +194,6 @@ TreelogDual::debug (const string& text)
 {
   impl->do_lazy ();
   impl->debug (text);
-  Treelog::debug (text);
 }
 
 void
@@ -202,7 +201,6 @@ TreelogDual::entry (const string& text)
 {
   impl->do_lazy ();
   impl->entry (text);
-  Treelog::entry (text);
 }
 
 void

@@ -78,6 +78,7 @@ public:
 
   // Create and Destroy.
 private:
+  static std::string sequence_id (std::string key, size_t index);
   Block ();
   Block (const Block&);
   Block& operator= (const Block&);

@@ -86,7 +86,7 @@ map_submodel (Block& parent, const std::string& key)
       const AttributeList& alist = *f[i];
       daisy_assert (syntax.check (parent.metalib (), 
                                   alist, Treelog::null ()));      
-      Block nested (parent, syntax, alist, sequence_id (key, i));
+      Block nested (parent, syntax, alist, key, i);
       t.push_back (submodel_block<T> (nested));
     }
   return t;
@@ -104,7 +104,7 @@ map_submodel_const (Block& parent, const std::string& key)
       const AttributeList& alist = *f[i];
       daisy_assert (syntax.check (parent.metalib (), 
                                   alist, Treelog::null ()));      
-      Block nested (parent, syntax, alist, sequence_id (key, i));
+      Block nested (parent, syntax, alist, key, i);
       t.push_back (submodel_block<T> (nested));
     }
   return t;

@@ -193,6 +193,34 @@ LogExtern::initialize (Treelog&)
     }
 }
 
+static void load_numbers (Syntax& syntax, AttributeList&)
+{
+  syntax.add ("name", Syntax::String, Syntax::State, "\
+Name to refer to number with.");
+  syntax.add ("value", Syntax::Unknown (), Syntax::State, "\
+Numeric value.");
+}
+
+void
+LogExtern::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  LogSelect::load_syntax (syntax, alist);
+
+  syntax.add_submodule_sequence ("numbers", Syntax::OptionalState, "\
+Inititial numeric values.  By default, none.", load_numbers);
+  syntax.add ("where", Syntax::String, Syntax::OptionalConst,
+              "Name of the extern log to use.\n\
+By default, use the model name.");
+  syntax.add ("parameter_names", Syntax::String, 
+              Syntax::Const, Syntax::Sequence, "\
+List of parameters to export.\n\
+\n\
+For example, if you have defined 'column' and 'crop' parameters for\n\
+this extern log parameterization, you can export them to through the\n\
+API interface by specifying '(names column crop)'.");
+  alist.add ("parameter_names", std::vector<symbol> ());
+}
+
 LogExtern::LogExtern (Block& al)
   : LogSelect (al),
     Scope (al)
@@ -237,32 +265,12 @@ static struct LogExternSyntax
   static Model& make (Block& al)
   { return dynamic_cast<Log&> (*new LogExtern (al)); }
 
-  static void load_numbers (Syntax& syntax, AttributeList&)
-  {
-    syntax.add ("name", Syntax::String, Syntax::State, "\
-Name to refer to number with.");
-    syntax.add ("value", Syntax::Unknown (), Syntax::State, "\
-Numeric value.");
-  }
   LogExternSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      LogSelect::load_syntax (syntax, alist);
-
-      syntax.add_submodule_sequence ("numbers", Syntax::OptionalState, "\
-Inititial numeric values.  By default, none.", load_numbers);
-      syntax.add ("where", Syntax::String, Syntax::OptionalConst,
-		  "Name of the extern log to use.\n\
-By default, use the model name.");
-      syntax.add ("parameter_names", Syntax::String, 
-                  Syntax::Const, Syntax::Sequence, "\
-List of parameters that to export.\n\
-\n\
-For example, if you have defined 'column' and 'crop' parameters for\n\
-this extern log parameterization, you can export them to through the\n\
-API interface by specifying '(names column crop)'.");
-      alist.add ("parameter_names", std::vector<symbol> ());
-      Librarian::add_type (Log::component, "extern", alist, syntax, &make);
-    }
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    LogExtern::load_syntax (syntax, alist);
+    alist.add ("description", "Log simulation state for extern use.");
+    Librarian::add_type (Log::component, "extern", alist, syntax, &make);
+  }
 } LogExtern_syntax;

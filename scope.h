@@ -40,13 +40,18 @@ public:
   // Use.
 public:
   symbol title () const;
+
   virtual const std::vector<symbol>& all_numbers () const = 0;
   bool is_number (symbol) const;
   virtual bool has_number (symbol) const = 0;
   virtual double number (symbol) const = 0;
   virtual symbol dimension (symbol) const = 0;
+
   virtual bool has_identifier (symbol) const;
   virtual symbol identifier (symbol) const;
+
+  virtual bool has_integer (symbol) const;
+  virtual int integer (symbol) const;
 
   virtual symbol get_description (symbol) const = 0;
 

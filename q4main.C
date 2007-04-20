@@ -1,13 +1,43 @@
-#include <QApplication>
-#include <QPushButton>
+// q4main.C -- Main program for Q4 based interface.
+
+#include "program.h"
+#include "ui_Qt.h"
+#include "toplevel.h"
+#include <typeinfo>
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    UIQt::setup (argc, argv);
 
-    QPushButton hello("Hello world!");
-    hello.resize(100, 30);
+    Toplevel toplevel;
+    try
+      {
+        toplevel.command_line (argc, argv);
+        toplevel.user_interface ();
+        toplevel.initialize ();
+        toplevel.run ();
 
-    hello.show();
-    return app.exec();
+        // All is well.
+        throw EXIT_SUCCESS;
+      }
+    catch (const char* error)
+      { toplevel.error (std::string ("Exception: ") + error); }
+    catch (const std::string& error)
+      { toplevel.error (std::string ("Exception raised: ") + error); }
+    catch (const std::exception& e)
+      {
+        toplevel.error (std::string ("Standard exception: ") 
+                        + typeid (e).name () + ": " + e.what ());
+      }
+    catch (const int exit_code)
+      {
+        // The program already reported the error, just exit.
+        return exit_code;
+      }
+    catch (...)
+      {
+        toplevel.error ("Unknown exception");
+      }
 }
+
+// q4main.C ends here

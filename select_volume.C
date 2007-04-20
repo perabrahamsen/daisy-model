@@ -109,6 +109,8 @@ SelectVolume::BD_convert::set_bulk (const Geometry& geo,
                                     const bool density_z, const bool density_x,
                                     const bool density_y)
 {
+  bulk = 0.0;
+
   const size_t cell_size = geo.cell_size ();
   for (size_t i = 0; i < cell_size; i++)
     {

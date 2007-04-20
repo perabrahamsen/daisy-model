@@ -55,6 +55,9 @@ private:
   static Model* build_alist (const char* component,
                              Block& parent, const AttributeList&, 
                              const std::string& scope_id);
+  static Model* build_alist (const char* component,
+                             Block& parent, const AttributeList&, 
+                             const std::string& scope_id, size_t index);
   static Model* build_item (const char* component,
                             Block& parent, const std::string& key);
   static std::vector<Model*> build_vector (const char* component,
@@ -78,6 +81,17 @@ public:
   { 
     T* x = dynamic_cast<T*> (Librarian::build_alist (T::component, 
                                                      parent, alist, scope_id));
+    non_null (x);
+    return x;
+  }
+
+  template <class T> static T* 
+  build_alist (Block& parent, const AttributeList& alist, 
+               const std::string& scope_id, const size_t index)
+  { 
+    T* x = dynamic_cast<T*> (Librarian::build_alist (T::component, 
+                                                     parent, alist, 
+                                                     scope_id, index));
     non_null (x);
     return x;
   }

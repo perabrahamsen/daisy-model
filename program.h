@@ -24,10 +24,14 @@
 
 #include "model.h"
 #include "symbol.h"
+#include "run.h"
+
+#include <vector>
 
 class Treelog;
 class Block;
 class AttributeList;
+class Log;
 
 class Program : public Model
 {
@@ -40,6 +44,17 @@ public:
   // Simulation.
 public:
   virtual bool run (Treelog&) = 0;
+
+  // User interface communication.
+private:
+  Run* ui;
+  std::vector<Log*> logs;  
+public:
+  virtual void attach_ui (Run*, const std::vector<Log*>&);
+protected:
+  void propagate_ui (Program *const child); 
+  bool ui_running () const;
+  void ui_set_progress (double val);
 
   // Create and Destroy.
 public:

@@ -48,8 +48,11 @@ struct ProgramBatch : public Program
         return false;
       }
 
-    for (size_t i = 0; program.size () > 0 ; i++)
+    for (size_t i = 0; program.size () > 0; i++)
       {
+        if (!ui_running ())
+          return false;
+
         std::ostringstream tmp;
         tmp << name << "[" << i << "]: " << program[0]->name;
         Treelog::Open nest (msg, tmp.str ());
@@ -62,6 +65,7 @@ struct ProgramBatch : public Program
         }
         if (!program[0]->check (msg))
           return false;
+        propagate_ui (program[0]);
         if (!program[0]->run (msg))
           return false;
         delete *program.begin ();

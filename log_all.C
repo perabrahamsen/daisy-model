@@ -252,6 +252,14 @@ void
 LogAll::initialize (Treelog&)
 { }
 
+void
+LogAll::attach_log (LogSelect *const log)
+{
+  slaves.push_back (log);
+  for (unsigned int j = 0; j < log->entries.size (); j++)
+    entries.push_back (log->entries[j]);
+}
+
 LogAll::LogAll (const std::vector<Log*>& logs)
   : LogSelect ("LogAll"),
     msg (NULL)
@@ -259,11 +267,7 @@ LogAll::LogAll (const std::vector<Log*>& logs)
   // Combine entries.
   for (unsigned int i = 0; i != logs.size (); i++)
     if (LogSelect* log = dynamic_cast<LogSelect*> (logs[i]))
-      {
-	slaves.push_back (log);
-	for (unsigned int j = 0; j < log->entries.size (); j++)
-	  entries.push_back (log->entries[j]);
-      }
+      attach_log (log);
 }
 
 LogAll::~LogAll ()

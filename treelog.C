@@ -23,21 +23,11 @@
 #include "treelog.h"
 #include <sstream>
 
-using namespace std;
-
-std::string 
-sequence_id (std::string key, size_t index)
-{
-  std::ostringstream tmp;
-  tmp << key << "[" << index << "]";
-  return tmp.str ();
-}
-
 Treelog::Open::Open (Treelog& l, const symbol name)
   : log (l)
 { log.open (name.name ()); }
 
-Treelog::Open::Open (Treelog& l, const string& name)
+Treelog::Open::Open (Treelog& l, const std::string& name)
   : log (l)
 { log.open (name); }
 
@@ -49,39 +39,31 @@ Treelog::open (const symbol name)
 { open (name.name ()); }
 
 void
-Treelog::debug (const string&)
-{ }
-
-void
-Treelog::entry (const string&)
-{ count++; }
-
-void
-Treelog::message (const string& str)
+Treelog::message (const std::string& str)
 { entry (str); }
 
 void
-Treelog::warning (const string& str)
+Treelog::warning (const std::string& str)
 { entry (str + " (warning)"); }
 
 void
-Treelog::error (const string& str)
+Treelog::error (const std::string& str)
 { entry (str + " (error)"); }
-
-void
-Treelog::lazy (const string& str)
-{ entry (str); }
 
 class TreelogNull : public Treelog
 {
   // Nesting.
 public:
-  void open (const string&)
+  void open (const std::string&)
   { }
   void close ()
   { }
 
   // Use.
+  void debug (const std::string&)
+  { }
+  void entry (const std::string&)
+  { }
   void touch ()
   { }
   void flush ()
@@ -102,7 +84,6 @@ Treelog::null ()
 { return nulllog; }
 
 Treelog::Treelog ()
-  : count (0)  
 { }
 
 Treelog::~Treelog ()

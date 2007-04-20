@@ -54,7 +54,9 @@ class LogExtern : public LogSelect,
 
   // Log.
   symbol last_done;
+protected:
   void done (const Time&, double dt);
+private:
   bool initial_match (const Daisy&, Treelog&)
     // No initial line.
   { return false; }
@@ -70,6 +72,7 @@ class LogExtern : public LogSelect,
   void add (const symbol value);
 
   // Scope
+public:
   void tick (const Scope&, Treelog&);
   const std::vector<symbol>& all_numbers () const;
   bool has_number (symbol) const;
@@ -80,6 +83,7 @@ class LogExtern : public LogSelect,
   symbol get_description (symbol) const;
 
   // Scope to be?
+private:
   type lookup (symbol tag) const;
   const std::vector<double>& array (symbol tag) const;
   int size (symbol tag) const;
@@ -87,6 +91,7 @@ class LogExtern : public LogSelect,
   // Create and destroy.
   void initialize (Treelog&);
 public:
+  static void load_syntax (Syntax&, AttributeList&);
   LogExtern (Block&);
   ~LogExtern ();
 };

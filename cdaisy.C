@@ -24,6 +24,7 @@
 
 #include "scope.h"
 #include "block.h"
+#include "metalib.h"
 #include "library.h"
 #include "syntax.h"
 #include "alist.h"
@@ -84,8 +85,8 @@ extern "C" int EXPORT
 daisy_syntax_check (const Syntax* syntax, const AttributeList* alist, 
 		    const char* name, Toplevel* toplevel)
 { 
-  Treelog::Open nest (*toplevel->msg, name);
-  return syntax->check (toplevel->metalib (), *alist, *toplevel->msg); 
+  Treelog::Open nest (toplevel->msg (), name);
+  return syntax->check (toplevel->metalib (), *alist, toplevel->msg ()); 
 }
 
 extern "C" void EXPORT
@@ -420,17 +421,16 @@ daisy_printer_good (Printer* printer)
 // @@ Building the environment.
 
 extern "C" EXPORT Toplevel*
-daisy_daisy_create_with_log (const char* logname)
+daisy_daisy_create ()
 {
   try 
-    { return new Toplevel (logname); }
+    { return new Toplevel (); }
   catch (...)
     { return NULL; }
 }
 
 extern "C" EXPORT void
-daisy_daisy_parse_command_line (Toplevel* toplevel,
-                                   int argc, char** argv)
+daisy_daisy_parse_command_line (Toplevel* toplevel, int argc, char** argv)
 {
   try
     { toplevel->command_line (argc, argv); }
@@ -531,8 +531,8 @@ daisy_daisy_tick (Toplevel* toplevel)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      Treelog::Open nest (*toplevel->msg, daisy.time.print ());
-      daisy.tick (*toplevel->msg); 
+      Treelog::Open nest (toplevel->msg (), daisy.time.print ());
+      daisy.tick (toplevel->msg ()); 
     }
   DAISY_CATCH_BLOCK(toplevel);
 }
@@ -543,7 +543,7 @@ daisy_daisy_tick_before (Toplevel* toplevel)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      daisy.tick_before (*toplevel->msg);
+      daisy.tick_before (toplevel->msg ());
     }
   DAISY_CATCH_BLOCK(toplevel);
 }
@@ -554,7 +554,7 @@ daisy_daisy_tick_columns (Toplevel* toplevel)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      daisy.tick_columns (*toplevel->msg);
+      daisy.tick_columns (toplevel->msg ());
     }
   DAISY_CATCH_BLOCK(toplevel);
 }
@@ -565,7 +565,7 @@ daisy_daisy_tick_column (Toplevel* toplevel, int col)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      daisy.tick_column (col, *toplevel->msg);
+      daisy.tick_column (col, toplevel->msg ());
     }
   DAISY_CATCH_BLOCK(toplevel);
 }
@@ -576,7 +576,7 @@ daisy_daisy_tick_after (Toplevel* toplevel)
   try
     {
       Daisy& daisy = dynamic_cast<Daisy&> (toplevel->program ());
-      daisy.tick_after (*toplevel->msg);
+      daisy.tick_after (toplevel->msg ());
     }
   DAISY_CATCH_BLOCK(toplevel);
 }

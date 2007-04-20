@@ -1,7 +1,6 @@
-// treelog_stream.h -- Log hierarchical information in an ostream.
+// treelog_store.h -- Store messages and distribute to client treelogs.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,18 +19,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef TREELOG_STREAM_H
-#define TREELOG_STREAM_H
+#ifndef TREELOG_STORE_H
+#define TREELOG_STORE_H
 
 #include "treelog.h"
-#include <iosfwd>
+#include <memory>
 
-class TreelogStream : public Treelog
+class TreelogStore : public Treelog
 {
   // Content.
 private:
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
 
   // Nesting.
 public:
@@ -42,13 +41,26 @@ public:
 public:
   void debug (const std::string&);
   void entry (const std::string&);
+  void message (const std::string&);
+  void warning (const std::string&);
+  void error (const std::string&);
   void touch ();
   void flush ();
 
-  // Create and Destroy.
 public:
-  TreelogStream (std::ostream&);
-  ~TreelogStream ();
+  bool running () const;
+
+  // Clients.
+public:
+  void add_client (Treelog*);
+
+  // Create and Destroy.
+private:
+  TreelogStore& operator= (const TreelogStore&); // Disable.
+  explicit TreelogStore (const TreelogStore&); // Disable.
+public:
+  TreelogStore ();
+  ~TreelogStore ();
 };
 
-#endif // TREELOG_STREAM_H
+#endif // TREELOG_STORE_H

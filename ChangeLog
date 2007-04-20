@@ -1,3 +1,29 @@
+2007-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* run.C, run.h: New base.
+	* Makefile (OTHER): Add it.
+
+2007-04-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* ui_Qt.C: New special model.
+
+	* ui.C, ui.h: New component.
+	* Makefile (COMPONENTS): Add it.
+
+2007-04-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* treelog_text.h, treelog_text.C: New utility.
+	* Makefile (OTHER): Add it.
+
+	* treelog_store.h, treelog_store.C: New utility.
+	* Makefile (OTHER): Add it.
+
+	* treelog_stream.h, treelog_stream.C: No longer used.
+	* Makefile (OTHER): Removed it.
+
+	* treelog_dual.h, treelog_dual.C: No longer used.
+	* Makefile (OTHER): Removed it.
+
 2007-03-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* intrinsics.C, intrinsics.h: New utility.

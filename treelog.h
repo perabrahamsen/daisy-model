@@ -26,14 +26,8 @@
 #include "symbol.h"
 #include <string>
 
-std::string sequence_id (std::string key, size_t index);
-
 class Treelog
 {
-  // Content.
-public:
-  int count;
-
   // Nesting.
 public:
   class Open
@@ -51,15 +45,14 @@ public:
   
   // Use.
 public:
-  virtual void debug (const std::string&);
-  virtual void entry (const std::string&);
+  virtual void debug (const std::string&) = 0;
+  virtual void entry (const std::string&) = 0;
   virtual void message (const std::string&);
   virtual void warning (const std::string&);
   virtual void error (const std::string&);
   virtual void touch () = 0;
   virtual void flush () = 0;
-  virtual void lazy (const std::string&);
-  
+
   // Create and Destroy.
 public:
   static Treelog& null ();

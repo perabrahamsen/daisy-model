@@ -218,6 +218,18 @@ bool
 Library::check (const symbol key) const
 { return impl->check (key); }
 
+bool
+Library::complete (const Metalib& metalib, const symbol key) const
+{ 
+  if (!check (key))
+    return false;
+
+  if (!syntax (key).check (metalib, lookup (key), Treelog::null ()))
+    return false;
+
+  return true;
+}
+
 void
 Library::add_base (AttributeList& value, const Syntax& syntax)
 { impl->add_base (value, syntax); }

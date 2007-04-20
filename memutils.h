@@ -46,6 +46,9 @@ struct auto_vector : public std::vector<T>
   auto_vector (const std::vector<T>& t)
     : std::vector<T> (t)
   { }
+  auto_vector ()
+    : std::vector<T> ()
+  { }
   ~auto_vector ()
   { sequence_delete (this->begin (), this->end ()); }
 };

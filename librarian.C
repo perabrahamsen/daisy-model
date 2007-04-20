@@ -25,7 +25,7 @@
 #include "intrinsics.h"
 #include "block.h"
 #include "alist.h"
-#include "treelog_stream.h"
+#include "treelog_text.h"
 #include "assertion.h"
 #include "librarian.h"
 #include <sstream>
@@ -62,11 +62,10 @@ Librarian::build_free (const char *const component, Metalib& metalib,
     }
   const Syntax& syntax = lib.syntax (type);
   {
-    std::ostringstream ttmp;
-    TreelogStream tlog (ttmp);
+    TreelogString tlog;
     if (!syntax.check (metalib, alist, tlog))
       {
-        msg.error (ttmp.str ());
+        msg.error (tlog.str ());
         return NULL;
       }
   }
@@ -113,6 +112,33 @@ Librarian::build_alist (const char *const component,
 }
 
 Model* 
+Librarian::build_alist (const char *const component,
+                        Block& parent, const AttributeList& alist, 
+                        const std::string& scope_id, size_t index)
+{
+  daisy_assert (alist.check ("type"));
+  const symbol type = alist.identifier ("type");
+  const Library& lib = parent.metalib ().library (component);
+  if (!lib.check (type))
+    {
+      std::ostringstream tmp;
+      tmp << "Component '" << lib.name () << "' contains no model '"
+          << type << "'";
+      daisy_panic (tmp.str ());
+    }
+  const Syntax& syntax = lib.syntax (type);
+  Block nested (parent, syntax, alist, scope_id + ": " + type.name (), index);
+  daisy_assert (syntax.check (parent.metalib (), alist, Treelog::null ()));
+  try
+    {  return lib.build_raw (type, nested); }
+  catch (const std::string& err)
+    { nested.error ("Build failed: " + err); }
+  catch (const char *const err)
+    { nested.error ("Build failure: " + std::string (err)); }
+  return NULL;
+}
+
+Model* 
 Librarian::build_item (const char *const component,
                        Block& parent, const std::string& key)
 { return build_alist (component, parent, parent.alist (key), key); }
@@ -124,7 +150,7 @@ Librarian::build_vector (const char *const component,
   std::vector<Model*> t;
   const std::vector<AttributeList*>& f (al.alist_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
-    t.push_back (build_alist (component, al, *f[i], sequence_id (key, i)));
+    t.push_back (build_alist (component, al, *f[i], key, i));
   return t;
 }
 
@@ -135,7 +161,7 @@ Librarian::build_vector_const (const char *const component,
   std::vector<const Model*> t;
   const std::vector<AttributeList*>& f (al.alist_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
-    t.push_back (build_alist (component, al, *f[i], sequence_id (key, i)));
+    t.push_back (build_alist (component, al, *f[i], key, i));
   return t;
 }
 

@@ -73,10 +73,14 @@ TreelogStream::touch ()
 	}
     }
 }
+
+void
+TreelogStream::debug (const string&)
+{ }
+
 void
 TreelogStream::entry (const string& text)
 {
-  Treelog::entry (text);
   touch ();
   impl.out << text << "\n";
 }

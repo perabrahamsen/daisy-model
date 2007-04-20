@@ -55,7 +55,7 @@ main (int argc, char* argv[])
     }
 
   /* Create a top level that logs to a daisy.log file. */
-  toplevel = daisy_daisy_create_with_log ("daisy.log");
+  toplevel = daisy_daisy_create ();
   assert (toplevel);
 
   /* Parse thecommand line. */

@@ -1,7 +1,6 @@
-// treelog_stream.h -- Log hierarchical information in an ostream.
+// run.C -- Top level user interface as seen from the program.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,36 +18,12 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "run.h"
 
-#ifndef TREELOG_STREAM_H
-#define TREELOG_STREAM_H
+Run::Run ()
+{ }
 
-#include "treelog.h"
-#include <iosfwd>
+Run::~Run ()
+{ }
 
-class TreelogStream : public Treelog
-{
-  // Content.
-private:
-  struct Implementation;
-  Implementation& impl;
-
-  // Nesting.
-public:
-  void open (const std::string& name);
-  void close ();
-
-  // Use.
-public:
-  void debug (const std::string&);
-  void entry (const std::string&);
-  void touch ();
-  void flush ();
-
-  // Create and Destroy.
-public:
-  TreelogStream (std::ostream&);
-  ~TreelogStream ();
-};
-
-#endif // TREELOG_STREAM_H
+// run.C ends here

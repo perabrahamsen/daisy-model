@@ -44,7 +44,7 @@ private:
   const auto_vector<Scope*> exchanges;
   const auto_vector<Log*> logs;
   const std::auto_ptr<LogAll> log_all;
-  const std::vector<Log*> active_logs;
+  std::vector<Log*> active_logs;
   const std::vector<Scope*> scopes;
   const std::auto_ptr<Condition> activate_output;
 
@@ -60,6 +60,7 @@ public:
 public:
   bool check (const Border& field, Treelog& msg);
   void initialize (const Metalib&, Treelog&);
+  void add_log (Log*);
 private:
   static const std::vector<Log*> 
   /**/ find_active_logs (const std::vector<Log*>& logs, LogAll& log_all);

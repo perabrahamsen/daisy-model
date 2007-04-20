@@ -375,7 +375,7 @@ ActionMarkvand::crop_map_t::crop_map_t (Block& al, const std::string& key)
   const std::vector<AttributeList*>& alists = al.alist_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
     {
-      Block nest (al, syntax, *alists[i], sequence_id (key, i));
+      Block nest (al, syntax, *alists[i], key, i);
       (*this)[alists[i]->name ("Daisy")] 
 	= Librarian::build_item<MV_Crop> (nest, "MARKVAND");
     }

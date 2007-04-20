@@ -487,6 +487,14 @@ Block::alist_sequence (const std::string& key) const
   return impl->find_alist (var).alist_sequence (var); 
 }
 
+std::string 
+Block::sequence_id (std::string key, size_t index)
+{
+  std::ostringstream tmp;
+  tmp << key << "[" << index << "]";
+  return tmp.str ();
+}
+
 Block::Block (Metalib& metalib, Treelog& msg, 
               const Syntax& syntax, const AttributeList& alist,
  	      const std::string& scope_id)

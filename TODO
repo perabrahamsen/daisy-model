@@ -1,22 +1,83 @@
-TODO --- things that needs to be done with Daisy -*- outline -*-
+'TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* QDaisy 2
+* Dist
 
-** Hent Qt 4 for MingW
+Få den til at compile uden Qt
 
-** Lav tomt program
+* Farquhar
 
-** Læs .dai, kør program
+** CO2_atm skal læses fra weather
 
-** Læs .dlf (.ddf, .dwf), plot data
+** regn bladresp-Farquhar us om natten
+
+** Farquahar -> C4 & C5
+
+* Torsdag VAND
+
+** vind over felt
+
+* Dist
+
+** Fortæl BGJ at daisy_daisy_create_with_log -> daisy_daisy_create
+
+** Fjern Qt include
+
+* Q4
+
+** Make
+
+Vi skal have Qt enabled per default.  
+
+Så vi skal have en ny Make variabel der bestemmer omvi bygger en GUI
+version, og hvilket gui
+
+if (mingw)
+USE_GUI = Q4
+else
+USE_GUI = none
+endif
+
+Vores valg af GUI skal bestemme hvilke filer der skal inkluderes.
+
+if (USE_GUI=Q4)
+  SOURCES += Q4SOURCES
+else if (USE_GUI=GTK)
+  SOURCES += GTKSOURCES
+endif
+
+Vi skal med andre ord ikke længere have forskellige mains eller exe.
+Eller måske skal vi have lidt endnu, men USE_GUI bestemmer, og Q4
+bruger altså samme main og exe som none.
+
+Vi skal have en statisk udgave af Qt på MingW.
+
+Vi skal have flyttet den til dirac for krydscompilering
+
+Vi skal have Qt til at bygge på Linux (har vi Qt 4.2 der?)
+
+** ui load
+
+** Læs .dlf (.ddf, .dwf), plot data (tidsakse???)
 
 ** Gem opsætning
 
-** Opsætning skal bestemme menuer og vinduer, skal kunne gemmes som lib
+** statisk link med Qt dll'er?
 
-** En Toplevel per .dai
+** Far out
+
+*** UI user
+
+Liste af "top level" attributter ui-brugeren kan sætte
+
+Disse "top level" attributer vil være defineret af setup-brugeren
+
+På den måde kan man lave en simpel "form" til undervisningsbrug.
 
 * Generer DLL i make dist?
+
+* Farquhar
+
+** omregn vind fra reference til aktuel overflade
 
 * OpenMI
 
@@ -25,6 +86,10 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 ** søjle polygon
 
 * R2D2
+
+** Force artihmetic average near top
+
+For vert edge, hvad med hor edges?  Irrigation? 
 
 ** Find ud af hvorfor boost-sandbox ikke vil installeres
 

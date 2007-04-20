@@ -35,28 +35,26 @@
 #include <sstream>
 #include <fstream>
 
-using namespace std;
-
 struct LogTable : public LogSelect, public Destination
 {
   static const char *const default_description;
 
   // File Content.
-  const string parsed_from_file; // Defined in...
-  const string file;            // Filename.
-  ofstream out;			// Output stream.
+  const std::string parsed_from_file; // Defined in...
+  const std::string file;       // Filename.
+  std::ofstream out;            // Output stream.
   const bool flush;		// Flush after each time step.
-  const string record_separator; // String to print on records (time steps).
-  const string field_separator;	// String to print between fields.
-  const string error_string;	// String to print on errors.
-  const string missing_value;	// String to print for missing values.
-  const string array_separator;	// String to print between array entries.
+  const std::string record_separator; // String to print on records (time steps).
+  const std::string field_separator; // String to print between fields.
+  const std::string error_string; // String to print on errors.
+  const std::string missing_value; // String to print for missing values.
+  const std::string array_separator; // String to print between array entries.
   DLF print_header;             // How much header should be printed?
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
   const bool print_initial;     // Set if initial values should be printed.
   const bool time_columns;	// Add year, month, day and hour columns.
-  const vector<Summary*> summary; // Summarize this log file.
+  const std::vector<Summary*> summary; // Summarize this log file.
   Time begin;			// First log entry.
   Time end;			// Last log entry.
 
@@ -64,7 +62,7 @@ struct LogTable : public LogSelect, public Destination
   enum { Error, Missing, Number, Name, Array } type;
   double dest_number;
   symbol dest_name;
-  const vector<double>* dest_array;
+  const std::vector<double>* dest_array;
   
   // Log.
   void common_match (const Daisy& daisy, Treelog& out);
@@ -81,13 +79,13 @@ struct LogTable : public LogSelect, public Destination
   // Select::Destination
   void error ();
   void missing ();
-  void add (const vector<double>& value);
+  void add (const std::vector<double>& value);
   void add (const double value);
   void add (const symbol value);
 
   // Create and destroy.
   bool check (const Border&, Treelog& msg) const;
-  static bool contain_time_columns (const vector<Select*>& entries);
+  static bool contain_time_columns (const std::vector<Select*>& entries);
   void initialize (Treelog&);
   explicit LogTable (Block& al);
   void summarize (Treelog&);
@@ -230,7 +228,7 @@ LogTable::common_done (const Time& time, const double dt)
 	case Array:
 	  {
             daisy_assert (dest_array);
-	    const vector<double> array = *dest_array;
+	    const std::vector<double> array = *dest_array;
 	    for (unsigned int i = 0; i < array.size (); i++)
 	      {
 		if (i != 0)
@@ -313,7 +311,7 @@ LogTable::missing ()
 }
 
 void 
-LogTable::add (const vector<double>& value)
+LogTable::add (const std::vector<double>& value)
 { 
   type = Array;
   dest_array = &value;
@@ -348,7 +346,7 @@ bool LogTable::check (const Border& border, Treelog& msg) const
 }
 
 bool 
-LogTable::contain_time_columns (const vector<Select*>& entries)
+LogTable::contain_time_columns (const std::vector<Select*>& entries)
 {
   static const symbol time ("time");
   for (unsigned int i = 0; i < entries.size (); i++)
@@ -426,7 +424,7 @@ LogTable::~LogTable ()
 {
   sequence_delete (summary.begin (), summary.end ());
   if (!out.good ())
-    throw (string ("Problems writing to '") + file + "'");
+    throw (std::string ("Problems writing to '") + file + "'");
 }
 
 static struct LogTableSyntax
@@ -481,7 +479,7 @@ String to print between array entries.");
       syntax.add_object ("summary", Summary::component,
                          Syntax::Const, Syntax::Sequence,
                          "Summaries for this log file.");
-      alist.add ("summary", vector<AttributeList*> ());
+      alist.add ("summary", std::vector<AttributeList*> ());
       Librarian::add_type (Log::component, "table", alist, syntax, &make);
       Librarian::add_doc_fun (LogSelect::component, 
                               LogSelect::document_entries);

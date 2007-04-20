@@ -151,8 +151,8 @@ TransformEquilibrium::initialize (Block& block, const Soil& soil)
         {
           vector<double> debug;
           auto_ptr<Pedotransfer> pedo_debug 
-            (Librarian::build_alist<Pedotransfer> (block, *alists[i],
-                                                   sequence_id ("debug", i)));
+            (Librarian::build_alist<Pedotransfer> (block, *alists[i], 
+                                                   "debug", i));
           if (pedo_debug->check (soil, pedo_debug->dimension (), block.msg ()))
             pedo_debug->set (soil, debug, pedo_debug->dimension ());
           else

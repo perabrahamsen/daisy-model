@@ -61,12 +61,16 @@ public:
   const double dt;
 private:
   const Time stop;
+  int duration;
 public:
   std::auto_ptr<Action> action;
   std::auto_ptr<Weather> weather;
 public:
   std::auto_ptr<Field> field;
   auto_vector<const Harvest*> harvest;
+
+  // UI.
+  void attach_ui (Run* run, const std::vector<Log*>& logs);
 
   // Simulation.
 public:

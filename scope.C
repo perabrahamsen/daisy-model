@@ -50,6 +50,14 @@ symbol
 Scope::identifier (symbol) const
 { daisy_notreached (); }
 
+bool
+Scope::has_integer (symbol) const
+{ return false; }
+
+int
+Scope::integer (symbol) const
+{ daisy_notreached (); }
+
 struct ScopeNull : public Scope
 {
   // Use.

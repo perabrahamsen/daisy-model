@@ -65,6 +65,7 @@ public:
 private:
   static Block& get_block ();
 public:
+  void attach_log (LogSelect* log);
   LogAll (const std::vector<Log*>& logs);
   ~LogAll ();
 };

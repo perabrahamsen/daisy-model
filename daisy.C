@@ -47,6 +47,15 @@
 const char *const Daisy::default_description = "\
 The Daisy crop/soil/atmosphere model.";
 
+void 
+Daisy::attach_ui (Run* run, const std::vector<Log*>& logs)
+{ 
+  Program::attach_ui (run, logs);
+
+  for (size_t i = 0; i < logs.size (); i++)
+    output_log->add_log (logs[i]);
+}
+
 bool
 Daisy::run (Treelog& msg)
 { 
@@ -118,6 +127,25 @@ Daisy::tick_after (Treelog& msg)
   
   if (time >= stop)
     running = false;
+
+  if (!ui_running ())
+    {
+      msg.error ("Simulation aborted");
+      running = false;
+    }
+  if (!running)
+    ui_set_progress (1.0);
+  else if (duration > 0)
+    {
+      const double total_hours = duration; // int -> double
+      const double hours_left = Time::hours_between (time, stop);
+      ui_set_progress ((total_hours - hours_left) / total_hours);
+    }
+  else if (duration != -42)
+    {
+      duration = -42;           // Magic to call this only once
+      ui_set_progress (-1.0);
+    }
 }
 
 void
@@ -197,6 +225,9 @@ Daisy::Daisy (Block& al)
     stop (al.check ("stop")
 	  ? Time (al.alist ("stop")) 
 	  : Time (9999, 1, 1, 1)),
+    duration (al.check ("stop")
+              ? Time::hours_between (stop, time)
+              :-1),
     action (Librarian::build_item<Action> (al, "manager")),
     weather (al.check ("weather") 
 	     ? Librarian::build_item<Weather> (al, "weather")

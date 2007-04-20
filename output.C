@@ -127,8 +127,17 @@ Output::initialize (const Metalib& metalib, Treelog& msg)
   log_all->initialize_common (metalib, msg);
 }
 
+void 
+Output::add_log (Log* log)
+{ 
+  if (LogSelect* sel = dynamic_cast<LogSelect*> (log))
+    log_all->attach_log (sel);
+  else
+    active_logs.push_back (log); 
+}
+
 const std::vector<Log*> 
-/**/ Output::find_active_logs (const std::vector<Log*>& logs, LogAll& log_all)
+Output::find_active_logs (const std::vector<Log*>& logs, LogAll& log_all)
 {
   std::vector<Log*> result;
 
@@ -142,8 +151,8 @@ const std::vector<Log*>
 }
 
 const std::vector<Scope*> 
-/**/ Output::find_extern_logs (const std::vector<Log*>& logs, 
-                               const std::vector<Scope*>& exchanges)
+Output::find_extern_logs (const std::vector<Log*>& logs, 
+                          const std::vector<Scope*>& exchanges)
 {
   std::vector<Scope*> result = exchanges;
 

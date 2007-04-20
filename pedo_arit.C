@@ -22,7 +22,7 @@
 #include "pedo.h"
 #include "alist.h"
 #include "soil.h"
-#include "treelog_stream.h"
+#include "treelog_text.h"
 #include "submodeler.h"
 #include "units.h"
 #include "vcheck.h"
@@ -331,8 +331,7 @@ struct PedotransferOperands : public Pedotransfer
     {
       typedef vector<const Pedotransfer*> op_x;
 
-      std::ostringstream tmp;
-      TreelogStream msg (tmp);
+      TreelogString msg;
       
       std::auto_ptr<Block> block (new Block (syn, al, msg, "unique"));
       const struct Operands : public  op_x
@@ -346,7 +345,7 @@ struct PedotransferOperands : public Pedotransfer
       const bool ok = block->ok ();
       block.reset ();
       if (!ok)
-        throw string ("Build failure: ") + tmp.str ();
+        throw string ("Build failure: ") + msg.str ();
 
       const string* found = NULL;
       for (size_t i = 0; i < operands.size (); i++)

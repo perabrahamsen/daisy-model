@@ -21,24 +21,37 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "toplevel.h"
-#include "program.h"
-#include "treelog.h"
 #include <stdexcept>
 #include <typeinfo>
 
 int
 main (int argc, char* argv[])
 {
-  Toplevel toplevel ("daisy.log");
-
+  Toplevel toplevel;
   try
     {
+      // toplevel.set_ui_progress ();
       toplevel.command_line (argc, argv);
-      toplevel.initialize ();
-      toplevel.run ();
+      toplevel.user_interface ();
+
+      switch (toplevel.state ())
+        {
+        case Toplevel::is_uninitialized:
+          toplevel.initialize ();
+          /* Fallthrough */;
+        case Toplevel::is_ready:
+          toplevel.run ();
+          /* Fallthrough */;
+        case Toplevel::is_done:
+          throw EXIT_SUCCESS;
+        case Toplevel::is_running:
+          toplevel.error ("Aborted while simulation was running");
+          throw EXIT_FAILURE;
+        case Toplevel::is_error:
+          throw EXIT_FAILURE;
+        }
 
       // All is well.
-      throw EXIT_SUCCESS;
 
     }
   catch (const char* error)

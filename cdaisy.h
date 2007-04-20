@@ -334,8 +334,8 @@ daisy_printer_delete (daisy_printer* printer);
  * describe a Daisy simulation. 
  */
 
-EXPORT daisy_daisy*          /* Create a toplevel with a log file. */
-daisy_daisy_create_with_log (const char* logname);
+EXPORT daisy_daisy*          /* Create a toplevel. */
+daisy_daisy_create ();
 
 EXPORT void                     /* Parse command arguments. */
 daisy_daisy_parse_command_line (daisy_daisy* toplevel,

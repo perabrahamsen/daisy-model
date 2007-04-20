@@ -22,11 +22,11 @@
 #ifndef TOPLEVEL_H
 #define TOPLEVEL_H
 
-#include "metalib.h"
+#include <vector>
 #include <string>
 #include <memory>
-#include <ctime>
 
+class Metalib;
 class Program;
 class Syntax;
 class AttributeList;
@@ -44,19 +44,18 @@ class Toplevel
 {
   //Content.
 private:
-  std::string program_name;
-  std::auto_ptr<Program> program_;
+  struct Implementation;
+  std::auto_ptr<Implementation> impl;
 public:
-  const std::auto_ptr<Treelog> msg;
-private:
-  Metalib metalib_;
-  std::time_t start_time;
-  bool has_printed_copyright;
-public:
-  enum state_t { is_uninitialized, is_ready, is_running, is_done, is_error };
-private:
-  state_t state_;
+  static const char *const default_description;
 
+  enum state_t { is_uninitialized, is_ready, is_running, is_done, is_error };
+
+  // Global command line parsers.
+  typedef void (*command_line_parser) (int&, char**&);
+  static void add_command_line_parser (command_line_parser);
+  static void remove_command_line_parser ();
+  
   // Accessors.
 private:
   Syntax& syntax ();
@@ -66,6 +65,11 @@ public:
   const AttributeList& program_alist () const;
   Program& program () const;
   Metalib& metalib ();
+  Treelog& msg ();
+  const std::vector<std::string>& files_found () const;
+  void add_treelog (Treelog*);
+  void set_ui_progress ();
+  void set_ui_none ();
 
   // Messages.
 private:
@@ -76,6 +80,7 @@ private:
 
   // Use.
 public:
+  void user_interface ();
   void run ();
   void error (const std::string&);
   state_t state () const;
@@ -94,7 +99,8 @@ public:
 private:
   static void load_syntax (Syntax&, AttributeList&);
 public:
-  Toplevel (const std::string& logname);
+  Toplevel ();
+  ~Toplevel ();
 private:                        // Disable defaults.
   Toplevel(const Toplevel&);
 };
