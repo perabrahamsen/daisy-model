@@ -504,8 +504,8 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 # Find all printable files.
 #
 TEXT =  ChangeLog.2 ChangeLog.1 \
-	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB \
-	$(HEADERS) $(SOURCES) $(DISABLED) $(ALLSYSSRC)
+	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
+	$(HEADERS) $(SOURCES) $(ALLSYSSRC) $(ALLGUIHDR) $(ALLGUIHDR)
 # The executables.
 #
 EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
