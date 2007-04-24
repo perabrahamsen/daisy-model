@@ -297,7 +297,9 @@ endif
 ifeq ($(HOSTTYPE),mingw)
 Q4HOME = /cygdrive/c/Qt/4.2.3
 Q4INCLUDE	= -isystem $(Q4HOME)/include
-Q4LIB		= -L$(Q4HOME)/lib -lQtGui4 -lQtCore4
+Q4SYS		= -lGDI32 -lole32 -lOleaut32 -luuid -lImm32 -lwinmm \
+		  -lWinspool -lWs2_32 -lcomdlg32
+Q4LIB		= -L$(Q4HOME)/lib -lQtGui -lQtCore $(Q4SYS) 
 Q4MOC		= $(Q4HOME)/bin/moc
 endif
 
