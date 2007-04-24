@@ -53,78 +53,148 @@ struct Toplevel::Implementation
   std::string program_name;
   std::auto_ptr<Program> program;
   TreelogStore msg;
+  Assertion::Register reg;
   Metalib metalib;
   std::time_t start_time;
   bool has_printed_copyright;
   Toplevel::state_t state;
   
+  void run_program (const std::string& name);
+
   std::vector<std::string> files_found;
   bool ran_user_interface;
   std::auto_ptr<UI> ui;
-  void add_daisy_ui (Toplevel& toplevel, const bool auto_run = false)
-  { 
-    add_daisy_log ();
+  void add_daisy_ui (Toplevel& toplevel, bool auto_run = false);
 
-    if (ui.get ())
-      return;
-
-    const Library& library = metalib.library (UI::component);
-    static const symbol run_symbol ("run");
-    static const symbol read_symbol ("read");
-    static const symbol progress_symbol ("progress");
-
-    if (metalib.alist ().check ("ui"))
-      /* Do nothing */;
-    else if ((auto_run || files_found.size () > 0)
-             && library.check (run_symbol))
-      {
-        AttributeList alist (library.lookup (run_symbol));
-        alist.add ("type", run_symbol);
-        metalib.alist ().add ("ui", alist);
-      }
-    else if (library.check (read_symbol))
-      {
-        AttributeList alist (library.lookup (read_symbol));
-        alist.add ("type", read_symbol);
-        metalib.alist ().add ("ui", alist);
-      }
-    else
-      {
-        AttributeList alist (library.lookup (progress_symbol));
-        alist.add ("type", progress_symbol);
-        metalib.alist ().add ("ui", alist);
-      }
-    Block block (metalib, msg, "UI");
-    ui.reset (Librarian::build_item<UI> (block, "ui"));
-    if (!ui.get ())
-      throw "Could not create UI";
-    ui->attach (toplevel);
-  }
-  
   bool has_daisy_log;
-  void add_daisy_log ()
-  { 
-    if (!has_daisy_log)
-      {
-        has_daisy_log = true;
-        msg.add_client (new TreelogFile ("daisy.log"));
-      }
-  }
+  void add_daisy_log ();
 
-  Implementation ()
-    : program_name ("daisy"),
-      start_time (std::time (NULL)),
-      has_printed_copyright (false),
-      state (is_uninitialized),
-      ran_user_interface (false),
-      has_daisy_log (false)
-  { }
-  ~Implementation ()
-  { add_daisy_log (); }
+  Implementation ();
+  ~Implementation ();
 };
 
 std::vector<Toplevel::command_line_parser>* 
 /**/ Toplevel::Implementation::command_line_parsers;
+
+void
+Toplevel::Implementation::run_program (const std::string& name_str)
+{
+  try 
+    {
+      Treelog::Open nest (msg, "Running '" + name_str + "' from command line");
+  
+      // Build alist.
+      const symbol name (name_str);
+      const Library& library = metalib.library (Program::component);
+      if (!library.check (name))
+        {
+          msg.error (program_name + ": '" + name + "' unknown program");
+          throw EXIT_FAILURE;
+        }
+      const Syntax& p_syntax = library.syntax (name);
+      AttributeList p_alist (library.lookup (name));
+      p_alist.add ("type", name);
+      if (!p_syntax.check (metalib, p_alist, msg))
+        {
+          msg.error ("Cannot run incomplete program");
+          throw EXIT_FAILURE;
+        }
+
+      std::auto_ptr<Program> program;
+
+      // Build.
+      {
+        Block block (metalib, msg, "Building");
+        program.reset (Librarian::build_alist<Program> (block, p_alist,
+                                                        "Command line"));
+        if (!block.ok ())
+          throw EXIT_FAILURE;
+      }
+      // Initialize.
+      {
+        Block block (metalib, msg, "Initializing");
+        program->initialize (block);
+        if (!block.ok ())
+          throw EXIT_FAILURE;
+      }
+      // Check.
+      if (!program->check (msg))
+        throw EXIT_FAILURE;
+
+      // Run.
+      program->run (msg);
+    }
+  catch (...)
+    {
+      state = is_error;
+      throw;
+    }
+}
+
+void 
+Toplevel::Implementation::add_daisy_ui (Toplevel& toplevel,
+                                        const bool auto_run)
+{ 
+  add_daisy_log ();
+
+  if (ui.get ())
+    return;
+
+  const Library& library = metalib.library (UI::component);
+  static const symbol run_symbol ("run");
+  static const symbol read_symbol ("read");
+  static const symbol progress_symbol ("progress");
+
+  if (metalib.alist ().check ("ui"))
+    /* Do nothing */;
+  else if ((auto_run || files_found.size () > 0)
+           && library.check (run_symbol))
+    {
+      AttributeList alist (library.lookup (run_symbol));
+      alist.add ("type", run_symbol);
+      metalib.alist ().add ("ui", alist);
+    }
+  else if (library.check (read_symbol))
+    {
+      AttributeList alist (library.lookup (read_symbol));
+      alist.add ("type", read_symbol);
+      metalib.alist ().add ("ui", alist);
+    }
+  else
+    {
+      AttributeList alist (library.lookup (progress_symbol));
+      alist.add ("type", progress_symbol);
+      metalib.alist ().add ("ui", alist);
+    }
+  Block block (metalib, msg, "UI");
+  ui.reset (Librarian::build_item<UI> (block, "ui"));
+  if (!ui.get ())
+    throw "Could not create UI";
+  ui->attach (toplevel);
+}
+  
+void 
+Toplevel::Implementation::add_daisy_log ()
+{ 
+  if (!has_daisy_log)
+    {
+      has_daisy_log = true;
+      msg.add_client (new TreelogFile ("daisy.log"));
+    }
+}
+
+Toplevel::Implementation::Implementation ()
+  : program_name ("daisy"),
+    reg (msg),
+    start_time (std::time (NULL)),
+    has_printed_copyright (false),
+    state (is_uninitialized),
+    ran_user_interface (false),
+    has_daisy_log (false)
+{ }
+  
+Toplevel::Implementation::~Implementation ()
+{ add_daisy_log (); }
 
 const char *const
 Toplevel::default_description = 
@@ -274,6 +344,8 @@ Toplevel::set_ui_none ()
 void
 Toplevel::usage ()
 {
+  copyright ();
+
   std::string s = "Usage: ";
   s += impl->program_name;
   s += " [-v] [-d dir] [-q | -nw] file... [-p ";
@@ -469,6 +541,8 @@ Toplevel::command_line (int& argc, char**& argv)
 { 
   daisy_assert (impl->state == is_uninitialized);
 
+  copyright ();
+
   // Create original command line string first, we modify argc and argv later.
   // However we only want to print it after we have parsed "(directory ...)".
   const struct CommandLine : public std::string
@@ -485,7 +559,7 @@ Toplevel::command_line (int& argc, char**& argv)
         }
     }
     ~CommandLine ()
-    { msg.debug (*this); }
+    { msg.debug ("Command line: " + *this); }
   } command_line (argc, argv, msg ());
 
   if (Implementation::command_line_parsers)
@@ -498,7 +572,6 @@ Toplevel::command_line (int& argc, char**& argv)
 
   // Loop over all arguments.
   bool options_finished = false; // "--" ends command line options.
-  bool prevent_run = false;     // We might already have run the program.
   int errors_found = 0;
 
   while (argc > 1)              // argc and argv updated as args are parsed.
@@ -509,7 +582,6 @@ Toplevel::command_line (int& argc, char**& argv)
         usage ();              // No zero sized args.
       else if (options_finished || arg[0] != '-')
 	{                       // Not an option, but a setup file.
-          copyright ();
 	  // Parse the file.
 	  Treelog::Open nest (msg (), "Parsing file");
 	  ParserFile parser (metalib (), arg, msg ());
@@ -531,7 +603,8 @@ Toplevel::command_line (int& argc, char**& argv)
 		{
 		  const std::string dir = get_arg (argc, argv);
 		  if (!Path::set_directory (dir))
-		    error (impl->program_name + ": chdir (" + dir + ") failed");
+		    error (impl->program_name
+                           + ": chdir (" + dir + ") failed");
 		}
 	      else
 		// Usage.
@@ -544,51 +617,9 @@ Toplevel::command_line (int& argc, char**& argv)
                 if (argc < 2)
                   // We need a program name.
                   usage ();
-                const Library& library = impl->metalib.library (Program::component);
-                const symbol name = symbol (get_arg (argc, argv));
-                if (!library.check (name))
-                  {
-                    error (impl->program_name + ": '" + name 
-                           + "' unknown program");
-                    usage ();
-                  }
-                const Syntax& p_syntax = library.syntax (name);
-                AttributeList p_alist (library.lookup (name));
-                p_alist.add ("type", name);
-                Treelog::Open nest (msg (), name);
-                if (p_syntax.check (metalib (), p_alist, msg ()))
-                  try 
-                    {
-                      // Build.
-                      std::auto_ptr<Block> block (new Block (metalib (),
-                                                             msg (), 
-                                                             "Building"));
-                      std::auto_ptr<Program> program
-                        (Librarian::build_alist<Program> (*block, p_alist, 
-                                                          "Command line"));
-                      if (!block->ok ())
-                        throw EXIT_FAILURE;
 
-                      // Initialize.
-                      block.reset (new Block (metalib (), msg (), "Initializing"));
-                      program->initialize (*block);
-                      if (!block->ok ())
-                        throw EXIT_FAILURE;
-
-                      // Check.
-                      block.reset ();
-                      if (!program->check (msg ()))
-                        throw EXIT_FAILURE;
-
-                      // Run.
-                      program->run (msg ());
-                    }
-                  catch (...)
-                    {
-                      impl->state = is_error;
-                      throw;
-                    }
-                prevent_run = true;
+                impl->run_program (get_arg (argc, argv));
+                impl->state = is_done;
               }
               break;
             case 'q':
@@ -597,6 +628,7 @@ Toplevel::command_line (int& argc, char**& argv)
             case 'v':
 	      // Print version.
 	      copyright ();
+              impl->state = is_done;
 	      break;
 	    case '-':
 	      // Finish option list.
@@ -615,9 +647,13 @@ Toplevel::command_line (int& argc, char**& argv)
   if (errors_found > 0)
     throw EXIT_FAILURE;
 
-  if (impl->files_found.size () < 1 || prevent_run)
-    // Done.
+  if (state () == is_done)
+    // Already done.
     throw EXIT_SUCCESS;
+
+  if (impl->files_found.size () < 1)
+    // Nothing to do.
+    usage ();
 
   // Done.
   daisy_assert (argc == 1);     // Only the program name remains.
@@ -682,7 +718,6 @@ Toplevel::load_syntax (Syntax& syntax, AttributeList& alist)
 Toplevel::Toplevel ()
   : impl (new Implementation)
 { 
-  Assertion::Register reg (msg ());
   load_syntax (impl->metalib.syntax (), impl->metalib.alist ()); 
   initialize_once ();
 }

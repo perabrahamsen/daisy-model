@@ -112,8 +112,11 @@ struct ActionPanic : public Action
 {
   const std::string message;
 
-  void doIt (Daisy&, Treelog&)
-  { throw message; }
+  void doIt (Daisy&, Treelog& msg)
+  { 
+    msg.touch ();
+    throw message; 
+  }
 
   ActionPanic (Block& al)
     : Action (al),

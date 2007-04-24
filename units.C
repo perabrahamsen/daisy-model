@@ -410,6 +410,7 @@ Units::standard_conversions ()
   add ("L/kg", "cm^3/g", 1.0);
   add ("l/kg", "cm^3/g", 1.0);
   add ("g/cm^3", "kg/m^3", (100.0 * 100.0 * 100.0) / 1000.0);
+  add ("g/cm^3", "mg/l", 1e6);
   add (Syntax::Fraction (), "mg N/kg dry soil", 1000000.0);
   add (Syntax::Fraction (), "ppm", 1000000.0);
   add (Syntax::Fraction (), "%", 100.0);

@@ -276,7 +276,7 @@ ChemicalStandard::infiltrate (const double rate, const double dt)
 
 double
 ChemicalStandard::down ()                 // [g/m^2/h]
-{ return surface_out; }
+{ return surface_out + surface_mixture; }
 
 void 
 ChemicalStandard::uptake (const Soil& soil, 
@@ -418,7 +418,11 @@ ChemicalStandard::ChemicalStandard (Block& al)
     canopy_dissipate (0.0),
     canopy_harvest (0.0),
     canopy_out (0.0),
+    surface_storage (al.number ("surface_storage")),
     surface_in (0.0),
+    surface_out (0.0),
+    surface_mixture (0.0),
+    surface_runoff (0.0),
     lag (al.check ("lag") 
          ? al.number_sequence ("lag") 
          : std::vector<double> ())

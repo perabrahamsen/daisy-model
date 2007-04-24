@@ -42,6 +42,8 @@ class VisQtMain : public QMainWindow
 private:
   const QString appName;
   QString fileName;
+  Toplevel::state_t state;
+  double progress;
 
 public:
   void set_file_name (QString fileName);
@@ -49,6 +51,7 @@ public:
 
 public slots:
   void new_progress (double);
+  void new_state (Toplevel::state_t);
 
   // Create and Destroy.
 public:

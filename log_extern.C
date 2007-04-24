@@ -27,6 +27,7 @@
 #include "block.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "submodeler.h"
 
 void 
 LogExtern::done (const Time& time, const double dt)
@@ -193,13 +194,24 @@ LogExtern::initialize (Treelog&)
     }
 }
 
-static void load_numbers (Syntax& syntax, AttributeList&)
+struct LogExtern::NumEntry
 {
-  syntax.add ("name", Syntax::String, Syntax::State, "\
+  const symbol name;
+  const double value;
+
+  static void load_syntax (Syntax& syntax, AttributeList&)
+  {
+    syntax.add ("name", Syntax::String, Syntax::State, "\
 Name to refer to number with.");
-  syntax.add ("value", Syntax::Unknown (), Syntax::State, "\
+    syntax.add ("value", Syntax::Unknown (), Syntax::State, "\
 Numeric value.");
-}
+  }
+
+  NumEntry (Block& al)
+    : name (al.identifier ("name")),
+      value (al.number ("value"))
+  { }
+};
 
 void
 LogExtern::load_syntax (Syntax& syntax, AttributeList& alist)
@@ -207,7 +219,7 @@ LogExtern::load_syntax (Syntax& syntax, AttributeList& alist)
   LogSelect::load_syntax (syntax, alist);
 
   syntax.add_submodule_sequence ("numbers", Syntax::OptionalState, "\
-Inititial numeric values.  By default, none.", load_numbers);
+Inititial numeric values.  By default, none.", NumEntry::load_syntax);
   syntax.add ("where", Syntax::String, Syntax::OptionalConst,
               "Name of the extern log to use.\n\
 By default, use the model name.");
@@ -243,12 +255,12 @@ LogExtern::LogExtern (Block& al)
 
   if (al.check ("numbers"))
     {
-      const std::vector<AttributeList*>& alists 
-        = al.alist_sequence ("numbers");
-      for (size_t i = 0; i < alists.size (); i++)
+      auto_vector<const NumEntry*> nums
+        = map_submodel_const<NumEntry> (al, "numbers");
+      for (size_t i = 0; i < nums.size (); i++)
         {
-          const symbol id = alists[i]->identifier ("name");
-          numbers[id] = alists[i]->number ("value");
+          const symbol id = nums[i]->name;
+          numbers[id] = nums[i]->value;
           types[id] = Number;
         }
     }

@@ -43,10 +43,15 @@
 ;; Output exchange items
 (deflog OpenMI_output extern
   (parameter_names column)
+  (declare x Number "x-coordinate of column")
+  (declare y Number "y-coordinate of column")
+  (numbers ((name x) (value $x))
+           ((name y) (value $y)))
   (declare column String "Name of column to log output")
   (when (hourly)))
 
 (deflog Matrix_percolation OpenMI_output
+  (numbers ((name "Matrix percolation") (value 0.0)))
   (entries (flux_bottom (tag "Matrix percolation")
 	  	    	(description "This is the amount of water leaving Daisy through the soil bottom.")
 	                (path column "${column}" SoilWater q)
@@ -56,7 +61,7 @@
 
 
 ;; Export these items through OpenMI.
-(output (Matrix_percolation (column Andeby)))
+(output (Matrix_percolation (column Andeby) (x -16) (y 4200.8)))
         
 
 ;; Input exchange items

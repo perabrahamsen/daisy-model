@@ -33,26 +33,46 @@ VisQtMain::set_file_name (QString file)
 void
 VisQtMain::set_title ()
 {
-  if (fileName.isEmpty ())
-    setWindowTitle (appName);
-  else
-    setWindowTitle (fileName + " - " + appName);
+  switch (state)
+    {
+    case Toplevel::is_uninitialized:
+    case Toplevel::is_ready:
+    case Toplevel::is_done:
+      if (fileName.isEmpty ())
+        setWindowTitle (appName);
+      else
+        setWindowTitle (fileName + " - " + appName);
+      break;
+    case Toplevel::is_running:
+      setWindowTitle (QString ("%1% completed - %2")
+                      .arg (double2int (progress * 100))
+                      .arg (appName));
+      break;
+    case Toplevel::is_error:
+      setWindowTitle ("Failed! - " + appName);
+      break;
+    }
 }
 
 void
 VisQtMain::new_progress (const double value)
+{ 
+  progress = value;
+  set_title ();
+}
+
+void 
+VisQtMain::new_state (Toplevel::state_t ns)
 {
-  if (value > 0 && value < 1)
-    setWindowTitle (QString ("%1% completed - %2")
-                    .arg (double2int (value * 100))
-                    .arg (appName));
-  else
-    set_title ();
+  state = ns;
+  set_title ();
 }
 
 VisQtMain::VisQtMain (const QString app, QWidget *const parent)
   : QMainWindow (parent),
-    appName (app)
+    appName (app),
+    state (Toplevel::is_uninitialized),
+    progress (0.0)
 { }
 
 VisQtMain::~VisQtMain ()

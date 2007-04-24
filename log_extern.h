@@ -36,6 +36,8 @@ class LogExtern : public LogSelect,
                   public Destination, 
                   public Scope
 {
+  class NumEntry;
+
   // Destination Content.
   typedef enum { Error, Missing, Number, Name, Array } type;
   typedef std::map<symbol, type> type_map;

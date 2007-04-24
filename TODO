@@ -1,8 +1,12 @@
 'TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Dist
+* Q4 Make
 
-Få den til at compile uden Qt
+Vi skal have en statisk udgave af Qt på MingW.
+
+Vi skal have flyttet den til dirac for krydscompilering
+
+Vi skal have Qt til at bygge på Linux (har vi Qt 4.2 der?)
 
 * Farquhar
 
@@ -20,59 +24,6 @@ Få den til at compile uden Qt
 
 ** Fortæl BGJ at daisy_daisy_create_with_log -> daisy_daisy_create
 
-** Fjern Qt include
-
-* Q4
-
-** Make
-
-Vi skal have Qt enabled per default.  
-
-Så vi skal have en ny Make variabel der bestemmer omvi bygger en GUI
-version, og hvilket gui
-
-if (mingw)
-USE_GUI = Q4
-else
-USE_GUI = none
-endif
-
-Vores valg af GUI skal bestemme hvilke filer der skal inkluderes.
-
-if (USE_GUI=Q4)
-  SOURCES += Q4SOURCES
-else if (USE_GUI=GTK)
-  SOURCES += GTKSOURCES
-endif
-
-Vi skal med andre ord ikke længere have forskellige mains eller exe.
-Eller måske skal vi have lidt endnu, men USE_GUI bestemmer, og Q4
-bruger altså samme main og exe som none.
-
-Vi skal have en statisk udgave af Qt på MingW.
-
-Vi skal have flyttet den til dirac for krydscompilering
-
-Vi skal have Qt til at bygge på Linux (har vi Qt 4.2 der?)
-
-** ui load
-
-** Læs .dlf (.ddf, .dwf), plot data (tidsakse???)
-
-** Gem opsætning
-
-** statisk link med Qt dll'er?
-
-** Far out
-
-*** UI user
-
-Liste af "top level" attributter ui-brugeren kan sætte
-
-Disse "top level" attributer vil være defineret af setup-brugeren
-
-På den måde kan man lave en simpel "form" til undervisningsbrug.
-
 * Generer DLL i make dist?
 
 * Farquhar
@@ -84,6 +35,12 @@ På den måde kan man lave en simpel "form" til undervisningsbrug.
 ** Installer C# på x40
 
 ** søjle polygon
+
+(where) ; ID
+
+(where (12 13) ; XY
+(where (12 13) (14 17)); Error
+(where (12 13) (14 17) (18 12)); Polygon
 
 * R2D2
 
@@ -133,6 +90,24 @@ For vert edge, hvad med hor edges?  Irrigation?
 
 * Programmering
 
+** Q4
+
+*** ui load
+
+*** Læs .dlf (.ddf, .dwf), plot data (tidsakse???)
+
+*** Gem opsætning
+
+*** Far out
+
+**** UI user
+
+Liste af "top level" attributter ui-brugeren kan sætte
+
+Disse "top level" attributer vil være defineret af setup-brugeren
+
+På den måde kan man lave en simpel "form" til undervisningsbrug.
+
 ** Metalib
 
 *** Bør build flyttes til metalib/block?
@@ -143,7 +118,8 @@ For vert edge, hvad med hor edges?  Irrigation?
 
 ** Plante
 
-Ny EmrDate parameter, overskriver EmrTSum, bruges for kartofler hvis fremspriring afhænger af opbevaring. 
+Ny EmrDate parameter, overskriver EmrTSum, bruges for kartofler hvis
+fremspriring afhænger af opbevaring.
 
 ** Generering af zplus
 

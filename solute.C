@@ -344,7 +344,7 @@ Solute::initialize (const AttributeList& al,
 			geo.cell_size () - S_permanent.size (),
 			0.0);
   S_root.insert (S_root.begin (), geo.cell_size (), 0.0);
-  J.insert (J_p.begin (), geo.edge_size (), 0.0);
+  J.insert (J.begin (), geo.edge_size (), 0.0);
   J_p.insert (J_p.begin (), geo.edge_size (), 0.0);
   tillage.insert (tillage.begin (), geo.cell_size (), 0.0);
 }

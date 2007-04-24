@@ -55,7 +55,7 @@ class UIRun : public UIQt
   auto_vector<Log*> all_logs;
   std::map<symbol, LogQt*> logs;
   void build_log (Block& block, const std::string& log);
-  void attach_log (const std::string& log, VisQtLog* object);
+  bool attach_log (const std::string& log, VisQtLog* object) const;
 
   // Use.
 public:
@@ -82,35 +82,33 @@ UIRun::build_log (Block& block, const std::string& name)
     return;
 
   const Library& library = block.metalib ().library (Log::component);
-  if (library.complete (block.metalib (), id))
+  if (!library.complete (block.metalib (), id))
+    return;
+
+  const AttributeList& alist = library.lookup (id);
+  std::auto_ptr<Log> log_raw 
+    (Librarian::build_alist<Log> (block, alist, name));
+  LogQt *const log = dynamic_cast<LogQt*> (log_raw.get ());
+  if (log)
     {
-      const AttributeList& alist = library.lookup (id);
-      std::auto_ptr<Log> log_raw 
-        (Librarian::build_alist<Log> (block, alist, name));
-      LogQt *const log = dynamic_cast<LogQt*> (log_raw.get ());
-      if (log)
-        {
-          log->initialize_common (block.metalib (), block.msg ());
-          all_logs.push_back (log);
-          logs[id] = log;
-          log_raw.release ();
-          block.msg ().debug ("Qt log '" + name + "' attached.");
-        }
+      log->initialize_common (block.metalib (), block.msg ());
+      all_logs.push_back (log);
+      logs[id] = log;
+      log_raw.release ();
+      block.msg ().debug ("Qt log '" + name + "' attached.");
     }
-  else
-    block.msg ().warning ("Log '" + name + "' not found"
-                          ", user interface may be crippled");
 }
 
-void
-UIRun::attach_log (const std::string& name, VisQtLog* vis)
+bool
+UIRun::attach_log (const std::string& name, VisQtLog *const vis) const
 {
   const symbol id (name);
   const std::map<symbol, LogQt*>::const_iterator i = logs.find (id);
   if (i == logs.end ())
-    return;
+    return false;
 
   vis->attach_log ((*i).second);
+  return true;
 }
 
 void 
@@ -120,16 +118,13 @@ UIRun::attach (Toplevel& toplevel)
   const AttributeList& alist = toplevel.program_alist ();
   const Syntax& syntax = toplevel.program_syntax ();
   
-  // Use a special treelog to relay messages to window.
-  TreelogQtText *const tlog = new TreelogQtText;                  
-  toplevel.add_treelog (tlog); 
-
   // We organize items in a grid layout.
   QWidget *const center = new QWidget (&qt_main);
   QGridLayout *const layout = new QGridLayout (center);
 
   // The program name.
-  QLabel *const qt_name = new QLabel;                      
+  QLabel *const qt_name = new QLabel;
+  qt_name->setToolTip ("The name of the program or simulation to run.");
   QFont font = qt_name->font ();
   font.setBold (true);
   qt_name->setFont (font);
@@ -140,7 +135,8 @@ UIRun::attach (Toplevel& toplevel)
   layout->addWidget (qt_name, 0, 0, Qt::AlignLeft);
 
   // The simulation time.
-  VisQtTime *const qt_time = new VisQtTime;                   
+  VisQtTime *const qt_time = new VisQtTime;
+  qt_time->setToolTip ("The simulation time.");
   if (alist.check ("time")
       && syntax.lookup ("time") == Syntax::AList
       && syntax.size ("time") == Syntax::Singleton)
@@ -157,27 +153,34 @@ UIRun::attach (Toplevel& toplevel)
           qt_time->set_time (time);
         }
     }
-  attach_log ("QtTime", qt_time);
+  if (!attach_log ("QtTime", qt_time)
+      && toplevel.state () == Toplevel::is_uninitialized)
+    toplevel.msg ().warning ("Log 'QtTime' not found"
+                             ", user interface may be crippled");
   layout->addWidget (qt_time, 0, 1, Qt::AlignCenter);
 
   // The file name.
-  QLabel *const qt_file = new QLabel;                      
+  QLabel *const qt_file = new QLabel;
   const std::vector<std::string> files = toplevel.files_found ();
   switch (files.size ())
     {
     case 0:
+      qt_file->setToolTip ("No file has been loaded.");
       qt_file->setText ("No file");
       break;
     case 1:
+      qt_file->setToolTip ("This is the name of the loaded file.");
       qt_file->setText (files[0].c_str ());
       break;
     default:
+      qt_file->setToolTip ("Multiple files have been loaded.");
       qt_file->setText ("Multiple files");
     }
   layout->addWidget (qt_file, 0, 2, Qt::AlignRight);
 
   // The program description.
   QLabel *const qt_description = new QLabel;               
+  qt_file->setToolTip ("The description of the selected program.");
   if (alist.check ("description")
       && alist.name ("description") != Toplevel::default_description)
     qt_description->setText (alist.name ("description").c_str ());
@@ -186,18 +189,24 @@ UIRun::attach (Toplevel& toplevel)
   layout->addWidget (qt_description, 1, 0, 1, 3, Qt::AlignLeft);
 
   // A text window for simulation messages.
-  VisQtText *const qt_vis = new VisQtText;                    
+  // Use a special treelog to relay messages to window.
+  TreelogQtText *const tlog = new TreelogQtText;                  
+  VisQtText *const qt_vis = new VisQtText;
+  qt_vis->setToolTip ("Textual feedback from the program.");
   QObject::connect(tlog->tracker (), SIGNAL(text_ready (std::string)),
                    qt_vis, SLOT(new_text (std::string))); 
   layout->addWidget (qt_vis, 2, 0, 1, 3);
+  toplevel.add_treelog (tlog); 
   
   // Emergency stop.
   qt_stop = new QPushButton ("Stop");
+  qt_stop->setToolTip ("Press here to stop the program.");
   qt_stop->setDisabled (true);
   layout->addWidget (qt_stop, 3, 0);
                                                 
   // Track newest messages.
   QCheckBox *const qt_track = new QCheckBox ("Track");
+  qt_track->setToolTip ("Check this box to always show new text.");
   QObject::connect(qt_track, SIGNAL(stateChanged (int)),
                    qt_vis, SLOT(track_tracking (int))); 
   qt_track->setCheckState (Qt::Checked);
@@ -205,6 +214,7 @@ UIRun::attach (Toplevel& toplevel)
 
   // Dismiss window.
   QPushButton *const qt_dismiss = new QPushButton ("Dismiss");
+  qt_dismiss->setToolTip ("Press here to end the application.");
   QObject::connect(qt_dismiss, SIGNAL(clicked ()),
                    &qt_main, SLOT(close ())); 
   layout->addWidget (qt_dismiss, 3, 2);
@@ -213,7 +223,8 @@ UIRun::attach (Toplevel& toplevel)
   qt_main.setCentralWidget (center);
 
   // A progress bar in the bottom.
-  qt_progress = new VisQtProgress;           
+  qt_progress = new VisQtProgress;
+  qt_progress->setToolTip ("Display progress of program.");
   QObject::connect(tlog->tracker (), SIGNAL(error_occured ()),
                    qt_progress, SLOT(found_error ())); 
   qt_progress->new_state (toplevel.state ());
@@ -242,6 +253,8 @@ UIRun::run (Toplevel& toplevel)
                    &qt_main, SLOT(new_progress (double))); 
   QObject::connect(&qt_run, SIGNAL(progress_state (Toplevel::state_t)),
                    qt_progress, SLOT(new_state (Toplevel::state_t))); 
+  QObject::connect(&qt_run, SIGNAL(progress_state (Toplevel::state_t)),
+                   &qt_main, SLOT(new_state (Toplevel::state_t))); 
   daisy_assert (!qt_stop.isNull ());
   QObject::connect(&qt_run, SIGNAL(is_now_running (bool)),
                    qt_stop, SLOT(setEnabled (bool))); 
