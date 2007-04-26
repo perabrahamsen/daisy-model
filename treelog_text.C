@@ -78,6 +78,7 @@ TreelogText::entry (const std::string& text)
   header ();
   write (text);
   write ("\n");
+  flush ();
 }
 
 TreelogText::TreelogText ()
