@@ -53,6 +53,7 @@ public:
   // Clients.
 public:
   void add_client (Treelog*);
+  void no_more_clients ();
 
   // Create and Destroy.
 private:

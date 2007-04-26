@@ -1,5 +1,9 @@
 'TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* reconfigure qt static
+
+* nullsoft?
+
 * Q4 Make
 
 Vi skal have en statisk udgave af Qt på MingW.
@@ -8,39 +12,33 @@ Vi skal have flyttet den til dirac for krydscompilering
 
 Vi skal have Qt til at bygge på Linux (har vi Qt 4.2 der?)
 
+* Generer DLL i make dist?
+
+bin/
+
+daisy.exe
+daisy.dll
+QtCore4.dll
+QtGui4.dll
+
+lib/
+
+sample/
+
+
 * Farquhar
 
 ** CO2_atm skal læses fra weather
 
-** regn bladresp-Farquhar us om natten
+** regn bladresp-Farquhar ud om natten
 
 ** Farquahar -> C4 & C5
-
-* Torsdag VAND
-
-** vind over felt
-
-* Dist
-
-** Fortæl BGJ at daisy_daisy_create_with_log -> daisy_daisy_create
-
-* Generer DLL i make dist?
-
-* Farquhar
 
 ** omregn vind fra reference til aktuel overflade
 
 * OpenMI
 
 ** Installer C# på x40
-
-** søjle polygon
-
-(where) ; ID
-
-(where (12 13) ; XY
-(where (12 13) (14 17)); Error
-(where (12 13) (14 17) (18 12)); Polygon
 
 * R2D2
 

@@ -36,7 +36,8 @@
 #include "memutils.h"
 
 #include <QtGui/QStatusBar>
-#include <QtGui/QGridLayout>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QCheckBox>
@@ -118,9 +119,13 @@ UIRun::attach (Toplevel& toplevel)
   const AttributeList& alist = toplevel.program_alist ();
   const Syntax& syntax = toplevel.program_syntax ();
   
-  // We organize items in a grid layout.
+  // We organize items in a boxes.
   QWidget *const center = new QWidget (&qt_main);
-  QGridLayout *const layout = new QGridLayout (center);
+  QVBoxLayout *const layout = new QVBoxLayout (center);
+  
+  // The top line.
+  QHBoxLayout *const top_layout = new QHBoxLayout;
+  layout->addLayout (top_layout);
 
   // The program name.
   QLabel *const qt_name = new QLabel;
@@ -132,7 +137,8 @@ UIRun::attach (Toplevel& toplevel)
     qt_name->setText (alist.name ("type").c_str ());
   else
     qt_name->setText ("No program");
-  layout->addWidget (qt_name, 0, 0, Qt::AlignLeft);
+  top_layout->addWidget (qt_name /* , Qt::AlignLeft */);
+  top_layout->addStretch ();
 
   // The simulation time.
   VisQtTime *const qt_time = new VisQtTime;
@@ -157,7 +163,7 @@ UIRun::attach (Toplevel& toplevel)
       && toplevel.state () == Toplevel::is_uninitialized)
     toplevel.msg ().warning ("Log 'QtTime' not found"
                              ", user interface may be crippled");
-  layout->addWidget (qt_time, 0, 1, Qt::AlignCenter);
+  top_layout->addWidget (qt_time /* , Qt::AlignCenter */);
 
   // The file name.
   QLabel *const qt_file = new QLabel;
@@ -176,17 +182,18 @@ UIRun::attach (Toplevel& toplevel)
       qt_file->setToolTip ("Multiple files have been loaded.");
       qt_file->setText ("Multiple files");
     }
-  layout->addWidget (qt_file, 0, 2, Qt::AlignRight);
+  top_layout->addStretch ();
+  top_layout->addWidget (qt_file /* , Qt::AlignRight */);
 
   // The program description.
   QLabel *const qt_description = new QLabel;               
-  qt_file->setToolTip ("The description of the selected program.");
+  qt_description->setToolTip ("The description of the selected program.");
   if (alist.check ("description")
       && alist.name ("description") != Toplevel::default_description)
     qt_description->setText (alist.name ("description").c_str ());
   else
     qt_description->hide (); // setText ("No description.");
-  layout->addWidget (qt_description, 1, 0, 1, 3, Qt::AlignLeft);
+  layout->addWidget (qt_description /* , Qt::AlignLeft */);
 
   // A text window for simulation messages.
   // Use a special treelog to relay messages to window.
@@ -195,14 +202,20 @@ UIRun::attach (Toplevel& toplevel)
   qt_vis->setToolTip ("Textual feedback from the program.");
   QObject::connect(tlog->tracker (), SIGNAL(text_ready (std::string)),
                    qt_vis, SLOT(new_text (std::string))); 
-  layout->addWidget (qt_vis, 2, 0, 1, 3);
   toplevel.add_treelog (tlog); 
-  
+  layout->addWidget (qt_vis);
+
+  // The bottom line
+  QWidget *const bottom = new QWidget (center);
+  QHBoxLayout *const bottom_layout = new QHBoxLayout (bottom);
+  layout->addWidget (bottom);
+
   // Emergency stop.
   qt_stop = new QPushButton ("Stop");
   qt_stop->setToolTip ("Press here to stop the program.");
   qt_stop->setDisabled (true);
-  layout->addWidget (qt_stop, 3, 0);
+  bottom_layout->addWidget (qt_stop);
+  bottom_layout->addStretch ();
                                                 
   // Track newest messages.
   QCheckBox *const qt_track = new QCheckBox ("Track");
@@ -210,15 +223,16 @@ UIRun::attach (Toplevel& toplevel)
   QObject::connect(qt_track, SIGNAL(stateChanged (int)),
                    qt_vis, SLOT(track_tracking (int))); 
   qt_track->setCheckState (Qt::Checked);
-  layout->addWidget (qt_track, 3, 1, Qt::AlignCenter);
-
+  bottom_layout->addWidget (qt_track /* , Qt::AlignCenter */);
+    
   // Dismiss window.
   QPushButton *const qt_dismiss = new QPushButton ("Dismiss");
   qt_dismiss->setToolTip ("Press here to end the application.");
   QObject::connect(qt_dismiss, SIGNAL(clicked ()),
                    &qt_main, SLOT(close ())); 
-  layout->addWidget (qt_dismiss, 3, 2);
-
+  bottom_layout->addStretch ();
+  bottom_layout->addWidget (qt_dismiss);
+    
   // All of this in our central widget.
   qt_main.setCentralWidget (center);
 

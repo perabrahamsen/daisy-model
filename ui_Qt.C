@@ -42,14 +42,18 @@ struct UIQt::Content
     ~Registrate ()
     { 
       Toplevel::remove_command_line_parser (); 
+#if 0
       delete UIQt::content;
       UIQt::content = NULL;
+#endif
     }
   } registrate;
 
   static void setup (int& argc, char**& argv)
   {
-    daisy_assert (!UIQt::content);
+    if (UIQt::content)
+      daisy_panic ("Can't parse Qt command line twice");
+
     UIQt::content = new UIQt::Content (argc, argv);
   }
 

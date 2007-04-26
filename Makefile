@@ -46,8 +46,8 @@ endif
 TARGETTYPE = i586-mingw32msvc
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
-USE_GUI = none
-#USE_GUI = Q4
+#USE_GUI = none
+USE_GUI = Q4
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
@@ -297,9 +297,13 @@ endif
 ifeq ($(HOSTTYPE),mingw)
 Q4HOME = /cygdrive/c/Qt/4.2.3
 Q4INCLUDE	= -isystem $(Q4HOME)/include
+ifeq (false,true)
 Q4SYS		= -lGDI32 -lole32 -lOleaut32 -luuid -lImm32 -lwinmm \
 		  -lWinspool -lWs2_32 -lcomdlg32
 Q4LIB		= -L$(Q4HOME)/lib -lQtGui -lQtCore $(Q4SYS) 
+else
+Q4LIB		= -L$(Q4HOME)/lib -lQtGui4 -lQtCore4
+endif
 Q4MOC		= $(Q4HOME)/bin/moc
 endif
 
@@ -472,7 +476,7 @@ Q4SOURCES = $(Q4HEADERS:.h=.C) ui_Qt_run.C
 Q4OBJECTS = $(Q4SOURCES:.C=${OBJ}) $(Q4MOCHDR:.h=_moc${OBJ}) 
 
 ifeq ($(USE_GUI),Q4)
-GUISOURCES = $(Q4SOURCES) $(Q4MOCSRC)
+GUISOURCES = $(Q4SOURCES) 
 GUIOBJECTS = $(Q4OBJECTS)
 GUILIB = $(Q4LIB)
 GUIINCLUDE = $(Q4INCLUDE)
@@ -583,6 +587,9 @@ qdaisy${EXE}:	$(QTOBJECTS) daisy.so
 cdaisy${EXE}:  cmain${OBJ} $(DAISYDYN)
 	gcc -o $@ $^ 
 
+ddaisy${EXE}:  main${OBJ} $(DAISYDYN) $(GUIOBJECTS) 
+	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB)
+
 cdaisy-mshe${EXE}:  cmain-mshe${OBJ} daisy.so
 	$(LINK)$@ cmain-mshe${OBJ} `pwd`/daisy.so $(MATHLIB)
 
@@ -593,8 +600,8 @@ cdaisy_test${EXE}:  cmain_test${OBJ} daisy.so
 
 # Create a DLL.
 #
-daisy.dll:	$(LIBOBJ)
-	$(CC) -shared -o daisy.dll $^ $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
+daisy.dll:	$(LIBOBJ) 
+	$(CC) -shared -o $@ $^ $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
 
 # Create a shared library.
 #
@@ -694,12 +701,11 @@ clean:
 
 # Update the Makefile when dependencies have changed.
 #
-depend: $(GUISOURCES) $(GUIAUTOSRC) $(SOURCES) 
+depend: $(GUISOURCES) $(SOURCES) 
 	rm -f Makefile.old
 	mv Makefile Makefile.old
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
-	$(CC) -I. $(GUIINCLUDE) \
-              -MM | sed -e 's/\.o:/$${OBJ}:/' >> Makefile
+	$(CC) -I. $(GUIINCLUDE) -MM $^ | sed -e 's/\.o:/$${OBJ}:/' >> Makefile
 
 # Create a ZIP file with all the sources.
 #
@@ -816,6 +822,21 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+run_Qt${OBJ}: run_Qt.C run_Qt.h run.h model.h toplevel.h treelog_text.h \
+  treelog.h symbol.h vis_Qt.h time.h program.h
+vis_Qt${OBJ}: vis_Qt.C vis_Qt.h toplevel.h time.h log_Qt.h log_extern.h \
+  log_select.h log.h border.h model.h alist.h symbol.h memutils.h \
+  destination.h scope.h mathlib.h assertion.h
+log_Qt${OBJ}: log_Qt.C log_Qt.h log_extern.h log_select.h log.h border.h \
+  model.h alist.h symbol.h memutils.h destination.h scope.h librarian.h \
+  syntax.h treelog.h
+ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
+  block.h syntax.h treelog.h plf.h alist.h assertion.h
+ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt.h ui.h model.h symbol.h run_Qt.h run.h \
+  toplevel.h treelog_text.h treelog.h vis_Qt.h time.h log_Qt.h \
+  log_extern.h log_select.h log.h border.h alist.h memutils.h \
+  destination.h scope.h program.h metalib.h library.h librarian.h block.h \
+  syntax.h plf.h assertion.h
 ui${OBJ}: ui.C ui.h model.h symbol.h toplevel.h treelog_text.h treelog.h \
   librarian.h block.h syntax.h plf.h alist.h
 reaction${OBJ}: reaction.C reaction.h model.h alist.h symbol.h block.h \
@@ -1084,7 +1105,7 @@ weather_old${OBJ}: weather_old.C weather_old.h weather.h model.h im.h \
 log_extern${OBJ}: log_extern.C log_extern.h log_select.h log.h border.h \
   model.h alist.h symbol.h memutils.h destination.h scope.h select.h \
   units.h volume.h scope_block.h block.h syntax.h treelog.h plf.h \
-  assertion.h librarian.h
+  assertion.h librarian.h submodeler.h
 log_select${OBJ}: log_select.C log_select.h log.h border.h model.h alist.h \
   symbol.h memutils.h select.h destination.h units.h volume.h condition.h \
   metalib.h library.h block.h syntax.h treelog.h plf.h field.h format.h \
@@ -1703,17 +1724,5 @@ action_surface${OBJ}: action_surface.C action.h model.h alist.h symbol.h \
   block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
   memutils.h field.h border.h check.h librarian.h
 main${OBJ}: main.C toplevel.h
-run_Qt${OBJ}: run_Qt.C run_Qt.h run.h model.h toplevel.h treelog_text.h \
-  treelog.h symbol.h vis_Qt.h time.h program.h
-vis_Qt${OBJ}: vis_Qt.C vis_Qt.h toplevel.h time.h log_Qt.h log_extern.h \
-  log_select.h log.h border.h model.h alist.h symbol.h memutils.h \
-  destination.h scope.h mathlib.h assertion.h
-ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h run_Qt.h run.h toplevel.h \
-  treelog_text.h treelog.h vis_Qt.h time.h log_Qt.h log_extern.h \
-  log_select.h log.h border.h alist.h memutils.h destination.h scope.h \
-  program.h metalib.h library.h librarian.h block.h syntax.h plf.h \
-  assertion.h
-log_Qt${OBJ}: log_Qt.C log_Qt.h log_extern.h log_select.h log.h border.h \
-  model.h alist.h symbol.h memutils.h destination.h scope.h
 cmain${OBJ}: cmain.c cdaisy.h
 bugmain${OBJ}: bugmain.c cdaisy.h

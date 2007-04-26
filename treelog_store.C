@@ -40,6 +40,7 @@ private:
   // Clients.
 private:
   auto_vector<Treelog*> client;
+  bool closed;
   void propagate (int nest, const std::string& text)
   {
     for (size_t i = 0; i < client.size (); i++)
@@ -77,13 +78,22 @@ private:
         msg.open (text);
       }
   }
+
 public:
   void add_client (Treelog *const msg)
   {
+    daisy_assert (!closed);
     daisy_assert (msg);
     client.push_back (msg);
     for (size_t i = 0; i < entries.size (); i++)
       propagate (*msg, entries[i].nest, entries[i].text);
+  }
+
+  void no_more_clients ()
+  {
+    daisy_assert (!closed);
+    closed = true;
+    entries.clear ();
   }
 
   // Entries.
@@ -107,7 +117,9 @@ private:
   std::vector<Entry> entries;
   void add (int nest, const std::string& text)
   { 
-    entries.push_back (Entry (nest, text)); 
+    if (!closed)
+      entries.push_back (Entry (nest, text)); 
+
     propagate (nest, text);
   }
 public:
@@ -140,7 +152,8 @@ public:
   // Create and Destroy.
 public:
   Implementation ()
-    : level (0)
+    : closed (false),
+      level (0)
   { }
   ~Implementation ()
   { 
@@ -188,6 +201,10 @@ TreelogStore::flush ()
 void 
 TreelogStore::add_client (Treelog *const msg)
 { impl->add_client (msg); }
+
+void 
+TreelogStore::no_more_clients ()
+{ impl->no_more_clients (); }
 
 TreelogStore::TreelogStore ()
   : impl (new Implementation ())

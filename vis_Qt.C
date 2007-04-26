@@ -44,9 +44,13 @@ VisQtMain::set_title ()
         setWindowTitle (fileName + " - " + appName);
       break;
     case Toplevel::is_running:
-      setWindowTitle (QString ("%1% completed - %2")
-                      .arg (double2int (progress * 100))
-                      .arg (appName));
+      if (progress >= 0.0 && progress <= 1.0)
+        setWindowTitle (QString ("%1% completed - %2")
+                        .arg (double2int (progress * 100))
+                        .arg (appName));
+      else
+        setWindowTitle ("Running... - " + appName);
+        
       break;
     case Toplevel::is_error:
       setWindowTitle ("Failed! - " + appName);

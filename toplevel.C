@@ -426,6 +426,7 @@ Toplevel::end_message () const
 void
 Toplevel::run ()
 {
+  impl->msg.no_more_clients ();
   daisy_assert (impl->state == is_ready);
   start_message ();
   impl->program->run (msg ());
