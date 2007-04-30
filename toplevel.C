@@ -74,7 +74,7 @@ struct Toplevel::Implementation
 };
 
 std::vector<Toplevel::command_line_parser>* 
-/**/ Toplevel::Implementation::command_line_parsers;
+/**/ Toplevel::Implementation::command_line_parsers = NULL;
 
 void
 Toplevel::Implementation::run_program (const std::string& name_str)
@@ -100,7 +100,7 @@ Toplevel::Implementation::run_program (const std::string& name_str)
           throw EXIT_FAILURE;
         }
 
-      std::auto_ptr<Program> program;
+      // std::auto_ptr<Program> program;
 
       // Build.
       {
@@ -573,7 +573,6 @@ Toplevel::command_line (int& argc, char**& argv)
 
   // Loop over all arguments.
   bool options_finished = false; // "--" ends command line options.
-  int errors_found = 0;
 
   while (argc > 1)              // argc and argv updated as args are parsed.
     {
@@ -582,16 +581,7 @@ Toplevel::command_line (int& argc, char**& argv)
       if (arg.size () < 1)      
         usage ();              // No zero sized args.
       else if (options_finished || arg[0] != '-')
-	{                       // Not an option, but a setup file.
-	  // Parse the file.
-	  Treelog::Open nest (msg (), "Parsing file");
-	  ParserFile parser (metalib (), arg, msg ());
-	  parser.load (impl->metalib.alist ());
-	  impl->files_found.push_back (arg);
-	  errors_found += parser.error_count ();
-          if (errors_found > 0)
-            impl->state = is_error;
-	}
+        parse_file (arg); // Not an option, but a setup file.
       else if (arg.size () < 2)
         usage ();              // We don't allow a lone '-'.
       else if (arg.size () == 2)
@@ -645,8 +635,6 @@ Toplevel::command_line (int& argc, char**& argv)
       else
         usage ();
     }
-  if (errors_found > 0)
-    throw EXIT_FAILURE;
 
   if (state () == is_done)
     // Already done.
@@ -663,11 +651,21 @@ Toplevel::command_line (int& argc, char**& argv)
 void
 Toplevel::parse_file (const std::string& filename)
 { 
-  impl->files_found.push_back (filename);
-  daisy_assert (impl->state == is_uninitialized);
   copyright ();
-  Treelog::Open nest (msg (), "Parsing file");
+  impl->files_found.push_back (filename);
+  Treelog::Open nest (msg (), "Parsing '"+ filename + "'");
+  if (impl->state != is_uninitialized)
+    {
+      error ("Program already initialized");
+      throw EXIT_FAILURE;
+    }
   ParserFile parser (metalib (), filename, msg ());
+  if (!parser.check ())
+    {
+      impl->state = is_error;
+      throw EXIT_FAILURE;
+    }
+  
   parser.load (impl->metalib.alist ());
   if (parser.error_count () > 0)
     {

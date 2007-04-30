@@ -424,7 +424,7 @@ LogTable::~LogTable ()
 {
   sequence_delete (summary.begin (), summary.end ());
   if (!out.good ())
-    throw (std::string ("Problems writing to '") + file + "'");
+    Assertion::error ("Problems writing to '" + file + "'");
 }
 
 static struct LogTableSyntax

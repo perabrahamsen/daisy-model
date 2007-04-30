@@ -103,7 +103,7 @@ private:
   {
     int nest;
     std::string text;
-    Entry& operator= (const Entry& other)
+    const Entry& operator= (const Entry& other)
     { 
       nest = other.nest; 
       text = other.text; 

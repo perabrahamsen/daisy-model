@@ -206,7 +206,7 @@ struct LogHarvest : public Log
   ~LogHarvest ()
   {
     if (!out.good ())
-      throw (string ("Problems writing to '") + file + "'");
+      Assertion::error  ("Problems writing to '" + file + "'");
   }
 };
 

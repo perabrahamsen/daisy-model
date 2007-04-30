@@ -50,9 +50,6 @@ main (int argc, char* argv[])
         case Toplevel::is_error:
           throw EXIT_FAILURE;
         }
-
-      // All is well.
-
     }
   catch (const char* error)
     { toplevel.error (std::string ("Exception: ") + error); }

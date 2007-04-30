@@ -1,4 +1,28 @@
-'TODO --- things that needs to be done with Daisy -*- outline -*-
+TODO --- things that needs to be done with Daisy -*- outline -*-
+
+* OM init
+
+H(t) : t -> R^n
+
+H'(t) = A H(t) ; A konstant n x n matrix
+
+H'(inf) = 0
+
+H(inf) er kendt
+
+H' er monotont faldene
+
+|H| er monoton eller konstant.
+
+H_i er monoton eller konstant
+
+ENTEN
+
+  H(0) er kendt; langtidssimulering fra gammelt ækvilibrium
+
+ELLER 
+
+  |H(t0)| er kendt, init fra ukendt præhistorie
 
 * reconfigure qt static
 
