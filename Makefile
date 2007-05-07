@@ -41,13 +41,15 @@ SRCDIR = ..
 OBJHOME = obj
 NATIVEHOME = $(OBJHOME)
 BOOSTINC = -isystem /usr/include/boost-1_33_1/
+SETUPDIR = $(HOME)/daisy/install
+MAKENSIS = /cygdrive/c/Programmer/NSIS/makensis.exe
 endif
 
 TARGETTYPE = i586-mingw32msvc
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
-#USE_GUI = none
-USE_GUI = Q4
+USE_GUI = none
+#USE_GUI = Q4
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
@@ -300,9 +302,9 @@ Q4INCLUDE	= -isystem $(Q4HOME)/include
 ifeq (false,true)
 Q4SYS		= -lGDI32 -lole32 -lOleaut32 -luuid -lImm32 -lwinmm \
 		  -lWinspool -lWs2_32 -lcomdlg32
-Q4LIB		= -L$(Q4HOME)/lib -lQtGui -lQtCore $(Q4SYS) 
+Q4LIB		= -mwindows -L$(Q4HOME)/lib -lQtGui -lQtCore $(Q4SYS) 
 else
-Q4LIB		= -L$(Q4HOME)/lib -lQtGui4 -lQtCore4
+Q4LIB		= -mwindows -L$(Q4HOME)/lib -lQtGui4 -lQtCore4
 endif
 Q4MOC		= $(Q4HOME)/bin/moc
 endif
@@ -738,7 +740,6 @@ dist:	cvs
 	$(CROSSSTRIP) -o $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe \
 		$(OBJHOME)/$(TARGETTYPE)/daisy
 	(cd $(FTPDIR); ln -s $(TARGETTYPE)/daisy-$(TAG).exe daisy.exe)
-	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
 	./utils/update_index $(FTPDIR)
 	./utils/update_index $(FTPDIR)/daisy-lib
 	./utils/update_index $(FTPDIR)/$(TARGETTYPE)
@@ -779,6 +780,24 @@ add:
 cast:
 	fgrep _cast $(INTERFACES) $(MODELS) $(MAIN)
 	wc -l  $(INTERFACES) $(MODELS) $(MAIN)
+
+setup:	#cvs
+	$(MAKE) native 
+	rm -rf $(SETUPDIR)
+	mkdir $(SETUPDIR)
+	cp ChangeLog NEWS $(SETUPDIR)
+	mkdir $(SETUPDIR)/src
+	cp $(TEXT) $(SETUPDIR)/src
+	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	(cd txt && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
+	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
+	mkdir $(SETUPDIR)/bin
+	$(STRIP) -o $(SETUPDIR)/daisy.exe $(SETUPDIR)/bin/daisy.exe
+	$(STRIP) -o $(SETUPDIR)/daisy.dll $(SETUPDIR)/bin/daisy.dll
+	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
+	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
+	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
 
 # How to compile the assembler file.
 #

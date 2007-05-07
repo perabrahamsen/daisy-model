@@ -1,3 +1,8 @@
+2007-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-Qt.dai: New log parameterization file.
+	* lib/Makefile (TEXT): Added it.
+
 2007-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* run.C, run.h: New base.

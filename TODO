@@ -1,52 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* OM init
+* Få "make setup" til at virke
 
-H(t) : t -> R^n
+Flyt mingw til cross
 
-H'(t) = A H(t) + k; A konstant n x n matrix
-
-H'(inf) = 0
-
-H(inf) er kendt
-
-H' er monotont faldene
-
-H_i er monoton eller konstant
-
-ENTEN
-
-  H(0) er kendt; langtidssimulering fra gammelt ækvilibrium
-
-ELLER 
-
-  sum H(t0) er kendt, init fra ukendt præhistorie
-
-* reconfigure qt static
-
-* nullsoft?
-
-* Q4 Make
-
-Vi skal have en statisk udgave af Qt på MingW.
-
-Vi skal have flyttet den til dirac for krydscompilering
-
-Vi skal have Qt til at bygge på Linux (har vi Qt 4.2 der?)
-
-* Generer DLL i make dist?
-
-bin/
-
-daisy.exe
-daisy.dll
-QtCore4.dll
-QtGui4.dll
-
-lib/
-
-sample/
-
+Lad daisy.exe bruge daisy.dll
 
 * Farquhar
 
@@ -61,6 +19,17 @@ sample/
 * OpenMI
 
 ** Installer C# på x40
+
+** Få Groundwater pipe til at læse tryk fra extern kilde.
+
+** Læs vejr fra OpenMI.
+
+** column location 
+
+(location); ID
+(location (x1 y1)); Point
+(location (x1 y1) (x2 y2)); Error
+(location (x1 y1) (x2 y2) (x3 y3) ...); Polygon
 
 * R2D2
 
@@ -102,11 +71,62 @@ For vert edge, hvad med hor edges?  Irrigation?
 
 4) Aftest mod 1D eller Grid
 
+* Artikler
+
+** OM init
+
+H(t) : t -> R^n
+
+H'(t) = A H(t) + k; A konstant n x n matrix
+
+H'(inf) = 0
+
+H(inf) er kendt
+
+H' er monotont faldene
+
+H_i er monoton eller konstant
+
+ENTEN
+
+  H(0) er kendt; langtidssimulering fra gammelt ækvilibrium
+
+ELLER 
+
+  sum H(t0) er kendt, init fra ukendt præhistorie
+
 * Distribution
 
 ** Indsæt mmo grøntsager i lib (og sample?).
 
 ** Ny plone baseret web side!
+
+** reconfigure qt static
+
+** nullsoft?
+
+** Q4 Make
+
+Vi skal have en statisk udgave af Qt på MingW.
+
+Vi skal have flyttet den til dirac for krydscompilering
+
+Vi skal have Qt til at bygge på Linux (har vi Qt 4.2 der?)
+
+** Generer DLL i make dist?
+
+bin/
+
+daisy.exe
+daisy.dll
+QtCore4.dll
+QtGui4.dll
+
+lib/
+
+sample/
+
+doc/
 
 * Programmering
 

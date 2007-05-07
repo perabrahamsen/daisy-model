@@ -29,6 +29,13 @@ dist:
 	rm -f $(FTPDIR)/daisy-sample.zip
 	(cd $(FTPDIR); ln -s daisy-lib/daisy-sample-$(TAG).zip daisy-sample.zip)
 
+# Prepare setup file.
+#
+setup:
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	mkdir $(SETUPDIR)/sample
+	cp $(TEXT) $(SETUPDIR)/sample
+
 # Update the CVS repository.
 #
 cvs: $(TEXT) 

@@ -10,7 +10,7 @@ ANSWERS = answers/Aarslev.dwf answers/Exercise01.dai answers/Exercise02.dai \
 	answers/Exercise09.dai answers/Exercise10.dai answers/Exercise11.dai \
 	answers/Exercise12.dai 
 
-TEXT = $(TEXTDATA) $(ANSWERS)
+TEXT = $(TEXTDATA) $(ANSWERS) Makefile
 
 ../txt/exercises.pdf:
 	(cd ../txt && make exercises.pdf)
@@ -24,6 +24,10 @@ exercises.zip:  exercises.pdf $(DATA) $(ANSWERS)
 
 dist: exercises.zip
 	cp -f exercises.zip $(FTPDIR)/
+
+setup: exercises.pdf $(DATA) $(ANSWERS)
+	mkdir $(SETUPDIR)/exercises
+	cp -f $^ $(SETUPDIR)/exercises
 
 cvs: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
