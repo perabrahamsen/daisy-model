@@ -120,14 +120,15 @@ UIRun::attach (Toplevel& toplevel)
   // We start by loading special log used by UI.
   try
     {
-      if (!has_loaded_log_file)
+      if (!has_loaded_log_file
+          && toplevel.state () == Toplevel::is_uninitialized)
         {
           has_loaded_log_file = true;
-          toplevel.parse_file ("log-Qt.dai");
+          toplevel.parse_file ("ui-Qt.dai");
         }
     }
   catch (...)
-    { toplevel.msg ().warning ("Problems loading utility file 'log-Qt.dai'"); }
+    { toplevel.msg ().warning ("Problems loading utility file 'ui-Qt.dai'"); }
 
   // Build log.
   {

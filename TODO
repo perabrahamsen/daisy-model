@@ -1,8 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* ui_Qt
+* ui
 
-Auto-load log-Qt.dai file
+Giv en UI specific usage besked hvis der kaldes uden argumenter
 
 * setup.exe
 
