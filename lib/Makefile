@@ -12,7 +12,7 @@ DAISY 	= markvand.dai log-std.dai dk-fertilizer.dai \
 	dk-crop.dai dk-horizon.dai log-old.dai crop-old.dai vegetation.dai \
 	crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
 	$(OLDCROPS) $(NEWCROPS) $(DKCROPS)
-TEXT	= Makefile  all.dai log-Qt.dai
+TEXT	= Makefile  all.dai ui-Qt.dai
 REMOVE 	=  weather.dwf dk-soil.dai mshe.dai mshe-standalone.dai
 
 all:
