@@ -37,8 +37,8 @@ reference.pdf: reference.tex components.tex $(LIBS)
 	bibtex reference
 	pdflatex reference.tex < /dev/null
 
-components.tex:	/usr/local/daisy/$(HOSTTYPE)/daisy
-	/usr/local/daisy/$(HOSTTYPE)/daisy all.dai -p document > components.tex
+components.tex:	$(DAISYEXE)
+	$(DAISYEXE) -nw all.dai -p document
 
 exercises.ps:	exercises.dvi 
 	dvips -f exercises.dvi > exercises.ps
