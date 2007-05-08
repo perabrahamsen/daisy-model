@@ -18,6 +18,7 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#define BUILD_DLL
 
 #include "ui_Qt.h"
 #include "run_Qt.h"
@@ -53,6 +54,7 @@ class UIRun : public UIQt
   QPointer<QPushButton> qt_stop;
 
   // Logs.
+  bool has_loaded_log_file;
   auto_vector<Log*> all_logs;
   std::map<symbol, LogQt*> logs;
   void build_log (Block& block, const std::string& log);
@@ -85,7 +87,7 @@ UIRun::build_log (Block& block, const std::string& name)
   const Library& library = block.metalib ().library (Log::component);
   if (!library.complete (block.metalib (), id))
     return;
-
+  
   const AttributeList& alist = library.lookup (id);
   std::auto_ptr<Log> log_raw 
     (Librarian::build_alist<Log> (block, alist, name));
@@ -115,6 +117,24 @@ UIRun::attach_log (const std::string& name, VisQtLog *const vis) const
 void 
 UIRun::attach (Toplevel& toplevel)
 {
+  // We start by loading special log used by UI.
+  try
+    {
+      if (!has_loaded_log_file)
+        {
+          has_loaded_log_file = true;
+          toplevel.parse_file ("log-Qt.dai");
+        }
+    }
+  catch (...)
+    { toplevel.msg ().warning ("Problems loading utility file 'log-Qt.dai'"); }
+
+  // Build log.
+  {
+    Block block (toplevel.metalib (), toplevel.msg (), "UI logs");
+    build_log (block, "QtTime");   
+  }
+
   // Fetch data.
   const AttributeList& alist = toplevel.program_alist ();
   const Syntax& syntax = toplevel.program_syntax ();
@@ -302,8 +322,9 @@ UIRun::run (Toplevel& toplevel)
 
 UIRun::UIRun (Block& al)
   : UIQt (al),
-    qt_main (application_name ())
-{ build_log (al, "QtTime"); }
+    qt_main (application_name ()),
+    has_loaded_log_file (false)
+{ }
 
 UIRun::~UIRun ()
 { }

@@ -18,6 +18,7 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#define BUILD_DLL
 
 #include "toplevel.h"
 #include "metalib.h"
@@ -173,6 +174,8 @@ Toplevel::Implementation::add_daisy_ui (Toplevel& toplevel,
   ui->attach (toplevel);
 }
   
+#include "w32reg.h"
+
 void 
 Toplevel::Implementation::add_daisy_log ()
 { 
@@ -180,6 +183,15 @@ Toplevel::Implementation::add_daisy_log ()
     {
       has_daisy_log = true;
       msg.add_client (new TreelogFile ("daisy.log"));
+
+
+      char* foo = read_w32_registry_string (NULL, "Software\\Daisy 5.00", "");
+      if (foo)
+        {
+          const std::string home = foo;
+          free (foo);
+          msg.message ("Home is '" + home + "'");
+        }
     }
 }
 

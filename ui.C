@@ -18,6 +18,7 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#define BUILD_DLL
 
 #include "ui.h"
 #include "toplevel.h"
@@ -126,7 +127,7 @@ static struct UINoneSyntax
     alist.add ("description", 
                "No user unterface.\n\
 \n\
-This is useful when running from a batch program, or as a component in\a\
+This is useful when running from a batch program, or as a component in\n\
 a larger system.");
     Librarian::add_type (UI::component, "none", alist, syntax, &make);
   }

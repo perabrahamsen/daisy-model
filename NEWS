@@ -12,6 +12,69 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.13
+
+** The Daisy distribution is now packaged as a normal Windows installer.
+
+For now, the installer will unpack the windows executable, the
+reference manual, the parameter library, the sample files and the
+source code.  
+
+The installer will add several Daisy related entries to the start
+menu, as well as a shortcut to the desctop.
+
+More might be added later.  Currently everything will be installed
+unconditionally.  Since the binaries takes almost all the space,
+making some components optional does not seem worthwhile.  But it is
+easy to do, so if you want it, let us know.
+
+** Daisy now has a (minimal) GUI.
+
+Basically, if you drag a file to the daisy.exe icon, output will be
+shown in a window, with a bit of auxiliary information.  No real
+functionality yet.
+
+** The -nw command line option will disable the GUI. 
+
+Adding (ui progress) to the setup file will do the same.
+
+If you call daisy.exe from TextPad, or another programmers editor),
+you should probably change the invocation to add the "-nw" command
+line flag.  
+
+In TextPad you do this with Configure -> Preferences -> Tools -> Daisy
+
+Add -nw followed by a space (but without the quotes) before $File in
+the "Parameters:" field.
+
+** The -q command line flag will shut up Daisy.
+
+Adding (ui none) to the setup file will do the same.
+
+Daisy will then no longer report progress to the screen, but it will
+still generate a daisy.log file.
+
+** The daisy.dll is now part of the distribution.
+
+And the daisy.exe file is a small wrapper around the DLL.  The
+daisy.dll file, and several other DLL's (mostly GUI related) needed
+for the minimalistic daisy.exe to run, are all included in the
+distribution.
+
+You can use daisy.dll from your own application using either a C
+interface, defined in 'cdaisy.h', or a C++ interface, defined in
+'toplevel.h'.  Both of those files can be found in the 'src'
+directory (Daisy -> Explore -> src from the Start menu).
+
+A C#/.NET interface will be added soon, as well as an OpenMI interface
+for coupling with other OpenMI compliant hydrological models, such as
+Mike/SHE.
+
+** GNU/Linux users are screwed.
+
+Well, not really, but a GNU/Linux binary is no longer autmatically
+build as part of the release process.
+
 * 4.12
 
 ** Reorganized pesticide handling

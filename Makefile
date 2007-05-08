@@ -43,13 +43,14 @@ NATIVEHOME = $(OBJHOME)
 BOOSTINC = -isystem /usr/include/boost-1_33_1/
 SETUPDIR = $(HOME)/daisy/install
 MAKENSIS = /cygdrive/c/Programmer/NSIS/makensis.exe
+MINGWHOME = /cygdrive/c/MinGW
 endif
 
 TARGETTYPE = i586-mingw32msvc
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
-USE_GUI = none
-#USE_GUI = Q4
+#USE_GUI = none
+USE_GUI = Q4
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
@@ -93,6 +94,10 @@ SPARCOBJ = set_exceptions.o
 #
 MSSRC = win32_unistd.C
 
+WINSRC = w32reg.c
+WINOBJ = w32reg.o
+WINHDR = w32reg.h
+
 ifeq ($(HOSTTYPE),sun4) 
 SYSSOURCES = $(SPARCSRC)
 SYSOBJECTS = $(SPARCOBJ)
@@ -102,7 +107,14 @@ ifeq ($(COMPILER),ms)
 SYSSOURCES = $(MSSRC)
 endif
 
-ALLSYSSRC = $(SPARCSRC) $(MSSRC)
+ifeq ($(HOSTTYPE),mingw)
+SYSSOURCES = $(WINSRC)
+SYSOBJECTS = $(WINOBJ)
+SYSHEADERS = $(WINHDR)
+endif
+
+ALLSYSSRC = $(SPARCSRC) $(MSSRC) $(WINSRC)
+ALLSYSHDR = $(WINHDR)
 
 # Find the profile flags.
 #
@@ -139,8 +151,6 @@ else
 		OPTIMIZE = -O0
 	endif
 endif
-
-DAISYDYN = daisy.dll
 
 # Do we want to create a dynamic library?
 #
@@ -302,9 +312,9 @@ Q4INCLUDE	= -isystem $(Q4HOME)/include
 ifeq (false,true)
 Q4SYS		= -lGDI32 -lole32 -lOleaut32 -luuid -lImm32 -lwinmm \
 		  -lWinspool -lWs2_32 -lcomdlg32
-Q4LIB		= -mwindows -L$(Q4HOME)/lib -lQtGui -lQtCore $(Q4SYS) 
+Q4LIB		= -L$(Q4HOME)/lib -lQtGui -lQtCore $(Q4SYS) 
 else
-Q4LIB		= -mwindows -L$(Q4HOME)/lib -lQtGui4 -lQtCore4
+Q4LIB		= -L$(Q4HOME)/lib -lQtGui4 -lQtCore4
 endif
 Q4MOC		= $(Q4HOME)/bin/moc
 endif
@@ -490,9 +500,10 @@ GUILIB =
 GUIINCLUDE = 
 endif
 
-ALLGUISRC = tkmain.C gmain.C pmain.C $(QTSOURCES) $(Q4SOURCES)
+ALLGUISRC = tkmain.C gmain.C $(QTSOURCES) $(Q4SOURCES)
 ALLGUIHDR = $(QTHEADERS) $(Q4HEADERS)
 
+LOSTGUISRC = pmain.C
 
 # Select the C files that are not part of the library.
 #
@@ -513,7 +524,9 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 #
 TEXT =  ChangeLog.2 ChangeLog.1 \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
-	$(HEADERS) $(SOURCES) $(ALLSYSSRC) $(ALLGUIHDR) $(ALLGUISRC)
+	$(HEADERS) $(SOURCES) $(ALLSYSHDR) $(ALLSYSSRC) \
+	$(ALLGUIHDR) $(ALLGUISRC)
+
 # The executables.
 #
 EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
@@ -535,9 +548,17 @@ REMOVED = soil_chemical.C soil_chemicals.C chemicals.C soil_chemical.h soil_chem
 all:	#(EXECUTABLES)
 	@echo 'Use "make native" to create a native Daisy executable.'
 
+# Create a DLL.
+#
+daisy.dll: $(LIBOBJ) $(GUIOBJECTS) 
+	$(CC) -shared -o $@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
+
 # Create the main executable.
 #
-daisy${EXE}:	main${OBJ} $(GUIOBJECTS) $(LIBOBJ)
+daisy.exe:	main${OBJ} daisy.dll
+	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB) -mwindows
+
+daisy:	main${OBJ} $(GUIOBJECTS) $(LIBOBJ)
 	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB)
 
 exp:	
@@ -600,18 +621,13 @@ cdaisy-mshe${EXE}:  cmain-mshe${OBJ} daisy.so
 cdaisy_test${EXE}:  cmain_test${OBJ} daisy.so
 	$(LINK)$@ $^ $(MATHLIB)
 
-# Create a DLL.
-#
-daisy.dll:	$(LIBOBJ) 
-	$(CC) -shared -o $@ $^ $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
-
 # Create a shared library.
 #
 daisy.so: $(LIBOBJ)
 	$(CC) -shared -o daisy.so $^ $(MATHLIB)
 
-cdaisy.o:
-	$(CC) $(NOLINK) -DBUILD_DLL $<
+# toplevel.o cdaisy.o:
+#	 $(CC) $(NOLINK) -DBUILD_DLL $<
 
 # Create daisy plot executable.
 #
@@ -694,7 +710,7 @@ txt/reference.pdf:	txt/components.tex
 	 && pdflatex reference.tex < /dev/null )
 
 txt/components.tex:
-	(cd txt && $(DAISYEXE) all.dai -p document > components.tex)
+	(cd txt && $(DAISYEXE) -nw all.dai -p document
 
 # Remove all the temporary files.
 #
@@ -781,7 +797,7 @@ cast:
 	fgrep _cast $(INTERFACES) $(MODELS) $(MAIN)
 	wc -l  $(INTERFACES) $(MODELS) $(MAIN)
 
-setup:	#cvs
+setup:	cvs
 	$(MAKE) native 
 	rm -rf $(SETUPDIR)
 	mkdir $(SETUPDIR)
@@ -790,13 +806,14 @@ setup:	#cvs
 	cp $(TEXT) $(SETUPDIR)/src
 	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	(cd txt && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
+	(cd txt && $(MAKE) PATH="$(PATH):$(Q4HOME)/bin" DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) SETUPDIR=$(SETUPDIR) DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" setup)
 	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	mkdir $(SETUPDIR)/bin
-	$(STRIP) -o $(SETUPDIR)/daisy.exe $(SETUPDIR)/bin/daisy.exe
-	$(STRIP) -o $(SETUPDIR)/daisy.dll $(SETUPDIR)/bin/daisy.dll
+	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
+	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
 	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
 	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
+	cp $(MINGWHOME)/bin/mingwm10.dll $(SETUPDIR)/bin
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
 
 # How to compile the assembler file.

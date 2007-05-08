@@ -40,7 +40,15 @@ class Treelog;
 #define NORETURN
 #endif
 
-class Toplevel
+#ifdef BUILD_DLL
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
+class EXPORT Toplevel
 {
   //Content.
 private:

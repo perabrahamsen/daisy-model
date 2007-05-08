@@ -1,10 +1,35 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Få "make setup" til at virke
+* ui_Qt
 
-Flyt mingw til cross
+Auto-load log-Qt.dai file
 
-Lad daisy.exe bruge daisy.dll
+* setup.exe
+
+** Skriv noget i NEWS.
+
+** make setup TAG=4.13
+
+** Upload
+
+** Skriv noget på hjemmesiden.
+
+** Toplevel::load_run
+
+Ny attribut "installdir".
+
+Initialiseres fra enten registry eller DAISYHOME.
+
+"path" initialiseres fra enten DAISYPATH, eller til 
+  ("." "${installdir}/lib" "${installdir}/sample")
+
+** Måske skal "directory" initialiseres til $HOME/Daisy?
+
+Vi vil gerne have D&D til at gøre noget fornuftigt.
+
+** .nsi fil eller section til at konfigurere textpad?
+
+** SourceForge?
 
 * Farquhar
 

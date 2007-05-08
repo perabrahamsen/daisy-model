@@ -27,7 +27,9 @@ dist: exercises.zip
 
 setup: exercises.pdf $(DATA) $(ANSWERS)
 	mkdir $(SETUPDIR)/exercises
-	cp -f $^ $(SETUPDIR)/exercises
+	cp -f exercises.pdf $(DATA) $(SETUPDIR)/exercises
+	mkdir $(SETUPDIR)/exercises/answers
+	cp -f $(ANSWERS) $(SETUPDIR)/exercises/answers
 
 cvs: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi

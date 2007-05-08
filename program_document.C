@@ -35,7 +35,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include <sstream>
-#include <iostream>
+#include <fstream>
 #include <memory>
 #include <algorithm>
 
@@ -44,6 +44,7 @@ struct ProgramDocument : public Program
   // Content.
   Metalib& metalib;
   XRef xref;
+  std::ofstream out;
   std::auto_ptr<Format> format;
   const bool print_parameterizations;
   // remember this for models.
@@ -123,7 +124,7 @@ struct ProgramDocument : public Program
   // Program.
   bool run (Treelog& msg)
   {
-    format->initialize (std::cout);
+    format->initialize (out);
     print_document (msg); 
     return true;
   }
@@ -137,6 +138,7 @@ struct ProgramDocument : public Program
     : Program (al),
       metalib (al.metalib ()),
       xref (metalib),
+      out (al.name ("where").c_str ()),
       format (Librarian::build_item<Format> (al, "format")),
       print_parameterizations (al.flag ("print_parameterizations"))
   { }
@@ -1270,6 +1272,9 @@ static struct ProgramDocumentSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Generate the components part of the reference manual.");
+    syntax.add ("where", Syntax::String, Syntax::Const, 
+                "Name of file to store results in.");
+    alist.add ("where", "components.tex");
     syntax.add_object ("format", Format::component, 
                        Syntax::Const, Syntax::Singleton,
                        "Text format used for the document.");
@@ -1279,7 +1284,6 @@ Generate the components part of the reference manual.");
     syntax.add ("print_parameterizations", Syntax::Boolean, Syntax::Const,
 		"Include a copy of all loaded parameterizations in document.");
     alist.add ("print_parameterizations", false);
-
     Librarian::add_type (Program::component, "document", alist, syntax, &make);
   }
 } ProgramDocument_syntax;
