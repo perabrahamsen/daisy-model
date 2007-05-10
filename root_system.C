@@ -453,7 +453,7 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("MxNH4Up", 2.5e-7);
   syntax.add ("MxNO3Up", "g/cm/h", Check::non_negative (), Syntax::Const,
 	    "Maximum NO3 uptake per unit root length.");
-  alist.add ("MxNO3Up", 2.5e-8);
+  alist.add ("MxNO3Up", 2.5e-7);
   syntax.add ("Rxylem", Syntax::None (), Check::non_negative (), Syntax::Const,
 	    "Transport resistence in xyleme.");
   alist.add ("Rxylem", 10.0);
