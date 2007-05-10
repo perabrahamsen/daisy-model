@@ -12,6 +12,15 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.14
+
+** Setup program now adds links to the tutorial and exercises to Start menu.
+
+** The path will now point to the installed library files by default.
+
+The new parameter 'install_directory' will by default points to the
+directory where you installed Daisy.
+
 * 4.13
 
 ** The Daisy distribution is now packaged as a normal Windows installer.

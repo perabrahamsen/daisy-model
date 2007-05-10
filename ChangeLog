@@ -1,3 +1,23 @@
+2007-05-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.14 released.
+
+2007-05-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* txt/Makefile (tutorial.dvi, tutorial.pdf, exercises.pdf) 
+	(exercises.dvi): Added dependencies on other documents.
+
+	* toplevel.C, toplevel.h (parse_system_file): New member function.
+	* toplevel.C (parse_file): Use it.
+	* ui_Qt_run.C (attach): Ditto.
+
+	* toplevel.C (get_daisy_home): New function.
+	(initialize_once): Use it.
+	(install_directory): New parameter.
+
+	* setup.nsi: Added start menu links to tutorial and exercises
+	documentation, and added a sample setup file to the desktop.
+
 2007-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.13 released.

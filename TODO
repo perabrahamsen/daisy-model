@@ -1,18 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* ui
-
-Giv en UI specific usage besked hvis der kaldes uden argumenter
-
 * setup.exe
-
-** Skriv noget i NEWS.
-
-** make setup TAG=4.13
-
-** Upload
-
-** Skriv noget på hjemmesiden.
 
 ** Toplevel::load_run
 
@@ -29,7 +17,11 @@ Vi vil gerne have D&D til at gøre noget fornuftigt.
 
 ** .nsi fil eller section til at konfigurere textpad?
 
-** SourceForge?
+* ui
+
+Giv en UI specific usage besked hvis der kaldes uden argumenter
+
+* SourceForge?
 
 * Farquhar
 

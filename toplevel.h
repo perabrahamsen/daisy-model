@@ -103,6 +103,7 @@ private:
 public:
   void command_line (int& argc, char**& argv);
   void parse_file (const std::string&);
+  void parse_system_file (const std::string&);
   static void load_run (Syntax&, AttributeList&);
 private:
   static void load_syntax (Syntax&, AttributeList&);

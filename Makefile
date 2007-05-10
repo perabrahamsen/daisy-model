@@ -798,6 +798,9 @@ cast:
 	wc -l  $(INTERFACES) $(MODELS) $(MAIN)
 
 setup:	cvs
+	$(MAKE) setupnocvs
+
+setupnocvs: 
 	$(MAKE) native 
 	rm -rf $(SETUPDIR)
 	mkdir $(SETUPDIR)

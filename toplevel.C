@@ -37,6 +37,8 @@
 #include "treelog_text.h"
 #include "treelog_store.h"
 #include "librarian.h"
+#include "w32reg.h"
+
 #include <sstream>
 #include <iostream>
 #include <ctime>
@@ -69,6 +71,8 @@ struct Toplevel::Implementation
 
   bool has_daisy_log;
   void add_daisy_log ();
+
+  static std::string get_daisy_home ();
 
   Implementation ();
   ~Implementation ();
@@ -174,8 +178,6 @@ Toplevel::Implementation::add_daisy_ui (Toplevel& toplevel,
   ui->attach (toplevel);
 }
   
-#include "w32reg.h"
-
 void 
 Toplevel::Implementation::add_daisy_log ()
 { 
@@ -183,16 +185,33 @@ Toplevel::Implementation::add_daisy_log ()
     {
       has_daisy_log = true;
       msg.add_client (new TreelogFile ("daisy.log"));
-
-
-      char* foo = read_w32_registry_string (NULL, "Software\\Daisy 5.00", "");
-      if (foo)
-        {
-          const std::string home = foo;
-          free (foo);
-          msg.message ("Home is '" + home + "'");
-        }
+      msg.message ("Storing 'daisy.log' in '" + Path::get_directory () + "'");
     }
+}
+
+std::string
+Toplevel::Implementation::get_daisy_home ()
+{
+  // Check DAISYHOME
+  const char* daisy_home_env = getenv ("DAISYHOME");
+  if (daisy_home_env)
+    return daisy_home_env;
+
+  // Check MS Windows registry
+#if defined (_WIN32) || defined (__CYGWIN32__)
+  const std::string key = "Software\\Daisy " + std::string (version);
+  char *const daisy_w32_reg 
+    = read_w32_registry_string (NULL, key.c_str (), "Install Directory");
+  if (daisy_w32_reg)
+    {
+      std::string result = daisy_w32_reg;
+      free (daisy_w32_reg);
+      return result;
+    }
+  return "C:/daisy";
+#else // !MS WINDOWS
+  return "/usr/local/daisy";
+#endif // !MS WINDOWS
 }
 
 Toplevel::Implementation::Implementation ()
@@ -472,18 +491,28 @@ Toplevel::initialize_once ()
   std::vector<std::string> path;
 
   // Initialize path.
-  const std::string colon_path
-    = getenv ("DAISYPATH") ? getenv ("DAISYPATH") : ".";
-  int last = 0;
-  for (;;)
+  const char *const daisy_path_env = getenv ("DAISYPATH");
+  if (daisy_path_env)
     {
-      const int next = colon_path.find (PATH_SEPARATOR, last);
-      if (next < 0)
-	break;
-      path.push_back (colon_path.substr (last, next - last));
-      last = next + 1;
+      const std::string colon_path = daisy_path_env;
+      int last = 0;
+      for (;;)
+        {
+          const int next = colon_path.find (PATH_SEPARATOR, last);
+          if (next < 0)
+            break;
+          path.push_back (colon_path.substr (last, next - last));
+          last = next + 1;
+        }
+      path.push_back (colon_path.substr (last));
     }
-  path.push_back (colon_path.substr (last));
+  else
+    {
+      const std::string daisy_home = Implementation::get_daisy_home ();
+      path.push_back (".");
+      path.push_back (daisy_home + "/lib");
+      path.push_back (daisy_home + "/sample");
+    }
   daisy_assert (path.size () > 0);
   Path::set_path (path);
 }
@@ -665,6 +694,12 @@ Toplevel::parse_file (const std::string& filename)
 { 
   copyright ();
   impl->files_found.push_back (filename);
+  parse_system_file (filename);
+}
+
+void
+Toplevel::parse_system_file (const std::string& filename)
+{ 
   Treelog::Open nest (msg (), "Parsing '"+ filename + "'");
   if (impl->state != is_uninitialized)
     {
@@ -692,6 +727,20 @@ Toplevel::load_run (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Toplevel");
   alist.add ("description", Toplevel::default_description);
 
+  syntax.add ("install_directory", Syntax::String, Syntax::Const,
+              "Directory where Daisy has been installed.\n\
+\n\
+This is used for looking up files that came with the installation, in\n\
+particular the parameter library.  By default, the value of the\n\
+DAISYHOME environment variable is used.  If DAISYHOME is not set, and\n\
+the program is running under MS Windows, the value of the \"Install\n\
+Directory\" registry key is used.  If that is not set either (or we\n\
+are not running MS Windows), a hardcoded value is used.  This is\n\
+\"C:/daisy\" under MS Windows, or \"/usr/local/daisy\" on other systems.\n\
+\n\
+The value found in the manual corresponds to the system where the\n\
+manual was generated.");
+  alist.add ("install_directory", Implementation::get_daisy_home ());
   syntax.add ("directory", Syntax::String, Syntax::OptionalConst,
               "Run program in this directory.\n\
 This can affect both where input files are found and where log files\n\
@@ -699,7 +748,21 @@ are generated.");
   syntax.add ("path", Syntax::String,
               Syntax::OptionalConst, Syntax::Sequence,
               "List of directories to search for input files in.\n\
-The special value \".\" means the current directory.");
+The special value \".\" means the current directory.\n\
+\n\
+By default, this variable will be initialised from the DAISYPATH\n\
+environment variable if it exists.  The value of the variable should\n\
+be a list of directories to search for input files in, seperated by\n\
+semicolon on MS Windows, or colon on other systems.  If the DAISYPATH\n\
+environment variable is not set, the path will be initialized to the\n\
+working directory followed by the standard parameter libraries.");
+
+  std::vector<symbol> default_path;
+  default_path.push_back (symbol ("."));
+  default_path.push_back (symbol ("${install_directory}/lib"));
+  default_path.push_back (symbol ("${install_directory}/sample"));
+  alist.add ("path", default_path);
+
   syntax.add_object ("input", Parser::component,
                      Syntax::OptionalConst, Syntax::Singleton,
                      "Command to add more information about the simulation.");

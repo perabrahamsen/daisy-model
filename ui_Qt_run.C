@@ -124,7 +124,7 @@ UIRun::attach (Toplevel& toplevel)
           && toplevel.state () == Toplevel::is_uninitialized)
         {
           has_loaded_log_file = true;
-          toplevel.parse_file ("ui-Qt.dai");
+          toplevel.parse_system_file ("ui-Qt.dai");
         }
     }
   catch (...)
