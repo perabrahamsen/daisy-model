@@ -43,12 +43,12 @@ components.tex:	$(DAISYEXE)
 exercises.ps:	exercises.dvi 
 	dvips -f exercises.dvi > exercises.ps
 
-exercises.dvi:	exercises.tex $(LIBS)
+exercises.dvi: reference.dvi tutorial.dvi exercises.tex $(LIBS)
 	latex exercises.tex < /dev/null
 	bibtex exercises
 	latex exercises.tex < /dev/null
 
-exercises.pdf:	exercises.tex $(LIBS)
+exercises.pdf:reference.pdf tutorial.pdf exercises.tex $(LIBS)
 	pdflatex exercises.tex < /dev/null
 	bibtex exercises
 	pdflatex exercises.tex < /dev/null
@@ -56,12 +56,12 @@ exercises.pdf:	exercises.tex $(LIBS)
 tutorial.ps:	tutorial.dvi
 	dvips -f tutorial.dvi > tutorial.ps
 
-tutorial.dvi:	tutorial.tex $(LIBS)
+tutorial.dvi:reference.dvi tutorial.tex $(LIBS)
 	latex tutorial.tex < /dev/null
 	bibtex tutorial
 	latex tutorial.tex < /dev/null
 
-tutorial.pdf:	tutorial.tex $(LIBS)
+tutorial.pdf:	reference.pdf tutorial.tex $(LIBS)
 	pdflatex tutorial.tex < /dev/null
 	bibtex tutorial
 	pdflatex tutorial.tex < /dev/null

@@ -29,7 +29,8 @@
   "The B.And farm, Andeby, 2002."
   (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
         (MaxRootingDepth 60.0 [cm]))
-  (OrganicMatter (init (input 1400 [kg C/ha/y])
+  (OrganicMatter original
+                 (init (input 1400 [kg C/ha/y])
                        (root 480 [kg C/ha/y])
                        (end -20 [cm])))
   ;; Measured numbers for groundwater table can be read from a file, like this:
@@ -71,7 +72,7 @@
         ("N Balance" (when monthly)
                      (from 0 [m]) (to -1 [m]))
         ("Crop Production"
-         (set "$crop" "Spring Barley")
+         (crop "Spring Barley")
          (where "sbarley.dlf"))
         (checkpoint (when (at 1987 8 7 6))))
 
