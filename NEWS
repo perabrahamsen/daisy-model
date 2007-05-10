@@ -12,6 +12,17 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.15
+
+** Better support for Drag & Drop
+
+When called from MS Windows with a single absolute file path as an
+argument, Daisy will change the currect directory to the directory
+where that file is located.  It provides a better default when using
+drag and drop.
+
+** Made default maximum crop uptake of nitrate faster.
+
 * 4.14
 
 ** Setup program now adds links to the tutorial and exercises to Start menu.

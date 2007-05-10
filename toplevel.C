@@ -604,6 +604,22 @@ Toplevel::command_line (int& argc, char**& argv)
     { msg.debug ("Command line: " + *this); }
   } command_line (argc, argv, msg ());
 
+  // If we use drag & drop, we want to cd to the directory containing the file
+#ifdef _WIN32
+  if (argc == 2 && strlen (argv[1]) > 1
+      && argv[1][0] != '-' && argv[1][1] == ':')
+    {
+      // Only one argument, a file name with an absolute path.
+      const std::string arg = argv[1];
+      int last = arg.rfind ("\\");
+      if (last == std::string::npos)
+        last == arg.find (":");
+      daisy_assert (last != std::string::npos);
+      const std::string dir = arg.substr (0, last);
+      Path::set_directory (dir);
+    }
+#endif // _WIN32
+
   if (Implementation::command_line_parsers)
     for (size_t i = 0; i < Implementation::command_line_parsers->size (); i++)
       Implementation::command_line_parsers->at (i)(argc, argv);
