@@ -1,28 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* setup.exe
-
-** Toplevel::load_run
-
-Ny attribut "installdir".
-
-Initialiseres fra enten registry eller DAISYHOME.
-
-"path" initialiseres fra enten DAISYPATH, eller til 
-  ("." "${installdir}/lib" "${installdir}/sample")
-
-** Måske skal "directory" initialiseres til $HOME/Daisy?
-
-Vi vil gerne have D&D til at gøre noget fornuftigt.
-
-** .nsi fil eller section til at konfigurere textpad?
-
-* ui
-
-Giv en UI specific usage besked hvis der kaldes uden argumenter
-
-* SourceForge?
-
 * Farquhar
 
 ** CO2_atm skal læses fra weather
@@ -87,6 +64,14 @@ For vert edge, hvad med hor edges?  Irrigation?
 3) Løs matrix
 
 4) Aftest mod 1D eller Grid
+
+* setup.exe
+
+** .nsi fil eller section til at konfigurere textpad?
+
+* ui
+
+Giv en UI specific usage besked hvis der kaldes uden argumenter
 
 * Artikler
 
