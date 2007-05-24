@@ -360,8 +360,9 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-LATER = msoltranrect_Mollerup.C
-MODELS = reaction_std.C chemistry_std.C groundwater_extern.C scope_exchange.C \
+LATER = 
+MODELS = msoltranrect_Mollerup.C \
+	reaction_std.C chemistry_std.C groundwater_extern.C scope_exchange.C \
 	msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
 	msoltranrect_2x1.C photo_FCC4.C ABAeffect_exp.C cropNdist_uniform.C \
 	uzrect_2x1.C select_flow.C volume_box.C \
