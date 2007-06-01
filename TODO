@@ -39,8 +39,6 @@ For vert edge, hvad med hor edges?  Irrigation?
 
 ** msoltranrect_Mollerup
 
-* TUT?
-
 * Brug Rect2x1 stoftransport komponent.
 
 ** Flyt surface/groundwater opdatering til MovementRect?
@@ -53,17 +51,7 @@ For vert edge, hvad med hor edges?  Irrigation?
 
 ** makroporer
 
-* Daisy 2D
-
-** C) Graph / Net
-
-1) Geometry -> Graph
-
-2) Graph til Matrix
-
-3) Løs matrix
-
-4) Aftest mod 1D eller Grid
+* TUT?
 
 * setup.exe
 
