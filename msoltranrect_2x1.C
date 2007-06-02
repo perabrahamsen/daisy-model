@@ -23,8 +23,7 @@
 #include "transport.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "solute.h"
-#include "element.h"
+#include "adsorption.h"
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -38,24 +37,17 @@ struct Msoltranrect2x1 : public Msoltranrect
   std::auto_ptr<Transport> reserve; // Reserve solute transport model in matr.
   std::auto_ptr<Transport> last_resort; // Last resort solute transport model.
   std::auto_ptr<Transport> transport_solid; // Pseudo transport for non-solutes
-  void solute (const GeometryRect&, const Soil&, const SoilWater&,
-               const double J_in, Solute&, double dt, Treelog& msg);
-  void element (const GeometryRect&, const Soil&, const SoilWater&,
-                Element&, Adsorption&,
-                const double diffusion_coefficient, double dt, Treelog&);
-  static void flow (const GeometryRect& geo, 
-                    const Soil& soil, 
-                    const SoilWater& soil_water, 
-                    const std::string& name,
-                    std::vector<double>& M, 
-                    std::vector<double>& C, 
-                    std::vector<double>& S, 
-                    std::vector<double>& /* S_p */, 
-                    std::vector<double>& J, 
-                    std::vector<double>& /* J_p */, 
-                    Adsorption& adsorption,
-                    double diffusion_coefficient, double dt,
-                    Treelog& msg);
+  void flow (const GeometryRect& geo, 
+             const Soil& soil, 
+             const SoilWater& soil_water, 
+             const std::string& name,
+             std::vector<double>& M, 
+             std::vector<double>& C, 
+             const std::vector<double>& S, 
+             std::vector<double>& J, 
+             Adsorption& adsorption,
+             double diffusion_coefficient, double dt,
+             Treelog& msg);
   void output (Log&) const;
 
   // Create.
@@ -65,61 +57,14 @@ struct Msoltranrect2x1 : public Msoltranrect
 };
 
 void
-Msoltranrect2x1::solute (const GeometryRect& geo,
-                         const Soil& soil, const SoilWater& soil_water,
-                         const double J_in, Solute& solute, const double dt,
-                         Treelog& msg)
-{ 
-  Treelog::Open nest (msg, "Msoltranrect: " + name);
-  const size_t edge_size = geo.edge_size ();
-  const size_t cell_size = geo.cell_size ();
-
-  solute.tick (cell_size, soil_water, dt);
-
-  // Upper border.
-  for (size_t e = 0; e < edge_size; e++)
-    {
-      if (geo.edge_to (e) != Geometry::cell_above)
-        continue;
-
-      solute.J_p[e] = 0.0;
-      solute.J[e] = J_in;
-    }
-
-  // Flow.
-  flow (geo, soil, soil_water, solute.submodel, 
-        solute.M_, solute.C_, 
-        solute.S_, solute.S_p_,
-        solute.J, solute.J_p, 
-        *solute.adsorption, solute.diffusion_coefficient (), 
-        dt, msg);
-}
-
-void 
-Msoltranrect2x1::element (const GeometryRect& geo, 
-                          const Soil& soil, const SoilWater& soil_water,
-                          Element& element, Adsorption& adsorption,
-                          const double diffusion_coefficient, 
-                          const double dt, Treelog& msg)
-{
-  element.tick (geo.cell_size (), soil_water, dt);
-  flow (geo, soil, soil_water, "DOM", 
-        element.M, element.C, element.S, element.S_p, 
-        element.J, element.J_p, 
-        adsorption, diffusion_coefficient, dt, msg);
-}
-
-void
 Msoltranrect2x1::flow (const GeometryRect& geo, 
                        const Soil& soil, 
                        const SoilWater& soil_water, 
                        const std::string& name,
                        std::vector<double>& M, 
                        std::vector<double>& C, 
-                       std::vector<double>& S, 
-                       std::vector<double>& /* S_p */, 
+                       const std::vector<double>& S, 
                        std::vector<double>& J, 
-                       std::vector<double>& /* J_p */, 
                        Adsorption& adsorption,
                        double /* diffusion_coefficient */,
                        const double dt,

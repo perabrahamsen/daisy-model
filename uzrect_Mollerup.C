@@ -264,11 +264,20 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 		{
 		  const int from = geo.edge_from (e);
 		  const int to = geo.edge_to (e);	   
-#if 0
-		  Kedge[e] = 2.0/(1.0/K[from] + 1.0/K[to]); 
-#else
-		  Kedge[e] = (K[from] + K[to]) / 2.0; 
-#endif
+
+                  // We have to use arithmetic average near the top of
+                  // the soil, otherwise we risk development an water
+                  // resistent crust to appear dut to soil
+                  // evaporation.  In Danish soil heterogeneity will
+                  // allow water to wet up the soil anyway.
+                  const bool top_edge 
+                    = geo.edge_center_z (edge) > edge_arithmetic_height;
+
+                  if (top_edge)
+                    Kedge[e] = (K[from] + K[to]) / 2.0; 
+                  else
+                    // Hormonic average is more correct.
+                    Kedge[e] = 2.0/(1.0/K[from] + 1.0/K[to]); 
 		} 
 	    }
 	  
@@ -881,6 +890,14 @@ UZRectMollerup::has_macropores (Block&, const bool)
 void 
 UZRectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  syntax.add ("edge_arithmetic_height", "cm", Syntax::Const, "\
+\\
+We have to use arithmetic average near the top of the soil, otherwise\n\
+we risk development an water resistent crust to appear dut to soil\n\
+evaporation.  In Danish soil heterogeneity will allow water to wet up\n\
+the soil anyway.");
+  alist.add ("edge_arithmetic_height", -15.0);
+
   syntax.add ("max_time_step_reductions",
               Syntax::Integer, Syntax::Const, "\
 Number of times we may reduce the time step before giving up");

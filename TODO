@@ -1,5 +1,29 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* R2D2
+
+** Find ud af hvorfor boost-sandbox ikke vil installeres
+
+** boost på dirac
+
+** inkluder uzrect_Mollerup
+
+** msoltranrect_Mollerup
+
+* Brug Rect2x1 stoftransport komponent.
+
+** Flyt surface/groundwater opdatering til MovementRect?
+
+* R2D2
+
+** stoftransport
+
+** varmetransport
+
+** makroporer
+
+* TUT?
+
 * Farquhar
 
 ** CO2_atm skal læses fra weather
@@ -24,34 +48,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 (location (x1 y1)); Point
 (location (x1 y1) (x2 y2)); Error
 (location (x1 y1) (x2 y2) (x3 y3) ...); Polygon
-
-* R2D2
-
-** Force artihmetic average near top
-
-For vert edge, hvad med hor edges?  Irrigation? 
-
-** Find ud af hvorfor boost-sandbox ikke vil installeres
-
-** boost på dirac
-
-** inkluder uzrect_Mollerup
-
-** msoltranrect_Mollerup
-
-* Brug Rect2x1 stoftransport komponent.
-
-** Flyt surface/groundwater opdatering til MovementRect?
-
-* R2D2
-
-** stoftransport
-
-** varmetransport
-
-** makroporer
-
-* TUT?
 
 * setup.exe
 

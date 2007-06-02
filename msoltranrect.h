@@ -50,12 +50,24 @@ public:
 
   // Simulation.
 public:
-  virtual void solute (const GeometryRect&, const Soil&, const SoilWater&, 
-                       const double J_in, Solute&, double dt, Treelog&) = 0;
-  virtual void element (const GeometryRect&, const Soil&, const SoilWater&, 
-                        Element&, Adsorption&,
-                        double diffusion_coefficient, double dt, Treelog&) = 0;
-
+  void solute (const GeometryRect&, const Soil&, const SoilWater&,
+               const double J_in, Solute&, double dt, Treelog& msg);
+  void element (const GeometryRect&, const Soil&, const SoilWater&,
+                Element&, Adsorption&,
+                const double diffusion_coefficient, double dt, Treelog&);
+private:
+  virtual void flow (const GeometryRect& geo, 
+                     const Soil& soil, 
+                     const SoilWater& soil_water, 
+                     const std::string& name,
+                     std::vector<double>& M, 
+                     std::vector<double>& C, 
+                     const std::vector<double>& S, 
+                     std::vector<double>& J, 
+                     Adsorption& adsorption,
+                     double diffusion_coefficient, double dt,
+                     Treelog& msg) = 0;
+public:
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

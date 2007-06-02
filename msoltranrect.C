@@ -20,10 +20,75 @@
 
 
 #include "msoltranrect.h"
+#include "solute.h"
+#include "element.h"
+#include "geometry_rect.h"
 #include "block.h"
 #include "librarian.h"
 
 const char *const Msoltranrect::component = "msoltranrect";
+
+void
+Msoltranrect::solute (const GeometryRect& geo,
+                      const Soil& soil, const SoilWater& soil_water,
+                      const double J_in, Solute& solute, const double dt,
+                      Treelog& msg)
+{ 
+  Treelog::Open nest (msg, "Msoltranrect: " + name);
+  const size_t edge_size = geo.edge_size ();
+  const size_t cell_size = geo.cell_size ();
+
+  solute.tick (cell_size, soil_water, dt);
+
+  std::vector<double> M (cell_size);
+  std::vector<double> C (cell_size);
+  std::vector<double> S (cell_size);
+  std::vector<double> J (edge_size);
+
+  // Initialize edges.
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      if (geo.edge_to (e) == Geometry::cell_above)
+        J[e] = J_in;
+      else
+        J[e] = 0.0;
+    }
+
+  // Initialize cells.
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      M[c] = solute.M (c);
+      C[c] = solute.C (c);
+      S[c] = solute.S (c);
+    }
+
+  // Flow.
+  flow (geo, soil, soil_water, solute.submodel, 
+        M, C, S, J, 
+        *solute.adsorption, solute.diffusion_coefficient (), 
+        dt, msg);
+
+  // Update edges.
+  for (size_t e = 0; e < edge_size; e++)
+    solute.set_matrix_flux (e, J[e]);
+
+  // Update cells.
+  for (size_t c = 0; c < cell_size; c++)
+    solute.set_content (c, M[c], C[c]);
+}
+
+void 
+Msoltranrect::element (const GeometryRect& geo, 
+                       const Soil& soil, const SoilWater& soil_water,
+                       Element& element, Adsorption& adsorption,
+                       const double diffusion_coefficient, 
+                       const double dt, Treelog& msg)
+{
+  element.tick (geo.cell_size (), soil_water, dt);
+  flow (geo, soil, soil_water, "DOM", 
+        element.M, element.C, element.S, element.J, 
+        adsorption, diffusion_coefficient, dt, msg);
+}
 
 Msoltranrect::Msoltranrect (Block& al)
   : name (al.identifier ("type"))

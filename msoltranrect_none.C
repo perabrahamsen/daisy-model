@@ -22,8 +22,7 @@
 #include "geometry_rect.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "solute.h"
-#include "element.h"
+#include "adsorption.h"
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -33,24 +32,17 @@
 struct MsoltranrectNone : public Msoltranrect
 {
   // Solute.
-  void solute (const GeometryRect&, const Soil&, const SoilWater&,
-               const double J_in, Solute&, double dt, Treelog& msg);
-  void element (const GeometryRect&, const Soil&, const SoilWater&,
-                Element&, Adsorption&,
-                const double diffusion_coefficient, double dt, Treelog&);
-  static void flow (const GeometryRect& geo, 
-                    const Soil& soil, 
-                    const SoilWater& soil_water, 
-                    const std::string& name,
-                    std::vector<double>& M, 
-                    std::vector<double>& C, 
-                    std::vector<double>& S, 
-                    std::vector<double>& /* S_p */, 
-                    std::vector<double>& J, 
-                    std::vector<double>& /* J_p */, 
-                    Adsorption& adsorption,
-                    double diffusion_coefficient, double dt,
-                    Treelog& msg);
+  void flow (const GeometryRect& geo, 
+             const Soil& soil, 
+             const SoilWater& soil_water, 
+             const std::string& name,
+             std::vector<double>& M, 
+             std::vector<double>& C, 
+             const std::vector<double>& S, 
+             std::vector<double>& J, 
+             Adsorption& adsorption,
+             double diffusion_coefficient, double dt,
+             Treelog& msg);
   void output (Log&) const;
 
   // Create.
@@ -60,89 +52,18 @@ struct MsoltranrectNone : public Msoltranrect
 };
 
 void
-MsoltranrectNone::solute (const GeometryRect& geo,
-                         const Soil& soil, const SoilWater& soil_water,
-                         const double J_in, Solute& solute, const double dt,
-                         Treelog& msg)
-{ 
-  Treelog::Open nest (msg, "Msoltranrect: " + name);
-  const size_t edge_size = geo.edge_size ();
-  const size_t cell_size = geo.cell_size ();
-
-  std::vector<double> M (cell_size);
-  std::vector<double> C (cell_size);
-  std::vector<double> S (cell_size);
-  std::vector<double> S_p (cell_size);
-  std::vector<double> J (edge_size, 0.0);
-  std::vector<double> J_p (edge_size, 0.0);
-  
-  solute.tick (cell_size, soil_water, dt);
-
-  // Initialize cells.
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      M[c] = solute.M (c);
-      C[c] = solute.C (c);
-      S[c] = solute.S (c);
-      S_p[c] = solute.S_p (c);
-    }
-
-  // Upper border.
-  for (size_t e = 0; e < edge_size; e++)
-    {
-      if (geo.edge_to (e) != Geometry::cell_above)
-        continue;
-
-      J_p[e] = 0.0;
-      J[e] = J_in;
-    }
-
-  // Flow.
-  flow (geo, soil, soil_water, solute.submodel, 
-        M, C, S, S_p, J, J_p, 
-        *solute.adsorption, solute.diffusion_coefficient (), 
-        dt, msg);
-
-  // Update solute.
-  for (size_t c = 0; c < cell_size; c++)
-    solute.set_content (c, M[c], C[c]);
-
-  for (size_t e = 0; e < edge_size; e++)
-    {
-      solute.set_matrix_flux (e, J[e]);
-      solute.set_macro_flux (e, J_p[e]);
-    }
-}
-
-void 
-MsoltranrectNone::element (const GeometryRect& geo, 
-                          const Soil& soil, const SoilWater& soil_water,
-                          Element& element, Adsorption& adsorption,
-                          const double diffusion_coefficient, 
-                          const double dt, Treelog& msg)
-{
-  element.tick (geo.cell_size (), soil_water, dt);
-  flow (geo, soil, soil_water, "DOM", 
-        element.M, element.C, element.S, element.S_p, 
-        element.J, element.J_p, 
-        adsorption, diffusion_coefficient, dt, msg);
-}
-
-void
 MsoltranrectNone::flow (const GeometryRect& geo, 
-                       const Soil& soil, 
-                       const SoilWater& soil_water, 
-                       const std::string& name,
-                       std::vector<double>& M, 
-                       std::vector<double>& C, 
-                       std::vector<double>& S, 
-                       std::vector<double>& /* S_p */, 
-                       std::vector<double>& J, 
-                       std::vector<double>& /* J_p */, 
-                       Adsorption& adsorption,
-                       double /* diffusion_coefficient */,
-                       const double dt,
-                       Treelog& msg)
+                        const Soil& soil, 
+                        const SoilWater& soil_water, 
+                        const std::string& name,
+                        std::vector<double>& M, 
+                        std::vector<double>& C, 
+                        const std::vector<double>& S, 
+                        std::vector<double>& J, 
+                        Adsorption& adsorption,
+                        double /* diffusion_coefficient */,
+                        const double dt,
+                        Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
 
