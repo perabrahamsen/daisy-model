@@ -51,6 +51,7 @@ struct UZRectMollerup : public UZRect
   enum top_state { top_undecided, top_flux, top_pressure };
 
   // Parameters.  
+  const double edge_arithmetic_height;
   const int max_time_step_reductions;
   const int time_step_reduction;
   const int max_iterations; 
@@ -271,7 +272,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                   // evaporation.  In Danish soil heterogeneity will
                   // allow water to wet up the soil anyway.
                   const bool top_edge 
-                    = geo.edge_center_z (edge) > edge_arithmetic_height;
+                    = geo.edge_center_z (e) > edge_arithmetic_height;
 
                   if (top_edge)
                     Kedge[e] = (K[from] + K[to]) / 2.0; 
@@ -891,7 +892,7 @@ void
 UZRectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add ("edge_arithmetic_height", "cm", Syntax::Const, "\
-\\
+\n\
 We have to use arithmetic average near the top of the soil, otherwise\n\
 we risk development an water resistent crust to appear dut to soil\n\
 evaporation.  In Danish soil heterogeneity will allow water to wet up\n\
@@ -934,6 +935,7 @@ Water mass balance error per cell.");
 
 UZRectMollerup::UZRectMollerup (Block& al)
   : UZRect (al),
+    edge_arithmetic_height (al.number ("edge_arithmetic_height")),
     max_time_step_reductions (al.integer ("max_time_step_reductions")),
     time_step_reduction (al.integer ("time_step_reduction")),
     max_iterations (al.integer ("max_iterations")),

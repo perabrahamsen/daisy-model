@@ -44,8 +44,6 @@ public:
   const std::string submodel;	// Derived submodel.
 
   friend class Movement1D;
-  friend class MovementRect;
-  friend class Msoltranrect2x1;
 
   // State variables.
 protected:
