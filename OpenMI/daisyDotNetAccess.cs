@@ -18,7 +18,7 @@ namespace dk.ku.life.Daisy
         {
             return daisy.ScopeSize();
         }
-        public Scope GetScope(uint index)
+        public Scope GetScope(int index)
         {
             return daisy.GetScope(index);
         }

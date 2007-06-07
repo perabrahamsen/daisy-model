@@ -9,7 +9,7 @@ namespace dk.ku.life.Daisy
         //daisy
 
         [DllImport("daisy")]
-        public static extern IntPtr daisy_daisy_create_with_log(string logname);     /* Create a toplevel with a log file. */
+        public static extern IntPtr daisy_daisy_create();     /* Create a toplevel. */
 
         [DllImport("daisy")]
         public static extern void daisy_daisy_initialize(IntPtr daisy);
@@ -45,7 +45,7 @@ namespace dk.ku.life.Daisy
         public static extern uint daisy_daisy_scope_extern_size(IntPtr daisy); /* Return number of extern scopes */
 
         [DllImport("daisy")]
-        public static extern IntPtr daisy_daisy_scope_extern_get(IntPtr daisy, uint index); /* Return extern scope INDEX. */
+        public static extern IntPtr daisy_daisy_scope_extern_get(IntPtr daisy, int index); /* Return extern scope INDEX. */
         
         //time
         [DllImport("daisy")]
@@ -186,7 +186,7 @@ namespace dk.ku.life.Daisy
         }
         public Daisy()
         {
-            daisy = DLL.daisy_daisy_create_with_log("daisy.log");
+            daisy = DLL.daisy_daisy_create();
             if (daisy == (IntPtr)0)
                 throw new ApplicationException("Could not create daisy");
         }
@@ -218,7 +218,7 @@ namespace dk.ku.life.Daisy
             return DLL.daisy_daisy_scope_extern_size(daisy);
         }
 
-        public Scope GetScope(uint index)
+        public Scope GetScope(int index)
         {
             Debug.Assert(index < ScopeSize());
             return new Scope(DLL.daisy_daisy_scope_extern_get(daisy, index));

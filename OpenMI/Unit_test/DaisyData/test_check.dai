@@ -37,8 +37,7 @@
   ;; (Groundwater file "example.gwt")
   ;; But here we assume free drainage.
   (Groundwater deep)
-  (Bioclimate default 
-	(r_ae 53))
+  (Bioclimate default) 
 )
 
 ;; Use it.
@@ -71,22 +70,27 @@
 
 (deflog check extern
   (parameter_names column)
+  (declare x Number "x-coordinate of column")
+  (declare y Number "y-coordinate of column")
+  (numbers ((name x) (value $x))
+           ((name y) (value $y)))
+  (x 0) (y 0)
   (declare column String
 	   "Name of column to log.  Use \"*\" to log all columns.")
   (when (hourly))                      ;When the stress is highest.
   (entries ;; Year Month MDay
-  	   (interval (path column "${column}" SoilWater Theta)
+           (interval (path column "${column}" SoilWater Theta)
                      (spec fixed SoilWater Theta)
                      (tag "Water")
                      (dimension "mm"))
            (number (path column "${column}" Vegetation crops crops "*" Devel "*" DS)
-           	   (spec phenology default DS))
+           	      (spec phenology default DS))
            (number (path column "${column}" Vegetation crops crops "*" Devel "*" day_length)
                    (spec phenology default day_length)
                    (dimension "h"))
            (number (path column "${column}" Vegetation crops crops "*" Canopy Height)
-		   (tag "height")
-		   (spec fixed CanopyStandard Height)
+	      (tag "height")
+	      (spec fixed CanopyStandard Height)
                    (dimension "cm"))
            (number (path column "${column}" Vegetation crops crops "*" Canopy CAI)
                    (tag "Crop AI")
@@ -94,10 +98,10 @@
 ))
 
 (deflog Andeby check
-  (column "Andeby"))
+  (column "Andeby") (x -16) (y 4200.8))
 
 (deflog Gaaseroed check
-  (column "Gaaseroed"))
+  (column "Gaaseroed") (x -10) (y 4300.8))
 
 
 ;; Create these log files.
@@ -115,11 +119,15 @@
    (declare column String
  	   "Name of column to log.  Use \"*\" to exchange for all columns.")
    (column "*")
-   (entries (name (name column) (value "${column}"))))
+   (declare x Number "x-coordinate of column")
+   (declare y Number "y-coordinate of column")
+   (entries (name (name column) (value "${column}"))
+            (number (name x) (value $x) (dimension []))
+            (number (name y) (value $y) (dimension []))))
  
 (defscope MyExchange column
    "My own exchange items."
-   (column Andeby)
+   (column Andeby) (x -16) (y 4200.8)
    (entries &old
             (number (name "GroundWaterTable")
                     (dimension [cm])

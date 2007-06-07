@@ -16,7 +16,7 @@ namespace Unit_test
             daisy.Initialize(); 
             daisy.Start();
             daisy.TickTime();
-            Assert.Greater(daisy.ScopeSize(), 2);
+            Assert.Greater(daisy.ScopeSize(), 3);
             Scope scope = daisy.GetScope(0);
             return scope;
         }
@@ -26,23 +26,25 @@ namespace Unit_test
             Scope scope = GetInitScope();
             string name = "GroundWaterTable";
             Assert.AreEqual(true, scope.IsNumber(name));
-            if (scope.Writeable())
-                scope.SetNumber(name, 10.10);
+            Assert.AreEqual(true, scope.Writeable());
+            scope.SetNumber(name, 10.10);
             Assert.AreEqual(true, scope.HasNumber(name));
-            Assert.AreEqual(false, scope.HasNumber("xx"));
+            Assert.AreEqual(true, scope.HasNumber("x"));
         }
         [Test]
         public void NumberSize()
         {
             Scope scope = GetInitScope();
-            Assert.AreEqual(1, scope.NumberSize());
+            Assert.AreEqual(3, scope.NumberSize());
         }
         [Test]
         public void NumberName()
         {
             Scope scope = GetInitScope();
-            Assert.Greater(scope.NumberSize(), 0);
-            Assert.AreEqual("GroundWaterTable", scope.NumberName(0));
+            Assert.Greater(scope.NumberSize(), 2);
+            Assert.AreEqual("x", scope.NumberName(0));
+            Assert.AreEqual("y", scope.NumberName(1));
+            Assert.AreEqual("GroundWaterTable", scope.NumberName(2));
         }
         [Test]
         public void Number()

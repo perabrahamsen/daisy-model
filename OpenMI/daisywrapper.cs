@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using org.OpenMI.Standard;
 using org.OpenMI.Backbone;
+using org.OpenMI.Utilities.Wrapper;
 
 namespace dk.ku.life.Daisy.OpenMI
 {
@@ -16,7 +17,6 @@ public class DaisyWrapper : org.OpenMI.Utilities.Wrapper.IEngine
     ArrayList _outputExchangeItems;
     string FilePath;
     string ModelDescription;
-    ElementSet elementset;
 
     struct DimTab
     {
@@ -102,18 +102,34 @@ public class DaisyWrapper : org.OpenMI.Utilities.Wrapper.IEngine
         _daisyEngine.Initialize((string)properties["FilePath"]);
         ModelDescription = ((string)_daisyEngine.GetDescription());
 
-        for (uint i = 0; i < _daisyEngine.ScopeSize(); i++)
+        for (int i = 0; i < _daisyEngine.ScopeSize(); i++)
         {
             Scope scope = _daisyEngine.GetScope(i);
 
             if (!scope.HasString("column"))
                 continue;
+
             string columnID = scope.String("column");
             string columnDescription = scope.Description("column");
-            elementset = new ElementSet(columnDescription, columnID, ElementType.IDBased, new SpatialReference(""));
-            Element element = new Element(columnID);
-            elementset.AddElement(element);
 
+            ElementSet point;
+
+            if (scope.HasNumber("x") && scope.HasNumber("y"))
+            {
+                double x = scope.Number("x");
+                double y = scope.Number("y");
+                double z = 0;
+                point = new ElementSet(columnDescription, columnID, ElementType.XYPoint, new SpatialReference(""));
+                Element element = new Element(columnID);
+                element.AddVertex(new Vertex(x, y, z));
+                point.AddElement(element);
+            }
+            else
+            {
+                point = new ElementSet(columnDescription, columnID, ElementType.IDBased, new SpatialReference(""));
+                Element element = new Element(columnID);
+                point.AddElement(element);
+            }
             for (uint j = 0; j < scope.NumberSize(); j++)
             {
                 string name = scope.NumberName(j);
@@ -125,14 +141,14 @@ public class DaisyWrapper : org.OpenMI.Utilities.Wrapper.IEngine
                 {
                     InputExchangeItem input = new InputExchangeItem();
                     input.Quantity = quantity;
-                    input.ElementSet = elementset;
+                    input.ElementSet = point;
                     _inputExchangeItems.Add(input);
                 }
                 else
                 {
                     OutputExchangeItem output = new OutputExchangeItem();
                     output.Quantity = quantity;
-                    output.ElementSet = elementset;
+                    output.ElementSet = point;
                     _outputExchangeItems.Add(output);
                 }
             }
@@ -194,7 +210,7 @@ public string GetModelID()
         double[] returnValues = new double[1];
         bool found = false;
         
-        for (uint i = 0; i < _daisyEngine.ScopeSize(); i++)
+        for (int i = 0; i < _daisyEngine.ScopeSize(); i++)
         {
             Scope scope = _daisyEngine.GetScope(i);
 
@@ -255,7 +271,7 @@ public string GetModelID()
     {
         bool found = false;
 
-        for (uint i = 0; i < _daisyEngine.ScopeSize(); i++)
+        for (int i = 0; i < _daisyEngine.ScopeSize(); i++)
         {
             Scope scope = _daisyEngine.GetScope(i);
 

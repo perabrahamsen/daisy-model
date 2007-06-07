@@ -4,6 +4,8 @@
 ;; Location of input files:
 (path "." "C:/Programmer/Daisy/daisy-src/lib/" )
 
+(input file "log.dai")
+
 
 ;; Weather data - no weather.
 (weather none)
@@ -24,10 +26,10 @@
   "The B.And farm, Andeby, 2002."
   (Soil (horizons (-2.50 [m] Ap))
     	(MaxRootingDepth 60.0 [cm]))
-  (Groundwater deep)
+  ;;(Groundwater deep)
   ;; Daisy does not use groundwater table from OpenMI unless you choose the model below,
   ;; which may not work fully yet.
-  ;;(Groundwater extern (scope name "Groundwater_table") (table "GroundWaterTable")) 
+  (Groundwater extern (scope name "Groundwater_table") (table "GroundWaterTable")) 
   (Bioclimate default))
 
 ;; Use it.
@@ -51,17 +53,18 @@
   (when (hourly)))
 
 (deflog Matrix_percolation OpenMI_output
-  (numbers ((name "Matrix percolation") (value 0.0)))
+  (numbers &old ((name "Matrix percolation") (value 0.0)))
   (entries (flux_bottom (tag "Matrix percolation")
-	  	    	(description "This is the amount of water leaving Daisy through the soil bottom.")
-	                (path column "${column}" SoilWater q)
-	                (spec fixed SoilWater q)
-	                (negate true)) ; positive flux downwards
+	           (description "This is the amount of water leaving Daisy through the soil bottom.")
+	           (path column "${column}" SoilWater q)
+	           (spec fixed SoilWater q)
+	           (negate true)) ; positive flux downwards
 ))
 
-
 ;; Export these items through OpenMI.
-(output (Matrix_percolation (column Andeby) (x -16) (y 4200.8)))
+(output (Matrix_percolation (column Andeby) (x -16) (y 4200.8))
+        ("Soil Water Potential" (column Andeby)))
+
         
 
 ;; Input exchange items
@@ -69,7 +72,11 @@
    "An exchange table for a specific column."
    (declare column String "Name of column to log input.")
    (column "*")
-   (entries (name (name column) (value "${column}"))))
+   (declare x Number "x-coordinate of column")
+   (declare y Number "y-coordinate of column")
+   (entries (name (name column) (value "${column}"))
+            (number (name x) (value $x) (dimension []))
+            (number (name y) (value $y) (dimension []))))
  
 (defscope Groundwater_table OpenMI_input
    (entries &old
@@ -78,7 +85,7 @@
                     (description "Ground water table. Value zero corresponds to soil surface, negative values are below surface."))))
  
 ;; Import these items through OpenMI.
-(exchange (Groundwater_table (column Andeby)))
+(exchange (Groundwater_table (column Andeby) (x -16) (y 4200.8)))
 
 
 ;;; testOpenMI_simple.dai ends here.
