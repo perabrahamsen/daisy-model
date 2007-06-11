@@ -361,7 +361,7 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = msoltranrect_Mollerup.C \
+MODELS = photo_FCC3.C photo_FCC4.C msoltranrect_Mollerup.C \
 	reaction_std.C chemistry_std.C groundwater_extern.C scope_exchange.C \
 	msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
 	msoltranrect_2x1.C photo_FCC4.C ABAeffect_exp.C cropNdist_uniform.C \
@@ -376,7 +376,7 @@ MODELS = msoltranrect_Mollerup.C \
 	xysource_merge.C xysource_inline.C xysource_loop.C \
 	xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
 	gnuplot_time.C source_combine.C number_arit.C source_expr.C \
-	source_std.C action_markvand.C photo_Farquhar.C photo_GL.C \
+	source_std.C action_markvand.C  photo_GL.C \
 	program_gnuplot.C \
 	program_document.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
@@ -447,7 +447,7 @@ SUBMODELS = toplevel.C timestep.C geometry_rect.C element.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
+SPECIALS = photo_Farquhar.C scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 	geometry.C printer_file.C log_alist.C
