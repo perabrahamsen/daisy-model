@@ -117,7 +117,7 @@ struct UZRectMollerup : public UZRect
 		     const ublas::vector<double>& h,
 		     ublas::matrix<double>& A,
 		     ublas::vector<double>& b, 
-		     const int debug);
+		     const int debug, Treelog& msg);
   static void diffusion (const GeometryRect& geo,
 			 const ublas::vector<double>& Kedge,
 			 ublas::matrix<double>& diff);
@@ -332,7 +332,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
 
 	  // Force active drains to zero h.
-	  drain (geo, drain_cell, h, A, b, debug);
+	  drain (geo, drain_cell, h, A, b, debug, msg);
 
 	  // Solve Ax=b (maybe)
 	  ublas::permutation_matrix<double> piv (cell_size);
@@ -749,7 +749,7 @@ UZRectMollerup::drain (const GeometryRect& geo,
 		       const ublas::vector<double>& h,
 		       ublas::matrix<double>& A,
 		       ublas::vector<double>& b,
-		       const int debug)
+		       const int debug, Treelog& msg)
 {
   const size_t drain_size  = drain_cell.size (); // // number of drains   
     
@@ -802,7 +802,8 @@ UZRectMollerup::drain (const GeometryRect& geo,
 		      ? approximate (A (cell, other), 1.0)
 		      : iszero (A (cell, other)));
     }
-  Assertion::message (tmp.str ());
+  if (tmp.str ().size () > 0)
+    msg.message (tmp.str ());
 }
 
 
