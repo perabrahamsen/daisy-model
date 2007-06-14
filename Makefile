@@ -362,7 +362,7 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = photo_FCC3.C photo_FCC4.C msoltranrect_Mollerup.C \
+MODELS = uzrect_const.C photo_FCC3.C photo_FCC4.C msoltranrect_Mollerup.C \
 	reaction_std.C chemistry_std.C groundwater_extern.C scope_exchange.C \
 	msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
 	msoltranrect_2x1.C photo_FCC4.C ABAeffect_exp.C cropNdist_uniform.C \
