@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "tortuosity.h"
 #include "block.h"
 #include "librarian.h"

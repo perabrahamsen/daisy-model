@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "geometry_vert.h"
 #include "block.h"
 #include <sstream>

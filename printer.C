@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "printer.h"
 #include "alist.h"
 #include "block.h"

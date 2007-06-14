@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "horheat.h"
 #include "texture.h"
 #include "hydraulic.h"

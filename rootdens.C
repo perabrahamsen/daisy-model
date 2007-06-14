@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "rootdens.h"
 #include "block.h"
 #include "syntax.h"

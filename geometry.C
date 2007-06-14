@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "geometry.h"
 #include "volume.h"
 #include "alist.h"

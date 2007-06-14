@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "om.h"
 #include "som.h"
 #include "smb.h"

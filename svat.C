@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "svat.h"
 #include "log.h"
 #include "block.h"

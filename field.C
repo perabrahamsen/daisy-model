@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "field.h"
 #include "column.h"
 #include "log.h"

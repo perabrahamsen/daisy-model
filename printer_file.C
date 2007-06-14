@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "printer_file.h"
 #include "metalib.h"
 #include "library.h"

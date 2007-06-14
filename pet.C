@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "pet.h"
 #include "syntax.h"
 #include "block.h"

@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "litter.h"
 #include "submodel.h"
 #include "syntax.h"

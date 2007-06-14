@@ -20,6 +20,8 @@
 //
 // Interface to generic boolean library.
 
+#define BUILD_DLL
+
 #include "condition.h"
 #include "daisy.h"
 #include "block.h"

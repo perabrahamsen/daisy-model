@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "ridge.h"
 #include "soil.h"
 #include "geometry1d.h"

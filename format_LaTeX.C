@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "format_LaTeX.h"
 #include "syntax.h"
 #include "alist.h"

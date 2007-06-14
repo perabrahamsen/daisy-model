@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "scope_id.h"
 #include "block.h"
 #include "alist.h"

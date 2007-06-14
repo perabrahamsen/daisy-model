@@ -494,12 +494,14 @@ GUISOURCES = $(Q4SOURCES)
 GUIOBJECTS = $(Q4OBJECTS)
 GUILIB = $(Q4LIB)
 GUIINCLUDE = $(Q4INCLUDE)
+GUIDLL = daisy_Qt.dll
 MOC = $(Q4MOC)
 else
 GUISOURCES =
 GUIOBJECTS = 
 GUILIB = 
 GUIINCLUDE = 
+GUIDLL =
 endif
 
 ALLGUISRC = tkmain.C gmain.C $(QTSOURCES) $(Q4SOURCES)
@@ -561,7 +563,7 @@ daisy_Qt.dll: $(Q4OBJECTS) daisy.dll
 
 # Create the main executable.
 #
-daisy.exe:	main${OBJ} daisy_Qt.dll daisy.dll
+daisy.exe:	main${OBJ} $(GUIDLL) daisy.dll
 	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB) -mwindows
 
 daisy:	main${OBJ} $(GUIOBJECTS) $(LIBOBJ)

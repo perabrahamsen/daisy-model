@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "canopy_simple.h"
 #include "submodel.h"
 #include "log.h"

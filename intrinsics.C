@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "intrinsics.h"
 #include "assertion.h"
 #include "library.h"

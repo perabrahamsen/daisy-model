@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "raddist.h"
 #include "block.h"
 #include "mathlib.h"

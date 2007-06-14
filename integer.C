@@ -20,8 +20,6 @@
 
 #define BUILD_DLL
 
-#define BUILD_DLL
-
 #include "integer.h"
 #include "boolean.h"
 #include "submodeler.h"

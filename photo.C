@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "photo.h"
 #include "block.h"
 #include "librarian.h"

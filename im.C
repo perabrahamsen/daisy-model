@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "im.h"
 #include "am.h"
 #include "log.h"

@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "soil_heat.h"
 #include "block.h"
 #include "alist.h"

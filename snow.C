@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "snow.h"
 #include "alist.h"
 #include "syntax.h"

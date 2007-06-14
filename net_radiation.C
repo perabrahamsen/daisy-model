@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "net_radiation.h"
 #include "log.h"
 #include "weather.h"

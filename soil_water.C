@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "soil_water.h"
 #include "geometry.h"
 #include "soil.h"

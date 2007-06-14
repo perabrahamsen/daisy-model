@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "bioclimate.h"
 #include "weather.h"
 #include "block.h"

@@ -22,6 +22,8 @@
 // Modified Campbell retention curve model with Burdine theory.
 // Parameters specified by Cosby et al.
 
+#define BUILD_DLL
+
 #include "hydraulic.h"
 #include "syntax.h"
 #include "alist.h"

@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "smb.h"
 #include "dom.h"
 #include "submodel.h"

@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "root_system.h"
 #include "rootdens.h"
 #include "submodel.h"

@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "source_file.h"
 #include "alist.h"
 #include "gnuplot_utils.h"

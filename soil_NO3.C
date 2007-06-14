@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "soil_NO3.h"
 #include "soil.h"
 #include "submodel.h"

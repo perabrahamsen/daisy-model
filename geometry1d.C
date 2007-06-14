@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "geometry1d.h"
 #include "volume.h"
 #include "block.h"

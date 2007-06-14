@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "vegetation.h"
 #include "log.h"
 #include "syntax.h"

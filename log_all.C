@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "log_all.h"
 #include "select.h"
 #include "block.h"

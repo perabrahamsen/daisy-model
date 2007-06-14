@@ -18,9 +18,10 @@
 // You should have received a copy of the GNU Lesser Public License
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
 //
 // van Genuchten retention curve model with Mualem theory.
+
+#define BUILD_DLL
 
 #include "hydraulic.h"
 #include "block.h"

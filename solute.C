@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "solute.h"
 #include "log.h"
 #include "block.h"

@@ -22,6 +22,8 @@
 // van Genuchten retention curve model with Mualem theory.
 // Parameters specified by the HYPRES transfer function.
 
+#define BUILD_DLL
+
 #include "hydraulic.h"
 #include "block.h"
 #include "alist.h"

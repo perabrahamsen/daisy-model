@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "horizon.h"
 #include "library.h"
 #include "block.h"

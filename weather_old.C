@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "weather_old.h"
 #include "block.h"
 #include "alist.h"

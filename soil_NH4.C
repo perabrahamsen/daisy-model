@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "soil_NH4.h"
 #include "soil.h"
 #include "soil_water.h"

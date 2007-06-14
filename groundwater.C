@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "groundwater.h"
 #include "geometry.h"
 #include "log.h"

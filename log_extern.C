@@ -22,7 +22,6 @@
 
 #define BUILD_DLL
 
-
 #include "log_extern.h"
 #include "select.h"
 #include "scope_block.h"

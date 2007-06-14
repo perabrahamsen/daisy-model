@@ -18,10 +18,11 @@
 // You should have received a copy of the GNU Lesser Public License
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
 //
 // Brooks and Corey retention curve model with Mualem theory.
 // Bimodal hydraulic conductivity curve.
+
+#define BUILD_DLL
 
 #include "hydraulic.h"
 #include "block.h"

@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "number.h"
 #include "block.h"
 #include "librarian.h"

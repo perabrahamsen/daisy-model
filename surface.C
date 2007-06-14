@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "surface.h"
 #include "syntax.h"
 #include "alist.h"

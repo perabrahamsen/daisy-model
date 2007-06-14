@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "clayom.h"
 #include "block.h"
 #include "librarian.h"

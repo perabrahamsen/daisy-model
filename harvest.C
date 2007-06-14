@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "harvest.h"
 #include "syntax.h"
 #include "log.h"

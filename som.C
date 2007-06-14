@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "som.h"
 #include "submodel.h"
 #include "alist.h"

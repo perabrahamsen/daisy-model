@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "movement.h"
 #include "block.h"
 #include "librarian.h"

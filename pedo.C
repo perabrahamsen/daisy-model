@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "pedo.h"
 #include "soil.h"
 #include "units.h"

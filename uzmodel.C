@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "uzmodel.h"
 #include "block.h"
 #include "librarian.h"

@@ -24,6 +24,9 @@
 // important for sensitivity studies: Do not alter !
 
 // description of functions
+
+#define BUILD_DLL
+
 # include "svat.h"
 #include "mathlib.h"
 #include "block.h"

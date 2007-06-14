@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "average.h"
 #include "block.h"
 #include "alist.h"

@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "format.h"
 #include "assertion.h"
 #include "block.h"

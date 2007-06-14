@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "action.h"
 #include "block.h"
 #include "librarian.h"

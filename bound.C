@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "bound.h"
 #include "block.h"
 #include "alist.h"

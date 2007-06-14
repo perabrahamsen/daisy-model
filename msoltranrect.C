@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "msoltranrect.h"
 #include "solute.h"
 #include "element.h"
