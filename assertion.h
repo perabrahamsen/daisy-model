@@ -29,6 +29,14 @@
 
 class Treelog;
 
+#ifdef BUILD_DLL
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
 #ifdef __GNUC__
 #define NORETURN __attribute__ ((noreturn))
 #elif defined (_MSC_VER)
@@ -44,7 +52,7 @@ namespace Assertion
   void error (const std::string&);
   void debug (const std::string&);
   NORETURN void failure (const char* file, int line, const char* fun,
-		         const char* test);
+		         const char* test) EXPORT;
   void bug (const char* file, int line, const char* fun, 
 	    const std::string& msg);
   void warning (const char* file, int line, const char* fun, 

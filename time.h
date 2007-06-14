@@ -26,11 +26,19 @@
 #include <string>
 #include <memory>
 
+#ifdef BUILD_DLL
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
 class AttributeList;
 class Syntax;
 class Log;
 
-class Time
+class EXPORT Time
 {
   // Content.
 private:

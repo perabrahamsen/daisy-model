@@ -19,7 +19,6 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #ifndef ALIST_H
 #define ALIST_H
 
@@ -34,7 +33,15 @@ class AttributeList;
 class Syntax;
 class Metalib;
 
-class AttributeList
+#ifdef BUILD_DLL
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
+class EXPORT AttributeList
 {
   // Content.
   struct Implementation;

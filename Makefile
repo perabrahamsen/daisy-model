@@ -203,18 +203,19 @@ ifeq ($(COMPILER),gcc)
 #		          -I/home/mingw/include -L/home/mingw/lib
 		DEBUG = -g
 	endif
-	WARNING = -Wextra -Wall -Wno-uninitialized \
+	WARNING = -Wall -Wno-uninitialized \
 		  -Wconversion -Woverloaded-virtual \
 		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings \
                   -Wno-sign-compare  -Wundef -Wendif-labels \
 		  -Wcast-qual -Wcast-align -Wmissing-format-attribute \
-		  -Wold-style-cast
+		  -Wold-style-cast 
 # -Wfloat-equal
 #  : triggered by header files for 2.95/woody
 #  -Wmissing-noreturn: triggered by some virtual functions.
 #  -Wmissing-prototypes -Wstrict-prototypes: Not C++ flags.
 #  -Wuninitialized: triggered in 3.4 in initializations!
 #  -Wunreachable-code: triggered by header files
+#  -Wextra: Triggers dllexport/inline: -Wno-attributes is not in GCC 3
 	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 	CPPLIB = -lstdc++
@@ -551,12 +552,16 @@ all:	#(EXECUTABLES)
 
 # Create a DLL.
 #
-daisy.dll: $(LIBOBJ) $(GUIOBJECTS) 
+daisy.dll: $(LIBOBJ) 
 	$(CC) -shared -o $@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
+
+daisy_Qt.dll: $(Q4OBJECTS) daisy.dll
+	$(CC) -shared -o $@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy_Qt.a 
+
 
 # Create the main executable.
 #
-daisy.exe:	main${OBJ} daisy.dll
+daisy.exe:	main${OBJ} daisy_Qt.dll daisy.dll
 	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB) -mwindows
 
 daisy:	main${OBJ} $(GUIOBJECTS) $(LIBOBJ)

@@ -18,6 +18,7 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#define BUILD_DLL
 
 #include "symbol.h"
 #include "assertion.h"
@@ -25,26 +26,24 @@
 #include <map>
 #include <iostream>
 
-using namespace std;
-
 struct symbol::DB
 {
   static symbol::DB* data;
   static const int fast_ints;
 
-  typedef map<string, int> name_map_t;
-  typedef map<int, int> int_map_t;
-  typedef map<int, string> reverse_map_t;
+  typedef std::map<std::string, int> name_map_t;
+  typedef std::map<int, int> int_map_t;
+  typedef std::map<int, std::string> reverse_map_t;
   name_map_t name_map;
   int_map_t int_map;
   reverse_map_t reverse_map;
   int counter;
 
-  int name2id (const string& name);
+  int name2id (const std::string& name);
   int name2id (const char *const s)
-  { return name2id (string (s)); }
+  { return name2id (std::string (s)); }
   int int2id (const int i);
-  const string& id2name (const int id)
+  const std::string& id2name (const int id)
   { 
     daisy_assert (reverse_map.find (id) != reverse_map.end ());
     return reverse_map[id]; 
@@ -64,7 +63,7 @@ symbol::DB::DB ()
     {
       std::ostringstream tmp;
       tmp << i;
-      const string name (tmp.str ());
+      const std::string name (tmp.str ());
       name_map[name] = i;
       reverse_map[i] = name;
       int_map[i] = i;
@@ -78,7 +77,7 @@ symbol::DB* symbol::data = NULL;
 const int symbol::DB::fast_ints = 100;
 
 int 
-symbol::DB::name2id (const string& name)
+symbol::DB::name2id (const std::string& name)
 {
   name_map_t::const_iterator i = name_map.find (name);
   if (i == name_map.end ())
@@ -107,7 +106,7 @@ symbol::DB::int2id (const int value)
     {
       std::ostringstream tmp;
       tmp << value;
-      const string name (tmp.str ());
+      const std::string name (tmp.str ());
       daisy_assert (name_map.find (name) == name_map.end ());
       name_map[name] = counter;
       daisy_assert (reverse_map.find (counter) == reverse_map.end ());
@@ -121,7 +120,7 @@ symbol::DB::int2id (const int value)
   return (*i).second;
 }
 
-const string&
+const std::string&
 symbol::name () const
 { return data->id2name (id); }
 
@@ -129,7 +128,7 @@ bool
 symbol::alphabetical (symbol a, symbol b)
 { return a.name () < b.name (); }
 
-symbol::symbol (const string& name)
+symbol::symbol (const std::string& name)
   : id (data->name2id (name))
 { }
 
@@ -170,15 +169,15 @@ std::string operator+ (const symbol sym, const char *const str)
 std::string operator+ (const char *const str, const symbol sym)
 { return str + sym.name (); }
 
-std::string operator+ (const symbol sym, const string& str)
+std::string operator+ (const symbol sym, const std::string& str)
 { return sym.name () + str; }
 
-std::string operator+ (const string& str, const symbol sym)
+std::string operator+ (const std::string& str, const symbol sym)
 { return str + sym.name (); }
 
 std::string operator+ (const symbol s1, const symbol s2)
 { return s1.name () + s2.name (); }
 
 std::ostream& 
-operator<< (ostream& out, const symbol sym)
+operator<< (std::ostream& out, const symbol sym)
 { out << sym.name (); return out; }

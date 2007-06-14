@@ -29,6 +29,14 @@
 #include "symbol.h"
 #include <iosfwd>
 #include <memory>
+#ifdef BUILD_DLL
+
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
 
 class Daisy;
 class PLF;
@@ -39,7 +47,9 @@ class Metalib;
 class Treelog;
 class Block;
 
-class Log : public Model
+using namespace std;
+
+class EXPORT Log : public Model
 {
   // Content.
 private:

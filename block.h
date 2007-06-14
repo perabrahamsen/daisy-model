@@ -30,7 +30,15 @@
 class Treelog;
 class Metalib;
 
-class Block
+#ifdef BUILD_DLL
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
+class EXPORT Block
 {
   struct Implementation;
   std::auto_ptr<Implementation> impl;

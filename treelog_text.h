@@ -25,7 +25,15 @@
 #include "treelog.h"
 #include <memory>
 
-class TreelogText : public Treelog
+#ifdef BUILD_DLL
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
+class EXPORT TreelogText : public Treelog
 {
   // Content.
 private:

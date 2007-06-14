@@ -20,6 +20,8 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#define BUILD_DLL
+
 
 #include "log_extern.h"
 #include "select.h"
@@ -43,6 +45,11 @@ LogExtern::done (const Time& time, const double dt)
       entries[i]->done (dt);
     }
 }
+
+bool 
+LogExtern::initial_match (const Daisy&, Treelog&)
+  // No initial line.
+{ return false; }
 
 void 
 LogExtern::output (Log& log) const

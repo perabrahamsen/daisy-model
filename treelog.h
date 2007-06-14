@@ -26,7 +26,15 @@
 #include "symbol.h"
 #include <string>
 
-class Treelog
+#ifdef BUILD_DLL
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
+class EXPORT Treelog
 {
   // Nesting.
 public:

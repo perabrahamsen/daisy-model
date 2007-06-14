@@ -34,7 +34,15 @@ class Metalib;
 class Check;
 class VCheck;
 
-class Syntax
+#ifdef BUILD_DLL
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
+class EXPORT Syntax
 { 
   struct Implementation;
   friend struct Implementation;

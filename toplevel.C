@@ -20,6 +20,8 @@
 
 #define BUILD_DLL
 
+#define BUILD_DLL
+
 #include "toplevel.h"
 #include "metalib.h"
 #include "daisy.h"

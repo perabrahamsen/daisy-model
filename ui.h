@@ -27,7 +27,7 @@
 class Block;
 class Toplevel;
 
-class UI : public Model
+class EXPORT UI : public Model
 {
   // Content.
 public:

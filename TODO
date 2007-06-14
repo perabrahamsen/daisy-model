@@ -1,5 +1,7 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* daisy-Q4.dll ?
+
 * R2D2
 
 ** Find ud af hvorfor boost-sandbox ikke vil installeres
@@ -33,6 +35,8 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 ** Farquahar -> C4 & C5
 
 ** omregn vind fra reference til aktuel overflade
+
+** Refact fælles kode.
 
 * OpenMI
 
@@ -98,21 +102,6 @@ Vi skal have en statisk udgave af Qt på MingW.
 Vi skal have flyttet den til dirac for krydscompilering
 
 Vi skal have Qt til at bygge på Linux (har vi Qt 4.2 der?)
-
-** Generer DLL i make dist?
-
-bin/
-
-daisy.exe
-daisy.dll
-QtCore4.dll
-QtGui4.dll
-
-lib/
-
-sample/
-
-doc/
 
 * Programmering
 
@@ -186,8 +175,6 @@ Use FormatLaTeX to escape dimensions and tags in plot when outputting
 LaTeX.
 
 *** Generelt fascilitet til at læse dwf/dlf/ddf filer?
-
-** Farquhar photo
 
 ** Program document
 
