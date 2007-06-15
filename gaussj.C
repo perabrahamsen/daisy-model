@@ -2,6 +2,8 @@
 //
 // <http://www-ee.eng.hawaii.edu/Courses/EE150/Book/chap9/section2.1.5.html>
 
+#define BUILD_DLL
+
 #include "gaussj.h"
 
 #define DEBUG_MESSAGES
