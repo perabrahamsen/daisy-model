@@ -65,16 +65,16 @@ public:
 
   // Utilities.
 public:
-  static bool alphabetical (symbol, symbol); // Sort function.
+  static bool alphabetical (symbol, symbol) EXPORT; // Sort function.
 
   // Create and destroy.
 public:
   explicit symbol ()
     : id (-1)
   { }
-  explicit symbol (const char*);
-  explicit symbol (const std::string&);
-  explicit symbol (int);
+  explicit symbol (const char*) EXPORT;
+  explicit symbol (const std::string&) EXPORT;
+  explicit symbol (int) EXPORT;
   symbol (const symbol& other)
     : id (other.id)
   { }
@@ -84,12 +84,12 @@ public:
   { }
 };
 
-std::string operator+ (symbol, const char*);
-std::string operator+ (const char*, symbol);
-std::string operator+ (symbol, const std::string&);
-std::string operator+ (const std::string&, symbol);
-std::string operator+ (symbol, symbol);
-std::ostream& operator<< (std::ostream&, symbol);
+std::string operator+ (symbol, const char*) EXPORT;
+std::string operator+ (const char*, symbol) EXPORT;
+std::string operator+ (symbol, const std::string&) EXPORT;
+std::string operator+ (const std::string&, symbol) EXPORT;
+std::string operator+ (symbol, symbol) EXPORT;
+std::ostream& operator<< (std::ostream&, symbol) EXPORT;
 
 static const symbol::Init symbol_init;
 

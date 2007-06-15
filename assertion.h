@@ -47,21 +47,22 @@ class Treelog;
 
 namespace Assertion
 {
-  void message (const std::string&);
-  void warning (const std::string&);
-  void error (const std::string&);
-  void debug (const std::string&);
+  void message (const std::string&) EXPORT;
+  void warning (const std::string&) EXPORT;
+  void error (const std::string&) EXPORT;
+  void debug (const std::string&) EXPORT;
   NORETURN void failure (const char* file, int line, const char* fun,
 		         const char* test) EXPORT;
   void bug (const char* file, int line, const char* fun, 
-	    const std::string& msg);
+	    const std::string& msg) EXPORT;
   void warning (const char* file, int line, const char* fun, 
-		const std::string& msg);
+		const std::string& msg) EXPORT;
   NORETURN void panic (const char* file, int line, const char* fun,
-	               const std::string& msg);
-  NORETURN void notreached (const char* file, int line, const char* fun);
+	               const std::string& msg) EXPORT;
+  NORETURN void notreached (const char* file, int line,
+                            const char* fun) EXPORT;
   void non_negative (const char* file, int line, const char* fun,
-		     const std::vector<double>& v);
+		     const std::vector<double>& v) EXPORT;
 
   class Register
   {

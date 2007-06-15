@@ -49,8 +49,8 @@ endif
 TARGETTYPE = i586-mingw32msvc
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
-USE_GUI = none
-#USE_GUI = Q4
+#USE_GUI = none
+USE_GUI = Q4
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
