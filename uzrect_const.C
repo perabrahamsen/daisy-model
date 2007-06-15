@@ -69,7 +69,7 @@ UZRectConst::tick (const GeometryRect& geo, std::vector<size_t>&,
   for (size_t edge = 0; edge != edge_size; ++edge) 
     {
       const double sin_angle = geo.edge_sin_angle (edge);
-      const double cos_angle = sqrt (1.0 - sqr (sin_angle));
+      const double cos_angle = cos (asin (sin_angle));      
       const double q = q_z * sin_angle + q_x * cos_angle;
       soil_water.set_flux (edge, q);
     }

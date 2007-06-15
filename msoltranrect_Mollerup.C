@@ -30,6 +30,16 @@
 #include "librarian.h"
 #include <sstream>
 
+#include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/triangular.hpp>
+#include <boost/numeric/ublas/banded.hpp>
+#include <boost/numeric/ublas/lu.hpp>
+#include <boost/numeric/ublas/io.hpp>
+
+
+
 struct MsoltranrectMollerup : public Msoltranrect
 {
   // Solute.
@@ -67,6 +77,26 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
                             Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
+  
+  ublas::vector<double> qx_cell (cell_size);
+  ublas::vector<double> qz_cell (cell_size);
+
+  qx_cell = ublas::zero_vector<double> (cell_size);
+  qz_cell = ublas::zero_vector<double> (cell_size);
+
+  for (int e=0; e < edge_size; e++)
+    {
+      const double q = soil_water.q (e);
+      const double sin_angle = geo.edge_sin_angle (e);
+      const double cos_angle = cos (asin (sin_angle));
+      const double qx = q * cos_angle;
+      const double qz = q * sin_angle;
+      
+
+    }
+
+
 
   // Remember old content for checking mass balance later.
   const double old_content = geo.total_soil (M);
