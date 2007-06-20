@@ -44,6 +44,7 @@ public:
 
   // Simulate.
 public:
+  virtual bool obey_surface ();
   virtual void tick (const GeometryRect&, std::vector<size_t>& drain_cell, 
 		     const Soil&, SoilWater&, 
                      const SoilHeat&, const Surface&, const Groundwater&, 

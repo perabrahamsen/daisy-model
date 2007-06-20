@@ -35,11 +35,11 @@
 struct UZRectConst : public UZRect
 {
   const double q_x;             //[mm/h] horizontal flow
-  const double q_z;             //[mm/h] verticla flow
+  const double q_z;             //[mm/h] vertical flow
  
-
-
   // Interface.
+  bool obey_surface ()
+  { return false; }
   void tick (const GeometryRect&, std::vector<size_t>& drain_cell,
 	     const Soil&, SoilWater&, const SoilHeat&, 
              const Surface&, const Groundwater&, double dt, Treelog&);
@@ -52,6 +52,8 @@ struct UZRectConst : public UZRect
   UZRectConst (Block& al);
   ~UZRectConst ();
 };
+
+
 
 
 

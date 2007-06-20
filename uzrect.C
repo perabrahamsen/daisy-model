@@ -26,6 +26,11 @@
 
 const char *const UZRect::component = "uzrect";
 
+bool 
+UZRect::obey_surface ()
+{ return true; }
+
+
 UZRect::UZRect (Block& al)
   : name (al.identifier ("type"))
 { }

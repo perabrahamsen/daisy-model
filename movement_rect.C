@@ -252,6 +252,8 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
 
   soil_water.tick (cell_size, soil, dt, msg); 
 
+  bool obey_surface;
+ 
   for (size_t i = 0; i < matrix_water.size (); i++)
     {
       Treelog::Open nest (msg, matrix_water[i]->name);
@@ -259,6 +261,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
         {
           matrix_water[i]->tick (*geo, drain_cell, soil, soil_water, soil_heat,
                                  surface, groundwater, dt, msg);
+	  obey_surface = matrix_water[i]->obey_surface ();
           goto update_borders;
         }
       catch (const char* error)
@@ -277,7 +280,12 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
   for (size_t edge = 0; edge < edge_size; edge++)
     {
       if (geo->edge_to (edge) == Geometry::cell_above)
-        surface.accept_top (soil_water.q (edge) * dt, *geo, edge, dt, msg);
+	{
+	  if (obey_surface)
+	    surface.accept_top (soil_water.q (edge) * dt, *geo, edge, dt, msg);
+	  else
+	    surface.accept_top (surface.q_top (*geo, edge), *geo, edge, dt, msg);
+	}
       if (geo->edge_from (edge) == Geometry::cell_below)
         groundwater.accept_bottom ((soil_water.q (edge)
                                     + soil_water.q_p (edge)) * dt,
