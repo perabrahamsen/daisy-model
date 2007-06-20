@@ -56,6 +56,7 @@ public:
   double h (size_t i, double Theta) const;
   double M (size_t i, double h) const;
   double dispersivity (size_t) const;
+  double dispersivity_transversal (size_t) const;  
   void set_porosity (size_t i, double Theta);
   
   // Texture.

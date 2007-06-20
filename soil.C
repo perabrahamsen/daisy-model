@@ -188,6 +188,10 @@ double
 Soil::dispersivity (size_t) const
 { return impl.dispersivity; }
 
+double 
+Soil::dispersivity_transversal (size_t c) const 
+{ return 0.1 * dispersivity (c); } 
+
 void
 Soil::set_porosity (size_t i, double Theta)
 { horizon_[i]->hydraulic->set_porosity (Theta); }

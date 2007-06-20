@@ -42,6 +42,11 @@ namespace ublas = boost::numeric::ublas;
 
 struct MsoltranrectMollerup : public Msoltranrect
 {
+  // Water flux.
+  static void cell_based_flux (const GeometryRect& geo,  
+                               const SoilWater& soil_water,
+                               ublas::vector<double>& qx_cell,
+                               ublas::vector<double>& qz_cell);
   // Solute.
   void flow (const GeometryRect& geo, 
              const Soil& soil, 
@@ -62,6 +67,65 @@ struct MsoltranrectMollerup : public Msoltranrect
   ~MsoltranrectMollerup ();
 };
 
+
+void
+MsoltranrectMollerup::cell_based_flux (const GeometryRect& geo,  
+                                       const SoilWater& soil_water,
+                                       ublas::vector<double>& qx_cell,
+                                       ublas::vector<double>& qz_cell)
+{
+  const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
+  
+  qx_cell = ublas::zero_vector<double> (cell_size);
+  qz_cell = ublas::zero_vector<double> (cell_size);
+  ublas::vector<double> wx_cell = ublas::zero_vector<double> (cell_size);
+  ublas::vector<double> wz_cell = ublas::zero_vector<double> (cell_size);
+
+  for (int e = 0; e < edge_size; e++)
+    {
+      const double q = soil_water.q (e);
+      const double sin_angle = geo.edge_sin_angle (e);
+      const double cos_angle = cos (asin (sin_angle));
+      const double area = geo.edge_area (e);
+      const double x_wall = area * cos_angle;
+      const double z_wall = area * sin_angle;
+      const double qx = q * x_wall;
+      const double qz = q * z_wall;
+
+      const int from = geo.edge_from (e);
+      if (geo.cell_is_internal (from))
+        {
+          qx_cell[from] += qx;
+          qz_cell[from] += qz;
+          wx_cell[from] += x_wall;
+          wz_cell[from] += z_wall;
+        }
+
+      const int to = geo.edge_to (e);
+      if (geo.cell_is_internal (to))
+        {
+          qx_cell[to] += qx;
+          qz_cell[to] += qz;
+          wx_cell[to] += x_wall;
+          wz_cell[to] += z_wall;
+        }
+    }
+
+  for (int c = 0; c < cell_size; c++)
+    {
+      
+      if (wx_cell[c] > 0.0)
+        qx_cell[c] /= wx_cell[c];
+      if (wz_cell[c] > 0.0)
+        qz_cell[c] /= wz_cell[c];
+    }
+
+}
+
+
+
+
 void
 MsoltranrectMollerup::flow (const GeometryRect& geo, 
                             const Soil& soil, 
@@ -72,30 +136,51 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
                             const std::vector<double>& S, 
                             std::vector<double>& J, 
                             Adsorption& adsorption,
-                            double /* diffusion_coefficient */,
+                            double diffusion_coefficient,
                             const double dt,
                             Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
   
-  ublas::vector<double> qx_cell (cell_size);
-  ublas::vector<double> qz_cell (cell_size);
+  // Calculate cell based water flux.
+  ublas::vector<double> qx_cell;
+  ublas::vector<double> qz_cell;
+  cell_based_flux (geo, soil_water, qx_cell, qz_cell);
+  
+  // Calculate diffusion matrix. 
+  ublas::vector<double> Dxx_cell (cell_size);
+  ublas::vector<double> Dzz_cell (cell_size);
+  ublas::vector<double> Dxz_cell (cell_size);
+  ublas::vector<double>& Dzx_cell = Dxz_cell;
 
-  qx_cell = ublas::zero_vector<double> (cell_size);
-  qz_cell = ublas::zero_vector<double> (cell_size);
-
-  for (int e=0; e < edge_size; e++)
+  for (int c = 0; c < cell_size; c++)
     {
-      const double q = soil_water.q (e);
-      const double sin_angle = geo.edge_sin_angle (e);
-      const double cos_angle = cos (asin (sin_angle));
-      const double qx = q * cos_angle;
-      const double qz = q * sin_angle;
-      
-
+      const double Theta = soil_water.Theta (c);
+      daisy_assert(Theta > 0);
+      const double qx = qx_cell (c);
+      const double qz = qz_cell (c);
+      const double q = sqrt (sqr (qx) + sqr (qz));
+      const double tau = soil.tortuosity_factor (c, Theta);
+      const double alpha_L = soil.dispersivity (c);
+      const double alpha_T = soil.dispersivity_transversal (c);
+      if (q > 0)
+        {
+          Dxx_cell (c) = (alpha_L * sqr (qx) + alpha_T * sqr (qz) )
+            / (q * Theta) + diffusion_coefficient * tau;
+          Dzz_cell (c) = (alpha_L * sqr (qz) + alpha_T * sqr (qx) )
+            / (q * Theta) + diffusion_coefficient * tau;   
+          Dxz_cell (c) = (alpha_L - alpha_T) * qx * qz / (q * Theta);
+        }  
+      else
+        { 
+          Dxx_cell (c) = diffusion_coefficient * tau;
+          Dzz_cell (c) = diffusion_coefficient * tau;
+          Dxz_cell (c) = 0.0;
+        }
     }
-
+  
+    
 
 
   // Remember old content for checking mass balance later.
