@@ -273,3 +273,5 @@ static struct ScopeExchangeSyntax
 
 static Librarian Exchange_init (Exchange::component, "\
 A named value to exchange with external models.");
+
+// scope_exchange.C ends here.
