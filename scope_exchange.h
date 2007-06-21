@@ -20,12 +20,17 @@
 
 #include "model.h"
 #include "symbol.h"
+#include "scope.h"
+#include "memutils.h"
+#include <map>
+#include <vector>
+
+class Block;
 
 class Exchange : public Model
 {
   // Content.
 public:
-  static const char *const description;
   static const char *const component;
 
   // Use.
@@ -38,12 +43,92 @@ public:
   virtual bool has_identifier () const;
   virtual symbol identifier () const;
   virtual symbol get_description () const = 0;
-  virtual void set_number (const double)
+  virtual void set_number (const double);
 
   // Create and Destroy.
 public:
   Exchange ();
-  ~Exchange ()
+  ~Exchange ();
+};
+
+class ExchangeNumber : public Exchange
+{
+  // Content.
+private:
+  const symbol name_;
+  const symbol dimension_;
+  const symbol description;
+  bool has_value;
+  double value;
+
+  // Use 
+public:
+  bool is_number () const;
+  symbol name () const;
+  double number () const;
+  bool has_number () const;
+  symbol dimension () const;
+  symbol get_description () const;
+  void set_number (const double val);
+
+  // Create and Destroy.
+public:
+  ExchangeNumber (Block& al);
+  ~ExchangeNumber ();
+};
+
+class ExchangeName : public Exchange
+{
+  // Content.
+private:
+  const symbol name_;
+  const symbol description;
+  const symbol value;
+
+  // Use
+public: 
+  symbol name () const;
+  bool has_identifier () const;
+  symbol identifier () const;
+  symbol get_description () const;
+
+  // Create and Destroy.
+public:
+  ExchangeName (Block& al);
+  ~ExchangeName ();
+};
+
+class ScopeExchange : public WScope
+{
+  // Parameters.
+private: 
+  const auto_vector<Exchange*> entries;
+  const std::vector<symbol> all_numbers_;
+  const std::map<symbol, Exchange*> named;
+
+  // Scope.
+public:
+  const std::vector<symbol>& all_numbers () const;
+  bool has_number (symbol tag) const;
+  double number (symbol tag) const;
+  symbol dimension (symbol tag) const;
+  bool has_identifier (symbol tag) const;
+  symbol identifier (symbol tag) const;
+  symbol get_description (symbol tag) const;
+
+  // WScope.
+public:
+  void set_number (symbol tag, double value);
+  
+  // Create.
+private:
+  static std::vector<symbol>
+  /**/ find_all_numbers (const std::vector<Exchange*>& entries);
+  static std::map<symbol, Exchange*> 
+  /**/ find_named (const std::vector<Exchange*>& entries);
+public:
+  ScopeExchange (Block& al);
+  ~ScopeExchange ();
 };
 
 // scope_exchange.h ends here.

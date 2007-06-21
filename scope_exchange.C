@@ -19,85 +19,91 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #define BUILD_DLL
-#include "scope.h"
+#include "scope_exchange.h"
 #include "block.h"
 #include "alist.h"
 #include "assertion.h"
-#include "memutils.h"
 #include "librarian.h"
-#include <map>
 
-class Exchange : public Model
-{
-  // Content.
-public:
-  static const char *const description;
-  static const char *const component;
+// The Exchange item model.
 
-  // Use.
-  virtual bool is_number () const
-  { return false; }
-  virtual symbol name () const = 0;
-  virtual double number () const
-  { daisy_notreached (); }
-  virtual bool has_number () const
-  { return false; }
-  virtual symbol dimension () const
-  { daisy_notreached (); }
-  virtual bool has_identifier () const
-  { return false; }
-  virtual symbol identifier () const
-  { daisy_notreached (); }
-  virtual symbol get_description () const = 0;
-  virtual void set_number (const double)
-  { daisy_notreached (); }
+const char *const 
+Exchange::component = "exchange";
 
-  // Create and Destroy.
-public:
-  Exchange ()
-  { }
-  ~Exchange ()
-  { }
-};
+bool 
+Exchange::is_number () const
+{ return false; }
 
-const char *const Exchange::component = "exchange";
+double 
+Exchange::number () const
+{ daisy_notreached (); }
 
-struct ExchangeNumber : public Exchange
-{
-  // Content.
-  const symbol name_;
-  const symbol dimension_;
-  const symbol description;
-  bool has_value;
-  double value;
+bool 
+Exchange::has_number () const
+{ return false; }
 
-  // Use 
-  bool is_number () const
-  { return true; }
-  symbol name () const
-  { return name_; }
-  double number () const
-  { return value; }
-  bool has_number () const
-  { return has_value; }
-  symbol dimension () const
-  { return dimension_; }
-  symbol get_description () const
-  { return description; }
-  void set_number (const double val) 
-  { value = val; has_value = true; }
+symbol 
+Exchange::dimension () const
+{ daisy_notreached (); }
 
-  // Create and Destroy.
-  ExchangeNumber (Block& al)
-    : name_ (al.identifier ("name")),
-      dimension_ (al.identifier ("dimension")),
-      description (al.identifier ("description")),
-      has_value (al.check ("value")),
-      value (al.number ("value", -42.42e42))
-  { }
-  ~ExchangeNumber ()
-  { }
-};
+bool 
+Exchange::has_identifier () const
+{ return false; }
+
+symbol 
+Exchange::identifier () const
+{ daisy_notreached (); }
+
+void 
+Exchange::set_number (const double)
+{ daisy_notreached (); }
+
+Exchange::Exchange ()
+{ }
+  
+Exchange::~Exchange ()
+{ }
+
+// Exchanging a number.
+
+bool 
+ExchangeNumber::is_number () const
+{ return true; }
+
+symbol 
+ExchangeNumber::name () const
+{ return name_; }
+
+double 
+ExchangeNumber::number () const
+{ return value; }
+
+bool 
+ExchangeNumber::has_number () const
+{ return has_value; }
+
+symbol 
+ExchangeNumber::dimension () const
+{ return dimension_; }
+
+symbol 
+ExchangeNumber::get_description () const
+{ return description; }
+
+void 
+ExchangeNumber::set_number (const double val) 
+{ value = val; has_value = true; }
+
+ExchangeNumber::ExchangeNumber (Block& al)
+  : name_ (al.identifier ("name")),
+    dimension_ (al.identifier ("dimension")),
+    description (al.identifier ("description")),
+    has_value (al.check ("value")),
+    value (al.number ("value", -42.42e42))
+{ }
+  
+ExchangeNumber::~ExchangeNumber ()
+{ }
 
 static struct ExchangeNumberSyntax
 {
@@ -120,32 +126,32 @@ Current value to exchange.");
   }
 } ExchangeNumber_syntax;
 
-struct ExchangeName : public Exchange
-{
-  // Content.
-  const symbol name_;
-  const symbol description;
-  const symbol value;
+// Exchanging a name (or string).
 
-  // Use 
-  symbol name () const
-  { return name_; }
-  bool has_identifier () const
-  { return true; }
-  symbol identifier () const
-  { return value; }
-  symbol get_description () const
-  { return description; }
+symbol 
+ExchangeName::name () const
+{ return name_; }
 
-  // Create and Destroy.
-  ExchangeName (Block& al)
-    : name_ (al.identifier ("name")),
-      description (al.identifier ("description")),
-      value (al.identifier ("value"))
-  { }
-  ~ExchangeName ()
-  { }
-};
+bool 
+ExchangeName::has_identifier () const
+{ return true; }
+
+symbol 
+ExchangeName::identifier () const
+{ return value; }
+
+symbol 
+ExchangeName::get_description () const
+{ return description; }
+
+ExchangeName::ExchangeName (Block& al)
+  : name_ (al.identifier ("name")),
+    description (al.identifier ("description")),
+    value (al.identifier ("value"))
+{ }
+
+ExchangeName::~ExchangeName ()
+{ }
 
 static struct ExchangeNameSyntax
 {
@@ -166,92 +172,97 @@ Current value to exchange.");
   }
 } ExchangeName_syntax;
 
-class ScopeExchange : public WScope
+// The scope.
+
+const std::vector<symbol>& 
+ScopeExchange::all_numbers () const
+{ return all_numbers_; }
+
+bool 
+ScopeExchange::has_number (symbol tag) const
 {
-  // Parameters.
-private: 
-  const auto_vector<Exchange*> entries;
-  const std::vector<symbol> all_numbers_;
-  const std::map<symbol, Exchange*> named;
+  const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
+  if (i == named.end ())
+    return false;
+  return (*i).second->has_number (); 
+}
 
-  // Scope.
-public:
-  const std::vector<symbol>& all_numbers () const
-  { return all_numbers_; }
-  bool has_number (symbol tag) const
-  {
-    const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
-    if (i == named.end ())
-      return false;
-    return (*i).second->has_number (); 
-  }
-  double number (symbol tag) const
-  { 
-    const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
-    daisy_assert (i != named.end ());
-    return (*i).second->number (); 
-  }
-  symbol dimension (symbol tag) const
-  { 
-    const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
-    daisy_assert (i != named.end ());
-    return (*i).second->dimension (); 
-  }
-  bool has_identifier (symbol tag) const
-  {
-    const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
-    daisy_assert (i != named.end ());
-    return (*i).second->has_identifier (); 
-  }
-  symbol identifier (symbol tag) const
-  {
-    const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
-    daisy_assert (i != named.end ());
-    return (*i).second->identifier (); 
-  }
-  symbol get_description (symbol tag) const
-  { 
-    const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
-    daisy_assert (i != named.end ());
-    return (*i).second->get_description ();
-  }
+double 
+ScopeExchange::number (symbol tag) const
+{ 
+  const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
+  daisy_assert (i != named.end ());
+  return (*i).second->number (); 
+}
 
-  // WScope.
-public:
-  void set_number (symbol tag, double value)
-  { 
-    const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
-    daisy_assert (i != named.end ());
-    (*i).second->set_number (value); 
-  }
+symbol 
+ScopeExchange::dimension (symbol tag) const
+{ 
+  const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
+  daisy_assert (i != named.end ());
+  return (*i).second->dimension (); 
+}
+
+bool 
+ScopeExchange::has_identifier (symbol tag) const
+{
+  const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
+  daisy_assert (i != named.end ());
+  return (*i).second->has_identifier (); 
+}
+
+symbol 
+ScopeExchange::identifier (symbol tag) const
+{
+  const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
+  daisy_assert (i != named.end ());
+  return (*i).second->identifier (); 
+}
+
+symbol 
+ScopeExchange::get_description (symbol tag) const
+{ 
+  const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
+  daisy_assert (i != named.end ());
+  return (*i).second->get_description ();
+}
+
+void 
+ScopeExchange::set_number (symbol tag, double value)
+{ 
+  const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
+  daisy_assert (i != named.end ());
+  (*i).second->set_number (value); 
+}
   
-  // Create.
-private:
-  static std::vector<symbol>
-  /**/ find_all_numbers (const std::vector<Exchange*>& entries)
-  {
-    std::vector<symbol> result;
-    for (size_t i = 0; i < entries.size (); i++)
-      if (entries[i]->is_number ())
-        result.push_back (entries[i]->name ());
-    return result;
-  }
-  static std::map<symbol, Exchange*> 
-  /**/ find_named (const std::vector<Exchange*>& entries)
-  {
-    std::map<symbol, Exchange*> result;
-    for (size_t i = 0; i < entries.size (); i++)
-      result[entries[i]->name ()] = entries[i];
-    return result;
-  }
-public:
-  ScopeExchange (Block& al)
-    : WScope (al),
-      entries (Librarian::build_vector<Exchange> (al, "entries")),
-      all_numbers_ (find_all_numbers (entries)),
-      named (find_named (entries))
-  { }
-};
+std::vector<symbol>
+ScopeExchange::find_all_numbers (const std::vector<Exchange*>& entries)
+{
+  std::vector<symbol> result;
+  for (size_t i = 0; i < entries.size (); i++)
+    if (entries[i]->is_number ())
+      result.push_back (entries[i]->name ());
+  return result;
+}
+
+std::map<symbol, Exchange*> 
+ScopeExchange::find_named (const std::vector<Exchange*>& entries)
+{
+  std::map<symbol, Exchange*> result;
+  for (size_t i = 0; i < entries.size (); i++)
+    result[entries[i]->name ()] = entries[i];
+  return result;
+}
+
+ScopeExchange::ScopeExchange (Block& al)
+  : WScope (al),
+    entries (Librarian::build_vector<Exchange> (al, "entries")),
+    all_numbers_ (find_all_numbers (entries)),
+    named (find_named (entries))
+{ }
+
+ScopeExchange::~ScopeExchange ()
+{ }
 
 static struct ScopeExchangeSyntax
 {
