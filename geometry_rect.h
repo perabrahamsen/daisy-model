@@ -41,6 +41,7 @@ private:
   std::vector<double> edge_length_;
   std::vector<double> edge_area_per_length_;
   std::vector<double> edge_sin_angle_;
+  std::vector<double> edge_cos_angle_;
   std::vector<double> edge_center_z_;
   std::vector<double> edge_center_x_;
   std::vector<double> corner_z_;
