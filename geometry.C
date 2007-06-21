@@ -90,7 +90,7 @@ Geometry::edge_index (const int from, const int to) const
 }
 
 double 
-Geometry::edge_cos_angle (size_t e) const; // Rel. hor. plane [-1:1]
+Geometry::edge_cos_angle (size_t e) const // Rel. hor. plane [-1:1]
 { return std::cos (std::asin (edge_sin_angle (e))); }
 
 double
