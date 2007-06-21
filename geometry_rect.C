@@ -225,6 +225,7 @@ GeometryRect::GeometryRect (Block& al)
     }
   daisy_assert (next_cell == cell_size ());
   edge_sin_angle_.insert (edge_sin_angle_.end (), edge_from_.size (), 1.0);
+  edge_cos_angle_.insert (edge_cos_angle_.end (), edge_from_.size (), 0.0);
 
   // Horizontal edges.
   for (size_t row = 0; row < cell_rows (); row++)
@@ -260,6 +261,8 @@ GeometryRect::GeometryRect (Block& al)
     }
   edge_sin_angle_.insert (edge_sin_angle_.end (),
 			  edge_from_.size () - edge_sin_angle_.size (), 0.0);
+  edge_cos_angle_.insert (edge_cos_angle_.end (),
+			  edge_from_.size () - edge_cos_angle_.size (), 1.0);
 
   // Cell edges.
   cell_edges_.insert (cell_edges_.end (), cell_pseudo_size (),

@@ -102,6 +102,8 @@ public:
   { return edge_area_per_length_[e]; }
   inline double edge_sin_angle (size_t e) const // To horizontal plane -1:1 []
   { return edge_sin_angle_[e]; }
+  inline double edge_cos_angle (size_t e) const // To horizontal plane -1:1 []
+  { return edge_cos_angle_[e]; }
   inline double edge_center_z (size_t e) const // Center z-pos [cm]
   { return edge_center_z_[e]; }
   inline double edge_center_x (size_t e) const // Center x-pos [cm]
