@@ -89,6 +89,10 @@ Geometry::edge_index (const int from, const int to) const
   return -1;
 }
 
+double 
+Geometry::edge_cos_angle (size_t e) const; // Rel. hor. plane [-1:1]
+{ return std::cos (std::asin (edge_sin_angle (e))); }
+
 double
 Geometry::z_safe (int n) const
 {

@@ -48,6 +48,10 @@ public:
   { return 1.0; }
   inline double edge_center_z (size_t e) const
   { return (e == 0) ? 0.0 : zplus (e - 1); }
+  inline double edge_sin_angle (size_t) const // Positive upwards. 
+  { return 1.0; }
+  inline double edge_cos_angle (size_t) const // Vertical
+  { return 0.0; }
   inline double surface_area () const // Total surface area.
   { return 1.0; }
   inline double zminus (size_t n) const

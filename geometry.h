@@ -96,6 +96,8 @@ public:
   { return 0.5; }
   virtual double edge_center_y (size_t) const
   { return 0.5; }
+  virtual double edge_sin_angle (size_t e) const = 0; // Rel. hor. plane [-1:1]
+  virtual double edge_cos_angle (size_t e) const; // Rel. hor. plane [-1:1]
 
   // Operations on whole volume.
 public:
