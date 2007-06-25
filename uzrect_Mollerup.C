@@ -139,7 +139,15 @@ struct UZRectMollerup : public UZRect
   ~UZRectMollerup ();
 };
 
+static double anisotropy_factor (const Geometry& geo, size_t edge, 
+				 const Soil& soil, size_t cell)
+{
+  const double sin_angle = geo.edge_sin_angle (edge);
+  const double cos_angle = geo.edge_cos_angle (edge);
+  const double factor = soil.anisotropy (cell);
 
+  return sqrt (sqr (sin_angle) + sqr (factor * cos_angle));
+}
 
 void 
 UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
@@ -248,7 +256,6 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
       std::vector<top_state> state (edge_above.size (), top_undecided);
 
-      try {
       do // Start iteration loop
 	{
 	  h_conv = h;
@@ -268,6 +275,11 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 		  const int from = geo.edge_from (e);
 		  const int to = geo.edge_to (e);	   
 
+		  const double K_from 
+		    = K[from] * anisotropy_factor (geo, e, soil, from);
+		  const double K_to
+		    = K[to] * anisotropy_factor (geo, e, soil, to);
+
                   // We have to use arithmetic average near the top of
                   // the soil, otherwise we risk development an water
                   // resistent crust to appear dut to soil
@@ -277,10 +289,10 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                     = geo.edge_center_z (e) > edge_arithmetic_height;
 
                   if (top_edge)
-                    Kedge[e] = (K[from] + K[to]) / 2.0; 
+                    Kedge[e] = (K_from + K_to) / 2.0; 
                   else
                     // Hormonic average is more correct.
-                    Kedge[e] = 2.0/(1.0/K[from] + 1.0/K[to]); 
+                    Kedge[e] = 2.0/(1.0/K_from + 1.0/K_to);
 		} 
 	    }
 	  
@@ -360,12 +372,6 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	}
       while (!converges (h_conv, h)
 	     && iterations_used <= max_iterations);
-
-      }
-      catch (top_state)
-        {
-          iterations_used = 999999;
-        }
 
       if (iterations_used > max_iterations)
 	{
@@ -659,18 +665,7 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
             // We pretend that the surface is particlaly saturated.
             const double K_sat = soil.K (cell, 0.0, 0.0, T (cell));
             const double K_cell = K (cell);
-
-#if 0
-            // Harmonic average of saturated top and dry cell.
-            const double K_edge = h_top <= 0
-              ? K_cell 
-              : 2.0/(1.0/K_sat + 1.0/K_cell);
-#elif 0
-            const double K_edge = h_top <= 0 ? K_cell : (K_sat + K_cell) / 2.0;
-#else
             const double K_edge = K_cell;
-#endif
-
             const double dz = geo.edge_length (edge);
             daisy_assert (approximate (dz, -geo.z (cell)));
             double q_in_avail = h_top / ddt;
@@ -678,35 +673,13 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
             // Decide type.
             bool is_flux = h_top <= 0.0 || q_in_pot > q_in_avail;
 
-#if 0
-            if (!is_flux && q_in_pot < 0.0)
-              {
-                q_in_avail = 0.0;
-                is_flux = true;
-              }
-#elif 0
-            if (!is_flux)
-              {
-                is_flux = true;
-                q_in_avail = q_in_pot;
-              }
-#endif
             if (is_flux)
               {
-#if 0
-                if (state[i] == top_pressure)
-                  throw top_pressure;
-#endif
                 state[i] = top_flux;
-
                 Neumann (edge, cell, area, in_sign, q_in_avail, dq, B);
               }
             else			// Pressure
               {
-#if 0
-                if (state[i] == top_flux)
-                  throw top_flux;
-#endif
                 state[i] = top_pressure;
 
                 if (debug > 0 && q_in_pot < 0.0)
