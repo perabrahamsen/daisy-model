@@ -29,8 +29,6 @@
 #include <vector>
 #include <iostream>
 
-using namespace std;
-
 struct Lexer::Implementation
 {
   std::istream& in;
@@ -40,7 +38,7 @@ struct Lexer::Implementation
   int get ();
   bool good ();
 
-  Implementation (const string& name);
+  Implementation (const std::string& name);
   ~Implementation ();
 };
 
@@ -84,7 +82,7 @@ Lexer::Implementation::good ()
 #endif
 }
 
-Lexer::Implementation::Implementation (const string& name)
+Lexer::Implementation::Implementation (const std::string& name)
   : in (Path::open_file (name)),
     line (1),
     column (0)
@@ -92,7 +90,7 @@ Lexer::Implementation::Implementation (const string& name)
   
 Lexer::Implementation::~Implementation ()
 {
-  if (&in != &cin)
+  if (&in != &std::cin)
     delete &in;
 }
 
@@ -140,7 +138,7 @@ void Lexer::seek (const Lexer::Position& pos)
   if (pos == position ())
     return;
 
-  impl.in.seekg (0, ios::beg);
+  impl.in.seekg (0, std::ios::beg);
   impl.column = 0;
   impl.line = 1;
   while (good () && position () < pos)
@@ -169,7 +167,7 @@ Lexer::good ()
 { return impl.good (); }
 
 void 
-Lexer::warning (const string& str, const Position& pos)
+Lexer::warning (const std::string& str, const Position& pos)
 {
   std::ostringstream tmp;
   tmp << file << ":" << pos.line << ":"
@@ -178,7 +176,7 @@ Lexer::warning (const string& str, const Position& pos)
 }
 
 void 
-Lexer::error (const string& str, const Position& pos)
+Lexer::error (const std::string& str, const Position& pos)
 {
   std::ostringstream tmp;
   tmp << file << ":" << pos.line << ":"
@@ -188,7 +186,7 @@ Lexer::error (const string& str, const Position& pos)
 }
 
 void 
-Lexer::debug (const string& str)
+Lexer::debug (const std::string& str)
 {
   std::ostringstream tmp;
   tmp << file << ":" << impl.line << ":"
@@ -197,7 +195,7 @@ Lexer::debug (const string& str)
 }
 
 void 
-Lexer::warning (const string& str)
+Lexer::warning (const std::string& str)
 {
   std::ostringstream tmp;
   tmp << file << ":" << impl.line << ":"
@@ -206,7 +204,7 @@ Lexer::warning (const string& str)
 }
 
 void 
-Lexer::error (const string& str)
+Lexer::error (const std::string& str)
 {
   std::ostringstream tmp;
   tmp << file << ":" << impl.line << ":"
@@ -222,19 +220,19 @@ Lexer::eof ()
     error ("Expected end of file");
 }
     
-Lexer::Lexer (const string& name, Treelog& out)
+Lexer::Lexer (const std::string& name, Treelog& out)
   : impl (*new Implementation (name)),
     err (out),
     file (name),
     error_count (0)
 {  
-  if (&impl.in == &cin || !impl.in.good ())
-    err.entry (string ("Open '") + file + "' failed");
+  if (&impl.in == &std::cin || !impl.in.good ())
+    err.entry (std::string ("Open '") + file + "' failed");
 }
 
 Lexer::~Lexer ()
 {
   if (impl.in.bad ())
-    err.entry (string ("There were trouble parsing '") + file  + "'");
+    err.entry (std::string ("There were trouble parsing '") + file  + "'");
   delete &impl;
 }

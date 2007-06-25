@@ -34,6 +34,10 @@ bool
 Exchange::is_number () const
 { return false; }
 
+symbol 
+Exchange::name () const
+{ return name_; }
+
 double 
 Exchange::number () const
 { daisy_notreached (); }
@@ -54,11 +58,26 @@ symbol
 Exchange::identifier () const
 { daisy_notreached (); }
 
+symbol 
+Exchange::get_description () const
+{ return description; }
+
 void 
 Exchange::set_number (const double)
 { daisy_notreached (); }
 
-Exchange::Exchange ()
+void
+Exchange::load_syntax (Syntax& syntax, AttributeList&)
+{
+  syntax.add ("description", Syntax::String, Syntax::Const, "\
+Description of value to exchange.");
+  syntax.add ("name", Syntax::String, Syntax::Const, "\
+Name of value to exchange.");
+}
+
+Exchange::Exchange (const symbol n, const symbol d)
+  : name_ (n),
+    description (d)
 { }
   
 Exchange::~Exchange ()
@@ -69,10 +88,6 @@ Exchange::~Exchange ()
 bool 
 ExchangeNumber::is_number () const
 { return true; }
-
-symbol 
-ExchangeNumber::name () const
-{ return name_; }
 
 double 
 ExchangeNumber::number () const
@@ -86,22 +101,33 @@ symbol
 ExchangeNumber::dimension () const
 { return dimension_; }
 
-symbol 
-ExchangeNumber::get_description () const
-{ return description; }
-
 void 
 ExchangeNumber::set_number (const double val) 
 { value = val; has_value = true; }
 
 ExchangeNumber::ExchangeNumber (Block& al)
-  : name_ (al.identifier ("name")),
+  : Exchange (al.identifier ("name"), al.identifier ("description")),
     dimension_ (al.identifier ("dimension")),
-    description (al.identifier ("description")),
     has_value (al.check ("value")),
     value (al.number ("value", -42.42e42))
 { }
   
+ExchangeNumber::ExchangeNumber (const symbol n, const char *const dim, 
+                                const char *const desc)
+  : Exchange (n, symbol (desc)),
+    dimension_ (dim),
+    has_value (false),
+    value (-42.42e42)
+{ }
+
+ExchangeNumber::ExchangeNumber (const symbol n, const double val, 
+                                const char *const dim, const char *const desc)
+  : Exchange (n, symbol (desc)),
+    dimension_ (dim),
+    has_value (true),
+    value (val)
+{ }
+
 ExchangeNumber::~ExchangeNumber ()
 { }
 
@@ -113,11 +139,8 @@ static struct ExchangeNumberSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("description", Syntax::String, Syntax::Const, "\
-Description of value to exchange.");
+    Exchange::load_syntax (syntax, alist);
     alist.add ("description", "Exchange a numeric value.");
-    syntax.add ("name", Syntax::String, Syntax::Const, "\
-Name of value to exchange.");
     syntax.add ("dimension", Syntax::String, Syntax::Const, "\
 Dimension of value to exchange.");
     syntax.add ("value", Syntax::Unknown (), Syntax::OptionalState, "\
@@ -128,10 +151,6 @@ Current value to exchange.");
 
 // Exchanging a name (or string).
 
-symbol 
-ExchangeName::name () const
-{ return name_; }
-
 bool 
 ExchangeName::has_identifier () const
 { return true; }
@@ -140,13 +159,8 @@ symbol
 ExchangeName::identifier () const
 { return value; }
 
-symbol 
-ExchangeName::get_description () const
-{ return description; }
-
 ExchangeName::ExchangeName (Block& al)
-  : name_ (al.identifier ("name")),
-    description (al.identifier ("description")),
+  : Exchange (al.identifier ("name"), al.identifier ("description")),
     value (al.identifier ("value"))
 { }
 
@@ -161,11 +175,8 @@ static struct ExchangeNameSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("description", Syntax::String, Syntax::Const, "\
-Description of value to exchange.");
-    alist.add ("description", "Exchange a numeric value.");
-    syntax.add ("name", Syntax::String, Syntax::Const, "\
-Name of value to exchange.");
+    Exchange::load_syntax (syntax, alist);
+    alist.add ("description", "Exchange a string value.");
     syntax.add ("value", Syntax::String, Syntax::Const, "\
 Current value to exchange.");
     Librarian::add_type (Exchange::component, "name", alist, syntax, &make);
@@ -207,7 +218,9 @@ bool
 ScopeExchange::has_identifier (symbol tag) const
 {
   const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
-  daisy_assert (i != named.end ());
+  if (i == named.end ())
+    return false;
+
   return (*i).second->has_identifier (); 
 }
 
@@ -254,11 +267,26 @@ ScopeExchange::find_named (const std::vector<Exchange*>& entries)
   return result;
 }
 
+void 
+ScopeExchange::add_item (Exchange* item)
+{ entries.push_back (item); }
+
+void 
+ScopeExchange::done ()
+{
+  all_numbers_ = find_all_numbers (entries);
+  named = find_named (entries);
+}
+
 ScopeExchange::ScopeExchange (Block& al)
   : WScope (al),
     entries (Librarian::build_vector<Exchange> (al, "entries")),
     all_numbers_ (find_all_numbers (entries)),
     named (find_named (entries))
+{ }
+
+ScopeExchange::ScopeExchange ()
+  : WScope ("ScopeExchange")
 { }
 
 ScopeExchange::~ScopeExchange ()

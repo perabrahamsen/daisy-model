@@ -236,17 +236,17 @@ endif
 
 CSHARP = /cygdrive/C/WINDOWS/Microsoft.NET/Framework/v2.0.50727/csc.exe
 
-csdaisy.exe:	csmain.cs csdaisy.netmodule
-	$(CSHARP) /out:csdaisy.exe /addmodule:csdaisy.netmodule csmain.cs 
-
-csdaisydll.exe:	csmain.cs csdaisy.dll
-	$(CSHARP) /out:csdaisy.exe /r:csdaisy.dll csmain.cs 
-
-csdaisy.dll: csdaisy.cs
-	$(CSHARP) /target:library csdaisy.cs
-
-csdaisy.netmodule: csdaisy.cs
-	$(CSHARP) /target:module csdaisy.cs
+#csdaisy.exe:	csmain.cs csdaisy.netmodule
+#	$(CSHARP) /out:csdaisy.exe /addmodule:csdaisy.netmodule csmain.cs 
+#
+#csdaisydll.exe:	csmain.cs csdaisy.dll
+#	$(CSHARP) /out:csdaisy.exe /r:csdaisy.dll csmain.cs 
+#
+#csdaisy.dll: csdaisy.cs
+#	$(CSHARP) /target:library csdaisy.cs
+#
+#csdaisy.netmodule: csdaisy.cs
+#	$(CSHARP) /target:module csdaisy.cs
 
 # Construct the compile command.
 #
@@ -687,13 +687,23 @@ TAGS: $(INTERFACES) $(MODELS) $(MAIN) $(HEADERS)
 dos2unix:
 	perl -pi.bak -e 's/\r\n$$/\n/' $(TEXT)
 
-# Print the current syntax for the Daisy input language.
-#
-dump:	daisy
-	daisy -p
-
 # Various test targets.
 #
+
+UTESTSRC = ut_scope_exchange.C
+UTESTOBJ = $(UTESTSRC:.C=${OBJ})
+
+utest$(EXE): $(LIBOBJ) $(UTESTOBJ)
+	$(CC) -o $@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) 
+
+unittest:	
+	(mkdir -p $(NATIVEHOME) \
+	 && cd $(NATIVEHOME) \
+         && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile utest${EXE} \
+	 && ./utest${EXE})
+
+utest: utest.exe
+
 xtest:	test/test.dai daisy
 	(cd test \
          && ../daisy test.dai \

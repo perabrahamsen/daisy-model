@@ -26,28 +26,38 @@
 #include <vector>
 
 class Block;
+class Syntax;
+class AttributeList;
 
 class Exchange : public Model
 {
-  // Content.
+  // Model.
 public:
   static const char *const component;
+
+  // Content.
+public:
+  const symbol name_;
+  const symbol description;
 
   // Use.
 public:
   virtual bool is_number () const;
-  virtual symbol name () const = 0;
+  symbol name () const;
   virtual double number () const;
   virtual bool has_number () const;
   virtual symbol dimension () const;
   virtual bool has_identifier () const;
   virtual symbol identifier () const;
-  virtual symbol get_description () const = 0;
+  symbol get_description () const;
   virtual void set_number (const double);
 
   // Create and Destroy.
 public:
-  Exchange ();
+  static void load_syntax (Syntax&, AttributeList&);
+protected:
+  explicit Exchange (symbol name, symbol description);
+public:
   ~Exchange ();
 };
 
@@ -55,25 +65,27 @@ class ExchangeNumber : public Exchange
 {
   // Content.
 private:
-  const symbol name_;
   const symbol dimension_;
-  const symbol description;
   bool has_value;
   double value;
 
   // Use 
 public:
   bool is_number () const;
-  symbol name () const;
   double number () const;
   bool has_number () const;
   symbol dimension () const;
-  symbol get_description () const;
   void set_number (const double val);
 
   // Create and Destroy.
+private:
+  explicit ExchangeNumber (const ExchangeNumber&); // Disable
 public:
-  ExchangeNumber (Block& al);
+  explicit ExchangeNumber (Block& al);
+  explicit ExchangeNumber (symbol name, const char* dimension, 
+                           const char* description);
+  explicit ExchangeNumber (symbol name, double value, 
+                           const char* dimension, const char* description);
   ~ExchangeNumber ();
 };
 
@@ -81,20 +93,16 @@ class ExchangeName : public Exchange
 {
   // Content.
 private:
-  const symbol name_;
-  const symbol description;
   const symbol value;
 
   // Use
 public: 
-  symbol name () const;
   bool has_identifier () const;
   symbol identifier () const;
-  symbol get_description () const;
 
   // Create and Destroy.
 public:
-  ExchangeName (Block& al);
+  explicit ExchangeName (Block& al);
   ~ExchangeName ();
 };
 
@@ -102,9 +110,9 @@ class ScopeExchange : public WScope
 {
   // Parameters.
 private: 
-  const auto_vector<Exchange*> entries;
-  const std::vector<symbol> all_numbers_;
-  const std::map<symbol, Exchange*> named;
+  auto_vector<Exchange*> entries;
+  std::vector<symbol> all_numbers_;
+  std::map<symbol, Exchange*> named;
 
   // Scope.
 public:
@@ -127,7 +135,10 @@ private:
   static std::map<symbol, Exchange*> 
   /**/ find_named (const std::vector<Exchange*>& entries);
 public:
-  ScopeExchange (Block& al);
+  void add_item (Exchange* item);
+  void done ();
+  explicit ScopeExchange (Block& al);
+  explicit ScopeExchange ();
   ~ScopeExchange ();
 };
 
