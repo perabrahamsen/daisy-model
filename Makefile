@@ -556,7 +556,7 @@ all:	#(EXECUTABLES)
 # Create a DLL.
 #
 daisy.dll: $(LIBOBJ) 
-	$(CC) -shared -o $@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
+	$(CC) -shared -o $@ $^ $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
 
 daisy_Qt.dll: $(Q4OBJECTS) daisy.dll
 	$(CC) -shared -o $@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy_Qt.a 
