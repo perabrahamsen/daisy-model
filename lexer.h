@@ -24,6 +24,7 @@
 #define LEXER_H
 
 #include <string>
+#include <memory>
 
 class Treelog;
 
@@ -32,7 +33,7 @@ class Lexer
   // Content.
 private:
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
 public:
   Treelog& err;
   const std::string file;

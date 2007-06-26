@@ -124,7 +124,7 @@ Lexer::Position::~Position ()
 
 Lexer::Position 
 Lexer::position ()
-{ return Position (impl.line, impl.column); }
+{ return Position (impl->line, impl->column); }
 
 const Lexer::Position& 
 Lexer::no_position ()
@@ -138,9 +138,9 @@ void Lexer::seek (const Lexer::Position& pos)
   if (pos == position ())
     return;
 
-  impl.in.seekg (0, std::ios::beg);
-  impl.column = 0;
-  impl.line = 1;
+  impl->in.seekg (0, std::ios::beg);
+  impl->column = 0;
+  impl->line = 1;
   while (good () && position () < pos)
     (void) get ();
 }
@@ -148,23 +148,23 @@ void Lexer::seek (const Lexer::Position& pos)
 
 int
 Lexer::get ()
-{ return impl.get (); }
+{ return impl->get (); }
 
 int
 Lexer::peek ()
 { 
-  const int c = impl.in.peek ();
+  const int c = impl->in.peek ();
   if (c != '\r')
     return c;
   
   // Skip DOS carriage return on Unix.
-  (void) impl.in.get ();
+  (void) impl->in.get ();
   return peek ();
 }
 
 bool
 Lexer::good ()
-{ return impl.good (); }
+{ return impl->good (); }
 
 void 
 Lexer::warning (const std::string& str, const Position& pos)
@@ -189,8 +189,8 @@ void
 Lexer::debug (const std::string& str)
 {
   std::ostringstream tmp;
-  tmp << file << ":" << impl.line << ":"
-	 << (impl.column + 1) << ": " << str;
+  tmp << file << ":" << impl->line << ":"
+	 << (impl->column + 1) << ": " << str;
   err.debug (tmp.str ());
 }
 
@@ -198,8 +198,8 @@ void
 Lexer::warning (const std::string& str)
 {
   std::ostringstream tmp;
-  tmp << file << ":" << impl.line << ":"
-	 << (impl.column + 1) << ": " << str;
+  tmp << file << ":" << impl->line << ":"
+	 << (impl->column + 1) << ": " << str;
   err.warning (tmp.str ());
 }
 
@@ -207,8 +207,8 @@ void
 Lexer::error (const std::string& str)
 {
   std::ostringstream tmp;
-  tmp << file << ":" << impl.line << ":"
-	 << (impl.column + 1) << ": " << str;
+  tmp << file << ":" << impl->line << ":"
+	 << (impl->column + 1) << ": " << str;
   err.error (tmp.str ());
   error_count++;
 }
@@ -216,7 +216,7 @@ Lexer::error (const std::string& str)
 void
 Lexer::eof ()
 { 
-  if (!impl.in.eof ())
+  if (!impl->in.eof ())
     error ("Expected end of file");
 }
     
@@ -226,13 +226,12 @@ Lexer::Lexer (const std::string& name, Treelog& out)
     file (name),
     error_count (0)
 {  
-  if (&impl.in == &std::cin || !impl.in.good ())
+  if (&impl->in == &std::cin || !impl->in.good ())
     err.entry (std::string ("Open '") + file + "' failed");
 }
 
 Lexer::~Lexer ()
 {
-  if (impl.in.bad ())
+  if (impl->in.bad ())
     err.entry (std::string ("There were trouble parsing '") + file  + "'");
-  delete &impl;
 }
