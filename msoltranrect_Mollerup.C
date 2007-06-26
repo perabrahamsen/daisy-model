@@ -73,7 +73,7 @@ struct MsoltranrectMollerup : public Msoltranrect
   static void Neumann (const size_t edge, const size_t cell, 
                        const double area, const double in_sign,
                        const double flux, 
-                       ublas::vector<double>& dq, ublas::vector<double>& B);
+                       ublas::vector<double>& dJ, ublas::vector<double>& B);
 
   
   static void lowerboundary (const GeometryRect& geo,
@@ -325,10 +325,10 @@ void
 MsoltranrectMollerup::Neumann (const size_t edge, const size_t cell,
 			       const double area, const double in_sign,
 			       const double flux, 
-			       ublas::vector<double>& dq, ublas::vector<double>& B)
+			       ublas::vector<double>& dJ, ublas::vector<double>& B)
 {
   B (cell) = flux * area;
-  dq (edge) = in_sign * flux;
+  dJ (edge) = in_sign * flux;
 }
 
 void 
@@ -337,7 +337,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 			       const std::vector<bool>& active_lysimeter,
 			       const ublas::vector<double>& h,
 			       const ublas::vector<double>& K,
-			       ublas::vector<double>& dq,
+			       ublas::vector<double>& dJ,
 			       ublas::banded_matrix<double>& Dm_mat, 
 			       ublas::vector<double>& Dm_vec, 
 			       ublas::vector<double>& Gm, 
@@ -396,6 +396,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
         }
     }
 }
+
 
 void 
 MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
