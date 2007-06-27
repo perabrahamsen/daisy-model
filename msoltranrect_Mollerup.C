@@ -70,39 +70,30 @@ struct MsoltranrectMollerup : public Msoltranrect
 			 ublas::banded_matrix<double>& advec);
 
   
-  static void Neumann (const size_t edge, const size_t cell, 
-                       const double area, const double in_sign,
-                       const double flux, 
-                       ublas::vector<double>& dJ, ublas::vector<double>& B);
+  static void Neumann_expl (const size_t cell, const double area, 
+                            const double in_sign, const double J, 
+                            ublas::vector<double>& B_vec);
 
+  static void Neumann_impl (const size_t cell, const double area, 
+                            const double in_sign, const double q, 
+                            ublas::banded_matrix<double>& B_mat);
   
   static void lowerboundary (const GeometryRect& geo,
-			     const Groundwater&,
-			     const std::vector<bool>& active_lysimeter,
-			     const ublas::vector<double>& h,
-			     const ublas::vector<double>& K,
-			     ublas::vector<double>& q,
-			     ublas::banded_matrix<double>& Dm_mat, 
-			     ublas::vector<double>& Dm_vec, 
-			     ublas::vector<double>& Gm, 
-			     ublas::vector<double>& B);
+			     const bool isflux,
+			     const double conc,
+			     const ublas::vector<double>& q_edge,
+                             std::vector<double>& J,
+                             ublas::banded_matrix<double>& B_mat,
+                             ublas::vector<double>& B_vec,
+                             ublas::banded_matrix<double>& Dlongm_mat, 
+                             ublas::vector<double>& Dlongm_vec);
+
 
   static void upperboundary (const GeometryRect& geo,
-                             const Soil& soil, 
-                             const ublas::vector<double>& T,
-			     const Surface& surface,
-                             std::vector<top_state>& state,
-			     const ublas::vector<double>& remaining_water,
-			     const ublas::vector<double>& h,
-			     const ublas::vector<double>& K,
-			     ublas::vector<double>& q,
-			     ublas::banded_matrix<double>& Dm_mat, 
-			     ublas::vector<double>& Dm_vec, 
-			     ublas::vector<double>& Gm, 
-			     ublas::vector<double>& B,
-			     const double dt,
-			     const int debug,
+              		     std::vector<double>& J,
+                             ublas::vector<double>& B_vec,
                              Treelog& msg);
+
 
 
   // Solute.
@@ -184,8 +175,8 @@ MsoltranrectMollerup::cell_based_flux (const GeometryRect& geo,
 
 double
 MsoltranrectMollerup::anisotropy_factor (const Geometry& geo, size_t edge, 
-				 const double Dxx, 
-				 const double Dzz)
+                                         const double Dxx, 
+                                         const double Dzz)
 {
   const double sin_angle = geo.edge_sin_angle (edge);
   const double cos_angle = geo.edge_cos_angle (edge);
@@ -322,26 +313,41 @@ MsoltranrectMollerup::advection (const GeometryRect& geo,
 
 
 void 
-MsoltranrectMollerup::Neumann (const size_t edge, const size_t cell,
-			       const double area, const double in_sign,
-			       const double flux, 
-			       ublas::vector<double>& dJ, ublas::vector<double>& B)
+MsoltranrectMollerup::Neumann_expl (const size_t cell,
+                                    const double area, 
+                                    const double in_sign,
+                                    const double J, 
+                                    ublas::vector<double>& B_vec)
 {
-  B (cell) = flux * area;
-  dJ (edge) = in_sign * flux;
+  daisy_assert (J * in_sign >= 0.0);
+  B_vec (cell) = J * area * in_sign; 
 }
 
+
 void 
-UZRectMollerup::lowerboundary (const GeometryRect& geo,
-			       const Groundwater& groundwater,
-			       const std::vector<bool>& active_lysimeter,
-			       const ublas::vector<double>& h,
-			       const ublas::vector<double>& K,
-			       ublas::vector<double>& dJ,
-			       ublas::banded_matrix<double>& Dm_mat, 
-			       ublas::vector<double>& Dm_vec, 
-			       ublas::vector<double>& Gm, 
-			       ublas::vector<double>& B)
+MsoltranrectMollerup::Neumann_impl (const size_t cell,
+                                    const double area, 
+                                    const double in_sign,
+                                    const double q, 
+                                    ublas::banded_matrix<double>& B_mat)
+{
+  daisy_assert (q * in_sign <= 0.0);
+  B_mat (cell, cell) = q * area * in_sign; 
+}
+
+
+
+void 
+MsoltranrectMollerup::lowerboundary (const GeometryRect& geo,
+                                     const bool isflux,
+                                     const double conc,
+                                     const  ublas::vector<double>& q_edge,
+                                     std::vector<double>& J,
+                                     ublas::banded_matrix<double>& B_mat,
+                                     ublas::vector<double>& B_vec,
+                                     ublas::banded_matrix<double>& Dlongm_mat, 
+                                     ublas::vector<double>& Dlongm_vec)
+
 {
   const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
   const size_t edge_below_size = edge_below.size ();
@@ -354,23 +360,30 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       daisy_assert (in_sign > 0);
       const double area = geo.edge_area (edge);
-      const double sin_angle = geo.edge_sin_angle (edge);
-
-      switch (groundwater.bottom_type ())
+    
+      if (isflux)               // Flux BC
         {
-        case Groundwater::free_drainage:
-          {
-            const double sin_angle = geo.edge_sin_angle (edge);
-            const double flux = -in_sign * sin_angle * K (cell) * area;
-            Neumann (edge, cell, area, in_sign, flux, dq, B);
-          }
-          break;
-        case Groundwater::forced_flux:
-          {
-            const double flux = groundwater.q_bottom () * area;
-            Neumann (edge, cell, area, in_sign, flux, dq, B);
-          }
-          break;
+          const bool influx = in_sign * q_edge (edge) > 0;
+          if (influx)
+            {
+              J[edge] = conc * q_edge (edge); 
+              Neumann_expl (cell, area, in_sign, J[edge], B_vec);
+            }
+          else
+            {
+              Neumann_impl (cell, area, in_sign, q_edge (edge), B_mat);
+            }
+        }
+      else                      // Conc. BC
+        {
+          // write something
+        }
+    }
+
+#if 0
+
+
+     
         case Groundwater::pressure:
           {
             const double value = -K (cell) * geo.edge_area_per_length (edge);
@@ -395,26 +408,16 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
           daisy_panic ("Unknown groundwater type");
         }
     }
+#endif 
+
 }
 
 
 void 
 MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
-				     const Soil& soil,
-				     const ublas::vector<double>& T,
-				     const Surface& surface,
-				     std::vector<top_state>& state,
-				     const ublas::vector<double>& remaining_water,
-				     const ublas::vector<double>& h,
-				     const ublas::vector<double>& K,
-				     ublas::vector<double>& dq,
-				     ublas::banded_matrix<double>& Dm_mat, 
-				     ublas::vector<double>& Dm_vec, 
-				     ublas::vector<double>& Gm, 
-				     ublas::vector<double>& B,
-				     const double ddt,
-				     const int debug,
-				     Treelog& msg)
+				     std::vector<double>& J,
+				     ublas::vector<double>& B_vec,
+                                     Treelog& msg)
 {
   const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
@@ -427,81 +430,7 @@ MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       daisy_assert (in_sign < 0);
       const double area = geo.edge_area (edge);
-      const double sin_angle = geo.edge_sin_angle (edge);
-
-      switch (surface.top_type (geo, edge))
-	{
-	case Surface::forced_flux: 
-          {
-            const double flux = -surface.q_top (geo, edge);
-            Neumann (edge, cell, area, in_sign, flux, dq, B);
-          }
-	  break;
-	case Surface::forced_pressure:
-          {
-            const double value = -K (cell) * geo.edge_area_per_length (edge);
-            const double pressure = surface.h_top (geo, edge);
-            Dirichlet (edge, cell, area, in_sign, sin_angle, K (cell),
-                       h (cell), value, pressure, dq, Dm_mat, Dm_vec, Gm);
-          }
-	  break;
-	case Surface::limited_water:
-          {
-            const double h_top = remaining_water (i);
-
-            // We pretend that the surface is particlaly saturated.
-            const double K_sat = soil.K (cell, 0.0, 0.0, T (cell));
-            const double K_cell = K (cell);
-            const double K_edge = K_cell;
-            const double dz = geo.edge_length (edge);
-            daisy_assert (approximate (dz, -geo.z (cell)));
-            double q_in_avail = h_top / ddt;
-            const double q_in_pot = K_edge * (h_top - h (cell) + dz) / dz;
-            // Decide type.
-            bool is_flux = h_top <= 0.0 || q_in_pot > q_in_avail;
-
-            if (is_flux)
-              {
-                state[i] = top_flux;
-                Neumann (edge, cell, area, in_sign, q_in_avail, dq, B);
-              }
-            else			// Pressure
-              {
-                state[i] = top_pressure;
-
-                if (debug > 0 && q_in_pot < 0.0)
-                  {
-                    std::ostringstream tmp;
-                    tmp << "q_in_pot = " << q_in_pot << ", q_avail = " 
-                        << q_in_avail << ", h_top = " << h_top 
-                        << ", h (cell) = " << h (cell) << " K (cell) = " 
-                        << K (cell) << ", K_sat = " << K_sat << ", K_edge = "
-                        << K_edge <<", dz = " << dz << ", ddt = " << ddt
-                        << ", is_flux = " << is_flux << "\n";
-                    msg.message (tmp.str ());
-                  }
-                const double value = -K_edge * geo.edge_area_per_length (edge);
-                const double pressure = h_top;
-                Dirichlet (edge, cell, area, in_sign, sin_angle, 
-                           K_edge, h (cell),
-                           value, pressure, dq, Dm_mat, Dm_vec, Gm);
-              }
-            if (debug == 3)
-              {
-                std::ostringstream tmp;
-                tmp << "edge = " << edge << ", K_edge = " << K_edge 
-                    << ", h_top = "
-                    << h_top << ", dz = " << dz << ", q_avail = " << q_in_avail
-                    << ", q_pot = " << q_in_pot << ", is_flux = " << is_flux;
-                msg.message (tmp.str ());
-              }
-          }
-	  break;
-	case Surface::soil:
-	  throw "Don't know how to handle this surface type";
-	default:
-	  daisy_panic ("Unknown surface type");
-	}
+      Neumann_expl (edge, cell, area, J[edge], B_vec);
     }
 }
 
@@ -559,29 +488,31 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   for (size_t cell = 0; cell != cell_size ; ++cell) 
     S_vol (cell) = S[cell] * geo.cell_volume (cell);
     
-   
-
-  // Boundary matrices and vectors
-  /*
-  ublas::banded_matrix<double>  Dm_mat (cell_size, cell_size, 
-					0, 0); // Dir bc
-  Dm_mat = ublas::zero_matrix<double> (cell_size, cell_size);
-  ublas::vector<double>  Dm_vec (cell_size); // Dir bc
-  Dm_vec = ublas::zero_vector<double> (cell_size);
-  ublas::vector<double> Gm (cell_size); // Dir bc
-  Gm = ublas::zero_vector<double> (cell_size);
-  ublas::vector<double> B (cell_size); // Neu bc 
-  B = ublas::zero_vector<double> (cell_size);
   
-  lowerboundary (geo, groundwater, active_lysimeter, h,
-		 K, dq, Dm_mat, Dm_vec, Gm, B);
-  upperboundary (geo, soil, T, surface, state, remaining_water, h,
-		 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg);
+  // Boundary matrices and vectors
+  
 
-  */
+  ublas::banded_matrix<double> B_mat (cell_size, cell_size, 0, 0); 
+  for (int c = 0; c < cell_size; c++)
+    B_mat (c, c) = 0.0;
+  ublas::vector<double> B_vec = ublas::zero_vector<double> (cell_size); 
+  ublas::banded_matrix<double>  Dlongm_mat (cell_size, cell_size,      
+                                            0, 0); // Dir bc
+  Dlongm_mat = ublas::zero_matrix<double> (cell_size, cell_size);  
+  ublas::vector<double>  Dlongm_vec (cell_size); // Dir bc
+  Dlongm_vec = ublas::zero_vector<double> (cell_size);
+  
+    
+  upperboundary (geo, J, B_vec, msg);
 
 
+  // Why not dt and msg????
+  const bool isflux = true;
+  const double conc = 0.0;
 
+  lowerboundary (geo, isflux, conc, q_edge, J, B_mat, B_vec, 
+                 Dlongm_mat, Dlongm_vec);
+  
 
   // Remember old content for checking mass balance later.
   const double old_content = geo.total_soil (M);

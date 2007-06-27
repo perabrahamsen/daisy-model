@@ -221,7 +221,7 @@ Lexer::eof ()
 }
     
 Lexer::Lexer (const std::string& name, Treelog& out)
-  : impl (*new Implementation (name)),
+  : impl (new Implementation (name)),
     err (out),
     file (name),
     error_count (0)
