@@ -191,15 +191,24 @@ Production::tick (const double AirT, const double SoilT,
   Respiration += RM;
   MaintRespiration = RM;
   NetAss -= RM;
-  double RootResp = RMRoot;     // [g CH2O/m^2/h]
 
+  double LeafMResp = RMLeaf;     // [g CH2O/m^2/h]
+  double StemMResp = RMStem;     // [g CH2O/m^2/h]
+  double SOrgMResp = RMSOrg;     // [g CH2O/m^2/h]
+  double RootMResp = RMRoot;     // [g CH2O/m^2/h]
+  
+  double LeafGResp = 0.0;
+  double StemGResp = 0.0;
+  double SOrgGResp = 0.0;
+  double RootGResp = 0.0;
+ 
   daisy_assert (CH2OPool >= 0.0);
   if (CH2OPool >= RM * dt)
     {
       // We have enough assimilate to cover respiration.
       CH2OPool -= RM * dt;
       const double AssG         // [g CH2O/m^2/h]
-        = std::max (1.0, dt * CH2OReleaseRate) * CH2OPool;
+        = std::min (1.0, dt * CH2OReleaseRate) * CH2OPool;
       CH2OPool -= AssG * dt;
 
       // Partition growth.
@@ -244,8 +253,11 @@ Production::tick (const double AirT, const double SoilT,
           msg.error (tmp.str ());
         }
       NetAss -= GrowthRespiration;
-      RootResp += RootGrowthRespCoef * f_Root * AssG;
       Respiration += GrowthRespiration;
+      LeafGResp = LeafGrowthRespCoef * f_Leaf * AssG;
+      StemGResp = StemGrowthRespCoef * f_Stem * AssG;
+      SOrgGResp = SOrgGrowthRespCoef * f_SOrg * AssG;
+      RootGResp = RootGrowthRespCoef * f_Root * AssG;
     }
   else
     {
@@ -325,7 +337,20 @@ Production::tick (const double AirT, const double SoilT,
   NetPhotosynthesis = molWeightCO2 / molWeightCH2O * NetAss;
   AccNetPhotosynthesis += NetPhotosynthesis * dt;
 
-  RootRespiration = molWeightCO2 / molWeightCH2O * RootResp;
+  LeafGrowthRespiration = molWeightCO2 / molWeightCH2O * LeafGResp;  
+  StemGrowthRespiration = molWeightCO2 / molWeightCH2O * StemGResp;  
+  SOrgGrowthRespiration = molWeightCO2 / molWeightCH2O * SOrgGResp;
+  RootGrowthRespiration = molWeightCO2 / molWeightCH2O * RootGResp;
+
+  LeafMaintRespiration = molWeightCO2 / molWeightCH2O * LeafMResp;  
+  StemMaintRespiration = molWeightCO2 / molWeightCH2O * StemMResp;  
+  SOrgMaintRespiration = molWeightCO2 / molWeightCH2O * SOrgMResp;
+  RootMaintRespiration = molWeightCO2 / molWeightCH2O * RootMResp;
+
+  LeafRespiration = LeafGrowthRespiration + LeafMaintRespiration;
+  StemRespiration = StemGrowthRespiration + StemMaintRespiration;
+  SOrgRespiration = SOrgGrowthRespiration + SOrgMaintRespiration;
+  RootRespiration = RootGrowthRespiration + RootMaintRespiration;
 
   // Update dead leafs
   DeadWLeaf = LfDR (DS) / 24.0 * WLeaf;
@@ -479,7 +504,18 @@ Production::none ()
   Respiration = 0.0;
   MaintRespiration = 0.0;
   GrowthRespiration = 0.0;
+  LeafRespiration = 0.0;
+  StemRespiration = 0.0;
+  SOrgRespiration = 0.0;
   RootRespiration = 0.0;
+  LeafMaintRespiration = 0.0;
+  StemMaintRespiration = 0.0;
+  SOrgMaintRespiration = 0.0;
+  RootMaintRespiration = 0.0;
+  LeafGrowthRespiration = 0.0;
+  StemGrowthRespiration = 0.0;
+  SOrgGrowthRespiration = 0.0;
+  RootGrowthRespiration = 0.0;
   DeadWLeaf = 0.0;
   DeadNLeaf = 0.0;
   DeadWRoot = 0.0;
@@ -520,7 +556,18 @@ Production::output (Log& log) const
   output_variable (Respiration, log);
   output_variable (MaintRespiration, log);
   output_variable (GrowthRespiration, log);
+  output_variable (LeafRespiration, log);
+  output_variable (StemRespiration, log);
+  output_variable (SOrgRespiration, log);
   output_variable (RootRespiration, log);
+  output_variable (LeafMaintRespiration, log);
+  output_variable (StemMaintRespiration, log);
+  output_variable (SOrgMaintRespiration, log);
+  output_variable (RootMaintRespiration, log);
+  output_variable (LeafGrowthRespiration, log);
+  output_variable (StemGrowthRespiration, log);
+  output_variable (SOrgGrowthRespiration, log);
+  output_variable (RootGrowthRespiration, log);
   output_variable (IncWLeaf, log);
   output_variable (IncWStem, log);
   output_variable (IncWSOrg, log);
@@ -669,8 +716,30 @@ For initialization, set this to the amount of N in the seed.");
 	      "Maintenance Respiration.");
   syntax.add ("GrowthRespiration", "g CH2O/m^2/h", Syntax::LogOnly,
 	      "Growth Respiration.");
+  syntax.add ("LeafRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Total Leaf Respiration.");
+  syntax.add ("StemRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Total Stem Respiration.");
+  syntax.add ("SOrgRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Total SOrg Respiration.");
   syntax.add ("RootRespiration", "g CO2/m^2/h", Syntax::LogOnly,
-	      "Root Respiration.");
+	      "Total Root Respiration.");
+  syntax.add ("LeafMaintRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Leaf Maintenance Respiration.");
+  syntax.add ("StemMaintRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Stem Maintenance Respiration.");
+  syntax.add ("SOrgMaintRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "SOrg Maintenance Respiration.");
+  syntax.add ("RootMaintRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Root Maintenance Respiration.");
+  syntax.add ("LeafGrowthRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Leaf Growth Respiration.");
+  syntax.add ("StemGrowthRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Stem Growth Respiration.");
+  syntax.add ("SOrgGrowthRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "SOrg Growth Respiration.");
+  syntax.add ("RootGrowthRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Root Growth Respiration.");
   syntax.add ("IncWLeaf", "g DM/m^2/h", Syntax::LogOnly,
 	      "Leaf growth.");
   syntax.add ("IncWStem", "g DM/m^2/h", Syntax::LogOnly,
@@ -792,7 +861,18 @@ Production::Production (const AttributeList& al)
     Respiration (0.0),
     MaintRespiration (0.0),
     GrowthRespiration (0.0),
+    LeafRespiration (0.0),
+    StemRespiration (0.0),
+    SOrgRespiration (0.0),
     RootRespiration (0.0),
+    LeafMaintRespiration (0.0),
+    StemMaintRespiration (0.0),
+    SOrgMaintRespiration (0.0),
+    RootMaintRespiration (0.0),
+    LeafGrowthRespiration (0.0),
+    StemGrowthRespiration (0.0),
+    SOrgGrowthRespiration (0.0),
+    RootGrowthRespiration (0.0),
     IncWLeaf (0.0),
     IncWStem (0.0),
     IncWSOrg (0.0),

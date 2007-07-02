@@ -419,7 +419,7 @@ PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
 
   syntax.add ("ci_middel", "Pa", Syntax::LogOnly, "Stomata average CO2 pressure.");
   syntax.add ("gs", "mol/m2/s", Syntax::LogOnly, "Stomata conductance.");
-  syntax.add ("Ass", "g CH2O/m2", Syntax::LogOnly, "'Net' leaf assimilate of CO2.");
+  syntax.add ("Ass", "g CH2O/m2", Syntax::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
   syntax.add ("Res", "g CH2O/m2", Syntax::LogOnly, "Farquhar leaf respiration.");
   syntax.add ("LAI", "", Syntax::LogOnly, "Leaf area index for the canopy used in photosynthesis.");
   syntax.add ("sun_LAI", "", Syntax::LogOnly, "Leaf area index for the sunlit fraction.");

@@ -253,8 +253,16 @@ GroundwaterPipe::DeepPercolation (const Geometry& geo)
   const int size = geo.cell_size ();
   daisy_assert (size > 0);
   const double hb = height - geo.bottom ();
+#if 0
+  std::ostringstream tmp;
+  tmp << "height = " << height << ", bottom = " << geo.bottom ()
+      << ", hb = " << hb << ", h_aquifer = " << h_aquifer << "\n"
+      << "Z_aquitard = " << Z_aquitard_ << ", deep = " 
+      << K_aquitard_ * (1.0 + (hb - h_aquifer) / Z_aquitard_);
+  Assertion::message (tmp.str ());
+#endif
   if (hb > 0)
-    return K_aquitard_ * (1.0 + (hb - h_aquifer) / Z_aquitard_);
+    return K_aquitard_ * (hb - (h_aquifer - Z_aquitard_)) / Z_aquitard_;
   else
     return 0;
 }

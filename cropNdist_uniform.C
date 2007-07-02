@@ -102,8 +102,9 @@ static struct cropNdistUniformSyntax
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
     syntax.add ("f_photo", Syntax::None (), Check::positive (), Syntax::Const,
-                "Fraction of photosynthetically active N in canopy, f_photo = 0.75 (Boegh et al., 2002)");
-    alist.add ("f_photo", 0.75);
+                "Fraction of photosynthetically active N in canopy, f_photo = 0.75 (Boegh et al., 2002). However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
+
+    alist.add ("f_photo", 1.0);
 
     syntax.add ("Xn", "mol/mol/s", Check::positive (), Syntax::Const,
                 "Slope of relationship between leaf nitrogen and Vmax, Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");

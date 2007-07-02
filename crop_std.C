@@ -326,7 +326,8 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   const double nitrogen_stress = nitrogen.nitrogen_stress;
   const double water_stress = root_system->water_stress;
 
-  if (bioclimate.hourly_global_radiation () > 1e-10 && canopy.CAI > 0)
+  if (true //bioclimate.hourly_global_radiation () > 1e-10  
+      && canopy.CAI > 0)
     {
       double Ass = 0.0;
       const std::vector<double>& total_PAR = bioclimate.PAR (); 
