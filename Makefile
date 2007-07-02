@@ -49,8 +49,8 @@ endif
 TARGETTYPE = i586-mingw32msvc
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
-USE_GUI = none
-#USE_GUI = Q4
+#USE_GUI = none
+USE_GUI = Q4
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
@@ -530,7 +530,7 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 TEXT =  ChangeLog.2 ChangeLog.1 \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
 	$(HEADERS) $(SOURCES) $(ALLSYSHDR) $(ALLSYSSRC) \
-	$(ALLGUIHDR) $(ALLGUISRC)
+	$(ALLGUIHDR) $(ALLGUISRC) $(UTTESTSRC)
 
 # The executables.
 #
@@ -564,7 +564,10 @@ daisy_Qt.dll: $(Q4OBJECTS) daisy.dll
 
 # Create the main executable.
 #
-daisy.exe:	main${OBJ} $(GUIDLL) daisy.dll
+daisy.exe:	main${OBJ} daisy.dll
+	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
+
+daisyw.exe:	main${OBJ}  $(GUIDLL) daisy.dll
 	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB) -mwindows
 
 daisy:	main${OBJ} $(GUIOBJECTS) $(LIBOBJ)
@@ -577,7 +580,7 @@ exp:
 native:	
 	(mkdir -p $(NATIVEHOME) \
 	 && cd $(NATIVEHOME) \
-         && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy${EXE})
+         && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy${EXE} daisyw.exe)
 
 cnative:
 	(mkdir -p $(NATIVEHOME) \
