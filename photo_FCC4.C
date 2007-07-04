@@ -22,7 +22,7 @@
 
 #define BUILD_DLL
 #include "photo_Farquhar.h"
-#include "cropNdist.h"
+#include "rubiscoNdist.h"
 #include "ABAeffect.h"
 #include "bioclimate.h"
 #include "canopy_std.h"
@@ -58,8 +58,9 @@ public:
   double V_m (const double Vm_25, double Tl) const;
   double J_m (const double vmax25, const double T) const;
   double Qt (const double k, const double Tl, const double Qtk) const;
-  void CxModel (double& pn, double& ci, const double Q, const double gsw, 
-		  const double T, const double vmax, const double rd, Treelog& msg) const ;
+  void CxModel (const double CO2_atm, double& pn, double& ci, const double Q, 
+		const double gsw, const double T, const double vmax, 
+		const double rd, Treelog& msg) const ;
   double respiration_rate(const double Vm_25, const double Tl) const;
   
   // Create and Destroy.
@@ -101,7 +102,7 @@ PhotoFCC4::Qt (const double k, const double Tl, const double Qtk) const
 }
 
 void 
-PhotoFCC4::CxModel (double& pn, double& ci/*[Pa]*/, 
+PhotoFCC4::CxModel (const double CO2_atm, double& pn, double& ci/*[Pa]*/, 
 		    const double PAR /*[mol/m²leaf/s/fraction]*/, 
 		    const double gsw /*[mol/m²/s]*/, const double T, 
 		    const double vmax25 /*[mol/m² leaf/s/fraction]*/, 

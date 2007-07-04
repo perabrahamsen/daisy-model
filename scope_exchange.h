@@ -24,6 +24,7 @@
 #include "memutils.h"
 #include <map>
 #include <vector>
+#include <string>
 
 class Block;
 class Syntax;
@@ -82,10 +83,10 @@ private:
   explicit ExchangeNumber (const ExchangeNumber&); // Disable
 public:
   explicit ExchangeNumber (Block& al);
-  explicit ExchangeNumber (symbol name, const char* dimension, 
-                           const char* description);
+  explicit ExchangeNumber (symbol name, const std::string dimension, 
+                           const std::string description);
   explicit ExchangeNumber (symbol name, double value, 
-                           const char* dimension, const char* description);
+                           const std::string dimension, const std::string description);
   ~ExchangeNumber ();
 };
 

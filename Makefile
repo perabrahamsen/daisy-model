@@ -362,14 +362,14 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = cropNdist_PLF.C uzrect_const.C photo_FCC3.C photo_FCC4.C \
+MODELS =rubiscoNdist_expr.C uzrect_const.C photo_FCC3.C photo_FCC4.C \
 	msoltranrect_Mollerup.C reaction_std.C chemistry_std.C \
 	groundwater_extern.C scope_exchange.C\
 	msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
-	msoltranrect_2x1.C photo_FCC4.C ABAeffect_exp.C cropNdist_uniform.C \
+	msoltranrect_2x1.C photo_FCC4.C ABAeffect_exp.C rubiscoNdist_uniform.C \
 	uzrect_2x1.C select_flow.C volume_box.C \
 	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
-	cropNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \
+	rubiscoNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \
         difrad_weather.C number_lisp.C condition_extern.C condition_boolean.C \
 	boolean_number.C boolean_string.C \
 	movement_rect.C number_soil.C organic_none.C \
@@ -424,7 +424,7 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 #
 COMPONENTS = ui.C reaction.C scopesel.C scope.C \
 	ABAeffect.C msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
-	cropNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C \
+	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C \
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
@@ -698,7 +698,7 @@ UTESTSRC = ut_scope_exchange.C
 UTESTOBJ = $(UTESTSRC:.C=${OBJ})
 
 utest$(EXE): $(LIBOBJ) $(UTESTOBJ)
-	$(CC) -o $@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) 
+	$(CC) -o $@ $^ $(CPPLIB) $(MATHLIB) 
 
 unittest:	
 	(mkdir -p $(NATIVEHOME) \
@@ -921,7 +921,7 @@ volume${OBJ}: volume.C volume.h model.h symbol.h block.h syntax.h treelog.h \
 uz1d${OBJ}: uz1d.C uz1d.h model.h geometry_rect.h geometry_vert.h geometry.h \
   syntax.h treelog.h symbol.h mathlib.h assertion.h soil.h soil_water.h \
   soil_heat.h block.h plf.h librarian.h
-cropNdist${OBJ}: cropNdist.C cropNdist.h model.h alist.h symbol.h block.h \
+rubiscoNdist${OBJ}: rubiscoNdist.C rubiscoNdist.h model.h alist.h symbol.h block.h \
   syntax.h treelog.h plf.h mathlib.h assertion.h librarian.h
 raddist${OBJ}: raddist.C raddist.h model.h alist.h symbol.h block.h syntax.h \
   treelog.h plf.h mathlib.h assertion.h librarian.h
@@ -1297,14 +1297,14 @@ msoltranrect_2x1${OBJ}: msoltranrect_2x1.C msoltranrect.h model.h symbol.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h transport.h soil.h soil_water.h solute.h adsorption.h \
   element.h alist.h submodeler.h block.h plf.h memutils.h librarian.h
-photo_FCC4${OBJ}: photo_FCC4.C photo.h model.h symbol.h cropNdist.h alist.h \
+photo_FCC4${OBJ}: photo_FCC4.C photo.h model.h symbol.h rubiscoNdist.h alist.h \
   ABAeffect.h bioclimate.h canopy_std.h canopy_simple.h plf.h phenology.h \
   log.h border.h syntax.h treelog.h block.h submodel.h mathlib.h \
   assertion.h check.h librarian.h
 ABAeffect_exp${OBJ}: ABAeffect_exp.C ABAeffect.h model.h alist.h symbol.h \
   mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
   librarian.h
-cropNdist_uniform${OBJ}: cropNdist_uniform.C cropNdist.h model.h alist.h \
+rubiscoNdist_uniform${OBJ}: rubiscoNdist_uniform.C rubiscoNdist.h model.h alist.h \
   symbol.h mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
   librarian.h
 uzrect_2x1${OBJ}: uzrect_2x1.C uzrect.h model.h symbol.h uzmodel.h uz1d.h \
@@ -1328,7 +1328,7 @@ uz1d_richard${OBJ}: uz1d_richard.C uz1d.h model.h geometry_rect.h \
   geometry_vert.h geometry.h syntax.h treelog.h symbol.h mathlib.h \
   assertion.h soil.h soil_water.h soil_heat.h block.h plf.h alist.h \
   average.h librarian.h
-cropNdist_DPF${OBJ}: cropNdist_DPF.C cropNdist.h model.h alist.h symbol.h \
+rubiscoNdist_DPF${OBJ}: rubiscoNdist_DPF.C rubiscoNdist.h model.h alist.h symbol.h \
   mathlib.h assertion.h block.h syntax.h treelog.h plf.h check.h \
   librarian.h
 raddist_DPF${OBJ}: raddist_DPF.C raddist.h model.h alist.h symbol.h block.h \
@@ -1429,7 +1429,7 @@ action_markvand${OBJ}: action_markvand.C action.h model.h alist.h symbol.h \
   memutils.h field.h border.h crop.h im.h fao.h log.h mathlib.h \
   assertion.h check.h vcheck.h librarian.h
 photo_Farquhar${OBJ}: photo_Farquhar.C photo.h model.h symbol.h block.h \
-  syntax.h treelog.h plf.h cropNdist.h alist.h ABAeffect.h bioclimate.h \
+  syntax.h treelog.h plf.h rubiscoNdist.h alist.h ABAeffect.h bioclimate.h \
   canopy_std.h canopy_simple.h phenology.h log.h border.h submodel.h \
   mathlib.h assertion.h check.h librarian.h
 photo_GL${OBJ}: photo_GL.C photo.h model.h symbol.h block.h syntax.h \

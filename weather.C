@@ -133,6 +133,10 @@ IM
 Weather::deposit () const // [g [stuff] /cm²/h]
 { return deposit_; }
 
+double
+Weather::CO2 () const // [Pa]
+{ return 35.0; }
+
 bool 
 Weather::has_reference_evapotranspiration () const
 { return false; }

@@ -129,6 +129,39 @@ static struct NumberLnSyntax
   }
 } NumberLn_syntax;
 
+struct NumberExp : public NumberOperand
+{
+  // Simulation.
+  double value (const Scope& scope) const
+  { 
+    const double v = operand->value (scope);
+    return exp (v); 
+  }
+
+  // Create.
+  NumberExp (Block& al)
+    : NumberOperand (al)
+  { }
+};
+
+static struct NumberExpSyntax
+{
+  static Model& make (Block& al)
+  { return *new NumberExp (al); }
+  NumberExpSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    alist.add ("description", 
+	       "Take the exponential of its argument.");
+    syntax.add_object ("operand", Number::component,
+                       "Operand for this function.");
+    syntax.order ("operand");
+    Librarian::add_type (Number::component, "exp", alist, syntax, &make);
+  }
+} NumberExp_syntax;
+
 struct NumberSqrt : public NumberOperand
 {
   // Simulation.

@@ -123,7 +123,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time& time, const double relative_humidity,
+  void tick (const Time& time, const double relative_humidity, const double CO2_atm,
 	     const Bioclimate&, const Geometry& geo,
              const Soil&, OrganicMatter&,
 	     const SoilHeat&, const SoilWater&, SoilNH4&, SoilNO3&, 
@@ -210,7 +210,7 @@ CropSimple::force_production_stress  (double pstress)
 { root_system->production_stress = pstress; }
 
 void
-CropSimple::tick (const Time& time, const double,
+CropSimple::tick (const Time& time, const double, const double,
 		  const Bioclimate& bioclimate,
                   const Geometry& geo,
 		  const Soil& soil,

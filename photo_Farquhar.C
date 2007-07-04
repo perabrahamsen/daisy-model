@@ -24,7 +24,7 @@
 
 #include "photo_Farquhar.h"
 #include "block.h"
-#include "cropNdist.h"
+#include "rubiscoNdist.h"
 #include "ABAeffect.h"
 #include "bioclimate.h"
 #include "canopy_std.h"
@@ -43,20 +43,32 @@ using namespace std;
 
 PhotoFarquhar::PhotoFarquhar (Block& al)
   : Photo (al),
+    Xn (al.number ("Xn")),
     O2_atm (al.number ("O2_atm")),
-    CO2_atm (al.number ("CO2_atm")),
     Gamma25 (al.number ("Gamma25")),
     Ea_Gamma (al.number ("Ea_Gamma")),
     Ptot (al.number("Ptot")),
     m (al.number("m")),
     b (al.number("b")),
     gbw (al.number("gbw")),
-    cropNdist (Librarian::build_item<CropNdist> (al, "N-dist")),
+    rubiscoNdist (Librarian::build_item<RubiscoNdist> (al, "N-dist")),
     ABAeffect (Librarian::build_item<ABAEffect> (al, "ABAeffect"))
 { }
 
 PhotoFarquhar::~PhotoFarquhar ()
 { }
+
+void
+PhotoFarquhar::crop_Vmax_total (const vector <double>& rubisco_Ndist/*[mol/m²leaf]*/,  
+				std::vector <double>& cropVm) const
+{
+  const int No = cropVm.size ();
+  daisy_assert (rubisco_Ndist.size () == No);
+  // Fill photosynthetic capacity Vm for each canopy layer in vector
+  for (int i = 0; i < No; i++)
+     cropVm[i] = Xn * rubisco_Ndist[i]; //[mol/m² leaf/s]
+}
+
 
 // Arrhenius temperature response function used for Kc, Ko og Gamma
 double
@@ -97,7 +109,7 @@ PhotoFarquhar:: Sat_vapor_pressure (const double T /*[degree C]*/) const
 }
 
 double
-PhotoFarquhar:: GSTModel(double ABA, double pn, double rel_hum /*[unitless]*/, 
+PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA, double pn, double rel_hum /*[unitless]*/, 
 			 double LA, double fraction, double gbw/*[mol/m2/s]*/, 
 			 const double Ta, const double Tl, Treelog&) 
 {
@@ -147,6 +159,7 @@ PhotoFarquhar:: GSTModel(double ABA, double pn, double rel_hum /*[unitless]*/,
 
 double
 PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum, 
+			   const double CO2_atm,
 			   const double Ta, const double Tl, const double cropN,
 			   const vector<double>& PAR, 
 			   const vector<double>& PAR_height,
@@ -194,8 +207,8 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
   daisy_assert (No == PAR_height.size () - 1);
   
   // N-distribution and photosynthetical capacity 
-  vector<double> crop_Ndist (No, 0.0);
-  vector<double> crop_Vmax_total (No, 0.0);
+  vector<double> rubisco_Ndist (No, 0.0);
+  vector<double> crop_Vm_total (No, 0.0);
 
   // Photosynthetic capacity (for logging)
   while (Vm_vector.size () < No)
@@ -213,9 +226,10 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
   while (sun_LAI_vector.size () < No)
     sun_LAI_vector.push_back (0.0);
 
-  cropNdist->cropN_distribution (prevLA, crop_Ndist/*[mol/m²leaf]*/, 
-				 crop_Vmax_total/*[mol/m²leaf/s]*/, 
-				 cropN /*[g/m²area]*/, msg);
+  rubiscoNdist->rubiscoN_distribution (PAR_height, prevLA, DS, rubisco_Ndist/*[mol/m²leaf]*/, 
+				       cropN /*[g/m²area]*/, msg);
+  crop_Vmax_total (rubisco_Ndist, crop_Vm_total);  
+
 
   // Stomata CO2 preassure (for logging)
   while (ci_vector.size () < No)
@@ -248,7 +262,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	  PAR_ += dPAR * dCAI * 3600.0; //mol/m2/h/fraction
 
 	  // Photosynthetic rubisco capacity 
-	  const double vmax25 = crop_Vmax_total[i]*fraction[i];//[mol/m²leaf/s/fracti.]
+	  const double vmax25 = crop_Vm_total[i]*fraction[i];//[mol/m²leaf/s/fracti.]
 	  daisy_assert (vmax25 >= 0.0);
 
 	  // Photosynthetic effect of Xylem ABA.
@@ -271,8 +285,8 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	      lastci = ci; //Stomata CO2 pressure 
 
 	      //Calculating ci and "net"photosynthesis
-	      CxModel(pn, ci, dPAR, gsw, Tl, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
-	      gsw = GSTModel(ABA, pn, rel_hum, LA, fraction[i], gbw, Ta, Tl, msg);//[mol/s/m²leaf/fraction]
+	      CxModel(CO2_atm, pn, ci, dPAR, gsw, Tl, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
+	      gsw = GSTModel(CO2_atm, ABA, pn, rel_hum, LA, fraction[i], gbw, Ta, Tl, msg);//[mol/s/m²leaf/fraction]
 
 	      iter++;
 	      if(iter > maxiter)
@@ -298,7 +312,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 
 	  //log variables:
 	  Ass_vector[i]+= pn_* (molWeightCH2O / molWeightCO2) * LA;//[g CH2O/m²area/h]
-	  Nleaf_vector[i]+= crop_Ndist[i] * LA * fraction[i]; //[mol N/m²area]OK
+	  Nleaf_vector[i]+= rubisco_Ndist[i] * LA * fraction[i]; //[mol N/m²area]OK
 	  gs_vector[i]+= gsw * LA * fraction[i];    //[mol/m² area/s]
 	  ci_vector[i]+= ci * fraction[i];  //[Pa] OK
 	  Vm_vector[i]+= Vm_ * 1000.0 * LA * fraction[i]; //[mmol/m² area/s]OK
@@ -312,7 +326,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	  LAI += LA * fraction[i];//OK
 	  Vmax += 1000.0 * LA * fraction[i] * Vm_;   //[mmol/m² area/s]
 	  jm += 1000.0 * LA * fraction[i] * Jm_;     //[mmol/m² area/s]
-	  leafPhotN += crop_Ndist[i] * LA *fraction[i]; //[mol N/m²area]; 
+	  leafPhotN += rubisco_Ndist[i] * LA *fraction[i]; //[mol N/m²area]; 
 	  fraction_total += fraction[i]/(No + 0.0);
 	  fraction_sun += fraction[i]/(No + 0.0);
 	}
@@ -378,13 +392,13 @@ PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
 
   alist.add ("description", "Faquhar et al. (1980) photosynthesis and Ball et al. (1987) stomataconductance model coupled as described by Collatz et al., 1991.");
 
+  syntax.add ("Xn", "mol/mol/s", Check::positive (), Syntax::Const,
+	      "Slope of relationship between leaf rubisco N and Vmax, Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
+  alist.add ("Xn", 1.16e-3);
+
   syntax.add ("O2_atm", "Pa", Check::positive (), Syntax::Const,
 	      "O2 partial pressure of atmosphere");
   alist.add ("O2_atm", 20500.0);
-
-  syntax.add ("CO2_atm", "Pa", Check::positive (), Syntax::Const,
-	      "CO2 partial pressure of atmosphere");
-  alist.add ("CO2_atm", 35.0);
 
   syntax.add ("Gamma25", "Pa", Check::positive (), Syntax::Const,
 	      "CO2 compensation point of photosynthesis. Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
@@ -431,9 +445,9 @@ PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("fraction_total", "", Syntax::LogOnly, "Fraction of leaf contributing to the photosynthesis.");
 
   // Models
-  syntax.add_object ("N-dist", CropNdist::component, 
-		     "N-distribution in the canopy layer.");
-  alist.add ("N-dist", CropNdist::default_model ());
+  syntax.add_object ("N-dist", RubiscoNdist::component, 
+		     "Rubisco N-distribution in the canopy layer.");
+  alist.add ("N-dist", RubiscoNdist::default_model ());
 
   syntax.add_object ("ABAeffect", ABAEffect::component, 
 		     "The effect of xylem ABA on stomata conductivity.");

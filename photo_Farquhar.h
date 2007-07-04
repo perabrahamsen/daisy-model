@@ -28,7 +28,7 @@
 #include <vector>
 
 class PLF;
-class CropNdist;
+class RubiscoNdist;
 class ABAEffect;
 class Treelog;
 class CanopyStandard;
@@ -46,15 +46,15 @@ class PhotoFarquhar : public Photo
 {
   // Parameters.
 protected:
+  const double Xn; //Slope of relationship between leaf N and Vm [mmol/mol/s]
   const double O2_atm;// Oxygen partial pressure of the atmosphere
-  const double CO2_atm;//CO2 partial pressure of atmosphere
   const double Gamma25;//CO2 compensation point of photosynthesis
   const double Ea_Gamma; // Activation energy for Gamma
   const double Ptot;  // Atmospheric pressure
   const double m;     // Stomatal slope factor, Ball and Berry model
   const double b;     // Stomatal intercept factor, Ball and Berry model
   const double gbw;   // Leaf boundary conductance of water 
-  std::auto_ptr<CropNdist> cropNdist;// Crop N distribution model.
+  std::auto_ptr<RubiscoNdist> rubiscoNdist;// Crop N distribution model.
   std::auto_ptr<ABAEffect> ABAeffect;// ABA-xylem effect on photosynthesis.
 
   // Log variable.
@@ -80,21 +80,23 @@ protected:
     
   // Simulation.
 public:
+  void crop_Vmax_total (const std::vector <double>& rubiscoNdist, 
+			std::vector <double>& cropVm) const;
   double Arrhenius (const double k25, const double Ea, double Tl) const;  
   virtual double V_m (const double Vm_25, double Tl) const = 0;
   double Sat_vapor_pressure (const double T) const;
-  double GSTModel(double ABA, double pn, double vp_ref, const double LA, 
-		  const double fraction, const double Ta, const double Tl,  
-		  double gb, Treelog& msg);
+  double GSTModel(const double CO2_atm, double ABA, double pn, double vp_ref, 
+		  const double LA, const double fraction, const double Ta, 
+		  const double Tl, double gb, Treelog& msg);
 private:
   virtual double respiration_rate (const double Vm_25, const double Tl) const = 0;
   virtual double J_m(const double Vm_25, const double Tl) const = 0;
-  virtual void CxModel(double& pn, double& ci, const double dPAR,
+  virtual void CxModel(const double CO2_atm, double& pn, double& ci, const double dPAR,
 		       const double gsw, const double Tl, const double Vm_25, 
 		       const double rd, Treelog& msg) const = 0;
 public:
   double assimilate (const double ABA_xylem, const double rel_hum, 
-		     double Ta, double Tl, const double cropN,
+		     const double CO2_atm, double Ta, double Tl, const double cropN,
 		     const std::vector<double>& PAR,
 		     const std::vector<double>& PAR_Height,
 		     const double PAR_LAI, const std::vector<double>& fraction,

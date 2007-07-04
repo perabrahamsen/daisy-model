@@ -118,7 +118,7 @@ struct VegetationCrops : public Vegetation
   std::string crop_names () const;
 
   // Simulation.
-  void tick (const Time& time, double relative_humidity,
+  void tick (const Time& time, double relative_humidity, const double CO2_atm,
 	     const Bioclimate& bioclimate, 
              const Geometry& geo,
 	     const Soil& soil,
@@ -295,7 +295,8 @@ VegetationCrops::crop_names () const
 }
 
 void 
-VegetationCrops::tick (const Time& time, const double relative_humidity,
+VegetationCrops::tick (const Time& time, const double relative_humidity, 
+		       const double CO2_atm,
 		       const Bioclimate& bioclimate, 
                        const Geometry& geo,
 		       const Soil& soil,
@@ -338,7 +339,7 @@ VegetationCrops::tick (const Time& time, const double relative_humidity,
       const double my_force = use_force ? (MyLAI / SimLAI) * ForcedLAI : -1.0;
       
       // Tick.
-      (*crop)->tick (time, relative_humidity, 
+      (*crop)->tick (time, relative_humidity, CO2_atm, 
                      bioclimate, geo, soil, organic_matter, 
 		     soil_heat, soil_water, soil_NH4, soil_NO3, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
@@ -637,7 +638,7 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
   if (!crop)
     {
       msg.error ("Sowing failed");
-      return;
+      throw 3;
     }
   const symbol name = crop->name;
   for (CropList::iterator i = crops.begin();

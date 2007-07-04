@@ -95,12 +95,13 @@ public:
   virtual double snow () const = 0;	// [mm/h]
   IM deposit () const; // [g [stuff] /cm²/h]
   double hourly_cloudiness () const // [0-1]
-    { return hourly_cloudiness_; }
+  { return hourly_cloudiness_; }
   double daily_cloudiness () const // [0-1]
-    { return daily_cloudiness_; }
+  { return daily_cloudiness_; }
   virtual double vapor_pressure () const = 0; // [Pa]
   virtual double relative_humidity () const = 0; // []
   virtual double wind () const = 0;	// [m/s]
+  double CO2 () const; //[Pa]
 
   // Initializing bioclimate.
 public:

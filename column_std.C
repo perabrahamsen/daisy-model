@@ -639,7 +639,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                     *vegetation, *movement,
                     geometry, *soil, *soil_water, *soil_heat, 
                     dt, msg);
-  vegetation->tick (time, my_weather.relative_humidity (),
+  vegetation->tick (time, my_weather.relative_humidity (), my_weather.CO2 (),
                     *bioclimate, geometry, *soil, 
 		    *organic_matter,
                     *soil_heat, *soil_water, *soil_NH4, *soil_NO3, 

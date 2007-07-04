@@ -118,6 +118,7 @@ public:
   // Simulation.
 public:
   void tick (const Time& time, double relative_humidity,
+	     const double CO2_atm,
 	     const Bioclimate&, const Geometry& geo,
              const Soil&,
 	     OrganicMatter&,
@@ -214,7 +215,8 @@ CropStandard::initialize (const Geometry& geo,
 }
 
 void
-CropStandard::tick (const Time& time, const double relative_humidity,
+CropStandard::tick (const Time& time, const double relative_humidity, 
+		    const double CO2_atm,
 		    const Bioclimate& bioclimate,
                     const Geometry& geo,
 		    const Soil& soil,
@@ -384,7 +386,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
       if (bioclimate.shared_light_fraction () > 1e-10)
         {
           // Shared light.
-	  Ass += photo->assimilate (ABA_xylem, relative_humidity, 
+	  Ass += photo->assimilate (ABA_xylem, relative_humidity, CO2_atm,
 				    bioclimate.daily_air_temperature (), 
 				    bioclimate.hourly_leaf_temperature(),
 				    cropN, shadow_PAR, PAR_height,
@@ -392,7 +394,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
 
-          Ass += photo->assimilate (ABA_xylem, relative_humidity,
+          Ass += photo->assimilate (ABA_xylem, relative_humidity, CO2_atm,
 				    bioclimate.daily_air_temperature (),
 				    bioclimate.hourly_leaf_temperature(),
 				    cropN, sun_PAR,  PAR_height,
@@ -409,7 +411,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
           Bioclimate::radiation_distribution 
             (No, LAI (), PARref (), bioclimate.hourly_global_radiation (),
              PARext (), PAR); 
-          Ass += photo->assimilate (ABA_xylem, relative_humidity,
+          Ass += photo->assimilate (ABA_xylem, relative_humidity, CO2_atm,
 				    bioclimate.daily_air_temperature (), 
 				    bioclimate.hourly_leaf_temperature(),
 				    cropN, PAR, PAR_height,

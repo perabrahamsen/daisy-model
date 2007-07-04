@@ -89,6 +89,7 @@ public:
 public:
 
   virtual void tick (const Time& time, double relative_humidity,
+		     const double CO2_atm,
                      const Bioclimate&, 
 		     const Geometry& geo, const Soil&, OrganicMatter&, 
 		     const SoilHeat&, const SoilWater&,
