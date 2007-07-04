@@ -1,3 +1,7 @@
+2007-07-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.16 released.
+
 2007-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* fetch.C (width): Fixed problem with small negative numbers.

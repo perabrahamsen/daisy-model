@@ -528,7 +528,7 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 
 # Find all printable files.
 #
-TEXT =  ChangeLog.2 ChangeLog.1 \
+TEXT =  ChangeLog.2 ChangeLog.1 setup.nsi \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
 	$(HEADERS) $(SOURCES) $(ALLSYSHDR) $(ALLSYSSRC) \
 	$(ALLGUIHDR) $(ALLGUISRC) $(UTESTSRC)
