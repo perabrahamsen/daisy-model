@@ -245,7 +245,7 @@ struct NumberPLF : public NumberOperand
   // Create.
   NumberPLF (Block& al)
     : NumberOperand (al),
-      plf (al.plf ("plf"))
+      plf (al.plf ("points"))
   { }
 };
 
@@ -262,10 +262,10 @@ static struct NumberPLFSyntax
 	       "Look up argumen in a piecewise linear function.");
     syntax.add_object ("operand", Number::component,
                        "Operand for this function.");
-    syntax.add ("plf", Syntax::Unknown () , Syntax::Unknown (),
+    syntax.add ("points", Syntax::Unknown () , Syntax::Unknown (),
                 Syntax::Const, "PLF to look up argument in.");
     syntax.order ("operand");
-    Librarian::add_type (Number::component, "sqr", alist, syntax, &make);
+    Librarian::add_type (Number::component, "plf", alist, syntax, &make);
   }
 } NumberPLF_syntax;
 

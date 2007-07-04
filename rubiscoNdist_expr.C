@@ -126,7 +126,7 @@ rubiscoNdist_expr::integral (const double total_LAI,
 void
 rubiscoNdist_expr::rubiscoN_distribution (const std::vector <double>& PAR_height, 
 					  const double LAI, const double DS,
-					  std::vector <double>& rubiscoNdist/*[mol/m²]*/,  
+					  std::vector <double>& rubiscoNdist /*[mol/m²]*/,  
 					  const double cropN /*[g/m²area]*/, Treelog&)
 {
   daisy_assert (std::isfinite (cropN));
