@@ -1,3 +1,11 @@
+2007-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* fetch.C (width): Fixed problem with small negative numbers.
+
+	* scope_exchange.h: New interface.
+
+	* number_arit.C (NumberPLF): New model.
+
 2007-05-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.15 released.

@@ -103,7 +103,8 @@ Fetch::width (const double value)
   if (!std::isnormal (value))
     return 0;
 
-  const int absolute = double2int (floor (log10 (fabs (value)))) + 1;
+  const int absolute 
+    = double2int (std::max (0.0, floor (log10 (fabs (value))))) + 1;
   if (value < 0)
     return absolute + 1;
   else

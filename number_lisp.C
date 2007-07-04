@@ -209,4 +209,4 @@ Expression to evaluate.");
   }
 } NumberLet_syntax;
 
-// number_extern.C ends here
+// number_lisp.C ends here

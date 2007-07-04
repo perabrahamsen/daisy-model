@@ -836,7 +836,9 @@ setupnocvs:
 	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	mkdir $(SETUPDIR)/bin
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
+	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisy.exe
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
+	$(STRIP) -o $(SETUPDIR)/bin/daisy_Qt.dll $(OBJHOME)/daisy_Qt.dll
 	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
 	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
 	cp $(MINGWHOME)/bin/mingwm10.dll $(SETUPDIR)/bin
