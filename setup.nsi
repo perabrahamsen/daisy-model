@@ -22,7 +22,7 @@ Section "Main Install"
   WriteRegStr HKCU "Software\Daisy ${VERSION}" "Install Directory" $INSTDIR
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   CreateDirectory "$SMPROGRAMS\Daisy ${VERSION}"
-  CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\Daisy.lnk" "$INSTDIR\bin\daisy.exe"
+  CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\Daisy.lnk" "$INSTDIR\bin\daisyw.exe"
   CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\Home Page.lnk" "http://www.dina.kvl.dk/~daisy/"
   CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\Explore.lnk" "$INSTDIR"
   CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\Reference Manual.lnk" "$INSTDIR\doc\reference.pdf"
