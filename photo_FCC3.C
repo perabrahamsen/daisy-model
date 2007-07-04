@@ -286,8 +286,8 @@ static struct Photo_FCC3Syntax
     alist.add ("theta", 0.7);
     
     syntax.add ("beta", " ", Check::positive (), Syntax::Const,
-                "Curvanture");
-    alist.add ("beta", 1.0);
+                "Curvature, Collatz et al., 1991");
+    alist.add ("beta", 0.95);
 
     syntax.add ("alfa", "mol/mol", Check::positive (), Syntax::Const,
                 "Fraction of PAR effectively absorbed by PSII, ");
