@@ -72,8 +72,8 @@ Library::Implementation::lookup (const symbol key) const
   alist_map::const_iterator i = alists.find (key);
 
   if (i == alists.end ())
-    daisy_notreached ();
-
+    daisy_panic ("Model '" + key.name ()
+                 + "' not in library '" + name.name () + "'");
   return *(*i).second;
 }
 
