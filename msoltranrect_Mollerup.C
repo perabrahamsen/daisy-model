@@ -30,6 +30,9 @@
 #include "librarian.h"
 #include <sstream>
 
+// Uncomment for fast code that does not catches bugs.
+// #define BOOST_UBLAS_NDEBUG
+
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -333,6 +336,36 @@ MsoltranrectMollerup::Neumann_impl (const size_t cell,
 {
   daisy_assert (q * in_sign <= 0.0);
   B_mat (cell, cell) = q * area * in_sign; 
+}
+
+
+void 
+MsoltranrectMollerup::Dirichlet_long (const size_t cell,
+                                      const double area, 
+                                      const double area_per_length, 
+                                      const double in_sign,
+                                      const double D_long,
+                                      const double C_bord,
+                                      const double C_cell,
+                                      const double q,
+                                      double& J,
+                                      ublas::banded_matrix<double>& Dlongm_mat,
+                                      ublas::vector<double>& Dmlong_vec, 
+                                      ublas::vector<double>& advecm) 
+{
+
+  // Boundary advection
+  const double value = area  * q;
+  advec (cell) -= in_sign * value;
+
+  //Boundary longitudinal diffusion
+  const double D_area_per_length = D_long * area_per_length;
+  Dlongm_mat (cell, cell) -= D_area_per_length;
+  
+  const double Dlongm_vec_val = D_area_per_length * C_bord;
+  Dlongm_vec (cell) += Dlongm_vec_val;
+    
+  J = in_sign * (D_area_per_length * C_cell + Dlongm_vec_val ) / area;  
 }
 
 

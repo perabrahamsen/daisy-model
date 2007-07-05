@@ -844,6 +844,9 @@ setupnocvs:
 	cp $(MINGWHOME)/bin/mingwm10.dll $(SETUPDIR)/bin
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
 
+daisysetup:
+	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
+
 # How to compile the assembler file.
 #
 set_exceptions${OBJ}: set_exceptions.S

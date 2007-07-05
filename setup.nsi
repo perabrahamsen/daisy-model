@@ -29,7 +29,7 @@ Section "Main Install"
   CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\Tutorial.lnk" "$INSTDIR\doc\tutorial.pdf"
   CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\Exercises.lnk" "$INSTDIR\doc\exercises.pdf"
   CreateShortCut "$SMPROGRAMS\Daisy ${VERSION}\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-  CreateShortCut "$DESKTOP\Daisy ${VERSION}.lnk" "$INSTDIR\bin\daisy.exe"
+  CreateShortCut "$DESKTOP\Daisy ${VERSION}.lnk" "$INSTDIR\bin\daisyw.exe"
   SetOutPath $DESKTOP
   File "install\sample\test.dai"
 SectionEnd
