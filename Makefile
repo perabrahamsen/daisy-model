@@ -364,9 +364,9 @@ NOLINK = -c
 LATER = 
 MODELS =rubiscoNdist_expr.C uzrect_const.C photo_FCC3.C photo_FCC4.C \
 	msoltranrect_Mollerup.C reaction_std.C chemistry_std.C \
-	groundwater_extern.C scope_exchange.C\
+	groundwater_extern.C \
 	msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
-	msoltranrect_2x1.C photo_FCC4.C ABAeffect_exp.C rubiscoNdist_uniform.C \
+	msoltranrect_2x1.C ABAeffect_exp.C rubiscoNdist_uniform.C \
 	uzrect_2x1.C select_flow.C volume_box.C \
 	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
 	rubiscoNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \

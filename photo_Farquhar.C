@@ -455,3 +455,14 @@ PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
 
 }
 
+static struct PhotoFarquharSyntax
+{
+  PhotoFarquharSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    PhotoFarquhar::load_syntax (syntax, alist);
+
+    Librarian::add_base (Photo::component, alist, syntax);
+  }
+} PhotoFarquhar_syntax;
