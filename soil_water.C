@@ -158,7 +158,7 @@ SoilWater::tick (const size_t cell_size, const Soil& soil,
       h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
     }
 
-  // External source.
+  // External sink.
   for (size_t i = 0; i < cell_size; i++)
     {
       S_incorp_[i] += S_permanent_[i];
