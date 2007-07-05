@@ -122,7 +122,7 @@ RubiscoNdist::default_model ()
     {
       Syntax syntax;
       rubiscoNdistDPFSyntax::load_syntax (syntax, alist);
-      alist.add ("type", "N-exp");
+      alist.add ("type", "exp");
     }
   return alist;
 }
