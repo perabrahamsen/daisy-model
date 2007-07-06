@@ -18,6 +18,8 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#if 0
+
 #define BUILD_DLL
 #include "msoltranrect.h"
 #include "geometry_rect.h"
@@ -652,3 +654,5 @@ See Mollerup 2007 for details.");
     Librarian::add_type (Msoltranrect::component, "Mollerup", alist, syntax, &make);
   }
 } MsoltranrectMollerup_syntax;
+
+#endif

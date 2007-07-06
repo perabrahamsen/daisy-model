@@ -568,8 +568,8 @@ daisy_Qt.dll: $(Q4OBJECTS) daisy.dll
 daisy.exe:	main${OBJ} daisy.dll
 	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
 
-daisyw.exe:	main${OBJ}  $(GUIDLL) daisy.dll
-	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB) -mwindows
+daisyw.exe:	main${OBJ} $(GUIOBJECTS) daisy.dll
+	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -mwindows
 
 daisy:	main${OBJ} $(GUIOBJECTS) $(LIBOBJ)
 	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB)
@@ -836,9 +836,8 @@ setupnocvs:
 	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	mkdir $(SETUPDIR)/bin
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
-	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisy.exe
+	$(STRIP) -o $(SETUPDIR)/bin/daisyw.exe $(OBJHOME)/daisyw.exe
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.dll $(OBJHOME)/daisy.dll
-	$(STRIP) -o $(SETUPDIR)/bin/daisy_Qt.dll $(OBJHOME)/daisy_Qt.dll
 	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
 	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
 	cp $(MINGWHOME)/bin/mingwm10.dll $(SETUPDIR)/bin

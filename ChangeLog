@@ -1,7 +1,17 @@
+2007-07-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.17 released.
+
+2007-07-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (daisyw.exe): Link GUIOBJECTS directly.
+
 2007-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.16 released.
 
+	* cropNdist renamed to rubiscoNdist.
+	
 2007-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* fetch.C (width): Fixed problem with small negative numbers.
