@@ -273,7 +273,11 @@ Angiv stem/leaf/sorg på forskellige datoer
           (N concentration 1 [mg N/l])
           (N amount 20 [kg N/ha])
           (N target 80 [kg N/ha] (from 0 [cm]) (to 50 [cm]))
-          (NH4_fraction concentration 1 [mg N/l]))
+          (NH4 concentration 1 [mg N/l])
+          (NH4 fraction 100 [%])
+          (NO3 concentration 0 [mg N/l])
+          (NO3 fraction 0 [%])
+          )
 
 ** min_intensity parameter for default weather
 
