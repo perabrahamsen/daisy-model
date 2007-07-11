@@ -29,7 +29,10 @@
   ;;(Groundwater deep)
   ;; Daisy does not use groundwater table from OpenMI unless you choose the model below,
   ;; which may not work fully yet.
-  (Groundwater extern (scope name "Groundwater_table") (table "GroundWaterTable")) 
+  (Groundwater extern 
+               (scope name "Groundwater_table") 
+               (table "GroundWaterTable")
+               (initial_table -200 [cm]))
   (Bioclimate default))
 
 ;; Use it.

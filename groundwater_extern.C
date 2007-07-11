@@ -28,6 +28,7 @@
 #include "block.h"
 #include "alist.h"
 #include "units.h"
+#include "check.h"
 #include "assertion.h"
 #include "librarian.h"
 #include <sstream>
@@ -113,8 +114,8 @@ public:
     : Groundwater (al),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       expr (Librarian::build_item<Number> (al, "table")),
-      has_table (false),
-      depth (-42.42e42)
+      has_table (al.check ("initial_table")),
+      depth (al.number ("initial_table", -42.42e42))
   { }
   ~GroundwaterExtern ()
   { }
@@ -137,6 +138,8 @@ Scope to look up groundwater table in.");
     syntax.add_object ("table", Number::component, 
                        Syntax::Const, Syntax::Singleton, "\
 Expression that evaluates to groundwate table in.");
+    syntax.add ("initial_table", "cm", Check::none (), Syntax::OptionalConst,
+		"Groundwater level for initialization of soil water.");
     Librarian::add_type (Groundwater::component, "extern", alist, syntax, &make);
   }
 } GroundwaterExtern_syntax;

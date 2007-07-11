@@ -1,3 +1,7 @@
+2007-07-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_extern.C (initial_table): New parameter.
+
 2007-07-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* action_extern.C: New model.
