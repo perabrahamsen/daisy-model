@@ -59,10 +59,10 @@ struct ActionFertilize : public Action
   Precision *const precision;
 
   // Simulation.
-  void doIt (Daisy& daisy, Treelog&);
+  void doIt (Daisy& daisy, const Scope&, Treelog&);
 
   // Create and Destroy.
-  bool check (const Daisy& daisy, Treelog& err) const;
+  bool check (const Daisy& daisy, const Scope&, Treelog& err) const;
   ActionFertilize (Block& al);
   ~ActionFertilize ();
 };
@@ -121,7 +121,7 @@ ActionFertilize::Precision::~Precision ()
 { }
 
 void 
-ActionFertilize::doIt (Daisy& daisy, Treelog& out)
+ActionFertilize::doIt (Daisy& daisy, const Scope&, Treelog& out)
 {
   if (precision)
     {
@@ -200,7 +200,7 @@ ActionFertilize::doIt (Daisy& daisy, Treelog& out)
 }
 
 bool 
-ActionFertilize::check (const Daisy& daisy, Treelog& err) const
+ActionFertilize::check (const Daisy& daisy, const Scope&, Treelog& err) const
 {
   bool ok = true;
   if (am.name ("syntax") != "mineral" && !daisy.field->check_am (am, err))

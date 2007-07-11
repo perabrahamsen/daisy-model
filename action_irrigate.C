@@ -47,7 +47,7 @@ struct ActionIrrigate : public Action
   virtual void irrigate (Field&, double flux, double temp, const IM&, 
                          double dt) const = 0;
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope&, Treelog& out)
   {
     if (!activated)
       {
@@ -84,7 +84,7 @@ struct ActionIrrigate : public Action
     irrigate (*daisy.field, this_flux, temp, sm, daisy.dt);
   }
 
-  bool done (const Daisy& daisy, Treelog&) const
+  bool done (const Daisy& daisy, const Scope&, Treelog&) const
   {
     daisy_assert (activated);
     return remaining_time < daisy.dt * 0.0001; 

@@ -31,7 +31,7 @@ struct ConditionPeriodic : public Condition
   const int period;
   mutable time_t last;
 public:
-  bool match (const Daisy&, Treelog&) const
+  bool match (const Daisy&, const Scope&, Treelog&) const
   {
     const time_t next = time (NULL);
     if (next - last >= period)

@@ -34,7 +34,7 @@ using namespace std;
 
 struct ConditionFalse : public Condition
 {
-  bool match (const Daisy&, Treelog&) const
+  bool match (const Daisy&, const Scope&, Treelog&) const
   { return false; }
   void output (Log&) const
   { }
@@ -49,7 +49,7 @@ struct ConditionFalse : public Condition
 
 struct ConditionTrue : public Condition
 {
-  bool match (const Daisy&, Treelog&) const
+  bool match (const Daisy&, const Scope&, Treelog&) const
   { return true; }
   void output (Log&) const
   { }
@@ -74,22 +74,22 @@ struct ConditionOr : public Condition
 {
   const vector<Condition*> conditions;
 
-  void tick (const Daisy& daisy, Treelog& out)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   {
     for (vector<Condition*>::const_iterator i = conditions.begin ();
 	 i != conditions.end ();
 	 i++)
       {
-	(*i)->tick (daisy, out);
+	(*i)->tick (daisy, scope, out);
       }
   }
-  bool match (const Daisy& daisy, Treelog& msg) const
+  bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   {
     for (vector<Condition*>::const_iterator i = conditions.begin ();
 	 i != conditions.end ();
 	 i++)
       {
-	if ((*i)->match (daisy, msg))
+	if ((*i)->match (daisy, scope, msg))
 	  return true;
       }
     return false;
@@ -110,22 +110,22 @@ struct ConditionAnd : public Condition
 {
   const vector<Condition*> conditions;
 
-  void tick (const Daisy& daisy, Treelog& out)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   {
     for (vector<Condition*>::const_iterator i = conditions.begin ();
 	 i != conditions.end ();
 	 i++)
       {
-	(*i)->tick (daisy, out);
+	(*i)->tick (daisy, scope, out);
       }
   }
-  bool match (const Daisy& daisy, Treelog& msg) const
+  bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   {
     for (vector<Condition*>::const_iterator i = conditions.begin ();
 	 i != conditions.end ();
 	 i++)
       {
-	if (!(*i)->match (daisy, msg))
+	if (!(*i)->match (daisy, scope, msg))
 	  return false;
       }
     return true;
@@ -146,11 +146,11 @@ struct ConditionNot : public Condition
 {
   auto_ptr<Condition> condition;
 
-  bool match (const Daisy& daisy, Treelog& msg) const
-  { return !condition->match (daisy, msg); }
+  bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  { return !condition->match (daisy, scope, msg); }
 
-  void tick (const Daisy& daisy, Treelog& out)
-  { condition->tick (daisy, out); }
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { condition->tick (daisy, scope, out); }
 
   void output (Log&) const
   { }
@@ -170,18 +170,18 @@ struct ConditionIf : public Condition
   auto_ptr<Condition> then_c;
   auto_ptr<Condition> else_c;
 
-  void tick (const Daisy& daisy, Treelog& out)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
-    if_c->tick (daisy, out);
-    then_c->tick (daisy, out);
-    else_c->tick (daisy, out);
+    if_c->tick (daisy, scope, out);
+    then_c->tick (daisy, scope, out);
+    else_c->tick (daisy, scope, out);
   }
-  bool match (const Daisy& daisy, Treelog& msg) const
+  bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   { 
-    if (if_c->match (daisy, msg))
-      return then_c->match (daisy, msg);
+    if (if_c->match (daisy, scope, msg))
+      return then_c->match (daisy, scope, msg);
     else
-      return else_c->match (daisy, msg); 
+      return else_c->match (daisy, scope, msg); 
   }
   void output (Log&) const
   { }

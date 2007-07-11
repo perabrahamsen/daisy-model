@@ -35,17 +35,23 @@ struct ActionWait : public Action
 {
   std::auto_ptr<Condition> condition;
 
-  void tick (const Daisy& daisy, Treelog& out)
-  { condition->tick (daisy, out); }
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { condition->tick (daisy, scope, out); }
 
-  void doIt (Daisy&, Treelog&)
+  void doIt (Daisy&, const Scope&, Treelog&)
   { }
 
-  bool done (const Daisy& daisy, Treelog& msg) const
-  { return condition->match (daisy, msg); }
+  bool done (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  { return condition->match (daisy, scope, msg); }
 
   void output (Log& log) const
   { output_derived (condition, "condition", log); }
+
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { condition->initialize (daisy, scope, out); }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& out) const
+  { return condition->check (daisy, scope, out); }
 
   ActionWait (Block& al)
     : Action (al),
@@ -63,7 +69,7 @@ struct ActionWaitDays : public Action
   bool activated;
   Time end_time;
 
-  void doIt (Daisy& daisy, Treelog&)
+  void doIt (Daisy& daisy, const Scope&, Treelog&)
   { 
     if (!activated)
       {
@@ -74,7 +80,7 @@ struct ActionWaitDays : public Action
       }
   }
 
-  bool done (const Daisy& daisy, Treelog&) const
+  bool done (const Daisy& daisy, const Scope&, Treelog&) const
   {
     daisy_assert (activated);
     return daisy.time >= end_time; 
@@ -107,10 +113,10 @@ struct ActionWaitMMDD : public Action
   const int day;
   const int hour;
 
-  void doIt (Daisy&, Treelog&)
+  void doIt (Daisy&, const Scope&, Treelog&)
   { }
 
-  bool done (const Daisy& daisy, Treelog&) const
+  bool done (const Daisy& daisy, const Scope&, Treelog&) const
   { 
     return daisy.time.month () == month
       && daisy.time.mday () == day 

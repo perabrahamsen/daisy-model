@@ -35,7 +35,7 @@ using namespace std;
 
 struct ActionNil : public Action
 {
-  void doIt (Daisy&, Treelog&)
+  void doIt (Daisy&, const Scope&, Treelog&)
   { }
 
   ActionNil (Block& al)
@@ -45,10 +45,10 @@ struct ActionNil : public Action
 
 struct ActionT : public Action
 {
-  void doIt (Daisy&, Treelog&)
+  void doIt (Daisy&, const Scope&, Treelog&)
   { }
 
-  bool done (const Daisy&, Treelog&) const
+  bool done (const Daisy&, const Scope&, Treelog&) const
   { return false; }
 
   ActionT (Block& al)
@@ -60,37 +60,47 @@ struct ActionProgn : public Action
 {
   vector<Action*> actions;
 
-  void tick (const Daisy& daisy, Treelog& out)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
     for (vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
-	(*i)->tick (daisy, out);
+	(*i)->tick (daisy, scope, out);
       }
   }
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope& scope, Treelog& out)
   { 
     for (vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
-	(*i)->doIt (daisy, out);
+	(*i)->doIt (daisy, scope, out);
       }
   }
 
   void output (Log& log) const
   { output_list (actions, "actions", log, Action::component); }
 
-  bool check (const Daisy& daisy, Treelog& err) const
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { 
+    for (vector<Action*>::iterator i = actions.begin ();
+	 i != actions.end ();
+	 i++)
+      {
+	(*i)->initialize (daisy, scope, out);
+      }
+  }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const
   { 
     bool ok = true;
     for (vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
-	if (!(*i)->check (daisy, err))
+	if (!(*i)->check (daisy, scope, err))
 	  ok = false;
       }
     return ok;
@@ -135,30 +145,30 @@ struct ActionCond : public Action
   };
   vector<clause*> clauses;
 
-  void tick (const Daisy& daisy, Treelog& out)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
     for (vector<clause*>::iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	(*i)->condition->tick (daisy, out);
+	(*i)->condition->tick (daisy, scope, out);
 	vector<Action*>& actions = (*i)->actions;
 	for (unsigned int j = 0; j < actions.size (); j++)
-	  actions[j]->tick (daisy, out);
+	  actions[j]->tick (daisy, scope, out);
       }
   }
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope& scope, Treelog& out)
   { 
     for (vector<clause*>::iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	if ((*i)->condition->match (daisy, out))
+	if ((*i)->condition->match (daisy, scope, out))
 	  {
 	    vector<Action*>& actions = (*i)->actions;
 	    for (unsigned int j = 0; j < actions.size (); j++)
-	      actions[j]->doIt (daisy, out);
+	      actions[j]->doIt (daisy, scope, out);
 	    break;
 	  }
       }
@@ -180,7 +190,20 @@ struct ActionCond : public Action
       }
   }
 
-  bool check (const Daisy& daisy, Treelog& err) const
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { 
+    for (vector<clause*>::iterator i = clauses.begin (); 
+	 i != clauses.end ();
+	 i++)
+      {
+	(*i)->condition->initialize (daisy, scope, out);
+	vector<Action*>& actions = (*i)->actions;
+	for (unsigned int j = 0; j < actions.size (); j++)
+	  actions[j]->initialize (daisy, scope, out);
+      }
+  }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const
   { 
     bool ok = true;
     for (vector<clause*>::const_iterator i = clauses.begin (); 
@@ -189,7 +212,7 @@ struct ActionCond : public Action
       {
 	const vector<Action*>& actions = (*i)->actions;
 	for (unsigned int j = 0; j < actions.size (); j++)
-	  if (!actions[j]->check (daisy, err))
+	  if (!actions[j]->check (daisy, scope, err))
 	    ok = false;
       }
     return ok;
@@ -210,19 +233,19 @@ struct ActionIf : public Action
   auto_ptr<Action> then_a;
   auto_ptr<Action> else_a;
 
-  void tick (const Daisy& daisy, Treelog& out)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
-    if_c->tick (daisy, out);
-    then_a->tick (daisy, out);
-    else_a->tick (daisy, out);
+    if_c->tick (daisy, scope, out);
+    then_a->tick (daisy, scope, out);
+    else_a->tick (daisy, scope, out);
   }
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope& scope, Treelog& out)
   { 
-    if (if_c->match (daisy, out))
-      then_a->doIt (daisy, out);
+    if (if_c->match (daisy, scope, out))
+      then_a->doIt (daisy, scope, out);
     else
-      else_a->doIt (daisy, out);
+      else_a->doIt (daisy, scope, out);
   }
 
   void output (Log& log) const
@@ -232,12 +255,19 @@ struct ActionIf : public Action
     output_derived (else_a, "else", log);
   }
 
-  bool check (const Daisy& daisy, Treelog& err) const
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { 
+    if_c->initialize (daisy, scope, out);
+    then_a->initialize (daisy, scope, out);
+    else_a->initialize (daisy, scope, out);
+  }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const
   { 
     bool ok = true; 
-    if (!then_a->check (daisy, err))
+    if (!then_a->check (daisy, scope, err))
       ok = false;
-    if (!else_a->check (daisy, err))
+    if (!else_a->check (daisy, scope, err))
       ok = false;
     return ok;
   }

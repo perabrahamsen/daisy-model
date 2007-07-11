@@ -30,6 +30,7 @@ class Log;
 class Daisy;
 class Treelog;
 class Block;
+class Scope;
 
 class Action : public Model
 {
@@ -40,14 +41,15 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Daisy&, Treelog&);
-  virtual void doIt (Daisy&, Treelog&) = 0;
-  virtual bool done (const Daisy&, Treelog&) const;
+  virtual void tick (const Daisy&, const Scope&, Treelog&);
+  virtual void doIt (Daisy&, const Scope&, Treelog&) = 0;
+  virtual bool done (const Daisy&, const Scope&, Treelog&) const;
   virtual void output (Log&) const;
 
   // Create and Destroy.
 public: 
-  virtual bool check (const Daisy&, Treelog& err) const;
+  virtual void initialize (const Daisy&, const Scope&, Treelog&);
+  virtual bool check (const Daisy&, const Scope&, Treelog&) const;
   static const char *const component;
 private:
   Action (const Action&);

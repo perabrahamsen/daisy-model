@@ -33,7 +33,7 @@ struct ActionEmerge : public Action
 {
   const symbol crop;
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope&, Treelog& out)
   {
     static const symbol all_symbol ("all");
     if (crop != all_symbol)
@@ -92,7 +92,7 @@ struct ActionHarvest : public Action
   const double sorg;
   const bool combine;
 
-  void doIt (Daisy& daisy, Treelog& msg)
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   {
     static const symbol all_symbol ("all");
     if (crop != all_symbol && daisy.field->crop_ds (crop) < 0.0)

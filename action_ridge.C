@@ -32,7 +32,7 @@ struct ActionRidge : public Action
 {
   const AttributeList& ridge;
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope&, Treelog& out)
     { 
       out.message ("Ridging");      
       daisy.field->ridge (ridge); 

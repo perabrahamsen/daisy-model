@@ -30,6 +30,7 @@ class Daisy;
 class Log;
 class Block;
 class Treelog;
+class Scope;
 
 class Condition : public Model
 {  
@@ -41,12 +42,14 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Daisy&, Treelog&);
-  virtual bool match (const Daisy&, Treelog&) const = 0;
+  virtual void tick (const Daisy&, const Scope&, Treelog&);
+  virtual bool match (const Daisy&, const Scope&, Treelog&) const = 0;
   virtual void output (Log&) const = 0;
 
   // Create & Destroy.
 public:
+  virtual void initialize (const Daisy&, const Scope&, Treelog&);
+  virtual bool check (const Daisy&, const Scope&, Treelog&) const;
   static std::auto_ptr<Condition> create_true ();
 protected:
   Condition (Block& al);

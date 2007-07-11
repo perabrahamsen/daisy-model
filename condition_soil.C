@@ -33,7 +33,7 @@ struct ConditionSoilTemperature : public Condition
   const double temperature;
   const double height;
 
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { 
     if (daisy.field->soil_temperature (height) > temperature)
       return true;
@@ -54,7 +54,7 @@ struct ConditionSoilPotential : public Condition
   const double potential;
   const double height;
 
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return (daisy.field->soil_water_potential (height) > potential); }
   void output (Log&) const
   { }
@@ -72,7 +72,7 @@ struct ConditionSoilWater : public Condition
   const double from;		// [cm]
   const double to;		// [cm]
 
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return (daisy.field->soil_water_content (from, to) * 10 > water); }
   void output (Log&) const
   { }
@@ -91,7 +91,7 @@ struct ConditionSoilN_min : public Condition
   const double from;		// [cm]
   const double to;		// [cm]
 
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return (daisy.field->soil_inorganic_nitrogen (from, to)  > amount); }
   void output (Log&) const
   { }

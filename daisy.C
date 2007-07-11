@@ -41,6 +41,7 @@
 #include "alist.h"
 #include "submodeler.h"
 #include "column.h"
+#include "scope.h"
 #include "mathlib.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -77,14 +78,15 @@ Daisy::run (Treelog& msg)
 	    msg.message ("Begin simulation");
 	  }
 
-	print_time->tick (*this, msg);
-	const bool force_print = print_time->match (*this, msg);
+	print_time->tick (*this, Scope::null (), msg);
+	const bool force_print 
+          = print_time->match (*this, Scope::null (), msg);
 
 	tick (msg);
 
 	if (!running)
 	  msg.message ("End simulation");
-	print_time->tick (*this, msg);
+	print_time->tick (*this, Scope::null (), msg);
 	if (force_print)
 	  msg.touch ();
       }
@@ -108,8 +110,8 @@ Daisy::tick_before (Treelog& msg)
   output_log->initial_logs (*this, msg);
   if (weather.get ())
     weather->tick (time, msg);
-  action->tick (*this, msg);
-  action->doIt (*this, msg);
+  action->tick (*this, Scope::null (), msg);
+  action->doIt (*this, Scope::null (), msg);
 }
 
 void
@@ -170,6 +172,10 @@ Daisy::initialize (Block& block)
     Treelog::Open nest (block.msg (), "output");
     output_log->initialize (metalib, block.msg ());
   }
+  {                             // Must come after output.
+    Treelog::Open nest (block.msg (), "manager");
+    action->initialize (*this, Scope::null (), block.msg ());
+  }
 }
 
 bool
@@ -207,7 +213,7 @@ Daisy::check (Treelog& msg)
   // Check actions.
   {
     Treelog::Open nest (msg, "manager");
-    if (!action->check (*this, msg))
+    if (!action->check (*this, Scope::null (), msg))
       ok = false;
   }
   return ok;

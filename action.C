@@ -28,7 +28,7 @@
 const char *const Action::component = "action";
 
 void
-Action::tick (const Daisy&, Treelog&)
+Action::tick (const Daisy&, const Scope&, Treelog&)
 { }
 
 void 
@@ -36,11 +36,15 @@ Action::output (Log&) const
 { }
 
 bool
-Action::done (const Daisy&, Treelog&) const
+Action::done (const Daisy&, const Scope&, Treelog&) const
 { return true; }
 
+void
+Action::initialize (const Daisy&, const Scope&, Treelog&)
+{ }
+
 bool
-Action::check (const Daisy&, Treelog&) const
+Action::check (const Daisy&, const Scope&, Treelog&) const
 { return true; }
 
 Action::Action (Block& al)

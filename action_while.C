@@ -34,28 +34,34 @@ struct ActionWhile : public Action
 {
   const vector<Action*> actions;
 
-  void tick (const Daisy& daisy, Treelog& out)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
     for (unsigned int i = 0; i < actions.size (); i++)
-      actions[i]->tick (daisy, out);
+      actions[i]->tick (daisy, scope, out);
   }
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope& scope, Treelog& out)
   { 
     for (unsigned int i = 0; i < actions.size (); i++)
-      actions[i]->doIt (daisy, out);
+      actions[i]->doIt (daisy, scope, out);
   }
 
-  bool done (const Daisy& daisy, Treelog& msg) const
+  bool done (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   {
     daisy_assert (actions.size () != 0U);
-    return (actions[0]->done (daisy, msg)); 
+    return (actions[0]->done (daisy, scope, msg)); 
   }
 
   void output (Log& log) const
   { output_list (actions, "actions", log, Action::component); }
 
-  bool check (const Daisy& daisy, Treelog& err) const
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { 
+    for (unsigned int i = 0; i < actions.size (); i++)
+      actions[i]->initialize (daisy, scope, out);
+  }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, "while");
     bool ok = true;
@@ -63,7 +69,7 @@ struct ActionWhile : public Action
 	 i != actions.end ();
 	 i++)
       {
-	if (!(*i)->check (daisy, err))
+	if (!(*i)->check (daisy, scope, err))
 	  ok = false;
       }
     return ok;

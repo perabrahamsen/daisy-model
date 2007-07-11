@@ -34,9 +34,9 @@
 void
 Output::initial_logs (const Daisy& daisy, Treelog& msg)
 {
-  activate_output->tick (daisy, msg);
+  activate_output->tick (daisy, Scope::null (), msg);
 
-  if (activate_output->match (daisy, msg))
+  if (activate_output->match (daisy, Scope::null (), msg))
     {
       if (!logging)
 	{

@@ -38,7 +38,7 @@ struct ConditionMMDD : public Condition
   const int day;
   const int hour;
 public:
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   {
     return daisy.time.month () == month
       && daisy.time.mday () == day 
@@ -62,7 +62,7 @@ struct ConditionBeforeMMDD : public Condition
   const int day;
   const int hour;
 public:
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   {
     return daisy.time.month () < month
       || (daisy.time.month () == month
@@ -89,7 +89,7 @@ struct ConditionAfterMMDD : public Condition
   const int day;
   const int hour;
 public:
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   {
     return daisy.time.month () > month
       || (daisy.time.month () == month
@@ -114,7 +114,7 @@ struct ConditionAt : public Condition
 {
   const Time time;
 public:
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return time == daisy.time; }
   void output (Log&) const
   { }
@@ -130,7 +130,7 @@ struct ConditionBefore : public Condition
 {
   const Time time;
 public:
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return time > daisy.time; }
   void output (Log&) const
   { }
@@ -146,7 +146,7 @@ struct ConditionAfter : public Condition
 {
   const Time time;
 public:
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return time < daisy.time; }  
   void output (Log&) const
   { }
@@ -169,7 +169,7 @@ struct ConditionHourly : public Condition
       return "h";
     return Condition::timestep ();
   } 
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return ((24 * daisy.time.yday ()
 	     + (daisy.time.hour () + 1)) % step) == 0; }
   void output (Log&) const
@@ -191,7 +191,7 @@ struct ConditionDaily : public Condition
       return "d";
     return Condition::timestep ();
   } 
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return daisy.time.hour () == 23 && (daisy.time.yday () % step) == 0; }
   void output (Log&) const
   { }
@@ -212,7 +212,7 @@ struct ConditionWeekly : public Condition
       return "w";
     return Condition::timestep ();
   } 
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return daisy.time.hour () == 23 
       && daisy.time.wday () == 6
       && (daisy.time.week () % step) == 0; }
@@ -235,7 +235,7 @@ struct ConditionMonthly : public Condition
       return "m";
     return Condition::timestep ();
   } 
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { 
     int month = daisy.time.month ();
     if (month % step != 0)
@@ -263,7 +263,7 @@ struct ConditionYearly : public Condition
       return "y";
     return Condition::timestep ();
   } 
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { 
     int year = daisy.time.year ();
     if ((year + 1) % step != 0)
@@ -288,7 +288,7 @@ struct ConditionHour : public Condition
   const int at;
   const string timestep ()
   { return "d"; } 
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
     { return daisy.time.hour () == at; }
   void output (Log&) const
     { }
@@ -303,7 +303,7 @@ struct ConditionHour : public Condition
 struct ConditionMDay : public Condition
 {
   const int at;
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
     { return daisy.time.mday () == at; }
   void output (Log&) const
     { }
@@ -319,7 +319,7 @@ struct ConditionYDay : public Condition
 {
   const int at;
 public:
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
     { return daisy.time.yday () == at; }
   void output (Log&) const
     { }
@@ -335,7 +335,7 @@ struct ConditionMonth : public Condition
 {
   const int at;
 public:
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
     { return daisy.time.month () == at; }
   void output (Log&) const
     { }
@@ -351,7 +351,7 @@ struct ConditionYear : public Condition
 {
   const int at;
 public:
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
     { return daisy.time.year () == at; }
   void output (Log&) const
     { }
@@ -371,11 +371,11 @@ struct ConditionTimestep : public Condition
   const string timestep ()
   { return dt; } 
 
-  bool match (const Daisy& daisy, Treelog& msg) const
-  { return condition->match (daisy, msg); }
+  bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  { return condition->match (daisy, scope, msg); }
 
-  void tick (const Daisy& daisy, Treelog& out)
-  { condition->tick (daisy, out); }
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { condition->tick (daisy, scope, out); }
 
   void output (Log&) const
   { }

@@ -30,6 +30,7 @@
 #include "field.h"
 #include "format.h"
 #include "volume.h"
+#include "scope.h"
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -51,8 +52,8 @@ LogSelect::check_derived (symbol field, symbol /* name */,
 bool 
 LogSelect::match (const Daisy& daisy, Treelog& out)
 {
-  condition->tick (daisy, out);
-  is_printing = condition->match (daisy, out);
+  condition->tick (daisy, Scope::null (), out);
+  is_printing = condition->match (daisy, Scope::null (), out);
   is_active = is_printing;
 
   for (std::vector<Select*>::const_iterator i = entries.begin (); 

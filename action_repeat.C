@@ -32,15 +32,15 @@ struct ActionRepeat : public Action
   const AttributeList repeat;
   Action* action;
 
-  void tick (const Daisy& daisy, Treelog& msg)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
     if (action)
-      action->tick (daisy, msg); 
+      action->tick (daisy, scope, msg); 
   }
 
-  void doIt (Daisy& daisy, Treelog& msg)
+  void doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
-    if (action && action->done (daisy, msg))
+    if (action && action->done (daisy, scope, msg))
       {
 	delete action;
 	action = NULL;
@@ -49,10 +49,10 @@ struct ActionRepeat : public Action
       action = Librarian::build_free<Action> (daisy.metalib, 
                                               msg, repeat, "repeat");
     if (action != NULL)         // Build free may fail.
-      action->doIt (daisy, msg);
+      action->doIt (daisy, scope, msg);
   }
 
-  bool done (const Daisy&, Treelog&) const
+  bool done (const Daisy&, const Scope&, Treelog&) const
   { return false; }
 
   void output (Log& log) const
@@ -61,10 +61,16 @@ struct ActionRepeat : public Action
       output_derived (action, "do", log);
   }
 
-  bool check (const Daisy& daisy, Treelog& err) const
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
     if (action)
-      return action->check (daisy, err);
+      action->initialize (daisy, scope, msg); 
+  }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const
+  { 
+    if (action)
+      return action->check (daisy, scope, err);
     else
       return true;
   }

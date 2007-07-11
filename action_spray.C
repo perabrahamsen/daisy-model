@@ -36,7 +36,7 @@ struct ActionSpray : public Action
   const symbol chemical;
   const double amount;
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope&, Treelog& out)
     {
       out.message ("Spraying " + chemical);
       daisy.field->spray (chemical, amount, daisy.dt, out); 

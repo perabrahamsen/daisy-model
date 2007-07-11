@@ -43,7 +43,7 @@ struct ConditionTSum : public Condition
   // State.
   double TSum_now;
 
-  void tick (const Daisy& daisy, Treelog&)
+  void tick (const Daisy& daisy, const Scope&, Treelog&)
   {
     if (daisy.time.hour () == check_hour)
       {
@@ -56,7 +56,7 @@ struct ConditionTSum : public Condition
       }
   }
 
-  bool match (const Daisy&, Treelog&) const
+  bool match (const Daisy&, const Scope&, Treelog&) const
   { return TSum_now > TSum_limit; }
 
   void output (Log& log) const

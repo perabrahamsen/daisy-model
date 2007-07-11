@@ -35,7 +35,7 @@ struct ActionMix : public Action
   const double penetration;
 
   // Simulation.
-  void doIt (Daisy& daisy, Treelog& msg)
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg)
     {
       msg.message ("Tillage operation " + name);
       daisy.field->mix (0.0, depth, penetration, daisy.time, daisy.dt, msg);
@@ -79,7 +79,7 @@ struct ActionSwap : public Action
   const double depth;
 
   // Simulation.
-  void doIt (Daisy& daisy, Treelog& msg)
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   {
     msg.message ("Tillage operation " + name);
     daisy.field->swap (0.0, middle, depth, daisy.time, daisy.dt, msg);
@@ -137,7 +137,7 @@ struct ActionSetPorosity : public Action
   const double depth;
 
   // Simulation.
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope&, Treelog& out)
   {
     out.message ("Adjusting porosity");
     daisy.field->set_porosity (depth, porosity);

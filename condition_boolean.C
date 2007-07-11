@@ -37,10 +37,10 @@ struct ConditionBoolean : public Condition
   // State.
   mutable enum { isfalse, istrue, missing, uninitialized, error } state;
 
-  void tick (const Daisy&, Treelog&)
+  void tick (const Daisy&, const Scope&, Treelog&)
   { }
 
-  bool match (const Daisy&, Treelog& msg) const
+  bool match (const Daisy&, const Scope&, Treelog& msg) const
   { 
     Treelog::Open nest (msg, name);
 

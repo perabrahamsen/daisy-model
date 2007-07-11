@@ -27,6 +27,7 @@
 #include "condition.h"
 #include "daisy.h"
 #include "printer_file.h"
+#include "scope.h"
 #include "assertion.h"
 #include "librarian.h"
 #include <sstream>
@@ -71,8 +72,8 @@ bool
 LogCheckpoint::match (const Daisy& daisy, Treelog& out)
 {
   daisy_assert (nested == 0);
-  condition->tick (daisy, out);
-  is_active = condition->match (daisy, out);
+  condition->tick (daisy, Scope::null (), out);
+  is_active = condition->match (daisy, Scope::null (), out);
   if (is_active)
     {
       static const symbol daisy_symbol ("daisy");

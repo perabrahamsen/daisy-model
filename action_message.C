@@ -33,17 +33,20 @@ struct ActionAssert : public Action
   std::auto_ptr<Condition> condition;
   const std::string message;
 
-  void tick (const Daisy& daisy, Treelog& out)
-  { condition->tick (daisy, out); }
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { condition->tick (daisy, scope, out); }
 
-  void doIt (Daisy& daisy, Treelog& msg)
+  void doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
-    if (!condition->match (daisy, msg))
+    if (!condition->match (daisy, scope, msg))
       throw (message);
   }
 
   void output (Log& log) const
   { output_derived (condition, "condition", log); }
+
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { condition->initialize (daisy, scope, out); }
 
   ActionAssert (Block& al)
     : Action (al),
@@ -59,7 +62,7 @@ struct ActionMessage : public Action
 {
   const std::string message;
 
-  void doIt (Daisy&, Treelog& out)
+  void doIt (Daisy&, const Scope&, Treelog& out)
   { 
     out.message (message);
   }
@@ -77,7 +80,7 @@ struct ActionWarning : public Action
 {
   const std::string message;
 
-  void doIt (Daisy&, Treelog& out)
+  void doIt (Daisy&, const Scope&, Treelog& out)
   { 
     out.warning (message);
   }
@@ -95,7 +98,7 @@ struct ActionError : public Action
 {
   const std::string message;
 
-  void doIt (Daisy&, Treelog& out)
+  void doIt (Daisy&, const Scope&, Treelog& out)
   { 
     out.error (message);
   }
@@ -113,7 +116,7 @@ struct ActionPanic : public Action
 {
   const std::string message;
 
-  void doIt (Daisy&, Treelog& msg)
+  void doIt (Daisy&, const Scope&, Treelog& msg)
   { 
     msg.touch ();
     throw message; 

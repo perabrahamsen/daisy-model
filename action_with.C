@@ -39,7 +39,7 @@ struct ActionWithColumn : public Action
   vector<Action*> actions;
 
 public:
-  void tick (const Daisy& daisy, Treelog& out)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
     Field::Restrict restriction (*daisy.field, column);
     Treelog::Open nest (out, column);
@@ -47,11 +47,11 @@ public:
 	 i != actions.end ();
 	 i++)
       {
-	(*i)->tick (daisy, out);
+	(*i)->tick (daisy, scope, out);
       }
   }
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope& scope, Treelog& out)
   { 
     Field::Restrict restriction (*daisy.field, column);
     Treelog::Open nest (out, column);
@@ -59,14 +59,26 @@ public:
 	 i != actions.end ();
 	 i++)
       {
-	(*i)->doIt (daisy, out);
+	(*i)->doIt (daisy, scope, out);
       }
   }
 
   void output (Log& log) const
   { output_list (actions, "actions", log, Action::component); }
 
-  bool check (const Daisy& daisy, Treelog& err) const
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { 
+    Field::Restrict restriction (*daisy.field, column);
+    Treelog::Open nest (out, column);
+    for (vector<Action*>::iterator i = actions.begin ();
+	 i != actions.end ();
+	 i++)
+      {
+	(*i)->initialize (daisy, scope, out);
+      }
+  }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, string ("with") + column);
     bool ok = true;
@@ -74,7 +86,7 @@ public:
 	 i != actions.end ();
 	 i++)
       {
-	if (!(*i)->check (daisy, err))
+	if (!(*i)->check (daisy, scope, err))
 	  ok = false;
       }
     if (!daisy.field->find (column))

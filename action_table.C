@@ -60,8 +60,8 @@ struct ActionTable : public Action
                          const std::vector<std::string>& entries, 
                          int rag_c, std::set<Time>& dates);
 
-  void doIt (Daisy& daisy, Treelog& msg);
-  bool check (const Daisy&, Treelog& err) const;
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg);
+  bool check (const Daisy&, const Scope&, Treelog& err) const;
   ActionTable (Block& al);
 };
 
@@ -133,15 +133,15 @@ ActionTable::read_date (const LexerTable& lex,
 }
 
 void 
-ActionTable::doIt (Daisy& daisy, Treelog& msg)
+ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 { 
   if (sow.get () && sow_dates.find (daisy.time) != sow_dates.end ())
-    sow->doIt (daisy, msg);
+    sow->doIt (daisy, scope, msg);
   if (emerge.get () && emerge_dates.find (daisy.time) != emerge_dates.end ())
-    emerge->doIt (daisy, msg);
+    emerge->doIt (daisy, scope, msg);
   if (harvest.get () 
       && harvest_dates.find (daisy.time) != harvest_dates.end ())
-    harvest->doIt (daisy, msg);
+    harvest->doIt (daisy, scope, msg);
   if ((am.get () 
        || fertilizers.find (daisy.time) != fertilizers.end ())
       && fertilize_events.find (daisy.time) != fertilize_events.end ())
@@ -212,7 +212,7 @@ ActionTable::doIt (Daisy& daisy, Treelog& msg)
 }
 
 bool 
-ActionTable::check (const Daisy&, Treelog&) const
+ActionTable::check (const Daisy&, const Scope&, Treelog&) const
 {
   bool ok = true;
   return ok;

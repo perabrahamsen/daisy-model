@@ -31,7 +31,7 @@
 
 struct ConditionRunning : public Condition
 {
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return daisy.running; }
   void output (Log&) const
   { }
@@ -42,7 +42,7 @@ struct ConditionRunning : public Condition
 
 struct ConditionFinished : public Condition
 {
-  bool match (const Daisy& daisy, Treelog&) const
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return !daisy.running; }
   void output (Log&) const
   { }

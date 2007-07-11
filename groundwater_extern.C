@@ -89,6 +89,7 @@ public:
     scope = scopesel->lookup (output, msg);
     expr->initialize (msg);
   }
+
   bool check (Treelog& msg) const
   {
     bool ok = true;

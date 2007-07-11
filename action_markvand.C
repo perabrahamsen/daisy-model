@@ -349,8 +349,8 @@ struct ActionMarkvand : public Action
 
   // Simulation.
   const MV_Crop* get_crop (Daisy& daisy) const;
-  void doIt (Daisy& daisy, Treelog& out);
-  bool done (const Daisy&, Treelog&) const
+  void doIt (Daisy& daisy, const Scope&, Treelog& out);
+  bool done (const Daisy&, const Scope&, Treelog&) const
   { return false; }
   void output (Log&) const;
 
@@ -394,7 +394,7 @@ ActionMarkvand::get_crop (Daisy& daisy) const
 }
 
 void 
-ActionMarkvand::doIt (Daisy& daisy, Treelog& out)
+ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& out)
 {
   // Default values.
   const double default_LAI = 3.0;

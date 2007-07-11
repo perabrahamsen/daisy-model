@@ -27,13 +27,21 @@
 
 const char *const Condition::component = "condition";
 
-void
-Condition::tick (const Daisy&, Treelog&)
-{ }
-
 const std::string
 Condition::timestep ()
 { return "dt"; } 
+
+void
+Condition::tick (const Daisy&, const Scope&, Treelog&)
+{ }
+
+void 
+Condition::initialize (const Daisy&, const Scope&, Treelog&)
+{ }
+
+bool 
+Condition::check (const Daisy&, const Scope&, Treelog&) const
+{ return true; }
 
 Condition::Condition (Block& al)
   : name (al.identifier ("type"))

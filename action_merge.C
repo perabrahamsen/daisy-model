@@ -32,7 +32,7 @@ struct ActionMerge : public Action
   const symbol combine;
   const symbol remove;
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope&, Treelog& out)
   {
     out.message ("Merging " + remove + " into " + combine);
     daisy.field->merge (combine, remove);

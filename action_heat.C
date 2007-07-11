@@ -35,7 +35,7 @@ struct ActionSetHeatSource : public Action
   const double value;
 
   // Simulation.
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope&, Treelog& out)
   {
     out.message ("Adjusting heat source");
     daisy.field->set_heat_source (height, value);

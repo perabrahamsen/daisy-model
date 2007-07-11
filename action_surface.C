@@ -34,7 +34,7 @@ struct ActionSetSurfaceDetentionCapacity : public Action
   const double height;
 
   // Simulation.
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope&, Treelog& out)
   {
     out.message ("Adjusting surface detention capacity");
     daisy.field->set_surface_detention_capacity (height);

@@ -28,7 +28,7 @@
 
 struct ActionStop : public Action
 {
-  void doIt (Daisy& daisy, Treelog&)
+  void doIt (Daisy& daisy, const Scope&, Treelog&)
     { daisy.running = false; }
 
   ActionStop (Block& al)

@@ -40,7 +40,7 @@ else
 SRCDIR = ..
 OBJHOME = obj
 NATIVEHOME = $(OBJHOME)
-BOOSTINC = -isystem /usr/include/boost-1_33_1/
+BOOSTINC = -isystem $(CYGHOME)/usr/include/boost-1_33_1
 SETUPDIR = $(HOME)/daisy/install
 MAKENSIS = /cygdrive/c/Programmer/NSIS/makensis.exe
 MINGWHOME = /cygdrive/c/MinGW
@@ -180,7 +180,7 @@ ifeq ($(USE_DYNLIB),true)
 endif
 
 GCC = gcc
-CROSSGCC = "$(TARGETTYPE)-gcc"
+CROSSGCC = $(GCC) # "$(TARGETTYPE)-gcc"
 
 STRIP = strip
 CROSSSTRIP = "$(TARGETTYPE)-strip"
@@ -362,7 +362,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS =rubiscoNdist_expr.C uzrect_const.C photo_FCC3.C photo_FCC4.C \
+MODELS = action_extern.C \
+	rubiscoNdist_expr.C uzrect_const.C photo_FCC3.C photo_FCC4.C \
 	msoltranrect_Mollerup.C reaction_std.C chemistry_std.C \
 	groundwater_extern.C \
 	msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
@@ -569,7 +570,7 @@ daisy.exe:	main${OBJ} daisy.dll
 	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
 
 daisyw.exe:	main${OBJ} $(GUIOBJECTS) daisy.dll
-	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -mwindows
+	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--enable-runtime-pseudo-reloc -mwindows
 
 daisy:	main${OBJ} $(GUIOBJECTS) $(LIBOBJ)
 	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB)
@@ -589,9 +590,11 @@ cnative:
          && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile cdaisy${EXE})
 
 cross:
-	(cd $(OBJHOME)/$(TARGETTYPE) \
-         && $(MAKE) GCC=$(CROSSGCC) DEBUG= VPATH=$(SRCDIR) \
-                    -f $(SRCDIR)/Makefile daisy${EXE})
+	(cd $(TARGETTYPE) \
+         && $(MAKE) "PATH=/cygdrive/c/MinGW/bin:$(PATH)" \
+		    "CYGHOME=C:/cygwin" Q4HOME=c:/Qt_dynamic/4.2.3\
+	            GCC=$(CROSSGCC) VPATH=$(SRCDIR) \
+                    -f $(SRCDIR)/Makefile daisy${EXE} daisyw.exe)
 
 # Create manager test executable.
 #
@@ -914,8 +917,9 @@ scope${OBJ}: scope.C scope.h symbol.h model.h block.h syntax.h treelog.h \
   plf.h assertion.h librarian.h
 ABAeffect${OBJ}: ABAeffect.C ABAeffect.h model.h alist.h symbol.h mathlib.h \
   assertion.h block.h syntax.h treelog.h plf.h librarian.h
-msoltranrect${OBJ}: msoltranrect.C msoltranrect.h model.h symbol.h block.h \
-  syntax.h treelog.h plf.h librarian.h
+msoltranrect${OBJ}: msoltranrect.C msoltranrect.h model.h symbol.h solute.h \
+  adsorption.h element.h geometry_rect.h geometry_vert.h geometry.h \
+  syntax.h treelog.h mathlib.h assertion.h block.h plf.h librarian.h
 uzrect${OBJ}: uzrect.C uzrect.h model.h symbol.h block.h syntax.h treelog.h \
   plf.h librarian.h
 bound${OBJ}: bound.C bound.h model.h symbol.h block.h syntax.h treelog.h \
@@ -925,8 +929,8 @@ volume${OBJ}: volume.C volume.h model.h symbol.h block.h syntax.h treelog.h \
 uz1d${OBJ}: uz1d.C uz1d.h model.h geometry_rect.h geometry_vert.h geometry.h \
   syntax.h treelog.h symbol.h mathlib.h assertion.h soil.h soil_water.h \
   soil_heat.h block.h plf.h librarian.h
-rubiscoNdist${OBJ}: rubiscoNdist.C rubiscoNdist.h model.h alist.h symbol.h block.h \
-  syntax.h treelog.h plf.h mathlib.h assertion.h librarian.h
+rubiscoNdist${OBJ}: rubiscoNdist.C rubiscoNdist.h model.h alist.h symbol.h \
+  block.h syntax.h treelog.h plf.h mathlib.h assertion.h librarian.h
 raddist${OBJ}: raddist.C raddist.h model.h alist.h symbol.h block.h syntax.h \
   treelog.h plf.h mathlib.h assertion.h librarian.h
 difrad${OBJ}: difrad.C difrad.h model.h alist.h symbol.h block.h syntax.h \
@@ -1051,7 +1055,7 @@ vegetation${OBJ}: vegetation.C vegetation.h model.h symbol.h log.h border.h \
 toplevel${OBJ}: toplevel.C toplevel.h metalib.h symbol.h daisy.h program.h \
   model.h run.h time.h memutils.h ui.h library.h parser_file.h parser.h \
   submodel.h block.h syntax.h treelog.h plf.h alist.h path.h version.h \
-  assertion.h treelog_text.h treelog_store.h librarian.h
+  assertion.h treelog_text.h treelog_store.h librarian.h w32reg.h
 timestep${OBJ}: timestep.C timestep.h time.h vcheck.h syntax.h treelog.h \
   symbol.h alist.h block.h plf.h assertion.h mathlib.h
 geometry_rect${OBJ}: geometry_rect.C geometry_rect.h geometry_vert.h \
@@ -1143,6 +1147,13 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
   symbol.h syntax.h treelog.h log.h border.h model.h geometry.h mathlib.h \
   assertion.h soil.h am.h submodel.h plf.h time.h aom.h om.h check.h \
   vcheck.h
+scope_exchange${OBJ}: scope_exchange.C scope_exchange.h model.h symbol.h \
+  scope.h memutils.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  librarian.h
+photo_Farquhar${OBJ}: photo_Farquhar.C photo_Farquhar.h photo.h model.h \
+  symbol.h block.h syntax.h treelog.h plf.h rubiscoNdist.h alist.h \
+  ABAeffect.h bioclimate.h canopy_std.h canopy_simple.h phenology.h log.h \
+  border.h submodel.h mathlib.h assertion.h check.h librarian.h
 scope_multi${OBJ}: scope_multi.C scope_multi.h scope.h symbol.h model.h \
   syntax.h treelog.h alist.h assertion.h librarian.h
 scope_id${OBJ}: scope_id.C scope_id.h scope.h symbol.h model.h block.h \
@@ -1275,6 +1286,21 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+rubiscoNdist_expr${OBJ}: rubiscoNdist_expr.C rubiscoNdist.h model.h alist.h \
+  symbol.h mathlib.h assertion.h block.h syntax.h treelog.h plf.h check.h \
+  librarian.h number.h scope_exchange.h scope.h memutils.h
+uzrect_const${OBJ}: uzrect_const.C uzrect.h model.h symbol.h geometry_rect.h \
+  geometry_vert.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
+  soil_water.h block.h plf.h alist.h librarian.h
+photo_FCC3${OBJ}: photo_FCC3.C photo_Farquhar.h photo.h model.h symbol.h \
+  block.h syntax.h treelog.h plf.h rubiscoNdist.h alist.h ABAeffect.h \
+  bioclimate.h canopy_std.h canopy_simple.h phenology.h log.h border.h \
+  submodel.h mathlib.h assertion.h check.h librarian.h
+photo_FCC4${OBJ}: photo_FCC4.C photo_Farquhar.h photo.h model.h symbol.h \
+  rubiscoNdist.h alist.h ABAeffect.h bioclimate.h canopy_std.h \
+  canopy_simple.h plf.h phenology.h log.h border.h syntax.h treelog.h \
+  block.h submodel.h mathlib.h assertion.h check.h librarian.h
+msoltranrect_Mollerup${OBJ}: msoltranrect_Mollerup.C
 reaction_std${OBJ}: reaction_std.C reaction.h model.h alist.h symbol.h \
   block.h syntax.h treelog.h plf.h transform.h chemistry.h chemical.h \
   solute.h adsorption.h soil.h log.h border.h assertion.h librarian.h
@@ -1285,12 +1311,10 @@ chemistry_std${OBJ}: chemistry_std.C chemistry.h model.h symbol.h chemical.h \
 groundwater_extern${OBJ}: groundwater_extern.C groundwater.h model.h symbol.h \
   output.h condition.h memutils.h scopesel.h scope.h number.h block.h \
   syntax.h treelog.h plf.h alist.h units.h assertion.h librarian.h
-scope_exchange${OBJ}: scope_exchange.C scope.h symbol.h model.h block.h \
-  syntax.h treelog.h plf.h alist.h assertion.h memutils.h librarian.h
 msoltranrect_none${OBJ}: msoltranrect_none.C msoltranrect.h model.h symbol.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
-  assertion.h soil.h soil_water.h solute.h adsorption.h element.h alist.h \
-  submodeler.h block.h plf.h memutils.h librarian.h
+  assertion.h soil.h soil_water.h adsorption.h alist.h submodeler.h \
+  block.h plf.h memutils.h librarian.h
 uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h model.h symbol.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil.h soil_water.h soil_heat.h groundwater.h surface.h \
@@ -1299,18 +1323,14 @@ groundwater_flux${OBJ}: groundwater_flux.C groundwater.h model.h symbol.h \
   syntax.h treelog.h alist.h block.h plf.h check.h librarian.h
 msoltranrect_2x1${OBJ}: msoltranrect_2x1.C msoltranrect.h model.h symbol.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
-  assertion.h transport.h soil.h soil_water.h solute.h adsorption.h \
-  element.h alist.h submodeler.h block.h plf.h memutils.h librarian.h
-photo_FCC4${OBJ}: photo_FCC4.C photo.h model.h symbol.h rubiscoNdist.h alist.h \
-  ABAeffect.h bioclimate.h canopy_std.h canopy_simple.h plf.h phenology.h \
-  log.h border.h syntax.h treelog.h block.h submodel.h mathlib.h \
-  assertion.h check.h librarian.h
+  assertion.h transport.h soil.h soil_water.h adsorption.h alist.h \
+  submodeler.h block.h plf.h memutils.h librarian.h
 ABAeffect_exp${OBJ}: ABAeffect_exp.C ABAeffect.h model.h alist.h symbol.h \
   mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
   librarian.h
-rubiscoNdist_uniform${OBJ}: rubiscoNdist_uniform.C rubiscoNdist.h model.h alist.h \
-  symbol.h mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
-  librarian.h
+rubiscoNdist_uniform${OBJ}: rubiscoNdist_uniform.C rubiscoNdist.h model.h \
+  alist.h symbol.h mathlib.h assertion.h check.h block.h syntax.h \
+  treelog.h plf.h librarian.h
 uzrect_2x1${OBJ}: uzrect_2x1.C uzrect.h model.h symbol.h uzmodel.h uz1d.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil.h soil_water.h soil_heat.h groundwater.h surface.h \
@@ -1332,8 +1352,8 @@ uz1d_richard${OBJ}: uz1d_richard.C uz1d.h model.h geometry_rect.h \
   geometry_vert.h geometry.h syntax.h treelog.h symbol.h mathlib.h \
   assertion.h soil.h soil_water.h soil_heat.h block.h plf.h alist.h \
   average.h librarian.h
-rubiscoNdist_DPF${OBJ}: rubiscoNdist_DPF.C rubiscoNdist.h model.h alist.h symbol.h \
-  mathlib.h assertion.h block.h syntax.h treelog.h plf.h check.h \
+rubiscoNdist_DPF${OBJ}: rubiscoNdist_DPF.C rubiscoNdist.h model.h alist.h \
+  symbol.h mathlib.h assertion.h block.h syntax.h treelog.h plf.h check.h \
   librarian.h
 raddist_DPF${OBJ}: raddist_DPF.C raddist.h model.h alist.h symbol.h block.h \
   syntax.h treelog.h plf.h vegetation.h weather.h im.h mathlib.h \
@@ -1421,7 +1441,8 @@ source_combine${OBJ}: source_combine.C source.h model.h time.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h number.h scope_sources.h \
   scope.h gnuplot_utils.h vcheck.h assertion.h librarian.h
 number_arit${OBJ}: number_arit.C number.h symbol.h model.h syntax.h treelog.h \
-  alist.h units.h vcheck.h mathlib.h assertion.h memutils.h librarian.h
+  alist.h plf.h units.h vcheck.h mathlib.h assertion.h memutils.h block.h \
+  librarian.h
 source_expr${OBJ}: source_expr.C source_file.h source.h model.h time.h \
   symbol.h lexer_table.h block.h syntax.h treelog.h plf.h scope_table.h \
   scope.h number.h alist.h librarian.h
@@ -1432,10 +1453,6 @@ action_markvand${OBJ}: action_markvand.C action.h model.h alist.h symbol.h \
   block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
   memutils.h field.h border.h crop.h im.h fao.h log.h mathlib.h \
   assertion.h check.h vcheck.h librarian.h
-photo_Farquhar${OBJ}: photo_Farquhar.C photo.h model.h symbol.h block.h \
-  syntax.h treelog.h plf.h rubiscoNdist.h alist.h ABAeffect.h bioclimate.h \
-  canopy_std.h canopy_simple.h phenology.h log.h border.h submodel.h \
-  mathlib.h assertion.h check.h librarian.h
 photo_GL${OBJ}: photo_GL.C photo.h model.h symbol.h block.h syntax.h \
   treelog.h plf.h canopy_std.h canopy_simple.h phenology.h alist.h \
   submodel.h mathlib.h assertion.h check.h librarian.h

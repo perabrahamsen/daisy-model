@@ -34,30 +34,30 @@ struct ActionActivity : public Action
 {
   vector<Action*> actions;
 
-  void tick (const Daisy& daisy, Treelog& out)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
     for (vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
-      (*i)->tick (daisy, out);
+      (*i)->tick (daisy, scope, out);
   }
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope& scope, Treelog& out)
   { 
     if (actions.size () == 0U)
       return;
 
     Action* action = actions.front ();
-    action->doIt (daisy, out);
+    action->doIt (daisy, scope, out);
 
-    if (action->done (daisy, out))
+    if (action->done (daisy, scope, out))
       {
 	delete action;
 	actions.erase (actions.begin ());
       }
   }
 
-  bool done (const Daisy&, Treelog&) const
+  bool done (const Daisy&, const Scope&, Treelog&) const
   { return (actions.size () == 0U); }
 
   void output (Log& log) const
@@ -65,14 +65,22 @@ struct ActionActivity : public Action
     output_list (actions, "actions", log, Action::component);
   }
 
-  bool check (const Daisy& daisy, Treelog& err) const
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+  { 
+    for (vector<Action*>::const_iterator i = actions.begin ();
+	 i != actions.end ();
+	 i++)
+      (*i)->initialize (daisy, scope, out);
+  }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const
   { 
     bool ok = true;
     for (vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
-	if (!(*i)->check (daisy, err))
+	if (!(*i)->check (daisy, scope, err))
 	  ok = false;
       }
     return ok;

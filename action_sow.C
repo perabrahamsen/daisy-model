@@ -34,7 +34,7 @@ struct ActionSow : public Action
 {
   const AttributeList& crop;
 
-  void doIt (Daisy& daisy, Treelog& msg)
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   { 
     msg.message (string ("Sowing ") + crop.name ("type"));      
     daisy.field->sow (daisy.metalib, crop, daisy.time, daisy.dt, msg); 

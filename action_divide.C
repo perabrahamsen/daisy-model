@@ -33,7 +33,7 @@ struct ActionDivide : public Action
   const symbol copy;
   const double size;
 
-  void doIt (Daisy& daisy, Treelog& out)
+  void doIt (Daisy& daisy, const Scope&, Treelog& out)
     {
       out.message ("[Dividing " + original + " into " + copy + "]");
       daisy.field->divide (*daisy.output_log,
