@@ -38,9 +38,6 @@
   <ItemGroup>
     <Compile Include="alist_test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="daisyDotNetAccess_test.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="daisyWrapper_test.cs" />
     <Compile Include="daisy_test.cs" />
     <Compile Include="scope_test.cs">

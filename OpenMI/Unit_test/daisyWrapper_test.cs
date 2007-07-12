@@ -18,6 +18,55 @@ namespace Unit_test
             return Daisy;
         }
         [Test]
+        public void Initialize()
+        {
+            DaisyWrapper daisy = GetInitDaisy();
+        }
+        [Test]
+        public void CountColumns()
+        {
+            DaisyWrapper daisy = GetInitDaisy();
+            Assert.AreEqual(1, daisy.CountColumns());
+        }
+        [Test]
+        public void IsRunning()
+        {
+            DaisyWrapper daisy = GetInitDaisy();
+            Assert.AreEqual(true, daisy.IsRunning());
+        }
+        [Test]
+        public void StartTime()
+        {
+            DaisyWrapper daisy = GetInitDaisy();
+            Assert.AreEqual(new DateTime(1986, 12, 1, 1, 0, 0), daisy.StartTime);
+        }
+        [Test]
+        public void EndTime()
+        {
+            DaisyWrapper daisy = GetInitDaisy();
+            Assert.AreEqual(new DateTime(1988, 4, 1, 1, 0, 0), daisy.EndTime);
+        }
+        [Test]
+        public void GetTime()
+        {
+            DaisyWrapper daisy = GetInitDaisy();
+            Assert.AreEqual(new DateTime(1986, 12, 1, 1, 0, 0), daisy.GetTime());
+            daisy.PerformTimeStep();
+            Assert.AreEqual(new DateTime(1986, 12, 1, 1, 0, 0).AddHours(1), daisy.GetTime());
+        }
+        [Test]
+        public void GetEndTime()
+        {
+            DaisyWrapper daisy = GetInitDaisy();
+            Assert.AreEqual(new DateTime(1988, 4, 1, 1, 0, 0), daisy.GetEndTime());
+        }
+        [Test]
+        public void GetDescription()
+        {
+            DaisyWrapper daisy = GetInitDaisy();
+            Assert.AreEqual("Simulation for use in tutorial.", daisy.GetDescription());
+        }
+        [Test]
         public void TimeHorizon()
         {
             DaisyWrapper Daisy = GetInitDaisy();
@@ -65,7 +114,7 @@ namespace Unit_test
         {
             DaisyWrapper Daisy = GetInitDaisy();
             Assert.AreEqual("Simulation for use in tutorial.", Daisy.GetModelDescription());
-            Assert.AreEqual("Daisy version 4.12", Daisy.GetComponentDescription());
+            Assert.AreEqual("Daisy version 4.16", Daisy.GetComponentDescription());
         }
         [Test]
         public void GetMissingValueDefinition()
@@ -120,11 +169,11 @@ namespace Unit_test
            Assert.AreEqual("<none>", Daisy.GetOutputExchangeItem(1).Quantity.Unit.ID);
            Assert.AreEqual("Crop AI", Daisy.GetOutputExchangeItem(4).Quantity.ID);
            Assert.AreEqual("m^2/m^2", Daisy.GetOutputExchangeItem(4).Quantity.Unit.ID);
-           Assert.AreEqual(1, Daisy.GetOutputExchangeItem(0).ElementSet.GetXCoordinate(0, 0));
-           Assert.AreEqual(1, Daisy.GetOutputExchangeItem(1).ElementSet.GetXCoordinate(0, 0));
-           Assert.AreEqual(0, Daisy.GetOutputExchangeItem(1).ElementSet.GetYCoordinate(0, 0));
-           Assert.AreEqual(1, Daisy.GetOutputExchangeItem(4).ElementSet.GetXCoordinate(0, 0));
-           Assert.AreEqual(0, Daisy.GetOutputExchangeItem(4).ElementSet.GetYCoordinate(0, 0));
+           Assert.AreEqual(-16, Daisy.GetOutputExchangeItem(0).ElementSet.GetXCoordinate(0, 0));
+           Assert.AreEqual(-16, Daisy.GetOutputExchangeItem(1).ElementSet.GetXCoordinate(0, 0));
+           Assert.AreEqual(4200.8, Daisy.GetOutputExchangeItem(1).ElementSet.GetYCoordinate(0, 0));
+           Assert.AreEqual(-16, Daisy.GetOutputExchangeItem(4).ElementSet.GetXCoordinate(0, 0));
+           Assert.AreEqual(4200.8, Daisy.GetOutputExchangeItem(4).ElementSet.GetYCoordinate(0, 0));
 
        }
     }

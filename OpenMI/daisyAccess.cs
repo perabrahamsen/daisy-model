@@ -119,7 +119,6 @@ namespace dk.ku.life.Daisy
 
     }
 
-
     public class AList
     {
         public IntPtr alist;
@@ -167,7 +166,6 @@ namespace dk.ku.life.Daisy
             alist = (IntPtr)0;
         }
     }   
-
 
     public class Daisy
     {
@@ -348,4 +346,5 @@ namespace dk.ku.life.Daisy
             DLL.daisy_scope_set_number(scope, name, value);
         }
     }
+
 }

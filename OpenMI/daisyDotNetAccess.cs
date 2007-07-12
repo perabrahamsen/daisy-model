@@ -105,27 +105,5 @@ namespace dk.ku.life.Daisy
             /* Cleanup. */
             daisy.Dispose();
         }
-
-        public void RunSimulation(string filename)
-        {
-            try
-            {
-                /* Link and initialize the daisy subsystem. */
-                Initialize(filename);
-
-                /* Run the simulation. */
-                {
-                    while (daisy.IsRunning())
-                    {
-                        PerformTimeStep();
-                    }
-                    Console.WriteLine("Simulation end.");
-                }
-            }
-            finally
-            {
-                Dispose();
-            }
-        }
     }
 }

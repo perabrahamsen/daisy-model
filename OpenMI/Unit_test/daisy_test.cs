@@ -25,7 +25,7 @@ namespace Unit_test
         public void Version()
         {
             string version = Daisy.Version();
-            Assert.AreEqual("4.12", version);
+            Assert.AreEqual("4.16", version);
         }
         [Test]
         public void ProgramAList()
