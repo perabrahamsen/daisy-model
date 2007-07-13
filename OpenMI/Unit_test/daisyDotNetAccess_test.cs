@@ -18,7 +18,7 @@ namespace Unit_test
         [Test]
         public void DaisyVersion()
         {
-            Assert.AreEqual("4.16", Daisy.Version());
+            Assert.AreEqual("4.12", Daisy.Version());
         }
         [Test]
         public void Initialize()

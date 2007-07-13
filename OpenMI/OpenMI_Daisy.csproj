@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="daisyAccess.cs" />
+    <Compile Include="daisyDotNetAccess.cs" />
     <Compile Include="daisyOpenMIcomponent.cs" />
     <Compile Include="daisywrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
