@@ -46,8 +46,18 @@ struct ActionRepeat : public Action
 	action = NULL;
       }
     if (action == NULL)
-      action = Librarian::build_free<Action> (daisy.metalib, 
-                                              msg, repeat, "repeat");
+      {
+	action = Librarian::build_free<Action> (daisy.metalib, 
+						msg, repeat, "repeat");
+	action->initialize (daisy, scope, msg);
+	if (!action->check (daisy, scope, msg))
+	  {
+	    delete action;
+	    action = NULL;
+	  }
+	else
+	  action->tick (daisy, scope, msg);
+      }
     if (action != NULL)         // Build free may fail.
       action->doIt (daisy, scope, msg);
   }

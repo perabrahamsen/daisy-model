@@ -265,6 +265,8 @@ struct ActionIf : public Action
   bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const
   { 
     bool ok = true; 
+    if (!if_c->check (daisy, scope, err))
+      ok = false;
     if (!then_a->check (daisy, scope, err))
       ok = false;
     if (!else_a->check (daisy, scope, err))

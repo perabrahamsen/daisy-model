@@ -35,7 +35,6 @@ struct ActionExtern : public Action
   const std::auto_ptr<Scopesel> scopesel;
   mutable const Scope* extern_scope;
   const std::auto_ptr<Action> child;
-  mutable enum { ready, uninitialized, error } state;
 
   void tick (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   {
@@ -45,14 +44,8 @@ struct ActionExtern : public Action
 
   void doIt (Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   { 
-    if (state == uninitialized)
-      {
-        if (state != error)
-          {
-            ScopeMulti multi (*extern_scope, parent_scope);
-            child->doIt (daisy, multi, msg);
-          }
-      }        
+    ScopeMulti multi (*extern_scope, parent_scope);
+    child->doIt (daisy, multi, msg);
   }
 
   bool done (const Daisy& daisy, const Scope& parent_scope, Treelog& msg) const
@@ -97,8 +90,7 @@ struct ActionExtern : public Action
     : Action (al),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
-      child (Librarian::build_item<Action> (al, "action")),
-      state (uninitialized)
+      child (Librarian::build_item<Action> (al, "action"))
   { }
   ~ActionExtern ()
   { }

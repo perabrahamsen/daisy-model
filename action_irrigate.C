@@ -22,8 +22,11 @@
 #define BUILD_DLL
 
 #include "action.h"
+#include "scope.h"
 #include "block.h"
 #include "daisy.h"
+#include "number.h"
+#include "units.h"
 #include "field.h"
 #include "im.h"
 #include "check.h"
@@ -40,13 +43,58 @@ struct ActionIrrigate : public Action
 
   static const double at_air_temperature;
 
-  const double flux;
+  const std::auto_ptr<Number> expr_flux;
+  double flux;
   const double temp;
   const IM sm;
   
   virtual void irrigate (Field&, double flux, double temp, const IM&, 
                          double dt) const = 0;
 
+  void initialize (const Daisy&, const Scope&, Treelog& msg)
+  { 
+    expr_flux->initialize (msg);
+  }
+
+  bool check (const Daisy&, const Scope& scope, Treelog& msg) const
+  {
+    bool ok = true;
+    if (!expr_flux->check (scope, msg))
+      ok = false;
+    else if (!Units::can_convert (expr_flux->dimension (scope).name (), "mm/h"))
+      {
+        msg.error ("Cannot convert [" + 
+		   expr_flux->dimension (scope).name () + "] to [mm/h]");
+        ok = false;
+      }
+    return ok;
+  }
+
+  void tick (const Daisy&, const Scope& scope, Treelog& msg)
+  { 
+    expr_flux->tick (scope, msg);
+    bool has_flux = !expr_flux->missing (scope);
+    std::ostringstream tmp;
+
+    if(has_flux)
+      {
+	flux = expr_flux->value (scope);
+	const symbol dim = expr_flux->dimension (scope);
+	
+	if (!Units::can_convert (dim.name (), "mm/h", flux))
+	  {
+	    tmp << "Cannot convert " << flux << " [" << dim << "] to [mm/h]";
+	    msg.warning (tmp.str ());
+	    has_flux = false;
+	  }
+	else
+	  {
+	    flux = Units::convert (dim.name (), "mm/h", flux);
+	    has_flux = true;
+	  }
+      }
+  }
+  
   void doIt (Daisy& daisy, const Scope&, Treelog& out)
   {
     if (!activated)
@@ -118,8 +166,9 @@ number of days else.");
     syntax.add ("remaining_time", "h", Syntax::OptionalState,
                 "Irrigate this number of hours.\
 Setting this overrides the 'days' and 'hours' parameters.");
-    syntax.add ("flux", "mm/h", Check::non_negative (), Syntax::Const, 
-		"Amount of irrigation applied.");
+    syntax.add_object ("flux", Number::component, 
+                       Syntax::Const, Syntax::Singleton, 
+"Amount of irrigation applied.");
     syntax.order ("flux");
     syntax.add ("temperature", "dg C", 
 		Check::positive (), Syntax::OptionalConst,
@@ -135,7 +184,8 @@ Nitrogen content of irrigation water [mg N/l] (default: none).",
       hours (al.integer ("hours", (days > 0) ? 0 : 1)),
       activated (al.check ("remaining_time")),
       remaining_time (al.number ("remaining_time", 0.0)),
-      flux (al.number ("flux")),
+      expr_flux (Librarian::build_item<Number> (al, "flux")),
+      flux (-42.42e42),
       temp (al.number ("temperature", at_air_temperature)),
       sm (al.alist ("solute"))
   { }

@@ -54,7 +54,7 @@ symbol
 ScopeMulti::dimension (const symbol tag) const
 {
   for (size_t i = 0; i < scopes.size (); i++)
-    if (scopes[i]->has_number (tag))
+    if (scopes[i]->is_number (tag))
       return scopes[i]->dimension (tag);
   
   daisy_panic ("'" + tag + "' not found in any scope");

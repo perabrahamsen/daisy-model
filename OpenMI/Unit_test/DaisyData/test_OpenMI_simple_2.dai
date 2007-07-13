@@ -29,7 +29,10 @@
   ;;(Groundwater deep)
   ;; Daisy does not use groundwater table from OpenMI unless you choose the model below,
   ;; which may not work fully yet.
-  (Groundwater extern (scope name "Groundwater_table") (table "GroundWaterTable")) 
+  (Groundwater extern 
+               (scope name "Groundwater_table") 
+               (table "GroundWaterTable")
+               (initial_table -200 [cm]))
   (Bioclimate default))
 
 ;; Use it.
@@ -40,7 +43,11 @@
 (stop 1988 4 1 1)
 
 ;; Simulation of bare soil 
-(manager activity)
+(manager activity
+	 (repeat (extern (name fertigation) 
+			 (if (extern (name fertigation)
+				     (> "Surface Irrigation" 0.0 [mm/h]))
+			     (irrigate_surface "Surface Irrigation")))))
 
 ;; Output exchange items
 (deflog OpenMI_output extern
@@ -161,26 +168,33 @@
             (number (name "GroundWaterTable")
                     (description "Ground water table. Value zero corresponds to soil surface, negative values are below surface.")
 		    (dimension [cm]))
+	    ))
+
+(defscope fertigation OpenMI_input
+  (entries &old
 	    (number (name "Overhead Irrigation")
 		    (description "Irrigation of soil and leaves by sprinkling")
-		    (dimension "mm/h"))
+		    (dimension "mm/h")
+		    (value 5.0))
 	    (number (name "Surface Irrigation")
 		    (description "Irrigation of surface soil by tubes")
-		    (dimension "mm/h"))
+		    (dimension "mm/h")
+		    (value 5.0))
 	    (number (name "Subsoil Irrigation")
 		    (description "Irrigation by tubes inside the soil")
 		    (dimension "mm/h"))
-	    (number (name "NO3-Subsoil Irrigation")
-		    (description "Amount of NO3-N in irrigation water")
+	    (number (name "NO3 input")
+		    (description "Amount of NO3-N applied")
 		    (dimension "kg N/ha/h"))
-	    (number (name "NH4-Subsoil Irrigation")
-		    (description "Amount of NH4-N in irrigation water")
+	    (number (name "NH4 input")
+		    (description "Amount of NH4-N applied")
 		    (dimension "kg N/ha/h"))
 		    )
    )
  
 ;; Import these items through OpenMI.
-(exchange (Groundwater_table (column Andeby) (x -16) (y 4200.8)))
+(exchange (Groundwater_table (column Andeby) (x -16) (y 4200.8))
+	  (fertigation (column Andeby) (x -16) (y 4200.8)))
 
 
 ;;; testOpenMI_simple_2.dai ends here.
