@@ -37,25 +37,25 @@ struct ConditionBoolean : public Condition
   // State.
   mutable enum { isfalse, istrue, missing, uninitialized, error } state;
 
-  void tick (const Daisy&, const Scope&, Treelog&)
-  { }
+  void tick (const Daisy&, const Scope& scope, Treelog& msg)
+  { expr->tick (scope, msg); }
 
-  bool match (const Daisy&, const Scope&, Treelog& msg) const
+  bool match (const Daisy&, const Scope& scope, Treelog& msg) const
   { 
     Treelog::Open nest (msg, name);
 
     if (state == uninitialized
         && (!expr->initialize (msg)
-            || !expr->check (Scope::null (), msg)))
+            || !expr->check (scope, msg)))
       state = error;
 
     if (state != error)
       {
-        expr->tick (Scope::null (), msg);
-        if (expr->missing (Scope::null ()))
+        expr->tick (scope, msg);
+        if (expr->missing (scope))
           state = missing;
         else
-          state = expr->value (Scope::null ()) ? istrue : isfalse;
+          state = expr->value (scope) ? istrue : isfalse;
       }
     
     return state == istrue ? true : false; 

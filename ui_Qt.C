@@ -28,6 +28,7 @@
 #include <QtGui/QApplication>
 #include <QtCore/QMetaType>
 
+#ifdef SELECTABLE_UI
 struct UIQt::Content
 {
   static struct Registrate 
@@ -62,7 +63,7 @@ struct UIQt::Content
     : app (argc, argv)
   { 
     app.setApplicationName ("Daisy");
-    app.setOrganizationDomain ("life.ku.org");
+    app.setOrganizationDomain ("life.ku.dk");
     app.setOrganizationName ("University of Copenhagen");
   }
 };
@@ -84,6 +85,36 @@ UIQt::application_name () const
   daisy_assert (UIQt::content);
   return UIQt::content->app.applicationName (); 
 }
+#else
+
+QApplication* UIQt::app = NULL;
+
+void
+UIQt::set_application (QApplication& a)
+{
+  daisy_assert (!app);
+  app = &a; 
+  a.setApplicationName ("Daisy");
+  a.setOrganizationDomain ("life.ku.dk");
+  a.setOrganizationName ("University of Copenhagen");
+  qRegisterMetaType<std::string>("std::string");
+  qRegisterMetaType<Toplevel::state_t>("Toplevel::state_t");
+}
+
+void
+UIQt::run_user_interface ()
+{ 
+  daisy_assert (app);
+  app->exec (); 
+}
+
+QString
+UIQt::application_name () const
+{
+  daisy_assert (app);
+  return app->applicationName (); 
+}
+#endif // SELECTABLE_UI
 
 UIQt::UIQt (Block& al)
   : UI (al)

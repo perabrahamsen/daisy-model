@@ -308,7 +308,7 @@ QTMOC		= /pack/qt/bin/moc
 endif
 
 ifeq ($(HOSTTYPE),mingw)
-Q4HOME = /cygdrive/c/Qt/4.2.3
+Q4HOME = /cygdrive/c/Qt/4.3.0
 Q4INCLUDE	= -isystem $(Q4HOME)/include
 ifeq (false,true)
 Q4SYS		= -lGDI32 -lole32 -lOleaut32 -luuid -lImm32 -lwinmm \
@@ -489,7 +489,7 @@ QTOBJECTS = $(QTSOURCES:.C=${OBJ}) $(QTMOCHDR:.h=_moc${OBJ})
 Q4MOCHDR = run_Qt.h vis_Qt.h log_Qt.h
 Q4MOCSRC = $(Q4MOCHDR:.h=_moc.C)
 Q4HEADERS = $(Q4MOCHDR) ui_Qt.h
-Q4SOURCES = $(Q4HEADERS:.h=.C) ui_Qt_run.C
+Q4SOURCES = $(Q4HEADERS:.h=.C) ui_Qt_run.C main_Qt.C
 Q4OBJECTS = $(Q4SOURCES:.C=${OBJ}) $(Q4MOCHDR:.h=_moc${OBJ}) 
 
 ifeq ($(USE_GUI),Q4)
@@ -569,7 +569,7 @@ daisy_Qt.dll: $(Q4OBJECTS) daisy.dll
 daisy.exe:	main${OBJ} daisy.dll
 	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
 
-daisyw.exe:	main${OBJ} $(GUIOBJECTS) daisy.dll
+daisyw.exe:	$(GUIOBJECTS) daisy.dll
 	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--enable-runtime-pseudo-reloc -mwindows
 
 daisy:	main${OBJ} $(GUIOBJECTS) $(LIBOBJ)
@@ -592,7 +592,7 @@ cnative:
 cross:
 	(cd $(TARGETTYPE) \
          && $(MAKE) "PATH=/cygdrive/c/MinGW/bin:$(PATH)" \
-		    "CYGHOME=C:/cygwin" Q4HOME=c:/Qt_dynamic/4.2.3\
+		    "CYGHOME=C:/cygwin" Q4HOME=c:/Qt/4.3.0\
 	            GCC=$(CROSSGCC) VPATH=$(SRCDIR) \
                     -f $(SRCDIR)/Makefile daisy${EXE} daisyw.exe)
 

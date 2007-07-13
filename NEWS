@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.18
+
+Reenabled GUI, more work on OpenMI.
+
 * 4.17
 
 More work on Farquhar photosynthesis and 2D transportation.
