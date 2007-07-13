@@ -36,10 +36,10 @@
 
 \section{Modelling the farmer}
 
-A conceptual problem for modelling the ecosystem of a field is how to
-model the farmer.  The farmer is a human being, and those are
-notoriously difficult to model, especially when they may have access
-to the model themselves.
+A conceptual problem for modelling the agro-ecosystem at field scale
+is how to model the farmer.  The farmer is a human being, and those
+are notoriously difficult to model, especially when they may have
+access to the model themselves.
 
 \paragraph{The past} When using the model on historical data, the
 problem is much simplified.  The management actions have already been
@@ -73,12 +73,13 @@ existing management description.  The problem occurs when these
 changes affect the basis for the historical management decisions.
 Soil carbon depletion and irrigation are both likely to increase the
 need of fertilization, and a warmer climate will almost always affect
-crop phenology, and therefore harvest time.  This means the reasonable
-management decisions in the hypothetical scenario will likely be
-different from the historical data the scenario is based upon.  This
-means that we either need to stop the scenario simulation regularly
-and make the new management decision based on the new state of the
-system, or use an automated decision making system.
+management operations in the spring, crop phenology, and therefore
+harvest time.  This means the reasonable management decisions in the
+hypothetical scenario will likely be different from the historical
+data the scenario is based upon.  This means that we either need to
+stop the scenario simulation regularly and make the new management
+decision based on the new state of the system, or use an automated
+decision making system.
 
 \paragraph{Decision making systems} A sufficiently detailed DSS can be
 used as a decision making system in a scenario simulation, simply by
@@ -106,19 +107,19 @@ model of an agro-ecological system.  It simulates water, nitrogen,
 carbon and energy below and above the soil surface.  Above the soil
 surface there is one or more crop, competing for light, water and
 nutrients.  Plant growth is fueled by available light, and limited by
-available nitrogen, water and respiration.  The accumulated growth is
-divided into stem, leaf, storage organs, and roots.  For light
-competition, the canopy is divided into vertical layers, where the
-crops with leafs in the upper layers may shadow the crops with leafs
-in the lower layer.  Below the soil surface, the soil is also divided
-into vertical (for now) numerical layers.  Transport of water in the
-soil matrix is done with Richard's equations, and supplemented with a
-simple macropore model.  Solute transport is done with
-convection-dispersion.  The user is able to choose simpler models for
-transport, when computational speed is more important than accuracy.
-Organic matter in the soils is divided into multiple pools, by default
-6, and both short-term (days) and long-term (decades) dynamics have
-been validated
+available nitrogen and water, with growth and maintenance respiration
+taken into account.  The accumulated growth is divided into stem,
+leaf, storage organs, and roots.  For light competition, the canopy is
+divided into vertical layers, where the crops with leafs in the upper
+layers may shadow the crops with leafs in the lower layer.  Below the
+soil surface, the soil is also divided into vertical (for now)
+numerical layers.  Transport of water in the soil matrix is done with
+Richard's equations, and supplemented with a simple macropore model.
+Solute transport is done with convection-dispersion equation.  The
+user is able to choose simpler models for transport, when
+computational speed is more important than accuracy.  Organic matter
+in the soils is divided into multiple pools, by default 6, and both
+short-term (days) and long-term (decades) dynamics have been validated
 \cite{willigen91-compar,vereecken91-compar,diekkruger95-compar,smith97-compar,daisy-somnew}.
 The internal timestep used for most of the calculations is one hour,
 but for water and solute transport this may be much shorter.
@@ -146,7 +147,7 @@ harvesting.  The second type of action is to do nothing, waiting for
 some condition to be true.  The third type of actions combines other
 actions.  The \dname{activity} action perform a list of actions
 sequentially, when the first action is finished, begin the next, and
-so on.  The \dname{while} action perform a list of actions
+so on.  The \dname{while} action perform multiple actions
 simultaneously.  For the duration of the first action, also perform
 all the remaining actions.  The \dname{if} action takes a condition
 and two actions as arguments, if the condition is true, it will
@@ -186,15 +187,14 @@ Floating point numbers are followed by a dimension in square brackets,
 cardinals are not.  Names containing whitespace must be surrounded
 by quotation marks.
 
-The string \dname{manager} is the name of a parameter in the
-Daisy model, here we specify the value for that parameter.  The Daisy
-model takes other parameters, such as \dname{column} to specify
-the properties of the field, and \dname{weather}, but those are
-not the topic of this article.  The next string is
-\dname{activity}, which is the action that takes a list of
-actions as arguments, and perform them sequentially.  In this case
-there are 8 arguments, as each argument is surrounded by
-parenthesizes.
+The string \dname{manager} is the name of a parameter in the Daisy
+model, here we specify the value for that parameter.  The Daisy model
+takes other parameters, such as \dname{column} to specify the
+properties of the field, and \dname{weather}, but those are not the
+topic of this paper.  The next string is \dname{activity}, which is
+the action that takes a list of actions as arguments, and perform them
+sequentially.  In this case there are 8 arguments, as each argument is
+surrounded by parenthesizes.
 
 The format of the action list is that we wait for a specific
 condition, and then perform a field operation action
@@ -304,17 +304,17 @@ it, and illustrates how we provide concurrency.
                (before_mm_dd 8 15)
                (not (soil_water_pressure_above 
                       (height -25.0 [cm])
-                      (potential -1000 [pF])))))
+                      (potential 2.3 [pF])))))
     (irrigate_overhead 5 [mm/h] (hours 6))
     (wait_days 2))
 \end{verbatim}
 Here we first define a single irrigation activity called
 \dname{irrigate\_30}.  We wait until the soil is sufficiently dry
-(more than 3 pF) at 25 cm.  We also check that we are within the local
-irrigation season with the \dname{after\_mm\_dd} and
+(potential below 2.3 pF) at 25 cm.  We also check that we are within
+the local irrigation season with the \dname{after\_mm\_dd} and
 \dname{before\_mm\_dd} conditions\footnote{These test the date
-  relative to the calendar year, and are most useful in Northern
-  climates where it is too cold to grow crops in December/January.}.
+relative to the calendar year, and are most useful in Northern
+climates where it is too cold to grow crops in December/January.}.
 When all three conditions are true, we irrigate with 5 mm/h for 6
 hours.  Afterwards, we wait two days in order to ensure the water
 reach our measuring point at 25 cm.
@@ -378,25 +378,20 @@ First we must define what part of the state we want to examine.
                      (spec fixed Production NCrop)
                      (dimension "kg N/ha"))))
 \end{verbatim}
-Here we define a log named \dname{DSS} of the type \dname{extern}.  A
-similar system is used by Daisy for defining what part of the state to
-write to files during the simulation, the only differences are that 1)
-the name of the log type is \dname{table} instead of \dname{extern},
-and 2) an additional parameter \dname{where} specifies the name of
-file to store the result.  For both \dname{table} and \dname{extern}
-logs, the \dname{when} parameter specifies how often to store the
-results, and the \dname{entries} parameter specifies which part of the
-state to store.
+Here we define a log named \dname{DSS} of the type \dname{extern}, the
+\dname{when} parameter specifies how often to store the results, and
+the \dname{entries} parameter specifies which part of the state to
+store.
 
 \paragraph{Select methods} The \dname{entries} parameter takes a list
 of select methods for individual state variables within the system.
 Here we use two types of select methods, \dname{interval} and
 \dname{number}.  Both have some shared parameters: \dname{path} and
-\dname{spec} specify how to find the state variable within the
+\dname{spec}, that specify how to find the state variable within the
 internal hierarchical structure of Daisy\footnote{Described in
-  \cite{daisy-ref}, and outside the scope of this article}, and
+\cite{daisy-ref}, and outside the scope of this article}, and
 \dname{dimension} the desired dimension for the value\footnote{Daisy
-  will convert from the internal dimension if needed.}.  Finally,
+will convert from the internal dimension if needed.}.  Finally,
 \dname{tag} is the external name (the use of which we will come back
 to) for the value, if not specified the last element of the
 \dname{path} list is used.  The \dname{interval} select method is used
@@ -481,25 +476,28 @@ Or we could combine them.
 
 Since all expressions are fully parenthesised, the input language can
 be implemented with a trivial recursive-descend parser with a single
-token lookahead, and no backtracking.  Alternatively, if one is
-willing to accept a somewhat bulkier notation, a ready-to-use XML
-based parser could be used.
+token lookahead, and no backtracking, se for example~\cite{dragon}.
+Alternatively, if one is willing to accept a somewhat bulkier
+notation, a ready-to-use XML~\cite{XML} based parser could be used.
 
 The base concepts \emph{action}, \emph{condition}, \emph{boolean}, and
 \emph{number} are all represented by pure base class, and the specific
 actions, conditions, etc.\ by concrete classes derived from the base.
 The accessor functions for actions and conditions need to take the
 simulation state as an argument (for conditions it can be a read-only
-argument).
+argument).  These concepts can be found on most book on object
+oriented programming, for example~\cite{tcpppl}.
 
 Each concrete class is responsible for registering itself with name,
-constructor and parameters with a factory pattern.  This registry is
-also use by the parser.  A global table of extern logs is used for
-making the log information available in the numerical expressions
-within the ``extern'' condition.
+constructor and parameters with a factory pattern, as described
+in~\cite{patterns}.  This registry is also use by the parser.  A
+global table of extern logs is used for making the log information
+available in the numerical expressions within the ``extern''
+condition.
 
 In \cite{daisy-ems} more information about the implementation
-framework can be found.
+framework can be found.  The implementation itself can be freely
+downloaded from the Daisy home page, at~\url{http://www.dina.dk/~daisy/}.
 
 \section{History}
 
@@ -619,10 +617,10 @@ advanced state, has not yet proved itself, but looks promising.
 
 All of these are easily implementable using
 elementary\footnote{Elementary today, they were not all elementary in
-  1995.}  computer science tools, and we believe that the diverse
-applications of the system demonstrate the value of combining the the
-specific modelling expertise behind the original Daisy model, with the
-computer science expertise the 1995 rewrite added.
+1995.}  computer science tools, and we believe that the diverse
+applications of the system demonstrate the value of adding general
+computer science expertice to the traditional domain specific
+modelling expertise.
 
 \section{Acknowledgements}
 
