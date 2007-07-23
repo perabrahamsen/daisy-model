@@ -24,13 +24,12 @@
 #define BUILD_DLL
 
 #include "condition.h"
+#include "log.h"
 #include "syntax.h"
 #include "alist.h"
 #include "memutils.h"
 #include "librarian.h"
 #include <memory>
-
-using namespace std;
 
 struct ConditionFalse : public Condition
 {
@@ -70,22 +69,60 @@ std::auto_ptr<Condition>
 Condition::create_true ()
 { return std::auto_ptr<Condition> (new ConditionTrue (__FUNCTION__)); }
 
-struct ConditionOr : public Condition
+struct ConditionOperands : public Condition
 {
-  const vector<Condition*> conditions;
+  const auto_vector<Condition*> conditions;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   {
-    for (vector<Condition*>::const_iterator i = conditions.begin ();
+    for (std::vector<Condition*>::const_iterator i = conditions.begin ();
 	 i != conditions.end ();
 	 i++)
       {
 	(*i)->tick (daisy, scope, out);
       }
   }
+  void output (Log& log) const
+  { 
+    output_vector (conditions, "operands", log);
+  }
+
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
+  { 
+    for (std::vector<Condition*>::const_iterator i = conditions.begin ();
+	 i != conditions.end ();
+	 i++)
+      (*i)->initialize (daisy, scope, msg);
+  }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  {
+    bool ok = true;
+    for (std::vector<Condition*>::const_iterator i = conditions.begin ();
+	 i != conditions.end ();
+	 i++)
+      {
+	if (!(*i)->check (daisy, scope, msg))
+	  ok = false;
+      }
+    return ok;
+  }
+
+
+  ConditionOperands (Block& al)
+    : Condition (al),
+      conditions (Librarian::build_vector<Condition> (al, "operands"))
+  { }
+
+  ~ConditionOperands ()
+  { }
+};
+
+struct ConditionOr : public ConditionOperands
+{
   bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   {
-    for (vector<Condition*>::const_iterator i = conditions.begin ();
+    for (std::vector<Condition*>::const_iterator i = conditions.begin ();
 	 i != conditions.end ();
 	 i++)
       {
@@ -94,34 +131,21 @@ struct ConditionOr : public Condition
       }
     return false;
   }
-  void output (Log&) const
-  { }
+
 
   ConditionOr (Block& al)
-    : Condition (al),
-      conditions (Librarian::build_vector<Condition> (al, "operands"))
+    : ConditionOperands (al)
   { }
 
   ~ConditionOr ()
-  { sequence_delete (conditions.begin (), conditions.end ()); }
+  { }
 };
 
-struct ConditionAnd : public Condition
+struct ConditionAnd : public ConditionOperands
 {
-  const vector<Condition*> conditions;
-
-  void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
-  {
-    for (vector<Condition*>::const_iterator i = conditions.begin ();
-	 i != conditions.end ();
-	 i++)
-      {
-	(*i)->tick (daisy, scope, out);
-      }
-  }
   bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   {
-    for (vector<Condition*>::const_iterator i = conditions.begin ();
+    for (std::vector<Condition*>::const_iterator i = conditions.begin ();
 	 i != conditions.end ();
 	 i++)
       {
@@ -130,21 +154,16 @@ struct ConditionAnd : public Condition
       }
     return true;
   }
-  void output (Log&) const
-  { }
 
   ConditionAnd (Block& al)
-    : Condition (al),
-      conditions (Librarian::build_vector<Condition> (al, "operands"))
+    : ConditionOperands (al)
   { }
 
-  ~ConditionAnd ()
-  { sequence_delete (conditions.begin (), conditions.end ()); }
 };
 
 struct ConditionNot : public Condition
 {
-  auto_ptr<Condition> condition;
+  std::auto_ptr<Condition> condition;
 
   bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   { return !condition->match (daisy, scope, msg); }
@@ -166,9 +185,9 @@ struct ConditionNot : public Condition
 
 struct ConditionIf : public Condition
 {
-  auto_ptr<Condition> if_c;
-  auto_ptr<Condition> then_c;
-  auto_ptr<Condition> else_c;
+  std::auto_ptr<Condition> if_c;
+  std::auto_ptr<Condition> then_c;
+  std::auto_ptr<Condition> else_c;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
