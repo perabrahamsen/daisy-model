@@ -40,6 +40,13 @@ struct ActionSetSurfaceDetentionCapacity : public Action
     daisy.field->set_surface_detention_capacity (height);
   }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   ActionSetSurfaceDetentionCapacity (Block& al)
     : Action (al),
       height (al.number ("height"))

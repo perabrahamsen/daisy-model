@@ -1,16 +1,24 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Alle actions skal have og propagere tick, check og initialize
+* Artikler:
 
-* Articler:
+** Daisy: An open... (published, PA + SH)
 
-** Daisy: An open...
+** flexible management... (done, PA + SH)
 
-** flexible management...
+** Flexible selection of model state... (idea, PA + ?SH)
 
-** Flexible selection of model state...
+** Flexible exchange of data through OpenMI (idea, PA + BGJ + SH?)
 
-** Flexible exchange of data through OpenMI 
+** Initializing OM (revise, PA, BGJ, SH)
+
+Divide?
+
+*** Evolution of the OM in Daisy (PA, SH)
+
+*** Initializing OM (PA, BGJ, SH)
+
+** A semi-analytical solution to OM evolution (PA, MMO, SH)
 
 * R2D2
 

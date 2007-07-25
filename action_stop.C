@@ -31,6 +31,13 @@ struct ActionStop : public Action
   void doIt (Daisy& daisy, const Scope&, Treelog&)
     { daisy.running = false; }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   ActionStop (Block& al)
     : Action (al)
     { }

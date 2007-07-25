@@ -55,6 +55,13 @@ struct ActionEmerge : public Action
     daisy.field->emerge (crop, out);
   }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   ActionEmerge (Block& al)
     : Action (al),
       crop (al.identifier ("crop"))
@@ -118,6 +125,13 @@ struct ActionHarvest : public Action
     tmp << crop << ", removing " << (new_DM - old_DM) * 0.01 << " Mg DM/ha";
     msg.message (tmp.str ());
   }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
 
   ActionHarvest (Block& al)
     : Action (al),

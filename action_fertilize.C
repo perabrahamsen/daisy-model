@@ -32,8 +32,6 @@
 #include "librarian.h"
 #include <sstream>
 
-using namespace std;
-
 struct ActionFertilize : public Action
 {
   // Parameters.
@@ -60,8 +58,12 @@ struct ActionFertilize : public Action
 
   // Simulation.
   void doIt (Daisy& daisy, const Scope&, Treelog&);
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
 
   // Create and Destroy.
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
   bool check (const Daisy& daisy, const Scope&, Treelog& err) const;
   ActionFertilize (Block& al);
   ~ActionFertilize ();
@@ -159,8 +161,8 @@ ActionFertilize::doIt (Daisy& daisy, const Scope&, Treelog& out)
 
   double water = 0.0;
 
-  const string syntax = am.name ("syntax");
-  ostringstream tmp;
+  const std::string syntax = am.name ("syntax");
+  std::ostringstream tmp;
   if (syntax == "mineral")
     tmp << "Fertilizing " << am.number ("weight") 
 	<< " kg "<< am.name ("type") << "-N/ha";
@@ -274,7 +276,7 @@ static struct ActionFertilizeSyntax
 
     if (equivalent_weight || precision || second_year_compensation)
       {
-	const string syntax = am.name ("syntax");
+	const std::string syntax = am.name ("syntax");
 	if (syntax != "mineral")
 	  {
 	    if (!am.check ("first_year_utilization"))
@@ -285,7 +287,7 @@ static struct ActionFertilizeSyntax
 	      }
 	    if (!am.check ("weight") || !am.check ("total_N_fraction"))
 	      {
-		ostringstream tmp;
+		std::ostringstream tmp;
 		tmp  << "You cannot use 'equivalent_weight' with "
 		     << syntax << " fertilizer";
 		err.entry (tmp.str ());

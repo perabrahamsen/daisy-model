@@ -41,6 +41,13 @@ struct ActionMix : public Action
       daisy.field->mix (0.0, depth, penetration, daisy.time, daisy.dt, msg);
     }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   ActionMix (Block& al)
     : Action (al),
       depth (al.number ("depth")),
@@ -84,6 +91,13 @@ struct ActionSwap : public Action
     msg.message ("Tillage operation " + name);
     daisy.field->swap (0.0, middle, depth, daisy.time, daisy.dt, msg);
   }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
 
   ActionSwap (Block& al)
     : Action (al),
@@ -142,6 +156,13 @@ struct ActionSetPorosity : public Action
     out.message ("Adjusting porosity");
     daisy.field->set_porosity (depth, porosity);
   }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
 
   ActionSetPorosity (Block& al)
     : Action (al),

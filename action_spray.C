@@ -42,6 +42,13 @@ struct ActionSpray : public Action
       daisy.field->spray (chemical, amount, daisy.dt, out); 
     }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   ActionSpray (Block& al)
     : Action (al),
       chemical (al.identifier ("chemical")),

@@ -38,8 +38,6 @@
 #include "librarian.h"
 #include <sstream>
 
-using namespace std;
-
 struct ActionCrop : public Action
 {
   // Submodules.
@@ -112,9 +110,9 @@ struct ActionCrop : public Action
     const double DS;
     const double DM;
     int year_of_last_harvest;
-    const vector<AttributeList*> *const fertilize;
+    const std::vector<AttributeList*> *const fertilize;
     int fertilize_index;
-    const vector<AttributeList*> *const fertilize_rest;
+    const std::vector<AttributeList*> *const fertilize_rest;
     int fertilize_rest_index;
     int fertilize_year;
 
@@ -156,7 +154,7 @@ struct ActionCrop : public Action
     // Content.
     const int month;
     const int day;
-    auto_ptr<Action> operation;
+    std::auto_ptr<Action> operation;
 
     // Simulation.
     void output (Log&) const;
@@ -167,7 +165,7 @@ struct ActionCrop : public Action
     Tillage (Block&);
     ~Tillage ();
   };
-  const vector<const Tillage*> tillage;
+  const std::vector<const Tillage*> tillage;
   int tillage_index;
 
   struct Spray		// Spray operations.
@@ -187,7 +185,7 @@ struct ActionCrop : public Action
     Spray (const AttributeList&);
     ~Spray ();
   };
-  const vector<const Spray*> spray;
+  const std::vector<const Spray*> spray;
   int spray_index;
 
   struct Irrigation		// Irrigation.
@@ -218,6 +216,8 @@ struct ActionCrop : public Action
   void output (Log&) const;
 
   // Create and Destroy.
+  void initialize (const Daisy&, const Scope&, Treelog&);
+  bool check (const Daisy&, const Scope&, Treelog& err) const;
   ActionCrop (Block& al);
   ~ActionCrop ();
 };
@@ -280,15 +280,6 @@ ActionCrop::MM_DD::MM_DD (const AttributeList& al)
 
 ActionCrop::MM_DD::~MM_DD ()
 { }
-
-void 
-ActionCrop::tick (const Daisy& daisy, const Scope& scope, Treelog& out)
-{ 
-  for (vector<const Tillage*>::const_iterator i = tillage.begin ();
-       i != tillage.end ();
-       i++)
-    (*i)->operation->tick (daisy, scope, out);
-}
 
 void 
 ActionCrop::Sow::doIt (Daisy& daisy, const Scope&, Treelog& out)
@@ -938,6 +929,38 @@ ActionCrop::output (Log& log) const
   output_variable (irrigation_delay, log);
 }
 
+void 
+ActionCrop::tick (const Daisy& daisy, const Scope& scope, Treelog& out)
+{ 
+  for (std::vector<const Tillage*>::const_iterator i = tillage.begin ();
+       i != tillage.end ();
+       i++)
+    (*i)->operation->tick (daisy, scope, out);
+}
+
+void 
+ActionCrop::initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+{ 
+  for (std::vector<const Tillage*>::const_iterator i = tillage.begin ();
+       i != tillage.end ();
+       i++)
+    (*i)->operation->initialize (daisy, scope, out);
+}
+
+bool
+ActionCrop::check (const Daisy& daisy, const Scope& scope, Treelog& out) const
+{ 
+  bool ok = true;
+
+  for (std::vector<const Tillage*>::const_iterator i = tillage.begin ();
+       i != tillage.end ();
+       i++)
+    if (!(*i)->operation->check (daisy, scope, out))
+      ok = false;
+  
+  return ok;
+}
+
 ActionCrop::ActionCrop (Block& al)
   : Action (al),
     primary (new Sow (al.alist ("primary"))),
@@ -1037,7 +1060,7 @@ Harvest conditions for perennial crops.",
 			  ActionCrop::Perennial::load_syntax);
     syntax.add_submodule_sequence("fertilize_at", Syntax::Const, "\
 Fertilizer application by date.", ActionCrop::Fertilize::load_syntax);
-    alist.add ("fertilize_at", vector<AttributeList*> ());
+    alist.add ("fertilize_at", std::vector<AttributeList*> ());
     syntax.add ("fertilize_at_index", Syntax::Integer, Syntax::State,
 		"Next entry in 'fertilize_at' to execute.");
     alist.add ("fertilize_at_index", 0);
@@ -1046,13 +1069,13 @@ Fertilizer application by date.", ActionCrop::Fertilize::load_syntax);
     alist.add ("fertilize_incorporate", false);
     syntax.add_submodule_sequence ("tillage", Syntax::State, "\
 List of tillage operations to apply.", ActionCrop::Tillage::load_syntax);
-    alist.add ("tillage", vector<AttributeList*> ());
+    alist.add ("tillage", std::vector<AttributeList*> ());
     syntax.add ("tillage_index", Syntax::Integer, Syntax::State,
 		"Next entry in 'tillage' to execute.");
     alist.add ("tillage_index", 0);
     syntax.add_submodule_sequence ("spray", Syntax::State, "\
 List of chemicals to apply.", ActionCrop::Spray::load_syntax);
-    alist.add ("spray", vector<AttributeList*> ());
+    alist.add ("spray", std::vector<AttributeList*> ());
     syntax.add ("spray_index", Syntax::Integer, Syntax::State,
 		"Next entry in 'spray' to execute.");
     alist.add ("spray_index", 0);

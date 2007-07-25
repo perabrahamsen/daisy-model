@@ -92,6 +92,13 @@ struct ActionWaitDays : public Action
       output_submodule (end_time, "end_time", log);
   }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   ActionWaitDays (Block& al)
     : Action (al),
       days (al.integer ("days")),
@@ -122,6 +129,13 @@ struct ActionWaitMMDD : public Action
       && daisy.time.mday () == day 
       && daisy.time.hour () == hour; 
   }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
 
   ActionWaitMMDD (Block& al)
     : Action (al),

@@ -48,6 +48,9 @@ struct ActionAssert : public Action
   void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
   { condition->initialize (daisy, scope, out); }
 
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& out) const
+  { return condition->check (daisy, scope, out); }
+
   ActionAssert (Block& al)
     : Action (al),
       condition (Librarian::build_item<Condition> (al, "condition")),
@@ -67,6 +70,13 @@ struct ActionMessage : public Action
     out.message (message);
   }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   ActionMessage (Block& al)
     : Action (al),
       message (al.name ("message"))
@@ -84,6 +94,13 @@ struct ActionWarning : public Action
   { 
     out.warning (message);
   }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
 
   ActionWarning (Block& al)
     : Action (al),
@@ -103,6 +120,13 @@ struct ActionError : public Action
     out.error (message);
   }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   ActionError (Block& al)
     : Action (al),
       message (al.name ("message"))
@@ -121,6 +145,13 @@ struct ActionPanic : public Action
     msg.touch ();
     throw message; 
   }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
 
   ActionPanic (Block& al)
     : Action (al),

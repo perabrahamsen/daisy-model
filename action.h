@@ -41,15 +41,15 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Daisy&, const Scope&, Treelog&);
+  virtual void tick (const Daisy&, const Scope&, Treelog&) = 0;
   virtual void doIt (Daisy&, const Scope&, Treelog&) = 0;
   virtual bool done (const Daisy&, const Scope&, Treelog&) const;
   virtual void output (Log&) const;
 
   // Create and Destroy.
 public: 
-  virtual void initialize (const Daisy&, const Scope&, Treelog&);
-  virtual bool check (const Daisy&, const Scope&, Treelog&) const;
+  virtual void initialize (const Daisy&, const Scope&, Treelog&) = 0;
+  virtual bool check (const Daisy&, const Scope&, Treelog&) const = 0;
   static const char *const component;
 private:
   Action (const Action&);

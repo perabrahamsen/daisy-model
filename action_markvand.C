@@ -354,6 +354,13 @@ struct ActionMarkvand : public Action
   { return false; }
   void output (Log&) const;
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   // Create and destroy.
   ActionMarkvand (Block& al);
   ~ActionMarkvand ();

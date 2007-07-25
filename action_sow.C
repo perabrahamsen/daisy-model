@@ -40,6 +40,13 @@ struct ActionSow : public Action
     daisy.field->sow (daisy.metalib, crop, daisy.time, daisy.dt, msg); 
   }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   ActionSow (Block& al)
     : Action (al),
       crop (al.alist ("crop"))

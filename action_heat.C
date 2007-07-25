@@ -41,6 +41,13 @@ struct ActionSetHeatSource : public Action
     daisy.field->set_heat_source (height, value);
   }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   ActionSetHeatSource (Block& al)
     : Action (al),
       height (al.number ("height")),

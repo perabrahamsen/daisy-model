@@ -61,6 +61,8 @@ struct ActionTable : public Action
                          int rag_c, std::set<Time>& dates);
 
   void doIt (Daisy& daisy, const Scope&, Treelog& msg);
+  void tick (const Daisy&, const Scope&, Treelog&);
+  void initialize (const Daisy&, const Scope&, Treelog&);
   bool check (const Daisy&, const Scope&, Treelog& err) const;
   ActionTable (Block& al);
 };
@@ -211,10 +213,38 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
     }
 }
 
+void 
+ActionTable::tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
+{ 
+  if (sow.get ())
+    sow->tick (daisy, scope, msg);
+  if (emerge.get ())
+    emerge->tick (daisy, scope, msg);
+  if (harvest.get ())
+    harvest->tick (daisy, scope, msg);
+}
+
+void 
+ActionTable::initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
+{ 
+  if (sow.get ())
+    sow->initialize (daisy, scope, msg);
+  if (emerge.get ())
+    emerge->initialize (daisy, scope, msg);
+  if (harvest.get ())
+    harvest->initialize (daisy, scope, msg);
+}
+
 bool 
-ActionTable::check (const Daisy&, const Scope&, Treelog&) const
+ActionTable::check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
 {
   bool ok = true;
+  if (sow.get () && ! sow->check (daisy, scope, msg))
+    ok = false;
+  if (emerge.get () && ! emerge->check (daisy, scope, msg))
+    ok = false;
+  if (harvest.get () && ! harvest->check (daisy, scope, msg))
+    ok = false;
   return ok;
 }
 

@@ -31,12 +31,17 @@
 // We need to initialize the Condition library.
 #include "condition.h"
 
-using namespace std;
-
 struct ActionNil : public Action
 {
   void doIt (Daisy&, const Scope&, Treelog&)
   { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
 
   ActionNil (Block& al)
     : Action (al)
@@ -50,6 +55,13 @@ struct ActionT : public Action
 
   bool done (const Daisy&, const Scope&, Treelog&) const
   { return false; }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
 
   ActionT (Block& al)
     : Action (al)

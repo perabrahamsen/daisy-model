@@ -38,6 +38,13 @@ struct ActionRidge : public Action
       daisy.field->ridge (ridge); 
     }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog& err) const
+  { return true; }
+
   ActionRidge (Block& al)
     : Action (al),
       ridge (al.alist ("ridge"))
