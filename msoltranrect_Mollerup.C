@@ -18,7 +18,7 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#if 0
+#if 1
 
 #define BUILD_DLL
 #include "msoltranrect.h"
@@ -73,7 +73,6 @@ struct MsoltranrectMollerup : public Msoltranrect
   static void advection (const GeometryRect& geo,
 			 const ublas::vector<double>& q_edge,
 			 ublas::banded_matrix<double>& advec);
-
   
   static void Neumann_expl (const size_t cell, const double area, 
                             const double in_sign, const double J, 
@@ -82,17 +81,32 @@ struct MsoltranrectMollerup : public Msoltranrect
   static void Neumann_impl (const size_t cell, const double area, 
                             const double in_sign, const double q, 
                             ublas::banded_matrix<double>& B_mat);
-  
+   
+  static void Dirichlet_long (const size_t cell,
+			      const double area, 
+			      const double area_per_length, 
+			      const double in_sign,
+			      const double D_long,
+			      const double C_border,
+			      const double C_cell,
+			      const double q,
+			      double& J,
+			      ublas::banded_matrix<double>& Dmlong_mat,
+			      ublas::vector<double>& Dmlong_vec, 
+			      ublas::banded_matrix<double>& advecm); 
+
   static void lowerboundary (const GeometryRect& geo,
 			     const bool isflux,
-			     const double conc,
+			     const double C_border,
+			     const std::vector<double>& C,
 			     const ublas::vector<double>& q_edge,
-                             std::vector<double>& J,
+                             const ublas::vector<double>& D_long,
+			     std::vector<double>& J,
                              ublas::banded_matrix<double>& B_mat,
                              ublas::vector<double>& B_vec,
-                             ublas::banded_matrix<double>& Dlongm_mat, 
-                             ublas::vector<double>& Dlongm_vec);
-
+                             ublas::banded_matrix<double>& Dmlong_mat, 
+                             ublas::vector<double>& Dmlong_vec,
+			     ublas::banded_matrix<double>& advecm);
 
   static void upperboundary (const GeometryRect& geo,
               		     std::vector<double>& J,
@@ -347,27 +361,27 @@ MsoltranrectMollerup::Dirichlet_long (const size_t cell,
                                       const double area_per_length, 
                                       const double in_sign,
                                       const double D_long,
-                                      const double C_bord,
+                                      const double C_border,
                                       const double C_cell,
                                       const double q,
                                       double& J,
-                                      ublas::banded_matrix<double>& Dlongm_mat,
+                                      ublas::banded_matrix<double>& Dmlong_mat,
                                       ublas::vector<double>& Dmlong_vec, 
-                                      ublas::vector<double>& advecm) 
+                                      ublas::banded_matrix<double>& advecm) 
 {
 
   // Boundary advection
   const double value = area  * q;
-  advec (cell) -= in_sign * value;
-
+  advecm (cell, cell) -= in_sign * value;
+  
   //Boundary longitudinal diffusion
   const double D_area_per_length = D_long * area_per_length;
-  Dlongm_mat (cell, cell) -= D_area_per_length;
+  Dmlong_mat (cell, cell) -= D_area_per_length;
   
-  const double Dlongm_vec_val = D_area_per_length * C_bord;
-  Dlongm_vec (cell) += Dlongm_vec_val;
+  const double Dmlong_vec_val = D_area_per_length * C_border;
+  Dmlong_vec (cell) += Dmlong_vec_val;
     
-  J = in_sign * (D_area_per_length * C_cell + Dlongm_vec_val ) / area;  
+  J = in_sign * (D_area_per_length * C_cell + Dmlong_vec_val ) / area;  
 }
 
 
@@ -375,13 +389,16 @@ MsoltranrectMollerup::Dirichlet_long (const size_t cell,
 void 
 MsoltranrectMollerup::lowerboundary (const GeometryRect& geo,
                                      const bool isflux,
-                                     const double conc,
-                                     const  ublas::vector<double>& q_edge,
-                                     std::vector<double>& J,
+                                     const double C_border,
+				     const std::vector<double>& C,
+                                     const ublas::vector<double>& q_edge,
+				     const ublas::vector<double>& D_long,
+				     std::vector<double>& J,
                                      ublas::banded_matrix<double>& B_mat,
                                      ublas::vector<double>& B_vec,
-                                     ublas::banded_matrix<double>& Dlongm_mat, 
-                                     ublas::vector<double>& Dlongm_vec)
+                                     ublas::banded_matrix<double>& Dmlong_mat, 
+                                     ublas::vector<double>& Dmlong_vec,
+				     ublas::banded_matrix<double>& advecm)
 
 {
   const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
@@ -395,13 +412,14 @@ MsoltranrectMollerup::lowerboundary (const GeometryRect& geo,
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       daisy_assert (in_sign > 0);
       const double area = geo.edge_area (edge);
+      const double area_per_length = geo.edge_area_per_length (edge);
     
       if (isflux)               // Flux BC
         {
           const bool influx = in_sign * q_edge (edge) > 0;
           if (influx)
             {
-              J[edge] = conc * q_edge (edge); 
+              J[edge] = C_border * q_edge (edge); 
               Neumann_expl (cell, area, in_sign, J[edge], B_vec);
             }
           else
@@ -409,9 +427,21 @@ MsoltranrectMollerup::lowerboundary (const GeometryRect& geo,
               Neumann_impl (cell, area, in_sign, q_edge (edge), B_mat);
             }
         }
-      else                      // Conc. BC
+      else                      // C_Border. BC
         {
           // write something
+	  Dirichlet_long (cell,
+			  area, 
+			  area_per_length, 
+			  in_sign,
+			  D_long (cell),
+			  C_border,
+			  C[cell], 
+			  q_edge (edge),
+			  J[edge],
+			  Dmlong_mat,
+			  Dmlong_vec, 
+			  advecm);  
         }
     }
 
@@ -475,7 +505,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
 				 const SoilWater& soil_water, 
 				 const std::string& name,
 				 std::vector<double>& M, 
-				 std::vector<double>& C, 
+                                 std::vector<double>& C, 
 				 const std::vector<double>& S, 
 				 std::vector<double>& J, 
 				 Adsorption& adsorption,
@@ -524,29 +554,31 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     S_vol (cell) = S[cell] * geo.cell_volume (cell);
     
   
-  // Boundary matrices and vectors
-  
-
+  // Boundary matrices and vectors  
   ublas::banded_matrix<double> B_mat (cell_size, cell_size, 0, 0); 
   for (int c = 0; c < cell_size; c++)
     B_mat (c, c) = 0.0;
   ublas::vector<double> B_vec = ublas::zero_vector<double> (cell_size); 
-  ublas::banded_matrix<double>  Dlongm_mat (cell_size, cell_size,      
+  ublas::banded_matrix<double>  Dmlong_mat (cell_size, cell_size,      
                                             0, 0); // Dir bc
-  Dlongm_mat = ublas::zero_matrix<double> (cell_size, cell_size);  
-  ublas::vector<double>  Dlongm_vec (cell_size); // Dir bc
-  Dlongm_vec = ublas::zero_vector<double> (cell_size);
-  
-    
+  Dmlong_mat = ublas::zero_matrix<double> (cell_size, cell_size);  
+  ublas::vector<double>  Dmlong_vec (cell_size); // Dir bc
+  Dmlong_vec = ublas::zero_vector<double> (cell_size);
+  ublas::banded_matrix<double> advecm (cell_size, cell_size, 0, 0);   
+  for (int c = 0; c < cell_size; c++)
+    advecm (c, c) = 0.0;
+      
+
+
   upperboundary (geo, J, B_vec, msg);
 
 
   // Why not dt and msg????
   const bool isflux = true;
-  const double conc = 0.0;
+  const double C_border = 0.0;
 
-  lowerboundary (geo, isflux, conc, q_edge, J, B_mat, B_vec, 
-                 Dlongm_mat, Dlongm_vec);
+  lowerboundary (geo, isflux, C_border, C, q_edge, D_long, J, B_mat, B_vec, 
+                 Dmlong_mat, Dmlong_vec, advecm);
   
 
   // Remember old content for checking mass balance later.
