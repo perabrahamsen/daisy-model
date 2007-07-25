@@ -42,6 +42,15 @@ struct ConditionSoilTemperature : public Condition
   void output (Log&) const
   { }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionSoilTemperature (Block& al)
     : Condition (al),
       temperature (al.number ("temperature")),
@@ -58,6 +67,15 @@ struct ConditionSoilPotential : public Condition
   { return (daisy.field->soil_water_potential (height) > potential); }
   void output (Log&) const
   { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
 
   ConditionSoilPotential (Block& al)
     : Condition (al),
@@ -77,6 +95,15 @@ struct ConditionSoilWater : public Condition
   void output (Log&) const
   { }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionSoilWater (Block& al)
     : Condition (al),
       water (al.number ("water")),
@@ -95,6 +122,15 @@ struct ConditionSoilN_min : public Condition
   { return (daisy.field->soil_inorganic_nitrogen (from, to)  > amount); }
   void output (Log&) const
   { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
 
   ConditionSoilN_min (Block& al)
     : Condition (al),

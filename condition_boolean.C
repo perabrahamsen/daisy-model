@@ -28,6 +28,7 @@
 #include "boolean.h"
 #include "scope.h"
 #include "librarian.h"
+#include "assertion.h"
 #include <memory>
 
 struct ConditionBoolean : public Condition
@@ -44,11 +45,6 @@ struct ConditionBoolean : public Condition
   { 
     Treelog::Open nest (msg, name);
 
-    if (state == uninitialized
-        && (!expr->initialize (msg)
-            || !expr->check (scope, msg)))
-      state = error;
-
     if (state != error)
       {
         expr->tick (scope, msg);
@@ -63,6 +59,30 @@ struct ConditionBoolean : public Condition
 
   void output (Log&) const
   { }
+
+  void initialize (const Daisy&, const Scope&, Treelog& msg)
+  {
+    daisy_assert (state == uninitialized);
+    
+    if (!expr->initialize (msg))
+      state = error;
+    else
+      state = missing;
+  }
+
+  bool check (const Daisy&, const Scope& scope, Treelog& msg) const
+  { 
+    if (state == error)
+      return false;
+  
+    daisy_assert (state == missing);
+
+    if (expr->check (scope, msg))
+      return true;
+
+    state = error;
+    return false;
+  }
 
   ConditionBoolean (Block& al)
     : Condition (al),

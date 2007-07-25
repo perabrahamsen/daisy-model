@@ -38,6 +38,15 @@ struct ConditionFalse : public Condition
   void output (Log&) const
   { }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionFalse (Block& al)
     : Condition (al)
   { }
@@ -52,6 +61,15 @@ struct ConditionTrue : public Condition
   { return true; }
   void output (Log&) const
   { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
 
   ConditionTrue (Block& al)
     : Condition (al)
@@ -84,7 +102,7 @@ struct ConditionOperands : public Condition
   }
   void output (Log& log) const
   { 
-    output_vector (conditions, "operands", log);
+    output_list (conditions, "operands", log, Condition::component);
   }
 
   void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
@@ -174,6 +192,12 @@ struct ConditionNot : public Condition
   void output (Log&) const
   { }
 
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
+  { condition->initialize (daisy, scope, msg); }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  { return condition->check (daisy, scope, msg); }
+
   ConditionNot (Block& al)
     : Condition (al),
       condition (Librarian::build_item<Condition> (al, "operand"))
@@ -204,6 +228,27 @@ struct ConditionIf : public Condition
   }
   void output (Log&) const
   { }
+
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
+  {
+    if_c->initialize (daisy, scope, msg);
+    then_c->initialize (daisy, scope, msg);
+    else_c->initialize (daisy, scope, msg);
+  }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  { 
+    bool ok = true;
+
+    if (!if_c->check (daisy, scope, msg))
+      ok = false;
+    if (!then_c->check (daisy, scope, msg))
+      ok = false;
+    if (!else_c->check (daisy, scope, msg))
+      ok = false;
+
+    return ok;
+  }
 
   ConditionIf (Block& al)
     : Condition (al),

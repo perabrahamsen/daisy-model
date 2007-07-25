@@ -30,8 +30,6 @@
 #include "librarian.h"
 #include <sstream>
 
-using namespace std;
-
 struct ConditionMMDD : public Condition
 {
   const int month;
@@ -44,8 +42,19 @@ public:
       && daisy.time.mday () == day 
       && daisy.time.hour () == hour; 
   }
+
   void output (Log&) const
   { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionMMDD (Block& al)
     : Condition (al),
       month (al.integer ("month")),
@@ -73,6 +82,16 @@ public:
   }
   void output (Log&) const
   { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionBeforeMMDD (Block& al)
     : Condition (al),
       month (al.integer ("month")),
@@ -98,6 +117,16 @@ public:
 	  && daisy.time.mday () == day
 	  && daisy.time.hour () > hour);
   }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   void output (Log&) const
   { }
   ConditionAfterMMDD (Block& al)
@@ -118,6 +147,16 @@ public:
   { return time == daisy.time; }
   void output (Log&) const
   { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionAt (Block& al)
     : Condition (al),
       time (al.alist ("time"))
@@ -134,6 +173,16 @@ public:
   { return time > daisy.time; }
   void output (Log&) const
   { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionBefore (Block& al)
     : Condition (al),
       time (al.alist ("time"))
@@ -150,6 +199,16 @@ public:
   { return time < daisy.time; }  
   void output (Log&) const
   { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionAfter (Block& al)
     : Condition (al),
       time (al.alist ("time"))
@@ -163,7 +222,7 @@ public:
 struct ConditionHourly : public Condition
 {
   const int step;
-  const string timestep ()
+  const std::string timestep ()
   { 
     if (step == 1)
       return "h";
@@ -174,6 +233,15 @@ struct ConditionHourly : public Condition
 	     + (daisy.time.hour () + 1)) % step) == 0; }
   void output (Log&) const
   { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionHourly (Block& al)
     : Condition (al),
       step (al.integer ("step"))
@@ -185,7 +253,7 @@ struct ConditionHourly : public Condition
 struct ConditionDaily : public Condition
 {
   const int step;
-  const string timestep ()
+  const std::string timestep ()
   { 
     if (step == 1)
       return "d";
@@ -195,6 +263,15 @@ struct ConditionDaily : public Condition
   { return daisy.time.hour () == 23 && (daisy.time.yday () % step) == 0; }
   void output (Log&) const
   { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionDaily (Block& al)
     : Condition (al),
       step (al.integer ("step"))
@@ -206,7 +283,7 @@ struct ConditionDaily : public Condition
 struct ConditionWeekly : public Condition
 {
   const int step;
-  const string timestep ()
+  const std::string timestep ()
   { 
     if (step == 1)
       return "w";
@@ -218,6 +295,15 @@ struct ConditionWeekly : public Condition
       && (daisy.time.week () % step) == 0; }
   void output (Log&) const
   { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionWeekly (Block& al)
     : Condition (al),
       step (al.integer ("step"))
@@ -229,7 +315,7 @@ struct ConditionWeekly : public Condition
 struct ConditionMonthly : public Condition
 {
   const int step;
-  const string timestep ()
+  const std::string timestep ()
   { 
     if (step == 1)
       return "m";
@@ -246,6 +332,15 @@ struct ConditionMonthly : public Condition
   }
   void output (Log&) const
   { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionMonthly (Block& al)
     : Condition (al),
       step (al.integer ("step"))
@@ -257,7 +352,7 @@ struct ConditionMonthly : public Condition
 struct ConditionYearly : public Condition
 {
   const int step;
-  const string timestep ()
+  const std::string timestep ()
   { 
     if (step == 1)
       return "y";
@@ -275,6 +370,15 @@ struct ConditionYearly : public Condition
 
   void output (Log&) const
   { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionYearly (Block& al)
     : Condition (al),
       step (al.integer ("step"))
@@ -286,33 +390,53 @@ struct ConditionYearly : public Condition
 struct ConditionHour : public Condition
 {
   const int at;
-  const string timestep ()
+  const std::string timestep ()
   { return "d"; } 
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-    { return daisy.time.hour () == at; }
+  { return daisy.time.hour () == at; }
   void output (Log&) const
-    { }
+  { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionHour (Block& al)
     : Condition (al),
       at (al.integer ("at"))
-    { }
+  { }
   static Model& make (Block& al)
-    { return *new ConditionHour (al); }
+  { return *new ConditionHour (al); }
 };
 
 struct ConditionMDay : public Condition
 {
   const int at;
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-    { return daisy.time.mday () == at; }
+  { return daisy.time.mday () == at; }
   void output (Log&) const
-    { }
+  { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+
   ConditionMDay (Block& al)
     : Condition (al),
       at (al.integer ("at"))
-    { }
+  { }
   static Model& make (Block& al)
-    { return *new ConditionMDay (al); }
+  { return *new ConditionMDay (al); }
 };
 
 struct ConditionYDay : public Condition
@@ -320,15 +444,24 @@ struct ConditionYDay : public Condition
   const int at;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-    { return daisy.time.yday () == at; }
+  { return daisy.time.yday () == at; }
   void output (Log&) const
-    { }
+  { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionYDay (Block& al)
     : Condition (al),
       at (al.integer ("at"))
-    { }
+  { }
   static Model& make (Block& al)
-    { return *new ConditionYDay (al); }
+  { return *new ConditionYDay (al); }
 };
 
 struct ConditionMonth : public Condition
@@ -336,15 +469,25 @@ struct ConditionMonth : public Condition
   const int at;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-    { return daisy.time.month () == at; }
+  { return daisy.time.month () == at; }
   void output (Log&) const
-    { }
+  { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionMonth (Block& al)
     : Condition (al),
       at (al.integer ("at"))
-    { }
+  { }
   static Model& make (Block& al)
-    { return *new ConditionMonth (al); }
+  { return *new ConditionMonth (al); }
 };
 
 struct ConditionYear : public Condition
@@ -352,23 +495,32 @@ struct ConditionYear : public Condition
   const int at;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-    { return daisy.time.year () == at; }
+  { return daisy.time.year () == at; }
   void output (Log&) const
-    { }
+  { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionYear (Block& al)
     : Condition (al),
       at (al.integer ("at"))
-    { }
+  { }
   static Model& make (Block& al)
-    { return *new ConditionYear (al); }
+  { return *new ConditionYear (al); }
 };
 
 struct ConditionTimestep : public Condition
 {
-  auto_ptr<Condition> condition;
+  std::auto_ptr<Condition> condition;
   const std::string dt;
 
-  const string timestep ()
+  const std::string timestep ()
   { return dt; } 
 
   bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
@@ -379,6 +531,12 @@ struct ConditionTimestep : public Condition
 
   void output (Log&) const
   { }
+
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
+  { condition->initialize (daisy, scope, msg); }
+
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
+  { return condition->check (daisy, scope, msg); }
 
   ConditionTimestep (Block& al)
     : Condition (al),
@@ -442,11 +600,11 @@ True after specific month, day and hour in the year.");
     syntax.order ("month", "day");
     syntax.add_check (check_mday);
     Librarian::add_type (Condition::component, "mm_dd", at_alist, syntax,
-				    &ConditionMMDD::make);
+                         &ConditionMMDD::make);
     Librarian::add_type (Condition::component, "before_mm_dd", before_alist, syntax,
-				    &ConditionBeforeMMDD::make);
+                         &ConditionBeforeMMDD::make);
     Librarian::add_type (Condition::component, "after_mm_dd", after_alist, syntax,
-				    &ConditionAfterMMDD::make);
+                         &ConditionAfterMMDD::make);
   }
   // At, before, or after a given time.
   {
@@ -465,11 +623,11 @@ True, iff the simulation time is before the specified time.");
 True, iff the simulation time is after the specified time.");
     syntax.order ("time");
     Librarian::add_type (Condition::component, "at", alist_at, syntax,
-				    &ConditionAt::make);
+                         &ConditionAt::make);
     Librarian::add_type (Condition::component, "before", alist_before, syntax, 
-				    &ConditionBefore::make);
+                         &ConditionBefore::make);
     Librarian::add_type (Condition::component, "after", alist_after, syntax,
-				    &ConditionAfter::make);
+                         &ConditionAfter::make);
   }
   // Every nth something.
   {
@@ -502,15 +660,15 @@ plus one modulo 'step' is 0.");
     alist_month.add ("step", 1);
     alist_year.add ("step", 1);
     Librarian::add_type (Condition::component, "hourly", alist_hour, syntax,
-				    &ConditionHourly::make);
+                         &ConditionHourly::make);
     Librarian::add_type (Condition::component, "daily", alist_day, syntax,
-				    &ConditionDaily::make);
+                         &ConditionDaily::make);
     Librarian::add_type (Condition::component, "weekly", alist_week, syntax,
-				    &ConditionWeekly::make);
+                         &ConditionWeekly::make);
     Librarian::add_type (Condition::component, "monthly", alist_month, syntax,
-				    &ConditionMonthly::make);
+                         &ConditionMonthly::make);
     Librarian::add_type (Condition::component, "yearly", alist_year, syntax,
-				    &ConditionYearly::make);
+                         &ConditionYearly::make);
   }
   // Specific hour.
   {
@@ -522,7 +680,7 @@ plus one modulo 'step' is 0.");
     syntax.add_check ("at", VCheck::valid_hour ());
     syntax.order ("at");
     Librarian::add_type (Condition::component, "hour", alist, syntax,
-                                    &ConditionHour::make);
+                         &ConditionHour::make);
   }
   // Every specific day in the month.
   {
@@ -534,7 +692,7 @@ plus one modulo 'step' is 0.");
     syntax.add_check ("at", VCheck::valid_mday ());
     syntax.order ("at");
     Librarian::add_type (Condition::component, "mday", alist, syntax,
-				    &ConditionMDay::make);
+                         &ConditionMDay::make);
   }
   // Every specific day in the year.
   {
@@ -547,7 +705,7 @@ plus one modulo 'step' is 0.");
     syntax.add_check ("at", valid_jday);
     syntax.order ("at");
     Librarian::add_type (Condition::component, "yday", alist, syntax,
-				    &ConditionYDay::make);
+                         &ConditionYDay::make);
   }
   // Every specific month.
   {
@@ -559,7 +717,7 @@ plus one modulo 'step' is 0.");
     syntax.add_check ("at", VCheck::valid_month ());
     syntax.order ("at");
     Librarian::add_type (Condition::component, "month", alist, syntax, 
-                                    &ConditionMonth::make);
+                         &ConditionMonth::make);
   }
   // A specific year.
   {
@@ -571,7 +729,7 @@ plus one modulo 'step' is 0.");
     syntax.add_check ("at", VCheck::valid_year ());
     syntax.order ("at");
     Librarian::add_type (Condition::component, "year", alist, syntax,
-				    &ConditionYear::make);
+                         &ConditionYear::make);
   }
   // Add timestep to condition.
   {
@@ -587,6 +745,6 @@ in log files.");
 Timestep to use.");
     syntax.order ("operand", "timestep");
     Librarian::add_type (Condition::component, "timestep", alist, syntax,
-				    &ConditionTimestep::make);
+                         &ConditionTimestep::make);
   }
 }

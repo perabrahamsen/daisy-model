@@ -1,6 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Alle conditions skal have og propagere check og initialize
+* Alle actions skal have og propagere tick, check og initialize
+
+* Articler:
+
+** Daisy: An open...
+
+** flexible management...
+
+** Flexible selection of model state...
+
+** Flexible exchange of data through OpenMI 
 
 * R2D2
 

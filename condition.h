@@ -25,6 +25,7 @@
 
 #include "model.h"
 #include "symbol.h"
+#include "alist.h"
 
 class Daisy;
 class Log;
@@ -37,19 +38,20 @@ class Condition : public Model
   // Content.
 public:
   const symbol name;
+  const AttributeList alist;
   static const char *const component;
   virtual const std::string timestep ();
 
   // Simulation.
 public:
-  virtual void tick (const Daisy&, const Scope&, Treelog&);
+  virtual void tick (const Daisy&, const Scope&, Treelog&) = 0;
   virtual bool match (const Daisy&, const Scope&, Treelog&) const = 0;
   virtual void output (Log&) const = 0;
 
   // Create & Destroy.
 public:
-  virtual void initialize (const Daisy&, const Scope&, Treelog&);
-  virtual bool check (const Daisy&, const Scope&, Treelog&) const;
+  virtual void initialize (const Daisy&, const Scope&, Treelog&) = 0;
+  virtual bool check (const Daisy&, const Scope&, Treelog&) const = 0;
   static std::auto_ptr<Condition> create_true ();
 protected:
   Condition (Block& al);

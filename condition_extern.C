@@ -28,9 +28,10 @@
 #include "alist.h"
 #include "boolean.h"
 #include "output.h"
-#include "scope.h"
+#include "scope_multi.h"
 #include "scopesel.h"
 #include "librarian.h"
+#include "assertion.h"
 #include <memory>
 
 struct ConditionExtern : public Condition
@@ -39,47 +40,55 @@ struct ConditionExtern : public Condition
   mutable const Scope* extern_scope;
   std::auto_ptr<Boolean> expr;
   
-  // State.
-  mutable enum { isfalse, istrue, missing, uninitialized, error } state;
+  void tick (const Daisy&, const Scope& parent_scope, Treelog& msg)
+  {
+    daisy_assert (extern_scope);
+    ScopeMulti multi (*extern_scope, parent_scope);
+    expr->tick (multi, msg);  
+  }
 
-  void tick (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  bool match (const Daisy& daisy, const Scope&, Treelog& msg) const
+  bool match (const Daisy&, const Scope& parent_scope, Treelog& msg) const
   { 
-    Treelog::Open nest (msg, name);
+    daisy_assert (extern_scope);
 
-    if (state == uninitialized)
-      {
-        extern_scope = scopesel->lookup (*daisy.output_log, msg);
-        if (!expr->initialize (msg)
-            || !extern_scope
-            || !expr->check (*extern_scope, msg))
-          {
-            state = error;
-            msg.error ("Initialize failed, condition will always be false");
-          }
-      }
-    if (state != error)
-      {
-        expr->tick (*extern_scope, msg);
-        if (expr->missing (*extern_scope))
-          state = missing;
-        else
-          state = expr->value (*extern_scope) ? istrue : isfalse;
-      }
-    return state == istrue ? true : false; 
+    Treelog::Open nest (msg, name);
+    ScopeMulti multi (*extern_scope, parent_scope);
+
+    if (expr->missing (multi))
+      return false;
+
+    return expr->value (multi);
   }
 
   void output (Log&) const
   { }
 
+  void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
+  { 
+    daisy_assert (!extern_scope);
+    extern_scope = scopesel->lookup (*daisy.output_log, msg); 
+    if (extern_scope)
+      expr->initialize (msg);
+  }
+
+  bool check (const Daisy& daisy, const Scope& parent_scope, 
+              Treelog& msg) const
+  { 
+    if (!extern_scope)
+      {
+        msg.error ("Extern scope not found");
+        return false;
+      }
+
+    ScopeMulti multi (*extern_scope, parent_scope);
+    return expr->check (multi, msg);
+  }
+
   ConditionExtern (Block& al)
     : Condition (al),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
-      expr (Librarian::build_item<Boolean> (al, "expr")),
-      state (uninitialized)
+      expr (Librarian::build_item<Boolean> (al, "expr"))
   { }
 };
 

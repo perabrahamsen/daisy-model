@@ -43,6 +43,13 @@ public:
   }
   void output (Log&) const
   { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionPeriodic (Block& al)
     : Condition (al),
       period (al.integer ("period")),

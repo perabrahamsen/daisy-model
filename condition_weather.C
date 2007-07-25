@@ -62,6 +62,11 @@ struct ConditionTSum : public Condition
   void output (Log& log) const
   { output_variable (TSum_now, log); }
 
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionTSum (Block& al)
     : Condition (al),
       check_hour (al.integer ("check_hour")),

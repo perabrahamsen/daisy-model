@@ -35,6 +35,15 @@ struct ConditionRunning : public Condition
   { return daisy.running; }
   void output (Log&) const
   { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionRunning (Block& al)
     : Condition (al)
   { }
@@ -46,6 +55,15 @@ struct ConditionFinished : public Condition
   { return !daisy.running; }
   void output (Log&) const
   { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionFinished (Block& al)
     : Condition (al)
   { }

@@ -47,6 +47,15 @@ struct ConditionDSAfter : public Condition
   void output (Log&) const
   { }
 
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
   ConditionDSAfter (Block& al)
     : Condition (al),
       crop (al.identifier ("crop")),
@@ -65,6 +74,15 @@ struct ConditionDMOver : public Condition
 
   void output (Log&) const
   { }
+
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
 
   ConditionDMOver (Block& al)
     : Condition (al),
