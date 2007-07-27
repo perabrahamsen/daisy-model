@@ -27,12 +27,19 @@
 #include "time.h"
 #include "plf.h"
 #include "lexer_data.h"
+#include "output.h"
+#include "scopesel.h"
+#include "scope.h"
+#include "number.h"
 #include "treelog.h"
+#include "units.h"
 #include "check.h"
 #include "vcheck.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "mathlib.h"
 #include <string>
+#include <sstream>
 
 // depth component.
 
@@ -55,10 +62,11 @@ struct DepthConst : public Depth
 {
   const double value;
   
-  double operator()(const Time&) const
+  void tick (const Time&, Treelog&)
+  { }
+  double operator()() const
   { return value; }
-
-  void initialize (Treelog&)
+  void initialize (const Output&, Treelog&)
   { }
   virtual bool check (Treelog&) const
   { return true; }
@@ -94,17 +102,122 @@ static struct DepthConstSyntax
   }
 } DepthConst_syntax;
 
+// extern model.
+
+struct DepthExtern : public Depth
+{
+  // Content.
+  const std::auto_ptr<Scopesel> scopesel;
+  const std::auto_ptr<Number> expr;
+  Scope* scope;
+  double value;
+
+  void tick (const Time&, Treelog& msg)
+  { 
+    expr->tick (*scope, msg);
+    
+    if (expr->missing (*scope))
+      {
+        if (!approximate (value, 42.0))
+          {
+            msg.error ("External depth not found");
+            value = 42.0;
+          }
+      }
+    else 
+      {
+        value = expr->value (*scope);
+        const symbol dim = expr->dimension (*scope);
+
+        if (!Units::can_convert (dim.name (), "cm", value))
+          {
+            std::ostringstream tmp;
+            tmp << "Cannot convert " << value << " [" << dim << "] to [cm]";
+            msg.warning (tmp.str ());
+            value = 1.0;
+          }
+        else
+          value = Units::convert (dim.name (), "cm", value);
+      }
+    
+  }
+
+  double operator()() const
+  { return value; }
+    
+  void initialize (const Output& output, Treelog& msg)
+  {
+    scope = scopesel->lookup (output, msg);
+    expr->initialize (msg);
+  }
+
+  virtual bool check (Treelog& msg) const
+  { 
+    bool ok = true;
+    if (!scope)
+      {
+        msg.error ("No matching scope found");
+        ok = false;
+      }
+    else if (!expr->check (*scope, msg))
+      ok = false;
+    else if (!Units::can_convert (expr->dimension (*scope).name (), "cm"))
+      {
+        msg.error ("Cannot convert [" + expr->dimension (*scope).name ()
+                   + "] to [cm]");
+        ok = false;
+      }
+    return ok;
+  }
+  DepthExtern (Block& al)
+    : Depth (al),
+      scopesel (Librarian::build_item<Scopesel> (al, "scope")),
+      expr (Librarian::build_item<Number> (al, "value")),
+      value (al.number ("initial_value", -42.42e42))
+  { }
+  ~DepthExtern ()
+  { }
+};
+
+static struct DepthExternSyntax
+{
+  static Model& make (Block& al)
+  { return *new DepthExtern (al); }
+  DepthExternSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "\
+Look up depth in an scope.");
+    syntax.add_object ("scope", Scopesel::component, 
+                       Syntax::Const, Syntax::Singleton, "\
+Scope to look up depth in.");
+    syntax.add_object ("value", Number::component, 
+                       Syntax::Const, Syntax::Singleton, "\
+Expression that evaluates to a depth.");
+    syntax.add ("initial_value", "cm", Check::none (), Syntax::OptionalConst,
+		"Initial depth.");
+
+    Librarian::add_type (Depth::component, "extern", alist, syntax, &make);
+  }
+} DepthExtern_syntax;
+
 // PLF model.
 
 struct DepthPLF : public Depth
 {
   const Time start;
   PLF value;
+  double current_value;
+
+  void  tick (const Time& time, Treelog&)
+  { current_value = value (Time::hours_between (start, time)); }
+
+  double operator()() const
+  { return current_value; }
+
   
-  double operator()(const Time& time) const
-  { return value (Time::hours_between (start, time)); }
-  
-  void initialize (Treelog&)
+  void initialize (const Output&, Treelog&)
   { }
   virtual bool check (Treelog&) const
   { return true; }
@@ -124,7 +237,8 @@ struct DepthPLF : public Depth
   DepthPLF (Block& al)
     : Depth (al),
       start (al.alist_sequence ("table")[0]->alist ("time")),
-      value (convert_to_plf (al.alist_sequence ("table")))
+      value (convert_to_plf (al.alist_sequence ("table"))),
+      current_value (-42.42e42)
   { }
   ~DepthPLF ()
   { }
@@ -195,12 +309,15 @@ struct DepthFile : public Depth
   State::type state;
   Time start;
   PLF value;
-  
-  double operator()(const Time& time) const
+  double current_value;
+
+  void tick (const Time& time, Treelog&)
   { 
     daisy_assert (state == State::ok);
-    return value (Time::hours_between (start, time)); 
+    current_value = value (Time::hours_between (start, time)); 
   }
+  double operator()() const
+  { return current_value; }
   bool read_date (LexerData& lex, Time& time)
   {
       int year;
@@ -229,7 +346,7 @@ struct DepthFile : public Depth
       time = Time (year, month, day, 23);
       return true;
   }
-  void initialize (Treelog& msg)
+  void initialize (const Output&, Treelog& msg)
   { 
     daisy_assert (state == State::uninitialized);
     LexerData lex (file, msg);
@@ -287,7 +404,8 @@ struct DepthFile : public Depth
     : Depth (al),
       file (al.name ("file")),
       state (State::uninitialized),
-      start (1, 1, 1, 1)
+      start (1, 1, 1, 1),
+      current_value (-42.42e42)
   { }
   ~DepthFile ()
   { }

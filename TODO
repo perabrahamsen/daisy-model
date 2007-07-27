@@ -46,15 +46,7 @@ Divide?
 
 * Farquhar
 
-** CO2_atm skal læses fra weather
-
-** regn bladresp-Farquhar ud om natten
-
-** Farquahar -> C4 & C5
-
 ** omregn vind fra reference til aktuel overflade
-
-** Refact fælles kode.
 
 * OpenMI
 

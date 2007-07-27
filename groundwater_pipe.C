@@ -91,10 +91,10 @@ public:
   void output (Log& log) const;
 
 private:
-  void set_h_aquifer (const Geometry& geo, const Time& time)
+  void set_h_aquifer (const Geometry& geo)
   {
     const double aquitart_bottom = geo.bottom () - Z_aquitard_;
-    h_aquifer = pressure_table->operator()(time) - aquitart_bottom;
+    h_aquifer = pressure_table->operator()() - aquitart_bottom;
   }
   double DeepPercolation (const Geometry&);
   double K_to_pipes (const unsigned int i, 
@@ -109,7 +109,7 @@ private:
 
   // Create and Destroy.
 public:
-  void initialize (const Output&, 
+  void initialize (const Output& output, 
                    const Geometry& geo, const Time& time, Treelog& msg)
   {
     const int size = geo.cell_size ();
@@ -136,17 +136,19 @@ public:
                                                    + h_aquifer));
         pressure_table = depth;
       }
-    pressure_table->initialize (msg);
+    pressure_table->initialize (output, msg);
     // Pressure below aquitard.
     if (pressure_table->check (msg))
-      set_h_aquifer (geo, time);
+      set_h_aquifer (geo);
+    else
+      pressure_table.reset (NULL);
   }
   bool check (Treelog& msg) const
   {
     if (pressure_table.get ())
       return pressure_table->check (msg); 
-    msg.warning ("No pressure table");
-    return true;
+    msg.error ("No pressure table");
+    return false;
   }
   GroundwaterPipe (Block& al)
     : Groundwater (al),
@@ -176,7 +178,7 @@ GroundwaterPipe::tick (const Geometry& geo,
                        const Soil& soil, SoilWater& soil_water, 
 		       const double h_surface,
 		       const SoilHeat& soil_heat, const Time& time,
-                       Treelog&)
+                       Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
 
@@ -184,7 +186,8 @@ GroundwaterPipe::tick (const Geometry& geo,
   fill (S.begin (), S.end (), 0.0);
   
   // Virtual pressure table.
-  set_h_aquifer (geo, time);
+  pressure_table->tick (time, msg);
+  set_h_aquifer (geo);
 
   // Find groundwater height.
 #if 1
