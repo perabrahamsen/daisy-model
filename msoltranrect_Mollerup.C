@@ -523,7 +523,15 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   ublas::vector<double> Theta_cell (cell_size);	
   for (int c = 0; c < cell_size; c++)
     Theta_cell (c) = soil_water.Theta (c);
-  
+    
+  ublas::vector<double> Theta_old_cell (cell_size);	
+  for (int c = 0; c < cell_size; c++)
+    Theta_old_cell (c) = soil_water.Theta_old (c);
+
+  ublas::vector<double> dThetadt_cell (cell_size);
+  for (int c=0; c < cell_size; c++)
+    dThetadt_cell (c) = 1.0/dt * 
+      (Theta_cell (c) - Theta_old_cell (c));
   
   // edge (inter cell) diffusion
   ublas::vector<double> D_long (edge_size); 
