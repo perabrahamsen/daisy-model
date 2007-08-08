@@ -193,6 +193,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   ublas::vector<double> dq (edge_size); // Flux in small timestep.
 
   //Make Qmat area diagonal matrix 
+  //Note: This only needs to be calculated once... 
   ublas::banded_matrix<double> Qmat (cell_size, cell_size, 0, 0);
   for (int c = 0; c < cell_size; c++)
     Qmat (c, c) = geo.cell_volume (c);

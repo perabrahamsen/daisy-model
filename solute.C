@@ -40,11 +40,11 @@ Solute::total_surface (const Geometry& geo,
 
 void 
 Solute::set_macro_flux (const size_t e, const double value)
-{ J[e] = value; }
+{ J_p[e] = value; }
 
 void
 Solute::set_matrix_flux (const size_t e, const double value)
-{ J_p[e] = value; }
+{ J[e] = value; }
 
 void 
 Solute::set_content (size_t c, double M, double C)

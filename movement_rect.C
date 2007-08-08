@@ -372,6 +372,8 @@ If none succeeds, the simulation ends.");
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
     std::vector<AttributeList*> matrix_solute_models;
+    AttributeList matrix_solute_default (Msoltranrect::default_model ());
+    matrix_solute_models.push_back (&matrix_solute_default);
     AttributeList matrix_solute_reserve (Msoltranrect::reserve_model ());
     matrix_solute_models.push_back (&matrix_solute_reserve);
     alist.add ("matrix_solute", matrix_solute_models);

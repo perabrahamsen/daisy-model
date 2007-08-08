@@ -47,9 +47,14 @@ Msoltranrect::solute (const GeometryRect& geo,
   std::vector<double> J (edge_size);
 
   // Initialize edges.
+  if (J_in > 0)
+    msg.warning ("flux out ignored");
+
   for (size_t e = 0; e < edge_size; e++)
     {
-      if (geo.edge_to (e) == Geometry::cell_above)
+      if (J_in > 0)
+	J[e] = 0.0;
+      else if (geo.edge_to (e) == Geometry::cell_above)
         J[e] = J_in;
       else
         J[e] = 0.0;
