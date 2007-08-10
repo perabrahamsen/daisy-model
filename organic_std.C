@@ -1197,7 +1197,8 @@ OrganicStandard::tick (const Geometry& geo,
       if (!active_[i])
         continue;
       
-      daisy_assert (N_used[i] < soil_NH4.M_left (i, dt) + soil_NO3.M_left (i, dt));
+      daisy_assert (N_used[i]
+                    <= soil_NH4.M_left (i, dt) + soil_NO3.M_left (i, dt));
 
       const double NH4 = (soil_NH4.M_left (i, dt) < 1e-9 * dt) // 1 mg/l/h
 	? 0.0 : soil_NH4.M_left (i, dt) * K_NH4;

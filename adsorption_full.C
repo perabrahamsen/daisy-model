@@ -34,10 +34,13 @@ public:
   bool full () const
   { return true; }
 
-  double C_to_M (const Soil&, double, int, double C) const
+  double C_to_M (const Soil&, double Theta, int, double C) const
   { 
-    daisy_assert (fabs (C) < 1.0e-100); 
-    return 0.0;
+    if (fabs (C) < 1.0e-100)
+      return 0.0;
+
+    // If we initialized a non-zero C, put it all in M right away.
+    return C * Theta;
   }
   double M_to_C (const Soil&, double, int, double) const
   { return 0; }

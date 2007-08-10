@@ -25,6 +25,7 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 #include "msoltranrect.h"
+#include "solute.h"
 #include "groundwater.h"
 #include "surface.h"
 #include "weather.h"
@@ -43,15 +44,16 @@ struct MovementRect : public Movement
 
   // Drains
   struct Point;
-  const std::vector<const Point*> drain_position;
+  const auto_vector<const Point*> drain_position;
   std::vector<size_t> drain_cell;
 
   // Water.
-  const std::vector<UZRect*> matrix_water;
+  const auto_vector<UZRect*> matrix_water;
   void macro_tick (const Soil&, SoilWater&, Surface&, double dt, Treelog&);
 
   // Solute.
-  const std::vector<Msoltranrect*> matrix_solute;
+  const auto_vector<Msoltranrect*> matrix_solute;
+  const std::auto_ptr<Msoltranrect> matrix_solute_solid;
   void solute (const Soil& soil, const SoilWater& soil_water,
                double J_in, Solute& solute, double dt,
                Treelog& msg);
@@ -117,6 +119,12 @@ MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
                       const double J_in, Solute& solute, const double dt,
                       Treelog& msg)
 {
+  if (solute.adsorption->full ())
+    {
+      matrix_solute_solid->solute (*geo, soil, soil_water, J_in, solute,
+                                   dt, msg);
+      return;
+    }
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
       Treelog::Open nest (msg, matrix_solute[i]->name);
@@ -146,6 +154,13 @@ MovementRect::element (const Soil& soil, const SoilWater& soil_water,
                        const double diffusion_coefficient, double dt, 
                        Treelog& msg)
 {
+  if (adsorption.full ())
+    {
+      matrix_solute_solid->element (*geo, soil, soil_water, element, 
+                                    adsorption, diffusion_coefficient, dt, 
+                                    msg);
+      return;
+    }
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
       Treelog::Open nest (msg, matrix_solute[i]->name);
@@ -315,7 +330,10 @@ MovementRect::MovementRect (Block& al)
     geo (submodel<GeometryRect> (al, "Geometry")),
     drain_position (map_construct_const<Point> (al.alist_sequence ("drain"))),
     matrix_water (Librarian::build_vector<UZRect> (al, "matrix_water")),
-    matrix_solute (Librarian::build_vector<Msoltranrect> (al, "matrix_solute"))
+    matrix_solute (Librarian::build_vector<Msoltranrect> 
+                   (al, "matrix_solute")),
+    matrix_solute_solid (Librarian::build_item<Msoltranrect>
+                         (al, "matrix_solute_solid"))
 { 
   for (size_t i = 0; i < drain_position.size (); i++)
     {
@@ -333,11 +351,7 @@ MovementRect::MovementRect (Block& al)
 }
 
 MovementRect::~MovementRect ()
-{ 
-  sequence_delete (drain_position.begin (), drain_position.end ());
-  sequence_delete (matrix_water.begin (), matrix_water.end ());
-  sequence_delete (matrix_solute.begin (), matrix_solute.end ());
-}
+{ }
 
 static struct MovementRectSyntax
 {
@@ -377,6 +391,13 @@ If none succeeds, the simulation ends.");
     AttributeList matrix_solute_reserve (Msoltranrect::reserve_model ());
     matrix_solute_models.push_back (&matrix_solute_reserve);
     alist.add ("matrix_solute", matrix_solute_models);
-    Librarian::add_type (Movement::component, "rectangle", alist, syntax, &make);
+
+    syntax.add_object ("matrix_solute_solid", Msoltranrect::component, 
+                       Syntax::Const, Syntax::Singleton, "\
+Matrix solute transport model used for fully adsorbed constituents.");
+    alist.add ("matrix_solute_solid", Msoltranrect::none_model ());
+
+    Librarian::add_type (Movement::component, "rectangle",
+                         alist, syntax, &make);
   }
 } MovementRect_syntax;
