@@ -296,16 +296,20 @@ GeometryRect::GeometryRect (Block& al)
         corner_z_.push_back (z_end[row]);
     }
 
-  corner_cells_.insert (corner_cells_.end (), cell_size (),
+  corner_cells_.insert (corner_cells_.end (), corner_size (),
                         std::vector<int> ());
-  daisy_assert (corner_cells_.size () == cell_size ());
+  daisy_assert (corner_cells_.size () == corner_size ());
   for (size_t cell = 0; cell < cell_size (); cell++)
-    for (size_t i = 0; i < cell_corners_[cell].size (); i++)
-      {
-        const int corner = cell_corners_[cell][i];
-        daisy_assert (corner >= 0);
-        corner_cells_[corner].push_back (cell);
-      }
+    {
+      daisy_assert (cell < cell_corners_.size ());
+      for (size_t i = 0; i < cell_corners_[cell].size (); i++)
+        {
+          const int corner = cell_corners_[cell][i];
+          daisy_assert (corner >= 0);
+          daisy_assert (corner < corner_cells_.size ());
+          corner_cells_[corner].push_back (cell);
+        }
+    }
 
   // Done.
   daisy_assert (zplus_.size () == cell_size ());
