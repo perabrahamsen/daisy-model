@@ -44,9 +44,10 @@ private:
   std::vector<double> edge_cos_angle_;
   std::vector<double> edge_center_z_;
   std::vector<double> edge_center_x_;
+  std::vector<std::vector<int> > edge_corners_;
   std::vector<double> corner_z_;
   std::vector<double> corner_x_;
-  std::vector<std::vector<int> > edge_corners_;
+  std::vector<std::vector<int> > corner_cells_;
   
   // Cell operations.
 public:
@@ -126,6 +127,8 @@ public:
   { return corner_z_[k]; }
   inline double corner_x (size_t k) const
   { return corner_x_[k]; }
+  const std::vector<int>& corner_cells (size_t n) const
+  { return corner_cells_[n]; }
   
   // Operations on whole volume.
 public:
