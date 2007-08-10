@@ -686,6 +686,18 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   if (simple_dcthetadt)
     {
       A = (1.0 / dt) * QTheta_mat                          // dtheta/dt
+	- gamma * prod (Theta_mat, diff_long);              // long diffusion
+	
+      b_mat =  (1.0 / dt) * QTheta_mat_old 
+	+ (1 - gamma) * prod (Theta_mat_old, diff_long); 
+	
+      b = prod (b_mat, C_old)
+	- S_vol;                                            // expl Neu BC         
+	
+       
+
+      /*   This is with all effects...
+      A = (1.0 / dt) * QTheta_mat                          // dtheta/dt
 	- gamma * prod (Theta_mat, diff_long + diff_tran)  // diffusion
 	+ gamma * advec                                    // advection
 	+ gamma * B_mat                                    // impl Neu BC
@@ -703,12 +715,12 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
 	- B_vec                                               // expl Neu BC         
 	+ gamma * prod (Theta_mat, diffm_long_vec)            // Dir BC
 	+ (1 - gamma) * prod (Theta_mat_old, diffm_long_vec)  // Dir BC
-	- S_vol;                                              // sink term	
+	- S_vol;       */                                     // sink term	
     }
-  else
+  else  
     {
       A = A;
-      b = b;	
+      b = b;     	
     }
   
   
@@ -732,7 +744,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   for (int c=0; c < cell_size; c++)
     {
       C[c] = C_new (c); 
-      daisy_assert (C[c] >= 0.0);
+      //daisy_assert (C[c] >= 0.0);
     }
 
   // BUG: Adsorption done wrong.
@@ -764,7 +776,31 @@ MsoltranrectMollerup::output (Log&) const
 
 MsoltranrectMollerup::MsoltranrectMollerup (Block& al)
   : Msoltranrect (al)
+  
 { }
+
+
+//* place something like this inside MsoltranrectMollerup
+
+/*
+UZRectMollerup::UZRectMollerup (Block& al)
+  : UZRect (al),
+    edge_arithmetic_height (al.number ("edge_arithmetic_height")),
+    max_time_step_reductions (al.integer ("max_time_step_reductions")),
+    time_step_reduction (al.integer ("time_step_reduction")),
+    max_iterations (al.integer ("max_iterations")),
+    max_absolute_difference (al.number ("max_absolute_difference")),
+    max_relative_difference (al.number ("max_relative_difference")),
+    use_forced_T (al.check ("forced_T")),
+    forced_T (al.number ("forced_T", -42.42e42)),
+    debug (al.integer ("debug"))
+{ }
+
+*/
+
+
+
+
 
 MsoltranrectMollerup::~MsoltranrectMollerup ()
 { }
