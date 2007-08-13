@@ -690,9 +690,9 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
 	
       b_mat =  (1.0 / dt) * QTheta_mat_old 
 	+ (1 - gamma) * prod (Theta_mat_old, diff_long); 
-	
-      b = prod (b_mat, C_old)
-	- S_vol;                                            // expl Neu BC         
+      
+      b = prod (b_mat, C_old);
+	//- S_vol;                                            // expl Neu BC         
 	
        
 
