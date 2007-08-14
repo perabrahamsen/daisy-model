@@ -308,7 +308,7 @@ QTMOC		= /pack/qt/bin/moc
 endif
 
 ifeq ($(HOSTTYPE),mingw)
-Q4HOME = /cygdrive/c/Qt/4.3.0
+Q4HOME = /cygdrive/c/Qt/4.3.1
 Q4INCLUDE	= -isystem $(Q4HOME)/include
 ifeq (false,true)
 Q4SYS		= -lGDI32 -lole32 -lOleaut32 -luuid -lImm32 -lwinmm \
@@ -816,8 +816,19 @@ cvs: $(TEXT)
 	cvs commit -m "Version $(TAG)"
 	cvs tag release_`echo $(TAG) | sed -e 's/[.]/_/g'`
 
+.IGNORE: add
+
 add:
 	cvs add $(TEXT)
+
+update:
+	cvs update -d -P
+
+commit:
+	cvs commit -m make
+
+done:	update add commit
+
 
 cast:
 	fgrep _cast $(INTERFACES) $(MODELS) $(MAIN)
