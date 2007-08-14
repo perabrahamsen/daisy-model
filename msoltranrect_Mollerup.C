@@ -128,6 +128,7 @@ struct MsoltranrectMollerup : public Msoltranrect
              std::vector<double>& C, 
              const std::vector<double>& S, 
              std::vector<double>& J, 
+	     const double C_below,
              Adsorption& adsorption,
              double diffusion_coefficient, double dt,
              Treelog& msg);
@@ -537,6 +538,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
                                  std::vector<double>& C, 
 				 const std::vector<double>& S, 
 				 std::vector<double>& J, 
+				 const double C_below,
 				 Adsorption& adsorption,
 				 double diffusion_coefficient,
 				 const double dt,
@@ -635,9 +637,8 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   
   // Why not dt and msg????
   const bool isflux = true;
-  const double C_border = 0.0;
 
-  lowerboundary (geo, isflux, C_border, C, q_edge, D_long, J, B_mat, B_vec, 
+  lowerboundary (geo, isflux, C_below, C, q_edge, D_long, J, B_mat, B_vec, 
                  diffm_long_mat, diffm_long_vec, advecm);
   
 

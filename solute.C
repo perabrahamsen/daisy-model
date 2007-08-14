@@ -33,6 +33,10 @@
 #include "librarian.h"
 #include <sstream>
 
+double 
+Solute::C_below () const
+{ return C_below_; }
+
 double
 Solute::total_surface (const Geometry& geo, 
                        const double from, const double to) const
@@ -158,6 +162,10 @@ void
 Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
+  syntax.add ("C_below", "g/cm^3", Syntax::Const, "\
+Concentration below the layer of soil being examined.");
+  alist.add ("C_below", 0.0);
+
   syntax.add_object ("adsorption", Adsorption::component, 
                      "Soil adsorption properties.");
   Geometry::add_layer (syntax, Syntax::OptionalState, "C", "g/cm^3",
@@ -195,6 +203,7 @@ Only for initialization of the 'M' parameter.");
 
 Solute::Solute (Block& al)
   : submodel (al.check ("type") ? al.name ("type") : al.name ("submodel")),
+    C_below_ (al.number ("C_below")),
     S_permanent (al.number_sequence ("S_permanent")),
     adsorption (Librarian::build_item<Adsorption> (al, "adsorption"))
 { }

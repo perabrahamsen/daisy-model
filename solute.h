@@ -45,10 +45,15 @@ public:
 
   friend class Movement1D;
 
+  // Parameters.
+  const double C_below_;		
+public:
+  double C_below () const; // Concentration in groundwater [g/cm^3]
+
   // State variables.
 protected:
-  std::vector<double> M_;		// Concentration in soil [g / cm³]
-  std::vector<double> C_;		// Concentration in soil solution [g / cm³]
+  std::vector<double> M_;	 // Concentration in soil [g/cm^3]
+  std::vector<double> C_;        // Concentration in soil solution [g/cm^3]
 
   // Flux variables.
 protected:

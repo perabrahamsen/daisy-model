@@ -64,6 +64,7 @@ private:
                      std::vector<double>& C, 
                      const std::vector<double>& S, 
                      std::vector<double>& J, 
+		     const double C_below,
                      Adsorption& adsorption,
                      double diffusion_coefficient, double dt,
                      Treelog& msg) = 0;
