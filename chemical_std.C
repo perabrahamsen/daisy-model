@@ -516,7 +516,7 @@ You must specify it with either 'canopy_dissipation_halftime' or\n\
 		"Obsolete alias for 'canopy_dissipation_rate'.");
     syntax.add_fraction ("canopy_washoff_coefficient", Syntax::Const, "\
 Fraction of the chemical that follows the water off the canopy.");
-    syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
+    syntax.add ("diffusion_coefficient", "cm^2/s", Check::non_negative (),
 		Syntax::Const, "Diffusion coefficient.");
     syntax.add ("decompose_rate", "h^-1", Check::fraction (),
 		Syntax::OptionalConst,

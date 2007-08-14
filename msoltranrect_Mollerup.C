@@ -658,7 +658,6 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   bool simple_dcthetadt = true;
      
 
-
   ublas::banded_matrix<double>Theta_mat_old (cell_size, cell_size, 0 ,0);
   ublas::banded_matrix<double>Theta_mat (cell_size, cell_size, 0, 0); 
   ublas::banded_matrix<double>QTheta_mat_old (cell_size, cell_size, 0 ,0);
@@ -683,6 +682,9 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   ublas::vector<double> b (cell_size);   
   ublas::matrix<double> b_mat (cell_size, cell_size);  
 
+  //Debug
+  C_old (0) = 1.0;
+ 
 
   if (simple_dcthetadt)
     {
@@ -692,10 +694,17 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       b_mat =  (1.0 / dt) * QTheta_mat_old 
 	+ (1 - gamma) * prod (Theta_mat_old, diff_long); 
       
-      b = prod (b_mat, C_old);
+      b = - prod (b_mat, C_old);
 	//- S_vol;                                            // expl Neu BC         
 	
-       
+      //Debug: Simple Dirichlet node       
+      A (0, 0) = 1.0;
+      for (int c = 1; c < cell_size; c++)
+	A (1, c) = 0.0;
+      b (0) = 1;
+
+
+ 
 
       /*   This is with all effects...
       A = (1.0 / dt) * QTheta_mat                          // dtheta/dt
@@ -724,7 +733,17 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       b = b;     	
     }
   
-  
+  //debug prints
+  std::cout << "Longitudinal diffusion";
+  std::cout << D_long << '\n'; 
+
+
+  std::cout << "Water content in upper node ";
+  std::cout << Theta_cell (0) << '\n';
+  std::cout << "Some concentration calcs prints\n";
+  std::cout << "A = " << A << '\n';
+  std::cout << "b = " << b << '\n';
+ 
   
   //b = sumvec + (1.0 / ddt) * (Qmatrix * Cw * h + Qmatrix *(Wxx-Wyy));
   //b = sumvec + (1.0 / ddt) * (prod (prod (Qmat, Cw),  h) 
@@ -740,7 +759,11 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   ublas::lu_substitute (A, piv, b); // b now contains solution 
   
   C_new = b; // new solution :-)
+ 
+  //debug Print new solution
+  std::cout << "C_new" << C_new << '\n';
   
+ 
   // Write solution into C (std::vec)
   for (int c=0; c < cell_size; c++)
     {
