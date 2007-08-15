@@ -83,6 +83,7 @@ A location and content of a soil layer.");
   // Parameters
   /* const */ double MaxRootingDepth;
   const double dispersivity;
+  const double dispersivity_transversal;
   const std::vector<double> border;
 
   bool has_attribute (const std::string& name, Treelog& msg) const
@@ -114,6 +115,8 @@ A location and content of a soil layer.");
       original_layer_size (layers.size ()),
       MaxRootingDepth (al.number ("MaxRootingDepth")),
       dispersivity (al.number ("dispersivity")),
+      dispersivity_transversal (al.number ("dispersivity_transversal",
+					   dispersivity * 0.1)),
       border (al.number_sequence ("border"))
   { }
   ~Implementation ()
@@ -190,7 +193,7 @@ Soil::dispersivity (size_t) const
 
 double 
 Soil::dispersivity_transversal (size_t c) const 
-{ return 0.1 * dispersivity (c); } 
+{ return impl.dispersivity_transversal; } 
 
 void
 Soil::set_porosity (size_t i, double Theta)
@@ -425,6 +428,9 @@ geometry.",
   syntax.add ("dispersivity", "cm", Check::positive (), 
 	      Syntax::Const, "Dispersion length.");
   alist.add ("dispersivity", 5.0);
+  syntax.add ("dispersivity_transversal", "cm", Check::positive (), 
+	      Syntax::OptionalConst, "Transversal dispersion length.\n\
+By default, this is 0.1 times the dispersivity.");
   syntax.add ("border", "cm", Check::negative (), 
               Syntax::Const, Syntax::Sequence, "\
 List of flux depths where a mass balance should be possible when logging.\n\

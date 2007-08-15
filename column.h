@@ -47,6 +47,22 @@ public:
   double size;
   static const char *const component;
 
+  // Location.
+public:
+  struct Point
+  {
+    const double x;
+    const double y;
+
+    static void load_syntax (Syntax&, AttributeList&);
+    Point (const Block&);
+    ~Point ();
+  };
+private:
+  const std::vector<const Point*> location_;
+public:
+  const std::vector<const Point*>& location () const;
+
   virtual const Horizon& horizon_at (double z, double x, double y) const = 0;
 
   // Actions.

@@ -20,17 +20,7 @@ Divide?
 
 ** A semi-analytical solution to OM evolution (PA, MMO, SH)
 
-* R2D2
-
-** Find ud af hvorfor boost-sandbox ikke vil installeres
-
-** boost på dirac
-
-** inkluder uzrect_Mollerup
-
-** msoltranrect_Mollerup
-
-* Brug Rect2x1 stoftransport komponent.
+* Lav Rect2x1 stoftransport komponent.
 
 ** Flyt surface/groundwater opdatering til MovementRect?
 
@@ -42,15 +32,13 @@ Divide?
 
 ** makroporer
 
-* TUT?
-
 * Farquhar
 
 ** omregn vind fra reference til aktuel overflade
 
 * OpenMI
 
-** Installer C# på x40
+** Installer C# på x61
 
 ** Få Groundwater pipe til at læse tryk fra extern kilde.
 
@@ -62,6 +50,12 @@ Divide?
 (location (x1 y1)); Point
 (location (x1 y1) (x2 y2)); Error
 (location (x1 y1) (x2 y2) (x3 y3) ...); Polygon
+
+C API
+
+daisy_column_location_size (daisy, column)
+daisy_column_location_x (daisy, column, index)
+daisy_column_location_y (daisy, column, index)
 
 * setup.exe
 
@@ -98,20 +92,6 @@ ELLER
 * Distribution
 
 ** Indsæt mmo grøntsager i lib (og sample?).
-
-** Ny plone baseret web side!
-
-** reconfigure qt static
-
-** nullsoft?
-
-** Q4 Make
-
-Vi skal have en statisk udgave af Qt på MingW.
-
-Vi skal have flyttet den til dirac for krydscompilering
-
-Vi skal have Qt til at bygge på Linux (har vi Qt 4.2 der?)
 
 * Programmering
 

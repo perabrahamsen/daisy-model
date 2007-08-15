@@ -21,15 +21,35 @@
 
 #define BUILD_DLL
 
-
 #include "column.h"
 #include "block.h"
 #include "syntax.h"
 #include "log.h"
 #include "librarian.h"
+#include "submodeler.h"
 #include <map>
 
 const char *const Column::component = "column";
+
+void
+Column::Point::load_syntax (Syntax& syntax, AttributeList&)
+{ 
+  syntax.add ("x", Syntax::Unknown (), Syntax::Const, "X-Coordinate.");
+  syntax.add ("y", Syntax::Unknown (), Syntax::Const, "Y-Coordinate.");
+  syntax.order ("x", "y");
+}
+
+Column::Point::Point (const Block& al)
+  : x (al.number ("x")),
+    y (al.number ("y"))
+{ }
+
+Column::Point::~Point ()
+{ }
+
+const std::vector<const Column::Point*>&
+Column::location () const
+{ return location_; }
 
 void
 Column::output (Log& log) const
@@ -44,12 +64,23 @@ Column::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Area covered by this column, for use by the 'merge' action.\n\
 The dimension is up to you, as long as all columns use the same unit.");
   alist.add ("size", 1.0);
+
+  syntax.add_submodule_sequence ("location", Syntax::Const, "\
+Location of this column.\n\
+\n\
+The meaning depends on the number of point in the sequence.\n\
+0 points: The column has no specific location.\n\
+1 point: The column has a location, but no specific area.\n\
+3 or more points: The column represents the area specified by a\n\
+polygon with the specified corner points.", Point::load_syntax);
+  alist.add ("location", std::vector<AttributeList*> ());
 }
 
 Column::Column (Block& al)
   : alist (al.alist ()),
     name (al.identifier ("type")),
-    size (alist.number ("size"))
+    size (al.number ("size")),
+    location_ (map_submodel_const<Point> (al, "location"))
 { }
 
 Column::~Column ()

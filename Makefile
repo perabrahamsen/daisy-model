@@ -236,17 +236,17 @@ endif
 
 CSHARP = /cygdrive/C/WINDOWS/Microsoft.NET/Framework/v2.0.50727/csc.exe
 
-#csdaisy.exe:	csmain.cs csdaisy.netmodule
-#	$(CSHARP) /out:csdaisy.exe /addmodule:csdaisy.netmodule csmain.cs 
-#
+csdaisy.exe:	csmain.cs csdaisy.netmodule
+	$(CSHARP) /out:csdaisy.exe /addmodule:csdaisy.netmodule csmain.cs
+
 #csdaisydll.exe:	csmain.cs csdaisy.dll
 #	$(CSHARP) /out:csdaisy.exe /r:csdaisy.dll csmain.cs 
-#
+
 #csdaisy.dll: csdaisy.cs
 #	$(CSHARP) /target:library csdaisy.cs
-#
-#csdaisy.netmodule: csdaisy.cs
-#	$(CSHARP) /target:module csdaisy.cs
+
+.cs.netmodule:
+	$(CSHARP) /target:module $<
 
 # Construct the compile command.
 #
@@ -548,7 +548,7 @@ REMOVED = soil_chemical.C soil_chemicals.C chemicals.C soil_chemical.h soil_chem
 
 # These are the file extensions we deal with.
 # 
-.SUFFIXES:	.C ${OBJ} .h .c ${EXE} .a
+.SUFFIXES:	.C ${OBJ} .h .c ${EXE} .a .cs .netmodule
 
 # Create all the executables.
 #
@@ -582,12 +582,12 @@ exp:
 native:	
 	(mkdir -p $(NATIVEHOME) \
 	 && cd $(NATIVEHOME) \
-         && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy${EXE} daisyw.exe)
+         && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy${EXE} daisyw.exe)
 
 cnative:
 	(mkdir -p $(NATIVEHOME) \
 	 && cd $(NATIVEHOME) \
-         && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile cdaisy${EXE})
+         && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile cdaisy.exe)
 
 cross:
 	(cd $(TARGETTYPE) \

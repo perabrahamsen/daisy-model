@@ -1,3 +1,12 @@
+2007-08-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* cdaisy.C, cdaisy.h (daisy_column_location_size)
+	(daisy_column_location_x, daisy_column_location_y): New functions.
+
+2007-08-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column.C, column.h (location): New parameter.
+
 2007-07-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* depth.C (DepthExtern): New model.

@@ -625,6 +625,18 @@ extern "C" const char* EXPORT
 daisy_column_get_name (const Column* column)
 { return column->name.name ().c_str (); }
 
+extern "C" unsigned int EXPORT
+daisy_column_location_size (const Column* column)
+{ return column->location ().size (); }
+
+extern "C" double EXPORT
+daisy_column_location_x (const Column* column, unsigned int index)
+{ return column->location ()[index]->x; }
+
+extern "C" double EXPORT
+daisy_column_location_y (const Column* column, unsigned int index)
+{ return column->location ()[index]->y; }
+
 // @ The daisy_time Type.
 
 extern "C" Time* EXPORT
