@@ -428,7 +428,7 @@ geometry.",
   syntax.add ("dispersivity", "cm", Check::positive (), 
 	      Syntax::Const, "Dispersion length.");
   alist.add ("dispersivity", 5.0);
-  syntax.add ("dispersivity_transversal", "cm", Check::positive (), 
+  syntax.add ("dispersivity_transversal", "cm", Check::non_negative (), 
 	      Syntax::OptionalConst, "Transversal dispersion length.\n\
 By default, this is 0.1 times the dispersivity.");
   syntax.add ("border", "cm", Check::negative (), 

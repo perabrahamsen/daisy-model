@@ -118,7 +118,6 @@ struct MsoltranrectMollerup : public Msoltranrect
                              Treelog& msg);
 
 
-
   // Solute.
   void flow (const GeometryRect& geo, 
              const Soil& soil, 
@@ -244,12 +243,12 @@ MsoltranrectMollerup::diffusion_tensor (const GeometryRect& geo,
       const double alpha_T = soil.dispersivity_transversal (c);
 
       //debug 
-      std::cout << "alpha_L" << alpha_L << '\n';
-      std::cout << "alpha_T" << alpha_T << '\n';
-      std::cout << "diffusion_coeff" << diffusion_coefficient << '\n';
-      std::cout << "q" << q << '\n';
-      std::cout << "qx" << qx << '\n';
-      std::cout << "qz" << qz << '\n';
+      //std::cout << "alpha_L" << alpha_L << '\n';
+      //std::cout << "alpha_T" << alpha_T << '\n';
+      //std::cout << "diffusion_coeff" << diffusion_coefficient << '\n';
+      //std::cout << "q" << q << '\n';
+      //std::cout << "qx" << qx << '\n';
+      //std::cout << "qz" << qz << '\n';
 
 
       if (q > 0)
@@ -269,9 +268,9 @@ MsoltranrectMollerup::diffusion_tensor (const GeometryRect& geo,
     }
    
   //Debug stuff
-  std::cout << "Dxx_cell" << Dxx_cell << '\n';
-  std::cout << "Dzz_cell" << Dzz_cell << '\n';
-  std::cout << "Dxz_cell" << Dxz_cell << '\n';
+  //std::cout << "Dxx_cell" << Dxx_cell << '\n';
+  //std::cout << "Dzz_cell" << Dzz_cell << '\n';
+  //std::cout << "Dxz_cell" << Dxz_cell << '\n';
     
   
 
@@ -306,7 +305,6 @@ MsoltranrectMollerup::diffusion_tensor (const GeometryRect& geo,
 	}
     }
 }
-
 
 
 void 
@@ -626,7 +624,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   for (int c = 0; c < cell_size; c++)
     advec (c, c) = 0.0;
   advection (geo, q_edge, advec);  
-  
+
   
   // Initialize and calculate sink term
   ublas::vector<double> S_vol (cell_size); // sink term 
@@ -701,26 +699,50 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   //Debug
   C_old (0) = 1.0;
  
+  /* //Debug
+  ublas::matrix<double> Kurt_mat (2,3);
+  Kurt_mat(0, 0) = 1.1;
+  Kurt_mat(0, 1) = 1.2;
+  Kurt_mat(0, 2) = 1.3;
+  Kurt_mat(1, 0) = 2.1;
+  Kurt_mat(1, 1) = 2.2;
+  Kurt_mat(1, 2) = 2.3;
+  ublas::vector<double> Kurt_vec (3);
+  Kurt_vec(0) = 1.0;
+  Kurt_vec(1) = 2.0;
+  Kurt_vec(2) = 3.0; 
+  std::cout << "Kurt_mat" << Kurt_mat << '\n';
+  std::cout << "Kurt_vec" << Kurt_vec << '\n';
+  std::cout << "Kurt_prod" << prod (Kurt_mat, Kurt_vec) << '\n'; 
+  */
+
+
+  //Debug 
+  //std::cout << "QTheta_mat" << QTheta_mat << '\n';
+  //std::cout << "diff_long" << diff_long << '\n';
+  //std::cout << "dt" << dt << '\n';
+  //std::cout << "prod" << prod (QTheta_mat, diff_long) << '\n';
+
 
   if (simple_dcthetadt)
     {
-      A = (1.0 / dt) * QTheta_mat                          // dtheta/dt
-	- gamma * prod (Theta_mat, diff_long);              // long diffusion
+      A = (1.0 / dt) * QTheta_mat                           // dtheta/dt
+	- gamma * prod (Theta_mat, diff_long)               // long diffusion
+	+ gamma * advec;                                    // advec
 	
       b_mat =  (1.0 / dt) * QTheta_mat_old 
-	+ (1 - gamma) * prod (Theta_mat_old, diff_long); 
+	+ (1 - gamma) * prod (Theta_mat_old, diff_long)
+	- (1 - gamma) * advec; 
       
-      b = - prod (b_mat, C_old);
+      b = prod (b_mat, C_old);
 	//- S_vol;                                            // expl Neu BC         
 	
       //Debug: Simple Dirichlet node       
       A (0, 0) = 1.0;
       for (int c = 1; c < cell_size; c++)
-	A (1, c) = 0.0;
+	A (0, c) = 0.0;
       b (0) = 1;
 
-
- 
 
       /*   This is with all effects...
       A = (1.0 / dt) * QTheta_mat                          // dtheta/dt
@@ -750,15 +772,16 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     }
   
   //debug prints
-  std::cout << "Longitudinal diffusion";
-  std::cout << D_long << '\n'; 
-
-
-  std::cout << "Water content in upper node ";
-  std::cout << Theta_cell (0) << '\n';
-  std::cout << "Some concentration calcs prints\n";
-  std::cout << "A = " << A << '\n';
-  std::cout << "b = " << b << '\n';
+  //std::cout << "Longitudinal diffusion";
+  //std::cout << D_long << '\n'; 
+  //std::cout << "diff_long" << diff_long << '\n';
+  //std::cout << "Thetadiffprod" <<  prod (Theta_mat, diff_long) << '\n'; 
+  //std::cout << "Water content in upper node ";
+  //std::cout << Theta_cell (0) << '\n';
+  //std::cout << "Some concentration calcs prints\n";
+  std::cout << "advec" << advec << '\n';
+  //std::cout << "A = " << A << '\n';
+  //std::cout << "b = " << b << '\n';
  
   
   //b = sumvec + (1.0 / ddt) * (Qmatrix * Cw * h + Qmatrix *(Wxx-Wyy));
