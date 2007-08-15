@@ -88,10 +88,10 @@ UZRectConst::has_macropores (Block&, const bool)
 void 
 UZRectConst::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add ("q_x", "mm/h", Syntax::Const, "\
+  syntax.add ("q_x", "cm/h", Syntax::Const, "\
 Horizontal flow.");
   alist.add ("q_x", 0.0);
-  syntax.add ("q_z", "mm/h", Syntax::Const, "\
+  syntax.add ("q_z", "cm/h", Syntax::Const, "\
 Vertical flow upwards.");
   alist.add ("q_z", 0.0); 
 }

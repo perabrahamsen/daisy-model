@@ -242,6 +242,16 @@ MsoltranrectMollerup::diffusion_tensor (const GeometryRect& geo,
       const double tau = soil.tortuosity_factor (c, Theta_cell);
       const double alpha_L = soil.dispersivity (c);
       const double alpha_T = soil.dispersivity_transversal (c);
+
+      //debug 
+      std::cout << "alpha_L" << alpha_L << '\n';
+      std::cout << "alpha_T" << alpha_T << '\n';
+      std::cout << "diffusion_coeff" << diffusion_coefficient << '\n';
+      std::cout << "q" << q << '\n';
+      std::cout << "qx" << qx << '\n';
+      std::cout << "qz" << qz << '\n';
+
+
       if (q > 0)
         {
           Dxx_cell (c) = (alpha_L * sqr (qx) + alpha_T * sqr (qz) )
@@ -258,7 +268,13 @@ MsoltranrectMollerup::diffusion_tensor (const GeometryRect& geo,
         }
     }
    
+  //Debug stuff
+  std::cout << "Dxx_cell" << Dxx_cell << '\n';
+  std::cout << "Dzz_cell" << Dzz_cell << '\n';
+  std::cout << "Dxz_cell" << Dxz_cell << '\n';
+    
   
+
 
   for (size_t e = 0; e < edge_size; e++)
     {
