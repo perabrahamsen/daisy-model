@@ -31,19 +31,17 @@
 #include "memutils.h"
 #include "librarian.h"
 
-using namespace std;
-
 struct ActionWithColumn : public Action
 {
   const symbol column;
-  vector<Action*> actions;
+  std::vector<Action*> actions;
 
 public:
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
     Field::Restrict restriction (*daisy.field, column);
     Treelog::Open nest (out, column);
-    for (vector<Action*>::iterator i = actions.begin ();
+    for (std::vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
@@ -55,12 +53,26 @@ public:
   { 
     Field::Restrict restriction (*daisy.field, column);
     Treelog::Open nest (out, column);
-    for (vector<Action*>::iterator i = actions.begin ();
+    for (std::vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
 	(*i)->doIt (daisy, scope, out);
       }
+  }
+
+  bool done (const Daisy& daisy, const Scope& scope, Treelog& out) const
+  {
+    bool all_done = true;
+    Treelog::Open nest (out, column);
+    for (std::vector<Action*>::const_iterator i = actions.begin ();
+	 i != actions.end ();
+	 i++)
+      {
+	if (!(*i)->done (daisy, scope, out))
+	  all_done = false;
+      }
+    return all_done;
   }
 
   void output (Log& log) const
@@ -70,7 +82,7 @@ public:
   { 
     Field::Restrict restriction (*daisy.field, column);
     Treelog::Open nest (out, column);
-    for (vector<Action*>::iterator i = actions.begin ();
+    for (std::vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
@@ -82,7 +94,7 @@ public:
   { 
     Treelog::Open nest (err, string ("with") + column);
     bool ok = true;
-    for (vector<Action*>::const_iterator i = actions.begin ();
+    for (std::vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {

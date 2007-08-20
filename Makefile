@@ -855,6 +855,7 @@ setupnocvs:
 	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
 	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
 	cp $(MINGWHOME)/bin/mingwm10.dll $(SETUPDIR)/bin
+	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
 
 daisysetup:

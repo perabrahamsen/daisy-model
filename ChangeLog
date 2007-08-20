@@ -1,8 +1,12 @@
+2007-08-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_with.C (done): Done when all actions are done.
+	* action_lisp.C (ActionProgn::done): Ditto.
+
 2007-08-20  Birgitte Gjettermann  <bgj@kvl.dk>
 
 	* cdaisy.C, cdaisy.h (daisy_column_get_description): New function.
 	
-
 2007-08-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* cdaisy.C, cdaisy.h (daisy_column_location_size)

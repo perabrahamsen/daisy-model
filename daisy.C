@@ -42,6 +42,7 @@
 #include "submodeler.h"
 #include "column.h"
 #include "scope.h"
+#include "scopesel.h"
 #include "mathlib.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -62,6 +63,8 @@ Daisy::attach_ui (Run* run, const std::vector<Log*>& logs)
 bool
 Daisy::run (Treelog& msg)
 { 
+  daisy_assert (extern_scope);
+
   // Run simulation.
   {
     Treelog::Open nest (msg, "Running");
@@ -78,15 +81,15 @@ Daisy::run (Treelog& msg)
 	    msg.message ("Begin simulation");
 	  }
 
-	print_time->tick (*this, Scope::null (), msg);
+	print_time->tick (*this, *extern_scope, msg);
 	const bool force_print 
-          = print_time->match (*this, Scope::null (), msg);
+          = print_time->match (*this, *extern_scope, msg);
 
 	tick (msg);
 
 	if (!running)
 	  msg.message ("End simulation");
-	print_time->tick (*this, Scope::null (), msg);
+	print_time->tick (*this, *extern_scope, msg);
 	if (force_print)
 	  msg.touch ();
       }
@@ -107,11 +110,13 @@ Daisy::tick (Treelog& msg)
 void
 Daisy::tick_before (Treelog& msg)
 { 
+  daisy_assert (extern_scope);
+
   output_log->initial_logs (*this, msg);
   if (weather.get ())
     weather->tick (time, msg);
-  action->tick (*this, Scope::null (), msg);
-  action->doIt (*this, Scope::null (), msg);
+  action->tick (*this, *extern_scope, msg);
+  action->doIt (*this, *extern_scope, msg);
 }
 
 void
@@ -172,9 +177,12 @@ Daisy::initialize (Block& block)
     Treelog::Open nest (block.msg (), "output");
     output_log->initialize (metalib, block.msg ());
   }
+  extern_scope = scopesel->lookup (*output_log, block.msg ()); 
   {                             // Must come after output.
     Treelog::Open nest (block.msg (), "manager");
-    action->initialize (*this, Scope::null (), block.msg ());
+    action->initialize (*this, 
+			extern_scope ? *extern_scope : Scope::null (), 
+			block.msg ());
   }
 }
 
@@ -210,10 +218,16 @@ Daisy::check (Treelog& msg)
     if (!output_log->check (*field, msg))
       ok = false;
   }
+  if (!extern_scope)
+    {
+      msg.error ("Extern scope not found");
+      ok = false;
+    }
   // Check actions.
-  {
+  else 
+    {
     Treelog::Open nest (msg, "manager");
-    if (!action->check (*this, Scope::null (), msg))
+    if (!action->check (*this, *extern_scope, msg))
       ok = false;
   }
   return ok;
@@ -224,6 +238,8 @@ Daisy::Daisy (Block& al)
     metalib (al.metalib ()),
     running (false),
     output_log (new Output (al)),
+    scopesel (Librarian::build_item<Scopesel> (al, "scope")),
+    extern_scope (NULL),
     print_time (Librarian::build_item<Condition> (al, "print_time")),
     time (al.alist ("time")),
     timestep (al.check ("timestep") 
@@ -252,6 +268,10 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", default_description);
   
   Output::load_syntax (syntax, alist);
+  syntax.add_object ("scope", Scopesel::component, 
+		     Syntax::Const, Syntax::Singleton, "\
+Scope to evaluate expessions in.");
+  alist.add ("scope", Scopesel::default_model ());
   syntax.add_object ("print_time", Condition::component,
                      "Print simulation time whenever this condition is true.\n\
 The simulation time will also be printed whenever there are any news\n\

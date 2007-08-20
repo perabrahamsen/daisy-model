@@ -97,15 +97,18 @@ ScopeMulti::ScopeMulti (const Scope& first, const Scope& second)
     all_numbers_ (find_numbers (scopes))
 { }
 
+#if 0
 ScopeMulti::ScopeMulti (Block& al)
   : Scope (al),
     scopes (Librarian::build_vector_const<Scope> (al, "scope")),
     all_numbers_ (find_numbers (scopes))
 { }
+#endif
 
 ScopeMulti::~ScopeMulti ()
 { }
 
+#if 0
 static struct ScopeMultiSyntax
 {
   static Model& make (Block& al)
@@ -124,5 +127,6 @@ static struct ScopeMultiSyntax
     Librarian::add_type (Scope::component, "multi", alist, syntax, &make);
   }
 } ScopeMulti_syntax;
+#endif
 
 // scope_multi.C ends here.

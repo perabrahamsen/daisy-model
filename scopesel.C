@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "scopesel.h"
 #include "scope.h"
 #include "assertion.h"
@@ -89,6 +88,44 @@ static struct ScopeselNameSyntax
     Librarian::add_type (Scopesel::component, "name", alist, syntax, &make);
   }
 } ScopeselName_syntax;
+
+class ScopeselNull : public Scopesel
+{
+  // Simulation.
+public:
+  Scope* lookup (const Output& output, Treelog& msg) const
+  { return &Scope::null (); }
+
+  // Create.
+public:
+  ScopeselNull (Block&)
+  { }
+};
+
+static struct ScopeselNullSyntax
+{
+  static Model& make (Block& al)
+  { return *new ScopeselNull (al); }
+
+  ScopeselNullSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Select the empty scope.");
+    Librarian::add_type (Scopesel::component, "null", alist, syntax, &make);
+  }
+} ScopeselNull_syntax;
+
+
+const AttributeList&
+Scopesel::default_model ()
+{
+  static AttributeList alist;
+  if (!alist.check ("type"))
+    alist.add ("type", "null");
+
+  return alist;
+}
 
 static Librarian Scopesel_init (Scopesel::component, "\
 A method to choose a scope in a Daisy simulation.");

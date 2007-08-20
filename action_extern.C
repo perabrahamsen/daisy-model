@@ -109,7 +109,7 @@ Select an external scope, and perform action.");
 
     syntax.add_object ("scope", Scopesel::component, 
                        Syntax::Const, Syntax::Singleton, "\
-Scope to evaluate expession in.");
+Scope to evaluate expessions in.");
     syntax.add_object ("action", Action::component, 
                        "Action to perform if the condition is false.");
     syntax.order ("scope", "action");

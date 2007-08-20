@@ -46,6 +46,7 @@ struct TransportConvection : public Transport
 	     std::vector<double>& C,
 	     const std::vector<double>& S,
 	     std::vector<double>& J, 
+	     const double C_below, 
              double dt);
 
   // Create.
@@ -65,7 +66,8 @@ TransportConvection::tick (Treelog& msg,
 			   std::vector<double>& C,
 			   const std::vector<double>& S,
 			   std::vector<double>& J,
-                           const double dt)
+                           const double C_below, 
+			   const double dt)
 {
   const double J_in = J[0];
 
@@ -127,18 +129,18 @@ TransportConvection::tick (Treelog& msg,
       dJ[0] = J_in;
 
       // Middle cells.
-      for (unsigned int i = 1; i < size; i++)
+      for (unsigned int i = 1; i <= size; i++)
 	{
 	  const double q = soil_water.q (i);
 	  if (q < 0)		// Downward flow, take from water above.
 	    dJ[i] = q * C[i-1];
-	  else			// Upward flow, take from water below.
-	    dJ[i] = q * C[i];
+	  else if (i < size)
+	    dJ[i] = q * C[i];	// Upward flow, take from water below.
+	  else if (C_below >= 0)
+	    dJ[i] = q * C[i];	// Use specified groundwater content.
+	  else
+	    dJ[i] = q * C[i-1];	// Assume the same concentration below.
 	}
-  
-      // Lower boundary.
-      // We assume the same concentration below the lowest cell.
-      dJ[size] = soil_water.q (size) * C[size-1];
 
       // Update content.
       for (unsigned int i = 0; i < size; i++)

@@ -1,5 +1,44 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* OpenMI
+
+** column location 
+
+(location); ID
+(location (x1 y1)); Point
+(location (x1 y1) (x2 y2)); Error
+(location (x1 y1) (x2 y2) (x3 y3) ...); Polygon
+
+C API
+
+daisy_column_location_size (column)
+daisy_column_location_x (column, index)
+daisy_column_location_y (column, index)
+
+** stof
+
+Solute::C_below bør være et Number.
+
+Kræver en Scope
+
+"default" scope for column?
+
+"default" scope for Daisy?
+
+** management
+
+** Læs vejr fra OpenMI.
+
+vejr multi
+
+vejr extern
+
+vejr table?
+
+vejr scope?
+
+ny vejr?
+
 * Artikler:
 
 ** Daisy: An open... (published, PA + SH)
@@ -35,27 +74,6 @@ Divide?
 * Farquhar
 
 ** omregn vind fra reference til aktuel overflade
-
-* OpenMI
-
-** Installer C# på x61
-
-** Få Groundwater pipe til at læse tryk fra extern kilde.
-
-** Læs vejr fra OpenMI.
-
-** column location 
-
-(location); ID
-(location (x1 y1)); Point
-(location (x1 y1) (x2 y2)); Error
-(location (x1 y1) (x2 y2) (x3 y3) ...); Polygon
-
-C API
-
-daisy_column_location_size (daisy, column)
-daisy_column_location_x (daisy, column, index)
-daisy_column_location_y (daisy, column, index)
 
 * setup.exe
 

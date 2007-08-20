@@ -44,7 +44,7 @@ struct TransportCD : public Transport
 	     std::vector<double>& M, 
 	     std::vector<double>& C,
 	     const std::vector<double>& S,
-	     std::vector<double>& J, double dt);
+	     std::vector<double>& J, double C_below, double dt);
 
   // Create.
   TransportCD (Block& al)
@@ -62,7 +62,8 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 		   std::vector<double>& M, 
 		   std::vector<double>& C,
 		   const std::vector<double>& S,
-		   std::vector<double>& J, const double dt)
+		   std::vector<double>& J, const double C_below,
+		   const double dt)
 {
   double J_in = J[0];
 
@@ -228,7 +229,8 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 
 	  // Concentration above and below current cell.
 	  const double C_minus = C[j-1];
-	  const double C_plus = (j == size - 1) ? C[j] : C[j+1];
+	  const double C_plus = (j == size - 1) ? 
+	    (C_below < 0.0 ? C[j] : C_below) : C[j+1];
 
 	  a[j] = - D_minus / (2.0 * dz_minus * dz) 
 	    + (alpha_minus * q_minus) / (2.0 * dz);

@@ -40,7 +40,8 @@ struct TransportNone : public Transport
 	     std::vector<double>& M, 
 	     std::vector<double>& C,
 	     const std::vector<double>& S,
-	     std::vector<double>& J, double dt);
+	     std::vector<double>& J,
+	     const double C_below, double dt);
 
   // Create.
   TransportNone (Block& al)
@@ -58,6 +59,7 @@ TransportNone::tick (Treelog& msg,
 		     std::vector<double>& C,
 		     const std::vector<double>& S,
 		     std::vector<double>& J,
+		     const double /* C_below */, 
                      const double dt)
 {
   Treelog::Open* nest = NULL;

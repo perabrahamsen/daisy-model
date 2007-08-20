@@ -41,6 +41,8 @@ class Output;
 class Condition;
 class Timestep;
 class Metalib;
+class Scopesel;
+class Scope;
 
 class Daisy : public Program
 {
@@ -54,6 +56,8 @@ public:
   bool running;
   const std::auto_ptr<Output> output_log;
 private:
+  const std::auto_ptr<Scopesel> scopesel;
+  mutable const Scope* extern_scope;
   const std::auto_ptr<Condition> print_time;
 public:
   Time time;

@@ -88,6 +88,7 @@ struct Movement1D : public Movement
              std::vector<double>& S_p, 
              std::vector<double>& J, 
              std::vector<double>& J_p, 
+	     double C_below,
              Adsorption& adsorption,
              double diffusion_coefficient,
              double dt,
@@ -287,6 +288,7 @@ Movement1D::solute (const Soil& soil,
         solute.M_, solute.C_, 
         solute.S_, solute.S_p_,
         solute.J, solute.J_p, 
+	solute.C_below (),
         *solute.adsorption, solute.diffusion_coefficient (), dt, msg);
 }
 
@@ -301,7 +303,7 @@ Movement1D::element (const Soil& soil,
 {
   element.tick (geo->cell_size (), soil_water, dt);
   flow (soil, soil_water, "DOM", element.M, element.C, 
-        element.S, element.S_p, element.J, element.J_p, 
+        element.S, element.S_p, element.J, element.J_p, 0.0, 
         adsorption, diffusion_coefficient, dt, msg);
 }
 
@@ -314,6 +316,7 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
                   std::vector<double>& S_p, 
                   std::vector<double>& J, 
                   std::vector<double>& J_p, 
+		  const double C_below,
                   Adsorption& adsorption,
                   double diffusion_coefficient,
                   const double dt,
@@ -325,7 +328,8 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
   if (adsorption.full ())
     {
       transport_solid->tick (msg, *geo, soil, soil_water, adsorption, 
-                             diffusion_coefficient, M, C, S, J, dt);
+                             diffusion_coefficient, M, C, S, J, C_below,
+			     dt);
       goto done;
     }
 
@@ -339,7 +343,7 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
         {
           matrix_solute[m]->tick (msg, *geo, soil, soil_water, adsorption, 
                                   diffusion_coefficient, 
-                                  M, C, S, J, dt);
+                                  M, C, S, J, C_below, dt);
           if (m > 0)
             msg.message ("Reserve model succeeded");
           goto done;

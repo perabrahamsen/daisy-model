@@ -50,7 +50,9 @@ private:
   /**/ vectorize (const Scope* first, const Scope* second);
 public:
   explicit ScopeMulti (const Scope& first, const Scope& second);
+#if 0
   explicit ScopeMulti (Block&);
+#endif
   ~ScopeMulti ();
 };
 

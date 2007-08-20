@@ -163,8 +163,9 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
   syntax.add ("C_below", "g/cm^3", Syntax::Const, "\
-Concentration below the layer of soil being examined.");
-  alist.add ("C_below", 0.0);
+Concentration below the layer of soil being examined.\n\
+Use a negative number to indicate same concentration as in lowest cell.");
+  alist.add ("C_below", -1.0);
 
   syntax.add_object ("adsorption", Adsorption::component, 
                      "Soil adsorption properties.");

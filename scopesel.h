@@ -27,6 +27,7 @@
 class Output;
 class Scope;
 class Treelog;
+class AttributeList;
 
 class Scopesel : public Model
 {
@@ -39,6 +40,9 @@ public:
   virtual Scope* lookup (const Output&, Treelog& msg) const = 0;
 
   // Create and Destroy.
+public:
+  static const AttributeList& default_model ();
+
 private:
   Scopesel (const Scopesel&);
 public:
