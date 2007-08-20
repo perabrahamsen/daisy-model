@@ -625,6 +625,15 @@ extern "C" const char* EXPORT
 daisy_column_get_name (const Column* column)
 { return column->name.name ().c_str (); }
 
+extern "C" const char* EXPORT
+daisy_column_get_description (const Column* column)
+{ 
+  const AttributeList& alist = column->alist; 
+  if (alist.check ("description"))
+    return alist.name ("description").c_str ();
+  return "";
+}
+
 extern "C" unsigned int EXPORT
 daisy_column_location_size (const Column* column)
 { return column->location ().size (); }

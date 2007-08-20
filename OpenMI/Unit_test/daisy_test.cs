@@ -25,7 +25,7 @@ namespace Unit_test
         public void Version()
         {
             string version = Daisy.Version();
-            Assert.AreEqual("4.16", version);
+            Assert.AreEqual("4.18", version);
         }
         [Test]
         public void ProgramAList()
@@ -47,7 +47,26 @@ namespace Unit_test
         {
             Daisy daisy = GetInitDaisy();
             uint columns = daisy.CountColumns();
-            Assert.AreEqual(1, columns);
+            Assert.AreEqual(2, columns);
+        }
+        
+        [Test]
+        public void GetColumnI()
+        {
+            Daisy daisy = GetInitDaisy();
+            Column col = daisy.GetColumn(0);
+            Assert.AreEqual(col.GetColumnName(), "Andeby");
+        }
+        [Test]
+        public void GetColumn()
+        {
+            Daisy daisy = GetInitDaisy();
+            string name = "Andeby";
+            if (daisy.HasColumn(name))
+            {
+                Column col = daisy.GetColumn(name);
+                Assert.AreEqual(col.GetColumnName(), "Andeby");
+            }
         }
         [Test]
         public void ScopeSize()

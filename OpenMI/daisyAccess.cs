@@ -46,7 +46,26 @@ namespace dk.ku.life.Daisy
 
         [DllImport("daisy")]
         public static extern IntPtr daisy_daisy_scope_extern_get(IntPtr daisy, int index); /* Return extern scope INDEX. */
+
+        [DllImport("daisy")]
+        public static extern IntPtr daisy_daisy_get_column (IntPtr daisy, int column); /* Extract a column, [0 <= col < size]. */
         
+        // Column
+        [DllImport("daisy")]
+        public static extern string daisy_column_get_name(IntPtr daisy_column); /* The name of the column. */
+
+        [DllImport("daisy")]
+        public static extern string daisy_column_get_description(IntPtr daisy_column); /* The name of the column. */
+
+        [DllImport("daisy")]
+        public static extern int daisy_column_location_size (IntPtr daisy_column); /* No points = ID, two points = error, three points or more = polygon */
+
+        [DllImport("daisy")]
+        public static extern double daisy_column_location_x (IntPtr daisy_column, uint index);
+
+        [DllImport("daisy")]
+        public static extern double daisy_column_location_y (IntPtr daisy_column, uint index);
+
         //time
         [DllImport("daisy")]
         public static extern int daisy_time_get_hour(IntPtr daisy_time);
@@ -165,11 +184,54 @@ namespace dk.ku.life.Daisy
                 DLL.daisy_alist_delete(alist);
             alist = (IntPtr)0;
         }
-    }   
+    }
+
+    public class Column
+    {
+        public IntPtr daisy_column;
+        
+        public Column(IntPtr col)
+        {
+            daisy_column = col;
+        }
+
+        public string GetColumnName()
+        {
+            Debug.Assert(daisy_column != (IntPtr)0);
+            return DLL.daisy_column_get_name(daisy_column); 
+        }
+
+        public string GetColumnDescription()
+        {
+            Debug.Assert(daisy_column != (IntPtr)0);
+            return DLL.daisy_column_get_description(daisy_column);
+        }
+
+        public int LocationSize()
+        {
+            Debug.Assert(daisy_column != (IntPtr)0);
+            return DLL.daisy_column_location_size(daisy_column); 
+        }
+
+        public double LocationX(uint index)
+        {
+            Debug.Assert(daisy_column != (IntPtr)0);
+            Debug.Assert(index < LocationSize());
+            return DLL.daisy_column_location_x(daisy_column, index);    
+        }
+
+        public double LocationY(uint index)
+        {
+            Debug.Assert(daisy_column != (IntPtr)0);
+            Debug.Assert(index < LocationSize());
+            return DLL.daisy_column_location_y(daisy_column, index);
+        }
+    }
 
     public class Daisy
     {
         public IntPtr daisy;
+
         static public string Version()
         {
             return DLL.daisy_version();
@@ -244,6 +306,39 @@ namespace dk.ku.life.Daisy
         {
             Debug.Assert(daisy != (IntPtr)0);
             return DLL.daisy_daisy_count_columns(daisy);
+        }
+
+        public bool HasColumn(string name)
+        {
+            Debug.Assert(daisy != (IntPtr)0);
+            uint size = DLL.daisy_daisy_count_columns(daisy);
+            for (int i = 0; i < size; i++)
+            {
+                IntPtr daisy_col = DLL.daisy_daisy_get_column(daisy, i);
+                if (name == DLL.daisy_column_get_name(daisy_col))
+                   return true;
+            }
+            return false;
+        }
+        public Column GetColumn(string name)
+        {
+            Debug.Assert(daisy != (IntPtr)0);
+            Debug.Assert(HasColumn(name));
+            uint size = DLL.daisy_daisy_count_columns(daisy);
+            for (int i = 0; i < size; i++)
+            {
+                IntPtr daisy_col = DLL.daisy_daisy_get_column(daisy, i);
+                if (name == DLL.daisy_column_get_name(daisy_col))
+                   return (new Column(daisy_col));
+            }
+            throw new ApplicationException();
+        }
+
+        public Column GetColumn(int column)
+        {
+            Debug.Assert(column < DLL.daisy_daisy_count_columns(daisy));
+            IntPtr daisy_col = DLL.daisy_daisy_get_column(daisy, column);
+            return (new Column(daisy_col));
         }
 
         public void Start()

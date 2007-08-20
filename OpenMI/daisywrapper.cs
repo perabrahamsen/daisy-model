@@ -153,30 +153,56 @@ namespace dk.ku.life.Daisy.OpenMI
             {
                 Scope scope = _daisyEngine.GetScope(i);
 
+                // Attribut column?
                 if (!scope.HasString("column"))
                     continue;
 
                 string columnID = scope.String("column");
-                string columnDescription = scope.Description("column");
+                ElementSet elementSet;
 
-                ElementSet point;
-
-                if (scope.HasNumber("x") && scope.HasNumber("y"))
+                // Daisy column?
+                if (!_daisyEngine.HasColumn(columnID))
                 {
-                    double x = scope.Number("x");
-                    double y = scope.Number("y");
-                    double z = 0;
-                    point = new ElementSet(columnDescription, columnID, ElementType.XYPoint, new SpatialReference(""));
+                    string columnDescription = scope.Description("column");
+                    elementSet = new ElementSet(columnDescription, columnID, ElementType.IDBased, new SpatialReference(""));
                     Element element = new Element(columnID);
-                    element.AddVertex(new Vertex(x, y, z));
-                    point.AddElement(element);
+                    elementSet.AddElement(element);
                 }
                 else
                 {
-                    point = new ElementSet(columnDescription, columnID, ElementType.IDBased, new SpatialReference(""));
+                    Column column = _daisyEngine.GetColumn(columnID);
+                    string columnDescription = column.GetColumnDescription();
+                    switch (column.LocationSize())
+                    {
+                        case 0:
+                            // ID based
+                            elementSet = new ElementSet(columnDescription, columnID, ElementType.XYPoint, new SpatialReference(""));
+                            break;
+                        case 1:
+                            // Point based
+                            elementSet = new ElementSet(columnDescription, columnID, ElementType.XYPoint, new SpatialReference(""));
+                            break;
+                        case 2:
+                            // Error
+                            throw new ApplicationException("Error: Column must not contain exactly two (X Y)-points!");
+                        default:
+                            // Polygon
+                            elementSet = new ElementSet(columnDescription, columnID, ElementType.XYPolygon, new SpatialReference(""));
+                            break;
+                    }
+
                     Element element = new Element(columnID);
-                    point.AddElement(element);
+                    
+                    for (uint ii = 0; ii < column.LocationSize(); ii++)
+                    {
+                        double x = column.LocationX(ii);
+                        double y = column.LocationY(ii);
+                        double z = 0.0;
+                        element.AddVertex(new Vertex(x, y, z));    
+                    }
+                    elementSet.AddElement(element);
                 }
+
                 for (uint j = 0; j < scope.NumberSize(); j++)
                 {
                     string name = scope.NumberName(j);
@@ -188,14 +214,14 @@ namespace dk.ku.life.Daisy.OpenMI
                     {
                         InputExchangeItem input = new InputExchangeItem();
                         input.Quantity = quantity;
-                        input.ElementSet = point;
+                        input.ElementSet = elementSet;
                         _inputExchangeItems.Add(input);
                     }
                     else
                     {
                         OutputExchangeItem output = new OutputExchangeItem();
                         output.Quantity = quantity;
-                        output.ElementSet = point;
+                        output.ElementSet = elementSet;
                         _outputExchangeItems.Add(output);
                     }
                 }

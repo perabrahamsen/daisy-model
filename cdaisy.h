@@ -423,6 +423,9 @@ daisy_daisy_get_column (const daisy_daisy* daisy, int col);
 EXPORT const char*              /* The name of the column. */
 daisy_column_get_name (const daisy_column* column);
 
+EXPORT const char*              /* The description of the column. */
+daisy_column_description (const daisy_column* column);
+
 EXPORT unsigned int
 daisy_column_location_size (const daisy_column* column);
 

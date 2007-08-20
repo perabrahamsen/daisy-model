@@ -26,7 +26,7 @@ namespace Unit_test
         public void CountColumns()
         {
             DaisyWrapper daisy = GetInitDaisy();
-            Assert.AreEqual(1, daisy.CountColumns());
+            Assert.AreEqual(2, daisy.CountColumns());
         }
         [Test]
         public void IsRunning()
@@ -114,7 +114,8 @@ namespace Unit_test
         {
             DaisyWrapper Daisy = GetInitDaisy();
             Assert.AreEqual("Simulation for use in tutorial.", Daisy.GetModelDescription());
-            Assert.AreEqual("Daisy version 4.16", Daisy.GetComponentDescription());
+            Assert.AreEqual("Daisy version 4.18", Daisy.GetComponentDescription());
+            Assert.AreEqual("Simulation for use in tutorial.", Daisy.GetDescription());
         }
         [Test]
         public void GetMissingValueDefinition()
@@ -150,14 +151,14 @@ namespace Unit_test
        public void GetInputExchangeItem()
        {
            DaisyWrapper Daisy = GetInitDaisy();
-           int item = 2;
+           int item = 0;
            Assert.AreEqual("GroundWaterTable", Daisy.GetInputExchangeItem(item).Quantity.ID);
            Assert.AreEqual("cm", Daisy.GetInputExchangeItem(item).Quantity.Unit.ID);
            Assert.AreEqual("Ground water table.", Daisy.GetInputExchangeItem(item).Quantity.Description);
            Assert.AreEqual(org.OpenMI.Standard.ElementType.XYPoint, Daisy.GetInputExchangeItem(item).ElementSet.ElementType);
            Assert.AreEqual(1, Daisy.GetInputExchangeItem(item).ElementSet.GetVertexCount(0));
-           Assert.AreEqual(-16, Daisy.GetInputExchangeItem(item).ElementSet.GetXCoordinate(0, 0));
-           Assert.AreEqual(4200.8, Daisy.GetInputExchangeItem(item).ElementSet.GetYCoordinate(0, 0));
+           Assert.AreEqual(-10, Daisy.GetInputExchangeItem(item).ElementSet.GetXCoordinate(0, 0));
+           Assert.AreEqual(100, Daisy.GetInputExchangeItem(item).ElementSet.GetYCoordinate(0, 0));
        }
        [Test]
        public void GetOutputExchangeItem()
@@ -169,11 +170,12 @@ namespace Unit_test
            Assert.AreEqual("<none>", Daisy.GetOutputExchangeItem(1).Quantity.Unit.ID);
            Assert.AreEqual("Crop AI", Daisy.GetOutputExchangeItem(4).Quantity.ID);
            Assert.AreEqual("m^2/m^2", Daisy.GetOutputExchangeItem(4).Quantity.Unit.ID);
-           Assert.AreEqual(-16, Daisy.GetOutputExchangeItem(0).ElementSet.GetXCoordinate(0, 0));
-           Assert.AreEqual(-16, Daisy.GetOutputExchangeItem(1).ElementSet.GetXCoordinate(0, 0));
-           Assert.AreEqual(4200.8, Daisy.GetOutputExchangeItem(1).ElementSet.GetYCoordinate(0, 0));
-           Assert.AreEqual(-16, Daisy.GetOutputExchangeItem(4).ElementSet.GetXCoordinate(0, 0));
-           Assert.AreEqual(4200.8, Daisy.GetOutputExchangeItem(4).ElementSet.GetYCoordinate(0, 0));
+           Assert.AreEqual(-10, Daisy.GetOutputExchangeItem(0).ElementSet.GetXCoordinate(0, 0));
+           Assert.AreEqual(100, Daisy.GetOutputExchangeItem(0).ElementSet.GetYCoordinate(0, 0));
+           Assert.AreEqual(-10, Daisy.GetOutputExchangeItem(1).ElementSet.GetXCoordinate(0, 0));
+           Assert.AreEqual(100, Daisy.GetOutputExchangeItem(1).ElementSet.GetYCoordinate(0, 0));
+           Assert.AreEqual(-10, Daisy.GetOutputExchangeItem(4).ElementSet.GetXCoordinate(0, 0));
+           Assert.AreEqual(100, Daisy.GetOutputExchangeItem(4).ElementSet.GetYCoordinate(0, 0));
 
        }
     }

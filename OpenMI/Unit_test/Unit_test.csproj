@@ -34,9 +34,12 @@
     <Reference Include="org.OpenMI.Standard, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
     <Reference Include="org.OpenMI.Utilities.Wrapper, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="alist_test.cs" />
+    <Compile Include="column_test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="daisyWrapper_test.cs" />
     <Compile Include="daisy_test.cs" />
