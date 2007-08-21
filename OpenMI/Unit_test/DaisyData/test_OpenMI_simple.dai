@@ -4,8 +4,10 @@
 ;; Location of input files:
 (path "." "C:/Programmer/Daisy/daisy-src/lib/" )
 
+;; Use standard parameterizations.
+(input file "tillage.dai")
+(input file "crop.dai")
 (input file "log.dai")
-
 
 ;; Weather data - no weather.
 (weather none)

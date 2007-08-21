@@ -117,6 +117,8 @@ namespace dk.ku.life.Daisy.OpenMI
         new DimTab ("mm/h", "millimeter per hour", 1, 0, -1, 0, 0, 1e-3/(60*60), 0),
         new DimTab ("mm/d", "millimeter per day", 1, 0, -1, 0, 0, 1e-3/(24*60*60), 0),
         new DimTab ("Mg DM/ha", "megagram DM per hectar", -2, 1, 0, 0, 0, 1e3*1e-4, 0),
+        new DimTab ("g/cm^3", "gram per cubic centimeter", -3, 1, 0, 0, 0, 1e-3*1e6, 0),
+        new DimTab ("g/cm^2/h", "gram per square centimeter", -2, 1, -1, 0, 0, 1e-3*1e4/(60*60), 0),
         new DimTab ("dg C", "degree Celcius", 0, 0, 0, 1, 0, 1, 273.15)
     };
         public Quantity Quantity(string dimension, string description, string name)

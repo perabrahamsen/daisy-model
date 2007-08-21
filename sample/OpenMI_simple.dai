@@ -1,0 +1,86 @@
+;;; OpenMI_simple.dai -- Example of two columns with bare soil for OpenMI coupling 
+
+(description "Simulation for use in simple OpenMI coupling with two soil columns and bare soil.")
+
+;; Location of input files:
+(path "." "C:/Programmer/Daisy/daisy-src/lib/" )
+
+;; Use standard parameterizations.
+(input file "OpenMi.dai")
+(input file "log.dai")
+
+;; Weather data - no weather.
+(weather none)
+
+;; We have some very sandy soil.
+(defhorizon Ap FAO3
+  "Top soil."
+  (clay 8.0 [%])
+  (silt 10.5 [%])
+  (sand 81.5 [%])
+  (humus 1.12 [%])
+  (C_per_N 11.0 [g C/g N])
+  (dry_bulk_density 1.5 [g/cm^3]))
+
+(defhorizon C Ap
+  "C horizon."
+  (humus 0.12 [%]))
+
+;; We build the column from the horizons.
+;; Andeby soil:
+(defcolumn Andeby default
+  "The B.And farm, Andeby, 2002."
+  ;; Location (X Y) point
+  (location (-10 100))
+  ;; Extern input
+  (scope name "Lower_boundary_input_Andeby")
+  ;; Daisy use solute NO3 concentration in lower boundary given by: 
+  (SoilNO3 (C_below "NO3 conc. groundwater"))
+  ;; Daisy use groundwater table from OpenMI with the pipe model below:
+  (Groundwater pipe (pressure_table extern 
+				    (value "GroundWaterTable")
+				    (initial_value -200 [cm])))
+  (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+    	(MaxRootingDepth 60.0 [cm]))
+  (OrganicMatter original (init (input 1400 [kg C/ha/y])))
+  (Bioclimate default))
+
+;; Gaaseroed soil
+(defcolumn Gaaseroed Andeby
+  "The S.Goose farm, Gaaseroed, 2002."
+  ;; Location given as more than two (X Y) points = polygon
+  (location (100 100)(90 100)(90 90))
+  ;; Extern input
+  (scope name "Lower_boundary_input_Gaaseroed")
+  ;; Daisy use groundwater table from OpenMI with the model below:
+  (Groundwater extern 
+	       (table "GroundWaterTable")
+               (initial_table -200 [cm]))
+  )
+
+;; Use these columns:
+(column Andeby Gaaseroed)
+
+;; Simulation period.
+(time 1986 12 1 1)
+(stop 1988 4 1 1)
+
+;; Simulation of bare soil 
+(manager activity)
+
+;; Export these items through OpenMI.
+(output (Lower_boundary_output (column Andeby))
+	(Lower_boundary_output (column Gaaseroed))
+	;; An ordinary log file:
+        ("Soil Water Potential" (column Andeby)))
+
+(defscope Lower_boundary_input_Andeby Lower_boundary_input 
+  (column Andeby))
+(defscope Lower_boundary_input_Gaaseroed Lower_boundary_input 
+  (column Gaaseroed))
+
+;; Import these items through OpenMI.
+(exchange (Lower_boundary_input_Andeby)
+	  (Lower_boundary_input_Gaaseroed))
+
+;;; OpenMI_simple.dai ends here.

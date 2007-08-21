@@ -97,7 +97,7 @@ static struct rubiscoNdistDPFSyntax
 
     syntax.add ("f_photo", Syntax::None (), Check::positive (), Syntax::Const,
                 "Fraction of photosynthetically active N in canopy. According to (Boegh et al., 2002) f_photo = 0.75. However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
-    alist.add ("f_photo", 1.0);
+    alist.add ("f_photo", 1.00);
   }  
 
   rubiscoNdistDPFSyntax ()
