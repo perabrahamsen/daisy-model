@@ -33,10 +33,10 @@ class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
-class Output;
 class Block;
 class Syntax;
 class AttributeList;
+class Scope;
 
 class Groundwater : public Model
 {
@@ -62,7 +62,7 @@ public:
 public:
   virtual void tick (const Geometry& geo,
                      const Soil&, SoilWater&, double h_surface /* [cm] */,
-		     const SoilHeat&, const Time&, Treelog&) = 0;
+		     const SoilHeat&, const Time&, const Scope&, Treelog&) = 0;
   virtual void output (Log&) const;
 
   // Accessors.
@@ -72,9 +72,9 @@ public:
     // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  virtual void initialize (const Output&, 
-                           const Geometry&, const Time& time, Treelog&) = 0;
-  virtual bool check (Treelog&) const;
+  virtual void initialize (const Geometry&, const Time&, 
+			   const Scope&, Treelog&) = 0;
+  virtual bool check (const Scope&, Treelog&) const = 0;
 protected:
   Groundwater (Block& al);
 public:

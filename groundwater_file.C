@@ -56,14 +56,16 @@ public:
 public:
   void tick (const Geometry&,
              const Soil&, SoilWater&, double, const SoilHeat&,
-	     const Time& time, Treelog& msg)
+	     const Time& time, const Scope&, Treelog& msg)
   { tick (time, msg); }
   void tick (const Time&, Treelog&);
   double table () const;
 
   // Create and Destroy.
 public:
-  void initialize (const Output&, const Geometry&, const Time& time, Treelog&);
+  void initialize (const Geometry&, const Time& time, const Scope&, Treelog&);
+  bool check (const Scope&, Treelog&) const
+  { return true; }
   GroundwaterFile (Block&);
   ~GroundwaterFile ();
 };
@@ -144,12 +146,12 @@ GroundwaterFile::table () const
 }
 
 void
-GroundwaterFile::initialize (const Output&, const Geometry&, const Time& time,
-			     Treelog& err)
+GroundwaterFile::initialize (const Geometry&, const Time& time, const Scope&, 
+			     Treelog& msg)
 {
   daisy_assert (lex == NULL);
-  lex = new LexerData (file_name, err);
-  tick (time, err); 
+  lex = new LexerData (file_name, msg);
+  tick (time, msg); 
 }
 
 GroundwaterFile::GroundwaterFile (Block& al)

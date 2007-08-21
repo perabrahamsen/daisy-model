@@ -45,15 +45,17 @@ public:
 public:
   void tick (const Geometry&,
              const Soil&, SoilWater&, double, 
-	     const SoilHeat&, const Time&, Treelog&)
+	     const SoilHeat&, const Time&, const Scope&, Treelog&)
   { }
   double table () const
   { return depth; }
 
   // Create and Destroy.
 public:
-  void initialize (const Output&, const Geometry&, const Time&, Treelog&)
+  void initialize (const Geometry&, const Time&, const Scope&, Treelog&)
   { }
+  bool check (const Scope&, Treelog&) const
+  { return true; }
   GroundwaterFixed (Block& al)
     : Groundwater (al),
       depth (al.number ("table"))

@@ -36,29 +36,28 @@ bool
 Number::known (symbol dim)
 { return dim != Syntax::unknown (); }
 
-void 
-Number::tick_value (double& value, symbol want, const double missing_value,
-		    const Scope& scope, Treelog& msg)
+bool 
+Number::tick_value (double& value, symbol want, const Scope& scope, 
+		    Treelog& msg)
 { 
   this->tick (scope, msg);
   if (this->missing (scope))
-    value = missing_value;
-  else 
-    {
-      value = this->value (scope);
-      const symbol has = this->dimension (scope);
+    return false;
+
+  value = this->value (scope);
+  const symbol has = this->dimension (scope);
       
-      if (!Units::can_convert (has, want, value))
-	{
-	  std::ostringstream tmp;
-	  tmp << "Cannot convert " << value << " [" << has
-	      << "] to [" << want << "]";
-	  msg.warning (tmp.str ());
-	  value = missing_value;
-	}
-      else
-	value = Units::convert (has, want, value);
+  if (!Units::can_convert (has, want, value))
+    {
+      std::ostringstream tmp;
+      tmp << "Cannot convert " << value << " [" << has
+	  << "] to [" << want << "]";
+      msg.warning (tmp.str ());
     }
+  else
+    value = Units::convert (has, want, value);
+  
+  return true;
 }
 
 bool 

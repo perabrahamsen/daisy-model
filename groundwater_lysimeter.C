@@ -43,15 +43,17 @@ public:
   // Simulation.
 public:
   void tick (const Geometry&, const Soil&, SoilWater&, double, 
-	     const SoilHeat&, const Time&, Treelog&)
+	     const SoilHeat&, const Time&, const Scope&, Treelog&)
   { }
   double table () const
   { return location; }
 
   // Create and Destroy.
 public:
-  void initialize (const Output&, const Geometry& geo, const Time&, Treelog&)
+  void initialize (const Geometry& geo, const Time&, const Scope&, Treelog&)
   { location = geo.bottom (); }
+  bool check (const Scope&, Treelog&) const
+  { return true; }
 
   GroundwaterLysimeter (Block& al)
     : Groundwater (al),

@@ -673,7 +673,7 @@ ColumnStandard::tick (const Time& time, const double dt,
   // Transport.
   groundwater->tick (geometry, *soil, *soil_water, 
                      surface.ponding () * 0.1, 
-                     *soil_heat, time, msg);
+                     *soil_heat, time, scope, msg);
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, my_weather, dt, msg);
   soil_water->tick_after (geometry.cell_size (), *soil, *soil_heat, msg);
@@ -741,7 +741,7 @@ ColumnStandard::check (bool require_weather,
   }
   {
     Treelog::Open nest (msg, "Groundwater: " + groundwater->name);
-    if (!groundwater->check (msg))
+    if (!groundwater->check (scope, msg))
       ok = false;
   }
   {
@@ -945,7 +945,7 @@ ColumnStandard::initialize (Block& block,
   residuals_C_soil.insert (residuals_C_soil.begin (), soil->size (), 0.0);
   daisy_assert (residuals_C_soil.size () == soil->size ());
 
-  groundwater->initialize (output, geometry, time, msg);
+  groundwater->initialize (geometry, time, scope, msg);
   soil_water->initialize (alist.alist ("SoilWater"), 
                           geometry, *soil, *groundwater, msg);
   if (alist.check ("Movement"))

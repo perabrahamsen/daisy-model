@@ -87,7 +87,7 @@ public:
 public:
   void tick (const Geometry& geo,
              const Soil&, SoilWater&, double,
-	     const SoilHeat&, const Time&, Treelog&);
+	     const SoilHeat&, const Time&, const Scope&, Treelog&);
   void output (Log& log) const;
 
 private:
@@ -109,8 +109,8 @@ private:
 
   // Create and Destroy.
 public:
-  void initialize (const Output& output, 
-                   const Geometry& geo, const Time& time, Treelog& msg)
+  void initialize (const Geometry& geo, const Time& time,
+		   const Scope& scope, Treelog& msg)
   {
     const int size = geo.cell_size ();
     double largest = 0.0;
@@ -136,17 +136,17 @@ public:
                                                    + h_aquifer));
         pressure_table = depth;
       }
-    pressure_table->initialize (output, msg);
+    pressure_table->initialize (msg);
     // Pressure below aquitard.
-    if (pressure_table->check (msg))
+    if (pressure_table->check (scope, msg))
       set_h_aquifer (geo);
     else
       pressure_table.reset (NULL);
   }
-  bool check (Treelog& msg) const
+  bool check (const Scope& scope, Treelog& msg) const
   {
     if (pressure_table.get ())
-      return pressure_table->check (msg); 
+      return pressure_table->check (scope, msg); 
     msg.error ("No pressure table");
     return false;
   }
@@ -178,7 +178,7 @@ GroundwaterPipe::tick (const Geometry& geo,
                        const Soil& soil, SoilWater& soil_water, 
 		       const double h_surface,
 		       const SoilHeat& soil_heat, const Time& time,
-                       Treelog& msg)
+                       const Scope& scope, Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
 
@@ -186,7 +186,7 @@ GroundwaterPipe::tick (const Geometry& geo,
   fill (S.begin (), S.end (), 0.0);
   
   // Virtual pressure table.
-  pressure_table->tick (time, msg);
+  pressure_table->tick (time, scope, msg);
   set_h_aquifer (geo);
 
   // Find groundwater height.

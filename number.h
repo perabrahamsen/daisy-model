@@ -43,8 +43,7 @@ public:
 protected:
   static bool known (const symbol);
 public:
-  void tick_value (double& value, symbol dim, const double missing_value,
-		   const Scope& , Treelog&);
+  bool tick_value (double& value, symbol dim, const Scope& , Treelog&);
   virtual void tick (const Scope& scope, Treelog& msg) = 0;
   virtual bool missing (const Scope& scope) const = 0;
   virtual double value (const Scope&) const = 0; 

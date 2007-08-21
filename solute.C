@@ -112,7 +112,8 @@ Solute::tick (const size_t cell_size,
 	      Treelog& msg)
 {
   // Find C below.
-  C_below_expr->tick_value (C_below_value, g_per_cm3, -1.0, scope, msg);
+  if (!C_below_expr->tick_value (C_below_value, g_per_cm3, scope, msg))
+    C_below_value = -1.0;
 
   // Assert no negative mass.
   for (unsigned i = 0; i < cell_size; i++)

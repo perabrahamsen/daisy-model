@@ -62,13 +62,13 @@ struct DepthConst : public Depth
 {
   const double value;
   
-  void tick (const Time&, Treelog&)
+  void tick (const Time&, const Scope&, Treelog&)
   { }
   double operator()() const
   { return value; }
-  void initialize (const Output&, Treelog&)
+  void initialize (Treelog&)
   { }
-  virtual bool check (Treelog&) const
+  virtual bool check (const Scope&, Treelog&) const
   { return true; }
   DepthConst (Block& al)
     : Depth (al),
@@ -107,64 +107,34 @@ static struct DepthConstSyntax
 struct DepthExtern : public Depth
 {
   // Content.
-  const std::auto_ptr<Scopesel> scopesel;
   const std::auto_ptr<Number> expr;
-  Scope* scope;
   double value;
 
-  void tick (const Time&, Treelog& msg)
+  void tick (const Time&, const Scope& scope, Treelog& msg)
   { 
-    expr->tick (*scope, msg);
-    
-    if (expr->missing (*scope))
-      {
-        if (!approximate (value, 42.0))
-          {
-            msg.error ("External depth not found");
-            value = 42.0;
-          }
-      }
-    else 
-      {
-        value = expr->value (*scope);
-        const symbol dim = expr->dimension (*scope);
-
-        if (!Units::can_convert (dim.name (), "cm", value))
-          {
-            std::ostringstream tmp;
-            tmp << "Cannot convert " << value << " [" << dim << "] to [cm]";
-            msg.warning (tmp.str ());
-            value = 1.0;
-          }
-        else
-          value = Units::convert (dim.name (), "cm", value);
-      }
+    if (!expr->tick_value (value, Units::cm, scope, msg))
+      if (!approximate (value, 42.0))
+	{
+	  msg.error ("External depth not found");
+	  value = 42.0;
+	}
   }
 
   double operator()() const
   { return value; }
     
-  void initialize (const Output& output, Treelog& msg)
-  {
-    scope = scopesel->lookup (output, msg);
-    expr->initialize (msg);
-  }
+  void initialize (Treelog& msg)
+  { expr->initialize (msg); }
 
-  virtual bool check (Treelog& msg) const
+  virtual bool check (const Scope& scope, Treelog& msg) const
   { 
     bool ok = true;
-    if (!scope)
-      {
-        msg.error ("No matching scope found");
-        ok = false;
-      }
-    else if (!expr->check_dim (*scope, Units::cm, msg))
+    if (!expr->check_dim (scope, Units::cm, msg))
       ok = false;
     return ok;
   }
   DepthExtern (Block& al)
     : Depth (al),
-      scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       expr (Librarian::build_item<Number> (al, "value")),
       value (al.number ("initial_value", -42.42e42))
   { }
@@ -203,16 +173,16 @@ struct DepthPLF : public Depth
   PLF value;
   double current_value;
 
-  void  tick (const Time& time, Treelog&)
+  void  tick (const Time& time, const Scope&, Treelog&)
   { current_value = value (Time::hours_between (start, time)); }
 
   double operator()() const
   { return current_value; }
 
   
-  void initialize (const Output&, Treelog&)
+  void initialize (Treelog&)
   { }
-  virtual bool check (Treelog&) const
+  virtual bool check (const Scope&, Treelog&) const
   { return true; }
   static PLF convert_to_plf (const std::vector<AttributeList*>& table)
   {
@@ -304,7 +274,7 @@ struct DepthFile : public Depth
   PLF value;
   double current_value;
 
-  void tick (const Time& time, Treelog&)
+  void tick (const Time& time, const Scope&, Treelog&)
   { 
     daisy_assert (state == State::ok);
     current_value = value (Time::hours_between (start, time)); 
@@ -339,7 +309,7 @@ struct DepthFile : public Depth
       time = Time (year, month, day, 23);
       return true;
   }
-  void initialize (const Output&, Treelog& msg)
+  void initialize (Treelog& msg)
   { 
     daisy_assert (state == State::uninitialized);
     LexerData lex (file, msg);
@@ -391,7 +361,7 @@ struct DepthFile : public Depth
     else 
       state = State::ok;
   }
-  virtual bool check (Treelog&) const
+  virtual bool check (const Scope&, Treelog&) const
   { return state == State::ok; }
   DepthFile (Block& al)
     : Depth (al),

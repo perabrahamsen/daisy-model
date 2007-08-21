@@ -971,14 +971,15 @@ photo${OBJ}: photo.C photo.h model.h symbol.h block.h syntax.h treelog.h \
 format${OBJ}: format.C format.h model.h symbol.h assertion.h block.h syntax.h \
   treelog.h plf.h librarian.h
 depth${OBJ}: depth.C depth.h model.h symbol.h block.h syntax.h treelog.h \
-  plf.h alist.h time.h lexer_data.h lexer.h check.h vcheck.h assertion.h \
-  librarian.h
+  plf.h alist.h time.h lexer_data.h lexer.h output.h condition.h \
+  memutils.h scopesel.h scope.h number.h units.h check.h vcheck.h \
+  assertion.h librarian.h mathlib.h
 wse${OBJ}: wse.C wse.h model.h symbol.h block.h syntax.h treelog.h plf.h \
   alist.h program.h run.h mathlib.h assertion.h librarian.h
 program${OBJ}: program.C program.h model.h symbol.h run.h block.h syntax.h \
   treelog.h plf.h librarian.h
 number${OBJ}: number.C number.h symbol.h model.h block.h syntax.h treelog.h \
-  plf.h librarian.h
+  plf.h librarian.h units.h
 domsorp${OBJ}: domsorp.C domsorp.h model.h symbol.h block.h syntax.h \
   treelog.h plf.h librarian.h
 chemistry${OBJ}: chemistry.C chemistry.h model.h symbol.h block.h syntax.h \
@@ -1020,7 +1021,7 @@ weather${OBJ}: weather.C weather.h model.h im.h symbol.h block.h syntax.h \
   treelog.h plf.h fao.h time.h log.h border.h alist.h mathlib.h \
   assertion.h librarian.h
 column${OBJ}: column.C column.h model.h alist.h symbol.h block.h syntax.h \
-  treelog.h plf.h log.h border.h librarian.h
+  treelog.h plf.h log.h border.h librarian.h submodeler.h assertion.h
 crop${OBJ}: crop.C crop.h time.h alist.h symbol.h model.h om.h plf.h block.h \
   syntax.h treelog.h mathlib.h assertion.h librarian.h
 action${OBJ}: action.C action.h model.h alist.h symbol.h block.h syntax.h \
@@ -1206,7 +1207,7 @@ parser_file${OBJ}: parser_file.C parser_file.h parser.h model.h symbol.h \
   units.h mathlib.h assertion.h memutils.h librarian.h
 solute${OBJ}: solute.C solute.h adsorption.h model.h symbol.h log.h border.h \
   alist.h block.h syntax.h treelog.h plf.h geometry.h mathlib.h \
-  assertion.h soil.h soil_water.h librarian.h
+  assertion.h soil.h soil_water.h number.h librarian.h units.h
 geometry${OBJ}: geometry.C geometry.h syntax.h treelog.h symbol.h mathlib.h \
   assertion.h volume.h model.h alist.h check.h vcheck.h
 printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
@@ -1280,7 +1281,7 @@ daisy${OBJ}: daisy.C daisy.h program.h model.h symbol.h run.h time.h \
   alist.h log.h border.h parser.h nitrification.h bioclimate.h \
   hydraulic.h syntax.h treelog.h field.h harvest.h block.h plf.h action.h \
   timestep.h vcheck.h library.h submodeler.h assertion.h column.h scope.h \
-  mathlib.h librarian.h
+  scopesel.h mathlib.h librarian.h
 alist${OBJ}: alist.C plf.h library.h symbol.h alist.h syntax.h treelog.h \
   time.h mathlib.h assertion.h memutils.h
 syntax${OBJ}: syntax.C syntax.h treelog.h symbol.h alist.h library.h \
@@ -1316,7 +1317,10 @@ photo_FCC4${OBJ}: photo_FCC4.C photo_Farquhar.h photo.h model.h symbol.h \
   rubiscoNdist.h alist.h ABAeffect.h bioclimate.h canopy_std.h \
   canopy_simple.h plf.h phenology.h log.h border.h syntax.h treelog.h \
   block.h submodel.h mathlib.h assertion.h check.h librarian.h
-msoltranrect_Mollerup${OBJ}: msoltranrect_Mollerup.C
+msoltranrect_Mollerup${OBJ}: msoltranrect_Mollerup.C msoltranrect.h model.h \
+  symbol.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
+  mathlib.h assertion.h soil.h soil_water.h adsorption.h alist.h \
+  submodeler.h block.h plf.h memutils.h librarian.h
 reaction_std${OBJ}: reaction_std.C reaction.h model.h alist.h symbol.h \
   block.h syntax.h treelog.h plf.h transform.h chemistry.h chemical.h \
   solute.h adsorption.h soil.h log.h border.h assertion.h librarian.h
@@ -1325,9 +1329,8 @@ chemistry_std${OBJ}: chemistry_std.C chemistry.h model.h symbol.h chemical.h \
   treelog.h mathlib.h assertion.h soil.h soil_water.h block.h plf.h \
   vcheck.h log.h border.h memutils.h librarian.h
 groundwater_extern${OBJ}: groundwater_extern.C groundwater.h model.h symbol.h \
-  output.h condition.h alist.h memutils.h scopesel.h scope.h number.h \
-  block.h syntax.h treelog.h plf.h units.h check.h assertion.h \
-  librarian.h
+  output.h condition.h alist.h memutils.h number.h block.h syntax.h \
+  treelog.h plf.h units.h check.h assertion.h librarian.h
 msoltranrect_none${OBJ}: msoltranrect_none.C msoltranrect.h model.h symbol.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil.h soil_water.h adsorption.h alist.h submodeler.h \
@@ -1397,13 +1400,13 @@ boolean_string${OBJ}: boolean_string.C boolean.h model.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h librarian.h
 movement_rect${OBJ}: movement_rect.C movement.h model.h symbol.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
-  assertion.h soil.h soil_water.h soil_heat.h msoltranrect.h \
-  groundwater.h surface.h uzmodel.h weather.h im.h uzrect.h check.h \
-  alist.h submodeler.h block.h plf.h memutils.h librarian.h
+  assertion.h soil.h soil_water.h soil_heat.h msoltranrect.h solute.h \
+  adsorption.h groundwater.h surface.h uzmodel.h weather.h im.h uzrect.h \
+  check.h alist.h submodeler.h block.h plf.h memutils.h librarian.h
 number_soil${OBJ}: number_soil.C number.h symbol.h model.h metalib.h \
   library.h block.h syntax.h treelog.h plf.h column.h alist.h horizon.h \
   hydraulic.h weather.h im.h output.h condition.h memutils.h time.h \
-  units.h librarian.h
+  units.h librarian.h scope.h
 organic_none${OBJ}: organic_none.C organic_matter.h model.h symbol.h alist.h \
   geometry.h syntax.h treelog.h mathlib.h assertion.h librarian.h
 organic_std${OBJ}: organic_std.C organic_matter.h model.h symbol.h syntax.h \
@@ -1658,7 +1661,7 @@ column_std${OBJ}: column_std.C column.h model.h alist.h symbol.h library.h \
   vegetation.h bioclimate.h weather.h im.h chemistry.h soil_NH4.h \
   solute.h adsorption.h soil_NO3.h organic_matter.h denitrification.h \
   plf.h am.h dom.h time.h log.h border.h submodeler.h block.h memutils.h \
-  librarian.h
+  librarian.h scope_multi.h scope.h scopesel.h
 weather_simple${OBJ}: weather_simple.C weather_old.h weather.h model.h im.h \
   symbol.h block.h syntax.h treelog.h plf.h time.h log.h border.h alist.h \
   mathlib.h assertion.h librarian.h
