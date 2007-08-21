@@ -1,0 +1,200 @@
+;;; test_OpenMI_simple_2.dai -- Testfile for OpenMI coupling 
+
+(description "Simulation for use in simple OpenMI coupling.")
+;; Location of input files:
+(path "." "C:/Programmer/Daisy/daisy-src/lib/" )
+
+(input file "log.dai")
+
+
+;; Weather data - no weather.
+(weather none)
+
+;; We have some very sandy soil.
+(defhorizon Ap FAO3
+  "Andeby top soil."
+  (clay 8.0 [%])
+  (silt 10.5 [%])
+  (sand 81.5 [%])
+  (humus 1.12 [%])
+  (C_per_N 11.0 [g C/g N])
+  (dry_bulk_density 1.5 [g/cm^3]))
+
+
+;; We build the column from the horizons.
+(defcolumn Andeby default
+  "The B.And farm, Andeby, 2002."
+  (Soil (horizons (-2.50 [m] Ap))
+    	(MaxRootingDepth 60.0 [cm]))
+  ;;(Groundwater deep)
+  ;; Daisy does not use groundwater table from OpenMI unless you choose the model below,
+  ;; which may not work fully yet.
+  (Groundwater extern 
+               (scope name "Groundwater_table") 
+               (table "GroundWaterTable")
+               (initial_table -200 [cm]))
+  (Bioclimate default))
+
+;; Use it.
+(column Andeby)
+
+;; Simulation period.
+(time 1986 12 1 1)
+(stop 1988 4 1 1)
+
+;; Simulation of bare soil 
+(manager activity
+	 (repeat (extern (name fertigation) 
+			 (if (extern (name fertigation)
+				     (> "Surface Irrigation" 0.0 [mm/h]))
+			     (irrigate_surface "Surface Irrigation")))))
+
+;; Output exchange items
+(deflog OpenMI_output extern
+  (parameter_names column crop)
+  (declare x Number "x-coordinate of column")
+  (declare y Number "y-coordinate of column")
+  (numbers ((name x) (value $x))
+           ((name y) (value $y)))
+  (declare column String "Name of column to log output")
+  (declare crop String "Crop growth parameters to log output")
+  (crop "*")
+  (when (hourly)))
+
+(deflog Matrix_percolation OpenMI_output
+  (numbers &old ((name "Matrix percolation") (value 0.0)))
+  (entries (flux_bottom (tag "Matrix percolation")
+			(description "This is the amount of water leaving Daisy through the soil bottom.")
+			(path column "${column}" SoilWater q)
+			(spec fixed SoilWater q)
+			(negate true)) ; positive flux downwards
+	   )
+  )
+
+(deflog Crop_soil_content OpenMI_output
+  (numbers &old ((name "Crop growth and soil content") (value 0.0)))
+  (entries (number (tag "DS")
+		   (description "Development stage of crop")
+		   (path column "${column}" Vegetation crops crops "${crop}" 
+			 Devel "*" DS)
+		   (dimension "none")
+		   (factor 1.0))        ;Development stage [-1:2]
+	   (number (tag "DM leaf")
+		   (description "Dry matter production of leaf")
+		   (path column "${column}" Vegetation crops crops "${crop}"Prod WLeaf)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))
+           (number (tag "DM dead")
+		   (description "Dry matter production of dead leaves")
+		   (path column "${column}" Vegetation crops crops "${crop}"Prod WDead)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))
+           (number (tag "DM stem")
+		   (description "Dry matter production of stem")
+		   (path column "${column}" Vegetation crops crops "${crop}"Prod WStem)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))
+           (number (tag "DM SOrg")
+		   (description "Dry matter production of storage organ")
+		   (path column "${column}" Vegetation crops crops "${crop}"Prod WSOrg)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))
+           (number (tag "DM root")
+		   (description "Dry matter production of root")
+		   (path column "${column}" Vegetation crops crops "${crop}"Prod WRoot)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))
+	   (number (tag "NCropAct")
+		   (description "Actual content of crop N")
+		   (path column "${column}" Vegetation crops crops "*" Prod NCrop)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+	   (number (tag "NCropCr")
+		   (description "Critical content of crop N")
+		   (path column "${column}" Vegetation crops crops "*" CrpN CrNCnt)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+	   (number (tag "NCropPt")
+		   (description "Potential (optimal) content of crop N")
+		   (path column "${column}" Vegetation crops crops "*" CrpN PtNCnt)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (tag "Harvest_N")
+		   (description "Harvest crop N")
+		   (path column "${column}" harvest_N)
+                   (handle sum)
+		   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg N/ha/&"))
+	   (interval (tag "NH4")
+		     (description "Soil content of NH4")
+                     (path column "${column}" SoilNH4 M)
+                     (spec fixed SoilNH4 M)
+                     (dimension "kg N/ha"))
+           (interval (tag "NO3")
+		     (description "Soil content of NO3")
+                     (path column "${column}" SoilNO3 M)
+                     (spec fixed SoilNO3 M)
+                     (dimension "kg N/ha"))
+           (interval (tag "ORG_N")
+		     (description "Soil content of organic N")
+                     (path column "${column}" OrganicMatter "*" total_N)
+                     (spec organic default total_N)
+                     (dimension "kg N/ha"))
+	   )
+  )
+
+;; Export these items through OpenMI.
+(output (Matrix_percolation (column Andeby) (x -16) (y 4200.8))
+	(Crop_soil_content (column Andeby) (x -16) (y 4200.8) (to -50 [cm]))
+        ("Soil Water Potential" (column Andeby)))
+
+;; Input exchange items
+(defscope OpenMI_input exchange
+   "An exchange table for a specific column."
+   (declare column String "Name of column to log input.")
+   (column "*")
+   (declare crop String "Crop growth parameters")
+   (crop "*")
+   (declare x Number "x-coordinate of column")
+   (declare y Number "y-coordinate of column")
+   (entries (name (name column) (value "${column}"))
+	    (name (name crop) (value "${crop}"))
+            (number (name x) (value $x) (dimension [none]))
+            (number (name y) (value $y) (dimension [none]))))
+
+ 
+(defscope Groundwater_table OpenMI_input
+   (entries &old
+            (number (name "GroundWaterTable")
+                    (description "Ground water table. Value zero corresponds to soil surface, negative values are below surface.")
+		    (dimension [cm]))
+	    ))
+
+(defscope fertigation OpenMI_input
+  (entries &old
+	    (number (name "Overhead Irrigation")
+		    (description "Irrigation of soil and leaves by sprinkling")
+		    (dimension "mm/h")
+		    (value 5.0))
+	    (number (name "Surface Irrigation")
+		    (description "Irrigation of surface soil by tubes")
+		    (dimension "mm/h")
+		    (value 5.0))
+	    (number (name "Subsoil Irrigation")
+		    (description "Irrigation by tubes inside the soil")
+		    (dimension "mm/h"))
+	    (number (name "NO3 input")
+		    (description "Amount of NO3-N applied")
+		    (dimension "kg N/ha/h"))
+	    (number (name "NH4 input")
+		    (description "Amount of NH4-N applied")
+		    (dimension "kg N/ha/h"))
+		    )
+   )
+ 
+;; Import these items through OpenMI.
+(exchange (Groundwater_table (column Andeby) (x -16) (y 4200.8))
+	  (fertigation (column Andeby) (x -16) (y 4200.8)))
+
+
+;;; testOpenMI_simple_2.dai ends here.
