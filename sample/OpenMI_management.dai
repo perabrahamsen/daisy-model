@@ -12,7 +12,8 @@
 (input file "OpenMI.dai")
 
 ;; Weather data 
-(weather default  "C:/Programmer/Daisy/daisy-src/sample/taastrup.dwf")
+;; (weather default  "C:/Programmer/Daisy/daisy-src/sample/taastrup.dwf")
+(weather default  "dk-taastrup.dwf")
 
 ;; We have some very sandy soil.
 (defhorizon Ap FAO3
