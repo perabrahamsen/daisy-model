@@ -1,3 +1,7 @@
+2007-08-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.19 released.
+
 2007-08-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* action_with.C (done): Done when all actions are done.
