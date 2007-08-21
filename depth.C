@@ -28,8 +28,6 @@
 #include "plf.h"
 #include "lexer_data.h"
 #include "output.h"
-#include "scopesel.h"
-#include "scope.h"
 #include "number.h"
 #include "treelog.h"
 #include "units.h"
@@ -152,9 +150,6 @@ static struct DepthExternSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Look up depth in an scope.");
-    syntax.add_object ("scope", Scopesel::component, 
-                       Syntax::Const, Syntax::Singleton, "\
-Scope to look up depth in.");
     syntax.add_object ("value", Number::component, 
                        Syntax::Const, Syntax::Singleton, "\
 Expression that evaluates to a depth.");
