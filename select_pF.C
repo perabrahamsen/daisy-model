@@ -1,4 +1,4 @@
-// select_pF.C --- Select a state variable.
+// select_pF.C --- Convert to pF.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -29,8 +29,6 @@
 #include "vcheck.h"
 #include "librarian.h"
 
-using namespace std;
-
 struct SelectPF : public Select
 {
   type_t type () const
@@ -38,14 +36,14 @@ struct SelectPF : public Select
 
   // Content.
   const double max_h;
-  vector<double> value;		// Total array.
+  std::vector<double> value;		// Total array.
   const Geometry* last_geo; // For printing dimensions;
 
   double cm2pF (double cm)
-  { return h2pF (min (cm, max_h)); }
+  { return h2pF (std::min (cm, max_h)); }
     
   // Output routines.
-  void output_array (const vector<double>& array, 
+  void output_array (const std::vector<double>& array, 
 		     const Geometry* geo, const Soil*, Treelog&)
   { 
     if (geo)
@@ -128,7 +126,7 @@ Pressure above this value will be represented as this value.");
     alist.add ("max_h", -0.1);
     syntax.add ("value", Syntax::Unknown (), Syntax::State, Syntax::Sequence,
 		"The current accumulated value.");
-    vector<double> empty;
+    std::vector<double> empty;
     alist.add ("value", empty);
     alist.add ("dimension", "pF");
 

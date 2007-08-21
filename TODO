@@ -2,30 +2,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * OpenMI
 
-** column location 
-
-(location); ID
-(location (x1 y1)); Point
-(location (x1 y1) (x2 y2)); Error
-(location (x1 y1) (x2 y2) (x3 y3) ...); Polygon
-
-C API
-
-daisy_column_location_size (column)
-daisy_column_location_x (column, index)
-daisy_column_location_y (column, index)
-
-** stof
-
-DONE Solute::C_below bør være et Number.
-
-DONE Kræver en Scope
-
-DONE "default" scope for column?
-
-DONE "default" scope for Daisy?
-
 ** management
+
+Spørge om vandindhold af jordvolumen ved bestemt tryk.
 
 ** Læs vejr fra OpenMI.
 

@@ -86,7 +86,7 @@ struct ConditionBoolean : public Condition
 
   ConditionBoolean (Block& al)
     : Condition (al),
-      expr (Librarian::build_item<Boolean> (al, "extern")),
+      expr (Librarian::build_item<Boolean> (al, "expr")),
       state (uninitialized)
   { }
 };
