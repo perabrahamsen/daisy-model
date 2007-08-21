@@ -3,7 +3,7 @@
 (description "Simulation for use in OpenMI coupling with irrigation defined as input exchange item.")
 
 ;; Location of input files:
-(path "." "C:/Programmer/Daisy/daisy-src/lib/" )
+;; (path "." "C:/Programmer/Daisy/daisy-src/lib/" )
 
 ;; Use standard parameterizations.
 (input file "tillage.dai")

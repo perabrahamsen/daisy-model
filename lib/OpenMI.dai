@@ -1,6 +1,5 @@
 ;;; OpenMI.dai -- Input and output exchange items
 
-
 ;; Common output exchange items
 (deflog OpenMI_output extern
   (parameter_names column)

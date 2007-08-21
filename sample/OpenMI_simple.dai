@@ -3,7 +3,7 @@
 (description "Simulation for use in simple OpenMI coupling with two soil columns and bare soil.")
 
 ;; Location of input files:
-(path "." "C:/Programmer/Daisy/daisy-src/lib/" )
+;; (path "." "C:/Programmer/Daisy/daisy-src/lib/" )
 
 ;; Use standard parameterizations.
 (input file "OpenMi.dai")
