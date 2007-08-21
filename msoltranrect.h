@@ -40,6 +40,7 @@ class Time;
 class Treelog;
 class AttributeList;
 class Block;
+class Scope;
 
 class Msoltranrect : public Model
 {
@@ -51,7 +52,8 @@ public:
   // Simulation.
 public:
   void solute (const GeometryRect&, const Soil&, const SoilWater&,
-               const double J_in, Solute&, double dt, Treelog& msg);
+               const double J_in, Solute&, double dt, const Scope&, 
+	       Treelog& msg);
   void element (const GeometryRect&, const Soil&, const SoilWater&,
                 Element&, Adsorption&,
                 const double diffusion_coefficient, double dt, Treelog&);

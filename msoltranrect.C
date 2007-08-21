@@ -33,13 +33,13 @@ void
 Msoltranrect::solute (const GeometryRect& geo,
                       const Soil& soil, const SoilWater& soil_water,
                       const double J_in, Solute& solute, const double dt,
-                      Treelog& msg)
+		      const Scope& scope, Treelog& msg)
 { 
   Treelog::Open nest (msg, "Msoltranrect: " + name);
   const size_t edge_size = geo.edge_size ();
   const size_t cell_size = geo.cell_size ();
 
-  solute.tick (cell_size, soil_water, dt);
+  solute.tick (cell_size, soil_water, dt, scope, msg);
 
   std::vector<double> M (cell_size);
   std::vector<double> C (cell_size);

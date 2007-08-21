@@ -38,6 +38,7 @@ class Output;
 class Treelog;
 class Metalib;
 class Block;
+class Scope;
 
 class Column : public Model
 {
@@ -123,11 +124,12 @@ public:
 
   // Simulation.
   virtual void clear () = 0;
-  virtual void tick (const Time&, double dt, const Weather*, Treelog&) = 0;
+  virtual void tick (const Time&, double dt, const Weather*, 
+		     const Scope&, Treelog&) = 0;
 
   virtual bool check (bool require_weather,
 		      const Time& from, const Time& to, 
-		      Treelog&) const = 0;
+		      const Scope&, Treelog&) const = 0;
   virtual bool check_am (const AttributeList& am, Treelog&) const = 0;
   virtual bool check_z_border (double, Treelog&) const = 0;
   virtual bool check_x_border (double, Treelog&) const = 0;
@@ -140,7 +142,7 @@ protected:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   virtual void initialize (Block&, const Output&, const Time&,
-                           const Weather*) = 0;
+                           const Weather*, const Scope&) = 0;
 
   ~Column ();
 };

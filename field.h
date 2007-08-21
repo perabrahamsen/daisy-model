@@ -39,6 +39,7 @@ class Treelog;
 class Log;
 class Block;
 class Metalib;
+class Scope;
 
 class Field : public Border
 { 
@@ -107,8 +108,10 @@ public:
   std::string crop_names () const;
   // Simulation.
   void clear ();
-  void tick_all (const Time&, double dt, const Weather*, Treelog&);
-  void tick_one (size_t, const Time&, double dt, const Weather*, Treelog&);
+  void tick_all (const Time&, double dt, const Weather*, 
+		 const Scope&, Treelog&);
+  void tick_one (size_t, const Time&, double dt, const Weather*,
+		 const Scope&, Treelog&);
   void output (Log&) const;
 
   // Find a specific column.
@@ -120,13 +123,14 @@ public:
 
   // Create and destroy.
   bool check (bool require_weather, const Time& from, const Time& to, 
-	      Treelog& err) const;
-  bool check_am (const AttributeList& am, Treelog& err) const;
-  bool check_z_border (double, Treelog& err) const;
-  bool check_x_border (double, Treelog& err) const;
-  bool check_y_border (double, Treelog& err) const;
+	      const Scope&, Treelog&) const;
+  bool check_am (const AttributeList& am, Treelog&) const;
+  bool check_z_border (double, Treelog&) const;
+  bool check_x_border (double, Treelog&) const;
+  bool check_y_border (double, Treelog&) const;
 
-  void initialize (Block&, const Output&, const Time&, const Weather*);
+  void initialize (Block&, const Output&, const Time&, const Weather*,
+		   const Scope&);
   Field (Block&, const std::string& key);
   virtual ~Field ();
 };

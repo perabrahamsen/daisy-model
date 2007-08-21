@@ -121,11 +121,11 @@ Daisy::tick_before (Treelog& msg)
 
 void
 Daisy::tick_columns (Treelog& msg)
-{ field->tick_all (time, dt, weather.get (), msg); }
+{ field->tick_all (time, dt, weather.get (), *extern_scope, msg); }
 
 void
 Daisy::tick_column (const size_t col, Treelog& msg)
-{ field->tick_one (col, time, dt, weather.get (), msg); }
+{ field->tick_one (col, time, dt, weather.get (), *extern_scope, msg); }
 
 void
 Daisy::tick_after (Treelog& msg)
@@ -170,19 +170,19 @@ Daisy::output (Log& log) const
 void
 Daisy::initialize (Block& block)
 { 
-  if (weather.get () && !weather->initialize (time, block.msg ()))
+  Treelog& msg = block.msg ();
+  if (weather.get () && !weather->initialize (time, msg))
     return;
-  field->initialize (block, *output_log, time, weather.get ());
   {
-    Treelog::Open nest (block.msg (), "output");
-    output_log->initialize (metalib, block.msg ());
+    Treelog::Open nest (msg, "output");
+    output_log->initialize (metalib, msg);
   }
-  extern_scope = scopesel->lookup (*output_log, block.msg ()); 
-  {                             // Must come after output.
-    Treelog::Open nest (block.msg (), "manager");
-    action->initialize (*this, 
-			extern_scope ? *extern_scope : Scope::null (), 
-			block.msg ());
+  extern_scope = scopesel->lookup (*output_log, msg); 
+  const Scope& scope = extern_scope ? *extern_scope : Scope::null ();
+  field->initialize (block, *output_log, time, weather.get (), scope);
+  {                       
+    Treelog::Open nest (msg, "manager");
+    action->initialize (*this, scope, msg);
   }
 }
 
@@ -190,6 +190,7 @@ bool
 Daisy::check (Treelog& msg)
 {
   bool ok = true;
+  const Scope& scope = extern_scope ? *extern_scope : Scope::null ();
 
   if (!approximate (dt, 1.0))
     {
@@ -209,7 +210,7 @@ Daisy::check (Treelog& msg)
   // Check field.
   {
     Treelog::Open nest (msg, "column");
-    if (!field->check (!weather.get (), time, stop, msg))
+    if (!field->check (!weather.get (), time, stop, scope, msg))
       ok = false;
   }
   // Check logs.
@@ -224,10 +225,9 @@ Daisy::check (Treelog& msg)
       ok = false;
     }
   // Check actions.
-  else 
-    {
+  {
     Treelog::Open nest (msg, "manager");
-    if (!action->check (*this, *extern_scope, msg))
+    if (!action->check (*this, scope, msg))
       ok = false;
   }
   return ok;

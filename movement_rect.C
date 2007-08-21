@@ -55,8 +55,7 @@ struct MovementRect : public Movement
   const auto_vector<Msoltranrect*> matrix_solute;
   const std::auto_ptr<Msoltranrect> matrix_solute_solid;
   void solute (const Soil& soil, const SoilWater& soil_water,
-               double J_in, Solute& solute, double dt,
-               Treelog& msg);
+               double J_in, Solute&, double dt, const Scope&, Treelog&);
   void element (const Soil& soil, const SoilWater& soil_water,
                 Element& element, Adsorption& adsorption,
                 double diffusion_coefficient, double dt, Treelog& msg);
@@ -117,12 +116,12 @@ MovementRect::macro_tick (const Soil&, SoilWater&, Surface&,
 void
 MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
                       const double J_in, Solute& solute, const double dt,
-                      Treelog& msg)
+                      const Scope& scope, Treelog& msg)
 {
   if (solute.adsorption->full ())
     {
       matrix_solute_solid->solute (*geo, soil, soil_water, J_in, solute,
-                                   dt, msg);
+                                   dt, scope, msg);
       return;
     }
   for (size_t i = 0; i < matrix_solute.size (); i++)
@@ -131,7 +130,7 @@ MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
       try
         {
           matrix_solute[i]->solute (*geo, soil, soil_water, J_in, solute, 
-                                    dt, msg);
+                                    dt, scope, msg);
           if (i > 0)
             msg.message ("Succeeded");
           return;

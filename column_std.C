@@ -47,9 +47,13 @@
 #include "submodeler.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "scope_multi.h"
+#include "scopesel.h"
 
 struct ColumnStandard : public Column
 {
+  const std::auto_ptr<Scopesel> scopesel;
+  const Scope* extern_scope;
   std::auto_ptr<Movement> movement;
   std::auto_ptr<Groundwater> groundwater;
   std::auto_ptr<Weather> weather;
@@ -159,20 +163,22 @@ public:
 
   // Simulation.
   void clear ();
-  void tick (const Time&, const double dt, const Weather*, Treelog&);
+  void tick (const Time&, const double dt, const Weather*,
+	     const Scope&, Treelog&);
   bool check (bool require_weather,
               const Time& from, const Time& to, 
-              Treelog& err) const;
-  bool check_am (const AttributeList& am, Treelog& err) const;
-  bool check_z_border (double, Treelog& err) const;
-  bool check_x_border (double, Treelog& err) const;
-  bool check_y_border (double, Treelog& err) const;
+              const Scope&, Treelog&) const;
+  bool check_am (const AttributeList& am, Treelog&) const;
+  bool check_z_border (double, Treelog&) const;
+  bool check_x_border (double, Treelog&) const;
+  bool check_y_border (double, Treelog&) const;
   void output (Log&) const;
 
   // Create and Destroy.
   static Movement* build_vertical (Block& al);
   ColumnStandard (Block& al);
-  void initialize (Block&, const Output&, const Time&, const Weather*);
+  void initialize (Block&, const Output&, const Time&, const Weather*,
+		   const Scope& scope);
   ~ColumnStandard ();
 };
 
@@ -615,8 +621,12 @@ ColumnStandard::clear ()
 
 void
 ColumnStandard::tick (const Time& time, const double dt,
-                      const Weather* global_weather, Treelog& msg)
+                      const Weather* global_weather, const Scope& parent_scope,
+		      Treelog& msg)
 {
+  daisy_assert (extern_scope);
+  ScopeMulti scope (*extern_scope, parent_scope);
+
   // Weather.
   if (weather.get ())
     weather->tick (time, msg);
@@ -671,7 +681,7 @@ ColumnStandard::tick (const Time& time, const double dt,
   chemistry->tick_soil (geometry, 
                         surface.ponding (), surface.mixing_resistance (),
                         *soil, *soil_water, *soil_heat, 
-                        *movement, *organic_matter, dt, msg);
+                        *movement, *organic_matter, dt, scope, msg);
   organic_matter->transport (*soil, *soil_water, msg);
   const std::vector<DOM*>& dom = organic_matter->fetch_dom ();
   for (size_t i = 0; i < dom.size (); i++)
@@ -686,12 +696,12 @@ ColumnStandard::tick (const Time& time, const double dt,
   {
     Treelog::Open nest (msg, "soil_NO3");
     movement->solute (*soil, *soil_water, 
-                      surface.matter_flux ().NO3, *soil_NO3, dt, msg);
+                      surface.matter_flux ().NO3, *soil_NO3, dt, scope, msg);
   }
   {
     Treelog::Open nest (msg, "soil_NH4");
     movement->solute (*soil, *soil_water,
-                      surface.matter_flux ().NH4, *soil_NH4, dt, msg);
+                      surface.matter_flux ().NH4, *soil_NH4, dt, scope, msg);
   }
   
   // Once a month we clean up old AM from organic matter.
@@ -701,112 +711,121 @@ ColumnStandard::tick (const Time& time, const double dt,
 
 bool
 ColumnStandard::check (bool require_weather,
-                       const Time& from, const Time& to, Treelog& err) const
+                       const Time& from, const Time& to,
+		       const Scope& parent_scope, Treelog& msg) const
 {
   bool ok = true;
   const int n = geometry.cell_size ();
+
+  if (!extern_scope)
+    {
+      msg.error ("Extern scope not found");
+      ok = false;
+    }
+  ScopeMulti scope (extern_scope ? *extern_scope : Scope::null (), 
+		    parent_scope);
   {
-    Treelog::Open nest (err, "Soil");
-    if (!geometry.check (err))
+    Treelog::Open nest (msg, "Soil");
+    if (!geometry.check (msg))
       ok = false;
   }
   {
-    Treelog::Open nest (err, "SoilHeat");
-    if (!soil_heat->check (n, err))
+    Treelog::Open nest (msg, "SoilHeat");
+    if (!soil_heat->check (n, msg))
       ok = false;
   }
   {
-    Treelog::Open nest (err, "Movement: " + movement->name);
-    if (!movement->check (err))
+    Treelog::Open nest (msg, "Movement: " + movement->name);
+    if (!movement->check (msg))
       ok = false;
   }
   {
-    Treelog::Open nest (err, "Groundwater: " + groundwater->name);
-    if (!groundwater->check (err))
+    Treelog::Open nest (msg, "Groundwater: " + groundwater->name);
+    if (!groundwater->check (msg))
       ok = false;
   }
   {
     if (weather.get ())
       {
-        Treelog::Open nest (err, "Weather: " + weather->name);
-	if (!weather->check (from, to, err))
+        Treelog::Open nest (msg, "Weather: " + weather->name);
+	if (!weather->check (from, to, msg))
 	  ok = false;
       }
 
     else if (require_weather)
       {
-	err.entry ("Weather unspecified");
+	msg.entry ("Weather unspecified");
 	// The rest is uninitialized, don't check it!
 	return false;
       }
   }
   {
-    Treelog::Open nest (err, "Chemistry");
-    if (!chemistry->check (*soil, err))
+    Treelog::Open nest (msg, "Chemistry");
+    if (!chemistry->check (*soil, scope, msg))
       ok = false;
   }
   {
-    Treelog::Open nest (err, "Soil");
-    if (!soil->check (organic_matter->som_pools (), geometry, err))
+    Treelog::Open nest (msg, "Soil");
+    if (!soil->check (organic_matter->som_pools (), geometry, msg))
       ok = false;
   }
   {
-    Treelog::Open nest (err, "SoilNO3");
-    if (!soil_NO3->check (n, err))
+    Treelog::Open nest (msg, "SoilNO3");
+    if (!soil_NO3->check (n, scope, msg))
       ok = false;
   }
   {
-    Treelog::Open nest (err, "SoilNH4");
-    if (!soil_NH4->check (n, err))
+    Treelog::Open nest (msg, "SoilNH4");
+    if (!soil_NH4->check (n, scope, msg))
       ok = false;
   }
-  if (!organic_matter->check (*soil, err))
+  if (!organic_matter->check (*soil, msg))
     ok = false;
   return ok;
 }
 
 bool 
-ColumnStandard::check_am (const AttributeList& am, Treelog& err) const 
+ColumnStandard::check_am (const AttributeList& am, Treelog& msg) const 
 { 
-  Treelog::Open nest (err, name);
-  return organic_matter->check_am (am, err); 
+  Treelog::Open nest (msg, name);
+  return organic_matter->check_am (am, msg); 
 }
 
 bool 
-ColumnStandard::check_z_border (const double value, Treelog& err) const
+ColumnStandard::check_z_border (const double value, Treelog& msg) const
 { 
-  Treelog::Open nest (err, "column: " + name);
+  Treelog::Open nest (msg, "column: " + name);
 
   bool ok = true;
-  if (!soil->check_z_border (value, err))
+  if (!soil->check_z_border (value, msg))
     ok = false; 
-  if (!geometry.check_z_border (value, err))
+  if (!geometry.check_z_border (value, msg))
     ok = false; 
   return ok;
 }
 
 bool 
-ColumnStandard::check_x_border (const double value, Treelog& err) const
+ColumnStandard::check_x_border (const double value, Treelog& msg) const
 { 
-  Treelog::Open nest (err, "column: " + name);
+  Treelog::Open nest (msg, "column: " + name);
 
   bool ok = true;
-  if (!soil->check_x_border (value, err))
+  if (!soil->check_x_border (value, msg))
     ok = false; 
-  if (!geometry.check_x_border (value, err))
+  if (!geometry.check_x_border (value, msg))
     ok = false; 
   return ok;
 }
 
 bool 
-ColumnStandard::check_y_border (const double value, Treelog& err) const
+ColumnStandard::check_y_border (const double value, Treelog& msg) const
 { 
-  Treelog::Open nest (err, "column: " + name);
+  Treelog::Open nest (msg, "column: " + name);
 
   bool ok = true;
-  if (!soil->check_y_border (value, err))
+  if (!soil->check_y_border (value, msg))
     ok = false; 
-  if (!geometry.check_y_border (value, err))
+  if (!geometry.check_y_border (value, msg))
     ok = false; 
   return ok;
 }
@@ -867,6 +886,8 @@ ColumnStandard::output (Log& log) const
 
 ColumnStandard::ColumnStandard (Block& al)
   : Column (al),
+    scopesel (Librarian::build_item<Scopesel> (al, "scope")),
+    extern_scope (NULL),
     movement (Librarian::build_item<Movement> (al, "Movement")),
     groundwater (Librarian::build_item<Groundwater> (al, "Groundwater")),
     weather (al.check ("weather") 
@@ -909,9 +930,14 @@ void
 ColumnStandard::initialize (Block& block, 
                             const Output& output,
                             const Time& time, 
-			    const Weather* global_weather)
+			    const Weather* global_weather,
+			    const Scope& parent_scope)
 {
-  Treelog::Open nest (block.msg (), name);
+  Treelog& msg = block.msg ();
+  Treelog::Open nest (msg, name);
+  extern_scope = scopesel->lookup (output, msg); 
+  ScopeMulti scope (extern_scope ? *extern_scope : Scope::null (),
+		    parent_scope);
   soil->initialize (block, geometry, *groundwater,
                     organic_matter->som_pools ());
   residuals_N_soil.insert (residuals_N_soil.begin (), soil->size (), 0.0);
@@ -919,9 +945,9 @@ ColumnStandard::initialize (Block& block,
   residuals_C_soil.insert (residuals_C_soil.begin (), soil->size (), 0.0);
   daisy_assert (residuals_C_soil.size () == soil->size ());
 
-  groundwater->initialize (output, geometry, time, block.msg ());
+  groundwater->initialize (output, geometry, time, msg);
   soil_water->initialize (alist.alist ("SoilWater"), 
-                          geometry, *soil, *groundwater, block.msg ());
+                          geometry, *soil, *groundwater, msg);
   if (alist.check ("Movement"))
     {
       AttributeList move_alist (alist.alist ("Movement"));
@@ -941,30 +967,30 @@ ColumnStandard::initialize (Block& block,
   chemistry->initialize (block, alist.alist ("Chemistry"),
                          geometry, *soil, *soil_water);
   soil_NH4->initialize (alist.alist ("SoilNH4"),
-                        geometry, *soil, *soil_water, block.msg ());
+                        geometry, *soil, *soil_water, msg);
   soil_NO3->initialize (alist.alist ("SoilNO3"), 
-                        geometry, *soil, *soil_water, block.msg ());
+                        geometry, *soil, *soil_water, msg);
   nitrification.initialize (soil->size ());
   denitrification.initialize (soil->size ());
 
   // Bioclimate and heat depends on weather.
-  if (weather.get () && !weather->initialize (time, block.msg ()))
+  if (weather.get () && !weather->initialize (time, msg))
     return;
   if (!global_weather && !weather.get ())
     return;
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
   bioclimate->initialize (block, my_weather);
   soil_heat->initialize (alist.alist ("SoilHeat"), geometry, 
-                         movement->default_heat (*soil, time, my_weather), block.msg ());
+                         movement->default_heat (*soil, time, my_weather), msg);
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
   organic_matter->initialize (block, alist.alist ("OrganicMatter"), 
                               geometry, *soil, *soil_water, T_avg);
-  vegetation->initialize (time, geometry, *soil, *organic_matter, block.msg ());
+  vegetation->initialize (time, geometry, *soil, *organic_matter, msg);
   
   // Soil conductivity and capacity logs.
-  soil_water->tick_after (geometry.cell_size (), *soil, *soil_heat, block.msg ());
-  soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, block.msg ());
+  soil_water->tick_after (geometry.cell_size (), *soil, *soil_heat, msg);
+  soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
 }
 
 ColumnStandard::~ColumnStandard ()
@@ -995,6 +1021,10 @@ amount of humus and clay in the top horizon is above 5%.");
     alist.add ("description", "\
 Hansen et.al. 1990. with generic movement in soil.");
 
+    syntax.add_object ("scope", Scopesel::component, 
+		       Syntax::Const, Syntax::Singleton, "\
+Scope to evaluate expessions in.");
+    alist.add ("scope", Scopesel::default_model ());
     syntax.add_submodule ("Soil", alist, Syntax::State,
                           "The numeric and physical soil properties.",
                           Soil::load_syntax);

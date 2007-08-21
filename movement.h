@@ -42,6 +42,7 @@ class Block;
 class Syntax;
 class AttributeList;
 class Log;
+class Scope;
 
 class Movement : public Model
 {
@@ -60,7 +61,8 @@ public:
                      Groundwater&, const Time&, const Weather&, 
                      double dt, Treelog&) = 0;
   virtual void solute (const Soil&, const SoilWater&, 
-                       const double J_in, Solute&, double dt, Treelog&) = 0;
+                       const double J_in, Solute&, double dt, 
+		       const Scope&, Treelog&) = 0;
   virtual void element (const Soil&, const SoilWater&, 
                         Element&, Adsorption&,
                         double diffusion_coefficient, double dt, Treelog&) = 0;

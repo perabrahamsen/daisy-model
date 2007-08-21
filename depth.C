@@ -139,7 +139,6 @@ struct DepthExtern : public Depth
         else
           value = Units::convert (dim.name (), "cm", value);
       }
-    
   }
 
   double operator()() const
@@ -159,14 +158,8 @@ struct DepthExtern : public Depth
         msg.error ("No matching scope found");
         ok = false;
       }
-    else if (!expr->check (*scope, msg))
+    else if (!expr->check_dim (*scope, Units::cm, msg))
       ok = false;
-    else if (!Units::can_convert (expr->dimension (*scope).name (), "cm"))
-      {
-        msg.error ("Cannot convert [" + expr->dimension (*scope).name ()
-                   + "] to [cm]");
-        ok = false;
-      }
     return ok;
   }
   DepthExtern (Block& al)

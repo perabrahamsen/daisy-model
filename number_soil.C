@@ -32,6 +32,7 @@
 #include "time.h"
 #include "units.h"
 #include "librarian.h"
+#include "scope.h"
 #include <memory>
 
 struct NumberByDepth : public Number
@@ -126,7 +127,7 @@ The height we want to compare with.");
     alist.add ("type", "none");
     std::auto_ptr<Weather> weather (Librarian::build_alist<Weather>
                                     (al, alist, "initialize"));
-    column->initialize (al, output, time, weather.get ());
+    column->initialize (al, output, time, weather.get (), Scope::null ());
     max_depth = column->bottom ();
   }
 };

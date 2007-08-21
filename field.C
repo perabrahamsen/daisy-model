@@ -94,8 +94,10 @@ public:
   string crop_names () const;
   // Simulation.
   void clear ();
-  void tick_all (const Time&, double dt, const Weather*, Treelog&);
-  void tick_one (size_t, const Time&, double dt, const Weather*, Treelog&);
+  void tick_all (const Time&, double dt, const Weather*,
+		 const Scope&, Treelog&);
+  void tick_one (size_t, const Time&, double dt, const Weather*, 
+		 const Scope&, Treelog&);
   void output (Log&) const;
 
   // Find a specific column.
@@ -103,12 +105,13 @@ public:
 
   // Create and destroy.
   bool check (bool require_weather, const Time& from, const Time& to, 
-	      Treelog& err) const;
+	      const Scope& scope, Treelog&) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   bool check_z_border (double, Treelog& err) const;
   bool check_x_border (double, Treelog& err) const;
   bool check_y_border (double, Treelog& err) const;
-  void initialize (Block&, const Output&, const Time&, const Weather*);
+  void initialize (Block&, const Output&, const Time&, const Weather*, 
+		   const Scope&);
   Implementation (Block& parent, const std::string& key);
   ~Implementation ();
 };
@@ -552,21 +555,23 @@ Field::Implementation::clear ()
 
 void 
 Field::Implementation::tick_all (const Time& time, const double dt, 
-                                 const Weather* weather, Treelog& msg)
+                                 const Weather* weather, const Scope& scope,
+				 Treelog& msg)
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    (*i)->tick (time, dt, weather, msg);
+    (*i)->tick (time, dt, weather, scope, msg);
 }
 
 void 
 Field::Implementation::tick_one (const size_t col,
                                  const Time& time, const double dt, 
-                                 const Weather* weather, Treelog& msg)
+                                 const Weather* weather, 
+				 const Scope& scope, Treelog& msg)
 {
   daisy_assert (columns.size () > 0);
-  columns[col]->tick (time, dt, weather, msg);
+  columns[col]->tick (time, dt, weather, scope, msg);
 }
 
 void 
@@ -600,7 +605,7 @@ Field::Implementation::find (symbol name) const
 bool 
 Field::Implementation::check (bool require_weather,
 			      const Time& from, const Time& to, 
-			      Treelog& err) const
+			      const Scope& scope, Treelog& err) const
 { 
   bool ok = true;
   for (ColumnList::const_iterator i = columns.begin ();
@@ -608,7 +613,7 @@ Field::Implementation::check (bool require_weather,
        i++)
     {
       Treelog::Open nest (err, (*i) ? (*i)->name.name ().c_str () : "error");
-      if ((*i) == NULL || !(*i)->check (require_weather, from, to, err))
+      if ((*i) == NULL || !(*i)->check (require_weather, from, to, scope, err))
 	ok = false;
     }
   return ok;
@@ -669,12 +674,13 @@ Field::Implementation::check_y_border (const double value, Treelog& err) const
 
 void 
 Field::Implementation::initialize (Block& block, const Output& output,
-                                   const Time& time, const Weather* weather)
+                                   const Time& time, const Weather* weather,
+				   const Scope& scope)
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    (*i)->initialize (block, output, time, weather);
+    (*i)->initialize (block, output, time, weather, scope);
 }
 
 Field::Implementation::Implementation (Block& parent, 
@@ -837,14 +843,14 @@ Field::clear ()
 
 void
 Field::tick_all (const Time& time, const double dt, const Weather* weather, 
-                 Treelog& msg)
-{ impl.tick_all (time, dt, weather, msg); }
+                 const Scope& scope, Treelog& msg)
+{ impl.tick_all (time, dt, weather, scope, msg); }
 
 void
 Field::tick_one (const size_t col,
                  const Time& time, const double dt, const Weather* weather, 
-                 Treelog& msg)
-{ impl.tick_one (col, time, dt, weather, msg); }
+                 const Scope& scope, Treelog& msg)
+{ impl.tick_one (col, time, dt, weather, scope, msg); }
 
 void 
 Field::output (Log& log) const
@@ -864,8 +870,8 @@ Field::size () const
 
 bool 
 Field::check (bool require_weather, const Time& from, const Time& to, 
-	      Treelog& err) const
-{ return impl.check (require_weather, from, to, err); }
+	      const Scope& scope, Treelog& err) const
+{ return impl.check (require_weather, from, to, scope, err); }
 
 bool 
 Field::check_am (const AttributeList& am, Treelog& err) const
@@ -885,8 +891,8 @@ Field::check_y_border (const double value, Treelog& err) const
 
 void 
 Field::initialize (Block& block, const Output& output,
-                   const Time& time, const Weather* weather)
-{ impl.initialize (block, output, time, weather); }
+                   const Time& time, const Weather* weather, const Scope& scope)
+{ impl.initialize (block, output, time, weather, scope); }
 
 Field::Field (Block& parent, const std::string& key)
   : impl (*new Implementation (parent, key))

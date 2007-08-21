@@ -64,14 +64,14 @@ struct ChemistryStandard : public Chemistry
   void tick_soil (const Geometry& geo, double ponding /* [mm] */,
                   double R_mixing /* [h/mm] */, 
                   const Soil&, const SoilWater&, const SoilHeat&, Movement&,
-                  const OrganicMatter&, double dt, Treelog&);
+                  const OrganicMatter&, double dt, const Scope&, Treelog&);
   void clear ();
   void output (Log&) const;
 
   // Create & Destroy.
   void initialize (Block&, const AttributeList&, const Geometry& geo,
                    const Soil&, const SoilWater&);
-  bool check (const Soil&, Treelog&) const;
+  bool check (const Soil&, const Scope& scope, Treelog&) const;
   explicit ChemistryStandard (Block& al);
   static bool check_alist (const AttributeList& al, Treelog& msg);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
@@ -178,7 +178,7 @@ ChemistryStandard::tick_soil (const Geometry& geo, const double ponding,
                               const Soil& soil, const SoilWater& soil_water,
                               const SoilHeat& soil_heat, Movement& movement,
                               const OrganicMatter& organic_matter,
-                              const double dt, Treelog& msg)
+                              const double dt, const Scope& scope, Treelog& msg)
 { 
   infiltrate (geo, ponding, soil_water.infiltration (geo), R_mixing, dt);
 
@@ -194,14 +194,14 @@ ChemistryStandard::tick_soil (const Geometry& geo, const double ponding,
 
   const size_t cell_size = geo.cell_size ();
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->tick (cell_size, soil_water, dt);
+    chemicals[c]->tick (cell_size, soil_water, dt, scope, msg);
 
   for (size_t c = 0; c < chemicals.size (); c++)
     {
       Treelog::Open nest (msg, name);
       // [g/m^2/h down -> g/cm^2/h up]
       const double J_in = -chemicals[c]->down () / (100.0 * 100.0);
-      movement.solute (soil, soil_water, J_in, *chemicals[c], dt, msg); 
+      movement.solute (soil, soil_water, J_in, *chemicals[c], dt, scope, msg); 
     }
 }
 
@@ -239,13 +239,14 @@ ChemistryStandard::initialize (Block& block,
 }
 
 bool 
-ChemistryStandard::check (const Soil& soil, Treelog& msg) const
+ChemistryStandard::check (const Soil& soil,
+			  const Scope& scope, Treelog& msg) const
 { 
   const size_t cell_size = soil.size ();
 
   bool ok = true; 
   for (size_t c = 0; c < chemicals.size (); c++)
-    if (!chemicals[c]->check (cell_size, msg))
+    if (!chemicals[c]->check (cell_size, scope, msg))
       ok = false;
 
   for (size_t r = 0; r < reactions.size (); r++)

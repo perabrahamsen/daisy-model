@@ -57,7 +57,7 @@ public:
   const std::auto_ptr<Output> output_log;
 private:
   const std::auto_ptr<Scopesel> scopesel;
-  mutable const Scope* extern_scope;
+  const Scope* extern_scope;
   const std::auto_ptr<Condition> print_time;
 public:
   Time time;

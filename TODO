@@ -17,13 +17,13 @@ daisy_column_location_y (column, index)
 
 ** stof
 
-Solute::C_below bør være et Number.
+DONE Solute::C_below bør være et Number.
 
-Kræver en Scope
+DONE Kræver en Scope
 
-"default" scope for column?
+DONE "default" scope for column?
 
-"default" scope for Daisy?
+DONE "default" scope for Daisy?
 
 ** management
 
@@ -38,6 +38,18 @@ vejr table?
 vejr scope?
 
 ny vejr?
+
+---
+
+læs frem?
+
+læs al ind?
+
+min max daily average?
+
+day cycle?
+
+reset bioclimate?
 
 * Artikler:
 

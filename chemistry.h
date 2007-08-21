@@ -36,6 +36,7 @@ class Chemical;
 class Treelog;
 class AttributeList;
 class Block;
+class Scope;
 
 class Chemistry : public Model
 {
@@ -68,7 +69,7 @@ public:
                           double R_mixing /* [h/mm] */,
                           const Soil&, const SoilWater&, const SoilHeat&, 
                           Movement&, const OrganicMatter&,
-                          double dt, Treelog&) = 0;
+                          double dt, const Scope&, Treelog&) = 0;
   virtual void clear () = 0;
   virtual void output (Log&) const = 0;
 
@@ -77,7 +78,7 @@ public:
   static const AttributeList& default_model ();
   virtual void initialize (Block&, const AttributeList&, const Geometry& geo,
                            const Soil&, const SoilWater&) = 0;
-  virtual bool check (const Soil&, Treelog&) const = 0;
+  virtual bool check (const Soil&, const Scope&, Treelog&) const = 0;
 protected:
   explicit Chemistry (Block& al);
 public:

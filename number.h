@@ -24,6 +24,7 @@
 
 #include "symbol.h"
 #include "model.h"
+#include "symbol.h"
 #include <vector>
 
 class Scope;
@@ -42,6 +43,8 @@ public:
 protected:
   static bool known (const symbol);
 public:
+  void tick_value (double& value, symbol dim, const double missing_value,
+		   const Scope& , Treelog&);
   virtual void tick (const Scope& scope, Treelog& msg) = 0;
   virtual bool missing (const Scope& scope) const = 0;
   virtual double value (const Scope&) const = 0; 
@@ -52,6 +55,7 @@ public:
 public:
   virtual bool initialize (Treelog& msg) = 0;
   virtual bool check (const Scope&, Treelog&) const = 0;
+  bool check_dim (const Scope&, symbol dim, Treelog&) const;
 protected:
   explicit Number (Block&);
 public:

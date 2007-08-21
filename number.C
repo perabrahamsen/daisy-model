@@ -23,6 +23,8 @@
 #include "number.h"
 #include "block.h"
 #include "librarian.h"
+#include "units.h"
+#include <sstream>
 
 const char *const Number::component = "number";
 
@@ -33,6 +35,45 @@ Number::title () const
 bool 
 Number::known (symbol dim)
 { return dim != Syntax::unknown (); }
+
+void 
+Number::tick_value (double& value, symbol want, const double missing_value,
+		    const Scope& scope, Treelog& msg)
+{ 
+  this->tick (scope, msg);
+  if (this->missing (scope))
+    value = missing_value;
+  else 
+    {
+      value = this->value (scope);
+      const symbol has = this->dimension (scope);
+      
+      if (!Units::can_convert (has, want, value))
+	{
+	  std::ostringstream tmp;
+	  tmp << "Cannot convert " << value << " [" << has
+	      << "] to [" << want << "]";
+	  msg.warning (tmp.str ());
+	  value = missing_value;
+	}
+      else
+	value = Units::convert (has, want, value);
+    }
+}
+
+bool 
+Number::check_dim (const Scope& scope, const symbol want, Treelog& msg) const
+{
+  if (!this->check (scope, msg))
+    return false;
+
+  const symbol has = this->dimension (scope);
+  if (Units::can_convert (has, want))
+    return true;
+
+  msg.error ("Cannot convert [" + has + "] to [" + want + "]");
+  return false;
+}
 
 Number::Number (Block& al)
   : name (al.identifier ("type"))

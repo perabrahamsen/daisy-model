@@ -72,6 +72,7 @@ struct Movement1D : public Movement
                const SoilWater& soil_water, 
                const double J_in, Solute& solute, 
                const double dt,
+	       const Scope&,
                Treelog& msg);
   void element (const Soil& soil, 
                 const SoilWater& soil_water, 
@@ -253,9 +254,10 @@ Movement1D::solute (const Soil& soil,
                     const SoilWater& soil_water, 
                     const double J_in, Solute& solute, 
                     const double dt,
+		    const Scope& scope,
                     Treelog& msg)
 { 
-  solute.tick (geo->cell_size (), soil_water, dt);
+  solute.tick (geo->cell_size (), soil_water, dt, scope, msg);
 
   // Upper border.
   if (soil_water.q_p (0) < 0.0)

@@ -37,16 +37,20 @@ struct Geometry;
 struct Soil;
 struct SoilWater;
 class Treelog;
+class Number;
+class Scope;
 
 class Solute
 {
 public:
   const std::string submodel;	// Derived submodel.
+  static const symbol g_per_cm3;
 
   friend class Movement1D;
 
   // Parameters.
-  const double C_below_;		
+  const std::auto_ptr<Number> C_below_expr;
+  double C_below_value;
 public:
   double C_below () const; // Concentration in groundwater [g/cm^3]
 
@@ -107,9 +111,10 @@ public:
   void add_to_root_sink (const std::vector<double>&, double dt);
 
   // Simulation.
-  void tick (const size_t cell_size, const SoilWater&, double dt);
+  void tick (const size_t cell_size, const SoilWater&, double dt,
+	     const Scope&, Treelog&);
 public:
-  bool check (size_t n, Treelog& err) const;
+  bool check (size_t n, const Scope&, Treelog&) const;
   virtual void output (Log&) const;
   void incorporate (const Geometry&, double amount, 
                     double from, double to, double dt);

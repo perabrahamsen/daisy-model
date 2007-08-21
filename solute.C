@@ -29,13 +29,18 @@
 #include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "number.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "units.h"
 #include <sstream>
+
+const symbol 
+Solute::g_per_cm3 ("g/cm^3");
 
 double 
 Solute::C_below () const
-{ return C_below_; }
+{ return C_below_value; }
 
 double
 Solute::total_surface (const Geometry& geo, 
@@ -102,8 +107,14 @@ Solute::add_to_root_sink (const std::vector<double>& v, const double dt)
 void 
 Solute::tick (const size_t cell_size,
 	      const SoilWater& soil_water,
-              const double dt)
+              const double dt,
+	      const Scope& scope,
+	      Treelog& msg)
 {
+  // Find C below.
+  C_below_expr->tick_value (C_below_value, g_per_cm3, -1.0, scope, msg);
+
+  // Assert no negative mass.
   for (unsigned i = 0; i < cell_size; i++)
     daisy_assert (M_left (i, dt) >= 0.0);
 
@@ -129,9 +140,11 @@ Solute::tick (const size_t cell_size,
 }
 
 bool 
-Solute::check (unsigned, Treelog&) const
+Solute::check (const unsigned, const Scope& scope, Treelog& msg) const
 {
   bool ok = true;
+  if (!C_below_expr->check_dim (scope, g_per_cm3, msg))
+    ok = false;
   return ok;
 }
 
@@ -162,10 +175,14 @@ void
 Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
-  syntax.add ("C_below", "g/cm^3", Syntax::Const, "\
+  syntax.add_object ("C_below", Number::component, 
+		     Syntax::Const, Syntax::Singleton, "\
 Concentration below the layer of soil being examined.\n\
 Use a negative number to indicate same concentration as in lowest cell.");
-  alist.add ("C_below", -1.0);
+  AttributeList minus_one;
+  minus_one.add ("value", -1.0, "g/cm^3");
+  minus_one.add ("type", "const");
+  alist.add ("C_below", minus_one);
 
   syntax.add_object ("adsorption", Adsorption::component, 
                      "Soil adsorption properties.");
@@ -204,7 +221,8 @@ Only for initialization of the 'M' parameter.");
 
 Solute::Solute (Block& al)
   : submodel (al.check ("type") ? al.name ("type") : al.name ("submodel")),
-    C_below_ (al.number ("C_below")),
+    C_below_expr (Librarian::build_item<Number> (al, "C_below")),
+    C_below_value (-42.42e42),
     S_permanent (al.number_sequence ("S_permanent")),
     adsorption (Librarian::build_item<Adsorption> (al, "adsorption"))
 { }
@@ -277,12 +295,14 @@ void
 Solute::initialize (const AttributeList& al, 
 		    const Geometry& geo,
                     const Soil& soil, const SoilWater& soil_water, 
-		    Treelog& out)
+		    Treelog& msg)
 {
+  C_below_expr->initialize (msg);
+
   std::vector<double> Ms;
-  geo.initialize_layer (C_, al, "C", out);
-  geo.initialize_layer (M_, al, "M", out);
-  geo.initialize_layer (Ms, al, "Ms", out);
+  geo.initialize_layer (C_, al, "C", msg);
+  geo.initialize_layer (M_, al, "M", msg);
+  geo.initialize_layer (Ms, al, "Ms", msg);
 
   if (C_.size () > 0)
     {
@@ -297,6 +317,7 @@ Solute::initialize (const AttributeList& al,
       // Fill it up.
       while (M_.size () < geo.cell_size ())
 	M_.push_back (M_[M_.size () - 1]);
+
       if (M_.size () > geo.cell_size ())
 	throw ("To many members of M sequence");
     }
