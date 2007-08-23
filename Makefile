@@ -42,7 +42,7 @@ OBJHOME = obj
 NATIVEHOME = $(OBJHOME)
 BOOSTINC = -isystem $(CYGHOME)/usr/include/boost-1_33_1
 SETUPDIR = /home/abraham/daisy/install
-MAKENSIS = /cygdrive/c/Programmer/NSIS/makensis.exe
+MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
 MINGWHOME = /cygdrive/c/MinGW
 endif
 

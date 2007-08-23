@@ -1,5 +1,9 @@
 2007-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.19 released.
+
+2007-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* select* (output_array): Take vegetation parameter.
 	* log.C, log.h (open_geo): Take vegetation paramater.
 	* column_std.C (output): Use it.
