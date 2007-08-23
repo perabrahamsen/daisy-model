@@ -36,6 +36,7 @@ struct Log::Implementation
 {
   std::list<const Soil*> soils;
   std::list<const Geometry*> geometries;
+  std::list<const Vegetation*> vegetations;
   const Metalib* metalib;
   Implementation ()
     : metalib (NULL)
@@ -97,10 +98,11 @@ Log::close_alist ()
 { close (); }
 
 void 
-Log::open_soil (const Geometry& g, const Soil& s)
+Log::open_soil (const Geometry& g, const Soil& s, const Vegetation& v)
 { 
   impl->geometries.push_back (&g);
   impl->soils.push_back (&s);
+  impl->vegetations.push_back (&v);
 }
 
 void 
@@ -108,20 +110,28 @@ Log::close_soil ()
 {
   impl->geometries.pop_back ();
   impl->soils.pop_back ();
+  impl->vegetations.pop_back ();
 }
 
 const Geometry*
-Log::geometry ()
+Log::geometry () const
 {
   daisy_assert (!impl->geometries.empty ());
   return impl->geometries.back ();
 }
 
 const Soil*
-Log::soil ()
+Log::soil () const
 {
   daisy_assert (!impl->soils.empty ());
   return impl->soils.back ();
+}
+
+const Vegetation*
+Log::vegetation () const
+{
+  daisy_assert (!impl->vegetations.empty ());
+  return impl->vegetations.back ();
 }
 
 

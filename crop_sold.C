@@ -138,6 +138,7 @@ public:
   double DM (double height) const;
   double total_N () const;
   double total_C () const;
+  const std::vector<double>& root_density () const;
 
   // Create and Destroy.
 public:
@@ -2014,6 +2015,10 @@ CropSold::total_C () const
   const double total = WLeaf * C_Leaf + WSOrg * C_SOrg + WRoot * C_Root;
   return total / conv;
 }
+
+const std::vector<double>& 
+CropSold::root_density () const
+{ return var.RootSys.Density; }
 
 CropSold::CropSold (Block& al)
   : Crop (al),

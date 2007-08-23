@@ -159,6 +159,8 @@ public:
   { return production.total_N (); }
   double total_C () const
   { return production.total_C (); }
+  const std::vector<double>& root_density () const
+  { return root_system->Density; }
 
   // Create and Destroy.
 public:

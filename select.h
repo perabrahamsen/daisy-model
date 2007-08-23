@@ -32,6 +32,7 @@
 
 class Geometry;
 class Soil;
+class Vegetation;
 class Time;
 class Treelog;
 class Format;
@@ -118,7 +119,8 @@ public:
   virtual void output_integer (int);
   virtual void output_name (symbol);
   virtual void output_array (const std::vector<double>&,
-                             const Geometry*, const Soil*, Treelog&);
+                             const Geometry*, const Soil*, const Vegetation*,
+			     Treelog&);
 
   // Reset at start of time step.
 public:

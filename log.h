@@ -42,12 +42,11 @@ class Daisy;
 class PLF;
 class Geometry;
 class Soil;
+class Vegetation;
 class Time;
 class Metalib;
 class Treelog;
 class Block;
-
-using namespace std;
 
 class EXPORT Log : public Model
 {
@@ -266,19 +265,22 @@ public:
   private:
     Log& ll;
   public:
-    Geo (Log& l, const Geometry& geo, const Soil& soil)
+    Geo (Log& l, const Geometry& geo, const Soil& soil, const Vegetation& veg)
       : ll (l)
-    { ll.open_soil (geo, soil); }
+    { ll.open_soil (geo, soil, veg); }
     ~Geo ()
     { ll.close_soil (); }
+  private:
+    Geo (const Geo&);
   };
 private:
-  void open_soil (const Geometry&, const Soil&);
+  void open_soil (const Geometry&, const Soil&, const Vegetation&);
   void close_soil ();
   friend struct Log::Geo;
 public:
-  const Geometry* geometry ();
-  const Soil* soil ();
+  const Geometry* geometry () const;
+  const Soil* soil () const;
+  const Vegetation* vegetation () const;
 
   // Utilities
 public:

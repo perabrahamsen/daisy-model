@@ -41,7 +41,8 @@ struct SelectContent : public SelectValue
 
   // Output routines.
   void output_array (const std::vector<double>& array, 
-		     const Geometry* geo, const Soil* soil, Treelog&)
+		     const Geometry* geo, const Soil* soil, const Vegetation*, 
+		     Treelog&)
   { 
     if (soil != old_soil)
         old_soil = soil;

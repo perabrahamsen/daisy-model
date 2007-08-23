@@ -463,7 +463,7 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Potential root penetration depth.");
   syntax.add ("Depth", "cm", Check::non_negative (), Syntax::OptionalState,
 	      "Rooting Depth.");
-  syntax.add ("Density", "cm/cm3", Check::non_negative (),
+  syntax.add ("Density", "cm/cm^3", Check::non_negative (),
 	      Syntax::LogOnly, Syntax::Sequence,
 	       "Root density in soil layers.");
   syntax.add ("H2OExtraction", "cm^3/cm^3/h", Check::non_negative (), 

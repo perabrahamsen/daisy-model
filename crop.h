@@ -134,6 +134,7 @@ public:
   virtual double DM (double height) const = 0; // Shoot dry matter, [kg DM/ha].
   virtual double total_N () const = 0; // N content [kg N/ha]
   virtual double total_C () const = 0; // C content [kg C/ha]
+  virtual const std::vector<double>& root_density () const = 0;
 
   // Create and Destroy.
 public:

@@ -122,6 +122,14 @@ struct VegetationPermanent : public Vegetation
   string crop_names () const
   { return name.name (); }
 
+  const std::vector<double>& root_density () const
+  { return root_system->Density; }
+  const std::vector<double>& root_density (symbol crop) const
+  { 
+    static const std::vector<double> empty;
+    return empty;
+  }
+
   // Simulation.
   void reset_canopy_structure (const Time& time);
   void tick (const Time& time, const double relative_humidity, const double CO2_atm,

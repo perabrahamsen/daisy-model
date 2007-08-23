@@ -833,7 +833,7 @@ ColumnStandard::check_y_border (const double value, Treelog& msg) const
 void
 ColumnStandard::output (Log& log) const
 {
-  Log::Geo geo (log, geometry, *soil);
+  Log::Geo geo (log, geometry, *soil, *vegetation);
   Column::output (log);
   if (weather.get ())
     output_derived (weather, "weather", log);

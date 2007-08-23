@@ -362,7 +362,7 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS =action_extern.C \
+MODELS = action_extern.C \
 	rubiscoNdist_expr.C uzrect_const.C photo_FCC3.C photo_FCC4.C \
 	msoltranrect_Mollerup.C reaction_std.C chemistry_std.C \
 	groundwater_extern.C \
@@ -540,11 +540,9 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = tlink32.ini daisy.bpr daisy.bpf daisy.bpg Daisy.vcproj q4main.C \
-	treelog_stream.C treelog_stream.h treelog_dual.C treelog_dual.h
+REMOVE = select_water.C 
 
-
-REMOVED = soil_chemical.C soil_chemicals.C chemicals.C soil_chemical.h soil_chemicals.h chemicals.h boolean_extern.C number_extern.C options.C options.h select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
+REMOVED = tlink32.ini daisy.bpr daisy.bpf daisy.bpg Daisy.vcproj q4main.C treelog_stream.C treelog_stream.h treelog_dual.C treelog_dual.h soil_chemical.C soil_chemicals.C chemicals.C soil_chemical.h soil_chemicals.h chemicals.h boolean_extern.C number_extern.C options.C options.h select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
 
 # These are the file extensions we deal with.
 # 

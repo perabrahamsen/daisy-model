@@ -12,6 +12,46 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.19
+
+** water_volume and water_interval:  New select models.
+
+These models will log how much water corresponds to a specific
+pressure in the specified volume or interval.
+
+** min_root_density and crop: New log parameters
+
+When logging a volume or interval, you can specify a min_root_density.
+If the root density is below this thresshold, the contribution from
+the cell will be scaled accordingly.  This can be used to log a
+dynamic root zone.  If the new crop parameter is specified (and
+different from "*"), the root zone of that crop only will be used.
+Otherwise, all roots will be used.
+
+** New 'location' column parameter.
+
+This replaces the old 'x' and 'y' paramaters.  It is a list of (x y)
+points, intended to identify the location of the column on an
+externally defined map.  This is most relevant when coupled with a GIS
+system, for example through the OpenMI interface.
+
+** New 'extern' depth model.
+
+This is used for specifying an externally defined pressure table with
+tillage drainage.
+
+** New OpenMI.dai library file
+
+Together with the also new OpenMI_simple.dai and OpenMI_management.dai
+files in the sample directory, they are intended to demonstrate how to
+use the OpenMI interface to Daisy.
+
+** daisy_dotnet.dll and daisy_OpenMI.dll included in distribution.
+
+The daisy_dotnet.dll is a .NET wrapper to the C interface of daisy.dll.
+
+The daisy_OpenMI.dll defines Daisy as an OpenMI component.
+
 * 4.18
 
 Reenabled GUI, more work on OpenMI.

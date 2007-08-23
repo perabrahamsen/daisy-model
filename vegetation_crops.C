@@ -117,6 +117,10 @@ struct VegetationCrops : public Vegetation
   double DM_by_name (symbol name, double height) const;
   std::string crop_names () const;
 
+  std::vector<double> total_root_density;
+  const std::vector<double>& root_density () const;
+  const std::vector<double>& root_density (symbol crop) const;
+
   // Simulation.
   void tick (const Time& time, double relative_humidity, const double CO2_atm,
 	     const Bioclimate& bioclimate, 
@@ -294,6 +298,23 @@ VegetationCrops::crop_names () const
   return result;
 }
 
+const std::vector<double>& 
+VegetationCrops::root_density () const
+{ return total_root_density; }
+
+const std::vector<double>& 
+VegetationCrops::root_density (symbol name) const
+{ 
+  for (CropList::const_iterator crop = crops.begin();
+       crop != crops.end();
+       crop++)
+    if ((*crop)->name == name)
+      return (*crop)->root_density ();
+
+  static const std::vector<double> empty;
+  return empty;
+}
+
 void 
 VegetationCrops::tick (const Time& time, const double relative_humidity, 
 		       const double CO2_atm,
@@ -360,6 +381,9 @@ VegetationCrops::tick (const Time& time, const double relative_humidity,
 void 
 VegetationCrops::reset_canopy_structure (Treelog& msg)
 {
+  // Clear roots.
+  total_root_density.clear ();
+
   // Shared light.
   shared_light_fraction_= 1.0;
       
@@ -373,6 +397,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
        crop != crops.end(); 
        crop++)
     {
+      // Canopy.
       shared_light_fraction_ -= (*crop)->minimum_light_fraction ();
       const double crop_LAI = (*crop)->LAI ();
       if (crop_LAI > 0.0)
@@ -383,6 +408,14 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 	    height_ = (*crop)->height ();
 	  LAIvsH_ += (*crop)->LAIvsH ();
 	}
+
+      // Roots.
+      const std::vector<double>& root_density = (*crop)->root_density ();
+      for (size_t i = 0; i < root_density.size (); i++)
+	if (total_root_density.size () > i)
+	  total_root_density[i] += root_density[i];
+	else
+	  total_root_density.push_back (root_density[i]);
     }
   
   if (shared_light_fraction_ < -1e-20)

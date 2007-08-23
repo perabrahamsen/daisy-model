@@ -144,7 +144,7 @@ struct ActionCrop : public Action
     Fertilize (const AttributeList&);
     ~Fertilize ();
   };
-  const vector <const Fertilize*> fertilize_at;
+  const std::vector <const Fertilize*> fertilize_at;
   int fertilize_at_index;
   const bool fertilize_incorporate;
   void fertilize (Daisy& daisy, Treelog&, const AttributeList& am) const;
@@ -245,7 +245,7 @@ ActionCrop::MM_DD::check_alist (const AttributeList& alist, Treelog& err)
   // don't test for bad month.
   else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      ostringstream tmp;
+      std::ostringstream tmp;
       tmp << "day should be between 1 and " << Time::month_length (1, mm);
       err.entry (tmp.str ());
       ok = false;
@@ -551,7 +551,7 @@ ActionCrop::Fertilize::check_alist (const AttributeList& al, Treelog& err)
   // don't test for bad month.
   else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      ostringstream tmp;
+      std::ostringstream tmp;
       tmp << "day should be between 1 and " << Time::month_length (1, mm);
       err.entry (tmp.str ());
       ok = false;
@@ -584,7 +584,7 @@ void
 ActionCrop::fertilize (Daisy& daisy, Treelog& out,
 		       const AttributeList& am) const
 {
-  out.message (string ("[Fertilizing ") + am.name ("type") + "]");
+  out.message (std::string ("[Fertilizing ") + am.name ("type") + "]");
 
 #if 0
   if (am.name ("syntax") != "mineral")
@@ -615,7 +615,7 @@ ActionCrop::Tillage::check_alist (const AttributeList& al, Treelog& err)
 
   if (dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      ostringstream tmp;
+      std::ostringstream tmp;
       tmp << "day should be between 1 and " << Time::month_length (1, mm);
       err.entry (tmp.str ());
       ok = false;
@@ -666,7 +666,7 @@ ActionCrop::Spray::check_alist (const AttributeList& al, Treelog& err)
   // don't test for bad month.
   else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      ostringstream tmp;
+      std::ostringstream tmp;
       tmp << "day should be between 1 and " << Time::month_length (1, mm);
       err.entry (tmp.str ());
       ok = false;
@@ -719,7 +719,7 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, const Scope&, Treelog& out) const
   if (daisy.field->soil_water_potential (depth) >= potential)
     return false;
 
-  ostringstream tmp;
+  std::ostringstream tmp;
   tmp << "Irrigating " << amount << " mm";
   out.message (tmp.str ());
   daisy.field->irrigate_overhead (amount, IM (), daisy.dt);

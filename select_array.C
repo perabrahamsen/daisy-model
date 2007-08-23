@@ -41,7 +41,8 @@ struct SelectArray : public Select
 
   // Output routines.
   void output_array (const std::vector<double>& array, 
-		     const Geometry* geo, const Soil*, Treelog&)
+		     const Geometry* geo, const Soil*, const Vegetation*, 
+		     Treelog&)
   { 
     if (geo)
       last_geo = geo;

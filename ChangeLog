@@ -1,6 +1,14 @@
-2007-08-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+2007-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 4.19 released.
+	* select* (output_array): Take vegetation parameter.
+	* log.C, log.h (open_geo): Take vegetation paramater.
+	* column_std.C (output): Use it.
+
+	* select_volume.C (min_root_density, crop): New parameters.
+
+2007-08-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_volume.C (water_interval, water_volume): New models.
 
 2007-08-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 

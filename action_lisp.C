@@ -236,7 +236,7 @@ struct ActionCond : public Action
 	 i != clauses.end ();
 	 i++)
       {
-	const vector<Action*>& actions = (*i)->actions;
+	const std::vector<Action*>& actions = (*i)->actions;
 	for (unsigned int j = 0; j < actions.size (); j++)
 	  if (!actions[j]->check (daisy, scope, err))
 	    ok = false;
@@ -255,9 +255,9 @@ struct ActionCond : public Action
 
 struct ActionIf : public Action
 {
-  auto_ptr<Condition> if_c;
-  auto_ptr<Action> then_a;
-  auto_ptr<Action> else_a;
+  std::auto_ptr<Condition> if_c;
+  std::auto_ptr<Action> then_a;
+  std::auto_ptr<Action> else_a;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 

@@ -92,7 +92,7 @@ public:
 
   bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const
   { 
-    Treelog::Open nest (err, string ("with") + column);
+    Treelog::Open nest (err, std::string ("with") + column);
     bool ok = true;
     for (std::vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();
@@ -103,7 +103,7 @@ public:
       }
     if (!daisy.field->find (column))
       {
-	err.entry (string ("No column '") + column + "'");
+	err.entry (std::string ("No column '") + column + "'");
 	ok = false;
       }
     return ok;

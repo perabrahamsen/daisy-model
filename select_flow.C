@@ -49,7 +49,7 @@ protected:
   // Output routines.
 private:
   void output_array (const std::vector<double>&, 
-                     const Geometry*, const Soil*, Treelog&);
+                     const Geometry*, const Soil*, const Vegetation*, Treelog&);
 
   // Create and Destroy.
 private:
@@ -108,7 +108,8 @@ SelectFlow::check_border (const Border& border, const Volume& default_volume,
 
 void
 SelectFlow::output_array (const std::vector<double>& array, 
-                          const Geometry* geo, const Soil*, Treelog& msg)
+                          const Geometry* geo, const Soil*, const Vegetation*, 
+			  Treelog& msg)
 { 
   if (geo != last_geo)
     {

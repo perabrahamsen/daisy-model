@@ -158,6 +158,8 @@ public:
   double DM (double height) const;
   double total_N () const;
   double total_C () const;
+  const std::vector<double>& root_density () const
+  { return root_system->Density; }
 
   // Create and Destroy.
 public:
@@ -438,7 +440,7 @@ CropSimple::~CropSimple ()
 static struct CropSimpleSyntax
 {
   static Model& make (Block& al)
-  { return *new CropSimple (al); }
+ { return *new CropSimple (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   { 

@@ -544,7 +544,8 @@ Select::output_name (const symbol)
 
 void 
 Select::output_array (const std::vector<double>&, 
-                      const Geometry*, const Soil*, Treelog&)
+                      const Geometry*, const Soil*, const Vegetation*,
+		      Treelog&)
 { throw ("This log selection can't log arrays."); }
 
 bool
