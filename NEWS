@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.20
+
+** More work on OpenMI.
+
 * 4.19
 
 ** water_volume and water_interval:  New select models.
