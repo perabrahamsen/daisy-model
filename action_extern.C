@@ -23,11 +23,18 @@
 #include "action.h"
 #include "scope_multi.h"
 #include "scopesel.h"
+#include "number.h"
 #include "daisy.h"
+#include "field.h"
+#include "am.h"
+#include "im.h"
 #include "log.h"
 #include "treelog.h"
 #include "librarian.h"
 #include "syntax.h"
+#include "block.h"
+#include "check.h"
+#include "assertion.h"
 #include <memory>
 
 struct ActionExtern : public Action
@@ -117,5 +124,217 @@ Scope to evaluate expessions in.");
     Librarian::add_type (Action::component, "extern", alist, syntax, &make);
   }
 } ActionExtern_syntax;
+
+struct ActionExternFertigation : public Action
+{
+  const std::auto_ptr<Scopesel> scopesel;
+  mutable const Scope* extern_scope;
+
+  const std::auto_ptr<Number> surface_expr;
+  double surface_value;
+  const std::auto_ptr<Number> subsoil_expr;
+  double subsoil_value;
+  const std::auto_ptr<Number> overhead_expr;
+  double overhead_value;
+  const std::auto_ptr<Number> NO3_expr;
+  double NO3_value;
+  const std::auto_ptr<Number> NH4_expr;
+  double NH4_value;
+  const double from;
+  const double to;
+
+  static const symbol kg_N_per_ha_per_h;
+  static const symbol mm_per_h;
+
+  void tick (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
+  {
+    daisy_assert (extern_scope);
+    ScopeMulti multi (*extern_scope, parent_scope);
+    if (!surface_expr->tick_value (surface_value, mm_per_h, multi, msg))
+      surface_value = 0.0;
+    if (!subsoil_expr->tick_value (subsoil_value, mm_per_h, multi, msg))
+      subsoil_value = 0.0;
+    if (!overhead_expr->tick_value (overhead_value, mm_per_h, multi, msg))
+      overhead_value = 0.0;
+    if (!NO3_expr->tick_value (NO3_value, kg_N_per_ha_per_h, multi, msg))
+      NO3_value = 0.0;
+    if (!NH4_expr->tick_value (NH4_value, kg_N_per_ha_per_h, multi, msg))
+      NH4_value = 0.0;
+  }
+
+  void doIt (Daisy& daisy, const Scope& parent_scope, Treelog& msg)
+  { 
+    Field& field = *daisy.field;
+    const double dt = daisy.dt;
+
+    daisy_assert (extern_scope);
+    ScopeMulti multi (*extern_scope, parent_scope);
+
+    const double total_flux
+      = surface_value + subsoil_value + overhead_value;
+
+    if (total_flux > 0.0)
+      {
+	// [kg/ha] -> [g/cm^2]
+	const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+	// [mm * mg N/ l] = [l/m^2 * mg N/l] = [mg/m^2] -> [g N/cm^2]
+	const double irrigate_solute_factor = 1.0e-7;
+	const double factor = (conv / irrigate_solute_factor) / total_flux;
+	IM im;
+	im.NH4 = NH4_value * factor;
+	im.NO3 = NO3_value * factor;
+
+	if (surface_value > 0)
+	  field.irrigate_surface (surface_value, im, dt); 
+	if (overhead_value > 0)
+	  field.irrigate_overhead (overhead_value, im, dt); 
+	if (subsoil_value > 0)
+	  field.irrigate_subsoil (subsoil_value, im, from, to, dt); 
+      }
+    else if (NH4_value + NO3_value > 0.0)
+      {
+	AttributeList alist;
+	AM::set_mineral (alist, NH4_value, NO3_value);
+	field.fertilize (alist, dt);
+      }
+  }
+
+  bool done (const Daisy&, const Scope&, Treelog&) const
+  { return false; }
+
+  void output (Log&) const
+  { }
+
+  void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
+  { 
+    extern_scope = scopesel->lookup (*daisy.output_log, msg); 
+    if (!extern_scope)
+      return;
+
+    surface_expr->initialize (msg);
+    subsoil_expr->initialize (msg);
+    overhead_expr->initialize (msg);
+    NH4_expr->initialize (msg);
+    NO3_expr->initialize (msg);
+  }
+
+  bool check (const Daisy& daisy, const Scope& parent_scope, 
+              Treelog& msg) const
+  { 
+    bool ok = true; 
+
+    if (!extern_scope)
+      {
+        msg.error ("Extern scope not found");
+        ok = false;
+      }
+    else
+      {
+        ScopeMulti multi (*extern_scope, parent_scope);
+	if (!surface_expr->check_dim (multi, mm_per_h, msg))
+	  ok = false;
+	if (!subsoil_expr->check_dim (multi, mm_per_h, msg))
+	  ok = false;
+	if (!overhead_expr->check_dim (multi, mm_per_h, msg))
+	  ok = false;
+	if (!NH4_expr->check_dim (multi, kg_N_per_ha_per_h, msg))
+	  ok = false;
+	if (!NO3_expr->check_dim (multi, kg_N_per_ha_per_h, msg))
+	  ok = false;
+      }
+    return ok;
+  }
+
+  ActionExternFertigation (Block& al)
+    : Action (al),
+      scopesel (Librarian::build_item<Scopesel> (al, "scope")),
+      extern_scope (NULL),
+      surface_expr (Librarian::build_item<Number> (al, "surface")),
+      surface_value (0.0),
+      subsoil_expr (Librarian::build_item<Number> (al, "subsoil")),
+      subsoil_value (0.0),
+      overhead_expr (Librarian::build_item<Number> (al, "overhead")),
+      overhead_value (0.0),
+      NO3_expr (Librarian::build_item<Number> (al, "NO3")),
+      NO3_value (0.0),
+      NH4_expr (Librarian::build_item<Number> (al, "NH4")),
+      NH4_value (0.0),
+      from (al.number ("from")),
+      to (al.number ("to"))
+  { }
+  ~ActionExternFertigation ()
+  { }
+};
+
+const symbol 
+ActionExternFertigation::kg_N_per_ha_per_h ("kg N/ha/h");
+
+const symbol
+ActionExternFertigation::mm_per_h ("mm/h");
+
+
+static struct ActionExternFertigationSyntax
+{
+  static bool check_alist (const AttributeList& al, Treelog& err)
+  { 
+    bool ok = true;
+    const double from = al.number ("from");
+    const double to = al.number ("to");
+    if (from <= to)
+      {
+	err.entry ("'from' must be higher than 'to' in"
+		   " the subsoil irrigation zone");
+	ok = false;
+      }
+    return ok;
+  }
+
+  static Model& make (Block& al)
+  { return *new ActionExternFertigation (al); }
+  ActionExternFertigationSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    syntax.add_check (check_alist);	
+    
+    alist.add ("description", "\
+Continiues irrigation with mineral nitrogen mix.\n\
+\n\
+If the nitrogen amount is non-zero, it will be applied in the\n\
+irrigation water if available, and otherwise be spread on the soil\n\
+surface.");
+
+    syntax.add_object ("scope", Scopesel::component, 
+                       Syntax::Const, Syntax::Singleton, "\
+Scope to evaluate expessions in.");
+    alist.add ("scope", Scopesel::default_model ());
+
+    syntax.add_object ("surface", Number::component, 
+		       Syntax::Const, Syntax::Singleton, 
+"Amount of surface irrigation applied.");
+    syntax.add_object ("overhead", Number::component, 
+		       Syntax::Const, Syntax::Singleton, 
+"Amount of overhead irrigation applied.");
+    syntax.add_object ("subsoil", Number::component, 
+		       Syntax::Const, Syntax::Singleton, 
+"Amount of subsoil irrigation applied.");
+    syntax.add_object ("NO3", Number::component, 
+		       Syntax::Const, Syntax::Singleton, 
+"Amount of NO3 in irrigation.");
+    syntax.add_object ("NH4", Number::component, 
+		       Syntax::Const, Syntax::Singleton, 
+"Amount of NH4 in irrigation.");
+
+    syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
+Height where you want to start the incorporation (a negative number).");
+    alist.add ("from", 0.0);
+    syntax.add ("to", "cm", Check::negative (), Syntax::Const, "\
+Height where you want to end the incorporation (a negative number).");
+    alist.add ("from", -10.0);
+
+    Librarian::add_type (Action::component, "extern_fertigation",
+			 alist, syntax, &make);
+  }
+} ActionExternFertigation_syntax;
 
 // action_extern.C ends here.

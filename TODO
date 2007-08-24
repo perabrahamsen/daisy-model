@@ -14,19 +14,6 @@ Snak med BGJ
 
 *** Variabel "to" (rodzone).  Scope? soil, geo, root zone depth
 
-DONE Log::Geo skal gemmer "Vegetation"
-
-DONE Ret alt :-)
-
-DONE Select::output_arry skal tage Vegetation parameter
-
-DONE Lav Vegetation::root_density (symbol crop)
-
-SelectVolume skal tage "crop" og en "min_root_density" parametre
-
-(crop "*")
-(min_root_density 1 [cm/cm^3])
-
 ** Læs vejr fra OpenMI.
 
 vejr multi

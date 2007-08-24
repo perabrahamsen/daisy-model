@@ -1,3 +1,7 @@
+2007-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_extern.C (extern_fertigation): New model.
+
 2007-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.19 released.

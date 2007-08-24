@@ -48,6 +48,8 @@ struct ActionIrrigate : public Action
   const double temp;
   const IM sm;
   
+  static const symbol mm_per_h;
+
   virtual void irrigate (Field&, double flux, double temp, const IM&, 
                          double dt) const = 0;
 
@@ -59,40 +61,15 @@ struct ActionIrrigate : public Action
   bool check (const Daisy&, const Scope& scope, Treelog& msg) const
   {
     bool ok = true;
-    if (!expr_flux->check (scope, msg))
+    if (!expr_flux->check_dim (scope, mm_per_h, msg))
       ok = false;
-    else if (!Units::can_convert (expr_flux->dimension (scope).name (), "mm/h"))
-      {
-        msg.error ("Cannot convert [" + 
-		   expr_flux->dimension (scope).name () + "] to [mm/h]");
-        ok = false;
-      }
     return ok;
   }
 
   void tick (const Daisy&, const Scope& scope, Treelog& msg)
   { 
-    expr_flux->tick (scope, msg);
-    bool has_flux = !expr_flux->missing (scope);
-    std::ostringstream tmp;
-
-    if(has_flux)
-      {
-	flux = expr_flux->value (scope);
-	const symbol dim = expr_flux->dimension (scope);
-	
-	if (!Units::can_convert (dim.name (), "mm/h", flux))
-	  {
-	    tmp << "Cannot convert " << flux << " [" << dim << "] to [mm/h]";
-	    msg.warning (tmp.str ());
-	    has_flux = false;
-	  }
-	else
-	  {
-	    flux = Units::convert (dim.name (), "mm/h", flux);
-	    has_flux = true;
-	  }
-      }
+    if (!expr_flux->tick_value (flux, mm_per_h, scope, msg))
+      flux = 0.0;
   }
   
   void doIt (Daisy& daisy, const Scope&, Treelog& out)
@@ -109,8 +86,8 @@ struct ActionIrrigate : public Action
         // [kg/ha] -> [g/cm^2]
         const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
         // [mm * mg N/ l] = [l/m^2 * mg N/l] = [mg/m^2] -> [g N/cm^2]
-        static const double irrigate_solute_factor = 1.0e-7;
-        double N = (sm.NO3 + sm.NH4) * flux * (days * 24 + hours) 
+	const double irrigate_solute_factor = 1.0e-7;
+        const double N = (sm.NO3 + sm.NH4) * flux * (days * 24 + hours) 
           * irrigate_solute_factor / conv;
         if (N > 1e-10)
           tmp << "; " << N << " kg N/ha";
@@ -194,6 +171,8 @@ Nitrogen content of irrigation water [mg N/l] (default: none).",
 };
 
 const double ActionIrrigate::at_air_temperature = -500;
+
+const symbol ActionIrrigate::mm_per_h ("mm/h");
 
 struct ActionIrrigateOverhead : public ActionIrrigate
 {
@@ -319,6 +298,8 @@ static struct ActionIrrigateSubsoilSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     ActionIrrigate::load_syntax (syntax, alist);
+    syntax.add_check (check_alist);	
+
     alist.add ("description", "\
 Irrigate the field directly into the soil.\n\
 Currently, the 'temperature' parameter is ignored.");

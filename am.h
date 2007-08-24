@@ -102,6 +102,7 @@ public:
 				   const double weight /* [kg N/ha] */);
   static double utilized_weight (const AttributeList& am); // [kg N/ha]
   static double second_year_utilization (const AttributeList& am); // [kg N/ha]
+  static void set_mineral (AttributeList&, double NH4, double NO3);// [kg N/ha]
 
 private:
   friend class AM_Syntax;

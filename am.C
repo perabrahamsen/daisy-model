@@ -883,6 +883,16 @@ AM::second_year_utilization (const AttributeList& am)
   return 0.0;
 }
 
+void
+AM::set_mineral (AttributeList& am, double NH4, double NO3)
+{
+  am.add ("syntax", "mineral");
+  const double total_N = NH4 + NO3;
+  am.add ("weight", total_N);
+  am.add ("NH4_fraction", (total_N > 0.0) ? NH4 / total_N : 0.0);
+  am.add ("volatilization", 0.0);
+}
+
 AM::AM (const AttributeList& al)
   : impl (*new Implementation 
 	  (al.check ("creation")

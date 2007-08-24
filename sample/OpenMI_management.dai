@@ -4,6 +4,7 @@
 
 ;; Location of input files:
 ;; (path "." "C:/Programmer/Daisy/daisy-src/lib/" )
+(path "." "c:/cygwin/home/abraham/daisy/lib")
 
 ;; Use standard parameterizations.
 (input file "tillage.dai")
@@ -13,7 +14,7 @@
 
 ;; Weather data 
 ;; (weather default  "C:/Programmer/Daisy/daisy-src/sample/taastrup.dwf")
-(weather default  "dk-taastrup.dwf")
+(weather default  "taastrup.dwf")
 
 ;; We have some very sandy soil.
 (defhorizon Ap FAO3
@@ -54,18 +55,16 @@
 (time 1986 12 1 1)
 (stop 1988 4 1 1)
 
-;; Make fertigation input items available 
-(scope name fertigation)
-
 ;; Simulation of bare soil with surface irrigation
-(manager activity
-	 (repeat 
-	  (if (check (> "Surface Irrigation" 0.0 [mm/h]))
-	      (irrigate_surface "Surface Irrigation"))))
+(manager OpenMI_fertigation
+  (scope name fertigation)
+  ;; Drip line placement.
+  (from -5 [cm])
+  (to  -15 [cm]))
 
 ;; Export these items through OpenMI.
 (output (Lower_boundary_output (column Andeby))
-	(Crop_soil_content (column Andeby)(to -50 [cm]))
+	(Crop_soil_content (column Andeby) (to -50 [cm]))
 	;; An ordinary log file:
         ("Soil Water Potential" (column Andeby)))
 
