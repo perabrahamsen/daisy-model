@@ -108,12 +108,12 @@ struct MsoltranrectMollerup : public Msoltranrect
                             const double in_sign, const double q, 
                             ublas::banded_matrix<double>& B_mat);
   
-  /*
+
   static void Dirichlet_long (const size_t cell,
 			      const double area, 
 			      const double area_per_length, 
 			      const double in_sign,
-			      const double D_long,
+			      const double ThetaD_long,
 			      const double C_border,
 			      const double C_cell,
 			      const double q,
@@ -121,13 +121,15 @@ struct MsoltranrectMollerup : public Msoltranrect
 			      ublas::banded_matrix<double>& diffm_long_mat,
 			      ublas::vector<double>& diffm_long_vec, 
 			      ublas::banded_matrix<double>& advecm); 
+			      
+  
 
   static void lowerboundary (const GeometryRect& geo,
 			     const bool isflux,
 			     const double C_border,
 			     const std::vector<double>& C,
 			     const ublas::vector<double>& q_edge,
-                             const ublas::vector<double>& D_long,
+                             const ublas::vector<double>& ThetaD_long,
 			     std::vector<double>& J,
                              ublas::banded_matrix<double>& B_mat,
                              ublas::vector<double>& B_vec,
@@ -135,16 +137,12 @@ struct MsoltranrectMollerup : public Msoltranrect
                              ublas::vector<double>& diffm_long_vec,
 			     ublas::banded_matrix<double>& advecm);
 
-
-  */
-
-
   static void upperboundary (const GeometryRect& geo,
               		     std::vector<double>& J,
                              ublas::vector<double>& B_vec,
                              Treelog& msg);
-
  
+
 
   // Solute.
   void flow (const GeometryRect& geo, 
@@ -553,7 +551,14 @@ MsoltranrectMollerup::Neumann_expl (const size_t cell,
                                     const double in_sign,
                                     const double J, 
                                     ublas::vector<double>& B_vec)
-{ B_vec (cell) = J * area * in_sign; }
+{
+  B_vec (cell) = J * area * in_sign;   //J*in_sign pos for fluc into domain (cell)  
+  //Debug
+  //std::cout << "Neumann expl, cell no " << cell << '\n';
+  //std::cout << "J = " << J << '\n';
+  //std::cout << "in_sign = " << in_sign << '\n';  
+  //std::cout << "B_vec(cell) = " << B_vec (cell) << '\n';
+}
 
 
 void 
@@ -564,17 +569,21 @@ MsoltranrectMollerup::Neumann_impl (const size_t cell,
                                     ublas::banded_matrix<double>& B_mat)
 {
   daisy_assert (q * in_sign <= 0.0);
-  B_mat (cell, cell) = q * area * in_sign; 
+  B_mat (cell, cell) = q * area * in_sign;  // q * in_sign pos for flux into domain  
+  //Debug
+  //std::cout << "Neumann impl, cell no " << cell << '\n';
+  //std::cout << "q = " << q << '\n';
+  //std::cout << "in_sign = " << in_sign << '\n';  
+  //std::cout << "B_mat(cell,cell) = " << B_mat (cell, cell) << '\n';
 }
 
 
-#if 0
 void 
 MsoltranrectMollerup::Dirichlet_long (const size_t cell,
                                       const double area, 
                                       const double area_per_length, 
                                       const double in_sign,
-                                      const double D_long,
+                                      const double ThetaD_long,
                                       const double C_border,
                                       const double C_cell,
                                       const double q,
@@ -585,27 +594,29 @@ MsoltranrectMollerup::Dirichlet_long (const size_t cell,
 {
   // Boundary advection
   const double value = area  * q;
-  advecm (cell, cell) -= in_sign * value;
+  advecm (cell, cell) -= in_sign * value;  //q*in_sign pos for inflow
   
   //Boundary longitudinal diffusion
-  const double D_area_per_length = D_long * area_per_length;
+  const double D_area_per_length = ThetaD_long * area_per_length;
   diffm_long_mat (cell, cell) -= D_area_per_length;
   
   const double diffm_long_vec_val = D_area_per_length * C_border;
   diffm_long_vec (cell) += diffm_long_vec_val;
-    
-  J = in_sign * (D_area_per_length * C_cell + diffm_long_vec_val ) / area;  
+  
+  //Calculate fluxes 
+  J = in_sign * (-value 
+		 -D_area_per_length * C_cell
+		 + diffm_long_vec_val) / area;
 }
-#endif
 
-#if 0
+
 void 
 MsoltranrectMollerup::lowerboundary (const GeometryRect& geo,
                                      const bool isflux,
                                      const double C_border,
 				     const std::vector<double>& C,
                                      const ublas::vector<double>& q_edge,
-				     const ublas::vector<double>& D_long,
+				     const ublas::vector<double>& ThetaD_long,
 				     std::vector<double>& J,
                                      ublas::banded_matrix<double>& B_mat,
                                      ublas::vector<double>& B_vec,
@@ -643,50 +654,42 @@ MsoltranrectMollerup::lowerboundary (const GeometryRect& geo,
       else                      // C_Border. BC
         {
           // write something
-	  Dirichlet_long (cell,
-			  area, 
-			  area_per_length, 
-			  in_sign,
-			  D_long (cell),
-			  C_border,
-			  C[cell], 
-			  q_edge (edge),
-			  J[edge],
-			  diffm_long_mat,
-			  diffm_long_vec, 
-			  advecm);  
+	  Dirichlet_long (cell, area, area_per_length, in_sign, 
+			  ThetaD_long (cell),
+			  C_border, C[cell], q_edge (edge),  J[edge],
+			  diffm_long_mat, diffm_long_vec, advecm);  
         }
     }
-
-
-#if 0     
-        case Groundwater::pressure:
-          {
-            const double value = -K (cell) * geo.edge_area_per_length (edge);
-            const double pressure =  groundwater.table () - geo.zplus (cell);
-            Dirichlet (edge, cell, area, in_sign, sin_angle, 
-                       K (cell), h (cell),
-                       value, pressure,
-                       dq, Dm_mat, Dm_vec, Gm);
-          }
-          break;
-        case Groundwater::lysimeter:
-          if (active_lysimeter[cell])
-            {
-              const double value = -K (cell) * geo.edge_area_per_length (edge);
-              const double pressure =  0.0;
-              Dirichlet (edge, cell, area, in_sign, sin_angle,
-                         K (cell), h (cell),
-                         value, pressure, dq, Dm_mat, Dm_vec, Gm);
-            }
-          break;
-        default:
-          daisy_panic ("Unknown groundwater type");
-        }
-    }
-#endif
 }
-#endif
+   
+
+#if 0 
+
+case Groundwater::pressure:
+{
+  const double value = -K (cell) * geo.edge_area_per_length (edge);
+  const double pressure =  groundwater.table () - geo.zplus (cell);
+  Dirichlet (edge, cell, area, in_sign, sin_angle, 
+	     K (cell), h (cell),
+	     value, pressure,
+	     dq, Dm_mat, Dm_vec, Gm);
+}
+break;
+case Groundwater::lysimeter:
+if (active_lysimeter[cell])
+{
+  const double value = -K (cell) * geo.edge_area_per_length (edge);
+  const double pressure =  0.0;
+  Dirichlet (edge, cell, area, in_sign, sin_angle,
+	     K (cell), h (cell),
+	     value, pressure, dq, Dm_mat, Dm_vec, Gm);
+}
+break;
+default:
+daisy_panic ("Unknown groundwater type");
+
+#endif 
+
 
 void 
 MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
@@ -700,6 +703,9 @@ MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
   for (size_t i = 0; i < edge_above_size; i++)
     {
       const int edge = edge_above[i];
+      //Debug 
+      //std::cout << "Edge no" << edge << '\n';
+      //std::cout << "J" << J[edge] << '\n';
       const int cell = geo.edge_other (edge, Geometry::cell_above);
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
@@ -834,7 +840,6 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     = ublas::zero_matrix<double> (cell_size, cell_size);
   advection (geo, q_edge, advec);  
   
-  
   // Initialize and calculate sink term
   ublas::vector<double> S_vol (cell_size); // sink term 
   for (size_t cell = 0; cell != cell_size ; ++cell) 
@@ -848,23 +853,32 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   ublas::vector<double> B_vec = ublas::zero_vector<double> (cell_size); 
   ublas::banded_matrix<double>  diffm_long_mat (cell_size, cell_size,      
 						0, 0); // Dir bc
-  diffm_long_mat = ublas::zero_matrix<double> (cell_size, cell_size);  
+  for (int c = 0; c < cell_size; c++)
+    diffm_long_mat (c, c) = 0.0;
+  //diffm_long_mat = ublas::zero_matrix<double> (cell_size, cell_size);  
+  
   ublas::vector<double>  diffm_long_vec (cell_size); // Dir bc
   diffm_long_vec = ublas::zero_vector<double> (cell_size);
   ublas::banded_matrix<double> advecm (cell_size, cell_size, 0, 0);   
   for (int c = 0; c < cell_size; c++)
     advecm (c, c) = 0.0;
   
-  //Debug - flow condition!!!
-  J[0] = 0.5; 
+
+  //Debug - flow c ndition!!!
+  //J[0] = -0.5; 
+  //J[101] = -0.5;
   upperboundary (geo, J, B_vec, msg);
   
-  
-  //const bool isflux = true;
 
-  //lowerboundary (geo, isflux, C_below, C, q_edge, D_long, J, B_mat, B_vec, 
-  //               diffm_long_mat, diffm_long_vec, advecm);
-  
+  //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  //bool isflux = true;
+  bool isflux = false;
+  double C_border = 1;
+  lowerboundary (geo, isflux, C_border, C, q_edge, ThetaD_long, J, B_mat, 
+		 B_vec, diffm_long_mat, diffm_long_vec, advecm);
+  //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
 
   //Make Q_mat area diagonal matrix 
   //Note: This only need to be "calculated" once.....
@@ -917,51 +931,31 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   
   if (simple_dcthetadt)
     {
-      //A = (1.0 / dt) * QTheta_mat                           // dtheta/dt
-      //- gamma * prod (Theta_mat, diff_long)               // long diffusion
-      //+ gamma * advec;                                    // advec
       A = (1.0 / dt) * QTheta_mat                           // dtheta/dt
 	- gamma * diff_long                                 // long diffusion
-	+ gamma * advec;                                    // advec
-     
-      //b_mat =  (1.0 / dt) * QTheta_mat_old 
-      //+ (1 - gamma) * prod (Theta_mat_old, diff_long)
-      //- (1 - gamma) * advec; 
+	+ gamma * advec                                     // advec
+	- gamma * B_mat                                     // impl Neumann BC 
+	- gamma * diffm_long_mat                            // Dirichlet BC
+	+ gamma * advecm;                                   // Dirichlet BC
+
       b_mat =  (1.0 / dt) * QTheta_mat_old 
 	+ (1 - gamma) * diff_long_old
-	- (1 - gamma) * advec; 
+	- (1 - gamma) * advec 
+	+ (1 - gamma) * B_mat
+	+ (1 - gamma) * diffm_long_mat
+	- (1 - gamma) * advecm;
       
       b = prod (b_mat, C_old)
-	- B_vec;                                        
-	//- S_vol;                                            // expl Neu BC         
+	+ B_vec                                    
+	+ diffm_long_vec;
+	//- S_vol;                                           
+ // expl Neu BC         
 	
       //Debug: Simple Dirichlet node       
       //A (0, 0) = 1.0;
       //for (int c = 1; c < cell_size; c++)
       //A (0, c) = 0.0;
       //b (0) = 1;
-
-
-      /*   This is with all effects...
-      A = (1.0 / dt) * QTheta_mat                          // dtheta/dt
-	- gamma * prod (Theta_mat, diff_long + diff_tran)  // diffusion
-	+ gamma * advec                                    // advection
-	+ gamma * B_mat                                    // impl Neu BC
-	- gamma * prod (Theta_mat, diffm_long_mat)         // Dir BC
-	+ gamma * advecm;                                  // Dir BC
-      
-      b_mat =  (1.0 / dt) * QTheta_mat_old 
-	+ (1 - gamma) * prod (Theta_mat_old, diff_long + diff_tran) 
-	- (1 - gamma) * advec
-	- (1 - gamma) * B_mat
-	+ (1 - gamma) * prod (Theta_mat_old, diffm_long_mat) 
-	- (1 - gamma) * advecm;
-
-      b = prod (b_mat, C_old)
-	- B_vec                                               // expl Neu BC         
-	+ gamma * prod (Theta_mat, diffm_long_vec)            // Dir BC
-	+ (1 - gamma) * prod (Theta_mat_old, diffm_long_vec)  // Dir BC
-	- S_vol;       */                                     // sink term	
     }
   else  
     {
