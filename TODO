@@ -1,18 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Få pdflatex installeret på X61
+* dist
 
-* Lav 4.19 setup
+Check OpenMI DLL.
 
 * OpenMI
-
-** management
-
-*** DONE Spørge om vandindhold af jordvolumen ved bestemt tryk.
-
-Snak med BGJ
-
-*** Variabel "to" (rodzone).  Scope? soil, geo, root zone depth
 
 ** Læs vejr fra OpenMI.
 
