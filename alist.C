@@ -32,8 +32,6 @@
 #include <map>
 #include <sstream>
 
-using namespace std;
-
 // @ Value
 //
 // Common abstraction of an attribute value.
@@ -72,16 +70,16 @@ struct Value
   int* ref_count;
 
   bool subset (const Metalib&, 
-               const Value& other, const Syntax&, const string& key) const;
+               const Value& other, const Syntax&, const std::string& key) const;
 
   void expect (const std::string& key, Syntax::type expected) const;
   void singleton (const std::string& key) const;
   void sequence (const std::string& key) const;
 
   // Variable
-  Value (const string& v, int)
+  Value (const std::string& v, int)
     : name (new symbol (v)),
-      type (Syntax::Object),
+      type (Syntax::Object),	// A reference.
       is_sequence (false),
       ref_count (new int (1))
     { }
@@ -91,9 +89,9 @@ struct Value
       is_sequence (false),
       ref_count (new int (1))
     { }
-  Value (double v, const string& s)
+  Value (double v, const std::string& s)
     : scalar (new Scalar (v, symbol (s))),
-      type (Syntax::Library),
+      type (Syntax::Library),	// Number with user specified dimension.
       is_sequence (false),
       ref_count (new int (1))
   { }
@@ -103,7 +101,7 @@ struct Value
       is_sequence (false),
       ref_count (new int (1))
   { }
-  Value (const string& v)
+  Value (const std::string& v)
     : name (new symbol (v)),
       type (Syntax::String),
       is_sequence (false),
@@ -139,64 +137,64 @@ struct Value
       is_sequence (false),
       ref_count (new int (1))
     { }
-  Value (const vector<double>& v)
-    : number_sequence (new vector<double> (v)),
+  Value (const std::vector<double>& v)
+    : number_sequence (new std::vector<double> (v)),
       type (Syntax::Number),
       is_sequence (true),
       ref_count (new int (1))
     { }
-  Value (const vector<symbol>& v)
-    : name_sequence (new vector<symbol> (v)),
+  Value (const std::vector<symbol>& v)
+    : name_sequence (new std::vector<symbol> (v)),
       type (Syntax::String),
       is_sequence (true),
       ref_count (new int (1))
     { }
-  static vector<symbol>* new_symbol_vector (const vector<string>& org)
+  static std::vector<symbol>* new_symbol_vector (const std::vector<std::string>& org)
   {
-    vector<symbol>* copy = new vector<symbol> ();
+    std::vector<symbol>* copy = new std::vector<symbol> ();
     for (unsigned int i = 0; i < org.size (); i++)
       copy->push_back (symbol (org[i]));
     return copy;
   }
-  Value (const vector<string>& v)
+  Value (const std::vector<std::string>& v)
     : name_sequence (new_symbol_vector (v)),
       type (Syntax::String),
       is_sequence (true),
       ref_count (new int (1))
     { }
-  Value (const vector<bool>& v)
-    : flag_sequence (new vector<bool> (v)),
+  Value (const std::vector<bool>& v)
+    : flag_sequence (new std::vector<bool> (v)),
       type (Syntax::Boolean),
       is_sequence (true),
       ref_count (new int (1))
     { }
-  Value (const vector<int>& v)
-    : integer_sequence (new vector<int> (v)),
+  Value (const std::vector<int>& v)
+    : integer_sequence (new std::vector<int> (v)),
       type (Syntax::Integer),
       is_sequence (true),
       ref_count (new int (1))
     { }
-  static vector<const PLF*>* copy_plfs (const vector<const PLF*>& org)
+  static std::vector<const PLF*>* copy_plfs (const std::vector<const PLF*>& org)
   {
-    vector<const PLF*>* copy = new vector<const PLF*> ();
+    std::vector<const PLF*>* copy = new std::vector<const PLF*> ();
     for (unsigned int i = 0; i < org.size (); i++)
       copy->push_back (new PLF (*org[i]));
     return copy;
   }
-  Value (const vector<const PLF*>& v)
+  Value (const std::vector<const PLF*>& v)
     : plf_sequence (copy_plfs (v)),
       type (Syntax::PLF),
       is_sequence (true),
       ref_count (new int (1))
     { }
-  vector<AttributeList*>* copy_alists (const vector<AttributeList*>& org)
+  std::vector<AttributeList*>* copy_alists (const std::vector<AttributeList*>& org)
   {
-    vector<AttributeList*>* copy = new vector<AttributeList*> ();
+    std::vector<AttributeList*>* copy = new std::vector<AttributeList*> ();
     for (unsigned int i = 0; i < org.size (); i++)
       copy->push_back (new AttributeList (*org[i]));
     return copy;
   }
-  Value (const vector<AttributeList*>& v)
+  Value (const std::vector<AttributeList*>& v)
     : alist_sequence (copy_alists (v)),
       type (Syntax::AList),
       is_sequence (true),
@@ -222,7 +220,7 @@ struct Value
 
 bool
 Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax, 
-	       const string& key) const
+	       const std::string& key) const
 {
   daisy_assert (type == v.type);
   daisy_assert (is_sequence == v.is_sequence);
@@ -289,8 +287,8 @@ Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax,
 	return *integer_sequence == *v.integer_sequence;
       case Syntax::AList:
 	{
-	  const vector<AttributeList*>& value = *alist_sequence;
-	  const vector<AttributeList*>& other = *v.alist_sequence;
+	  const std::vector<AttributeList*>& value = *alist_sequence;
+	  const std::vector<AttributeList*>& other = *v.alist_sequence;
 
 	  const unsigned int size = value.size ();
 	  if (other.size () != size)
@@ -351,7 +349,7 @@ Value::expect (const std::string& key, Syntax::type expected) const
 }
 
 void
-Value::singleton (const string& key) const
+Value::singleton (const std::string& key) const
 {
   if (!is_sequence)
     return;
@@ -362,7 +360,7 @@ Value::singleton (const string& key) const
 }
 
 void
-Value::sequence (const string& key) const
+Value::sequence (const std::string& key) const
 {
   if (is_sequence)
     return;
@@ -527,43 +525,43 @@ Value::operator= (const Value& v)
 
 // @ AttributeList
 
-typedef map <string, Value, less<string> > value_map;
+typedef std::map <std::string, Value> value_map;
 
 struct AttributeList::Implementation
 {
   value_map values;
-  bool check (const string& key) const;
-  const Value& lookup (const string& key) const;
-  void add (const string& key, const Value& value);
-  void remove (const string& key);
+  bool check (const std::string& key) const;
+  const Value& lookup (const std::string& key) const;
+  void add (const std::string& key, const Value& value);
+  void remove (const std::string& key);
   void clear ();
 };    
 
 bool
-AttributeList::Implementation::check (const string& key) const
+AttributeList::Implementation::check (const std::string& key) const
 { 
   return values.find (key) != values.end ();
 }
 
 const Value& 
-AttributeList::Implementation::lookup (const string& key) const
+AttributeList::Implementation::lookup (const std::string& key) const
 { 
   value_map::const_iterator i = values.find (key);
   
   if (i == values.end ())
-   daisy_panic (string ("AList: Missing key '") + key + "'");
+    daisy_panic (std::string ("AList: Missing key '") + key + "'");
 
   return (*i).second;
 }
 
 void
-AttributeList::Implementation::add (const string& key, const Value& value)
+AttributeList::Implementation::add (const std::string& key, const Value& value)
 {
   values[key] = value;
 }
 
 void
-AttributeList::Implementation::remove (const string& key)
+AttributeList::Implementation::remove (const std::string& key)
 {
   value_map::iterator i = values.find (key);
   if (i != values.end ())
@@ -577,7 +575,7 @@ AttributeList::Implementation::clear ()
 }
 
 bool
-AttributeList::check (const string& key) const
+AttributeList::check (const std::string& key) const
 { 
   return impl.check (key) && impl.lookup (key).type != Syntax::Object; 
 }
@@ -587,14 +585,14 @@ AttributeList::subset (const Metalib& metalib,
                        const AttributeList& other, const Syntax& syntax) const
 { 
   // Find syntax entries.
-  vector<string> entries;
+  std::vector<std::string> entries;
   syntax.entries (entries);
   const unsigned int size = entries.size ();
 
   // Loop over them.
   for (unsigned int i = 0; i < size; i++)
     {
-      const string& key = entries[i];
+      const std::string& key = entries[i];
       if (!subset (metalib, other, syntax, key))
 	return false;
     }
@@ -604,7 +602,7 @@ AttributeList::subset (const Metalib& metalib,
 bool 
 AttributeList::subset (const Metalib& metalib, 
                        const AttributeList& other, const Syntax& syntax,
-		       const string& key) const
+		       const std::string& key) const
 {
   if (check (key))
     {
@@ -621,7 +619,7 @@ AttributeList::subset (const Metalib& metalib,
 }
 
 int
-AttributeList::size (const string& key)	const
+AttributeList::size (const std::string& key)	const
 {
   const Value& value = impl.lookup (key);
 
@@ -653,15 +651,15 @@ AttributeList::size (const string& key)	const
 
   // Variables.
 void 
-AttributeList::add_reference (const string& key, const string& v)
+AttributeList::add_reference (const std::string& key, const std::string& v)
 { impl.add (key, Value (v, -1)); }
 
 bool
-AttributeList::is_reference (const string& key) const
+AttributeList::is_reference (const std::string& key) const
 { return impl.check (key) && impl.lookup (key).type == Syntax::Object; }
   
-const string& 
-AttributeList::get_reference (const string& key) const
+const std::string& 
+AttributeList::get_reference (const std::string& key) const
 {
   daisy_assert (is_reference (key));
   const Value& value = impl.lookup (key);
@@ -670,7 +668,7 @@ AttributeList::get_reference (const string& key) const
 }
 
 double 
-AttributeList::number (const string& key) const
+AttributeList::number (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.singleton (key);
@@ -681,7 +679,7 @@ AttributeList::number (const string& key) const
 }
 
 double 
-AttributeList::number (const string& key, const double default_value) const
+AttributeList::number (const std::string& key, const double default_value) const
 {
   if (!check (key))
     return default_value;
@@ -689,12 +687,12 @@ AttributeList::number (const string& key, const double default_value) const
   return number (key);
 }
 
-const string& 
-AttributeList::name (const string& key) const
+const std::string& 
+AttributeList::name (const std::string& key) const
 { return identifier (key).name (); }
 
-const string& 
-AttributeList::name (const string& key, const string& default_value) const
+const std::string& 
+AttributeList::name (const std::string& key, const std::string& default_value) const
 {
   if (!check (key))
     return default_value;
@@ -702,7 +700,7 @@ AttributeList::name (const string& key, const string& default_value) const
 }
 
 symbol
-AttributeList::identifier (const string& key) const
+AttributeList::identifier (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.singleton (key);
@@ -713,7 +711,7 @@ AttributeList::identifier (const string& key) const
 }
 
 bool 
-AttributeList::flag (const string& key) const
+AttributeList::flag (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.expect (key, Syntax::Boolean);
@@ -722,7 +720,7 @@ AttributeList::flag (const string& key) const
 }
 
 bool
-AttributeList::flag (const string& key, const bool default_value) const
+AttributeList::flag (const std::string& key, const bool default_value) const
 {
   if (!check (key))
     return default_value;
@@ -730,7 +728,7 @@ AttributeList::flag (const string& key, const bool default_value) const
 }
 
 int
-AttributeList::integer (const string& key) const
+AttributeList::integer (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.expect (key, Syntax::Integer);
@@ -739,7 +737,7 @@ AttributeList::integer (const string& key) const
 }
 
 int
-AttributeList::integer (const string& key, const int default_value) const
+AttributeList::integer (const std::string& key, const int default_value) const
 {
   if (!check (key))
     return default_value;
@@ -747,7 +745,7 @@ AttributeList::integer (const string& key, const int default_value) const
 }
 
 const PLF& 
-AttributeList::plf (const string& key) const
+AttributeList::plf (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.expect (key, Syntax::PLF);
@@ -756,7 +754,7 @@ AttributeList::plf (const string& key) const
 }
 
 AttributeList& 
-AttributeList::alist (const string& key) const
+AttributeList::alist (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.expect (key, Syntax::AList);
@@ -764,8 +762,8 @@ AttributeList::alist (const string& key) const
   return *value.alist;
 }
 
-const vector<double>& 
-AttributeList::number_sequence (const string& key) const
+const std::vector<double>& 
+AttributeList::number_sequence (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.expect (key, Syntax::Number);
@@ -773,8 +771,8 @@ AttributeList::number_sequence (const string& key) const
   return *value.number_sequence;
 }
 
-const vector<symbol>&
-AttributeList::identifier_sequence (const string& key) const
+const std::vector<symbol>&
+AttributeList::identifier_sequence (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.expect (key, Syntax::String);
@@ -782,18 +780,18 @@ AttributeList::identifier_sequence (const string& key) const
   return *value.name_sequence;
 }
 
-vector<string>
-AttributeList::name_sequence (const string& key) const
+std::vector<std::string>
+AttributeList::name_sequence (const std::string& key) const
 {
-  const vector<symbol>& v = identifier_sequence (key);
-  vector<string> result;
+  const std::vector<symbol>& v = identifier_sequence (key);
+  std::vector<std::string> result;
   for (size_t i = 0; i < v.size (); i++)
     result.push_back (v[i].name ());
   return result;
 }
 
-const vector<bool>& 
-AttributeList::flag_sequence (const string& key) const
+const std::vector<bool>& 
+AttributeList::flag_sequence (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.expect (key, Syntax::Boolean);
@@ -801,8 +799,8 @@ AttributeList::flag_sequence (const string& key) const
   return *value.flag_sequence;
 }
 
-const vector<int>& 
-AttributeList::integer_sequence (const string& key) const
+const std::vector<int>& 
+AttributeList::integer_sequence (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.expect (key, Syntax::Integer);
@@ -810,8 +808,8 @@ AttributeList::integer_sequence (const string& key) const
   return *value.integer_sequence;
 }
 
-const vector<const PLF*>& 
-AttributeList::plf_sequence (const string& key) const
+const std::vector<const PLF*>& 
+AttributeList::plf_sequence (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.expect (key, Syntax::PLF);
@@ -819,8 +817,8 @@ AttributeList::plf_sequence (const string& key) const
   return *value.plf_sequence;
 }
 
-const vector<AttributeList*>& 
-AttributeList::alist_sequence (const string& key) const
+const std::vector<AttributeList*>& 
+AttributeList::alist_sequence (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
   value.expect (key, Syntax::AList);
@@ -829,72 +827,72 @@ AttributeList::alist_sequence (const string& key) const
 }
 
 void 
-AttributeList::add (const string& key, double v)
+AttributeList::add (const std::string& key, double v)
 { impl.add (key, Value (v)); }
 
 void
-AttributeList::add (const string& key, double v, const string& d)
+AttributeList::add (const std::string& key, double v, const std::string& d)
 { impl.add (key, Value (v, d)); }
 
 void 
-AttributeList::add (const string& key, const char *const v)
+AttributeList::add (const std::string& key, const char *const v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const string& v)
+AttributeList::add (const std::string& key, const std::string& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const symbol sym)
+AttributeList::add (const std::string& key, const symbol sym)
 { add (key, sym.name ()); }
 
 void 
-AttributeList::add (const string& key, bool v)
+AttributeList::add (const std::string& key, bool v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, int v)
+AttributeList::add (const std::string& key, int v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const AttributeList& v)
+AttributeList::add (const std::string& key, const AttributeList& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const PLF& v)
+AttributeList::add (const std::string& key, const PLF& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const vector<double>& v)
+AttributeList::add (const std::string& key, const std::vector<double>& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const vector<symbol>& v)
+AttributeList::add (const std::string& key, const std::vector<symbol>& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const vector<bool>& v)
+AttributeList::add (const std::string& key, const std::vector<bool>& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const vector<int>& v)
+AttributeList::add (const std::string& key, const std::vector<int>& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const vector<AttributeList*>& v)
+AttributeList::add (const std::string& key, const std::vector<AttributeList*>& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const vector<const PLF*>& v)
+AttributeList::add (const std::string& key, const std::vector<const PLF*>& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::remove (const string& key)
+AttributeList::remove (const std::string& key)
 { impl.remove (key); }
 
 bool
 AttributeList::revert (const Metalib& metalib,
-                       const string& key, 
+                       const std::string& key, 
 		       const AttributeList& default_alist, 
 		       const Syntax& syntax)
 {

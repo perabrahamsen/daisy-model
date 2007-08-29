@@ -805,6 +805,7 @@ cvs: $(TEXT)
 	echo "	* Version" $(TAG) released. >> ChangeLog
 	echo >> ChangeLog
 	cat ChangeLog.old >> ChangeLog
+	(cd OpenMI; $(MAKE) cvs);
 	(cd lib; $(MAKE) cvs);
 	(cd sample; $(MAKE) cvs);
 	(cd txt; $(MAKE) cvs);
