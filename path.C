@@ -35,9 +35,8 @@ extern "C" char *getcwd (char *buf, size_t size);
 extern "C" int mkdir(const char *pathname, int mode);
 
 #include <fstream>
-#include <iostream>
-
-using namespace std;
+#include <ostream>
+#include <istream>
 
 #if defined (__unix) 
 #define DIRECTORY_SEPARATOR "/"
@@ -51,8 +50,8 @@ std::ostream& Path::Output::stream () const
 bool Path::Output::good () const
 { return owner && out.good (); }
 
-Path::Output::Output (const string& file)
-  : out (*new ofstream (file.c_str ())),
+Path::Output::Output (const std::string& file)
+  : out (*new std::ofstream (file.c_str ())),
     owner (true)
 { }
 
@@ -70,9 +69,9 @@ bool
 Path::Input::good () const
 { return owner && in.good (); }
 
-Path::Input::Input (const string& file)
+Path::Input::Input (const std::string& file)
   : in (open_file (file)),
-    owner (&in != &cin)
+    owner (true)
 { }
 
 Path::Input::~Input ()
@@ -84,7 +83,7 @@ Path::Input::~Input ()
 namespace Path
 {
   // Relative filename, use path.
-  static vector<string>* path = NULL;
+  static std::vector<std::string>* path = NULL;
 
   struct path_handler 
   { 
@@ -96,7 +95,7 @@ namespace Path
 }
 
 std::istream& 
-Path::open_file (const string& name)
+Path::open_file (const std::string& name)
 {
   // Absolute filename.
   if (name[0] == '.' || name[0] == '/'
@@ -105,17 +104,17 @@ Path::open_file (const string& name)
 #endif
       )
     {
-      return *new ifstream (name.c_str ());
+      return *new std::ifstream (name.c_str ());
     }
 
   // Look in path.
   daisy_assert (path);		// Must call set_path first.
-  ifstream* in = NULL;
+  std::ifstream* in = NULL;
   for (unsigned int i = 0; i < path->size (); i++)
     {
-      const string file = (*path)[i] + DIRECTORY_SEPARATOR + name;
+      const std::string file = (*path)[i] + DIRECTORY_SEPARATOR + name;
       delete in;
-      in = new ifstream (file.c_str ());
+      in = new std::ifstream (file.c_str ());
       if (in->good ())
 	return *in;
     }
@@ -123,7 +122,7 @@ Path::open_file (const string& name)
 }
 
 bool 
-Path::set_directory (const string& directory)
+Path::set_directory (const std::string& directory)
 { 
   const char *const dir = directory.c_str ();
   return chdir (dir) == 0 || (mkdir (dir, 0777) == 0 && chdir (dir) == 0); 
@@ -141,16 +140,16 @@ Path::get_directory ()
 }
 
 void 
-Path::set_path (const vector<string>& value)
+Path::set_path (const std::vector<std::string>& value)
 { 
   if (!path)
-    path = new vector<string> (value);
+    path = new std::vector<std::string> (value);
   else
    *path = value;
 }
 
 void
-Path::get_path (vector<string>& value)
+Path::get_path (std::vector<std::string>& value)
 { 
   daisy_assert (path);		// Must call set_path first.
   value = *path;

@@ -22,12 +22,10 @@
 #define BUILD_DLL
 
 #include "lexer.h"
-#include <sstream>
 #include "treelog.h"
 #include "path.h"
-
+#include <sstream>
 #include <vector>
-#include <iostream>
 
 struct Lexer::Implementation
 {
@@ -89,10 +87,7 @@ Lexer::Implementation::Implementation (const std::string& name)
 {}
   
 Lexer::Implementation::~Implementation ()
-{
-  if (&in != &std::cin)
-    delete &in;
-}
+{ delete &in; }
 
 bool 
 Lexer::Position::operator== (const Position& pos) const
@@ -226,7 +221,7 @@ Lexer::Lexer (const std::string& name, Treelog& out)
     file (name),
     error_count (0)
 {  
-  if (&impl->in == &std::cin || !impl->in.good ())
+  if (!impl->in.good ())
     err.entry (std::string ("Open '") + file + "' failed");
 }
 

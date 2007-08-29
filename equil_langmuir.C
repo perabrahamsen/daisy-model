@@ -43,7 +43,7 @@ struct EquilibriumLangmuir : public Equilibrium
   // Simulation.
   void find (const Soil&, const SoilWater&, unsigned int i,
 	     double has_A, double has_B, 
-	     double& want_A, double& want_B) const;
+	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
   enum { uninitialized, init_succes, init_failure } initialize_state;
@@ -60,7 +60,7 @@ struct EquilibriumLangmuir : public Equilibrium
 void
 EquilibriumLangmuir::find (const Soil&, const SoilWater&, unsigned int i,
 			   const double has_A, const double has_B, 
-			   double& want_A, double& want_B) const
+			   double& want_A, double& want_B, Treelog&) const
 {
   daisy_assert (has_A >= 0.0);
   daisy_assert (has_B >= 0.0);

@@ -32,23 +32,20 @@
 #include "librarian.h"
 #include <memory>
 #include <sstream>
-#include <iostream>
-
-using namespace std;
 
 struct EquilibriumGoal_A : public Equilibrium
 {
   // Parameters.
-  /* const */ vector<double> goal_A;
+  /* const */ std::vector<double> goal_A;
   const bool A_solute;
-  /* const */ vector<double> min_B;
+  /* const */ std::vector<double> min_B;
   const bool B_solute;
   const int debug_cell;
 
   // Simulation.
   void find (const Soil&, const SoilWater&, unsigned int i,
 	     double has_A, double has_B, 
-	     double& want_A, double& want_B) const;
+	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
   enum { uninitialized, init_succes, init_failure } initialize_state;
@@ -69,7 +66,7 @@ void
 EquilibriumGoal_A::find (const Soil&, const SoilWater& soil_water,
                          unsigned int i,
                          const double has_A, const double has_B, 
-                         double& want_A, double& want_B) const
+                         double& want_A, double& want_B, Treelog& msg) const
 {
   daisy_assert (goal_A.size () > i);
   daisy_assert (goal_A[i] >= 0.0);
@@ -107,13 +104,13 @@ EquilibriumGoal_A::find (const Soil&, const SoilWater& soil_water,
       tmp << "B->A";
       
       // We have too little A and too much B, convert just enough to fit one.
-      want_B = max (min_B_dry, M - goal_A_dry);
+      want_B = std::max (min_B_dry, M - goal_A_dry);
       want_A = M - want_B;
     }
   tmp << "\t" << has_A << "\t" << goal_A_dry << "\t" << want_A << "\t"
       << has_B << "\t" << min_B_dry << "\t" << want_B << "\t" << M;
   if (i == debug_cell)
-    cout << tmp.str () << "\n";
+    msg.message (tmp.str ());
 
   daisy_assert (want_A >= 0.0);
   daisy_assert (want_B >= 0.0);
@@ -126,7 +123,7 @@ EquilibriumGoal_A::initialize (Block& block, const Soil& soil)
   daisy_assert (initialize_state == uninitialized);
   initialize_state = init_succes;
 
-  auto_ptr<Pedotransfer> pedo_goal_A 
+  std::auto_ptr<Pedotransfer> pedo_goal_A 
     (Librarian::build_alist<Pedotransfer> (block, alist.alist ("goal_A"),
                                           "goal_A"));
   if (pedo_goal_A->check (soil, "g/cm^3", block.msg ()))
@@ -135,7 +132,7 @@ EquilibriumGoal_A::initialize (Block& block, const Soil& soil)
     initialize_state = init_failure;
   Pedotransfer::debug_message ("goal_A", goal_A, "g/cm^3", block.msg ());
 
-  auto_ptr<Pedotransfer> pedo_min_B 
+  std::auto_ptr<Pedotransfer> pedo_min_B 
     (Librarian::build_alist<Pedotransfer> (block, alist.alist ("min_B"),
                                           "min_B"));
   if (pedo_min_B->check (soil, "g/cm^3", block.msg ()))
@@ -145,8 +142,9 @@ EquilibriumGoal_A::initialize (Block& block, const Soil& soil)
   Pedotransfer::debug_message ("min_B", min_B, "g/cm^3",block.msg ());
 
   if (debug_cell >= 0 && debug_cell < soil.size ())
-    cout << "type\thas_A\tgoal_A\twant_A\thas_B\tgoal_B\twant_B\ttotal\n"
-         << "\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\n";
+    block.msg ()
+      .message ("type\thas_A\tgoal_A\twant_A\thas_B\tgoal_B\twant_B\ttotal\n"
+		"\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3");
 }
 
 bool 

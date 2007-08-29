@@ -24,7 +24,7 @@
 #include "assertion.h"
 #include <sstream>
 #include <map>
-#include <iostream>
+#include <ostream>
 
 struct symbol::DB
 {

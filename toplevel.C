@@ -40,7 +40,6 @@
 #include "w32reg.h"
 
 #include <sstream>
-#include <iostream>
 #include <ctime>
 
 #if defined (__unix) 

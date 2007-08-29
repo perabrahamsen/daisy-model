@@ -26,8 +26,7 @@
 #include "version.h"
 #include "assertion.h"
 #include "librarian.h"
-// GCC 2.95 lack ostream.
-#include <iostream>
+#include <ostream>
 #include <map>
 #include <time.h>
 

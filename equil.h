@@ -44,7 +44,7 @@ public:
 public:
   virtual void find (const Soil&, const SoilWater&, unsigned int i,
 		     double has_A, double has_B, 
-		     double& want_A, double& want_B) const = 0;
+		     double& want_A, double& want_B, Treelog&) const = 0;
 
   // Create and Destroy.
 public:

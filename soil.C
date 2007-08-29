@@ -43,8 +43,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include <sstream>
-#include <iomanip>
-#include <iostream>
 
 struct Soil::Implementation
 {

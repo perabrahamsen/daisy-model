@@ -62,7 +62,7 @@ struct TransformEquilibrium : public Transform
 void 
 TransformEquilibrium::tick (const Soil& soil, const SoilWater& soil_water,
 			    const vector<double>& A, const vector<double>& B,
-                            vector<double>& S_AB, Treelog&) const
+                            vector<double>& S_AB, Treelog& msg) const
 { 
   daisy_assert (k_AB.size () == soil.size ());
   daisy_assert (k_BA.size () == soil.size ());
@@ -76,7 +76,8 @@ TransformEquilibrium::tick (const Soil& soil, const SoilWater& soil_water,
       const double has_B = B[i];
       double want_A;
       double want_B;
-      equilibrium->find (soil, soil_water, i, has_A, has_B, want_A, want_B);
+      equilibrium->find (soil, soil_water, i, has_A, has_B, want_A, want_B,
+			 msg);
       daisy_assert (approximate (has_A + has_B, want_A + want_B));
 
       const double convert = (has_A > want_A)

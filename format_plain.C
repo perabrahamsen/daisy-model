@@ -22,8 +22,7 @@
 
 #include "format.h"
 #include "version.h"
-// GCC 2.95 lack ostream.
-#include <iostream>
+#include <ostream>
 #include <map>
 #include <time.h>
 
