@@ -31,9 +31,9 @@
 
 static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
 static const symbol LAI_symbol = symbol("LAI");
-static const symbol height_symbol = symbol("height"); // [cm]
+static const symbol distance_from_top_symbol = symbol("distance_from_top"); // [cm]
 static const symbol relative_LAI_symbol = symbol("relative_LAI");
-static const symbol relative_height_symbol = symbol("relative_height");
+static const symbol relative_distance_from_top_symbol = symbol("relative_distance_from_top");
 static const symbol DS_symbol = symbol("DS");
 
 struct rubiscoNdist_expr : public RubiscoNdist
@@ -51,8 +51,8 @@ private:
     expr->tick (scope, msg);
   }
 
-  double function (const double height, const double LAI, 
-		       const double relative_LAI, const double relative_height, 
+  double function (const double distance_from_top, const double LAI, 
+		       const double relative_LAI, const double relative_distance_from_top, 
 		       const double DS);
   double integral (const double total_LAI, const std::vector <double>& PAR_height, 
 		   const double DS, const int No);
@@ -73,34 +73,35 @@ private:
   {
     scope.add_item (new ExchangeNumber (LAI_symbol, Syntax::None(),
 					"Leaf area index"));
-    scope.add_item (new ExchangeNumber (height_symbol, "cm",
-					"Height of canopy"));
+    scope.add_item (new ExchangeNumber (distance_from_top_symbol, "cm",
+					"Distance from top of canopy"));
     scope.add_item (new ExchangeNumber (relative_LAI_symbol, Syntax::None(),
 					"Relative leaf area index"));
-    scope.add_item (new ExchangeNumber (relative_height_symbol, Syntax::None(),
-					"Relative height of canopy"));
+    scope.add_item (new ExchangeNumber (relative_distance_from_top_symbol, Syntax::None(),
+					"Relative distance from top of canopy"));
     scope.add_item (new ExchangeNumber (DS_symbol, Syntax::None(),
 					"Development stage"));
     scope.done ();
     expr->initialize (al.msg());
-    if (!expr->check (scope, al.msg()))
+    if (!expr->check_dim (scope, Syntax::fraction (), al.msg()))
       al.error("Invalid expression of rubisco expr");
   }
 };
 
 double
-rubiscoNdist_expr::function (const double height, const double LAI, 
+rubiscoNdist_expr::function (const double distance_from_top, const double LAI, 
 			     const double relative_LAI, 
-			     const double relative_height, const double DS)
+			     const double relative_distance_from_top, const double DS)
 {
-  scope.set_number (height_symbol, height);
-  scope.set_number (relative_height_symbol, relative_height);
+  scope.set_number (distance_from_top_symbol, distance_from_top);
+  scope.set_number (relative_distance_from_top_symbol, relative_distance_from_top);
   scope.set_number (LAI_symbol, LAI);
   scope.set_number (relative_LAI_symbol, relative_LAI);
   scope.set_number (DS_symbol, DS);
-  if(expr->missing (scope))
+  double value = -1.0;
+  if (!expr->tick_value (value, Syntax::fraction (), scope, Treelog::null ()))
     throw "Missing value in rubisco expr";
-  return  expr->value (scope); 
+  return value; 
 }
 
 double
@@ -115,10 +116,12 @@ rubiscoNdist_expr::integral (const double total_LAI,
   for (int i = 0; i < No; i++)
     {
       const double relative_LAI = (i + 0.5)/(No + 0.0);  
-      const double height_i = (PAR_height [i]- PAR_height[i+1])/2.0;
-      const double relative_height = height_i/total_height;
+      const double distance_from_top_i = 
+	total_height-((PAR_height [i]+ PAR_height[i+1])/2.0);
+      const double relative_distance_from_top = distance_from_top_i/total_height;
       const double LAI_i = total_LAI * (i + 0.5)/(No + 0.0);
-      sum+= function(height_i, LAI_i, relative_LAI, relative_height, DS) * dLAI; //[leaf area per soil area]
+      sum+= function(distance_from_top_i, LAI_i, relative_LAI, 
+		     relative_distance_from_top, DS) * dLAI; //[Unitless]
     }
   return sum; 
 }
@@ -149,11 +152,12 @@ rubiscoNdist_expr::rubiscoN_distribution (const std::vector <double>& PAR_height
   for (int i = 0; i < No; i++)
     {
       const double relative_LAI = (i + 0.5)/(No + 0.0);  
-      const double height_i = (PAR_height [i]- PAR_height[i+1])/2.0;
-      const double relative_height = height_i/total_height;
+      // height from top of canopy:
+      const double distance_from_top_i = total_height -((PAR_height [i]+ PAR_height[i+1])/2.0);
+      const double relative_distance_from_top = distance_from_top_i/total_height;
       const double LAI_i = LAI * (i + 0.5)/(No + 0.0);
       rubiscoNdist[i] = f_photo * cropN0 * 
-	function(height_i, LAI_i, relative_LAI, relative_height, DS); //[mol/m² leaf]
+	function(distance_from_top_i, LAI_i, relative_LAI, relative_distance_from_top, DS); //[mol/m² leaf]
     }
 }
 

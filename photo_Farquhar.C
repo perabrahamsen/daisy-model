@@ -415,32 +415,32 @@ PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("m", Syntax::None (), Check::positive (), Syntax::Const,
 	      "Stomatal slope factor. Ball and Berry (1982): m = 9 for soyabean. Wang and Leuning(1998): m = 11 for wheat");
 
-  syntax.add ("b", "mol/m2/s", Check::positive (), Syntax::Const,
+  syntax.add ("b", "mol/m^2/s", Check::positive (), Syntax::Const,
 	      "Stomatal intercept factor, Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
 
-    syntax.add ("gbw", "s/m2/mol", Check::positive (), Syntax::Const,
+    syntax.add ("gbw", "s/m^2/mol", Check::positive (), Syntax::Const,
                 "Leaf boundary conductance of water. gbw = 2 s/m2/mol (Collatz et al., 1991");
     alist.add ("gbw", 2.00);
 
   //log variables
   syntax.add ("ci_vector", "Pa", Syntax::LogOnly, Syntax::Sequence, "CO2 pressure in Stomatal in each layer.");
-  syntax.add ("Vm_vector", "mmol/m2/s", Syntax::LogOnly, Syntax::Sequence, "Photosynthetic capacity in each layer.");
-  syntax.add ("Jm_vector", "mmol/m2/s", Syntax::LogOnly, Syntax::Sequence, "Potential rate of electron transport in each layer.");
-  syntax.add ("gs_vector", "mol/m2/s", Syntax::LogOnly, Syntax::Sequence, "Stomata cunductance in each layer.");
-  syntax.add ("Nleaf_vector", "mol N/m2", Syntax::LogOnly, Syntax::Sequence, "Distribution of photosynthetic N-leaf.");
-  syntax.add ("Ass_vector", "mol CH2O/m2/s", Syntax::LogOnly, Syntax::Sequence, "Brutto assimilate.");
-  syntax.add ("sun_LAI_vector", "mol CH2O/m2/s", Syntax::LogOnly, Syntax::Sequence, "sunlit LAI.");
+  syntax.add ("Vm_vector", "mmol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Photosynthetic capacity in each layer.");
+  syntax.add ("Jm_vector", "mmol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Potential rate of electron transport in each layer.");
+  syntax.add ("gs_vector", "mol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Stomata cunductance in each layer.");
+  syntax.add ("Nleaf_vector", "mol N/m^2", Syntax::LogOnly, Syntax::Sequence, "Distribution of photosynthetic N-leaf.");
+  syntax.add ("Ass_vector", "mol CH2O/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Brutto assimilate.");
+  syntax.add ("sun_LAI_vector", "mol CH2O/m^2/s", Syntax::LogOnly, Syntax::Sequence, "sunlit LAI.");
 
   syntax.add ("ci_middel", "Pa", Syntax::LogOnly, "Stomata average CO2 pressure.");
-  syntax.add ("gs", "mol/m2/s", Syntax::LogOnly, "Stomata conductance.");
-  syntax.add ("Ass", "g CH2O/m2", Syntax::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
-  syntax.add ("Res", "g CH2O/m2", Syntax::LogOnly, "Farquhar leaf respiration.");
+  syntax.add ("gs", "mol/m^2/s", Syntax::LogOnly, "Stomata conductance.");
+  syntax.add ("Ass", "g CH2O/m^2", Syntax::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
+  syntax.add ("Res", "g CH2O/m^2", Syntax::LogOnly, "Farquhar leaf respiration.");
   syntax.add ("LAI", "", Syntax::LogOnly, "Leaf area index for the canopy used in photosynthesis.");
   syntax.add ("sun_LAI", "", Syntax::LogOnly, "Leaf area index for the sunlit fraction.");
-  syntax.add ("PAR_", "mol/m2/day", Syntax::LogOnly, "PAR.");
-  syntax.add ("Vmax", "[mmol/m2/s]", Syntax::LogOnly, "Photosynthetic Rubisco capacity.");
-  syntax.add ("jm", "[mmol/m2/s]", Syntax::LogOnly, "Potential rate of electron transport.");
-  syntax.add ("leafPhotN", "[mol N/m2]", Syntax::LogOnly, "Content of photosynthetic active leaf N.");
+  syntax.add ("PAR_", "mol/m^2/day", Syntax::LogOnly, "PAR.");
+  syntax.add ("Vmax", "[mmol/m^2/s]", Syntax::LogOnly, "Photosynthetic Rubisco capacity.");
+  syntax.add ("jm", "[mmol/m^2/s]", Syntax::LogOnly, "Potential rate of electron transport.");
+  syntax.add ("leafPhotN", "[mol N/m^2]", Syntax::LogOnly, "Content of photosynthetic active leaf N.");
   syntax.add ("fraction_sun", "", Syntax::LogOnly, "Fraction of sunlit in the canopy.");
   syntax.add ("fraction_total", "", Syntax::LogOnly, "Fraction of leaf contributing to the photosynthesis.");
 
