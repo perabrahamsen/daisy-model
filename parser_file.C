@@ -815,7 +815,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
               if (syntax.dimension (name) == Syntax::User ())
                 {
                   const double value = get_number ();
-                  const std::string dim = get_dimension ();
+                  const std::string dim = 
+		    looking_at ('[') ? get_dimension () : Syntax::Unknown ();
                   check_value (syntax, name, value);
                   atts.add (name, value, dim);
                   break;

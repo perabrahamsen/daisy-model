@@ -35,8 +35,7 @@ extern "C" char *getcwd (char *buf, size_t size);
 extern "C" int mkdir(const char *pathname, int mode);
 
 #include <fstream>
-#include <ostream>
-#include <istream>
+#include <sstream>
 
 #if defined (__unix) 
 #define DIRECTORY_SEPARATOR "/"
@@ -97,6 +96,13 @@ namespace Path
 std::istream& 
 Path::open_file (const std::string& name)
 {
+  struct Message : std::ostringstream 
+  {
+    ~Message ()
+    { Assertion::debug (this->str ()); }
+  } tmp;
+  tmp << "In directory '" << get_directory () << ":";
+
   // Absolute filename.
   if (name[0] == '.' || name[0] == '/'
 #ifndef __unix__
@@ -104,8 +110,11 @@ Path::open_file (const std::string& name)
 #endif
       )
     {
+      tmp << "\nOpening absolute file name '" << name << "'";
       return *new std::ifstream (name.c_str ());
     }
+
+  tmp << "\nLooking for file '" << name << "'";
 
   // Look in path.
   daisy_assert (path);		// Must call set_path first.
@@ -113,19 +122,33 @@ Path::open_file (const std::string& name)
   for (unsigned int i = 0; i < path->size (); i++)
     {
       const std::string file = (*path)[i] + DIRECTORY_SEPARATOR + name;
+      tmp << "\nTrying '" << file << "'";
       delete in;
       in = new std::ifstream (file.c_str ());
       if (in->good ())
-	return *in;
+	{
+	  tmp << " success!";
+	  return *in;
+	}
     }
-  return *in;
+  tmp << "\nGiving up";
+  daisy_assert (in);		
+  return *in;			// Return last bad stream.
 }
 
 bool 
 Path::set_directory (const std::string& directory)
 { 
   const char *const dir = directory.c_str ();
-  return chdir (dir) == 0 || (mkdir (dir, 0777) == 0 && chdir (dir) == 0); 
+  const bool result 
+    = chdir (dir) == 0 || (mkdir (dir, 0777) == 0 && chdir (dir) == 0); 
+  
+  std::ostringstream tmp;
+  tmp << "Changing directory to '" << directory << "' " 
+      << (result ? "success" : "failure");
+  Assertion::debug (tmp.str ());
+
+  return result;
 }
 
 const std::string 
@@ -146,6 +169,14 @@ Path::set_path (const std::vector<std::string>& value)
     path = new std::vector<std::string> (value);
   else
    *path = value;
+
+  std::ostringstream tmp;
+  tmp << "Path set to:";
+  for (size_t i = 0; i < value.size (); i++)
+    tmp << "\n" << i << ": '" << value[i] << "'";
+  tmp << "\ndone";
+  Assertion::debug (tmp.str ());
+  
 }
 
 void

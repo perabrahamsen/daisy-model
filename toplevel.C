@@ -194,7 +194,10 @@ Toplevel::Implementation::get_daisy_home ()
   // Check DAISYHOME
   const char* daisy_home_env = getenv ("DAISYHOME");
   if (daisy_home_env)
-    return daisy_home_env;
+    {
+      Assertion::debug ("Has DAISYHOME environment variable");
+      return daisy_home_env;
+    }
 
   // Check MS Windows registry
 #if defined (_WIN32) || defined (__CYGWIN32__)
@@ -203,12 +206,15 @@ Toplevel::Implementation::get_daisy_home ()
     = read_w32_registry_string (NULL, key.c_str (), "Install Directory");
   if (daisy_w32_reg)
     {
+      Assertion::debug ("Has '" + key + "' registry entry.");
       std::string result = daisy_w32_reg;
       free (daisy_w32_reg);
       return result;
     }
+  Assertion::debug ("Using standard MS Windows home.");
   return "C:/daisy";
 #else // !MS WINDOWS
+  Assertion::debug ("Using standard Unix home.");
   return "/usr/local/daisy";
 #endif // !MS WINDOWS
 }
@@ -493,6 +499,7 @@ Toplevel::initialize_once ()
   const char *const daisy_path_env = getenv ("DAISYPATH");
   if (daisy_path_env)
     {
+      Assertion::debug ("Has DAISYPATH environment variable.");
       const std::string colon_path = daisy_path_env;
       int last = 0;
       for (;;)
@@ -508,6 +515,7 @@ Toplevel::initialize_once ()
   else
     {
       const std::string daisy_home = Implementation::get_daisy_home ();
+      Assertion::debug ("Using '" + daisy_home + "' as daisy home.");
       path.push_back (".");
       path.push_back (daisy_home + "/lib");
       path.push_back (daisy_home + "/sample");

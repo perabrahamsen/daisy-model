@@ -1,3 +1,7 @@
+2007-08-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (load_list): Made user specified dimension optional. 
+
 2007-08-29  Birgitte Gjettermann  <bgj@kvl.dk>
 
 	* rubiscoNdist_forced.C: New model. 
