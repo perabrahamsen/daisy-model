@@ -2,6 +2,22 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Hvad er galt med path?
 
+* PLF fra alist 
+
+DONE tilad Syntax::User at undlade at angive dimension.
+
+plf -> domain [dim]
+plf -> range [dim]
+plf -> point sequence
+
+point -> x (user)
+point -> y (user)
+
+check_alist can convert all x -> domain
+check_alist can convert all y -> range
+
+
+
 * OpenMI
 
 ** Læs vejr fra OpenMI.

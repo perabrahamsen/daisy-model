@@ -362,7 +362,7 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = rubiscoNdist_forced.C action_extern.C \
+MODELS = number_plf.C rubiscoNdist_forced.C action_extern.C \
 	rubiscoNdist_expr.C uzrect_const.C photo_FCC3.C photo_FCC4.C \
 	msoltranrect_Mollerup.C reaction_std.C chemistry_std.C \
 	groundwater_extern.C \

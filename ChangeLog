@@ -1,3 +1,8 @@
+2007-09-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* number_plf.C: New model.
+	* Makefile (MODELS): Added it.
+
 2007-08-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* parser_file.C (load_list): Made user specified dimension optional. 

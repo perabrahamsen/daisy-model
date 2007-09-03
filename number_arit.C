@@ -23,13 +23,13 @@
 #include "number.h"
 #include "syntax.h"
 #include "alist.h"
-#include "plf.h"
 #include "units.h"
 #include "vcheck.h"
 #include "mathlib.h"
 #include "memutils.h"
 #include "block.h"
 #include "librarian.h"
+#include "submodeler.h"
 #include <sstream>
 #include <memory>
 
@@ -230,44 +230,6 @@ static struct NumberSqrSyntax
     Librarian::add_type (Number::component, "sqr", alist, syntax, &make);
   }
 } NumberSqr_syntax;
-
-struct NumberPLF : public NumberOperand
-{
-  PLF plf;
-
-  // Simulation.
-  double value (const Scope& scope) const
-  { 
-    const double v = operand->value (scope);
-    return plf (v); 
-  }
-
-  // Create.
-  NumberPLF (Block& al)
-    : NumberOperand (al),
-      plf (al.plf ("points"))
-  { }
-};
-
-static struct NumberPLFSyntax
-{
-  static Model& make (Block& al)
-  { return *new NumberPLF (al); }
-  NumberPLFSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-	       "Look up argumen in a piecewise linear function.");
-    syntax.add_object ("operand", Number::component,
-                       "Operand for this function.");
-    syntax.add ("points", Syntax::Unknown () , Syntax::Unknown (),
-                Syntax::Const, "PLF to look up argument in.");
-    syntax.order ("operand");
-    Librarian::add_type (Number::component, "plf", alist, syntax, &make);
-  }
-} NumberPLF_syntax;
 
 struct NumberPow : public Number
 {
@@ -720,4 +682,6 @@ static struct NumberDivideSyntax
     Librarian::add_type (Number::component, "/", alist, syntax, &make);
   }
 } NumberDivide_syntax;
+
+// number_arit.C ends here.
 
