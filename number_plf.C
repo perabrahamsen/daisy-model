@@ -69,7 +69,7 @@ struct NumberPLF : public Number
 
   // Simulation.
   void tick (const Scope& scope, Treelog& msg)
-  { operand_missing = operand->tick_value (operand_value, domain, scope, msg); }
+  { operand_missing = !operand->tick_value (operand_value, domain, scope, msg); }
   bool missing (const Scope& scope) const 
   { return operand_missing; }
   double value (const Scope& scope) const
@@ -102,7 +102,7 @@ struct NumberPLF : public Number
       }
 
     bool ok = true;
-    double last_x;
+    double last_x = 42.42e42;
     for (size_t i = 0; i < points.size (); i++)
       {
 	const Point& point = *points[i];
@@ -118,14 +118,15 @@ struct NumberPLF : public Number
 	      msg.error (err);
 	      ok = false;
 	    }
-	if (ok && x <= last_x)
+	if (ok && i > 0 && x <= last_x)
 	  {
 	    std::ostringstream tmp;
 	    tmp << x << " <= " << last_x << ", x values should be increasing";
 	    msg.error (tmp.str ());
 	    ok = false;
 	  }
-	
+	last_x = x;
+
 	const symbol y_dim = point.y_dimension;
 	if (domain != Syntax::unknown () && y_dim != Syntax::unknown ())
 	  try

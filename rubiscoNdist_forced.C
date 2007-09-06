@@ -49,12 +49,14 @@ private:
   void tick (std::vector <double>& , std::vector <double>& , 
 	     const double , Treelog& msg)
   { 
-    expr->tick (scope, msg);
+    // Done in function.
+    // expr->tick (scope, msg);
   }
 
   double function (const double distance_from_top, 
 		   const double LAI, const double relative_LAI, 
-		   const double relative_distance_from_top, const double DS);
+		   const double relative_distance_from_top, const double DS,
+		   Treelog& msg);
   void rubiscoN_distribution (const std::vector <double>& PAR_height,
 			      const double LAI, const double DS, 
 			      std::vector <double>& rubiscoNdist, 
@@ -64,7 +66,7 @@ private:
   const AttributeList& default_model ();
 
   // Create.
-  public:
+public:
   rubiscoNdist_forced (Block& al)
     : RubiscoNdist (al),
       expr (Librarian::build_item<Number> (al, "value"))
@@ -91,7 +93,8 @@ const symbol rubiscoNdist_forced::mol_per_area ("mol/m^2");
 double
 rubiscoNdist_forced::function (const double distance_from_top,
 			       const double LAI, const double relative_LAI, 
-			       const double relative_distance_from_top, const double DS)
+			       const double relative_distance_from_top,
+			       const double DS, Treelog& msg)
 {
   scope.set_number (distance_from_top_symbol, distance_from_top);
   scope.set_number (relative_distance_from_top_symbol, relative_distance_from_top);
@@ -99,16 +102,17 @@ rubiscoNdist_forced::function (const double distance_from_top,
   scope.set_number (relative_LAI_symbol, relative_LAI);
   scope.set_number (DS_symbol, DS);
   double value = -1.0;
-  if (!expr->tick_value (value, mol_per_area, scope, Treelog::null ()))
+  if (!expr->tick_value (value, mol_per_area, scope, msg))
     throw "Missing value in rubisco forced expr";
   return  value; 
 }
 
 void
 rubiscoNdist_forced::rubiscoN_distribution (const std::vector <double>& PAR_height, 
-					  const double LAI, const double DS,
-					  std::vector <double>& rubiscoNdist/*[mol/m²]*/,  
-					  const double cropN /*[g/m²area]*/, Treelog&)
+					    const double LAI, const double DS,
+					    std::vector <double>& rubiscoNdist/*[mol/m²]*/,  
+					    const double cropN /*[g/m²area]*/, 
+					    Treelog& msg)
 {
   daisy_assert (std::isfinite (cropN));
   daisy_assert (cropN >= 0.0);
@@ -126,7 +130,7 @@ rubiscoNdist_forced::rubiscoN_distribution (const std::vector <double>& PAR_heig
       const double relative_distance_from_top = distance_from_top_i/total_height;
       const double LAI_i = LAI * (i + 0.5)/(No + 0.0);
       rubiscoNdist[i] = function(distance_from_top_i, LAI_i, relative_LAI,
-				 relative_distance_from_top, DS); //[mol/m² leaf]
+				 relative_distance_from_top, DS, msg); //[mol/m² leaf]
     }
 }
 

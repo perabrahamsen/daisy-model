@@ -42,7 +42,10 @@ Number::tick_value (double& value, symbol want, const Scope& scope,
 { 
   this->tick (scope, msg);
   if (this->missing (scope))
-    return false;
+    {
+      // msg.warning ("Expression '" + name + "' is missing in scope");
+      return false;
+    }
 
   value = this->value (scope);
   const symbol has = this->dimension (scope);
