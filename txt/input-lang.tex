@@ -2,19 +2,30 @@
 \usepackage{a4}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
-%\usepackage{doublespace}
 \usepackage{hyperref}
-%\usepackage{setspace}
+\usepackage[doublespacing]{setspace}
 
-\bibliographystyle{apalike}
+\usepackage[left,running]{lineno}
+
+\usepackage{natbib}
 \input{macro}
 
 \newcommand{\dname}[1]{``\texttt{#1}''}
 
-\setcounter{secnumdepth}{0}
+% \setcounter{secnumdepth}{0}
 
 \begin{document}
-\section*{A flexible system for specifying agricultural field management strategies}
+
+\title{A flexible system for specifying agricultural field management strategies}
+\author{Per Abrahamsen\footnote{Corresponding author.  Fax:
+  +4535333384 Email: daisy@dina.kvl.dk} and Søren Hansen\\  
+  \em University of Copenhagen, LIFE\\
+  Department of Agricultural Sciences\\
+  Højbakkegård Allé 9, 2630 Taastrup, Denmark}
+
+\maketitle
+
+\linenumbers
 
 \begin{abstract}
   Modelling the farmer is hard, a flexible system is needed.  Such a
@@ -30,7 +41,28 @@
   conditions, quite flexible strategies can be described.  The system
   is easy to implement using modern computer science principles, and
   have been successfully used for various diverse purposes.
+
+  {\em Keywords}: Agricultural modelling; Field management; Decision
+  support systems; Agro-ecosystems; Simulation models; Environmental
+  impact assesment
 \end{abstract}
+
+\noindent{\bf Software availability}\\
+Program title: Daisy --- A soil/crop/atmosphere model\\
+Developers: Søren Hansen and Per Abrahamsen\\
+Contact address: Søren Hansen, University of Copenhagen, LIFE,
+Department of Agricultural Sciences Højbakkegård Allé 9, 2630
+Taastrup, Denmark\\
+Tel.: +4535333383, Fax: +4535333384 Email: daisy@dina.kvl.dk\\
+URL: http://www.dina.kvl.dk/~daisy/\\
+First available: 1999\\
+Requirements: The precompiled binaries will run on any contemporary PC
+with Microsoft Windows or Linux; It needs GCC and GNU Make to build
+from source.\\
+Programming languages: \cplusplus\\
+Availability: Source, binaries and documentation are freely available
+from the specified URL, redistribution is covered by the GNU GPL and
+LGPL licenses.
 
 % \tableofcontents
 
@@ -63,8 +95,8 @@ advance by the farmer.
 \paragraph{The future} Sometimes simulations models are used for
 predicting the effect of some change imposed on the field.  This
 change can be to the soil (e.g.\ depletion of soil carbon
-\cite{daisy-somnew}), climate (e.g. effect of global warming
-\cite{climate}) or management (e.g.  introduction of irrigation).
+\citep{daisy-somnew}), climate (e.g. effect of global warming
+\citep{climate}) or management (e.g.  introduction of irrigation).
 These scenarios can also be build on historical data, with relevant
 alternations.  A simulation model may be able to simulate the soil
 carbon change itself.  Global warming may be imitated by simply
@@ -102,7 +134,7 @@ present first.
 
 \section{Daisy}
 
-Daisy \cite{daisy-fertilizer,daisy-ems} is a mechanistic simulation
+Daisy \citep{daisy-fertilizer,daisy-ems} is a mechanistic simulation
 model of an agro-ecological system.  It simulates water, nitrogen,
 carbon and energy below and above the soil surface.  Above the soil
 surface there is one or more crop, competing for light, water and
@@ -120,7 +152,7 @@ user is able to choose simpler models for transport, when
 computational speed is more important than accuracy.  Organic matter
 in the soils is divided into multiple pools, by default 6, and both
 short-term (days) and long-term (decades) dynamics have been validated
-\cite{willigen91-compar,vereecken91-compar,diekkruger95-compar,smith97-compar,daisy-somnew}.
+\citep{willigen91-compar,vereecken91-compar,diekkruger95-compar,smith97-compar,daisy-somnew}.
 The internal timestep used for most of the calculations is one hour,
 but for water and solute transport this may be much shorter.
 
@@ -389,7 +421,7 @@ Here we use two types of select methods, \dname{interval} and
 \dname{number}.  Both have some shared parameters: \dname{path} and
 \dname{spec}, that specify how to find the state variable within the
 internal hierarchical structure of Daisy\footnote{Described in
-\cite{daisy-ref}, and outside the scope of this article}, and
+\citet{daisy-ref}, and outside the scope of this article}, and
 \dname{dimension} the desired dimension for the value\footnote{Daisy
 will convert from the internal dimension if needed.}.  Finally,
 \dname{tag} is the external name (the use of which we will come back
@@ -476,9 +508,9 @@ Or we could combine them.
 
 Since all expressions are fully parenthesised, the input language can
 be implemented with a trivial recursive-descend parser with a single
-token lookahead, and no backtracking, se for example~\cite{dragon}.
+token lookahead, and no backtracking, se for example~\citet{dragon}.
 Alternatively, if one is willing to accept a somewhat bulkier
-notation, a ready-to-use XML~\cite{XML} based parser could be used.
+notation, a ready-to-use XML~\citep{XML} based parser could be used.
 
 The base concepts \emph{action}, \emph{condition}, \emph{boolean}, and
 \emph{number} are all represented by pure base class, and the specific
@@ -486,16 +518,16 @@ actions, conditions, etc.\ by concrete classes derived from the base.
 The accessor functions for actions and conditions need to take the
 simulation state as an argument (for conditions it can be a read-only
 argument).  These concepts can be found on most book on object
-oriented programming, for example~\cite{tcpppl}.
+oriented programming, for example~\citet{tcpppl}.
 
 Each concrete class is responsible for registering itself with name,
 constructor and parameters with a factory pattern, as described
-in~\cite{patterns}.  This registry is also use by the parser.  A
+in~\citet{patterns}.  This registry is also use by the parser.  A
 global table of extern logs is used for making the log information
 available in the numerical expressions within the ``extern''
 condition.
 
-In \cite{daisy-ems} more information about the implementation
+In \citet{daisy-ems} more information about the implementation
 framework can be found.  The implementation itself can be freely
 downloaded from the Daisy home page, at~\url{http://www.dina.dk/~daisy/}.
 
@@ -519,12 +551,12 @@ describe irrigation strategies independently of the specific crop on the
 field.
 
 The \dname{extern} log model was implemented in 1999, as a part of a
-flexible interface to the Mike/SHE groundwater model \cite{mikeshe}
-under the the SDSS EU project \cite{sdss}.  The ``number'' abstraction
+flexible interface to the Mike/SHE groundwater model \citep{mikeshe}
+under the the SDSS EU project \citep{sdss}.  The ``number'' abstraction
 for doing arithmetic was implemented in 2004 to support generic
 pedotransfer functions for sorbtion in a Ph.D. project about dissolved
-organic matter \cite{bgj-dom}.  The last components were provided as
-part of the FertOrgaNic project \cite{fertorganic}, where we should
+organic matter \citep{bgj-dom}.  The last components were provided as
+part of the FertOrgaNic project \citep{fertorganic}, where we should
 develop DSS rules in a project with 3 experimental years and 9
 experimental sites across Europe.  In 2005 the ``boolean'' abstraction
 was implemented and the ``number'' abstraction significantly extended
@@ -549,7 +581,7 @@ including the FertOrgaNic project.
 \paragraph{Flexible crop management use by the adminsitration} The
 flexible crop management system has been used mainly by the Danish
 environmental administration.  One example is a standardized procedure
-\cite{daisy-staabi} for getting an environmental permit for major
+\citep{daisy-staabi} for getting an environmental permit for major
 changes in farm management, such as introducing pigs to what used to
 be a pure crop farm.  The procedure calls for running a crop rotation
 with the new and old farm management with 10 years of historical
@@ -566,7 +598,7 @@ national ``Action Plan for the Aquatic Environment''.  In selected
 areas the aquatic environment is intensively monitored (the
 \textsc{Loop} areas), and this information is used together with
 statistical information about the farm management and soil types in
-the area to model the nitrogen leaching \cite{novana}.  Since the
+the area to model the nitrogen leaching \citep{novana}.  Since the
 regional authorities don't have the exact information, they instead
 use statistical combinations of soil types and typical crop management
 to estimate the total leaching.  This, again, is only possible because
@@ -579,8 +611,8 @@ scenarios.  This is also useful for educational purpose, asking
 students to introduce irrigation to a simulated and see the effect in
 nitrogen is an example of a typical exercise using the flexible crop
 management system.  An example of a scientific use is found in
-\cite{boegh04a}, where a water balance for Zealand is calculated based
-on statistical information in a GIS setup, another in \cite{org-init},
+\citet{boegh04a}, where a water balance for Zealand is calculated based
+on statistical information in a GIS setup, another in \citet{org-init},
 where we examine how best to initialise the organic matter pool based
 on 1000 year simulations where we go from equilibrium under one
 management strategy, to equilibrium under another management strategy.
@@ -599,7 +631,7 @@ Most people who later use the system for real work learn to appreciate
 the flexibility.
 
 There exist several graphical user interfaces for Daisy
-\cite{plantinfo-daisy,daisygis,fertorganic}, which generate management
+\citep{plantinfo-daisy,daisygis,fertorganic}, which generate management
 descriptions using a subset of the textual interface described in this
 article.  Most users of these interfaces tend to run into the limits
 eventually, and switch to the textual interface.  However, for users
@@ -634,6 +666,7 @@ Framework RTD project (QLK5-2002-01799), which financed the advanced
 state management.
 
 \addcontentsline{toc}{section}{\numberline{}Bibliography}
+\bibliographystyle{elsart-harv}
 \bibliography{daisy}
 
 \end{document}

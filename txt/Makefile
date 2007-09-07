@@ -1,4 +1,4 @@
-LIBS = macro.tex daisy.bib
+LIBS = macro.tex daisy.bib elsart-harv.bst
 
 FIGS = start.fig
 
