@@ -44,7 +44,7 @@
 
   {\em Keywords}: Agricultural modelling; Field management; Decision
   support systems; Agro-ecosystems; Simulation models; Environmental
-  impact assesment
+  impact assessment
 \end{abstract}
 
 \noindent{\bf Software availability}\\
@@ -78,7 +78,7 @@ problem is much simplified.  The management actions have already been
 performed.  The model is simply provided with a list of management
 operations, at the same level of detail as the model itself.  This is
 the approach traditionally taken by simulation models.  Running the
-model on historical data is useful for analysing a field experiment, and
+model on historical data is useful for analyzing a field experiment, and
 especially for extracting data that have not been directly measured.
 
 \paragraph{The present} When using the model as part of a decision
@@ -213,7 +213,7 @@ farmer did, and when.
 \end{verbatim}
 
 First a few words about the notation.  Everything is fully
-parenthesised, with the name coming after after the opening
+parenthesized, with the name coming after after the opening
 parenthesis, followed by the arguments separated by whitespace.
 Floating point numbers are followed by a dimension in square brackets,
 cardinals are not.  Names containing whitespace must be surrounded
@@ -452,7 +452,7 @@ argument is a \emph{boolean}.
 in that it is either true or false, and indeed, the value of the
 \dname{extern} condition will be the value of its second argument.
 Booleans, as one might guess from the name, also provides the usual
-operations on Boolsk algebra.  Additionally, booleans provides
+operations on Boolean algebra.  Additionally, booleans provides
 comparison operations ($<$ and $>$) on \emph{numbers}, another new
 abstraction here.  A number can be either a constant (like \texttt{1.8
   []} in the example above, number constants have dimensions), an
@@ -506,9 +506,9 @@ Or we could combine them.
 
 \section{Implementation}
 
-Since all expressions are fully parenthesised, the input language can
+Since all expressions are fully parenthesized, the input language can
 be implemented with a trivial recursive-descend parser with a single
-token lookahead, and no backtracking, se for example~\citet{dragon}.
+token lookahead, and no backtracking, see for example~\citet{dragon}.
 Alternatively, if one is willing to accept a somewhat bulkier
 notation, a ready-to-use XML~\citep{XML} based parser could be used.
 
@@ -560,7 +560,7 @@ part of the FertOrgaNic project \citep{fertorganic}, where we should
 develop DSS rules in a project with 3 experimental years and 9
 experimental sites across Europe.  In 2005 the ``boolean'' abstraction
 was implemented and the ``number'' abstraction significantly extended
-as part of a subsystem that should plot the large amountof field data
+as part of a subsystem that should plot the large amount of field data
 together with simulation results.  Finally, in 2006 the \dname{extern}
 condition and implemented and the ``boolean'' abstraction further
 developed in order to implement the DSS directly in Daisy.
@@ -575,10 +575,10 @@ follow, especially as the advanced state management system was only
 developed near the end of the project.
 
 The historical data management is used in basically every project
-where we have experimental data we want to analyse with the model,
+where we have experimental data we want to analyze with the model,
 including the FertOrgaNic project.
 
-\paragraph{Flexible crop management use by the adminsitration} The
+\paragraph{Flexible crop management use by the administration} The
 flexible crop management system has been used mainly by the Danish
 environmental administration.  One example is a standardized procedure
 \citep{daisy-staabi} for getting an environmental permit for major
@@ -589,7 +589,7 @@ weather data, and compare the nitrogen leaching predicted by Daisy.
 This simulation must be repeated several times with the weather data
 shifted one year, so each crop in the rotation is grown under each
 year in the weather data.  Setting up management for all these
-combinations by hand would be unmanageable and errorprone, so the
+combinations by hand would be unmanageable and error prone, so the
 flexible crop management system, where we only have to describe each
 crop once, has been a great help.
 
@@ -613,7 +613,7 @@ nitrogen is an example of a typical exercise using the flexible crop
 management system.  An example of a scientific use is found in
 \citet{boegh04a}, where a water balance for Zealand is calculated based
 on statistical information in a GIS setup, another in \citet{org-init},
-where we examine how best to initialise the organic matter pool based
+where we examine how best to initialize the organic matter pool based
 on 1000 year simulations where we go from equilibrium under one
 management strategy, to equilibrium under another management strategy.
 In the first example we scale up in space, in the second we scale up
@@ -651,7 +651,7 @@ All of these are easily implementable using
 elementary\footnote{Elementary today, they were not all elementary in
 1995.}  computer science tools, and we believe that the diverse
 applications of the system demonstrate the value of adding general
-computer science expertice to the traditional domain specific
+computer science expertise to the traditional domain specific
 modelling expertise.
 
 \section{Acknowledgements}
@@ -660,7 +660,7 @@ This work was financed by a large array of projects, most of which had
 their focus elsewhere.  We do believe that the Danish Informatics
 Network in Agriculture (Dina), which funded the rewrite that made it
 all possible, deserves special mention, together with FertOrgaNic
-(Improved organic fertiliser management for high nitrogen and water
+(Improved organic fertilizer management for high nitrogen and water
 use efficiency and reduced pollution in crop systems), EU 5th
 Framework RTD project (QLK5-2002-01799), which financed the advanced
 state management.
