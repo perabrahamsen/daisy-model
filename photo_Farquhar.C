@@ -109,11 +109,11 @@ PhotoFarquhar:: Sat_vapor_pressure (const double T /*[degree C]*/) const
 }
 
 double
-PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA, double pn, double rel_hum /*[unitless]*/, 
+PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, double rel_hum /*[unitless]*/, 
 			 double LA, double fraction, double gbw/*[mol/m2/s]*/, 
 			 const double Ta, const double Tl, Treelog&) 
 {
-  const double wsf = ABA; //water stress function
+  const double wsf = ABA_effect; //water stress function
   const double intercept = b * LA * fraction; //min conductance 
   daisy_assert (gbw >0.0);
   const double rbw = 1./gbw;   //[s*m2/mol]
@@ -135,6 +135,7 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA, double pn, double rel
   const double wi = Sat_vapor_pressure (Tl) / Ptot;
   const double Gamma = Arrhenius (Gamma25, Ea_Gamma, Tl);//Pa
 
+  // Interpolation between limiting factors.
   const double aa = wsf * m * pz * Ptot /(cs-Gamma); //[mol/m2/s]
   const double bb = intercept + (1./rbw)-(wsf * m * pz * Ptot/(cs-Gamma));//[mol/m2/s]
   const double cc = (- wa /(wi * rbw)) - intercept;//[mol/m2/s]
@@ -266,7 +267,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	  daisy_assert (vmax25 >= 0.0);
 
 	  // Photosynthetic effect of Xylem ABA.
-	  const double ABA = ABAeffect->ABA_effect(ABA_xylem, msg);
+	  const double ABA_effect = ABAeffect->ABA_effect(ABA_xylem, msg);
 
 	  // leaf respiration
 	  const double rd = respiration_rate(vmax25, Tl);
@@ -286,7 +287,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 
 	      //Calculating ci and "net"photosynthesis
 	      CxModel(CO2_atm, pn, ci, dPAR, gsw, Tl, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
-	      gsw = GSTModel(CO2_atm, ABA, pn, rel_hum, LA, fraction[i], gbw, Ta, Tl, msg);//[mol/s/m²leaf/fraction]
+	      gsw = GSTModel(CO2_atm, ABA_effect, pn, rel_hum, LA, fraction[i], gbw, Ta, Tl, msg);//[mol/s/m²leaf/fraction]
 
 	      iter++;
 	      if(iter > maxiter)

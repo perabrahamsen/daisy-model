@@ -181,10 +181,11 @@ PhotoFCC3::CxModel (const double CO2_atm, double& pn, double& ci,
       // Net CO2 uptake
       pn = p - rd; // [mol/m² leaf/s] 
       
-      //Total resistance to CO2
+      //Total conductance of CO2
       const double gtc = 1./(1.4*rbw+1.6*rsw);   //[mol/m² leaf/s]
       newci = ((gtc * CO2_atm /Ptot)-pn)/gtc*Ptot;//[Pa]
-      
+      // newci = CO2_atm - (pn/gtc) * Ptot; //[Pa]
+
       double dp;
       if (wc < we) 
 	dp = Vm * (Kcl+Gamma)/((ci+Kcl)*(ci+Kcl));//[mol/m² leaf/s/Pa]

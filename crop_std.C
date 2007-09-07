@@ -373,15 +373,19 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 		development->light_time (dt);
 	    }
  	}
-      const double cropN = std::max (0.0,
-				     std::min (production.NLeaf
-					       -(canopy.corresponding_WLeaf (DS)
-						 * nitrogen.NfLeafCnc (DS)),
-					       canopy.corresponding_WLeaf (DS)
-					       * nitrogen.CrLeafCnc (DS) 
-					       -(canopy.corresponding_WLeaf (DS)
-						 * nitrogen.NfLeafCnc (DS))));
-      daisy_assert (cropN >= 0.0);
+
+      // We use non-functional (Nf) and critical limits (Cr) to
+      // estimate how much N is used in photosynthesis.  The
+      // non-functional is considered structural N, and not used in
+      // photosynthesis.  N content above critical is considered
+      // luxury, and also not used in photosynthesis.
+      const double N_at_Nf 
+        = canopy.corresponding_WLeaf (DS) * nitrogen.NfLeafCnc (DS);
+      const double N_at_Cr
+        = canopy.corresponding_WLeaf (DS) * nitrogen.CrLeafCnc (DS);
+      const double N_above_Nf = production.NLeaf - N_at_Nf;
+      const double rubiscoN = bound (0.0, N_above_Nf, N_at_Cr - N_at_Nf);
+      daisy_assert (rubiscoN >= 0.0);
       
       const double ABA_xylem = 0.0;
 
@@ -390,16 +394,16 @@ CropStandard::tick (const Time& time, const double relative_humidity,
           // Shared light.
 	  Ass += photo->assimilate (ABA_xylem, relative_humidity, CO2_atm,
 				    bioclimate.daily_air_temperature (), 
-				    bioclimate.hourly_leaf_temperature(),
-				    cropN, shadow_PAR, PAR_height,
+				    bioclimate.hourly_canopy_temperature(),
+				    rubiscoN, shadow_PAR, PAR_height,
                                     total_LAI, fraction_shadow_LAI, dt,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
 
           Ass += photo->assimilate (ABA_xylem, relative_humidity, CO2_atm,
 				    bioclimate.daily_air_temperature (),
-				    bioclimate.hourly_leaf_temperature(),
-				    cropN, sun_PAR,  PAR_height,
+				    bioclimate.hourly_canopy_temperature(),
+				    rubiscoN, sun_PAR,  PAR_height,
                                     total_LAI, fraction_sun_LAI, dt,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
@@ -415,8 +419,8 @@ CropStandard::tick (const Time& time, const double relative_humidity,
              PARext (), PAR); 
           Ass += photo->assimilate (ABA_xylem, relative_humidity, CO2_atm,
 				    bioclimate.daily_air_temperature (), 
-				    bioclimate.hourly_leaf_temperature(),
-				    cropN, PAR, PAR_height,
+				    bioclimate.hourly_canopy_temperature(),
+				    rubiscoN, PAR, PAR_height,
 				    bioclimate.LAI (), fraction_total_LAI, dt,
 				    canopy, *development, msg)
             * min_light_fraction;

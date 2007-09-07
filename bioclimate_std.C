@@ -119,8 +119,8 @@ struct BioclimateStandard : public Bioclimate
   double crop_ea;		// Actual transpiration. [mm/h]
   double production_stress;	// Stress calculated by SVAT module.
 
-  // Bioclimate leaf
-  double LeafTemperature;       // Leaf temperature
+  // Bioclimate canopy
+  double CanopyTemperature;       // Canopy temperature
 
 
   void WaterDistribution (const Time&,
@@ -168,8 +168,8 @@ struct BioclimateStandard : public Bioclimate
   // Weather.
   double daily_air_temperature () const
   { return daily_air_temperature_; }
-  double hourly_leaf_temperature () const
-  { return LeafTemperature; }
+  double hourly_canopy_temperature () const
+  { return CanopyTemperature; }
   double daily_precipitation () const
   { return daily_precipitation_; }
   double day_length () const
@@ -412,8 +412,8 @@ As a last resort,  Makkink (makkink) will be used.");
   syntax.add ("r_ae", "s/m", Check::positive (), Syntax::Const,
               "Atmospheric resistance.");
   alist.add ("r_ae", 53.);
-  syntax.add ("LeafTemperature", "dg C", Syntax::LogOnly,
-              "Actual leaf temperature.");
+  syntax.add ("CanopyTemperature", "dg C", Syntax::LogOnly,
+              "Actual canopy temperature.");
 
   //Radiation
   syntax.add_object ("raddist", Raddist::component, 
@@ -904,28 +904,37 @@ BioclimateStandard::tick (const Time& time,
   WaterDistribution (time, surface, weather, vegetation, 
 		     movement, geo, soil, soil_water, soil_heat, dt, msg);
 
-  // Calculate leaf temperature of canopy
+  // Calculate temperature of canopy
   static const double rho_water = 1.0; // [kg/dm^3]
   const double AirTemperature = weather.hourly_air_temperature ();//[dg C]
-  const double LatentHeatVapor = FAO::LatentHeatVaporization (AirTemperature); //[J/kg]
-  const double LeafTranspirationRate = 
+  const double LatentHeatVapor 
+    = FAO::LatentHeatVaporization (AirTemperature); //[J/kg]
+  const double CanopyTranspirationRate = 
     crop_ea /*[mm/h]*/* rho_water * LatentHeatVapor / 3600. /*[s/h]*/; //[W/m^2] 
 
-  const double NetRadiation = net_radiation->net_radiation ();
-  const double SensibleHeatFlux = NetRadiation - LeafTranspirationRate;//[W/m^2] 
+  const double CanopyNetRadiation = net_radiation->net_radiation () 
+    * vegetation.cover ();
+  const double SensibleHeatFlux 
+    = CanopyNetRadiation - CanopyTranspirationRate;//[W/m^2] 
   
-  const double AirPressure = FAO::AtmosphericPressure (weather.elevation ());//[Pa]
-  const double pa = FAO::AirDensity(AirPressure, AirTemperature);//[kg/m3]
-  const double gamma = FAO::PsychrometricConstant (AirPressure, AirTemperature);//[Pa/dgC]
-  const double epsilon = 0.622; // Ration molecular weight of water vapor / dry air []
-  const double cp = gamma * epsilon * LatentHeatVapor / AirPressure;//[J/kg/dg C]
+  const double AirPressure 
+    = FAO::AtmosphericPressure (weather.elevation ());//[Pa]
+  const double rho_a = FAO::AirDensity(AirPressure, AirTemperature);//[kg/m3]
+  const double gamma
+    = FAO::PsychrometricConstant (AirPressure, AirTemperature);//[Pa/dgC]
+  const double epsilon 
+    = 0.622; // Ration molecular weight of water vapor / dry air []
+  const double c_p 
+    = gamma * epsilon * LatentHeatVapor / AirPressure;//[J/kg/dg C]
   
   const double ScreenHeight = weather.screen_height (); //[m]
   const double wind_speed =  weather.wind ();//[m/s] 
-  const double ra_e =  FAO::AerodynamicResistance (Height[0], ScreenHeight, wind_speed); // [s m-1]
+  const double ra_e 
+    =  FAO::AerodynamicResistance (Height[0], 
+                                   ScreenHeight, wind_speed); // [s m-1]
 
-  LeafTemperature = SensibleHeatFlux * ra_e / (pa * cp) + AirTemperature;//[dg C]
-
+  CanopyTemperature = SensibleHeatFlux * ra_e / (rho_a * c_p) 
+    + AirTemperature;//[dg C]
 }
 
 void 
@@ -978,7 +987,7 @@ BioclimateStandard::output (Log& log) const
   output_variable (crop_ep, log);
   output_variable (crop_ea, log);
   output_variable (production_stress, log);
-  output_variable (LeafTemperature, log);
+  output_variable (CanopyTemperature, log);
 
   //radiation
   output_derived (raddist, "raddist", log);

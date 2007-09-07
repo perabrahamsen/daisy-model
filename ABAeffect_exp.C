@@ -48,7 +48,7 @@ private:
 };
 
 double
-ABAEffect_exp::ABA_effect (const double ABA_xylem /*[]*/, Treelog&)
+ABAEffect_exp::ABA_effect (const double ABA_xylem /*[?]*/, Treelog&)
 {
      const double ABAeffect = exp(-k * ABA_xylem); //[]
      return ABAeffect;
@@ -60,7 +60,7 @@ static struct ABAEffectexpSyntax
   { return *new ABAEffect_exp (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("k", Syntax::None (), Check::positive (), Syntax::Const,
+    syntax.add ("k", Syntax::Unknown (), Check::positive (), Syntax::Const,
                 "Coefficient");
     alist.add ("k", 1.0);
   }  
