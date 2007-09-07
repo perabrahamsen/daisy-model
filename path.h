@@ -7,6 +7,14 @@
 #include <string>
 #include <iosfwd>
 
+#ifdef BUILD_DLL
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
 namespace Path
 {
   class Output
@@ -36,6 +44,8 @@ namespace Path
   void set_path (const std::vector<std::string>& path);
   void get_path (std::vector<std::string>& path);
 
+  EXPORT const std::string nodir (const std::string& name);
+  
   class InDirectory
   {
     const std::string from;

@@ -434,7 +434,7 @@ extern "C" EXPORT void
 daisy_daisy_parse_command_line (Toplevel* toplevel, int argc, char** argv)
 {
   try
-    { toplevel->command_line (argc, argv); }
+    { toplevel->command_line (argc, argv, true); }
   catch (int i)
     { 
       if (i != EXIT_SUCCESS)

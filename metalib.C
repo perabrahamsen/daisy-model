@@ -108,6 +108,10 @@ Metalib::get_sequence ()
   return impl->sequence;
 }
 
+void
+Metalib::reset ()
+{ impl.reset (new Implementation); }
+
 Metalib::Metalib ()
   : impl (new Implementation ())
 { }

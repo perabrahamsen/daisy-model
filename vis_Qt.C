@@ -122,27 +122,22 @@ VisQtText::VisQtText (QWidget* parent)
 VisQtText::~VisQtText ()
 { }
 
-
-void 
-VisQtProgress::setToolTip (const char *const tip)
-{ bar.setToolTip (tip); }
-
 void 
 VisQtProgress::new_progress (double value)
 {
   if (value < 0)
-    bar.setMaximum (0);
+    this->setMaximum (0);
   else
     {
-      bar.setMaximum (1000);
-      bar.setValue (double2int (value * 1000));
+      this->setMaximum (1000);
+      this->setValue (double2int (value * 1000));
     }
 }
 
 void 
 VisQtProgress::new_state (Toplevel::state_t state)
 {
-  QPalette pal = bar.palette();
+  QPalette pal = this->palette();
 
   switch (state)
     {
@@ -172,25 +167,28 @@ VisQtProgress::new_state (Toplevel::state_t state)
       pal.setColor(QPalette::Highlight, QColor(Qt::red));
       break;
     }
-  bar.setPalette(pal);
+  this->setPalette(pal);
 }
 
 void
 VisQtProgress::found_error ()
 { 
   has_error = true; 
-  QPalette pal = bar.palette();
+  QPalette pal = this->palette();
   pal.setColor (QPalette::Highlight, QColor(Qt::black));
-  bar.setPalette(pal);
+  this->setPalette(pal);
 }
 
 VisQtProgress::VisQtProgress (QWidget* parent)
-  : bar (parent),
-    has_error (false)
+  : has_error (false)
 { 
-  bar.setMinimum (0);
-  bar.setMaximum (1000);
-  bar.setValue (0);
+  this->setMinimum (0);
+  this->setMaximum (1000);
+  this->setValue (0);
+
+  QPalette pal = this->palette();
+  pal.setColor(QPalette::Highlight, QColor(Qt::magenta));
+  this->setPalette(pal);
 }
 
 VisQtProgress::~VisQtProgress ()

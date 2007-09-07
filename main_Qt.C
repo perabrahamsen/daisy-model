@@ -37,17 +37,13 @@ main (int argc, char* argv[])
   try
     {
       // toplevel.set_ui_progress ();
-      toplevel.command_line (argc, argv);
+      toplevel.command_line (argc, argv, false);
       toplevel.user_interface ();
 
       switch (toplevel.state ())
         {
         case Toplevel::is_uninitialized:
-          toplevel.initialize ();
-          /* Fallthrough */;
         case Toplevel::is_ready:
-          toplevel.run ();
-          /* Fallthrough */;
         case Toplevel::is_done:
           throw EXIT_SUCCESS;
         case Toplevel::is_running:

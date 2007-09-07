@@ -59,6 +59,8 @@ public:
   void refile_parsed (const std::string& from, const std::string& to);
 
   // Create and Destroy.
+ public:
+  void reset ();
 private:
   Metalib (const Metalib&);
 public:

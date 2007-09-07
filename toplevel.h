@@ -98,10 +98,11 @@ private:
   static void initialize_once ();
 public:
   void initialize ();
+  void reset ();
 private:
   static std::string get_arg (int& argc, char**& argv);
 public:
-  void command_line (int& argc, char**& argv);
+  void command_line (int& argc, char**& argv, bool require_);
   void parse_file (const std::string&);
   void parse_system_file (const std::string&);
   static void load_run (Syntax&, AttributeList&);

@@ -1,3 +1,11 @@
+2007-09-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.21 released.
+
+2007-09-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* ui_Qt_read.C: New model.
+
 2007-09-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* number_plf.C: New model.

@@ -123,44 +123,4 @@ UIQt::UIQt (Block& al)
 UIQt::~UIQt ()
 { }
 
-// UIRead
-
-class UIRead : public UIQt
-{
-  // Use.
-public:
-  void attach (Toplevel&)
-  { }
-  void run (Toplevel&)
-  { }
-
-  // Create.
-private:
-  UIRead& operator= (const UIRead&); // Disable.
-  UIRead (const UIRead&); // Disable.
-public:
-  explicit UIRead (Block& al)
-    : UIQt (al)
-  { }
-private:
-  ~UIRead ()
-  { }
-};
-
-static struct UIReadSyntax
-{
-  static Model& make (Block& al)
-  { return *new UIRead (al); }
-
-  UIReadSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-               "Allow the user to select a file to read.");
-    Librarian::add_type (UI::component, "read_NOT_YET_DONE", alist, syntax, &make);
-  }
-} UIRead_syntax;
-
 // ui.C ends here.

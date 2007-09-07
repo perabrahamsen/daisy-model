@@ -80,18 +80,15 @@ public:
   ~VisQtText ();
 };
 
-class VisQtProgress : public QWidget
+class VisQtProgress : public QProgressBar
 {
   Q_OBJECT
 
   // Content.
 private:
-  QProgressBar bar;
   bool has_error;
 
   // Use.
-public:
-  void setToolTip (const char* tip);
 public slots:
   void new_progress (double);
   void new_state (Toplevel::state_t);

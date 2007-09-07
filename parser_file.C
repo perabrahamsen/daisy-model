@@ -1427,3 +1427,5 @@ static struct ParserFileSyntax
     Librarian::add_type (Parser::component, "file", alist, syntax, &make);
   }
 } ParserFile_syntax;
+
+// parser_file.C ends here.

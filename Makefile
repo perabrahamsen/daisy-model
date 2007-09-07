@@ -486,7 +486,7 @@ QTOBJECTS = $(QTSOURCES:.C=${OBJ}) $(QTMOCHDR:.h=_moc${OBJ})
 
 # Select the Qt4 frontend files
 
-Q4MOCHDR = run_Qt.h vis_Qt.h log_Qt.h
+Q4MOCHDR = run_Qt.h vis_Qt.h log_Qt.h ui_Qt_read.h
 Q4MOCSRC = $(Q4MOCHDR:.h=_moc.C)
 Q4HEADERS = $(Q4MOCHDR) ui_Qt.h
 Q4SOURCES = $(Q4HEADERS:.h=.C) ui_Qt_run.C main_Qt.C
@@ -910,6 +910,10 @@ vis_Qt${OBJ}: vis_Qt.C vis_Qt.h toplevel.h time.h log_Qt.h log_extern.h \
 log_Qt${OBJ}: log_Qt.C log_Qt.h log_extern.h log_select.h log.h border.h \
   model.h alist.h symbol.h memutils.h destination.h scope.h librarian.h \
   syntax.h treelog.h
+ui_Qt_read${OBJ}: ui_Qt_read.C ui_Qt_read.h ui_Qt.h ui.h model.h symbol.h \
+  vis_Qt.h toplevel.h time.h program.h run.h metalib.h library.h \
+  librarian.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
+  memutils.h
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h
 ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt.h ui.h model.h symbol.h run_Qt.h run.h \
@@ -971,8 +975,8 @@ format${OBJ}: format.C format.h model.h symbol.h assertion.h block.h syntax.h \
   treelog.h plf.h librarian.h
 depth${OBJ}: depth.C depth.h model.h symbol.h block.h syntax.h treelog.h \
   plf.h alist.h time.h lexer_data.h lexer.h output.h condition.h \
-  memutils.h scopesel.h scope.h number.h units.h check.h vcheck.h \
-  assertion.h librarian.h mathlib.h
+  memutils.h number.h units.h check.h vcheck.h assertion.h librarian.h \
+  mathlib.h
 wse${OBJ}: wse.C wse.h model.h symbol.h block.h syntax.h treelog.h plf.h \
   alist.h program.h run.h mathlib.h assertion.h librarian.h
 program${OBJ}: program.C program.h model.h symbol.h run.h block.h syntax.h \
@@ -1299,9 +1303,16 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+number_plf${OBJ}: number_plf.C number.h symbol.h model.h syntax.h treelog.h \
+  alist.h plf.h units.h memutils.h block.h librarian.h submodeler.h \
+  assertion.h
+rubiscoNdist_forced${OBJ}: rubiscoNdist_forced.C rubiscoNdist.h model.h \
+  alist.h symbol.h mathlib.h assertion.h block.h syntax.h treelog.h plf.h \
+  check.h librarian.h number.h scope_exchange.h scope.h memutils.h
 action_extern${OBJ}: action_extern.C action.h model.h alist.h symbol.h \
-  scope_multi.h scope.h scopesel.h daisy.h program.h run.h time.h \
-  memutils.h log.h border.h treelog.h librarian.h syntax.h
+  scope_multi.h scope.h scopesel.h number.h daisy.h program.h run.h \
+  time.h memutils.h field.h border.h am.h im.h log.h treelog.h \
+  librarian.h syntax.h block.h plf.h check.h assertion.h
 rubiscoNdist_expr${OBJ}: rubiscoNdist_expr.C rubiscoNdist.h model.h alist.h \
   symbol.h mathlib.h assertion.h block.h syntax.h treelog.h plf.h check.h \
   librarian.h number.h scope_exchange.h scope.h memutils.h
@@ -1361,7 +1372,8 @@ volume_box${OBJ}: volume_box.C volume.h model.h symbol.h syntax.h treelog.h \
   alist.h bound.h border.h mathlib.h assertion.h librarian.h
 select_volume${OBJ}: select_volume.C select_value.h select.h destination.h \
   symbol.h model.h units.h volume.h block.h syntax.h treelog.h plf.h \
-  alist.h geometry.h mathlib.h assertion.h soil.h librarian.h
+  alist.h geometry.h mathlib.h assertion.h soil.h vegetation.h check.h \
+  librarian.h
 uz1d_none${OBJ}: uz1d_none.C uz1d.h model.h geometry_rect.h geometry_vert.h \
   geometry.h syntax.h treelog.h symbol.h mathlib.h assertion.h soil.h \
   soil_water.h soil_heat.h alist.h librarian.h
@@ -1461,8 +1473,8 @@ source_combine${OBJ}: source_combine.C source.h model.h time.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h number.h scope_sources.h \
   scope.h gnuplot_utils.h vcheck.h assertion.h librarian.h
 number_arit${OBJ}: number_arit.C number.h symbol.h model.h syntax.h treelog.h \
-  alist.h plf.h units.h vcheck.h mathlib.h assertion.h memutils.h block.h \
-  librarian.h
+  alist.h units.h vcheck.h mathlib.h assertion.h memutils.h block.h plf.h \
+  librarian.h submodeler.h
 source_expr${OBJ}: source_expr.C source_file.h source.h model.h time.h \
   symbol.h lexer_table.h block.h syntax.h treelog.h plf.h scope_table.h \
   scope.h number.h alist.h librarian.h

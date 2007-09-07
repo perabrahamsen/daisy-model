@@ -186,6 +186,32 @@ Path::get_path (std::vector<std::string>& value)
   value = *path;
 }
 
+const std::string 
+Path::nodir (const std::string& name)
+{
+  size_t start = name.size ();
+
+  for (;start > 0; start--)
+    {
+      const char prev = name[start-1];
+
+      if (prev == '/')
+	break;
+      
+#if !defined (__unix) 
+      if (prev == '\\' || prev == ':')
+	break;
+#endif // !unix
+    }
+  
+  std::string result;
+
+  for (;start < name.size (); start++)
+    result += name[start];
+
+  return result;
+}
+
 Path::InDirectory::InDirectory (const std::string& to)
   : from (get_directory ()),
     ok (set_directory (to))

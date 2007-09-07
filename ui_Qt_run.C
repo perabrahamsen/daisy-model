@@ -47,6 +47,7 @@
 
 class UIRun : public UIQt
 {
+  // Widgets.
   VisQtMain qt_main;
   QPointer<VisQtProgress> qt_progress;
   QPointer<QPushButton> qt_stop;
@@ -235,7 +236,7 @@ UIRun::attach (Toplevel& toplevel)
   qt_stop->setDisabled (true);
   bottom_layout->addWidget (qt_stop);
   bottom_layout->addStretch ();
-                                                
+  daisy_assert (!qt_stop.isNull ());                                                
   // Track newest messages.
   QCheckBox *const qt_track = new QCheckBox ("Track");
   qt_track->setToolTip ("Check this box to always show new text.");
@@ -281,18 +282,19 @@ UIRun::run (Toplevel& toplevel)
   RunQtMain qt_run (toplevel, all_logs);
   daisy_assert (!qt_progress.isNull ());
   QObject::connect(&qt_run, SIGNAL(progress_changed (double)),
-                   qt_progress, SLOT(new_progress (double))); 
+		   qt_progress, SLOT(new_progress (double))); 
   QObject::connect(&qt_run, SIGNAL(progress_changed (double)),
-                   &qt_main, SLOT(new_progress (double))); 
+		   &qt_main, SLOT(new_progress (double))); 
   QObject::connect(&qt_run, SIGNAL(progress_state (Toplevel::state_t)),
-                   qt_progress, SLOT(new_state (Toplevel::state_t))); 
+		   qt_progress, SLOT(new_state (Toplevel::state_t))); 
   QObject::connect(&qt_run, SIGNAL(progress_state (Toplevel::state_t)),
-                   &qt_main, SLOT(new_state (Toplevel::state_t))); 
+		   &qt_main, SLOT(new_state (Toplevel::state_t))); 
   daisy_assert (!qt_stop.isNull ());
   QObject::connect(&qt_run, SIGNAL(is_now_running (bool)),
-                   qt_stop, SLOT(setEnabled (bool))); 
+		   qt_stop, SLOT(setEnabled (bool))); 
   QObject::connect(qt_stop, SIGNAL(clicked ()),
-                   &qt_run, SLOT(stop ())); 
+		   &qt_run, SLOT(stop ())); 
+  
   try 
     {
       qt_run.start ();
@@ -340,7 +342,6 @@ static struct UIRunSyntax
 
     alist.add ("description", "Run the program in a window.");
     Librarian::add_type (UI::component, "run", alist, syntax, &make);
-    Librarian::add_type (UI::component, "read", alist, syntax, &make);
   }
 } UIRun_syntax;
 

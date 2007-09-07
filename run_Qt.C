@@ -32,7 +32,7 @@ RunQtMain::run()
   emit progress_state (toplevel.state ());
 
   try
-    {
+    { 
       if (toplevel.state () != Toplevel::is_uninitialized)
         throw EXIT_FAILURE;
 
@@ -41,9 +41,10 @@ RunQtMain::run()
 
       if (toplevel.state () != Toplevel::is_ready)
         throw EXIT_FAILURE;
-
+      
       toplevel.program ().attach_ui (this, logs);
       emit progress_state (Toplevel::is_running);
+
       toplevel.run ();
 
       if (toplevel.state () != Toplevel::is_done)
@@ -68,6 +69,7 @@ RunQtMain::run()
     {
       toplevel.error ("Unknown exception");
     }
+
   emit progress_state (toplevel.state ());
   emit is_now_running (false);
 }

@@ -31,7 +31,7 @@ main (int argc, char* argv[])
   try
     {
       // toplevel.set_ui_progress ();
-      toplevel.command_line (argc, argv);
+      toplevel.command_line (argc, argv, true);
       toplevel.user_interface ();
 
       switch (toplevel.state ())

@@ -52,7 +52,7 @@ struct Toplevel::Implementation
 {
   static std::vector<Toplevel::command_line_parser>* command_line_parsers;
 
-  std::string program_name;
+  const std::string program_name;
   std::auto_ptr<Program> program;
   TreelogStore msg;
   Assertion::Register reg;
@@ -72,6 +72,8 @@ struct Toplevel::Implementation
   void add_daisy_log ();
 
   static std::string get_daisy_home ();
+
+  void reset ();
 
   Implementation ();
   ~Implementation ();
@@ -217,6 +219,16 @@ Toplevel::Implementation::get_daisy_home ()
   Assertion::debug ("Using standard Unix home.");
   return "/usr/local/daisy";
 #endif // !MS WINDOWS
+}
+
+void
+Toplevel::Implementation::reset ()
+{
+  program.reset (NULL);
+  start_time = std::time (NULL);
+  metalib.reset ();
+  state = is_uninitialized;
+  files_found.clear ();
 }
 
 Toplevel::Implementation::Implementation ()
@@ -570,6 +582,13 @@ Toplevel::initialize ()
   impl->state = is_ready;
 }
 
+void
+Toplevel::reset ()
+{ 
+  impl->reset (); 
+  load_syntax (impl->metalib.syntax (), impl->metalib.alist ()); 
+}
+
 std::string
 Toplevel::get_arg (int& argc, char**& argv)
 {
@@ -586,7 +605,7 @@ Toplevel::get_arg (int& argc, char**& argv)
 }
 
 void
-Toplevel::command_line (int& argc, char**& argv)
+Toplevel::command_line (int& argc, char**& argv, const bool require_arg)
 { 
   daisy_assert (impl->state == is_uninitialized);
 
@@ -632,7 +651,7 @@ Toplevel::command_line (int& argc, char**& argv)
       Implementation::command_line_parsers->at (i)(argc, argv);
   
   // We need at least one argument.
-  if (argc < 2)
+  if (argc < 2 && require_arg)
     usage ();                   // Usage.
 
   // Loop over all arguments.
@@ -704,7 +723,7 @@ Toplevel::command_line (int& argc, char**& argv)
     // Already done.
     throw EXIT_SUCCESS;
 
-  if (impl->files_found.size () < 1)
+  if (impl->files_found.size () < 1 && require_arg)
     // Nothing to do.
     usage ();
 
