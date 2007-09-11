@@ -26,6 +26,7 @@
 #include <memory>
 #include <vector>
 
+class Path;
 class Syntax;
 class AttributeList;
 class Library;
@@ -48,6 +49,7 @@ class EXPORT Metalib
 
   // Use.
 public:
+  Path& path () const;
   Syntax& syntax () const;
   AttributeList& alist () const;
   bool exist (symbol name) const;

@@ -1,3 +1,7 @@
+2007-09-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Made 'Path' a class.
+
 2007-09-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.21 released.

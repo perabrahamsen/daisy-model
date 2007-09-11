@@ -32,12 +32,13 @@
 struct ProgramCD : public Program
 {
   // Content.
+  Path& path;
   const std::string dir;
 
   // Use.
   bool run (Treelog& msg)
   { 
-    if (Path::set_directory (dir))
+    if (path.set_directory (dir))
       return true;
     msg.error (std::string ("Could not change to directory '") + dir + "'");
     return false;
@@ -51,6 +52,7 @@ struct ProgramCD : public Program
 
   ProgramCD (Block& al)
     : Program (al),
+      path (al.path ()),
       dir (al.name ("directory"))
   { }
   ~ProgramCD ()

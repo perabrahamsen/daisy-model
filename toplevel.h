@@ -94,8 +94,6 @@ public:
   state_t state () const;
 
   // Create and Destroy.
-private:  
-  static void initialize_once ();
 public:
   void initialize ();
   void reset ();

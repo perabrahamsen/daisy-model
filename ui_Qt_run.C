@@ -18,10 +18,9 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "ui_Qt.h"
-#include "run_Qt.h"
-#include "vis_Qt.h"
+#include "ui_Qt_run.h"
 #include "log_Qt.h"
+#include "run_Qt.h"
 
 #include "time.h"
 #include "toplevel.h"
@@ -32,48 +31,18 @@
 #include "block.h"
 #include "alist.h"
 #include "assertion.h"
-#include "memutils.h"
+#include "path.h"
 
+#include <QtGui/QMenuBar>
+#include <QtGui/QFileDialog>
 #include <QtGui/QStatusBar>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QCheckBox>
-#include <QtCore/QPointer>
 
 #include <sstream>
-#include <map>
-
-class UIRun : public UIQt
-{
-  // Widgets.
-  VisQtMain qt_main;
-  QPointer<VisQtProgress> qt_progress;
-  QPointer<QPushButton> qt_stop;
-
-  // Logs.
-  bool has_loaded_log_file;
-  auto_vector<Log*> all_logs;
-  std::map<symbol, LogQt*> logs;
-  void build_log (Block& block, const std::string& log);
-  bool attach_log (const std::string& log, VisQtLog* object) const;
-
-  // Use.
-public:
-  void attach (Toplevel& toplevel);
-  void run (Toplevel& toplevel);
-
-  // Create.
-private:
-  UIRun& operator= (const UIRun&); // Disable.
-  UIRun (const UIRun&);         // Disable.
-  explicit UIRun ();            // Disable.
-public:
-  explicit UIRun (Block& al);
-private:
-  ~UIRun ();
-};
 
 void
 UIRun::build_log (Block& block, const std::string& name)
@@ -116,6 +85,9 @@ UIRun::attach_log (const std::string& name, VisQtLog *const vis) const
 void 
 UIRun::attach (Toplevel& toplevel)
 {
+  daisy_assert (top_level == NULL);
+  top_level = &toplevel;
+
   // We start by loading special log used by UI.
   try
     {
@@ -139,6 +111,18 @@ UIRun::attach (Toplevel& toplevel)
   const AttributeList& alist = toplevel.program_alist ();
   const Syntax& syntax = toplevel.program_syntax ();
   
+  // Attach menubar.
+  QMenuBar* menuBar = qt_main.menuBar ();
+
+  // Create File menu.
+  QMenu* fileMenu = menuBar->addMenu ("&File");
+
+  // Open setup.
+  QAction* openAction = new QAction ("&Open setup...", this);
+  openAction->setStatusTip ("Open a setup file");
+  connect (openAction, SIGNAL(triggered()), this, SLOT(open_setup()));
+  fileMenu->addAction (openAction);
+
   // We organize items in a boxes.
   QWidget *const center = new QWidget (&qt_main);
   QVBoxLayout *const layout = new QVBoxLayout (center);
@@ -148,7 +132,6 @@ UIRun::attach (Toplevel& toplevel)
   layout->addLayout (top_layout);
 
   // The program name.
-  QLabel *const qt_name = new QLabel;
   qt_name->setToolTip ("The name of the program or simulation to run.");
   QFont font = qt_name->font ();
   font.setBold (true);
@@ -186,7 +169,6 @@ UIRun::attach (Toplevel& toplevel)
   top_layout->addWidget (qt_time /* , Qt::AlignCenter */);
 
   // The file name.
-  QLabel *const qt_file = new QLabel;
   const std::vector<std::string> files = toplevel.files_found ();
   switch (files.size ())
     {
@@ -206,7 +188,6 @@ UIRun::attach (Toplevel& toplevel)
   top_layout->addWidget (qt_file /* , Qt::AlignRight */);
 
   // The program description.
-  QLabel *const qt_description = new QLabel;               
   qt_description->setToolTip ("The description of the selected program.");
   if (alist.check ("description")
       && alist.name ("description") != Toplevel::default_description)
@@ -276,59 +257,134 @@ UIRun::attach (Toplevel& toplevel)
 }
 
 void 
-UIRun::run (Toplevel& toplevel)
+UIRun::run_program ()
 { 
-  // Start calculations.
-  RunQtMain qt_run (toplevel, all_logs);
+  // New thread.
+  daisy_assert (qt_run.isNull ());
+  qt_run = new RunQtMain (*top_level, all_logs);
+  daisy_assert (!qt_run.isNull ());
+
+  // Progress bar.
   daisy_assert (!qt_progress.isNull ());
-  QObject::connect(&qt_run, SIGNAL(progress_changed (double)),
+  QObject::connect(qt_run, SIGNAL(progress_changed (double)),
 		   qt_progress, SLOT(new_progress (double))); 
-  QObject::connect(&qt_run, SIGNAL(progress_changed (double)),
-		   &qt_main, SLOT(new_progress (double))); 
-  QObject::connect(&qt_run, SIGNAL(progress_state (Toplevel::state_t)),
+  QObject::connect(qt_run, SIGNAL(progress_state (Toplevel::state_t)),
 		   qt_progress, SLOT(new_state (Toplevel::state_t))); 
-  QObject::connect(&qt_run, SIGNAL(progress_state (Toplevel::state_t)),
+
+  // Main window.
+  QObject::connect(qt_run, SIGNAL(progress_changed (double)),
+		   &qt_main, SLOT(new_progress (double))); 
+  QObject::connect(qt_run, SIGNAL(progress_state (Toplevel::state_t)),
 		   &qt_main, SLOT(new_state (Toplevel::state_t))); 
+
+  // Stop button.
   daisy_assert (!qt_stop.isNull ());
-  QObject::connect(&qt_run, SIGNAL(is_now_running (bool)),
+  QObject::connect(qt_run, SIGNAL(is_now_running (bool)),
 		   qt_stop, SLOT(setEnabled (bool))); 
   QObject::connect(qt_stop, SIGNAL(clicked ()),
-		   &qt_run, SLOT(stop ())); 
-  
-  try 
+		   qt_run, SLOT(stop ())); 
+
+  // Start thread.
+  qt_run->start ();
+}
+
+void
+UIRun::stop_program ()
+{
+  if (!qt_run.isNull ())
     {
-      qt_run.start ();
-
-      // Start interface.
-      run_user_interface ();       // Start the UI.
-      qt_run.stop ();              // Tell program to stop.
-      qt_run.wait ();              // Wait for it to happen.
-      daisy_assert (qt_run.isFinished ());
-
-      switch (toplevel.state ())
-        {
-        case Toplevel::is_done:
-        case Toplevel::is_error:
-          break;
-        default:
-          toplevel.error ("Top level did not finish properly");
-          break;
-        }
+      qt_run->stop ();              // Tell program to stop.
+      qt_run->wait ();              // Wait for it to happen.
+      daisy_assert (qt_run->isFinished ());
+      delete qt_run;
     }
-  catch (...)
+  daisy_assert (qt_run.isNull ());
+}
+
+void 
+UIRun::run (Toplevel& toplevel)
+{ 
+
+  run_user_interface ();	// Start the UI.
+  stop_program ();		// Stop the simulation.
+}
+
+void
+UIRun::reset ()
+{
+  // Fetch data.
+  daisy_assert (top_level);
+  const AttributeList& alist = top_level->program_alist ();
+  const std::vector<std::string> files = top_level->files_found ();
+
+  // The program name.
+  if (alist.check ("type"))
+    qt_name->setText (alist.name ("type").c_str ());
+  else
+    qt_name->setText ("No program");
+
+  // The file name.
+  switch (files.size ())
     {
-      exit (107);
+    case 0:
+      qt_file->setToolTip ("No setup file has been loaded.");
+      qt_file->setText ("No file");
+      break;
+    case 1:
+      qt_file->setToolTip ("This is the name of the loaded setup file.");
+      qt_file->setText (Path::nodir (files[0]).c_str ());
+      break;
+    default:
+      qt_file->setToolTip ("Multiple setup files have been loaded.");
+      qt_file->setText ("Multiple files");
+    }
+
+  // The program description.
+  if (alist.check ("description")
+      && alist.name ("description") != Toplevel::default_description)
+    qt_description->setText (alist.name ("description").c_str ());
+  else
+    qt_description->setText ("No setup file has been loaded.\n\
+You can drag a setup file to the Daisy icon to run a simulation.");
+
+  // The title.
+  if (files.size () == 1)
+    qt_main.set_file_name (Path::nodir (files[0]).c_str ());
+  else
+    qt_main.set_file_name ("");
+  qt_main.set_title ();
+}
+
+void 
+UIRun::open_setup ()
+{
+  QString fileName 
+    = QFileDialog::getOpenFileName (this,
+				    "Open Daisy Setup", NULL, 
+				    "Daisy Setup Files (*.dai)");
+
+  if (!fileName.isEmpty())
+    {
+      qt_main.statusBar ()->showMessage ("Loading...");
+      top_level->reset ();
+      top_level->parse_file (fileName.toStdString ());
+      reset ();
+      qt_main.statusBar ()->showMessage ("Setup loaded", 2000);
     }
 }
 
 UIRun::UIRun (Block& al)
   : UIQt (al),
     qt_main (application_name ()),
-    has_loaded_log_file (false)
+    qt_name (new QLabel),
+    qt_file (new QLabel),
+    qt_description (new QLabel),
+    has_loaded_log_file (false),
+    top_level (NULL)
 { }
 
 UIRun::~UIRun ()
-{ }
+{ stop_program (); }
 
 static struct UIRunSyntax
 {

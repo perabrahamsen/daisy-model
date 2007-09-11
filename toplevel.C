@@ -37,21 +37,13 @@
 #include "treelog_text.h"
 #include "treelog_store.h"
 #include "librarian.h"
-#include "w32reg.h"
 
 #include <sstream>
 #include <ctime>
 
-#if defined (__unix) 
-#define PATH_SEPARATOR ":"
-#else
-#define PATH_SEPARATOR ";"
-#endif
-
 struct Toplevel::Implementation
 {
   static std::vector<Toplevel::command_line_parser>* command_line_parsers;
-
   const std::string program_name;
   std::auto_ptr<Program> program;
   TreelogStore msg;
@@ -70,8 +62,6 @@ struct Toplevel::Implementation
 
   bool has_daisy_log;
   void add_daisy_log ();
-
-  static std::string get_daisy_home ();
 
   void reset ();
 
@@ -186,39 +176,9 @@ Toplevel::Implementation::add_daisy_log ()
     {
       has_daisy_log = true;
       msg.add_client (new TreelogFile ("daisy.log"));
-      msg.message ("Storing 'daisy.log' in '" + Path::get_directory () + "'");
+      msg.message ("Storing 'daisy.log' in '" 
+		   + metalib.path ().get_directory () + "'");
     }
-}
-
-std::string
-Toplevel::Implementation::get_daisy_home ()
-{
-  // Check DAISYHOME
-  const char* daisy_home_env = getenv ("DAISYHOME");
-  if (daisy_home_env)
-    {
-      Assertion::debug ("Has DAISYHOME environment variable");
-      return daisy_home_env;
-    }
-
-  // Check MS Windows registry
-#if defined (_WIN32) || defined (__CYGWIN32__)
-  const std::string key = "Software\\Daisy " + std::string (version);
-  char *const daisy_w32_reg 
-    = read_w32_registry_string (NULL, key.c_str (), "Install Directory");
-  if (daisy_w32_reg)
-    {
-      Assertion::debug ("Has '" + key + "' registry entry.");
-      std::string result = daisy_w32_reg;
-      free (daisy_w32_reg);
-      return result;
-    }
-  Assertion::debug ("Using standard MS Windows home.");
-  return "C:/daisy";
-#else // !MS WINDOWS
-  Assertion::debug ("Using standard Unix home.");
-  return "/usr/local/daisy";
-#endif // !MS WINDOWS
 }
 
 void
@@ -493,49 +453,6 @@ Toplevel::state_t
 Toplevel::state () const
 { return impl->state ; }
 
-void 
-Toplevel::initialize_once ()
-{
-  // Only run once.
-  static bool first_time = true;
-  if (!first_time)
-    return;
-  first_time = false;
-
-  // We don't use stdio.
-  std::ios::sync_with_stdio (false);
-
-  std::vector<std::string> path;
-
-  // Initialize path.
-  const char *const daisy_path_env = getenv ("DAISYPATH");
-  if (daisy_path_env)
-    {
-      Assertion::debug ("Has DAISYPATH environment variable.");
-      const std::string colon_path = daisy_path_env;
-      int last = 0;
-      for (;;)
-        {
-          const int next = colon_path.find (PATH_SEPARATOR, last);
-          if (next < 0)
-            break;
-          path.push_back (colon_path.substr (last, next - last));
-          last = next + 1;
-        }
-      path.push_back (colon_path.substr (last));
-    }
-  else
-    {
-      const std::string daisy_home = Implementation::get_daisy_home ();
-      Assertion::debug ("Using '" + daisy_home + "' as daisy home.");
-      path.push_back (".");
-      path.push_back (daisy_home + "/lib");
-      path.push_back (daisy_home + "/sample");
-    }
-  daisy_assert (path.size () > 0);
-  Path::set_path (path);
-}
-
 void
 Toplevel::user_interface ()
 {
@@ -642,7 +559,7 @@ Toplevel::command_line (int& argc, char**& argv, const bool require_arg)
         last == arg.find (":");
       daisy_assert (last != std::string::npos);
       const std::string dir = arg.substr (0, last);
-      Path::set_directory (dir);
+      impl->metalib.path ().set_directory (dir);
     }
 #endif // _WIN32
 
@@ -676,7 +593,7 @@ Toplevel::command_line (int& argc, char**& argv, const bool require_arg)
 		// Change directory.
 		{
 		  const std::string dir = get_arg (argc, argv);
-		  if (!Path::set_directory (dir))
+		  if (!impl->metalib.path ().set_directory (dir))
 		    error (impl->program_name
                            + ": chdir (" + dir + ") failed");
 		}
@@ -782,7 +699,7 @@ are not running MS Windows), a hardcoded value is used.  This is\n\
 \n\
 The value found in the manual corresponds to the system where the\n\
 manual was generated.");
-  alist.add ("install_directory", Implementation::get_daisy_home ());
+  alist.add ("install_directory", Path::get_daisy_home ());
   syntax.add ("directory", Syntax::String, Syntax::OptionalConst,
               "Run program in this directory.\n\
 This can affect both where input files are found and where log files\n\
@@ -835,7 +752,9 @@ Toplevel::Toplevel ()
   : impl (new Implementation)
 { 
   load_syntax (impl->metalib.syntax (), impl->metalib.alist ()); 
-  initialize_once ();
+
+  // We don't use stdio.
+  std::ios::sync_with_stdio (false);
 }
 
 Toplevel::~Toplevel ()

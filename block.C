@@ -264,6 +264,10 @@ Metalib&
 Block::metalib ()
 { return impl->metalib; }
 
+Path& 
+Block::path ()
+{ return impl->metalib.path (); }
+
 const AttributeList&
 Block::alist () const
 { return impl->alist; }

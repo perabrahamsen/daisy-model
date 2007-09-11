@@ -48,7 +48,7 @@ RunQtMain::run()
       toplevel.run ();
 
       if (toplevel.state () != Toplevel::is_done)
-        throw EXIT_FAILURE;
+	throw EXIT_FAILURE;
 
       throw EXIT_SUCCESS;
     }

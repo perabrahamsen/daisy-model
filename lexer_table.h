@@ -28,16 +28,20 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <iosfwd>
 
 class Treelog;
 class LexerData;
 class Time;
+class Path;
 
 class LexerTable
 {
   // Content.
 private:
+  Path& path;
   const std::string filename;  
+  std::auto_ptr<std::istream> owned_stream;
   std::auto_ptr<LexerData> lex;
   std::string field_sep;
   std::string type_;

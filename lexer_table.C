@@ -29,6 +29,7 @@
 #include "memutils.h"
 #include "time.h"
 #include "vcheck.h"
+#include "path.h"
 #include <sstream>
 
 class LexerTable::Filter
@@ -91,7 +92,9 @@ LexerTable::good ()
 bool
 LexerTable::read_header (Treelog& msg)
 {
-  lex.reset (new LexerData (filename, msg));
+  owned_stream = path.open_file (filename);
+  lex.reset (new LexerData (filename, *owned_stream, msg));
+
   // Open errors?
   if (!lex->good ())
     return false;
@@ -466,7 +469,9 @@ By default this will be true iff 'original' is not specified.");
 }
 
 LexerTable::LexerTable (Block& al)
-  : filename (al.name ("file")),
+  : path (al.path ()),
+    filename (al.name ("file")),
+    owned_stream (NULL),
     lex (NULL),
     field_sep ("UNINITIALIZED"),
     type_ ("UNINITIALIZED"),

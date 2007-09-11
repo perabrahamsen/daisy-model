@@ -42,7 +42,7 @@ struct PrinterFile::Implementation
 {
   // Data.
   const Metalib& metalib;
-  Path::Output* output;
+  const std::auto_ptr<std::ofstream> owned_stream; // If we opened it.
   std::ostream& out;
 
   // String utilities.
@@ -730,22 +730,19 @@ PrinterFile::Implementation::good ()
 PrinterFile::Implementation::Implementation (const Metalib& mlib,
                                              const std::string& name)
   : metalib (mlib),
-    output (new Path::Output (name)),
-    out (output->stream ())
+    owned_stream (new std::ofstream (name.c_str ())),
+    out (*owned_stream)
 { }
 
 PrinterFile::Implementation::Implementation (const Metalib& mlib,
                                              std::ostream& stream)
   : metalib (mlib),
-    output (NULL),
+    owned_stream (NULL),
     out (stream)
 { }
 
 PrinterFile::Implementation::~Implementation ()
-{
-  if (output)
-    delete output;
-}
+{ }
 
 void 
 PrinterFile::print_string (std::ostream& out,

@@ -30,13 +30,15 @@
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "path.h"
 #include <map>
 #include <sstream>
 
 struct Metalib::Implementation
 {
-  Syntax syntax_;
-  AttributeList alist_;
+  Path path;
+  Syntax syntax;
+  AttributeList alist;
 
   typedef std::map<symbol, Library*> library_map;
   library_map all;
@@ -51,14 +53,17 @@ struct Metalib::Implementation
   { map_delete (all.begin (), all.end ()); }
 };
 
-  
+Path& 
+Metalib::path () const
+{ return impl->path; }
+
 Syntax& 
 Metalib::syntax () const
-{ return impl->syntax_; }
+{ return impl->syntax; }
 
 AttributeList&
 Metalib::alist () const
-{ return impl->alist_; }
+{ return impl->alist; }
 
 bool
 Metalib::exist (const symbol name) const

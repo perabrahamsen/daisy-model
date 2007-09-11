@@ -35,6 +35,7 @@
 #include "vcheck.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "path.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -44,6 +45,8 @@ using namespace std;
 
 struct WeatherStandard : public Weather
 {
+  Path& path;
+
   // Snow Model.
   const double T_rain;
   const double T_snow;
@@ -147,6 +150,7 @@ struct WeatherStandard : public Weather
 
   // Parsing.
   const string where;
+  std::auto_ptr<std::istream> owned_stream;
   std::auto_ptr<LexerData> lex;
   Lexer::Position end_of_header;
 
@@ -855,8 +859,10 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 { 
   Treelog::Open nest (msg, "Weather: " + name);
 
+  daisy_assert (!owned_stream.get ());
+  owned_stream = path.open_file (where);
   daisy_assert (!lex.get ());
-  lex.reset (new LexerData (where, msg));
+  lex.reset (new LexerData (where, *owned_stream, msg));
   daisy_assert (lex.get ());
   // Open errors?
   if (!lex->good ())
@@ -1252,6 +1258,7 @@ NO3DryDep: " << DryDeposit.NO3 << " kgN/ha/year";
 
 WeatherStandard::WeatherStandard (Block& al)
   : Weather (al),
+    path (al.path ()),
     T_rain (al.number ("T_rain")),
     T_snow (al.number ("T_snow")),
     missing_years (map_submodel_const<YearMap> (al, "missing_years")),
@@ -1274,6 +1281,7 @@ WeatherStandard::WeatherStandard (Block& al)
     has_wind_speed (false),
     has_reference_evapotranspiration_ (false),
     where (al.name ("where")),
+    owned_stream (NULL),
     lex (NULL),
     end_of_header (Lexer::no_position ()),
     last_time (end),

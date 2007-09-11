@@ -144,6 +144,7 @@ You can drag a setup file to the Daisy icon to run a simulation.");
     qt_main.set_file_name ("");
   qt_main.set_title ();
 }
+
 void 
 UIRead::open_setup ()
 {

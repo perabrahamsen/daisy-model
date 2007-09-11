@@ -26,12 +26,10 @@
 #include "mathlib.h"
 #include <ctype.h>
 
-using namespace std;
-
-string
+std::string
 LexerData::get_word ()
 {
-  string tmp;
+  std::string tmp;
   while (good () && !isspace (peek ()))
     tmp += int2char (get ());
   return tmp;
@@ -40,7 +38,7 @@ LexerData::get_word ()
 double
 LexerData::get_number ()
 {
-  string str;
+  std::string str;
   int c = peek ();
 
   while (good () && (isdigit (c) 
@@ -62,7 +60,7 @@ LexerData::get_number ()
   const double value = strtod (c_str, const_cast<char**> (&endptr));
   
   if (*endptr != '\0')
-    error (string ("Junk at end of number '") + endptr + "'");
+    error (std::string ("Junk at end of number '") + endptr + "'");
 
   return value;
 }
@@ -70,7 +68,7 @@ LexerData::get_number ()
 int
 LexerData::get_cardinal ()
 {
-  string str;
+  std::string str;
   int c = peek ();
 
   while (isdigit (c))
@@ -114,7 +112,7 @@ LexerData::skip (const char* str)
   for (const char* p = str; *p; p++)
     if (*p != peek ())
       {
-	error (string("Expected '") + str + "'");
+	error (std::string("Expected '") + str + "'");
 	break;
       }
     else
@@ -172,9 +170,12 @@ LexerData::next_line ()
     }
 }
 
-LexerData::LexerData (const string& name, Treelog& out)
-  : Lexer (name, out)
+LexerData::LexerData (const std::string& name,
+		      std::istream& input, Treelog& out)
+  : Lexer (name, input, out)
 { }
 
 LexerData::~LexerData ()
 { }
+
+// lexer_data.C ends here.

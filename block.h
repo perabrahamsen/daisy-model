@@ -29,6 +29,7 @@
 
 class Treelog;
 class Metalib;
+class Path;
 
 #ifdef BUILD_DLL
 /* DLL export */
@@ -44,6 +45,7 @@ class EXPORT Block
   std::auto_ptr<Implementation> impl;
 public:
   Metalib& metalib ();
+  Path& path ();
   const AttributeList& alist () const;
   const Syntax& syntax () const;
   Treelog& msg () const;

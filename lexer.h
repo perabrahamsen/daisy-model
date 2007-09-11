@@ -25,6 +25,7 @@
 
 #include <string>
 #include <memory>
+#include <iosfwd>
 
 class Treelog;
 
@@ -32,8 +33,9 @@ class Lexer
 {
   // Content.
 private:
-  struct Implementation;
-  std::auto_ptr<Implementation> impl;
+  std::istream& in;
+  int line;
+  int column;
 public:
   Treelog& err;
   const std::string file;
@@ -81,7 +83,7 @@ public:
 
   // Create and destroy.
 public:
-  Lexer (const std::string&, Treelog&);
+  Lexer (const std::string& name, std::istream&, Treelog&);
   virtual ~Lexer ();
 };
 

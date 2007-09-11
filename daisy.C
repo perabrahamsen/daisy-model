@@ -325,3 +325,5 @@ static struct ProgramDaisySyntax
     Librarian::add_type (Program::component, "Daisy", alist, syntax, &make);
   }
 } ProgramDaisy_syntax;
+
+// daisy.C ends here.

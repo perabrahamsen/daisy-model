@@ -34,15 +34,16 @@
 struct ProgramBatch : public Program
 {
   // Content.
+  Metalib& metalib;
+  Path& path;
   const std::string directory;
   std::vector<Program*> program;
-  Metalib& metalib;
-
+  
   // Use.
   bool run (Treelog& msg)
   { 
 
-    Path::InDirectory cwd (directory);
+    Path::InDirectory cwd (path, directory);
     if (!cwd.check ())
       {
         msg.error ("Could not change to directory '" + directory + "'");
@@ -83,9 +84,10 @@ struct ProgramBatch : public Program
 
   ProgramBatch (Block& al)
     : Program (al),
+      metalib (al.metalib ()),
+      path (al.path ()),
       directory (al.name ("directory")),
-      program (Librarian::build_vector<Program> (al, "run")),
-      metalib (al.metalib ())
+      program (Librarian::build_vector<Program> (al, "run"))
   { }
 
   ~ProgramBatch ()

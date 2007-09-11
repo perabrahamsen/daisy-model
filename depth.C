@@ -36,6 +36,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "mathlib.h"
+#include "path.h"
 #include <string>
 #include <sstream>
 
@@ -263,6 +264,7 @@ namespace State
 
 struct DepthFile : public Depth
 {
+  Path& path;
   const std::string file;
   State::type state;
   Time start;
@@ -307,7 +309,8 @@ struct DepthFile : public Depth
   void initialize (Treelog& msg)
   { 
     daisy_assert (state == State::uninitialized);
-    LexerData lex (file, msg);
+    std::auto_ptr<std::istream> input_stream = path.open_file (file);
+    LexerData lex (file, *input_stream, msg);
     lex.skip_space ();
     if (lex.peek () == '#')
       {
@@ -360,6 +363,7 @@ struct DepthFile : public Depth
   { return state == State::ok; }
   DepthFile (Block& al)
     : Depth (al),
+      path (al.path ()),
       file (al.name ("file")),
       state (State::uninitialized),
       start (1, 1, 1, 1),

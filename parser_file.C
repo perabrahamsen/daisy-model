@@ -47,11 +47,15 @@ static const symbol error_symbol ("__PARSER_FILE_ERROR_MAGIC__");
 
 struct ParserFile::Implementation
 {
+  // Environment.
+  Metalib& metalib;
+
   // Inputs.
   auto_vector<AttributeList*> inputs;
 
   // Lexer.
   std::string file;
+  std::auto_ptr<std::istream> input_stream;
   std::auto_ptr<Lexer> lexer;
   std::auto_ptr<Treelog::Open> nest;
 
@@ -111,7 +115,6 @@ struct ParserFile::Implementation
   AttributeList& load_derived (const Library& lib, bool in_sequence,
 			       const AttributeList* original);
   void load_list (Syntax&, AttributeList&);
-  Metalib& metalib;
 
   // Create and destroy.
   Implementation (Metalib&, const std::string&, Treelog&);
@@ -899,9 +902,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    atts.add (name, get_string ());
 	    // Handle "directory" immediately.
 	    if (&syntax == &metalib.syntax () && name == "directory")
-	      if (!Path::set_directory (atts.name (name)))
-		error (std::string ("Could not set directory '") + atts.name (name)
-		       + "'");
+	      if (!metalib.path ().set_directory (atts.name (name)))
+		error ("Could not set directory '" + atts.name (name) + "'");
 	    break;
 	  case Syntax::Boolean:
 	    {
@@ -1283,7 +1285,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		    std::vector<std::string> names;
 		    for (unsigned int i = 0; i < symbols.size (); i++)
 		      names.push_back (symbols[i].name ());
-		    Path::set_path (names);
+		    metalib.path ().set_path (names);
 		  }
 		break;
 	      }
@@ -1352,11 +1354,12 @@ done:
 ParserFile::Implementation::Implementation (Metalib& mlib,
                                             const std::string& name,
                                             Treelog& msg)
-  : inputs (std::vector<AttributeList*> ()),
+  : metalib (mlib),
+    inputs (std::vector<AttributeList*> ()),
     file (name),
-    lexer (new Lexer (file, msg)),
-    nest (new Treelog::Open (msg, file)),
-    metalib (mlib)
+    input_stream (mlib.path ().open_file (name)),
+    lexer (new Lexer (name, *input_stream, msg)),
+    nest (new Treelog::Open (msg, file))
 { }
 
 void

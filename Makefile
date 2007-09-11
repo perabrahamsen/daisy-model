@@ -486,10 +486,10 @@ QTOBJECTS = $(QTSOURCES:.C=${OBJ}) $(QTMOCHDR:.h=_moc${OBJ})
 
 # Select the Qt4 frontend files
 
-Q4MOCHDR = run_Qt.h vis_Qt.h log_Qt.h ui_Qt_read.h
+Q4MOCHDR = run_Qt.h vis_Qt.h log_Qt.h ui_Qt_run.h ui_Qt_read.h
 Q4MOCSRC = $(Q4MOCHDR:.h=_moc.C)
 Q4HEADERS = $(Q4MOCHDR) ui_Qt.h
-Q4SOURCES = $(Q4HEADERS:.h=.C) ui_Qt_run.C main_Qt.C
+Q4SOURCES = $(Q4HEADERS:.h=.C) main_Qt.C
 Q4OBJECTS = $(Q4SOURCES:.C=${OBJ}) $(Q4MOCHDR:.h=_moc${OBJ}) 
 
 ifeq ($(USE_GUI),Q4)

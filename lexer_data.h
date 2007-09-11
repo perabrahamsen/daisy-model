@@ -43,7 +43,7 @@ public:
 
   // Create and Destroy.
 public:
-  LexerData (const std::string& name, Treelog&);
+  LexerData (const std::string& name, std::istream&, Treelog&);
   ~LexerData ();
 };
 

@@ -28,14 +28,14 @@
 #include "assertion.h"
 #include "time.h"
 #include "librarian.h"
-#include <fstream>
-
-using namespace std;
+#include "path.h"
+#include <istream>
 
 class GroundwaterFile : public Groundwater
 {
   // Data.
 private:
+  Path& path;
   Time previous_time;
   Time next_time;
   double previous_depth;
@@ -43,8 +43,9 @@ private:
   double depth;
 
   // File.
-  const string file_name;
-  LexerData* lex;
+  const std::string file_name;
+  std::auto_ptr<std::istream> owned_stream;
+  std::auto_ptr<LexerData> lex;
   
   // Groundwater.
 public:
@@ -82,7 +83,7 @@ GroundwaterFile::bottom_type () const
 void
 GroundwaterFile::tick (const Time& time, Treelog&)
 {
-  daisy_assert (lex);
+  daisy_assert (lex.get ());
   while (next_time < time)
     {
       if (!lex->good ())
@@ -149,26 +150,28 @@ void
 GroundwaterFile::initialize (const Geometry&, const Time& time, const Scope&, 
 			     Treelog& msg)
 {
-  daisy_assert (lex == NULL);
-  lex = new LexerData (file_name, msg);
+  daisy_assert (!owned_stream.get ());
+  owned_stream = path.open_file (file_name);
+  daisy_assert (!lex.get ());
+  lex.reset (new LexerData (file_name, *owned_stream, msg));
   tick (time, msg); 
 }
 
 GroundwaterFile::GroundwaterFile (Block& al)
   : Groundwater (al),
+    path (al.path ()),
     previous_time (42, 1, 1, 0),
     next_time (42, 1, 1, 0),
     previous_depth (-42.42e42),
     next_depth (-42.42e42),
     depth (-42.42e42),
     file_name (al.name ("file")),
+    owned_stream (NULL),
     lex (NULL)
 { }
 
 GroundwaterFile::~GroundwaterFile ()
-{ 
-  delete lex;
-}
+{ }
 
 static struct GroundwaterFileSyntax
 {
