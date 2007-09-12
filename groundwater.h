@@ -74,7 +74,7 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   virtual void initialize (const Geometry&, const Time&, 
 			   const Scope&, Treelog&) = 0;
-  virtual bool check (const Scope&, Treelog&) const = 0;
+  virtual bool check (const Geometry&, const Scope&, Treelog&) const = 0;
 protected:
   Groundwater (Block& al);
 public:

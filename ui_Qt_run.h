@@ -58,7 +58,9 @@ class UIRun : public QWidget, public UIQt
 private:
   Toplevel* top_level;
   QPointer<RunQtMain> qt_run;
+private slots:
   void run_program ();
+private:
   void stop_program ();
 
   // Use.

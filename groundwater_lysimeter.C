@@ -52,7 +52,7 @@ public:
 public:
   void initialize (const Geometry& geo, const Time&, const Scope&, Treelog&)
   { location = geo.bottom (); }
-  bool check (const Scope&, Treelog&) const
+  bool check (const Geometry&, const Scope&, Treelog&) const
   { return true; }
 
   GroundwaterLysimeter (Block& al)

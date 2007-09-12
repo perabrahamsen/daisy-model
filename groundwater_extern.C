@@ -60,7 +60,7 @@ public:
   void initialize (const Geometry&, const Time&, const Scope&, Treelog& msg)
   { expr->initialize (msg); }
 
-  bool check (const Scope& scope, Treelog& msg) const
+  bool check (const Geometry&, const Scope& scope, Treelog& msg) const
   {
     bool ok = true;
     if (!expr->check_dim (scope, Units::cm, msg))

@@ -65,7 +65,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (const Geometry&, const Time& time, const Scope&, Treelog&);
-  bool check (const Scope&, Treelog&) const
+  bool check (const Geometry&, const Scope&, Treelog&) const
   { return true; }
   GroundwaterFile (Block&);
   ~GroundwaterFile ();

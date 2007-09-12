@@ -910,17 +910,17 @@ vis_Qt${OBJ}: vis_Qt.C vis_Qt.h toplevel.h time.h log_Qt.h log_extern.h \
 log_Qt${OBJ}: log_Qt.C log_Qt.h log_extern.h log_select.h log.h border.h \
   model.h alist.h symbol.h memutils.h destination.h scope.h librarian.h \
   syntax.h treelog.h
+ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
+  vis_Qt.h toplevel.h time.h memutils.h log_Qt.h log_extern.h \
+  log_select.h log.h border.h alist.h destination.h scope.h run_Qt.h \
+  run.h treelog_text.h treelog.h program.h metalib.h library.h \
+  librarian.h block.h syntax.h plf.h assertion.h path.h
 ui_Qt_read${OBJ}: ui_Qt_read.C ui_Qt_read.h ui_Qt.h ui.h model.h symbol.h \
   vis_Qt.h toplevel.h time.h program.h run.h metalib.h library.h \
   librarian.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
-  memutils.h
+  memutils.h path.h
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h
-ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt.h ui.h model.h symbol.h run_Qt.h run.h \
-  toplevel.h treelog_text.h treelog.h vis_Qt.h time.h log_Qt.h \
-  log_extern.h log_select.h log.h border.h alist.h memutils.h \
-  destination.h scope.h program.h metalib.h library.h librarian.h block.h \
-  syntax.h plf.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
 ui${OBJ}: ui.C ui.h model.h symbol.h toplevel.h treelog_text.h treelog.h \
   librarian.h block.h syntax.h plf.h alist.h
@@ -976,7 +976,7 @@ format${OBJ}: format.C format.h model.h symbol.h assertion.h block.h syntax.h \
 depth${OBJ}: depth.C depth.h model.h symbol.h block.h syntax.h treelog.h \
   plf.h alist.h time.h lexer_data.h lexer.h output.h condition.h \
   memutils.h number.h units.h check.h vcheck.h assertion.h librarian.h \
-  mathlib.h
+  mathlib.h path.h
 wse${OBJ}: wse.C wse.h model.h symbol.h block.h syntax.h treelog.h plf.h \
   alist.h program.h run.h mathlib.h assertion.h librarian.h
 program${OBJ}: program.C program.h model.h symbol.h run.h block.h syntax.h \
@@ -1072,7 +1072,7 @@ vegetation${OBJ}: vegetation.C vegetation.h model.h symbol.h log.h border.h \
 toplevel${OBJ}: toplevel.C toplevel.h metalib.h symbol.h daisy.h program.h \
   model.h run.h time.h memutils.h ui.h library.h parser_file.h parser.h \
   submodel.h block.h syntax.h treelog.h plf.h alist.h path.h version.h \
-  assertion.h treelog_text.h treelog_store.h librarian.h w32reg.h
+  assertion.h treelog_text.h treelog_store.h librarian.h
 timestep${OBJ}: timestep.C timestep.h time.h vcheck.h syntax.h treelog.h \
   symbol.h alist.h block.h plf.h assertion.h mathlib.h
 geometry_rect${OBJ}: geometry_rect.C geometry_rect.h geometry_vert.h \
@@ -1227,7 +1227,7 @@ intrinsics${OBJ}: intrinsics.C intrinsics.h symbol.h assertion.h library.h \
   memutils.h
 metalib${OBJ}: metalib.C metalib.h symbol.h intrinsics.h librarian.h model.h \
   library.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
-  memutils.h
+  memutils.h path.h
 model${OBJ}: model.C model.h
 output${OBJ}: output.C output.h condition.h model.h symbol.h alist.h \
   memutils.h daisy.h program.h run.h time.h log_all.h log_select.h log.h \
@@ -1247,7 +1247,7 @@ scope_table${OBJ}: scope_table.C scope_table.h scope.h symbol.h model.h \
   lexer_table.h block.h syntax.h treelog.h plf.h assertion.h
 lexer_table${OBJ}: lexer_table.C lexer_table.h block.h syntax.h treelog.h \
   symbol.h plf.h lexer_data.h lexer.h alist.h assertion.h mathlib.h \
-  submodeler.h memutils.h time.h vcheck.h
+  submodeler.h memutils.h time.h vcheck.h path.h
 block${OBJ}: block.C block.h syntax.h treelog.h symbol.h plf.h metalib.h \
   library.h alist.h librarian.h model.h stringer.h number.h assertion.h \
   scope_block.h scope.h
@@ -1268,7 +1268,7 @@ units${OBJ}: units.C units.h symbol.h syntax.h treelog.h mathlib.h \
   assertion.h memutils.h
 check${OBJ}: check.C check.h mathlib.h assertion.h
 check_range${OBJ}: check_range.C check_range.h check.h
-path${OBJ}: path.C path.h assertion.h
+path${OBJ}: path.C path.h assertion.h w32reg.h version.h
 traverse_delete${OBJ}: traverse_delete.C traverse_delete.h symbol.h \
   traverse.h metalib.h library.h syntax.h treelog.h alist.h assertion.h
 depend${OBJ}: depend.C depend.h symbol.h traverse.h library.h metalib.h \
@@ -1278,7 +1278,7 @@ traverse${OBJ}: traverse.C traverse.h symbol.h metalib.h library.h syntax.h \
 treelog${OBJ}: treelog.C treelog.h symbol.h
 lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h time.h mathlib.h \
   assertion.h
-lexer${OBJ}: lexer.C lexer.h treelog.h symbol.h path.h
+lexer${OBJ}: lexer.C lexer.h treelog.h symbol.h
 daisy${OBJ}: daisy.C daisy.h program.h model.h symbol.h run.h time.h \
   memutils.h weather.h im.h groundwater.h horizon.h output.h condition.h \
   alist.h log.h border.h parser.h nitrification.h bioclimate.h \
@@ -1576,7 +1576,7 @@ rootdens_G_P${OBJ}: rootdens_G_P.C rootdens.h model.h symbol.h block.h \
   border.h alist.h check.h librarian.h
 groundwater_file${OBJ}: groundwater_file.C groundwater.h model.h symbol.h \
   block.h syntax.h treelog.h plf.h alist.h lexer_data.h lexer.h \
-  assertion.h time.h librarian.h
+  assertion.h time.h librarian.h path.h
 action_fertilize${OBJ}: action_fertilize.C action.h model.h alist.h symbol.h \
   block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
   memutils.h field.h border.h am.h im.h check.h assertion.h librarian.h
@@ -1625,7 +1625,7 @@ action_message${OBJ}: action_message.C action.h model.h alist.h symbol.h \
 weather_std${OBJ}: weather_std.C weather.h model.h im.h symbol.h alist.h \
   fao.h lexer_data.h lexer.h time.h plf.h mathlib.h assertion.h units.h \
   submodeler.h block.h syntax.h treelog.h check.h vcheck.h memutils.h \
-  librarian.h
+  librarian.h path.h
 groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h model.h symbol.h \
   block.h syntax.h treelog.h plf.h log.h border.h alist.h geometry.h \
   mathlib.h assertion.h soil.h soil_heat.h soil_water.h depth.h check.h \

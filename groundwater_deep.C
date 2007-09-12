@@ -49,7 +49,7 @@ public:
 public:
   void initialize (const Geometry&, const Time&, const Scope&, Treelog&)
   { }
-  bool check (const Scope&, Treelog&) const
+  bool check (const Geometry&, const Scope&, Treelog&) const
   { return true; }
   GroundwaterDeep (Block& al)
     : Groundwater (al)

@@ -109,66 +109,9 @@ private:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geo, const Time& time,
-		   const Scope& scope, Treelog& msg)
-  {
-    const int size = geo.cell_size ();
-    double largest = 0.0;
-    for (unsigned int i = 0; i < size; i++)
-      if (geo.cell_volume (i) > largest)
-	largest = geo.cell_volume (i);
-    if (largest > 10.0)
-      {
-	Treelog::Open nest (msg, "Groundwater pipe");
-	std::ostringstream tmp;
-	tmp << "WARNING: drained soil needs soil intervals < 10.0 cm; "
-	    << "largest is " << largest << "";
-	msg.warning (tmp.str ());
-      }
-
-    S.insert (S.end (), size, 0.0);
-
-    if (!pressure_table.get ())
-      {
-        // GCC 2.95 need the extra variable for the assignment.
-        std::auto_ptr<Depth> depth (Depth::create ((geo.bottom ()
-                                                    - Z_aquitard_)
-                                                   + h_aquifer));
-        pressure_table = depth;
-      }
-    pressure_table->initialize (msg);
-    // Pressure below aquitard.
-    if (pressure_table->check (scope, msg))
-      set_h_aquifer (geo);
-    else
-      pressure_table.reset (NULL);
-  }
-  bool check (const Scope& scope, Treelog& msg) const
-  {
-    if (pressure_table.get ())
-      return pressure_table->check (scope, msg); 
-    msg.error ("No pressure table");
-    return false;
-  }
-  GroundwaterPipe (Block& al)
-    : Groundwater (al),
-      L (al.number ("L")),
-      x (al.number ("x", L / 2.0)),
-      pipe_position (al.number ("pipe_position")),
-      K_to_pipes_ (al.number ("K_to_pipes", -1.0)),
-      K_aquitard_ (al.number ("K_aquitard")),
-      Z_aquitard_ (al.number ("Z_aquitard")),
-      height (al.number ("height", pipe_position)),
-      h_aquifer (al.number ("h_aquifer", Z_aquitard_))
-  {
-    if (al.check ("pressure_table"))
-      {
-        // GCC 2.95 needs the extra variable for the asignment.
-        std::auto_ptr<Depth> depth
-          (Librarian::build_item<Depth> (al, "pressure_table"));
-        pressure_table = depth;
-      }
-  }
+  void initialize (const Geometry&, const Time&, const Scope&, Treelog&);
+  bool check (const Geometry&, const Scope&, Treelog&) const;
+  GroundwaterPipe (Block&);
   ~GroundwaterPipe ()
   { }
 };
@@ -349,6 +292,86 @@ GroundwaterPipe::output (Log& log) const
   output_value (deep_percolation, "DeepPercolation", log);
   output_variable (S, log);
   output_variable (h_aquifer, log);
+}
+
+void
+GroundwaterPipe::initialize (const Geometry& geo, const Time& time,
+			     const Scope& scope, Treelog& msg)
+{
+  const int size = geo.cell_size ();
+  double largest = 0.0;
+  for (unsigned int i = 0; i < size; i++)
+    if (geo.cell_volume (i) > largest)
+      largest = geo.cell_volume (i);
+  if (largest > 10.0)
+    {
+      Treelog::Open nest (msg, "Groundwater pipe");
+      std::ostringstream tmp;
+      tmp << "WARNING: drained soil needs soil intervals < 10.0 cm; "
+	  << "largest is " << largest << "";
+      msg.warning (tmp.str ());
+    }
+
+  S.insert (S.end (), size, 0.0);
+
+  if (!pressure_table.get ())
+    {
+      // GCC 2.95 need the extra variable for the assignment.
+      std::auto_ptr<Depth> depth (Depth::create ((geo.bottom ()
+						  - Z_aquitard_)
+						 + h_aquifer));
+      pressure_table = depth;
+    }
+  pressure_table->initialize (msg);
+  // Pressure below aquitard.
+  if (pressure_table->check (scope, msg))
+    set_h_aquifer (geo);
+  else
+    pressure_table.reset (NULL);
+}
+
+bool 
+GroundwaterPipe::check (const Geometry& geo, const Scope& scope,
+			Treelog& msg) const
+{
+  bool ok = true;
+  if (!pressure_table.get ())
+    {
+      ok = false;
+      msg.error ("No pressure table");
+    }
+  else if (!pressure_table->check (scope, msg))
+    ok = false;
+  
+  // Check that we have a volume below the pipes.
+  for (size_t i = 0; i < geo.cell_size (); i++)
+    if (geo.z (i) < pipe_position - 1e-10)
+      goto found_cell_center_below_pipe;
+
+  msg.error ("Insufficient soil defined below the pipe drains");
+  ok = false;
+ found_cell_center_below_pipe:
+  return ok;
+}
+ 
+GroundwaterPipe::GroundwaterPipe (Block& al)
+  : Groundwater (al),
+    L (al.number ("L")),
+    x (al.number ("x", L / 2.0)),
+    pipe_position (al.number ("pipe_position")),
+    K_to_pipes_ (al.number ("K_to_pipes", -1.0)),
+    K_aquitard_ (al.number ("K_aquitard")),
+    Z_aquitard_ (al.number ("Z_aquitard")),
+    height (al.number ("height", pipe_position)),
+      h_aquifer (al.number ("h_aquifer", Z_aquitard_))
+{
+  if (al.check ("pressure_table"))
+    {
+      // GCC 2.95 needs the extra variable for the asignment.
+      std::auto_ptr<Depth> depth
+	(Librarian::build_item<Depth> (al, "pressure_table"));
+      pressure_table = depth;
+    }
 }
 
 static struct GroundwaterPipeSyntax

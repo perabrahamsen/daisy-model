@@ -725,7 +725,7 @@ ColumnStandard::check (bool require_weather,
   ScopeMulti scope (extern_scope ? *extern_scope : Scope::null (), 
 		    parent_scope);
   {
-    Treelog::Open nest (msg, "Soil");
+    Treelog::Open nest (msg, "Geometry");
     if (!geometry.check (msg))
       ok = false;
   }
@@ -741,7 +741,7 @@ ColumnStandard::check (bool require_weather,
   }
   {
     Treelog::Open nest (msg, "Groundwater: " + groundwater->name);
-    if (!groundwater->check (scope, msg))
+    if (!groundwater->check (geometry, scope, msg))
       ok = false;
   }
   {

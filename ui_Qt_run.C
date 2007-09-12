@@ -119,9 +119,15 @@ UIRun::attach (Toplevel& toplevel)
 
   // Open setup.
   QAction* openAction = new QAction ("&Open setup...", this);
-  openAction->setStatusTip ("Open a setup file");
+  openAction->setToolTip ("Open a setup file");
   connect (openAction, SIGNAL(triggered()), this, SLOT(open_setup()));
   fileMenu->addAction (openAction);
+
+  // Run setup.
+  QAction* runAction = new QAction ("&Run program...", this);
+  runAction->setToolTip ("Run the selected program.");
+  connect (runAction, SIGNAL(triggered()), this, SLOT(run_program()));
+  fileMenu->addAction (runAction);
 
   // We organize items in a boxes.
   QWidget *const center = new QWidget (&qt_main);
