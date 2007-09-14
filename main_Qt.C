@@ -26,30 +26,38 @@
 #include <typeinfo>
 
 #include <QtGui/QApplication>
+#include <QtCore/QMetaType>
 
 int
 main (int argc, char* argv[])
 {
+  qRegisterMetaType<std::string>("std::string");
+  qRegisterMetaType<Toplevel::state_t>("Toplevel::state_t");
   QApplication app (argc, argv);
+  app.setApplicationName ("Daisy");
+  app.setOrganizationDomain ("life.ku.dk");
+  app.setOrganizationName ("University of Copenhagen");
   UIQt::set_application (app);
 
-  Toplevel toplevel;
+  Toplevel toplevel ("GUI");
+
   try
     {
       // toplevel.set_ui_progress ();
-      toplevel.command_line (argc, argv, false);
+      toplevel.command_line (argc, argv);
       toplevel.user_interface ();
 
       switch (toplevel.state ())
         {
+	case Toplevel::is_unloaded:
         case Toplevel::is_uninitialized:
         case Toplevel::is_ready:
         case Toplevel::is_done:
           throw EXIT_SUCCESS;
         case Toplevel::is_running:
           toplevel.error ("Aborted while simulation was running");
-          throw EXIT_FAILURE;
-        case Toplevel::is_error:
+	  /* Fallthrough */
+	case Toplevel::is_error:
           throw EXIT_FAILURE;
         }
     }

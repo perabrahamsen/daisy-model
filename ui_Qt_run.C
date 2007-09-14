@@ -21,7 +21,6 @@
 #include "ui_Qt_run.h"
 #include "log_Qt.h"
 #include "run_Qt.h"
-
 #include "time.h"
 #include "toplevel.h"
 #include "program.h"
@@ -32,6 +31,7 @@
 #include "alist.h"
 #include "assertion.h"
 #include "path.h"
+#include <sstream>
 
 #include <QtGui/QMenuBar>
 #include <QtGui/QFileDialog>
@@ -41,8 +41,6 @@
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QCheckBox>
-
-#include <sstream>
 
 void
 UIRun::build_log (Block& block, const std::string& name)
@@ -124,7 +122,7 @@ UIRun::attach (Toplevel& toplevel)
   fileMenu->addAction (openAction);
 
   // Run setup.
-  QAction* runAction = new QAction ("&Run program...", this);
+  QAction* runAction = new QAction ("&Run", this);
   runAction->setToolTip ("Run the selected program.");
   connect (runAction, SIGNAL(triggered()), this, SLOT(run_program()));
   fileMenu->addAction (runAction);
@@ -270,6 +268,7 @@ UIRun::run_program ()
   qt_run = new RunQtMain (*top_level, all_logs);
   daisy_assert (!qt_run.isNull ());
 
+#if 0
   // Progress bar.
   daisy_assert (!qt_progress.isNull ());
   QObject::connect(qt_run, SIGNAL(progress_changed (double)),
@@ -289,6 +288,7 @@ UIRun::run_program ()
 		   qt_stop, SLOT(setEnabled (bool))); 
   QObject::connect(qt_stop, SIGNAL(clicked ()),
 		   qt_run, SLOT(stop ())); 
+#endif
 
   // Start thread.
   qt_run->start ();
@@ -403,7 +403,7 @@ static struct UIRunSyntax
     AttributeList& alist = *new AttributeList ();
 
     alist.add ("description", "Run the program in a window.");
-    Librarian::add_type (UI::component, "run", alist, syntax, &make);
+    Librarian::add_type (UI::component, "GUI", alist, syntax, &make);
   }
 } UIRun_syntax;
 

@@ -425,7 +425,7 @@ extern "C" EXPORT Toplevel*
 daisy_daisy_create ()
 {
   try 
-    { return new Toplevel (); }
+    { return new Toplevel ("none"); }
   catch (...)
     { return NULL; }
 }
@@ -434,7 +434,7 @@ extern "C" EXPORT void
 daisy_daisy_parse_command_line (Toplevel* toplevel, int argc, char** argv)
 {
   try
-    { toplevel->command_line (argc, argv, true); }
+    { toplevel->command_line (argc, argv); }
   catch (int i)
     { 
       if (i != EXIT_SUCCESS)

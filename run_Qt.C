@@ -47,10 +47,12 @@ RunQtMain::run()
 
       toplevel.run ();
 
+#if 0
       if (toplevel.state () != Toplevel::is_done)
 	throw EXIT_FAILURE;
 
       throw EXIT_SUCCESS;
+#endif
     }
   catch (const char* error)
     { toplevel.error (std::string ("Exception: ") + error); }
@@ -69,9 +71,10 @@ RunQtMain::run()
     {
       toplevel.error ("Unknown exception");
     }
-
+#if 0
   emit progress_state (toplevel.state ());
   emit is_now_running (false);
+#endif
 }
 
 bool

@@ -486,7 +486,7 @@ QTOBJECTS = $(QTSOURCES:.C=${OBJ}) $(QTMOCHDR:.h=_moc${OBJ})
 
 # Select the Qt4 frontend files
 
-Q4MOCHDR = run_Qt.h vis_Qt.h log_Qt.h ui_Qt_run.h ui_Qt_read.h
+Q4MOCHDR = run_Qt.h vis_Qt.h log_Qt.h ui_Qt_run.h
 Q4MOCSRC = $(Q4MOCHDR:.h=_moc.C)
 Q4HEADERS = $(Q4MOCHDR) ui_Qt.h
 Q4SOURCES = $(Q4HEADERS:.h=.C) main_Qt.C
@@ -540,7 +540,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = select_water.C 
+REMOVE = ui_Qt_read.h ui_Qt_read.C
 
 REMOVED = tlink32.ini daisy.bpr daisy.bpf daisy.bpg Daisy.vcproj q4main.C treelog_stream.C treelog_stream.h treelog_dual.C treelog_dual.h soil_chemical.C soil_chemicals.C chemicals.C soil_chemical.h soil_chemicals.h chemicals.h boolean_extern.C number_extern.C options.C options.h select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
 

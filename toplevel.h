@@ -57,13 +57,9 @@ private:
 public:
   static const char *const default_description;
 
-  enum state_t { is_uninitialized, is_ready, is_running, is_done, is_error };
+  enum state_t { is_unloaded, is_uninitialized,
+		 is_ready, is_running, is_done, is_error };
 
-  // Global command line parsers.
-  typedef void (*command_line_parser) (int&, char**&);
-  static void add_command_line_parser (command_line_parser);
-  static void remove_command_line_parser ();
-  
   // Accessors.
 private:
   Syntax& syntax ();
@@ -80,8 +76,9 @@ public:
   void set_ui_none ();
 
   // Messages.
-private:
+public:
   NORETURN void usage ();
+private:
   void copyright ();
   void start_message () const;
   void end_message () const;
@@ -100,17 +97,18 @@ public:
 private:
   static std::string get_arg (int& argc, char**& argv);
 public:
-  void command_line (int& argc, char**& argv, bool require_);
+  void command_line (int& argc, char**& argv);
   void parse_file (const std::string&);
   void parse_system_file (const std::string&);
   static void load_run (Syntax&, AttributeList&);
 private:
   static void load_syntax (Syntax&, AttributeList&);
 public:
-  Toplevel ();
+  Toplevel (const std::string& preferred_ui);
   ~Toplevel ();
 private:                        // Disable defaults.
   Toplevel(const Toplevel&);
+  Toplevel ();
 };
 
 #endif // TOPLEVEL_H

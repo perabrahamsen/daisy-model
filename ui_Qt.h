@@ -31,15 +31,10 @@ class QApplication;
 class UIQt : public UI
 {
   // Class variables.
-#ifdef SELECTABLE_UI
 private:
-  class Content;
-  static Content* content;
-#else // !SELECTABLE_UI
-public:
   static QApplication* app;
+public:
   static void set_application (QApplication& a);
-#endif // !SELECTABLE_UI
 protected:
   void run_user_interface ();
   QString application_name () const;

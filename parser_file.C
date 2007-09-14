@@ -55,7 +55,7 @@ struct ParserFile::Implementation
 
   // Lexer.
   std::string file;
-  std::auto_ptr<std::istream> input_stream;
+  std::auto_ptr<std::istream> owned_stream;
   std::auto_ptr<Lexer> lexer;
   std::auto_ptr<Treelog::Open> nest;
 
@@ -1357,8 +1357,8 @@ ParserFile::Implementation::Implementation (Metalib& mlib,
   : metalib (mlib),
     inputs (std::vector<AttributeList*> ()),
     file (name),
-    input_stream (mlib.path ().open_file (name)),
-    lexer (new Lexer (name, *input_stream, msg)),
+    owned_stream (mlib.path ().open_file (name)),
+    lexer (new Lexer (name, *owned_stream, msg)),
     nest (new Treelog::Open (msg, file))
 { }
 

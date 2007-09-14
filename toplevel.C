@@ -43,7 +43,7 @@
 
 struct Toplevel::Implementation
 {
-  static std::vector<Toplevel::command_line_parser>* command_line_parsers;
+  const symbol preferred_ui;
   const std::string program_name;
   std::auto_ptr<Program> program;
   TreelogStore msg;
@@ -58,19 +58,16 @@ struct Toplevel::Implementation
   std::vector<std::string> files_found;
   bool ran_user_interface;
   std::auto_ptr<UI> ui;
-  void add_daisy_ui (Toplevel& toplevel, bool auto_run = false);
+  void add_daisy_ui (Toplevel& toplevel);
 
   bool has_daisy_log;
   void add_daisy_log ();
 
   void reset ();
 
-  Implementation ();
+  Implementation (const std::string& preferred_ui);
   ~Implementation ();
 };
-
-std::vector<Toplevel::command_line_parser>* 
-/**/ Toplevel::Implementation::command_line_parsers = NULL;
 
 void
 Toplevel::Implementation::run_program (const std::string& name_str)
@@ -128,8 +125,7 @@ Toplevel::Implementation::run_program (const std::string& name_str)
 }
 
 void 
-Toplevel::Implementation::add_daisy_ui (Toplevel& toplevel,
-                                        const bool auto_run)
+Toplevel::Implementation::add_daisy_ui (Toplevel& toplevel)
 { 
   add_daisy_log ();
 
@@ -137,29 +133,13 @@ Toplevel::Implementation::add_daisy_ui (Toplevel& toplevel,
     return;
 
   const Library& library = metalib.library (UI::component);
-  static const symbol run_symbol ("run");
-  static const symbol read_symbol ("read");
-  static const symbol progress_symbol ("progress");
 
   if (metalib.alist ().check ("ui"))
     /* Do nothing */;
-  else if ((auto_run || files_found.size () > 0)
-           && library.check (run_symbol))
+  else 
     {
-      AttributeList alist (library.lookup (run_symbol));
-      alist.add ("type", run_symbol);
-      metalib.alist ().add ("ui", alist);
-    }
-  else if (library.check (read_symbol))
-    {
-      AttributeList alist (library.lookup (read_symbol));
-      alist.add ("type", read_symbol);
-      metalib.alist ().add ("ui", alist);
-    }
-  else
-    {
-      AttributeList alist (library.lookup (progress_symbol));
-      alist.add ("type", progress_symbol);
+      AttributeList alist (library.lookup (preferred_ui));
+      alist.add ("type", preferred_ui);
       metalib.alist ().add ("ui", alist);
     }
   Block block (metalib, msg, "UI");
@@ -187,16 +167,17 @@ Toplevel::Implementation::reset ()
   program.reset (NULL);
   start_time = std::time (NULL);
   metalib.reset ();
-  state = is_uninitialized;
+  state = is_unloaded;
   files_found.clear ();
 }
 
-Toplevel::Implementation::Implementation ()
-  : program_name ("daisy"),
+Toplevel::Implementation::Implementation (const std::string& pref_ui)
+  : preferred_ui (pref_ui),
+    program_name ("daisy"),
     reg (msg),
     start_time (std::time (NULL)),
     has_printed_copyright (false),
-    state (is_uninitialized),
+    state (is_unloaded),
     ran_user_interface (false),
     has_daisy_log (false)
 { }
@@ -246,28 +227,6 @@ the value must be a primitive of that type.  For Number, you can also\n\
 specify a dimension in square brackets afterwards.  DOC is a\n\
 non-optional description of the new parameter.";
 
-void 
-Toplevel::add_command_line_parser (command_line_parser parser)
-{
-  if (!Implementation::command_line_parsers)
-    Implementation::command_line_parsers 
-      = new std::vector<command_line_parser> ();
-
-  Implementation::command_line_parsers->push_back (parser);
-}
-
-void
-Toplevel::remove_command_line_parser ()
-{
-  daisy_assert (Implementation::command_line_parsers);
-  Implementation::command_line_parsers->pop_back ();
-  if (Implementation::command_line_parsers->size () < 1)
-    {
-      delete Implementation::command_line_parsers;
-      Implementation::command_line_parsers = NULL;
-    }
-}
-
 Syntax& 
 Toplevel::syntax () 
 { return metalib ().syntax (); }
@@ -306,6 +265,7 @@ Toplevel::program () const
     case is_running:
     case is_done:
       break;
+    case is_unloaded:
     case is_uninitialized:
     case is_error:
       daisy_notreached ();
@@ -522,9 +482,9 @@ Toplevel::get_arg (int& argc, char**& argv)
 }
 
 void
-Toplevel::command_line (int& argc, char**& argv, const bool require_arg)
+Toplevel::command_line (int& argc, char**& argv)
 { 
-  daisy_assert (impl->state == is_uninitialized);
+  daisy_assert (impl->state == is_unloaded);
 
   copyright ();
 
@@ -563,14 +523,6 @@ Toplevel::command_line (int& argc, char**& argv, const bool require_arg)
     }
 #endif // _WIN32
 
-  if (Implementation::command_line_parsers)
-    for (size_t i = 0; i < Implementation::command_line_parsers->size (); i++)
-      Implementation::command_line_parsers->at (i)(argc, argv);
-  
-  // We need at least one argument.
-  if (argc < 2 && require_arg)
-    usage ();                   // Usage.
-
   // Loop over all arguments.
   bool options_finished = false; // "--" ends command line options.
 
@@ -603,7 +555,7 @@ Toplevel::command_line (int& argc, char**& argv, const bool require_arg)
               break;
 	    case 'p':
               {                 // Run a named program.
-                impl->add_daisy_ui (*this, true);
+                impl->add_daisy_ui (*this);
 
                 if (argc < 2)
                   // We need a program name.
@@ -640,10 +592,6 @@ Toplevel::command_line (int& argc, char**& argv, const bool require_arg)
     // Already done.
     throw EXIT_SUCCESS;
 
-  if (impl->files_found.size () < 1 && require_arg)
-    // Nothing to do.
-    usage ();
-
   // Done.
   daisy_assert (argc == 1);     // Only the program name remains.
 }
@@ -654,13 +602,14 @@ Toplevel::parse_file (const std::string& filename)
   copyright ();
   impl->files_found.push_back (filename);
   parse_system_file (filename);
+  impl->state = is_uninitialized;
 }
 
 void
 Toplevel::parse_system_file (const std::string& filename)
 { 
   Treelog::Open nest (msg (), "Parsing '"+ filename + "'");
-  if (impl->state != is_uninitialized)
+  if (impl->state > is_uninitialized)
     {
       error ("Program already initialized");
       throw EXIT_FAILURE;
@@ -748,8 +697,8 @@ Toplevel::load_syntax (Syntax& syntax, AttributeList& alist)
   load_run (syntax, alist);
 }
 
-Toplevel::Toplevel ()
-  : impl (new Implementation)
+Toplevel::Toplevel (const std::string& preferred_ui)
+  : impl (new Implementation (preferred_ui))
 { 
   load_syntax (impl->metalib.syntax (), impl->metalib.alist ()); 
 

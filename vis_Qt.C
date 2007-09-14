@@ -35,13 +35,13 @@ VisQtMain::set_title ()
 {
   switch (state)
     {
+    case Toplevel::is_unloaded:
+        setWindowTitle (appName);
+	break;
     case Toplevel::is_uninitialized:
     case Toplevel::is_ready:
     case Toplevel::is_done:
-      if (fileName.isEmpty ())
-        setWindowTitle (appName);
-      else
-        setWindowTitle (fileName + " - " + appName);
+      setWindowTitle (fileName + " - " + appName);
       break;
     case Toplevel::is_running:
       if (progress >= 0.0 && progress <= 1.0)
@@ -141,6 +141,10 @@ VisQtProgress::new_state (Toplevel::state_t state)
 
   switch (state)
     {
+    case Toplevel::is_unloaded:
+      new_progress (0.0);
+      pal.setColor(QPalette::Highlight, QColor(Qt::black));
+      break;
     case Toplevel::is_uninitialized:
       new_progress (0.0);
       pal.setColor(QPalette::Highlight, QColor(Qt::white));
