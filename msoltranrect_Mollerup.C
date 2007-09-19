@@ -18,7 +18,7 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#if 1
+//#if 1  //mmo udkomenteret
 
 #define BUILD_DLL
 #include "msoltranrect.h"
@@ -30,6 +30,7 @@
 #include "submodeler.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "mathlib.h"
 #include <sstream>
 
 // Uncomment for fast code that does not catches bugs.
@@ -58,6 +59,13 @@ struct MsoltranrectMollerup : public Msoltranrect
   static void edge_watercontent (const GeometryRect& geo,
 				 const ublas::vector<double>& Theta_cell,
 				 ublas::vector<double>& Theta_edge);
+  
+  // Interpolation function for vectors (for water content)
+  static void interpol(const ublas::vector<double>& V_start,
+                       const ublas::vector<double>& V_end,
+                       const double dt,
+                       const double ddt,
+                       ublas::vector<double>& V);
 
   static double anisotropy_factor (const Geometry& geo, size_t edge, 
 				   const double Dxx, 
@@ -155,7 +163,6 @@ struct MsoltranrectMollerup : public Msoltranrect
   ~MsoltranrectMollerup ();
 };
 
-
 void
 MsoltranrectMollerup::cell_based_flux (const GeometryRect& geo,  
 				       const ublas::vector<double>& q_edge, 
@@ -216,7 +223,7 @@ MsoltranrectMollerup::edge_watercontent (const GeometryRect& geo,
 					 ublas::vector<double>& Theta_edge)
 {
   const size_t edge_size = geo.edge_size ();
-  //ublas::vector<double> Theta_edge = ublas::zero_vector<double> (edge_size);
+  //Theta_edge = ublas::zero_vector<double> (edge_size);
   
   for (int e = 0; e < edge_size; e++)
     {
@@ -229,9 +236,24 @@ MsoltranrectMollerup::edge_watercontent (const GeometryRect& geo,
       else if (geo.cell_is_internal (from))
 	Theta_edge[e] = Theta_cell[from];
       else
-	Theta_edge[e] = Theta_cell[from];
+	Theta_edge[e] = Theta_cell[to];
     }
 }
+
+void
+MsoltranrectMollerup::interpol(const ublas::vector<double>& V_start,
+                       const ublas::vector<double>& V_end,
+                       const double dt,
+                       const double ddt,
+                       ublas::vector<double>& V)
+{
+  //Linear interpolation
+  V = (1 - ddt/dt)*V_start + ddt/dt*V_end; 
+}
+
+
+
+
 
 
 double
@@ -244,6 +266,7 @@ MsoltranrectMollerup::anisotropy_factor (const Geometry& geo, size_t edge,
   
   return sqrt (sqr (Dzz*sin_angle) + sqr (Dxx * cos_angle));
 }
+
 
 
 void
@@ -275,7 +298,7 @@ MsoltranrectMollerup::diffusion_tensor (const GeometryRect& geo,
       const double tau = soil.tortuosity_factor (c, Theta_cell);
       const double alpha_L = soil.dispersivity (c);
       const double alpha_T = soil.dispersivity_transversal (c);
-
+      
       if (q > 0)
         {
           Dxx_cell (c) = (alpha_L * sqr (qx) + alpha_T * sqr (qz) )
@@ -371,7 +394,8 @@ MsoltranrectMollerup::diffusion_long (const GeometryRect& geo,
 	{
 	  const int from = geo.edge_from (e);
 	  const int to = geo.edge_to (e);
-	  const double magnitude = geo.edge_area_per_length (e) * ThetaD_long[e]; 
+	  const double magnitude = geo.edge_area_per_length (e) 
+            * ThetaD_long[e]; 
 	  diff_long (from, from) -= magnitude;
 	  diff_long (from, to) += magnitude;
 	  diff_long (to, to) -= magnitude;
@@ -383,8 +407,8 @@ MsoltranrectMollerup::diffusion_long (const GeometryRect& geo,
 
 void 
 MsoltranrectMollerup::diffusion_tran (const GeometryRect& geo,
-				      const ublas::vector<double>& ThetaD_tran,	       
-				      ublas::matrix<double>& diff_tran)
+				      const ublas::vector<double>& ThetaD_tran,
+                                      ublas::matrix<double>& diff_tran)
 {
 
   //copy from long....
@@ -524,10 +548,10 @@ MsoltranrectMollerup::lowerboundary (const GeometryRect& geo,
 				     std::vector<double>& J,
                                      ublas::banded_matrix<double>& B_mat,
                                      ublas::vector<double>& B_vec,
-                                     ublas::banded_matrix<double>& diffm_long_mat, 
+                                     ublas::banded_matrix<double>
+                                     & diffm_long_mat, 
                                      ublas::vector<double>& diffm_long_vec,
 				     ublas::banded_matrix<double>& advecm)
-
 {
   const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
   const size_t edge_below_size = edge_below.size ();
@@ -617,7 +641,6 @@ MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
     }
 }
 
-
 void MsoltranrectMollerup::flow (const GeometryRect& geo, 
 				 const Soil& soil, 
 				 const SoilWater& soil_water, 
@@ -642,19 +665,25 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   ublas::vector<double> C_new (cell_size);
   
   //Water content old and new 
-  ublas::vector<double> Theta_cell (cell_size);	
-  for (int c = 0; c < cell_size; c++)
-    Theta_cell (c) = soil_water.Theta (c);
-    
   ublas::vector<double> Theta_cell_old (cell_size);	
   for (int c = 0; c < cell_size; c++)
     Theta_cell_old (c) = soil_water.Theta_old (c);
+  ublas::vector<double> Theta_cell (cell_size);	
+  for (int c = 0; c < cell_size; c++)
+    Theta_cell (c) = soil_water.Theta (c);
 
+  //Average water content in large timestep
+  ublas::vector<double> Theta_cell_avg (cell_size);     //Using avg cell size
+  Theta_cell_avg = 0.5 * (Theta_cell + Theta_cell_old);
+  
+  //Flux in timestep
   ublas::vector<double> q_edge (edge_size);	
   for (int e = 0; e < edge_size; e++)
     q_edge (e) = soil_water.q (e);
-
   
+  //For stabilizers
+  //ublas::vector<double> Theta_edge = ublas::zero_vector<double> (edge_size);
+
   // BUG: Adsorption done wrong.
   std::vector<double> Ads (cell_size);
   for (size_t c = 0; c < cell_size; c++)
@@ -667,38 +696,16 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
 	}
     }
   
-
   //Cell diffusion tensor
   ublas::vector<double> Dxx_cell (cell_size);
   ublas::vector<double> Dzz_cell (cell_size);
   ublas::vector<double> Dxz_cell (cell_size);
-  ublas::vector<double> Theta_cell_avg (cell_size);     //Using avg cell size
-  Theta_cell_avg = 0.5 * (Theta_cell + Theta_cell_old);
-
+  
+  //Calculate cell based diffusion based on average water content
   diffusion_tensor (geo, soil, q_edge, Theta_cell_avg, diffusion_coefficient,
 		    Dxx_cell, Dzz_cell, Dxz_cell, msg);
   
-  //Debug 
-  //std::cout << "Theta_cell_avg" << Theta_cell_avg << '\n';
-  //std::cout << "Dxx_cell" << Dxx_cell << '\n';
-  //std::cout << "Dzz_cell" << Dzz_cell << '\n';
-  //std::cout << "Dxz_cell" << Dxz_cell << '\n';
-  
-  
-  //Water content stuff
-  //ublas::banded_matrix<double>Theta_mat_old (cell_size, cell_size, 0 ,0);
-  //ublas::banded_matrix<double>Theta_mat (cell_size, cell_size, 0, 0); 
-  ublas::banded_matrix<double>QTheta_mat_old (cell_size, cell_size, 0 ,0);
-  ublas::banded_matrix<double>QTheta_mat (cell_size, cell_size, 0, 0); 
-  for (int c = 0; c < cell_size; c++)
-    {
-      //Theta_mat_old (c, c) = Theta_cell_old (c);
-      //Theta_mat (c, c) = Theta_cell (c);
-      QTheta_mat_old (c, c) = geo.cell_volume (c) * Theta_cell_old (c);
-      QTheta_mat (c, c) = geo.cell_volume (c) * Theta_cell (c) ;
-    }
-  
-  //Theta * D - old and new 
+  //Theta * D - old and new and average 
   ublas::vector<double> ThetaD_long_old (edge_size); 
   ublas::vector<double> ThetaD_tran_old (edge_size);
   thetadiff_longtran (geo, Theta_cell_old, Dxx_cell, Dzz_cell, Dxz_cell,
@@ -708,100 +715,114 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   thetadiff_longtran (geo, Theta_cell, Dxx_cell, Dzz_cell, Dxz_cell,
 		      ThetaD_long, ThetaD_tran);
   
-  //Debug 
-  //std::cout << "ThetaD_long_old" << ThetaD_long_old << '\n';
-  //std::cout << "ThetaD_tran_old" << ThetaD_tran_old << '\n';
-  //std::cout << "ThetaD_long" << ThetaD_long << '\n';
-  //std::cout << "ThetaD_tran" << ThetaD_tran << '\n';
-  //std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \n";
-
-
-  #if 0 
+  ublas::vector<double> ThetaD_long_avg (edge_size); 
+  ublas::vector<double> ThetaD_tran_avg (edge_size);
+  thetadiff_longtran (geo, Theta_cell_avg, Dxx_cell, Dzz_cell, Dxz_cell,
+		      ThetaD_long_avg, ThetaD_tran_avg);
+ 
+    
   //Begin small timestep stuff  
   enum stabilizing_method_t { None, Timestep_reduction, Streamline_diffusion };
-  stabilizing_method_t stabilizing_method = None;
+  //stabilizing_method_t stabilizing_method = None;
+  stabilizing_method_t stabilizing_method = Timestep_reduction;
   double dt_min = 1e-10;
   double gamma_stabilization = 10.0;
-
-
   int nddt;        //number of small timesteps
 
   
   switch (stabilizing_method)
     {
     case None:
-      //No stabilization!!!
-      std::cout << "No stabilization\n";
-      
-      nddt = 1;    //Number of small timesteps 
-      break;
+      {
+        //No stabilization!!!
+        std::cout << "No stabilization\n";
+        nddt = 1;    //Number of small timesteps 
+        break;
+      }
 
     case Timestep_reduction:
-      //Use smaller time steps
-      std::cout << "Smaller timesteps\n";      
+      {
+        //Use smaller time steps
+        std::cout << "Smaller timesteps\n";      
+          
+        ublas::vector<double> Theta_edge 
+          = ublas::zero_vector<double> (edge_size);
+        edge_watercontent (geo, Theta_cell_avg, Theta_edge);      
       
-      ublas::vector<double> Theta_edge = ublas::zero_vector<double> (edge_size);
-      edge_watercontent (geo, Theta_cell_avg, Theta_edge);      
-      double dt_PeCr;
-      double dt_PeCr_min = 2*dt;
-
-      for (int e = 0; e < edge_size; e++)
-	{
-	  if (fabs(q_edge[e]) > 0)
-	    dt_PeCr = gamma_stabilization * ThetaD_long[e] *
-	      Theta_edge[e]/(q_edge[e]*q_edge[e]);
-	  else 
-	    dt_PeCr = 2*dt;
+        double dt_PeCr;
+        double dt_PeCr_min = 2*dt;
+      
+        for (int e = 0; e < edge_size; e++)
+          {
+            if (fabs(q_edge[e]) > 0)
+              dt_PeCr = gamma_stabilization * ThetaD_long_avg[e] *
+                Theta_edge[e]/(q_edge[e]*q_edge[e]);
+            else 
+              dt_PeCr = 2*dt;
 	  
-	  if (dt_PeCr < dt_PeCr_min)
-	    dt_PeCr_min = dt_PeCr;
-	}
+            if (dt_PeCr < dt_PeCr_min)
+              dt_PeCr_min = dt_PeCr;
+          }
 
-      std::cout << "dt_PeCr_min = " << dt_PeCr_min << '\n';
-      //Number of small timesteps 
-      
-      nddt = 1; //should be changed 
-      break;
-
+        std::cout << "dt_PeCr_min = " << dt_PeCr_min << '\n';
+        
+        //Number of small timesteps 
+        int divres = double2int(dt/dt_PeCr_min);
+        double remainder = dt - divres*dt_PeCr_min; 
+        if (remainder <= dt_min*1e-3)
+          nddt = divres;
+        else 
+          nddt = divres + 1;
+        
+        //Print out some results
+        std::cout << "divres = " << divres << '\n';
+        std::cout << "remainder = " << remainder << '\n';
+        std::cout << "nddt = " << nddt << '\n';  
+        break;
+      }
     case Streamline_diffusion:
-      //Add some ekstra diffusion in the streamline 
-      std::cout << "Smaller timesteps\n";      
-            
-      edge_watercontent (geo, Theta_cell_avg, Theta_edge);
+      {
+        //Add some ekstra diffusion in the streamline 
+        std::cout << "Smaller timesteps\n";      
+        
+        ublas::vector<double> Theta_edge 
+          = ublas::zero_vector<double> (edge_size);
+        edge_watercontent (geo, Theta_cell_avg, Theta_edge);
       
-      for (int e = 0; e < edge_size; e++)
-	{
-	  const double PeCr = q_edge[e]*q_edge[e] * Theta_edge[e] * dt
-	    / ThetaD_long[e];
-	  if (PeCr > gamma_stabilization)    //Need to ad some extra diffusion
-	    ThetaD_long[e] = q_edge[e] * q_edge[e] * dt / Theta_edge[e];	      
-	}
-	  
-      nddt = 1;
-      break;
+        for (int e = 0; e < edge_size; e++)
+          {
+            const double PeCr = q_edge[e]*q_edge[e] * Theta_edge[e] * dt
+              / ThetaD_long[e];
+            if (PeCr > gamma_stabilization)    //Need to ad some extra diffusion
+              ThetaD_long_avg[e] 
+                = q_edge[e] * q_edge[e] * dt / Theta_edge[e];     
+          }
+        nddt = 1; //Dont use smaller timesteps 
+        break;
+      }
     } 
-      //#endif
-
-  for (int dtstep = 0; dtstep < nddt; dtstep++)
-    {
-      std::cout << "dtstep = " << dtstep << '\n';
-    }
-
-  #endif
-
-  //Debug - test with numbers 
-  double kurt_t1 = 2.0;
-  double kurt_n1 = 1.0;
-  //int kurt_r1 = double2int(kurt_t1/kurt_n1);
-  //std::cout << "kurt_r1 = " kurt_r1 << '\n';
   
-  double kurt_t2 = 2.5;
-  double kurt_n2 = 1.0;
-  //int kurt_r2 = double2int(kurt_t2/kurt_n2);
-  //std::cout << "kurt_r2 = " kurt_r2 << '\n';
-
+  //Calculate size of smal timesteps
+  double ddt = dt/nddt;
+  std::cout << "ddt = " << ddt << '\n';
   
+  
+  //Initialise water content stuff
+  //ublas::banded_matrix<double>QTheta_mat_old (cell_size, cell_size, 0 ,0);
+  //ublas::banded_matrix<double>QTheta_mat (cell_size, cell_size, 0, 0); 
+  // for (int c = 0; c < cell_size; c++)
+  //  {
+  //    QTheta_mat_old (c, c) = geo.cell_volume (c) * Theta_cell_old (c);
+  //    QTheta_mat (c, c) = geo.cell_volume (c) * Theta_cell (c) ;
+  //  }
 
+    
+  //interpol(Kurt_start, Kurt_end, 1.0, 1.0, Kurt_res);
+  //std::cout << "Kurt_res" << Kurt_res << '\n';
+    
+  //--------------------------------------
+  //--- For moving in/out of tick loop ---
+  //--------------------------------------
 
   //Initialize longitudinal diffusion matrix - old and new
   ublas::matrix<double> diff_long_old 
@@ -816,27 +837,20 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     = ublas::zero_matrix<double> (cell_size, cell_size);
   diffusion_tran (geo, ThetaD_tran, diff_tran); 
   
-  //Note: Now it is neccessary to calculate both a old and 
-  //a new diffusion_tran matrix...
   
-
-  // Initialize advection diagonal matrix 
-  //Old
-  //ublas::banded_matrix<double> advec (cell_size, cell_size, 0, 0);   
-  //for (int c = 0; c < cell_size; c++)
-  //  advec (c, c) = 0.0;
-  //New 
+  //--- Things that not changes in smal timesteps --- 
+ 
+  //Advection
   ublas::matrix<double> advec  
     = ublas::zero_matrix<double> (cell_size, cell_size);
   advection (geo, q_edge, advec);  
   
-  // Initialize and calculate sink term
-  ublas::vector<double> S_vol (cell_size); // sink term 
+  //Sink term
+   ublas::vector<double> S_vol (cell_size); // sink term 
   for (size_t cell = 0; cell != cell_size ; ++cell) 
     S_vol (cell) = S[cell] * geo.cell_volume (cell);
-    
-
-  // Boundary matrices and vectors  
+  
+  //Boundary matrices and vectors  
   ublas::banded_matrix<double> B_mat (cell_size, cell_size, 0, 0); 
   for (int c = 0; c < cell_size; c++)
     B_mat (c, c) = 0.0;
@@ -845,7 +859,6 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
 						0, 0); // Dir bc
   for (int c = 0; c < cell_size; c++)
     diffm_long_mat (c, c) = 0.0;
-  //diffm_long_mat = ublas::zero_matrix<double> (cell_size, cell_size);  
   
   ublas::vector<double> diffm_long_vec (cell_size); // Dir bc
   diffm_long_vec = ublas::zero_vector<double> (cell_size);
@@ -853,12 +866,10 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   for (int c = 0; c < cell_size; c++)
     advecm (c, c) = 0.0;
   
-
   //Debug - flow c ndition!!!
   //J[0] = -0.5; 
   //J[101] = -0.5;
   upperboundary (geo, J, B_vec, msg);
-  
 
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   //bool isflux = true;
@@ -867,13 +878,8 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   lowerboundary (geo, isflux, C_border, C, q_edge, ThetaD_long, J, B_mat, 
 		 B_vec, diffm_long_mat, diffm_long_vec, advecm);
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  //-----------------------------------------------------------------
 
-
-  //Make Q_mat area diagonal matrix 
-  //Note: This only need to be "calculated" once.....
-  ublas::banded_matrix<double> Q_mat (cell_size, cell_size, 0, 0);
-  for (int c = 0; c < cell_size; c++)
-    Q_mat (c, c) = geo.cell_volume (c);
  
   
   // Solver parameter , gamma
@@ -892,94 +898,78 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   ublas::vector<double> b (cell_size);   
   ublas::matrix<double> b_mat (cell_size, cell_size);  
 
-  //Debug
-  //C_old (0) = 1.0;
- 
-  //Debug
-  /*
-  ublas::matrix<double> Kurt_mat (2,3);
-  Kurt_mat(0, 0) = 1.1;
-  Kurt_mat(0, 1) = 1.2;
-  Kurt_mat(0, 2) = 1.3;
-  Kurt_mat(1, 0) = 2.1;
-  Kurt_mat(1, 1) = 2.2;
-  Kurt_mat(1, 2) = 2.3;
-  ublas::vector<double> Kurt_vec (3);
-  Kurt_vec(0) = 1.0;
-  Kurt_vec(1) = 2.0;
-  Kurt_vec(2) = 3.0; 
-  std::cout << "Kurt_mat" << Kurt_mat << '\n';
-  std::cout << "Kurt_vec" << Kurt_vec << '\n';
-  std::cout << "Kurt_prod" << prod (Kurt_mat, Kurt_vec) << '\n'; 
-  */
-
-  //Debug 
-  //std::cout << "QTheta_mat" << QTheta_mat << '\n';
-  //std::cout << "diff_long" << diff_long << '\n';
-  //std::cout << "dt" << dt << '\n';
+  //-------------------------------------------
+  //--- End, For moving in/out of tick loop ---
+  //-------------------------------------------
   
-  if (simple_dcthetadt)
-    {
-      A = (1.0 / dt) * QTheta_mat                           // dtheta/dt
-	- gamma * diff_long                                 // long diffusion
-	+ gamma * advec                                     // advec
-	- gamma * B_mat                                     // impl Neumann BC 
-	- gamma * diffm_long_mat                            // Dirichlet BC
-	+ gamma * advecm;                                   // Dirichlet BC
+  ublas::vector<double> Theta_cell_n (cell_size);	
+  Theta_cell_n = Theta_cell_old;
+  ublas::vector<double> Theta_cell_np1 (cell_size);	
+  
+  ublas::banded_matrix<double>QTheta_mat_n (cell_size, cell_size, 0 ,0);
+  for (int c = 0; c < cell_size; c++)
+    QTheta_mat_n (c, c) = geo.cell_volume (c) * Theta_cell_n (c);
+  ublas::banded_matrix<double>QTheta_mat_np1 (cell_size, cell_size, 0, 0);
 
-      b_mat =  (1.0 / dt) * QTheta_mat_old 
-	+ (1 - gamma) * diff_long_old
-	- (1 - gamma) * advec 
-	+ (1 - gamma) * B_mat
-	+ (1 - gamma) * diffm_long_mat
-	- (1 - gamma) * advecm;
+
+  double dtime = 0.0;
+  for (int dtstep = 0; dtstep < nddt; dtstep++)
+    {
+      dtime += ddt;       //update time 
+      std::cout << "dtime = " << dtstep << '\n';
       
-      b = prod (b_mat, C_old)
-	+ B_vec                                    
-	+ diffm_long_vec;                                   //Dirichlet BC
-	//- S_vol;                                          //Sink term            
-
-	
-      //Debug: Simple Dirichlet node       
-      //A (0, 0) = 1.0;
-      //for (int c = 1; c < cell_size; c++)
-      //A (0, c) = 0.0;
-      //b (0) = 1;
-    }
-  else  
-    {
-      A = A;
-      b = b;     	
-    }
+      //Calculate water content 
+      interpol(Theta_cell_old, Theta_cell, dt, dtime, Theta_cell_np1);
+      
+      for (int c = 0; c < cell_size; c++)
+        QTheta_mat_np1 (c, c) = geo.cell_volume (c) * Theta_cell_np1 (c);
+      
+      
+      if (simple_dcthetadt)
+        {
+          A = (1.0 / dt) * QTheta_mat_np1          // dtheta/dt
+            - gamma * diff_long                    // long diffusion
+            + gamma * advec                        // advec
+            - gamma * B_mat                        // impl Neumann BC 
+            - gamma * diffm_long_mat               // Dirichlet BC
+            + gamma * advecm;                      // Dirichlet BC
+          
+          b_mat =  (1.0 / dt) * QTheta_mat_n 
+            + (1 - gamma) * diff_long_old
+            - (1 - gamma) * advec 
+            + (1 - gamma) * B_mat
+            + (1 - gamma) * diffm_long_mat
+            - (1 - gamma) * advecm;
+      
+          b = prod (b_mat, C_old)
+            + B_vec                                    
+            + diffm_long_vec;                      //Dirichlet BC
+          //- S_vol;                               //Sink term        
+        }
+      else  
+        {
+          A = A;
+          b = b;     	
+        }
+      
+      // Solve Ax=b (maybe)
+      ublas::permutation_matrix<double> piv (cell_size);
+      const bool singular = ublas::lu_factorize(A, piv);
+      daisy_assert (!singular);
+      ublas::lu_substitute (A, piv, b); // b now contains solution 
   
-  //debug prints
-  //std::cout << "Longitudinal diffusion";
-  //std::cout << D_long << '\n'; 
-  //std::cout << "diff_long" << diff_long << '\n';
-  //std::cout << "Thetadiffprod" <<  prod (Theta_mat, diff_long) << '\n'; 
-  //std::cout << "Water content in upper node ";
-  //std::cout << Theta_cell (0) << '\n';
-  //std::cout << "Some concentration calcs prints\n";
-  //std::cout << "advec" << advec << '\n';
-  //std::cout << "A = " << A << '\n';
-  //std::cout << "b = " << b << '\n';
- 
-  
-  //b = sumvec + (1.0 / ddt) * (Qmatrix * Cw * h + Qmatrix *(Wxx-Wyy));
-  //b = sumvec + (1.0 / ddt) * (prod (prod (Qmat, Cw),  h) 
-  //				      + prod (Qmat, Theta_previous-Theta));
+      C_new = b; // new solution :-)
 
-  // Force active drains to zero h.
-  // drain (geo, drain_cell, h, A, b, debug, msg);
+      //Solution checks???
+      //Calculate and sum up fluxes 
 
-  // Solve Ax=b (maybe)
-  ublas::permutation_matrix<double> piv (cell_size);
-  const bool singular = ublas::lu_factorize(A, piv);
-  daisy_assert (!singular);
-  ublas::lu_substitute (A, piv, b); // b now contains solution 
-  
-  C_new = b; // new solution :-)
- 
+      //Update Theta and QTheta
+      Theta_cell_n = Theta_cell_np1;
+      QTheta_mat_n = QTheta_mat_np1;
+
+    } //End small timestep loop
+
+
   //debug Print new solution
   std::ostringstream tmp;
   tmp << "C_new" << C_new;
@@ -998,7 +988,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       // We use the old absorbed stuff plus the new dissolved stuff.
       M[c] = Ads[c] + Theta_cell (c) * C[c];
       daisy_assert (M[c] >= 0.0);
-
+      
       // We calculate new C by assumining instant absorption.
       C[c] = adsorption.M_to_C (soil, Theta_cell (c), c, M[c]);
 
@@ -1087,4 +1077,4 @@ See Mollerup 2007 for details.");
   }
 } MsoltranrectMollerup_syntax;
 
-#endif
+
