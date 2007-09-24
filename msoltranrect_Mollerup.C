@@ -48,7 +48,7 @@ namespace ublas = boost::numeric::ublas;
 
 struct MsoltranrectMollerup : public Msoltranrect
 {
-  
+ 
   // Water flux.
   static void cell_based_flux (const GeometryRect& geo,  
 			       const ublas::vector<double>& q_edge,
@@ -139,7 +139,13 @@ struct MsoltranrectMollerup : public Msoltranrect
               		     std::vector<double>& J,
                              ublas::vector<double>& B_vec,
                              Treelog& msg);
- 
+
+  static void fluxes (const GeometryRect& geo,
+                      const ublas::vector<double>& q_edge,
+                      const ublas::vector<double>& ThetaD_long,
+                      const ublas::vector<double>& ThetaD_tran,
+                      const ublas::vector<double>& C,
+                      ublas::vector<double>& dJ); 
 
   // Solute.
   void flow (const GeometryRect& geo, 
@@ -640,6 +646,42 @@ MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
       Neumann_expl (cell, area, in_sign, J[edge], B_vec);
     }
 }
+
+void MsoltranrectMollerup::fluxes (const GeometryRect& geo,
+                                   const ublas::vector<double>& q_edge,
+                                   const ublas::vector<double>& ThetaD_long,
+                                   const ublas::vector<double>& ThetaD_tran,
+                                   const ublas::vector<double>& C,
+                                   ublas::vector<double>& dJ) 
+{
+  
+  const size_t edge_size = geo.edge_size (); // number of edges  
+  
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      if (geo.edge_is_internal (e))   //Do something else on outher boundaries
+	{
+          const int from = geo.edge_from (e);
+	  const int to = geo.edge_to (e);	   
+	  
+          //--- Advective part ---
+          const double upstream_weight = 0.5;  //Should be taken from  outside
+          const double alpha = (q_edge[e] >= 0) 
+	    ? upstream_weight 
+	    : 1.0 - upstream_weight;
+          dJ[e] = alpha * q_edge[e] * C[from] 
+            + (1.0-alpha)*C[to];
+          
+          //--- Diffusive part --- 
+          const double gradient = geo.edge_area_per_length (e) *
+            (C[to] - C[from]);
+          dJ[e] += ThetaD_long[e]*gradient;  //Longitudinal diffusion
+
+          dJ[e] += 0.0;                      //Transversal diffusion
+	} 
+    }
+}
+          
 
 void MsoltranrectMollerup::flow (const GeometryRect& geo, 
 				 const Soil& soil, 
