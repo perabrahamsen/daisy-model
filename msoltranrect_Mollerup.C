@@ -126,7 +126,7 @@ struct MsoltranrectMollerup : public Msoltranrect
 			     const bool isflux,
 			     const double C_border,
 			     const std::vector<double>& C,
-			     const ublas::vector<double>& q_edge,
+                             const ublas::vector<double>& q_edge,
                              const ublas::vector<double>& ThetaD_long,
 			     std::vector<double>& J,
                              ublas::banded_matrix<double>& B_mat,
@@ -256,10 +256,6 @@ MsoltranrectMollerup::interpol(const ublas::vector<double>& V_start,
   //Linear interpolation
   V = (1 - ddt/dt)*V_start + ddt/dt*V_end; 
 }
-
-
-
-
 
 
 double
@@ -571,7 +567,7 @@ MsoltranrectMollerup::lowerboundary (const GeometryRect& geo,
       daisy_assert (in_sign > 0);
       const double area = geo.edge_area (edge);
       const double area_per_length = geo.edge_area_per_length (edge);
-    
+      
       if (isflux)               // Flux BC
         {
           const bool influx = in_sign * q_edge (edge) > 0;
@@ -678,10 +674,14 @@ void MsoltranrectMollerup::fluxes (const GeometryRect& geo,
           dJ[e] += ThetaD_long[e]*gradient;  //Longitudinal diffusion
 
           dJ[e] += 0.0;                      //Transversal diffusion
-	} 
+	}
+      else //edge is external
+        {
+          
+        }
     }
 }
-          
+
 
 void MsoltranrectMollerup::flow (const GeometryRect& geo, 
 				 const Soil& soil, 
@@ -954,6 +954,8 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   ublas::banded_matrix<double>QTheta_mat_np1 (cell_size, cell_size, 0, 0);
 
 
+  ublas::vector<double> dJ = ublas::zero_vector<double> (edge_size);
+
   double dtime = 0.0;
   for (int dtstep = 0; dtstep < nddt; dtstep++)
     {
@@ -1004,6 +1006,14 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
 
       //Solution checks???
       //Calculate and sum up fluxes 
+      
+      
+        
+      fluxes (geo, q_edge, ThetaD_long, ThetaD_tran, C_new, dJ); 
+
+
+      
+
 
       //Update Theta and QTheta
       Theta_cell_n = Theta_cell_np1;
