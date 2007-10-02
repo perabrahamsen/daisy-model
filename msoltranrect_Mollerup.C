@@ -56,16 +56,16 @@ struct MsoltranrectMollerup : public Msoltranrect
                                ublas::vector<double>& qz_cell);
 
   // Edge water content 
-  static void edge_watercontent (const GeometryRect& geo,
+  static void edge_water_content (const GeometryRect& geo,
 				 const ublas::vector<double>& Theta_cell,
 				 ublas::vector<double>& Theta_edge);
   
   // Interpolation function for vectors (for water content)
-  static void interpol(const ublas::vector<double>& V_start,
-                       const ublas::vector<double>& V_end,
-                       const double dt,
-                       const double ddt,
-                       ublas::vector<double>& V);
+  static void interpol (const ublas::vector<double>& V_start,
+                        const ublas::vector<double>& V_end,
+                        const double dt,
+                        const double ddt,
+                        ublas::vector<double>& V);
 
   static double anisotropy_factor (const Geometry& geo, size_t edge, 
 				   const double Dxx, 
@@ -224,9 +224,10 @@ MsoltranrectMollerup::cell_based_flux (const GeometryRect& geo,
 }
 
 void 
-MsoltranrectMollerup::edge_watercontent (const GeometryRect& geo,
-					 const ublas::vector<double>& Theta_cell,
-					 ublas::vector<double>& Theta_edge)
+MsoltranrectMollerup::edge_water_content 
+/**/ (const GeometryRect& geo,
+      const ublas::vector<double>& Theta_cell,
+      ublas::vector<double>& Theta_edge)
 {
   const size_t edge_size = geo.edge_size ();
   //Theta_edge = ublas::zero_vector<double> (edge_size);
@@ -320,13 +321,14 @@ MsoltranrectMollerup::diffusion_tensor (const GeometryRect& geo,
 
 
 void 
-MsoltranrectMollerup::thetadiff_longtran (const GeometryRect& geo,
-					  const ublas::vector<double>& Theta,
-					  const ublas::vector<double>& Dxx_cell,
-					  const ublas::vector<double>& Dzz_cell,
-					  const ublas::vector<double>& Dxz_cell,
-					  ublas::vector<double>& ThetaD_long,
-					  ublas::vector<double>& ThetaD_tran)
+MsoltranrectMollerup::thetadiff_longtran
+/**/ (const GeometryRect& geo,
+      const ublas::vector<double>& Theta,
+      const ublas::vector<double>& Dxx_cell,
+      const ublas::vector<double>& Dzz_cell,
+      const ublas::vector<double>& Dxz_cell,
+      ublas::vector<double>& ThetaD_long,
+      ublas::vector<double>& ThetaD_tran)
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
   
@@ -482,7 +484,8 @@ MsoltranrectMollerup::Neumann_expl (const size_t cell,
                                     const double J, 
                                     ublas::vector<double>& B_vec)
 {
-  B_vec (cell) = J * area * in_sign;   //J*in_sign pos for fluc into domain (cell)  
+  B_vec (cell) = J * area * in_sign;   
+  //J*in_sign pos for fluc into domain (cell)  
   //Debug
   //std::cout << "Neumann expl, cell no " << cell << '\n';
   //std::cout << "J = " << J << '\n';
@@ -499,7 +502,8 @@ MsoltranrectMollerup::Neumann_impl (const size_t cell,
                                     ublas::banded_matrix<double>& B_mat)
 {
   daisy_assert (q * in_sign <= 0.0);
-  B_mat (cell, cell) = q * area * in_sign;  // q * in_sign pos for flux into domain  
+  B_mat (cell, cell) = q * area * in_sign; 
+  // q * in_sign pos for flux into domain  
   //Debug
   //std::cout << "Neumann impl, cell no " << cell << '\n';
   //std::cout << "q = " << q << '\n';
@@ -509,18 +513,19 @@ MsoltranrectMollerup::Neumann_impl (const size_t cell,
 
 
 void 
-MsoltranrectMollerup::Dirichlet_long (const size_t cell,
-                                      const double area, 
-                                      const double area_per_length, 
-                                      const double in_sign,
-                                      const double ThetaD_long,
-                                      const double C_border,
-                                      const double C_cell,
-                                      const double q,
-                                      double& J,
-                                      ublas::banded_matrix<double>& diffm_long_mat,
-                                      ublas::vector<double>& diffm_long_vec, 
-                                      ublas::banded_matrix<double>& advecm) 
+MsoltranrectMollerup::Dirichlet_long 
+/**/ (const size_t cell,
+      const double area, 
+      const double area_per_length, 
+      const double in_sign,
+      const double ThetaD_long,
+      const double C_border,
+      const double C_cell,
+      const double q,
+      double& J,
+      ublas::banded_matrix<double>& diffm_long_mat,
+      ublas::vector<double>& diffm_long_vec, 
+      ublas::banded_matrix<double>& advecm) 
 {
   // Boundary advection
   const double value = area  * q;
@@ -592,33 +597,6 @@ MsoltranrectMollerup::lowerboundary (const GeometryRect& geo,
     }
 }
    
-
-#if 0 
-case Groundwater::pressure:
-{
-  const double value = -K (cell) * geo.edge_area_per_length (edge);
-  const double pressure =  groundwater.table () - geo.zplus (cell);
-  Dirichlet (edge, cell, area, in_sign, sin_angle, 
-	     K (cell), h (cell),
-	     value, pressure,
-	     dq, Dm_mat, Dm_vec, Gm);
-}
-break;
-case Groundwater::lysimeter:
-if (active_lysimeter[cell])
-{
-  const double value = -K (cell) * geo.edge_area_per_length (edge);
-  const double pressure =  0.0;
-  Dirichlet (edge, cell, area, in_sign, sin_angle,
-	     K (cell), h (cell),
-	     value, pressure, dq, Dm_mat, Dm_vec, Gm);
-}
-break;
-default:
-daisy_panic ("Unknown groundwater type");
-#endif 
-
-
 void 
 MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
 				     std::vector<double>& J,
@@ -700,13 +678,12 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
  
-  // Solution old and new
+  // Solution old
   ublas::vector<double> C_old (cell_size);
   for (int c = 0; c < cell_size; c++)
     C_old (c) = C[c];
-  ublas::vector<double> C_new (cell_size);
   
-  //Water content old and new 
+  // Water content old and new 
   ublas::vector<double> Theta_cell_old (cell_size);	
   for (int c = 0; c < cell_size; c++)
     Theta_cell_old (c) = soil_water.Theta_old (c);
@@ -714,18 +691,16 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   for (int c = 0; c < cell_size; c++)
     Theta_cell (c) = soil_water.Theta (c);
 
-  //Average water content in large timestep
+  // Average water content in large timestep
   ublas::vector<double> Theta_cell_avg (cell_size);     //Using avg cell size
   Theta_cell_avg = 0.5 * (Theta_cell + Theta_cell_old);
   
-  //Flux in timestep
+  // Flux in timestep
   ublas::vector<double> q_edge (edge_size);	
   for (int e = 0; e < edge_size; e++)
     q_edge (e) = soil_water.q (e);
   
-  //For stabilizers
-  //ublas::vector<double> Theta_edge = ublas::zero_vector<double> (edge_size);
-
+  
   // BUG: Adsorption done wrong.
   std::vector<double> Ads (cell_size);
   for (size_t c = 0; c < cell_size; c++)
@@ -766,9 +741,9 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   //Begin small timestep stuff  
   enum stabilizing_method_t { None, Timestep_reduction, Streamline_diffusion };
   //stabilizing_method_t stabilizing_method = None;
-  stabilizing_method_t stabilizing_method = Timestep_reduction;
-  double dt_min = 1e-10;
-  double gamma_stabilization = 10.0;
+  const stabilizing_method_t stabilizing_method = Timestep_reduction;
+  const double dt_min = 1e-10;
+  const double gamma_stabilization = 10.0;
   int nddt;        //number of small timesteps
 
   
@@ -789,18 +764,18 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
           
         ublas::vector<double> Theta_edge 
           = ublas::zero_vector<double> (edge_size);
-        edge_watercontent (geo, Theta_cell_avg, Theta_edge);      
+        edge_water_content (geo, Theta_cell_avg, Theta_edge);      
       
-        double dt_PeCr;
         double dt_PeCr_min = 2*dt;
       
-        for (int e = 0; e < edge_size; e++)
+        for (size_t e = 0; e < edge_size; e++)
           {
-            if (fabs(q_edge[e]) > 0)
-              dt_PeCr = gamma_stabilization * ThetaD_long_avg[e] *
-                Theta_edge[e]/(q_edge[e]*q_edge[e]);
-            else 
-              dt_PeCr = 2*dt;
+            if (iszero (q_edge[e]))
+              continue;
+
+            const double dt_PeCr
+              = gamma_stabilization * ThetaD_long_avg[e]
+              * Theta_edge[e]/(q_edge[e]*q_edge[e]);
 	  
             if (dt_PeCr < dt_PeCr_min)
               dt_PeCr_min = dt_PeCr;
@@ -809,7 +784,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
         std::cout << "dt_PeCr_min = " << dt_PeCr_min << '\n';
         
         //Number of small timesteps 
-        int divres = double2int(dt/dt_PeCr_min);
+        const int divres = double2int(dt/dt_PeCr_min);
         double remainder = dt - divres*dt_PeCr_min; 
         if (remainder <= dt_min*1e-3)
           nddt = divres;
@@ -829,13 +804,16 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
         
         ublas::vector<double> Theta_edge 
           = ublas::zero_vector<double> (edge_size);
-        edge_watercontent (geo, Theta_cell_avg, Theta_edge);
+        edge_water_content (geo, Theta_cell_avg, Theta_edge);
       
-        for (int e = 0; e < edge_size; e++)
+        for (size_t e = 0; e < edge_size; e++)
           {
             const double PeCr = q_edge[e]*q_edge[e] * Theta_edge[e] * dt
               / ThetaD_long[e];
-            if (PeCr > gamma_stabilization)    //Need to ad some extra diffusion
+            if (PeCr > gamma_stabilization)  
+              //Need to ad some extra diffusion
+              //Ged i koden mangler gamma_stab i og hvad med avg 
+              //i nedenstående
               ThetaD_long_avg[e] 
                 = q_edge[e] * q_edge[e] * dt / Theta_edge[e];     
           }
@@ -845,7 +823,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     } 
   
   //Calculate size of smal timesteps
-  double ddt = dt/nddt;
+  const double ddt = dt/nddt;
   std::cout << "ddt = " << ddt << '\n';
   
   
@@ -915,8 +893,8 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
 
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   //bool isflux = true;
-  bool isflux = false;
-  double C_border = 1;
+  const bool isflux = false;
+  const double C_border = 1;
   lowerboundary (geo, isflux, C_border, C, q_edge, ThetaD_long, J, B_mat, 
 		 B_vec, diffm_long_mat, diffm_long_vec, advecm);
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -927,10 +905,10 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   // Solver parameter , gamma
   // gamma = 0      : Backward Euler 
   // gamma = 0.5    : Crank - Nicholson
-  double gamma = 0.5;
+  const double gamma = 0.5;
    
   //solver type for dc
-  bool simple_dcthetadt = true;
+  const bool simple_dcthetadt = true;
      
 
   //Initialize A-matrix (left hand side)
@@ -948,19 +926,21 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   Theta_cell_n = Theta_cell_old;
   ublas::vector<double> Theta_cell_np1 (cell_size);	
   
-  ublas::banded_matrix<double>QTheta_mat_n (cell_size, cell_size, 0 ,0);
+  ublas::banded_matrix<double> QTheta_mat_n (cell_size, cell_size, 0 ,0);
   for (int c = 0; c < cell_size; c++)
     QTheta_mat_n (c, c) = geo.cell_volume (c) * Theta_cell_n (c);
-  ublas::banded_matrix<double>QTheta_mat_np1 (cell_size, cell_size, 0, 0);
+  ublas::banded_matrix<double> QTheta_mat_np1 (cell_size, cell_size, 0, 0);
 
+  ublas::vector<double> C_n (cell_size);
+  C_n = C_old;
 
   ublas::vector<double> dJ = ublas::zero_vector<double> (edge_size);
 
   double dtime = 0.0;
-  for (int dtstep = 0; dtstep < nddt; dtstep++)
+  for (int ddtstep = 0; ddtstep < nddt; ddtstep++)
     {
       dtime += ddt;       //update time 
-      std::cout << "dtime = " << dtstep << '\n';
+      std::cout << "dtime = " << ddtstep << '\n';
       
       //Calculate water content 
       interpol(Theta_cell_old, Theta_cell, dt, dtime, Theta_cell_np1);
@@ -985,7 +965,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
             + (1 - gamma) * diffm_long_mat
             - (1 - gamma) * advecm;
       
-          b = prod (b_mat, C_old)
+          b = prod (b_mat, C_n)
             + B_vec                                    
             + diffm_long_vec;                      //Dirichlet BC
           //- S_vol;                               //Sink term        
@@ -1002,18 +982,13 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       daisy_assert (!singular);
       ublas::lu_substitute (A, piv, b); // b now contains solution 
   
-      C_new = b; // new solution :-)
-
+      // C_n = C_np1
+      C_n = b; // new solution :-)
+      
       //Solution checks???
       //Calculate and sum up fluxes 
       
-      
-        
-      fluxes (geo, q_edge, ThetaD_long, ThetaD_tran, C_new, dJ); 
-
-
-      
-
+      fluxes (geo, q_edge, ThetaD_long, ThetaD_tran, C_n, dJ); 
 
       //Update Theta and QTheta
       Theta_cell_n = Theta_cell_np1;
@@ -1024,13 +999,13 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
 
   //debug Print new solution
   std::ostringstream tmp;
-  tmp << "C_new" << C_new;
+  tmp << "C_n" << C_n;
   msg.message (tmp.str ());
  
   // Write solution into C (std::vec)
   for (int c=0; c < cell_size; c++)
     {
-      C[c] = C_new (c); 
+      C[c] = C_n (c); 
       //daisy_assert (C[c] >= 0.0);
     }
 
@@ -1125,7 +1100,8 @@ Coupled vertical and horizontal transport.\n\
 See Mollerup 2007 for details.");
     MsoltranrectMollerup::load_syntax (syntax, alist);
  
-    Librarian::add_type (Msoltranrect::component, "Mollerup", alist, syntax, &make);
+    Librarian::add_type (Msoltranrect::component,
+                         "Mollerup", alist, syntax, &make);
   }
 } MsoltranrectMollerup_syntax;
 
