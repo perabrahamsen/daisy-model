@@ -48,6 +48,9 @@ namespace ublas = boost::numeric::ublas;
 
 struct MsoltranrectMollerup : public Msoltranrect
 {
+  // Keep track of edge types in small time steps.
+  enum edge_type_t { Internal, Neumann_explicit_upper,
+                     Neumann_explicit_lower, Neumann_implicit, Dirichlet };
  
   // Water flux.
   static void cell_based_flux (const GeometryRect& geo,  
@@ -115,20 +118,17 @@ struct MsoltranrectMollerup : public Msoltranrect
 			      const double in_sign,
 			      const double ThetaD_long,
 			      const double C_border,
-			      const double C_cell,
-			      const double q,
-			      double& J,
-			      ublas::banded_matrix<double>& diffm_long_mat,
+                              const double q,
+                              ublas::banded_matrix<double>& diffm_long_mat,
 			      ublas::vector<double>& diffm_long_vec, 
 			      ublas::banded_matrix<double>& advecm); 
 
   static void lowerboundary (const GeometryRect& geo,
 			     const bool isflux,
 			     const double C_border,
-			     const std::vector<double>& C,
                              const ublas::vector<double>& q_edge,
                              const ublas::vector<double>& ThetaD_long,
-			     std::vector<double>& J,
+                             std::vector<edge_type_t>& edge_type,
                              ublas::banded_matrix<double>& B_mat,
                              ublas::vector<double>& B_vec,
                              ublas::banded_matrix<double>& diffm_long_mat, 
@@ -136,15 +136,18 @@ struct MsoltranrectMollerup : public Msoltranrect
 			     ublas::banded_matrix<double>& advecm);
 
   static void upperboundary (const GeometryRect& geo,
-              		     std::vector<double>& J,
+                             std::vector<edge_type_t>& edge_type,
+                             const std::vector<double>& J,
                              ublas::vector<double>& B_vec,
                              Treelog& msg);
 
   static void fluxes (const GeometryRect& geo,
+                      const std::vector<edge_type_t>& edge_type,
                       const ublas::vector<double>& q_edge,
                       const ublas::vector<double>& ThetaD_long,
                       const ublas::vector<double>& ThetaD_tran,
                       const ublas::vector<double>& C,
+                      const double C_below,
                       ublas::vector<double>& dJ); 
 
   // Solute.
@@ -486,11 +489,6 @@ MsoltranrectMollerup::Neumann_expl (const size_t cell,
 {
   B_vec (cell) = J * area * in_sign;   
   //J*in_sign pos for fluc into domain (cell)  
-  //Debug
-  //std::cout << "Neumann expl, cell no " << cell << '\n';
-  //std::cout << "J = " << J << '\n';
-  //std::cout << "in_sign = " << in_sign << '\n';  
-  //std::cout << "B_vec(cell) = " << B_vec (cell) << '\n';
 }
 
 
@@ -504,11 +502,6 @@ MsoltranrectMollerup::Neumann_impl (const size_t cell,
   daisy_assert (q * in_sign <= 0.0);
   B_mat (cell, cell) = q * area * in_sign; 
   // q * in_sign pos for flux into domain  
-  //Debug
-  //std::cout << "Neumann impl, cell no " << cell << '\n';
-  //std::cout << "q = " << q << '\n';
-  //std::cout << "in_sign = " << in_sign << '\n';  
-  //std::cout << "B_mat(cell,cell) = " << B_mat (cell, cell) << '\n';
 }
 
 
@@ -520,9 +513,7 @@ MsoltranrectMollerup::Dirichlet_long
       const double in_sign,
       const double ThetaD_long,
       const double C_border,
-      const double C_cell,
       const double q,
-      double& J,
       ublas::banded_matrix<double>& diffm_long_mat,
       ublas::vector<double>& diffm_long_vec, 
       ublas::banded_matrix<double>& advecm) 
@@ -538,10 +529,7 @@ MsoltranrectMollerup::Dirichlet_long
   const double diffm_long_vec_val = D_area_per_length * C_border;
   diffm_long_vec (cell) += diffm_long_vec_val;
   
-  //Calculate fluxes 
-  J = in_sign * (-value 
-		 -D_area_per_length * C_cell
-		 + diffm_long_vec_val) / area;
+
 }
 
 
@@ -549,10 +537,9 @@ void
 MsoltranrectMollerup::lowerboundary (const GeometryRect& geo,
                                      const bool isflux,
                                      const double C_border,
-				     const std::vector<double>& C,
                                      const ublas::vector<double>& q_edge,
 				     const ublas::vector<double>& ThetaD_long,
-				     std::vector<double>& J,
+                                     std::vector<edge_type_t>& edge_type,      
                                      ublas::banded_matrix<double>& B_mat,
                                      ublas::vector<double>& B_vec,
                                      ublas::banded_matrix<double>
@@ -578,29 +565,29 @@ MsoltranrectMollerup::lowerboundary (const GeometryRect& geo,
           const bool influx = in_sign * q_edge (edge) > 0;
           if (influx)
             {
-              J[edge] = C_border * q_edge (edge); 
-              Neumann_expl (cell, area, in_sign, J[edge], B_vec);
+              const double J_in = C_border * q_edge (edge); 
+              Neumann_expl (cell, area, in_sign, J_in, B_vec);
             }
           else
-            {
-              Neumann_impl (cell, area, in_sign, q_edge (edge), B_mat);
-            }
+            Neumann_impl (cell, area, in_sign, q_edge (edge), B_mat);
+            
         }
       else                      // C_Border. BC
         {
           // write something
 	  Dirichlet_long (cell, area, area_per_length, in_sign, 
-			  ThetaD_long (cell),
-			  C_border, C[cell], q_edge (edge),  J[edge],
-			  diffm_long_mat, diffm_long_vec, advecm);  
+			  ThetaD_long (cell), C_border, 
+                          q_edge (edge), diffm_long_mat, 
+                          diffm_long_vec, advecm);  
         }
     }
 }
    
 void 
 MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
-				     std::vector<double>& J,
-				     ublas::vector<double>& B_vec,
+                                     std::vector<edge_type_t>& edge_type,
+				     const std::vector<double>& J,
+                                     ublas::vector<double>& B_vec,
                                      Treelog& msg)
 {
   const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
@@ -621,44 +608,91 @@ MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
     }
 }
 
-void MsoltranrectMollerup::fluxes (const GeometryRect& geo,
-                                   const ublas::vector<double>& q_edge,
-                                   const ublas::vector<double>& ThetaD_long,
-                                   const ublas::vector<double>& ThetaD_tran,
-                                   const ublas::vector<double>& C,
-                                   ublas::vector<double>& dJ) 
+void 
+MsoltranrectMollerup::fluxes (const GeometryRect& geo,
+                              const std::vector<edge_type_t>& edge_type, 
+                              const ublas::vector<double>& q_edge,
+                              const ublas::vector<double>& ThetaD_long,
+                              const ublas::vector<double>& ThetaD_tran,
+                              const ublas::vector<double>& C,
+                              const double C_below,
+                              ublas::vector<double>& dJ) 
 {
   
   const size_t edge_size = geo.edge_size (); // number of edges  
   
   for (size_t e = 0; e < edge_size; e++)
     {
-      if (geo.edge_is_internal (e))   //Do something else on outher boundaries
-	{
-          const int from = geo.edge_from (e);
-	  const int to = geo.edge_to (e);	   
-	  
-          //--- Advective part ---
-          const double upstream_weight = 0.5;  //Should be taken from  outside
-          const double alpha = (q_edge[e] >= 0) 
-	    ? upstream_weight 
-	    : 1.0 - upstream_weight;
-          dJ[e] = alpha * q_edge[e] * C[from] 
-            + (1.0-alpha)*C[to];
-          
-          //--- Diffusive part --- 
-          const double gradient = geo.edge_area_per_length (e) *
-            (C[to] - C[from]);
-          dJ[e] += ThetaD_long[e]*gradient;  //Longitudinal diffusion
-
-          dJ[e] += 0.0;                      //Transversal diffusion
-	}
-      else //edge is external
+      const int from = geo.edge_from (e);
+      const int to = geo.edge_to (e);  
+      
+      switch (edge_type[e])
         {
+        case Internal:
+          {
+            //--- Advective part ---
+            const double upstream_weight = 0.5;  //Should be taken from  outside
+            const double alpha = (q_edge[e] >= 0) 
+              ? upstream_weight 
+              : 1.0 - upstream_weight;
+            dJ[e] = alpha * q_edge[e] * C[from] 
+              + (1.0-alpha)*C[to];
+            
+            //--- Diffusive part --- 
+            const double gradient = geo.edge_area_per_length (e) *
+              (C[to] - C[from]);
+            dJ[e] += ThetaD_long[e]*gradient;  //Longitudinal diffusion
+            
+            dJ[e] += 0.0;                      //Transversal diffusion
+          }
+          break;
+        case Neumann_explicit_upper:
+          dJ[e] = 0.0; // use existing J 
+          break;
+
+        case Neumann_explicit_lower:
+          dJ[e] = q_edge[e] * C_below; 
+          break;
+          
+        case Neumann_implicit:
+          {
+            const int cell = geo.cell_is_internal (to) ? to : from;
+            dJ[e] = q_edge[e] * C[cell];
+          }
+          break;
+
+          
+        case Dirichlet:
+          {
+            // No area!!!
+            
+            
+            // Boundary advection
+#if 0
+            const double value = area  * q;
+            advecm (cell, cell) -= in_sign * value;  //q*in_sign pos for inflow
+  
+            //Boundary longitudinal diffusion
+            const double D_area_per_length = ThetaD_long * area_per_length;
+            diffm_long_mat (cell, cell) -= D_area_per_length;
+  
+            const double diffm_long_vec_val = D_area_per_length * C_border;
+            diffm_long_vec (cell) += diffm_long_vec_val;
+          
+            J = in_sign * (-value 
+                           -D_area_per_length * C_cell
+                           + diffm_long_vec_val) / area;
+#endif
+          }
+          break;
+
           
         }
     }
 }
+
+
+
 
 
 void MsoltranrectMollerup::flow (const GeometryRect& geo, 
@@ -889,14 +923,16 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   //Debug - flow c ndition!!!
   //J[0] = -0.5; 
   //J[101] = -0.5;
-  upperboundary (geo, J, B_vec, msg);
+
+  std::vector<edge_type_t> edge_type (edge_size, Internal);
+
+  upperboundary (geo, edge_type, J, B_vec, msg);
 
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   //bool isflux = true;
   const bool isflux = false;
-  const double C_border = 1;
-  lowerboundary (geo, isflux, C_border, C, q_edge, ThetaD_long, J, B_mat, 
-		 B_vec, diffm_long_mat, diffm_long_vec, advecm);
+  lowerboundary (geo, isflux, C_below, q_edge, ThetaD_long, edge_type,  
+                 B_mat, B_vec, diffm_long_mat, diffm_long_vec, advecm);
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   //-----------------------------------------------------------------
 
@@ -988,8 +1024,10 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       //Solution checks???
       //Calculate and sum up fluxes 
       
-      fluxes (geo, q_edge, ThetaD_long, ThetaD_tran, C_n, dJ); 
-
+      fluxes (geo, edge_type, q_edge, ThetaD_long, ThetaD_tran,
+              C_n, C_below, dJ); 
+      
+      
       //Update Theta and QTheta
       Theta_cell_n = Theta_cell_np1;
       QTheta_mat_n = QTheta_mat_np1;
