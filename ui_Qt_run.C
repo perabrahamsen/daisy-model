@@ -42,6 +42,46 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QCheckBox>
 
+struct UIRun::WidgetState
+{
+  QPointer<QWidget> widget;
+  const std::string active_tip;
+  const std::string inactive_tip;
+  const bool notify;
+  std::vector<Toplevel::state_t> active_state;
+
+  WidgetState (QWidget *const w, const std::string& a, const std::string& i,
+	       const bool n)
+    : widget (w),
+      active_tip (a),
+      inactive_tip (i),
+      notify (n)
+  { }
+};
+
+void 
+UIRun::manage_widget (QWidget* widget, const std::string& active_tip, 
+		      const std::string& inactive_tip, bool notify)
+{ 
+  for (size_t i = 0; i < widget_state.size (); i++)
+    daisy_assert (widget != widget_state[i]->widget);
+
+  widget_state.push_back (new WidgetState (widget, 
+					   active_tip, inactive_tip, notify));
+}
+
+void 
+UIRun::manage_widget_active (QWidget* widget, Toplevel::state_t state)
+{ 
+  for (size_t i = 0; i < widget_state.size (); i++)
+    if (widget == widget_state[i]->widget)
+      {
+	widget_state[i]->active_state.push_back (state);
+	return;
+      }
+  daisy_notreached ();
+}
+
 void
 UIRun::build_log (Block& block, const std::string& name)
 {

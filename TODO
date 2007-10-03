@@ -1,16 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* BIF 
-
-status på artikler
-
-Fon accepteret, farmer-model submitted, og evas abstract submitted.
+* Rootdens
 
 * Qt
 
-** check at der er connects nok
+** Vi skal have en tabel med
 
-** run command
+widget active-states active-desc inactive-desc inform-when-active-change?
+
+** Vi skal oplyse i Treelog når top-level fil bliver loaded
 
 * OpenMI
 

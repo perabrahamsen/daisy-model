@@ -27,11 +27,9 @@
 #include "log.h"
 #include "plf.h"
 #include "check.h"
-#include <sstream>
 #include "mathlib.h"
 #include "librarian.h"
-
-using namespace std;
+#include <sstream>
 
 struct Rootdens_AP : public Rootdens
 {
@@ -44,7 +42,7 @@ struct Rootdens_AP : public Rootdens
   double L0;                    // Root density at soil surface [cm/cm^3]
 
   // simulation.
-  void set_density (Treelog&, vector<double>& Density,
+  void set_density (Treelog&, std::vector<double>& Density,
 		    const Geometry& geo, 
 		    double Depth, double PotRtDpt,
 		    double WRoot, double DS);
@@ -56,7 +54,7 @@ struct Rootdens_AP : public Rootdens
 
 void
 Rootdens_AP::set_density (Treelog& /*msg*/,
-                          vector<double>& Density,
+                          std::vector<double>& Density,
                           const Geometry& geo, 
                           const double Depth, const double /*PotRtDpt*/,
                           const double WRoot, const double DS)

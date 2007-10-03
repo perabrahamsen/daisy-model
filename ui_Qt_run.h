@@ -23,6 +23,7 @@
 
 #include "ui_Qt.h"
 #include "vis_Qt.h"
+#include "toplevel.h"
 #include "memutils.h"
 #include <map>
 
@@ -38,6 +39,13 @@ class QLabel;
 class UIRun : public QWidget, public UIQt
 {
   Q_OBJECT
+
+  // Widget state manager.
+  class WidgetState;
+  auto_vector<WidgetState*> widget_state;
+  void manage_widget (QWidget*, const std::string& active_tip, 
+		      const std::string& inactive_tip, bool notify);
+  void manage_widget_active (QWidget*, Toplevel::state_t);
 
   // Widgets.
   VisQtMain qt_main;

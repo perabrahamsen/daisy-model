@@ -32,8 +32,6 @@
 #include "memutils.h"
 #include "librarian.h"
 
-using namespace std;
-
 struct Rootdens_PLF : public Rootdens
 {
   // Parameters.
@@ -42,7 +40,7 @@ struct Rootdens_PLF : public Rootdens
   {
     // Check that the indexes are monotonically increasing.
     void check (const Syntax& syntax, const AttributeList& alist, 
-		const string& key) const throw (string);
+		const std::string& key) const throw (std::string);
   };
 
   struct Entry
@@ -56,10 +54,10 @@ struct Rootdens_PLF : public Rootdens
     Entry (const AttributeList&);
     ~Entry ();
   };
-  vector<const Entry*> entries;
+  std::vector<const Entry*> entries;
 
   // Simulation.
-  void get_density (Treelog&, vector<double>& Density,
+  void get_density (Treelog&, std::vector<double>& Density,
 		    const Geometry& geo, 
 		    double WRoot, double value, double z_factor,
 		    double max_depth = 1e100);
@@ -86,17 +84,17 @@ Relative root density as a function of root depth .");
 void
 Rootdens_PLF::Check_Indexes::check (const Syntax& syntax, 
 				    const AttributeList& alist, 
-				    const string& key) const throw (string)
+				    const std::string& key) const throw (std::string)
 { 
   daisy_assert (alist.check (key));
   daisy_assert (syntax.lookup (key) == Syntax::AList);
   daisy_assert (!syntax.is_log (key));
   daisy_assert (syntax.size (key) == Syntax::Sequence);
 
-  const vector<AttributeList*>& alists = alist.alist_sequence (key);
+  const std::vector<AttributeList*>& alists = alist.alist_sequence (key);
 
   if (alists.size () < 1)
-    throw string ("You must specify at least one entry");
+    throw std::string ("You must specify at least one entry");
   else
     {
       double last_index = alists[0]->number ("index");
@@ -108,7 +106,7 @@ Rootdens_PLF::Check_Indexes::check (const Syntax& syntax,
 	  const double new_index = alists[i]->number ("index");
 	  
 	  if (new_index <= last_index)
-	    throw string ("Index should be monotonically increasing");
+	    throw std::string ("Index should be monotonically increasing");
 	  last_index = new_index;
 	}
     }
@@ -123,7 +121,7 @@ Rootdens_PLF::Entry::~Entry ()
 { }
 	
 void 
-Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
+Rootdens_PLF::get_density (Treelog&, std::vector<double>& abs_dens,
 			   const Geometry& geo, 
 			   const double WRoot,
 			   const double index, const double z_factor, 
@@ -204,7 +202,7 @@ Rootdens_PLF::~Rootdens_PLF ()
 struct Rootdens_DS_Depth : public Rootdens_PLF
 {
   // Simulation.
-  void set_density (Treelog& msg, vector<double>& abs_dens,
+  void set_density (Treelog& msg, std::vector<double>& abs_dens,
 		    const Geometry& geo, 
 		    double /* Depth */, double /* PotRtDpt */,
 		    double WRoot, double DS)
@@ -250,7 +248,7 @@ total root mass.",
 struct Rootdens_DS_Rel : public Rootdens_PLF
 {
   // Simulation.
-  void set_density (Treelog& msg, vector<double>& abs_dens,
+  void set_density (Treelog& msg, std::vector<double>& abs_dens,
 		    const Geometry& geo, 
 		    double Depth, double /* PotRtDpt */,
 		    double WRoot, double DS)
@@ -300,7 +298,7 @@ total root mass.",
 struct Rootdens_Depth_Depth : public Rootdens_PLF
 {
   // Simulation.
-  void set_density (Treelog& msg, vector<double>& abs_dens,
+  void set_density (Treelog& msg, std::vector<double>& abs_dens,
 		    const Geometry& geo, 
 		    double Depth, double PotRtDpt,
 		    double WRoot, double /* DS */)

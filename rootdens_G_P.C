@@ -26,11 +26,10 @@
 #include "geometry.h"
 #include "log.h"
 #include "check.h"
-#include <sstream>
 #include "mathlib.h"
 #include "librarian.h"
 
-using namespace std;
+#include <sstream>
 
 struct Rootdens_G_P : public Rootdens
 {
@@ -43,7 +42,7 @@ struct Rootdens_G_P : public Rootdens
 
   // Simulation.
   static double density_distribution_parameter (double a);
-  void set_density (Treelog&, vector<double>& Density,
+  void set_density (Treelog&, std::vector<double>& Density,
 		    const Geometry& geo, 
 		    double Depth, double PotRtDpt,
 		    double WRoot, double DS);
@@ -113,7 +112,7 @@ Rootdens_G_P::density_distribution_parameter (double a)
 
 void
 Rootdens_G_P::set_density (Treelog& msg,
-			   vector<double>& Density,
+			   std::vector<double>& Density,
 			   const Geometry& geo, 
 			   const double Depth, const double PotRtDpt,
 			   const double WRoot, const double)
@@ -123,7 +122,7 @@ Rootdens_G_P::set_density (Treelog& msg,
 
   const double MinLengthPrArea = (DensRtTip * 1.2) * PotRtDpt;
   const double LengthPrArea
-    = max (m_per_cm * SpRtLength * WRoot, MinLengthPrArea); // [cm/cm^2]
+    = std::max (m_per_cm * SpRtLength * WRoot, MinLengthPrArea); // [cm/cm^2]
   a = density_distribution_parameter (LengthPrArea / 
                                       (PotRtDpt * DensRtTip));
   L0 = DensRtTip * exp (a);
