@@ -801,20 +801,25 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
         edge_water_content (geo, Theta_cell_avg, Theta_edge);      
       
         double dt_PeCr_min = 2*dt;
-      
+        
+        std::cout << "here1 \n";
+
         for (size_t e = 0; e < edge_size; e++)
           {
             if (iszero (q_edge[e]))
               continue;
-
+            
             const double dt_PeCr
               = gamma_stabilization * ThetaD_long_avg[e]
               * Theta_edge[e]/(q_edge[e]*q_edge[e]);
-	  
+            std::cout << "here2 \n";
             if (dt_PeCr < dt_PeCr_min)
               dt_PeCr_min = dt_PeCr;
           }
-
+        std::cout << "here3 \n";
+        if (dt_PeCr_min < dt_min)
+          dt_PeCr_min = dt_min; //no timesteps small than dt_min!
+        
         std::cout << "dt_PeCr_min = " << dt_PeCr_min << '\n';
         
         //Number of small timesteps 
@@ -834,7 +839,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     case Streamline_diffusion:
       {
         //Add some ekstra diffusion in the streamline 
-        std::cout << "Smaller timesteps\n";      
+        std::cout << "Streamline diffusion\n";      
         
         ublas::vector<double> Theta_edge 
           = ublas::zero_vector<double> (edge_size);
@@ -842,14 +847,11 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       
         for (size_t e = 0; e < edge_size; e++)
           {
-            const double PeCr = q_edge[e]*q_edge[e] * Theta_edge[e] * dt
-              / ThetaD_long[e];
-            if (PeCr > gamma_stabilization)  
-              //Need to ad some extra diffusion
-              //Ged i koden mangler gamma_stab i og hvad med avg 
-              //i nedenstående
-              ThetaD_long_avg[e] 
-                = q_edge[e] * q_edge[e] * dt / Theta_edge[e];     
+            const double ThetaD_PeCr = q_edge[e]*q_edge[e] * dt
+              / (Theta_edge[e] * gamma_stabilization);
+            
+            if (ThetaD_long_avg[e] < ThetaD_PeCr)  //Need extra diffusion
+              ThetaD_long_avg[e] = ThetaD_PeCr;
           }
         nddt = 1; //Dont use smaller timesteps 
         break;
@@ -976,11 +978,13 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   for (int ddtstep = 0; ddtstep < nddt; ddtstep++)
     {
       dtime += ddt;       //update time 
-      std::cout << "dtime = " << ddtstep << '\n';
+      std::cout << "here4 \n";
+      std::cout << "dtime = " << dtime << '\n';
       
       //Calculate water content 
       interpol(Theta_cell_old, Theta_cell, dt, dtime, Theta_cell_np1);
-      
+      std::cout << "here5 \n";
+
       for (int c = 0; c < cell_size; c++)
         QTheta_mat_np1 (c, c) = geo.cell_volume (c) * Theta_cell_np1 (c);
       
@@ -1024,9 +1028,11 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       //Solution checks???
       //Calculate and sum up fluxes 
       
+        std::cout << "here6 \n";
       fluxes (geo, edge_type, q_edge, ThetaD_long, ThetaD_tran,
               C_n, C_below, dJ); 
       
+      std::cout << "here7 \n";
       
       //Update Theta and QTheta
       Theta_cell_n = Theta_cell_np1;
