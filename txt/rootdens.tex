@@ -1,0 +1,62 @@
+
+hroot density component
+
+input 
+
+  Depth, PotRtDpt
+  Width, PotRtWdt
+  DS
+  WRoot
+
+output
+
+  Density
+
+...
+
+Gerwitz and Page
+
+parameters
+
+  SpRtLength
+  DensRtTip
+
+Substitute:
+
+     RootLength = WRoot * SpRtLength
+
+Equations:
+
+     L(z) = L0 * exp (-a * z)
+
+     L0 and a are unknown
+
+     integral (L, 0, inf) = RootLength
+
+(1)  L0 * exp (-a * PotRtDpt) = DensRtTip
+
+Solve
+
+    stamfunktionen til L0 * exp (-a * z) er G(z) = -L0 exp (-a z) / a
+   
+    G(inf) - G(0) =  RootLength
+
+    (-L0 exp (-a inf) / a) - (-L0 exp (-a 0) / a) = RootLength
+
+    L0 / a = RootLength
+
+(2) L0 = RootLength * a
+
+Indsæt (2) i (1)
+
+    RootLength * a * exp (-a * PotRtDpt) = DensRtTip
+
+Substitute x = -a * PotRtDpt => a = -x / PotRtDpt
+
+    - RootLength * x / PotRtDpt * exp (x) = DensRtTip
+
+    x * exp (x) = - DensRtTip * PotRtDpt / RootLength
+
+    x = W (- DensRtTip * PotRtDpt / RootLength)
+
+    a = -W (- DensRtTip * PotRtDpt / RootLength) / PotRtDpt
