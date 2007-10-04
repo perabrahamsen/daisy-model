@@ -123,10 +123,17 @@ Rootdens_G_P::set_density (Treelog& msg,
   const double MinLengthPrArea = (DensRtTip * 1.2) * PotRtDpt;
   const double LengthPrArea
     = std::max (m_per_cm * SpRtLength * WRoot, MinLengthPrArea); // [cm/cm^2]
-  a = density_distribution_parameter (LengthPrArea / 
-                                      (PotRtDpt * DensRtTip));
-  L0 = DensRtTip * exp (a);
-  a /= PotRtDpt;
+  
+  // We find a * depth first.
+  const double ad = density_distribution_parameter (LengthPrArea / 
+						    (PotRtDpt * DensRtTip));
+  // We find L0 from a d.
+  //
+  // L0 * exp (-a d) = DensRtTip
+  // => L0 = DensRtTip / exp (-a d)
+  L0 = DensRtTip * exp (ad);	//  1 / exp (-x) = exp (x)
+  a = ad / PotRtDpt;
+
   if (Depth < PotRtDpt)
     {
       double Lz = L0 * exp (-a * Depth);
