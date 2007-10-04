@@ -1,3 +1,57 @@
+\documentclass[a4paper,11pt,twoside]{article}
+\usepackage{a4}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{hyperref}
+\usepackage{natbib}
+\input{macro}
+
+\begin{document}
+
+\section*{Estimating the root density distribution from root mass and depth}
+
+In accordance with \cite{gp74}, the root density for a crop can be
+described by equation
+
+\begin{equation}
+  L_z = L_0\; e^{-a z}
+  \label{eq:g+p}
+\end{equation}
+
+We here assume that the density is uniformly distributed on the
+horizontal plane, an assumption that fails with e.g.\ row crops.
+
+The parameters $a$ and $L_0$ will both vary with time.  For a
+production oriented simulation model like
+Daisy~\citep{daisy-def,daisy-ems}, it can be more convenient to
+specify the density in terms of root dry matter and root depth.  To
+achieve this, we assume that the specific root length is a known
+constant (rather than varying with depth).  By doing this, we
+can find the total root length, given the root dry matter.
+
+\begin{equation}
+  l_r = S_r W_r
+  \label{eq:root-length}
+\end{equation}
+
+\section*{List of symbols}
+
+\begin{tabular}{lll}
+Symbol & Unit & Description\\\hline
+$a$   & m$^{-1}$ & Root density distribution parameter\\
+$l_r$ & m/m$^2$ & Total root length\\
+$L_0$ & m/m$^3$ & Root density at soil surface\\
+$L_z$ & m/m$^3$ & Root density at soil depth $z$\\
+$S_r$ & m/kg & Specific root length\\
+$W_r$ & kg/m$^2$ & Total root dry matter\\
+$z$ & m & Soil depth. \\
+\end{tabular}
+
+
+
+\cite{euler83,lambert58}
+
+\cite{lambertwcode}
 
 hroot density component
 
@@ -60,3 +114,9 @@ Substitute x = -a * PotRtDpt => a = -x / PotRtDpt
     x = W (- DensRtTip * PotRtDpt / RootLength)
 
     a = -W (- DensRtTip * PotRtDpt / RootLength) / PotRtDpt
+
+\addcontentsline{toc}{section}{\numberline{}Bibliography}
+\bibliographystyle{elsart-harv}
+\bibliography{daisy}
+
+\end{document}
