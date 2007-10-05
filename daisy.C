@@ -62,7 +62,7 @@ Daisy::attach_ui (Run* run, const std::vector<Log*>& logs)
 
 bool
 Daisy::run (Treelog& msg)
-{ 
+{
   daisy_assert (extern_scope);
 
   // Run simulation.

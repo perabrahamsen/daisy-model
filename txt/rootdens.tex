@@ -8,15 +8,21 @@
 
 \begin{document}
 
-\section*{Estimating the root density distribution from root mass and depth}
+\section*{Estimating the root density distribution from root dry matter and 
+  depth}
 
-In accordance with \cite{gp74}, the root density for a crop can be
-described by equation
+\section{One dimension}
 
+\subsection{Unlimited growth}
+
+In accordance with \cite{gp74}, the root density distribution $L_z$
+for a crop can be described by
 \begin{equation}
-  L_z = L_0\; e^{-a z}
+  L_z = L_0\, e^{-a z}
   \label{eq:g+p}
 \end{equation}
+where $L_0$ is the root density at the soil surface, $a$ is a
+distribution parameter, and $z$ is the depth below soil surface.
 
 We here assume that the density is uniformly distributed on the
 horizontal plane, an assumption that fails with e.g.\ row crops.
@@ -24,96 +30,123 @@ horizontal plane, an assumption that fails with e.g.\ row crops.
 The parameters $a$ and $L_0$ will both vary with time.  For a
 production oriented simulation model like
 Daisy~\citep{daisy-def,daisy-ems}, it can be more convenient to
-specify the density in terms of root dry matter and root depth.  To
-achieve this, we assume that the specific root length is a known
-constant (rather than varying with depth).  By doing this, we
-can find the total root length, given the root dry matter.
-
+specify the density in terms of accumulated root dry matter $M_r$ and
+total root depth $d$.  To do this, we define the root depth at the
+lowest depth where the root density is at above specified threshold
+$L_m$.  By inserting this in (\ref{eq:g+p}), we get
 \begin{equation}
-  l_r = S_r W_r
+  L_m = L_0\, e^{-a d}
+  \label{eq:root-depth}
+\end{equation}
+
+We convert the root mass to root length $l_r$ by assuming the specific
+root length $S_r$ is a known constant (rather than varying with depth)
+\begin{equation}
+  l_r = S_r \, M_r
   \label{eq:root-length}
 \end{equation}
 
+The total root length is also the integral of the root density over
+the profile
+\begin{equation}
+  l_r = \int_0^{\infty} L_z \: dz = \int_0^{\infty} L_0\, e^{-a z} \, dz
+  \label{eq:root-integral}
+\end{equation}
+
+An indefinite integral to (\ref{eq:g+p}) is 
+\begin{equation}
+  G_z = -\frac{L_0}{a}\, e^{-a z}
+  \label{eq:indefinite}
+\end{equation}
+
+Using (\ref{eq:indefinite}) in (\ref{eq:root-integral}) gives us
+\begin{equation}
+    l_r = G_{\infty} - G_0 = \frac{L_0}{a}
+  \label{eq:root-integrated}
+\end{equation}
+
+By inserting the expressin we get for $L_0$ from
+(\ref{eq:root-integrated}) in (\ref{eq:root-depth}) we get
+\begin{equation}
+  L_m = L_r \, a \, e^{-a d}
+  \label{eq:a-only}
+\end{equation}
+
+If we substitute $W = -a d$ (and thus $a = -W / d$) we get
+\begin{equation}
+   L_m = L_r \frac{-W}{d} e^W
+  \label{eq:sub-W}
+\end{equation}
+
+By isolating the known values on the right side this gives us
+\begin{equation}
+   W e^W = - L_m \frac{d}{L_r}
+  \label{eq:Lambert}
+\end{equation}
+
+The solution to this equation with regard to $W$ happens to be the
+definition of the Lambert-W function \citep{euler83,lambert58}.  An
+existing implementation such as \citep{lambertwcode} can then be used
+to find a by substituting $a$ back
+\begin{equation}
+   a = -\frac{W (-\frac{L_m d}{L_r})}{d}
+  \label{eq:a-solved}
+\end{equation}
+
+Having found $a$, $L_0$ can be determined by rewriting (\ref{eq:root-depth}) to
+\begin{equation}
+  L_0 = \frac{L_m}{e^{-a d}}
+  \label{eq:L0-found}
+\end{equation}
+
+\section{Limited growth}
+
+The distribution described in (\ref{eq:g+p}) assumes a gradual
+decrease of roots.  For some soil we see !!!REF!! a sharp decrease at
+a specific depth, as the roots are unable to penetrate further down.
+The way we model this is to is to divide the root depth into a crop
+specific and soil independent potential root depth $d_c$, and soil
+specific and crop independent maximum root depth $d_s$.
+
+When the crop potential root depth haven't reached the soil maximum
+root depth (that is $d_s > d_c$), we calculate the root density
+distribution parameters as previously described for unlimited growth.
+
+When the potential root depth is below the soil maximum root depth
+
+\begin{equation}
+  \begin{array}{rcll}
+           &=& L_z     &; d_s >= d_c \\
+     L_z^* &=& 0       &; z > d_s \wedge d_s < d_c \\
+           &=& k^* L_z &; z < d_s \wedge d_s < d_c 
+  \end{array}
+  \label{eq:limited-depth}
+\end{equation}
+
+\begin{equation}
+  k^* = \frac{\int_0^{\infty} L_z \, dz}{\int_0^{d_s}, L_z \, dz}
+\end{equation}
+
 \section*{List of symbols}
+\addcontentsline{toc}{section}{\numberline{}List of symbols}
 
 \begin{tabular}{lll}
 Symbol & Unit & Description\\\hline
-$a$   & m$^{-1}$ & Root density distribution parameter\\
-$l_r$ & m/m$^2$ & Total root length\\
-$L_0$ & m/m$^3$ & Root density at soil surface\\
-$L_z$ & m/m$^3$ & Root density at soil depth $z$\\
-$S_r$ & m/kg & Specific root length\\
-$W_r$ & kg/m$^2$ & Total root dry matter\\
-$z$ & m & Soil depth. \\
+$a$     & m$^{-1}$ & Root density distribution parameter\\
+$d$     & m       & Root depth\\
+$d_c$   & m       & Crop portential root depth\\
+$d_s$   & m       & Soil maximum root depth\\
+$k^*$   &         & Soil root limit factor\\
+$l_r$   & m/m$^2$ & Total root length\\
+$L_0$   & m/m$^3$ & Root density at soil surface\\
+$L_d$   & m/m$^3$ & Minimal root density\\
+$L_z$   & m/m$^3$ & Root density at soil depth $z$\\
+$L_z^*$ & m/m$^3$ & Soil modified root density at soil depth $z$\\
+$M_r$   & kg/m$^2$& Total root dry matter\\
+$S_r$   & m/kg    & Specific root length\\
+$W$     &         & Lambert W function\\
+$z$     & m       & Soil depth. \\
 \end{tabular}
-
-
-
-\cite{euler83,lambert58}
-
-\cite{lambertwcode}
-
-hroot density component
-
-input 
-
-  Depth, PotRtDpt
-  Width, PotRtWdt
-  DS
-  WRoot
-
-output
-
-  Density
-
-...
-
-Gerwitz and Page
-
-parameters
-
-  SpRtLength
-  DensRtTip
-
-Substitute:
-
-     RootLength = WRoot * SpRtLength
-
-Equations:
-
-     L(z) = L0 * exp (-a * z)
-
-     L0 and a are unknown
-
-     integral (L, 0, inf) = RootLength
-
-(1)  L0 * exp (-a * PotRtDpt) = DensRtTip
-
-Solve
-
-    stamfunktionen til L0 * exp (-a * z) er G(z) = -L0 exp (-a z) / a
-   
-    G(inf) - G(0) =  RootLength
-
-    (-L0 exp (-a inf) / a) - (-L0 exp (-a 0) / a) = RootLength
-
-    L0 / a = RootLength
-
-(2) L0 = RootLength * a
-
-Indsæt (2) i (1)
-
-    RootLength * a * exp (-a * PotRtDpt) = DensRtTip
-
-Substitute x = -a * PotRtDpt => a = -x / PotRtDpt
-
-    - RootLength * x / PotRtDpt * exp (x) = DensRtTip
-
-    x * exp (x) = - DensRtTip * PotRtDpt / RootLength
-
-    x = W (- DensRtTip * PotRtDpt / RootLength)
-
-    a = -W (- DensRtTip * PotRtDpt / RootLength) / PotRtDpt
 
 \addcontentsline{toc}{section}{\numberline{}Bibliography}
 \bibliographystyle{elsart-harv}
