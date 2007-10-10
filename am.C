@@ -524,19 +524,19 @@ AM::Implementation::~Implementation ()
 
 symbol
 AM::real_name () const
-{ return impl.name; }
+{ return impl->name; }
 
 void
 AM::output (Log& log) const
-{ impl.output (log); }
+{ impl->output (log); }
 
 void 
 AM::append_to (std::vector<AOM*>& added)
-{ impl.append_to (added); }
+{ impl->append_to (added); }
 
 bool 
 AM::check (Treelog& err) const
-{ return impl.check (err); }
+{ return impl->check (err); }
 
 void 
 AM::mix (const Geometry& geo,
@@ -544,7 +544,7 @@ AM::mix (const Geometry& geo,
          double& tillage_N_top, double& tillage_C_top,
          std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil,
          const double dt)
-{ impl.mix (geo, from, to, penetration, 
+{ impl->mix (geo, from, to, penetration, 
             tillage_N_top, tillage_C_top, 
             tillage_N_soil, tillage_C_soil, dt); }
 
@@ -553,69 +553,69 @@ AM::swap (const Geometry& geo,
 	  const double from, const double middle, const double to,
           std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil,
           const double dt)
-{ impl.swap (geo, from, middle, to, tillage_N_soil, tillage_C_soil, dt); }
+{ impl->swap (geo, from, middle, to, tillage_N_soil, tillage_C_soil, dt); }
 
 double 
 AM::total_C (const Geometry& geo) const
-{ return impl.total_C (geo); }
+{ return impl->total_C (geo); }
 
 double 
 AM::total_N (const Geometry& geo) const
-{ return impl.total_N (geo); }
+{ return impl->total_N (geo); }
 
 double 
 AM::C_at (size_t at) const
-{ return impl.C_at (at); }
+{ return impl->C_at (at); }
 
 double 
 AM::N_at (size_t at) const
-{ return impl.N_at (at); }
+{ return impl->N_at (at); }
 
 void 
 AM::pour (std::vector<double>& cc, std::vector<double>& nn)
-{ impl.pour (cc, nn); }
+{ impl->pour (cc, nn); }
 
 void 
 AM::add (double C, double N)
-{ impl.add (C, N); }
+{ impl->add (C, N); }
 
 void 
 AM::add (const Geometry& geo, AM& other)
-{ impl.add (geo, other.impl); }
+{ impl->add (geo, *other.impl); }
 
 void 
 AM::add_surface (const Geometry& geo,
                  double C, double N, 
                  const std::vector<double>& density)
-{ impl.add_surface (geo, C, N, density); }
+{ impl->add_surface (geo, C, N, density); }
 
 double
 AM::top_C () const
-{ return impl.top_C (); }
+{ return impl->top_C (); }
 
 double 
 AM::top_N () const
-{ return impl.top_N (); }
+{ return impl->top_N (); }
 
 void 
 AM::multiply_top (double fraction)
-{ impl.multiply_top (fraction); }
+{ impl->multiply_top (fraction); }
 
 void 
 AM::unlock ()
-{ impl.unlock (); }
+{ impl->unlock (); }
 
 bool 
 AM::locked () const
-{ return impl.locked (); }
+{ return impl->locked (); }
 
 symbol
 AM::crop_name () const
-{ return impl.crop_name (); }
+{ return impl->crop_name (); }
 
 symbol
 AM:: crop_part_name () const
-{ return impl.crop_part_name (); }
+{ return impl->crop_part_name (); }
 
 const VCheck& 
 AM::check_om_pools ()
@@ -652,10 +652,10 @@ AM::create (const size_t cell_size, const Time& time,
   al.add ("name", sort + "/" + part);
   al.add ("om", ol);
   AM& am = *new AM (al);
-  for (size_t i = 0; i < am.impl.om.size (); i++)
-    am.impl.om[i]->initialize (cell_size);
+  for (size_t i = 0; i < am.impl->om.size (); i++)
+    am.impl->om[i]->initialize (cell_size);
   if (lock == AM::Locked)
-    am.impl.lock = new AM::Implementation::Lock (sort, part);
+    am.impl->lock = new AM::Implementation::Lock (sort, part);
   return am;
 }
 
@@ -894,7 +894,7 @@ AM::set_mineral (AttributeList& am, double NH4, double NO3)
 }
 
 AM::AM (const AttributeList& al)
-  : impl (*new Implementation 
+  : impl (new Implementation 
 	  (al.check ("creation")
 	   ? Time (al.alist ("creation"))
 	   : Time (1, 1, 1, 1),
@@ -904,21 +904,21 @@ AM::AM (const AttributeList& al)
     name ("state")
 {
   if (al.check ("lock"))
-    impl.lock = new AM::Implementation::Lock (al.alist ("lock"));
+    impl->lock = new AM::Implementation::Lock (al.alist ("lock"));
  }
 
 void
 AM::initialize (const Geometry& geo, const double max_rooting_depth)
 {
-  for (size_t i = 0; i < impl.om.size (); i++)
-    impl.om[i]->initialize (geo.cell_size ());
+  for (size_t i = 0; i < impl->om.size (); i++)
+    impl->om[i]->initialize (geo.cell_size ());
 
   const std::string syntax = alist.name ("syntax");
   
   if (syntax == "state")
     {
       if (alist.check ("lock"))
-	impl.lock = new Implementation::Lock (alist.alist ("lock"));
+	impl->lock = new Implementation::Lock (alist.alist ("lock"));
     }
   else if (syntax == "organic")
     {
@@ -940,7 +940,7 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
   else if (syntax == "initial")
     {
       const std::vector<AttributeList*>& oms = alist.alist_sequence ("om");
-      const std::vector<AOM*>& om = impl.om;
+      const std::vector<AOM*>& om = impl->om;
       
       const std::vector<AttributeList*>& layers
 	= alist.alist_sequence ("layers");
@@ -1014,12 +1014,12 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
           density[i] = k * exp (k * geo.z (i));
 
       // Add it.
-      impl.add_surface (geo, C, N, density);
+      impl->add_surface (geo, C, N, density);
     }
 }
 
 AM::~AM ()
-{ delete &impl; }
+{ }
 
 static struct AM_Syntax
 {
@@ -1234,6 +1234,12 @@ original.");
     }
 } am_syntax;
 
+
+static Librarian AM_init (AM::component, "\
+The 'am' component describes various kinds of fertilizer and other\n\
+added matter such as crop residues.  In particular, it describes how\n\
+they decompose.");
+
 struct ProgramAM_table : public Program
 {
   const Library& library;
@@ -1312,8 +1318,4 @@ static struct ProgramAM_tableSyntax
   }
 } ProgramAM_table_syntax;
 
-static Librarian AM_init (AM::component, "\
-The 'am' component describes various kinds of fertilizer and other\n\
-added matter such as crop residues.  In particular, it describes how\n\
-they decompose.");
-
+// am.C ends here.

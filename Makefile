@@ -469,7 +469,7 @@ OTHER = run.C treelog_text.C treelog_store.C \
 	mathlib.C cdaisy.C nrutil.C submodel.C version.C
 
 # Utilities in header alone.
-HEADONLY = submodeler.h border.h memutils.h 
+HEADONLY = submodeler.h border.h memutils.h iterative.h
 
 # Everything that has an interface.
 #

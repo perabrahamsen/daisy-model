@@ -450,6 +450,7 @@ Units::standard_conversions ()
   add ("g/cm^2", "kg N/ha", 1e5); // Inorganic N.
   add ("g N/cm^2/h", "kg N/ha/h", 1e5); 
   add ("g N/m^2", "kg N/ha", 10.0); // Crop N.
+  add ("g/m^2", "kg/ha", 10.0);
   add ("g/m^2", "kg N/ha", 10.0);
   add ("g/m^2/h", "kg N/ha/h", 10.0);
   add ("g/cm^2", "kg C/ha", 1e5); // DOM.

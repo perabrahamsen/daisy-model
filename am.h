@@ -26,6 +26,7 @@
 #include "model.h"
 #include "alist.h"
 #include <vector>
+#include <memory>
 
 class Log;
 class Geometry;
@@ -38,7 +39,7 @@ class AM : public Model
 {
   // Content.
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
   friend class Implementation;
 
 public:
