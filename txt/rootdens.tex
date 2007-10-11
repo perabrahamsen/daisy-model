@@ -1,17 +1,32 @@
-\documentclass[a4paper,11pt,twoside]{amsart}
+\documentclass[a4paper,11pt,twoside]{article}
 \usepackage{a4}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
+\usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{natbib}
 \input{macro}
 
 \begin{document}
 
-\section*{Estimating the root density distribution from root dry matter and 
-  depth}
+\title{Estimating the root density from root dry matter and size}
+\author{Per Abrahamsen\footnote{Corresponding author.  Fax:
+  +4535333384 Email: daisy@dina.kvl.dk}, Mikkel Mollerup and Søren Hansen\\  
+  \em University of Copenhagen, LIFE\\
+  Department of Agricultural Sciences\\
+  Højbakkegård Allé 9, 2630 Taastrup, Denmark}
 
-\section{Uniform field crops}
+\maketitle
+
+\begin{abstract}
+  In this paper we extend an emperical root density distribution based
+  on densely populated homogenious fields to row crops that are dense
+  in the rows but with a distance between rows, and demonstrate in
+  each case how to find the distribution parameters from root dry
+  matter and the size of the root zone.
+\end{abstract}
+
+\section{Densily populated fields}
 
 In accordance with \cite{gp74}, the root density distribution $L_z$
 for a crop can be described by
@@ -101,7 +116,7 @@ Having found $a$, $L_0$ can be determined by rewriting
   \label{eq:L0-found}
 \end{equation}
 
-\section{Limited growth}
+\subsection{Limited growth}
 
 The distribution (\ref{eq:g+p}) implies a gradual decrease of roots
 going towards, but never reaching zero.  There are two problems with
@@ -146,48 +161,16 @@ We can describe a row crop with a two dimensional model by assuming
 that the plants are densily packed in the row.  Our second dimension
 $x$ is horizontal, ortogonal to the row.  The root density at a
 specific point can be denoted $L_{z,x}$, and we chooce origo so
-$L_{0,0}$ is the the root density in the top of the row.  We also need
-to know the distance between rows $R$, and assume an infinite number
-of identical rows to avoid any border problems.
-
-We would like to retain our original distribution when ignoring the x
-dimension
-\begin{equation}
-  L_z = \frac{2 \int_0^{\infty} L_{z,x}\, dx}{R}
-  \label{eq:x-integrated}
-\end{equation}
-We multiply by two as we assume the two sides of the rows are
-identical.  By integrating to $\infty$ rather than just $R/2$ we do
-include roots from outside the row.  However, because the system has
-an infinite number of identical rows, the amount of roots from the
-crop outside its own row is exactly the same as the amount of roots
-from other rows inside the row we are examining.
-
-If we further assumes that the root density decrease with the
-horizontal distance can also be described with (\ref{eq:g+p}), we get
+$L_{0,0}$ is the the root density in the top of the row.  We then
+define the following root dstribution
 \begin{equation}
   L_{z,x} = L_{0,0}\, e^{-a_z z} e^{-a_x x}
   \label{eq:Lzx}
 \end{equation}
-Inserting (\ref{eq:Lzx}) and (\ref{eq:g+p}) in (\ref{eq:x-integrated}) we get
-\begin{equation}
-  \begin{array}{rcl}
-    L_0\, e^{-a z} &=& \frac{2}{R} \int_{0}^{\infty} L_{0,0}\, e^{-a_z z} e^{-a_x x} dx\\
-                 &=& \frac{2 L_{0,0}\, e^{-a_z z}}{R} \int_{0}^{\infty} e^{-a_x x} dx\\
-                 &=& L_{0,0}\, e^{-a_z z} \frac{0 - 1}{-a_x}\\
-                 &=& \frac{2 L_{0,0}}{R a_x} e^{-a_z z}\\
-  \end{array}
-  \label{eq:1d2d}
-\end{equation}
-So we get
-\begin{eqnarray}
-  a_z &=& a\\\label{eq:azisa}
-  L_{0,0} &=& ½ a_x R L_0\\\label{eq:L00L0}
-  L_0 &=& \frac{2 L_{0,0}}{a_x R}\label{eq:L0L00}
-\end{eqnarray}
-when switching between the one and two dimensional descriptions.
+where $a_z$ and $a_z$ control the density decrease in the two
+dimensions.
 
-\section{Finding the parameters}
+\subsection{Finding the parameters}
 
 To find the parameters $a_z$, $a_x$ and $L_{0,0}$, we assume as before
 that the root depth and root mass is known, and now additionally that
@@ -250,7 +233,7 @@ and isolate the known values on the right side, this gives us:
   \label{eq:logsquare}
 \end{equation}
 
-\section{Numeric solution}
+\subsection{Numeric solution}
 
 Unlike (\ref{eq:Lambert}), nobody bothered to give the solution to
 \ref{eq:logsquare} a name, so we have to solve it numerically.
@@ -298,7 +281,7 @@ distributions.
   total root length from outside the root zone.  
 \end{itemize}
 As the total root length increases, pressing Q towards $0$ or
-$-\infty$, the difference in the solutions grow.  When there is just
+$-\infty$, the difference between the solutions grow.  When there is just
 enough roots to satisfy the contraints at $Q = -2$, the two solutions
 converges to one.  As we like our roots to stay mostly within the root
 zone, we choose the solution for $Q < -2$.
@@ -306,6 +289,82 @@ zone, we choose the solution for $Q < -2$.
 We can find $Q$ numerically using Newton's method and an initial guess
 of $-3$.  From that we can find $a_z$ from (\ref{eq:Qaz}), $a_x$ from
 (\ref{eq:aztoax}), and $L_{0,0}$ from (\ref{eq:root-integral2}).
+
+\subsection{Multiple rows}
+
+If the rows are close enough, the root systems will overlap as shown
+on figure~\ref{fig:zigzag}.
+\begin{figure}[htbp]
+  ZIG ZAG
+  \caption{Overlapping root systems in half a row.}
+  \label{fig:zigzag}
+\end{figure}
+If $R$ is the distance between rows, and we assume an infinite number
+of identical rows, this can be expressed by the equation
+\begin{equation}
+  L^*_{z,x} =
+    \begin{cases}
+       \Sigma_{i=0}^{\infty} (L_{z,x + i R} + L_{z,R + i R - x}) & \text{if $x < R/2$}\\
+                                                    0  & \text{if $x \geq R/2$}
+    \end{cases}
+  \label{eq:Lzxstar}
+\end{equation}
+
+Using (\ref{eq:Lzx}) and the rules for geometric serieses we can rewrite
+the first case to get rid of the sum
+\begin{equation}
+  \begin{array}{rl}
+     & \Sigma_{i=0}^{\infty} (L_{z,x + i R} + L_{z,R + i R - x})\\
+    =& L_{0,0}\, e^{-a_z z} 
+       \Sigma_{i=0}^{\infty} (e^{-a_x (x + i R)} + e^{-a_x (R + i R - x)})\\
+    =& L_{0,0}\, e^{-a_z z} (       e^{-a_x x} \Sigma_{i=0}^{\infty} e^{-a_x i R} 
+                          + e^{-a_x (R - x)} \Sigma_{i=0}^{\infty} e^{-a_x i R})\\
+    =& L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})
+       \Sigma_{i=0}^{\infty} e^{-a_x i R}) \\
+    =& L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})
+       \Sigma_{i=0}^{\infty} ((\frac{1}{e})^{a_x R})^i\\
+    =& \frac{L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})}
+            {1 - \frac{1}{e}^{a_x R}}\\
+  \end{array}
+  \label{eq:Lzxstar-solved}
+\end{equation}
+
+\subsection{Mapping between the models}
+
+We would like to retain our original distribution when ignoring the x
+dimension.  We coudn't do that when looking only at the root system
+for a single row, as it is infinitely wide and thus has an average
+density of zero.  However, if we look at the roots of single row, we
+get
+\begin{equation}
+  L_z = \frac{2 \int_0^{\infty} L_{z,x}\, dx}{R}
+  \label{eq:x-integrated}
+\end{equation}
+We multiply by two as we assume the two sides of the rows are
+identical.  By integrating to $\infty$ rather than just $R/2$ we do
+include roots from outside the row.  However, because the system has
+an infinite number of identical rows, the amount of roots from the
+crop outside its own row is exactly the same as the amount of roots
+from other rows inside the row we are examining.
+
+Inserting (\ref{eq:Lzx}) and (\ref{eq:g+p}) in (\ref{eq:x-integrated}) we get
+\begin{equation}
+  \begin{array}{rcl}
+    L_0\, e^{-a z} &=& \frac{2}{R} \int_{0}^{\infty} L_{0,0}\, e^{-a_z z} e^{-a_x x} dx\\
+                 &=& \frac{2 L_{0,0}\, e^{-a_z z}}{R} \int_{0}^{\infty} e^{-a_x x} dx\\
+                 &=& L_{0,0}\, e^{-a_z z} \frac{0 - 1}{-a_x}\\
+                 &=& \frac{2 L_{0,0}}{R a_x} e^{-a_z z}\\
+  \end{array}
+  \label{eq:1d2d}
+\end{equation}
+So we get
+\begin{eqnarray}
+  a_z &=& a\\\label{eq:azisa}
+  L_{0,0} &=& ½ a_x R L_0\\\label{eq:L00L0}
+  L_0 &=& \frac{2 L_{0,0}}{a_x R}\label{eq:L0L00}
+\end{eqnarray}
+as the equation to use when switching between the one and two
+dimensional descriptions.
 
 \section*{List of symbols}
 
@@ -325,6 +384,7 @@ $L_m$   & m/m$^3$ & Minimal root density\\
 $L_z$   & m/m$^3$ & Root density at soil depth $z$\\
 $L_z^*$ & m/m$^3$ & Soil limited root density at soil depth $z$\\ 
 $L_{z,x}$& m/m$^3$ & Root density at soil depth $z$ and distance $x$ from row\\
+$L^*_{z,x}$& m/m$^3$ & Root density from multiple rows\\
 $M_r$   & kg/m$^2$& Total root dry matter\\ 
 $Q$     &         & Substitution variable\\
 $r$     & m       & Horizontal root radius\\
