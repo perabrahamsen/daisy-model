@@ -1,12 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* OpenMI Præsentation 
-
 * Rootdens
 
-** Vis L^*_{x,z} tabel
+VI KAN IKKE BRUGE LAMBERT-W
 
-** Excel?
+** roodens_GP2D.C
+
+** program GP2D:  Bedre output
+
+** rootdens.tex
+
+*** Figur af L*_xz (conturplot)
+
+*** Nævn software
+
+* output
+
+Skal kunne fjerne minut og sekund simpelt.
 
 * Qt
 

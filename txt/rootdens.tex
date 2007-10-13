@@ -5,13 +5,19 @@
 \usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{natbib}
+\usepackage{graphicx}
 \input{macro}
+
+% MMO
+% L_z -> L(z)
+% L_{z,x} -> L(x,z)
+% (1) -> Equation 1
 
 \begin{document}
 
 \title{Estimating the root density from root dry matter and size}
 \author{Per Abrahamsen\footnote{Corresponding author.  Fax:
-  +4535333384 Email: daisy@dina.kvl.dk}, Mikkel Mollerup and Søren Hansen\\  
+  +4535333384 Email: daisy@dina.kvl.dk}, Mikkel Mollerup, and Søren Hansen\\  
   \em University of Copenhagen, LIFE\\
   Department of Agricultural Sciences\\
   Højbakkegård Allé 9, 2630 Taastrup, Denmark}
@@ -20,10 +26,11 @@
 
 \begin{abstract}
   In this paper we extend an emperical root density distribution based
-  on densely populated homogenious fields to row crops that are dense
-  in the rows but with a distance between rows, and demonstrate in
-  each case how to find the distribution parameters from root dry
-  matter and the size of the root zone.
+  on densely populated homogenious fields to row crops.  The row crops
+  are modeled as having a uniform density in the direction parallel to
+  the rows, but variable in the direction perpindicular to the row.
+  In each case how to find the distribution parameters from the root
+  dry matter and the size of the root zone.
 \end{abstract}
 
 \section{Densily populated fields}
@@ -51,7 +58,7 @@ We define the root depth at the lowest depth where the root density is
 at above specified threshold $L_m$.  By inserting this in
 (\ref{eq:g+p}), we get
 \begin{equation}
-  L_m = L_0\, e^{-a d}
+  L_m = L_d = L_0\, e^{-a d}
   \label{eq:root-depth}
 \end{equation}
 
@@ -65,56 +72,85 @@ root length $S_r$ is a known constant (rather than varying with depth)
 The total root length is also the integral of the root density over
 the profile
 \begin{equation}
-  l_r = \int_0^{\infty} L_z \: dz = \int_0^{\infty} L_0\, e^{-a z} \, dz
+  l_r = \int_0^{\infty} L_z \: dz 
+      = \int_0^{\infty} L_0\, e^{-a z} \, dz 
+      = \frac{L_0}{a}
   \label{eq:root-integral}
 \end{equation}
 
-An indefinite integral to (\ref{eq:g+p}) is 
+By inserting the expression we get for $L_0$ from
+(\ref{eq:root-integral}) in (\ref{eq:root-depth}) we get
 \begin{equation}
-  G_z = -\frac{L_0}{a}\, e^{-a z}
-  \label{eq:indefinite}
-\end{equation}
-
-Using (\ref{eq:indefinite}) in (\ref{eq:root-integral}) gives us
-\begin{equation}
-    l_r = G_{\infty} - G_0 = \frac{L_0}{a}
-  \label{eq:root-integrated}
-\end{equation}
-
-By inserting the expressin we get for $L_0$ from
-(\ref{eq:root-integrated}) in (\ref{eq:root-depth}) we get
-\begin{equation}
-  L_m = L_r \, a \, e^{-a d}
+  L_m = l_r \, a \, e^{-a d}
   \label{eq:a-only}
 \end{equation}
 
-If we substitute $W = -a d$ (and thus $a = -W / d$) we get
+If we substitute $W = -a d$ and isolate the known values on the right
+side this gives us
 \begin{equation}
-   L_m = L_r \frac{-W}{d} e^W
-  \label{eq:sub-W}
-\end{equation}
-
-By isolating the known values on the right side this gives us
-\begin{equation}
-   W e^W = - L_m \frac{d}{L_r}
+   W e^W = - L_m \frac{d}{l_r}
   \label{eq:Lambert}
 \end{equation}
-
 The solution to this equation with regard to $W$ happens to be the
-definition of the Lambert-W function \citep{euler83,lambert58}.  An
-existing implementation such as \citep{lambertwcode} can then be used
-to find a by substituting $a$ back
-\begin{equation}
-   a = -\frac{W (-\frac{L_m d}{L_r})}{d}
-  \label{eq:a-solved}
-\end{equation}
+definition of the Lambert-W function \citep{euler83,lambert58}.  The
+function on the left hand side of the equation is depicted on
+figure~\ref{fig:W}. 
+\begin{figure}[htbp]
+  \input{rootdens_W}
+  \caption{$W e^W$}
+  \label{fig:W}
+\end{figure}
 
-Having found $a$, $L_0$ can be determined by rewriting
-(\ref{eq:root-depth}) into
+Since we now know the value for $W$m we can find the desired density
+parameters $L_0$ and $a$ by substituting back
+\begin{eqnarray}
+   a   &=& -\frac{W (-\frac{L_m d}{l_r})}{d}\\\label{eq:a-solved}
+   L_0 &=& \frac{L_m}{e^{-a d}} = L_m e^{a d}\label{eq:L0-found}
+\end{eqnarray}
+
+\subsection{Numeric solution to $W$}
+
+We start by dividing the funtions into monotonic intervals by finding
+the derivative
 \begin{equation}
-  L_0 = \frac{L_m}{e^{-a d}}
-  \label{eq:L0-found}
+  \frac{d W\, e^W}{dW} = e^W + W e^W
+  \label{eq:derived-W}
 \end{equation}
+The equation
+\begin{equation}
+  e^W + W e^W = 0
+  \label{eq:derived-W-solutions}
+\end{equation}
+has one solution, $W=-1$. The expression $W\, e^W$ is decreasing below
+$-1$ and increasing above $-1$.  Thus, $W=0$ is a global minimum.
+
+Since $\lim_{Q\to-\infty} W\,e^W=0$ we get a single solution when
+$-L_m \frac{d}{l_r}$ is exactly at the bottom point ($-1 e^{-1}$), two
+when it is above (it is never positive), and none when it is below.
+The later situation corresponds to the case where there are
+insufficent root $l_r$ to satisfy the minimal root density $L_m$
+within the given root zone $d$.
+
+Both solutions are valid, but represent different distributions.
+\begin{itemize} 
+\item The solution for $W < -1$ represents a large $a$ parameter. From
+  (\ref{eq:L0-found}) we see this also means $L_0$ is large.  Thus,
+  the solution corresponds to a root zone with a high density near the
+  top that decreases rapidly to $L_m$ at the bottom of the root zone,
+  and continues to decrease so only a small contribution to the total
+  root length from below he root zone.
+\item The solution for $W > -1$ (and thus small values of $a$ and
+  $L_0$) corresponds to a low root density near the top that
+  decreases slowly, and thus gives a larger contribution to the total
+  root length from below the root zone.
+\end{itemize}
+As the total root length increases, pressing $W$ towards $0$ or
+$-\infty$, the difference between the solutions grow.  When there is
+just enough roots to satisfy the contraints at $W = -1$, the two
+solutions converges to one.  As we like our roots to stay mostly
+within the root zone, we choose the solution for $W < -1$.  We can
+thus find $W$ numerically using Newton's method and an initial guess
+of $-2$.
 
 \subsection{Limited growth}
 
@@ -122,20 +158,16 @@ The distribution (\ref{eq:g+p}) implies a gradual decrease of roots
 going towards, but never reaching zero.  There are two problems with
 this.  The first one is emprical, for some soils it doesn't match what
 we observe, rather than a gradual decrease, there is sharp decrease at
-a specific depth, as the roots are unable to penetrate further down.
-The other one is practical, too large a root zone makes computation
-impractical.
+a specific depth, as the roots are unable to penetrate further
+down~\cite{limroot}. The other one is practical, too large a root zone
+makes computation impractical.
 
 The way we model the first issue is to divide the root depth into a
 crop specific and soil independent potential root depth $d$, and soil
 specific and crop independent maximum root depth $d_s$.  The actual
 root depth $d_a$ is then the shallowest of these two.
 \begin{equation}
-  d_a =
-  \begin{cases}
-    d & \text{if $d < d_s$}\\
-    d_s & \text{if $d \geq d_s$}
-  \end{cases}
+  d_a = \min (d, d_s)
   \label{eq:actual-depth}
 \end{equation}
 
@@ -144,8 +176,8 @@ zero below $d_a$, and a $L_z$ scaled to preserve mass balance above.
 \begin{equation}
   L_z^* =
   \begin{cases}
-    0 & \text{if $z > d_a$} \\
-    k^* L_z & \text{if $z \leq d_a$}
+    k^* L_z & \text{if $z \leq d_a$}\\
+    0 & \text{if $z > d_a$}
   \end{cases}
   \label{eq:limited-depth}
 \end{equation}
@@ -161,8 +193,15 @@ We can describe a row crop with a two dimensional model by assuming
 that the plants are densily packed in the row.  Our second dimension
 $x$ is horizontal, ortogonal to the row.  The root density at a
 specific point can be denoted $L_{z,x}$, and we chooce origo so
-$L_{0,0}$ is the the root density in the top of the row.  We then
-define the following root dstribution
+$L_{0,0}$ is the the root density in the top of the row.  See
+figure~\ref{fig:row-crop}.
+\begin{figure}[htbp]
+  TODO: Insert figure here.
+  \caption{Crop row.}
+  \label{fig:row-crop}
+\end{figure}
+
+We then define the following root dstribution
 \begin{equation}
   L_{z,x} = L_{0,0}\, e^{-a_z z} e^{-a_x x}
   \label{eq:Lzx}
@@ -174,14 +213,13 @@ dimensions.
 
 To find the parameters $a_z$, $a_x$ and $L_{0,0}$, we assume as before
 that the root depth and root mass is known, and now additionally that
-the root width $w$ is known.  As we only calculate on one side of the
-row (the other being symetrical) we use the radius $r$ instead, where
-$r = w/2$.
-
-We used the minimum root density $L_m$ to define the width and depth
-as before, but since it vary with the other dimension, we choose the
-maximum point, which happens to be at the surface and at the root,
-respectively
+the root radius $r$ is known.  We define the root zone depth $d$ to be
+the depth right below the row ($x = 0$) where the root density is
+$L_m$.  As $x=0$ is the place where (\ref{eq:Lzx}) predicts the
+highest density, the average root density at that depth will be well
+below $L_m$.  Similarily, we define the radius $r$ as the horizontal
+distance $r$ from the row where the root density at the surface ($z =
+0$)
 \begin{equation}
   L_m = L_{d,0} = L_{0,r}
   \label{eq:minroot}
@@ -192,9 +230,7 @@ half plane
 \begin{equation}
   \begin{array}{rcl}
     l_r &=& \int_0^{\infty} \int_0^{\infty} L_{z,x} \: dz \, dx \\
-        &=& \int_0^{\infty} \int_0^{\infty} e^{-a_z z} e^{-a_x x} \: dz \, dx\\
-        &=& L_{0,0} \int_0^{\infty} e^{-a_x x} \int_0^{\infty} e^{-a_z z} \: dz \, dx\\
-        &=& \frac{L_{0,0}}{a_z} \int_0^{\infty} e^{-a_x x} \:  dx\\
+        &=& \int_0^{\infty} \int_0^{\infty} L_{0,0}\, e^{-a_z z} e^{-a_x x} \: dz \, dx\\
         &=& \frac{L_{0,0}}{a_z a_x}\\ 
   \end{array}
   \label{eq:root-integral2}
@@ -232,16 +268,21 @@ and isolate the known values on the right side, this gives us:
   Q^2\, e^Q = L_m \frac{d \, r}{l_r}
   \label{eq:logsquare}
 \end{equation}
-
-\subsection{Numeric solution}
-
+The left hand side expression is illustrated in figure~\ref{fig:Q}.
 Unlike (\ref{eq:Lambert}), nobody bothered to give the solution to
-\ref{eq:logsquare} a name, so we have to solve it numerically.
+(\ref{eq:logsquare}) a name.
+\begin{figure}[htbp]
+  \input{rootdens_Q}
+  \caption{$Q^2 e^Q$}
+  \label{fig:Q}
+\end{figure}
+
+\subsection{Numeric solution to $Q$}
 
 We start by dividing the funtions into monotonic intervals by finding
 the derivative
 \begin{equation}
-  \frac{d Q^2\, e^Q}{dQ} = 2 Q e^Q + Q^2 e^Q
+  \frac{d (Q^2\, e^Q)}{dQ} = 2 Q e^Q + Q^2 e^Q
   \label{eq:derived}
 \end{equation}
 The equation
@@ -280,7 +321,7 @@ distributions.
   that decreases slowly, and thus gives a larger contribution to the
   total root length from outside the root zone.  
 \end{itemize}
-As the total root length increases, pressing Q towards $0$ or
+As the total root length increases, pressing $Q$ towards $0$ or
 $-\infty$, the difference between the solutions grow.  When there is just
 enough roots to satisfy the contraints at $Q = -2$, the two solutions
 converges to one.  As we like our roots to stay mostly within the root
@@ -295,16 +336,24 @@ of $-3$.  From that we can find $a_z$ from (\ref{eq:Qaz}), $a_x$ from
 If the rows are close enough, the root systems will overlap as shown
 on figure~\ref{fig:zigzag}.
 \begin{figure}[htbp]
-  ZIG ZAG
-  \caption{Overlapping root systems in half a row.}
+  \input{rootdens_L}
+  \caption{The x-axis represents the distance from a row to the
+    midpoint between it and the row to its right.  The y-axis is the
+    root density for roots originating in a specific row.  The top
+    line represents the roots from the row itself.  The next line the
+    roots from the row to the right.  And the last line the roots from
+    the row to the left.  In theory, all the rows on the field will
+    contibute some roots to the interval.  The root density in the
+    interval will be the sum of all the individual contributions.}
   \label{fig:zigzag}
 \end{figure}
+
 If $R$ is the distance between rows, and we assume an infinite number
 of identical rows, this can be expressed by the equation
 \begin{equation}
   L^*_{z,x} =
     \begin{cases}
-       \Sigma_{i=0}^{\infty} (L_{z,x + i R} + L_{z,R + i R - x}) & \text{if $x < R/2$}\\
+       \sum_{i=0}^{\infty} (L_{z,x + i R} + L_{z,R + i R - x}) & \text{if $x < R/2$}\\
                                                     0  & \text{if $x \geq R/2$}
     \end{cases}
   \label{eq:Lzxstar}
@@ -314,15 +363,15 @@ Using (\ref{eq:Lzx}) and the rules for geometric serieses we can rewrite
 the first case to get rid of the sum
 \begin{equation}
   \begin{array}{rl}
-     & \Sigma_{i=0}^{\infty} (L_{z,x + i R} + L_{z,R + i R - x})\\
+     & \sum_{i=0}^{\infty} (L_{z,x + i R} + L_{z,R + i R - x})\\
     =& L_{0,0}\, e^{-a_z z} 
-       \Sigma_{i=0}^{\infty} (e^{-a_x (x + i R)} + e^{-a_x (R + i R - x)})\\
-    =& L_{0,0}\, e^{-a_z z} (       e^{-a_x x} \Sigma_{i=0}^{\infty} e^{-a_x i R} 
-                          + e^{-a_x (R - x)} \Sigma_{i=0}^{\infty} e^{-a_x i R})\\
+       \sum_{i=0}^{\infty} (e^{-a_x (x + i R)} + e^{-a_x (R + i R - x)})\\
+    =& L_{0,0}\, e^{-a_z z} (       e^{-a_x x} \sum_{i=0}^{\infty} e^{-a_x i R} 
+                          + e^{-a_x (R - x)} \sum_{i=0}^{\infty} e^{-a_x i R})\\
     =& L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})
-       \Sigma_{i=0}^{\infty} e^{-a_x i R}) \\
+       \sum_{i=0}^{\infty} e^{-a_x i R}) \\
     =& L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})
-       \Sigma_{i=0}^{\infty} ((\frac{1}{e})^{a_x R})^i\\
+       \sum_{i=0}^{\infty} ((\frac{1}{e})^{a_x R})^i\\
     =& \frac{L_{0,0}\, e^{-a_z z} (e^{-a_x x} + e^{-a_x (R - x)})}
             {1 - \frac{1}{e}^{a_x R}}\\
   \end{array}
@@ -373,7 +422,7 @@ Symbol  & Unit    & Description\\\hline
 $a$     & m$^{-1}$ & Root density distribution parameter\\
 $a_z$   & m$^{-1}$ & Vertical root density distribution parameter\\
 $a_x$   & m$^{-1}$ & Horizontal root density distribution parameter\\
-$d$     & m       & Root depth\\
+$d$     & m       & Crop potential root depth\\
 $d_a$   & m       & Soil limited root depth\\
 $d_s$   & m       & Soil maximum root depth\\ 
 $k^*$   &         & Soil root limit factor\\ 
@@ -390,8 +439,7 @@ $Q$     &         & Substitution variable\\
 $r$     & m       & Horizontal root radius\\
 $R$     & m       & Distance between rows\\
 $S_r$   & m/kg    & Specific root length\\ 
-$w$     & m       & Root width\\ 
-$W$     &         & Lambert W function\\ 
+$W$     &         & Lambert-W function\\ 
 $x$     & m       & Horizontal distance from row \\
 $z$     & m       & Soil depth \\
 \end{tabular}
