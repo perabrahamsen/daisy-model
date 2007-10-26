@@ -301,5 +301,3 @@ root zone.");
     Librarian::add_type (Program::component, "GP2D", alist, syntax, &make);
   }
 } ProgramGP2Dsyntax;
-
-

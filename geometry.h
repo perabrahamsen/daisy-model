@@ -102,7 +102,7 @@ public:
   // Operations on whole volume.
 public:
   virtual int dimensions () const = 0; // Number of non-trivial dimensions.
-  virtual double surface_area () const = 0; // Total surface area.
+  virtual double surface_area () const = 0; // Total surface area. [cm^2]
   inline double top () const    // Top of highest cell. [cm]
   { return 0.0; }
   virtual double bottom () const = 0; // Bottom of deepest cell. [cm]
