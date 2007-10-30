@@ -58,10 +58,16 @@ struct Rootdens_GP1D : public Rootdens
   };
 
   // simulation.
-  void set_density (Treelog&, std::vector<double>& Density,
-		    const Geometry& geo, 
+  void set_density (const Geometry& geo, 
 		    double Depth, double PotRtDpt,
-		    double WRoot, double DS);
+		    double WRoot, double DS, std::vector<double>& Density,
+		    Treelog&);
+  void limit_depth (const Geometry& geo, 
+		    const double l_r /* [cm/cm^2] */,
+		    const double d_s /* [cm] */, 
+		    const double d_a /* [cm] */, 
+		    std::vector<double>& Density  /* [cm/cm^3] */,
+		    Treelog& msg);
   void uniform (const Geometry& geo, const double l_r, const double d_a,
 		std::vector<double>& Density);
   void output (Log& log) const;
@@ -71,18 +77,18 @@ struct Rootdens_GP1D : public Rootdens
 };
 
 void
-Rootdens_GP1D::set_density (Treelog& msg,
+Rootdens_GP1D::set_density (const Geometry& geo, 
+			    const double SoilDepth /* [cm] */, 
+			    const double CropDepth /* [cm] */,
+			    const double WRoot /* [g DM/m^2] */, const double,
 			    std::vector<double>& Density  /* [cm/cm^3] */,
-			    const Geometry& geo, 
-			    const double Depth /* [cm] */, 
-			    const double PotRtDpt /* [cm] */,
-			    const double WRoot /* [g DM/m^2] */, const double)
+			    Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
 
   // Check input.
   daisy_assert (Density.size () == cell_size);
-  daisy_assert (PotRtDpt > 0);
+  daisy_assert (CropDepth > 0);
   daisy_assert (WRoot > 0);
 
   static const double m_per_cm = 0.01;
@@ -97,16 +103,19 @@ Rootdens_GP1D::set_density (Treelog& msg,
   const double l_r = S_r * M_r;	// [cm/cm^2]
   
   // Potential depth.
-  const double d = PotRtDpt;	// [cm]
+  const double d_c = CropDepth;	// [cm]
+
+  // Soil depth.
+  const double d_s = SoilDepth;	// [cm]
 
   // Actual depth.
-  const double d_a = Depth;	// [cm]
+  const double d_a = std::min (d_c, d_s); // [cm]
 
   // Minimum density.
   const double L_m = DensRtTip;	// [cm/cm^3]
 
   // Minimum root length in root zone.
-  const double l_m = L_m * d;	// [cm/cm^2]
+  const double l_m = L_m * d_c;	// [cm/cm^2]
 
   // Minimum root length as fraction of total root length.
   const double D = l_m / l_r;	// []
@@ -123,7 +132,7 @@ Rootdens_GP1D::set_density (Treelog& msg,
   const double W_min = -1;	   // []
 
   // There is no solution when -D is below the value at W_min.
-  const double D_max = -f (W_min); // []
+  const double D_max = -W_min * std::exp (W_min); // []
 
   // Too little root mass to fill the root zone.
   if (D > D_max)
@@ -132,9 +141,12 @@ Rootdens_GP1D::set_density (Treelog& msg,
       static bool warn_about_to_little_root = true;
       if (warn_about_to_little_root)
 	{
-	  warn_about_to_little_root = false;
-	  msg.warning ("Not enough root mass to fill root zone.  \
-Using uniform distribution.");
+	  // warn_about_to_little_root = false;
+	  std::ostringstream tmp;
+	  tmp << "Min ratio is " << D << ", max is " << D_max << ".\n"
+	      << "Not enough root mass to fill root zone.\n"
+	      << "Using uniform distribution.";
+	  msg.warning (tmp.str ());
 	}
       uniform (geo, l_r, d_a, Density);
       return;
@@ -143,7 +155,7 @@ Using uniform distribution.");
   // There are two solutions to f (W) = 0, we are interested in the
   // one for W < W_min.  We start with a guess of -2.
   const double W = Newton (-2.0, f, f.derived);
-
+  
   // Check the solution.
   const double f_W = f (W);
   if (!approximate (D, D + f_W))
@@ -159,23 +171,37 @@ Using uniform distribution.");
     }
 
   // Find a from W (Eq 7):
-  a = -W / d;			// [cm^-1]
+  a = -W / d_c;			// [cm^-1]
   // and L0 from a (Eq 8):
-  L0 = L_m  * std::exp (a * d);	// [cm/cm^3]
+  L0 = L_m  * std::exp (a * d_c); // [cm/cm^3]
 
   // Fill Density.
   for (size_t cell = 0; cell < cell_size; cell++)
     {
       // TODO: Using cell average would be better than cell center.
-      const double z = geo.z (cell);
+      const double z = -geo.z (cell); // Positive below ground. [cm]
       Density[cell] = L0 * std::exp (-a * z);
     }
 
+  // Redistribute roots from outside root zone.
+  limit_depth (geo, l_r, d_s, d_a, Density, msg);
+}
+
+void
+Rootdens_GP1D::limit_depth (const Geometry& geo, 
+			    const double l_r /* [cm/cm^2] */,
+			    const double d_s /* [cm] */, 
+			    const double d_a /* [cm] */, 
+			    std::vector<double>& Density  /* [cm/cm^3] */,
+			    Treelog& msg)
+{
+  const size_t cell_size = geo.cell_size ();
+			    
   // Lowest density worth calculating on.
   const double L_epsilon = DensIgnore; // [cm/cm^3]
 
   // We find the total root length from cells above minimum.
-  double l_i = 0;
+  double l_i = 0;		// Integrated root length [cm]
   for (size_t cell = 0; cell < cell_size; cell++)
     {
       // Density in cell.
@@ -187,13 +213,14 @@ Using uniform distribution.");
 
       // Eliminate roots below actual root depth.
       // TODO:  We really would like the soil maximum instead
-      L_c *= geo.fraction_in_z_interval (cell, 0, -d_a);
+      L_c *= geo.fraction_in_z_interval (cell, 0, -d_s);
 
       // Add and update.
       l_i += L_c * geo.cell_volume (cell);
       Density[cell] = L_c;
     }
-  
+  l_i /= geo.surface_area ();	// Per area [cm/cm^2]
+
   // No roots, nothing to do.
   if (iszero (l_i))
     {
@@ -220,7 +247,7 @@ Rootdens_GP1D::uniform (const Geometry& geo, const double l_r, const double d_a,
 
   // Uniform distribution parameters.
   a = 0;
-  L0 = l_r / d_a;
+  L0 = std::max (l_r / d_a, DensRtTip);
   for (size_t cell = 0; cell < cell_size; cell++)
     {
       const double f = geo.fraction_in_z_interval (cell, 0, -d_a);
@@ -244,22 +271,6 @@ Rootdens_GP1D::Rootdens_GP1D (Block& al)
     L0 (-42.42e42),
     k (-42.42e42)
 { }
-
-const AttributeList& 
-Rootdens::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      Rootdens::load_syntax (dummy, alist);
-      alist.add ("type", "Gerwitz+Page74");
-      alist.add ("DensRtTip", 0.1);
-      alist.add ("MinDens", 0.0);
-    }
-  return alist;
-}
 
 static struct Rootdens_GP1DSyntax
 {
@@ -295,6 +306,8 @@ with a density lower than the limit specified by DensIgnore.\n\
 These roots will be re distributed within the root zone by multiplying the\n\
 density with this scale factor.");
 
-    Librarian::add_type (Rootdens::component, "Gerwitz+Page74", alist, syntax, &make);
+    Librarian::add_type (Rootdens::component, "GP1D", alist, syntax, &make);
   }
 } Rootdens_GP1D_syntax;
+
+// rootdens_GP1D.C ends here.

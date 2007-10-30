@@ -45,11 +45,12 @@ protected:
 
   // Simulation.
 public:
-  virtual void set_density (Treelog&, 
+  virtual void set_density (const Geometry& geometry, 
+			    double SoilDepth /* [cm] */,
+			    double CropDepth /* [cm] */,
+			    double WRoot /* [g DM/m^2] */, double DS,
 			    std::vector<double>& Density /* [cm/cm^3] */,
-			    const Geometry& geometry, 
-			    double Depth /* [cm] */, double PotRtDpt /* [cm] */,
-			    double WRoot /* [g DM/m^2] */, double DS) = 0;
+			    Treelog&) = 0;
   virtual void output (Log& log) const = 0;
 
   // Create and Destroy.

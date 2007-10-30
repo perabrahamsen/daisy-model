@@ -202,10 +202,10 @@ Rootdens_PLF::~Rootdens_PLF ()
 struct Rootdens_DS_Depth : public Rootdens_PLF
 {
   // Simulation.
-  void set_density (Treelog& msg, std::vector<double>& abs_dens,
-		    const Geometry& geo, 
-		    double /* Depth */, double /* PotRtDpt */,
-		    double WRoot, double DS)
+  void set_density (const Geometry& geo, 
+		    double /* SoilDepth */, double /* CropDepth */,
+		    double WRoot, double DS,
+		    std::vector<double>& abs_dens, Treelog& msg)
   { get_density (msg, abs_dens, geo, WRoot, DS, -1.0); }
   
   // Create.
@@ -248,11 +248,12 @@ total root mass.",
 struct Rootdens_DS_Rel : public Rootdens_PLF
 {
   // Simulation.
-  void set_density (Treelog& msg, std::vector<double>& abs_dens,
-		    const Geometry& geo, 
-		    double Depth, double /* PotRtDpt */,
-		    double WRoot, double DS)
+  void set_density (const Geometry& geo, 
+		    double SoilDepth, double CropDepth,
+		    double WRoot, double DS,
+		    std::vector<double>& abs_dens, Treelog& msg)
   { 
+    const double Depth = std::min (SoilDepth, CropDepth);
     daisy_assert (Depth > 0.0);
     get_density (msg, abs_dens, geo, WRoot, DS, -1.0 / Depth); 
   }
@@ -298,12 +299,13 @@ total root mass.",
 struct Rootdens_Depth_Depth : public Rootdens_PLF
 {
   // Simulation.
-  void set_density (Treelog& msg, std::vector<double>& abs_dens,
-		    const Geometry& geo, 
-		    double Depth, double PotRtDpt,
-		    double WRoot, double /* DS */)
+  void set_density (const Geometry& geo, 
+		    double SoilDepth, double CropDepth,
+		    double WRoot, double /* DS */,
+		    std::vector<double>& abs_dens, Treelog& msg)
   { 
-    get_density (msg, abs_dens, geo, WRoot, -PotRtDpt, -1.0, -Depth); 
+    const double Depth = std::min (SoilDepth, CropDepth);
+    get_density (msg, abs_dens, geo, WRoot, -CropDepth, -1.0, -Depth); 
   }
 
   // Create.

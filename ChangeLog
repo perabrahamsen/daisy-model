@@ -1,6 +1,7 @@
 2007-10-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* rootdens_GP1D.C: New model.
+	* Makefile (MODELS): Added it.
 
 2007-09-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 

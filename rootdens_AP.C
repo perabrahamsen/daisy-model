@@ -42,10 +42,11 @@ struct Rootdens_AP : public Rootdens
   double L0;                    // Root density at soil surface [cm/cm^3]
 
   // simulation.
-  void set_density (Treelog&, std::vector<double>& Density,
-		    const Geometry& geo, 
-		    double Depth, double PotRtDpt,
-		    double WRoot, double DS);
+  void set_density (const Geometry& geo, 
+		    double SoilDepth, double CropDepth,
+		    double WRoot, double DS,
+		    std::vector<double>& Density, 
+		    Treelog& );
   void output (Log& log) const;
 
   // Create.
@@ -53,12 +54,13 @@ struct Rootdens_AP : public Rootdens
 };
 
 void
-Rootdens_AP::set_density (Treelog& /*msg*/,
-                          std::vector<double>& Density,
-                          const Geometry& geo, 
-                          const double Depth, const double /*PotRtDpt*/,
-                          const double WRoot, const double DS)
+Rootdens_AP::set_density (const Geometry& geo, 
+                          const double SoilDepth, const double CropDepth,
+                          const double WRoot, const double DS,
+			  std::vector<double>& Density,
+                          Treelog&)
 {
+  const double Depth = std::min (SoilDepth, CropDepth);
   a = a_DS (DS);
   static const double m_per_cm = 0.01;
   const double LengthPrArea = m_per_cm * SpRtLength * WRoot; // [cm/cm^2]

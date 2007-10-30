@@ -42,10 +42,10 @@ struct Rootdens_G_P : public Rootdens
 
   // Simulation.
   static double density_distribution_parameter (double a);
-  void set_density (Treelog&, std::vector<double>& Density,
-		    const Geometry& geo, 
-		    double Depth, double PotRtDpt,
-		    double WRoot, double DS);
+  void set_density (const Geometry& geo, 
+		    double SoilDepth, double CropDepth,
+		    double WRoot, double DS,
+		    std::vector<double>& Density, Treelog&);
   void output (Log& log) const;
 
   // Create.
@@ -111,30 +111,30 @@ Rootdens_G_P::density_distribution_parameter (double a)
 }
 
 void
-Rootdens_G_P::set_density (Treelog& msg,
-			   std::vector<double>& Density,
-			   const Geometry& geo, 
-			   const double Depth, const double PotRtDpt,
-			   const double WRoot, const double)
+Rootdens_G_P::set_density  (const Geometry& geo, 
+			    double SoilDepth, double CropDepth,
+			    double WRoot, double /* DS */,
+			    std::vector<double>& Density, Treelog& msg)
 {
+  const double Depth = std::min (SoilDepth, CropDepth);
   // Dimensional conversion.
   static const double m_per_cm = 0.01;
 
-  const double MinLengthPrArea = (DensRtTip * 1.2) * PotRtDpt;
+  const double MinLengthPrArea = (DensRtTip * 1.2) * CropDepth;
   const double LengthPrArea
     = std::max (m_per_cm * SpRtLength * WRoot, MinLengthPrArea); // [cm/cm^2]
   
   // We find a * depth first.
   const double ad = density_distribution_parameter (LengthPrArea / 
-						    (PotRtDpt * DensRtTip));
+						    (CropDepth * DensRtTip));
   // We find L0 from a d.
   //
   // L0 * exp (-a d) = DensRtTip
   // => L0 = DensRtTip / exp (-a d)
   L0 = DensRtTip * exp (ad);	//  1 / exp (-x) = exp (x)
-  a = ad / PotRtDpt;
+  a = ad / CropDepth;
 
-  if (Depth < PotRtDpt)
+  if (Depth < CropDepth)
     {
       double Lz = L0 * exp (-a * Depth);
       a = density_distribution_parameter (LengthPrArea / (Depth * Lz)) / Depth;

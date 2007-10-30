@@ -366,7 +366,7 @@ RootSystem::tick_daily (const Geometry& geo, const Soil& soil,
 void
 RootSystem::set_density (const Geometry& geo, 
 			 const double WRoot, const double DS, Treelog& msg)
-{ rootdens->set_density (msg, Density, geo, Depth, PotRtDpt, WRoot, DS); }
+{ rootdens->set_density (geo, MaxPen, PotRtDpt, WRoot, DS, Density, msg); }
 
 void
 RootSystem::full_grown (const Geometry& geo, 

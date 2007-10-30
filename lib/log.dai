@@ -1796,6 +1796,9 @@ sum of all chemicals will be logged."
   (when daily)
   (entries ;; Year Month MDay
            (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Prod WRoot)
+                   (spec fixed Production WRoot))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
                          Phenology DS)
                    (spec phenology default DS))
            (number (path column "${column}" Vegetation crops crops "${crop}" 
@@ -1803,10 +1806,29 @@ sum of all chemicals will be logged."
                    (spec fixed RootSystem Depth))
            (number (path column "${column}" Vegetation crops crops "${crop}" 
                          Root rootdens "*" a)
-                   (spec rootdens "Gerwitz+Page74" a))
+                   (spec rootdens GP1D a))
            (number (path column "${column}" Vegetation crops crops "${crop}" 
                          Root rootdens "*" L0)
-                   (spec rootdens "Gerwitz+Page74" L0))))
+                   (spec rootdens GP1D L0))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" k)
+                   (spec rootdens GP1D k))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "10 cm")
+		    (height -10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "50 cm")
+		    (height -50 [cm]))
+	   (interval (path column "${column}" Vegetation crops crops "${crop}" 
+			   Root Density)
+		     (spec fixed RootSystem Density)
+		     (tag "0-1 m")
+		     (from  0 [cm])
+		     (to -100 [cm]))))
 
 (deflog "Bioclimate" column
   (where "bioclimate.dlf")

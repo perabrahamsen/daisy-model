@@ -915,15 +915,11 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
   log_select.h log.h border.h alist.h destination.h scope.h run_Qt.h \
   run.h treelog_text.h treelog.h program.h metalib.h library.h \
   librarian.h block.h syntax.h plf.h assertion.h path.h
-ui_Qt_read${OBJ}: ui_Qt_read.C ui_Qt_read.h ui_Qt.h ui.h model.h symbol.h \
-  vis_Qt.h toplevel.h time.h program.h run.h metalib.h library.h \
-  librarian.h block.h syntax.h treelog.h plf.h alist.h assertion.h \
-  memutils.h path.h
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
 ui${OBJ}: ui.C ui.h model.h symbol.h toplevel.h treelog_text.h treelog.h \
-  librarian.h block.h syntax.h plf.h alist.h
+  librarian.h block.h syntax.h plf.h alist.h assertion.h
 reaction${OBJ}: reaction.C reaction.h model.h alist.h symbol.h block.h \
   syntax.h treelog.h plf.h librarian.h
 scopesel${OBJ}: scopesel.C scopesel.h model.h scope.h symbol.h assertion.h \
@@ -1004,7 +1000,8 @@ pedo${OBJ}: pedo.C pedo.h model.h symbol.h soil.h units.h block.h syntax.h \
 transform${OBJ}: transform.C transform.h model.h symbol.h block.h syntax.h \
   treelog.h plf.h librarian.h
 rootdens${OBJ}: rootdens.C rootdens.h model.h symbol.h block.h syntax.h \
-  treelog.h plf.h alist.h check.h librarian.h
+  treelog.h plf.h alist.h check.h librarian.h program.h run.h iterative.h \
+  mathlib.h assertion.h
 select${OBJ}: select.C select.h destination.h symbol.h model.h units.h \
   volume.h condition.h alist.h block.h syntax.h treelog.h plf.h \
   geometry.h mathlib.h assertion.h number.h scope_id.h scope.h metalib.h \
@@ -1303,6 +1300,9 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+rootdens_GP1D${OBJ}: rootdens_GP1D.C rootdens.h model.h symbol.h block.h \
+  syntax.h treelog.h plf.h geometry.h mathlib.h assertion.h log.h \
+  border.h alist.h check.h librarian.h iterative.h
 number_plf${OBJ}: number_plf.C number.h symbol.h model.h syntax.h treelog.h \
   alist.h plf.h units.h memutils.h block.h librarian.h submodeler.h \
   assertion.h
