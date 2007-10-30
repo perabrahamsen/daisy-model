@@ -13,10 +13,11 @@
 \begin{document}
 
 \title{\textbf{Initializing organic matter pools}}
-\author{Per Abrahamsen, Søren Hansen and Henrik Svendsen\\
-    The Royal Veterinary and Agricultural University\\
-    Department of Agricultural Sciences\\
-    Laboratory for Agrohydrology and Bioclimatology
+\author{Per Abrahamsen, Birgitte Gjettermann and Søren Hansen\\
+    University of Copenhagen, Faculty of Life Sciences,\\
+    Department of Agricultural Sciences. \\
+    Højbakkegård Allé 9, DK-2630 Taastrup, Denmark.
+
 }
 \date{\today}
 \maketitle
@@ -27,63 +28,65 @@
   term change in humus content of agricultural soil.  However, these
   pools do not correspond to measurable physical quantities, and are
   therefore difficult for a non-expert to understand and use, and
-  fragile with respect to changes in the model.  An alternative
-  sometimes used is to assume the organic matter is in a state of
-  equilibrium.  Unfortunately, the time to reach equilibrium is often
-  measured in centuries, so this assumptions is unlikely to hold true.
-  For the same reason, the use of a warmup period cannot replace the
-  need for a good initial partitioning.  In this paper we propose a
-  milder assumption, namely a quasi-equilibrium where all but the
-  slowest pool is in equilibrium with the amount of carbon input.
-  This assumption allows the non-expert user to initialize the model,
-  and is robust with regard to model changes.
+  fragile with respect to changes in the model. An alternative
+  sometimes used approach is to assume that organic matter is in a
+  state of equilibrium. Unfortunately, the time to reach equilibrium
+  is often measured in centuries, so this assumptions is unlikely to
+  hold true.  For the same reason, the use of a warm-up period cannot
+  replace the need for a good initial partitioning. In this paper we
+  propose a milder assumption, namely a quasi-equilibrium where all
+  except for the slowest pool is in equilibrium with the amount of
+  carbon input.  This assumption allows the non-expert user to
+  initialize the model, and is robust with regard to model changes.
 \end{abstract}
 
 \tableofcontents
 
-\section{Soil organic matter modelling}
+\section{Introduction}
+\subsection{Soil organic matter modelling}
 
-It is conventional to divide the organic matter in the soil into three
-fractions.  First we have the recently entered organic matter.  For a
-cultivated soil, this might include organic fertilizer, crop
-residuals, including rhizodeposition and dead leaves incorporated to
-the soil by earthworms.  This fraction is called \emph{added organic
-  matter}, or \textsc{aom}.  Then we have the \emph{soil microbial
-  biomass}, or \textsc{smb}, the living part of the organic matter,
-excluding roots.  Finally we have the humus, the \emph{soil organic
-  matter} (\textsc{som}), which can no longer be traced back to its
-origin.  The dynamics of the system consist of input in the form of
-new added organic matter, and turnover in the form the soil biomass
-eating the other matter (and itself).
+It is conventional and very used to divide the organic matter in the
+soil into three fractions. First we have the recently entered organic
+matter. For a cultivated soil, this might include organic fertilizer,
+crop residuals, including rhizodeposition and dead leaves incorporated
+to the soil by earthworms. This fraction is called \emph{added organic
+matter}, or \textsc{aom}. Then we have the \emph{soil microbial
+biomass}, or \textsc{smb}, the living part of the organic matter,
+excluding roots. Finally we have the humus, the \emph{soil organic
+matter} (\textsc{som}), which can no longer be traced back to its
+origin. The dynamics of the system consist of input in the form of new
+added organic matter, and turnover in the form of the soil biomass
+degrading the other organic matter pools (and itself).
 
 In numeric models, these fractions may be further divided into smaller
 pools, the content of each pool assumed by the model to have uniform
-properties, e.g.\ similar turnover rate and C/N ratio.  Having two
+properties, e.g.\ similar turnover rate and C/N ratio. Having two
 \textsc{som} and two \textsc{smb} pools allows a well calibrated model
 to capture both the short term (see SHORT-TERM-NEED-2-POOLS-PAPER) and
-long term (LONG-TERM-NEED-2-POOLS-PAPER) dynamics of the system.  If
+long term (LONG-TERM-NEED-2-POOLS-PAPER) dynamics of the system. If
 you are only interested in accuracy on a single time scale, less pools
-may be needed.  The number of \textsc{aom} pools needed also depends
-on what you are simulating.  For batch experiments and some long time
-scenarios, a single pool may be enough.  To simulate input sources
-from real farming, two pools per source are in general needed.
+may be needed. The number of \textsc{aom} pools needed also depends on
+what you are simulating. For batch experiments and some long time
+scenarios, a single pool may be enough. To simulate input sources from
+real farming, two pools per source are in general needed.
 
-\section{\Daisy{}}
+\subsection{\Daisy{}}
 
 In several comparisons \citep{vereecken91-compar, willigen91-compar,
-  diekkruger95-compar, smith97-compar} \daisy{} \citep{daisy-def,
-  daisy-fertilizer, daisy-ems} has been among the best models for both
+diekkruger95-compar, smith97-compar} \daisy{} \citep{daisy-def,
+daisy-fertilizer, daisy-ems} has been among the best models for both
 short and long term predictions of soil matter, and \daisy{} will be
-the reference for the rest of this article.  Apart from soil organic
+the reference for the rest of this article. Apart from soil organic
 matter, \daisy{} also simulates a number of other processes outside
 the scope of this article, such as water, heat and nitrogen dynamics
 in the soil, as well as bioclimate, crop development and management.
 
 The purpose of the \daisy{} model is to simulate real farming
-practice, both on the short and the long term.  Thus, we get a system
+practice, both on the short and the long term. Thus, assuming a system
 with two pools for each of \textsc{som} and \textsc{smb}, and two
-pools for each type of fertilizer applied and crop residual left on the
-field.  The original model is depicted in figure~\ref{fig:om1}.
+pools of \textsc{aom} for each type of fertilizer applied and crop
+residual left on the field. The original organic matter model in
+\daisy{} is depicted in figure~\ref{fig:om1}.
 
 \begin{figure}[htbp]
   \centering
@@ -94,58 +97,64 @@ field.  The original model is depicted in figure~\ref{fig:om1}.
 \end{figure}
 
 Figure~\ref{fig:om1} has 6 visible boxes, corresponding to the
-\textsc{som}, \textsc{smb} and \textsc{aom} pools.  If you look at the
-\textsc{som1} pool at the bottom left corner, you will see that it has
-one line going out from it, marked with the text ``703y''.  This
-indicate the speed the pool is being eaten by the soil biomass.  All
-the pools have such a fully drawn outgoing line.  The amount of carbon
-being eaten is directly proportional with the size of the pool.  We
-call this the \emph{turnover rate}.  The number is the corresponding
-halftime.  The \textsc{som1} pool thus have a halftime of 703 years,
-meaning if there was no input it would be half the original size after
-703 years.  For some pools this time is given in days, e.g.\ the
-\textsc{smb2} pool has a turnover halftime of 69 days.
+\textsc{som}, \textsc{smb}, and \textsc{aom} pools, respectively.All
+the pools have a fully drawn outgoing line. The amount of carbon
+turned over and decomposed is directly proportional with the size of
+the pool. We call this the \emph{turnover rate}. Looking at the
+\textsc{som1} pool at the bottom left corner, it is noted that it has
+one outgoing line, marked with the text ``703y''. This indicate the
+turnover rate of this particular pool by the soil microbial biomass
+and the number is the corresponding halftime. Thus, the \textsc{som1}
+pool have a halftime of 703 years, meaning if there was no input it
+would be half the original size after 703 years. For some pools this
+time is given in days, e.g.\ the \textsc{smb2} pool has a turnover
+halftime of 69 days.
   
 If we follow the line from \textsc{som1} it splits into two parts.
-40\% is lost in digestion as CO$_2$, the rest is going to be new
-biomass in the \textsc{smb1} pool.  If we look at the line going out
-of the \textsc{som2} pool, we see that only 90\% of the carbon not
-lost as CO$_2$ become biomass, the remaining 10\% end up in
-\textsc{som1}.  The biomass pools have a turnover rate like the other
-pools, but also a maintenance rate.  This reflects the cost of staying
-alive, and is indicated by a stippled line out of the \textsc{smb}
-pools.  The rates and even the number of \textsc{aom} pools are
-variable, the rates given here are just examples.  Also, there can be
-many sets of added organic matter pools, each set corresponding to
-particular fertilizer or residual, and each with its own parameters.
+40\% is lost in digestion as CO$_2$, the rest is allocated to the
+microbial biomass in the \textsc{smb1} pool. Looking at the line going
+out from the \textsc{som2} pool, we see that only 90\% of the carbon
+not lost as CO$_2$ are allocated to the microbial biomass, the
+remaining 10\% end up in \textsc{som1}. Besides a turnover rate, the
+two pools of microbial biomasses have a maintenance rate. This rate
+reflects the cost of staying alive, and is indicated by a stippled
+line out of the \textsc{smb} pools. In general, the rates and even the
+number of \textsc{aom} pools are variable, the rates given here are
+just examples. Also, there can be many sets of added organic matter
+pools, each set corresponds to a particular fertilizer or residual
+with its specific parameters.
 
-What isn't depicted is the abiotic factors: clay, heat and moisture.
-The halftimes given correspond to 0\% clay, 10$^\circ$C and field
-capacity (pF 2).  The halftimes will be longer with more clay, lower
-temperature, or dryer soil.  They will be shorter with higher
-temperature.
+The coefficients of the turnover rate and maintenance of the pools is
+affected by abiotic factors as clay conten in the soil, soil
+temperature and moisture. The halftimes listed in figure~\ref{fig:om1}
+corresponds to 0\% clay, 10$^\circ$C and field capacity (pF 2). The
+halftimes will increase with increasing clay content, decreasing
+temperature, or decreasing soil water content. Further information of
+the abiotic factors included in the organic matter model in \daisy{}
+is given in (XXXX).
 
-\section{Evolution of the Daisy model}
+\subsection{Evolution of the Daisy model}
 
-The \daisy{} software allows the user to adjust all of these
-parameters.  It also allows the user to specify the number of \textsc{som}
-and \textsc{smb} pools, as well as the number of \textsc{aom} pools for each
-fertilizer application and each crop residual type.  It thus provides
-a good basis for experimentation.
+The \daisy{} software allows the user to adjust the turnover rates,
+the rate of maintenance, and directions of flow. It also allows the
+user to specify the number of \textsc{som} and \textsc{smb} pools, as
+well as the number of \textsc{aom} pools for each fertilizer
+application and each crop residual type. Thus, the model provides a
+good basis for experimentation.
 
-The first such experimental change that made it back into \daisy{} was
-made by Torsten Müller \citep{mueller-smb}, who adjusted the turnover
-rates of the \textsc{smb} pools so the biomass content of the soil
-better matched the levels measured at the fields.  The change did not
-affect the long time dynamics of the system.  The second such change
-was made by Sander Bruun \citep{daisy-somnew}.  This was a complete
-recalibration that took into account the carbon input from
-rhizodepositions.  This change was more radical, involving both
-turnover rates and directions of flow, and made the system much more
-adaptable to new levels of input, another effect which has also been
-observed empirically \citep{dk-humus-change}.
+The first such experimental change was made by Müller
+\citep{mueller-smb}, who adjusted the turnover rates of the
+\textsc{smb} pools so the biomass content of the soil matched
+the levels measured at the fields. The change did not affect the long
+time dynamics of the system. The second change in parameterisation was
+made by Bruun \citep{daisy-somnew}. This was a complete recalibration
+that took into account the carbon input from rhizodepositions. This
+change was more radical, involving both turnover rates and directions
+of flow, and made the system much more adaptable to new levels of
+input, another effect which has also been observed empirically
+\citep{dk-humus-change}.
 
-The current model is depicted in figure~\ref{fig:om2}.  The purpose of
+The current model is depicted in figure~\ref{fig:om2}. The purpose of
 the \textsc{som3} pool in that figure will be explained later.
 
 \begin{figure}[htbp]
@@ -158,17 +167,16 @@ the \textsc{som3} pool in that figure will be explained later.
 
 Some of the experimental changes affecting soil organic matter that we
 are currently working on, and which may be included in future versions
-of \daisy{}, are dissolved organic matter \citep{bgj-dom}, another
+of \daisy{}, are dissolved organic matter \citep{bgj-dom}. Another
 recalibration based on a larger experimental database and with special
-focus on the effect of clay \citep{biomod,biomod2}, and some wishlist
-items include phosphor dynamics \citep{bgj-ptr} and a calibration for
-forest soil.  The conclusion is that the model has changed in the
-past, and will continue to change in the future.
+focus on the effect of clay \citep{biomod,biomod2}, and a calibration
+for forest soil (XXX). The conclusion is that the model has changed in
+the past, and will continue to change in the future.
 
-\section{Expanding user base}
+\subsection{Expanding user base}
 
 The original development of \daisy{} was founded by the Danish
-environmental protection agency \citep{daisy-def}, and the first
+Environmental Protection Agency \citep{daisy-def}, and the first
 non-research use was made by expert users who evaluated the national
 environmental plans for limiting nitrogen contamination of groundwater
 and surface water (see VMPuse).  Since then, \daisy{} has been used in
@@ -176,95 +184,65 @@ other parts of the environmental and agricultural agencies (see
 \citep{novana} XXX), as well as increasingly by local authorities for
 evaluating regional plans (see Århus Amt og XXX), and recently also
 for evaluation of applications for changed farm practice at an
-individual farm level (see VVM, \citep{plantinfo-daisy}).  For the last
+individual farm level (see VVM, \citep{plantinfo-daisy}). For the last
 case, \daisy{} has also been used by consulting agencies representing
 ``the other side'', namely farmers seeking permission to change
 farming practice.
 
-The effect of this increased use has been that we no longer can rely
-on the users being experts.  Therefore, a project was started in order
+The effect of this increased use has been that we can no longer rely
+on the users being experts. Therefore, a project was started in order
 to provide standardized procedures for \daisy{} simulations (see XXX).
 As part of this project, most components of \daisy{} was evaluated in
 order to find parameters and submodels which could be initialized
-automatically from default values, or from other parameters.  These
+automatically from default values, or from other parameters. These
 parameters and submodels are still available to the expert user, but
-will be hidden for the user who do not have the expertise or data
-available.  The result is that the software now appears much simpler
-to the user, even though no substantial changes to the model have been
+are hidden for the user who do not have the expertise or data
+available. The result is that the software now appears much simpler to
+the user, even though no substantial changes to the model have been
 made.
 
-The partition of the organic matter into the various soil pools have
-been a particular stumbling block for most users, partly because it
-does not reflect an easily identifiable property of the system being
-modelled.  
+\subsection{Equilibrium assumptions}
 
-\section{Equilibrium}
+Initialisation of the partition of the organic matter into the various
+soil pools have been a particular stumbling block for most
+users. Partly because it does not reflect an easily identifiable
+property of the system being modelled. It is common to use an
+equilibrium assumption for initializing models where measurements are
+not available. For example, in \daisy{} we assume that the soil water
+in the bottom of the unsaturated zone is in equilibrium with the
+groundwater, as specified by Darcy's equation.  There are two
+conditions where equilibrium is a good assumption: 1) when the system
+quickly reach equilibrium compared to the external imposed changes, 2)
+when the dynamic of the system quickly dominate over the initial
+condition. The assumption of an initial equilibrium is good when a
+reasonable initial state rather than a correct one is needed in the
+model.
 
-It is common to use an equilibrium assumption for initializing models
-where measurements are not available.  For example, in \daisy{} we
-assume that the soil water in the bottom of the unsaturated zone is in
-equilibrium with the groundwater, as specified by Darcy's equation.
-There are two reasons equilibrium is often a good assumption.  For
-some systems, it will be correct most of the time, because they quickly
-reach equilibrium compared to the externally imposed changes.  In other
-cases, the dynamic of the system quickly dominate over the initial
-condition, so an equilibrium is good when we just need a reasonable
-initial state, rather than a correct one.
+As part of the recalibration work conducted by Bruun
+\citep{daisy-somnew}, they found that equilibrium between the
+\textsc{som1} and \textsc{som2} was obtained very slowly up to XX
+years for a XX system. They also found that the ratio between the
+\textsc{som1} and \textsc{som2} for a system in equilibrium would be
+49\% vs 51\%. Since \daisy{} after this recalibration required the
+users to readjust the partitioning between \textsc{som1} and
+\textsc{som2}, there was a strong tendency that users just picked the
+equilibrium values.
 
-As part of Sander's recalibration work, he also found that the ratio
-between the \textsc{som1} and \textsc{som2} for a system in
-equilibrium will be 49\% vs 51\%.  Since \daisy{} after his
-recalibration required users to readjust the partitioning between
-\textsc{som1} and \textsc{som2}, there was a strong tendency that
-users just picked the equilibrium values.
+Thus, the most used initialization condition of soil organic matter
+pools, the equilibrium assumption, has been shown to be inaccurate in
+many soil systems. As a consequence, a new initialisation method of
+the soil organic matter pools is needed. The method should be robust
+with regard to changes in the model or model parameterization, and at
+the same time be expressible in terms of physical properties the user
+can understand.
 
-\section{Long term simulations}
 
-As part of the standardization project mentioned earlier, We used
-\daisy{} to simulate the effect on soil organic matter of changing
-farming practice.  Figure~\ref{fig:clayom} shows humus content for a
-system that goes from equilibrium at a high level of carbon input, to
-equilibrium at a low level of carbon input.  Danish farming practice
-has been used, as well as Danish climate and soil.  The soil has a for
-Danish conditions high clay content (12\%).  Figure~\ref{fig:clayom}
-also shows the simulated\footnote{Simulated values are on the dotted
-  line.  The $\Diamond$'s and $+$'s indicate the initialization values
-  for the current humus level chosen by two variants of the proposed
-  quasi-equilibrium.} \textsc{som1} fraction of total \textsc{som}.
-Finally, figure~\ref{fig:sandom} shows the a simulation on a COARSE
-SANDY SOIL going from a low to high input equilibrium.
+\subsection{Hypothesis}
 
-\begin{figure}[htbp]
-  \centering
-  \input{clayh2l.tex}
-  \caption{Long term simulation of organic matter content (left axis)
-    and \textsc{som1} fraction (right axis) from changing from high to
-    low input on a CLAYISH LOAM.}
-  \label{fig:clayom}
-\end{figure}
 
-\begin{figure}[htbp]
-  \input{sandl2h.tex}
-  
-  \caption{Long term simulation of organic matter content (left axis)
-    and \textsc{som1} fraction (right axis) from changing from low to
-    high input on a SANDY SOIL.}
-  \label{fig:sandom}
-\end{figure}
 
-As can be seen, the time to reach a new equilibrium after a change in
-farming practice can be several centuries, which makes it safe to
-assume that Danish farming land is not in equilibrium.  At such a time
-scale, not only farming practice but also climate is going to change.
-
-As a conclusion, we need a way to initialize the soil organic matter
-that is robust with regard to changes in the model or model
-parameterization, and at the same time expressible in terms of
-physical properties the user can understand.  And we cannot use the
-most obvious initialization condition, namely an equilibrium
-assumption.
-
-\section{Basic equations}
+\section{Methodology}
+\subsection{Basic equations}
 
 In order to find a better way to initialize the organic matter pools,
 we will start by looking at the four equations describing their
@@ -307,7 +285,7 @@ initialization problem in a way that is robust with regard to changes
 in the model.  The description is also robust with regard to the
 number of pools\footnote{The generalized form used by the \daisy{}
   program is:
-  \begin{displaymath}
+  \begin{equation}
     \begin{array}{rclcr}
       \Delta\mbox{\textsc{smb}}i &=& \displaystyle
       \sum_{k=1}^{\mbox{\tiny\#\textsc{smb}}} a_{i,k}\,\mbox{\textsc{smb}}k + 
@@ -320,7 +298,7 @@ number of pools\footnote{The generalized form used by the \daisy{}
       f_j \Delta\mbox{\textsc{aom}} 
       &;&j = 1\ldots\mbox{\#\textsc{som}}\nonumber
     \end{array}
-  \end{displaymath}
+  \end{equation}
 }, adding a new pool will add one more equation, and two new unknowns.
 
 Back to the two pool example.  We have four equations and nine
@@ -333,7 +311,7 @@ variables.
   \mbox{\textsc{total}} = \mbox{\textsc{smb1}} + \mbox{\textsc{smb2}}
   + \mbox{\textsc{som1}} + \mbox{\textsc{som2}} + \mbox{\textsc{aom}}
 \end{equation}
-\textsc{total} is measured.  \mbox{\textsc{aom}}, the initial content
+\textsc{total} is measured. \mbox{\textsc{aom}}, the initial content
 of added organic matter, is given a default value corresponding to
 typical root residuals left from a crop.  We now need four more
 equations\footnote{Everybody: Four more equations!  Four more
@@ -342,10 +320,10 @@ equations\footnote{Everybody: Four more equations!  Four more
 \section{Quasi-equilibrium}
 
 The equilibrium assumption corresponds to adding these four equations: 
-\begin{displaymath}
+\begin{equation}
   \Delta\mbox{\textsc{smb1}} = \Delta\mbox{\textsc{smb2}} 
   = \Delta\mbox{\textsc{som1}} = \Delta\mbox{\textsc{som2}} = 0
-\end{displaymath}
+\end{equation}
 Even though we earlier argued that it was not good for initializing
 the system, we can use it to obtain an estimate of
 $\Delta\mbox{\textsc{aom}}$, the carbon input level required to
@@ -374,37 +352,36 @@ Figure~\ref{fig:clayom} and~\ref{fig:sandom} shows that the fast
 input much faster than the slow pool (\textsc{som1}), the hump in each
 graph is due to that effect.
 
-\section{User calibration}
+\subsection{User calibration}
 
 We also have a model independent knob for users who want to calibrate
 the system.  If the user can estimate the total rate of change in
 carbon content, i.e.\ is the soil gaining or losing organic matter
 with the specified input, we can substitute
 equation~\ref{eq:fastpooleq} with
-\begin{displaymath}
+\begin{equation}
   \Delta\mbox{\textsc{smb1}} + \Delta\mbox{\textsc{smb2}} 
   + \Delta\mbox{\textsc{som1}} + \Delta\mbox{\textsc{som2}} = v
-\end{displaymath}
+\end{equation}
 where $v$ is the user specified change in carbon content.  Since our
 users are generally more concerned with nitrogen than with carbon, we
 ask them to specify the \emph{background mineralization} ($w$), which
 is the amount of nitrogen the rest of the system gets or loses from
 the soil.  The equation is then
-\begin{displaymath}
+\begin{equation}
   \frac{\Delta\mbox{\textsc{smb1}}}{{C/N}_{\mbox{\small\textsc {smb1}}}}
   + \frac{\Delta\mbox{\textsc{smb2}}}{{C/N}_{\mbox{\small\textsc{smb2}}}}
   + \frac{\Delta\mbox{\textsc{som1}}}{{C/N}_{\mbox{\small\textsc{som1}}}}
   + \frac{\Delta\mbox{\textsc{som2}}}{{C/N}_{\mbox{\small\textsc{som2}}}}
   = w
-\end{displaymath}
+\end{equation}
 Note that the simulated background mineralization will only be the
-specified value ($w$) if the simulated carbon input also corresponds to
-the specified value ($u$).  If we are simulating the effect of a
+specified value ($w$) if the simulated carbon input also corresponds
+to the specified value ($u$).  If we are simulating the effect of a
 proposed change in management practice, this will not be the
-case\footnote{Another caveat is that \daisy{} treat the $C/N$ for
-  matter entering the \textsc{som} pools independently of the $C/N$
-  leaving them.  The equation will only be correct when the two are
-  close.}.
+case. Another caveat is that \daisy{} treat the $C/N$ for matter
+entering the \textsc{som} pools independently of the $C/N$ leaving
+them. The equation will only be correct when the two are close.
 
 In conclusion, we can now initialize the soil organic matter system
 from two or three numbers supplied by the user.  The two mandatory
@@ -417,7 +394,7 @@ knowledge of the model, and can be estimated by the user, for example
 from the use of \daisy{} simulations.  None of the these numbers need
 to be changed when the model itself is changed.
 
-\section{Abiotic factors}
+\subsection{Abiotic factors}
 
 In the equations~\ref{eq:dsmb1} to~\ref{eq:dsom2} we used a large number
 of constants, without indicating how we calculate them.  Here is the
@@ -465,7 +442,7 @@ logging the product of factors in a realistic simulation, \daisy{} can
 be used to calculate the combined effect.  From that, the user can
 choose values for $T$ and $\psi$ that give the same effect.
 
-\section{Inert organic matter}
+\subsection{Inert organic matter}
 
 The current \daisy{} model calibration is based primarily on
 measurements on agricultural topsoil \citep{daisy-somnew,mueller-smb},
@@ -488,7 +465,8 @@ this assumption.  For topsoil, the user can explicitly park some of
 the humus in the \textsc{som3} pool, if he has reason to believe it to
 be necessary.
 
-\section{Comparisons}
+\section{Results and Discussion}
+\subsection{Comparisons}
 
 PA: Diskution af fig3 og 4 quasi-eq
 
@@ -496,7 +474,55 @@ PA: Overvej initialisering med ``background mineralization = 0''.
 
 PA: Ref til \citep{daisy-init}.
 
-\section{Limitations}
+
+
+\subsection{Long term simulations}
+NOTER As part of the standardization project mentioned earlier,
+\daisy{} was used to simulate the effect of changing farming practice
+on soil organic matter.  Figure~\ref{fig:clayom} shows humus content
+for a system that goes from equilibrium at a high level of carbon
+input, to equilibrium at a low level of carbon input. Danish farming
+practice has been used, as well as Danish climate and soil. The soil
+has a for Danish conditions a relative high clay content (12\%).
+Figure~\ref{fig:clayom} also shows the simulated \textsc{som1}
+fraction of total \textsc{som}. Finally, figure~\ref{fig:sandom} shows
+that a simulation on a COARSE SANDY SOIL going from a low to high
+input equilibrium.
+
+\begin{figure}[htbp]
+  \centering
+  \input{clayh2l.tex}
+  \caption{Long term simulation of organic matter content (left axis)
+    and \textsc{som1} fraction (right axis) from changing from high to
+    low input on a CLAYISH LOAM.Simulated values are on the dotted
+    line. The $\Diamond$'s and $+$'s indicate the initialization
+    values for the current humus level chosen by two variants of the
+    proposed quasi-equilibrium.}
+  \label{fig:clayom}
+\end{figure}
+
+\begin{figure}[htbp]
+  \input{sandl2h.tex}
+  
+  \caption{Long term simulation of organic matter content (left axis)
+    and \textsc{som1} fraction (right axis) from changing from low to
+    high input on a SANDY SOIL.Simulated values are on the dotted
+    line. The $\Diamond$'s and $+$'s indicate the initialization
+    values for the current humus level chosen by two variants of the
+    proposed quasi-equilibrium.}
+  \label{fig:sandom}
+\end{figure}
+
+As can be seen, the time to reach a new equilibrium after a change in
+farming practice can be several centuries, which makes it safe to
+assume that Danish farming land is not in equilibrium. At such a time
+scale, not only farming practice but also climate is going to change.
+
+
+
+\subsection{Abiotic factors}
+
+\subsection{Limitations}
 
 When using the current input levels, the quasi-equilibrium assumption
 will give very poor, even physically impossible estimates right after

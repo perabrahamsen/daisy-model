@@ -160,9 +160,9 @@ Daisy::tick_after (Treelog& msg)
 void
 Daisy::output (Log& log) const
 {
+  output_submodule (*field, "column", log);
   if (weather.get ())
     output_derived (weather, "weather", log);
-  output_submodule (*field, "column", log);
   output_vector (harvest, "harvest", log);
   output_derived (action, "manager", log);
 }
