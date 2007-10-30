@@ -408,7 +408,7 @@ static struct GnuplotXYSyntax
     GnuplotBase::load_syntax (syntax, alist);
 
     alist.add ("description",
-               "Generate a gnuplot graph with times series."); 
+               "Generate a gnuplot graph with up to two x-axes."); 
 
     syntax.add ("xmin", Syntax::User (), Syntax::OptionalConst, "\
 Fixed lowest value on left x-axis.\n\

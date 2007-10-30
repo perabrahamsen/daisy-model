@@ -1,3 +1,7 @@
+2007-10-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnuplot_base.C: New parameter 'device' to specify output device.
+
 2007-10-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* rootdens_GP1D.C: New model.

@@ -70,15 +70,16 @@ void
 GnuplotBase::plot_header (std::ostream& out) const
 { 
   // Header.
+  if (file != "screen")
+    out << "set output " << quote (file) << "\n";
+  else
+    out << "unset output\n";
   if (device != "screen")
-    out << "set output " << quote (file) << "\n"
-	<< "set terminal " << device << "\n";
+    out << "set terminal " << device << "\n";
   else if (getenv ("DISPLAY"))
-    out << "unset output\n"
-        << "set terminal x11\n";
+    out << "set terminal x11\n";
   else 
-    out << "unset output\n"
-        << "set terminal windows\n";
+    out << "set terminal windows\n";
   if (title != "")
     out << "set title " << quote (title) << "\n";
   if (size.x > 0.0)
@@ -88,8 +89,8 @@ GnuplotBase::plot_header (std::ostream& out) const
 std::string 
 GnuplotBase::file2device (const std::string& file)
 {
-  if (file == "screen")
-    return "screen";
+  if (file == "screen" || file == "windows" || file == "x11")
+    return file;
   if (file.size () < 5 || file[file.size () - 4] != '.')
     return "unknown";
 
@@ -110,7 +111,7 @@ GnuplotBase::file2device (const std::string& file)
 GnuplotBase::GnuplotBase (Block& al)
   : Gnuplot (al),
     file (al.name ("where")),
-    device (file2device (file)),
+    device (al.name ("device", file2device (file))),
     extra (al.identifier_sequence ("extra")),
     title (al.name ("title", "")),
     size (al.check ("size")
@@ -153,6 +154,8 @@ the screen instead of being stored in a file.");
   } check_where;
   syntax.add_check ("where", check_where);
   alist.add ("where", "screen");
+  syntax.add ("device", Syntax::String, Syntax::OptionalConst, "\
+Output device.  By default, this is derived from the file extenstion.");
   syntax.add ("extra", Syntax::String, Syntax::Const, 
               Syntax::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the plot command.\n\

@@ -2180,7 +2180,7 @@ file ``\texttt{another-test.eps}''.
 The \texttt{arithmetic} source mode allows simple arithmetics with
 columns in a single file.
 \begin{verbatim}
-  (defprogram crop gnuplot
+  (defgnuplot crop time
     "Plot crop dry matter partitions."
     (source (arithmetic (file "crop_prod.dlf")
                          (expr WSOrg))
