@@ -48,6 +48,7 @@ public:
   virtual void set_density (const Geometry& geometry, 
 			    double SoilDepth /* [cm] */,
 			    double CropDepth /* [cm] */,
+			    double CropWidth /* [cm] */,
 			    double WRoot /* [g DM/m^2] */, double DS,
 			    std::vector<double>& Density /* [cm/cm^3] */,
 			    Treelog&) = 0;

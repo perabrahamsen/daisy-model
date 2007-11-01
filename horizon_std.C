@@ -30,8 +30,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 
-using namespace std;
-
 struct HorizonStandard : public Horizon
 {
   // Content.
@@ -42,18 +40,18 @@ struct HorizonStandard : public Horizon
   { return texture.fraction_of_minerals_smaller_than (size); }
 
   // Create and Destroy.
-  static const vector<double>& get_limits ();
-  static const vector<double> get_fractions (Block& al);
+  static const std::vector<double>& get_limits ();
+  static const std::vector<double> get_fractions (Block& al);
   static double get_humus (Block& al);
   void initialize (bool top_soil, int som_size, Treelog& msg);
   HorizonStandard (Block& al);
   ~HorizonStandard ();
 };
 
-const vector<double>&
+const std::vector<double>&
 HorizonStandard::get_limits ()
 {
-  static vector<double> USDA_limits;
+  static std::vector<double> USDA_limits;
   if (USDA_limits.size () < 1)
     {
       USDA_limits.push_back (2.0); // Clay < 2 [um]
@@ -63,7 +61,7 @@ HorizonStandard::get_limits ()
   return USDA_limits;
 }
 
-const vector<double>
+const std::vector<double>
 HorizonStandard::get_fractions (Block& al)
 {
   daisy_assert (al.check ("sand") || 
@@ -77,7 +75,7 @@ HorizonStandard::get_fractions (Block& al)
   const double total = sand + silt + clay;
   daisy_assert (total > 0.0);
 
-  vector<double> result;
+  std::vector<double> result;
   result.push_back (clay / total);
   result.push_back (silt / total);
   result.push_back (sand / total);
@@ -171,7 +169,7 @@ distinguish between fine and coarse sand?");
     const double clay =  al.number ("clay");
     const double total = sand + silt + clay;
 
-    if (!isnormal (total) || total <= 0.0)
+    if (!std::isnormal (total) || total <= 0.0)
       {
         err.entry ("There must be some sand, silt or clay in the soil");
         ok = false;

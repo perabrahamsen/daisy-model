@@ -33,25 +33,23 @@
 #include <sstream>
 #include <numeric>
 
-using namespace std;
-
 struct HorizonSystem : public Horizon
 {
   // Types.
   struct System 
   { 
     // Content.
-    const string name;
-    vector<double> limits;
-    vector<string> names;
+    const std::string name;
+    std::vector<double> limits;
+    std::vector<std::string> names;
 
     // Utilities. 
-    const vector<double> get_fractions (Block& al) const;
+    const std::vector<double> get_fractions (Block& al) const;
     bool check_alist (const AttributeList& al, Treelog& err) const;
 
     // Create and destroy.
-    void add (const string& name, double limit);
-    System (const string n)
+    void add (const std::string& name, double limit);
+    System (const std::string n)
       : name (n)
     { }
     void add_to_lib (Model& (*make)(Block&),
@@ -68,8 +66,7 @@ struct HorizonSystem : public Horizon
   // Create and Destroy.
   void initialize (bool top_soil, int som_size, Treelog& msg)
   { initialize_base (top_soil, som_size, texture, msg); }
-  HorizonSystem (const System& system,
-                   Block& al)
+  HorizonSystem (const System& system, Block& al)
     : Horizon (al),
       texture (system.limits, system.get_fractions (al), 
                al.number ("humus"), 0.0)
@@ -78,10 +75,10 @@ struct HorizonSystem : public Horizon
   { }
 };
 
-const vector<double>
+const std::vector<double>
 HorizonSystem::System::get_fractions (Block& al) const
 {
-  vector<double> result;
+  std::vector<double> result;
   for (unsigned int i = 0; i < names.size (); i++)
     result.push_back (al.number (names[i]));
 
@@ -121,7 +118,7 @@ HorizonSystem::System::check_alist (const AttributeList& al,
 }
 
 void 
-HorizonSystem::System::add (const string& name, double limit)
+HorizonSystem::System::add (const std::string& name, double limit)
 {
   daisy_assert (limits.size () < 1 || limits[limits.size () - 1] < limit);
   limits.push_back (limit);
@@ -322,7 +319,7 @@ static struct HorizonSystemSyntax
   static bool check_DIN5 (const AttributeList& al, Treelog& err)
   { return DIN5.check_alist (al, err); }
 
-  static void derive (const string& d, const string& b)
+  static void derive (const std::string& d, const std::string& b)
   {
     const symbol derived = symbol (d);
     const symbol base = symbol (b);

@@ -4,8 +4,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** roodens_GP2D.C
 
-x
-row_width
+test setup
+
+** Real crop width.
 
 ** program GP2D:  Bedre output
 
@@ -14,6 +15,10 @@ row_width
 *** Figur af L*_xz (conturplot)
 
 *** Nævn software
+
+*** Implementation in Daisy.
+
+* MiniOM init
 
 * output
 

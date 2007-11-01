@@ -44,6 +44,7 @@ struct Rootdens_AP : public Rootdens
   // simulation.
   void set_density (const Geometry& geo, 
 		    double SoilDepth, double CropDepth,
+		    const double /* CropWidth [cm] */,
 		    double WRoot, double DS,
 		    std::vector<double>& Density, 
 		    Treelog& );
@@ -56,6 +57,7 @@ struct Rootdens_AP : public Rootdens
 void
 Rootdens_AP::set_density (const Geometry& geo, 
                           const double SoilDepth, const double CropDepth,
+			  const double /* CropWidth [cm] */,
                           const double WRoot, const double DS,
 			  std::vector<double>& Density,
                           Treelog&)

@@ -44,6 +44,7 @@ struct Rootdens_G_P : public Rootdens
   static double density_distribution_parameter (double a);
   void set_density (const Geometry& geo, 
 		    double SoilDepth, double CropDepth,
+		    const double /* CropWidth [cm] */,
 		    double WRoot, double DS,
 		    std::vector<double>& Density, Treelog&);
   void output (Log& log) const;
@@ -113,6 +114,7 @@ Rootdens_G_P::density_distribution_parameter (double a)
 void
 Rootdens_G_P::set_density  (const Geometry& geo, 
 			    double SoilDepth, double CropDepth,
+			    const double /* CropWidth [cm] */,
 			    double WRoot, double /* DS */,
 			    std::vector<double>& Density, Treelog& msg)
 {

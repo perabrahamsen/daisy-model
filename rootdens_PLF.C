@@ -204,6 +204,7 @@ struct Rootdens_DS_Depth : public Rootdens_PLF
   // Simulation.
   void set_density (const Geometry& geo, 
 		    double /* SoilDepth */, double /* CropDepth */,
+		    const double /* CropWidth [cm] */,
 		    double WRoot, double DS,
 		    std::vector<double>& abs_dens, Treelog& msg)
   { get_density (msg, abs_dens, geo, WRoot, DS, -1.0); }
@@ -250,6 +251,7 @@ struct Rootdens_DS_Rel : public Rootdens_PLF
   // Simulation.
   void set_density (const Geometry& geo, 
 		    double SoilDepth, double CropDepth,
+		    const double /* CropWidth [cm] */,
 		    double WRoot, double DS,
 		    std::vector<double>& abs_dens, Treelog& msg)
   { 
@@ -301,6 +303,7 @@ struct Rootdens_Depth_Depth : public Rootdens_PLF
   // Simulation.
   void set_density (const Geometry& geo, 
 		    double SoilDepth, double CropDepth,
+		    const double /* CropWidth [cm] */,
 		    double WRoot, double /* DS */,
 		    std::vector<double>& abs_dens, Treelog& msg)
   { 

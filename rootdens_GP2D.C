@@ -1,4 +1,4 @@
-// rootdens_GP1D.C -- Gerwitz and Page model for calculating root density.
+// rootdens_GP2D.C -- Gerwitz and Page model extended for row crops.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -33,26 +33,29 @@
 
 #include <sstream>
 
-struct Rootdens_GP1D : public Rootdens
+struct Rootdens_GP2D : public Rootdens
 {
   // Parameters.
+  const double row_position;	// Horizontal position of row crops. [cm]
+  const double row_distance;	// Distance betweeen rows. [cm]
   const double DensRtTip;	// Root density at (pot) pen. depth. [cm/cm^3]
   const double DensIgnore;	// Ignore cells below this density. [cm/cm^3]
 
   // Log variables.
-  double a;                     // Form parameter. [cm^-1]
-  double L0;                    // Root density at soil surface. [cm/cm^3]
+  double a_z;                     // Form parameter. [cm^-1]
+  double a_x;                     // Form parameter. [cm^-1]
+  double L00;		      // Root density at row at soil surface. [cm/cm^3]
   double k;			// Scale factor due to soil limit. []
 
-  // LogProduct
-  struct InvW
+  // LogSquare
+  struct InvQ
   {
-    static double derived (const double W)
-    { return std::exp (W) + W * std::exp (W); }
+    static double derived (const double Q)
+    { return 2.0 * Q * std::exp (Q) + sqr (Q) * std::exp (Q); }
     const double k;
-    double operator()(const double W) const
-    { return W * std::exp (W) - k; }
-    InvW (const double k_)
+    double operator()(const double Q) const
+    { return sqr (Q) * std::exp (Q) - k; }
+    InvQ (const double k_)
       : k (k_)
     { }
   };
@@ -73,14 +76,14 @@ struct Rootdens_GP1D : public Rootdens
   void output (Log& log) const;
 
   // Create.
-  Rootdens_GP1D (Block&);
+  Rootdens_GP2D (Block&);
 };
 
 void
-Rootdens_GP1D::set_density (const Geometry& geo, 
+Rootdens_GP2D::set_density (const Geometry& geo, 
 			    const double SoilDepth /* [cm] */, 
 			    const double CropDepth /* [cm] */,
-			    const double /* CropWidth [cm] */,
+			    const double CropWidth /* [cm] */,
 			    const double WRoot /* [g DM/m^2] */, const double,
 			    std::vector<double>& Density  /* [cm/cm^3] */,
 			    Treelog& msg)
@@ -94,7 +97,10 @@ Rootdens_GP1D::set_density (const Geometry& geo,
 
   static const double m_per_cm = 0.01;
 
-  // Root dry matter.
+  // Row distance.
+  const double R = row_distance; /* [cm] */ 
+
+  // Root dry matter per area.
   const double M_r = WRoot /* [g/m^2] */ * m_per_cm * m_per_cm; // [g/cm^2]
 
   // Specific root length.
@@ -102,7 +108,13 @@ Rootdens_GP1D::set_density (const Geometry& geo,
 
   // Root length (\ref{eq:root_length} Eq 3).
   const double l_r = S_r * M_r;	// [cm/cm^2]
-  
+
+  // Root length per half row.
+  const double l_R = l_r * 0.5 * R; // [cm/cm]
+
+  // Crop width.
+  const double r = CropWidth;	// [cm]
+
   // Potential depth.
   const double d_c = CropDepth;	// [cm]
 
@@ -121,19 +133,17 @@ Rootdens_GP1D::set_density (const Geometry& geo,
   // Minimum root length as fraction of total root length.
   const double D = l_m / l_r;	// []
 
-  // Identity: W = - a d_c
-  // Solve: W * exp (W) = -D (\ref{eq:Lambert} Eq 6):
-  // IW (W) = W * exp (W) - D
-  // Since we know D, we can construct the function f.
-  const InvW f (-D);		// [] -> []
+  // Identity: Q = -a_z d_c
+  // Solve: Q^2 * exp (Q) = D (\eqref{eq:logsquare} Eq 23):
+  // IQ (Q) = Q^2 * exp (Q) + D
+  // Since we know D, we can construct the function g.
+  const InvQ g (D);		// [] -> []
 
-  // ... And the derived df/dW
+  // The function g has a local maximum at -2.
+  const double Q_max = -2;	   // []
 
-  // The function f has a local minimum at -1.
-  const double W_min = -1;	   // []
-
-  // There is no solution when -D is below the value at W_min.
-  const double D_max = -W_min * std::exp (W_min); // []
+  // There is no solution when D is above the value at Q_max.
+  const double D_max = sqr (Q_max) * std::exp (Q_max); // []
 
   // Too little root mass to fill the root zone.
   if (D > D_max)
@@ -153,35 +163,65 @@ Rootdens_GP1D::set_density (const Geometry& geo,
       return;
     }
 
-  // There are two solutions to f (W) = 0, we are interested in the
-  // one for W < W_min.  We start with a guess of -2.
-  const double W = Newton (-2.0, f, f.derived);
+  // There are three solutions to g (Q) = 0, we are interested in the
+  // one for Q < Q_max.  We start with a guess of -3.
+  const double Q = Newton (-3.0, g, g.derived);
   
   // Check the solution.
-  const double f_W = f (W);
-  if (!approximate (D, D + f_W))
+  const double g_Q = g (Q);
+  if (!approximate (D, D - g_Q))
     {
       std::ostringstream tmp;
       tmp << "Newton's methods did not converge.\n";
-      tmp << "W = " << W << ", f (W) = " << f_W << ", D = " << D << "\n";
-      (void) Newton (-2, f, f.derived, &tmp);
+      tmp << "Q = " << Q << ", g (Q) = " << g_Q << ", D = " << D << "\n";
+      (void) Newton (-3, g, g.derived, &tmp);
       tmp << "Using uniform distribution.";
       msg.error (tmp.str ());
       uniform (geo, l_r, d_a, Density);
       return;
     }
 
-  // Find a from W (\ref{eq:a-solved} Eq 7):
-  a = -W / d_c;			// [cm^-1]
-  // and L0 from a (\ref{eq:L0-found} Eq 8):
-  L0 = L_m  * std::exp (a * d_c); // [cm/cm^3]
+  // Find a_z from Q (\ref{eq:Qaz} Eq 22):
+  a_z = -Q / d_c;		// [cm^-1]
+
+  // Find a_x from a_z (\ref{eq:aztoax} Eq 20):
+  a_x = (d_c / r) *  a_z;	// [cm^-1]
+
+  // and L00 from a (\ref{{eq:root-integral2} Eq 16):
+  L00 = l_R  * a_z * a_x;	// [cm/cm^3]
+
+  std::ostringstream tmp;
+  tmp << "a_z = " << a_z << " a_x = " << a_x << " L00 = " << L00;
+  msg.message (tmp.str ());
 
   // Fill Density.
   for (size_t cell = 0; cell < cell_size; cell++)
     {
-      // TODO: Using cell average would be better than cell center.
       const double z = -geo.z (cell); // Positive below ground. [cm]
-      Density[cell] = L0 * std::exp (-a * z);
+      double x = geo.x (cell) - row_position; // Rel. pos to row.
+
+      const double row_center = row_distance / 2.0; // Row center. [cm]
+
+      // While x is on the other size of the right center, go one row to the
+      // left.
+      while (x > row_center)
+	x -= row_distance;
+
+      // While x is on the other size of the left center, go one row to the
+      // right.
+      while (x < -row_center)
+	x += row_distance;
+
+      // Make it positive (mirror in row).
+      x = std::fabs (x);
+
+      // We should now be between the crop row, and the right center.
+      daisy_assert (x <= row_center);
+      
+      // \ref{eq:Lzxstar-solved} Eq 27
+      Density[cell] = L00 * std::exp (-a_z * z) 
+	* (std::exp (-a_x * x) + std::exp (-a_x * (row_distance - x)))
+	/ (1.0 - std::pow (1.0/std::exp (1.0), a_x * row_distance));
     }
 
   // Redistribute roots from outside root zone.
@@ -189,7 +229,7 @@ Rootdens_GP1D::set_density (const Geometry& geo,
 }
 
 void
-Rootdens_GP1D::limit_depth (const Geometry& geo, 
+Rootdens_GP2D::limit_depth (const Geometry& geo, 
 			    const double l_r /* [cm/cm^2] */,
 			    const double d_s /* [cm] */, 
 			    const double d_a /* [cm] */, 
@@ -241,54 +281,71 @@ Rootdens_GP1D::limit_depth (const Geometry& geo,
 }
 
 void
-Rootdens_GP1D::uniform (const Geometry& geo, const double l_r, const double d_a,
+Rootdens_GP2D::uniform (const Geometry& geo, const double l_r, const double d_a,
 			std::vector<double>& Density)
 {
   const size_t cell_size = geo.cell_size ();
 
   // Uniform distribution parameters.
-  a = 0;
-  L0 = std::max (l_r / d_a, DensRtTip);
+  a_z = 0;
+  a_x = 0;
+  L00 = std::max (l_r / d_a, DensRtTip);
   for (size_t cell = 0; cell < cell_size; cell++)
     {
       const double f = geo.fraction_in_z_interval (cell, 0, -d_a);
-      Density[cell] = f * L0;
+      Density[cell] = f * L00;
     }
   k = 1.0;
 }
 
 void 
-Rootdens_GP1D::output (Log& log) const
+Rootdens_GP2D::output (Log& log) const
 {
-  output_variable (a, log); 
-  output_variable (L0, log); 
+  output_variable (a_z, log); 
+  output_variable (a_x, log); 
+  output_variable (L00, log); 
   output_variable (k, log); 
 }
 
-Rootdens_GP1D::Rootdens_GP1D (Block& al)
+Rootdens_GP2D::Rootdens_GP2D (Block& al)
   : Rootdens (al),
+    row_position (al.number ("row_position")),
+    row_distance (al.number ("row_distance")),
     DensRtTip (al.number ("DensRtTip")),
     DensIgnore (al.number ("DensIgnore", DensRtTip)),
-    a (-42.42e42),
-    L0 (-42.42e42),
+    a_z (-42.42e42),
+    a_x (-42.42e42),
+    L00 (-42.42e42),
     k (-42.42e42)
 { }
 
-static struct Rootdens_GP1DSyntax
+static struct Rootdens_GP2DSyntax
 {
   static Model& make (Block& al)
-  { return *new Rootdens_GP1D (al); }
-  Rootdens_GP1DSyntax ()
+  { return *new Rootdens_GP2D (al); }
+  Rootdens_GP2DSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
-	       "Use exponential function for root density.\n\
+	       "Use exponential function for root density in row crops.\n\
+\n\
+This is a two dimension model (z, x), where the z-axis is vertical,\n\
+and the x-axis is horizontal and ortogonal to the row.  The row is\n\
+assumed to be uniform (dense), allowing us to ignore that dimension.\n\
+\n\
+We assume the root density decrease with horizontal distance to row,\n\
+as well as depth below row.\n\
 \n\
 See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
 to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
 
     Rootdens::load_syntax (syntax, alist);
+    syntax.add ("row_position", "cm", Syntax::Const, "\
+Horizontal position of row crops.");
+    alist.add ("row_position", 0.0);
+    syntax.add ("row_distance", "cm", Syntax::Const, 
+		"Distance between rows of crops.");
     syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
 		"Root density at (potential) penetration depth.");
     alist.add ("DensRtTip", 0.1);
@@ -296,20 +353,22 @@ to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
 		Syntax::OptionalConst,
 		"Ignore cells with less than this root density.\n\
 By default, this is the same as DensRtTip.");
-    syntax.add ("a", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
+    syntax.add ("a_z", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
 Calculated from 'DensRtTip'.");
-    syntax.add ("L0", "cm/cm^3", Syntax::LogOnly,
-                "Root density at soil surface.");
+    syntax.add ("a_x", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
+Calculated from 'DensRtTip'.");
+    syntax.add ("L00", "cm/cm^3", Syntax::LogOnly,
+                "Root density at row crop at soil surface.");
     syntax.add ("k", Syntax::None (), Syntax::LogOnly,
                 "Scale factor due to soil limit.\n\
 \n\
 Some roots might be below the soil imposed maximum root depth, or in areas\n\
-with a density lower than the limit specified by DensIgnore.\n\
+with a density lower than the limit specified by 'DensIgnore'.\n\
 These roots will be re distributed within the root zone by multiplying the\n\
 density with this scale factor.");
 
-    Librarian::add_type (Rootdens::component, "GP1D", alist, syntax, &make);
+    Librarian::add_type (Rootdens::component, "GP2D", alist, syntax, &make);
   }
-} Rootdens_GP1D_syntax;
+} Rootdens_GP2D_syntax;
 
-// rootdens_GP1D.C ends here.
+// rootdens_GP2D.C ends here.

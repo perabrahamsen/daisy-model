@@ -40,8 +40,6 @@
 #include <vector>
 #include <map>
 
-using namespace std;
-
 // Weight of humus. [g/cm^3]
 static const double rho_water = 1.0; // [g/cm^3]
 static const double rho_ice = 0.917; // [g/cm^3]
@@ -51,23 +49,23 @@ struct Horizon::Implementation
 {
   // Content.
   double dry_bulk_density;
-  /* const */ vector<double> SOM_C_per_N;
+  /* const */ std::vector<double> SOM_C_per_N;
   const double C_per_N;
-  /* const */ vector<double> SOM_fractions;
+  /* const */ std::vector<double> SOM_fractions;
   const double turnover_factor;
   const double anisotropy;
-  typedef map<string, double, less<string> > double_map;
+  typedef std::map<std::string, double> double_map;
   const double_map attributes;
-  typedef map<string, string, less<string> > string_map;
+  typedef std::map<std::string, std::string> string_map;
   const string_map dimensions;
-  const auto_ptr<Nitrification> nitrification;
+  const std::auto_ptr<Nitrification> nitrification;
   HorHeat hor_heat;
   
   // Create and Detroy.
   void initialize (const Hydraulic&, const Texture& texture, double quarts, 
                    int som_size, Treelog& msg);
-  static double_map get_attributes (const vector<AttributeList*>& alists);
-  static string_map get_dimensions (const vector<AttributeList*>& alists);
+  static double_map get_attributes (const std::vector<AttributeList*>& alists);
+  static string_map get_dimensions (const std::vector<AttributeList*>& alists);
   Implementation (Block& al);
   ~Implementation ();
 };
@@ -101,7 +99,7 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
 }
 
 Horizon::Implementation::double_map
-Horizon::Implementation::get_attributes (const vector<AttributeList*>& alists)
+Horizon::Implementation::get_attributes (const std::vector<AttributeList*>& alists)
 { 
   double_map result; 
   for (unsigned int i = 0; i < alists.size (); i++)
@@ -110,7 +108,7 @@ Horizon::Implementation::get_attributes (const vector<AttributeList*>& alists)
 }
 
 Horizon::Implementation::string_map
-Horizon::Implementation::get_dimensions (const vector<AttributeList*>& alists)
+Horizon::Implementation::get_dimensions (const std::vector<AttributeList*>& alists)
 { 
   string_map result; 
   for (unsigned int i = 0; i < alists.size (); i++)
@@ -124,7 +122,7 @@ Horizon::Implementation::Implementation (Block& al)
     C_per_N (al.number ("C_per_N", -42.42e42)),
     SOM_fractions (al.check ("SOM_fractions") 
 		   ? al.number_sequence ("SOM_fractions")
-		   : vector<double> ()),
+		   : std::vector<double> ()),
     turnover_factor (al.number ("turnover_factor")),
     anisotropy (al.number ("anisotropy")),
     attributes (get_attributes (al.alist_sequence ("attributes"))),
@@ -201,19 +199,19 @@ Horizon::heat_capacity (double Theta, double Ice) const
 { return impl->hor_heat.heat_capacity (Theta, Ice); }
 
 bool
-Horizon::has_attribute (const string& name) const
+Horizon::has_attribute (const std::string& name) const
 { return impl->attributes.find (name) != impl->attributes.end (); }
 
 double 
-Horizon::get_attribute (const string& name) const
+Horizon::get_attribute (const std::string& name) const
 { 
   Implementation::double_map::const_iterator i = impl->attributes.find (name);
   daisy_assert (i != impl->attributes.end ());
   return (*i).second;
 }
 
-string
-Horizon::get_dimension (const string& name) const
+std::string
+Horizon::get_dimension (const std::string& name) const
 { 
   Implementation::string_map::const_iterator i = impl->dimensions.find (name);
   daisy_assert (i != impl->dimensions.end ());
@@ -254,14 +252,14 @@ Horizon::output (Log& log) const
 static const class SOM_fractions_check_type : public VCheck
 {
   void check (const Syntax& syntax, const AttributeList& alist, 
-              const string& key)
-    const throw (string)
+              const std::string& key)
+    const throw (std::string)
   {
     daisy_assert (key == "SOM_fractions");
     daisy_assert (alist.check (key));
     daisy_assert (syntax.lookup (key) == Syntax::Number);
     daisy_assert (syntax.size (key) == Syntax::Sequence);
-    vector<double> fractions = alist.number_sequence ("SOM_fractions");
+    std::vector<double> fractions = alist.number_sequence ("SOM_fractions");
     bool has_negative = false;
     double sum = 0.0;
     for (unsigned int i = 0; i < fractions.size (); i++)
@@ -272,9 +270,9 @@ static const class SOM_fractions_check_type : public VCheck
           sum += fractions[i];
       }
     if (!has_negative && !approximate (sum, 1.0))
-      throw string ("sum must be 1.0");
+      throw std::string ("sum must be 1.0");
     if (sum > 1.0 && !approximate (sum, 1.0))
-      throw string ("sum must be at most 1.0");
+      throw std::string ("sum must be at most 1.0");
   };
 } SOM_fractions_check;
 
@@ -311,7 +309,7 @@ By default, this is calculated from the soil constituents.");
 	      "C/N ratio for each SOM pool in this soil.\n\
 If 'C_per_N' is specified, this is used as a goal only.  If 'C_per_N' is\n\
 unspecified, the SOM pools will be initialized with this value.");
-  vector<double> SOM_C_per_N;
+  std::vector<double> SOM_C_per_N;
   SOM_C_per_N.push_back (11.0);
   SOM_C_per_N.push_back (11.0);
   SOM_C_per_N.push_back (11.0);
@@ -364,7 +362,7 @@ this horizon.");
   syntax.add ("attributes", attSyntax, Syntax::OptionalConst, Syntax::Sequence,
 	      "List of additional attributes for this horizon.\n\
 Intended for use with pedotransfer functions.");
-  alist.add ("attributes", vector<AttributeList*> ());
+  alist.add ("attributes", std::vector<AttributeList*> ());
 }
 
 Horizon::Horizon (Block& al)
