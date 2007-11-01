@@ -64,7 +64,8 @@ struct ChemistryStandard : public Chemistry
   void tick_soil (const Geometry& geo, double ponding /* [mm] */,
                   double R_mixing /* [h/mm] */, 
                   const Soil&, const SoilWater&, const SoilHeat&, Movement&,
-                  const OrganicMatter&, double dt, const Scope&, Treelog&);
+                  const OrganicMatter&, const bool flux_below, 
+		  double dt, const Scope&, Treelog&);
   void clear ();
   void output (Log&) const;
 
@@ -178,6 +179,7 @@ ChemistryStandard::tick_soil (const Geometry& geo, const double ponding,
                               const Soil& soil, const SoilWater& soil_water,
                               const SoilHeat& soil_heat, Movement& movement,
                               const OrganicMatter& organic_matter,
+			      const bool flux_below, 
                               const double dt, const Scope& scope, Treelog& msg)
 { 
   infiltrate (geo, ponding, soil_water.infiltration (geo), R_mixing, dt);
@@ -201,7 +203,8 @@ ChemistryStandard::tick_soil (const Geometry& geo, const double ponding,
       Treelog::Open nest (msg, name);
       // [g/m^2/h down -> g/cm^2/h up]
       const double J_in = -chemicals[c]->down () / (100.0 * 100.0);
-      movement.solute (soil, soil_water, J_in, *chemicals[c], dt, scope, msg); 
+      movement.solute (soil, soil_water, J_in, *chemicals[c], flux_below, 
+		       dt, scope, msg); 
     }
 }
 

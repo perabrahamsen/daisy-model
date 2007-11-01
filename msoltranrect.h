@@ -52,8 +52,8 @@ public:
   // Simulation.
 public:
   void solute (const GeometryRect&, const Soil&, const SoilWater&,
-               const double J_in, Solute&, double dt, const Scope&, 
-	       Treelog& msg);
+               const double J_in, Solute&, const bool flux_below,
+	       double dt, const Scope&, Treelog& msg);
   void element (const GeometryRect&, const Soil&, const SoilWater&,
                 Element&, Adsorption&,
                 const double diffusion_coefficient, double dt, Treelog&);
@@ -67,6 +67,7 @@ private:
                      const std::vector<double>& S, 
                      std::vector<double>& J, 
 		     const double C_below,
+		     const bool flux_below,
                      Adsorption& adsorption,
                      double diffusion_coefficient, double dt,
                      Treelog& msg) = 0;

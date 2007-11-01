@@ -71,9 +71,8 @@ struct Movement1D : public Movement
   void solute (const Soil& soil, 
                const SoilWater& soil_water, 
                const double J_in, Solute& solute, 
-               const double dt,
-	       const Scope&,
-               Treelog& msg);
+	       const bool flux_below, 
+               const double dt, const Scope&, Treelog& msg);
   void element (const Soil& soil, 
                 const SoilWater& soil_water, 
                 Element& element,
@@ -253,6 +252,7 @@ void
 Movement1D::solute (const Soil& soil, 
                     const SoilWater& soil_water, 
                     const double J_in, Solute& solute, 
+		    const bool flux_below, 
                     const double dt,
 		    const Scope& scope,
                     Treelog& msg)

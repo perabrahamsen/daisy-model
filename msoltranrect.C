@@ -32,7 +32,8 @@ const char *const Msoltranrect::component = "msoltranrect";
 void
 Msoltranrect::solute (const GeometryRect& geo,
                       const Soil& soil, const SoilWater& soil_water,
-                      const double J_in, Solute& solute, const double dt,
+                      const double J_in, Solute& solute, 
+		      const bool flux_below, const double dt,
 		      const Scope& scope, Treelog& msg)
 { 
   Treelog::Open nest (msg, "Msoltranrect: " + name);
@@ -70,7 +71,7 @@ Msoltranrect::solute (const GeometryRect& geo,
 
   // Flow.
   flow (geo, soil, soil_water, solute.submodel, 
-        M, C, S, J, solute.C_below (),
+        M, C, S, J, solute.C_below (), flux_below,
         *solute.adsorption, solute.diffusion_coefficient (), 
         dt, msg);
 
@@ -92,7 +93,7 @@ Msoltranrect::element (const GeometryRect& geo,
 {
   element.tick (geo.cell_size (), soil_water, dt);
   flow (geo, soil, soil_water, "DOM", 
-        element.M, element.C, element.S, element.J, 0.0,
+        element.M, element.C, element.S, element.J, 0.0, false,
         adsorption, diffusion_coefficient, dt, msg);
 }
 

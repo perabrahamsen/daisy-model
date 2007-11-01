@@ -674,6 +674,7 @@ ColumnStandard::tick (const Time& time, const double dt,
   groundwater->tick (geometry, *soil, *soil_water, 
                      surface.ponding () * 0.1, 
                      *soil_heat, time, scope, msg);
+  const bool flux_below = groundwater->bottom_type () != Groundwater::pressure;
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, my_weather, dt, msg);
   soil_water->tick_after (geometry.cell_size (), *soil, *soil_heat, msg);
@@ -681,7 +682,8 @@ ColumnStandard::tick (const Time& time, const double dt,
   chemistry->tick_soil (geometry, 
                         surface.ponding (), surface.mixing_resistance (),
                         *soil, *soil_water, *soil_heat, 
-                        *movement, *organic_matter, dt, scope, msg);
+                        *movement, *organic_matter, 
+			flux_below, dt, scope, msg);
   organic_matter->transport (*soil, *soil_water, msg);
   const std::vector<DOM*>& dom = organic_matter->fetch_dom ();
   for (size_t i = 0; i < dom.size (); i++)
@@ -696,12 +698,14 @@ ColumnStandard::tick (const Time& time, const double dt,
   {
     Treelog::Open nest (msg, "soil_NO3");
     movement->solute (*soil, *soil_water, 
-                      surface.matter_flux ().NO3, *soil_NO3, dt, scope, msg);
+                      surface.matter_flux ().NO3, *soil_NO3, 
+		      flux_below, dt, scope, msg);
   }
   {
     Treelog::Open nest (msg, "soil_NH4");
     movement->solute (*soil, *soil_water,
-                      surface.matter_flux ().NH4, *soil_NH4, dt, scope, msg);
+                      surface.matter_flux ().NH4, *soil_NH4,
+		      flux_below, dt, scope, msg);
   }
   
   // Once a month we clean up old AM from organic matter.

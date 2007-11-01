@@ -190,10 +190,6 @@ Rootdens_GP2D::set_density (const Geometry& geo,
   // and L00 from a (\ref{{eq:root-integral2} Eq 16):
   L00 = l_R  * a_z * a_x;	// [cm/cm^3]
 
-  std::ostringstream tmp;
-  tmp << "a_z = " << a_z << " a_x = " << a_x << " L00 = " << L00;
-  msg.message (tmp.str ());
-
   // Fill Density.
   for (size_t cell = 0; cell < cell_size; cell++)
     {
