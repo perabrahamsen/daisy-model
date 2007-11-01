@@ -309,7 +309,7 @@ set style data lines\n";
     }
 
   // The end.
-  if (device == "screen")
+  if (interactive ())
     out << "pause mouse\n";
 
   return true;

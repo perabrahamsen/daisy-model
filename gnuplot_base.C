@@ -86,6 +86,10 @@ GnuplotBase::plot_header (std::ostream& out) const
     out << "set size " << size.x << ", " << size.y << "\n";
 }
 
+bool 
+GnuplotBase::interactive () const
+{ return device == "screen" || device == "windows" || "device" == "x11"; }
+
 std::string 
 GnuplotBase::file2device (const std::string& file)
 {

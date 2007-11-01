@@ -113,7 +113,7 @@ Rootdens_GP2D::set_density (const Geometry& geo,
   const double l_R = l_r * 0.5 * R; // [cm/cm]
 
   // Crop width.
-  const double r = CropWidth;	// [cm]
+  const double w_c = CropWidth;	// [cm]
 
   // Potential depth.
   const double d_c = CropDepth;	// [cm]
@@ -185,7 +185,7 @@ Rootdens_GP2D::set_density (const Geometry& geo,
   a_z = -Q / d_c;		// [cm^-1]
 
   // Find a_x from a_z (\ref{eq:aztoax} Eq 20):
-  a_x = (d_c / r) *  a_z;	// [cm^-1]
+  a_x = (d_c / w_c) *  a_z;	// [cm^-1]
 
   // and L00 from a (\ref{{eq:root-integral2} Eq 16):
   L00 = l_R  * a_z * a_x;	// [cm/cm^3]

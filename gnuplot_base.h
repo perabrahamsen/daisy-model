@@ -62,7 +62,8 @@ protected:
   // Use.
 protected:
   void plot_header (std::ostream& out) const;
-  
+  bool interactive () const;
+
   // Create and Destroy.
 public:
   static void load_syntax (Syntax& syntax, AttributeList&);

@@ -50,14 +50,14 @@ The parameters $a$ and $L_0$ will both vary with time.  For a
 production oriented simulation model like
 Daisy~\citep{daisy-fertilizer,daisy-ems}, it can be more convenient to
 specify the density in terms of accumulated root dry matter $M_r$ and
-total root depth $d$, as described in \cite{daisy-def} or the
+total root depth $d_c$, as described in \cite{daisy-def} or the
 following.
 
 We define the root depth at the lowest depth where the root density is
 at above specified threshold $L_m$.  By inserting this in
 \eqref{eq:g+p}, we get
 \begin{equation}
-  L_m = L_d = L_0\, e^{-a d}
+  L_m = L_{d_c} = L_0\, e^{-a d_c}
   \label{eq:root-depth}
 \end{equation}
 
@@ -80,14 +80,14 @@ the profile
 By inserting the expression we get for $L_0$ from
 \eqref{eq:root-integral} in \eqref{eq:root-depth} we get
 \begin{equation}
-  L_m = l_r \, a \, e^{-a d}
+  L_m = l_r \, a \, e^{-a d_c}
   \label{eq:a-only}
 \end{equation}
 
-If we substitute $W = -a d$ and isolate the known values on the right
+If we substitute $W = -a d_c$ and isolate the known values on the right
 side this gives us
 \begin{equation}
-   W e^W = - L_m \frac{d}{l_r}
+   W e^W = - L_m \frac{d_c}{l_r}
   \label{eq:Lambert}
 \end{equation}
 The solution to this equation with regard to $W$ happens to be the
@@ -103,8 +103,8 @@ figure~\ref{fig:W}.
 Since we now know the value for $W$m we can find the desired density
 parameters $L_0$ and $a$ by substituting back
 \begin{eqnarray}
-   a   &=& -W / d\\\label{eq:a-solved}
-   L_0 &=& \frac{L_m}{e^{-a d}} = L_m e^{a d}\label{eq:L0-found}
+   a   &=& -W / d_c\\\label{eq:a-solved}
+   L_0 &=& \frac{L_m}{e^{-a d_c}} = L_m e^{a d_c}\label{eq:L0-found}
 \end{eqnarray}
 
 \subsection{Numeric solution to $W$}
@@ -124,11 +124,11 @@ has one solution, $W=-1$. The expression $W\, e^W$ is decreasing below
 $-1$ and increasing above $-1$.  Thus, $W=0$ is a global minimum.
 
 Since $\lim_{Q\to-\infty} W\,e^W=0$ we get a single solution when
-$-L_m \frac{d}{l_r}$ is exactly at the bottom point ($-1 e^{-1}$), two
+$-L_m \frac{d_c}{l_r}$ is exactly at the bottom point ($-1 e^{-1}$), two
 when it is above (it is never positive), and none when it is below.
 The later situation corresponds to the case where there are
 insufficent root $l_r$ to satisfy the minimal root density $L_m$
-within the given root zone $d$.
+within the given root zone $d_c$.
 
 Both solutions are valid, but represent different distributions.
 \begin{itemize} 
@@ -213,11 +213,11 @@ dimensions.
 
 To find the parameters $a_z$, $a_x$ and $L_{0,0}$, we assume as before
 that the root depth and root mass is known, and now additionally that
-the root radius $r_c$ is known.  We define the root zone depth $d_c$
+the root radius $w_c$ is known.  We define the root zone depth $d_c$
 to be the depth right below the row ($x = 0$) where the root density
 is $L_m$.  As $x=0$ is the place where \eqref{eq:Lzx} predicts the
 highest density, the average root density at that depth will be well
-below $L_m$.  Similarily, we define the radius $r_c$ as the horizontal
+below $L_m$.  Similarily, we define the radius $w_c$ as the horizontal
 distance from the row where the root density at the surface ($z = 0$)
 \begin{equation}
   L_m = L_{d,0} = L_{0,r}
@@ -248,7 +248,7 @@ By using \eqref{eq:azx} in \eqref{eq:minroot} we get
 \end{eqnarray}
 Thus $e^{-a_z d} = e^{-a_x r}$ or
 \begin{equation}
-  a_x = \frac{d_c}{r_c} a_z
+  a_x = \frac{d_c}{w_c} a_z
   \label{eq:aztoax}
 \end{equation}
 
@@ -437,10 +437,10 @@ $L_{z,x}$& m/m$^3$ & Root density at soil depth $z$ and distance $x$ from row\\
 $L^*_{z,x}$& m/m$^3$ & Root density from multiple rows\\
 $M_r$   & kg/m$^2$& Total root dry matter\\ 
 $Q$     &         & Substitution variable\\
-$r_c$     & m     & Horizontal root radius\\
 $R$     & m       & Distance between rows\\
 $S_r$   & m/kg    & Specific root length\\ 
 $W$     &         & Lambert-W function\\ 
+$w_c$     & m     & Horizontal root radius\\
 $x$     & m       & Horizontal distance from row \\
 $z$     & m       & Soil depth \\
 \end{tabular}
