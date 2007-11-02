@@ -712,9 +712,6 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
 }
 
 
-
-
-
 void MsoltranrectMollerup::flow (const GeometryRect& geo, 
 				 const Soil& soil, 
 				 const SoilWater& soil_water, 
@@ -795,20 +792,24 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     
   //Begin small timestep stuff  
   enum stabilizing_method_t { None, Timestep_reduction, Streamline_diffusion };
-  //stabilizing_method_t stabilizing_method = None;
+  const stabilizing_method_t stabilizing_method = Streamline_diffusion;
   //const stabilizing_method_t stabilizing_method = Timestep_reduction;
-  const stabilizing_method_t stabilizing_method = None;
+  //const stabilizing_method_t stabilizing_method = None;
   const double dt_min = 1e-10;
-  const double gamma_stabilization = 10.0;
+  const double gamma_stabilization = 20;
   int nddt;        //number of small timesteps
 
   
+  std::ostringstream tmp_mmo;
+
   switch (stabilizing_method)
     {
     case None:
       {
         //No stabilization!!!
-        std::cout << "No stabilization\n";
+        tmp_mmo << "No stabilization\n";
+        //msg.message(tmp_mmo.str ());
+        //std::cout << "No stabilization\n";
         nddt = 1;    //Number of small timesteps 
         break;
       }
@@ -816,7 +817,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     case Timestep_reduction:
       {
         //Use smaller time steps
-        std::cout << "Smaller timesteps\n";      
+        tmp_mmo << "Smaller timesteps\n";      
           
         ublas::vector<double> Theta_edge 
           = ublas::zero_vector<double> (edge_size);
@@ -838,7 +839,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
         if (dt_PeCr_min < dt_min)
           dt_PeCr_min = dt_min; //no timesteps small than dt_min!
         
-        std::cout << "dt_PeCr_min = " << dt_PeCr_min << '\n';
+        tmp_mmo << "dt_PeCr_min = " << dt_PeCr_min << '\n';
         
         //Number of small timesteps 
         const int divres = double2int(dt/dt_PeCr_min);
@@ -849,20 +850,24 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
           nddt = divres + 1;
         
         //Print out some results
-        std::cout << "divres = " << divres << '\n';
-        std::cout << "remainder = " << remainder << '\n';
-        std::cout << "nddt = " << nddt << '\n';  
+        //std::cout << "divres = " << divres << '\n';
+        //std::cout << "remainder = " << remainder << '\n';
+        //std::cout << "nddt = " << nddt << '\n';  
+        tmp_mmo << "divres = " << divres << '\n';
+        tmp_mmo << "remainder = " << remainder << '\n';
+        tmp_mmo << "nddt = " << nddt << '\n';  
         break;
       }
     case Streamline_diffusion:
       {
         //Add some ekstra diffusion in the streamline 
-        std::cout << "Streamline diffusion\n";      
+        tmp_mmo << "Streamline diffusion\n";      
         
         ublas::vector<double> Theta_edge 
           = ublas::zero_vector<double> (edge_size);
         edge_water_content (geo, Theta_cell_avg, Theta_edge);
       
+        tmp_mmo << "ThetaD_long_avg, before: " << ThetaD_long_avg << '\n';
         for (size_t e = 0; e < edge_size; e++)
           {
             const double ThetaD_PeCr = q_edge[e]*q_edge[e] * dt
@@ -870,7 +875,12 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
             
             if (ThetaD_long_avg[e] < ThetaD_PeCr)  //Need extra diffusion
               ThetaD_long_avg[e] = ThetaD_PeCr;
+          
+            tmp_mmo << "ThetaD_PeCr: " << ThetaD_PeCr << '\n'; 
           }
+        tmp_mmo << "ThetaD_long_avg, after: " << ThetaD_long_avg << '\n';
+        
+        
         nddt = 1; //Dont use smaller timesteps 
         break;
       }
@@ -878,7 +888,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   
   //Calculate size of smal timesteps
   const double ddt = dt/nddt;
-  std::cout << "ddt = " << ddt << '\n';
+  tmp_mmo << "ddt = " << ddt << '\n';
   
   
   //Initialise water content stuff
@@ -941,8 +951,8 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     advecm (c, c) = 0.0;
   
   //Debug - flow c ndition!!!
-  //J[0] = -0.5; 
-  //J[101] = -0.5;
+  J[0] = -0.5;       //mmoxxx 
+  J[101] = -0.5;     //mmoxxx
 
   std::vector<edge_type_t> edge_type (edge_size, Unhandled);
   for (size_t e = 0; e < edge_size; e++)
@@ -952,8 +962,8 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   upperboundary (geo, edge_type, J, B_vec, msg);
 
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-  //bool isflux = true;
-  const bool isflux = false;
+  const bool isflux = true;
+  //const bool isflux = false;
   lowerboundary (geo, isflux, C_below, q_edge, ThetaD_long, edge_type,  
                  B_mat, B_vec, diffm_long_mat, diffm_long_vec, advecm);
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -995,11 +1005,14 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
 
   ublas::vector<double> dJ = ublas::zero_vector<double> (edge_size);
 
+  // msg.message(tmp_mmo.str ());
+
+
   double dtime = 0.0;
   for (int ddtstep = 0; ddtstep < nddt; ddtstep++)
     {
       dtime += ddt;       //update time 
-      std::cout << "dtime = " << dtime << '\n';
+      tmp_mmo << "dtime = " << dtime << '\n';
       
       //Calculate water content 
       interpol(Theta_cell_old, Theta_cell, dt, dtime, Theta_cell_np1);
@@ -1055,13 +1068,18 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       Theta_cell_n = Theta_cell_np1;
       QTheta_mat_n = QTheta_mat_np1;
 
+      //debug Print new solution
+      std::ostringstream tmp;
+      tmp << "C_n" << C_n;
+      msg.message (tmp.str ());
+      
     } //End small timestep loop
-
+  
 
   //debug Print new solution
-  std::ostringstream tmp;
-  tmp << "C_n" << C_n;
-  msg.message (tmp.str ());
+  //std::ostringstream tmp;
+  // tmp << "C_n" << C_n;
+  //msg.message (tmp.str ());
  
   // Write solution into C (std::vec)
   for (int c=0; c < cell_size; c++)
@@ -1090,7 +1108,8 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     }
 
   // BUG: No J for inner nodes.
-
+    msg.message(tmp_mmo.str ());
+  
 }
 
 void 
