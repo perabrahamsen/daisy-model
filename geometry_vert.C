@@ -26,7 +26,7 @@
 
 bool 
 GeometryVert::contain_z (size_t i, double z) const
-{ return  z <= zminus (i) && z >= zplus(i); }
+{ return  z <= zminus (i) && z >= zplus (i); }
 
 bool 
 GeometryVert::check_z_border (const double value, Treelog& err) const

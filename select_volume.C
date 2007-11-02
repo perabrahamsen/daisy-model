@@ -47,7 +47,7 @@ struct SelectVolume : public SelectValue
   std::vector<int> cells;
   std::vector<double> weight;
   const double min_root_density;
-  const symbol crop;
+  const symbol min_root_crop;
 
   // Bulk density convertions.
   struct BD_convert;
@@ -210,9 +210,9 @@ SelectVolume::output_array (const std::vector<double>& array,
   if (min_root_density > 0.0)
     {
       const std::vector<double>& root_density 
-	= (crop == wildcard)
+	= (min_root_crop == wildcard)
 	? vegetation->root_density ()
-	: vegetation->root_density (crop);
+	: vegetation->root_density (min_root_crop);
 
       for (size_t i = 0; i < cells.size (); i++)
 	{
@@ -322,7 +322,7 @@ SelectVolume::SelectVolume (Block& al)
     last_geo (NULL),
     last_soil (NULL),
     min_root_density (al.number ("min_root_density")),
-    crop (al.identifier ("crop")),
+    min_root_crop (al.identifier ("min_root_crop")),
     bd_convert (NULL)
 { }
   
@@ -368,10 +368,10 @@ the cell will be scaled to zero, while if there is only half the\n\
 specified minimum root density, the data for the cell will be scaled\n\
 to 0.5.");
     alist.add ("min_root_density", -1.0);
-    syntax.add ("crop", Syntax::String, Syntax::Const, "\
+    syntax.add ("min_root_crop", Syntax::String, Syntax::Const, "\
 Name of crop whose roots scould be used for the root density requirements.\n\
 Set this to \"*\" to use all roots.");
-    alist.add ("crop", "*");	// Select::wildcard may not be initialized.
+    alist.add ("min_root_crop", "*");	// Select::wildcard may not be initialized.
   }
   void add_volume ()
   {

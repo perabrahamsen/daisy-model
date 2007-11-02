@@ -1,3 +1,12 @@
+2007-11-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_content.C (z, x, y): New parameters.
+
+	* geometry.h (contain_x, contain_y): New virtual member functions.
+	* geometry_1D.C, geometry_rect.C: Implement them.
+	
+	* select_volume.C (min_root_crop): Renamed from 'crop'.
+
 2007-10-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* rootdens_GP2D.C: New model.

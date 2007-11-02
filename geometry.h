@@ -77,6 +77,10 @@ public:
                                      const Volume& volume) const = 0;
   virtual bool contain_z (size_t n, double z) const = 0; // True iff cell n
                                                          // includes depth z
+  virtual bool contain_x (size_t n, double x) const = 0; // True iff cell n
+                                                         // includes width z
+  virtual bool contain_y (size_t n, double y) const = 0; // True iff cell n
+                                                         // includes length y
   bool node_center_in_volume (int c, const Volume& volume) const;
 
   // Edge operations.

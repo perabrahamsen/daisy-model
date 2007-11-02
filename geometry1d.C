@@ -62,6 +62,14 @@ double
 Geometry1D::fraction_in_volume (size_t n, const Volume& volume) const
 { return volume.box_fraction (zplus (n), zminus (n)); }
 
+bool 
+Geometry1D::contain_x (size_t, double x) const
+{ return  left () <= x  && x <= right (); }
+
+bool 
+Geometry1D::contain_y (size_t, double y) const
+{ return  front () <= y  && y <= back (); }
+
 size_t 
 Geometry1D::interval_plus (double z) const
 {

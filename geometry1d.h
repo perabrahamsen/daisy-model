@@ -63,6 +63,8 @@ public:
   size_t cell_at (double z, double x, double y) const ;
   double fraction_in_z_interval (size_t i, double from, double to) const;
   double fraction_in_volume (size_t n, const Volume& volume) const;
+  bool contain_x (size_t i, double x) const;
+  bool contain_y (size_t i, double y) const;
 
   size_t interval_plus (double z) const;
   size_t interval_border (double z) const;

@@ -541,7 +541,8 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = ui_Qt_read.h ui_Qt_read.C
+REMOVE = soil_heat1d.h soil_heat1d.C soil_heat_rect.h soil_heat_rect.C \
+	ui_Qt_read.h ui_Qt_read.C
 
 REMOVED = tlink32.ini daisy.bpr daisy.bpf daisy.bpg Daisy.vcproj q4main.C treelog_stream.C treelog_stream.h treelog_dual.C treelog_dual.h soil_chemical.C soil_chemicals.C chemicals.C soil_chemical.h soil_chemicals.h chemicals.h boolean_extern.C number_extern.C options.C options.h select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
 
@@ -1301,6 +1302,9 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+rootdens_GP2D${OBJ}: rootdens_GP2D.C rootdens.h model.h symbol.h block.h \
+  syntax.h treelog.h plf.h geometry.h mathlib.h assertion.h log.h \
+  border.h alist.h check.h librarian.h iterative.h
 rootdens_GP1D${OBJ}: rootdens_GP1D.C rootdens.h model.h symbol.h block.h \
   syntax.h treelog.h plf.h geometry.h mathlib.h assertion.h log.h \
   border.h alist.h check.h librarian.h iterative.h

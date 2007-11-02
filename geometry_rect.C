@@ -57,6 +57,14 @@ GeometryRect::fraction_in_volume (size_t n, const Volume& volume) const
                               xminus (n), xplus (n));
 }
 
+bool 
+GeometryRect::contain_x (size_t i, double x) const
+{ return  xminus (i) <= x && x <= xplus (i); }
+
+bool 
+GeometryRect::contain_y (size_t i, double y) const
+{ return  front () <= y  && y <= back (); }
+
 size_t 
 GeometryRect::cell_pseudo_number (const int n) const
 {
