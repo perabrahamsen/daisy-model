@@ -775,14 +775,14 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
 		    Dxx_cell, Dzz_cell, Dxz_cell, msg);
   
   //Theta * D - old and new and average 
-  ublas::vector<double> ThetaD_long_old (edge_size); 
-  ublas::vector<double> ThetaD_tran_old (edge_size);
-  thetadiff_longtran (geo, Theta_cell_old, Dxx_cell, Dzz_cell, Dxz_cell,
-		      ThetaD_long_old, ThetaD_tran_old);
-  ublas::vector<double> ThetaD_long (edge_size); 
-  ublas::vector<double> ThetaD_tran (edge_size);
-  thetadiff_longtran (geo, Theta_cell, Dxx_cell, Dzz_cell, Dxz_cell,
-		      ThetaD_long, ThetaD_tran);
+  //ublas::vector<double> ThetaD_long_old (edge_size);                       //mmo 20071102 
+  //ublas::vector<double> ThetaD_tran_old (edge_size);                       //mmo 20071102
+  //thetadiff_longtran (geo, Theta_cell_old, Dxx_cell, Dzz_cell, Dxz_cell,   //mmo 20071102
+  //		      ThetaD_long_old, ThetaD_tran_old);                     //mmo 20071102
+  //ublas::vector<double> ThetaD_long (edge_size);                           //mmo 20071102
+  //ublas::vector<double> ThetaD_tran (edge_size);                           //mmo 20071102
+  //thetadiff_longtran (geo, Theta_cell, Dxx_cell, Dzz_cell, Dxz_cell,       //mmo 20071102
+  //		      ThetaD_long, ThetaD_tran);                             //mmo 20071102
   
   ublas::vector<double> ThetaD_long_avg (edge_size); 
   ublas::vector<double> ThetaD_tran_avg (edge_size);
@@ -792,11 +792,11 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     
   //Begin small timestep stuff  
   enum stabilizing_method_t { None, Timestep_reduction, Streamline_diffusion };
-  const stabilizing_method_t stabilizing_method = Streamline_diffusion;
+  //const stabilizing_method_t stabilizing_method = Streamline_diffusion;
   //const stabilizing_method_t stabilizing_method = Timestep_reduction;
-  //const stabilizing_method_t stabilizing_method = None;
+  const stabilizing_method_t stabilizing_method = None;
   const double dt_min = 1e-10;
-  const double gamma_stabilization = 20;
+  const double gamma_stabilization = 10;
   int nddt;        //number of small timesteps
 
   
@@ -867,7 +867,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
           = ublas::zero_vector<double> (edge_size);
         edge_water_content (geo, Theta_cell_avg, Theta_edge);
       
-        tmp_mmo << "ThetaD_long_avg, before: " << ThetaD_long_avg << '\n';
+        //tmp_mmo << "ThetaD_long_avg, before: " << ThetaD_long_avg << '\n';
         for (size_t e = 0; e < edge_size; e++)
           {
             const double ThetaD_PeCr = q_edge[e]*q_edge[e] * dt
@@ -876,9 +876,9 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
             if (ThetaD_long_avg[e] < ThetaD_PeCr)  //Need extra diffusion
               ThetaD_long_avg[e] = ThetaD_PeCr;
           
-            tmp_mmo << "ThetaD_PeCr: " << ThetaD_PeCr << '\n'; 
+            //tmp_mmo << "ThetaD_PeCr: " << ThetaD_PeCr << '\n'; 
           }
-        tmp_mmo << "ThetaD_long_avg, after: " << ThetaD_long_avg << '\n';
+        //tmp_mmo << "ThetaD_long_avg, after: " << ThetaD_long_avg << '\n';
         
         
         nddt = 1; //Dont use smaller timesteps 
@@ -889,37 +889,29 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   //Calculate size of smal timesteps
   const double ddt = dt/nddt;
   tmp_mmo << "ddt = " << ddt << '\n';
-  
-  
-  //Initialise water content stuff
-  //ublas::banded_matrix<double>QTheta_mat_old (cell_size, cell_size, 0 ,0);
-  //ublas::banded_matrix<double>QTheta_mat (cell_size, cell_size, 0, 0); 
-  // for (int c = 0; c < cell_size; c++)
-  //  {
-  //    QTheta_mat_old (c, c) = geo.cell_volume (c) * Theta_cell_old (c);
-  //    QTheta_mat (c, c) = geo.cell_volume (c) * Theta_cell (c) ;
-  //  }
-
-    
-  //interpol(Kurt_start, Kurt_end, 1.0, 1.0, Kurt_res);
-  //std::cout << "Kurt_res" << Kurt_res << '\n';
-    
+   
+     
   //--------------------------------------
   //--- For moving in/out of tick loop ---
   //--------------------------------------
 
   //Initialize longitudinal diffusion matrix - old and new
-  ublas::matrix<double> diff_long_old 
-    = ublas::zero_matrix<double> (cell_size, cell_size);
-  diffusion_long (geo, ThetaD_long_old, diff_long_old);  	   
-  ublas::matrix<double> diff_long 
-    = ublas::zero_matrix<double> (cell_size, cell_size);
-  diffusion_long (geo, ThetaD_long, diff_long);    
+  //ublas::matrix<double> diff_long_old                     //mmo 20071102
+  //  = ublas::zero_matrix<double> (cell_size, cell_size);  //mmo 20071102
+  //diffusion_long (geo, ThetaD_long_old, diff_long_old);   //mmo 20071102	   
+  //ublas::matrix<double> diff_long                         //mmo 20071102
+  //  = ublas::zero_matrix<double> (cell_size, cell_size);  //mmo 20071102
+  //diffusion_long (geo, ThetaD_long, diff_long);           //mmo 20071102 
 
-  //Initialize transversal diffusion matrix
-  ublas::matrix<double> diff_tran 
+  //Initialize longitudinal diffusion - average
+  ublas::matrix<double> diff_long_avg 
     = ublas::zero_matrix<double> (cell_size, cell_size);
-  diffusion_tran (geo, ThetaD_tran, diff_tran); 
+  diffusion_long (geo, ThetaD_long_avg, diff_long_avg);    
+
+  //Initialize transversal diffusion matrix -average 
+  ublas::matrix<double> diff_tran_avg  
+    = ublas::zero_matrix<double> (cell_size, cell_size);
+  diffusion_tran (geo, ThetaD_tran_avg, diff_tran_avg); 
   
   
   //--- Things that not changes in smal timesteps --- 
@@ -964,8 +956,11 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   const bool isflux = true;
   //const bool isflux = false;
-  lowerboundary (geo, isflux, C_below, q_edge, ThetaD_long, edge_type,  
-                 B_mat, B_vec, diffm_long_mat, diffm_long_vec, advecm);
+  //lowerboundary (geo, isflux, C_below, q_edge, ThetaD_long, edge_type,       //mmo 20071102  
+  //               B_mat, B_vec, diffm_long_mat, diffm_long_vec, advecm);      //mmo 20071102
+
+  lowerboundary (geo, isflux, C_below, q_edge, ThetaD_long_avg, edge_type,     //mmo 20071102  
+                 B_mat, B_vec, diffm_long_mat, diffm_long_vec, advecm);        //mmo 20071102
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   //-----------------------------------------------------------------
 
@@ -1023,15 +1018,17 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       
       if (simple_dcthetadt)
         {
-          A = (1.0 / dt) * QTheta_mat_np1          // dtheta/dt
-            - gamma * diff_long                    // long diffusion
+          A = (1.0 / ddt) * QTheta_mat_np1          // dtheta/ddt
+            //- gamma * diff_long                  // long diffusion   //mmo 20071102
+            - gamma * diff_long_avg                // long diffusion
             + gamma * advec                        // advec
             - gamma * B_mat                        // impl Neumann BC 
             - gamma * diffm_long_mat               // Dirichlet BC
             + gamma * advecm;                      // Dirichlet BC
           
-          b_mat =  (1.0 / dt) * QTheta_mat_n 
-            + (1 - gamma) * diff_long_old
+          b_mat =  (1.0 / ddt) * QTheta_mat_n 
+            //+ (1 - gamma) * diff_long_old        //mmo 20071102
+            + (1 - gamma) * diff_long_avg                               
             - (1 - gamma) * advec 
             + (1 - gamma) * B_mat
             + (1 - gamma) * diffm_long_mat
@@ -1060,9 +1057,11 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       //Solution checks???
       //Calculate and sum up fluxes 
       
-      fluxes (geo, edge_type, q_edge, ThetaD_long, ThetaD_tran,
-              C_n, C_below, dJ); 
+      //fluxes (geo, edge_type, q_edge, ThetaD_long, ThetaD_tran,     //mmo20071102
+      //        C_n, C_below, dJ); 
       
+      fluxes (geo, edge_type, q_edge, ThetaD_long_avg, ThetaD_tran_avg,
+              C_n, C_below, dJ); 
       
       //Update Theta and QTheta
       Theta_cell_n = Theta_cell_np1;
