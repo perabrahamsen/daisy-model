@@ -64,7 +64,8 @@ class EXPORT LogExtern : public LogSelect,
   // Log.
   symbol last_done;
 protected:
-  void done (const Time&, double dt);
+  void done (const std::vector<Time::component_t>& time_columns,
+	     const Time&, double dt);
 private:
   bool initial_match (const Daisy&, Treelog&);
 

@@ -234,6 +234,9 @@ private:
 
   // Create and Destroy.
 public:
+  Enum ();
+  void add (const std::string& a);
+  size_t size () const;
   Enum (const std::string& a);
   Enum (const std::string& a, const std::string& b);
   Enum (const std::string& a, const std::string& b, const std::string& c);

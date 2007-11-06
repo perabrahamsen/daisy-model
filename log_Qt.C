@@ -24,11 +24,12 @@
 #include "alist.h"
 
 void
-LogQt::done (const Time& time, double dt)
+LogQt::done (const std::vector<Time::component_t>& time_columns,
+	     const Time& time, double dt)
 { 
   {
     QMutexLocker lock (&mutex);
-    LogExtern::done (time, dt);
+    LogExtern::done (time_columns, time, dt);
   }
   emit ready ();
 }

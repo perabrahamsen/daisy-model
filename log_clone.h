@@ -35,9 +35,11 @@ private:
   bool check_leaf (symbol) const;
   bool check_interior (symbol) const;
   bool match (const Daisy& daisy, Treelog&);
-  void done (const Time&, double dt);
+  void done (const std::vector<Time::component_t>& time_columns,
+	     const Time&, double dt);
   bool initial_match (const Daisy&, Treelog&);
-  void initial_done (const Time& time, double dt);
+  void initial_done (const std::vector<Time::component_t>& time_columns,
+		     const Time& time, double dt);
 
   // Get result.
 public:

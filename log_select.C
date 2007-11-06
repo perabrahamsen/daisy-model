@@ -66,7 +66,8 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 }
 
 void
-LogSelect::done (const Time&, double)
+LogSelect::done (const std::vector<Time::component_t>& time_columns,
+		 const Time&, double)
 { }
 
 bool
@@ -85,7 +86,8 @@ LogSelect::initial_match (const Daisy&, Treelog&)
 }
 
 void
-LogSelect::initial_done (const Time&, double)
+LogSelect::initial_done (const std::vector<Time::component_t>& time_columns,
+			 const Time&, double)
 { }
 
 void 

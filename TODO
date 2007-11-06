@@ -1,10 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* units
+
+(defunit [cm] SI
+  "centimeter"
+  (expr (dim (* x 0.01 [cm/m]) [m]))
+  (length 1))
+
+
+class Unit
+{
+  public:
+  
+}  
+
 * Rootdens
 
 ** Real crop width.
-
-** program GP2D:  Bedre output
 
 ** rootdens.tex
 
@@ -18,9 +30,27 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * MiniOM init
 
-* output
+Pool 
+  input 
+  turnover*
+  content
 
-Skal kunne fjerne minut og sekund simpelt.
+Turnover
+  base rate
+  factor*
+  target* 
+
+Target
+  pool
+  fraction 
+  efficiency
+
+Factor
+  expr
+
+
+MiniOM
+  Pool*
 
 * Qt
 

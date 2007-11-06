@@ -137,6 +137,87 @@ Time::set_alist (AttributeList& alist) const
   alist.add ("second", second ());
 }
 
+int 
+Time::component_value (component_t c) const
+{
+  switch (c)
+    {
+    case Year:
+      return year ();
+    case Month:
+      return month ();
+    case Week:
+      return week ();
+    case Yday:
+      return yday ();
+    case Mday:
+      return mday ();
+    case Wday:
+      return wday ();
+    case Hour:
+      return hour ();
+    case Minute:
+      return minute ();
+    case Second:
+      return second ();
+    }
+  daisy_notreached ();
+}
+
+std::string
+Time::component_name (component_t c)
+{
+  switch (c)
+    {
+    case Year:
+      return "year";
+    case Month:
+      return "month";
+    case Week:
+      return "week";
+    case Yday:
+      return "yday";
+    case Mday:
+      return "mday";
+    case Wday:
+      return "wday";
+    case Hour:
+      return "hour";
+    case Minute:
+      return "minute";
+    case Second:
+      return "second";
+    }
+  daisy_notreached ();
+}
+
+std::string
+Time::component_documentation (component_t c)
+{
+  switch (c)
+    {
+    case Year:
+      return "Year";
+    case Month:
+      return "Month";
+    case Week:
+      return "Week number (first Thursday is in week 1)";
+    case Yday:
+      return "Julian day";
+    case Mday:
+      return "Day in month";
+    case Wday:
+      return "Weekday (Sunday = 7)";
+    case Hour:
+      return "Hour";
+    case Minute:
+      return "Minute";
+    case Second:
+      return "Second";
+    }
+  daisy_notreached ();
+}
+
 // Simulate. 
 
 void 

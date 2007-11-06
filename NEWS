@@ -14,7 +14,13 @@ release.
 
 * 4.21
 
-** Cleanups
+** log_time_columns
+
+New top level parameter.  Use it like
+
+  (log_time_columns year month mday hour)
+
+to avoid minute and second in the log files.
 
 * 4.20
 

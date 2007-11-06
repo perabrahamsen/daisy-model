@@ -50,7 +50,8 @@ static double f_T (double T)
   if (T < 60.0)
     {
       // J.A. van Veen and M.J.Frissel.
-      const double max_val = std::exp (0.47 - 0.027 * T + 0.00193 * T * T);
+      const double T_max = 37.0;
+      const double max_val = exp (0.47 - 0.027 * T_max + 0.00193 * sqr (T_max));
       return max_val * (1.0 - (T - 37.0) / (60.0 - 37.0));
     }
   return 0.0;

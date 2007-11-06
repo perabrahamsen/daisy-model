@@ -24,6 +24,7 @@
 
 #include "condition.h"
 #include "memutils.h"
+#include "time.h"
 #include <vector>
 
 struct Log;
@@ -47,6 +48,7 @@ private:
   std::vector<Log*> active_logs;
   const std::vector<Scope*> scopes;
   const std::auto_ptr<Condition> activate_output;
+  const std::vector<Time::component_t> time_columns;
 
   // Use.
 public:
@@ -67,6 +69,8 @@ private:
   static const std::vector<Scope*> 
   /**/ find_extern_logs (const std::vector<Log*>& logs, 
                          const std::vector<Scope*>& exchanges);
+  static std::vector<Time::component_t>
+  /**/ find_time_columns (const std::vector<std::string>& names);
 public:
   static void load_syntax (Syntax&, AttributeList&);
   explicit Output (Block&);

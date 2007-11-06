@@ -1,4 +1,14 @@
+2007-11-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemical_std.C (ChemicalStandard::heat_turnover_factor): Fix T_max.
+	* denitrification.C (f_T): Ditto.
+	* nitrification.C (Nitrification::f_T): Ditto.
+	* organic_std.C (OrganicStandard::heat_turnover_factor): Ditto.
+
 2007-11-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* output.C, output.h (log_time_columns): New paramater.
+	* log_table.C: Use it.
 
 	* select_content.C (z, x, y): New parameters.
 

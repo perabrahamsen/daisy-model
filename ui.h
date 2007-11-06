@@ -33,7 +33,11 @@ class EXPORT UI : public Model
 public:
   const symbol name;
   static const char *const component;
-  
+
+  // Utilities.
+protected:
+  void set_low_priority () const;
+
   // Use.
 public:
   virtual void attach (Toplevel&) = 0;

@@ -111,12 +111,14 @@ struct LogHarvest : public Log
     return false;
   }
 
-  void done (const Time&, double)
+  void done (const std::vector<Time::component_t>& time_columns,
+	     const Time&, double)
   { daisy_notreached (); }
 
   bool initial_match (const Daisy&, Treelog&)
   { return false; }
-  void initial_done (const Time&, double)
+  void initial_done (const std::vector<Time::component_t>& time_columns,
+		     const Time&, double)
   { daisy_notreached (); }
 
   // Normal items.

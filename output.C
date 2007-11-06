@@ -27,9 +27,14 @@
 #include "treelog.h"
 #include "time.h"
 #include "timestep.h"
+#include "block.h"
 #include "syntax.h"
 #include "assertion.h"
 #include "librarian.h"
+
+static void
+operator++ (Time::component_t& val, int)
+{ val = Time::component_t (val + 1); }
 
 void
 Output::initial_logs (const Daisy& daisy, Treelog& msg)
@@ -51,7 +56,7 @@ Output::initial_logs (const Daisy& daisy, Treelog& msg)
 		  output_submodule (previous, "time", log);
                   daisy.output (log);
                   output_list (logs, "output", log, Log::component);
-		  log.initial_done (previous, daisy.dt);
+		  log.initial_done (time_columns, previous, daisy.dt);
 		}
 	    }
 	}
@@ -77,7 +82,7 @@ Output::tick (const Daisy& daisy, Treelog& msg)
 	      output_submodule (daisy.time, "time", log);
               daisy.output (log);
               output_list (logs, "output", log, Log::component);
-	      log.done (daisy.time, daisy.dt);
+	      log.done (time_columns, daisy.time, daisy.dt);
 	    }
 	}
     }
@@ -165,6 +170,19 @@ Output::find_extern_logs (const std::vector<Log*>& logs,
   return result;
 }
 
+std::vector<Time::component_t>
+Output::find_time_columns (const std::vector<std::string>& names)
+{
+  std::vector<Time::component_t> result;
+  
+  for (size_t n = 0; n < names.size (); n++)
+    for (Time::component_t c = Time::First; c <= Time::Last; c++)
+      if (names[n] == Time::component_name (c))
+	result.push_back (c);
+
+  return result;
+}
+
 Output::Output (Block& al)
   : logging (false),
     exchanges (Librarian::build_vector<Scope> (al, "exchange")),
@@ -172,7 +190,8 @@ Output::Output (Block& al)
     log_all (new LogAll (logs)),
     active_logs (find_active_logs (logs, *log_all)),
     scopes (find_extern_logs (logs, exchanges)),
-    activate_output (Librarian::build_item<Condition> (al, "activate_output"))
+    activate_output (Librarian::build_item<Condition> (al, "activate_output")),
+    time_columns (find_time_columns (al.name_sequence ("log_time_columns")))
 { }
 
 Output::Output ()
@@ -204,4 +223,33 @@ period.");
                      Syntax::Const, Syntax::Sequence, "\
 List of exchange items for communicating with external models.");
   alist.add ("exchange", std::vector<AttributeList*> ());
+
+  // The log_time paramater.
+  static VCheck::Enum valid_component;
+  const bool empty_valid = valid_component.size () < 1;
+  std::string log_time_doc = "\
+List of default time components to include in log files. Choose between:\n";
+
+  for (Time::component_t i = Time::First; i <= Time::Last; i++)
+    {
+      const std::string& name = Time::component_name (i);
+      const std::string& doc = Time::component_documentation (i);
+      log_time_doc += " '" + name + "': " + doc + "\n";
+      if (empty_valid)
+	valid_component.add (name);
+    }
+  syntax.add ("log_time_columns",
+	      Syntax::String, Syntax::Const, Syntax::Sequence, 
+	      log_time_doc);
+  syntax.add_check ("log_time_columns", valid_component);
+  std::vector<symbol> default_time;
+  default_time.push_back (symbol ("year"));
+  default_time.push_back (symbol ("month"));
+  default_time.push_back (symbol ("mday"));
+  default_time.push_back (symbol ("hour"));
+  default_time.push_back (symbol ("minute"));
+  default_time.push_back (symbol ("second"));
+  alist.add ("log_time_columns", default_time);
 }
+
+// output.C ends here.

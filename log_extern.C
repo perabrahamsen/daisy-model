@@ -31,9 +31,10 @@
 #include "submodeler.h"
 
 void 
-LogExtern::done (const Time& time, const double dt)
+LogExtern::done (const std::vector<Time::component_t>& time_columns,
+		 const Time& time, const double dt)
 { 
-  LogSelect::done (time, dt);
+  LogSelect::done (time_columns, time, dt);
 
   if (!is_printing)
     return;

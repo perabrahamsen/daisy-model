@@ -39,7 +39,8 @@ signals:
   
   // Use.
 private:
-  void done (const Time&, double dt);
+  void done (const std::vector<Time::component_t>& time_columns,
+	     const Time&, double dt);
 
   // Create and destroy.
 public:

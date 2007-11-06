@@ -563,6 +563,17 @@ VCheck::Enum::validate (const std::string& value) const throw (std::string)
     throw std::string ("Invalid value '" + value + "'");
 }
 
+VCheck::Enum::Enum ()
+{ }
+
+void 
+VCheck::Enum::add (const std::string& a)
+{ ids.insert (a); }
+
+size_t 
+VCheck::Enum::size () const
+{ return ids.size (); }
+
 VCheck::Enum::Enum (const std::string& a)
 {
   ids.insert (a);

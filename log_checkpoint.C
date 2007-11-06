@@ -47,11 +47,13 @@ struct LogCheckpoint : public LogAList
   bool check_leaf (symbol) const;
   bool check_interior (symbol) const;
   bool match (const Daisy& daisy, Treelog& out);
-  void done (const Time& time, double dt);
+  void done (const std::vector<Time::component_t>& time_columns,
+	     const Time& time, double dt);
 
   bool initial_match (const Daisy&, Treelog&)
   { return false; }
-  void initial_done (const Time&, double)
+  void initial_done (const std::vector<Time::component_t>& time_columns,
+		     const Time&, double)
   { daisy_notreached (); }
 
   // Create and Destroy.
@@ -85,7 +87,8 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& out)
 }
 
 void
-LogCheckpoint::done (const Time&, double)
+LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
+		     const Time&, double)
 {
   if (is_active)
     {

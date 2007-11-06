@@ -23,6 +23,7 @@
 #ifndef LOG_H
 #define LOG_H
 
+#include "time.h"
 #include "border.h"
 #include "model.h"
 #include "alist.h"
@@ -43,7 +44,6 @@ class PLF;
 class Geometry;
 class Soil;
 class Vegetation;
-class Time;
 class Metalib;
 class Treelog;
 class Block;
@@ -73,12 +73,14 @@ public:
   // Called at the start of each time step.
   virtual bool match (const Daisy&, Treelog&) = 0;
   // Called at the end of each time step.
-  virtual void done (const Time& time, double dt) = 0;
+  virtual void done (const std::vector<Time::component_t>& time_columns,
+		     const Time& time, double dt) = 0;
 
   // Initial line.
 public:
   virtual bool initial_match (const Daisy&, Treelog&) = 0;
-  virtual void initial_done (const Time& time, double dt) = 0;
+  virtual void initial_done (const std::vector<Time::component_t>& time_columns,
+			     const Time& time, double dt) = 0;
 
   // Normal items.
 public:

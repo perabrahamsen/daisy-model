@@ -135,12 +135,6 @@ Log::vegetation () const
 }
 
 
-#if 0
-void 
-Log::done (const Time&, const double)
-{ }
-#endif
-
 void
 Log::print_dlf_header (std::ostream& out, const AttributeList& al)
 {

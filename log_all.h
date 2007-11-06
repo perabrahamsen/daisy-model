@@ -43,11 +43,13 @@ private:
 public:
   void insert_active ();
   bool match (const Daisy& daisy, Treelog&);
-  void done (const Time& time, double dt);
+  void done (const std::vector<Time::component_t>& time_columns,
+	     const Time& time, double dt);
 
   // Initial line.
   bool initial_match (const Daisy&, Treelog&);
-  void initial_done (const Time& time, double dt);
+  void initial_done (const std::vector<Time::component_t>& time_columns,
+		     const Time& time, double dt);
 
   // Open normal items.
   void open (symbol name);

@@ -86,5 +86,4 @@ public:
   ~Units ();
 } units;
 
-
 #endif // UNITS_H

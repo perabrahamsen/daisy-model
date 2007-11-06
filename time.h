@@ -24,6 +24,7 @@
 #define TIME_H
 
 #include <string>
+#include <vector>
 #include <memory>
 
 #ifdef BUILD_DLL
@@ -52,12 +53,20 @@ public:
   int week () const;
   int yday () const;
   int mday () const;
-  int wday () const;		// 0=monday, 6=sunday.
+  int wday () const;		// 1=monday, 7=sunday.
   int hour () const;
   int minute () const;
   int second () const;
   std::string print () const;
   void set_alist (AttributeList& alist) const;
+
+  enum component_t {
+    Year, Month, Week, Yday, Mday, Wday, Hour, Minute, Second, 
+    First = Year, Last = Second
+  };
+  int component_value (component_t) const;
+  static std::string component_name (component_t);
+  static std::string component_documentation (component_t);
 
   // Simulate. 
   int tick_generic (const int amount, const int limit, 

@@ -54,7 +54,7 @@ struct LogTable : public LogSelect, public Destination
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
   const bool print_initial;     // Set if initial values should be printed.
-  const bool time_columns;	// Add year, month, day and hour columns.
+  const bool std_time_columns;	// Add year, month, day and hour columns.
   const std::vector<Summary*> summary; // Summarize this log file.
   Time begin;			// First log entry.
   Time end;			// Last log entry.
@@ -67,15 +67,18 @@ struct LogTable : public LogSelect, public Destination
   
   // Log.
   void common_match (const Daisy& daisy, Treelog& out);
-  void common_done (const Time& time, double dt);
+  void common_done (const std::vector<Time::component_t>& time_columns,
+		    const Time& time, double dt);
 
   // Log.
   bool match (const Daisy& daisy, Treelog& out);
-  void done (const Time& time, double dt);
+  void done (const std::vector<Time::component_t>& time_columns,
+	     const Time& time, double dt);
 
   // Initial line.
   bool initial_match (const Daisy&, Treelog&);
-  void initial_done (const Time& time, const double dt);
+  void initial_done (const std::vector<Time::component_t>& time_columns,
+		     const Time& time, const double dt);
 
   // Select::Destination
   void error ();
@@ -101,14 +104,14 @@ LogTable::common_match (const Daisy& daisy, Treelog&)
 { print_header.finish (out, daisy); }
 
 void 
-LogTable::common_done (const Time& time, const double dt)
+LogTable::common_done (const std::vector<Time::component_t>& time_columns,
+		       const Time& time, const double dt)
 { 
   if (print_tags)
     {
-      if (time_columns)
-	out << "year" << field_separator << "month" << field_separator 
-	    << "mday" << field_separator << "hour" << field_separator
-            << "minute" << field_separator << "second" << field_separator;
+      if (std_time_columns)
+	for (size_t i = 0; i < time_columns.size (); i++)
+	  out << Time::component_name (time_columns[i]) << field_separator;
 
       // Print the entry names in the first line of the log file..
       for (unsigned int i = 0; i < entries.size (); i++)
@@ -166,10 +169,9 @@ LogTable::common_done (const Time& time, const double dt)
     }
   if (print_dimension)
     {
-      if (time_columns)
-	out << field_separator << field_separator 
-	    << field_separator << field_separator 
-	    << field_separator << field_separator;
+      if (std_time_columns)
+	for (size_t i = 0; i < time_columns.size (); i++)
+	  out << field_separator;
 
       // Print the entry names in the first line of the log file..
       for (unsigned int i = 0; i < entries.size (); i++)
@@ -200,10 +202,9 @@ LogTable::common_done (const Time& time, const double dt)
       print_dimension = false;
     }
 
-  if (time_columns)
-    out << time.year () << field_separator << time.month () << field_separator 
-	<< time.mday () << field_separator << time.hour () << field_separator
-        << time.minute () << field_separator << time.second () << field_separator;
+  if (std_time_columns)
+    for (size_t i = 0; i < time_columns.size (); i++)
+      out << time.component_value (time_columns[i]) << field_separator;
 
   for (size_t i = 0; i < entries.size (); i++)
     {
@@ -254,9 +255,10 @@ LogTable::match (const Daisy& daisy, Treelog& msg)
   return LogSelect::match (daisy, msg);
 }
 void 
-LogTable::done (const Time& time, const double dt)
+LogTable::done (const std::vector<Time::component_t>& time_columns,
+		const Time& time, const double dt)
 { 
-  LogSelect::done (time, dt);
+  LogSelect::done (time_columns, time, dt);
 
   if (!is_printing)
     return;
@@ -265,7 +267,7 @@ LogTable::done (const Time& time, const double dt)
     if (entries[i]->prevent_printing ())
       return;
 
-  common_done (time, dt);
+  common_done (time_columns, time, dt);
   end = time;
 }
 bool 
@@ -280,9 +282,10 @@ LogTable::initial_match (const Daisy& daisy, Treelog& msg)
   return LogSelect::initial_match (daisy, msg);
 }
 void 
-LogTable::initial_done (const Time& time, const double dt)
+LogTable::initial_done (const std::vector<Time::component_t>& time_columns,
+			const Time& time, const double dt)
 { 
-  LogSelect::initial_done (time, dt);
+  LogSelect::initial_done (time_columns, time, dt);
 
   if (!print_initial)
     {
@@ -295,7 +298,7 @@ LogTable::initial_done (const Time& time, const double dt)
     if (entries[i]->prevent_printing ())
       return;
 
-  common_done (time, dt);
+  common_done (time_columns, time, dt);
   begin = time;
 }
 
@@ -388,7 +391,7 @@ LogTable::LogTable (Block& al)
     print_tags (al.flag ("print_tags")),
     print_dimension (al.flag ("print_dimension")),
     print_initial (al.flag ("print_initial")),
-    time_columns (al.ok () && !contain_time_columns (entries)),
+    std_time_columns (al.ok () && !contain_time_columns (entries)),
     summary (Librarian::build_vector<Summary> (al, "summary")),
     begin (1, 1, 1, 1),
     end (1, 1, 1, 1),

@@ -28,9 +28,21 @@
 #include "alist.h"
 #include "assertion.h"
 
+#if defined (__MINGW32__) || defined (_MSC_VER)
+#include <windows.h>
+#endif // win32 API
+
 // UI
 
 const char *const UI::component = "ui";
+
+void
+UI::set_low_priority () const
+{
+#if defined (__MINGW32__) || defined (_MSC_VER)
+  (void) SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS); 
+#endif // win32 API
+}
 
 UI::UI (Block& al)
   : name (al.identifier ("type"))
@@ -55,6 +67,8 @@ UIProgress::attach (Toplevel& toplevel)
 void 
 UIProgress::run (Toplevel& toplevel)
 { 
+  set_low_priority ();
+
   switch (toplevel.state ())
     {
     case Toplevel::is_unloaded:
@@ -119,7 +133,7 @@ UINone::attach (Toplevel&)
 
 void 
 UINone::run (Toplevel&)
-{ }
+{ set_low_priority (); }
 
 bool 
 UINone::running () const

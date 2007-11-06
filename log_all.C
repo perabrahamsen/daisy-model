@@ -103,14 +103,15 @@ LogAll::match (const Daisy& daisy, Treelog& out)
 }
 
 void 
-LogAll::done (const Time& time, double dt)
+LogAll::done (const std::vector<Time::component_t>& time_columns,
+	      const Time& time, double dt)
 {
   msg = NULL;
   for (std::vector<LogSelect*>::const_iterator i = slaves.begin (); 
        i != slaves.end (); 
        i++)
     if ((*i)->is_active)
-      (*i)->done (time, dt);
+      (*i)->done (time_columns, time, dt);
 
   active_leafs.pop ();
   active_interiors.pop ();
@@ -134,14 +135,15 @@ LogAll::initial_match (const Daisy& daisy, Treelog& out)
 }
 
 void 
-LogAll::initial_done (const Time& time, const double dt)
+LogAll::initial_done (const std::vector<Time::component_t>& time_columns,
+		      const Time& time, const double dt)
 {
   msg = NULL;
   for (std::vector<LogSelect*>::const_iterator i = slaves.begin (); 
        i != slaves.end (); 
        i++)
     if ((*i)->is_active)
-      (*i)->initial_done (time, dt);
+      (*i)->initial_done (time_columns, time, dt);
 
   active_leafs.pop ();
   active_interiors.pop ();
