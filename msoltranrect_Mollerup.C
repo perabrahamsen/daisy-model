@@ -954,12 +954,10 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   upperboundary (geo, edge_type, J, B_vec, msg);
 
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-  const bool isflux = true;
-  //const bool isflux = false;
   //lowerboundary (geo, isflux, C_below, q_edge, ThetaD_long, edge_type,       //mmo 20071102  
   //               B_mat, B_vec, diffm_long_mat, diffm_long_vec, advecm);      //mmo 20071102
 
-  lowerboundary (geo, isflux, C_below, q_edge, ThetaD_long_avg, edge_type,     //mmo 20071102  
+  lowerboundary (geo, flux_below, C_below, q_edge, ThetaD_long_avg, edge_type,     //mmo 20071102  
                  B_mat, B_vec, diffm_long_mat, diffm_long_vec, advecm);        //mmo 20071102
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   //-----------------------------------------------------------------
