@@ -421,22 +421,21 @@ MsoltranrectMollerup::diffusion_tran (const GeometryRect& geo,
                                       ublas::matrix<double>& diff_tran)
 {
 
-  //copy from long....
   const size_t edge_size = geo.edge_size (); // number of edges  
     
   for (size_t e = 0; e < edge_size; e++)
     {
       if (geo.edge_is_internal (e))
 	{
-	  /*
-	  const int from = geo.edge_from (e);
+          const int from = geo.edge_from (e);
 	  const int to = geo.edge_to (e);
-	  const double magnitude = geo.edge_area_per_length (e) * D_tran[e]; 
+	  
+          const double magnitude = geo.edge_area_per_length (e) * D_tran[e]; 
 	  diff_tran (from, from) -= magnitude;
 	  diff_tran (from, to) += magnitude;
 	  diff_tran (to, to) -= magnitude;
 	  diff_tran (to, from) += magnitude;
-	  */ 
+	  
 	} 
     }
 }
@@ -943,8 +942,8 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     advecm (c, c) = 0.0;
   
   //Debug - flow c ndition!!!
-  J[0] = -0.5;       //mmoxxx 
-  J[101] = -0.5;     //mmoxxx
+  //J[0] = -0.5;       //mmoxxx 
+  //J[101] = -0.5;     //mmoxxx
 
   std::vector<edge_type_t> edge_type (edge_size, Unhandled);
   for (size_t e = 0; e < edge_size; e++)
@@ -1013,7 +1012,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       for (int c = 0; c < cell_size; c++)
         QTheta_mat_np1 (c, c) = geo.cell_volume (c) * Theta_cell_np1 (c);
       
-      
+            
       if (simple_dcthetadt)
         {
           A = (1.0 / ddt) * QTheta_mat_np1          // dtheta/ddt
@@ -1031,7 +1030,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
             + (1 - gamma) * B_mat
             + (1 - gamma) * diffm_long_mat
             - (1 - gamma) * advecm;
-      
+
           b = prod (b_mat, C_n)
             + B_vec                                    
             + diffm_long_vec;                      //Dirichlet BC
@@ -1051,7 +1050,8 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   
       // C_n = C_np1
       C_n = b; // new solution :-)
-      
+
+
       //Solution checks???
       //Calculate and sum up fluxes 
       
