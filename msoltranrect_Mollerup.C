@@ -430,17 +430,64 @@ MsoltranrectMollerup::diffusion_tran (const GeometryRect& geo,
           const int from = geo.edge_from (e);
 	  const int to = geo.edge_to (e);
 	  
-          const double magnitude = geo.edge_area_per_length (e) * D_tran[e]; 
-	  diff_tran (from, from) -= magnitude;
-	  diff_tran (from, to) += magnitude;
-	  diff_tran (to, to) -= magnitude;
-	  diff_tran (to, from) += magnitude;
-	  
+          const std::vector<int>& corners = geo.edge_corners (e);
+          daisy_assert (corners.size () == 2);
+          const int A = corners[0];
+          const int B = corners[1];
+          const std::vector<int>& A_cells = geo.corner_cells (A);
+          const std::vector<int>& B_cells = geo.corner_cells (B);
+          const bool A_is_border = A_cells.size () == 2;
+          daisy_assert (A_is_border || A_cells.size () == 4);
+          const bool B_is_border = B_cells.size () == 2;
+          daisy_assert (B_is_border || B_cells.size () == 4);
+          
+          if (A_is_border && B_is_border)
+            // Both corners of the edge touches the border.
+            continue;
+
+          // We use the fact that the geometry is rectangular and
+          // alligned with our coordinate system to ignore whether
+          // we are looking at the z or the x dimension.
+          const double dkz = geo.corner_z (B) - geo.corner_z (A);
+          const double dkx = geo.corner_x (B) - geo.corner_x (A);
+          const double area = geo.edge_area (e);
+          daisy_assert (approximate (fabs (dkz + dkx), area));
+          double magnitude = -ThetaD_tran (e) * area / (dkz + dkx);
+
+          // On a border we calculate from edge center, rather than corner.
+          if (A_is_border || B_is_border)
+            magnitude *= 2.0;
+
+          const double dcz = geo.z (to) - geo.z (from);
+          const double dcx = geo.x (to) - geo.x (from);
+          const double length = geo.edge_length (e);
+          daisy_assert (approximate (fabs (dcz + dcx), length));
+          const double sign =  length / (dcz + dcx);
+
+          // On the border, we average over two cell. 
+          // For interior corners, over four cells.
+          const double A_magnitude = A_is_border 
+            ? magnitude / 2.0
+            : magnitude / 4.0;
+
+          const double B_magnitude = B_is_border 
+            ? magnitude / 2.0
+            : magnitude / 4.0;
+
+          for (size_t i = 0; i < A_cells.size (); i++)
+            {
+              diff_tran (from, A_cells[i]) += A_magnitude * sign;
+              diff_tran (to, A_cells[i]) -= A_magnitude * sign;
+            }
+
+          for (size_t i = 0; i < B_cells.size (); i++)
+            {
+              diff_tran (from, B_cells[i]) -= B_magnitude * sign;
+              diff_tran (to, B_cells[i]) += B_magnitude * sign;
+            }
 	} 
     }
 }
-
-
 
 void 
 MsoltranrectMollerup::advection (const GeometryRect& geo,
