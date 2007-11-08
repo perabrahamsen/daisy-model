@@ -29,7 +29,7 @@
 #include "surface.h"
 #include "weather.h"
 #include "solute.h"
-#include "element.h"
+#include "doe.h"
 #include "transport.h"
 #include "mactrans.h"
 #include "log.h"
@@ -75,7 +75,7 @@ struct Movement1D : public Movement
                const double dt, const Scope&, Treelog& msg);
   void element (const Soil& soil, 
                 const SoilWater& soil_water, 
-                Element& element,
+                DOE& element,
                 Adsorption& adsorption,
                 double diffusion_coefficient,
                 double dt,
@@ -297,7 +297,7 @@ Movement1D::solute (const Soil& soil,
 void 
 Movement1D::element (const Soil& soil, 
                      const SoilWater& soil_water, 
-                     Element& element,
+                     DOE& element,
                      Adsorption& adsorption,
                      const double diffusion_coefficient,
                      const double dt,

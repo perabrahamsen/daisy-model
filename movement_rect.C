@@ -58,7 +58,7 @@ struct MovementRect : public Movement
                double J_in, Solute&, const bool flux_below, 
 	       double dt, const Scope&, Treelog&);
   void element (const Soil& soil, const SoilWater& soil_water,
-                Element& element, Adsorption& adsorption,
+                DOE& element, Adsorption& adsorption,
                 double diffusion_coefficient, double dt, Treelog& msg);
 
   // Management.
@@ -152,7 +152,7 @@ MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
 
 void 
 MovementRect::element (const Soil& soil, const SoilWater& soil_water,
-                       Element& element, Adsorption& adsorption,
+                       DOE& element, Adsorption& adsorption,
                        const double diffusion_coefficient, double dt, 
                        Treelog& msg)
 {

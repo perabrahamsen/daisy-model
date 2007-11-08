@@ -424,9 +424,9 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = ui.C reaction.C scopesel.C scope.C \
+COMPONENTS = element.C ui.C reaction.C scopesel.C scope.C \
 	ABAeffect.C msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
-	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C \
+	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C\
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
@@ -439,7 +439,7 @@ COMPONENTS = ui.C reaction.C scopesel.C scope.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = toplevel.C timestep.C geometry_rect.C element.C \
+SUBMODELS = toplevel.C timestep.C geometry_rect.C doe.C \
         geometry1d.C fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \
@@ -920,6 +920,8 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+element${OBJ}: element.C element.h model.h symbol.h block.h syntax.h \
+  treelog.h plf.h alist.h mathlib.h assertion.h librarian.h
 ui${OBJ}: ui.C ui.h model.h symbol.h toplevel.h treelog_text.h treelog.h \
   librarian.h block.h syntax.h plf.h alist.h assertion.h
 reaction${OBJ}: reaction.C reaction.h model.h alist.h symbol.h block.h \
@@ -932,8 +934,8 @@ scope${OBJ}: scope.C scope.h symbol.h model.h block.h syntax.h treelog.h \
 ABAeffect${OBJ}: ABAeffect.C ABAeffect.h model.h alist.h symbol.h mathlib.h \
   assertion.h block.h syntax.h treelog.h plf.h librarian.h
 msoltranrect${OBJ}: msoltranrect.C msoltranrect.h model.h symbol.h solute.h \
-  adsorption.h element.h geometry_rect.h geometry_vert.h geometry.h \
-  syntax.h treelog.h mathlib.h assertion.h block.h plf.h librarian.h
+  adsorption.h doe.h geometry_rect.h geometry_vert.h geometry.h syntax.h \
+  treelog.h mathlib.h assertion.h block.h plf.h librarian.h
 uzrect${OBJ}: uzrect.C uzrect.h model.h symbol.h block.h syntax.h treelog.h \
   plf.h librarian.h
 bound${OBJ}: bound.C bound.h model.h symbol.h block.h syntax.h treelog.h \
@@ -1078,9 +1080,9 @@ timestep${OBJ}: timestep.C timestep.h time.h vcheck.h syntax.h treelog.h \
 geometry_rect${OBJ}: geometry_rect.C geometry_rect.h geometry_vert.h \
   geometry.h syntax.h treelog.h symbol.h mathlib.h assertion.h volume.h \
   model.h check.h vcheck.h block.h plf.h alist.h submodel.h
-element${OBJ}: element.C element.h log.h time.h border.h model.h alist.h \
-  symbol.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
-  adsorption.h submodel.h soil.h soil_water.h
+doe${OBJ}: doe.C doe.h log.h time.h border.h model.h alist.h symbol.h \
+  geometry.h syntax.h treelog.h mathlib.h assertion.h adsorption.h \
+  submodel.h soil.h soil_water.h
 geometry1d${OBJ}: geometry1d.C geometry1d.h geometry_vert.h geometry.h \
   syntax.h treelog.h symbol.h mathlib.h assertion.h volume.h model.h \
   block.h plf.h alist.h check.h vcheck.h submodel.h
@@ -1099,10 +1101,9 @@ smb${OBJ}: smb.C smb.h om.h plf.h dom.h adsorption.h model.h symbol.h \
 aom${OBJ}: aom.C aom.h om.h plf.h submodel.h alist.h symbol.h syntax.h \
   treelog.h check.h assertion.h smb.h dom.h adsorption.h model.h log.h \
   time.h border.h geometry.h mathlib.h
-dom${OBJ}: dom.C dom.h adsorption.h model.h symbol.h plf.h element.h smb.h \
-  om.h geometry.h syntax.h treelog.h mathlib.h assertion.h submodel.h \
-  block.h alist.h soil.h soil_water.h log.h time.h border.h check.h \
-  librarian.h
+dom${OBJ}: dom.C dom.h adsorption.h model.h symbol.h plf.h doe.h smb.h om.h \
+  geometry.h syntax.h treelog.h mathlib.h assertion.h submodel.h block.h \
+  alist.h soil.h soil_water.h log.h time.h border.h check.h librarian.h
 crpn${OBJ}: crpn.C crpn.h production.h symbol.h root_system.h rootdens.h \
   model.h plf.h syntax.h treelog.h alist.h log.h time.h border.h \
   mathlib.h assertion.h submodel.h check.h
@@ -1437,7 +1438,7 @@ organic_std${OBJ}: organic_std.C organic_matter.h model.h symbol.h syntax.h \
 movement_1D${OBJ}: movement_1D.C movement.h model.h symbol.h geometry1d.h \
   geometry_vert.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
   soil.h soil_water.h soil_heat.h macro.h groundwater.h surface.h \
-  uzmodel.h weather.h im.h solute.h adsorption.h element.h transport.h \
+  uzmodel.h weather.h im.h solute.h adsorption.h doe.h transport.h \
   mactrans.h log.h time.h border.h alist.h submodeler.h block.h plf.h \
   memutils.h librarian.h
 integer_arit${OBJ}: integer_arit.C integer.h model.h symbol.h syntax.h \

@@ -22,7 +22,7 @@
 
 #include "msoltranrect.h"
 #include "solute.h"
-#include "element.h"
+#include "doe.h"
 #include "geometry_rect.h"
 #include "block.h"
 #include "librarian.h"
@@ -87,7 +87,7 @@ Msoltranrect::solute (const GeometryRect& geo,
 void 
 Msoltranrect::element (const GeometryRect& geo, 
                        const Soil& soil, const SoilWater& soil_water,
-                       Element& element, Adsorption& adsorption,
+                       DOE& element, Adsorption& adsorption,
                        const double diffusion_coefficient, 
                        const double dt, Treelog& msg)
 {

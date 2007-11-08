@@ -30,7 +30,7 @@ class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
-class Element;
+class DOE;
 class Solute;
 class Adsorption;
 class Surface;
@@ -64,7 +64,7 @@ public:
                        const double J_in, Solute&, const bool flux_below, 
 		       double dt, const Scope&, Treelog&) = 0;
   virtual void element (const Soil&, const SoilWater&, 
-                        Element&, Adsorption&,
+                        DOE&, Adsorption&,
                         double diffusion_coefficient, double dt, Treelog&) = 0;
   virtual void ridge (Surface&, const Soil&, const SoilWater&, 
                       const AttributeList&) = 0;

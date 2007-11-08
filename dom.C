@@ -22,7 +22,7 @@
 
 
 #include "dom.h"
-#include "element.h"
+#include "doe.h"
 #include "smb.h"
 #include "om.h"
 #include "geometry.h"
@@ -190,10 +190,10 @@ A single Dissolved Organic Matter pool.");
   // Content.
   syntax.add_submodule ("C", alist, Syntax::State,
 			"Carbon content of DOM pool.",
-			Element::load_syntax);
+			DOE::load_syntax);
   syntax.add_submodule ("N", alist, Syntax::State,
 			"Nitrogen content of DOM pool.",
-			Element::load_syntax);
+			DOE::load_syntax);
 
   // Transport
   syntax.add_object ("adsorption", Adsorption::component, 
@@ -229,8 +229,8 @@ DOM::initialize (const Geometry& geo,
 }
 
 DOM::DOM (Block& al)
-  : C (*new Element (al.alist ("C"))),
-    N (*new Element (al.alist ("N"))),
+  : C (*new DOE (al.alist ("C"))),
+    N (*new DOE (al.alist ("N"))),
     adsorption (Librarian::build_item<Adsorption> (al, "adsorption")),
     diffusion_coefficient (al.number ("diffusion_coefficient")),
     turnover_rate (al.check ("turnover_rate")

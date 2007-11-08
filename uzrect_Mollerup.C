@@ -36,7 +36,7 @@
 #include "librarian.h"
 
 // Uncomment for fast code that does not catches bugs.
-// #define BOOST_UBLAS_NDEBUG
+#define BOOST_UBLAS_NDEBUG
 
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -45,6 +45,7 @@
 #include <boost/numeric/ublas/banded.hpp>
 #include <boost/numeric/ublas/lu.hpp>
 #include <boost/numeric/ublas/io.hpp>
+// #include <boost/numeric/ublas/matrix_sparse.hpp>
 
 #include <sstream>
 

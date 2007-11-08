@@ -1,6 +1,6 @@
-// element.h --- A single element in a compound solute.
+// element.h --- An element of a compound.
 // 
-// Copyright 2002, 2006 Per Abrahamsen and KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -18,47 +18,31 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+
 #ifndef ELEMENT_H
 #define ELEMENT_H
 
-#include <vector>
+#include "model.h"
+#include "symbol.h"
 
-class Log;
-class Geometry;
-class Soil;
-class SoilWater;
-class Adsorption;
-class Treelog;
-class Syntax;
+class Block;
 class AttributeList;
 
-class Element
+class Element : public Model
 {
+  // Identity.
+public:
+  const symbol name;
+  static const char *const component;
+  
   // Content.
 public:
-  std::vector<double> M;        // Concentration in soil [g/cm^3]
-  std::vector<double> C;    // Concentration in soil solution [g/cm^3]
-  std::vector<double> S;        // Combined source term.
-  std::vector<double> S_p;      // Source term for macropores only.
-  std::vector<double> S_drain;	// Source term for soil drainage only.
-  std::vector<double> J;        // Solute transport log in matrix.
-  std::vector<double> J_p;      // Solute transport log in macropores.
+  virtual double weight () const = 0; // Relative weight [?]
+  virtual symbol dimension () const = 0; // Dimension of relative weight.
 
-  // Simulation.
-public:
-  void output (Log&) const;
-  void mix (const Geometry&, const Soil&, const SoilWater&, Adsorption&,
-	    double from, double to);
-  void swap (const Geometry&, const Soil&, const SoilWater&, Adsorption&, 
-	     double from, double middle, double to);
-  void tick (size_t cell_size, const SoilWater& soil_water, double dt);
-  
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
-  void initialize (const Geometry&, 
-                   const Soil&, const SoilWater&, Adsorption&, Treelog&);
-  Element (const AttributeList& al);
+  Element (Block& al);
   ~Element ();
 };
 

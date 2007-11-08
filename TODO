@@ -1,5 +1,48 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Sorption
+
+** Mål
+
+- Assorption skal ud af solute, og være selvstændig
+
+- SoilNH4 og SoilNO3 skal være chemichals.
+
+- Vi skal have nogle standard kemikalier, og standard transformationer.
+
+** Start
+
+rename Element til DOElement
+
+new element component
+
+new atom class
+
+
+"NO3" i setup fil.
+
+Lad "NO3" være en del af chemistry->trace
+
+Lav "NH4_sorbed" "NO3_solute"
+
+"adsorption" transformation.
+
+transformation skal indgå i source/sink termer.
+
+"denitrification" 
+
+"nitrification"
+
+"root uptake"
+
+"organic matter"
+
+smid SoilNO3 og SoilNH4 ud
+
+fjern adsorption fra Solute
+
+omdøb Solute
+
 * units
 
 (defunit [cm] SI

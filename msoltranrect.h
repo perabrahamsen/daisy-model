@@ -30,7 +30,7 @@ class Log;
 class GeometryRect;
 class Soil;
 class SoilWater;
-class Element;
+class DOE;
 class Solute;
 class Adsorption;
 class Surface;
@@ -55,7 +55,7 @@ public:
                const double J_in, Solute&, const bool flux_below,
 	       double dt, const Scope&, Treelog& msg);
   void element (const GeometryRect&, const Soil&, const SoilWater&,
-                Element&, Adsorption&,
+                DOE&, Adsorption&,
                 const double diffusion_coefficient, double dt, Treelog&);
 private:
   virtual void flow (const GeometryRect& geo, 

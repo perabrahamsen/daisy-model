@@ -1,3 +1,11 @@
+2007-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* element.h, element.C: New component.
+	* Makefile (COMPONENTS): Added.
+
+	* element.h, element.C: Renamed to doe.h and doe.C.
+	* Makefile (SUBMODELS): Changed.
+
 2007-11-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* chemical_std.C (ChemicalStandard::heat_turnover_factor): Fix T_max.

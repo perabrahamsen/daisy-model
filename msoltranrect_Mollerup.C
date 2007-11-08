@@ -34,7 +34,7 @@
 #include <sstream>
 
 // Uncomment for fast code that does not catches bugs.
-// #define BOOST_UBLAS_NDEBUG
+#define BOOST_UBLAS_NDEBUG
 
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -1059,7 +1059,6 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       for (int c = 0; c < cell_size; c++)
         QTheta_mat_np1 (c, c) = geo.cell_volume (c) * Theta_cell_np1 (c);
       
-            
       if (simple_dcthetadt)
         {
           A = (1.0 / ddt) * QTheta_mat_np1          // dtheta/ddt
@@ -1085,8 +1084,9 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
         }
       else  
         {
-          A = A;
-          b = b;     	
+	  daisy_notreached ();
+          // A = ;
+          // b = ;     	
         }
       
       // Solve Ax=b (maybe)

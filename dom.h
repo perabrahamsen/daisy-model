@@ -33,7 +33,7 @@ struct AttributeList;
 struct Geometry;
 struct Soil;
 struct SoilWater;
-struct Element;
+struct DOE;
 struct Adsorption;
 struct SMB;
 struct OM;
@@ -44,8 +44,8 @@ class DOM
 { 
   // Content.
 public:
-  Element& C;
-  Element& N;
+  DOE& C;
+  DOE& N;
 
   // Transport.
 public:
