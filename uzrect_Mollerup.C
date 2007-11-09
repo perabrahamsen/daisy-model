@@ -853,8 +853,6 @@ UZRectMollerup::Darcy (const GeometryRect& geo,
 	  const int from = geo.edge_from (e);
 	  const int to = geo.edge_to (e);	   
           const double length = geo.edge_length (e);
-          // const double area_per_length = geo.edge_area_per_length (e);
-          // const double area = geo.edge_area (e);
           const double sin_angle = geo.edge_sin_angle (e);
           const double K = Kedge (e);
           const double dh = h (to) - h (from);

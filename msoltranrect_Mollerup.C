@@ -349,47 +349,28 @@ MsoltranrectMollerup::thetadiff_xx_zz_xz_zx
       
       if (geo.edge_is_internal (e))
 	{  
-	  //Debug
-	  //std::cout << "internal\n";
-	  // Arithmetic average of Theta * D is used
-	  const double ThetaD_xx_zz_from = Theta[from] 
+          const double ThetaD_xx_zz_from = Theta[from] 
 	    * anisotropy_factor (geo, e, Dxx_cell[from], Dzz_cell[from]);
 	  const double ThetaD_xx_zz_to = Theta[to] 
 	    * anisotropy_factor (geo, e, Dxx_cell[to], Dzz_cell[to]); 
 	  ThetaD_xx_zz[e] = (ThetaD_xx_zz_from + ThetaD_xx_zz_to) / 2.0;
 	  ThetaD_xz_zx[e] = (Theta[from] * Dxz_cell[from] + 
-			    Theta[to] * Dxz_cell[to]) / 2.0;
-	  //Debug
-	  //std::cout << "ThetaD_xx_zz" << ThetaD_xx_zz[e] << "\n"; 
-	  //std::cout << "ThetaD_xz_zx" << ThetaD_xz_zx[e] << "\n";
+                             Theta[to] * Dxz_cell[to]) / 2.0;
 	}  
       else if (geo.cell_is_internal (from))
 	{
-	  //Debug
-	  //std::cout << "External, from\n";
-	  ThetaD_xx_zz[e] = Theta[from] 
+          ThetaD_xx_zz[e] = Theta[from] 
 	    * anisotropy_factor (geo, e, Dxx_cell[from], Dzz_cell[from]);
 	  ThetaD_xz_zx[e] = Theta[from] * Dxz_cell[from];
-	  //Debug
-	  //std::cout << "ThetaD_xx_zz" << ThetaD_xx_zz[e] << "\n"; 
-	  //std::cout << "ThetaD_xz_zx" << ThetaD_xz_zx[e] << "\n";
-	}
+        }
       else 
 	{
-	  //Debug
-	  //std::cout << "External, to\n";
-	  daisy_assert(geo.cell_is_internal (to));
+          daisy_assert(geo.cell_is_internal (to));
 	  ThetaD_xx_zz[e] = Theta[to] 
 	    * anisotropy_factor (geo, e, Dxx_cell[to], Dzz_cell[to]);
 	  ThetaD_xz_zx[e] = Theta[to] * Dxz_cell[to];
-	  //Debug
-	  //std::cout << "ThetaD_xx_zz" << ThetaD_xx_zz[e] << "\n"; 
-	  //std::cout << "ThetaD_xz_zx" << ThetaD_xz_zx[e] << "\n";
-	}
+        }
     }
-  //Debug 
-  //std::cout << "Inside routine: ThetaD_xx_zz" << ThetaD_xx_zz << "\n"; 
-  //std::cout << "Inside routine: ThetaD_xz_zx" << ThetaD_xz_zx << "\n";
 }
 
 
@@ -582,9 +563,8 @@ MsoltranrectMollerup::Dirichlet_xx_zz
   if (q*in_sign >= 0)     //Inflow
     advecm_vec (cell) -= in_sign * value * C_border;
   else                    //Outflow 
-    advecm_mat (cell, cell) -= in_sign * value;
+    advecm_mat (cell, cell) -= in_sign * value;   
   
-
   //Boundary xx_zz diffusion
   const double D_area_per_length = ThetaD_xx_zz * area_per_length;
   diffm_xx_zz_mat (cell, cell) -= D_area_per_length;
@@ -715,14 +695,64 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
               : 1.0 - upstream_weight;
             dJ[e] = alpha * q_edge[e] * C[from] + (1.0-alpha) * C[to];
             
-            //--- Diffusive part --- 
+            //--- Diffusive part - xx_zz --- 
             const double gradient = geo.edge_area_per_length (e) *
               (C[to] - C[from]);
-            dJ[e] += ThetaD_xx_zz[e]*gradient;  //xx_zz diffusion
+            dJ[e] -= ThetaD_xx_zz[e]*gradient;  //xx_zz diffusion
+              
+            //--- Diffusive part - xz_zx ---
+            const std::vector<int>& corners = geo.edge_corners (e);
+            daisy_assert (corners.size () == 2);
+            const int A = corners[0];
+            const int B = corners[1];
+            const std::vector<int>& A_cells = geo.corner_cells (A);
+            const std::vector<int>& B_cells = geo.corner_cells (B);
+            const bool A_is_border = A_cells.size () == 2;
+            daisy_assert (A_is_border || A_cells.size () == 4);
+            const bool B_is_border = B_cells.size () == 2;
+            daisy_assert (B_is_border || B_cells.size () == 4);
+          
+            if (A_is_border && B_is_border)
+              // Both corners of the edge touches the border.
+              continue;
             
-            dJ[e] += 0.0;                       //xz_zx diffusion
+            // We use the fact that the geometry is rectangular and
+            // alligned with our coordinate system to ignore whether
+            // we are looking at the z or the x dimension.
+            const double dkz = geo.corner_z (B) - geo.corner_z (A);
+            const double dkx = geo.corner_x (B) - geo.corner_x (A);
+            const double area = geo.edge_area (e);
+            daisy_assert (approximate (fabs (dkz + dkx), area));
+            double magnitude = -ThetaD_xz_zx (e) * area / (dkz + dkx);
+
+            // On a border we calculate from edge center, rather than corner.
+            if (A_is_border || B_is_border)
+              magnitude *= 2.0;
+
+            const double dcz = geo.z (to) - geo.z (from);
+            const double dcx = geo.x (to) - geo.x (from);
+            const double length = geo.edge_length (e);
+            daisy_assert (approximate (fabs (dcz + dcx), length));
+            const double sign =  length / (dcz + dcx);
+            
+            double Sum_C_A = 0.0;
+            for (size_t i = 0; i < A_cells.size (); i++)
+              Sum_C_A += C[A_cells[i]];
+            const double C_A = A_is_border
+              ? Sum_C_A / 4.0
+              : Sum_C_A / 2.0;
+
+            double Sum_C_B = 0.0;
+            for (size_t i = 0; i < B_cells.size (); i++)
+              Sum_C_B += C[B_cells[i]];
+            const double C_B = B_is_border
+              ? Sum_C_B / 4.0
+              : Sum_C_B / 2.0;
+            
+            Dj[e] -= ThetaD_xz_zx (e) * (C_B-C_A)/(dcz + dcx);  
           }
           break;
+
         case Neumann_explicit_upper:
           dJ[e] = 0.0; // use existing J 
           break;
@@ -740,38 +770,32 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
           }
           break;
           
-        case Dirichlet:
+        case Dirichlet:      //Only lower boundary 
           {
-            const double area = geo.edge_area (e); 
+            //Advective transport
+            double in_sign 
+              = geo.cell_is_internal (geo.edge_to (e)) ? 1.0 : -1.0;
+            const int cell = geo.cell_is_internal (to) ? to : from;
+            if (q_edge[e] * in_sign >= 0)       //Inflow
+              dJ[e] = q_edge[e] * C_below;
+            else                                //Outflow
+              {
+                const int cell = geo.cell_is_internal (to) ? to : from;
+                daisy_assert (cell >= 0);
+                daisy_assert (cell < C.size ());
+                dJ[e] = q_edge[e] * C[cell];
+              }
             
-            //Boundary advection
-            const double advec_value = area  * q * C_below;
-            
-            //Boundary xx_zz diffusion
-            const double 
-
-              //xxxxxxxxxzzzzzzzzzzzz
-
-            
-        //advecm (cell, cell) -= in_sign * value;  //q*in_sign pos for inflow
-  
-            //Boundary xx_zz diffusion
-            
-
-            //const double D_area_per_length = ThetaD_xx_zz * area_per_length;
-            //diffm_xx_zz_mat (cell, cell) -= D_area_per_length;
-            //
-            //const double diffm_xx_zz_vec_val = D_area_per_length * C_border;
-            //diffm_xx_zz_vec (cell) += diffm_xx_zz_vec_val;
-          
-            //J = in_sign * (-value 
-            //               -D_area_per_length * C_cell
-            //               + diffm_xx_zz_vec_val) / area;
-
+            //Diffusive transport - xx_zz diffusion  
+            const double gradient = geo.edge_area_per_length (e) *
+              (C[cell]-C_below)*in_sign;
+            dJ[e] -= ThetaD_xx_zz[e]*gradient;
+         
+            //Diffusive transport - xz_zx diffusion
+            //Constant values along border direction ->
+            //no flux 
           }
           break;
-
-          
         }
     }
 }
