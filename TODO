@@ -12,26 +12,39 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** Start
 
-rename Element til DOElement
+DONE rename Element til DOE
 
-new element component
+DONE new element component
 
-new atom class
+DONE new atom class
 
+DONE "NO3" i setup fil.
 
-"NO3" i setup fil.
+DONE Lad "NO3" være en del af chemistry->trace
 
-Lad "NO3" være en del af chemistry->trace
+DONE Lav "NH4_sorbed" "NO3_solute"
 
-Lav "NH4_sorbed" "NO3_solute"
+DONE "adsorption" transformation.
 
-"adsorption" transformation.
+DONE ScopeSoil
 
-transformation skal indgå i source/sink termer.
+DONE soil/horizon attributes skal være symbol
 
-"denitrification" 
+DONE initialiser N03-, NH4+_sorbed, NH4+_solute
 
-"nitrification"
+DONE - log NO3-, NH4+_sorbed, NH4+_solute, NH4+_sorbtion
+
+DONE - mass balance
+
+DONE Inkluder reactions i "Soil Chemical" balance.
+
+DONE Ny inorganic N log.
+
+doing - abiotic.[Ch]
+
+DONE reaction denitrification
+
+DONE "nitrification"
 
 "root uptake"
 
@@ -42,6 +55,26 @@ smid SoilNO3 og SoilNH4 ud
 fjern adsorption fra Solute
 
 omdøb Solute
+
+Udskudt:
+
+- horizon attributes skal være parametre
+
+- erstat pedo med number
+
+- reaction sorption
+
+- BGJ opsætning
+
+* chemistry multi
+
+Måske skal vi have en "multi" chemistry model, og så definere en
+chemistry for hcert sæt stoffer og reactions der hører sammen?  På den
+måde vil de gamle "defchemical" blive til en "defchemistry" med en
+sorbed og en solute form, samt en sorption (og en decompose?)
+reaction.
+
+** Gør "decompose" til en reaction.
 
 * units
 

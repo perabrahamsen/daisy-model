@@ -1,3 +1,43 @@
+2007-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_nit.C: New model.
+	* Makefile (MODELS): Add it.
+
+2007-11-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_std.C, reaction.h (tick): Extra parameters.
+	* chemistry_std.C (tick_soil): Update caller.
+	* reaction_denit.C: New model.
+	* Makefile (MODELS): Add it.
+
+	* abiotic.C, abiotic.h: New utility.
+	* Makefile (OTHER): Add it.
+	* chemical_std.C, nitrification.C, nitrification_soil.C:
+	* nitrification_solute.C, denitrification.C, organic_std.C: Use it.
+	
+2007-11-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C (initial): New parameter
+	(Solute::default_initialize): Use it.
+	* all: Update callers and implementers.
+
+	* number_arit.C (NumberProduct::dimension): Use 'Units::multiply'.
+
+2007-11-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_adsorption.C: New model.
+	* Makefile (MODELS): Added.
+
+2007-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* scope_soil.h, scope_soil.C: New utility.
+	* Makefile (OTHER): Added.
+
+2007-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_equil.C: New model.
+	* Makefile (MODELS): Added.
+
 2007-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* element.h, element.C: New component.

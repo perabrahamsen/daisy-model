@@ -29,13 +29,14 @@
 #include <string>
 #include <memory>
 
-struct Log;
-struct Syntax;
-struct AttributeList;
+class Log;
+class Syntax;
+class AttributeList;
 class Block;
-struct Geometry;
-struct Soil;
-struct SoilWater;
+class Geometry;
+class Soil;
+class SoilWater;
+class SoilHeat;
 class Treelog;
 class Number;
 class Scope;
@@ -51,6 +52,7 @@ public:
   // Parameters.
   const std::auto_ptr<Number> C_below_expr;
   double C_below_value;
+  const std::auto_ptr<Number> initial_expr;
 public:
   double C_below () const; // Concentration in groundwater [g/cm^3]
 
@@ -67,6 +69,8 @@ protected:
   std::vector<double> S_external;	// External source term, e.g. incorp. fert.
   std::vector<double> S_permanent;	// Permanent external source term.
   std::vector<double> S_root;	// Root uptake source term (negative).
+  std::vector<double> S_sorption;	// Sorption source term.
+  std::vector<double> S_transform;	// Transform source term.
   std::vector<double> J;		// Solute transport log in matrix.
   std::vector<double> J_p;		// Solute transport log in macropores.
 public:
@@ -109,6 +113,10 @@ public:
   void add_to_source (const std::vector<double>&, double dt);
   void add_to_sink (const std::vector<double>&, double dt);
   void add_to_root_sink (const std::vector<double>&, double dt);
+  void add_to_transform_source (const std::vector<double>&, double dt);
+  void add_to_transform_sink (const std::vector<double>&, double dt);
+  void add_to_sorption_source (const std::vector<double>&, double dt);
+  void add_to_sorption_sink (const std::vector<double>&, double dt);
 
   // Simulation.
   void tick (const size_t cell_size, const SoilWater&, double dt,
@@ -136,11 +144,13 @@ public:
 protected:
   Solute (Block& al);
 private:
-  virtual void default_initialize (const Soil& soil, const SoilWater&);
+  virtual void default_initialize (const Soil& soil, const SoilWater&, 
+				   const SoilHeat&, Treelog&);
 public:
   virtual void initialize (const AttributeList&,
 			   const Geometry& geo,
-                           const Soil&, const SoilWater&, Treelog&);
+                           const Soil&, const SoilWater&, const SoilHeat&,
+			   Treelog&);
 public:
   virtual ~Solute ();
 };

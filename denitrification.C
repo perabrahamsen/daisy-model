@@ -23,6 +23,7 @@
 
 
 #include "denitrification.h"
+#include "abiotic.h"
 #include "alist.h"
 #include "syntax.h"
 #include "geometry.h"
@@ -37,26 +38,6 @@
 #include "check.h"
 #include "mathlib.h"
 
-static double f_T (double T)
-{
-  if (T < 2.0)
-    return 0.0;
-  if (T < 6.0)
-    return 0.15 * (T - 2.0);
-  if (T < 20.0)
-    return 0.10 * T;
-  if (T < 37.0)
-    return exp (0.47 - 0.027 * T + 0.00193 * T * T);
-  if (T < 60.0)
-    {
-      // J.A. van Veen and M.J.Frissel.
-      const double T_max = 37.0;
-      const double max_val = exp (0.47 - 0.027 * T_max + 0.00193 * sqr (T_max));
-      return max_val * (1.0 - (T - 37.0) / (60.0 - 37.0));
-    }
-  return 0.0;
-}
-
 void
 Denitrification::output (Log& log) const
 {
@@ -67,13 +48,14 @@ Denitrification::output (Log& log) const
   output_variable (potential_fast, log);
 }
 
-void Denitrification::tick (const std::vector<bool>& active,
-                            const Geometry& geo,
-                            const Soil& soil, const SoilWater& soil_water,
-			    const SoilHeat& soil_heat,
-			    SoilNO3& soil_NO3, 
-			    const OrganicMatter& organic_matter, 
-                            const double dt)
+void 
+Denitrification::tick (const std::vector<bool>& active,
+		       const Geometry& geo,
+		       const Soil& soil, const SoilWater& soil_water,
+		       const SoilHeat& soil_heat,
+		       SoilNO3& soil_NO3, 
+		       const OrganicMatter& organic_matter, 
+		       const double dt)
 {
   const size_t cell_size = geo.cell_size ();
   for (size_t i = 0; i < cell_size; i++)
@@ -93,7 +75,7 @@ void Denitrification::tick (const std::vector<bool>& active,
       const double T = soil_heat.T (i);
       const double height = geo.z (i);
       const double T_factor = (heat_factor.size () < 1)
-	? f_T (T)
+	? Abiotic::f_T2 (T)
 	: heat_factor (T);
       const double pot = T_factor * alpha * CO2_slow;
       const double w_factor = water_factor (Theta_fraction);
@@ -211,3 +193,5 @@ Denitrification::Denitrification (const AttributeList& al)
 
 static Submodel::Register 
 denitrification_submodel ("Denitrification", Denitrification::load_syntax);
+
+// denitrification.C ends here.

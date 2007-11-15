@@ -78,8 +78,10 @@ public:
 public:
   static const AttributeList& default_model ();
   virtual void initialize (Block&, const AttributeList&, const Geometry& geo,
-                           const Soil&, const SoilWater&) = 0;
-  virtual bool check (const Soil&, const Scope&, Treelog&) const = 0;
+                           const Soil&, const SoilWater&, const SoilHeat&,
+			   Treelog&) = 0;
+  virtual bool check (const Soil&, const SoilWater&, const SoilHeat&,
+		      const Scope&, Treelog&) const = 0;
 protected:
   explicit Chemistry (Block& al);
 public:

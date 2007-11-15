@@ -26,6 +26,7 @@
 #include "soil_water.h"
 #include "soil.h"
 #include "geometry.h"
+#include "abiotic.h"
 #include "log.h"
 #include "block.h"
 #include "alist.h"
@@ -72,12 +73,9 @@ struct ChemicalStandard : public Chemical
   double surface_runoff;
 
   // Soil state and log.
-  std::vector<double> decomposed;
-  std::vector<double> uptaken;
   std::vector<double> lag;
 
   // Utlities.
-  static double heat_turnover_factor (double T);
   static double water_turnover_factor (double h);
   double decompose_heat_factor (const double T) const;
   double decompose_water_factor (const double h) const;
@@ -109,30 +107,9 @@ struct ChemicalStandard : public Chemical
 
   // Create.
   void initialize (const AttributeList&, const Geometry&,
-                   const Soil&, const SoilWater&, Treelog&);
+                   const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   ChemicalStandard (Block&);
 };
-
-
-double
-ChemicalStandard::heat_turnover_factor (const double T)
-{
-  if (T < 0.0)
-    return 0.0;
-  if (T < 20.0)
-    return 0.1 * T;
-  if (T < 37.0)
-    return exp (0.47 - 0.027 * T + 0.00193 * T *T);
-
-  if (T < 60.0)
-    {
-      // J.A. van Veen and M.J.Frissel.
-      const double T_max = 37.0;
-      const double max_val = exp (0.47 - 0.027 * T_max + 0.00193 * sqr (T_max));
-      return max_val * (1.0 - (T - 37.0) / (60.0 - 37.0));
-    }
-  return 0.0;
-}
 
 double
 ChemicalStandard::water_turnover_factor (const double h)
@@ -158,7 +135,7 @@ double
 ChemicalStandard::decompose_heat_factor (const double T) const
 {
   if (decompose_heat_factor_.size () < 1)
-    return heat_turnover_factor (T);
+    return Abiotic::f_T0 (T);
   else
     return decompose_heat_factor_ (T);
 }
@@ -285,7 +262,7 @@ ChemicalStandard::uptake (const Soil& soil,
                           const SoilWater& soil_water,
                           const double dt)
 {
-  daisy_assert (uptaken.size () == soil.size ());
+  std::vector<double> uptaken (soil.size (), 0.0);
 
   const double rate = 1.0 - crop_uptake_reflection_factor;
   
@@ -303,7 +280,7 @@ ChemicalStandard::decompose (const Geometry& geo,
                              const OrganicMatter& organic_matter,
                              const double dt)
 {
-  daisy_assert (decomposed.size () == soil.size ());
+  std::vector<double> decomposed (soil.size (), 0.0);
 
   unsigned int size = soil.size ();
 
@@ -348,7 +325,7 @@ ChemicalStandard::decompose (const Geometry& geo,
   for (unsigned int i = size; i < soil.size (); i++)
     decomposed[i] = 0.0;
 
-  add_to_sink (decomposed, dt);
+  add_to_transform_sink (decomposed, dt);
 }
 
 void
@@ -370,21 +347,16 @@ ChemicalStandard::output (Log& log) const
   output_variable (surface_runoff, log);
   output_variable (surface_mixture, log);
   output_variable (surface_out, log);
-
-  // Soil.
-  output_variable (uptaken, log);
-  output_variable (decomposed, log);
 }
 
 void
 ChemicalStandard::initialize (const AttributeList& al,
                               const Geometry& geo,
                               const Soil& soil, const SoilWater& soil_water, 
-                              Treelog& out)
+			      const SoilHeat& soil_heat,
+                              Treelog& msg)
 {
-  Solute::initialize (al, geo, soil, soil_water, out);
-  uptaken.insert (uptaken.begin (), soil.size (), 0.0);
-  decomposed.insert (decomposed.begin (), soil.size (), 0.0);
+  Solute::initialize (al, geo, soil, soil_water, soil_heat, msg);
   lag.insert (lag.end (), soil.size () - lag.size (), 0.0);
 }
 
@@ -486,11 +458,6 @@ You may not specify both 'decompose_rate' and 'decompose_halftime'");
     AttributeList& alist = *new AttributeList ();
     syntax.add_check (check_alist);
 
-#if 0
-    syntax.add_submodule ("solute", alist, Syntax::Const,
-			  "Description of chemical in soil.",
-                          Solute::load_syntax);
-#endif
     Solute::load_syntax (syntax, alist);
     
     syntax.add ("description", Syntax::String, Syntax::OptionalConst,
@@ -590,10 +557,6 @@ decomposition begins.  It can never be more than 1.0 or less than 0.0.");
                 "Entering the soil with water infiltration.");
 
     // Soil solute.
-    syntax.add ("uptaken", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-                "Amount uptaken by crops in this time step.");
-    syntax.add ("decomposed", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-                "Amount decomposed in this time step.");
     syntax.add ("lag", Syntax::None (), Syntax::OptionalState,
                 "This state variable grows with lag_increment (C) each hour.\n\
 When it reached 1.0, decomposition begins.");

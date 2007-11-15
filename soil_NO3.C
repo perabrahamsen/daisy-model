@@ -34,7 +34,8 @@ SoilNO3::diffusion_coefficient () const
 }
 
 void 
-SoilNO3::default_initialize (const Soil& soil, const SoilWater&)
+SoilNO3::default_initialize (const Soil& soil, const SoilWater&, 
+			     const SoilHeat&, Treelog&)
 {
   daisy_assert (C_.size () == 0);
   daisy_assert (M_.size () == 0);

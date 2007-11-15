@@ -282,7 +282,7 @@ The total amount of water in the soil interval")
   "NO3 balance for the complete system."
   (precision 3)
   (require_top true)
-  (input "NO3-Fertilizer" "NO3-Deposit" "NO3-Nitrification")
+  (input "NO3-Fertilizer" "NO3-Deposit" "NO3-_Nitrification")
   (output "NO3-Immobilization" Denitrification
           "NO3-Leak-Matrix" "NO3-Leak-Macro" "NO3-Drain" "NO3-Runoff"
           "NO3-Crop")
@@ -702,3 +702,209 @@ The total amount of water in the soil interval")
                      (path column "${column}" OrganicMatter "*" buffer N)
                      (spec organic default buffer N)
                      (dimension "kg N/ha"))))
+
+(defsummary "Soil NO3- balance" balance
+  (precision 3)
+  (input "NO3-_In" "NO3-_Incorp" "NO3-_Transform" "NO3-_Nitrification")
+  (output "NO3-_Leak-Matrix" "NO3-_Leak-Macro" "NO3-_Drain" "NO3-_Uptake"
+	  "Denitrification")
+  (content "NO3-_Content"))
+
+(defsummary "Soil NH4+ solute balance" balance
+  (precision 3)
+  (input "NH4+_solute_In" "NH4+_solute_Incorp" 
+	 "NH4+_solute_Transform")
+  (output "NH4+_solute_Leak-Matrix" "NH4+_solute_Leak-Macro" "NH4+_solute_Drain"
+	  "NH4+_solute_Uptake" "NH4+_Sorption")
+  (content "NH4+_solute_Content"))
+
+(defsummary "Soil NH4+ sorbed balance" balance
+  (precision 3)
+  (input "NH4+_sorbed_Incorp" "NH4+_Sorption" 
+	 "NH4+_sorbed_Transform")
+  (output "NH4+_sorbed_Uptake")
+  (content "NH4+_sorbed_Content"))
+
+(defsummary "Soil NH4+ balance" balance
+  (precision 3)
+  (input "NH4+_solute_In" 
+	 "NH4+_solute_Incorp" "NH4+_sorbed_Incorp"
+	 )
+  (output "NH4+_solute_Leak-Matrix" "NH4+_solute_Leak-Macro" "NH4+_solute_Drain"
+	  "NH4+_solute_Uptake"  "NH4+_sorbed_Uptake" "NH4+_Nitrification")
+  (content "NH4+_solute_Content" "NH4+_sorbed_Content"))
+
+
+(defsummary "Soil Inorganic-N balance" balance
+  (precision 3)
+  (input "NO3-_In" "NH4+_solute_In" 
+	 "NO3-_Incorp" "NH4+_solute_Incorp" "NH4+_sorbed_Incorp")
+  (output "NO3-_Leak-Matrix" "NH4+_solute_Leak-Matrix"
+	  "NO3-_Leak-Macro" "NH4+_solute_Leak-Macro"
+	  "NO3-_Drain" "NH4+_solute_Drain"
+	  "NO3-_Uptake" "NH4+_solute_Uptake"
+	  "Denitrification" "N2O_Nitrification")
+  (content "NO3-_Content" "NH4+_solute_Content" "NH4+_sorbed_Content"))
+
+(deflog "2Soil nitrogen" column
+  "Nitrogen input, output, transformation and content for the soil."
+  (where "2soil_nitrogen.dlf")
+  (summary "Soil NO3- balance" "Soil NH4+ balance" 
+	   "Soil NH4+ solute balance" "Soil NH4+ sorbed balance"
+	   "Soil Inorganic-N balance")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (flux_top (path column "${column}" Chemistry "*" trace NO3- J)
+                     (tag "NO3-_In")
+                     (handle sum)
+                     (negate true)
+                     (dimension "kg/ha/&")
+                     (spec chemical default J))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NO3- J)
+                        (tag "NO3-_Leak-Matrix")
+                        (negate true)
+                        (handle sum)
+                        (dimension "kg/ha/&")
+                        (spec chemical default J))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NO3- J_p)
+                        (tag "NO3-_Leak-Macro")
+                        (negate true)
+                        (handle sum)
+                        (dimension "kg/ha/&")
+                        (spec chemical default J_p))
+           (interval (path column "${column}" Chemistry "*" trace NO3- S_drain)
+                     (tag "NO3-_Drain")
+                     (negate true)
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+			   trace NO3- S_external)
+                     (tag "NO3-_Incorp")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec chemical default S_external))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace NO3- S_root)
+                     (tag "NO3-_Uptake")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec chemical default S_root))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace NO3- S_transform)
+                     (tag "NO3-_Transform")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec chemical default S_transform))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace NO3- M)
+                     (tag "NO3-_Content")
+                     (dimension "kg/ha")
+                     (spec chemical default M))
+           (flux_top (path column "${column}"
+			   Chemistry "*" trace NH4+_solute J)
+                     (tag "NH4+_solute_In")
+                     (handle sum)
+                     (negate true)
+                     (dimension "kg/ha/&")
+                     (spec chemical default J))
+           (flux_bottom (path column "${column}"
+			      Chemistry "*" trace NH4+_solute J)
+                        (tag "NH4+_solute_Leak-Matrix")
+                        (negate true)
+                        (handle sum)
+                        (dimension "kg/ha/&")
+                        (spec chemical default J))
+           (flux_bottom (path column "${column}"
+			      Chemistry "*" trace NH4+_solute J_p)
+                        (tag "NH4+_solute_Leak-Macro")
+                        (negate true)
+                        (handle sum)
+                        (dimension "kg/ha/&")
+                        (spec chemical default J_p))
+           (interval (path column "${column}"
+			   Chemistry "*" trace NH4+_solute S_drain)
+                     (tag "NH4+_solute_Drain")
+                     (negate true)
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+			   trace NH4+_solute S_external)
+                     (tag "NH4+_solute_Incorp")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec chemical default S_external))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace NH4+_solute S_root)
+                     (tag "NH4+_solute_Uptake")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec chemical default S_root))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace NH4+_solute S_transform)
+                     (tag "NH4+_solute_Transform")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec chemical default S_transform))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace NH4+_solute M)
+                     (tag "NH4+_solute_Content")
+                     (dimension "kg/ha")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+			   trace NH4+_sorbed S_external)
+                     (tag "NH4+_sorbed_Incorp")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec chemical default S_external))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace NH4+_sorbed S_root)
+                     (tag "NH4+_sorbed_Uptake")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec chemical default S_root))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace NH4+_sorbed S_transform)
+                     (tag "NH4+_sorbed_Transform")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec chemical default S_transform))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace NH4+_sorbed M)
+                     (tag "NH4+_sorbed_Content")
+                     (dimension "kg/ha")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*"
+                           reaction NH4+_sorption adsorption_source)
+                     (tag "NH4+_Sorption")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec reaction adsorption adsorption_source))
+	   (interval (path column "${column}" Chemistry "*"
+                           reaction denitrification converted)
+                     (tag "Denitrification")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec reaction denitrification converted))
+	   (interval (path column "${column}" Chemistry "*"
+                           reaction nitrification NH4)
+                     (tag "NH4+_Nitrification")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec reaction nitrification NH4))
+	   (interval (path column "${column}" Chemistry "*"
+                           reaction nitrification NO3)
+                     (tag "NO3-_Nitrification")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec reaction nitrification NO3))
+	   (interval (path column "${column}" Chemistry "*"
+                           reaction nitrification N2O)
+                     (tag "N2O_Nitrification")
+                     (handle sum)
+                     (dimension "kg/ha/&")
+                     (spec reaction nitrification N2O))))
+
+;; log-std.dai ends here.
+

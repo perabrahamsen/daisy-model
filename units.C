@@ -397,6 +397,7 @@ Units::standard_conversions ()
   add ("cm", "kPa", 0.1);
   add ("hPa", "kPa", 0.1);
   add ("cm", "Pa", 100.0);
+  add ("s^-1", "h^-1", 60.0 * 60.0);
   add ("d^-1", "h^-1", 1.0/24.0);
   add ("d", "h", 24.0);
   add ("mm/d", "mm/h", 1.0/24.0);

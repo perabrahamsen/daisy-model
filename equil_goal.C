@@ -122,24 +122,24 @@ EquilibriumGoal_A::initialize (Block& block, const Soil& soil)
 { 
   daisy_assert (initialize_state == uninitialized);
   initialize_state = init_succes;
-
+  static const symbol my_dim ("g/cm^3");
   std::auto_ptr<Pedotransfer> pedo_goal_A 
     (Librarian::build_alist<Pedotransfer> (block, alist.alist ("goal_A"),
                                           "goal_A"));
-  if (pedo_goal_A->check (soil, "g/cm^3", block.msg ()))
-    pedo_goal_A->set (soil, goal_A, "g/cm^3");
+  if (pedo_goal_A->check (soil, my_dim, block.msg ()))
+    pedo_goal_A->set (soil, goal_A, my_dim);
   else
     initialize_state = init_failure;
-  Pedotransfer::debug_message ("goal_A", goal_A, "g/cm^3", block.msg ());
+  Pedotransfer::debug_message ("goal_A", goal_A, my_dim, block.msg ());
 
   std::auto_ptr<Pedotransfer> pedo_min_B 
     (Librarian::build_alist<Pedotransfer> (block, alist.alist ("min_B"),
                                           "min_B"));
-  if (pedo_min_B->check (soil, "g/cm^3", block.msg ()))
-    pedo_min_B->set (soil, min_B, "g/cm^3");
+  if (pedo_min_B->check (soil, my_dim, block.msg ()))
+    pedo_min_B->set (soil, min_B, my_dim);
   else
     initialize_state = init_failure;
-  Pedotransfer::debug_message ("min_B", min_B, "g/cm^3",block.msg ());
+  Pedotransfer::debug_message ("min_B", min_B, my_dim, block.msg ());
 
   if (debug_cell >= 0 && debug_cell < soil.size ())
     block.msg ()

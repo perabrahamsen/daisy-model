@@ -44,18 +44,20 @@ struct ReactionStandard : public Reaction
   { output_variable (S_AB, log); }
 
   // Simulation.
-  void tick (const Soil& soil, const SoilWater& soil_water, 
+  void tick (const Geometry&, const Soil& soil, const SoilWater& soil_water, 
+	     const SoilHeat&, const OrganicMatter&,
              Chemistry& chemistry, const double dt, Treelog& msg)
   { 
     Solute& A = chemistry.find (name_A);
     Solute& B = chemistry.find (name_B);
     transform->tick (soil, soil_water, A.M (), B.M (), S_AB, msg);
-    A.add_to_sink (S_AB, dt);
-    B.add_to_source (S_AB, dt);
+    A.add_to_transform_sink (S_AB, dt);
+    B.add_to_transform_source (S_AB, dt);
   }
 
   // Create.
-  bool check (const Soil& soil, const Chemistry& chemistry, Treelog& msg) const
+  bool check (const Soil& soil, const SoilWater&, const SoilHeat&,
+	      const Chemistry& chemistry, Treelog& msg) const
   { 
     bool ok = true;
     if (!chemistry.know (name_A))

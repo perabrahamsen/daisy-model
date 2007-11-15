@@ -765,7 +765,7 @@ ColumnStandard::check (bool require_weather,
   }
   {
     Treelog::Open nest (msg, "Chemistry");
-    if (!chemistry->check (*soil, scope, msg))
+    if (!chemistry->check (*soil, *soil_water, *soil_heat, scope, msg))
       ok = false;
   }
   {
@@ -969,11 +969,11 @@ ColumnStandard::initialize (Block& block,
 
   // Solutes depends on water.
   chemistry->initialize (block, alist.alist ("Chemistry"),
-                         geometry, *soil, *soil_water);
+                         geometry, *soil, *soil_water, *soil_heat, msg);
   soil_NH4->initialize (alist.alist ("SoilNH4"),
-                        geometry, *soil, *soil_water, msg);
+                        geometry, *soil, *soil_water, *soil_heat, msg);
   soil_NO3->initialize (alist.alist ("SoilNO3"), 
-                        geometry, *soil, *soil_water, msg);
+                        geometry, *soil, *soil_water, *soil_heat, msg);
   nitrification.initialize (soil->size ());
   denitrification.initialize (soil->size ());
 

@@ -54,10 +54,10 @@ struct Horizon::Implementation
   /* const */ std::vector<double> SOM_fractions;
   const double turnover_factor;
   const double anisotropy;
-  typedef std::map<std::string, double> double_map;
+  typedef std::map<symbol, double> double_map;
   const double_map attributes;
-  typedef std::map<std::string, std::string> string_map;
-  const string_map dimensions;
+  typedef std::map<symbol, symbol> symbol_map;
+  const symbol_map dimensions;
   const std::auto_ptr<Nitrification> nitrification;
   HorHeat hor_heat;
   
@@ -65,7 +65,7 @@ struct Horizon::Implementation
   void initialize (const Hydraulic&, const Texture& texture, double quarts, 
                    int som_size, Treelog& msg);
   static double_map get_attributes (const std::vector<AttributeList*>& alists);
-  static string_map get_dimensions (const std::vector<AttributeList*>& alists);
+  static symbol_map get_dimensions (const std::vector<AttributeList*>& alists);
   Implementation (Block& al);
   ~Implementation ();
 };
@@ -103,16 +103,16 @@ Horizon::Implementation::get_attributes (const std::vector<AttributeList*>& alis
 { 
   double_map result; 
   for (unsigned int i = 0; i < alists.size (); i++)
-    result[alists[i]->name ("key")] = alists[i]->number ("value");
+    result[alists[i]->identifier ("key")] = alists[i]->number ("value");
   return result;
 }
 
-Horizon::Implementation::string_map
+Horizon::Implementation::symbol_map
 Horizon::Implementation::get_dimensions (const std::vector<AttributeList*>& alists)
 { 
-  string_map result; 
+  symbol_map result; 
   for (unsigned int i = 0; i < alists.size (); i++)
-    result[alists[i]->name ("key")] = alists[i]->name ("value");
+    result[alists[i]->identifier ("key")] = alists[i]->identifier ("value");
   return result;
 }
 
@@ -199,21 +199,21 @@ Horizon::heat_capacity (double Theta, double Ice) const
 { return impl->hor_heat.heat_capacity (Theta, Ice); }
 
 bool
-Horizon::has_attribute (const std::string& name) const
+Horizon::has_attribute (const symbol name) const
 { return impl->attributes.find (name) != impl->attributes.end (); }
 
 double 
-Horizon::get_attribute (const std::string& name) const
+Horizon::get_attribute (const symbol name) const
 { 
   Implementation::double_map::const_iterator i = impl->attributes.find (name);
   daisy_assert (i != impl->attributes.end ());
   return (*i).second;
 }
 
-std::string
-Horizon::get_dimension (const std::string& name) const
+symbol
+Horizon::get_dimension (const symbol name) const
 { 
-  Implementation::string_map::const_iterator i = impl->dimensions.find (name);
+  Implementation::symbol_map::const_iterator i = impl->dimensions.find (name);
   daisy_assert (i != impl->dimensions.end ());
   return (*i).second;
 }

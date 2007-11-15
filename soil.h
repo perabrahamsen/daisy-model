@@ -23,6 +23,7 @@
 #ifndef SOIL_H
 #define SOIL_H
 
+#include "symbol.h"
 #include <vector>
 
 class AttributeList;
@@ -77,11 +78,11 @@ public:
   double heat_capacity (size_t i, double Theta, double Ice) const;
   
   // Chemistry.
-  bool has_attribute (const std::string& name, Treelog& msg) const;
-  bool has_attribute (const std::string& name) const;
-  bool has_attribute (size_t i, const std::string& name) const;
-  double get_attribute (size_t i, const std::string& name) const;
-  std::string get_dimension (size_t i, const std::string& name) const;
+  bool has_attribute (const symbol name, Treelog& msg) const;
+  bool has_attribute (const symbol name) const;
+  bool has_attribute (size_t i, const symbol name) const;
+  double get_attribute (size_t i, const symbol name) const;
+  symbol get_dimension (size_t i, const symbol name) const;
 
   // Simulation.
 public:

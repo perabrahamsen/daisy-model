@@ -115,18 +115,20 @@ TransformEquilibrium::initialize (Block& block, const Soil& soil)
   daisy_assert (initialize_state == uninitialized);
   initialize_state = init_succes;
 
+  static const symbol rate_dim ("h^-1");
+
   // k_AB
   {
     Treelog::Open nest (block.msg (), "k_AB");
     auto_ptr<Pedotransfer> pedo_AB 
       (Librarian::build_alist<Pedotransfer> (block, alist.alist ("k_AB"), 
                                              "k_AB"));
-    if (pedo_AB->check (soil, "h^-1", block.msg ()))
-      pedo_AB->set (soil, k_AB, "h^-1");
+    if (pedo_AB->check (soil, rate_dim, block.msg ()))
+      pedo_AB->set (soil, k_AB, rate_dim);
     else
       initialize_state = init_failure;
 
-    Pedotransfer::debug_message ("k_AB", k_AB, "h^-1", block.msg ());
+    Pedotransfer::debug_message ("k_AB", k_AB, rate_dim, block.msg ());
   }
   
   // k_BA
@@ -136,11 +138,11 @@ TransformEquilibrium::initialize (Block& block, const Soil& soil)
       auto_ptr<Pedotransfer> pedo_BA 
         (Librarian::build_alist<Pedotransfer> (block, alist.alist ("k_BA"),
                                                "k_BA"));
-      if (pedo_BA->check (soil, "h^-1", block.msg ()))
-        pedo_BA->set (soil, k_BA, "h^-1");
+      if (pedo_BA->check (soil, rate_dim, block.msg ()))
+        pedo_BA->set (soil, k_BA, rate_dim);
       else
         initialize_state = init_failure;
-      Pedotransfer::debug_message ("k_BA", k_BA, "h^-1", block.msg ());
+      Pedotransfer::debug_message ("k_BA", k_BA, rate_dim, block.msg ());
     }
   else
     k_BA = k_AB;
@@ -178,7 +180,7 @@ static struct TransformEquilibriumSyntax
     alist.add ("description", 
 	       "Two soil components reching for equilibrium.");
     syntax.add_object ("equilibrium", Equilibrium::component,
-                       "Function for calculating equilibrioum between A and B.");
+                       "Function for calculating equilibrium between A and B.");
     syntax.add_object ("k_AB", Pedotransfer::component,
                        Syntax::Const, Syntax::Singleton, 
                        "Tranformation rate from soil component 'A' to 'B' [h^-1].");

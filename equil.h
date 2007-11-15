@@ -31,6 +31,7 @@ class Block;
 class Syntax;
 class AttributeList;
 class Treelog;
+class ScopeSoil;
 
 class Equilibrium : public Model
 {
@@ -45,6 +46,9 @@ public:
   virtual void find (const Soil&, const SoilWater&, unsigned int i,
 		     double has_A, double has_B, 
 		     double& want_A, double& want_B, Treelog&) const = 0;
+  void find (const ScopeSoil&,
+	     double has_A, double has_B, 
+	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
 public:

@@ -84,7 +84,7 @@ A location and content of a soil layer.");
   const double dispersivity_transversal;
   const std::vector<double> border;
 
-  bool has_attribute (const std::string& name, Treelog& msg) const
+  bool has_attribute (const symbol name, Treelog& msg) const
   { 
     bool missing = false;
     for (size_t i = 0; i < layers.size (); i++)
@@ -98,7 +98,7 @@ A location and content of a soil layer.");
     return !missing;
   }
   
-  bool has_attribute (const std::string& name) const
+  bool has_attribute (const symbol name) const
   { 
     bool missing = false;
     for (size_t i = 0; i < layers.size (); i++)
@@ -250,23 +250,23 @@ Soil::heat_capacity (size_t i, double Theta, double Ice) const
 { return horizon_[i]->heat_capacity (Theta, Ice); }
 
 bool
-Soil::has_attribute (const std::string& name, Treelog& msg) const
+Soil::has_attribute (const symbol name, Treelog& msg) const
 { return impl.has_attribute (name, msg); }
 
 bool
-Soil::has_attribute (const std::string& name) const
+Soil::has_attribute (const symbol name) const
 { return impl.has_attribute (name); }
 
 bool 
-Soil::has_attribute (size_t i, const std::string& name) const
+Soil::has_attribute (size_t i, const symbol name) const
 { return horizon_[i]->has_attribute (name); }
 
 double 
-Soil::get_attribute (size_t i, const std::string& name) const
+Soil::get_attribute (size_t i, const symbol name) const
 { return horizon_[i]->get_attribute (name); }
 
-std::string
-Soil::get_dimension (size_t i, const std::string& name) const
+symbol
+Soil::get_dimension (size_t i, const symbol name) const
 { return horizon_[i]->get_dimension (name); }
 
 void

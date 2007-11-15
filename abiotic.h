@@ -1,7 +1,6 @@
-// soil_NO3.h
+// abiotic.h -- Standard abiotic factors.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,24 +19,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef SOIL_NO3_H
-#define SOIL_NO3_H
+#ifndef ABIOTIC_H
+#define ABIOTIC_H
 
-#include "solute.h"
-
-class SoilNO3 : public Solute
+namespace Abiotic
 {
-public:
-  // Substance specific constants.
-  double diffusion_coefficient () const; // in free solu. [cm² / h]
- 
-private:
-  void default_initialize (const Soil& soil, const SoilWater&, 
-			   const SoilHeat&, Treelog&);
-  SoilNO3 (const SoilNO3&);
-public:
-  static void load_syntax (Syntax&, AttributeList&);
-  SoilNO3 (Block&);
-};
+  double f_T2 (double T);
+  double f_T0 (double T);
+}
 
-#endif // SOIL_NO3_H
+#endif // ABIOTIC_H

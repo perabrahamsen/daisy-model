@@ -24,8 +24,16 @@
 #include "equil.h"
 #include "block.h"
 #include "librarian.h"
+#include "scope_soil.h"
 
 const char *const Equilibrium::component = "equilibrium";
+
+void 
+Equilibrium::find (const ScopeSoil& scope,
+		   double has_A, double has_B, 
+		   double& want_A, double& want_B, Treelog& msg) const
+{ find (scope.soil, scope.soil_water, scope.cell, 
+	has_A, has_B, want_A, want_B, msg); }
 
 void
 Equilibrium::load_syntax (Syntax& syntax, AttributeList&)

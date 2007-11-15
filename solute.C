@@ -33,6 +33,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "units.h"
+#include "scope_soil.h"
 #include <sstream>
 
 const symbol 
@@ -68,6 +69,8 @@ Solute::clear ()
   std::fill (S_.begin (), S_.end (), 0.0);
   std::fill (S_external.begin (), S_external.end (), 0.0);
   std::fill (S_root.begin (), S_root.end (), 0.0);
+  std::fill (S_sorption.begin (), S_sorption.end (), 0.0);
+  std::fill (S_transform.begin (), S_transform.end (), 0.0);
   std::fill (tillage.begin (), tillage.end (), 0.0);
 }
 
@@ -102,6 +105,42 @@ Solute::add_to_root_sink (const std::vector<double>& v, const double dt)
   for (unsigned i = 0; i < v.size (); i++)
     S_root[i] -= v[i];
   add_to_sink (v, dt);
+}
+
+void
+Solute::add_to_sorption_sink (const std::vector<double>& v, const double dt)
+{
+  daisy_assert (S_sorption.size () >= v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    S_sorption[i] -= v[i];
+  add_to_sink (v, dt);
+}
+
+void
+Solute::add_to_sorption_source (const std::vector<double>& v, const double dt)
+{
+  daisy_assert (S_sorption.size () >= v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    S_sorption[i] += v[i];
+  add_to_source (v, dt);
+}
+
+void
+Solute::add_to_transform_sink (const std::vector<double>& v, const double dt)
+{
+  daisy_assert (S_transform.size () >= v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    S_transform[i] -= v[i];
+  add_to_sink (v, dt);
+}
+
+void
+Solute::add_to_transform_source (const std::vector<double>& v, const double dt)
+{
+  daisy_assert (S_transform.size () >= v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    S_transform[i] += v[i];
+  add_to_source (v, dt);
 }
 
 void 
@@ -161,6 +200,8 @@ Solute::output (Log& log) const
   output_variable (S_external, log);
   output_variable (S_permanent, log);
   output_variable (S_root, log);
+  output_variable (S_sorption, log);
+  output_variable (S_transform, log);
   output_variable (J, log);
   output_variable (J_p, log);
   output_variable (tillage, log);
@@ -184,6 +225,13 @@ Use a negative number to indicate same concentration as in lowest cell.");
   minus_one.add ("value", -1.0, "g/cm^3");
   minus_one.add ("type", "const");
   alist.add ("C_below", minus_one);
+  syntax.add_object ("initial", Number::component, 
+		     Syntax::Const, Syntax::Singleton, "\
+Initial content if otherwise unspecified. [g/cm^3]");
+  AttributeList zero;
+  zero.add ("value", 0.0, "g/cm^3");
+  zero.add ("type", "const");
+  alist.add ("initial", zero);
 
   syntax.add_object ("adsorption", Adsorption::component, 
                      "Soil adsorption properties.");
@@ -212,6 +260,10 @@ Only for initialization of the 'M' parameter.");
   alist.add ("S_permanent", empty);
   syntax.add ("S_root", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term (root uptake only, always negative).");
+  syntax.add ("S_sorption", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Source term for sorption.");
+  syntax.add ("S_transform", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Source term for transformations other than sorption.");
   syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Transportation in matrix (positive up).");
   syntax.add ("J_p", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
@@ -224,6 +276,7 @@ Solute::Solute (Block& al)
   : submodel (al.check ("type") ? al.name ("type") : al.name ("submodel")),
     C_below_expr (Librarian::build_item<Number> (al, "C_below")),
     C_below_value (-42.42e42),
+    initial_expr (Librarian::build_item<Number> (al, "initial")),
     S_permanent (al.number_sequence ("S_permanent")),
     adsorption (Librarian::build_item<Adsorption> (al, "adsorption"))
 { }
@@ -287,15 +340,26 @@ Solute::put_M (const Soil& soil, const SoilWater& soil_water,
 }
 
 void 
-Solute::default_initialize (const Soil& soil, const SoilWater&)
+Solute::default_initialize (const Soil& soil, const SoilWater& soil_water, 
+			    const SoilHeat& soil_heat, Treelog& msg)
 { 
-  M_.insert (M_.begin (), soil.size (), 0.0);
+  initial_expr->initialize (msg);
+  ScopeSoil scope (soil, soil_water, soil_heat);
+  for (size_t c = 0; c < soil.size (); c++)
+    { 
+      scope.set_cell (c);
+      double value = 0.0;
+      if (!initial_expr->tick_value (value, g_per_cm3, scope, msg))
+	msg.error ("Could not evaluate 'inital_expr'");
+      M_.push_back (value);
+    }
 }
 
 void
 Solute::initialize (const AttributeList& al, 
 		    const Geometry& geo,
                     const Soil& soil, const SoilWater& soil_water, 
+		    const SoilHeat& soil_heat,
 		    Treelog& msg)
 {
   C_below_expr->initialize (msg);
@@ -341,7 +405,7 @@ Solute::initialize (const AttributeList& al,
 	}
       if (M_.size () == 0 && C_.size () == 0)
 	{
-	  default_initialize (soil, soil_water);
+	  default_initialize (soil, soil_water, soil_heat, msg);
 	}
     }
   for (size_t i = C_.size (); i < M_.size (); i++)
@@ -377,6 +441,8 @@ Solute::initialize (const AttributeList& al,
 			geo.cell_size () - S_permanent.size (),
 			0.0);
   S_root.insert (S_root.begin (), geo.cell_size (), 0.0);
+  S_sorption.insert (S_sorption.begin (), geo.cell_size (), 0.0);
+  S_transform.insert (S_transform.begin (), geo.cell_size (), 0.0);
   J.insert (J.begin (), geo.edge_size (), 0.0);
   J_p.insert (J_p.begin (), geo.edge_size (), 0.0);
   tillage.insert (tillage.begin (), geo.cell_size (), 0.0);

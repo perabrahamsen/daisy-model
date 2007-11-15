@@ -42,6 +42,7 @@
 #include "soil_NO3.h"
 #include "soil_heat.h"
 #include "bioincorporation.h"
+#include "abiotic.h"
 #include "time.h"
 #include "mathlib.h"
 #include "plf.h"
@@ -181,7 +182,6 @@ struct OrganicStandard : public OrganicMatter
 			      bool use_clay,
 			      std::vector<double>& scratch) const;
 
-  double heat_turnover_factor (double T) const;
   double water_turnover_factor (double h) const;
   std::vector<double> clay_turnover_factor;
   std::vector<double> soil_turnover_factor;
@@ -697,27 +697,6 @@ OrganicStandard::total_C (const Geometry& geo) const
   return result;
 }
 
-double 
-OrganicStandard::heat_turnover_factor (double T) const
-{
-  if (heat_factor.size () > 0)
-    return heat_factor (T);
-  if (T < 0.0)
-    return 0.0;
-  if (T < 20.0)
-    return 0.1 * T;
-  if (T < 37.0)
-    return exp (0.47 - 0.027 * T + 0.00193 * T * T);
-  if (T < 60.0)
-    {
-      // J.A. van Veen and M.J.Frissel.
-      const double T_max = 37.0;
-      const double max_val = exp (0.47 - 0.027 * T_max + 0.00193 * sqr (T_max));
-      return max_val * (1.0 - (T - 37.0) / (60.0 - 37.0));
-    }
-  return 0.0;
-}
-
 double
 OrganicStandard::water_turnover_factor (double h) const
 {
@@ -1003,7 +982,7 @@ OrganicStandard::find_abiotic (const DAOM& om,
       if (use_om_heat)
 	scratch[i] = om.heat_factor (T);
       else
-	scratch[i] = heat_turnover_factor (T);
+	scratch[i] = Abiotic::f_T0 (T);
 
       const double h = soil_water.h (i);
       if (use_om_water)
@@ -1050,7 +1029,7 @@ OrganicStandard::find_abiotic (const OM& om,
 	  if (use_om_heat)
 	    scratch[i] *= om.heat_factor (T);
 	  else
-	    scratch[i] *= heat_turnover_factor (T);
+	    scratch[i] *= Abiotic::f_T0 (T);
 
 	  const double h = soil_water.h (i);
 	  if (use_om_water)
@@ -1124,7 +1103,7 @@ OrganicStandard::tick (const Geometry& geo,
       const double h = soil_water.h (i);
       daisy_assert (std::isfinite (h));
       const double T = soil_heat.T (i);
-      const double heat = heat_turnover_factor (T);
+      const double heat = Abiotic::f_T0 (T);
       const double water = water_turnover_factor (h);
       abiotic_factor[i] = heat * water;
       clay_factor[i] = abiotic_factor[i] * clay_turnover_factor [i];
@@ -1446,7 +1425,7 @@ OrganicStandard::abiotic (const OM& om, double T, double h,
 {
   return ((om.heat_factor.size () > 0) 
 	  ? om.heat_factor (T) 
-	  : heat_turnover_factor (T))
+	  : Abiotic::f_T0 (T))
     * ((om.water_factor.size () > 0)
        ? om.water_factor (h)
        : water_turnover_factor (h))

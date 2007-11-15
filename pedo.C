@@ -29,13 +29,11 @@
 #include "treelog.h"
 #include "librarian.h"
 
-using namespace std;
-
 const char *const Pedotransfer::component = "pedotransfer";
 
 void 
-Pedotransfer::set (const Soil& soil, vector<double>& array,
-                   const string& dim) const
+Pedotransfer::set (const Soil& soil, std::vector<double>& array,
+                   const symbol dim) const
 {
   array.insert (array.end (), soil.size () - array.size (), 0.0);
 
@@ -48,7 +46,7 @@ Pedotransfer::set (const Soil& soil, vector<double>& array,
 
 
 bool
-Pedotransfer::check (const Soil& soil, const string& dim, Treelog& msg) const
+Pedotransfer::check (const Soil& soil, const symbol dim, Treelog& msg) const
 { 
   Treelog::Open nest (msg, name);
   bool ok = true;
@@ -67,13 +65,14 @@ Pedotransfer::check (const Soil& soil, const string& dim, Treelog& msg) const
 }
 
 bool 
-Pedotransfer::known (const std::string& dim)
-{ return dim != Syntax::Unknown () && (dim.size () < 1 || dim[0] != '?'); }
+Pedotransfer::known (const symbol dim)
+{ return dim != Syntax::unknown () 
+    && (dim.name ().size () < 1 || dim.name ()[0] != '?'); }
 
 void 
-Pedotransfer::debug_message (const string& name,
-                             const vector<double>& value, 
-                             const string& dim,
+Pedotransfer::debug_message (const std::string& name,
+                             const std::vector<double>& value, 
+                             const symbol dim,
                              Treelog& msg)
 { 
   std::ostringstream tmp;

@@ -35,7 +35,8 @@ SoilNH4::diffusion_coefficient () const
 }
 
 void 
-SoilNH4::default_initialize (const Soil& soil, const SoilWater& soil_water)
+SoilNH4::default_initialize (const Soil& soil, const SoilWater& soil_water, 
+			     const SoilHeat&, Treelog&)
 {
   daisy_assert (C_.size () == 0);
   daisy_assert (M_.size () == 0);

@@ -72,9 +72,9 @@ public:
 
   // Chemistry.
 public:
-  bool has_attribute (const std::string& name) const;
-  double get_attribute (const std::string& name) const;
-  std::string get_dimension (const std::string& name) const;
+  bool has_attribute (symbol) const;
+  double get_attribute (symbol) const;
+  symbol get_dimension (symbol name) const;
 
   // Simulation.
 public:

@@ -33,18 +33,16 @@
 #include <sstream>
 #include <memory>
 
-using namespace std;
-
 struct PedotransferIdentity : public Pedotransfer
 {
   // Parameters.
-  const auto_ptr<Pedotransfer> child;
-  const string dim;
+  const std::auto_ptr<Pedotransfer> child;
+  const symbol dim;
 
   // Simulation.
   double value (const Soil& soil, int lay) const
   { return child->value (soil, lay); }
-  const string& dimension () const
+  symbol dimension () const
   { return dim; }
 
   // Create.
@@ -68,7 +66,7 @@ struct PedotransferIdentity : public Pedotransfer
   PedotransferIdentity (Block& al)
     : Pedotransfer (al),
       child (Librarian::build_item<Pedotransfer> (al, "value")),
-      dim (al.name ("dimension", child->dimension ()))
+      dim (al.identifier ("dimension", child->dimension ()))
   { }
 };
 
@@ -93,11 +91,11 @@ static struct PedotransferIdentitySyntax
 struct PedotransferOperand : public Pedotransfer
 {
   // Parameters.
-  const auto_ptr<Pedotransfer> operand;
+  const std::auto_ptr<Pedotransfer> operand;
 
   // Simulation.
-  const string& dimension () const
-  { return Syntax::Unknown (); }
+  symbol dimension () const
+  { return Syntax::unknown (); }
 
   // Create.
   bool check_nested (const Soil& soil, Treelog& err) const
@@ -249,8 +247,8 @@ static struct PedotransferSqrSyntax
 struct PedotransferPow : public Pedotransfer
 {
   // Parameters.
-  const auto_ptr<Pedotransfer> base;
-  const auto_ptr<Pedotransfer> exponent;
+  const std::auto_ptr<Pedotransfer> base;
+  const std::auto_ptr<Pedotransfer> exponent;
 
   // Simulation.
   double value (const Soil& soil, int lay) const
@@ -260,8 +258,8 @@ struct PedotransferPow : public Pedotransfer
     daisy_assert (x >= 0.0);
     return pow (x, y); 
   }
-  const string& dimension () const 
-  { return Syntax::Unknown (); }
+  symbol dimension () const 
+  { return Syntax::unknown (); }
 
   // Create.
   bool check_nested (const Soil& soil, Treelog& err) const
@@ -304,23 +302,23 @@ static struct PedotransferPowSyntax
 struct PedotransferOperands : public Pedotransfer
 {
   // Parameters.
-  const vector<const Pedotransfer*> operands;
+  const std::vector<const Pedotransfer*> operands;
 
   // Utilities.
-  const string& unique_dimension () const 
+  symbol unique_dimension () const 
   { 
-    const string* found = NULL;
+    symbol unique = Syntax::unknown ();
     for (size_t i = 0; i < operands.size (); i++)
       if (known (operands[i]->dimension ()))
-        if (found)
+        if (unique != Syntax::unknown ())
           {
-            if (operands[i]->dimension () != *found)
-              return Syntax::Unknown ();
+            if (operands[i]->dimension () != unique)
+              return Syntax::unknown ();
           }
         else
-          found = &operands[i]->dimension ();
+	  unique = operands[i]->dimension ();
     
-    return found ? *found : Syntax::Unknown ();
+    return unique;
   }
 
   // Create.
@@ -330,7 +328,7 @@ struct PedotransferOperands : public Pedotransfer
     void check (const Syntax& syn, const AttributeList& al,
                 const std::string&) const throw (std::string)
     {
-      typedef vector<const Pedotransfer*> op_x;
+      typedef std::vector<const Pedotransfer*> op_x;
 
       TreelogString msg;
       
@@ -410,7 +408,7 @@ struct PedotransferMax : public PedotransferOperands
       }
     return max;
   }
-  const string& dimension () const 
+  symbol dimension () const 
   { return unique_dimension (); }
 
   // Create.
@@ -456,7 +454,7 @@ struct PedotransferMin : public PedotransferOperands
       }
     return min;
   }
-  const string& dimension () const 
+  symbol dimension () const 
   { return unique_dimension (); }
 
   // Create.
@@ -497,8 +495,8 @@ struct PedotransferProduct : public PedotransferOperands
       product *= operands[i]->value (soil, lay);
     return product;
   }
-  const string& dimension () const 
-  { return Syntax::Unknown (); }
+  symbol dimension () const 
+  { return Syntax::unknown (); }
 
   // Create.
   PedotransferProduct (Block& al)
@@ -535,7 +533,7 @@ struct PedotransferSum : public PedotransferOperands
       sum += operands[i]->value (soil, lay);
     return sum;
   }
-  const string& dimension () const 
+  symbol dimension () const 
   { return unique_dimension (); }
 
   // Create.
@@ -579,7 +577,7 @@ struct PedotransferSubtract : public PedotransferOperands
       val -= operands[i]->value (soil, lay);
     return val;
   }
-  const string& dimension () const 
+  symbol dimension () const 
   { return unique_dimension (); }
 
   // Create.
@@ -623,8 +621,8 @@ struct PedotransferDivide : public PedotransferOperands
       val /= operands[i]->value (soil, lay);
     return val;
   }
-  const string& dimension () const 
-  { return Syntax::Unknown (); }
+  symbol dimension () const 
+  { return Syntax::unknown (); }
 
   // Create.
   PedotransferDivide (Block& al)

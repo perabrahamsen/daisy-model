@@ -22,6 +22,7 @@
 #define BUILD_DLL
 
 #include "nitrification.h"
+#include "abiotic.h"
 #include "block.h"
 #include "alist.h"
 #include "soil.h"
@@ -62,7 +63,7 @@ NitrificationSolute::tick (const double /* M */, const double C,
                            const double dt) const
 {
   const double T_factor = (heat_factor.size () < 1)
-    ? f_T (T)
+    ? Abiotic::f_T2 (T)
     : heat_factor (T);
   const double w_factor = (water_factor.size () < 1)
     ? f_h (h)

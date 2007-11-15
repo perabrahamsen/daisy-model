@@ -71,8 +71,9 @@ struct ChemistryStandard : public Chemistry
 
   // Create & Destroy.
   void initialize (Block&, const AttributeList&, const Geometry& geo,
-                   const Soil&, const SoilWater&);
-  bool check (const Soil&, const Scope& scope, Treelog&) const;
+                   const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
+  bool check (const Soil&, const SoilWater&, const SoilHeat&,
+	      const Scope& scope, Treelog&) const;
   explicit ChemistryStandard (Block& al);
   static bool check_alist (const AttributeList& al, Treelog& msg);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
@@ -192,7 +193,8 @@ ChemistryStandard::tick_soil (const Geometry& geo, const double ponding,
                              dt); 
 
   for (size_t r = 0; r < reactions.size (); r++)
-    reactions[r]->tick (soil, soil_water, *this, dt, msg);
+    reactions[r]->tick (geo, soil, soil_water, soil_heat, organic_matter, 
+			*this, dt, msg);
 
   const size_t cell_size = geo.cell_size ();
   for (size_t c = 0; c < chemicals.size (); c++)
@@ -229,20 +231,24 @@ ChemistryStandard::initialize (Block& block,
                                const AttributeList& al,
                                const Geometry& geo,
                                const Soil& soil, 
-                               const SoilWater& soil_water)
+                               const SoilWater& soil_water,
+			       const SoilHeat& soil_heat,
+			       Treelog& msg)
 {
   const std::vector<AttributeList*>& alists = al.alist_sequence ("trace");
   daisy_assert (alists.size () == chemicals.size ());
   
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->initialize (*alists[c], geo, soil, soil_water, block.msg ());
+    chemicals[c]->initialize (*alists[c], geo, soil, soil_water, soil_heat, 
+			      msg);
 
   for (size_t r = 0; r < reactions.size (); r++)
     reactions[r]->initialize (block, soil);
 }
 
 bool 
-ChemistryStandard::check (const Soil& soil,
+ChemistryStandard::check (const Soil& soil, const SoilWater& soil_water,
+			  const SoilHeat& soil_heat, 
 			  const Scope& scope, Treelog& msg) const
 { 
   const size_t cell_size = soil.size ();
@@ -253,7 +259,7 @@ ChemistryStandard::check (const Soil& soil,
       ok = false;
 
   for (size_t r = 0; r < reactions.size (); r++)
-    if (!reactions[r]->check (soil, *this, msg))
+    if (!reactions[r]->check (soil, soil_water, soil_heat, *this, msg))
       ok = false;
 
   return ok;

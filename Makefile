@@ -362,7 +362,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = rootdens_GP2D.C \
+MODELS = reaction_nit.C reaction_denit.C \
+	reaction_adsorption.C reaction_equil.C rootdens_GP2D.C \
 	rootdens_GP1D.C number_plf.C rubiscoNdist_forced.C action_extern.C \
 	rubiscoNdist_expr.C uzrect_const.C photo_FCC3.C photo_FCC4.C \
 	msoltranrect_Mollerup.C reaction_std.C chemistry_std.C \
@@ -459,7 +460,7 @@ SPECIALS = scope_exchange.C photo_Farquhar.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = run.C treelog_text.C treelog_store.C \
+OTHER = abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
 	intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C texture.C destination.C symbol.C \
@@ -998,7 +999,7 @@ phenology${OBJ}: phenology.C phenology.h model.h symbol.h block.h syntax.h \
 clayom${OBJ}: clayom.C clayom.h model.h symbol.h block.h syntax.h treelog.h \
   plf.h librarian.h
 equil${OBJ}: equil.C equil.h model.h symbol.h block.h syntax.h treelog.h \
-  plf.h librarian.h
+  plf.h librarian.h scope_soil.h scope.h
 pedo${OBJ}: pedo.C pedo.h model.h symbol.h soil.h units.h block.h syntax.h \
   treelog.h plf.h librarian.h
 transform${OBJ}: transform.C transform.h model.h symbol.h block.h syntax.h \
@@ -1127,10 +1128,10 @@ root_system${OBJ}: root_system.C root_system.h rootdens.h model.h symbol.h \
   plf.h submodel.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
   soil_heat.h soil_NH4.h solute.h adsorption.h soil_NO3.h soil_water.h \
   soil.h log.h time.h border.h alist.h check.h block.h librarian.h
-ridge${OBJ}: ridge.C ridge.h soil.h geometry1d.h geometry_vert.h geometry.h \
-  syntax.h treelog.h symbol.h mathlib.h assertion.h plf.h submodel.h \
+ridge${OBJ}: ridge.C ridge.h soil.h symbol.h geometry1d.h geometry_vert.h \
+  geometry.h syntax.h treelog.h mathlib.h assertion.h plf.h submodel.h \
   log.h time.h border.h model.h alist.h soil_water.h check.h
-soil${OBJ}: soil.C soil.h horizon.h model.h symbol.h geometry.h syntax.h \
+soil${OBJ}: soil.C soil.h symbol.h horizon.h model.h geometry.h syntax.h \
   treelog.h mathlib.h assertion.h hydraulic.h tortuosity.h groundwater.h \
   metalib.h library.h alist.h submodel.h submodeler.h block.h plf.h log.h \
   time.h border.h check.h vcheck.h memutils.h librarian.h
@@ -1145,10 +1146,10 @@ soil_NH4${OBJ}: soil_NH4.C soil_NH4.h solute.h adsorption.h model.h symbol.h \
   soil.h soil_water.h submodel.h alist.h assertion.h
 soil_NO3${OBJ}: soil_NO3.C soil_NO3.h solute.h adsorption.h model.h symbol.h \
   soil.h submodel.h alist.h assertion.h
-denitrification${OBJ}: denitrification.C denitrification.h plf.h alist.h \
-  symbol.h syntax.h treelog.h geometry.h mathlib.h assertion.h soil.h \
-  soil_water.h soil_heat.h organic_matter.h model.h soil_NO3.h solute.h \
-  adsorption.h log.h time.h border.h submodel.h check.h
+denitrification${OBJ}: denitrification.C denitrification.h plf.h abiotic.h \
+  alist.h symbol.h syntax.h treelog.h geometry.h mathlib.h assertion.h \
+  soil.h soil_water.h soil_heat.h organic_matter.h model.h soil_NO3.h \
+  solute.h adsorption.h log.h time.h border.h submodel.h check.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h block.h syntax.h treelog.h symbol.h \
   plf.h alist.h geometry.h mathlib.h assertion.h soil.h soil_water.h \
   weather.h model.h im.h log.h time.h border.h submodel.h
@@ -1212,7 +1213,8 @@ parser_file${OBJ}: parser_file.C parser_file.h parser.h model.h symbol.h \
   units.h mathlib.h assertion.h memutils.h librarian.h
 solute${OBJ}: solute.C solute.h adsorption.h model.h symbol.h log.h time.h \
   border.h alist.h block.h syntax.h treelog.h plf.h geometry.h mathlib.h \
-  assertion.h soil.h soil_water.h number.h librarian.h units.h
+  assertion.h soil.h soil_water.h number.h librarian.h units.h \
+  scope_soil.h scope.h
 geometry${OBJ}: geometry.C geometry.h syntax.h treelog.h symbol.h mathlib.h \
   assertion.h volume.h model.h alist.h check.h vcheck.h
 printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
@@ -1220,6 +1222,10 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   parser.h path.h assertion.h librarian.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h border.h model.h \
   alist.h symbol.h library.h syntax.h treelog.h assertion.h
+abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
+scope_soil${OBJ}: scope_soil.C scope_soil.h scope.h symbol.h model.h soil.h \
+  soil_water.h soil_heat.h units.h syntax.h treelog.h alist.h assertion.h \
+  librarian.h
 run${OBJ}: run.C run.h model.h
 treelog_text${OBJ}: treelog_text.C treelog_text.h treelog.h symbol.h \
   assertion.h
@@ -1305,6 +1311,23 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+reaction_nit${OBJ}: reaction_nit.C reaction.h model.h alist.h symbol.h \
+  geometry.h syntax.h treelog.h mathlib.h assertion.h soil.h soil_water.h \
+  soil_heat.h chemistry.h chemical.h solute.h adsorption.h \
+  organic_matter.h log.h time.h border.h librarian.h
+reaction_denit${OBJ}: reaction_denit.C reaction.h model.h alist.h symbol.h \
+  abiotic.h librarian.h block.h syntax.h treelog.h plf.h geometry.h \
+  mathlib.h assertion.h soil.h soil_water.h soil_heat.h organic_matter.h \
+  chemistry.h chemical.h solute.h adsorption.h log.h time.h border.h \
+  check.h
+reaction_adsorption${OBJ}: reaction_adsorption.C reaction.h model.h alist.h \
+  symbol.h block.h syntax.h treelog.h plf.h number.h adsorption.h \
+  chemistry.h chemical.h solute.h geometry.h mathlib.h assertion.h soil.h \
+  soil_water.h scope_soil.h scope.h log.h time.h border.h librarian.h
+reaction_equil${OBJ}: reaction_equil.C reaction.h model.h alist.h symbol.h \
+  block.h syntax.h treelog.h plf.h number.h equil.h chemistry.h \
+  chemical.h solute.h adsorption.h geometry.h mathlib.h assertion.h \
+  soil.h scope_soil.h scope.h log.h time.h border.h librarian.h
 rootdens_GP2D${OBJ}: rootdens_GP2D.C rootdens.h model.h symbol.h block.h \
   syntax.h treelog.h plf.h geometry.h mathlib.h assertion.h log.h time.h \
   border.h alist.h check.h librarian.h iterative.h
@@ -1433,8 +1456,8 @@ organic_std${OBJ}: organic_std.C organic_matter.h model.h symbol.h syntax.h \
   treelog.h alist.h submodeler.h block.h plf.h assertion.h log.h time.h \
   border.h am.h om.h som.h smb.h dom.h adsorption.h domsorp.h aom.h \
   clayom.h soil.h geometry.h mathlib.h soil_water.h soil_NH4.h solute.h \
-  soil_NO3.h soil_heat.h bioincorporation.h check_range.h check.h \
-  vcheck.h gaussj.h memutils.h librarian.h
+  soil_NO3.h soil_heat.h bioincorporation.h abiotic.h check_range.h \
+  check.h vcheck.h gaussj.h memutils.h librarian.h
 movement_1D${OBJ}: movement_1D.C movement.h model.h symbol.h geometry1d.h \
   geometry_vert.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
   soil.h soil_water.h soil_heat.h macro.h groundwater.h surface.h \
@@ -1757,12 +1780,12 @@ action_with${OBJ}: action_with.C action.h model.h alist.h symbol.h block.h \
   syntax.h treelog.h plf.h daisy.h program.h run.h time.h memutils.h \
   field.h border.h log.h librarian.h
 nitrification_soil${OBJ}: nitrification_soil.C nitrification.h model.h \
-  symbol.h block.h syntax.h treelog.h plf.h alist.h mathlib.h assertion.h \
-  check.h librarian.h
-nitrification_solute${OBJ}: nitrification_solute.C nitrification.h model.h \
-  symbol.h block.h syntax.h treelog.h plf.h alist.h soil.h soil_water.h \
-  soil_heat.h soil_NH4.h solute.h adsorption.h soil_NO3.h mathlib.h \
+  symbol.h abiotic.h block.h syntax.h treelog.h plf.h alist.h mathlib.h \
   assertion.h check.h librarian.h
+nitrification_solute${OBJ}: nitrification_solute.C nitrification.h model.h \
+  symbol.h abiotic.h block.h syntax.h treelog.h plf.h alist.h soil.h \
+  soil_water.h soil_heat.h soil_NH4.h solute.h adsorption.h soil_NO3.h \
+  mathlib.h assertion.h check.h librarian.h
 hydraulic_mod_C${OBJ}: hydraulic_mod_C.C hydraulic.h model.h syntax.h \
   treelog.h symbol.h block.h plf.h alist.h check.h mathlib.h assertion.h \
   librarian.h
@@ -1820,8 +1843,8 @@ condition_daisy${OBJ}: condition_daisy.C condition.h model.h symbol.h alist.h \
   librarian.h
 chemical_std${OBJ}: chemical_std.C chemical.h model.h solute.h adsorption.h \
   symbol.h alist.h organic_matter.h soil_heat.h soil_water.h soil.h \
-  geometry.h syntax.h treelog.h mathlib.h assertion.h log.h time.h \
-  border.h block.h plf.h check.h librarian.h
+  geometry.h syntax.h treelog.h mathlib.h assertion.h abiotic.h log.h \
+  time.h border.h block.h plf.h check.h librarian.h
 hydraulic_M_BaC_Bimodal${OBJ}: hydraulic_M_BaC_Bimodal.C hydraulic.h model.h \
   syntax.h treelog.h symbol.h block.h plf.h alist.h check.h mathlib.h \
   assertion.h librarian.h

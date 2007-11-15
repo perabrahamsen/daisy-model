@@ -29,18 +29,16 @@
 #include "assertion.h"
 #include "librarian.h"
 
-using namespace std;
-
 struct PedotransferConst : public Pedotransfer
 {
   // Parameters.
   const double val;
-  const string dim;
+  const symbol dim;
 
   // Simulation.
   double value (const Soil&, int) const
   { return val; }
-  const string& dimension () const
+  symbol dimension () const
   { return dim; }
 
   // Create.
@@ -49,17 +47,17 @@ struct PedotransferConst : public Pedotransfer
   PedotransferConst (Block& al)
     : Pedotransfer (al),
       val (al.number ("value")),
-      dim (al.name ("value"))
+      dim (al.identifier ("value"))
   { }
 };
 
 struct PedotransferLeaf : public Pedotransfer
 {
   // Parameters.
-  const string dim;
+  const symbol dim;
 
   // Simulation.
-  const string& dimension () const
+  symbol dimension () const
   { return dim; }
 
   // Create.
@@ -76,7 +74,7 @@ struct PedotransferHumus : public PedotransferLeaf
   // Simulation.
   double value (const Soil& soil, int i) const
   { 
-    return Units::convert (Syntax::Fraction (), dimension (), 
+    return Units::convert (Syntax::fraction (), dimension (), 
                            soil.humus (i)); 
   }
 
@@ -91,7 +89,7 @@ struct PedotransferMineral : public PedotransferLeaf
   // Simulation.
   double value (const Soil& soil, int i) const
   { 
-    return Units::convert (Syntax::Fraction (), dimension (),
+    return Units::convert (Syntax::fraction (), dimension (),
                            1.0 - soil.humus (i));
   }
 
@@ -106,7 +104,8 @@ struct PedotransferRho_B : public PedotransferLeaf
   // Simulation.
   double value (const Soil& soil, int i) const
   { 
-    return Units::convert ("g/cm^3", dimension (), soil.dry_bulk_density (i));
+    static const symbol has_dim ("g/cm^3");
+    return Units::convert (has_dim, dimension (), soil.dry_bulk_density (i));
   }
 
   // Create.
@@ -123,7 +122,7 @@ struct PedotransferBelow : public PedotransferLeaf
   // Simulation.
   double value (const Soil& soil, int i) const
   { 
-    return Units::convert (Syntax::Fraction (), dimension (),
+    return Units::convert (Syntax::fraction (), dimension (),
                            soil.texture_below (i, size));
   }
 
@@ -137,14 +136,14 @@ struct PedotransferBelow : public PedotransferLeaf
 struct PedotransferGet : public PedotransferLeaf
 {
   // Parameters.
-  const string name;
+  const symbol name;
 
   // Simulation.
   double value (const Soil& soil, int i) const
   { 
     daisy_assert (soil.has_attribute (i, name));
     const double value = soil.get_attribute (i, name);
-    const string got_dim = soil.get_dimension (i, name);
+    const symbol got_dim = soil.get_dimension (i, name);
     return Units::convert (got_dim, dim, value);
   }
 

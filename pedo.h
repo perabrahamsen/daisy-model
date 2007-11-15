@@ -39,22 +39,21 @@ public:
 
   // Simulation.
 public:
-  void set (const Soil&, std::vector<double>&, const std::string& dim ) const;
+  void set (const Soil&, std::vector<double>&, symbol dim ) const;
   virtual double value (const Soil&, int i) const = 0; 
-  virtual const std::string& dimension () const = 0;
+  virtual symbol dimension () const = 0;
 
   // Utilities.
 public:
-  static bool known (const std::string& dim);
+  static bool known (symbol dim);
   static void debug_message (const std::string& name, 
                              const std::vector<double>& value,  
-                             const std::string& dim, 
+                             symbol dim, 
                              Treelog& msg);
 
   // Create and Destroy.
 public:
-  bool check (const Soil&, const std::string& dim,
-              Treelog& err) const;
+  bool check (const Soil&, symbol dim, Treelog& err) const;
   virtual bool check_nested (const Soil&, Treelog& err) const = 0;
   Pedotransfer (Block&);
   ~Pedotransfer ();

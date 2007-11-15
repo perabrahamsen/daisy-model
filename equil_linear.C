@@ -90,11 +90,11 @@ EquilibriumLinear::initialize (Block& block, const Soil& soil)
 
   auto_ptr<Pedotransfer> pedo_K 
     (Librarian::build_alist<Pedotransfer> (block, alist, "K"));
-  if (pedo_K->check (soil, Syntax::None (), block.msg ()))
-    pedo_K->set (soil, K, Syntax::None ());
+  if (pedo_K->check (soil, Syntax::none (), block.msg ()))
+    pedo_K->set (soil, K, Syntax::none ());
   else
     initialize_state = init_failure;
-  Pedotransfer::debug_message ("K", K, "", block.msg ());
+  Pedotransfer::debug_message ("K", K, Syntax::none (), block.msg ());
 }
 
 bool 

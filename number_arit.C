@@ -315,13 +315,13 @@ struct NumberOperands : public Number
     symbol found = unspecified;
     for (size_t i = 0; i < operands.size (); i++)
       if (known (operands[i]->dimension (scope)))
-        if (found != unspecified)
+        if (found == unspecified)
+          found = operands[i]->dimension (scope);
+        else
           {
             if (operands[i]->dimension (scope) != found)
               return Syntax::unknown ();
           }
-        else
-          found = operands[i]->dimension (scope);
     
     return found != unspecified ? found : Syntax::unknown ();
   }
@@ -526,8 +526,13 @@ struct NumberProduct : public NumberOperands
       product *= operands[i]->value (scope);
     return product;
   }
-  symbol dimension (const Scope&) const 
-  { return Syntax::unknown (); }
+  symbol dimension (const Scope& scope) const 
+  { 
+    symbol dim = Syntax::none ();
+    for (size_t i = 0; i < operands.size (); i++)
+      dim = Units::multiply (dim, operands[i]->dimension (scope));
+    return dim;
+  }
 
   // Create.
   NumberProduct (Block& al)

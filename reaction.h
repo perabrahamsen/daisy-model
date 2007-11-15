@@ -29,6 +29,8 @@ class Log;
 class Geometry;
 class Soil;
 class SoilWater;
+class SoilHeat;
+class OrganicMatter;
 class Chemistry;
 class Treelog;
 class Block;
@@ -43,14 +45,16 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Soil&, const SoilWater&, 
-                     Chemistry&, const double dt, Treelog&) = 0;
+  virtual void tick (const Geometry&, const Soil&, const SoilWater&,
+		     const SoilHeat&, const OrganicMatter&, Chemistry&,
+		     const double dt, Treelog&) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 public:
   virtual void initialize (Block&, const Soil&) = 0;
-  virtual bool check (const Soil&, const Chemistry&, Treelog& err) const = 0;
+  virtual bool check (const Soil&, const SoilWater&, const SoilHeat&,
+		      const Chemistry&, Treelog& err) const = 0;
 protected:
   Reaction (Block& al);
 public:
