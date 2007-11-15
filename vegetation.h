@@ -36,8 +36,7 @@ class Soil;
 class OrganicMatter;
 class SoilHeat;
 class SoilWater;
-class SoilNH4;
-class SoilNO3;
+class Solute;
 class PLF;
 class Harvest;
 class AM;
@@ -84,11 +83,11 @@ public:
 
   // Simulation
 public:
-  virtual void tick (const Time&, double relative_humidity, const double CO2_atm,
+  virtual void tick (const Time&, double relative_humidity, double CO2_atm,
                      const Bioclimate&, const Geometry&, const Soil&,
 		     OrganicMatter&, const SoilHeat&, const SoilWater&,
 		     // Allow plants to grow (hourly).
-		     SoilNH4&, SoilNO3&, 
+		     Solute&, Solute&, 
 		     double& residuals_DM,
 		     double& residuals_N_top, double& residuals_C_top,
 		     std::vector<double>& residuals_N_soil,

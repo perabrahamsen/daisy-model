@@ -42,8 +42,7 @@ class Soil;
 class Geometry;
 class OrganicMatter;
 class SoilHeat;
-class SoilNH4;
-class SoilNO3;
+class Solute;
 class Column;
 class Harvest;
 class AM;
@@ -93,7 +92,7 @@ public:
                      const Bioclimate&, 
 		     const Geometry& geo, const Soil&, OrganicMatter&, 
 		     const SoilHeat&, const SoilWater&,
-		     SoilNH4&, SoilNO3&, 
+		     Solute&, Solute&, 
 		     double& residuals_DM,
 		     double& residuals_N_top, double& residuals_C_top,
 		     std::vector<double>& residuals_N_soil, 

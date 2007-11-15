@@ -31,8 +31,6 @@ struct Geometry;
 struct Soil;
 struct SoilWater;
 struct Solute;
-struct SoilNO3;
-struct SoilNH4;
 
 struct Log;
 struct AttributeList;
@@ -106,9 +104,9 @@ public:
   double nitrogen_uptake (const Geometry&,
                           const Soil& soil,
 			  const SoilWater& soil_water,
-			  SoilNH4& soil_NH4,
+			  Solute& soil_NH4,
 			  double NH4_root_min,
-			  SoilNO3& soil_NO3,
+			  Solute& soil_NO3,
 			  double NO3_root_min,
 			  double PotNUpt,
                           double dt);

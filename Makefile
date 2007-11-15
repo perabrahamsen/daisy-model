@@ -1126,8 +1126,8 @@ canopy_std${OBJ}: canopy_std.C canopy_std.h canopy_simple.h plf.h submodel.h \
   mathlib.h assertion.h
 root_system${OBJ}: root_system.C root_system.h rootdens.h model.h symbol.h \
   plf.h submodel.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
-  soil_heat.h soil_NH4.h solute.h adsorption.h soil_NO3.h soil_water.h \
-  soil.h log.h time.h border.h alist.h check.h block.h librarian.h
+  soil_heat.h soil_water.h soil.h solute.h adsorption.h log.h time.h \
+  border.h alist.h check.h block.h librarian.h
 ridge${OBJ}: ridge.C ridge.h soil.h symbol.h geometry1d.h geometry_vert.h \
   geometry.h syntax.h treelog.h mathlib.h assertion.h plf.h submodel.h \
   log.h time.h border.h model.h alist.h soil_water.h check.h
@@ -1455,9 +1455,9 @@ organic_none${OBJ}: organic_none.C organic_matter.h model.h symbol.h alist.h \
 organic_std${OBJ}: organic_std.C organic_matter.h model.h symbol.h syntax.h \
   treelog.h alist.h submodeler.h block.h plf.h assertion.h log.h time.h \
   border.h am.h om.h som.h smb.h dom.h adsorption.h domsorp.h aom.h \
-  clayom.h soil.h geometry.h mathlib.h soil_water.h soil_NH4.h solute.h \
-  soil_NO3.h soil_heat.h bioincorporation.h abiotic.h check_range.h \
-  check.h vcheck.h gaussj.h memutils.h librarian.h
+  clayom.h soil.h geometry.h mathlib.h soil_water.h soil_heat.h \
+  chemistry.h soil_NH4.h solute.h soil_NO3.h bioincorporation.h abiotic.h \
+  check_range.h check.h vcheck.h gaussj.h memutils.h librarian.h
 movement_1D${OBJ}: movement_1D.C movement.h model.h symbol.h geometry1d.h \
   geometry_vert.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
   soil.h soil_water.h soil_heat.h macro.h groundwater.h surface.h \

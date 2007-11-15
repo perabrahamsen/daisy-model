@@ -26,10 +26,9 @@
 #include "submodel.h"
 #include "geometry.h"
 #include "soil_heat.h"
-#include "soil_NH4.h"
-#include "soil_NO3.h"
 #include "soil_water.h"
 #include "soil.h"
+#include "solute.h"
 #include "log.h"
 #include "check.h"
 #include "block.h"
@@ -308,9 +307,9 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 double
 RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
 			     const SoilWater& soil_water,
-			     SoilNH4& soil_NH4,
+			     Solute& soil_NH4,
 			     const double NH4_root_min,
-			     SoilNO3& soil_NO3,
+			     Solute& soil_NO3,
 			     const double NO3_root_min,
 			     const double PotNUpt, double dt)
 {

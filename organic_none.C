@@ -69,7 +69,7 @@ struct OrganicNone : public OrganicMatter
   // Create and Destroy.
   int som_pools () const
   { return 3; }
-  bool check (const Soil&, Treelog&) const
+  bool check (const Soil&, const Chemistry&, Treelog&) const
   { return true; }
   bool check_am (const AttributeList&, Treelog&) const
   { return true; }

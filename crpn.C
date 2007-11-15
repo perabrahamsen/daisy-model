@@ -148,7 +148,7 @@ CrpN::update (double& NCrop, const double DS,
 	      const bool enable_N_stress,
               const Geometry& geo,
 	      const Soil& soil, const SoilWater& soil_water,
-	      SoilNH4& soil_NH4, SoilNO3& soil_NO3,
+	      Solute& soil_NH4, Solute& soil_NO3,
               const double day_fraction,
 	      RootSystem& root_system,
               const double dt)

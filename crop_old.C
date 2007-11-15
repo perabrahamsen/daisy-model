@@ -97,8 +97,8 @@ protected:
 		       const Geometry& geo,
                        const Soil& soil,
 		       const SoilWater& soil_water,
-		       SoilNH4& soil_NH4,
-		       SoilNO3& soil_NO3,
+		       Solute& soil_NH4,
+		       Solute& soil_NO3,
                        double dt);
   // Sugar production [gCH2O/m2/h] by canopy photosynthesis.
   void AssimilatePartitioning (double DS, double& f_Leaf, double& f_Root);
@@ -110,7 +110,7 @@ public:
   void tick (const Time& time,  double relative_humidity, const double CO2_atm,
 	     const Bioclimate&, const Geometry& geo, const Soil&,
 	     OrganicMatter&, const SoilHeat&, const SoilWater&, 
-	     SoilNH4&, SoilNO3&, double&, double&, double&, 
+	     Solute&, Solute&, double&, double&, double&, 
              std::vector<double>&, std::vector<double>&,
 	     double ForcedCAI, double dt, Treelog&);
   void emerge ();
@@ -1610,8 +1610,8 @@ CropOld::NitrogenUptake (const int Hour,
 			 const Geometry& geo,
                          const Soil& soil,
 			 const SoilWater& soil_water,
-			 SoilNH4& soil_NH4,
-			 SoilNO3& soil_NO3,
+			 Solute& soil_NH4,
+			 Solute& soil_NO3,
                          const double dt)
 {
   const Parameters::RootPar& Root = par.Root;
@@ -1726,7 +1726,7 @@ CropOld::tick (const Time& time, const double, const double,
 	       OrganicMatter&,
 	       const SoilHeat& soil_heat,
 	       const SoilWater& soil_water, 
-	       SoilNH4& soil_NH4, SoilNO3& soil_NO3,
+	       Solute& soil_NH4, Solute& soil_NO3,
 	       double&, double&, double&,
                std::vector<double>&, std::vector<double>&,
 	       const double ForcedCAI,

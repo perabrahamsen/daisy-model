@@ -38,9 +38,10 @@
 #include "soil.h"
 #include "geometry.h"
 #include "soil_water.h"
+#include "soil_heat.h"
+#include "chemistry.h"
 #include "soil_NH4.h"
 #include "soil_NO3.h"
-#include "soil_heat.h"
 #include "bioincorporation.h"
 #include "abiotic.h"
 #include "time.h"
@@ -243,7 +244,7 @@ struct OrganicStandard : public OrganicMatter
 
   // Create and Destroy.
   int som_pools () const;
-  bool check (const Soil&, Treelog& err) const;
+  bool check (const Soil&, const Chemistry&, Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   void add (AM&);
   void fertilize (const AttributeList&, const Geometry&, double dt);
@@ -845,17 +846,18 @@ OrganicStandard::output (Log& log) const
 }
 
 bool
-OrganicStandard::check (const Soil& soil, Treelog& err) const
+OrganicStandard::check (const Soil& soil, const Chemistry&, Treelog& msg) const
 {
-  Treelog::Open nest (err, "OrganicStandard");
+  Treelog::Open nest (msg, "OrganicStandard");
   bool ok = true;
+  
   for (size_t i = 0; i < am.size (); i++)
-    if (!am[i]->check (err))
+    if (!am[i]->check (msg))
       ok = false;
   for (size_t i = 0; i < domsorp.size (); i++)
-    if (!domsorp[i]->check (soil, dom.size (), som.size (), err))
+    if (!domsorp[i]->check (soil, dom.size (), som.size (), msg))
       ok = false;
-  if (!clayom->check (smb, err))
+  if (!clayom->check (smb, msg))
     ok = false;
   return ok;
 }

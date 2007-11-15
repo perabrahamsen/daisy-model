@@ -46,9 +46,9 @@ DONE reaction denitrification
 
 DONE "nitrification"
 
-"root uptake"
+doing "root uptake"
 
-"organic matter"
+doing "organic matter"
 
 smid SoilNO3 og SoilNH4 ud
 
@@ -65,6 +65,10 @@ Udskudt:
 - reaction sorption
 
 - BGJ opsætning
+
+* Elements
+
+* Gør DOM til DOM-C og DOM-N ?
 
 * chemistry multi
 

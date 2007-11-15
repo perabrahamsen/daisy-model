@@ -783,7 +783,7 @@ ColumnStandard::check (bool require_weather,
     if (!soil_NH4->check (n, scope, msg))
       ok = false;
   }
-  if (!organic_matter->check (*soil, msg))
+  if (!organic_matter->check (*soil, *chemistry, msg))
     ok = false;
   return ok;
 }

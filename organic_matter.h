@@ -37,6 +37,7 @@ class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
+class Chemistry;
 class SoilNO3;
 class SoilNH4;
 class Time;
@@ -56,8 +57,8 @@ public:
   virtual void monthly (const Geometry&) = 0;
   virtual const std::vector<bool>& active () const = 0;
   virtual void tick (const Geometry& geo,
-             const SoilWater&, const SoilHeat&, 
-	     SoilNO3&, SoilNH4&, double dt, Treelog& msg) = 0;
+		     const SoilWater&, const SoilHeat&, 
+		     SoilNO3&, SoilNH4&, double dt, Treelog& msg) = 0;
   virtual void transport (const Soil&, const SoilWater&, Treelog&) = 0;
   virtual const std::vector<DOM*>& fetch_dom () const = 0;
   virtual void output (Log&) const = 0;
@@ -75,7 +76,7 @@ public:
 
   // Create and Destroy.
   virtual int som_pools () const = 0;
-  virtual bool check (const Soil&, Treelog& err) const = 0;
+  virtual bool check (const Soil&, const Chemistry&, Treelog&) const = 0;
   virtual bool check_am (const AttributeList& am, Treelog& err) const = 0;
   virtual void add (AM&) = 0;
   virtual void fertilize (const AttributeList&, const Geometry&, 
