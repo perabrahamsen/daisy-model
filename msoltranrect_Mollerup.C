@@ -563,6 +563,10 @@ MsoltranrectMollerup::Dirichlet_xx_zz
   
   const double diffm_xx_zz_vec_val = D_area_per_length * C_border;
   diffm_xx_zz_vec (cell) += diffm_xx_zz_vec_val;
+
+  std::cout << "cell = " << cell << ", area_per_length = " << area_per_length
+            << ", D_area_per_length = " << D_area_per_length << ", C_border = "
+            << C_border << "\n";
 }
 
 
@@ -599,13 +603,13 @@ MsoltranrectMollerup::lowerboundary
           const bool influx = in_sign * q_edge (edge) > 0;
           if (influx)
             {
+              edge_type[edge] = Neumann_explicit_lower;
               const double J_in = C_border * q_edge (edge); 
               Neumann_expl (cell, area, in_sign, J_in, B_vec);
-              edge_type[edge] = Neumann_implicit;
             }
           else
             {
-              edge_type[edge] = Neumann_explicit_lower;
+              edge_type[edge] = Neumann_implicit;
               Neumann_impl (cell, area, in_sign, q_edge (edge), B_mat);
             }
             
@@ -615,9 +619,9 @@ MsoltranrectMollerup::lowerboundary
           edge_type[edge] = Dirichlet;
           // write something
 	  Dirichlet_xx_zz (cell, area, area_per_length, in_sign, 
-			  ThetaD_xx_zz (cell), C_border, 
-                          q_edge (edge), diffm_xx_zz_mat, 
-                          diffm_xx_zz_vec, advecm_mat, advecm_vec);  
+                           ThetaD_xx_zz (cell), C_border, 
+                           q_edge (edge), diffm_xx_zz_mat, 
+                           diffm_xx_zz_vec, advecm_mat, advecm_vec);  
         }
     }
 }
@@ -764,25 +768,30 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
           
         case Dirichlet:      //Only lower boundary 
           {
+            const int cell = geo.cell_is_internal (to) ? to : from;
+            daisy_assert (cell >= 0);
+            daisy_assert (cell < C.size ());
+
             //Advective transport
             const double in_sign 
               = geo.cell_is_internal (geo.edge_to (e)) ? 1.0 : -1.0;
-            const int cell = geo.cell_is_internal (to) ? to : from;
+
             if (q_edge[e] * in_sign >= 0)       //Inflow
               dJ[e] = q_edge[e] * C_below;
             else                                //Outflow
-              {
-                const int cell = geo.cell_is_internal (to) ? to : from;
-                daisy_assert (cell >= 0);
-                daisy_assert (cell < C.size ());
-                dJ[e] = q_edge[e] * C[cell];
-              }
+              dJ[e] = q_edge[e] * C[cell];
             
             //Diffusive transport - xx_zz diffusion  
             const double gradient = geo.edge_area_per_length (e) *
               (C[cell]-C_below)*in_sign;
             dJ[e] -= ThetaD_xx_zz[e]*gradient;
          
+            std::cout << "cell: " << cell << '\n';
+            std::cout << "in_sign:" << in_sign << '\n';
+            std::cout << "C[cell]:" << C[cell] << '\n';
+            std::cout << "C_below" << C_below << '\n';
+            std::cout << "gradient" << gradient << '\n';
+
             //Diffusive transport - xz_zx diffusion
             //Constant values along border direction ->
             //no flux 
@@ -1135,7 +1144,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       fluxes (geo, edge_type, q_edge, ThetaD_xx_zz_avg, ThetaD_xz_zx_avg,
               C_n, C_below, dJ); 
       for (int e=0; e<edge_size; e++)
-        J[e] += dJ[e] * ddt;
+        J[e] += dJ[e] * ddt/dt;
       
       //Update Theta and QTheta
       Theta_cell_n = Theta_cell_np1;
