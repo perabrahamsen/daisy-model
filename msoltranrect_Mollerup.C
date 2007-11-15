@@ -152,8 +152,6 @@ struct MsoltranrectMollerup : public Msoltranrect
                       const double C_below,
                       ublas::vector<double>& dJ); 
 
-
-
   // Solute.
   void flow (const GeometryRect& geo, 
              const Soil& soil, 
@@ -520,7 +518,7 @@ MsoltranrectMollerup::Neumann_expl (const size_t cell,
                                     ublas::vector<double>& B_vec)
 {
   B_vec (cell) = J * area * in_sign;   
-  //J*in_sign pos for fluc into domain (cell)  
+  //J*in_sign pos for flux into domain (cell)  
 }
 
 
@@ -551,17 +549,11 @@ MsoltranrectMollerup::Dirichlet_xx_zz
       ublas::banded_matrix<double>& advecm_mat,
       ublas::vector<double>& advecm_vec) 
 {
-  //Boundary advection
-  
-  //Old - only uses cell values not border values!!! 
-  //const double value = area  * q;
-  //advecm_mat (cell, cell) -= in_sign * value;  //q*in_sign pos for inflow
-  
-
-  //New Use C_border for influx and C_cell for outflux 
+  // Boundary advection
+  // Use C_border for influx and C_cell for outflux 
   const double value = area * q;
   if (q*in_sign >= 0)     //Inflow
-    advecm_vec (cell) -= in_sign * value * C_border;
+    advecm_vec (cell) -= in_sign * value * C_border; 
   else                    //Outflow 
     advecm_mat (cell, cell) -= in_sign * value;   
   
@@ -733,7 +725,7 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
             const double dcx = geo.x (to) - geo.x (from);
             const double length = geo.edge_length (e);
             daisy_assert (approximate (fabs (dcz + dcx), length));
-            const double sign =  length / (dcz + dcx);
+            //const double sign =  length / (dcz + dcx);
             
             double Sum_C_A = 0.0;
             for (size_t i = 0; i < A_cells.size (); i++)
@@ -749,7 +741,7 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
               ? Sum_C_B / 4.0
               : Sum_C_B / 2.0;
             
-            Dj[e] -= ThetaD_xz_zx (e) * (C_B-C_A)/(dcz + dcx);  
+            dJ[e] -= ThetaD_xz_zx (e) * (C_B-C_A)/(dcz + dcx);  
           }
           break;
 
@@ -773,7 +765,7 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
         case Dirichlet:      //Only lower boundary 
           {
             //Advective transport
-            double in_sign 
+            const double in_sign 
               = geo.cell_is_internal (geo.edge_to (e)) ? 1.0 : -1.0;
             const int cell = geo.cell_is_internal (to) ? to : from;
             if (q_edge[e] * in_sign >= 0)       //Inflow
@@ -1027,11 +1019,16 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   //Debug - flow c ndition!!!
   //J[0] = -0.5;       //mmoxxx 
   //J[101] = -0.5;     //mmoxxx
+  //xxxxxxxxx
+  //Neumann_expl (0, 5.0, 1, 0.5, B_vec);  
+  //Neumann_expl (1, 5.0, 1, 0.5, B_vec);  
+  
 
   std::vector<edge_type_t> edge_type (edge_size, Unhandled);
   for (size_t e = 0; e < edge_size; e++)
     if (geo.edge_is_internal (e))
       edge_type[e] = Internal;
+
 
   upperboundary (geo, edge_type, J, B_vec, msg);
 
@@ -1039,6 +1036,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   lowerboundary (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg, 
                  edge_type, B_mat, B_vec, diffm_xx_zz_mat, 
                  diffm_xx_zz_vec, advecm_mat, advecm_vec);       
+  
 
   // Solver parameter , gamma
   // gamma = 0      : Backward Euler 
@@ -1072,10 +1070,6 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   ublas::vector<double> C_n (cell_size);
   C_n = C_old;
 
-  ublas::vector<double> dJ = ublas::zero_vector<double> (edge_size);
-
-  // msg.message(tmp_mmo.str ());
-
 
   double dtime = 0.0;
   for (int ddtstep = 0; ddtstep < nddt; ddtstep++)
@@ -1106,12 +1100,12 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
             + (1 - gamma) * B_mat
             + (1 - gamma) * diffm_xx_zz_mat
             - (1 - gamma) * advecm_mat;
-          //  XXXXX      advecm_vec +-+-
-
+   
           b = prod (b_mat, C_n)
-            + B_vec                                    
-            + diffm_xx_zz_vec;                      //Dirichlet BC
-            - S_vol;                                //Sink term        
+            + B_vec                                 // expl Neumann BC    
+            + diffm_xx_zz_vec                       // Dirichlet BC
+            - advecm_vec                            // Dirichlet BC 
+            - S_vol;                                // Sink term        
         }
       else  
         {
@@ -1125,10 +1119,10 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       const bool singular = ublas::lu_factorize(A, piv);
       daisy_assert (!singular);
       ublas::lu_substitute (A, piv, b); // b now contains solution 
-  
+      
       // C_n = C_np1
       C_n = b; // new solution :-)
-
+      
 
       //Solution checks???
       //Calculate and sum up fluxes 
@@ -1136,8 +1130,12 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       //fluxes (geo, edge_type, q_edge, ThetaD_xx_zz, ThetaD_xz_zx,     //mmo20071102
       //        C_n, C_below, dJ); 
       
+      //Update fluxes 
+      ublas::vector<double> dJ = ublas::zero_vector<double> (edge_size);
       fluxes (geo, edge_type, q_edge, ThetaD_xx_zz_avg, ThetaD_xz_zx_avg,
               C_n, C_below, dJ); 
+      for (int e=0; e<edge_size; e++)
+        J[e] += dJ[e] * ddt;
       
       //Update Theta and QTheta
       Theta_cell_n = Theta_cell_np1;
@@ -1147,7 +1145,9 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       std::ostringstream tmp;
       tmp << "C_n" << C_n;
       msg.message (tmp.str ());
-      
+     
+
+ 
     } //End small timestep loop
   
 
