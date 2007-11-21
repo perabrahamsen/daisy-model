@@ -3,8 +3,7 @@
 // Copyright 2007 Mikkel Mollerup, Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
-// 
-// Daisy is free software; you can redistribute it and/or modify
+// Dirichlet// Daisy is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation; either version 2.1 of the License, or
 // (at your option) any later version.
@@ -48,6 +47,8 @@ namespace ublas = boost::numeric::ublas;
 
 struct MsoltranrectMollerup : public Msoltranrect
 {
+  const bool enable_boundary_diffusion;
+
   // Keep track of edge types in small time steps.
   enum edge_type_t { Unhandled, Internal, Neumann_explicit_upper,
                      Neumann_explicit_lower, Neumann_implicit, Dirichlet };
@@ -112,6 +113,17 @@ struct MsoltranrectMollerup : public Msoltranrect
                             const double in_sign, const double q, 
                             ublas::banded_matrix<double>& B_mat);
   
+  static void Dirichlet_expl(const size_t cell,
+                             const double area,
+                             const double area_per_length, 
+                             const double in_sign,
+                             const double ThetaD_xx_zz,
+                             const double C_border,
+                             const double C_cell,
+                             const double q,
+                             const bool enable_boundary_diffusion,
+                             ublas::vector<double>& B_dir_vec);
+
   static void Dirichlet_xx_zz (const size_t cell,
                                const double area, 
                                const double area_per_length, 
@@ -123,6 +135,18 @@ struct MsoltranrectMollerup : public Msoltranrect
                                ublas::vector<double>& diffm_xx_zz_vec, 
                                ublas::banded_matrix<double>& advecm_mat,
                                ublas::vector<double>& advecm_vec); 
+
+  static void lowerboundary_new (const GeometryRect& geo,
+                                 const bool isflux,
+                                 const double C_border,
+                                 const ublas::vector<double>& q_edge,
+                                 const ublas::vector<double>& ThetaD_xx_zz,
+                                 const ublas::vector<double>& C,
+                                 const bool enable_boundary_diffusion,
+                                 std::vector<edge_type_t>& edge_type,      
+                                 ublas::banded_matrix<double>& B_mat,
+                                 ublas::vector<double>& B_vec,
+                                 ublas::vector<double>& B_dir_vec);
   
   static void lowerboundary (const GeometryRect& geo,
 			     const bool isflux,
@@ -535,6 +559,146 @@ MsoltranrectMollerup::Neumann_impl (const size_t cell,
 }
 
 
+void
+MsoltranrectMollerup::Dirichlet_expl(const size_t cell,
+                                     const double area,
+                                     const double area_per_length, 
+                                     const double in_sign,
+                                     const double ThetaD_xx_zz,
+                                     const double C_border,
+                                     const double C_cell,
+                                     const double q,
+                                     const bool enable_boundary_diffusion,
+                                     ublas::vector<double>& B_dir_vec)
+{
+
+  //Estimate flux 
+  double Q_advec_out;
+  double Q_diff_out;
+  double Q_out;
+
+
+  // Boundary advection
+  if (q*in_sign >= 0)     //Inflow
+    Q_advec_out = - in_sign * q * area * C_border;
+  else                    //Outflow 
+    Q_advec_out = - in_sign * q * area * C_cell;
+    
+  
+
+  if (enable_boundary_diffusion)
+    {
+      // Boundary xx_zz diffusion
+      
+       const double gradient =  area_per_length * (C_border - C_cell);
+
+       //the best until now ...
+       Q_diff_out = -ThetaD_xx_zz * gradient;
+       double ddt = 1.0/60.0;
+       double V_cell = 0.1;
+       double newC =  C_cell - Q_diff_out*ddt/V_cell;
+       
+       double ddt_new1 = (C_cell - C_border)/Q_diff_out * V_cell; 
+       std::cout << "ddt_new1" << ddt_new1 << '\n'; 
+       double ddt_new2 = 0.5 * V_cell * (C_cell-C_border)/Q_diff_out;
+       std::cout << "ddt_new2" << ddt_new2 << '\n';
+
+
+       if (newC > C_border)   //some overshoot is ok... 
+         Q_diff_out = 0.5 * V_cell * (C_cell-C_border)/ddt;  //almost stable - not best for only diff
+       //Q_diff_out *= 0.5;   //svingende 
+       else if (newC < 0.0)
+         Q_diff_out = 0.5 * V_cell * C_cell/ddt;
+       //Q_diff_out *= 0.5;   //svingende  */
+       
+      
+
+      /*
+      // Doesnt works well
+      const double gradient_max = area_per_length * C_border; // Depending on in or outflow
+      const double gradient =  area_per_length * (C_border - C_cell);
+      
+      std::cout << "gradient_max: " << gradient_max << '\n';
+      std::cout << "gradient: " << gradient << '\n';
+      
+      double sign;
+      if (gradient >= 0.0)
+        sign = 1.0;
+      else 
+        sign = -1.0;
+ 
+      if (fabs(gradient) > 0.5 * gradient_max)
+        Q_diff_out = - 0.5 *sign * 0.1* ThetaD_xx_zz * gradient_max;
+      else 
+        Q_diff_out = - ThetaD_xx_zz * gradient;
+      */
+     
+        
+      /* //Long term oscilations      
+      if (C_cell > C_border)
+        Q_diff_out = 0.0;
+      else 
+        Q_diff_out -= ThetaD_xx_zz * gradient;
+      */
+
+
+       /* Not only diffusion very stable but too low diffusion
+       Q_diff_out -= ThetaD_xx_zz * gradient;
+       
+       double ddt = 1.0/60.0;
+       double V_cell = 0.1;
+       double newC =  C_cell - Q_diff_out*ddt/V_cell;
+       if (newC > 1.0*C_border)   //some overshoot is ok... 
+         Q_diff_out = 0.0;
+       */ 
+       
+       //
+       
+
+
+       
+       /*
+       //New one - elendig!
+       Q_diff_out = -ThetaD_xx_zz * gradient;
+       double Q_tot_out = Q_advec_out + Q_diff_out;
+       double ddt = 1.0/60.0;
+       double V_cell = 0.1;
+       double newC =  C_cell - (Q_diff_out+Q_advec_out)*ddt/V_cell;
+       
+       std::cout << "C_cell" << C_cell << '\n';
+       std::cout << "V_cell = " << V_cell << '\n';
+       std::cout << "ddt = " << ddt << '\n';
+       std::cout << "newC = " << newC << '\n';
+       std::cout << "gradient = " << gradient << '\n';
+       std::cout << "ThetaD_xx_zz = " << ThetaD_xx_zz << '\n';
+       std::cout << "Q_diff_out = " << Q_diff_out << '\n';
+       std::cout << "Q_advec_out = " << Q_advec_out << '\n';
+
+
+       if (newC > C_border)    
+         Q_tot_out = V_cell * (C_cell-C_border)/ddt;  //almost stable - not best for only diff
+       
+       else if (newC < 0.0)
+         Q_tot_out = V_cell * C_cell/ddt;
+         //Q_diff_out *= 0.5;   //svingende  
+       
+         Q_diff_out = 1.1*(Q_tot_out - Q_advec_out);
+       */
+
+    }
+  else 
+    Q_diff_out = 0.0; 
+  
+  
+  // Boundary flux by advection and diffusion
+  Q_out = Q_advec_out + Q_diff_out;
+  
+  // Write to Neumann-type vector 
+  B_dir_vec (cell) = Q_out;
+}
+
+
+
 void 
 MsoltranrectMollerup::Dirichlet_xx_zz 
 /**/ (const size_t cell,
@@ -564,11 +728,67 @@ MsoltranrectMollerup::Dirichlet_xx_zz
   const double diffm_xx_zz_vec_val = D_area_per_length * C_border;
   diffm_xx_zz_vec (cell) += diffm_xx_zz_vec_val;
 
-  std::cout << "cell = " << cell << ", area_per_length = " << area_per_length
-            << ", D_area_per_length = " << D_area_per_length << ", C_border = "
-            << C_border << "\n";
+  //std::cout << "cell = " << cell << ", area_per_length = " << area_per_length
+  //          << ", D_area_per_length = " << D_area_per_length << ", C_border = "
+  //          << C_border << "\n";
 }
 
+
+void 
+MsoltranrectMollerup::lowerboundary_new
+/**/ (const GeometryRect& geo,
+      const bool isflux,
+      const double C_border,
+      const ublas::vector<double>& q_edge,
+      const ublas::vector<double>& ThetaD_xx_zz,
+      const ublas::vector<double>& C,
+      const bool enable_boundary_diffusion,
+      std::vector<edge_type_t>& edge_type,      
+      ublas::banded_matrix<double>& B_mat,
+      ublas::vector<double>& B_vec,
+      ublas::vector<double>& B_dir_vec)
+{
+  const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
+  const size_t edge_below_size = edge_below.size ();
+  
+  for (size_t i = 0; i < edge_below_size; i++)
+    {
+      const int edge = edge_below[i];
+      const int cell = geo.edge_other (edge, Geometry::cell_below);
+      const double in_sign 
+        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+      daisy_assert (in_sign > 0);
+      const double area = geo.edge_area (edge);
+      const double area_per_length = geo.edge_area_per_length (edge);
+      
+      if (isflux)               // Flux BC
+        {
+          const bool influx = in_sign * q_edge (edge) > 0;
+          if (influx)
+            {
+              edge_type[edge] = Neumann_explicit_lower;
+              const double J_in = C_border * q_edge (edge); 
+              Neumann_expl (cell, area, in_sign, J_in, B_vec);
+            }
+          else
+            {
+              edge_type[edge] = Neumann_implicit;
+              Neumann_impl (cell, area, in_sign, q_edge (edge), B_mat);
+            }
+            
+        }
+      else                      // C_Border. BC
+        {
+          edge_type[edge] = Dirichlet;
+          // write something
+          double C_cell = C (cell);
+	  Dirichlet_expl (cell, area, area_per_length, in_sign, 
+                          ThetaD_xx_zz (edge), C_border, C_cell, 
+                          q_edge (edge), enable_boundary_diffusion, B_dir_vec); 
+        }
+    }
+}
+ 
 
 void 
 MsoltranrectMollerup::lowerboundary 
@@ -625,7 +845,9 @@ MsoltranrectMollerup::lowerboundary
         }
     }
 }
-   
+
+
+  
 void 
 MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
                                      std::vector<edge_type_t>& edge_type,
@@ -772,6 +994,7 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
             daisy_assert (cell >= 0);
             daisy_assert (cell < C.size ());
 
+
             //Advective transport
             const double in_sign 
               = geo.cell_is_internal (geo.edge_to (e)) ? 1.0 : -1.0;
@@ -877,7 +1100,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   ublas::vector<double> ThetaD_xx_zz_avg (edge_size); 
   ublas::vector<double> ThetaD_xz_zx_avg (edge_size);
   thetadiff_xx_zz_xz_zx (geo, Theta_cell_avg, Dxx_cell, Dzz_cell, Dxz_cell,
-		      ThetaD_xx_zz_avg, ThetaD_xz_zx_avg);
+                         ThetaD_xx_zz_avg, ThetaD_xz_zx_avg);
  
     
   //Begin small timestep stuff  
@@ -1012,8 +1235,11 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   for (int c = 0; c < cell_size; c++)
     B_mat (c, c) = 0.0;
   ublas::vector<double> B_vec = ublas::zero_vector<double> (cell_size); 
+  
+  ublas::vector<double> B_dir_vec = ublas::zero_vector<double> (cell_size);
+  
   ublas::banded_matrix<double>  diffm_xx_zz_mat (cell_size, cell_size,      
-						0, 0); // Dir bc
+                                                 0, 0); // Dir bc
   for (int c = 0; c < cell_size; c++)
     diffm_xx_zz_mat (c, c) = 0.0;
   
@@ -1042,9 +1268,9 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   upperboundary (geo, edge_type, J, B_vec, msg);
 
 
-  lowerboundary (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg, 
-                 edge_type, B_mat, B_vec, diffm_xx_zz_mat, 
-                 diffm_xx_zz_vec, advecm_mat, advecm_vec);       
+  //lowerboundary (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg, 
+  //               edge_type, B_mat, B_vec, diffm_xx_zz_mat, 
+  //               diffm_xx_zz_vec, advecm_mat, advecm_vec);       
   
 
   // Solver parameter , gamma
@@ -1092,6 +1318,11 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       for (int c = 0; c < cell_size; c++)
         QTheta_mat_np1 (c, c) = geo.cell_volume (c) * Theta_cell_np1 (c);
       
+      
+      lowerboundary_new (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg,
+                         C_n, enable_boundary_diffusion, edge_type, B_mat, B_vec, B_dir_vec);
+      
+     
       if (simple_dcthetadt)
         {
           A = (1.0 / ddt) * QTheta_mat_np1          // dtheta/ddt
@@ -1111,7 +1342,8 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
             - (1 - gamma) * advecm_mat;
    
           b = prod (b_mat, C_n)
-            + B_vec                                 // expl Neumann BC    
+            + B_vec                                 // expl Neumann BC
+            - B_dir_vec                             // Dirichlet BC as Neumann
             + diffm_xx_zz_vec                       // Dirichlet BC
             - advecm_vec                            // Dirichlet BC 
             - S_vol;                                // Sink term        
@@ -1149,7 +1381,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       //Update Theta and QTheta
       Theta_cell_n = Theta_cell_np1;
       QTheta_mat_n = QTheta_mat_np1;
-
+      
       //debug Print new solution
       std::ostringstream tmp;
       tmp << "C_n" << C_n;
@@ -1177,11 +1409,12 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
     {
       // We use the old absorbed stuff plus the new dissolved stuff.
       M[c] = Ads[c] + Theta_cell (c) * C[c];
-      daisy_assert (M[c] >= 0.0);
+      if (M[c] < 0.0)
+        throw "Negative mass";
       
       // We calculate new C by assumining instant absorption.
       C[c] = adsorption.M_to_C (soil, Theta_cell (c), c, M[c]);
-
+      
       // Check that it goes both ways.
       if (iszero (C[c]))
 	daisy_assert (iszero (M[c]));
@@ -1190,7 +1423,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
 				   adsorption.C_to_M (soil, Theta_cell (c),
 						      c, C[c])));
     }
-
+  
   // BUG: No J for inner nodes.
     msg.message(tmp_mmo.str ());
   
@@ -1201,39 +1434,20 @@ MsoltranrectMollerup::output (Log&) const
 { }
 
 MsoltranrectMollerup::MsoltranrectMollerup (Block& al)
-  : Msoltranrect (al)
-  
+  : Msoltranrect (al),
+    enable_boundary_diffusion (al.flag ("enable_boundary_diffusion"))
 { }
-
-
-//* place something like this inside MsoltranrectMollerup
-
-/*
-UZRectMollerup::UZRectMollerup (Block& al)
-  : UZRect (al),
-    edge_arithmetic_height (al.number ("edge_arithmetic_height")),
-    max_time_step_reductions (al.integer ("max_time_step_reductions")),
-    time_step_reduction (al.integer ("time_step_reduction")),
-    max_iterations (al.integer ("max_iterations")),
-    max_absolute_difference (al.number ("max_absolute_difference")),
-    max_relative_difference (al.number ("max_relative_difference")),
-    use_forced_T (al.check ("forced_T")),
-    forced_T (al.number ("forced_T", -42.42e42)),
-    debug (al.integer ("debug"))
-{ }
-
-*/
-
-
-
-
 
 MsoltranrectMollerup::~MsoltranrectMollerup ()
 { }
 
 void 
-MsoltranrectMollerup::load_syntax (Syntax&, AttributeList&)
-{ }
+MsoltranrectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
+{ 
+  syntax.add ("enable_boundary_diffusion", Syntax::Boolean, Syntax::Const, "\
+If this is set, diffusion over boundaries is enabled."); 
+  alist.add ("enable_boundary_diffusion", true);
+}
 
 const AttributeList& 
 Msoltranrect::default_model ()
@@ -1245,6 +1459,21 @@ Msoltranrect::default_model ()
       Syntax dummy;
       MsoltranrectMollerup::load_syntax (dummy, alist);
       alist.add ("type", "Mollerup");
+    }
+  return alist;
+}
+
+const AttributeList& 
+Msoltranrect::reserve_model ()
+{
+  static AttributeList alist;
+
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      MsoltranrectMollerup::load_syntax (dummy, alist);
+      alist.add ("type", "Mollerup");
+      alist.add ("enable_boundary_diffusion", false);
     }
   return alist;
 }

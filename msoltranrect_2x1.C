@@ -169,6 +169,7 @@ Should be 'none'.");
   alist.add ("transport_solid", Transport::none_model ());
 }
 
+#if 0
 const AttributeList& 
 Msoltranrect::reserve_model ()
 {
@@ -182,6 +183,7 @@ Msoltranrect::reserve_model ()
     }
   return alist;
 }
+#endif
 
 static struct Msoltranrect2x1Syntax
 {
