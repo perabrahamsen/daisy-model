@@ -880,14 +880,17 @@ MsoltranrectMollerup::Dirichlet_timestep
     
   for (size_t i = 0; i < edge_below_size; i++)
     {
-      // For diffusion into the cell, only half of the volume of the cell
-      // with conc C_border can be transported by diffusion over the 
-      // boundary into the cell in a timestep. 
+      // For diffusion into the cell, only half of the volume of the 
+      // conc difference between border and cell can be transported by 
+      // diffusion over the boundary into the cell in a timestep. 
       //  
-      // For diffusion out from the cell, only half of the volume of the cell
-      // with conc C_cell can be transported by diffusion over the 
-      // boundary out from the cell in a timestep. 
+      // For diffusion out from the cell, only half of the volume of the
+      // conc difference between cell and border can be transported by 
+      // diffusion over the boundary out from the cell in a timestep. 
           
+      // The code is actally independent concs
+
+
       const int edge = edge_below[i];
       const int cell = geo.edge_other (edge, Geometry::cell_below);
       const double C_cell = C (cell);
@@ -904,9 +907,9 @@ MsoltranrectMollerup::Dirichlet_timestep
       double ddt_dir_new = dt;
 
       if (Q_diff_out > 0)       //Diff out of cell
-        ddt_dir_new = 0.5 * V_cell * C_cell / Q_diff_out; 
+        ddt_dir_new = 0.5 * V_cell *  (C_cell-C_border) / Q_diff_out; 
       else if  (Q_diff_out < 0) //Diff into cell
-        ddt_dir_new = -0.5 * V_cell * C_border / Q_diff_out; 
+        ddt_dir_new = -0.5 * V_cell * (C_border-C_cell) / Q_diff_out; 
           
       // std::cout << "ddt_dir_new " << ddt_dir_new << '\n';
           
@@ -1073,10 +1076,10 @@ MsoltranrectMollerup::fluxes_new (const GeometryRect& geo,
 
             dJ[e] = -in_sign * B_dir_vec (cell) / geo.edge_area (e); 
 
-            std::cout << "Dirichlet flux: \n";
-            std::cout << "in_sign: " << in_sign << '\n';
-            std::cout << "B_dir_vec (cell):" << B_dir_vec (cell) << '\n';  
-            std::cout << "dJ[e]: " << dJ[e] << '\n';
+            // std::cout << "Dirichlet flux: \n";
+            // std::cout << "in_sign: " << in_sign << '\n';
+            // std::cout << "B_dir_vec (cell):" << B_dir_vec (cell) << '\n';  
+            // std::cout << "dJ[e]: " << dJ[e] << '\n';
             
             
             
@@ -1252,11 +1255,11 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
               (C[cell]-C_below)*in_sign;
             dJ[e] -= ThetaD_xx_zz[e]*gradient;
          
-            std::cout << "cell: " << cell << '\n';
-            std::cout << "in_sign:" << in_sign << '\n';
-            std::cout << "C[cell]:" << C[cell] << '\n';
-            std::cout << "C_below" << C_below << '\n';
-            std::cout << "gradient" << gradient << '\n';
+            //std::cout << "cell: " << cell << '\n';
+            //std::cout << "in_sign:" << in_sign << '\n';
+            //std::cout << "C[cell]:" << C[cell] << '\n';
+            //std::cout << "C_below" << C_below << '\n';
+            //std::cout << "gradient" << gradient << '\n';
 
             //Diffusive transport - xz_zx diffusion
             //Constant values along border direction ->
@@ -1268,20 +1271,21 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
 }
 
 
-void MsoltranrectMollerup::flow (const GeometryRect& geo, 
-				 const Soil& soil, 
-				 const SoilWater& soil_water, 
-				 const std::string& name,
-				 std::vector<double>& M, 
-                                 std::vector<double>& C, 
-				 const std::vector<double>& S, 
-				 std::vector<double>& J, 
-				 const double C_below,
-				 const bool flux_below,
-				 Adsorption& adsorption,
-				 double diffusion_coefficient,
-				 const double dt,
-				 Treelog& msg)
+void 
+MsoltranrectMollerup::flow (const GeometryRect& geo, 
+                            const Soil& soil, 
+                            const SoilWater& soil_water, 
+                            const std::string& name,
+                            std::vector<double>& M, 
+                            std::vector<double>& C, 
+                            const std::vector<double>& S, 
+                            std::vector<double>& J, 
+                            const double C_below,
+                            const bool flux_below,
+                            Adsorption& adsorption,
+                            double diffusion_coefficient,
+                            const double dt,
+                            Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
@@ -1423,7 +1427,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   // No timesteps small than ddt_min!
   if (ddt_max < ddt_min)
     ddt_max = ddt_min;
-
+  
   //--------------------------------------
   //--- For moving in/out of tick loop ---
   //--------------------------------------
@@ -1551,15 +1555,17 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
           && enable_boundary_diffusion)
         {
           double ddt_dir = Dirichlet_timestep (geo, C_below, ThetaD_xx_zz_avg,
-                                               C_old, time_left);
+                                               C_n, time_left);
           if (ddt_dir < ddt)
             ddt = ddt_dir;
-
-          std::cout << "xxxxxxxxxxxxxx" << '\n';
-          std::cout << "dt: " << dt << '\n';
-          std::cout << "ddt_dir: " << ddt_dir << '\n'; 
+          
+          tmp_mmo << "xxxxxxxxxxxxxx" << '\n';
+          tmp_mmo << "dt: " << dt << '\n';
+          tmp_mmo << "ddt_dir: " << ddt_dir << '\n'; 
         }
 
+      
+      
       if (ddt * 1.0001 >= time_left)
         // We never use more time than is left.
         ddt = time_left;
@@ -1570,7 +1576,7 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
         
       time_left -= ddt;
       dtime += ddt;       //update time 
-
+     
       tmp_mmo << "dtime = " << dtime << '\n';
       
       //Calculate water content 
@@ -1581,7 +1587,8 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       
       
       lowerboundary_new (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg,
-                       C_n, enable_boundary_diffusion, edge_type, B_mat, B_vec, B_dir_vec);
+                         C_n, enable_boundary_diffusion, edge_type, B_mat,
+                         B_vec, B_dir_vec);
       //lowerboundary (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg, 
       //               edge_type, B_mat, B_vec, diffm_xx_zz_mat, 
       //               diffm_xx_zz_vec, advecm_mat, advecm_vec);       
@@ -1628,18 +1635,11 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       // C_n = C_np1
       C_n = b; // new solution :-)
       
-
-      //Solution checks???
-      //Calculate and sum up fluxes 
-      
-      //fluxes (geo, edge_type, q_edge, ThetaD_xx_zz, ThetaD_xz_zx,     //mmo20071102
-      //        C_n, C_below, dJ); 
-      
+            
       //Update fluxes 
       ublas::vector<double> dJ = ublas::zero_vector<double> (edge_size);
       //fluxes (geo, edge_type, q_edge, ThetaD_xx_zz_avg, ThetaD_xz_zx_avg,
       //        C_n, C_below, dJ); 
-      
       fluxes_new (geo, edge_type, q_edge, ThetaD_xx_zz_avg, ThetaD_xz_zx_avg,
                   C_n, C_below, B_dir_vec, dJ); 
       
@@ -1652,10 +1652,12 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       
       //debug Print new solution
       std::ostringstream tmp;
-      tmp << "C_n" << C_n;
-      msg.message (tmp.str ());
+      //tmp_mmo << "C_n" << C_n;
+      //msg.message (tmp.str ());
     } //End small timestep loop
   
+  tmp_mmo << "C_n" << C_n;
+
 
   //debug Print new solution
   //std::ostringstream tmp;
