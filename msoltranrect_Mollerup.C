@@ -162,14 +162,11 @@ struct MsoltranrectMollerup : public Msoltranrect
                              ublas::vector<double>& advecm_vec);
 
 
-  static void Dirichlet_timestep (const GeometryRect& geo,
-                                  const bool isflux,
-                                  const double C_border,
-                                  const ublas::vector<double>& ThetaD_xx_zz,
-                                  const ublas::vector<double>& C,
-                                  const bool enable_boundary_diffusion,
-                                  const double dt,
-                                  double& ddt_dir);
+  static double Dirichlet_timestep (const GeometryRect& geo,
+                                    const double C_border,
+                                    const ublas::vector<double>& ThetaD_xx_zz,
+                                    const ublas::vector<double>& C,
+                                    const double dt);
 
   static void upperboundary (const GeometryRect& geo,
                              std::vector<edge_type_t>& edge_type,
@@ -865,68 +862,59 @@ MsoltranrectMollerup::lowerboundary
 
 
   
-void 
+double 
 MsoltranrectMollerup::Dirichlet_timestep
 /**/ (const GeometryRect& geo,
-      const bool isflux,
       const double C_border,
       const ublas::vector<double>& ThetaD_xx_zz,
       const ublas::vector<double>& C,
-      const bool enable_boundary_diffusion,
-      const double dt,
-      double& ddt_dir)
+      const double dt)
 {
-
-
-  ddt_dir = dt; 
+  double ddt_dir = dt; 
   
-  if (enable_boundary_diffusion && !isflux)
-    {
-      //std::cout << "yes sir!! \n";  
+  //std::cout << "yes sir!! \n";  
 
-      const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
-      const size_t edge_below_size = edge_below.size ();
+  const std::vector<int>& edge_below
+    = geo.cell_edges (Geometry::cell_below);
+  const size_t edge_below_size = edge_below.size ();
     
-      double ddt_dir_new;
-
-      for (size_t i = 0; i < edge_below_size; i++)
-        {
-          // For diffusion into the cell, only half of the volume of the cell
-          // with conc C_border can be transported by diffusion over the 
-          // boundary into the cell in a timestep. 
-          //  
-          // For diffusion out from the cell, only half of the volume of the cell
-          // with conc C_cell can be transported by diffusion over the 
-          // boundary out from the cell in a timestep. 
+  for (size_t i = 0; i < edge_below_size; i++)
+    {
+      // For diffusion into the cell, only half of the volume of the cell
+      // with conc C_border can be transported by diffusion over the 
+      // boundary into the cell in a timestep. 
+      //  
+      // For diffusion out from the cell, only half of the volume of the cell
+      // with conc C_cell can be transported by diffusion over the 
+      // boundary out from the cell in a timestep. 
           
-          const int edge = edge_below[i];
-          const int cell = geo.edge_other (edge, Geometry::cell_below);
-          const double C_cell = C (cell);
-          const double area_per_length = geo.edge_area_per_length (edge);
-          const double V_cell = geo.cell_volume (cell);
-          const double gradient =  area_per_length * (C_border - C_cell);
-          const double Q_diff_out = -ThetaD_xx_zz (edge) * gradient;
+      const int edge = edge_below[i];
+      const int cell = geo.edge_other (edge, Geometry::cell_below);
+      const double C_cell = C (cell);
+      const double area_per_length = geo.edge_area_per_length (edge);
+      const double V_cell = geo.cell_volume (cell);
+      const double gradient =  area_per_length * (C_border - C_cell);
+      const double Q_diff_out = -ThetaD_xx_zz (edge) * gradient;
 
-          //std::cout << "dt " << dt << '\n';
-          //std::cout << "V_cell " << V_cell << '\n';
-          //std::cout << "gradient " << gradient << '\n';
-          //std::cout << "Q_diff_out " << Q_diff_out << '\n'; 
+      //std::cout << "dt " << dt << '\n';
+      //std::cout << "V_cell " << V_cell << '\n';
+      //std::cout << "gradient " << gradient << '\n';
+      //std::cout << "Q_diff_out " << Q_diff_out << '\n'; 
           
+      double ddt_dir_new = dt;
 
-          if (Q_diff_out > 0)       //Diff out of cell
-            ddt_dir_new = 0.5 * V_cell * C_cell / Q_diff_out; 
-          else if  (Q_diff_out < 0) //Diff into cell
-            ddt_dir_new = - 0.5 * V_cell * C_border / Q_diff_out; 
+      if (Q_diff_out > 0)       //Diff out of cell
+        ddt_dir_new = 0.5 * V_cell * C_cell / Q_diff_out; 
+      else if  (Q_diff_out < 0) //Diff into cell
+        ddt_dir_new = -0.5 * V_cell * C_border / Q_diff_out; 
           
-          // std::cout << "ddt_dir_new " << ddt_dir_new << '\n';
+      // std::cout << "ddt_dir_new " << ddt_dir_new << '\n';
           
-          if (ddt_dir_new < ddt_dir)
-            ddt_dir = ddt_dir_new;
-
-          
-
-        }
+      if (ddt_dir_new < ddt_dir)
+        ddt_dir = ddt_dir_new;
     }
+
+  return ddt_dir;
 }
 
 
@@ -1363,13 +1351,14 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   //const stabilizing_method_t stabilizing_method = Streamline_diffusion;
   const stabilizing_method_t stabilizing_method = Timestep_reduction;
   //const stabilizing_method_t stabilizing_method = None;
-  const double dt_min = 1e-10;
+  const double ddt_min = 1e-10;
   const double gamma_stabilization = 10;
-  int nddt;        //number of small timesteps
 
   
   std::ostringstream tmp_mmo;
   
+  // Largest allowable timestep in loop.
+  double ddt_max = 2 * dt;
   switch (stabilizing_method)
     {
     case None:
@@ -1378,7 +1367,6 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
         tmp_mmo << "No stabilization\n";
         //msg.message(tmp_mmo.str ());
         //std::cout << "No stabilization\n";
-        nddt = 1;    //Number of small timesteps 
         break;
       }
 
@@ -1391,49 +1379,24 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
           = ublas::zero_vector<double> (edge_size);
         edge_water_content (geo, Theta_cell_avg, Theta_edge);      
         
-        double dt_PeCr_min = 2*dt;
+        double ddt_PeCr_min = 2*dt;
         
         for (size_t e = 0; e < edge_size; e++)
           {
             if (iszero (q_edge[e]))
               continue;
             
-            const double dt_PeCr
+            const double ddt_PeCr
               = gamma_stabilization * ThetaD_xx_zz_avg[e]
               * Theta_edge[e]/(q_edge[e]*q_edge[e]);
-            if (dt_PeCr < dt_PeCr_min)
-              dt_PeCr_min = dt_PeCr;
+            if (ddt_PeCr < ddt_PeCr_min)
+              ddt_PeCr_min = ddt_PeCr;
           }
     
+        if (ddt_PeCr_min < ddt_max)
+          ddt_max = ddt_PeCr_min;
         
-        //Dumt sted at have den
-        double ddt_dir = 0.0;
-        //double ddt = 0.0;
-        Dirichlet_timestep (geo, flux_below, C_below, ThetaD_xx_zz_avg, C_old, 
-                            enable_boundary_diffusion, dt, ddt_dir);
-        
-        std::cout << "xxxxxxxxxxxxxx" << '\n';
-        std::cout << "dt: " << dt << '\n';
-        std::cout << "ddt_dir: " << ddt_dir << '\n'; 
-
-
-        if (dt_PeCr_min < dt_min)
-          dt_PeCr_min = dt_min; //no timesteps small than dt_min!
-        
-        tmp_mmo << "dt_PeCr_min = " << dt_PeCr_min << '\n';
-        
-        //Number of small timesteps 
-        const int divres = double2int(dt/dt_PeCr_min);
-        double remainder = dt - divres*dt_PeCr_min; 
-        if (remainder <= dt_min*1e-3)
-          nddt = divres;
-        else 
-          nddt = divres + 1;
-        
-        //Print out some results
-        tmp_mmo << "divres = " << divres << '\n';
-        tmp_mmo << "remainder = " << remainder << '\n';
-        tmp_mmo << "nddt = " << nddt << '\n';  
+        tmp_mmo << "ddt_PeCr_min = " << ddt_PeCr_min << '\n';
         break;
       }
     case Streamline_diffusion:
@@ -1453,16 +1416,14 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
             if (ThetaD_xx_zz_avg[e] < ThetaD_PeCr)  //Need extra diffusion
               ThetaD_xx_zz_avg[e] = ThetaD_PeCr;
           }
-        nddt = 1; //Dont use smaller timesteps 
         break;
       }
     } 
-  
-  //Calculate size of smal timesteps
-  const double ddt = dt/nddt;
-  tmp_mmo << "ddt = " << ddt << '\n';
-   
-     
+
+  // No timesteps small than ddt_min!
+  if (ddt_max < ddt_min)
+    ddt_max = ddt_min;
+
   //--------------------------------------
   //--- For moving in/out of tick loop ---
   //--------------------------------------
@@ -1574,10 +1535,42 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
   C_n = C_old;
 
 
+  // Time left of current large timestep.
+  double time_left = dt;
+  // Time already processed of large timestep.
   double dtime = 0.0;
-  for (int ddtstep = 0; ddtstep < nddt; ddtstep++)
+
+  while (dtime * 1.000001 < dt)
     {
+      // First we try the maximum allowable timestep.
+      double ddt = ddt_max;
+      
+      // Then we allow dirichlet boundary to limit it.
+      if (stabilizing_method == Timestep_reduction
+          && !flux_below
+          && enable_boundary_diffusion)
+        {
+          double ddt_dir = Dirichlet_timestep (geo, C_below, ThetaD_xx_zz_avg,
+                                               C_old, time_left);
+          if (ddt_dir < ddt)
+            ddt = ddt_dir;
+
+          std::cout << "xxxxxxxxxxxxxx" << '\n';
+          std::cout << "dt: " << dt << '\n';
+          std::cout << "ddt_dir: " << ddt_dir << '\n'; 
+        }
+
+      if (ddt * 1.0001 >= time_left)
+        // We never use more time than is left.
+        ddt = time_left;
+      else if (ddt > time_left / 2.0)
+        // If we use smaller timestep, only do half the rest in this try.
+        // This should prevent orphans.
+        ddt = time_left / 2.0;
+        
+      time_left -= ddt;
       dtime += ddt;       //update time 
+
       tmp_mmo << "dtime = " << dtime << '\n';
       
       //Calculate water content 
@@ -1661,9 +1654,6 @@ void MsoltranrectMollerup::flow (const GeometryRect& geo,
       std::ostringstream tmp;
       tmp << "C_n" << C_n;
       msg.message (tmp.str ());
-     
-
- 
     } //End small timestep loop
   
 
