@@ -63,7 +63,7 @@ struct Value
     std::vector<bool>* flag_sequence;
     std::vector<int>* integer_sequence;
     std::vector<const PLF*>* plf_sequence;
-    std::vector<AttributeList*>* alist_sequence;
+    std::vector<const AttributeList*>* alist_sequence;
   };
   Syntax::type type;
   bool is_sequence;
@@ -187,14 +187,14 @@ struct Value
       is_sequence (true),
       ref_count (new int (1))
     { }
-  std::vector<AttributeList*>* copy_alists (const std::vector<AttributeList*>& org)
+  std::vector<const AttributeList*>* copy_alists (const std::vector<const AttributeList*>& org)
   {
-    std::vector<AttributeList*>* copy = new std::vector<AttributeList*> ();
+    std::vector<const AttributeList*>* copy = new std::vector<const AttributeList*> ();
     for (unsigned int i = 0; i < org.size (); i++)
       copy->push_back (new AttributeList (*org[i]));
     return copy;
   }
-  Value (const std::vector<AttributeList*>& v)
+  Value (const std::vector<const AttributeList*>& v)
     : alist_sequence (copy_alists (v)),
       type (Syntax::AList),
       is_sequence (true),
@@ -287,8 +287,8 @@ Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax,
 	return *integer_sequence == *v.integer_sequence;
       case Syntax::AList:
 	{
-	  const std::vector<AttributeList*>& value = *alist_sequence;
-	  const std::vector<AttributeList*>& other = *v.alist_sequence;
+	  const std::vector<const AttributeList*>& value = *alist_sequence;
+	  const std::vector<const AttributeList*>& other = *v.alist_sequence;
 
 	  const unsigned int size = value.size ();
 	  if (other.size () != size)
@@ -817,7 +817,7 @@ AttributeList::plf_sequence (const std::string& key) const
   return *value.plf_sequence;
 }
 
-const std::vector<AttributeList*>& 
+const std::vector<const AttributeList*>& 
 AttributeList::alist_sequence (const std::string& key) const
 {
   const Value& value = impl.lookup (key);
@@ -879,7 +879,8 @@ AttributeList::add (const std::string& key, const std::vector<int>& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const std::string& key, const std::vector<AttributeList*>& v)
+AttributeList::add (const std::string& key, 
+		    const std::vector<const AttributeList*>& v)
 { impl.add (key, Value (v)); }
 
 void 

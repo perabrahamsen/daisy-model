@@ -23,44 +23,117 @@
 #ifndef IM_H
 #define IM_H
 
-#include <string>
+#include "symbol.h"
+#include "syntax.h"
+#include <map>
 
-struct Log;
-struct Syntax;
-struct AttributeList;
+class Log;
+class Syntax;
+class AttributeList;
+class Block;
+
+class Scalar 
+{
+  // Content.
+private:
+  const symbol dim;
+  const double val;
+
+  // Use.
+public:
+  symbol dimension () const
+  { return dim; }
+  double value () const
+  { return val; }
+
+  // Create and Destroy.
+public:
+  Scalar (const double v, const symbol d)
+    : dim (d),
+      val (v)
+  { }
+  Scalar (const double v, const char *const d)
+    : dim (d),
+      val (v)
+  { }
+  Scalar (const Scalar& s)
+    : dim (s.dim),
+      val (s.val)
+  { }
+private:
+  Scalar& operator= (const Scalar&); // Disable
+};
 
 class IM
 {
-  // Content.
+  // Utility.
 public:
-  double NH4;
-  double NO3;
+  static symbol storage_unit (); // [g/cm^2]
+  static symbol flux_unit ();    // [g/cm^2/h]
+  static symbol solute_unit ();  // [g/cm^2/mm]
+
+  // Content.
+private:
+  symbol dimension;
+  std::map<symbol, double> content;
+
+  // Accessors.
+public:
+  double get_value (symbol chem, symbol dim) const;
+  void set_value (symbol chem, symbol dim, double value);
+  void add_value (symbol chem, symbol dim, double value);
+private:
+  double get_value_raw (symbol chem) const;
+  void set_value_raw (symbol chem, double value);
+
+  // Iterate.
+public:
+  struct const_iterator
+  {
+    std::map<symbol, double>::const_iterator i;
+
+    symbol operator* () const
+    { return (*i).first; }
+    bool operator!= (const_iterator j)
+    { return i != j.i; }
+    const_iterator operator++(int)
+    { const_iterator old = *this; i++; return old; }
+    const_iterator operator++()
+    { i++; return *this; }
+    explicit const_iterator (std::map<symbol, double>::const_iterator x)
+      : i (x)
+    { }
+  };
+  const_iterator begin () const
+  { return const_iterator (content.begin ()); }
+  const_iterator end () const
+  { return const_iterator (content.end ()); }
 
   // Operations.
 public:
   void output (Log&) const;
-  void clear ();
+  void rebase (const symbol dim);
+  void rebase (const char* dim);
   void operator+= (const IM&);
-  void operator-= (const IM&);
-  void operator*= (double);
-  void operator/= (double);
-  bool empty () const;
+  IM operator+ (const IM&) const;
+  void operator*= (const Scalar&);
+  IM operator* (const Scalar&) const;
+  IM& operator= (const IM&);
+  void clear ();
 
   // Create. 
 public:
-  IM operator* (double flux) const;
-  IM operator+ (const IM&) const;
-  static void define_syntax (Syntax&, AttributeList&, const std::string& dim);
-  static void load_ppm (Syntax&, AttributeList&);
-  static void load_soil (Syntax&, AttributeList&);
-  static void load_soil_flux (Syntax&, AttributeList&);
-  static void load_field_flux (Syntax&, AttributeList&);
-  IM (const IM& im);
-  explicit IM (const AttributeList&);
-  explicit IM (const IM&, double flux);
+  static void add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,
+			  Syntax::category cat, 
+			  const char *const key,
+			  const symbol dimension,
+			  const char *const description);
+  explicit IM (Block&, const char* key);
   explicit IM ();
+  IM (const IM& im);
+  explicit IM (symbol dim);
+  explicit IM (symbol dim, const IM&);
   ~IM ();
 };
-
 
 #endif // IM_H

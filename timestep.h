@@ -55,7 +55,8 @@ public:
   {
   private:
     virtual void check_dt (double dt) const throw (std::string) = 0;
-    void check (const Syntax& syntax, const AttributeList& alist, 
+    void check (const Metalib&,
+		const Syntax& syntax, const AttributeList& alist, 
                 const std::string& key) const throw (std::string);
   };
   static const VCheck& positive ();

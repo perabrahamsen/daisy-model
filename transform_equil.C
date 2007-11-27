@@ -2,6 +2,7 @@
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2007 Per Abrahamsen and KVL:
 //
 // This file is part of Daisy.
 // 
@@ -27,144 +28,115 @@
 #include "alist.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "pedo.h"
 #include "equil.h"
+#include "scope_soil.h"
+#include "number.h"
+#include "units.h"
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include <memory>
-
-using namespace std;
+#include <sstream>
 
 struct TransformEquilibrium : public Transform
 {
   // Parameters.
-  /* const */ auto_ptr<Equilibrium> equilibrium;
-  /* const */ vector<double> k_AB;
-  /* const */ vector<double> k_BA;
+  std::auto_ptr<Equilibrium> equilibrium;
+  std::auto_ptr<Number> k_AB_expr;
+  std::auto_ptr<Number> k_BA_expr;
 
   // Simulation.
-  void tick (const Soil&, const SoilWater&, 
-             const vector<double>& A, const vector<double>& B,
-             vector<double>& S_AB, Treelog&) const;
+  void tick (const Soil&, const SoilWater&, const SoilHeat&,
+             const std::vector<double>& A, const std::vector<double>& B,
+             std::vector<double>& S_AB, Treelog&) const;
 
   // Create.
-  enum { uninitialized, init_succes, init_failure } initialize_state;
-  void initialize (Block&, const Soil&);
-  bool check (const Soil&, Treelog& err) const;
+  void initialize (const Soil&, Treelog&);
+  bool check (const Soil&, const SoilWater&, const SoilHeat&, Treelog&) const;
   TransformEquilibrium (Block& al)
     : Transform (al),
       equilibrium (Librarian::build_item<Equilibrium> (al, "equilibrium")),
-      initialize_state (uninitialized)
+      k_AB_expr (Librarian::build_item<Number> (al, "k_AB")),
+      k_BA_expr (al.check ("k_BA")
+		 ? Librarian::build_item<Number> (al, "k_BA")
+		 : Librarian::build_item<Number> (al, "k_AB"))
   { }
 };
 
 void 
 TransformEquilibrium::tick (const Soil& soil, const SoilWater& soil_water,
-			    const vector<double>& A, const vector<double>& B,
-                            vector<double>& S_AB, Treelog& msg) const
+			    const SoilHeat& soil_heat,
+			    const std::vector<double>& A, 
+			    const std::vector<double>& B,
+                            std::vector<double>& S_AB, Treelog& msg) const
 { 
-  daisy_assert (k_AB.size () == soil.size ());
-  daisy_assert (k_BA.size () == soil.size ());
-  daisy_assert (A.size () == soil.size ());
-  daisy_assert (B.size () == soil.size ());
-  daisy_assert (S_AB.size () == soil.size ());
+  const size_t cell_size = soil.size ();
+  daisy_assert (A.size () == cell_size);
+  daisy_assert (B.size () == cell_size);
+  daisy_assert (S_AB.size () == cell_size);
 
-  for (unsigned int i = 0; i < soil.size (); i++)
+  ScopeSoil scope (soil, soil_water, soil_heat);
+  for (size_t c = 0; c < cell_size; c++)
     { 
-      const double has_A = A[i];
-      const double has_B = B[i];
+      scope.set_cell (c);
+      const double has_A = A[c];
+      const double has_B = B[c];
       double want_A;
       double want_B;
-      equilibrium->find (soil, soil_water, i, has_A, has_B, want_A, want_B,
-			 msg);
+      equilibrium->find (scope, has_A, has_B, want_A, want_B, msg);
+
       daisy_assert (approximate (has_A + has_B, want_A + want_B));
 
-      const double convert = (has_A > want_A)
-	? k_AB[i] * (has_A - want_A)
-	: -k_BA[i] * (has_B - want_B);
-      
-      S_AB[i] = convert;
-	
+      double convert = 0.0;
+      if (has_A > want_A)
+	{
+	  if (!k_AB_expr->tick_value (convert, Units::per_h (), scope, msg))
+	    msg.error ("Could not evaluate 'k_AB'");
+
+	  convert *= (has_A - want_A);
+	}
+      else
+	{
+	  if (!k_BA_expr->tick_value (convert, Units::per_h (), scope, msg))
+	    msg.error ("Could not evaluate 'k_BA'");
+
+	  convert *= -(has_B - want_B);
+	}
+      S_AB[c] = convert;
     }
 }
 
 bool
-TransformEquilibrium::check (const Soil& soil, Treelog& err) const
+TransformEquilibrium::check (const Soil& soil, const SoilWater& soil_water,
+			     const SoilHeat& soil_heat, Treelog& msg) const
 { 
-  Treelog::Open nest (err, name);
   bool ok = true;
 
-  if (!equilibrium->check (soil, err))
-    ok = false;
-
-  if (initialize_state != init_succes)
-    { 
-      err.error ("Initialize failed");
-      ok = false;
+  ScopeSoil scope (soil, soil_water, soil_heat);
+  const size_t cell_size = soil.size ();
+  for (size_t c = 0; ok && c < cell_size; c++)
+    {
+      std::ostringstream tmp;
+      tmp << "Transform '" + name + "' cell " << c;
+      Treelog::Open nest (msg, tmp.str ());
+      scope.set_cell (c);
+      if (!equilibrium->check (scope, msg))
+	ok = false;
+      if (!k_AB_expr->check_dim (scope, Units::per_h (), msg))
+	ok = false;
+      if (!k_BA_expr->check_dim (scope, Units::per_h (), msg))
+	ok = false;
     }
   return ok;
 }
 
 void
-TransformEquilibrium::initialize (Block& block, const Soil& soil)
+TransformEquilibrium::initialize (const Soil& soil, Treelog& msg)
 { 
-  Treelog::Open nest (block.msg (), name);
-  equilibrium->initialize (block, soil);
-
-  daisy_assert (initialize_state == uninitialized);
-  initialize_state = init_succes;
-
-  static const symbol rate_dim ("h^-1");
-
-  // k_AB
-  {
-    Treelog::Open nest (block.msg (), "k_AB");
-    auto_ptr<Pedotransfer> pedo_AB 
-      (Librarian::build_alist<Pedotransfer> (block, alist.alist ("k_AB"), 
-                                             "k_AB"));
-    if (pedo_AB->check (soil, rate_dim, block.msg ()))
-      pedo_AB->set (soil, k_AB, rate_dim);
-    else
-      initialize_state = init_failure;
-
-    Pedotransfer::debug_message ("k_AB", k_AB, rate_dim, block.msg ());
-  }
-  
-  // k_BA
-  if (alist.check ("k_BA"))
-    {
-      Treelog::Open nest (block.msg (), "k_BA");
-      auto_ptr<Pedotransfer> pedo_BA 
-        (Librarian::build_alist<Pedotransfer> (block, alist.alist ("k_BA"),
-                                               "k_BA"));
-      if (pedo_BA->check (soil, rate_dim, block.msg ()))
-        pedo_BA->set (soil, k_BA, rate_dim);
-      else
-        initialize_state = init_failure;
-      Pedotransfer::debug_message ("k_BA", k_BA, rate_dim, block.msg ());
-    }
-  else
-    k_BA = k_AB;
-  
-  if (alist.check ("debug"))
-    {
-      Treelog::Open nest (block.msg (), "debug");
-      const vector<AttributeList*> alists = alist.alist_sequence ("debug");
-      for (unsigned int i = 0; i < alists.size (); i++)
-        {
-          vector<double> debug;
-          auto_ptr<Pedotransfer> pedo_debug 
-            (Librarian::build_alist<Pedotransfer> (block, *alists[i], 
-                                                   "debug", i));
-          if (pedo_debug->check (soil, pedo_debug->dimension (), block.msg ()))
-            pedo_debug->set (soil, debug, pedo_debug->dimension ());
-          else
-            initialize_state = init_failure;
-          Pedotransfer::debug_message (pedo_debug->name.name (), 
-                                       debug, pedo_debug->dimension (), block.msg ());
-        }
-    }
+  Treelog::Open nest (msg, name);
+  equilibrium->initialize (msg);
+  k_AB_expr->initialize (msg); 
+  k_BA_expr->initialize (msg); 
 }
 
 static struct TransformEquilibriumSyntax
@@ -181,16 +153,14 @@ static struct TransformEquilibriumSyntax
 	       "Two soil components reching for equilibrium.");
     syntax.add_object ("equilibrium", Equilibrium::component,
                        "Function for calculating equilibrium between A and B.");
-    syntax.add_object ("k_AB", Pedotransfer::component,
-                       Syntax::Const, Syntax::Singleton, 
-                       "Tranformation rate from soil component 'A' to 'B' [h^-1].");
-    syntax.add_object ("k_BA", Pedotransfer::component,
-                       Syntax::OptionalConst, Syntax::Singleton,
-                       "Tranformation rate from soil component 'B' to 'A' [h^-1].\n\
+    syntax.add_object ("k_AB", Number::component,
+                       Syntax::Const, Syntax::Singleton, "\
+Tranformation rate from soil component 'A' to 'B' [h^-1].");
+    syntax.add_object ("k_BA", Number::component,
+                       Syntax::OptionalConst, Syntax::Singleton, "\
+Tranformation rate from soil component 'B' to 'A' [h^-1].\n\
 By default, this is identical to 'k_AB'.");
-    syntax.add_object ("debug", Pedotransfer::component,
-                       Syntax::OptionalConst, Syntax::Sequence, "\
-Extra pedotransfer function to include in 'daisy.log' for debugging.");
-    Librarian::add_type (Transform::component, "equilibrium", alist, syntax, &make);
+    Librarian::add_type (Transform::component, "equilibrium",
+			 alist, syntax, &make);
   }
 } TransformEquilibrium_syntax;

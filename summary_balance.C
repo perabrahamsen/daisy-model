@@ -279,7 +279,7 @@ instead of total amount.");
       alist.add ("precision", 2);
       syntax.add ("require_top", Syntax::Boolean, Syntax::Const, "\
 If the balance only hold true when logging the top of the soil, i.e. the\n\
-`to' parameter of the log model is 0, this flag should be set.");
+`from' parameter of the log model is 0, this flag should be set.");
       alist.add ("require_top", false);
       syntax.add ("input", Syntax::String, Syntax::Const, Syntax::Sequence,
                   "Tags of columns in log file representing inputs.");

@@ -148,7 +148,7 @@ CrpN::update (double& NCrop, const double DS,
 	      const bool enable_N_stress,
               const Geometry& geo,
 	      const Soil& soil, const SoilWater& soil_water,
-	      Solute& soil_NH4, Solute& soil_NO3,
+	      Chemistry& chemistry,
               const double day_fraction,
 	      RootSystem& root_system,
               const double dt)
@@ -161,8 +161,8 @@ CrpN::update (double& NCrop, const double DS,
 #endif
 
   const double NUpt = root_system.nitrogen_uptake (geo, soil, soil_water, 
-						   soil_NH4, NH4_root_min, 
-						   soil_NO3, NO3_root_min,
+						   chemistry,
+						   NH4_root_min, NO3_root_min,
 						   PotNUpt, dt) * dt;
   NCrop += NUpt;
   PotNUpt -= NUpt;

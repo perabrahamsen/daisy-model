@@ -1,3 +1,36 @@
+2007-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C, solute.h: Merged into chemical.
+	* Makefile (SPECIALS): Removed.
+	* chemical.h, chemical_std.C: Incorporated solute.
+	* all: Updated.
+
+2007-11-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vcheck.C (VCheck::unique): Handle objects.
+
+	* vcheck.h, vcheck.C (check): Take 'Metalib' parameter.
+	* all: Updated callers.
+	* vcheck.h, vcheck.C (InLibrary): New member class.
+	* chemical.h (check_library): New function.
+
+	* action_spray.C (doIt): Better message.
+
+	* im.h, im.C: Rewritten.
+	* action_table.C, action_crop.C, acrion_extern.C, acrion_irrigate.C:
+	* column_std.C, weather.C, weather_old.C, weather_std.C: Update caller.
+
+2007-11-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemistry_multi.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* pedo.C, pedo.h, pedo_arit.C, pedo_const.C: Removed component.
+	* Makefile (MODELS, COMPONENTS): Ditto.
+	* equil.h, equil.C, equil_langmuir.C, equil_linear.C:
+	* equil_goal.C: Update callers.
+	* transform_equil.C: Update caller.
+	
 2007-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* reaction_nit.C: New model.

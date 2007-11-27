@@ -34,8 +34,6 @@
 #include "aom.h"
 #include "organic_matter.h"
 #include "soil_heat.h"
-#include "soil_NH4.h"
-#include "soil_NO3.h"
 #include "am.h"
 #include "harvest.h"
 #include "submodeler.h"
@@ -76,7 +74,7 @@ public:
   std::auto_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
   const double NRoot;		// Root nitrogen weight [g N/m^2]
-  const vector<AttributeList*>& root_am; // Root AM parameters.
+  const vector<const AttributeList*>& root_am; // Root AM parameters.
 
   // Nitrogen.
   const double N_potential;	// Potential N content at harvest. [g N/m^2]
@@ -127,8 +125,7 @@ public:
 	     const Bioclimate&, const Geometry& geo,
              const Soil&, OrganicMatter&,
 	     const SoilHeat&, const SoilWater&, 
-	     Solute& /* NH4 */, 
-	     Solute& /* NO3 */, 
+	     Chemistry&, 
 	     double&, double&, double&, vector<double>&, vector<double>&,
 	     double ForcedCAI,
 	     double dt, Treelog&);
@@ -221,7 +218,7 @@ CropSimple::tick (const Time& time, const double, const double,
 		  OrganicMatter& /* organic_matter */,
 		  const SoilHeat& soil_heat,
 		  const SoilWater& soil_water,
-		  Solute& soil_NH4, Solute& soil_NO3, 
+		  Chemistry& chemistry,
 		  double&, double&, double&, vector<double>&, vector<double>&,
 		  const double ForcedCAI,
                   const double dt,
@@ -293,8 +290,7 @@ CropSimple::tick (const Time& time, const double, const double,
       N_demand = N_potential / (1.0 + ((N_potential - N_b) / N_b)
 				* exp (- N_c * (T - T_emergence)));
       N_actual += root_system->nitrogen_uptake (geo, soil, soil_water, 
-                                                soil_NH4, 0.0, 
-                                                soil_NO3, 0.0,
+                                                chemistry, 0.0, 0.0,
                                                 N_demand - N_actual,
                                                 dt);
     }
@@ -546,3 +542,4 @@ Fraction of potential N uptake reached at flowering.");
   }
 } simple_crop_syntax;
 
+// crop_simple.C ends here.

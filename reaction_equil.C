@@ -58,8 +58,8 @@ struct ReactionEquilibrium : public Reaction
              Chemistry& chemistry, const double dt, Treelog& msg)
   { 
     const size_t cell_size = geo.cell_size ();
-    Solute& A = chemistry.find (name_A);
-    Solute& B = chemistry.find (name_B);
+    Chemical& A = chemistry.find (name_A);
+    Chemical& B = chemistry.find (name_B);
     
     ScopeSoil scope (soil, soil_water, soil_heat);
     for (size_t c = 0; c < cell_size; c++)
@@ -124,7 +124,7 @@ struct ReactionEquilibrium : public Reaction
         ok = false;
       }
     ScopeSoil scope (soil, soil_water, soil_heat);
-    if (!equilibrium->check (soil, msg))
+    if (!equilibrium->check (scope, msg))
       ok = false;
     if (!k_AB->check_dim (scope, k_unit, msg))
       ok = false;
@@ -133,13 +133,13 @@ struct ReactionEquilibrium : public Reaction
 
     return ok;
   }
-  void initialize (Block& block, const Soil& soil)
+  void initialize (const Soil& soil, Treelog& msg)
   { 
-    equilibrium->initialize (block, soil); 
+    equilibrium->initialize (msg); 
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);
     daisy_assert (S_AB.size () == soil.size ());
-    k_AB->initialize (block.msg ()); 
-    k_BA->initialize (block.msg ()); 
+    k_AB->initialize (msg); 
+    k_BA->initialize (msg); 
   }
   explicit ReactionEquilibrium (Block& al)
     : Reaction (al),

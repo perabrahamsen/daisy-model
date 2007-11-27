@@ -25,13 +25,11 @@
 #include "model.h"
 #include "symbol.h"
 
-class Soil;
-class SoilWater;
 class Block;
 class Syntax;
 class AttributeList;
 class Treelog;
-class ScopeSoil;
+class Scope;
 
 class Equilibrium : public Model
 {
@@ -43,17 +41,14 @@ public:
   
   // Simulation.
 public:
-  virtual void find (const Soil&, const SoilWater&, unsigned int i,
+  virtual void find (const Scope&,
 		     double has_A, double has_B, 
 		     double& want_A, double& want_B, Treelog&) const = 0;
-  void find (const ScopeSoil&,
-	     double has_A, double has_B, 
-	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
 public:
-  virtual void initialize (Block&, const Soil&) = 0;
-  virtual bool check (const Soil&, Treelog&) const = 0;
+  virtual void initialize (Treelog&) = 0;
+  virtual bool check (const Scope&, Treelog&) const = 0;
   static void load_syntax (Syntax&, AttributeList&);
 private:
   Equilibrium ();

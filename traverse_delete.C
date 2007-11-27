@@ -63,7 +63,7 @@ private:
 			       const string& name);
   void leave_submodel_default ();
   bool enter_submodel_sequence (const Syntax& syntax,
-  				AttributeList& alist,
+  				const AttributeList& alist,
   				const AttributeList& default_alist,
   				const string& name, unsigned index);
   void leave_submodel_sequence ();
@@ -72,17 +72,17 @@ private:
   					const string& name);
   void leave_submodel_sequence_default ();
   bool enter_object (const Library&, 
-		     const Syntax& syntax, AttributeList& alist,
+		     const Syntax& syntax, const AttributeList& alist,
   		     const AttributeList& default_alist,
   		     const string& name);
   void leave_object ();
   bool enter_object_sequence (const Library&, const Syntax& syntax,
-  			      AttributeList& alist,
+  			      const AttributeList& alist,
   			      const AttributeList& default_alist,
   			      const string& name, 
   			      unsigned index);
   void leave_object_sequence ();
-  bool enter_parameter (const Syntax&, AttributeList& alist, 
+  bool enter_parameter (const Syntax&, const AttributeList& alist, 
 			const AttributeList& default_alist, 
 			const string& name, const string& parameter);
   void leave_parameter ();
@@ -134,7 +134,7 @@ TraverseDelete::leave_submodel_default ()
 
 bool
 TraverseDelete::enter_submodel_sequence (const Syntax&,
-					 AttributeList&,
+					 const AttributeList&,
 					 const AttributeList&,
 					 const string&, unsigned)
 { return true; }
@@ -155,14 +155,14 @@ TraverseDelete::leave_submodel_sequence_default ()
 
 bool
 TraverseDelete::enter_object (const Library& library, 
-			      const Syntax&, AttributeList& alist,
+			      const Syntax&, const AttributeList& alist,
 			      const AttributeList&,
 			      const string&)
 {
   daisy_assert (alist.check ("type"));
   const symbol super = alist.identifier ("type");
   if (dep_lib == library.name () && super == dep_par)
-    alist.add ("type", dep_super);
+    const_cast<AttributeList&> (alist).add ("type", dep_super);
 
   return true; 
 }
@@ -174,7 +174,7 @@ TraverseDelete::leave_object ()
 bool
 TraverseDelete::enter_object_sequence (const Library& library, 
 				       const Syntax& syntax, 
-				       AttributeList& alist,
+				       const AttributeList& alist,
 				       const AttributeList& default_alist,
 				       const string&, unsigned)
 { return enter_object (library, syntax, alist, default_alist, "dummy"); }
@@ -184,7 +184,7 @@ TraverseDelete::leave_object_sequence ()
 { leave_object (); }
 
 bool
-TraverseDelete::enter_parameter (const Syntax&, AttributeList&, 
+TraverseDelete::enter_parameter (const Syntax&, const AttributeList&, 
 				 const AttributeList&, 
 				 const string&, const string&)
 { return true; }

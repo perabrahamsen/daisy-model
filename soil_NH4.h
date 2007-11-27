@@ -19,6 +19,7 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#error "old NH4"
 
 #ifndef SOIL_NH4_H
 #define SOIL_NH4_H

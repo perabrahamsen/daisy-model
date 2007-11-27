@@ -306,7 +306,7 @@ the simulation.  Can be overwritten by column specific weather.");
   syntax.add_submodule_sequence ("harvest", Syntax::State, 
 				 "Total list of all crop yields.",
 				 Harvest::load_syntax);
-  alist.add ("harvest", std::vector<AttributeList*> ());
+  alist.add ("harvest", std::vector<const AttributeList*> ());
 }
 
 Daisy::~Daisy ()

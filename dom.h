@@ -22,8 +22,6 @@
 #ifndef DOM_H
 #define DOM_H
 
-// These must be included in the header file, for 'load_syntax' to work.
-#include "adsorption.h"
 #include "plf.h"
 #include <memory>
 
@@ -34,7 +32,6 @@ struct Geometry;
 struct Soil;
 struct SoilWater;
 struct DOE;
-struct Adsorption;
 struct SMB;
 struct OM;
 class Treelog;
@@ -49,7 +46,6 @@ public:
 
   // Transport.
 public:
-  std::auto_ptr<Adsorption> adsorption;	// Solute adsorption.
   const double diffusion_coefficient;
 
   // Turnover.

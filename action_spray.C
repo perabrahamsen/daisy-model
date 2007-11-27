@@ -1,4 +1,4 @@
-// action_sow.C
+// action_spray.C -- Spray a chemical on the field.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -30,30 +30,33 @@
 #include "chemical.h"
 #include "check.h"
 #include "librarian.h"
+#include <sstream>
 
 struct ActionSpray : public Action
 {
   const symbol chemical;
   const double amount;
 
-  void doIt (Daisy& daisy, const Scope&, Treelog& out)
-    {
-      out.message ("Spraying " + chemical);
-      daisy.field->spray (chemical, amount, daisy.dt, out); 
-    }
+  void doIt (Daisy& daisy, const Scope&, Treelog& msg)
+  {
+    std::ostringstream tmp;
+    tmp << "Spraying " << amount << " g " << chemical << "/ha";
+    msg.message (tmp.str ());
+    daisy.field->spray (chemical, amount, daisy.dt, msg); 
+  }
 
   void tick (const Daisy&, const Scope&, Treelog&)
   { }
   void initialize (const Daisy&, const Scope&, Treelog&)
   { }
-  bool check (const Daisy&, const Scope&, Treelog& err) const
+  bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
   ActionSpray (Block& al)
     : Action (al),
       chemical (al.identifier ("chemical")),
       amount (al.number ("amount"))
-    { }
+  { }
 };
 
 // Add the ActionSpray syntax to the syntax table.
@@ -62,39 +65,15 @@ static struct ActionSpraySyntax
   static Model& make (Block& al)
   { return *new ActionSpray (al); }
 
-  static bool check_alist (const Metalib& metalib,
-                           const AttributeList& al, Treelog& err)
-    {
-      bool ok = true;
-      const symbol chemical = al.identifier ("chemical");
-
-      const Library& library = metalib.library (Chemical::component);
-      if (!library.check (chemical))
-	{
-	  err.entry ("Unknown chemical '" + chemical + "'");
-	  ok = false;
-	}
-      else
-	{
-	  const Syntax& syntax = library.syntax (chemical);
-	  const AttributeList& alist = library.lookup (chemical);
-	  if (!syntax.check (metalib, alist, err))
-	    {
-	      err.entry ("Incomplete chemical '" + chemical + "'");
-	      ok = false;
-	    }
-	}
-      return ok;
-    }
   ActionSpraySyntax ()
   { 
     Syntax& syntax = *new Syntax ();
-    syntax.add_object_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Spray a chemical (typically a pesticide) on the field.");
     syntax.add ("chemical", Syntax::String, Syntax::Const,
 		"Name of pesticide to spray.");
+    syntax.add_check ("chemical", Chemical::check_library ());
     syntax.add ("amount", "g/ha", Check::non_negative (), Syntax::Const,
 		"Amount of pesticide to spray.");
     syntax.order ("chemical", "amount");
@@ -102,3 +81,4 @@ Spray a chemical (typically a pesticide) on the field.");
   }
 } ActionSpray_syntax;
 
+// action_spray.C ends here.

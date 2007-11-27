@@ -222,7 +222,7 @@ period.");
   syntax.add_object ("exchange", Scope::component,
                      Syntax::Const, Syntax::Sequence, "\
 List of exchange items for communicating with external models.");
-  alist.add ("exchange", std::vector<AttributeList*> ());
+  alist.add ("exchange", std::vector<const AttributeList*> ());
 
   // The log_time paramater.
   static VCheck::Enum valid_component;
@@ -247,8 +247,10 @@ List of default time components to include in log files. Choose between:\n";
   default_time.push_back (symbol ("month"));
   default_time.push_back (symbol ("mday"));
   default_time.push_back (symbol ("hour"));
+#if 0
   default_time.push_back (symbol ("minute"));
   default_time.push_back (symbol ("second"));
+#endif
   alist.add ("log_time_columns", default_time);
 }
 

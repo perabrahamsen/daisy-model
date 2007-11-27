@@ -119,7 +119,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       // Print input files.
       if (global_alist->check ("parser_inputs"))
 	{
-	  const vector<AttributeList*> inputs 
+	  const vector<const AttributeList*> inputs 
 	    (global_alist->alist_sequence ("parser_inputs"));
 	  printer.print_comment ("Input files.");
 	  for (unsigned int i = 0; i < inputs.size (); i++)

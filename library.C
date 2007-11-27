@@ -31,29 +31,31 @@
 #include "symbol.h"
 #include "memutils.h"
 #include <map>
-#include <set>
 #include <sstream>
 
 struct Library::Implementation
 {
   // Id.
   const symbol name;
-  const char * description;
+  const char* description;
 
   // Types.
   typedef std::map<symbol, builder> bmap_type;
   typedef std::map<symbol, AttributeList*> alist_map;
   typedef std::map<symbol, const Syntax*> syntax_map;
+  typedef std::map<symbol, std::set<symbol>/**/> ancestor_map;
 
   // Data (remember to update Library::clone if you change this).
   bmap_type builders;
   alist_map alists;
   syntax_map syntaxen;
   std::vector<doc_fun> doc_funs;
+  ancestor_map ancestors;
 
   // Accessors.
   AttributeList& lookup (symbol) const;
   bool check (symbol) const;
+  void add_ancestors (symbol);
   void add_base (AttributeList&, const Syntax&);
   void add (symbol, AttributeList&, const Syntax&, builder);
   const Syntax& syntax (symbol) const;
@@ -89,13 +91,47 @@ Library::Implementation::check (const symbol key) const
 }
 
 void
+Library::Implementation::add_ancestors (const symbol key)
+{
+  std::set<symbol> all;
+  
+  symbol current = key;
+
+  while (true)
+    {
+      all.insert (current);
+
+      if (!check (current))
+	break;
+
+      const AttributeList& alist = lookup (current);
+
+      symbol next;
+
+      if (alist.check ("type"))
+	next = alist.identifier ("type");
+      else if (alist.check ("base_model"))
+	next = alist.identifier ("base_model");
+      else
+	break;
+
+      if (next == current)
+	break;
+
+      current = next;
+    }
+  ancestors[key] = all;
+}
+
+void
 Library::Implementation::add_base (AttributeList& value,
-			      const Syntax& syntax)
+				   const Syntax& syntax)
 {
   daisy_assert (value.check ("base_model"));
   const symbol key = value.identifier ("base_model");
   alists[key] = &value;
   syntaxen[key] = &syntax;
+  add_ancestors (key);
 }
 
 void
@@ -104,8 +140,8 @@ Library::Implementation::add (const symbol key, AttributeList& value,
 {
   alists[key] = &value;
   syntaxen[key] = &syntax;
-  // builders.insert (std::make_pair (key, build));
   builders[key] = build;
+  add_ancestors (key);
 }
 
 const Syntax& 
@@ -263,6 +299,11 @@ void
 Library::entries (std::vector<symbol>& result) const
 { impl->entries (result); }
 
+const std::set<symbol>& 
+Library::ancestors (symbol key) const
+{ return impl->ancestors[key]; }
+
+
 bool 
 Library::is_derived_from (const symbol a, const symbol b) const
 {
@@ -379,7 +420,7 @@ Library::clone () const
        i++)
     lib->impl->syntaxen[(*i).first] = new Syntax (*(*i).second);
   lib->impl->doc_funs = impl->doc_funs;
-
+  lib->impl->ancestors = impl->ancestors;
   return lib;
 }
 

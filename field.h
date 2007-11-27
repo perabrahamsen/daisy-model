@@ -64,15 +64,17 @@ public:
   void sow (Metalib&, const AttributeList& crop,
             const Time&, double dt, Treelog&);
   void ridge (const AttributeList& ridge);
-  void irrigate_overhead (double water, double temp, const IM&, double dt);
-  void irrigate_surface (double water, double temp, const IM&, double dt);
-  void irrigate_overhead (double water, const IM&, double dt);
-  void irrigate_surface (double water, const IM&, double dt);
+  void irrigate_overhead (double water, double temp, const IM&, double dt,
+			  Treelog& msg);
+  void irrigate_surface (double water, double temp, const IM&, double dt,
+			 Treelog& msg);
+  void irrigate_overhead (double water, const IM&, double dt, Treelog& msg);
+  void irrigate_surface (double water, const IM&, double dt, Treelog& msg);
   void irrigate_subsoil (double water, const IM&, double from, double to, 
-                         double dt);
+                         double dt, Treelog& msg);
   void fertilize (const AttributeList&,
-                  double from, double to, double dt); // Organic.
-  void fertilize (const AttributeList&, double dt);
+                  double from, double to, double dt, Treelog& msg); // Organic.
+  void fertilize (const AttributeList&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
   void harvest (const Time&, double dt, symbol name,

@@ -49,7 +49,7 @@ struct Bioincorporation::Implementation
   const double respiration;
   const PLF distribution;
   std::vector<double> density;
-  const std::vector<AttributeList*>& aom_alists; // Stem AM parameters.
+  const std::vector<const AttributeList*>& aom_alists; // Stem AM parameters.
   
   // Content.
   AM* aom;
@@ -396,7 +396,7 @@ the whole profile.");
   fractions2.push_back (1.00);
   fractions2.push_back (0.00);
   AOM2.add ("fractions", fractions2);
-  std::vector<AttributeList*> am;
+  std::vector<const AttributeList*> am;
   am.push_back (&AOM1);
   am.push_back (&AOM2);
   syntax.add_submodule_sequence ("AOM", Syntax::Const, 
@@ -404,8 +404,10 @@ the whole profile.");
 				 AOM::load_syntax);
   syntax.add_check ("AOM", AM::check_om_pools ());
   alist.add ("AOM", am);
+#if 0				// Dsiabled: We need metalib.
   // Check that default value is ok.
-  AM::check_om_pools ().check (syntax, alist, "AOM");
+  AM::check_om_pools ().check (metalib, syntax, alist, "AOM");
+#endif
 }
   
 Bioincorporation::Bioincorporation (const AttributeList& al)

@@ -22,6 +22,8 @@
 
 #include "log_all.h"
 #include "select.h"
+#include "metalib.h"
+#include "library.h"
 #include "block.h"
 #include "syntax.h"
 #include "treelog.h"
@@ -150,7 +152,35 @@ LogAll::initial_done (const std::vector<Time::component_t>& time_columns,
 }
 
 void 
-LogAll::open (symbol name)
+LogAll::open_derived_type (const symbol key, const char *const component)
+{ 
+  daisy_assert (is_active);
+
+  const int depth = active_interiors.size ();
+  daisy_assert (depth > 0);
+  daisy_assert (depth == active_leafs.size ());
+
+  const std::vector<Select*>& old = active_interiors.top ();
+  active_interiors.push (std::vector<Select*> ());
+  std::vector<Select*>& interiors = active_interiors.top ();
+  active_leafs.push (std::vector<Select*> ());
+  std::vector<Select*>& leafs = active_leafs.top ();
+
+  const Library& library = metalib ().library (symbol (component));
+  const std::set<symbol>& ancestors = library.ancestors (key);
+
+  for (std::vector<Select*>::const_iterator i = old.begin (); 
+       i != old.end (); 
+       i++)
+    if ((*i)->open (ancestors, depth))
+      if ((*i)->last_index == depth)
+	leafs.push_back (*i);
+      else
+	interiors.push_back (*i);
+}
+
+void 
+LogAll::open (const symbol name)
 { 
   daisy_assert (is_active);
 

@@ -34,7 +34,9 @@
 #include "librarian.h"
 #include "units.h"
 #include "scope_soil.h"
+#include "vcheck.h"
 #include <sstream>
+#include <map>
 
 const symbol 
 Solute::g_per_cm3 ("g/cm^3");
@@ -42,6 +44,23 @@ Solute::g_per_cm3 ("g/cm^3");
 double 
 Solute::C_below () const
 { return C_below_value; }
+
+Solute::phase_t 
+Solute::get_phase (symbol name)
+{
+  static struct phase_map_t : public std::map<symbol, phase_t>
+  {
+    phase_map_t ()
+    {
+      (*this)[symbol ("solid")] = solid;
+      (*this)[symbol ("solute")] = solute;
+    }
+  } phase_map;
+
+  const phase_map_t::const_iterator i = phase_map.find (name);
+  daisy_assert (i != phase_map.end ());
+  return (*i).second;
+}
 
 double
 Solute::total_surface (const Geometry& geo, 
@@ -179,19 +198,9 @@ Solute::tick (const size_t cell_size,
     }
 }
 
-bool 
-Solute::check (const unsigned, const Scope& scope, Treelog& msg) const
-{
-  bool ok = true;
-  if (!C_below_expr->check_dim (scope, g_per_cm3, msg))
-    ok = false;
-  return ok;
-}
-
 void
 Solute::output (Log& log) const
 {
-  output_derived (adsorption, "adsorption", log);
   output_value (C_, "C", log);
   output_value (M_, "M", log);
   output_value (S_, "S", log);
@@ -233,8 +242,10 @@ Initial content if otherwise unspecified. [g/cm^3]");
   zero.add ("type", "const");
   alist.add ("initial", zero);
 
-  syntax.add_object ("adsorption", Adsorption::component, 
-                     "Soil adsorption properties.");
+  syntax.add ("phase", Syntax::String, Syntax::Const,
+                     "Either 'solid' or 'solute'.");
+  static const VCheck::Enum phase_check ("solid", "solute");
+  syntax.add_check ("phase", phase_check);
   Geometry::add_layer (syntax, Syntax::OptionalState, "C", "g/cm^3",
                        "Concentration in water.\n\
 This number does not include adsorped matter.");
@@ -273,12 +284,11 @@ Only for initialization of the 'M' parameter.");
 }
 
 Solute::Solute (Block& al)
-  : submodel (al.check ("type") ? al.name ("type") : al.name ("submodel")),
-    C_below_expr (Librarian::build_item<Number> (al, "C_below")),
+  : C_below_expr (Librarian::build_item<Number> (al, "C_below")),
     C_below_value (-42.42e42),
     initial_expr (Librarian::build_item<Number> (al, "initial")),
-    S_permanent (al.number_sequence ("S_permanent")),
-    adsorption (Librarian::build_item<Adsorption> (al, "adsorption"))
+    phase (get_phase (al.identifier ("phase"))),
+    S_permanent (al.number_sequence ("S_permanent"))
 { }
 
 Solute::~Solute ()
@@ -303,14 +313,23 @@ Solute::set_external_source (const Geometry& geo,
   geo.add_surface (S_permanent, from, to, amount);
 }
 
+void
+Solute::update_C (const SoilWater& soil_water)
+{
+  if (phase != solute)
+    return;
+
+  for (size_t i = 0; i < C_.size (); i++)
+    C_[i] = M_[i] / soil_water.Theta (i);
+}
+
 void 
 Solute::mix (const Geometry& geo,
              const Soil& soil, const SoilWater& soil_water, 
 	     const double from, const double to, const double dt)
 { 
   geo.mix (M_, from, to, tillage, dt);
-  for (size_t i = 0; i < C_.size (); i++)
-    C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
+  update_C (soil_water);
 }
 
 void 
@@ -320,23 +339,29 @@ Solute::swap (const Geometry& geo,
               const double dt)
 { 
   geo.swap (M_, from, middle, to, tillage, dt);
-  for (size_t i = 0; i < C_.size (); i++)
-    C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
+  update_C (soil_water);
 }
 
-void 
-Solute::put_M (const Soil& soil, const SoilWater& soil_water,
-	       const std::vector<double>& v)
+bool 
+Solute::check (const unsigned, const Scope& scope, Treelog& msg) const
 {
-  const size_t size = soil.size ();
-  daisy_assert (M_.size () == size);
-  daisy_assert (C_.size () == size);
-  daisy_assert (v.size () == size);
-
-  M_ = v;
-
-  for (size_t i = 0; i < size; i++)
-    C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
+  bool ok = true;
+  if (!C_below_expr->check_dim (scope, g_per_cm3, msg))
+    ok = false;
+  if (phase != solute)
+    {
+      for (size_t i = 0; i < C_.size (); i++)
+	if (std::isnormal (C_[i]))
+	  {
+	    std::ostringstream tmp;
+	    tmp << "C[" << i << "] is " << C_[i] 
+		<< " despite this not being a solute";
+	    msg.error (tmp.str ());
+	    ok = false;
+	    break;
+	  }
+    }
+  return ok;
 }
 
 void 
@@ -409,10 +434,15 @@ Solute::initialize (const AttributeList& al,
 	}
     }
   for (size_t i = C_.size (); i < M_.size (); i++)
-    C_.push_back (M_to_C (soil, soil_water.Theta (i), i, M_[i]));
+    {
+      if (phase == solute)
+	C_.push_back (M_[i] / soil_water.Theta (i));
+      else
+	C_.push_back (0.0);
+    }
   for (size_t i = M_.size (); i < C_.size (); i++)
-    M_.push_back (C_to_M (soil, soil_water.Theta (i), i, C_[i]));
-
+    M_.push_back (soil_water.Theta (i) * C_[i]);
+  
   daisy_assert (C_.size () == M_.size ());
   daisy_assert (C_.size () == geo.cell_size ());
 
@@ -421,14 +451,17 @@ Solute::initialize (const AttributeList& al,
       if (iszero (M_[i]))
 	{
 	  if (std::isnormal (C_[i]))
-	    throw ("C & M mismatch in solute");
+	    throw "C & M mismatch in solute";
+	}
+      else if (phase == solute)
+	{
+	  if (!approximate (C_[i], M_[i] / soil_water.Theta (i)))
+	    throw "Solute C does not match M";
 	}
       else
 	{
-	  
-	  if (!approximate (C_[i],
-			    M_to_C (soil, soil_water.Theta (i), i, M_[i])))
-	    throw ("Solute C does not match M");
+	  if (std::isnormal (C_[i]))
+	    throw "C should be zero for non-solutes";
 	}
     }
 
@@ -447,3 +480,5 @@ Solute::initialize (const AttributeList& al,
   J_p.insert (J_p.begin (), geo.edge_size (), 0.0);
   tillage.insert (tillage.begin (), geo.cell_size (), 0.0);
 }
+
+// solute.C ends here.

@@ -28,8 +28,6 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
-#include "soil_NH4.h"
-#include "soil_NO3.h"
 #include "mathlib.h"
 #include "plf.h"
 #include "check.h"

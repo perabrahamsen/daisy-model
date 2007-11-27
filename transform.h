@@ -28,6 +28,7 @@
 
 class Soil;
 class SoilWater;
+class SoilHeat;
 class Treelog;
 class Syntax;
 class AttributeList;
@@ -43,15 +44,16 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Soil&, const SoilWater&, 
+  virtual void tick (const Soil&, const SoilWater&, const SoilHeat&,
                      const std::vector<double>& A,
                      const std::vector<double>& B, 
                      std::vector<double>& S_AB, Treelog&) const = 0;
-  virtual bool check (const Soil&, Treelog& err) const;
+  virtual bool check (const Soil&, const SoilWater&, const SoilHeat&,
+		      Treelog&) const;
 
   // Create and Destroy.
 public:
-  virtual void initialize (Block&, const Soil&);
+  virtual void initialize (const Soil&, Treelog&);
   static void load_syntax (Syntax&, AttributeList&);
 private:
   Transform ();

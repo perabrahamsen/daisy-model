@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "msoltranrect.h"
-#include "solute.h"
+#include "chemical.h"
 #include "doe.h"
 #include "geometry_rect.h"
 #include "block.h"
@@ -32,7 +32,7 @@ const char *const Msoltranrect::component = "msoltranrect";
 void
 Msoltranrect::solute (const GeometryRect& geo,
                       const Soil& soil, const SoilWater& soil_water,
-                      const double J_in, Solute& solute, 
+                      const double J_in, Chemical& solute, 
 		      const bool flux_below, const double dt,
 		      const Scope& scope, Treelog& msg)
 { 
@@ -40,7 +40,7 @@ Msoltranrect::solute (const GeometryRect& geo,
   const size_t edge_size = geo.edge_size ();
   const size_t cell_size = geo.cell_size ();
 
-  solute.tick (cell_size, soil_water, dt, scope, msg);
+  daisy_assert (solute.phase () == Chemical::solute);
 
   std::vector<double> M (cell_size);
   std::vector<double> C (cell_size);
@@ -70,9 +70,9 @@ Msoltranrect::solute (const GeometryRect& geo,
     }
 
   // Flow.
-  flow (geo, soil, soil_water, solute.submodel, 
+  flow (geo, soil, soil_water, solute.name, 
         M, C, S, J, solute.C_below (), flux_below,
-        *solute.adsorption, solute.diffusion_coefficient (), 
+	solute.diffusion_coefficient (), 
         dt, msg);
 
   // Update edges.
@@ -87,14 +87,14 @@ Msoltranrect::solute (const GeometryRect& geo,
 void 
 Msoltranrect::element (const GeometryRect& geo, 
                        const Soil& soil, const SoilWater& soil_water,
-                       DOE& element, Adsorption& adsorption,
-                       const double diffusion_coefficient, 
+                       DOE& element, const double diffusion_coefficient, 
                        const double dt, Treelog& msg)
 {
   element.tick (geo.cell_size (), soil_water, dt);
-  flow (geo, soil, soil_water, "DOM", 
+  static const symbol DOM_name ("DOM");
+  flow (geo, soil, soil_water, DOM_name, 
         element.M, element.C, element.S, element.J, 0.0, false,
-        adsorption, diffusion_coefficient, dt, msg);
+	diffusion_coefficient, dt, msg);
 }
 
 Msoltranrect::Msoltranrect (Block& al)

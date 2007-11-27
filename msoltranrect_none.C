@@ -23,7 +23,6 @@
 #include "geometry_rect.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "adsorption.h"
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -36,14 +35,13 @@ struct MsoltranrectNone : public Msoltranrect
   void flow (const GeometryRect& geo, 
              const Soil& soil, 
              const SoilWater& soil_water, 
-             const std::string& name,
+             const symbol name,
              std::vector<double>& M, 
              std::vector<double>& C, 
              const std::vector<double>& S, 
              std::vector<double>& J, 
 	     const double C_below,
 	     const bool flux_below,
-             Adsorption& adsorption,
              double diffusion_coefficient, double dt,
              Treelog& msg);
   void output (Log&) const;
@@ -58,14 +56,13 @@ void
 MsoltranrectNone::flow (const GeometryRect& geo, 
                         const Soil& soil, 
                         const SoilWater& soil_water, 
-                        const std::string& name,
+                        const symbol name,
                         std::vector<double>& M, 
                         std::vector<double>& C, 
                         const std::vector<double>& S, 
                         std::vector<double>& J, 
 			const double /* C_below */,
 			const bool /* flux_below */,
-                        Adsorption& adsorption,
                         double /* diffusion_coefficient */,
                         const double dt,
                         Treelog& msg)
@@ -96,7 +93,7 @@ MsoltranrectNone::flow (const GeometryRect& geo,
   for (size_t n = 0; n < cell_size; n++)
     {
       M[n] += S[n] * dt;
-      C[n] = adsorption.M_to_C (soil, soil_water.Theta (n), n, M[n]);
+      C[n] = M[n] / soil_water.Theta (n);
 
       if (!(M[n] >= 0.0))
         {

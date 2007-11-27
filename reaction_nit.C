@@ -33,10 +33,6 @@
 
 struct ReactionNitrification : public Reaction
 {
-  static const symbol name_NO3;
-  static const symbol name_NH4_solute;
-  static const symbol name_NH4_sorbed;
-
   // Log variables.
   std::vector<double> NH4;
   std::vector<double> NO3;
@@ -56,18 +52,9 @@ struct ReactionNitrification : public Reaction
   bool check (const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const;
-  void initialize (Block& block, const Soil& soil);
+  void initialize (const Soil& soil, Treelog&);
   explicit ReactionNitrification (Block& al);
 };
-
-const symbol
-ReactionNitrification::name_NO3 ("NO3-");
-
-const symbol
-ReactionNitrification::name_NH4_solute ("NH4+_solute");
-
-const symbol
-ReactionNitrification::name_NH4_sorbed ("NH4+_sorbed");
 
 void
 ReactionNitrification::output (Log& log) const
@@ -87,9 +74,9 @@ ReactionNitrification::tick (const Geometry& geo,
 {
   const size_t cell_size = geo.cell_size ();
   const std::vector<bool> active = organic_matter.active (); 
-  Chemical& soil_NO3 = chemistry.find (name_NO3);
-  Chemical& soil_NH4_solute = chemistry.find (name_NH4_solute);
-  Chemical& soil_NH4_sorbed = chemistry.find (name_NH4_sorbed);
+  Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
+  Chemical& soil_NH4_solute = chemistry.find (Chemical::NH4_solute ());
+  Chemical& soil_NH4_sorbed = chemistry.find (Chemical::NH4_sorbed ());
 
   for (size_t i = 0; i < cell_size; i++)
     {
@@ -116,17 +103,27 @@ ReactionNitrification::tick (const Geometry& geo,
         NH4[i] = N2O[i] = NO3[i] = 0.0;        
     }
 
-  std::vector<double> NH4_solute = NH4;
-  std::vector<double> NH4_sorbed (NH4.size (), 0.0);
+  daisy_assert (NH4.size () == cell_size);
+  std::vector<double> NH4_solute (cell_size, 0.0);
+  std::vector<double> NH4_sorbed (cell_size, 0.0);
   
   for (size_t i = 0; i < cell_size; i++)
     {
-      const double max_sol = soil_NH4_solute.M_left (i, dt) * 0.95;
-      if (NH4[i] > max_sol)
-	{
-	  NH4_solute[i] = max_sol;
-	  NH4_sorbed[i] = NH4[i] - max_sol;
-	}
+      // We divide by content.  We really should take all from solute,
+      // if using the "solute" nitrification model, bt we don't have
+      // that informaiton here.
+      const double solute_left = soil_NH4_solute.M_left (i, dt);
+      const double sorbed_left = soil_NH4_sorbed.M_left (i, dt);
+      const double total_left = solute_left + sorbed_left;
+      const double solute_fraction = std::isnormal (total_left)
+	? solute_left / total_left
+	// Nothing?  Take from solute, and hope we get it!
+	: 1.0;
+      const double sorbed_fraction = 1.0 - solute_fraction;
+      daisy_assert (sorbed_fraction >= 0.0);
+      daisy_assert (sorbed_fraction <= 1.0);
+      NH4_solute[i] = NH4[i] * solute_fraction;
+      NH4_sorbed[i] = NH4[i] * sorbed_fraction;
     }
   
   soil_NH4_solute.add_to_transform_sink (NH4_solute, dt);
@@ -146,26 +143,18 @@ ReactionNitrification::check (const Soil&, const SoilWater&, const SoilHeat&,
 			      const Chemistry& chemistry, Treelog& msg) const
 { 
   bool ok = true;
-  if (!chemistry.know (name_NO3))
-    {
-      msg.error ("'" + name_NO3.name () + "' not traced");
-      ok = false;
-    }
-  if (!chemistry.know (name_NH4_sorbed))
-    {
-      msg.error ("'" + name_NH4_sorbed.name () + "' not traced");
-      ok = false;
-    }
-  if (!chemistry.know (name_NH4_solute))
-    {
-      msg.error ("'" + name_NH4_solute.name () + "' not traced");
-      ok = false;
-    }
+  if (!chemistry.require (Chemical::NO3 (), msg))
+    ok = false;
+  if (!chemistry.require (Chemical::NH4_sorbed (), msg))
+    ok = false;
+  if (!chemistry.require (Chemical::NH4_solute (), msg))
+    ok = false;
+
   return ok;
 }
 
 void
-ReactionNitrification::initialize (Block& block, const Soil& soil)
+ReactionNitrification::initialize (const Soil& soil, Treelog&)
 {
   const size_t cell_size = soil.size ();
 
@@ -182,11 +171,8 @@ static struct ReactionNitrificationSyntax
 {
   static Model& make (Block& al)
   { return *new ReactionNitrification (al); }
-  ReactionNitrificationSyntax ()
+  static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
     alist.add ("description", "Nitrification.\n\
 The actual nitrification specification is part of the horizon models, this\n\
 reaction just applies the models and logs the result. ");
@@ -196,10 +182,30 @@ reaction just applies the models and logs the result. ");
 		"Amount of nitrate generated this hour.");
     syntax.add ("N2O", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
 		"Amount of nitrous oxide generated this hour.");
+  }
+  ReactionNitrificationSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    load_syntax (syntax, alist);
 
     Librarian::add_type (Reaction::component, "nitrification",
 			 alist, syntax, &make);
   }
 } ReactionNitrification_syntax;
+
+const AttributeList& 
+Reaction::nitrification_model ()
+{
+  static AttributeList alist;
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      ReactionNitrificationSyntax::load_syntax (dummy, alist);
+      alist.add ("type", "nitrification");
+    }
+  return alist;
+}
 
 // reaction_nit.C ends here.

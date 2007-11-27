@@ -111,7 +111,7 @@ struct DepthExtern : public Depth
 
   void tick (const Time&, const Scope& scope, Treelog& msg)
   { 
-    if (!expr->tick_value (value, Units::cm, scope, msg))
+    if (!expr->tick_value (value, Units::cm (), scope, msg))
       if (!approximate (value, 42.0))
 	{
 	  msg.error ("External depth not found");
@@ -128,7 +128,7 @@ struct DepthExtern : public Depth
   virtual bool check (const Scope& scope, Treelog& msg) const
   { 
     bool ok = true;
-    if (!expr->check_dim (scope, Units::cm, msg))
+    if (!expr->check_dim (scope, Units::cm (), msg))
       ok = false;
     return ok;
   }
@@ -180,7 +180,7 @@ struct DepthPLF : public Depth
   { }
   virtual bool check (const Scope&, Treelog&) const
   { return true; }
-  static PLF convert_to_plf (const std::vector<AttributeList*>& table)
+  static PLF convert_to_plf (const std::vector<const AttributeList*>& table)
   {
     daisy_assert (table.size () > 0);
     const Time start (table[0]->alist ("time"));
@@ -206,12 +206,13 @@ struct DepthPLF : public Depth
 // GCC 2.95 can't link if this class is nested.
 static const class CheckTable : public VCheck
 {
-  void check (const Syntax&, const AttributeList& alist,
+  void check (const Metalib&, const Syntax&, const AttributeList& alist,
               const std::string& key) const throw (std::string)
   {
     daisy_assert (alist.check (key));
         
-    const std::vector<AttributeList*>& table = alist.alist_sequence (key); 
+    const std::vector<const AttributeList*>& table 
+      = alist.alist_sequence (key); 
     if (table.size () < 2)
       throw std::string ("You must list at least two entries");
     Time last (table[0]->alist ("time"));

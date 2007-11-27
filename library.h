@@ -26,6 +26,7 @@
 #include "symbol.h"
 #include <string>
 #include <vector>
+#include <set>
 #include <memory>
 
 class Metalib;
@@ -78,6 +79,7 @@ public:
 		    symbol super);
   const Syntax& syntax (symbol) const;
   void entries (std::vector<symbol>&) const;
+  const std::set<symbol>& ancestors (symbol) const;
   bool is_derived_from (symbol a, symbol b) const;
   const symbol base_model (symbol parameterization) const;
   bool has_interesting_description (const AttributeList& alist) const;

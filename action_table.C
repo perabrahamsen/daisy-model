@@ -27,6 +27,7 @@
 #include "field.h"
 #include "am.h"
 #include "im.h"
+#include "units.h"
 #include "lexer_table.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -161,12 +162,20 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
               tmp << "Applying minimum of 0.1 mm\n";
               value = 0.1;
             }
-          IM im (fert);
-          const double conv = 100 * 100 * 1000; // [g/cm^2] -> [mg/m^2]
-          im *= conv / value;   // [mg/l]
-          daisy.field->irrigate_subsoil (value, im, -5.0, -25.0, daisy.dt); 
-          tmp << "Fertigating " << value << " mm, " 
-              << im.NO3 << " ppm NO3 and " << im.NH4 << " ppm NH4";
+          IM im = AM::get_IM (fert);
+	  im.rebase ("mg/m^2");
+	  daisy_assert (std::isnormal (value));
+	  im *= Scalar (1.0 / value, Units::per_mm ());
+          daisy.field->irrigate_subsoil (value, im, -5.0, -25.0, daisy.dt,
+					 msg); 
+          tmp << "Fertigating " << value << " mm, with";
+	  for (IM::const_iterator i = im.begin (); i != im.end (); i++)
+	    {
+	      const symbol chem = *i;
+	      const double value = im.get_value (chem, Units::ppm ());
+	      if (std::isnormal (value))
+		tmp << " " << value << " ppm " << chem;
+	    }
           msg.message (tmp.str ());
         }
       else
@@ -197,9 +206,9 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
               daisy.time.set_alist (new_time);
               fert.add ("creation", new_time);
             }
-          daisy.field->fertilize (fert, daisy.dt);
+          daisy.field->fertilize (fert, daisy.dt, msg);
           if (water > 0.0)
-            daisy.field->irrigate_surface (water, IM (), daisy.dt);
+            daisy.field->irrigate_surface (water, IM (), daisy.dt, msg);
         }
     }
   else if (irrigate_events.find (daisy.time) != irrigate_events.end ())
@@ -207,7 +216,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       const double value = irrigate_events[daisy.time];
       std::ostringstream tmp;
       IM im;
-      daisy.field->irrigate_overhead (value, im, daisy.dt); 
+      daisy.field->irrigate_overhead (value, im, daisy.dt, msg); 
       tmp << "Irrigating " << value << " mm";
       msg.message (tmp.str ());
     }

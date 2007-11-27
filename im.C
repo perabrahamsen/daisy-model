@@ -2,6 +2,7 @@
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -22,64 +23,113 @@
 #define BUILD_DLL
 
 #include "im.h"
+#include "chemical.h"
+#include "units.h"
 #include "am.h"
 #include "log.h"
+#include "block.h"
 #include "alist.h"
 #include "syntax.h"
+#include "check.h"
 #include "submodel.h"
+#include "assertion.h"
+#include <cmath>
 
-using namespace std;
+symbol
+IM::storage_unit ()
+{
+  static const symbol unit ("g/cm^2");
+  return unit;
+}
+
+symbol
+IM::flux_unit ()
+{
+  static const symbol unit ("g/cm^2/h");
+  return unit;
+}
+
+symbol
+IM::solute_unit ()
+{
+  static const symbol unit ("g/cm^2/mm");
+  return unit;
+}
+
+double 
+IM::get_value (const symbol chem, const symbol dim) const
+{
+  return Units::convert (dimension, dim, get_value_raw (chem)); 
+}
+
+void 
+IM::set_value (const symbol chem, const symbol dim, const double value)
+{
+  set_value_raw (chem, Units::convert (dim, dimension, value)); 
+}
+
+void 
+IM::add_value (const symbol chem, const symbol dim, const double value)
+{
+  set_value (chem, dim, value + get_value (chem, dim)); 
+}
+
+double 
+IM::get_value_raw (const symbol chem) const
+{
+  std::map<symbol, double>::const_iterator i = content.find (chem);
+
+  if (i != content.end ())
+    return (*i).second;
+
+  return 0.0;
+}
+
+void 
+IM::set_value_raw (const symbol chem, const double value)
+{ content[chem] = value; }
 
 void
 IM::output (Log& log) const
 {
-  output_variable (NO3, log);
-  output_variable (NH4, log);
+  for (std::map<symbol, double>::const_iterator i = content.begin (); 
+       i != content.end ();
+       i++)
+    {
+      const symbol name = (*i).first;
+      if (!log.check_interior (name))
+	continue;
+
+      Log::Named named (log, name);
+      output_variable (name, log);
+      const double value = (*i).second;
+      output_variable (value, log);
+    }
 }
 
-void IM::clear ()
-{ 
-  NO3 = 0.0;
-  NH4 = 0.0;
+void 
+IM::rebase (const symbol dim)
+{
+  for (std::map<symbol, double>::iterator i = content.begin (); 
+       i != content.end ();
+       i++)
+    (*i).second = Units::convert (dimension, dim, (*i).second);
+  dimension = dim;
 }
+
+void 
+IM::rebase (const char *const dim)
+{ rebase (symbol (dim)); }
 
 void
 IM::operator += (const IM& n)
 { 
-  NO3 += n.NO3;
-  NH4 += n.NH4;
-}
+  daisy_assert (dimension != Syntax::unknown ());
 
-void
-IM::operator -= (const IM& n)
-{ 
-  NO3 -= n.NO3;
-  NH4 -= n.NH4;
-}
-
-void
-IM::operator *= (double n)
-{ 
-  NO3 *= n;
-  NH4 *= n;
-}
-
-void
-IM::operator /= (double n)
-{ 
-  *this *= (1.0 / n);
-}
-
-bool
-IM::empty () const
-{
-  return NO3 < 1e-20 && NH4 < 1e-20;
-}
-
-IM
-IM::operator* (double flux) const
-{
-  return IM (*this, flux);
+  for (std::map<symbol, double>::const_iterator i = n.content.begin (); 
+       i != n.content.end ();
+       i++)
+    content[(*i).first] += Units::convert (n.dimension, dimension, (*i).second);
 }
 
 IM
@@ -90,71 +140,96 @@ IM::operator+ (const IM& im) const
   return result;
 }
 
+void
+IM::operator*= (const Scalar& s)
+{
+  dimension = Units::multiply (dimension, s.dimension ());
+  for (std::map<symbol, double>::iterator i = content.begin (); 
+       i != content.end ();
+       i++)
+    (*i).second *= s.value ();
+}
+
+IM
+IM::operator* (const Scalar& s) const
+{
+  IM result (*this);
+  result *= s;
+  return result;
+}
+
+IM& 
+IM::operator= (const IM& im)
+{
+  dimension = im.dimension;
+  content = im.content;
+  return *this;
+}
+
+void
+IM::clear ()
+{
+  for (std::map<symbol, double>::iterator i = content.begin (); 
+       i != content.end ();
+       i++)
+    (*i).second = 0.0;
+}
+
+IM::IM (Block& parent, const char *const key)
+{
+  // Find dimension.
+  const Syntax& parent_syntax = parent.find_syntax (key);
+  const Syntax& syntax = parent_syntax.syntax (key);
+  dimension = symbol (syntax.dimension ("value"));
+  
+  // Find content.
+  const std::vector<const AttributeList*>& alists = parent.alist_sequence (key);
+  for (size_t i = 0; i < alists.size (); i++)
+    {
+      const AttributeList& al = *alists[i];
+      content[al.identifier ("name")] = al.number ("value");
+    }
+}
+
 IM::IM ()
-  : NH4 (0.0),
-    NO3 (0.0)
+  : dimension (Syntax::unknown ())
 { }
 
 IM::IM (const IM& im)
-  : NH4 (im.NH4),
-    NO3 (im.NO3)
-{ }
+  : dimension (im.dimension),
+    content (im.content)
+{ daisy_assert (dimension != Syntax::unknown ()); }
 
-IM::IM (const AttributeList& al)
-  : NH4 (AM::get_NH4 (al)),
-    NO3 (AM::get_NO3 (al))
-{ }
+IM::IM (const symbol dim)
+  : dimension (dim)
+{ daisy_assert (dimension != Syntax::unknown ()); }
 
-IM::IM (const IM& n, double flux)
-  : NH4 (n.NH4 * flux),
-    NO3 (n.NO3 * flux)
-{ }
+IM::IM (const symbol dim, const IM& im)
+  : dimension (dim)
+{
+  for (const_iterator i = im.begin (); i != im.end (); i++)
+    content[*i] = im.get_value (*i, dimension);
+}
 
 IM::~IM ()
-{ }
+{ daisy_assert (dimension != Syntax::unknown ());  }
 
-void 
-IM::define_syntax (Syntax& syntax, AttributeList& alist, const string& dim)
+void
+IM::add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,
+		Syntax::category cat, 
+		const char *const key,
+		const symbol dimension,
+		const char *const description)
 {
-  alist.add ("description", "\
-Inorganic matter, or more precisely, mineral nitrogen.");
-  syntax.add ("NH4", dim, Syntax::State, "Ammonium content.");
-  alist.add ("NH4", 0.0);
-  syntax.add ("NO3", dim, Syntax::State, "Nitrate content.");
-  alist.add ("NO3", 0.0);
+  Syntax& child_syntax = *new Syntax ();
+  child_syntax.add ("name", Syntax::String, cat, 
+		    "Name of chemical.");
+  child_syntax.add_check ("name", Chemical::check_library ());
+  child_syntax.add ("value", dimension.name (), Check::non_negative (), cat, 
+		    "Value for chemical.");
+  child_syntax.order ("name", "value");
+  parent_syntax.add (key, child_syntax, cat, Syntax::Sequence, description);
+  parent_alist.add (key, std::vector<const AttributeList*> ());
 }
 
-void 
-IM::load_ppm (Syntax& syntax, AttributeList& alist)
-{
-  alist.add ("submodel", "IM_ppm");
-  define_syntax (syntax, alist, "mg N/l"); 
-}
-
-void 
-IM::load_soil (Syntax& syntax, AttributeList& alist)
-{ 
-  alist.add ("submodel", "IM_soil");
-  define_syntax (syntax, alist, "g N/cm^2"); 
-}
-
-void 
-IM::load_soil_flux (Syntax& syntax, AttributeList& alist)
-{ 
-  alist.add ("submodel", "IM_soil_flux");
-  define_syntax (syntax, alist, "g N/cm^2/h"); 
-}
-
-void 
-IM::load_field_flux (Syntax& syntax, AttributeList& alist)
-{ 
-  alist.add ("submodel", "IM_field_flux");
-  define_syntax (syntax, alist, "kg N/ha/y"); 
-}
-
-static Submodel::Register im_ppm_submodel ("IM_ppm", IM::load_ppm);
-static Submodel::Register im_field_flux_submodel ("IM_field_flux",
-                                                  IM::load_field_flux);
-static Submodel::Register im_soil_submodel ("IM_soil", IM::load_soil);
-static Submodel::Register im_soil_flux_submodel ("IM_soil_flux", 
-                                                 IM::load_soil_flux);
+// im.C ends here.

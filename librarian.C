@@ -149,7 +149,7 @@ Librarian::build_vector (const char *const component,
                          Block& al, const std::string& key)
 { 
   std::vector<Model*> t;
-  const std::vector<AttributeList*>& f (al.alist_sequence (key));
+  const std::vector<const AttributeList*>& f (al.alist_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
     t.push_back (build_alist (component, al, *f[i], key, i));
   return t;
@@ -160,7 +160,7 @@ Librarian::build_vector_const (const char *const component,
                                Block& al, const std::string& key)
 { 
   std::vector<const Model*> t;
-  const std::vector<AttributeList*>& f (al.alist_sequence (key));
+  const std::vector<const AttributeList*>& f (al.alist_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
     t.push_back (build_alist (component, al, *f[i], key, i));
   return t;

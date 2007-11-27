@@ -91,6 +91,10 @@ LogSelect::initial_done (const std::vector<Time::component_t>& time_columns,
 { }
 
 void 
+LogSelect::open_derived_type (const symbol type, const char *const)
+{ open (type); }
+
+void 
 LogSelect::open (symbol)
 { daisy_notreached (); }
 
@@ -115,7 +119,7 @@ LogSelect::close_named ()
 { close (); }
 
 void 
-LogSelect::open_ordered (int index)
+LogSelect::open_ordered (const int index)
 { 
   open (symbol (index));
 }
@@ -125,24 +129,26 @@ LogSelect::close_ordered ()
 { close (); }
 
 void 
-LogSelect::open_derived (symbol field, symbol type)
-{ open (field); open (type); }
+LogSelect::open_derived (symbol field, symbol type, const char *const library)
+{ open (field); open_derived_type (type, library); }
 
 void 
 LogSelect::close_derived ()
 { close (); close (); }
 
 void 
-LogSelect::open_object (symbol field, symbol type, const AttributeList&)
-{ open_derived (field, type); }
+LogSelect::open_object (symbol field, symbol type, const AttributeList&,
+			const char *const library)
+{ open_derived (field, type, library); }
 
 void 
 LogSelect::close_object ()
 { close_derived (); }
 
 void 
-LogSelect::open_entry (symbol type, const AttributeList&)
-{ open (type); }
+LogSelect::open_entry (symbol type, const AttributeList&, 
+		       const char *const library)
+{ open_derived_type (type, library); }
 
 void 
 LogSelect::close_entry ()
@@ -273,7 +279,7 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
       if (!alist.check ("entries"))
 	return;
 
-      const std::vector<AttributeList*>& entries 
+      const std::vector<const AttributeList*>& entries 
         = alist.alist_sequence ("entries");
       if (entries.size () < 1)
 	return;

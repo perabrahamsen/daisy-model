@@ -64,8 +64,8 @@ struct Horizon::Implementation
   // Create and Detroy.
   void initialize (const Hydraulic&, const Texture& texture, double quarts, 
                    int som_size, Treelog& msg);
-  static double_map get_attributes (const std::vector<AttributeList*>& alists);
-  static symbol_map get_dimensions (const std::vector<AttributeList*>& alists);
+  static double_map get_attributes (const std::vector<const AttributeList*>& alists);
+  static symbol_map get_dimensions (const std::vector<const AttributeList*>& alists);
   Implementation (Block& al);
   ~Implementation ();
 };
@@ -99,7 +99,7 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
 }
 
 Horizon::Implementation::double_map
-Horizon::Implementation::get_attributes (const std::vector<AttributeList*>& alists)
+Horizon::Implementation::get_attributes (const std::vector<const AttributeList*>& alists)
 { 
   double_map result; 
   for (unsigned int i = 0; i < alists.size (); i++)
@@ -108,7 +108,7 @@ Horizon::Implementation::get_attributes (const std::vector<AttributeList*>& alis
 }
 
 Horizon::Implementation::symbol_map
-Horizon::Implementation::get_dimensions (const std::vector<AttributeList*>& alists)
+Horizon::Implementation::get_dimensions (const std::vector<const AttributeList*>& alists)
 { 
   symbol_map result; 
   for (unsigned int i = 0; i < alists.size (); i++)
@@ -251,7 +251,7 @@ Horizon::output (Log& log) const
 
 static const class SOM_fractions_check_type : public VCheck
 {
-  void check (const Syntax& syntax, const AttributeList& alist, 
+  void check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
               const std::string& key)
     const throw (std::string)
   {
@@ -362,7 +362,7 @@ this horizon.");
   syntax.add ("attributes", attSyntax, Syntax::OptionalConst, Syntax::Sequence,
 	      "List of additional attributes for this horizon.\n\
 Intended for use with pedotransfer functions.");
-  alist.add ("attributes", std::vector<AttributeList*> ());
+  alist.add ("attributes", std::vector<const AttributeList*> ());
 }
 
 Horizon::Horizon (Block& al)

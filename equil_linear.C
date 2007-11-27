@@ -24,46 +24,45 @@
 #include "block.h"
 #include "syntax.h"
 #include "alist.h"
-#include "pedo.h"
-#include "soil.h"
+#include "number.h"
 #include "treelog.h"
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include <memory>
 
-using namespace std;
-
 struct EquilibriumLinear : public Equilibrium
 {
   // Parameters.
-  /* const */ vector<double> K;
+  std::auto_ptr<Number> K_expr;
 
   // Simulation.
-  void find (const Soil&, const SoilWater&, unsigned int i,
-	     double has_A, double has_B, 
+  void find (const Scope&, double has_A, double has_B, 
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
-  enum { uninitialized, init_succes, init_failure } initialize_state;
-  void initialize (Block&, const Soil&);
-  bool check (const Soil&, Treelog& err) const;
+  void initialize (Treelog&);
+  bool check (const Scope&, Treelog&) const;
   EquilibriumLinear (Block& al)
     : Equilibrium (al),
-      initialize_state (uninitialized)
+      K_expr (Librarian::build_item<Number> (al, "K"))
   { }
   ~EquilibriumLinear ()
   { }
 };
 
 void
-EquilibriumLinear::find (const Soil&, const SoilWater&, unsigned int i,
+EquilibriumLinear::find (const Scope& scope,
                          const double has_A, const double has_B, 
-                         double& want_A, double& want_B, Treelog&) const
+                         double& want_A, double& want_B, Treelog& msg) const
 {
   daisy_assert (has_A >= 0.0);
   daisy_assert (has_B >= 0.0);
   const double M = has_A + has_B;
+
+  double K = 1.0;
+  if (!K_expr->tick_value (K, Syntax::none (), scope, msg))
+    msg.error ("Could not evaluate 'K'");
 
   // We need to solve the following equation w.r.t. B
   //
@@ -75,37 +74,25 @@ EquilibriumLinear::find (const Soil&, const SoilWater&, unsigned int i,
   // ==>
   //     B = M / (1 + K)
 
-  daisy_assert (K.size () > i);
-
-  want_B = M / (1.0 + K[i]);
+  want_B = M / (1.0 + K);
   want_A = M - want_B;
   daisy_assert (want_A >= 0.0);
 }
 
 void
-EquilibriumLinear::initialize (Block& block, const Soil& soil)
+EquilibriumLinear::initialize (Treelog& msg)
 { 
-  daisy_assert (initialize_state == uninitialized);
-  initialize_state = init_succes;
-
-  auto_ptr<Pedotransfer> pedo_K 
-    (Librarian::build_alist<Pedotransfer> (block, alist, "K"));
-  if (pedo_K->check (soil, Syntax::none (), block.msg ()))
-    pedo_K->set (soil, K, Syntax::none ());
-  else
-    initialize_state = init_failure;
-  Pedotransfer::debug_message ("K", K, Syntax::none (), block.msg ());
+  K_expr->initialize (msg);
 }
 
 bool 
-EquilibriumLinear::check (const Soil&, Treelog& err) const
+EquilibriumLinear::check (const Scope& scope, Treelog& msg) const
 {
-  if (initialize_state == init_succes)
-    return true;
-
-  Treelog::Open nest (err, name);
-  err.error ("Initialize failed");
-  return false;
+  Treelog::Open nest (msg, name);
+  bool ok = true;
+  if (!K_expr->check_dim (scope, Syntax::none (), msg))
+    ok = false;
+  return ok;
 }
 
 static struct EquilibriumLinearSyntax
@@ -119,9 +106,10 @@ static struct EquilibriumLinearSyntax
     AttributeList& alist = *new AttributeList ();
     Equilibrium::load_syntax (syntax, alist);
     alist.add ("description", "A = K B");
-    syntax.add_object ("K", Pedotransfer::component, Syntax::Const, 
+    syntax.add_object ("K", Number::component, Syntax::Const, 
                        Syntax::Singleton, "The ratio A/B at equilibrium [].");
 
-    Librarian::add_type (Equilibrium::component, "linear", alist, syntax, &make);
+    Librarian::add_type (Equilibrium::component, "linear",
+			 alist, syntax, &make);
   }
 } EquilibriumLinear_syntax;

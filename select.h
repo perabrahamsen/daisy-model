@@ -29,6 +29,7 @@
 #include "units.h"
 #include "volume.h"
 #include <vector>
+#include <set>
 
 class Geometry;
 class Soil;
@@ -108,6 +109,19 @@ public:
     current_name = path[depth];
     return true;
   }
+  bool open (const std::set<symbol>& ancestors, const int depth) 
+  // Derived object.
+  { 
+    // Check if next level is also in path.
+    if (current_name != wildcard
+	&& ancestors.find (current_name) == ancestors.end ())
+      return false;
+
+    // Direct acces to new head of path.
+    current_name = path[depth];
+    return true;
+  }
+
   void close (const int depth)		// Close one level.
   { 
     // And restore direct access to current path.

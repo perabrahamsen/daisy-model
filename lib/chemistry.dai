@@ -6,7 +6,7 @@
   (canopy_dissipation_rate 0 [h^-1])
   (canopy_washoff_coefficient 1 [])
   (diffusion_coefficient 1 [cm^2/s])
-  (adsorption full)
+  (phase solid)
   (decompose_rate 0 [h^-1]))
   
 (defchemical common default
@@ -14,7 +14,8 @@
   (canopy_dissipation_rate 0.0083 [h^-1])
   (canopy_washoff_coefficient 1.0 [])
   (crop_uptake_reflection_factor 1 [])
-  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+  (diffusion_coefficient 4.6e-6 [cm^2/s])
+  (phase solute))
   
 (defchemical fungicide common
   "This stuff kills swamps.")
@@ -25,43 +26,111 @@
 (defchemical insecticide common
   "This stuff kills insects.")
 
+(defreaction instant adsorption
+  "Very fast adsorption."
+  (adsorption_rate 1.0 [s^-1]))
+
 (defchemical Atrazine herbicide
   (crop_uptake_reflection_factor 0.8 [])
   (decompose_rate 7e-5 [h^-1])
-  (diffusion_coefficient 8e-6 [cm^2/s])
-  (adsorption linear (K_clay 7 [cm^3/g])))
+  (diffusion_coefficient 8e-6 [cm^2/s]))
+
+(defchemical Atrazine_sorbed Atrazine
+  (phase solid))
+
+(defchemistry Atrazine default
+  (trace Atrazine Atrazine_sorbed)
+  (reaction (instant (solute Atrazine) (sorbed Atrazine_sorbed)
+		     (equilibrium linear (K_clay 7 [cm^3/g])))))
 
 (defchemical Bentazon herbicide
-  (decompose_halftime 40 [d])	
-  (adsorption linear (K_OC 34 [cm^3/g])))
+  (decompose_halftime 40 [d]))
+
+(defchemical Bentazon_sorbed Bentazon
+  (phase solid))
+
+(defchemistry Bentazon default
+  (trace Bentazon Bentazon_sorbed)
+  (reaction (instant (solute Bentazon) (sorbed Bentazon_sorbed)
+		     (equilibrium linear (K_OC 34 [cm^3/g])))))
+
 
 (defchemical IPU herbicide
-  (decompose_halftime 29 [d])
-  (adsorption linear (K_OC 100 [cm^3/g])))
+  (decompose_halftime 29 [d]))
+
+(defchemical IPU_sorbed IPU
+  (phase solid))
+
+(defchemistry IPU default
+  (trace IPU IPU_sorbed)
+  (reaction (instant (solute IPU) (sorbed IPU_sorbed)
+		     (equilibrium linear (K_OC 100 [cm^3/g])))))
 
 (defchemical MCPP herbicide
-  (decompose_halftime 7 [d])
-  (adsorption linear (K_OC 20 [cm^3/g])))
+  (decompose_halftime 7 [d]))
+
+(defchemical MCPP_sorbed MCPP
+  (phase solid))
+
+(defchemistry MCPP default
+  (trace MCPP MCPP_sorbed)
+  (reaction (instant (solute MCPP) (sorbed MCPP_sorbed)
+		     (equilibrium linear (K_OC 20 [cm^3/g])))))
 
 (defchemical Pendimethalin herbicide
-  (decompose_rate 0.0004 [h^-1])
-  (adsorption linear (K_OC 16000 [cm^3/g])))
+  (decompose_rate 0.0004 [h^-1]))
+
+(defchemical Pendimethalin_sorbed Pendimethalin
+  (phase solid))
+
+(defchemistry Pendimethalin default
+  (trace Pendimethalin Pendimethalin_sorbed)
+  (reaction (instant (solute Pendimethalin) (sorbed Pendimethalin_sorbed)
+		     (equilibrium linear (K_OC 16000 [cm^3/g])))))
 
 (defchemical Ioxynil herbicide
-  (decompose_halftime 10 [d])	
-  (adsorption linear (K_OC 350 [cm^3/g])))
+  (decompose_halftime 10 [d])	)
+
+(defchemical Ioxynil_sorbed Ioxynil
+  (phase solid))
+
+(defchemistry Ioxynil default
+  (trace Ioxynil Ioxynil_sorbed)
+  (reaction (instant (solute Ioxynil) (sorbed Ioxynil_sorbed)
+		     (equilibrium linear (K_OC 350 [cm^3/g])))))
 
 (defchemical "2,4-D" herbicide
   "Selective herbicide, kill weeds but not crops."
-  (decompose_halftime 10 [d])
-  (adsorption linear (K_OC 20 [cm^3/g])))
+  (decompose_halftime 10 [d]))
+
+(defchemical "2,4-D_sorbed" "2,4-D"
+  (phase solid))
+
+(defchemistry "2,4-D" default
+  (trace "2,4-D" "2,4-D_sorbed")
+  (reaction (instant (solute "2,4-D") (sorbed "2,4-D_sorbed")
+		     (equilibrium linear (K_OC 20 [cm^3/g])))))
 
 (defchemical Heptachlor insecticide
-  (decompose_halftime 300 [d])
-  (adsorption linear (K_OC 24e3 [cm^3/g])))
+  (decompose_halftime 300 [d]))
+
+(defchemical Heptachlor_sorbed Heptachlor
+  (phase solid))
+
+(defchemistry Heptachlor default
+  (trace Heptachlor Heptachlor_sorbed)
+  (reaction (instant (solute Heptachlor) (sorbed Heptachlor_sorbed)
+		     (equilibrium linear (K_OC 24e3 [cm^3/g])))))
 
 (defchemical DDT insecticide
-  (decompose_halftime 2000 [d])
-  (adsorption linear (K_OC 2e6 [cm^3/g])))
+  (decompose_halftime 2000 [d]))
+
+(defchemical DDT_sorbed DDT
+  (phase solid))
+
+(defchemistry DDT default
+  (trace DDT DDT_sorbed)
+  (reaction (instant (solute DDT) (sorbed DDT_sorbed)
+		     (equilibrium linear (K_OC 2e6 [cm^3/g])))))
 
 ;;; chemestry.dai ends here.

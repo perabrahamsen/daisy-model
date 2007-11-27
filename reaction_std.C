@@ -44,19 +44,29 @@ struct ReactionStandard : public Reaction
   { output_variable (S_AB, log); }
 
   // Simulation.
-  void tick (const Geometry&, const Soil& soil, const SoilWater& soil_water, 
-	     const SoilHeat&, const OrganicMatter&,
+  void tick (const Geometry&,
+	     const Soil& soil, const SoilWater& soil_water, 
+	     const SoilHeat& soil_heat, const OrganicMatter&,
              Chemistry& chemistry, const double dt, Treelog& msg)
   { 
-    Solute& A = chemistry.find (name_A);
-    Solute& B = chemistry.find (name_B);
-    transform->tick (soil, soil_water, A.M (), B.M (), S_AB, msg);
+    const size_t cell_size = soil.size ();
+    Chemical& A = chemistry.find (name_A);
+    Chemical& B = chemistry.find (name_B);
+    std::vector<double> AM (cell_size);
+    std::vector<double> BM (cell_size);
+    for (size_t i = 0; i < cell_size; i++)
+      {
+	AM[i] = A.M (i);
+	BM[i] = B.M (i);
+      }
+    transform->tick (soil, soil_water, soil_heat, AM, BM, S_AB, msg);
     A.add_to_transform_sink (S_AB, dt);
     B.add_to_transform_source (S_AB, dt);
   }
 
   // Create.
-  bool check (const Soil& soil, const SoilWater&, const SoilHeat&,
+  bool check (const Soil& soil, const SoilWater& soil_water,
+	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const
   { 
     bool ok = true;
@@ -70,14 +80,14 @@ struct ReactionStandard : public Reaction
         msg.error ("'" + name_B.name () + "' not traced");
         ok = false;
       }
-    if (!transform->check (soil, msg))
+    if (!transform->check (soil, soil_water, soil_heat, msg))
       ok = false;
 
     return ok;
   }
-  void initialize (Block& block, const Soil& soil)
+  void initialize (const Soil& soil, Treelog& msg)
   { 
-    transform->initialize (block, soil); 
+    transform->initialize (soil, msg); 
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);
     daisy_assert (S_AB.size () == soil.size ());
   }

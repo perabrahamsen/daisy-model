@@ -235,7 +235,7 @@ daisy_alist_get_number_at (const AttributeList* alist, const char* name,
 			    unsigned int index)
 { return alist->number_sequence (name)[index]; }
 
-extern "C" AttributeList* EXPORT
+extern "C" const AttributeList* EXPORT
 daisy_alist_get_alist_at (const AttributeList* alist, const char* name,
 			  unsigned int index)
 { return alist->alist_sequence (name)[index]; }
@@ -308,9 +308,9 @@ extern "C" void EXPORT
 daisy_alist_set_alist_at (AttributeList* alist, const char* name,
 			  AttributeList* value, unsigned int index)
 { 
-  std::vector<AttributeList*>& v = alist->check (name)
-    ? *new std::vector<AttributeList*> (alist->alist_sequence (name))
-    : *new std::vector<AttributeList*>;
+  std::vector<const AttributeList*>& v = alist->check (name)
+    ? *new std::vector<const AttributeList*> (alist->alist_sequence (name))
+    : *new std::vector<const AttributeList*>;
   if (v.size () <= index)
     while (v.size () <= index)
       v.push_back (value);

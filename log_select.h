@@ -70,6 +70,9 @@ struct EXPORT LogSelect : public Log
   void initial_done (const std::vector<Time::component_t>& time_columns,
 		     const Time& time, double dt);
 
+  // Open a derived type (for LogAll to overwrite).
+  virtual void open_derived_type (symbol type, const char* library);
+
   // Open normal items.
   void open (symbol name);
   void close ();
@@ -87,15 +90,16 @@ struct EXPORT LogSelect : public Log
   void close_unnamed ();
 
   // Derived items.
-  void open_derived (symbol field, symbol type);
+  void open_derived (symbol field, symbol type, const char* library);
   void close_derived ();
 
   // Object singletons with alist.
-  void open_object (symbol field, symbol type, const AttributeList&); 
+  void open_object (symbol field, symbol type, const AttributeList&,
+		    const char* library); 
   void close_object ();
 
   // Derived items in a list.
-  void open_entry (symbol type, const AttributeList&);
+  void open_entry (symbol type, const AttributeList&, const char* library);
   void close_entry ();
 
   // Named derived items in a list.

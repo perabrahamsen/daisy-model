@@ -27,10 +27,11 @@
 #include "fao.h"
 #include "time.h"
 #include "log.h"
+#include "units.h"
 #include "mathlib.h"
 #include "librarian.h"
 
-using namespace std;
+const symbol Weather::dry_deposit_unit ("kg/ha/y");
 
 const char *const Weather::component = "weather";
 
@@ -82,23 +83,10 @@ Weather::tick_after (const Time& time, Treelog&)
   const double Precipitation = rain () + snow (); // [mm]
   daisy_assert (Precipitation >= 0.0);
   
-  // [kg N/ha/year -> [g/cm²/h]
-  const double hours_to_years = 365.2425 * 24.0;
-  const double kg_per_ha_to_g_cm2 
-    = 1000.0 / ((100.0 * 100.0) * (100.0 * 100.0));
-  const IM dry (DryDeposit, kg_per_ha_to_g_cm2 / hours_to_years);
-  const IM wet (WetDeposit, 1.0e-7); // [ppm] -> [g/cm²/mm]
-
-  deposit_ = dry + wet * Precipitation;
-  daisy_assert (deposit_.NO3 >= 0.0);
-  daisy_assert (deposit_.NH4 >= 0.0);
-
-  daisy_assert (approximate (deposit_.NO3, 
-		       DryDeposit.NO3 * kg_per_ha_to_g_cm2/hours_to_years
-		       + Precipitation * WetDeposit.NO3 * 1e-7));
-  daisy_assert (approximate (deposit_.NH4, 
-		       DryDeposit.NH4 * kg_per_ha_to_g_cm2/hours_to_years
-		       + Precipitation * WetDeposit.NH4 * 1e-7));
+  const IM dry (IM::flux_unit (), DryDeposit);
+  const IM solute (IM::solute_unit (), WetDeposit);
+  const IM wet = solute * Scalar (Precipitation, Units::mm_per_h ());
+  deposit_ = dry + wet;
 }
 
 void
@@ -172,12 +160,12 @@ Weather::day_cycle (const Time& time) const	// Sum over a day is 1.0.
   // Day error sum
   double sum = 0.0;
   for (int i = 0; i < 24; i++)
-    sum += max (0.0, M_PI_2 / dl * cos (M_PI * (i + 0.5 - 12) / dl));
+    sum += std::max (0.0, M_PI_2 / dl * cos (M_PI * (i + 0.5 - 12) / dl));
 
   const double hour = time.hour () + 0.5; // Value in the middle of time step.
 
   // Day cycle.
-  const double dc = max (0.0, M_PI_2 / dl * cos (M_PI * (hour - 12) / dl));
+  const double dc = std::max (0.0, M_PI_2 / dl * cos (M_PI * (hour - 12) / dl));
   daisy_assert (dc >= 0.0);
   daisy_assert (dc <= 1.0);  
 
@@ -295,19 +283,17 @@ Weather::Weather (Block& al)
     timezone (-42.42e42),
     surface_ (reference),
     screen_height_ (2.0),
+    DryDeposit (dry_deposit_unit),
+    WetDeposit (Units::ppm ()),
     T_average (-42.42e42),           // May be used before Weather::check.
     T_amplitude (-42.42e42),
     max_Ta_yday (-42.42e42),
     day_length_ (-42.42e42),
     day_cycle_ (-42.42e42),
     hourly_cloudiness_ (0.0),	// It may be dark at the start.
-    daily_cloudiness_ (0.0)
-{
-  WetDeposit.NO3 = -42.42e42;
-  WetDeposit.NH4 = -42.42e42;
-  DryDeposit.NO3 = -42.42e42;
-  DryDeposit.NH4 = -42.42e42;
-}
+    daily_cloudiness_ (0.0),
+    deposit_ (al, "deposit")
+{ }
 
 Weather::~Weather ()
 { }
@@ -357,10 +343,8 @@ This is not a model, but a list of parameters shared by all weather models.");
 	      "Number of light hours this day.");
   syntax.add ("day_cycle", Syntax::None (), Syntax::LogOnly,
 	      "Fraction of daily radiation received this hour.");
-  syntax.add_submodule ("deposit", alist, Syntax::LogOnly, 
-			"\
-Total atmospheric deposition of nitrogen this hour [g N/cm^2/h].", 
-			&IM::load_soil_flux);
+  IM::add_syntax (syntax, alist, Syntax::LogOnly, "deposit", IM::flux_unit (),
+		  "Total atmospheric deposition of nitrogen.");
 }
 
 static struct WeatherSyntax

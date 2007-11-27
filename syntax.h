@@ -106,7 +106,8 @@ public:
   void check (const std::string& key, double value) const;
 
   // Check than an arbitrary alist member is valid.
-  bool check (const AttributeList&, const std::string& key, Treelog&) const;
+  bool check (const Metalib&,
+	      const AttributeList&, const std::string& key, Treelog&) const;
 
   // These functions will allow you to lookup information about a
   // specific syntax entry. 

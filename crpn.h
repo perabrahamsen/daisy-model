@@ -26,7 +26,7 @@ class Production;
 class Geometry;
 class Soil;
 class SoilWater;
-class Solute;
+class Chemistry;
 class RootSystem;
 class AttributeList;
 class Syntax;
@@ -96,8 +96,7 @@ public:
   void clear ();
   void update (double& NCrop, double DS, bool enable_N_stress,
 	       const Geometry&, const Soil& soil, const SoilWater& soil_water,
-	       Solute& soil_NH4, Solute& soil_NO3,
-               double day_fraction,
+	       Chemistry& chemistry, double day_fraction,
 	       RootSystem& root_system, double dt);
   void output (Log& log) const;
 

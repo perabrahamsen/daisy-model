@@ -42,14 +42,14 @@ class Harvesting
 {
   // Parameters.
 private:
-  const std::vector<AttributeList*>& Stem; // Stem AM parameters.
-  const std::vector<AttributeList*>& Leaf; // Leaf AM parameters.
+  const std::vector<const AttributeList*>& Stem; // Stem AM parameters.
+  const std::vector<const AttributeList*>& Leaf; // Leaf AM parameters.
 public:
-  const std::vector<AttributeList*>& Dead; // Dead AM parameters.
+  const std::vector<const AttributeList*>& Dead; // Dead AM parameters.
 private:
-  const std::vector<AttributeList*>& SOrg; // SOrg AM parameters.
+  const std::vector<const AttributeList*>& SOrg; // SOrg AM parameters.
 public:
-  const std::vector<AttributeList*>& Root; // Root AM parameters.
+  const std::vector<const AttributeList*>& Root; // Root AM parameters.
 private:
   const double EconomicYield_W; // Frac. of economic yield (DM) in storage org.
   const double EconomicYield_N; // Frac. of economic yield (N) in storage org.

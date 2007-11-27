@@ -49,7 +49,7 @@ struct NumberPLF : public Number
       syntax.order ("x", "y");
     }
     
-    Point (AttributeList& al)
+    Point (const AttributeList& al)
       : x_value (al.number ("x")),
 	x_dimension (al.identifier ("x")),
 	y_value (al.number ("y")),

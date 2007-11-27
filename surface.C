@@ -28,7 +28,6 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "log.h"
-#include "im.h"
 #include "mathlib.h"
 #include "submodel.h"
 #include "plf.h"
@@ -49,16 +48,13 @@ struct Surface::Implementation
   const bool use_forced_flux;
   const double forced_flux_value;
   double pond;
-  IM im_flux;
   double EvapSoilSurface;
   double Eps;
   double T;
-  IM im;
   double DetentionCapacity;
   const double ReservoirConstant;
   double runoff;
   double runoff_fraction;
-  IM im_runoff;
   const double R_mixing;
   Ridge* ridge_;
 
@@ -66,15 +62,12 @@ struct Surface::Implementation
   void ridge (const Geometry1D& geo,
               const Soil& soil, const SoilWater& soil_water,
 	      const AttributeList&);
-  void mixture (const IM& soil_im /* g/cm^2/mm */,
-                double dt);
   void exfiltrate (double water, double dt, Treelog&);
   double ponding () const;
   void tick (Treelog&, double PotSoilEvaporation, double water, double temp,
 	     const Geometry&, const Soil&, const SoilWater&,
              double T, double dt);
   double albedo (const Geometry&, const Soil&, const SoilWater&) const;
-  void fertilize (const IM& n);
   void output (Log& log) const;
   double exfiltration () const; // [mm/h]
   
@@ -192,30 +185,6 @@ Surface::unridge ()
 }
 
 void
-Surface::mixture (const IM& soil_im /* g/cm^2/mm */, 
-                  const double dt /* [h] */)
-{
-  impl.mixture (soil_im, dt);
-}
-
-void
-Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */, 
-                                  const double dt /* [h] */)
-{
-  if (!total_matter_flux && pond > 1e-6 && R_mixing > 0.0)
-    {
-      // [g/cm^2/h] = ([g/cm^2/mm] - [g/cm^2] / [mm]) / [h/mm]
-      im_flux.NO3 = std::max (-im.NO3 / dt,
-                              (soil_im.NO3 - im.NO3 / pond) / R_mixing);
-      im_flux.NH4 = std::max (-im.NH4 / dt,
-                              (soil_im.NH4 - im.NH4 / pond) / R_mixing);
-      im += im_flux * dt;
-    }
-  else
-    im_flux.clear ();
-}
-
-void
 Surface::Implementation::exfiltrate (const double water /* [mm] */, 
                                      const double dt /* [h] */, Treelog& msg)
 {
@@ -243,34 +212,6 @@ Surface::Implementation::exfiltrate (const double water /* [mm] */,
       msg.warning (tmp.str ());
       return;
     }
-  if (im.NO3 < 0.0)
-    {
-      std::ostringstream tmp;
-      tmp << "Added " << -im.NO3 << " NO3 to surface";
-      msg.warning (tmp.str ());
-      im.NO3 = 0.0;
-    }
-  if (im.NH4 < 0.0)
-    {
-      std::ostringstream tmp;
-      tmp << "Added " << -im.NH4 << " NH4 to surface\n";
-      msg.warning (tmp.str ());
-      im.NH4 = 0.0;
-    }
-  if (total_matter_flux)
-    {
-      IM delta_matter (im, 1.0);
-      delta_matter /= dt;
-      im_flux -= delta_matter;
-      im.clear ();
-    }
-  else if (-water / dt > minimal_matter_flux)
-    {
-      IM delta_matter (im, -water / pond);
-      im -= delta_matter;
-      delta_matter /= dt;
-      im_flux -= delta_matter;
-    }
   pond += water;
 }
 
@@ -286,10 +227,6 @@ Surface::Implementation::ponding () const
 
   return pond;
 }
-
-const IM& 
-Surface::matter_flux ()
-{ return impl.im_flux; }
 
 double
 Surface::runoff_rate (const double dt) const
@@ -327,15 +264,12 @@ Surface::Implementation::tick (Treelog& msg,
     {
       runoff = (pond - DetentionCapacity) * ReservoirConstant;
       runoff_fraction = runoff / pond;
-      im_runoff = im * (runoff / pond);
       pond -= runoff * dt;
-      im -= im_runoff;
     }
   else
     {
       runoff = 0.0;
       runoff_fraction = 0.0;
-      im_runoff.clear ();
     }
 
   const double MaxExfiltration
@@ -415,19 +349,6 @@ Surface::Implementation::albedo (const Geometry& geo, const Soil& soil,
     * (Theta - Theta_pf_3) / (Theta_pf_1_7 - Theta_pf_3);
 }
 
-void 
-Surface::fertilize (const IM& n)
-{ impl.fertilize (n); }
-
-void 
-Surface::Implementation::fertilize (const IM& n)
-{ 
-  daisy_assert (n.NO3 >= 0.0);
-  daisy_assert (n.NH4 >= 0.0);
-
-  im += n;
-}
-
 void
 Surface::set_detention_capacity (const double height)
 { impl.DetentionCapacity = height; }
@@ -444,8 +365,6 @@ Surface::Implementation::output (Log& log) const
   output_variable (EvapSoilSurface, log);
   output_variable (Eps, log);
   output_variable (runoff, log);
-  output_submodule (im, "IM", log);
-  output_submodule (im_runoff, "IM_runoff", log);
   if (ridge_)
     output_submodule (*ridge_, "ridge", log);
 }
@@ -555,12 +474,6 @@ Fraction of ponding above DetentionCapacity that runoffs each hour.");
   alist.add ("ReservoirConstant", 1.0);
   syntax.add ("runoff", "mm/h", Syntax::LogOnly, "\
 Amount of water runoff from ponding this hour.");
-  syntax.add_submodule ("IM", alist, Syntax::State, "\
-Inorganic nitrogen on the surface [g/cm^2].",
-			IM::load_soil);
-  syntax.add_submodule ("IM_runoff", alist, Syntax::LogOnly, "\
-Inorganic nitrogen on the runoff water this hour [g/cm^2/h].",
-			IM::load_soil_flux);
   syntax.add ("R_mixing", "h/mm", Check::non_negative (), Syntax::Const, "\
 Resistance to mixing inorganic N between soil and ponding.");
   alist.add ("R_mixing", 1.0e9);
@@ -584,22 +497,16 @@ Surface::Implementation::Implementation (const AttributeList& al)
     use_forced_flux (al.check ("forced_flux")),
     forced_flux_value (al.number ("forced_flux", -42.42e42)),
     pond (al.number ("pond")),
-    im_flux (),
     EvapSoilSurface (0.0),
     Eps (0.0),
     T (0.0),
-    im (al.alist ("IM")),
     DetentionCapacity (al.number ("DetentionCapacity")),
     ReservoirConstant (al.number ("ReservoirConstant")),
     runoff (0.0),
     runoff_fraction (0.0),
-    im_runoff (),
     R_mixing (al.number ("R_mixing")),
     ridge_ (al.check ("ridge") ? new Ridge (al.alist ("ridge")) : NULL)
-{
-  daisy_assert (iszero (im_flux.NO3));
-  daisy_assert (iszero (im_flux.NH4));
-}
+{ }
 
 Surface::~Surface ()
 { delete &impl; }

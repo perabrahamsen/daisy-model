@@ -27,7 +27,6 @@ class Log;
 class Geometry;
 class Soil;
 class SoilWater;
-class Adsorption;
 class Treelog;
 class Syntax;
 class AttributeList;
@@ -47,9 +46,9 @@ public:
   // Simulation.
 public:
   void output (Log&) const;
-  void mix (const Geometry&, const Soil&, const SoilWater&, Adsorption&,
+  void mix (const Geometry&, const Soil&, const SoilWater&, 
 	    double from, double to);
-  void swap (const Geometry&, const Soil&, const SoilWater&, Adsorption&, 
+  void swap (const Geometry&, const Soil&, const SoilWater&,
 	     double from, double middle, double to);
   void tick (size_t cell_size, const SoilWater& soil_water, double dt);
   
@@ -57,7 +56,7 @@ public:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   void initialize (const Geometry&, 
-                   const Soil&, const SoilWater&, Adsorption&, Treelog&);
+                   const Soil&, const SoilWater&, Treelog&);
   DOE (const AttributeList& al);
   ~DOE ();
 };

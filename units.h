@@ -35,10 +35,16 @@ private:
 
   // Symbols.
 public:
-  static const symbol cm;
-  static const symbol cm_per_h;
-  static const symbol cm2;
-  static const symbol cm3;
+  static symbol h ();
+  static symbol mm ();
+  static symbol per_mm ();
+  static symbol mm_per_h ();
+  static symbol cm ();
+  static symbol cm_per_h ();
+  static symbol cm2 ();
+  static symbol cm3 ();
+  static symbol per_h ();
+  static symbol ppm ();
 
   // Conversion.
 public:

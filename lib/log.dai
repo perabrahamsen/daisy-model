@@ -41,12 +41,16 @@
                      (tag "Water")
                      (dimension "mm"))
            (interval (tag "NH4")
-                     (path column "${column}" SoilNH4 M)
-                     (spec fixed SoilNH4 M)
+                     (path column "${column}" Chemistry "*" trace NH4 M)
+                     (spec chemical default M)
+                     (dimension "kg N/ha"))
+           (interval (tag "NH4")
+                     (path column "${column}" Chemistry "*" trace NH4_sorbed M)
+                     (spec chemical default M)
                      (dimension "kg N/ha"))
            (interval (tag "NO3")
-                     (path column "${column}" SoilNO3 M)
-                     (spec fixed SoilNO3 M)
+                     (path column "${column}" Chemistry "*" trace NO3 M)
+                     (spec chemical default M)
                      (dimension "kg N/ha"))
            (interval (tag "ORG_N")
                      (path column "${column}" OrganicMatter "*" total_N)
@@ -113,21 +117,23 @@
   (where "no3_uptake.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-   (array (path column "${column}" SoilNO3 S_root)
+   (array (path column "${column}" Chemistry "*" trace NO3 S_root)
+	  (spec chemical default S_root)
           (tag "NO3-Root")
+	  (negate true)
           (handle sum)
-          (dimension "kg N/ha/cm/&")
-          (factor -1e5))))      ;g/cm^2 -> kg N/ha
+          (dimension "kg N/ha/cm/&"))))
 
 (deflog "NH4 Root Uptake" column
   (where "nh4_uptake.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-   (array (path column "${column}" SoilNH4 S_root)
+   (array (path column "${column}" Chemistry "*" trace NH4 S_root)
+	  (spec chemical default S_root)
           (tag "NH4-Root")
+	  (negate true)
           (handle sum)
-          (dimension "kg N/ha/cm/&")
-          (factor -1e5))))      ;g/cm^2 -> kg N/ha
+          (dimension "kg N/ha/cm/&"))))
 
 (deflog "Soil NO3 Concentration" column
   "Amount of nitrate in all numeric soil layers.
@@ -135,7 +141,7 @@ This include both the nitrogen and oxygen atoms of the nitrate."
   (where "soil_NO3.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilNO3 C)
+           (array (path column "${column}" Chemistry "*" trace NO3 C)
                   (dimension "mg/l")
                   (factor 4.43e6))))     ;g NO3-N/cm³ -> mg NO3/l
 
@@ -146,8 +152,8 @@ This include only nitrogen atoms of the nitrate."
   (where "soil_NO3-N.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilNO3 C)
-                  (spec fixed SoilNO3 C)
+           (array (path column "${column}" Chemistry "*" trace NO3 C)
+                  (spec chemical default C)
                   (dimension "mg/l"))))
 
 (deflog "Soil NH4-N Concentration" column
@@ -156,18 +162,18 @@ This include only nitrogen atoms of the ammonium."
   (where "soil_NH4-N_conc.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilNH4 C)
-                  (spec fixed SoilNH4 C)
+           (array (path column "${column}" Chemistry "*" trace NH4 C)
+                  (spec chemical default C)
                   (dimension "mg/l"))))
 
-(deflog "Soil NH4-N Content" column
+(deflog "Soil Sorbed NH4-N Content" column
   "Total amount of ammonium nitrogen in all numeric soil layers.
 This include only nitrogen atoms of the ammonium."
   (where "soil_NH4-N_content.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilNH4 M)
-                  (spec fixed SoilNH4 M))))
+           (array (path column "${column}" Chemistry "*" trace NH4_sorbed M)
+                  (spec chemical default M))))
 
 (deflog "Soil Temperature" column
   "Temperature in all numeric soil layers."
@@ -253,24 +259,22 @@ flow to drain pipes, and subsoil irrigation."
   (where "pref_NO3.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilNO3 J_p)
+           (array (path column "${column}" Chemistry "*" trace NO3 J_p)
+                  (spec chemical default J_p)
                   (tag "NO3-J_p")
                   (handle sum)
-                  (dimension "kg N/ha/&")
-                  (factor -1e5))        ;g/cm^2 -> kg N/ha
-           ))
+                  (dimension "kg N/ha/&"))))
 
 (deflog "Preferential NH4 Transport" column
   "The preferential ammonium transport between all numeric soil layers."
   (where "pref_NH4.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilNH4 J_p)
+           (array (path column "${column}" Chemistry "*" trace NH4 J_p)
+                  (spec chemical default J_p)
                   (tag "NH4-J_p")
                   (handle sum)
-                  (dimension "kg N/ha/&")
-                  (factor -1e5))        ;g/cm^2 -> kg N/ha
-           ))
+                  (dimension "kg N/ha/&"))))
 
 (defsummary "Evapotranspiration" simple
   "Summary of evapotranspiration."
@@ -559,93 +563,8 @@ Note that negative deltas means the amount of water increases."
                    (tag "Snow Storage")
                    (dimension "mm"))))
 
-(defsummary "NH4 Soil Balance" simple
-  "Mass balance for NH4 in soil.
 
-Tillage can be different from zero iff you do not log the entire
-plowing layer.
 
-Note that a negative delta Content means that the amount of NH4 in the
-soil increases."
-  (sum_name "Balance")
-  (precision 3)
-  (fetch ("NH4-Incorp" (name "Incorporated"))
-	 ("NH4-In-Matrix" (name "Matrix input"))
-	 ("NH4-In-Macro" (name "Macropores input"))
-	 ("NH4-Leak-Matrix" (name "Matrix leak") (factor -1.0))
-	 ("NH4-Leak-Macro" (name "Macropores leak") (factor -1.0))
-	 ("NH4-Drain" (name "Drain pipes leak") (factor -1.0))
-	 ("NH4-Root" (name "Root uptake") (factor -1.0))
-	 ("NH4-Nit" (name "Nitrification") (factor -1.0))
-	 ("NH4-mineralization" (name "Mineralization"))
-         ("NH4-Tillage" (name "Tillage"))
-	 ("NH4-Total" (name "Content") (factor -1.0))))
-	 
-(defsummary "NO3 Soil Balance" simple
-  "Mass balance for NO3 in soil.
-
-Tillage can be different from zero iff you do not log the entire
-plowing layer.
-
-Note that a negative delta Content means that the amount of NO3 in the
-soil increases."
-  (sum_name "Balance")
-  (precision 3)
-  (fetch ("NO3-Incorp" (name "Incorporated"))
-	 ("NO3-In-Matrix" (name "Matrix input"))
-	 ("NO3-In-Macro" (name "Macropores input"))
-	 ("NO3-Leak-Matrix" (name "Matrix leak") (factor -1.0))
-	 ("NO3-Leak-Macro" (name "Macropores leak") (factor -1.0))
-	 ("NO3-Drain" (name "Drain pipes leak") (factor -1.0))
-	 ("NO3-Root" (name "Root uptake") (factor -1.0))
-	 ("NO3-Nit" (name "Nitrification"))
-	 ("Denit" (name Denitrification) (factor -1.0))
-	 ("NO3-immobilization" (name "Immobilization") (factor -1.0))
-         ("NO3-Tillage" (name "Tillage"))
-	 ("NO3-Total" (name "Content") (factor -1.0))))
-	 
-(defsummary "Organic Nitrogen Balance" simple
-  "Total system mass balance for organic bound nitrogen.
-
-Note that a negative delta content means that the amount increases."
-  (sum_name "Balance")
-  (precision 3)
-  (fetch (Fixated)
-         ("NO3-Crop")
-	 ("NH4-Crop")
-         ("Org_N-Fertilizer")
-         ("Seed_N")
-         ("NO3-immobilization" (name "Immobilization"))
-         ("NH4-mineralization" (name "Mineralization") (factor -1.0))
-         ("Harvest_N" (factor -1.0))
-         ("AOM" (factor -1.0))
-         ("SOM" (factor -1.0))
-         ("SMB" (factor -1.0))
-         ("AOM-Surface" (factor -1.0))
-         ("Bioinc_N-Surface" (factor -1.0))
-         ("Bioinc_N-Soil")
-         ("Residuals_N_root" (factor -1.0))
-         ("Residuals_N_soil")
-         ("Tillage_Org_N_top")
-         ("Tillage_Org_N_soil")
-         ("Crop" (factor -1.0))
-         ("Dead leaves" (factor -1.0))))
-
-(defsummary "Crop Nitrogen Balance" simple
-  "Total system mass balance for nitrogen i crops.
-
-Note that a negative delta content means that the amount increases."
-  (sum_name "Balance")
-  (precision 3)
-  (fetch (Fixated)
-         ("NO3-Crop")
-	 ("NH4-Crop")
-         ("Seed_N")
-         ("Harvest_N" (factor -1.0))
-         ("Residuals_N_root" (factor -1.0))
-         ("Residuals_N_top" (factor -1.0))
-         ("Crop" (factor -1.0))
-         ("Dead leaves" (factor -1.0))))
 
 (defsummary "Nitrogen Balance" simple
   "Total system mass balance for nitrogen.
@@ -661,7 +580,7 @@ Note that a negative delta content means that the amount increases."
   (sum_name "Balance")
   (precision 3)
   (fetch ("NH4-Fertilizer-Surface")
-         ("NH4-Volatilization-Surface" (factor -1.0))         
+         ("NH4-Volatilization" (factor -1.0))         
          ("NH4-Incorp")
          ("NH4-Deposit")
          ("NH4-Surface" (factor -1.0))
@@ -674,7 +593,8 @@ Note that a negative delta content means that the amount increases."
          ("NH4-Leak-Macro" (factor -1.0))
          ("NH4-Drain" (factor -1.0))
          ("N2O-Nit" (name "Loss during nitrification") (factor -1.0))
-         ("NH4-Total" (name "NH4-Soil") (factor -1.0))
+         ("NH4-Solute-Total" (name "NH4-Soil") (factor -1.0))
+         ("NH4-Sorbed-Total" (name "NH4-Soil") (factor -1.0))
          ("NH4-Tillage")
          ("NO3-Fertilizer-Surface")
          ("NO3-Incorp")
@@ -713,6 +633,101 @@ Note that a negative delta content means that the amount increases."
 	 ("NH4-Crop" (name "NH4 Root uptake (full)"))
 	 ("NH4-Root" (name "NH4 Root uptake (interval)") (factor -1.0))))
 
+
+
+(defsummary "Crop Nitrogen Balance" simple
+  "Total system mass balance for nitrogen i crops.
+
+Note that a negative delta content means that the amount increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch (Fixated)
+         ("NO3-Crop")
+	 ("NH4-Crop")
+         ("Seed_N")
+         ("Harvest_N" (factor -1.0))
+         ("Residuals_N_root" (factor -1.0))
+         ("Residuals_N_top" (factor -1.0))
+         ("Crop" (factor -1.0))
+         ("Dead leaves" (factor -1.0))))
+
+
+	 
+(defsummary "Organic Nitrogen Balance" simple
+  "Total system mass balance for organic bound nitrogen.
+
+Note that a negative delta content means that the amount increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch (Fixated)
+         ("NO3-Crop")
+	 ("NH4-Crop")
+         ("Org_N-Fertilizer")
+         ("Seed_N")
+         ("NO3-immobilization" (name "Immobilization"))
+         ("NH4-mineralization" (name "Mineralization") (factor -1.0))
+         ("Harvest_N" (factor -1.0))
+         ("AOM" (factor -1.0))
+         ("SOM" (factor -1.0))
+         ("SMB" (factor -1.0))
+         ("AOM-Surface" (factor -1.0))
+         ("Bioinc_N-Surface" (factor -1.0))
+         ("Bioinc_N-Soil")
+         ("Residuals_N_root" (factor -1.0))
+         ("Residuals_N_soil")
+         ("Tillage_Org_N_top")
+         ("Tillage_Org_N_soil")
+         ("Crop" (factor -1.0))
+         ("Dead leaves" (factor -1.0))))
+
+
+	 
+(defsummary "NO3 Soil Balance" simple
+  "Mass balance for NO3 in soil.
+
+Tillage can be different from zero iff you do not log the entire
+plowing layer.
+
+Note that a negative delta Content means that the amount of NO3 in the
+soil increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch ("NO3-Incorp" (name "Incorporated"))
+	 ("NO3-In-Matrix" (name "Matrix input"))
+	 ("NO3-In-Macro" (name "Macropores input"))
+	 ("NO3-Leak-Matrix" (name "Matrix leak") (factor -1.0))
+	 ("NO3-Leak-Macro" (name "Macropores leak") (factor -1.0))
+	 ("NO3-Drain" (name "Drain pipes leak") (factor -1.0))
+	 ("NO3-Root" (name "Root uptake") (factor -1.0))
+	 ("NO3-Nit" (name "Nitrification"))
+	 ("Denit" (name Denitrification) (factor -1.0))
+	 ("NO3-immobilization" (name "Immobilization") (factor -1.0))
+         ("NO3-Tillage" (name "Tillage"))
+	 ("NO3-Total" (name "Content") (factor -1.0))))
+
+(defsummary "NH4 Soil Balance" simple
+  "Mass balance for NH4 in soil.
+
+Tillage can be different from zero iff you do not log the entire
+plowing layer.
+
+Note that a negative delta Content means that the amount of NH4 in the
+soil increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch ("NH4-Incorp" (name "Incorporated"))
+	 ("NH4-In-Matrix" (name "Matrix input"))
+	 ("NH4-In-Macro" (name "Macropores input"))
+	 ("NH4-Leak-Matrix" (name "Matrix leak") (factor -1.0))
+	 ("NH4-Leak-Macro" (name "Macropores leak") (factor -1.0))
+	 ("NH4-Drain" (name "Drain pipes leak") (factor -1.0))
+	 ("NH4-Root" (name "Root uptake") (factor -1.0))
+	 ("NH4-Nit" (name "Nitrification") (factor -1.0))
+	 ("NH4-mineralization" (name "Mineralization"))
+         ("NH4-Tillage" (name "Tillage"))
+	 ("NH4-Sorbed-Total" (name "Content") (factor -1.0))
+	 ("NH4-Solute-Total" (name "Content") (factor -1.0))))
+
 (deflog "N Balance" crop
   "Enough information to create a balance for the soil nitrogen."
   (where "N_balance.dlf")
@@ -720,99 +735,108 @@ Note that a negative delta content means that the amount increases."
            "Crop Nitrogen Balance" "Nitrogen Balance")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (number (path column "${column}" fertilized_NH4)
-                   (handle sum)
-                   (tag "NH4-Fertilizer")
-                   (dimension "kg N/ha/&"))
-           (number (path column "${column}" volatilization)
-                   (handle sum)
-                   (tag "NH4-Volatilization")
-                   (dimension "kg N/ha/&"))
-           (number (path column "${column}" fertilized_NH4_surface)
+           (number (path column "${column}" Chemistry "*" trace NH4 spray)
+		   (spec chemical default spray)
                    (handle sum)
                    (tag "NH4-Fertilizer-Surface")
                    (dimension "kg N/ha/&"))
-           (number (path column "${column}" volatilization_surface)
+           (number (path column "${column}"
+			 Chemistry "*" trace NH4 canopy_dissipate)
+                   (spec chemical default canopy_dissipate)
                    (handle sum)
-                   (tag "NH4-Volatilization-Surface")
+                   (tag "NH4-Volatilization")
                    (dimension "kg N/ha/&"))
-           (number (path weather "*" deposit NH4)
+           (number (path column "${column}" Chemistry "*" trace NH4 deposit)
+		   (spec chemical default deposit)
                    (handle sum)
                    (tag "NH4-Deposit")
-                   (factor 1e5)      ;g/cm^2 -> kg N/ha
                    (dimension "kg N/ha/&"))
-           (interval (path column "${column}" SoilNH4 S_external)
+           (interval (path column "${column}" 
+			   Chemistry "*" trace NH4 S_external)
+		     (spec chemical default S_external)
                      (tag "NH4-Incorp")
-                     (handle sum)
-                     (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm^2 -> kg N/ha
-           (number (path column "${column}" Surface IM NH4)
+		     (negate true)
+		     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}" Chemistry "*" trace NH4 top_storage)
+		   (spec chemical default top_storage)
                    (tag "NH4-Surface")
-                   (dimension "kg N/ha")
-                   (factor 1e5))        ;g/cm^2 -> kg/ha
-           (number (path column "${column}" Surface IM_runoff NH4)
+                   (dimension "kg N/ha"))
+           (number (path column "${column}" Chemistry "*" trace NH4 top_loss)
+		   (spec chemical default top_loss)
                    (handle sum)
                    (tag "NH4-Runoff")
-                   (dimension "kg N/ha/&")
-                   (factor 1e5))        ;g/cm^2 -> kg/ha
-           (index (path column "${column}" SoilNH4 J)
+                   (dimension "kg N/ha/&"))
+           (index (path column "${column}" Chemistry "*" trace NH4 J)
+		  (spec chemical default J)
                   (index 0)
                   (tag "NH4-Surface-Matrix")
+                  (negate true)
                   (handle sum)
-                  (dimension "kg N/ha/&")
-                  (factor -1e5))     ;g/cm^2 -> kg N/ha
-           (index (path column "${column}" SoilNH4 J_p)
+                  (dimension "kg N/ha/&"))
+           (index (path column "${column}" Chemistry "*" trace NH4 J_p)
+		  (spec chemical default J_p)
                   (index 0)
                   (tag "NH4-Surface-Macro")
+                  (negate true)
                   (handle sum)
-                  (dimension "kg N/ha/&")
-                  (factor -1e5))     ;g/cm^2 -> kg N/ha
-           (flux_top (path column "${column}" SoilNH4 J)
+                  (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" Chemistry "*" trace NH4 J)
+		     (spec chemical default J)
                      (tag "NH4-In-Matrix")
-                     (handle sum)
-                     (dimension "kg N/ha/&")
-                     (factor -1e5))     ;g/cm^2 -> kg N/ha
-           (flux_top (path column "${column}" SoilNH4 J_p)
+		     (negate true)
+		     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" Chemistry "*" trace NH4 J_p)
+		     (spec chemical default J_p)
                      (tag "NH4-In-Macro")
+		     (negate true)
                      (handle sum)
-                     (dimension "kg N/ha/&")
-                     (factor -1e5))     ;g/cm^2 -> kg N/ha
-           (flux_bottom (path column "${column}" SoilNH4 J)
+                     (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NH4 J)
+			(spec chemical default J)
+			(negate true)
                         (handle sum)
                         (tag "NH4-Leak-Matrix")
-                        (dimension "kg N/ha/&")
-                        (factor -1e5))  ;g/cm^2 -> kg N/ha
-           (flux_bottom (path column "${column}" SoilNH4 J_p)
+                        (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NH4 J_p)
+			(spec chemical default J_p)
+			(negate true)
                         (handle sum)
                         (tag "NH4-Leak-Macro")
-                        (dimension "kg N/ha/&")
-                        (factor -1e5))  ;g/cm^2 -> kg N/ha
-           (interval (path column "${column}" SoilNH4 S_drain)
+                        (dimension "kg N/ha/&"))
+           (interval (path column "${column}" Chemistry "*" trace NH4 S_drain)
+		     (spec chemical default S_drain)
                      (tag "NH4-Drain")
                      (handle sum)
-                     (dimension "kg N/ha/&")
-                     (factor -1e5))      ;g/cm^2 -> kg N/ha
-           (number (path column "${column}" Vegetation crops crops "*" Root NH4Upt)
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}" 
+			 Vegetation crops crops "*" Root NH4Upt)
                    (tag "NH4-Crop")
                    (handle sum)
                    (dimension "kg N/ha/&")
                    (factor 10.0))       ;g/m^2 -> kg N/ha
-           (interval (path column "${column}" SoilNH4 S_root)
+           (interval (path column "${column}"
+			   Chemistry "*" trace NH4 S_root)
+		     (spec chemical default S_root)
                      (tag "NH4-Root")
+		     (negate true)
                      (handle sum)
-                     (dimension "kg N/ha/&")
-                     (factor -1e5))      ;g/cm^2 -> kg N/ha
-           (interval (path column "${column}" Nitrification NH4)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction nitrification NH4)
                      (handle sum)
                      (tag "NH4-Nit")
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
-           (interval (path column "${column}" Nitrification NO3)
+           (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction nitrification NO3)
                      (handle sum)
                      (tag "NO3-Nit")
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
-           (interval (path column "${column}" Nitrification N2O)
+           (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction nitrification N2O)
                      (handle sum)
                      (tag "N2O-Nit")
                      (dimension "kg N/ha/&")
@@ -822,90 +846,102 @@ Note that a negative delta content means that the amount increases."
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
-           (interval (path column "${column}" SoilNH4 M)
-                     (tag "NH4-Total")
-                     (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "${column}" SoilNH4 tillage)
+           (interval (path column "${column}" Chemistry "*" trace NH4 M)
+		     (spec chemical default M)
+                     (tag "NH4-Solute-Total")
+                     (dimension "kg N/ha"))
+           (interval (path column "${column}" Chemistry "*" trace NH4_sorbed M)
+		     (spec chemical default M)
+                     (tag "NH4-Sorbed-Total")
+                     (dimension "kg N/ha"))
+           (interval (path column "${column}"
+			   Chemistry "*" trace NH4 tillage)
+		     (spec chemical default tillage)
                      (handle sum)
                      (tag "NH4-Tillage")
-                     (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (number (path column "${column}" fertilized_NO3)
-                   (handle sum)
-                   (tag "NO3-Fertilizer")
-                   (dimension "kg N/ha/&"))
-           (number (path column "${column}" fertilized_NO3_surface)
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}" Chemistry "*" trace NO3 spray)
+		   (spec chemical default spray)
                    (handle sum)
                    (tag "NO3-Fertilizer-Surface")
                    (dimension "kg N/ha/&"))
-           (number (path weather "*" deposit NO3)
+           (number (path column "${column}" Chemistry "*" trace NO3 deposit)
+		   (spec chemical default deposit)
                    (handle sum)
                    (tag "NO3-Deposit")
-                   (factor 1e5)      ;g/cm^2 -> kg N/ha
                    (dimension "kg N/ha/&"))
-           (number (path column "${column}" Surface IM NO3)
+           (number (path column "${column}" Chemistry "*" trace NO3 top_storage)
+		   (spec chemical default top_storage)
                    (tag "NO3-Surface")
-                   (dimension "kg N/ha")
-                   (factor 1e5))        ;g/cm^2 -> kg/ha
-           (number (path column "${column}" Surface IM_runoff NO3)
+                   (dimension "kg N/ha"))
+           (number (path column "${column}" Chemistry "*" trace NO3 top_loss)
+		   (spec chemical default top_loss)
                    (handle sum)
                    (tag "NO3-Runoff")
-                   (dimension "kg N/ha/&")
-                   (factor 1e5))        ;g/cm^2 -> kg/ha
-           (index (path column "${column}" SoilNO3 J)
+                   (dimension "kg N/ha/&"))
+           (index (path column "${column}" Chemistry "*" trace NO3 J)
+		  (spec chemical default J)
                   (index 0)
                   (tag "NO3-Surface-Matrix")
+		  (negate true)
                   (handle sum)
-                  (dimension "kg N/ha/&")
-                  (factor -1e5))     ;g/cm^2 -> kg N/ha
-           (index (path column "${column}" SoilNO3 J_p)
+                  (dimension "kg N/ha/&"))
+           (index (path column "${column}" Chemistry "*" trace NO3 J_p)
+		     (spec chemical default J_p)
                   (index 0)
                   (tag "NO3-Surface-Macro")
                   (handle sum)
-                  (dimension "kg N/ha/&")
-                  (factor -1e5))     ;g/cm^2 -> kg N/ha
-           (flux_top (path column "${column}" SoilNO3 J)
+		  (negate true)
+                  (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" Chemistry "*" trace NO3 J)
+		     (spec chemical default J)
                      (handle sum)
                      (tag "NO3-In-Matrix")
-                     (dimension "kg N/ha/&")
-                     (factor -1e5))     ;g/cm^2 -> kg N/ha
-           (flux_top (path column "${column}" SoilNO3 J_p)
+		     (negate true)
+                     (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" Chemistry "*" trace NO3 J_p)
+		     (spec chemical default J_p)
                      (handle sum)
+		     (negate true)
                      (tag "NO3-In-Macro")
-                     (dimension "kg N/ha/&")
-                     (factor -1e5))     ;g/cm^2 -> kg N/ha
-           (flux_bottom (path column "${column}" SoilNO3 J)
-                        (tag "NO3-Leak-Matrix")
-                        (handle sum)
-                        (dimension "kg N/ha/&")
-                        (factor -1e5))  ;g/cm^2 -> kg N/ha
-           (flux_bottom (path column "${column}" SoilNO3 J_p)
+                     (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NO3 J)
+			(spec chemical default J)
+			(tag "NO3-Leak-Matrix")
+			(negate true)
+			(handle sum)
+			(dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NO3 J_p)
+			(spec chemical default J_p)
                         (tag "NO3-Leak-Macro")
-                        (handle sum)
-                        (dimension "kg N/ha/&")
-                        (factor -1e5))  ;g/cm^2 -> kg N/ha
-           (interval (path column "${column}" SoilNO3 S_drain)
+			(negate true)
+			(handle sum)
+                        (dimension "kg N/ha/&"))
+           (interval (path column "${column}" Chemistry "*" trace NO3 S_drain)
+		     (spec chemical default S_drain)
                      (tag "NO3-Drain")
                      (handle sum)
-                     (dimension "kg N/ha/&")
-                     (factor -1e5))      ;g/cm^2 -> kg N/ha
-           (interval (path column "${column}" SoilNO3 S_external)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}" 
+			   Chemistry "*" trace NO3 S_external)
+		     (spec chemical default S_external)
                      (tag "NO3-Incorp")
                      (handle sum)
-                     (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm^2 -> kg N/ha
-           (number (path column "${column}" Vegetation crops crops "*" Root NO3Upt)
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Root NO3Upt)
                    (tag "NO3-Crop")
                    (handle sum)
                    (dimension "kg N/ha/&")
                    (factor 10.0))       ;g/m^2 -> kg N/ha
-           (interval (path column "${column}" SoilNO3 S_root)
+           (interval (path column "${column}" Chemistry "*" trace NO3 S_root)
+		     (spec chemical default S_root)
                      (tag "NO3-Root")
+		     (negate true)
                      (handle sum)
-                     (dimension "kg N/ha/&")
-                     (factor -1e5))      ;g/cm^2 -> kg N/ha
-           (interval (path column "${column}" Denitrification converted)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification converted)
                      (tag "Denit")
                      (handle sum)
                      (dimension "kg N/ha/&")
@@ -916,15 +952,16 @@ Note that a negative delta content means that the amount increases."
                      (dimension "kg N/ha/&")
                      (factor -1e5))      ;g/cm^2 -> kg N/ha
            (interval (tag "NO3-Total")
-                     (path column "${column}" SoilNO3 M)
-                     (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
+                     (path column "${column}" Chemistry "*" trace NO3 M)
+		     (spec chemical default M)
+                     (dimension "kg N/ha"))
            (interval (tag "NO3-Tillage")
-                     (path column "${column}" SoilNO3 tillage)
+                     (path column "${column}" Chemistry "*" trace NO3 tillage)
+		     (spec chemical default tillage)
                      (handle sum)
-                     (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm^2 -> kg/ha
-           (number (path column "${column}" Vegetation crops crops "*" CrpN Fixated)
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}"
+			 Vegetation crops crops "*" CrpN Fixated)
                    (handle sum)
                    (dimension "kg N/ha/&")
                    (factor 10.0))
@@ -973,7 +1010,8 @@ Note that a negative delta content means that the amount increases."
                    (handle sum)
                    (dimension "kg N/ha/&")
                    (factor 10))         ;g/m^2 -> kg/ha
-           (interval (path column "${column}" OrganicMatter "*" Bioincorporation 
+           (interval (path column "${column}"
+			   OrganicMatter "*" Bioincorporation 
                            N_added)
                      (tag "Bioinc_N-Soil")
                      (handle sum)
@@ -996,7 +1034,8 @@ Note that a negative delta content means that the amount increases."
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
            (number (tag "AOM-Surface")
-                   (path column "${column}" OrganicMatter "*" am "*" om "*" top_N)
+                   (path column "${column}"
+			 OrganicMatter "*" am "*" om "*" top_N)
                    (dimension "kg N/ha")
                    (factor 1e5))      ;g/cm^2 -> kg/ha
            (number (tag "Crop")
@@ -1033,32 +1072,38 @@ Note that a negative delta content means that the amount increases."
                      (dimension "kg CO2-C/ha/&")
                      (handle sum)
                      (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
-	   (interval (path column "${column}" Denitrification converted)
+	   (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification converted)
                      (tag "Denitrification")
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
-	   (interval (path column "${column}" Denitrification converted_fast)
+	   (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification converted_fast)
                      (tag "Denitrification from fast pools")
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
-	   (interval (path column "${column}" Denitrification converted_redox)
+	   (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification converted_redox)
                      (tag "Redox denitrification")
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
-	   (interval (path column "${column}" Denitrification potential)
+	   (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification potential)
                      (tag "Potential denitrification")
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
-	   (interval (path column "${column}" Denitrification potential_fast)
+	   (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification potential_fast)
                      (tag "Potential denitrification from fast pools")
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
-           (interval (path column "${column}" Nitrification N2O)
+           (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction nitrification N2O)
                      (handle sum)
                      (tag "N2O from Nitrification")
                      (dimension "kg N/ha/&")
@@ -1254,11 +1299,22 @@ content of 'Atrazine' on the soil.  If you don't specify chemical, the
 sum of all chemicals will be logged."
   (where "surface_chemicals.dlf")
   (summary (balance (precision 3)
-                    (input snow_in)
-                    (output canopy_dissipate surface_runoff surface_out)
+                    (input spray deposit)
+                    (output canopy_harvest canopy_dissipate
+			    surface_runoff surface_out)
                     (content snow_storage canopy_storage surface_storage)))
   (when hourly)
   (entries ;; Year Month MDay Hour
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         spray)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default spray))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         deposit)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default deposit))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          snow_in)
                    (handle sum)
@@ -1289,6 +1345,11 @@ sum of all chemicals will be logged."
                    (handle sum)
                    (dimension "g/ha/&")
                    (spec chemical default canopy_dissipate))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_harvest)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default canopy_harvest))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          canopy_out)
                    (handle sum)
@@ -1363,6 +1424,7 @@ sum of all chemicals will be logged."
                            trace "${chemical}" S_root)
                      (tag "Uptake")
                      (handle sum)
+		     (negate true)
                      (dimension "g/ha/&")
                      (spec chemical default S_root))
            (interval (path column "${column}" Chemistry "*" 
@@ -1415,7 +1477,7 @@ sum of all chemicals will be logged."
   (where "chemistry.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry
+           (array (path column "${column}" Chemistry "*" combine "*"
                         reaction "${reaction}" S_AB)
                   (handle sum)
                   (spec reaction default S_AB))))
@@ -1683,10 +1745,12 @@ sum of all chemicals will be logged."
   (where "simple_crop_prod.dlf")
   (when (hour 12))
   (entries ;; Year Month MDay
-           (number (path column "${column}" Vegetation crops crops "${crop}" T_sum)
+           (number (path column "${column}"
+			 Vegetation crops crops "${crop}" T_sum)
                    (dimension "dg C d")
                    (factor 1.0))        ;Temperature sum
-           (number (path column "${column}" Vegetation crops crops "${crop}" day)
+           (number (path column "${column}"
+			 Vegetation crops crops "${crop}" day)
                    (dimension "d")
                    (factor 1.0))        ;Temperature sum
            (number (path column "${column}" Vegetation crops crops "${crop}"
@@ -1698,10 +1762,12 @@ sum of all chemicals will be logged."
                          Root Depth)
                    (dimension "cm")
                    (factor 1.0))        ;cm [-inf:0]
-           (number (path column "${column}" Vegetation crops crops "${crop}" N_actual)
+           (number (path column "${column}"
+			 Vegetation crops crops "${crop}" N_actual)
                    (dimension "kg N/ha")
                    (factor 10.0))
-           (number (path column "${column}" Vegetation crops crops "${crop}" N_demand)
+           (number (path column "${column}"
+			 Vegetation crops crops "${crop}" N_demand)
                    (dimension "kg N/ha")
                    (factor 10.0))
            (number (path column "${column}" Vegetation crops crops "${crop}" 
@@ -1711,36 +1777,42 @@ sum of all chemicals will be logged."
   (where "old_crop_prod.dlf")
   (when daily)
   (entries ;; Year Month MDay
-           (number (path column "${column}" Vegetation crops crops "*" Phenology DS)
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Phenology DS)
                    (dimension "none")
                    (factor 1.0))        ;Development stage [-1:2]
            (number (path column "${column}" Vegetation crops crops "*"
                          Phenology day_length)
                    (dimension "h")
                    (factor 1.0))        ;Light hours previous day.
-           (number (path column "${column}" Vegetation crops crops "*" Canopy LAI)
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Canopy LAI)
                    (dimension "none")
                    (factor 1.0))        ;Leaf Area Index [0:inf]
            (number (path column "${column}" Vegetation crops crops "*"
                          RootSys Depth)
                    (dimension "cm")
                    (factor 1.0))        ;cm [-inf:0]
-           (number (path column "${column}" Vegetation crops crops "*" Prod WLeaf)
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Prod WLeaf)
                    (dimension "Mg DM/ha") ;Actually stem + leaf + grain
                    (factor 0.01))
-           (number (path column "${column}" Vegetation crops crops "*" Prod WSOrg)
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Prod WSOrg)
                    (dimension "Mg DM/ha") ;Beet & Potatoes only
                    (factor 0.01))
-           (number (path column "${column}" Vegetation crops crops "*" Prod WRoot)
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Prod WRoot)
                    (dimension "Mg DM/ha")
                    (factor 0.01))
-           (number (path column "${column}" Vegetation crops crops "*"
-                         CrpAux Fixated)
+           (number (path column "${column}"
+			 Vegetation crops crops "*" CrpAux Fixated)
                    (handle sum)
                    (accumulate true)
                    (dimension "kg N/ha")
                    (factor 10.0))
-           (number (path column "${column}" Vegetation crops crops "*" Prod NCrop)
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Prod NCrop)
                    (dimension "kg N/ha")
                    (factor 10.0))
            ))
@@ -1765,7 +1837,8 @@ sum of all chemicals will be logged."
                    (dimension "EpFactor"))
            (number (path column "${column}" Vegetation crops albedo)
                    (dimension "albedo"))
-           (number (path column "${column}" Vegetation crops interception_capacity)
+           (number (path column "${column}"
+			 Vegetation crops interception_capacity)
                    (dimension "mm"))))
 
 (deflog "Permanent Vegetation" column
@@ -2101,27 +2174,28 @@ sum of all chemicals will be logged."
                    (handle sum)
                    (dimension "mm/&")
                    (factor 10))
-           (interval (path column "${column}" SoilNH4 S_drain)
+           (interval (path column "${column}"
+			   Chemistry "*" trace NH4 S_drain)
                      (tag "NH4-Drain")
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (factor -1e5))      ;g/cm^2 -> kg N/ha
-           (flux_bottom (path column "${column}" SoilNH4 J)
+           (flux_bottom (path column "${column}" 
+			      Chemistry "*" trace NH4 J)
+			(spec chemical default J)
                         (tag "NH4-Perc-Matrix")
                         (handle sum)
-                        (dimension "kg N/ha/&")
-                        (factor 1e5))   ;g/cm^2 -> kg N/ha
-           (interval (path column "${column}" SoilNO3 S_drain)
+                        (dimension "kg N/ha/&"))
+           (interval (path column "${column}" Chemistry "*" trace NO3 S_drain)
+		     (spec chemical default S_drain)
                      (tag "NO3-Drain")
                      (handle sum)
-                     (dimension "kg N/ha/&")
-                     (factor -1e5))      ;g/cm^2 -> kg N/ha
-           (flux_bottom (path column "${column}" SoilNO3 J)
+                     (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NO3 J)
+			(spec chemical default J)
                         (tag "NO3-Perc-Matrix")
                         (handle sum)
-                        (dimension "kg N/ha/&")
-                        (factor 1e5))   ;g/cm^2 -> kg N/ha
-           ))
+                        (dimension "kg N/ha/&"))))
 
 (deflog Bioincorporation column
   (where "bioincorporation.dlf")
@@ -2702,18 +2776,20 @@ Use \"*\" to log all added organic matter matter.")
   (where "drain_sink_NO3.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilNO3 S_drain)
+           (array (path column "${column}" Chemistry "*" trace NO3 S_drain)
+		  (spec chemical default S_drain)
                   (handle sum)
-                  (factor -1)
+		  (negate true)
                   (dimension "g/cm^3/&"))))
 
 (deflog "Drain Sink NH4" column
   (where "drain_sink_NH4.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (array (path column "${column}" SoilNH4 S_drain)
+           (array (path column "${column}" Chemistry "*" trace NH4 S_drain)
+		     (spec chemical default S_drain)
                   (handle sum)
-                  (factor -1)
+		  (negate true)
                   (dimension "cm^3/cm^3/&"))))
 
 (deflog "Soil Water Content" column
@@ -2729,14 +2805,28 @@ Use \"*\" to log all added organic matter matter.")
   (where "fertilizer_monthly.dlf")
   (when monthly)
   (entries ;; Year Month
-           (number (path column "${column}" fertilized_NO3)
+           (number (path column "${column}" Chemistry "*" trace NO3 spray)
+		   (spec chemistry default spray)
                    (handle sum)
-                   (tag "NO3")
+                   (tag "Surface-NO3")
                    (dimension "kg N/ha/&"))
-           (number (path column "${column}" fertilized_NH4)
+           (interval (path column "${column}"
+			   Chemistry "*" trace NO3 S_external)
+		     (spec chemistry default S_external)
+		     (handle sum)
+		     (tag "Surface-NO3")
+		     (dimension "kg N/ha/&"))
+           (number (path column "${column}" Chemistry "*" trace NH4 spray)
+		   (spec chemistry default spray)
                    (handle sum)
-                   (tag "NH4")
+                   (tag "Surface-NH4")
                    (dimension "kg N/ha/&"))
+           (interval (path column "${column}"
+			   Chemistry "*" trace NH4 S_external)
+		     (spec chemistry default S_external)
+		     (handle sum)
+		     (tag "Soil NH4")
+		     (dimension "kg N/ha/&"))
            (number (path column "${column}" OrganicMatter "*" fertilized_N)
                    (handle sum)
                    (tag "Org_N")
@@ -2747,7 +2837,7 @@ Use \"*\" to log all added organic matter matter.")
                    (tag "Org_C")
                    (factor 1e5)         ;g/cm^2 -> kg/ha
                    (dimension "kg C/ha/&"))
-           (number (path column "${column}" fertilized_DM)
+           (number (path column "${column}" applied_DM)
                    (handle sum)
                    (tag "WetWeight")
                    (dimension "ton ww/ha/&"))
@@ -2758,9 +2848,11 @@ Use \"*\" to log all added organic matter matter.")
            (number (path column "${column}" second_year_utilization)
                    (tag "2ndYear")
                    (dimension "kg N/ha"))
-           (number (path column "${column}" volatilization)
+           (number (path column "${column}" Chemistry "*" trace NH4
+			 canopy_dissipate)
+                   (spec chemical default canopy_dissipate)
                    (handle sum)
-                   (tag "vol")
+                   (tag "NH4-Volatilization")
                    (dimension "kg N/ha/&"))))
 
 (deflog "Fertilizer Yearly" "Fertilizer"

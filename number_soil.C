@@ -52,15 +52,15 @@ struct NumberByDepth : public Number
   bool missing (const Scope& scope) const 
   { 
     if (h->missing (scope) 
-        || !Units::can_convert (h->dimension (scope), Units::cm,
+        || !Units::can_convert (h->dimension (scope), Units::cm (),
                                 h->value (scope))
         || z->missing (scope) 
-        || !Units::can_convert (z->dimension (scope), Units::cm, 
+        || !Units::can_convert (z->dimension (scope), Units::cm (), 
                                 z->value (scope)))
       return true;
 
     const double height = Units::convert (z->dimension (scope), 
-                                          Units::cm, 
+                                          Units::cm (), 
                                           z->value (scope));
     if (height > 0 || height < max_depth)
       return true;
@@ -85,7 +85,7 @@ struct NumberByDepth : public Number
     Treelog::Open nest (msg, name);
     if (!h->check (scope, msg))
       ok = false;
-    else if (!Units::can_convert (h->dimension (scope), Units::cm))
+    else if (!Units::can_convert (h->dimension (scope), Units::cm ()))
       {
         msg.error ("Cannot convert pressure [" + h->dimension (scope) 
                    + "] to [cm] for soil hydraulics");
@@ -93,7 +93,7 @@ struct NumberByDepth : public Number
       }
     if (!z->check (scope, msg))
       ok = false;
-    else if (!Units::can_convert (z->dimension (scope), Units::cm))
+    else if (!Units::can_convert (z->dimension (scope), Units::cm ()))
       {
         msg.error ("Cannot convert height [" + z->dimension (scope) 
                    + "] to [cm] for soil hydraulics");
@@ -138,9 +138,9 @@ struct NumberDepthTheta : public NumberByDepth
   double value (const Scope& scope) const
   { 
     const double pressure 
-      = Units::convert (h->dimension (scope), Units::cm, h->value (scope));
+      = Units::convert (h->dimension (scope), Units::cm (), h->value (scope));
     const double height
-      = Units::convert (z->dimension (scope), Units::cm, z->value (scope));
+      = Units::convert (z->dimension (scope), Units::cm (), z->value (scope));
     const Horizon& horizon = column->horizon_at (height, 0.5, 0.5);
     return horizon.hydraulic->Theta (pressure);
   }
@@ -176,15 +176,15 @@ struct NumberDepthK : public NumberByDepth
   double value (const Scope& scope) const
   { 
     const double pressure 
-      = Units::convert (h->dimension (scope), Units::cm, h->value (scope));
+      = Units::convert (h->dimension (scope), Units::cm (), h->value (scope));
     const double height
-      = Units::convert (z->dimension (scope), Units::cm, z->value (scope));
+      = Units::convert (z->dimension (scope), Units::cm (), z->value (scope));
     const Horizon& horizon = column->horizon_at (height, 0.5, 0.5);
     return horizon.hydraulic->K (pressure);
   }
 
   symbol dimension (const Scope&) const 
-  { return Units::cm_per_h; }
+  { return Units::cm_per_h (); }
 
   // Create.
   NumberDepthK (Block& al)
@@ -219,7 +219,7 @@ struct NumberByTension : public Number
   { h->tick (scope, msg); }
   bool missing (const Scope& scope) const 
   { return h->missing (scope) 
-      || !Units::can_convert (h->dimension (scope), Units::cm,
+      || !Units::can_convert (h->dimension (scope), Units::cm (),
                               h->value (scope)); }
 
   // Create.
@@ -236,7 +236,7 @@ struct NumberByTension : public Number
     Treelog::Open nest (msg, name);
     if (!h->check (scope, msg))
       return false;
-    if (!Units::can_convert (h->dimension (scope), Units::cm))
+    if (!Units::can_convert (h->dimension (scope), Units::cm ()))
       {
         msg.error ("Cannot convert [" + h->dimension (scope) 
                    + "] to [cm] for soil hydraulics");
@@ -268,7 +268,7 @@ struct NumberSoilTheta : public NumberByTension
   double value (const Scope& scope) const
   { 
     return horizon->hydraulic->Theta (Units::convert (h->dimension (scope), 
-                                                      Units::cm, 
+                                                      Units::cm (), 
                                                       h->value (scope)));
   }
   symbol dimension (const Scope&) const 
@@ -302,11 +302,11 @@ struct NumberSoilK : public NumberByTension
   double value (const Scope& scope) const
   { 
     return horizon->hydraulic->K (Units::convert (h->dimension (scope), 
-                                                  Units::cm, 
+                                                  Units::cm (), 
                                                   h->value (scope)));
   }
   symbol dimension (const Scope&) const 
-  { return Units::cm_per_h; }
+  { return Units::cm_per_h (); }
 
   // Create.
   NumberSoilK (Block& al)
@@ -337,7 +337,7 @@ struct NumberSoilHeatCapacity : public NumberByTension
   { 
     const symbol my_dim = h->dimension (scope);
     const double my_val = h->value (scope);
-    const double my_h = Units::convert (my_dim, Units::cm, my_val);
+    const double my_h = Units::convert (my_dim, Units::cm (), my_val);
     const double Theta = horizon->hydraulic->Theta (my_h);
     return horizon->heat_capacity (Theta, 0.0);
   }
@@ -376,7 +376,7 @@ struct NumberSoilHeatConductivity : public NumberByTension
   { 
     const symbol my_dim = h->dimension (scope);
     const double my_val = h->value (scope);
-    const double my_h = Units::convert (my_dim, Units::cm, my_val);
+    const double my_h = Units::convert (my_dim, Units::cm (), my_val);
     const double Theta = horizon->hydraulic->Theta (my_h);
     return horizon->heat_conductivity (Theta, 0.0);
   }
@@ -428,7 +428,7 @@ struct NumberTensionByTheta : public Number
                                                   Theta->value (scope)));
   }
   symbol dimension (const Scope&) const 
-  { return Units::cm; }
+  { return Units::cm (); }
 
   // Create.
   bool initialize (Treelog& msg)

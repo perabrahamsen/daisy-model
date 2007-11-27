@@ -36,7 +36,7 @@ class Soil;
 class OrganicMatter;
 class SoilHeat;
 class SoilWater;
-class Solute;
+class Chemistry;
 class PLF;
 class Harvest;
 class AM;
@@ -87,7 +87,7 @@ public:
                      const Bioclimate&, const Geometry&, const Soil&,
 		     OrganicMatter&, const SoilHeat&, const SoilWater&,
 		     // Allow plants to grow (hourly).
-		     Solute&, Solute&, 
+		     Chemistry&, 
 		     double& residuals_DM,
 		     double& residuals_N_top, double& residuals_C_top,
 		     std::vector<double>& residuals_N_soil,

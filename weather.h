@@ -33,6 +33,10 @@ class Block;
 
 class Weather : public Model
 {
+  // Units.
+public:
+  static const symbol dry_deposit_unit;
+
   // Content.
 public: 
   const symbol name;

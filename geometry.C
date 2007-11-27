@@ -410,7 +410,8 @@ Geometry::total_surface (const std::vector<double>& v,
 
 static struct CheckLayers : public VCheck
 {
-  void check (const Syntax& syntax, const AttributeList& alist, 
+  void check (const Metalib&,
+	      const Syntax& syntax, const AttributeList& alist, 
 	      const std::string& key) const throw (std::string)
   {
     daisy_assert (alist.check (key));
@@ -418,7 +419,7 @@ static struct CheckLayers : public VCheck
     daisy_assert (!syntax.is_log (key));
     daisy_assert (syntax.size (key) == Syntax::Sequence);
 
-    const std::vector<AttributeList*>& layers = alist.alist_sequence (key);
+    const std::vector<const AttributeList*>& layers = alist.alist_sequence (key);
 
     double last = 0.0;
     for (unsigned int i = 0; i < layers.size (); i++)
@@ -484,7 +485,8 @@ Geometry::initialize_layer (std::vector<double>& array,
   else if (al.check (initial))
     {
       // Initialize by layers.
-      const std::vector<AttributeList*>& layers = al.alist_sequence (initial);
+      const std::vector<const AttributeList*>& layers
+	= al.alist_sequence (initial);
       const double soil_end = bottom ();
       double last = 0.0;
       for (size_t i = 0; i < layers.size (); i++)

@@ -22,6 +22,7 @@
 #define BUILD_DLL
 
 #include "weather.h"
+#include "chemical.h"
 #include "alist.h"
 #include "fao.h"
 #include "lexer_data.h"
@@ -981,7 +982,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
-	      WetDeposit.NH4 = val;
+	      WetDeposit.set_value (Chemical::NH4_solute (),
+				    Units::ppm (), val);
 	    }
 	  else if (key == "NH4DryDep")
 	    {
@@ -991,7 +993,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
-	      DryDeposit.NH4 = val;
+	      DryDeposit.set_value (Chemical::NH4_solute (),
+				    Weather::dry_deposit_unit, val);
 	    }
 	  else if (key == "NO3WetDep")
 	    {
@@ -1001,7 +1004,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
-	      WetDeposit.NO3 = val;
+	      WetDeposit.set_value (Chemical::NO3 (), Units::ppm (), val);
 	    }
 	  else if (key == "NO3DryDep")
 	    {
@@ -1011,7 +1014,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
-	      DryDeposit.NO3 = val;
+	      DryDeposit.set_value (Chemical::NO3 (), 
+				    Weather::dry_deposit_unit, val);
 	    }
           // Alternative way of specifying deposition.
 	  else if (key == "Deposition")
@@ -1149,8 +1153,6 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 You must specify either all of 'NH4WetDep', 'NO3WetDep', 'NH4DryDep',\n\
 and 'NO3DryDep'; or alternatively all of 'Deposition' and 'PAverage',\n\
 but not both");
-      DryDeposit.NH4 = DryDeposit.NO3 = 1.0;
-      WetDeposit.NH4 = WetDeposit.NO3 = 1.0;
     }
   else if (dep1_has_all)
     daisy_assert (!dep2_has_any);
@@ -1160,21 +1162,29 @@ but not both");
       const double dry = deposition.total * deposition.dry;
       const double wet = deposition.total * (1.0 - deposition.dry);
       daisy_assert (approximate (dry + wet, deposition.total));
-      DryDeposit.NH4 = dry * deposition.dry_NH4;
-      DryDeposit.NO3 = dry * (1.0 - deposition.dry_NH4);
-      WetDeposit.NH4 = wet * 100.0 * deposition.wet_NH4 
-        / deposition.precipitation;
-      WetDeposit.NO3 = wet * 100.0 * (1.0 - deposition.wet_NH4)
-        / deposition.precipitation;
-      daisy_assert (approximate (DryDeposit.NH4 + DryDeposit.NO3
-                                 + ((WetDeposit.NH4 + WetDeposit.NO3)
-                                    * deposition.precipitation / 100.0),
-                                 deposition.total));
+      DryDeposit.set_value (Chemical::NH4_solute (), Weather::dry_deposit_unit,
+			    dry * deposition.dry_NH4);
+      DryDeposit.set_value (Chemical::NO3 (), Weather::dry_deposit_unit,
+			    dry * (1.0 - deposition.dry_NH4));
+      WetDeposit.set_value (Chemical::NH4_solute (), Units::ppm (),
+			    wet * 100.0 * deposition.wet_NH4 
+			    / deposition.precipitation);
+      WetDeposit.set_value (Chemical::NO3 (), Units::ppm (),
+			    wet * 100.0 * (1.0 - deposition.wet_NH4)
+			    / deposition.precipitation);
       std::ostringstream tmp;
-      tmp << "NH4WetDep: " << WetDeposit.NH4 << " ppm\n\
-NH4DryDep: " << DryDeposit.NH4 << " kgN/ha/year\n\
-NO3WetDep: " << WetDeposit.NO3 << " ppm\n\
-NO3DryDep: " << DryDeposit.NO3 << " kgN/ha/year";
+      tmp << "NH4WetDep: " 
+	  << WetDeposit.get_value (Chemical::NH4_solute (),
+				   Units::ppm ()) << " ppm\n\
+NH4DryDep: " 
+	  << DryDeposit.get_value (Chemical::NH4_solute (), 
+				   Weather::dry_deposit_unit) 
+	  << " kgN/ha/year\n\
+NO3WetDep: " << WetDeposit.get_value (Chemical::NO3 (), Units::ppm ()) 
+	  << " ppm\n\
+NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (),
+				      Weather::dry_deposit_unit)
+	  << " kgN/ha/year";
       msg.debug (tmp.str ());
     }
 
@@ -1423,7 +1433,7 @@ year in the second interval.\n\
 If a given year is covered by multiple intervals in the list, the first\n\
 one will be used.",
 				   WeatherStandard::YearMap::load_syntax);
-    alist.add ("missing_years", vector<AttributeList*> ());
+    alist.add ("missing_years", vector<const AttributeList*> ());
 
     // Division between Rain and Snow.
     syntax.add ("T_rain", "dg C", Syntax::Const, 

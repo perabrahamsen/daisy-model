@@ -110,9 +110,9 @@ struct ActionCrop : public Action
     const double DS;
     const double DM;
     int year_of_last_harvest;
-    const std::vector<AttributeList*> *const fertilize;
+    const std::vector<const AttributeList*> *const fertilize;
     int fertilize_index;
-    const std::vector<AttributeList*> *const fertilize_rest;
+    const std::vector<const AttributeList*> *const fertilize_rest;
     int fertilize_rest_index;
     int fertilize_year;
 
@@ -282,12 +282,12 @@ ActionCrop::MM_DD::~MM_DD ()
 { }
 
 void 
-ActionCrop::Sow::doIt (Daisy& daisy, const Scope&, Treelog& out)
+ActionCrop::Sow::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 {
   if (!done && date.match (daisy.time))
     {
-      out.message ("Sowing " + crop.name ("type"));      
-      daisy.field->sow (daisy.metalib, crop, daisy.time, daisy.dt, out); 
+      msg.message ("Sowing " + crop.name ("type"));      
+      daisy.field->sow (daisy.metalib, crop, daisy.time, daisy.dt, msg); 
       done = true;
     }
 }
@@ -326,7 +326,7 @@ ActionCrop::Sow::~Sow ()
 { }
 
 bool
-ActionCrop::Annual::doIt (Daisy& daisy, const Scope&, Treelog& out, symbol name)
+ActionCrop::Annual::doIt (Daisy& daisy, const Scope&, Treelog& msg, symbol name)
 {
   if (!done && (daisy.field->crop_ds (name) >= 2.0
 		|| latest.match (daisy.time)))
@@ -338,8 +338,8 @@ ActionCrop::Annual::doIt (Daisy& daisy, const Scope&, Treelog& out, symbol name)
       static const symbol all_symbol ("all");
       daisy.field->harvest (daisy.time, daisy.dt, 
                            all_symbol, stub, stem, leaf, sorg, 
-			   false, daisy.harvest, out);
-      out.message ("Annual harvest of " + name);
+			   false, daisy.harvest, msg);
+      msg.message ("Annual harvest of " + name);
       done = true;
       return true;
     }
@@ -386,7 +386,7 @@ ActionCrop::Annual::~Annual ()
 { }
 
 void
-ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& out)
+ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& msg)
 {
   const double stub = 8.0;
   const double stem = 1.0;
@@ -395,12 +395,12 @@ ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& out)
   static const symbol all_symbol ("all");
   daisy.field->harvest (daisy.time, daisy.dt,
                        all_symbol, stub, stem, leaf, sorg, 
-		       false, daisy.harvest, out);
-  out.message ("Perennial harvest");
+		       false, daisy.harvest, msg);
+  msg.message ("Perennial harvest");
 }
 
 bool
-ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& out, symbol name)
+ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& msg, symbol name)
 {
   const double stub = 8.0;
 
@@ -410,14 +410,14 @@ ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& out, symbol na
   if (daisy.field->crop_ds (name) >= DS 
       || daisy.field->crop_dm (name, stub) >= DM)
     {
-      harvest (daisy, out);
+      harvest (daisy, msg);
       return true;
     }
   return false;
 }
 
 bool
-ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& out,
+ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& msg,
 			     symbol primary, symbol secondary)
 {
   const double stub = 8.0;
@@ -430,7 +430,7 @@ ActionCrop::Perennial::doIt (Daisy& daisy, const Scope&, Treelog& out,
       || (daisy.field->crop_dm (primary, stub)
 	  + daisy.field->crop_dm (secondary, stub)) >= DM)
     {
-      harvest (daisy, out);
+      harvest (daisy, msg);
       return true;
     }
   return false;
@@ -581,10 +581,10 @@ ActionCrop::Fertilize::~Fertilize ()
 { }
 
 void
-ActionCrop::fertilize (Daisy& daisy, Treelog& out,
+ActionCrop::fertilize (Daisy& daisy, Treelog& msg,
 		       const AttributeList& am) const
 {
-  out.message (std::string ("[Fertilizing ") + am.name ("type") + "]");
+  msg.message (std::string ("[Fertilizing ") + am.name ("type") + "]");
 
 #if 0
   if (am.name ("syntax") != "mineral")
@@ -595,9 +595,9 @@ ActionCrop::fertilize (Daisy& daisy, Treelog& out,
   const double to = -18.0;
       
   if (fertilize_incorporate)
-    daisy.field->fertilize (am, from, to, daisy.dt);
+    daisy.field->fertilize (am, from, to, daisy.dt, msg);
   else
-    daisy.field->fertilize (am, daisy.dt);
+    daisy.field->fertilize (am, daisy.dt, msg);
 }
 
 void 
@@ -701,7 +701,7 @@ ActionCrop::Spray::~Spray ()
 { }
 
 bool
-ActionCrop::Irrigation::doIt (Daisy& daisy, const Scope&, Treelog& out) const
+ActionCrop::Irrigation::doIt (Daisy& daisy, const Scope&, Treelog& msg) const
 {
   if (iszero (amount))
     return false;
@@ -721,8 +721,8 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, const Scope&, Treelog& out) const
 
   std::ostringstream tmp;
   tmp << "Irrigating " << amount << " mm";
-  out.message (tmp.str ());
-  daisy.field->irrigate_overhead (amount, IM (), daisy.dt);
+  msg.message (tmp.str ());
+  daisy.field->irrigate_overhead (amount, IM (), daisy.dt, msg);
   return true;
 }
 
@@ -752,12 +752,12 @@ ActionCrop::Irrigation::~Irrigation ()
 { }
 
 void
-ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& out)
+ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 {
   // Sowing.
-  primary->doIt (daisy, scope, out);
+  primary->doIt (daisy, scope, msg);
   if (secondary)
-    secondary->doIt (daisy, scope, out);
+    secondary->doIt (daisy, scope, msg);
 
   // Harvesting.
   bool harvested = false;
@@ -769,12 +769,12 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& out)
 	{
 	  // If annual done, do perennial.
 	  if (secondary->done 
-	      && harvest_perennial->doIt (daisy, scope, out,
+	      && harvest_perennial->doIt (daisy, scope, msg,
 					  secondary->crop.identifier ("type")))
 	    harvested = true;
 	}
       else if (primary->done 
-	       && harvest_annual->doIt (daisy, scope, out, 
+	       && harvest_annual->doIt (daisy, scope, msg, 
 					primary->crop.identifier ("type")))
 	// else do annual.
 	harvested = true;
@@ -784,7 +784,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& out)
       // We have only annual crops.  Let 'primary' when they are harvested.
       if (primary->done 
 	  && harvest_annual->doIt (daisy, scope, 
-                                   out, primary->crop.identifier ("type")))
+                                   msg, primary->crop.identifier ("type")))
 	harvested = true;
     }
   else
@@ -795,13 +795,13 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& out)
 	{
 	  // If we have two, let them both control.
 	  if ((primary->done || secondary->done)
-	      && harvest_perennial->doIt (daisy, scope, out,
+	      && harvest_perennial->doIt (daisy, scope, msg,
 					  primary->crop.identifier ("type"),
 					  secondary->crop.identifier ("type")))
 	    harvested = true;
 	}
       else if (primary->done 
-	       && harvest_perennial->doIt (daisy, scope, out, 
+	       && harvest_perennial->doIt (daisy, scope, msg, 
 					   primary->crop.identifier ("type")))
 	// If we have only one, it is of course in control.
 	harvested = true;
@@ -814,7 +814,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& out)
       && daisy.time.mday () == fertilize_at[fertilize_at_index]->day)
     {
       // Fertilize by date.
-      fertilize (daisy, out, fertilize_at[fertilize_at_index]->what);
+      fertilize (daisy, msg, fertilize_at[fertilize_at_index]->what);
       fertilize_at_index++;
     }
   if (harvested && harvest_perennial && harvest_perennial->fertilize)
@@ -848,7 +848,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& out)
 	  < harvest_perennial->fertilize->size ())
 	{
 	  // If 'fertilize' is active, use it.
-	  fertilize (daisy, out, *(*harvest_perennial->fertilize)
+	  fertilize (daisy, msg, *(*harvest_perennial->fertilize)
 		     [harvest_perennial->fertilize_index]);
 	  harvest_perennial->fertilize_index++;
 	}
@@ -857,7 +857,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& out)
 		   < harvest_perennial->fertilize_rest->size ()))
 	{
 	  // Else, if 'fertilize_rest' is active, us that.
-	  fertilize (daisy, out, *(*harvest_perennial->fertilize_rest)
+	  fertilize (daisy, msg, *(*harvest_perennial->fertilize_rest)
 		     [harvest_perennial->fertilize_rest_index]);
 	  harvest_perennial->fertilize_rest_index++;
 	}
@@ -869,7 +869,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& out)
       && daisy.time.month () == tillage[tillage_index]->month
       && daisy.time.mday () == tillage[tillage_index]->day)
     {
-      tillage[tillage_index]->operation->doIt (daisy, scope, out);
+      tillage[tillage_index]->operation->doIt (daisy, scope, msg);
       tillage_index++;
     }
 
@@ -881,8 +881,8 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& out)
     {
       symbol chemical = spray[spray_index]->name;
       const double amount = spray[spray_index]->amount;
-      out.message ("Spraying " + chemical);
-      daisy.field->spray (chemical, amount, daisy.dt, out); 
+      msg.message ("Spraying " + chemical);
+      daisy.field->spray (chemical, amount, daisy.dt, msg); 
 
       spray_index++;
     }
@@ -896,10 +896,10 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& out)
     {
       if (irrigation_rest && irrigation_year != daisy.time.year ())
 	{
-	  if (irrigation_rest->doIt (daisy, scope, out))
+	  if (irrigation_rest->doIt (daisy, scope, msg))
 	    irrigation_delay = 48;
 	}
-      else if (irrigation->doIt (daisy, scope, out))
+      else if (irrigation->doIt (daisy, scope, msg))
 	irrigation_delay = 48;
     }
 }
@@ -930,32 +930,32 @@ ActionCrop::output (Log& log) const
 }
 
 void 
-ActionCrop::tick (const Daisy& daisy, const Scope& scope, Treelog& out)
+ActionCrop::tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
 { 
   for (std::vector<const Tillage*>::const_iterator i = tillage.begin ();
        i != tillage.end ();
        i++)
-    (*i)->operation->tick (daisy, scope, out);
+    (*i)->operation->tick (daisy, scope, msg);
 }
 
 void 
-ActionCrop::initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
+ActionCrop::initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
 { 
   for (std::vector<const Tillage*>::const_iterator i = tillage.begin ();
        i != tillage.end ();
        i++)
-    (*i)->operation->initialize (daisy, scope, out);
+    (*i)->operation->initialize (daisy, scope, msg);
 }
 
 bool
-ActionCrop::check (const Daisy& daisy, const Scope& scope, Treelog& out) const
+ActionCrop::check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
 { 
   bool ok = true;
 
   for (std::vector<const Tillage*>::const_iterator i = tillage.begin ();
        i != tillage.end ();
        i++)
-    if (!(*i)->operation->check (daisy, scope, out))
+    if (!(*i)->operation->check (daisy, scope, msg))
       ok = false;
   
   return ok;
@@ -1060,7 +1060,7 @@ Harvest conditions for perennial crops.",
 			  ActionCrop::Perennial::load_syntax);
     syntax.add_submodule_sequence("fertilize_at", Syntax::Const, "\
 Fertilizer application by date.", ActionCrop::Fertilize::load_syntax);
-    alist.add ("fertilize_at", std::vector<AttributeList*> ());
+    alist.add ("fertilize_at", std::vector<const AttributeList*> ());
     syntax.add ("fertilize_at_index", Syntax::Integer, Syntax::State,
 		"Next entry in 'fertilize_at' to execute.");
     alist.add ("fertilize_at_index", 0);
@@ -1069,13 +1069,13 @@ Fertilizer application by date.", ActionCrop::Fertilize::load_syntax);
     alist.add ("fertilize_incorporate", false);
     syntax.add_submodule_sequence ("tillage", Syntax::State, "\
 List of tillage operations to apply.", ActionCrop::Tillage::load_syntax);
-    alist.add ("tillage", std::vector<AttributeList*> ());
+    alist.add ("tillage", std::vector<const AttributeList*> ());
     syntax.add ("tillage_index", Syntax::Integer, Syntax::State,
 		"Next entry in 'tillage' to execute.");
     alist.add ("tillage_index", 0);
     syntax.add_submodule_sequence ("spray", Syntax::State, "\
 List of chemicals to apply.", ActionCrop::Spray::load_syntax);
-    alist.add ("spray", std::vector<AttributeList*> ());
+    alist.add ("spray", std::vector<const AttributeList*> ());
     syntax.add ("spray_index", Syntax::Integer, Syntax::State,
 		"Next entry in 'spray' to execute.");
     alist.add ("spray_index", 0);

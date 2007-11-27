@@ -166,8 +166,8 @@ public:
 public:
   void initialize (const double SeedN);
   void initialize (symbol name,
-		   const std::vector<AttributeList*>& root,
-		   const std::vector<AttributeList*>& dead,
+		   const std::vector<const AttributeList*>& root,
+		   const std::vector<const AttributeList*>& dead,
 		   const Geometry&, OrganicMatter&);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   Production (const AttributeList&);

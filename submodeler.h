@@ -29,10 +29,10 @@
 // Old style (no block scope).
 template <class T> 
 std::vector<T*>
-map_construct (const std::vector<AttributeList*>& f)
+map_construct (const std::vector<const AttributeList*>& f)
 { 
   std::vector<T*> t;
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
+  for (std::vector<const AttributeList*>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
     t.push_back (new T (**i));
@@ -41,10 +41,10 @@ map_construct (const std::vector<AttributeList*>& f)
 
 template <class T> 
 std::vector<const T*>
-map_construct_const (const std::vector<AttributeList*>& f)
+map_construct_const (const std::vector<const AttributeList*>& f)
 { 
   std::vector<const T*> t;
-  for (std::vector<AttributeList*>::const_iterator i = f.begin ();
+  for (std::vector<const AttributeList*>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
     t.push_back (new T (**i));
@@ -79,7 +79,7 @@ std::vector<T*>
 map_submodel (Block& parent, const std::string& key)
 { 
   std::vector<T*> t;
-  const std::vector<AttributeList*> f (parent.alist_sequence (key));
+  const std::vector<const AttributeList*> f (parent.alist_sequence (key));
   const Syntax& syntax = parent.syntax ().syntax (key);
   for (size_t i = 0; i < f.size (); i++)
     {
@@ -97,7 +97,7 @@ std::vector<const T*>
 map_submodel_const (Block& parent, const std::string& key)
 { 
   std::vector<const T*> t;
-  const std::vector<AttributeList*> f (parent.alist_sequence (key));
+  const std::vector<const AttributeList*> f (parent.alist_sequence (key));
   const Syntax& syntax = parent.syntax ().syntax (key);
   for (size_t i = 0; i < f.size (); i++)
     {

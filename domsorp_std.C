@@ -31,18 +31,16 @@
 #include "librarian.h"
 #include <memory>
 
-using namespace std;
-
 struct DomsorpStandard : public Domsorp
 {
   // Parameters.
   const size_t dom_pool;
   const size_t som_pool;
-  const auto_ptr<Transform> transform;
+  const std::auto_ptr<Transform> transform;
   
   // Output.
-  vector<double> S_C;
-  vector<double> S_N;
+  std::vector<double> S_C;
+  std::vector<double> S_N;
   void output (Log& log) const
   { 
     output_variable (S_C, log); 
@@ -50,18 +48,20 @@ struct DomsorpStandard : public Domsorp
   }
 
   // Simulation.
-  void tick (const Soil& soil, const SoilWater& soil_water, 
-             const vector<DOM*>& dom, const vector<SOM*>& som, Treelog& msg)
+  void tick (const Soil& soil, 
+	     const SoilWater& soil_water, const SoilHeat& soil_heat,
+             const std::vector<DOM*>& dom, const std::vector<SOM*>& som, 
+	     Treelog& msg)
   { 
     daisy_assert (dom.size () > dom_pool);
     daisy_assert (som.size () > som_pool);
     DOM& d = *dom[dom_pool];
     SOM& s = *som[som_pool];
-    vector<double> dC;
+    std::vector<double> dC;
     for (size_t i = 0; i < soil.size (); i++)
       dC.push_back (d.C_at (i));
     daisy_assert (s.C.size () == soil.size ());
-    transform->tick (soil, soil_water, dC, s.C, S_C, msg);
+    transform->tick (soil, soil_water, soil_heat, dC, s.C, S_C, msg);
 
     for (size_t i = 0; i < soil.size (); i++)
       {
@@ -85,14 +85,16 @@ struct DomsorpStandard : public Domsorp
   }
 
   // Create.
-  bool check (const Soil& soil, const size_t dom_size, const size_t som_size,
+  bool check (const Soil& soil, 
+	      const SoilWater& soil_water, const SoilHeat& soil_heat,
+	      const size_t dom_size, const size_t som_size,
               Treelog& msg) const
   { 
     Treelog::Open nest (msg, "Domsorp: " + name);
     bool ok = true;
     {
       Treelog::Open nest (msg, "transform: " + transform->name);
-      if (!transform->check (soil, msg))
+      if (!transform->check (soil, soil_water, soil_heat, msg))
         ok = false; 
     }
     if (dom_pool >= dom_size)
@@ -107,9 +109,9 @@ struct DomsorpStandard : public Domsorp
       }
     return ok;
   }
-  void initialize (Block& block, const Soil& soil)
+  void initialize (const Soil& soil, Treelog& msg)
   { 
-    transform->initialize (block, soil); 
+    transform->initialize (soil, msg); 
     S_C.insert (S_C.begin (), soil.size (), 0.0);
     daisy_assert (S_C.size () == soil.size ());
     S_N.insert (S_N.begin (), soil.size (), 0.0);

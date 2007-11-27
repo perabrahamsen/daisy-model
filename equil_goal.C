@@ -23,9 +23,8 @@
 #include "equil.h"
 #include "block.h"
 #include "alist.h"
-#include "soil_water.h"
-#include "pedo.h"
-#include "soil.h"
+#include "scope_soil.h"
+#include "number.h"
 #include "treelog.h"
 #include "check.h"
 #include "mathlib.h"
@@ -35,53 +34,62 @@
 
 struct EquilibriumGoal_A : public Equilibrium
 {
+  static const symbol goal_unit;
+
   // Parameters.
-  /* const */ std::vector<double> goal_A;
+  std::auto_ptr<Number> goal_A_expr;
+  std::auto_ptr<Number> min_B_expr;
   const bool A_solute;
-  /* const */ std::vector<double> min_B;
   const bool B_solute;
   const int debug_cell;
 
   // Simulation.
-  void find (const Soil&, const SoilWater&, unsigned int i,
-	     double has_A, double has_B, 
+  void find (const Scope&, double has_A, double has_B, 
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
-  enum { uninitialized, init_succes, init_failure } initialize_state;
-  void initialize (Block&, const Soil&);
-  bool check (const Soil&, Treelog& err) const;
+  void initialize (Treelog&);
+  bool check (const Scope&, Treelog&) const;
   EquilibriumGoal_A (Block& al)
     : Equilibrium (al),
+      goal_A_expr (Librarian::build_item<Number> (al, "goal_A")),
+      min_B_expr (Librarian::build_item<Number> (al, "min_B")),
       A_solute (al.flag ("A_solute")),
       B_solute (al.flag ("B_solute")),
-      debug_cell (al.integer ("debug_cell")),
-      initialize_state (uninitialized)
+      debug_cell (al.integer ("debug_cell"))
   { }
   ~EquilibriumGoal_A ()
   { }
 };
 
+const symbol
+EquilibriumGoal_A::goal_unit ("g/cm^3");
+
 void
-EquilibriumGoal_A::find (const Soil&, const SoilWater& soil_water,
-                         unsigned int i,
+EquilibriumGoal_A::find (const Scope& scope,
                          const double has_A, const double has_B, 
                          double& want_A, double& want_B, Treelog& msg) const
 {
-  daisy_assert (goal_A.size () > i);
-  daisy_assert (goal_A[i] >= 0.0);
-  daisy_assert (min_B.size () > i);
-  daisy_assert (min_B[i] >= 0.0);
-  
   daisy_assert (has_A >= 0.0);
   daisy_assert (has_B >= 0.0);
   const double M = has_A + has_B;
 
-  const double Theta = soil_water.Theta (i);
+  double goal_A = 1.0;
+  if (!goal_A_expr->tick_value (goal_A, goal_unit, scope, msg))
+    msg.error ("Could not evaluate 'goal_A'");
+  daisy_assert (goal_A >= 0.0);
+  double min_B = 1.0;
+  if (!min_B_expr->tick_value (min_B, goal_unit, scope, msg))
+    msg.error ("Could not evaluate 'min_B'");
+  daisy_assert (min_B >= 0.0);
+
+  static const symbol Theta_name ("Theta");
+  const double Theta = scope.number (Theta_name);
   daisy_assert (Theta > 0.0);
   daisy_assert (Theta < 1.0);
-  const double goal_A_dry = goal_A[i] * (A_solute ? Theta : 1.0);
-  const double min_B_dry = min_B[i] * (B_solute ? Theta : 1.0);
+
+  const double goal_A_dry = goal_A * (A_solute ? Theta : 1.0);
+  const double min_B_dry = min_B * (B_solute ? Theta : 1.0);
 
   std::ostringstream tmp;
 
@@ -109,8 +117,10 @@ EquilibriumGoal_A::find (const Soil&, const SoilWater& soil_water,
     }
   tmp << "\t" << has_A << "\t" << goal_A_dry << "\t" << want_A << "\t"
       << has_B << "\t" << min_B_dry << "\t" << want_B << "\t" << M;
-  if (i == debug_cell)
-    msg.message (tmp.str ());
+  if (const ScopeSoil *const scope_soil 
+      = dynamic_cast<const ScopeSoil*> (&scope))
+    if (scope_soil->cell == debug_cell)
+      msg.message (tmp.str ());
 
   daisy_assert (want_A >= 0.0);
   daisy_assert (want_B >= 0.0);
@@ -118,44 +128,22 @@ EquilibriumGoal_A::find (const Soil&, const SoilWater& soil_water,
 }
 
 void
-EquilibriumGoal_A::initialize (Block& block, const Soil& soil)
+EquilibriumGoal_A::initialize (Treelog& msg)
 { 
-  daisy_assert (initialize_state == uninitialized);
-  initialize_state = init_succes;
-  static const symbol my_dim ("g/cm^3");
-  std::auto_ptr<Pedotransfer> pedo_goal_A 
-    (Librarian::build_alist<Pedotransfer> (block, alist.alist ("goal_A"),
-                                          "goal_A"));
-  if (pedo_goal_A->check (soil, my_dim, block.msg ()))
-    pedo_goal_A->set (soil, goal_A, my_dim);
-  else
-    initialize_state = init_failure;
-  Pedotransfer::debug_message ("goal_A", goal_A, my_dim, block.msg ());
-
-  std::auto_ptr<Pedotransfer> pedo_min_B 
-    (Librarian::build_alist<Pedotransfer> (block, alist.alist ("min_B"),
-                                          "min_B"));
-  if (pedo_min_B->check (soil, my_dim, block.msg ()))
-    pedo_min_B->set (soil, min_B, my_dim);
-  else
-    initialize_state = init_failure;
-  Pedotransfer::debug_message ("min_B", min_B, my_dim, block.msg ());
-
-  if (debug_cell >= 0 && debug_cell < soil.size ())
-    block.msg ()
-      .message ("type\thas_A\tgoal_A\twant_A\thas_B\tgoal_B\twant_B\ttotal\n"
-		"\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3");
+  goal_A_expr->initialize (msg);
+  min_B_expr->initialize (msg);
 }
 
 bool 
-EquilibriumGoal_A::check (const Soil&, Treelog& err) const
+EquilibriumGoal_A::check (const Scope& scope, Treelog& msg) const
 {
-  if (initialize_state == init_succes)
-    return true;
-
-  Treelog::Open nest (err, name);
-  err.error ("Initialize failed");
-  return false;
+  Treelog::Open nest (msg, "Equilibrium: '" + name + "'");
+  bool ok = true;
+  if (!goal_A_expr->check_dim (scope, goal_unit, msg))
+    ok = false;
+  if (!min_B_expr->check_dim (scope, goal_unit, msg))
+    ok = false;
+  return ok;
 }
 
 static struct EquilibriumGoal_ASyntax
@@ -169,14 +157,14 @@ static struct EquilibriumGoal_ASyntax
     AttributeList& alist = *new AttributeList ();
     Equilibrium::load_syntax (syntax, alist);
     alist.add ("description", "Attempt to maintain A at at fixed level.");
-    syntax.add_object ("goal_A", Pedotransfer::component, Syntax::Const, 
+    syntax.add_object ("goal_A", Number::component, Syntax::Const, 
                        Syntax::Singleton, "The desired level of A [g/cm^3].");
     syntax.add ("A_solute", Syntax::Boolean, Syntax::Const, 
                 "True iff 'goal_A' is in solute (mass per volume water).\n\
 If false, the unit is assumed to be mass per volume space.");
-    syntax.add_object ("min_B", Pedotransfer::component, Syntax::Const, 
-                       Syntax::Singleton, 
-                       "Do not convert B to A if B is smaller than this [g/cm^3].");
+    syntax.add_object ("min_B", Number::component, Syntax::Const, 
+                       Syntax::Singleton, "\
+Do not convert B to A if B is smaller than this [g/cm^3].");
     syntax.add ("B_solute", Syntax::Boolean, Syntax::Const, 
                 "True iff 'min_B' is in solute (mass per volume water).\n\
 If false, the unit is assumed to be mass per volume space.");
@@ -184,7 +172,8 @@ If false, the unit is assumed to be mass per volume space.");
                 "Print debug information for this cell.\n\
 Set it to a negative number to disable it.");
     alist.add ("debug_cell", -1);
-    Librarian::add_type (Equilibrium::component, "goal_A", alist, syntax, &make);
+    Librarian::add_type (Equilibrium::component, "goal_A",
+			 alist, syntax, &make);
   }
 } EquilibriumGoal_A_syntax;
 

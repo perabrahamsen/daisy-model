@@ -22,6 +22,8 @@
 
 #include "vcheck.h"
 #include "units.h"
+#include "metalib.h"
+#include "library.h"
 #include "syntax.h"
 #include "alist.h"
 #include "time.h"
@@ -31,6 +33,7 @@
 #include "mathlib.h"
 #include <algorithm>
 #include <numeric>
+#include <map>
 
 // GCC 2.95 -O2 dislike declaring these classes local.
 struct ValidYear : public VCheck
@@ -45,7 +48,7 @@ struct ValidYear : public VCheck
       }
   }
 
-  void check (const Syntax& syntax, const AttributeList& alist, 
+  void check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
 	      const std::string& key) const throw (std::string)
   { 
     daisy_assert (alist.check (key));
@@ -80,7 +83,7 @@ VCheck::IRange::validate (const int value) const throw (std::string)
 }
 
 void
-VCheck::IRange::check (const Syntax& syntax, const AttributeList& alist, 
+VCheck::IRange::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
 		       const std::string& key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
@@ -120,7 +123,7 @@ struct LocalOrder : public VCheck
       }
   }
 
-  void check (const Syntax& syntax, const AttributeList& alist, 
+  void check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
 	      const std::string& key) const throw (std::string)
   { 
     daisy_assert (alist.check (key));
@@ -318,7 +321,7 @@ VCheck::SumEqual::validate (const PLF& plf) const throw (std::string)
 }
 
 void
-VCheck::SumEqual::check (const Syntax& syntax, const AttributeList& alist, 
+VCheck::SumEqual::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
 			 const std::string& key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
@@ -368,7 +371,7 @@ VCheck::StartValue::validate (const PLF& plf) const throw (std::string)
 { validate (plf.y (0)); }
 
 void
-VCheck::StartValue::check (const Syntax& syntax, const AttributeList& alist, 
+VCheck::StartValue::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
 			   const std::string& key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
@@ -422,7 +425,7 @@ VCheck::EndValue::validate (const PLF& plf) const throw (std::string)
 }
 
 void
-VCheck::EndValue::check (const Syntax& syntax, const AttributeList& alist, 
+VCheck::EndValue::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
 			   const std::string& key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
@@ -470,7 +473,7 @@ VCheck::FixedPoint::validate (const PLF& plf) const throw (std::string)
 }
 
 void
-VCheck::FixedPoint::check (const Syntax& syntax, const AttributeList& alist, 
+VCheck::FixedPoint::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
 			   const std::string& key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
@@ -499,7 +502,7 @@ VCheck::FixedPoint::FixedPoint (double x, double y)
 { }
 
 void
-VCheck::MinSize::check (const Syntax& syntax, const AttributeList& alist, 
+VCheck::MinSize::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
 			const std::string& key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
@@ -519,7 +522,7 @@ VCheck::MinSize::MinSize (unsigned int size)
 { }
 
 void
-VCheck::String::check (const Syntax& syntax, const AttributeList& alist, 
+VCheck::String::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
                        const std::string& key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
@@ -622,18 +625,60 @@ VCheck::Enum::Enum (const std::string& a, const std::string& b, const std::strin
   ids.insert (f);
 }
 
+void
+VCheck::InLibrary::check (const Metalib& metalib, 
+			  const Syntax& syntax, const AttributeList& alist, 
+			  const std::string& key) const throw (std::string)
+{
+  daisy_assert (alist.check (key));
+  daisy_assert (!syntax.is_log (key));
+  if (syntax.size (key) == Syntax::Singleton)
+    validate (metalib, alist.identifier (key));
+  else
+    {
+      const std::vector<symbol> names = alist.identifier_sequence (key);
+      for (size_t i = 0; i < names.size (); i++)
+        validate (metalib, names[i]);
+    }
+}
+
+void
+VCheck::InLibrary::validate (const Metalib& metalib,
+			     const symbol type) const throw (std::string)
+{
+  daisy_assert (metalib.exist (lib_name));
+  const Library& library = metalib.library (lib_name);
+  
+  if (!library.check (type))
+    throw "Unknown type '" + type + "'";
+
+  const Syntax& syntax = library.syntax (type);
+  const AttributeList& alist = library.lookup (type);
+  if (!syntax.check (metalib, alist, Treelog::null ()))
+    throw "Incomplete type '" + type + "'";
+}
+
+VCheck::InLibrary::InLibrary (const symbol lib)
+  : lib_name (lib)
+{ }
+
 template<class T> 
 void unique_validate (const std::vector<T>& list)
 {
-  for (int i = 0; i < list.size (); i++)
-    for (int j = i + 1; j < list.size (); j++)
-      if (list[i] == list[j])
-        {
-          std::ostringstream tmp;
-          tmp << "Entry " << i << " and " << j << " are both '" 
-              << list[j] << "'";
-          throw std::string (tmp.str ());
-        }
+  std::map<T, size_t> found;
+  for (size_t i = 0; i < list.size (); i++)
+    {
+      T v = list[i];
+      typename std::map<T, size_t>::const_iterator f = found.find (v);
+      if (f != found.end ())
+	{
+	  std::ostringstream tmp;
+	  tmp << "Entry " << (*f).second << " and " << i 
+	      << " are both '" << v << "'";
+	  throw std::string (tmp.str ());
+	}
+      found[v] = i;
+    }
 }
 
 const VCheck& 
@@ -641,7 +686,8 @@ VCheck::unique ()
 {
   static struct Unique : public VCheck
   {
-    void check (const Syntax& syntax, const AttributeList& alist, 
+    void check (const Metalib&,
+		const Syntax& syntax, const AttributeList& alist, 
                 const std::string& key) const throw (std::string)
     { 
       daisy_assert (alist.check (key));
@@ -665,6 +711,25 @@ VCheck::unique ()
         case Syntax::Integer:
           unique_validate (alist.integer_sequence (key));
           break;
+	case Syntax::Object:
+	  {
+	    std::vector<const AttributeList*> list = alist.alist_sequence (key);
+	    std::map<symbol, size_t> found;
+	    for (size_t i = 0; i < list.size (); i++)
+	      {
+		const symbol type = list[i]->identifier ("type");
+		std::map<symbol, size_t>::const_iterator f = found.find (type);
+		if (f != found.end ())
+		  {
+		    std::ostringstream tmp;
+		    tmp << "Entry " << (*f).second << " and " << i 
+			<< " are both '" << type << "'";
+		    throw std::string (tmp.str ());
+		  }
+		found[type] = i;
+	      }
+	    break;
+	  }
         default:
           daisy_panic ("Unhandled list type "
                        + Syntax::type_name (syntax.lookup (key)));
@@ -676,11 +741,12 @@ VCheck::unique ()
 }
 
 void
-VCheck::All::check (const Syntax& syntax, const AttributeList& alist, 
+VCheck::All::check (const Metalib& metalib,
+		    const Syntax& syntax, const AttributeList& alist, 
 		    const std::string& key) const throw (std::string)
 {
   for (int i = 0; i < checks.size (); i++)
-    checks[i]->check (syntax, alist, key);
+    checks[i]->check (metalib, syntax, alist, key);
 }
 
 VCheck::All::All (const VCheck& a, const VCheck& b)
@@ -714,3 +780,5 @@ VCheck::All::All (const VCheck& a, const VCheck& b, const VCheck& c,
   checks.push_back (&d);
   checks.push_back (&e);
 }
+
+// vcheck.C ends here.

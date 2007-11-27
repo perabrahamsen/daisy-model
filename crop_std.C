@@ -124,8 +124,7 @@ public:
 	     OrganicMatter&,
 	     const SoilHeat&,
 	     const SoilWater&,
-	     Solute&,
-	     Solute&, 
+	     Chemistry&,
 	     double& residuals_DM,
 	     double& residuals_N_top, double& residuals_C_top,
 	     std::vector<double>& residuals_N_soil,
@@ -225,8 +224,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 		    OrganicMatter& organic_matter,
 		    const SoilHeat& soil_heat,
 		    const SoilWater& soil_water,
-		    Solute& soil_NH4,
-		    Solute& soil_NO3, 
+		    Chemistry& chemistry,
 		    double& residuals_DM,
 		    double& residuals_N_top, double& residuals_C_top,
 		    std::vector<double>& residuals_N_soil,
@@ -323,7 +321,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   daisy_assert (production.AM_leaf);
   
   nitrogen.update (production.NCrop, DS, enable_N_stress,
-                   geo, soil, soil_water, soil_NH4, soil_NO3,
+                   geo, soil, soil_water, chemistry,
                    bioclimate.day_fraction (),
                    *root_system, dt);
 

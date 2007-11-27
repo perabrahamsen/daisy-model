@@ -69,7 +69,7 @@ LogAList::alist () const
   return *alist_stack.front ();
 }
 
-vector<AttributeList*>&
+vector<const AttributeList*>&
 LogAList::alist_sequence ()
 {
   daisy_assert (alist_sequence_stack.size () > 0U);
@@ -90,7 +90,7 @@ LogAList::push (symbol entry, const Library& library, const AttributeList& alist
   library_stack.push_front (&library);
   syntax_stack.push_front (NULL);
   alist_stack.push_front (new AttributeList (alist));
-  alist_sequence_stack.push_front (vector<AttributeList*> ());
+  alist_sequence_stack.push_front (vector<const AttributeList*> ());
   unnamed_stack.push_front (-1);
 }
 
@@ -101,7 +101,7 @@ LogAList::push (symbol entry, const Syntax& syntax, const AttributeList& alist)
   library_stack.push_front (NULL);
   syntax_stack.push_front (&syntax);
   alist_stack.push_front (new AttributeList (alist));
-  alist_sequence_stack.push_front (vector<AttributeList*> ());
+  alist_sequence_stack.push_front (vector<const AttributeList*> ());
   unnamed_stack.push_front (-1);
 }
 
@@ -109,7 +109,7 @@ void
 LogAList::push (symbol entry, 
 		const Syntax& syntax, 
 		const AttributeList& default_alist,
-		vector<AttributeList*> alist_sequence)
+		vector<const AttributeList*> alist_sequence)
 {
   entry_stack.push_front (entry);
   library_stack.push_front (NULL);
@@ -214,7 +214,7 @@ LogAList::close ()
     {
       // Remember old values.
       AttributeList& old_alist = alist ();
-      vector<AttributeList*> old_alist_sequence = alist_sequence ();
+      vector<const AttributeList*> old_alist_sequence = alist_sequence ();
       const symbol old_entry = entry ();
 
       // Pop stack.
@@ -326,11 +326,11 @@ LogAList::close_alist ()
     close_ignore (); 
 }
 void
-LogAList::open_derived (symbol field, symbol type)
+LogAList::open_derived (symbol field, symbol type, const char *const library)
 { 
   const string& sfield = field.name ();
   daisy_assert (alist ().check (sfield));
-  open_object (field, type, alist ().alist (sfield));
+  open_object (field, type, alist ().alist (sfield), library);
 }
 	
 void
@@ -339,7 +339,7 @@ LogAList::close_derived ()
 
 void
 LogAList::open_object (symbol field, symbol type, 
-                       const AttributeList& alist)
+                       const AttributeList& alist, const char* lib)
 { 
   if (is_active)
     {
@@ -347,6 +347,7 @@ LogAList::open_object (symbol field, symbol type,
       daisy_assert (syntax ().lookup (sfield) == Syntax::Object);
       daisy_assert (syntax ().size (sfield) == Syntax::Singleton);
       const Library& library = syntax ().library (metalib (), sfield);
+      daisy_assert (library.name () == symbol (lib));
       if (!library.check (type))
         daisy_panic ("Field '" + sfield + "' containing component '"
                      + library.name () + "' has unknown model '" + type + "'");
@@ -373,7 +374,7 @@ LogAList::close_object ()
 }
 
 void
-LogAList::open_entry (symbol type, const AttributeList& alist)
+LogAList::open_entry (symbol type, const AttributeList& alist, const char*)
 {
   if (is_active)
     push (type, library ().syntax (type), alist);
@@ -397,7 +398,7 @@ LogAList::close_entry ()
 void
 LogAList::open_named_entry (const symbol, const symbol type,
 			    const AttributeList& alist)
-{ open_entry (type, alist); }
+{ open_entry (type, alist, NULL); }
 
 void
 LogAList::close_named_entry ()

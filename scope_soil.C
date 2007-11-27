@@ -29,6 +29,10 @@
 #include "alist.h"
 #include "assertion.h"
 #include "librarian.h"
+#include <sstream>
+
+const symbol 
+ScopeSoil::humus ("humus");
 
 const symbol 
 ScopeSoil::h ("h");
@@ -52,11 +56,15 @@ ScopeSoil::has_number (const symbol tag) const
 {
   daisy_assert (cell >= 0);
 
-  if (tag == h || tag == Theta || tag == T)
+  if (tag == humus || tag == h || tag == Theta || tag == T)
     return true;
 
   if (soil.has_attribute (cell, tag))
     return true;
+  
+  std::ostringstream tmp;
+  tmp << "Attribute '" << tag << "' missing in cell " << cell;
+  Assertion::warning (tmp.str ());
   
   return false;
 }
@@ -66,6 +74,8 @@ ScopeSoil::number (const symbol tag) const
 {
   daisy_assert (cell >= 0);
 
+  if (tag == humus)
+    return soil.humus (cell);
   if (tag == h)
     return soil_water.h (cell);
   if (tag == Theta)
@@ -79,8 +89,10 @@ ScopeSoil::number (const symbol tag) const
 symbol 
 ScopeSoil::dimension (const symbol tag) const
 {
+  if (tag == humus)
+    return Syntax::fraction ();
   if (tag == h)
-    return Units::cm;
+    return Units::cm ();
   if (tag == Theta)
     return Syntax::none ();
 
@@ -95,6 +107,10 @@ ScopeSoil::dimension (const symbol tag) const
 symbol
 ScopeSoil::get_description (symbol tag) const
 {
+  static const symbol humus_description ("Humus fraction of dry matter.");
+  if (tag == humus)
+    return humus_description;
+
   static const symbol h_description ("Soil hydraulic pressure.");
   if (tag == h)
     return h_description;
@@ -115,6 +131,7 @@ std::vector<symbol>
 ScopeSoil::find_numbers (const Soil&)
 {
   std::vector<symbol> result;
+  result.push_back (humus);
   result.push_back (h);
   result.push_back (Theta);
   result.push_back (T);

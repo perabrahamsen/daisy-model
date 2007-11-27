@@ -28,6 +28,7 @@
 #include "field.h"
 #include "am.h"
 #include "im.h"
+#include "chemical.h"
 #include "log.h"
 #include "treelog.h"
 #include "librarian.h"
@@ -35,6 +36,7 @@
 #include "block.h"
 #include "check.h"
 #include "assertion.h"
+#include "units.h"
 #include <memory>
 
 struct ActionExtern : public Action
@@ -175,27 +177,25 @@ struct ActionExternFertigation : public Action
 
     if (total_flux > 0.0)
       {
-	// [kg/ha] -> [g/cm^2]
-	const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
-	// [mm * mg N/ l] = [l/m^2 * mg N/l] = [mg/m^2] -> [g N/cm^2]
-	const double irrigate_solute_factor = 1.0e-7;
-	const double factor = (conv / irrigate_solute_factor) / total_flux;
-	IM im;
-	im.NH4 = NH4_value * factor;
-	im.NO3 = NO3_value * factor;
+	static const symbol mg_per_square_m ("mg/m^2");
+	static const symbol kg_per_ha ("kg/ha");
+	IM im (mg_per_square_m);
+	im.set_value (Chemical::NH4_solute (), kg_per_ha, NH4_value * dt);
+	im.set_value (Chemical::NO3 (),        kg_per_ha, NO3_value * dt);
+	im *= Scalar (total_flux * dt, Units::per_mm ());
 
 	if (surface_value > 0)
-	  field.irrigate_surface (surface_value, im, dt); 
+	  field.irrigate_surface (surface_value, im, dt, msg); 
 	if (overhead_value > 0)
-	  field.irrigate_overhead (overhead_value, im, dt); 
+	  field.irrigate_overhead (overhead_value, im, dt, msg); 
 	if (subsoil_value > 0)
-	  field.irrigate_subsoil (subsoil_value, im, from, to, dt); 
+	  field.irrigate_subsoil (subsoil_value, im, from, to, dt, msg); 
       }
     else if (NH4_value + NO3_value > 0.0)
       {
 	AttributeList alist;
 	AM::set_mineral (alist, NH4_value, NO3_value);
-	field.fertilize (alist, dt);
+	field.fertilize (alist, dt, msg);
       }
   }
 

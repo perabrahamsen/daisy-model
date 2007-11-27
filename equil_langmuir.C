@@ -24,7 +24,7 @@
 #include "block.h"
 #include "syntax.h"
 #include "alist.h"
-#include "pedo.h"
+#include "number.h"
 #include "soil.h"
 #include "treelog.h"
 #include "check.h"
@@ -32,39 +32,48 @@
 #include "librarian.h"
 #include <memory>
 
-using namespace std;
-
 struct EquilibriumLangmuir : public Equilibrium
 {
+  static const symbol base_unit;
+
   // Parameters.
-  /* const */ vector<double> K;
-  /* const */ vector<double> my_max;
+  std::auto_ptr<Number> K_expr;
+  std::auto_ptr<Number> my_max_expr;
 
   // Simulation.
-  void find (const Soil&, const SoilWater&, unsigned int i,
-	     double has_A, double has_B, 
+  void find (const Scope&, double has_A, double has_B, 
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
-  enum { uninitialized, init_succes, init_failure } initialize_state;
-  void initialize (Block&, const Soil&);
-  bool check (const Soil&, Treelog& err) const;
+  void initialize (Treelog&);
+  bool check (const Scope&, Treelog&) const;
   EquilibriumLangmuir (Block& al)
     : Equilibrium (al),
-      initialize_state (uninitialized)
+      K_expr (Librarian::build_item<Number> (al, "K")),
+      my_max_expr (Librarian::build_item<Number> (al, "my_max"))
   { }
   ~EquilibriumLangmuir ()
   { }
 };
 
+const symbol 
+EquilibriumLangmuir::base_unit ("g/cm^3");
+
 void
-EquilibriumLangmuir::find (const Soil&, const SoilWater&, unsigned int i,
+EquilibriumLangmuir::find (const Scope& scope,
 			   const double has_A, const double has_B, 
-			   double& want_A, double& want_B, Treelog&) const
+			   double& want_A, double& want_B, Treelog& msg) const
 {
   daisy_assert (has_A >= 0.0);
   daisy_assert (has_B >= 0.0);
   const double M = has_A + has_B;
+
+  double K = 1.0;
+  if (!K_expr->tick_value (K, base_unit, scope, msg))
+    msg.error ("Could not evaluate 'K'");
+  double my_max = 1.0;
+  if (!my_max_expr->tick_value (my_max, base_unit, scope, msg))
+    msg.error ("Could not evaluate 'my_max'");
 
   // We need to solve the following equation w.r.t. B
   //
@@ -80,12 +89,9 @@ EquilibriumLangmuir::find (const Soil&, const SoilWater&, unsigned int i,
   //
   // So we get a square equation.  We use the positive solution.
 
-  daisy_assert (K.size () > i);
-  daisy_assert (my_max.size () > i);
-
   const double a = 1.0;
-  const double b = my_max[i] + K[i] - M;
-  const double c = - M * K[i];
+  const double b = my_max + K - M;
+  const double c = - M * K;
 
   want_B = single_positive_root_of_square_equation (a, b, c);
   want_A = M - want_B;
@@ -93,44 +99,22 @@ EquilibriumLangmuir::find (const Soil&, const SoilWater&, unsigned int i,
 }
 
 void
-EquilibriumLangmuir::initialize (Block& block, const Soil& soil)
+EquilibriumLangmuir::initialize (Treelog& msg)
 { 
-  daisy_assert (initialize_state == uninitialized);
-  initialize_state = init_succes;
-
-  static const symbol my_dim ("g/cm^3");
-  // K
-  {
-    auto_ptr<Pedotransfer> pedo_K 
-      (Librarian::build_alist<Pedotransfer> (block, alist, "K"));
-    if (pedo_K->check (soil, my_dim, block.msg ()))
-      pedo_K->set (soil, K, my_dim);
-    else 
-      initialize_state = init_failure;
-    Pedotransfer::debug_message ("K", K, my_dim, block.msg ());
-  }
-
-  // my_max
-  {
-    auto_ptr<Pedotransfer> pedo_my_max 
-      (Librarian::build_alist<Pedotransfer> (block, alist, "my_max"));
-    if (pedo_my_max->check (soil, my_dim, block.msg ()))
-      pedo_my_max->set (soil, my_max, my_dim);
-    else 
-      initialize_state = init_failure;
-    Pedotransfer::debug_message ("my_max", my_max, my_dim, block.msg ());
-  }
+  K_expr->initialize (msg);
+  my_max_expr->initialize (msg);
 }
 
 bool 
-EquilibriumLangmuir::check (const Soil&, Treelog& err) const
+EquilibriumLangmuir::check (const Scope& scope, Treelog& msg) const
 {
-  if (initialize_state == init_succes)
-    return true;
-
-  Treelog::Open nest (err, name);
-  err.error ("Initialize failed");
-  return false;
+  Treelog::Open nest (msg, name);
+  bool ok = true;
+  if (!K_expr->check_dim (scope, base_unit, msg))
+    ok = false;
+  if (!my_max_expr->check_dim (scope, base_unit, msg))
+    ok = false;
+  return ok;
 }
 
 static struct EquilibriumLangmuirSyntax
@@ -144,12 +128,13 @@ static struct EquilibriumLangmuirSyntax
     AttributeList& alist = *new AttributeList ();
     Equilibrium::load_syntax (syntax, alist);
     alist.add ("description", "A = (my_max B) / (K + B)");
-    syntax.add_object ("K", Pedotransfer::component, 
+    syntax.add_object ("K", Number::component, 
                        Syntax::Const, Syntax::Singleton,
                        "Half saturation constant [g/cm^3].");
-    syntax.add_object ("my_max", Pedotransfer::component, 
+    syntax.add_object ("my_max", Number::component, 
                        Syntax::Const, Syntax::Singleton,
                        "Max equilibrium capacity [g/cm^3].");
-    Librarian::add_type (Equilibrium::component, "Langmuir", alist, syntax, &make);
+    Librarian::add_type (Equilibrium::component,
+			 "Langmuir", alist, syntax, &make);
   }
 } EquilibriumLangmuir_syntax;

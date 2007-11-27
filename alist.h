@@ -84,7 +84,7 @@ public:
   const std::vector<bool>& flag_sequence (const std::string& key) const;
   const std::vector<int>& integer_sequence (const std::string& key) const;
   const std::vector<const PLF*>& plf_sequence (const std::string& key) const;
-  const std::vector<AttributeList*>& 
+  const std::vector<const AttributeList*>& 
   /**/ alist_sequence (const std::string& key) const;
 
   // Create and Destroy.
@@ -101,7 +101,7 @@ public:
   void add (const std::string&, const std::vector<symbol>&);
   void add (const std::string&, const std::vector<bool>&);
   void add (const std::string&, const std::vector<int>&);
-  void add (const std::string&, const std::vector<AttributeList*>&);
+  void add (const std::string&, const std::vector<const AttributeList*>&);
   void add (const std::string&, const std::vector<const PLF*>&);
 
   void remove (const std::string&);

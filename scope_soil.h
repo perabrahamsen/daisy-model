@@ -33,6 +33,7 @@ class ScopeSoil : public Scope
 {
   // Content.
 private:
+  static const symbol humus;
   static const symbol h;
   static const symbol Theta;
   static const symbol T;

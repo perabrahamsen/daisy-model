@@ -42,8 +42,6 @@
 
 struct ReactionDenit : public Reaction
 {
-  static const symbol name_NO3;
-
   // Parameters.
   const double K;
   const double K_fast;
@@ -75,12 +73,9 @@ struct ReactionDenit : public Reaction
   bool check (const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const;
-  void initialize (Block& block, const Soil& soil);
+  void initialize (const Soil& soil, Treelog&);
   explicit ReactionDenit (Block& al);
 };
-
-const symbol
-ReactionDenit::name_NO3 ("NO3-");
 
 void
 ReactionDenit::output (Log& log) const
@@ -102,7 +97,7 @@ ReactionDenit::tick (const Geometry& geo,
 {
   const size_t cell_size = geo.cell_size ();
   const std::vector<bool> active = organic_matter.active (); 
-  Chemical& soil_NO3 = chemistry.find (name_NO3);
+  Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
 
   for (size_t i = 0; i < cell_size; i++)
     {
@@ -155,16 +150,14 @@ ReactionDenit::check (const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry& chemistry, Treelog& msg) const
 { 
   bool ok = true;
-  if (!chemistry.know (name_NO3))
-    {
-      msg.error ("'" + name_NO3.name () + "' not traced");
-      ok = false;
-    }
+  if (!chemistry.require (Chemical::NO3 (), msg))
+    ok = false;
+
   return ok;
 }
 
 void
-ReactionDenit::initialize (Block& block, const Soil& soil)
+ReactionDenit::initialize (const Soil& soil, Treelog&)
 {
   const size_t cell_size = soil.size ();
 
@@ -195,11 +188,8 @@ static struct ReactionDenitSyntax
 {
   static Model& make (Block& al)
   { return *new ReactionDenit (al); }
-  ReactionDenitSyntax ()
+  static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
     alist.add ("description", "Denitrification in soil (conversion\n\
 of nitrate to atmospheric nitrogen).  In this model, it is made\n\
 proportional to the CO2 development, as specified by the parameter\n\
@@ -256,9 +246,29 @@ By default, this is identical to the 'water_factor' parameter.");
 Height (a negative number) blow which redox processes start.\n	\
 All NO3 below this height will be denitrified immediately.\n\
 By default no redox denitrification occurs.");
+  }
+  ReactionDenitSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    load_syntax (syntax, alist);
     Librarian::add_type (Reaction::component, "denitrification",
 			 alist, syntax, &make);
   }
 } ReactionDenit_syntax;
+
+const AttributeList& 
+Reaction::denitrification_model ()
+{
+  static AttributeList alist;
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      ReactionDenitSyntax::load_syntax (dummy, alist);
+      alist.add ("type", "denitrification");
+    }
+  return alist;
+
+}
 
 // reaction_denit.C ends here.

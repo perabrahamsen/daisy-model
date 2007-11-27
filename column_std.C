@@ -35,14 +35,13 @@
 #include "bioclimate.h"
 #include "weather.h"
 #include "chemistry.h"
-#include "soil_NH4.h"
-#include "soil_NO3.h"
+#include "chemical.h"
 #include "organic_matter.h"
-#include "denitrification.h"
 #include "im.h"
 #include "am.h"
 #include "dom.h"
 #include "time.h"
+#include "units.h"
 #include "log.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -52,6 +51,10 @@
 
 struct ColumnStandard : public Column
 {
+  static const symbol solute_per_mm_unit;
+  static const symbol field_flux_unit;
+
+
   const std::auto_ptr<Scopesel> scopesel;
   const Scope* extern_scope;
   std::auto_ptr<Movement> movement;
@@ -65,10 +68,7 @@ struct ColumnStandard : public Column
   std::auto_ptr<SoilWater> soil_water;
   std::auto_ptr<SoilHeat> soil_heat;
   std::auto_ptr<Chemistry> chemistry;
-  std::auto_ptr<SoilNH4> soil_NH4;
-  std::auto_ptr<SoilNO3> soil_NO3;
   std::auto_ptr<OrganicMatter> organic_matter;
-  Denitrification denitrification;
   double second_year_utilization_;
 
   // Log variables.
@@ -82,54 +82,28 @@ struct ColumnStandard : public Column
   std::vector<double> residuals_C_soil;
   double seed_N;
   double seed_C;
-  double fertilized_NO3_total;
-  double fertilized_NH4_total;
-  double volatilization_total;
-  double fertilized_NO3_surface;
-  double fertilized_NH4_surface;
-  double volatilization_surface;
-  double fertilized_DM;
+  double applied_DM;
   double first_year_utilization;
 
 public:
-  struct NitLog			// Nitrification log variables.
-  {
-    // Log variables.
-    std::vector<double> NH4;
-    std::vector<double> NO3;
-    std::vector<double> N2O;
-
-    // Simulation.
-    void tick (const std::vector<bool>&, 
-               const Soil& soil, const SoilWater& soil_water,
-               const SoilHeat& soil_heat,
-               SoilNO3& soil_NO3, SoilNH4& soil_NH4, double dt);
-    void output (Log&) const;
-    
-    // Create and Destroy.
-    void initialize (const size_t size);
-    static void load_syntax (Syntax&, AttributeList&);
-    NitLog (const AttributeList&)
-    { }
-    ~NitLog () 
-    { }
-  } nitrification;
-
   const Horizon& horizon_at (double z, double x, double y) const;
 
   // Actions.
   void sow (Metalib&, const AttributeList&,
             const Time&, const double dt, Treelog&);
   void ridge (const AttributeList& al);
-  void irrigate_overhead (double flux, double temp, const IM&, double dt);
-  void irrigate_surface (double flux, double temp, const IM&, double dt);
-  void irrigate_overhead (double flux, const IM&, double dt);
-  void irrigate_surface (double flux, const IM&, double dt);
+  void irrigate_overhead (double flux, double temp, const IM&, double dt,
+			  Treelog& msg);
+  void irrigate_surface (double flux, double temp, const IM&, double dt, 
+			 Treelog& msg);
+  void irrigate_overhead (double flux, const IM&, double dt, Treelog& msg);
+  void irrigate_surface (double flux, const IM&, double dt, Treelog& msg);
   void irrigate_subsoil (double flux, const IM& sm, 
-                         double from, double to, double dt);
-  void fertilize (const IM&, double dt);
-  void fertilize (const AttributeList&, double dt);
-  void fertilize (const AttributeList&, double from, double to, double dt);
+                         double from, double to, double dt, Treelog& msg);
+  void fertilize (const IM&, double dt, Treelog& msg);
+  void fertilize (const AttributeList&, double dt, Treelog& msg);
+  void fertilize (const AttributeList&, double from, double to, double dt,
+		  Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (const symbol crop_name, Treelog& msg);
   void harvest (const Time& time, double dt, const symbol crop_name,
@@ -182,72 +156,11 @@ public:
   ~ColumnStandard ();
 };
 
-void 
-ColumnStandard::NitLog::tick (const std::vector<bool>& active, 
-                              const Soil& soil, const SoilWater& soil_water,
-                              const SoilHeat& soil_heat,
-                              SoilNO3& soil_NO3, SoilNH4& soil_NH4,
-                              const double dt)
-{
-  const size_t cell_size = soil.size ();
-  for (int i = 0; i < cell_size; i++)
-    {
-      daisy_assert (soil_NO3.M_left (i, dt) >= 0.0);
-      daisy_assert (soil_NH4.M_left (i, dt) >= 0.0);
-    }
+const symbol 
+ColumnStandard::solute_per_mm_unit ("g/cm^2/mm");
 
-  daisy_assert (NH4.size () == cell_size);
-  daisy_assert (N2O.size () == cell_size);
-  daisy_assert (NO3.size () == cell_size);
-
-  for (size_t i = 0; i < cell_size; i++)
-    {
-      if (active[i])
-        soil.nitrification (i, 
-                            soil_NH4.M (i), soil_NH4.C (i), 
-                            soil_NH4.M_left (i, dt),
-                            soil_water.h (i), soil_heat.T (i),
-                            NH4[i], N2O[i], NO3[i], dt);
-      else
-        NH4[i] = N2O[i] = NO3[i] = 0.0;        
-    }
-
-  soil_NH4.add_to_sink (NH4, dt);
-  soil_NO3.add_to_source (NO3, dt);
-
-  for (size_t i = 0; i < cell_size; i++)
-    {
-      daisy_assert (soil_NO3.M_left (i, dt) >= 0.0);
-      daisy_assert (soil_NH4.M_left (i, dt) >= 0.0);
-    }
-}
-
-void 
-ColumnStandard::NitLog::output (Log& log) const
-{ 
-  output_variable (NH4, log);
-  output_variable (NO3, log);
-  output_variable (N2O, log);
-}
-    
-void 
-ColumnStandard::NitLog::initialize (const size_t size)
-{
-  NH4 = std::vector<double> (size, 0.0);
-  NO3 = std::vector<double> (size, 0.0);
-  N2O = std::vector<double> (size, 0.0);
-}
-
-void 
-ColumnStandard::NitLog::load_syntax (Syntax& syntax, AttributeList&)
-{
-  syntax.add ("NH4", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
-              "Amount of ammonium consumed this hour.");
-  syntax.add ("NO3", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
-              "Amount of nitrate generated this hour.");
-  syntax.add ("N2O", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
-              "Amount of nitrous oxide generated this hour.");
-}
+const symbol
+ColumnStandard::field_flux_unit ("kg/ha/h");
 
 const Horizon& 
 ColumnStandard::horizon_at (const double z, 
@@ -260,11 +173,6 @@ ColumnStandard::sow (Metalib& metalib, const AttributeList& al,
 { vegetation->sow (metalib, al, geometry, *organic_matter, seed_N, seed_C, 
                    time, dt, msg); }
 
-// We need to convert from mm * mg N / liter to g N/cm^2.
-// mm / liter = 1/m^2 = 1/(100^2 cm^2) = 1/10000 1/cm^2 = 1.0e-4 1/cm^2
-// mg = 1/1000 g = 1.0e-3 g
-// Thus, we need to divide flux * solute with 1.0e-7 to get the surface input.
-static const double irrigate_solute_factor = 1.0e-7;
 
 void 
 ColumnStandard::ridge (const AttributeList& al)
@@ -272,81 +180,67 @@ ColumnStandard::ridge (const AttributeList& al)
 
 void 
 ColumnStandard::irrigate_overhead (const double flux, const double temp,
-                                   const IM& sm, const double dt)
+                                   const IM& sm, const double dt, Treelog& msg)
 {
   daisy_assert (flux >= 0.0);
-  daisy_assert (sm.NH4 >= 0.0);
-  daisy_assert (sm.NO3 >= 0.0);
   bioclimate->irrigate_overhead (flux, temp);
-  fertilize (sm * (flux * irrigate_solute_factor), dt);
+  IM im (solute_per_mm_unit, sm);
+  im *= Scalar (flux * dt, Units::mm ());
+  fertilize (im, dt, msg);
 }
 
 void 
 ColumnStandard::irrigate_surface (const double flux, const double temp, 
-                                  const IM& sm, const double dt)
+                                  const IM& sm, const double dt, Treelog& msg)
 {
   daisy_assert (flux >= 0.0);
-  daisy_assert (sm.NH4 >= 0.0);
-  daisy_assert (sm.NO3 >= 0.0);
   bioclimate->irrigate_surface (flux, temp);
-  fertilize (sm * (flux * irrigate_solute_factor), dt);
+  IM im (solute_per_mm_unit, sm);
+  im *= Scalar (flux * dt, Units::mm ());
+  fertilize (im, dt, msg);
 }
 
 void 
 ColumnStandard::irrigate_overhead (const double flux,
-                                   const IM& sm, const double dt)
+                                   const IM& sm, const double dt, Treelog& msg)
 {
   daisy_assert (flux >= 0.0);
-  daisy_assert (sm.NH4 >= 0.0);
-  daisy_assert (sm.NO3 >= 0.0);
   bioclimate->irrigate_overhead (flux);
-  fertilize (sm * (flux * irrigate_solute_factor), dt);
+  IM im (solute_per_mm_unit, sm);
+  im *= Scalar (flux * dt, Units::mm ());
+  fertilize (im, dt, msg);
 }
 
 void 
 ColumnStandard::irrigate_surface (const double flux, 
-                                  const IM& sm, const double dt)
+                                  const IM& sm, const double dt, Treelog& msg)
 {
   daisy_assert (flux >= 0.0);
-  daisy_assert (sm.NH4 >= 0.0);
-  daisy_assert (sm.NO3 >= 0.0);
   bioclimate->irrigate_surface (flux);
-  fertilize (sm * (flux * irrigate_solute_factor), dt);
+  IM im (solute_per_mm_unit, sm);
+  im *= Scalar (flux * dt, Units::mm ());
+  fertilize (im, dt, msg);
 }
 
 void
 ColumnStandard::irrigate_subsoil (const double flux, const IM& sm, 
                                   const double from, const double to, 
-                                  const double dt)
+                                  const double dt, Treelog& msg)
 {
   soil_water->incorporate (geometry, flux / 10.0 /* mm -> cm */, from, to);
   bioclimate->irrigate_subsoil (flux);
-  const IM im (sm, flux * irrigate_solute_factor);
-  soil_NH4->incorporate (geometry, im.NH4, from, to, 1.0);
-  soil_NO3->incorporate (geometry, im.NO3, from, to, 1.0);
-  // kg/ha -> g/cm^2
-  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
-  fertilized_NO3_total += im.NO3 / conv / dt; 
-  fertilized_NH4_total += im.NH4 / conv / dt;
+  IM im (solute_per_mm_unit, sm);
+  im *= Scalar (flux * dt, Units::mm ());
+  chemistry->incorporate (geometry, im, from, to, dt, msg);
 }
 
 void
-ColumnStandard::fertilize (const IM& im, double dt)
-{
-  // kg/ha -> g/cm^2
-  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
-
-  daisy_assert (im.NH4 >= 0.0);
-  daisy_assert (im.NO3 >= 0.0);
-  surface.fertilize (im);
-  fertilized_NO3_total += im.NO3 / conv / dt; 
-  fertilized_NH4_total += im.NH4 / conv / dt;
-  fertilized_NO3_surface += im.NO3 / conv / dt; 
-  fertilized_NH4_surface += im.NH4 / conv / dt;
-}
+ColumnStandard::fertilize (const IM& im, const double dt, Treelog& msg)
+{ chemistry->spray (im, dt, msg); }
 
 void
-ColumnStandard::fertilize (const AttributeList& al, const double dt)
+ColumnStandard::fertilize (const AttributeList& al, const double dt,
+			   Treelog& msg)
 {
   // Utilization log.
   first_year_utilization += AM::utilized_weight (al);
@@ -354,27 +248,23 @@ ColumnStandard::fertilize (const AttributeList& al, const double dt)
 
   // Volatilization.
   const double lost_NH4 = AM::get_volatilization (al);
-  volatilization_total += lost_NH4 / dt;
-  volatilization_surface += lost_NH4 / dt;
+  chemistry->dissipate (Chemical::NH4_solute (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  fertilize (IM (al), dt);
-  fertilized_NH4_total += lost_NH4 / dt;
-  fertilized_NH4_surface += lost_NH4 / dt;
+  fertilize (AM::get_IM (al), dt, msg);
 
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")
     organic_matter->fertilize (al, geometry, dt);
-  fertilized_DM += AM::get_DM (al) / dt;
+  applied_DM += AM::get_DM (al) / dt;
 }
 
 void 
 ColumnStandard::fertilize (const AttributeList& al, 
-                           const double from, const double to, const double dt)
+                           const double from, const double to, const double dt,
+			   Treelog& msg)
 {
   daisy_assert (to < from);
-  // kg/ha -> g/cm^2
-  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
 
   // Utilization log.
   first_year_utilization += AM::utilized_weight (al);
@@ -382,17 +272,12 @@ ColumnStandard::fertilize (const AttributeList& al,
 
   // Volatilization.
   const double lost_NH4 = AM::get_volatilization (al);
-  volatilization_total += lost_NH4 / dt;
+  chemistry->dissipate (Chemical::NH4_solute (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  IM im (al);
-  daisy_assert (im.NH4 >= 0.0);
-  daisy_assert (im.NO3 >= 0.0);
-  soil_NO3->incorporate (geometry, im.NO3, from, to, dt);
-  soil_NH4->incorporate (geometry, im.NH4, from, to, dt);
-  fertilized_NO3_total += im.NO3 / conv / dt; 
-  fertilized_NH4_total += (im.NH4 / conv + lost_NH4) / dt;
-  fertilized_DM += AM::get_DM (al) / dt;
+  const IM im = AM::get_IM (al);
+  chemistry->incorporate (geometry, im, from, to, dt, msg);
+  applied_DM += AM::get_DM (al) / dt;
 
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")
@@ -470,8 +355,6 @@ ColumnStandard::mix (const double from, const double to,
   soil_heat->set_energy (geometry, *soil, *soil_water, from, to, energy);
   chemistry->mix (geometry, *soil, *soil_water, from, to, dt);
   surface.unridge ();
-  soil_NO3->mix (geometry, *soil, *soil_water, from, to, dt);
-  soil_NH4->mix (geometry, *soil, *soil_water, from, to, dt);
   organic_matter->mix (geometry, *soil, *soil_water, from, to, penetration, 
                        time, dt);
 }
@@ -485,8 +368,6 @@ ColumnStandard::swap (const double from, const double middle, const double to,
   soil_water->swap (geometry, *soil, from, middle, to, dt, msg);
   soil_heat->swap (geometry, from, middle, to);
   chemistry->swap (geometry, *soil, *soil_water, from, middle, to, dt);
-  soil_NO3->swap (geometry, *soil, *soil_water, from, middle, to, dt);
-  soil_NH4->swap (geometry, *soil, *soil_water, from, middle, to, dt);
   organic_matter->swap (geometry, *soil, *soil_water, from, middle, to, 
                         time, dt);
 }
@@ -520,8 +401,10 @@ void
 ColumnStandard::spray (const symbol chemical, 
                        const double amount /* [g/ha] */,
                        const double dt, Treelog& msg)
-{ chemistry->spray (chemical, amount / (100.0 * 100.0 /* ha->m^2 */),
-                    dt, msg); }
+{
+  chemistry->spray (chemical, amount / (100.0 * 100.0 /* ha->m^2 */),
+                    dt, msg); 
+}
 
 void 
 ColumnStandard::set_surface_detention_capacity (double height) // [mm]
@@ -561,9 +444,14 @@ ColumnStandard::soil_water_content (double from, double to) const
 double				// [kg N/ha]
 ColumnStandard::soil_inorganic_nitrogen (double from, double to) const
 {
-  return (soil_NH4->total_surface (geometry, from, to) 
-	  + soil_NO3->total_surface (geometry, from, to))
-    * 1.0e5; // g N/cm^2 -> kg N/ha
+  double N = 0.0;
+  if (chemistry->know (Chemical::NH4_solute ()))
+    N += chemistry->find (Chemical::NH4_solute ())
+      /**/ .total_surface (geometry, from, to);
+  if (chemistry->know (Chemical::NO3 ()))
+    N += chemistry->find (Chemical::NO3 ())
+      /**/ .total_surface (geometry, from, to);
+  return N * 1.0e5; // g N/cm^2 -> kg N/ha
 }  
 
 double				// [kg N/ha]
@@ -602,21 +490,12 @@ ColumnStandard::clear ()
   fill (residuals_N_soil.begin (), residuals_N_soil.end (), 0.0);
   fill (residuals_C_soil.begin (), residuals_C_soil.end (), 0.0);
 
-  soil_NO3->clear ();
-  soil_NH4->clear ();
-  
   organic_matter->clear ();
 
   seed_N = 0.0;
   seed_C = 0.0;
-  fertilized_NO3_total = 0.0;
-  fertilized_NH4_total = 0.0;
-  fertilized_NO3_surface = 0.0;
-  fertilized_NH4_surface = 0.0;
-  fertilized_DM = 0.0;
+  applied_DM = 0.0;
   first_year_utilization = 0.0;
-  volatilization_total = 0.0;
-  volatilization_surface = 0.0;
 }
 
 void
@@ -634,41 +513,24 @@ ColumnStandard::tick (const Time& time, const double dt,
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
 
   // Early calculation.
-  IM soil_top_conc;
-  soil_top_conc.NO3 
-    = geometry.content_at (static_cast<const Solute&> (*soil_NO3),
-                            &Solute::C, 0.0)
-    / 10.0; // [g/cm^3] -> [g/cm^2/mm]
-  soil_top_conc.NH4 
-    = geometry.content_at (static_cast<const Solute&> (*soil_NH4),
-                            &Solute::C, 0.0) 
-    / 10.0; // [g/cm^3] -> [g/cm^2/mm]
-  surface.mixture (soil_top_conc, dt);
   movement->macro_tick (*soil, *soil_water, surface, dt, msg);
   bioclimate->tick (time, surface, my_weather, 
                     *vegetation, *movement,
-                    geometry, *soil, *soil_water, *soil_heat, 
+                    geometry, *soil, *soil_water, *soil_heat, *chemistry,
                     dt, msg);
   vegetation->tick (time, my_weather.relative_humidity (), my_weather.CO2 (),
                     *bioclimate, geometry, *soil, 
 		    *organic_matter,
-                    *soil_heat, *soil_water, *soil_NH4, *soil_NO3, 
+                    *soil_heat, *soil_water, *chemistry,
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, dt, msg);
   chemistry->tick_top (bioclimate->snow_leak_rate (dt), vegetation->cover (),
                        bioclimate->canopy_leak_rate (dt), 
-                       surface.runoff_rate (dt), dt);
+                       surface.runoff_rate (dt), dt, msg);
 
   // Turnover.
   organic_matter->tick (geometry, *soil_water, *soil_heat, 
-                        *soil_NO3, *soil_NH4, dt, msg);
-  const std::vector<bool> active = organic_matter-> active (); 
-  nitrification.tick (active, *soil, *soil_water, *soil_heat,
-                      *soil_NO3, *soil_NH4, dt);
-  denitrification.tick (active, 
-                        geometry, *soil, *soil_water, *soil_heat, *soil_NO3, 
-			*organic_matter, dt);
-
+                        *chemistry, dt, msg);
   
   // Transport.
   groundwater->tick (geometry, *soil, *soil_water, 
@@ -682,31 +544,19 @@ ColumnStandard::tick (const Time& time, const double dt,
   chemistry->tick_soil (geometry, 
                         surface.ponding (), surface.mixing_resistance (),
                         *soil, *soil_water, *soil_heat, 
-                        *movement, *organic_matter, 
+                        *movement, *organic_matter, *chemistry,
 			flux_below, dt, scope, msg);
-  organic_matter->transport (*soil, *soil_water, msg);
+  organic_matter->transport (*soil, *soil_water, *soil_heat, msg);
   const std::vector<DOM*>& dom = organic_matter->fetch_dom ();
   for (size_t i = 0; i < dom.size (); i++)
     {
       movement->element (*soil, *soil_water, dom[i]->C, 
-                         *dom[i]->adsorption, dom[i]->diffusion_coefficient, 
+                         dom[i]->diffusion_coefficient, 
                          dt, msg);
       movement->element (*soil, *soil_water, dom[i]->N, 
-                         *dom[i]->adsorption, dom[i]->diffusion_coefficient, 
+                         dom[i]->diffusion_coefficient, 
                          dt, msg);
     }
-  {
-    Treelog::Open nest (msg, "soil_NO3");
-    movement->solute (*soil, *soil_water, 
-                      surface.matter_flux ().NO3, *soil_NO3, 
-		      flux_below, dt, scope, msg);
-  }
-  {
-    Treelog::Open nest (msg, "soil_NH4");
-    movement->solute (*soil, *soil_water,
-                      surface.matter_flux ().NH4, *soil_NH4,
-		      flux_below, dt, scope, msg);
-  }
   
   // Once a month we clean up old AM from organic matter.
   if (time.hour () == 13 && time.mday () == 13)
@@ -765,7 +615,8 @@ ColumnStandard::check (bool require_weather,
   }
   {
     Treelog::Open nest (msg, "Chemistry");
-    if (!chemistry->check (*soil, *soil_water, *soil_heat, scope, msg))
+    if (!chemistry->check (*soil, *soil_water, *soil_heat, *chemistry,
+			   scope, msg))
       ok = false;
   }
   {
@@ -773,17 +624,7 @@ ColumnStandard::check (bool require_weather,
     if (!soil->check (organic_matter->som_pools (), geometry, msg))
       ok = false;
   }
-  {
-    Treelog::Open nest (msg, "SoilNO3");
-    if (!soil_NO3->check (n, scope, msg))
-      ok = false;
-  }
-  {
-    Treelog::Open nest (msg, "SoilNH4");
-    if (!soil_NH4->check (n, scope, msg))
-      ok = false;
-  }
-  if (!organic_matter->check (*soil, *chemistry, msg))
+  if (!organic_matter->check (*soil, *soil_water, *soil_heat, *chemistry, msg))
     ok = false;
   return ok;
 }
@@ -849,22 +690,12 @@ ColumnStandard::output (Log& log) const
   output_submodule (*soil_heat, "SoilHeat", log);
   output_derived (chemistry, "Chemistry", log);
   output_derived (vegetation, "Vegetation", log);
-  output_submodule (*soil_NH4, "SoilNH4", log);
-  output_submodule (*soil_NO3, "SoilNO3", log);
   output_derived (organic_matter, "OrganicMatter", log);
-  output_submodule (denitrification, "Denitrification", log);
   output_value (second_year_utilization_, "second_year_utilization", log);
   output_variable (seed_N, log);
   output_variable (seed_C, log);
-  output_value (fertilized_NO3_total, "fertilized_NO3", log);
-  output_value (fertilized_NH4_total, "fertilized_NH4", log);
-  output_variable (fertilized_NO3_surface, log);
-  output_variable (fertilized_NH4_surface, log);
-  output_value (volatilization_total, "volatilization", log);
-  output_variable (volatilization_surface, log);
-  output_variable (fertilized_DM, log);
+  output_variable (applied_DM, log);
   output_variable (first_year_utilization, log);
-  output_submodule (nitrification, "Nitrification", log);
   output_value (harvest_DM, "harvest_DM", log);
   output_value (harvest_N, "harvest_N", log);
   output_value (harvest_C, "harvest_C", log);
@@ -905,11 +736,8 @@ ColumnStandard::ColumnStandard (Block& al)
     soil_water (submodel<SoilWater> (al, "SoilWater")),
     soil_heat (submodel<SoilHeat> (al, "SoilHeat")),
     chemistry (Librarian::build_item<Chemistry> (al, "Chemistry")),
-    soil_NH4 (submodel<SoilNH4> (al, "SoilNH4")),
-    soil_NO3 (submodel<SoilNO3> (al, "SoilNO3")),
     organic_matter (Librarian::build_item<OrganicMatter> 
                     (al, "OrganicMatter")),
-    denitrification (al.alist ("Denitrification")),
     second_year_utilization_ (al.number ("second_year_utilization")),
     harvest_DM (0.0),
     harvest_N (0.0),
@@ -919,15 +747,8 @@ ColumnStandard::ColumnStandard (Block& al)
     residuals_C_top (0.0),
     seed_N (0.0),
     seed_C (0.0),
-    fertilized_NO3_total (0.0),
-    fertilized_NH4_total (0.0),
-    volatilization_total (0.0),
-    fertilized_NO3_surface (0.0),
-    fertilized_NH4_surface (0.0),
-    volatilization_surface (0.0),
-    fertilized_DM (0.0),
-    first_year_utilization (0.0),
-    nitrification (al.alist ("Nitrification"))
+    applied_DM (0.0),
+    first_year_utilization (0.0)
 { }
 
 void 
@@ -967,16 +788,6 @@ ColumnStandard::initialize (Block& block,
       movement->initialize (block, al, *soil, *groundwater);
     }
 
-  // Solutes depends on water.
-  chemistry->initialize (block, alist.alist ("Chemistry"),
-                         geometry, *soil, *soil_water, *soil_heat, msg);
-  soil_NH4->initialize (alist.alist ("SoilNH4"),
-                        geometry, *soil, *soil_water, *soil_heat, msg);
-  soil_NO3->initialize (alist.alist ("SoilNO3"), 
-                        geometry, *soil, *soil_water, *soil_heat, msg);
-  nitrification.initialize (soil->size ());
-  denitrification.initialize (soil->size ());
-
   // Bioclimate and heat depends on weather.
   if (weather.get () && !weather->initialize (time, msg))
     return;
@@ -986,10 +797,15 @@ ColumnStandard::initialize (Block& block,
   bioclimate->initialize (block, my_weather);
   soil_heat->initialize (alist.alist ("SoilHeat"), geometry, 
                          movement->default_heat (*soil, time, my_weather), msg);
+  
+  // Solutes depends on water and heat.
+  chemistry->initialize (alist.alist ("Chemistry"),
+                         geometry, *soil, *soil_water, *soil_heat, msg);
+
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
-  organic_matter->initialize (block, alist.alist ("OrganicMatter"), 
-                              geometry, *soil, *soil_water, T_avg);
+  organic_matter->initialize (alist.alist ("OrganicMatter"), 
+                              geometry, *soil, *soil_water, T_avg, msg);
   vegetation->initialize (time, geometry, *soil, *organic_matter, msg);
   
   // Soil conductivity and capacity logs.
@@ -1051,8 +867,8 @@ the simulation.  If unspecified, used global weather.");
                        "The crops on the field.");
     AttributeList vegetation_alist;
     vegetation_alist.add ("type", "crops");
-    vegetation_alist.add ("crops", std::vector<AttributeList*> ());
-    vegetation_alist.add ("ForcedLAI", std::vector<AttributeList*> ());
+    vegetation_alist.add ("crops", std::vector<const AttributeList*> ());
+    vegetation_alist.add ("ForcedLAI", std::vector<const AttributeList*> ());
     vegetation_alist.add ("EpInterchange", 0.6);
     alist.add ("Vegetation", vegetation_alist);
 
@@ -1099,19 +915,10 @@ This includes loss as harvest, as well as loss of old roots.");
     syntax.add ("surface_water", "mm", Syntax::LogOnly, 
                 "Amount of water in the system above ground.\n\
 This include ponded water, intercepted water and the snow pack.");
-    syntax.add_submodule ("SoilNH4", alist, Syntax::State,
-			  "Ammonium content in soil.",
-			  SoilNH4::load_syntax);
-    syntax.add_submodule ("SoilNO3", alist, Syntax::State,
-			  "Nitrate content in soil.",
-			  SoilNO3::load_syntax);
     syntax.add_object ("OrganicMatter", OrganicMatter::component,
                        Syntax::State, Syntax::Singleton, "\
 The organic matter in the soil and on the surface.");
     alist.add ("OrganicMatter", OrganicMatter::default_model ());
-    syntax.add_submodule ("Denitrification", alist, Syntax::State, "\
-The denitrification process.",
-			  Denitrification::load_syntax);
     syntax.add ("second_year_utilization", "kg N/ha", Syntax::State,
 		"Estimated accumulated second year fertilizer effect.");
     alist.add ("second_year_utilization", 0.0);
@@ -1119,33 +926,11 @@ The denitrification process.",
 		"Amount of nitrogen in seed applied this time step.");
     syntax.add ("seed_C", "kg C/ha/h", Syntax::LogOnly,
 		"Amount of carbon in seed applied this time step.");
-    syntax.add ("fertilized_NO3", "kg N/ha/h", Syntax::LogOnly,
-		"Amount of nitrate applied this time step.\n\
-This does include nitrate incorporated in the soil.");
-    syntax.add ("fertilized_NH4", "kg N/ha/h", Syntax::LogOnly,
-		"Amount of ammonium applied this time step.\n\
-This includes both ammonium lost due to volatilization, and ammonium\n\
-incorporated in the soil.");
-    syntax.add ("fertilized_NO3_surface", "kg N/ha/h", Syntax::LogOnly,
-		"Amount of nitrate applied to surface this time step.\n\
-This does not include nitrate incorporated in the soil.");
-    syntax.add ("fertilized_NH4_surface", "kg N/ha/h", Syntax::LogOnly,
-		"Amount of ammonium applied to surface this time step.\n\
-This includes ammonium lost due to volatilization, but not ammonium\n\
-incorporated in the soil.");
-    syntax.add ("fertilized_DM", "ton DM/ha/h", Syntax::LogOnly,
+    syntax.add ("applied_DM", "ton DM/ha/h", Syntax::LogOnly,
 		"Amount of dry matter applied this time step.\n\
 This includes dry matter incorporated directly in the soil.");
     syntax.add ("first_year_utilization", "kg N/ha/h", Syntax::LogOnly,
 		"Estimated first year fertilizer effect.");
-    syntax.add ("volatilization", "kg N/ha/h", Syntax::LogOnly, "\
-Amount of NH4 volatilization, also from incorporated fertilizer.");
-    syntax.add ("volatilization_surface", "kg N/ha/h", Syntax::LogOnly, "\
-Amount of NH4 volatilization, only from surface applied fertilizer.");
-    syntax.add_submodule ("Nitrification", alist, Syntax::State, "\
-The nitrification log.\n\
-Note that the nitrification parameters are found in the horizons.",
-			  ColumnStandard::NitLog::load_syntax);
     
     Librarian::add_type (Column::component, "default", alist, syntax, &make);
   }

@@ -120,7 +120,7 @@ struct NumberGet : public NumberLeaf
     bool ok = true;
     if (!scope.is_number (name))
       {
-        err.error ("'" + name + "' not in scope");
+        err.error ("'" + name + "' not found in scope");
         ok = false;
       }
     return ok;

@@ -38,8 +38,6 @@ class Soil;
 class SoilWater;
 class SoilHeat;
 class Chemistry;
-class SoilNO3;
-class SoilNH4;
 class Time;
 class Treelog;
 class Block;
@@ -58,8 +56,9 @@ public:
   virtual const std::vector<bool>& active () const = 0;
   virtual void tick (const Geometry& geo,
 		     const SoilWater&, const SoilHeat&, 
-		     SoilNO3&, SoilNH4&, double dt, Treelog& msg) = 0;
-  virtual void transport (const Soil&, const SoilWater&, Treelog&) = 0;
+		     Chemistry&, double dt, Treelog& msg) = 0;
+  virtual void transport (const Soil&, const SoilWater&, const SoilHeat&,
+			  Treelog&) = 0;
   virtual const std::vector<DOM*>& fetch_dom () const = 0;
   virtual void output (Log&) const = 0;
   virtual double CO2 (size_t i) const = 0;	// [g C/cm³]
@@ -76,7 +75,8 @@ public:
 
   // Create and Destroy.
   virtual int som_pools () const = 0;
-  virtual bool check (const Soil&, const Chemistry&, Treelog&) const = 0;
+  virtual bool check (const Soil&, const SoilWater&, const SoilHeat&,
+		      const Chemistry&, Treelog&) const = 0;
   virtual bool check_am (const AttributeList& am, Treelog& err) const = 0;
   virtual void add (AM&) = 0;
   virtual void fertilize (const AttributeList&, const Geometry&, 
@@ -85,9 +85,9 @@ public:
                           double from, double to, double dt) = 0;
   virtual AM* find_am (symbol sort, symbol part) const = 0;
 public:
-  virtual void initialize (Block&, const AttributeList&, const Geometry& geo,
+  virtual void initialize (const AttributeList&, const Geometry& geo,
                            const Soil&, const SoilWater&, 
-                           double T_avg) = 0;
+                           double T_avg, Treelog&) = 0;
   static const AttributeList& default_model ();
 private:
   OrganicMatter ();

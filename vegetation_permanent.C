@@ -56,7 +56,7 @@ struct VegetationPermanent : public Vegetation
     
     // Create;
     static void load_syntax (Syntax&, AttributeList&);
-    YearlyLAI (const vector<AttributeList*>& als);
+    YearlyLAI (const vector<const AttributeList*>& als);
   } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
   CanopySimple canopy;
@@ -71,7 +71,7 @@ struct VegetationPermanent : public Vegetation
   AM* AM_litter;                // Dead plant matter.
   double N_uptake;		// N uptake this hour. [g N/m^2/h]
   double N_litter;		// N litter this hour. [g N/m^2/h]
-  const vector<AttributeList*>& litter_am; // Litter AM parameters.
+  const vector<const AttributeList*>& litter_am; // Litter AM parameters.
   // Root.
   std::auto_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
@@ -139,7 +139,7 @@ struct VegetationPermanent : public Vegetation
 	     OrganicMatter& organic_matter,
 	     const SoilHeat& soil_heat,
 	     const SoilWater& soil_water,
-	     Solute& soil_NH4, Solute& soil_NO3,
+	     Chemistry&,
 	     double& residuals_DM,
 	     double& residuals_N_top, double& residuals_C_top,
 	     vector<double>& residuals_N_soil,
@@ -223,7 +223,7 @@ whenever 'LAIvsDAY' becomes negative.");
   syntax.order ("year", "LAIvsDAY");
 }
 
-VegetationPermanent::YearlyLAI::YearlyLAI (const vector<AttributeList*>& als)
+VegetationPermanent::YearlyLAI::YearlyLAI (const vector<const AttributeList*>& als)
 {
   for (unsigned int i = 0; i < als.size (); i++)
     {
@@ -254,8 +254,7 @@ VegetationPermanent::tick (const Time& time, const double, const double,
 			   OrganicMatter& organic_matter,
 			   const SoilHeat&,
 			   const SoilWater& soil_water,
-			   Solute& soil_NH4,
-			   Solute& soil_NO3,
+			   Chemistry& chemistry,
 			   double& residuals_DM,
 			   double& residuals_N_top, double& residuals_C_top,
 			   vector<double>& /* residuals_N_soil */,
@@ -274,7 +273,7 @@ VegetationPermanent::tick (const Time& time, const double, const double,
   else
     daisy_assert (N_actual >= 0.0);
   N_uptake = root_system->nitrogen_uptake (geo, soil, soil_water, 
-                                           soil_NH4, 0.0, soil_NO3, 0.0,
+                                           chemistry, 0.0, 0.0,
                                            N_demand - N_actual, dt);
   
   if (canopy.CAI < old_LAI)
@@ -402,7 +401,7 @@ VegetationPermanentSyntax
 These numbers are used when there are no yearly numbers (YearlyLAI).");
     syntax.add_submodule_sequence("YearlyLAI", Syntax::Const, "\
 Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
-    alist.add ("YearlyLAI", vector<AttributeList*> ());
+    alist.add ("YearlyLAI", vector<const AttributeList*> ());
 
 
     syntax.add_submodule("Canopy", alist, Syntax::State, "Canopy.",

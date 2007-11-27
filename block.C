@@ -483,7 +483,7 @@ Block::plf_sequence (const std::string& key) const
   return impl->find_alist (var).plf_sequence (var); 
 }
 
-const std::vector<AttributeList*>& 
+const std::vector<const AttributeList*>& 
 Block::alist_sequence (const std::string& key) const
 { 
   if (!impl->alist.is_reference (key))

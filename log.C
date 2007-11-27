@@ -56,11 +56,12 @@ Log::check_entry (symbol name, const char *const component) const
   bool looking = true;
   const Library& library = metalib ().library (symbol (component));
 
+  // TODO: We should have check_interior use Library::ancestors for speed.
   while (looking && !check_interior (name))
     {
       if (library.check (name))
 	{
-	  const AttributeList alist (library.lookup (name));
+	  const AttributeList& alist = library.lookup (name);
 	  if (alist.check ("type"))
 	    name = alist.identifier ("type");
 	  else

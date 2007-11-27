@@ -28,7 +28,7 @@
 const char *const Domsorp::component = "domsorp";
 
 void
-Domsorp::initialize (Block&, const Soil&)
+Domsorp::initialize (const Soil&, Treelog&)
 { }
 
 void

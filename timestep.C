@@ -72,7 +72,8 @@ Timestep::total_hours () const
 }
 
 void
-Timestep::GenCheck::check (const Syntax& syntax, 
+Timestep::GenCheck::check (const Metalib&,
+			   const Syntax& syntax, 
                            const AttributeList& alist, 
                            const std::string& key) const throw (std::string)
 { 

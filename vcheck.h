@@ -22,10 +22,12 @@
 #ifndef VCHECK_H
 #define VCHECK_H
 
+#include "symbol.h"
 #include <string>
 #include <vector>
 #include <set>
 
+class Metalib;
 class AttributeList;
 class Syntax;
 class PLF;
@@ -34,7 +36,7 @@ class VCheck
 { 
   // Use.
 public:
-  virtual void check (const Syntax&, const AttributeList&,
+  virtual void check (const Metalib&, const Syntax&, const AttributeList&,
                       const std::string& key) const throw (std::string) = 0;
 
   // Integer or Integer sequence.
@@ -72,6 +74,7 @@ public:
   class Compatible;
   static const VCheck& fraction ();
   class Enum;
+  class InLibrary;
 
   // Sequence.
 public:
@@ -101,7 +104,7 @@ private:
   // Use.
 private:
   void validate (int value) const throw (std::string);
-  void check (const Syntax&, const AttributeList&,
+  void check (const Metalib&, const Syntax&, const AttributeList&,
               const std::string& key) const throw (std::string);
 
   // Create and Destroy.
@@ -119,7 +122,7 @@ private:
 private:
   void validate (double value) const throw (std::string);
   void validate (const PLF& value) const throw (std::string);
-  void check (const Syntax&, const AttributeList&,
+  void check (const Metalib&, const Syntax&, const AttributeList&,
               const std::string& key) const throw (std::string);
 
   // Create and Destroy.
@@ -137,7 +140,7 @@ private:
 private:
   void validate (double value) const throw (std::string);
   void validate (const PLF& value) const throw (std::string);
-  void check (const Syntax&, const AttributeList&,
+  void check (const Metalib&, const Syntax&, const AttributeList&,
               const std::string& key) const throw (std::string);
 
   // Create and Destroy.
@@ -155,7 +158,7 @@ private:
 private:
   void validate (double value) const throw (std::string);
   void validate (const PLF& value) const throw (std::string);
-  void check (const Syntax&, const AttributeList&,
+  void check (const Metalib&, const Syntax&, const AttributeList&,
               const std::string& key) const throw (std::string);
 
   // Create and Destroy.
@@ -173,7 +176,7 @@ private:
   // Use.
 private:
   void validate (const PLF& value) const throw (std::string);
-  void check (const Syntax&, const AttributeList&,
+  void check (const Metalib&, const Syntax&, const AttributeList&,
               const std::string& key) const throw (std::string);
 
   // Create and Destroy.
@@ -189,7 +192,7 @@ private:
 
   // Use.
 private:
-  void check (const Syntax&, const AttributeList&,
+  void check (const Metalib&, const Syntax&, const AttributeList&,
               const std::string& key) const throw (std::string);
 
   // Create and Destroy.
@@ -203,7 +206,7 @@ class VCheck::String : public VCheck
 private:
   virtual void validate (const std::string& value) 
     const throw (std::string) = 0;
-  void check (const Syntax&, const AttributeList&,
+  void check (const Metalib&, const Syntax&, const AttributeList&,
               const std::string& key) const throw (std::string);
 };
 
@@ -248,6 +251,23 @@ public:
         const std::string& d, const std::string& e, const std::string& f);
 };
 
+class VCheck::InLibrary : public VCheck
+{
+  // Parameters.
+private:
+  const symbol lib_name;
+
+  // Use.
+private:
+  void check (const Metalib&, const Syntax&, const AttributeList&,
+              const std::string& key) const throw (std::string);
+  void validate (const Metalib&, const symbol value) const throw (std::string);
+
+  // Create and Destroy.
+public:
+  InLibrary (const symbol lib);
+};
+
 class VCheck::All : public VCheck
 {
   // Parameters.
@@ -256,7 +276,7 @@ private:
 
   // Use.
 private:
-  void check (const Syntax&, const AttributeList&,
+  void check (const Metalib&, const Syntax&, const AttributeList&,
               const std::string& key) const throw (std::string);
 
   // Create and Destroy.

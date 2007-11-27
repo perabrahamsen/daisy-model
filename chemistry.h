@@ -24,6 +24,8 @@
 
 #include "model.h"
 #include "symbol.h"
+#include "alist.h"
+#include <vector>
 
 class Log;
 class Geometry;
@@ -34,29 +36,47 @@ class OrganicMatter;
 class Movement;
 class Chemical;
 class Treelog;
-class AttributeList;
+class Syntax;
 class Block;
 class Scope;
+class IM;
 
 class Chemistry : public Model
 {
   // Content.
 public:
   const symbol name;
+  const AttributeList alist;
   static const char *const component;
 
   // Query.
+public:
+  bool require (const symbol chem, Treelog&) const;
   virtual bool know (symbol chem) const = 0;
   virtual Chemical& find (symbol chem) = 0;
+  virtual const std::vector<Chemical*>& all () const = 0;
 
-  // Management.
 public:
-  virtual void spray (symbol chem, double amount, double dt, Treelog&) = 0;
+  void deposit (const IM& im, double dt /* [h] */, Treelog&);
+  virtual void deposit (symbol chem, double amount /* [g/m^2] */,
+			double dt /* [h] */, Treelog&) = 0;
+  void spray (const IM& im, double dt /* [h] */, Treelog&);
+  virtual void spray (symbol chem, double amount /* [g/m^2] */,
+		      double dt /* [h] */, Treelog&) = 0;
+  virtual void dissipate (symbol chem, double amount /* [g/m^2] */,
+			  double dt /* [h] */, Treelog&) = 0;
   virtual void harvest (double removed, double surface, double dt) = 0;
   virtual void mix (const Geometry&, const Soil&, const SoilWater&, 
                     double from, double to, double dt) = 0;
   virtual void swap (const Geometry&, const Soil&, const SoilWater&,
                      double from, double middle, double to, double dt) = 0;
+  void incorporate (const Geometry& geo, const IM& im, 
+		    const double from, const double to,
+		    const double dt, Treelog& msg);
+  virtual void incorporate (const Geometry& geo,
+			    const symbol chem, const double amount,
+			    const double from, const double to, 
+			    const double dt, Treelog& msg) = 0;
 
   // Simulation.
 public:
@@ -64,24 +84,27 @@ public:
                          double cover /* [] */,
                          double canopy_leak_rate /* [h^-1] */,
                          double surface_runoff_rate /* [h^-1] */,
-                         double dt /* [h] */) = 0;
+                         double dt /* [h] */,
+			 Treelog&) = 0;
   virtual void tick_soil (const Geometry& geo, double ponding /* [mm] */,
                           double R_mixing /* [h/mm] */,
                           const Soil&, const SoilWater&, const SoilHeat&, 
-                          Movement&, const OrganicMatter&,
+			  Movement&, const OrganicMatter&, Chemistry&, 
 			  const bool flux_below, 
                           double dt, const Scope&, Treelog&) = 0;
   virtual void clear () = 0;
-  virtual void output (Log&) const = 0;
+  virtual void output (Log&) const;
 
   // Create & Destroy.
 public:
   static const AttributeList& default_model ();
-  virtual void initialize (Block&, const AttributeList&, const Geometry& geo,
+  static const AttributeList& N_model ();
+  virtual void initialize (const AttributeList&, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
 			   Treelog&) = 0;
   virtual bool check (const Soil&, const SoilWater&, const SoilHeat&,
-		      const Scope&, Treelog&) const = 0;
+		      const Chemistry&, const Scope&, Treelog&) const = 0;
+  static void load_syntax (Syntax&, AttributeList&);
 protected:
   explicit Chemistry (Block& al);
 public:

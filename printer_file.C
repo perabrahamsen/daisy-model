@@ -293,7 +293,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	  {
 	    const AttributeList& other = syntax.default_alist (key);
 	    const Syntax& nested = syntax.syntax (key);
-	    const std::vector<AttributeList*>& value = alist.alist_sequence (key);
+	    const std::vector<const AttributeList*>& value = alist.alist_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
@@ -360,7 +360,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	case Syntax::Object:
 	  {
 	    const Library& library = syntax.library (metalib, key);
-	    const std::vector<AttributeList*>& value = alist.alist_sequence (key);
+	    const std::vector<const AttributeList*>& value = alist.alist_sequence (key);
 
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {

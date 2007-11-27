@@ -143,7 +143,8 @@ The special name 'screen' indicate that the data should be shown on\n\
 the screen instead of being stored in a file.");
   static struct CheckWhere : public VCheck
   {
-    void check (const Syntax& syntax, const AttributeList& alist, 
+    void check (const Metalib&,
+		const Syntax& syntax, const AttributeList& alist, 
                 const std::string& key) const throw (std::string)
     {
       daisy_assert (key == "where");
@@ -186,7 +187,8 @@ a line conncting two datapoints, one of them outside the graph, may\n\
 cross the legend.");
   static struct CheckLegend : public VCheck
   {
-    void check (const Syntax& syntax, const AttributeList& alist, 
+    void check (const Metalib&,
+		const Syntax& syntax, const AttributeList& alist, 
                 const std::string& key) const throw (std::string)
     {
       daisy_assert (key == "legend");

@@ -54,7 +54,7 @@ struct VegetationCrops : public Vegetation
     
     // Create;
     static void load_syntax (Syntax&, AttributeList&);
-    ForcedLAI (const std::vector<AttributeList*>& als);
+    ForcedLAI (const std::vector<const AttributeList*>& als);
   } forced_LAI;
 
   // Canopy structure.
@@ -129,7 +129,7 @@ struct VegetationCrops : public Vegetation
 	     OrganicMatter& organic_matter,
 	     const SoilHeat& soil_heat,
 	     const SoilWater& soil_water,
-	     Solute& soil_NH4, Solute& soil_NO3, 
+	     Chemistry&, 
 	     double& residuals_DM,
 	     double& residuals_N_top, double& residuals_C_top,
 	     std::vector<double>& residuals_N_soil,
@@ -217,7 +217,7 @@ whenever 'LAIvsDAY' becomes negative.");
   syntax.order ("year", "LAIvsDAY");
 }
 
-VegetationCrops::ForcedLAI::ForcedLAI (const std::vector<AttributeList*>& als)
+VegetationCrops::ForcedLAI::ForcedLAI (const std::vector<const AttributeList*>& als)
 {
   for (unsigned int i = 0; i < als.size (); i++)
     {
@@ -324,7 +324,7 @@ VegetationCrops::tick (const Time& time, const double relative_humidity,
 		       OrganicMatter& organic_matter,
 		       const SoilHeat& soil_heat,
 		       const SoilWater& soil_water,
-		       Solute& soil_NH4, Solute& soil_NO3,
+		       Chemistry& chemistry,
 		       double& residuals_DM,
 		       double& residuals_N_top, double& residuals_C_top,
 		       std::vector<double>& residuals_N_soil,
@@ -362,7 +362,7 @@ VegetationCrops::tick (const Time& time, const double relative_humidity,
       // Tick.
       (*crop)->tick (time, relative_humidity, CO2_atm, 
                      bioclimate, geo, soil, organic_matter, 
-		     soil_heat, soil_water, soil_NH4, soil_NO3, 
+		     soil_heat, soil_water, chemistry, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
 		     residuals_N_soil, residuals_C_soil, my_force, dt, msg);
     }
@@ -763,11 +763,11 @@ field, and want to force the model to confirm to the measurements.  \n\
 'ForcedDAY' will not affect the LAI for crops that have not yet\n\
 emerged.  If no crops have emerged on the field, it will be ignored.",
 				  VegetationCrops::ForcedLAI::load_syntax);
-    alist.add ("ForcedLAI", std::vector<AttributeList*> ());
+    alist.add ("ForcedLAI", std::vector<const AttributeList*> ());
     syntax.add_object ("crops", Crop::component, 
                        Syntax::State, Syntax::Sequence,
                        "List of crops growing in the field");
-    alist.add ("crops", std::vector<AttributeList*> ());
+    alist.add ("crops", std::vector<const AttributeList*> ());
     Librarian::add_type (Vegetation::component, "crops", alist, syntax, &make);
   }
 } VegetationCrops_syntax;

@@ -40,9 +40,9 @@ struct OrganicNone : public OrganicMatter
   { return active_; }
   void tick (const Geometry&,
              const SoilWater&, const SoilHeat&, 
-	     SoilNO3&, SoilNH4&, double, Treelog&)
+	     Chemistry&, double, Treelog&)
   { }
-  void transport (const Soil&, const SoilWater&, Treelog&)
+  void transport (const Soil&, const SoilWater&, const SoilHeat&, Treelog&)
   { }
   const std::vector<DOM*>& fetch_dom () const
   { 
@@ -69,7 +69,8 @@ struct OrganicNone : public OrganicMatter
   // Create and Destroy.
   int som_pools () const
   { return 3; }
-  bool check (const Soil&, const Chemistry&, Treelog&) const
+  bool check (const Soil&, const SoilWater&, const SoilHeat&,
+	      const Chemistry&, Treelog&) const
   { return true; }
   bool check_am (const AttributeList&, Treelog&) const
   { return true; }
@@ -82,8 +83,8 @@ struct OrganicNone : public OrganicMatter
   { }
   AM* find_am (symbol, symbol) const
   { return NULL; }
-  void initialize (Block&, const AttributeList&, const Geometry& geo,
-                   const Soil&, const SoilWater&, double)
+  void initialize (const AttributeList&, const Geometry& geo,
+                   const Soil&, const SoilWater&, double, Treelog&)
   { active_.insert (active_.end (), geo.cell_size (), false); }
   explicit OrganicNone (Block& al)
     : OrganicMatter (al)

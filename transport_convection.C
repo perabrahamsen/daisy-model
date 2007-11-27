@@ -26,7 +26,6 @@
 #include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -40,7 +39,7 @@ struct TransportConvection : public Transport
 
   // Simulation.
   void tick (Treelog&, const Geometry1D& geo,
-             const Soil&, const SoilWater&, const Adsorption&,
+             const Soil&, const SoilWater&, 
 	     double diffusion_coefficient,
 	     std::vector<double>& M, 
 	     std::vector<double>& C,
@@ -61,7 +60,7 @@ void
 TransportConvection::tick (Treelog& msg, 
 			   const Geometry1D& geo,
                            const Soil& soil, const SoilWater& soil_water,
-			   const Adsorption& adsorption, double,
+			   double,
 			   std::vector<double>& M, 
 			   std::vector<double>& C,
 			   const std::vector<double>& S,
@@ -147,7 +146,7 @@ TransportConvection::tick (Treelog& msg,
 	{
 	  J[i] += dJ[i] * ddt;
 	  M[i] += (-dJ[i] + dJ[i+1]) * ddt / geo.dz (i) + S[i] * ddt;
-	  C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
+	  C[i] = M[i] / soil_water.Theta (i);
 	}
       J[size] += dJ[size] * ddt;
     }

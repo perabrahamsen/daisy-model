@@ -73,7 +73,7 @@ The meaning depends on the number of point in the sequence.\n\
 1 point: The column has a location, but no specific area.\n\
 3 or more points: The column represents the area specified by a\n\
 polygon with the specified corner points.", Point::load_syntax);
-  alist.add ("location", std::vector<AttributeList*> ());
+  alist.add ("location", std::vector<const AttributeList*> ());
 }
 
 Column::Column (Block& al)

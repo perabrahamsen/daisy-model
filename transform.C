@@ -27,11 +27,12 @@
 const char *const Transform::component = "transform";
 
 bool
-Transform::check (const Soil&, Treelog&) const
+Transform::check (const Soil&, const SoilWater&, const SoilHeat&, 
+		  Treelog&) const
 { return true; }
 
 void
-Transform::initialize (Block&, const Soil&)
+Transform::initialize (const Soil&, Treelog&)
 { }
 
 void

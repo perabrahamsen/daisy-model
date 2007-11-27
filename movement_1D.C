@@ -28,7 +28,7 @@
 #include "groundwater.h"
 #include "surface.h"
 #include "weather.h"
-#include "solute.h"
+#include "chemical.h"
 #include "doe.h"
 #include "transport.h"
 #include "mactrans.h"
@@ -70,18 +70,17 @@ struct Movement1D : public Movement
   std::auto_ptr<Mactrans> mactrans; // Solute transport model in macropores.
   void solute (const Soil& soil, 
                const SoilWater& soil_water, 
-               const double J_in, Solute& solute, 
+               const double J_in, Chemical&, 
 	       const bool flux_below, 
                const double dt, const Scope&, Treelog& msg);
   void element (const Soil& soil, 
                 const SoilWater& soil_water, 
                 DOE& element,
-                Adsorption& adsorption,
                 double diffusion_coefficient,
                 double dt,
                 Treelog& msg);
   void flow (const Soil& soil, const SoilWater& soil_water, 
-             const std::string& name,
+             symbol name,
              std::vector<double>& M, 
              std::vector<double>& C, 
              std::vector<double>& S, 
@@ -89,10 +88,9 @@ struct Movement1D : public Movement
              std::vector<double>& J, 
              std::vector<double>& J_p, 
 	     double C_below,
-             Adsorption& adsorption,
              double diffusion_coefficient,
              double dt,
-             Treelog& msg);
+             Treelog& msg) const;
 
   // Heat.
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
@@ -251,13 +249,33 @@ Movement1D::tick_water (const Geometry1D& geo,
 void 
 Movement1D::solute (const Soil& soil, 
                     const SoilWater& soil_water, 
-                    const double J_in, Solute& solute, 
+                    const double J_in, Chemical& solute, 
 		    const bool flux_below, 
                     const double dt,
 		    const Scope& scope,
                     Treelog& msg)
 { 
-  solute.tick (geo->cell_size (), soil_water, dt, scope, msg);
+  Treelog::Open nest (msg, "Solute: " + solute.name);
+
+  const size_t cell_size = geo->cell_size ();
+  const size_t edge_size = geo->edge_size ();
+
+  // Content.
+  std::vector<double> M (cell_size);
+  std::vector<double> C (cell_size);
+  std::vector<double> S (cell_size);
+  std::vector<double> S_p (cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      M[c] = solute.M (c);
+      C[c] = solute.C (c);
+      S[c] = solute.S (c);
+      S_p[c] = solute.S_p (c);
+    }
+  
+  // Fluxes.
+  std::vector<double> J (edge_size, 0.0);
+  std::vector<double> J_p (edge_size, 0.0);
 
   // Upper border.
   if (soil_water.q_p (0) < 0.0)
@@ -271,47 +289,63 @@ Movement1D::solute (const Soil& soil,
                   << " and q[0] = " << soil_water.q (0);
               msg.error (tmp.str ());
             }
-          solute.J_p[0] = J_in;
-          solute.J[0] = J_in;
+          J[0] = J_in;
+          J_p[0] = J_in;
         }
       else
         {
           const double macro_fraction
             = soil_water.q_p (0) / (soil_water.q_p (0) + soil_water.q (0));
-          solute.J_p[0] = J_in * macro_fraction;
-          solute.J[0] = J_in - solute.J_p[0];
+	  J_p[0] = J_in * macro_fraction;
+          J[0] = J_in - J_p[0];
         }
     }
   else
-    solute.J[0] = J_in;
-
+    J[0] = J_in;
+  
   // Flow.
-  flow (soil, soil_water, solute.submodel, 
-        solute.M_, solute.C_, 
-        solute.S_, solute.S_p_,
-        solute.J, solute.J_p, 
-	solute.C_below (),
-        *solute.adsorption, solute.diffusion_coefficient (), dt, msg);
+  switch (solute.phase ())
+    {
+    case Chemical::solid:
+      transport_solid->tick (msg, *geo, soil, soil_water, 
+			     solute.diffusion_coefficient (),
+			     M, C, S, J, solute.C_below (), dt);
+      break;
+    case Chemical::solute:
+      flow (soil, soil_water, solute.name, M, C, S, S_p, J, J_p, 
+	    solute.C_below (), solute.diffusion_coefficient (),
+	    dt, msg);
+      break;
+    }
+  
+  for (size_t c = 0; c < cell_size; c++)
+    solute.set_content (c, M[c], C[c]);
+
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      solute.set_matrix_flux (e, J[e]);
+      solute.set_macro_flux (e, J_p[e]);
+    }
 }
 
 void 
 Movement1D::element (const Soil& soil, 
                      const SoilWater& soil_water, 
                      DOE& element,
-                     Adsorption& adsorption,
                      const double diffusion_coefficient,
                      const double dt,
                      Treelog& msg)
 {
   element.tick (geo->cell_size (), soil_water, dt);
-  flow (soil, soil_water, "DOM", element.M, element.C, 
+  static const symbol DOM_name ("DOM");
+  flow (soil, soil_water, DOM_name, element.M, element.C, 
         element.S, element.S_p, element.J, element.J_p, 0.0, 
-        adsorption, diffusion_coefficient, dt, msg);
+	diffusion_coefficient, dt, msg);
 }
 
 void 
 Movement1D::flow (const Soil& soil, const SoilWater& soil_water, 
-                  const std::string& name,
+                  const symbol name,
                   std::vector<double>& M, 
                   std::vector<double>& C, 
                   std::vector<double>& S, 
@@ -319,21 +353,11 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
                   std::vector<double>& J, 
                   std::vector<double>& J_p, 
 		  const double C_below,
-                  Adsorption& adsorption,
                   double diffusion_coefficient,
                   const double dt,
-                  Treelog& msg)
+                  Treelog& msg) const
 {
   const double old_content = geo->total_surface (M);
-
-  // Flow.
-  if (adsorption.full ())
-    {
-      transport_solid->tick (msg, *geo, soil, soil_water, adsorption, 
-                             diffusion_coefficient, M, C, S, J, C_below,
-			     dt);
-      goto done;
-    }
 
   mactrans->tick (*geo, soil_water, M, C, S, S_p, J_p, dt, msg);
 
@@ -343,8 +367,8 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
 
       try
         {
-          matrix_solute[m]->tick (msg, *geo, soil, soil_water, adsorption, 
-                                  diffusion_coefficient, 
+          matrix_solute[m]->tick (msg, *geo, soil, soil_water, 
+				  diffusion_coefficient, 
                                   M, C, S, J, C_below, dt);
           if (m > 0)
             msg.message ("Reserve model succeeded");
@@ -742,7 +766,7 @@ Movement::load_vertical (Syntax& syntax, AttributeList& alist)
                       "Vertical matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-   std::vector<AttributeList*> vertical_models;
+   std::vector<const AttributeList*> vertical_models;
    AttributeList vertical_default (UZmodel::default_model ());
    vertical_models.push_back (&vertical_default);
    AttributeList vertical_reserve (UZmodel::reserve_model ());
@@ -753,7 +777,7 @@ If none succeeds, the simulation ends.");
                       "Vertical matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-   std::vector<AttributeList*> transport_models;
+   std::vector<const AttributeList*> transport_models;
    AttributeList transport_default (Transport::default_model ());
    transport_models.push_back (&transport_default);
    AttributeList transport_reserve (Transport::reserve_model ());

@@ -123,7 +123,7 @@ ActionFertilize::Precision::~Precision ()
 { }
 
 void 
-ActionFertilize::doIt (Daisy& daisy, const Scope&, Treelog& out)
+ActionFertilize::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 {
   if (precision)
     {
@@ -133,7 +133,7 @@ ActionFertilize::doIt (Daisy& daisy, const Scope&, Treelog& out)
       
       if (weight <= minimum_weight)
 	{
-	  out.message ("Not fertilizing due to precision farming");
+	  msg.message ("Not fertilizing due to precision farming");
 	  return;
 	}
       AM::set_utilized_weight (am, weight);
@@ -146,7 +146,7 @@ ActionFertilize::doIt (Daisy& daisy, const Scope&, Treelog& out)
 
       if (weight - compensation <= minimum_weight)
 	{
-	  out.message ("Not fertilizing due to second year effect");
+	  msg.message ("Not fertilizing due to second year effect");
 	  return;
 	}
       else
@@ -155,7 +155,7 @@ ActionFertilize::doIt (Daisy& daisy, const Scope&, Treelog& out)
   else if (minimum_weight > 0.0
 	   && minimum_weight > AM::utilized_weight (am))
     {
-      out.message ("Not fertilizing due to minimum weight");
+      msg.message ("Not fertilizing due to minimum weight");
       return;
     }
 
@@ -179,7 +179,7 @@ ActionFertilize::doIt (Daisy& daisy, const Scope&, Treelog& out)
     }
   else
     tmp << "Fertilizing " << am.name ("type");
-  out.message (tmp.str ());
+  msg.message (tmp.str ());
   if (syntax != "mineral")
     {
       AttributeList new_time;
@@ -189,15 +189,15 @@ ActionFertilize::doIt (Daisy& daisy, const Scope&, Treelog& out)
 
   if (to < from)
     {
-      daisy.field->fertilize (am, from, to, daisy.dt);
+      daisy.field->fertilize (am, from, to, daisy.dt, msg);
       if (water > 0.0)
-        daisy.field->irrigate_subsoil (water, IM (), from, to, daisy.dt);
+        daisy.field->irrigate_subsoil (water, IM (), from, to, daisy.dt, msg);
     }
   else
     {
-      daisy.field->fertilize (am, daisy.dt);
+      daisy.field->fertilize (am, daisy.dt, msg);
       if (water > 0.0)
-        daisy.field->irrigate_surface (water, IM (), daisy.dt);
+        daisy.field->irrigate_surface (water, IM (), daisy.dt, msg);
     }
 }
 

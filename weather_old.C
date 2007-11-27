@@ -26,6 +26,7 @@
 #include "alist.h"
 #include "fao.h"
 #include "time.h"
+#include "units.h"
 #include <sstream>
 
 struct WeatherOld::Implementation
@@ -141,8 +142,8 @@ WeatherOld::WeatherOld (Block& al)
   T_average = al.number ("average");
   T_amplitude = al.number ("amplitude");
   max_Ta_yday = al.number ("max_Ta_yday");
-  DryDeposit = IM (al.alist ("DryDeposit"));
-  WetDeposit = IM (al.alist ("WetDeposit"));
+  DryDeposit = IM (al, "DryDeposit");
+  WetDeposit = IM (al, "WetDeposit");
 }
 
 WeatherOld::~WeatherOld ()
@@ -193,12 +194,10 @@ WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("UTM_y", Syntax::Unknown (), Syntax::OptionalConst,
 	      "Y position of weather station."); // Unused.
 
-  syntax.add_submodule ("DryDeposit", alist, Syntax::Const, 
-			"\
-Dry atmospheric deposition of nitrogen [kg N/ha/y].", &IM::load_field_flux);
-  syntax.add_submodule ("WetDeposit", alist, Syntax::Const, 
-			"\
-Deposition of nitrogen solutes with precipitation [ppm].", &IM::load_ppm);
+  IM::add_syntax (syntax, alist, Syntax::Const, "DryDeposit", dry_deposit_unit,
+		  "Atmospheric deposition.");
+  IM::add_syntax (syntax, alist, Syntax::Const, "WetDeposit", Units::ppm (), 
+		  "Deposition of solutes with precipitation.");
 
   // Division between Rain and Snow.
   syntax.add ("T_rain", "dg C", Syntax::Const, 

@@ -51,7 +51,7 @@ public:
   void tick (const Geometry&,
              const Soil&, SoilWater&, double, 
 	     const SoilHeat&, const Time&, const Scope& scope, Treelog& msg)
-  { has_table = expr->tick_value (depth, Units::cm, scope, msg); }
+  { has_table = expr->tick_value (depth, Units::cm (), scope, msg); }
   double table () const
   { return depth; }
 
@@ -63,7 +63,7 @@ public:
   bool check (const Geometry&, const Scope& scope, Treelog& msg) const
   {
     bool ok = true;
-    if (!expr->check_dim (scope, Units::cm, msg))
+    if (!expr->check_dim (scope, Units::cm (), msg))
       ok = false;
     return ok;
   }

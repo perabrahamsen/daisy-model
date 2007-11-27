@@ -774,8 +774,8 @@ Production::initialize (const double SeedN)
 
 void
 Production::initialize (const symbol name, 
-			const std::vector<AttributeList*>& root,
-			const std::vector<AttributeList*>& dead,
+			const std::vector<const AttributeList*>& root,
+			const std::vector<const AttributeList*>& dead,
 			const Geometry& geo,
 			OrganicMatter& organic_matter)
 {

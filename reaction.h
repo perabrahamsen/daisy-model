@@ -51,10 +51,13 @@ public:
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
+  static const AttributeList& nitrification_model ();
+  static const AttributeList& denitrification_model ();
+  static const AttributeList& NH4_sorption_model ();
 public:
-  virtual void initialize (Block&, const Soil&) = 0;
+  virtual void initialize (const Soil&, Treelog&) = 0;
   virtual bool check (const Soil&, const SoilWater&, const SoilHeat&,
-		      const Chemistry&, Treelog& err) const = 0;
+		      const Chemistry&, Treelog&) const = 0;
 protected:
   Reaction (Block& al);
 public:

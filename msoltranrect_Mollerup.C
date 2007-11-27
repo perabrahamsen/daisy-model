@@ -24,7 +24,6 @@
 #include "geometry_rect.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "adsorption.h"
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -200,14 +199,13 @@ struct MsoltranrectMollerup : public Msoltranrect
   void flow (const GeometryRect& geo, 
              const Soil& soil, 
              const SoilWater& soil_water, 
-             const std::string& name,
+             symbol name,
              std::vector<double>& M, 
              std::vector<double>& C, 
              const std::vector<double>& S, 
              std::vector<double>& J, 
 	     const double C_below,
 	     const bool flux_below,
-             Adsorption& adsorption,
              double diffusion_coefficient, double dt,
              Treelog& msg);
   
@@ -1318,21 +1316,20 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
 }
 
 
-void 
+void
 MsoltranrectMollerup::flow (const GeometryRect& geo, 
-                            const Soil& soil, 
-                            const SoilWater& soil_water, 
-                            const std::string& name,
-                            std::vector<double>& M, 
-                            std::vector<double>& C, 
-                            const std::vector<double>& S, 
-                            std::vector<double>& J, 
-                            const double C_below,
-                            const bool flux_below,
-                            Adsorption& adsorption,
-                            double diffusion_coefficient,
-                            const double dt,
-                            Treelog& msg)
+			    const Soil& soil, 
+			    const SoilWater& soil_water, 
+			    const symbol name,
+			    std::vector<double>& M, 
+			    std::vector<double>& C, 
+			    const std::vector<double>& S, 
+			    std::vector<double>& J, 
+			    const double C_below,
+			    const bool flux_below,
+			    double diffusion_coefficient,
+			    const double dt,
+			    Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
@@ -1359,18 +1356,6 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   for (int e = 0; e < edge_size; e++)
     q_edge (e) = soil_water.q (e);
   
-  
-  // BUG: Adsorption done wrong.
-  std::vector<double> Ads (cell_size);
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      Ads[c] = M[c] - C[c] * soil_water.Theta_old (c);
-      if (Ads[c] < 0)
-	{
-	  daisy_assert (approximate (M[c], C[c] * soil_water.Theta_old (c)));
-	  Ads[c] = 0.0;
-	}
-    }
   
   //Cell diffusion tensor
   ublas::vector<double> Dxx_cell (cell_size);
@@ -1730,31 +1715,13 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   // tmp << "C_n" << C_n;
   //msg.message (tmp.str ());
  
-  // Write solution into C (std::vec)
-  for (int c=0; c < cell_size; c++)
+  // Write solution into C (std::vector) and M
+  for (size_t c=0; c < cell_size; c++)
     {
       C[c] = C_n (c); 
-      //daisy_assert (C[c] >= 0.0);
-    }
-
-  // BUG: Adsorption done wrong.
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      // We use the old absorbed stuff plus the new dissolved stuff.
-      M[c] = Ads[c] + Theta_cell (c) * C[c];
-      if (M[c] < 0.0)
-        throw "Negative mass";
-      
-      // We calculate new C by assumining instant absorption.
-      C[c] = adsorption.M_to_C (soil, Theta_cell (c), c, M[c]);
-      
-      // Check that it goes both ways.
-      if (iszero (C[c]))
-	daisy_assert (iszero (M[c]));
-      else
-	daisy_assert (approximate (M[c], 
-				   adsorption.C_to_M (soil, Theta_cell (c),
-						      c, C[c])));
+      M[c] = Theta_cell (c) * C[c];
+      daisy_assert (C[c] >= 0.0);
+      daisy_assert (M[c] >= 0.0);
     }
   
   // BUG: No J for inner nodes.
@@ -1820,8 +1787,7 @@ static struct MsoltranrectMollerupSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-               "\
+    alist.add ("description", "\
 Coupled vertical and horizontal transport.\n\
 See Mollerup 2007 for details.");
     MsoltranrectMollerup::load_syntax (syntax, alist);

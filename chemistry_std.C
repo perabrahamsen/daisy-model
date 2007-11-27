@@ -27,56 +27,62 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "block.h"
-#include "vcheck.h"
 #include "log.h"
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "vcheck.h"
 
 struct ChemistryStandard : public Chemistry
 {
   // Parameters.
   auto_vector<Chemical*> chemicals;
   auto_vector<Reaction*> reactions;
-  std::vector<symbol> ignore;
 
   // Query.
   bool know (symbol chem) const;
-  Chemical& find (symbol chem);
-  
+  Chemical& find (symbol chem); 
+  const std::vector<Chemical*>& all () const;
+ 
   // Management.
+  void deposit (symbol chem, double amount, double dt, Treelog&);
   void spray (symbol chem, double amount, double dt, Treelog&);
+  void dissipate (symbol chem, double amount  /* [g/m^2] */,
+		  double dt /* [h] */, Treelog&);
   void harvest (double removed, double surface, double dt);
   void mix (const Geometry&, const Soil&, const SoilWater&, 
             double from, double to, double dt);
   void swap (const Geometry&, const Soil&, const SoilWater&,
 	     double from, double middle, double to, double dt);
+  void incorporate (const Geometry& geo,
+		    const symbol chem, const double amount,
+		    const double from, const double to, 
+		    const double dt, Treelog& msg);
   
   // Simulation.
   void tick_top (const double snow_leak_rate, // [h^-1]
                  const double cover, // [],
                  const double canopy_leak_rate, // [h^-1]
                  double surface_runoff_rate /* [h^-1] */,
-                 const double dt); // [h]
+                 const double dt, // [h]
+		 Treelog&);
   void infiltrate (const Geometry&, 
                    double infiltration /* [mm/h] */, double ponding /* [mm] */,
                    double R_mixing /* [h/mm] */, const double dt /* [h] */);
   void tick_soil (const Geometry& geo, double ponding /* [mm] */,
                   double R_mixing /* [h/mm] */, 
                   const Soil&, const SoilWater&, const SoilHeat&, Movement&,
-                  const OrganicMatter&, const bool flux_below, 
+                  const OrganicMatter&, Chemistry&, const bool flux_below, 
 		  double dt, const Scope&, Treelog&);
   void clear ();
   void output (Log&) const;
 
   // Create & Destroy.
-  void initialize (Block&, const AttributeList&, const Geometry& geo,
+  void initialize (const AttributeList&, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
-  bool check (const Soil&, const SoilWater&, const SoilHeat&,
+  bool check (const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
 	      const Scope& scope, Treelog&) const;
   explicit ChemistryStandard (Block& al);
-  static bool check_alist (const AttributeList& al, Treelog& msg);
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
 
 bool
@@ -99,6 +105,23 @@ ChemistryStandard::find (symbol chem)
   daisy_notreached ();
 }
 
+const std::vector<Chemical*>& 
+ChemistryStandard::all () const
+{ return chemicals; }
+
+void 
+ChemistryStandard::deposit (const symbol chem, 
+			    const double amount, const double dt, Treelog& msg)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    if (chemicals[c]->name == chem)
+      {
+        chemicals[c]->deposit (amount, dt);
+        return;
+      }
+  msg.warning ("Unknwon chemical '" + chem + "' ignored");
+}
+
 void 
 ChemistryStandard::spray (const symbol chem, 
                           const double amount, const double dt, Treelog& msg)
@@ -109,13 +132,20 @@ ChemistryStandard::spray (const symbol chem,
         chemicals[c]->spray (amount, dt);
         return;
       }
+  msg.warning ("Unknwon chemical '" + chem + "' ignored");
+}
 
-  for (size_t i = 0; i < ignore.size (); i++)
-    if (ignore[i] == chem)
-      return;
-
-  msg.message ("Fate of '" + chem.name () + "' will not be traced");
-  ignore.push_back (chem);
+void 
+ChemistryStandard::dissipate (const symbol chem, const double amount,
+			      const double dt, Treelog& msg)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    if (chemicals[c]->name == chem)
+      {
+        chemicals[c]->dissipate (amount, dt);
+        return;
+      }
+  msg.warning ("Unknwon chemical '" + chem + "' ignored");
 }
 
 void
@@ -146,15 +176,31 @@ ChemistryStandard::swap (const Geometry& geo,
 }
 
 void 
+ChemistryStandard::incorporate (const Geometry& geo,
+				const symbol chem, const double amount,
+				const double from, const double to, 
+				const double dt, Treelog& msg)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    if (chemicals[c]->name == chem)
+      {
+        chemicals[c]->incorporate (geo, amount, from, to, dt);
+        return;
+      }
+  msg.warning ("Unknwon chemical '" + chem + "' ignored");
+}
+
+void 
 ChemistryStandard::tick_top (const double snow_leak_rate, // [h^-1]
                              const double cover, // [],
                              const double canopy_leak_rate, // [h^-1]
                              double surface_runoff_rate /* [h^-1] */,
-                             const double dt) // [h]
+                             const double dt, // [h]
+			     Treelog& msg) 
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     chemicals[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 
-                            surface_runoff_rate, dt);
+                            surface_runoff_rate, dt, msg);
 }
 
 void 
@@ -180,9 +226,11 @@ ChemistryStandard::tick_soil (const Geometry& geo, const double ponding,
                               const Soil& soil, const SoilWater& soil_water,
                               const SoilHeat& soil_heat, Movement& movement,
                               const OrganicMatter& organic_matter,
+			      Chemistry& chemistry,
 			      const bool flux_below, 
                               const double dt, const Scope& scope, Treelog& msg)
 { 
+  Treelog::Open nest (msg, "Chemistry: " + name + ": tick soil");
   infiltrate (geo, ponding, soil_water.infiltration (geo), R_mixing, dt);
 
   for (size_t c = 0; c < chemicals.size (); c++)
@@ -194,15 +242,14 @@ ChemistryStandard::tick_soil (const Geometry& geo, const double ponding,
 
   for (size_t r = 0; r < reactions.size (); r++)
     reactions[r]->tick (geo, soil, soil_water, soil_heat, organic_matter, 
-			*this, dt, msg);
+			chemistry, dt, msg);
 
   const size_t cell_size = geo.cell_size ();
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->tick (cell_size, soil_water, dt, scope, msg);
+    chemicals[c]->tick_soil (cell_size, soil_water, dt, scope, msg);
 
   for (size_t c = 0; c < chemicals.size (); c++)
     {
-      Treelog::Open nest (msg, name);
       // [g/m^2/h down -> g/cm^2/h up]
       const double J_in = -chemicals[c]->down () / (100.0 * 100.0);
       movement.solute (soil, soil_water, J_in, *chemicals[c], flux_below, 
@@ -220,22 +267,20 @@ ChemistryStandard::clear ()
 void 
 ChemistryStandard::output (Log& log) const
 {
+  Chemistry::output (log);
   output_list (chemicals, "trace", log, Chemical::component);
   output_list (reactions, "reaction", log, Reaction::component);
-  // We can't log identifier_sequence yet.
-  // output_variable (ignore, log);
 }
 
 void 
-ChemistryStandard::initialize (Block& block,
-                               const AttributeList& al,
+ChemistryStandard::initialize (const AttributeList& al,
                                const Geometry& geo,
                                const Soil& soil, 
                                const SoilWater& soil_water,
 			       const SoilHeat& soil_heat,
 			       Treelog& msg)
 {
-  const std::vector<AttributeList*>& alists = al.alist_sequence ("trace");
+  const std::vector<const AttributeList*>& alists = al.alist_sequence ("trace");
   daisy_assert (alists.size () == chemicals.size ());
   
   for (size_t c = 0; c < chemicals.size (); c++)
@@ -243,24 +288,30 @@ ChemistryStandard::initialize (Block& block,
 			      msg);
 
   for (size_t r = 0; r < reactions.size (); r++)
-    reactions[r]->initialize (block, soil);
+    reactions[r]->initialize (soil, msg);
 }
 
 bool 
 ChemistryStandard::check (const Soil& soil, const SoilWater& soil_water,
-			  const SoilHeat& soil_heat, 
+			  const SoilHeat& soil_heat, const Chemistry& chemistry,
 			  const Scope& scope, Treelog& msg) const
 { 
   const size_t cell_size = soil.size ();
 
   bool ok = true; 
   for (size_t c = 0; c < chemicals.size (); c++)
-    if (!chemicals[c]->check (cell_size, scope, msg))
-      ok = false;
+    {
+      Treelog::Open nest (msg, "Chemical: '" + chemicals[c]->name  + "'");
+      if (!chemicals[c]->check (cell_size, scope, msg))
+	ok = false;
+    }
 
   for (size_t r = 0; r < reactions.size (); r++)
-    if (!reactions[r]->check (soil, soil_water, soil_heat, *this, msg))
-      ok = false;
+    {
+      Treelog::Open nest (msg, "Reaction: '" + reactions[r]->name  + "'");
+      if (!reactions[r]->check (soil, soil_water, soil_heat, chemistry, msg))
+	ok = false;
+    }
 
   return ok;
 }
@@ -268,77 +319,81 @@ ChemistryStandard::check (const Soil& soil, const SoilWater& soil_water,
 ChemistryStandard::ChemistryStandard (Block& al)
   : Chemistry (al),
     chemicals (Librarian::build_vector<Chemical> (al, "trace")),
-    reactions (Librarian::build_vector<Reaction> (al, "reaction")),
-    ignore (al.identifier_sequence ("ignore"))
+    reactions (Librarian::build_vector<Reaction> (al, "reaction"))
 { }
-
-bool
-ChemistryStandard::check_alist (const AttributeList& al, Treelog& msg)
-{ 
-  const std::vector<AttributeList*> trace = al.alist_sequence ("trace");
-  const std::vector<symbol> ignore = al.identifier_sequence ("ignore");
-
-  for (size_t i = 0; i < ignore.size (); i++)
-    {
-      for (size_t t = 0; t < trace.size (); t++)
-        if (trace[t]->identifier ("type") == ignore[i])
-          msg.warning ("'" + ignore[i].name () 
-                       + "' is both ignored and traced");
-    }          
-  for (size_t t = 0; t < trace.size (); t++)
-    for (size_t u = 0; u < trace.size (); u++)
-      if (trace[t]->identifier ("type") == trace[u]->identifier ("type")
-          && t != u)
-        msg.warning ("'" + trace[t]->name ("type") + "' traced twice");
-
-  return true;
-}
-
-void
-ChemistryStandard::load_syntax (Syntax& syntax, AttributeList& alist)
-{ 
-  syntax.add_check (check_alist);
-
-  syntax.add_object ("trace", Chemical::component, 
-                     Syntax::State, Syntax::Sequence, "\
-List of chemicals you want to trace in the simulation.");
-  alist.add ("trace", std::vector<AttributeList*> ());
-  syntax.add_object ("reaction", Reaction::component, 
-                     Syntax::State, Syntax::Sequence, "\
-List of chemical reactions you want to simulate.");
-
-  syntax.add ("ignore", Syntax::String, Syntax::State, Syntax::Sequence,
-              "Don't warn when spraying one of these chemicals.\n\
-The first time an untraced chemical not on the list is sprayed on the\n\
-field, Daisy will issue a warning and add the chemical to this list.");
-  syntax.add_check ("ignore", VCheck::unique ());
-  alist.add ("ignore", std::vector<symbol> ());
-  alist.add ("reaction", std::vector<AttributeList*> ());
-}
-
-const AttributeList& 
-Chemistry::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      ChemistryStandard::load_syntax (dummy, alist);
-      alist.add ("type", "default");
-    }
-  return alist;
-}
 
 static struct ChemistryStandardSyntax
 {
   static Model& make (Block& al)
   { return *new ChemistryStandard (al); }
-  ChemistryStandardSyntax ()
+  static void load_syntax (Syntax& syntax, AttributeList& alist);
+  static void load_N (Syntax& syntax, AttributeList& alist);
+  static void build_default ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    ChemistryStandard::load_syntax (syntax, alist);
+    load_syntax (syntax, alist);
     Librarian::add_type (Chemistry::component, "default", alist, syntax, &make);
   }
+  static void build_N ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    load_N (syntax, alist);
+    alist.add ("type", "default");
+    Librarian::add_type (Chemistry::component, "N", alist, syntax, &make);
+  }
+  ChemistryStandardSyntax ()
+  { 
+    build_default ();
+    build_N ();
+  }
 } ChemistryStandard_syntax;
+
+void
+ChemistryStandardSyntax::load_syntax (Syntax& syntax, AttributeList& alist)
+{ 
+  Chemistry::load_syntax (syntax, alist);
+
+  syntax.add_object ("trace", Chemical::component, 
+                     Syntax::State, Syntax::Sequence, "\
+List of chemicals you want to trace in the simulation.");
+  syntax.add_check ("trace", VCheck::unique ());
+  alist.add ("trace", std::vector<const AttributeList*> ());
+  syntax.add_object ("reaction", Reaction::component, 
+                     Syntax::State, Syntax::Sequence, "\
+List of chemical reactions you want to simulate.");
+  alist.add ("reaction", std::vector<const AttributeList*> ());
+}
+
+void
+ChemistryStandardSyntax::load_N (Syntax& syntax, AttributeList& alist)
+{ 
+  load_syntax (syntax, alist);
+  alist.add ("description", "Inorganic nitrogen.");
+  std::vector<const AttributeList*> trace;
+  trace.push_back (&Chemical::NO3_model ());
+  trace.push_back (&Chemical::NH4_solute_model ());
+  trace.push_back (&Chemical::NH4_sorbed_model ());
+  alist.add ("trace", trace);
+  std::vector<const AttributeList*> reaction;
+  reaction.push_back (&Reaction::nitrification_model ());
+  reaction.push_back (&Reaction::denitrification_model ());
+  reaction.push_back (&Reaction::NH4_sorption_model ());
+  alist.add ("reaction", reaction);
+}
+
+const AttributeList& 
+Chemistry::N_model ()
+{ 
+  static AttributeList alist;
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      ChemistryStandardSyntax::load_N (dummy, alist);
+      alist.add ("type", "N");
+    }
+  return alist;
+}
+
+// chemistry_std.C ends her.

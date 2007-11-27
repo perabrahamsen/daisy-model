@@ -32,8 +32,8 @@
 #include "organic_matter.h"
 #include "aom.h"
 #include "soil_heat.h"
-#include "soil_NH4.h"
-#include "soil_NO3.h"
+#include "chemistry.h"
+#include "chemical.h"
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
@@ -73,7 +73,7 @@ protected:
   double SoluteUptake (const Geometry& geo,
                        const Soil&,
 		       const SoilWater&,
-		       Solute&,
+		       Chemical&,
 		       double PotNUpt,
 		       std::vector<double>& uptake,
 		       double I_Mx, double Rad,
@@ -96,8 +96,7 @@ protected:
 		       const Geometry& geo,
                        const Soil& soil,
 		       const SoilWater& soil_water,
-		       Solute& soil_NH4,
-		       Solute& soil_NO3,
+		       Chemistry&,
                        double dt);
   // Sugar production [gCH2O/m2/h] by canopy photosynthesis.
   void AssimilatePartitioning (double DS, double& f_Leaf, double& f_SOrg,
@@ -111,7 +110,7 @@ public:
              const Bioclimate&, const Geometry& geo,
              const Soil&,
 	     OrganicMatter&,
-	     const SoilHeat&, const SoilWater&, Solute&, Solute&,
+	     const SoilHeat&, const SoilWater&, Chemistry&,
 	     double&, double&, double&, 
              std::vector<double>&, std::vector<double>&, 
 	     double ForcedCAI,
@@ -256,9 +255,9 @@ struct CropSold::Parameters
     const double beta;		// The root/top concentration relation
     const double At;		// N distribution parameter.
     const double Bt;		// N distribution parameter.
-    const std::vector<AttributeList*>& Leaf; // Leaf AM parameters.
-    const std::vector<AttributeList*>& SOrg; // SOrg AM parameters.
-    const std::vector<AttributeList*>& Root; // Root AM parameters.
+    const std::vector<const AttributeList*>& Leaf; // Leaf AM parameters.
+    const std::vector<const AttributeList*>& SOrg; // SOrg AM parameters.
+    const std::vector<const AttributeList*>& Root; // Root AM parameters.
     const double C_Leaf;	// C fraction of total weight.
     const double C_SOrg;	// C fraction of total weight.
     const double C_Root;	// C fraction of total weight.
@@ -1026,7 +1025,7 @@ double
 CropSold::SoluteUptake (const Geometry& geo,
                         const Soil& soil,
 			const SoilWater& soil_water,
-			Solute& solute,
+			Chemical& solute,
                         double PotNUpt,
 			std::vector<double>& uptake,
 			const double I_max, const double r_root,
@@ -1607,8 +1606,7 @@ CropSold::NitrogenUptake (const int Hour,
                           const Geometry& geo,
                           const Soil& soil,
                           const SoilWater& soil_water,
-                          Solute& soil_NH4,
-                          Solute& soil_NO3, 
+                          Chemistry& chemistry, 
                           const double dt)
 {
   const Parameters::RootPar& Root = par.Root;
@@ -1617,6 +1615,20 @@ CropSold::NitrogenUptake (const int Hour,
   Variables::RecRootSys& RootSys = var.RootSys;
 
   double PotNUpt = (CrpAux.PtNCnt - NCrop) / ((Hour == 0) ? 1 : (25 - Hour));
+
+  if (!chemistry.know (Chemical::NH4_solute ())
+      || !chemistry.know (Chemical::NO3 ()))
+    {
+      // We don't trace inorganic nitrogen, assume we have plenty.
+      CrpAux.NH4Upt = PotNUpt;
+      CrpAux.NO3Upt = 0.0;
+      CrpAux.Fixated = 0.0;
+      NCrop += PotNUpt;
+      return;
+    }
+    
+  Chemical& soil_NH4 = chemistry.find (Chemical::NH4_solute ());
+  Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
 
   if (PotNUpt > 0)
     {
@@ -1730,7 +1742,7 @@ CropSold::tick (const Time& time, const double, const double,
 		OrganicMatter&,
 		const SoilHeat& soil_heat,
 		const SoilWater& soil_water, 
-		Solute& soil_NH4, Solute& soil_NO3, 
+		Chemistry& chemistry, 
 		double&, double&, double&,
                 std::vector<double>&, std::vector<double>&, 
 		const double ForcedCAI,
@@ -1780,7 +1792,7 @@ CropSold::tick (const Time& time, const double, const double,
   if (var.Phenology.DS <= 0 || var.Phenology.DS >= 2)
     return;
   NitrogenUptake (time.hour (), 
-                  geo, soil, soil_water, soil_NH4, soil_NO3, dt);
+                  geo, soil, soil_water, chemistry, dt);
   if (time.hour () != 0)
     return;
   double& water_stress = var.RootSys.water_stress;
@@ -1900,9 +1912,9 @@ CropSold::harvest (const symbol column_name,
   const double C_SOrg = Hp.C_SOrg;
   const double C_Root = Hp.C_Root;
 
-  const std::vector<AttributeList*>& Leaf = Hp.Leaf;
-  const std::vector<AttributeList*>& SOrg = Hp.SOrg;
-  const std::vector<AttributeList*>& Root = Hp.Root;
+  const std::vector<const AttributeList*>& Leaf = Hp.Leaf;
+  const std::vector<const AttributeList*>& SOrg = Hp.SOrg;
+  const std::vector<const AttributeList*>& Root = Hp.Root;
 
   const std::vector<double>& density = var.RootSys.Density;
 

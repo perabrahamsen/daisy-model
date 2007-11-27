@@ -47,7 +47,7 @@ struct LogAList : public Log
   // State and parameters of entity.
   std::deque<AttributeList*> alist_stack; 
   // Ditto for lists.
-  std::deque<std::vector<AttributeList*>/**/> alist_sequence_stack; 
+  std::deque<std::vector<const AttributeList*>/**/> alist_sequence_stack; 
   // Current element of AList sequence.
   std::deque<int> unnamed_stack;
 
@@ -56,7 +56,7 @@ struct LogAList : public Log
   const Library& library () const;
   const Syntax& syntax () const;
   AttributeList& alist () const;
-  std::vector<AttributeList*>& alist_sequence ();
+  std::vector<const AttributeList*>& alist_sequence ();
   int unnamed ();
 
   // Stack Constructors.
@@ -67,7 +67,7 @@ struct LogAList : public Log
   void push (symbol entry, 
 	     const Syntax& syntax, 
 	     const AttributeList& default_alist,
-	     std::vector<AttributeList*> alist_sequence);
+	     std::vector<const AttributeList*> alist_sequence);
   void pop ();
 
   // Nesting.
@@ -82,13 +82,13 @@ struct LogAList : public Log
   void close_alist ();
 
   void open_derived (symbol field, // Object singletons.
-		     symbol type); 
+		     symbol type, const char* library); 
   void close_derived ();
   void open_object (symbol field, // Object singletons with alist.
-                    symbol type, const AttributeList&); 
+		    symbol type, const AttributeList&, const char* library); 
   void close_object ();
   void open_entry (symbol type,   // Items in an Object sequence.
-		   const AttributeList& alist);
+		   const AttributeList& alist, const char *const library);
   void close_entry ();
   void open_named_entry (symbol name,   // Named items in an Obj seq.
 			 symbol type, 

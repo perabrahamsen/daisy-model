@@ -25,6 +25,7 @@
 
 #include "model.h"
 #include "alist.h"
+#include "im.h"
 #include <vector>
 #include <memory>
 
@@ -89,14 +90,15 @@ public:
                      double max_rooting_depth = 1.0);
   // Crop part.
   static AM& create (const size_t cell_size, const Time&,
-		     const std::vector<AttributeList*>&,
+		     const std::vector<const AttributeList*>&,
 		     symbol sort, symbol part, lock_type lock = Unlocked);
   void initialize (const Geometry& geometry, const double max_rooting_depth);
-  static const std::vector<AttributeList*>& default_AM ();
+  static const std::vector<const AttributeList*>& default_AM ();
   static const AttributeList& default_root ();
   static double get_NO3 (const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const AttributeList&);	// [g N/cm^2]
-  static double get_volatilization (const AttributeList&);	// [kg N/ha]
+  static IM get_IM (const AttributeList&);
+  static double get_volatilization (const AttributeList&);	// [g N/m^2]
   static double get_DM (const AttributeList&);	// [Mg DM/ha]
   static double get_water (const AttributeList&);	// [mm]
   static void set_utilized_weight (AttributeList& am,

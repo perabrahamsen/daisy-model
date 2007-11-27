@@ -26,28 +26,29 @@
 #include "memutils.h"
 #include <map>
 
-using namespace std;
-
 struct Units::Content
 {
-  typedef map<string, Convert*, less<string>/**/> to_type;
-  typedef map<string, to_type, less<string>/**/> table_type;
+  typedef std::map<std::string, Convert*> to_type;
+  typedef std::map<std::string, to_type> table_type;
   table_type table;
 
-  static bool time_match (const string& from, const string& to);
-  static const string crop_time (const string&);
+  static bool time_match (const std::string& from, const std::string& to);
+  static const std::string crop_time (const std::string&);
   
-  double convert (const string& from, const string& to, double value) const;
-  bool can_convert (const string& from, const string& to) const;
-  bool can_convert (const string& from, const string& to, double value) const;
-  const Convert& get_convertion (const string& from, const string& to) const;
+  double convert (const std::string& from, const std::string& to,
+		  double value) const;
+  bool can_convert (const std::string& from, const std::string& to) const;
+  bool can_convert (const std::string& from, const std::string& to,
+		    double value) const;
+  const Convert& get_convertion (const std::string& from,
+				 const std::string& to) const;
 
   Content ();
   ~Content ();
 };  
 
 bool				// True iff FROM and TO have same time unit.
-Units::Content::time_match (const string& from, const string& to)
+Units::Content::time_match (const std::string& from, const std::string& to)
 {
   const size_t from_size = from.size ();
   const size_t to_size = to.size ();
@@ -68,21 +69,21 @@ Units::Content::time_match (const string& from, const string& to)
     }
 }
 
-const string			// Return DIM without time.
-Units::Content::crop_time (const string& dim)
+const std::string			// Return DIM without time.
+Units::Content::crop_time (const std::string& dim)
 {
   daisy_assert (dim.size () > 0);
   size_t end;
   for (end = dim.size () - 1; dim[end] != '/'; end--)
     daisy_assert (end > 0);
-  string result;
+  std::string result;
   for (int i = 0; i < end; i++)
     result += dim[i];
   return result;
 }
 
 double 
-Units::Content::convert (const string& from, const string& to, 
+Units::Content::convert (const std::string& from, const std::string& to, 
 			 double value) const
 { 
   if (from == to)
@@ -91,13 +92,14 @@ Units::Content::convert (const string& from, const string& to,
   const Units::Convert& conv = get_convertion (from, to);
 
   if (!conv.valid (value))
-    throw string ("invalid value");
+    throw std::string ("invalid value");
 
   return conv (value);
 }
 
 bool 
-Units::Content::can_convert (const string& from, const string& to) const
+Units::Content::can_convert (const std::string& from,
+			     const std::string& to) const
 { 
   if (from == to)
     return true;
@@ -114,7 +116,7 @@ Units::Content::can_convert (const string& from, const string& to) const
 }
 
 bool 
-Units::Content::can_convert (const string& from, const string& to, 
+Units::Content::can_convert (const std::string& from, const std::string& to, 
 			     double value) const
 { 
   if (from == to)
@@ -143,7 +145,8 @@ public:
 } convert_identity;
 
 const Units::Convert&
-Units::Content::get_convertion (const string& from, const string& to) const
+Units::Content::get_convertion (const std::string& from,
+				const std::string& to) const
 { 
   if (from == to)
     return convert_identity;
@@ -154,21 +157,22 @@ Units::Content::get_convertion (const string& from, const string& to) const
       // We check if we can convert without time.
       if (time_match (from, to))
 	{
-	  const string from_c = crop_time (from);
+	  const std::string from_c = crop_time (from);
 	  table_type::const_iterator i_c = table.find (from_c);
 	  if (i_c != table.end ())
 	    {
-	      const string to_c = crop_time (to);
+	      const std::string to_c = crop_time (to);
 	      to_type::const_iterator j_c = (*i_c).second.find (to_c);
 	      if (j_c != (*i_c).second.end ())
 		return *(*j_c).second;
 	    }
 	}
-      throw string ("[") + from + "] unknown dimension, expected [" + to + "]";
+      throw std::string ("Convert [") + from 
+	+ "] unknown dimension, expected [" + to + "]";
     }
   to_type::const_iterator j = (*i).second.find (to);
   if (j == (*i).second.end ())
-    throw string ("Cannot convert [") + from + "] to [" + to + "]";
+    throw std::string ("Cannot convert [") + from + "] to [" + to + "]";
 
   return *(*j).second;
 }
@@ -190,10 +194,75 @@ Units::Content::~Content ()
 Units::Content* Units::content = NULL;
 int Units::count = 0;
 
-const symbol Units::cm ("cm");
-const symbol Units::cm_per_h ("cm/h");
-const symbol Units::cm2 ("cm^2");
-const symbol Units::cm3 ("cm^3");
+symbol
+Units::h ()
+{
+  static const symbol unit ("h");
+  return unit;
+}
+
+symbol
+Units::mm ()
+{
+  static const symbol unit ("mm");
+  return unit;
+}
+
+symbol
+Units::per_mm ()
+{
+  static const symbol unit ("mm^-1");
+  return unit;
+}
+
+symbol
+Units::mm_per_h ()
+{
+  static const symbol unit ("mm/h");
+  return unit;
+}
+
+symbol
+Units::cm ()
+{
+  static const symbol unit ("cm");
+  return unit;
+}
+
+symbol
+Units::cm_per_h ()
+{
+  static const symbol unit ("cm/h");
+  return unit;
+}
+
+symbol
+Units::cm2 ()
+{
+  static const symbol unit ("cm^2");
+  return unit;
+}
+
+symbol
+Units::cm3 ()
+{
+  static const symbol unit ("cm^3");
+  return unit;
+}
+
+symbol
+Units::per_h ()
+{
+  static const symbol unit ("h^-1");
+  return unit;
+}
+
+symbol
+Units::ppm ()
+{
+  static const symbol unit ("ppm");
+  return unit;
+}
 
 bool
 Units::Convert::valid (double) const
@@ -220,7 +289,8 @@ struct ConvertLinear : public Units::Convert
 };
 
 void 
-Units::add (const string& from, const string& to, double factor, double offset)
+Units::add (const std::string& from, const std::string& to,
+	    double factor, double offset)
 { 
   daisy_assert (content);
   if (!(content->table[from].find (to) == content->table[from].end ()))
@@ -228,7 +298,7 @@ Units::add (const string& from, const string& to, double factor, double offset)
   else
     content->table[from][to] = new ConvertLinear (factor, offset);
   // Reverse conversion.
-  daisy_assert (isnormal (factor));
+  daisy_assert (std::isnormal (factor));
   if (!(content->table[to].find (from) == content->table[to].end ()))
     daisy_warning ("convert from [" + from + "] to [" + to + "] reverse\n");
   else
@@ -237,7 +307,7 @@ Units::add (const string& from, const string& to, double factor, double offset)
 }
 
 void 
-Units::add (const string& from, const string& to, Convert& convert)
+Units::add (const std::string& from, const std::string& to, Convert& convert)
 {
   daisy_assert (content);
   daisy_assert (content->table[from].find (to) == content->table[from].end ());
@@ -246,35 +316,36 @@ Units::add (const string& from, const string& to, Convert& convert)
 }
 
 double 
-Units::convert (const string& from, const string& to, double value)
+Units::convert (const std::string& from, const std::string& to, double value)
 { 
   daisy_assert (content);
   return content->convert (from, to, value);
 }
 
 bool
-Units::can_convert (const string& from, const string& to)
+Units::can_convert (const std::string& from, const std::string& to)
 { 
   daisy_assert (content);
   return content->can_convert (from, to);
 }
 
 bool
-Units::can_convert (const string& from, const string& to, double value)
+Units::can_convert (const std::string& from, const std::string& to, 
+		    double value)
 { 
   daisy_assert (content);
   return content->can_convert (from, to, value);
 }
 
 const Units::Convert&
-Units::get_convertion (const string& from, const string& to)
+Units::get_convertion (const std::string& from, const std::string& to)
 {
   daisy_assert (content);
   return content->get_convertion (from, to);
 }
 
-string
-Units::multiply (const string& one, const string& two)
+std::string
+Units::multiply (const std::string& one, const std::string& two)
 { 
   if (one == Syntax::None () || one == Syntax::Fraction ())
     return two;
@@ -314,6 +385,12 @@ Units::multiply (const string& one, const string& two)
     { "g C/cm^3/h", "cm^3", "g C/h" },
     { "g N/cm^3/h", "cm^3", "g N/h" }, 
     { "g CO_2-C/cm^3/h", "cm^3", "g CO_2-C/h"},
+    // im.C
+    { "g/cm^2/mm", "mm/h", "g/cm^2/h"},
+    { "g/cm^2/mm", "mm", "g/cm^2"},
+    { "g/cm^2/h", "h", "g/cm^2"},
+    { "mg/m^2", "mm^-1", "ppm"},
+    { "g/cm^2", "h^-1", "g/cm^2/h"},    
   };
   
   for (unsigned int i = 0; i < sizeof (table) / sizeof (multiply_table); i++)
@@ -409,6 +486,7 @@ Units::standard_conversions ()
   add ("mm/d", "cm/h", 0.1/24.0);
   add ("T w.w./ha", "Mg w.w./ha", 1.0);
   add ("ppm", "mg N/l", 1.0);
+  add ("ppm", "g/cm^2/mm", 1.0e-7);
   add ("L/kg", "cm^3/g", 1.0);
   add ("l/kg", "cm^3/g", 1.0);
   add ("g/cm^3", "kg/m^3", (100.0 * 100.0 * 100.0) / 1000.0);
@@ -418,7 +496,6 @@ Units::standard_conversions ()
   add (Syntax::Fraction (), "ppm", 1000000.0);
   add (Syntax::Fraction (), "%", 100.0);
   add (Syntax::Fraction (), "", 1.0);
-
   add ("", "ppm", 1000000.0);
   add ("", "%", 100.0);
   add ("none", "", 1.0);
@@ -428,6 +505,19 @@ Units::standard_conversions ()
   add ("cm^3 H2O/cm^3", Syntax::Fraction (), 1.0);
   add ("cm^3 H2O/cm^3", "", 1.0);
   add ("g/cm^3", Syntax::Fraction (), 1.0);
+  add ("kg/ha/y", "g/cm^2/h",
+       (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))) / (365.2425 * 24.0));
+  add ("g/cm^2/h", "g/ha/h", ((100.0 * 100.0) * (100.0 * 100.0)));
+  add ("g/cm^2/h", "kg N/ha/h",
+       ((100.0 * 100.0) * (100.0 * 100.0)) / 1000.0);
+  add ("g/cm^2", "g/m^2", 100.0 * 100.0);
+  add ("g/cm^2", "mg/m^2", 100.0 * 100.0 * 1000.0);
+  add ("kg/ha", "mg/m^2", (1000.0 * 1000.0) / (100.0 * 100.0));
+  add ("ppm", "kg/ha/mm", (100.0 * 100.0) / (1000.0 * 1000.0));
+  add ("kg/ha/h", "kg N/ha/h", 1.0);
+  add ("g/cm^2/h", "kg/ha/h", ((100.0 * 100.0) * (100.0 * 100.0)) / 1000.0);
+  add ("g/ha", "kg/ha", 1.0 / 1000.0);
+  add ("kg/ha/h", "g/ha/h", 1000.0);
 
   // Weather.
   add ("dgWest", "dgEast", -1.0);

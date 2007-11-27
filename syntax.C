@@ -171,9 +171,9 @@ Syntax::Implementation::check (const Metalib& metalib,
 	if (size[key] != Singleton)
 	  {
 	    const ::Library& lib = metalib.library (libraries[key]);
-	    const std::vector<AttributeList*>& seq = vl.alist_sequence (key);
+	    const std::vector<const AttributeList*>& seq = vl.alist_sequence (key);
 	    int j_index = 0;
-	    for (std::vector<AttributeList*>::const_iterator j = seq.begin ();
+	    for (std::vector<const AttributeList*>::const_iterator j = seq.begin ();
 		 j != seq.end ();
 		 j++)
 	      {
@@ -225,9 +225,9 @@ Syntax::Implementation::check (const Metalib& metalib,
 	if (size[key] != Singleton)
 	  {
 	    daisy_assert (vl.size (key) != Syntax::Singleton);
-	    const std::vector<AttributeList*>& seq = vl.alist_sequence (key);
+	    const std::vector<const AttributeList*>& seq = vl.alist_sequence (key);
 	    int j_index = 0;
-	    for (std::vector<AttributeList*>::const_iterator j = seq.begin ();
+	    for (std::vector<const AttributeList*>::const_iterator j = seq.begin ();
 		 j != seq.end ();
 		 j++)
 	      {
@@ -407,7 +407,7 @@ Syntax::check (const std::string& key, const double value) const
 { impl.check (key, value); }
 
 bool 
-Syntax::check (const AttributeList& vl, 
+Syntax::check (const Metalib& metalib, const AttributeList& vl, 
                const std::string& key, Treelog& err) const
 {
   bool ok = true;
@@ -419,7 +419,7 @@ Syntax::check (const AttributeList& vl,
 
       try
 	{
-	  vcheck->check (*this, vl, key);
+	  vcheck->check (metalib, *this, vl, key);
 	}
       catch (const std::string& message)
 	{

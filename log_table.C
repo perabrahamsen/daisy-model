@@ -483,7 +483,7 @@ String to print between array entries.");
       syntax.add_object ("summary", Summary::component,
                          Syntax::Const, Syntax::Sequence,
                          "Summaries for this log file.");
-      alist.add ("summary", std::vector<AttributeList*> ());
+      alist.add ("summary", std::vector<const AttributeList*> ());
       Librarian::add_type (Log::component, "table", alist, syntax, &make);
       Librarian::add_doc_fun (LogSelect::component, 
                               LogSelect::document_entries);

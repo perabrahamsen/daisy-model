@@ -140,7 +140,7 @@ Traverse::traverse_submodel_default (const Syntax& syntax,
 
 void
 Traverse::traverse_submodel_sequence (const Syntax& syntax,
-				      AttributeList& alist,
+				      const AttributeList& alist,
 				      const AttributeList& default_alist,
 				      const string& name, unsigned index)
   // Traverse through a submodel, typically a nested alist.
@@ -185,7 +185,8 @@ Traverse::traverse_object (const Library& library,
 
 void
 Traverse::traverse_object_sequence (const Library& library,
-				    const Syntax& syntax, AttributeList& alist,
+				    const Syntax& syntax, 
+				    const AttributeList& alist,
 				    const AttributeList& default_alist,
 				    const string& name, unsigned index)
   // Traverse through a object parameter value.
@@ -199,7 +200,7 @@ Traverse::traverse_object_sequence (const Library& library,
 }
 
 void
-Traverse::traverse_alist (const Syntax& syntax, AttributeList& alist,
+Traverse::traverse_alist (const Syntax& syntax, const AttributeList& alist,
 			  const AttributeList& default_alist,
 			  const string& name)
   // Generic code to traverse through any kind of alist.
@@ -221,7 +222,7 @@ Traverse::traverse_alist (const Syntax& syntax, AttributeList& alist,
 }
 
 void
-Traverse::traverse_parameter (const Syntax& syntax, AttributeList& alist,
+Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
 			      const AttributeList& default_alist,
 			      const string& name, const string& parameter)
   // Traverse through an alist member.  This is most interesting for
@@ -270,7 +271,7 @@ Traverse::traverse_parameter (const Syntax& syntax, AttributeList& alist,
 		
 		if (has_value)
 		  {
-		    const vector<AttributeList*> sequence
+		    const vector<const AttributeList*> sequence
 		      = alist.alist_sequence (parameter);
 		    for (unsigned int i = 0; i < sequence.size (); i++)
 		      traverse_submodel_sequence (entry_syntax, *sequence[i],
@@ -301,11 +302,11 @@ Traverse::traverse_parameter (const Syntax& syntax, AttributeList& alist,
 		  }
 		else
 		  {
-		    const vector<AttributeList*> sequence
+		    const vector<const AttributeList*> sequence
 		      = alist.alist_sequence (parameter);
 		    for (unsigned int i = 0; i < sequence.size (); i++)
 		      {
-			AttributeList& entry_alist = *sequence[i];
+			const AttributeList& entry_alist = *sequence[i];
 			daisy_assert (entry_alist.check ("type"));
 			const symbol type = entry_alist.identifier ("type");
 			const Library& library = syntax.library (metalib,

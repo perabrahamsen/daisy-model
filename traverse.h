@@ -52,7 +52,7 @@ public:
 				  const AttributeList& default_alist,
 				  const std::string& name);
   void traverse_submodel_sequence (const Syntax& syntax,
-				   AttributeList& alist,
+				   const AttributeList& alist,
 				   const AttributeList& default_alist,
 				   const std::string& name, unsigned index);
   void traverse_submodel_sequence_default (const Syntax& syntax, 
@@ -63,13 +63,14 @@ public:
 			const AttributeList& default_alist,
 			const std::string& name);
   void traverse_object_sequence (const Library& library,
-				 const Syntax& syntax, AttributeList& alist,
+				 const Syntax& syntax, 
+				 const AttributeList& alist,
 				 const AttributeList& default_alist,
 				 const std::string& name, unsigned index);
-  void traverse_alist (const Syntax&, AttributeList& alist, 
+  void traverse_alist (const Syntax&, const AttributeList& alist, 
 		       const AttributeList& default_alist,
 		       const std::string& name);
-  void traverse_parameter (const Syntax&, AttributeList& alist, 
+  void traverse_parameter (const Syntax&, const AttributeList& alist, 
 			   const AttributeList& default_alist, 
 			   const std::string& name, const std::string& parameter);
 
@@ -89,7 +90,7 @@ protected:
 				       const std::string& name) = 0;
   virtual void leave_submodel_default () = 0;
   virtual bool enter_submodel_sequence (const Syntax& syntax,
-					AttributeList& alist,
+					const AttributeList& alist,
 					const AttributeList& default_alist,
 					const std::string& name, 
 					unsigned index) = 0;
@@ -100,17 +101,17 @@ protected:
 						const std::string& name) = 0;
   virtual void leave_submodel_sequence_default () = 0;
   virtual bool enter_object (const Library&, 
-			     const Syntax& syntax, AttributeList& alist,
+			     const Syntax& syntax, const AttributeList& alist,
 			     const AttributeList& default_alist,
 			     const std::string& name) = 0;
   virtual void leave_object () = 0;
   virtual bool enter_object_sequence (const Library&, const Syntax& syntax, 
-				      AttributeList& alist,
+				      const AttributeList& alist,
 				      const AttributeList& default_alist,
 				      const std::string& name, 
 				      unsigned index) = 0;
   virtual void leave_object_sequence () = 0;
-  virtual bool enter_parameter (const Syntax&, AttributeList& alist, 
+  virtual bool enter_parameter (const Syntax&, const AttributeList& alist, 
 				const AttributeList& default_alist, 
 				const std::string& name, 
 				const std::string& parameter) = 0;

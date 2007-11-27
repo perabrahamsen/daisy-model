@@ -24,7 +24,6 @@
 #include "doe.h"
 #include "log.h"
 #include "geometry.h"
-#include "adsorption.h"
 #include "submodel.h"
 #include "alist.h"
 #include "syntax.h"
@@ -47,29 +46,25 @@ DOE::output (Log& log) const
 void 
 DOE::mix (const Geometry& geo, 
               const Soil& soil, const SoilWater& soil_water, 
-              Adsorption& adsorption,
               double from, double to)
 {
   geo.mix (M, from, to);
-  for (unsigned int i = 0; i < C.size (); i++)
-    C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
+  for (size_t i = 0; i < C.size (); i++)
+    C[i] = M[i] / soil_water.Theta (i);
 }
 
 void 
 DOE::swap (const Geometry& geo, 
-               const Soil& soil, const SoilWater& soil_water,
-               Adsorption& adsorption,
-               double from, double middle, double to)
+	   const Soil& soil, const SoilWater& soil_water,
+	   double from, double middle, double to)
 {
   geo.swap (M, from, middle, to);
-  for (unsigned int i = 0; i < C.size (); i++)
-    C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
+  for (size_t i = 0; i < C.size (); i++)
+    C[i] = M[i] / soil_water.Theta (i);
 }
 
 void 
-DOE::tick (const size_t cell_size,
-               const SoilWater& soil_water,
-               const double dt)
+DOE::tick (const size_t cell_size, const SoilWater& soil_water, const double dt)
 {
   // Initialize.
   fill (S_p.begin (), S_p.end (), 0.0);
@@ -113,8 +108,8 @@ A single element in a Dissolved Organic Matter pool.");
 
 void 
 DOE::initialize (const Geometry& geo, 
-                     const Soil& soil, const SoilWater& soil_water,
-                     Adsorption& adsorption, Treelog& msg)
+		 const Soil& soil, const SoilWater& soil_water,
+		 Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
@@ -124,8 +119,8 @@ DOE::initialize (const Geometry& geo,
   else
     msg.warning ("Too many elements of M in DOM pool");
 
-  for (unsigned int i = C.size (); i < M.size (); i++)
-    C.push_back (adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]));
+  for (size_t i = C.size (); i < M.size (); i++)
+    C.push_back (M[i] / soil_water.Theta (i));
 
   S.insert (S.begin (), cell_size, 0.0);
   S_p.insert (S_p.begin (), cell_size, 0.0);

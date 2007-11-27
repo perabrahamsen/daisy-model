@@ -22,7 +22,6 @@
 
 #include "uzmodel.h"
 
-class IM;
 class AttributeList;
 class Log;
 class SoilWater;
@@ -47,7 +46,6 @@ public:
   size_t last_cell (const Geometry&, size_t edge) const;
 
   // Column.
-  const IM& matter_flux ();
   double runoff_rate (double dt) const; // [h^-1]
   double mixing_resistance () const; // [h/mm]
 
@@ -59,7 +57,6 @@ public:
                      double dt);
 
   // Manager.
-  void fertilize (const IM& /* [g/cm^2] */);
   void set_detention_capacity (double);
   void ridge (const Geometry1D& geo,
               const Soil& soil, const SoilWater& soil_water,
@@ -67,8 +64,6 @@ public:
   void unridge ();
 
   // Simulation.
-  void mixture (const IM& soil_im /* [g/cm^2/mm] */, 
-                double dt);
   void output (Log&) const;
   void tick (Treelog&, double PotSoilEvaporation, double flux_in /* [mm/h] */,
              double temp /* [dg C] */, const Geometry& geo,

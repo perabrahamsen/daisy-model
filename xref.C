@@ -71,7 +71,7 @@ private:
 			       const string& name);
   void leave_submodel_default ();
   bool enter_submodel_sequence (const Syntax& syntax,
-  				AttributeList& alist,
+  				const AttributeList& alist,
   				const AttributeList& default_alist,
   				const string& name, unsigned index);
   void leave_submodel_sequence ();
@@ -80,17 +80,17 @@ private:
   					const string& name);
   void leave_submodel_sequence_default ();
   bool enter_object (const Library&, 
-		     const Syntax& syntax, AttributeList& alist,
+		     const Syntax& syntax, const AttributeList& alist,
   		     const AttributeList& default_alist,
   		     const string& name);
   void leave_object ();
   bool enter_object_sequence (const Library&, const Syntax& syntax,
-  			      AttributeList& alist,
+  			      const AttributeList& alist,
   			      const AttributeList& default_alist,
   			      const string& name, 
   			      unsigned index);
   void leave_object_sequence ();
-  bool enter_parameter (const Syntax&, AttributeList& alist, 
+  bool enter_parameter (const Syntax&, const AttributeList& alist, 
 			const AttributeList& default_alist, 
 			const string& name, const string& parameter);
   void leave_parameter ();
@@ -252,7 +252,7 @@ TraverseXRef::leave_submodel_default ()
 
 bool
 TraverseXRef::enter_submodel_sequence (const Syntax& syntax,
-				       AttributeList& al,
+				       const AttributeList& al,
 				       const AttributeList&,
 				       const string& name, unsigned)
 { return enter_submodel_default (syntax, al, name); }
@@ -273,7 +273,7 @@ TraverseXRef::leave_submodel_sequence_default ()
 
 bool
 TraverseXRef::enter_object (const Library& library, 
-			    const Syntax&, AttributeList& alist,
+			    const Syntax&, const AttributeList& alist,
 			    const AttributeList&,
 			    const string&)
 {
@@ -289,7 +289,7 @@ TraverseXRef::leave_object ()
 bool
 TraverseXRef::enter_object_sequence (const Library& library, 
 				     const Syntax& syntax, 
-				     AttributeList& alist,
+				     const AttributeList& alist,
 				     const AttributeList& default_alist,
 				     const string& name, unsigned)
 { return enter_object (library, syntax, alist, default_alist, name); }
@@ -299,7 +299,8 @@ TraverseXRef::leave_object_sequence ()
 { leave_object (); }
 
 bool
-TraverseXRef::enter_parameter (const Syntax& syntax, AttributeList& alist, 
+TraverseXRef::enter_parameter (const Syntax& syntax, 
+			       const AttributeList& alist, 
 			       const AttributeList& default_alist, 
 			       const string&, const string& name)
 { 

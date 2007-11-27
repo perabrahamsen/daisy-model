@@ -83,7 +83,7 @@ SelectFlow::default_dimension (const symbol spec_dim) const
   if (density)
     return spec_dim;
   
-  return Units::multiply (spec_dim, Units::cm2);
+  return Units::multiply (spec_dim, Units::cm2 ());
 }
 
 bool 

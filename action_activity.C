@@ -111,7 +111,7 @@ at each time step.");
     syntax.add_object ("actions", Action::component, 
                        Syntax::State, Syntax::Sequence,
                        "Sequence of actions to perform.");
-    alist.add ("actions", vector<AttributeList*> ());
+    alist.add ("actions", vector<const AttributeList*> ());
     syntax.order ("actions");
     Librarian::add_type (Action::component, "activity", alist, syntax, &make);
   }

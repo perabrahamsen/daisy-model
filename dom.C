@@ -43,23 +43,22 @@ DOM::output (Log& log) const
 {
   output_submodule (C, "C", log);
   output_submodule (N, "N", log);
-  output_derived (adsorption, "adsorption", log);
 }
 
 void 
 DOM::mix (const Geometry& geo, const Soil& soil, const SoilWater& soil_water,
 	  double from, double to)
 {
-  C.mix (geo, soil, soil_water, *adsorption, from, to);
-  N.mix (geo, soil, soil_water, *adsorption, from, to);
+  C.mix (geo, soil, soil_water, from, to);
+  N.mix (geo, soil, soil_water, from, to);
 }
 
 void 
 DOM::swap (const Geometry& geo, const Soil& soil, const SoilWater& soil_water,
 	   double from, double middle, double to)
 {
-  C.swap (geo, soil, soil_water, *adsorption, from, middle, to);
-  N.swap (geo, soil, soil_water, *adsorption, from, middle, to);
+  C.swap (geo, soil, soil_water, from, middle, to);
+  N.swap (geo, soil, soil_water, from, middle, to);
 }
 
 void
@@ -196,8 +195,6 @@ A single Dissolved Organic Matter pool.");
 			DOE::load_syntax);
 
   // Transport
-  syntax.add_object ("adsorption", Adsorption::component, 
-                     "Soil adsorption properties.");
   syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
 	      Syntax::Const, "Diffusion coefficient.");
 
@@ -224,14 +221,13 @@ void
 DOM::initialize (const Geometry& geo, 
                  const Soil& soil, const SoilWater& soil_water, Treelog& msg)
 { 
-  C.initialize (geo, soil, soil_water, *adsorption, msg);
-  N.initialize (geo, soil, soil_water, *adsorption, msg);
+  C.initialize (geo, soil, soil_water, msg);
+  N.initialize (geo, soil, soil_water, msg);
 }
 
 DOM::DOM (Block& al)
   : C (*new DOE (al.alist ("C"))),
     N (*new DOE (al.alist ("N"))),
-    adsorption (Librarian::build_item<Adsorption> (al, "adsorption")),
     diffusion_coefficient (al.number ("diffusion_coefficient")),
     turnover_rate (al.check ("turnover_rate")
 		   ? al.number ("turnover_rate")

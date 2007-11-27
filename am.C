@@ -23,7 +23,7 @@
 
 #include "am.h"
 #include "aom.h"
-#include "im.h"
+#include "chemical.h"
 #include "metalib.h"
 #include "library.h"
 #include "submodeler.h"
@@ -49,7 +49,8 @@ struct AM::Implementation
   struct Check_OM_Pools : public VCheck
   {
     // Check that the OM pools are correct for organic fertilizer.
-    void check (const Syntax& syntax, const AttributeList& alist, 
+    void check (const Metalib&, 
+		const Syntax& syntax, const AttributeList& alist, 
 		const std::string& key) const throw (std::string);
   };
 
@@ -100,7 +101,8 @@ struct AM::Implementation
 };
 
 void
-AM::Implementation::Check_OM_Pools::check (const Syntax& syntax, 
+AM::Implementation::Check_OM_Pools::check (const Metalib&, 
+					   const Syntax& syntax, 
 					   const AttributeList& alist, 
 					   const std::string& key) 
   const throw (std::string)
@@ -110,7 +112,8 @@ AM::Implementation::Check_OM_Pools::check (const Syntax& syntax,
   daisy_assert (!syntax.is_log (key));
   daisy_assert (syntax.size (key) == Syntax::Sequence);
 
-  const std::vector<AttributeList*>& om_alist = alist.alist_sequence (key);
+  const std::vector<const AttributeList*>& om_alist 
+    = alist.alist_sequence (key);
   int missing_initial_fraction = 0;
   int missing_C_per_N = 0;
   double total_fractions = 0.0;
@@ -542,7 +545,8 @@ void
 AM::mix (const Geometry& geo,
 	 const double from, const double to, const double penetration,
          double& tillage_N_top, double& tillage_C_top,
-         std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil,
+         std::vector<double>& tillage_N_soil,
+	 std::vector<double>& tillage_C_soil,
          const double dt)
 { impl->mix (geo, from, to, penetration, 
             tillage_N_top, tillage_C_top, 
@@ -551,7 +555,8 @@ AM::mix (const Geometry& geo,
 void
 AM::swap (const Geometry& geo,
 	  const double from, const double middle, const double to,
-          std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil,
+          std::vector<double>& tillage_N_soil,
+	  std::vector<double>& tillage_C_soil,
           const double dt)
 { impl->swap (geo, from, middle, to, tillage_N_soil, tillage_C_soil, dt); }
 
@@ -640,7 +645,7 @@ AM::create (const AttributeList& al1 , const Geometry& geo,
 // Crop part.
 AM& 
 AM::create (const size_t cell_size, const Time& time,
-	    const std::vector<AttributeList*>& ol,
+	    const std::vector<const AttributeList*>& ol,
 	    const symbol sort, const symbol part,
 	    AM::lock_type lock)
 {
@@ -659,10 +664,10 @@ AM::create (const size_t cell_size, const Time& time,
   return am;
 }
 
-const std::vector<AttributeList*>&
+const std::vector<const AttributeList*>&
 AM::default_AM ()
 {
-  static std::vector<AttributeList*> am;
+  static std::vector<const AttributeList*> am;
 
   if (am.size () < 1)
     {
@@ -777,6 +782,15 @@ AM::get_NH4 (const AttributeList& al)
   return al.number ("NH4");
 }
 
+IM
+AM::get_IM (const AttributeList& al)
+{
+  IM result (IM::storage_unit ());
+  result.set_value (Chemical::NH4_solute (), IM::storage_unit (), get_NH4 (al));
+  result.set_value (Chemical::NO3 (), IM::storage_unit (), get_NO3 (al));
+  return result;
+}
+
 double
 AM::get_volatilization (const AttributeList& al)
 {
@@ -789,7 +803,7 @@ AM::get_volatilization (const AttributeList& al)
 	  // Organic fertilizer.
 	  const double weight = al.number ("weight") 
 	    * al.number ("dry_matter_fraction") 
-	    * 1000;			// T w.w. / ha --> kg DM / ha
+	    * 100.0;			// T w.w. / ha --> g / m^2
 	  const double N = weight * al.number ("total_N_fraction");
 	  return N * al.number ("NH4_fraction") * volatilization;
 	}
@@ -939,10 +953,11 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
     daisy_notreached ();
   else if (syntax == "initial")
     {
-      const std::vector<AttributeList*>& oms = alist.alist_sequence ("om");
+      const std::vector<const AttributeList*>& oms
+	= alist.alist_sequence ("om");
       const std::vector<AOM*>& om = impl->om;
       
-      const std::vector<AttributeList*>& layers
+      const std::vector<const AttributeList*>& layers
 	= alist.alist_sequence ("layers");
       
       double last = 0.0;
@@ -1054,7 +1069,7 @@ static struct AM_Syntax
     // We need exactly one pool with unspecified OM.
     daisy_assert (al.check ("om"));
     int unspecified = 0;
-    const std::vector<AttributeList*>& om = al.alist_sequence ("om");
+    const std::vector<const AttributeList*>& om = al.alist_sequence ("om");
     for (size_t i = 0; i < om.size (); i++)
       if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
 	unspecified++;
@@ -1074,7 +1089,7 @@ static struct AM_Syntax
 
     // We need exactly one pool with unspecified OM.
     daisy_assert (al.check ("om"));
-    const std::vector<AttributeList*>& om = al.alist_sequence ("om");
+    const std::vector<const AttributeList*>& om = al.alist_sequence ("om");
     for (size_t i = 0; i < om.size (); i++)
       if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
 	{

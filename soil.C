@@ -385,7 +385,8 @@ check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
-  const std::vector<AttributeList*>& layers = al.alist_sequence ("horizons");
+  const std::vector<const AttributeList*>& layers
+    = al.alist_sequence ("horizons");
 
   if (layers.size () < 1U)
     {

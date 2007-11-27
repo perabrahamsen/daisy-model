@@ -280,11 +280,11 @@ SelectVolume::default_dimension (const symbol spec_dim) const
   switch (dimensions ())
     {
     case 0:
-      return Units::multiply (spec_dim, Units::cm3);
+      return Units::multiply (spec_dim, Units::cm3 ());
     case 1:
-      return Units::multiply (spec_dim, Units::cm2);
+      return Units::multiply (spec_dim, Units::cm2 ());
     case 2:
-      return Units::multiply (spec_dim, Units::cm);
+      return Units::multiply (spec_dim, Units::cm ());
     case 3:
       return spec_dim;
     default:

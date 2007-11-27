@@ -30,8 +30,8 @@
 struct Geometry;
 struct Soil;
 struct SoilWater;
-struct Solute;
-
+struct Chemical;
+struct Chemistry;
 struct Log;
 struct AttributeList;
 struct Syntax;
@@ -97,16 +97,15 @@ public:
 		       Treelog&);
 private:
   double solute_uptake (const Geometry&, 
-                        const Soil&, const SoilWater&, Solute&,
+                        const Soil&, const SoilWater&, Chemical&,
 			double PotNUpt, std::vector<double>& uptake,
 			double i_max, double C_root_min, double dt);
 public:
   double nitrogen_uptake (const Geometry&,
                           const Soil& soil,
 			  const SoilWater& soil_water,
-			  Solute& soil_NH4,
+			  Chemistry& chemistry,
 			  double NH4_root_min,
-			  Solute& soil_NO3,
 			  double NO3_root_min,
 			  double PotNUpt,
                           double dt);

@@ -25,7 +25,7 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 #include "msoltranrect.h"
-#include "solute.h"
+#include "chemical.h"
 #include "groundwater.h"
 #include "surface.h"
 #include "weather.h"
@@ -53,13 +53,13 @@ struct MovementRect : public Movement
 
   // Solute.
   const auto_vector<Msoltranrect*> matrix_solute;
-  const std::auto_ptr<Msoltranrect> matrix_solute_solid;
+  const std::auto_ptr<Msoltranrect> matrix_solid;
   void solute (const Soil& soil, const SoilWater& soil_water,
-               double J_in, Solute&, const bool flux_below, 
+               double J_in, Chemical&, const bool flux_below, 
 	       double dt, const Scope&, Treelog&);
   void element (const Soil& soil, const SoilWater& soil_water,
-                DOE& element, Adsorption& adsorption,
-                double diffusion_coefficient, double dt, Treelog& msg);
+                DOE& element, 
+		double diffusion_coefficient, double dt, Treelog& msg);
 
   // Management.
   void ridge (Surface&, const Soil&, const SoilWater&, const AttributeList&);
@@ -116,23 +116,24 @@ MovementRect::macro_tick (const Soil&, SoilWater&, Surface&,
 
 void
 MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
-                      const double J_in, Solute& solute, 
+                      const double J_in, Chemical& chemical, 
 		      const bool flux_below, 
 		      const double dt,
                       const Scope& scope, Treelog& msg)
 {
-  if (solute.adsorption->full ())
+  if (chemical.phase () == Chemical::solid)
     {
-      matrix_solute_solid->solute (*geo, soil, soil_water, J_in, solute,
-				   flux_below, dt, scope, msg);
+      matrix_solid->solute (*geo, soil, soil_water, J_in, chemical,
+			    flux_below, dt, scope, msg);
       return;
     }
+  daisy_assert (chemical.phase () == Chemical::solute);
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
       Treelog::Open nest (msg, matrix_solute[i]->name);
       try
         {
-          matrix_solute[i]->solute (*geo, soil, soil_water, J_in, solute, 
+          matrix_solute[i]->solute (*geo, soil, soil_water, J_in, chemical, 
                                     flux_below, dt, scope, msg);
           if (i > 0)
             msg.message ("Succeeded");
@@ -152,24 +153,17 @@ MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
 
 void 
 MovementRect::element (const Soil& soil, const SoilWater& soil_water,
-                       DOE& element, Adsorption& adsorption,
+                       DOE& element, 
                        const double diffusion_coefficient, double dt, 
                        Treelog& msg)
 {
-  if (adsorption.full ())
-    {
-      matrix_solute_solid->element (*geo, soil, soil_water, element, 
-                                    adsorption, diffusion_coefficient, dt, 
-                                    msg);
-      return;
-    }
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
       Treelog::Open nest (msg, matrix_solute[i]->name);
       try
         {
           matrix_solute[i]->element (*geo, soil, soil_water, element, 
-                                     adsorption, diffusion_coefficient, dt, 
+                                     diffusion_coefficient, dt, 
                                      msg);
           if (i > 0)
             msg.message ("Succeeded");
@@ -334,8 +328,8 @@ MovementRect::MovementRect (Block& al)
     matrix_water (Librarian::build_vector<UZRect> (al, "matrix_water")),
     matrix_solute (Librarian::build_vector<Msoltranrect> 
                    (al, "matrix_solute")),
-    matrix_solute_solid (Librarian::build_item<Msoltranrect>
-                         (al, "matrix_solute_solid"))
+    matrix_solid (Librarian::build_item<Msoltranrect>
+		  (al, "matrix_solid"))
 { 
   for (size_t i = 0; i < drain_position.size (); i++)
     {
@@ -372,13 +366,13 @@ static struct MovementRectSyntax
     syntax.add_submodule_sequence ("drain", Syntax::Const,
 				   "Location of cells with drain pipes.",
 				   MovementRect::Point::load_syntax);
-    alist.add ("drain", std::vector<AttributeList*> ());
+    alist.add ("drain", std::vector<const AttributeList*> ());
     syntax.add_object ("matrix_water", UZRect::component, 
                        Syntax::Const, Syntax::Sequence,
                        "Matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-    std::vector<AttributeList*> matrix_water_models;
+    std::vector<const AttributeList*> matrix_water_models;
     AttributeList matrix_water_reserve (UZRect::reserve_model ());
     matrix_water_models.push_back (&matrix_water_reserve);
     alist.add ("matrix_water", matrix_water_models);
@@ -387,17 +381,17 @@ If none succeeds, the simulation ends.");
                        "Matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-    std::vector<AttributeList*> matrix_solute_models;
+    std::vector<const AttributeList*> matrix_solute_models;
     AttributeList matrix_solute_default (Msoltranrect::default_model ());
     matrix_solute_models.push_back (&matrix_solute_default);
     AttributeList matrix_solute_reserve (Msoltranrect::reserve_model ());
     matrix_solute_models.push_back (&matrix_solute_reserve);
     alist.add ("matrix_solute", matrix_solute_models);
 
-    syntax.add_object ("matrix_solute_solid", Msoltranrect::component, 
+    syntax.add_object ("matrix_solid", Msoltranrect::component, 
                        Syntax::Const, Syntax::Singleton, "\
-Matrix solute transport model used for fully adsorbed constituents.");
-    alist.add ("matrix_solute_solid", Msoltranrect::none_model ());
+Matrix solute transport model used for fully sorbed constituents.");
+    alist.add ("matrix_solid", Msoltranrect::none_model ());
 
     Librarian::add_type (Movement::component, "rectangle",
                          alist, syntax, &make);

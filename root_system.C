@@ -28,7 +28,8 @@
 #include "soil_heat.h"
 #include "soil_water.h"
 #include "soil.h"
-#include "solute.h"
+#include "chemical.h"
+#include "chemistry.h"
 #include "log.h"
 #include "check.h"
 #include "block.h"
@@ -208,7 +209,7 @@ RootSystem::water_uptake (double Ept_,
 double
 RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 			   const SoilWater& soil_water,
-			   Solute& solute,
+			   Chemical& solute,
 			   double PotNUpt,
 			   std::vector<double>& uptake,
 			   const double I_max,
@@ -307,12 +308,19 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 double
 RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
 			     const SoilWater& soil_water,
-			     Solute& soil_NH4,
+			     Chemistry& chemistry,
 			     const double NH4_root_min,
-			     Solute& soil_NO3,
 			     const double NO3_root_min,
 			     const double PotNUpt, double dt)
 {
+  // If we don't track inorganic N, assume we have enough.
+  if (!chemistry.know (Chemical::NH4_solute ())
+      || !chemistry.know (Chemical::NO3 ()))
+    return PotNUpt;
+    
+  Chemical& soil_NH4 = chemistry.find (Chemical::NH4_solute ());
+  Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
+
   NH4Upt = solute_uptake (geo, soil, soil_water, soil_NH4, 
 			  PotNUpt, NH4Extraction, MxNH4Up, NH4_root_min, dt);
   NO3Upt = solute_uptake (geo, soil, soil_water, soil_NO3, 

@@ -19,12 +19,12 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#error "don't include solute.h"
 
 #ifndef SOLUTE_H
 #define SOLUTE_H
 
-// These must be included in the header file, for 'load_syntax' to work.
-#include "adsorption.h"
+#include "symbol.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -43,28 +43,29 @@ class Scope;
 
 class Solute
 {
-public:
-  const std::string submodel;	// Derived submodel.
+  // Units.
+private:
   static const symbol g_per_cm3;
 
-  friend class Movement1D;
-
   // Parameters.
+private:
   const std::auto_ptr<Number> C_below_expr;
   double C_below_value;
   const std::auto_ptr<Number> initial_expr;
 public:
   double C_below () const; // Concentration in groundwater [g/cm^3]
+  const enum phase_t { solid, solute } phase;
+  static phase_t get_phase (symbol);
 
   // State variables.
 protected:
-  std::vector<double> M_;	 // Concentration in soil [g/cm^3]
+  std::vector<double> M_;	       // Concentration in soil [g/cm^3]
   std::vector<double> C_;        // Concentration in soil solution [g/cm^3]
 
   // Flux variables.
 protected:
   std::vector<double> S_;		// Combined source term.
-  std::vector<double> S_p_;		// Source term for macropores only.
+  std::vector<double> S_p_;	// Source term for macropores only.
   std::vector<double> S_drain;	// Source term for soil drainage only.
   std::vector<double> S_external;	// External source term, e.g. incorp. fert.
   std::vector<double> S_permanent;	// Permanent external source term.
@@ -72,20 +73,12 @@ protected:
   std::vector<double> S_sorption;	// Sorption source term.
   std::vector<double> S_transform;	// Transform source term.
   std::vector<double> J;		// Solute transport log in matrix.
-  std::vector<double> J_p;		// Solute transport log in macropores.
-public:
-  std::auto_ptr<Adsorption> adsorption;	// Solute adsorption.
+  std::vector<double> J_p;             // Solute transport log in macropores.
 private:
-  std::vector<double> tillage;       // Changes during tillage.
+  std::vector<double> tillage;         // Changes during tillage.
 
 public:
   virtual double diffusion_coefficient () const = 0; // in free solute. 
-  double C_to_M (const Soil& soil, double Theta, size_t i, double C) const
-  { return adsorption->C_to_M (soil, Theta, i, C); }
-  double M_to_C (const Soil& soil, double Theta, size_t i, double M) const
-  { return adsorption->M_to_C (soil, Theta, i, M); }
-
-public:
   const std::vector<double>& M () const
   { return M_; }
   double M (size_t i) const
@@ -119,30 +112,32 @@ public:
   void add_to_sorption_sink (const std::vector<double>&, double dt);
 
   // Simulation.
-  void tick (const size_t cell_size, const SoilWater&, double dt,
-	     const Scope&, Treelog&);
 public:
-  bool check (size_t n, const Scope&, Treelog&) const;
+  void tick (const size_t cell_size, const SoilWater&, double dt,
+	const Scope&, Treelog&);
   virtual void output (Log&) const;
+
+  // Operations.
+private:
+  void update_C (const SoilWater&);
+public:
   void incorporate (const Geometry&, double amount, 
                     double from, double to, double dt);
   void set_external_source (const Geometry&, 
-			    double amount, double from, double to);
+		  double amount, double from, double to);
   void mix (const Geometry& geo,
             const Soil&, const SoilWater&, double from, double to, double dt);
   void swap (const Geometry& geo,
              const Soil&, const SoilWater&,
              double from, double middle, double to, double dt);
 
-  // Communication with external model.
-  void put_M (const Soil& soil, const SoilWater& soil_water,
-	      const std::vector<double>& v);
-
   // Create and destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
 protected:
   Solute (Block& al);
+public:
+  bool check (size_t n, const Scope&, Treelog&) const;
 private:
   virtual void default_initialize (const Soil& soil, const SoilWater&, 
 				   const SoilHeat&, Treelog&);

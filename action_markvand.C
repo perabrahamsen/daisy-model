@@ -380,7 +380,7 @@ ActionMarkvand::crop_map_t::load_syntax (Syntax& syntax, AttributeList&)
 ActionMarkvand::crop_map_t::crop_map_t (Block& al, const std::string& key)
 {
   const Syntax& syntax = al.syntax ().syntax (key);
-  const std::vector<AttributeList*>& alists = al.alist_sequence (key);
+  const std::vector<const AttributeList*>& alists = al.alist_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
     {
       Block nest (al, syntax, *alists[i], key, i);
@@ -401,7 +401,7 @@ ActionMarkvand::get_crop (Daisy& daisy) const
 }
 
 void 
-ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& out)
+ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 {
   // Default values.
   const double default_LAI = 3.0;
@@ -422,10 +422,10 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& out)
           T_sum = 0.0;
 	  dt = 0.0;
 	  if (crop)
-	    out.message ("Starting MARKVAND irrigation for " 
+	    msg.message ("Starting MARKVAND irrigation for " 
 			 + crop->name.name () + ".");
 	  else
-	    out.message ("Starting MARKVAND irrigation for unknown crop "
+	    msg.message ("Starting MARKVAND irrigation for unknown crop "
                          + daisy.field->crop_names () + ".");
 	  const double z_x = crop 
 	    ? std::min (crop->z_xA, soil->z_xJ)
@@ -443,7 +443,7 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& out)
     {
       T_sum = dt = V_e = V_r = V_b = -42.42e42;
       V_I = C_u = V_u = 0.0;
-      out.message ("Stoping MARKVAND irrigation.");
+      msg.message ("Stoping MARKVAND irrigation.");
       return;
     }
 
@@ -477,9 +477,9 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& out)
     {
       std::ostringstream tmp;
       tmp << "MARKVAND Irrigating " << I << " mm";
-      out.message (tmp.str ());
+      msg.message (tmp.str ());
       IM im;
-      daisy.field->irrigate_overhead (I, im, daisy.dt);
+      daisy.field->irrigate_overhead (I, im, daisy.dt, msg);
     }
 
   // Update temperature sum and time.
@@ -608,7 +608,7 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& out)
         << ", V_u = " << V_u
         << ", V_b = " << V_b 
         << ", V_I = " << V_I;
-  out.message (debug.str ());
+  msg.message (debug.str ());
 #endif
 }
 

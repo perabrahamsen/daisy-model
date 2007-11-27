@@ -40,8 +40,7 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 #include "chemistry.h"
-#include "soil_NH4.h"
-#include "soil_NO3.h"
+#include "chemical.h"
 #include "bioincorporation.h"
 #include "abiotic.h"
 #include "time.h"
@@ -226,8 +225,8 @@ struct OrganicStandard : public OrganicMatter
   const std::vector<bool>& active () const;
   void tick (const Geometry& geo,
              const SoilWater&, const SoilHeat&, 
-	     SoilNO3&, SoilNH4&, double dt, Treelog& msg);
-  void transport (const Soil&, const SoilWater&, Treelog&);
+	     Chemistry&, double dt, Treelog& msg);
+  void transport (const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   const std::vector<DOM*>& fetch_dom () const;
   void output (Log&) const;
   double CO2 (size_t i) const;	// [g C/cm³]
@@ -244,16 +243,17 @@ struct OrganicStandard : public OrganicMatter
 
   // Create and Destroy.
   int som_pools () const;
-  bool check (const Soil&, const Chemistry&, Treelog& err) const;
+  bool check (const Soil&, const SoilWater&, const SoilHeat&,
+	      const Chemistry&, Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   void add (AM&);
   void fertilize (const AttributeList&, const Geometry&, double dt);
   void fertilize (const AttributeList&, const Geometry&,
                   double from, double to, double dt);
   AM* find_am (symbol sort, symbol part) const;
-  void initialize (Block&, const AttributeList&, const Geometry& geo,
+  void initialize (const AttributeList&, const Geometry& geo,
                    const Soil&, const SoilWater&, 
-		   double T_avg);
+		   double T_avg, Treelog&);
   static void load_syntax (Syntax&, AttributeList&);
   OrganicStandard ();
   OrganicStandard (const OrganicStandard&);
@@ -846,19 +846,28 @@ OrganicStandard::output (Log& log) const
 }
 
 bool
-OrganicStandard::check (const Soil& soil, const Chemistry&, Treelog& msg) const
+OrganicStandard::check (const Soil& soil, 
+			const SoilWater& soil_water, const SoilHeat& soil_heat, 
+			const Chemistry& chemistry, Treelog& msg) const
 {
   Treelog::Open nest (msg, "OrganicStandard");
   bool ok = true;
   
+  if (!chemistry.require (Chemical::NO3 (), msg))
+    ok = false;
+  if (!chemistry.require (Chemical::NH4_solute (), msg))
+    ok = false;
+
   for (size_t i = 0; i < am.size (); i++)
     if (!am[i]->check (msg))
       ok = false;
   for (size_t i = 0; i < domsorp.size (); i++)
-    if (!domsorp[i]->check (soil, dom.size (), som.size (), msg))
+    if (!domsorp[i]->check (soil, soil_water, soil_heat, 
+			    dom.size (), som.size (), msg))
       ok = false;
   if (!clayom->check (smb, msg))
     ok = false;
+
   return ok;
 }
 
@@ -1055,11 +1064,13 @@ void
 OrganicStandard::tick (const Geometry& geo,
                        const SoilWater& soil_water, 
                        const SoilHeat& soil_heat,
-                       SoilNO3& soil_NO3,
-                       SoilNH4& soil_NH4,
+		       Chemistry& chemistry,
                        const double dt,
                        Treelog& msg)
 {
+  Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
+  Chemical& soil_NH4 = chemistry.find (Chemical::NH4_solute ());
+
   const double old_N = total_N (geo);
   const double old_C = total_C (geo);
 
@@ -1201,8 +1212,8 @@ OrganicStandard::tick (const Geometry& geo,
     }
   
   // Update soil solutes.
-  soil_NO3.add_to_source (NO3_source, dt);
-  soil_NH4.add_to_source (NH4_source, dt);
+  soil_NO3.add_to_transform_source (NO3_source, dt);
+  soil_NH4.add_to_transform_source (NH4_source, dt);
 
   // Biological incorporation.
   const double soil_T = geo.content_at (soil_heat, &SoilHeat::T, 0.0 /* cm */);
@@ -1266,10 +1277,11 @@ OrganicStandard::tick (const Geometry& geo,
 void 
 OrganicStandard::transport (const Soil& soil, 
                             const SoilWater& soil_water, 
+			    const SoilHeat& soil_heat,
                             Treelog& msg)
 {
   for (size_t j = 0; j < domsorp.size (); j++)
-    domsorp[j]->tick (soil, soil_water, dom, som, msg);
+    domsorp[j]->tick (soil, soil_water, soil_heat, dom, som, msg);
 }
 
 void 
@@ -2320,13 +2332,13 @@ OrganicStandard::update_pools
 }
 
 void
-OrganicStandard::initialize (Block& block, const AttributeList& al,
+OrganicStandard::initialize (const AttributeList& al,
                              const Geometry& geo,
                              const Soil& soil, 
                              const SoilWater& soil_water,
-                             double T_avg)
+                             double T_avg, Treelog& msg)
 { 
-  Treelog::Open nest (block.msg (), "OrganicStandard");
+  Treelog::Open nest (msg, "OrganicStandard");
 
   // Sizes.
   const size_t cell_size = geo.cell_size ();
@@ -2400,24 +2412,24 @@ OrganicStandard::initialize (Block& block, const AttributeList& al,
     {
       std::ostringstream tmp;
       tmp << "som[" << pool << "]";
-      Treelog::Open nest (block.msg (), tmp.str ());
+      Treelog::Open nest (msg, tmp.str ());
       if (som[pool]->C.size () > 0 && som[pool]->C.size () < cell_size)
-	block.msg ().warning ("C partially initialized.\n\
+	msg.warning ("C partially initialized.\n\
 Using humus for remaining entries");
       if (som[pool]->N.size () > 0 && som[pool]->N.size () < cell_size)
-	block.msg ().warning ("N partially initialized.\n\
+	msg.warning ("N partially initialized.\n\
 Using humus for remaining entries");
     }
   for (size_t pool = 0; pool < smb_size; pool++)
     {
       std::ostringstream tmp;
       tmp << "smb[" << pool << "]";
-      Treelog::Open nest (block.msg (), tmp.str ());
+      Treelog::Open nest (msg, tmp.str ());
       if (smb[pool]->C.size () > 0 && smb[pool]->C.size () < cell_size)
-	block.msg ().warning ("C partially initialized.\n\
+	msg.warning ("C partially initialized.\n\
 Using equilibrium for remaining entries");
       if (smb[pool]->N.size () > 0 && smb[pool]->N.size () < cell_size)
-	block.msg ().warning ("N partially initialized.\n\
+	msg.warning ("N partially initialized.\n\
 Using initial C per N for remaining entries");
     }
 
@@ -2427,7 +2439,7 @@ Using initial C per N for remaining entries");
   // Initialize C from layers, when available.
   if (al.check ("initial_SOM"))
     {
-      const std::vector<AttributeList*>& layers
+      const std::vector<const AttributeList*>& layers
 	= al.alist_sequence ("initial_SOM");
       const double soil_end = geo.bottom ();
       double last = 0.0;
@@ -2439,7 +2451,7 @@ Using initial C per N for remaining entries");
 	  daisy_assert (end < last);
 	  if (end < soil_end)
 	    {
-	      block.msg ().warning ("\
+	      msg.warning ("\
 An 'initial_SOM' layer in OrganicStandard ends below the last cell");
 	      weight *= (last - soil_end) / (last - end);
 	      end = soil_end;
@@ -2499,7 +2511,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
                    SOM_results, SMB_results,
                    delta_C, delta_N,
                    soil.dry_bulk_density (lay),
-                   block.msg (),
+                   msg,
                    init.print_equations (lay), init.debug_rows, 
                    init.debug_to_screen);
         if (top_soil)
@@ -2518,15 +2530,15 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
 
   // Initialize DOM.
   for (size_t pool = 0; pool < dom_size; pool++)
-    dom[pool]->initialize (geo, soil, soil_water, block.msg ());
+    dom[pool]->initialize (geo, soil, soil_water, msg);
 
   // Initialize domsorp
   for (size_t i = 0; i < domsorp.size (); i++)
-    domsorp[i]->initialize (block, soil);
+    domsorp[i]->initialize (soil, msg);
 
   // Summary.
   {
-    Treelog::Open nest (block.msg (), "Total soil summary");
+    Treelog::Open nest (msg, "Total soil summary");
     std::ostringstream total;
     total << "Expected humus change: " 
           << total_delta_C * g_per_cm2_per_h_to_kg_per_ha_per_y 
@@ -2540,9 +2552,9 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
           << -total_delta_N * g_per_cm2_per_h_to_kg_per_ha_per_y 
           << " [kg N/ha/y].";
     if (init.debug_to_screen)
-      block.msg ().message (total.str ());
+      msg.message (total.str ());
     else
-      block.msg ().debug (total.str ());  
+      msg.debug (total.str ());  
   }
 
   // Print top summary.
@@ -2550,18 +2562,18 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
     const std::string summary 
       = top_summary (geo, soil, init, zone_delta_N, zone_delta_C);
 
-    Treelog::Open nest (block.msg (), "Top soil summary");
+    Treelog::Open nest (msg, "Top soil summary");
     if (init.debug_to_screen)
-      block.msg ().message (summary);
+      msg.message (summary);
     else
-      block.msg ().debug (summary);
+      msg.debug (summary);
     
     if (init.top_summary != "")
       {
         std::ofstream out (init.top_summary.c_str ());
         out << summary;
         if (!out.good ())
-          block.error ("Problems writing to '" + init.top_summary + "'");
+          msg.error ("Problems writing to '" + init.top_summary + "'");
       }
   }  
 
@@ -2635,7 +2647,7 @@ OrganicStandard::check_am (const AttributeList& am, Treelog& err) const
   bool ok = true;
   if (ok)
     {
-      const std::vector<AttributeList*>& om_alist
+      const std::vector<const AttributeList*>& om_alist
 	= am.alist_sequence ("om");
       
       for (size_t i = 0; i < om_alist.size(); i++)
@@ -2687,10 +2699,10 @@ check_alist (const AttributeList& al, Treelog& err)
   if (al.check ("active_groundwater"))
     err.warning ("The 'active_groundwater' parameter is ignored.");
 
-  const std::vector<AttributeList*>& am_alist = al.alist_sequence ("am");
-  const std::vector<AttributeList*>& smb_alist = al.alist_sequence ("smb");
-  const std::vector<AttributeList*>& som_alist = al.alist_sequence ("som");
-  const std::vector<AttributeList*>& dom_alist = al.alist_sequence ("dom");
+  const std::vector<const AttributeList*>& am_alist = al.alist_sequence ("am");
+  const std::vector<const AttributeList*>& smb_alist = al.alist_sequence ("smb");
+  const std::vector<const AttributeList*>& som_alist = al.alist_sequence ("som");
+  const std::vector<const AttributeList*>& dom_alist = al.alist_sequence ("dom");
 
   for (size_t j = 0; j < am_alist.size(); j++)
     {
@@ -2701,7 +2713,7 @@ check_alist (const AttributeList& al, Treelog& err)
       if (am_ok)
 	{
 	  bool om_ok = true;
-	  const std::vector<AttributeList*>& om_alist
+	  const std::vector<const AttributeList*>& om_alist
 	    = am_alist[j]->alist_sequence ("om");
 	  for (size_t i = 0; i < om_alist.size(); i++)
 	    {
@@ -2969,7 +2981,7 @@ Turnover rate above which pools will contribute to 'CO2_fast'.");
   syntax.add_object ("am", AM::component, 
                      Syntax::State, Syntax::Sequence, 
                      "Added organic matter pools.");
-  std::vector<AttributeList*> am;
+  std::vector<const AttributeList*> am;
   AttributeList root (AM::default_root ());
   am.push_back (&root);
   alist.add ("am", am);
@@ -2986,7 +2998,7 @@ Turnover rate above which pools will contribute to 'CO2_fast'.");
 Soil MicroBiomass pools.\n\
 Initial value will be estimated based on equilibrium with AM and SOM pools.",
 				 SMB::load_syntax);
-  std::vector<AttributeList*> SMB;
+  std::vector<const AttributeList*> SMB;
   AttributeList SMB1 (smb_alist);
   std::vector<double> SMB1_C_per_N;
   SMB1_C_per_N.push_back (6.7);
@@ -3031,7 +3043,7 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   Syntax som_syntax;
   AttributeList som_alist;
   SOM::load_syntax (som_syntax, som_alist);
-  std::vector<AttributeList*> SOM;
+  std::vector<const AttributeList*> SOM;
   AttributeList SOM1 (som_alist);
 #if 1 // SANDER_PARAMS
   SOM1.add ("turnover_rate", 4.3e-5 / 24.0 /* 1.7916667e-6 */);
@@ -3093,11 +3105,11 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   syntax.add_submodule_sequence ("dom", Syntax::State, 
 				 "Dissolved Organic Matter pools.",
 				 DOM::load_syntax);
-  alist.add ("dom", std::vector<AttributeList*> ());
+  alist.add ("dom", std::vector<const AttributeList*> ());
   syntax.add_object ("domsorp", Domsorp::component, 
                      Syntax::State, Syntax::Sequence, 
                      "Interchange between DOM and SOM pools.");
-  alist.add ("domsorp", std::vector<AttributeList*> ());
+  alist.add ("domsorp", std::vector<const AttributeList*> ());
 
   syntax.add ("heat_factor", "dg C", Syntax::None (), Check::non_negative (),
 	      Syntax::Const,

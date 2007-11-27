@@ -30,6 +30,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "scope_soil.h"
+#include "units.h"
 #include "log.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -38,8 +39,6 @@
 
 struct ReactionAdsorption : public Reaction
 {
-  static const symbol rate_unit;
-  
   // Parameters.
   const symbol name_solute;
   const symbol name_sorbed;
@@ -59,8 +58,8 @@ struct ReactionAdsorption : public Reaction
 	     const double dt, Treelog& msg)
   { 
     const size_t cell_size = geo.cell_size ();
-    Solute& solute = chemistry.find (name_solute);
-    Solute& sorbed = chemistry.find (name_sorbed);
+    Chemical& solute = chemistry.find (name_solute);
+    Chemical& sorbed = chemistry.find (name_sorbed);
     
     ScopeSoil scope (soil, soil_water, soil_heat);
     for (size_t c = 0; c < cell_size; c++)
@@ -81,7 +80,8 @@ struct ReactionAdsorption : public Reaction
 
 	if (has_solute > want_solute)
 	  {
-	    if (!adsorption_rate->tick_value (convert, rate_unit, scope, msg))
+	    if (!adsorption_rate->tick_value (convert,
+					      Units::per_h (), scope, msg))
 	      msg.error ("Could not evaluate 'adsorption_rate'");
 	    
 	    
@@ -96,7 +96,8 @@ struct ReactionAdsorption : public Reaction
 	  }
 	else
 	  {
-	    if (!desorption_rate->tick_value (convert, rate_unit, scope, msg))
+	    if (!desorption_rate->tick_value (convert,
+					      Units::per_h (), scope, msg))
 	      msg.error ("Could not evaluate 'desorption_rate'");
 	    
 	    if (convert >= 1.0)
@@ -135,19 +136,19 @@ struct ReactionAdsorption : public Reaction
         ok = false;
       }
     ScopeSoil scope (soil, soil_water, soil_heat);
-    if (!adsorption_rate->check_dim (scope, rate_unit, msg))
+    if (!adsorption_rate->check_dim (scope, Units::per_h (), msg))
       ok = false;
-    if (!desorption_rate->check_dim (scope, rate_unit, msg))
+    if (!desorption_rate->check_dim (scope, Units::per_h (), msg))
       ok = false;
 
     return ok;
   }
-  void initialize (Block& block, const Soil& soil)
+  void initialize (const Soil& soil, Treelog& msg)
   { 
     adsorption_source.insert (adsorption_source.begin (), soil.size (), 0.0);
     daisy_assert (adsorption_source.size () == soil.size ());
-    adsorption_rate->initialize (block.msg ()); 
-    desorption_rate->initialize (block.msg ()); 
+    adsorption_rate->initialize (msg); 
+    desorption_rate->initialize (msg); 
   }
   explicit ReactionAdsorption (Block& al)
     : Reaction (al),
@@ -161,18 +162,12 @@ struct ReactionAdsorption : public Reaction
   { }
 };
 
-const symbol
-ReactionAdsorption::rate_unit ("h^-1");
-
 static struct ReactionAdsorptionSyntax
 {
   static Model& make (Block& al)
   { return *new ReactionAdsorption (al); }
-  ReactionAdsorptionSyntax ()
+  static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
     alist.add ("description", 
 	       "Maintain equilibrium between solute and sorbed from.");
     syntax.add ("solute", Syntax::String, Syntax::Const,
@@ -191,10 +186,62 @@ By default, this is identical to 'adsorption_rate'.");
     syntax.add ("adsorption_source", "g/cm^3/h", 
 		Syntax::LogOnly, Syntax::Sequence, "\
 Converted from solute to sorbed form this timestep (may be negative).");
+  }
+  static void load_NH4 (Syntax& syntax, AttributeList& alist);
+  static void build_adsoption ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
 
+    load_syntax (syntax, alist);
     Librarian::add_type (Reaction::component, "adsorption",
 			 alist, syntax, &make);
   }
+  static void build_NH4 ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    load_NH4 (syntax, alist);
+    alist.add ("type", "adsorption");
+
+    Librarian::add_type (Reaction::component, "NH4_sorption",
+			 alist, syntax, &make);
+  }
+  ReactionAdsorptionSyntax ()
+  {
+    build_adsoption ();
+    build_NH4 ();
+  }
 } ReactionAdsorption_syntax;
+
+void 
+ReactionAdsorptionSyntax::load_NH4 (Syntax& syntax, AttributeList& alist)
+{
+  load_syntax (syntax, alist);
+  alist.add ("solute", Chemical::NH4_solute ());
+  alist.add ("sorbed", Chemical::NH4_sorbed ());
+  AttributeList linear;
+  linear.add ("type", "linear");
+  linear.add ("K_clay", 117.116);
+  alist.add ("equilibrium", linear);
+  AttributeList rate;
+  rate.add ("type", "const");
+  rate.add ("value", 1.0, "s^-1");
+  alist.add ("adsorption_rate", rate);
+}
+
+const AttributeList& 
+Reaction::NH4_sorption_model ()
+{ 
+  static AttributeList alist;
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      ReactionAdsorptionSyntax::load_NH4 (dummy, alist);
+      alist.add ("type", "NH4_sorption");
+    }
+  return alist;
+}
 
 // reaction_adsorption.C ends here.

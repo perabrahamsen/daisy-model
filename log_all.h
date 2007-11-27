@@ -51,6 +51,9 @@ public:
   void initial_done (const std::vector<Time::component_t>& time_columns,
 		     const Time& time, double dt);
 
+  // Open a derived type.
+  void open_derived_type (symbol type, const char* library);
+
   // Open normal items.
   void open (symbol name);
   void close ();

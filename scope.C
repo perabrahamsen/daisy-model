@@ -34,6 +34,9 @@ Scope::title () const
 bool 
 Scope::is_number (symbol tag) const
 {
+  if (has_number (tag))
+    return true;
+
   const std::vector<symbol>& all = all_numbers ();
 
   for (size_t i = 0; i < all.size (); i++)

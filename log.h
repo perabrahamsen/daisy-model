@@ -181,14 +181,16 @@ public:
   private:
     Log& ll;
   public:
-    Derived (Log& l, const symbol field, const symbol type)
+    Derived (Log& l, const symbol field, const symbol type, 
+	     const char *const library)
       : ll (l)
-    { ll.open_derived (field, type); }
+    { ll.open_derived (field, type, library); }
     ~Derived ()
     { ll.close_derived (); }
   };
 private:
-  virtual void open_derived (symbol field, symbol type) = 0;
+  virtual void open_derived (symbol field, symbol type, 
+			     const char* library) = 0;
   virtual void close_derived () = 0;
   friend struct Log::Derived;
 
@@ -200,15 +202,16 @@ public:
     Log& ll;
   public:
     Object (Log& l, const symbol field, const symbol type, 
-            const AttributeList& alist)
+            const AttributeList& alist, const char *const library)
       : ll (l)
-    { ll.open_object (field, type, alist); }
+    { ll.open_object (field, type, alist, library); }
     ~Object ()
     { ll.close_object (); }
   };
 private:
   virtual void open_object (symbol field, symbol type, 
-                            const AttributeList& alist) = 0;
+			    const AttributeList& alist, 
+			    const char* library) = 0;
   virtual void close_object () = 0;
   friend struct Log::Object;
 
@@ -219,15 +222,16 @@ public:
   private:
     Log& ll;
   public:
-    Entry (Log& l, symbol type, 
-	   const AttributeList& alist)
+    Entry (Log& l, const symbol type,
+	   const AttributeList& alist, const char *const library)
       : ll (l)
-    { ll.open_entry (type, alist); }
+    { ll.open_entry (type, alist, library); }
     ~Entry ()
     { ll.close_entry (); }
   };
 private:
-  virtual void open_entry (symbol type, const AttributeList&) = 0;
+  virtual void open_entry (symbol type, const AttributeList&, 
+			   const char* library) = 0;
   virtual void close_entry () = 0;
   friend struct Log::Entry;
 
@@ -348,7 +352,7 @@ output_derived_ (const T& submodule, const symbol name, Log& log)
 {
   if (log.check_derived (name, submodule.name, T::component))
     {
-      Log::Derived derived (log, name, submodule.name);
+      Log::Derived derived (log, name, submodule.name, T::component);
       submodule.output (log);
     }
 }
@@ -367,7 +371,8 @@ output_object_ (const T& submodule, const symbol name, Log& log)
 {
   if (log.check_derived (name, submodule.name, T::component))
     {
-      Log::Object object (log, name, submodule.name, submodule.alist);
+      Log::Object object (log, name, submodule.name, 
+			  submodule.alist, T::component);
       submodule.output (log);
     }
 }
@@ -393,7 +398,7 @@ output_list_ (T const& items, const symbol name, Log& log,
 	  if (log.check_entry ((*item)->name, library))
 	    {
 	      Log::Entry entry (log, symbol ((*item)->name),
-				(*item)->alist);
+				(*item)->alist, library);
 	      (*item)->output (log);
 	    }
 	}

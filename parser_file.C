@@ -51,7 +51,7 @@ struct ParserFile::Implementation
   Metalib& metalib;
 
   // Inputs.
-  auto_vector<AttributeList*> inputs;
+  auto_vector<const AttributeList*> inputs;
 
   // Lexer.
   std::string file;
@@ -993,9 +993,9 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    case Syntax::Object:
 	      {
 		const Library& lib = syntax.library (metalib, name);
-		static const std::vector<AttributeList*> no_sequence;
-		std::vector<AttributeList*> sequence;
-		const std::vector<AttributeList*>& old_sequence
+		static const std::vector<const AttributeList*> no_sequence;
+		std::vector<const AttributeList*> sequence;
+		const std::vector<const AttributeList*>& old_sequence
 		  = atts.check (name) 
 		  ? atts.alist_sequence (name) 
 		  : no_sequence;
@@ -1037,13 +1037,13 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    case Syntax::AList:
 	      {
 		const size_t size = syntax.size (name);
-		static const std::vector<AttributeList*> no_sequence;
+		static const std::vector<const AttributeList*> no_sequence;
 		const Syntax& syn = syntax.syntax (name);
-		const std::vector<AttributeList*>& old_sequence
+		const std::vector<const AttributeList*>& old_sequence
 		  = atts.check (name) 
 		  ? atts.alist_sequence (name) 
 		  : no_sequence;
-		std::vector<AttributeList*> sequence;
+		std::vector<const AttributeList*> sequence;
 		bool skipped = false;
 		// We do not force parentheses around the alist if it
 		// is the last member of a fully ordered list.
@@ -1340,7 +1340,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	{
 	  TreelogString treelog;
 	  Treelog::Open nest (treelog, name);
-	  if (!syntax.check (atts, name, treelog))
+	  if (!syntax.check (metalib, atts, name, treelog))
 	    error (treelog.str ());
 	}
 
@@ -1355,7 +1355,7 @@ ParserFile::Implementation::Implementation (Metalib& mlib,
                                             const std::string& name,
                                             Treelog& msg)
   : metalib (mlib),
-    inputs (std::vector<AttributeList*> ()),
+    inputs (std::vector<const AttributeList*> ()),
     file (name),
     owned_stream (mlib.path ().open_file (name)),
     lexer (new Lexer (name, *owned_stream, msg)),

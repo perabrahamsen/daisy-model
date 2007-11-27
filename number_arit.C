@@ -365,7 +365,7 @@ struct NumberOperands : public Number
 
       const struct Operands : public  op_x
       {
-        Operands (Block& Block, const std::vector<AttributeList*>& as)
+        Operands (Block& Block, const std::vector<const AttributeList*>& as)
           : op_x (Librarian:build_vector_const<Number> (as))
         { }
         ~Operands ()

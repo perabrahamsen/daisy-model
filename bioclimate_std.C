@@ -32,6 +32,8 @@
 #include "geometry.h"
 #include "soil.h"
 #include "soil_heat.h"
+#include "chemistry.h"
+#include "chemical.h"
 #include "syntax.h"
 #include "snow.h"
 #include "log.h"
@@ -43,6 +45,7 @@
 #include "svat.h"
 #include "vegetation.h"
 #include "time.h"
+#include "units.h"
 #include "check.h"
 #include "fao.h"
 #include "librarian.h"
@@ -148,7 +151,8 @@ struct BioclimateStandard : public Bioclimate
   // Simulation
   void tick (const Time&, Surface&, const Weather&, 
 	     Vegetation&, const Movement&, const Geometry&,
-             const Soil&, SoilWater&, const SoilHeat&, double dt, Treelog&);
+             const Soil&, SoilWater&, const SoilHeat&, Chemistry&, 
+	     double dt, Treelog&);
   void output (Log&) const;
 
   // Canopy.
@@ -628,7 +632,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   const double VaporPressure = weather.vapor_pressure ();
   const double Si = weather.hourly_global_radiation ();
   const double Albedo = albedo (vegetation, surface, geo, soil, soil_water);
-  net_radiation->tick (Cloudiness, AirTemperature, VaporPressure, Si, Albedo, msg);
+  net_radiation->tick (Cloudiness, AirTemperature, VaporPressure, Si, Albedo,
+		       msg);
   const double Rn = net_radiation->net_radiation ();
 
   // 1.1 Evapotranspiration
@@ -875,6 +880,7 @@ BioclimateStandard::tick (const Time& time,
 			  Vegetation& vegetation, const Movement& movement,
                           const Geometry& geo, const Soil& soil, 
 			  SoilWater& soil_water, const SoilHeat& soil_heat,
+			  Chemistry& chemistry,
 			  const double dt, Treelog& msg)
 {
   // Keep weather information during time step.
@@ -885,8 +891,9 @@ BioclimateStandard::tick (const Time& time,
   daily_precipitation_ = weather.daily_precipitation ();
   day_length_ = weather.day_length ();
   
-  // Add nitrogen deposit. 
-  surface.fertilize (weather.deposit () * dt);
+  // Add deposition. 
+  const IM im = weather.deposit () * Scalar (dt, Units::h ());
+  chemistry.deposit (im, dt, msg);
 
   // Update canopy structure.
   CanopyStructure (vegetation);

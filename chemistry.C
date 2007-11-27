@@ -21,13 +21,72 @@
 #define BUILD_DLL
 
 #include "chemistry.h"
+#include "im.h"
+#include "chemical.h"
+#include "treelog.h"
 #include "block.h"
 #include "librarian.h"
+#include "vcheck.h"
+#include "alist.h"
 
 const char *const Chemistry::component = "chemistry";
 
+bool
+Chemistry::require (const symbol chem, Treelog& msg) const
+{
+  if (know (chem))
+    return true;
+  
+  msg.error ("Required chemical '" + chem.name () + "' not found");
+  return false;
+}
+
+void 
+Chemistry::deposit (const IM& im, double dt, Treelog& msg)
+{ 
+  for (IM::const_iterator i = im.begin (); i != im.end (); i++)
+    {
+      const symbol chem = *i;
+      const double amount = im.get_value (chem, Chemical::spray_unit ());
+      deposit (chem, amount, dt, msg);
+    }
+}
+
+void 
+Chemistry::spray (const IM& im, double dt, Treelog& msg)
+{ 
+  for (IM::const_iterator i = im.begin (); i != im.end (); i++)
+    {
+      const symbol chem = *i;
+      const double amount = im.get_value (chem, Chemical::spray_unit ());
+      spray (chem, amount, dt, msg);
+    }
+}
+
+void 
+Chemistry::incorporate (const Geometry& geo, const IM& im, 
+			const double from, const double to,
+			const double dt, Treelog& msg)
+{
+  for (IM::const_iterator i = im.begin (); i != im.end (); i++)
+    {
+      const symbol chem = *i;
+      const double amount = im.get_value (chem, Chemical::spray_unit ());
+      incorporate (geo, chem, amount, from, to, dt, msg);
+    }
+}
+
+void
+Chemistry::output (Log&) const
+{ }
+
+void
+Chemistry::load_syntax (Syntax& syntax, AttributeList& alist)
+{ }
+
 Chemistry::Chemistry (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.identifier ("type")),
+    alist (al.alist ())
 { }
 
 Chemistry::~Chemistry ()

@@ -72,16 +72,19 @@ public:
                     const Time&, double dt, Treelog&) = 0;
   virtual void ridge (const AttributeList& ridge) = 0;
   virtual void irrigate_overhead (double flux, double temp, const IM&, 
-                                  double dt) = 0;
+                                  double dt, Treelog& msg) = 0;
   virtual void irrigate_surface (double flux, double temp, const IM&,
-                                 double dt) = 0;
-  virtual void irrigate_overhead (double flux, const IM&, double dt) = 0;
-  virtual void irrigate_surface (double flux, const IM&, double dt) = 0;
+                                 double dt, Treelog& msg) = 0;
+  virtual void irrigate_overhead (double flux, const IM&, double dt,
+				  Treelog& msg) = 0;
+  virtual void irrigate_surface (double flux, const IM&, double dt, 
+				 Treelog& msg) = 0;
   virtual void irrigate_subsoil (double flux, const IM&, 
-                                 double from, double to, double dt) = 0;
+                                 double from, double to, double dt, 
+				 Treelog& msg) = 0;
   virtual void fertilize (const AttributeList&, 
-                          double from, double to, double dt) = 0;
-  virtual void fertilize (const AttributeList&, double dt) = 0;
+                          double from, double to, double dt, Treelog& msg) = 0;
+  virtual void fertilize (const AttributeList&, double dt, Treelog& msg) = 0;
   virtual void clear_second_year_utilization () = 0;
   virtual void emerge (symbol crop, Treelog&) = 0;
   virtual void harvest (const Time&, double dt, symbol name,
