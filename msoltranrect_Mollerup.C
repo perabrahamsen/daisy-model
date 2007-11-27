@@ -161,19 +161,21 @@ struct MsoltranrectMollerup : public Msoltranrect
 			     ublas::banded_matrix<double>& advecm_mat,
                              ublas::vector<double>& advecm_vec);
 
-
+  static double Dirichlet_timestep_new (const GeometryRect& geo,
+                                        const ublas::vector<double>& ThetaD_xx_zz,
+                                        const double dt);
+  
   static double Dirichlet_timestep (const GeometryRect& geo,
                                     const double C_border,
                                     const ublas::vector<double>& ThetaD_xx_zz,
                                     const ublas::vector<double>& C,
                                     const double dt);
-
+  
   static void upperboundary (const GeometryRect& geo,
                              std::vector<edge_type_t>& edge_type,
                              const std::vector<double>& J,
                              ublas::vector<double>& B_vec,
                              Treelog& msg);
-
 
   static void fluxes_new (const GeometryRect& geo,
                           const std::vector<edge_type_t>& edge_type,
@@ -860,6 +862,51 @@ MsoltranrectMollerup::lowerboundary
     }
 }
 
+double 
+MsoltranrectMollerup::Dirichlet_timestep_new 
+/**/ (const GeometryRect& geo,
+      const ublas::vector<double>& ThetaD_xx_zz,
+      const double dt)
+{
+  double ddt_dir = dt; 
+  double ddt_dir_new = dt;
+  
+  const std::vector<int>& edge_below
+    = geo.cell_edges (Geometry::cell_below);
+  const size_t edge_below_size = edge_below.size ();
+  
+  for (size_t i = 0; i < edge_below_size; i++)
+    {
+      // For diffusion into the cell, only half of the volume of the 
+      // conc difference between border and cell can be transported by 
+      // diffusion over the boundary into the cell in a timestep. 
+      //  
+      // For diffusion out from the cell, only half of the volume of the
+      // conc difference between cell and border can be transported by 
+      // diffusion over the boundary out from the cell in a timestep. 
+          
+      const int edge = edge_below[i];
+      const int cell = geo.edge_other (edge, Geometry::cell_below);
+      const double area_per_length = geo.edge_area_per_length (edge);
+      const double V_cell = geo.cell_volume (cell);
+      
+      //const double gradient =  area_per_length * (C_border - C_cell);
+      //const double Q_diff_out = -ThetaD_xx_zz (edge) * gradient;
+      //if  (Q_diff_out < 0) //Diff into cell
+      //  ddt_dir_new = 0.5 * V_cell *  (C_cell-C_border) / Q_diff_out; 
+      //else if  (Q_diff_out < 0) //Diff into cell
+      //  ddt_dir_new = -0.5 * V_cell * (C_border-C_cell) / Q_diff_out; 
+    
+      if (ThetaD_xx_zz (edge) > 0)    //No diffusive transport if zero diff
+        ddt_dir_new = 0.5 * V_cell / (ThetaD_xx_zz (edge) * area_per_length); 
+      else 
+        ddt_dir_new = ddt_dir;
+      
+      if (ddt_dir_new < ddt_dir)
+        ddt_dir = ddt_dir_new;
+    }
+  return ddt_dir;
+}
 
   
 double 
@@ -1337,12 +1384,12 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   //Theta * D - old and new and average 
   //ublas::vector<double> ThetaD_xx_zz_old (edge_size);                       //mmo 20071102 
   //ublas::vector<double> ThetaD_xz_zx_old (edge_size);                       //mmo 20071102
-  //thetadiff_xx_zz_xz_zx (geo, Theta_cell_old, Dxx_cell, Dzz_cell, Dxz_cell,   //mmo 20071102
-  //		      ThetaD_xx_zz_old, ThetaD_xz_zx_old);                     //mmo 20071102
+  //thetadiff_xx_zz_xz_zx (geo, Theta_cell_old, Dxx_cell, Dzz_cell, Dxz_cell, //mmo 20071102
+  //		      ThetaD_xx_zz_old, ThetaD_xz_zx_old);                    //mmo 20071102
   //ublas::vector<double> ThetaD_xx_zz (edge_size);                           //mmo 20071102
   //ublas::vector<double> ThetaD_xz_zx (edge_size);                           //mmo 20071102
-  //thetadiff_xx_zz_xz_zx (geo, Theta_cell, Dxx_cell, Dzz_cell, Dxz_cell,       //mmo 20071102
-  //		      ThetaD_xx_zz, ThetaD_xz_zx);                             //mmo 20071102
+  //thetadiff_xx_zz_xz_zx (geo, Theta_cell, Dxx_cell, Dzz_cell, Dxz_cell,     //mmo 20071102
+  //		      ThetaD_xx_zz, ThetaD_xz_zx);                            //mmo 20071102
   
   ublas::vector<double> ThetaD_xx_zz_avg (edge_size); 
   ublas::vector<double> ThetaD_xz_zx_avg (edge_size);
@@ -1358,17 +1405,21 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   const double ddt_min = 1e-10;
   const double gamma_stabilization = 10;
 
-  
   std::ostringstream tmp_mmo;
   
   // Largest allowable timestep in loop.
-  double ddt_max = 2 * dt;
+  double ddt_max = dt;  
+
+  double ddt; //size of small timestep
+
   switch (stabilizing_method)
     {
     case None:
       {
         //No stabilization!!!
         tmp_mmo << "No stabilization\n";
+        ddt = dt;
+        
         //msg.message(tmp_mmo.str ());
         //std::cout << "No stabilization\n";
         break;
@@ -1383,7 +1434,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
           = ublas::zero_vector<double> (edge_size);
         edge_water_content (geo, Theta_cell_avg, Theta_edge);      
         
-        double ddt_PeCr_min = 2*dt;
+        double ddt_PeCr_min = dt;
         
         for (size_t e = 0; e < edge_size; e++)
           {
@@ -1400,14 +1451,49 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
         if (ddt_PeCr_min < ddt_max)
           ddt_max = ddt_PeCr_min;
         
-        tmp_mmo << "ddt_PeCr_min = " << ddt_PeCr_min << '\n';
+        tmp_mmo << "ddt_PeCr_min: " << ddt_PeCr_min << '\n';
+        
+        if (!flux_below && enable_boundary_diffusion)
+          {
+            double ddt_dir  = Dirichlet_timestep_new (geo, ThetaD_xx_zz_avg, ddt_max);
+            tmp_mmo << "ddt_dir: " << ddt_dir << '\n';
+            
+            if (ddt_dir < ddt_max)
+              ddt_max = ddt_dir;
+          }
+        
+                
+        tmp_mmo << "ddt_max: " << ddt_max << '\n'; 
+         
+        if (ddt_max < ddt_min)
+          ddt = ddt_min; // No timesteps smaller than ddt_min
+        else 
+          ddt = ddt_max; // Else use the maximum allowable timestep
+              
+        //tmp_mmo << "ddt: " << ddt << '\n';
+
+       
+        //Number of small timesteps 
+        const int divres = double2int(dt/ddt);
+        double remainder = dt - divres*ddt; 
+        int nddt; //Number of small timesteps in a large timestep
+        if (remainder <= ddt_min*1e-3)
+          nddt = divres;
+        else 
+          nddt = divres + 1;
+        
+        ddt = dt/nddt;
+        
+        
+
         break;
       }
     case Streamline_diffusion:
       {
         //Add some ekstra diffusion in the streamline 
         tmp_mmo << "Streamline diffusion\n";      
-        
+        ddt = dt;
+    
         ublas::vector<double> Theta_edge 
           = ublas::zero_vector<double> (edge_size);
         edge_water_content (geo, Theta_cell_avg, Theta_edge);
@@ -1424,9 +1510,6 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
       }
     } 
 
-  // No timesteps small than ddt_min!
-  if (ddt_max < ddt_min)
-    ddt_max = ddt_min;
   
   //--------------------------------------
   //--- For moving in/out of tick loop ---
@@ -1546,25 +1629,6 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
 
   while (dtime * 1.000001 < dt)
     {
-      // First we try the maximum allowable timestep.
-      double ddt = ddt_max;
-      
-      // Then we allow dirichlet boundary to limit it.
-      if (stabilizing_method == Timestep_reduction
-          && !flux_below
-          && enable_boundary_diffusion)
-        {
-          double ddt_dir = Dirichlet_timestep (geo, C_below, ThetaD_xx_zz_avg,
-                                               C_n, time_left);
-          if (ddt_dir < ddt)
-            ddt = ddt_dir;
-          
-          tmp_mmo << "xxxxxxxxxxxxxx" << '\n';
-          tmp_mmo << "dt: " << dt << '\n';
-          tmp_mmo << "ddt_dir: " << ddt_dir << '\n'; 
-        }
-
-      
       
       if (ddt * 1.0001 >= time_left)
         // We never use more time than is left.
@@ -1573,11 +1637,13 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
         // If we use smaller timestep, only do half the rest in this try.
         // This should prevent orphans.
         ddt = time_left / 2.0;
-        
+      
+            
+      tmp_mmo << "ddt: " << ddt << '\n';
+
+
       time_left -= ddt;
       dtime += ddt;       //update time 
-     
-      tmp_mmo << "dtime = " << dtime << '\n';
       
       //Calculate water content 
       interpol(Theta_cell_old, Theta_cell, dt, dtime, Theta_cell_np1);
