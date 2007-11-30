@@ -67,7 +67,7 @@ public:
 public:
   static const AttributeList& default_model ();
   static const AttributeList& reserve_model ();
-  virtual void has_macropores (Block&, bool) = 0; // Tell UZ about macropores.
+  virtual void has_macropores (bool) = 0; // Tell UZ about macropores.
 protected:
   UZmodel (Block&);
 public:

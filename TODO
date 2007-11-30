@@ -1,16 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* SoilHeat transport skal
-
-DONE flyt soil_heat ud af Movement1D::solve_heat
-DONE Fjern  friend class Movement1D;
-DONE Geometry::cell_edges
-DONE Lad flux bruge en standard geometri.
-DONE test Movement1D
-Få MovRect til at virke
-Lav RectHeat submodul
-make done
-
 * Fjern Block fra Movement::initialize && uzmodel::has_macropores
 
 * Hurtig løser.
