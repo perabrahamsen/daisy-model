@@ -782,12 +782,11 @@ ColumnStandard::initialize (Block& block,
       if (water_alist.check ("macro")
           && !move_alist.check ("macro"))
         move_alist.add ("macro", water_alist.alist ("macro"));
-      movement->initialize (block, move_alist, *soil, *groundwater);
+      movement->initialize (*soil, *groundwater, msg);
     }
   else
     {
-      AttributeList al;
-      movement->initialize (block, al, *soil, *groundwater);
+      movement->initialize (*soil, *groundwater, msg);
     }
 
   // Bioclimate and heat depends on weather.

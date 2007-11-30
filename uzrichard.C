@@ -97,7 +97,7 @@ public:
   
   // Create and Destroy.
 public:
-  void has_macropores (Block&, bool); // Tell UZ that there is macropores.
+  void has_macropores (bool); // Tell UZ that there is macropores.
   UZRichard (Block& par);
   ~UZRichard ();
   static void load_syntax (Syntax& syntax, AttributeList& alist);
@@ -667,7 +667,7 @@ UZRichard::tick (Treelog& msg, const GeometryVert& geo,
 }
 
 void
-UZRichard::has_macropores (Block&, bool has_them)
+UZRichard::has_macropores (const bool has_them)
 { 
   if (K_average.get ())
     return;

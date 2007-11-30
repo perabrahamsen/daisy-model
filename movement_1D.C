@@ -138,8 +138,8 @@ struct Movement1D : public Movement
 
   // Create.
   bool check (Treelog& err) const;
-  void initialize (Block&, const AttributeList& alist,
-                   const Soil& soil, const Groundwater& groundwater);
+  void initialize (const Soil& soil, const Groundwater& groundwater,
+		   Treelog&);
   Movement1D (Block& al);
   ~Movement1D ();
 };
@@ -596,17 +596,16 @@ Movement1D::check (Treelog&) const
 { return true; }
 
 void 
-Movement1D::initialize (Block& block, const AttributeList& al,
-                        const Soil& soil, const Groundwater& groundwater)
+Movement1D::initialize (const Soil& soil, const Groundwater& groundwater,
+			Treelog& msg)
 {
-  Treelog::Open nest (block.msg (), "Movement: " + name.name ());
+  Treelog::Open nest (msg, "Movement: " + name.name ());
 
   const size_t cell_size = geo->cell_size ();
 
   // Macropores.
-  if (al.check ("macro"))
-    macro.reset (Librarian::build_alist<Macro> (block, al.alist ("macro"), 
-                                                "macro"));
+  if (macro.get ())
+    /* Already got them. */;
   else if (soil.humus (0) + soil.clay (0) > 0.05)
     // More than 5% clay (and humus) in first horizon.
     {
@@ -625,20 +624,22 @@ Movement1D::initialize (Block& block, const AttributeList& al,
       // Add them.
       macro = Macro::create (height);
 
-      block.msg ().debug ("Adding macropores");
+      msg.debug ("Adding macropores");
     }
 
   // Let 'macro' choose the default method to average K values in 'uz'.
   const bool has_macropores = (macro.get () && !macro->none ());
   for (size_t i = 0; i < matrix_water.size (); i++)
-    matrix_water[i]->has_macropores (block, has_macropores);
+    matrix_water[i]->has_macropores (has_macropores);
 }
 
 Movement1D::Movement1D (Block& al)
   : Movement (al),
     geo (submodel<Geometry1D> (al, "Geometry")),
     matrix_water (Librarian::build_vector<UZmodel> (al, "matrix_water")),
-    macro (NULL), 
+    macro (al.check ("macro")
+	   ? Librarian::build_item<Macro> (al, "macro")
+	   : NULL), 
     matrix_solute (Librarian::build_vector<Transport> (al, "matrix_solute")),
     transport_solid (Librarian::build_item<Transport> (al, "transport_solid")),
     mactrans  (Librarian::build_item<Mactrans> (al, "mactrans")),

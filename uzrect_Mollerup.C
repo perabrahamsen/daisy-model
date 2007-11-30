@@ -137,7 +137,7 @@ struct UZRectMollerup : public UZRect
 
 
   // Create and Destroy.
-  void has_macropores (Block&, bool);
+  void has_macropores (bool);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   UZRectMollerup (Block& al);
   ~UZRectMollerup ();
@@ -864,7 +864,7 @@ UZRectMollerup::Darcy (const GeometryRect& geo,
 }
 
 void 
-UZRectMollerup::has_macropores (Block&, const bool)
+UZRectMollerup::has_macropores (const bool)
 { /* Ignore for now. */ }
 
 void 

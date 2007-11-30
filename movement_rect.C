@@ -94,8 +94,7 @@ struct MovementRect : public Movement
 
   // Create.
   bool check (Treelog&) const;
-  void initialize (Block&, const AttributeList&, 
-                   const Soil&, const Groundwater&);
+  void initialize (const Soil&, const Groundwater&, Treelog&);
   MovementRect (Block& al);
   ~MovementRect ();
 };
@@ -346,12 +345,11 @@ MovementRect::check (Treelog&) const
 { return true; }
 
 void 
-MovementRect::initialize (Block& block, const AttributeList&,
-                          const Soil&, const Groundwater&)
+MovementRect::initialize (const Soil&, const Groundwater&, Treelog&)
 {
   const bool has_macropores = false;
   for (size_t i = 0; i < matrix_water.size (); i++)
-    matrix_water[i]->has_macropores (block, has_macropores);
+    matrix_water[i]->has_macropores (has_macropores);
 }
 
 MovementRect::MovementRect (Block& al)

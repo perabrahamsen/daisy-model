@@ -47,7 +47,7 @@ struct UZRectConst : public UZRect
   
  
   // Create and Destroy.
-  void has_macropores (Block&, bool);
+  void has_macropores (bool);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   UZRectConst (Block& al);
   ~UZRectConst ();
@@ -82,7 +82,7 @@ UZRectConst::output (Log&) const
 { }
 
 void 
-UZRectConst::has_macropores (Block&, const bool)
+UZRectConst::has_macropores (const bool)
 { /* Ignore for now. */ }
 
 void 

@@ -60,7 +60,7 @@ public:
              double dt);
 
   // Create and Destroy.
-  void has_macropores (Block&, bool)
+  void has_macropores (bool)
   { }
 public:
   UZlr (Block& par);

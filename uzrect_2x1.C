@@ -63,7 +63,7 @@ struct UZRect2x1 : public UZRect
                      double dt, Treelog& msg);
 
   // Create and Destroy.
-  void has_macropores (Block&, bool);
+  void has_macropores (bool);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   UZRect2x1 (Block& al);
   ~UZRect2x1 ();
@@ -247,10 +247,10 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
 }
 
 void 
-UZRect2x1::has_macropores (Block& block, const bool has_them)
+UZRect2x1::has_macropores (const bool has_them)
 {
   for (size_t i = 0; i < vertical.size (); i++)
-    vertical[i]->has_macropores (block, has_them);
+    vertical[i]->has_macropores (has_them);
 }
 
 void 

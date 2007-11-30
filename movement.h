@@ -91,8 +91,7 @@ public:
   // Create and Destroy.
 public:
   virtual bool check (Treelog& err) const = 0;
-  virtual void initialize (const AttributeList&,
-                           const Soil&, const Groundwater&) = 0;
+  virtual void initialize (const Soil&, const Groundwater&, Treelog& msg) = 0;
   static const AttributeList& default_model ();
   static void load_vertical (Syntax& syntax, AttributeList& alist);
   static Movement* build_vertical (Block& al);
