@@ -160,9 +160,10 @@ struct MsoltranrectMollerup : public Msoltranrect
 			     ublas::banded_matrix<double>& advecm_mat,
                              ublas::vector<double>& advecm_vec);
 
-  static double Dirichlet_timestep_new (const GeometryRect& geo,
-                                        const ublas::vector<double>& ThetaD_xx_zz,
-                                        const double dt);
+  static double Dirichlet_timestep_new  
+  /**/                      (const GeometryRect& geo,
+                             const ublas::vector<double>& ThetaD_xx_zz,
+                             const double dt);
   
   static double Dirichlet_timestep (const GeometryRect& geo,
                                     const double C_border,
