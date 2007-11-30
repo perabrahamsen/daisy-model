@@ -1,3 +1,21 @@
+2007-11-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* heat_rect.C, heat_rect.h: New submodel.
+
+2007-11-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat.h, soil_heat.C: Updated interface.
+	* movement_1D.C: Update caller.
+
+	* soil_water.C (SoilWater::freeze): Changed interface.
+
+	* geometry.C, geometry.h (cell_pseudo_number, cell_edges): Moved here.
+	* geometry_rect.C, geometry_rect.h (cell_pseudo_number)
+	(cell_edges): From here. 
+
+	* geometry.C, geometry.h (build_cell_edges): New function.
+	* geometry1d.C, geometry_rect.C: Use it.
+	
 2007-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* solute.C, solute.h: Merged into chemical.

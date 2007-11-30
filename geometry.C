@@ -183,6 +183,30 @@ Geometry::node_center_in_volume (int c, const Volume& volume) const
   return volume.contain_point (z (c), x (c), y (c));
 }
 
+size_t 
+Geometry::cell_pseudo_number (const int n) const
+{
+  switch (n)
+    {
+    case cell_above:
+      return cell_size () + 0;
+    case cell_below:
+      return cell_size () + 1;
+    case cell_left:
+      return cell_size () + 2;
+    case cell_right:
+      return cell_size () + 3;
+    case cell_front:
+      return cell_size () + 4;
+    case cell_back:
+      return cell_size () + 5;
+    default:
+      daisy_assert (n >= 0);
+      daisy_assert (n < cell_size ());
+      return n;
+    }
+}
+
 void
 Geometry::mix (std::vector<double>& v, double from, double to) const
 {
@@ -534,6 +558,19 @@ Geometry::initialize_intervals (const std::vector<double>& end,
       last = next;
     }
 }
+
+void
+Geometry::build_cell_edges ()
+{
+  cell_edges_.insert (cell_edges_.end (), cell_pseudo_size (),
+                      std::vector<int> ());
+  for (size_t e = 0; e < edge_size (); e++)
+    { 
+      cell_edges_[cell_pseudo_number (edge_from (e))].push_back (e);
+      cell_edges_[cell_pseudo_number (edge_to (e))].push_back (e);
+    }
+}
+
 Geometry::Geometry (Block&)
   : size_ (0)
 { }

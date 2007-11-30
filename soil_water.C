@@ -44,18 +44,15 @@ SoilWater::clear ()
 }
 
 void 
-SoilWater::freeze (const Soil&, const std::vector<double>& v)
+SoilWater::freeze (const Soil&, const size_t c, const double rate /* [h^-1] */)
 {
   static const double rho_water = 1.0; // [g/cm^3]
   static const double rho_ice = 0.917; // [g/cm^3]
 
-  daisy_assert (v.size () == S_ice_.size ());
-  daisy_assert (S_sum_.size () == v.size ());
-  for (size_t i = 0; i < v.size (); i++)
-    {
-      S_sum_[i] += v[i];
-      S_ice_[i] -= v[i] * rho_water / rho_ice;
-    }
+  daisy_assert (c < S_ice_.size ());
+  daisy_assert (c < S_sum_.size () );
+  S_sum_[c] += rate;
+  S_ice_[c] -= rate * rho_water / rho_ice;
 }
 
 void

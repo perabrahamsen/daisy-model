@@ -34,11 +34,9 @@ private:
   std::vector<double> x_;       // Horizontal center of each cell.
   std::vector<double> dx_;      // Horizontal size of each cell.
   std::vector<std::vector<int> > cell_corners_; // The corners of cell.
-  std::vector<std::vector<int> > cell_edges_; // Edges connected with cell.
   std::vector<int> edge_from_;
   std::vector<int> edge_to_;
   std::vector<double> edge_area_;
-  std::vector<double> edge_length_;
   std::vector<double> edge_area_per_length_;
   std::vector<double> edge_sin_angle_;
   std::vector<double> edge_cos_angle_;
@@ -76,13 +74,6 @@ public:
   bool contain_y (size_t i, double y) const;
   const std::vector<int>& cell_corners (size_t n) const
   { return cell_corners_[n]; }
-private:
-  size_t cell_pseudo_size () const // Add top, bottom, left, right, front, back
-  { return cell_size () + 6U; }
-  size_t cell_pseudo_number (int n) const;
-public:
-  inline const std::vector<int>& cell_edges (int n) const
-  { return cell_edges_[cell_pseudo_number (n)]; }
 
   // Edge operations.
 public:
@@ -100,8 +91,6 @@ public:
   { return edge_from (e) == n ? edge_to (e) : edge_from (e); }
   inline double edge_area (size_t e) const // Area connecting cells [cm^2]
   { return edge_area_[e]; }
-  inline double edge_length (size_t e) const // Distance between c-cent. [cm^2]
-  { return edge_length_[e]; }
   inline double edge_area_per_length (size_t e) const 
   { return edge_area_per_length_[e]; }
   inline double edge_sin_angle (size_t e) const // To horizontal plane -1:1 []

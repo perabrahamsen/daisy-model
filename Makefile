@@ -362,7 +362,7 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = chemistry_multi.C \
+MODELS = movement_rect.C chemistry_multi.C \
 	equil_goal.C equil_linear.C equil_langmuir.C transform_equil.C \
 	reaction_nit.C reaction_denit.C \
 	reaction_adsorption.C reaction_equil.C rootdens_GP2D.C \
@@ -377,7 +377,7 @@ MODELS = chemistry_multi.C \
 	rubiscoNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \
         difrad_weather.C number_lisp.C condition_extern.C condition_boolean.C \
 	boolean_number.C boolean_string.C \
-	movement_rect.C number_soil.C organic_none.C \
+	number_soil.C organic_none.C \
 	organic_std.C movement_1D.C integer_arit.C \
 	source_merge.C number_source.C program_file.C action_table.C \
 	xysource_merge.C xysource_inline.C xysource_loop.C \
@@ -442,7 +442,7 @@ COMPONENTS = element.C ui.C reaction.C scopesel.C scope.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = toplevel.C timestep.C geometry_rect.C doe.C \
+SUBMODELS = heat_rect.C toplevel.C timestep.C geometry_rect.C doe.C \
         geometry1d.C fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \
@@ -1074,6 +1074,9 @@ svat${OBJ}: svat.C svat.h model.h symbol.h log.h time.h border.h alist.h \
   block.h syntax.h treelog.h plf.h librarian.h
 vegetation${OBJ}: vegetation.C vegetation.h model.h symbol.h log.h time.h \
   border.h alist.h syntax.h treelog.h block.h plf.h librarian.h
+heat_rect${OBJ}: heat_rect.C heat_rect.h geometry_rect.h geometry_vert.h \
+  geometry.h syntax.h treelog.h symbol.h mathlib.h assertion.h alist.h \
+  block.h plf.h submodel.h
 toplevel${OBJ}: toplevel.C toplevel.h metalib.h symbol.h daisy.h program.h \
   model.h run.h time.h memutils.h ui.h library.h parser_file.h parser.h \
   submodel.h block.h syntax.h treelog.h plf.h alist.h path.h version.h \
@@ -1146,7 +1149,8 @@ soil_water${OBJ}: soil_water.C soil_water.h geometry.h syntax.h treelog.h \
   log.h time.h border.h alist.h submodel.h block.h plf.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h block.h syntax.h treelog.h symbol.h \
   plf.h alist.h geometry.h mathlib.h assertion.h soil.h soil_water.h \
-  weather.h model.h im.h log.h time.h border.h submodel.h
+  surface.h uzmodel.h model.h movement.h weather.h im.h log.h time.h \
+  border.h submodel.h
 snow${OBJ}: snow.C snow.h alist.h symbol.h syntax.h treelog.h log.h time.h \
   border.h model.h geometry.h mathlib.h assertion.h soil.h soil_water.h \
   soil_heat.h movement.h submodel.h
@@ -1301,6 +1305,11 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+movement_rect${OBJ}: movement_rect.C movement.h model.h symbol.h \
+  geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
+  assertion.h heat_rect.h soil.h soil_water.h soil_heat.h msoltranrect.h \
+  chemical.h alist.h groundwater.h surface.h uzmodel.h weather.h im.h \
+  uzrect.h check.h submodeler.h block.h plf.h memutils.h librarian.h
 chemistry_multi${OBJ}: chemistry_multi.C chemistry.h model.h symbol.h alist.h \
   chemical.h log.h time.h border.h block.h syntax.h treelog.h plf.h \
   assertion.h memutils.h librarian.h vcheck.h
@@ -1446,11 +1455,6 @@ boolean_number${OBJ}: boolean_number.C boolean.h model.h symbol.h syntax.h \
   treelog.h alist.h number.h memutils.h librarian.h
 boolean_string${OBJ}: boolean_string.C boolean.h model.h symbol.h block.h \
   syntax.h treelog.h plf.h alist.h librarian.h
-movement_rect${OBJ}: movement_rect.C movement.h model.h symbol.h \
-  geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
-  assertion.h soil.h soil_water.h soil_heat.h msoltranrect.h chemical.h \
-  alist.h groundwater.h surface.h uzmodel.h weather.h im.h uzrect.h \
-  check.h submodeler.h block.h plf.h memutils.h librarian.h
 number_soil${OBJ}: number_soil.C number.h symbol.h model.h metalib.h \
   library.h block.h syntax.h treelog.h plf.h column.h alist.h horizon.h \
   hydraulic.h weather.h im.h output.h condition.h memutils.h time.h \

@@ -539,6 +539,8 @@ ColumnStandard::tick (const Time& time, const double dt,
   const bool flux_below = groundwater->bottom_type () != Groundwater::pressure;
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, my_weather, dt, msg);
+  soil_heat->tick (geometry, *soil, *soil_water, *movement, 
+		   surface, dt, msg);
   soil_water->tick_after (geometry.cell_size (), *soil, *soil_heat, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
   chemistry->tick_soil (geometry, 

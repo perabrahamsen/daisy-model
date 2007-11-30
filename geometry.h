@@ -47,6 +47,11 @@ public:
   // Parameters.
 protected:
   size_t size_;		// Number of cells.
+
+  // Helper data.
+protected:
+  std::vector<std::vector<int> > cell_edges_; // Edges connected with cell.
+  std::vector<double> edge_length_;	      // Distance between cell centers.
   
   // Cell operations.
 public:
@@ -82,6 +87,13 @@ public:
   virtual bool contain_y (size_t n, double y) const = 0; // True iff cell n
                                                          // includes length y
   bool node_center_in_volume (int c, const Volume& volume) const;
+protected:
+  size_t cell_pseudo_size () const // Add top, bottom, left, right, front, back
+  { return cell_size () + 6U; }
+  size_t cell_pseudo_number (int n) const;
+public:
+  inline const std::vector<int>& cell_edges (int n) const
+  { return cell_edges_[cell_pseudo_number (n)]; }
 
   // Edge operations.
 public:
@@ -94,6 +106,8 @@ public:
   { return cell_is_internal (edge_from (e))
       && cell_is_internal (edge_to (e)); }
   virtual double edge_area (size_t) const = 0; // Area connecting the cells.
+  inline double edge_length (size_t e) const // Distance between c-cent. [cm^2]
+  { return edge_length_[e]; }
   bool edge_cross_z (size_t e, double z) const; // Cross depth?
   virtual double edge_center_z (size_t e) const = 0;
   virtual double edge_center_x (size_t) const
@@ -194,7 +208,6 @@ public:
   virtual bool check_z_border (double, Treelog& err) const = 0;
   virtual bool check_x_border (double, Treelog& err) const = 0;
   virtual bool check_y_border (double, Treelog& err) const = 0;
-  Geometry (Block&);
   static void initialize_intervals (const std::vector<double>& end, 
                                     std::vector<double>& center,
                                     std::vector<double>& distance);
@@ -203,6 +216,9 @@ public:
                                  const double max_rooting_depth,
                                  const double max_interval,
                                  Treelog& msg) = 0;
+protected:
+  void build_cell_edges ();
+  Geometry (Block&);
   virtual ~Geometry ();
 };
 

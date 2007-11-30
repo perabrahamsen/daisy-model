@@ -57,7 +57,7 @@ public:
 public:
   virtual void macro_tick (const Soil&, SoilWater&, Surface&, 
                            const double dt, Treelog&) = 0;
-  virtual void tick (const Soil&, SoilWater&, SoilHeat&, Surface&,
+  virtual void tick (const Soil&, SoilWater&, const SoilHeat&, Surface&,
                      Groundwater&, const Time&, const Weather&, 
                      double dt, Treelog&) = 0;
   virtual void solute (const Soil&, const SoilWater&, 
@@ -66,6 +66,15 @@ public:
   virtual void element (const Soil&, const SoilWater&, 
                         DOE&, double diffusion_coefficient, 
 			double dt, Treelog&) = 0;
+  virtual void heat (const std::vector<double>& q_water,
+		     const std::vector<double>& S,
+		     const std::vector<double>& capacity,
+		     const std::vector<double>& conductivity,
+		     double T_top,
+		     double T_top_new,
+		     std::vector<double>& T,
+		     const double dt, Treelog&) const = 0;
+
   virtual void ridge (Surface&, const Soil&, const SoilWater&, 
                       const AttributeList&) = 0;
 
@@ -77,6 +86,7 @@ public:
                                  double dZs) const = 0;
   virtual std::vector<double> default_heat (const Soil&, 
                                             const Time&, const Weather&) = 0;
+  virtual double bottom_T () const = 0;
 
   // Create and Destroy.
 public:

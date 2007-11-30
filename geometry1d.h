@@ -70,6 +70,8 @@ public:
   size_t interval_border (double z) const;
 
   // Creation.
+private:
+  void build_edge_length ();
 public:
   bool check (Treelog&) const;
   bool check_x_border (const double value, Treelog& err) const;

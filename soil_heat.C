@@ -26,6 +26,8 @@
 #include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "surface.h"
+#include "movement.h"
 #include "weather.h"
 #include "syntax.h"
 #include "log.h"
@@ -105,7 +107,205 @@ SoilHeat::swap (const Geometry& geo,
   // proportional with the water content.
   geo.swap (T_, from, middle, to);
 }
+
+double 
+SoilHeat::source (const Geometry& geo, const SoilWater& soil_water,
+		  size_t c) const
+{
+  double v = S[c];
+
+  if (state[c] == SoilHeat::freezing || state[c] == SoilHeat::thawing)
+    {
+      const std::vector<int>& cell_edges = geo.cell_edges (c);
+      for (size_t e = 0; e < cell_edges.size (); e++)
+	{
+	  const int edge = cell_edges[e];
+	  const double in_sign = (geo.edge_to (edge) == c)
+	    ? 1.0 : -1.0;				// []
+	  const double area = geo.edge_area (edge);	// [cm^2]
+	  const double flux = soil_water.q (edge);	// [cm/h]
+	  const double in = flux * area;		// [cm^3/h]
+	  const double vol = geo.cell_volume (c);	// [cm^3]
+	  v += latent_heat_of_fussion * rho_water * in_sign * in / vol;
+	  // [erg/cm^3/h] += [erg/g] * [g/cm^3] * [] * [cm^3/h] / [cm^3]
+	}
+    }
+  return v;
+}
+
+void 
+SoilHeat::set_source (const size_t c, const double value) // [erg/cm^3/h]
+{ S[c] = value; }
+
+double 
+SoilHeat::T_pseudo (const Geometry& geo,
+		    const int cell,
+		    const int other,
+		    const std::vector<double>& T_old,
+		    const double T_top,
+		    const std::vector<double>& T,
+		    const double T_bottom)
+{
+  if (geo.cell_is_internal (cell))
+    return (T_old[cell] + T[cell]) / 2.0;
   
+  switch (cell)
+    {
+    case Geometry::cell_above:
+      return T_top;
+    case Geometry::cell_below:
+      return T_bottom;
+    default:
+      daisy_assert (geo.cell_is_internal (other));
+      return (T_old[other] + T[other]) / 2.0;
+    }
+}
+
+double 
+SoilHeat::K_pseudo (const Geometry& geo, const int cell, const int other,
+		    const Soil& soil, const SoilWater& soil_water)
+{
+  if (geo.cell_is_internal (cell))
+    return soil.heat_conductivity (cell, 
+				   soil_water.Theta (cell),
+				   soil_water.X_ice (cell));
+
+  daisy_assert (geo.cell_is_internal (other));
+  return soil.heat_conductivity (other, 
+				 soil_water.Theta (other),
+				 soil_water.X_ice (other));
+}
+
+void 
+SoilHeat::calculate_heat_flux (const Geometry& geo,
+			       const Soil& soil,
+			       const SoilWater& soil_water,
+			       const std::vector<double>& T_old,
+			       const double T_top,
+			       const std::vector<double>& T_new,
+			       const double T_bottom,
+			       std::vector<double>& q)
+{
+  const size_t edge_size = geo.edge_size ();
+
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      const int from = geo.edge_from (e);
+      const int to = geo.edge_to (e);
+      const double l = geo.edge_length (e);	 // [cm]
+      const double q_water = soil_water.q (e);	 // [cm/h]
+      const double T_from			 // [dg C]
+	= T_pseudo (geo, from, to, T_old, T_top, T_new, T_bottom);
+      const double T_to	                         // [dg C]
+	= T_pseudo (geo, to, from, T_old, T_top, T_new, T_bottom);
+      const double dT = T_from - T_to;           // [dg C]
+      const double T = (T_from + T_to) / 2.0;	 // [dg C]
+      const double K_from			 // [erg/cm/h/dg C]
+	= K_pseudo (geo, from, to, soil, soil_water);
+      const double K_to		                 // [erg/cm/h/dg C]
+	= K_pseudo (geo, from, to, soil, soil_water);
+      const double K = (K_from + K_to) / 2.0;    // [erg/cm/h/dg C]
+      q[e] = K * dT/l + water_heat_capacity * rho_water *  q_water * T;
+      // [erg/cm^2/h] = [erg/cm/h/dg C] * [dg C] / [cm] 
+      //              + [erg/g/dg C] * [g/cm^3] * [cm/h] * [dg C]
+    }
+}
+
+void 
+SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
+		const Movement& movement, const Surface& surface, 
+		const double dt, Treelog& msg)
+{
+  const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
+
+  // Update freezing and melting points.
+  this->update_freezing_points (soil, soil_water);
+
+  // Borders.
+  double T_top_old = this->T_top ();
+  const double T_top_new = surface.temperature ();
+  if (T_top_old < -400.0)
+    T_top_old = T_top_new;
+  const double T_bottom = movement.bottom_T ();
+
+  // Edges.
+  std::vector<double> q_water (edge_size);
+  for (size_t e = 0; e < edge_size; e++)
+    q_water[e] = soil_water.q (e);
+
+  // Cells;
+  std::vector<double> conductivity (cell_size);
+  std::vector<double> T (cell_size);
+  std::vector<double> S (cell_size);
+  std::vector<double> capacity_apparent (cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      // Fixed.
+      const double Theta = soil_water.Theta (c);
+      const double X_ice = soil_water.X_ice (c);
+      conductivity[c] = soil.heat_conductivity (c, Theta, X_ice);
+
+      // Changes with ice state.
+      T[c] = this->T (c);
+      capacity_apparent[c] = this->capacity_apparent (soil, soil_water, c);
+      S[c] = this->source (geo, soil_water, c);
+    }
+
+  // Solve with old state.
+  const std::vector<double> T_old = T;
+  movement.heat (q_water, S, capacity_apparent, conductivity,
+		 T_top_old, T_top_new, T, dt, msg);
+
+  // Update ice state according to new temperatures.
+  if (this->enable_ice)
+    {
+      const bool changed 
+	= this->update_state (geo, soil, soil_water, T, dt);
+
+      if (changed)
+	{
+	  // Solve again with new state.
+	  for (size_t c = 0; c < cell_size; c++)
+	    {
+	      capacity_apparent[c]
+		= this->capacity_apparent (soil, soil_water, c);
+	      S[c] = this->source (geo, soil_water, c);
+	    }
+	  T = T_old;
+	  movement.heat (q_water, S, capacity_apparent, conductivity,
+			 T_top_old, T_top_new, T, dt, msg);
+
+	  // Check if state match new temperatures.
+	  const bool changed_again = this->check_state (soil, T);
+
+	  if (changed_again)
+	    {
+	      // Force temperatures to match state.
+	      this->force_state (T);
+	    }
+	}
+
+      // Update ice in water.
+      for (size_t c = 0; c < cell_size; c++)
+	soil_water.freeze (soil, c, this->freezing_rate (c));
+    }
+
+  // Calculate flux.
+  std::vector<double> q (edge_size, 0.0);
+  const double T_prev = (T_top_old + T_top_new) / 2.0;
+  calculate_heat_flux (geo, soil, soil_water, T_old, T_prev, T, T_bottom, q);
+
+  // Update soil heat.
+  this->set_T_top (T_top_new);
+  for (size_t c = 0; c < cell_size; c++)
+    this->set_temperature (c, T[c]);
+  for (size_t e = 0; e < edge_size; e++)
+    this->set_flux (e, q[e]);
+
+
+}
+
 void
 SoilHeat::tick_after (const size_t cell_size, 
                       const Soil& soil, const SoilWater& soil_water, 
@@ -120,6 +320,18 @@ SoilHeat::tick_after (const size_t cell_size,
         = soil.heat_capacity (i, soil_water.Theta (i), soil_water.X_ice (i));
     }
 }
+
+void 
+SoilHeat::set_T_top (const double value)
+{ T_top_ = value; }
+
+void 
+SoilHeat::set_temperature (const size_t c, const double value)
+{ T_[c] = value; }
+
+void 
+SoilHeat::set_flux (const size_t e, const double value)
+{ q[e] = value; }
 
 double 
 SoilHeat::capacity (const Soil& soil, 
@@ -200,6 +412,10 @@ SoilHeat::update_state (const Geometry& geo,
                         std::vector<double>& T,
                         const double dt)
 {
+  // If we don't use ice, there is nothing to do here.
+  if (!enable_ice)
+    return false;
+
   bool changed = false;
 
   for (unsigned int i = 0; i < soil.size (); i++)
@@ -210,19 +426,19 @@ SoilHeat::update_state (const Geometry& geo,
           if (T[i] < T_freezing[i])
             {
               // Find freezing rate.
-              freezing_rate[i] = calculate_freezing_rate (geo, 
-                                                          soil, soil_water, 
-                                                          i, T, dt);
+              freezing_rate_[i] = calculate_freezing_rate (geo, 
+							   soil, soil_water, 
+							   i, T, dt);
 
-              if (freezing_rate[i] < 0.0)
-                freezing_rate[i] = 0.0;
+              if (freezing_rate_[i] < 0.0)
+                freezing_rate_[i] = 0.0;
 
               // Check if there are sufficient water.
               const double Theta_min = soil.Theta (i, h_frozen - 1000.0, 0.0);
               daisy_assert (Theta_min >= soil.Theta_res (i));
               const double available_water = soil_water.Theta (i) - Theta_min;
-              if (freezing_rate[i] * dt > available_water)
-                freezing_rate[i] = std::max (0.0, available_water / dt);
+              if (freezing_rate_[i] * dt > available_water)
+                freezing_rate_[i] = std::max (0.0, available_water / dt);
 	      
               // We have used the energy.
               T[i] = T_freezing[i];
@@ -235,15 +451,15 @@ SoilHeat::update_state (const Geometry& geo,
                 state[i] = liquid;
 
               changed = true;
-              freezing_rate[i] = 0.0;
+              freezing_rate_[i] = 0.0;
             }
           else
-            freezing_rate[i] = 0.0;
-          daisy_assert (-freezing_rate[i] * rho_water / rho_ice
+            freezing_rate_[i] = 0.0;
+          daisy_assert (-freezing_rate_[i] * rho_water / rho_ice
                         <= soil_water.X_ice_total (i));
           break;
         case frozen:
-          freezing_rate[i] = 0.0;
+          freezing_rate_[i] = 0.0;
           if (T[i] > T_thawing[i])
             {
               if (soil_water.X_ice_total (i) > 0.0)
@@ -256,18 +472,18 @@ SoilHeat::update_state (const Geometry& geo,
         case thawing:
           if (T[i] > T_thawing[i])
             {
-              freezing_rate[i] = calculate_freezing_rate (geo, 
-                                                          soil, soil_water, 
-                                                          i, T, dt);
-              if (freezing_rate[i] > 0.0)
-                freezing_rate[i] = 0.0;
+              freezing_rate_[i] = calculate_freezing_rate (geo, 
+							   soil, soil_water, 
+							   i, T, dt);
+              if (freezing_rate_[i] > 0.0)
+                freezing_rate_[i] = 0.0;
 
               const double X_ice_total = soil_water.X_ice_total (i);
               const double ice_water = X_ice_total * rho_ice / rho_water;
-              if (-freezing_rate[i] * dt >= ice_water)
+              if (-freezing_rate_[i] * dt >= ice_water)
                 {
-                  freezing_rate[i] = -ice_water / dt;
-                  daisy_assert (freezing_rate[i] <= 0.0);
+                  freezing_rate_[i] = -ice_water / dt;
+                  daisy_assert (freezing_rate_[i] <= 0.0);
 
                   state[i] = liquid;
                 }
@@ -279,15 +495,15 @@ SoilHeat::update_state (const Geometry& geo,
             {
               state[i] = freezing;
               changed = true;
-              freezing_rate[i] = 0.0;
+              freezing_rate_[i] = 0.0;
             }
           else
-            freezing_rate[i] = 0.0;
-          daisy_assert (-freezing_rate[i] * rho_water / rho_ice
+            freezing_rate_[i] = 0.0;
+          daisy_assert (-freezing_rate_[i] * rho_water / rho_ice
                         <= soil_water.X_ice_total (i) * 1.0001);
           break;
         case liquid:
-          freezing_rate[i] = 0.0;
+          freezing_rate_[i] = 0.0;
           if (T[i] < T_freezing[i])
             {
               state[i] = freezing;
@@ -295,7 +511,7 @@ SoilHeat::update_state (const Geometry& geo,
             }
           break;
         }
-      daisy_assert (-freezing_rate[i] * rho_water / rho_ice
+      daisy_assert (-freezing_rate_[i] * rho_water / rho_ice
                     <= soil_water.X_ice_total (i) * 1.0001);
     }
   return changed;
@@ -377,6 +593,14 @@ SoilHeat::force_state (std::vector<double>& T)
 }
 
 double 
+SoilHeat::freezing_rate (const size_t c) const
+{ return freezing_rate_[c]; }
+
+double 
+SoilHeat::T_top () const	// [dg C]
+{ return T_top_; }
+
+double 
 SoilHeat::top_flux (const Geometry& geo,
                       const Soil& soil, const SoilWater& soil_water) const
 {
@@ -393,7 +617,7 @@ SoilHeat::output (Log& log) const
   output_value (T_, "T", log); 
   output_value (capacity_, "capacity", log); 
   output_value (conductivity_, "conductivity", log); 
-  output_value (T_top, "T_top", log);
+  output_value (T_top_, "T_top", log);
   output_value (T_freezing, "T_freezing", log);
   output_value (T_thawing, "T_thawing", log);
   output_value (q, "q", log);
@@ -456,7 +680,7 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("T_thawing", "dg C", Syntax::LogOnly, Syntax::Sequence,
               "Freezing point depression for thawing.");
   syntax.add ("q", "erg/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
-              "Heat flux (positive upward).");
+              "Heat flux.");
   syntax.add ("state", Syntax::Unknown (), Syntax::LogOnly, Syntax::Sequence,
               "Current freezing/melting state.");
 }
@@ -464,7 +688,7 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
 SoilHeat::SoilHeat (const Block& al)
   : h_frozen (al.number ("h_frozen")),
     enable_ice (al.flag ("enable_ice")),
-    T_top (al.number ("T_top", -500.0))
+    T_top_ (al.number ("T_top", -500.0))
 {
   if (al.check ("S"))
     S = al.number_sequence ("S");
@@ -489,7 +713,7 @@ SoilHeat::initialize (const AttributeList& al,
   T_freezing.insert (T_freezing.end (), cell_size, 0.0);
   T_thawing.insert (T_thawing.end (), cell_size, 0.0);
   state.insert (state.end (), cell_size, liquid);
-  freezing_rate.insert (freezing_rate.end (), cell_size, 0.0);
+  freezing_rate_.insert (freezing_rate_.end (), cell_size, 0.0);
   q.insert (q.end (), edge_size, 0.0);
 
   for (unsigned int i = 0; i < cell_size; i++)

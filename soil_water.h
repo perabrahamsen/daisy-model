@@ -65,7 +65,7 @@ private:
   // Sink.
 public:
   void clear ();
-  void freeze (const Soil&, const std::vector<double>&);
+  void freeze (const Soil&, size_t c, double rate /* [h^-1] */);
   void drain (const std::vector<double>&);
   void root_uptake (const std::vector<double>&);
   

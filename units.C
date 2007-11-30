@@ -516,6 +516,7 @@ Units::standard_conversions ()
   add ("ppm", "kg/ha/mm", (100.0 * 100.0) / (1000.0 * 1000.0));
   add ("kg/ha/h", "kg N/ha/h", 1.0);
   add ("g/cm^2/h", "kg/ha/h", ((100.0 * 100.0) * (100.0 * 100.0)) / 1000.0);
+  add ("g/cm^2/h", "kg C/ha/h", ((100.0 * 100.0) * (100.0 * 100.0)) / 1000.0);
   add ("g/ha", "kg/ha", 1.0 / 1000.0);
   add ("kg/ha/h", "g/ha/h", 1000.0);
 

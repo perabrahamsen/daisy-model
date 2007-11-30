@@ -94,6 +94,7 @@ struct Movement1D : public Movement
 
   // Heat.
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
+  double T_bottom;		// [dg C]
   double surface_snow_T (const Soil& soil,
                          const SoilWater& soil_water,
                          const SoilHeat& soil_heat,
@@ -101,35 +102,35 @@ struct Movement1D : public Movement
                          const double K_snow,
                          const double dZs) const;
   double bottom_heat (const Time& time, const Weather& weather) const ;
+  double bottom_T () const;
   std::vector<double> default_heat (const Soil& soil, 
                                     const Time& time, const Weather& weather);
-  static void calculate_heat_flux (const Geometry& geo,
-                                   const Soil& soil,
-                                   const SoilWater& soil_water,
-                                   const std::vector<double>& T_old,
-                                   double T_prev,
-                                   const std::vector<double>& T,
-                                   double T_bottom,
-                                   std::vector<double>& q);
   static void solve_heat (const Geometry1D& geo,
-                          const Soil& soil,
-                          const SoilWater& soil_water,
-                          SoilHeat& soil_heat,
-                          const Surface& surface,
-                          double T_bottom, double dt);
-  void tick_heat (const Geometry1D& geo,
-                  const Soil& soil,
-                  SoilWater& soil_water,
-                  SoilHeat& soil_heat,
-                  const Surface& surface, 
-                  double T_bottom, double dt);
+			  const std::vector<double>& q_water,
+			  const std::vector<double>& S,
+			  const std::vector<double>& capacity,
+			  const std::vector<double>& conductivity,
+			  const double T_top,
+			  const double T_top_new,
+			  const double T_bottom,
+			  std::vector<double>& T,
+			  const double dt);
+  void heat (const std::vector<double>& q_water,
+	     const std::vector<double>& S,
+	     const std::vector<double>& capacity,
+	     const std::vector<double>& conductivity,
+	     double T_top,
+	     double T_top_new,
+	     std::vector<double>& T,
+	     const double dt, Treelog&) const;
+
 
   // Management.
   void ridge (Surface& surface, const Soil& soil, const SoilWater& soil_water,
               const AttributeList& al);
 
   // Simulation.
-  void tick (const Soil& soil, SoilWater& soil_water, SoilHeat& soil_heat,
+  void tick (const Soil& soil, SoilWater& soil_water, const SoilHeat& soil_heat,
              Surface& surface, Groundwater& groundwater,
              const Time& time, const Weather& weather, double dt, 
              Treelog& msg);
@@ -429,6 +430,10 @@ double
 Movement1D::bottom_heat (const Time& time, const Weather& weather) const 
 { return weather.T_normal (time, delay); }
 
+double
+Movement1D::bottom_T () const
+{ return T_bottom; }
+
 std::vector<double> 
 Movement1D::default_heat (const Soil& soil, 
                           const Time& time, const Weather& weather)
@@ -459,70 +464,18 @@ Movement1D::default_heat (const Soil& soil,
 }
 
 void 
-Movement1D::calculate_heat_flux (const Geometry& geo,
-                                 const Soil& soil,
-                                 const SoilWater& soil_water,
-                                 const std::vector<double>& T_old,
-                                 double T_prev,
-                                 const std::vector<double>& T,
-                                 const double T_bottom,
-                                 std::vector<double>& q)
-{
-  // Top and inner cells.
-  double z_prev = 0.0;
-  for (unsigned int i = 0; i < soil.size (); i++)
-    {
-      const double Theta = soil_water.Theta (i);
-      const double X_ice = soil_water.X_ice (i);
-      const double K = soil.heat_conductivity (i, Theta, X_ice);
-      const double T_next = (T[i] + T_old[i]) / 2.0;
-      const double dT = T_prev - T_next;
-      const double dz = z_prev - geo.z (i);
-      const double q_water = soil_water.q (i);
-      const double T = (T_prev + T_next) / 2.0;
-
-      q[i] = - K * dT/dz + water_heat_capacity * rho_water *  q_water * T;
-      T_prev = T_next;
-      z_prev = geo.z (i);
-    }
-  // Lower boundary.
-  const unsigned int i = soil.size ();
-  const unsigned int prev = i - 1U;
-  const double Theta = soil_water.Theta (prev);
-  const double X_ice = soil_water.X_ice (prev);
-  const double K = soil.heat_conductivity (prev, Theta, X_ice);
-  const double T_next = T_bottom;
-  const double dT = T_prev - T_next;
-  const double dz = geo.z (prev-1U) - geo.z (prev);
-  const double q_water = soil_water.q (i);
-  const double my_T = (T_prev + T_next) / 2.0;
-
-  q[i] = - K * dT/dz - water_heat_capacity * rho_water *  q_water * my_T;
-}
-
-void 
 Movement1D::solve_heat (const Geometry1D& geo,
-                        const Soil& soil,
-                        const SoilWater& soil_water,
-                        SoilHeat& soil_heat,
-                        const Surface& surface,
+			const std::vector<double>& q_water,
+			const std::vector<double>& S,
+			const std::vector<double>& capacity,
+			const std::vector<double>& conductivity,
+			const double T_top,
+			const double T_top_new,
                         const double T_bottom,
+			std::vector<double>& T,
                         const double dt)
 {
-  double& T_top = soil_heat.T_top;
-  std::vector<double>& T = soil_heat.T_;
-  std::vector<double>& q = soil_heat.q;
-  const std::vector<SoilHeat::state_t>& state = soil_heat.state;
-  const std::vector<double>& S = soil_heat.S;
-  const std::vector<double>& T_old = soil_heat.T_old;
-
-  // Border conditions.
-  const double T_top_new = surface.temperature ();
-
-  if (T_top < -400.0)
-    T_top = T_top_new;
-
-  int size = soil.size ();
+  const size_t size = geo.cell_size ();
 
   // Tridiagonal matrix.
   std::vector<double> a (size, 0.0);
@@ -533,15 +486,12 @@ Movement1D::solve_heat (const Geometry1D& geo,
   // Inner cells.
   for (int i = 0; i < size; i++)
     {
-      // Soil Water
-      const double Theta = soil_water.Theta (i);
-      const double X_ice = soil_water.X_ice (i);
-
+      // Surrounding cells.
       const int prev = i - 1;
       const int next = i + 1;
 
       // Calculate average heat capacity and conductivity.
-      const double conductivity = soil.heat_conductivity (i, Theta, X_ice);
+      const double conductivity_cell = conductivity[i];
 
       // Calculate distances.
       const double dz_next 
@@ -562,110 +512,55 @@ Movement1D::solve_heat (const Geometry1D& geo,
       const double dT_both = dT_prev + dT_next;
 
       // Calculate conductivity gradient.
-      double gradient;
+      double gradient_cell;
       if (i == 0)
-        gradient = 0.0;
+        gradient_cell = 0.0;
       else if (i == size - 1)
-        gradient 
-          = (soil.heat_conductivity (i, 
-                                     soil_water.Theta (i),
-                                     soil_water.X_ice (i))
-             - soil.heat_conductivity (prev, 
-                                       soil_water.Theta (prev),
-                                       soil_water.X_ice (prev)))
-          / dz_prev;
+        gradient_cell = (conductivity_cell - conductivity[prev]) / dz_prev;
       else
-        gradient 
-          = (soil.heat_conductivity (next, 
-                                     soil_water.Theta (next),
-                                     soil_water.X_ice (next))
-             - soil.heat_conductivity (prev, 
-                                       soil_water.Theta (prev),
-                                       soil_water.X_ice (prev)))
-          / dz_both;
+        gradient_cell = (conductivity[next] - conductivity[prev]) / dz_both;
 
       // Computational,
-      const double Cx = gradient
-        + water_heat_capacity
-        * (soil_water.q (i) + soil_water.q (next)) / 2.0;
+      const double Cx = gradient_cell
+        + water_heat_capacity * (q_water[i] + q_water[next]) / 2.0;
 
       // Heat capacity including thawing/freezing.
-      const double capacity 
-        = soil_heat.capacity_apparent (soil, soil_water, i);
+      const double capacity_cell = capacity[i];
 
       // Setup tridiagonal matrix.
-      a[i] = - conductivity / dz_both / dz_prev + Cx / 2.0 / dz_both;
-      b[i] = capacity / dt
-        + conductivity / dz_both * (1.0 / dz_next + 1.0 / dz_prev);
-      c[i] = - conductivity / dz_both / dz_next - Cx / 2.0 / dz_both;
+      a[i] = - conductivity_cell / dz_both / dz_prev + Cx / 2.0 / dz_both;
+      b[i] = capacity_cell / dt
+        + conductivity_cell / dz_both * (1.0 / dz_next + 1.0 / dz_prev);
+      c[i] = - conductivity_cell / dz_both / dz_next - Cx / 2.0 / dz_both;
       const double x2 = dT_next / dz_next - dT_prev/ dz_prev;
       if (i == 0)
-        d[i] = T[i] * capacity / dt
-          + conductivity / geo.z (1) * (x2 + T_top_new / geo.z (0))
+        d[i] = T[i] * capacity_cell / dt
+          + conductivity_cell / geo.z (1) * (x2 + T_top_new / geo.z (0))
           + Cx * (T[1] - T_top + T_top_new) / (2.0 * geo.z (1));
       else
-        d[i] = T[i] * capacity / dt + (conductivity / dz_both) * x2
+        d[i] = T[i] * capacity_cell / dt + (conductivity_cell / dz_both) * x2
           + Cx * dT_both / dz_both / 2.0;
 
-      if (state[i] == SoilHeat::freezing || state[i] == SoilHeat::thawing)
-        d[i] -= latent_heat_of_fussion * rho_water
-          * (soil_water.q (i) - soil_water.q (next)) / geo.dz (i) / dt;
-
-      // External heat source.
+      // External heat source + thawing/freezing.
       d[i] += S[i];
     }
   d[size - 1] = d[size - 1] - c[size - 1] * T_bottom;
   tridia (0, size, a, b, c, d, T.begin ());
-  double T_prev = (T_top + T_top_new) / 2.0;
-  T_top = T_top_new;
   daisy_assert (T[0] < 50.0);
-
-  calculate_heat_flux (geo, soil, soil_water, 
-                       T_old, T_prev, T, T_bottom, q);
 }
 
 void 
-Movement1D::tick_heat (const Geometry1D& geo,
-                       const Soil& soil,
-                       SoilWater& soil_water,
-                       SoilHeat& soil_heat,
-                       const Surface& surface,
-                       const double T_bottom,
-                       const double dt)
+Movement1D::heat (const std::vector<double>& q_water,
+		  const std::vector<double>& S,
+		  const std::vector<double>& capacity,
+		  const std::vector<double>& conductivity,
+		  const double T_top,
+		  const double T_top_new,
+		  std::vector<double>& T,
+		  const double dt, Treelog&) const
 {
-  // Update freezing and melting points.
-  soil_heat.update_freezing_points (soil, soil_water);
-
-  // Solve with old state.
-  soil_heat.T_old = soil_heat.T_;
-  solve_heat (geo, soil, soil_water, soil_heat, 
-              surface, T_bottom, dt);
-
-  // Check if ice is enabled.
-  if (!soil_heat.enable_ice)
-    return;
-
-  // Update state according to new temperatures.
-  const bool changed 
-    = soil_heat.update_state (geo, soil, soil_water, soil_heat.T_, dt);
-
-  if (changed)
-    {
-      // Solve again with new state.
-      soil_heat.T_ = soil_heat.T_old;
-      solve_heat (geo, soil, soil_water, soil_heat, surface, T_bottom, dt);
-
-      // Check if state match new temperatures.
-      const bool changed_again = soil_heat.check_state (soil, soil_heat.T_);
-
-      if (changed_again)
-        {
-          // Force temperatures to match state.
-          soil_heat.force_state (soil_heat.T_);
-        }
-    }
-  // Update ice in water.
-  soil_water.freeze (soil, soil_heat.freezing_rate);
+  solve_heat (*geo, q_water, S, capacity, conductivity,
+	      T_top, T_top_new, T_bottom, T, dt);
 }
 
 void 
@@ -675,15 +570,15 @@ Movement1D::ridge (Surface& surface, const Soil& soil,
 { surface.ridge (*geo, soil, soil_water, al); }
 
 void 
-Movement1D::tick (const Soil& soil, SoilWater& soil_water, SoilHeat& soil_heat,
+Movement1D::tick (const Soil& soil, SoilWater& soil_water, 
+		  const SoilHeat& soil_heat,
                   Surface& surface, Groundwater& groundwater,
                   const Time& time, const Weather& weather, 
                   const double dt, Treelog& msg) 
 {
   Treelog::Open nest (msg, "Movement: " + name.name ());
 
-  tick_heat (*geo, soil, soil_water, soil_heat, surface, 
-             bottom_heat (time, weather), dt);
+  T_bottom = bottom_heat (time, weather);
   soil_water.tick (geo->cell_size (), soil, dt, msg);
   tick_water (*geo, soil, soil_heat, surface, groundwater, 
               soil_water.S_sum_, soil_water.h_old_, soil_water.Theta_old_,
@@ -746,7 +641,8 @@ Movement1D::Movement1D (Block& al)
     macro (NULL), 
     matrix_solute (Librarian::build_vector<Transport> (al, "matrix_solute")),
     transport_solid (Librarian::build_item<Transport> (al, "transport_solid")),
-    mactrans  (Librarian::build_item<Mactrans> (al, "mactrans"))
+    mactrans  (Librarian::build_item<Mactrans> (al, "mactrans")),
+    T_bottom (-42.42e42)
 { }
 
 Movement1D::~Movement1D ()

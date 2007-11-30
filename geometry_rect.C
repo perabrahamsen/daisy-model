@@ -65,30 +65,6 @@ bool
 GeometryRect::contain_y (size_t i, double y) const
 { return  front () <= y  && y <= back (); }
 
-size_t 
-GeometryRect::cell_pseudo_number (const int n) const
-{
-  switch (n)
-    {
-    case cell_above:
-      return cell_size () + 0;
-    case cell_below:
-      return cell_size () + 1;
-    case cell_left:
-      return cell_size () + 2;
-    case cell_right:
-      return cell_size () + 3;
-    case cell_front:
-      return cell_size () + 4;
-    case cell_back:
-      return cell_size () + 5;
-    default:
-      daisy_assert (n >= 0);
-      daisy_assert (n < cell_size ());
-      return n;
-    }
-}
-
 double 
 GeometryRect::xplus (size_t n) const
 { 
@@ -273,13 +249,7 @@ GeometryRect::GeometryRect (Block& al)
 			  edge_from_.size () - edge_cos_angle_.size (), 1.0);
 
   // Cell edges.
-  cell_edges_.insert (cell_edges_.end (), cell_pseudo_size (),
-                      std::vector<int> ());
-  for (size_t e = 0; e < edge_size (); e++)
-    { 
-      cell_edges_[cell_pseudo_number (edge_from (e))].push_back (e);
-      cell_edges_[cell_pseudo_number (edge_to (e))].push_back (e);
-    }
+  build_cell_edges ();
 
   // Edges.
   daisy_assert (edge_area_.size () == edge_size ());

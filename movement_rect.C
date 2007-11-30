@@ -21,6 +21,7 @@
 #define BUILD_DLL
 #include "movement.h"
 #include "geometry_rect.h"
+#include "heat_rect.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
@@ -65,16 +66,28 @@ struct MovementRect : public Movement
   void ridge (Surface&, const Soil&, const SoilWater&, const AttributeList&);
 
   // Heat.
+  std::auto_ptr<HeatRect> heat_rect;
+
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
+  double T_bottom;		// [dg C]
   double bottom_heat (const Time&, const Weather&) const ;
+  double bottom_T () const;
   std::vector<double> default_heat (const Soil&, 
                                     const Time&, const Weather&);
   double surface_snow_T (const Soil&, const SoilWater&, const SoilHeat&,
                          const double T_snow, const double K_snow,
                          const double dZs) const;
+  void heat (const std::vector<double>& q_water,
+	     const std::vector<double>& S,
+	     const std::vector<double>& capacity,
+	     const std::vector<double>& conductivity,
+	     double T_top,
+	     double T_top_new,
+	     std::vector<double>& T,
+	     const double dt, Treelog&) const;
 
   // Simulation.
-  void tick (const Soil& soil, SoilWater& soil_water, SoilHeat& soil_heat,
+  void tick (const Soil& soil, SoilWater& soil_water, const SoilHeat& soil_heat,
              Surface& surface, Groundwater& groundwater, const Time&,
              const Weather&, double dt, Treelog& msg);
   void output (Log&) const;
@@ -186,31 +199,13 @@ MovementRect::ridge (Surface&, const Soil&, const SoilWater&,
                      const AttributeList&)
 { throw "Can't make ridges on a rectangular grid"; }
 
-double
-MovementRect::surface_snow_T (const Soil& soil,
-                              const SoilWater& soil_water,
-                              const SoilHeat& soil_heat,
-                              const double T_snow,
-                              const double K_snow,
-                              const double dZs) const
-{
-  // We just use the first cell, ignore rest of surface.
-
-  // Information about soil.
-  const double K_soil 
-    = soil.heat_conductivity (0, soil_water.Theta (0),
-                              soil_water.X_ice (0)) 
-    * 1e-7 * 100.0 / 3600.0; // [erg/cm/h/dg C] -> [W/m/dg C]
-  const double Z = -geo->z (0) / 100.0; // [cm] -> [m]
-  const double T_soil = geo->content_at (soil_heat, &SoilHeat::T, Z); // [dg C]
-
-  return (K_soil / Z * T_soil + K_snow / dZs * T_snow) 
-    / (K_soil / Z + K_snow / dZs);
-}
-
 double 
 MovementRect::bottom_heat (const Time& time, const Weather& weather) const 
 { return weather.T_normal (time, delay); }
+
+double
+MovementRect::bottom_T () const
+{ return T_bottom; }
 
 std::vector<double> 
 MovementRect::default_heat (const Soil& soil, 
@@ -251,13 +246,51 @@ MovementRect::default_heat (const Soil& soil,
   return T;
 }
 
+double
+MovementRect::surface_snow_T (const Soil& soil,
+                              const SoilWater& soil_water,
+                              const SoilHeat& soil_heat,
+                              const double T_snow,
+                              const double K_snow,
+                              const double dZs) const
+{
+  // We just use the first cell, ignore rest of surface.
+
+  // Information about soil.
+  const double K_soil 
+    = soil.heat_conductivity (0, soil_water.Theta (0),
+                              soil_water.X_ice (0)) 
+    * 1e-7 * 100.0 / 3600.0; // [erg/cm/h/dg C] -> [W/m/dg C]
+  const double Z = -geo->z (0) / 100.0; // [cm] -> [m]
+  const double T_soil = geo->content_at (soil_heat, &SoilHeat::T, Z); // [dg C]
+
+  return (K_soil / Z * T_soil + K_snow / dZs * T_snow) 
+    / (K_soil / Z + K_snow / dZs);
+}
+
+void 
+MovementRect::heat (const std::vector<double>& q_water,
+		    const std::vector<double>& S,
+		    const std::vector<double>& capacity,
+		    const std::vector<double>& conductivity,
+		    const double T_top,
+		    const double T_top_new,
+		    std::vector<double>& T,
+		    const double dt, Treelog& msg) const
+{
+  heat_rect->solve (*geo, q_water, S, capacity, conductivity, 
+		    T_top, T_top_new, T_bottom, T, dt, msg);
+}
+
 void
 MovementRect::tick (const Soil& soil, SoilWater& soil_water, 
-                    SoilHeat& soil_heat,
+                    const SoilHeat& soil_heat,
                     Surface& surface, Groundwater& groundwater, 
-                    const Time&,
-                    const Weather&, const double dt, Treelog& msg) 
+                    const Time& time,
+                    const Weather& weather, const double dt, Treelog& msg) 
 {
+  T_bottom = bottom_heat (time, weather);
+
   const size_t cell_size = geo->cell_size ();
   const size_t edge_size = geo->edge_size ();
 
@@ -329,7 +362,9 @@ MovementRect::MovementRect (Block& al)
     matrix_solute (Librarian::build_vector<Msoltranrect> 
                    (al, "matrix_solute")),
     matrix_solid (Librarian::build_item<Msoltranrect>
-		  (al, "matrix_solid"))
+		  (al, "matrix_solid")),
+    heat_rect (submodel<HeatRect> (al, "heat")),
+    T_bottom (-42.42e42)
 { 
   for (size_t i = 0; i < drain_position.size (); i++)
     {
@@ -392,6 +427,9 @@ If none succeeds, the simulation ends.");
                        Syntax::Const, Syntax::Singleton, "\
 Matrix solute transport model used for fully sorbed constituents.");
     alist.add ("matrix_solid", Msoltranrect::none_model ());
+    syntax.add_submodule ("heat", alist, Syntax::Const,
+                          "Heat transport.", HeatRect::load_syntax);
+
 
     Librarian::add_type (Movement::component, "rectangle",
                          alist, syntax, &make);

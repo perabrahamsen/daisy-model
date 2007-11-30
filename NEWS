@@ -4,13 +4,61 @@ This file contains an overview of changes between Daisy source
 releases.  Please note that the version numbers for binary releases
 are less accurate, for example a binary version '1.40' may contain
 some of the changes listed here under '1.41'.  You can get the version
-number of the binary with the command 'daisy -v', or 'cdaisy -v' for
-the daisy DLL.
+number of the binary with the command 'daisy -v'.
 
 When you upgrade Daisy, it is recommended that you read at least the
 headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
+
+* 4.22
+
+** Inorganic nitrogen merged with chemistry.
+
+The 'adsorption' chemical parameter has been removed, instead a new
+'adsorption' reaction has been added.  The adsorbed and solute forms
+of a pesticide are now considered seperate chemicals.  A new 'phase'
+chemical parameter specifies whether it is sorbed (and stay where it
+is) or solute (and moves with water).
+
+The 'SoilNO3' and 'SoilNH4' column parameters have been removed.
+
+New build-in chemical parameterizations for 'nutrient', 'NO3',
+'NH4_common', 'NH4_sorbed' and 'NH4' have been added.
+
+The 'Denitrification' column parameter has been removed., and new
+reaction models 'nitrification' and 'denitrification' have been added.
+
+New build-in chemistry parameterizations for 'N' has been added,
+compromising the chemicals 'NO3', 'NH4_sorbed', and 'NH4', and the
+reactions 'nirification' and 'denitrification.
+
+A new chemistry model 'multi' has been added, the main paramater
+'combine' specifies a list of chemistry parameterizations to activate.
+
+The default value of the 'Chemistry' column parameter is now a 'multi'
+model, containing 'N' in its 'combine' parameter.
+
+The 'chemistry.dai' library has been rewritten, so each pesticide now
+is represented a chemistry parameterizations containing the sorbed and
+solute form of the pesticide, and an adsorption reaction.
+
+To enable a pesticide like 'DDT', you should contact a lawyer, and
+specify "(Chemistry original (combine &old DDT))" in the column setup.
+
+You can now specify any chemicals in the 'solute' argument to the
+irrigation actions, although it makes little sense to put the sorbed
+forms in there.
+
+The 'log.dai' and 'log-std.dai' libraries have been rewritten to
+accomodate the changes.  Old log parameterizations involving inorganic
+chemicals, including NO3- and NH4+, will need to be rewritten.
+
+** New 'GP2D' rooddens model for row crops.
+
+** New 'device' gnuplot parameter for specifying output devise.
+
+** More work on the 'rectangle' movement model.
 
 * 4.21
 

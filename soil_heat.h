@@ -33,6 +33,8 @@ class Syntax;
 class Geometry;
 class Soil;
 class SoilWater;
+class Movement;
+class Surface;
 class Treelog;
 
 static const double latent_heat_of_fussion = 3.35e9; // [erg/g]
@@ -40,9 +42,6 @@ static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
 
 class SoilHeat
 {
-  friend class Movement1D;
-  friend class MovementRect;
-
   // Parameters
 private:
   const double h_frozen;
@@ -51,10 +50,10 @@ private:
   // State
 private:
   std::vector<double> T_old;
-  double T_top;
+  double T_top_;
   std::vector<double> T_freezing;
   std::vector<double> T_thawing;
-  std::vector<double> freezing_rate;
+  std::vector<double> freezing_rate_;
   enum state_t { liquid, freezing, frozen, thawing };
   std::vector<state_t> state;
   std::vector<double> q;
@@ -63,8 +62,10 @@ private:
   std::vector<double> capacity_;
   std::vector<double> conductivity_;
 public:
-  double T (size_t i) const // [dg C]
-  { return T_[i]; }
+  double T_top () const;	// [dg C]
+  double freezing_rate (const size_t c) const;
+  double T (size_t c) const	// [dg C]
+  { return T_[c]; }
   double top_flux (const Geometry& geo,
                    const Soil&, const SoilWater&) const;
   double energy (const Geometry& geo, const Soil& soil,
@@ -74,12 +75,37 @@ public:
                    const Soil& soil, const SoilWater& soil_water, 
                    double from, double to, double energy);
   void swap (const Geometry& geo, double from, double middle, double to);
-  double source (size_t i) const
-  { return S[i]; }
-  void set_source (const size_t i, const double value) // [erg/cm^3/h]
-  { S[i] = value; }
+  double source (const Geometry&, const SoilWater&, size_t c) const;
+  void set_source (const size_t c, const double value); // [erg/cm^3/h]
+private:
+  static double T_pseudo (const Geometry& geo,
+			  const int cell,
+			  const int other,
+			  const std::vector<double>& T_old,
+			  const double T_top,
+			  const std::vector<double>& T,
+			  const double T_bottom);
+  static double K_pseudo (const Geometry& geo, const int cell, const int other,
+			  const Soil& soil, const SoilWater& soil_water);
+  static void calculate_heat_flux (const Geometry& geo,
+                                   const Soil& soil,
+                                   const SoilWater& soil_water,
+                                   const std::vector<double>& T_old,
+                                   double T_prev,
+                                   const std::vector<double>& T,
+                                   double T_bottom,
+                                   std::vector<double>& q);
+public:
+  void tick (const Geometry&, const Soil&, SoilWater&, const Movement&, 
+	     const Surface& surface, double dt, Treelog& msg);
   void tick_after (const size_t cell_size, 
                    const Soil&, const SoilWater&, Treelog&);
+  
+  // Transport.
+private:
+  void set_T_top (const double value);
+  void set_temperature (const size_t c, const double value);
+  void set_flux (const size_t e, const double value);
 
   // Solve.
 private:

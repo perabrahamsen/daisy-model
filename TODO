@@ -1,14 +1,23 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Møde: SH, CPE, MHN, BG
+* SoilHeat transport skal
 
-** DOMÆNER
+DONE flyt soil_heat ud af Movement1D::solve_heat
+DONE Fjern  friend class Movement1D;
+DONE Geometry::cell_edges
+DONE Lad flux bruge en standard geometri.
+DONE test Movement1D
+Få MovRect til at virke
+Lav RectHeat submodul
+make done
 
-stof i mobil vand, immobil vand, makropore 1, 2, og n.
+* Fjern Block fra Movement::initialize && uzmodel::has_macropores
 
 * Hurtig løser.
 
-* SoilHeat transport
+* DOMÆNER
+
+stof i mobil vand, immobil vand, makropore 1, 2, og n.
 
 * OM init artikel
 
@@ -25,130 +34,19 @@ Equation system
 
 * Sorption
 
-** Mål
-
-- Adsorption skal ud af solute, og være selvstændig
-
-- SoilNH4 og SoilNO3 skal være chemichals.
-
-- Vi skal have nogle standard kemikalier, og standard transformationer.
-
-** Start
-
-DONE rename Element til DOE
-DONE new element component
-DONE new atom class
-DONE "NO3" i setup fil.
-DONE Lad "NO3" være en del af chemistry->trace
-DONE Lav "NH4_sorbed" "NO3_solute"
-DONE "adsorption" transformation.
-DONE ScopeSoil
-DONE soil/horizon attributes skal være symbol
-DONE initialiser N03-, NH4+_sorbed, NH4+_solute
-DONE - log NO3-, NH4+_sorbed, NH4+_solute, NH4+_sorbtion
-DONE - mass balance
-DONE Inkluder reactions i "Soil Chemical" balance.
-DONE Ny inorganic N log.
-DONE reaction denitrification
-DONE "nitrification"
-DONE "organic matter"
-DONE "root uptake"
-DONE organic N balance
-DONE check resultat med OLD_N.txt
-DONE Ret "Soil nitrogen" til
-DONE "Field nitrogen"
-DONE smid SoilNO3 og SoilNH4 ud
-DONE "Surface Chemicals" balance
-DONE erstat pedo med number
-DONE BGJ opsætning
-DONE chemisty multi
-DONE Rename 
-DONE  NH4+_solute -> NH4
-DONE  NH4+_sorbed -> NH4_sorbed
-DONE  NO3-        -> NO3
-DONE Get rid of IM (map chem -> amount)
-DONE - Action*
-DONE - WeatherStandard
-DONE - ColumnStandard
-DONE - extra operations
-DONE - extra constructors
-DONE - map
-DONE - log fornuftigt (Named?)
-DONE - ret log*.dai
-DONE - check checkpoint
-DONE - test irrigate NH4 kurt
-DONE - ryd op i log.dai og log-std.dai
-DONE doing fertilized_NO3 -> fertilized; (IM)
-DONE Chemestry::reaction must take chemestry argument for nesting to work
-DONE check at chem er defineret... "spray NOTDEF" giver fejl.  
-DONE solute m.m. skulle gøre det samme.  Måske en VCheck?
-DONE Kræver metalib i VCheck
-DONE Måske skal "ignore" kun være del af ChemistryMulti?
-DONE - Flyt ignore fra chemistry.h til chemistry_multi.C
-DONE - VCheck::Unique skal virke med objecter, bruges i ChemistryStandard::trace
-DONE ChemistryMulti::check skal checke duplikater og ignore/trace konflikt
-DONE ChemistryMulti skal kunne logge alle kemikalier
-DONE fjern adsorption fra Solute (erstat med "phase" enum).
-DONE lad være med at kalde msoltrans::flow for solids
-DONT fjern Solute::C SKAL BRUGES AF LOG
-DONE Solute -> Chemical
-DONE Chemical::tick_soil kaldes to steder fra? ChemistryStandard og Movement_1D?
-DONE chemistry.dai
-DONE - split i 2 stoffer + adsorption
-DONE lose column applied & volatilized, put them in chemical instead
-
-DONE test om man kan logge både NH4+ solute og sorbed takket være nedarvning
-DONE Sørg for at nedarvning virker
-DONE omskriv NH4 i termer af nedarvning
-DONE open_entry skal tage library argument
-DONE test om open_derived virker.
-DONE open_derived skal tage library argument
-DONE log_all open skal tage library argument
-DONE test at det virker
-DONE select valid skal måske tage library argument
-
-chemistry N med venner skal være indbyggede parameteriseringer
-DONE chemical default skal definere nutrient, NH4_shared, NH4, NH4_sorbed, NO3
-DONE reaction_nitrification skal bruge dem
-DONE reaction_denit skal bruge dem
-DONE chemistry default skal definere N
-chemistry multi default_model skal bruge den
-
-make done
-
-Log NH4 total?
-
-doing Check log.dai, log_std.dai
-
 Check sample/*.dai
-
 Check dokumentaion
-
 
 Udskudt:
 
 - decompose reaction
 - fjern decompose
-
 - elements
-
 doing - abiotic.[Ch]
-
 - horizon attributes skal være parametre
-
-DONE erstat pedo med number
-
-BGJ opsætning
-
 geo skal i ScopeSoil, så man kan spørge på z
-
 slet transform?  Kan ikke, bruges af domsorp...
-
-* Elements
-
-* Gør DOM til DOM-C og DOM-N ?
-
-Integrer Solute i Chemical(std?)
+Gør DOM til DOM-C og DOM-N ?
 
 * units
 
