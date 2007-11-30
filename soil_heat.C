@@ -692,16 +692,16 @@ SoilHeat::SoilHeat (const Block& al)
 {
   if (al.check ("S"))
     S = al.number_sequence ("S");
+
+  // Fetch initial T.
+  geo.initialize_layer (T_, al, "T", msg);
 }
 
-void
-SoilHeat::initialize (const AttributeList& al, 
-                      const Geometry& geo,
+void 
+SoilHeat::initialize (const Geometry& geo,
                       const std::vector<double>& default_T,
-                      Treelog& out)
+                      Treelog& msg)
 {
-  // Fetch initial T.
-  geo.initialize_layer (T_, al, "T", out);
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
   while (S.size () < cell_size)

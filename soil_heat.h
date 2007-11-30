@@ -132,7 +132,7 @@ public:
   bool check (size_t n, Treelog&) const;
   static void load_syntax (Syntax&, AttributeList&);
   SoilHeat (const Block&);
-  void initialize (const AttributeList& al, const Geometry& geo, 
+  void initialize (const Geometry& geo, 
                    const std::vector<double>& default_T, Treelog&);
   ~SoilHeat ();
 private:                        // Disable.
