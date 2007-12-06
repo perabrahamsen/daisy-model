@@ -77,9 +77,9 @@ using well known methods.  The problem is that, in the most general
 case, the space need to store the equation system is the square of the
 number of cells ($O(n^2)$, abusing the Big-O notation to express
 memory requirements) , and the time complexity of the solution is
-$O(n^3)$.  This means that if we double the number of cells, we need
-four as much memory, and we will have to wait eight times as long for
-the answer.  
+$O(n^4)$.  This means that if we double the number of cells, we need
+four times as much memory, and we will have to wait eight times as
+long for the answer.
 
 \subsubsection{Iterations and time steps}
 
@@ -312,5 +312,19 @@ more faces, and corners are the points connecting edges.
 
 \section{API}
 
+\section{Transport solution}
+
+The water, solute, and heat transport models all relies on solving
+linear equation systems which can be rewritten to the form $A x = b$,
+where $x$ is a vector of size $n$ (the number of cells) and represents
+our solution in the form of water pressure $h$, solute concentration
+$C$, or temperature $T$.  $A$ is a $n\cross{}n$ matrix, where each row
+represents the solution for a specific cell, and each column
+represents the influence from a specific cell on the other cells.  So
+the value of row 3, column six represents the influence of the state
+of cell 6 o the solution for cell 3.  $b$ is a vector of size $n$,
+which represents solution independent influences on the solution for
+each sell.  That is, the old value for the cell, and source/sink terms
+that are independent of the solution.
 
 \end{document}

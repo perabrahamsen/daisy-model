@@ -796,7 +796,7 @@ ColumnStandard::initialize (Block& block,
     return;
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
   bioclimate->initialize (block, my_weather);
-  soil_heat->initialize (geometry, 
+  soil_heat->initialize (alist.alist ("SoilHeat"), geometry, 
                          movement->default_heat (*soil, time, my_weather), msg);
   
   // Solutes depends on water and heat.

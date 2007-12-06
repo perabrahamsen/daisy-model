@@ -2,6 +2,20 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Hurtig løser.
 
+** Få test-rect.dai til at køre (disable N?)
+
+** typedef ublas::compressed_matrix<blah, blah> Matrix;
+
+** Omskriv uzrect_Mollerup.C til at bruge Matrix
+
+** Isoler løser.
+
+** Erstat løser med CS::solve
+
+** link libcsparse
+
+** kør
+
 * DOMÆNER
 
 stof i mobil vand, immobil vand, makropore 1, 2, og n.
