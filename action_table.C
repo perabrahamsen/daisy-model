@@ -208,7 +208,8 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
             }
           daisy.field->fertilize (fert, daisy.dt, msg);
           if (water > 0.0)
-            daisy.field->irrigate_surface (water, IM (), daisy.dt, msg);
+            daisy.field->irrigate_surface (water, IM (IM::solute_unit ()),
+                                           daisy.dt, msg);
         }
     }
   else if (irrigate_events.find (daisy.time) != irrigate_events.end ())

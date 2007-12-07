@@ -33,6 +33,8 @@ ifeq ($(HOSTTYPE),i386-linux)
 SRCDIR = $(HOME)/daisy
 OBJHOME = /usr/local/daisy
 NATIVEHOME = $(OBJHOME)/$(HOSTTYPE)
+NATIVEEXE = daisy
+USE_GUI = none
 BOOSTINC = -isystem $(HOME)/boost/include/boost-1_35/
 FTPDIR = /home/ftp/pub/daisy
 WWWINDEX = /home/user_3/daisy/.public_html/index.html
@@ -40,6 +42,8 @@ else
 SRCDIR = ..
 OBJHOME = obj
 NATIVEHOME = $(OBJHOME)
+NATIVEEXE = daisy.exe daisyw.exe
+USE_GUI = Q4
 BOOSTINC = -isystem $(CYGHOME)/usr/include/boost-1_33_1
 SETUPDIR = /home/abraham/daisy/install
 MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
@@ -49,8 +53,7 @@ endif
 TARGETTYPE = i586-mingw32msvc
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
-#USE_GUI = none
-USE_GUI = Q4
+#
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
@@ -588,7 +591,7 @@ exp:
 native:	
 	(mkdir -p $(NATIVEHOME) \
 	 && cd $(NATIVEHOME) \
-         && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy${EXE} daisyw.exe)
+         && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE))
 
 cnative:
 	(mkdir -p $(NATIVEHOME) \

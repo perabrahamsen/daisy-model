@@ -99,7 +99,7 @@ public:
   virtual void spray (double amount /* [g/m^2] */, double dt /* [h] */) = 0;
   virtual void dissipate (double amount /* [g/m^2] */, double dt /* [h] */) = 0;
   virtual void harvest (double removed, double surface, double dt) = 0;
-  virtual void incorporate (const Geometry&, double amount, 
+  virtual void incorporate (const Geometry&, double amount /* [g/m^2] */, 
 			    double from, double to, double dt) = 0;
   virtual void mix (const Geometry& geo, const Soil&, const SoilWater&,
 		    double from, double to, double dt) = 0;

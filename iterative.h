@@ -26,8 +26,7 @@
 
 template<class T>
 const double
-bisection (double min_x, double max_x, const T& f, 
-	   std::ostream *const dbg = NULL)
+bisection (double min_x, double max_x, T& f, std::ostream *const dbg = NULL)
 {
   // Initial range.
   double min_y = f (min_x);
@@ -70,8 +69,8 @@ bisection (double min_x, double max_x, const T& f,
 }
 
 template<class F, class D>
-const double
-Newton (double guess, const F& f, const D& d, std::ostream *const dbg = NULL)
+double
+Newton (double guess, F& f, D& d, std::ostream *const dbg = NULL)
 {
   // Value for initial guess.
   double value = f (guess);

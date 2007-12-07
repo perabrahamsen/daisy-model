@@ -33,7 +33,9 @@ class AttributeList;
 class Syntax;
 class Metalib;
 
-#ifdef BUILD_DLL
+#ifdef __unix
+#define EXPORT /* Nothing */
+#elif defined (BUILD_DLL)
 /* DLL export */
 #define EXPORT __declspec(dllexport)
 #else

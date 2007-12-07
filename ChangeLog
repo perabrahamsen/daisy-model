@@ -1,3 +1,14 @@
+2007-12-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* chemical_std.C (incorporate): Unit fix.
+
+	* iterative.h: Ported to GCC 3.3.
+
+	* Makefile: Ported to Linux.
+
+	* action_crop.C, action_fertilize.C, action_table.C: Add unit to
+	empty solute for irrigation.
+
 2007-11-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* heat_rect.C, heat_rect.h: New submodel.

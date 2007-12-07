@@ -401,7 +401,8 @@ ChemicalStandard::incorporate (const Geometry& geo, const double amount,
   daisy_assert (amount >= 0.0);
   daisy_assert (from <= 0.0);
   daisy_assert (to <= from);
-  geo.add_surface (S_external, from, to, amount / dt);
+  const double m2_per_cm2 = 0.01 * 0.01;
+  geo.add_surface (S_external, from, to, m2_per_cm2 * amount / dt);
 }
 
 void 

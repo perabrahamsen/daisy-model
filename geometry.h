@@ -168,11 +168,12 @@ public:
                  double from, double to, double amount) const;
   void add_soil (std::vector<double>& v, const std::vector<double>& density,
                  double amount) const;
-  void add_surface (std::vector<double>& v,
-                    const double from, const double to, 
-                    const double amount) const;
-  void add_surface (std::vector<double>& v, const std::vector<double>& density,
-                    const double amount) const;
+  void add_surface (std::vector<double>& v /* [X] */,
+                    const double from /* [cm] */, const double to /* [cm] */,
+                    const double amount /* [X/cm^2] */) const;
+  void add_surface (std::vector<double>& v /* [X] */,
+                    const std::vector<double>& density,
+                    const double amount /* [X/cm^2] */) const;
   double extract_soil (std::vector<double>& v, double from, double to) const;
   double extract_surface (std::vector<double>& v, 
                           double from, double to) const;

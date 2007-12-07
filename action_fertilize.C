@@ -191,13 +191,15 @@ ActionFertilize::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     {
       daisy.field->fertilize (am, from, to, daisy.dt, msg);
       if (water > 0.0)
-        daisy.field->irrigate_subsoil (water, IM (), from, to, daisy.dt, msg);
+        daisy.field->irrigate_subsoil (water, IM (IM::solute_unit ()),
+                                       from, to, daisy.dt, msg);
     }
   else
     {
       daisy.field->fertilize (am, daisy.dt, msg);
       if (water > 0.0)
-        daisy.field->irrigate_surface (water, IM (), daisy.dt, msg);
+        daisy.field->irrigate_surface (water, IM (IM::solute_unit ()),
+                                       daisy.dt, msg);
     }
 }
 

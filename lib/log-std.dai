@@ -263,7 +263,7 @@ The total amount of water in the soil interval")
 	 "NO3-Surface-Fertilizer" "NO3-Soil-Fertilizer"
 	 "Org_N-Fertilizer"
          "NH4-Deposit" "NO3-Deposit" Fixated "Seed_N")
-  (output "NH4-Volatilization" "N2O-Nitrification" "Denitrification"
+  (output "N2O-Nitrification" "Denitrification"
           "NH4-Leak-Matrix" "NH4-Leak-Macro" "NO3-Leak-Matrix"
           "NO3-Leak-Macro" "NH4-Drain" "NO3-Drain" "NH4-Surface-Loss"
           "NO3-Surface-Loss" "Harvest_N")
@@ -277,7 +277,7 @@ The total amount of water in the soil interval")
   (require_top true)
   (input "NH4-Surface-Fertilizer" "NH4-Soil-Fertilizer"
 	 "NH4-Deposit" "NH4-Mineralization")
-  (output "NH4-Volatilization" "NH4-Nitrification"
+  (output "NH4-Nitrification"
           "NH4-Leak-Matrix" "NH4-Leak-Macro" "NH4-Drain" "NH4-Surface-Loss"
           "NH4-Crop")
   (content "NH4-Surface" "NH4-Solute-Soil" "NH4-Sorbed-Soil"))
@@ -328,7 +328,6 @@ The total amount of water in the soil interval")
                      (spec chemical default S_external)
                      (tag "NH4-Soil-Fertilizer")
                      (handle sum)
-                     (negate true)
                      (dimension "kg N/ha/&"))
            (number (path column "${column}" 
 			 Chemistry "*" trace NH4 canopy_dissipate)
@@ -424,7 +423,6 @@ The total amount of water in the soil interval")
                      (spec chemical default S_external)
                      (tag "NO3-Soil-Fertilizer")
                      (handle sum)
-                     (negate true)
                      (dimension "kg N/ha/&"))
            (number (path column "${column}" Chemistry "*" trace NO3 deposit)
                    (spec chemical default deposit)

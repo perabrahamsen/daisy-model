@@ -174,7 +174,7 @@ Rootdens_GP2D::set_density (const Geometry& geo,
       std::ostringstream tmp;
       tmp << "Newton's methods did not converge.\n";
       tmp << "Q = " << Q << ", g (Q) = " << g_Q << ", D = " << D << "\n";
-      (void) Newton (-3, g, g.derived, &tmp);
+      (void) Newton (-3.0, g, g.derived, &tmp);
       tmp << "Using uniform distribution.";
       msg.error (tmp.str ());
       uniform (geo, l_r, d_a, Density);
