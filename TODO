@@ -10,11 +10,27 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** Isoler løser.
 
+** tag tid på test-rect.dai
+
 ** Erstat løser med CS::solve
 
 ** link libcsparse
 
-** kør
+** tag tid på test-rect.dai
+
+** Erstat løser med UMF_solve
+
+** link med UMF/AMD
+
+** tag tid på test-rect.dai
+
+** Installer Atlas
+
+** Recombile UMF med Atlas
+
+** link med UMF/AMD/Atlas
+
+** tag tid på test-rect.dai
 
 * DOMÆNER
 

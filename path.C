@@ -165,7 +165,7 @@ Path::open_file (const std::string& name) const
   // Absolute filename.
   if (name[0] == '.' || name[0] == '/'
 #ifndef __unix__
-      || name[1] == ':'
+      || name[0] == '\\' || name[1] == ':'
 #endif
       )
     {

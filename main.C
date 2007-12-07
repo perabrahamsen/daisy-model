@@ -24,6 +24,8 @@
 #include <stdexcept>
 #include <typeinfo>
 
+#include "treelog.h"
+
 int
 main (int argc, char* argv[])
 {
@@ -47,6 +49,8 @@ main (int argc, char* argv[])
         case Toplevel::is_error:
           throw EXIT_FAILURE;
         }
+      toplevel.error ("Program ended with unknown state");
+      throw EXIT_FAILURE;
     }
   catch (const char* error)
     { toplevel.error (std::string ("Exception: ") + error); }

@@ -174,6 +174,7 @@ Toplevel::Implementation::reset ()
 Toplevel::Implementation::Implementation (const std::string& pref_ui)
   : preferred_ui (pref_ui),
     program_name ("daisy"),
+    program (NULL),
     reg (msg),
     start_time (std::time (NULL)),
     has_printed_copyright (false),

@@ -1,4 +1,7 @@
-2007-12-07  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2007-12-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* path.C (open_file): Treat file names starting with "\" as
+	absolute outside unix.
 
 	* chemical_std.C (incorporate): Unit fix.
 
