@@ -1,5 +1,12 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Ensure this code is ran
+
+  if (!impl->ran_user_interface)
+    user_interface ();
+
+before top_level is deleted.
+
 * Hurtig løser.
 
 ** Få test-rect.dai til at køre (disable N?)

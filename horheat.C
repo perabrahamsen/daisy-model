@@ -283,7 +283,7 @@ HorHeat::ThermalConductivity (const Hydraulic& hydraulic,
 	      }
 	    break;
 	    case Constituents_End:
-	      abort ();
+	      daisy_notreached ();
 	    }
 	  S1 += k * content[i] * thermal_conductivity[i];
 	  S2 += k * content[i];
