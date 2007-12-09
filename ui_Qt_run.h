@@ -75,6 +75,7 @@ private:
 public:
   void attach (Toplevel& toplevel);
   void run (Toplevel& toplevel);
+  void failure (Toplevel& toplevel);
 
   // Update.
 private:

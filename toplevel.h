@@ -88,6 +88,9 @@ private:
   // Use.
 public:
   void user_interface ();
+private:
+  void failure_interface ();
+public:
   void run ();
   void error (const std::string&);
   state_t state () const;

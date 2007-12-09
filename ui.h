@@ -42,6 +42,7 @@ protected:
 public:
   virtual void attach (Toplevel&) = 0;
   virtual void run (Toplevel&) = 0;
+  virtual void failure (Toplevel&) = 0;
 
   // Create and Destroy.
 private:
@@ -61,6 +62,7 @@ class UIProgress : public UI
 public:
   void attach (Toplevel&);
   void run (Toplevel&);
+  void failure (Toplevel&);
 
   // Control.
 private:
@@ -82,6 +84,7 @@ class UINone : public UI
 public:
   void attach (Toplevel&);
   void run (Toplevel&);
+  void failure (Toplevel&);
 
   // Control.
 private:

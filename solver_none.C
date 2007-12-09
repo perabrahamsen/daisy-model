@@ -1,4 +1,4 @@
-// element.h --- An element of a compound.
+// solver_none.C -- "Solve" matrix equation Ax=b by doing nothing.
 // 
 // Copyright 2007 Per Abrahamsen and KVL.
 //
@@ -18,31 +18,33 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#define BUILD_DLL
 
-#ifndef ELEMENT_H
-#define ELEMENT_H
+#include "solver.h"
+#include "syntax.h"
+#include "alist.h"
+#include "librarian.h"
 
-#include "model.h"
-#include "symbol.h"
-
-class Block;
-
-class Element : public Model
-{
-  // Identity.
-public:
-  const symbol name;
-  static const char *const component;
-  
-  // Content.
-public:
-  virtual double weight () const = 0; // Relative weight [?]
-  virtual symbol dimension () const = 0; // Dimension of relative weight.
-
-  // Create and Destroy.
-public:
-  Element (Block& al);
-  ~Element ();
+struct SolverNone : public Solver
+{ 
+  void solve (Matrix&, const Vector&, Vector&) const
+  { }
+  SolverNone (Block& al)
+    : Solver (al)
+  { }
 };
 
-#endif // ELEMENT_H
+static struct SolverNoneSyntax
+{
+  static Model& make (Block& al)
+  { return *new SolverNone (al); }
+  SolverNoneSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Don't solve the equation.");
+    Librarian::add_type (Solver::component, "none", alist, syntax, &make);
+  }
+} SolverNone_syntax;
+
+// solver_none.C ends here.

@@ -352,6 +352,14 @@ UIRun::run (Toplevel& toplevel)
 { 
 
   run_user_interface ();	// Start the UI.
+  daisy_assert (qt_run.isNull ()); // Program should not be running.
+}
+
+void 
+UIRun::failure (Toplevel& toplevel)
+{ 
+
+  run_user_interface ();	// Start the UI.
   stop_program ();		// Stop the simulation.
 }
 

@@ -27,6 +27,7 @@
 #include "soil_heat.h"
 #include "groundwater.h"
 #include "surface.h"
+#include "solver.h"
 #include "log.h"
 #include "syntax.h"
 #include "block.h"
@@ -38,14 +39,10 @@
 // Uncomment for fast code that does not catches bugs.
 #define BOOST_UBLAS_NDEBUG
 
-#include <boost/numeric/ublas/vector_proxy.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/triangular.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/banded.hpp>
-#include <boost/numeric/ublas/lu.hpp>
 #include <boost/numeric/ublas/io.hpp>
-// #include <boost/numeric/ublas/matrix_sparse.hpp>
 
 #include <sstream>
 
@@ -57,6 +54,7 @@ struct UZRectMollerup : public UZRect
   enum top_state { top_undecided, top_flux, top_pressure };
 
   // Parameters.  
+  const std::auto_ptr<Solver> solver;
   const double edge_arithmetic_height;
   const int max_time_step_reductions;
   const int time_step_reduction;
@@ -121,12 +119,12 @@ struct UZRectMollerup : public UZRect
   static void drain (const GeometryRect& geo,
 		     const std::vector<size_t>& drain_cell,
 		     const ublas::vector<double>& h,
-		     ublas::matrix<double>& A,
+		     Solver::Matrix& A,
 		     ublas::vector<double>& b, 
 		     const int debug, Treelog& msg);
   static void diffusion (const GeometryRect& geo,
 			 const ublas::vector<double>& Kedge,
-			 ublas::matrix<double>& diff);
+			 Solver::Matrix& diff);
   static void gravitation (const GeometryRect& geo,
 			   const ublas::vector<double>& Kedge,
 			   ublas::vector<double>& grav);  
@@ -300,10 +298,10 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                     Kedge[e] = 2.0/(1.0/K_from + 1.0/K_to);
 		} 
 	    }
-	  
+
 	  //Initialize diffusive matrix
-	  ublas::matrix<double> diff (cell_size, cell_size);
-	  diff = ublas::zero_matrix<double> (cell_size, cell_size);
+	  Solver::Matrix diff (cell_size);
+	  // diff = ublas::zero_matrix<double> (cell_size, cell_size);
 	  diffusion (geo, Kedge, diff);
 
 	  //Initialize gravitational matrix
@@ -332,35 +330,35 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	    Cw (c, c) = soil.Cw2 (c, h[c]);
 	  
 	  //Initialize sum matrix
-	  ublas::matrix<double> summat (cell_size, cell_size);  
+	  Solver::Matrix summat (cell_size);  
 	  summat = diff + Dm_mat;
 
 	  //Initialize sum vector
 	  ublas::vector<double> sumvec (cell_size);  
 	  sumvec = grav + B + Gm + Dm_vec - S_vol; 
 
+	  // QCw is shorthand for Qmatrix * Cw
+	  Solver::Matrix Q_Cw (cell_size);
+	  Q_Cw = prod (Qmat, Cw);
+
 	  //Initialize A-matrix
-	  ublas::matrix<double> A (cell_size, cell_size);  
-	  A = (1.0 / ddt) * prod (Qmat, Cw) - summat;  
+	  Solver::Matrix A (cell_size);  
+	  A = (1.0 / ddt) * Q_Cw - summat;  
+
+	  // Q_Cw_h is shorthand for Qmatrix * Cw * h
+	  const ublas::vector<double> Q_Cw_h = prod (Q_Cw, h);
 
 	  //Initialize b-vector
 	  ublas::vector<double> b (cell_size);  
 	  //b = sumvec + (1.0 / ddt) * (Qmatrix * Cw * h + Qmatrix *(Wxx-Wyy));
-	  b = sumvec + (1.0 / ddt) * (prod (prod (Qmat, Cw),  h) 
+	  b = sumvec + (1.0 / ddt) * (Q_Cw_h
 				      + prod (Qmat, Theta_previous-Theta));
-
 
 	  // Force active drains to zero h.
 	  drain (geo, drain_cell, h, A, b, debug, msg);
 
-	  // Solve Ax=b (maybe)
-	  ublas::permutation_matrix<double> piv (cell_size);
-	  const bool singular = ublas::lu_factorize(A, piv);
-	  daisy_assert (!singular);
-	  ublas::lu_substitute (A, piv, b); // b now contains solution 
-	  
-	  h = b; // new solution :-)
-	  
+	  solver->solve (A, b, h); // Solve Ah=b with regard to h.
+
 	  for (int c=0; c < cell_size; c++) // update Theta - not neccessary???
 	    Theta (c) = soil.Theta (c, h (c), h_ice (c)); 
 
@@ -727,7 +725,7 @@ void
 UZRectMollerup::drain (const GeometryRect& geo,
 		       const std::vector<size_t>& drain_cell,
 		       const ublas::vector<double>& h,
-		       ublas::matrix<double>& A,
+		       Solver::Matrix& A,
 		       ublas::vector<double>& b,
 		       const int debug, Treelog& msg)
 {
@@ -786,18 +784,10 @@ UZRectMollerup::drain (const GeometryRect& geo,
     msg.message (tmp.str ());
 }
 
-
-
-
-
-
-
-
-
 void 
 UZRectMollerup::diffusion (const GeometryRect& geo,
 			   const ublas::vector<double>& Kedge,
-			   ublas::matrix<double>& diff)
+			   Solver::Matrix& diff)
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
     
@@ -870,6 +860,11 @@ UZRectMollerup::has_macropores (const bool)
 void 
 UZRectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  syntax.add_object ("solver", Solver::component, 
+		     Syntax::Const, Syntax::Singleton, "\
+Model used for solving matrix equation system.");
+  alist.add ("solver", Solver::default_model ());
+
   syntax.add ("edge_arithmetic_height", "cm", Syntax::Const, "\
 \n\
 We have to use arithmetic average near the top of the soil, otherwise\n\
@@ -914,6 +909,7 @@ Water mass balance error per cell.");
 
 UZRectMollerup::UZRectMollerup (Block& al)
   : UZRect (al),
+    solver (Librarian::build_item<Solver> (al, "solver")),
     edge_arithmetic_height (al.number ("edge_arithmetic_height")),
     max_time_step_reductions (al.integer ("max_time_step_reductions")),
     time_step_reduction (al.integer ("time_step_reduction")),

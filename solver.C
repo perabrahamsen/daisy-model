@@ -1,4 +1,4 @@
-// element.h --- An element of a compound.
+// solver.C -- Solve matrix equation Ax=b.
 // 
 // Copyright 2007 Per Abrahamsen and KVL.
 //
@@ -18,31 +18,30 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#define BUILD_DLL
 
-#ifndef ELEMENT_H
-#define ELEMENT_H
+#include "solver.h"
+#include "block.h"
+#include "librarian.h"
 
-#include "model.h"
-#include "symbol.h"
+const char *const Solver::component = "solver";
 
-class Block;
-
-class Element : public Model
+Solver::Matrix::Matrix (const size_t size)
+  : SMatrix_type (size, size)
 {
-  // Identity.
-public:
-  const symbol name;
-  static const char *const component;
-  
-  // Content.
-public:
-  virtual double weight () const = 0; // Relative weight [?]
-  virtual symbol dimension () const = 0; // Dimension of relative weight.
+#ifdef USE_DENSE_MATRIX
+  *this = ublas::zero_matrix<double> (size, size); 
+#endif // USE_DENSE_MATRIX
+}
 
-  // Create and Destroy.
-public:
-  Element (Block& al);
-  ~Element ();
-};
+Solver::Solver (Block& al)
+  : name (al.identifier ("type"))
+{ }
 
-#endif // ELEMENT_H
+Solver::~Solver ()
+{ }
+
+static Librarian Solver_init (Solver::component, "\
+A way to solve the matrix equation 'A x = b'.");
+
+// solver.C ends here.

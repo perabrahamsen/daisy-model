@@ -89,9 +89,11 @@ Daisy::run (Treelog& msg)
 
 	if (!running)
 	  msg.message ("End simulation");
-	print_time->tick (*this, *extern_scope, msg);
 	if (force_print)
-	  msg.touch ();
+	  {
+	    msg.touch ();
+	    msg.flush ();
+	  }
       }
     while (running);
   }

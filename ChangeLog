@@ -1,4 +1,24 @@
+2007-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solver.C: Made it a component.
+	* Makefile (COMPONENTS): Added ít.
+	(OTHER): Remove it.
+	* solver_ublas.C, solver_cxsparse.C, solver_none.C: New models.
+	(MODELS): Added them.
+
+	* daisy.C (Daisy::run): Call 'msg.flush' when 'force_print'.
+
+2007-12-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solver.C, solver.h: New utility.
+	* Makefile (OTHER): Add it
+	* uzrect_Mollerup.C: Use it.
+
 2007-12-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* ui.h, ui.C, ui_Qt_run.C (failure): New virtual member function.
+	* toplevel.C, toplevel.h (failure_interface): New member function.
+	* toplevel.C (~Toplevel): Call it.
 
 	* path.C (open_file): Treat file names starting with "\" as
 	absolute outside unix.

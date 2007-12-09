@@ -91,6 +91,10 @@ UIProgress::run (Toplevel& toplevel)
   daisy_notreached ();
 }
 
+void 
+UIProgress::failure (Toplevel&)
+{ }
+
 bool 
 UIProgress::running () const
 { return true; }
@@ -134,6 +138,10 @@ UINone::attach (Toplevel&)
 void 
 UINone::run (Toplevel&)
 { set_low_priority (); }
+
+void 
+UINone::failure (Toplevel&)
+{ }
 
 bool 
 UINone::running () const

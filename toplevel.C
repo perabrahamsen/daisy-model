@@ -424,6 +424,15 @@ Toplevel::user_interface ()
 }
 
 void
+Toplevel::failure_interface ()
+{
+  daisy_assert (!impl->ran_user_interface);
+  impl->ran_user_interface = true;
+  impl->add_daisy_ui (*this);
+  impl->ui->failure (*this);
+}
+
+void
 Toplevel::initialize ()
 {
   try 
@@ -709,8 +718,13 @@ Toplevel::Toplevel (const std::string& preferred_ui)
 
 Toplevel::~Toplevel ()
 { 
-  if (!impl->ran_user_interface)
-    user_interface ();
+  try 
+    {
+      if (!impl->ran_user_interface)
+	failure_interface ();
+    }
+  catch (...)
+    { error ("Exception occured during cleanup"); }
 }
 
 static Submodel::Register 

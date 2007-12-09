@@ -276,6 +276,10 @@ ifeq ($(HOSTTYPE),mingw)
 	MATHLIB =
 endif
 
+# Locate the CSSparse lib
+CXSPARSELIB = -L../libdeps -lcxsparse
+CXSPARSEHEAD = ublas_cxsparse.h cs.h UFconfig.h
+
 # Locate the tk library.
 #
 TKINCLUDE	= -I/pack/tcl+tk-8/include -I/usr/openwin/include
@@ -365,7 +369,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = movement_rect.C chemistry_multi.C \
+MODELS = solver_ublas.C solver_cxsparse.C solver_none.C \
+	movement_rect.C chemistry_multi.C \
 	equil_goal.C equil_linear.C equil_langmuir.C transform_equil.C \
 	reaction_nit.C reaction_denit.C \
 	reaction_adsorption.C reaction_equil.C rootdens_GP2D.C \
@@ -430,7 +435,7 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = element.C ui.C reaction.C scopesel.C scope.C \
+COMPONENTS = solver.C element.C ui.C reaction.C scopesel.C scope.C \
 	ABAeffect.C msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
 	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C\
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
@@ -464,7 +469,7 @@ SPECIALS = scope_exchange.C photo_Farquhar.C \
 	geometry.C printer_file.C log_alist.C
 
 # Various utility code that are neither a component nor a (sub)model.
-#
+# 
 OTHER = abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
 	intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
@@ -475,8 +480,9 @@ OTHER = abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	mathlib.C cdaisy.C nrutil.C submodel.C version.C
 
-# Utilities in header alone.
-HEADONLY = submodeler.h border.h memutils.h iterative.h
+# Utilities in header or source alone.
+HEADONLY = submodeler.h border.h memutils.h iterative.h $(CXSPARSEHEAD)
+SRCONLY = 
 
 # Everything that has an interface.
 #
@@ -525,13 +531,14 @@ MAIN = main.C
 
 # The object files used in the daisy library.
 #
-LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SYSOBJECTS)
+LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SYSOBJECTS) \
+	$(SRCONLY:.C=$(OBJ))
 
 # Find all object files, header files, and source files.
 #
 OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
 SOURCES = $(INTERFACES) $(MODELS)  $(MAIN) \
-	 cmain.c bugmain.c 
+	 cmain.c bugmain.c $(SRCONLY)
 HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 
 # Find all printable files.
@@ -567,7 +574,7 @@ all:	#(EXECUTABLES)
 # Create a DLL.
 #
 daisy.dll: $(LIBOBJ) 
-	$(CC) -shared -o $@ $^ $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy.a 
+	$(CC) -shared -o $@ $^ $(CPPLIB) $(MATHLIB) $(CXSPARSELIB) -Wl,--out-implib,libdaisy.a 
 
 daisy_Qt.dll: $(Q4OBJECTS) daisy.dll
 	$(CC) -shared -o $@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB) -Wl,--out-implib,libdaisy_Qt.a 
@@ -929,6 +936,8 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+solver${OBJ}: solver.C solver.h model.h symbol.h block.h syntax.h treelog.h \
+  plf.h librarian.h
 element${OBJ}: element.C element.h model.h symbol.h block.h syntax.h \
   treelog.h plf.h alist.h mathlib.h assertion.h librarian.h
 ui${OBJ}: ui.C ui.h model.h symbol.h toplevel.h treelog_text.h treelog.h \
@@ -1308,6 +1317,7 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+solver_ublas${OBJ}: solver_ublas.C solver.h model.h symbol.h assertion.h
 movement_rect${OBJ}: movement_rect.C movement.h model.h symbol.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h heat_rect.h soil.h soil_water.h soil_heat.h msoltranrect.h \
@@ -1397,7 +1407,8 @@ msoltranrect_none${OBJ}: msoltranrect_none.C msoltranrect.h model.h symbol.h \
 uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h model.h symbol.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil.h soil_water.h soil_heat.h groundwater.h surface.h \
-  uzmodel.h log.h time.h border.h alist.h block.h plf.h librarian.h
+  uzmodel.h solver.h log.h time.h border.h alist.h block.h plf.h \
+  librarian.h
 groundwater_flux${OBJ}: groundwater_flux.C groundwater.h model.h symbol.h \
   syntax.h treelog.h alist.h block.h plf.h check.h librarian.h
 msoltranrect_2x1${OBJ}: msoltranrect_2x1.C msoltranrect.h model.h symbol.h \
@@ -1861,6 +1872,6 @@ svat_pmsw${OBJ}: svat_pmsw.C svat.h model.h symbol.h mathlib.h assertion.h \
 action_surface${OBJ}: action_surface.C action.h model.h alist.h symbol.h \
   block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
   memutils.h field.h border.h check.h librarian.h
-main${OBJ}: main.C toplevel.h
+main${OBJ}: main.C toplevel.h treelog.h symbol.h
 cmain${OBJ}: cmain.c cdaisy.h
 bugmain${OBJ}: bugmain.c cdaisy.h
