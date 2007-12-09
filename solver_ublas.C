@@ -20,6 +20,10 @@
 
 #define BUILD_DLL
 
+// Uncomment for fast code that does not catches bugs.
+#define BOOST_UBLAS_NDEBUG
+#define NDEBUG
+
 #include "solver.h"
 #include "assertion.h"
 #include "syntax.h"

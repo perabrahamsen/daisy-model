@@ -20,6 +20,10 @@
 
 #define BUILD_DLL
 
+// Uncomment for fast code that does not catches bugs.
+#define BOOST_UBLAS_NDEBUG
+#define NDEBUG
+
 #include "uzrect.h"
 #include "geometry_rect.h"
 #include "soil.h"
@@ -35,9 +39,6 @@
 #include "mathlib.h"
 #include "assertion.h"
 #include "librarian.h"
-
-// Uncomment for fast code that does not catches bugs.
-#define BOOST_UBLAS_NDEBUG
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>

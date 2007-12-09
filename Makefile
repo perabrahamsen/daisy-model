@@ -1317,7 +1317,12 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
-solver_ublas${OBJ}: solver_ublas.C solver.h model.h symbol.h assertion.h
+solver_ublas${OBJ}: solver_ublas.C solver.h model.h symbol.h assertion.h \
+  syntax.h treelog.h alist.h librarian.h
+solver_cxsparse${OBJ}: solver_cxsparse.C solver.h model.h symbol.h syntax.h \
+  treelog.h alist.h librarian.h ublas_cxsparse.h
+solver_none${OBJ}: solver_none.C solver.h model.h symbol.h syntax.h treelog.h \
+  alist.h librarian.h
 movement_rect${OBJ}: movement_rect.C movement.h model.h symbol.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h heat_rect.h soil.h soil_water.h soil_heat.h msoltranrect.h \

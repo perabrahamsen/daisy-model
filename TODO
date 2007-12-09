@@ -15,6 +15,11 @@ DONE solver_ublas.C, solver_none.C, solver_cxsparse.C
 DONE Fix "b", cxsparse. Tid: 2s (7 minutes for et år).
 DONE Fix "b", none. Tid: 1s (2½ minutes for et år).
 DONE Find ud af hvad vi gør med cxsparse
+DONE NDEBUG, none: Tid: (0:44).
+DONE NDEBUG, cxsparse: Tid: (1:45).
+DONE NDEBUG, ublas: Tid: (6:39).
+
+skriv tak til ublas folk
 
 * DOMÆNER
 
