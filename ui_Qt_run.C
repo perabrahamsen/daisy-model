@@ -308,7 +308,6 @@ UIRun::run_program ()
   qt_run = new RunQtMain (*top_level, all_logs);
   daisy_assert (!qt_run.isNull ());
 
-#if 0
   // Progress bar.
   daisy_assert (!qt_progress.isNull ());
   QObject::connect(qt_run, SIGNAL(progress_changed (double)),
@@ -321,6 +320,9 @@ UIRun::run_program ()
 		   &qt_main, SLOT(new_progress (double))); 
   QObject::connect(qt_run, SIGNAL(progress_state (Toplevel::state_t)),
 		   &qt_main, SLOT(new_state (Toplevel::state_t))); 
+  QObject::connect(&qt_main, SIGNAL(stop_program ()),
+		   this, SLOT(stop_program ())); 
+
 
   // Stop button.
   daisy_assert (!qt_stop.isNull ());
@@ -328,10 +330,9 @@ UIRun::run_program ()
 		   qt_stop, SLOT(setEnabled (bool))); 
   QObject::connect(qt_stop, SIGNAL(clicked ()),
 		   qt_run, SLOT(stop ())); 
-#endif
 
   // Start thread.
-  qt_run->start ();
+  qt_run->start (QThread::QThread::IdlePriority);
 }
 
 void
@@ -343,8 +344,10 @@ UIRun::stop_program ()
       qt_run->wait ();              // Wait for it to happen.
       daisy_assert (qt_run->isFinished ());
       delete qt_run;
+      qt_run = NULL;
     }
-  daisy_assert (qt_run.isNull ());
+  if (!qt_run.isNull ())
+    daisy_bug ("qt_run should be NULL after process has been stopped");
 }
 
 void 
@@ -352,7 +355,8 @@ UIRun::run (Toplevel& toplevel)
 { 
 
   run_user_interface ();	// Start the UI.
-  daisy_assert (qt_run.isNull ()); // Program should not be running.
+  if (!qt_run.isNull ())
+    daisy_bug ("qt_run should be NULL after user interface has finished");
 }
 
 void 

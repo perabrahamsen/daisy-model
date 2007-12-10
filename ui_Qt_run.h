@@ -68,7 +68,6 @@ private:
   QPointer<RunQtMain> qt_run;
 private slots:
   void run_program ();
-private:
   void stop_program ();
 
   // Use.

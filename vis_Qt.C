@@ -25,6 +25,7 @@
 
 #include <QtGui/QPalette>
 #include <QtGui/QStyle>
+#include <QtGui/QCloseEvent>
 
 void
 VisQtMain::set_file_name (QString file)
@@ -70,6 +71,13 @@ VisQtMain::new_state (Toplevel::state_t ns)
 {
   state = ns;
   set_title ();
+}
+
+void 
+VisQtMain::closeEvent (QCloseEvent* event)
+{
+  emit stop_program (); 
+  event->accept ();
 }
 
 VisQtMain::VisQtMain (const QString app, QWidget *const parent)

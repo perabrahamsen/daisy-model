@@ -53,6 +53,12 @@ public slots:
   void new_progress (double);
   void new_state (Toplevel::state_t);
 
+protected:
+  void closeEvent (QCloseEvent* event);
+
+signals:
+  void stop_program ();
+  
   // Create and Destroy.
 public:
   VisQtMain (QString appName, QWidget* parent = 0);

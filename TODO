@@ -1,26 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Hurtig løser.
-
-DONE Få test-rect.dai til at køre (disable N?)
-DONE typedef ublas::compressed_matrix<blah, blah> Matrix;
-DONE Omskriv uzrect_Mollerup.C til at bruge Matrix
-DONE Isoler løser i seperat function. Tid: 60s (5½ time for et år)
-DONE Isoler løser i seperat fil. Tid: 90s (8 timer for et år)
-DONE prøv med sparse matrix. Tid: 75s (7 timer for et år)
-DONE Erstat løser med CS::solve.  Tid: 22s (2 timer for et år)
-DONE Erstat løser med "return".  Tid: 11s (1 time for et år).
-DONE v+h  Tid: 1s (45s for et år)
-DONE solver_ublas.C, solver_none.C, solver_cxsparse.C
-DONE Fix "b", cxsparse. Tid: 2s (7 minutes for et år).
-DONE Fix "b", none. Tid: 1s (2½ minutes for et år).
-DONE Find ud af hvad vi gør med cxsparse
-DONE NDEBUG, none: Tid: (0:44).
-DONE NDEBUG, cxsparse: Tid: (1:45).
-DONE NDEBUG, ublas: Tid: (6:39).
-
-skriv tak til ublas folk
-
 * DOMÆNER
 
 stof i mobil vand, immobil vand, makropore 1, 2, og n.
