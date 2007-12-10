@@ -540,8 +540,9 @@ MsoltranrectMollerup::advection (const GeometryRect& geo,
 	  //More flexible
 	  //Equal weight: upstream_weight = 0.5
 	  //Upstr weight: upstream_weight = 1.0
-	  const double upstream_weight = 0.5;
-	  const double alpha = (q_edge[e] >= 0) 
+	  //const double upstream_weight = 0.5;
+          const double upstream_weight = 1.0;
+          const double alpha = (q_edge[e] >= 0) 
 	    ? upstream_weight 
 	    : 1.0 - upstream_weight;
 	  advec (from, from) += alpha*value;
@@ -1386,8 +1387,8 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   //Begin small timestep stuff  
   enum stabilizing_method_t { None, Timestep_reduction, Streamline_diffusion };
   //const stabilizing_method_t stabilizing_method = Streamline_diffusion;
-  const stabilizing_method_t stabilizing_method = Timestep_reduction;
-  //const stabilizing_method_t stabilizing_method = None;
+  //const stabilizing_method_t stabilizing_method = Timestep_reduction;
+  const stabilizing_method_t stabilizing_method = None;
   const double ddt_min = 1e-10;
   const double gamma_stabilization = 10;
 
