@@ -1,5 +1,38 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* ABAprod
+
+S	[cm^3 H2O/cm^3 SOIL/h]
+l	[cm ROOT/cm^3 SOIL]
+dt 	[h]
+h	[hPa]
+
+ABAroot (h): [hPa] -> [g/cm ROOT/h]
+
+Itegrate ABAroot (h) l dV / Integrate S dVb
+
+  [g/cm ROOT/h] [cm ROOT/cm^3 SOIL] [cm^3 SOIL] 
+/ [cm^3 H2O/cm^3 SOIL/h] [cm^3 SOIL] 
+= [g/cm^3 H2O]
+
+ABAsoil (h): [hPa] -> [g/cm^3 H2O]
+
+Itegrate S ABAsoil (h) dV / Integrate S dVb
+
+  [cm^3 H2O/cm^3 SOIL/h] [g/cm^3 H2O] [cm^3 SOIL] 
+/ [cm^3 H2O/cm^3 SOIL/h] [cm^3 SOIL] 
+= [g/cm^3 H2O]
+
+** make depend
+
+** transfer to photosynthesis
+
+** write test setup
+
+** look at log files
+
+* Overfør h_lim til OpenMI
+
 * DOMÆNER
 
 stof i mobil vand, immobil vand, makropore 1, 2, og n.

@@ -390,6 +390,7 @@ void
 RootSystem::output (Log& log) const
 {
   output_derived (rootdens, "rootdens", log);
+  output_derived (ABAprod, "ABAprod", log);
   output_variable (PotRtDpt, log);
   output_variable (Depth, log);
   output_variable (Density, log);
@@ -431,6 +432,10 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_object ("rootdens", Rootdens::component,
                      "Root density model.");
   alist.add ("rootdens", Rootdens::default_model ());
+
+  syntax.add_object ("ABAprod", ABAProd::component,
+                     "ABA production model.");
+  alist.add ("ABAprod", ABAProd::default_model ());
 
   syntax.add ("DptEmr", "cm", Check::non_negative (), Syntax::Const,
 	    "Penetration at emergence.");
@@ -483,6 +488,12 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("NO3Extraction", "g N/cm^3/h", Check::non_negative (), 
 	      Syntax::LogOnly, Syntax::Sequence,
 	       "Extraction of NO3-N in soil layers.");
+  syntax.add ("ABAExtraction", "g/cm^3/h", Check::non_negative (), 
+	      Syntax::LogOnly, Syntax::Sequence,
+	      "Extraction of ABA in soil layers.");
+  syntax.add ("ABAConc", "g/cm^3/h", Check::non_negative (), 
+	      Syntax::State, "ABA concentration in water uptake.");
+  alist.add ("ABAConc", 0.0);
   syntax.add ("h_x", "cm", Check::none (), Syntax::State,
 	       "Root extraction at surface.");
   alist.add ("h_x", 0.0);
@@ -529,6 +540,7 @@ get_PotRtDpt (Block& al)
 
 RootSystem::RootSystem (Block& al)
   : rootdens (Librarian::build_item<Rootdens> (al, "rootdens")),
+    ABAprod (Librarian::build_item<ABAProd> (al, "ABAprod")),
     PenPar1 (al.number ("PenPar1")),
     PenPar2 (al.number ("PenPar2")),
     PenClayFac (al.plf ("PenClayFac")),
@@ -540,6 +552,7 @@ RootSystem::RootSystem (Block& al)
     Rxylem (al.number ("Rxylem")),
     PotRtDpt (get_PotRtDpt (al)),
     Depth (al.check ("Depth") ? al.number ("Depth") : al.number ("DptEmr")),
+    ABAConc (al.number ("ABAConc")),
     h_x (al.number ("h_x")),
     partial_soil_temperature (al.number ("partial_soil_temperature")),
     partial_day (al.number ("partial_day")),

@@ -1,3 +1,12 @@
+2007-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* ABAprod.C, ABAprod.h: New component.
+	* ABAprod_root.C, ABAprod_soil.C, ABAprod_expr.C: New model.
+	* Makefile (COMPONENTS, MODELS): Add them.
+	* root_system.h, root_system.C (ABAExtraction):  New log variable.
+	(ABAConc): New state variable.
+	(ABAprod): New parameter.
+
 2007-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* solver.C: Made it a component.

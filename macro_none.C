@@ -67,3 +67,5 @@ static struct MacroNoneSyntax
       Librarian::add_type (Macro::component, "none", alist, syntax, &make);
     }
 } MacroNone_syntax;
+
+// macro_none.C ends here

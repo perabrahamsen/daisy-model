@@ -34,7 +34,8 @@ private:
   const double k;  //Coefficient
   
   // Simulation.
-  double ABA_effect (const double ABA_xylem, Treelog& msg);
+  double ABA_effect (const double ABA_xylem /* [g/cm^3] */,
+		     Treelog& msg);	    // []
   void output (Log&) const
   { }
   const AttributeList& default_model ();
@@ -48,10 +49,10 @@ private:
 };
 
 double
-ABAEffect_exp::ABA_effect (const double ABA_xylem /*[?]*/, Treelog&)
+ABAEffect_exp::ABA_effect (const double ABA_xylem /* [g/cm^3] */, Treelog&)
 {
-     const double ABAeffect = exp(-k * ABA_xylem); //[]
-     return ABAeffect;
+  const double ABAeffect = exp(-k * ABA_xylem); //[]
+  return ABAeffect;
 }
 
 static struct ABAEffectexpSyntax
@@ -60,7 +61,7 @@ static struct ABAEffectexpSyntax
   { return *new ABAEffect_exp (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("k", Syntax::Unknown (), Check::positive (), Syntax::Const,
+    syntax.add ("k", "cm^3/g", Check::positive (), Syntax::Const,
                 "Coefficient");
     alist.add ("k", 1.0);
   }  

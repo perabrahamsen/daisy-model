@@ -23,6 +23,7 @@
 #define ROOT_SYSTEM_H
 
 #include "rootdens.h"
+#include "ABAprod.h"
 #include "plf.h"
 #include <vector>
 #include <memory>
@@ -41,6 +42,7 @@ class RootSystem
   // Components.
 private:
   std::auto_ptr<Rootdens> rootdens; // Root density calculation.
+  std::auto_ptr<ABAProd> ABAprod; // Root density calculation.
 
   // Parameters.
 private:
@@ -64,6 +66,10 @@ private:
   std::vector<double> H2OExtraction; // Extraction of H2O in soil [cm³/cm³/h]
   std::vector<double> NH4Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
   std::vector<double> NO3Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
+  std::vector<double> ABAExtraction; // Extraction of ABA in soil [g ABA/cm³/h]
+public:
+  double ABAConc;		// ABA concentration in uptake [g/cm^3]
+private:
   double h_x;			// Root extraction at surface
 public:
   double partial_soil_temperature; // Accumaleted soil temperature [°C]

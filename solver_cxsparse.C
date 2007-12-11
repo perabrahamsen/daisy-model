@@ -60,7 +60,14 @@ static struct SolverCXSparseSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Solve equation using CXSparse library.");
+    alist.add ("description", "\
+Solve equation using CXSparse library described in:\n\
+\n\
+Direct Methods for Sparse Linear Systems, T. A. Davis, SIAM,\n\
+Philadelphia, Sept. 2006. Part of the SIAM Book Series on the\n\
+Fundamentals of Algorithms.\n\
+\n\
+The uBLAS interface was provided by Gunter Winkler <guwi17@gmx.de>.");
     Librarian::add_type (Solver::component, "cxsparse", alist, syntax, &make);
   }
 } SolverCXSparse_syntax;

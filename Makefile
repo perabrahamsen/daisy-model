@@ -369,7 +369,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = solver_ublas.C solver_cxsparse.C solver_none.C \
+MODELS = ABAprod_expr.C ABAprod_soil.C ABAprod_root.C \
+	solver_ublas.C solver_cxsparse.C solver_none.C \
 	movement_rect.C chemistry_multi.C \
 	equil_goal.C equil_linear.C equil_langmuir.C transform_equil.C \
 	reaction_nit.C reaction_denit.C \
@@ -435,7 +436,7 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = solver.C element.C ui.C reaction.C scopesel.C scope.C \
+COMPONENTS = ABAprod.C solver.C element.C ui.C reaction.C scopesel.C scope.C \
 	ABAeffect.C msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
 	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C\
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
@@ -936,6 +937,8 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
   block.h syntax.h treelog.h plf.h alist.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+ABAprod${OBJ}: ABAprod.C ABAprod.h model.h symbol.h block.h syntax.h \
+  treelog.h plf.h librarian.h alist.h
 solver${OBJ}: solver.C solver.h model.h symbol.h block.h syntax.h treelog.h \
   plf.h librarian.h
 element${OBJ}: element.C element.h model.h symbol.h block.h syntax.h \
@@ -1123,8 +1126,8 @@ dom${OBJ}: dom.C dom.h plf.h doe.h smb.h om.h geometry.h syntax.h treelog.h \
   symbol.h mathlib.h assertion.h submodel.h block.h alist.h soil.h \
   soil_water.h log.h time.h border.h model.h check.h librarian.h
 crpn${OBJ}: crpn.C crpn.h production.h symbol.h root_system.h rootdens.h \
-  model.h plf.h syntax.h treelog.h alist.h log.h time.h border.h \
-  mathlib.h assertion.h submodel.h check.h
+  model.h ABAprod.h plf.h syntax.h treelog.h alist.h log.h time.h \
+  border.h mathlib.h assertion.h submodel.h check.h
 vernalization${OBJ}: vernalization.C vernalization.h submodel.h log.h time.h \
   border.h model.h alist.h symbol.h syntax.h treelog.h
 partition${OBJ}: partition.C partition.h plf.h submodel.h syntax.h treelog.h \
@@ -1142,9 +1145,9 @@ canopy_std${OBJ}: canopy_std.C canopy_std.h canopy_simple.h plf.h submodel.h \
   log.h time.h border.h model.h alist.h symbol.h syntax.h treelog.h \
   mathlib.h assertion.h
 root_system${OBJ}: root_system.C root_system.h rootdens.h model.h symbol.h \
-  plf.h submodel.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
-  soil_heat.h soil_water.h soil.h chemical.h alist.h chemistry.h log.h \
-  time.h border.h check.h block.h librarian.h
+  ABAprod.h plf.h submodel.h geometry.h syntax.h treelog.h mathlib.h \
+  assertion.h soil_heat.h soil_water.h soil.h chemical.h alist.h \
+  chemistry.h log.h time.h border.h check.h block.h librarian.h
 ridge${OBJ}: ridge.C ridge.h soil.h symbol.h geometry1d.h geometry_vert.h \
   geometry.h syntax.h treelog.h mathlib.h assertion.h plf.h submodel.h \
   log.h time.h border.h model.h alist.h soil_water.h check.h
@@ -1317,6 +1320,15 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+ABAprod_expr${OBJ}: ABAprod_expr.C ABAprod.h model.h symbol.h number.h \
+  scope_exchange.h scope.h memutils.h geometry.h syntax.h treelog.h \
+  mathlib.h assertion.h soil_water.h units.h librarian.h alist.h
+ABAprod_soil${OBJ}: ABAprod_soil.C ABAprod.h model.h symbol.h number.h \
+  scope_id.h scope.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
+  soil_water.h units.h librarian.h alist.h
+ABAprod_root${OBJ}: ABAprod_root.C ABAprod.h model.h symbol.h number.h \
+  scope_id.h scope.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
+  soil_water.h units.h librarian.h alist.h
 solver_ublas${OBJ}: solver_ublas.C solver.h model.h symbol.h assertion.h \
   syntax.h treelog.h alist.h librarian.h
 solver_cxsparse${OBJ}: solver_cxsparse.C solver.h model.h symbol.h syntax.h \
@@ -1628,15 +1640,15 @@ action_repeat${OBJ}: action_repeat.C action.h model.h alist.h symbol.h \
   plf.h log.h border.h librarian.h
 vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h model.h \
   symbol.h plf.h mathlib.h assertion.h log.h time.h border.h alist.h \
-  litter.h root_system.h rootdens.h canopy_simple.h geometry.h syntax.h \
-  treelog.h soil.h crop.h am.h im.h aom.h om.h organic_matter.h \
+  litter.h root_system.h rootdens.h ABAprod.h canopy_simple.h geometry.h \
+  syntax.h treelog.h soil.h crop.h am.h im.h aom.h om.h organic_matter.h \
   submodeler.h block.h check.h librarian.h
 vegetation_crops${OBJ}: vegetation_crops.C vegetation.h model.h symbol.h \
   crop.h time.h alist.h organic_matter.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h soil.h plf.h harvest.h block.h log.h border.h \
   librarian.h
 crop_simple${OBJ}: crop_simple.C crop.h time.h alist.h symbol.h model.h \
-  root_system.h rootdens.h plf.h canopy_simple.h log.h border.h \
+  root_system.h rootdens.h ABAprod.h plf.h canopy_simple.h log.h border.h \
   bioclimate.h soil_water.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil.h aom.h om.h organic_matter.h soil_heat.h am.h im.h \
   harvest.h block.h submodeler.h check.h librarian.h
@@ -1746,7 +1758,7 @@ horizon_std${OBJ}: horizon_std.C horizon.h model.h symbol.h block.h syntax.h \
   treelog.h plf.h alist.h texture.h hydraulic.h check.h mathlib.h \
   assertion.h librarian.h
 crop_std${OBJ}: crop_std.C crop.h time.h alist.h symbol.h model.h chemistry.h \
-  root_system.h rootdens.h plf.h canopy_std.h canopy_simple.h \
+  root_system.h rootdens.h ABAprod.h plf.h canopy_std.h canopy_simple.h \
   harvesting.h production.h phenology.h partition.h vernalization.h \
   photo.h crpn.h wse.h log.h border.h timestep.h vcheck.h bioclimate.h \
   soil_water.h geometry.h syntax.h treelog.h mathlib.h assertion.h soil.h \

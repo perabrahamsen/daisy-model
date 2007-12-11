@@ -1,6 +1,6 @@
-// ABAeffect.h -- Effect of ABA on stomata.
+// ABAprod.h -- Production of ABA in soil.
 // 
-// Copyright 2006 Birgitte Gjettermann, Per Abrahamsen and KVL
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -18,38 +18,46 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef ABAEFFECT_H
-#define ABAEFFECT_H
+#ifndef ABAPROD_H
+#define ABAPROD_H
 
 #include "model.h"
-#include "alist.h"
+#include "symbol.h"
 #include <vector>
 
-class Log;
 class Treelog;
 class Block;
+class Log;
+class AttributeList;
+class Geometry;
+class SoilWater;
 
-class ABAEffect : public Model
+class ABAProd : public Model
 {
   // Content.
 public:
   const symbol name;
   static const char *const component;
 
-  const AttributeList alist;	// Remember attributes for checkpoint.
-
   // Simulation.
 public:
-  virtual void output (Log&) const = 0;
-  virtual double ABA_effect (const double ABA_xylem /* [g/cm^3] */,
-			     Treelog& msg) = 0;	    // []
+  virtual void production (const Geometry&, const SoilWater&,
+			   const std::vector<double>& S /* [cm^3/cm^3] */,
+			   const std::vector<double>& l /* [cm/cm^3] */,
+			   std::vector<double>& ABA /* [g/cm/h] */,
+			   Treelog& msg) const = 0; 
+  virtual void output (Log& log) const = 0;
+
   // Create and Destroy.
+public:
+  virtual void initialize (Treelog&) = 0;
+  virtual bool check (Treelog&) const = 0;
 protected:
-  ABAEffect (Block&);
+  ABAProd (Block&);
 
 public:
   static const AttributeList& default_model ();
-  ~ABAEffect ();
+  ~ABAProd ();
 };
 
-#endif // ABAEFFECT_H
+#endif // ABAPROD_H
