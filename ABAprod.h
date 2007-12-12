@@ -42,9 +42,9 @@ public:
   // Simulation.
 public:
   virtual void production (const Geometry&, const SoilWater&,
-			   const std::vector<double>& S /* [cm^3/cm^3] */,
+			   const std::vector<double>& S /* [cm^3/cm^3/h] */,
 			   const std::vector<double>& l /* [cm/cm^3] */,
-			   std::vector<double>& ABA /* [g/cm/h] */,
+			   std::vector<double>& ABA /* [g/cm^3/h] */,
 			   Treelog& msg) const = 0; 
   virtual void output (Log& log) const = 0;
 

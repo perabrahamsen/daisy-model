@@ -186,6 +186,7 @@ struct VegetationPermanent : public Vegetation
   void initialize (const Time& time, const Geometry& geo,
                    const Soil& soil, OrganicMatter&, 
                    Treelog&);
+  bool check (Treelog&) const;
   VegetationPermanent (Block&);
   ~VegetationPermanent ();
 };
@@ -350,12 +351,21 @@ VegetationPermanent::initialize (const Time& time,
                                  Treelog& msg)
 {
   reset_canopy_structure (time);
-  root_system->initialize (soil.size ());
+  root_system->initialize (soil.size (), msg);
   root_system->full_grown (geo, soil.MaxRootingHeight (), WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");
   static const symbol litter_symbol ("litter");
   AM_litter = organic_matter.find_am (vegetation_symbol, litter_symbol);
+}
+
+bool 
+VegetationPermanent::check (Treelog& msg) const 
+{ 
+  bool ok = true;
+  if (!root_system->check (msg))
+    ok = false;
+  return ok;
 }
 
 VegetationPermanent::VegetationPermanent (Block& al)

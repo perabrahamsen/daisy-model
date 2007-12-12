@@ -143,6 +143,7 @@ public:
   virtual void initialize (const Time&, const Geometry& geo,
                            const Soil& soil, OrganicMatter&,
                            Treelog&) = 0;
+  virtual bool check (Treelog& msg) const = 0;
   static void load_syntax (Syntax&, AttributeList&);
   explicit Vegetation (Block&);
   ~Vegetation ();

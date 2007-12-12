@@ -165,6 +165,7 @@ public:
 public:
   void initialize (const Geometry& geometry, OrganicMatter&, 
                    const Time&, Treelog&);
+  bool check (Treelog&) const;
   CropStandard (Block& vl);
   ~CropStandard ();
 };
@@ -194,7 +195,7 @@ CropStandard::initialize (const Geometry& geo,
 {
   if (!last_time.get ())
     last_time.reset (new Time (now));
-  root_system->initialize (geo.cell_size ());
+  root_system->initialize (geo.cell_size (), msg);
   production.initialize (nitrogen.SeedN);
 
   const double DS = development->DS;
@@ -213,6 +214,15 @@ CropStandard::initialize (const Geometry& geo,
       root_system->set_density (geo, production.WRoot, DS, msg);
       nitrogen.content (DS, production, msg);
     }
+}
+
+bool
+CropStandard::check (Treelog& msg) const
+{
+  bool ok = true;
+  if (!root_system->check (msg))
+    ok = false;
+  return ok;
 }
 
 void
@@ -385,7 +395,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
       const double rubiscoN = bound (0.0, N_above_Nf, N_at_Cr - N_at_Nf);
       daisy_assert (rubiscoN >= 0.0);
       
-      const double ABA_xylem = 0.0;
+      const double ABA_xylem = root_system->ABAConc;
 
       if (bioclimate.shared_light_fraction () > 1e-10)
         {

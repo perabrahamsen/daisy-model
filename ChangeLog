@@ -1,3 +1,7 @@
+2007-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (tick): Enable ABA from roots.
+
 2007-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* ABAprod.C, ABAprod.h: New component.
@@ -6,6 +10,13 @@
 	* root_system.h, root_system.C (ABAExtraction):  New log variable.
 	(ABAConc): New state variable.
 	(ABAprod): New parameter.
+
+2007-12-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* run_Qt.h (stop): Made it a slot.
+	* vis_Qt.h (VisQtMain::stop_program): New signal.
+	* vis_Qt.C (VisQtMain::closeEvent): Emit it.
+	* ui_Qt_run.C (run_program): Connect them.
 
 2007-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 

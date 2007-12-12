@@ -142,6 +142,8 @@ public:
   // Create and Destroy.
 public:
   void initialize (const Geometry& geo, OrganicMatter&, const Time&, Treelog&);
+  bool check (Treelog&) const
+  { return true; }
   CropSold (Block& vl);
   ~CropSold ();
 };

@@ -203,6 +203,14 @@ RootSystem::water_uptake (double Ept_,
     water_stress = 1.0 - (total + EvapInterception) / (Ept + EvapInterception);
   water_stress_days += water_stress * day_fraction;
 
+  // ABA production.
+  ABAprod->production (geo, soil_water, H2OExtraction, Density, ABAExtraction, 
+		       msg);
+  const double mm_per_cm = 10.0; // [mm/cm]
+  ABAConc = geo.total_surface (ABAExtraction) * mm_per_cm / H2OUpt;
+  // [g/cm^3 W] = [g/cm^2 A] * [mm/cm] / [mm/h]
+
+  // Result.
   return H2OUpt;
 }
 
@@ -397,6 +405,8 @@ RootSystem::output (Log& log) const
   output_variable (H2OExtraction, log);
   output_variable (NH4Extraction, log);
   output_variable (NO3Extraction, log);
+  output_variable (ABAExtraction, log);
+  output_variable (ABAConc, log);
   output_variable (h_x, log);
   output_variable (partial_soil_temperature, log);
   output_variable (partial_day, log);
@@ -411,8 +421,9 @@ RootSystem::output (Log& log) const
 }
 
 void
-RootSystem::initialize (size_t size)
+RootSystem::initialize (size_t size, Treelog& msg)
 {
+  ABAprod->initialize (msg);
   while (Density.size () < size)
     Density.push_back (0.0);
   while (H2OExtraction.size () < size)
@@ -421,6 +432,17 @@ RootSystem::initialize (size_t size)
     NH4Extraction.push_back (0.0);
   while (NO3Extraction.size () < size)
     NO3Extraction.push_back (0.0);
+  while (ABAExtraction.size () < size)
+    ABAExtraction.push_back (0.0);
+}
+
+bool
+RootSystem::check (Treelog& msg) const
+{
+  bool ok = true;
+  if (!ABAprod->check (msg))
+    ok = false;
+  return ok;
 }
 
 void 

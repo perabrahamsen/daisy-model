@@ -180,6 +180,7 @@ struct VegetationCrops : public Vegetation
   void initialize (const Time&, const Geometry& geo,
                    const Soil& soil, OrganicMatter&,
                    Treelog& msg);
+  bool check (Treelog& msg) const;
   static CropList build_crops (Block& block, const std::string& key);
   VegetationCrops (Block&);
   ~VegetationCrops ();
@@ -681,6 +682,11 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
   crop->initialize (geo, organic_matter, time, msg);
+  if (!crop->check (msg))
+    {
+      msg.error ("Sow failed");
+      return;
+    }
   crops.push_back (crop);
   seed_N += crop->total_N () / dt;
   seed_C += crop->total_C () / dt;
@@ -703,6 +709,18 @@ VegetationCrops::initialize (const Time& time, const Geometry& geo,
     crops[i]->initialize (geo, organic_matter, time, msg);
 
   reset_canopy_structure (msg);
+}
+
+bool 
+VegetationCrops::check (Treelog& msg) const
+{
+  bool ok = true;
+  for (size_t i = 0; i < crops.size (); i++)
+    {
+      Treelog::Open nest (msg, "crop:' " + crops[i]->name + "'");
+      crops[i]->check (msg);
+    }
+  return ok;
 }
 
 VegetationCrops::CropList

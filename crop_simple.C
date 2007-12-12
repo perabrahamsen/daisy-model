@@ -41,8 +41,6 @@
 #include "check.h"
 #include "librarian.h"
 
-using namespace std;
-
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
 
@@ -74,7 +72,7 @@ public:
   std::auto_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
   const double NRoot;		// Root nitrogen weight [g N/m^2]
-  const vector<const AttributeList*>& root_am; // Root AM parameters.
+  const std::vector<const AttributeList*>& root_am; // Root AM parameters.
 
   // Nitrogen.
   const double N_potential;	// Potential N content at harvest. [g N/m^2]
@@ -126,7 +124,8 @@ public:
              const Soil&, OrganicMatter&,
 	     const SoilHeat&, const SoilWater&, 
 	     Chemistry&, 
-	     double&, double&, double&, vector<double>&, vector<double>&,
+	     double&, double&, double&, 
+	     std::vector<double>&, std::vector<double>&,
 	     double ForcedCAI,
 	     double dt, Treelog&);
   void emerge ()
@@ -141,12 +140,12 @@ public:
 			  const Time&, const Geometry&, 
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
-			  bool kill_off, vector<AM*>& residuals,
+			  bool kill_off, std::vector<AM*>& residuals,
 			  double& residuals_DM,
 			  double& residuals_N_top,
 			  double& residuals_C_top,
-			  vector<double>& residuals_N_soil,
-			  vector<double>& residuals_C_soil,
+			  std::vector<double>& residuals_N_soil,
+			  std::vector<double>& residuals_C_soil,
                           const bool,
 			  Treelog&);
   double sorg_height () const 
@@ -163,6 +162,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (const Geometry& geo, OrganicMatter&, const Time&, Treelog&);
+  bool check (Treelog&) const;
   CropSimple (Block& vl);
   ~CropSimple ();
 };
@@ -219,7 +219,7 @@ CropSimple::tick (const Time& time, const double, const double,
 		  const SoilHeat& soil_heat,
 		  const SoilWater& soil_water,
 		  Chemistry& chemistry,
-		  double&, double&, double&, vector<double>&, vector<double>&,
+		  double&, double&, double&, std::vector<double>&, std::vector<double>&,
 		  const double ForcedCAI,
                   const double dt,
 		  Treelog& msg)
@@ -305,12 +305,12 @@ CropSimple::harvest (const symbol column_name,
 		     double /* leaf_harvest */,
 		     double /* sorg_harvest */,
 		     bool /* kill_off */,
-		     vector<AM*>& residuals,
+		     std::vector<AM*>& residuals,
 		     double& residuals_DM,
 		     double& /* residuals_N_top */,
 		     double& /* residuals_C_top */,
-		     vector<double>& residuals_N_soil,
-		     vector<double>& residuals_C_soil,
+		     std::vector<double>& residuals_N_soil,
+		     std::vector<double>& residuals_C_soil,
                      const bool,
 		     Treelog&)
 {
@@ -320,7 +320,7 @@ CropSimple::harvest (const symbol column_name,
   if (T > T_emergence)
     {
       const double T_growth = T_flowering - T_emergence;
-      const double this_far = min (1.0, (T - T_emergence) / T_growth);
+      const double this_far = std::min (1.0, (T - T_emergence) / T_growth);
 
       static const symbol root_symbol ("root");
       AM& am = AM::create (geo.cell_size (), time, root_am, name, root_symbol);
@@ -396,10 +396,19 @@ CropSimple::total_C () const
 
 void
 CropSimple::initialize (const Geometry& geo, OrganicMatter&, 
-                        const Time&, Treelog&)
+                        const Time&, Treelog& msg)
 {
-  root_system->initialize (geo.cell_size ());
+  root_system->initialize (geo.cell_size (), msg);
   CropCAI ();
+}
+
+bool
+CropSimple::check (Treelog& msg) const
+{
+  bool ok = true;
+  if (!root_system->check (msg))
+    ok = false;
+  return ok;
 }
 
 CropSimple::CropSimple (Block& al)
@@ -465,7 +474,7 @@ static struct CropSimpleSyntax
 	  }
 	catch (...)
 	  {
-	    err.entry (string ("'")
+	    err.entry (std::string ("'")
 		       + (al.check ("LAIvsTS") ? "LAIvsTS" : "LAIvsDay")
 		       + "' has bogus value");
 	    ok = false;
@@ -505,7 +514,7 @@ Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
     alist.add ("day", 0.0);
     syntax.add ("spring", Syntax::Integer, Syntax::Const, 2,
 		"Zero 'T_sum' at this month and day.");
-    vector<int> spring_time;
+    std::vector<int> spring_time;
     spring_time.push_back (3);
     spring_time.push_back (1);
     alist.add ("spring", spring_time);

@@ -131,7 +131,8 @@ public:
 
   // Create and Destroy
 public:
-  void initialize (size_t size);
+  void initialize (size_t size, Treelog& msg);
+  bool check (Treelog& msg) const;
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   RootSystem (Block& al);
   ~RootSystem ();

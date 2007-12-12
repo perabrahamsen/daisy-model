@@ -622,6 +622,11 @@ ColumnStandard::check (bool require_weather,
       ok = false;
   }
   {
+    Treelog::Open nest (msg, "Vegetation");
+    if (!vegetation->check (msg))
+      ok = false;
+  }
+  {
     Treelog::Open nest (msg, "Soil");
     if (!soil->check (organic_matter->som_pools (), geometry, msg))
       ok = false;
@@ -802,7 +807,7 @@ ColumnStandard::initialize (Block& block,
   // Solutes depends on water and heat.
   chemistry->initialize (alist.alist ("Chemistry"),
                          geometry, *soil, *soil_water, *soil_heat, msg);
-
+  
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
   organic_matter->initialize (alist.alist ("OrganicMatter"), 
