@@ -1,0 +1,137 @@
+\documentclass[a4paper,11pt,twoside]{article}
+\usepackage{a4}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{graphicx}
+\input{macro}
+
+\newcommand{\aba}[1]{\text{\textsc{aba}$_\text{\textsc{#1}}$}}
+
+\begin{document}
+
+\title{ABA in Daisy}
+\author{Per Abrahamsen}
+\maketitle
+
+\section{Introduction}
+
+ABA is a plant hormom which regulates, among other things, the closing
+of stomata.  By triggering the production of ABA in crops it is hoped
+to be possible to combine a significant reduction in water use, with a
+moderate reduction in yield.
+
+ABA is produced in the root system and has its effect in the canopy.
+In the present implementation in Daisy transport, storage, and
+degradation of ABA are all ignored in favor of a system where the ABA
+concentration in the canopy is solely function of the current water
+status in the root system.
+
+\section{ABA production in soil}
+
+Let $V$ represent the soil volume we are looking.  The soil volume
+should as minimum include the entire root zone.  For every point in
+$V$, Daisy will calculate three values: the volumetric water uptake
+$S$, the root density $l$, and the water potential $h$.
+
+Based on these values, we have several models for estimating ABA in
+the stem (\aba{xylem}) from the conditions in the soil.
+
+\subsection{Based on uptake location}
+
+The first model is based directly on pot experiments where both
+\aba{xylem} and the water potential ($h$) is measured.  The pots are
+sufficiently small that the water potential is assumed to be the same
+everywhere in the pot.  From this an empirical relationship
+(\aba{uptake}) between $h$ and \aba{xylem} in the pots can be
+developed.  By assuming the same relationship between ABA
+concentration and uptaken water also holds in a field, we
+get~\eqref{eq:aba_uptake}.
+
+\begin{equation}
+  \aba{xylem} = \frac{\int_V S \: \aba{uptake} \: dV}{\int_V S \: dV}
+  \label{eq:aba_uptake}
+\end{equation}
+
+\subsection{Based on production in roots}
+
+ABA is produced in the roots with a rate that depends in the water
+potential (\aba{root}).  If we assume all the ABA produced ends up in
+the stem, we can use \aba{root} to find \aba{xylem}, as
+in~\eqref{eq:aba_root}.
+
+\begin{equation}
+  \aba{xylem} = \frac{\int_V l \: \aba{root} \: dV}{\int_V S \: dV}
+  \label{eq:aba_root}
+\end{equation}
+
+\subsection{Based on production in soil}
+
+Both \aba{uptake} and \aba{root} are special cases of calculating the
+ABA contribution from the soil water potential, root uptake, and root
+density.  We call this generalized function \aba{soil}, and the
+generalized equation for~\eqref{eq:aba_soil}.
+
+\begin{equation}
+  \aba{xylem} = \frac{\int_V \aba{soil} \: dV}{\int_V S \: dV}
+  \label{eq:aba_soil}
+\end{equation}
+
+\subsection{No ABA production}
+
+The simplest model for ABA production is to assume no ABA is produced,
+which also gives the simlest equation (\eqref{eq:aba_none}).
+
+\begin{equation}
+  \aba{xylem} = 0
+  \label{eq:aba_none}
+\end{equation}
+
+\section{ABA effect in canopy}
+
+\subsection{ABA effect on photosynthesis}
+
+The ABA effect on photosynthesis is through a factor (\aba{cond})
+which is multiplied to the stomata conductance.  The factor is
+calculated as decribed in \eqref{eq:aba-cond}.
+
+\begin{equation}
+  \aba{cond} = e^{-k \aba{xylem}}
+  \label{eq:aba-cond}
+\end{equation}
+
+\subsection{ABA effect on transpiration}
+
+This effect has yet to be implemented.  Currently transpiration is
+calculated based on an energy balance, and limited by the root systems
+potential water uptake.  Stomata conductance is ignored.
+
+\section{List of symbols}
+
+\begin{tabular}{lll}
+  Symbol & Unit & Description\\\hline
+  \aba{cond} & 
+    & ABA effect on stomata conductance.\\
+  \aba{root} & g \textsc{ABA}/cm \textsc{root}/h
+    & ABA production in roots\\
+  \aba{soil} & g \textsc{ABA}/cm$^3$ \textsc{soil}/h
+    & ABA contribution from soil\\
+  \aba{uptake} & g \textsc{ABA}/cm$^3$ \textsc{water}
+    & ABA concentration in water from roots\\
+  \aba{xylem} & g \textsc{ABA}/cm$^3$ \textsc{water}
+    & ABA concentration in xylem\\
+  $h$    & hPa              
+    & Soil water potential\\
+  $k$    & cm$^3$ \textsc{water}/g \textsc{ABA}
+    & Coefficient for calculating \aba{cond}\\
+  $l$    & cm \textsc{root}/cm$^3$ \textsc{soil} 
+    & Root density\\
+  $S$    & cm$^3$ \textsc{water}/cm$^3$ \textsc{soil}/h
+    & Volumetric water uptake\\
+  $V$    & cm$^3$ \textsc{soil}
+    & Soil volume\\
+\end{tabular}
+
+\end{document}

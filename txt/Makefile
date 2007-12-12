@@ -4,7 +4,7 @@ FIGS = start.fig
 
 REFDOCS = reference.tex introduction.tex title.tex dwf.tex
 
-DOCS = rootdens.plf roodens.tex geometry.tex \
+DOCS = aba.tex rootdens.plt rootdens.tex geometry.tex \
 	input-lang.tex gui-why.tex notes.tex requirements.tex exercises.tex \
 	litterature.tex c-api.tex guide.tex tutorial.tex $(REFDOCS)
 
