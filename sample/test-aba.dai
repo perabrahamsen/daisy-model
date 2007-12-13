@@ -14,7 +14,7 @@
 Based on data collected by Fulai Liu, 2007."
   (expr (plf h
 	     (range "ng/mm/h")
-	     (domain "MPa")
+	     (domain "kurt")
 	     (points (-1.00 6.00)
 		     (-0.35 1.25)
 		     (-0.00 0.15)))))
