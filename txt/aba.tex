@@ -19,9 +19,11 @@
 \section{Introduction}
 
 ABA is a plant hormom which regulates, among other things, the closing
-of stomata.  By triggering the production of ABA in crops it is hoped
-to be possible to combine a significant reduction in water use, with a
-moderate reduction in yield.
+of stomata.  By triggering the production of ABA in crops it is
+sometimes possible to combine a significant reduction in water use,
+with a moderate reduction in yield.  By supporting ABA in Daisy, we
+hope to be better at predicting when and how such savings can be
+achieved.
 
 ABA is produced in the root system and has its effect in the canopy.
 In the present implementation in Daisy transport, storage, and
@@ -29,9 +31,13 @@ degradation of ABA are all ignored in favor of a system where the ABA
 concentration in the canopy is solely function of the current water
 status in the root system.
 
+ABA also has other effects, such as on roth growth and plant
+phenology, but these are not implemented in Daisy and outside the
+scope of this paper.
+
 \section{ABA production in soil}
 
-Let $V$ represent the soil volume we are looking.  The soil volume
+Let $V$ represent the soil volume we are simulating.  The soil volume
 should as minimum include the entire root zone.  For every point in
 $V$, Daisy will calculate three values: the volumetric water uptake
 $S$, the root density $l$, and the water potential $h$.
@@ -71,13 +77,17 @@ in~\eqref{eq:aba_root}.
 
 Both \aba{uptake} and \aba{root} are special cases of calculating the
 ABA contribution from the soil water potential, root uptake, and root
-density.  We call this generalized function \aba{soil}, and the
+density.  We call the generalized function \aba{soil}, and the
 generalized equation for~\eqref{eq:aba_soil}.
 
 \begin{equation}
   \aba{xylem} = \frac{\int_V \aba{soil} \: dV}{\int_V S \: dV}
   \label{eq:aba_soil}
 \end{equation}
+
+We get \eqref{eq:aba_uptake} by setting $\aba{soil} = S \:
+\aba{uptake}$ and \eqref{eq:aba_root} by setting $\aba{soil} = l \:
+\aba{root}$.
 
 \subsection{No ABA production}
 
@@ -112,19 +122,19 @@ potential water uptake.  Stomata conductance is ignored.
 
 \begin{tabular}{lll}
   Symbol & Unit & Description\\\hline
-  \aba{cond} & 
+  \aba{cond} & None
     & ABA effect on stomata conductance.\\
-  \aba{root} & g \textsc{ABA}/cm \textsc{root}/h
+  \aba{root} & g \textsc{aba}/cm \textsc{root}/h
     & ABA production in roots\\
-  \aba{soil} & g \textsc{ABA}/cm$^3$ \textsc{soil}/h
+  \aba{soil} & g \textsc{aba}/cm$^3$ \textsc{soil}/h
     & ABA contribution from soil\\
-  \aba{uptake} & g \textsc{ABA}/cm$^3$ \textsc{water}
+  \aba{uptake} & g \textsc{aba}/cm$^3$ \textsc{water}
     & ABA concentration in water from roots\\
-  \aba{xylem} & g \textsc{ABA}/cm$^3$ \textsc{water}
+  \aba{xylem} & g \textsc{aba}/cm$^3$ \textsc{water}
     & ABA concentration in xylem\\
   $h$    & hPa              
     & Soil water potential\\
-  $k$    & cm$^3$ \textsc{water}/g \textsc{ABA}
+  $k$    & cm$^3$ \textsc{water}/g \textsc{aba}
     & Coefficient for calculating \aba{cond}\\
   $l$    & cm \textsc{root}/cm$^3$ \textsc{soil} 
     & Root density\\

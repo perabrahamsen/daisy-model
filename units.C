@@ -398,6 +398,9 @@ Units::multiply (const std::string& one, const std::string& two)
 	|| (two == table[i].one && one == table[i].two))
       return table[i].result;
 
+  if (one == two + "^-1" || one + "^-1" == two)
+    return Syntax::None ();
+
   return Syntax::Unknown ();
 }
 
@@ -489,6 +492,7 @@ Units::standard_conversions ()
   add ("ppm", "g/cm^2/mm", 1.0e-7);
   add ("L/kg", "cm^3/g", 1.0);
   add ("l/kg", "cm^3/g", 1.0);
+  
   add ("g/cm^3", "kg/m^3", (100.0 * 100.0 * 100.0) / 1000.0);
   add ("g/cm^3", "mg/l", 1e6);
   add ("mol/m^2", "mmol/m^2", 1e3);
@@ -519,6 +523,11 @@ Units::standard_conversions ()
   add ("g/cm^2/h", "kg C/ha/h", ((100.0 * 100.0) * (100.0 * 100.0)) / 1000.0);
   add ("g/ha", "kg/ha", 1.0 / 1000.0);
   add ("kg/ha/h", "g/ha/h", 1000.0);
+  add ("cm^3/g", "cm^3/ng", 1e9);
+  add ("MPa", "cm", 1e4);
+  add ("MPa^-1", "cm^-1", 1e-4);
+  add ("ng/mm/h", "g/cm/h", 1e-8);
+  add ("ng/cm^3", "g/cm^3", 1e-9);
 
   // Weather.
   add ("dgWest", "dgEast", -1.0);

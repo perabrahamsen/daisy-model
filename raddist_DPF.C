@@ -164,19 +164,19 @@ static struct RaddistDPFSyntax
     alist.add ("description", 
 	       "Sun-shade model of radiation distribution in the canopy.");
 
-    syntax.add ("sigma", " ", Check::positive (), Syntax::Const,
+    syntax.add ("sigma", Syntax::None (), Check::positive (), Syntax::Const,
                 " Leaf scattering coefficient of PAR. sigma = 0,15 for wheat, (De Pury & Farquhar, 1997)");
     alist.add ("sigma", 0.15);
 
-    syntax.add ("kds", " ", Check::positive (), Syntax::Const,
-                "Extinction coefficient of scattered diffuse PAR, kds = , (De Pury & Farquhar, 1997)");
+    syntax.add ("kds", Syntax::None (), Check::positive (), Syntax::Const,
+                "Extinction coefficient of scattered diffuse PAR (De Pury & Farquhar, 1997)");
     alist.add ("kds", 0.719); 
 
-    syntax.add ("Pcd", " ", Check::positive (), Syntax::Const,
+    syntax.add ("Pcd", Syntax::None (), Check::positive (), Syntax::Const,
                 " Reflection coefficient of diffuse PAR, Pcd = 0.036 (De Pury & Farquhar, 1997)");
     alist.add ("Pcd", 0.036); 
 
-    syntax.add ("Pcb", " ", Check::positive (), Syntax::Const,
+    syntax.add ("Pcb", Syntax::None (), Check::positive (), Syntax::Const,
                 "Reflection coefficient of beam PAR, Pcb = 0.029 (De Pury & Farquhar, 1997)");
     alist.add ("Pcb", 0.029); 
 

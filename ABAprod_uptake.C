@@ -1,4 +1,4 @@
-// ABAprod_soil.C  -- ABA production based on soil location.
+// ABAprod_uptake.C  -- ABA production based on water uptake.
 // 
 // Copyright 2007 Per Abrahamsen and KVL.
 //
@@ -22,7 +22,7 @@
 
 #include "ABAprod.h"
 #include "number.h"
-#include "scope_exchange.h"
+#include "scope_id.h"
 #include "geometry.h"
 #include "soil_water.h"
 #include "units.h"
@@ -31,16 +31,14 @@
 #include "syntax.h"
 #include "alist.h"
 
-struct ABAProdSoil : public ABAProd
+struct ABAProdUptake : public ABAProd
 {
   // Units.
   static const symbol h_name;
-  static const symbol l_name;
-  static const symbol S_name;
   static const symbol ABA_unit;
 
   // Parameters.
-  mutable ScopeExchange scope;
+  mutable ScopeID scope;
   const std::auto_ptr<Number> expr;
   
   // Solve.
@@ -55,100 +53,90 @@ struct ABAProdSoil : public ABAProd
   // Create and Destroy.
   void initialize (Treelog&);
   bool check (Treelog&) const;
-  ABAProdSoil (Block& al);
-  ~ABAProdSoil ();
+  ABAProdUptake (Block& al);
+  ~ABAProdUptake ();
 };
 
 const symbol 
-ABAProdSoil::h_name ("h");
+ABAProdUptake::h_name ("h");
 
 const symbol 
-ABAProdSoil::l_name ("l");
-
-const symbol 
-ABAProdSoil::S_name ("S");
-
-const symbol 
-ABAProdSoil::ABA_unit ("g/cm^3/h");
+ABAProdUptake::ABA_unit ("g/cm^3");
 
 void
-ABAProdSoil::production (const Geometry& geo, const SoilWater& soil_water,
+ABAProdUptake::production (const Geometry& geo, const SoilWater& soil_water,
 			 const std::vector<double>& S /* [cm^3/cm^3/h] */,
-			 const std::vector<double>& l /* [cm/cm^3] */,
+			 const std::vector<double>& /* l [cm/cm^3] */,
 			 std::vector<double>& ABA    /* [g/cm^3/h] */,
 			 Treelog& msg) const
 {
   // Check input.
   const size_t cell_size = geo.cell_size ();
   daisy_assert (ABA.size () == cell_size);
-  daisy_assert (l.size () == cell_size);
   daisy_assert (S.size () == cell_size);
   
   // For all cells.
   for (size_t c = 0; c < cell_size; c++)
     {
-      // Set up values in scope.
+      // Set up 'h' in scope.
       scope.set_number (h_name, soil_water.h (c));
-      scope.set_number (l_name, l[c]);
-      scope.set_number (S_name, S[c]);
 
-      // Find expr value.
+      // Find soil value.
       double value = 0.0;
       if (!expr->tick_value (value, ABA_unit, scope, msg))
 	msg.error ("No ABA production value found");
 
       // Find ABA uptake.
-      ABA[c] = value; 		// [g/cm^3 S/h]
+      ABA[c] = value * S[c];
+      // [g/cm^3 S/h] = [g/cm^3 W] * [cm^3 W/cm^3 S/h]
     }
 }
 
 void 
-ABAProdSoil::initialize (Treelog& msg)
+ABAProdUptake::initialize (Treelog& msg)
 { expr->initialize (msg); }
 
 bool 
-ABAProdSoil::check (Treelog& msg) const
+ABAProdUptake::check (Treelog& msg) const
 {
   bool ok = true;
-  
+
   if (!expr->check_dim (scope, ABA_unit, msg))
     ok = false;
 
   return ok;
 }
 
-ABAProdSoil::ABAProdSoil (Block& al)
+ABAProdUptake::ABAProdUptake (Block& al)
   : ABAProd (al),
+    scope (h_name, Units::cm ()),
     expr (Librarian::build_item<Number> (al, "expr"))
-{
-  scope.add_item (new ExchangeNumber (h_name, "cm", "Soil water pressure."));
-  scope.add_item (new ExchangeNumber (l_name, "cm/cm^3", "Root density."));
-  scope.add_item (new ExchangeNumber (S_name, "cm^3/cm^3/h", "Water uptake."));
-  scope.done ();
- }
-
-ABAProdSoil::~ABAProdSoil ()
 { }
 
-static struct ABAProdSoilSyntax
+ABAProdUptake::~ABAProdUptake ()
+{ }
+
+static struct ABAProdUptakeSyntax
 {
   static Model& make (Block& al)
-  { return *new ABAProdSoil (al); }
-  ABAProdSoilSyntax ()
+  { return *new ABAProdUptake (al); }
+  ABAProdUptakeSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
-ABA production based on soil location.");
+ABA production based on concentration in water uptake.\n\
+\n\
+The assumption is water uptake from roots in specific region of the soil\n\
+comes with a specific ABA concentration, which depends solely on the\n\
+water pressure in that region.");
     syntax.add_object ("expr", Number::component, 
                        Syntax::Const, Syntax::Singleton, "\
-Expression to evaluate to ABA uptake [g/cm^3/h].\n\
-The symbol 'h' will be bound to the water pressure [cm].\n\
-The symbol 'l' will be bound to the root density [cm/cm^3].\n\
-The symbol 'S' will be bound to the water uptake [cm^3/cm^3/h].");
-    Librarian::add_type (ABAProd::component, "soil", alist, syntax, &make);
+Expression to evaluate to ABA concentration in water uptake [g/cm^3].\n\
+The symbol 'h' will be bound to the water pressure [cm].");
+    Librarian::add_type (ABAProd::component, "uptake", alist, syntax, &make);
   }
-} ABAProdSoil_syntax;
+} ABAProdUptake_syntax;
 
-// ABAprod_soil.C ends here
+// ABAprod_uptake.C ends here
 

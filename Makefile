@@ -369,7 +369,7 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = ABAprod_expr.C ABAprod_soil.C ABAprod_root.C \
+MODELS = ABAprod_uptake.C ABAprod_soil.C ABAprod_root.C \
 	solver_ublas.C solver_cxsparse.C solver_none.C \
 	movement_rect.C chemistry_multi.C \
 	equil_goal.C equil_linear.C equil_langmuir.C transform_equil.C \
@@ -555,7 +555,8 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = solute.C solute.h pedo.C pedo.h pedo_arit.C pedo_const.C \
+REMOVE = ABAprod_expr.C \
+	solute.C solute.h pedo.C pedo.h pedo_arit.C pedo_const.C \
 	denitrification.C soil_NH4.C soil_NO3.C \
 	denitrification.h soil_NH4.h soil_NO3.h \
 	soil_heat1d.h soil_heat1d.C soil_heat_rect.h soil_heat_rect.C \

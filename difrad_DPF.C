@@ -56,7 +56,7 @@ struct DifradDPF : public Difrad
     const double I_e = weather.HourlyExtraterrestrialRadiation (time);//[W/m^2]
    
     // Beam PAR calculated from extra-terrestrial PAR
-       const double I_b = pow(a, m) * I_e * sin_beta;
+    const double I_b = pow(a, m) * I_e * sin_beta;
    
     // Diffuse radiation under a cloudless sky
     const double I_d = fa * (1 - pow(a, m)) * I_e * sin_beta;
@@ -98,12 +98,15 @@ static struct DifradDPFSyntax
     alist.add ("description", "\
 Diffuse radiation calculated using the model of De Pury and Farquhar, 1997.");
 
-    syntax.add ("fa", Syntax::Fraction (), Check::positive (), Syntax::Const,
-                "The proportion of attenuated radiation that reaches the surface as diffuse radiation");
+    syntax.add ("fa", Syntax::Fraction (), Check::positive (), Syntax::Const, "\
+Diffuse radiation proportion.\n\
+Proportion of attenuated radiation that reaches the surface as diffuse\n\
+radiation.");
     alist.add ("fa", 0.5);
 
-    syntax.add ("a", Syntax::None (), Check::positive (), Syntax::Const,
-                "Atmospheric transmission coefficient of PAR. Value around 0.6-0.9 depending on dustparticles");
+    syntax.add ("a", Syntax::None (), Check::positive (), Syntax::Const, "\
+Atmospheric transmission coefficient of PAR.\n\
+Value around 0.6-0.9 depending on dust particles.");
     alist.add ("a", 0.84);
     
     Librarian::add_type (Difrad::component, "DPF", alist, syntax, &make);

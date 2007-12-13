@@ -43,8 +43,13 @@ struct NumberOperand : public Number
   { operand->tick (scope, msg); }
   bool missing (const Scope& scope) const 
   { return operand->missing (scope); }
-  symbol dimension (const Scope&) const
-  { return Syntax::unknown (); }
+  symbol dimension (const Scope& scope) const
+  {
+    if (operand->dimension (scope) == Syntax::none ())
+      return Syntax::none ();
+
+    return Syntax::unknown (); 
+  }
 
   // Create.
   bool initialize (Treelog& err)
@@ -205,6 +210,11 @@ struct NumberSqr : public NumberOperand
   { 
     const double v = operand->value (scope);
     return v * v; 
+  }
+  symbol dimension (const Scope& scope) const
+  { 
+    const symbol opdim = operand->dimension (scope);
+    return Units::multiply (opdim, opdim);
   }
 
   // Create.

@@ -112,7 +112,7 @@ struct SelectArray : public Select
             break;
           case Handle::sum:
             for (size_t i = 0; i < value.size (); i++)
-              result[i] = convert (exp (value[i] * dt));
+              result[i] = convert (value[i] * dt);
             dest.add (result);
             break;
           default:

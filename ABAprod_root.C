@@ -61,7 +61,7 @@ const symbol
 ABAProdRoot::h_name ("h");
 
 const symbol 
-ABAProdRoot::ABA_unit ("g/cm");
+ABAProdRoot::ABA_unit ("g/cm/h");
 
 void
 ABAProdRoot::production (const Geometry& geo, const SoilWater& soil_water,
@@ -133,7 +133,6 @@ and that all the ABA will be included in the water uptake.");
                        Syntax::Const, Syntax::Singleton, "\
 Expression to evaluate to ABA production per root length [g/cm/h].\n\
 The symbol 'h' will be bound to the water pressure [cm].");
-    syntax.order ("expr");
     Librarian::add_type (ABAProd::component, "root", alist, syntax, &make);
   }
 } ABAProdRoot_syntax;

@@ -1,6 +1,24 @@
+2007-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/test-aba.dai: New setup.
+	* sample/Makefile (SETUPS): Add it.
+
 2007-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* number_arit.C (NumberSqr::dimension): Multiply operand dimension
+	with itself.
+	(NumberOperand::dimension): If dimension is "none", leave it alone.
+
+	* ABAprod_soil.C: Renamed from ABAprod_expr.C
+	* ABAprod_uptake.C: Renamed from ABAprod_soil.C
+	* Makefile (MODELS, REMOVE): Update.
+
 	* crop_std.C (tick): Enable ABA from roots.
+	* vegetation.h, vegetation_crops.C, vegetation_permanent.C:
+	* crop.h, crop_old.C, crop_sold.C, crop_simple.C, crop_std.C:
+	* root_system.C, root_system.h (check): New function.
+	(initialize): Take 'Treelog&' argument.
+	* column_std.C (initialize, check): Update caller.
 
 2007-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 

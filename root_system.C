@@ -207,8 +207,11 @@ RootSystem::water_uptake (double Ept_,
   ABAprod->production (geo, soil_water, H2OExtraction, Density, ABAExtraction, 
 		       msg);
   const double mm_per_cm = 10.0; // [mm/cm]
-  ABAConc = geo.total_surface (ABAExtraction) * mm_per_cm / H2OUpt;
-  // [g/cm^3 W] = [g/cm^2 A] * [mm/cm] / [mm/h]
+  if (H2OUpt > 0.0)
+    // [g/cm^3 W] = [g/cm^2 A] * [mm/cm] / [mm/h]
+    ABAConc = geo.total_surface (ABAExtraction) * mm_per_cm / H2OUpt;
+  else
+    ABAConc = 0.0;
 
   // Result.
   return H2OUpt;
@@ -513,7 +516,7 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("ABAExtraction", "g/cm^3/h", Check::non_negative (), 
 	      Syntax::LogOnly, Syntax::Sequence,
 	      "Extraction of ABA in soil layers.");
-  syntax.add ("ABAConc", "g/cm^3/h", Check::non_negative (), 
+  syntax.add ("ABAConc", "g/cm^3", Check::non_negative (), 
 	      Syntax::State, "ABA concentration in water uptake.");
   alist.add ("ABAConc", 0.0);
   syntax.add ("h_x", "cm", Check::none (), Syntax::State,

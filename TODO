@@ -4,29 +4,19 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** write test setup
 
-** look at log files
+*** ABAchina (a, b)
 
-** Dokumenter modeller.
+*** Spørg BGJ om TempEff & FCC3 pars
 
-S	[cm^3 H2O/cm^3 SOIL/h]
-l	[cm ROOT/cm^3 SOIL]
-h	[hPa]
+** Excel 
 
-ABAroot (h): [hPa] -> [g/cm ROOT/h]
+1 summary
+2 setup ext
+3 abacrop ext 
+4 abaextration ext
+5 h2oextraction ext
 
-Itegrate ABAroot (h) * l * dV / Integrate S dVb
-
-  [g/cm ROOT/h] [cm ROOT/cm^3 SOIL] [cm^3 SOIL] 
-/ [cm^3 H2O/cm^3 SOIL/h] [cm^3 SOIL] 
-= [g/cm^3 H2O]
-
-ABAsoil (h): [hPa] -> [g/cm^3 H2O]
-
-Itegrate S * ABAsoil (h) dV / Integrate S dV
-
-  [cm^3 H2O/cm^3 SOIL/h] [g/cm^3 H2O] [cm^3 SOIL] 
-/ [cm^3 H2O/cm^3 SOIL/h] [cm^3 SOIL] 
-= [g/cm^3 H2O]
+** Dokumenter how to use it.
 
 * Overfør h_lim til OpenMI
 
