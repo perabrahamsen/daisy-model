@@ -211,7 +211,7 @@ RootSystem::water_uptake (double Ept_,
     // [g/cm^3 W] = [g/cm^2 A] * [mm/cm] / [mm/h]
     ABAConc = geo.total_surface (ABAExtraction) * mm_per_cm / H2OUpt;
   else
-    ABAConc = 0.0;
+    /* Use old value */;
 
   // Result.
   return H2OUpt;

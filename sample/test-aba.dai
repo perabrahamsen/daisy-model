@@ -14,7 +14,7 @@
 Based on data collected by Fulai Liu, 2007."
   (expr (plf h
 	     (range "ng/mm/h")
-	     (domain "kurt")
+	     (domain "MPa")
 	     (points (-1.00 6.00)
 		     (-0.35 1.25)
 		     (-0.00 0.15)))))
@@ -30,7 +30,7 @@ Based on data collected by Fulai Liu, 2007."
   (sow ("Spring Barley"
 	(enable_N_stress false)
 	;; ABA production in roots is affected by soil water potential.
-	(Root (ABAprod "Fulai Liu root"))
+	(Root (ABAprod "Fulai Liu uptake"))
 	;; Stomata conductivity is affected by ABA.
 	;; Doesn't work right now.
 	;;   (LeafPhot FC_C3 
@@ -150,6 +150,9 @@ Based on data collected by Fulai Liu, 2007."
 		       (when (crop_ds_after "Spring Barley" 0.0)))
 	(H2OExtraction (crop "Spring Barley") 
 		       (when (crop_ds_after "Spring Barley" 0.0)))
+	("Root Density" (crop "Spring Barley") 
+	                (when (crop_ds_after "Spring Barley" 0.0)))
+	("Soil Water Potential" (when (crop_ds_after "Spring Barley" 0.0)))
 	("Field water")
         ("Crop Production" 
 	 (crop "Spring Barley")
