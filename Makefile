@@ -1321,12 +1321,12 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
-ABAprod_expr${OBJ}: ABAprod_expr.C ABAprod.h model.h symbol.h number.h \
-  scope_exchange.h scope.h memutils.h geometry.h syntax.h treelog.h \
-  mathlib.h assertion.h soil_water.h units.h librarian.h alist.h
-ABAprod_soil${OBJ}: ABAprod_soil.C ABAprod.h model.h symbol.h number.h \
+ABAprod_uptake${OBJ}: ABAprod_uptake.C ABAprod.h model.h symbol.h number.h \
   scope_id.h scope.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
   soil_water.h units.h librarian.h alist.h
+ABAprod_soil${OBJ}: ABAprod_soil.C ABAprod.h model.h symbol.h number.h \
+  scope_exchange.h scope.h memutils.h geometry.h syntax.h treelog.h \
+  mathlib.h assertion.h soil_water.h units.h librarian.h alist.h
 ABAprod_root${OBJ}: ABAprod_root.C ABAprod.h model.h symbol.h number.h \
   scope_id.h scope.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
   soil_water.h units.h librarian.h alist.h
