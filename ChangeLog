@@ -1,3 +1,7 @@
+2007-12-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C (nitrogen_uptake): Handle negative PotNUpt request.
+
 2007-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* sample/test-aba.dai: New setup.

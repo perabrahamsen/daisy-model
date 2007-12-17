@@ -33,10 +33,10 @@ Based on data collected by Fulai Liu, 2007."
 	(Root (ABAprod "Fulai Liu uptake"))
 	;; Stomata conductivity is affected by ABA.
 	;; Doesn't work right now.
-	;;   (LeafPhot FC_C3 
-	;;   	  (Xn 6e-3 [mol/mol/s])
-	;;    	  (ABAeffect ABA-exp (k 0.0152 [cm^3/ng]))
-	;;    	  (TempEff (0 1) (100 1)))
+	(LeafPhot FC_C3 
+	   	  (Xn 6e-3 [mol/mol/s])
+		  (ABAeffect ABA-exp (k 0.0152 [cm^3/ng]))
+		  (TempEff (0 1) (100 1)))
 	)))
 
 ;; The rest is just a standard simulation from the tutorial.
