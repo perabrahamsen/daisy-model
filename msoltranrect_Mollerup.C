@@ -1387,8 +1387,8 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   //Begin small timestep stuff  
   enum stabilizing_method_t { None, Timestep_reduction, Streamline_diffusion };
   //const stabilizing_method_t stabilizing_method = Streamline_diffusion;
-  //const stabilizing_method_t stabilizing_method = Timestep_reduction;
-  const stabilizing_method_t stabilizing_method = None;
+  const stabilizing_method_t stabilizing_method = Timestep_reduction;
+  //const stabilizing_method_t stabilizing_method = None;
   const double ddt_min = 1e-10;
   const double gamma_stabilization = 10;
 
@@ -1531,7 +1531,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   //Sink term
    ublas::vector<double> S_vol (cell_size); // sink term 
   for (size_t cell = 0; cell != cell_size ; ++cell) 
-    S_vol (cell) = S[cell] * geo.cell_volume (cell);
+    S_vol (cell) = - S[cell] * geo.cell_volume (cell);
   
   //Boundary matrices and vectors  
   ublas::banded_matrix<double> B_mat (cell_size, cell_size, 0, 0); 
@@ -1709,7 +1709,10 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
       //msg.message (tmp.str ());
     } //End small timestep loop
   
-  tmp_mmo << "C_n" << C_n;
+  //ublas::vector<double> S_ublas (S.size ());
+  //copy (S.begin (), S.end (), S_ublas.begin ());
+  //tmp_mmo << "C_n" << C_n << "\nS" << S_ublas << "\nS_vol" << S_vol;
+  tmp_mmo << "C_n" << C_n << "\nS";
 
 
   //debug Print new solution
