@@ -324,20 +324,33 @@ RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
 			     const double NO3_root_min,
 			     const double PotNUpt, double dt)
 {
-  // If we don't track inorganic N, assume we have enough.
-  if (!chemistry.know (Chemical::NH4_solute ())
-      || !chemistry.know (Chemical::NO3 ()))
-    return PotNUpt;
-    
-  Chemical& soil_NH4 = chemistry.find (Chemical::NH4_solute ());
-  Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
+  if (PotNUpt <= 0.0)		
+    // No uptake needed.
+    {
+      NH4Upt = NO3Upt = 0.0;
+      fill (NH4Extraction.begin (), NH4Extraction.end (), 0.0);
+      fill (NO3Extraction.begin (), NO3Extraction.end (), 0.0);
+    }
+  else if (chemistry.know (Chemical::NH4_solute ()) 
+	   && chemistry.know (Chemical::NO3 ()))
+    // Normlal uptake.
+    {
+      Chemical& soil_NH4 = chemistry.find (Chemical::NH4_solute ());
+      Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
 
-  NH4Upt = solute_uptake (geo, soil, soil_water, soil_NH4, 
-			  PotNUpt, NH4Extraction, MxNH4Up, NH4_root_min, dt);
-  NO3Upt = solute_uptake (geo, soil, soil_water, soil_NO3, 
-			  PotNUpt - NH4Upt, NO3Extraction, 
-			  MxNO3Up, NO3_root_min, dt);
-
+      NH4Upt = solute_uptake (geo, soil, soil_water, soil_NH4, 
+			      PotNUpt, NH4Extraction,
+			      MxNH4Up, NH4_root_min, dt);
+      NO3Upt = solute_uptake (geo, soil, soil_water, soil_NO3, 
+			      PotNUpt - NH4Upt, NO3Extraction, 
+			      MxNO3Up, NO3_root_min, dt);
+    }
+  else 
+    // If we don't track inorganic N, assume we have enough.
+    {
+      NH4Upt = PotNUpt;
+      NO3Upt = 0.0;
+    }
   daisy_assert (NH4Upt >= 0.0);
   daisy_assert (NO3Upt >= 0.0);
 
