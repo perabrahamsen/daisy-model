@@ -51,43 +51,50 @@ The first model is based directly on pot experiments where both
 \aba{xylem} and the water potential ($h$) is measured.  The pots are
 sufficiently small that the water potential is assumed to be the same
 everywhere in the pot.  From this an empirical relationship
-(\aba{uptake}) between $h$ and \aba{xylem} in the pots can be
+($\aba{uptake}(h)$) between $h$ and \aba{xylem} in the pots can be
 developed.  By assuming the same relationship between ABA
 concentration and uptaken water also holds in a field, we
 get~\eqref{eq:aba_uptake}.
 
 \begin{equation}
-  \aba{xylem} = \frac{\int_V S \: \aba{uptake} \: dV}{\int_V S \: dV}
+  \aba{xylem} = \frac{\int_V S \: \aba{uptake}(h) \: dV}{\int_V S \: dV}
   \label{eq:aba_uptake}
 \end{equation}
+
+The function $\aba{uptake}(h)$ must be supplied by the user.
 
 \subsection{Based on production in roots}
 
 ABA is produced in the roots with a rate that depends in the water
-potential (\aba{root}).  If we assume all the ABA produced ends up in
-the stem, we can use \aba{root} to find \aba{xylem}, as
+potential ($\aba{root}(h)$).  If we assume all the ABA produced ends up in
+the stem, we can use $\aba{root}(h)$ to find \aba{xylem}, as
 in~\eqref{eq:aba_root}.
 
 \begin{equation}
-  \aba{xylem} = \frac{\int_V l \: \aba{root} \: dV}{\int_V S \: dV}
+  \aba{xylem} = \frac{\int_V l \: \aba{root}(h) \: dV}{\int_V S \: dV}
   \label{eq:aba_root}
 \end{equation}
 
+The function $\aba{root}(h)$ must be supplied by the user.
+
 \subsection{Based on production in soil}
 
-Both \aba{uptake} and \aba{root} are special cases of calculating the
-ABA contribution from the soil water potential, root uptake, and root
-density.  We call the generalized function \aba{soil}, and the
-generalized equation for~\eqref{eq:aba_soil}.
+Both $S \aba{uptake}(h)$ and $l \aba{root}(h)$ are special cases of
+calculating the ABA contribution from the soil water potential, root
+uptake, and root density.  We call the generalized function
+$\aba{soil}(S,l,h)$, and the generalized equation
+for~\eqref{eq:aba_soil}.
 
 \begin{equation}
-  \aba{xylem} = \frac{\int_V \aba{soil} \: dV}{\int_V S \: dV}
+  \aba{xylem} = \frac{\int_V \aba{soil}(S,l,h) \: dV}{\int_V S \: dV}
   \label{eq:aba_soil}
 \end{equation}
 
-We get \eqref{eq:aba_uptake} by setting $\aba{soil} = S \:
-\aba{uptake}$ and \eqref{eq:aba_root} by setting $\aba{soil} = l \:
-\aba{root}$.
+We get \eqref{eq:aba_uptake} by setting $\aba{soil}(S,l,h) = S \:
+\aba{uptake}(h)$ and \eqref{eq:aba_root} by setting $\aba{soil}(S,l,h) = l \:
+\aba{root}(h)$.
+
+The function $\aba{soil}(S,l,h)$ must be supplied by the user.
 
 \subsection{No ABA production}
 
@@ -124,11 +131,11 @@ potential water uptake.  Stomata conductance is ignored.
   Symbol & Unit & Description\\\hline
   \aba{cond} & None
     & ABA effect on stomata conductance.\\
-  \aba{root} & g \textsc{aba}/cm \textsc{root}/h
+  $\aba{root}(h)$ & g \textsc{aba}/cm \textsc{root}/h
     & ABA production in roots\\
-  \aba{soil} & g \textsc{aba}/cm$^3$ \textsc{soil}/h
+  $\aba{soil}(S,l,h)$ & g \textsc{aba}/cm$^3$ \textsc{soil}/h
     & ABA contribution from soil\\
-  \aba{uptake} & g \textsc{aba}/cm$^3$ \textsc{water}
+  $\aba{uptake}(h)$ & g \textsc{aba}/cm$^3$ \textsc{water}
     & ABA concentration in water from roots\\
   \aba{xylem} & g \textsc{aba}/cm$^3$ \textsc{water}
     & ABA concentration in xylem\\
