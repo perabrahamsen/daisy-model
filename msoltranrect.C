@@ -40,9 +40,7 @@ Msoltranrect::solute (const GeometryRect& geo,
   const size_t edge_size = geo.edge_size ();
   const size_t cell_size = geo.cell_size ();
 
-  daisy_assert (solute.phase () == Chemical::solute);
-
-  std::vector<double> M (cell_size);
+    std::vector<double> M (cell_size);
   std::vector<double> C (cell_size);
   std::vector<double> S (cell_size);
   std::vector<double> J (edge_size);

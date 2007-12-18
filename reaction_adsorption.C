@@ -84,13 +84,12 @@ struct ReactionAdsorption : public Reaction
 					      Units::per_h (), scope, msg))
 	      msg.error ("Could not evaluate 'adsorption_rate'");
 	    
-	    
-	    if (convert >= 1.0)
-	      convert = (has_solute - want_solute);
+	    if (convert * dt >= 1.0)
+	      convert = (has_solute - want_solute) / dt;
 	    else
 	      convert *= (has_solute - want_solute);
 	    
-	    const double left = solute.M_left (c, dt);
+	    const double left = solute.M_left (c, dt) / dt;
 	    if (convert > left)
 	      convert = left * 0.99;
 	  }
@@ -100,12 +99,12 @@ struct ReactionAdsorption : public Reaction
 					      Units::per_h (), scope, msg))
 	      msg.error ("Could not evaluate 'desorption_rate'");
 	    
-	    if (convert >= 1.0)
-	      convert = (has_sorbed - want_sorbed);
+	    if (convert * dt >= 1.0)
+	      convert = (has_sorbed - want_sorbed) / dt;
 	    else
 	      convert *= (has_sorbed - want_sorbed);
 	    
-	    const double left = sorbed.M_left (c, dt);
+	    const double left = sorbed.M_left (c, dt) / dt;
 	    if (convert > left)
 	      convert = left * 0.99;
 	    

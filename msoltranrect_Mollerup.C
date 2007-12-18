@@ -32,7 +32,8 @@
 #include <sstream>
 
 // Uncomment for fast code that does not catches bugs.
-#define BOOST_UBLAS_NDEBUG
+#define NDEBUG
+//#define BOOST_UBLAS_NDEBUG
 
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
