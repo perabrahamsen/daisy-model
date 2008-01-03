@@ -541,8 +541,8 @@ MsoltranrectMollerup::advection (const GeometryRect& geo,
 	  //More flexible
 	  //Equal weight: upstream_weight = 0.5
 	  //Upstr weight: upstream_weight = 1.0
-	  //const double upstream_weight = 0.5;
-          const double upstream_weight = 1.0;
+	  const double upstream_weight = 0.5;
+          //const double upstream_weight = 1.0;
           const double alpha = (q_edge[e] >= 0) 
 	    ? upstream_weight 
 	    : 1.0 - upstream_weight;
@@ -1383,17 +1383,26 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   ublas::vector<double> ThetaD_xz_zx_avg (edge_size);
   thetadiff_xx_zz_xz_zx (geo, Theta_cell_avg, Dxx_cell, Dzz_cell, Dxz_cell,
                          ThetaD_xx_zz_avg, ThetaD_xz_zx_avg);
+
+  std::ostringstream tmp_mmo;
+  //ZZZZZZZZZZZZZZZZZ
+  //tmp_mmo << "Dxx_cell: " << Dxx_cell << '\n';
+  //tmp_mmo << "Dzz_cell: " << Dzz_cell << '\n';
+  //tmp_mmo << "Dxz_cell: " << Dxz_cell << '\n';
+  //tmp_mmo << "ThetaD_xx_zz_avg: " << ThetaD_xx_zz_avg << '\n';
+  //tmp_mmo << "ThetaD_xz_zx_avg: " << ThetaD_xz_zx_avg << '\n'; 
+  //XXXX---OOOO---XXXX
+  
  
     
   //Begin small timestep stuff  
   enum stabilizing_method_t { None, Timestep_reduction, Streamline_diffusion };
-  //const stabilizing_method_t stabilizing_method = Streamline_diffusion;
-  const stabilizing_method_t stabilizing_method = Timestep_reduction;
+  const stabilizing_method_t stabilizing_method = Streamline_diffusion;
+  //const stabilizing_method_t stabilizing_method = Timestep_reduction;
   //const stabilizing_method_t stabilizing_method = None;
   const double ddt_min = 1e-10;
-  const double gamma_stabilization = 10;
+  const double gamma_stabilization = 2;
 
-  std::ostringstream tmp_mmo;
   
   // Largest allowable timestep in loop.
   double ddt_max = dt;  
@@ -1521,7 +1530,11 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
     = ublas::zero_matrix<double> (cell_size, cell_size);
   diffusion_xz_zx (geo, ThetaD_xz_zx_avg, diff_xz_zx_avg); 
   
-  
+  //tmp_mmo << "diff_xx_zz_avg" << diff_xx_zz_avg << '\n';
+  //tmp_mmo << "diff_xz_zx_avg" << diff_xz_zx_avg << '\n';
+
+
+
   //--- Things that not changes in smal timesteps --- 
  
   //Advection
@@ -1615,6 +1628,8 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   // Time already processed of large timestep.
   double dtime = 0.0;
 
+  double R = 2.0;  //Retardation factor 
+
   while (dtime * 1.000001 < dt)
     {
       
@@ -1650,7 +1665,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
      
       if (simple_dcthetadt)
         {
-          A = (1.0 / ddt) * QTheta_mat_np1          // dtheta/ddt
+          A = R *(1.0 / ddt) * QTheta_mat_np1          // dtheta/ddt
             - gamma * diff_xx_zz_avg                // xx_zz diffusion
             - gamma * diff_xz_zx_avg                // xz_zx diffusion
             + gamma * advec                         // advec
@@ -1658,7 +1673,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
             - gamma * diffm_xx_zz_mat               // Dirichlet BC
             + gamma * advecm_mat;                   // Dirichlet BC
           
-          b_mat =  (1.0 / ddt) * QTheta_mat_n 
+          b_mat = R * (1.0 / ddt) * QTheta_mat_n 
             + (1 - gamma) * diff_xx_zz_avg 
             + (1 - gamma) * diff_xz_zx_avg 
             - (1 - gamma) * advec 

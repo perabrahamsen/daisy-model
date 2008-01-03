@@ -29,6 +29,22 @@
 #include "treelog.h"
 #include "plf.h"
 
+
+// Uncomment for fast code that does not catches bugs.
+#define NDEBUG
+//#define BOOST_UBLAS_NDEBUG
+
+#include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/triangular.hpp>
+#include <boost/numeric/ublas/banded.hpp>
+#include <boost/numeric/ublas/lu.hpp>
+#include <boost/numeric/ublas/io.hpp>
+
+namespace ublas = boost::numeric::ublas;
+
+
 void
 HeatRect::solve (const GeometryRect& geo,
 		 const std::vector<double>& q_water,
