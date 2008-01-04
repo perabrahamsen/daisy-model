@@ -27,6 +27,7 @@
 #include "soil.h"
 #include "geometry.h"
 #include "abiotic.h"
+#include "adsorption.h"
 #include "log.h"
 #include "block.h"
 #include "alist.h"
@@ -59,7 +60,7 @@ struct ChemicalStandard : public Chemical
   const std::auto_ptr<Number> C_below_expr;
   double C_below_value;
   const std::auto_ptr<Number> initial_expr;
-  const phase_t phase_;
+  const std::auto_ptr<Adsorption> adsorption_;
 
   // Management.
   double deposit_;
@@ -107,7 +108,7 @@ struct ChemicalStandard : public Chemical
   double decompose_water_factor (const double h) const;
 
   // Solute.
-  phase_t phase () const;
+  const Adsorption& adsorption () const;
   double diffusion_coefficient () const;
 
   // Soil content.
@@ -136,7 +137,7 @@ struct ChemicalStandard : public Chemical
   void add_to_sorption_sink (const std::vector<double>&, double dt);
 
   // Management.
-  void update_C (const SoilWater& soil);
+  void update_C (const Soil& soil, const SoilWater& soil);
   void deposit (const double amount, const double dt); // [g/m^2]
   void spray (const double amount, const double dt); // [g/m^2]
   void dissipate (const double amount, const double dt); // [g/m^2]
@@ -170,7 +171,8 @@ struct ChemicalStandard : public Chemical
   void output (Log&) const;
 
   // Create.
-  bool check (size_t n, const Scope&, Treelog&) const;
+  bool check (const Geometry& geo, const Soil& soil, const SoilWater&, 
+	      const Scope& scope, Treelog& msg) const;
   void initialize (const AttributeList&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   ChemicalStandard (Block&);
@@ -217,9 +219,9 @@ ChemicalStandard::decompose_water_factor (const double h) const
     return decompose_water_factor_ (h);
 }
 
-Chemical::phase_t
-ChemicalStandard::phase () const
-{ return phase_; }
+const Adsorption&
+ChemicalStandard::adsorption () const
+{ return *adsorption_; }
 
 double
 ChemicalStandard::diffusion_coefficient () const
@@ -360,13 +362,10 @@ ChemicalStandard::add_to_transform_source (const std::vector<double>& v,
 }
 
 void
-ChemicalStandard::update_C (const SoilWater& soil_water)
+ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
 {
-  if (phase () != solute)
-    return;
-
   for (size_t i = 0; i < C_.size (); i++)
-    C_[i] = M_[i] / soil_water.Theta (i);
+    C_[i] = adsorption_->M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
 
 void 
@@ -411,7 +410,7 @@ ChemicalStandard::mix (const Geometry& geo,
 		       const double from, const double to, const double dt)
 { 
   geo.mix (M_, from, to, tillage, dt);
-  update_C (soil_water);
+  update_C (soil, soil_water);
 }
 
 void 
@@ -421,7 +420,7 @@ ChemicalStandard::swap (const Geometry& geo,
 			const double dt)
 { 
   geo.swap (M_, from, middle, to, tillage, dt);
-  update_C (soil_water);
+  update_C (soil, soil_water);
 }
 
 void 
@@ -635,6 +634,9 @@ ChemicalStandard::decompose (const Geometry& geo,
 void
 ChemicalStandard::output (Log& log) const
 {
+  // Parameters.
+  output_derived (adsorption_, "adsorption", log);
+
   // Management and climate fluxes.
   output_value (deposit_, "deposit", log);
   output_value (spray_, "spray", log);
@@ -674,27 +676,55 @@ ChemicalStandard::output (Log& log) const
 }
 
 bool 
-ChemicalStandard::check (const unsigned, const Scope& scope, Treelog& msg) const
+ChemicalStandard::check (const Geometry& geo, 
+			 const Soil& soil, const SoilWater& soil_water,
+			 const Scope& scope, Treelog& msg) const
 {
+  const size_t cell_size = geo.cell_size ();
+
   bool ok = true;
 
   if (!C_below_expr->check_dim (scope, g_per_cm3, msg))
     ok = false;
 
-  if (phase () != solute)
-    {
-      for (size_t i = 0; i < C_.size (); i++)
-	if (std::isnormal (C_[i]))
-	  {
-	    std::ostringstream tmp;
-	    tmp << "C[" << i << "] is " << C_[i] 
-		<< " despite this not being a solute";
-	    msg.error (tmp.str ());
-	    ok = false;
-	    break;
-	  }
-    }
+  const bool solid = adsorption_->full ();
 
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      try 
+	{   
+	  const double Theta = soil_water.Theta (i);
+	  const double M = M_[i];
+	  const double C = C_[i];
+	  if (iszero (M))
+	    {
+	      if (std::isnormal (C))
+		throw "C & M mismatch in solute";
+	    }
+	  else if (iszero (C))
+	    {
+	      if (std::isnormal (M) && !solid)
+		throw "No solute part";
+	    }
+	  else if (solid)
+	    {
+	      if (std::isnormal (C_[i]))
+		throw "C should be zero for non-solutes";
+	    }
+	  else if (!approximate (adsorption_->M_to_C (soil, Theta, i, M), C))
+	    throw "Solute C does not match M";
+	  else if (!approximate (adsorption_->C_to_M (soil, Theta, i, C), M))
+	    throw "Solute M does not match C";
+	}
+      catch (const char *const error)
+	{
+	  std::stringstream tmp;
+	  tmp << name << "[" << i << "]";
+	  Treelog::Open next (msg, tmp.str ());
+	  msg.error (error);
+	  ok = false;
+	}
+    }
   return ok;
 }
 
@@ -705,6 +735,9 @@ ChemicalStandard::initialize (const AttributeList& al,
 			      const SoilHeat& soil_heat,
                               Treelog& msg)
 {
+  const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
+
   C_below_expr->initialize (msg);
 
   std::vector<double> Ms;
@@ -715,33 +748,33 @@ ChemicalStandard::initialize (const AttributeList& al,
   if (C_.size () > 0)
     {
       // Fill it up.
-      while (C_.size () < geo.cell_size ())
+      while (C_.size () < cell_size)
 	C_.push_back (C_[C_.size () - 1]);
-      if (C_.size () > geo.cell_size ())
+      if (C_.size () > cell_size)
 	throw ("To many members of C sequence");
     }
   if (M_.size () > 0)
     {
       // Fill it up.
-      while (M_.size () < geo.cell_size ())
+      while (M_.size () < cell_size)
 	M_.push_back (M_[M_.size () - 1]);
 
-      if (M_.size () > geo.cell_size ())
+      if (M_.size () > cell_size)
 	throw ("To many members of M sequence");
     }
   if (Ms.size () > 0)
     {
       // Fill it up.
-      while (Ms.size () < geo.cell_size ())
+      while (Ms.size () < cell_size)
 	Ms.push_back ( Ms[Ms.size () - 1]);
-      if (Ms.size () > geo.cell_size ())
+      if (Ms.size () > cell_size)
 	throw ("To many members of Ms sequence");
     }
   if (M_.size () == 0 && C_.size () == 0)
     {
       if (Ms.size () != 0)
 	{
-	  daisy_assert (Ms.size () == geo.cell_size ());
+	  daisy_assert (Ms.size () == cell_size);
 
 	  for (size_t i = M_.size (); i < Ms.size (); i++)
 	    M_.push_back (Ms[i] * soil.dry_bulk_density (i));
@@ -761,52 +794,28 @@ ChemicalStandard::initialize (const AttributeList& al,
 	}
     }
   for (size_t i = C_.size (); i < M_.size (); i++)
-    {
-      if (phase () == solute)
-	C_.push_back (M_[i] / soil_water.Theta (i));
-      else
-	C_.push_back (0.0);
-    }
+    C_.push_back (adsorption_->M_to_C (soil, soil_water.Theta (i), i, M_[i]));
   for (size_t i = M_.size (); i < C_.size (); i++)
-    M_.push_back (soil_water.Theta (i) * C_[i]);
+    M_.push_back (adsorption_->C_to_M (soil, soil_water.Theta (i), i, C_[i]));
   
   daisy_assert (C_.size () == M_.size ());
-  daisy_assert (C_.size () == geo.cell_size ());
+  daisy_assert (C_.size () == cell_size);
 
-  for (size_t i = 0; i < geo.cell_size (); i++)
-    {
-      if (iszero (M_[i]))
-	{
-	  if (std::isnormal (C_[i]))
-	    throw "C & M mismatch in solute";
-	}
-      else if (phase () == solute)
-	{
-	  if (!approximate (C_[i], M_[i] / soil_water.Theta (i)))
-	    throw "Solute C does not match M";
-	}
-      else
-	{
-	  if (std::isnormal (C_[i]))
-	    throw "C should be zero for non-solutes";
-	}
-    }
-
-  S_.insert (S_.begin (), geo.cell_size (), 0.0);
-  S_p_.insert (S_p_.begin (), geo.cell_size (), 0.0);
-  S_drain.insert (S_drain.begin (), geo.cell_size (), 0.0);
-  S_external.insert (S_external.begin (), geo.cell_size (), 0.0);
-  if (S_permanent.size () < geo.cell_size ())
+  S_.insert (S_.begin (), cell_size, 0.0);
+  S_p_.insert (S_p_.begin (), cell_size, 0.0);
+  S_drain.insert (S_drain.begin (), cell_size, 0.0);
+  S_external.insert (S_external.begin (), cell_size, 0.0);
+  if (S_permanent.size () < cell_size)
     S_permanent.insert (S_permanent.end (), 
-			geo.cell_size () - S_permanent.size (),
+			cell_size - S_permanent.size (),
 			0.0);
-  S_root.insert (S_root.begin (), geo.cell_size (), 0.0);
-  S_sorption.insert (S_sorption.begin (), geo.cell_size (), 0.0);
-  S_transform.insert (S_transform.begin (), geo.cell_size (), 0.0);
-  J.insert (J.begin (), geo.edge_size (), 0.0);
-  J_p.insert (J_p.begin (), geo.edge_size (), 0.0);
-  tillage.insert (tillage.begin (), geo.cell_size (), 0.0);
-  lag.insert (lag.end (), soil.size () - lag.size (), 0.0);
+  S_root.insert (S_root.begin (), cell_size, 0.0);
+  S_sorption.insert (S_sorption.begin (), cell_size, 0.0);
+  S_transform.insert (S_transform.begin (), cell_size, 0.0);
+  J.insert (J.begin (), edge_size, 0.0);
+  J_p.insert (J_p.begin (), edge_size, 0.0);
+  tillage.insert (tillage.begin (), cell_size, 0.0);
+  lag.insert (lag.end (), cell_size - lag.size (), 0.0);
 }
 
 ChemicalStandard::ChemicalStandard (Block& al)
@@ -833,7 +842,7 @@ ChemicalStandard::ChemicalStandard (Block& al)
     C_below_expr (Librarian::build_item<Number> (al, "C_below")),
     C_below_value (-42.42e42),
     initial_expr (Librarian::build_item<Number> (al, "initial")),
-    phase_ (get_phase (al.identifier ("phase"))),
+    adsorption_ (Librarian::build_item<Adsorption> (al, "adsorption")),
     deposit_ (0.0), 
     spray_ (0.0),
     dissipate_ (0.0),
@@ -1023,6 +1032,17 @@ Initial content if otherwise unspecified. [g/cm^3]");
   zero.add ("value", 0.0, "g/cm^3");
   zero.add ("type", "const");
   alist.add ("initial", zero);
+  syntax.add_object ("adsorption", Adsorption::component, 
+		     Syntax::Const, Syntax::Singleton, "\
+Instant equilibrium between sorbed and solute phases.\n\
+\n\
+Specify the equilibrium model here for chemicals where the sorbed and\n\
+solute phases typically reaches equilibrium within a single timestep.\n\
+Slower adsorption processes should be modelled as two chemicals, one\n\
+with 'none' adsorption and one with 'full' adsorption, and an\n\
+'adsorption' reaction between them.");
+  alist.add ("adsorption", Adsorption::none_model ());
+
   syntax.add ("phase", Syntax::String, Syntax::Const,
 	      "Either 'solid' or 'solute'.");
   static const VCheck::Enum phase_check ("solid", "solute");
@@ -1176,7 +1196,7 @@ ChemicalStandardSyntax::load_NH4_sorbed (Syntax& syntax, AttributeList& alist)
 { 
   load_NH4_common (syntax, alist);
   alist.add ("description", "Ammonium-N in sorbed form.");
-  alist.add ("phase", "solid");
+  alist.add ("adsorption", Adsorption::full_model ());
   alist.add ("diffusion_coefficient", 1.0); // Meaningless.
   // We initialize to approximatey 5% of the N corresponding to the
   // allowed content of NO3 in drinking water.

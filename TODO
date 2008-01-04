@@ -1,5 +1,25 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Genindfør "adsorption".
+
+** genindfør "A" omkring transport kode.
+
+*** movement "rectangle"
+
+msoltrans Mollerup
+
+**** Linear:  Brug "K"
+
+**** Brug "A" i lille tidskridt?
+
+** redefiner NH4 build-in
+
+** omskriv chemistry.dai
+
+** test
+
+* 2D gnuplot?
+
 * Overfør h_lim til OpenMI 
 
 Eller hvad?  Tabeller i Daisy?
@@ -39,17 +59,51 @@ Gør DOM til DOM-C og DOM-N ?
 
 * units
 
-(defunit [cm] SI
+convert to SI: DIM, value
+convert from SI: DIM, value
+compatible DIM1 DIM2
+
+static auto_map<symbol,Unit> all_units;
+static map<symbol, set<symbol>> convertions;
+static map<symbol, Convert> convertions;
+
+
+SI_base
+SI_factor
+SI_expr
+
+
+(defunit [cm] SI_factor
   "centimeter"
-  (expr (dim (* x 0.01 [cm/m]) [m]))
+  (expr (dim (* [cm] 0.01 [cm/m]) [m]))
   (length 1))
+
+(defunit [m] SI
+  "meter"
+  (expr x))
 
 
 class Unit
 {
-  public:
-  
-}  
+  virtual symbol identifier const () = 0;
+  virtual double to_SI (double) const = 0;
+  virtual double from_SI (double) const = 0;
+};
+
+plain SI
+special
+
+
+* function
+
+(defnumber function sqr
+  "Find the square of a number."
+  (parameters (x [D]))
+  (order x)
+  (value (* x x))
+  (dimension (* U U)))
+
+(sqr 7)
 
 * Rootdens
 

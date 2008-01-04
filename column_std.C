@@ -617,7 +617,7 @@ ColumnStandard::check (bool require_weather,
   }
   {
     Treelog::Open nest (msg, "Chemistry");
-    if (!chemistry->check (*soil, *soil_water, *soil_heat, *chemistry,
+    if (!chemistry->check (geometry, *soil, *soil_water, *soil_heat, *chemistry,
 			   scope, msg))
       ok = false;
   }

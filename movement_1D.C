@@ -32,6 +32,7 @@
 #include "doe.h"
 #include "transport.h"
 #include "mactrans.h"
+#include "adsorption.h"
 #include "log.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -79,7 +80,7 @@ struct Movement1D : public Movement
                 double diffusion_coefficient,
                 double dt,
                 Treelog& msg);
-  void flow (const Soil& soil, const SoilWater& soil_water, 
+  void flow (const Soil&, const SoilWater&, const Adsorption&,
              symbol name,
              std::vector<double>& M, 
              std::vector<double>& C, 
@@ -305,19 +306,15 @@ Movement1D::solute (const Soil& soil,
     J[0] = J_in;
   
   // Flow.
-  switch (solute.phase ())
-    {
-    case Chemical::solid:
-      transport_solid->tick (msg, *geo, soil, soil_water, 
-			     solute.diffusion_coefficient (),
-			     M, C, S, J, solute.C_below (), dt);
-      break;
-    case Chemical::solute:
-      flow (soil, soil_water, solute.name, M, C, S, S_p, J, J_p, 
-	    solute.C_below (), solute.diffusion_coefficient (),
-	    dt, msg);
-      break;
-    }
+  if (solute.adsorption ().full ())
+    transport_solid->tick (msg, *geo, soil, soil_water, solute.adsorption (),
+			   solute.diffusion_coefficient (),
+			   M, C, S, J, solute.C_below (), dt);
+  else
+    flow (soil, soil_water, solute.adsorption (), solute.name, 
+	  M, C, S, S_p, J, J_p, 
+	  solute.C_below (), solute.diffusion_coefficient (),
+	  dt, msg);
   
   for (size_t c = 0; c < cell_size; c++)
     solute.set_content (c, M[c], C[c]);
@@ -339,14 +336,14 @@ Movement1D::element (const Soil& soil,
 {
   element.tick (geo->cell_size (), soil_water, dt);
   static const symbol DOM_name ("DOM");
-  flow (soil, soil_water, DOM_name, element.M, element.C, 
+  flow (soil, soil_water, Adsorption::none (), DOM_name, element.M, element.C, 
         element.S, element.S_p, element.J, element.J_p, 0.0, 
 	diffusion_coefficient, dt, msg);
 }
 
 void 
 Movement1D::flow (const Soil& soil, const SoilWater& soil_water, 
-                  const symbol name,
+                  const Adsorption& adsorption, const symbol name,
                   std::vector<double>& M, 
                   std::vector<double>& C, 
                   std::vector<double>& S, 
@@ -368,7 +365,7 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
 
       try
         {
-          matrix_solute[m]->tick (msg, *geo, soil, soil_water, 
+          matrix_solute[m]->tick (msg, *geo, soil, soil_water, adsorption,
 				  diffusion_coefficient, 
                                   M, C, S, J, C_below, dt);
           if (m > 0)

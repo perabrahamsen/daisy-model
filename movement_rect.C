@@ -31,6 +31,7 @@
 #include "surface.h"
 #include "weather.h"
 #include "uzrect.h"
+#include "adsorption.h"
 #include "check.h"
 #include "alist.h"
 #include "submodeler.h"
@@ -133,13 +134,12 @@ MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
 		      const double dt,
                       const Scope& scope, Treelog& msg)
 {
-  if (chemical.phase () == Chemical::solid)
+  if (chemical.adsorption ().full ())
     {
       matrix_solid->solute (*geo, soil, soil_water, J_in, chemical,
 			    flux_below, dt, scope, msg);
       return;
     }
-  daisy_assert (chemical.phase () == Chemical::solute);
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
       Treelog::Open nest (msg, matrix_solute[i]->name);

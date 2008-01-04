@@ -32,6 +32,7 @@ class Soil;
 class SoilWater;
 class DOE;
 class Chemical;
+class Adsorption;
 class Surface;
 class Groundwater;
 class Weather;
@@ -59,6 +60,7 @@ private:
   virtual void flow (const GeometryRect& geo, 
                      const Soil& soil, 
                      const SoilWater& soil_water, 
+		     const Adsorption& adsorption,
                      symbol name,
                      std::vector<double>& M, 
                      std::vector<double>& C, 

@@ -26,6 +26,7 @@
 #include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -38,7 +39,7 @@ struct TransportCD : public Transport
   
   // Simulation.
   void tick (Treelog&, const Geometry1D& geo,
-             const Soil&, const SoilWater&, 
+             const Soil&, const SoilWater&, const Adsorption&,
 	     double diffusion_coefficient,
 	     std::vector<double>& M, 
 	     std::vector<double>& C,
@@ -56,6 +57,7 @@ struct TransportCD : public Transport
 void 
 TransportCD::tick (Treelog&, const Geometry1D& geo,
                    const Soil& soil, const SoilWater& soil_water,
+		   const Adsorption& adsorption,
 		   const double diffusion_coefficient,
 		   std::vector<double>& M, 
 		   std::vector<double>& C,
@@ -80,7 +82,10 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
       if (iszero (C[i]))
 	daisy_assert (iszero (M[i]));
       else 
-        daisy_assert (approximate (M[i], soil_water.Theta_old (i) * C[i]));
+        daisy_assert (approximate (M[i], 
+                                   adsorption.C_to_M (soil,
+                                                      soil_water.Theta_old (i),
+                                                      i, C[i])));
     }
 
   // Note: q, D, and alpha depth indexes are all [j-½].
@@ -193,6 +198,8 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
       std::vector<double> c (size);
       std::vector<double> d (size);
   
+      // Old absorbed matter.
+      std::vector<double> A (size);
       // Water content at start and end of small timestep.
       std::vector<double> Theta_old (size);
       std::vector<double> Theta_new (size);
@@ -202,6 +209,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 	    = (soil_water.Theta (j) - soil_water.Theta_old (j)) / dt;
 	  Theta_new[j] = soil_water.Theta_old (j) + Theta_ratio * t;
 	  Theta_old[j] = soil_water.Theta_old (j) + Theta_ratio * old_t;
+	  A[j] = M[j] - C[j] * Theta_old[j];
 	}
 
       for (unsigned int j = 1; j < size; j++)
@@ -318,11 +326,22 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 	  }
 
       // Update M and C.
-      for (size_t j = 0; j < size; j++)
+      for (unsigned int j = 0; j < size; j++)
 	{
 	  // We use the old absorbed stuff plus the new dissolved stuff.
- 	  M[j] = Theta_new[j] * C[j];
+ 	  M[j] = A[j] + Theta_new[j] * C[j];
 	  daisy_assert (M[j] >= 0.0);
+
+	  // We calculate new C by assumining instant absorption.
+	  C[j] = adsorption.M_to_C (soil, Theta_new[j], j, M[j]);
+
+          // Check that it goes both ways.
+          if (iszero (C[j]))
+            daisy_assert (iszero (M[j]));
+          else
+            daisy_assert (approximate (M[j], 
+                                       adsorption.C_to_M (soil, Theta_new[j],
+                                                          j, C[j])));
 	}
     }
 

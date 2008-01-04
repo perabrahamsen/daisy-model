@@ -25,6 +25,7 @@
 #include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -34,7 +35,7 @@ struct TransportNone : public Transport
 {
   // Simulation.
   void tick (Treelog&, const Geometry1D&,
-             const Soil&, const SoilWater&,
+             const Soil&, const SoilWater&, const Adsorption&,
 	     double diffusion_coefficient,
 	     std::vector<double>& M, 
 	     std::vector<double>& C,
@@ -52,6 +53,7 @@ void
 TransportNone::tick (Treelog& msg,
 		     const Geometry1D& geo,
                      const Soil& soil, const SoilWater& soil_water,
+		     const Adsorption& adsorption, 
 		     const double,
 		     std::vector<double>& M, 
 		     std::vector<double>& C,
@@ -60,8 +62,8 @@ TransportNone::tick (Treelog& msg,
 		     const double /* C_below */, 
                      const double dt)
 {
-  Treelog::Open* nest = NULL;
-  for (size_t i = 0; i < soil.size (); i++)
+  Treelog::Open nest (msg, "Transport none");
+  for (unsigned int i = 0; i < soil.size (); i++)
     {
       M[i] += S[i] *dt;
 
@@ -70,11 +72,9 @@ TransportNone::tick (Treelog& msg,
       else
 	J[i] = 0.0;
 
-      C[i] = M[i] / soil_water.Theta (i);
+      C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
       if (!(M[i] >= 0.0))
 	{
-	  if (!nest)
-	    nest = new Treelog::Open (msg, "Transport none");
 	  std::ostringstream tmp;
 	  tmp << "BUG: M[" << i << "] = " << M[i] 
 		 << " (J_in = " << J[0] << ") S[" << i << "] = " << S[i];
@@ -84,9 +84,6 @@ TransportNone::tick (Treelog& msg,
       daisy_assert (C[i] >= 0.0);
     }
   J[soil.size ()] = 0.0;
-
-  if (nest)
-    delete nest;
 }
 
 const AttributeList& 

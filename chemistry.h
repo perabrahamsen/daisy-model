@@ -102,7 +102,8 @@ public:
   virtual void initialize (const AttributeList&, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
 			   Treelog&) = 0;
-  virtual bool check (const Soil&, const SoilWater&, const SoilHeat&,
+  virtual bool check (const Geometry&,
+		      const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, const Scope&, Treelog&) const = 0;
   static void load_syntax (Syntax&, AttributeList&);
 protected:

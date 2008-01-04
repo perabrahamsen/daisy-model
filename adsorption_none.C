@@ -31,16 +31,27 @@ class AdsorptionNone : public Adsorption
   // Simulation.
 public:
   double C_to_M (const Soil&, double Theta, int, double C) const
-    { return C * Theta; }
+  { return C * Theta; }
   double M_to_C (const Soil&, double Theta, int, double M) const
-    { return M / Theta; }
+  { return M / Theta; }
 
   // Create.
 public:
   AdsorptionNone (Block& al)
     : Adsorption (al)
-    { }
+  { }
 };
+
+const AttributeList& 
+Adsorption::none_model ()
+{
+  static AttributeList alist;
+
+  if (!alist.check ("type"))
+      alist.add ("type", "none");
+
+  return alist;
+}
 
 static struct AdsorptionNoneSyntax
 {

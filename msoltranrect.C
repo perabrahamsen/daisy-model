@@ -24,6 +24,7 @@
 #include "chemical.h"
 #include "doe.h"
 #include "geometry_rect.h"
+#include "adsorption.h"
 #include "block.h"
 #include "librarian.h"
 
@@ -40,7 +41,7 @@ Msoltranrect::solute (const GeometryRect& geo,
   const size_t edge_size = geo.edge_size ();
   const size_t cell_size = geo.cell_size ();
 
-    std::vector<double> M (cell_size);
+  std::vector<double> M (cell_size);
   std::vector<double> C (cell_size);
   std::vector<double> S (cell_size);
   std::vector<double> J (edge_size);
@@ -68,7 +69,7 @@ Msoltranrect::solute (const GeometryRect& geo,
     }
 
   // Flow.
-  flow (geo, soil, soil_water, solute.name, 
+  flow (geo, soil, soil_water, solute.adsorption (), solute.name, 
         M, C, S, J, solute.C_below (), flux_below,
 	solute.diffusion_coefficient (), 
         dt, msg);
@@ -90,7 +91,7 @@ Msoltranrect::element (const GeometryRect& geo,
 {
   element.tick (geo.cell_size (), soil_water, dt);
   static const symbol DOM_name ("DOM");
-  flow (geo, soil, soil_water, DOM_name, 
+  flow (geo, soil, soil_water, Adsorption::none (), DOM_name, 
         element.M, element.C, element.S, element.J, 0.0, false,
 	diffusion_coefficient, dt, msg);
 }

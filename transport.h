@@ -30,6 +30,7 @@
 class Geometry1D;
 class Soil;
 class SoilWater;
+class Adsorption;
 class Block;
 class AttributeList;
 class Treelog;
@@ -45,6 +46,7 @@ public:
 public:
   virtual void tick (Treelog&, const Geometry1D&,
                      const Soil&, const SoilWater&, 
+		     const Adsorption&, 
 		     double diffusion_coefficient,
 		     std::vector<double>& M, 
 		     std::vector<double>& C,

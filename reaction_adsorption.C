@@ -223,6 +223,7 @@ ReactionAdsorptionSyntax::load_NH4 (Syntax& syntax, AttributeList& alist)
   AttributeList linear;
   linear.add ("type", "linear");
   linear.add ("K_clay", 117.116);
+  linear.add ("K_OC", 117.116);
   alist.add ("equilibrium", linear);
   AttributeList rate;
   rate.add ("type", "const");

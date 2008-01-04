@@ -29,6 +29,7 @@
 class Log;
 class Soil;
 class Block;
+class AttributeList;
 
 class Adsorption : public Model
 {
@@ -45,10 +46,23 @@ public:
   virtual double M_to_C (const Soil&, double Theta, int i, double M) const = 0;
 
   // Create and Destroy.
+public:
+  static const Adsorption& none ();
+  static const AttributeList& none_model ();
+  static const AttributeList& full_model ();
 protected:
+  Adsorption (const char* name);
   Adsorption (Block& al);
 public:
   ~Adsorption ();
+};
+
+// Linear adsorption is treated specially in some solute transport models.
+struct AdsorptionLinear : public Adsorption
+{
+  virtual double K (const Soil& soil, size_t c) const = 0;
+protected:
+  AdsorptionLinear (Block&);
 };
 
 #endif // ADSORPTION_H

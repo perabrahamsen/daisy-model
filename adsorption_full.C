@@ -66,3 +66,5 @@ Used for non-solutes, fully adsorped in the soil.");
     Librarian::add_type (Adsorption::component, "full", alist, syntax, &make);
   }
 } AdsorptionFull_syntax;
+
+// adsorption_full.C ends here.

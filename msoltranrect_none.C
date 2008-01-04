@@ -23,6 +23,7 @@
 #include "geometry_rect.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "adsorption.h"
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -35,6 +36,7 @@ struct MsoltranrectNone : public Msoltranrect
   void flow (const GeometryRect& geo, 
              const Soil& soil, 
              const SoilWater& soil_water, 
+	     const Adsorption&, 
              const symbol name,
              std::vector<double>& M, 
              std::vector<double>& C, 
@@ -56,6 +58,7 @@ void
 MsoltranrectNone::flow (const GeometryRect& geo, 
                         const Soil& soil, 
                         const SoilWater& soil_water, 
+			const Adsorption& adsorption, 
                         const symbol name,
                         std::vector<double>& M, 
                         std::vector<double>& C, 
@@ -93,7 +96,7 @@ MsoltranrectNone::flow (const GeometryRect& geo,
   for (size_t n = 0; n < cell_size; n++)
     {
       M[n] += S[n] * dt;
-      C[n] = M[n] / soil_water.Theta (n);
+      C[n] = adsorption.M_to_C (soil, soil_water.Theta (n), n, M[n]);
 
       if (!(M[n] >= 0.0))
         {

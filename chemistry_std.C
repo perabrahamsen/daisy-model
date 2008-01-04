@@ -80,7 +80,8 @@ struct ChemistryStandard : public Chemistry
   // Create & Destroy.
   void initialize (const AttributeList&, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
-  bool check (const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
+  bool check (const Geometry&,
+	      const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
 	      const Scope& scope, Treelog&) const;
   explicit ChemistryStandard (Block& al);
 };
@@ -292,17 +293,16 @@ ChemistryStandard::initialize (const AttributeList& al,
 }
 
 bool 
-ChemistryStandard::check (const Soil& soil, const SoilWater& soil_water,
+ChemistryStandard::check (const Geometry& geo,
+			  const Soil& soil, const SoilWater& soil_water,
 			  const SoilHeat& soil_heat, const Chemistry& chemistry,
 			  const Scope& scope, Treelog& msg) const
 { 
-  const size_t cell_size = soil.size ();
-
   bool ok = true; 
   for (size_t c = 0; c < chemicals.size (); c++)
     {
       Treelog::Open nest (msg, "Chemical: '" + chemicals[c]->name  + "'");
-      if (!chemicals[c]->check (cell_size, scope, msg))
+      if (!chemicals[c]->check (geo, soil, soil_water, scope, msg))
 	ok = false;
     }
 

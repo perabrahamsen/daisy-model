@@ -82,7 +82,8 @@ struct ChemistryMulti : public Chemistry
   // Create & Destroy.
   void initialize (const AttributeList&, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
-  bool check (const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
+  bool check (const Geometry&, 
+	      const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
 	      const Scope& scope, Treelog&) const;
   static const std::vector<Chemical*> 
   /**/ find_chemicals (const std::vector<Chemistry*>& combine);
@@ -315,7 +316,8 @@ ChemistryMulti::initialize (const AttributeList& al,
 }
 
 bool 
-ChemistryMulti::check (const Soil& soil, const SoilWater& soil_water,
+ChemistryMulti::check (const Geometry& geo,
+		       const Soil& soil, const SoilWater& soil_water,
 		       const SoilHeat& soil_heat, const Chemistry& chemistry,
 		       const Scope& scope, Treelog& msg) const
 { 
@@ -323,7 +325,7 @@ ChemistryMulti::check (const Soil& soil, const SoilWater& soil_water,
   for (size_t c = 0; c < combine.size (); c++)
     {
       Treelog::Open nest (msg, "Chemistry: '" + combine[c]->name  + "'");
-      if (!combine[c]->check (soil, soil_water, soil_heat, chemistry, 
+      if (!combine[c]->check (geo, soil, soil_water, soil_heat, chemistry, 
 			      scope, msg))
 	ok = false;
     }

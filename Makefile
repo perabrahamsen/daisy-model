@@ -400,7 +400,7 @@ MODELS = ABAprod_uptake.C ABAprod_soil.C ABAprod_root.C \
 	horizon_numeric.C horizon_system.C select_pF.C pet_FAO_PM.C \
 	pet_Hargreaves.C hydraulic_M_vGp.C summary_simple.C \
 	phenology_TSum.C phenology_std.C hydraulic_hypres.C clayom_biomod.C \
-        clayom_old.C hydraulic_Cosby.C adsorption_full.C \
+        clayom_old.C hydraulic_Cosby.C \
 	condition_weather.C \
 	rootdens_PLF.C rootdens_G_P.C groundwater_file.C action_fertilize.C \
 	action_repeat.C vegetation_permanent.C \
@@ -423,7 +423,7 @@ MODELS = ABAprod_uptake.C ABAprod_soil.C ABAprod_root.C \
 	action_with.C nitrification_soil.C \
 	nitrification_solute.C hydraulic_mod_C.C uzlr.C transport_cd.C \
 	transport_none.C transport_convection.C adsorption_vS_S.C \
-	adsorption_none.C tortuosity_M_Q.C tortuosity_linear.C \
+	tortuosity_M_Q.C tortuosity_linear.C \
 	adsorption_freundlich.C adsorption_linear.C adsorption_langmuir.C \
 	bioclimate_std.C condition_crop.C \
 	condition_soil.C log_checkpoint.C \
@@ -555,7 +555,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = ABAprod_expr.C \
+REMOVE = adsorption_none.C adsorption_full.C ABAprod_expr.C \
 	solute.C solute.h pedo.C pedo.h pedo_arit.C pedo_const.C \
 	denitrification.C soil_NH4.C soil_NO3.C \
 	denitrification.h soil_NH4.h soil_NO3.h \

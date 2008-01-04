@@ -1,3 +1,15 @@
+2008-01-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (MODELS, REMOVE): Remove adsorption_none.C and
+	adsorption_full.C.
+	* adsorption.C: Add code here.
+
+	* adsorption.C, adsorption.h (AdsorptionLinear): New class.
+	* adsorption_linear.C (AdsorptionLinearOld): Renamed.
+
+	* chemical.h, chemical_std.C: Restored 'adsorption' parameter.
+	* movement_1D.C, movement_rect.C: Use it.
+
 2007-12-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* root_system.C (nitrogen_uptake): Handle negative PotNUpt request.

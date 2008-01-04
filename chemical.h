@@ -32,6 +32,7 @@ class Soil;
 class SoilWater;
 class SoilHeat;
 class OrganicMatter;
+class Adsorption;
 class VCheck;
 class Treelog;
 class Log;
@@ -58,9 +59,7 @@ public:
 
   // Soil.
 public:
-  enum phase_t { solid, solute };
-  virtual phase_t phase () const = 0;
-  static phase_t get_phase (symbol);
+  virtual const Adsorption& adsorption () const = 0;
   virtual double diffusion_coefficient () const = 0; // in free solute. 
 
   // Soil content.
@@ -134,7 +133,8 @@ public:
   static const AttributeList& NH4_solute_model ();
   static const AttributeList& NH4_sorbed_model ();
   static const VCheck& check_library ();
-  virtual bool check (size_t n, const Scope&, Treelog&) const = 0;
+  virtual bool check (const Geometry& geo, const Soil& soil, const SoilWater&,
+		      const Scope& scope, Treelog& msg) const = 0;
   virtual void initialize (const AttributeList&,
 			   const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,

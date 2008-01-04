@@ -29,7 +29,7 @@
 
 static const double c_fraction_in_humus = 0.587;
 
-class AdsorptionLinear : public Adsorption
+class AdsorptionLinearOld : public AdsorptionLinear
 {
   // Parameters.
   const double K_clay;
@@ -37,51 +37,55 @@ class AdsorptionLinear : public Adsorption
 
   // Simulation.
 public:
+  double K (const Soil& soil, size_t c) const
+  { 
+    return soil.clay (c) * K_clay 
+      + soil.humus (c) * c_fraction_in_humus * K_OC;
+  }
+
   double C_to_M (const Soil& soil, double Theta, int i, double C) const
-    {
-      const double K = soil.clay (i) * K_clay
-	+ soil.humus (i) * c_fraction_in_humus * K_OC;
-      const double rho = soil.dry_bulk_density (i);
-      return C * (K * rho + Theta);
-    }
+  {
+    const double K = this->K (soil, i);
+    const double rho = soil.dry_bulk_density (i);
+    return C * (K * rho + Theta);
+  }
   double M_to_C (const Soil& soil, double Theta, int i, double M) const
-    {
-      const double K = soil.clay (i) * K_clay 
-	+ soil.humus (i) * c_fraction_in_humus * K_OC;
-      const double rho = soil.dry_bulk_density (i);
-      return M / (Theta + K * rho);
-    }
+  {
+    const double K = this->K (soil, i);
+    const double rho = soil.dry_bulk_density (i);
+    return M / (Theta + K * rho);
+  }
   // Create.
 public:
-  AdsorptionLinear (Block& al)
-    : Adsorption (al),
+  AdsorptionLinearOld (Block& al)
+    : AdsorptionLinear (al),
       K_clay (al.number ("K_clay", 0.0)),
       K_OC (al.check ("K_OC") ? al.number ("K_OC") : al.number ("K_clay"))
-    { }
+  { }
 };
 
-static struct AdsorptionLinearSyntax
+static struct AdsorptionLinearOldSyntax
 {
   static Model& make (Block& al)
   {
-    return *new AdsorptionLinear (al);
+    return *new AdsorptionLinearOld (al);
   }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
-    {
-      bool ok = true;
+  {
+    bool ok = true;
 
-      const bool has_K_clay = al.check ("K_clay");
-      const bool has_K_OC = al.check ("K_OC");
+    const bool has_K_clay = al.check ("K_clay");
+    const bool has_K_OC = al.check ("K_OC");
       
-      if (!has_K_clay && !has_K_OC)
-	{
-	  err.entry ("You must specify either 'K_clay' or 'K_OC'");
-	  ok = false;
-	}
-      return ok;
-    }
-  AdsorptionLinearSyntax ()
+    if (!has_K_clay && !has_K_OC)
+      {
+	err.entry ("You must specify either 'K_clay' or 'K_OC'");
+	ok = false;
+      }
+    return ok;
+  }
+  AdsorptionLinearOldSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     syntax.add_check (check_alist);
@@ -100,4 +104,4 @@ carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.");
 
     Librarian::add_type (Adsorption::component, "linear", alist, syntax, &make);
   }
-} AdsorptionLinear_syntax;
+} AdsorptionLinearOld_syntax;

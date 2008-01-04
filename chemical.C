@@ -59,23 +59,6 @@ Chemical::spray_unit ()
   return unit;
 }
 
-Chemical::phase_t 
-Chemical::get_phase (symbol name)
-{
-  static struct phase_map_t : public std::map<symbol, phase_t>
-  {
-    phase_map_t ()
-    {
-      (*this)[symbol ("solid")] = solid;
-      (*this)[symbol ("solute")] = solute;
-    }
-  } phase_map;
-
-  const phase_map_t::const_iterator i = phase_map.find (name);
-  daisy_assert (i != phase_map.end ());
-  return (*i).second;
-}
-
 const VCheck& 
 Chemical::check_library ()
 {
