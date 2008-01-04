@@ -6,7 +6,6 @@
 // Daisy is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation; either version 2.1 of the License, or
-// (at your option) any later version.
 // 
 // Daisy is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,7 +16,7 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-//#if 1  //mmo udkomenteret
+
 
 #define BUILD_DLL
 #include "msoltranrect.h"
@@ -138,17 +137,10 @@ struct MsoltranrectMollerup : public Msoltranrect
                              ublas::vector<double>& B_vec,
                              ublas::vector<double>& B_dir_vec);
                              
-  static double Dirichlet_timestep_new  
-  /**/                      (const GeometryRect& geo,
-                             const ublas::vector<double>& ThetaD_xx_zz,
-                             const double dt);
-  
   static double Dirichlet_timestep (const GeometryRect& geo,
-                                    const double C_border,
                                     const ublas::vector<double>& ThetaD_xx_zz,
-                                    const ublas::vector<double>& C,
                                     const double dt);
-  
+
   static void upperboundary (const GeometryRect& geo,
                              std::vector<edge_type_t>& edge_type,
                              const std::vector<double>& J,
@@ -164,8 +156,6 @@ struct MsoltranrectMollerup : public Msoltranrect
                       const double C_below,
                       const ublas::vector<double>& B_dir_vec,
                       ublas::vector<double>& dJ); 
-
-
 
   // Solute.
   void flow (const GeometryRect& geo, 
@@ -739,71 +729,13 @@ MsoltranrectMollerup::lowerboundary
         }
     }
 }
- 
-#if 0
-void 
-MsoltranrectMollerup::lowerboundary 
-/**/ (const GeometryRect& geo,
-      const bool isflux,
-      const double C_border,
-      const ublas::vector<double>& q_edge,
-      const ublas::vector<double>& ThetaD_xx_zz,
-      std::vector<edge_type_t>& edge_type,      
-      ublas::banded_matrix<double>& B_mat,
-      ublas::vector<double>& B_vec,
-      ublas::banded_matrix<double>& diffm_xx_zz_mat, 
-      ublas::vector<double>& diffm_xx_zz_vec,
-      ublas::banded_matrix<double>& advecm_mat,
-      ublas::vector<double>& advecm_vec)
-{
-  const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
-  const size_t edge_below_size = edge_below.size ();
-
-  for (size_t i = 0; i < edge_below_size; i++)
-    {
-      const int edge = edge_below[i];
-      const int cell = geo.edge_other (edge, Geometry::cell_below);
-      const double in_sign 
-        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
-      daisy_assert (in_sign > 0);
-      const double area = geo.edge_area (edge);
-      const double area_per_length = geo.edge_area_per_length (edge);
-      
-      if (isflux)               // Flux BC
-        {
-          const bool influx = in_sign * q_edge (edge) > 0;
-          if (influx)
-            {
-              edge_type[edge] = Neumann_explicit_lower;
-              const double J_in = C_border * q_edge (edge); 
-              Neumann_expl (cell, area, in_sign, J_in, B_vec);
-            }
-          else
-            {
-              edge_type[edge] = Neumann_implicit;
-              Neumann_impl (cell, area, in_sign, q_edge (edge), B_mat);
-            }
-            
-        }
-      else                      // C_Border. BC
-        {
-          edge_type[edge] = Dirichlet;
-          // write something
-	  Dirichlet_xx_zz (cell, area, area_per_length, in_sign, 
-                           ThetaD_xx_zz (cell), C_border, 
-                           q_edge (edge), diffm_xx_zz_mat, 
-                           diffm_xx_zz_vec, advecm_mat, advecm_vec);  
-        }
-    }
-}
-#endif 
 
 
 double 
-MsoltranrectMollerup::Dirichlet_timestep_new 
-/**/ (const GeometryRect& geo,
-      const ublas::vector<double>& ThetaD_xx_zz,
-      const double dt)
+MsoltranrectMollerup::Dirichlet_timestep 
+/**/                    (const GeometryRect& geo,
+                         const ublas::vector<double>& ThetaD_xx_zz,
+                         const double dt)
 {
   double ddt_dir = dt; 
   double ddt_dir_new = dt;
@@ -844,66 +776,6 @@ MsoltranrectMollerup::Dirichlet_timestep_new
     }
   return ddt_dir;
 }
-
-  
-double 
-MsoltranrectMollerup::Dirichlet_timestep
-/**/ (const GeometryRect& geo,
-      const double C_border,
-      const ublas::vector<double>& ThetaD_xx_zz,
-      const ublas::vector<double>& C,
-      const double dt)
-{
-  double ddt_dir = dt; 
-  
-  //std::cout << "yes sir!! \n";  
-
-  const std::vector<int>& edge_below
-    = geo.cell_edges (Geometry::cell_below);
-  const size_t edge_below_size = edge_below.size ();
-    
-  for (size_t i = 0; i < edge_below_size; i++)
-    {
-      // For diffusion into the cell, only half of the volume of the 
-      // conc difference between border and cell can be transported by 
-      // diffusion over the boundary into the cell in a timestep. 
-      //  
-      // For diffusion out from the cell, only half of the volume of the
-      // conc difference between cell and border can be transported by 
-      // diffusion over the boundary out from the cell in a timestep. 
-          
-      // The code is actally independent concs
-
-
-      const int edge = edge_below[i];
-      const int cell = geo.edge_other (edge, Geometry::cell_below);
-      const double C_cell = C (cell);
-      const double area_per_length = geo.edge_area_per_length (edge);
-      const double V_cell = geo.cell_volume (cell);
-      const double gradient =  area_per_length * (C_border - C_cell);
-      const double Q_diff_out = -ThetaD_xx_zz (edge) * gradient;
-
-      //std::cout << "dt " << dt << '\n';
-      //std::cout << "V_cell " << V_cell << '\n';
-      //std::cout << "gradient " << gradient << '\n';
-      //std::cout << "Q_diff_out " << Q_diff_out << '\n'; 
-          
-      double ddt_dir_new = dt;
-
-      if (Q_diff_out > 0)       //Diff out of cell
-        ddt_dir_new = 0.5 * V_cell *  (C_cell-C_border) / Q_diff_out; 
-      else if  (Q_diff_out < 0) //Diff into cell
-        ddt_dir_new = -0.5 * V_cell * (C_border-C_cell) / Q_diff_out; 
-          
-      // std::cout << "ddt_dir_new " << ddt_dir_new << '\n';
-          
-      if (ddt_dir_new < ddt_dir)
-        ddt_dir = ddt_dir_new;
-    }
-
-  return ddt_dir;
-}
-
 
 
 
@@ -1248,7 +1120,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
         
         if (!flux_below && enable_boundary_diffusion)
           {
-            double ddt_dir  = Dirichlet_timestep_new (geo, ThetaD_xx_zz_avg, ddt_max);
+            double ddt_dir  = Dirichlet_timestep (geo, ThetaD_xx_zz_avg, ddt_max);
             tmp_mmo << "ddt_dir: " << ddt_dir << '\n';
             
             if (ddt_dir < ddt_max)
@@ -1379,11 +1251,6 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
 
 
   upperboundary (geo, edge_type, J, B_vec, msg);
-
-
-  //lowerboundary (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg, 
-  //               edge_type, B_mat, B_vec, diffm_xx_zz_mat, 
-  //               diffm_xx_zz_vec, advecm_mat, advecm_vec);       
   
 
   // Solver parameter , gamma
