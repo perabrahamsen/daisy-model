@@ -992,18 +992,22 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
 
   // Adsorption.
   ublas::vector<double> K_ads_cell (cell_size);
+  ublas::vector<double> M_total (cell_size) = M;
   const AdsorptionLinear *const ads_lin 
     = dynamic_cast<const AdsorptionLinear*> (&adsorption);
   if (ads_lin)
     {
       for (size_t c = 0; c < cell_size; c++)
-	K_ads_cell[c] = ads_lin->K (soil, c);
+	{
+	  K_ads_cell[c] = ads_lin->K (soil, c);
+	}
     }
   else
-    // No linear adsorption.
-    K_ads_cell = ublas::zero_vector<double> (cell_size);
-
-  const Adsorption& ads_use = ads_lin ? Adsorption::none () : adsorption;
+    {
+      // No linear adsorption.
+      K_ads_cell = ublas::zero_vector<double> (cell_size);
+      M_total = M;
+    }
  
   // Solution old
   ublas::vector<double> C_old (cell_size);
@@ -1316,7 +1320,10 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
       
       for (int c = 0; c < cell_size; c++)
         QTheta_mat_np1 (c, c) = geo.cell_volume (c) * Theta_cell_np1 (c);
-      
+
+      // Non-linear adsorption, store old adsorbed matter.
+      if (!ads_lin)
+	ads_total = M_total - C_n * Theta_cell_n;
       
       lowerboundary (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg,
                      C_n, enable_boundary_diffusion, edge_type, B_mat,
@@ -1364,7 +1371,6 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
       // C_n = C_np1
       C_n = b; // new solution :-)
       
-            
       //Update fluxes 
       ublas::vector<double> dJ = ublas::zero_vector<double> (edge_size);
       fluxes (geo, edge_type, q_edge, ThetaD_xx_zz_avg, ThetaD_xz_zx_avg,
@@ -1377,10 +1383,16 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
       Theta_cell_n = Theta_cell_np1;
       QTheta_mat_n = QTheta_mat_np1;
       
-      //debug Print new solution
-      std::ostringstream tmp;
-      //tmp_mmo << "C_n" << C_n;
-      //msg.message (tmp.str ());
+      // Non-linear adsorption, calculate new total matter and new conc.
+      if (!ads_lin)
+	{
+	  // We assume the adsorbed matter stayed during transport.
+	  M_total = ads_total + C_n * Theta_cell_np1;
+	  // We assume new equilibrium right after transport.
+	  for (size_t c = 0; c < cell_size; c++)
+	    C_n[c] = adsorption.M_to_C (soil, Theta_cell_np1[c], c, M_total[c]);
+	}
+
     } //End small timestep loop
   
   //ublas::vector<double> S_ublas (S.size ());
