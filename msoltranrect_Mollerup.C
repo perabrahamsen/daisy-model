@@ -992,22 +992,26 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
 
   // Adsorption.
   ublas::vector<double> K_ads_cell (cell_size);
-  ublas::vector<double> M_total (cell_size) = M;
+  ublas::vector<double> ads_total (cell_size);
+#ifdef ENABLE_LINEAR_ADSORPTION
   const AdsorptionLinear *const ads_lin 
     = dynamic_cast<const AdsorptionLinear*> (&adsorption);
+#else
+  const AdsorptionLinear *const ads_lin = NULL;
+#endif
   if (ads_lin)
     {
       for (size_t c = 0; c < cell_size; c++)
-	{
-	  K_ads_cell[c] = ads_lin->K (soil, c);
-	}
+	K_ads_cell[c] = ads_lin->K (soil, c);
     }
   else
-    {
-      // No linear adsorption.
-      K_ads_cell = ublas::zero_vector<double> (cell_size);
-      M_total = M;
-    }
+    // No linear adsorption.
+    K_ads_cell = ublas::zero_vector<double> (cell_size);
+
+  // ublas mass
+  ublas::vector<double> M_total (cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    M_total[c] = M[c];
  
   // Solution old
   ublas::vector<double> C_old (cell_size);
@@ -1323,7 +1327,8 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
 
       // Non-linear adsorption, store old adsorbed matter.
       if (!ads_lin)
-	ads_total = M_total - C_n * Theta_cell_n;
+	for (int c = 0; c < cell_size; c++)
+	  ads_total[c] = M_total[c] - C_n[c] * Theta_cell_n[c];
       
       lowerboundary (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg,
                      C_n, enable_boundary_diffusion, edge_type, B_mat,
@@ -1386,11 +1391,14 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
       // Non-linear adsorption, calculate new total matter and new conc.
       if (!ads_lin)
 	{
-	  // We assume the adsorbed matter stayed during transport.
-	  M_total = ads_total + C_n * Theta_cell_np1;
-	  // We assume new equilibrium right after transport.
 	  for (size_t c = 0; c < cell_size; c++)
-	    C_n[c] = adsorption.M_to_C (soil, Theta_cell_np1[c], c, M_total[c]);
+	    {
+	      // We assume the adsorbed matter stayed during transport.
+	      M_total[c] = ads_total[c] + C_n[c] * Theta_cell_np1[c];
+	      // We assume new equilibrium right after transport.
+	      C_n[c] = adsorption.M_to_C (soil, Theta_cell_np1[c],
+					  c, M_total[c]);
+	    }
 	}
 
     } //End small timestep loop
@@ -1410,7 +1418,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   for (size_t c=0; c < cell_size; c++)
     {
       C[c] = C_n (c); 
-      M[c] = Theta_cell (c) * C[c];
+      M[c] = adsorption.C_to_M (soil, Theta_cell (c), c, C[c]);
       daisy_assert (C[c] >= 0.0);
       daisy_assert (M[c] >= 0.0);
     }
