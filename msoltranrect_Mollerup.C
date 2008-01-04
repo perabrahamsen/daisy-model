@@ -24,6 +24,7 @@
 #include "geometry_rect.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "adsorption.h"
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -1116,6 +1117,21 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
 {
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
+
+  // Adsorption.
+  ublas::vector<double> K_ads_cell (cell_size);
+  const AdsorptionLinear *const ads_lin 
+    = dynamic_cast<const AdsorptionLinear*> (&adsorption);
+  if (ads_lin)
+    {
+      for (size_t c = 0; c < cell_size; c++)
+	K_ads_cell[c] = ads_lin->K (soil, c);
+    }
+  else
+    // No linear adsorption.
+    K_ads_cell = ublas::zero_vector<double> (cell_size);
+
+  const Adsorption& ads_use = ads_lin ? Adsorption::none () : adsorption;
  
   // Solution old
   ublas::vector<double> C_old (cell_size);
