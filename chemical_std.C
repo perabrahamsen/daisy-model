@@ -876,25 +876,19 @@ static struct ChemicalStandardSyntax
   static void load_nutrient (Syntax& syntax, AttributeList& alist);
   static void initial_C (const double value, AttributeList& alist);
   static void load_NO3 (Syntax& syntax, AttributeList& alist);
-  static void load_NH4_common (Syntax& syntax, AttributeList& alist);
-  static void load_NH4_solute (Syntax& syntax, AttributeList& alist);
-  static void load_NH4_sorbed (Syntax& syntax, AttributeList& alist);
+  static void load_NH4 (Syntax& syntax, AttributeList& alist);
 
   static void build_default ();
   static void build_nutrient ();
   static void build_NO3 ();
-  static void build_NH4_common ();
-  static void build_NH4_solute ();
-  static void build_NH4_sorbed ();
+  static void build_NH4 ();
 
   ChemicalStandardSyntax ()
   {
     build_default ();
     build_nutrient ();
     build_NO3 ();
-    build_NH4_common ();
-    build_NH4_solute ();
-    build_NH4_sorbed ();
+    build_NH4 ();
   }
 } ChemicalStandard_syntax;
 
@@ -1176,28 +1170,16 @@ ChemicalStandardSyntax::load_NO3 (Syntax& syntax, AttributeList& alist)
 }
 
 void
-ChemicalStandardSyntax::load_NH4_common (Syntax& syntax, AttributeList& alist)
+ChemicalStandardSyntax::load_NH4 (Syntax& syntax, AttributeList& alist)
 { 
   load_nutrient (syntax, alist);
   alist.add ("description", "Ammonium-N.");
-}
-
-void
-ChemicalStandardSyntax::load_NH4_solute (Syntax& syntax, AttributeList& alist)
-{ 
-  load_NH4_common (syntax, alist);
-  alist.add ("description", "Ammonium-N in solute form.");
+  AttributeList linear;
+  linear.add ("type", "linear");
+  linear.add ("K_clay", 117.116);
+  linear.add ("K_OC", 117.116);
+  alist.add ("adsorption", linear);
   alist.add ("diffusion_coefficient", 1.8e-5);
-  // We initialize all NH4 as sorbed.
-}
-
-void
-ChemicalStandardSyntax::load_NH4_sorbed (Syntax& syntax, AttributeList& alist)
-{ 
-  load_NH4_common (syntax, alist);
-  alist.add ("description", "Ammonium-N in sorbed form.");
-  alist.add ("adsorption", Adsorption::full_model ());
-  alist.add ("diffusion_coefficient", 1.0); // Meaningless.
   // We initialize to approximatey 5% of the N corresponding to the
   // allowed content of NO3 in drinking water.
   // [ 0.05 * 100 mg/l = 0.5e-6 g/cm^3 ]
@@ -1234,33 +1216,13 @@ ChemicalStandardSyntax::build_NO3 ()
 }
 
 void
-ChemicalStandardSyntax::build_NH4_common ()
+ChemicalStandardSyntax::build_NH4 ()
 {
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  ChemicalStandardSyntax::load_NH4_common (syntax, alist);
+  ChemicalStandardSyntax::load_NH4 (syntax, alist);
   alist.add ("type", "nutrient");
-  Librarian::add_type (Chemical::component, "NH4_common", alist, syntax, &make);
-}
-
-void
-ChemicalStandardSyntax::build_NH4_solute ()
-{
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  ChemicalStandardSyntax::load_NH4_solute (syntax, alist);
-  alist.add ("type", "NH4_common");
   Librarian::add_type (Chemical::component, "NH4", alist, syntax, &make);
-}
-
-void
-ChemicalStandardSyntax::build_NH4_sorbed ()
-{
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  ChemicalStandardSyntax::load_NH4_sorbed (syntax, alist);
-  alist.add ("type", "NH4_common");
-  Librarian::add_type (Chemical::component, "NH4_sorbed", alist, syntax, &make);
 }
 
 const AttributeList& 
@@ -1278,29 +1240,15 @@ Chemical::NO3_model ()
 }
 
 const AttributeList& 
-Chemical::NH4_solute_model ()
+Chemical::NH4_model ()
 {
   static AttributeList alist;
   
   if (!alist.check ("type"))
     {
       Syntax dummy;
-      ChemicalStandardSyntax::load_NH4_solute (dummy, alist);
+      ChemicalStandardSyntax::load_NH4 (dummy, alist);
       alist.add ("type", "NH4");
-    }
-  return alist;
-}
-
-const AttributeList& 
-Chemical::NH4_sorbed_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      ChemicalStandardSyntax::load_NH4_sorbed (dummy, alist);
-      alist.add ("type", "NH4_sorbed");
     }
   return alist;
 }

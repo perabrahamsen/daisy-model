@@ -1618,8 +1618,7 @@ CropSold::NitrogenUptake (const int Hour,
 
   double PotNUpt = (CrpAux.PtNCnt - NCrop) / ((Hour == 0) ? 1 : (25 - Hour));
 
-  if (!chemistry.know (Chemical::NH4_solute ())
-      || !chemistry.know (Chemical::NO3 ()))
+  if (!chemistry.know (Chemical::NH4 ()) || !chemistry.know (Chemical::NO3 ()))
     {
       // We don't trace inorganic nitrogen, assume we have plenty.
       CrpAux.NH4Upt = PotNUpt;
@@ -1629,7 +1628,7 @@ CropSold::NitrogenUptake (const int Hour,
       return;
     }
     
-  Chemical& soil_NH4 = chemistry.find (Chemical::NH4_solute ());
+  Chemical& soil_NH4 = chemistry.find (Chemical::NH4 ());
   Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
 
   if (PotNUpt > 0)

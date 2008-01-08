@@ -786,7 +786,7 @@ IM
 AM::get_IM (const AttributeList& al)
 {
   IM result (IM::storage_unit ());
-  result.set_value (Chemical::NH4_solute (), IM::storage_unit (), get_NH4 (al));
+  result.set_value (Chemical::NH4 (), IM::storage_unit (), get_NH4 (al));
   result.set_value (Chemical::NO3 (), IM::storage_unit (), get_NO3 (al));
   return result;
 }

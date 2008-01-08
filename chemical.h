@@ -50,8 +50,7 @@ public:
   // Some standard chemicals.
 public:
   static const symbol NO3 ();
-  static const symbol NH4_solute ();
-  static const symbol NH4_sorbed ();
+  static const symbol NH4 ();
 
   // And standard units.
 public:
@@ -130,8 +129,7 @@ public:
   // Create and Destroy.
 public:
   static const AttributeList& NO3_model ();
-  static const AttributeList& NH4_solute_model ();
-  static const AttributeList& NH4_sorbed_model ();
+  static const AttributeList& NH4_model ();
   static const VCheck& check_library ();
   virtual bool check (const Geometry& geo, const Soil& soil, const SoilWater&,
 		      const Scope& scope, Treelog& msg) const = 0;

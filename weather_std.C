@@ -982,7 +982,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
-	      WetDeposit.set_value (Chemical::NH4_solute (),
+	      WetDeposit.set_value (Chemical::NH4 (),
 				    Units::ppm (), val);
 	    }
 	  else if (key == "NH4DryDep")
@@ -993,7 +993,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
-	      DryDeposit.set_value (Chemical::NH4_solute (),
+	      DryDeposit.set_value (Chemical::NH4 (),
 				    Weather::dry_deposit_unit, val);
 	    }
 	  else if (key == "NO3WetDep")
@@ -1162,11 +1162,11 @@ but not both");
       const double dry = deposition.total * deposition.dry;
       const double wet = deposition.total * (1.0 - deposition.dry);
       daisy_assert (approximate (dry + wet, deposition.total));
-      DryDeposit.set_value (Chemical::NH4_solute (), Weather::dry_deposit_unit,
+      DryDeposit.set_value (Chemical::NH4 (), Weather::dry_deposit_unit,
 			    dry * deposition.dry_NH4);
       DryDeposit.set_value (Chemical::NO3 (), Weather::dry_deposit_unit,
 			    dry * (1.0 - deposition.dry_NH4));
-      WetDeposit.set_value (Chemical::NH4_solute (), Units::ppm (),
+      WetDeposit.set_value (Chemical::NH4 (), Units::ppm (),
 			    wet * 100.0 * deposition.wet_NH4 
 			    / deposition.precipitation);
       WetDeposit.set_value (Chemical::NO3 (), Units::ppm (),
@@ -1174,10 +1174,10 @@ but not both");
 			    / deposition.precipitation);
       std::ostringstream tmp;
       tmp << "NH4WetDep: " 
-	  << WetDeposit.get_value (Chemical::NH4_solute (),
+	  << WetDeposit.get_value (Chemical::NH4 (),
 				   Units::ppm ()) << " ppm\n\
 NH4DryDep: " 
-	  << DryDeposit.get_value (Chemical::NH4_solute (), 
+	  << DryDeposit.get_value (Chemical::NH4 (), 
 				   Weather::dry_deposit_unit) 
 	  << " kgN/ha/year\n\
 NO3WetDep: " << WetDeposit.get_value (Chemical::NO3 (), Units::ppm ()) 

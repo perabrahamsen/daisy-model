@@ -24,6 +24,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "adsorption.h"
+#include "solver.h"
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -35,12 +36,9 @@
 #define NDEBUG
 //#define BOOST_UBLAS_NDEBUG
 
-#include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/banded.hpp>
-#include <boost/numeric/ublas/lu.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
 namespace ublas = boost::numeric::ublas;
@@ -48,11 +46,14 @@ namespace ublas = boost::numeric::ublas;
 
 struct MsoltranrectMollerup : public Msoltranrect
 {
-  const bool enable_boundary_diffusion;
-
   // Keep track of edge types in small time steps.
   enum edge_type_t { Unhandled, Internal, Neumann_explicit_upper,
                      Neumann_explicit_lower, Neumann_implicit, Dirichlet };
+
+  // Parameters.
+  const std::auto_ptr<Solver> solver;
+  const bool enable_boundary_diffusion;
+
  
   // Water flux.
   static void cell_based_flux (const GeometryRect& geo,  
@@ -96,15 +97,15 @@ struct MsoltranrectMollerup : public Msoltranrect
   
   static void diffusion_xx_zz (const GeometryRect& geo,
                                const ublas::vector<double>& ThetaD_xx_zz,
-                               ublas::matrix<double>& diff_xx_zz);
+                               Solver::Matrix& diff_xx_zz);
   
   static void diffusion_xz_zx (const GeometryRect& geo,
                                const ublas::vector<double>& ThetaD_xz_zx,      
-                               ublas::matrix<double>& diff_xz_zx);
+                               Solver::Matrix& diff_xz_zx);
 
   static void advection (const GeometryRect& geo,
 			 const ublas::vector<double>& q_edge,
-			 ublas::matrix<double>& advec);
+			 Solver::Matrix& advec);
   
   static void Neumann_expl (const size_t cell, const double area, 
                             const double in_sign, const double J, 
@@ -380,7 +381,7 @@ MsoltranrectMollerup::thetadiff_xx_zz_xz_zx
 void 
 MsoltranrectMollerup::diffusion_xx_zz (const GeometryRect& geo,
                                        const ublas::vector<double>& ThetaD_xx_zz,
-                                       ublas::matrix<double>& diff_xx_zz)
+                                       Solver::Matrix& diff_xx_zz)
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
   
@@ -404,7 +405,7 @@ MsoltranrectMollerup::diffusion_xx_zz (const GeometryRect& geo,
 void 
 MsoltranrectMollerup::diffusion_xz_zx (const GeometryRect& geo,
                                        const ublas::vector<double>& ThetaD_xz_zx,
-                                       ublas::matrix<double>& diff_xz_zx)
+                                       Solver::Matrix& diff_xz_zx)
 {
 
   const size_t edge_size = geo.edge_size (); // number of edges  
@@ -478,7 +479,7 @@ MsoltranrectMollerup::diffusion_xz_zx (const GeometryRect& geo,
 void 
 MsoltranrectMollerup::advection (const GeometryRect& geo,
 				 const ublas::vector<double>& q_edge,
-				 ublas::matrix<double>& advec)  
+				 Solver::Matrix& advec)  
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
 
@@ -1189,21 +1190,17 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   //--------------------------------------
 
   //Initialize xx_zz diffusion matrix - old and new
-  //ublas::matrix<double> diff_xx_zz_old                       //mmo 20071102
-  //  = ublas::zero_matrix<double> (cell_size, cell_size);     //mmo 20071102
+  //Solver::Matrix diff_xx_zz_old (cell_size);     //mmo 20071102
   //diffusion_xx_zz (geo, ThetaD_xx_zz_old, diff_xx_zz_old);   //mmo 20071102	   
-  //ublas::matrix<double> diff_xx_zz                           //mmo 20071102
-  //  = ublas::zero_matrix<double> (cell_size, cell_size);     //mmo 20071102
+  //Solver::Matrix diff_xx_zz (cell_size);     //mmo 20071102
   //diffusion_xx_zz (geo, ThetaD_xx_zz, diff_xx_zz);           //mmo 20071102 
 
   //Initialize xx_zz diffusion - average
-  ublas::matrix<double> diff_xx_zz_avg 
-    = ublas::zero_matrix<double> (cell_size, cell_size);
+  Solver::Matrix diff_xx_zz_avg (cell_size);
   diffusion_xx_zz (geo, ThetaD_xx_zz_avg, diff_xx_zz_avg);    
 
   //Initialize xz_zx diffusion matrix -average 
-  ublas::matrix<double> diff_xz_zx_avg  
-    = ublas::zero_matrix<double> (cell_size, cell_size);
+  Solver::Matrix diff_xz_zx_avg (cell_size);
   diffusion_xz_zx (geo, ThetaD_xz_zx_avg, diff_xz_zx_avg); 
   
   //tmp_mmo << "diff_xx_zz_avg" << diff_xx_zz_avg << '\n';
@@ -1214,8 +1211,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   //--- Things that not changes in smal timesteps --- 
  
   //Advection
-  ublas::matrix<double> advec  
-    = ublas::zero_matrix<double> (cell_size, cell_size);
+  Solver::Matrix advec (cell_size);
   advection (geo, q_edge, advec);  
   
   //Sink term
@@ -1271,11 +1267,11 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
      
 
   //Initialize A-matrix (left hand side)
-  ublas::matrix<double> A (cell_size, cell_size);  
+  Solver::Matrix A (cell_size);  
   
   //Initialize b-vector (right hand side)
   ublas::vector<double> b (cell_size);   
-  ublas::matrix<double> b_mat (cell_size, cell_size);  
+  Solver::Matrix b_mat (cell_size);  
 
   //-------------------------------------------
   //--- End, For moving in/out of tick loop ---
@@ -1367,14 +1363,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
           // b = ;     	
         }
       
-      // Solve Ax=b (maybe)
-      ublas::permutation_matrix<double> piv (cell_size);
-      const bool singular = ublas::lu_factorize(A, piv);
-      daisy_assert (!singular);
-      ublas::lu_substitute (A, piv, b); // b now contains solution 
-      
-      // C_n = C_np1
-      C_n = b; // new solution :-)
+      solver->solve (A, b, C_n); // Solve A C_n = b with regard to C_n.
       
       //Update fluxes 
       ublas::vector<double> dJ = ublas::zero_vector<double> (edge_size);
@@ -1434,6 +1423,7 @@ MsoltranrectMollerup::output (Log&) const
 
 MsoltranrectMollerup::MsoltranrectMollerup (Block& al)
   : Msoltranrect (al),
+    solver (Librarian::build_item<Solver> (al, "solver")),
     enable_boundary_diffusion (al.flag ("enable_boundary_diffusion"))
 { }
 
@@ -1443,6 +1433,10 @@ MsoltranrectMollerup::~MsoltranrectMollerup ()
 void 
 MsoltranrectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  syntax.add_object ("solver", Solver::component, 
+		     Syntax::Const, Syntax::Singleton, "\
+Model used for solving matrix equation system.");
+  alist.add ("solver", Solver::default_model ());
   syntax.add ("enable_boundary_diffusion", Syntax::Boolean, Syntax::Const, "\
 If this is set, diffusion over boundaries is enabled."); 
   alist.add ("enable_boundary_diffusion", true);

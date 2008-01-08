@@ -180,8 +180,8 @@ struct ActionExternFertigation : public Action
 	static const symbol mg_per_square_m ("mg/m^2");
 	static const symbol kg_per_ha ("kg/ha");
 	IM im (mg_per_square_m);
-	im.set_value (Chemical::NH4_solute (), kg_per_ha, NH4_value * dt);
-	im.set_value (Chemical::NO3 (),        kg_per_ha, NO3_value * dt);
+	im.set_value (Chemical::NH4 (), kg_per_ha, NH4_value * dt);
+	im.set_value (Chemical::NO3 (), kg_per_ha, NO3_value * dt);
 	im *= Scalar (total_flux * dt, Units::per_mm ());
 
 	if (surface_value > 0)

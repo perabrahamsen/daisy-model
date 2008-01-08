@@ -75,14 +75,12 @@ ReactionNitrification::tick (const Geometry& geo,
   const size_t cell_size = geo.cell_size ();
   const std::vector<bool> active = organic_matter.active (); 
   Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
-  Chemical& soil_NH4_solute = chemistry.find (Chemical::NH4_solute ());
-  Chemical& soil_NH4_sorbed = chemistry.find (Chemical::NH4_sorbed ());
+  Chemical& soil_NH4 = chemistry.find (Chemical::NH4 ());
 
   for (size_t i = 0; i < cell_size; i++)
     {
       daisy_assert (soil_NO3.M_left (i, dt) >= 0.0);
-      daisy_assert (soil_NH4_sorbed.M_left (i, dt) >= 0.0);
-      daisy_assert (soil_NH4_solute.M_left (i, dt) >= 0.0);
+      daisy_assert (soil_NH4.M_left (i, dt) >= 0.0);
     }
 
   daisy_assert (NH4.size () == cell_size);
@@ -93,48 +91,23 @@ ReactionNitrification::tick (const Geometry& geo,
     {
       if (active[i])
         soil.nitrification (i, 
-                            soil_NH4_sorbed.M (i) + soil_NH4_solute.M (i), 
-			    soil_NH4_solute.C (i), 
-                            soil_NH4_sorbed.M_left (i, dt)
-			    + soil_NH4_solute.M_left (i, dt),
+                            soil_NH4.M (i), 
+			    soil_NH4.C (i), 
+                            soil_NH4.M_left (i, dt),
                             soil_water.h (i), soil_heat.T (i),
                             NH4[i], N2O[i], NO3[i], dt);
       else
         NH4[i] = N2O[i] = NO3[i] = 0.0;        
     }
 
-  daisy_assert (NH4.size () == cell_size);
-  std::vector<double> NH4_solute (cell_size, 0.0);
-  std::vector<double> NH4_sorbed (cell_size, 0.0);
-  
-  for (size_t i = 0; i < cell_size; i++)
-    {
-      // We divide by content.  We really should take all from solute,
-      // if using the "solute" nitrification model, bt we don't have
-      // that informaiton here.
-      const double solute_left = soil_NH4_solute.M_left (i, dt);
-      const double sorbed_left = soil_NH4_sorbed.M_left (i, dt);
-      const double total_left = solute_left + sorbed_left;
-      const double solute_fraction = std::isnormal (total_left)
-	? solute_left / total_left
-	// Nothing?  Take from solute, and hope we get it!
-	: 1.0;
-      const double sorbed_fraction = 1.0 - solute_fraction;
-      daisy_assert (sorbed_fraction >= 0.0);
-      daisy_assert (sorbed_fraction <= 1.0);
-      NH4_solute[i] = NH4[i] * solute_fraction;
-      NH4_sorbed[i] = NH4[i] * sorbed_fraction;
-    }
-  
-  soil_NH4_solute.add_to_transform_sink (NH4_solute, dt);
-  soil_NH4_sorbed.add_to_transform_sink (NH4_sorbed, dt);
+
+  soil_NH4.add_to_transform_sink (NH4, dt);
   soil_NO3.add_to_transform_source (NO3, dt);
 
   for (size_t i = 0; i < cell_size; i++)
     {
       daisy_assert (soil_NO3.M_left (i, dt) >= 0.0);
-      daisy_assert (soil_NH4_solute.M_left (i, dt) >= 0.0);
-      daisy_assert (soil_NH4_sorbed.M_left (i, dt) >= 0.0);
+      daisy_assert (soil_NH4.M_left (i, dt) >= 0.0);
     }
 }
 
@@ -145,9 +118,7 @@ ReactionNitrification::check (const Soil&, const SoilWater&, const SoilHeat&,
   bool ok = true;
   if (!chemistry.require (Chemical::NO3 (), msg))
     ok = false;
-  if (!chemistry.require (Chemical::NH4_sorbed (), msg))
-    ok = false;
-  if (!chemistry.require (Chemical::NH4_solute (), msg))
+  if (!chemistry.require (Chemical::NH4 (), msg))
     ok = false;
 
   return ok;

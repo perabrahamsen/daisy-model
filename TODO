@@ -2,13 +2,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Genindfør "adsorption".
 
-** genindfør "A" omkring transport kode.
-
-** redefiner NH4 build-in
-
 ** omskriv chemistry.dai
 
 ** test
+
+** Ret NEWS
 
 * 2D gnuplot?
 

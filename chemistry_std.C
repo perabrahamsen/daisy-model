@@ -373,13 +373,11 @@ ChemistryStandardSyntax::load_N (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "Inorganic nitrogen.");
   std::vector<const AttributeList*> trace;
   trace.push_back (&Chemical::NO3_model ());
-  trace.push_back (&Chemical::NH4_solute_model ());
-  trace.push_back (&Chemical::NH4_sorbed_model ());
+  trace.push_back (&Chemical::NH4_model ());
   alist.add ("trace", trace);
   std::vector<const AttributeList*> reaction;
   reaction.push_back (&Reaction::nitrification_model ());
   reaction.push_back (&Reaction::denitrification_model ());
-  reaction.push_back (&Reaction::NH4_sorption_model ());
   alist.add ("reaction", reaction);
 }
 

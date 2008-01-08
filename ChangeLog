@@ -1,3 +1,7 @@
+2008-01-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* msoltranrect_Mollerup.C: Use 'solver.h'.
+
 2008-01-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Makefile (MODELS, REMOVE): Remove adsorption_none.C and

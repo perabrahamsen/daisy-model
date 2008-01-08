@@ -44,10 +44,6 @@
                      (path column "${column}" Chemistry "*" trace NH4 M)
                      (spec chemical default M)
                      (dimension "kg N/ha"))
-           (interval (tag "NH4")
-                     (path column "${column}" Chemistry "*" trace NH4_sorbed M)
-                     (spec chemical default M)
-                     (dimension "kg N/ha"))
            (interval (tag "NO3")
                      (path column "${column}" Chemistry "*" trace NO3 M)
                      (spec chemical default M)
@@ -166,13 +162,13 @@ This include only nitrogen atoms of the ammonium."
                   (spec chemical default C)
                   (dimension "mg/l"))))
 
-(deflog "Soil Sorbed NH4-N Content" column
+(deflog "Soil NH4-N Content" column
   "Total amount of ammonium nitrogen in all numeric soil layers.
 This include only nitrogen atoms of the ammonium."
   (where "soil_NH4-N_content.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (array (path column "${column}" Chemistry "*" trace NH4_sorbed M)
+           (array (path column "${column}" Chemistry "*" trace NH4 M)
                   (spec chemical default M))))
 
 (deflog "Soil Temperature" column
@@ -592,8 +588,7 @@ Note that a negative delta content means that the amount increases."
          ("NH4-Leak-Macro" (factor -1.0))
          ("NH4-Drain" (factor -1.0))
          ("N2O-Nit" (name "Loss during nitrification") (factor -1.0))
-         ("NH4-Solute-Total" (name "NH4-Soil") (factor -1.0))
-         ("NH4-Sorbed-Total" (name "NH4-Soil") (factor -1.0))
+         ("NH4-Total" (name "NH4-Soil") (factor -1.0))
          ("NH4-Tillage")
          ("NO3-Fertilizer-Surface")
          ("NO3-Incorp")
@@ -724,8 +719,7 @@ soil increases."
 	 ("NH4-Nit" (name "Nitrification") (factor -1.0))
 	 ("NH4-mineralization" (name "Mineralization"))
          ("NH4-Tillage" (name "Tillage"))
-	 ("NH4-Sorbed-Total" (name "Content") (factor -1.0))
-	 ("NH4-Solute-Total" (name "Content") (factor -1.0))))
+	 ("NH4-Total" (name "Content") (factor -1.0))))
 
 (deflog "N Balance" crop
   "Enough information to create a balance for the soil nitrogen."
@@ -846,11 +840,7 @@ soil increases."
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
            (interval (path column "${column}" Chemistry "*" trace NH4 M)
 		     (spec chemical default M)
-                     (tag "NH4-Solute-Total")
-                     (dimension "kg N/ha"))
-           (interval (path column "${column}" Chemistry "*" trace NH4_sorbed M)
-		     (spec chemical default M)
-                     (tag "NH4-Sorbed-Total")
+                     (tag "NH4-Total")
                      (dimension "kg N/ha"))
            (interval (path column "${column}"
 			   Chemistry "*" trace NH4 tillage)

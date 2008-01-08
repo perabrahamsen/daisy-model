@@ -855,7 +855,7 @@ OrganicStandard::check (const Soil& soil,
   
   if (!chemistry.require (Chemical::NO3 (), msg))
     ok = false;
-  if (!chemistry.require (Chemical::NH4_solute (), msg))
+  if (!chemistry.require (Chemical::NH4 (), msg))
     ok = false;
 
   for (size_t i = 0; i < am.size (); i++)
@@ -1069,7 +1069,7 @@ OrganicStandard::tick (const Geometry& geo,
                        Treelog& msg)
 {
   Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
-  Chemical& soil_NH4 = chemistry.find (Chemical::NH4_solute ());
+  Chemical& soil_NH4 = chemistry.find (Chemical::NH4 ());
 
   const double old_N = total_N (geo);
   const double old_C = total_C (geo);

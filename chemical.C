@@ -39,16 +39,9 @@ Chemical::NO3 ()
 }
 
 const symbol
-Chemical::NH4_solute ()
+Chemical::NH4 ()
 {
   static const symbol unit ("NH4");
-  return unit;
-}
-
-const symbol
-Chemical::NH4_sorbed ()
-{
-  static const symbol unit ("NH4_sorbed");
   return unit;
 }
 

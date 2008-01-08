@@ -331,11 +331,11 @@ RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
       fill (NH4Extraction.begin (), NH4Extraction.end (), 0.0);
       fill (NO3Extraction.begin (), NO3Extraction.end (), 0.0);
     }
-  else if (chemistry.know (Chemical::NH4_solute ()) 
+  else if (chemistry.know (Chemical::NH4 ()) 
 	   && chemistry.know (Chemical::NO3 ()))
     // Normlal uptake.
     {
-      Chemical& soil_NH4 = chemistry.find (Chemical::NH4_solute ());
+      Chemical& soil_NH4 = chemistry.find (Chemical::NH4 ());
       Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
 
       NH4Upt = solute_uptake (geo, soil, soil_water, soil_NH4, 

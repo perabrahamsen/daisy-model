@@ -186,7 +186,6 @@ By default, this is identical to 'adsorption_rate'.");
 		Syntax::LogOnly, Syntax::Sequence, "\
 Converted from solute to sorbed form this timestep (may be negative).");
   }
-  static void load_NH4 (Syntax& syntax, AttributeList& alist);
   static void build_adsoption ()
   {
     Syntax& syntax = *new Syntax ();
@@ -196,52 +195,8 @@ Converted from solute to sorbed form this timestep (may be negative).");
     Librarian::add_type (Reaction::component, "adsorption",
 			 alist, syntax, &make);
   }
-  static void build_NH4 ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    load_NH4 (syntax, alist);
-    alist.add ("type", "adsorption");
-
-    Librarian::add_type (Reaction::component, "NH4_sorption",
-			 alist, syntax, &make);
-  }
   ReactionAdsorptionSyntax ()
-  {
-    build_adsoption ();
-    build_NH4 ();
-  }
+  { build_adsoption (); }
 } ReactionAdsorption_syntax;
-
-void 
-ReactionAdsorptionSyntax::load_NH4 (Syntax& syntax, AttributeList& alist)
-{
-  load_syntax (syntax, alist);
-  alist.add ("solute", Chemical::NH4_solute ());
-  alist.add ("sorbed", Chemical::NH4_sorbed ());
-  AttributeList linear;
-  linear.add ("type", "linear");
-  linear.add ("K_clay", 117.116);
-  linear.add ("K_OC", 117.116);
-  alist.add ("equilibrium", linear);
-  AttributeList rate;
-  rate.add ("type", "const");
-  rate.add ("value", 1.0, "s^-1");
-  alist.add ("adsorption_rate", rate);
-}
-
-const AttributeList& 
-Reaction::NH4_sorption_model ()
-{ 
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      ReactionAdsorptionSyntax::load_NH4 (dummy, alist);
-      alist.add ("type", "NH4_sorption");
-    }
-  return alist;
-}
 
 // reaction_adsorption.C ends here.

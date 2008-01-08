@@ -248,7 +248,7 @@ ColumnStandard::fertilize (const AttributeList& al, const double dt,
 
   // Volatilization.
   const double lost_NH4 = AM::get_volatilization (al);
-  chemistry->dissipate (Chemical::NH4_solute (), lost_NH4, dt, msg);
+  chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
   fertilize (AM::get_IM (al), dt, msg);
@@ -272,7 +272,7 @@ ColumnStandard::fertilize (const AttributeList& al,
 
   // Volatilization.
   const double lost_NH4 = AM::get_volatilization (al);
-  chemistry->dissipate (Chemical::NH4_solute (), lost_NH4, dt, msg);
+  chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
   const IM im = AM::get_IM (al);
@@ -445,8 +445,8 @@ double				// [kg N/ha]
 ColumnStandard::soil_inorganic_nitrogen (double from, double to) const
 {
   double N = 0.0;
-  if (chemistry->know (Chemical::NH4_solute ()))
-    N += chemistry->find (Chemical::NH4_solute ())
+  if (chemistry->know (Chemical::NH4 ()))
+    N += chemistry->find (Chemical::NH4 ())
       /**/ .total_surface (geometry, from, to);
   if (chemistry->know (Chemical::NO3 ()))
     N += chemistry->find (Chemical::NO3 ())

@@ -86,15 +86,14 @@ struct ActionIrrigate : public Action
           tmp << "s";
 	static const symbol conc_flux_unit ("kg/ha/mm");
         const double N = (sm.get_value (Chemical::NO3 (), conc_flux_unit)
-			  + sm.get_value (Chemical::NH4_solute (), 
-					  conc_flux_unit))
+			  + sm.get_value (Chemical::NH4 (), conc_flux_unit))
 	  * flux * (days * 24 + hours);
         if (N > 1e-10)
           tmp << "; " << N << " kg N/ha";
 	for (IM::const_iterator i = sm.begin (); i != sm.end (); i++)
 	  {
 	    const symbol chem = *i;
-	    if (chem == Chemical::NO3 () || chem == Chemical::NH4_solute ())
+	    if (chem == Chemical::NO3 () || chem == Chemical::NH4 ())
 	      continue;
 	    const double value = sm.get_value (chem, conc_flux_unit)
 	      * flux * (days * 24 + hours) * 1000.0 /* [g/kg] */;

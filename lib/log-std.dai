@@ -267,8 +267,7 @@ The total amount of water in the soil interval")
           "NH4-Leak-Matrix" "NH4-Leak-Macro" "NO3-Leak-Matrix"
           "NO3-Leak-Macro" "NH4-Drain" "NO3-Drain" "NH4-Surface-Loss"
           "NO3-Surface-Loss" "Harvest_N")
-  (content "NH4-Surface"  "NO3-Surface" "NH4-Solute-Soil" "NH4-Sorbed-Soil"
-	   "NO3-Soil" 
+  (content "NH4-Surface"  "NO3-Surface" "NH4-Soil" "NO3-Soil" 
 	   "Org_N-Surface" "Org_N-Soil" "Crop" "Dead leaves"))
 
 (defsummary "Field NH4 balance" balance
@@ -280,7 +279,7 @@ The total amount of water in the soil interval")
   (output "NH4-Nitrification"
           "NH4-Leak-Matrix" "NH4-Leak-Macro" "NH4-Drain" "NH4-Surface-Loss"
           "NH4-Crop")
-  (content "NH4-Surface" "NH4-Solute-Soil" "NH4-Sorbed-Soil"))
+  (content "NH4-Surface" "NH4-Soil"))
 
 (defsummary "Field NO3 balance" balance
   "NO3 balance for the complete system."
@@ -405,12 +404,7 @@ The total amount of water in the soil interval")
            (interval (path column "${column}"
 			   Chemistry "*" trace NH4 M)
                      (spec chemical default M)
-                     (tag "NH4-Solute-Soil")
-                     (dimension "kg N/ha"))
-           (interval (path column "${column}"
-			   Chemistry "*" trace NH4_sorbed M)
-                     (spec chemical default M)
-                     (tag "NH4-Sorbed-Soil")
+                     (tag "NH4-Soil")
                      (dimension "kg N/ha"))
            (number (path column "${column}" 
 			 Chemistry "*" trace NO3 spray)
@@ -543,69 +537,50 @@ The total amount of water in the soil interval")
 	  "Denitrification" "NO3-Immobilization")
   (content "NO3-Content"))
 
-(defsummary "Soil NH4+ solute balance" N_balance
-  "Solute NH4+ balance for a soil interval."
-  (input "NH4_Solute_In" "NH4_Solute_Incorp" "NH4_Solute_Transform")
-  (output "NH4_Solute_Leak-Matrix" "NH4_Solute_Leak-Macro" "NH4_Solute_Drain"
-	  "NH4_Solute_Uptake" "NH4_Sorption")
-  (content "NH4_Solute_Content"))
-
-(defsummary "Soil NH4+ sorbed balance" N_balance
-  "Sorbed NH4+ balance for a soil interval."
-  (input "NH4_Sorbed_Incorp" "NH4_Sorption" 
-	 "NH4_Sorbed_Transform")
-  (output )
-  (content "NH4_Sorbed_Content"))
-
 (defsummary "Soil NH4+ balance" N_balance
   "NH4+ balance for a soil interval."
-  (input "NH4_Solute_In" 
-	 "NH4_Solute_Incorp" "NH4_Sorbed_Incorp"
-	 "NH4_Mineralization")
-  (output "NH4_Solute_Leak-Matrix" "NH4_Solute_Leak-Macro" "NH4_Solute_Drain"
-	  "NH4_Solute_Uptake"  "NH4_Nitrification")
-  (content "NH4_Solute_Content" "NH4_Sorbed_Content"))
+  (input "NH4-In" "NH4-Incorp" "NH4-Mineralization")
+  (output "NH4-Leak-Matrix" "NH4-Leak-Macro" "NH4-Drain"
+	  "NH4-Uptake"  "NH4-Nitrification")
+  (content "NH4-Content"))
 
 
 (defsummary "Soil mineral-N balance" N_balance
   "Mineral N balance for a soil interval."
-  (input "NO3-In" "NH4_Solute_In" 
-	 "NO3-Incorp" "NH4_Solute_Incorp" "NH4_Sorbed_Incorp"
-	 "NH4_Mineralization")
-  (output "NO3-Leak-Matrix" "NH4_Solute_Leak-Matrix"
-	  "NO3-Leak-Macro" "NH4_Solute_Leak-Macro"
-	  "NO3-Drain" "NH4_Solute_Drain"
-	  "NO3-Uptake" "NH4_Solute_Uptake"
-	  "Denitrification" "N2O_Nitrification"
+  (input "NO3-In" "NH4-In" 
+	 "NO3-Incorp" "NH4-Incorp"
+	 "NH4-Mineralization")
+  (output "NO3-Leak-Matrix" "NH4-Leak-Matrix"
+	  "NO3-Leak-Macro" "NH4-Leak-Macro"
+	  "NO3-Drain" "NH4-Drain"
+	  "NO3-Uptake" "NH4-Uptake"
+	  "Denitrification" "N2O-Nitrification"
 	  "NO3-Immobilization")
-  (content "NO3-Content" "NH4_Solute_Content" "NH4_Sorbed_Content"))
+  (content "NO3-Content" "NH4-Content"))
 
 (defsummary "Soil organic-N balance" N_balance
   "Organic nitrogen balance for a soil interval."
-  (input "Residuals_N" "Tillage_Org_N" "NO3-Immobilization" "Bioincorporation")
-  (output "NH4_Mineralization")
+  (input "Residuals-N" "Tillage-Org_N" "NO3-Immobilization" "Bioincorporation")
+  (output "NH4-Mineralization")
   (content "AOM" "SOM" "SMB" "Buffer"))
 
 (defsummary "Soil N balance" balance
   "Nitrogen balance for a soil interval."
   (precision 3)
   (require_top true)
-  (input "NO3-In" "NH4_Solute_In" 
-	 "NO3-Incorp" "NH4_Solute_Incorp" "NH4_Sorbed_Incorp"
-	 "Residuals_N" "Tillage_Org_N" "Bioincorporation")
-  (output "NO3-Leak-Matrix" "NH4_Solute_Leak-Matrix"
-	  "NO3-Leak-Macro" "NH4_Solute_Leak-Macro"
-	  "NO3-Drain" "NH4_Solute_Drain"
-	  "NO3-Uptake" "NH4_Solute_Uptake"
-	  "Denitrification" "N2O_Nitrification"	  )
-  (content "NO3-Content" "NH4_Solute_Content" "NH4_Sorbed_Content"
-	   "AOM" "SOM" "SMB" "Buffer"))
+  (input "NO3-In" "NH4-In" "NO3-Incorp" "NH4-Incorp"
+	 "Residuals-N" "Tillage-Org_N" "Bioincorporation")
+  (output "NO3-Leak-Matrix" "NH4-Leak-Matrix"
+	  "NO3-Leak-Macro" "NH4-Leak-Macro"
+	  "NO3-Drain" "NH4-Drain"
+	  "NO3-Uptake" "NH4-Uptake"
+	  "Denitrification" "N2O-Nitrification"	  )
+  (content "NO3-Content" "NH4-Content" "AOM" "SOM" "SMB" "Buffer"))
 
 (deflog "Soil nitrogen" column
   "Nitrogen input, output, transformation and content for the soil."
   (where "soil_nitrogen.dlf")
   (summary "Soil NO3- balance" "Soil NH4+ balance" 
-	   "Soil NH4+ solute balance" "Soil NH4+ sorbed balance"
 	   "Soil mineral-N balance" "Soil organic-N balance"
 	   "Soil N balance")
   (when hourly)
@@ -659,79 +634,56 @@ The total amount of water in the soil interval")
                      (spec chemical default M))
            (flux_top (path column "${column}"
 			   Chemistry "*" trace NH4 J)
-                     (tag "NH4_Solute_In")
+                     (tag "NH4-In")
                      (handle sum)
                      (negate true)
                      (dimension "kg N/ha/&")
                      (spec chemical default J))
            (flux_bottom (path column "${column}"
 			      Chemistry "*" trace NH4 J)
-                        (tag "NH4_Solute_Leak-Matrix")
+                        (tag "NH4-Leak-Matrix")
                         (negate true)
                         (handle sum)
                         (dimension "kg N/ha/&")
                         (spec chemical default J))
            (flux_bottom (path column "${column}"
 			      Chemistry "*" trace NH4 J_p)
-                        (tag "NH4_Solute_Leak-Macro")
+                        (tag "NH4-Leak-Macro")
                         (negate true)
                         (handle sum)
                         (dimension "kg N/ha/&")
                         (spec chemical default J_p))
            (interval (path column "${column}"
 			   Chemistry "*" trace NH4 S_drain)
-                     (tag "NH4_Solute_Drain")
+                     (tag "NH4-Drain")
                      (negate true)
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (spec chemical default S_drain))
            (interval (path column "${column}" Chemistry "*" 
 			   trace NH4 S_external)
-                     (tag "NH4_Solute_Incorp")
+                     (tag "NH4-Incorp")
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (spec chemical default S_external))
            (interval (path column "${column}" Chemistry "*" 
                            trace NH4 S_root)
-                     (tag "NH4_Solute_Uptake")
+                     (tag "NH4-Uptake")
                      (handle sum)
 		     (negate true)
                      (dimension "kg N/ha/&")
                      (spec chemical default S_root))
            (interval (path column "${column}" Chemistry "*" 
                            trace NH4 S_transform)
-                     (tag "NH4_Solute_Transform")
+                     (tag "NH4-Transform")
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (spec chemical default S_transform))
            (interval (path column "${column}" Chemistry "*" 
                            trace NH4 M)
-                     (tag "NH4_Solute_Content")
+                     (tag "NH4-Content")
                      (dimension "kg N/ha")
                      (spec chemical default M))
-           (interval (path column "${column}" Chemistry "*" 
-			   trace NH4_sorbed S_external)
-                     (tag "NH4_Sorbed_Incorp")
-                     (handle sum)
-                     (dimension "kg N/ha/&")
-                     (spec chemical default S_external))
-           (interval (path column "${column}" Chemistry "*" 
-                           trace NH4_sorbed S_transform)
-                     (tag "NH4_Sorbed_Transform")
-                     (handle sum)
-                     (dimension "kg N/ha/&")
-                     (spec chemical default S_transform))
-           (interval (path column "${column}" Chemistry "*" 
-                           trace NH4_sorbed M)
-                     (tag "NH4_Sorbed_Content")
-                     (dimension "kg N/ha")
-                     (spec chemical default M))
-           (interval (path column "${column}" Chemistry "*" combine "N"
-			   reaction NH4_sorption adsorption_source)
-                     (tag "NH4_Sorption")
-                     (handle sum)
-                     (dimension "kg N/ha/&")
-                     (spec reaction adsorption adsorption_source))
 	   (interval (path column "${column}" Chemistry "*"
                            combine "N" reaction denitrification converted)
                      (tag "Denitrification")
@@ -740,7 +692,7 @@ The total amount of water in the soil interval")
                      (spec reaction denitrification converted))
 	   (interval (path column "${column}" Chemistry "*"
                            combine "N" reaction nitrification NH4)
-                     (tag "NH4_Nitrification")
+                     (tag "NH4-Nitrification")
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (spec reaction nitrification NH4))
@@ -752,13 +704,13 @@ The total amount of water in the soil interval")
                      (spec reaction nitrification NO3))
 	   (interval (path column "${column}" Chemistry "*"
                            combine "N" reaction nitrification N2O)
-                     (tag "N2O_Nitrification")
+                     (tag "N2O-Nitrification")
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (spec reaction nitrification N2O))
            (interval (path column "${column}" OrganicMatter "*" NH4_source)
                      (spec organic default NH4_source)
-                     (tag "NH4_Mineralization")
+                     (tag "NH4-Mineralization")
                      (handle sum)
                      (dimension "kg N/ha/&"))
            (interval (path column "${column}" OrganicMatter "*" NO3_source)
@@ -770,12 +722,12 @@ The total amount of water in the soil interval")
            (interval (path column "${column}" residuals_N_soil)
                      (spec column default residuals_N_soil)
                      (handle sum)
-                     (tag "Residuals_N")
+                     (tag "Residuals-N")
                      (dimension "kg N/ha/&"))
            (interval (path column "${column}" OrganicMatter "*" tillage_N_soil)
                      (spec organic default tillage_N_soil)
                      (handle sum)
-                     (tag "Tillage_Org_N")
+                     (tag "Tillage-Org_N")
                      (dimension "kg N/ha/&"))
            (interval (path column "${column}" OrganicMatter "*"
                            Bioincorporation N_added)
