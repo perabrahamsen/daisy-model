@@ -15,12 +15,6 @@ release.
 
 ** Inorganic nitrogen merged with chemistry.
 
-The 'adsorption' chemical parameter has been removed, instead a new
-'adsorption' reaction has been added.  The adsorbed and solute forms
-of a pesticide are now considered seperate chemicals.  A new 'phase'
-chemical parameter specifies whether it is sorbed (and stay where it
-is) or solute (and moves with water).
-
 The 'SoilNO3' and 'SoilNH4' column parameters have been removed.
 
 New build-in chemical parameterizations for 'nutrient', 'NO3',
@@ -39,16 +33,20 @@ A new chemistry model 'multi' has been added, the main paramater
 The default value of the 'Chemistry' column parameter is now a 'multi'
 model, containing 'N' in its 'combine' parameter.
 
-The 'chemistry.dai' library has been rewritten, so each pesticide now
-is represented a chemistry parameterizations containing the sorbed and
-solute form of the pesticide, and an adsorption reaction.
+A new 'pesticides' chemistry model has been added to 'chemistry.dai',
+it enables all the pesticides defined in that file.
 
-To enable a pesticide like 'DDT', you should contact a lawyer, and
-specify "(Chemistry original (combine &old DDT))" in the column setup.
+To enable a single pesticide like 'DDT', you should contact a lawyer,
+and specify 
+ 
+  (Chemistry multi (combine (N (trace &old DDT))))
+
+in the column setup.  To enable all pesticides, instead specify
+
+  (Chemistry multi (combine N pesticides))
 
 You can now specify any chemicals in the 'solute' argument to the
-irrigation actions, although it makes little sense to put the sorbed
-forms in there.
+irrigation actions.
 
 The 'log.dai' and 'log-std.dai' libraries have been rewritten to
 accomodate the changes.  Old log parameterizations involving inorganic

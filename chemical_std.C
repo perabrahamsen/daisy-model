@@ -1037,11 +1037,6 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
 'adsorption' reaction between them.");
   alist.add ("adsorption", Adsorption::none_model ());
 
-  syntax.add ("phase", Syntax::String, Syntax::Const,
-	      "Either 'solid' or 'solute'.");
-  static const VCheck::Enum phase_check ("solid", "solute");
-  syntax.add_check ("phase", phase_check);
-
   // Management and climate fluxes.
   syntax.add ("deposit", "g/m^2/h", Syntax::LogOnly,
 	      "Amount deposited from the atmosphere.");
@@ -1132,7 +1127,6 @@ ChemicalStandardSyntax::load_nutrient (Syntax& syntax, AttributeList& alist)
 { 
   load_syntax (syntax, alist);
   alist.add ("description", "Plants eat this stuff.");
-  alist.add ("phase", "solute");
   alist.add ("crop_uptake_reflection_factor", 1.0); // Specific uptake code.
   alist.add ("canopy_dissipation_rate", 0.0);
   alist.add ("canopy_washoff_coefficient", 1.0);
