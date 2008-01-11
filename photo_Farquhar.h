@@ -77,6 +77,7 @@ protected:
   double leafPhotN;              // Content of photosynthetic active leaf N
   double fraction_sun;           // fraction of sunlit in the canopy.
   double fraction_total;         // total fraction of leaf active in photosynthesis.
+  double ABA_effect;
     
   // Simulation.
 public:

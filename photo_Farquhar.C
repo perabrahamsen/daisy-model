@@ -113,7 +113,7 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
 			 double LA, double fraction, double gbw/*[mol/m2/s]*/, 
 			 const double Ta, const double Tl, Treelog&) 
 {
-  const double wsf = ABA_effect; //water stress function
+  const double wsf = ABA_effect; //water stress function []
   const double intercept = b * LA * fraction; //min conductance 
   daisy_assert (gbw >0.0);
   const double rbw = 1./gbw;   //[s*m2/mol]
@@ -267,7 +267,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	  daisy_assert (vmax25 >= 0.0);
 
 	  // Photosynthetic effect of Xylem ABA.
-	  const double ABA_effect = ABAeffect->ABA_effect(ABA_xylem, msg);
+	  ABA_effect = ABAeffect->ABA_effect(ABA_xylem, msg);//[unitless]
 
 	  // leaf respiration
 	  const double rd = respiration_rate(vmax25, Tl);
@@ -319,7 +319,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	  Vm_vector[i]+= Vm_ * 1000.0 * LA * fraction[i]; //[mmol/m² area/s]OK
 	  Jm_vector[i]+= Jm_ * 1000.0 * LA * fraction[i]; //[mmol/m² area/s]OK
 	  sun_LAI_vector[i] = LA * fraction[i];//OK
-
+	  
 	  ci_middel += ci * fraction[i]/(No + 0.0);// [Pa]   OK
 	  gs += LA * gsw * fraction[i]; 
 	  Ass += LA * pn_ * (molWeightCH2O / molWeightCO2);//[g CH2O/m2 area/h] OK
@@ -360,6 +360,7 @@ PhotoFarquhar::clear ()
   leafPhotN = 0.0;
   fraction_sun = 0.0;
   fraction_total = 0.0;
+  ABA_effect = 1.0;
 }
 
 void
@@ -384,6 +385,7 @@ PhotoFarquhar::output(Log& log) const
   output_variable (leafPhotN, log);
   output_variable (fraction_sun, log);
   output_variable (fraction_total, log);
+  output_variable (ABA_effect, log);
 }
 
 void 
@@ -424,6 +426,8 @@ PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
     alist.add ("gbw", 2.00);
 
   //log variables
+  syntax.add ("ABA_effect", Syntax::None (), Syntax::LogOnly,
+              "Water stress effect induced by ABA");
   syntax.add ("ci_vector", "Pa", Syntax::LogOnly, Syntax::Sequence, "CO2 pressure in Stomatal in each layer.");
   syntax.add ("Vm_vector", "mmol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Photosynthetic capacity in each layer.");
   syntax.add ("Jm_vector", "mmol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Potential rate of electron transport in each layer.");
