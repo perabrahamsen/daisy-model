@@ -1295,7 +1295,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   // Time already processed of large timestep.
   double dtime = 0.0;
 
-  double R = 2.0;  //Retardation factor 
+  double R = 1.0;  //Retardation factor 
 
   while (dtime * 1.000001 < dt)
     {
@@ -1333,7 +1333,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
      
       if (simple_dcthetadt)
         {
-          A = R *(1.0 / ddt) * QTheta_mat_np1          // dtheta/ddt
+          A = R *(1.0 / ddt) * QTheta_mat_np1       // dtheta/ddt
             - gamma * diff_xx_zz_avg                // xx_zz diffusion
             - gamma * diff_xz_zx_avg                // xz_zx diffusion
             + gamma * advec                         // advec

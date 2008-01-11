@@ -22,13 +22,14 @@
 
 #include "heat_rect.h"
 #include "geometry_rect.h"
+#include "librarian.h"
 #include "syntax.h"
 #include "alist.h"
 #include "block.h"
 #include "submodel.h"
 #include "treelog.h"
 #include "plf.h"
-
+#include "solver.h" //mmo
 
 // Uncomment for fast code that does not catches bugs.
 #define NDEBUG
@@ -43,13 +44,14 @@
 #include <boost/numeric/ublas/io.hpp>
 
 namespace ublas = boost::numeric::ublas;
-
+static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
 
 static void 
 convection (const GeometryRect& geo,
             const ublas::vector<double>& q_edge,
-            ublas::matrix<double>& convec)  
+            Solver::Matrix& convec)
 {
+
   const size_t edge_size = geo.edge_size (); // number of edges  
 
   for (size_t e = 0; e < edge_size; e++)
@@ -58,8 +60,9 @@ convection (const GeometryRect& geo,
 	{
 	  const int from = geo.edge_from (e);
 	  const int to = geo.edge_to (e);	   
-	  const double value = geo.edge_area (e) * q_edge[e];
-	
+	  const double value = geo.edge_area (e) *
+            water_heat_capacity * q_edge[e];
+          
 	  //Equal weight: upstream_weight = 0.5
 	  //Upstr weight: upstream_weight = 1.0
 	  const double upstream_weight = 0.5;
@@ -104,7 +107,7 @@ cond_cell2edge (const GeometryRect& geo,
 static void 
 conduction (const GeometryRect& geo,
             const ublas::vector<double>& cond_edge,
-            ublas::matrix<double>& conduc)
+            Solver::Matrix& conduc)
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
   
@@ -235,7 +238,6 @@ upperboundary (const GeometryRect& geo,
 }
 
 
-
 static void 
 fluxes (const GeometryRect& geo,
         const bool isflux_lower,
@@ -317,42 +319,9 @@ fluxes (const GeometryRect& geo,
         }
     }
 }
-//#endif
-
-
-void
-HeatRect::solve (const GeometryRect& geo,
-		 const std::vector<double>& q_water,
-		 const std::vector<double>& S,
-		 const std::vector<double>& capacity,
-		 const std::vector<double>& conductivity,
-		 const double T_top_old,
-		 const double T_top_new,
-		 const double T_bottom,
-		 std::vector<double>& T,
-		 const double dt, Treelog& msg) const
-{
-  const size_t cell_size = geo.cell_size ();
-  const double T_top = (T_top_new + T_top_old) / 2.0;
-
- 
-  
-
-  
-  // Linear interpolation between bottom and top.
-  PLF plf;
-  plf.add (geo.bottom (), T_bottom);
-  plf.add (geo.top (), T_top);
-
-  for (size_t c = 0; c < cell_size; c++)
-    T[c] = plf (geo.z (c));
-}
-
 
 
 #if 0
-
-
 void
 HeatRect::solve (const GeometryRect& geo,
 		 const std::vector<double>& q_water,
@@ -365,10 +334,11 @@ HeatRect::solve (const GeometryRect& geo,
 		 std::vector<double>& T,
 		 const double dt, Treelog& msg) const
 {
-  const size_t cell_size = geo.cell_size ();
 
+  const size_t cell_size = geo.cell_size ();
   const double T_top = (T_top_new + T_top_old) / 2.0;
 
+  
   // Linear interpolation between bottom and top.
   PLF plf;
   plf.add (geo.bottom (), T_bottom);
@@ -377,21 +347,157 @@ HeatRect::solve (const GeometryRect& geo,
   for (size_t c = 0; c < cell_size; c++)
     T[c] = plf (geo.z (c));
 }
-
-
 #endif
+
+
+// ------ New version of Solve ------
+void
+HeatRect::solve (const GeometryRect& geo,
+                 const std::vector<double>& q_water,
+                 const std::vector<double>& S,
+                 const std::vector<double>& capacity,
+                 const std::vector<double>& conductivity,
+                 const double T_top_old,
+                 const double T_top_new,
+                 const double T_bottom,
+                 std::vector<double>& T,
+                 const double dt, Treelog& msg) const
+{
+  // mmo
+  // Note S_h should be calculated correctly the value imported 
+  // here is most probalbly only from heatsource like wires and 
+  // not added/removed water
+  //
+  // S_h_water = S_water * water_heat_capacity * T 
+  
+
+  const std::auto_ptr<Solver> solver;  //mmo what is this
+
+  const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();  
+ 
+  // Solution old
+  ublas::vector<double> T_old (cell_size);
+  for (int c = 0; c < cell_size; c++)
+    T_old (c) = T[c];
+  ublas::vector<double> T_n (cell_size);  // Maybe not neccessary with both T_old and T_n
+  T_n = T_old;
+
+  //return;
+  // Mean temp at upper boundary
+  double T_top_mean = 0.5*(T_top_old + T_top_new);
+
+  // Area (volume) Multiplied with heat capacity 
+  ublas::banded_matrix<double> Q_Ch_mat (cell_size, cell_size, 0 ,0);
+  for (int c = 0; c < cell_size; c++)
+    Q_Ch_mat (c, c) = geo.cell_volume (c) * capacity[c];
+  
+  // Flux in timestep
+  ublas::vector<double> q_edge (edge_size);	
+  for (int e = 0; e < edge_size; e++)
+    q_edge (e) = q_water[e];
+  
+  //Convection
+  Solver::Matrix convec (cell_size);
+  convection (geo, q_edge, convec);  
+
+  //return;
+  //Conduction
+  ublas::vector<double> cond_edge (edge_size); 
+  cond_cell2edge (geo, conductivity, cond_edge);
+  Solver::Matrix conduc (cell_size);
+  conduction (geo, cond_edge, conduc);
+
+  //Sink term
+  ublas::vector<double> S_vol (cell_size); // sink term 
+  for (size_t cell = 0; cell != cell_size ; ++cell) 
+    S_vol (cell) = - S[cell] * geo.cell_volume (cell);
+  
+  //return;
+
+  //Boundary vectors  
+  ublas::vector<double> B_dir_vec = ublas::zero_vector<double> (cell_size);
+
+  const bool isflux_lower= true;    //lower BC 
+  const bool isflux_upper = true;   //upper BC
+
+  const bool enable_boundary_conduction = true; //mmo should be changed....
+
+  lowerboundary(geo, isflux_lower, T_bottom,
+                q_edge, cond_edge, T_old,
+                enable_boundary_conduction, B_dir_vec);
+  upperboundary (geo, isflux_upper, T_top_mean,
+                 q_edge, cond_edge, T_old,
+                 enable_boundary_conduction, B_dir_vec);
+
+  //return;
+
+  // Solver parameter , gamma
+  // gamma = 0      : Backward Euler 
+  // gamma = 0.5    : Crank - Nicholson
+  const double gamma = 0.5;
+
+
+  //Initialize A-matrix (left hand side)
+  Solver::Matrix A (cell_size);  
+  
+  //Initialize b-vector (right hand side)
+  ublas::vector<double> b (cell_size);   
+  Solver::Matrix b_mat (cell_size);  
+
+  A = (1.0 / dt) * Q_Ch_mat                 // dT/dt
+    - gamma * conduc                        // conduction
+    + gamma * convec;                       // convection
+  
+  b_mat = (1.0 / dt) * Q_Ch_mat 
+    + (1 - gamma) * conduc                  // conduction  
+    - (1 - gamma) * convec;                 // convection
+   
+  b = prod (b_mat, T_n)
+    - B_dir_vec                             // Dirichlet BC as Neumann
+    - S_vol;                                // Sink term        
+  
+
+  std::cout << "A: \n" << A << '\n';
+  std::cout << "b_mat \n" << b_mat << '\n';
+  std::cout << "b \n" << b << '\n';
+
+  //return;
+
+  solver->solve (A, b, T_n); // Solve A T_n = b with regard to T_n.
+  
+  //return; 
+
+  //New solution into T
+  for (size_t c = 0; c < cell_size; c++)
+    T[c] = T_n (c);
+
+  //Calculate fluxes 
+  ublas::vector<double> dQ = ublas::zero_vector<double> (edge_size);
+  fluxes (geo, isflux_lower, isflux_upper, q_edge, cond_edge,
+          T_n, T_top_mean, T_bottom, B_dir_vec, dQ); 
+
+}
+// --- End of new version of solve ---
 
 
 
 
 void
-HeatRect::load_syntax (Syntax&, AttributeList& alist)
+HeatRect::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add_object ("solver", Solver::component, 
+		     Syntax::Const, Syntax::Singleton, "\
+Model used for solving matrix equation system.");
+  alist.add ("solver", Solver::default_model ());
+
   alist.add ("submodel", "HeatRect");
   alist.add ("description", "Heat transport in a rectangular grid.");
 }
 
-HeatRect::HeatRect (Block&)
+HeatRect::HeatRect (Block& al)
+  : solver (Librarian::build_item<Solver> (al, "solver"))
+
 { }
 
 HeatRect::~HeatRect ()

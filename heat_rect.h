@@ -22,8 +22,10 @@
 #define HEAT_RECT_H
 
 #include <vector>
+#include <memory>
 
 class GeometryRect;
+class Solver;
 class Syntax;
 class AttributeList;
 class Block;
@@ -31,6 +33,8 @@ class Treelog;
 
 class HeatRect
 {
+  const std::auto_ptr<Solver> solver;
+
   // Simulation.
 public:
   void solve (const GeometryRect& geo,
