@@ -38,6 +38,8 @@
 #include "number.h"
 #include "scope_soil.h"
 #include "vcheck.h"
+#include "memutils.h"
+#include "submodeler.h"
 #include <sstream>
 
 struct ChemicalStandard : public Chemical
@@ -57,6 +59,15 @@ struct ChemicalStandard : public Chemical
   const PLF decompose_conc_factor;
   const PLF decompose_depth_factor;
   const PLF decompose_lag_increment;
+  struct Product
+  {
+    const double fraction;
+    const symbol chemical;
+    static void load_syntax (Syntax&, AttributeList&);
+    Product (Block&);
+  };
+  const auto_vector<const Product*> product;
+  
   const std::auto_ptr<Number> C_below_expr;
   double C_below_value;
   const std::auto_ptr<Number> initial_expr;
@@ -167,7 +178,7 @@ struct ChemicalStandard : public Chemical
   void uptake (const Soil&, const SoilWater&, double dt);
   void decompose (const Geometry& geo,
                   const Soil&, const SoilWater&, const SoilHeat&, 
-                  const OrganicMatter&, double dt);
+                  const OrganicMatter&, Chemistry&, double dt, Treelog&);
   void output (Log&) const;
 
   // Create.
@@ -180,6 +191,21 @@ struct ChemicalStandard : public Chemical
 
 const symbol 
 ChemicalStandard::g_per_cm3 ("g/cm^3");
+
+void
+ChemicalStandard::Product::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add ("fraction", Syntax::Fraction (), Syntax::Const,
+	      "Fraction of decomposed matter that become this chemcial.");
+  syntax.add ("chemical", Syntax::String, Syntax::Const, 
+	      "Chemical product of decomposed matter.");
+  syntax.order ("fraction", "chemical");
+}
+
+ChemicalStandard::Product::Product (Block& al)
+  : fraction (al.number ("fraction")),
+    chemical (al.identifier ("chemical"))
+{ }
 
 double
 ChemicalStandard::water_turnover_factor (const double h)
@@ -581,7 +607,7 @@ ChemicalStandard::decompose (const Geometry& geo,
                              const SoilWater& soil_water,
                              const SoilHeat& soil_heat,
                              const OrganicMatter& organic_matter,
-                             const double dt)
+			     Chemistry&, const double dt, Treelog&)
 {
   std::vector<double> decomposed (soil.size (), 0.0);
 
@@ -599,9 +625,7 @@ ChemicalStandard::decompose (const Geometry& geo,
 	  found = true;
 	}
       else if (lag[i] < 0.0)
-	{
-	  lag[i] = 0.0;
-	}
+	lag[i] = 0.0;
     }
 
   // No decomposition.
@@ -839,6 +863,7 @@ ChemicalStandard::ChemicalStandard (Block& al)
     decompose_conc_factor (al.plf ("decompose_conc_factor")),
     decompose_depth_factor (al.plf ("decompose_depth_factor")),
     decompose_lag_increment (al.plf ("decompose_lag_increment")),
+    product (map_submodel_const<Product> (al, "decompose_products")),
     C_below_expr (Librarian::build_item<Number> (al, "C_below")),
     C_below_value (-42.42e42),
     initial_expr (Librarian::build_item<Number> (al, "initial")),
@@ -971,6 +996,8 @@ You must specify it with either 'canopy_dissipation_halftime' or\n\
 	      "Obsolete alias for 'canopy_dissipation_rate'.");
   syntax.add_fraction ("canopy_washoff_coefficient", Syntax::Const, "\
 Fraction of the chemical that follows the water off the canopy.");
+
+  // Soil parameters.
   syntax.add ("diffusion_coefficient", "cm^2/s", Check::non_negative (),
 	      Syntax::Const, "Diffusion coefficient.");
   syntax.add ("decompose_rate", "h^-1", Check::fraction (),
@@ -1009,8 +1036,6 @@ You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
 concentration each hour.  When lag in any cell reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.");
   alist.add ("decompose_lag_increment", no_factor);
-
-  // Soil parameters.
   syntax.add_object ("C_below", Number::component, 
 		     Syntax::Const, Syntax::Singleton, "\
 Concentration below the layer of soil being examined.\n\
@@ -1018,6 +1043,9 @@ Use a negative number to indicate same concentration as in lowest cell.");
   AttributeList minus_one;
   minus_one.add ("value", -1.0, "g/cm^3");
   minus_one.add ("type", "const");
+  syntax.add_submodule_sequence ("decompose_products", Syntax::Const, "\
+List of products from decomposition.", ChemicalStandard::Product::load_syntax);
+  alist.add ("decompose_products", std::vector<const AttributeList*> ());
   alist.add ("C_below", minus_one);
   syntax.add_object ("initial", Number::component, 
 		     Syntax::Const, Syntax::Singleton, "\

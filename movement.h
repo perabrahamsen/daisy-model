@@ -74,7 +74,6 @@ public:
 		     double T_top_new,
 		     std::vector<double>& T,
 		     const double dt, Treelog&) const = 0;
-
   virtual void ridge (Surface&, const Soil&, const SoilWater&, 
                       const AttributeList&) = 0;
 

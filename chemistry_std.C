@@ -239,7 +239,7 @@ ChemistryStandard::tick_soil (const Geometry& geo, const double ponding,
 
   for (size_t c = 0; c < chemicals.size (); c++)
     chemicals[c]->decompose (geo, soil, soil_water, soil_heat, organic_matter,
-                             dt); 
+                             chemistry, dt, msg); 
 
   for (size_t r = 0; r < reactions.size (); r++)
     reactions[r]->tick (geo, soil, soil_water, soil_heat, organic_matter, 

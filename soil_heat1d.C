@@ -624,3 +624,5 @@ SoilHeat1D::load_syntax (Syntax& syntax, AttributeList& alist)
 
 static Submodel::Register 
 soil_heat_submodel ("SoilHeat", SoilHeat1D::load_syntax);
+
+// soil_heat1d.C ends here.

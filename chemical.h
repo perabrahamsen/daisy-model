@@ -33,6 +33,7 @@ class SoilWater;
 class SoilHeat;
 class OrganicMatter;
 class Adsorption;
+class Chemistry;
 class VCheck;
 class Treelog;
 class Log;
@@ -123,7 +124,8 @@ public:
   virtual void uptake (const Soil&, const SoilWater&, double dt) = 0;
   virtual void decompose (const Geometry& geo,
                           const Soil&, const SoilWater&, const SoilHeat&, 
-                          const OrganicMatter&, double dt) = 0;
+                          const OrganicMatter&, Chemistry&, double dt,
+			  Treelog& msg) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

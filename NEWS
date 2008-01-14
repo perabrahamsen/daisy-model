@@ -17,15 +17,15 @@ release.
 
 The 'SoilNO3' and 'SoilNH4' column parameters have been removed.
 
-New build-in chemical parameterizations for 'nutrient', 'NO3',
-'NH4_common', 'NH4_sorbed' and 'NH4' have been added.
+New build-in chemical parameterizations for 'nutrient', 'NO3', and
+'NH4' have been added.
 
 The 'Denitrification' column parameter has been removed., and new
 reaction models 'nitrification' and 'denitrification' have been added.
 
 New build-in chemistry parameterizations for 'N' has been added,
-compromising the chemicals 'NO3', 'NH4_sorbed', and 'NH4', and the
-reactions 'nirification' and 'denitrification.
+compromising the chemicals 'NO3' and 'NH4', and the reactions
+'nirification' and 'denitrification.
 
 A new chemistry model 'multi' has been added, the main paramater
 'combine' specifies a list of chemistry parameterizations to activate.
@@ -37,11 +37,12 @@ A new 'pesticides' chemistry model has been added to 'chemistry.dai',
 it enables all the pesticides defined in that file.
 
 To enable a single pesticide like 'DDT', you should contact a lawyer,
-and specify 
+and specify in the column description:
  
   (Chemistry multi (combine (N (trace &old DDT))))
 
-in the column setup.  To enable all pesticides, instead specify
+in the column setup.  To enable all pesticides (somewhat slower),
+instead specify:
 
   (Chemistry multi (combine N pesticides))
 

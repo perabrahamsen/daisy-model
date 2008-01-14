@@ -1,5 +1,25 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Biotoxin
+
+** Metabolit
+
+(defchemichal foo bar
+  (decompose_rate 0.001 [d^-1])
+  (decompose_products (2% chemX) (1% chemY)))
+
+** Litter decompose
+
+Litter = surface?
+
+* heat_rect: S_water og capacity_old
+
+* Få 2d dim itl at køre
+
+MMO mangler et led
+
+* X61 backup
+
 * 2D gnuplot?
 
 * Overfør h_lim til OpenMI 
