@@ -79,8 +79,10 @@ struct MovementRect : public Movement
                          const double T_snow, const double K_snow,
                          const double dZs) const;
   void heat (const std::vector<double>& q_water,
-	     const std::vector<double>& S,
-	     const std::vector<double>& capacity,
+	     const std::vector<double>& S_water,
+	     const std::vector<double>& S_heat,
+	     const std::vector<double>& capacity_old,
+	     const std::vector<double>& capacity_new,
 	     const std::vector<double>& conductivity,
 	     double T_top,
 	     double T_top_new,
@@ -269,15 +271,18 @@ MovementRect::surface_snow_T (const Soil& soil,
 
 void 
 MovementRect::heat (const std::vector<double>& q_water,
-		    const std::vector<double>& S,
-		    const std::vector<double>& capacity,
+		    const std::vector<double>& S_water,
+		    const std::vector<double>& S_heat,
+		    const std::vector<double>& capacity_old,
+		    const std::vector<double>& capacity_new,
 		    const std::vector<double>& conductivity,
 		    const double T_top,
 		    const double T_top_new,
 		    std::vector<double>& T,
 		    const double dt, Treelog& msg) const
 {
-  heat_rect->solve (*geo, q_water, S, capacity, conductivity, 
+  heat_rect->solve (*geo, q_water, S_water, S_heat,
+		    capacity_old, capacity_new, conductivity, 
 		    T_top, T_top_new, T_bottom, T, dt, msg);
 }
 

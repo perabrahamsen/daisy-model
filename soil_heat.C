@@ -236,8 +236,9 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
 
   // Cells;
   std::vector<double> conductivity (cell_size);
+  std::vector<double> S_water (cell_size);
   std::vector<double> T (cell_size);
-  std::vector<double> S (cell_size);
+  std::vector<double> S_heat (cell_size);
   std::vector<double> capacity_apparent (cell_size);
   for (size_t c = 0; c < cell_size; c++)
     {
@@ -245,16 +246,18 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
       const double Theta = soil_water.Theta (c);
       const double X_ice = soil_water.X_ice (c);
       conductivity[c] = soil.heat_conductivity (c, Theta, X_ice);
+      S_water[c] = soil_water.S_sum (c); // Bug? S_sum includes freeze/thaw.
 
       // Changes with ice state.
       T[c] = this->T (c);
       capacity_apparent[c] = this->capacity_apparent (soil, soil_water, c);
-      S[c] = this->source (geo, soil_water, c);
+      S_heat[c] = this->source (geo, soil_water, c);
     }
 
   // Solve with old state.
   const std::vector<double> T_old = T;
-  movement.heat (q_water, S, capacity_apparent, conductivity,
+  movement.heat (q_water, S_water, S_heat, 
+		 capacity_old, capacity_apparent, conductivity,
 		 T_top_old, T_top_new, T, dt, msg);
 
   // Update ice state according to new temperatures.
@@ -273,7 +276,8 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
 	      S[c] = this->source (geo, soil_water, c);
 	    }
 	  T = T_old;
-	  movement.heat (q_water, S, capacity_apparent, conductivity,
+	  movement.heat (q_water, S_water, S_heat,
+			 capacity_old, capacity_apparent, conductivity,
 			 T_top_old, T_top_new, T, dt, msg);
 
 	  // Check if state match new temperatures.
@@ -302,8 +306,6 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
     this->set_temperature (c, T[c]);
   for (size_t e = 0; e < edge_size; e++)
     this->set_flux (e, q[e]);
-
-
 }
 
 void
@@ -316,7 +318,7 @@ SoilHeat::tick_after (const size_t cell_size,
       conductivity_[i]
         = soil.heat_conductivity (i,
                                   soil_water.Theta (i), soil_water.X_ice (i));
-      capacity_[i]
+      capacity_old[i]
         = soil.heat_capacity (i, soil_water.Theta (i), soil_water.X_ice (i));
     }
 }
@@ -615,7 +617,7 @@ void
 SoilHeat::output (Log& log) const
 {
   output_value (T_, "T", log); 
-  output_value (capacity_, "capacity", log); 
+  output_value (capacity_old, "capacity", log); 
   output_value (conductivity_, "conductivity", log); 
   output_value (T_top_, "T_top", log);
   output_value (T_freezing, "T_freezing", log);
@@ -706,7 +708,7 @@ SoilHeat::initialize (const AttributeList& al, const Geometry& geo,
   const size_t edge_size = geo.edge_size ();
   while (S.size () < cell_size)
     S.push_back (0.0);
-  capacity_.insert (capacity_.begin (), cell_size, -42.42e42);
+  capacity_old.insert (capacity_old.begin (), cell_size, -42.42e42);
   conductivity_.insert (conductivity_.begin (), cell_size, -42.42e42);
 
   // Freezing point.

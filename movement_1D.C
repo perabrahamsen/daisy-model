@@ -108,8 +108,10 @@ struct Movement1D : public Movement
                                     const Time& time, const Weather& weather);
   static void solve_heat (const Geometry1D& geo,
 			  const std::vector<double>& q_water,
-			  const std::vector<double>& S,
-			  const std::vector<double>& capacity,
+			  const std::vector<double>& S_water,
+			  const std::vector<double>& S_heat,
+			  const std::vector<double>& capacity_old,
+			  const std::vector<double>& capacity_new,
 			  const std::vector<double>& conductivity,
 			  const double T_top,
 			  const double T_top_new,
@@ -117,8 +119,10 @@ struct Movement1D : public Movement
 			  std::vector<double>& T,
 			  const double dt);
   void heat (const std::vector<double>& q_water,
-	     const std::vector<double>& S,
-	     const std::vector<double>& capacity,
+	     const std::vector<double>& S_water,
+	     const std::vector<double>& S_heat,
+	     const std::vector<double>& capacity_old,
+	     const std::vector<double>& capacity_new,
 	     const std::vector<double>& conductivity,
 	     double T_top,
 	     double T_top_new,
@@ -463,8 +467,10 @@ Movement1D::default_heat (const Soil& soil,
 void 
 Movement1D::solve_heat (const Geometry1D& geo,
 			const std::vector<double>& q_water,
-			const std::vector<double>& S,
-			const std::vector<double>& capacity,
+			const std::vector<double>& /* S_water */,
+			const std::vector<double>& S, // Heat.
+			const std::vector<double>& /* capacity_old */,
+			const std::vector<double>& capacity, // New.
 			const std::vector<double>& conductivity,
 			const double T_top,
 			const double T_top_new,
@@ -548,15 +554,18 @@ Movement1D::solve_heat (const Geometry1D& geo,
 
 void 
 Movement1D::heat (const std::vector<double>& q_water,
-		  const std::vector<double>& S,
-		  const std::vector<double>& capacity,
+		  const std::vector<double>& S_water,
+		  const std::vector<double>& S_heat,
+		  const std::vector<double>& capacity_old,
+		  const std::vector<double>& capacity_new,
 		  const std::vector<double>& conductivity,
 		  const double T_top,
 		  const double T_top_new,
 		  std::vector<double>& T,
 		  const double dt, Treelog&) const
 {
-  solve_heat (*geo, q_water, S, capacity, conductivity,
+  solve_heat (*geo, q_water, S_water, S_heat, 
+	      capacity_old, capacity_new, conductivity,
 	      T_top, T_top_new, T_bottom, T, dt);
 }
 

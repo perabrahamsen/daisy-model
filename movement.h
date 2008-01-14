@@ -67,8 +67,10 @@ public:
                         DOE&, double diffusion_coefficient, 
 			double dt, Treelog&) = 0;
   virtual void heat (const std::vector<double>& q_water,
-		     const std::vector<double>& S,
-		     const std::vector<double>& capacity,
+		     const std::vector<double>& S_water,
+		     const std::vector<double>& S_heat,
+		     const std::vector<double>& capacity_old,
+		     const std::vector<double>& capacity_new,
 		     const std::vector<double>& conductivity,
 		     double T_top,
 		     double T_top_new,

@@ -39,8 +39,10 @@ class HeatRect
 public:
   void solve (const GeometryRect& geo,
 	      const std::vector<double>& q_water,
-	      const std::vector<double>& S,
-	      const std::vector<double>& capacity,
+	      const std::vector<double>& S_water,
+	      const std::vector<double>& S_heat,
+	      const std::vector<double>& capacity_old,
+	      const std::vector<double>& capacity_new,
 	      const std::vector<double>& conductivity,
 	      const double T_top,
 	      const double T_top_new,

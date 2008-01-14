@@ -59,7 +59,7 @@ private:
   std::vector<double> q;
   std::vector<double> T_;
   std::vector<double> S;
-  std::vector<double> capacity_;
+  std::vector<double> capacity_old;
   std::vector<double> conductivity_;
 public:
   double T_top () const;	// [dg C]
