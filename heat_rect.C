@@ -392,7 +392,7 @@ HeatRect::solve (const GeometryRect& geo,
   // Area (volume) Multiplied with heat capacity 
   ublas::banded_matrix<double> Q_Ch_mat (cell_size, cell_size, 0 ,0);
   for (int c = 0; c < cell_size; c++)
-    Q_Ch_mat (c, c) = geo.cell_volume (c) * capacity[c];
+    Q_Ch_mat (c, c) = geo.cell_volume (c) * capacity_new[c];
   
   // Flux in timestep
   ublas::vector<double> q_edge (edge_size);	
@@ -413,7 +413,7 @@ HeatRect::solve (const GeometryRect& geo,
   //Sink term
   ublas::vector<double> S_vol (cell_size); // sink term 
   for (size_t cell = 0; cell != cell_size ; ++cell) 
-    S_vol (cell) = - S[cell] * geo.cell_volume (cell);
+    S_vol (cell) = - S_heat[cell] * geo.cell_volume (cell);
   
   //return;
 

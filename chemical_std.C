@@ -28,6 +28,7 @@
 #include "geometry.h"
 #include "abiotic.h"
 #include "adsorption.h"
+#include "chemistry.h"
 #include "log.h"
 #include "block.h"
 #include "alist.h"
@@ -182,8 +183,8 @@ struct ChemicalStandard : public Chemical
   void output (Log&) const;
 
   // Create.
-  bool check (const Geometry& geo, const Soil& soil, const SoilWater&, 
-	      const Scope& scope, Treelog& msg) const;
+  bool check (const Geometry&, const Soil&, const SoilWater&, 
+	      const Chemistry&, const Scope&, Treelog&) const;
   void initialize (const AttributeList&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   ChemicalStandard (Block&);
@@ -607,52 +608,63 @@ ChemicalStandard::decompose (const Geometry& geo,
                              const SoilWater& soil_water,
                              const SoilHeat& soil_heat,
                              const OrganicMatter& organic_matter,
-			     Chemistry&, const double dt, Treelog&)
+			     Chemistry& chemistry, const double dt, Treelog&)
 {
-  std::vector<double> decomposed (soil.size (), 0.0);
-
-  unsigned int size = soil.size ();
+  const size_t cell_size = geo.cell_size ();
+  std::vector<double> decomposed (cell_size, 0.0);
 
   // Update lag time.
   bool found = false;
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t c = 0; c < cell_size; c++)
     {
-      lag[i] += this->decompose_lag_increment (C_[i]) * dt;
+      lag[c] += this->decompose_lag_increment (C_[c]) * dt;
       
-      if (lag[i] >= 1.0)
+      if (lag[c] >= 1.0)
 	{
-	  lag[i] = 1.0;
+	  lag[c] = 1.0;
 	  found = true;
 	}
-      else if (lag[i] < 0.0)
-	lag[i] = 0.0;
+      else if (lag[c] < 0.0)
+	lag[c] = 0.0;
     }
 
   // No decomposition.
   if (!found)
-    size = 0;
+    return;
 
-  for (unsigned int i = 0; i < size; i++)
+  for (size_t c = 0; c < cell_size; c++)
     {
       const double heat_factor 
-	= this->decompose_heat_factor (soil_heat.T (i));
+	= this->decompose_heat_factor (soil_heat.T (c));
       const double water_factor 
-	= this->decompose_water_factor (soil_water.h (i));
+	= this->decompose_water_factor (soil_water.h (c));
       const double CO2_factor 
-	= this->decompose_CO2_factor (organic_matter.CO2 (i));
+	= this->decompose_CO2_factor (organic_matter.CO2 (c));
       const double conc_factor
-	= this->decompose_conc_factor (C_[i]);
+	= this->decompose_conc_factor (C_[c]);
       const double depth_factor
-	= this->decompose_depth_factor (geo.z (i));
+	= this->decompose_depth_factor (geo.z (c));
       const double rate
 	= decompose_rate * heat_factor * water_factor * CO2_factor
 	* conc_factor * depth_factor;
-      decomposed[i] = M_left (i, dt) * rate;
+      decomposed[c] = M_left (c, dt) * rate;
     }
-  for (unsigned int i = size; i < soil.size (); i++)
-    decomposed[i] = 0.0;
 
-  add_to_transform_sink (decomposed, dt);
+  this->add_to_transform_sink (decomposed, dt);
+
+  for (size_t i = 0; i < product.size (); i++)
+    {
+      const symbol name = product[i]->chemical;
+      if (chemistry.know (name))
+	{
+	  Chemical& chemical = chemistry.find (name);
+	  const double fraction = product[i]->fraction;
+	  std::vector<double> created = decomposed;
+	  for (size_t c = 0; c < cell_size; c++)
+	    created[c] *= fraction;
+	  chemical.add_to_transform_source (created, dt);
+	}
+    }
 }
 
 void
@@ -702,9 +714,22 @@ ChemicalStandard::output (Log& log) const
 bool 
 ChemicalStandard::check (const Geometry& geo, 
 			 const Soil& soil, const SoilWater& soil_water,
+			 const Chemistry& chemistry,
 			 const Scope& scope, Treelog& msg) const
 {
   const size_t cell_size = geo.cell_size ();
+
+  // Warn against untraced chemicals.
+  if (!chemistry.know (name) && !chemistry.ignored (name))
+    msg.warning ("This chemical will not be traced");
+  else 
+    for (size_t i = 0; i < product.size (); i++)
+      {
+	const symbol chemical = product[i]->chemical;
+	if (!chemistry.know (chemical) && !chemistry.ignored (chemical))
+	  msg.warning ("Decompose product '" + chemical.name () 
+		       + "' will not be traced");
+      }
 
   bool ok = true;
 

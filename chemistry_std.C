@@ -41,6 +41,7 @@ struct ChemistryStandard : public Chemistry
 
   // Query.
   bool know (symbol chem) const;
+  bool ignored (symbol chem) const;
   Chemical& find (symbol chem); 
   const std::vector<Chemical*>& all () const;
  
@@ -95,6 +96,10 @@ ChemistryStandard::know (const symbol chem) const
 
   return false;
 }
+
+bool 
+ChemistryStandard::ignored (symbol chem) const
+{ return false; }
 
 Chemical& 
 ChemistryStandard::find (symbol chem)
@@ -302,7 +307,7 @@ ChemistryStandard::check (const Geometry& geo,
   for (size_t c = 0; c < chemicals.size (); c++)
     {
       Treelog::Open nest (msg, "Chemical: '" + chemicals[c]->name  + "'");
-      if (!chemicals[c]->check (geo, soil, soil_water, scope, msg))
+      if (!chemicals[c]->check (geo, soil, soil_water, chemistry, scope, msg))
 	ok = false;
     }
 

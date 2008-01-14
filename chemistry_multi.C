@@ -43,6 +43,7 @@ struct ChemistryMulti : public Chemistry
 
   // Query.
   bool know (symbol chem) const;
+  bool ignored (symbol chem) const;
   Chemical& find (symbol chem);
   const std::vector<Chemical*>& all () const;
   
@@ -92,6 +93,16 @@ struct ChemistryMulti : public Chemistry
   static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
 
+bool 
+ChemistryMulti::ignored (symbol chem) const
+{
+  for (size_t i = 0; i < ignore.size (); i++)
+    if (ignore[i] == chem)
+      return true;
+
+  return false;
+}
+
 bool
 ChemistryMulti::know (const symbol chem) const
 {
@@ -119,9 +130,8 @@ ChemistryMulti::all () const
 void 
 ChemistryMulti::check_ignore (const symbol chem, Treelog& msg)
 {
-  for (size_t i = 0; i < ignore.size (); i++)
-    if (ignore[i] == chem)
-      return;
+  if (ignored (chem))
+    return;
   
   msg.message ("Fate of '" + chem.name () + "' will not be traced");
   ignore.push_back (chem);
@@ -382,8 +392,7 @@ List of chemistry parameterizations you want to combine.");
               "Don't warn when spraying one of these chemicals.\n\
 The first time an untraced chemical not on the list is sprayed on the\n\
 field, Daisy will issue a warning and add the chemical to this list.");
-  static const VCheck::All all (VCheck::unique (), Chemical::check_library ());
-  syntax.add_check ("ignore", all);
+  syntax.add_check ("ignore", VCheck::unique ());
   alist.add ("ignore", std::vector<symbol> ());
   syntax.add_object ("trace", Chemical::component, 
                      Syntax::LogOnly, Syntax::Sequence, "\

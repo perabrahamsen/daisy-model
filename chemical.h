@@ -133,8 +133,8 @@ public:
   static const AttributeList& NO3_model ();
   static const AttributeList& NH4_model ();
   static const VCheck& check_library ();
-  virtual bool check (const Geometry& geo, const Soil& soil, const SoilWater&,
-		      const Scope& scope, Treelog& msg) const = 0;
+  virtual bool check (const Geometry&, const Soil&, const SoilWater&,
+		      const Chemistry&, const Scope&, Treelog&) const = 0;
   virtual void initialize (const AttributeList&,
 			   const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
