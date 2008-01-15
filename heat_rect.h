@@ -34,6 +34,7 @@ class Treelog;
 class HeatRect
 {
   const std::auto_ptr<Solver> solver;
+  const int debug;
 
   // Simulation.
 public:

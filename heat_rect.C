@@ -459,10 +459,14 @@ HeatRect::solve (const GeometryRect& geo,
     - B_dir_vec                             // Dirichlet BC as Neumann
     - S_vol;                                // Sink term        
   
-
-  std::cout << "A: \n" << A << '\n';
-  std::cout << "b_mat \n" << b_mat << '\n';
-  std::cout << "b \n" << b << '\n';
+  if (debug > 0)
+    {
+      std::ostringstream tmp;
+      tmp << "A: \n" << A << '\n'
+	  << "b_mat \n" << b_mat << '\n'
+	  << "b \n" << b << '\n';
+      msg.message (tmp.str ());
+    }
 
   //return;
 
@@ -492,14 +496,18 @@ HeatRect::load_syntax (Syntax& syntax, AttributeList& alist)
 		     Syntax::Const, Syntax::Singleton, "\
 Model used for solving matrix equation system.");
   alist.add ("solver", Solver::default_model ());
+  syntax.add ("debug", Syntax::Integer, Syntax::Const, "\
+Enable additional debug message.\n\
+A value of 0 means no message, higher numbers means more messages.");
+  alist.add ("debug", 0);
 
   alist.add ("submodel", "HeatRect");
   alist.add ("description", "Heat transport in a rectangular grid.");
 }
 
 HeatRect::HeatRect (Block& al)
-  : solver (Librarian::build_item<Solver> (al, "solver"))
-
+  : solver (Librarian::build_item<Solver> (al, "solver")),
+    debug (al.integer ("debug"))
 { }
 
 HeatRect::~HeatRect ()

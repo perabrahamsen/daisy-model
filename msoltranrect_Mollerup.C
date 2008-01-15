@@ -53,7 +53,7 @@ struct MsoltranrectMollerup : public Msoltranrect
   // Parameters.
   const std::auto_ptr<Solver> solver;
   const bool enable_boundary_diffusion;
-
+  const int debug;
  
   // Water flux.
   static void cell_based_flux (const GeometryRect& geo,  
@@ -1413,8 +1413,8 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
     }
   
   // BUG: No J for inner nodes.
+  if (debug > 0)
     msg.message(tmp_mmo.str ());
-  
 }
 
 void 
@@ -1424,7 +1424,8 @@ MsoltranrectMollerup::output (Log&) const
 MsoltranrectMollerup::MsoltranrectMollerup (Block& al)
   : Msoltranrect (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
-    enable_boundary_diffusion (al.flag ("enable_boundary_diffusion"))
+    enable_boundary_diffusion (al.flag ("enable_boundary_diffusion")),
+    debug (al.integer ("debug"))
 { }
 
 MsoltranrectMollerup::~MsoltranrectMollerup ()
@@ -1440,6 +1441,10 @@ Model used for solving matrix equation system.");
   syntax.add ("enable_boundary_diffusion", Syntax::Boolean, Syntax::Const, "\
 If this is set, diffusion over boundaries is enabled."); 
   alist.add ("enable_boundary_diffusion", true);
+  syntax.add ("debug", Syntax::Integer, Syntax::Const, "\
+Enable additional debug message.\n\
+A value of 0 means no message, higher numbers means more messages.");
+  alist.add ("debug", 0);
 }
 
 const AttributeList& 

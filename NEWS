@@ -53,6 +53,22 @@ The 'log.dai' and 'log-std.dai' libraries have been rewritten to
 accomodate the changes.  Old log parameterizations involving inorganic
 chemicals, including NO3- and NH4+, will need to be rewritten.
 
+** You can now specify decompose products in the default chemical model.
+
+(defchemical "Pesticide A" insecticide
+  (decompose_halftime 20 [d])
+  (decompose_products (7 [%] "Metabolit 1")
+                      (5 [%] "Metabolit 2"))
+  (adsorption linear (K_OC 2e6 [cm^3/g])))
+
+Here 7% (weight relative) of the pesticide named "Pesticide A" will
+become "Metabolit 1" when decomposed, and 5% will become "Metabolit
+2".  The decompose products can be defined with 'defchemical' like any
+other chemicals, and their fate followed by lsiting them in the
+"trace" parameter in the default chemistry model.
+
+  (Chemistry multi (combine (N (trace &old "Metabolit 1" "Metabolit 2"))))
+
 ** New 'GP2D' rooddens model for row crops.
 
 ** New 'device' gnuplot parameter for specifying output devise.

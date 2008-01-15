@@ -650,7 +650,7 @@ VCheck::InLibrary::validate (const Metalib& metalib,
   const Library& library = metalib.library (lib_name);
   
   if (!library.check (type))
-    throw "Unknown type '" + type + "'";
+    throw "Unknown '" + lib_name + "' type '" + type + "'";
 
   const Syntax& syntax = library.syntax (type);
   const AttributeList& alist = library.lookup (type);
