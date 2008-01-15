@@ -325,8 +325,10 @@ fluxes (const GeometryRect& geo,
 void
 HeatRect::solve (const GeometryRect& geo,
 		 const std::vector<double>& q_water,
-		 const std::vector<double>& S,
-		 const std::vector<double>& capacity,
+		 const std::vector<double>& S_water,
+		 const std::vector<double>& S_heat,
+		 const std::vector<double>& capacity_old,
+		 const std::vector<double>& capacity_new,
 		 const std::vector<double>& conductivity,
 		 const double T_top_old,
 		 const double T_top_new,
@@ -347,7 +349,7 @@ HeatRect::solve (const GeometryRect& geo,
   for (size_t c = 0; c < cell_size; c++)
     T[c] = plf (geo.z (c));
 }
-#endif
+#else
 
 
 // ------ New version of Solve ------
@@ -372,8 +374,6 @@ HeatRect::solve (const GeometryRect& geo,
   //
   // S_h_water = S_water * water_heat_capacity * T 
   
-
-  const std::auto_ptr<Solver> solver;  //mmo what is this
 
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();  
@@ -486,7 +486,7 @@ HeatRect::solve (const GeometryRect& geo,
 }
 // --- End of new version of solve ---
 
-
+#endif
 
 
 void
