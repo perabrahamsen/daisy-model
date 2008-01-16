@@ -45,6 +45,7 @@
 
 namespace ublas = boost::numeric::ublas;
 static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
+static const double rho_water = 1.0;             // [g/cm^3]
 
 static void 
 convection (const GeometryRect& geo,
@@ -61,7 +62,7 @@ convection (const GeometryRect& geo,
 	  const int from = geo.edge_from (e);
 	  const int to = geo.edge_to (e);	   
 	  const double value = geo.edge_area (e) *
-            water_heat_capacity * q_edge[e];
+            water_heat_capacity * rho_water * q_edge[e];
           
 	  //Equal weight: upstream_weight = 0.5
 	  //Upstr weight: upstream_weight = 1.0
@@ -255,7 +256,6 @@ fluxes (const GeometryRect& geo,
   daisy_assert (q_edge.size () == edge_size);
   daisy_assert (cond_edge.size () == edge_size);
   daisy_assert (dQ.size () == edge_size);
-  
 
   //First all the internal edges...
   for (size_t e = 0; e < edge_size; e++)
@@ -389,9 +389,12 @@ HeatRect::solve (const GeometryRect& geo,
   double T_top_mean = 0.5*(T_top_old + T_top_new);
 
   // Area (volume) Multiplied with heat capacity 
-  ublas::banded_matrix<double> Q_Ch_mat (cell_size, cell_size, 0 ,0);
+  ublas::banded_matrix<double> Q_Ch_mat_n (cell_size, cell_size, 0 ,0);
   for (int c = 0; c < cell_size; c++)
-    Q_Ch_mat (c, c) = geo.cell_volume (c) * capacity_new[c];
+    Q_Ch_mat_n (c, c) = geo.cell_volume (c) * capacity_new[c];
+  ublas::banded_matrix<double> Q_Ch_mat_np1 (cell_size, cell_size, 0 ,0);
+  for (int c = 0; c < cell_size; c++)
+    Q_Ch_mat_np1 (c, c) = geo.cell_volume (c) * capacity_new[c];
   
   // Flux in timestep
   ublas::vector<double> q_edge (edge_size);	
@@ -411,14 +414,14 @@ HeatRect::solve (const GeometryRect& geo,
   //Sink term
   ublas::vector<double> S_vol (cell_size); // sink term 
   for (size_t cell = 0; cell != cell_size ; ++cell) 
-    S_vol (cell) = - S_heat[cell] * geo.cell_volume (cell);
+    S_vol (cell) = - S_water[cell] * water_heat_capacity  //water
+      - S_heat[cell] * geo.cell_volume (cell);            //electricity
   
   //Boundary vectors  
   ublas::vector<double> B_dir_vec = ublas::zero_vector<double> (cell_size);
 
   const bool isflux_lower= true;    //lower BC 
   const bool isflux_upper = true;   //upper BC
-
   const bool enable_boundary_conduction = true; //mmo should be changed....
 
   lowerboundary(geo, isflux_lower, T_bottom,
@@ -427,6 +430,7 @@ HeatRect::solve (const GeometryRect& geo,
   upperboundary (geo, isflux_upper, T_top_mean,
                  q_edge, cond_edge, T_old,
                  enable_boundary_conduction, B_dir_vec);
+
 
   // Solver parameter , gamma
   // gamma = 0      : Backward Euler 
@@ -441,11 +445,11 @@ HeatRect::solve (const GeometryRect& geo,
   ublas::vector<double> b (cell_size);   
   Solver::Matrix b_mat (cell_size);  
 
-  A = (1.0 / dt) * Q_Ch_mat                 // dT/dt
+  A = (1.0 / dt) * Q_Ch_mat_np1             // dT/dt
     - gamma * conduc                        // conduction
     + gamma * convec;                       // convection
   
-  b_mat = (1.0 / dt) * Q_Ch_mat 
+  b_mat = (1.0 / dt) * Q_Ch_mat_n 
     + (1 - gamma) * conduc                  // conduction  
     - (1 - gamma) * convec;                 // convection
    
@@ -464,6 +468,7 @@ HeatRect::solve (const GeometryRect& geo,
 
   solver->solve (A, b, T_n); // Solve A T_n = b with regard to T_n.
   
+
   //New solution into T
   for (size_t c = 0; c < cell_size; c++)
     T[c] = T_n (c);
