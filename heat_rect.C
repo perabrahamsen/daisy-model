@@ -150,9 +150,12 @@ Dirichlet_expl(const size_t cell,
 
   // Boundary convection
   if (q*in_sign >= 0)     //Inflow
-    Q_convec_out = - in_sign * q * area * T_border;
+    Q_convec_out = - in_sign * area * 
+      water_heat_capacity * rho_water * T_border * q;
   else                    //Outflow 
-    Q_convec_out = - in_sign * q * area * T_cell;
+    Q_convec_out = - in_sign * area * 
+      water_heat_capacity * rho_water * T_cell * q;
+    //Q_convec_out = - in_sign * q * area * T_cell;
   
   if (enable_boundary_conduction)
     {
@@ -275,7 +278,9 @@ fluxes (const GeometryRect& geo,
           const double alpha = (q_edge[e] >= 0) 
             ? upstream_weight 
             : 1.0 - upstream_weight;
-          dQ[e] = alpha * q_edge[e] * T[from] + (1.0-alpha) * T[to];
+          dQ[e] = water_heat_capacity * rho_water * 
+            (alpha * T[from] + (1.0-alpha) * T[to]) * q_edge[e];
+          //dQ[e] = alpha * q_edge[e] * T[from] + (1.0-alpha) * T[to];    //mmo old and wrong!!!
           
           //--- Conductive part - xx_zz --- 
           const double gradient = geo.edge_area_per_length (e) *
@@ -414,8 +419,9 @@ HeatRect::solve (const GeometryRect& geo,
   //Sink term
   ublas::vector<double> S_vol (cell_size); // sink term 
   for (size_t cell = 0; cell != cell_size ; ++cell) 
-    S_vol (cell) = - S_water[cell] * water_heat_capacity  //water
-      - S_heat[cell] * geo.cell_volume (cell);            //electricity
+    S_vol (cell) = - geo.cell_volume (cell) *             //water 
+      water_heat_capacity * rho_water *  S_water[cell]    //water
+      - geo.cell_volume (cell) * S_heat[cell];            //electricity
   
   //Boundary vectors  
   ublas::vector<double> B_dir_vec = ublas::zero_vector<double> (cell_size);
