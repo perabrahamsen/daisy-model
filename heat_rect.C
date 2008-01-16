@@ -345,7 +345,8 @@ HeatRect::solve (const GeometryRect& geo,
   const size_t cell_size = geo.cell_size ();
   const double T_top = (T_top_new + T_top_old) / 2.0;
 
-  
+
+
   // Linear interpolation between bottom and top.
   PLF plf;
   plf.add (geo.bottom (), T_bottom);
@@ -354,7 +355,7 @@ HeatRect::solve (const GeometryRect& geo,
   for (size_t c = 0; c < cell_size; c++)
     T[c] = plf (geo.z (c));
 }
-#else
+#endif
 
 
 // ------ New version of Solve ------
@@ -382,7 +383,7 @@ HeatRect::solve (const GeometryRect& geo,
 
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();  
- 
+
   // Solution old
   ublas::vector<double> T_old (cell_size);
   for (int c = 0; c < cell_size; c++)
@@ -466,9 +467,17 @@ HeatRect::solve (const GeometryRect& geo,
   if (debug > 0)
     {
       std::ostringstream tmp;
-      tmp << "A: \n" << A << '\n'
-	  << "b_mat \n" << b_mat << '\n'
-	  << "b \n" << b << '\n';
+      //tmp << "A: \n" << A << '\n'
+      //	  << "b_mat \n" << b_mat << '\n'
+      //  << "b \n" << b << '\n';
+      
+      tmp << "T \n" << T_n << '\n';
+
+      tmp << "T_top_new: \n" << T_top_new << '\n'
+          << "T_top_old: \n" << T_top_old << '\n'
+          << "T_top_mean: \n" << T_top_mean << '\n'
+          << "T_bottom: \n" << T_bottom << '\n';
+     
       msg.message (tmp.str ());
     }
 
@@ -487,7 +496,6 @@ HeatRect::solve (const GeometryRect& geo,
 }
 // --- End of new version of solve ---
 
-#endif
 
 
 void
