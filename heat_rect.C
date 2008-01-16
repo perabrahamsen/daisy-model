@@ -385,7 +385,6 @@ HeatRect::solve (const GeometryRect& geo,
   ublas::vector<double> T_n (cell_size);  // Maybe not neccessary with both T_old and T_n
   T_n = T_old;
 
-  //return;
   // Mean temp at upper boundary
   double T_top_mean = 0.5*(T_top_old + T_top_new);
 
@@ -403,7 +402,6 @@ HeatRect::solve (const GeometryRect& geo,
   Solver::Matrix convec (cell_size);
   convection (geo, q_edge, convec);  
 
-  //return;
   //Conduction
   ublas::vector<double> cond_edge (edge_size); 
   cond_cell2edge (geo, conductivity, cond_edge);
@@ -415,8 +413,6 @@ HeatRect::solve (const GeometryRect& geo,
   for (size_t cell = 0; cell != cell_size ; ++cell) 
     S_vol (cell) = - S_heat[cell] * geo.cell_volume (cell);
   
-  //return;
-
   //Boundary vectors  
   ublas::vector<double> B_dir_vec = ublas::zero_vector<double> (cell_size);
 
@@ -431,8 +427,6 @@ HeatRect::solve (const GeometryRect& geo,
   upperboundary (geo, isflux_upper, T_top_mean,
                  q_edge, cond_edge, T_old,
                  enable_boundary_conduction, B_dir_vec);
-
-  //return;
 
   // Solver parameter , gamma
   // gamma = 0      : Backward Euler 
@@ -458,7 +452,7 @@ HeatRect::solve (const GeometryRect& geo,
   b = prod (b_mat, T_n)
     - B_dir_vec                             // Dirichlet BC as Neumann
     - S_vol;                                // Sink term        
-  
+
   if (debug > 0)
     {
       std::ostringstream tmp;
@@ -468,12 +462,8 @@ HeatRect::solve (const GeometryRect& geo,
       msg.message (tmp.str ());
     }
 
-  //return;
-
   solver->solve (A, b, T_n); // Solve A T_n = b with regard to T_n.
   
-  //return; 
-
   //New solution into T
   for (size_t c = 0; c < cell_size; c++)
     T[c] = T_n (c);
