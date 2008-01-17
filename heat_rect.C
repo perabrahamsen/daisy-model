@@ -218,8 +218,7 @@ upperboundary (const GeometryRect& geo,
 {
   // change to isflux_lower?????
   if (!isflux)   //Nothing to do for (no) flux bc 
-    {
-      
+    {      
       const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
       const size_t edge_above_size = edge_above.size ();
       
@@ -234,9 +233,21 @@ upperboundary (const GeometryRect& geo,
           daisy_assert (in_sign < 0);
           
           double T_cell = T (cell);
-	  Dirichlet_expl (cell, area, area_per_length, in_sign, 
+	  //Dirichlet_expl (cell, area, area_per_length, in_sign, 
+          //                cond_edge (edge), T_border, T_cell, 
+          //                q_edge (edge), enable_boundary_conduction, B_dir_vec);
+          
+          
+          std::cout << "Upper cell: " << cell << '\n';
+          std::cout << "Upper edge: " << edge << '\n';
+          std::cout << "T Upper: " << T_border << '\n';
+          std::cout << "cond_edge: " << cond_edge (edge) << '\n';
+          std::cout << "q_edge: " << q_edge (edge) << '\n';
+          
+          Dirichlet_expl (cell, area, area_per_length, in_sign, 
                           cond_edge (edge), T_border, T_cell, 
                           q_edge (edge), enable_boundary_conduction, B_dir_vec);
+          
         }
     }
 }
@@ -335,7 +346,7 @@ HeatRect::solve (const GeometryRect& geo,
 		 const std::vector<double>& capacity_old,
 		 const std::vector<double>& capacity_new,
 		 const std::vector<double>& conductivity,
-		 const double T_top_old,
+		 const double T_top_old,                   
 		 const double T_top_new,
 		 const double T_bottom,
 		 std::vector<double>& T,
@@ -367,9 +378,9 @@ HeatRect::solve (const GeometryRect& geo,
 		 const std::vector<double>& capacity_old,
 		 const std::vector<double>& capacity_new,
                  const std::vector<double>& conductivity,
-                 const double T_top_old,
-                 const double T_top_new,
-                 const double T_bottom,
+                 double T_top_old,      //mmo should not be constant
+                 double T_top_new,      //mmo should not be constant
+                 double T_bottom,       //mmo should not be constant 
                  std::vector<double>& T,
                  const double dt, Treelog& msg) const
 {
@@ -384,6 +395,12 @@ HeatRect::solve (const GeometryRect& geo,
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();  
 
+  //mmo testing 
+  //T_top_old = 3.188;
+  //T_top_new = 3.188;
+  //T_bottom = 10;
+
+
   // Solution old
   ublas::vector<double> T_old (cell_size);
   for (int c = 0; c < cell_size; c++)
@@ -392,7 +409,7 @@ HeatRect::solve (const GeometryRect& geo,
   T_n = T_old;
 
   // Mean temp at upper boundary
-  double T_top_mean = 0.5*(T_top_old + T_top_new);
+  double T_top_mean = 0.5 * (T_top_old + T_top_new);
 
   // Area (volume) Multiplied with heat capacity 
   ublas::banded_matrix<double> Q_Ch_mat_n (cell_size, cell_size, 0 ,0);
@@ -427,16 +444,16 @@ HeatRect::solve (const GeometryRect& geo,
   //Boundary vectors  
   ublas::vector<double> B_dir_vec = ublas::zero_vector<double> (cell_size);
 
-  const bool isflux_lower= true;    //lower BC 
-  const bool isflux_upper = true;   //upper BC
+  const bool isflux_lower = false;      //true;    //lower BC 
+  const bool isflux_upper = false; //true;   //upper BC
   const bool enable_boundary_conduction = true; //mmo should be changed....
 
-  lowerboundary(geo, isflux_lower, T_bottom,
-                q_edge, cond_edge, T_old,
-                enable_boundary_conduction, B_dir_vec);
-  upperboundary (geo, isflux_upper, T_top_mean,
+  lowerboundary (geo, isflux_lower, T_bottom,
                  q_edge, cond_edge, T_old,
                  enable_boundary_conduction, B_dir_vec);
+  //upperboundary (geo, isflux_upper, T_top_mean,
+  //               q_edge, cond_edge, T_old,
+  //               enable_boundary_conduction, B_dir_vec);
 
 
   // Solver parameter , gamma
@@ -480,6 +497,12 @@ HeatRect::solve (const GeometryRect& geo,
      
       msg.message (tmp.str ());
     }
+
+  //Force upper cell
+  A (0, 0) = 1.0;
+  A (0, 1) = 0.0;
+  b (0) = T_top_mean;
+
 
   solver->solve (A, b, T_n); // Solve A T_n = b with regard to T_n.
   
