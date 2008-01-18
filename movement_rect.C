@@ -32,6 +32,7 @@
 #include "weather.h"
 #include "uzrect.h"
 #include "adsorption.h"
+#include "log.h"
 #include "check.h"
 #include "alist.h"
 #include "submodeler.h"
@@ -342,8 +343,10 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
 }
 
 void 
-MovementRect::output (Log&) const
-{ }
+MovementRect::output (Log& log) const
+{ 
+  output_list (matrix_solute, "matrix_solute", log, Msoltranrect::component);
+}
 
 bool
 MovementRect::check (Treelog&) const
@@ -398,7 +401,7 @@ static struct MovementRectSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
                "Two dimensional movement in a rectangular grid.");
-    syntax.add_submodule ("Geometry", alist, Syntax::State,
+    syntax.add_submodule ("Geometry", alist, Syntax::Const,
                           "Discretization of the soil.",
                           GeometryRect::load_syntax);
     syntax.add_submodule_sequence ("drain", Syntax::Const,
@@ -415,7 +418,7 @@ If none succeeds, the simulation ends.");
     matrix_water_models.push_back (&matrix_water_reserve);
     alist.add ("matrix_water", matrix_water_models);
     syntax.add_object ("matrix_solute", Msoltranrect::component, 
-                       Syntax::Const, Syntax::Sequence,
+                       Syntax::State, Syntax::Sequence,
                        "Matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");

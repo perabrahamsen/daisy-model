@@ -25,6 +25,7 @@
 #include "soil_water.h"
 #include "adsorption.h"
 #include "solver.h"
+#include "log.h"
 #include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -55,6 +56,9 @@ struct MsoltranrectMollerup : public Msoltranrect
   const bool enable_boundary_diffusion;
   const int debug;
  
+  // Log variables.
+  double ddt; //size of small timestep 
+
   // Water flux.
   static void cell_based_flux (const GeometryRect& geo,  
 			       const ublas::vector<double>& q_edge,
@@ -1418,14 +1422,15 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
 }
 
 void 
-MsoltranrectMollerup::output (Log&) const
-{ }
+MsoltranrectMollerup::output (Log& log) const
+{ output_variable (ddt, log); }
 
 MsoltranrectMollerup::MsoltranrectMollerup (Block& al)
   : Msoltranrect (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
     enable_boundary_diffusion (al.flag ("enable_boundary_diffusion")),
-    debug (al.integer ("debug"))
+    debug (al.integer ("debug")),
+    ddt (-42.42e42)
 { }
 
 MsoltranrectMollerup::~MsoltranrectMollerup ()
@@ -1445,6 +1450,7 @@ If this is set, diffusion over boundaries is enabled.");
 Enable additional debug message.\n\
 A value of 0 means no message, higher numbers means more messages.");
   alist.add ("debug", 0);
+  syntax.add ("ddt", "h", Syntax::LogOnly, "Small timestep.");
 }
 
 const AttributeList& 

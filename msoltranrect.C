@@ -97,7 +97,8 @@ Msoltranrect::element (const GeometryRect& geo,
 }
 
 Msoltranrect::Msoltranrect (Block& al)
-  : name (al.identifier ("type"))
+  : alist (al.alist ()),
+    name (al.identifier ("type"))
 { }
 
 Msoltranrect::~Msoltranrect ()

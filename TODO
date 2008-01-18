@@ -8,6 +8,65 @@ batteri
 - vand, - stof, - varme: 20 s
 - vand, - stof, varme (none): 43 s
 
+strøm;
+
+1D: 13 s
+-vand, -stof, -varme: 11 s
+-vand, -stof, +varme: 23 s
+-vand, -stof, varme (none): 23 s
++vand, -stof, +varme: 32 s
++vand, +stof, +varme: 3 m 27 s
++vand, +stof (none), +varme: 3 m 26 s
++vand, +stof (par), +varme: 3 m 30 s
++vand, stof (-A b), +varme; 0 m 47 s
++vand, +stof (vectorofvector all), +varme: 2 m 21 s
++vand, +stof (vectorofvector -bmat -banded), +varme: 4 m 9 s
++vand, +stof (vectorofvector -banded), +varme:  4 m 27 s
++vand, +stof (vectorofvector -bmat), +varme:  4 m 19 s
++vand, +stof (vectorofvector all), +varme: 2 m 17 s
++vand, +stof (dense all), +varme: 2 m 28 s
++vand, +stof (mapped), +varme:  4 m 57 s
++vamd, +stof, +varme, cvsboost: 3 m 33 s
+
+
+batteri, 1 måned:
+
++vand, +stof, +varme: 28 s
++vand, +stof (-A b), +varme: 7 s
++vand, +stof (-sum 0 0 0), +varme: 8 s
++vand, +stof (-sum 0 0 1), +varme: 8 s
++vand, +stof (-sum 0 1 1), +varme: 8 s
++vand, +stof (-prod 0 0 0), +varme: 19 s
++vand, +stof (-banded), +varme:  14s
++vand, +stof (banded->compressed), +varme:  31s
++vand, +stof (SumMatrix = banded), +varme:  31s
++vand, +stof (SumMatrix = coordinate), +varme:  1m xs
++vand, +stof (SumMatrix = vector_of_vector), +varme:  17 s
+
+*****
+
+Er problemet at man blander banded matrix med compressed matrix?
+NEJ!
+
+*****
+
+Prøv med coordinate matrix i stedet for.
+
+// This matrix type is optimized for matrix addition.
+// typedef ublas::vector_of_vector<double> SumMatrix_type;
+// typedef ublas::mapped_matrix<double> SumMatrix_type;
+typedef ublas::compressed_matrix<double> SumMatrix_type;
+struct SumMatrix : public SumMatrix_type
+{
+  using SumMatrix_type::operator=;
+  SumMatrix (size_t size) 
+    : SumMatrix_type (size, size)
+  { /* *this = ublas::zero_matrix<double> (size, size); */ }
+};
+
+typedef SumMatrix ProdMatrix;	// This is for products.
+typedef SumMatrix TriMatrix;	// Tridiagonal matrix.
+
 * 2D: mmo: få T til at virke
 
 * Biotoxin

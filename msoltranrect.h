@@ -23,6 +23,7 @@
 #define MSOLTRANRECT_H
 
 #include "model.h"
+#include "alist.h"
 #include "symbol.h"
 #include <vector>
 
@@ -38,7 +39,6 @@ class Groundwater;
 class Weather;
 class Time;
 class Treelog;
-class AttributeList;
 class Block;
 class Scope;
 
@@ -46,6 +46,7 @@ class Msoltranrect : public Model
 {
   // Content.
 public:
+  const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
   static const char *const component;
 
