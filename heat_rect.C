@@ -406,9 +406,10 @@ fluxes_new (const GeometryRect& geo,
       ublas::vector<double> B_dir_vec_new (cell_size);
       B_dir_vec_new = b_before + B_dir_vec - prod(A, T); 
 
+#if 0
       std::cout << "B_dir_vec: " << B_dir_vec << '\n';
       std::cout << "B_dir_vec_new: " << B_dir_vec_new << '\n';
-
+#endif
         
       const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
       const size_t edge_above_size = edge_above.size ();

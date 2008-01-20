@@ -975,6 +975,22 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
     }
 }
 
+static void
+add_to (const Solver::Matrix& from, ublas::coordinate_matrix<double>& to)
+{
+  for (Solver::Matrix::const_iterator1 i1 = from.begin1 (); i1 != from.end1 (); ++i1)
+    for (Solver::Matrix::const_iterator2 i2 = i1.begin (); i2 != i1.end (); ++i2)
+      to.append_element (i2.index1 (), i2.index2 (), *i2);
+}
+
+static void
+sub_to (const Solver::Matrix& from, ublas::coordinate_matrix<double>& to)
+{
+  for (Solver::Matrix::const_iterator1 i1 = from.begin1 (); i1 != from.end1 (); ++i1)
+    for (Solver::Matrix::const_iterator2 i2 = i1.begin (); i2 != i1.end (); ++i2)
+      to.append_element (i2.index1 (), i2.index2 (), - *i2);
+}
+
 
 void
 MsoltranrectMollerup::flow (const GeometryRect& geo, 
@@ -1327,8 +1343,8 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
 
       // Non-linear adsorption, store old adsorbed matter.
       if (!ads_lin)
-	for (int c = 0; c < cell_size; c++)
-	  ads_total[c] = M_total[c] - C_n[c] * Theta_cell_n[c];
+        for (int c = 0; c < cell_size; c++)
+          ads_total[c] = M_total[c] - C_n[c] * Theta_cell_n[c];
       
       lowerboundary (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg,
                      C_n, enable_boundary_diffusion, edge_type, B_mat,
@@ -1337,6 +1353,33 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
      
       if (simple_dcthetadt)
         {
+#if 1
+          // UBLAS matrix addition is slow.
+          // Using coordinate matrix and append_element is less bad.
+          ublas::coordinate_matrix<double> m_sum (cell_size, cell_size);
+          add_to (diff_xx_zz_avg, m_sum);	// xx_zz diffusion
+          add_to (diff_xz_zx_avg, m_sum);	// xz_zx diffusion
+          sub_to (advec,          m_sum);	// advec
+
+          // Banded matrix can be done fast, just not by ublas.
+          for (size_t c = 0; c < cell_size; c++)
+            {
+	 const double val = B_mat (c, c) // impl Neumann BC 
+	   + diffm_xx_zz_mat (c, c)      // Dirichlet BC
+	   - advecm_mat (c, c);	       // Dirichlet BC
+	 m_sum.append_element (c, c, val);
+            }
+
+          // Use the sum matrix.
+          A = - gamma * m_sum;
+          b_mat =  (1 - gamma) * m_sum;
+          // As usual, band matrix is faster cell based.
+          for (size_t c = 0; c < cell_size; c++)
+            {
+	 A (c, c) += R *(1.0 / ddt) * QTheta_mat_np1 (c, c); // dtheta/ddt
+	 b_mat (c, c) += R * (1.0 / ddt) * QTheta_mat_n (c, c);
+            }
+#else
           A = R *(1.0 / ddt) * QTheta_mat_np1       // dtheta/ddt
             - gamma * diff_xx_zz_avg                // xx_zz diffusion
             - gamma * diff_xz_zx_avg                // xz_zx diffusion
@@ -1344,7 +1387,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
             - gamma * B_mat                         // impl Neumann BC 
             - gamma * diffm_xx_zz_mat               // Dirichlet BC
             + gamma * advecm_mat;                   // Dirichlet BC
-          
+
           b_mat = R * (1.0 / ddt) * QTheta_mat_n 
             + (1 - gamma) * diff_xx_zz_avg 
             + (1 - gamma) * diff_xz_zx_avg 
@@ -1352,7 +1395,8 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
             + (1 - gamma) * B_mat
             + (1 - gamma) * diffm_xx_zz_mat
             - (1 - gamma) * advecm_mat;
-   
+#endif
+
           b = prod (b_mat, C_n)
             + B_vec                                 // expl Neumann BC
             - B_dir_vec                             // Dirichlet BC as Neumann
@@ -1501,4 +1545,5 @@ See Mollerup 2007 for details.");
   }
 } MsoltranrectMollerup_syntax;
 
+// msoltranrect_Mollerup.C ends here.
 

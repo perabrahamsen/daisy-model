@@ -26,8 +26,17 @@ strøm;
 +vand, +stof (vectorofvector all), +varme: 2 m 17 s
 +vand, +stof (dense all), +varme: 2 m 28 s
 +vand, +stof (mapped), +varme:  4 m 57 s
-+vamd, +stof, +varme, cvsboost: 3 m 33 s
-
++vand, +stof, +varme, cvsboost: 3 m 33 s
++vand, +stof (A = add_to), +varme: 2 m 32 s
++vand, +stof (A, b_mat = add_to), +varme: 1 m 52 s
++vand, +stof (A, b_mat = add_to, solve = none), +varme: 1 m 51 s
++vand, +stof (A, b_mat = add_to, solve = none, -b), +varme: 1 m 40 s
++vand, +stof (A, b_mat = add_to, solve = none), +varme: 2 m 12 s
++vand, +stof (A, b_mat = add_to, solve = none), +varme: 1 m 57 s
++vand, +stof (m_sum, solve = none), +varme: 1 m 47 s
++vand, +stof (band, solve = none), +varme: 1 m 34 s
++vand, +stof (band, band, solve = none), +varme: 1 m 30 s
++vand, +stof (band, band), +varme: 1 m 33 s
 
 batteri, 1 måned:
 
@@ -53,8 +62,11 @@ NEJ!
 Prøv med coordinate matrix i stedet for.
 
 // This matrix type is optimized for matrix addition.
+// typedef ublas::matrix<double> SumMatrix_type;
 // typedef ublas::vector_of_vector<double> SumMatrix_type;
 // typedef ublas::mapped_matrix<double> SumMatrix_type;
+// typedef ublas::sparse_matrix<double> SumMatrix_type;
+// typedef ublas::coordinate_matrix<double> SumMatrix_type;
 typedef ublas::compressed_matrix<double> SumMatrix_type;
 struct SumMatrix : public SumMatrix_type
 {
