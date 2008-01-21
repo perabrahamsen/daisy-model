@@ -438,7 +438,8 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = ABAprod.C solver.C element.C ui.C reaction.C scopesel.C scope.C \
+COMPONENTS = \
+	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C scope.C \
 	ABAeffect.C msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
 	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C\
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \

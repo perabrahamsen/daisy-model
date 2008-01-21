@@ -1364,10 +1364,10 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
           // Banded matrix can be done fast, just not by ublas.
           for (size_t c = 0; c < cell_size; c++)
             {
-         const double val = B_mat (c, c) // impl Neumann BC 
-           + diffm_xx_zz_mat (c, c)      // Dirichlet BC
-           - advecm_mat (c, c);        // Dirichlet BC
-         m_sum.append_element (c, c, val);
+              const double val = B_mat (c, c) // impl Neumann BC 
+                + diffm_xx_zz_mat (c, c)      // Dirichlet BC
+                - advecm_mat (c, c);        // Dirichlet BC
+              m_sum.append_element (c, c, val);
             }
 
           // Use the sum matrix.
@@ -1376,8 +1376,8 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
           // As usual, band matrix is faster cell based.
           for (size_t c = 0; c < cell_size; c++)
             {
-         A (c, c) += R *(1.0 / ddt) * QTheta_mat_np1 (c, c); // dtheta/ddt
-         b_mat (c, c) += R * (1.0 / ddt) * QTheta_mat_n (c, c);
+              A (c, c) += R *(1.0 / ddt) * QTheta_mat_np1 (c, c); // dtheta/ddt
+              b_mat (c, c) += R * (1.0 / ddt) * QTheta_mat_n (c, c);
             }
 #else
           A = R *(1.0 / ddt) * QTheta_mat_np1       // dtheta/ddt
