@@ -61,14 +61,14 @@ struct MsoltranrectMollerup : public Msoltranrect
 
   // Water flux.
   static void cell_based_flux (const GeometryRect& geo,  
-			       const ublas::vector<double>& q_edge,
+                               const ublas::vector<double>& q_edge,
                                ublas::vector<double>& qx_cell,
                                ublas::vector<double>& qz_cell);
 
   // Edge water content 
   static void edge_water_content (const GeometryRect& geo,
-				 const ublas::vector<double>& Theta_cell,
-				 ublas::vector<double>& Theta_edge);
+                                 const ublas::vector<double>& Theta_cell,
+                                 ublas::vector<double>& Theta_edge);
   
   // Interpolation function for vectors (for water content)
   static void interpol (const ublas::vector<double>& V_start,
@@ -78,18 +78,18 @@ struct MsoltranrectMollerup : public Msoltranrect
                         ublas::vector<double>& V);
 
   static double anisotropy_factor (const Geometry& geo, size_t edge, 
-				   const double Dxx, 
-				   const double Dzz);
+                                   const double Dxx, 
+                                   const double Dzz);
 
   static void diffusion_tensor (const GeometryRect& geo, 
-				const Soil& soil, 
-				const ublas::vector<double>& q_edge, 
-				const ublas::vector<double>& Theta,
-				const double diffusion_coefficient,
-				ublas::vector<double>& Dxx_cell,
-				ublas::vector<double>& Dzz_cell,
-				ublas::vector<double>& Dxz_cell,
-				Treelog& msg);
+                                const Soil& soil, 
+                                const ublas::vector<double>& q_edge, 
+                                const ublas::vector<double>& Theta,
+                                const double diffusion_coefficient,
+                                ublas::vector<double>& Dxx_cell,
+                                ublas::vector<double>& Dzz_cell,
+                                ublas::vector<double>& Dxz_cell,
+                                Treelog& msg);
   
   static void thetadiff_xx_zz_xz_zx (const GeometryRect& geo,
                                      const ublas::vector<double>& Theta,
@@ -108,8 +108,8 @@ struct MsoltranrectMollerup : public Msoltranrect
                                Solver::Matrix& diff_xz_zx);
 
   static void advection (const GeometryRect& geo,
-			 const ublas::vector<double>& q_edge,
-			 Solver::Matrix& advec);
+                         const ublas::vector<double>& q_edge,
+                         Solver::Matrix& advec);
   
   static void Neumann_expl (const size_t cell, const double area, 
                             const double in_sign, const double J, 
@@ -166,14 +166,14 @@ struct MsoltranrectMollerup : public Msoltranrect
   void flow (const GeometryRect& geo, 
              const Soil& soil, 
              const SoilWater& soil_water, 
-	     const Adsorption& adsorption,
+             const Adsorption& adsorption,
              symbol name,
              std::vector<double>& M, 
              std::vector<double>& C, 
              const std::vector<double>& S, 
              std::vector<double>& J, 
-	     const double C_below,
-	     const bool flux_below,
+             const double C_below,
+             const bool flux_below,
              double diffusion_coefficient, double dt,
              Treelog& msg);
   
@@ -187,8 +187,8 @@ struct MsoltranrectMollerup : public Msoltranrect
 
 void
 MsoltranrectMollerup::cell_based_flux (const GeometryRect& geo,  
-				       const ublas::vector<double>& q_edge, 
-				       ublas::vector<double>& qx_cell,
+                                       const ublas::vector<double>& q_edge, 
+                                       ublas::vector<double>& qx_cell,
                                        ublas::vector<double>& qz_cell)
 {
   const size_t cell_size = geo.cell_size ();
@@ -254,12 +254,12 @@ MsoltranrectMollerup::edge_water_content
       const int to = geo.edge_to (e);    
       
       if (geo.edge_is_internal (e))
-	Theta_edge[e] = 0.5 *
-	  (Theta_cell[from] + Theta_cell[to]);
+        Theta_edge[e] = 0.5 *
+          (Theta_cell[from] + Theta_cell[to]);
       else if (geo.cell_is_internal (from))
-	Theta_edge[e] = Theta_cell[from];
+        Theta_edge[e] = Theta_cell[from];
       else
-	Theta_edge[e] = Theta_cell[to];
+        Theta_edge[e] = Theta_cell[to];
     }
 }
 
@@ -290,14 +290,14 @@ MsoltranrectMollerup::anisotropy_factor (const Geometry& geo, size_t edge,
 
 void
 MsoltranrectMollerup::diffusion_tensor (const GeometryRect& geo, 
-					const Soil& soil, 
-					const ublas::vector<double>& q_edge,
-					const ublas::vector<double>& Theta,
-					const double diffusion_coefficient,
-					ublas::vector<double>& Dxx_cell,
-					ublas::vector<double>& Dzz_cell,
-					ublas::vector<double>& Dxz_cell,
-					Treelog& msg)
+                                        const Soil& soil, 
+                                        const ublas::vector<double>& q_edge,
+                                        const ublas::vector<double>& Theta,
+                                        const double diffusion_coefficient,
+                                        ublas::vector<double>& Dxx_cell,
+                                        ublas::vector<double>& Dzz_cell,
+                                        ublas::vector<double>& Dxz_cell,
+                                        Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   
@@ -356,27 +356,27 @@ MsoltranrectMollerup::thetadiff_xx_zz_xz_zx
       //std::cout << "e" << e << '\n';
       
       if (geo.edge_is_internal (e))
-	{  
+        {  
           const double ThetaD_xx_zz_from = Theta[from] 
-	    * anisotropy_factor (geo, e, Dxx_cell[from], Dzz_cell[from]);
-	  const double ThetaD_xx_zz_to = Theta[to] 
-	    * anisotropy_factor (geo, e, Dxx_cell[to], Dzz_cell[to]); 
-	  ThetaD_xx_zz[e] = (ThetaD_xx_zz_from + ThetaD_xx_zz_to) / 2.0;
-	  ThetaD_xz_zx[e] = (Theta[from] * Dxz_cell[from] + 
+            * anisotropy_factor (geo, e, Dxx_cell[from], Dzz_cell[from]);
+          const double ThetaD_xx_zz_to = Theta[to] 
+            * anisotropy_factor (geo, e, Dxx_cell[to], Dzz_cell[to]); 
+          ThetaD_xx_zz[e] = (ThetaD_xx_zz_from + ThetaD_xx_zz_to) / 2.0;
+          ThetaD_xz_zx[e] = (Theta[from] * Dxz_cell[from] + 
                              Theta[to] * Dxz_cell[to]) / 2.0;
-	}  
+        }  
       else if (geo.cell_is_internal (from))
-	{
+        {
           ThetaD_xx_zz[e] = Theta[from] 
-	    * anisotropy_factor (geo, e, Dxx_cell[from], Dzz_cell[from]);
-	  ThetaD_xz_zx[e] = Theta[from] * Dxz_cell[from];
+            * anisotropy_factor (geo, e, Dxx_cell[from], Dzz_cell[from]);
+          ThetaD_xz_zx[e] = Theta[from] * Dxz_cell[from];
         }
       else 
-	{
+        {
           daisy_assert(geo.cell_is_internal (to));
-	  ThetaD_xx_zz[e] = Theta[to] 
-	    * anisotropy_factor (geo, e, Dxx_cell[to], Dzz_cell[to]);
-	  ThetaD_xz_zx[e] = Theta[to] * Dxz_cell[to];
+          ThetaD_xx_zz[e] = Theta[to] 
+            * anisotropy_factor (geo, e, Dxx_cell[to], Dzz_cell[to]);
+          ThetaD_xz_zx[e] = Theta[to] * Dxz_cell[to];
         }
     }
 }
@@ -392,16 +392,16 @@ MsoltranrectMollerup::diffusion_xx_zz (const GeometryRect& geo,
   for (size_t e = 0; e < edge_size; e++)
     {
       if (geo.edge_is_internal (e))
-	{
-	  const int from = geo.edge_from (e);
-	  const int to = geo.edge_to (e);
-	  const double magnitude = geo.edge_area_per_length (e) 
+        {
+          const int from = geo.edge_from (e);
+          const int to = geo.edge_to (e);
+          const double magnitude = geo.edge_area_per_length (e) 
             * ThetaD_xx_zz[e]; 
-	  diff_xx_zz (from, from) -= magnitude;
-	  diff_xx_zz (from, to) += magnitude;
-	  diff_xx_zz (to, to) -= magnitude;
-	  diff_xx_zz (to, from) += magnitude; 
-	} 
+          diff_xx_zz (from, from) -= magnitude;
+          diff_xx_zz (from, to) += magnitude;
+          diff_xx_zz (to, to) -= magnitude;
+          diff_xx_zz (to, from) += magnitude; 
+        } 
     }
 }
 
@@ -417,10 +417,10 @@ MsoltranrectMollerup::diffusion_xz_zx (const GeometryRect& geo,
   for (size_t e = 0; e < edge_size; e++)
     {
       if (geo.edge_is_internal (e))
-	{
+        {
           const int from = geo.edge_from (e);
-	  const int to = geo.edge_to (e);
-	  
+          const int to = geo.edge_to (e);
+          
           const std::vector<int>& corners = geo.edge_corners (e);
           daisy_assert (corners.size () == 2);
           const int A = corners[0];
@@ -476,47 +476,47 @@ MsoltranrectMollerup::diffusion_xz_zx (const GeometryRect& geo,
               diff_xz_zx (from, B_cells[i]) -= B_magnitude * sign;
               diff_xz_zx (to, B_cells[i]) += B_magnitude * sign;
             }
-	} 
+        } 
     }
 }
 
 void 
 MsoltranrectMollerup::advection (const GeometryRect& geo,
-				 const ublas::vector<double>& q_edge,
-				 Solver::Matrix& advec)  
+                                 const ublas::vector<double>& q_edge,
+                                 Solver::Matrix& advec)  
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
 
   for (size_t e = 0; e < edge_size; e++)
     {
       if (geo.edge_is_internal (e))
-	{
-	  const int from = geo.edge_from (e);
-	  const int to = geo.edge_to (e);	   
-	  const double value = geo.edge_area (e) * q_edge[e];
-	  //Equal weighting
-	  //advec (from, from) += 0.5*value;
-	  //advec (from, to) += 0.5**value;
-	  //advec (to, from) -= 0.5*value;
-	  //advec (to, to) -= 0.5*value;
+        {
+          const int from = geo.edge_from (e);
+          const int to = geo.edge_to (e);          
+          const double value = geo.edge_area (e) * q_edge[e];
+          //Equal weighting
+          //advec (from, from) += 0.5*value;
+          //advec (from, to) += 0.5**value;
+          //advec (to, from) -= 0.5*value;
+          //advec (to, to) -= 0.5*value;
 
-	  //Upstream formulation 
-	  //advec (from, from) += 1.0*value;
-	  //advec (to, from) -= 1.0*value;
+          //Upstream formulation 
+          //advec (from, from) += 1.0*value;
+          //advec (to, from) -= 1.0*value;
 
-	  //More flexible
-	  //Equal weight: upstream_weight = 0.5
-	  //Upstr weight: upstream_weight = 1.0
-	  const double upstream_weight = 0.5;
+          //More flexible
+          //Equal weight: upstream_weight = 0.5
+          //Upstr weight: upstream_weight = 1.0
+          const double upstream_weight = 0.5;
           //const double upstream_weight = 1.0;
           const double alpha = (q_edge[e] >= 0) 
-	    ? upstream_weight 
-	    : 1.0 - upstream_weight;
-	  advec (from, from) += alpha*value;
-	  advec (from, to)   += (1.0-alpha)*value;
-	  advec (to, from)   -= alpha*value;
-	  advec (to, to)     -= (1.0-alpha)*value;
-	} 
+            ? upstream_weight 
+            : 1.0 - upstream_weight;
+          advec (from, from) += alpha*value;
+          advec (from, to)   += (1.0-alpha)*value;
+          advec (to, from)   -= alpha*value;
+          advec (to, to)     -= (1.0-alpha)*value;
+        } 
     }
 }
 
@@ -728,7 +728,7 @@ MsoltranrectMollerup::lowerboundary
           edge_type[edge] = Dirichlet;
           // write something
           double C_cell = C (cell);
-	  Dirichlet_expl (cell, area, area_per_length, in_sign, 
+          Dirichlet_expl (cell, area, area_per_length, in_sign, 
                           ThetaD_xx_zz (edge), C_border, C_cell, 
                           q_edge (edge), enable_boundary_diffusion, B_dir_vec); 
         }
@@ -787,7 +787,7 @@ MsoltranrectMollerup::Dirichlet_timestep
 void 
 MsoltranrectMollerup::upperboundary (const GeometryRect& geo,
                                      std::vector<edge_type_t>& edge_type,
-				     const std::vector<double>& J,
+                                     const std::vector<double>& J,
                                      ublas::vector<double>& B_vec,
                                      Treelog& msg)
 {
@@ -994,19 +994,19 @@ sub_to (const Solver::Matrix& from, ublas::coordinate_matrix<double>& to)
 
 void
 MsoltranrectMollerup::flow (const GeometryRect& geo, 
-			    const Soil& soil, 
-			    const SoilWater& soil_water, 
-			    const Adsorption& adsorption,
-			    const symbol name,
-			    std::vector<double>& M, 
-			    std::vector<double>& C, 
-			    const std::vector<double>& S, 
-			    std::vector<double>& J, 
-			    const double C_below,
-			    const bool flux_below,
-			    double diffusion_coefficient,
-			    const double dt,
-			    Treelog& msg)
+                            const Soil& soil, 
+                            const SoilWater& soil_water, 
+                            const Adsorption& adsorption,
+                            const symbol name,
+                            std::vector<double>& M, 
+                            std::vector<double>& C, 
+                            const std::vector<double>& S, 
+                            std::vector<double>& J, 
+                            const double C_below,
+                            const bool flux_below,
+                            double diffusion_coefficient,
+                            const double dt,
+                            Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
@@ -1023,7 +1023,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   if (ads_lin)
     {
       for (size_t c = 0; c < cell_size; c++)
-	K_ads_cell[c] = ads_lin->K (soil, c);
+        K_ads_cell[c] = ads_lin->K (soil, c);
     }
   else
     // No linear adsorption.
@@ -1040,10 +1040,10 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
     C_old (c) = C[c];
   
   // Water content old and new 
-  ublas::vector<double> Theta_cell_old (cell_size);	
+  ublas::vector<double> Theta_cell_old (cell_size);     
   for (int c = 0; c < cell_size; c++)
     Theta_cell_old (c) = soil_water.Theta_old (c);
-  ublas::vector<double> Theta_cell (cell_size);	
+  ublas::vector<double> Theta_cell (cell_size); 
   for (int c = 0; c < cell_size; c++)
     Theta_cell (c) = soil_water.Theta (c);
 
@@ -1052,7 +1052,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   Theta_cell_avg = 0.5 * (Theta_cell + Theta_cell_old);
   
   // Flux in timestep
-  ublas::vector<double> q_edge (edge_size);	
+  ublas::vector<double> q_edge (edge_size);     
   for (int e = 0; e < edge_size; e++)
     q_edge (e) = soil_water.q (e);
   
@@ -1064,17 +1064,17 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   
   //Calculate cell based diffusion based on average water content
   diffusion_tensor (geo, soil, q_edge, Theta_cell_avg, diffusion_coefficient,
-		    Dxx_cell, Dzz_cell, Dxz_cell, msg);
+                    Dxx_cell, Dzz_cell, Dxz_cell, msg);
   
   //Theta * D - old and new and average 
   //ublas::vector<double> ThetaD_xx_zz_old (edge_size);                       //mmo 20071102 
   //ublas::vector<double> ThetaD_xz_zx_old (edge_size);                       //mmo 20071102
   //thetadiff_xx_zz_xz_zx (geo, Theta_cell_old, Dxx_cell, Dzz_cell, Dxz_cell, //mmo 20071102
-  //		      ThetaD_xx_zz_old, ThetaD_xz_zx_old);                    //mmo 20071102
+  //                  ThetaD_xx_zz_old, ThetaD_xz_zx_old);                    //mmo 20071102
   //ublas::vector<double> ThetaD_xx_zz (edge_size);                           //mmo 20071102
   //ublas::vector<double> ThetaD_xz_zx (edge_size);                           //mmo 20071102
   //thetadiff_xx_zz_xz_zx (geo, Theta_cell, Dxx_cell, Dzz_cell, Dxz_cell,     //mmo 20071102
-  //		      ThetaD_xx_zz, ThetaD_xz_zx);                            //mmo 20071102
+  //                  ThetaD_xx_zz, ThetaD_xz_zx);                            //mmo 20071102
   
   ublas::vector<double> ThetaD_xx_zz_avg (edge_size); 
   ublas::vector<double> ThetaD_xz_zx_avg (edge_size);
@@ -1211,7 +1211,7 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
 
   //Initialize xx_zz diffusion matrix - old and new
   //Solver::Matrix diff_xx_zz_old (cell_size);     //mmo 20071102
-  //diffusion_xx_zz (geo, ThetaD_xx_zz_old, diff_xx_zz_old);   //mmo 20071102	   
+  //diffusion_xx_zz (geo, ThetaD_xx_zz_old, diff_xx_zz_old);   //mmo 20071102      
   //Solver::Matrix diff_xx_zz (cell_size);     //mmo 20071102
   //diffusion_xx_zz (geo, ThetaD_xx_zz, diff_xx_zz);           //mmo 20071102 
 
@@ -1297,9 +1297,9 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   //--- End, For moving in/out of tick loop ---
   //-------------------------------------------
   
-  ublas::vector<double> Theta_cell_n (cell_size);	
+  ublas::vector<double> Theta_cell_n (cell_size);       
   Theta_cell_n = Theta_cell_old;
-  ublas::vector<double> Theta_cell_np1 (cell_size);	
+  ublas::vector<double> Theta_cell_np1 (cell_size);     
   
   ublas::banded_matrix<double> QTheta_mat_n (cell_size, cell_size, 0 ,0);
   for (int c = 0; c < cell_size; c++)
@@ -1357,17 +1357,17 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
           // UBLAS matrix addition is slow.
           // Using coordinate matrix and append_element is less bad.
           ublas::coordinate_matrix<double> m_sum (cell_size, cell_size);
-          add_to (diff_xx_zz_avg, m_sum);	// xx_zz diffusion
-          add_to (diff_xz_zx_avg, m_sum);	// xz_zx diffusion
-          sub_to (advec,          m_sum);	// advec
+          add_to (diff_xx_zz_avg, m_sum);       // xx_zz diffusion
+          add_to (diff_xz_zx_avg, m_sum);       // xz_zx diffusion
+          sub_to (advec,          m_sum);       // advec
 
           // Banded matrix can be done fast, just not by ublas.
           for (size_t c = 0; c < cell_size; c++)
             {
-	 const double val = B_mat (c, c) // impl Neumann BC 
-	   + diffm_xx_zz_mat (c, c)      // Dirichlet BC
-	   - advecm_mat (c, c);	       // Dirichlet BC
-	 m_sum.append_element (c, c, val);
+         const double val = B_mat (c, c) // impl Neumann BC 
+           + diffm_xx_zz_mat (c, c)      // Dirichlet BC
+           - advecm_mat (c, c);        // Dirichlet BC
+         m_sum.append_element (c, c, val);
             }
 
           // Use the sum matrix.
@@ -1376,8 +1376,8 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
           // As usual, band matrix is faster cell based.
           for (size_t c = 0; c < cell_size; c++)
             {
-	 A (c, c) += R *(1.0 / ddt) * QTheta_mat_np1 (c, c); // dtheta/ddt
-	 b_mat (c, c) += R * (1.0 / ddt) * QTheta_mat_n (c, c);
+         A (c, c) += R *(1.0 / ddt) * QTheta_mat_np1 (c, c); // dtheta/ddt
+         b_mat (c, c) += R * (1.0 / ddt) * QTheta_mat_n (c, c);
             }
 #else
           A = R *(1.0 / ddt) * QTheta_mat_np1       // dtheta/ddt
@@ -1406,9 +1406,9 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
         }
       else  
         {
-	  daisy_notreached ();
+          daisy_notreached ();
           // A = ;
-          // b = ;     	
+          // b = ;      
         }
       
       solver->solve (A, b, C_n); // Solve A C_n = b with regard to C_n.
@@ -1427,16 +1427,16 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
       
       // Non-linear adsorption, calculate new total matter and new conc.
       if (!ads_lin)
-	{
-	  for (size_t c = 0; c < cell_size; c++)
-	    {
-	      // We assume the adsorbed matter stayed during transport.
-	      M_total[c] = ads_total[c] + C_n[c] * Theta_cell_np1[c];
-	      // We assume new equilibrium right after transport.
-	      C_n[c] = adsorption.M_to_C (soil, Theta_cell_np1[c],
-					  c, M_total[c]);
-	    }
-	}
+        {
+          for (size_t c = 0; c < cell_size; c++)
+            {
+              // We assume the adsorbed matter stayed during transport.
+              M_total[c] = ads_total[c] + C_n[c] * Theta_cell_np1[c];
+              // We assume new equilibrium right after transport.
+              C_n[c] = adsorption.M_to_C (soil, Theta_cell_np1[c],
+                                          c, M_total[c]);
+            }
+        }
 
     } //End small timestep loop
   
@@ -1484,7 +1484,7 @@ void
 MsoltranrectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_object ("solver", Solver::component, 
-		     Syntax::Const, Syntax::Singleton, "\
+                     Syntax::Const, Syntax::Singleton, "\
 Model used for solving matrix equation system.");
   alist.add ("solver", Solver::default_model ());
   syntax.add ("enable_boundary_diffusion", Syntax::Boolean, Syntax::Const, "\
