@@ -55,6 +55,7 @@ struct MsoltranrectMollerup : public Msoltranrect
   const std::auto_ptr<Solver> solver;
   const bool enable_boundary_diffusion;
   const int debug;
+  const double upstream_weight;
  
   // Log variables.
   double ddt; //size of small timestep 
@@ -107,9 +108,9 @@ struct MsoltranrectMollerup : public Msoltranrect
                                const ublas::vector<double>& ThetaD_xz_zx,      
                                Solver::Matrix& diff_xz_zx);
 
-  static void advection (const GeometryRect& geo,
-                         const ublas::vector<double>& q_edge,
-                         Solver::Matrix& advec);
+  void advection (const GeometryRect& geo,
+                  const ublas::vector<double>& q_edge,
+                  Solver::Matrix& advec);
   
   static void Neumann_expl (const size_t cell, const double area, 
                             const double in_sign, const double J, 
@@ -152,15 +153,15 @@ struct MsoltranrectMollerup : public Msoltranrect
                              ublas::vector<double>& B_vec,
                              Treelog& msg);
 
-  static void fluxes (const GeometryRect& geo,
-                      const std::vector<edge_type_t>& edge_type,
-                      const ublas::vector<double>& q_edge,
-                      const ublas::vector<double>& ThetaD_xx_zz,
-                      const ublas::vector<double>& ThetaD_xz_zx,
-                      const ublas::vector<double>& C,
-                      const double C_below,
-                      const ublas::vector<double>& B_dir_vec,
-                      ublas::vector<double>& dJ); 
+  void fluxes (const GeometryRect& geo,
+               const std::vector<edge_type_t>& edge_type,
+               const ublas::vector<double>& q_edge,
+               const ublas::vector<double>& ThetaD_xx_zz,
+               const ublas::vector<double>& ThetaD_xz_zx,
+               const ublas::vector<double>& C,
+               const double C_below,
+               const ublas::vector<double>& B_dir_vec,
+               ublas::vector<double>& dJ); 
 
   // Solute.
   void flow (const GeometryRect& geo, 
@@ -507,8 +508,6 @@ MsoltranrectMollerup::advection (const GeometryRect& geo,
           //More flexible
           //Equal weight: upstream_weight = 0.5
           //Upstr weight: upstream_weight = 1.0
-          const double upstream_weight = 0.5;
-          //const double upstream_weight = 1.0;
           const double alpha = (q_edge[e] >= 0) 
             ? upstream_weight 
             : 1.0 - upstream_weight;
@@ -845,7 +844,6 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
             daisy_assert (to < C.size ());
             
             //--- Advective part ---
-            const double upstream_weight = 0.5;  //Should be taken from  outside
             const double alpha = (q_edge[e] >= 0) 
               ? upstream_weight 
               : 1.0 - upstream_weight;
@@ -1481,6 +1479,7 @@ MsoltranrectMollerup::MsoltranrectMollerup (Block& al)
     solver (Librarian::build_item<Solver> (al, "solver")),
     enable_boundary_diffusion (al.flag ("enable_boundary_diffusion")),
     debug (al.integer ("debug")),
+    upstream_weight (al.number ("upstream_weight")),
     ddt (-42.42e42)
 { }
 
@@ -1501,6 +1500,9 @@ If this is set, diffusion over boundaries is enabled.");
 Enable additional debug message.\n\
 A value of 0 means no message, higher numbers means more messages.");
   alist.add ("debug", 0);
+  syntax.add ("upstream_weight", Syntax::Fraction(), Syntax::Const, "\
+Upstream weighting factor: 1 = full upstream formulation, 0.5 = equal weight.");
+  alist.add ("upstream_weight", 0.5);
   syntax.add ("ddt", "h", Syntax::LogOnly, "Small timestep.");
 }
 
