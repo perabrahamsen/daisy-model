@@ -427,6 +427,8 @@ If none succeeds, the simulation ends.");
     matrix_solute_models.push_back (&matrix_solute_default);
     AttributeList matrix_solute_reserve (Msoltranrect::reserve_model ());
     matrix_solute_models.push_back (&matrix_solute_reserve);
+    AttributeList matrix_solute_none (Msoltranrect::none_model ());
+    matrix_solute_models.push_back (&matrix_solute_none);
     alist.add ("matrix_solute", matrix_solute_models);
 
     syntax.add_object ("matrix_solid", Msoltranrect::component, 

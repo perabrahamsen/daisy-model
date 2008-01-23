@@ -78,11 +78,11 @@ AOM::penetrate (const Geometry& geo, double from, double to,
 
 double 
 AOM::full_C (const Geometry& geo) const
-{ return soil_C (geo) + top_C; }
+{ return soil_C (geo) + top_C * geo.surface_area (); }
 
 double 
 AOM::full_N (const Geometry& geo) const
-{ return soil_N (geo) + top_N; }
+{ return soil_N (geo) + top_N * geo.surface_area (); }
 
 double 
 AOM::C_at (unsigned int at) const

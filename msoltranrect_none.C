@@ -92,7 +92,7 @@ MsoltranrectNone::flow (const GeometryRect& geo,
       in -= value;
     }
 
-  // Cell fluxes.
+  // Cell source.
   for (size_t n = 0; n < cell_size; n++)
     {
       M[n] += S[n] * dt;

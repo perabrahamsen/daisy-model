@@ -1,3 +1,10 @@
+2008-01-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* msoltranrect_forward.C: New model.
+	* Makefile (MODELS): Add it.
+
+	* aom.C (AOM::full_C, AOM::full_N): Take surface area into account.
+
 2008-01-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* msoltranrect_Mollerup.C: Use 'solver.h'.

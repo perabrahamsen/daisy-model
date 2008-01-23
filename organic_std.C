@@ -1238,8 +1238,8 @@ OrganicStandard::tick (const Geometry& geo,
     {
       std::ostringstream tmp;
       tmp << "BUG: OrganicStandard: delta_N != NO3 + NH4 [g N]\n"
-          << delta_N << " != " << geo.total_soil (NO3_source)
-          << " + " << geo.total_soil (NH4_source);
+          << delta_N << " != " << geo.total_soil (NO3_source) * dt
+          << " + " << geo.total_soil (NH4_source) * dt;
       if (std::isnormal (N_source))
 	tmp << " (error " 
             << fabs (delta_N / (N_source) - 1.0) * 100.0 << "%)";

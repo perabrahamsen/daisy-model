@@ -1440,10 +1440,10 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
 
     } //End small timestep loop
   
-  //ublas::vector<double> S_ublas (S.size ());
-  //copy (S.begin (), S.end (), S_ublas.begin ());
-  //tmp_mmo << "C_n" << C_n << "\nS" << S_ublas << "\nS_vol" << S_vol;
-  tmp_mmo << "C_n" << C_n << "\nS";
+  ublas::vector<double> S_ublas (S.size ());
+  copy (S.begin (), S.end (), S_ublas.begin ());
+  tmp_mmo << "C_n" << C_n << "\nS" << S_ublas << "\nS_vol" << S_vol;
+  //tmp_mmo << "C_n" << C_n << "\n";
 
 
   //debug Print new solution
@@ -1456,8 +1456,15 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
     {
       C[c] = C_n (c); 
       M[c] = adsorption.C_to_M (soil, Theta_cell (c), c, C[c]);
-      daisy_assert (C[c] >= 0.0);
-      daisy_assert (M[c] >= 0.0);
+      if (C[c] < 0.0)
+        {
+          tmp_mmo << "Cell = " << c << "\n";
+          tmp_mmo << "C_old = " << C_old;
+          msg.error (tmp_mmo.str ());
+          throw "Negative concentration in solution";
+        }
+      if (M[c] < 0.0)
+        throw "Negative content in solution";
     }
   
   // BUG: No J for inner nodes.
@@ -1507,21 +1514,6 @@ Msoltranrect::default_model ()
       Syntax dummy;
       MsoltranrectMollerup::load_syntax (dummy, alist);
       alist.add ("type", "Mollerup");
-    }
-  return alist;
-}
-
-const AttributeList& 
-Msoltranrect::reserve_model ()
-{
-  static AttributeList alist;
-
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      MsoltranrectMollerup::load_syntax (dummy, alist);
-      alist.add ("type", "Mollerup");
-      alist.add ("enable_boundary_diffusion", false);
     }
   return alist;
 }
