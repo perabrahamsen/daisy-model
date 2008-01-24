@@ -353,7 +353,9 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       total_S += geo.dz (i) * S[i] * dt;
     }
   daisy_assert (approximate (total_old + (-q_up + q_down - total_S) * dt, 
-			     total_new));
+			     total_new)
+		|| approximate (total_new - total_old, 
+				(-q_up + q_down - total_S) * dt));
 }
 
 UZlr::UZlr (Block& al)
