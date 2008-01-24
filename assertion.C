@@ -148,6 +148,38 @@ Assertion::non_negative (const char* file, int line, const char* fun,
       }
 }
 
+void 
+Assertion::approximate (const char* file, int line, const char* fun,
+                        double a, double b)
+{
+  if (!::approximate (a, b))
+    {
+      std::ostringstream tmp;
+      tmp << a << " != " << b;
+      Assertion::failure (file, line, fun, tmp.str ().c_str ());
+    }
+    
+}
+
+void 
+Assertion::balance (const char* file, int line, const char* fun,
+                    double oldval, double newval, double growth) 
+{
+  if (!::approximate (newval, oldval + growth)
+      && !::approximate (newval - oldval, growth))
+    {
+      std::ostringstream tmp;
+      tmp << "Internal balance check:\n"
+          << "old value = " << oldval << "\n"
+          << "new value = " << newval << " (should be " 
+          << oldval + growth << ")\n"
+          << "growth = " << growth << " (should be " 
+          << newval - oldval << ")";
+      Assertion::failure (file, line, fun, tmp.str ().c_str ());
+    }
+}
+
+
 Assertion::Register::Register (Treelog& log)
   : treelog (log)
 {

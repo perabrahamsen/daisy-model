@@ -64,13 +64,13 @@ AOM::penetrate (const Geometry& geo, double from, double to,
   // Penetrate.
   geo.add_surface (C, from, to, C_pen);
   geo.add_surface (tillage_C_soil, from, to, C_pen);
-  assert_non_negative (C);
+  daisy_non_negative (C);
   top_C -= C_pen;
   tillage_C_top -= C_pen * cm2_to_m2;
   daisy_assert (top_C >= 0.0);
   geo.add_surface (N, from, to, N_pen);
   geo.add_surface (tillage_N_soil, from, to, N_pen);
-  assert_non_negative (N);
+  daisy_non_negative (N);
   top_N -= N_pen;
   tillage_N_top -= N_pen * cm2_to_m2;
   daisy_assert (top_N >= 0.0);
@@ -114,8 +114,8 @@ AOM::pour (vector<double>& cc, vector<double>& nn)
       nn[i] += N[i];
       N[i] = 0.0;
     }
-  assert_non_negative (cc);
-  assert_non_negative (nn);
+  daisy_non_negative (cc);
+  daisy_non_negative (nn);
 }
 
 void 

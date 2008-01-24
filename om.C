@@ -69,12 +69,12 @@ OM::mix (const Geometry& geo, const double from, const double to,
     return;
 
   // Mix.
-  assert_non_negative (C);
+  daisy_non_negative (C);
   geo.mix (C, from, to, C_change, dt);
-  assert_non_negative (C);
-  assert_non_negative (N);
+  daisy_non_negative (C);
+  daisy_non_negative (N);
   geo.mix (N, from, to, N_change, dt);
-  assert_non_negative (N);
+  daisy_non_negative (N);
 }
 
 void
@@ -88,12 +88,12 @@ OM::swap (const Geometry& geo,
     return;
 
   // Swap.
-  assert_non_negative (C);
+  daisy_non_negative (C);
   geo.swap (C, from, middle, to, C_change, dt);
-  assert_non_negative (C);
-  assert_non_negative (N);
+  daisy_non_negative (C);
+  daisy_non_negative (N);
   geo.swap (N, from, middle, to, N_change, dt);
-  assert_non_negative (N);
+  daisy_non_negative (N);
 }
 
 double 

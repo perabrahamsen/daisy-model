@@ -163,6 +163,13 @@ bool approximate (const double a, const double b, const double noise)
   return (iszero (b) ? iszero (a) : fabs (a / b - 1.0) < noise);
 }
 
+bool balance (const double oldval, const double newval, const double growth,
+              const double noise)
+{
+  return approximate (newval - oldval, growth)
+    || approximate (oldval + growth, newval);
+}
+
 double halftime_to_rate (double halftime)
 { return M_LN2 / halftime; }
 

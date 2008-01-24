@@ -65,6 +65,10 @@ namespace Assertion
                             const char* fun) EXPORT;
   void non_negative (const char* file, int line, const char* fun,
 		     const std::vector<double>& v) EXPORT;
+  void approximate (const char* file, int line, const char* fun,
+                    double a, double b) EXPORT;
+  void balance (const char* file, int line, const char* fun,
+                double oldval, double newbal, double growth) EXPORT;
 
   class Register
   {
@@ -85,7 +89,11 @@ namespace Assertion
   Assertion::panic (__FILE__, __LINE__, __FUNCTION__, msg)
 #define daisy_notreached() \
   Assertion::notreached (__FILE__, __LINE__, __FUNCTION__)
-#define assert_non_negative(v) \
+#define daisy_non_negative(v) \
   Assertion::non_negative (__FILE__, __LINE__, __FUNCTION__, v)
+#define daisy_approximate(a, b) \
+  Assertion::non_negative (__FILE__, __LINE__, __FUNCTION__, a, b)
+#define daisy_balance(oldval, newval, growth) \
+  Assertion::non_negative (__FILE__, __LINE__, __FUNCTION__, oldval, newval, growth)
 
 #endif // ASSERTION_H

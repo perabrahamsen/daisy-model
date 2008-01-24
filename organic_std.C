@@ -307,12 +307,12 @@ void
 OrganicStandard::Buffer::mix (const Geometry& geo, 
                               double from, double to)
 {
-  assert_non_negative (C);
+  daisy_non_negative (C);
   geo.mix (C, from, to);
-  assert_non_negative (C);
-  assert_non_negative (N);
+  daisy_non_negative (C);
+  daisy_non_negative (N);
   geo.mix (N, from, to);
-  assert_non_negative (N);
+  daisy_non_negative (N);
 }
 
 void
@@ -321,12 +321,12 @@ OrganicStandard::Buffer::swap (const Geometry& geo,
                                double middle, 
                                double to)
 {
-  assert_non_negative (C);
+  daisy_non_negative (C);
   geo.swap (C, from, middle, to);
-  assert_non_negative (C);
-  assert_non_negative (N);
+  daisy_non_negative (C);
+  daisy_non_negative (N);
   geo.swap (N, from, middle, to);
-  assert_non_negative (N);
+  daisy_non_negative (N);
 }
 
 void
@@ -369,7 +369,7 @@ OrganicStandard::Initialization
       if (i < efficiency.size ())
         destination[i] *= efficiency[i];
     }
-  assert_non_negative (destination);
+  daisy_non_negative (destination);
 }
 
 double
@@ -643,7 +643,7 @@ OrganicStandard::Initialization::
   // Mix roots in top.
   geo.mix (per_lay, 0.0, end);
   
-  assert_non_negative (per_lay);
+  daisy_non_negative (per_lay);
 }
 
 OrganicStandard::Initialization::~Initialization ()
@@ -728,10 +728,10 @@ OrganicStandard::Buffer::initialize (const Geometry& geo)
   // Make sure the vectors are large enough.
   while (N.size () < size)
     N.push_back (0.0);
-  assert_non_negative (N);
+  daisy_non_negative (N);
   while (C.size () < size)
     C.push_back (0.0);
-  assert_non_negative (C);
+  daisy_non_negative (C);
 }
 
 OrganicStandard::Buffer::Buffer (const AttributeList& al)
@@ -742,8 +742,8 @@ OrganicStandard::Buffer::Buffer (const AttributeList& al)
 		   : al.number ("turnover_rate")),
     where (al.integer ("where"))
 {
-  assert_non_negative (N);
-  assert_non_negative (C);
+  daisy_non_negative (N);
+  daisy_non_negative (C);
   daisy_assert (turnover_rate >= 0.0);
   daisy_assert (turnover_rate <= 1.0);
 }

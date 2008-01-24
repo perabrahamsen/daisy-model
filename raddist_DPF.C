@@ -109,10 +109,10 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   // Fill beam PAR (cummulative)
    daisy_assert (std::isfinite (IRb0));
   radiation_distribution (No, LAI, Pcb, IRb0, kbs, beam_PAR);
-  assert_non_negative (beam_PAR);
+  daisy_non_negative (beam_PAR);
   // Fill diffuse PAR (cummulative)
   radiation_distribution (No, LAI, Pcd, IRd0, kds, dif_PAR);
-  assert_non_negative (dif_PAR);
+  daisy_non_negative (dif_PAR);
 
   // Sunlit PAR
   // Fill direct beam PAR without scattering (cummulative)
