@@ -15,6 +15,12 @@
 	   "Name of crop to log.  Use \"*\" to log all crops.")
   (crop "*"))
 
+(deflog chemical column 
+  "A log table for a specific chemical."
+  (declare chemical String
+	   "Name of chemical to log.  Use \"*\" to log all chemicals.")
+  (chemical "*"))
+
 (defsummary "Field water balance" balance
   "Water balance for the complete system."
   (precision 1)
@@ -751,6 +757,186 @@ The total amount of water in the soil interval")
                      (path column "${column}" OrganicMatter "*" buffer N)
                      (spec organic default buffer N)
                      (dimension "kg N/ha"))))
+
+(deflog "Field chemical" chemical
+  "Content, transport and transformation of chemicals in the field."
+  (where "soil_${chemical}.dlf")
+  (summary (balance (precision 3)
+                    (input "Spray" "Deposit" "External" "Transform")
+                    (output "Harvest" "Dissipate" "Runoff"
+                            "Decompose" "Leak-Matrix" "Leak-Macro" "Drain" 
+                            "Uptake")
+                    (content "Snow" "Canopy" "Surface" "Soil")))
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         spray)
+                   (tag "Spray")
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default spray))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         deposit)
+                   (tag "Deposit")
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default deposit))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_harvest)
+                   (tag Harvest)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default canopy_harvest))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_dissipate)
+                   (tag Dissipate)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default canopy_dissipate))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_runoff)
+                   (tag Runoff)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_runoff))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J)
+                        (tag "Leak-Matrix")
+                        (negate true)
+                        (handle sum)
+                        (dimension "g/ha/&")
+                        (spec chemical default J))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_p)
+                        (tag "Leak-Macro")
+                        (negate true)
+                        (handle sum)
+                        (dimension "g/ha/&")
+                        (spec chemical default J_p))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_drain)
+                     (tag "Drain")
+                     (negate true)
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_external)
+                     (tag "External")
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_external))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_root)
+                     (tag "Uptake")
+                     (handle sum)
+		     (negate true)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_root))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_decompose)
+                     (tag "Decompose")
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_decompose))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_transform)
+                     (tag "Transform")
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_transform))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         snow_storage)
+                   (tag Snow)
+                   (handle current)
+                   (dimension "g/ha")
+                   (spec chemical default snow_storage))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_storage)
+                   (tag "Canopy")
+                   (handle current)
+                   (dimension "g/ha")
+                   (spec chemical default canopy_storage))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_storage)
+                   (tag "Surface")
+                   (handle current)
+                   (dimension "g/ha")
+                   (spec chemical default surface_storage))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (tag "Soil")
+                     (dimension "g/ha")
+                     (spec chemical default M))))
+
+(deflog "Soil chemical" chemical
+  "Content, transport and transformation of chemicals in the soil."
+  (where "soil_${chemical}.dlf")
+  (summary (balance (precision 3)
+                    (input "In" "External" "Transform")
+                    (output "Decompose" "Leak-Matrix" "Leak-Macro" "Drain" 
+                            "Uptake")
+                    (content "Content")))
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J)
+                     (tag "In")
+                     (handle sum)
+                     (negate true)
+                     (dimension "g/ha/&")
+                     (spec chemical default J))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J)
+                        (tag "Leak-Matrix")
+                        (negate true)
+                        (handle sum)
+                        (dimension "g/ha/&")
+                        (spec chemical default J))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_p)
+                        (tag "Leak-Macro")
+                        (negate true)
+                        (handle sum)
+                        (dimension "g/ha/&")
+                        (spec chemical default J_p))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_drain)
+                     (tag "Drain")
+                     (negate true)
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_external)
+                     (tag "External")
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_external))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_root)
+                     (tag "Uptake")
+                     (handle sum)
+		     (negate true)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_root))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_decompose)
+                     (tag "Decompose")
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_decompose))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_transform)
+                     (tag "Transform")
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_transform))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (tag "Content")
+                     (dimension "g/ha")
+                     (spec chemical default M))))
 
 ;; log-std.dai ends here.
 

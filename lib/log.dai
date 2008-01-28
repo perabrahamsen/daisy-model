@@ -1274,12 +1274,6 @@ soil increases."
                    (dimension "mm")
                    (factor 1000))))
 
-(deflog chemical column 
-  "A log table for a specific chemical."
-  (declare chemical String
-	   "Name of chemical to log.  Use \"*\" to log all chemicals.")
-  (chemical "*"))
-
 (deflog "Surface Chemicals" chemical
   "Summary information about a specific chemical on the soil surface.
 Use like (\"Surface Chemicals\" (chemical Atrazine)) to log the 
