@@ -107,6 +107,21 @@ UZRectConst::~UZRectConst ()
 { }
 
 
+const AttributeList& 
+UZRect::none_model ()
+{
+  static AttributeList alist;
+  
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      UZRectConst::load_syntax (dummy, alist);
+      alist.add ("type", "const");
+
+    }
+  return alist;
+}
+
 static struct UZRectConstSyntax
 {
   static Model& make (Block& al)

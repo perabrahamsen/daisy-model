@@ -371,7 +371,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = msoltranrect_forward.C ABAprod_uptake.C ABAprod_soil.C ABAprod_root.C \
+MODELS = heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \
+	msoltranrect_forward.C ABAprod_uptake.C ABAprod_soil.C ABAprod_root.C \
 	solver_ublas.C solver_cxsparse.C solver_none.C \
 	movement_rect.C chemistry_multi.C \
 	equil_goal.C equil_linear.C equil_langmuir.C transform_equil.C \
@@ -438,7 +439,7 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = unit.C \
+COMPONENTS = heatrect.C unit.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C scope.C \
 	ABAeffect.C msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
 	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C\

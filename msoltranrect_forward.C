@@ -220,7 +220,7 @@ static struct MsoltranrectForwardSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Pure forward calculation of flow except through upper boundary.\n\
-J[edge] = q[edge] * C_old[from]");
+J[edge] = q[edge] * C_old[upstream]");
     MsoltranrectForward::load_syntax (syntax, alist);
  
     Librarian::add_type (Msoltranrect::component, "forward",

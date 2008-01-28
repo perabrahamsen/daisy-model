@@ -21,7 +21,7 @@
 #define BUILD_DLL
 #include "movement.h"
 #include "geometry_rect.h"
-#include "heat_rect.h"
+#include "heatrect.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
@@ -68,7 +68,7 @@ struct MovementRect : public Movement
   void ridge (Surface&, const Soil&, const SoilWater&, const AttributeList&);
 
   // Heat.
-  std::auto_ptr<HeatRect> heat_rect;
+  std::auto_ptr<Heatrect> heatrect;
 
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
   double T_bottom;		// [dg C]
@@ -282,7 +282,7 @@ MovementRect::heat (const std::vector<double>& q_water,
 		    std::vector<double>& T,
 		    const double dt, Treelog& msg) const
 {
-  heat_rect->solve (*geo, q_water, S_water, S_heat,
+  heatrect->solve (*geo, q_water, S_water, S_heat,
 		    capacity_old, capacity_new, conductivity, 
 		    T_top, T_top_new, T_bottom, T, dt, msg);
 }
@@ -369,7 +369,7 @@ MovementRect::MovementRect (Block& al)
                    (al, "matrix_solute")),
     matrix_solid (Librarian::build_item<Msoltranrect>
 		  (al, "matrix_solid")),
-    heat_rect (submodel<HeatRect> (al, "heat")),
+    heatrect (Librarian::build_item<Heatrect> (al, "heat")),
     T_bottom (-42.42e42)
 { 
   for (size_t i = 0; i < drain_position.size (); i++)
@@ -414,8 +414,12 @@ static struct MovementRectSyntax
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
     std::vector<const AttributeList*> matrix_water_models;
+    AttributeList matrix_water_default (UZRect::default_model ());
+    matrix_water_models.push_back (&matrix_water_default);
     AttributeList matrix_water_reserve (UZRect::reserve_model ());
     matrix_water_models.push_back (&matrix_water_reserve);
+    AttributeList matrix_water_none (UZRect::none_model ());
+    matrix_water_models.push_back (&matrix_water_none);
     alist.add ("matrix_water", matrix_water_models);
     syntax.add_object ("matrix_solute", Msoltranrect::component, 
                        Syntax::State, Syntax::Sequence,
@@ -435,9 +439,10 @@ If none succeeds, the simulation ends.");
                        Syntax::Const, Syntax::Singleton, "\
 Matrix solute transport model used for fully sorbed constituents.");
     alist.add ("matrix_solid", Msoltranrect::none_model ());
-    syntax.add_submodule ("heat", alist, Syntax::Const,
-                          "Heat transport.", HeatRect::load_syntax);
-
+    syntax.add_object ("heat", Heatrect::component, 
+                       Syntax::Const, Syntax::Singleton, "\
+Heat transport model.");
+    alist.add ("heat", Heatrect::default_model ());
 
     Librarian::add_type (Movement::component, "rectangle",
                          alist, syntax, &make);

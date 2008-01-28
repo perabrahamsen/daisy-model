@@ -1,8 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Hvor kommer solute.S_drain fra?
+* Gør heat_rect til en komponent
 
+** linear & const models.
 
+* Forstå BGJ opsætning
 
 * X61 backup
 

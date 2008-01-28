@@ -1,8 +1,25 @@
+2008-01-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* heatrect.C, heatrect.h: New component.
+	* Makefile (COMPONENTS): Add it.
+	* heatrect_Mollerup.C: Renamed from 'heat_rect.C' and 'heat_rect.h'.
+	* Makefile (MODELS): Add it.
+	* heatrect_linear.C, heatrect_none.C: New models.
+	* Makefile (MODELS): Add it.
+	* movement_rect.C: Update caller.
+
 2008-01-24  Per Abrahamsen  <abraham@dina.kvl.dk>
-
+	
 	* assertion.h (daisy_non_negative): Renamed from 'assert_non_negative'.
-
+	* all: Update callers.
+	* assertion.h, assertion.C (daisy_approximate, daisy_balance):
+	New macros.
+	* assertion.C: Implement them.
+	
 	* mathlib.C, newlib.h (balance): New function.
+
+	* unit.C, unit.h: New component.
+	* Makefile (COMPONENTS): Add it.
 
 2008-01-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 

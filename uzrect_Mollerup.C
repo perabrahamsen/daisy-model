@@ -935,7 +935,6 @@ UZRect::default_model ()
       Syntax dummy;
       UZRectMollerup::load_syntax (dummy, alist);
       alist.add ("type", "Mollerup");
-
     }
   return alist;
 }

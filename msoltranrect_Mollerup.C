@@ -1502,7 +1502,7 @@ A value of 0 means no message, higher numbers means more messages.");
   alist.add ("debug", 0);
   syntax.add ("upstream_weight", Syntax::Fraction(), Syntax::Const, "\
 Upstream weighting factor: 1 = full upstream formulation, 0.5 = equal weight.");
-  alist.add ("upstream_weight", 0.5);
+  alist.add ("upstream_weight", 1.0);
   syntax.add ("ddt", "h", Syntax::LogOnly, "Small timestep.");
 }
 

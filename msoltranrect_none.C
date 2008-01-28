@@ -175,3 +175,5 @@ static struct MsoltranrectNoneSyntax
     Librarian::add_type (Msoltranrect::component, "none", alist, syntax, &make);
   }
 } MsoltranrectNone_syntax;
+
+// msoltranrect_none.C ends here.

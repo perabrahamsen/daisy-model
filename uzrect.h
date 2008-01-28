@@ -55,6 +55,7 @@ public:
   virtual void has_macropores (bool) = 0;
   static const AttributeList& default_model ();
   static const AttributeList& reserve_model ();
+  static const AttributeList& none_model ();
 private:
   UZRect ();
   UZRect (const UZRect&);
