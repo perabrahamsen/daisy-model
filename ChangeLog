@@ -1,3 +1,8 @@
+2008-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* heat_rect.C, heat_rect.h: Removed.
+	* Makefile (SUBMODELS): Removed.
+
 2008-01-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* heatrect.C, heatrect.h: New component.
