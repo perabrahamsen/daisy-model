@@ -13,6 +13,30 @@ release.
 
 * 4.22
 
+** 2D Daisy
+
+Daisy can now calculate two dimensional flow.  To enable, you must
+specify the new Movement column parameter, like this:
+
+(defcolumn Andeby2D Andeby
+  "Two dimensional setup for Andeby."
+  (Movement rectangle
+	    (Geometry (zplus -2.5 -5 -10 -20 -40 -60 -80 -100  -120  -150 [cm])
+		      (xplus 2 4 6 8 10 [cm]))))
+
+The 2D movement model is called "rectangle", because it is called
+"rectangle", because it is based on a rectangular grid, where you
+specify the grid endpoints in both the z and x dimension.  
+
+The same equations (Richard's, convection-dispertion, heat) is solved
+for two dimensions, as is solved for one dimension.
+
+Most stuff, including drain pipes and macropores, will work with no
+changes for two dimensions.  
+
+The one dimensional description is still available (and default) as
+the "vertical" model.
+
 ** Inorganic nitrogen merged with chemistry.
 
 The 'SoilNO3' and 'SoilNH4' column parameters have been removed.

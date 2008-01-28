@@ -1,5 +1,9 @@
 2008-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.22 released.
+
+2008-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* heat_rect.C, heat_rect.h: Removed.
 	* Makefile (SUBMODELS): Removed.
 
