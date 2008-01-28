@@ -87,10 +87,6 @@ public:
 					double dt) = 0;
   virtual void add_to_transform_sink (const std::vector<double>&,
 				      double dt) = 0;
-  virtual void add_to_sorption_source (const std::vector<double>&,
-				       double dt) = 0;
-  virtual void add_to_sorption_sink (const std::vector<double>&,
-				     double dt) = 0;
 
   // Management.
 public:

@@ -107,7 +107,7 @@ struct ChemicalStandard : public Chemical
   std::vector<double> S_external; // External source term, e.g. incorp. fert.
   std::vector<double> S_permanent; // Permanent external source term.
   std::vector<double> S_root;	// Root uptake source term (negative).
-  std::vector<double> S_sorption;	// Sorption source term.
+  std::vector<double> S_decompose;	// Decompose source term.
   std::vector<double> S_transform;	// Transform source term.
   std::vector<double> J;		// Solute transport log in matrix.
   std::vector<double> J_p;             // Solute transport log in macropores.
@@ -143,10 +143,9 @@ struct ChemicalStandard : public Chemical
   void add_to_source (const std::vector<double>&, double dt);
   void add_to_sink (const std::vector<double>&, double dt);
   void add_to_root_sink (const std::vector<double>&, double dt);
+  void add_to_decompose_sink (const std::vector<double>&, double dt);
   void add_to_transform_source (const std::vector<double>&, double dt);
   void add_to_transform_sink (const std::vector<double>&, double dt);
-  void add_to_sorption_source (const std::vector<double>&, double dt);
-  void add_to_sorption_sink (const std::vector<double>&, double dt);
 
   // Management.
   void update_C (const Soil& soil, const SoilWater& soil);
@@ -309,7 +308,7 @@ ChemicalStandard::clear ()
   std::fill (S_.begin (), S_.end (), 0.0);
   std::fill (S_external.begin (), S_external.end (), 0.0);
   std::fill (S_root.begin (), S_root.end (), 0.0);
-  std::fill (S_sorption.begin (), S_sorption.end (), 0.0);
+  std::fill (S_decompose.begin (), S_decompose.end (), 0.0);
   std::fill (S_transform.begin (), S_transform.end (), 0.0);
   std::fill (tillage.begin (), tillage.end (), 0.0);
 }
@@ -349,23 +348,13 @@ ChemicalStandard::add_to_root_sink (const std::vector<double>& v,
 }
 
 void
-ChemicalStandard::add_to_sorption_sink (const std::vector<double>& v,
+ChemicalStandard::add_to_decompose_sink (const std::vector<double>& v,
 					const double dt)
 {
-  daisy_assert (S_sorption.size () >= v.size ());
+  daisy_assert (S_decompose.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
-    S_sorption[i] -= v[i];
+    S_decompose[i] -= v[i];
   add_to_sink (v, dt);
-}
-
-void
-ChemicalStandard::add_to_sorption_source (const std::vector<double>& v,
-					  const double dt)
-{
-  daisy_assert (S_sorption.size () >= v.size ());
-  for (unsigned i = 0; i < v.size (); i++)
-    S_sorption[i] += v[i];
-  add_to_source (v, dt);
 }
 
 void
@@ -653,7 +642,7 @@ ChemicalStandard::decompose (const Geometry& geo,
       decomposed[c] = M_left (c, dt) * rate;
     }
 
-  this->add_to_transform_sink (decomposed, dt);
+  this->add_to_decompose_sink (decomposed, dt);
 
   for (size_t i = 0; i < product.size (); i++)
     {
@@ -706,7 +695,7 @@ ChemicalStandard::output (Log& log) const
   output_variable (S_external, log);
   output_variable (S_permanent, log);
   output_variable (S_root, log);
-  output_variable (S_sorption, log);
+  output_variable (S_decompose, log);
   output_variable (S_transform, log);
   output_variable (J, log);
   output_variable (J_p, log);
@@ -862,7 +851,7 @@ ChemicalStandard::initialize (const AttributeList& al,
 			cell_size - S_permanent.size (),
 			0.0);
   S_root.insert (S_root.begin (), cell_size, 0.0);
-  S_sorption.insert (S_sorption.begin (), cell_size, 0.0);
+  S_decompose.insert (S_decompose.begin (), cell_size, 0.0);
   S_transform.insert (S_transform.begin (), cell_size, 0.0);
   J.insert (J.begin (), edge_size, 0.0);
   J_p.insert (J_p.begin (), edge_size, 0.0);
@@ -1163,8 +1152,8 @@ Only for initialization of the 'M' parameter.");
   alist.add ("S_permanent", empty);
   syntax.add ("S_root", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term (root uptake only, always negative).");
-  syntax.add ("S_sorption", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Source term for sorption.");
+  syntax.add ("S_decompose", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Source term for decompose, is never positive.");
   syntax.add ("S_transform", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term for transformations other than sorption.");
   syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,

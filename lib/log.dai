@@ -1368,8 +1368,8 @@ sum of all chemicals will be logged."
   "Summary information about chemicals in the soil."
   (where "soil_chemical.dlf")
   (summary (balance (precision 3)
-                    (input "In" "External" "Sorption" "Transform")
-                    (output "Leak-Matrix" "Leak-Macro" "Drain" 
+                    (input "In" "External" "Transform")
+                    (output "Decompose" "Leak-Matrix" "Leak-Macro" "Drain" 
                             "Uptake")
                     (content "Content")))
   (when hourly)
@@ -1416,11 +1416,11 @@ sum of all chemicals will be logged."
                      (dimension "g/ha/&")
                      (spec chemical default S_root))
            (interval (path column "${column}" Chemistry "*" 
-                           trace "${chemical}" S_sorption)
-                     (tag "Sorption")
+                           trace "${chemical}" S_decompose)
+                     (tag "Decompose")
                      (handle sum)
                      (dimension "g/ha/&")
-                     (spec chemical default S_sorption))
+                     (spec chemical default S_decompose))
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" S_transform)
                      (tag "Transform")

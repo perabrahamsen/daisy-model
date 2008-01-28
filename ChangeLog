@@ -1,5 +1,8 @@
 2008-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* macro_std.C (MacroStandard::check_alist): Bug fix,
+	distribution (height_end) should be 1.0, not 0.0.
+
 	* Version 4.22 released.
 
 2008-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>

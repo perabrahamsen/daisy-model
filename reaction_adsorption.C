@@ -114,8 +114,8 @@ struct ReactionAdsorption : public Reaction
       adsorption_source[c] = convert;
 	
     }
-    solute.add_to_sorption_sink (adsorption_source, dt);
-    sorbed.add_to_sorption_source (adsorption_source, dt);
+    solute.add_to_transform_sink (adsorption_source, dt);
+    sorbed.add_to_transform_source (adsorption_source, dt);
   }
 
   // Create.

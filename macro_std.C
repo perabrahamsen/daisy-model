@@ -325,7 +325,7 @@ MacroStandard::check_alist (const AttributeList& al, Treelog& err)
   if (al.check ("height_end"))
     {
       height_end = al.number ("height_end");
-      if (std::isnormal (distribution (height_end)))
+      if (!approximate (distribution (height_end), 1.0))
 	{
 	  err.error ("distribution (height_end) should be 1.0");
 	  ok = false;
