@@ -92,8 +92,8 @@ namespace Assertion
 #define daisy_non_negative(v) \
   Assertion::non_negative (__FILE__, __LINE__, __FUNCTION__, v)
 #define daisy_approximate(a, b) \
-  Assertion::non_negative (__FILE__, __LINE__, __FUNCTION__, a, b)
+  Assertion::approximate (__FILE__, __LINE__, __FUNCTION__, a, b)
 #define daisy_balance(oldval, newval, growth) \
-  Assertion::non_negative (__FILE__, __LINE__, __FUNCTION__, oldval, newval, growth)
+  Assertion::balance (__FILE__, __LINE__, __FUNCTION__, oldval, newval, growth)
 
 #endif // ASSERTION_H

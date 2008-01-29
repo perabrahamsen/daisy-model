@@ -237,7 +237,7 @@ ScopeBlock::get_description (symbol tag_symbol) const
 }
 
 ScopeBlock::ScopeBlock (Block& b)
-  : Scope (b),
+  : Scope ("block"),
     block (b)
 { }
 

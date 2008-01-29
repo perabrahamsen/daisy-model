@@ -33,36 +33,32 @@
 #include "librarian.h"
 #include <sstream>
 
-using namespace std;
-
-class UZlr : public UZmodel
+struct UZlr : public UZmodel
 {
   // Parameters.
-private:
+  bool overflow_warn;     // Warn first time profile is oversaturared.
   const double h_fc;		// Field Capacity. [cm]
   const double z_top;		// Depth of layer with upw. water movement [cm]
 
   // Simulate.
-public:
   void tick (Treelog&, const GeometryVert& geo,
              const Soil& soil, const SoilHeat& soil_heat,
 	     unsigned int first, const Surface& top, 
              size_t top_edge,
 	     unsigned int last, const Groundwater& bottom, 
-	     const vector<double>& S,
-	     const vector<double>& h_old,
-	     const vector<double>& Theta_old,
-	     const vector<double>& h_ice,
-	     vector<double>& h,
-	     vector<double>& Theta,
+	     const std::vector<double>& S,
+	     const std::vector<double>& h_old,
+	     const std::vector<double>& Theta_old,
+	     const std::vector<double>& h_ice,
+	     std::vector<double>& h,
+	     std::vector<double>& Theta,
              size_t q_offset,
-	     vector<double>& q_base,
+	     std::vector<double>& q_base,
              double dt);
 
   // Create and Destroy.
   void has_macropores (bool)
   { }
-public:
   UZlr (Block& par);
   ~UZlr ();
   static void load_syntax (Syntax& syntax, AttributeList& alist);
@@ -74,14 +70,14 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	    unsigned int first, const Surface& top, 
             const size_t top_edge,
 	    unsigned int last, const Groundwater& bottom, 
-	    const vector<double>& S,
-	    const vector<double>& h_old,
-	    const vector<double>& Theta_old,
-	    const vector<double>& h_ice,
-	    vector<double>& h,
-	    vector<double>& Theta,
+	    const std::vector<double>& S,
+	    const std::vector<double>& h_old,
+	    const std::vector<double>& Theta_old,
+	    const std::vector<double>& h_ice,
+	    std::vector<double>& h,
+	    std::vector<double>& Theta,
             const size_t q_offset,
-            vector<double>& q_base,
+            std::vector<double>& q_base,
             const double dt)
 {
   double *const q = &q_base[q_offset];
@@ -98,10 +94,10 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       // top from the second cell.
       const double dz = geo.z (first) - geo.z (first+1);
       const double dh = (h_old[first] - h_old[first+1]);
-      const double K = min (soil.K (first, h_old[first], h_ice[first],
-				    soil_heat.T (first)),
-			    soil.K (first, h_old[first+1], h_ice[first+1],
-				    soil_heat.T (first+1)));
+      const double K = std::min (soil.K (first, h_old[first], h_ice[first],
+                                         soil_heat.T (first)),
+                                 soil.K (first, h_old[first+1], h_ice[first+1],
+                                         soil_heat.T (first+1)));
       q_up = -K * (dh/dz + 1.0);
 
       // We can safely ignore S[first], since the ridge system has
@@ -126,7 +122,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	}
       else
         // Limited water or forced flux.
-	q_up = q[first] = max (top.q_top (geo, top_edge), -K_sat);
+	q_up = q[first] = std::max (top.q_top (geo, top_edge), -K_sat);
     }
 
   //  Use darcy for upward movement in the top.
@@ -156,14 +152,14 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       const double h_lim = (bottom.bottom_type ()
                             == Groundwater::free_drainage) 
         ? h_fc
-        : max (geo.zplus (last) - z, h_fc);
+        : std::max (geo.zplus (last) - z, h_fc);
       daisy_assert (h_lim < 0.0);
 
       if (use_darcy && i < first + 5 && z > z_top)
 	// Dry earth, near top.  Use darcy to move water up.
 	{
 	  const double dist = z - geo.z (i+1);
-	  q[i+1] = max (K_new * ((h_old[i+1] - h_new) / dist - 1.0), 0.0);
+	  q[i+1] = std::max (K_new * ((h_old[i+1] - h_new) / dist - 1.0), 0.0);
 
 	  if (Theta_new + q[i+1] * dt / dz > Theta_sat)
 	    {
@@ -213,9 +209,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
                 }
               else
                 {
-                  std::ostringstream tmp;
-                  tmp << "BUG: h_new = " << h_new << " h_lim = " << h_lim;
-                  msg.error (tmp.str ());
+                  daisy_approximate (h_lim, h_new);
                   q[i+1] = 0.0;
                   Theta[i] = Theta_new;
                   h[i] = h_new;
@@ -234,9 +228,9 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	      h[i] = soil.h (i, Theta[i]);
 	    }
 	}
-      daisy_assert (isfinite (h[i]));
-      daisy_assert (isfinite (Theta[i]));
-      daisy_assert (isfinite (q[i+1]));
+      daisy_assert (std::isfinite (h[i]));
+      daisy_assert (std::isfinite (Theta[i]));
+      daisy_assert (std::isfinite (q[i+1]));
       daisy_assert (Theta[i] <= Theta_sat);
       daisy_assert (Theta[i] >= Theta_res);
     }
@@ -244,18 +238,23 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
   // Lower border.
   q_down = q[last + 1];
 
-#if 1
   if (bottom.bottom_type () == Groundwater::forced_flux
       && !approximate (q_down, bottom.q_bottom ()))
     {
       // Ensure forced bottom.
       double extra_water = (bottom.q_bottom () - q_down) * dt;
-      for (int i = last; isnormal (extra_water); i--)
+      for (int i = last; std::isnormal (extra_water); i--)
 	{
 	  q[i+1] += extra_water / dt;
-	  if (i < 0)
-	    // Take it from ponding.
-	    break;
+	  if (i < static_cast<int> (first))
+            {
+              if (overflow_warn)
+                {
+                  msg.warning ("Soil profile saturated, water flow to surface");
+                  overflow_warn = false;
+                }
+              break;
+            }
 	  const double dz = geo.dz (i);
 	  const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
 	  Theta[i] += extra_water / dz;
@@ -271,77 +270,10 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	      h[i] = 0.0;
 	    }
 	}
-      q_up = q[first] + extra_water / dt;
+      q_up = q[first];
       q_down = q[last + 1];
     }
-#else
-  double extra_water = 0.0;
-  if (bottom.type () == Groundwater::forced_flux
-      && !approximate (q_down, bottom.q_bottom ()))
-      // Ensure forced bottom.
-      extra_water = (bottom.q_bottom () - q_down) * dt;
 
-  for (int i = last; i >= int (first); i--)
-    {
-      const double dz = geo.dz (i);
-
-      if (isnormal (extra_water))
-	{
-	  // Add extra water from bottom to this layer.
-	  q[i+1] += extra_water / dt;
-      
-	  // Does it fit?
-	  const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
-	  Theta[i] += extra_water / dz;
-	  if (Theta[i] <= Theta_sat)
-	    {
-	      extra_water = 0;
-	      h[i] = soil.h (i, Theta[i]);
-	    }
-	  else
-	    {
-	      extra_water = (Theta[i] - Theta_sat) * dz;
-	      Theta[i] = Theta_sat;
-	      h[i] = 0.0;
-	    }
-	  daisy_assert (extra_water >= 0.0);
-	}      
-#if 1
-      // Can it pass down this fast?
-      const double K_this = soil.K (i, 0.0, h_ice[i], soil_heat.T (i));
-      const double K_above = (i > 0) 
-	? soil.K (i-1, 0.0, h_ice[i-1], soil_heat.T (i-1))
-	: K_this;
-      const double K = max (K_this, K_above);
-      const double conductivity_extra_water = (q[i] < -K * 1.01)
-	? -(q[i] + K) * dt 
-	: 0.0;
-      daisy_assert (conductivity_extra_water >= 0.0);
-
-      // Check that extra water is enough.
-      if (extra_water < conductivity_extra_water)
-	{
-	  // We get less water from above.
-	  Theta[i] -= (conductivity_extra_water - extra_water) / dz;
-	  extra_water = conductivity_extra_water;
-
-	  // Did we get too little water?
-	  const double Theta_res = soil.Theta_res (i);
-	  if (Theta[i] < Theta_res)
-	    {
-	      // We substracted to much, get it from above.
-	      extra_water = conductivity_extra_water 
-		- (Theta_res - Theta[i]) * dz;
-	      Theta[i] = Theta_res;
-	    }
-	  h[i] = soil.h (i, Theta[i]);
-	}
-      daisy_assert (extra_water >= 0.0);
-#endif
-    }
-  q_up = q[first] + extra_water / dt;
-  q_down = q[last + 1];
-#endif
   // Check mass conservation.
   double total_old = 0.0;
   double total_new = 0.0;
@@ -352,14 +284,12 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       total_new += geo.dz (i) * Theta[i];
       total_S += geo.dz (i) * S[i] * dt;
     }
-  daisy_assert (approximate (total_old + (-q_up + q_down - total_S) * dt, 
-			     total_new)
-		|| approximate (total_new - total_old, 
-				(-q_up + q_down - total_S) * dt));
+  daisy_balance (total_old, total_new, (-q_up + q_down - total_S) * dt);
 }
 
 UZlr::UZlr (Block& al)
   : UZmodel (al),
+    overflow_warn (al.flag ("overflow_warn")),
     h_fc (al.number ("h_fc")),
     z_top (al.number ("z_top"))
 { }
@@ -370,6 +300,9 @@ UZlr::~UZlr ()
 void 
 UZlr::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add ("overflow_warn", Syntax::Boolean, Syntax::Const, "\
+If true, warn the first time the soil profile is oversaturated.");
+  alist.add ("overflow_warn", true);
   syntax.add ("h_fc", "cm", Syntax::Const, "Field capacity.");
   alist.add ("h_fc", -100.0);
   syntax.add ("z_top", "cm", Syntax::Const, 

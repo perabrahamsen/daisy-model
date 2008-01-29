@@ -1,4 +1,13 @@
+2008-01-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrichard.C (debug): New parameter.
+
 2008-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* scope_block.C (ScopeBlock::ScopeBlock): Don't pass block to
+	avoid infinite loop when expanding "where" or "type" in block.C.
+
+	* lib/log-std.dai ("Field chemical", "Soil chemical"): New log models.
 
 	* macro_std.C (MacroStandard::check_alist): Bug fix,
 	distribution (height_end) should be 1.0, not 0.0.

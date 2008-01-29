@@ -40,6 +40,7 @@
 class UZRichard : public UZmodel
 {
   // Parameters.
+  const int debug;
   const int max_time_step_reductions;
   const int time_step_reduction;
   const int max_iterations;
@@ -379,11 +380,14 @@ UZRichard::richard (Treelog& msg,
           daisy_assert (h.size () > 1);
 	  if (h[0] < -1e9 || h[1] < -1e9 || h[size-1] < -1e9)
 	    {
-	      std::ostringstream tmp;
-	      tmp << "ABSURD: h[0] = " << h[0] << " h[1] = " << h[1] 
-		     << " h[" << (size-1) << "] = " << h[size-1]
-		     << " stepping down";
-	      msg.error (tmp.str ());
+              if (debug > 0)
+                {
+                  std::ostringstream tmp;
+                  tmp << "ABSURD: h[0] = " << h[0] << " h[1] = " << h[1] 
+                      << " h[" << (size-1) << "] = " << h[size-1]
+                      << " stepping down";
+                  msg.warning (tmp.str ());
+                }
 	      iterations_used = max_iterations + 42;
 	      break;
 	    }
@@ -393,16 +397,53 @@ UZRichard::richard (Treelog& msg,
 
       if (iterations_used > max_iterations)
 	{
+          if (debug > 1)
+            {
+              std::ostringstream tmp;
+              tmp << "Too many iterations: "
+                  << "available_water = " << available_water 
+                  << ", time left = " << time_left
+                  << ", ddt = " << ddt;
+              msg.message (tmp.str ());
+            }
         try_again:
 	  number_of_time_step_reductions++;
 
 	  if (number_of_time_step_reductions > max_time_step_reductions)
 	    {
 	      if (approximate (switched_top_last, time_left))
-		return false;
+                {
+                  if (debug > 1)
+                    msg.message ("Been there, tried that.");
+                  return false;
+                }
 	      else 
                 flux = !flux;
-		
+
+              if (debug > 1)
+                {
+                  std::ostringstream tmp;
+                  if (flux)
+                    tmp << "Trying flux top";
+                  else
+                    tmp << "Trying pressure top";
+                  if (debug > 2)
+                    {
+                      tmp << "\nh =";
+                      for (size_t c = 0; c < size; c++)
+                        tmp << "\t" << h_previous[c];
+                      tmp << "\nTheta =";
+                      for (size_t c = 0; c < size; c++)
+                        tmp << "\t" << Theta[c];
+                      tmp << "\nS =";
+                      for (size_t c = 0; c < size; c++)
+                        tmp << "\t" << S[first + c];
+                      tmp << "\nK =";
+                      for (size_t c = 0; c < size; c++)
+                        tmp << "\t" << K[c];
+                    }
+                  msg.message (tmp.str ());
+                }
 	      switched_top_last = time_left;
 	      ddt = time_left;
 	      number_of_time_step_reductions = 0;
@@ -443,17 +484,38 @@ UZRichard::richard (Treelog& msg,
 		{
 		  if (approximate (switched_top_last, time_left))
 		    {
-		      std::ostringstream tmp;
-		      tmp << "available_water = " << available_water 
-			     << ", delta_top_water = " << delta_top_water
-			     << ", time left = " << time_left;
-		      msg.warning (tmp.str ());
-                      msg.warning ("Couldn't accept top flux");
+                      if (debug > 1)
+                        {
+                          std::ostringstream tmp;
+                          tmp << "Couldn't accept top flux: "
+                              << "available_water = " << available_water 
+                              << ", delta_top_water = " << delta_top_water
+                              << ", time left = " << time_left
+                              << ", ddt = " << ddt;
+                          if (debug > 2)
+                            {
+                              tmp << "\nh =";
+                              for (size_t c = 0; c < size; c++)
+                                tmp << "\t" << h[c];
+                              tmp << "\nTheta =";
+                              for (size_t c = 0; c < size; c++)
+                                tmp << "\t" << Theta[c];
+                              tmp << "\nS =";
+                              for (size_t c = 0; c < size; c++)
+                                tmp << "\t" << S[first + c];
+                              tmp << "\nK =";
+                              for (size_t c = 0; c < size; c++)
+                                tmp << "\t" << K[c];
+                            }
+                          msg.message (tmp.str ());
+                        }
                       Theta = Theta_previous;
                       goto try_again;
 		    }
 		  else
 		    {
+                      if (debug > 0)
+                        msg.message ("Emptied pond, switching to flux top");
 		      flux = true;
 		      accepted = false;
 		    }
@@ -471,18 +533,22 @@ UZRichard::richard (Treelog& msg,
 	    }
 	  else if (switched_top_last < time_left + ddt / 2.0)
             {
-              std::ostringstream tmp;
-              tmp << "last: " << switched_top_last 
-                  << "; time left: " << time_left << "; h[" << first 
-                  << "] = " << h[first] <<"; q = " << q_top;
-              msg.warning (tmp.str ());
-              msg.warning ("Couldn't drain top flux");
+              if (debug > 0)
+                {
+                  std::ostringstream tmp;
+                  tmp << "last: " << switched_top_last 
+                      << "; time left: " << time_left << "; h[" << first 
+                      << "] = " << h[first] <<"; q = " << q_top;
+                  msg.message (tmp.str ());
+                }
 	      Theta = Theta_previous;
               goto try_again;
             }
 	  else
 	    // We have saturated soil, make it a pressure top.
 	    {
+              if (debug > 0)
+                msg.message ("Saturated soil, switching to pressure top");
 	      flux = false;
 	      accepted = false;
 	    }
@@ -503,6 +569,8 @@ UZRichard::richard (Treelog& msg,
 	    }
 	  else
 	    {
+              if (debug > 0)
+                msg.message ("Not accepted, mark switched top");
 	      switched_top_last = time_left;
 	      Theta = Theta_previous;
 	      h = h_previous;
@@ -683,6 +751,7 @@ UZRichard::has_macropores (const bool has_them)
 UZRichard::UZRichard (Block& al)
   : UZmodel (al),
     // Parameters.
+    debug (al.integer ("debug")),
     max_time_step_reductions (al.integer ("max_time_step_reductions")),
     time_step_reduction (al.integer ("time_step_reduction")),
     max_iterations (al.integer ("max_iterations")),
@@ -699,6 +768,9 @@ UZRichard::~UZRichard ()
 void 
 UZRichard::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add ("debug", Syntax::Integer, Syntax::Const, "\
+Print additional debug messages, higher numbers means more messages.");
+  alist.add ("debug", 1);
   syntax.add ("max_time_step_reductions",
               Syntax::Integer, Syntax::Const, "\
 Number of times we may reduce the time step before giving up");

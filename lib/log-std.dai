@@ -5,21 +5,45 @@
 
 (deflog column table
   "A log table for a specific column."
+  ;; Let the user choose a column.
   (declare column String
 	   "Name of column to log.  Use \"*\" to log all columns.")
-  (column "*"))
+  (column "*")
+  ;; Use column name as part of file name.
+  (declare colfid string
+           "File component name indicating column logged.")
+  (colfid (cond ((string-equal "${column}" "*")
+                 "")
+                (true
+                 "${column}_"))))
 
 (deflog crop column
   "A log table for a specific crop."
+  ;; Let the user choose a crop.
   (declare crop String
 	   "Name of crop to log.  Use \"*\" to log all crops.")
-  (crop "*"))
+  (crop "*")
+  ;; Use crop name as part of file name.
+  (declare cropfid string
+           "File component name indicating crop logged.")
+  (cropfid (cond ((string-equal "${crop}" "*")
+                  "crops")
+                 (true
+                  "${crop}"))))
 
 (deflog chemical column 
   "A log table for a specific chemical."
+  ;; Let the user choose a chemical.
   (declare chemical String
-	   "Name of chemical to log.  Use \"*\" to log all chemicals.")
-  (chemical "*"))
+	   "Name of chemical to log.")
+  ;; (chemical "*") ; Not very useful, N dominates.
+  ;; Use chemical name as part of file name.
+  (declare chemfid string
+           "File name component indicating chemical logged.")
+  (chemfid (cond ((string-equal "${chemical}" "*")
+                  "chemicals")
+                 (true
+                  "${chemical}"))))
 
 (defsummary "Field water balance" balance
   "Water balance for the complete system."
@@ -33,7 +57,7 @@
 
 (deflog "Field water" column
   "Information about water input, output and content for the system."
-  (where "field_water.dlf")
+  (where "${colfid}field_water.dlf")
   (when hourly)
   (summary "Field water balance")
   (entries (number (tag "Precipitation")
@@ -143,7 +167,7 @@ the litter layer.")
 
 (deflog "Soil water" column
   "Information about water input, output and content for the soil."
-  (where "soil_water.dlf")
+  (where "${colfid}soil_water.dlf")
   (when hourly)
   (summary "Soil water balance")
   (entries (flux_top (tag "Matrix infiltration")
@@ -317,7 +341,7 @@ The total amount of water in the soil interval")
 
 (deflog "Field nitrogen" column
   "Nitrogen input, output, transformation and content for the system."
-  (where "field_nitrogen.dlf")
+  (where "${colfid}field_nitrogen.dlf")
   (summary "Field nitrogen balance" "Field NH4 balance" 
            "Field NO3 balance" "Field organic nitrogen balance"
            "Field crop nitrogen balance")
@@ -585,7 +609,7 @@ The total amount of water in the soil interval")
 
 (deflog "Soil nitrogen" column
   "Nitrogen input, output, transformation and content for the soil."
-  (where "soil_nitrogen.dlf")
+  (where "${colfid}soil_nitrogen.dlf")
   (summary "Soil NO3- balance" "Soil NH4+ balance" 
 	   "Soil mineral-N balance" "Soil organic-N balance"
 	   "Soil N balance")
@@ -760,7 +784,7 @@ The total amount of water in the soil interval")
 
 (deflog "Field chemical" chemical
   "Content, transport and transformation of chemicals in the field."
-  (where "soil_${chemical}.dlf")
+  (where "${colfid}field_${chemfid}.dlf")
   (summary (balance (precision 3)
                     (input "Spray" "Deposit" "External" "Transform")
                     (output "Harvest" "Dissipate" "Runoff"
@@ -871,7 +895,7 @@ The total amount of water in the soil interval")
 
 (deflog "Soil chemical" chemical
   "Content, transport and transformation of chemicals in the soil."
-  (where "soil_${chemical}.dlf")
+  (where "${colfid}soil_${chemfid}.dlf")
   (summary (balance (precision 3)
                     (input "In" "External" "Transform")
                     (output "Decompose" "Leak-Matrix" "Leak-Macro" "Drain" 
@@ -939,4 +963,3 @@ The total amount of water in the soil interval")
                      (spec chemical default M))))
 
 ;; log-std.dai ends here.
-

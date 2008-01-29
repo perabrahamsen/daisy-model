@@ -333,7 +333,8 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
 	  if (obey_surface)
 	    surface.accept_top (soil_water.q (edge) * dt, *geo, edge, dt, msg);
 	  else
-	    surface.accept_top (surface.q_top (*geo, edge), *geo, edge, dt, msg);
+	    surface.accept_top (surface.q_top (*geo, edge),
+                                *geo, edge, dt, msg);
 	}
       if (geo->edge_from (edge) == Geometry::cell_below)
         groundwater.accept_bottom ((soil_water.q (edge)

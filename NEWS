@@ -1,15 +1,23 @@
 * NEWS --- Changes in the Daisy program and libraries -*- outline -*-
 
-This file contains an overview of changes between Daisy source
-releases.  Please note that the version numbers for binary releases
-are less accurate, for example a binary version '1.40' may contain
-some of the changes listed here under '1.41'.  You can get the version
-number of the binary with the command 'daisy -v'.
-
-When you upgrade Daisy, it is recommended that you read at least the
+This file contains an overview of changes between Daisy releases. When
+you upgrade Daisy, it is recommended that you read at least the
 headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
+
+* 4.23
+
+** New log models "Soil chemical" and "Field chemical" in "log-std.dai".
+
+Use the "chemical" parameter to specify which chemical to log.  The
+default file name will be "soil-" or "field-" followed by the name of
+the chemical, followed by ".dlf".
+
+** Name of the column automatically prepended to the log file names.
+
+This happens for all the standard log parameterizations if you specify
+the "column" parameter, but do not specify the "where" parameter.
 
 * 4.22
 
