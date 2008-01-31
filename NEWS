@@ -19,6 +19,8 @@ the chemical, followed by ".dlf".
 This happens for all the standard log parameterizations if you specify
 the "column" parameter, but do not specify the "where" parameter.
 
+** Bug fixes.
+
 * 4.22
 
 ** 2D Daisy

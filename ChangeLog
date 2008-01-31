@@ -1,5 +1,20 @@
+2008-01-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_soil.C: New select model.
+	* Makefile (MODELS): Use it.
+
+2008-01-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bdconv.C, bdconv.h: Extracted from select_volume.C.
+	* Makefile (OTHER): Added.
+	* select_volume.C: Use it.
+
+	* msoltranrect_convection.C: Renamed from "msoltranrect_forward.C".
+	* Makefile (MODELS): Update.
+
 2008-01-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* uzlr.C (UZlr::tick): Bug fix.
 	* uzrichard.C (debug): New parameter.
 
 2008-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>

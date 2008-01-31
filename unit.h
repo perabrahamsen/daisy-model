@@ -25,6 +25,8 @@
 #include "symbol.h"
 
 class Block;
+class Metalib;
+class Treelog;
 
 class Unit : public Model
 {
@@ -38,10 +40,14 @@ public:
   virtual double to_base (double) const = 0;
   virtual double from_base (double) const = 0;
   virtual bool in_domain (double) const = 0;
+  virtual bool in_range (double) const = 0;
 
   // Utilities.
-  static bool can_convert (symbol from, symbol to);
-  static bool can_convert (symbol from, symbol to, double);
+public:
+  static bool can_convert (Metalib&, symbol from, symbol to, Treelog&);
+  static bool can_convert (Metalib&, symbol from, symbol to);
+  static bool can_convert (Metalib&, symbol from, symbol to, double);
+  static double convert (Metalib&, symbol from, symbol to, double);
 
   // Create and Destroy.
 protected:

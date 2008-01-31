@@ -372,7 +372,8 @@ NOLINK = -c
 # 
 LATER = 
 MODELS = heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \
-	msoltranrect_forward.C ABAprod_uptake.C ABAprod_soil.C ABAprod_root.C \
+	msoltranrect_convection.C \
+	ABAprod_uptake.C ABAprod_soil.C ABAprod_root.C \
 	solver_ublas.C solver_cxsparse.C solver_none.C \
 	movement_rect.C chemistry_multi.C \
 	equil_goal.C equil_linear.C equil_langmuir.C transform_equil.C \
@@ -475,7 +476,7 @@ SPECIALS = scope_exchange.C photo_Farquhar.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
+OTHER = bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
 	intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C texture.C destination.C symbol.C \
@@ -559,14 +560,15 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = adsorption_none.C adsorption_full.C ABAprod_expr.C \
+REMOVE = select_soil.C 
+
+REMOVED = adsorption_none.C adsorption_full.C ABAprod_expr.C \
 	solute.C solute.h pedo.C pedo.h pedo_arit.C pedo_const.C \
 	denitrification.C soil_NH4.C soil_NO3.C \
 	denitrification.h soil_NH4.h soil_NO3.h \
 	soil_heat1d.h soil_heat1d.C soil_heat_rect.h soil_heat_rect.C \
-	ui_Qt_read.h ui_Qt_read.C
-
-REMOVED = tlink32.ini daisy.bpr daisy.bpf daisy.bpg Daisy.vcproj q4main.C treelog_stream.C treelog_stream.h treelog_dual.C treelog_dual.h soil_chemical.C soil_chemicals.C chemicals.C soil_chemical.h soil_chemicals.h chemicals.h boolean_extern.C number_extern.C options.C options.h select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
+	ui_Qt_read.h ui_Qt_read.C \
+	tlink32.ini daisy.bpr daisy.bpf daisy.bpg Daisy.vcproj q4main.C treelog_stream.C treelog_stream.h treelog_dual.C treelog_dual.h soil_chemical.C soil_chemicals.C chemicals.C soil_chemical.h soil_chemicals.h chemicals.h boolean_extern.C number_extern.C options.C options.h select_interval.C select_utils.h select_utils.C select_flux_top.C select_flux_bottom.C select_flux.C select_flux.h column_base.h
 
 # These are the file extensions we deal with.
 # 
@@ -944,8 +946,8 @@ ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h block.h syntax.h \
   treelog.h plf.h librarian.h
-unit${OBJ}: unit.C unit.h model.h symbol.h librarian.h block.h syntax.h \
-  treelog.h plf.h
+unit${OBJ}: unit.C unit.h model.h symbol.h check.h treelog.h metalib.h \
+  library.h librarian.h alist.h syntax.h block.h plf.h
 ABAprod${OBJ}: ABAprod.C ABAprod.h model.h symbol.h block.h syntax.h \
   treelog.h plf.h librarian.h alist.h
 solver${OBJ}: solver.C solver.h model.h symbol.h block.h syntax.h treelog.h \
@@ -1238,6 +1240,8 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   parser.h path.h assertion.h librarian.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h border.h model.h \
   alist.h symbol.h library.h syntax.h treelog.h assertion.h
+bdconv${OBJ}: bdconv.C bdconv.h units.h symbol.h geometry.h syntax.h \
+  treelog.h mathlib.h assertion.h soil.h volume.h model.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
 scope_soil${OBJ}: scope_soil.C scope_soil.h scope.h symbol.h model.h soil.h \
   soil_water.h soil_heat.h units.h syntax.h treelog.h alist.h assertion.h \
@@ -1334,10 +1338,10 @@ heatrect_linear${OBJ}: heatrect_linear.C heatrect.h model.h symbol.h \
   assertion.h plf.h alist.h librarian.h
 heatrect_none${OBJ}: heatrect_none.C heatrect.h model.h symbol.h syntax.h \
   treelog.h alist.h librarian.h
-msoltranrect_forward${OBJ}: msoltranrect_forward.C msoltranrect.h model.h \
-  alist.h symbol.h geometry_rect.h geometry_vert.h geometry.h syntax.h \
-  treelog.h mathlib.h assertion.h soil.h soil_water.h adsorption.h \
-  submodeler.h block.h plf.h memutils.h librarian.h
+msoltranrect_convection${OBJ}: msoltranrect_convection.C msoltranrect.h \
+  model.h alist.h symbol.h geometry_rect.h geometry_vert.h geometry.h \
+  syntax.h treelog.h mathlib.h assertion.h soil.h soil_water.h \
+  adsorption.h submodeler.h block.h plf.h memutils.h librarian.h
 ABAprod_uptake${OBJ}: ABAprod_uptake.C ABAprod.h model.h symbol.h number.h \
   scope_id.h scope.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
   soil_water.h units.h librarian.h alist.h
@@ -1468,9 +1472,9 @@ select_flow${OBJ}: select_flow.C select_value.h select.h destination.h \
 volume_box${OBJ}: volume_box.C volume.h model.h symbol.h syntax.h treelog.h \
   alist.h bound.h border.h mathlib.h assertion.h librarian.h
 select_volume${OBJ}: select_volume.C select_value.h select.h destination.h \
-  symbol.h model.h units.h volume.h block.h syntax.h treelog.h plf.h \
-  alist.h geometry.h mathlib.h assertion.h soil.h vegetation.h check.h \
-  librarian.h
+  symbol.h model.h units.h volume.h bdconv.h block.h syntax.h treelog.h \
+  plf.h alist.h geometry.h mathlib.h assertion.h soil.h vegetation.h \
+  check.h librarian.h
 uz1d_none${OBJ}: uz1d_none.C uz1d.h model.h geometry_rect.h geometry_vert.h \
   geometry.h syntax.h treelog.h symbol.h mathlib.h assertion.h soil.h \
   soil_water.h soil_heat.h alist.h librarian.h
@@ -1712,8 +1716,8 @@ select_number${OBJ}: select_number.C select_value.h select.h destination.h \
   symbol.h model.h units.h volume.h syntax.h treelog.h alist.h \
   librarian.h
 select_array${OBJ}: select_array.C select.h destination.h symbol.h model.h \
-  units.h volume.h block.h syntax.h treelog.h plf.h alist.h mathlib.h \
-  assertion.h librarian.h
+  units.h volume.h soil.h bdconv.h block.h syntax.h treelog.h plf.h \
+  alist.h mathlib.h assertion.h librarian.h
 log_table${OBJ}: log_table.C log_select.h log.h time.h border.h model.h \
   alist.h symbol.h memutils.h library.h block.h syntax.h treelog.h plf.h \
   select.h destination.h units.h volume.h summary.h geometry.h mathlib.h \

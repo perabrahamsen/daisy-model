@@ -23,6 +23,7 @@
 #define BUILD_DLL
 
 #include "select_value.h"
+#include "bdconv.h"
 #include "block.h"
 #include "alist.h"
 #include "volume.h"
@@ -50,7 +51,6 @@ struct SelectVolume : public SelectValue
   const symbol min_root_crop;
 
   // Bulk density convertions.
-  struct BD_convert;
   std::auto_ptr<BD_convert> bd_convert;
   const Units::Convert* special_convert (const symbol has, const symbol want);
 
@@ -76,68 +76,6 @@ struct SelectVolume : public SelectValue
 int
 SelectVolume::dimensions () const
 { return (density_z ? 1 : 0) + (density_x ? 1 : 0) + (density_y ? 1 : 0); }
-
-struct SelectVolume::BD_convert : public Units::Convert
-{
-  const Units::Convert& in;
-  const Units::Convert& out;
-  double bulk;
-
-  // Use.
-  double operator()(double value) const;
-  bool valid (double value) const;
-  void set_bulk (const Geometry& geo,
-                 const Soil& soil, const Volume& volume,
-                 const bool density_z, const bool density_x,
-                 const bool density_y);
-
-  // Create and destroy.
-  BD_convert (const symbol has, const symbol want, const symbol bulk_unit);
-};
-
-double
-SelectVolume::BD_convert::operator()(double value) const
-{ 
-  daisy_assert (bulk > 0.0);
-  return out (in (value) / bulk); 
-}
-
-bool
-SelectVolume::BD_convert::valid (double value) const
-{
-  daisy_assert (bulk > 0.0);
-  return in.valid (value) && out.valid (in (value) / bulk);
-}
-
-void
-SelectVolume::BD_convert::set_bulk (const Geometry& geo,
-                                    const Soil& soil, const Volume& volume,
-                                    const bool density_z, const bool density_x,
-                                    const bool density_y)
-{
-  bulk = 0.0;
-
-  const size_t cell_size = geo.cell_size ();
-  for (size_t i = 0; i < cell_size; i++)
-    {
-      const double f = geo.fraction_in_volume (i, volume);
-      if (f > 1e-10)
-        bulk += soil.dry_bulk_density (i) * geo.cell_volume (i) * f;
-    }
-  if (density_z)
-    bulk /= volume.height (geo.bottom (), geo.top ()); 
-  if (density_x)
-    bulk /= volume.width (geo.left (), geo.right ()); 
-  if (density_y)
-    bulk /= volume.depth (geo.front (), geo.back ()); 
-}
-
-SelectVolume::BD_convert::BD_convert (const symbol has, const symbol want,
-                                      const symbol bulk_unit)
-  : in (Units::get_convertion (has, bulk_unit)),
-    out (Units::get_convertion (Syntax::fraction (), want)),
-    bulk (-42.42e42)
-{ }
 
 const Units::Convert* 
 SelectVolume::special_convert (const symbol has, const symbol want)
@@ -288,7 +226,7 @@ SelectVolume::default_dimension (const symbol spec_dim) const
     case 3:
       return spec_dim;
     default:
-      daisy_panic ("Can't handle more than 3 space dimensions");
+      daisy_panic ("Can't handle more than 3 spacial dimensions");
     }
 }
 
