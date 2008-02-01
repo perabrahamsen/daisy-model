@@ -216,6 +216,14 @@ Geometry::mix (std::vector<double>& v, double from, double to) const
 }
 
 void
+Geometry::mix (std::vector<double>& v, const Volume& volume) const
+{
+  const double old_total = total_soil (v);
+  add_soil (v, volume, extract_soil (v, volume));
+  daisy_assert (approximate (old_total, total_soil (v)));
+}
+
+void
 Geometry::mix (std::vector<double>& v, const double from, const double to, 
                std::vector<double>& change, const double dt) const
 {
@@ -225,6 +233,20 @@ Geometry::mix (std::vector<double>& v, const double from, const double to,
 
   const std::vector<double> old = v;
   mix (v, from, to);
+  for (size_t i = 0; i < cell_size; i++)
+    change[i] += (v[i] - old[i]) / dt;
+}
+
+void
+Geometry::mix (std::vector<double>& v, const Volume& volume, 
+               std::vector<double>& change, const double dt) const
+{
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
+  daisy_assert (change.size () == cell_size);
+
+  const std::vector<double> old = v;
+  mix (v, volume);
   for (size_t i = 0; i < cell_size; i++)
     change[i] += (v[i] - old[i]) / dt;
 }
@@ -282,6 +304,11 @@ Geometry::add_soil (std::vector<double>& v, const std::vector<double>& density,
   daisy_assert (approximate (old_total + amount, total_soil (v)));
 }
 
+void
+Geometry::add_soil (std::vector<double>& v, const Volume& volume,
+                    const double amount) const
+{ add_soil (v, volume.density (*this), amount); }
+
 void 
 Geometry::add_surface (std::vector<double>& v,
                        const double from, const double to, 
@@ -293,6 +320,12 @@ Geometry::add_surface (std::vector<double>& v,
                        const std::vector<double>& density,
                        const double amount) const
 { add_soil (v, density, amount * surface_area ()); }
+
+void 
+Geometry::add_surface (std::vector<double>& v,
+                       const Volume& volume,
+                       const double amount) const
+{ add_soil (v, volume, amount * surface_area ()); }
 
 double
 Geometry::extract_soil (std::vector<double>& v, 
@@ -307,6 +340,33 @@ Geometry::extract_soil (std::vector<double>& v,
   for (size_t i = 0; i < cell_size; i++)
     {
       const double f = fraction_in_z_interval (i, from, to);
+      if (f > 0.0)
+        {
+          amount += f * cell_volume (i) * v[i];
+
+	  if (f < 1.0)
+	    v[i] *= (1.0 - f);
+	  else
+	    v[i] = 0.0;
+
+	}
+    }
+  daisy_assert (approximate (old_total, total_soil (v) + amount));
+  return amount;
+}
+
+double
+Geometry::extract_soil (std::vector<double>& v, const Volume& volume) const
+{
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
+
+  const double old_total = total_soil (v);
+
+  double amount = 0.0;
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      const double f = fraction_in_volume (i, volume);
       if (f > 0.0)
         {
           amount += f * cell_volume (i) * v[i];

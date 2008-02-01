@@ -34,6 +34,7 @@ class SoilHeat;
 class OrganicMatter;
 class Adsorption;
 class Chemistry;
+class Volume;
 class VCheck;
 class Treelog;
 class Log;
@@ -96,6 +97,8 @@ public:
   virtual void harvest (double removed, double surface, double dt) = 0;
   virtual void incorporate (const Geometry&, double amount /* [g/m^2] */, 
 			    double from, double to, double dt) = 0;
+  virtual void incorporate (const Geometry&, double amount /* [g/m^2] */, 
+			    const Volume& volume, double dt) = 0;
   virtual void mix (const Geometry& geo, const Soil&, const SoilWater&,
 		    double from, double to, double dt) = 0;
   virtual void swap (const Geometry& geo, const Soil&, const SoilWater&,

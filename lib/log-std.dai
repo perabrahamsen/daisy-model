@@ -861,6 +861,7 @@ The total amount of water in the soil interval")
                            trace "${chemical}" S_decompose)
                      (tag "Decompose")
                      (handle sum)
+                     (negate true)
                      (dimension "g/ha/&")
                      (spec chemical default S_decompose))
            (interval (path column "${column}" Chemistry "*" 

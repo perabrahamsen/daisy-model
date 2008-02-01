@@ -40,6 +40,7 @@ class Log;
 class Block;
 class Metalib;
 class Scope;
+class Volume;
 
 class Field : public Border
 { 
@@ -72,8 +73,12 @@ public:
   void irrigate_surface (double water, const IM&, double dt, Treelog& msg);
   void irrigate_subsoil (double water, const IM&, double from, double to, 
                          double dt, Treelog& msg);
+  void irrigate_subsoil (double water, const IM&, const Volume&, 
+                         double dt, Treelog& msg);
   void fertilize (const AttributeList&,
                   double from, double to, double dt, Treelog& msg); // Organic.
+  void fertilize (const AttributeList&,
+                  const Volume&, double dt, Treelog& msg); // Organic.
   void fertilize (const AttributeList&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);

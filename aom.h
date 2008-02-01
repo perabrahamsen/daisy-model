@@ -25,6 +25,8 @@
 #include "om.h"
 #include <vector>
 
+class Volume;
+
 class AOM : public OM
 { 
   // Parameters.
@@ -40,6 +42,10 @@ public:
 public:
   void output (Log&) const;
   void penetrate (const Geometry&, double from, double to, double penetration,
+                  double& tillage_N_top, double& tillage_C_top,
+                  std::vector<double>& tillage_N_soil,
+                  std::vector<double>& tillage_C_soil);
+  void penetrate (const Geometry&, const Volume&, double penetration,
                   double& tillage_N_top, double& tillage_C_top,
                   std::vector<double>& tillage_N_soil,
                   std::vector<double>& tillage_C_soil);

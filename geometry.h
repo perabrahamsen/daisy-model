@@ -162,10 +162,14 @@ private:
                                std::vector<double>& frac) const;
 public:
   void mix (std::vector<double>& v, double from, double to) const;
+  void mix (std::vector<double>& v, const Volume&) const;
   void mix (std::vector<double>& v, double from, double to, 
+            std::vector<double>& change, double dt) const;
+  void mix (std::vector<double>& v, const Volume&,
             std::vector<double>& change, double dt) const;
   void add_soil (std::vector<double>& v,
                  double from, double to, double amount) const;
+  void add_soil (std::vector<double>& v, const Volume&, double amount) const;
   void add_soil (std::vector<double>& v, const std::vector<double>& density,
                  double amount) const;
   void add_surface (std::vector<double>& v /* [X] */,
@@ -174,7 +178,11 @@ public:
   void add_surface (std::vector<double>& v /* [X] */,
                     const std::vector<double>& density,
                     const double amount /* [X/cm^2] */) const;
+  void add_surface (std::vector<double>& v /* [X] */,
+                    const Volume&,
+                    const double amount /* [X/cm^2] */) const;
   double extract_soil (std::vector<double>& v, double from, double to) const;
+  double extract_soil (std::vector<double>& v, const Volume&) const;
   double extract_surface (std::vector<double>& v, 
                           double from, double to) const;
   void set_soil (std::vector<double>& v,

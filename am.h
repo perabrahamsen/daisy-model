@@ -31,6 +31,7 @@
 
 class Log;
 class Geometry;
+class Volume;
 class Time;
 class AOM;
 class Treelog;
@@ -55,6 +56,10 @@ public:
   void output (Log&) const;
   bool check (Treelog& err) const;
   void mix (const Geometry&, double from, double to, double penetration,
+            double& tillage_N_top, double& tillage_C_top,
+            std::vector<double>& tillage_N_soil,
+            std::vector<double>& tillage_C_soil, double dt);
+  void mix (const Geometry&, const Volume&, double penetration,
             double& tillage_N_top, double& tillage_C_top,
             std::vector<double>& tillage_N_soil,
             std::vector<double>& tillage_C_soil, double dt);

@@ -32,12 +32,10 @@
 #include "assertion.h"
 #include "librarian.h"
 
-using namespace std;
-
 struct Field::Implementation
 {
   // Columns.
-  typedef vector<Column*> ColumnList;
+  typedef std::vector<Column*> ColumnList;
   ColumnList columns;
 
   // Restrictions.
@@ -57,6 +55,10 @@ struct Field::Implementation
   void irrigate_surface (double flux, const IM&, double dt, Treelog& msg);
   void irrigate_subsoil (double flux, const IM&, double from, double to, 
                          double dt, Treelog& msg);
+  void irrigate_subsoil (double flux, const IM&, const Volume&,
+                         double dt, Treelog& msg);
+  void fertilize (const AttributeList&, const Volume&, double dt, 
+		  Treelog& msg);
   void fertilize (const AttributeList&, double from, double to, double dt, 
 		  Treelog& msg);
   void fertilize (const AttributeList&, double dt, Treelog& msg);
@@ -68,7 +70,7 @@ struct Field::Implementation
 		double leaf_harvest, 
 		double sorg_harvest,
                 const bool combine,
-		vector<const Harvest*>&, Treelog&);
+		std::vector<const Harvest*>&, Treelog&);
   void mix (double from, double to, double penetration, 
             const Time&, double dt, Treelog&);
   void swap (double from, double middle, double to, 
@@ -94,7 +96,7 @@ public:
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
   double crop_dm (symbol crop, double height) const; 
   // All names of all crops on selected columns.
-  string crop_names () const;
+  std::string crop_names () const;
   // Simulation.
   void clear ();
   void tick_all (const Time&, double dt, const Weather*,
@@ -127,7 +129,7 @@ Field::Implementation::restrict (symbol name)
   selected = find (name);
 
   if (!selected)
-    throw (string ("Restricting to non-existing column '") + name + "'");
+    throw (std::string ("Restricting to non-existing column '") + name + "'");
 }
 
 void 
@@ -236,6 +238,19 @@ Field::Implementation::irrigate_subsoil (const double flux, const IM& im,
 }
 
 void 
+Field::Implementation::irrigate_subsoil (const double flux, const IM& im, 
+                                         const Volume& volume,
+                                         const double dt, Treelog& msg)
+{
+  if (selected)
+    selected->irrigate_subsoil (flux, im, volume, dt, msg);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+	 (*i)->irrigate_subsoil (flux, im, volume, dt, msg);
+}
+
+void 
 Field::Implementation::fertilize (const AttributeList& al, 
 				  const double from, const double to,
                                   const double dt, Treelog& msg)
@@ -246,6 +261,19 @@ Field::Implementation::fertilize (const AttributeList& al,
 	    i != columns.end ();
 	    i++)
 	 (*i)->fertilize (al, from, to, dt, msg);
+}
+
+void 
+Field::Implementation::fertilize (const AttributeList& al, 
+                                  const Volume& volume,
+                                  const double dt, Treelog& msg)
+{
+  if (selected)
+    selected->fertilize (al, volume, dt, msg);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+	 (*i)->fertilize (al, volume, dt, msg);
 }
 
 void 
@@ -306,7 +334,7 @@ Field::Implementation::harvest (const Time& time, const double dt,
 				const double leaf_harvest, 
 				const double sorg_harvest,
                                 const bool combine,
-				vector<const Harvest*>& total,
+				std::vector<const Harvest*>& total,
 				Treelog& out)
 {
   if (selected)
@@ -532,13 +560,13 @@ Field::Implementation::crop_dm (const symbol crop, const double height) const
   return DM;
 }
   
-string
+std::string
 Field::Implementation::crop_names () const
 {
   if (selected)
     return selected->crop_names ();
   
-  string result = "";
+  std::string result = "";
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
@@ -744,10 +772,21 @@ Field::irrigate_subsoil (double water, const IM& im,
 { impl.irrigate_subsoil (water, im, from, to, dt, msg); }
 
 void 
+Field::irrigate_subsoil (double water, const IM& im, 
+                         const Volume& volume, double dt, Treelog& msg)
+{ impl.irrigate_subsoil (water, im, volume, dt, msg); }
+
+void 
 Field::fertilize (const AttributeList& al, 
                   const double from, const double to, const double dt,
 		  Treelog& msg)
 { impl.fertilize (al, from, to, dt, msg); }
+
+void 
+Field::fertilize (const AttributeList& al, 
+                  const Volume& volume, const double dt,
+		  Treelog& msg)
+{ impl.fertilize (al, volume, dt, msg); }
 
 void 
 Field::fertilize (const AttributeList& al, const double dt, Treelog& msg)
@@ -768,7 +807,7 @@ Field::harvest (const Time& time, const double dt, const symbol name,
 		const double leaf_harvest, 
 		const double sorg_harvest,
                 const bool combine,
-		vector<const Harvest*>& total, Treelog& msg)
+		std::vector<const Harvest*>& total, Treelog& msg)
 { impl.harvest (time, dt, name,
 		stub_length,
 		stem_harvest, leaf_harvest, sorg_harvest, combine, 
@@ -843,7 +882,7 @@ double
 Field::crop_dm (const symbol crop, const double height) const
 { return impl.crop_dm (crop, height); } 
 
-string
+std::string
 Field::crop_names () const
 { return impl.crop_names (); } 
 
@@ -910,3 +949,5 @@ Field::Field (Block& parent, const std::string& key)
 
 Field::~Field ()
 { delete &impl; }
+
+// field.C ends here.

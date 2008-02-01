@@ -155,6 +155,8 @@ struct ChemicalStandard : public Chemical
   void harvest (const double removed, const double surface, const double dt);
   void incorporate (const Geometry&, double amount, 
 		    double from, double to, double dt);
+  void incorporate (const Geometry&, double amount, 
+		    const Volume&, double dt);
   void mix (const Geometry& geo, const Soil&, const SoilWater&,
 	    double from, double to, double dt);
   void swap (const Geometry& geo, const Soil&, const SoilWater&,
@@ -418,6 +420,15 @@ ChemicalStandard::incorporate (const Geometry& geo, const double amount,
   daisy_assert (to <= from);
   const double m2_per_cm2 = 0.01 * 0.01;
   geo.add_surface (S_external, from, to, m2_per_cm2 * amount / dt);
+}
+
+void 
+ChemicalStandard::incorporate (const Geometry& geo, const double amount,
+                               const Volume& volume, const double dt)
+{ 
+  daisy_assert (amount >= 0.0);
+  const double m2_per_cm2 = 0.01 * 0.01;
+  geo.add_surface (S_external, volume, m2_per_cm2 * amount / dt);
 }
 
 void 

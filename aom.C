@@ -76,6 +76,39 @@ AOM::penetrate (const Geometry& geo, double from, double to,
   daisy_assert (top_N >= 0.0);
 }
 
+void 
+AOM::penetrate (const Geometry& geo, const Volume& volume,
+		double penetration,
+                double& tillage_N_top, double& tillage_C_top,
+                vector<double>& tillage_N_soil, vector<double>& tillage_C_soil)
+{
+  daisy_assert (penetration >= 0.0);
+  daisy_assert (penetration <= 1.0);
+
+  // Ignore tiny pools.
+  if (top_C < 1e-20 && top_N < 1e-21)
+    return;
+  
+  const double C_pen = top_C * penetration;
+  const double N_pen = top_N * penetration;
+
+  static const double cm2_to_m2 = 100 * 100;
+
+  // Penetrate.
+  geo.add_surface (C, volume, C_pen);
+  geo.add_surface (tillage_C_soil, volume, C_pen);
+  daisy_non_negative (C);
+  top_C -= C_pen;
+  tillage_C_top -= C_pen * cm2_to_m2;
+  daisy_assert (top_C >= 0.0);
+  geo.add_surface (N, volume, N_pen);
+  geo.add_surface (tillage_N_soil, volume, N_pen);
+  daisy_non_negative (N);
+  top_N -= N_pen;
+  tillage_N_top -= N_pen * cm2_to_m2;
+  daisy_assert (top_N >= 0.0);
+}
+
 double 
 AOM::full_C (const Geometry& geo) const
 { return soil_C (geo) + top_C * geo.surface_area (); }

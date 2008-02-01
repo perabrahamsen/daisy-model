@@ -59,6 +59,9 @@ struct ChemistryStandard : public Chemistry
 		    const symbol chem, const double amount,
 		    const double from, const double to, 
 		    const double dt, Treelog& msg);
+  void incorporate (const Geometry& geo,
+		    const symbol chem, const double amount,
+                    const Volume&, const double dt, Treelog& msg);
   
   // Simulation.
   void tick_top (const double snow_leak_rate, // [h^-1]
@@ -191,6 +194,21 @@ ChemistryStandard::incorporate (const Geometry& geo,
     if (chemicals[c]->name == chem)
       {
         chemicals[c]->incorporate (geo, amount, from, to, dt);
+        return;
+      }
+  msg.warning ("Unknwon chemical '" + chem + "' ignored");
+}
+
+void 
+ChemistryStandard::incorporate (const Geometry& geo,
+				const symbol chem, const double amount,
+                                const Volume& volume,
+				const double dt, Treelog& msg)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    if (chemicals[c]->name == chem)
+      {
+        chemicals[c]->incorporate (geo, amount, volume, dt);
         return;
       }
   msg.warning ("Unknwon chemical '" + chem + "' ignored");

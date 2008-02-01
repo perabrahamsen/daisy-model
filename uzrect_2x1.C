@@ -262,21 +262,17 @@ UZRect2x1::load_syntax (Syntax& syntax, AttributeList& alist)
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
   std::vector<const AttributeList*> vertical_models;
-  AttributeList vertical_default (UZmodel::default_model ());
-  vertical_models.push_back (&vertical_default);
-  AttributeList vertical_reserve (UZmodel::reserve_model ());
-  vertical_models.push_back (&vertical_reserve);
+  vertical_models.push_back (&UZmodel::default_model ());
+  vertical_models.push_back (&UZmodel::reserve_model ());
   alist.add ("vertical", vertical_models);
-  syntax.add_object ("horizontal", UZmodel::component,
+  syntax.add_object ("horizontal", UZ1D::component,
                      Syntax::Const, Syntax::Sequence,
                      "Horizontal matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends."); 
   std::vector<const AttributeList*> horizontal_models;
-  AttributeList horizontal_default (UZ1D::default_model ());
-  horizontal_models.push_back (&horizontal_default);
-  AttributeList horizontal_none (UZ1D::none_model ());
-  horizontal_models.push_back (&horizontal_none);
+  horizontal_models.push_back (&UZ1D::default_model ());
+  horizontal_models.push_back (&UZ1D::none_model ());
   alist.add ("horizontal", horizontal_models);
 }
 

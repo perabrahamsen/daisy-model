@@ -77,6 +77,24 @@ OM::mix (const Geometry& geo, const double from, const double to,
   daisy_non_negative (N);
 }
 
+void 
+OM::mix (const Geometry& geo, const Volume& volume,
+         std::vector<double>& N_change, std::vector<double>& C_change,
+         const double dt)
+{
+  // Ignore tiny pools.
+  if (soil_C (geo) < 1e-20)
+    return;
+
+  // Mix.
+  daisy_non_negative (C);
+  geo.mix (C, volume, C_change, dt);
+  daisy_non_negative (C);
+  daisy_non_negative (N);
+  geo.mix (N, volume, N_change, dt);
+  daisy_non_negative (N);
+}
+
 void
 OM::swap (const Geometry& geo, 
           const double from, const double middle, const double to,

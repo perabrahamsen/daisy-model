@@ -35,6 +35,7 @@ class SoilHeat;
 class OrganicMatter;
 class Movement;
 class Chemical;
+class Volume;
 class Treelog;
 class Syntax;
 class Block;
@@ -74,10 +75,15 @@ public:
   void incorporate (const Geometry& geo, const IM& im, 
 		    const double from, const double to,
 		    const double dt, Treelog& msg);
+  void incorporate (const Geometry& geo, const IM& im, const Volume&, 
+		    const double dt, Treelog& msg);
   virtual void incorporate (const Geometry& geo,
 			    const symbol chem, const double amount,
 			    const double from, const double to, 
 			    const double dt, Treelog& msg) = 0;
+  virtual void incorporate (const Geometry& geo,
+			    const symbol chem, const double amount,
+			    const Volume&, const double dt, Treelog& msg) = 0;
 
   // Simulation.
 public:

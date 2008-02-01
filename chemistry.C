@@ -76,6 +76,19 @@ Chemistry::incorporate (const Geometry& geo, const IM& im,
     }
 }
 
+void 
+Chemistry::incorporate (const Geometry& geo, const IM& im, 
+			const Volume& volume,
+			const double dt, Treelog& msg)
+{
+  for (IM::const_iterator i = im.begin (); i != im.end (); i++)
+    {
+      const symbol chem = *i;
+      const double amount = im.get_value (chem, Chemical::spray_unit ());
+      incorporate (geo, chem, amount, volume, dt, msg);
+    }
+}
+
 void
 Chemistry::output (Log&) const
 { }

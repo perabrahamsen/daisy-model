@@ -21,6 +21,7 @@
 #define BUILD_DLL
 
 #include "volume.h"
+#include "geometry.h"
 #include "block.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -28,6 +29,22 @@
 class Log;
 
 const char *const Volume::component = "volume";
+
+const std::vector<double>&
+Volume::density (const Geometry& geo) const
+{
+  density_map::const_iterator i = densities.find (&geo);
+  
+  if (i != densities.end ())
+    return (*i).second;
+
+  const size_t cell_size = geo.cell_size ();
+  std::vector<double> result (cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    result[c] = geo.fraction_in_volume (c, *this);
+  densities[&geo] = result;
+  return densities[&geo];
+}
 
 std::auto_ptr<Volume>
 Volume::build_obsolete (Block& al)

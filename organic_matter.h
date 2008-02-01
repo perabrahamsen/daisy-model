@@ -39,6 +39,7 @@ class SoilWater;
 class SoilHeat;
 class Chemistry;
 class Time;
+class Volume;
 class Treelog;
 class Block;
 
@@ -83,6 +84,8 @@ public:
                           double dt) = 0;
   virtual void fertilize (const AttributeList&, const Geometry&,
                           double from, double to, double dt) = 0;
+  virtual void fertilize (const AttributeList&, const Geometry&,
+                          const Volume&, double dt) = 0;
   virtual AM* find_am (symbol sort, symbol part) const = 0;
 public:
   virtual void initialize (const AttributeList&, const Geometry& geo,

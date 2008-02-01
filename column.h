@@ -34,6 +34,7 @@ class Horizon;
 class IM;
 class Crop;
 class Harvest;
+class Volume;
 class Output;
 class Treelog;
 class Metalib;
@@ -82,8 +83,13 @@ public:
   virtual void irrigate_subsoil (double flux, const IM&, 
                                  double from, double to, double dt, 
 				 Treelog& msg) = 0;
+  virtual void irrigate_subsoil (double flux, const IM&, const Volume&,
+                                 double dt, 
+				 Treelog& msg) = 0;
   virtual void fertilize (const AttributeList&, 
                           double from, double to, double dt, Treelog& msg) = 0;
+  virtual void fertilize (const AttributeList&, 
+                          const Volume&, double dt, Treelog& msg) = 0;
   virtual void fertilize (const AttributeList&, double dt, Treelog& msg) = 0;
   virtual void clear_second_year_utilization () = 0;
   virtual void emerge (symbol crop, Treelog&) = 0;

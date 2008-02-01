@@ -250,6 +250,8 @@ struct OrganicStandard : public OrganicMatter
   void fertilize (const AttributeList&, const Geometry&, double dt);
   void fertilize (const AttributeList&, const Geometry&,
                   double from, double to, double dt);
+  void fertilize (const AttributeList&, const Geometry&, 
+                  const Volume&, double dt);
   AM* find_am (symbol sort, symbol part) const;
   void initialize (const AttributeList&, const Geometry& geo,
                    const Soil&, const SoilWater&, 
@@ -899,6 +901,21 @@ OrganicStandard::fertilize (const AttributeList& al,
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   om.mix (geo, from, to, 1.0,
+          tillage_N_top, tillage_C_top,
+          tillage_N_soil, tillage_C_soil, dt);
+  add (om);
+}
+
+void 
+OrganicStandard::fertilize (const AttributeList& al,
+                            const Geometry& geo,
+                            const Volume& volume,
+                            const double dt)
+{ 
+  AM& om = AM::create (al, geo);
+  fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
+  fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
+  om.mix (geo, volume, 1.0,
           tillage_N_top, tillage_C_top,
           tillage_N_soil, tillage_C_soil, dt);
   add (om);

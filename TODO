@@ -1,8 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* ppm i array?
+* Fertilization based on volume
 
-* Hvad nu?
+** fertilize_incorporate
 
 * DOMÆNER
 
@@ -39,14 +39,14 @@ Gør DOM til DOM-C og DOM-N ?
 
 * function
 
-(defnumber function sqr
+(defnumber sqr function
   "Find the square of a number."
   (parameters (x [D]))
   (order x)
   (value (* x x))
   (dimension (* U U)))
 
-(sqr 7)
+(sqr 7 [cm])
 
 * Rootdens
 
@@ -90,44 +90,6 @@ MiniOM
 Eller hvad?  Tabeller i Daisy?
 
 * 2D gnuplot?
-
-* units
-
-convert to SI: DIM, value
-convert from SI: DIM, value
-compatible DIM1 DIM2
-
-static auto_map<symbol,Unit> all_units;
-static map<symbol, set<symbol>> convertions;
-static map<symbol, Convert> convertions;
-
-problem med flere instanser af Daisy (Metalib)
-
-SI_base
-SI_factor
-SI_expr
-
-
-(defunit [cm] SI_factor
-  "centimeter"
-  (expr (dim (* [cm] 0.01 [cm/m]) [m]))
-  (length 1))
-
-(defunit [m] SI
-  "meter"
-  (expr x))
-
-
-class Unit
-{
-  virtual symbol identifier const () = 0;
-  virtual double to_SI (double) const = 0;
-  virtual double from_SI (double) const = 0;
-};
-
-plain SI
-special
-
 
 * Qt
 

@@ -33,6 +33,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "volume.h"
 #include <sstream>
 
 struct ActionIrrigate : public Action
@@ -216,16 +217,14 @@ struct ActionIrrigateSurface : public ActionIrrigate
 
 struct ActionIrrigateSubsoil : public ActionIrrigate
 {
-  const double from;
-  const double to;
+  std::auto_ptr<Volume> volume;
 
   void irrigate (Field& f, const double flux, const double /* temp */, 
                  const IM& im, const double dt, Treelog& msg) const
-  { f.irrigate_subsoil (flux, im, from, to, dt, msg); }
+  { f.irrigate_subsoil (flux, im, *volume, dt, msg); }
   ActionIrrigateSubsoil (Block& al)
     : ActionIrrigate (al),
-      from (al.number ("from")),
-      to (al.number ("to"))
+      volume (Volume::build_obsolete (al))
   { }
 };
 
@@ -292,13 +291,16 @@ static struct ActionIrrigateSubsoilSyntax
   static bool check_alist (const AttributeList& al, Treelog& err)
   { 
     bool ok = true;
-    const double from = al.number ("from");
-    const double to = al.number ("to");
-    if (from <= to)
+    if (al.check ("from") && al.check ("to"))
       {
-	err.entry ("'from' must be higher than 'to' in"
-		   " the subsoil irrigation zone");
-	ok = false;
+        const double from = al.number ("from");
+        const double to = al.number ("to");
+        if (from <= to)
+          {
+            err.entry ("'from' must be higher than 'to' in"
+                       " the subsoil irrigation zone");
+            ok = false;
+          }
       }
     return ok;
   }
@@ -313,11 +315,16 @@ static struct ActionIrrigateSubsoilSyntax
     alist.add ("description", "\
 Irrigate the field directly into the soil.\n\
 Currently, the 'temperature' parameter is ignored.");
-    syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
-Height where you want to start the incorporation (a negative number).");
-    alist.add ("from", 0.0);
-    syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
-Height where you want to end the incorporation (a negative number).");
+    syntax.add_object ("volume", Volume::component, 
+                       Syntax::Const, Syntax::Singleton,
+                       "Soil volume to add irritaion.");
+    alist.add ("volume", Volume::infinite_box ());
+    syntax.add ("from", "cm", Check::non_positive (), Syntax::OptionalConst, "\
+Height where you want to start the incorporation (a negative number).\n\
+OBSOLETE: Use (volume box (top FROM)) instead.");
+    syntax.add ("to", "cm", Check::non_positive (), Syntax::OptionalConst, "\
+Height where you want to end the incorporation (a negative number).\n\
+OBSOLETE: Use (volume box (bottom TO)) instead.");
 
     Librarian::add_type (Action::component, "irrigate_subsoil", alist, syntax, &make);
   }

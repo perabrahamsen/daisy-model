@@ -19,6 +19,33 @@ the chemical, followed by ".dlf".
 This happens for all the standard log parameterizations if you specify
 the "column" parameter, but do not specify the "where" parameter.
 
+** You can now log soil content as [ppm] with the 'array' select model.
+
+That is, content of chemical as part per million of soil dry bulk density.
+
+** You can now irrigate at a specific x interval.
+
+The 'irrigate_subsoil' action model now takes a 'volume' parameter,
+that allows you to specify a rectangle to irrigate.
+
+  (irrigate_subsoil 5 [mm/h] (hours 3)
+                    (volume box
+                            (top finite -10 [cm]) (bottom finite -20 [cm])
+                            (left finite 3 [cm]) (right finite  6 [cm])))
+
+** You can now incorporate fertilizer in a specifuc x interval.
+
+The new 'incorporate_fertilizer' action model allows you to specify
+exactly where to put the fertilizer.
+
+  (incorporate_fertilizer (mineral (weight 100.0 [kg N/ha])
+                                   (NH4_fraction 0.5 []))
+                          (volume box 
+                                  (top finite -5 [cm])
+                                  (bottom finite -15 [cm])
+                                  (left finite 2 [cm])
+                                  (right finite 8 [cm])))
+
 ** Bug fixes.
 
 * 4.22

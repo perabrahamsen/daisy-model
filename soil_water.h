@@ -32,6 +32,7 @@ class Soil;
 class Syntax;
 class Geometry;
 class SoilHeat;
+class Volume;
 class Treelog;
 class Block;
 
@@ -115,6 +116,7 @@ public:
   void tick_after (const size_t cell_size, 
                    const Soil& soil, const SoilHeat& soil_heat, Treelog& msg);
   void incorporate (const Geometry&, double amount, double from, double to);
+  void incorporate (const Geometry&, double amount, const Volume&);
   void mix (const Geometry& geo,
             const Soil&, double from, double to, double dt);
   void swap (const Geometry& geo,

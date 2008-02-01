@@ -26,7 +26,10 @@
 #include "model.h"
 #include "symbol.h"
 #include <memory>
+#include <vector>
+#include <map>
 
+class Geometry;
 class Border;
 class Treelog;
 class Block;
@@ -39,6 +42,9 @@ public:
   const symbol name;
   static const char *const component;
   virtual std::string one_line_description () const = 0;
+private:
+  typedef std::map<const Geometry*, std::vector<double>/**/> density_map;
+  mutable density_map densities;
 
   // Use.
 private:
@@ -58,6 +64,7 @@ public:
                                double xm = 0.0, double xp = 1.0,
                                double ym = 0.0, double yp = 1.0) const = 0;
   virtual bool contain_point (double z, double x, double y) const = 0;
+  const std::vector<double>& density (const Geometry&) const;
 
   // Create and Destroy.
 public:

@@ -33,6 +33,7 @@ class Geometry;
 class SOM;
 class SMB;
 class DOM;
+class Volume;
 
 class OM
 { 
@@ -56,6 +57,9 @@ public:
 public:
   void output (Log&) const;
   void mix (const Geometry&, double from, double to,
+            std::vector<double>& N_change, std::vector<double>& C_change, 
+            double dt);
+  void mix (const Geometry&, const Volume&,
             std::vector<double>& N_change, std::vector<double>& C_change, 
             double dt);
   void swap (const Geometry&, double from, double middle, double to,

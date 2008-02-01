@@ -81,6 +81,9 @@ struct OrganicNone : public OrganicMatter
   void fertilize (const AttributeList&, const Geometry&, 
                   double, double, double)
   { }
+  void fertilize (const AttributeList&, const Geometry&, 
+                  const Volume&, double)
+  { }
   AM* find_am (symbol, symbol) const
   { return NULL; }
   void initialize (const AttributeList&, const Geometry& geo,

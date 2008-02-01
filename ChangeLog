@@ -1,7 +1,32 @@
+2008-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrect_2x1.C (UZRect2x1::load_syntax): Bug fix: 'UZModel' -> 'UZ1D'. 
+
+	* action_irrigate.C (volume): New parameter for the
+	'irrigate_subsoil' model.
+	* aom.C, aom.h (AOM::penetrate): 
+	* am.C, am.h (AM::mix): 
+	* om.C, om.h (OM::mix): 
+	* organic_std.C (OrganicStandard::fertilize): 
+	* organic_none.C (OrganicNone::fertilize): 
+	* organic_matter.h (fertilize): 
+	* column_std.C, column.h (ColumnStandard::irrigate_subsoil)
+	(ColumnStandard::fertilize): 
+	* chemical_std.C (ChemicalStandard::incorporate): 
+	* chemical.h (Chemical::incorporate): 
+	* chemistry_multi.C (ChemistryMulti::incorporate): 
+	* chemistry_std.C (ChemistryStandard::incorporate): 
+	* chemistry.C, chemistry.h (Chemistry::incorporate): 
+	* soil_water.C, soil_water.h (SoilWater::incorporate): 
+	* geometry.C, geometry.h (Geometry::add_soil):
+	(Geometry::mix, Geometry::extract_soil): 
+	(Geometry::add_surface): Add versions taking 'Volume' argument.
+
+	* volume.C, volume.h (Volume::density): New member function.
+
 2008-01-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* select_soil.C: New select model.
-	* Makefile (MODELS): Use it.
+	* select_array.C: Handle dry bulk density for [ppm] log.
 
 2008-01-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 

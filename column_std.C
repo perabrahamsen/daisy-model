@@ -100,9 +100,13 @@ public:
   void irrigate_surface (double flux, const IM&, double dt, Treelog& msg);
   void irrigate_subsoil (double flux, const IM& sm, 
                          double from, double to, double dt, Treelog& msg);
+  void irrigate_subsoil (double flux, const IM& sm, 
+                         const Volume& volume, double dt, Treelog& msg);
   void fertilize (const IM&, double dt, Treelog& msg);
   void fertilize (const AttributeList&, double dt, Treelog& msg);
   void fertilize (const AttributeList&, double from, double to, double dt,
+		  Treelog& msg);
+  void fertilize (const AttributeList&, const Volume&, double dt,
 		  Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (const symbol crop_name, Treelog& msg);
@@ -235,6 +239,18 @@ ColumnStandard::irrigate_subsoil (const double flux, const IM& sm,
 }
 
 void
+ColumnStandard::irrigate_subsoil (const double flux, const IM& sm, 
+                                  const Volume& volume, 
+                                  const double dt, Treelog& msg)
+{
+  soil_water->incorporate (geometry, flux / 10.0 /* mm -> cm */, volume);
+  bioclimate->irrigate_subsoil (flux);
+  IM im (solute_per_mm_unit, sm);
+  im *= Scalar (flux * dt, Units::mm ());
+  chemistry->incorporate (geometry, im, volume, dt, msg);
+}
+
+void
 ColumnStandard::fertilize (const IM& im, const double dt, Treelog& msg)
 { chemistry->spray (im, dt, msg); }
 
@@ -282,6 +298,29 @@ ColumnStandard::fertilize (const AttributeList& al,
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")
     organic_matter->fertilize (al, geometry, from, to, dt);
+}
+
+void 
+ColumnStandard::fertilize (const AttributeList& al, 
+                           const Volume& volume, const double dt,
+			   Treelog& msg)
+{
+  // Utilization log.
+  first_year_utilization += AM::utilized_weight (al);
+  second_year_utilization_ += AM::second_year_utilization (al);
+
+  // Volatilization.
+  const double lost_NH4 = AM::get_volatilization (al);
+  chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
+
+  // Add inorganic matter.
+  const IM im = AM::get_IM (al);
+  chemistry->incorporate (geometry, im, volume, dt, msg);
+  applied_DM += AM::get_DM (al) / dt;
+
+  // Add organic matter, if any.
+  if (al.name ("syntax") != "mineral")
+    organic_matter->fertilize (al, geometry, volume, dt);
 }
 
 void 

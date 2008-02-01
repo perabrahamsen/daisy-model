@@ -61,6 +61,10 @@ struct ChemistryMulti : public Chemistry
 		    const symbol chem, const double amount,
 		    const double from, const double to, 
 		    const double dt, Treelog& msg);
+  void incorporate (const Geometry& geo,
+		    const symbol chem, const double amount,
+                    const Volume&,
+		    const double dt, Treelog& msg);
   
   // Simulation.
   void tick_top (const double snow_leak_rate, // [h^-1]
@@ -216,8 +220,8 @@ ChemistryMulti::harvest (const double removed, const double surface,
 
 void 
 ChemistryMulti::mix (const Geometry& geo, const Soil& soil, 
-                        const SoilWater& soil_water,
-                        const double from, const double to, const double dt)
+                     const SoilWater& soil_water,
+                     const double from, const double to, const double dt)
 {
   for (size_t c = 0; c < combine.size (); c++)
     combine[c]->mix (geo, soil, soil_water, from, to, dt); 
@@ -225,9 +229,9 @@ ChemistryMulti::mix (const Geometry& geo, const Soil& soil,
 
 void 
 ChemistryMulti::swap (const Geometry& geo,
-                         const Soil& soil, const SoilWater& soil_water,
-                         const double from, const double middle,
-                         const double to, const double dt)
+                      const Soil& soil, const SoilWater& soil_water,
+                      const double from, const double middle,
+                      const double to, const double dt)
 { 
   for (size_t c = 0; c < combine.size (); c++)
     combine[c]->swap (geo, soil, soil_water, from, middle, to, dt); 
@@ -259,12 +263,37 @@ ChemistryMulti::incorporate (const Geometry& geo,
 }
 
 void 
+ChemistryMulti::incorporate (const Geometry& geo,
+			     const symbol chem, const double amount,
+                             const Volume& volume,
+			     const double dt, Treelog& msg)
+{
+  bool found = false;
+
+  for (size_t c = 0; c < combine.size (); c++)
+    if (combine[c]->know (chem))
+      {
+	if (found)
+	  msg.error ("Duplicate chemical '" + chem + "' detected");
+
+	Chemical& chemical = combine[c]->find (chem);
+        chemical.incorporate (geo, amount, volume, dt);
+	found = true;
+      }
+  
+  if (found)
+    return;
+
+  check_ignore (chem, msg);
+}
+
+void 
 ChemistryMulti::tick_top (const double snow_leak_rate, // [h^-1]
-                             const double cover, // [],
-                             const double canopy_leak_rate, // [h^-1]
-                             double surface_runoff_rate /* [h^-1] */,
-                             const double dt, // [h]
-			     Treelog& msg) 
+                          const double cover, // [],
+                          const double canopy_leak_rate, // [h^-1]
+                          double surface_runoff_rate /* [h^-1] */,
+                          const double dt, // [h]
+                          Treelog& msg) 
 {
   for (size_t c = 0; c < combine.size (); c++)
     combine[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 
