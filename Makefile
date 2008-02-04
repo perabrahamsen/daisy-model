@@ -972,8 +972,8 @@ uzrect${OBJ}: uzrect.C uzrect.h model.h symbol.h block.h syntax.h treelog.h \
   plf.h librarian.h
 bound${OBJ}: bound.C bound.h model.h symbol.h block.h syntax.h treelog.h \
   plf.h alist.h mathlib.h assertion.h librarian.h
-volume${OBJ}: volume.C volume.h model.h symbol.h block.h syntax.h treelog.h \
-  plf.h assertion.h librarian.h
+volume${OBJ}: volume.C volume.h model.h symbol.h geometry.h syntax.h \
+  treelog.h mathlib.h assertion.h block.h plf.h librarian.h
 uz1d${OBJ}: uz1d.C uz1d.h model.h geometry_rect.h geometry_vert.h geometry.h \
   syntax.h treelog.h symbol.h mathlib.h assertion.h soil.h soil_water.h \
   soil_heat.h block.h plf.h librarian.h
@@ -1162,7 +1162,7 @@ ridge${OBJ}: ridge.C ridge.h soil.h symbol.h geometry1d.h geometry_vert.h \
 soil${OBJ}: soil.C soil.h symbol.h horizon.h model.h geometry.h syntax.h \
   treelog.h mathlib.h assertion.h hydraulic.h tortuosity.h groundwater.h \
   metalib.h library.h alist.h submodel.h submodeler.h block.h plf.h log.h \
-  time.h border.h check.h vcheck.h memutils.h librarian.h
+  time.h border.h check.h vcheck.h memutils.h librarian.h volume.h
 surface${OBJ}: surface.C surface.h uzmodel.h model.h symbol.h syntax.h \
   treelog.h alist.h geometry1d.h geometry_vert.h geometry.h mathlib.h \
   assertion.h soil.h soil_water.h log.h time.h border.h submodel.h plf.h \
@@ -1656,7 +1656,8 @@ groundwater_file${OBJ}: groundwater_file.C groundwater.h model.h symbol.h \
   assertion.h time.h librarian.h path.h
 action_fertilize${OBJ}: action_fertilize.C action.h model.h alist.h symbol.h \
   block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
-  memutils.h field.h border.h am.h im.h check.h assertion.h librarian.h
+  memutils.h field.h border.h am.h im.h check.h assertion.h librarian.h \
+  volume.h
 action_repeat${OBJ}: action_repeat.C action.h model.h alist.h symbol.h \
   daisy.h program.h run.h time.h memutils.h block.h syntax.h treelog.h \
   plf.h log.h border.h librarian.h
@@ -1798,7 +1799,7 @@ condition_logic${OBJ}: condition_logic.C condition.h model.h symbol.h alist.h \
 action_irrigate${OBJ}: action_irrigate.C action.h model.h alist.h symbol.h \
   scope.h block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
   memutils.h chemical.h number.h units.h field.h border.h im.h check.h \
-  mathlib.h assertion.h librarian.h
+  mathlib.h assertion.h librarian.h volume.h
 action_lisp${OBJ}: action_lisp.C action.h model.h alist.h symbol.h daisy.h \
   program.h run.h time.h memutils.h log.h border.h submodeler.h block.h \
   syntax.h treelog.h plf.h assertion.h librarian.h condition.h

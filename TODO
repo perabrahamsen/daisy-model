@@ -1,8 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Fertilization based on volume
+* 2D brugbar for dræn
 
-** fertilize_incorporate
+** Drængrøft horisont (liste af rektangler)
+
+** Drænnode skal virke med vand (påvirk S_drain)
+
+* row width
+
+* InitLAI erstatning
 
 * DOMÆNER
 
@@ -32,6 +38,7 @@ Udskudt:
 - fjern decompose
 - elements
 doing - abiotic.[Ch]
+
 - horizon attributes skal være parametre
 geo skal i ScopeSoil, så man kan spørge på z
 slet transform?  Kan ikke, bruges af domsorp...

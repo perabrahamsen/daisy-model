@@ -25,6 +25,7 @@
 
 #include "symbol.h"
 #include <vector>
+#include <memory>
 
 class AttributeList;
 class Horizon;
@@ -39,7 +40,7 @@ class Soil
 {
   // Content.
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
   // Cache for fast inline access.
   /* const */ std::vector<Horizon*> horizon_;
 

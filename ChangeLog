@@ -1,3 +1,7 @@
+2008-02-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil.C (zones): New parameter.
+
 2008-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* uzrect_2x1.C (UZRect2x1::load_syntax): Bug fix: 'UZModel' -> 'UZ1D'. 

@@ -46,6 +46,30 @@ exactly where to put the fertilizer.
                                   (left finite 2 [cm])
                                   (right finite 8 [cm])))
 
+** You can now specify different soil types in specific rectangle.
+
+The new 'zones' Soil parameter contain a list of (volume horizon)
+pairs, where the volume is specified as for the preious two news
+items, and the horizon is a soil type as specified in the 'horizons'
+parameter.  If multiple zones apply to a specific volume of soil, the
+soil type of the first one listed will be used.  If no zone apply, the
+horizons specified by the 'horizons' parameter will be used.
+
+If you have specified a geometry where a cell overlaps multiple zones,
+the soil type of zone containing the center of the cell will be used
+for the entire cell.
+
+(defcolumn Andeby default
+  "The B.And farm, Andeby, 2002."
+  (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+        (MaxRootingDepth 60.0 [cm])
+        (zones ((box (top finite -5 [cm]) (bottom finite -15 [cm])
+                     (left finite 2 [cm]) (right finite 8 [cm]))
+                Drain_padding)
+               ((box  (bottom finite -5 [cm])
+                     (left finite 2 [cm]) (right finite 8 [cm]))
+                Drain_canyon)))
+
 ** Bug fixes.
 
 * 4.22
