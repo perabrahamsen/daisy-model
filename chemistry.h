@@ -69,7 +69,7 @@ public:
 			  double dt /* [h] */, Treelog&) = 0;
   virtual void harvest (double removed, double surface, double dt) = 0;
   virtual void mix (const Geometry&, const Soil&, const SoilWater&, 
-                    double from, double to, double dt) = 0;
+                    double from, double to, double penetration, double dt) = 0;
   virtual void swap (const Geometry&, const Soil&, const SoilWater&,
                      double from, double middle, double to, double dt) = 0;
   void incorporate (const Geometry& geo, const IM& im, 

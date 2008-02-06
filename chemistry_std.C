@@ -52,7 +52,7 @@ struct ChemistryStandard : public Chemistry
 		  double dt /* [h] */, Treelog&);
   void harvest (double removed, double surface, double dt);
   void mix (const Geometry&, const Soil&, const SoilWater&, 
-            double from, double to, double dt);
+            double from, double to, double penetration, double dt);
   void swap (const Geometry&, const Soil&, const SoilWater&,
 	     double from, double middle, double to, double dt);
   void incorporate (const Geometry& geo,
@@ -168,10 +168,11 @@ ChemistryStandard::harvest (const double removed, const double surface,
 void 
 ChemistryStandard::mix (const Geometry& geo, const Soil& soil, 
                         const SoilWater& soil_water,
-                        const double from, const double to, const double dt)
+                        const double from, const double to,
+                        const double penetration, const double dt)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->mix (geo, soil, soil_water, from, to, dt); 
+    chemicals[c]->mix (geo, soil, soil_water, from, to, penetration, dt); 
 }
 
 void 

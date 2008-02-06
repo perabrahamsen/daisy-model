@@ -80,6 +80,7 @@ struct ChemicalStandard : public Chemical
   double dissipate_;
   double harvest_;
   double residuals;
+  double surface_tillage;
 
   // Surface state and log.
   double snow_storage;
@@ -158,7 +159,7 @@ struct ChemicalStandard : public Chemical
   void incorporate (const Geometry&, double amount, 
 		    const Volume&, double dt);
   void mix (const Geometry& geo, const Soil&, const SoilWater&,
-	    double from, double to, double dt);
+	    double from, double to, double penetration, double dt);
   void swap (const Geometry& geo, const Soil&, const SoilWater&,
 	     double from, double middle, double to, double dt);
   
@@ -307,6 +308,7 @@ ChemicalStandard::clear ()
   dissipate_ = 0.0;
   harvest_ = 0.0;
   residuals = 0.0;
+  surface_tillage = 0.0;
   std::fill (S_.begin (), S_.end (), 0.0);
   std::fill (S_external.begin (), S_external.end (), 0.0);
   std::fill (S_root.begin (), S_root.end (), 0.0);
@@ -434,8 +436,21 @@ ChemicalStandard::incorporate (const Geometry& geo, const double amount,
 void 
 ChemicalStandard::mix (const Geometry& geo,
 		       const Soil& soil, const SoilWater& soil_water, 
-		       const double from, const double to, const double dt)
+		       const double from, const double to,
+                       const double penetration, const double dt)
 { 
+  // Removed from surface.
+  const double removed = surface_storage * penetration;
+  surface_tillage += removed / dt;
+  surface_storage -= removed;
+  
+  // Add to soil.
+  const double m2_per_cm2 = 0.01 * 0.01;
+  const double penetrated = removed * m2_per_cm2;
+  geo.add_surface (M_, from, to, penetrated);
+  geo.add_surface (tillage, from, to, penetrated / dt);
+
+  // Mix.
   geo.mix (M_, from, to, tillage, dt);
   update_C (soil, soil_water);
 }
@@ -679,6 +694,7 @@ ChemicalStandard::output (Log& log) const
   // Management and climate fluxes.
   output_value (deposit_, "deposit", log);
   output_value (spray_, "spray", log);
+  output_variable (surface_tillage, log);
 
   // Surface.
   output_variable (snow_storage, log);
@@ -901,6 +917,7 @@ ChemicalStandard::ChemicalStandard (Block& al)
     dissipate_ (0.0),
     harvest_ (0.0),
     residuals (0.0),
+    surface_tillage (0.0),
     snow_storage (al.number ("snow_storage")),
     snow_in (0.0),
     snow_out (0.0),
@@ -1098,6 +1115,8 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
 	      "Amount deposited from the atmosphere.");
   syntax.add ("spray", "g/m^2/h", Syntax::LogOnly,
 	      "Amount currently being applied.");
+  syntax.add ("surface_tillage", "g/m^2/h", Syntax::LogOnly, 
+	      "Amount removed from surface due to tillage operations.");
     
   // Surface variables.
   syntax.add ("snow_storage", "g/m^2", Syntax::State, 

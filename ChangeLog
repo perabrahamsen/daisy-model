@@ -1,3 +1,10 @@
+2008-02-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemical_std.C (surface_tillage): New parameter.
+	* chemical_std.C, chemical.h (mix): 
+	* chemistry_std.C, chemistry_multi.C, chemistry.h (mix):
+	* column_std.C (mix): Support 'penetration' parameter.
+
 2008-02-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* soil.C (zones): New parameter.

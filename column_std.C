@@ -392,7 +392,7 @@ ColumnStandard::mix (const double from, const double to,
     = soil_heat->energy (geometry, *soil, *soil_water, from, to);
   soil_water->mix (geometry, *soil, from, to, dt);
   soil_heat->set_energy (geometry, *soil, *soil_water, from, to, energy);
-  chemistry->mix (geometry, *soil, *soil_water, from, to, dt);
+  chemistry->mix (geometry, *soil, *soil_water, from, to, penetration, dt);
   surface.unridge ();
   organic_matter->mix (geometry, *soil, *soil_water, from, to, penetration, 
                        time, dt);
