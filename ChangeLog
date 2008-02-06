@@ -1,6 +1,8 @@
 2008-02-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* lib/log-std.dai ("Soil chemical"): Take tillage into account.
 	* chemical_std.C (surface_tillage): New parameter.
+	* lib/log.dai ("Surface Chemicals"): Log it.
 	* chemical_std.C, chemical.h (mix): 
 	* chemistry_std.C, chemistry_multi.C, chemistry.h (mix):
 	* column_std.C (mix): Support 'penetration' parameter.
