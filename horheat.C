@@ -33,8 +33,6 @@
 #include <numeric>
 #include <sstream>
 
-using namespace std;
-
 double
 HorHeat::heat_conductivity (double Theta, double Ice) const
 {
@@ -159,8 +157,8 @@ HorHeat::initialize (const Hydraulic& hydraulic, const Texture& texture,
 	  / (Theta_pF_low - Theta_pF_high);
       
       // Fill out water, ice, and air for pure ice system.
-      content[Water] = min (LiquidWater, (i + 0.0) / (intervals + 0.0));
-      content[Ice] = max ((i + 0.0) / (intervals + 0.0) - LiquidWater, 0.0);
+      content[Water] = std::min (LiquidWater, (i + 0.0) / (intervals + 0.0));
+      content[Ice] = std::max ((i + 0.0) / (intervals + 0.0) - LiquidWater, 0.0);
       content[Air] = hydraulic.Theta_sat - (content[Water] + content[Ice]);
       
       // Calculate termal attributes for this combination.
@@ -194,10 +192,10 @@ HorHeat::initialize (const Hydraulic& hydraulic, const Texture& texture,
 double 
 HorHeat::HeatCapacity ()
 {
-  daisy_assert (approximate (accumulate (&content[0], 
-                                         &content[Constituents_End],
-                                         0.0),
-                             1.0));
+  daisy_approximate (std::accumulate (&content[0], 
+                                      &content[Constituents_End],
+                                      0.0),
+                     1.0);
   double C = 0.0;
   for (int i = 0; i < Constituents_End; i++)
     C += heat_capacity_table[i] * content[i];
@@ -241,7 +239,7 @@ HorHeat::ThermalConductivity (const Hydraulic& hydraulic,
   // Air conductivity is modified by water vapour.
   const double vapour_conductivity = 0.040e5;
   thermal_conductivity[Air] 
-    += vapour_conductivity * min (1.0, (content[Water] / Theta_pF_high));
+    += vapour_conductivity * std::min (1.0, (content[Water] / Theta_pF_high));
   
   double S1 = content[medium] * thermal_conductivity[medium];
   double S2 = content[medium];
@@ -303,10 +301,10 @@ HorHeat::HorHeat (const AttributeList& al)
     C_soil (al.number ("C_soil", -42.42e42)),
     K_water (al.check ("C_soil")
              ? al.number_sequence ("K_water") 
-             : vector<double> ()),
+             : std::vector<double> ()),
     K_ice (al.check ("K_ice")
            ? al.number_sequence ("K_ice") 
-           : vector<double> ()),
+           : std::vector<double> ()),
     intervals (al.integer ("intervals"))
 { }
 

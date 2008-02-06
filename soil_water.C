@@ -495,3 +495,5 @@ SoilWater::~SoilWater ()
 
 static Submodel::Register 
 soil_water_submodel ("SoilWater", SoilWater::load_syntax);
+
+// soil_water.C ends here.

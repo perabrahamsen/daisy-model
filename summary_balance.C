@@ -32,33 +32,32 @@
 #include <algorithm>
 #include <fstream>
 #include <string>
-using namespace std;
 
 struct SummaryBalance : public Summary
 {
   static const char *const default_description;
   const symbol description;
-  const string file;
+  const std::string file;
   const symbol title;
   const symbol period;
 
   // Content.
   const int precision;
   const bool require_top;
-  const vector<symbol> input;
-  const vector<symbol> output;
-  const vector<symbol> content;
-  const class ConstructFetch : public vector<Fetch*> 
+  const std::vector<symbol> input;
+  const std::vector<symbol> output;
+  const std::vector<symbol> content;
+  const class ConstructFetch : public std::vector<Fetch*> 
   {
-    void add (const vector<symbol>& a)
+    void add (const std::vector<symbol>& a)
     {
       for (size_t i = 0; i < a.size (); i++)
         push_back (new Fetch (a[i]));
     }
   public:
-    ConstructFetch (const vector<symbol>& a, 
-                    const vector<symbol>& b, 
-                    const vector<symbol>& c)
+    ConstructFetch (const std::vector<symbol>& a, 
+                    const std::vector<symbol>& b, 
+                    const std::vector<symbol>& c)
     { add (a); add (b); add (c); }
     ~ConstructFetch ()
     { sequence_delete (begin (), end ()); }
@@ -67,15 +66,15 @@ struct SummaryBalance : public Summary
 
   // Create and Destroy.
   void clear ();
-  void initialize (vector<Select*>&, Treelog&);
+  void initialize (std::vector<Select*>&, Treelog&);
   explicit SummaryBalance (Block&);
-  bool in_list (size_t i, const vector<symbol>& names) const;
-  double find_total (const vector<symbol>& names, 
+  bool in_list (size_t i, const std::vector<symbol>& names) const;
+  double find_total (const std::vector<symbol>& names, 
                      int& max_digits, int hours) const;
-  string print_entries (ostream& out, const vector<symbol>& names, 
+  std::string print_entries (std::ostream& out, const std::vector<symbol>& names, 
                         int max_size, int width, int hours) const;
-  void print_balance (ostream& out,
-                      const string& title, double total, const string& dim,
+  void print_balance (std::ostream& out,
+                      const std::string& title, double total, const std::string& dim,
                       int dim_size, int max_size,
                       int width) const;
   void summarize (int hours, Treelog&) const;
@@ -89,7 +88,7 @@ SummaryBalance::clear ()
 { Fetch::clear (fetch); }
 
 void
-SummaryBalance::initialize (vector<Select*>& select, Treelog& msg)
+SummaryBalance::initialize (std::vector<Select*>& select, Treelog& msg)
 { 
   Treelog::Open nest (msg, name);
   Fetch::initialize (fetch, select, msg);
@@ -110,27 +109,27 @@ SummaryBalance::SummaryBalance (Block& al)
 { }
 
 bool
-SummaryBalance::in_list (size_t i, const vector<symbol>& names) const
+SummaryBalance::in_list (size_t i, const std::vector<symbol>& names) const
 { return find (names.begin (), names.end (), fetch[i]->tag) != names.end (); }
 
 double
-SummaryBalance::find_total (const vector<symbol>& names, 
+SummaryBalance::find_total (const std::vector<symbol>& names, 
                             int& max_digits, int hours) const
 {
   double total = 0.0;
   for (size_t i = 0; i < fetch.size (); i++)
     if (in_list (i, names))
-      max_digits = max (max_digits, 
-			fetch[i]->value_size (total, period, hours));
+      max_digits = std::max (max_digits, 
+                             fetch[i]->value_size (total, period, hours));
   return total;
 }
 
-string
-SummaryBalance::print_entries (ostream& out, const vector<symbol>& names, 
+std::string
+SummaryBalance::print_entries (std::ostream& out, const std::vector<symbol>& names, 
                                const int max_size, const int width, 
                                const int hours) const
 {
-  string dim = Syntax::User ();
+  std::string dim = Syntax::User ();
   for (unsigned int i = 0; i < fetch.size (); i++)
     {
       if (!in_list (i, names))
@@ -141,21 +140,21 @@ SummaryBalance::print_entries (ostream& out, const vector<symbol>& names,
       else if (fetch[i]->dimension (period) != dim)
         dim = Syntax::Unknown ();
 
-      out << string (max_size - fetch[i]->name_size (), ' ');
+      out << std::string (max_size - fetch[i]->name_size (), ' ');
       fetch[i]->summarize (out, width, period, hours);
     }
   return dim;
 }
 
 void
-SummaryBalance::print_balance (ostream& out,
-                               const string& title, const double total, 
-                               const string& dim,
+SummaryBalance::print_balance (std::ostream& out,
+                               const std::string& title, const double total, 
+                               const std::string& dim,
                                const int /* dim_size */, const int max_size,
                                const int width) const
 {
-  out << string (max_size + 3, ' ') << string (width, '-') << "\n"
-      << string (max_size - title.size (), ' ') << title << " = ";
+  out << std::string (max_size + 3, ' ') << std::string (width, '-') << "\n"
+      << std::string (max_size - title.size (), ' ') << title << " = ";
   out.width (width);
   out << total;
   if (dim != Syntax::Unknown ())
@@ -171,16 +170,16 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
   // We write the summary to a string at first.
   std::ostringstream tmp;
   tmp.precision (precision);
-  tmp.flags (ios::right | ios::fixed);
+  tmp.flags (std::ios::right | std::ios::fixed);
   if (description.name () != default_description)
     tmp << description << "\n\n";
 
   // Find width of tags.
-  const string total_title = "Balance (= In - Out - Increase)";
-  const string content_title = "Total increase in content";
-  size_t max_size = max (total_title.size (), content_title.size ());
+  const std::string total_title = "Balance (= In - Out - Increase)";
+  const std::string content_title = "Total increase in content";
+  size_t max_size = std::max (total_title.size (), content_title.size ());
   for (unsigned int i = 0; i < fetch.size (); i++)
-    max_size = max (max_size, fetch[i]->name_size ());
+    max_size = std::max (max_size, fetch[i]->name_size ());
 
   // Find width and total values
   int max_digits = 0;
@@ -188,10 +187,10 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
   const double total_output = find_total (output, max_digits, hours);
   const double total_content = find_total (content, max_digits, hours);
   const double total = total_input - total_output - total_content;
-  max_digits = max (max_digits, Fetch::width (total_input));
-  max_digits = max (max_digits, Fetch::width (total_output));
-  max_digits = max (max_digits, Fetch::width (total_content));
-  max_digits = max (max_digits, Fetch::width (total));
+  max_digits = std::max (max_digits, Fetch::width (total_input));
+  max_digits = std::max (max_digits, Fetch::width (total_output));
+  max_digits = std::max (max_digits, Fetch::width (total_content));
+  max_digits = std::max (max_digits, Fetch::width (total));
 
   // Find total width.
   const int width = max_digits + (precision > 0 ? 1 : 0) + precision;
@@ -199,13 +198,13 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
   // Find width of dimensions.
   size_t dim_size = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
-    dim_size = max (dim_size, fetch[i]->dimension (period).size ());
+    dim_size = std::max (dim_size, fetch[i]->dimension (period).size ());
 
   // Print all entries.
-  string shared_dim = Syntax::User ();
+  std::string shared_dim = Syntax::User ();
   if (input.size () > 0)
     {
-      const string dim = print_entries (tmp, input, max_size, width, hours);
+      const std::string dim = print_entries (tmp, input, max_size, width, hours);
       print_balance (tmp, "Total input", total_input, dim,
                      dim_size, max_size, width);
       shared_dim = dim;
@@ -214,7 +213,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
 
   if (output.size () > 0)
     {
-      const string dim = print_entries (tmp, output, 
+      const std::string dim = print_entries (tmp, output, 
                                         max_size, width, hours);
       print_balance (tmp, "Total output", total_output, dim,
                      dim_size, max_size, width);
@@ -227,7 +226,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
 
   if (content.size () > 0)
     {
-      const string dim = print_entries (tmp, content, 
+      const std::string dim = print_entries (tmp, content, 
                                         max_size, width, hours);
       print_balance (tmp, content_title, total_content, dim,
                      dim_size, max_size, width);
@@ -240,14 +239,14 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
 
   print_balance (tmp, total_title, total, 
                  shared_dim, dim_size, max_size, width);
-  tmp << string (max_size + 3, ' ') << string (width, '=');
+  tmp << std::string (max_size + 3, ' ') << std::string (width, '=');
 
   // Where?
   if (file == "")
     msg.message (tmp.str ());
   else
     { 
-      ofstream out (file.c_str ());
+      std::ofstream out (file.c_str ());
       out << tmp.str ();
       if (! out.good ())
         msg.error ("Could not write to '" + file + "'");
@@ -290,3 +289,5 @@ If the balance only hold true when logging the top of the soil, i.e. the\n\
       Librarian::add_type (Summary::component, "balance", alist, syntax, &make);
     }
 } SummaryBalance_syntax;
+
+// summary_balance.C ends here.

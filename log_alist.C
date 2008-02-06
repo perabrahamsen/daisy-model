@@ -28,8 +28,6 @@
 #include "syntax.h"
 #include "assertion.h"
 
-using namespace std;
-
 bool
 LogAList::check_entry (symbol, const char*) const
 { return is_active; }
@@ -69,7 +67,7 @@ LogAList::alist () const
   return *alist_stack.front ();
 }
 
-vector<const AttributeList*>&
+std::vector<const AttributeList*>&
 LogAList::alist_sequence ()
 {
   daisy_assert (alist_sequence_stack.size () > 0U);
@@ -90,7 +88,7 @@ LogAList::push (symbol entry, const Library& library, const AttributeList& alist
   library_stack.push_front (&library);
   syntax_stack.push_front (NULL);
   alist_stack.push_front (new AttributeList (alist));
-  alist_sequence_stack.push_front (vector<const AttributeList*> ());
+  alist_sequence_stack.push_front (std::vector<const AttributeList*> ());
   unnamed_stack.push_front (-1);
 }
 
@@ -101,7 +99,7 @@ LogAList::push (symbol entry, const Syntax& syntax, const AttributeList& alist)
   library_stack.push_front (NULL);
   syntax_stack.push_front (&syntax);
   alist_stack.push_front (new AttributeList (alist));
-  alist_sequence_stack.push_front (vector<const AttributeList*> ());
+  alist_sequence_stack.push_front (std::vector<const AttributeList*> ());
   unnamed_stack.push_front (-1);
 }
 
@@ -109,7 +107,7 @@ void
 LogAList::push (symbol entry, 
 		const Syntax& syntax, 
 		const AttributeList& default_alist,
-		vector<const AttributeList*> alist_sequence)
+		std::vector<const AttributeList*> alist_sequence)
 {
   entry_stack.push_front (entry);
   library_stack.push_front (NULL);
@@ -166,7 +164,7 @@ LogAList::open (const symbol name)
 {
   if (is_active)
     {
-      const string& sname = name.name ();
+      const std::string& sname = name.name ();
       daisy_assert (!syntax ().is_const (sname));
       if (syntax ().is_state (sname))
 	{
@@ -214,7 +212,7 @@ LogAList::close ()
     {
       // Remember old values.
       AttributeList& old_alist = alist ();
-      vector<const AttributeList*> old_alist_sequence = alist_sequence ();
+      std::vector<const AttributeList*> old_alist_sequence = alist_sequence ();
       const symbol old_entry = entry ();
 
       // Pop stack.
@@ -223,7 +221,7 @@ LogAList::close ()
       // Assign new value to entry.
       if (entry_stack.size () > 0)
 	{
-	  const string& sold_entry = old_entry.name ();
+	  const std::string& sold_entry = old_entry.name ();
 	  daisy_assert (syntax_stack.front ());
 	  const Syntax::type type = syntax ().lookup (sold_entry);
 	  switch (type)
@@ -288,7 +286,7 @@ LogAList::close_unnamed ()
       if (unnamed () >= 0)
 	unnamed_stack[0]++;
       daisy_assert (syntax_stack.size () > 1);
-      const string& sentry = entry ().name ();
+      const std::string& sentry = entry ().name ();
       daisy_assert (syntax_stack[1]->lookup (sentry) == Syntax::AList);
       daisy_assert (syntax_stack[1]->size (sentry) != Syntax::Singleton);
     }
@@ -301,7 +299,7 @@ LogAList::open_alist (symbol name, const AttributeList& alist)
 {
   if (is_active)
     {
-      const string& sname = name.name ();
+      const std::string& sname = name.name ();
       daisy_assert (syntax ().lookup (sname) == Syntax::AList);
       daisy_assert (syntax ().size (sname) == Syntax::Singleton);
       const Syntax& syn = syntax ().syntax (sname);
@@ -317,7 +315,7 @@ LogAList::close_alist ()
   if (is_active)
     {
       AttributeList& old_alist = alist ();
-      const string& old_entry = entry ().name ();
+      const std::string& old_entry = entry ().name ();
       pop ();
       alist ().add (old_entry, old_alist);
       delete &old_alist;
@@ -328,7 +326,7 @@ LogAList::close_alist ()
 void
 LogAList::open_derived (symbol field, symbol type, const char *const library)
 { 
-  const string& sfield = field.name ();
+  const std::string& sfield = field.name ();
   daisy_assert (alist ().check (sfield));
   open_object (field, type, alist ().alist (sfield), library);
 }
@@ -343,7 +341,7 @@ LogAList::open_object (symbol field, symbol type,
 { 
   if (is_active)
     {
-      const string& sfield = field.name ();
+      const std::string& sfield = field.name ();
       daisy_assert (syntax ().lookup (sfield) == Syntax::Object);
       daisy_assert (syntax ().size (sfield) == Syntax::Singleton);
       const Library& library = syntax ().library (metalib (), sfield);
@@ -364,7 +362,7 @@ LogAList::close_object ()
   if (is_active)
     {
       AttributeList& old_alist = alist ();
-      const string& old_entry = entry ().name ();
+      const std::string& old_entry = entry ().name ();
       pop ();
       alist ().add (old_entry, old_alist);
       delete &old_alist;
@@ -409,7 +407,7 @@ LogAList::output_entry (symbol name, const bool value)
 { 
   if (!is_active)
     return;
-  const string& sname = name.name ();
+  const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
     alist ().add (sname, value);
@@ -420,7 +418,7 @@ LogAList::output_entry (symbol name, const double value)
 { 
   if (!is_active)
     return;
-  const string& sname = name.name ();
+  const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
     alist ().add (sname, value);
@@ -431,7 +429,7 @@ LogAList::output_entry (symbol name, const int value)
 { 
   if (!is_active)
     return;
-  const string& sname = name.name ();
+  const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
     alist ().add (sname, value);
@@ -442,18 +440,18 @@ LogAList::output_entry (symbol name, symbol value)
 { 
   if (!is_active)
     return;
-  const string& sname = name.name ();
+  const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
     alist ().add (sname, value);
 }
 
 void
-LogAList::output_entry (symbol name, const vector<double>& value)
+LogAList::output_entry (symbol name, const std::vector<double>& value)
 { 
   if (!is_active)
     return;
-  const string& sname = name.name ();
+  const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
     alist ().add (sname, value);
@@ -464,7 +462,7 @@ LogAList::output_entry (symbol name, const PLF& value)
 { 
   if (!is_active)
     return;
-  const string& sname = name.name ();
+  const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
     alist ().add (sname, value);

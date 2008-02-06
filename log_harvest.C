@@ -32,8 +32,6 @@
 #include <fstream>
 #include <time.h>
 
-using namespace std;
-
 struct LogHarvest : public Log
 {
   // Filter function.
@@ -46,8 +44,8 @@ struct LogHarvest : public Log
 
   // Content.
   unsigned int last_size;
-  const string file;            // Filename.
-  ofstream out;			// Output stream.
+  const std::string file;            // Filename.
+  std::ofstream out;			// Output stream.
   DLF print_header;		// How much header should be printed?
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
@@ -165,7 +163,7 @@ struct LogHarvest : public Log
   { }
   void output_entry (symbol, symbol)
   { }
-  void output_entry (symbol, const vector<double>&)
+  void output_entry (symbol, const std::vector<double>&)
   { }
   void output_entry (symbol, const PLF&)
   { }

@@ -1,8 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* 2D brugbar for dræn
+* Nu
 
-** Drængrøft horisont (liste af rektangler)
+** Implementer "penetrate" for Chemistry::mix
+
+* 2D brugbar for dræn
 
 ** Drænnode skal virke med vand (påvirk S_drain)
 

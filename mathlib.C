@@ -23,7 +23,6 @@
 
 #include "mathlib.h"
 #include "assertion.h"
-using namespace std;
 
 #if !defined (__unix)
 // Apparently not provided on Borland C++ 5.0 or 5.5.
@@ -35,19 +34,19 @@ double cbrt (double x)
 void
 tridia (int from,
 	const unsigned int N,
-	const vector<double>& a,
-	const vector<double>& b, 
-	const vector<double>& c,
-	const vector<double>& d,
-	vector<double>::iterator x)
+	const std::vector<double>& a,
+	const std::vector<double>& b, 
+	const std::vector<double>& c,
+	const std::vector<double>& d,
+	std::vector<double>::iterator x)
 {
   daisy_assert (a.size () >= N);
   daisy_assert (b.size () >= N);
   daisy_assert (c.size () >= N);
   daisy_assert (d.size () >= N);
 
-  static vector<double> y;
-  static vector<double> beta;
+  static std::vector<double> y;
+  static std::vector<double> beta;
   
   if (y.size() < N)
     {

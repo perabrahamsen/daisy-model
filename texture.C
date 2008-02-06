@@ -25,8 +25,6 @@
 #include "mathlib.h"
 #include <numeric>
 
-using namespace std;
-
 // Weigth of mineral particles. [g/cm^3]
 static const double rho_mineral = 2.65;	
 static const double rho_humus = 1.3; 
@@ -45,8 +43,8 @@ Texture::rho_soil_particles () const
 { return mineral () * rho_mineral + humus * rho_humus + CaCO3 * rho_CaCO3; }
 
 const PLF
-Texture::build_accumulated (const vector<double>& lim,
-                            const vector<double>& frac)
+Texture::build_accumulated (const std::vector<double>& lim,
+                            const std::vector<double>& frac)
 {
   PLF result;
   daisy_assert (lim.size () == frac.size ());
@@ -60,7 +58,7 @@ Texture::build_accumulated (const vector<double>& lim,
   return result;
 }
 
-Texture::Texture (const vector<double>& lim, const vector<double>& frac,
+Texture::Texture (const std::vector<double>& lim, const std::vector<double>& frac,
                   double hum, double chalk)
   : limit (lim),
     fraction (frac),

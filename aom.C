@@ -33,8 +33,6 @@
 #include "geometry.h"
 #include "mathlib.h"
 
-using namespace std;
-
 void
 AOM::output (Log& log) const
 {
@@ -47,7 +45,7 @@ void
 AOM::penetrate (const Geometry& geo, double from, double to,
 		double penetration,
                 double& tillage_N_top, double& tillage_C_top,
-                vector<double>& tillage_N_soil, vector<double>& tillage_C_soil)
+                std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil)
 {
   daisy_assert (penetration >= 0.0);
   daisy_assert (penetration <= 1.0);
@@ -80,7 +78,7 @@ void
 AOM::penetrate (const Geometry& geo, const Volume& volume,
 		double penetration,
                 double& tillage_N_top, double& tillage_C_top,
-                vector<double>& tillage_N_soil, vector<double>& tillage_C_soil)
+                std::vector<double>& tillage_N_soil, std::vector<double>& tillage_C_soil)
 {
   daisy_assert (penetration >= 0.0);
   daisy_assert (penetration <= 1.0);
@@ -134,7 +132,7 @@ AOM::N_at (unsigned int at) const
 }
 
 void
-AOM::pour (vector<double>& cc, vector<double>& nn)
+AOM::pour (std::vector<double>& cc, std::vector<double>& nn)
 {
   const unsigned int size = C.size ();
   daisy_assert (N.size () >= size);
@@ -174,7 +172,7 @@ AOM::add (double C, double N)
 void 
 AOM::add (const Geometry& geo, // Add dead roots.
 	 double to_C, double to_N, 
-	 const vector<double>& density)
+	 const std::vector<double>& density)
 {
   const double old_C = soil_C (geo);
   const double old_N = soil_N (geo);
@@ -207,8 +205,8 @@ AOM::add (const Geometry& geo, // Add dead roots.
 void 
 AOM::tick (const std::vector<bool>& active, const double* abiotic_factor, 
            const double* N_soil, double* N_used,
-           double* CO2, const vector<SMB*>& smb, double* som_C, double* som_N,
-           const vector<DOM*>& dom, const double dt)
+           double* CO2, const std::vector<SMB*>& smb, double* som_C, double* som_N,
+           const std::vector<DOM*>& dom, const double dt)
 {
   const size_t cell_size = active.size ();
   daisy_assert (C.size () == cell_size);
@@ -234,7 +232,7 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
       {
         if (!active[i])
           continue;
-	const double rate = min (factor * abiotic_factor[i], 0.1);
+	const double rate = std::min (factor * abiotic_factor[i], 0.1);
 	const double C_use = C[i] * rate;
 	const double N_use = N[i] * rate;
 	som_N[i] += N_use * dt;

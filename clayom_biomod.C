@@ -31,8 +31,6 @@
 #include "librarian.h"
 #include <sstream>
 
-using namespace std;
-
 class ClayOMBiomod : public ClayOM
 {
   // Content.
@@ -49,14 +47,14 @@ class ClayOMBiomod : public ClayOM
 private:
   double find_f (double r_SMB1, double r_SMB2, double clay) const;
 public:
-  void set_rates (const Soil& soil, const vector<SMB*>& smb) const;
+  void set_rates (const Soil& soil, const std::vector<SMB*>& smb) const;
   double factor (const double clay) const ;
   bool smb_use_clay (unsigned int pool) const ;
   bool som_use_clay (unsigned int pool) const ;
 
   // Create and Destroy.
 public:
-  bool check (const vector<SMB*>& smb, Treelog& err) const;
+  bool check (const std::vector<SMB*>& smb, Treelog& err) const;
   ClayOMBiomod (Block& al);
   ~ClayOMBiomod ();
 };
@@ -86,7 +84,7 @@ ClayOMBiomod::find_f (const double r_SMB1, const double r_SMB2,
 }
 
 void
-ClayOMBiomod::set_rates (const Soil& soil, const vector<SMB*>& smb) const
+ClayOMBiomod::set_rates (const Soil& soil, const std::vector<SMB*>& smb) const
 { 
   // We always have two SMB pools in BIOMOD.
   daisy_assert (smb.size () == 2);
@@ -151,7 +149,7 @@ ClayOMBiomod::som_use_clay (unsigned int /*pool*/) const
 // Create and Destroy.
 
 bool
-ClayOMBiomod::check (const vector<SMB*>& smb, Treelog& err) const
+ClayOMBiomod::check (const std::vector<SMB*>& smb, Treelog& err) const
 {
   Treelog::Open nest (err, "ClayOM biomod");
   

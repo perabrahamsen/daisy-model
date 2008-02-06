@@ -28,15 +28,13 @@
 #include "memutils.h"
 #include "librarian.h"
 
-using namespace std;
-
 struct ActionActivity : public Action
 {
-  vector<Action*> actions;
+  std::vector<Action*> actions;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
-    for (vector<Action*>::const_iterator i = actions.begin ();
+    for (std::vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       (*i)->tick (daisy, scope, out);
@@ -67,7 +65,7 @@ struct ActionActivity : public Action
 
   void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
-    for (vector<Action*>::const_iterator i = actions.begin ();
+    for (std::vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       (*i)->initialize (daisy, scope, out);
@@ -76,7 +74,7 @@ struct ActionActivity : public Action
   bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const
   { 
     bool ok = true;
-    for (vector<Action*>::const_iterator i = actions.begin ();
+    for (std::vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
@@ -111,7 +109,7 @@ at each time step.");
     syntax.add_object ("actions", Action::component, 
                        Syntax::State, Syntax::Sequence,
                        "Sequence of actions to perform.");
-    alist.add ("actions", vector<const AttributeList*> ());
+    alist.add ("actions", std::vector<const AttributeList*> ());
     syntax.order ("actions");
     Librarian::add_type (Action::component, "activity", alist, syntax, &make);
   }

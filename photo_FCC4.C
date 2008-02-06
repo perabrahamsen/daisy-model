@@ -38,8 +38,6 @@
 #include "check.h"
 #include "librarian.h"
 
-using namespace std;
-
 class PhotoFCC4 : public PhotoFarquhar
 {
   // Parameters.
@@ -123,7 +121,7 @@ PhotoFCC4::CxModel (const double CO2_atm, double& pn, double& ci/*[Pa]*/,
   int aiter; 
   double lastci, newci;
 
-  if (isnormal (ci)) 
+  if (std::isnormal (ci)) 
     lastci = ci;
   else 
     lastci = CO2_atm;

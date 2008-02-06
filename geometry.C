@@ -212,7 +212,7 @@ Geometry::mix (std::vector<double>& v, double from, double to) const
 {
   const double old_total = total_soil (v);
   add_soil (v, from, to, extract_soil (v, from, to));
-  daisy_assert (approximate (old_total, total_soil (v)));
+  daisy_approximate (old_total, total_soil (v));
 }
 
 void
@@ -220,7 +220,7 @@ Geometry::mix (std::vector<double>& v, const Volume& volume) const
 {
   const double old_total = total_soil (v);
   add_soil (v, volume, extract_soil (v, volume));
-  daisy_assert (approximate (old_total, total_soil (v)));
+  daisy_approximate (old_total, total_soil (v));
 }
 
 void

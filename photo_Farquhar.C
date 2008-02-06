@@ -39,8 +39,6 @@
 #include "check.h"
 #include "librarian.h"
 
-using namespace std;
-
 PhotoFarquhar::PhotoFarquhar (Block& al)
   : Photo (al),
     Xn (al.number ("Xn")),
@@ -59,8 +57,8 @@ PhotoFarquhar::~PhotoFarquhar ()
 { }
 
 void
-PhotoFarquhar::crop_Vmax_total (const vector <double>& rubisco_Ndist/*[mol/m²leaf]*/,  
-				std::vector <double>& cropVm) const
+PhotoFarquhar::crop_Vmax_total (const std::vector<double>& rubisco_Ndist /* [mol/m²leaf] */,  
+				std::vector<double>& cropVm) const
 {
   const int No = cropVm.size ();
   daisy_assert (rubisco_Ndist.size () == No);
@@ -162,8 +160,8 @@ double
 PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum, 
 			   const double CO2_atm,
 			   const double Ta, const double Tl, const double cropN,
-			   const vector<double>& PAR, 
-			   const vector<double>& PAR_height,
+			   const std::vector<double>& PAR, 
+			   const std::vector<double>& PAR_height,
 			   const double PAR_LAI,
 			   const std::vector<double>& fraction,
                            const double,
@@ -208,8 +206,8 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
   daisy_assert (No == PAR_height.size () - 1);
   
   // N-distribution and photosynthetical capacity 
-  vector<double> rubisco_Ndist (No, 0.0);
-  vector<double> crop_Vm_total (No, 0.0);
+  std::vector<double> rubisco_Ndist (No, 0.0);
+  std::vector<double> crop_Vm_total (No, 0.0);
 
   // Photosynthetic capacity (for logging)
   while (Vm_vector.size () < No)

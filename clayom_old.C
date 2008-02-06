@@ -29,8 +29,6 @@
 #include "assertion.h"
 #include "librarian.h"
 
-using namespace std;
-
 class ClayOMOld : public ClayOM
 {
   // Content.
@@ -38,19 +36,19 @@ class ClayOMOld : public ClayOM
 
   // Simulation.
 public:
-  void set_rates (const Soil&, const vector<SMB*>&) const;
+  void set_rates (const Soil&, const std::vector<SMB*>&) const;
   double factor (const double clay) const ;
   bool smb_use_clay (unsigned int pool) const ;
   bool som_use_clay (unsigned int pool) const ;
 
   // Create and Destroy.
-  bool check (const vector<SMB*>& smb, Treelog& err) const;
+  bool check (const std::vector<SMB*>& smb, Treelog& err) const;
   ClayOMOld (Block& al);
   ~ClayOMOld ();
 };
 
 void
-ClayOMOld::set_rates (const Soil& soil, const vector<SMB*>& smb) const
+ClayOMOld::set_rates (const Soil& soil, const std::vector<SMB*>& smb) const
 { 
   for (int pool = 0; pool < smb.size (); pool++)
     {
@@ -80,7 +78,7 @@ ClayOMOld::som_use_clay (unsigned int /* pool */) const
 // Create and Destroy.
 
 bool 
-ClayOMOld::check (const vector<SMB*>&, Treelog&) const
+ClayOMOld::check (const std::vector<SMB*>&, Treelog&) const
 { return true; }
 
 ClayOMOld::ClayOMOld (Block& al)

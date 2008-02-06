@@ -29,8 +29,6 @@
 #include "librarian.h"
 #include <sstream>
 
-using namespace std;
-
 struct RaddistDPF : public Raddist
 {
   // Parameters.

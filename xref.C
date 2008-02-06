@@ -30,8 +30,6 @@
 #include "assertion.h"
 #include <deque>
 
-using namespace std;
-
 class TraverseXRef : public Traverse
 {
   // We store it here.
@@ -41,12 +39,12 @@ class TraverseXRef : public Traverse
   symbol current_component;
   symbol current_model;
   enum { is_model, is_parameterization, is_submodel, is_invalid = -1 } type;
-  string current_submodel;
-  vector<string> path;
+  std::string current_submodel;
+  std::vector<std::string> path;
 
   // Use.
 private:
-  void use_submodel (const string& submodel);
+  void use_submodel (const std::string& submodel);
   void use_component (const Library& library);
   void use_model (const Library& library, symbol model);
 
@@ -64,40 +62,40 @@ private:
   void leave_model (symbol component, symbol name);
   bool enter_submodel (const Syntax& syntax, AttributeList& alist,
   		       const AttributeList& default_alist,
-  		       const string& name);
+  		       const std::string& name);
   void leave_submodel ();
   bool enter_submodel_default (const Syntax& syntax, 
 			       const AttributeList& default_alist,
-			       const string& name);
+			       const std::string& name);
   void leave_submodel_default ();
   bool enter_submodel_sequence (const Syntax& syntax,
   				const AttributeList& alist,
   				const AttributeList& default_alist,
-  				const string& name, unsigned index);
+  				const std::string& name, unsigned index);
   void leave_submodel_sequence ();
   bool enter_submodel_sequence_default (const Syntax& syntax, 
   					const AttributeList& default_alist,
-  					const string& name);
+  					const std::string& name);
   void leave_submodel_sequence_default ();
   bool enter_object (const Library&, 
 		     const Syntax& syntax, const AttributeList& alist,
   		     const AttributeList& default_alist,
-  		     const string& name);
+  		     const std::string& name);
   void leave_object ();
   bool enter_object_sequence (const Library&, const Syntax& syntax,
   			      const AttributeList& alist,
   			      const AttributeList& default_alist,
-  			      const string& name, 
+  			      const std::string& name, 
   			      unsigned index);
   void leave_object_sequence ();
   bool enter_parameter (const Syntax&, const AttributeList& alist, 
 			const AttributeList& default_alist, 
-			const string& name, const string& parameter);
+			const std::string& name, const std::string& parameter);
   void leave_parameter ();
 };
 
 void 
-TraverseXRef::use_submodel (const string& submodel)
+TraverseXRef::use_submodel (const std::string& submodel)
 {
   daisy_assert (Submodel::registered (submodel));
   XRef::Users& moi = xref.submodels[submodel];
@@ -209,7 +207,7 @@ TraverseXRef::leave_model (const symbol component, const symbol name)
 bool
 TraverseXRef::enter_submodel (const Syntax& syntax, AttributeList& al,
 			      const AttributeList&,
-			      const string& name)
+			      const std::string& name)
 { return enter_submodel_default (syntax, al, name); }
 
 void
@@ -218,7 +216,7 @@ TraverseXRef::leave_submodel ()
 
 bool
 TraverseXRef::enter_submodel_default (const Syntax&, const AttributeList& al, 
-				      const string& name)
+				      const std::string& name)
 { 
   if (type == is_invalid)
     {
@@ -254,7 +252,7 @@ bool
 TraverseXRef::enter_submodel_sequence (const Syntax& syntax,
 				       const AttributeList& al,
 				       const AttributeList&,
-				       const string& name, unsigned)
+				       const std::string& name, unsigned)
 { return enter_submodel_default (syntax, al, name); }
 
 void
@@ -264,7 +262,7 @@ TraverseXRef::leave_submodel_sequence ()
 bool
 TraverseXRef::enter_submodel_sequence_default (const Syntax& syntax, 
 					       const AttributeList& al,
-					       const string& name)
+					       const std::string& name)
 { return enter_submodel_default (syntax, al, name); }
 
 void
@@ -275,7 +273,7 @@ bool
 TraverseXRef::enter_object (const Library& library, 
 			    const Syntax&, const AttributeList& alist,
 			    const AttributeList&,
-			    const string&)
+			    const std::string&)
 {
   daisy_assert (alist.check ("type"));
   use_model (library, alist.identifier ("type"));
@@ -291,7 +289,7 @@ TraverseXRef::enter_object_sequence (const Library& library,
 				     const Syntax& syntax, 
 				     const AttributeList& alist,
 				     const AttributeList& default_alist,
-				     const string& name, unsigned)
+				     const std::string& name, unsigned)
 { return enter_object (library, syntax, alist, default_alist, name); }
 
 void
@@ -302,7 +300,7 @@ bool
 TraverseXRef::enter_parameter (const Syntax& syntax, 
 			       const AttributeList& alist, 
 			       const AttributeList& default_alist, 
-			       const string&, const string& name)
+			       const std::string&, const std::string& name)
 { 
   if (type == is_parameterization)
     {
@@ -375,7 +373,7 @@ XRef::ModelUser::operator< (const ModelUser& other) const
 
 
 XRef::ModelUser::ModelUser (const symbol comp, const symbol mod,
-			    const vector<string>& p)
+			    const std::vector<std::string>& p)
   : component (comp),
     model (mod),
     path (p)
@@ -385,7 +383,7 @@ bool
 XRef::SubmodelUser::operator< (const SubmodelUser& other) const
 { return submodel < other.submodel; }
 
-XRef::SubmodelUser::SubmodelUser (const string& sub, const vector<string>& p)
+XRef::SubmodelUser::SubmodelUser (const std::string& sub, const std::vector<std::string>& p)
   : submodel (sub),
     path (p)
 { }

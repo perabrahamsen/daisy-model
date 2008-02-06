@@ -28,8 +28,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 
-using namespace std;
-
 struct PetHargreaves : public Pet
 {
   // State.
@@ -44,9 +42,9 @@ struct PetHargreaves : public Pet
     {
       const double K_hs = 0.0023;
       const double T_avg = weather.daily_air_temperature ();
-      const double T_diff = max (weather.daily_max_air_temperature () 
-                                 - weather.daily_min_air_temperature (),
-                                 0.0);
+      const double T_diff = std::max (weather.daily_max_air_temperature () 
+                                      - weather.daily_min_air_temperature (),
+                                      0.0);
       static const double s_per_d = 60.0 * 60.0 * 24.0; // [W] -> [J/d]
       const double latent_heat_of_vaporation = 
         FAO::LatentHeatVaporization (T_avg); // [J/kg] 

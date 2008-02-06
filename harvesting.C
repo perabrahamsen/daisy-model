@@ -35,8 +35,6 @@
 #include "check_range.h"
 #include <numeric>
 
-using namespace std;
-
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
 // Based on Penning de Vries et al. 1989, page 63
@@ -49,7 +47,7 @@ static double DM_to_C_factor (double E)
 const Harvest&
 Harvesting::operator() (const symbol column_name,
 			const symbol crop_name,
-			const vector<double>& density,
+			const std::vector<double>& density,
 			const Time& time,
 			const Geometry& geo,
 			Production& production,
@@ -60,11 +58,11 @@ Harvesting::operator() (const symbol column_name,
 			const double leaf_harvest_frac,
 			const double sorg_harvest_frac,
 			const bool kill_off,
-			vector<AM*>& residuals,
+			std::vector<AM*>& residuals,
 			double& residuals_DM,
 			double& residuals_N_top, double& residuals_C_top,
-			vector<double>& residuals_N_soil,
-			vector<double>& residuals_C_soil,
+			std::vector<double>& residuals_N_soil,
+			std::vector<double>& residuals_C_soil,
                         const bool combine,
                         double& water_stress_days,
                         double& nitrogen_stress_days)
@@ -187,15 +185,15 @@ Harvesting::operator() (const symbol column_name,
   production.CCrop -= 
     (Crop_C_Yield + Crop_C_Loss - (Dead_C_Yield + Dead_C_Loss));
 
-  production.WStem = max(0.0, production.WStem);
-  production.WDead = max(0.0, production.WDead);
-  production.WLeaf = max(0.0, production.WLeaf);
-  production.WSOrg = max(0.0, production.WSOrg);
-  production.NStem = max(0.0, production.NStem);
-  production.NDead = max(0.0, production.NDead);
-  production.NLeaf = max(0.0, production.NLeaf);
-  production.NSOrg = max(0.0, production.NSOrg);
-  production.NCrop = max(0.0, production.NCrop);
+  production.WStem = std::max (0.0, production.WStem);
+  production.WDead = std::max (0.0, production.WDead);
+  production.WLeaf = std::max (0.0, production.WLeaf);
+  production.WSOrg = std::max (0.0, production.WSOrg);
+  production.NStem = std::max (0.0, production.NStem);
+  production.NDead = std::max (0.0, production.NDead);
+  production.NLeaf = std::max (0.0, production.NLeaf);
+  production.NSOrg = std::max (0.0, production.NSOrg);
+  production.NCrop = std::max (0.0, production.NCrop);
 
   // Put tiny losses away in the "Stem" pool.
   if (Dead_W_Loss < 0.1)

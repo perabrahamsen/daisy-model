@@ -33,8 +33,6 @@
 #include <sstream>
 #include <numeric>
 
-using namespace std;
-
 struct HorizonNumeric : public Horizon
 {
   // Content.
@@ -47,7 +45,7 @@ struct HorizonNumeric : public Horizon
   // Create and Destroy.
   void initialize (bool top_soil, int som_size, Treelog& msg)
   { initialize_base (top_soil, som_size, texture, msg); }
-  static const vector<double> normalize (const vector<double>& original);
+  static const std::vector<double> normalize (const std::vector<double>& original);
   HorizonNumeric (Block& al)
     : Horizon (al),
       texture (al.number_sequence ("limits"),
@@ -58,8 +56,8 @@ struct HorizonNumeric : public Horizon
   { }
 };
 
-const vector<double>
-HorizonNumeric::normalize (const vector<double>& original)
+const std::vector<double>
+HorizonNumeric::normalize (const std::vector<double>& original)
 {
   const double sum = accumulate (original.begin (), original.end (), 0.0);
 
@@ -68,7 +66,7 @@ HorizonNumeric::normalize (const vector<double>& original)
 
   daisy_assert (sum > 0.0);
 
-  vector<double> normalized;
+  std::vector<double> normalized;
 
   for (size_t i = 0; i < original.size (); i++)
     normalized.push_back (original[i] / sum);
@@ -90,8 +88,8 @@ static struct HorizonNumericSyntax
   {
     bool ok = true;
 
-    const vector<double>& limits = al.number_sequence ("limits");
-    const vector<double>& fractions = al.number_sequence ("fractions");
+    const std::vector<double>& limits = al.number_sequence ("limits");
+    const std::vector<double>& fractions = al.number_sequence ("fractions");
 
     if (limits.size () != fractions.size ())
       {

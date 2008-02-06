@@ -28,8 +28,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 
-using namespace std;
-
 class WeatherSimple : public WeatherOld
 {
   const double precipitation;
@@ -99,7 +97,7 @@ WeatherSimple::hourly_global_radiation () const	// [W/m²]
   int m = time.month () - 1;
   double Si = (  A0[m] + A1[m] * cos (t) + B1[m] * sin (t)
 		 + A2[m] * cos (2 * t) + B2[m] * sin (2 * t));
-  return max (0.0, Si);
+  return std::max (0.0, Si);
 }
 
 double
@@ -107,7 +105,7 @@ WeatherSimple::daily_global_radiation () const	// [W/m²]
 {
   int m = time.month () - 1;
   double Si = A0[m];
-  return max (0.0, Si);
+  return std::max (0.0, Si);
 }
 
 double

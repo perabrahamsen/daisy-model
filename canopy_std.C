@@ -26,14 +26,13 @@
 #include "log.h"
 #include "syntax.h"
 #include "mathlib.h"
-using namespace std;
 
 double
 CanopyStandard::CropHeight (double WStem, double DS) const
 {
   const double H1 = HvsDS (DS) + Offset;
   const double H2 = HvsDS (1.0) * HvsWStem (WStem);
-  return max (min (H1, H2), 0.01);
+  return std::max (std::min (H1, H2), 0.01);
 }
 
 double
@@ -66,11 +65,11 @@ CanopyStandard::InitialCAI (double WLeaf, double DS)
     {
       // After that, we use SpLAIfac, which tell how much thiner the
       // early leafs may be.  We always allow a LAI of 0.01.
-      CAI_max = max( 0.01, SpLAIfac (DS) * SpLAI * WLeaf);
+      CAI_max = std::max( 0.01, SpLAIfac (DS) * SpLAI * WLeaf);
     }
 
   // This is then our initial CAI esstimate.
-  const double CAI_init = min (CAI_max, CAI_fixed);
+  const double CAI_init = std::min (CAI_max, CAI_fixed);
 
   // If CAI_init is below CAI_exit, we exit will initialization phase.
   // The idea is that enough leaf DM has been generated to account for
@@ -156,7 +155,7 @@ CanopyStandard::CanopyStructure (double DS)
 
 	  // Need is the Area we want after moving z1 and z0.
 	  daisy_assert (Area * 1.0001 >= CAI / Height / LADm);
-	  const double Need = min (CAI / Height / LADm, Area);
+	  const double Need = std::min (CAI / Height / LADm, Area);
 	  daisy_assert (Need <= Area);
 	  daisy_assert (Need > 0);
 
@@ -209,13 +208,13 @@ CanopyStandard::CanopyStructure (double DS)
   LADvsH.add (     Height, 0.0);
   LAIvsH = LADvsH.integrate_stupidly ();
   const double CAIm = - log (PARrel) / PARext;
-  CAImRat = max (0.0, (CAI - CAIm) / CAIm);
+  CAImRat = std::max (0.0, (CAI - CAIm) / CAIm);
 }
 
 void
 CanopyStandard::cut (double WStem, double DS, double stub_length)
 {
-  Offset = min (stub_length, Height) - HvsDS (DS);
+  Offset = std::min (stub_length, Height) - HvsDS (DS);
   Height = CropHeight (WStem, DS);
 }
 

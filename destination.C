@@ -22,8 +22,6 @@
 
 #include "destination.h"
 
-using namespace std;
-
 Destination::Destination ()
 { }
 
@@ -33,7 +31,7 @@ Destination::~Destination ()
 void
 MultiDest::error ()
 {
-  for (vector<Destination*>::iterator i = destinations.begin ();
+  for (std::vector<Destination*>::iterator i = destinations.begin ();
        i != destinations.end ();
        i++)
     (*i)->error ();
@@ -42,16 +40,16 @@ MultiDest::error ()
 void
 MultiDest::missing ()
 {
-  for (vector<Destination*>::iterator i = destinations.begin ();
+  for (std::vector<Destination*>::iterator i = destinations.begin ();
        i != destinations.end ();
        i++)
     (*i)->missing ();
 }
 
 void
-MultiDest::add (const vector<double>& value)
+MultiDest::add (const std::vector<double>& value)
 {
-  for (vector<Destination*>::iterator i = destinations.begin ();
+  for (std::vector<Destination*>::iterator i = destinations.begin ();
        i != destinations.end ();
        i++)
     (*i)->add (value);
@@ -60,7 +58,7 @@ MultiDest::add (const vector<double>& value)
 void
 MultiDest::add (const double value)
 {
-  for (vector<Destination*>::iterator i = destinations.begin ();
+  for (std::vector<Destination*>::iterator i = destinations.begin ();
        i != destinations.end ();
        i++)
     (*i)->add (value);
@@ -69,7 +67,7 @@ MultiDest::add (const double value)
 void
 MultiDest::add (const symbol value)
 {
-  for (vector<Destination*>::iterator i = destinations.begin ();
+  for (std::vector<Destination*>::iterator i = destinations.begin ();
        i != destinations.end ();
        i++)
     (*i)->add (value);

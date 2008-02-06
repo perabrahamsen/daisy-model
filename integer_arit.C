@@ -30,12 +30,10 @@
 #include <sstream>
 #include <memory>
 
-using namespace std;
-
 struct IntegerOperand : public Integer
 {
   // Parameters.
-  const auto_ptr<Integer> operand;
+  const std::auto_ptr<Integer> operand;
 
   // Simulation.
   bool missing (const Scope& scope) const 
@@ -94,7 +92,7 @@ static struct IntegerSqrSyntax
 struct IntegerOperands : public Integer
 {
   // Parameters.
-  const vector<Integer*> operands;
+  const std::vector<Integer*> operands;
 
   // Use.
   bool missing (const Scope& scope) const 

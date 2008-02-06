@@ -31,13 +31,12 @@
 #include <sstream>
 #include <fstream>
 #include <string>
-using namespace std;
 
 struct SummarySimple : public Summary
 {
   static const symbol default_description;
   const symbol description;
-  const string file;
+  const std::string file;
   const symbol title;
   const bool print_sum;
   const symbol sum_name;
@@ -45,11 +44,11 @@ struct SummarySimple : public Summary
 
   // Content.
   const int precision;
-  const vector<Fetch*> fetch;
+  const std::vector<Fetch*> fetch;
 
   // Create and Destroy.
   void clear ();
-  void initialize (vector<Select*>&, Treelog&);
+  void initialize (std::vector<Select*>&, Treelog&);
   explicit SummarySimple (Block&);
   ~SummarySimple ();
   void summarize (int hours, Treelog&) const;
@@ -63,7 +62,7 @@ SummarySimple::clear ()
 { Fetch::clear (fetch); }
 
 void
-SummarySimple::initialize (vector<Select*>& select, Treelog& msg)
+SummarySimple::initialize (std::vector<Select*>& select, Treelog& msg)
 { 
   Treelog::Open nest (msg, name);
   Fetch::initialize (fetch, select, msg);
@@ -90,7 +89,7 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
   Treelog::Open nest (msg, title);
   std::ostringstream tmp;
   tmp.precision (precision);
-  tmp.flags (ios::right | ios::fixed);
+  tmp.flags (std::ios::right | std::ios::fixed);
   if (description != default_description)
     tmp << description << "\n\n";
 
@@ -98,16 +97,16 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
   const int sum_size = sum_name.name ().size ();
   size_t max_size = print_sum ? sum_size : 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
-    max_size = max (max_size, fetch[i]->name_size ());
+    max_size = std::max (max_size, fetch[i]->name_size ());
   int max_digits = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
-    max_digits = max (max_digits, fetch[i]->value_size (total, period, hours));
-  max_digits = max (max_digits, Fetch::width (total));
+    max_digits = std::max (max_digits, fetch[i]->value_size (total, period, hours));
+  max_digits = std::max (max_digits, Fetch::width (total));
   const int width = max_digits + (precision > 0 ? 1 : 0) + precision;
   size_t dim_size = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
-    dim_size = max (dim_size, fetch[i]->dimension (period).size ());
-  string last_dim;
+    dim_size = std::max (dim_size, fetch[i]->dimension (period).size ());
+  std::string last_dim;
   bool same_dim = true;
   for (unsigned int i = 0; i < fetch.size (); i++)
     {
@@ -116,24 +115,24 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
       else if (same_dim && fetch[i]->dimension (period) != last_dim)
 	same_dim = false;
 	
-      tmp << string (max_size - fetch[i]->name_size (), ' ');
+      tmp << std::string (max_size - fetch[i]->name_size (), ' ');
       fetch[i]->summarize (tmp, width, period, hours);
     }
   if (print_sum)
   {
-    tmp << string (max_size + 3 + width + 3 + dim_size, '-') << "\n"
-	   << string (max_size - sum_size, ' ') << sum_name << " = ";
+    tmp << std::string (max_size + 3 + width + 3 + dim_size, '-') << "\n"
+	   << std::string (max_size - sum_size, ' ') << sum_name << " = ";
     tmp.width (width);
     tmp << total;
     if (same_dim)
       tmp << " [" << last_dim << "]";
-    tmp << "\n" << string (max_size + 3, ' ') << string (width, '=');
+    tmp << "\n" << std::string (max_size + 3, ' ') << std::string (width, '=');
   }
   if (file == "")
     msg.message (tmp.str ());
   else
     { 
-      ofstream out (file.c_str ());
+      std::ofstream out (file.c_str ());
       out << tmp.str ();
       if (! out.good ())
         msg.error ("Could not write to '" + file + "'");
@@ -174,3 +173,5 @@ List of columns to fetch for the summary.", Fetch::load_syntax);
       Librarian::add_type (Summary::component, "simple", alist, syntax, &make);
     }
 } SummarySimple_syntax;
+
+// summary_simple.C ends here.

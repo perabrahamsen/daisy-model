@@ -33,8 +33,6 @@
 #include "check.h"
 #include "librarian.h"
 
-using namespace std;
-
 // Chemical constants affecting the crop.
 const double molWeightCH2O = 30.0; // [gCH2O/mol]
 const double molWeightCO2 = 44.0; // [gCO2/mol]
@@ -80,8 +78,8 @@ public:
 double
 PhotoGL::assimilate (const double,  const double, const double,
 		     const double Ta, const double, const double,
-                     const vector<double>& PAR,
-                     const vector<double>& PAR_height,
+                     const std::vector<double>& PAR,
+                     const std::vector<double>& PAR_height,
                      const double PAR_LAI,
 		     const std::vector<double>&,
                      const double,

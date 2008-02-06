@@ -42,8 +42,6 @@
 #include <numeric>
 #include <set>
 
-using namespace std;
-
 struct WeatherStandard : public Weather
 {
   Path& path;
@@ -104,12 +102,12 @@ struct WeatherStandard : public Weather
   int timestep;
   Time begin;
   Time end;
-  vector<double> precipitation_correction;
+  std::vector<double> precipitation_correction;
 
   // Extra parameters.
-  vector<double> precipitation_scale;
-  vector<double> temperature_scale;
-  vector<double> temperature_offset;
+  std::vector<double> precipitation_scale;
+  std::vector<double> temperature_scale;
+  std::vector<double> temperature_offset;
 
   // Data description.
   struct data_description_type
@@ -117,15 +115,15 @@ struct WeatherStandard : public Weather
     const char* name;
     const char* dim;
     double WeatherStandard::* value;
-    string WeatherStandard::* read;
+    std::string WeatherStandard::* read;
     double min;
     double max;
     bool required;
   };
   static data_description_type data_description[];
   static const int data_description_size;
-  vector<int> data_index;
-  bool has_data (const string& name);
+  std::vector<int> data_index;
+  bool has_data (const std::string& name);
   bool has_date;
   bool has_hour;
   bool has_temperature;
@@ -138,19 +136,19 @@ struct WeatherStandard : public Weather
   bool has_reference_evapotranspiration_;
 
   // Convertion.
-  string air_temperature_read;
-  string min_air_temperature_read;
-  string max_air_temperature_read;
-  string global_radiation_read;
-  string precipitation_read;
-  string vapor_pressure_read;
-  string diffuse_radiation_read;
-  string relative_humidity_read;
-  string wind_speed_read;
-  string reference_evapotranspiration_read;
+  std::string air_temperature_read;
+  std::string min_air_temperature_read;
+  std::string max_air_temperature_read;
+  std::string global_radiation_read;
+  std::string precipitation_read;
+  std::string vapor_pressure_read;
+  std::string diffuse_radiation_read;
+  std::string relative_humidity_read;
+  std::string wind_speed_read;
+  std::string reference_evapotranspiration_read;
 
   // Parsing.
-  const string where;
+  const std::string where;
   std::auto_ptr<std::istream> owned_stream;
   std::auto_ptr<LexerData> lex;
   Lexer::Position end_of_header;
@@ -469,7 +467,7 @@ WeatherStandard::data_description_size
   /**/ / sizeof (data_description_type);
 
 bool
-WeatherStandard::has_data (const string& name)
+WeatherStandard::has_data (const std::string& name)
 {
   for (unsigned int i = 0; i < data_index.size (); i++)
     {
@@ -554,16 +552,16 @@ WeatherStandard::read_line ()
 	  const int index = data_index[i];
 	  if (index < 0)
 	    continue;
-	  const string dim = data_description[index].dim;
-	  const string read = data_description[index].read
+	  const std::string dim = data_description[index].dim;
+	  const std::string read = data_description[index].read
 	    ? this->*(data_description[index].read) : dim;
 	  const double value =  Units::convert (read, dim, lex->get_number ());
 	  this->*(data_description[index].value) = value;
 	  if (value < data_description[index].min)
-	    lex->error (string ("Column ") 
+	    lex->error (std::string ("Column ") 
                         + data_description[index].name + " value too low");
 	  else if (value > data_description[index].max)
-	    lex->error (string ("Column ") 
+	    lex->error (std::string ("Column ") 
                         + data_description[index].name + " value too hight");
 	  if (next_precipitation < 0.0)
 	    next_precipitation = 0.0;
@@ -821,23 +819,23 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
   daily_precipitation_
     = long_timestep
     ? last_precipitation * 24
-    : accumulate (&precipitation_[0], &precipitation_[24], 0.0);
+    : std::accumulate (&precipitation_[0], &precipitation_[24], 0.0);
   daily_global_radiation_ 
     = long_timestep
     ? last_global_radiation
-    : accumulate (&global_radiation_[0], &global_radiation_[24], 0.0) / 24.0;
+    : std::accumulate (&global_radiation_[0], &global_radiation_[24], 0.0) / 24.0;
   daily_air_temperature_
     = (long_timestep && has_temperature)
     ? last_air_temperature
-    : accumulate (&air_temperature_[0], &air_temperature_[24], 0.0) / 24.0;
+    : std::accumulate (&air_temperature_[0], &air_temperature_[24], 0.0) / 24.0;
   daily_max_air_temperature_
     = has_max_temperature 
     ? last_max_air_temperature
-    : *max_element (&air_temperature_[0], &air_temperature_[24]);
+    : *std::max_element (&air_temperature_[0], &air_temperature_[24]);
   daily_min_air_temperature_
     = has_min_temperature 
     ? last_min_air_temperature
-    : *min_element (&air_temperature_[0], &air_temperature_[24]);
+    : *std::min_element (&air_temperature_[0], &air_temperature_[24]);
 
   if (!has_vapor_pressure_ && !has_relative_humidity_)
     {
@@ -870,13 +868,13 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
     return false;
 
   // Read first line.
-  const string type = lex->get_word ();
+  const std::string type = lex->get_word ();
   if (type != "dwf-0.0")
     lex->error ("Wrong file type");
   lex->skip_line ();
   lex->next_line ();
 
-  set<string, less<string>/**/> keywords;
+  std::set<std::string/**/> keywords;
 
   struct Deposition
   {
@@ -898,7 +896,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
   bool last_was_note = false;
   while (lex->good () && lex->peek () != '-')
     {
-      string key = lex->get_word ();
+      std::string key = lex->get_word ();
 
       if (key.size () < 1)
         {
@@ -919,7 +917,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
       if (keywords.find (key) == keywords.end ())
 	keywords.insert (key);
       else if (key != "Note")
-	lex->error (string ("Duplicate keyword '") + key + "'");
+	lex->error (std::string ("Duplicate keyword '") + key + "'");
       else if (!last_was_note)
 	lex->error ("Only one Note: block allowed");
       
@@ -935,7 +933,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
       else if (key == "Surface")
 	{
 	  lex->skip_space ();
-	  const string type = lex->get_word ();
+	  const std::string type = lex->get_word ();
 	  if (type == "reference")
 	    surface_ = reference;
 	  else if (type == "field")
@@ -972,7 +970,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	  lex->skip_space ();
 	  double val = lex->get_number ();
 	  lex->skip_space ();
-	  const string dim = lex->get_word ();
+	  const std::string dim = lex->get_word ();
 	      
 	  if (key == "NH4WetDep")
 	    {
@@ -1099,7 +1097,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		    }
 		}
 	      if (!found)
-		lex->error (string ("Unknown keyword: '") + key + "'");
+		lex->error (std::string ("Unknown keyword: '") + key + "'");
 	    }
 	}
       lex->next_line ();
@@ -1109,20 +1107,20 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
   for (unsigned int i = 0; i < keyword_description_size; i++)
     if (keyword_description[i].required 
 	&& keywords.find (keyword_description[i].name) == keywords.end ())
-      lex->error (string ("Keyword ") 
+      lex->error (std::string ("Keyword ") 
                   + keyword_description[i].name + " missing");
 
-  static const string required[] = 
+  static const std::string required[] = 
     { "Station", "Surface", "Begin", "End" };
-  static const int required_size = sizeof (required) / sizeof (string);
+  static const int required_size = sizeof (required) / sizeof (std::string);
   
   for (unsigned int i = 0; i < required_size; i++)
     if (keywords.find (required[i]) == keywords.end ())
-      lex->error (string ("Missing keyword '") + required[i] + "'");
+      lex->error (std::string ("Missing keyword '") + required[i] + "'");
 
-  static const string dep1[] = 
+  static const std::string dep1[] = 
     { "NH4WetDep", "NO3WetDep", "NH4DryDep", "NO3DryDep" };
-  static const int dep1_size = sizeof (dep1) / sizeof (string);
+  static const int dep1_size = sizeof (dep1) / sizeof (std::string);
 
   bool dep1_has_all = true;
   bool dep1_has_any = false;
@@ -1133,9 +1131,9 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
       dep1_has_any = true;
   daisy_assert (dep1_has_any || !dep1_has_all);
   
-  static const string dep2[] = 
+  static const std::string dep2[] = 
     { "Deposition", "PAverage" };
-  static const int dep2_size = sizeof (dep2) / sizeof (string);
+  static const int dep2_size = sizeof (dep2) / sizeof (std::string);
 
   bool dep2_has_all = true;
   bool dep2_has_any = false;
@@ -1197,7 +1195,7 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (),
   // Columns
   do
     {
-      const string column = lex->get_word ();
+      const std::string column = lex->get_word ();
       bool found = false;
       for (unsigned int j = 0; j < data_description_size; j++)
 	if (column == data_description[j].name)
@@ -1209,7 +1207,7 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (),
       if (!found)
 	{
 	  data_index.push_back (-1);
-	  lex->error (string ("Unknown column ") + column);
+	  lex->error (std::string ("Unknown column ") + column);
 	}
       lex->skip_space ();
     }
@@ -1236,13 +1234,13 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (),
   has_reference_evapotranspiration_ = has_data ("RefEvap");
   for (unsigned int j = 0; j < data_description_size; j++)
     if (data_description[j].required && !has_data (data_description[j].name))
-      lex->error (string ("Required data column '") 
+      lex->error (std::string ("Required data column '") 
                   + data_description[j].name + "' missing");
 
   // Dimensions.
   for (unsigned int i = 0; i < data_index.size (); i++)
     {
-      const string dimension = lex->get_word ();
+      const std::string dimension = lex->get_word ();
       const int index = data_index[i];
       if (Units::can_convert (dimension, data_description[index].dim))
 	{
@@ -1276,7 +1274,7 @@ WeatherStandard::WeatherStandard (Block& al)
     timestep (0),
     begin (1900, 1, 1, 0),
     end (2100, 1, 1, 0),
-    precipitation_correction (vector<double> (12, 1.0)),
+    precipitation_correction (std::vector<double> (12, 1.0)),
     precipitation_scale (al.number_sequence ("PrecipScale")),
     temperature_scale (al.number_sequence ("TempScale")),
     temperature_offset (al.number_sequence ("TempOffset")),
@@ -1433,7 +1431,7 @@ year in the second interval.\n\
 If a given year is covered by multiple intervals in the list, the first\n\
 one will be used.",
 				   WeatherStandard::YearMap::load_syntax);
-    alist.add ("missing_years", vector<const AttributeList*> ());
+    alist.add ("missing_years", std::vector<const AttributeList*> ());
 
     // Division between Rain and Snow.
     syntax.add ("T_rain", "dg C", Syntax::Const, 
@@ -1463,21 +1461,21 @@ mistakes in the measurement process, while the parameter is used for\n\
 experimenting with different precipitation values and for reusing data\n\
 from one weather station in nearby areas where only average values are\n\
 known.");
-    alist.add ("PrecipScale", vector<double> (12, 1.0));
+    alist.add ("PrecipScale", std::vector<double> (12, 1.0));
     syntax.add ("TempScale", Syntax::None (),
 		Syntax::Const, 12, "\
 The temperature listed in the file will be multiplied by the number\n\
 from this list before it is used in the simulation, depending on the\n\
 month.  The first number corresponds to January, the second to\n\
 February, etc.");
-    alist.add ("TempScale", vector<double> (12, 1.0));
+    alist.add ("TempScale", std::vector<double> (12, 1.0));
     syntax.add ("TempOffset", "dg C",
 		Syntax::Const, 12, "\
 Anumber from this list will be added to the temperature listed in\n\
 the file before it is used in the simulation, depending on the\n\
 month.  The first number corresponds to January, the second to\n\
 February, etc.");
-    alist.add ("TempOffset", vector<double> (12, 0.0));
+    alist.add ("TempOffset", std::vector<double> (12, 0.0));
 
     Librarian::add_type (Weather::component, "default", alist, syntax, &make);
   }

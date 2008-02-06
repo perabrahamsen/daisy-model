@@ -173,6 +173,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   ublas::vector<double> h_ice (cell_size); // 
   ublas::vector<double> S (cell_size); // sink term
   ublas::vector<double> S_vol (cell_size); // sink term
+  std::vector<double> S_drain (cell_size, 0.0); // drain flow
   ublas::vector<double> T (cell_size); // temperature 
   ublas::vector<double> K (cell_size); // hydraulic conductivity
   ublas::vector<double> Kold (cell_size); // old hydraulic conductivity
@@ -483,6 +484,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
     soil_water.set_content (cell, h (cell), Theta (cell));
   for (size_t edge = 0; edge != edge_size; ++edge) 
     soil_water.set_flux (edge, q[edge]);
+  soil_water.drain (S_drain);
 
   // End of large time step.
 }

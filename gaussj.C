@@ -14,8 +14,6 @@
 #include <sstream>
 #endif
 
-using namespace std;
-
 void 
 GaussJordan::uptriangle ()
 { 
@@ -100,7 +98,7 @@ GaussJordan::solve ()
       if (iszero (entry))
 	throw ("GaussJordan: zero solution");
 #ifdef DEBUG_MESSAGES
-      if (!isfinite (entry) || !isfinite (value[i]) || !isfinite (sum))
+      if (!std::isfinite (entry) || !std::isfinite (value[i]) || !std::isfinite (sum))
 	throw ("GaussJordan: non-finite number");
       if (fabs (entry) < 1e-100)
 	{

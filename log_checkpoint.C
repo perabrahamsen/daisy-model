@@ -32,14 +32,12 @@
 #include "librarian.h"
 #include <sstream>
 
-using namespace std;
-
 struct LogCheckpoint : public LogAList
 {
   // Content.
-  const string file;		// Name of file to write checkpoint in.
-  const string description;	// Comment to go to the start of the file.
-  auto_ptr<Condition> condition; // Should we print a log now?
+  const std::string file;		// Name of file to write checkpoint in.
+  const std::string description;	// Comment to go to the start of the file.
+  std::auto_ptr<Condition> condition; // Should we print a log now?
   Time time;			// Time of current checkpoint.
   const AttributeList* global_alist; // All attributes.
 
@@ -104,7 +102,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       scratch << file.c_str () 
 	      << "-" << time.year () << "-" << time.month () << "-" 
 	      << time.mday () << "+" << time.hour () << ".dai";
-      const string filename (scratch.str ());
+      const std::string filename (scratch.str ());
 
       // Open log file.
       PrinterFile printer (metalib (), filename);
@@ -119,7 +117,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       // Print input files.
       if (global_alist->check ("parser_inputs"))
 	{
-	  const vector<const AttributeList*> inputs 
+	  const std::vector<const AttributeList*> inputs 
 	    (global_alist->alist_sequence ("parser_inputs"));
 	  printer.print_comment ("Input files.");
 	  for (unsigned int i = 0; i < inputs.size (); i++)
@@ -129,10 +127,10 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       // Print included files.
       if (global_alist->check ("parser_files"))
 	{
-	  const vector<symbol> 
+	  const std::vector<symbol> 
             files (global_alist->identifier_sequence ("parser_files"));
-	  const string lib_start = "From file '";
-	  const string lib_end = "':";
+	  const std::string lib_start = "From file '";
+	  const std::string lib_end = "':";
 	  for (unsigned int i = 0; i < files.size (); i++)
 	    {
 	      const symbol library = files[i];

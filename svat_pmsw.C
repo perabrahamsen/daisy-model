@@ -57,8 +57,6 @@
 # define NP 20 // from xgaussj driver program
 # define MP 20 // from xgaussj driver program
 
-using namespace std;
-
 #ifdef _MSC_VER
 #pragma warning (disable: 4244)
 #endif
@@ -393,13 +391,13 @@ int RAC(double z_ref,
         double alpha_u, double arac, double &rd, double &rX, double &rz_0,
         double &ru_h, double &rr_ac)
 {
-  daisy_assert (isfinite (u));
+  daisy_assert (std::isfinite (u));
   daisy_assert (u >= 0.0);
-  daisy_assert (isnormal (LAI));
+  daisy_assert (std::isnormal (LAI));
   daisy_assert (LAI > 0.0);
-  daisy_assert (isnormal (h));
+  daisy_assert (std::isnormal (h));
   daisy_assert (h > 0.0);
-  daisy_assert (isnormal (arac));
+  daisy_assert (std::isnormal (arac));
 
   // ru_h: windspeed at cropheight h, i.e. above crop [m/s]
   // z_0, d roughness and zero displacement height [m]
@@ -421,12 +419,12 @@ int RAC(double z_ref,
     rz_0=z_0s+0.3*h*sqrt(rX); // SG eq.43a
   else if (rX>0.2 && rX<1.5) 
     {
-      daisy_assert (isnormal (h));
+      daisy_assert (std::isnormal (h));
       rz_0=0.3*h*(1-rd/h); // SG eq.43b
     }
   else 
     rz_0=0.13*h; // otherwise
-  daisy_assert (isnormal (rz_0));
+  daisy_assert (std::isnormal (rz_0));
 
   if (Z < 2.0*rz_0)
     {
@@ -449,7 +447,7 @@ int RAC(double z_ref,
 	  ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
 	}
     }
-  daisy_assert (isnormal (ru_h));
+  daisy_assert (std::isnormal (ru_h));
   rr_ac=(alpha_u/(2.0*LAI*arac))*sqrt((w/ru_h)*1/(1-exp(-alpha_u/2)));
 
   return 0;
@@ -681,7 +679,7 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   // Assume 2 criteria: lel > 25.0 & abs(crop_ea-lel) > 50.0 (noise reduction)
   // when incepted water evaporates rpstress = 0 (no stress)
   if (canopy_ea > 0.0 || lel < 25.0 || fabs(crop_ea_w-lel) < 50.0) rpstress = 0.0;
-  		else rpstress=1.0-min(1.0,rrcmin_star/r_sc);
+  else rpstress=1.0-std::min(1.0,rrcmin_star/r_sc);
 /*
 	rpstress=0.0;
 */
@@ -844,9 +842,9 @@ int ACOEFF(double tair, double e_abs, double netrad, double LAI, double les,
   const double c_p=1010.0;
   const double z_sz=0.02;
 
-  daisy_assert (isnormal (r_aa));
-  daisy_assert (isnormal (r_ac));
-  daisy_assert (isnormal (r_as));
+  daisy_assert (std::isnormal (r_aa));
+  daisy_assert (std::isnormal (r_ac));
+  daisy_assert (std::isnormal (r_as));
   ra_11=1.0/r_aa+1.0/r_ac+1.0/r_as;
   ra_12=-1.0/r_as;
   ra_13=-1.0/r_ac;
@@ -1374,7 +1372,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       tmp << "Current crop height is " << h 
 	     << " [m].\nMax for svat model PMSW is screen height ("
 	     << z_ref << " [m])";
-      throw (string (tmp.str ()));
+      throw (std::string (tmp.str ()));
     }
 
   //cout << "LAI is\t" << LAI << "\n";
@@ -1453,7 +1451,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       tair = weather.hourly_air_temperature (); // [C]
       srad = weather.hourly_global_radiation (); // [W/m^2]
       u_ref = weather.wind (); // u_ref from reference plane [m/s]
-      daisy_assert (isfinite (u_ref));
+      daisy_assert (std::isfinite (u_ref));
       daisy_assert (u_ref >= 0.0);
       relsun_day = weather.hourly_cloudiness ();  // [-]
       prec = 1.10*weather.rain(); // [mm] corrected by 10 %
@@ -1468,7 +1466,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       // convert from u_ref_2m at reference plane (h=0.12 m, FAO) to u_2m_ww at
       // winter wheat field: use eq.26 FAO, p.10, and d=0.27*h and z0=0.123*h
       u=0.205*u_ref*log((z_ref-0.67*h)/(0.123*h));
-      daisy_assert (isfinite (u));
+      daisy_assert (std::isfinite (u));
       daisy_assert (u >= 0.0);
       //  cout << "u and u_ref are:\t" << u << "\t" << u_ref << "\n";
 
@@ -1751,7 +1749,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       catch (const char* error)
 	{
 	  tmp << "Error: " << error;
-	  throw string (tmp.str ());
+	  throw std::string (tmp.str ());
 	}
       for (int l = 1; l <= n; l++)
 	x[l][1] = equations.result (l-1);

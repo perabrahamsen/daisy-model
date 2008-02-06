@@ -28,8 +28,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 
-using namespace std;
-
 class HydraulicYolo : public Hydraulic
 {
   int M_intervals;
@@ -52,7 +50,7 @@ double
 HydraulicYolo::Theta (const double h) const
 {
   if (h < -1.0)
-    return min (0.495, 0.124 + 274.2 / (739.0 + pow (log (-h), 4)));
+    return std::min (0.495, 0.124 + 274.2 / (739.0 + pow (log (-h), 4)));
   else
     return 0.495;
 }

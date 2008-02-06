@@ -29,8 +29,6 @@
 #include "surface.h"
 #include "librarian.h"
 
-using namespace std;
-
 const char *const Pet::component = "pet";
 
 double
@@ -41,7 +39,7 @@ Pet::reference_to_potential (const Vegetation& crops,
   const double cover = crops.cover ();
   const double EpFactor = cover * crops.EpFactor ()
     + (1.0 - cover) * surface.EpFactor ();
-  return EpFactor * max (0.0, ref);
+  return EpFactor * std::max (0.0, ref);
 }
 
 double

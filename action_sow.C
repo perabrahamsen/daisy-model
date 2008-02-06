@@ -28,15 +28,13 @@
 #include "crop.h"
 #include "librarian.h"
 
-using namespace std;
-
 struct ActionSow : public Action
 {
   const AttributeList& crop;
 
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   { 
-    msg.message (string ("Sowing ") + crop.name ("type"));      
+    msg.message ("Sowing " + crop.name ("type"));      
     daisy.field->sow (daisy.metalib, crop, daisy.time, daisy.dt, msg); 
   }
 

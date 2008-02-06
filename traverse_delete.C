@@ -29,8 +29,6 @@
 #include "alist.h"
 #include "assertion.h"
 
-using namespace std;
-
 class TraverseDelete : public Traverse
 {
 private:
@@ -56,35 +54,35 @@ private:
   void leave_model (symbol component, symbol name);
   bool enter_submodel (const Syntax& syntax, AttributeList& alist,
   		       const AttributeList& default_alist,
-  		       const string& name);
+  		       const std::string& name);
   void leave_submodel ();
   bool enter_submodel_default (const Syntax& syntax, 
 			       const AttributeList& default_alist,
-			       const string& name);
+			       const std::string& name);
   void leave_submodel_default ();
   bool enter_submodel_sequence (const Syntax& syntax,
   				const AttributeList& alist,
   				const AttributeList& default_alist,
-  				const string& name, unsigned index);
+  				const std::string& name, unsigned index);
   void leave_submodel_sequence ();
   bool enter_submodel_sequence_default (const Syntax& syntax, 
   					const AttributeList& default_alist,
-  					const string& name);
+  					const std::string& name);
   void leave_submodel_sequence_default ();
   bool enter_object (const Library&, 
 		     const Syntax& syntax, const AttributeList& alist,
   		     const AttributeList& default_alist,
-  		     const string& name);
+  		     const std::string& name);
   void leave_object ();
   bool enter_object_sequence (const Library&, const Syntax& syntax,
   			      const AttributeList& alist,
   			      const AttributeList& default_alist,
-  			      const string& name, 
+  			      const std::string& name, 
   			      unsigned index);
   void leave_object_sequence ();
   bool enter_parameter (const Syntax&, const AttributeList& alist, 
 			const AttributeList& default_alist, 
-			const string& name, const string& parameter);
+			const std::string& name, const std::string& parameter);
   void leave_parameter ();
 };
 
@@ -116,7 +114,7 @@ TraverseDelete::leave_model (const symbol, const symbol)
 bool
 TraverseDelete::enter_submodel (const Syntax&, AttributeList&,
 				const AttributeList&,
-				const string&)
+				const std::string&)
 { return true; }
 
 void
@@ -125,7 +123,7 @@ TraverseDelete::leave_submodel ()
 
 bool
 TraverseDelete::enter_submodel_default (const Syntax&, const AttributeList&, 
-					const string&)
+					const std::string&)
 { return false; }
 
 void
@@ -136,7 +134,7 @@ bool
 TraverseDelete::enter_submodel_sequence (const Syntax&,
 					 const AttributeList&,
 					 const AttributeList&,
-					 const string&, unsigned)
+					 const std::string&, unsigned)
 { return true; }
 
 void
@@ -146,7 +144,7 @@ TraverseDelete::leave_submodel_sequence ()
 bool
 TraverseDelete::enter_submodel_sequence_default (const Syntax&, 
 						 const AttributeList&,
-						 const string&)
+						 const std::string&)
 { return false; }
 
 void
@@ -157,7 +155,7 @@ bool
 TraverseDelete::enter_object (const Library& library, 
 			      const Syntax&, const AttributeList& alist,
 			      const AttributeList&,
-			      const string&)
+			      const std::string&)
 {
   daisy_assert (alist.check ("type"));
   const symbol super = alist.identifier ("type");
@@ -176,7 +174,7 @@ TraverseDelete::enter_object_sequence (const Library& library,
 				       const Syntax& syntax, 
 				       const AttributeList& alist,
 				       const AttributeList& default_alist,
-				       const string&, unsigned)
+				       const std::string&, unsigned)
 { return enter_object (library, syntax, alist, default_alist, "dummy"); }
 
 void
@@ -186,7 +184,7 @@ TraverseDelete::leave_object_sequence ()
 bool
 TraverseDelete::enter_parameter (const Syntax&, const AttributeList&, 
 				 const AttributeList&, 
-				 const string&, const string&)
+				 const std::string&, const std::string&)
 { return true; }
 
 void 

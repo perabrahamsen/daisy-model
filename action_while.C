@@ -28,11 +28,9 @@
 #include "memutils.h"
 #include "librarian.h"
 
-using namespace std;
-
 struct ActionWhile : public Action
 {
-  const vector<Action*> actions;
+  const std::vector<Action*> actions;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
@@ -65,7 +63,7 @@ struct ActionWhile : public Action
   { 
     Treelog::Open nest (err, "while");
     bool ok = true;
-    for (vector<Action*>::const_iterator i = actions.begin ();
+    for (std::vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {

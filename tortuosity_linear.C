@@ -27,8 +27,6 @@
 #include "hydraulic.h"
 #include "librarian.h"
 
-using namespace std;
-
 static double h_wp = -15000;
 
 class TortuosityLinear : public Tortuosity
@@ -44,7 +42,7 @@ public:
       if (a < 0.0)
 	a = hydraulic.Theta (h_wp);
       
-      return max (1.0e-6, a + b * Theta);
+      return std::max (1.0e-6, a + b * Theta);
     }
 
   // Create.

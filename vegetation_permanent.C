@@ -40,15 +40,13 @@
 #include <sstream>
 #include <deque>
 
-using namespace std;
-
 struct VegetationPermanent : public Vegetation
 {
   // Canopy.
   class YearlyLAI
   {
-    /* const */ vector<int> years;
-    /* const */ vector<PLF> LAIvsDAY;
+    /* const */ std::vector<int> years;
+    /* const */ std::vector<PLF> LAIvsDAY;
 
     // use.
   public:
@@ -56,7 +54,7 @@ struct VegetationPermanent : public Vegetation
     
     // Create;
     static void load_syntax (Syntax&, AttributeList&);
-    YearlyLAI (const vector<const AttributeList*>& als);
+    YearlyLAI (const std::vector<const AttributeList*>& als);
   } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
   CanopySimple canopy;
@@ -71,7 +69,7 @@ struct VegetationPermanent : public Vegetation
   AM* AM_litter;                // Dead plant matter.
   double N_uptake;		// N uptake this hour. [g N/m^2/h]
   double N_litter;		// N litter this hour. [g N/m^2/h]
-  const vector<const AttributeList*>& litter_am; // Litter AM parameters.
+  const std::vector<const AttributeList*>& litter_am; // Litter AM parameters.
   // Root.
   std::auto_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
@@ -119,7 +117,7 @@ struct VegetationPermanent : public Vegetation
   {   return Crop::DSremove; }
   double DM_by_name (symbol, double) const
   { return 0.0; }
-  string crop_names () const
+  std::string crop_names () const
   { return name.name (); }
 
   const std::vector<double>& root_density () const
@@ -142,8 +140,8 @@ struct VegetationPermanent : public Vegetation
 	     Chemistry&,
 	     double& residuals_DM,
 	     double& residuals_N_top, double& residuals_C_top,
-	     vector<double>& residuals_N_soil,
-	     vector<double>& residuals_C_soil,
+	     std::vector<double>& residuals_N_soil,
+	     std::vector<double>& residuals_C_soil,
 	     double dt, Treelog&);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
@@ -155,17 +153,17 @@ struct VegetationPermanent : public Vegetation
   void emerge (const symbol, Treelog&)
   { }
   void kill_all (symbol, const Time&, const Geometry&,
-		 vector<AM*>&, double&, double&, double&, 
-		 vector<double>&, vector<double>&, Treelog&)
+		 std::vector<AM*>&, double&, double&, double&, 
+		 std::vector<double>&, std::vector<double>&, Treelog&)
   { }
   void harvest (symbol, symbol,
 		const Time&, const Geometry&, 
 		double, double, double, double, 
-		vector<const Harvest*>&,
+		std::vector<const Harvest*>&,
                 double&,
- 		vector<AM*>&, 
+ 		std::vector<AM*>&, 
 		double&, double&, double&,
-		double&, double&, double&, vector<double>&, vector<double>&,
+		double&, double&, double&, std::vector<double>&, std::vector<double>&,
                 const bool,
 		Treelog&)
   { }
@@ -224,7 +222,7 @@ whenever 'LAIvsDAY' becomes negative.");
   syntax.order ("year", "LAIvsDAY");
 }
 
-VegetationPermanent::YearlyLAI::YearlyLAI (const vector<const AttributeList*>& als)
+VegetationPermanent::YearlyLAI::YearlyLAI (const std::vector<const AttributeList*>& als)
 {
   for (unsigned int i = 0; i < als.size (); i++)
     {
@@ -258,8 +256,8 @@ VegetationPermanent::tick (const Time& time, const double, const double,
 			   Chemistry& chemistry,
 			   double& residuals_DM,
 			   double& residuals_N_top, double& residuals_C_top,
-			   vector<double>& /* residuals_N_soil */,
-			   vector<double>& /* residuals_C_soil */,
+			   std::vector<double>& /* residuals_N_soil */,
+			   std::vector<double>& /* residuals_C_soil */,
                            const double dt, 
 			   Treelog&)
 {
@@ -411,7 +409,7 @@ VegetationPermanentSyntax
 These numbers are used when there are no yearly numbers (YearlyLAI).");
     syntax.add_submodule_sequence("YearlyLAI", Syntax::Const, "\
 Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
-    alist.add ("YearlyLAI", vector<const AttributeList*> ());
+    alist.add ("YearlyLAI", std::vector<const AttributeList*> ());
 
 
     syntax.add_submodule("Canopy", alist, Syntax::State, "Canopy.",

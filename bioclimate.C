@@ -27,8 +27,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 
-using namespace std;
-
 const char *const Bioclimate::component = "bioclimate";
 
 double 
@@ -44,7 +42,7 @@ Bioclimate::radiation_distribution (const int No, const double LAI,
                                     const double Ref,
                                     const double Si,
                                     const double Ext,
-                                    vector <double>& Rad)
+                                    std::vector <double>& Rad)
 {
   // Fraction of Photosynthetically Active Radiation in Shortware
   // incoming radiation. 
@@ -58,7 +56,7 @@ void
 Bioclimate::intensity_distribution (const int No, const double LAI,
                                     const double Rad0,
                                     const double Ext,
-                                    vector <double>& Rad)
+                                    std::vector <double>& Rad)
 {
   daisy_assert (Rad.size () == No + 1);
   const double dLAI = (LAI / No);

@@ -36,8 +36,6 @@
 #include "check.h"
 #include "librarian.h"
 
-using namespace std;
-
 void 
 DOM::output (Log& log) const
 {
@@ -111,7 +109,7 @@ DOM::clear ()
 void 
 DOM::turnover (const std::vector<bool>& active, const double* turnover_factor, 
 	       const double* N_soil, double* N_used,
-	       double* CO2, const vector<SMB*>& smb, const double dt)
+	       double* CO2, const std::vector<SMB*>& smb, const double dt)
 {
   // Find size.
   const size_t cell_size = active.size ();
@@ -143,9 +141,9 @@ DOM::tock (const std::vector<bool>& active,
     {
       if (!active[i])
         continue;
-      double rate = min (factor[i] * fraction, 0.1);
+      double rate = std::min (factor[i] * fraction, 0.1);
       daisy_assert (C.M[i] >= 0.0);
-      daisy_assert (isfinite (rate));
+      daisy_assert (std::isfinite (rate));
       daisy_assert (rate >=0);
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (N.M[i] >= 0.0);
@@ -156,7 +154,7 @@ DOM::tock (const std::vector<bool>& active,
       double N_consume;
       
       OM::turnover (C.M[i], N.M[i], om.goal_C_per_N (i), N_soil[i] - N_used[i],
-		    min (factor[i] * fraction, 0.1), efficiency,
+		    std::min (factor[i] * fraction, 0.1), efficiency,
 		    C_use, N_produce, N_consume);
       add_to_source (i, -C_use, -N_produce);
 

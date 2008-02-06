@@ -27,8 +27,6 @@
 #include "alist.h"
 #include "syntax.h"
 
-using namespace std;
-
 void
 Vernalization::operator () (double Ta, double& DS)
 {
@@ -37,7 +35,7 @@ Vernalization::operator () (double Ta, double& DS)
 
   if (TaSum < 0)
     {
-      TaSum -= min (Ta - TaLim, 0.0);
+      TaSum -= std::min (Ta - TaLim, 0.0);
       if (DS > DSLim)
 	DS = DSLim;
     }

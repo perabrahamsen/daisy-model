@@ -30,8 +30,6 @@
 #include "mathlib.h"
 #include <sstream>
 
-using namespace std;
-
 void
 Partition::operator() (double DS, double current_RSR, double nitrogen_stress,
 		       double& f_Leaf, double& f_Stem,
@@ -50,7 +48,7 @@ Partition::operator() (double DS, double current_RSR, double nitrogen_stress,
     f_Root = Root (DS);
   f_Leaf = (1 - f_Root) * Leaf (DS);
   f_Stem = (1 - f_Root) * Stem (DS);
-  f_SOrg = max (0.0, 1 - f_Root - f_Leaf - f_Stem);
+  f_SOrg = std::max (0.0, 1 - f_Root - f_Leaf - f_Stem);
   daisy_assert (f_SOrg > -1e-5);
   if (f_SOrg < 1e-5)
     {
