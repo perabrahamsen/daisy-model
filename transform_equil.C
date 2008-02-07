@@ -1,8 +1,8 @@
 // transform_equil.C -- Two soil components reching for equilibrium.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
+// Copyright 1996-2001 Per Abrahamsen and Søren Hansen.
 // Copyright 2000-2001 KVL.
-// Copyright 2007 Per Abrahamsen and KVL:
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 

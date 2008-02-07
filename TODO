@@ -1,8 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* 2D brugbar for dræn
+* penetration?
 
-** Drænnode skal virke med vand (påvirk S_drain)
+* Drænnode skal virke med vand (påvirk S_drain)
+
+Massebalance omkring drænnoder.
 
 * row width
 
@@ -11,6 +13,40 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 * DOMÆNER
 
 stof i mobil vand, immobil vand, makropore 1, 2, og n.
+
+* Mobil/immobil
+
+1. h_immobil
+
+Placering:  Horizon?  Movement?
+Værdi: ? h_fc?
+Default: ? h_wp? -inf?
+
+(på dette tidspunkt har intet ændret sig, det er bare en ny parameter)
+
+2. Opdel Chemical::C i C_m og C_im
+
+M_m = C_m Theta_m + A_m 
+M_im = C_im * Theta_im + A_im
+
+M = M_m + M_im
+A = A_m + A_im
+C = (M - A) / Theta
+
+(foreløber lader vi M/im/C_im/A_im være 0 så intet har ændret sig).
+
+3. 
+
+Transport
+omsætning (S)
+diffusion (alpha)
+initialisering
+
+Hvad sker der når det mobile domæne aktiveres/deaktiveres?
+
+Hvad sker der med sorberet stof når det mobile domæne deaktiveres?
+
+Kan planter få fat i det?
 
 * OM init artikel
 
