@@ -66,12 +66,14 @@ public:
   // AList emulation.
 public:
   bool check (const std::string& key) const;
+  bool check (const symbol key) const;
   double number (const std::string&) const;
   double number (const std::string&, double default_value) const;
   const std::string name (const std::string&);
   const std::string name (const std::string&, 
 			  const std::string& default_value);
   symbol identifier (const std::string&);
+  symbol identifier (const symbol);
   symbol identifier (const std::string&, symbol default_value);
   bool flag (const std::string&) const;
   bool flag (const std::string&, bool default_value) const;

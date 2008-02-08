@@ -19,6 +19,11 @@ the chemical, followed by ".dlf".
 This happens for all the standard log parameterizations if you specify
 the "column" parameter, but do not specify the "where" parameter.
 
+** The 'column', 'crop', and 'chemical' parameters now appear in log headers.
+
+The new 'parameter_names' table log model parameter list parameters
+whose value should be included in the preamble.
+
 ** You can now log soil content as [ppm] with the 'array' select model.
 
 That is, content of chemical as part per million of soil dry bulk density.

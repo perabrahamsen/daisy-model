@@ -314,6 +314,9 @@ Block::check (const std::string& key) const
   return impl->find_alist (var).check (var); 
 }
 
+bool 
+Block::check (const symbol key) const
+{ return check (key.name ()); }
 
 double 
 Block::number (const std::string& key) const
@@ -347,6 +350,10 @@ Block::name (const std::string& key, const std::string& default_value)
 symbol 
 Block::identifier (const std::string& key)
 { return symbol (name (key)); }
+
+symbol 
+Block::identifier (const symbol key)
+{ return identifier (key.name ()); }
 
 symbol
 Block::identifier (const std::string& key, const symbol default_value)

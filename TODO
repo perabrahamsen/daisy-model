@@ -1,7 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* penetration?
-
 * Drænnode skal virke med vand (påvirk S_drain)
 
 Massebalance omkring drænnoder.
@@ -18,7 +16,7 @@ stof i mobil vand, immobil vand, makropore 1, 2, og n.
 
 1. h_immobil
 
-Placering:  Horizon?  Movement?
+Placering:  Movement?  Stof?
 Værdi: ? h_fc?
 Default: ? h_wp? -inf?
 

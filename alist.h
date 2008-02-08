@@ -52,6 +52,7 @@ class EXPORT AttributeList
 public:
   // Is 'key' an element of this alist?
   bool check (const std::string& key) const;
+  bool check (const symbol key) const;
   // Is this alist a subset of 'other'?
   bool subset (const Metalib&, 
                const AttributeList& other, const Syntax& syntax) const;
@@ -73,6 +74,7 @@ public:
   const std::string& name (const std::string&,
                            const std::string& default_value) const;
   symbol identifier (const std::string&) const;
+  symbol identifier (const symbol) const;
   bool flag (const std::string&) const;
   bool flag (const std::string&, bool default_value) const;
   const PLF& plf (const std::string&) const;

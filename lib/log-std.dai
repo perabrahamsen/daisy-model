@@ -9,6 +9,8 @@
   (declare column String
 	   "Name of column to log.  Use \"*\" to log all columns.")
   (column "*")
+  ;; Add it to the log files.
+  (parameter_names &old column)
   ;; Use column name as part of file name.
   (declare colfid string
            "File component name indicating column logged.")
@@ -23,6 +25,8 @@
   (declare crop String
 	   "Name of crop to log.  Use \"*\" to log all crops.")
   (crop "*")
+  ;; Add it to the log files.
+  (parameter_names &old crop)
   ;; Use crop name as part of file name.
   (declare cropfid string
            "File component name indicating crop logged.")
@@ -37,6 +41,8 @@
   (declare chemical String
 	   "Name of chemical to log.")
   ;; (chemical "*") ; Not very useful, N dominates.
+  ;; Add it to the log files.
+  (parameter_names &old chemical)
   ;; Use chemical name as part of file name.
   (declare chemfid string
            "File name component indicating chemical logged.")
@@ -562,14 +568,14 @@ The total amount of water in the soil interval")
 
 (defsummary "Soil NO3- balance" N_balance
   "NO3- balance for a soil interval."
-  (input "NO3-In" "NO3-Incorp" "NO3-Nitrification" )
+  (input "NO3-In" "NO3-Incorp" "NO3-Tillage" "NO3-Nitrification" )
   (output "NO3-Leak-Matrix" "NO3-Leak-Macro" "NO3-Drain" "NO3-Uptake"
 	  "Denitrification" "NO3-Immobilization")
   (content "NO3-Content"))
 
 (defsummary "Soil NH4+ balance" N_balance
   "NH4+ balance for a soil interval."
-  (input "NH4-In" "NH4-Incorp" "NH4-Mineralization")
+  (input "NH4-In" "NH4-Incorp" "NH4-Tillage" "NH4-Mineralization")
   (output "NH4-Leak-Matrix" "NH4-Leak-Macro" "NH4-Drain"
 	  "NH4-Uptake"  "NH4-Nitrification")
   (content "NH4-Content"))
@@ -579,6 +585,7 @@ The total amount of water in the soil interval")
   "Mineral N balance for a soil interval."
   (input "NO3-In" "NH4-In" 
 	 "NO3-Incorp" "NH4-Incorp"
+	 "NO3-Tillage" "NH4-Tillage"
 	 "NH4-Mineralization")
   (output "NO3-Leak-Matrix" "NH4-Leak-Matrix"
 	  "NO3-Leak-Macro" "NH4-Leak-Macro"
@@ -599,6 +606,7 @@ The total amount of water in the soil interval")
   (precision 3)
   (require_top true)
   (input "NO3-In" "NH4-In" "NO3-Incorp" "NH4-Incorp"
+         "NO3-Tillage" "NH4-Tillage"
 	 "Residuals-N" "Tillage-Org_N" "Bioincorporation")
   (output "NO3-Leak-Matrix" "NH4-Leak-Matrix"
 	  "NO3-Leak-Macro" "NH4-Leak-Macro"
@@ -646,6 +654,12 @@ The total amount of water in the soil interval")
                      (dimension "kg N/ha/&")
                      (spec chemical default S_external))
            (interval (path column "${column}" Chemistry "*" 
+			   trace NO3 tillage)
+                     (tag "NO3-Tillage")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (spec chemical default tillage))
+           (interval (path column "${column}" Chemistry "*" 
                            trace NO3 S_root)
                      (tag "NO3-Uptake")
                      (handle sum)
@@ -690,6 +704,12 @@ The total amount of water in the soil interval")
                      (handle sum)
                      (dimension "kg N/ha/&")
                      (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+			   trace NH4 tillage)
+                     (tag "NH4-Tillage")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (spec chemical default tillage))
            (interval (path column "${column}" Chemistry "*" 
 			   trace NH4 S_external)
                      (tag "NH4-Incorp")

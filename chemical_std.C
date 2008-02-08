@@ -567,7 +567,6 @@ ChemicalStandard::tick_soil (const size_t cell_size,
     {
       S_drain[i] = -soil_water.S_drain (i) * C (i);
       S_[i] += S_drain[i];
-      daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
 void 

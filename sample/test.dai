@@ -69,8 +69,10 @@
 
 ;; Create these log files.
 (output harvest
-        ("N Balance" (when monthly)
-                     (from 0 [m]) (to -1 [m]))
+        ("Field nitrogen" (when monthly))
+        ("Soil nitrogen" (when daily) (from 0 [m]) (to -1 [m]))
+        ("Field water" (when monthly))
+        ("Soil water" (when daily) (from 0 [m]) (to -1 [m]))
         ("Crop Production"
          (crop "Spring Barley")
          (where "sbarley.dlf"))

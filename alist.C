@@ -581,6 +581,10 @@ AttributeList::check (const std::string& key) const
 }
 
 bool
+AttributeList::check (const symbol key) const
+{ return check (key.name ()); }
+
+bool
 AttributeList::subset (const Metalib& metalib, 
                        const AttributeList& other, const Syntax& syntax) const
 { 
@@ -709,6 +713,10 @@ AttributeList::identifier (const std::string& key) const
   value.expect (key, Syntax::String);
   return *value.name;
 }
+
+symbol
+AttributeList::identifier (const symbol key) const
+{ return identifier (key.name ()); }
 
 bool 
 AttributeList::flag (const std::string& key) const

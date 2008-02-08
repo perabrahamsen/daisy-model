@@ -1,4 +1,4 @@
-// log_table.C
+// log_table.C -- Log selected data in tabular format.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -33,6 +33,7 @@
 #include "vcheck.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "scope_block.h"
 #include <sstream>
 #include <fstream>
 
@@ -51,6 +52,7 @@ struct LogTable : public LogSelect, public Destination
   const std::string missing_value; // String to print for missing values.
   const std::string array_separator; // String to print between array entries.
   DLF print_header;             // How much header should be printed?
+  std::vector<std::pair<symbol, symbol>/**/> parameters;      // Par vals.
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
   const bool print_initial;     // Set if initial values should be printed.
@@ -91,6 +93,8 @@ struct LogTable : public LogSelect, public Destination
   bool check (const Border&, Treelog& msg) const;
   static bool contain_time_columns (const std::vector<Select*>& entries);
   void initialize (Treelog&);
+  static std::vector<std::pair<symbol, symbol>/**/>
+  /**/ build_parameters (Block& al);
   explicit LogTable (Block& al);
   void summarize (Treelog&);
   ~LogTable ();
@@ -366,6 +370,9 @@ LogTable::initialize (Treelog& msg)
 
   print_header.start (out, name, file, parsed_from_file);
 
+  for (size_t i = 0; i < parameters.size (); i++)
+    print_header.parameter (out, parameters[i].first, parameters[i].second);
+
   print_header.interval (out, *volume);
   if (description != default_description)
     print_header.log_description (out, description);
@@ -375,6 +382,28 @@ LogTable::initialize (Treelog& msg)
   Treelog::Open nest (msg, name);
   for (unsigned int i = 0; i < summary.size (); i++)
     summary[i]->initialize (entries, msg);
+}
+
+std::vector<std::pair<symbol, symbol>/**/>
+LogTable::build_parameters (Block& al)
+{
+  std::vector<std::pair<symbol, symbol>/**/> result;
+  ScopeBlock scope_block (al);
+  std::vector<symbol> pars = al.identifier_sequence ("parameter_names");
+  for (size_t i = 0; i < pars.size (); i++)
+    {
+      const symbol key = pars[i];
+      if (scope_block.has_identifier (key))
+        {
+          const symbol value = scope_block.identifier (key);
+          std::string id = key.name ();
+          std::transform (id.begin (), id.end (), id.begin (), ::toupper);
+          result.push_back (std::pair<symbol, symbol> (symbol (id), value));
+        }
+      else
+        al.msg ().warning ("Parameter name '" + key + "' not found"); 
+    }
+  return result;
 }
 
 LogTable::LogTable (Block& al)
@@ -388,6 +417,7 @@ LogTable::LogTable (Block& al)
     missing_value (al.name ("missing_value")),
     array_separator (al.name ("array_separator")),
     print_header (al.name ("print_header")),
+    parameters (build_parameters (al)),
     print_tags (al.flag ("print_tags")),
     print_dimension (al.flag ("print_dimension")),
     print_initial (al.flag ("print_initial")),
@@ -442,6 +472,14 @@ static struct LogTableSyntax
       AttributeList& alist = *new AttributeList ();
       LogSelect::load_syntax (syntax, alist);
       alist.add ("description", LogTable::default_description);
+      syntax.add ("parameter_names", Syntax::String, 
+                  Syntax::Const, Syntax::Sequence, "\
+List of string parameters to print to the table header.\n\
+\n\
+For example, if you have defined 'column' and 'crop' parameters for\n\
+this table log parameterization, you can print them to the log file\n\
+header by specifying '(names column crop)'.");
+      alist.add ("parameter_names", std::vector<symbol> ());
       syntax.add ("where", Syntax::String, Syntax::Const,
 		  "Name of the log file to create.");
       syntax.add ("print_header", Syntax::String, Syntax::Const,

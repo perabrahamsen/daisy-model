@@ -440,6 +440,28 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       // End of small time step.
     }
   
+#if 1
+  // Find drain sing from mass balance.
+  for (size_t i = 0; i < drain_cell.size (); i++)
+    {
+      const size_t cell = drain_cell[i];
+      const double volume = geo.cell_volume (cell);
+      const double Theta_new = Theta (cell);
+      const double Theta_old = soil_water.Theta (cell);
+      const std::vector<int> edges = geo.cell_edges (cell);
+      double drain = (Theta_old - Theta_new) * volume;
+      for (size_t j = 0; j < edges.size (); j++)
+        {
+          const int edge = edges[j];
+          const double flux = q (edge) * geo.edge_area (edge) * dt;
+          const double in_sign = geo.edge_to (edge) == cell;
+          drain += in_sign * flux;
+        }
+      S_drain[cell] += drain / volume / dt;
+      Theta_error (cell) -= drain * dt;
+    }
+#endif
+
   // New = Old - S * dt + q_in * dt - q_out * dt + Error =>
   // 0 = Old - New - S * dt + q_in * dt - q_out * dt + Error
   Theta_error -= Theta;         // Old - New
@@ -454,24 +476,24 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       if (geo.cell_is_internal (to))
         Theta_error (to) += flux / geo.cell_volume (to);
     }
-  double total_error = 0.0;
-  double total_abs_error = 0.0;
-  double max_error = 0.0;
-  int max_cell = -1;
-  for (size_t cell = 0; cell != cell_size; ++cell) 
-    {
-      const double volume = geo.cell_volume (cell);
-      const double error = Theta_error (cell);
-      total_error += volume * error;
-      total_abs_error += std::fabs (volume * error);
-      if (std::fabs (error) > std::fabs (max_error))
-        {
-          max_error = error;
-          max_cell = cell;
-        }
-    }
   if (debug == 2)
     {
+      double total_error = 0.0;
+      double total_abs_error = 0.0;
+      double max_error = 0.0;
+      int max_cell = -1;
+      for (size_t cell = 0; cell != cell_size; ++cell) 
+        {
+          const double volume = geo.cell_volume (cell);
+          const double error = Theta_error (cell);
+          total_error += volume * error;
+          total_abs_error += std::fabs (volume * error);
+          if (std::fabs (error) > std::fabs (max_error))
+            {
+              max_error = error;
+              max_cell = cell;
+            }
+        }
       std::ostringstream tmp;
       tmp << "Total error = " << total_error << " [cm^3], abs = " 
 	  << total_abs_error << " [cm^3], max = " << max_error << " [] in cell " 
