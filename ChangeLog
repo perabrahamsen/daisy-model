@@ -1,5 +1,9 @@
 2008-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.23 released.
+
+2008-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* dlf.C, dlf.h (DLF::parameter): New function.
 	* log_table.C (parameter_names): New parameter.
 

@@ -787,7 +787,7 @@ daisy-src.zip:	$(TEXT)
 txtdist:
 	(cd txt && $(MAKE) FTPDIR=$(FTPDIR) dist)
 
-dist:	cvs
+dist:	cvsci
 	$(MAKE) native cross
 	mv -f $(WWWINDEX) $(WWWINDEX).old
 	sed -e 's/Daisy version [1-9]\.[0-9][0-9]/Daisy version $(TAG)/' \
@@ -820,7 +820,7 @@ version.C:
 
 # Update the CVS repository.
 #
-cvs: $(TEXT)
+cvsci: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	rm -f version.C
 	$(MAKE) version.C
@@ -831,10 +831,10 @@ cvs: $(TEXT)
 	echo "	* Version" $(TAG) released. >> ChangeLog
 	echo >> ChangeLog
 	cat ChangeLog.old >> ChangeLog
-	(cd OpenMI; $(MAKE) cvs);
-	(cd lib; $(MAKE) cvs);
-	(cd sample; $(MAKE) cvs);
-	(cd txt; $(MAKE) cvs);
+	(cd OpenMI; $(MAKE) cvsci);
+	(cd lib; $(MAKE) cvsci);
+	(cd sample; $(MAKE) cvsci);
+	(cd txt; $(MAKE) cvsci);
 	-cvs add $(TEXT)
 	rm -f $(REMOVE) 
 	-cvs remove $(REMOVE) 
@@ -859,7 +859,7 @@ cast:
 	fgrep _cast $(INTERFACES) $(MODELS) $(MAIN)
 	wc -l  $(INTERFACES) $(MODELS) $(MAIN)
 
-setup:	cvs
+setup:	cvsci
 	$(MAKE) setupnocvs
 
 setupnocvs: 
