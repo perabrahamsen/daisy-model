@@ -40,7 +40,7 @@ setup:
 
 # Update the CVS repository.
 #
-cvs: $(DAISY) $(TEXT)
+cvsci: $(DAISY) $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-cvs add $(DAISY) $(TEXT)
 	rm -f $(REMOVE) 

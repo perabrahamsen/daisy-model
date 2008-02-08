@@ -80,7 +80,7 @@ setup: reference.pdf reference.ps tutorial.pdf exercises.pdf
 	cp -f tutorial.pdf $(SETUPDIR)/doc
 	cp -f exercises.pdf $(SETUPDIR)/doc
 
-cvs: $(TEXT)
+cvsci: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-cvs add $(TEXT)
 	rm -f $(REMOVE) 

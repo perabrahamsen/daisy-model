@@ -17,9 +17,9 @@ all:	$(TARGETS)
 setup: $(TARGETS)
 	cp $(TARGETS) $(SETUPDIR)/bin
 
-.IGNORE: cvs
+.IGNORE: cvsci
 
-cvs: $(TEXT)
+cvsci: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	cvs update
 	-cvs add $(TEXT)

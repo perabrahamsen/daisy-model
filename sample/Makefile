@@ -39,7 +39,7 @@ setup:
 
 # Update the CVS repository.
 #
-cvs: $(TEXT) 
+cvsci: $(TEXT) 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-cvs add $(TEXT) 
 	rm -f $(REMOVE) 
