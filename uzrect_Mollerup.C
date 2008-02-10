@@ -598,6 +598,35 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
       const double area = geo.edge_area (edge);
       const double sin_angle = geo.edge_sin_angle (edge);
 
+
+      #if 0      
+      //------------------Aquitard boundary condition -----------------
+
+      double K_aq = 0.001;   //Conductivity of aquitard
+      double Dz_aq = 100;      //Thickness of aquitard
+      double h_aq = 1000;       //Pressure below aquitard
+      //double Dz_i = 10;        //Height of cell i   - should come from geometry!!!!
+      double Dz_i = 2 * geo.edge_length (edge);  //Multiplied with 2 because it is a boundary cell...
+      
+      double K_i = K (cell);   //Conductivity in cell
+      double h_i = h (cell);   //Pressure in cell
+      
+      double q_in; //Flux into domain
+      
+      double taeller = K_i * (2*h_i/Dz_i+1) + K_aq * (h_aq/Dz_aq-1);
+      double naevner = K_aq + 2*K_i*Dz_aq/Dz_i;
+
+      q_in = -K_aq * (taeller/naevner - h_aq/Dz_aq +1);
+
+      const double flux = in_sign * q_in * area;
+
+      Neumann (edge, cell, area, in_sign, flux, dq, B);
+
+      //--------------------------------------------------------------- 
+      #endif
+      
+
+      //#if 0
       switch (groundwater.bottom_type ())
         {
         case Groundwater::free_drainage:
@@ -636,6 +665,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
         default:
           daisy_panic ("Unknown groundwater type");
         }
+      //#endif
     }
 }
 
