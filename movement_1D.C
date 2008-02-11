@@ -184,6 +184,8 @@ Movement1D::tick_water (const Geometry1D& geo,
                         const double dt, 
                         Treelog& msg)
 {
+  const size_t top_edge = 0U;
+  const size_t bottom_edge = geo.edge_size () - 1U;
   // Limit for groundwater table.
   size_t last  = soil.size () - 1;
   if (groundwater.bottom_type () == Groundwater::pressure)
@@ -214,7 +216,8 @@ Movement1D::tick_water (const Geometry1D& geo,
       try
         {
           matrix_water[m]->tick (msg, geo, soil, soil_heat,
-                                 first, surface, 0U, last, groundwater,
+                                 first, surface, top_edge, 
+                                 last, groundwater, bottom_edge,
                                  S, h_old, Theta_old, h_ice, h, Theta, 0U, q, 
                                  dt);
 

@@ -74,7 +74,7 @@ public:
     return forced_flux;
 #endif // !USE_UPDATE_WATER
   }
-  double q_bottom () const
+  double q_bottom (size_t) const
   { return -deep_percolation; }
 
   // Identity

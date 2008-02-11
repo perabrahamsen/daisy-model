@@ -43,7 +43,7 @@ private:
 public:
   bottom_t bottom_type () const
   { return has_table ? pressure : free_drainage; }
-  double q_bottom () const
+  double q_bottom (size_t) const
   { daisy_notreached (); }
 
   // Simulation.

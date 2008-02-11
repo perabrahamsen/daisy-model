@@ -439,29 +439,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	}
       // End of small time step.
     }
-  
-#if 1
-  // Find drain sing from mass balance.
-  for (size_t i = 0; i < drain_cell.size (); i++)
-    {
-      const size_t cell = drain_cell[i];
-      const double volume = geo.cell_volume (cell);
-      const double Theta_new = Theta (cell);
-      const double Theta_old = soil_water.Theta (cell);
-      const std::vector<int> edges = geo.cell_edges (cell);
-      double drain = (Theta_old - Theta_new) * volume;
-      for (size_t j = 0; j < edges.size (); j++)
-        {
-          const int edge = edges[j];
-          const double flux = q (edge) * geo.edge_area (edge) * dt;
-          const double in_sign = geo.edge_to (edge) == cell;
-          drain += in_sign * flux;
-        }
-      S_drain[cell] += drain / volume / dt;
-      Theta_error (cell) -= drain * dt;
-    }
-#endif
 
+  // Mass balance.
   // New = Old - S * dt + q_in * dt - q_out * dt + Error =>
   // 0 = Old - New - S * dt + q_in * dt - q_out * dt + Error
   Theta_error -= Theta;         // Old - New
@@ -476,6 +455,15 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       if (geo.cell_is_internal (to))
         Theta_error (to) += flux / geo.cell_volume (to);
     }
+
+  // Find drain sink from mass balance.
+  for (size_t i = 0; i < drain_cell.size (); i++)
+    {
+      const size_t cell = drain_cell[i];
+      S_drain[cell] = Theta_error (cell) / dt;
+      Theta_error (cell) -= S_drain[cell] * dt;
+    }
+
   if (debug == 2)
     {
       double total_error = 0.0;
@@ -598,36 +586,6 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
       const double area = geo.edge_area (edge);
       const double sin_angle = geo.edge_sin_angle (edge);
 
-
-#if 0      
-
-      //------------------Aquitard boundary condition -----------------
-
-      double K_aq = 0.001;   //Conductivity of aquitard
-      double Dz_aq = 100;      //Thickness of aquitard
-      double h_aq = 1000;       //Pressure below aquitard
-      //double Dz_i = 10;        //Height of cell i   - should come from geometry!!!!
-      double Dz_i = 2 * geo.edge_length (edge);  //Multiplied with 2 because it is a boundary cell...
-      
-      double K_i = K (cell);   //Conductivity in cell
-      double h_i = h (cell);   //Pressure in cell
-      
-      double q_in; //Flux into domain
-      
-      double taeller = K_i * (2*h_i/Dz_i+1) + K_aq * (h_aq/Dz_aq-1);
-      double naevner = K_aq + 2*K_i*Dz_aq/Dz_i;
-
-      q_in = -K_aq * (taeller/naevner - h_aq/Dz_aq +1);
-
-      const double flux = in_sign * q_in * area;
-
-      Neumann (edge, cell, area, in_sign, flux, dq, B);
-
-      //--------------------------------------------------------------- 
-#endif
-      
-
-      //#if 0
       switch (groundwater.bottom_type ())
         {
         case Groundwater::free_drainage:
@@ -639,7 +597,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
           break;
         case Groundwater::forced_flux:
           {
-            const double flux = groundwater.q_bottom () * area;
+            const double flux = groundwater.q_bottom (edge) * area;
             Neumann (edge, cell, area, in_sign, flux, dq, B);
           }
           break;
@@ -666,7 +624,6 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
         default:
           daisy_panic ("Unknown groundwater type");
         }
-      //#endif
     }
 }
 

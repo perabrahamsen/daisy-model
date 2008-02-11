@@ -1,8 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Drænnode skal virke med vand (påvirk S_drain)
+* cvs add groundwater_aquitard.C (Makefile)
 
-Massebalance omkring drænnoder.
+* decompose stof i litter som jord
 
 * row width
 

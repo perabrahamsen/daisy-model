@@ -1,9 +1,15 @@
 2008-02-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* soil_water.C, soil_water.h (K) Initialize and export.
 	* geometry.h, geometry_rect.h (edge_other): Moved to 'geometry.h'.
+	* groundwater_extern.C, groundwater_flux.C, groundwater_file.C:
+	* groundwater_fixed.C, groundwater_deep.C, groundwater_lysimeter.C:
+	* groundwater_pipe.C, groundwater_static.C:
 	* groundwater.h (q_bottom): Take edge parameter.
 	* groundwater_aquitard.C: New model.
 	* Makefile (MODELS): Add it.
+	* uzrichard.C (UZRichard::richard): Update caller.
+	* uzlr.C (UZlr::tick): Ditto.
 
 2008-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 

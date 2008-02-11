@@ -52,9 +52,8 @@ class UZRichard : public UZmodel
 private:
   bool richard (Treelog&, const GeometryVert& geo,
                 const Soil& soil, const SoilHeat& soil_heat,
-		int first, const Surface& top,
-                size_t top_edge,
-		int last, const Groundwater& bottom,
+		int first, const Surface& top, size_t top_edge,
+		int last, const Groundwater& bottom, size_t bottom_edge,
 		const std::vector<double>& S,
 		const std::vector<double>& h_old,
 		const std::vector<double>& Theta_old,
@@ -86,6 +85,7 @@ public:
 	     unsigned int first, const Surface& top,
              size_t top_edge, 
 	     unsigned int last, const Groundwater& bottom,
+             const size_t bottom_edge,
 	     const std::vector<double>& S,
 	     const std::vector<double>& h_old,
 	     const std::vector<double>& Theta_old,
@@ -112,6 +112,7 @@ UZRichard::richard (Treelog& msg,
 		    int first, const Surface& top,
                     const size_t top_edge,
 		    const int last, const Groundwater& bottom,
+                    const size_t bottom_edge,
 		    const std::vector<double>& S,
 		    const std::vector<double>& h_old,
 		    const std::vector<double>& Theta_old,
@@ -132,7 +133,7 @@ UZRichard::richard (Treelog& msg,
   const double q_top = top.q_top (geo, top_edge);
   const Groundwater::bottom_t bottom_type = bottom.bottom_type ();
   const double q_bottom_forced = (bottom_type == Groundwater::forced_flux)
-    ? bottom.q_bottom () : -42.42e42;
+    ? bottom.q_bottom (bottom_edge) : -42.42e42;
 
   // Find relevant fluxes.
   daisy_assert (geo.edge_to (top_edge) == Geometry::cell_above);
@@ -466,7 +467,7 @@ UZRichard::richard (Treelog& msg,
 	      // Find flux.
 	      if (bottom_type == Groundwater::forced_flux)
 		{
-		  q[last + 1] = bottom.q_bottom ();
+		  q[last + 1] = bottom.q_bottom (bottom_edge);
 		  for (int i = last; i >= first; i--)
 		    q[i] = - (((Theta[i - first] 
 				- Theta_previous[i-first]) / ddt) + S[i])
@@ -719,6 +720,7 @@ UZRichard::tick (Treelog& msg, const GeometryVert& geo,
 		 const unsigned int first, const Surface& top, 
                  const size_t top_edge,
 		 const unsigned int last, const Groundwater& bottom, 
+                 const size_t bottom_edge,
 		 const std::vector<double>& S,
 		 const std::vector<double>& h_old,
 		 const std::vector<double>& Theta_old,
@@ -729,7 +731,8 @@ UZRichard::tick (Treelog& msg, const GeometryVert& geo,
 		 std::vector<double>& q_base,
                  const double dt)
 {
-  if (!richard (msg, geo, soil, soil_heat, first, top, top_edge, last, bottom, 
+  if (!richard (msg, geo, soil, soil_heat,
+                first, top, top_edge, last, bottom, bottom_edge,
 		S, h_old, Theta_old, h_ice, h, Theta, q_offset, q_base, dt))
     throw "Richard's equation doesn't converge";
 }

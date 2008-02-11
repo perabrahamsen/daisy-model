@@ -36,7 +36,7 @@ class GroundwaterFlux : public Groundwater
 public:
   bottom_t bottom_type() const
   { return forced_flux; }
-  double q_bottom () const
+  double q_bottom (size_t) const
   { return flux; }
 
   // Simulation.

@@ -196,6 +196,7 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
      ?  surface.last_cell (geo, top_edge) : 0);
 
   // Limit for groundwater table.
+  const size_t bottom_edge = bottom_cell + q_offset + 1U;
   size_t last = bottom_cell;
   if (groundwater.bottom_type () == Groundwater::pressure)
     {
@@ -217,7 +218,8 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
       try
         {
           vertical[i]->tick (msg, geo, soil, soil_heat,
-                             first, surface, top_edge, last, groundwater,
+                             first, surface, top_edge, 
+                             last, groundwater, bottom_edge, 
                              S, h_old, Theta_old, h_ice, h, Theta, 
                              q_offset, q, dt);
           for (size_t i = last + 2; i <= bottom_cell + 1; i++)

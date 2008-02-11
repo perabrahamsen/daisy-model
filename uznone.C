@@ -36,6 +36,7 @@ public:
 	     const unsigned int first, const Surface& /* top */, 
              const size_t /* top_edge */,
 	     const unsigned int last, const Groundwater& /* bottom */, 
+             const size_t /* bottom_edge */,
 	     const std::vector<double>& /* S */,
 	     const std::vector<double>& h_old,
 	     const std::vector<double>& Theta_old,

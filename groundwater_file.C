@@ -50,7 +50,7 @@ private:
   // Groundwater.
 public:
   bottom_t bottom_type () const;
-  double q_bottom () const
+  double q_bottom (size_t) const
   { daisy_notreached (); }
 
   // Simulation.

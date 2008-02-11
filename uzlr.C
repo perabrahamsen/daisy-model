@@ -46,6 +46,7 @@ struct UZlr : public UZmodel
 	     unsigned int first, const Surface& top, 
              size_t top_edge,
 	     unsigned int last, const Groundwater& bottom, 
+             const size_t bottom_edge,
 	     const std::vector<double>& S,
 	     const std::vector<double>& h_old,
 	     const std::vector<double>& Theta_old,
@@ -70,6 +71,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	    unsigned int first, const Surface& top, 
             const size_t top_edge,
 	    unsigned int last, const Groundwater& bottom, 
+            const size_t bottom_edge,
 	    const std::vector<double>& S,
 	    const std::vector<double>& h_old,
 	    const std::vector<double>& Theta_old,
@@ -194,7 +196,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 					      soil_heat.T (i+1)));
 	    }
 	  else if (bottom.bottom_type () == Groundwater::forced_flux)
-	    K_new = -bottom.q_bottom ();
+	    K_new = -bottom.q_bottom (bottom_edge);
           
 	  const double Theta_lim = soil.Theta (i, h_lim, h_ice[i]);
 	  const double Theta_next = Theta_new - K_new * dt / dz;
@@ -239,10 +241,10 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
   q_down = q[last + 1];
 
   if (bottom.bottom_type () == Groundwater::forced_flux
-      && !approximate (q_down, bottom.q_bottom ()))
+      && !approximate (q_down, bottom.q_bottom (bottom_edge)))
     {
       // Ensure forced bottom.
-      double extra_water = (bottom.q_bottom () - q_down) * dt;
+      double extra_water = (bottom.q_bottom (bottom_edge) - q_down) * dt;
       for (int i = last; std::isnormal (extra_water); i--)
 	{
 	  q[i+1] += extra_water / dt;
