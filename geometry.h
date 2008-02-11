@@ -102,6 +102,8 @@ public:
   virtual int edge_index (int from, int to) const; // Find edge between cells.
   virtual int edge_from (size_t) const = 0; // Cell where edge originates.
   virtual int edge_to (size_t) const = 0; // Cell where edge leads.
+  inline int edge_other (size_t e, size_t n) const // Other cell at edge.
+  { return edge_from (e) == n ? edge_to (e) : edge_from (e); }
   inline bool edge_is_internal (size_t e) const // Edge does not lead out of volume.
   { return cell_is_internal (edge_from (e))
       && cell_is_internal (edge_to (e)); }

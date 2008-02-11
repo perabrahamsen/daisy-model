@@ -48,7 +48,7 @@ public:
   // Lower boundary.
   enum bottom_t { pressure, lysimeter, forced_flux, free_drainage };
   virtual bottom_t bottom_type () const = 0;
-  virtual double q_bottom () const = 0;
+  virtual double q_bottom (size_t edge) const = 0;
   virtual void accept_bottom (double amount, const Geometry&, size_t edge);
 
   // Groundwater.

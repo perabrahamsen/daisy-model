@@ -103,7 +103,9 @@ public:
   double q_p (size_t i) const
   { return q_p_[i]; }
   double Theta_ice (const Soil&, size_t i, double h) const;
- 
+  double K (size_t i) const
+  { return K_[i]; }
+
   // Modify.
 public:
   void set_content (size_t i, double h, double Theta);

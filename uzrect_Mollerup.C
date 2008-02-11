@@ -599,7 +599,8 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
       const double sin_angle = geo.edge_sin_angle (edge);
 
 
-      #if 0      
+#if 0      
+
       //------------------Aquitard boundary condition -----------------
 
       double K_aq = 0.001;   //Conductivity of aquitard
@@ -623,7 +624,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
       Neumann (edge, cell, area, in_sign, flux, dq, B);
 
       //--------------------------------------------------------------- 
-      #endif
+#endif
       
 
       //#if 0

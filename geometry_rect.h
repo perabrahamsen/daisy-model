@@ -87,8 +87,6 @@ public:
   { return edge_from_[e]; }
   inline int edge_to (size_t e) const   // Cell where edge leads.
   { return edge_to_[e]; }
-  inline int edge_other (size_t e, size_t n) const // Other cell at edge.
-  { return edge_from (e) == n ? edge_to (e) : edge_from (e); }
   inline double edge_area (size_t e) const // Area connecting cells [cm^2]
   { return edge_area_[e]; }
   inline double edge_area_per_length (size_t e) const 

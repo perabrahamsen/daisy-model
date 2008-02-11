@@ -483,7 +483,8 @@ SoilWater::initialize (const AttributeList& al, const Geometry& geo,
   q_p_.insert (q_p_.begin (), edge_size, 0.0);
 
   // Conductivity.
-  K_.insert (K_.begin (), cell_size, -42.42e42);
+  for (size_t i = 0; i < cell_size, i++)
+    K_.push_back (soil.K (i, h_[i], h_ice_[i], 10.0 /* [dg C] */);
 }
 
 SoilWater::SoilWater (Block& al)

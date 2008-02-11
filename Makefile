@@ -371,7 +371,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \
+MODELS = groundwater_aquitard.C \
+	heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \
 	msoltranrect_convection.C \
 	ABAprod_uptake.C ABAprod_soil.C ABAprod_root.C \
 	solver_ublas.C solver_cxsparse.C solver_none.C \

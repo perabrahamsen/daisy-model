@@ -1,3 +1,10 @@
+2008-02-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.h, geometry_rect.h (edge_other): Moved to 'geometry.h'.
+	* groundwater.h (q_bottom): Take edge parameter.
+	* groundwater_aquitard.C: New model.
+	* Makefile (MODELS): Add it.
+
 2008-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.23 released.
