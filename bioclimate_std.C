@@ -823,7 +823,18 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   // 6 Soil
 
   soil_ep = pond_ep - pond_ea;
-  daisy_assert (soil_ep >= 0.0);
+  if (soil_ep < 0.0)
+    {
+      if (!approximate (pond_ep, pond_ea))
+        {
+          std::ostringstream tmp;
+          tmp << "BUG:\nsoil_ep = " << soil_ep << "\n"
+              << "pond_ep = " << pond_ep << "\n"
+              << "pond_ea = " << pond_ea;
+          msg.error (tmp.str ());
+        }
+      soil_ep = 0.0;
+    }
   soil_ea = surface.exfiltration ();
   daisy_assert (soil_ea >= 0.0);
   total_ea += soil_ea;

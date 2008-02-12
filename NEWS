@@ -22,6 +22,8 @@ The parameters 'K_aquitard', 'Z_aquitard', 'h_aquifer', and
 'pressure_table' are supported with the same meaning as for the 'pipe'
 groundwater model.
 
+** Bug fixes.
+
 * 4.23
 
 ** New log models "Soil chemical" and "Field chemical" in "log-std.dai".

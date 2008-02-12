@@ -35,7 +35,7 @@ struct ABAProdSoil : public ABAProd
 {
   // Units.
   static const symbol h_name;
-  static const symbol l_name;
+  static const symbol L_name;
   static const symbol S_name;
   static const symbol ABA_unit;
 
@@ -46,7 +46,7 @@ struct ABAProdSoil : public ABAProd
   // Solve.
   void production (const Geometry&, const SoilWater&,
 		   const std::vector<double>& S /* [cm^3/cm^3/h] */,
-		   const std::vector<double>& l /* [cm/cm^3] */,
+		   const std::vector<double>& L /* [cm/cm^3] */,
 		   std::vector<double>& ABA /* [g/cm^3/h] */,
 		   Treelog&) const;
   void output (Log&) const
@@ -63,7 +63,7 @@ const symbol
 ABAProdSoil::h_name ("h");
 
 const symbol 
-ABAProdSoil::l_name ("l");
+ABAProdSoil::L_name ("L");
 
 const symbol 
 ABAProdSoil::S_name ("S");
@@ -74,14 +74,14 @@ ABAProdSoil::ABA_unit ("g/cm^3/h");
 void
 ABAProdSoil::production (const Geometry& geo, const SoilWater& soil_water,
 			 const std::vector<double>& S /* [cm^3/cm^3/h] */,
-			 const std::vector<double>& l /* [cm/cm^3] */,
+			 const std::vector<double>& L /* [cm/cm^3] */,
 			 std::vector<double>& ABA    /* [g/cm^3/h] */,
 			 Treelog& msg) const
 {
   // Check input.
   const size_t cell_size = geo.cell_size ();
   daisy_assert (ABA.size () == cell_size);
-  daisy_assert (l.size () == cell_size);
+  daisy_assert (L.size () == cell_size);
   daisy_assert (S.size () == cell_size);
   
   // For all cells.
@@ -89,7 +89,7 @@ ABAProdSoil::production (const Geometry& geo, const SoilWater& soil_water,
     {
       // Set up values in scope.
       scope.set_number (h_name, soil_water.h (c));
-      scope.set_number (l_name, l[c]);
+      scope.set_number (L_name, L[c]);
       scope.set_number (S_name, S[c]);
 
       // Find expr value.
@@ -122,7 +122,7 @@ ABAProdSoil::ABAProdSoil (Block& al)
     expr (Librarian::build_item<Number> (al, "expr"))
 {
   scope.add_item (new ExchangeNumber (h_name, "cm", "Soil water pressure."));
-  scope.add_item (new ExchangeNumber (l_name, "cm/cm^3", "Root density."));
+  scope.add_item (new ExchangeNumber (L_name, "cm/cm^3", "Root density."));
   scope.add_item (new ExchangeNumber (S_name, "cm^3/cm^3/h", "Water uptake."));
   scope.done ();
  }
@@ -144,11 +144,10 @@ ABA production based on soil location.");
                        Syntax::Const, Syntax::Singleton, "\
 Expression to evaluate to ABA uptake [g/cm^3/h].\n\
 The symbol 'h' will be bound to the water pressure [cm].\n\
-The symbol 'l' will be bound to the root density [cm/cm^3].\n\
+The symbol 'L' will be bound to the root density [cm/cm^3].\n\
 The symbol 'S' will be bound to the water uptake [cm^3/cm^3/h].");
     Librarian::add_type (ABAProd::component, "soil", alist, syntax, &make);
   }
 } ABAProdSoil_syntax;
 
 // ABAprod_soil.C ends here
-

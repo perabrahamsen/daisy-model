@@ -195,3 +195,5 @@ Assertion::Register::~Register ()
   logs.erase (find (logs.begin (), logs.end (), &treelog));
   daisy_assert (find (logs.begin (), logs.end (), &treelog) == logs.end ());
 }
+
+// assertion.C ends here.
