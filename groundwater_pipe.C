@@ -67,13 +67,7 @@ class GroundwaterPipe : public Groundwater
   // Groundwater.
 public:
   bottom_t bottom_type () const
-  { 
-#ifdef USE_UPDATE_WATER
-    return pressure; 
-#else // !USE_UPDATE_WATER
-    return forced_flux;
-#endif // !USE_UPDATE_WATER
-  }
+  { return forced_flux; }
   double q_bottom (size_t) const
   { return -deep_percolation; }
 
@@ -133,7 +127,8 @@ GroundwaterPipe::tick (const Geometry& geo,
   set_h_aquifer (geo);
 
   // Find groundwater height.
-#if 1
+#if 1                           // This works with any geometry, 
+                                // but is less precise.
   const double old_height = height;
   height = 1.0;
   double lowest = 0.0;
@@ -163,7 +158,7 @@ GroundwaterPipe::tick (const Geometry& geo,
     }    
   if (height > 0.0)
     height = h_surface;
-#else
+#else  // This only works with Geometry1D.
   height = h_surface;
   for (int i = size - 1; i >= 0; i--)
     {

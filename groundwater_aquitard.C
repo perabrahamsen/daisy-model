@@ -23,34 +23,55 @@
 #include "groundwater.h"
 #include "syntax.h"
 #include "alist.h"
-#include "assertion.h"
+#include "block.h"
 #include "librarian.h"
+#include "check.h"
+#include "assertion.h"
+#include "depth.h"
+#include "geometry.h"
+#include "soil_water.h"
+#include "log.h"
 #include <map>
 
 struct GroundwaterAquitard : public Groundwater
 {
-  // We keep fluxes in a map.
+  // Parameters
+  const double K_aquitard;  // Conductivity of the aquitard. [cm h^-1]
+  const double Z_aquitard;    // Vertical length of the aquitard. [cm]
+  std::auto_ptr<Depth> pressure_table; // Virtual groundwater height. [cm]
+  double h_aquifer;          // Pressure potential in the aquifer [cm]
+
+  // Utility.
+  void set_h_aquifer (const Geometry& geo)
+  {
+    const double aquitart_bottom = geo.bottom () - Z_aquitard;
+    h_aquifer = pressure_table->operator()() - aquitart_bottom;
+  }
+
+  // Bottom flux.
   typedef std::map<size_t, double> edge_flux_map;
   edge_flux_map edge_flux;
-
-public:
   bottom_t bottom_type() const
   { return forced_flux; }
-
   double q_bottom (size_t edge) const
   {
     edge_flux_map::const_iterator i = edge_flux.find (edge);
     daisy_assert (i != edge_flux.end ());
-    return (*).second;
+    return (*i).second;
   }
     
   // Simulation.
-public:
   void tick (const Geometry& geo,
              const Soil&, SoilWater& soil_water, double, 
-	     const SoilHeat&, const Time&, const Scope&, Treelog&)
+	     const SoilHeat&, const Time& time, 
+             const Scope& scope, Treelog& msg)
   { 
-    const std::vector<int>& bottow_edges 
+    // Virtual pressure table.
+    pressure_table->tick (time, scope, msg);
+    set_h_aquifer (geo);
+
+    // Deep percolation.
+    const std::vector<int>& bottom_edges 
       = geo.cell_edges (Geometry::cell_below);
     const size_t bottom_edges_size = bottom_edges.size ();
 
@@ -59,39 +80,67 @@ public:
         const int edge = bottom_edges[i];
         const int cell = geo.edge_other (edge, Geometry::cell_below);
         
-        // Parameters.
-        const double K_aq = 0.001;   //Conductivity of aquitard
-        const double Dz_aq = 100;      //Thickness of aquitard
-        const double h_aq = 1000;       //Pressure below aquitard
-
-        // Calculation.
         // Multiplied with 2 because it is a boundary cell...
         const double Dz_i = 2 * geo.edge_length (edge);  
     
-        double K_i = soil_water.K (cell);   //Conductivity in cell
-        double h_i = soil_water.h (cell);   //Pressure in cell
+        const double K_i = soil_water.K (cell);   //Conductivity in cell
+        const double h_i = soil_water.h (cell);   //Pressure in cell
         
-        double taeller = K_i * (2*h_i/Dz_i+1) + K_aq * (h_aq/Dz_aq-1);
-        double naevner = K_aq + 2*K_i*Dz_aq/Dz_i;
+        const double numerator = K_i * (2.0 * h_i / Dz_i + 1.0)
+          + K_aquitard * (h_aquifer / Z_aquitard - 1.0);
+        const double denominator = K_aquitard + 2.0 * K_i * Z_aquitard / Dz_i;
     
         // Flux into domain.
-        const double q_up = -K_aq * (taeller/naevner - h_aq/Dz_aq +1);
+        const double q_up = -K_aquitard * (numerator / denominator 
+                                           - h_aquifer / Z_aquitard + 1.0);
         edge_flux[edge] = q_up;
       }
+  }
+  void output (Log& log) const
+  {
+    Groundwater::output (log);
+    output_variable (h_aquifer, log);
   }
 
   double table () const
   { return 42.42e42; }
 
   // Create and Destroy.
-public:
-  void initialize (const Geometry&, const Time&, const Scope&, Treelog&)
-  { }
-  bool check (const Geometry&, const Scope&, Treelog&) const
-  { return true; }
+  void initialize (const Geometry& geo, const Time&,
+                   const Scope& scope, Treelog& msg)
+  {
+    if (!pressure_table.get ())
+      pressure_table.reset (Depth::create ((geo.bottom () - Z_aquitard)
+                                           + h_aquifer));
+    pressure_table->initialize (msg);
+    // Pressure below aquitard.
+    if (pressure_table->check (scope, msg))
+      set_h_aquifer (geo);
+    else
+      pressure_table.reset (NULL);
+  }
+  bool check (const Geometry& geo, const Scope& scope,
+              Treelog& msg) const
+  {
+    bool ok = true;
+    if (!pressure_table.get ())
+      {
+        ok = false;
+        msg.error ("No pressure table");
+      }
+    else if (!pressure_table->check (scope, msg))
+      ok = false;
+    return ok;
+  }
   GroundwaterAquitard (Block& al)
-    : Groundwater (al)
-  { }
+    : Groundwater (al),
+      K_aquitard (al.number ("K_aquitard")),
+      Z_aquitard (al.number ("Z_aquitard")),
+      pressure_table (al.check ("pressure_table")
+                      ? Librarian::build_item<Depth> (al, "pressure_table")
+                      : NULL),
+      h_aquifer (al.number ("h_aquifer", Z_aquitard))
+  {}
   ~GroundwaterAquitard ()
   { }
 };
@@ -107,6 +156,27 @@ static struct GroundwaterAquitardSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "Aquitard groundwater, free drainage.");
       Groundwater::load_syntax (syntax, alist);
+      syntax.add ("K_aquitard", "cm/h", Check::non_negative (), Syntax::Const,
+		  "Conductivity of the aquitard.");
+      alist.add ("K_aquitard", 1e-3);
+      syntax.add ("Z_aquitard", "cm", Check::positive (), Syntax::Const,
+		  "Thickness of the aquitard.\n\
+The aquitard begins below the bottommost soil horizon.");
+      alist.add ("Z_aquitard", 200.0);
+      syntax.add ("h_aquifer", "cm", Check::positive (), Syntax::OptionalState,
+		  "Pressure potential in the aquifer below the aquitard.\n\
+By default. this is Z_aquitard.\n\
+You can alternatively specify the pressure as a virtual groundwater level.\n\
+See 'pressure_table'.");
+      syntax.add_object ("pressure_table", Depth::component,
+                         Syntax::OptionalConst, Syntax::Singleton, "\
+Height of groundwater the corresponds to the pressure in the aquifer.  \n\
+\n\
+If you drilled a well down to the aquifer, this is number what the\n\
+water level in the well would be as height above ground (a negative\n\
+number).  This is different from the actual groundwater table, because\n\
+the aquitart block the water, and the pipes lead the water away.\n\
+You can alternatively specify the pressure directly, with 'h_aquifer'.");
       Librarian::add_type (Groundwater::component, "aquitard", alist, syntax, &make);
     }
 } GroundwaterAquitard_syntax;
