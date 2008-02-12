@@ -370,8 +370,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-LATER = groundwater_aquitard.C 
-MODELS = \
+LATER = 
+MODELS = groundwater_aquitard.C \
 	heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \
 	msoltranrect_convection.C \
 	ABAprod_uptake.C ABAprod_soil.C ABAprod_root.C \
