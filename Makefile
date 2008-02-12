@@ -1331,6 +1331,8 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+groundwater_aquitard${OBJ}: groundwater_aquitard.C groundwater.h model.h \
+  symbol.h syntax.h treelog.h alist.h assertion.h librarian.h
 heatrect_Mollerup${OBJ}: heatrect_Mollerup.C heatrect.h model.h symbol.h \
   solver.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h plf.h alist.h block.h librarian.h
@@ -1724,7 +1726,7 @@ log_table${OBJ}: log_table.C log_select.h log.h time.h border.h model.h \
   alist.h symbol.h memutils.h library.h block.h syntax.h treelog.h plf.h \
   select.h destination.h units.h volume.h summary.h geometry.h mathlib.h \
   assertion.h dlf.h daisy.h program.h run.h timestep.h vcheck.h \
-  librarian.h
+  librarian.h scope_block.h scope.h
 log_harvest${OBJ}: log_harvest.C log.h time.h border.h model.h alist.h \
   symbol.h daisy.h program.h run.h memutils.h harvest.h block.h syntax.h \
   treelog.h plf.h dlf.h vcheck.h version.h assertion.h librarian.h
