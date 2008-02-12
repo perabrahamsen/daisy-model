@@ -129,6 +129,8 @@ public:
 
   // Communication with surface.
 public:
+  double MaxExfiltration (const Geometry&, size_t edge, 
+                          const Soil&, double T) const;
   double MaxExfiltration (const Geometry&, const Soil&, double T) const;
   double infiltration (const Geometry&) const; // [mm/h]
 

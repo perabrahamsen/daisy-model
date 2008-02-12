@@ -264,6 +264,15 @@ SoilWater::MaxExfiltration (const Geometry& geo,
 }
 
 double
+SoilWater::MaxExfiltration (const Geometry& geo, const size_t edge,
+                            const Soil& soil, const double T) const
+{
+  const size_t n = geo.edge_other (edge, Geometry::cell_above);
+  return (soil.K (n, h (n), h_ice (n), T) / soil.Cw2 (n, h (n))) 
+    * ((Theta (n) - soil.Theta_res (n)) / geo.z (n));
+}
+
+double
 SoilWater::infiltration (const Geometry& geo) const
 {
   const size_t edge_size = geo.edge_size ();

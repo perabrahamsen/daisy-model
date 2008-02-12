@@ -1,3 +1,8 @@
+2008-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C, soil_water.h (MaxExfiltration): New version that
+	takes ekstra 'edge' parameter.
+
 2008-02-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* soil_water.C, soil_water.h (K) Initialize and export.

@@ -6,6 +6,22 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.24
+
+** New 'aquitard' groundwater model.
+
+It is similar to the 'pipe' groundwater model, except that it does not
+actually include drain pipes.  Like the 'pipe' groundwater model, the
+'aquitard' model will create a dynamic groundwater table.  
+
+The intention is the that the 'aquitard' groundwater model should be
+used with the 'rectangle' movement model which supports explicit drain
+pipes, but it should work fine with 1D simulations as well.
+
+The parameters 'K_aquitard', 'Z_aquitard', 'h_aquifer', and
+'pressure_table' are supported with the same meaning as for the 'pipe'
+groundwater model.
+
 * 4.23
 
 ** New log models "Soil chemical" and "Field chemical" in "log-std.dai".

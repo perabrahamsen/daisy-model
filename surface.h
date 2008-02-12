@@ -33,7 +33,7 @@ class Treelog;
 class Surface
 {
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
 
 public:
   // Communication with soil water.
@@ -81,6 +81,7 @@ public:
   void put_ponding (double pond);	// [mm]
 
   // Create.
+  void initialize (const Geometry&);
   static void load_syntax (Syntax&, AttributeList&);
   Surface (const AttributeList& par);
   ~Surface ();
