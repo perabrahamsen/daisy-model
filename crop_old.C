@@ -1725,7 +1725,11 @@ CropOld::NetProduction (const Bioclimate& bioclimate,
   if (CrpAux.IncWRoot < 0.0)
     CrpAux.IncWRoot = f_Root * AssG - RMRoot;
   Prod.WLeaf += CrpAux.IncWLeaf;
+  if (Prod.WLeaf < 0.0)
+    Prod.WLeaf = 0.0;
   Prod.WRoot += CrpAux.IncWRoot;
+  if (Prod.WRoot < 0.0)
+    Prod.WRoot = 0.0;
 }
 
 void CropOld::emerge ()

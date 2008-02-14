@@ -263,6 +263,10 @@ Surface::tick (Treelog& msg,
              soil, soil_water, soil_T, dt); }
 
 void
+Surface::update_pond_average (const Geometry& geo)
+{ impl->update_pond_average (geo); }
+
+void
 Surface::Implementation::update_pond_average (const Geometry& geo)
 {
   const std::vector<int>& top_edges = geo.cell_edges (Geometry::cell_above);

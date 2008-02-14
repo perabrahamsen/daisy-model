@@ -1,6 +1,7 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* cvs add groundwater_aquitard.C (Makefile)
+
+* Hvorfor er startindholdet af vand et andet i 2d end i 1d?
 
 * decompose stof i litter som jord
 
@@ -12,85 +13,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 stof i mobil vand, immobil vand, makropore 1, 2, og n.
 
-* Mobil/immobil
+* 1D vs 2D drænvand artiklel
 
-1. h_immobil
-
-Placering:  Soil? Movement?  Stof?
-Værdi: ? h_fc?
-Default: ? h_wp? -inf?
-
-(på dette tidspunkt har intet ændret sig, det er bare en ny parameter)
-
-2. Opdel Chemical::C i C_m og C_im
-
-M_m = C_m Theta_m + A_m 
-M_im = C_im * Theta_im + A_im
-
-M = M_m + M_i
-A = A_m + A_i
-C = (M - A) / Theta
-
-(foreløber lader vi M/im/C_im/A_im være 0 så intet har ændret sig).
-
-3. Sorbtion
-
-Linear: 
-  M_i = f_i rho K C_i + Theta C_i
-  M_m = (1 - f_i) rho K C_m + Theta C_m
-
-Langmuir:
- M_i = f_i rho (my_max C_i) / (K + C_i) + Theta C_i
-
-Freundlich:
- M_i = f_i rho K C_i^m + Theta C_i
-
-Theta_immobil = Theta (h_immobil)
-f_i = int (Theta_res, Theta_immobil, h (Theta)) 
-    / int (Theta_res, Theta_sat, h (Theta)) 
-
-4. Transport
-
-C_m -> matrix_solute med "v" fra immobil vand
-
-C_i -> matrix_solid
-
-5. source/sink
-
-a) drain pipes
-   mobil
-
-b) passive root uptake
-   ?
-
-c) active root uptake
-   ?
-
-d) decompose
-   ?
-
-e) nitrification
-   ?
-
-g) denitrification
-   ?
-
-h) drip points
-   mobil
-
-6. diffusion (alpha)
-
-7 initialisering
-
-8 aktivering / deaktivering
-
-a) Hvad sker der når det mobile domæne aktiveres/deaktiveres?
-
-b) Hvad sker der med sorberet stof når det mobile domæne deaktiveres?
-
-c) Kan planter få fat i det?
-
-d) Kan det omsættes?
+søren, carsten
+marie, nanna, birgitte
+per, mikkel
 
 * OM init artikel
 

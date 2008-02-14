@@ -1,4 +1,18 @@
+2008-02-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.25 released.
+
+2008-02-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C, surface.h (Surface::update_pond_average): Export it.
+	* movement_rect.C (MovementRect::tick): 
+	* movement_1D.C (Movement1D::tick_water): 
+	* macro_std.C (MacroStandard::tick): Call it.
+
 2008-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* production.C (Production::tick): Prevent negative mass.
+	* crop_old.C (CropOld::NetProduction): Ditto.
 
 	* Version 4.24 released.
 

@@ -32,6 +32,7 @@
 #include "soil_water.h"
 #include "log.h"
 #include <map>
+#include <sstream>
 
 struct GroundwaterAquitard : public Groundwater
 {
@@ -79,7 +80,8 @@ struct GroundwaterAquitard : public Groundwater
       {
         const int edge = bottom_edges[i];
         const int cell = geo.edge_other (edge, Geometry::cell_below);
-        
+        const double in_sign = (geo.edge_to (edge) == cell) ? 1.0 : -1.0;
+
         // Multiplied with 2 because it is a boundary cell...
         const double Dz_i = 2 * geo.edge_length (edge);  
     
@@ -93,7 +95,24 @@ struct GroundwaterAquitard : public Groundwater
         // Flux into domain.
         const double q_up = -K_aquitard * (numerator / denominator 
                                            - h_aquifer / Z_aquitard + 1.0);
-        edge_flux[edge] = q_up;
+        edge_flux[edge] = in_sign * q_up;
+
+#if 0
+        Treelog::Open nest (msg, geo.edge_name (edge));
+        std::ostringstream tmp;
+        tmp << "cell = " << geo.cell_name (cell) << "\n"
+            << "in_sign = " << in_sign << "\n"
+            << "Dz_i = " <<  Dz_i << "\n"
+            << "K_i = " << K_i << "\n"
+            << "h_i = " << h_i << "\n"
+            << "numerator = " << numerator << "\n"
+            << "denominator = " << denominator << "\n"
+            << "q_up = " << q_up << "\n"
+            << "h_aquifer = " << h_aquifer << "\n"
+            << "Z_aquitard = " << Z_aquitard << "\n"
+            << "K_aquitard = " << K_aquitard;
+        msg.message (tmp.str ());
+#endif
       }
   }
   void output (Log& log) const
@@ -103,7 +122,7 @@ struct GroundwaterAquitard : public Groundwater
   }
 
   double table () const
-  { return 42.42e42; }
+  { return pressure_table->operator()(); }
 
   // Create and Destroy.
   void initialize (const Geometry& geo, const Time&,

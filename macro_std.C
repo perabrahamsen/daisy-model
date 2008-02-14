@@ -151,6 +151,7 @@ MacroStandard::tick (const Geometry1D& geo,
 	  daisy_assert (from == 0);
 	  q_p[0] = q_top;
 	  surface.accept_top (q_p[0], geo, 0U, dt, msg);
+          surface.update_pond_average (geo);
 	}
     }
 
@@ -281,7 +282,10 @@ MacroStandard::tick (const Geometry1D& geo,
 
   // Check that we got all the extra water stored somewhere.
   if (std::isnormal (extra_water))
-    surface.accept_top (extra_water, geo, 0U, dt, msg);
+    {
+      surface.accept_top (extra_water, geo, 0U, dt, msg);
+      surface.update_pond_average (geo);
+    }
 
   // Check that the sink terms add up.
   if (fabs (geo.total_surface (S_p) - q_top - extra_water) > 1.0e-11)

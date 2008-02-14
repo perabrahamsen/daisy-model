@@ -448,9 +448,17 @@ Production::tick (const double AirT, const double SoilT,
   NCrop -= (DeadNLeaf + DeadNRoot) * dt;
   daisy_assert (NCrop > 0.0);
   WLeaf += IncWLeaf * dt;
+  if (WLeaf < 0.0)
+    WLeaf = 0.0;
   WStem += IncWStem * dt;
+  if (WStem < 0.0)
+    WStem = 0.0;
   WSOrg += IncWSOrg * dt;
+  if (WSOrg < 0.0)
+    WSOrg = 0.0;
   WRoot += IncWRoot * dt;
+  if (WRoot < 0.0)
+    WRoot = 0.0;
   DailyNetRoot += (IncWRoot + DeadWRoot) * dt;
   DailyNetLeaf += (IncWRoot + DeadWRoot) * dt;
 

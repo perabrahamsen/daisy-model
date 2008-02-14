@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.25
+
+** Bug fixes.
+
 * 4.24
 
 ** New 'aquitard' groundwater model.

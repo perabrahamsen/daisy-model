@@ -236,6 +236,7 @@ Movement1D::tick_water (const Geometry1D& geo,
 
           // Update surface and groundwater reservoirs.
           surface.accept_top (q[0] * dt, geo, 0U, dt, msg);
+          surface.update_pond_average (geo);
           groundwater.accept_bottom ((q[soil.size ()]
                                       + q_p[soil.size ()]) * dt,
                                      geo, soil.size ());

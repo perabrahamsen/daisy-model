@@ -335,6 +335,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
 	  else
 	    surface.accept_top (surface.q_top (*geo, edge),
                                 *geo, edge, dt, msg);
+          surface.update_pond_average (*geo);
 	}
       if (geo->edge_from (edge) == Geometry::cell_below)
         groundwater.accept_bottom ((soil_water.q (edge)
