@@ -34,6 +34,8 @@
 #include <map>
 #include <sstream>
 
+#include <iostream>   //mmo
+
 struct GroundwaterAquitard : public Groundwater
 {
   // Parameters
@@ -45,8 +47,8 @@ struct GroundwaterAquitard : public Groundwater
   // Utility.
   void set_h_aquifer (const Geometry& geo)
   {
-    const double aquitart_bottom = geo.bottom () - Z_aquitard;
-    h_aquifer = pressure_table->operator()() - aquitart_bottom;
+    const double aquitard_bottom = geo.bottom () - Z_aquitard;
+    h_aquifer = pressure_table->operator()() - aquitard_bottom;
   }
 
   // Bottom flux.
@@ -88,6 +90,7 @@ struct GroundwaterAquitard : public Groundwater
         const double K_i = soil_water.K (cell);   //Conductivity in cell
         const double h_i = soil_water.h (cell);   //Pressure in cell
         
+
         const double numerator = K_i * (2.0 * h_i / Dz_i + 1.0)
           + K_aquitard * (h_aquifer / Z_aquitard - 1.0);
         const double denominator = K_aquitard + 2.0 * K_i * Z_aquitard / Dz_i;
