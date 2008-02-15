@@ -581,8 +581,8 @@ Soil::initialize_aquitard (Block& top,
   Block block (top, layer_syntax, layer_alist, "aquitard layer");
   impl->layers.push_back (new Implementation::Layer (block));
 
-  // Return the new value of Z_aquitard.
-  return Z_aquitard - Z_horizon;
+  // Return the old end of soil.
+  return old_end;
 }
 
 void
@@ -598,9 +598,9 @@ Soil::initialize (Block& block, Geometry& geo,
       // Find parameters.
       const double Z_aquitard = groundwater.Z_aquitard ();
       const double K_aquitard = groundwater.K_aquitard ();
-      const double new_Z_aq 
+      const double old_bottom 
         = initialize_aquitard (block, Z_aquitard, K_aquitard);
-      groundwater.set_Z_aquitard (new_Z_aq);
+      groundwater.set_original_bottom (old_bottom);
     }
   const bool volatile_bottom =
     groundwater.bottom_type () == Groundwater::lysimeter 

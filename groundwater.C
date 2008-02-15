@@ -51,7 +51,7 @@ Groundwater::K_aquitard () const
 { daisy_notreached (); }
 
 void 
-Groundwater::set_Z_aquitard (double)
+Groundwater::set_original_bottom (double)
 { daisy_notreached (); }
 
 void

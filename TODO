@@ -1,7 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Send paper og spreadsheet til Sayed & Mathias
 
-* Hvorfor er startindholdet af vand et andet i 2d end i 1d?
+* nedre rand
+
+* Fjern "SIM: (default daisy description)" fra log filer.
+
+* (when hourly) skal ikke logge hvert minut
+
+og (when minutely) skal have en enhed "/M"
 
 * decompose stof i litter som jord
 

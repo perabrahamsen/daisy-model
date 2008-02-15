@@ -44,16 +44,17 @@ class GroundwaterPipe : public Groundwater
   const double pipe_position;	// Height pipes are placed above surface. [cm]
   const double K_to_pipes_;	// Horizontal sat. conductivity. [cm h^-1]
   const double K_aquitard_;	// Conductivity of the aquitard. [cm h^-1]
-  /*const*/ double Z_aquitard_;	// Vertical length of the aquitard. [cm]
+  const double Z_aquitard_;	// Vertical length of the aquitard. [cm]
   std::auto_ptr<Depth> pressure_table; // Virtual groundwater height. [cm]
+  double original_bottom;       // Bottom of soil above aquitard. [cm]
 
   // Accessors.
   double Z_aquitard () const
   { return Z_aquitard_; }
   double K_aquitard () const
   { return K_aquitard_; }
-  void set_Z_aquitard (double value)
-  { Z_aquitard_ = value; }
+  void set_original_bottom (double value)
+  { original_bottom = value; }
 
   // Data.
   double height;		// Groundwater table height above surface. [cm]
@@ -87,10 +88,10 @@ public:
 private:
   void set_h_aquifer (const Geometry& geo)
   {
-    const double aquitart_bottom = geo.bottom () - Z_aquitard_;
+    const double aquitart_bottom = original_bottom - Z_aquitard_;
     h_aquifer = pressure_table->operator()() - aquitart_bottom;
   }
-  double DeepPercolation (const Geometry&);
+  double DeepPercolation ();
   double K_to_pipes (const unsigned int i, 
                      const Soil& soil, 
                      const SoilHeat& soil_heat) const;
@@ -184,22 +185,22 @@ GroundwaterPipe::tick (const Geometry& geo,
   soil_water.drain (S);
 
   // Find deep percolation.
-  deep_percolation = DeepPercolation (geo);
+  deep_percolation = DeepPercolation ();
 }
 
 
 double
-GroundwaterPipe::DeepPercolation (const Geometry& geo)
+GroundwaterPipe::DeepPercolation ()
 {
-  const int size = geo.cell_size ();
-  daisy_assert (size > 0);
-  const double hb = height - geo.bottom ();
+  const double hb = height - original_bottom;
 #if 0
   std::ostringstream tmp;
-  tmp << "height = " << height << ", bottom = " << geo.bottom ()
+  tmp << "height = " << height << ", bottom = " << original_bottom
       << ", hb = " << hb << ", h_aquifer = " << h_aquifer << "\n"
       << "Z_aquitard = " << Z_aquitard_ << ", deep = " 
-      << K_aquitard_ * (1.0 + (hb - h_aquifer) / Z_aquitard_);
+      << K_aquitard_ * (1.0 + (hb - h_aquifer) / Z_aquitard_)
+      << "deep = " 
+      << K_aquitard_ * (hb - (h_aquifer - Z_aquitard_)) / Z_aquitard_;
   Assertion::message (tmp.str ());
 #endif
   if (hb > 0)
@@ -312,8 +313,7 @@ GroundwaterPipe::initialize (const Geometry& geo, const Time& time,
   if (!pressure_table.get ())
     {
       // GCC 2.95 need the extra variable for the assignment.
-      std::auto_ptr<Depth> depth (Depth::create ((geo.bottom ()
-						  - Z_aquitard_)
+      std::auto_ptr<Depth> depth (Depth::create ((original_bottom - Z_aquitard_)
 						 + h_aquifer));
       pressure_table = depth;
     }

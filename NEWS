@@ -6,6 +6,13 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4 26
+
+** Bug Fix: 'pipe' groundwater gave 50% too much deep percolation.
+
+If you have a calibrated setup, multiply K_aquitard with 1.5 to get
+the same results as before.
+
 * 4.25
 
 ** Bug fixes.

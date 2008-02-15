@@ -53,10 +53,10 @@ public:
 
   // Groundwater.
   virtual bool is_pipe () const;
-  virtual double pipe_height () const;
-  virtual double Z_aquitard () const;
-  virtual double K_aquitard () const;
-  virtual void set_Z_aquitard (double);
+  virtual double pipe_height () const; // [cm]
+  virtual double Z_aquitard () const; // [cm]
+  virtual double K_aquitard () const; // [cm/h]
+  virtual void set_original_bottom (double /* [cm] */);
 
   // Simulation.
 public:
