@@ -132,6 +132,8 @@ public:
   virtual double crop_ds (symbol crop) const = 0; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
   virtual double crop_dm (symbol crop, double height) const = 0; 
+  // Drymatter in storage organ [kg/ha], or negative if no such crop is present
+  virtual double crop_sorg_dm (symbol crop) const = 0; 
   // All names of all crops on the column.
   virtual std::string crop_names () const = 0;
   // Lower limit of soil description.

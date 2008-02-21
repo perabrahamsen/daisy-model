@@ -154,6 +154,7 @@ public:
 
   double DS () const;
   double DM (double height) const;
+  double SOrg_DM () const;
   double total_N () const;
   double total_C () const;
   const std::vector<double>& root_density () const
@@ -379,6 +380,10 @@ CropSimple::DS () const
 double
 CropSimple::DM (double) const	
 { throw ("Can't take DM of simple crop model"); }
+
+double
+CropSimple::SOrg_DM () const	
+{ throw ("Can't estimate the dry matter with simple crop model"); }
 
 double
 CropSimple::total_N () const

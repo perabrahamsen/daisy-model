@@ -144,6 +144,7 @@ public:
   virtual double DS () const = 0; // Development stage, [-1:2] or DSremove.
   static const double DSremove;
   virtual double DM (double height) const = 0; // Shoot dry matter, [kg DM/ha].
+  virtual double SOrg_DM () const = 0;         // SOrg dry matter [kg DM/ha].
   virtual double total_N () const = 0; // N content [kg N/ha]
   virtual double total_C () const = 0; // C content [kg C/ha]
   virtual const std::vector<double>& root_density () const = 0;

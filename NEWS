@@ -22,6 +22,10 @@ without cutting the crop down.
 Dead leaves will no longer be harvested, unless you also have asked to
 harvest live leaves with the 'leaf' harvest parameter.
 
+** The 'crop_dm_over' condition now takes 'sorg_height' into account.
+
+Thus, root fruits will not be considered part of the shoot dry mass.
+
 ** Bug fix: 'pipe' groundwater gave 50% too much deep percolation.
 
 If you have a calibrated setup, multiply K_aquitard with 1.5 to get

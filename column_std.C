@@ -142,6 +142,7 @@ public:
   double second_year_utilization () const;// [kg N/ha]
   double crop_ds (symbol crop) const; 
   double crop_dm (symbol crop, double height) const; 
+  double crop_sorg_dm (const symbol name) const;
   std::string crop_names () const;
   double bottom () const;
 
@@ -539,6 +540,11 @@ double
 ColumnStandard::crop_dm (const symbol name, const double height) const
   //[kg/ha], negative when no crop
 { return vegetation->DM_by_name (name, height); }
+
+double 
+ColumnStandard::crop_sorg_dm (const symbol name) const
+  //[kg/ha], negative when no crop
+{ return vegetation->SOrg_DM_by_name (name); }
 
 std::string
 ColumnStandard::crop_names () const

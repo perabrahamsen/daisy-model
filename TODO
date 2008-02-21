@@ -1,7 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* opdater spreadsheet.
-
 * Tove
 
 ** crop_dm_above should obey storage_height
@@ -33,6 +31,24 @@ stof i mobil vand, immobil vand, makropore 1, 2, og n.
 søren, carsten
 marie, nanna, birgitte
 per, mikkel
+
+* ABA
+
+** ABA container in soil for every cell
+
+production function, decompose function 
+
+** Cycly broken by using ABAxylem for previous hour
+
+E_a = f (g_s)
+g_s = f (ABA_xylem)
+ABA_xylem = f (h, E_a)
+
+** Would like to calculate ABAxylem for night with "minimum transpiration".
+
+This gets the first light hour less wrong.
+
+* opdater spreadsheet.
 
 * OM init artikeltop  
 

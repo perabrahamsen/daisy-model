@@ -570,7 +570,7 @@ removed by harvest.  By default, there is no delay.");
               "Vertical location of storage organ.\n\
 Set this to a negative number for root fruits, this will cause harvesting\n\
 to imply a suitable tillage operation, and guarentee that harvest will kill\n\
-the plant.  By default, the storage organ is assumed to be located somewhere\n\
+the plant.  By default, the storage organ is assumed to be located far\n\
 above ground.");
 }
 

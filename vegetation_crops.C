@@ -115,6 +115,7 @@ struct VegetationCrops : public Vegetation
   // Individual crop queries.
   double DS_by_name (symbol name) const;
   double DM_by_name (symbol name, double height) const;
+  double SOrg_DM_by_name (symbol name) const;
   std::string crop_names () const;
 
   std::vector<double> total_root_density;
@@ -297,6 +298,29 @@ VegetationCrops::DM_by_name (symbol name, double height) const
        crop++)
     if ((*crop)->name == name)
       return (*crop)->DM (height);
+  return 0.0;
+}
+
+double 
+VegetationCrops::SOrg_DM_by_name (symbol name) const
+{
+  if (name == Vegetation::all_crops ())
+    {
+      double sum = 0.0;
+
+      for (CropList::const_iterator crop = crops.begin();
+	   crop != crops.end();
+	   crop++)
+	sum += (*crop)->SOrg_DM ();
+
+      return sum;
+    }
+  
+  for (CropList::const_iterator crop = crops.begin();
+       crop != crops.end();
+       crop++)
+    if ((*crop)->name == name)
+      return (*crop)->SOrg_DM ();
   return 0.0;
 }
 

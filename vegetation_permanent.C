@@ -117,6 +117,8 @@ struct VegetationPermanent : public Vegetation
   {   return Crop::DSremove; }
   double DM_by_name (symbol, double) const
   { return 0.0; }
+  double SOrg_DM_by_name (symbol) const
+  { return 0.0; }
   std::string crop_names () const
   { return name.name (); }
 

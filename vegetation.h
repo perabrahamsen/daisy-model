@@ -77,6 +77,7 @@ public:
 public:
   virtual double DS_by_name (symbol name) const = 0;// [-1:2]/DSremove
   virtual double DM_by_name (symbol name, double height) const = 0;// Shoot DM [kg/ha]
+  virtual double SOrg_DM_by_name (symbol name) const = 0;// SOrg DM [kg/ha]
   virtual std::string crop_names () const = 0;
   virtual const std::vector<double>& root_density () const = 0;
   virtual const std::vector<double>& root_density (symbol name) const = 0;

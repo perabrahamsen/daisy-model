@@ -132,6 +132,7 @@ public:
 
   double DS () const;
   double DM (double height) const;
+  double SOrg_DM () const;
   double total_N () const;
   double total_C () const;
   const std::vector<double>& root_density () const;
@@ -2047,6 +2048,13 @@ CropOld::DM (double above) const
   if (above > height ())
     return 0.0;
   return var.Prod.WLeaf * (1.0 - above / height ())
+    * 10;                       // [g/m^2 -> kg/ha]
+}
+
+double
+CropOld::SOrg_DM () const
+{ 
+  return var.Prod.WLeaf * par.Harvest.index
     * 10;                       // [g/m^2 -> kg/ha]
 }
 

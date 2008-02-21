@@ -169,6 +169,7 @@ public:
   double DS () const
   { return development->DS; }
   double DM (double height) const;
+  double SOrg_DM () const;
   double total_N () const
   { return production.total_N (); }
   double total_C () const
@@ -186,30 +187,33 @@ public:
 };
 
 double 
-CropStandard::DM (double height) const
+CropStandard::DM (const double height) const
 {
-  if (canopy.Height < height)
-    return 0.0;
-
-  const double stem_harvest = (1.0 - height / canopy.Height);
-  const double stub_CAI = (canopy.CAI > 0.0)
-    ? canopy.LAIvsH (height)
+  const double stem_harvest = bound (0.0, (1.0 - height / canopy.Height), 1.0);
+  const double leaf_harvest = (canopy.CAI > 0.0 && height < canopy.Height)
+    ? bound (0.0, (1.0 - canopy.LAIvsH (height)  / canopy.CAI), 1.0)
     : 0.0;
-  const double leaf_harvest = (1.0 - stub_CAI / canopy.CAI);
+  const double sorg_harvest = (height < harvesting.sorg_height) ? 1.0 : 0.0;
   const double total = stem_harvest * (production.WStem + production.WDead)
     + leaf_harvest * production.WLeaf 
-    + production.WSOrg;      // We shouldn't add this for root fruits.
+    + sorg_harvest * production.WSOrg;
 
 #if 0
   std::ostringstream tmp;
   tmp << "height = " << height << ", CAI (height) = "  
-      << canopy.LAIvsH (height) << ", CAI = " << canopy.CAI 
-      << ", leaf_harvest = " << leaf_harvest << ", total = " << total * 10.0;
+      << ((leaf_harvest > 0.0) ? canopy.LAIvsH (height) : 0.0 )
+      << ", CAI = " << canopy.CAI 
+      << ", leaf_harvest = " << leaf_harvest 
+      << ", sorg_harvest = " << sorg_harvest << ", total = " << total * 10.0;
   Assertion::message (tmp.str ());
 #endif
 
   return total * 10.0;          // [g/m^2 -> kg/ha]
 }
+
+double 
+CropStandard::SOrg_DM () const
+{ return production.WSOrg * 10.0 /* [g/m^2 -> kg/ha] */;}
 
 void
 CropStandard::initialize (const Geometry& geo,
@@ -631,9 +635,6 @@ CropStandard::pluck (const symbol column_name,
 	    development->DS = harvesting.DSnew;
 	  
 	  // Reset canopy.
-	  daisy_assert (approximate (canopy.CropHeight (production.WStem,
-							development->DS), 
-				     canopy.Height));
 	  canopy.CropCAI (production.WLeaf, production.WSOrg,
 			  production.WStem, development->DS);
 	  if (LAI () > 0.0)
