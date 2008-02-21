@@ -71,6 +71,11 @@ struct Field::Implementation
 		double sorg_harvest,
                 const bool combine,
 		std::vector<const Harvest*>&, Treelog&);
+  void pluck (const Time&, double dt, symbol name,
+              double stem_harvest, 
+              double leaf_harvest, 
+              double sorg_harvest,
+              std::vector<const Harvest*>&, Treelog&);
   void mix (double from, double to, double penetration, 
             const Time&, double dt, Treelog&);
   void swap (double from, double middle, double to, 
@@ -356,6 +361,36 @@ Field::Implementation::harvest (const Time& time, const double dt,
 			 stub_length,
 			 stem_harvest, leaf_harvest, sorg_harvest, combine,
                          total, out);
+	}
+    }
+}
+
+void
+Field::Implementation::pluck (const Time& time, const double dt,
+                              const symbol name,
+                              const double stem_harvest, 
+                              const double leaf_harvest, 
+                              const double sorg_harvest,
+                              std::vector<const Harvest*>& total,
+                              Treelog& out)
+{
+  if (selected)
+    {
+      Treelog::Open nest (out, selected->name);
+      selected->pluck (time, dt, name,
+                       stem_harvest, leaf_harvest, sorg_harvest, 
+                       total, out);
+    }
+  else
+    {
+      for (ColumnList::iterator i = columns.begin ();
+	   i != columns.end ();
+	   i++)
+	{
+	  Treelog::Open nest (out, (*i)->name);
+	  (*i)->pluck (time, dt, name,
+                       stem_harvest, leaf_harvest, sorg_harvest, 
+                       total, out);
 	}
     }
 }
@@ -812,6 +847,16 @@ Field::harvest (const Time& time, const double dt, const symbol name,
 		stub_length,
 		stem_harvest, leaf_harvest, sorg_harvest, combine, 
                 total, msg); }
+
+void
+Field::pluck (const Time& time, const double dt, const symbol name,
+              const double stem_harvest, 
+              const double leaf_harvest, 
+              const double sorg_harvest,
+              std::vector<const Harvest*>& total, Treelog& msg)
+{ impl.pluck (time, dt, name,
+              stem_harvest, leaf_harvest, sorg_harvest, 
+              total, msg); }
 
 void 
 Field::mix (const double from, const double to, 

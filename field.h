@@ -87,6 +87,9 @@ public:
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
                 bool combine,
 		std::vector<const Harvest*>&, Treelog&);
+  void pluck (const Time&, double dt, symbol name,
+              double stem_harvest, double leaf_harvest, double sorg_harvest,
+              std::vector<const Harvest*>&, Treelog&);
   void mix (double from, double to, double penetration, 
             const Time&, double dt, Treelog&);
   void swap (double from, double middle, double to, 

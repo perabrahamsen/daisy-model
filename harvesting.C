@@ -54,6 +54,7 @@ Harvesting::operator() (const symbol column_name,
 			double& DS,
 			const double stem_harvest,
 			const double leaf_harvest,
+			const double sorg_harvest,
 			const double stem_harvest_frac,
 			const double leaf_harvest_frac,
 			const double sorg_harvest_frac,
@@ -94,8 +95,7 @@ Harvesting::operator() (const symbol column_name,
                              total_old_C + production.CH2OPool * 12./30.));
 
   // Part of crop we attempt to harvest.
-  const double dead_harvest = 1.0;
-  const double sorg_harvest = 1.0;
+  const double dead_harvest = leaf_harvest;
 
   // Harvested yield and losses left in the field at harvest
   const double Stem_W_Yield
@@ -544,8 +544,8 @@ By default the value for DM is used.");
 	      Syntax::Const, "\
 Maximal development stage for which the crop survives harvest.");
   alist.add ("DSmax", 0.80);
-  static const RangeII range_new (0.0, 1.0);
-  syntax.add ("DSnew", Syntax::None (), range_new, Syntax::OptionalConst,
+  syntax.add ("DSnew", Syntax::None (), Check::non_negative (),
+              Syntax::OptionalConst,
 	      "New development stage after harvest.\n\
 If not specified, use the DS where an uncut crop would first reach the\n\
 height it now has after the cut.  I.e. it uses the inverse function of\n\

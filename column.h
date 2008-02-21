@@ -100,6 +100,12 @@ public:
 			double sorg_harvest, 
                         const bool combine,
 			std::vector<const Harvest*>& harvest, Treelog&) = 0;
+  virtual void pluck (const Time& time, double dt, const symbol crop_name,
+                      const double stem_harvest,
+                      const double leaf_harvest,
+                      const double sorg_harvest,
+                      std::vector<const Harvest*>& harvest, 
+                      Treelog& msg) = 0;
   virtual void mix (double from, double to, double penetration, 
                     const Time&, double dt, Treelog&) = 0;
   virtual void swap (double from, double middle, double to, 

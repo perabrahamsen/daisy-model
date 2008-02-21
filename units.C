@@ -563,6 +563,7 @@ Units::standard_conversions ()
   add ("g C/cm^3", "g/cm^3", 1.0);	// For "per dry matter" logging.
   add ("g N/cm^3", "g/cm^3", 1.0);	// For "per dry matter" logging.
   add ("g DM/m^2", "Mg DM/ha", 1.0e-2); // Crop production.
+  add ("kg DM/ha", "Mg DM/ha", 0.001);
   add ("g/m^2", "Mg DM/ha", 1.0e-2); // harvest DM.
   add ("g/m^2/h", "Mg DM/ha/h", 1.0e-2); // harvest DM.
   add ("g CO_2-C/cm^2/h", "g CO2/m^2/h", 1.7272e4); // OM CO2

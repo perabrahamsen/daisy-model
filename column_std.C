@@ -114,6 +114,12 @@ public:
                 double stub_length, double stem_harvest,
                 double leaf_harvest, double sorg_harvest, const bool combine,
                 std::vector<const Harvest*>& harvest, Treelog& msg);
+  void pluck (const Time& time, double dt, const symbol crop_name,
+              const double stem_harvest,
+              const double leaf_harvest,
+              const double sorg_harvest,
+              std::vector<const Harvest*>& harvest, 
+              Treelog& msg);
 
   void add_residuals (std::vector<AM*>& residuals);
   void mix (double from, double to, double penetration, 
@@ -348,7 +354,7 @@ ColumnStandard::harvest (const Time& time, const double dt,
                        stub_length, 
                        stem_harvest, leaf_harvest, sorg_harvest,
                        harvest, min_height, 
-                       residuals, harvest_DM, harvest_N, harvest_C, 
+                       harvest_DM, harvest_N, harvest_C, residuals, 
                        residuals_DM, residuals_N_top, residuals_C_top,
                        residuals_N_soil, residuals_C_soil,
                        combine, msg); 
@@ -364,6 +370,34 @@ ColumnStandard::harvest (const Time& time, const double dt,
     {
       const double removed_fraction = (old_LAI - new_LAI) / old_LAI;
       chemistry->harvest (removed_fraction, 1.0 - leaf_harvest, dt);
+    }
+}
+
+void 
+ColumnStandard::pluck (const Time& time, double dt, const symbol crop_name,
+                       const double stem_harvest,
+                       const double leaf_harvest,
+                       const double sorg_harvest,
+                       std::vector<const Harvest*>& harvest, 
+                       Treelog& msg)
+{ 
+  const double old_LAI = vegetation->LAI ();
+  std::vector<AM*> residuals;
+  vegetation->pluck (name, crop_name, time, geometry,
+                     stem_harvest, leaf_harvest, sorg_harvest,
+                     harvest, harvest_DM, harvest_N, harvest_C, 
+                     residuals, residuals_DM, residuals_N_top, residuals_C_top,
+                     residuals_N_soil, residuals_C_soil,msg); 
+  add_residuals (residuals);
+
+  // Chemicals removed by harvest.  BUG: We assume chemicals are above stub.
+  const double new_LAI = vegetation->LAI ();
+  if (new_LAI < 1e-5)
+    chemistry->harvest (1.0, 0.0, dt);
+  else if (new_LAI < old_LAI)
+    {
+      const double removed_fraction = (old_LAI - new_LAI) / old_LAI;
+      chemistry->harvest (removed_fraction, 0.0, dt);
     }
 }
 

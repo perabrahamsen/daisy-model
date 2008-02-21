@@ -53,6 +53,7 @@ public:
   const symbol name;
   static const char *const component;
   const double EpInterchange_;  // Soil to canopy pot-.evap. interchange.
+  static symbol all_crops ();         // Symbol matching all crops on field.
 
   // Canopy queries.
 public:
@@ -117,15 +118,31 @@ public:
 			double sorg_harvest,
 			std::vector<const Harvest*>& harvest,
                         double& min_height,
-			std::vector<AM*>& residuals,
 			double& harvest_DM, 
 			double& harvest_N, double& harvest_C,
+			std::vector<AM*>& residuals,
 			double& residuals_DM,
 			double& residuals_N_top, double& residuals_C_top,
 			std::vector<double>& residuals_N_soil,
 			std::vector<double>& residuals_C_soil,
                         const bool combine,
 			Treelog&) = 0;
+  virtual void pluck (symbol column_name,
+                      symbol crop_name,
+                      const Time&, const Geometry&, 
+                      double stem_harvest,
+                      double leaf_harvest, 
+                      double sorg_harvest,
+                      std::vector<const Harvest*>& harvest,
+                      double& harvest_DM, 
+                      double& harvest_N, double& harvest_C,
+                      std::vector<AM*>& residuals,
+                      double& residuals_DM,
+                      double& residuals_N_top,
+                      double& residuals_C_top,
+                      std::vector<double>& residuals_N_soil,
+                      std::vector<double>& residuals_C_soil,
+                      Treelog&) = 0;
   virtual void sow (Metalib&, const AttributeList& al, 
                     const Geometry&, OrganicMatter&, 
                     double& seed_N /* kg/ha/h */,

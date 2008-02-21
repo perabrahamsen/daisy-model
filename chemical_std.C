@@ -494,11 +494,9 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
     = old_canopy / (1.0 + dt * (canopy_dissipation_rate + washoff_rate));
   canopy_dissipate = canopy_dissipation_rate * canopy_storage;
   canopy_out = canopy_storage * washoff_rate + residuals;
-  daisy_assert (approximate (canopy_storage, 
-                             old_canopy - dt*(canopy_out - residuals
-					      + canopy_dissipate))
-		|| approximate (old_canopy - canopy_storage,
-				dt * (canopy_out - residuals + canopy_dissipate)));
+  daisy_balance (old_canopy, canopy_storage, 
+                 - dt * (canopy_out - residuals + canopy_dissipate));
+
   if (canopy_storage < 1e-18)
     {
       canopy_out += canopy_storage / dt;

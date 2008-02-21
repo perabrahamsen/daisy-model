@@ -550,7 +550,7 @@ HEADERS = $(INTERFACES:.C=.h) $(HEADONLY)
 
 # Find all printable files.
 #
-TEXT =  ChangeLog.2 ChangeLog.1 setup.nsi \
+TEXT =  ChangeLog.3 ChangeLog.2 ChangeLog.1 setup.nsi \
 	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB  $(DISABLED) \
 	$(HEADERS) $(SOURCES) $(ALLSYSHDR) $(ALLSYSSRC) \
 	$(ALLGUIHDR) $(ALLGUISRC) $(UTESTSRC)
@@ -1281,7 +1281,7 @@ block${OBJ}: block.C block.h syntax.h treelog.h symbol.h plf.h metalib.h \
   library.h alist.h librarian.h model.h stringer.h number.h assertion.h \
   scope_block.h scope.h
 dlf${OBJ}: dlf.C dlf.h symbol.h volume.h model.h alist.h assertion.h \
-  version.h daisy.h program.h run.h time.h memutils.h
+  version.h daisy.h program.h run.h time.h memutils.h toplevel.h
 texture${OBJ}: texture.C texture.h plf.h assertion.h mathlib.h
 destination${OBJ}: destination.C destination.h symbol.h
 symbol${OBJ}: symbol.C symbol.h assertion.h
@@ -1332,7 +1332,9 @@ submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
 groundwater_aquitard${OBJ}: groundwater_aquitard.C groundwater.h model.h \
-  symbol.h syntax.h treelog.h alist.h assertion.h librarian.h
+  symbol.h syntax.h treelog.h alist.h block.h plf.h librarian.h check.h \
+  assertion.h depth.h geometry.h mathlib.h soil_water.h log.h time.h \
+  border.h
 heatrect_Mollerup${OBJ}: heatrect_Mollerup.C heatrect.h model.h symbol.h \
   solver.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h plf.h alist.h block.h librarian.h
@@ -1583,7 +1585,7 @@ source_std${OBJ}: source_std.C source_file.h source.h model.h time.h symbol.h \
 action_markvand${OBJ}: action_markvand.C action.h model.h alist.h symbol.h \
   block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
   memutils.h field.h border.h crop.h im.h fao.h log.h mathlib.h \
-  assertion.h check.h vcheck.h librarian.h
+  assertion.h check.h vcheck.h librarian.h vegetation.h
 photo_GL${OBJ}: photo_GL.C photo.h model.h symbol.h block.h syntax.h \
   treelog.h plf.h canopy_std.h canopy_simple.h phenology.h alist.h \
   submodel.h mathlib.h assertion.h check.h librarian.h
@@ -1695,7 +1697,7 @@ hydraulic_M_vG_compact${OBJ}: hydraulic_M_vG_compact.C hydraulic.h model.h \
 action_crop${OBJ}: action_crop.C action.h model.h alist.h symbol.h daisy.h \
   program.h run.h time.h memutils.h field.h border.h crop.h am.h im.h \
   syntax.h treelog.h log.h harvest.h block.h plf.h check_range.h check.h \
-  submodeler.h assertion.h vcheck.h mathlib.h librarian.h
+  submodeler.h assertion.h vcheck.h mathlib.h librarian.h vegetation.h
 groundwater_lysimeter${OBJ}: groundwater_lysimeter.C groundwater.h model.h \
   symbol.h alist.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
   librarian.h
@@ -1788,7 +1790,8 @@ crop_std${OBJ}: crop_std.C crop.h time.h alist.h symbol.h model.h chemistry.h \
   harvesting.h production.h phenology.h partition.h vernalization.h \
   photo.h crpn.h wse.h log.h border.h timestep.h vcheck.h bioclimate.h \
   soil_water.h geometry.h syntax.h treelog.h mathlib.h assertion.h soil.h \
-  organic_matter.h soil_heat.h am.h im.h submodeler.h block.h librarian.h
+  organic_matter.h soil_heat.h am.h im.h submodeler.h block.h librarian.h \
+  memutils.h
 action_sow${OBJ}: action_sow.C action.h model.h alist.h symbol.h block.h \
   syntax.h treelog.h plf.h daisy.h program.h run.h time.h memutils.h \
   field.h border.h crop.h librarian.h
@@ -1813,7 +1816,7 @@ action_tillage${OBJ}: action_tillage.C action.h model.h alist.h symbol.h \
   memutils.h field.h border.h check.h librarian.h
 action_harvest${OBJ}: action_harvest.C action.h model.h alist.h symbol.h \
   daisy.h program.h run.h time.h memutils.h field.h border.h harvest.h \
-  block.h syntax.h treelog.h plf.h librarian.h
+  block.h syntax.h treelog.h plf.h librarian.h vegetation.h
 crop_old${OBJ}: crop_old.C crop.h time.h alist.h symbol.h model.h log.h \
   border.h bioclimate.h plf.h soil_water.h soil.h geometry.h syntax.h \
   treelog.h mathlib.h assertion.h aom.h om.h organic_matter.h soil_heat.h \

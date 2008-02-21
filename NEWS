@@ -8,10 +8,26 @@ release.
 
 * 4 26
 
-** Bug Fix: 'pipe' groundwater gave 50% too much deep percolation.
+** New 'pluck' and 'cut' actions.
+
+The 'cut' actions is identical to 'harvest', except that it will warn
+if the crop dies.  The existing 'harvest' action will now warn if the
+crop doesn't die.
+
+The 'pluck' action allows you to selectively harvest storage organs
+without cutting the crop down.
+
+** Less harvest of dead leaves.
+
+Dead leaves will no longer be harvested, unless you also have asked to
+harvest live leaves with the 'leaf' harvest parameter.
+
+** Bug fix: 'pipe' groundwater gave 50% too much deep percolation.
 
 If you have a calibrated setup, multiply K_aquitard with 1.5 to get
 the same results as before.
+
+** Bug fix: No longer ptint toplevel description in log files.
 
 * 4.25
 

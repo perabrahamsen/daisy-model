@@ -1,10 +1,18 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Send paper og spreadsheet til Sayed & Mathias
+* opdater spreadsheet.
 
-* nedre rand
+* Tove
 
-* Fjern "SIM: (default daisy description)" fra log filer.
+** crop_dm_above should obey storage_height
+
+** New operation to ask for storage organ size.
+
+** Update test-partial-harvest.dai
+
+** make release
+
+** mail Tove
 
 * (when hourly) skal ikke logge hvert minut
 
@@ -26,7 +34,7 @@ søren, carsten
 marie, nanna, birgitte
 per, mikkel
 
-* OM init artikel
+* OM init artikeltop  
 
 ** Formål
 

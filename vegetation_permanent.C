@@ -161,11 +161,22 @@ struct VegetationPermanent : public Vegetation
 		double, double, double, double, 
 		std::vector<const Harvest*>&,
                 double&,
- 		std::vector<AM*>&, 
 		double&, double&, double&,
-		double&, double&, double&, std::vector<double>&, std::vector<double>&,
+                std::vector<AM*>&, 
+		double&, double&, double&,
+                std::vector<double>&, std::vector<double>&,
                 const bool,
 		Treelog&)
+  { }
+  void pluck (symbol, symbol,
+              const Time&, const Geometry&, 
+              double, double, double,
+              std::vector<const Harvest*>&,
+              double&, double&, double&,
+              std::vector<AM*>&, 
+              double&, double&, double&,
+              std::vector<double>&, std::vector<double>&,
+              Treelog&)
   { }
   void sow (Metalib&, const AttributeList&, 
             const Geometry&, OrganicMatter&, 

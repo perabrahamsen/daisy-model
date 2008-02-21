@@ -29,6 +29,13 @@
 
 const char *const Vegetation::component = "vegetation";
 
+symbol 
+Vegetation::all_crops ()
+{
+  static const symbol all_symbol ("all");
+  return all_symbol;
+}
+
 double 
 Vegetation::shared_light_fraction () const
 { return 1.0; }

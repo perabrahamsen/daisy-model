@@ -26,6 +26,7 @@
 #include "assertion.h"
 #include "version.h"
 #include "daisy.h"
+#include "toplevel.h"
 #include <time.h>
 #include <ostream>
 
@@ -115,7 +116,9 @@ DLF::finish (std::ostream& out, const Daisy& daisy)
 
   // SIM:
   const std::string sim_description = al.name ("description");
-  if (sim_description != Daisy::default_description || value == Terse)
+  if ((sim_description != Daisy::default_description
+       && sim_description != Toplevel::default_description)
+      || value == Terse)
     {
       out << "SIM: ";
       for (unsigned int i = 0; i < sim_description.size (); i++)

@@ -100,7 +100,7 @@ struct UZRectMollerup : public UZRect
 			     ublas::banded_matrix<double>& Dm_mat, 
 			     ublas::vector<double>& Dm_vec, 
 			     ublas::vector<double>& Gm, 
-			     ublas::vector<double>& B);
+			     ublas::vector<double>& B, Treelog& msg);
   static void upperboundary (const GeometryRect& geo,
                              const Soil& soil, 
                              const ublas::vector<double>& T,
@@ -322,7 +322,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  ublas::vector<double> B (cell_size); // Neu bc 
 	  B = ublas::zero_vector<double> (cell_size);
 	  lowerboundary (geo, groundwater, active_lysimeter, h,
-			 K, dq, Dm_mat, Dm_vec, Gm, B);
+			 K, dq, Dm_mat, Dm_vec, Gm, B, msg);
 	  upperboundary (geo, soil, T, surface, state, remaining_water, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg);
 
@@ -402,7 +402,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  ublas::vector<double> B (cell_size); // Neu bc 
 	  B = ublas::zero_vector<double> (cell_size);
 	  lowerboundary (geo, groundwater, active_lysimeter, h,
-			 K, dq, Dm_mat, Dm_vec, Gm, B);
+			 K, dq, Dm_mat, Dm_vec, Gm, B, msg);
 	  upperboundary (geo, soil, T, surface, state, remaining_water, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg);
           Darcy (geo, Kedge, h, dq);
@@ -547,6 +547,8 @@ UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
                            ublas::vector<double>& Dm_vec, 
                            ublas::vector<double>& Gm)
 {
+  daisy_approximate (sin_angle, 1.0);
+
   Dm_mat (cell, cell) += K_area_per_length;
   const double Dm_vec_val = -K_area_per_length * pressure;
   Dm_vec (cell) += Dm_vec_val;
@@ -571,7 +573,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 			       ublas::banded_matrix<double>& Dm_mat, 
 			       ublas::vector<double>& Dm_vec, 
 			       ublas::vector<double>& Gm, 
-			       ublas::vector<double>& B)
+			       ublas::vector<double>& B, Treelog& msg)
 {
   const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
   const size_t edge_below_size = edge_below.size ();
@@ -656,6 +658,16 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
                        K (cell), h (cell),
                        value, pressure,
                        dq, Dm_mat, Dm_vec, Gm);
+#if 0
+            std::ostringstream tmp;
+            const double l = geo.edge_length (edge);
+            const double Darcy = -K (cell) * (1.0 + (h (cell) - pressure) / l);
+            tmp << "dq (cell) = " << dq (edge) << ", Darcy = " << Darcy
+                << ", l = " << l << ", area = " << area 
+                << ", area/l = " << geo.edge_area_per_length (edge) 
+                << " = " << area / l << ", K = " << K (cell);
+            msg.message (tmp.str ());
+#endif
           }
           break;
         case Groundwater::lysimeter:

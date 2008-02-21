@@ -79,6 +79,7 @@ public:
 			     double& DS,
 			     const double stem_harvest,
 			     const double leaf_harvest,
+			     const double sorg_harvest,
 			     const double stem_harvest_frac,
 			     const double leaf_harvest_frac,
 			     const double sorg_harvest_frac,

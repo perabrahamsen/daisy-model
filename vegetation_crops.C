@@ -155,14 +155,31 @@ struct VegetationCrops : public Vegetation
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
 		std::vector<const Harvest*>& harvest, double& min_height,
-                std::vector<AM*>& residuals,
 		double& harvest_DM, double& harvest_N, double& harvest_C, 
+                std::vector<AM*>& residuals,
 		double& residuals_DM,
 		double& residuals_N_top, double& residuals_C_top,
 		std::vector<double>& residuals_N_soil,
 		std::vector<double>& residuals_C_soil,
                 const bool combine,
 		Treelog&);
+  void pluck (symbol column_name,
+              symbol crop_name,
+              const Time&, const Geometry&, 
+              double stem_harvest,
+              double leaf_harvest, 
+              double sorg_harvest,
+              std::vector<const Harvest*>& harvest,
+              double& harvest_DM, 
+              double& harvest_N, double& harvest_C,
+              std::vector<AM*>& residuals,
+              double& residuals_DM,
+              double& residuals_N_top,
+              double& residuals_C_top,
+              std::vector<double>& residuals_N_soil,
+              std::vector<double>& residuals_C_soil,
+              Treelog&);
+  void cleanup_canopy (symbol crop_name, Treelog&);
   void sow (Metalib&, const AttributeList& al, 
             const Geometry&, OrganicMatter&, 
             double& seed_N /* kg/ha/h */, double& seed_C /* kg/ha/h */,
@@ -263,8 +280,7 @@ VegetationCrops::DS_by_name (symbol name) const
 double 
 VegetationCrops::DM_by_name (symbol name, double height) const
 {
-  static const symbol all_symbol ("all");
-  if (name == all_symbol)
+  if (name == Vegetation::all_crops ())
     {
       double sum = 0.0;
 
@@ -550,8 +566,7 @@ VegetationCrops::kill_all (symbol name, const Time& time,
 void
 VegetationCrops::emerge (const symbol crop_name, Treelog&)
 {
-  static const symbol all_symbol ("all");
-  const bool all = (crop_name == all_symbol);
+  const bool all = (crop_name == Vegetation::all_crops ());
 
   // Harvest all crops of this type.
   for (CropList::iterator crop = crops.begin();
@@ -572,9 +587,9 @@ VegetationCrops::harvest (const symbol column_name,
 			  double sorg_harvest, 
 			  std::vector<const Harvest*>& harvest,
                           double& min_height,
-			  std::vector<AM*>& residuals,
 			  double& harvest_DM, 
 			  double& harvest_N, double& harvest_C,
+			  std::vector<AM*>& residuals,
 			  double& residuals_DM, 
 			  double& residuals_N_top, double& residuals_C_top,
 			  std::vector<double>& residuals_N_soil,
@@ -582,8 +597,7 @@ VegetationCrops::harvest (const symbol column_name,
                           const bool combine,
 			  Treelog& msg)
 {
-  static const symbol all_symbol ("all");
-  const bool all = (crop_name == all_symbol);
+  const bool all = (crop_name == Vegetation::all_crops ());
 
   // Harvest all crops of this type.
   for (CropList::iterator crop = crops.begin();
@@ -633,6 +647,80 @@ VegetationCrops::harvest (const symbol column_name,
             msg.error (tmp.str ());
           }
       }
+
+  // Remove dead crops and reset canopy structure.
+  cleanup_canopy (crop_name, msg);
+}
+
+void 
+VegetationCrops::pluck (symbol column_name,
+                        symbol crop_name,
+                        const Time& time, const Geometry& geo, 
+                        double stem_harvest,
+                        double leaf_harvest, 
+                        double sorg_harvest,
+                        std::vector<const Harvest*>& harvest,
+                        double& harvest_DM, 
+                        double& harvest_N, double& harvest_C,
+                        std::vector<AM*>& residuals,
+                        double& residuals_DM, 
+                        double& residuals_N_top, double& residuals_C_top,
+                        std::vector<double>& residuals_N_soil,
+                        std::vector<double>& residuals_C_soil,
+                        Treelog& msg)
+{
+  const bool all = (crop_name == Vegetation::all_crops ());
+  
+  // Harvest all crops of this type.
+  for (CropList::iterator crop = crops.begin();
+       crop != crops.end();
+       crop++)
+    if (all || (*crop)->name == crop_name)
+      {
+        const double old_crop_C = (*crop)->total_C ();
+        const double old_residuals_C_top = residuals_C_top;
+        const double old_residuals_C_soil
+          = geo.total_surface (residuals_C_soil) * 10000;
+        const double old_residuals_C 
+          = old_residuals_C_top + old_residuals_C_soil;
+	const Harvest& mine 
+          = (*crop)->pluck (column_name, time, geo, 
+                            stem_harvest, leaf_harvest, sorg_harvest, 
+                            residuals, 
+                            residuals_DM, residuals_N_top, residuals_C_top,
+                            residuals_N_soil, residuals_C_soil, msg);
+	harvest_DM += mine.total_DM ();
+	harvest_N += mine.total_N ();
+	harvest_C += mine.total_C ();
+
+	harvest.push_back (&mine);
+
+        const double new_crop_C = Crop::ds_remove (*crop) 
+          ? 0.0 
+          : (*crop)->total_C ();
+        const double new_residuals_C 
+          = (residuals_C_top + geo.total_surface (residuals_C_soil) * 10000);
+        if (!balance (old_crop_C + 10 * old_residuals_C,
+                      new_crop_C + 10 * new_residuals_C,
+                      -10.0 * mine.total_C ()))
+          {
+            std::ostringstream tmp;
+            tmp << "delta Crop (" << new_crop_C - old_crop_C
+                << ") != harvest (" << mine.total_C () * 10 
+                << ") + delta residuals (" 
+                << 10 * (new_residuals_C - old_residuals_C) << ")";
+            msg.error (tmp.str ());
+          }
+      }
+
+  // Remove dead crops and reset canopy structure.
+  cleanup_canopy (crop_name, msg);
+}
+
+void
+VegetationCrops::cleanup_canopy (const symbol crop_name, Treelog& msg)
+{
+  const bool all = (crop_name == Vegetation::all_crops ());
 
   // Remove all dead crops.  There has to be a better way.
   bool removed;

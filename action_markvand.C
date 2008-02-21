@@ -34,6 +34,7 @@
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "vegetation.h"
 #include <vector>
 #include <memory>
 #include <sstream>
@@ -412,8 +413,8 @@ ActionMarkvand::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     return;
   
   // Emergence and harvest.
-  static const symbol all_symbol ("all");
-  const bool has_crop = daisy.field->crop_dm (all_symbol, 0.1) > 0.0; 
+  const bool has_crop
+    = daisy.field->crop_dm (Vegetation::all_crops (), 0.1) > 0.0; 
   if (T_sum < 0.0)
     {
       if (has_crop)

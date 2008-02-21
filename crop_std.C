@@ -46,6 +46,7 @@
 #include "submodeler.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "memutils.h"
 #include <sstream>
 #include <numeric>
 
@@ -146,6 +147,20 @@ public:
 			  std::vector<double>& residuals_C_soil,
                           const bool combine,
 			  Treelog&);
+  const Harvest& pluck (const symbol column_name,
+                        const Time& time,
+                        const Geometry& geometry,
+                        const double stem_harvest,
+                        const double leaf_harvest,
+                        const double sorg_harvest,
+                        std::vector<AM*>& residuals,
+                        double& residuals_DM,
+                        double& residuals_N_top,
+                        double& residuals_C_top,
+                        std::vector<double>& residuals_N_soil,
+                        std::vector<double>& residuals_C_soil,
+                        Treelog& msg);
+  
   double sorg_height () const 
   { return harvesting.sorg_height; }
   void output (Log&) const;
@@ -184,6 +199,14 @@ CropStandard::DM (double height) const
   const double total = stem_harvest * (production.WStem + production.WDead)
     + leaf_harvest * production.WLeaf 
     + production.WSOrg;      // We shouldn't add this for root fruits.
+
+#if 0
+  std::ostringstream tmp;
+  tmp << "height = " << height << ", CAI (height) = "  
+      << canopy.LAIvsH (height) << ", CAI = " << canopy.CAI 
+      << ", leaf_harvest = " << leaf_harvest << ", total = " << total * 10.0;
+  Assertion::message (tmp.str ());
+#endif
 
   return total * 10.0;          // [g/m^2 -> kg/ha]
 }
@@ -518,7 +541,7 @@ CropStandard::harvest (const symbol column_name,
     = harvesting (column_name, name, 
 		  root_system->Density,
 		  time, geometry, production, development->DS,
-		  stem_harvest, leaf_harvest, 
+		  stem_harvest, leaf_harvest, 1.0,
 		  stem_harvest_frac, leaf_harvest_frac, sorg_harvest_frac,
 		  kill_off, residuals, residuals_DM,
 		  residuals_N_top, residuals_C_top, 
@@ -558,6 +581,65 @@ CropStandard::harvest (const symbol column_name,
 	    CanopyStructure ();
 	  else
 	    msg.warning ("No CAI after harvest");
+	}
+    }
+  return harvest;
+}
+
+const Harvest&
+CropStandard::pluck (const symbol column_name,
+                     const Time& time,
+                     const Geometry& geometry,
+                     const double stem_harvest,
+                     const double leaf_harvest,
+                     const double sorg_harvest,
+                     std::vector<AM*>& residuals,
+                     double& residuals_DM,
+                     double& residuals_N_top, double& residuals_C_top,
+                     std::vector<double>& residuals_N_soil,
+                     std::vector<double>& residuals_C_soil,
+                     Treelog& msg)
+{
+  Treelog::Open nest (msg, "Plucking " + name);
+  
+  // Update nitrogen content.
+  nitrogen.content (development->DS, production, msg);
+
+  // Harvest.
+  const Harvest& harvest 
+    = harvesting (column_name, name, 
+		  root_system->Density,
+		  time, geometry, production, development->DS,
+		  stem_harvest, leaf_harvest, sorg_harvest,
+		  1.0, 1.0, 1.0,
+		  false, residuals, residuals_DM,
+		  residuals_N_top, residuals_C_top, 
+		  residuals_N_soil, residuals_C_soil,
+                  false,
+                  root_system->water_stress_days, 
+                  nitrogen.nitrogen_stress_days);
+
+  // Phenology may be affected.
+  if (!approximate (development->DS, DSremove))
+    {
+      nitrogen.cut (development->DS); // Stop fixation.
+
+      if (development->DS > 0.0)
+	{
+	  // Revert development.
+          if (harvesting.DSnew > 0.0 && development->DS > harvesting.DSnew)
+	    development->DS = harvesting.DSnew;
+	  
+	  // Reset canopy.
+	  daisy_assert (approximate (canopy.CropHeight (production.WStem,
+							development->DS), 
+				     canopy.Height));
+	  canopy.CropCAI (production.WLeaf, production.WSOrg,
+			  production.WStem, development->DS);
+	  if (LAI () > 0.0)
+	    CanopyStructure ();
+	  else
+	    msg.warning ("No canopy after harvest");
 	}
     }
   return harvest;

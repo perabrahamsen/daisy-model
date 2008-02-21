@@ -36,6 +36,8 @@ namespace Assertion
 void 
 Assertion::message (const std::string& msg)
 {
+  static std::ios_base::Init init;   // Can be called from static constructor.
+
   if (logs.size () == 0)
     std::cout << msg;
 
@@ -49,6 +51,8 @@ Assertion::message (const std::string& msg)
 void 
 Assertion::error (const std::string& msg)
 {
+  static std::ios_base::Init init;   // Can be called from static constructor.
+
   if (logs.size () == 0)
     std::cerr << msg << "\n";
   
@@ -62,6 +66,8 @@ Assertion::error (const std::string& msg)
 void 
 Assertion::warning (const std::string& msg)
 {
+  static std::ios_base::Init init;   // Can be called from static constructor.
+
   if (logs.size () == 0)
     std::cerr << msg << "\n";
 
@@ -75,6 +81,8 @@ Assertion::warning (const std::string& msg)
 void 
 Assertion::debug (const std::string& msg)
 {
+  static std::ios_base::Init init;   // Can be called from static constructor.
+
   if (logs.size () == 0)
     std::cerr << msg << "\n";
 

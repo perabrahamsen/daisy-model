@@ -60,6 +60,18 @@ double
 Crop::albedo () const
 { return 0.20; }
 
+const Harvest&
+Crop::pluck (const symbol, const Time&, const Geometry&,
+             const double, const double, const double,
+             std::vector<AM*>& residuals,
+             double& residuals_DM,
+             double& residuals_N_top,
+             double& residuals_C_top,
+             std::vector<double>& residuals_N_soil,
+             std::vector<double>& residuals_C_soil,
+             Treelog&)
+{ throw name + " is unpluckable"; }
+
 void
 Crop::kill (const symbol name, const Time& time, const Geometry& geo,
 	    std::vector<AM*>& residuals, double& residuals_DM,

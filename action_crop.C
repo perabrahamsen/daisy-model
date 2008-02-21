@@ -36,6 +36,7 @@
 #include "memutils.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "vegetation.h"
 #include <sstream>
 
 struct ActionCrop : public Action
@@ -335,9 +336,8 @@ ActionCrop::Annual::doIt (Daisy& daisy, const Scope&, Treelog& msg, symbol name)
       const double stem = remove_residuals ? 1.0 : 0.0;
       const double leaf = remove_residuals ? 1.0 : 0.0;
       const double sorg = (1.0 - loss);
-      static const symbol all_symbol ("all");
       daisy.field->harvest (daisy.time, daisy.dt, 
-                           all_symbol, stub, stem, leaf, sorg, 
+                            Vegetation::all_crops (), stub, stem, leaf, sorg, 
 			   false, daisy.harvest, msg);
       msg.message ("Annual harvest of " + name);
       done = true;
@@ -392,9 +392,8 @@ ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& msg)
   const double stem = 1.0;
   const double leaf = 1.0;
   const double sorg = 1.0;
-  static const symbol all_symbol ("all");
   daisy.field->harvest (daisy.time, daisy.dt,
-                       all_symbol, stub, stem, leaf, sorg, 
+                        Vegetation::all_crops (), stub, stem, leaf, sorg, 
 		       false, daisy.harvest, msg);
   msg.message ("Perennial harvest");
 }
