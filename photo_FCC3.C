@@ -121,8 +121,8 @@ PhotoFCC3::J_m (const double vmax25, const double T/*[degree C]*/) const
 
 void 
 PhotoFCC3::CxModel (const double CO2_atm, double& pn, double& ci, 
-		    const double PAR /*[mol/m²/s]*/, 
-		    const double gsw /*[mol/m²/s]*/, const double T, 
+		    const double PAR /*[mol/m²leaf/s]*/, 
+		    const double gsw /*[mol/m²leaf/s]*/, const double T, 
 		    const double vmax25 /*[mol/m² leaf/s]*/, 
 		    const double rd /*[mol/m² leaf/s]*/, Treelog& msg) const  
 {

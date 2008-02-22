@@ -108,19 +108,19 @@ PhotoFarquhar:: Sat_vapor_pressure (const double T /*[degree C]*/) const
 
 double
 PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, double rel_hum /*[unitless]*/, 
-			 double LA, double fraction, double gbw/*[mol/m2/s]*/, 
+			 double LA, double fraction, double gbw/*[mol/m2 leaf/s]*/, 
 			 const double Ta, const double Tl, Treelog&) 
 {
   const double wsf = ABA_effect; //water stress function []
   const double intercept = b * LA * fraction; //min conductance 
   daisy_assert (gbw >0.0);
-  const double rbw = 1./gbw;   //[s*m2/mol]
+  const double rbw = 1./gbw;   //[s*m2 leaf/mol]
 
   //leaf surface CO2
   const double cs = CO2_atm - (1.4 * pn * Ptot * rbw); //[Pa] 
   daisy_assert (cs > 0.0);
 
-  double pz; //[mol/m2/s]
+  double pz; //[mol/m²leaf/s]
   if(pn <= 0.) 
     pz = 1.0e-12;
   else 
@@ -145,15 +145,15 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
 
   double gsw; //stomatal conductance
   if(pn <= 0.0)
-    gsw = intercept;//[mol/m2/s]
+    gsw = intercept;//[mol/m²leaf/s]
   else 
     {
       daisy_assert (cs > Gamma);
-      gsw = wsf * (m*hs*pz*Ptot) /(cs-Gamma) + intercept;//[mol/m2/s]  
+      gsw = wsf * (m*hs*pz*Ptot) /(cs-Gamma) + intercept;//[mol/m²leaf/s]  
     }
   daisy_assert (gsw >= 0.0);
 
-  return gsw;//conductance[mol/m2/s]
+  return gsw;//conductance[mol/m²leaf/s]
 }
 
 double
@@ -235,8 +235,10 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
     ci_vector.push_back (0.0);//[Pa]
 
   // Stomata conductance (for logging)
-  while (gs_vector.size () < No)
+  while (gs_vector.size () < No)         //total (sun+shade)
     gs_vector.push_back (0.0);//[m/s]
+  while (gs_sun_vector.size () < No)     //sunlit  
+    gs_sun_vector.push_back (0.0);//[m/s]
      
   // CAI in each interval.
   const double dCAI = PAR_LAI / No;
@@ -256,9 +258,9 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
       if (LA * fraction [i] > 0)
 	{  
 	  // PAR in mol/m2/s = PAR in W/m2 * 0.0000046
-	  const double dPAR = (PAR[i] - PAR[i+1])/dCAI * 0.0000046; // W/m2->mol/m2/s
+	  const double dPAR = (PAR[i] - PAR[i+1])/dCAI * 0.0000046; //W/m2->mol/m²leaf/s
 	  // log variable
-	  PAR_ += dPAR * dCAI * 3600.0; //mol/m2/h/fraction
+	  PAR_ += dPAR * dCAI * 3600.0; //mol/m²area/h/fraction
 
 	  // Photosynthetic rubisco capacity 
 	  const double vmax25 = crop_Vm_total[i]*fraction[i];//[mol/m²leaf/s/fracti.]
@@ -273,8 +275,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 
 	  //solving photosynthesis and stomatacondctance model for each layer
 	  double ci  = 0.5 * CO2_atm;//first guess for ci, Pa
-	  double gsw = LA / 5.0; //first gues for stomatal cond. gsw, [mol/s/m²]
-
+	  double gsw = LA / 5.0; //first gues for stomatal cond,[mol/s/m²leaf]
 	  const int maxiter = 150;
 	  int iter = 0;
 	  double lastci;
@@ -284,8 +285,10 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	      lastci = ci; //Stomata CO2 pressure 
 
 	      //Calculating ci and "net"photosynthesis
-	      CxModel(CO2_atm, pn, ci, dPAR, gsw, Tl, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
-	      gsw = GSTModel(CO2_atm, ABA_effect, pn, rel_hum, LA, fraction[i], gbw, Ta, Tl, msg);//[mol/s/m²leaf/fraction]
+	      CxModel(CO2_atm, pn, ci, dPAR /*[mol/m²leaf/s]*/, 
+                      gsw, Tl, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
+	      gsw = GSTModel(CO2_atm, ABA_effect, pn, rel_hum, LA, 
+                    fraction[i], gbw, Ta, Tl, msg);//[mol/s/m²leaf/fraction]
 
 	      iter++;
 	      if(iter > maxiter)
@@ -305,14 +308,15 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 	  const double Jm_ = J_m(vmax25, Tl); //[mol/m² leaf/s/fraction]
 
 	  daisy_assert (pn_>= 0.0);
-	  Ass_ += LA * pn_; // [g/m²area/s] 
-	  Res += LA * rd_;  // [g/m²area/s] 
+	  Ass_ += LA * pn_; // [g/m²area/h] 
+	  Res += LA * rd_;  // [g/m²area/h] 
 	  daisy_assert (Ass_ >= 0.0);
 
 	  //log variables:
 	  Ass_vector[i]+= pn_* (molWeightCH2O / molWeightCO2) * LA;//[g CH2O/m²area/h]
 	  Nleaf_vector[i]+= rubisco_Ndist[i] * LA * fraction[i]; //[mol N/m²area]OK
-	  gs_vector[i]+= gsw * LA * fraction[i];    //[mol/m² area/s]
+	  gs_vector[i]+= gsw * LA * fraction[i];     //[mol/m² area/s]
+	  gs_sun_vector[i]= gsw * LA * fraction[i]; //[mol/m² area/s]
 	  ci_vector[i]+= ci * fraction[i];  //[Pa] OK
 	  Vm_vector[i]+= Vm_ * 1000.0 * LA * fraction[i]; //[mmol/m² area/s]OK
 	  Jm_vector[i]+= Jm_ * 1000.0 * LA * fraction[i]; //[mmol/m² area/s]OK
@@ -340,6 +344,7 @@ void
 PhotoFarquhar::clear ()
 {
   std::fill(gs_vector.begin (), gs_vector.end (), 0.0);
+  std::fill(gs_sun_vector.begin (), gs_sun_vector.end (), 0.0);
   std::fill(ci_vector.begin (), ci_vector.end (), 0.0);
   std::fill(Vm_vector.begin (), Vm_vector.end (), 0.0);
   std::fill(Jm_vector.begin (), Jm_vector.end (), 0.0);
@@ -367,6 +372,7 @@ PhotoFarquhar::output(Log& log) const
   output_variable (Ass_vector, log);
   output_variable (Nleaf_vector, log);
   output_variable (gs_vector, log);
+  output_variable (gs_sun_vector, log);
   output_variable (ci_vector, log);
   output_variable (Vm_vector, log);
   output_variable (Jm_vector, log);
@@ -430,17 +436,18 @@ PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("Vm_vector", "mmol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Photosynthetic capacity in each layer.");
   syntax.add ("Jm_vector", "mmol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Potential rate of electron transport in each layer.");
   syntax.add ("gs_vector", "mol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Stomata cunductance in each layer.");
+  syntax.add ("gs_sun_vector", "mol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Stomata cunductance in sunlit fraction of each layer.");
   syntax.add ("Nleaf_vector", "mol N/m^2", Syntax::LogOnly, Syntax::Sequence, "Distribution of photosynthetic N-leaf.");
-  syntax.add ("Ass_vector", "mol CH2O/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Brutto assimilate.");
+  syntax.add ("Ass_vector", "mol CH2O/m^2/h", Syntax::LogOnly, Syntax::Sequence, "Brutto assimilate.");
   syntax.add ("sun_LAI_vector", "mol CH2O/m^2/s", Syntax::LogOnly, Syntax::Sequence, "sunlit LAI.");
 
   syntax.add ("ci_middel", "Pa", Syntax::LogOnly, "Stomata average CO2 pressure.");
   syntax.add ("gs", "mol/m^2/s", Syntax::LogOnly, "Stomata conductance.");
-  syntax.add ("Ass", "g CH2O/m^2", Syntax::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
-  syntax.add ("Res", "g CH2O/m^2", Syntax::LogOnly, "Farquhar leaf respiration.");
+  syntax.add ("Ass", "g CH2O/m^2/h", Syntax::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
+  syntax.add ("Res", "g CH2O/m^2/h", Syntax::LogOnly, "Farquhar leaf respiration.");
   syntax.add ("LAI", "", Syntax::LogOnly, "Leaf area index for the canopy used in photosynthesis.");
   syntax.add ("sun_LAI", "", Syntax::LogOnly, "Leaf area index for the sunlit fraction.");
-  syntax.add ("PAR_", "mol/m^2/day", Syntax::LogOnly, "PAR.");
+  syntax.add ("PAR_", "mol/m^2/h", Syntax::LogOnly, "PAR.");
   syntax.add ("Vmax", "[mmol/m^2/s]", Syntax::LogOnly, "Photosynthetic Rubisco capacity.");
   syntax.add ("jm", "[mmol/m^2/s]", Syntax::LogOnly, "Potential rate of electron transport.");
   syntax.add ("leafPhotN", "[mol N/m^2]", Syntax::LogOnly, "Content of photosynthetic active leaf N.");

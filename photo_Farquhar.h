@@ -64,6 +64,7 @@ protected:
   std::vector<double> Ass_vector; // Brutto assimilate  
   std::vector<double> Jm_vector; // Potential rate of electron transport
   std::vector<double> gs_vector; // Stomata cunductance
+  std::vector<double> gs_sun_vector; // Stomata cunductance in sunlit leaves 
   std::vector<double> sun_LAI_vector; // sunlit LAI
   double ci_middel;              // Average stomata CO2 pressure per LAI units
   double Ass;                    // 'Netto' assimilate of CO2 
