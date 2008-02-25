@@ -52,6 +52,7 @@ struct ChemicalStandard : public Chemical
   const double crop_uptake_reflection_factor;
   const double canopy_dissipation_rate;
   const double canopy_washoff_coefficient;
+  const double surface_decompose_rate;
   const double diffusion_coefficient_; 
   const double decompose_rate;
   const PLF decompose_heat_factor_;
@@ -98,6 +99,7 @@ struct ChemicalStandard : public Chemical
   double surface_out;
   double surface_mixture;
   double surface_runoff;
+  double surface_decompose;
 
   // Soil state and log.
   std::vector<double> M_;	// Concentration in soil [g/cm^3]
@@ -116,7 +118,6 @@ struct ChemicalStandard : public Chemical
   std::vector<double> lag;
 
   // Utilities.
-  static double water_turnover_factor (double h);
   double decompose_heat_factor (const double T) const;
   double decompose_water_factor (const double h) const;
 
@@ -189,6 +190,7 @@ struct ChemicalStandard : public Chemical
 	      const Chemistry&, const Scope&, Treelog&) const;
   void initialize (const AttributeList&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
+  static double find_surface_decompose_rate (Block& al);
   ChemicalStandard (Block&);
 };
 
@@ -211,26 +213,6 @@ ChemicalStandard::Product::Product (Block& al)
 { }
 
 double
-ChemicalStandard::water_turnover_factor (const double h)
-{
-  if (h >= 0.0)
-    return 0.6;
-
-  const double pF = h2pF (h);
-
-  if (pF <= 0.0)
-    return 0.6;
-  if (pF <= 1.5)
-    return 0.6 + (1.0 - 0.6) * pF / 1.5;
-  if (pF <= 2.5)
-    return 1.0;
-  if (pF <= 6.5)
-    return 1.0 - (pF - 2.5) / (6.5 - 2.5);
-
-  return 0;
-}
-
-double
 ChemicalStandard::decompose_heat_factor (const double T) const
 {
   if (decompose_heat_factor_.size () < 1)
@@ -243,7 +225,7 @@ double
 ChemicalStandard::decompose_water_factor (const double h) const
 {
   if (decompose_water_factor_.size () < 1)
-    return water_turnover_factor (h);
+    return Abiotic::f_h (h);
   else
     return decompose_water_factor_ (h);
 }
@@ -513,7 +495,8 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   // Surface
   surface_in = canopy_out + (snow_out - canopy_in);
   surface_runoff = surface_storage * surface_runoff_rate; 
-  surface_storage += (surface_in - surface_runoff) * dt;
+  surface_decompose = surface_storage * surface_decompose_rate; 
+  surface_storage += (surface_in - surface_runoff - surface_decompose) * dt;
 
   // Mass balance.
   const double new_storage = snow_storage + canopy_storage;
@@ -705,11 +688,13 @@ ChemicalStandard::output (Log& log) const
   output_variable (surface_storage, log);
   output_variable (surface_in, log);
   output_variable (surface_runoff, log);
+  output_variable (surface_decompose, log);
   output_variable (surface_mixture, log);
   output_variable (surface_out, log);
   output_value (snow_storage + canopy_storage + surface_storage,
 		"top_storage", log);
-  output_value (canopy_dissipate + canopy_harvest + surface_runoff,
+  output_value (canopy_dissipate + canopy_harvest + surface_runoff 
+                + surface_decompose,
 		"top_loss", log);
   output_value (C_, "C", log);
   output_value (M_, "M", log);
@@ -883,6 +868,19 @@ ChemicalStandard::initialize (const AttributeList& al,
   lag.insert (lag.end (), cell_size - lag.size (), 0.0);
 }
 
+double
+ChemicalStandard::find_surface_decompose_rate (Block& al)
+{
+  if (al.check ("surface_decompose_rate"))
+    return al.number ("surface_decompose_rate");
+  if (al.check ("surface_decompose_halftime"))
+    return halftime_to_rate (al.number ("surface_decompose_halftime"));
+  if (al.check ("decompose_rate"))
+    return al.number ("decompose_rate");
+  
+  return halftime_to_rate (al.number ("decompose_halftime"));
+}
+
 ChemicalStandard::ChemicalStandard (Block& al)
   : Chemical (al),
     crop_uptake_reflection_factor 
@@ -894,6 +892,7 @@ ChemicalStandard::ChemicalStandard (Block& al)
            ? halftime_to_rate (al.number ("canopy_dissipation_halftime"))
            : al.number ("canopy_dissipation_rate_coefficient"))),
     canopy_washoff_coefficient (al.number ("canopy_washoff_coefficient")),
+    surface_decompose_rate (find_surface_decompose_rate (al)),
     diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
     decompose_rate (al.check ("decompose_rate")
                     ? al.number ("decompose_rate")
@@ -928,6 +927,7 @@ ChemicalStandard::ChemicalStandard (Block& al)
     surface_out (0.0),
     surface_mixture (0.0),
     surface_runoff (0.0),
+    surface_decompose (0.0),
     S_permanent (al.number_sequence ("S_permanent")),
     lag (al.check ("lag")
 	 ? al.number_sequence ("lag")
@@ -993,6 +993,15 @@ You may not specify both 'canopy_dissipation_rate' and \
       ok = false;
     }
 
+  if (al.check ("surface_decompose_rate") 
+      && al.check ("surface_decompose_halftime"))
+    {
+      msg.entry ("\
+You may not specify both 'surface_decompose_rate' and \
+'surface_decompose_halftime'");
+      ok = false;
+    }
+
   if (!al.check ("decompose_rate") && !al.check ("decompose_halftime"))
     {
       msg.entry ("\
@@ -1038,6 +1047,16 @@ You must specify it with either 'canopy_dissipation_halftime' or\n\
 	      "Obsolete alias for 'canopy_dissipation_rate'.");
   syntax.add_fraction ("canopy_washoff_coefficient", Syntax::Const, "\
 Fraction of the chemical that follows the water off the canopy.");
+  syntax.add ("surface_decompose_rate", "h^-1", 
+	      Check::fraction (), Syntax::OptionalConst,
+	      "How fast does the chemical decomposee on surface.\n\
+You must specify it with either 'surface_decompose_halftime' or\n\
+'surface_decompose_rate'.  If neither is specified, 'decompose_rate' is used.");
+  syntax.add ("surface_decompose_halftime", "h", 
+	      Check::positive (), Syntax::OptionalConst,
+	      "How fast does the chemical decompose on surface.\n\
+You must specify it with either 'surface_decompose_halftime' or\n\
+'surface_decompose_rate'.  If neither is specified, 'decompose_rate' is used.");
 
   // Soil parameters.
   syntax.add ("diffusion_coefficient", "cm^2/s", Check::non_negative (),
@@ -1143,6 +1162,8 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
 	      "Falling on the bare soil surface.");
   syntax.add ("surface_runoff", "g/m^2/h", Syntax::LogOnly, 
 	      "Removed through lateral movement on the soil.");
+  syntax.add ("surface_decompose", "g/m^2/h", Syntax::LogOnly, 
+	      "Decomposed from the surface.");
   syntax.add ("surface_mixture", "g/m^2/h", Syntax::LogOnly, 
 	      "Entering the soil through mixture with ponded water.");
   syntax.add ("surface_out", "g/m^2/h", Syntax::LogOnly, 

@@ -1,3 +1,9 @@
+2008-02-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemical_std.C (ChemicalStandard::water_turnover_factor): Moved.
+	* abiotic.C, abiotic.h (Abiotic::f_h): To here.
+	* organic_std.C (OrganicStandard::water_turnover_factor): Use it.
+
 2008-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.26 released.

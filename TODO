@@ -1,17 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Tove
-
-** crop_dm_above should obey storage_height
-
-** New operation to ask for storage organ size.
-
-** Update test-partial-harvest.dai
-
-** make release
-
-** mail Tove
-
 * (when hourly) skal ikke logge hvert minut
 
 og (when minutely) skal have en enhed "/M"
@@ -73,7 +61,6 @@ Udskudt:
 - decompose reaction
 - fjern decompose
 - elements
-doing - abiotic.[Ch]
 
 - horizon attributes skal være parametre
 geo skal i ScopeSoil, så man kan spørge på z

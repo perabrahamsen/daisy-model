@@ -24,6 +24,7 @@
 
 namespace Abiotic
 {
+  double f_h (double h);
   double f_T2 (double T);
   double f_T0 (double T);
 }

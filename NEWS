@@ -6,6 +6,19 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.27
+
+** Surface chemicals now decompose.
+
+The two new paramaters 'surface_decompose_rate' and
+'surface_decompose_halftime' determine how fast they decompose.  If
+they are both unspecified, the 'decompose_rate' (or
+'decompose_halftime') parameters are used instead.  No abiotic factors
+currently affects the surface docomposition, not is any decompose
+products produced (yet).
+
+Set 'surface_decompose_rate' to 0 in order to get the old behaviour.
+
 * 4 26
 
 ** New 'pluck' and 'cut' actions.

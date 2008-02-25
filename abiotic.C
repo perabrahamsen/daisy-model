@@ -24,9 +24,30 @@
 #include "mathlib.h"
 
 double
+Abiotic::f_h (double h)
+{
+  // Used by mineralization and chemical decomposition.
+  if (h >= 0.0)
+    return 0.6;
+
+  const double pF = h2pF (h);
+
+  if (pF <= 0.0)
+    return 0.6;
+  if (pF <= 1.5)
+    return 0.6 + (1.0 - 0.6) * pF / 1.5;
+  if (pF <= 2.5)
+    return 1.0;
+  if (pF <= 6.5)
+    return 1.0 - (pF - 2.5) / (6.5 - 2.5);
+
+  return 0;
+}
+
+double
 Abiotic::f_T0 (const double T)
 {
-  // Used by chemical decomposition.
+  // Used by mineralization and chemical decomposition.
   if (T < 0.0)
     return 0.0;
   if (T < 20.0)
@@ -47,6 +68,7 @@ Abiotic::f_T0 (const double T)
 double 
 Abiotic::f_T2 (const double T)
 {
+  // Used by nitrification and denitrification.
   if (T < 2.0)
     return 0.0;
   if (T < 6.0)

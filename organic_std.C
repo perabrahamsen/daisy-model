@@ -705,22 +705,8 @@ OrganicStandard::water_turnover_factor (double h) const
 {
   if (water_factor.size () > 0)
     return water_factor (h);
-
-  if (h >= 0.0)
-    return 0.6;
-
-  const double pF = h2pF (h);
-
-  if (pF <= 0.0)
-    return 0.6;
-  if (pF <= 1.5)
-    return 0.6 + (1.0 - 0.6) * pF / 1.5;
-  if (pF <= 2.5)
-    return 1.0;
-  if (pF <= 6.5)
-    return 1.0 - (pF - 2.5) / (6.5 - 2.5);
-
-  return 0;
+  
+  return Abiotic::f_h (h);
 }
 
 void
