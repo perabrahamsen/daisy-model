@@ -1283,7 +1283,8 @@ sum of all chemicals will be logged."
   (summary (balance (precision 3)
                     (input spray deposit)
                     (output canopy_harvest canopy_dissipate
-			    surface_runoff surface_out surface_tillage)
+			    surface_decompose 
+                            surface_runoff surface_out surface_tillage)
                     (content snow_storage canopy_storage surface_storage)))
   (when hourly)
   (entries ;; Year Month MDay Hour
@@ -1361,7 +1362,12 @@ sum of all chemicals will be logged."
                          surface_runoff)
                    (handle sum)
                    (dimension "g/ha/&")
-                   (spec chemical default surface_runoff))))
+                   (spec chemical default surface_runoff))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_decompose)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_decompose))))
 
 (deflog "Soil Chemicals" chemical
   "Summary information about chemicals in the soil."

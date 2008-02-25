@@ -243,6 +243,20 @@ VCheck::valid_hour ()
 }
 
 const VCheck& 
+VCheck::valid_minute ()
+{
+  static IRange valid_minute (0, 59);
+  return valid_minute;
+}
+
+const VCheck& 
+VCheck::valid_second ()
+{
+  static IRange valid_second (0, 59);
+  return valid_second;
+}
+
+const VCheck& 
 VCheck::increasing ()
 {
   static Increasing increasing;

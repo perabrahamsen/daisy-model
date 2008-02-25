@@ -45,6 +45,8 @@ public:
   static const VCheck& valid_month ();
   static const VCheck& valid_mday ();
   static const VCheck& valid_hour ();
+  static const VCheck& valid_minute ();
+  static const VCheck& valid_second ();
 
   class IRange;
 

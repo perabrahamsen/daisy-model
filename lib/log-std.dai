@@ -807,9 +807,9 @@ The total amount of water in the soil interval")
   (where "${colfid}field_${chemfid}.dlf")
   (summary (balance (precision 3)
                     (input "Spray" "Deposit" "External" "Transform")
-                    (output "Harvest" "Dissipate" "Runoff"
-                            "Decompose" "Leak-Matrix" "Leak-Macro" "Drain" 
-                            "Uptake")
+                    (output "Harvest" "Dissipate" "Surface Decompose" "Runoff"
+                            "Soil Decompose" "Leak-Matrix" "Leak-Macro" 
+                            "Drain" "Uptake")
                     (content "Snow" "Canopy" "Surface" "Soil")))
   (when hourly)
   (entries ;; Year Month MDay Hour
@@ -837,6 +837,12 @@ The total amount of water in the soil interval")
                    (handle sum)
                    (dimension "g/ha/&")
                    (spec chemical default canopy_dissipate))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_decompose)
+                   (tag "Surface Decompose")
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_decompose))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          surface_runoff)
                    (tag Runoff)
@@ -879,7 +885,7 @@ The total amount of water in the soil interval")
                      (spec chemical default S_root))
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" S_decompose)
-                     (tag "Decompose")
+                     (tag "Soil Decompose")
                      (handle sum)
                      (negate true)
                      (dimension "g/ha/&")

@@ -1,5 +1,13 @@
 2008-02-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* chemical_std.C (surface_decompose): New log variable.
+	(surface_decompose_rate, surface_decompose_halftime): New paramaters.
+	* lib/log.dai ("Surface Chemicals"): Use it.
+	* lib/log-std.dai ("Field chemical"): Use it.
+
+	* vcheck.C, vcheck.h (valid_hour, valid_minute): New static member
+	functions.
+
 	* chemical_std.C (ChemicalStandard::water_turnover_factor): Moved.
 	* abiotic.C, abiotic.h (Abiotic::f_h): To here.
 	* organic_std.C (OrganicStandard::water_turnover_factor): Use it.
