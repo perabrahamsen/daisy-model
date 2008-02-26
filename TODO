@@ -6,6 +6,10 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 og (when minutely) skal have en enhed "/M"
 
+** New "(every timestep)" condition
+
+Skal have logable "last" state vairable.
+
 * row width
 
 * InitLAI erstatning

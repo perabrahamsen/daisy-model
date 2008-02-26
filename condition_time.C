@@ -35,12 +35,16 @@ struct ConditionMMDD : public Condition
   const int month;
   const int day;
   const int hour;
+  const int minute;
+  const int second;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
   {
     return daisy.time.month () == month
       && daisy.time.mday () == day 
-      && daisy.time.hour () == hour; 
+      && daisy.time.hour () == hour
+      && daisy.time.minute () == minute
+      && daisy.time.second () == second; 
   }
 
   void output (Log&) const
@@ -48,7 +52,6 @@ public:
 
   void tick (const Daisy&, const Scope&, Treelog&)
   { }
-
   void initialize (const Daisy&, const Scope&, Treelog&)
   { }
 
@@ -59,7 +62,9 @@ public:
     : Condition (al),
       month (al.integer ("month")),
       day (al.integer ("day")),
-      hour (al.integer ("hour"))
+      hour (al.integer ("hour")),
+      minute (al.integer ("minute")),
+      second (al.integer ("second"))
   { }
   static Model& make (Block& al)
   { return *new ConditionMMDD (al); }
@@ -70,15 +75,38 @@ struct ConditionBeforeMMDD : public Condition
   const int month;
   const int day;
   const int hour;
+  const int minute;
+  const int second;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
   {
-    return daisy.time.month () < month
-      || (daisy.time.month () == month
-	  && daisy.time.mday () < day)
-      || (daisy.time.month () == month
-	  && daisy.time.mday () == day
-	  && daisy.time.hour () < hour);
+    if (daisy.time.month () < month)
+      return true;
+    if (daisy.time.month () > month)
+      return false;
+
+    if (daisy.time.mday () < day)
+      return true;
+    if (daisy.time.mday () > day)
+      return false;
+
+    if (daisy.time.hour () < hour)
+      return true;
+    if (daisy.time.hour () > hour)
+      return false;
+
+    if (daisy.time.minute () < minute)
+      return true;
+    if (daisy.time.minute () > minute)
+      return false;
+
+    if (daisy.time.second () < second)
+      return true;
+    if (daisy.time.second () > second)
+      return false;
+
+    // Equal
+    return false;
   }
   void output (Log&) const
   { }
@@ -96,7 +124,9 @@ public:
     : Condition (al),
       month (al.integer ("month")),
       day (al.integer ("day")),
-      hour (al.integer ("hour"))
+      hour (al.integer ("hour")),
+      minute (al.integer ("minute")),
+      second (al.integer ("second"))
   { }
   static Model& make (Block& al)
   { return *new ConditionBeforeMMDD (al); }
@@ -107,15 +137,38 @@ struct ConditionAfterMMDD : public Condition
   const int month;
   const int day;
   const int hour;
+  const int minute;
+  const int second;
 public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
   {
-    return daisy.time.month () > month
-      || (daisy.time.month () == month
-	  && daisy.time.mday () > day)
-      || (daisy.time.month () == month
-	  && daisy.time.mday () == day
-	  && daisy.time.hour () > hour);
+    if (daisy.time.month () < month)
+      return false;
+    if (daisy.time.month () > month)
+      return true;
+
+    if (daisy.time.mday () < day)
+      return false;
+    if (daisy.time.mday () > day)
+      return true;
+
+    if (daisy.time.hour () < hour)
+      return false;
+    if (daisy.time.hour () > hour)
+      return true;
+
+    if (daisy.time.minute () < minute)
+      return false;
+    if (daisy.time.minute () > minute)
+      return true;
+
+    if (daisy.time.second () < second)
+      return false;
+    if (daisy.time.second () > second)
+      return true;
+
+    // Equal
+    return true;
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -133,7 +186,9 @@ public:
     : Condition (al),
       month (al.integer ("month")),
       day (al.integer ("day")),
-      hour (al.integer ("hour"))
+      hour (al.integer ("hour")),
+      minute (al.integer ("minute")),
+      second (al.integer ("second"))
   { }
   static Model& make (Block& al)
   { return *new ConditionAfterMMDD (al); }
@@ -580,14 +635,20 @@ ConditionTimeSyntax::ConditionTimeSyntax ()
     at_alist.add ("description", "\
 True a specific month, day and hour in the year.");
     at_alist.add ("hour", 8);
+    at_alist.add ("minute", 0);
+    at_alist.add ("second", 0);
     AttributeList& before_alist = *new AttributeList ();
     before_alist.add ("description", "\
 True before specific month, day and hour in the year.");
     before_alist.add ("hour", 8);
+    before_alist.add ("minute", 0);
+    before_alist.add ("second", 0);
     AttributeList& after_alist = *new AttributeList ();
     after_alist.add ("description", "\
 True after specific month, day and hour in the year.");
     after_alist.add ("hour", 8);
+    after_alist.add ("minute", 0);
+    after_alist.add ("second", 0);
     syntax.add ("month", Syntax::Integer, Syntax::Const, 
 		"Month to test for.");
     syntax.add_check ("month", VCheck::valid_month ());
@@ -597,6 +658,12 @@ True after specific month, day and hour in the year.");
     syntax.add ("hour", Syntax::Integer, Syntax::Const, 
 		"Hour to test for.");
     syntax.add_check ("hour", VCheck::valid_hour ());
+    syntax.add ("minute", Syntax::Integer, Syntax::Const, 
+		"Minute to test for.");
+    syntax.add_check ("hour", VCheck::valid_minute ());
+    syntax.add ("second", Syntax::Integer, Syntax::Const, 
+		"Second to test for.");
+    syntax.add_check ("second", VCheck::valid_second ());
     syntax.order ("month", "day");
     syntax.add_check (check_mday);
     Librarian::add_type (Condition::component, "mm_dd", at_alist, syntax,
@@ -748,3 +815,5 @@ Timestep to use.");
                          &ConditionTimestep::make);
   }
 }
+
+// condition_time.C ends here.
