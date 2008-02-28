@@ -40,6 +40,7 @@
 class AttributeList;
 class Syntax;
 class Log;
+class Block;
 
 class EXPORT Time
 {
@@ -113,14 +114,18 @@ public:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   explicit Time (const AttributeList&);
+  explicit Time (Block&);
 
   // Construct.
 public:
+  static const Time& null ();
   const Time& operator= (const Time&);
   Time (int year, int month, int mday, int hour,
         int minute = 0, int second = 0);
   Time (const Time&);
   ~Time ();
+private:                    
+  explicit Time ();
 };
 
 #endif // TIME_H

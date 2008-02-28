@@ -1,14 +1,23 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Check cvs2
-
 * (when hourly) skal ikke logge hvert minut
 
 og (when minutely) skal have en enhed "/M"
 
-** New "(every timestep)" condition
+DONE: New "(every timestep)" condition
+DONE: Skal have logable "last" state vairable.
 
-Skal have logable "last" state vairable.
+** omskriv ...ly til at bruge every.
+
+* Nanna
+
+** "power function" i c horizon
+
+** (anisotropy 0.025) i b horizon 
+
+** Varierende tryk?
+
+* Check cvs2
 
 * row width
 

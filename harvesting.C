@@ -33,6 +33,7 @@
 #include "mathlib.h"
 #include "submodel.h"
 #include "check_range.h"
+#include "submodeler.h"
 #include <numeric>
 
 // Dimensional conversion.
@@ -45,28 +46,28 @@ static double DM_to_C_factor (double E)
 }
 
 const Harvest&
-Harvesting::operator() (const symbol column_name,
-			const symbol crop_name,
-			const std::vector<double>& density,
-			const Time& time,
-			const Geometry& geo,
-			Production& production,
-			double& DS,
-			const double stem_harvest,
-			const double leaf_harvest,
-			const double sorg_harvest,
-			const double stem_harvest_frac,
-			const double leaf_harvest_frac,
-			const double sorg_harvest_frac,
-			const bool kill_off,
-			std::vector<AM*>& residuals,
-			double& residuals_DM,
-			double& residuals_N_top, double& residuals_C_top,
-			std::vector<double>& residuals_N_soil,
-			std::vector<double>& residuals_C_soil,
-                        const bool combine,
-                        double& water_stress_days,
-                        double& nitrogen_stress_days)
+Harvesting::harvest (const symbol column_name,
+                     const symbol crop_name,
+                     const std::vector<double>& density,
+                     const Time& time,
+                     const Geometry& geo,
+                     Production& production,
+                     double& DS,
+                     const double stem_harvest,
+                     const double leaf_harvest,
+                     const double sorg_harvest,
+                     const double stem_harvest_frac,
+                     const double leaf_harvest_frac,
+                     const double sorg_harvest_frac,
+                     const bool kill_off,
+                     std::vector<AM*>& residuals,
+                     double& residuals_DM,
+                     double& residuals_N_top, double& residuals_C_top,
+                     std::vector<double>& residuals_N_soil,
+                     std::vector<double>& residuals_C_soil,
+                     const bool combine,
+                     double& water_stress_days,
+                     double& nitrogen_stress_days)
 {
   const double old_DM = production.DM ();
 
@@ -308,10 +309,7 @@ Harvesting::operator() (const symbol column_name,
       // Cut delay.
       const double removed_DM = old_DM - production.DM ();
       production_delay = cut_delay (removed_DM);
-      if (!last_cut)
-	last_cut = new Time (time);
-      else
-	*last_cut = time;
+      last_cut = time;
     }
   else
     {
@@ -475,9 +473,9 @@ Harvesting::tick (const Time& time)
     cut_stress = 0.0;
   else
     {
-      if (!last_cut)
-        last_cut = new Time (time);
-      const Timestep step = time - *last_cut;
+      if (last_cut == Time::null ())
+        last_cut = time;
+      const Timestep step = time - last_cut;
       const double days_between = step.total_hours () / 24.0;
       daisy_assert (days_between >= 0.0);
       
@@ -498,8 +496,8 @@ Harvesting::tick (const Time& time)
 void 
 Harvesting::output (Log& log) const
 { 
-  if (last_cut)
-    output_submodule (*last_cut, "last_cut", log);
+  if (last_cut != Time::null ())
+    output_submodule (last_cut, "last_cut", log);
   output_variable (production_delay, log);
   output_variable (cut_stress, log);
 }
@@ -574,7 +572,7 @@ the plant.  By default, the storage organ is assumed to be located far\n\
 above ground.");
 }
 
-Harvesting::Harvesting (const AttributeList& al)
+Harvesting::Harvesting (Block& al)
   : Stem (al.alist_sequence ("Stem")),
     Leaf (al.alist_sequence ("Leaf")),
     Dead (al.alist_sequence ("Dead")),
@@ -586,7 +584,9 @@ Harvesting::Harvesting (const AttributeList& al)
                      : al.number ("EconomicYield_W")),
     DSmax (al.number ("DSmax")),
     DSnew (al.number ("DSnew", -44.0)),
-    last_cut (al.check ("last_cut") ? new Time (al.alist ("last_cut")) : NULL),
+    last_cut (al.check ("last_cut")
+              ? submodel_value<Time> (al, "last_cut") 
+              : Time::null ()),
     production_delay (al.number ("production_delay")),
     cut_delay (al.plf ("cut_delay")),
     cut_stress (0.0),
@@ -594,10 +594,7 @@ Harvesting::Harvesting (const AttributeList& al)
 { }
 
 Harvesting::~Harvesting ()
-{ 
-  if (last_cut)
-    delete last_cut;
-}
+{  }
 
 static Submodel::Register 
 soil_submodel ("Harvesting", Harvesting::load_syntax);

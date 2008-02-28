@@ -1,3 +1,12 @@
+2008-02-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_time.C (every): New model.
+	* harvesting.C (Harvesting::harvest): Renamed from 'operator ()'.
+	* crop_std.C: Update caller.
+	* submodeler.h (submodel_value): New template.
+	* timestep.C (Timestep::null): New function.
+	* time.C (Time::null): New function.
+
 2008-02-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* condition_time.C (mm_dd, before_mm_dd, after_mm_dd): Take

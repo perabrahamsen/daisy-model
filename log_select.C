@@ -71,9 +71,11 @@ LogSelect::done (const std::vector<Time::component_t>& time_columns,
 { }
 
 bool
-LogSelect::initial_match (const Daisy&, Treelog&)
+LogSelect::initial_match (const Daisy& daisy, Treelog&)
 {
-  is_active = false;
+  condition->initiate_log (daisy);
+
+ is_active = false;
 
   for (std::vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 
@@ -82,6 +84,7 @@ LogSelect::initial_match (const Daisy&, Treelog&)
       is_active = true;
 
   is_printing = is_active;
+
   return is_active;
 }
 

@@ -54,6 +54,20 @@ map_construct_const (const std::vector<const AttributeList*>& f)
 // New style (block scope).
 
 template <class T> 
+T
+submodel_value (Block& parent, const std::string& key)
+{ 
+  Block nested (parent, key);
+  try
+    { return T (nested); }
+  catch (const std::string& err)
+    { nested.error ("Submodel value build failed: " + err); }
+  catch (const char *const err)
+    { nested.error ("Submodel value build failed: " + std::string (err)); }
+  return T::null ();
+}
+
+template <class T> 
 T*
 submodel_block (Block& nested)
 { 

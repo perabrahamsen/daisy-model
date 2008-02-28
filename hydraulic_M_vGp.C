@@ -19,7 +19,7 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// van Genuchten retention curve model with Mualem theory and power function..
+// van Genuchten retention curve model with Mualem theory and power function.
 
 #define BUILD_DLL
 
@@ -191,3 +191,5 @@ Water Resources Research 2003.");
     
   Librarian::add_type (Hydraulic::component, "M_vGp", alist, syntax, make);
 }
+
+// hydraulic_M_vGp.C ends here.

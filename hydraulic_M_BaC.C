@@ -140,3 +140,5 @@ HydraulicM_BaCSyntax::HydraulicM_BaCSyntax ()
 
   Librarian::add_type (Hydraulic::component, "M_BaC", alist, syntax, make);
 }
+
+// hydraulic_M_BaC.C ends here.

@@ -36,6 +36,10 @@ Condition::Condition (Block& al)
     alist (al.alist ())
 { }
 
+void 
+Condition::initiate_log (const Daisy&)
+{ }
+
 Condition::Condition (const char *const id)
   : name (id)
 { }

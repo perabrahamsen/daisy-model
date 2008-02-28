@@ -56,7 +56,7 @@ class CropStandard : public Crop
 public:
   const std::auto_ptr<RootSystem> root_system;
   CanopyStandard canopy;
-  Harvesting harvesting;
+  std::auto_ptr<Harvesting> harvesting;
   Production production;
   std::auto_ptr<Time> last_time;
   std::auto_ptr<Phenology> development;
@@ -162,7 +162,7 @@ public:
                         Treelog& msg);
   
   double sorg_height () const 
-  { return harvesting.sorg_height; }
+  { return harvesting->sorg_height; }
   void output (Log&) const;
 
   // Queries.
@@ -193,7 +193,7 @@ CropStandard::DM (const double height) const
   const double leaf_harvest = (canopy.CAI > 0.0 && height < canopy.Height)
     ? bound (0.0, (1.0 - canopy.LAIvsH (height)  / canopy.CAI), 1.0)
     : 0.0;
-  const double sorg_harvest = (height < harvesting.sorg_height) ? 1.0 : 0.0;
+  const double sorg_harvest = (height < harvesting->sorg_height) ? 1.0 : 0.0;
   const double total = stem_harvest * (production.WStem + production.WDead)
     + leaf_harvest * production.WLeaf 
     + sorg_harvest * production.WSOrg;
@@ -229,7 +229,7 @@ CropStandard::initialize (const Geometry& geo,
   if (DS >= 0)
     {
       // Dead organic matter.
-      production.initialize (name, harvesting.Root, harvesting.Dead,
+      production.initialize (name, harvesting->Root, harvesting->Dead,
                              geo, organic_matter);
       
       // Update derived state content.
@@ -277,7 +277,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   const double& DS = development->DS;
 
   // Update cut stress.
-  harvesting.tick (time);
+  harvesting->tick (time);
 
   // Update average soil temperature.
   const double T_soil = geo.content_at (soil_heat, &SoilHeat::T,
@@ -326,14 +326,14 @@ CropStandard::tick (const Time& time, const double relative_humidity,
           if (!production.AM_root)
             {
               production.AM_root
-                = &AM::create (geo.cell_size (), time, harvesting.Root,
+                = &AM::create (geo.cell_size (), time, harvesting->Root,
                                name, root_symbol, AM::Locked);
               organic_matter.add (*production.AM_root);
             }
           if (!production.AM_leaf)
             {
               production.AM_leaf
-                = &AM::create (geo.cell_size (), time, harvesting.Dead,
+                = &AM::create (geo.cell_size (), time, harvesting->Dead,
                                name, dead_symbol, AM::Locked);
               organic_matter.add (*production.AM_leaf);
 	    }
@@ -341,11 +341,11 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 	    {
 	      if (!production.AM_root)
 		production.AM_root
-		  = &AM::create (geo.cell_size (), time, harvesting.Root,
+		  = &AM::create (geo.cell_size (), time, harvesting->Root,
 				 name, root_symbol, AM::Unlocked);
 	      if (!production.AM_leaf)
 		production.AM_leaf
-		  = &AM::create (geo.cell_size (), time, harvesting.Dead,
+		  = &AM::create (geo.cell_size (), time, harvesting->Dead,
 				 name, dead_symbol, AM::Unlocked);
 	    }
 	}
@@ -468,7 +468,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 	Ass *= water_stress_effect->factor (water_stress);
       if (enable_N_stress)
 	Ass *= (1.0 - nitrogen_stress);
-      Ass *= (1.0 - harvesting.cut_stress);
+      Ass *= (1.0 - harvesting->cut_stress);
       production.CanopyAss = Ass;
       daisy_assert (Ass >= 0.0);
     }
@@ -491,7 +491,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 
   development->tick_daily (bioclimate.daily_air_temperature (), 
                            production.leaf_growth (), production, 
-                           vernalization, harvesting.cut_stress, msg);
+                           vernalization, harvesting->cut_stress, msg);
   root_system->tick_daily (geo, soil, 
                            production.WRoot, production.root_growth (),
                            DS, msg);
@@ -542,17 +542,18 @@ CropStandard::harvest (const symbol column_name,
     }
 
   const Harvest& harvest 
-    = harvesting (column_name, name, 
-		  root_system->Density,
-		  time, geometry, production, development->DS,
-		  stem_harvest, leaf_harvest, 1.0,
-		  stem_harvest_frac, leaf_harvest_frac, sorg_harvest_frac,
-		  kill_off, residuals, residuals_DM,
-		  residuals_N_top, residuals_C_top, 
-		  residuals_N_soil, residuals_C_soil,
-                  combine,
-                  root_system->water_stress_days, 
-                  nitrogen.nitrogen_stress_days);
+    = harvesting->harvest (column_name, name, 
+                           root_system->Density,
+                           time, geometry, production, development->DS,
+                           stem_harvest, leaf_harvest, 1.0,
+                           stem_harvest_frac, leaf_harvest_frac,
+                           sorg_harvest_frac,
+                           kill_off, residuals, residuals_DM,
+                           residuals_N_top, residuals_C_top, 
+                           residuals_N_soil, residuals_C_soil,
+                           combine,
+                           root_system->water_stress_days, 
+                           nitrogen.nitrogen_stress_days);
 
   if (!approximate (development->DS, DSremove))
     {
@@ -561,7 +562,7 @@ CropStandard::harvest (const symbol column_name,
       if (development->DS > 0.0)
 	{
 	  // Revert development.
-	  if (harvesting.DSnew < 0.0)
+	  if (harvesting->DSnew < 0.0)
 	    {
 	      // We want a cut to always put back development, even
 	      // for a crop which is so retarded that it has no stem
@@ -570,8 +571,8 @@ CropStandard::harvest (const symbol column_name,
 	      if (development->DS > DS_height)
 		development->DS = std::max (DS_height, 0.01);
 	    }
-	  else if (development->DS > harvesting.DSnew)
-	    development->DS = harvesting.DSnew;
+	  else if (development->DS > harvesting->DSnew)
+	    development->DS = harvesting->DSnew;
 	  
 	  // Cut canopy.
 	  canopy.cut (production.WStem, development->DS, stub_length);
@@ -611,17 +612,17 @@ CropStandard::pluck (const symbol column_name,
 
   // Harvest.
   const Harvest& harvest 
-    = harvesting (column_name, name, 
-		  root_system->Density,
-		  time, geometry, production, development->DS,
-		  stem_harvest, leaf_harvest, sorg_harvest,
-		  1.0, 1.0, 1.0,
-		  false, residuals, residuals_DM,
-		  residuals_N_top, residuals_C_top, 
-		  residuals_N_soil, residuals_C_soil,
-                  false,
-                  root_system->water_stress_days, 
-                  nitrogen.nitrogen_stress_days);
+    = harvesting->harvest (column_name, name, 
+                           root_system->Density,
+                           time, geometry, production, development->DS,
+                           stem_harvest, leaf_harvest, sorg_harvest,
+                           1.0, 1.0, 1.0,
+                           false, residuals, residuals_DM,
+                           residuals_N_top, residuals_C_top, 
+                           residuals_N_soil, residuals_C_soil,
+                           false,
+                           root_system->water_stress_days, 
+                           nitrogen.nitrogen_stress_days);
 
   // Phenology may be affected.
   if (!approximate (development->DS, DSremove))
@@ -631,8 +632,8 @@ CropStandard::pluck (const symbol column_name,
       if (development->DS > 0.0)
 	{
 	  // Revert development.
-          if (harvesting.DSnew > 0.0 && development->DS > harvesting.DSnew)
-	    development->DS = harvesting.DSnew;
+          if (harvesting->DSnew > 0.0 && development->DS > harvesting->DSnew)
+	    development->DS = harvesting->DSnew;
 	  
 	  // Reset canopy.
 	  canopy.CropCAI (production.WLeaf, production.WSOrg,
@@ -651,7 +652,7 @@ CropStandard::output (Log& log) const
 {
   output_submodule (*root_system, "Root", log);
   output_submodule (canopy, "Canopy", log);
-  output_submodule (harvesting, "Harvest", log);
+  output_submodule (*harvesting, "Harvest", log);
 #if 1
   static const symbol Prod_symbol ("Prod");
   if (log.check_interior (Prod_symbol))
@@ -675,7 +676,7 @@ CropStandard::CropStandard (Block& al)
   : Crop (al),
     root_system (submodel<RootSystem> (al, "Root")),
     canopy (al.alist ("Canopy")),
-    harvesting (al.alist ("Harvest")),
+    harvesting (submodel<Harvesting> (al, "Harvest")),
     production (al.alist ("Prod")),
     last_time (al.check ("last_time")
                ? new Time (al.alist ("last_time"))
@@ -752,3 +753,5 @@ light though.  Competition for water and nutrients are unaffected.");
   alist.add ("min_light_fraction", 0.0);
   Librarian::add_type (Crop::component, "default", alist, syntax, &make);
 }
+
+// crop_std.C ends here.

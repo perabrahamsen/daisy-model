@@ -134,6 +134,13 @@ Timestep::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("seconds", 0);
 }
 
+const Timestep& 
+Timestep::null ()
+{
+  static Timestep none (99999, 99999, 99999, 99999, 99999);
+  return none;
+}
+
 Timestep::Timestep (Block& al)
   : impl (new Implementation (al.integer ("years"), 
                               al.integer ("days"),

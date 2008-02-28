@@ -45,6 +45,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Daisy&, const Scope&, Treelog&) = 0;
+  virtual void initiate_log (const Daisy& daisy);
   virtual bool match (const Daisy&, const Scope&, Treelog&) const = 0;
   virtual void output (Log&) const = 0;
 

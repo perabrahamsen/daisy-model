@@ -32,7 +32,6 @@
 class AttributeList;
 class Syntax;
 class Log;
-class Time;
 class Geometry;
 class Production;
 class AM;
@@ -58,7 +57,7 @@ private:
 public:
   const double DSnew;		// Maximal development stage after harvest.
 private:
-  Time* last_cut;		// Date of last cut.
+  Time last_cut;		// Date of last cut.
   double production_delay;	// Production delay after cut [d]
   const PLF cut_delay;		// -||- as function of removed fraction.
 public:
@@ -70,35 +69,35 @@ public:
                                 // plant and imply a mix operation.
   // Simulation.
 public:
-  const Harvest& operator() (symbol column_name,
-			     symbol crop_name,
-			     const std::vector<double>& density,
-			     const Time& time,
-			     const Geometry& geometry,
-			     Production& production,
-			     double& DS,
-			     const double stem_harvest,
-			     const double leaf_harvest,
-			     const double sorg_harvest,
-			     const double stem_harvest_frac,
-			     const double leaf_harvest_frac,
-			     const double sorg_harvest_frac,
-			     const bool kill_off,
-			     std::vector<AM*>& residuals,
-			     double& residuals_DM,
-			     double& residuals_N_top, double& residuals_C_top,
-			     std::vector<double>& residuals_N_soil,
-			     std::vector<double>& residuals_C_soil,
-                             const bool combine,
-                             double& water_stress_days,
-                             double& nitrogen_stress_days);
+  const Harvest& harvest (symbol column_name,
+                          symbol crop_name,
+                          const std::vector<double>& density,
+                          const Time& time,
+                          const Geometry& geometry,
+                          Production& production,
+                          double& DS,
+                          const double stem_harvest,
+                          const double leaf_harvest,
+                          const double sorg_harvest,
+                          const double stem_harvest_frac,
+                          const double leaf_harvest_frac,
+                          const double sorg_harvest_frac,
+                          const bool kill_off,
+                          std::vector<AM*>& residuals,
+                          double& residuals_DM,
+                          double& residuals_N_top, double& residuals_C_top,
+                          std::vector<double>& residuals_N_soil,
+                          std::vector<double>& residuals_C_soil,
+                          const bool combine,
+                          double& water_stress_days,
+                          double& nitrogen_stress_days);
   void tick (const Time& time);
   void output (Log& log) const;
 
   // Create and Destroy.
 public:
   static void load_syntax (Syntax& syntax, AttributeList& alist);
-  Harvesting (const AttributeList&);
+  Harvesting (Block&);
   ~Harvesting ();
 };
 

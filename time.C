@@ -29,6 +29,7 @@
 #include "alist.h"
 #include "vcheck.h"
 #include "submodel.h"
+#include "block.h"
 #include <sstream>
 #include <iomanip>
 
@@ -543,6 +544,16 @@ Time::load_syntax (Syntax& syntax, AttributeList& alist)
 Monday is 1, Sunday is 7.");
 }
 
+Time::Time (Block& al)
+  : impl (new Implementation (al.integer ("year"), 
+                              mday2yday (al.integer ("year"),
+                                         al.integer ("month"),
+                                         al.integer ("mday")),
+                              al.integer ("hour"),
+                              al.integer ("minute"),
+                              al.integer ("second")))
+{ }
+
 Time::Time (const AttributeList& al)
   : impl (new Implementation (al.integer ("year"), 
                               mday2yday (al.integer ("year"),
@@ -557,6 +568,13 @@ static Submodel::Register
 time_submodel ("Time", Time::load_syntax);
 
 // @ Construct.
+
+const Time& 
+Time::null ()
+{
+  static Time no_time;
+  return no_time;
+}
 
 const Time& 
 Time::operator= (const Time& t)
@@ -580,6 +598,10 @@ Time::Time (const Time& t)
 { }
 
 Time::~Time ()
+{ }
+
+Time::Time ()
+  : impl (new Implementation (99999, 99999, 99999, 99999, 99999))
 { }
 
 // Operators.

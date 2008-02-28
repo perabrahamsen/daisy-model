@@ -1,7 +1,8 @@
-// condition_time.C
+// condition_time.C -- Conditions realted to simulation time.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2008 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -28,6 +29,9 @@
 #include "daisy.h"
 #include "vcheck.h"
 #include "librarian.h"
+#include "timestep.h"
+#include "log.h"
+#include "submodeler.h"
 #include <sstream>
 
 struct ConditionMMDD : public Condition
@@ -815,5 +819,73 @@ Timestep to use.");
                          &ConditionTimestep::make);
   }
 }
+
+// The 'every' condition.
+
+struct ConditionEvery : public Condition
+{
+  const Timestep interval;
+  Time next;
+  bool does_match;
+
+public:
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
+  { return does_match; }
+
+  void output (Log& log) const
+  { 
+    output_submodule (next, "next", log);
+  }
+  
+  void tick (const Daisy& daisy, const Scope&, Treelog&)
+  { 
+    does_match = (next <= daisy.time);
+
+    if (!does_match)
+      return;
+    
+    next = daisy.time + interval;
+  }
+  void initiate_log (const Daisy& daisy)
+  { next = daisy.time + interval - *daisy.timestep; }
+
+  void initialize (const Daisy& daisy, const Scope&, Treelog&)
+  { initiate_log (daisy); }
+  
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ConditionEvery (Block& al)
+    : Condition (al),
+      interval (submodel_value<Timestep> (al, "interval")),
+      next (al.check ("next")
+            ? submodel_value<Time> (al, "next")
+            : Time::null ()),
+      does_match (false)
+  { }
+  
+  static Model& make (Block& al)
+  { return *new ConditionEvery (al); }
+};
+
+static struct ConditionEverySyntax
+{
+  ConditionEverySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Matches simulation with fixed time intervals.");
+    syntax.add_submodule ("interval", alist, Syntax::Const,
+                          "Time interval between matches.",
+                          Timestep::load_syntax);
+    syntax.add_check ("interval", Timestep::positive ());
+    // syntax.order ("interval");
+    syntax.add_submodule ("next", alist, Syntax::OptionalState,
+                          "Time for next match.",
+                          Time::load_syntax);
+    Librarian::add_type (Condition::component, "every", alist, syntax,
+                         &ConditionEvery::make);
+  }
+} ConditionEvery_syntax;
 
 // condition_time.C ends here.
