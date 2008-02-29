@@ -530,47 +530,6 @@ True, iff the simulation time is after the specified time.");
     Librarian::add_type (Condition::component, "after", alist_after, syntax,
                          &ConditionAfter::make);
   }
-  // Every nth something.
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist_hour = *new AttributeList ();
-    alist_hour.add ("description", "True every 'step' hours.\n\
-Warning, this may be imprecise around new year.");
-    AttributeList& alist_day = *new AttributeList ();
-    alist_day.add ("description", "True every 'step' days.\n\
-Or, more precisely, at 23 hour when the Julian day modulo\n\
-'step' is zero.");
-    AttributeList& alist_week = *new AttributeList ();
-    alist_week.add ("description", "True every 'step' week.\n\
-Or, more precisely, sunday at 23 hour when the week number\n\
-modulo 'step' is zero.");
-    AttributeList& alist_month = *new AttributeList ();
-    alist_month.add ("description", "True every 'step' month.\n\
-Or, more precisely, the last hour in each month, where\n\
-the month number modulo 'step' is 0.");
-    AttributeList& alist_year = *new AttributeList ();
-    alist_year.add ("description", "True every 'step' year.\n\
-Or, more precisely, the last hour of each year, where the year\n\
-plus one modulo 'step' is 0.");
-    syntax.add ("step", Syntax::Integer, Syntax::Const,
-		"Number of time periods between this condition is true.");
-    syntax.order ("step");
-    alist_hour.add ("step", 1);
-    alist_day.add ("step", 1);
-    alist_week.add ("step", 1);
-    alist_month.add ("step", 1);
-    alist_year.add ("step", 1);
-    Librarian::add_type (Condition::component, "hourly", alist_hour, syntax,
-                         &ConditionHourly::make);
-    Librarian::add_type (Condition::component, "daily", alist_day, syntax,
-                         &ConditionDaily::make);
-    Librarian::add_type (Condition::component, "weekly", alist_week, syntax,
-                         &ConditionWeekly::make);
-    Librarian::add_type (Condition::component, "monthly", alist_month, syntax,
-                         &ConditionMonthly::make);
-    Librarian::add_type (Condition::component, "yearly", alist_year, syntax,
-                         &ConditionYearly::make);
-  }
   // Specific hour.
   {
     Syntax& syntax = *new Syntax ();
@@ -650,19 +609,19 @@ Timestep to use.");
   }
 }
 
-// The 'end' model.
+// The 'end' base model.
 
 struct ConditionEnd : public Condition
 {
   const std::string timestep_name;
-  typedef int Time::entry_type () const;
+  typedef int (Time::*entry_type) () const;
   entry_type entry;
 
   const std::string timestep ()
   { return timestep_name; } 
 
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return daisy.time.*entry () != (daisy.time + daisy.timestep).*entry (); }
+  { return (daisy.time.*entry) () != ((daisy.time + daisy.timestep).*entry) (); }
 
   void output (Log&) const
   { }
@@ -675,41 +634,19 @@ struct ConditionEnd : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionEnd (Block& al)
-    : Condition (al)
+  ConditionEnd (Block& al, const std::string& tstep, entry_type e)
+    : Condition (al),
+      timestep_name (tstep),
+      entry (e)
   { }
 };
 
 // The 'hourly' model.
 
-struct ConditionHourly : public Condition
-{
-  const std::string timestep ()
-  { return "h"; } 
-
-  bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return daisy.time.hour () != (daisy.time + daisy.timestep).hour (); }
-
-  void output (Log&) const
-  { }
-  void tick (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  void initialize (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  bool check (const Daisy&, const Scope&, Treelog&) const
-  { return true; }
-
-  ConditionHourly (Block& al)
-    : Condition (al)
-  { }
-};
-
 static struct ConditionHourlySyntax
 {
   static Model& make (Block& al)
-  { return *new ConditionHourly (al); }
+  { return *new ConditionEnd (al, "h", &Time::hour); }
 
   ConditionHourlySyntax ()
   {
@@ -719,6 +656,102 @@ static struct ConditionHourlySyntax
     Librarian::add_type (Condition::component, "hourly", alist, syntax, make);
   }
 } ConditionHourly_syntax;
+
+// The 'secondly' model.
+
+static struct ConditionSecondlySyntax
+{
+  static Model& make (Block& al)
+  { return *new ConditionEnd (al, "h", &Time::second); }
+
+  ConditionSecondlySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True at the end of each second.");
+    Librarian::add_type (Condition::component, "secondly", alist, syntax, make);
+  }
+} ConditionSecondly_syntax;
+
+// The 'minutely' model.
+
+static struct ConditionMinutelySyntax
+{
+  static Model& make (Block& al)
+  { return *new ConditionEnd (al, "h", &Time::minute); }
+
+  ConditionMinutelySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True at the end of each minute.");
+    Librarian::add_type (Condition::component, "minutely", alist, syntax, make);
+  }
+} ConditionMinutely_syntax;
+
+// The 'daily' model.
+
+static struct ConditionDailySyntax
+{
+  static Model& make (Block& al)
+  { return *new ConditionEnd (al, "h", &Time::mday); }
+
+  ConditionDailySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True at the end of each day.");
+    Librarian::add_type (Condition::component, "daily", alist, syntax, make);
+  }
+} ConditionDaily_syntax;
+
+// The 'weekly' model.
+
+static struct ConditionWeeklySyntax
+{
+  static Model& make (Block& al)
+  { return *new ConditionEnd (al, "h", &Time::week); }
+
+  ConditionWeeklySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True at the end of each week.");
+    Librarian::add_type (Condition::component, "weekly", alist, syntax, make);
+  }
+} ConditionWeekly_syntax;
+
+// The 'monthly' model.
+
+static struct ConditionMonthlySyntax
+{
+  static Model& make (Block& al)
+  { return *new ConditionEnd (al, "h", &Time::month); }
+
+  ConditionMonthlySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True at the end of each month.");
+    Librarian::add_type (Condition::component, "monthly", alist, syntax, make);
+  }
+} ConditionMonthly_syntax;
+
+// The 'yearly' model.
+
+static struct ConditionYearlySyntax
+{
+  static Model& make (Block& al)
+  { return *new ConditionEnd (al, "h", &Time::year); }
+
+  ConditionYearlySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True at the end of each year.");
+    Librarian::add_type (Condition::component, "yearly", alist, syntax, make);
+  }
+} ConditionYearly_syntax;
 
 // The 'interval' base model.
 
@@ -781,7 +814,7 @@ private:
     
     return "dt";
   }
-protected:
+public:
   ConditionInterval (Block& al, const Timestep tstep)
     : Condition (al),
       interval (tstep),
@@ -795,17 +828,10 @@ protected:
 
 // The 'every' model.
 
-struct ConditionEvery : public ConditionInterval
-{
-  ConditionEvery (Block& al)
-    : ConditionInterval (al, submodel_value_block<Timestep> (al))
-  { }
-};
-
 static struct ConditionEverySyntax
 {
   static Model& make (Block& al)
-  { return *new ConditionEvery (al); }
+  { return *new ConditionInterval (al, submodel_value_block<Timestep> (al)); }
 
   ConditionEverySyntax ()
   {

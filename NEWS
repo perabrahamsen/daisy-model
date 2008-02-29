@@ -15,7 +15,7 @@ the same parameters as the 'timestep' parameter top level Daisy paramater.
 
 (every (years 0) (days 1) (hours 2) (minutes 3) (seconds 4))
 
-** The optinal parameter removed from the ..ly conditions.
+** The optional 'step' parameter removed from the ..ly conditions.
 
 This affects condition 'hourly', 'daily' 'weekly', 'monthly' and
 'yearly' conditions.  They now always matches once at the last
@@ -23,6 +23,10 @@ timestep of the interval they are named after.
 
 If you need other intervals, use the new 'every' condition.  Thus,
 instead of (daily 2) you can write (every (days 2)).
+
+** New 'minutely' and 'secondly' conditions.
+
+These are true at the end of each minute and each second, respectively.
 
 ** Surface chemicals now decompose.
 
