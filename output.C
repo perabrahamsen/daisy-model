@@ -47,7 +47,7 @@ Output::initial_logs (const Daisy& daisy, Treelog& msg)
 	{
 	  msg.message ("Start logging");
 	  // get initial values for previous day.
-	  const Time previous = daisy.time - *(daisy.timestep);
+	  const Time previous = daisy.time - daisy.timestep;
 	  for (size_t i = 0; i < active_logs.size (); i++)
 	    {
 	      Log& log = *active_logs[i];

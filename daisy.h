@@ -25,6 +25,7 @@
 
 #include "program.h"
 #include "time.h"
+#include "timestep.h"
 #include "memutils.h"
 #include <vector>
 #include <memory>
@@ -61,7 +62,7 @@ private:
   const std::auto_ptr<Condition> print_time;
 public:
   Time time;
-  const std::auto_ptr<Timestep> timestep;
+  const Timestep timestep;
   const double dt;
 private:
   const Time stop;

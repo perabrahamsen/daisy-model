@@ -44,6 +44,41 @@ struct Timestep::Implementation
   { }
 };
 
+const Timestep& 
+Timestep::year ()
+{
+  static const Timestep value (1, 0, 0, 0, 0);
+  return value;
+}
+
+const Timestep& 
+Timestep::day ()
+{
+  static const Timestep value (0, 1, 0, 0, 0);
+  return value;
+}
+
+const Timestep& 
+Timestep::hour ()
+{
+  static const Timestep value (0, 0, 1, 0, 0);
+  return value;
+}
+
+const Timestep& 
+Timestep::minute ()
+{
+  static const Timestep value (0, 0, 0, 1, 0);
+  return value;
+}
+
+const Timestep& 
+Timestep::second ()
+{
+  static const Timestep value (0, 0, 0, 0, 1);
+  return value;
+}
+
 int
 Timestep::years () const
 { return impl->years; }
@@ -137,7 +172,7 @@ Timestep::load_syntax (Syntax& syntax, AttributeList& alist)
 const Timestep& 
 Timestep::null ()
 {
-  static Timestep none (99999, 99999, 99999, 99999, 99999);
+  static Timestep none (0, 0, 0, 0, 0);
   return none;
 }
 
@@ -237,6 +272,13 @@ Timestep operator- (const Time& a, const Time& b)
     }
   daisy_assert (years >= 0);
   return Timestep (years, days, hours, minutes, seconds);
+}
+
+bool 
+operator== (const Timestep& a, const Timestep& b)
+{
+  static const Time center (5000, 1, 1, 0);
+  return center + a == center + b;
 }
 
 // timestep.C ends here

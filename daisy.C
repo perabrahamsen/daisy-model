@@ -134,7 +134,7 @@ Daisy::tick_after (Treelog& msg)
 { 
   output_log->tick (*this, msg);
   field->clear ();
-  time += *timestep;
+  time += timestep;
   
   if (time >= stop)
     running = false;
@@ -245,9 +245,9 @@ Daisy::Daisy (Block& al)
     print_time (Librarian::build_item<Condition> (al, "print_time")),
     time (al.alist ("time")),
     timestep (al.check ("timestep") 
-              ? submodel<Timestep> (al, "timestep")
-              : new Timestep (0, 0, 1, 0, 0)),
-    dt (timestep->total_hours ()),
+              ? submodel_value<Timestep> (al, "timestep")
+              : Timestep::hour ()),
+    dt (timestep.total_hours ()),
     stop (al.check ("stop")
 	  ? Time (al.alist ("stop")) 
 	  : Time (9999, 1, 1, 1)),

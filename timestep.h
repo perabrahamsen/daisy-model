@@ -37,6 +37,14 @@ private:
   struct Implementation;
   const std::auto_ptr<Implementation> impl;
 
+  // Prebuild values.
+public:
+  static const Timestep& year ();
+  static const Timestep& day ();
+  static const Timestep& hour ();
+  static const Timestep& minute ();
+  static const Timestep& second ();
+
   // Extract elements.
 public:
   int years () const;
@@ -82,5 +90,6 @@ Time operator- (const Time&, const Timestep&);
 Timestep operator- (const Timestep& step);
 Timestep operator- (const Time&, const Time&);
 Timestep operator+ (const Timestep&, const Timestep&);
+bool operator== (const Timestep&, const Timestep&);
 
 #endif // TIMESTEP_H

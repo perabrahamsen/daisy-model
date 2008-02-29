@@ -280,16 +280,12 @@ public:
 
 struct ConditionHourly : public Condition
 {
-  const int step;
   const std::string timestep ()
-  { 
-    if (step == 1)
-      return "h";
-    return Condition::timestep ();
-  } 
+  { return "h"; } 
+
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return ((24 * daisy.time.yday ()
-	     + (daisy.time.hour () + 1)) % step) == 0; }
+  { return daisy.time.hour () != (daisy.time + daisy.timestep).hour (); }
+
   void output (Log&) const
   { }
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -302,8 +298,7 @@ struct ConditionHourly : public Condition
   { return true; }
 
   ConditionHourly (Block& al)
-    : Condition (al),
-      step (al.integer ("step"))
+    : Condition (al)
   { }
   static Model& make (Block& al)
   { return *new ConditionHourly (al); }
@@ -820,22 +815,21 @@ Timestep to use.");
   }
 }
 
-// The 'every' condition.
+// The 'interval' base model.
 
-struct ConditionEvery : public Condition
+struct ConditionInterval : public Condition
 {
+private:
   const Timestep interval;
+  const std::string step;
   Time next;
   bool does_match;
 
-public:
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return does_match; }
 
   void output (Log& log) const
-  { 
-    output_submodule (next, "next", log);
-  }
+  { output_submodule (next, "next", log); }
   
   void tick (const Daisy& daisy, const Scope&, Treelog&)
   { 
@@ -847,7 +841,7 @@ public:
     next = daisy.time + interval;
   }
   void initiate_log (const Daisy& daisy)
-  { next = daisy.time + interval - *daisy.timestep; }
+  { next = daisy.time + interval - daisy.timestep; }
 
   void initialize (const Daisy& daisy, const Scope&, Treelog&)
   { initiate_log (daisy); }
@@ -855,36 +849,67 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionEvery (Block& al)
+public:
+  static void load_syntax (Syntax& syntax, AttributeList& alist)
+  {
+    syntax.add_submodule ("next", alist, Syntax::OptionalState,
+                          "Time for next match.",
+                          Time::load_syntax);
+  }
+
+private:
+  static std::string find_timestep (const Timestep& tstep)
+  {
+    if (tstep == Timestep::second ())
+      return "s";
+    if (tstep == Timestep::minute ())
+      return "M";
+    if (tstep == Timestep::hour ())
+      return "h";
+    if (tstep == Timestep::day ())
+      return "d";
+    static Timestep week (0, 7, 0, 0, 0);
+    if (tstep == week)
+      return "w";
+    if (tstep == Timestep::year ())
+      return "y";
+    
+    return "dt";
+  }
+protected:
+  ConditionInterval (Block& al, const Timestep tstep)
     : Condition (al),
-      interval (submodel_value<Timestep> (al, "interval")),
+      interval (tstep),
+      step (find_timestep (tstep)),
       next (al.check ("next")
-            ? submodel_value<Time> (al, "next")
+            ? submodel_value<Time> (al, "next") 
             : Time::null ()),
       does_match (false)
   { }
-  
-  static Model& make (Block& al)
-  { return *new ConditionEvery (al); }
+};
+
+// The 'every' model.
+
+struct ConditionEvery : public ConditionInterval
+{
+  ConditionEvery (Block& al)
+    : ConditionInterval (al, submodel_value_block<Timestep> (al))
+  { }
 };
 
 static struct ConditionEverySyntax
 {
+  static Model& make (Block& al)
+  { return *new ConditionEvery (al); }
+
   ConditionEverySyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    Timestep::load_syntax (syntax, alist); // We steal all timestep attributes.
+    ConditionInterval::load_syntax (syntax, alist); // Base attributes.
     alist.add ("description", "Matches simulation with fixed time intervals.");
-    syntax.add_submodule ("interval", alist, Syntax::Const,
-                          "Time interval between matches.",
-                          Timestep::load_syntax);
-    syntax.add_check ("interval", Timestep::positive ());
-    // syntax.order ("interval");
-    syntax.add_submodule ("next", alist, Syntax::OptionalState,
-                          "Time for next match.",
-                          Time::load_syntax);
-    Librarian::add_type (Condition::component, "every", alist, syntax,
-                         &ConditionEvery::make);
+    Librarian::add_type (Condition::component, "every", alist, syntax, make);
   }
 } ConditionEvery_syntax;
 
