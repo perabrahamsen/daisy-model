@@ -276,171 +276,6 @@ public:
   { return *new ConditionAfter (al); }
 };
 
-// BUG: The following classes behave strangely around new year.
-
-struct ConditionHourly : public Condition
-{
-  const std::string timestep ()
-  { return "h"; } 
-
-  bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return daisy.time.hour () != (daisy.time + daisy.timestep).hour (); }
-
-  void output (Log&) const
-  { }
-  void tick (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  void initialize (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  bool check (const Daisy&, const Scope&, Treelog&) const
-  { return true; }
-
-  ConditionHourly (Block& al)
-    : Condition (al)
-  { }
-  static Model& make (Block& al)
-  { return *new ConditionHourly (al); }
-};
-
-struct ConditionDaily : public Condition
-{
-  const int step;
-  const std::string timestep ()
-  { 
-    if (step == 1)
-      return "d";
-    return Condition::timestep ();
-  } 
-  bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return daisy.time.hour () == 23 && (daisy.time.yday () % step) == 0; }
-  void output (Log&) const
-  { }
-  void tick (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  void initialize (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  bool check (const Daisy&, const Scope&, Treelog&) const
-  { return true; }
-
-  ConditionDaily (Block& al)
-    : Condition (al),
-      step (al.integer ("step"))
-  { }
-  static Model& make (Block& al)
-  { return *new ConditionDaily (al); }
-};
-
-struct ConditionWeekly : public Condition
-{
-  const int step;
-  const std::string timestep ()
-  { 
-    if (step == 1)
-      return "w";
-    return Condition::timestep ();
-  } 
-  bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { return daisy.time.hour () == 23 
-      && daisy.time.wday () == 6
-      && (daisy.time.week () % step) == 0; }
-  void output (Log&) const
-  { }
-  void tick (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  void initialize (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  bool check (const Daisy&, const Scope&, Treelog&) const
-  { return true; }
-
-  ConditionWeekly (Block& al)
-    : Condition (al),
-      step (al.integer ("step"))
-  { }
-  static Model& make (Block& al)
-  { return *new ConditionWeekly (al); }
-};
-
-struct ConditionMonthly : public Condition
-{
-  const int step;
-  const std::string timestep ()
-  { 
-    if (step == 1)
-      return "m";
-    return Condition::timestep ();
-  } 
-  bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { 
-    int month = daisy.time.month ();
-    if (month % step != 0)
-      return false;
-    Time next = daisy.time;
-    next.tick_hour ();
-    return next.month () != month;
-  }
-  void output (Log&) const
-  { }
-  void tick (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  void initialize (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  bool check (const Daisy&, const Scope&, Treelog&) const
-  { return true; }
-
-  ConditionMonthly (Block& al)
-    : Condition (al),
-      step (al.integer ("step"))
-  { }
-  static Model& make (Block& al)
-  { return *new ConditionMonthly (al); }
-};
-
-struct ConditionYearly : public Condition
-{
-  const int step;
-  const std::string timestep ()
-  { 
-    if (step == 1)
-      return "y";
-    return Condition::timestep ();
-  } 
-  bool match (const Daisy& daisy, const Scope&, Treelog&) const
-  { 
-    int year = daisy.time.year ();
-    if ((year + 1) % step != 0)
-      return false;
-    Time next = daisy.time;
-    next.tick_hour ();
-    return next.year () != year;
-  }
-
-  void output (Log&) const
-  { }
-  void tick (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  void initialize (const Daisy&, const Scope&, Treelog&)
-  { }
-
-  bool check (const Daisy&, const Scope&, Treelog&) const
-  { return true; }
-
-  ConditionYearly (Block& al)
-    : Condition (al),
-      step (al.integer ("step"))
-  { }
-  static Model& make (Block& al)
-  { return *new ConditionYearly (al); }
-};
-
 struct ConditionHour : public Condition
 {
   const int at;
@@ -814,6 +649,76 @@ Timestep to use.");
                          &ConditionTimestep::make);
   }
 }
+
+// The 'end' model.
+
+struct ConditionEnd : public Condition
+{
+  const std::string timestep_name;
+  typedef int Time::entry_type () const;
+  entry_type entry;
+
+  const std::string timestep ()
+  { return timestep_name; } 
+
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
+  { return daisy.time.*entry () != (daisy.time + daisy.timestep).*entry (); }
+
+  void output (Log&) const
+  { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ConditionEnd (Block& al)
+    : Condition (al)
+  { }
+};
+
+// The 'hourly' model.
+
+struct ConditionHourly : public Condition
+{
+  const std::string timestep ()
+  { return "h"; } 
+
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
+  { return daisy.time.hour () != (daisy.time + daisy.timestep).hour (); }
+
+  void output (Log&) const
+  { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ConditionHourly (Block& al)
+    : Condition (al)
+  { }
+};
+
+static struct ConditionHourlySyntax
+{
+  static Model& make (Block& al)
+  { return *new ConditionHourly (al); }
+
+  ConditionHourlySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "True at the end of each hour.");
+    Librarian::add_type (Condition::component, "hourly", alist, syntax, make);
+  }
+} ConditionHourly_syntax;
 
 // The 'interval' base model.
 
