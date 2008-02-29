@@ -1,9 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Test cvs
-
-Try lock dir and history file.
-
 * Parser file should use Treelog::Open to tell where it is.
 
 * Nanna
