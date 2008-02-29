@@ -1,15 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-
-* (when hourly) skal ikke logge hvert minut
-
-og (when minutely) skal have en enhed "/M"
-
-DONE: New "(every timestep)" condition
-DONE: Skal have logable "last" state vairable.
-
-** omskriv ...ly til at bruge every.
-
 * Parser file should use Treelog::Open to tell where it is.
 
 * Nanna
