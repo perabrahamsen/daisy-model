@@ -618,7 +618,6 @@ Toplevel::parse_file (const std::string& filename)
 void
 Toplevel::parse_system_file (const std::string& filename)
 { 
-  Treelog::Open nest (msg (), "Parsing '"+ filename + "'");
   if (impl->state > is_uninitialized)
     {
       error ("Program already initialized");

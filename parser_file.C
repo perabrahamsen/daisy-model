@@ -49,6 +49,7 @@ struct ParserFile::Implementation
 {
   // Environment.
   Metalib& metalib;
+  Treelog& msg;
 
   // Inputs.
   auto_vector<const AttributeList*> inputs;
@@ -117,7 +118,9 @@ struct ParserFile::Implementation
   void load_list (Syntax&, AttributeList&);
 
   // Create and destroy.
+  void initialize ();
   Implementation (Metalib&, const std::string&, Treelog&);
+  ~Implementation ();
 };
 
 std::string
@@ -554,6 +557,7 @@ ParserFile::Implementation::add_derived (Library& lib)
       && looking_at ('"'))
     atts.add ("description", get_string ());
   // Add separate attributes for this object.
+  Treelog::Open nest (msg, "Defining '" + name + "'");
   load_list (syntax, atts);
   // Add new object to library.
   lib.add_derived (name, syntax, atts, super);
@@ -652,13 +656,14 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
 	{
 	  // TODO: allow local parameters in inline objects.
 	  Syntax syntax (lib.syntax (type));
+          Treelog::Open nest (msg, "Deriving from '" + type + "'");
 	  load_list (syntax, *alist);
 	}
     skip_it:;
     }
-  catch (const std::string& msg)
+  catch (const std::string& wrong)
     {
-      error (msg);
+      error (wrong);
       skip_to_end ();
       alist = new AttributeList ();
       alist->add ("type", error_symbol);
@@ -695,6 +700,24 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	  name = *current;
 	  current++;
 	}
+
+      // Make sure we skip the ')' afterwards.
+      struct RAII_skip
+      { 
+        ParserFile::Implementation& outer;
+        const bool skipped;
+        
+        RAII_skip (ParserFile::Implementation& o, const bool s)
+          : outer (o),
+            skipped (s)
+        { }
+        ~RAII_skip ()
+        {
+          if (skipped)
+            outer.skip (")");
+          outer.skip ();
+        }
+      } raii_skip (*this, skipped);
 
       // Declarations.
       if (name == "declare")
@@ -785,7 +808,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      error ("'" + type_name + "' unhandled type");
 	      ok = false;
 	    }
-	  goto done;
+          // Next attribute.
+          continue;
 	}
 
       // Duplicate warning.
@@ -831,6 +855,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    }
 	  case Syntax::AList: 
 	    {
+              Treelog::Open nest (msg, "In submodel '" + name + "'");
 	      bool alist_skipped = false;
 	      if (in_order)
 		{
@@ -928,36 +953,34 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    break;
 	  case Syntax::Object:
 	    {
+              std::auto_ptr<AttributeList> al;
 	      const Library& lib = syntax.library (metalib, name);
-#ifdef SLOPPY_PARENTHESES
-	      AttributeList& al = (atts.check (name) 
-				   ? load_derived (lib, current != end,
-						   &atts.alist (name))
-				   : load_derived (lib, current != end, NULL));
-#else // !SLOPPY_PARENTHESES
-	      AttributeList& al = (atts.check (name) 
-				   ? load_derived (lib, in_order, 
-						   &atts.alist (name))
-				   : load_derived (lib, in_order, NULL));
-#endif // !SLOPPY_PARENTHESES						   
+              if (atts.check (name))
+                {
+                  Treelog::Open nest (msg, "Refining model '" + name + "'");
+                  al.reset (&load_derived (lib, in_order, &atts.alist (name)));
+                }
+              else
+                {
+                  Treelog::Open nest (msg, "In model '" + name + "'");
+                  al.reset (&load_derived (lib, in_order, NULL));
+                }
 	      if (lib.name () == symbol (Parser::component))
 		{
-                  Block block (metalib, lexer->err, "input");
 		  std::auto_ptr<Parser> parser 
-                    (Librarian::build_alist<Parser> (block, al, "input"));
-                  if (!block.ok () || !parser->check ())
+                    (Librarian::build_free<Parser> (metalib, msg, *al, name));
+                  if (!parser.get () || !parser->check ())
                     error ("file error");
                   else
                     parser->load_nested (atts);
 		  lexer->error_count += parser->error_count ();
-		  inputs.push_back (&al);
+		  inputs.push_back (al.release ());
 		}
 	      else
 		{
-		  const symbol obj = al.identifier ("type");
+		  const symbol obj = al->identifier ("type");
 		  if (obj != error_symbol)
-                    atts.add (name, al);
-		  delete &al;
+                    atts.add (name, *al);
 		}
 	    }
 	    break;
@@ -1020,6 +1043,10 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                         continue;
                       }
 		    const size_t element = sequence.size ();
+                    std::ostringstream tmp;
+                    tmp << "In '" << name << "' model #" << element + 1U;
+                    Treelog::Open nest (msg, tmp.str ());
+
 		    AttributeList& al 
 		      = (old_sequence.size () > element
 			 ? load_derived (lib, true, old_sequence[element])
@@ -1068,6 +1095,9 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                       }
 		    Parskip skip (*this);
 		    const size_t element = sequence.size ();
+                    std::ostringstream tmp;
+                    tmp << "In '" << name << "' submodel #" << element + 1U;
+                    Treelog::Open nest (msg, tmp.str ());
 		    AttributeList& al
 		      = *new AttributeList (old_sequence.size () > element
 					    ? *old_sequence[element]
@@ -1338,33 +1368,39 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
       // Value check.
       if (atts.check (name))
 	{
-	  TreelogString treelog;
-	  Treelog::Open nest (treelog, name);
-	  if (!syntax.check (metalib, atts, name, treelog))
-	    error (treelog.str ());
+	  Treelog::Open nest (msg, "Checking value of '" + name + "'");
+	  if (!syntax.check (metalib, atts, name, msg))
+	    error ("Invalid value");
 	}
-
-done:
-      if (skipped)
-	skip (")");
-      skip ();
     }
+}
+
+void
+ParserFile::Implementation::initialize ()
+{
+  if (!nest.get ())
+    nest.reset (new Treelog::Open (msg, "Parsing file: '" + file + "'"));
 }
 
 ParserFile::Implementation::Implementation (Metalib& mlib,
                                             const std::string& name,
-                                            Treelog& msg)
+                                            Treelog& treelog)
   : metalib (mlib),
+    msg (treelog),
     inputs (std::vector<const AttributeList*> ()),
     file (name),
     owned_stream (mlib.path ().open_file (name)),
-    lexer (new Lexer (name, *owned_stream, msg)),
-    nest (new Treelog::Open (msg, file))
+    lexer (new Lexer (name, *owned_stream, msg))
+{ }
+
+ParserFile::Implementation::~Implementation ()
+
 { }
 
 void
 ParserFile::load_nested (AttributeList& alist)
 {
+  impl->initialize ();
   impl->skip ();
   impl->load_list (impl->metalib.syntax (), alist);
   impl->skip ();

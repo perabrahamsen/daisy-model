@@ -1,3 +1,11 @@
+2008-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (Implementation::initialize): New function.
+	(ParserFile::load_nested): Call it.
+	(Implementation::add_derived, Implementation::load_derived)
+	(Implementation::load_list):  Use 'Treelog::Open'.
+	* toplevel.C (Toplevel::parse_system_file): Don't use 'Treelog::Open'.
+
 2008-02-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* condition_time.C (every): New model.
