@@ -1,5 +1,7 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Test svn
+
 * Parser file should use Treelog::Open to tell where it is.
 
 * Nanna
