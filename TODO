@@ -1,6 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Test svn fra Emacs
+* Test svn fra M-x compite
 
 * Parser file should use Treelog::Open to tell where it is.
 
