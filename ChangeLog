@@ -1,3 +1,7 @@
+2008-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.27 released.
+
 2008-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* parser_file.C (Implementation::initialize): New function.
