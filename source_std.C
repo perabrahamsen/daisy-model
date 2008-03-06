@@ -21,7 +21,7 @@
 #include "source_file.h"
 #include "units.h"
 #include "librarian.h"
-#include "lexer_data.h"
+#include "lexer_table.h"
 #include <sstream>
 
 struct SourceStandard : public SourceFile
@@ -55,7 +55,7 @@ bool
 SourceStandard::load (Treelog& msg)
 {
   // Read header.
-  LexerData lex (filename, msg);
+  LexerTable lex (filename, msg);
   if (!read_header (lex))
     return false;
 

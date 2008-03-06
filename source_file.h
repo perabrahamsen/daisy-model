@@ -23,7 +23,7 @@
 
 #include "source.h"
 
-class LexerData;
+class LexerTable;
 
 static int
 find_tag (const std::map<std::string,int>& tag_pos, const std::string& tag)
@@ -69,19 +69,13 @@ public:
 
   // Read.
 private:
-  std::string get_entry (LexerData& lex) const;
-protected:
-  std::vector<std::string> get_entries (LexerData& lex) const;
-private:
-  static int get_date_component (LexerData& lex,
+  static int get_date_component (LexerTable& lex,
                                  const std::vector<std::string>& entries, 
                                  int column, 
                                  int default_value);
   static Time get_time (const std::string& entry);
 protected:
-  static double convert_to_double (LexerData& lex, const std::string& value);
-private:
-  std::string field_sep;
+  static double convert_to_double (LexerTable& lex, const std::string& value);
 protected:
   std::vector<std::string> tag_names;
   std::map<std::string,int> tag_pos;
@@ -93,8 +87,8 @@ private:
   int hour_c;
   int time_c;
 protected:
-  bool read_header (LexerData&);
-  bool read_entry (LexerData&, std::vector<std::string>&, Time&) const;
+  bool read_header (LexerTable&);
+  bool read_entry (LexerTable&, std::vector<std::string>&, Time&) const;
 
   // Create.
 public:

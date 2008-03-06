@@ -20,7 +20,7 @@
 
 
 #include "source_file.h"
-#include "lexer_data.h"
+#include "lexer_table.h"
 #include "submodeler.h"
 #include "vcheck.h"
 #include "mathlib.h"
@@ -106,63 +106,8 @@ SourceFile::add_entry (const Time& time, std::vector<double>& vals)
   vals.clear ();
 }
 
-std::string
-SourceFile::get_entry (LexerData& lex) const
-{
-  std::string tmp_term;  // Data storage.
-  const char* field_term;
-
-  switch (field_sep.size ())
-    { 
-    case 0:
-      // Whitespace
-      field_term = " \t\n";
-      break;
-    case 1:
-      // Single character field seperator.
-      tmp_term = field_sep + "\n";
-      field_term = tmp_term.c_str ();
-      break;
-    default:
-      // Multi-character field seperator.
-      daisy_assert (false);
-    }
-
-  // Find it.
-  std::string entry = "";
-  while (lex.good ())
-    {
-      int c = lex.peek ();
-      if (strchr (field_term, c))
-	break;
-      entry += int2char (lex.get ());
-    }
-  return entry;
-}
-
-std::vector<std::string>
-SourceFile::get_entries (LexerData& lex) const
-{
-  lex.skip ("\n");
-  std::vector<std::string> entries;
-
-  while (lex.good ())
-    {
-      entries.push_back (get_entry (lex));
-
-      if (lex.peek () == '\n')
-        break;
-
-      if (field_sep == "")
-	lex.skip_space ();
-      else
-	lex.skip(field_sep.c_str ());
-    }
-  return entries;
-}
-
 int
-SourceFile::get_date_component (LexerData& lex,
+SourceFile::get_date_component (LexerTable& lex,
 				const std::vector<std::string>&
 				/**/ entries, 
 				int column, 
@@ -231,7 +176,7 @@ SourceFile::get_time (const std::string& entry)
 }
 
 double
-SourceFile::convert_to_double (LexerData& lex,
+SourceFile::convert_to_double (LexerTable& lex,
 			       const std::string& value)
 {
   const char *const str = value.c_str ();
@@ -243,51 +188,26 @@ SourceFile::convert_to_double (LexerData& lex,
 }
 
 bool
-SourceFile::read_header (LexerData& lex)
+SourceFile::read_header (LexerTable& lex)
 {
-  // Open errors?
-  if (!lex.good ())
+  // Read header.
+  if (!lex.read_header ())
     return false;
 
-  // Read first line.
-  const std::string type = lex.get_word ();
-  if (type == "dwf-0.0")
+  // Choose lines or points from type.
+  if (with_ == "")
     {
-      field_sep = "";
-      if (with_ == "")
+      const std::string type = lex.type ();
+      if (type == "dwf-0.0")
 	with_ = "lines";
-    }
-  else if (type == "dlf-0.0")
-    {
-      field_sep = "\t";
-      if (with_ == "")
+      else if (type == "dlf-0.0")
 	with_ = "lines";
-    }
-  else if (type == "ddf-0.0")
-    {
-      field_sep = "\t";
-      if (with_ == "")
+      else if (type == "ddf-0.0")
 	with_ = "points";
     }
-  else
-    lex.error ("Unknown file type '" + type + "'");
-  lex.skip_line ();
-  lex.next_line ();
-
-  // Skip keywords.
-  while (lex.good () && lex.peek () != '-')
-    {
-      lex.skip_line ();
-      lex.next_line ();
-    }
-
-  // Skip hyphens.
-  while (lex.good () && lex.peek () == '-')
-    lex.get ();
-  lex.skip_space ();
   
   // Read tags.
-  tag_names = get_entries (lex);
+  tag_names = lex.get_entries ();
   for (int count = 0; count < tag_names.size (); count++)
     {
       const std::string candidate = tag_names[count];
@@ -320,12 +240,12 @@ SourceFile::read_header (LexerData& lex)
 }
 
 bool
-SourceFile::read_entry (LexerData& lex, 
+SourceFile::read_entry (LexerTable& lex, 
                         std::vector<std::string>& entries,
                         Time& time) const
 {
   // Read entries.
-  entries = get_entries (lex);
+  entries = lex->get_entries ();
 
   if (entries.size () != tag_names.size ())
     {
@@ -428,7 +348,6 @@ SourceFile::SourceFile (Block& al)
     style_ (al.integer ("style", -1)),
     missing (al.name_sequence ("missing")),
     filter (map_submodel_const<Filter> (al, "filter")),
-    field_sep ("UNINITIALIZED"),
     year_c (-42),
     month_c (-42),
     mday_c (-42),

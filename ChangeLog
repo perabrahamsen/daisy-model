@@ -1,5 +1,11 @@
 2005-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* lexer_table.C, lexer_table.h: New utility.
+	* Makefile (OTHER): Added it.
+
+	* xysource.C, xysource.h: New component.
+	* Makefile (COMPONENTS): Add it.
+
 	* Version 3.93 released.
 
 2005-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>

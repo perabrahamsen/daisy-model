@@ -337,7 +337,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = gnuplot.C boolean.C stringer.C source.C photo.C \
+COMPONENTS = xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
 	transform.C rootdens.C select.C average.C mactrans.C macro.C \
@@ -367,7 +367,8 @@ SPECIALS = source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 #
-OTHER = block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
+OTHER = lexer_table.C \
+	block.C dlf.C scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C \

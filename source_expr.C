@@ -23,7 +23,7 @@
 #include "scope.h"
 #include "units.h"
 #include "librarian.h"
-#include "lexer_data.h"
+#include "lexer_table.h"
 #include <sstream>
 
 // ScopeScource
@@ -116,7 +116,7 @@ bool
 SourceExpr::load (Treelog& msg)
 {
   // Lex it.
-  LexerData lex (filename, msg);
+  LexerTable lex (filename, msg);
   if (!read_header (lex))
     return false;
 
