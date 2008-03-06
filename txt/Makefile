@@ -25,13 +25,16 @@ pdf:	reference.pdf
 reference.ps:	reference.dvi
 	dvips -f reference.dvi > reference.ps
 
-reference.dvi:	components.tex
+reference.dvi: reference.tex components.tex $(LIBS)
+	latex reference.tex < /dev/null
 	makeindex reference
+	bibtex reference
 	latex reference.tex < /dev/null
 
-reference.pdf:	components.tex
+reference.pdf: reference.tex components.tex $(LIBS)
 	pdflatex reference.tex < /dev/null
 	makeindex reference
+	bibtex reference
 	pdflatex reference.tex < /dev/null
 
 components.tex:	/usr/local/daisy/$(HOSTTYPE)/daisy
@@ -42,12 +45,12 @@ exercises.ps:	exercises.dvi
 
 exercises.dvi:	exercises.tex $(LIBS)
 	latex exercises.tex < /dev/null
-	bibtex exercises.tex
+	bibtex exercises
 	latex exercises.tex < /dev/null
 
 exercises.pdf:	exercises.tex $(LIBS)
 	pdflatex exercises.tex < /dev/null
-	bibtex exercises.tex
+	bibtex exercises
 	pdflatex exercises.tex < /dev/null
 
 tutorial.ps:	tutorial.dvi
@@ -55,12 +58,12 @@ tutorial.ps:	tutorial.dvi
 
 tutorial.dvi:	tutorial.tex $(LIBS)
 	latex tutorial.tex < /dev/null
-	bibtex tutorial.tex
+	bibtex tutorial
 	latex tutorial.tex < /dev/null
 
 tutorial.pdf:	tutorial.tex $(LIBS)
 	pdflatex tutorial.tex < /dev/null
-	bibtex tutorial.tex
+	bibtex tutorial
 	pdflatex tutorial.tex < /dev/null
 
 dist: reference.pdf reference.ps tutorial.pdf exercises.pdf
