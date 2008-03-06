@@ -38,12 +38,12 @@ setup:
 	mkdir $(SETUPDIR)/lib
 	cp $(DAISY) $(TEXT) $(SETUPDIR)/lib
 
-# Update the CVS repository.
+# Update the SVN repository.
 #
-cvsci: $(DAISY) $(TEXT)
+svnci: $(DAISY) $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	-cvs add $(DAISY) $(TEXT)
+	-svn add $(DAISY) $(TEXT)
 	rm -f $(REMOVE) 
-	-cvs remove $(REMOVE) 
-	cvs commit -m "$(TAG)" # "Version $(TAG)"
+	-svn remove $(REMOVE) 
+	svn commit -m "$(TAG)" # "Version $(TAG)"
 

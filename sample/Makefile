@@ -37,17 +37,17 @@ setup:
 	mkdir $(SETUPDIR)/sample
 	cp $(TEXT) $(SETUPDIR)/sample
 
-# Update the CVS repository.
+# Update the SVN repository.
 #
-cvsci: $(TEXT) 
+svnci: $(TEXT) 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	-cvs add $(TEXT) 
+	-svn add $(TEXT) 
 	rm -f $(REMOVE) 
-	-cvs remove $(REMOVE) 
-	cvs commit -m "$(TAG)" # "Version $(TAG)"
+	-svn remove $(REMOVE) 
+	svn commit -m "$(TAG)" # "Version $(TAG)"
 
 add:
-	cvs add $(TEXT)
+	svn add $(TEXT)
 
 # Check
 #

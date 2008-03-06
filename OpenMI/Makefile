@@ -17,22 +17,22 @@ all:	$(TARGETS)
 setup: $(TARGETS)
 	cp $(TARGETS) $(SETUPDIR)/bin
 
-.IGNORE: cvsci
+.IGNORE: svnci
 
-cvsci: $(TEXT)
+svnci: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	cvs update
-	-cvs add $(TEXT)
+	svn update
+	-svn add $(TEXT)
 	rm -f $(REMOVE) 
-	-cvs remove $(REMOVE) 
-	cvs commit -m "$(TAG)" # "Version $(TAG)"
+	-svn remove $(REMOVE) 
+	svn commit -m "$(TAG)" # "Version $(TAG)"
 
 commit: $(TEXT)
-	cvs update
-	-cvs add $(TEXT)
+	svn update
+	-svn add $(TEXT)
 	rm -f $(REMOVE) 
-	-cvs remove $(REMOVE) 
-	cvs commit -m "commit" # "Version $(TAG)"
+	-svn remove $(REMOVE) 
+	svn commit -m "commit" # "Version $(TAG)"
 
 daisy_dotnet.dll: $(DOTNETSRC)
 	$(CSHARP) /target:library /out:$@ $<

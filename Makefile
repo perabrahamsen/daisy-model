@@ -559,7 +559,7 @@ TEXT =  ChangeLog.3 ChangeLog.2 ChangeLog.1 setup.nsi \
 #
 EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
-# Select files to be removed by the next cvs update.
+# Select files to be removed by the next svn update.
 #
 REMOVE = select_soil.C 
 
@@ -788,7 +788,7 @@ daisy-src.zip:	$(TEXT)
 txtdist:
 	(cd txt && $(MAKE) FTPDIR=$(FTPDIR) dist)
 
-dist:	cvsci
+dist:	svnci
 	$(MAKE) native cross
 	mv -f $(WWWINDEX) $(WWWINDEX).old
 	sed -e 's/Daisy version [1-9]\.[0-9][0-9]/Daisy version $(TAG)/' \
@@ -819,9 +819,9 @@ version.C:
 	echo "extern const char *const version = \"$(TAG)\";" >> version.C
 	echo "extern const char *const version_date = __DATE__;" >> version.C
 
-# Update the CVS repository.
+# Update the SVN repository.
 #
-cvsci: $(TEXT)
+svnci: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	rm -f version.C
 	$(MAKE) version.C
@@ -832,26 +832,26 @@ cvsci: $(TEXT)
 	echo "	* Version" $(TAG) released. >> ChangeLog
 	echo >> ChangeLog
 	cat ChangeLog.old >> ChangeLog
-	(cd OpenMI; $(MAKE) cvsci);
-	(cd lib; $(MAKE) cvsci);
-	(cd sample; $(MAKE) cvsci);
-	(cd txt; $(MAKE) cvsci);
-	-cvs add $(TEXT)
+	(cd OpenMI; $(MAKE) svnci);
+	(cd lib; $(MAKE) svnci);
+	(cd sample; $(MAKE) svnci);
+	(cd txt; $(MAKE) svnci);
+	-svn add $(TEXT)
 	rm -f $(REMOVE) 
-	-cvs remove $(REMOVE) 
-	cvs commit -m "Version $(TAG)"
-	cvs tag release_`echo $(TAG) | sed -e 's/[.]/_/g'`
+	-svn remove $(REMOVE) 
+	svn commit -m "Version $(TAG)"
+	svn tag release_`echo $(TAG) | sed -e 's/[.]/_/g'`
 
 .IGNORE: add
 
 add:
-	cvs add $(TEXT)
+	svn add $(TEXT)
 
 update:
-	cvs update -d -P
+	svn update
 
 commit:
-	cvs commit -m make
+	svn commit -m make
 
 done:	update add commit
 
@@ -860,10 +860,10 @@ cast:
 	fgrep _cast $(INTERFACES) $(MODELS) $(MAIN)
 	wc -l  $(INTERFACES) $(MODELS) $(MAIN)
 
-setup:	cvsci
-	$(MAKE) setupnocvs
+setup:	svnci
+	$(MAKE) setupnosvn
 
-setupnocvs: 
+setupnosvn: 
 	$(MAKE) native 
 	rm -rf $(SETUPDIR)
 	mkdir $(SETUPDIR)

@@ -80,15 +80,15 @@ setup: reference.pdf reference.ps tutorial.pdf exercises.pdf
 	cp -f tutorial.pdf $(SETUPDIR)/doc
 	cp -f exercises.pdf $(SETUPDIR)/doc
 
-cvsci: $(TEXT)
+svnci: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	-cvs add $(TEXT)
+	-svn add $(TEXT)
 	rm -f $(REMOVE) 
-	-cvs remove $(REMOVE) 
-	cvs commit -m "$(TAG)" # "Version $(TAG)"
+	-svn remove $(REMOVE) 
+	svn commit -m "$(TAG)" # "Version $(TAG)"
 
 commit: $(TEXT)
-	-cvs add $(TEXT)
+	-svn add $(TEXT)
 	rm -f $(REMOVE) 
-	-cvs remove $(REMOVE) 
-	cvs commit -m "commit" # "Version $(TAG)"
+	-svn remove $(REMOVE) 
+	svn commit -m "commit" # "Version $(TAG)"
