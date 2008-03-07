@@ -1,17 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Test svn fra Makefile
-
-* Parser file should use Treelog::Open to tell where it is.
-
-* Nanna
-
-** "power function" i c horizon
-
-** (anisotropy 0.025) i b horizon 
-
-** Varierende tryk?
-
 * row width
 
 * InitLAI erstatning

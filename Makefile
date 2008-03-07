@@ -53,6 +53,7 @@ MINGWHOME = /cygdrive/c/MinGW
 endif
 
 TARGETTYPE = i586-mingw32msvc
+SVNROOT = https://daisy-model.googlecode.com/svn
 
 # Set USE_GUI to Q4 or none, depending on what GUI you want.
 #
@@ -97,7 +98,7 @@ SPARCOBJ = set_exceptions.o
 
 # Microsoft lacks some common Unix functions.
 #
-MSSRC = win32_unistd.C
+MSSRC = win32_unistd.c
 
 WINSRC = w32reg.c
 WINOBJ = w32reg.o
@@ -840,7 +841,8 @@ svnci: $(TEXT)
 	rm -f $(REMOVE) 
 	-svn remove $(REMOVE) 
 	svn commit -m "Version $(TAG)"
-	svn tag release_`echo $(TAG) | sed -e 's/[.]/_/g'`
+	svn copy $(SVNROOT)/trunk \
+	  $(SVNROOT)/tags/release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
 
 .IGNORE: add
 
@@ -862,6 +864,7 @@ cast:
 
 setup:	svnci
 	$(MAKE) setupnosvn
+	$(MAKE) upload
 
 setupnosvn: 
 	$(MAKE) native 
@@ -872,7 +875,10 @@ setupnosvn:
 	cp $(TEXT) $(SETUPDIR)/src
 	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	(cd txt && $(MAKE) PATH="$(PATH):$(Q4HOME)/bin" DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) SETUPDIR=$(SETUPDIR) DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" setup)
+	(cd txt && $(MAKE) PATH="$(PATH):$(Q4HOME)/bin" \
+		           DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) \
+			   SETUPDIR=$(SETUPDIR) \
+			   DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" setup)
 	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	mkdir $(SETUPDIR)/bin
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe
@@ -883,6 +889,12 @@ setupnosvn:
 	cp $(MINGWHOME)/bin/mingwm10.dll $(SETUPDIR)/bin
 	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
+
+upload:
+	./utils/googlecode_upload.py -p daisy-model -u per.abrahamsen \
+		-s "Daisy version $(TAG) installer for MS Windows" \
+		-l Type-Installer,OpSys-Windows,Featured \
+		daisy-$(TAG)-setup.exe
 
 daisysetup:
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
