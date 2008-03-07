@@ -30,6 +30,10 @@
 #include <map>
 #include <time.h>
 
+std::string 
+FormatLaTeX::format_type () const
+{ return "LaTeX"; }
+
 void
 FormatLaTeX::list_open ()
 { 
@@ -250,12 +254,12 @@ FormatLaTeX::verbatim (const std::string& text)
 
 bool
 FormatLaTeX::formatp (const std::string& format)
-{ return format == "LaTeX"; }
+{ return format == format_type (); }
 
 void
 FormatLaTeX::raw (const std::string& format, const std::string& text)
 {
-  daisy_assert (format == "LaTeX");
+  daisy_assert (format == format_type ());
   out () << text;
 }
 

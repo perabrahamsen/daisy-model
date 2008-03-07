@@ -1,3 +1,11 @@
+2008-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* format.C, format.h, format_LaTeX.C, format_LaTeX.h
+	(format_type): New virtual member function.
+	* format_LaTeX.C (FormatLaTeX::formatp, FormatLaTeX::raw): Use it.
+	* format.C, format.h (Format::alist_discription): New virtual
+	member function.
+
 2008-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.27 released.

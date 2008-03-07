@@ -28,6 +28,7 @@
 #include <stack>
 
 class Block;
+class AttributeList;
 
 class Format : public Model
 {
@@ -35,6 +36,7 @@ class Format : public Model
 public:
   const symbol name;
   static const char *const component;
+  virtual std::string format_type () const;
 private:
   std::ostream* output;
 protected:
@@ -211,6 +213,7 @@ public:
   virtual void see (const std::string& type,
 		    const std::string& scope, const std::string& id) = 0;
   virtual void see_page (const std::string& scope, const std::string& id) = 0;
+  virtual void alist_discription (const AttributeList&);
 
   // Create and Destroy.
 public:

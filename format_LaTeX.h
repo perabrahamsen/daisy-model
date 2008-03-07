@@ -23,6 +23,9 @@
 
 struct FormatLaTeX : public Format
 {
+  // Content.
+  std::string format_type () const;
+
   // Nesting.
   int list_level;
   void list_open ();

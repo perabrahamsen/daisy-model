@@ -24,8 +24,13 @@
 #include "assertion.h"
 #include "block.h"
 #include "librarian.h"
+#include "alist.h"
 
 const char *const Format::component = "format";
+
+std::string 
+Format::format_type () const
+{ return name.name (); }
 
 std::ostream&
 Format::out ()
@@ -173,6 +178,25 @@ Format::Document::~Document ()
   format.pop ("document");
   format.document_close (); 
   daisy_assert (format.nest.empty ());
+}
+
+void
+Format::alist_discription (const AttributeList& alist)
+{
+  const std::string native_description = "description_" + format_type ();
+  if (alist.check (native_description))
+    {
+      soft_linebreak ();
+      raw (format_type (), alist.name (native_description));
+      soft_linebreak ();
+      return;
+    }
+  if (alist.check ("description"))
+    {
+      soft_linebreak ();
+      text (alist.name ("description"));
+      soft_linebreak ();
+    }
 }
 
 void
