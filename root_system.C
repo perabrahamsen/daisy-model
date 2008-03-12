@@ -437,18 +437,27 @@ RootSystem::output (Log& log) const
 }
 
 void
-RootSystem::initialize (size_t size, Treelog& msg)
+RootSystem::initialize (const Geometry& geo, const double row_width, 
+                        Treelog& msg)
 {
+  rootdens->initialize (geo, row_width, msg);
+  initialize (geo, msg);
+}
+
+void
+RootSystem::initialize (const Geometry& geo, Treelog& msg)
+{
+  const size_t cell_size = geo.cell_size ();
   ABAprod->initialize (msg);
-  while (Density.size () < size)
+  while (Density.size () < cell_size)
     Density.push_back (0.0);
-  while (H2OExtraction.size () < size)
+  while (H2OExtraction.size () < cell_size)
     H2OExtraction.push_back (0.0);
-  while (NH4Extraction.size () < size)
+  while (NH4Extraction.size () < cell_size)
     NH4Extraction.push_back (0.0);
-  while (NO3Extraction.size () < size)
+  while (NO3Extraction.size () < cell_size)
     NO3Extraction.push_back (0.0);
-  while (ABAExtraction.size () < size)
+  while (ABAExtraction.size () < cell_size)
     ABAExtraction.push_back (0.0);
 }
 

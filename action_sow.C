@@ -27,15 +27,18 @@
 #include "field.h"
 #include "crop.h"
 #include "librarian.h"
+#include "check.h"
 
 struct ActionSow : public Action
 {
   const AttributeList& crop;
+  const double row_width;
 
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   { 
     msg.message ("Sowing " + crop.name ("type"));      
-    daisy.field->sow (daisy.metalib, crop, daisy.time, daisy.dt, msg); 
+    daisy.field->sow (daisy.metalib, crop, row_width, daisy.time, 
+                      daisy.dt, msg); 
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -47,7 +50,8 @@ struct ActionSow : public Action
 
   ActionSow (Block& al)
     : Action (al),
-      crop (al.alist ("crop"))
+      crop (al.alist ("crop")),
+      row_width (al.number ("row_width"))
   { }
 };
 
@@ -64,7 +68,15 @@ static struct ActionSowSyntax
     alist.add ("description", "Sow a crop on the field.");
     syntax.add_object ("crop", Crop::component, "Crop to sow.");
     syntax.order ("crop");
+    syntax.add ("row_width", "cm", Check::non_negative (), 
+                Syntax::Const, "Distance between rows.\n\
+Specify zero to spread equally over the area (no rows).");
+    alist.add ("row_width", 0.0);
+    syntax.add ("seed", "kg DM/ha", Check::positive (), Syntax::OptionalConst,
+                "Amount of seed applied.  NOT YET IMPLEMENTED.\n\
+Currently, initial growth will be governed by 'typical' seed amounts.");
     Librarian::add_type (Action::component, "sow", alist, syntax, &make);
+    Librarian::add_alias (Action::component, symbol ("plant"), symbol ("sow"));
   }
 } ActionSow_syntax;
 

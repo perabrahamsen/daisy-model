@@ -56,6 +56,8 @@ public:
 
   // Create and Destroy.
 public:
+  virtual void initialize (const Geometry& geo, double row_width, 
+                           Treelog& msg) = 0;
   static const AttributeList& default_model ();
   static void load_syntax (Syntax&, AttributeList&);
 protected:

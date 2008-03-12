@@ -1,3 +1,22 @@
+2008-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rootdens_GP2D.C, rootdens_GP1D.C, rootdens_AP.C, rootdens_PLF.C:
+	* rootdens_PLF, rootdens.h (initalize): New function.
+
+	* action_sow.C (plant): New alias.
+	(row_width): New parameter.
+	* column_std.C, column.h, field.C, field.h (sow): Take row width
+	argument. 
+	* vegetation.h, vegetation_permanent.C, vegetation_crops.C (sow): Ditto.
+	* crop_std.C, crop_simple.C, crop_sold.C, crop_old.C:
+	* crop.h, root_system.C, root_system.h (initialize): Ditto.
+
+2008-03-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* program_document.C (ProgramDocument::print_model)
+	(ProgramDocument::print_model, ProgramDocument::print_fixed): Use
+	'Format::alist_description'.
+
 2008-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* format.C, format.h, format_LaTeX.C, format_LaTeX.h

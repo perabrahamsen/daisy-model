@@ -213,7 +213,7 @@ public:
   virtual void see (const std::string& type,
 		    const std::string& scope, const std::string& id) = 0;
   virtual void see_page (const std::string& scope, const std::string& id) = 0;
-  virtual void alist_discription (const AttributeList&);
+  virtual void alist_description (const AttributeList&);
 
   // Create and Destroy.
 public:

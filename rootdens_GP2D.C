@@ -76,6 +76,7 @@ struct Rootdens_GP2D : public Rootdens
   void output (Log& log) const;
 
   // Create.
+  void initialize (const Geometry&, double /* row_width */, Treelog&);
   Rootdens_GP2D (Block&);
 };
 
@@ -302,6 +303,10 @@ Rootdens_GP2D::output (Log& log) const
   output_variable (L00, log); 
   output_variable (k, log); 
 }
+
+void 
+Rootdens_GP2D::initialize (const Geometry&, double /* row_width */, Treelog&)
+{ }
 
 Rootdens_GP2D::Rootdens_GP2D (Block& al)
   : Rootdens (al),

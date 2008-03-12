@@ -324,6 +324,8 @@ static struct ProgramDaisySyntax
     AttributeList& alist = *new AttributeList ();
     Daisy::load_syntax (syntax, alist);
     alist.add ("description", "A soil-crop-atmosphere simulation model.");
+    alist.add ("description_LaTeX", "A soil plant atmosphere system model \
+\\cite{daisy-def,daisy-new,daisy-fertilizer}.");
     Librarian::add_type (Program::component, "Daisy", alist, syntax, &make);
   }
 } ProgramDaisy_syntax;

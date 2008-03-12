@@ -98,7 +98,8 @@ SPARCOBJ = set_exceptions.o
 
 # Microsoft lacks some common Unix functions.
 #
-MSSRC = win32_unistd.c
+#MSSRC = win32_unistd.c
+MSSRC =
 
 WINSRC = w32reg.c
 WINOBJ = w32reg.o
@@ -761,8 +762,8 @@ txt/reference.pdf:	txt/components.tex
 	 && makeindex reference \
 	 && pdflatex reference.tex < /dev/null )
 
-txt/components.tex:
-	(cd txt && $(DAISYEXE) -nw all.dai -p document
+txt/components.tex: $(DAISYEXE)
+	(cd txt && $(DAISYEXE) -nw all.dai -p document )
 
 # Remove all the temporary files.
 #
@@ -864,9 +865,10 @@ cast:
 
 setup:	svnci
 	$(MAKE) setupnosvn
-	$(MAKE) upload
+#	$(MAKE) upload
 
 setupnosvn: 
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	$(MAKE) native 
 	rm -rf $(SETUPDIR)
 	mkdir $(SETUPDIR)
@@ -891,6 +893,7 @@ setupnosvn:
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
 
 upload:
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	./utils/googlecode_upload.py -p daisy-model -u per.abrahamsen \
 		-s "Daisy version $(TAG) installer for MS Windows" \
 		-l Type-Installer,OpSys-Windows,Featured \

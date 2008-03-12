@@ -179,8 +179,11 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry, OrganicMatter&, 
+  void initialize (const Geometry& geometry, double row_width, OrganicMatter&, 
                    const Time&, Treelog&);
+  void initialize (const Geometry&, OrganicMatter&, const Time&, Treelog&);
+  void initialize_shared (const Geometry&, OrganicMatter&, 
+                          const Time&, Treelog&);
   bool check (Treelog&) const;
   CropStandard (Block& vl);
   ~CropStandard ();
@@ -216,13 +219,30 @@ CropStandard::SOrg_DM () const
 { return production.WSOrg * 10.0 /* [g/m^2 -> kg/ha] */;}
 
 void
-CropStandard::initialize (const Geometry& geo,
+CropStandard::initialize (const Geometry& geo, const double row_width,
                           OrganicMatter& organic_matter,
                           const Time& now, Treelog& msg)
 {
+  root_system->initialize (geo, row_width, msg);
+  initialize_shared (geo, organic_matter, now, msg);
+}
+
+void
+CropStandard::initialize (const Geometry& geo, 
+                          OrganicMatter& organic_matter,
+                          const Time& now, Treelog& msg)
+{
+  root_system->initialize (geo, msg);
+  initialize_shared (geo, organic_matter, now, msg);
+}
+
+void
+CropStandard::initialize_shared (const Geometry& geo, 
+                                 OrganicMatter& organic_matter,
+                                 const Time& now, Treelog& msg)
+{
   if (!last_time.get ())
     last_time.reset (new Time (now));
-  root_system->initialize (geo.cell_size (), msg);
   production.initialize (nitrogen.SeedN);
 
   const double DS = development->DS;

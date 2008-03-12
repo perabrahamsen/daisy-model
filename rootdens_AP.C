@@ -51,6 +51,8 @@ struct Rootdens_AP : public Rootdens
   void output (Log& log) const;
 
   // Create.
+  void initialize (const Geometry&, double /* row_width */, Treelog&)
+  { }
   Rootdens_AP (Block&);
 };
 

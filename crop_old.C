@@ -139,6 +139,8 @@ public:
 
   // Create and Destroy.
 public:
+  void initialize (const Geometry& geo, double row_width, 
+                   OrganicMatter&, const Time&, Treelog&);
   void initialize (const Geometry& geo, OrganicMatter&, const Time&, Treelog&);
   bool check (Treelog&) const
   { return true; }
@@ -624,8 +626,17 @@ CropOld::Variables::~Variables ()
 { }
 
 void
-CropOld::initialize (const Geometry& geo, 
-                     OrganicMatter&, const Time&, Treelog&)
+CropOld::initialize (const Geometry& geo, const double row_width,
+                     OrganicMatter& organic_matter, const Time& time, 
+                     Treelog& msg)
+{
+  if (!std::isnormal (row_width))
+    throw "The 'old' crop model does not work with row crops.";
+  initialize (geo, organic_matter, time, msg);
+}
+
+void
+CropOld::initialize (const Geometry& geo, OrganicMatter&, const Time&, Treelog&)
 {
   unsigned int size = geo.cell_size ();
 

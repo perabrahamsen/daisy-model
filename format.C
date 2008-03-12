@@ -181,7 +181,7 @@ Format::Document::~Document ()
 }
 
 void
-Format::alist_discription (const AttributeList& alist)
+Format::alist_description (const AttributeList& alist)
 {
   const std::string native_description = "description_" + format_type ();
   if (alist.check (native_description))

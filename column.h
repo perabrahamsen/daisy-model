@@ -69,7 +69,7 @@ public:
 
   // Actions.
 public:
-  virtual void sow (Metalib&, const AttributeList& crop, 
+  virtual void sow (Metalib&, const AttributeList& crop, const double row_width,
                     const Time&, double dt, Treelog&) = 0;
   virtual void ridge (const AttributeList& ridge) = 0;
   virtual void irrigate_overhead (double flux, double temp, const IM&, 

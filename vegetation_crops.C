@@ -182,6 +182,7 @@ struct VegetationCrops : public Vegetation
               Treelog&);
   void cleanup_canopy (symbol crop_name, Treelog&);
   void sow (Metalib&, const AttributeList& al, 
+            const double row_width /* [cm] */,
             const Geometry&, OrganicMatter&, 
             double& seed_N /* kg/ha/h */, double& seed_C /* kg/ha/h */,
             const Time&, double dt, Treelog&);
@@ -774,6 +775,7 @@ VegetationCrops::cleanup_canopy (const symbol crop_name, Treelog& msg)
 
 void
 VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
+                      const double row_width,
 		      const Geometry& geo,
 		      OrganicMatter& organic_matter, 
                       double& seed_N, double& seed_C, const Time& time, 
@@ -793,7 +795,7 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
     if ((*i)->name == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
-  crop->initialize (geo, organic_matter, time, msg);
+  crop->initialize (geo, row_width, organic_matter, time, msg);
   if (!crop->check (msg))
     {
       msg.error ("Sow failed");

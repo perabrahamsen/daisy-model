@@ -3199,6 +3199,9 @@ static struct OrganicStandardSyntax
     alist.add ("description", "\
 Mineralization and immobilization in soil.  Hansen et.al. 1991.\n\
 Recalibrated by Bruun et.al. 2002.");
+    alist.add ("description_LaTeX", "\
+Mineralization and immobilization in soil \
+\\cite{daisy-fertilizer,daisy-somnew}.");
     OrganicStandard::load_syntax (syntax, alist);
  
     Librarian::add_type (OrganicMatter::component, "default", alist, syntax, &make);

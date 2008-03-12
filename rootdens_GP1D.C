@@ -73,6 +73,8 @@ struct Rootdens_GP1D : public Rootdens
   void output (Log& log) const;
 
   // Create.
+  void initialize (const Geometry&, double /* row_width */, Treelog&)
+  { }
   Rootdens_GP1D (Block&);
 };
 

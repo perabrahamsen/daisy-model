@@ -1094,7 +1094,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
 	}
 
       if (library.has_interesting_description (alist))
-        print_description (alist.name ("description"));
+        format->alist_description (alist);
 
       print_users (xref.models[used]);
       const std::vector<Library::doc_fun>& doc_funs 
@@ -1121,8 +1121,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       format->index (name.name ());
 
       // Print description, if any.
-      if (alist.check ("description"))
-	print_description (alist.name ("description"));
+      format->alist_description (alist);
 
       print_users (xref.models[used]);
       print_sample (name, library);
@@ -1145,8 +1144,7 @@ ProgramDocument::print_fixed (const std::string& name,
   format->index (name);
 
   // Print description, if any.
-  if (alist.check ("description"))
-    print_description (alist.name ("description"));
+  format->alist_description (alist);
 
   print_users (xref.submodels[name]);
 

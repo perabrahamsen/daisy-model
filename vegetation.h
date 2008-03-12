@@ -144,7 +144,7 @@ public:
                       std::vector<double>& residuals_N_soil,
                       std::vector<double>& residuals_C_soil,
                       Treelog&) = 0;
-  virtual void sow (Metalib&, const AttributeList& al, 
+  virtual void sow (Metalib&, const AttributeList& al, double row_width,
                     const Geometry&, OrganicMatter&, 
                     double& seed_N /* kg/ha/h */,
                     double& seed_C /* kg/ha/h */,
