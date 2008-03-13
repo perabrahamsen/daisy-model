@@ -217,17 +217,21 @@ SoilWater::incorporate (const Geometry& geo, const double amount,
 { geo.add_surface (S_incorp_, volume, -amount); }
 
 void
-SoilWater::mix (const Geometry& geo, const Soil& soil,
-                const double from, const double to, const double dt)
+SoilWater::mix (const Geometry& geo, const Soil& soil, 
+                const SoilHeat& soil_heat, const double from, 
+                const double to, const double dt, Treelog& msg)
 {
   geo.mix (Theta_, from, to, tillage_, dt);
   for (size_t i = 0; i < soil.size(); i++)
     h_[i] = soil.h (i, Theta_[i]);
+  
+  tick_after (geo.cell_size (), soil,  soil_heat, msg);
 }
 
 void
-SoilWater::swap (const Geometry& geo, const Soil& soil,
-                 const double from, const double middle, const double to,
+SoilWater::swap (const Geometry& geo, const Soil& soil, 
+                 const SoilHeat& soil_heat, const double from, 
+                 const double middle, const double to,
                  const double dt, Treelog& msg)
 {
   geo.swap (Theta_, from, middle, to, tillage_, dt);
@@ -245,6 +249,7 @@ SoilWater::swap (const Geometry& geo, const Soil& soil,
 	}
       h_[i] = soil.h (i, Theta_[i]);
     }
+  tick_after (geo.cell_size (), soil,  soil_heat, msg);
 }
 
 void 
@@ -410,8 +415,8 @@ presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
 
 void
 SoilWater::initialize (const AttributeList& al, const Geometry& geo,
-                       const Soil& soil, const Groundwater& groundwater,
-                       Treelog& msg)
+                       const Soil& soil, const SoilHeat& soil_heat,
+                       const Groundwater& groundwater, Treelog& msg)
 {
   Treelog::Open nest (msg, "SoilWater");
 
@@ -523,6 +528,11 @@ SoilWater::initialize (const AttributeList& al, const Geometry& geo,
                          0.0);
   S_ice_.insert (S_ice_.begin (), cell_size, 0.0);
 
+  // Mobile/immobile solute
+  mobile_solute_.insert (mobile_solute_.begin (), cell_size, mobile);
+  Theta_mobile_ = Theta_;
+  Theta_immobile_.insert (Theta_immobile_.begin (), cell_size, 0.0);
+
   // Fluxes.
   q_.insert (q_.begin (), edge_size, 0.0);
   q_p_.insert (q_p_.begin (), edge_size, 0.0);
@@ -530,6 +540,9 @@ SoilWater::initialize (const AttributeList& al, const Geometry& geo,
   // Conductivity.
   for (size_t i = 0; i < cell_size; i++)
     K_.push_back (soil.K (i, h_[i], h_ice_[i], 10.0 /* [dg C] */));
+
+  // Update K and mobile/immobile water
+  tick_after (geo.cell_size (), soil,  soil_heat, msg);
 }
 
 SoilWater::SoilWater (Block& al)

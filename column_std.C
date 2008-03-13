@@ -427,7 +427,7 @@ ColumnStandard::mix (const double from, const double to,
   add_residuals (residuals);
   const double energy 
     = soil_heat->energy (geometry, *soil, *soil_water, from, to);
-  soil_water->mix (geometry, *soil, from, to, dt);
+  soil_water->mix (geometry, *soil, *soil_heat, from, to, dt, msg);
   soil_heat->set_energy (geometry, *soil, *soil_water, from, to, energy);
   chemistry->mix (geometry, *soil, *soil_water, from, to, penetration, dt);
   surface.unridge ();
@@ -441,7 +441,7 @@ ColumnStandard::swap (const double from, const double middle, const double to,
 {
   mix (from, middle, 1.0, time, dt, msg);
   mix (middle, to, 0.0, time, dt, msg);
-  soil_water->swap (geometry, *soil, from, middle, to, dt, msg);
+  soil_water->swap (geometry, *soil, *soil_heat, from, middle, to, dt, msg);
   soil_heat->swap (geometry, from, middle, to);
   chemistry->swap (geometry, *soil, *soil_water, from, middle, to, dt);
   organic_matter->swap (geometry, *soil, *soil_water, from, middle, to, 
@@ -859,8 +859,7 @@ ColumnStandard::initialize (Block& block,
   daisy_assert (residuals_C_soil.size () == soil->size ());
 
   groundwater->initialize (geometry, time, scope, msg);
-  soil_water->initialize (alist.alist ("SoilWater"), 
-                          geometry, *soil, *groundwater, msg);
+
   if (alist.check ("Movement"))
     {
       AttributeList move_alist (alist.alist ("Movement"));
@@ -886,6 +885,9 @@ ColumnStandard::initialize (Block& block,
   soil_heat->initialize (alist.alist ("SoilHeat"), geometry, 
                          movement->default_heat (*soil, time, my_weather),
                          msg);
+
+  soil_water->initialize (alist.alist ("SoilWater"), 
+                          geometry, *soil, *soil_heat, *groundwater, msg);
   
   // Solutes depends on water and heat.
   chemistry->initialize (alist.alist ("Chemistry"),

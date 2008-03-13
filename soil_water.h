@@ -132,11 +132,10 @@ public:
                    const Soil& soil, const SoilHeat& soil_heat, Treelog& msg);
   void incorporate (const Geometry&, double amount, double from, double to);
   void incorporate (const Geometry&, double amount, const Volume&);
-  void mix (const Geometry& geo,
-            const Soil&, double from, double to, double dt);
-  void swap (const Geometry& geo,
-             const Soil&, double from, double middle, double to, double dt, 
-             Treelog&);
+  void mix (const Geometry& geo, const Soil&, const SoilHeat&, double from, 
+            double to, double dt, Treelog&);
+  void swap (const Geometry& geo, const Soil&, const SoilHeat&, 
+             double from, double middle, double to, double dt, Treelog&);
   bool check (size_t n, Treelog& err) const;
   void output (Log& log) const;
 
@@ -151,7 +150,7 @@ public:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   void initialize (const AttributeList&, const Geometry&,
-                   const Soil&, const Groundwater&, Treelog&);
+                   const Soil&, const SoilHeat&, const Groundwater&, Treelog&);
   SoilWater (Block&);
   virtual ~SoilWater ();
 };
