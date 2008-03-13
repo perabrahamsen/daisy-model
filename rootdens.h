@@ -26,6 +26,7 @@
 #include "model.h"
 #include "symbol.h"
 #include <vector>
+#include <memory>
 
 class Log;
 class Geometry;
@@ -56,12 +57,17 @@ public:
 
   // Create and Destroy.
 public:
+  static std::auto_ptr<Rootdens> create_row (double row_width, 
+                                             double row_position);
+  static std::auto_ptr<Rootdens> create_uniform ();
+public:
   virtual void initialize (const Geometry& geo, double row_width, 
                            Treelog& msg) = 0;
   static const AttributeList& default_model ();
   static void load_syntax (Syntax&, AttributeList&);
 protected:
-  Rootdens (Block&);
+  explicit Rootdens (const char* id);
+  explicit Rootdens (Block&);
 public:
   ~Rootdens ();
 };

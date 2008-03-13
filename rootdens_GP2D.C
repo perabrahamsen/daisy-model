@@ -33,6 +33,8 @@
 
 #include <sstream>
 
+static const double default_DensRtTip = 0.1;
+
 struct Rootdens_GP2D : public Rootdens
 {
   // Parameters.
@@ -77,7 +79,8 @@ struct Rootdens_GP2D : public Rootdens
 
   // Create.
   void initialize (const Geometry&, double /* row_width */, Treelog&);
-  Rootdens_GP2D (Block&);
+  explicit Rootdens_GP2D (Block&);
+  explicit Rootdens_GP2D (const double row_width, const double row_pos);
 };
 
 void
@@ -320,6 +323,23 @@ Rootdens_GP2D::Rootdens_GP2D (Block& al)
     k (-42.42e42)
 { }
 
+Rootdens_GP2D::Rootdens_GP2D (const double row_width, const double row_pos)
+  : Rootdens ("GP2D"),
+    row_position (row_pos),
+    row_distance (row_width),
+    DensRtTip (default_DensRtTip),
+    DensIgnore (default_DensRtTip),
+    a_z (-42.42e42),
+    a_x (-42.42e42),
+    L00 (-42.42e42),
+    k (-42.42e42)
+{ }
+
+std::auto_ptr<Rootdens> 
+Rootdens::create_row (const double row_width, const double row_position)
+{ return std::auto_ptr<Rootdens> (new Rootdens_GP2D (row_width, 
+                                                     row_position)); }
+
 static struct Rootdens_GP2DSyntax
 {
   static Model& make (Block& al)
@@ -349,7 +369,7 @@ Horizontal position of row crops.");
 		"Distance between rows of crops.");
     syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
 		"Root density at (potential) penetration depth.");
-    alist.add ("DensRtTip", 0.1);
+    alist.add ("DensRtTip", default_DensRtTip);
     syntax.add ("DensIgnore", "cm/cm^3", Check::positive (),
 		Syntax::OptionalConst,
 		"Ignore cells with less than this root density.\n\

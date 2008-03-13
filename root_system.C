@@ -440,6 +440,14 @@ void
 RootSystem::initialize (const Geometry& geo, const double row_width, 
                         Treelog& msg)
 {
+  const bool is_row_crop = row_width > 0.0;
+  if (rootdens.get ())
+    /* We already has a root density model. */;
+  else if (is_row_crop)
+    rootdens = Rootdens::create_row (row_width, 0.0);
+  else
+    rootdens = Rootdens::create_uniform ();
+
   rootdens->initialize (geo, row_width, msg);
   initialize (geo, msg);
 }

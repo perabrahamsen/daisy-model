@@ -33,6 +33,8 @@
 
 #include <sstream>
 
+static const double default_DensRtTip = 0.1;
+
 struct Rootdens_GP1D : public Rootdens
 {
   // Parameters.
@@ -75,7 +77,8 @@ struct Rootdens_GP1D : public Rootdens
   // Create.
   void initialize (const Geometry&, double /* row_width */, Treelog&)
   { }
-  Rootdens_GP1D (Block&);
+  explicit Rootdens_GP1D (Block&);
+  explicit Rootdens_GP1D ();
 };
 
 void
@@ -276,6 +279,19 @@ Rootdens_GP1D::Rootdens_GP1D (Block& al)
     k (-42.42e42)
 { }
 
+Rootdens_GP1D::Rootdens_GP1D ()
+  : Rootdens ("GP1D"),
+    DensRtTip (default_DensRtTip),
+    DensIgnore (default_DensRtTip),
+    a (-42.42e42),
+    L0 (-42.42e42),
+    k (-42.42e42)
+{ }
+
+std::auto_ptr<Rootdens> 
+Rootdens::create_uniform ()
+{ return std::auto_ptr<Rootdens> (new Rootdens_GP1D ()); }
+
 static struct Rootdens_GP1DSyntax
 {
   static Model& make (Block& al)
@@ -293,7 +309,7 @@ to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
     Rootdens::load_syntax (syntax, alist);
     syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
 		"Root density at (potential) penetration depth.");
-    alist.add ("DensRtTip", 0.1);
+    alist.add ("DensRtTip", default_DensRtTip);
     syntax.add ("DensIgnore", "cm/cm^3", Check::positive (),
 		Syntax::OptionalConst,
 		"Ignore cells with less than this root density.\n\

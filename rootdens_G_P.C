@@ -273,3 +273,5 @@ Calculated from 'DensRtTip'.");
     Librarian::add_type (Rootdens::component, "Gerwitz+Page74", alist, syntax, &make);
   }
 } Rootdens_G_P_syntax;
+
+// rootdens_G_P.C ends here.
