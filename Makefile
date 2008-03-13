@@ -944,22 +944,8 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
-run_Qt${OBJ}: run_Qt.C run_Qt.h run.h model.h toplevel.h treelog_text.h \
-  treelog.h symbol.h vis_Qt.h time.h program.h
-vis_Qt${OBJ}: vis_Qt.C vis_Qt.h toplevel.h time.h log_Qt.h log_extern.h \
-  log_select.h log.h border.h model.h alist.h symbol.h memutils.h \
-  destination.h scope.h mathlib.h assertion.h
-log_Qt${OBJ}: log_Qt.C log_Qt.h log_extern.h log_select.h log.h time.h \
-  border.h model.h alist.h symbol.h memutils.h destination.h scope.h \
-  librarian.h syntax.h treelog.h
-ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
-  vis_Qt.h toplevel.h time.h memutils.h log_Qt.h log_extern.h \
-  log_select.h log.h border.h alist.h destination.h scope.h run_Qt.h \
-  run.h treelog_text.h treelog.h program.h metalib.h library.h \
-  librarian.h block.h syntax.h plf.h assertion.h path.h
-ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
-  block.h syntax.h treelog.h plf.h alist.h assertion.h
-main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+mobsol${OBJ}: mobsol.C mobsol.h model.h symbol.h block.h syntax.h treelog.h \
+  plf.h alist.h librarian.h assertion.h
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h block.h syntax.h \
   treelog.h plf.h librarian.h
 unit${OBJ}: unit.C unit.h model.h symbol.h check.h treelog.h metalib.h \
@@ -1020,7 +1006,7 @@ source${OBJ}: source.C source.h model.h time.h symbol.h block.h syntax.h \
 photo${OBJ}: photo.C photo.h model.h symbol.h block.h syntax.h treelog.h \
   plf.h librarian.h
 format${OBJ}: format.C format.h model.h symbol.h assertion.h block.h syntax.h \
-  treelog.h plf.h librarian.h
+  treelog.h plf.h librarian.h alist.h
 depth${OBJ}: depth.C depth.h model.h symbol.h block.h syntax.h treelog.h \
   plf.h alist.h time.h lexer_data.h lexer.h output.h condition.h \
   memutils.h number.h units.h check.h vcheck.h assertion.h librarian.h \
@@ -1080,7 +1066,7 @@ condition${OBJ}: condition.C condition.h model.h symbol.h alist.h block.h \
 horizon${OBJ}: horizon.C horizon.h model.h symbol.h library.h block.h \
   syntax.h treelog.h plf.h alist.h horheat.h hydraulic.h mathlib.h \
   assertion.h tortuosity.h texture.h nitrification.h log.h time.h \
-  border.h check_range.h check.h vcheck.h librarian.h
+  border.h check_range.h check.h vcheck.h librarian.h mobsol.h
 uzmodel${OBJ}: uzmodel.C uzmodel.h model.h symbol.h block.h syntax.h \
   treelog.h plf.h librarian.h
 hydraulic${OBJ}: hydraulic.C hydraulic.h model.h syntax.h treelog.h symbol.h \
@@ -1187,7 +1173,7 @@ surface${OBJ}: surface.C surface.h uzmodel.h model.h symbol.h syntax.h \
   ridge.h check.h
 soil_water${OBJ}: soil_water.C soil_water.h geometry.h syntax.h treelog.h \
   symbol.h mathlib.h assertion.h soil.h soil_heat.h groundwater.h model.h \
-  log.h time.h border.h alist.h submodel.h block.h plf.h
+  log.h time.h border.h alist.h submodel.h block.h plf.h mobsol.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h block.h syntax.h treelog.h symbol.h \
   plf.h alist.h geometry.h mathlib.h assertion.h soil.h soil_water.h \
   surface.h uzmodel.h model.h movement.h weather.h im.h log.h time.h \
@@ -1817,7 +1803,7 @@ crop_std${OBJ}: crop_std.C crop.h time.h alist.h symbol.h model.h chemistry.h \
   memutils.h
 action_sow${OBJ}: action_sow.C action.h model.h alist.h symbol.h block.h \
   syntax.h treelog.h plf.h daisy.h program.h run.h time.h timestep.h \
-  vcheck.h memutils.h field.h border.h crop.h librarian.h
+  vcheck.h memutils.h field.h border.h crop.h librarian.h check.h
 action_stop${OBJ}: action_stop.C action.h model.h alist.h symbol.h syntax.h \
   treelog.h daisy.h program.h run.h time.h timestep.h vcheck.h memutils.h \
   librarian.h

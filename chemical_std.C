@@ -104,7 +104,11 @@ struct ChemicalStandard : public Chemical
   // Soil state and log.
   std::vector<double> M_;	// Concentration in soil [g/cm^3]
   std::vector<double> C_;   // Concentration in soil solution [g/cm^3]
-  std::vector<double> S_;	// Combined source term.
+  std::vector<double> C_mobile_;   // Mobile conc. in soil solution [g/cm^3]
+  std::vector<double> C_immobile_; // Immobile conc. in soil solution [g/cm^3]
+  std::vector<double> S_;	  // Combined source term.
+  std::vector<double> S_mobile_;  // Mobile source term.
+  std::vector<double> S_immobile_;// Immobile source term.
   std::vector<double> S_p_;	// Source term for macropores only.
   std::vector<double> S_drain;	// Source term for soil drainage only.
   std::vector<double> S_external; // External source term, e.g. incorp. fert.
@@ -129,10 +133,14 @@ struct ChemicalStandard : public Chemical
   double C_below () const; // Concentration in groundwater [g/cm^3]
   double M (size_t) const;
   double C (size_t) const;
+  double C_mobile (size_t) const;
+  double C_immobile (size_t) const;
   double M_left (size_t, double dt) const;
   double total_surface (const Geometry&, 
 			double from, double to) const; // [g/cm^2]
   double S (size_t) const;
+  double S_mobile (size_t) const;
+  double S_immobile (size_t) const;
   double S_p (size_t) const;
   
   // Transport.
@@ -142,8 +150,10 @@ struct ChemicalStandard : public Chemical
 
   // Sink.
   void clear ();
-  void add_to_source (const std::vector<double>&, double dt);
-  void add_to_sink (const std::vector<double>&, double dt);
+  void add_to_source_mobile (const std::vector<double>&, double dt);
+  void add_to_source_immobile (const std::vector<double>&, double dt);
+  void add_to_sink_mobile (const std::vector<double>&, double dt);
+  void add_to_sink_immobile (const std::vector<double>&, double dt);
   void add_to_root_sink (const std::vector<double>&, double dt);
   void add_to_decompose_sink (const std::vector<double>&, double dt);
   void add_to_transform_source (const std::vector<double>&, double dt);
@@ -251,6 +261,14 @@ ChemicalStandard::C (size_t i) const
 { return C_[i]; }
 
 double 
+ChemicalStandard::C_mobile (size_t i) const
+{ return C_mobile_[i]; }
+
+double 
+ChemicalStandard::C_immobile (size_t i) const
+{ return C_immobile_[i]; }
+
+double 
 ChemicalStandard::M_left (size_t i, double dt) const
 { return M_[i] + S_[i] * dt; }
 
@@ -262,6 +280,14 @@ ChemicalStandard::total_surface (const Geometry& geo,
 double 
 ChemicalStandard::S (size_t i) const
 { return S_[i]; }
+
+double 
+ChemicalStandard::S_mobile (size_t i) const
+{ return S_mobile_[i]; }
+
+double 
+ChemicalStandard::S_immobile (size_t i) const
+{ return S_immobile_[i]; }
 
 double 
 ChemicalStandard::S_p (size_t i) const
@@ -280,6 +306,8 @@ ChemicalStandard::set_content (size_t c, double M, double C)
 { 
   M_[c] = M; 
   C_[c] = C; 
+  C_mobile_[c] = C;
+  C_immobile_[c] = C;
 }
 
 void
@@ -292,6 +320,8 @@ ChemicalStandard::clear ()
   residuals = 0.0;
   surface_tillage = 0.0;
   std::fill (S_.begin (), S_.end (), 0.0);
+  std::fill (S_mobile_.begin (), S_mobile_.end (), 0.0);
+  std::fill (S_immobile_.begin (), S_immobile_.end (), 0.0);
   std::fill (S_external.begin (), S_external.end (), 0.0);
   std::fill (S_root.begin (), S_root.end (), 0.0);
   std::fill (S_decompose.begin (), S_decompose.end (), 0.0);
@@ -300,25 +330,66 @@ ChemicalStandard::clear ()
 }
 
 void
-ChemicalStandard::add_to_source (const std::vector<double>& v, const double dt)
+ChemicalStandard::add_to_source_mobile (const std::vector<double>& v,
+                                        const double dt)
 {
   daisy_assert (S_.size () >= v.size ());
+  daisy_assert (S_mobile_.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
       S_[i] += v[i];
       daisy_assert (std::isfinite (S_[i]));
+      S_mobile_[i] += v[i];
+      daisy_assert (std::isfinite (S_mobile_[i]));
+      daisy_assert (M_left (i, dt) >= 0.0);
+    }
+}
+
+
+void
+ChemicalStandard::add_to_source_immobile (const std::vector<double>& v,
+                                        const double dt)
+{
+  daisy_assert (S_.size () >= v.size ());
+  daisy_assert (S_immobile_.size () >= v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    {
+      S_[i] += v[i];
+      daisy_assert (std::isfinite (S_[i]));
+      S_immobile_[i] += v[i];
+      daisy_assert (std::isfinite (S_immobile_[i]));
       daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
 
 void
-ChemicalStandard::add_to_sink (const std::vector<double>& v, const double dt)
+ChemicalStandard::add_to_sink_mobile (const std::vector<double>& v,
+                                      const double dt)
 {
   daisy_assert (S_.size () >= v.size ());
+  daisy_assert (S_mobile_.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
       S_[i] -= v[i];
       daisy_assert (std::isfinite (S_[i]));
+      S_mobile_[i] -= v[i];
+      daisy_assert (std::isfinite (S_mobile_[i]));
+      daisy_assert (M_left (i, dt) >= 0.0);
+    }
+}
+
+void
+ChemicalStandard::add_to_sink_immobile (const std::vector<double>& v,
+                                        const double dt)
+{
+  daisy_assert (S_.size () >= v.size ());
+  daisy_assert (S_immobile_.size () >= v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    {
+      S_[i] -= v[i];
+      daisy_assert (std::isfinite (S_[i]));
+      S_immobile_[i] -= v[i];
+      daisy_assert (std::isfinite (S_immobile_[i]));
       daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
@@ -330,7 +401,7 @@ ChemicalStandard::add_to_root_sink (const std::vector<double>& v,
   daisy_assert (S_root.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     S_root[i] -= v[i];
-  add_to_sink (v, dt);
+  add_to_sink_mobile (v, dt);
 }
 
 void
@@ -340,7 +411,7 @@ ChemicalStandard::add_to_decompose_sink (const std::vector<double>& v,
   daisy_assert (S_decompose.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     S_decompose[i] -= v[i];
-  add_to_sink (v, dt);
+  add_to_sink_immobile (v, dt);
 }
 
 void
@@ -350,7 +421,7 @@ ChemicalStandard::add_to_transform_sink (const std::vector<double>& v,
   daisy_assert (S_transform.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     S_transform[i] -= v[i];
-  add_to_sink (v, dt);
+  add_to_sink_immobile (v, dt);
 }
 
 void
@@ -360,7 +431,7 @@ ChemicalStandard::add_to_transform_source (const std::vector<double>& v,
   daisy_assert (S_transform.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     S_transform[i] += v[i];
-  add_to_source (v, dt);
+  add_to_source_immobile (v, dt);
 }
 
 void
@@ -537,18 +608,14 @@ ChemicalStandard::tick_soil (const size_t cell_size,
 
   // Permanent source.
   for (size_t i = 0; i < cell_size; i++)
-    {
-      S_external[i] += S_permanent[i];
-      S_[i] += S_external[i];
-      daisy_assert (M_left (i, dt) >= 0.0);
-    }
-
+    S_external[i] += S_permanent[i];
+  add_to_source_mobile (S_external, dt); 
+ 
   // Drainage.
   for (size_t i = 0; i < cell_size; i++)
-    {
-      S_drain[i] = -soil_water.S_drain (i) * C (i);
-      S_[i] += S_drain[i];
-    }
+    S_drain[i] = -soil_water.S_drain (i) * C (i);
+  add_to_source_mobile (S_drain, dt); 
+  
 }
 void 
 ChemicalStandard::mixture (const Geometry& geo,
@@ -697,8 +764,12 @@ ChemicalStandard::output (Log& log) const
                 + surface_decompose,
 		"top_loss", log);
   output_value (C_, "C", log);
+  output_value (C_mobile_, "C_mobile", log);
+  output_value (C_immobile_, "C_immobile", log);
   output_value (M_, "M", log);
   output_value (S_, "S", log);
+  output_value (S_mobile_, "S_mobile", log);
+  output_value (S_immobile_, "S_immobile", log);
   output_value (S_p_, "S_p", log);
   output_variable (S_drain, log);
   output_variable (S_external, log);
@@ -850,8 +921,11 @@ ChemicalStandard::initialize (const AttributeList& al,
   
   daisy_assert (C_.size () == M_.size ());
   daisy_assert (C_.size () == cell_size);
-
+  C_mobile_ = C_;
+  C_immobile_ = C_; 
   S_.insert (S_.begin (), cell_size, 0.0);
+  S_mobile_ = S_;
+  S_immobile_ = S_;
   S_p_.insert (S_p_.begin (), cell_size, 0.0);
   S_drain.insert (S_drain.begin (), cell_size, 0.0);
   S_external.insert (S_external.begin (), cell_size, 0.0);
@@ -1179,6 +1253,10 @@ infiltration..");
   // Soil variables.
   Geometry::add_layer (syntax, Syntax::OptionalState, "C", "g/cm^3",
 		       "Concentration in water.");
+  Geometry::add_layer (syntax, Syntax::OptionalState, "C_mobile", "g/cm^3",
+		       "Concentration in mobile water.");
+  Geometry::add_layer (syntax, Syntax::OptionalState, "C_immobile", "g/cm^3",
+		       "Concentration in immobile water.");
   Geometry::add_layer (syntax, Syntax::OptionalState, "M", "g/cm^3", 
 		       "Total mass per volume water, soil, and air.");
   Geometry::add_layer (syntax, Syntax::OptionalConst,
@@ -1188,6 +1266,10 @@ dry matter weight.\n\
 Only for initialization of the 'M' parameter.");
   syntax.add ("S", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term.");
+  syntax.add ("S_mobile", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Mobile source term.");
+  syntax.add ("S_immobile", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Immobile source term.");
   syntax.add ("S_p", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term (macropore transport only).");
   syntax.add ("S_drain", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,

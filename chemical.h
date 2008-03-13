@@ -68,10 +68,14 @@ public:
   virtual double C_below () const = 0; // Concentration in groundwater [g/cm^3]
   virtual double M (size_t i) const = 0;
   virtual double C (size_t i) const = 0;
+  virtual double C_mobile (size_t i) const = 0;
+  virtual double C_immobile (size_t i) const = 0;
   virtual double M_left (size_t i, double dt) const = 0;
   virtual double total_surface (const Geometry&, 
 				double from, double to) const = 0; // [g/cm^2]
   virtual double S (size_t i) const = 0;
+  virtual double S_mobile (size_t i) const = 0;
+  virtual double S_immobile (size_t i) const = 0;
   virtual double S_p (size_t i) const = 0;
   
   // Transport.
@@ -79,7 +83,6 @@ public:
   virtual void set_macro_flux (size_t e, double value) = 0;
   virtual void set_matrix_flux (size_t e, double value) = 0;
   virtual void set_content (size_t c, double M, double C) = 0;
-
   // Sink.
 public:
   virtual void clear () = 0;
