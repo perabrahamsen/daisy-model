@@ -1,3 +1,8 @@
+2008-03-12  Mikkel Mollerup  <mmo@life.ku.dk>
+
+	* Makefile (COMPONENTS): Added it.
+	* mobsol.C, mobsol.h: New component.
+
 2008-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* rootdens_GP2D.C, rootdens_GP1D.C, rootdens_AP.C, rootdens_PLF.C:

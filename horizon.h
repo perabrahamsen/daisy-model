@@ -36,6 +36,7 @@ class Treelog;
 class Block;
 class Syntax;
 class AttributeList;
+class Mobsol;
 
 class Horizon : public Model 
 {
@@ -55,6 +56,7 @@ public:
   double anisotropy () const;
   double heat_conductivity (double Theta, double Ice) const; // [erg/cm/h/dg C]
   double heat_capacity (double Theta, double Ice) const; // [erg/cm^3/dg C]
+  const Mobsol& mobile_solute () const;
   
   // Texture.
 public:
@@ -83,7 +85,8 @@ public:
                       const double h, const double T,
                       double& NH4, double& N2O, double& NO3, 
                       const double dt) const;
-  void output (Log&) const;
+ 
+void output (Log&) const;
 
   // Create and Destroy.
 private:

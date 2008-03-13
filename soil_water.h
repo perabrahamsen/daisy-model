@@ -42,6 +42,10 @@ class SoilWater
   friend class MovementRect;
   friend class UZRect2x1;
 
+  // Types.
+public:
+  enum mobile_solute_t { mobile, immobile, mixed };
+
   // Content.
 private:
   std::vector<double> h_;
@@ -59,6 +63,9 @@ private:
   std::vector<double> X_ice_;
   std::vector<double> X_ice_buffer_;
   std::vector<double> h_ice_;
+  std::vector<mobile_solute_t> mobile_solute_; 
+  std::vector<double> Theta_mobile_;
+  std::vector<double> Theta_immobile_;
   std::vector<double> q_;
   std::vector<double> q_p_;
   std::vector<double> K_;
@@ -98,6 +105,12 @@ public:
   { return X_ice_[i]; }
   double X_ice_total (size_t i) const
   { return X_ice_[i] + X_ice_buffer_[i]; }
+  mobile_solute_t mobile_solute (size_t i) const
+  { return mobile_solute_[i]; }
+  double Theta_mobile (size_t i) const
+  { return Theta_mobile_[i]; }
+  double Theta_immobile (size_t i) const
+  { return Theta_immobile_[i]; }
   double q (size_t i) const
   { return q_[i]; }
   double q_p (size_t i) const

@@ -37,6 +37,7 @@
 #include "check_range.h"
 #include "vcheck.h"
 #include "librarian.h"
+#include "mobsol.h"
 #include <vector>
 #include <map>
 
@@ -59,6 +60,7 @@ struct Horizon::Implementation
   typedef std::map<symbol, symbol> symbol_map;
   const symbol_map dimensions;
   const std::auto_ptr<Nitrification> nitrification;
+  const std::auto_ptr<Mobsol> mobsol;
   HorHeat hor_heat;
   
   // Create and Detroy.
@@ -128,6 +130,7 @@ Horizon::Implementation::Implementation (Block& al)
     attributes (get_attributes (al.alist_sequence ("attributes"))),
     dimensions (get_dimensions (al.alist_sequence ("attributes"))),
     nitrification (Librarian::build_item<Nitrification> (al, "Nitrification")),
+    mobsol (Librarian::build_item<Mobsol> (al, "mobile_solute")),
     hor_heat (al.alist ("HorHeat"))
 { }
 
@@ -198,6 +201,10 @@ double
 Horizon::heat_capacity (double Theta, double Ice) const
 { return impl->hor_heat.heat_capacity (Theta, Ice); }
 
+const Mobsol& 
+Horizon::mobile_solute () const
+{ return *impl->mobsol;}
+
 bool
 Horizon::has_attribute (const symbol name) const
 { return impl->attributes.find (name) != impl->attributes.end (); }
@@ -243,6 +250,7 @@ Horizon::nitrification (const double M, const double C,
                         double& NH4, double& N2O, double& NO3, 
                         const double dt) const
 { impl->nitrification->tick (M, C, M_left, h,  T, NH4, N2O, NO3, dt); }
+
 
 void 
 Horizon::output (Log& log) const
@@ -348,6 +356,11 @@ this horizon.");
   nitrification_alist.add ("N2O_fraction", 0.02);
 
   alist.add ("Nitrification", nitrification_alist);
+  
+  syntax.add_object ("mobile_solute", Mobsol::component,
+                     "Mobile/immobile solute movement.");
+  alist.add ("mobile_solute", Mobsol::full_model ());
+
 
   syntax.add_submodule ("HorHeat", alist, Syntax::State, 
                         "Heat capacity and conductivity.",

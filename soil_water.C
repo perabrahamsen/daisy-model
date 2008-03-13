@@ -29,6 +29,7 @@
 #include "log.h"
 #include "submodel.h"
 #include "block.h"
+#include "mobsol.h"
 #include <sstream>
 
 void
@@ -173,7 +174,34 @@ SoilWater::tick_after (const size_t cell_size,
                        Treelog&)
 {
   for (size_t i = 0; i < cell_size; i++)
-    K_[i] = soil.K (i, h_[i], h_ice_[i], soil_heat.T(i));
+    {
+      K_[i] = soil.K (i, h_[i], h_ice_[i], soil_heat.T(i));
+      
+      const Mobsol& mobsol = soil.mobile_solute (i);
+      if (mobsol.full ())
+        {
+          mobile_solute_[i] = mobile;
+          Theta_mobile_[i] = Theta_[i];
+          Theta_immobile_[i] = 0.0;
+        }
+      else  
+        {
+          const double h_lim = mobsol.h_lim ();
+          if (h_[i] <= h_lim)
+            {
+              mobile_solute_[i] = immobile;
+              Theta_mobile_[i] = 0.0;
+              Theta_immobile_[i] = Theta_[i];
+            }
+          else 
+            {
+              mobile_solute_[i] = mixed;
+              const double Theta_lim = soil.Theta (i, h_lim, h_ice_[i]);
+              Theta_mobile_[i] = Theta_[i] - Theta_lim;
+              Theta_immobile_[i] = Theta_lim;
+            }
+        }
+    }
 }
 
 void 
@@ -235,6 +263,8 @@ SoilWater::output (Log& log) const
   output_value (X_ice_, "X_ice", log);
   output_value (X_ice_buffer_, "X_ice_buffer", log);
   output_value (h_ice_, "h_ice", log);
+  output_value (Theta_mobile_, "Theta_mobile", log);
+  output_value (Theta_immobile_, "Theta_immobile", log);
   output_value (q_, "q", log);
   output_value (q_p_, "q_p", log);
   output_value (K_, "K", log);
@@ -364,8 +394,14 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Pressure at which all air is out of the matrix.\n\
 When there are no ice, this is 0.0.  When there are ice, the ice is\n\
 presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
+  syntax.add ("Theta_mobile", Syntax::Fraction (), 
+              Syntax::LogOnly, Syntax::Sequence,
+	      "Mobile soil water content.");
+  syntax.add ("Theta_immobile", Syntax::Fraction (), 
+              Syntax::LogOnly, Syntax::Sequence,
+	      "Immobile soil water content.");
   syntax.add ("q", "cm/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Matrix water flux (positive numbers mean upward).");
+	      "Matrix water flux (positive numbers mean upward).");  
   syntax.add ("q_p", "cm/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Water flux in macro pores (positive numbers mean upward).");
   syntax.add ("K", "cm/h", Syntax::LogOnly, Syntax::Sequence,
