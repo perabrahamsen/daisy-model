@@ -39,7 +39,6 @@ class Block;
 class SoilWater
 {
   friend class Movement1D;
-  friend class MovementRect;
   friend class UZRect2x1;
 
   // Types.

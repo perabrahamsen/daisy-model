@@ -944,6 +944,22 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+run_Qt${OBJ}: run_Qt.C run_Qt.h run.h model.h toplevel.h treelog_text.h \
+  treelog.h symbol.h vis_Qt.h time.h program.h
+vis_Qt${OBJ}: vis_Qt.C vis_Qt.h toplevel.h time.h log_Qt.h log_extern.h \
+  log_select.h log.h border.h model.h alist.h symbol.h memutils.h \
+  destination.h scope.h mathlib.h assertion.h
+log_Qt${OBJ}: log_Qt.C log_Qt.h log_extern.h log_select.h log.h time.h \
+  border.h model.h alist.h symbol.h memutils.h destination.h scope.h \
+  librarian.h syntax.h treelog.h
+ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
+  vis_Qt.h toplevel.h time.h memutils.h log_Qt.h log_extern.h \
+  log_select.h log.h border.h alist.h destination.h scope.h run_Qt.h \
+  run.h treelog_text.h treelog.h program.h metalib.h library.h \
+  librarian.h block.h syntax.h plf.h assertion.h path.h
+ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
+  block.h syntax.h treelog.h plf.h alist.h assertion.h
+main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
 mobsol${OBJ}: mobsol.C mobsol.h model.h symbol.h block.h syntax.h treelog.h \
   plf.h alist.h librarian.h assertion.h
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h block.h syntax.h \

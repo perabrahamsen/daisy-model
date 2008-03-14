@@ -231,7 +231,7 @@ static struct Rootdens_DS_Depth_Syntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
 
-    Rootdens::load_syntax (syntax, alist);
+    Rootdens::load_base (syntax, alist);
     alist.add ("description", "\
 Specify root density as a function of development stage.");
     syntax.add_submodule_sequence("entries", Syntax::Const, "\
@@ -282,7 +282,7 @@ static struct Rootdens_DS_Rel_Syntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
 
-    Rootdens::load_syntax (syntax, alist);
+    Rootdens::load_base (syntax, alist);
     alist.add ("description", "\
 Specify root density as a function of development stage.");
     syntax.add_submodule_sequence("entries", Syntax::Const, "\
@@ -333,7 +333,7 @@ static struct Rootdens_Depth_Depth_Syntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
 
-    Rootdens::load_syntax (syntax, alist);
+    Rootdens::load_base (syntax, alist);
     alist.add ("description", "\
 Specify root density as a function of development stage.");
     syntax.add_submodule_sequence("entries", Syntax::Const, "\

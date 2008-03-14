@@ -6,6 +6,13 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.28
+
+** New 'row_width' parameter to the 'sow' action.
+
+Specifying this will determine which rootdens model will be used,
+unless specified in the crop parameterization.
+
 * 4.27
 
 ** New 'every' conditions.

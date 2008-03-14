@@ -413,7 +413,7 @@ RootSystem::full_grown (const Geometry& geo,
 void
 RootSystem::output (Log& log) const
 {
-  output_derived (rootdens, "rootdens", log);
+  output_object (rootdens, "rootdens", log);
   output_derived (ABAprod, "ABAprod", log);
   output_variable (PotRtDpt, log);
   output_variable (Depth, log);
@@ -484,9 +484,9 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "RootSystem");
   alist.add ("description", "Standard root system model.");
 
-  syntax.add_object ("rootdens", Rootdens::component,
+  syntax.add_object ("rootdens", Rootdens::component, 
+                     Syntax::OptionalConst, Syntax::Singleton,
                      "Root density model.");
-  alist.add ("rootdens", Rootdens::default_model ());
 
   syntax.add_object ("ABAprod", ABAProd::component,
                      "ABA production model.");
@@ -594,7 +594,9 @@ get_PotRtDpt (Block& al)
 }
 
 RootSystem::RootSystem (Block& al)
-  : rootdens (Librarian::build_item<Rootdens> (al, "rootdens")),
+  : rootdens (al.check ("rootdens") 
+              ? Librarian::build_item<Rootdens> (al, "rootdens")
+              : NULL),
     ABAprod (Librarian::build_item<ABAProd> (al, "ABAprod")),
     PenPar1 (al.number ("PenPar1")),
     PenPar2 (al.number ("PenPar2")),

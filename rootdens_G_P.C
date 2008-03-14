@@ -225,6 +225,7 @@ Rootdens_G_P::Rootdens_G_P (Block& al)
     L0 (-42.42e42)
 { }
 
+#if 0
 const AttributeList& 
 Rootdens::default_model ()
 {
@@ -240,6 +241,7 @@ Rootdens::default_model ()
     }
   return alist;
 }
+#endif
 
 static struct Rootdens_G_PSyntax
 {
@@ -255,7 +257,7 @@ static struct Rootdens_G_PSyntax
 See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
 to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
 
-    Rootdens::load_syntax (syntax, alist);
+    Rootdens::load_base (syntax, alist);
     syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
 		"Root density at (potential) penetration depth.");
     alist.add ("DensRtTip", 0.1);

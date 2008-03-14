@@ -25,6 +25,7 @@
 
 #include "model.h"
 #include "symbol.h"
+#include "alist.h"
 #include <vector>
 #include <memory>
 
@@ -32,7 +33,6 @@ class Log;
 class Geometry;
 class Block;
 class Treelog;
-class AttributeList;
 class Syntax;
 
 class Rootdens : public Model
@@ -41,6 +41,7 @@ class Rootdens : public Model
 public:
   const symbol name;
   static const char *const component;
+  const AttributeList alist;	// Remember attributes for checkpoint.
 protected:
   const double SpRtLength;	// Specific root length [m/g]
 
@@ -63,10 +64,9 @@ public:
 public:
   virtual void initialize (const Geometry& geo, double row_width, 
                            Treelog& msg) = 0;
-  static const AttributeList& default_model ();
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_base (Syntax&, AttributeList&);
 protected:
-  explicit Rootdens (const char* id);
+  explicit Rootdens (const AttributeList&);
   explicit Rootdens (Block&);
 public:
   ~Rootdens ();

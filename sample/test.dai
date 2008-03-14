@@ -41,8 +41,9 @@
 ;; Use it.
 (column Andeby)
 
-;; Simulation start date.
+;; Simulation start and stop dates.
 (time 1986 12 1 1)
+(stop 1988 4 1 1)
 
 (manager activity
   (wait (at 1987 3 20 1))
@@ -63,9 +64,7 @@
   (wait (at 1987 10 10 1))
   (harvest "Grass"
            (stub 8.0 [cm])              ;Leave 8 cm stub.
-           (stem 1.00 []))             ;Harvest everything above stub.
-  (wait (at 1988 4 1 1))
-  (stop))
+           (stem 1.00 [])))             ;Harvest everything above stub.
 
 ;; Create these log files.
 (output harvest

@@ -33,8 +33,6 @@
 
 #include <sstream>
 
-static const double default_DensRtTip = 0.1;
-
 struct Rootdens_GP1D : public Rootdens
 {
   // Parameters.
@@ -75,10 +73,10 @@ struct Rootdens_GP1D : public Rootdens
   void output (Log& log) const;
 
   // Create.
-  void initialize (const Geometry&, double /* row_width */, Treelog&)
-  { }
+  void initialize (const Geometry&, double row_width, Treelog& msg);
+  static void load_syntax (Syntax&, AttributeList&);
   explicit Rootdens_GP1D (Block&);
-  explicit Rootdens_GP1D ();
+  explicit Rootdens_GP1D (const AttributeList&);
 };
 
 void
@@ -270,6 +268,38 @@ Rootdens_GP1D::output (Log& log) const
   output_variable (k, log); 
 }
 
+void 
+Rootdens_GP1D::initialize (const Geometry&, double row_width, Treelog& msg)
+{
+  if (!iszero (row_width))
+    msg.warning ("Row width not supported for '" + name 
+                 + "' root density model");
+}
+
+void
+Rootdens_GP1D::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  Rootdens::load_base (syntax, alist);
+  syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
+              "Root density at (potential) penetration depth.");
+  alist.add ("DensRtTip", 0.1);
+  syntax.add ("DensIgnore", "cm/cm^3", Check::positive (),
+              Syntax::OptionalConst,
+              "Ignore cells with less than this root density.\n\
+By default, this is the same as DensRtTip.");
+  syntax.add ("a", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
+Calculated from 'DensRtTip'.");
+  syntax.add ("L0", "cm/cm^3", Syntax::LogOnly,
+              "Root density at soil surface.");
+  syntax.add ("k", Syntax::None (), Syntax::LogOnly,
+              "Scale factor due to soil limit.\n\
+\n\
+Some roots might be below the soil imposed maximum root depth, or in areas\n\
+with a density lower than the limit specified by DensIgnore.\n\
+These roots will be re distributed within the root zone by multiplying the\n\
+density with this scale factor.");
+}
+
 Rootdens_GP1D::Rootdens_GP1D (Block& al)
   : Rootdens (al),
     DensRtTip (al.number ("DensRtTip")),
@@ -279,10 +309,10 @@ Rootdens_GP1D::Rootdens_GP1D (Block& al)
     k (-42.42e42)
 { }
 
-Rootdens_GP1D::Rootdens_GP1D ()
-  : Rootdens ("GP1D"),
-    DensRtTip (default_DensRtTip),
-    DensIgnore (default_DensRtTip),
+Rootdens_GP1D::Rootdens_GP1D (const AttributeList& al)
+  : Rootdens (al),
+    DensRtTip (al.number ("DensRtTip")),
+    DensIgnore (al.number ("DensIgnore", DensRtTip)),
     a (-42.42e42),
     L0 (-42.42e42),
     k (-42.42e42)
@@ -290,7 +320,16 @@ Rootdens_GP1D::Rootdens_GP1D ()
 
 std::auto_ptr<Rootdens> 
 Rootdens::create_uniform ()
-{ return std::auto_ptr<Rootdens> (new Rootdens_GP1D ()); }
+{
+  static AttributeList alist;
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      Rootdens_GP1D::load_syntax (dummy, alist);
+      alist.add ("type", "GP1D");
+    }
+  return std::auto_ptr<Rootdens> (new Rootdens_GP1D (alist)); 
+}
 
 static struct Rootdens_GP1DSyntax
 {
@@ -305,27 +344,7 @@ static struct Rootdens_GP1DSyntax
 \n\
 See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
 to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
-
-    Rootdens::load_syntax (syntax, alist);
-    syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
-		"Root density at (potential) penetration depth.");
-    alist.add ("DensRtTip", default_DensRtTip);
-    syntax.add ("DensIgnore", "cm/cm^3", Check::positive (),
-		Syntax::OptionalConst,
-		"Ignore cells with less than this root density.\n\
-By default, this is the same as DensRtTip.");
-    syntax.add ("a", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
-Calculated from 'DensRtTip'.");
-    syntax.add ("L0", "cm/cm^3", Syntax::LogOnly,
-                "Root density at soil surface.");
-    syntax.add ("k", Syntax::None (), Syntax::LogOnly,
-                "Scale factor due to soil limit.\n\
-\n\
-Some roots might be below the soil imposed maximum root depth, or in areas\n\
-with a density lower than the limit specified by DensIgnore.\n\
-These roots will be re distributed within the root zone by multiplying the\n\
-density with this scale factor.");
-
+    Rootdens_GP1D::load_syntax (syntax, alist);
     Librarian::add_type (Rootdens::component, "GP1D", alist, syntax, &make);
   }
 } Rootdens_GP1D_syntax;

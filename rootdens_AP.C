@@ -134,7 +134,7 @@ static struct Rootdens_APSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    Rootdens::load_syntax (syntax, alist);
+    Rootdens::load_base (syntax, alist);
     alist.add ("description", 
 	       "Use exponential function for root density.\n\
 \n\

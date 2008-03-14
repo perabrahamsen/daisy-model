@@ -79,8 +79,9 @@ struct Rootdens_GP2D : public Rootdens
 
   // Create.
   void initialize (const Geometry&, double /* row_width */, Treelog&);
+  static void load_syntax (Syntax&, AttributeList&);
   explicit Rootdens_GP2D (Block&);
-  explicit Rootdens_GP2D (const double row_width, const double row_pos);
+  explicit Rootdens_GP2D (const AttributeList&);
 };
 
 void
@@ -308,8 +309,55 @@ Rootdens_GP2D::output (Log& log) const
 }
 
 void 
-Rootdens_GP2D::initialize (const Geometry&, double /* row_width */, Treelog&)
-{ }
+Rootdens_GP2D::initialize (const Geometry& geo, double row_width, Treelog& msg)
+{ 
+  const double geo_width = geo.right () - geo.left ();
+  if (!approximate (geo_width, row_width))
+    {
+      std::ostringstream tmp;
+      tmp << "Row width (" << row_width << ") should match geometry width ("
+          << geo_width << ")";
+      msg.warning (tmp.str ());
+    }
+  if (!approximate (row_distance, row_width))
+    {
+      std::ostringstream tmp;
+      tmp << "Row width (" << row_width << ") does not match root distance ("
+          << row_distance << ")";
+      msg.warning (tmp.str ());
+    }
+}
+
+void
+Rootdens_GP2D::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  Rootdens::load_base (syntax, alist);
+  syntax.add ("row_position", "cm", Syntax::Const, "\
+Horizontal position of row crops.");
+  alist.add ("row_position", 0.0);
+  syntax.add ("row_distance", "cm", Syntax::Const, 
+              "Distance between rows of crops.");
+  syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
+              "Root density at (potential) penetration depth.");
+  alist.add ("DensRtTip", default_DensRtTip);
+  syntax.add ("DensIgnore", "cm/cm^3", Check::positive (),
+              Syntax::OptionalConst,
+              "Ignore cells with less than this root density.\n\
+By default, this is the same as DensRtTip.");
+  syntax.add ("a_z", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
+Calculated from 'DensRtTip'.");
+  syntax.add ("a_x", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
+Calculated from 'DensRtTip'.");
+  syntax.add ("L00", "cm/cm^3", Syntax::LogOnly,
+              "Root density at row crop at soil surface.");
+  syntax.add ("k", Syntax::None (), Syntax::LogOnly,
+              "Scale factor due to soil limit.\n\
+\n\
+Some roots might be below the soil imposed maximum root depth, or in areas\n\
+with a density lower than the limit specified by 'DensIgnore'.\n\
+These roots will be re distributed within the root zone by multiplying the\n\
+density with this scale factor.");
+}
 
 Rootdens_GP2D::Rootdens_GP2D (Block& al)
   : Rootdens (al),
@@ -323,12 +371,12 @@ Rootdens_GP2D::Rootdens_GP2D (Block& al)
     k (-42.42e42)
 { }
 
-Rootdens_GP2D::Rootdens_GP2D (const double row_width, const double row_pos)
-  : Rootdens ("GP2D"),
-    row_position (row_pos),
-    row_distance (row_width),
-    DensRtTip (default_DensRtTip),
-    DensIgnore (default_DensRtTip),
+Rootdens_GP2D::Rootdens_GP2D (const AttributeList& al)
+  : Rootdens (al),
+    row_position (al.number ("row_position")),
+    row_distance (al.number ("row_distance")),
+    DensRtTip (al.number ("DensRtTip")),
+    DensIgnore (al.number ("DensIgnore", DensRtTip)),
     a_z (-42.42e42),
     a_x (-42.42e42),
     L00 (-42.42e42),
@@ -337,8 +385,15 @@ Rootdens_GP2D::Rootdens_GP2D (const double row_width, const double row_pos)
 
 std::auto_ptr<Rootdens> 
 Rootdens::create_row (const double row_width, const double row_position)
-{ return std::auto_ptr<Rootdens> (new Rootdens_GP2D (row_width, 
-                                                     row_position)); }
+{
+  Syntax dummy;
+  AttributeList alist;
+  Rootdens_GP2D::load_syntax (dummy, alist);
+  alist.add ("type", "GP2D");
+  alist.add ("row_position", row_position);
+  alist.add ("row_distance", row_width);
+  return std::auto_ptr<Rootdens> (new Rootdens_GP2D (alist)); 
+}
 
 static struct Rootdens_GP2DSyntax
 {
@@ -360,34 +415,8 @@ as well as depth below row.\n\
 \n\
 See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
 to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
-
-    Rootdens::load_syntax (syntax, alist);
-    syntax.add ("row_position", "cm", Syntax::Const, "\
-Horizontal position of row crops.");
-    alist.add ("row_position", 0.0);
-    syntax.add ("row_distance", "cm", Syntax::Const, 
-		"Distance between rows of crops.");
-    syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
-		"Root density at (potential) penetration depth.");
-    alist.add ("DensRtTip", default_DensRtTip);
-    syntax.add ("DensIgnore", "cm/cm^3", Check::positive (),
-		Syntax::OptionalConst,
-		"Ignore cells with less than this root density.\n\
-By default, this is the same as DensRtTip.");
-    syntax.add ("a_z", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
-Calculated from 'DensRtTip'.");
-    syntax.add ("a_x", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
-Calculated from 'DensRtTip'.");
-    syntax.add ("L00", "cm/cm^3", Syntax::LogOnly,
-                "Root density at row crop at soil surface.");
-    syntax.add ("k", Syntax::None (), Syntax::LogOnly,
-                "Scale factor due to soil limit.\n\
-\n\
-Some roots might be below the soil imposed maximum root depth, or in areas\n\
-with a density lower than the limit specified by 'DensIgnore'.\n\
-These roots will be re distributed within the root zone by multiplying the\n\
-density with this scale factor.");
-
+    Rootdens_GP2D::load_syntax (syntax, alist);
+    
     Librarian::add_type (Rootdens::component, "GP2D", alist, syntax, &make);
   }
 } Rootdens_GP2D_syntax;

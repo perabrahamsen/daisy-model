@@ -1,12 +1,16 @@
+2008-03-13  Mikkel Mollerup  <mmo@life.ku.dk>
+
+	* soil_water.h, soil_water.C, chemical.h, chemical_std.C: Prepare
+	for mobile/immobile solute support.  
+	* column_std.C: Update caller.
+	
 2008-03-12  Mikkel Mollerup  <mmo@life.ku.dk>
 
 	* Makefile (COMPONENTS): Added it.
 	* mobsol.C, mobsol.h: New component.
-
+	* horizon.h, horizon.C, soil.h, soil.C: Support it.
+	
 2008-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
-
-	* rootdens_GP2D.C, rootdens_GP1D.C, rootdens_AP.C, rootdens_PLF.C:
-	* rootdens_PLF, rootdens.h (initalize): New function.
 
 	* action_sow.C (plant): New alias.
 	(row_width): New parameter.
@@ -15,6 +19,8 @@
 	* vegetation.h, vegetation_permanent.C, vegetation_crops.C (sow): Ditto.
 	* crop_std.C, crop_simple.C, crop_sold.C, crop_old.C:
 	* crop.h, root_system.C, root_system.h (initialize): Ditto.
+	* rootdens_GP2D.C, rootdens_GP1D.C, rootdens_AP.C, rootdens_PLF.C:
+	* rootdens_PLF, rootdens.h (initalize): New function.
 
 2008-03-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 

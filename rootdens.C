@@ -30,23 +30,23 @@
 
 const char *const Rootdens::component = "rootdens";
 
-static const double default_SpRtLength = 100.0; // [m/g]
-
 void
-Rootdens::load_syntax (Syntax& syntax, AttributeList& alist)
+Rootdens::load_base (Syntax& syntax, AttributeList& alist)
 {
   syntax.add ("SpRtLength", "m/g", Check::positive (), Syntax::Const,
 	      "Specific root length");
-  alist.add ("SpRtLength", default_SpRtLength);
+  alist.add ("SpRtLength", 100.0);
 }
 
-Rootdens::Rootdens (const char *const id)
-  : name (id),
-    SpRtLength (default_SpRtLength)
+Rootdens::Rootdens (const AttributeList& al)
+  : name (al.identifier ("type")),
+    alist (al),
+    SpRtLength (al.number ("SpRtLength"))
 { }
 
 Rootdens::Rootdens (Block& al)
   : name (al.identifier ("type")),
+    alist (al.alist ()),
     SpRtLength (al.number ("SpRtLength"))
 { }
 
