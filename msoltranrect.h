@@ -22,9 +22,7 @@
 #ifndef MSOLTRANRECT_H
 #define MSOLTRANRECT_H
 
-#include "model.h"
-#include "alist.h"
-#include "symbol.h"
+#include "logable.h"
 #include <vector>
 
 class Log;
@@ -42,13 +40,12 @@ class Treelog;
 class Block;
 class Scope;
 
-class Msoltranrect : public Model
+class Msoltranrect : public ModelAListed
 {
   // Content.
 public:
-  const AttributeList alist;	// Remember attributes for checkpoint.
-  const symbol name;
   static const char *const component;
+  symbol library_id () const;
 
   // Simulation.
 public:

@@ -27,6 +27,13 @@
 
 const char *const Raddist::component = "raddist";
 
+symbol 
+Raddist::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Raddist::output (Log&) const
 { }
@@ -73,8 +80,7 @@ Raddist::load_syntax (Syntax&, AttributeList&)
 { }
 
 Raddist::Raddist (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : ModelAListed (al.alist ())
 { }
 
 Raddist::~Raddist ()

@@ -384,18 +384,7 @@ output_list_ (T const& items, const symbol name, Log& log,
       for (typename T::const_iterator item = items.begin(); 
 	   item != items.end();
 	   item++)
-#if 1
-	{
-	  if (log.check_entry ((*item)->name, library))
-	    {
-	      Log::Entry entry (log, symbol ((*item)->name),
-				(*item)->alist, library);
-	      (*item)->output (log);
-	    }
-	}
-#else
         (*item)->output_as_entry (log);
-#endif
     }
 }
 

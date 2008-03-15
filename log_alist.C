@@ -27,6 +27,7 @@
 #include "library.h"
 #include "syntax.h"
 #include "assertion.h"
+#include <sstream>
 
 bool
 LogAList::check_entry (symbol, const char*) const
@@ -327,7 +328,13 @@ void
 LogAList::open_derived (symbol field, symbol type, const char *const library)
 { 
   const std::string& sfield = field.name ();
-  daisy_assert (alist ().check (sfield));
+  if (!alist ().check (sfield))
+    {
+      std::ostringstream tmp;
+      tmp << "No field '" << field << "' (type " << type
+          << ") within library '" << library << "'";
+      daisy_panic (tmp.str ());
+    }
   open_object (field, type, alist ().alist (sfield), library);
 }
 	

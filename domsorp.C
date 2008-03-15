@@ -27,6 +27,13 @@
 
 const char *const Domsorp::component = "domsorp";
 
+symbol 
+Domsorp::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Domsorp::initialize (const Soil&, Treelog&)
 { }
@@ -36,8 +43,7 @@ Domsorp::load_syntax (Syntax&, AttributeList&)
 { }
 
 Domsorp::Domsorp (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : ModelAListed (al.alist ())
 { }
 
 Domsorp::~Domsorp ()

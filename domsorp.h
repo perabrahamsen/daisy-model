@@ -22,8 +22,7 @@
 #ifndef DOMSORP_H
 #define DOMSORP_H
 
-#include "model.h"
-#include "symbol.h"
+#include "logable.h"
 #include <vector>
 
 class Log;
@@ -37,13 +36,12 @@ class Block;
 class Treelog;
 class Syntax;
 
-class Domsorp : public Model
+class Domsorp : public ModelAListed
 {
   // Content.
 public:
   static const char *const component;
-  const symbol name;
-  const AttributeList& alist;
+  symbol library_id () const;
 
   // Simulation.
 public:

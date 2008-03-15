@@ -30,6 +30,13 @@ const double Crop::DSremove = -5001.0;
 
 const char *const Crop::component = "crop";
 
+symbol 
+Crop::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 double 
 Crop::minimum_light_fraction () const
 { return 0.0; }
@@ -98,8 +105,7 @@ Crop::ds_remove (const Crop* crop)
 { return approximate (crop->DS (), Crop::DSremove); }
 
 Crop::Crop (Block& al)
-  : alist (al.alist ()),
-    name (al.identifier ("type"))
+  : ModelAListed (al.alist ())
 { }
 
 Crop::~Crop ()

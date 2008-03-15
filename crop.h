@@ -1,4 +1,4 @@
-// crop.h
+// crop.h -- Stuff that grows on fields.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -23,9 +23,8 @@
 #ifndef CROP_H
 #define CROP_H
 
+#include "logable.h"
 #include "time.h"
-#include "alist.h"
-#include "model.h"
 #include <vector>
 
 class Log;
@@ -49,13 +48,12 @@ class AM;
 class Treelog;
 class Block;
 
-class Crop : public Model 
+class Crop : public ModelAListed
 {
   // Content.
 public:
-  const AttributeList alist;	// Remember attributes for checkpoint.
-  const symbol name;
   static const char *const component;
+  symbol library_id () const;
 
   // Communication with Bioclimate.
 public:

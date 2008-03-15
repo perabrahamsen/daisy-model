@@ -30,6 +30,13 @@
 
 const char *const Msoltranrect::component = "msoltranrect";
 
+symbol 
+Msoltranrect::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Msoltranrect::solute (const GeometryRect& geo,
                       const Soil& soil, const SoilWater& soil_water,
@@ -97,8 +104,7 @@ Msoltranrect::element (const GeometryRect& geo,
 }
 
 Msoltranrect::Msoltranrect (Block& al)
-  : alist (al.alist ()),
-    name (al.identifier ("type"))
+  : ModelAListed (al.alist ())
 { }
 
 Msoltranrect::~Msoltranrect ()

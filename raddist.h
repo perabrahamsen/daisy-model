@@ -22,8 +22,7 @@
 #ifndef RADDIST_H
 #define RADDIST_H
 
-#include "model.h"
-#include "alist.h"
+#include "logable.h"
 #include <vector>
 
 class Log;
@@ -31,13 +30,12 @@ class Vegetation;
 class Treelog;
 class Block;
 
-class Raddist : public Model
+class Raddist : public ModelAListed
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
-  const AttributeList alist;	// Remember attributes for checkpoint.
+  symbol library_id () const;
 
   // Simulation.
 public:
