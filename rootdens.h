@@ -23,9 +23,7 @@
 #ifndef ROOTDENS_H
 #define ROOTDENS_H
 
-#include "model.h"
-#include "symbol.h"
-#include "alist.h"
+#include "logable.h"
 #include <vector>
 #include <memory>
 
@@ -35,13 +33,12 @@ class Block;
 class Treelog;
 class Syntax;
 
-class Rootdens : public Model
+class Rootdens : public ModelAListed
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
-  const AttributeList alist;	// Remember attributes for checkpoint.
+  symbol library_id () const;
 protected:
   const double SpRtLength;	// Specific root length [m/g]
 
@@ -54,7 +51,6 @@ public:
 			    double WRoot /* [g DM/m^2] */, double DS,
 			    std::vector<double>& Density /* [cm/cm^3] */,
 			    Treelog&) = 0;
-  virtual void output (Log& log) const = 0;
 
   // Create and Destroy.
 public:

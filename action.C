@@ -27,6 +27,13 @@
 
 const char *const Action::component = "action";
 
+symbol 
+Action::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Action::tick (const Daisy&, const Scope&, Treelog&)
 { }
@@ -48,13 +55,11 @@ Action::check (const Daisy&, const Scope&, Treelog&) const
 { return true; }
 
 Action::Action (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : ModelAListed (al.alist ())
 { }
 
 Action::Action (Block&, const AttributeList& al)
-  : name (al.identifier ("type")),
-    alist (al)
+  : ModelAListed (al)
 { }
 
 Action::~Action ()

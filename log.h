@@ -25,7 +25,7 @@
 
 #include "time.h"
 #include "border.h"
-#include "model.h"
+#include "logable.h"
 #include "alist.h"
 #include "symbol.h"
 #include <iosfwd>
@@ -50,16 +50,15 @@ class Metalib;
 class Treelog;
 class Block;
 
-class EXPORT Log : public Model
+class EXPORT Log : public ModelAListed
 {
   // Content.
 private:
   struct Implementation;
   std::auto_ptr<Implementation> impl;
 public:
-  const AttributeList alist;	// Remember attributes for checkpoint.
-  const symbol name;
   static const char *const component;
+  symbol library_id () const;
   const Metalib& metalib () const;
 
   // Filter
@@ -365,19 +364,8 @@ output_derived_ (const T& submodule, const symbol name, Log& log)
 #define output_object(submodule, key, log) \
 do { \
   static const symbol MACRO_name (key); \
-  output_object_ ((*submodule), MACRO_name, (log)); \
+  submodule->output_as_object (MACRO_name, (log));      \
 } while (false)
-
-template <class T> void
-output_object_ (const T& submodule, const symbol name, Log& log)
-{
-  if (log.check_derived (name, submodule.name, T::component))
-    {
-      Log::Object object (log, name, submodule.name, 
-			  submodule.alist, T::component);
-      submodule.output (log);
-    }
-}
 
 // Output a list of objects.
 #define output_list(items, key, log, lib) \
@@ -396,6 +384,7 @@ output_list_ (T const& items, const symbol name, Log& log,
       for (typename T::const_iterator item = items.begin(); 
 	   item != items.end();
 	   item++)
+#if 1
 	{
 	  if (log.check_entry ((*item)->name, library))
 	    {
@@ -404,6 +393,9 @@ output_list_ (T const& items, const symbol name, Log& log,
 	      (*item)->output (log);
 	    }
 	}
+#else
+        (*item)->output_as_entry (log);
+#endif
     }
 }
 

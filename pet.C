@@ -31,6 +31,13 @@
 
 const char *const Pet::component = "pet";
 
+symbol 
+Pet::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 double
 Pet::reference_to_potential (const Vegetation& crops, 
 			     const Surface& surface,
@@ -65,8 +72,7 @@ Pet::load_syntax (Syntax& syntax, AttributeList&)
 }
 
 Pet::Pet (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : ModelAListed (al.alist ())
 { }
 
 Pet::~Pet ()

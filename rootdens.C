@@ -30,6 +30,13 @@
 
 const char *const Rootdens::component = "rootdens";
 
+symbol 
+Rootdens::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Rootdens::load_base (Syntax& syntax, AttributeList& alist)
 {
@@ -39,14 +46,12 @@ Rootdens::load_base (Syntax& syntax, AttributeList& alist)
 }
 
 Rootdens::Rootdens (const AttributeList& al)
-  : name (al.identifier ("type")),
-    alist (al),
+  : ModelAListed (al),
     SpRtLength (al.number ("SpRtLength"))
 { }
 
 Rootdens::Rootdens (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ()),
+  : ModelAListed (al.alist ()),
     SpRtLength (al.number ("SpRtLength"))
 { }
 

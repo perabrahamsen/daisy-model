@@ -38,7 +38,7 @@ Mobsol::~Mobsol ()
 { }
 
 static Librarian Mobsol_init (Mobsol::component, "\
-Specify one end of an interval mobsolary.");
+Specify solute mobility.");
 
 // "full" model.
 

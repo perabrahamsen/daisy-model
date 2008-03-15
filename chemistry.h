@@ -22,7 +22,7 @@
 #ifndef CHEMISTRY_H
 #define CHEMISTRY_H
 
-#include "model.h"
+#include "logable.h"
 #include "symbol.h"
 #include "alist.h"
 #include <vector>
@@ -42,13 +42,12 @@ class Block;
 class Scope;
 class IM;
 
-class Chemistry : public Model
+class Chemistry : public ModelAListed
 {
   // Content.
 public:
-  const symbol name;
-  const AttributeList alist;
   static const char *const component;
+  symbol library_id () const;
 
   // Query.
 public:

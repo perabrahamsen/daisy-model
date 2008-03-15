@@ -26,6 +26,13 @@
 
 const char *const Difrad::component = "difrad";
 
+symbol 
+Difrad::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Difrad::output (Log&) const
 { }
@@ -35,8 +42,7 @@ Difrad::load_syntax (Syntax&, AttributeList&)
 { }
 
 Difrad::Difrad (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : ModelAListed (al.alist ())
 { }
 
 Difrad::~Difrad ()
@@ -46,3 +52,4 @@ static Librarian Difrad_init (Difrad::component, "\
 The 'difrad' component should calculate the diffuse radiation from\n\
 meterological data.");
 
+// difrad.C ends here.

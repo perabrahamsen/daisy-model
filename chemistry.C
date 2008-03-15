@@ -31,6 +31,13 @@
 
 const char *const Chemistry::component = "chemistry";
 
+symbol 
+Chemistry::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 bool
 Chemistry::require (const symbol chem, Treelog& msg) const
 {
@@ -98,8 +105,7 @@ Chemistry::load_syntax (Syntax& syntax, AttributeList& alist)
 { }
 
 Chemistry::Chemistry (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : ModelAListed (al.alist ())
 { }
 
 Chemistry::~Chemistry ()

@@ -29,6 +29,13 @@
 
 const char *const Bioclimate::component = "bioclimate";
 
+symbol 
+Bioclimate::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 double 
 Bioclimate::day_fraction () const
 {
@@ -66,8 +73,7 @@ Bioclimate::intensity_distribution (const int No, const double LAI,
 }
 
 Bioclimate::Bioclimate (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : ModelAListed (al.alist ())
 { }
 
 Bioclimate::~Bioclimate ()
@@ -77,3 +83,5 @@ static Librarian Bioclimate_init (Bioclimate::component, "\
 The 'bioclimate' component is responsible for distributing the water\n\
 and energy provided by the weather component among the crops and soil\n\
 for a given column.");
+
+// bioclimate.C ends here.

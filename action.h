@@ -23,8 +23,7 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#include "model.h"
-#include "alist.h"
+#include "logable.h"
 
 class Log;
 class Daisy;
@@ -32,12 +31,12 @@ class Treelog;
 class Block;
 class Scope;
 
-class Action : public Model
+class Action : public ModelAListed
 {
   // Content.
 public:
-  const symbol name;
-  const AttributeList alist;
+  static const char *const component;
+  symbol library_id () const;
 
   // Simulation.
 public:
@@ -50,7 +49,6 @@ public:
 public: 
   virtual void initialize (const Daisy&, const Scope&, Treelog&) = 0;
   virtual bool check (const Daisy&, const Scope&, Treelog&) const = 0;
-  static const char *const component;
 private:
   Action (const Action&);
   Action& operator= (const Action&);

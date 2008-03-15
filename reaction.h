@@ -22,8 +22,7 @@
 #ifndef REACTION_H
 #define REACTION_H
 
-#include "model.h"
-#include "alist.h"
+#include "logable.h"
 
 class Log;
 class Geometry;
@@ -35,13 +34,12 @@ class Chemistry;
 class Treelog;
 class Block;
 
-class Reaction : public Model
+class Reaction : public ModelAListed
 {
   // Content.
 public:
   static const char *const component;
-  const symbol name;
-  const AttributeList alist;
+  symbol library_id () const;
 
   // Simulation.
 public:

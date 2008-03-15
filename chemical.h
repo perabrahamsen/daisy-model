@@ -24,8 +24,7 @@
 #ifndef CHEMICAL_H
 #define CHEMICAL_H
 
-#include "model.h"
-#include "alist.h"
+#include "logable.h"
 
 class Geometry;
 class Soil;
@@ -41,13 +40,12 @@ class Log;
 class Block;
 class Scope;
 
-class Chemical : public Model
+class Chemical : public ModelAListed
 {
   // Content.
 public:
-  const symbol name;
-  const AttributeList alist;
   static const char *const component;
+  symbol library_id () const;
 
   // Some standard chemicals.
 public:

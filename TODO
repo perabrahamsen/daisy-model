@@ -1,8 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* alist.cite ...
-
-* alist.location
+* Gør den gamle 1D rootdens til default.
 
 * Treelog send (severity, location, text);
 

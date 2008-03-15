@@ -32,6 +32,13 @@
 
 const char *const Log::component = "log";
 
+symbol 
+Log::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 struct Log::Implementation
 {
   std::list<const Soil*> soils;
@@ -173,14 +180,13 @@ Log::initialize_common (const Metalib& metalib, Treelog& msg)
 }
 
 Log::Log (Block& al)
-  : impl (new Implementation ()),
-    alist (al.alist ()),
-    name (al.identifier ("type"))
+  : ModelAListed (al.alist ()),
+    impl (new Implementation ())
 { }
 
 Log::Log (const char *const id)
-  : impl (new Implementation ()),
-    name (id)
+  : ModelAListed (symbol (id)),
+    impl (new Implementation ())
 { }
 
 void

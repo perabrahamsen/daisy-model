@@ -22,8 +22,7 @@
 #ifndef DIFRAD_H
 #define DIFRAD_H
 
-#include "model.h"
-#include "alist.h"
+#include "logable.h"
 
 class Log;
 class Weather;
@@ -31,18 +30,17 @@ class Time;
 class Treelog;
 class Block;
 
-class Difrad : public Model
+class Difrad : public ModelAListed
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
-  const AttributeList alist;	// Remember attributes for checkpoint.
+  symbol library_id () const;
 
   // Simulation.
 public:
   virtual double value (const Time&, const Weather&, Treelog&) = 0;//[]
-  virtual void output (Log&) const;
+  void output (Log&) const;
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);

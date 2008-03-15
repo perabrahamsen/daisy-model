@@ -31,6 +31,14 @@
 
 const char *const Chemical::component = "chemical";
 
+symbol 
+Chemical::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
+
 const symbol
 Chemical::NO3 ()
 {
@@ -60,8 +68,7 @@ Chemical::check_library ()
 }
 
 Chemical::Chemical (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : ModelAListed (al.alist ())
 { }
 
 Chemical::~Chemical ()
@@ -71,3 +78,4 @@ static Librarian Chemical_init (Chemical::component, "\
 This component should, for a specific chemical (typically a pesticide),\n\
 provide a description of the properties of interest to Daisy.");
 
+// chemical.C ends here.

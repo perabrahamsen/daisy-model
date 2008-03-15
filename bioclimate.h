@@ -23,9 +23,7 @@
 #ifndef BIOCLIMATE_H
 #define BIOCLIMATE_H
 
-#include "model.h"
-#include "alist.h"
-#include "symbol.h"
+#include "logable.h"
 
 class Surface;
 class Weather;
@@ -43,13 +41,12 @@ class Time;
 class Treelog;
 class Block;
 
-class Bioclimate : public Model
+class Bioclimate : public ModelAListed
 { 
   // Content.
 public:
-  const symbol name;
   static const char *const component;
-  const AttributeList alist;	// Remember attributes for checkpoint.
+  symbol library_id () const;
 
   // Simulation.
 public:
@@ -57,7 +54,6 @@ public:
                      const Movement&, const Geometry&,
 		     const Soil&, SoilWater&, const SoilHeat&, 
 		     Chemistry&, double dt, Treelog&) = 0;
-  virtual void output (Log&) const = 0;
   virtual double get_intercepted_water () const = 0; // [mm]
   virtual double get_snow_storage () const = 0; // [mm]
   virtual double snow_leak_rate (double dt) const = 0; // [h^-1]

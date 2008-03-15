@@ -23,9 +23,7 @@
 #ifndef CONDITION_H
 #define CONDITION_H
 
-#include "model.h"
-#include "symbol.h"
-#include "alist.h"
+#include "logable.h"
 
 class Daisy;
 class Log;
@@ -33,13 +31,12 @@ class Block;
 class Treelog;
 class Scope;
 
-class Condition : public Model
+class Condition : public ModelAListed
 {  
   // Content.
 public:
-  const symbol name;
-  const AttributeList alist;
   static const char *const component;
+  symbol library_id () const;
   virtual const std::string timestep ();
 
   // Simulation.

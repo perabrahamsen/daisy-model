@@ -27,13 +27,19 @@
 
 const char *const Condition::component = "condition";
 
+symbol 
+Condition::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 const std::string
 Condition::timestep ()
 { return "dt"; } 
 
 Condition::Condition (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : ModelAListed (al.alist ())
 { }
 
 void 
@@ -41,7 +47,7 @@ Condition::initiate_log (const Daisy&)
 { }
 
 Condition::Condition (const char *const id)
-  : name (id)
+  : ModelAListed (symbol (id))
 { }
 
 Condition::~Condition ()
@@ -53,3 +59,4 @@ whether the water pressure in a specific depth is above a given\n\
 threshold.  Logic conditions like 'and' and 'or' can be used for\n\
 testing whether multiple conditions are fulfilled simultaneously.");
 
+// condition.C ends here.

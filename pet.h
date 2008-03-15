@@ -23,8 +23,7 @@
 #ifndef PET_H
 #define PET_H
 
-#include "model.h"
-#include "alist.h"
+#include "logable.h"
 
 class Log;
 class Geometry;
@@ -38,13 +37,12 @@ class Time;
 class Treelog;
 class Block;
 
-class Pet : public Model
+class Pet : public ModelAListed
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
-  const AttributeList alist;	// Remember attributes for checkpoint.
+  symbol library_id () const;
 
   // Utilities.
 public:
@@ -59,7 +57,7 @@ public:
 		     const SoilWater&, Treelog&) = 0;
   virtual double wet () const = 0; // [mm/h]
   virtual double dry () const; // [mm/h]
-  virtual void output (Log&) const;
+  void output (Log&) const;
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);

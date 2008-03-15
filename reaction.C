@@ -26,9 +26,15 @@
 
 const char *const Reaction::component = "reaction";
 
+symbol 
+Reaction::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Reaction::Reaction (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : ModelAListed (al.alist ())
 { }
 
 Reaction::~Reaction ()
@@ -36,3 +42,5 @@ Reaction::~Reaction ()
 
 static Librarian Reaction_init (Reaction::component, "\
 Generic transformations between soil chemicals.");
+
+// reaction.C ends here.
