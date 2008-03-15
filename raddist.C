@@ -80,7 +80,7 @@ Raddist::load_syntax (Syntax&, AttributeList&)
 { }
 
 Raddist::Raddist (Block& al)
-  : ModelAListed (al.alist ())
+  : ModelNamed (al.identifier ("type"))
 { }
 
 Raddist::~Raddist ()

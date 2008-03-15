@@ -388,29 +388,6 @@ output_list_ (T const& items, const symbol name, Log& log,
     }
 }
 
-// Output a list of named alists.
-#define output_named(items, key, log) \
-do { \
-  static const symbol MACRO_name (key); \
-  output_named_ ((items), MACRO_name, (log)); \
-} while (false)
-
-template <class T> void
-output_named_ (T const& items, const symbol name, Log& log)
-{
-  if (log.check_interior (name))
-    {
-      Log::Open open (log, name);
-      for (typename T::const_iterator item = items.begin ();
-	   item != items.end ();
-	   item++)
-	{
-	  Log::Named named (log, (*item)->name);
-	  (*item)->output (log);
-	}
-    }
-}
-
 // Output an ordered list of alists.
 #define output_ordered(items, key, log) \
 do { \

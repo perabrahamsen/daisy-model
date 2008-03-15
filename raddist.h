@@ -30,7 +30,7 @@ class Vegetation;
 class Treelog;
 class Block;
 
-class Raddist : public ModelAListed
+class Raddist : public ModelNamed
 {
   // Content.
 public:
