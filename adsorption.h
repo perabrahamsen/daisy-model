@@ -24,19 +24,18 @@
 #define ADSORPTION_H
 
 #include "model.h"
-#include "symbol.h"
 
 class Log;
 class Soil;
 class Block;
 class AttributeList;
 
-class Adsorption : public Model
+class Adsorption : public ModelNamed
 {
   // Content.
 public:
   static const char *const component;
-  const symbol name;
+  symbol library_id () const;
 
   // Simulation.
 public:

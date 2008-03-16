@@ -24,7 +24,7 @@
 #ifndef CHEMICAL_H
 #define CHEMICAL_H
 
-#include "logable.h"
+#include "model.h"
 
 class Geometry;
 class Soil;

@@ -25,7 +25,7 @@
 
 #include "time.h"
 #include "border.h"
-#include "logable.h"
+#include "model.h"
 #include "alist.h"
 #include "symbol.h"
 #include <iosfwd>

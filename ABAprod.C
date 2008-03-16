@@ -27,8 +27,15 @@
 
 const char *const ABAProd::component = "ABAproduction";
 
+symbol 
+ABAProd::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 ABAProd::ABAProd (Block& al)
-  : name (al.identifier ("type"))
+  : ModelNamed (al.identifier ("type"))
 { }
 
 ABAProd::~ABAProd ()

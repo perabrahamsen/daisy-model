@@ -32,6 +32,13 @@
 
 const char *const Adsorption::component = "adsorption";
 
+symbol 
+Adsorption::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 bool
 Adsorption::full () const
 { return false; }
@@ -41,11 +48,11 @@ Adsorption::output (Log&) const
 { }
 
 Adsorption::Adsorption (const char *const type)
-  : name (type)
+  : ModelNamed (symbol (type))
 { }
 
 Adsorption::Adsorption (Block& al)
-  : name (al.identifier ("type"))
+  : ModelNamed (al.identifier ("type"))
 { }
 
 Adsorption::~Adsorption ()

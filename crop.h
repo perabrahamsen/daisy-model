@@ -23,7 +23,7 @@
 #ifndef CROP_H
 #define CROP_H
 
-#include "logable.h"
+#include "model.h"
 #include "time.h"
 #include <vector>
 

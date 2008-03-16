@@ -22,7 +22,6 @@
 #define ABAPROD_H
 
 #include "model.h"
-#include "symbol.h"
 #include <vector>
 
 class Treelog;
@@ -32,12 +31,12 @@ class AttributeList;
 class Geometry;
 class SoilWater;
 
-class ABAProd : public Model
+class ABAProd : public ModelNamed
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
+  symbol library_id () const;
 
   // Simulation.
 public:

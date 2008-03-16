@@ -22,7 +22,7 @@
 #ifndef RADDIST_H
 #define RADDIST_H
 
-#include "logable.h"
+#include "model.h"
 #include <vector>
 
 class Log;

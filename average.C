@@ -32,12 +32,14 @@
 
 const char *const Average::component = "average";
 
-Average::Average (Block& al)
-  : name (al.identifier ("type"))
-{ }
+symbol 
+Average::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
 
-Average::Average (const char *const id)
-  : name (id)
+Average::Average ()
 { }
 
 Average::~Average ()
@@ -51,11 +53,9 @@ struct AverageArithmetic : public Average
   double operator()(double a, double b) const
   { return (a + b) / 2.0; }
   // Create and Destroy.
-  AverageArithmetic (Block& al)
-    : Average (al)
+  AverageArithmetic (Block&)
   { }
-  AverageArithmetic (const char *const id)
-    : Average (id)
+  AverageArithmetic (const char *const)
   { }
   ~AverageArithmetic ()
   { }
@@ -102,8 +102,7 @@ struct AverageHarmonic : public Average
   double operator()(double a, double b) const
   { return 2.0 * a * b / (a + b); }
   // Create and Destroy.
-  AverageHarmonic (Block& al)
-    : Average (al)
+  AverageHarmonic (Block&)
   { }
   ~AverageHarmonic ()
   { }
@@ -130,11 +129,9 @@ struct AverageGeometric : public Average
   double operator()(double a, double b) const
   { return sqrt (a * b); }
   // Create and Destroy.
-  AverageGeometric (Block& al)
-    : Average (al)
+  AverageGeometric (Block&)
   { }
-  AverageGeometric (const char *const id)
-    : Average (id)
+  AverageGeometric (const char *const)
   { }
   ~AverageGeometric ()
   { }

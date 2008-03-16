@@ -23,7 +23,7 @@
 #ifndef ROOTDENS_H
 #define ROOTDENS_H
 
-#include "logable.h"
+#include "model.h"
 #include <vector>
 #include <memory>
 

@@ -23,7 +23,7 @@
 #ifndef BIOCLIMATE_H
 #define BIOCLIMATE_H
 
-#include "logable.h"
+#include "model.h"
 
 class Surface;
 class Weather;

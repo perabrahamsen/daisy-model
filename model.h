@@ -22,6 +22,11 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include "symbol.h"
+#include "alist.h"
+
+class Log;
+
 class Model
 {
   // Create and Destroy.
@@ -31,6 +36,45 @@ protected:
   Model ();
 public:
   virtual ~Model ();
+};
+
+class ModelNamed : public Model
+{
+  // Content.
+public:
+  const symbol name;            // Remember name for logs.
+  virtual symbol library_id () const = 0;
+
+  // Use.
+public:
+  virtual void output (Log& log) const = 0;
+
+  // Create and Destroy.
+private:
+  ModelNamed (const ModelNamed&);
+  ModelNamed ();
+protected:
+  ModelNamed (symbol);
+};
+
+class ModelAListed : public ModelNamed
+{
+  // Content.
+public:
+  const AttributeList alist;	// Remember attributes for checkpoint.
+
+  // Use.
+public:
+  void output_as_object (symbol, Log&) const;
+  void output_as_entry (Log&) const;
+  
+  // Create and Destroy.
+private:
+  ModelAListed (const ModelAListed&);
+  ModelAListed ();
+protected:
+  ModelAListed (const AttributeList&);
+  ModelAListed (symbol);
 };
 
 #endif // MODEL_H

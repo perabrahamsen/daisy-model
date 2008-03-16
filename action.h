@@ -23,7 +23,7 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#include "logable.h"
+#include "model.h"
 
 class Log;
 class Daisy;

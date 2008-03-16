@@ -1,3 +1,9 @@
+2008-03-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* model.h (class ModelNamed, class ModelAListed): New base
+	classes.
+	* all: Use them.
+
 2008-03-13  Mikkel Mollerup  <mmo@life.ku.dk>
 
 	* soil_water.h, soil_water.C, chemical.h, chemical_std.C: Prepare

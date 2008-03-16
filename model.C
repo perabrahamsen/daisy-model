@@ -21,11 +21,54 @@
 #define BUILD_DLL
 
 #include "model.h"
+#include "log.h"
+
+// Base class 'Model'
 
 Model::Model ()
 { }
 
 Model::~Model ()
+{ }
+
+// The 'ModelNamed' Class.
+
+ModelNamed::ModelNamed (const symbol n)
+  : name (n)
+{ }
+
+// The 'ModelAListed' Class.
+
+void 
+ModelAListed::output_as_object (const symbol key, Log& log) const
+{
+  const char *const component = library_id ().name ().c_str ();
+  if (log.check_derived (key, name, component))
+    {
+      Log::Object object (log, key, name, alist, component);
+      output (log);
+    }
+}
+
+void 
+ModelAListed::output_as_entry (Log& log) const
+{
+  const char *const component = library_id ().name ().c_str ();
+ 
+  if (log.check_entry (name, component))
+    {
+      Log::Entry entry (log, name, alist, component);
+      output (log);
+    }
+}
+
+ModelAListed::ModelAListed (const AttributeList& al)
+  : ModelNamed (al.identifier ("type")),
+    alist (al)
+{ }
+
+ModelAListed::ModelAListed (const symbol n)
+  : ModelNamed (n)
 { }
 
 // model.C ends here.

@@ -24,7 +24,6 @@
 #define AVERAGE_H
 
 #include "model.h"
-#include "symbol.h"
 #include <memory>
 
 class Block;
@@ -34,8 +33,8 @@ class Average : public Model
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
+  symbol library_id () const;
 
   // Simulation.
 public:
@@ -47,8 +46,7 @@ public:
   static std::auto_ptr<const Average> build_geometric ();
   static const AttributeList& arithmetic_model ();
 protected:
-  Average (Block& al);
-  Average (const char*);
+  Average ();
 public:
   ~Average ();
 };

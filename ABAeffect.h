@@ -22,21 +22,18 @@
 #define ABAEFFECT_H
 
 #include "model.h"
-#include "alist.h"
 #include <vector>
 
 class Log;
 class Treelog;
 class Block;
 
-class ABAEffect : public Model
+class ABAEffect : public ModelNamed
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
-
-  const AttributeList alist;	// Remember attributes for checkpoint.
+  symbol library_id () const;
 
   // Simulation.
 public:

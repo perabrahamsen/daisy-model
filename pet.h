@@ -23,7 +23,7 @@
 #ifndef PET_H
 #define PET_H
 
-#include "logable.h"
+#include "model.h"
 
 class Log;
 class Geometry;

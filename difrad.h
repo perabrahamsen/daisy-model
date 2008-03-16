@@ -22,7 +22,7 @@
 #ifndef DIFRAD_H
 #define DIFRAD_H
 
-#include "logable.h"
+#include "model.h"
 
 class Log;
 class Weather;

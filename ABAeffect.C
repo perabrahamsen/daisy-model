@@ -28,9 +28,15 @@
 
 const char *const ABAEffect::component = "ABAeffect";
 
+symbol 
+ABAEffect::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 ABAEffect::ABAEffect (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+  : ModelNamed (al.identifier ("type"))
 { }
 
 ABAEffect::~ABAEffect ()
@@ -39,3 +45,4 @@ ABAEffect::~ABAEffect ()
 static Librarian ABAEffect_init (ABAEffect::component, "\
 The 'ABAeffect' component calculates the effect of ABA on photosynthesis.");
 
+// ABAeffect.C ends here.

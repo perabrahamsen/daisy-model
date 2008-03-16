@@ -22,7 +22,7 @@
 #ifndef MSOLTRANRECT_H
 #define MSOLTRANRECT_H
 
-#include "logable.h"
+#include "model.h"
 #include <vector>
 
 class Log;

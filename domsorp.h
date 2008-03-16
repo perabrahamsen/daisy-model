@@ -22,7 +22,7 @@
 #ifndef DOMSORP_H
 #define DOMSORP_H
 
-#include "logable.h"
+#include "model.h"
 #include <vector>
 
 class Log;

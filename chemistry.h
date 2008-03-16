@@ -22,7 +22,7 @@
 #ifndef CHEMISTRY_H
 #define CHEMISTRY_H
 
-#include "logable.h"
+#include "model.h"
 #include "symbol.h"
 #include "alist.h"
 #include <vector>
