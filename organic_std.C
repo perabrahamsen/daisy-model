@@ -2929,6 +2929,10 @@ check_alist (const AttributeList& al, Treelog& err)
 void
 OrganicStandard::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  Model::load_model (syntax, alist);
+  alist.add ("description", "\
+Mineralization and immobilization in soil.");
+  alist.add_strings ("cite", "daisy-fertilizer", "daisy-somnew");
   syntax.add_check (check_alist);
   syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
 Set this flag to turn on mineralization below the root zone.");
@@ -3196,12 +3200,6 @@ static struct OrganicStandardSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Mineralization and immobilization in soil.  Hansen et.al. 1991.\n\
-Recalibrated by Bruun et.al. 2002.");
-    alist.add ("description_LaTeX", "\
-Mineralization and immobilization in soil \
-\\cite{daisy-fertilizer,daisy-somnew}.");
     OrganicStandard::load_syntax (syntax, alist);
  
     Librarian::add_type (OrganicMatter::component, "default", alist, syntax, &make);

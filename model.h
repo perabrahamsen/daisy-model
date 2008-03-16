@@ -26,12 +26,15 @@
 #include "alist.h"
 
 class Log;
+class Syntax;
 
 // 'Model' is the base class for all models.
 // Inheriting from model is needed in order to be put in libraries.
 class Model
 {
   // Create and Destroy.
+public:
+  static void load_model (Syntax&, AttributeList&);
 private:
   Model (const Model&);
 protected:

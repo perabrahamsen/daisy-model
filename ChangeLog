@@ -1,5 +1,10 @@
 2008-03-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* model.h, model.C (Model::load_model): New utility.
+	* alist.C, alist.h (AttributeList::add_strings): New convenience
+	function.
+	* format_LaTeX.C (FormatLaTeX::alist_description): Use it.
+
 	* model.h (ModelLogable, ModelAListed): New base classes.
 	* all: Use them.
 

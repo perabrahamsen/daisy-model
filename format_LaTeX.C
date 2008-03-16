@@ -325,7 +325,23 @@ FormatLaTeX::see_page (const std::string& scope, const std::string& id)
   ref (scope, id);
   out () << ", page ";
   pageref (scope, id);
-  out () << ")";
+  out () << ")\n";
+}
+
+void
+FormatLaTeX::alist_description (const AttributeList& alist)
+{
+  Format::alist_description (alist);
+  if (!alist.check ("cite"))
+    return;
+  std::vector<std::string> cite = alist.name_sequence ("cite");
+  if (cite.size () < 1)
+    return;
+  out () << "See also \\cite{" << cite[0];
+  for (size_t i = 1; i < cite.size (); i++)
+    out () << "," << cite[i];
+  out () << "}";
+  soft_linebreak ();
 }
 
 FormatLaTeX::FormatLaTeX (Block& al)

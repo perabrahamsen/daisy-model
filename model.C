@@ -22,8 +22,21 @@
 
 #include "model.h"
 #include "log.h"
+#include "syntax.h"
 
 // Base class 'Model'
+
+void 
+Model::load_model (Syntax& syntax, AttributeList& alist)
+{ 
+  syntax.add ("description", Syntax::String, Syntax::OptionalConst, "\
+Description of this model or parameterization.\n\
+The value will appear in the reference manual, and may also appear in some \
+GUI front ends.");
+  syntax.add ("cite", Syntax::String, Syntax::Const, Syntax::Sequence, "\
+BibTeX keys that would be relevant for this model or paramterization.");
+  alist.add ("cite", std::vector<symbol> ());
+}
 
 Model::Model ()
 { }

@@ -879,6 +879,36 @@ AttributeList::add (const std::string& key, const std::vector<symbol>& v)
 { impl.add (key, Value (v)); }
 
 void 
+AttributeList::add_strings (const std::string& key, const std::string& a)
+{
+  std::vector<symbol> all;
+  all.push_back (symbol (a));
+  add (key, all);
+}
+
+void 
+AttributeList::add_strings (const std::string& key,
+                            const std::string& a, const std::string& b)
+{
+  std::vector<symbol> all;
+  all.push_back (symbol (a));
+  all.push_back (symbol (b));
+  add (key, all);
+}
+
+void 
+AttributeList::add_strings (const std::string& key,
+                            const std::string& a, const std::string& b,
+                            const std::string& c)
+{
+  std::vector<symbol> all;
+  all.push_back (symbol (a));
+  all.push_back (symbol (b));
+  all.push_back (symbol (c));
+  add (key, all);
+}
+
+void 
 AttributeList::add (const std::string& key, const std::vector<bool>& v)
 { impl.add (key, Value (v)); }
 

@@ -103,6 +103,12 @@ public:
   void add (const std::string&, const PLF&);
   void add (const std::string&, const std::vector<double>&);
   void add (const std::string&, const std::vector<symbol>&);
+  void add_strings (const std::string& key, const std::string& a);
+  void add_strings (const std::string& key,
+                    const std::string& a, const std::string& b);
+  void add_strings (const std::string& key,
+                    const std::string& a, const std::string& b,
+                    const std::string& c);
   void add (const std::string&, const std::vector<bool>&);
   void add (const std::string&, const std::vector<int>&);
   void add (const std::string&, const std::vector<const AttributeList*>&);
