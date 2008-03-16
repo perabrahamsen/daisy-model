@@ -88,7 +88,7 @@ EquilibriumLinear::initialize (Treelog& msg)
 bool 
 EquilibriumLinear::check (const Scope& scope, Treelog& msg) const
 {
-  Treelog::Open nest (msg, name);
+  Treelog::Open nest (msg, "linear");
   bool ok = true;
   if (!K_expr->check_dim (scope, Syntax::none (), msg))
     ok = false;

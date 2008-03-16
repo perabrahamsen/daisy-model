@@ -30,14 +30,12 @@ class Log;
 class Treelog;
 class Block;
 
-class RubiscoNdist : public Model
+class RubiscoNdist : public ModelNamed
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
-  const AttributeList alist;	// Remember attributes for checkpoint.
 
   // Simulation.
 public:

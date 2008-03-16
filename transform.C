@@ -46,9 +46,7 @@ void
 Transform::load_syntax (Syntax&, AttributeList&)
 { }
 
-Transform::Transform (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
+Transform::Transform (Block&)
 { }
 
 Transform::~Transform ()

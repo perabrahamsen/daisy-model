@@ -34,11 +34,10 @@ class Block;
 class Syntax;
 class AttributeList;
 
-class Hydraulic : public Model 
+class Hydraulic : public ModelNamed
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
   //

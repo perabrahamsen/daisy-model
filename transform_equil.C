@@ -117,7 +117,7 @@ TransformEquilibrium::check (const Soil& soil, const SoilWater& soil_water,
   for (size_t c = 0; ok && c < cell_size; c++)
     {
       std::ostringstream tmp;
-      tmp << "Transform '" + name + "' cell " << c;
+      tmp << "Transform 'equil' cell " << c;
       Treelog::Open nest (msg, tmp.str ());
       scope.set_cell (c);
       if (!equilibrium->check (scope, msg))
@@ -133,7 +133,7 @@ TransformEquilibrium::check (const Soil& soil, const SoilWater& soil_water,
 void
 TransformEquilibrium::initialize (const Soil& soil, Treelog& msg)
 { 
-  Treelog::Open nest (msg, name);
+  Treelog::Open nest (msg, "equil");
   equilibrium->initialize (msg);
   k_AB_expr->initialize (msg); 
   k_BA_expr->initialize (msg); 

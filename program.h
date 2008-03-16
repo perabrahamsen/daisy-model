@@ -37,8 +37,8 @@ class Program : public Model
 {
   // Content.
 public:
-  const AttributeList& alist;  	// Remember attributes for checkpoint.
   const symbol name;
+  const AttributeList& alist;  	// Remember attributes for checkpoint.
   static const char *const component;
   symbol library_id () const;
 

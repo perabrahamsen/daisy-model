@@ -93,7 +93,7 @@ struct DomsorpStandard : public Domsorp
     Treelog::Open nest (msg, "Domsorp: " + name);
     bool ok = true;
     {
-      Treelog::Open nest (msg, "transform: " + transform->name);
+      Treelog::Open nest (msg, "transform");
       if (!transform->check (soil, soil_water, soil_heat, msg))
         ok = false; 
     }

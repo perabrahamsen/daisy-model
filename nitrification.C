@@ -70,8 +70,7 @@ Nitrification::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 Nitrification::Nitrification (Block& al)
-  : name (al.identifier ("type")),
-    N2O_fraction (al.number ("N2O_fraction"))
+  : N2O_fraction (al.number ("N2O_fraction"))
 { }
 
 Nitrification::~Nitrification ()

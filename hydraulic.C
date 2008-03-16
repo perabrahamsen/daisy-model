@@ -218,7 +218,7 @@ Hydraulic::check (Treelog& msg) const
 }
 
 Hydraulic::Hydraulic (Block& al)
-  : name (al.identifier ("type")),
+  : ModelNamed (al.identifier ("type")),
     K_init (al.check ("K_at_h")
 	    ? new K_at_h (al.alist ("K_at_h"))
 	    : NULL),

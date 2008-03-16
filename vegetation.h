@@ -46,11 +46,10 @@ class Block;
 class AttributeList;
 class Syntax;
 
-class Vegetation : public Model
+class Vegetation : public ModelNamed
 { 
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
   const double EpInterchange_;  // Soil to canopy pot-.evap. interchange.

@@ -34,7 +34,6 @@ class Format : public Model
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
   virtual std::string format_type () const;

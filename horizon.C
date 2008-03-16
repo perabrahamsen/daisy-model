@@ -379,10 +379,10 @@ Intended for use with pedotransfer functions.");
 }
 
 Horizon::Horizon (Block& al)
-  : impl (new Implementation (al)),
+  : ModelNamed (al.identifier ("type")),
+    impl (new Implementation (al)),
     fast_clay (-42.42e42),
     fast_humus (-42.42e42),
-    name (al.identifier ("type")),
     hydraulic (Librarian::build_item<Hydraulic> (al, "hydraulic")),
     tortuosity (Librarian::build_item<Tortuosity> (al, "tortuosity"))
 { }

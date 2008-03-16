@@ -283,7 +283,7 @@ Weather::initialize (const Time&, Treelog &)
 { return true; }
 
 Weather::Weather (Block& al)
-  : name (al.identifier ("type")),
+  : ModelNamed (al.identifier ("type")),
     latitude (-42.42e42),
     longitude (-42.42e42),
     elevation_ (-42.42e42),

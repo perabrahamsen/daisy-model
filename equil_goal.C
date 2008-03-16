@@ -137,7 +137,7 @@ EquilibriumGoal_A::initialize (Treelog& msg)
 bool 
 EquilibriumGoal_A::check (const Scope& scope, Treelog& msg) const
 {
-  Treelog::Open nest (msg, "Equilibrium: '" + name + "'");
+  Treelog::Open nest (msg, "Equilibrium: 'Goal_A'");
   bool ok = true;
   if (!goal_A_expr->check_dim (scope, goal_unit, msg))
     ok = false;

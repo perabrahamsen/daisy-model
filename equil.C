@@ -42,8 +42,6 @@ Equilibrium::load_syntax (Syntax& syntax, AttributeList&)
 }
 
 Equilibrium::Equilibrium (Block& al)
-  : name (al.identifier ("type")),
-    alist (al.alist ())
 { }
 
 Equilibrium::~Equilibrium ()

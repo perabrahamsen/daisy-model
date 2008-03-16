@@ -31,7 +31,7 @@ class Time;
 class Treelog;
 class Block;
 
-class Weather : public Model
+class Weather : public ModelNamed
 {
   // Units.
 public:
@@ -39,7 +39,6 @@ public:
 
   // Content.
 public: 
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
   

@@ -45,7 +45,6 @@
 struct MV_Soil : public Model
 {
   // Content.
-  const symbol name;
   static const char *const description;
   static const char *const component;
   symbol library_id () const;
@@ -79,8 +78,7 @@ struct MV_Soil : public Model
 
   // Create and Destroy.
   MV_Soil (Block& al)
-    : name (al.identifier ("type")),
-      z_o (al.number ("z_o")),
+    : z_o (al.number ("z_o")),
       z_xJ (al.number ("z_xJ")),
       Theta_fo (al.number ("Theta_fo")),
       Theta_wo (al.number ("Theta_wo")),
@@ -242,8 +240,7 @@ struct MV_Crop : public Model
 
   // Create and Destroy.
   MV_Crop (Block& al)
-    : name (al.identifier ("type")),
-      S_F (accumulated (al.number_sequence ("S_F"))),
+    : S_F (accumulated (al.number_sequence ("S_F"))),
       A_F (al.number_sequence ("A_F")),
       L_gv (al.number ("L_gv")),
       L_ge (al.number ("L_ge")),

@@ -86,14 +86,12 @@ Bound::set_full ()
 }
 
 Bound::Bound (Block& al, const type_t type, const double value)
-  : name (al.identifier ("type")),
-    type_ (type),
+  : type_ (type),
     value_ (value)
 { }
 
-Bound::Bound (const char *const id, const type_t type, const double value)
-  : name (id),
-    type_ (type),
+Bound::Bound (const char *const, const type_t type, const double value)
+  : type_ (type),
     value_ (value)
 { }
 

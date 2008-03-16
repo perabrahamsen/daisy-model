@@ -108,7 +108,7 @@ EquilibriumLangmuir::initialize (Treelog& msg)
 bool 
 EquilibriumLangmuir::check (const Scope& scope, Treelog& msg) const
 {
-  Treelog::Open nest (msg, name);
+  Treelog::Open nest (msg, "Langmuir");
   bool ok = true;
   if (!K_expr->check_dim (scope, base_unit, msg))
     ok = false;

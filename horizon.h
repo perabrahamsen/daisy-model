@@ -38,7 +38,7 @@ class Syntax;
 class AttributeList;
 class Mobsol;
 
-class Horizon : public Model 
+class Horizon : public ModelNamed
 {
   // Content.
 private:
@@ -47,7 +47,6 @@ private:
   double fast_clay;
   double fast_humus;
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
 

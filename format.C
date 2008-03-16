@@ -37,7 +37,7 @@ Format::library_id () const
 
 std::string 
 Format::format_type () const
-{ return name.name (); }
+{ return "unknown"; }
 
 std::ostream&
 Format::out ()
@@ -214,8 +214,7 @@ Format::initialize (std::ostream& o)
 }
 
 Format::Format (Block& al)
-  : name (al.identifier ("type")),
-    output (NULL)
+  : output (NULL)
 { }
 
 Format::~Format ()

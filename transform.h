@@ -40,8 +40,6 @@ class Transform : public Model
 public:
   static const char *const component;
   symbol library_id () const;
-  const symbol name;
-  const AttributeList& alist;
 
   // Simulation.
 public:
