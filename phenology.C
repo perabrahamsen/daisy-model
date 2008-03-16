@@ -30,6 +30,13 @@
 
 const char *const Phenology::component = "phenology";
 
+symbol
+Phenology::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Phenology::light_time (const double dt)
 { partial_day_length += dt; }

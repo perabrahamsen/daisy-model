@@ -160,6 +160,13 @@ SMM1D::SMM1D (const GeometryRect& geo_, const Soil& soil_,
 
 const char *const UZ1D::component = "uz1d";
 
+symbol
+UZ1D::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 UZ1D::UZ1D (Block& al)
   : name (al.identifier ("type"))
 { }

@@ -35,6 +35,7 @@ class Exchange : public Model
   // Model.
 public:
   static const char *const component;
+  symbol library_id () const;
 
   // Content.
 public:

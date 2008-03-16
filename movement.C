@@ -26,6 +26,13 @@
 
 const char *const Movement::component = "movement";
 
+symbol
+Movement::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Movement::Movement (Block& al)
   : name (al.identifier ("type"))
 { }

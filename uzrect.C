@@ -26,6 +26,13 @@
 
 const char *const UZRect::component = "uzrect";
 
+symbol
+UZRect::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 bool 
 UZRect::obey_surface ()
 { return true; }

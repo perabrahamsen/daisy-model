@@ -26,6 +26,13 @@
 
 const char *const Photo::component = "photosynthesis";
 
+symbol
+Photo::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Photo::clear ()
 { }

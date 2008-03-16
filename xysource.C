@@ -27,6 +27,13 @@
 
 const char *const XYSource::component = "xysource";
 
+symbol
+XYSource::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void 
 XYSource::limit (double& xmin, double& xmax, double& ymin, double& ymax) const
 {

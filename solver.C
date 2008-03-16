@@ -26,6 +26,13 @@
 
 const char *const Solver::component = "solver";
 
+symbol
+Solver::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Solver::Matrix::Matrix (const size_t size)
   : SMatrix_type (size, size)
 {

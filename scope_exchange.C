@@ -30,6 +30,13 @@
 const char *const 
 Exchange::component = "exchange";
 
+symbol
+Exchange::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 bool 
 Exchange::is_number () const
 { return false; }

@@ -28,6 +28,13 @@
 
 const char *const Printer::component = "printer";
 
+symbol
+Printer::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Printer::Printer (const AttributeList& al)
   : name (al.identifier ("type"))
 { }

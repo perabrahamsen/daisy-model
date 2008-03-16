@@ -39,6 +39,7 @@ class Transform : public Model
   // Content.
 public:
   static const char *const component;
+  symbol library_id () const;
   const symbol name;
   const AttributeList& alist;
 

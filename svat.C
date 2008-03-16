@@ -28,6 +28,13 @@
 
 const char *const SVAT::component = "svat";
 
+symbol
+SVAT::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 SVAT::output (Log&) const
 { }

@@ -30,6 +30,13 @@
 
 const char *const Mobsol::component = "mobsol";
 
+symbol
+Mobsol::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Mobsol::Mobsol (Block& al)
   : name (al.identifier ("type"))
 { }

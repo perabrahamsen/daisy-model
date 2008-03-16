@@ -31,6 +31,13 @@
 
 const char *const Element::component = "element";
 
+symbol
+Element::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Element::Element (Block& al)
   : name (al.identifier ("type"))
 { }

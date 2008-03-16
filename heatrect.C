@@ -26,6 +26,13 @@
 
 const char *const Heatrect::component = "heatrect";
 
+symbol
+Heatrect::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Heatrect::Heatrect (Block& al)
   : name (al.identifier ("type"))
 { }

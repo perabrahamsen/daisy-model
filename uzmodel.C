@@ -34,6 +34,13 @@ UZmodel::~UZmodel ()
 
 const char *const UZmodel::component = "uzmodel";
 
+symbol
+UZmodel::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 static Librarian UZmodel_init (UZmodel::component, "\
 The 'uzmodel' component handles the vertical water movement in the\n\
 unsaturated zone soil matrix.");

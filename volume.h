@@ -41,6 +41,7 @@ class Volume : public Model
 public:
   const symbol name;
   static const char *const component;
+  symbol library_id () const;
   virtual std::string one_line_description () const = 0;
 private:
   typedef std::map<const Geometry*, std::vector<double>/**/> density_map;

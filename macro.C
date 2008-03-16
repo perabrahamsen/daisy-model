@@ -27,6 +27,13 @@
 
 const char *const Macro::component = "macro";
 
+symbol
+Macro::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 bool 
 Macro::none () const 
 { return false; }

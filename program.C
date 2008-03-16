@@ -26,6 +26,13 @@
 
 const char *const Program::component = "program";
 
+symbol
+Program::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Program::attach_ui (Run *const run, const std::vector<Log*>& l)
 {

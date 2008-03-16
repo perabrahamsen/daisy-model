@@ -71,6 +71,13 @@ Handle::symbol2handle (symbol s)
 const char *const Select::description = "Select part of state.";
 
 const char *const Select::component = "select";
+
+symbol
+Select::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
   
 struct Select::Implementation
 {

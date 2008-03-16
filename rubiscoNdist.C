@@ -27,6 +27,13 @@
 
 const char *const RubiscoNdist::component = "rubiscoNdist";
 
+symbol
+RubiscoNdist::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 RubiscoNdist::RubiscoNdist (Block& al)
   : name (al.identifier ("type")),
     alist (al.alist ())

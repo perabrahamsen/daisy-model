@@ -31,6 +31,13 @@
 
 const char *const NetRadiation::component = "net_radiation";
 
+symbol
+NetRadiation::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 // Interface class.
 
 void

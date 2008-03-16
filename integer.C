@@ -31,6 +31,13 @@
 
 const char *const Integer::component = "integer";
 
+symbol
+Integer::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 const std::string& 
 Integer::title () const
 { return name.name (); }

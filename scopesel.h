@@ -34,6 +34,7 @@ class Scopesel : public Model
   // Content.
 public:
   static const char *const component;
+  symbol library_id () const;
 
   // Use.
 public:

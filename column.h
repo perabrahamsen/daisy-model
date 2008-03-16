@@ -48,6 +48,7 @@ public:
   const symbol name;
   double size;
   static const char *const component;
+  symbol library_id () const;
 
   // Location.
 public:

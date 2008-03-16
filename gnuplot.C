@@ -26,6 +26,13 @@
 
 const char *const Gnuplot::component = "gnuplot";
 
+symbol
+Gnuplot::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 std::string 
 Gnuplot::quote (const std::string& value)
 { return "'" + value + "'"; }

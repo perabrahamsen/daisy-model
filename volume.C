@@ -30,6 +30,13 @@ class Log;
 
 const char *const Volume::component = "volume";
 
+symbol
+Volume::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 const std::vector<double>&
 Volume::density (const Geometry& geo) const
 {

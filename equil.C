@@ -27,6 +27,13 @@
 
 const char *const Equilibrium::component = "equilibrium";
 
+symbol
+Equilibrium::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Equilibrium::load_syntax (Syntax& syntax, AttributeList&)
 {

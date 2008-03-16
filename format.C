@@ -28,6 +28,13 @@
 
 const char *const Format::component = "format";
 
+symbol
+Format::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 std::string 
 Format::format_type () const
 { return name.name (); }

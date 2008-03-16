@@ -36,6 +36,13 @@
 
 const char *const UI::component = "ui";
 
+symbol
+UI::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 UI::set_low_priority () const
 {

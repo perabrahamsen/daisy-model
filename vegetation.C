@@ -29,6 +29,13 @@
 
 const char *const Vegetation::component = "vegetation";
 
+symbol
+Vegetation::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 symbol 
 Vegetation::all_crops ()
 {

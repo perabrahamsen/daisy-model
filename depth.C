@@ -44,6 +44,13 @@
 
 const char *const Depth::component = "depth";
 
+symbol
+Depth::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Depth::Depth (Block& al)
   : name (al.identifier ("type"))
 { }

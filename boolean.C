@@ -33,6 +33,13 @@
 
 const char *const Boolean::component = "boolean";
 
+symbol
+Boolean::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 const std::string& 
 Boolean::title () const
 { return name.name (); }

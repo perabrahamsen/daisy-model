@@ -41,6 +41,7 @@ class Nitrification : public Model
 public:
   const symbol name;
   static const char *const component;
+  symbol library_id () const;
 
   // Parameters.
 protected:

@@ -29,6 +29,13 @@
 const char *const Number::component = "number";
 
 symbol
+Number::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
+symbol
 Number::title () const
 { return name; }
 

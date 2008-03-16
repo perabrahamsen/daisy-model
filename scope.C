@@ -27,6 +27,13 @@
 
 const char *const Scope::component = "scope";
 
+symbol
+Scope::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 symbol 
 Scope::title () const
 { return title_; }

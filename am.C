@@ -43,6 +43,13 @@
 
 const char *const AM::component = "am";
 
+symbol
+AM::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 struct AM::Implementation
 {
   // Check.

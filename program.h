@@ -40,6 +40,7 @@ public:
   const AttributeList& alist;  	// Remember attributes for checkpoint.
   const symbol name;
   static const char *const component;
+  symbol library_id () const;
 
   // Simulation.
 public:

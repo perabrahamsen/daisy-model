@@ -31,6 +31,13 @@
 
 const char *const Bound::component = "bound";
 
+symbol
+Bound::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 std::string
 Bound::describe () const
 {

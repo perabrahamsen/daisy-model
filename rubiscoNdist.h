@@ -36,6 +36,7 @@ class RubiscoNdist : public Model
 public:
   const symbol name;
   static const char *const component;
+  symbol library_id () const;
   const AttributeList alist;	// Remember attributes for checkpoint.
 
   // Simulation.

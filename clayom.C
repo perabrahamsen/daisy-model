@@ -26,6 +26,13 @@
 
 const char *const ClayOM::component = "ClayOM";
 
+symbol
+ClayOM::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 ClayOM::ClayOM (Block& al)
   : name (al.identifier ("type"))
 { }

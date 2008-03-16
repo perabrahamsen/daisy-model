@@ -27,6 +27,13 @@
 
 const char *const Transport::component = "transport";
 
+symbol
+Transport::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Transport::Transport (Block& al)
   : name (al.identifier ("type"))
 { }

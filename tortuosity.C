@@ -27,6 +27,13 @@
 
 const char *const Tortuosity::component = "tortuosity";
 
+symbol
+Tortuosity::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Tortuosity::Tortuosity (Block& al)
   : name (al.identifier ("type"))
 { }

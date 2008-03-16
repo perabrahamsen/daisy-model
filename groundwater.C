@@ -30,6 +30,13 @@
 
 const char *const Groundwater::component = "groundwater";
 
+symbol
+Groundwater::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Groundwater::accept_bottom (double, const Geometry& geo, size_t edge)
 { daisy_assert (geo.edge_from (edge) == Geometry::cell_below); }

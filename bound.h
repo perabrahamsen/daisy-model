@@ -34,6 +34,7 @@ class Bound : public Model
 public:
   const symbol name;
   static const char *const component;
+  symbol library_id () const;
   std::string describe () const;
 
   // Content.

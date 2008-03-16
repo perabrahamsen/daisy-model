@@ -34,6 +34,13 @@
 
 const char *const Nitrification::component = "nitrification";
 
+symbol
+Nitrification::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 double 
 Nitrification::f_h (double h)
 {

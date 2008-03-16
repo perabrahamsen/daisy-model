@@ -26,6 +26,13 @@
 
 const char *const Summary::component = "summary";
 
+symbol
+Summary::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Summary::Summary (Block& al)
   : name (al.identifier ("type"))
 { }

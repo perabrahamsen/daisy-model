@@ -30,6 +30,13 @@
 
 const char *const Scopesel::component = "scopesel";
 
+symbol
+Scopesel::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Scopesel::Scopesel ()
 { }
 

@@ -26,6 +26,13 @@
 
 const char *const OrganicMatter::component = "organic";
 
+symbol
+OrganicMatter::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 OrganicMatter::OrganicMatter (Block& al)
   : name (al.identifier ("type"))
 { }

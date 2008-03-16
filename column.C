@@ -31,6 +31,13 @@
 
 const char *const Column::component = "column";
 
+symbol
+Column::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void
 Column::Point::load_syntax (Syntax& syntax, AttributeList&)
 { 

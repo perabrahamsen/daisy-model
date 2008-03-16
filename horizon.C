@@ -407,6 +407,13 @@ Horizon::~Horizon ()
 // Create Horizon library.
 const char *const Horizon::component = "horizon";
 
+symbol
+Horizon::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 static struct HorizonSyntax
 {
   HorizonSyntax ()

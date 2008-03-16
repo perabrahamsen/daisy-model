@@ -39,6 +39,13 @@
 
 const char *const Hydraulic::component = "hydraulic";
 
+symbol
+Hydraulic::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 struct Hydraulic::K_at_h
 {
   // Parameters.

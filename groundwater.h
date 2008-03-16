@@ -44,6 +44,7 @@ class Groundwater : public Model
 public:
   const symbol name;
   static const char *const component;
+  symbol library_id () const;
 
   // Lower boundary.
   enum bottom_t { pressure, lysimeter, forced_flux, free_drainage };

@@ -48,6 +48,7 @@ struct MV_Soil : public Model
   const symbol name;
   static const char *const description;
   static const char *const component;
+  symbol library_id () const;
 
   // Parameters.
   const double z_o;		// Depth of top soil. [mm]
@@ -106,6 +107,13 @@ Description of a soil for use by the MARKVAND model.";
 
 const char *const MV_Soil::component = "MV_Soil";
 
+symbol
+MV_Soil::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 static struct MV_SoilSyntax
 {
   static Model& make (Block& al)
@@ -153,6 +161,7 @@ struct MV_Crop : public Model
   const symbol name;
   static const char *const description;
   static const char *const component;
+  symbol library_id () const;
 
   // Parameters.
   const std::vector<double> S_F; // Temperature sum for each phase.
@@ -261,6 +270,13 @@ const char *const MV_Crop::description = "\
 Description of a crop for use by the MARKVAND model.";
 
 const char *const MV_Crop::component = "MV_Crop";
+
+symbol
+MV_Crop::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
 
 static struct MV_CropSyntax
 {

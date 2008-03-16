@@ -32,6 +32,13 @@
 
 const char *const WSE::component = "wse";
 
+symbol
+WSE::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 WSE::WSE (Block& al)
   : name (al.identifier ("type"))
 { }

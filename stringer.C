@@ -33,6 +33,13 @@
 
 const char *const Stringer::component = "string";
 
+symbol
+Stringer::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 const std::string& 
 Stringer::title () const
 { return name.name (); }

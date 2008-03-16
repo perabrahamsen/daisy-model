@@ -27,6 +27,13 @@
 
 const char *const Mactrans::component = "mactrans";
 
+symbol
+Mactrans::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Mactrans::Mactrans (Block& al)
   : name (al.identifier ("type"))
 { }

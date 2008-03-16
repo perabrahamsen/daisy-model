@@ -35,6 +35,13 @@ const symbol Weather::dry_deposit_unit ("kg/ha/y");
 
 const char *const Weather::component = "weather";
 
+symbol
+Weather::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 const double SolarConstant = 1366.7; // {W/m2]
 
 double

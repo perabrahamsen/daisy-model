@@ -27,6 +27,13 @@
 
 const char *const CropNdist::component = "cropNdist";
 
+symbol
+CropNdist::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 CropNdist::CropNdist (Block& al)
   : name (al.identifier ("type")),
     alist (al.alist ())

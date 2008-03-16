@@ -48,6 +48,7 @@ public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
   static const char *const component;
+  symbol library_id () const;
   void append_to (std::vector<AOM*>& added);
   symbol real_name () const;
 

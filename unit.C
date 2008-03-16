@@ -34,6 +34,13 @@
 
 const char *const Unit::component = "unit";
 
+symbol
+Unit::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Unit::Unit (Block& al)
   : name (al.identifier ("type"))
 { }

@@ -26,6 +26,13 @@
 
 const char *const Transform::component = "transform";
 
+symbol
+Transform::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 bool
 Transform::check (const Soil&, const SoilWater&, const SoilHeat&, 
 		  Treelog&) const

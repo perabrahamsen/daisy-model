@@ -36,6 +36,7 @@ class Format : public Model
 public:
   const symbol name;
   static const char *const component;
+  symbol library_id () const;
   virtual std::string format_type () const;
 private:
   std::ostream* output;

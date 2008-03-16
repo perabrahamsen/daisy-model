@@ -46,6 +46,7 @@ private:
   const symbol title_;
 public:
   static const char *const component;
+  symbol library_id () const;
 
   // Use.
 public:

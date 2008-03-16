@@ -26,6 +26,13 @@
 
 const char *const Source::component = "source";
 
+symbol
+Source::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 void 
 Source::limit (Time& begin, Time& end, double& ymin, double& ymax) const
 {

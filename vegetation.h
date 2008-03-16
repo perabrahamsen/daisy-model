@@ -52,6 +52,7 @@ class Vegetation : public Model
 public:
   const symbol name;
   static const char *const component;
+  symbol library_id () const;
   const double EpInterchange_;  // Soil to canopy pot-.evap. interchange.
   static symbol all_crops ();         // Symbol matching all crops on field.
 

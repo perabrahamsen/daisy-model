@@ -27,6 +27,13 @@
 
 const char *const Parser::component = "parser";
 
+symbol
+Parser::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
 Parser::Parser (const symbol id)
   : name (id)
 { }
