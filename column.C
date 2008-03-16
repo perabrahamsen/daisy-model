@@ -84,8 +84,7 @@ polygon with the specified corner points.", Point::load_syntax);
 }
 
 Column::Column (Block& al)
-  : alist (al.alist ()),
-    name (al.identifier ("type")),
+  : ModelAListed (al.alist ()),
     size (al.number ("size")),
     location_ (map_submodel_const<Point> (al, "location"))
 { }

@@ -41,11 +41,9 @@ class Metalib;
 class Block;
 class Scope;
 
-class Column : public Model
+class Column : public ModelAListed
 {
 public:
-  const AttributeList alist;	// Remember attributes for checkpoint.
-  const symbol name;
   double size;
   static const char *const component;
   symbol library_id () const;
