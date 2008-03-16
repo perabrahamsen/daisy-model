@@ -28,7 +28,7 @@ class Log;
 class Treelog;
 class Block;
 
-class ABAEffect : public ModelNamed
+class ABAEffect : public ModelLogable
 {
   // Content.
 public:

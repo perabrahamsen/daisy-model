@@ -24,9 +24,7 @@
 #define GROUNDWATER_H
 
 #include "model.h"
-#include "symbol.h"
 
-class Log;
 class Time;
 class Treelog;
 class Geometry;
@@ -38,11 +36,10 @@ class Syntax;
 class AttributeList;
 class Scope;
 
-class Groundwater : public Model
+class Groundwater : public ModelLogable
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
 

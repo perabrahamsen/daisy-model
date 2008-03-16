@@ -34,7 +34,7 @@ Movement::library_id () const
 }
 
 Movement::Movement (Block& al)
-  : name (al.identifier ("type"))
+  : ModelLogable (al.identifier ("type"))
 { }
 
 Movement::~Movement ()

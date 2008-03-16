@@ -103,7 +103,7 @@ Canopy adsorbtion fraction of unreached potential soil evaporation.");
 }
 
 Vegetation::Vegetation (Block& al)
-  : ModelNamed (al.identifier ("type")),
+  : ModelLogable (al.identifier ("type")),
     EpInterchange_ (al.number ("EpInterchange"))
 { }
 

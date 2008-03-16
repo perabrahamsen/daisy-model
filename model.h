@@ -27,6 +27,8 @@
 
 class Log;
 
+// 'Model' is the base class for all models.
+// Inheriting from model is needed in order to be put in libraries.
 class Model
 {
   // Create and Destroy.
@@ -38,7 +40,9 @@ public:
   virtual ~Model ();
 };
 
-class ModelNamed : public Model
+// 'ModelLogable' is the base class for all logable models.
+// It has a 'name' parameter for idnetifying it, and 
+class ModelLogable : public Model
 {
   // Content.
 public:
@@ -48,16 +52,22 @@ public:
   // Use.
 public:
   virtual void output (Log& log) const = 0;
+  void output_as_derived (symbol, Log&) const;
 
   // Create and Destroy.
 private:
-  ModelNamed (const ModelNamed&);
-  ModelNamed ();
+  ModelLogable (const ModelLogable&);
+  ModelLogable ();
 protected:
-  ModelNamed (symbol);
+  ModelLogable (symbol);
 };
 
-class ModelAListed : public ModelNamed
+// 'ModelAlisted' is the base class for models that needs to keep
+// track of its own attribute list.  The includes models that are part
+// of a variable length list, or are created ad-hoc.  Other models
+// will not need to maintain their own attribute lists, as the
+// attribute list of the enclosing frame will be sufficient.
+class ModelAListed : public ModelLogable
 {
   // Content.
 public:

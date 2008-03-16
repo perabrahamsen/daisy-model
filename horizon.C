@@ -379,7 +379,7 @@ Intended for use with pedotransfer functions.");
 }
 
 Horizon::Horizon (Block& al)
-  : ModelNamed (al.identifier ("type")),
+  : ModelLogable (al.identifier ("type")),
     impl (new Implementation (al)),
     fast_clay (-42.42e42),
     fast_humus (-42.42e42),

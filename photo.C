@@ -38,7 +38,7 @@ Photo::clear ()
 { }
 
 Photo::Photo (Block& al)
-  : name (al.identifier ("type"))
+  : ModelLogable (al.identifier ("type"))
 { }
 
 Photo::~Photo ()

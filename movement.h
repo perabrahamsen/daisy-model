@@ -23,7 +23,6 @@
 #define MOVEMENT_H
 
 #include "model.h"
-#include "symbol.h"
 #include <vector>
 
 class Geometry;
@@ -44,11 +43,10 @@ class AttributeList;
 class Log;
 class Scope;
 
-class Movement : public Model
+class Movement : public ModelLogable
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
 

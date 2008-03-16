@@ -34,7 +34,7 @@ class Block;
 class Syntax;
 class AttributeList;
 
-class Hydraulic : public ModelNamed
+class Hydraulic : public ModelLogable
 {
   // Content.
 public:

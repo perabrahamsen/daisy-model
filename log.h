@@ -345,18 +345,8 @@ do { \
 #define output_derived(submodule, key, log) \
 do { \
   static const symbol MACRO_name (key); \
-  output_derived_ ((*submodule), MACRO_name, (log)); \
+  submodule->output_as_derived (MACRO_name, (log));   \
 } while (false)
-
-template <class T> void
-output_derived_ (const T& submodule, const symbol name, Log& log)
-{
-  if (log.check_derived (name, submodule.name, T::component))
-    {
-      Log::Derived derived (log, name, submodule.name, T::component);
-      submodule.output (log);
-    }
-}
 
 // Like output_derived, except that SUBMODULE contain its own alist member.
 // Useful for dynamically created object singletons, where the alist can't

@@ -47,7 +47,7 @@ NetRadiation::output (Log& log) const
 }
 
 NetRadiation::NetRadiation (Block& al)
-  : name (al.identifier ("type"))
+  : ModelLogable (al.identifier ("type"))
 { }
 
 NetRadiation::~NetRadiation ()

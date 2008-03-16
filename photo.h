@@ -22,7 +22,6 @@
 #define PHOTO_H
 
 #include "model.h"
-#include "symbol.h"
 #include <vector>
 
 class CanopyStandard;
@@ -32,11 +31,10 @@ class Treelog;
 class Block;
 class AttributeList;
 
-class Photo : public Model 
+class Photo : public ModelLogable
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
 

@@ -31,9 +31,20 @@ Model::Model ()
 Model::~Model ()
 { }
 
-// The 'ModelNamed' Class.
+// The 'ModelLogable' Class.
 
-ModelNamed::ModelNamed (const symbol n)
+void 
+ModelLogable::output_as_derived (const symbol key, Log& log) const
+{
+  const char *const component = library_id ().name ().c_str ();
+  if (log.check_derived (key, name, component))
+    {
+      Log::Derived derived (log, key, name, component);
+      output (log);
+    }
+}
+
+ModelLogable::ModelLogable (const symbol n)
   : name (n)
 { }
 
@@ -63,12 +74,12 @@ ModelAListed::output_as_entry (Log& log) const
 }
 
 ModelAListed::ModelAListed (const AttributeList& al)
-  : ModelNamed (al.identifier ("type")),
+  : ModelLogable (al.identifier ("type")),
     alist (al)
 { }
 
 ModelAListed::ModelAListed (const symbol n)
-  : ModelNamed (n)
+  : ModelLogable (n)
 { }
 
 // model.C ends here.

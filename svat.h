@@ -38,11 +38,10 @@ class Block;
 class Syntax;
 class AttributeList;
 
-class SVAT : public Model
+class SVAT : public ModelLogable
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
 

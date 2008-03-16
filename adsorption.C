@@ -48,11 +48,11 @@ Adsorption::output (Log&) const
 { }
 
 Adsorption::Adsorption (const char *const type)
-  : ModelNamed (symbol (type))
+  : ModelLogable (symbol (type))
 { }
 
 Adsorption::Adsorption (Block& al)
-  : ModelNamed (al.identifier ("type"))
+  : ModelLogable (al.identifier ("type"))
 { }
 
 Adsorption::~Adsorption ()

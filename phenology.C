@@ -72,7 +72,7 @@ Phenology::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 Phenology::Phenology (Block& al)
-  : ModelNamed (al.identifier ("type")),
+  : ModelLogable (al.identifier ("type")),
     // State.
     DAP (al.number ("DAP")),
     DS (al.number ("DS")),

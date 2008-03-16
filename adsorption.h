@@ -30,7 +30,7 @@ class Soil;
 class Block;
 class AttributeList;
 
-class Adsorption : public ModelNamed
+class Adsorption : public ModelLogable
 {
   // Content.
 public:

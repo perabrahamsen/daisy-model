@@ -31,7 +31,7 @@ class Time;
 class Treelog;
 class Block;
 
-class Weather : public ModelNamed
+class Weather : public ModelLogable
 {
   // Units.
 public:

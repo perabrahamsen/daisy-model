@@ -30,7 +30,7 @@ class Log;
 class Treelog;
 class Block;
 
-class RubiscoNdist : public ModelNamed
+class RubiscoNdist : public ModelLogable
 {
   // Content.
 public:

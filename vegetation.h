@@ -46,7 +46,7 @@ class Block;
 class AttributeList;
 class Syntax;
 
-class Vegetation : public ModelNamed
+class Vegetation : public ModelLogable
 { 
   // Content.
 public:

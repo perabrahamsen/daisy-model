@@ -38,7 +38,7 @@ class Syntax;
 class AttributeList;
 class Mobsol;
 
-class Horizon : public ModelNamed
+class Horizon : public ModelLogable
 {
   // Content.
 private:

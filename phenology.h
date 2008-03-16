@@ -35,7 +35,7 @@ class Block;
 class Syntax;
 class AttributeList;
 
-class Phenology : public ModelNamed
+class Phenology : public ModelLogable
 {
   // Content.
 public:

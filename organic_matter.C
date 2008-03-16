@@ -34,7 +34,7 @@ OrganicMatter::library_id () const
 }
 
 OrganicMatter::OrganicMatter (Block& al)
-  : name (al.identifier ("type"))
+  : ModelLogable (al.identifier ("type"))
 { }
 
 OrganicMatter::~OrganicMatter ()

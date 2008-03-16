@@ -25,7 +25,6 @@
 #define ORGANIC_MATTER_H
 
 #include "model.h"
-#include "symbol.h"
 #include <vector>
 
 class AttributeList;
@@ -43,11 +42,10 @@ class Volume;
 class Treelog;
 class Block;
 
-class OrganicMatter : public Model
+class OrganicMatter : public ModelLogable
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
 

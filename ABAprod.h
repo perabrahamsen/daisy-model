@@ -31,7 +31,7 @@ class AttributeList;
 class Geometry;
 class SoilWater;
 
-class ABAProd : public ModelNamed
+class ABAProd : public ModelLogable
 {
   // Content.
 public:
