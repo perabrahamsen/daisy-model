@@ -157,8 +157,7 @@ public:
                         const char* name, AttributeList& al,
                         const Syntax& syntax, builder build);
   static void add_alias (const char* component, symbol derived, symbol base);
-  typedef void (*doc_fun) (Format&, Metalib&, Treelog&, 
-                           const AttributeList& al);
+  typedef void (*doc_fun) (Format&, Metalib&, Treelog&, symbol name);
   static void add_doc_fun (const char* component, doc_fun);
   static void load_syntax (Syntax&, AttributeList&);
 

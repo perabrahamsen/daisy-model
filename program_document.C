@@ -1068,7 +1068,6 @@ void
 ProgramDocument::print_model (const symbol name, const Library& library,
                               Treelog& msg)
 {
-  
   const Syntax& syntax = library.syntax (name);
   const AttributeList& alist = library.lookup (name);  
 
@@ -1102,7 +1101,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       for (size_t i = 0; i < doc_funs.size ();i++)
 	{
 	  format->soft_linebreak ();
-	  doc_funs[i](*format, metalib, msg, alist);
+	  doc_funs[i](*format, metalib, msg, name);
 	}
       if (print_parameterizations)
 	{

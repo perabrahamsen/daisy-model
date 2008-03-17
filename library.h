@@ -51,9 +51,7 @@ class EXPORT Library
 {
   // Types.
 public:
-  typedef void (*doc_fun) (Format&, Metalib&, Treelog&, 
-                           const AttributeList& al);
-
+  typedef void (*doc_fun) (Format&, Metalib&, Treelog&, symbol name);
   typedef Model& (*builder) (Block&);
 
   // Content.

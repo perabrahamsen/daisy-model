@@ -258,27 +258,32 @@ struct DocSelect : public LogSelect
 
 void
 LogSelect::document_entries (Format& format, Metalib& metalib, 
-                             Treelog& msg,
-                             const AttributeList& alist)
+                             Treelog& msg, const symbol name)
 {
-  Syntax syntax;
-  AttributeList dummy_alist;
-  LogSelect::load_syntax (syntax, dummy_alist);
-
   const Library& log_lib = metalib.library (Log::component);
-  if (alist.check ("type"))
+  const Syntax& syntax = log_lib.syntax (name);
+  const AttributeList& alist = log_lib.lookup (name);  
+
+  // We need a type.
+  if (!alist.check ("type"))
     {
-      const symbol parent = alist.identifier ("type");
-      if (log_lib.check (parent)
-          && alist.subset (metalib, 
-                           log_lib.lookup (parent), log_lib.syntax (parent),
-                           "entries"))
-        return;
+      msg.warning ("bug: Orphan log parameterisation.");
+      return;
     }
 
+  // Check if this log parameterizations adds something compared to
+  // its parent. 
+  const symbol parent = alist.identifier ("type");
+  if (log_lib.check (parent)
+      && alist.subset (metalib, 
+                       log_lib.lookup (parent), log_lib.syntax (parent),
+                       "entries"))
+    // If not, don't document the entries.
+    return;
+
+  // Incomplete log.
   if (!syntax.check (metalib, alist, Treelog::null ()))
     {
-      // Incomplete log.
       if (!alist.check ("entries"))
 	return;
 
@@ -309,6 +314,7 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
 	}
       return;
     }
+
   // Complete log.
   Block block (metalib, msg, syntax, alist, "docselect");
   DocSelect select (block);

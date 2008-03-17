@@ -118,8 +118,7 @@ struct EXPORT LogSelect : public Log
 
   // Create and Destroy.
   bool check (const Border&, Treelog& err) const;
-  static void document_entries (Format& format, Metalib&, Treelog&, 
-                                const AttributeList& alist);
+  static void document_entries (Format& format, Metalib&, Treelog&, symbol);
   static void load_syntax (Syntax&, AttributeList&);
   LogSelect (Block& al);
   LogSelect (const char* id);
