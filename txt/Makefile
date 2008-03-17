@@ -37,6 +37,9 @@ reference.pdf: reference.tex components.tex $(LIBS)
 	makeindex reference
 	bibtex reference
 	pdflatex reference.tex < /dev/null
+	makeindex reference
+	bibtex reference
+	pdflatex reference.tex < /dev/null
 
 components.tex:	$(DAISYEXE)
 	$(DAISYEXE) -nw all.dai -p document

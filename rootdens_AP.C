@@ -137,11 +137,10 @@ static struct Rootdens_APSyntax
     Rootdens::load_base (syntax, alist);
     alist.add ("description", 
 	       "Use exponential function for root density.\n\
-\n\
-See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
-to describe plant root systems.  J. Appl. Ecol. 11, 773-781.\n\
-\n\
-In this variant, 'a' is specified as a function of development stage.");
+In this variant of Gerwitz and Page, 'a' is specified as a function of\n\
+development stage.");
+    alist.add_strings ("cite", "gp74");
+
     syntax.add ("a_DS", "DS", "cm^-1", Syntax::Const, 
                 "Form parameter as a function of development stage.");
     syntax.add ("q", "cm", Check::non_negative (), Syntax::Const, 
