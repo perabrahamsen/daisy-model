@@ -329,8 +329,8 @@ LogSelect::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Description of this log file format.");
   alist.add ("description", "\
 Each selected variable is represented by a column in the log.");
-  syntax.add_object ("when", Condition::component, 
-                     "Add entries to the log file when this condition is true.");
+  syntax.add_object ("when", Condition::component, "\
+Add entries to the log file when this condition is true.");
   syntax.add_object ("entries", Select::component, 
                      Syntax::State, Syntax::Sequence,
                      "What to log in each column.");
@@ -351,3 +351,5 @@ OBSOLETE: Use (volume box (top FROM)) instead.");
 By default, use the bottom of the soil.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
 }
+
+// log_select.C ends here.

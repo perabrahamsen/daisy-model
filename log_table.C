@@ -527,3 +527,5 @@ String to print between array entries.");
                               LogSelect::document_entries);
     }
 } LogTable_syntax;
+
+// log_table.C ends here.
