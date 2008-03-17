@@ -865,7 +865,13 @@ cast:
 
 setup:	svnci
 	$(MAKE) setupnosvn
-#	$(MAKE) upload
+	$(MAKE) upload
+
+setupdocs:
+	(cd txt && $(MAKE) PATH="$(PATH):$(Q4HOME)/bin" \
+		           DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) \
+			   SETUPDIR=$(SETUPDIR) \
+			   DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" setup)
 
 setupnosvn: 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
@@ -877,6 +883,7 @@ setupnosvn:
 	cp $(TEXT) $(SETUPDIR)/src
 	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	$(MAKE) setupdocs
 	(cd txt && $(MAKE) PATH="$(PATH):$(Q4HOME)/bin" \
 		           DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) \
 			   SETUPDIR=$(SETUPDIR) \
@@ -894,7 +901,7 @@ setupnosvn:
 
 upload:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	./utils/googlecode_upload.py -p daisy-model -u per.abrahamsen \
+	./libdeps/googlecode_upload.py -p daisy-model \
 		-s "Daisy version $(TAG) installer for MS Windows" \
 		-l Type-Installer,OpSys-Windows,Featured \
 		daisy-$(TAG)-setup.exe

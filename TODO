@@ -1,7 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Gør den gamle 1D rootdens til default.
-
 * Treelog send (severity, location, text);
 
 * InitLAI erstatning

@@ -318,19 +318,6 @@ Rootdens_GP1D::Rootdens_GP1D (const AttributeList& al)
     k (-42.42e42)
 { }
 
-std::auto_ptr<Rootdens> 
-Rootdens::create_uniform ()
-{
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      Rootdens_GP1D::load_syntax (dummy, alist);
-      alist.add ("type", "GP1D");
-    }
-  return std::auto_ptr<Rootdens> (new Rootdens_GP1D (alist)); 
-}
-
 static struct Rootdens_GP1DSyntax
 {
   static Model& make (Block& al)

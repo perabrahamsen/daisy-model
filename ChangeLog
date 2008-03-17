@@ -1,3 +1,9 @@
+2008-03-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rootdens_GP1D.C, rootdens_G_P.C (Rootdens::create_uniform): Made 
+
+	* rootdens.C (Rootdens::load_base): Call 'Model::load_model'.
+
 2008-03-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* model.h, model.C (Model::load_model): New utility.
