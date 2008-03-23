@@ -103,7 +103,7 @@ model (\ref{model:crop-default}) is sufficiently generic to be able to
 describe crops ranging from grass to potatoes, but it takes lot of
 parameters to do so.  This is why Daisy comes with already
 parameterized versions of the model, with names like ``Grass'' and
-``Potato''.
+x``Potato''.
 
 All in all, this gives a three layered hierarchy, with library
 components in top.  For each library component, there can be one or
@@ -130,12 +130,12 @@ exceptions to that rule though.
 First, some parameters and state variables are marked \emph{optional}.
 This can mean one of two things.  Sometimes the model will be able to
 infer the value of one variable (or parameter) from the values of
-other variables or parameters.  For example, the `SoilNO3' component
-(section~\ref{fixed:SoilNO3}) has both an `M' state variable,
-indicating the total nitrate content in the soil, and a `C' state
-variable, indicating the nitrate concentration in the soil water.
+other variables or parameters.  For example, the `default' chemical
+model (section~\ref{model:chemical-default}) has both an `M' state variable,
+indicating the total chemical content in the soil, and a `C' state
+variable, indicating the chemical concentration in the soil water.
 Given one of these, and information about the amount of water in the
-soil, the `SoilNO3' component is able to calculate the other.
+soil, the `default' chemical component is able to calculate the other.
 
 The other exception is parameters or state variables which have a
 \emph{default value}.  Many models have parameters that the typical
