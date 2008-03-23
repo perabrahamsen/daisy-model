@@ -40,7 +40,7 @@
   ;; Let the user choose a chemical.
   (declare chemical String
 	   "Name of chemical to log.")
-  ;; (chemical "*") ; Not very useful, N dominates.
+  (chemical "*") ; Not very useful, N dominates.  But needed for ref.manual.
   ;; Add it to the log files.
   (parameter_names &old chemical)
   ;; Use chemical name as part of file name.
