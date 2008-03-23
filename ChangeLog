@@ -1,3 +1,16 @@
+2008-03-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.28 released.
+
+2008-03-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-std.dai (chemical): Give default value to 'chemical' for
+	the sake of the reference manual.
+
+	* program_document.C (ProgramDocument::own_entries): New
+	'new_only' parameter.
+	(ProgramDocument::print_model): Use it.
+
 2008-03-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* library.h (doc_fun): Changed parameter type.

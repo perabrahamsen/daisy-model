@@ -82,7 +82,8 @@ struct ProgramDocument : public Program
   // Print parts of it.
   static void own_entries (const Metalib&,
                            const Library& library, const symbol name, 
-                           std::vector<std::string>& entries);
+                           std::vector<std::string>& entries, 
+                           bool new_only = false);
   static void inherited_entries (const Metalib&, const Library& library,
                                  const symbol name, 
                                  std::vector<std::string>& entries);
@@ -712,10 +713,12 @@ ProgramDocument::print_sample_entry (const std::string& name,
 	print_sample_end ();
     }
 }
+
 void
 ProgramDocument::own_entries (const Metalib& metalib,
                               const Library& library, const symbol name, 
-			      std::vector<std::string>& entries)
+			      std::vector<std::string>& entries,
+                              const bool new_only)
 {
   const Syntax& syntax = library.syntax (name);
   const AttributeList& alist = library.lookup (name);
@@ -723,9 +726,11 @@ ProgramDocument::own_entries (const Metalib& metalib,
   syntax.entries (entries);
 
   // Remove base entries.
-  if (alist.check ("base_model"))
+  if (alist.check ("base_model") || alist.check ("type"))
     {
-      const symbol base_model = alist.identifier ("base_model");
+      const symbol base_model = alist.check ("base_model")
+        ? alist.identifier ("base_model")
+        : alist.identifier ("type");
           
       if (base_model != name)
         {
@@ -736,7 +741,8 @@ ProgramDocument::own_entries (const Metalib& metalib,
           for (size_t i = 0; i < base_entries.size (); i++)
             {
               const std::string& key = base_entries[i];
-              if (key == "description"
+              if (new_only
+                  || key == "description"
                   || alist.subset (metalib, base_alist, base_syntax, key))
                 entries.erase (find (entries.begin (), entries.end (), key));
             }
@@ -1096,6 +1102,12 @@ ProgramDocument::print_model (const symbol name, const Library& library,
         format->alist_description (alist);
 
       print_users (xref.models[used]);
+      std::vector<std::string> entries;
+      own_entries (metalib, library, name, entries, true);
+      if (entries.size () > 0)
+        print_submodel_entries (name.name (), 0, syntax, alist, entries, 
+                                library.name ().name ());
+
       const std::vector<Library::doc_fun>& doc_funs 
 	= library.doc_funs ();
       for (size_t i = 0; i < doc_funs.size ();i++)
