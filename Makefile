@@ -884,10 +884,6 @@ setupnosvn:
 	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	$(MAKE) setupdocs
-	(cd txt && $(MAKE) PATH="$(PATH):$(Q4HOME)/bin" \
-		           DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) \
-			   SETUPDIR=$(SETUPDIR) \
-			   DAISYPATH=".;$(SRCDIR)/lib;$(SRCDIR)/sample" setup)
 	(cd exercises && $(MAKE) SETUPDIR=$(SETUPDIR) setup)
 	mkdir $(SETUPDIR)/bin
 	$(STRIP) -o $(SETUPDIR)/bin/daisy.exe $(OBJHOME)/daisy.exe

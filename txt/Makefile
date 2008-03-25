@@ -77,7 +77,7 @@ dist: reference.pdf reference.ps tutorial.pdf exercises.pdf
 	cp -f exercises.pdf $(FTPDIR)/
 
 setup: reference.pdf reference.ps tutorial.pdf exercises.pdf
-	mkdir $(SETUPDIR)/doc
+	-mkdir $(SETUPDIR)/doc
 	cp -f reference.pdf $(SETUPDIR)/doc
 	cp -f reference.ps $(SETUPDIR)/doc
 	cp -f tutorial.pdf $(SETUPDIR)/doc
