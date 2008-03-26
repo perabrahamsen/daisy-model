@@ -548,7 +548,7 @@ Syntax::order () const
 }
 
 int
-Syntax::order (const std::string& name) const
+Syntax::order_index (const std::string& name) const
 {
   return impl.order_number (name);
 }

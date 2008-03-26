@@ -163,8 +163,8 @@ public:
   // Create and Destroy.
 public:
   void initialize (const Geometry& geo, double row_width,
-                   OrganicMatter&, const Time&, Treelog&);
-  void initialize (const Geometry& geo, OrganicMatter&, const Time&, Treelog&);
+                   OrganicMatter&, double SoilLimit, const Time&, Treelog&);
+  void initialize (const Geometry& geo, OrganicMatter&, double SoilLimit, const Time&, Treelog&);
   bool check (Treelog&) const;
   CropSimple (Block& vl);
   ~CropSimple ();
@@ -403,7 +403,8 @@ CropSimple::total_C () const
 
 void
 CropSimple::initialize (const Geometry& geo, const double row_width, 
-                        OrganicMatter&, const Time&, Treelog& msg)
+                        OrganicMatter&, double /* SoilLimit */,
+                        const Time&, Treelog& msg)
 {
   root_system->initialize (geo, row_width, msg);
   CropCAI ();
@@ -411,7 +412,8 @@ CropSimple::initialize (const Geometry& geo, const double row_width,
 
 void
 CropSimple::initialize (const Geometry& geo, 
-                        OrganicMatter&, const Time&, Treelog& msg)
+                        OrganicMatter&, double /* SoilLimit */, 
+                        const Time&, Treelog& msg)
 {
   root_system->initialize (geo, msg);
   CropCAI ();

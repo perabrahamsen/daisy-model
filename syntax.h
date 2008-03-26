@@ -128,7 +128,7 @@ public:
   const std::string& description (const std::string&) const;
   bool ordered () const;
   const std::vector<std::string>& order () const;
-  int order (const std::string& name) const;	// Return index in order, or -1
+  int order_index (const std::string& name) const; // Return index in order, or -1
   bool total_order () const;	// True iff all members are ordered.
   const AttributeList& default_alist (const std::string&) const;
 

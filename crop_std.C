@@ -180,10 +180,12 @@ public:
   // Create and Destroy.
 public:
   void initialize (const Geometry& geometry, double row_width, OrganicMatter&, 
+                   double SoilLimit,
                    const Time&, Treelog&);
-  void initialize (const Geometry&, OrganicMatter&, const Time&, Treelog&);
+  void initialize (const Geometry&, OrganicMatter&, 
+                   double SoilLimit, const Time&, Treelog&);
   void initialize_shared (const Geometry&, OrganicMatter&, 
-                          const Time&, Treelog&);
+                          double SoilLimit, const Time&, Treelog&);
   bool check (Treelog&) const;
   CropStandard (Block& vl);
   ~CropStandard ();
@@ -221,24 +223,27 @@ CropStandard::SOrg_DM () const
 void
 CropStandard::initialize (const Geometry& geo, const double row_width,
                           OrganicMatter& organic_matter,
+                          const double SoilLimit,
                           const Time& now, Treelog& msg)
 {
   root_system->initialize (geo, row_width, msg);
-  initialize_shared (geo, organic_matter, now, msg);
+  initialize_shared (geo, organic_matter, SoilLimit, now, msg);
 }
 
 void
 CropStandard::initialize (const Geometry& geo, 
                           OrganicMatter& organic_matter,
+                          const double SoilLimit,
                           const Time& now, Treelog& msg)
 {
   root_system->initialize (geo, msg);
-  initialize_shared (geo, organic_matter, now, msg);
+  initialize_shared (geo, organic_matter, SoilLimit, now, msg);
 }
 
 void
 CropStandard::initialize_shared (const Geometry& geo, 
                                  OrganicMatter& organic_matter,
+                                 const double SoilLimit,
                                  const Time& now, Treelog& msg)
 {
   if (!last_time.get ())
@@ -258,7 +263,7 @@ CropStandard::initialize_shared (const Geometry& geo,
 		   // We don't save the forced CAI, use simulated CAI
 		   //  until midnight (small error).
 		   -1.0);
-      root_system->set_density (geo, production.WRoot, DS, msg);
+      root_system->set_density (geo, SoilLimit, production.WRoot, DS, msg);
       nitrogen.content (DS, production, msg);
     }
 }

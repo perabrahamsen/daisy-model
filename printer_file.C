@@ -108,7 +108,7 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
       if (!syntax.total_order ())
 	return true;
       // or not the last element in the order.
-      if (syntax.order (key) + 1U != syntax.order ().size ())
+      if (syntax.order_index (key) + 1U != syntax.order ().size ())
 	return true;
       return false;
     }
@@ -122,7 +122,7 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
     case Syntax::String:
       return false;
     case Syntax::Object:
-      return syntax.order (key) >= 0
+      return syntax.order_index (key) >= 0
 	|| is_complex_object (alist.alist (key), 
                               syntax.library (metalib, key));
     case Syntax::AList:
@@ -489,7 +489,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
       const std::string key = entries[i];
       
       // Skip already printed members.
-      if (syntax.order (key) >= 0)
+      if (syntax.order_index (key) >= 0)
 	continue;
 
       // Declare new members.

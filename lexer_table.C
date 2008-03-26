@@ -1,4 +1,4 @@
-// lexer_data.C --- Read tabular data from a file.
+// lexer_table.C --- Read tabular data from a file.
 // 
 // Copyright 2005 Per Abrahamsen and KVL.
 //
@@ -490,3 +490,5 @@ LexerTable::LexerTable (Block& al)
 
 LexerTable::~LexerTable ()
 { sequence_delete (filter.begin (), filter.end ()); }
+
+// lexer_table.C ends here.

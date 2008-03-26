@@ -123,8 +123,8 @@ public:
   void tick (double T, double dt);
   void tick_daily (const Geometry&, const Soil&, 
 		   double WRoot, bool root_growth, double DS, Treelog&);
-  void set_density (const Geometry& geometry, double WRoot, double DS, 
-                    Treelog&);
+  void set_density (const Geometry& geometry, double SoilLimit, 
+                    double WRoot, double DS, Treelog&);
   void full_grown (const Geometry&, double max_rooting_depth, double WRoot, 
                    Treelog&);
   void output (Log& log) const;

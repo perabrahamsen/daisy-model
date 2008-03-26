@@ -150,9 +150,9 @@ public:
   // Create and Destroy.
 public:
   virtual void initialize (const Geometry&, OrganicMatter&, 
-                           const Time& now, Treelog&) = 0;
+                           double SoilLimit, const Time& now, Treelog&) = 0;
   virtual void initialize (const Geometry&, double row_width, OrganicMatter&, 
-                           const Time& now, Treelog&) = 0;
+                           double SoilLimit, const Time& now, Treelog&) = 0;
   virtual bool check (Treelog& msg) const = 0;
 protected:
   Crop (Block&);

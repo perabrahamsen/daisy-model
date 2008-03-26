@@ -146,6 +146,7 @@ public:
                       Treelog&) = 0;
   virtual void sow (Metalib&, const AttributeList& al, double row_width,
                     const Geometry&, OrganicMatter&, 
+                    double SoilLimit /* [cm] */,
                     double& seed_N /* kg/ha/h */,
                     double& seed_C /* kg/ha/h */,
                     const Time&, double dt, Treelog& msg) = 0;

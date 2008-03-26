@@ -43,7 +43,7 @@ SourceFile::add_entry (const Time& time, std::vector<double>& vals)
 
       if (vals.size () > 1 && !explicit_with)
         with_ = "errorbars";
-      const double total = std::accumulate (vals.begin (), vals.end (), 0.0);
+
       const double N = vals.size ();
       const double mean = total / N;
       double variance = 0;

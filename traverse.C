@@ -214,7 +214,7 @@ Traverse::traverse_alist (const Syntax& syntax, const AttributeList& alist,
   for (unsigned int i = 0; i < parameters.size (); i++)
     {
       const std::string& parameter = parameters[i];
-      if (syntax.order (parameter) < 0)
+      if (syntax.order_index (parameter) < 0)
 	traverse_parameter (syntax, alist, default_alist, name, parameter);
   }
 }

@@ -378,6 +378,7 @@ RootSystem::tick_daily (const Geometry& geo, const Soil& soil,
 			const double WRoot, const bool root_growth,
 			const double DS, Treelog& msg)
 {
+  const double SoilLimit = -soil.MaxRootingHeight ();
   // Penetration.
   if (root_growth)
     {
@@ -389,15 +390,15 @@ RootSystem::tick_daily (const Geometry& geo, const Soil& soil,
       Depth = std::min (Depth + dp, MaxPen);
       PotRtDpt = std::max (PotRtDpt, Depth);
       /*max depth determined by crop*/
-      Depth = std::min (Depth, -soil.MaxRootingHeight ()); /*or by soil conditions*/
+      Depth = std::min (Depth, SoilLimit); /*or by soil conditions*/
     }
-  set_density (geo, WRoot, DS, msg);
+  set_density (geo, SoilLimit, WRoot, DS, msg);
 }
 
 void
-RootSystem::set_density (const Geometry& geo, 
+RootSystem::set_density (const Geometry& geo, const double SoilLimit,
 			 const double WRoot, const double DS, Treelog& msg)
-{ rootdens->set_density (geo, MaxPen, PotRtDpt, PotRtDpt,
+{ rootdens->set_density (geo, SoilLimit, PotRtDpt, PotRtDpt,
 			 WRoot, DS, Density, msg); }
 
 void
@@ -407,7 +408,7 @@ RootSystem::full_grown (const Geometry& geo,
 {
   PotRtDpt = MaxPen;
   Depth = std::min (MaxPen, -max_rooting_depth);
-  set_density (geo, WRoot, 1.0, msg);
+  set_density (geo, -max_rooting_depth, WRoot, 1.0, msg);
 }
 
 void

@@ -844,13 +844,13 @@ ProgramDocument::print_sample_entries (const std::string& name,
   // Remove uninteresting entries
   std::vector<std::string> own; 
   for (size_t i = 0; i < own_entries.size (); i++)
-    if (syntax.order (own_entries[i]) < 0
+    if (syntax.order_index (own_entries[i]) < 0
 	&& !syntax.is_log (own_entries[i])
 	&& syntax.lookup (own_entries[i]) != Syntax::Library)
       own.push_back (own_entries[i]);
   std::vector<std::string> base;
   for (size_t i = 0; i < base_entries.size (); i++)
-    if (syntax.order (base_entries[i]) < 0
+    if (syntax.order_index (base_entries[i]) < 0
 	&& !syntax.is_log (base_entries[i])
 	&& syntax.lookup (base_entries[i]) != Syntax::Library)
       base.push_back (base_entries[i]);
@@ -979,7 +979,8 @@ ProgramDocument::print_submodel_entries (const std::string& name, int level,
       
 	  // Then the remaining members, except log variables.
 	  for (unsigned int i = 0; i < entries.size (); i++)
-	    if (syntax.order (entries[i]) < 0 && !syntax.is_log (entries[i]))
+	    if (syntax.order_index (entries[i]) < 0 
+                && !syntax.is_log (entries[i]))
 	      print_submodel_entry (entries[i], level, syntax, alist, first, 
 				    bref);
 	}

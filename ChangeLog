@@ -1,3 +1,22 @@
+2008-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.29 released.
+
+2008-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Obey 'MaxRootingDepth'.
+
+	* syntax.C, syntax.h (Syntax::order_index): Renamed from 'order'
+	to avoid name conflict.
+	* program_document.C, traverse.C, printer_file.C: Update callers.
+
+	* lexer_table.C: Fix comment.
+
+2008-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_file.C (SourceFile::add_entry): Removed duplicate
+	definition of 'total'.
+
 2008-03-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.28 released.

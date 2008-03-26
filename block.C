@@ -544,3 +544,5 @@ Block::Block (Block& block,
 
 Block::~Block ()
 { }
+
+// block.C ends here.

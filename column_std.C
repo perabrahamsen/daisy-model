@@ -183,8 +183,8 @@ ColumnStandard::sow (Metalib& metalib, const AttributeList& al,
                      const double row_width, const Time& time,
                      const double dt, Treelog& msg)
 { vegetation->sow (metalib, al, row_width, 
-                   geometry, *organic_matter, seed_N, seed_C, 
-                   time, dt, msg); }
+                   geometry, *organic_matter, -soil->MaxRootingHeight (),
+                   seed_N, seed_C, time, dt, msg); }
 
 
 void 
