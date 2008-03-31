@@ -129,7 +129,7 @@ MsoltranrectConvection::flow (const GeometryRect& geo,
 
   // Update C.
   for (size_t n = 0; n < cell_size; n++)
-    C[n] = M[n] * soil_water.Theta (n) * C[n];
+    C[n] = M[n] / soil_water.Theta (n);
 }
 
 void 
