@@ -1,3 +1,13 @@
+2008-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transport.h (class Transport): 
+
+2008-03-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (OTHER): Added it.
+
+	* frame.C, frame.h: New utility.
+
 2008-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.29 released.

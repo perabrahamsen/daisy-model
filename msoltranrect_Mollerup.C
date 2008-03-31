@@ -23,7 +23,6 @@
 #include "geometry_rect.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "adsorption.h"
 #include "solver.h"
 #include "log.h"
 #include "alist.h"
@@ -43,7 +42,6 @@
 #include <boost/numeric/ublas/io.hpp>
 
 namespace ublas = boost::numeric::ublas;
-
 
 struct MsoltranrectMollerup : public Msoltranrect
 {
@@ -167,9 +165,7 @@ struct MsoltranrectMollerup : public Msoltranrect
   void flow (const GeometryRect& geo, 
              const Soil& soil, 
              const SoilWater& soil_water, 
-             const Adsorption& adsorption,
              symbol name,
-             std::vector<double>& M, 
              std::vector<double>& C, 
              const std::vector<double>& S, 
              std::vector<double>& J, 
@@ -994,9 +990,7 @@ void
 MsoltranrectMollerup::flow (const GeometryRect& geo, 
                             const Soil& soil, 
                             const SoilWater& soil_water, 
-                            const Adsorption& adsorption,
                             const symbol name,
-                            std::vector<double>& M, 
                             std::vector<double>& C, 
                             const std::vector<double>& S, 
                             std::vector<double>& J, 
@@ -1009,29 +1003,6 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
 
-  // Adsorption.
-  ublas::vector<double> K_ads_cell (cell_size);
-  ublas::vector<double> ads_total (cell_size);
-#ifdef ENABLE_LINEAR_ADSORPTION
-  const AdsorptionLinear *const ads_lin 
-    = dynamic_cast<const AdsorptionLinear*> (&adsorption);
-#else
-  const AdsorptionLinear *const ads_lin = NULL;
-#endif
-  if (ads_lin)
-    {
-      for (size_t c = 0; c < cell_size; c++)
-        K_ads_cell[c] = ads_lin->K (soil, c);
-    }
-  else
-    // No linear adsorption.
-    K_ads_cell = ublas::zero_vector<double> (cell_size);
-
-  // ublas mass
-  ublas::vector<double> M_total (cell_size);
-  for (size_t c = 0; c < cell_size; c++)
-    M_total[c] = M[c];
- 
   // Solution old
   ublas::vector<double> C_old (cell_size);
   for (int c = 0; c < cell_size; c++)
@@ -1339,11 +1310,6 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
       for (int c = 0; c < cell_size; c++)
         QTheta_mat_np1 (c, c) = geo.cell_volume (c) * Theta_cell_np1 (c);
 
-      // Non-linear adsorption, store old adsorbed matter.
-      if (!ads_lin)
-        for (int c = 0; c < cell_size; c++)
-          ads_total[c] = M_total[c] - C_n[c] * Theta_cell_n[c];
-      
       lowerboundary (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg,
                      C_n, enable_boundary_diffusion, edge_type, B_mat,
                      B_vec, B_dir_vec);
@@ -1422,19 +1388,6 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
       //Update Theta and QTheta
       Theta_cell_n = Theta_cell_np1;
       QTheta_mat_n = QTheta_mat_np1;
-      
-      // Non-linear adsorption, calculate new total matter and new conc.
-      if (!ads_lin)
-        {
-          for (size_t c = 0; c < cell_size; c++)
-            {
-              // We assume the adsorbed matter stayed during transport.
-              M_total[c] = ads_total[c] + C_n[c] * Theta_cell_np1[c];
-              // We assume new equilibrium right after transport.
-              C_n[c] = adsorption.M_to_C (soil, Theta_cell_np1[c],
-                                          c, M_total[c]);
-            }
-        }
 
     } //End small timestep loop
   
@@ -1449,21 +1402,9 @@ MsoltranrectMollerup::flow (const GeometryRect& geo,
   // tmp << "C_n" << C_n;
   //msg.message (tmp.str ());
  
-  // Write solution into C (std::vector) and M
-  for (size_t c=0; c < cell_size; c++)
-    {
+  // Write solution into C (std::vector)
+  for (size_t c = 0; c < cell_size; c++)
       C[c] = C_n (c); 
-      M[c] = adsorption.C_to_M (soil, Theta_cell (c), c, C[c]);
-      if (C[c] < 0.0)
-        {
-          tmp_mmo << "Cell = " << c << "\n";
-          tmp_mmo << "C_old = " << C_old;
-          msg.error (tmp_mmo.str ());
-          throw "Negative concentration in solution";
-        }
-      if (M[c] < 0.0)
-        throw "Negative content in solution";
-    }
   
   // BUG: No J for inner nodes.
   if (debug > 0)
@@ -1540,4 +1481,3 @@ See Mollerup 2007 for details.");
 } MsoltranrectMollerup_syntax;
 
 // msoltranrect_Mollerup.C ends here.
-

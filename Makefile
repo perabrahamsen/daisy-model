@@ -387,7 +387,7 @@ MODELS = groundwater_aquitard.C \
 	msoltranrect_Mollerup.C reaction_std.C chemistry_std.C \
 	groundwater_extern.C \
 	msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
-	msoltranrect_2x1.C ABAeffect_exp.C rubiscoNdist_uniform.C \
+	ABAeffect_exp.C rubiscoNdist_uniform.C \
 	uzrect_2x1.C select_flow.C volume_box.C \
 	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
 	rubiscoNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \
@@ -479,7 +479,8 @@ SPECIALS = scope_exchange.C photo_Farquhar.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
+OTHER = frame.C \
+	bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
 	intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
 	block.C dlf.C texture.C destination.C symbol.C \
@@ -563,9 +564,9 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = select_soil.C 
+REMOVE = msoltranrect_2x1.C
 
-REMOVED = adsorption_none.C adsorption_full.C ABAprod_expr.C \
+REMOVED = select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
 	solute.C solute.h pedo.C pedo.h pedo_arit.C pedo_const.C \
 	denitrification.C soil_NH4.C soil_NO3.C \
 	denitrification.h soil_NH4.h soil_NO3.h \

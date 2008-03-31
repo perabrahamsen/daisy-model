@@ -36,9 +36,7 @@ struct MsoltranrectConvection : public Msoltranrect
   void flow (const GeometryRect& geo, 
              const Soil& soil, 
              const SoilWater& soil_water, 
-	     const Adsorption&, 
              const symbol name,
-             std::vector<double>& M, 
              std::vector<double>& C, 
              const std::vector<double>& S, 
              std::vector<double>& J, 
@@ -58,9 +56,7 @@ void
 MsoltranrectConvection::flow (const GeometryRect& geo, 
                            const Soil& soil, 
                            const SoilWater& soil_water, 
-                           const Adsorption& adsorption, 
                            const symbol name,
-                           std::vector<double>& M, 
                            std::vector<double>& C, 
                            const std::vector<double>& S, 
                            std::vector<double>& J, 
@@ -73,9 +69,10 @@ MsoltranrectConvection::flow (const GeometryRect& geo,
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
 
-  // Remember old content for checking mass balance later.
-  const double old_content = geo.total_soil (M);
-  double border = 0.0;	
+  // Solute M.
+  std::vector<double> M (cell_size);
+  for (size_t i = 0; i < M.size (); i++)
+    M[i] = soil_water.Theta (i) * C[i];
 
   // Find fluxes using old values.
   for (size_t e = 0; e < edge_size; e++)
@@ -120,43 +117,19 @@ MsoltranrectConvection::flow (const GeometryRect& geo,
       const int from = geo.edge_from (e);
       if (geo.cell_is_internal (from))
         M[from] -= value / geo.cell_volume (from);
-      else 
-        border -= value * dt;
 
       const int to = geo.edge_to (e);
       if (geo.cell_is_internal (to))
         M[to] += value / geo.cell_volume (to);
-      else 
-        border += value * dt;
     }
 
-  // Update cell for source term and concentration.
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      M[c] += S[c] * dt;
-      if (M[c] < 0.0)
-        throw "Negative content in solution";
-      C[c] = adsorption.M_to_C (soil, soil_water.Theta (c), c, M[c]);
-      if (C[c] < 0.0)
-        throw "Negative concentration in solution";
-    }
+  // Cell source.
+  for (size_t n = 0; n < cell_size; n++)
+    M[n] += S[n] * dt;
 
-  // Mass balance.
-  const double new_content = geo.total_soil (M);
-  const double delta_content = new_content - old_content;
-  const double source = geo.total_soil (S) * dt;
-  const double expected = (source - border);
-  if (!approximate (delta_content, expected)
-      && !approximate (new_content, old_content + expected))
-    {
-      std::ostringstream tmp;
-      tmp << __FILE__ << ":" << __LINE__ << ": " << name
-          << ": mass balance new - old != source - border\n"
-          << new_content << " - " << old_content << " != " 
-          << source << " - " << border << " (error "
-          << (delta_content - expected) << ")";
-      msg.error (tmp.str ());
-    }
+  // Update C.
+  for (size_t n = 0; n < cell_size; n++)
+    C[n] = M[n] * soil_water.Theta (n) * C[n];
 }
 
 void 

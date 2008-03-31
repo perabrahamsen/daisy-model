@@ -27,6 +27,7 @@
 #include "adsorption.h"
 #include "block.h"
 #include "librarian.h"
+#include "soil_water.h"
 
 const char *const Msoltranrect::component = "msoltranrect";
 
@@ -50,6 +51,7 @@ Msoltranrect::solute (const GeometryRect& geo,
 
   std::vector<double> M (cell_size);
   std::vector<double> C (cell_size);
+  std::vector<double> A (cell_size);
   std::vector<double> S (cell_size);
   std::vector<double> J (edge_size);
 
@@ -72,14 +74,23 @@ Msoltranrect::solute (const GeometryRect& geo,
     {
       M[c] = solute.M (c);
       C[c] = solute.C (c);
+      A[c] = M[c] - C[c] * soil_water.Theta_old (c);
       S[c] = solute.S (c);
     }
 
   // Flow.
-  flow (geo, soil, soil_water, solute.adsorption (), solute.name, 
-        M, C, S, J, solute.C_below (), flux_below,
+  flow (geo, soil, soil_water, solute.name, 
+        C, S, J, solute.C_below (), flux_below,
 	solute.diffusion_coefficient (), 
         dt, msg);
+
+  // Update M & C with old sorbed matter.
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double Theta = soil_water.Theta (c);
+      M[c] = A[c] + C[c] * Theta;
+      C[c] = solute.adsorption ().M_to_C (soil, Theta, c, M[c]);
+    }
 
   // Update edges.
   for (size_t e = 0; e < edge_size; e++)
@@ -96,11 +107,15 @@ Msoltranrect::element (const GeometryRect& geo,
                        DOE& element, const double diffusion_coefficient, 
                        const double dt, Treelog& msg)
 {
-  element.tick (geo.cell_size (), soil_water, dt);
+  const size_t cell_size = geo.cell_size ();
+
+  element.tick (cell_size, soil_water, dt);
   static const symbol DOM_name ("DOM");
-  flow (geo, soil, soil_water, Adsorption::none (), DOM_name, 
-        element.M, element.C, element.S, element.J, 0.0, false,
+  flow (geo, soil, soil_water, DOM_name, 
+        element.C, element.S, element.J, 0.0, false,
 	diffusion_coefficient, dt, msg);
+  for (size_t c = 0; c < cell_size; c++)
+    element.M[c] = element.C[c] * soil_water.Theta (c);
 }
 
 Msoltranrect::Msoltranrect (Block& al)

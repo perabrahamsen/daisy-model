@@ -1,5 +1,17 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* mob/immob
+
+           C          S        Theta
+mobile     C_mobile   S_total  Theta_mobile
+immobile   C_immobile S_total  Theta_immobile
+mixed      C_mobile   S_mobile Theta_mobile
+
+Adsorption:  Theta_total eller Theta_immobile?
+q: 0 hvis en af cellerne er immobil
+convection: v udregnes for Theta_mobile
+diffusion: v udregnes for Theta_total
+
 * Frame
 
 * Treelog send (severity, location, text);

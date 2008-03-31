@@ -36,9 +36,7 @@ struct MsoltranrectNone : public Msoltranrect
   void flow (const GeometryRect& geo, 
              const Soil& soil, 
              const SoilWater& soil_water, 
-	     const Adsorption&, 
              const symbol name,
-             std::vector<double>& M, 
              std::vector<double>& C, 
              const std::vector<double>& S, 
              std::vector<double>& J, 
@@ -58,9 +56,7 @@ void
 MsoltranrectNone::flow (const GeometryRect& geo, 
                         const Soil& soil, 
                         const SoilWater& soil_water, 
-			const Adsorption& adsorption, 
                         const symbol name,
-                        std::vector<double>& M, 
                         std::vector<double>& C, 
                         const std::vector<double>& S, 
                         std::vector<double>& J, 
@@ -72,10 +68,10 @@ MsoltranrectNone::flow (const GeometryRect& geo,
 {
   const size_t cell_size = geo.cell_size ();
 
-  // Remember old content for checking mass balance later.
-  const double old_content = geo.total_soil (M);
-  double in = 0.0;	
-  double out = 0.0; 
+  // Solute M.
+  std::vector<double> M (cell_size);
+  for (size_t i = 0; i < M.size (); i++)
+    M[i] = soil_water.Theta (i) * C[i];
 
   // Upper border.
   const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
@@ -85,49 +81,19 @@ MsoltranrectNone::flow (const GeometryRect& geo,
     {
       const int edge = edge_above[i];
       const int cell = geo.edge_other (edge, Geometry::cell_above);
-      
-      const double sin_angle = geo.edge_sin_angle (edge);
-      const double value = J[edge] * geo.edge_area (edge) * sin_angle;
-      M[cell] -=  dt * value / geo.cell_volume (cell);
-      in -= value;
+      const double in_sign 
+        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+      const double value = in_sign * J[edge] * dt * geo.edge_area (edge); // [g]
+      M[cell] += value / geo.cell_volume (cell);
     }
 
   // Cell source.
   for (size_t n = 0; n < cell_size; n++)
-    {
-      M[n] += S[n] * dt;
-      C[n] = adsorption.M_to_C (soil, soil_water.Theta (n), n, M[n]);
+    M[n] += S[n] * dt;
 
-      if (!(M[n] >= 0.0))
-        {
-
-          std::ostringstream tmp;
-          tmp << "BUG: M[" << n << "] = " << M[n] 
-              << " (J[0] = " << J[0] << ") S[" << n << "] = " << S[n];
-          msg.error (tmp.str ());
-          M[n] = C[n] = 0.0;
-        }
-      daisy_assert (M[n] >= 0.0);
-      daisy_assert (C[n] >= 0.0);
-    }
-
-  // Mass balance.
-  const double new_content = geo.total_soil (M);
-  const double delta_content = new_content - old_content;
-  const double source = geo.total_soil (S);
-  // BUG: ASSume uniform boundaries.
-  const double expected = (source + in - out) * dt;
-  if (!approximate (delta_content, expected)
-      && new_content < fabs (expected) * 1e10)
-    {
-      std::ostringstream tmp;
-      tmp << __FILE__ << ":" << __LINE__ << ": " << name
-          << ": mass balance new - old != source + in - out\n"
-          << new_content << " - " << old_content << " != " 
-          << source * dt << " + " << in * dt << " - " << out * dt << " (error "
-          << (delta_content - expected) << ")";
-      msg.error (tmp.str ());
-    }
+  // Update C.
+  for (size_t n = 0; n < cell_size; n++)
+    C[n] = M[n] * soil_water.Theta (n) * C[n];
 }
 
 void 
