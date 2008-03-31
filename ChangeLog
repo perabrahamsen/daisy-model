@@ -1,6 +1,11 @@
-2008-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+2008-03-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* transport.h (class Transport): 
+	* msoltranrect_convection.C (MsoltranrectConvection::flow): 
+	* msoltranrect_Mollerup.C (MsoltranrectMollerup::flow): 
+	* msoltranrect_none.C (MsoltranrectNone::flow):
+	All calculation on solute (C).
+	* msoltranrect.C (Msoltranrect::solute, Msoltranrect::element): 
+	Update callers.
 
 2008-03-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
