@@ -72,7 +72,7 @@ MsoltranrectConvection::flow (const GeometryRect& geo,
   // Solute M.
   std::vector<double> M (cell_size);
   for (size_t i = 0; i < M.size (); i++)
-    M[i] = soil_water.Theta (i) * C[i];
+    M[i] = soil_water.Theta_old (i) * C[i];
 
   // Find fluxes using old values.
   for (size_t e = 0; e < edge_size; e++)
