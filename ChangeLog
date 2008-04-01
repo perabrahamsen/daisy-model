@@ -1,3 +1,8 @@
+2008-04-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* msoltranrect_convection.C (ddt): New log variable.
+	(MsoltranrectConvection::flow): Small timesteps.
+
 2008-03-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* msoltranrect_convection.C (MsoltranrectConvection::flow): 

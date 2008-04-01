@@ -2,13 +2,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * msoltranrect_convection
 
-** Smaller timesteps based an S and q
+** Håndter mobil/immobil vand.
 
 ** Fælles "transport" component (vertical & rectangle)
 
 * mob/immob
-
-** alpha
 
 ** Mollerup
 
