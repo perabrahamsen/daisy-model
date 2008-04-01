@@ -1,16 +1,18 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* msoltranrect_convection
+
+** Smaller timesteps based an S and q
+
+** Fælles "transport" component (vertical & rectangle)
+
 * mob/immob
 
-           C          S        Theta
-mobile     C_mobile   S_total  Theta_mobile
-immobile   C_immobile S_total  Theta_immobile
-mixed      C_mobile   S_mobile Theta_mobile
+** alpha
 
-Adsorption:  Theta_total eller Theta_immobile?
-q: 0 hvis en af cellerne er immobil
-convection: v udregnes for Theta_mobile
-diffusion: v udregnes for Theta_total
+** Mollerup
+
+** 1D
 
 * Frame
 
