@@ -66,8 +66,8 @@ struct ReactionAdsorption : public Reaction
       { 
 	scope.set_cell (c);
 	const double Theta = soil_water.Theta (c);
-	const double has_solute = solute.M (c);
-	const double has_sorbed = sorbed.M (c);
+	const double has_solute = solute.M_immobile (c);
+	const double has_sorbed = sorbed.M_immobile (c);
 	const double has_M = has_solute + has_sorbed;
 	const double want_C = equilibrium->M_to_C (soil, Theta, c, has_M);
 	const double want_solute = want_C * Theta;
@@ -88,10 +88,6 @@ struct ReactionAdsorption : public Reaction
 	      convert = (has_solute - want_solute) / dt;
 	    else
 	      convert *= (has_solute - want_solute);
-	    
-	    const double left = solute.M_left (c, dt) / dt;
-	    if (convert > left)
-	      convert = left * 0.99;
 	  }
 	else
 	  {
@@ -103,10 +99,6 @@ struct ReactionAdsorption : public Reaction
 	      convert = (has_sorbed - want_sorbed) / dt;
 	    else
 	      convert *= (has_sorbed - want_sorbed);
-	    
-	    const double left = sorbed.M_left (c, dt) / dt;
-	    if (convert > left)
-	      convert = left * 0.99;
 	    
 	    convert *= -1.0;
 	  }

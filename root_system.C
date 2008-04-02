@@ -245,7 +245,7 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 
   for (int i = 0; i < size; i++)
     {
-      const double C_l = solute.C (i);
+      const double C_l = solute.C_mobile (i);
       const double Theta = soil_water.Theta_old (i);
       const double L = Density[i];
       if (L > 0 && soil_water.h (i) <= 0.0)
@@ -301,11 +301,9 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
   for (int i = 0; i < size; i++)
     {
       const double L = Density[i];
-      if (solute.M_left (i, dt) > 1e-8 && L > 0 && soil_water.h (i) <= 0.0)
-	uptake[i] = bound (0.0,
-			   L * (std::min (I_zero[i], I_max)
-				- B_zero[i] * C_root),
-			   std::max (solute.M_left (i, dt) - 1e-8, 0.0));
+      if (L > 0 && soil_water.h (i) <= 0.0)
+	uptake[i] = std::max (0.0, L * (std::min (I_zero[i], I_max)
+                                        - B_zero[i] * C_root));
       else
 	uptake[i] = 0.0;
       daisy_assert (uptake[i] >= 0.0);

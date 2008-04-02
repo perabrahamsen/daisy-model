@@ -44,7 +44,6 @@ class NitrificationSolute : public Nitrification
   // Simulation.
 public:
   void tick (const double M, const double C, 
-             const double M_left,
              const double h, const double T,
              double& NH4, double& N2O, double& NO3, double dt) const;
 
@@ -55,7 +54,6 @@ public:
 
 void 
 NitrificationSolute::tick (const double /* M */, const double C, 
-                           const double M_left,
                            const double h, const double T,
                            double& NH4, double& N2O, double& NO3,
                            const double dt) const
@@ -69,8 +67,7 @@ NitrificationSolute::tick (const double /* M */, const double C,
 
   const double rate = k_10 * w_factor * T_factor * C / (k + C);
   daisy_assert (rate >= 0.0);
-  daisy_assert (M_left >= 0.0);
-  const double M_new = std::min (rate, M_left / dt - 1e-8);
+  const double M_new = rate;
   if (M_new > 0.0)
     {
       NH4 = M_new;

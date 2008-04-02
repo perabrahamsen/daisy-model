@@ -62,4 +62,5 @@ Rootdens::~Rootdens ()
 static Librarian Rootdens_init (Rootdens::component, "\
 Root density calculations.");
 
-// rootdens.C ends here
+// rootdens.C ends here.
+

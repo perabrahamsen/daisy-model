@@ -63,6 +63,7 @@ private:
   std::vector<double> X_ice_buffer_;
   std::vector<double> h_ice_;
   std::vector<mobile_solute_t> mobile_solute_; 
+  std::vector<mobile_solute_t> mobile_solute_old_; 
   std::vector<double> Theta_mobile_;
   std::vector<double> Theta_immobile_;
   std::vector<double> q_;
@@ -106,6 +107,8 @@ public:
   { return X_ice_[i] + X_ice_buffer_[i]; }
   mobile_solute_t mobile_solute (size_t i) const
   { return mobile_solute_[i]; }
+  mobile_solute_t mobile_solute_old (size_t i) const
+  { return mobile_solute_old_[i]; }
   double Theta_mobile (size_t i) const
   { return Theta_mobile_[i]; }
   double Theta_immobile (size_t i) const

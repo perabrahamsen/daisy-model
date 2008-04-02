@@ -77,12 +77,6 @@ ReactionNitrification::tick (const Geometry& geo,
   Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
   Chemical& soil_NH4 = chemistry.find (Chemical::NH4 ());
 
-  for (size_t i = 0; i < cell_size; i++)
-    {
-      daisy_assert (soil_NO3.M_left (i, dt) >= 0.0);
-      daisy_assert (soil_NH4.M_left (i, dt) >= 0.0);
-    }
-
   daisy_assert (NH4.size () == cell_size);
   daisy_assert (N2O.size () == cell_size);
   daisy_assert (NO3.size () == cell_size);
@@ -91,9 +85,8 @@ ReactionNitrification::tick (const Geometry& geo,
     {
       if (active[i])
         soil.nitrification (i, 
-                            soil_NH4.M (i), 
-			    soil_NH4.C (i), 
-                            soil_NH4.M_left (i, dt),
+                            soil_NH4.M_immobile (i), 
+			    soil_NH4.C_immobile (i), 
                             soil_water.h (i), soil_heat.T (i),
                             NH4[i], N2O[i], NO3[i], dt);
       else
@@ -103,12 +96,6 @@ ReactionNitrification::tick (const Geometry& geo,
 
   soil_NH4.add_to_transform_sink (NH4, dt);
   soil_NO3.add_to_transform_source (NO3, dt);
-
-  for (size_t i = 0; i < cell_size; i++)
-    {
-      daisy_assert (soil_NO3.M_left (i, dt) >= 0.0);
-      daisy_assert (soil_NH4.M_left (i, dt) >= 0.0);
-    }
 }
 
 bool 

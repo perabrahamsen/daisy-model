@@ -245,11 +245,10 @@ hydraulic model");
 
 void 
 Horizon::nitrification (const double M, const double C, 
-                        const double M_left,
                         const double h, const double T,
                         double& NH4, double& N2O, double& NO3, 
                         const double dt) const
-{ impl->nitrification->tick (M, C, M_left, h,  T, NH4, N2O, NO3, dt); }
+{ impl->nitrification->tick (M, C, h,  T, NH4, N2O, NO3, dt); }
 
 
 void 

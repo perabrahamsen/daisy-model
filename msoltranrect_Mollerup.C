@@ -1121,14 +1121,14 @@ MsoltranrectMollerup::flow (const Geometry& geo_base,
         
         if (!flux_below && enable_boundary_diffusion)
           {
-            double ddt_dir  = Dirichlet_timestep (geo, ThetaD_xx_zz_avg, ddt_max);
+            double ddt_dir 
+              = Dirichlet_timestep (geo, ThetaD_xx_zz_avg, ddt_max);
             tmp_mmo << "ddt_dir: " << ddt_dir << '\n';
             
             if (ddt_dir < ddt_max)
               ddt_max = ddt_dir;
           }
-        
-                
+                     
         tmp_mmo << "ddt_max: " << ddt_max << '\n'; 
          
         if (ddt_max < ddt_min)

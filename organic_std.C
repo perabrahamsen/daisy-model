@@ -1106,12 +1106,8 @@ OrganicStandard::tick (const Geometry& geo,
     {
       if (!active_[i])
         continue;
-      daisy_assert (soil_NH4.M_left (i, dt) >= 0);
-      const double NH4 = (soil_NH4.M_left (i, dt) < 1e-9) // 1 mg/l
-	? 0.0 : soil_NH4.M_left (i, dt) * K_NH4;
-      daisy_assert (soil_NO3.M_left (i, dt) >= 0);
-      const double NO3 = (soil_NO3.M_left (i, dt) < 1e-9) // 1 mg/l
-	? 0.0 : soil_NO3.M_left (i, dt) * K_NO3;
+      const double NH4 = soil_NH4.M_immobile (i) * K_NH4;
+      const double NO3 = soil_NO3.M_immobile (i) * K_NO3;
 
       N_soil[i] = NH4 + NO3;
       N_used[i] = 0.0;
@@ -1193,11 +1189,7 @@ OrganicStandard::tick (const Geometry& geo,
       if (!active_[i])
         continue;
       
-      daisy_assert (N_used[i]
-                    <= soil_NH4.M_left (i, dt) + soil_NO3.M_left (i, dt));
-
-      const double NH4 = (soil_NH4.M_left (i, dt) < 1e-9 * dt) // 1 mg/l/h
-	? 0.0 : soil_NH4.M_left (i, dt) * K_NH4;
+      const double NH4 = soil_NH4.M_immobile (i) * K_NH4;
       daisy_assert (NH4 >= 0.0);
 
       if (N_used[i] > NH4)
@@ -1267,13 +1259,6 @@ OrganicStandard::tick (const Geometry& geo,
           << geo.total_soil (CO2_fast_) * dt << " + "
           << top_CO2 * geo.surface_area () * dt;
       msg.error (tmp.str ());
-    }
-
-  // We didn't steal it all?
-  for (int i = 0; i < cell_size; i++)
-    {
-      daisy_assert (soil_NO3.M_left (i, dt) >= 0.0);
-      daisy_assert (soil_NH4.M_left (i, dt) >= 0.0);
     }
 }
       

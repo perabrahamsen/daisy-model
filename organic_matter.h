@@ -61,8 +61,8 @@ public:
 			  Treelog&) = 0;
   virtual const std::vector<DOM*>& fetch_dom () const = 0;
   virtual void output (Log&) const = 0;
-  virtual double CO2 (size_t i) const = 0;	// [g C/cm³]
-  virtual double CO2_fast (size_t i) const = 0;	// [g C/cm³]
+  virtual double CO2 (size_t i) const = 0;	// [g C/cm^3/h]
+  virtual double CO2_fast (size_t i) const = 0;	// [g C/cm^3/h]
   virtual void mix (const Geometry&, const Soil&, const SoilWater&,
                     double from, double to, double penetration,
                     const Time& time, double dt) = 0;

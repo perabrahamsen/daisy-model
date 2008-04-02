@@ -49,7 +49,6 @@ protected:
   // Simulation.
 public:
   virtual void tick (const double M, const double C, 
-                     const double M_left,
                      const double h, const double T,
                      double& NH4, double& N2O, double& NO3, 
                      double dt) const = 0;

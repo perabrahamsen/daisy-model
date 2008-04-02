@@ -102,11 +102,11 @@ struct ChemicalStandard : public Chemical
   double surface_decompose;
 
   // Soil state and log.
-  std::vector<double> M_;	// Concentration in soil [g/cm^3]
-  std::vector<double> C_;   // Concentration in soil solution [g/cm^3]
+  std::vector<double> C_avg_;   // Concentration in soil solution [g/cm^3]
   std::vector<double> C_mobile_;   // Mobile conc. in soil solution [g/cm^3]
   std::vector<double> C_immobile_; // Immobile conc. in soil solution [g/cm^3]
-  std::vector<double> S_;	  // Combined source term.
+  std::vector<double> M_immobile_; // Immobile conc. in soil [g/cm^3]
+  std::vector<double> M_total_;	// Concentration in soil [g/cm^3]
   std::vector<double> S_mobile_;  // Mobile source term.
   std::vector<double> S_immobile_;// Immobile source term.
   std::vector<double> S_p_;	// Source term for macropores only.
@@ -131,14 +131,12 @@ struct ChemicalStandard : public Chemical
 
   // Soil content.
   double C_below () const; // Concentration in groundwater [g/cm^3]
-  double M (size_t) const;
-  double C (size_t) const;
   double C_mobile (size_t) const;
   double C_immobile (size_t) const;
-  double M_left (size_t, double dt) const;
+  double M_immobile (size_t) const;
+  double M_total (size_t) const;
   double total_surface (const Geometry&, 
 			double from, double to) const; // [g/cm^2]
-  double S (size_t) const;
   double S_mobile (size_t) const;
   double S_immobile (size_t) const;
   double S_p (size_t) const;
@@ -146,7 +144,10 @@ struct ChemicalStandard : public Chemical
   // Transport.
   void set_macro_flux (size_t e, double value);
   void set_matrix_flux (size_t e, double value);
-  void set_content (size_t c, double M, double C);
+  void set_uniform (const Soil& soil, const SoilWater& soil_water, size_t c,
+                    double M_total);
+  void set_mixed (const Soil& soil, const SoilWater& soil_water, size_t c,
+                  double M_total, double C_mobile);
 
   // Sink.
   void clear ();
@@ -198,6 +199,7 @@ struct ChemicalStandard : public Chemical
   // Create.
   bool check (const Geometry&, const Soil&, const SoilWater&, 
 	      const Chemistry&, const Scope&, Treelog&) const;
+  static void fillup(std::vector<double>& v, const size_t size);
   void initialize (const AttributeList&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   static double find_surface_decompose_rate (Block& al);
@@ -253,14 +255,6 @@ ChemicalStandard::C_below () const
 { return C_below_value; }
 
 double 
-ChemicalStandard::M (size_t i) const
-{ return M_[i]; }
-
-double 
-ChemicalStandard::C (size_t i) const
-{ return C_[i]; }
-
-double 
 ChemicalStandard::C_mobile (size_t i) const
 { return C_mobile_[i]; }
 
@@ -269,17 +263,17 @@ ChemicalStandard::C_immobile (size_t i) const
 { return C_immobile_[i]; }
 
 double 
-ChemicalStandard::M_left (size_t i, double dt) const
-{ return M_[i] + S_[i] * dt; }
+ChemicalStandard::M_immobile (size_t i) const
+{ return M_immobile_[i]; }
+
+double 
+ChemicalStandard::M_total (size_t i) const
+{ return M_total_[i]; }
 
 double
 ChemicalStandard::total_surface (const Geometry& geo, 
 				 const double from, const double to) const
-{ return geo.total_surface (M_, from, to); }
-
-double 
-ChemicalStandard::S (size_t i) const
-{ return S_[i]; }
+{ return geo.total_surface (M_total_, from, to); }
 
 double 
 ChemicalStandard::S_mobile (size_t i) const
@@ -302,12 +296,39 @@ ChemicalStandard::set_matrix_flux (const size_t e, const double value)
 { J[e] = value; }
 
 void 
-ChemicalStandard::set_content (size_t c, double M, double C)
+ChemicalStandard::set_uniform (const Soil& soil, const SoilWater& soil_water,
+                               const size_t c, const double M_total)
 { 
-  M_[c] = M; 
-  C_[c] = C; 
-  C_mobile_[c] = C;
-  C_immobile_[c] = C;
+  const double C_avg
+    = adsorption_->M_to_C (soil, soil_water.Theta (c), c, M_total);
+  M_immobile_[c] = M_total; 
+  M_total_[c] = M_total;
+  C_mobile_[c] = C_avg;
+  C_immobile_[c] = C_avg;
+  C_avg_[c] = C_avg;
+}
+
+void 
+ChemicalStandard::set_mixed (const Soil& soil, const SoilWater& soil_water,
+                             const size_t c,
+                             const double M_total, const double C_mobile)
+{ 
+  const double Theta_total = soil_water.Theta (c);
+  const double Theta_mobile = soil_water.Theta_mobile (c);
+  const double Theta_immobile = soil_water.Theta_immobile (c);
+  daisy_approximate (Theta_total, Theta_mobile + Theta_immobile);
+  const double M_mobile = C_mobile * Theta_mobile;
+  const double M_immobile = M_total - M_mobile;
+  const double C_immobile 
+    = adsorption_->M_to_C (soil, Theta_immobile, c, M_immobile);
+  const double C_avg 
+    = (C_mobile * Theta_mobile + C_immobile * Theta_immobile) / Theta_total;
+
+  M_immobile_[c] = M_immobile; 
+  M_total_[c] = M_total;
+  C_mobile_[c] = C_mobile;
+  C_immobile_[c] = C_immobile; 
+  C_avg_[c] = C_avg;
 }
 
 void
@@ -319,7 +340,6 @@ ChemicalStandard::clear ()
   harvest_ = 0.0;
   residuals = 0.0;
   surface_tillage = 0.0;
-  std::fill (S_.begin (), S_.end (), 0.0);
   std::fill (S_mobile_.begin (), S_mobile_.end (), 0.0);
   std::fill (S_immobile_.begin (), S_immobile_.end (), 0.0);
   std::fill (S_external.begin (), S_external.end (), 0.0);
@@ -333,15 +353,11 @@ void
 ChemicalStandard::add_to_source_mobile (const std::vector<double>& v,
                                         const double dt)
 {
-  daisy_assert (S_.size () >= v.size ());
   daisy_assert (S_mobile_.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
-      S_[i] += v[i];
-      daisy_assert (std::isfinite (S_[i]));
       S_mobile_[i] += v[i];
       daisy_assert (std::isfinite (S_mobile_[i]));
-      daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
 
@@ -350,15 +366,11 @@ void
 ChemicalStandard::add_to_source_immobile (const std::vector<double>& v,
                                         const double dt)
 {
-  daisy_assert (S_.size () >= v.size ());
   daisy_assert (S_immobile_.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
-      S_[i] += v[i];
-      daisy_assert (std::isfinite (S_[i]));
       S_immobile_[i] += v[i];
       daisy_assert (std::isfinite (S_immobile_[i]));
-      daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
 
@@ -366,15 +378,11 @@ void
 ChemicalStandard::add_to_sink_mobile (const std::vector<double>& v,
                                       const double dt)
 {
-  daisy_assert (S_.size () >= v.size ());
   daisy_assert (S_mobile_.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
-      S_[i] -= v[i];
-      daisy_assert (std::isfinite (S_[i]));
       S_mobile_[i] -= v[i];
       daisy_assert (std::isfinite (S_mobile_[i]));
-      daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
 
@@ -382,15 +390,11 @@ void
 ChemicalStandard::add_to_sink_immobile (const std::vector<double>& v,
                                         const double dt)
 {
-  daisy_assert (S_.size () >= v.size ());
   daisy_assert (S_immobile_.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
-      S_[i] -= v[i];
-      daisy_assert (std::isfinite (S_[i]));
       S_immobile_[i] -= v[i];
       daisy_assert (std::isfinite (S_immobile_[i]));
-      daisy_assert (M_left (i, dt) >= 0.0);
     }
 }
 
@@ -437,10 +441,32 @@ ChemicalStandard::add_to_transform_source (const std::vector<double>& v,
 void
 ChemicalStandard::update_C (const Soil& soil, const SoilWater& soil_water)
 {
-  for (size_t i = 0; i < C_.size (); i++)
-    C_[i] = adsorption_->M_to_C (soil, soil_water.Theta (i), i, M_[i]);
+  for (size_t i = 0; i < C_immobile_.size (); i++)
+    {
+      C_avg_[i] = adsorption_->M_to_C (soil, soil_water.Theta (i),
+                                       i, M_total_[i]);
+      switch (soil_water.mobile_solute (i))
+        {
+        case SoilWater::immobile:
+          C_mobile_[i] = C_avg_[i];
+          C_immobile_[i] = C_avg_[i];
+          M_immobile_[i] = M_total_[i];
+          break;
+        case SoilWater::mobile:
+          C_mobile_[i] = C_avg_[i];
+          C_immobile_[i] = C_mobile_[i];
+          M_immobile_[i] = M_total_[i];
+          break;
+        case SoilWater::mixed:
+          C_mobile_[i] = C_avg_[i];
+          C_immobile_[i] = C_avg_[i];
+          M_immobile_[i] = M_total_[i] - C_mobile_[i] 
+            * soil_water.Theta_mobile (i);
+          break;
+        }
+    }
 }
-
+  
 void 
 ChemicalStandard::deposit (const double amount, const double dt) // [g/m^2]
 { deposit_ += amount / dt; }
@@ -500,11 +526,11 @@ ChemicalStandard::mix (const Geometry& geo,
   // Add to soil.
   const double m2_per_cm2 = 0.01 * 0.01;
   const double penetrated = removed * m2_per_cm2;
-  geo.add_surface (M_, from, to, penetrated);
+  geo.add_surface (M_total_, from, to, penetrated);
   geo.add_surface (tillage, from, to, penetrated / dt);
 
   // Mix.
-  geo.mix (M_, from, to, tillage, dt);
+  geo.mix (M_total_, from, to, tillage, dt);
   update_C (soil, soil_water);
 }
 
@@ -514,7 +540,7 @@ ChemicalStandard::swap (const Geometry& geo,
 			const double from, const double middle, const double to,
 			const double dt)
 { 
-  geo.swap (M_, from, middle, to, tillage, dt);
+  geo.swap (M_total_, from, middle, to, tillage, dt);
   update_C (soil, soil_water);
 }
 
@@ -587,7 +613,7 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
     }
 }
 
-void 
+void                            // Called just before solute movement.
 ChemicalStandard::tick_soil (const size_t cell_size,
 			     const SoilWater& soil_water,
 			     const double dt,
@@ -597,10 +623,6 @@ ChemicalStandard::tick_soil (const size_t cell_size,
   // Find C below.
   if (!C_below_expr->tick_value (C_below_value, g_per_cm3, scope, msg))
     C_below_value = -1.0;
-
-  // Assert no negative mass.
-  for (unsigned i = 0; i < cell_size; i++)
-    daisy_assert (M_left (i, dt) >= 0.0);
 
   // Initialize.
   std::fill (S_p_.begin (), S_p_.end (), 0.0);
@@ -613,10 +635,10 @@ ChemicalStandard::tick_soil (const size_t cell_size,
  
   // Drainage.
   for (size_t i = 0; i < cell_size; i++)
-    S_drain[i] = -soil_water.S_drain (i) * C (i);
+    S_drain[i] = -soil_water.S_drain (i) * C_mobile_[i];
   add_to_source_mobile (S_drain, dt); 
-  
 }
+
 void 
 ChemicalStandard::mixture (const Geometry& geo,
                            const double pond /* [mm] */, 
@@ -632,7 +654,8 @@ ChemicalStandard::mixture (const Geometry& geo,
 
   // Mix them.
   const double soil_conc
-    = geo.content_at (static_cast<const Chemical&> (*this), &Chemical::C, 0.0)
+    = geo.content_at (static_cast<const Chemical&> (*this),
+                      &Chemical::C_mobile, 0.0)
     * (100.0 * 100.0) / 10.0; // [g/cm^3/] -> [g/m^2/mm]
   const double storage_conc = surface_storage / pond;// [g/m^2/mm]
   
@@ -662,7 +685,7 @@ ChemicalStandard::uptake (const Soil& soil,
   const double rate = 1.0 - crop_uptake_reflection_factor;
   
   for (unsigned int i = 0; i < soil.size (); i++)
-    uptaken[i] = C (i) * soil_water.S_root (i) * rate;
+    uptaken[i] = C_mobile (i) * soil_water.S_root (i) * rate;
   
   add_to_root_sink (uptaken, dt);
 }
@@ -682,7 +705,7 @@ ChemicalStandard::decompose (const Geometry& geo,
   bool found = false;
   for (size_t c = 0; c < cell_size; c++)
     {
-      lag[c] += this->decompose_lag_increment (C_[c]) * dt;
+      lag[c] += this->decompose_lag_increment (C_immobile_[c]) * dt;
       
       if (lag[c] >= 1.0)
 	{
@@ -706,13 +729,13 @@ ChemicalStandard::decompose (const Geometry& geo,
       const double CO2_factor 
 	= this->decompose_CO2_factor (organic_matter.CO2 (c));
       const double conc_factor
-	= this->decompose_conc_factor (C_[c]);
+	= this->decompose_conc_factor (C_immobile_[c]);
       const double depth_factor
 	= this->decompose_depth_factor (geo.z (c));
       const double rate
 	= decompose_rate * heat_factor * water_factor * CO2_factor
 	* conc_factor * depth_factor;
-      decomposed[c] = M_left (c, dt) * rate;
+      decomposed[c] = M_immobile (c) * rate;
     }
 
   this->add_to_decompose_sink (decomposed, dt);
@@ -763,11 +786,11 @@ ChemicalStandard::output (Log& log) const
   output_value (canopy_dissipate + canopy_harvest + surface_runoff 
                 + surface_decompose,
 		"top_loss", log);
-  output_value (C_, "C", log);
+  output_value (C_avg_, "C", log);
   output_value (C_mobile_, "C_mobile", log);
   output_value (C_immobile_, "C_immobile", log);
-  output_value (M_, "M", log);
-  output_value (S_, "S", log);
+  output_value (M_total_, "M", log);
+  output_value (M_immobile_, "M_immobile", log);
   output_value (S_mobile_, "S_mobile", log);
   output_value (S_immobile_, "S_immobile", log);
   output_value (S_p_, "S_p", log);
@@ -814,10 +837,51 @@ ChemicalStandard::check (const Geometry& geo,
     {
       try 
 	{   
-	  const double Theta = soil_water.Theta (i);
-	  const double M = M_[i];
-	  const double C = C_[i];
-	  if (iszero (M))
+	  const double Theta_immobile = soil_water.Theta_immobile (i);
+	  const double Theta_mobile = soil_water.Theta_mobile (i);
+	  const double M = M_total_[i];
+	  const double M_immobile = M_immobile_[i];
+          const double C = C_avg_[i];
+          const double C_mobile = C_mobile_[i];
+          const double C_immobile = C_immobile_[i];
+          
+          if (M_immobile > M)
+            throw "M_immobile > M";
+          switch (soil_water.mobile_solute (i))
+            {
+            case SoilWater::immobile:
+              if (!approximate (C_mobile, C))
+                throw "C_mobile should be C for immobile water";
+              if (!approximate (C_immobile, C))
+                throw "C_immobile should be C for immobile water";
+              if (!approximate (M_immobile, M))
+                throw "M_immobile should be M for immobile water";
+              if (!approximate (adsorption_->M_to_C (soil, Theta_immobile, i,
+                                                     M_immobile), C_immobile))
+                throw "\
+Solute C_immobile does not match M_immobile for immobile water";
+              break;
+            case SoilWater::mobile:
+              if (!approximate (C_mobile, C))
+                throw "C_mobile should be C for mobile water";
+              if (!approximate (C_immobile, C_mobile))
+                throw "C_immobile should be C_mobile for mobile water";
+              if (!approximate (M_immobile, M))
+                throw "M_immobile should be M for mobile water";
+              break;
+            case SoilWater::mixed:
+              if (!approximate (M_immobile, M - C_mobile * Theta_mobile))
+                throw 
+                  "M_immobile should be M - C_mobile * Theta for mixed water"; 
+              if (!approximate (adsorption_->M_to_C (soil, Theta_immobile, i, 
+                                                     M_immobile),
+                                C_immobile))
+                throw "\
+Solute C_immobile does not match M_immobile for mixed water";
+              break;
+            }          
+          
+          if (iszero (M))
 	    {
 	      if (std::isnormal (C))
 		throw "C & M mismatch in solute";
@@ -829,13 +893,9 @@ ChemicalStandard::check (const Geometry& geo,
 	    }
 	  else if (solid)
 	    {
-	      if (std::isnormal (C_[i]))
+	      if (std::isnormal (C_avg_[i]))
 		throw "C should be zero for non-solutes";
 	    }
-	  else if (!approximate (adsorption_->M_to_C (soil, Theta, i, M), C))
-	    throw "Solute C does not match M";
-	  else if (!approximate (adsorption_->C_to_M (soil, Theta, i, C), M))
-	    throw "Solute M does not match C";
 	}
       catch (const char *const error)
 	{
@@ -847,6 +907,20 @@ ChemicalStandard::check (const Geometry& geo,
 	}
     }
   return ok;
+}
+
+
+void 
+ChemicalStandard::fillup(std::vector<double>& v, const size_t size)
+{
+  if (v.size () > 0)
+    {
+      // Fill it up.
+      while (v.size () < size)
+	v.push_back (v[v.size () - 1]);
+      if (v.size () > size)
+	throw ("To many members of sequence");
+    }
 }
 
 void
@@ -862,45 +936,26 @@ ChemicalStandard::initialize (const AttributeList& al,
   C_below_expr->initialize (msg);
 
   std::vector<double> Ms;
-  geo.initialize_layer (C_, al, "C", msg);
-  geo.initialize_layer (M_, al, "M", msg);
+  geo.initialize_layer (C_avg_, al, "C", msg);
+  geo.initialize_layer (C_mobile_, al, "C_mobile", msg);
+  geo.initialize_layer (M_total_, al, "M", msg);
   geo.initialize_layer (Ms, al, "Ms", msg);
 
-  if (C_.size () > 0)
-    {
-      // Fill it up.
-      while (C_.size () < cell_size)
-	C_.push_back (C_[C_.size () - 1]);
-      if (C_.size () > cell_size)
-	throw ("To many members of C sequence");
-    }
-  if (M_.size () > 0)
-    {
-      // Fill it up.
-      while (M_.size () < cell_size)
-	M_.push_back (M_[M_.size () - 1]);
+  fillup (C_avg_, cell_size);
+  fillup (C_mobile_, cell_size);
+  fillup (M_total_, cell_size);
+  fillup (Ms, cell_size);
 
-      if (M_.size () > cell_size)
-	throw ("To many members of M sequence");
-    }
-  if (Ms.size () > 0)
-    {
-      // Fill it up.
-      while (Ms.size () < cell_size)
-	Ms.push_back ( Ms[Ms.size () - 1]);
-      if (Ms.size () > cell_size)
-	throw ("To many members of Ms sequence");
-    }
-  if (M_.size () == 0 && C_.size () == 0)
+  if (M_total_.size () == 0 && C_avg_.size () == 0)
     {
       if (Ms.size () != 0)
 	{
 	  daisy_assert (Ms.size () == cell_size);
 
-	  for (size_t i = M_.size (); i < Ms.size (); i++)
-	    M_.push_back (Ms[i] * soil.dry_bulk_density (i));
+	  for (size_t i = M_total_.size (); i < Ms.size (); i++)
+	    M_total_.push_back (Ms[i] * soil.dry_bulk_density (i));
 	}
-      if (M_.size () == 0 && C_.size () == 0)
+      if (M_total_.size () == 0 && C_avg_.size () == 0)
 	{
 	  initial_expr->initialize (msg);
 	  ScopeSoil scope (soil, soil_water, soil_heat);
@@ -910,22 +965,104 @@ ChemicalStandard::initialize (const AttributeList& al,
 	      double value = 0.0;
 	      if (!initial_expr->tick_value (value, g_per_cm3, scope, msg))
 		msg.error ("Could not evaluate 'inital_expr'");
-	      M_.push_back (value);
+	      M_total_.push_back (value);
 	    }
 	}
     }
-  for (size_t i = C_.size (); i < M_.size (); i++)
-    C_.push_back (adsorption_->M_to_C (soil, soil_water.Theta (i), i, M_[i]));
-  for (size_t i = M_.size (); i < C_.size (); i++)
-    M_.push_back (adsorption_->C_to_M (soil, soil_water.Theta (i), i, C_[i]));
+
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      const double Theta_mobile = soil_water.Theta_mobile (i);
+      const double Theta_immobile = soil_water.Theta_immobile (i);
+      const double Theta = soil_water.Theta (i);
+      daisy_assert (approximate (Theta, Theta_mobile + Theta_immobile));
+      const bool has_C_mobile = C_mobile_.size () > i;
+      const bool has_C_avg  = C_avg_.size () > i;
+      const bool has_M_total  = M_total_.size () > i;
+      daisy_assert (has_C_avg || has_M_total);
+
+      switch (soil_water.mobile_solute (i))
+        {
+        case SoilWater::immobile:
+          daisy_assert (iszero (Theta_mobile));
+          if (!has_C_avg)
+            C_avg_.push_back (adsorption_->M_to_C (soil, Theta, i, 
+                                                   M_total_[i]));
+          if (!has_M_total) 
+            M_total_.push_back (adsorption_->C_to_M (soil, Theta, i,
+                                                     C_avg_[i])); 
+          if (!has_C_mobile)
+            C_mobile_.push_back (C_avg_[i]);
+          C_immobile_.push_back (C_avg_[i]);
+          M_immobile_.push_back (M_total_[i]);
+          break;
+        case SoilWater::mobile:
+          daisy_assert (iszero (Theta_immobile));
+          if (!has_C_avg)
+            C_avg_.push_back (adsorption_->M_to_C (soil, Theta, i,
+                                                   M_total_[i]));
+          if (!has_M_total) 
+            M_total_.push_back (adsorption_->C_to_M (soil, Theta, i, 
+                                                     C_avg_[i])); 
+          if (!has_C_mobile)
+            C_mobile_.push_back (C_avg_[i]);
+          C_immobile_.push_back (C_avg_[i]);
+          M_immobile_.push_back (M_total_[i]);
+          break;
+        case SoilWater::mixed:
+          if (has_C_mobile)
+            {
+              if (has_C_avg)
+                {
+                  // Theta * C_a = Theta_i * C_i + Theta_m * C_m
+                  // => C_i = (Theta * C_a - Theta_m * C_m) / Theta_i
+                  C_immobile_.push_back ((Theta * C_avg_[i]
+                                          - Theta_mobile * C_mobile_[i])
+                                         / Theta_immobile);
+                  M_immobile_.push_back (adsorption_->C_to_M (soil, 
+                                                              Theta_immobile, 
+                                                              i, 
+                                                              C_immobile_[i]));
+                  M_total_.push_back (M_immobile_[i] 
+                                      + Theta_mobile * C_mobile_[i]);
+                }
+              else
+                {
+                  daisy_assert (has_M_total);
+                  M_immobile_.push_back (M_total_[i]
+                                         - C_mobile_[i] * Theta_mobile);
+                  C_immobile_.push_back (adsorption_->M_to_C (soil, 
+                                                              Theta_immobile,
+                                                              i,
+                                                              M_immobile_[i]));
+                  C_avg_.push_back ((C_mobile_[i] * Theta_mobile
+                                     + C_immobile_[i] * Theta_immobile)
+                                    / Theta);
+                }
+            }
+          else
+            {
+              if (!has_C_avg)
+                C_avg_.push_back (adsorption_->M_to_C (soil, Theta, i,
+                                                      M_total_[i]));
+              if (!has_M_total) 
+                M_total_.push_back (adsorption_->C_to_M (soil, Theta, i, 
+                                                         C_avg_[i])); 
+              C_mobile_.push_back (C_avg_[i]);
+              C_immobile_.push_back (C_avg_[i]);
+              M_immobile_.push_back (M_total_[i] 
+                                     - C_mobile_[i] * Theta_mobile);
+            }
+          break;
+        }
+    }
+
+  daisy_assert (C_mobile_.size () == cell_size);
+  daisy_assert (C_immobile_.size () == cell_size);
+  daisy_assert (M_immobile_.size () == cell_size);
   
-  daisy_assert (C_.size () == M_.size ());
-  daisy_assert (C_.size () == cell_size);
-  C_mobile_ = C_;
-  C_immobile_ = C_; 
-  S_.insert (S_.begin (), cell_size, 0.0);
-  S_mobile_ = S_;
-  S_immobile_ = S_;
+  S_mobile_.insert (S_mobile_.begin (), cell_size, 0.0);
+  S_immobile_.insert (S_immobile_.begin (), cell_size, 0.0);
   S_p_.insert (S_p_.begin (), cell_size, 0.0);
   S_drain.insert (S_drain.begin (), cell_size, 0.0);
   S_external.insert (S_external.begin (), cell_size, 0.0);
@@ -1255,17 +1392,17 @@ infiltration..");
 		       "Concentration in water.");
   Geometry::add_layer (syntax, Syntax::OptionalState, "C_mobile", "g/cm^3",
 		       "Concentration in mobile water.");
-  Geometry::add_layer (syntax, Syntax::OptionalState, "C_immobile", "g/cm^3",
+  Geometry::add_layer (syntax, Syntax::LogOnly, "C_immobile", "g/cm^3",
 		       "Concentration in immobile water.");
   Geometry::add_layer (syntax, Syntax::OptionalState, "M", "g/cm^3", 
 		       "Total mass per volume water, soil, and air.");
+  Geometry::add_layer (syntax, Syntax::LogOnly, "M_immobile", "g/cm^3", 
+		       "Immobile mass per volume water, soil, and air.");
   Geometry::add_layer (syntax, Syntax::OptionalConst,
 		       "Ms", Syntax::Fraction (), "Mass in dry soil.\n\
 This include all matter in both soil and water, relative to the\n\
 dry matter weight.\n\
 Only for initialization of the 'M' parameter.");
-  syntax.add ("S", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Source term.");
   syntax.add ("S_mobile", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Mobile source term.");
   syntax.add ("S_immobile", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,

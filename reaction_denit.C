@@ -112,7 +112,7 @@ ReactionDenit::tick (const Geometry& geo,
       const double Theta = soil_water.Theta (i);
       const double Theta_sat = soil_water.Theta_ice (soil, i, 0.0);
       const double Theta_fraction = Theta / Theta_sat;
-      const double NO3 = soil_NO3.M_left (i, dt) / dt;
+      const double NO3 = soil_NO3.C_immobile (i) * Theta;
       const double T = soil_heat.T (i);
       const double height = geo.z (i);
       const double T_factor = (heat_factor.size () < 1)
@@ -130,15 +130,15 @@ ReactionDenit::tick (const Geometry& geo,
         = std::min (rate, K * NO3) + std::min (rate_fast, K_fast * NO3);
       if (redox_height <= 0 && height < redox_height)
 	{
-	  converted[i] = NO3;
-	  converted_redox[i] = NO3 - M;
+	  converted[i] = NO3 / dt;
+	  converted_redox[i] = (NO3 - M) / dt;
 	}
       else
 	{
-	  converted[i] = M;
+	  converted[i] = M / dt;
 	  converted_redox[i] = 0.0;
 	}
-      converted_fast[i] = (M > rate ? M - rate : 0.0);
+      converted_fast[i] = (M / dt > rate ? M / dt - rate : 0.0);
       potential[i] = pot;
       potential_fast[i] = pot_fast;
     }

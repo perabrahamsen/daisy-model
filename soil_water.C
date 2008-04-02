@@ -173,6 +173,8 @@ SoilWater::tick_after (const size_t cell_size,
                        const Soil& soil, const SoilHeat& soil_heat, 
                        Treelog&)
 {
+  mobile_solute_old_ = mobile_solute_;
+
   for (size_t i = 0; i < cell_size; i++)
     {
       K_[i] = soil.K (i, h_[i], h_ice_[i], soil_heat.T(i));
@@ -530,6 +532,7 @@ SoilWater::initialize (const AttributeList& al, const Geometry& geo,
 
   // Mobile/immobile solute
   mobile_solute_.insert (mobile_solute_.begin (), cell_size, mobile);
+  mobile_solute_old_ = mobile_solute_;
   Theta_mobile_ = Theta_;
   Theta_immobile_.insert (Theta_immobile_.begin (), cell_size, 0.0);
 

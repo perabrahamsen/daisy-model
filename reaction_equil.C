@@ -65,8 +65,8 @@ struct ReactionEquilibrium : public Reaction
     for (size_t c = 0; c < cell_size; c++)
       { 
 	scope.set_cell (c);
-	const double has_A = A.M (c);
-	const double has_B = B.M (c);
+	const double has_A = A.M_immobile (c);
+	const double has_B = B.M_immobile (c);
 	double want_A;
 	double want_B;
 	equilibrium->find (scope, has_A, has_B, want_A, want_B,
@@ -81,23 +81,14 @@ struct ReactionEquilibrium : public Reaction
 	      msg.error ("Could not evaluate k_AB");
 	    
 	    convert *= (has_A - want_A);
-	    
-	    const double left = A.M_left (c, dt);
-	    if (convert > left)
-	      convert = left * 0.99;
-	  }
+          }
 	else
 	  {
 	    if (!k_BA->tick_value (convert, k_unit, scope, msg))
 	      msg.error ("Could not evaluate k_BA");
 	    
 	    convert *= (has_B - want_B);
-	    
-	    const double left = B.M_left (c, dt);
-	    if (convert > left)
-	      convert = left * 0.99;
-	    
-	    convert *= -1.0;
+            convert *= -1.0;
 	  }
       
       S_AB[c] = convert;

@@ -372,7 +372,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-LATER = 
+LATER = movement_1D.C 
 MODELS = groundwater_aquitard.C \
 	heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \
 	msoltranrect_convection.C \
@@ -394,7 +394,7 @@ MODELS = groundwater_aquitard.C \
         difrad_weather.C number_lisp.C condition_extern.C condition_boolean.C \
 	boolean_number.C boolean_string.C \
 	number_soil.C organic_none.C \
-	organic_std.C movement_1D.C integer_arit.C \
+	organic_std.C integer_arit.C \
 	source_merge.C number_source.C program_file.C action_table.C \
 	xysource_merge.C xysource_inline.C xysource_loop.C \
 	xysource_combine.C gnuplot_xy.C xysource_expr.C gnuplot_multi.C \
