@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "msoltranrect.h"
-#include "geometry_rect.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "adsorption.h"
@@ -33,7 +33,7 @@
 struct MsoltranrectNone : public Msoltranrect
 {
   // Solute.
-  void flow (const GeometryRect& geo, 
+  void flow (const Geometry& geo, 
              const Soil& soil, 
              const SoilWater& soil_water, 
              const symbol name,
@@ -53,7 +53,7 @@ struct MsoltranrectNone : public Msoltranrect
 };
 
 void
-MsoltranrectNone::flow (const GeometryRect& geo, 
+MsoltranrectNone::flow (const Geometry& geo, 
                         const Soil& soil, 
                         const SoilWater& soil_water, 
                         const symbol name,

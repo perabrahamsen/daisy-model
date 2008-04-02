@@ -23,7 +23,7 @@
 #include "msoltranrect.h"
 #include "chemical.h"
 #include "doe.h"
-#include "geometry_rect.h"
+#include "geometry.h"
 #include "adsorption.h"
 #include "block.h"
 #include "librarian.h"
@@ -39,7 +39,7 @@ Msoltranrect::library_id () const
 }
 
 void
-Msoltranrect::solute (const GeometryRect& geo,
+Msoltranrect::solute (const Geometry& geo,
                       const Soil& soil, const SoilWater& soil_water,
                       const double J_in, Chemical& solute, 
 		      const bool flux_below, const double dt,
@@ -102,7 +102,7 @@ Msoltranrect::solute (const GeometryRect& geo,
 }
 
 void 
-Msoltranrect::element (const GeometryRect& geo, 
+Msoltranrect::element (const Geometry& geo, 
                        const Soil& soil, const SoilWater& soil_water,
                        DOE& element, const double diffusion_coefficient, 
                        const double dt, Treelog& msg)
@@ -117,6 +117,10 @@ Msoltranrect::element (const GeometryRect& geo,
   for (size_t c = 0; c < cell_size; c++)
     element.M[c] = element.C[c] * soil_water.Theta (c);
 }
+
+bool 
+Msoltranrect::check (const Geometry&, Treelog&)
+{ return true; }
 
 Msoltranrect::Msoltranrect (Block& al)
   : ModelAListed (al.alist ())

@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "msoltranrect.h"
-#include "geometry_rect.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "adsorption.h"
@@ -38,7 +38,7 @@ struct MsoltranrectConvection : public Msoltranrect
   double ddt; //size of small timestep 
 
   // Solute.
-  void flow (const GeometryRect& geo, 
+  void flow (const Geometry& geo, 
              const Soil& soil, 
              const SoilWater& soil_water, 
              const symbol name,
@@ -58,7 +58,7 @@ struct MsoltranrectConvection : public Msoltranrect
 };
 
 void
-MsoltranrectConvection::flow (const GeometryRect& geo, 
+MsoltranrectConvection::flow (const Geometry& geo, 
                               const Soil& soil, 
                               const SoilWater& soil_water, 
                               const symbol name,

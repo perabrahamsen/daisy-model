@@ -351,8 +351,17 @@ MovementRect::output (Log& log) const
 }
 
 bool
-MovementRect::check (Treelog&) const
-{ return true; }
+MovementRect::check (Treelog& msg) const
+{
+  bool ok = true; 
+  for (size_t i = 0; i < matrix_solute.size (); i++)
+    {
+      Treelog::Open nest (msg, "matrix_solute", i, matrix_solute[i]->name);
+      if (!matrix_solute[i]->check (*geo, msg))
+        ok = false;
+    }
+  return ok;
+}
 
 void 
 MovementRect::initialize (const Soil&, const Groundwater&, Treelog&)

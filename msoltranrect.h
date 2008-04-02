@@ -26,7 +26,7 @@
 #include <vector>
 
 class Log;
-class GeometryRect;
+class Geometry;
 class Soil;
 class SoilWater;
 class DOE;
@@ -49,13 +49,13 @@ public:
 
   // Simulation.
 public:
-  void solute (const GeometryRect&, const Soil&, const SoilWater&,
+  void solute (const Geometry&, const Soil&, const SoilWater&,
                const double J_in, Chemical&, const bool flux_below,
 	       double dt, const Scope&, Treelog& msg);
-  void element (const GeometryRect&, const Soil&, const SoilWater&,
+  void element (const Geometry&, const Soil&, const SoilWater&,
                 DOE&, const double diffusion_coefficient, double dt, Treelog&);
 private:
-  virtual void flow (const GeometryRect& geo, 
+  virtual void flow (const Geometry& geo, 
                      const Soil& soil, 
                      const SoilWater& soil_water, 
                      symbol name,
@@ -71,6 +71,7 @@ public:
 
   // Create and Destroy.
 public:
+  virtual bool check (const Geometry&, Treelog&);
   static const AttributeList& none_model ();
   static const AttributeList& reserve_model ();
   static const AttributeList& default_model ();

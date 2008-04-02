@@ -47,6 +47,8 @@ public:
   public:
     Open (Treelog& l, const symbol name);
     Open (Treelog& l, const std::string& name);
+    Open (Treelog& l, 
+          const std::string& parameter, size_t index, symbol model);
     ~Open ();
   };
   virtual void open (const std::string& name) = 0;

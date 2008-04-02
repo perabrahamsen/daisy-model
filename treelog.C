@@ -32,6 +32,15 @@ Treelog::Open::Open (Treelog& l, const std::string& name)
   : log (l)
 { log.open (name); }
 
+Treelog::Open::Open (Treelog& l, const std::string& parameter, 
+                     const size_t index, const symbol model)
+  : log (l)
+{
+  std::ostringstream tmp;
+  tmp << parameter << "[" << index << "]: " << model;
+  log.open (tmp.str ());
+}
+
 Treelog::Open::~Open ()
 { log.close (); }
 
@@ -89,3 +98,5 @@ Treelog::Treelog ()
 
 Treelog::~Treelog ()
 { }
+
+// treelog.C ends here.

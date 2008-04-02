@@ -1,3 +1,18 @@
+2008-04-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* treelog.C (Open::Open): Added new variant for entries in model
+	lists.
+	* gnuplot_multi.C (GnuplotMulti::initialize): Use it.
+	(GnuplotMulti::plot): Ditto.
+	* program_batch.C (struct ProgramBatch): Ditto.
+	* program_gnuplot.C (ProgramGnuplot::run): Ditto.
+
+	* geometry.h (Geometry::edge_area_per_length): New virtual member.
+
+	* msoltranrect.h, msoltranrect.C, msoltranrect_none.C,
+	* msoltranrect_convection.C: Use 'Geometry' instead of 'GeometryRect'.
+	* msoltranrect_cd.C: Ditto, and cast to 'GeometryRect' internally.
+
 2008-04-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* msoltranrect_convection.C (ddt): New log variable.

@@ -110,6 +110,8 @@ public:
   virtual double edge_area (size_t) const = 0; // Area connecting the cells.
   inline double edge_length (size_t e) const // Distance between c-cent. [cm^2]
   { return edge_length_[e]; }
+  virtual double edge_area_per_length (size_t e) const 
+  { return edge_area (e) / edge_length (e); }
   bool edge_cross_z (size_t e, double z) const; // Cross depth?
   virtual double edge_center_z (size_t e) const = 0;
   virtual double edge_center_x (size_t) const

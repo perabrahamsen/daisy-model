@@ -29,7 +29,6 @@
 #include "memutils.h"
 #include "librarian.h"
 #include <vector>
-#include <sstream>
 
 struct ProgramBatch : public Program
 {
@@ -55,9 +54,7 @@ struct ProgramBatch : public Program
         if (!ui_running ())
           return false;
 
-        std::ostringstream tmp;
-        tmp << name << "[" << i << "]: " << program[0]->name;
-        Treelog::Open nest (msg, tmp.str ());
+        Treelog::Open nest (msg, name.name (), i, program[i]->name);
         msg.touch ();
         {
           Block block (metalib, msg, "Initializing");

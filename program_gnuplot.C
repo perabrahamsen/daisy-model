@@ -30,7 +30,6 @@
 #include <string>
 #include <set>
 #include <fstream>
-#include <sstream>
 
 struct ProgramGnuplot : public Program
 {
@@ -64,9 +63,7 @@ ProgramGnuplot::run (Treelog& msg)
     bool ok = true;
     for (size_t i = 0; i < graph.size(); i++)
       {
-        std::ostringstream tmp;
-        tmp << name << "[" << i << "]: " << graph[i]->name;
-        Treelog::Open nest (msg, tmp.str ());
+        Treelog::Open nest (msg, name.name (), i, graph[i]->name);
         msg.touch ();
         if (!graph[i]->initialize (msg))
           ok = false;
@@ -93,9 +90,7 @@ ProgramGnuplot::run (Treelog& msg)
     bool ok = true;
     for (size_t i = 0; i < graph.size(); i++)
       {
-        std::ostringstream tmp;
-        tmp << name << "[" << i << "]: " << graph[i]->name;
-        Treelog::Open nest (msg, tmp.str ());
+        Treelog::Open nest (msg, name.name (), i, graph[i]->name);
         if (!graph[i]->plot (out, msg))
           ok = false;
       }

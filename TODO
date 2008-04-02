@@ -4,7 +4,13 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** Håndter mobil/immobil vand.
 
-** Fælles "transport" component (vertical & rectangle)
+* Fælles "transport" component (vertical & rectangle)
+
+** Geometry
+
+** soil_water -> Theta_old, Theta_new, q
+
+** soil -> tortuosity, dispersivity, dispersivity_transversal
 
 * mob/immob
 
