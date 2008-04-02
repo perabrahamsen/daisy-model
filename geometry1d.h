@@ -44,8 +44,6 @@ public:
   { return e == cell_size () ? cell_below : static_cast<int> (e); }
   inline int edge_to (size_t e) const // Cell where edge leads.
   { return e == 0 ? cell_above : static_cast<int> (e) - 1; };
-  inline double edge_area (size_t) const // Area connecting the cells.
-  { return 1.0; }
   inline double edge_center_z (size_t e) const
   { return (e == 0) ? 0.0 : zplus (e - 1); }
   inline double edge_sin_angle (size_t) const // Positive upwards. 
@@ -71,7 +69,7 @@ public:
 
   // Creation.
 private:
-  void build_edge_length ();
+  void build_edges ();
 public:
   bool check (Treelog&) const;
   bool check_x_border (const double value, Treelog& err) const;

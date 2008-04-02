@@ -52,6 +52,8 @@ protected:
 protected:
   std::vector<std::vector<int> > cell_edges_; // Edges connected with cell.
   std::vector<double> edge_length_;	      // Distance between cell centers.
+  std::vector<double> edge_area_;             // Area connecting cells.
+  std::vector<double> edge_area_per_length_;  // One divided by the other.
   
   // Cell operations.
 public:
@@ -107,11 +109,13 @@ public:
   inline bool edge_is_internal (size_t e) const // Edge does not lead out of volume.
   { return cell_is_internal (edge_from (e))
       && cell_is_internal (edge_to (e)); }
-  virtual double edge_area (size_t) const = 0; // Area connecting the cells.
-  inline double edge_length (size_t e) const // Distance between c-cent. [cm^2]
+
+  inline double edge_length (size_t e) const // Distance between c-cent. [cm]
   { return edge_length_[e]; }
-  virtual double edge_area_per_length (size_t e) const 
-  { return edge_area (e) / edge_length (e); }
+  inline double edge_area (size_t e) const // Area connecting cells [cm^2]
+  { return edge_area_[e]; }
+  inline double edge_area_per_length (size_t e) const // [cm]
+  { return edge_area_per_length_[e]; }
   bool edge_cross_z (size_t e, double z) const; // Cross depth?
   virtual double edge_center_z (size_t e) const = 0;
   virtual double edge_center_x (size_t) const
@@ -230,7 +234,7 @@ public:
                                  const double max_interval,
                                  Treelog& msg) = 0;
 protected:
-  void build_cell_edges ();
+  void build_common ();
   Geometry (Block&);
   virtual ~Geometry ();
 };

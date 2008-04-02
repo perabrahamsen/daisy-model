@@ -36,8 +36,6 @@ private:
   std::vector<std::vector<int> > cell_corners_; // The corners of cell.
   std::vector<int> edge_from_;
   std::vector<int> edge_to_;
-  std::vector<double> edge_area_;
-  std::vector<double> edge_area_per_length_;
   std::vector<double> edge_sin_angle_;
   std::vector<double> edge_cos_angle_;
   std::vector<double> edge_center_z_;
@@ -87,10 +85,6 @@ public:
   { return edge_from_[e]; }
   inline int edge_to (size_t e) const   // Cell where edge leads.
   { return edge_to_[e]; }
-  inline double edge_area (size_t e) const // Area connecting cells [cm^2]
-  { return edge_area_[e]; }
-  inline double edge_area_per_length (size_t e) const 
-  { return edge_area_per_length_[e]; }
   inline double edge_sin_angle (size_t e) const // To horizontal plane -1:1 []
   { return edge_sin_angle_[e]; }
   inline double edge_cos_angle (size_t e) const // To horizontal plane -1:1 []

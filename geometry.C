@@ -620,14 +620,26 @@ Geometry::initialize_intervals (const std::vector<double>& end,
 }
 
 void
-Geometry::build_cell_edges ()
+Geometry::build_common ()
 {
+  // Cell edges.
   cell_edges_.insert (cell_edges_.end (), cell_pseudo_size (),
                       std::vector<int> ());
   for (size_t e = 0; e < edge_size (); e++)
     { 
       cell_edges_[cell_pseudo_number (edge_from (e))].push_back (e);
       cell_edges_[cell_pseudo_number (edge_to (e))].push_back (e);
+    }
+
+  // Area per length.
+  daisy_assert (edge_area_.size () == edge_size ());
+  daisy_assert (edge_length_.size () == edge_size ());
+
+  for (size_t e = 0; e < edge_size (); e++)
+    { 
+      const double length = edge_length (e);
+      daisy_assert (length > 0.0);
+      edge_area_per_length_.push_back (edge_area (e) / length);
     }
 }
 

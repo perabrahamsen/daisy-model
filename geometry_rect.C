@@ -248,19 +248,11 @@ GeometryRect::GeometryRect (Block& al)
   edge_cos_angle_.insert (edge_cos_angle_.end (),
 			  edge_from_.size () - edge_cos_angle_.size (), 1.0);
 
-  // Cell edges.
-  build_cell_edges ();
-
-  // Edges.
+  // Common stuff.
+  build_common ();
   daisy_assert (edge_area_.size () == edge_size ());
   daisy_assert (edge_length_.size () == edge_size ());
-
-  for (size_t e = 0; e < edge_size (); e++)
-    { 
-      const double length = edge_length (e);
-      daisy_assert (length > 0.0);
-      edge_area_per_length_.push_back (edge_area (e) / length);
-    }
+  daisy_assert (edge_area_per_length_.size () == edge_size ());
 
   // Corners.
   corner_x_.insert (corner_x_.end (), corner_rows (), 0.0);

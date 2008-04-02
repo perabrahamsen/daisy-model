@@ -98,7 +98,7 @@ Geometry1D::interval_border (double z) const
 }
 
 void 
-Geometry1D::build_edge_length ()
+Geometry1D::build_edges ()
 {
   // Distance from surface to first cell center.
   edge_length_.push_back (-zplus (0));
@@ -114,6 +114,10 @@ Geometry1D::build_edge_length ()
   daisy_assert (edge_length_.size () == edge_size ());
   for (size_t e = 0; e < edge_size (); e++)
     daisy_assert (edge_length (e) > 0.0);
+
+  // Edge area.
+  edge_area_.insert (edge_area_.end (), edge_size (), 1.0);
+  daisy_assert (edge_area_.size () == edge_size ());
 }
 
 bool 
@@ -317,8 +321,8 @@ Can't automatically make discretizations less than 1 [cm], needed at "
   size_ = zplus_.size ();
 
   // Geometry structures.
-  build_edge_length ();
-  build_cell_edges ();
+  build_edges ();
+  build_common ();
 }
 
 Geometry1D::~Geometry1D ()
