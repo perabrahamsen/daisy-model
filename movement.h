@@ -60,7 +60,7 @@ public:
                      Groundwater&, const Time&, const Weather&, 
                      double dt, Treelog&) = 0;
   virtual void solute (const Soil&, const SoilWater&, 
-                       const double J_in, Chemical&, const bool flux_below, 
+                       const double J_above, Chemical&, const bool flux_below, 
 		       double dt, const Scope&, Treelog&) = 0;
   virtual void element (const Soil&, const SoilWater&, 
                         DOE&, double diffusion_coefficient, 

@@ -101,8 +101,8 @@ SoilWater::set_content (const size_t i, const double h, const double Theta)
 void
 SoilWater::set_flux (const size_t i, const double q)
 {
-  daisy_assert (i < q_.size ());
-  q_[i] = q;
+  daisy_assert (i < q_matrix_.size ());
+  q_matrix_[i] = q;
 }
 
 void
@@ -136,7 +136,7 @@ SoilWater::tick (const size_t cell_size, const Soil& soil,
 	    {
 	      X_ice_[i] += available_space;
 	      X_ice_buffer_[i] -= available_space;
-	    }
+            }
 	}
 
       if (X_ice_[i] < 0.0)
@@ -164,44 +164,132 @@ SoilWater::tick (const size_t cell_size, const Soil& soil,
     }
 
   // Remember old values.
-  Theta_old_ = Theta_;
   h_old_ = h_;
+  Theta_old_ = Theta_;
+  Theta_primary_old_ = Theta_primary_;
+  Theta_secondary_old_ = Theta_secondary_;
 }
 
 void
-SoilWater::tick_after (const size_t cell_size, 
+SoilWater::tick_after (const Geometry& geo,
                        const Soil& soil, const SoilHeat& soil_heat, 
+                       const bool initial,
                        Treelog&)
 {
-  mobile_solute_old_ = mobile_solute_;
+  // We need old K for primary/secondary flux division.
+  std::vector<double> K_old = K_;
 
-  for (size_t i = 0; i < cell_size; i++)
+  // Update cells.
+  const size_t cell_size = geo.cell_size ();
+  daisy_assert (K_.size () == cell_size);
+  daisy_assert (h_.size () == cell_size);
+  daisy_assert (h_ice_.size () == cell_size);
+  daisy_assert (K_old.size () == cell_size);
+  daisy_assert (Theta_.size () == cell_size);
+  daisy_assert (Theta_primary_.size () == cell_size);
+  daisy_assert (Theta_secondary_.size () == cell_size);
+
+  for (size_t c = 0; c < cell_size; c++)
     {
-      K_[i] = soil.K (i, h_[i], h_ice_[i], soil_heat.T(i));
+      K_[c] = soil.K (c, h_[c], h_ice_[c], soil_heat.T (c));
       
-      const Mobsol& mobsol = soil.mobile_solute (i);
+      const Mobsol& mobsol = soil.mobile_solute (c);
       if (mobsol.full ())
         {
-          mobile_solute_[i] = mobile;
-          Theta_mobile_[i] = Theta_[i];
-          Theta_immobile_[i] = 0.0;
+          // Only one domain in this horizon.
+          Theta_primary_[c] = Theta_[c];
+          Theta_secondary_[c] = 0.0;
         }
       else  
         {
+          // Two matrix domains.
           const double h_lim = mobsol.h_lim ();
-          if (h_[i] <= h_lim)
+          if (h_[c] <= h_lim)
             {
-              mobile_solute_[i] = immobile;
-              Theta_mobile_[i] = 0.0;
-              Theta_immobile_[i] = Theta_[i];
+              // Sedondary domain not activated.
+              Theta_primary_[c] = Theta_[c];
+              Theta_secondary_[c] = 0.0;
             }
           else 
             {
-              mobile_solute_[i] = mixed;
-              const double Theta_lim = soil.Theta (i, h_lim, h_ice_[i]);
-              Theta_mobile_[i] = Theta_[i] - Theta_lim;
-              Theta_immobile_[i] = Theta_lim;
+              // Secondary domain activated.
+              const double Theta_lim = soil.Theta (c, h_lim, h_ice_[c]);
+              Theta_primary_[c] = Theta_lim;
+              Theta_secondary_[c] = Theta_[c] - Theta_lim;
             }
+        }
+    }
+
+  // Initialize
+  if (initial)
+    {
+      K_old = K_;
+      Theta_primary_old_ = Theta_primary_;
+      Theta_secondary_old_ = Theta_secondary_;
+    }
+  daisy_assert (K_old.size () == cell_size);
+  daisy_assert (Theta_primary_old_.size () == cell_size);
+  daisy_assert (Theta_secondary_old_.size () == cell_size);
+
+  // Update edges.
+  const size_t edge_size = geo.edge_size ();
+  daisy_assert (q_matrix_.size () == edge_size);
+  daisy_assert (q_primary_.size () == edge_size);
+  daisy_assert (q_secondary_.size () == edge_size);
+  daisy_assert (q_matrix_.size () == edge_size);
+  daisy_assert (q_matrix_.size () == edge_size);
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      // By default, all flux is in primary domain.
+      q_primary_[e] = q_matrix_[e];
+      q_secondary_[e] = 0.0;
+      
+      // Find average K.
+      double K_edge = 0.0;
+      double K_lim = 0.0;
+
+      // Contributions from target.
+      const int to = geo.edge_to (e);
+      if (geo.cell_is_internal (to))
+        {
+          
+          if (iszero (Theta_secondary_old (to)) || 
+              iszero (Theta_secondary (to)))
+            continue;
+          K_edge += 0.5 * (K_old[to] + K (to));
+
+          const Mobsol& mobsol = soil.mobile_solute (to);
+          daisy_assert (!mobsol.full ());
+          const double h_lim = mobsol.h_lim ();
+          K_lim += soil.K (to, h_lim, h_ice (to), soil_heat.T (to));
+        }
+      
+      // Contributions from source.
+      const int from = geo.edge_from (e);
+      if (geo.cell_is_internal (from))
+        {
+          
+          if (iszero (Theta_secondary_old (from)) || 
+              iszero (Theta_secondary (from)))
+            continue;
+          K_edge += 0.5 * (K_old[from] + K (from));
+
+          const Mobsol& mobsol = soil.mobile_solute (from);
+          daisy_assert (!mobsol.full ());
+          const double h_lim = mobsol.h_lim ();
+          K_lim += soil.K (from, h_lim, h_ice (from), soil_heat.T (from));
+        }
+      
+      daisy_assert (K_lim > 0.0);
+      daisy_assert (K_edge > 0.0);
+      
+      // BUGLET:  We use in effect arithmetic average here for K.
+      // This may not have been what was used for calculating q matrix.
+      const double K_factor = K_lim / K_edge;
+      if (K_factor < 0.99999)
+        {
+          q_primary_[e] = q_matrix_[e] * K_factor;
+          q_secondary_[e] = q_matrix_[e] - q_primary_[e];
         }
     }
 }
@@ -227,7 +315,7 @@ SoilWater::mix (const Geometry& geo, const Soil& soil,
   for (size_t i = 0; i < soil.size(); i++)
     h_[i] = soil.h (i, Theta_[i]);
   
-  tick_after (geo.cell_size (), soil,  soil_heat, msg);
+  tick_after (geo, soil,  soil_heat, false, msg);
 }
 
 void
@@ -251,7 +339,7 @@ SoilWater::swap (const Geometry& geo, const Soil& soil,
 	}
       h_[i] = soil.h (i, Theta_[i]);
     }
-  tick_after (geo.cell_size (), soil,  soil_heat, msg);
+  tick_after (geo, soil,  soil_heat, false, msg);
 }
 
 void 
@@ -259,6 +347,8 @@ SoilWater::output (Log& log) const
 {
   output_value (h_, "h", log);
   output_value (Theta_, "Theta", log);
+  output_value (Theta_primary_, "Theta_primary", log);
+  output_value (Theta_secondary_, "Theta_secondary", log);
   output_value (S_sum_, "S_sum", log);
   output_value (S_root_, "S_root", log);
   output_value (S_drain_, "S_drain", log);
@@ -270,10 +360,8 @@ SoilWater::output (Log& log) const
   output_value (X_ice_, "X_ice", log);
   output_value (X_ice_buffer_, "X_ice_buffer", log);
   output_value (h_ice_, "h_ice", log);
-  output_value (Theta_mobile_, "Theta_mobile", log);
-  output_value (Theta_immobile_, "Theta_immobile", log);
-  output_value (q_, "q", log);
-  output_value (q_p_, "q_p", log);
+  output_value (q_matrix_, "q", log);
+  output_value (q_tertiary_, "q_p", log);
   output_value (K_, "K", log);
 }
 
@@ -318,7 +406,7 @@ SoilWater::infiltration (const Geometry& geo) const
 
   for (size_t e = 0; e < edge_size; e++)
     if (geo.edge_to (e) == Geometry::cell_above)
-      sum -= q (e) * geo.edge_area (e);
+      sum -= q_matrix (e) * geo.edge_area (e);
   
   const double mm_per_cm = 10.0;
   return mm_per_cm * sum / geo.surface_area ();
@@ -375,6 +463,12 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
   Geometry::add_layer (syntax, Syntax::OptionalState,
                        "Theta", Syntax::Fraction (),
                        "Soil water content.");
+  syntax.add ("Theta_primary", "cm^3/cm^3", Syntax::LogOnly, 
+              "Water content in primary matrix system.\n\
+Conventionally, this is the intra-aggregate pores.");
+  syntax.add ("Theta_secondary", "cm^3/cm^3", Syntax::LogOnly, 
+              "Water content in secondary matrix system.\n\
+Conventionally, this is the inter-aggregate pores.");
   syntax.add ("S_sum", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Total water sink (due to root uptake and macropores).");
   syntax.add ("S_root", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
@@ -401,12 +495,6 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Pressure at which all air is out of the matrix.\n\
 When there are no ice, this is 0.0.  When there are ice, the ice is\n\
 presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
-  syntax.add ("Theta_mobile", Syntax::Fraction (), 
-              Syntax::LogOnly, Syntax::Sequence,
-	      "Mobile soil water content.");
-  syntax.add ("Theta_immobile", Syntax::Fraction (), 
-              Syntax::LogOnly, Syntax::Sequence,
-	      "Immobile soil water content.");
   syntax.add ("q", "cm/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Matrix water flux (positive numbers mean upward).");  
   syntax.add ("q_p", "cm/h", Syntax::LogOnly, Syntax::Sequence,
@@ -514,10 +602,6 @@ SoilWater::initialize (const AttributeList& al, const Geometry& geo,
     }
   daisy_assert (h_.size () == cell_size);
 
-  // We just assume no changes.
-  Theta_old_ = Theta_;
-  h_old_ = h_;
-
   // Sources.
   S_sum_.insert (S_sum_.begin (), cell_size, 0.0);
   S_root_.insert (S_root_.begin (), cell_size, 0.0);
@@ -530,22 +614,21 @@ SoilWater::initialize (const AttributeList& al, const Geometry& geo,
                          0.0);
   S_ice_.insert (S_ice_.begin (), cell_size, 0.0);
 
-  // Mobile/immobile solute
-  mobile_solute_.insert (mobile_solute_.begin (), cell_size, mobile);
-  mobile_solute_old_ = mobile_solute_;
-  Theta_mobile_ = Theta_;
-  Theta_immobile_.insert (Theta_immobile_.begin (), cell_size, 0.0);
-
   // Fluxes.
-  q_.insert (q_.begin (), edge_size, 0.0);
-  q_p_.insert (q_p_.begin (), edge_size, 0.0);
+  q_primary_.insert (q_primary_.begin (), edge_size, 0.0);
+  q_secondary_.insert (q_secondary_.begin (), edge_size, 0.0);
+  q_matrix_.insert (q_matrix_.begin (), edge_size, 0.0);
+  q_tertiary_.insert (q_tertiary_.begin (), edge_size, 0.0);
 
-  // Conductivity.
-  for (size_t i = 0; i < cell_size; i++)
-    K_.push_back (soil.K (i, h_[i], h_ice_[i], 10.0 /* [dg C] */));
+  // Update conductivity and primary/secondary water.
+  Theta_primary_.insert (Theta_primary_.begin (), cell_size, -42.42e42);
+  Theta_secondary_.insert (Theta_secondary_.begin (), cell_size, -42.42e42);
+  K_.insert (K_.begin (), cell_size, 0.0);
+  tick_after (geo, soil,  soil_heat, true, msg);
 
-  // Update K and mobile/immobile water
-  tick_after (geo.cell_size (), soil,  soil_heat, msg);
+  // We just assume no changes.
+  h_old_ = h_;
+  Theta_old_ = Theta_;
 }
 
 SoilWater::SoilWater (Block& al)

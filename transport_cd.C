@@ -99,7 +99,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
       const double lambda = soil.dispersivity (j);
 
       // Water flux [cm³ /cm² / h]
-      const double q = soil_water.q (j);
+      const double q = soil_water.q_matrix (j);
       
       // Theta middled in time and space.
       const double Theta = 
@@ -120,7 +120,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
     const double lambda = soil.dispersivity (size-1);
 
     // Water flux [cm³ /cm² / h]
-    const double q = soil_water.q (size);
+    const double q = soil_water.q_matrix (size);
       
     // Theta middled in time and space.
     const double Theta = 
@@ -141,7 +141,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 
   for (unsigned int j = 0; j < size + 1; j++)
     {
-      if (soil_water.q (j) < 0.0)
+      if (soil_water.q_matrix (j) < 0.0)
 	alpha[j] = 1.0;
       else
 	alpha[j] = 0.0;
@@ -161,10 +161,10 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 #ifdef DISABLE_MIXING
       daisy_assert (J_in < 0.0);
 #endif
-      if (soil_water.q (0) < 0.0)
+      if (soil_water.q_matrix (0) < 0.0)
 	// Normal condition, stuff is in solute.
 	if (J_in < 0.0)
-	  C_top = J_in / soil_water.q (0);
+	  C_top = J_in / soil_water.q_matrix (0);
 	else
 	  {
 	    S_top = -J_in / geo.dz (0);
@@ -220,8 +220,8 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 	    = (j == size - 1) ? dz_minus : (geo.z (j) - geo.z (j+1));
 
 	  const double dz = geo.dz (j); // Size of current cell.
-	  double q_minus = soil_water.q (j); // Flow to above.
-	  const double q_plus = soil_water.q (j+1);	// Flow from below.
+	  double q_minus = soil_water.q_matrix (j); // Flow to above.
+	  const double q_plus = soil_water.q_matrix (j+1);	// Flow from below.
 	  const double alpha_minus = alpha[j]; // Direction above.
 	  const double alpha_plus = alpha[j+1]; // Direction below.
 	  double D_minus = D[j]; // Dispertion above.
@@ -267,9 +267,9 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 	// Size of current cell.
 	const double dz = geo.dz (0);
 	// Flow to above.
-	double q_minus = std::isnormal (J_in) ? soil_water.q (0) : 0.0;
+	double q_minus = std::isnormal (J_in) ? soil_water.q_matrix (0) : 0.0;
 	// Flow from below.
-	const double q_plus = soil_water.q (1);
+	const double q_plus = soil_water.q_matrix (1);
 	const double alpha_minus = alpha[0]; // Direction above.
 	const double alpha_plus = alpha[1]; // Direction below.
 	double D_minus = D[0]; // Dispertion above.

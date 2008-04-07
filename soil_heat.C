@@ -116,14 +116,14 @@ SoilHeat::source (const Geometry& geo, const SoilWater& soil_water,
 
   if (state[c] == SoilHeat::freezing || state[c] == SoilHeat::thawing)
     {
-      const std::vector<int>& cell_edges = geo.cell_edges (c);
+      const std::vector<size_t>& cell_edges = geo.cell_edges (c);
       for (size_t e = 0; e < cell_edges.size (); e++)
 	{
-	  const int edge = cell_edges[e];
+	  const size_t edge = cell_edges[e];
 	  const double in_sign = (geo.edge_to (edge) == c)
 	    ? 1.0 : -1.0;				// []
 	  const double area = geo.edge_area (edge);	// [cm^2]
-	  const double flux = soil_water.q (edge);	// [cm/h]
+	  const double flux = soil_water.q_matrix (edge); // [cm/h]
 	  const double in = flux * area;		// [cm^3/h]
 	  const double vol = geo.cell_volume (c);	// [cm^3]
 	  v += latent_heat_of_fussion * rho_water * in_sign * in / vol;
@@ -193,7 +193,7 @@ SoilHeat::calculate_heat_flux (const Geometry& geo,
       const int from = geo.edge_from (e);
       const int to = geo.edge_to (e);
       const double l = geo.edge_length (e);	 // [cm]
-      const double q_water = soil_water.q (e);	 // [cm/h]
+      const double q_water = soil_water.q_matrix (e); // [cm/h]
       const double T_from			 // [dg C]
 	= T_pseudo (geo, from, to, T_old, T_top, T_new, T_bottom);
       const double T_to	                         // [dg C]
@@ -232,7 +232,7 @@ SoilHeat::tick (const Geometry& geo, const Soil& soil, SoilWater& soil_water,
   // Edges.
   std::vector<double> q_water (edge_size);
   for (size_t e = 0; e < edge_size; e++)
-    q_water[e] = soil_water.q (e);
+    q_water[e] = soil_water.q_matrix (e);
 
   // Cells;
   std::vector<double> conductivity (cell_size);

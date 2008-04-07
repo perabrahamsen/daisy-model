@@ -22,7 +22,6 @@
 #include "msoltranrect.h"
 #include "geometry.h"
 #include "soil.h"
-#include "soil_water.h"
 #include "adsorption.h"
 #include "alist.h"
 #include "submodeler.h"
@@ -35,7 +34,9 @@ struct MsoltranrectNone : public Msoltranrect
   // Solute.
   void flow (const Geometry& geo, 
              const Soil& soil, 
-             const SoilWater& soil_water, 
+             const std::vector<double>& Theta_old,
+             const std::vector<double>& Theta_new,
+             const std::vector<double>& q,
              const symbol name,
              std::vector<double>& C, 
              const std::vector<double>& S, 
@@ -43,8 +44,7 @@ struct MsoltranrectNone : public Msoltranrect
 	     const double C_below,
 	     const bool flux_below,
              double diffusion_coefficient, double dt,
-             Treelog& msg);
-  void output (Log&) const;
+             Treelog& msg) const;
 
   // Create.
   static void load_syntax (Syntax& syntax, AttributeList& alist);
@@ -55,7 +55,9 @@ struct MsoltranrectNone : public Msoltranrect
 void
 MsoltranrectNone::flow (const Geometry& geo, 
                         const Soil& soil, 
-                        const SoilWater& soil_water, 
+                        const std::vector<double>& Theta_old,
+                        const std::vector<double>& Theta_new,
+                        const std::vector<double>& q,
                         const symbol name,
                         std::vector<double>& C, 
                         const std::vector<double>& S, 
@@ -64,23 +66,24 @@ MsoltranrectNone::flow (const Geometry& geo,
 			const bool /* flux_below */,
                         double /* diffusion_coefficient */,
                         const double dt,
-                        Treelog& msg)
+                        Treelog& msg) const
 {
   const size_t cell_size = geo.cell_size ();
 
   // Solute M.
   std::vector<double> M (cell_size);
   for (size_t i = 0; i < M.size (); i++)
-    M[i] = soil_water.Theta_old (i) * C[i];
+    M[i] = Theta_old[i] * C[i];
 
   // Upper border.
-  const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
 
   for (size_t i = 0; i < edge_above_size; i++)
     {
-      const int edge = edge_above[i];
+      const size_t edge = edge_above[i];
       const int cell = geo.edge_other (edge, Geometry::cell_above);
+      daisy_assert (geo.cell_is_internal (cell));
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       const double value = in_sign * J[edge] * dt * geo.edge_area (edge); // [g]
@@ -88,17 +91,13 @@ MsoltranrectNone::flow (const Geometry& geo,
     }
 
   // Cell source.
-  for (size_t n = 0; n < cell_size; n++)
-    M[n] += S[n] * dt;
+  for (size_t c = 0; c < cell_size; c++)
+    M[c] += S[c] * dt;
 
   // Update C.
-  for (size_t n = 0; n < cell_size; n++)
-    C[n] = M[n] / soil_water.Theta (n);
+  for (size_t c = 0; c < cell_size; c++)
+    C[c] = M[c] / Theta_new[c];
 }
-
-void 
-MsoltranrectNone::output (Log&) const
-{ }
 
 MsoltranrectNone::MsoltranrectNone (Block& al)
   : Msoltranrect (al)

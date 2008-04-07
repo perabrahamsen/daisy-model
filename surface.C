@@ -269,7 +269,7 @@ Surface::update_pond_average (const Geometry& geo)
 void
 Surface::Implementation::update_pond_average (const Geometry& geo)
 {
-  const std::vector<int>& top_edges = geo.cell_edges (Geometry::cell_above);
+  const std::vector<size_t>& top_edges = geo.cell_edges (Geometry::cell_above);
   const size_t top_edges_size = top_edges.size ();
 
   // Find total pond.
@@ -277,7 +277,6 @@ Surface::Implementation::update_pond_average (const Geometry& geo)
   double total_area = 0.0;      // [cm^2]
   for (int i = 0; i < top_edges_size; i++)
     {
-      daisy_assert (top_edges[i] >= 0);
       const size_t edge = top_edges[i];
       const double area = geo.edge_area (edge);
       total_area += area;
@@ -321,11 +320,10 @@ Surface::Implementation::tick (Treelog& msg,
   double EvapSoilTotal = 0.0;   // [mm cm^2/h]
 
   // Update pond above each top cell.
-  const std::vector<int>& top_edges = geo.cell_edges (Geometry::cell_above);
+  const std::vector<size_t>& top_edges = geo.cell_edges (Geometry::cell_above);
   const size_t top_edges_size = top_edges.size ();
   for (size_t i = 0; i < top_edges_size; i++)
     {
-      daisy_assert (top_edges[i] >= 0);
       const size_t edge = top_edges[i];
       const double area = geo.edge_area (edge); // [cm^2]
 
@@ -505,12 +503,11 @@ Surface::initialize (const Geometry& geo)
 void 
 Surface::Implementation::initialize (const Geometry& geo)
 { 
-  const std::vector<int>& top_edges = geo.cell_edges (Geometry::cell_above);
+  const std::vector<size_t>& top_edges = geo.cell_edges (Geometry::cell_above);
   const size_t top_edges_size = top_edges.size ();
 
   for (size_t i = 0; i < top_edges_size; i++)
     {
-      daisy_assert (top_edges[i] >= 0);
       const size_t edge = top_edges[i];
       pond_edge[edge] = pond_average;
     }

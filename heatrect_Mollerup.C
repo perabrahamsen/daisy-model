@@ -178,14 +178,15 @@ lowerboundary (const GeometryRect& geo,
   // change to isflux_lower?????
   if (!isflux)   //Nothing to do for (no) flux bc 
     {
-      const std::vector<int>& edge_below 
+      const std::vector<size_t>& edge_below 
         = geo.cell_edges (Geometry::cell_below);
       const size_t edge_below_size = edge_below.size ();
       
       for (size_t i = 0; i < edge_below_size; i++)
         {
-          const int edge = edge_below[i];
+          const size_t edge = edge_below[i];
           const int cell = geo.edge_other (edge, Geometry::cell_below);
+          daisy_assert (geo.cell_is_internal (cell));
           const double area = geo.edge_area (edge);
           const double area_per_length = geo.edge_area_per_length (edge);
           const double in_sign 
@@ -219,20 +220,20 @@ upperboundary (const GeometryRect& geo,
   if (isflux)   //Nothing to do for (no)flux bc 
     return;
   
-  const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
   
   for (size_t i = 0; i < edge_above_size; i++)
     {
-      const int edge = edge_above[i];
+      const size_t edge = edge_above[i];
       const int cell = geo.edge_other (edge, Geometry::cell_above);
-      
-      const std::vector<int>& edge_around = geo.cell_edges (cell);
+      daisy_assert (geo.cell_is_internal (cell));
+      const std::vector<size_t>& edge_around = geo.cell_edges (cell);
       const size_t edge_around_size = edge_around.size ();
       
       for (size_t j= 0; j < edge_around_size; j++)
         {
-          const int edge_next = edge_around[j];
+          const size_t edge_next = edge_around[j];
           const int cell_next = geo.edge_other (edge_next, cell);
           if (geo.cell_is_internal (cell_next))
             A (cell, cell_next) = 0;
@@ -293,13 +294,14 @@ fluxes (const GeometryRect& geo,
   //Lower boundary 
   if (!isflux_lower)   //Do nothing for no-flux boundaries
     {
-      const std::vector<int>& edge_below 
+      const std::vector<size_t>& edge_below 
         = geo.cell_edges (Geometry::cell_below);
       const size_t edge_below_size = edge_below.size ();
       for (size_t i = 0; i < edge_below_size; i++)
         {
-          const int edge = edge_below[i];
+          const size_t edge = edge_below[i];
           const int cell = geo.edge_other (edge, Geometry::cell_below);
+          daisy_assert (geo.cell_is_internal (cell));
           daisy_assert (cell >= 0);
           daisy_assert (cell < T.size ());
           const double in_sign 
@@ -320,14 +322,15 @@ fluxes (const GeometryRect& geo,
       std::cout << "B_dir_vec_new: " << B_dir_vec_new << '\n';
 #endif
         
-      const std::vector<int>& edge_above
+      const std::vector<size_t>& edge_above
         = geo.cell_edges (Geometry::cell_above);
       const size_t edge_above_size = edge_above.size ();
       
       for (size_t i = 0; i < edge_above_size; i++)
         {
-          const int edge = edge_above[i];
+          const size_t edge = edge_above[i];
           const int cell = geo.edge_other (edge, Geometry::cell_above);
+          daisy_assert (geo.cell_is_internal (cell));
           daisy_assert (cell >= 0);
           daisy_assert (cell < T.size ());
           const double in_sign 

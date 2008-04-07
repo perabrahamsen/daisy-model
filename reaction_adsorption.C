@@ -66,8 +66,8 @@ struct ReactionAdsorption : public Reaction
       { 
 	scope.set_cell (c);
 	const double Theta = soil_water.Theta (c);
-	const double has_solute = solute.M_immobile (c);
-	const double has_sorbed = sorbed.M_immobile (c);
+	const double has_solute = solute.M_primary (c);
+	const double has_sorbed = sorbed.M_primary (c);
 	const double has_M = has_solute + has_sorbed;
 	const double want_C = equilibrium->M_to_C (soil, Theta, c, has_M);
 	const double want_solute = want_C * Theta;

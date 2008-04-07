@@ -278,8 +278,8 @@ ChemistryStandard::tick_soil (const Geometry& geo, const double ponding,
       Treelog::Open nest (msg, "Chemical: " 
                           + chemicals[c]->name + ": transport");
       // [g/m^2/h down -> g/cm^2/h up]
-      const double J_in = -chemicals[c]->down () / (100.0 * 100.0);
-      movement.solute (soil, soil_water, J_in, *chemicals[c], flux_below, 
+      const double J_above = -chemicals[c]->down () / (100.0 * 100.0);
+      movement.solute (soil, soil_water, J_above, *chemicals[c], flux_below, 
 		       dt, scope, msg); 
     }
 }

@@ -22,7 +22,6 @@
 #include "msoltranrect.h"
 #include "geometry_rect.h"
 #include "soil.h"
-#include "soil_water.h"
 #include "solver.h"
 #include "log.h"
 #include "alist.h"
@@ -55,9 +54,6 @@ struct MsoltranrectMollerup : public Msoltranrect
   const int debug;
   const double upstream_weight;
  
-  // Log variables.
-  double ddt; //size of small timestep 
-
   // Water flux.
   static void cell_based_flux (const Geometry& geo,  
                                const ublas::vector<double>& q_edge,
@@ -108,7 +104,7 @@ struct MsoltranrectMollerup : public Msoltranrect
 
   void advection (const Geometry& geo,
                   const ublas::vector<double>& q_edge,
-                  Solver::Matrix& advec);
+                  Solver::Matrix& advec) const;
   
   static void Neumann_expl (const size_t cell, const double area, 
                             const double in_sign, const double J, 
@@ -159,12 +155,14 @@ struct MsoltranrectMollerup : public Msoltranrect
                const ublas::vector<double>& C,
                const double C_below,
                const ublas::vector<double>& B_dir_vec,
-               ublas::vector<double>& dJ); 
+               ublas::vector<double>& dJ) const; 
 
   // Solute.
   void flow (const Geometry& geo, 
              const Soil& soil, 
-             const SoilWater& soil_water, 
+             const std::vector<double>& Theta_old,
+             const std::vector<double>& Theta_new,
+             const std::vector<double>& q,
              symbol name,
              std::vector<double>& C, 
              const std::vector<double>& S, 
@@ -172,10 +170,8 @@ struct MsoltranrectMollerup : public Msoltranrect
              const double C_below,
              const bool flux_below,
              double diffusion_coefficient, double dt,
-             Treelog& msg);
+             Treelog& msg) const;
   
-  void output (Log&) const;
-
   // Create.
   bool check (const Geometry&, Treelog&);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
@@ -481,7 +477,7 @@ MsoltranrectMollerup::diffusion_xz_zx (const GeometryRect& geo,
 void 
 MsoltranrectMollerup::advection (const Geometry& geo,
                                  const ublas::vector<double>& q_edge,
-                                 Solver::Matrix& advec)  
+                                 Solver::Matrix& advec) const
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
 
@@ -691,13 +687,14 @@ MsoltranrectMollerup::lowerboundary
       ublas::vector<double>& B_vec,
       ublas::vector<double>& B_dir_vec)
 {
-  const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
+  const std::vector<size_t>& edge_below = geo.cell_edges (Geometry::cell_below);
   const size_t edge_below_size = edge_below.size ();
   
   for (size_t i = 0; i < edge_below_size; i++)
     {
-      const int edge = edge_below[i];
+      const size_t edge = edge_below[i];
       const int cell = geo.edge_other (edge, Geometry::cell_below);
+      daisy_assert (geo.cell_is_internal (cell));
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       daisy_assert (in_sign > 0);
@@ -741,7 +738,7 @@ MsoltranrectMollerup::Dirichlet_timestep
   double ddt_dir = dt; 
   double ddt_dir_new = dt;
   
-  const std::vector<int>& edge_below
+  const std::vector<size_t>& edge_below
     = geo.cell_edges (Geometry::cell_below);
   const size_t edge_below_size = edge_below.size ();
   
@@ -755,8 +752,9 @@ MsoltranrectMollerup::Dirichlet_timestep
       // conc difference between cell and border can be transported by 
       // diffusion over the boundary out from the cell in a timestep. 
           
-      const int edge = edge_below[i];
+      const size_t edge = edge_below[i];
       const int cell = geo.edge_other (edge, Geometry::cell_below);
+      daisy_assert (geo.cell_is_internal (cell));
       const double area_per_length = geo.edge_area_per_length (edge);
       const double V_cell = geo.cell_volume (cell);
       
@@ -787,13 +785,14 @@ MsoltranrectMollerup::upperboundary (const Geometry& geo,
                                      ublas::vector<double>& B_vec,
                                      Treelog& msg)
 {
-  const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
 
   for (size_t i = 0; i < edge_above_size; i++)
     {
-      const int edge = edge_above[i];
+      const size_t edge = edge_above[i];
       const int cell = geo.edge_other (edge, Geometry::cell_above);
+      daisy_assert (geo.cell_is_internal (cell));
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       daisy_assert (in_sign < 0);
@@ -813,7 +812,7 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
                               const ublas::vector<double>& C,
                               const double C_below,
                               const ublas::vector<double>& B_dir_vec,
-                              ublas::vector<double>& dJ) 
+                              ublas::vector<double>& dJ) const
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
 
@@ -990,7 +989,9 @@ sub_to (const Solver::Matrix& from, ublas::coordinate_matrix<double>& to)
 void
 MsoltranrectMollerup::flow (const Geometry& geo_base, 
                             const Soil& soil, 
-                            const SoilWater& soil_water, 
+                            const std::vector<double>& Theta_old,
+                            const std::vector<double>& Theta_new,
+                            const std::vector<double>& q,
                             const symbol name,
                             std::vector<double>& C, 
                             const std::vector<double>& S, 
@@ -999,7 +1000,7 @@ MsoltranrectMollerup::flow (const Geometry& geo_base,
                             const bool flux_below,
                             double diffusion_coefficient,
                             const double dt,
-                            Treelog& msg)
+                            Treelog& msg) const
 {
   const GeometryRect& geo = dynamic_cast<const GeometryRect&> (geo_base);
 
@@ -1014,10 +1015,10 @@ MsoltranrectMollerup::flow (const Geometry& geo_base,
   // Water content old and new 
   ublas::vector<double> Theta_cell_old (cell_size);     
   for (int c = 0; c < cell_size; c++)
-    Theta_cell_old (c) = soil_water.Theta_old (c);
+    Theta_cell_old (c) = Theta_old[c];
   ublas::vector<double> Theta_cell (cell_size); 
   for (int c = 0; c < cell_size; c++)
-    Theta_cell (c) = soil_water.Theta (c);
+    Theta_cell (c) = Theta_new[c];
 
   // Average water content in large timestep
   ublas::vector<double> Theta_cell_avg (cell_size);     //Using avg cell size
@@ -1026,7 +1027,7 @@ MsoltranrectMollerup::flow (const Geometry& geo_base,
   // Flux in timestep
   ublas::vector<double> q_edge (edge_size);     
   for (int e = 0; e < edge_size; e++)
-    q_edge (e) = soil_water.q (e);
+    q_edge (e) = q[e];
   
   
   //Cell diffusion tensor
@@ -1414,10 +1415,6 @@ MsoltranrectMollerup::flow (const Geometry& geo_base,
     msg.message(tmp_mmo.str ());
 }
 
-void 
-MsoltranrectMollerup::output (Log& log) const
-{ output_variable (ddt, log); }
-
 bool 
 MsoltranrectMollerup::check (const Geometry& geo, Treelog& msg)
 {
@@ -1437,8 +1434,7 @@ MsoltranrectMollerup::MsoltranrectMollerup (Block& al)
     solver (Librarian::build_item<Solver> (al, "solver")),
     enable_boundary_diffusion (al.flag ("enable_boundary_diffusion")),
     debug (al.integer ("debug")),
-    upstream_weight (al.number ("upstream_weight")),
-    ddt (-42.42e42)
+    upstream_weight (al.number ("upstream_weight"))
 { }
 
 MsoltranrectMollerup::~MsoltranrectMollerup ()
@@ -1461,7 +1457,6 @@ A value of 0 means no message, higher numbers means more messages.");
   syntax.add ("upstream_weight", Syntax::Fraction(), Syntax::Const, "\
 Upstream weighting factor: 1 = full upstream formulation, 0.5 = equal weight.");
   alist.add ("upstream_weight", 1.0);
-  syntax.add ("ddt", "h", Syntax::LogOnly, "Small timestep.");
 }
 
 const AttributeList& 

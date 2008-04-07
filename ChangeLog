@@ -1,5 +1,8 @@
 2008-04-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* geometry.C, geometry.h, geometry1d.C, geometry1d.h, geometry_rect.C
+	* geometry_rect.h (edge_area, edge_area_per_length): Moved to Geometry.
+
 	* treelog.C (Open::Open): Added new variant for entries in model
 	lists.
 	* gnuplot_multi.C (GnuplotMulti::initialize): Use it.

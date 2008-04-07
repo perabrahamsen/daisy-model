@@ -51,6 +51,10 @@ private:
   std::vector<double> h_old_;
   std::vector<double> Theta_;
   std::vector<double> Theta_old_;
+  std::vector<double> Theta_primary_;
+  std::vector<double> Theta_primary_old_;
+  std::vector<double> Theta_secondary_;
+  std::vector<double> Theta_secondary_old_;
   std::vector<double> S_sum_;
   std::vector<double> S_root_;
   std::vector<double> S_drain_;
@@ -62,12 +66,10 @@ private:
   std::vector<double> X_ice_;
   std::vector<double> X_ice_buffer_;
   std::vector<double> h_ice_;
-  std::vector<mobile_solute_t> mobile_solute_; 
-  std::vector<mobile_solute_t> mobile_solute_old_; 
-  std::vector<double> Theta_mobile_;
-  std::vector<double> Theta_immobile_;
-  std::vector<double> q_;
-  std::vector<double> q_p_;
+  std::vector<double> q_matrix_;
+  std::vector<double> q_primary_;
+  std::vector<double> q_secondary_;
+  std::vector<double> q_tertiary_;
   std::vector<double> K_;
 
   // Sink.
@@ -85,10 +87,16 @@ public:
   { return h_old_[i]; }
   double Theta (size_t i) const
   { return Theta_[i]; }
-  double Theta_left (size_t i, const double dt) const
-  { return Theta_[i] - S_sum_[i] * dt; }
   double Theta_old (size_t i) const
   { return Theta_old_[i]; }
+  double Theta_primary (size_t i) const
+  { return Theta_primary_[i]; }
+  double Theta_primary_old (size_t i) const
+  { return Theta_primary_old_[i]; }
+  double Theta_secondary (size_t i) const
+  { return Theta_secondary_[i]; }
+  double Theta_secondary_old (size_t i) const
+  { return Theta_secondary_old_[i]; }
   double content_surface (const Geometry&, 
                           double from, double to) const; // [cm]
   double S_root (size_t i) const
@@ -105,18 +113,14 @@ public:
   { return X_ice_[i]; }
   double X_ice_total (size_t i) const
   { return X_ice_[i] + X_ice_buffer_[i]; }
-  mobile_solute_t mobile_solute (size_t i) const
-  { return mobile_solute_[i]; }
-  mobile_solute_t mobile_solute_old (size_t i) const
-  { return mobile_solute_old_[i]; }
-  double Theta_mobile (size_t i) const
-  { return Theta_mobile_[i]; }
-  double Theta_immobile (size_t i) const
-  { return Theta_immobile_[i]; }
-  double q (size_t i) const
-  { return q_[i]; }
-  double q_p (size_t i) const
-  { return q_p_[i]; }
+  double q_matrix (size_t i) const
+  { return q_matrix_[i]; }
+  double q_primary (size_t i) const
+  { return q_primary_[i]; }
+  double q_secondary (size_t i) const
+  { return q_secondary_[i]; }
+  double q_tertiary (size_t i) const
+  { return q_tertiary_[i]; }
   double Theta_ice (const Soil&, size_t i, double h) const;
   double K (size_t i) const
   { return K_[i]; }
@@ -130,8 +134,9 @@ public:
 public:
   void tick (const size_t cell_size, const Soil& soil, 
              double dt, Treelog& msg);
-  void tick_after (const size_t cell_size, 
-                   const Soil& soil, const SoilHeat& soil_heat, Treelog& msg);
+  void tick_after (const Geometry&, 
+                   const Soil& soil, const SoilHeat& soil_heat, 
+                   bool initial, Treelog& msg);
   void incorporate (const Geometry&, double amount, double from, double to);
   void incorporate (const Geometry&, double amount, const Volume&);
   void mix (const Geometry& geo, const Soil&, const SoilHeat&, double from, 

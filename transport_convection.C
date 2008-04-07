@@ -89,14 +89,14 @@ TransportConvection::tick (Treelog& msg,
   for (unsigned int i = 0; i < size; i++)
     {
       const double half_content = soil_water.Theta (i) * geo.dz (i) / 2.0;
-      const double q_up = soil_water.q (i);
+      const double q_up = soil_water.q_matrix (i);
       if (q_up > 0.0)
 	{
 	  const double dd_up = half_content / q_up;
 	  if (dd_up < ddt)
 	    ddt = dd_up;
 	}
-      const double q_down = -soil_water.q (i+1);
+      const double q_down = -soil_water.q_matrix (i+1);
       if (q_down > 0.0)
 	{
 	  const double dd_down = half_content / q_down;
@@ -131,7 +131,7 @@ TransportConvection::tick (Treelog& msg,
       // Middle cells.
       for (unsigned int i = 1; i <= size; i++)
 	{
-	  const double q = soil_water.q (i);
+	  const double q = soil_water.q_matrix (i);
 	  if (q < 0)		// Downward flow, take from water above.
 	    dJ[i] = q * C[i-1];
 	  else if (i < size)

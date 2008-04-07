@@ -1,3 +1,4 @@
+
 // geometry.h -- Abstract interface to geometric information.
 // 
 // Copyright 2006 Per Abrahamsen and KVL.
@@ -50,7 +51,7 @@ protected:
 
   // Helper data.
 protected:
-  std::vector<std::vector<int> > cell_edges_; // Edges connected with cell.
+  std::vector<std::vector<size_t> > cell_edges_; // Edges connected with cell.
   std::vector<double> edge_length_;	      // Distance between cell centers.
   std::vector<double> edge_area_;             // Area connecting cells.
   std::vector<double> edge_area_per_length_;  // One divided by the other.
@@ -94,7 +95,7 @@ protected:
   { return cell_size () + 6U; }
   size_t cell_pseudo_number (int n) const;
 public:
-  inline const std::vector<int>& cell_edges (int n) const
+  inline const std::vector<size_t>& cell_edges (int n) const
   { return cell_edges_[cell_pseudo_number (n)]; }
 
   // Edge operations.

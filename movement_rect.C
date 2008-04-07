@@ -57,8 +57,32 @@ struct MovementRect : public Movement
   // Solute.
   const auto_vector<Msoltranrect*> matrix_solute;
   const std::auto_ptr<Msoltranrect> matrix_solid;
+  static void secondary_flow (const Geometry& geo, 
+                              const std::vector<double>& Theta_old,
+                              const std::vector<double>& Theta_new,
+                              const std::vector<double>& q,
+                              const symbol name,
+                              std::vector<double>& M, 
+                              const std::vector<double>& S, 
+                              std::vector<double>& J_sum, 
+                              const double C_below,
+                              const double dt,
+                              Treelog& msg);
+  static void secondary_transport (const Geometry&,
+                                   const Soil&, const SoilWater&,
+                                   const double J_above, Chemical& solute, 
+                                   std::vector<double>& S_extra,
+                                   const bool flux_below, const double dt,
+                                   const Scope& scope, Treelog& msg);
+  static void primary_transport (const Geometry& geo,
+                                 const Soil& soil, const SoilWater& soil_water,
+                                 const Msoltranrect&,
+                                 const double J_above, Chemical& solute, 
+                                 const std::vector<double>& S_extra,
+                                 const bool flux_below, const double dt,
+                                 const Scope& scope, Treelog& msg);
   void solute (const Soil& soil, const SoilWater& soil_water,
-               double J_in, Chemical&, const bool flux_below, 
+               double J_above, Chemical&, const bool flux_below, 
 	       double dt, const Scope&, Treelog&);
   void element (const Soil& soil, const SoilWater& soil_water,
                 DOE& element, 
@@ -130,26 +154,315 @@ MovementRect::macro_tick (const Soil&, SoilWater&, Surface&,
                           const double /* dt */, Treelog&)
 { }
 
+void 
+MovementRect::secondary_flow (const Geometry& geo, 
+                              const std::vector<double>& Theta_old,
+                              const std::vector<double>& Theta_new,
+                              const std::vector<double>& q,
+                              const symbol name,
+                              std::vector<double>& M, 
+                              const std::vector<double>& S, 
+                              std::vector<double>& J_sum, 
+                              const double C_below,
+                              const double dt,
+                              Treelog& msg)
+{
+  const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
+
+  double time_left = dt;
+
+  // Keep upper boundary constant during simulation.
+  const std::vector<double> J = J_sum;
+  fill (J_sum.begin (), J_sum.end (), 0.0);
+  
+  // Initial water content.
+  std::vector<double> Theta (cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    Theta[c] = Theta_old[c];
+
+  // Small timesteps.
+  for (;;)
+    {
+      // Are we done yet?
+      const double min_timestep_factor = 0.001;
+      if (time_left < 0.1 * min_timestep_factor * dt)
+        break;
+
+      // Find new timestep.
+      double ddt = time_left;
+  
+      // Limit timestep based on water flux.
+      for (size_t e = 0; e < edge_size; e++)
+        {
+          const int cell = (q[e] > 0.0 ? geo.edge_to (e) : geo.edge_from (e));
+          if (geo.cell_is_internal (cell))
+            {
+              const double loss_rate = std::fabs (q[e]) * geo.edge_area (e);
+              const double content = Theta[cell] * geo.cell_volume (cell); 
+              const double time_to_empty = content / loss_rate;
+              if (time_to_empty < min_timestep_factor * dt)
+                // Unreasonable small time step.  Give up.
+                continue;
+              
+              // Go down in timestep while it takes less than two to empty cell.
+              while (time_to_empty < 2.0 * ddt)
+                ddt *= 0.5;
+            }
+        }
+
+      // Cell source.
+      for (size_t c = 0; c < cell_size; c++)
+        M[c] += S[c] * ddt;
+
+      // Find fluxes using new values (more stable).
+      std::vector<double> dJ (edge_size);
+      for (size_t e = 0; e < edge_size; e++)
+        {
+          const int edge_from = geo.edge_from (e);
+          const int edge_to = geo.edge_to (e);
+          const bool in_flux = q[e] > 0.0;
+          const int flux_from = in_flux ? edge_from : edge_to;
+          double C_flux_from;
+          switch (flux_from)
+            {
+            case Geometry::cell_above:
+            case Geometry::cell_left:
+            case Geometry::cell_right:
+            case Geometry::cell_front:
+            case Geometry::cell_back:
+              dJ[e] = J[e];
+              continue;
+            case Geometry::cell_below:
+              C_flux_from = C_below;
+              break;
+            default:
+              daisy_assert (geo.cell_is_internal (flux_from));
+              if (geo.edge_other (e, flux_from) == Geometry::cell_above)
+                // No flux upwards.
+                continue;
+              if (Theta[flux_from] > 1e-6 && M[flux_from] > 0.0)
+                // Positive content in positive water.
+                C_flux_from = M[flux_from] / Theta[flux_from];
+              else
+                // You can't cut the hair of a bald guy.
+                C_flux_from = 0.0;
+            }
+
+          // Convection.
+          dJ[e] = q[e] * C_flux_from;
+        }
+
+      // Update values for fluxes.
+      for (size_t e = 0; e < edge_size; e++)
+        {
+          const double value = ddt * dJ[e] * geo.edge_area (e);
+
+          const int from = geo.edge_from (e);
+          if (geo.cell_is_internal (from))
+            M[from] -= value / geo.cell_volume (from);
+
+          const int to = geo.edge_to (e);
+          if (geo.cell_is_internal (to))
+            M[to] += value / geo.cell_volume (to);
+
+          J_sum[e] += dJ[e] * ddt;
+        }
+
+      // Update time left.
+      time_left -= ddt;
+
+      // Interpolate Theta.
+      for (size_t c = 0; c < cell_size; c++)
+        Theta[c] = time_left * Theta_old[c] + (1.0 - time_left) * Theta_new[c];
+    }
+}
+
+void
+MovementRect::secondary_transport (const Geometry& geo,
+                                   const Soil& soil,
+                                   const SoilWater& soil_water,
+                                   const double J_above, Chemical& solute, 
+                                   std::vector<double>& S_extra,
+                                   const bool flux_below, const double dt,
+                                   const Scope& scope, Treelog& msg)
+{ 
+  
+  // Edges.
+  const size_t edge_size = geo.edge_size ();
+
+  std::vector<double> q (edge_size); // Water flux [cm].
+  std::vector<double> J (edge_size); // Flux delivered by flow.
+
+  if (J_above > 0)
+    msg.warning ("flux out ignored");
+
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      q[e] = soil_water.q_secondary (e);
+
+      if (J_above > 0)
+        J[e] = 0.0;             // Wrong direction.
+      else if (q[e] > 0.0)
+        J[e] = 0.0;             // Handled by primary flow.
+      else if (geo.edge_to (e) == Geometry::cell_above)
+        J[e] = J_above;         // Top edge.
+      else
+        J[e] = 0.0;             // Not a top edge.
+    }
+
+  // Cells.
+  const size_t cell_size = geo.cell_size ();
+
+  std::vector<double> Theta_old (cell_size); // Water content at start...
+  std::vector<double> Theta_new (cell_size); // ...and end of timestep.
+  std::vector<double> M (cell_size); // Content given to flow.
+  std::vector<double> S (cell_size); // Source given to flow.
+
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      Theta_old[c] = soil_water.Theta_secondary_old (c);
+      Theta_new[c] = soil_water.Theta_secondary (c);
+      const double source = solute.S_secondary (c);
+      M[c] = solute.C_secondary (c) * Theta_old[c];
+      if (Theta_new[c] > 0)
+        {
+          if (Theta_old[c] > 0)
+            // Secondary water fully active.
+            S[c] = source;
+          else if (source > 0.0)
+            // Fresh water and source.
+            S[c] = source;
+          else
+            // Fresh water and sink.
+            S[c] = 0.0;
+        }
+      else
+        // No secondary water at end of timestep.
+        S[c] = 0.0;
+      
+      // Put any remaining source in S_extra.
+      S_extra[c] += source - S[c];
+    }
+  
+  // Flow.
+  secondary_flow (geo, Theta_old, Theta_new, q, solute.name, 
+                  M, S, J, solute.C_below (), dt, msg);
+
+  // Negative content should be handled by primary transport.
+  std::vector<double> C (cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    if (Theta_new[c] > 1e-6 &&  M[c] > 0.0)
+      // Positive mass in positive water.
+      C[c] = M[c] / Theta_new[c];
+    else
+      // Otherwise, pass to primary transport.
+      {
+        S_extra[c] += M[c] / dt;
+        C[c] = 0.0;
+      }
+  solute.set_secondary (soil, soil_water, C, J);
+}
+
+void
+MovementRect::primary_transport (const Geometry& geo,
+                                 const Soil& soil, const SoilWater& soil_water,
+                                 const Msoltranrect& transport,
+                                 const double J_above, Chemical& solute, 
+                                 const std::vector<double>& S_extra,
+                                 const bool flux_below, const double dt,
+                                 const Scope& scope, Treelog& msg)
+{ 
+  
+  // Edges.
+  const size_t edge_size = geo.edge_size ();
+
+  std::vector<double> q (edge_size); // Water flux [cm].
+  std::vector<double> J (edge_size); // Flux delivered by flow.
+
+  if (J_above > 0)
+    msg.warning ("flux out ignored");
+
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      q[e] = soil_water.q_primary (e);
+
+      if (J_above > 0)
+        J[e] = 0.0;             // Wrong direction.
+      else if (soil_water.q_secondary (e) < 0.0)
+        J[e] = 0.0;             // Handled by secondary transport.
+      else if (geo.edge_to (e) == Geometry::cell_above)
+        J[e] = J_above;         // Top edge.
+      else
+        J[e] = 0.0;             // Not a top edge.
+    }
+
+  // Cells.
+  const size_t cell_size = geo.cell_size ();
+
+  std::vector<double> Theta_old (cell_size); // Water content at start...
+  std::vector<double> Theta_new (cell_size); // ...and end of timestep.
+  std::vector<double> C (cell_size); // Concentration given to flow.
+  std::vector<double> A (cell_size); // Sorbed mass not given to flow.
+  std::vector<double> S (cell_size); // Source given to flow.
+
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      Theta_old[c] = soil_water.Theta_primary_old (c);
+      Theta_new[c] = soil_water.Theta_primary (c);
+      C[c] = solute.C_primary (c);
+      const double M = solute.M_primary (c);
+      A[c] = M - C[c] * Theta_old[c];
+      S[c] = solute.S_primary (c) + S_extra[c];
+    }
+  
+  // Flow.
+  transport.flow (geo, soil, Theta_old, Theta_new, q, solute.name, 
+                  C, S, J, solute.C_below (), flux_below,
+                  solute.diffusion_coefficient (), 
+                  dt, msg);
+
+  // Update with new content.
+  std::vector<double> M (cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    M[c] = A[c] + C[c] * Theta_new[c];
+
+  solute.set_primary (soil, soil_water, M, J);
+}
+
 void
 MovementRect::solute (const Soil& soil, const SoilWater& soil_water,
-                      const double J_in, Chemical& chemical, 
+                      const double J_above, Chemical& chemical, 
 		      const bool flux_below, 
 		      const double dt,
                       const Scope& scope, Treelog& msg)
 {
+  const size_t cell_size = geo->cell_size ();
+  std::vector<double> S_extra (cell_size, 0.0);
+
+  // Fully adsorbed.
   if (chemical.adsorption ().full ())
     {
-      matrix_solid->solute (*geo, soil, soil_water, J_in, chemical,
-			    flux_below, dt, scope, msg);
+      Treelog::Open nest (msg, "solid " + matrix_solid->library_id ());
+      for (size_t c = 0; c < cell_size; c++)
+        S_extra[c] = chemical.S_secondary (c);
+      primary_transport (*geo, soil, soil_water, *matrix_solid, J_above,
+                         chemical, S_extra, flux_below, dt, scope, msg);
       return;
     }
+
+  // Secondary transport activated.
+  secondary_transport (*geo, soil, soil_water, J_above, 
+                       chemical, S_extra, flux_below, dt, scope, msg);
+
+  // Primary transport.
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
-      Treelog::Open nest (msg, matrix_solute[i]->name);
+      Treelog::Open nest (msg, "solute", i, matrix_solute[i]->library_id ());
       try
         {
-          matrix_solute[i]->solute (*geo, soil, soil_water, J_in, chemical, 
-                                    flux_below, dt, scope, msg);
+          primary_transport (*geo, soil, soil_water, *matrix_solute[i], J_above,
+                             chemical, S_extra, flux_below, dt, scope, msg);
           if (i > 0)
             msg.message ("Succeeded");
           return;
@@ -174,7 +487,7 @@ MovementRect::element (const Soil& soil, const SoilWater& soil_water,
 {
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
-      Treelog::Open nest (msg, matrix_solute[i]->name);
+      Treelog::Open nest (msg, "element", i, matrix_solute[i]->library_id ());
       try
         {
           matrix_solute[i]->element (*geo, soil, soil_water, element, 
@@ -331,24 +644,23 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       if (geo->edge_to (edge) == Geometry::cell_above)
 	{
 	  if (obey_surface)
-	    surface.accept_top (soil_water.q (edge) * dt, *geo, edge, dt, msg);
+	    surface.accept_top (soil_water.q_matrix (edge) * dt, 
+                                *geo, edge, dt, msg);
 	  else
 	    surface.accept_top (surface.q_top (*geo, edge),
                                 *geo, edge, dt, msg);
           surface.update_pond_average (*geo);
 	}
       if (geo->edge_from (edge) == Geometry::cell_below)
-        groundwater.accept_bottom ((soil_water.q (edge)
-                                    + soil_water.q_p (edge)) * dt,
+        groundwater.accept_bottom ((soil_water.q_matrix (edge)
+                                    + soil_water.q_tertiary (edge)) * dt,
                                    *geo, edge);
     }
 }
 
 void 
-MovementRect::output (Log& log) const
-{ 
-  output_list (matrix_solute, "matrix_solute", log, Msoltranrect::component);
-}
+MovementRect::output (Log&) const
+{ }
 
 bool
 MovementRect::check (Treelog& msg) const
@@ -356,7 +668,8 @@ MovementRect::check (Treelog& msg) const
   bool ok = true; 
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
-      Treelog::Open nest (msg, "matrix_solute", i, matrix_solute[i]->name);
+      Treelog::Open nest (msg, 
+                          "matrix_solute", i, matrix_solute[i]->library_id ());
       if (!matrix_solute[i]->check (*geo, msg))
         ok = false;
     }

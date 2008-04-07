@@ -64,25 +64,25 @@ public:
   // Soil content.
 public:
   virtual double C_below () const = 0; // Concentration in groundwater [g/cm^3]
-  virtual double C_mobile (size_t i) const = 0;
-  virtual double C_immobile (size_t i) const = 0;
-  virtual double M_immobile (size_t i) const = 0;
+  virtual double C_secondary (size_t i) const = 0;
+  virtual double C_primary (size_t i) const = 0;
+  virtual double M_primary (size_t i) const = 0;
   virtual double M_total (size_t i) const = 0;
   virtual double total_surface (const Geometry&, 
   				double from, double to) const = 0; // [g/cm^2]
-  virtual double S_mobile (size_t i) const = 0;
-  virtual double S_immobile (size_t i) const = 0;
+  virtual double S_secondary (size_t i) const = 0;
+  virtual double S_primary (size_t i) const = 0;
   virtual double S_p (size_t i) const = 0;
   
   // Transport.
 public:
   virtual void set_macro_flux (size_t e, double value) = 0;
-  virtual void set_matrix_flux (size_t e, double value) = 0;
-  virtual void set_uniform (const Soil& soil, const SoilWater& soil_water, 
-                            size_t c, double M_total) = 0;
-  virtual void set_mixed (const Soil& soil, const SoilWater& soil_water,
-                          size_t c, double M_total, double C_mobile) = 0;
-
+  virtual void set_primary (const Soil& soil, const SoilWater& soil_water,
+                            const std::vector<double>& M,
+                            const std::vector<double>& J) = 0;
+  virtual void set_secondary (const Soil& soil, const SoilWater& soil_water,
+                              const std::vector<double>& C,
+                              const std::vector<double>& J) = 0;
   // Sink.
 public:
   virtual void clear () = 0;

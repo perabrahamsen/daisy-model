@@ -1058,7 +1058,7 @@ CropSold::SoluteUptake (const Geometry& geo,
 
   for (int i = 0; i < size; i++)
     {
-      const double C_l = solute.C_mobile (i);
+      const double C_l = solute.C_secondary (i);
       const double Theta = soil_water.Theta_old (i);
       const double L = root_density[i];
       if (L > 0 && soil_water.h (i) <= 0.0)

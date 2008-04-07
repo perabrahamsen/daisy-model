@@ -58,12 +58,11 @@ RootSystem::potential_water_uptake (const double h_x,
 	  continue;
 	}
       const double h = h_x - (1 + Rxylem) * geo.z (i);
-      daisy_assert (soil_water.Theta_left (i, dt) >= 0.0);
       daisy_assert (soil_water.Theta_ice (soil, i, h_wp) 
                     >= soil.Theta_res (i));
       const double max_uptake
-	= std::max (0.0, (soil_water.Theta_left (i, dt) 
-		     - soil_water.Theta_ice (soil, i, h_wp)) / dt);
+	= std::max (0.0, (soil_water.Theta (i) 
+                          - soil_water.Theta_ice (soil, i, h_wp)) / dt);
       const double uptake
 	= bound (0.0, 
 		 (2 * M_PI * L[i]
@@ -73,8 +72,6 @@ RootSystem::potential_water_uptake (const double h_x,
 		  / (- 0.5 * log (area * L[i]))),
 		 max_uptake);
       daisy_assert (soil_water.h (i) > h_wp || iszero (uptake));
-      daisy_assert (soil_water.Theta_left (i, dt) - uptake * dt
-                    > soil.Theta_res (i));
       daisy_assert (L[i] >= 0.0);
       daisy_assert (soil_water.Theta_ice (soil, i, h) > 0.0);
       daisy_assert (soil_water.Theta_ice (soil, i, 0.0) > 0.0);
@@ -245,7 +242,7 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 
   for (int i = 0; i < size; i++)
     {
-      const double C_l = solute.C_mobile (i);
+      const double C_l = solute.C_secondary (i);
       const double Theta = soil_water.Theta_old (i);
       const double L = Density[i];
       if (L > 0 && soil_water.h (i) <= 0.0)

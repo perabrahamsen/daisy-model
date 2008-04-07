@@ -56,8 +56,8 @@ struct ReactionStandard : public Reaction
     std::vector<double> BM (cell_size);
     for (size_t i = 0; i < cell_size; i++)
       {
-	AM[i] = A.M_immobile (i);
-	BM[i] = B.M_immobile (i);
+	AM[i] = A.M_primary (i);
+	BM[i] = B.M_primary (i);
       }
     transform->tick (soil, soil_water, soil_heat, AM, BM, S_AB, msg);
     A.add_to_transform_sink (S_AB, dt);

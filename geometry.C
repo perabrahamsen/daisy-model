@@ -624,7 +624,7 @@ Geometry::build_common ()
 {
   // Cell edges.
   cell_edges_.insert (cell_edges_.end (), cell_pseudo_size (),
-                      std::vector<int> ());
+                      std::vector<size_t> ());
   for (size_t e = 0; e < edge_size (); e++)
     { 
       cell_edges_[cell_pseudo_number (edge_from (e))].push_back (e);

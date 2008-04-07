@@ -112,7 +112,7 @@ ReactionDenit::tick (const Geometry& geo,
       const double Theta = soil_water.Theta (i);
       const double Theta_sat = soil_water.Theta_ice (soil, i, 0.0);
       const double Theta_fraction = Theta / Theta_sat;
-      const double NO3 = soil_NO3.C_immobile (i) * Theta;
+      const double NO3 = soil_NO3.C_primary (i) * Theta;
       const double T = soil_heat.T (i);
       const double height = geo.z (i);
       const double T_factor = (heat_factor.size () < 1)

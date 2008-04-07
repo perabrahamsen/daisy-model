@@ -22,7 +22,6 @@
 #include "msoltranrect.h"
 #include "geometry.h"
 #include "soil.h"
-#include "soil_water.h"
 #include "adsorption.h"
 #include "alist.h"
 #include "submodeler.h"
@@ -34,13 +33,12 @@
 
 struct MsoltranrectConvection : public Msoltranrect
 {
-  // Log variables.
-  double ddt; //size of small timestep 
-
   // Solute.
   void flow (const Geometry& geo, 
              const Soil& soil, 
-             const SoilWater& soil_water, 
+             const std::vector<double>& Theta_old,
+             const std::vector<double>& Theta_new,
+             const std::vector<double>& q,
              const symbol name,
              std::vector<double>& C, 
              const std::vector<double>& S, 
@@ -48,8 +46,7 @@ struct MsoltranrectConvection : public Msoltranrect
 	     const double C_below,
 	     const bool flux_below,
              double diffusion_coefficient, double dt,
-             Treelog& msg);
-  void output (Log&) const;
+             Treelog& msg) const;
 
   // Create.
   static void load_syntax (Syntax& syntax, AttributeList& alist);
@@ -60,7 +57,9 @@ struct MsoltranrectConvection : public Msoltranrect
 void
 MsoltranrectConvection::flow (const Geometry& geo, 
                               const Soil& soil, 
-                              const SoilWater& soil_water, 
+                              const std::vector<double>& Theta_old,
+                              const std::vector<double>& Theta_new,
+                              const std::vector<double>& q,
                               const symbol name,
                               std::vector<double>& C, 
                               const std::vector<double>& S, 
@@ -69,7 +68,7 @@ MsoltranrectConvection::flow (const Geometry& geo,
                               const bool /* flux_below */,
                               double diffusion_coefficient,
                               const double dt,
-                              Treelog& msg)
+                              Treelog& msg) const
 {
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
@@ -83,7 +82,7 @@ MsoltranrectConvection::flow (const Geometry& geo,
   // Initial water content.
   std::vector<double> Theta (cell_size);
   for (size_t c = 0; c < cell_size; c++)
-    Theta[c] = soil_water.Theta_old (c);
+    Theta[c] = Theta_old[c];
 
   // Small timesteps.
   for (;;)
@@ -99,7 +98,7 @@ MsoltranrectConvection::flow (const Geometry& geo,
         break;
 
       // Find new timestep.
-      ddt = time_left;
+      double ddt = time_left;
   
       // Limit timestep based on source term.
       for (size_t c = 0; c < cell_size; c++)
@@ -114,17 +113,16 @@ MsoltranrectConvection::flow (const Geometry& geo,
             while (time_to_empty < 2.0 * ddt)
               ddt *= 0.5;
           }
-  
+
       // Limit timestep based on water flux.
       for (size_t e = 0; e < edge_size; e++)
         {
-          const double q = soil_water.q (e);
-          const int cell = (q < 0.0 ? geo.edge_to (e) : geo.edge_from (e));
+          const int cell = (q[e] > 0.0 ? geo.edge_to (e) : geo.edge_from (e));
           if (geo.cell_is_internal (cell))
             {
-              const double water = std::fabs (q) * geo.edge_area (e);
-              const double solute = water * C[cell];
-              const double time_to_empty = M[cell] / solute;
+              const double loss_rate = std::fabs (q[e]) * geo.edge_area (e);
+              const double content = Theta[cell] * geo.cell_volume (cell); 
+              const double time_to_empty = content / loss_rate;
               if (time_to_empty < min_timestep_factor * dt)
                 // Unreasonable small time step.  Give up.
                 continue;
@@ -145,8 +143,7 @@ MsoltranrectConvection::flow (const Geometry& geo,
         {
           const int edge_from = geo.edge_from (e);
           const int edge_to = geo.edge_to (e);
-          const double q = soil_water.q (e);
-          const bool in_flux = q > 0.0;
+          const bool in_flux = q[e] > 0.0;
           const int flux_from = in_flux ? edge_from : edge_to;
           double C_flux_from;
           switch (flux_from)
@@ -170,7 +167,7 @@ MsoltranrectConvection::flow (const Geometry& geo,
             }
 
           // Convection.
-          dJ[e] = q * C_flux_from;
+          dJ[e] = q[e] * C_flux_from;
         }
 
       // Update values for fluxes.
@@ -194,8 +191,7 @@ MsoltranrectConvection::flow (const Geometry& geo,
 
       // Interpolate Theta.
       for (size_t c = 0; c < cell_size; c++)
-        Theta[c] = time_left * soil_water.Theta_old (c) 
-          + (1.0 - time_left) * soil_water.Theta (c);
+        Theta[c] = time_left * Theta_old[c] + (1.0 - time_left) * Theta_new[c];
 
       // Update C.
       for (size_t c = 0; c < cell_size; c++)
@@ -203,13 +199,8 @@ MsoltranrectConvection::flow (const Geometry& geo,
     }
 }
 
-void 
-MsoltranrectConvection::output (Log& log) const
-{ output_variable (ddt, log); }
-
 MsoltranrectConvection::MsoltranrectConvection (Block& al)
-  : Msoltranrect (al),
-    ddt (-42.42e42)
+  : Msoltranrect (al)
 { }
 
 MsoltranrectConvection::~MsoltranrectConvection ()
@@ -217,12 +208,7 @@ MsoltranrectConvection::~MsoltranrectConvection ()
 
 void 
 MsoltranrectConvection::load_syntax (Syntax& syntax, AttributeList&)
-{ 
-  syntax.add ("ddt", "h", Syntax::LogOnly, "Small timestep.\n\
-Note that this changes dynamically during a large timestep, the value\n\
-logged corresponds to the size of last small timestep during the large\n\
-timestep.");
-}
+{ }
 
 const AttributeList& 
 Msoltranrect::reserve_model ()

@@ -39,8 +39,8 @@ DOE::output (Log& log) const
   output_variable (S, log);
   output_variable (S_p, log);
   output_variable (S_drain, log);
-  output_variable (J, log);
-  output_variable (J_p, log);
+  output_variable (J_matrix, log);
+  output_variable (J_tertiary, log);
 }
 
 void 
@@ -68,7 +68,7 @@ DOE::tick (const size_t cell_size, const SoilWater& soil_water, const double dt)
 {
   // Initialize.
   fill (S_p.begin (), S_p.end (), 0.0);
-  fill (J_p.begin (), J_p.end (), 0.0);
+  fill (J_tertiary.begin (), J_tertiary.end (), 0.0);
 
   daisy_assert (S_drain.size () >= cell_size);
   daisy_assert (S.size () >= cell_size);
@@ -100,10 +100,10 @@ A single element in a Dissolved Organic Matter pool.");
 	      "Source term (macropore transport only).");
   syntax.add ("S_drain", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term (soil drainage only).");
-  syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("J_matrix", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Transportation in matrix (positive up).");
-  syntax.add ("J_p", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Transportation in macropores (positive up).");
+  syntax.add ("J_tertiary", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Transportation outside matrix (positive up).");
 }
 
 void 
@@ -125,8 +125,8 @@ DOE::initialize (const Geometry& geo,
   S.insert (S.begin (), cell_size, 0.0);
   S_p.insert (S_p.begin (), cell_size, 0.0);
   S_drain.insert (S_drain.begin (), cell_size, 0.0);
-  J.insert (J_p.begin (), edge_size, 0.0);
-  J_p.insert (J_p.begin (), edge_size, 0.0);
+  J_matrix.insert (J_matrix.begin (), edge_size, 0.0);
+  J_tertiary.insert (J_tertiary.begin (), edge_size, 0.0);
 }
 
 DOE::DOE (const AttributeList& al)

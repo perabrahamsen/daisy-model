@@ -40,8 +40,8 @@ public:
   std::vector<double> S;        // Combined source term.
   std::vector<double> S_p;      // Source term for macropores only.
   std::vector<double> S_drain;	// Source term for soil drainage only.
-  std::vector<double> J;        // Solute transport log in matrix.
-  std::vector<double> J_p;      // Solute transport log in macropores.
+  std::vector<double> J_matrix;        // Solute transport log in matrix.
+  std::vector<double> J_tertiary;      // Solute transport log in macropores.
 
   // Simulation.
 public:

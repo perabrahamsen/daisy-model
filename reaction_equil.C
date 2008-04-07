@@ -65,8 +65,8 @@ struct ReactionEquilibrium : public Reaction
     for (size_t c = 0; c < cell_size; c++)
       { 
 	scope.set_cell (c);
-	const double has_A = A.M_immobile (c);
-	const double has_B = B.M_immobile (c);
+	const double has_A = A.M_primary (c);
+	const double has_B = B.M_primary (c);
 	double want_A;
 	double want_B;
 	equilibrium->find (scope, has_A, has_B, want_A, want_B,

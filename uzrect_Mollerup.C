@@ -181,7 +181,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   ublas::vector<double> Kedge (edge_size); // edge (inter cell) conductivity
   ublas::vector<double> h_lysimeter (cell_size);
   std::vector<bool> active_lysimeter (cell_size);
-  const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
   ublas::vector<double> remaining_water (edge_above_size);
   for (size_t i = 0; i < edge_above_size; i++)
@@ -577,13 +577,14 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 			       ublas::vector<double>& Gm, 
 			       ublas::vector<double>& B, Treelog& msg)
 {
-  const std::vector<int>& edge_below = geo.cell_edges (Geometry::cell_below);
+  const std::vector<size_t>& edge_below = geo.cell_edges (Geometry::cell_below);
   const size_t edge_below_size = edge_below.size ();
 
   for (size_t i = 0; i < edge_below_size; i++)
     {
-      const int edge = edge_below[i];
+      const size_t edge = edge_below[i];
       const int cell = geo.edge_other (edge, Geometry::cell_below);
+      daisy_assert (geo.cell_is_internal (cell));
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       daisy_assert (in_sign > 0);
@@ -707,13 +708,14 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 			       const int debug,
                                Treelog& msg)
 {
-  const std::vector<int>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
 
   for (size_t i = 0; i < edge_above_size; i++)
     {
-      const int edge = edge_above[i];
+      const size_t edge = edge_above[i];
       const int cell = geo.edge_other (edge, Geometry::cell_above);
+      daisy_assert (geo.cell_is_internal (cell));
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       daisy_assert (in_sign < 0);
@@ -813,7 +815,7 @@ UZRectMollerup::drain (const GeometryRect& geo,
       const size_t cell = drain_cell[d];
 
       // Guestimate pressure in cell from surrounding cells.
-      const std::vector<int>& edges = geo.cell_edges (cell);
+      const std::vector<size_t>& edges = geo.cell_edges (cell);
       const size_t edge_size = edges.size ();
       const double z_drain = geo.z (cell);      
       double h_sum = h (cell);

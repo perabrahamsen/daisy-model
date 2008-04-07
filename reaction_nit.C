@@ -85,8 +85,8 @@ ReactionNitrification::tick (const Geometry& geo,
     {
       if (active[i])
         soil.nitrification (i, 
-                            soil_NH4.M_immobile (i), 
-			    soil_NH4.C_immobile (i), 
+                            soil_NH4.M_primary (i), 
+			    soil_NH4.C_primary (i), 
                             soil_water.h (i), soil_heat.T (i),
                             NH4[i], N2O[i], NO3[i], dt);
       else

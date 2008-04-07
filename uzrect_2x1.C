@@ -106,7 +106,7 @@ UZRect2x1::tick (const GeometryRect& geo, std::vector<size_t>&,
                     soil_water.S_sum_, soil_water.h_old_, 
                     soil_water.Theta_old_,
                     soil_water.h_ice_, soil_water.h_, soil_water.Theta_,
-                    col, soil_water.q_, soil_water.q_p_,
+                    col, soil_water.q_matrix_, soil_water.q_tertiary_,
                     dt, msg);
    }
 

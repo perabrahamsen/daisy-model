@@ -74,14 +74,15 @@ struct GroundwaterAquitard : public Groundwater
     set_h_aquifer (geo);
 
     // Deep percolation.
-    const std::vector<int>& bottom_edges 
+    const std::vector<size_t>& bottom_edges 
       = geo.cell_edges (Geometry::cell_below);
     const size_t bottom_edges_size = bottom_edges.size ();
 
     for (size_t i = 0; i < bottom_edges_size; i++)
       {
-        const int edge = bottom_edges[i];
+        const size_t edge = bottom_edges[i];
         const int cell = geo.edge_other (edge, Geometry::cell_below);
+        daisy_assert (geo.cell_is_internal (cell));
         const double in_sign = (geo.edge_to (edge) == cell) ? 1.0 : -1.0;
 
         // Multiplied with 2 because it is a boundary cell...

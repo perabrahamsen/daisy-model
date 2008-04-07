@@ -622,7 +622,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                   surface, *groundwater, time, my_weather, dt, msg);
   soil_heat->tick (geometry, *soil, *soil_water, *movement, 
 		   surface, dt, msg);
-  soil_water->tick_after (geometry.cell_size (), *soil, *soil_heat, msg);
+  soil_water->tick_after (geometry, *soil, *soil_heat, false, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
   chemistry->tick_soil (geometry, 
                         surface.ponding (), surface.mixing_resistance (),
@@ -900,7 +900,6 @@ ColumnStandard::initialize (Block& block,
   vegetation->initialize (time, geometry, *soil, *organic_matter, msg);
   
   // Soil conductivity and capacity logs.
-  soil_water->tick_after (geometry.cell_size (), *soil, *soil_heat, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
 }
 

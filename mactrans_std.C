@@ -64,8 +64,8 @@ MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,
       const double dz = geo.dz (i);
 
       // Amount of water entering this layer through macropores.
-      const double water_in_above = -soil_water.q_p (i); // [cm]
-      const double water_out_below = -soil_water.q_p (i+1); // [cm]
+      const double water_in_above = -soil_water.q_tertiary (i); // [cm]
+      const double water_out_below = -soil_water.q_tertiary (i+1); // [cm]
       const double delta_water = water_in_above - water_out_below; // [cm]
       
       // Amount of matter entering this layer through macropores.

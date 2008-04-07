@@ -40,7 +40,7 @@ class Treelog;
 class Block;
 class Scope;
 
-class Msoltranrect : public ModelAListed
+class Msoltranrect : public Model
 {
   // Content.
 public:
@@ -49,15 +49,13 @@ public:
 
   // Simulation.
 public:
-  void solute (const Geometry&, const Soil&, const SoilWater&,
-               const double J_in, Chemical&, const bool flux_below,
-	       double dt, const Scope&, Treelog& msg);
   void element (const Geometry&, const Soil&, const SoilWater&,
                 DOE&, const double diffusion_coefficient, double dt, Treelog&);
-private:
   virtual void flow (const Geometry& geo, 
                      const Soil& soil, 
-                     const SoilWater& soil_water, 
+                     const std::vector<double>& Theta_old,
+                     const std::vector<double>& Theta_new,
+                     const std::vector<double>& q,
                      symbol name,
                      std::vector<double>& C, 
                      const std::vector<double>& S, 
@@ -65,9 +63,7 @@ private:
 		     const double C_below,
 		     const bool flux_below,
                      double diffusion_coefficient, double dt,
-                     Treelog& msg) = 0;
-public:
-  virtual void output (Log&) const = 0;
+                     Treelog& msg) const = 0;
 
   // Create and Destroy.
 public:
