@@ -947,7 +947,7 @@ Scope to evaluate expessions in.");
     syntax.add_object ("Movement", Movement::component,
                        Syntax::State, Syntax::Singleton, "\
 Discretization and movement of water, heat and solutes in the soil.");
-    // alist.add ("Movement", Movement::default_model ());
+    alist.add ("Movement", Movement::default_model ());
     syntax.add_object ("weather", Weather::component,
                        Syntax::OptionalState, Syntax::Singleton,
                        "Weather model for providing climate information during\n\

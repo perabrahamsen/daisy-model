@@ -1,5 +1,23 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* secondary flow
+
+** 1D
+
+*** re-enable tertiary transport
+
+** solute
+
+*** obey mobsol.alpha
+
+*** Choose "Hansen" or "Molleup" according to geometry.
+
+** msoltransrect
+
+*** port "cd Hansen" from transport
+
+*** rename to transport or msoltrans
+
 * alpha
 
       

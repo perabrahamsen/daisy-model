@@ -126,8 +126,11 @@ public:
 
   // Modify.
 public:
-  void set_content (size_t i, double h, double Theta);
-  void set_flux (size_t i, double q);
+  void set_content (size_t cell, double h, double Theta);
+  void set_flux (size_t edge, double q);
+  void set_matrix (const std::vector<double>& h,
+                   const std::vector<double>& Theta,
+                   const std::vector<double>& q);
   void set_tertiary (const std::vector<double>& S_p, 
                      const std::vector<double>& q_p);
 

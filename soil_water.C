@@ -97,12 +97,25 @@ SoilWater::set_content (const size_t i, const double h, const double Theta)
   daisy_assert (i < Theta_.size ());
   Theta_[i] = Theta;
 }
-
+ 
 void
 SoilWater::set_flux (const size_t i, const double q)
 {
   daisy_assert (i < q_matrix_.size ());
   q_matrix_[i] = q;
+}
+
+void 
+SoilWater::set_matrix (const std::vector<double>& h,
+                       const std::vector<double>& Theta,
+                       const std::vector<double>& q)
+{
+  daisy_assert (h_.size () == h.size ());
+  h_ = h;
+  daisy_assert (Theta_.size () == Theta.size ());
+  Theta_ = Theta;
+  daisy_assert (q_matrix_.size () == q.size ());
+  q_matrix_ = q;
 }
 
 void 

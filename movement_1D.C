@@ -1,6 +1,6 @@
 // movement_1D.C --- Movement in a 1D system.
 // 
-// Copyright 2006 Per Abrahamsen and KVL.
+// Copyright 2006, 2008 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #define BUILD_DLL
-#include "movement.h"
+#include "movement_solute.h"
 #include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"
@@ -41,14 +41,14 @@
 
 static const double rho_water = 1.0; // [g/cm^3]
 
-struct Movement1D : public Movement
+struct Movement1D : public MovementSolute
 {
   // Geometry.
   std::auto_ptr<Geometry1D> geo;
   Geometry& geometry () const;
 
   // Water.
-  const std::vector<UZmodel*> matrix_water;
+  const auto_vector<UZmodel*> matrix_water;
   std::auto_ptr<Macro> macro;
   void macro_tick (const Soil&, SoilWater&,
                    Surface&, const double dt, Treelog&);
@@ -66,32 +66,7 @@ struct Movement1D : public Movement
                    double dt, Treelog& msg);
 
   // Solute.
-  const std::vector<Transport*> matrix_solute;
-  std::auto_ptr<Transport> transport_solid; // Pseudo transport for non-solutes
   std::auto_ptr<Mactrans> mactrans; // Solute transport model in macropores.
-  void solute (const Soil& soil, 
-               const SoilWater& soil_water, 
-               const double J_in, Chemical&, 
-	       const bool flux_below, 
-               const double dt, const Scope&, Treelog& msg);
-  void element (const Soil& soil, 
-                const SoilWater& soil_water, 
-                DOE& element,
-                double diffusion_coefficient,
-                double dt,
-                Treelog& msg);
-  void flow (const Soil&, const SoilWater&, const Adsorption&,
-             symbol name,
-             std::vector<double>& M, 
-             std::vector<double>& C, 
-             std::vector<double>& S, 
-             std::vector<double>& S_p, 
-             std::vector<double>& J, 
-             std::vector<double>& J_p, 
-	     double C_below,
-             double diffusion_coefficient,
-             double dt,
-             Treelog& msg) const;
 
   // Heat.
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
@@ -139,7 +114,7 @@ struct Movement1D : public Movement
              Surface& surface, Groundwater& groundwater,
              const Time& time, const Weather& weather, double dt, 
              Treelog& msg);
-   void output (Log&) const;
+  void output (Log&) const;
 
   // Create.
   bool check (Treelog& err) const;
@@ -274,6 +249,7 @@ Movement1D::tick_water (const Geometry1D& geo,
   throw "Water matrix transport failed"; 
 }
 
+#if 0
 void 
 Movement1D::solute (const Soil& soil, 
                     const SoilWater& soil_water, 
@@ -428,6 +404,7 @@ Movement1D::flow (const Soil& soil, const SoilWater& soil_water,
       msg.error (tmp.str ());
     }
 }
+#endif
 
 double 
 Movement1D::surface_snow_T (const Soil& soil,
@@ -604,15 +581,45 @@ Movement1D::tick (const Soil& soil, SoilWater& soil_water,
                   const Time& time, const Weather& weather, 
                   const double dt, Treelog& msg) 
 {
+  const size_t edge_size = geo->edge_size ();
+  const size_t cell_size = geo->cell_size ();
+
   Treelog::Open nest (msg, "Movement: " + name.name ());
 
   T_bottom = bottom_heat (time, weather);
-  soil_water.tick (geo->cell_size (), soil, dt, msg);
+  soil_water.tick (cell_size, soil, dt, msg);
+
+  // Cells.
+  std::vector<double> S_sum (cell_size);
+  std::vector<double> h_old (cell_size);
+  std::vector<double> Theta_old (cell_size);
+  std::vector<double> h_ice (cell_size);
+  std::vector<double> h (cell_size);
+  std::vector<double> Theta (cell_size);
+  
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      S_sum[c] = soil_water.S_sum (c);
+      h_old[c] = soil_water.h_old (c);
+      Theta_old[c] = soil_water.Theta_old (c);
+      h_ice[c] = soil_water.h_ice (c);
+      h[c] = soil_water.h (c);
+      Theta[c] = soil_water.Theta (c);
+    }
+
+  // Edges.
+  std::vector<double> q (edge_size, 0.0);
+  std::vector<double> q_p (edge_size, 0.0);
+
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      q[e] = soil_water.q_matrix (e);
+      q_p[e] = soil_water.q_tertiary (e);
+    }
   tick_water (*geo, soil, soil_heat, surface, groundwater, 
-              soil_water.S_sum_, soil_water.h_old_, soil_water.Theta_old_,
-              soil_water.h_ice_, soil_water.h_, soil_water.Theta_,
-              soil_water.q_, soil_water.q_p_,
-              dt, msg);
+              S_sum, h_old, Theta_old, h_ice, h, Theta,
+              q, q_p, dt, msg);
+  soil_water.set_matrix (h, Theta, q);
 }
 
 void 
@@ -620,8 +627,8 @@ Movement1D::output (Log&) const
 { }
 
 bool
-Movement1D::check (Treelog&) const
-{ return true; }
+Movement1D::check (Treelog& msg) const
+{ return check_solute (msg); }
 
 void 
 Movement1D::initialize (const Soil& soil, const Groundwater& groundwater,
@@ -662,66 +669,45 @@ Movement1D::initialize (const Soil& soil, const Groundwater& groundwater,
 }
 
 Movement1D::Movement1D (Block& al)
-  : Movement (al),
+  : MovementSolute (al),
     geo (submodel<Geometry1D> (al, "Geometry")),
     matrix_water (Librarian::build_vector<UZmodel> (al, "matrix_water")),
     macro (al.check ("macro")
 	   ? Librarian::build_item<Macro> (al, "macro")
 	   : NULL), 
-    matrix_solute (Librarian::build_vector<Transport> (al, "matrix_solute")),
-    transport_solid (Librarian::build_item<Transport> (al, "transport_solid")),
     mactrans  (Librarian::build_item<Mactrans> (al, "mactrans")),
     T_bottom (-42.42e42)
 { }
 
 Movement1D::~Movement1D ()
-{
-  sequence_delete (matrix_water.begin (), matrix_water.end ()); 
-  sequence_delete (matrix_solute.begin (), matrix_solute.end ()); 
-}
+{ }
 
 void 
 Movement::load_vertical (Syntax& syntax, AttributeList& alist)
 {
-   syntax.add_submodule ("Geometry", alist, Syntax::State,
-                         "Discretization of the soil.",
-                         Geometry1D::load_syntax);
-   syntax.add_object ("matrix_water", UZmodel::component, 
-                      Syntax::Const, Syntax::Sequence,
-                      "Vertical matrix water transport models.\n\
+  MovementSolute::load_solute (syntax, alist);
+  syntax.add_submodule ("Geometry", alist, Syntax::State,
+                        "Discretization of the soil.",
+                        Geometry1D::load_syntax);
+  syntax.add_object ("matrix_water", UZmodel::component, 
+                     Syntax::Const, Syntax::Sequence,
+                     "Vertical matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-   std::vector<const AttributeList*> vertical_models;
-   AttributeList vertical_default (UZmodel::default_model ());
-   vertical_models.push_back (&vertical_default);
-   AttributeList vertical_reserve (UZmodel::reserve_model ());
-   vertical_models.push_back (&vertical_reserve);
-   alist.add ("matrix_water", vertical_models);
-   syntax.add_object ("matrix_solute", Transport::component, 
-                      Syntax::Const, Syntax::Sequence,
-                      "Vertical matrix solute transport models.\n\
-Each model will be tried in turn, until one succeeds.\n\
-If none succeeds, the simulation ends.");
-   std::vector<const AttributeList*> transport_models;
-   AttributeList transport_default (Transport::default_model ());
-   transport_models.push_back (&transport_default);
-   AttributeList transport_reserve (Transport::reserve_model ());
-   transport_models.push_back (&transport_reserve);
-   AttributeList transport_last_resort (Transport::none_model ());
-   transport_models.push_back (&transport_last_resort);
-   alist.add ("matrix_solute", transport_models);
-   syntax.add_object ("transport_solid", Transport::component,
-                      "Transport model for non-dissolvable chemicals.\n\
-Should be 'none'.");
-   alist.add ("transport_solid", Transport::none_model ());
-   syntax.add_object ("macro", Macro::component,
-                      Syntax::OptionalState, Syntax::Singleton,
-                      "Preferential flow model.\n\
+  std::vector<const AttributeList*> vertical_models;
+  AttributeList vertical_default (UZmodel::default_model ());
+  vertical_models.push_back (&vertical_default);
+  AttributeList vertical_reserve (UZmodel::reserve_model ());
+  vertical_models.push_back (&vertical_reserve);
+  alist.add ("matrix_water", vertical_models);
+  syntax.add_object ("macro", Macro::component,
+                     Syntax::OptionalState, Syntax::Singleton,
+                     "Preferential flow model.\n\
 By default, preferential flow is enabled if and only if the combined\n\
 amount of humus and clay in the top horizon is above 5%.");
-   syntax.add_object ("mactrans", Mactrans::component, 
-                      "Solute transport model in macropores.");
-   alist.add ("mactrans", Mactrans::default_model ());
+  syntax.add_object ("mactrans", Mactrans::component, 
+                     "Solute transport model in macropores.");
+  alist.add ("mactrans", Mactrans::default_model ());
 }
 
 const AttributeList& 

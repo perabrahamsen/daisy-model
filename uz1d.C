@@ -66,7 +66,6 @@ SMM1D::update (const std::vector<double>& h,
     }
 }
 
-
 static std::vector<double>
 calculate_edge_distance (const GeometryRect& geo, 
                          const std::vector<size_t>& cells)

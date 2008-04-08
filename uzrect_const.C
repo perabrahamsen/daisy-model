@@ -59,11 +59,11 @@ struct UZRectConst : public UZRect
 
 void 
 UZRectConst::tick (const GeometryRect& geo, std::vector<size_t>&,
-		      const Soil&, 
-                      SoilWater& soil_water, const SoilHeat&,
-                      const Surface&, const Groundwater&,
-                      const double,
-                      Treelog&)
+                   const Soil&, 
+                   SoilWater& soil_water, const SoilHeat&,
+                   const Surface&, const Groundwater&,
+                   const double,
+                   Treelog&)
 
 {
   const size_t edge_size = geo.edge_size (); // number of edges 

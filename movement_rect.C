@@ -1,6 +1,6 @@
 // movement_rect.C --- Movement in a rectangular 2D grid.
 // 
-// Copyright 2006 Per Abrahamsen and KVL.
+// Copyright 2006, 2008 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -356,3 +356,5 @@ Heat transport model.");
                          alist, syntax, &make);
   }
 } MovementRect_syntax;
+
+// movement_rect.C ends here.

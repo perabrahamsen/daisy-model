@@ -1020,7 +1020,7 @@ The total amount of water in the soil interval")
                      (spec chemical default M))
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" M_error)
-                     (tag "Content")
+                     (tag "Error")
                      (dimension "g/ha")
                      (spec chemical default M_error))))
 

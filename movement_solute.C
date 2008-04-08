@@ -416,8 +416,10 @@ MovementSolute::load_solute (Syntax& syntax, AttributeList& alist)
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
     std::vector<const AttributeList*> matrix_solute_models;
+#if 0 // Need to distinguish between 1D & 2D
     AttributeList matrix_solute_default (Msoltranrect::default_model ());
     matrix_solute_models.push_back (&matrix_solute_default);
+#endif
     AttributeList matrix_solute_reserve (Msoltranrect::reserve_model ());
     matrix_solute_models.push_back (&matrix_solute_reserve);
     AttributeList matrix_solute_none (Msoltranrect::none_model ());
