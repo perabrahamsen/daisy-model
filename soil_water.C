@@ -105,6 +105,18 @@ SoilWater::set_flux (const size_t i, const double q)
   q_matrix_[i] = q;
 }
 
+void 
+SoilWater::set_tertiary (const std::vector<double>& S_p, 
+                         const std::vector<double>& q_p)
+{
+  const size_t cell_size = S_p.size ();
+  daisy_assert (S_sum_.size () == cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    S_sum_[c] += S_p[c];
+  S_p_ = S_p;
+  q_tertiary_ = q_p;
+}
+
 void
 SoilWater::tick (const size_t cell_size, const Soil& soil, 
                  const double dt, Treelog& msg)

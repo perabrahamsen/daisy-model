@@ -38,7 +38,6 @@ class Block;
 
 class SoilWater
 {
-  friend class Movement1D;
   friend class UZRect2x1;
 
   // Types.
@@ -129,6 +128,8 @@ public:
 public:
   void set_content (size_t i, double h, double Theta);
   void set_flux (size_t i, double q);
+  void set_tertiary (const std::vector<double>& S_p, 
+                     const std::vector<double>& q_p);
 
   // Simulation.
 public:

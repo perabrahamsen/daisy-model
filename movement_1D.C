@@ -50,8 +50,8 @@ struct Movement1D : public Movement
   // Water.
   const std::vector<UZmodel*> matrix_water;
   std::auto_ptr<Macro> macro;
-  void macro_tick (const Soil& soil, SoilWater& soil_water,
-                   Surface& surface, const double dt, Treelog& msg);
+  void macro_tick (const Soil&, SoilWater&,
+                   Surface&, const double dt, Treelog&);
   void tick_water (const Geometry1D& geo,
                    const Soil& soil, const SoilHeat& soil_heat, 
                    Surface& surface, Groundwater& groundwater,
@@ -161,12 +161,30 @@ Movement1D::macro_tick (const Soil& soil, SoilWater& soil_water,
   if (!macro.get ())			// No macropores.
     return;
 
-  // Calculate preferential flow first.
-  std::fill (soil_water.S_p_.begin (), soil_water.S_p_.end (), 0.0);
-  std::fill (soil_water.q_p_.begin (), soil_water.q_p_.end (), 0.0);
+  // Edges.
+  const size_t edge_size = geo->edge_size ();
+  std::vector<double> q_p (edge_size, 0.0);
+
+  // Cells.
+  const size_t cell_size = geo->cell_size ();
+  std::vector<double> S_p (cell_size, 0.0);
+  std::vector<double> h_ice (cell_size);
+  std::vector<double> h (cell_size);
+  std::vector<double> Theta (cell_size);
+  std::vector<double> S_sum (cell_size);
+  
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      h_ice[c] = soil_water.h_ice (c);
+      h[c] = soil_water.h (c);
+      Theta[c] = soil_water.Theta (c);
+      S_sum[c] = soil_water.S_sum (c);
+    }
+
+  // Calculate and update.
   macro->tick (*geo, soil, 0, soil.size () - 1, surface, 
-               soil_water.h_ice_, soil_water.h_, soil_water.Theta_,
-               soil_water.S_sum_, soil_water.S_p_, soil_water.q_p_, dt, msg);
+               h_ice, h, Theta, S_sum, S_p, q_p, dt, msg);
+  soil_water.set_tertiary (S_p, q_p);
 }
 
 void 
@@ -739,3 +757,5 @@ static struct Movement1DSyntax
     Librarian::add_type (Movement::component, "vertical", alist, syntax, &make);
   }
 } Movement1D_syntax;
+
+// movement_1D.C ends here.
