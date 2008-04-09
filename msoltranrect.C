@@ -1,4 +1,4 @@
-// msoltranrect.C -- Matrix solute transport in rectangular grid.
+// msoltranrect.C -- Solute transport in primary domain.
 // 
 // Copyright 2006, 2008 Per Abrahamsen and KVL.
 //
@@ -84,6 +84,6 @@ Msoltranrect::~Msoltranrect ()
 { }
 
 static Librarian Msoltranrect_init (Msoltranrect::component, "\
-Matrix solute transport in rectangular grid.");
+Solute transport in primary domain.");
 
 // msoltranrect.C ends here

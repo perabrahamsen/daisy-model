@@ -30,16 +30,16 @@
 
 void 
 MovementSolute::secondary_flow (const Geometry& geo, 
-                              const std::vector<double>& Theta_old,
-                              const std::vector<double>& Theta_new,
-                              const std::vector<double>& q,
-                              const symbol name,
-                              std::vector<double>& M, 
-                              const std::vector<double>& S, 
-                              std::vector<double>& J_sum, 
-                              const double C_below,
-                              const double dt,
-                              Treelog& msg)
+                                const std::vector<double>& Theta_old,
+                                const std::vector<double>& Theta_new,
+                                const std::vector<double>& q,
+                                const symbol name,
+                                std::vector<double>& M, 
+                                const std::vector<double>& S, 
+                                std::vector<double>& J_sum, 
+                                const double C_below,
+                                const double dt,
+                                Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
@@ -154,12 +154,12 @@ MovementSolute::secondary_flow (const Geometry& geo,
 
 void
 MovementSolute::secondary_transport (const Geometry& geo,
-                                   const Soil& soil,
-                                   const SoilWater& soil_water,
-                                   const double J_above, Chemical& solute, 
-                                   std::vector<double>& S_extra,
-                                   const bool flux_below, const double dt,
-                                   const Scope& scope, Treelog& msg)
+                                     const Soil& soil,
+                                     const SoilWater& soil_water,
+                                     const double J_above, Chemical& solute, 
+                                     std::vector<double>& S_extra,
+                                     const bool flux_below, const double dt,
+                                     const Scope& scope, Treelog& msg)
 { 
   
   // Edges.
@@ -177,7 +177,7 @@ MovementSolute::secondary_transport (const Geometry& geo,
 
       if (J_above > 0)
         J[e] = 0.0;             // Wrong direction.
-      else if (q[e] > 0.0)
+      else if (q[e] >= 0.0)
         J[e] = 0.0;             // Handled by primary flow.
       else if (geo.edge_to (e) == Geometry::cell_above)
         J[e] = J_above;         // Top edge.
@@ -240,12 +240,12 @@ MovementSolute::secondary_transport (const Geometry& geo,
 
 void
 MovementSolute::primary_transport (const Geometry& geo,
-                                 const Soil& soil, const SoilWater& soil_water,
-                                 const Msoltranrect& transport,
-                                 const double J_above, Chemical& solute, 
-                                 const std::vector<double>& S_extra,
-                                 const bool flux_below, const double dt,
-                                 const Scope& scope, Treelog& msg)
+                                   const Soil& soil, const SoilWater& soil_water,
+                                   const Msoltranrect& transport,
+                                   const double J_above, Chemical& solute, 
+                                   const std::vector<double>& S_extra,
+                                   const bool flux_below, const double dt,
+                                   const Scope& scope, Treelog& msg)
 { 
   
   // Edges.
@@ -356,9 +356,9 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
 
 void 
 MovementSolute::element (const Soil& soil, const SoilWater& soil_water,
-                       DOE& element, 
-                       const double diffusion_coefficient, double dt, 
-                       Treelog& msg)
+                         DOE& element, 
+                         const double diffusion_coefficient, double dt, 
+                         Treelog& msg)
 {
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
@@ -410,26 +410,26 @@ MovementSolute::MovementSolute (Block& al)
 void
 MovementSolute::load_solute (Syntax& syntax, AttributeList& alist)
 {
-    syntax.add_object ("matrix_solute", Msoltranrect::component, 
-                       Syntax::State, Syntax::Sequence,
-                       "Matrix solute transport models.\n\
+  syntax.add_object ("matrix_solute", Msoltranrect::component, 
+                     Syntax::State, Syntax::Sequence,
+                     "Matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-    std::vector<const AttributeList*> matrix_solute_models;
+  std::vector<const AttributeList*> matrix_solute_models;
 #if 0 // Need to distinguish between 1D & 2D
-    AttributeList matrix_solute_default (Msoltranrect::default_model ());
-    matrix_solute_models.push_back (&matrix_solute_default);
+  AttributeList matrix_solute_default (Msoltranrect::default_model ());
+  matrix_solute_models.push_back (&matrix_solute_default);
 #endif
-    AttributeList matrix_solute_reserve (Msoltranrect::reserve_model ());
-    matrix_solute_models.push_back (&matrix_solute_reserve);
-    AttributeList matrix_solute_none (Msoltranrect::none_model ());
-    matrix_solute_models.push_back (&matrix_solute_none);
-    alist.add ("matrix_solute", matrix_solute_models);
+  AttributeList matrix_solute_reserve (Msoltranrect::reserve_model ());
+  matrix_solute_models.push_back (&matrix_solute_reserve);
+  AttributeList matrix_solute_none (Msoltranrect::none_model ());
+  matrix_solute_models.push_back (&matrix_solute_none);
+  alist.add ("matrix_solute", matrix_solute_models);
 
-    syntax.add_object ("matrix_solid", Msoltranrect::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+  syntax.add_object ("matrix_solid", Msoltranrect::component, 
+                     Syntax::Const, Syntax::Singleton, "\
 Matrix solute transport model used for fully sorbed constituents.");
-    alist.add ("matrix_solid", Msoltranrect::none_model ());
+  alist.add ("matrix_solid", Msoltranrect::none_model ());
 }
 
 // movement_solute.C ends here.

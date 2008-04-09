@@ -1,4 +1,4 @@
-// msoltranrect.h -- Matrix solute transport in rectangular grid.
+// msoltranrect.h -- Solute transport in primary domain.
 // 
 // Copyright 2006 Per Abrahamsen and KVL.
 //
