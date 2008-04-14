@@ -24,6 +24,7 @@
 
 #include "model.h"
 #include <vector>
+#include <map>
 
 class Log;
 class Geometry;
@@ -57,20 +58,23 @@ public:
                      const std::vector<double>& Theta_new,
                      const std::vector<double>& q,
                      symbol name,
-                     std::vector<double>& C, 
                      const std::vector<double>& S, 
+                     const std::map<size_t, double>& J_forced,
+                     const std::map<size_t, double>& C_border,
+                     std::vector<double>& C, 
                      std::vector<double>& J, 
-		     const double C_below,
-		     const bool flux_below,
                      double diffusion_coefficient, double dt,
                      Treelog& msg) const = 0;
 
   // Create and Destroy.
 public:
   virtual bool check (const Geometry&, Treelog&);
+  // Generic models.
   static const AttributeList& none_model ();
   static const AttributeList& reserve_model ();
-  static const AttributeList& default_model ();
+  // Geometry specific models.
+  static const AttributeList& vertical_model ();
+  static const AttributeList& rectangle_model ();
 protected:
   Msoltranrect (Block&);
 public:

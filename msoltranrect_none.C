@@ -37,12 +37,12 @@ struct MsoltranrectNone : public Msoltranrect
              const std::vector<double>& Theta_old,
              const std::vector<double>& Theta_new,
              const std::vector<double>& q,
-             const symbol name,
-             std::vector<double>& C, 
+             symbol name,
              const std::vector<double>& S, 
+             const std::map<size_t, double>& J_forced,
+             const std::map<size_t, double>& C_border,
+             std::vector<double>& C, 
              std::vector<double>& J, 
-	     const double C_below,
-	     const bool flux_below,
              double diffusion_coefficient, double dt,
              Treelog& msg) const;
 
@@ -58,15 +58,14 @@ MsoltranrectNone::flow (const Geometry& geo,
                         const std::vector<double>& Theta_old,
                         const std::vector<double>& Theta_new,
                         const std::vector<double>& q,
-                        const symbol name,
-                        std::vector<double>& C, 
+                        const symbol /* name */,
                         const std::vector<double>& S, 
+                        const std::map<size_t, double>& J_forced,
+                        const std::map<size_t, double>& /* C_border */,
+                        std::vector<double>& C, 
                         std::vector<double>& J, 
-			const double /* C_below */,
-			const bool /* flux_below */,
-                        double /* diffusion_coefficient */,
-                        const double dt,
-                        Treelog& msg) const
+                        double /* diffusion_coefficient */, double dt,
+                        Treelog& /* msg */) const
 {
   const size_t cell_size = geo.cell_size ();
 
@@ -75,19 +74,24 @@ MsoltranrectNone::flow (const Geometry& geo,
   for (size_t i = 0; i < M.size (); i++)
     M[i] = Theta_old[i] * C[i];
 
-  // Upper border.
-  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
-  const size_t edge_above_size = edge_above.size ();
-
-  for (size_t i = 0; i < edge_above_size; i++)
+  // Forced flux.
+  for (std::map<size_t, double>::const_iterator i = J_forced.begin ();
+       i != J_forced.end ();
+       i++)
     {
-      const size_t edge = edge_above[i];
-      const int cell = geo.edge_other (edge, Geometry::cell_above);
-      daisy_assert (geo.cell_is_internal (cell));
-      const double in_sign 
-        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
-      const double value = in_sign * J[edge] * dt * geo.edge_area (edge); // [g]
-      M[cell] += value / geo.cell_volume (cell);
+      const size_t edge = (*i).first;
+      const double flow = (*i).second;
+      J[edge] = flow;
+
+      const double amount = flow * geo.edge_area (edge) * dt;
+
+      const int from = geo.edge_from (edge);
+      if (geo.cell_is_internal (from))
+        M[from] -= amount / geo.cell_volume (from);
+
+      const int to = geo.edge_to (edge);
+      if (geo.cell_is_internal (to))
+        M[to] += amount / geo.cell_volume (to);
     }
 
   // Cell source.

@@ -1207,8 +1207,8 @@ OrganicStandard::tick (const Geometry& geo,
     }
   
   // Update soil solutes.
-  soil_NO3.add_to_transform_source (NO3_source, dt);
-  soil_NH4.add_to_transform_source (NH4_source, dt);
+  soil_NO3.add_to_transform_source (NO3_source);
+  soil_NH4.add_to_transform_source (NH4_source);
 
   // Biological incorporation.
   const double soil_T = geo.content_at (soil_heat, &SoilHeat::T, 0.0 /* cm */);

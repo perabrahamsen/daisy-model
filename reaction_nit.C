@@ -94,8 +94,8 @@ ReactionNitrification::tick (const Geometry& geo,
     }
 
 
-  soil_NH4.add_to_transform_sink (NH4, dt);
-  soil_NO3.add_to_transform_source (NO3, dt);
+  soil_NH4.add_to_transform_sink (NH4);
+  soil_NO3.add_to_transform_source (NO3);
 }
 
 bool 

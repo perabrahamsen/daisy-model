@@ -37,6 +37,7 @@
 #include "submodeler.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "msoltranrect.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]
@@ -685,7 +686,7 @@ Movement1D::~Movement1D ()
 void 
 Movement::load_vertical (Syntax& syntax, AttributeList& alist)
 {
-  MovementSolute::load_solute (syntax, alist);
+  MovementSolute::load_solute (syntax, alist, Msoltranrect::vertical_model ());
   syntax.add_submodule ("Geometry", alist, Syntax::State,
                         "Discretization of the soil.",
                         Geometry1D::load_syntax);

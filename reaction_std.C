@@ -60,8 +60,8 @@ struct ReactionStandard : public Reaction
 	BM[i] = B.M_primary (i);
       }
     transform->tick (soil, soil_water, soil_heat, AM, BM, S_AB, msg);
-    A.add_to_transform_sink (S_AB, dt);
-    B.add_to_transform_source (S_AB, dt);
+    A.add_to_transform_sink (S_AB);
+    B.add_to_transform_source (S_AB);
   }
 
   // Create.

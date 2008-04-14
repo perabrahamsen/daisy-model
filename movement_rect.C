@@ -324,7 +324,13 @@ static struct MovementRectSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    MovementSolute::load_solute (syntax, alist);
+#ifdef HAS_MOLLERUP
+    MovementSolute::load_solute (syntax, alist, 
+                                 Msoltranrect::rectangle_model ());
+#else //!HAS_MOLLERUP
+    MovementSolute::load_solute (syntax, alist, 
+                                 Msoltranrect::reserve_model ());
+#endif //!HAS_MOLLERUP
     alist.add ("description", 
                "Two dimensional movement in a rectangular grid.");
     syntax.add_submodule ("Geometry", alist, Syntax::Const,

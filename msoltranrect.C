@@ -29,7 +29,6 @@
 #include "librarian.h"
 #include "soil_water.h"
 #include "soil.h"
-#include "mobsol.h"
 
 const char *const Msoltranrect::component = "msoltranrect";
 
@@ -46,27 +45,46 @@ Msoltranrect::element (const Geometry& geo,
                        DOE& element, const double diffusion_coefficient, 
                        const double dt, Treelog& msg)
 {
-  const size_t cell_size = geo.cell_size ();
+  // Edges.
   const size_t edge_size = geo.edge_size ();
-
-  std::vector<double> Theta_old (cell_size); // Water content at start...
-  std::vector<double> Theta_new (cell_size); // ...and end of timestep.
   std::vector<double> q (edge_size); // Water flux [cm].
-
   for (size_t e = 0; e < edge_size; e++)
     q[e] = soil_water.q_primary (e);
 
-  // Initialize cells.
+  // Cells.
+  const size_t cell_size = geo.cell_size ();
+  std::vector<double> Theta_old (cell_size); // Water content at start...
+  std::vector<double> Theta_new (cell_size); // ...and end of timestep.
   for (size_t c = 0; c < cell_size; c++)
     {
       Theta_old[c] = soil_water.Theta_primary_old (c);
       Theta_new[c] = soil_water.Theta_primary (c);
     }
 
+  // Upper border.
+  std::map<size_t, double> J_forced;
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      J_forced[edge] = 0.0;
+    }
+
+  // Lower border.
+  std::map<size_t, double> C_border;
+  const std::vector<size_t>& edge_below = geo.cell_edges (Geometry::cell_below);
+  const size_t edge_below_size = edge_below.size ();
+  for (size_t i = 0; i < edge_below_size; i++)
+    {
+      const size_t edge = edge_below[i];
+      C_border[edge] = 0.0;
+    }
+
   element.tick (cell_size, soil_water, dt);
   static const symbol DOM_name ("DOM");
   flow (geo, soil, Theta_old, Theta_new, q, DOM_name, 
-        element.C, element.S, element.J_matrix, 0.0, false,
+        element.S, J_forced, C_border, element.C, element.J_matrix, 
         diffusion_coefficient, dt, msg);
   for (size_t c = 0; c < cell_size; c++)
     element.M[c] = element.C[c] * soil_water.Theta (c);

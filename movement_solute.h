@@ -23,6 +23,7 @@
 
 #include "movement.h"
 #include "memutils.h"
+#include <map>
 
 class Msoltranrect;
 
@@ -36,24 +37,29 @@ struct MovementSolute : public Movement
                               const std::vector<double>& Theta_new,
                               const std::vector<double>& q,
                               const symbol name,
-                              std::vector<double>& M, 
                               const std::vector<double>& S, 
-                              std::vector<double>& J_sum, 
-                              const double C_below,
+                              const std::map<size_t, double>& J_forced,
+                              const std::map<size_t, double>& C_border,
+                              std::vector<double>& M, 
+                              std::vector<double>& J, 
                               const double dt,
                               Treelog& msg);
   static void secondary_transport (const Geometry&,
                                    const Soil&, const SoilWater&,
-                                   const double J_above, Chemical& solute, 
+                                   const std::map<size_t, double>& J_forced,
+                                   const std::map<size_t, double>& C_border,
+                                   Chemical& solute, 
                                    std::vector<double>& S_extra,
-                                   const bool flux_below, const double dt,
+                                   const double dt, 
                                    const Scope& scope, Treelog& msg);
   static void primary_transport (const Geometry& geo,
                                  const Soil& soil, const SoilWater& soil_water,
                                  const Msoltranrect&,
-                                 const double J_above, Chemical& solute, 
+                                 const std::map<size_t, double>& J_forced,
+                                 const std::map<size_t, double>& C_border,
+                                 Chemical& solute, 
                                  const std::vector<double>& S_extra,
-                                 const bool flux_below, const double dt,
+                                 const double dt,
                                  const Scope& scope, Treelog& msg);
   void solute (const Soil& soil, const SoilWater& soil_water,
                double J_above, Chemical&, const bool flux_below, 
@@ -65,7 +71,8 @@ struct MovementSolute : public Movement
   // Create.
   bool check_solute (Treelog&) const;
   MovementSolute (Block& al);
-  static void load_solute (Syntax&, AttributeList&);
+  static void load_solute  (Syntax& syntax, AttributeList& alist, 
+                            const AttributeList& prefered_solute);
 };
 
 #endif // MOVEMENT_SOLUTE_H

@@ -94,8 +94,8 @@ struct ReactionEquilibrium : public Reaction
       S_AB[c] = convert;
 	
     }
-    A.add_to_transform_sink (S_AB, dt);
-    B.add_to_transform_source (S_AB, dt);
+    A.add_to_transform_sink (S_AB);
+    B.add_to_transform_source (S_AB);
   }
 
   // Create.

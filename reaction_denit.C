@@ -142,7 +142,7 @@ ReactionDenit::tick (const Geometry& geo,
       potential[i] = pot;
       potential_fast[i] = pot_fast;
     }
-  soil_NO3.add_to_transform_sink (converted, dt);
+  soil_NO3.add_to_transform_sink (converted);
 }
 
 bool 

@@ -1113,7 +1113,7 @@ CropOld::SoluteUptake (const Geometry& geo,
 	uptake[i] = 0.0;
       daisy_assert (uptake[i] >= 0.0);
     }
-  solute.add_to_root_sink (uptake, dt);
+  solute.add_to_root_sink (uptake);
 
   // g N/cm^3/h -> g N/m^2/h
   return geo.total_surface (uptake) * 1.0e4; 

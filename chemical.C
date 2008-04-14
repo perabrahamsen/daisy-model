@@ -38,7 +38,6 @@ Chemical::library_id () const
   return id;
 }
 
-
 const symbol
 Chemical::NO3 ()
 {

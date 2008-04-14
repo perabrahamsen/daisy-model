@@ -373,7 +373,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = movement_1D.C groundwater_aquitard.C \
+MODELS = msoltranrect_Mollerup.C msoltranrect_Hansen.C \
+	movement_1D.C groundwater_aquitard.C \
 	heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \
 	msoltranrect_convection.C \
 	ABAprod_uptake.C ABAprod_soil.C ABAprod_root.C \
@@ -384,7 +385,7 @@ MODELS = movement_1D.C groundwater_aquitard.C \
 	reaction_adsorption.C reaction_equil.C rootdens_GP2D.C \
 	rootdens_GP1D.C number_plf.C rubiscoNdist_forced.C action_extern.C \
 	rubiscoNdist_expr.C uzrect_const.C photo_FCC3.C photo_FCC4.C \
-	msoltranrect_Mollerup.C reaction_std.C chemistry_std.C \
+	reaction_std.C chemistry_std.C \
 	groundwater_extern.C \
 	msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
 	ABAeffect_exp.C rubiscoNdist_uniform.C \

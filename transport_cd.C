@@ -82,10 +82,10 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
       if (iszero (C[i]))
 	daisy_assert (iszero (M[i]));
       else 
-        daisy_assert (approximate (M[i], 
-                                   adsorption.C_to_M (soil,
-                                                      soil_water.Theta_old (i),
-                                                      i, C[i])));
+        daisy_approximate (M[i], 
+                           adsorption.C_to_M (soil,
+                                              soil_water.Theta_old (i),
+                                              i, C[i]));
     }
 
   // Note: q, D, and alpha depth indexes are all [j-½].

@@ -72,7 +72,7 @@ public:
   				double from, double to) const = 0; // [g/cm^2]
   virtual double S_secondary (size_t i) const = 0;
   virtual double S_primary (size_t i) const = 0;
-  virtual double S_p (size_t i) const = 0;
+  virtual double S_tertiary (size_t i) const = 0;
   
   // Transport.
 public:
@@ -86,11 +86,9 @@ public:
   // Sink.
 public:
   virtual void clear () = 0;
-  virtual void add_to_root_sink (const std::vector<double>&, double dt) = 0;
-  virtual void add_to_transform_source (const std::vector<double>&,
-					double dt) = 0;
-  virtual void add_to_transform_sink (const std::vector<double>&,
-				      double dt) = 0;
+  virtual void add_to_root_sink (const std::vector<double>&) = 0;
+  virtual void add_to_transform_source (const std::vector<double>&) = 0;
+  virtual void add_to_transform_sink (const std::vector<double>&) = 0;
 
   // Management.
 public:
@@ -115,8 +113,8 @@ public:
                          double surface_runoff_rate /* [h^-1] */,
                          double dt /* [h] */,
 			 Treelog&) = 0;
-  virtual void tick_soil (size_t cell_size, const SoilWater&, double dt,
-			  const Scope&, Treelog&) = 0;
+  virtual void tick_soil (const Geometry&, const Soil&, const SoilWater&,
+                          double dt, const Scope&, Treelog&) = 0;
   virtual void mixture (const Geometry& geo,
                         const double pond /* [mm] */, 
                         const double rate /* [h/mm] */,

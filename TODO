@@ -10,13 +10,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 *** obey mobsol.alpha
 
-*** Choose "Hansen" or "Molleup" according to geometry.
-
 ** msoltransrect
 
-*** port "cd Hansen" from transport
-
-*** rename to transport or msoltrans
+*** rename to transport or msoltran or primsol or primary
 
 * alpha
 
@@ -171,18 +167,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
           break;
         }
     }
-
-* secondary solute tarnsport
-
-** SoilWater skal dele op i tick_after
-
-** fjern S lim af ddt i convection
-
-** Kald secondary_solute i 2D movement
-
-** Overfør negativ til primary
-
-** 1D skal bruge 2D solute transport kode.
 
 * Frame
 

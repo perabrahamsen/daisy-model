@@ -269,9 +269,8 @@ ChemistryStandard::tick_soil (const Geometry& geo, const double ponding,
     reactions[r]->tick (geo, soil, soil_water, soil_heat, organic_matter, 
 			chemistry, dt, msg);
 
-  const size_t cell_size = geo.cell_size ();
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->tick_soil (cell_size, soil_water, dt, scope, msg);
+    chemicals[c]->tick_soil (geo, soil, soil_water, dt, scope, msg);
 
   for (size_t c = 0; c < chemicals.size (); c++)
     {

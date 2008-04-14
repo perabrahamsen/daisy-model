@@ -39,12 +39,12 @@ struct MsoltranrectConvection : public Msoltranrect
              const std::vector<double>& Theta_old,
              const std::vector<double>& Theta_new,
              const std::vector<double>& q,
-             const symbol name,
-             std::vector<double>& C, 
+             symbol name,
              const std::vector<double>& S, 
+             const std::map<size_t, double>& J_forced,
+             const std::map<size_t, double>& C_border,
+             std::vector<double>& C, 
              std::vector<double>& J, 
-	     const double C_below,
-	     const bool flux_below,
              double diffusion_coefficient, double dt,
              Treelog& msg) const;
 
@@ -60,25 +60,21 @@ MsoltranrectConvection::flow (const Geometry& geo,
                               const std::vector<double>& Theta_old,
                               const std::vector<double>& Theta_new,
                               const std::vector<double>& q,
-                              const symbol name,
-                              std::vector<double>& C, 
+                              const symbol /* name */,
                               const std::vector<double>& S, 
-                              std::vector<double>& J_sum, 
-                              const double C_below,
-                              const bool /* flux_below */,
-                              double diffusion_coefficient,
-                              const double dt,
-                              Treelog& msg) const
+                              const std::map<size_t, double>& J_forced,
+                              const std::map<size_t, double>& C_border,
+                              std::vector<double>& C, 
+                              std::vector<double>& J, 
+                              double /* diffusion_coefficient */, double dt,
+                              Treelog& /* msg */) const
 {
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
 
+  // One timestep left.
   double time_left = dt;
 
-  // Keep upper boundary constant during simulation.
-  const std::vector<double> J = J_sum;
-  fill (J_sum.begin (), J_sum.end (), 0.0);
-  
   // Initial water content.
   std::vector<double> Theta (cell_size);
   for (size_t c = 0; c < cell_size; c++)
@@ -141,29 +137,35 @@ MsoltranrectConvection::flow (const Geometry& geo,
       std::vector<double> dJ (edge_size);
       for (size_t e = 0; e < edge_size; e++)
         {
+          std::map<size_t, double>::const_iterator i = J_forced.find (e);
+          if (i != J_forced.end ())
+            // Forced flux.
+            {
+              dJ[e] = (*i).second;
+              continue;
+            }
+
           const int edge_from = geo.edge_from (e);
           const int edge_to = geo.edge_to (e);
           const bool in_flux = q[e] > 0.0;
           const int flux_from = in_flux ? edge_from : edge_to;
-          double C_flux_from;
-          switch (flux_from)
+          double C_flux_from = -42.42e42;
+
+          if (geo.cell_is_internal (flux_from))
+            // Internal cell, use its concentration.
+            C_flux_from = C[flux_from];
+          else
             {
-            case Geometry::cell_above:
-            case Geometry::cell_left:
-            case Geometry::cell_right:
-            case Geometry::cell_front:
-            case Geometry::cell_back:
-              dJ[e] = J[e];
-              continue;
-            case Geometry::cell_below:
-              C_flux_from = C_below;
-              break;
-            default:
-              daisy_assert (geo.cell_is_internal (flux_from));
-              if (geo.edge_other (e, flux_from) == Geometry::cell_above)
-                // No flux upwards.
-                continue;
-              C_flux_from = C[flux_from];
+              i = C_border.find (e);
+              if (i != C_border.end ())
+                // Specified by C_border.
+                C_flux_from = (*i).second;
+              else
+                // Assume no gradient.
+                {
+                  const int flux_to = in_flux ? edge_to : edge_from;
+                  C_flux_from = C[flux_to];
+                }
             }
 
           // Convection.
@@ -183,7 +185,7 @@ MsoltranrectConvection::flow (const Geometry& geo,
           if (geo.cell_is_internal (to))
             M[to] += value / geo.cell_volume (to);
 
-          J_sum[e] += dJ[e] * ddt;
+          J[e] += dJ[e] * ddt / dt;
         }
 
       // Update time left.
