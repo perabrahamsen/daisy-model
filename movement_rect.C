@@ -25,7 +25,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
-#include "msoltranrect.h"
+#include "transport.h"
 #include "chemical.h"
 #include "groundwater.h"
 #include "surface.h"
@@ -326,10 +326,10 @@ static struct MovementRectSyntax
     AttributeList& alist = *new AttributeList ();
 #ifdef HAS_MOLLERUP
     MovementSolute::load_solute (syntax, alist, 
-                                 Msoltranrect::rectangle_model ());
+                                 Transport::rectangle_model ());
 #else //!HAS_MOLLERUP
     MovementSolute::load_solute (syntax, alist, 
-                                 Msoltranrect::reserve_model ());
+                                 Transport::reserve_model ());
 #endif //!HAS_MOLLERUP
     alist.add ("description", 
                "Two dimensional movement in a rectangular grid.");

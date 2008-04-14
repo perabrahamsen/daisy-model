@@ -1,7 +1,6 @@
-// transport_none.C
+// transport_none.C --- No transport.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,80 +19,110 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #define BUILD_DLL
-
 #include "transport.h"
-#include "geometry1d.h"
+#include "geometry.h"
 #include "soil.h"
-#include "soil_water.h"
 #include "adsorption.h"
-#include "log.h"
-#include "mathlib.h"
+#include "alist.h"
+#include "submodeler.h"
+#include "memutils.h"
 #include "librarian.h"
 #include <sstream>
 
 struct TransportNone : public Transport
 {
-  // Simulation.
-  void tick (Treelog&, const Geometry1D&,
-             const Soil&, const SoilWater&, const Adsorption&,
-	     double diffusion_coefficient,
-	     std::vector<double>& M, 
-	     std::vector<double>& C,
-	     const std::vector<double>& S,
-	     std::vector<double>& J,
-	     const double C_below, double dt);
+  // Solute.
+  void flow (const Geometry& geo, 
+             const Soil& soil, 
+             const std::vector<double>& Theta_old,
+             const std::vector<double>& Theta_new,
+             const std::vector<double>& q,
+             symbol name,
+             const std::vector<double>& S, 
+             const std::map<size_t, double>& J_forced,
+             const std::map<size_t, double>& C_border,
+             std::vector<double>& C, 
+             std::vector<double>& J, 
+             double diffusion_coefficient, double dt,
+             Treelog& msg) const;
 
   // Create.
-  TransportNone (Block& al)
-    : Transport (al)
-    { }
+  static void load_syntax (Syntax& syntax, AttributeList& alist);
+  TransportNone (Block& al);
+  ~TransportNone ();
 };
 
-void 
-TransportNone::tick (Treelog& msg,
-		     const Geometry1D& geo,
-                     const Soil& soil, const SoilWater& soil_water,
-		     const Adsorption& adsorption, 
-		     const double,
-		     std::vector<double>& M, 
-		     std::vector<double>& C,
-		     const std::vector<double>& S,
-		     std::vector<double>& J,
-		     const double /* C_below */, 
-                     const double dt)
+void
+TransportNone::flow (const Geometry& geo, 
+                        const Soil& soil, 
+                        const std::vector<double>& Theta_old,
+                        const std::vector<double>& Theta_new,
+                        const std::vector<double>& q,
+                        const symbol /* name */,
+                        const std::vector<double>& S, 
+                        const std::map<size_t, double>& J_forced,
+                        const std::map<size_t, double>& /* C_border */,
+                        std::vector<double>& C, 
+                        std::vector<double>& J, 
+                        double /* diffusion_coefficient */, double dt,
+                        Treelog& /* msg */) const
 {
-  Treelog::Open nest (msg, "Transport none");
-  for (unsigned int i = 0; i < soil.size (); i++)
+  const size_t cell_size = geo.cell_size ();
+
+  // Solute M.
+  std::vector<double> M (cell_size);
+  for (size_t i = 0; i < M.size (); i++)
+    M[i] = Theta_old[i] * C[i];
+
+  // Forced flux.
+  for (std::map<size_t, double>::const_iterator i = J_forced.begin ();
+       i != J_forced.end ();
+       i++)
     {
-      M[i] += S[i] *dt;
+      const size_t edge = (*i).first;
+      const double flow = (*i).second;
+      J[edge] = flow;
 
-      if (i == 0)
-	M[i] -= J[0] / geo.dz (0);
-      else
-	J[i] = 0.0;
+      const double amount = flow * geo.edge_area (edge) * dt;
 
-      C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
-      if (!(M[i] >= 0.0))
-	{
-	  std::ostringstream tmp;
-	  tmp << "BUG: M[" << i << "] = " << M[i] 
-		 << " (J_in = " << J[0] << ") S[" << i << "] = " << S[i];
-	  msg.error (tmp.str ());
-	}
-      daisy_assert (M[i] >= 0.0);
-      daisy_assert (C[i] >= 0.0);
+      const int from = geo.edge_from (edge);
+      if (geo.cell_is_internal (from))
+        M[from] -= amount / geo.cell_volume (from);
+
+      const int to = geo.edge_to (edge);
+      if (geo.cell_is_internal (to))
+        M[to] += amount / geo.cell_volume (to);
     }
-  J[soil.size ()] = 0.0;
+
+  // Cell source.
+  for (size_t c = 0; c < cell_size; c++)
+    M[c] += S[c] * dt;
+
+  // Update C.
+  for (size_t c = 0; c < cell_size; c++)
+    C[c] = M[c] / Theta_new[c];
 }
+
+TransportNone::TransportNone (Block& al)
+  : Transport (al)
+{ }
+
+TransportNone::~TransportNone ()
+{ }
+
+void 
+TransportNone::load_syntax (Syntax&, AttributeList&)
+{ }
 
 const AttributeList& 
 Transport::none_model ()
 {
   static AttributeList alist;
-  
+
   if (!alist.check ("type"))
     {
       Syntax dummy;
+      TransportNone::load_syntax (dummy, alist);
       alist.add ("type", "none");
     }
   return alist;
@@ -102,15 +131,18 @@ Transport::none_model ()
 static struct TransportNoneSyntax
 {
   static Model& make (Block& al)
-  {
-    return *new TransportNone (al);
-  }
+  { return *new TransportNone (al); }
 
   TransportNoneSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "No solute transport.");
+    alist.add ("description", 
+               "Disable all transport except through boundaries.");
+    TransportNone::load_syntax (syntax, alist);
+ 
     Librarian::add_type (Transport::component, "none", alist, syntax, &make);
   }
 } TransportNone_syntax;
+
+// transport_none.C ends here.

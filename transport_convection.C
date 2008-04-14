@@ -1,7 +1,6 @@
-// transport_convection.C --- Using convection alone for solute transport.
+// transport_convection.C --- Pure forward convection.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2007, 2008 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,174 +19,204 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #define BUILD_DLL
-
 #include "transport.h"
-#include "block.h"
-#include "geometry1d.h"
+#include "geometry.h"
 #include "soil.h"
-#include "soil_water.h"
 #include "adsorption.h"
-#include "log.h"
-#include "mathlib.h"
+#include "alist.h"
+#include "submodeler.h"
+#include "memutils.h"
 #include "librarian.h"
-#include <vector>
+#include "log.h"
+#include "syntax.h"
 #include <sstream>
 
 struct TransportConvection : public Transport
 {
-  // Parameters.
-  const int max_time_step_reductions;
-
-  // Simulation.
-  void tick (Treelog&, const Geometry1D& geo,
-             const Soil&, const SoilWater&, const Adsorption&,
-	     double diffusion_coefficient,
-	     std::vector<double>& M, 
-	     std::vector<double>& C,
-	     const std::vector<double>& S,
-	     std::vector<double>& J, 
-	     const double C_below, 
-             double dt);
+  // Solute.
+  void flow (const Geometry& geo, 
+             const Soil& soil, 
+             const std::vector<double>& Theta_old,
+             const std::vector<double>& Theta_new,
+             const std::vector<double>& q,
+             symbol name,
+             const std::vector<double>& S, 
+             const std::map<size_t, double>& J_forced,
+             const std::map<size_t, double>& C_border,
+             std::vector<double>& C, 
+             std::vector<double>& J, 
+             double diffusion_coefficient, double dt,
+             Treelog& msg) const;
 
   // Create.
-  TransportConvection (Block& al)
-    : Transport (al),
-      max_time_step_reductions (al.integer ("max_time_step_reductions"))
-    { }
   static void load_syntax (Syntax& syntax, AttributeList& alist);
+  TransportConvection (Block& al);
+  ~TransportConvection ();
 };
 
-void 
-TransportConvection::tick (Treelog& msg, 
-			   const Geometry1D& geo,
-                           const Soil& soil, const SoilWater& soil_water,
-			   const Adsorption& adsorption, double,
-			   std::vector<double>& M, 
-			   std::vector<double>& C,
-			   const std::vector<double>& S,
-			   std::vector<double>& J,
-                           const double C_below, 
-			   const double dt)
+void
+TransportConvection::flow (const Geometry& geo, 
+                              const Soil& soil, 
+                              const std::vector<double>& Theta_old,
+                              const std::vector<double>& Theta_new,
+                              const std::vector<double>& q,
+                              const symbol /* name */,
+                              const std::vector<double>& S, 
+                              const std::map<size_t, double>& J_forced,
+                              const std::map<size_t, double>& C_border,
+                              std::vector<double>& C, 
+                              std::vector<double>& J, 
+                              double /* diffusion_coefficient */, double dt,
+                              Treelog& /* msg */) const
 {
-  const double J_in = J[0];
+  const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
 
-  // Remember old values.
-  const std::vector<double> C_prev = C;
-  const std::vector<double> M_prev = M;
+  // One timestep left.
+  double time_left = dt;
 
-  // Number of soil layers.
-  const size_t size = geo.cell_size ();
+  // Initial water content.
+  std::vector<double> Theta (cell_size);
+  for (size_t c = 0; c < cell_size; c++)
+    Theta[c] = Theta_old[c];
 
-  // Remember old content
-  const double old_total = geo.total_surface (M) + geo.total_surface (S) * dt;
-
-  // Flux in individual time step.
-  std::vector<double> dJ (size + 1, 0.0); 
-
-  // Find time step.
-  double ddt = dt;
-  for (unsigned int i = 0; i < size; i++)
+  // Small timesteps.
+  for (;;)
     {
-      const double half_content = soil_water.Theta (i) * geo.dz (i) / 2.0;
-      const double q_up = soil_water.q_matrix (i);
-      if (q_up > 0.0)
-	{
-	  const double dd_up = half_content / q_up;
-	  if (dd_up < ddt)
-	    ddt = dd_up;
-	}
-      const double q_down = -soil_water.q_matrix (i+1);
-      if (q_down > 0.0)
-	{
-	  const double dd_down = half_content / q_down;
-	  if (dd_down < ddt)
-	    ddt = dd_down;
-	}
-    }
+      // Solute M.
+      std::vector<double> M (cell_size);
+      for (size_t c = 0; c < cell_size; c++)
+        M[c] = Theta[c] * C[c];
 
-  // We restart from here if anything goes wrong.
-  int time_step_reductions = 0;
- try_again:;
-  daisy_assert (ddt > 0.0);
-  daisy_assert (ddt <= dt);
+      // Are we done yet?
+      const double min_timestep_factor = 0.001;
+      if (time_left < 0.1 * min_timestep_factor * dt)
+        break;
 
-  // Find number of steps
-  unsigned int steps = 1;
-  if (ddt < dt)
-    {
-      steps = int (dt / ddt) + 1U;
-      ddt = dt / (steps + 0.0);
-    }
-
-  // Initialize flux.
-  fill (J.begin (), J.end (), 0.0);
-
-  // Step through it.
-  for (unsigned int step = 0; step < steps; step++)
-    {
-      // Upper boundary.
-      dJ[0] = J_in;
-
-      // Middle cells.
-      for (unsigned int i = 1; i <= size; i++)
-	{
-	  const double q = soil_water.q_matrix (i);
-	  if (q < 0)		// Downward flow, take from water above.
-	    dJ[i] = q * C[i-1];
-	  else if (i < size)
-	    dJ[i] = q * C[i];	// Upward flow, take from water below.
-	  else if (C_below >= 0)
-	    dJ[i] = q * C[i];	// Use specified groundwater content.
-	  else
-	    dJ[i] = q * C[i-1];	// Assume the same concentration below.
-	}
-
-      // Update content.
-      for (unsigned int i = 0; i < size; i++)
-	{
-	  J[i] += dJ[i] * ddt;
-	  M[i] += (-dJ[i] + dJ[i+1]) * ddt / geo.dz (i) + S[i] * ddt;
-	  C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
-	}
-      J[size] += dJ[size] * ddt;
-    }
-  daisy_assert (approximate (J_in, J[0]));
-
-  for (unsigned int i = 0; i < size; i++)
-    if (M[i] < 0.0)
-      {
-	ddt *= 0.5;
-	C = C_prev;
-	M = M_prev;
-	time_step_reductions++;
-	if (time_step_reductions > max_time_step_reductions)
-	  throw ("convection gave negative solution");
-	goto try_again;
-      }
+      // Find new timestep.
+      double ddt = time_left;
   
-  // Check mass conservation.
-  const double new_total = geo.total_surface (M);
-  if (!approximate (old_total - J[0] * dt + J[size] * dt, new_total)
-      && !approximate (- J[0] * dt + J[size] * dt, 
-                       new_total - old_total,
-                       0.05))
-    {
-      Treelog::Open nest (msg, name);
-      const double total_S = geo.total_surface (S) * dt;
-      std::ostringstream tmp;
-      tmp << "In (" << - J[0] << ") - out (" << -J[size] 
-             << " != new (" << new_total 
-             << ") - old (" << (old_total - total_S) 
-             << ") - source (" << total_S << ")";
-      msg.error (tmp.str ());
-    };
+      // Limit timestep based on source term.
+      for (size_t c = 0; c < cell_size; c++)
+        if (S[c] < 0.0 && M[c] > 0.0) // If it is a sink.
+          {
+            const double time_to_empty = -M[c] / S[c];
+            if (time_to_empty < min_timestep_factor * dt)
+              // Unreasonable small time step.  Give up.
+              continue;
+            
+            // Go down in timestep while it takes less than two to empty cell.
+            while (time_to_empty < 2.0 * ddt)
+              ddt *= 0.5;
+          }
+
+      // Limit timestep based on water flux.
+      for (size_t e = 0; e < edge_size; e++)
+        {
+          const int cell = (q[e] > 0.0 ? geo.edge_to (e) : geo.edge_from (e));
+          if (geo.cell_is_internal (cell))
+            {
+              const double loss_rate = std::fabs (q[e]) * geo.edge_area (e);
+              const double content = Theta[cell] * geo.cell_volume (cell); 
+              const double time_to_empty = content / loss_rate;
+              if (time_to_empty < min_timestep_factor * dt)
+                // Unreasonable small time step.  Give up.
+                continue;
+              
+              // Go down in timestep while it takes less than two to empty cell.
+              while (time_to_empty < 2.0 * ddt)
+                ddt *= 0.5;
+            }
+        }
+
+      // Cell source.
+      for (size_t c = 0; c < cell_size; c++)
+        M[c] += S[c] * ddt;
+
+      // Find fluxes using new values (more stable).
+      std::vector<double> dJ (edge_size);
+      for (size_t e = 0; e < edge_size; e++)
+        {
+          std::map<size_t, double>::const_iterator i = J_forced.find (e);
+          if (i != J_forced.end ())
+            // Forced flux.
+            {
+              dJ[e] = (*i).second;
+              continue;
+            }
+
+          const int edge_from = geo.edge_from (e);
+          const int edge_to = geo.edge_to (e);
+          const bool in_flux = q[e] > 0.0;
+          const int flux_from = in_flux ? edge_from : edge_to;
+          double C_flux_from = -42.42e42;
+
+          if (geo.cell_is_internal (flux_from))
+            // Internal cell, use its concentration.
+            C_flux_from = C[flux_from];
+          else
+            {
+              i = C_border.find (e);
+              if (i != C_border.end ())
+                // Specified by C_border.
+                C_flux_from = (*i).second;
+              else
+                // Assume no gradient.
+                {
+                  const int flux_to = in_flux ? edge_to : edge_from;
+                  C_flux_from = C[flux_to];
+                }
+            }
+
+          // Convection.
+          dJ[e] = q[e] * C_flux_from;
+        }
+
+      // Update values for fluxes.
+      for (size_t e = 0; e < edge_size; e++)
+        {
+          const double value = ddt * dJ[e] * geo.edge_area (e);
+
+          const int from = geo.edge_from (e);
+          if (geo.cell_is_internal (from))
+            M[from] -= value / geo.cell_volume (from);
+
+          const int to = geo.edge_to (e);
+          if (geo.cell_is_internal (to))
+            M[to] += value / geo.cell_volume (to);
+
+          J[e] += dJ[e] * ddt / dt;
+        }
+
+      // Update time left.
+      time_left -= ddt;
+
+      // Interpolate Theta.
+      for (size_t c = 0; c < cell_size; c++)
+        Theta[c] = time_left * Theta_old[c] + (1.0 - time_left) * Theta_new[c];
+
+      // Update C.
+      for (size_t c = 0; c < cell_size; c++)
+        C[c] = M[c] / Theta[c];
+    }
 }
+
+TransportConvection::TransportConvection (Block& al)
+  : Transport (al)
+{ }
+
+TransportConvection::~TransportConvection ()
+{ }
+
+void 
+TransportConvection::load_syntax (Syntax& syntax, AttributeList&)
+{ }
 
 const AttributeList& 
 Transport::reserve_model ()
 {
   static AttributeList alist;
-  
+
   if (!alist.check ("type"))
     {
       Syntax dummy;
@@ -197,30 +226,24 @@ Transport::reserve_model ()
   return alist;
 }
 
-void 
-TransportConvection::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  syntax.add ("max_time_step_reductions",
-              Syntax::Integer, Syntax::Const, "\
-Number of times we may reduce the time step before giving up");
-  alist.add ("max_time_step_reductions", 10);
-}
-
 static struct TransportConvectionSyntax
 {
   static Model& make (Block& al)
-  {
-    return *new TransportConvection (al);
-  }
+  { return *new TransportConvection (al); }
 
   TransportConvectionSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Transport using convection alone.");
+    alist.add ("description", "\
+Pure forward calculation of flow except through upper boundary.\n\
+J[edge] = q[edge] * C_old[upstream]");
     TransportConvection::load_syntax (syntax, alist);
-    Librarian::add_type (Transport::component, "convection", alist, syntax, &make);
+ 
+    Librarian::add_type (Transport::component, "convection",
+                         alist, syntax, &make);
   }
 } TransportConvection_syntax;
 
 // transport_convection.C ends here.
+

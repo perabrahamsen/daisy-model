@@ -373,10 +373,10 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = msoltranrect_Mollerup.C msoltranrect_Hansen.C \
+MODELS = transport_Mollerup.C transport_Hansen.C \
 	movement_1D.C groundwater_aquitard.C \
 	heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \
-	msoltranrect_convection.C \
+	transport_convection.C \
 	ABAprod_uptake.C ABAprod_soil.C ABAprod_root.C \
 	solver_ublas.C solver_cxsparse.C solver_none.C \
 	movement_rect.C chemistry_multi.C \
@@ -387,7 +387,7 @@ MODELS = msoltranrect_Mollerup.C msoltranrect_Hansen.C \
 	rubiscoNdist_expr.C uzrect_const.C photo_FCC3.C photo_FCC4.C \
 	reaction_std.C chemistry_std.C \
 	groundwater_extern.C \
-	msoltranrect_none.C uzrect_Mollerup.C groundwater_flux.C \
+	transport_none.C uzrect_Mollerup.C groundwater_flux.C \
 	ABAeffect_exp.C rubiscoNdist_uniform.C \
 	uzrect_2x1.C select_flow.C volume_box.C \
 	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
@@ -429,8 +429,7 @@ MODELS = msoltranrect_Mollerup.C msoltranrect_Hansen.C \
 	weather_none.C action_tillage.C \
 	action_harvest.C crop_old.C crop_sold.C \
 	action_with.C nitrification_soil.C \
-	nitrification_solute.C hydraulic_mod_C.C uzlr.C transport_cd.C \
-	transport_none.C transport_convection.C adsorption_vS_S.C \
+	nitrification_solute.C hydraulic_mod_C.C uzlr.C adsorption_vS_S.C \
 	tortuosity_M_Q.C tortuosity_linear.C \
 	adsorption_freundlich.C adsorption_linear.C adsorption_langmuir.C \
 	bioclimate_std.C condition_crop.C \
@@ -446,7 +445,7 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 #
 COMPONENTS = mobsol.C heatrect.C unit.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C scope.C \
-	ABAeffect.C msoltranrect.C uzrect.C bound.C volume.C uz1d.C \
+	ABAeffect.C transport.C uzrect.C bound.C volume.C uz1d.C \
 	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C\
 	xysource.C gnuplot.C boolean.C stringer.C source.C photo.C \
 	format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
@@ -454,7 +453,7 @@ COMPONENTS = mobsol.C heatrect.C unit.C \
 	transform.C rootdens.C select.C average.C mactrans.C macro.C \
 	parser.C log.C weather.C column.C crop.C \
 	action.C condition.C horizon.C 	uzmodel.C hydraulic.C \
-	bioclimate.C groundwater.C am.C transport.C \
+	bioclimate.C groundwater.C am.C \
 	adsorption.C tortuosity.C printer.C chemical.C \
 	pet.C net_radiation.C svat.C vegetation.C 
 
@@ -565,9 +564,10 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = msoltranrect_2x1.C msoltranrect_forward.C
+REMOVE = 
 
-REMOVED = select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
+REMOVED = msoltranrect_2x1.C msoltranrect_forward.C\
+	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
 	solute.C solute.h pedo.C pedo.h pedo_arit.C pedo_const.C \
 	denitrification.C soil_NH4.C soil_NO3.C \
 	denitrification.h soil_NH4.h soil_NO3.h \
@@ -988,9 +988,9 @@ scope${OBJ}: scope.C scope.h symbol.h model.h alist.h block.h syntax.h \
   treelog.h plf.h assertion.h librarian.h
 ABAeffect${OBJ}: ABAeffect.C ABAeffect.h model.h symbol.h alist.h mathlib.h \
   assertion.h block.h syntax.h treelog.h plf.h librarian.h
-msoltranrect${OBJ}: msoltranrect.C msoltranrect.h model.h symbol.h alist.h \
-  chemical.h doe.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
-  adsorption.h block.h plf.h librarian.h soil_water.h soil.h mobsol.h
+transport${OBJ}: transport.C transport.h model.h symbol.h alist.h chemical.h \
+  doe.h geometry.h syntax.h treelog.h mathlib.h assertion.h adsorption.h \
+  block.h plf.h librarian.h soil_water.h soil.h
 uzrect${OBJ}: uzrect.C uzrect.h model.h symbol.h alist.h block.h syntax.h \
   treelog.h plf.h librarian.h
 bound${OBJ}: bound.C bound.h model.h symbol.h alist.h block.h syntax.h \
@@ -1103,8 +1103,6 @@ am${OBJ}: am.C am.h model.h symbol.h alist.h im.h syntax.h treelog.h aom.h \
   om.h plf.h chemical.h metalib.h library.h submodeler.h block.h \
   assertion.h time.h log.h border.h geometry.h mathlib.h check.h vcheck.h \
   program.h run.h memutils.h librarian.h
-transport${OBJ}: transport.C transport.h model.h symbol.h alist.h syntax.h \
-  treelog.h block.h plf.h librarian.h
 adsorption${OBJ}: adsorption.C adsorption.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h librarian.h mathlib.h assertion.h
 tortuosity${OBJ}: tortuosity.C tortuosity.h model.h symbol.h alist.h block.h \
@@ -1216,7 +1214,7 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
   check.h vcheck.h
 movement_solute${OBJ}: movement_solute.C movement_solute.h movement.h model.h \
   symbol.h alist.h memutils.h geometry.h syntax.h treelog.h mathlib.h \
-  assertion.h soil_water.h msoltranrect.h chemical.h adsorption.h \
+  assertion.h soil_water.h transport.h chemical.h adsorption.h \
   librarian.h
 scope_exchange${OBJ}: scope_exchange.C scope_exchange.h model.h symbol.h \
   alist.h scope.h memutils.h block.h syntax.h treelog.h plf.h assertion.h \
@@ -1363,6 +1361,14 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
+  alist.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
+  mathlib.h assertion.h soil.h solver.h log.h time.h border.h \
+  submodeler.h block.h plf.h memutils.h librarian.h
+transport_Hansen${OBJ}: transport_Hansen.C transport.h model.h symbol.h \
+  alist.h block.h syntax.h treelog.h plf.h geometry1d.h geometry_vert.h \
+  geometry.h mathlib.h assertion.h soil.h adsorption.h log.h time.h \
+  border.h librarian.h
 movement_1D${OBJ}: movement_1D.C movement_solute.h movement.h model.h \
   symbol.h alist.h memutils.h geometry1d.h geometry_vert.h geometry.h \
   syntax.h treelog.h mathlib.h assertion.h soil.h soil_water.h \
@@ -1381,10 +1387,10 @@ heatrect_linear${OBJ}: heatrect_linear.C heatrect.h model.h symbol.h alist.h \
   assertion.h plf.h librarian.h
 heatrect_none${OBJ}: heatrect_none.C heatrect.h model.h symbol.h alist.h \
   syntax.h treelog.h librarian.h
-msoltranrect_convection${OBJ}: msoltranrect_convection.C msoltranrect.h \
-  model.h symbol.h alist.h geometry.h syntax.h treelog.h mathlib.h \
-  assertion.h soil.h adsorption.h submodeler.h block.h plf.h memutils.h \
-  librarian.h log.h time.h border.h
+transport_convection${OBJ}: transport_convection.C transport.h model.h \
+  symbol.h alist.h geometry.h syntax.h treelog.h mathlib.h assertion.h \
+  soil.h adsorption.h submodeler.h block.h plf.h memutils.h librarian.h \
+  log.h time.h border.h
 ABAprod_uptake${OBJ}: ABAprod_uptake.C ABAprod.h model.h symbol.h alist.h \
   number.h scope_id.h scope.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil_water.h units.h librarian.h
@@ -1403,7 +1409,7 @@ solver_none${OBJ}: solver_none.C solver.h model.h symbol.h alist.h syntax.h \
 movement_rect${OBJ}: movement_rect.C movement_solute.h movement.h model.h \
   symbol.h alist.h memutils.h geometry_rect.h geometry_vert.h geometry.h \
   syntax.h treelog.h mathlib.h assertion.h heatrect.h soil.h soil_water.h \
-  soil_heat.h msoltranrect.h chemical.h groundwater.h surface.h uzmodel.h \
+  soil_heat.h transport.h chemical.h groundwater.h surface.h uzmodel.h \
   weather.h im.h uzrect.h adsorption.h log.h time.h border.h check.h \
   submodeler.h block.h plf.h librarian.h
 chemistry_multi${OBJ}: chemistry_multi.C chemistry.h model.h symbol.h alist.h \
@@ -1470,10 +1476,6 @@ photo_FCC4${OBJ}: photo_FCC4.C photo_Farquhar.h photo.h model.h symbol.h \
   alist.h rubiscoNdist.h ABAeffect.h bioclimate.h canopy_std.h \
   canopy_simple.h plf.h phenology.h log.h time.h border.h syntax.h \
   treelog.h block.h submodel.h mathlib.h assertion.h check.h librarian.h
-msoltranrect_Mollerup${OBJ}: msoltranrect_Mollerup.C msoltranrect.h model.h \
-  symbol.h alist.h geometry_rect.h geometry_vert.h geometry.h syntax.h \
-  treelog.h mathlib.h assertion.h soil.h solver.h log.h time.h border.h \
-  submodeler.h block.h plf.h memutils.h librarian.h
 reaction_std${OBJ}: reaction_std.C reaction.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h transform.h chemistry.h chemical.h \
   soil.h log.h time.h border.h assertion.h librarian.h
@@ -1484,9 +1486,9 @@ chemistry_std${OBJ}: chemistry_std.C chemistry.h model.h symbol.h alist.h \
 groundwater_extern${OBJ}: groundwater_extern.C groundwater.h model.h symbol.h \
   alist.h output.h condition.h memutils.h time.h number.h block.h \
   syntax.h treelog.h plf.h units.h check.h assertion.h librarian.h
-msoltranrect_none${OBJ}: msoltranrect_none.C msoltranrect.h model.h symbol.h \
-  alist.h geometry.h syntax.h treelog.h mathlib.h assertion.h soil.h \
-  adsorption.h submodeler.h block.h plf.h memutils.h librarian.h
+transport_none${OBJ}: transport_none.C transport.h model.h symbol.h alist.h \
+  geometry.h syntax.h treelog.h mathlib.h assertion.h soil.h adsorption.h \
+  submodeler.h block.h plf.h memutils.h librarian.h
 uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h model.h symbol.h alist.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil.h soil_water.h soil_heat.h groundwater.h surface.h \
@@ -1871,18 +1873,6 @@ hydraulic_mod_C${OBJ}: hydraulic_mod_C.C hydraulic.h model.h symbol.h alist.h \
 uzlr${OBJ}: uzlr.C uzmodel.h model.h symbol.h alist.h block.h syntax.h \
   treelog.h plf.h surface.h groundwater.h geometry_vert.h geometry.h \
   mathlib.h assertion.h soil.h soil_heat.h librarian.h
-transport_cd${OBJ}: transport_cd.C transport.h model.h symbol.h alist.h \
-  syntax.h treelog.h block.h plf.h geometry1d.h geometry_vert.h \
-  geometry.h mathlib.h assertion.h soil.h soil_water.h adsorption.h log.h \
-  time.h border.h librarian.h
-transport_none${OBJ}: transport_none.C transport.h model.h symbol.h alist.h \
-  syntax.h treelog.h geometry1d.h geometry_vert.h geometry.h mathlib.h \
-  assertion.h soil.h soil_water.h adsorption.h log.h time.h border.h \
-  librarian.h
-transport_convection${OBJ}: transport_convection.C transport.h model.h \
-  symbol.h alist.h syntax.h treelog.h block.h plf.h geometry1d.h \
-  geometry_vert.h geometry.h mathlib.h assertion.h soil.h soil_water.h \
-  adsorption.h log.h time.h border.h librarian.h
 adsorption_vS_S${OBJ}: adsorption_vS_S.C adsorption.h model.h symbol.h \
   alist.h syntax.h treelog.h soil.h mathlib.h assertion.h librarian.h
 tortuosity_M_Q${OBJ}: tortuosity_M_Q.C tortuosity.h model.h symbol.h alist.h \
@@ -1923,7 +1913,7 @@ chemical_std${OBJ}: chemical_std.C chemical.h model.h symbol.h alist.h \
   organic_matter.h soil_heat.h soil_water.h soil.h geometry.h syntax.h \
   treelog.h mathlib.h assertion.h abiotic.h adsorption.h chemistry.h \
   log.h time.h border.h block.h plf.h check.h librarian.h number.h \
-  scope_soil.h scope.h vcheck.h memutils.h submodeler.h
+  scope_soil.h scope.h vcheck.h memutils.h submodeler.h mobsol.h
 hydraulic_M_BaC_Bimodal${OBJ}: hydraulic_M_BaC_Bimodal.C hydraulic.h model.h \
   symbol.h alist.h syntax.h treelog.h block.h plf.h check.h mathlib.h \
   assertion.h librarian.h

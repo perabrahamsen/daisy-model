@@ -1,4 +1,4 @@
-// msoltranrect_Mollerup.C --- Coupled vertical and horizontal transport.
+// transport_Mollerup.C --- Coupled vertical and horizontal transport.
 // 
 // Copyright 2007 Mikkel Mollerup, Per Abrahamsen and KVL.
 //
@@ -19,7 +19,7 @@
 
 
 #define BUILD_DLL
-#include "msoltranrect.h"
+#include "transport.h"
 #include "geometry_rect.h"
 #include "soil.h"
 #include "solver.h"
@@ -42,7 +42,7 @@
 
 namespace ublas = boost::numeric::ublas;
 
-struct MsoltranrectMollerup : public Msoltranrect
+struct TransportMollerup : public Transport
 {
   // Keep track of edge types in small time steps.
   enum edge_type_t { Unhandled, Internal, Neumann_explicit_upper,
@@ -207,12 +207,12 @@ struct MsoltranrectMollerup : public Msoltranrect
   // Create.
   bool check (const Geometry&, Treelog&);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
-  MsoltranrectMollerup (Block& al);
-  ~MsoltranrectMollerup ();
+  TransportMollerup (Block& al);
+  ~TransportMollerup ();
 };
 
 void
-MsoltranrectMollerup::cell_based_flux (const Geometry& geo,  
+TransportMollerup::cell_based_flux (const Geometry& geo,  
                                        const ublas::vector<double>& q_edge, 
                                        ublas::vector<double>& qx_cell,
                                        ublas::vector<double>& qz_cell)
@@ -266,7 +266,7 @@ MsoltranrectMollerup::cell_based_flux (const Geometry& geo,
 }
 
 void 
-MsoltranrectMollerup::edge_water_content 
+TransportMollerup::edge_water_content 
 /**/ (const Geometry& geo,
       const ublas::vector<double>& Theta_cell,
       ublas::vector<double>& Theta_edge)
@@ -290,7 +290,7 @@ MsoltranrectMollerup::edge_water_content
 }
 
 void
-MsoltranrectMollerup::interpol(const ublas::vector<double>& V_start,
+TransportMollerup::interpol(const ublas::vector<double>& V_start,
                                const ublas::vector<double>& V_end,
                                const double dt,
                                const double ddt,
@@ -302,7 +302,7 @@ MsoltranrectMollerup::interpol(const ublas::vector<double>& V_start,
 
 
 double
-MsoltranrectMollerup::anisotropy_factor (const Geometry& geo, size_t edge, 
+TransportMollerup::anisotropy_factor (const Geometry& geo, size_t edge, 
                                          const double Dxx, 
                                          const double Dzz)
 {
@@ -315,7 +315,7 @@ MsoltranrectMollerup::anisotropy_factor (const Geometry& geo, size_t edge,
 
 
 void
-MsoltranrectMollerup::diffusion_tensor (const Geometry& geo, 
+TransportMollerup::diffusion_tensor (const Geometry& geo, 
                                         const Soil& soil, 
                                         const ublas::vector<double>& q_edge,
                                         const ublas::vector<double>& Theta,
@@ -363,7 +363,7 @@ MsoltranrectMollerup::diffusion_tensor (const Geometry& geo,
 
 
 void 
-MsoltranrectMollerup::thetadiff_xx_zz_xz_zx
+TransportMollerup::thetadiff_xx_zz_xz_zx
 /**/ (const Geometry& geo,
       const ublas::vector<double>& Theta,
       const ublas::vector<double>& Dxx_cell,
@@ -409,7 +409,7 @@ MsoltranrectMollerup::thetadiff_xx_zz_xz_zx
 
 
 void 
-MsoltranrectMollerup::diffusion_xx_zz (const Geometry& geo,
+TransportMollerup::diffusion_xx_zz (const Geometry& geo,
                                        const ublas::vector<double>& ThetaD_xx_zz,
                                        Solver::Matrix& diff_xx_zz)
 {
@@ -433,7 +433,7 @@ MsoltranrectMollerup::diffusion_xx_zz (const Geometry& geo,
 
 
 void 
-MsoltranrectMollerup::diffusion_xz_zx (const GeometryRect& geo,
+TransportMollerup::diffusion_xz_zx (const GeometryRect& geo,
                                        const ublas::vector<double>& ThetaD_xz_zx,
                                        Solver::Matrix& diff_xz_zx)
 {
@@ -507,7 +507,7 @@ MsoltranrectMollerup::diffusion_xz_zx (const GeometryRect& geo,
 }
 
 void 
-MsoltranrectMollerup::advection (const Geometry& geo,
+TransportMollerup::advection (const Geometry& geo,
                                  const ublas::vector<double>& q_edge,
                                  Solver::Matrix& advec) const
 {
@@ -546,7 +546,7 @@ MsoltranrectMollerup::advection (const Geometry& geo,
 
 
 void 
-MsoltranrectMollerup::Neumann_expl (const size_t cell,
+TransportMollerup::Neumann_expl (const size_t cell,
                                     const double area, 
                                     const double in_sign,
                                     const double J, 
@@ -558,7 +558,7 @@ MsoltranrectMollerup::Neumann_expl (const size_t cell,
 
 
 void 
-MsoltranrectMollerup::Neumann_impl (const size_t cell,
+TransportMollerup::Neumann_impl (const size_t cell,
                                     const double area, 
                                     const double in_sign,
                                     const double q, 
@@ -571,7 +571,7 @@ MsoltranrectMollerup::Neumann_impl (const size_t cell,
 
 
 void
-MsoltranrectMollerup::Dirichlet_expl(const size_t cell,
+TransportMollerup::Dirichlet_expl(const size_t cell,
                                      const double area,
                                      const double area_per_length, 
                                      const double in_sign,
@@ -707,7 +707,7 @@ MsoltranrectMollerup::Dirichlet_expl(const size_t cell,
 
 #ifdef OLD_BORDER
 void 
-MsoltranrectMollerup::lowerboundary
+TransportMollerup::lowerboundary
 /**/ (const Geometry& geo,
       const bool isflux,
       const double C_border,
@@ -762,7 +762,7 @@ MsoltranrectMollerup::lowerboundary
 }
 #else // !OLD_BORDER
 void 
-MsoltranrectMollerup::lowerboundary (const Geometry& geo,
+TransportMollerup::lowerboundary (const Geometry& geo,
                                      const std::map <size_t, double>& C_border,
                                      const ublas::vector<double>& q_edge,
                                      const ublas::vector<double>& ThetaD_xx_zz,
@@ -809,7 +809,7 @@ MsoltranrectMollerup::lowerboundary (const Geometry& geo,
 #endif //!OLD_BORDER
 
 double 
-MsoltranrectMollerup::Dirichlet_timestep 
+TransportMollerup::Dirichlet_timestep 
 /**/                    (const Geometry& geo,
                          const ublas::vector<double>& ThetaD_xx_zz,
                          const double dt)
@@ -859,7 +859,7 @@ MsoltranrectMollerup::Dirichlet_timestep
 
 #ifdef OLD_BORDER
 void 
-MsoltranrectMollerup::upperboundary (const Geometry& geo,
+TransportMollerup::upperboundary (const Geometry& geo,
                                      std::vector<edge_type_t>& edge_type,
                                      const std::vector<double>& J,
                                      ublas::vector<double>& B_vec,
@@ -883,7 +883,7 @@ MsoltranrectMollerup::upperboundary (const Geometry& geo,
 }
 #else //!OLD_BORDER
 void 
-MsoltranrectMollerup::forced_flux (const Geometry& geo,
+TransportMollerup::forced_flux (const Geometry& geo,
                                    const std::map<size_t, double>& J_forced,
                                    std::vector<edge_type_t>& edge_type,
                                    ublas::vector<double>& B_vec,
@@ -911,7 +911,7 @@ MsoltranrectMollerup::forced_flux (const Geometry& geo,
 
 #ifdef OLD_BORDER
 void 
-MsoltranrectMollerup::fluxes (const GeometryRect& geo,
+TransportMollerup::fluxes (const GeometryRect& geo,
                               const std::vector<edge_type_t>& edge_type, 
                               const ublas::vector<double>& q_edge,
                               const ublas::vector<double>& ThetaD_xx_zz,
@@ -1077,7 +1077,7 @@ MsoltranrectMollerup::fluxes (const GeometryRect& geo,
 }
 #else // !OLD_BORDER
 void 
-MsoltranrectMollerup::fluxes (const GeometryRect& geo,
+TransportMollerup::fluxes (const GeometryRect& geo,
                               const std::vector<edge_type_t>& edge_type, 
                               const ublas::vector<double>& q_edge,
                               const ublas::vector<double>& ThetaD_xx_zz,
@@ -1284,7 +1284,7 @@ sub_to (const Solver::Matrix& from, ublas::coordinate_matrix<double>& to)
 
 
 void
-MsoltranrectMollerup::flow (const Geometry& geo_base, 
+TransportMollerup::flow (const Geometry& geo_base, 
                             const Soil& soil, 
                             const std::vector<double>& Theta_old,
                             const std::vector<double>& Theta_new,
@@ -1726,7 +1726,7 @@ MsoltranrectMollerup::flow (const Geometry& geo_base,
 }
 
 bool 
-MsoltranrectMollerup::check (const Geometry& geo, Treelog& msg)
+TransportMollerup::check (const Geometry& geo, Treelog& msg)
 {
   bool ok = true;
 
@@ -1739,19 +1739,19 @@ This primary solute transport model only works with 'rectangle' movement");
   return ok;
 }
 
-MsoltranrectMollerup::MsoltranrectMollerup (Block& al)
-  : Msoltranrect (al),
+TransportMollerup::TransportMollerup (Block& al)
+  : Transport (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
     enable_boundary_diffusion (al.flag ("enable_boundary_diffusion")),
     debug (al.integer ("debug")),
     upstream_weight (al.number ("upstream_weight"))
 { }
 
-MsoltranrectMollerup::~MsoltranrectMollerup ()
+TransportMollerup::~TransportMollerup ()
 { }
 
 void 
-MsoltranrectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
+TransportMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_object ("solver", Solver::component, 
                      Syntax::Const, Syntax::Singleton, "\
@@ -1770,36 +1770,36 @@ Upstream weighting factor: 1 = full upstream formulation, 0.5 = equal weight.");
 }
 
 const AttributeList& 
-Msoltranrect::rectangle_model ()
+Transport::rectangle_model ()
 {
   static AttributeList alist;
 
   if (!alist.check ("type"))
     {
       Syntax dummy;
-      MsoltranrectMollerup::load_syntax (dummy, alist);
+      TransportMollerup::load_syntax (dummy, alist);
       alist.add ("type", "Mollerup");
     }
   return alist;
 }
 
-static struct MsoltranrectMollerupSyntax
+static struct TransportMollerupSyntax
 {
   static Model& make (Block& al)
-  { return *new MsoltranrectMollerup (al); }
+  { return *new TransportMollerup (al); }
 
-  MsoltranrectMollerupSyntax ()
+  TransportMollerupSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Coupled vertical and horizontal transport.\n\
 See Mollerup 2007 for details.");
-    MsoltranrectMollerup::load_syntax (syntax, alist);
+    TransportMollerup::load_syntax (syntax, alist);
  
-    Librarian::add_type (Msoltranrect::component,
+    Librarian::add_type (Transport::component,
                          "Mollerup", alist, syntax, &make);
   }
-} MsoltranrectMollerup_syntax;
+} TransportMollerup_syntax;
 
-// msoltranrect_Mollerup.C ends here.
+// transport_Mollerup.C ends here.

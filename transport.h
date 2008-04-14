@@ -1,7 +1,6 @@
-// transport.h
+// transport.h -- Solute transport in primary domain.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2006 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -24,42 +23,58 @@
 #define TRANSPORT_H
 
 #include "model.h"
-#include "syntax.h"
 #include <vector>
+#include <map>
 
-class Geometry1D;
+class Log;
+class Geometry;
 class Soil;
 class SoilWater;
+class DOE;
+class Chemical;
 class Adsorption;
-class Block;
-class AttributeList;
+class Surface;
+class Groundwater;
+class Weather;
+class Time;
 class Treelog;
+class Block;
+class Scope;
 
 class Transport : public Model
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
 
   // Simulation.
 public:
-  virtual void tick (Treelog&, const Geometry1D&,
-                     const Soil&, const SoilWater&, 
-		     const Adsorption&, 
-		     double diffusion_coefficient,
-		     std::vector<double>& M, 
-		     std::vector<double>& C,
-		     const std::vector<double>& S,
-		     std::vector<double>& J,
-		     const double C_below, double dt) = 0;
+  void element (const Geometry&, const Soil&, const SoilWater&,
+                DOE&, const double diffusion_coefficient, double dt, Treelog&);
+  virtual void flow (const Geometry& geo, 
+                     const Soil& soil, 
+                     const std::vector<double>& Theta_old,
+                     const std::vector<double>& Theta_new,
+                     const std::vector<double>& q,
+                     symbol name,
+                     const std::vector<double>& S, 
+                     const std::map<size_t, double>& J_forced,
+                     const std::map<size_t, double>& C_border,
+                     std::vector<double>& C, 
+                     std::vector<double>& J, 
+                     double diffusion_coefficient, double dt,
+                     Treelog& msg) const = 0;
 
   // Create and Destroy.
 public:
-  static const AttributeList& default_model ();
-  static const AttributeList& reserve_model ();
+  virtual bool check (const Geometry&, Treelog&);
+  // Generic models.
   static const AttributeList& none_model ();
+  static const AttributeList& reserve_model ();
+  // Geometry specific models.
+  static const AttributeList& vertical_model ();
+  static const AttributeList& rectangle_model ();
 protected:
   Transport (Block&);
 public:

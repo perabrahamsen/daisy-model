@@ -22,7 +22,7 @@
 #include "movement_solute.h"
 #include "geometry.h"
 #include "soil_water.h"
-#include "msoltranrect.h"
+#include "transport.h"
 #include "chemical.h"
 #include "adsorption.h"
 #include "alist.h"
@@ -266,7 +266,7 @@ MovementSolute::secondary_transport (const Geometry& geo,
 void
 MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
                                    const SoilWater& soil_water,
-                                   const Msoltranrect& transport,
+                                   const Transport& transport,
                                    const std::map<size_t, double>& J_forced,
                                    const std::map<size_t, double>& C_border,
                                    Chemical& solute, 
@@ -530,9 +530,9 @@ MovementSolute::check_solute (Treelog& msg) const
 
 MovementSolute::MovementSolute (Block& al)
   : Movement (al),
-    matrix_solute (Librarian::build_vector<Msoltranrect> 
+    matrix_solute (Librarian::build_vector<Transport> 
                    (al, "matrix_solute")),
-    matrix_solid (Librarian::build_item<Msoltranrect>
+    matrix_solid (Librarian::build_item<Transport>
 		  (al, "matrix_solid"))
 { }
 
@@ -541,7 +541,7 @@ void
 MovementSolute::load_solute (Syntax& syntax, AttributeList& alist, 
                              const AttributeList& prefered_solute)
 {
-  syntax.add_object ("matrix_solute", Msoltranrect::component, 
+  syntax.add_object ("matrix_solute", Transport::component, 
                      Syntax::State, Syntax::Sequence,
                      "Matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
@@ -551,16 +551,16 @@ If none succeeds, the simulation ends.");
   AttributeList matrix_solute_default (prefered_solute);
   matrix_solute_models.push_back (&matrix_solute_default);
 #endif
-  AttributeList matrix_solute_reserve (Msoltranrect::reserve_model ());
+  AttributeList matrix_solute_reserve (Transport::reserve_model ());
   matrix_solute_models.push_back (&matrix_solute_reserve);
-  AttributeList matrix_solute_none (Msoltranrect::none_model ());
+  AttributeList matrix_solute_none (Transport::none_model ());
   matrix_solute_models.push_back (&matrix_solute_none);
   alist.add ("matrix_solute", matrix_solute_models);
 
-  syntax.add_object ("matrix_solid", Msoltranrect::component, 
+  syntax.add_object ("matrix_solid", Transport::component, 
                      Syntax::Const, Syntax::Singleton, "\
 Matrix solute transport model used for fully sorbed constituents.");
-  alist.add ("matrix_solid", Msoltranrect::none_model ());
+  alist.add ("matrix_solid", Transport::none_model ());
 }
 
 // movement_solute.C ends here.

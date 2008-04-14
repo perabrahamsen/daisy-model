@@ -1,7 +1,8 @@
-// transport_cd.C --- Using convection-dispersion.
+// transport_Hansen.C --- Using convection-dispersion.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2008 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -25,70 +26,73 @@
 #include "block.h"
 #include "geometry1d.h"
 #include "soil.h"
-#include "soil_water.h"
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include <sstream>
 
-struct TransportCD : public Transport
+struct TransportHansen : public Transport
 {
-  // Parameters.
-  const int max_time_step_reductions;
-  
   // Simulation.
-  void tick (Treelog&, const Geometry1D& geo,
-             const Soil&, const SoilWater&, const Adsorption&,
-	     double diffusion_coefficient,
-	     std::vector<double>& M, 
-	     std::vector<double>& C,
-	     const std::vector<double>& S,
-	     std::vector<double>& J, double C_below, double dt);
+  void flow (const Geometry& geo, 
+             const Soil& soil, 
+             const std::vector<double>& Theta_old,
+             const std::vector<double>& Theta_new,
+             const std::vector<double>& q,
+             symbol name,
+             const std::vector<double>& S, 
+             const std::map<size_t, double>& J_forced,
+             const std::map<size_t, double>& C_border,
+             std::vector<double>& C, 
+             std::vector<double>& J, 
+             double diffusion_coefficient, double dt,
+             Treelog& msg) const;
 
   // Create.
-  TransportCD (Block& al)
-    : Transport (al),
-      max_time_step_reductions (al.integer ("max_time_step_reductions"))
+  // Create.
+  bool check (const Geometry&, Treelog&);
+  TransportHansen (Block& al)
+    : Transport (al)
   { }
   static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
 
 void 
-TransportCD::tick (Treelog&, const Geometry1D& geo,
-                   const Soil& soil, const SoilWater& soil_water,
-		   const Adsorption& adsorption,
-		   const double diffusion_coefficient,
-		   std::vector<double>& M, 
-		   std::vector<double>& C,
-		   const std::vector<double>& S,
-		   std::vector<double>& J, const double C_below,
-		   const double dt)
+TransportHansen::flow (const Geometry& geo_base, 
+                           const Soil& soil, 
+                           const std::vector<double>& Theta_begin,
+                           const std::vector<double>& Theta_end,
+                           const std::vector<double>& q_primary,
+                           symbol name,
+                           const std::vector<double>& S, 
+                           const std::map<size_t, double>& J_forced,
+                           const std::map<size_t, double>& C_border,
+                           std::vector<double>& C, 
+                           std::vector<double>& J, 
+                           double diffusion_coefficient, double dt,
+                           Treelog& msg) const
 {
-  double J_in = J[0];
-
-  // Remember old values.
-  const std::vector<double> C_prev = C;
-  const std::vector<double> M_prev = M;
+  const Geometry1D& geo = dynamic_cast<const Geometry1D&> (geo_base);
 
   // Constants.
   const size_t size = geo.cell_size (); // Number of soil layers.
 
-  // Check that incomming C and M makes sense.
-  for (unsigned int i = 0; i < size; i++)
-    {
-      daisy_assert (C[i] >= 0.0);
-      daisy_assert (M[i] >= 0.0);
-      if (iszero (C[i]))
-	daisy_assert (iszero (M[i]));
-      else 
-        daisy_approximate (M[i], 
-                           adsorption.C_to_M (soil,
-                                              soil_water.Theta_old (i),
-                                              i, C[i]));
-    }
+  // Border conditions
+  daisy_assert (J_forced.size () == 1);
+  daisy_assert (J_forced.begin ()->first == 0);
+  double J_in = J_forced.begin ()->second;
+  daisy_assert (C_border.size () < 2);
+  daisy_assert (C_border.size () == 0 || C_border.begin ()->first == size);
+  const double C_below = C_border.begin () == C_border.end ()
+    ? -42.42e42
+    : C_border.begin ()->second;
 
-  // Note: q, D, and alpha depth indexes are all [j-½].
+  // Remember old values.
+  const std::vector<double> C_prev = C;
+  std::vector<double> M_prev (size);
+  for (size_t c = 0; c < size; c++)
+    M_prev[c] = C[c] * Theta_begin[c];
 
   // Dispersion coefficient [cm²/s]
   std::vector<double> D (size + 1);
@@ -99,12 +103,11 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
       const double lambda = soil.dispersivity (j);
 
       // Water flux [cm³ /cm² / h]
-      const double q = soil_water.q_matrix (j);
+      const double q = q_primary[j];
       
       // Theta middled in time and space.
-      const double Theta = 
-	(soil_water.Theta (j) + soil_water.Theta (j-1)
-	 + soil_water.Theta_old (j) + soil_water.Theta_old (j-1)) / 4.0;
+      const double Theta = (Theta_begin[j] + Theta_begin[j-1]
+                            + Theta_end[j] + Theta_end[j-1]) / 4.0;
       // From equation 7-39:
       D[j] = (lambda * fabs (-q / Theta)
 	      + soil.tortuosity_factor (j, Theta)
@@ -120,11 +123,10 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
     const double lambda = soil.dispersivity (size-1);
 
     // Water flux [cm³ /cm² / h]
-    const double q = soil_water.q_matrix (size);
+    const double q = q_primary[size];
       
     // Theta middled in time and space.
-    const double Theta = 
-      (soil_water.Theta (size - 1) + soil_water.Theta_old (size  - 1)) / 2.0;
+    const double Theta = (Theta_begin[size - 1] + Theta_end[size  - 1]) / 2.0;
     // From equation 7-39:
     D[size] = (lambda * fabs (-q / Theta)
 	       + soil.tortuosity_factor (size-1, Theta) 
@@ -141,7 +143,7 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 
   for (unsigned int j = 0; j < size + 1; j++)
     {
-      if (soil_water.q_matrix (j) < 0.0)
+      if (q_primary[j] < 0.0)
 	alpha[j] = 1.0;
       else
 	alpha[j] = 0.0;
@@ -161,10 +163,10 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 #ifdef DISABLE_MIXING
       daisy_assert (J_in < 0.0);
 #endif
-      if (soil_water.q_matrix (0) < 0.0)
+      if (q_primary[0] < 0.0)
 	// Normal condition, stuff is in solute.
 	if (J_in < 0.0)
-	  C_top = J_in / soil_water.q_matrix (0);
+	  C_top = J_in / q_primary[0];
 	else
 	  {
 	    S_top = -J_in / geo.dz (0);
@@ -182,10 +184,6 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
   double ddt = dt;
   for (unsigned int i = 0; i < size; i++)
     ddt = std::min (ddt, std::pow (geo.dz (i), 2) / (2 * D[i + 1]));
-  int time_step_reductions = 0;
-
-  // We restart from here if anything goes wrong.
- try_again:;
 
   // Loop through small time steps.
   for (double old_t = 0.0, t = ddt; 
@@ -205,11 +203,9 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
       std::vector<double> Theta_new (size);
       for (unsigned int j = 0; j < size; j++)
 	{
-	  const double Theta_ratio 
-	    = (soil_water.Theta (j) - soil_water.Theta_old (j)) / dt;
-	  Theta_new[j] = soil_water.Theta_old (j) + Theta_ratio * t;
-	  Theta_old[j] = soil_water.Theta_old (j) + Theta_ratio * old_t;
-	  A[j] = M[j] - C[j] * Theta_old[j];
+	  const double Theta_ratio = (Theta_begin[j] - Theta_end[j]) / dt;
+	  Theta_new[j] = Theta_end[j] + Theta_ratio * t;
+	  Theta_old[j] = Theta_end[j] + Theta_ratio * old_t;
 	}
 
       for (unsigned int j = 1; j < size; j++)
@@ -220,8 +216,8 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 	    = (j == size - 1) ? dz_minus : (geo.z (j) - geo.z (j+1));
 
 	  const double dz = geo.dz (j); // Size of current cell.
-	  double q_minus = soil_water.q_matrix (j); // Flow to above.
-	  const double q_plus = soil_water.q_matrix (j+1);	// Flow from below.
+	  double q_minus = q_primary[j]; // Flow to above.
+	  const double q_plus = q_primary[j+1];	// Flow from below.
 	  const double alpha_minus = alpha[j]; // Direction above.
 	  const double alpha_plus = alpha[j+1]; // Direction below.
 	  double D_minus = D[j]; // Dispertion above.
@@ -267,9 +263,9 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 	// Size of current cell.
 	const double dz = geo.dz (0);
 	// Flow to above.
-	double q_minus = std::isnormal (J_in) ? soil_water.q_matrix (0) : 0.0;
+	double q_minus = std::isnormal (J_in) ? q_primary[0] : 0.0;
 	// Flow from below.
-	const double q_plus = soil_water.q_matrix (1);
+	const double q_plus = q_primary[1];
 	const double alpha_minus = alpha[0]; // Direction above.
 	const double alpha_plus = alpha[1]; // Direction below.
 	double D_minus = D[0]; // Dispertion above.
@@ -311,41 +307,13 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 
       // Calculate new concentration.
       tridia (0, size, a, b, c, d, C.begin ());
-
-      // Check solution.
-      for (unsigned int j = 0; j < size; j++)
-	if (C[j] < 0.0)
-	  {
-	    ddt *= 0.5;
-	    C = C_prev;
-	    M = M_prev;
-	    time_step_reductions++;
-	    if (time_step_reductions > max_time_step_reductions)
-	      throw ("convection-dispersion gave negative solution");
-	    goto try_again;
-	  }
-
-      // Update M and C.
-      for (unsigned int j = 0; j < size; j++)
-	{
-	  // We use the old absorbed stuff plus the new dissolved stuff.
- 	  M[j] = A[j] + Theta_new[j] * C[j];
-	  daisy_assert (M[j] >= 0.0);
-
-	  // We calculate new C by assumining instant absorption.
-	  C[j] = adsorption.M_to_C (soil, Theta_new[j], j, M[j]);
-
-          // Check that it goes both ways.
-          if (iszero (C[j]))
-            daisy_assert (iszero (M[j]));
-          else
-            daisy_assert (approximate (M[j], 
-                                       adsorption.C_to_M (soil, Theta_new[j],
-                                                          j, C[j])));
-	}
     }
 
   // Calculate flux with mass conservation.
+  std::vector<double> M (size);
+  for (size_t c = 0; c < size; c++)
+    M[c] = C[c] * Theta_end[c];
+
   if (size + 1 > J.size ())
     J.insert (J.begin (), size + 1 - J.size (), 0.0);
 
@@ -358,42 +326,52 @@ TransportCD::tick (Treelog&, const Geometry1D& geo,
 }
 
 const AttributeList& 
-Transport::default_model ()
+Transport::vertical_model ()
 {
   static AttributeList alist;
   
   if (!alist.check ("type"))
     {
       Syntax dummy;
-      TransportCD::load_syntax (dummy, alist);
-      alist.add ("type", "cd");
+      TransportHansen::load_syntax (dummy, alist);
+      alist.add ("type", "Hansen");
     }
   return alist;
 }
 
-void 
-TransportCD::load_syntax (Syntax& syntax, AttributeList& alist)
+bool 
+TransportHansen::check (const Geometry& geo, Treelog& msg)
 {
-    syntax.add ("max_time_step_reductions",
-		Syntax::Integer, Syntax::Const, "\
-Number of times we may reduce the time step before giving up");
-    alist.add ("max_time_step_reductions", 20);
+  bool ok = true;
+
+  if (!dynamic_cast<const Geometry1D*> (&geo))
+    {
+      msg.error ("\
+This primary solute transport model only works with 'vertical' movement");
+      ok = false;
+    }
+  return ok;
 }
 
-static struct TransportCDSyntax
+void 
+TransportHansen::load_syntax (Syntax& syntax, AttributeList& alist)
+{ }
+
+static struct TransportHansenSyntax
 {
   static Model& make (Block& al)
   {
-    return *new TransportCD (al);
+    return *new TransportHansen (al);
   }
 
-  TransportCDSyntax ()
+  TransportHansenSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
 	       "Solute transport using convection-dispersion.");
-    TransportCD::load_syntax (syntax, alist);
-    Librarian::add_type (Transport::component, "cd", alist, syntax, &make);
+    TransportHansen::load_syntax (syntax, alist);
+    Librarian::add_type (Transport::component, "Hansen", 
+                         alist, syntax, &make);
   }
-} TransportCD_syntax;
+} TransportHansen_syntax;

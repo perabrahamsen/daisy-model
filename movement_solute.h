@@ -25,13 +25,13 @@
 #include "memutils.h"
 #include <map>
 
-class Msoltranrect;
+class Transport;
 
 struct MovementSolute : public Movement
 {
   // Solute.
-  const auto_vector<Msoltranrect*> matrix_solute;
-  const std::auto_ptr<Msoltranrect> matrix_solid;
+  const auto_vector<Transport*> matrix_solute;
+  const std::auto_ptr<Transport> matrix_solid;
   static void secondary_flow (const Geometry& geo, 
                               const std::vector<double>& Theta_old,
                               const std::vector<double>& Theta_new,
@@ -54,7 +54,7 @@ struct MovementSolute : public Movement
                                    const Scope& scope, Treelog& msg);
   static void primary_transport (const Geometry& geo,
                                  const Soil& soil, const SoilWater& soil_water,
-                                 const Msoltranrect&,
+                                 const Transport&,
                                  const std::map<size_t, double>& J_forced,
                                  const std::map<size_t, double>& C_border,
                                  Chemical& solute, 
