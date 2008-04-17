@@ -27,6 +27,22 @@
 #include "adsorption.h"
 #include "alist.h"
 #include "librarian.h"
+#include "block.h"
+#include "mactrans.h"
+
+void
+MovementSolute::tertiary_transport (const Geometry& geo,
+                                    const Soil& soil,
+                                    const SoilWater& soil_water,
+                                    const Mactrans& tertiary,
+                                    const std::map<size_t, double>& J_forced,
+                                    const std::map<size_t, double>& C_border,
+                                    Chemical& solute, 
+                                    const double dt,
+                                    const Scope& scope, Treelog& msg)
+{ 
+  
+}
 
 void 
 MovementSolute::secondary_flow (const Geometry& geo, 
@@ -184,7 +200,6 @@ MovementSolute::secondary_transport (const Geometry& geo,
                                      const double dt,
                                      const Scope& scope, Treelog& msg)
 { 
-  
   // Edges.
   const size_t edge_size = geo.edge_size ();
 
@@ -356,7 +371,8 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
   // Divide incomming flux according to water.
   daisy_assert (J_above <= 0.0);
   std::map<size_t, double> J_tertiary;
-  std::map<size_t, double> J_secondary;  std::map<size_t, double> J_primary;
+  std::map<size_t, double> J_secondary; 
+  std::map<size_t, double> J_primary;
 
   const std::vector<size_t>& edge_above 
     = geometry ().cell_edges (Geometry::cell_above);
@@ -371,7 +387,9 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
       daisy_assert (geometry ().cell_is_internal (cell));
       const double area = geometry ().edge_area (edge);
       const double in_sign 
-        = geometry ().cell_is_internal (geometry ().edge_to (edge)) ? 1.0 : -1.0;
+        = geometry ().cell_is_internal (geometry ().edge_to (edge)) 
+        ? 1.0
+        : -1.0;
       daisy_assert (in_sign < 0);
 
       // Tertiary domain.
@@ -381,7 +399,6 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
           const double flow = tertiary_in * area;
           total_water_in += flow;
           J_tertiary[edge] = flow * in_sign;
-          
         }
       else
         J_tertiary[edge] = 0.0;
@@ -426,8 +443,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
     }
 
   // We set a fixed concentration below lower boundary, if specified.
-  std::map<size_t, double> C_secondary;
-  std::map<size_t, double> C_primary;
+  std::map<size_t, double> C_border;
 
   const double C_below = chemical.C_below ();
   if (C_below >= 0.0)
@@ -439,13 +455,17 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
       for (size_t i = 0; i < edge_below_size; i++)
         {
           const size_t edge = edge_below[i];
-          C_secondary[edge] = C_below;
-          C_primary[edge] = C_below;
+          C_border[edge] = C_below;
         }
     }
 
+  // Tertiary transport.
+  if (tertiary.get ())
+    tertiary_transport (geometry (), soil, soil_water, *tertiary, 
+                        J_tertiary, C_border, chemical, dt, scope, msg);
+    
   // Secondary transport activated.
-  secondary_transport (geometry (), soil, soil_water, J_secondary, C_secondary,
+  secondary_transport (geometry (), soil, soil_water, J_secondary, C_border,
                        chemical, S_extra, dt, scope, msg);
 
   // Fully adsorbed primary transport.
@@ -454,7 +474,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
       daisy_assert (iszero (J_above));
       Treelog::Open nest (msg, "solid " + matrix_solid->library_id ());
       primary_transport (geometry (), soil, soil_water,
-                         *matrix_solid, J_primary, C_primary,
+                         *matrix_solid, J_primary, C_border,
                          chemical, S_extra, dt, scope, msg);
       return;
     }
@@ -466,7 +486,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
       try
         {
           primary_transport (geometry (), soil, soil_water, 
-                             *matrix_solute[i], J_primary, C_primary,
+                             *matrix_solute[i], J_primary, C_border,
                              chemical, S_extra, dt, scope, msg);
           if (i > 0)
             msg.message ("Succeeded");
@@ -518,6 +538,7 @@ bool
 MovementSolute::check_solute (Treelog& msg) const
 {
   bool ok = true; 
+  // Primary domain
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
       Treelog::Open nest (msg, 
@@ -525,15 +546,30 @@ MovementSolute::check_solute (Treelog& msg) const
       if (!matrix_solute[i]->check (geometry (), msg))
         ok = false;
     }
+  // Solid.
+  {
+      Treelog::Open nest (msg, "matrix_solid: '"
+                          + matrix_solid->library_id () + "'");
+      if (!matrix_solid->check (geometry (), msg))
+        ok = false;
+  }
+  // Tertiary.
+  if (tertiary.get ())
+    {
+        Treelog::Open nest (msg, "tertiary: '" + tertiary->library_id () + "'");
+        if (!tertiary->check (geometry (), msg))
+          ok = false;
+    }
   return ok;
 }
 
 MovementSolute::MovementSolute (Block& al)
   : Movement (al),
-    matrix_solute (Librarian::build_vector<Transport> 
-                   (al, "matrix_solute")),
-    matrix_solid (Librarian::build_item<Transport>
-		  (al, "matrix_solid"))
+    matrix_solute (Librarian::build_vector<Transport> (al, "matrix_solute")),
+    matrix_solid (Librarian::build_item<Transport> (al, "matrix_solid")),
+    tertiary (al.check ("tertiary")
+              ? Librarian::build_item<Mactrans> (al, "tertiary")
+              : NULL)
 { }
 
 
@@ -547,10 +583,8 @@ MovementSolute::load_solute (Syntax& syntax, AttributeList& alist,
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
   std::vector<const AttributeList*> matrix_solute_models;
-#if 0 // Need to distinguish between 1D & 2D
   AttributeList matrix_solute_default (prefered_solute);
   matrix_solute_models.push_back (&matrix_solute_default);
-#endif
   AttributeList matrix_solute_reserve (Transport::reserve_model ());
   matrix_solute_models.push_back (&matrix_solute_reserve);
   AttributeList matrix_solute_none (Transport::none_model ());
@@ -561,6 +595,9 @@ If none succeeds, the simulation ends.");
                      Syntax::Const, Syntax::Singleton, "\
 Matrix solute transport model used for fully sorbed constituents.");
   alist.add ("matrix_solid", Transport::none_model ());
+  syntax.add_object ("tertiary", Transport::component, 
+                     Syntax::OptionalConst, Syntax::Singleton, "\
+Matrix solute transport model used for tertiary domain (macropores).");
 }
 
 // movement_solute.C ends here.

@@ -27,6 +27,7 @@
 #include "symbol.h"
 #include <vector>
 
+class Geometry;
 class Geometry1D;
 class SoilWater;
 class Log;
@@ -50,9 +51,10 @@ public:
 		     std::vector<double>& S,
 		     std::vector<double>& S_p,
 		     std::vector<double>& J_p, double dt, Treelog&) = 0;
-  virtual void output (Log&) const = 0;
 
   // Create and Destroy.
+public:
+  virtual bool check (const Geometry&, Treelog&) const = 0;
 protected:
   Mactrans (Block& al);
 public:

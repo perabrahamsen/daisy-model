@@ -26,12 +26,23 @@
 #include <map>
 
 class Transport;
+class Mactrans;
 
 struct MovementSolute : public Movement
 {
   // Solute.
   const auto_vector<Transport*> matrix_solute;
   const std::auto_ptr<Transport> matrix_solid;
+  const std::auto_ptr<Mactrans> tertiary;
+  static void tertiary_transport (const Geometry& geo,
+                                  const Soil& soil,
+                                  const SoilWater& soil_water,
+                                  const Mactrans& tertiary,
+                                  const std::map<size_t, double>& J_forced,
+                                  const std::map<size_t, double>& C_border,
+                                  Chemical& solute, 
+                                  const double dt,
+                                  const Scope& scope, Treelog& msg);
   static void secondary_flow (const Geometry& geo, 
                               const std::vector<double>& Theta_old,
                               const std::vector<double>& Theta_new,

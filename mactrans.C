@@ -43,3 +43,5 @@ Mactrans::~Mactrans ()
 
 static Librarian Mactrans_init (Mactrans::component, "\
 Macropore transportation of solutes.");
+
+// mactrans.C ends here.

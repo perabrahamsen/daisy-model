@@ -51,7 +51,7 @@ struct TransportHansen : public Transport
 
   // Create.
   // Create.
-  bool check (const Geometry&, Treelog&);
+  bool check (const Geometry&, Treelog&) const;
   TransportHansen (Block& al)
     : Transport (al)
   { }
@@ -340,7 +340,7 @@ Transport::vertical_model ()
 }
 
 bool 
-TransportHansen::check (const Geometry& geo, Treelog& msg)
+TransportHansen::check (const Geometry& geo, Treelog& msg) const
 {
   bool ok = true;
 

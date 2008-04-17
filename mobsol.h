@@ -1,4 +1,4 @@
-// mobsol.h --- Specify mobile/immobile solute parameters.
+// secondary.h --- Specify secondary domain solute parameters.
 // 
 // Copyright 2008 Per Abrahamsen, Mikkel Mollerup and KU.
 //
@@ -19,8 +19,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef MOBSOL_H
-#define MOBSOL_H
+#ifndef SECONDARY_H
+#define SECONDARY_H
 
 #include "model.h"
 #include "symbol.h"
@@ -28,7 +28,7 @@
 class Block;
 class AttributeList;
 
-class Mobsol : public Model
+class Secondary : public Model
 {
   // Identity.
 public:
@@ -38,15 +38,15 @@ public:
  
   // Content.
 public:
-  virtual bool full () const = 0;    // True iff all water is mobile.
+  virtual bool none () const = 0;    // True iff all water is in primary domain.
   virtual double h_lim () const = 0; // The value of the 'h_lim' parameter.
   virtual double alpha () const = 0; // The value of the 'alpha' parameter.
 
   // Create and Destroy.
 public:
-  static const AttributeList& full_model ();
-  Mobsol (Block& al);
-  virtual ~Mobsol ();
+  static const AttributeList& none_model ();
+  Secondary (Block& al);
+  virtual ~Secondary ();
 };
 
-#endif // MOBSOL_H
+#endif // SECONDARY_H

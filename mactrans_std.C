@@ -38,10 +38,9 @@ struct MactransStandard : public Mactrans
 	    const std::vector<double>& M, const std::vector<double>& C,
 	    std::vector<double>& S, std::vector<double>& S_p,
 	    std::vector<double>& J_p, double dt, Treelog&);
-  void output (Log&) const
-    { }
 
   // Create and Destroy.
+  bool check (const Geometry&, Treelog&) const;
   MactransStandard (Block& al)
     : Mactrans (al)
     { }
@@ -173,6 +172,19 @@ MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,
 	     << "' solute\n";
       out.error (tmp.str ());
     }
+}
+
+bool 
+MactransStandard::check (const Geometry& geo, Treelog& msg) const
+{ 
+  bool ok = true;
+  if (!dynamic_cast<const GeometryVert*> (&geo))
+    {
+      msg.error ("\
+This tertiary solute transport model only works with vertical geometries");
+      ok = false;
+    }
+  return ok; 
 }
 
 const AttributeList& 

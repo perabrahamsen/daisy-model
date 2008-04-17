@@ -91,7 +91,7 @@ Transport::element (const Geometry& geo,
 }
 
 bool 
-Transport::check (const Geometry&, Treelog&)
+Transport::check (const Geometry&, Treelog&) const
 { return true; }
 
 Transport::Transport (Block& al)

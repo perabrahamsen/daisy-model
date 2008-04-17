@@ -205,7 +205,7 @@ struct TransportMollerup : public Transport
              Treelog& msg) const;
   
   // Create.
-  bool check (const Geometry&, Treelog&);
+  bool check (const Geometry&, Treelog&) const;
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   TransportMollerup (Block& al);
   ~TransportMollerup ();
@@ -1726,7 +1726,7 @@ TransportMollerup::flow (const Geometry& geo_base,
 }
 
 bool 
-TransportMollerup::check (const Geometry& geo, Treelog& msg)
+TransportMollerup::check (const Geometry& geo, Treelog& msg) const
 {
   bool ok = true;
 
