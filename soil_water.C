@@ -29,7 +29,7 @@
 #include "log.h"
 #include "submodel.h"
 #include "block.h"
-#include "mobsol.h"
+#include "secondary.h"
 #include <sstream>
 
 void
@@ -218,8 +218,8 @@ SoilWater::tick_after (const Geometry& geo,
     {
       K_[c] = soil.K (c, h_[c], h_ice_[c], soil_heat.T (c));
       
-      const Mobsol& mobsol = soil.mobile_solute (c);
-      if (mobsol.full ())
+      const Secondary& secondary = soil.secondary_domain (c);
+      if (secondary.none ())
         {
           // Only one domain in this horizon.
           Theta_primary_[c] = Theta_[c];
@@ -228,7 +228,7 @@ SoilWater::tick_after (const Geometry& geo,
       else  
         {
           // Two matrix domains.
-          const double h_lim = mobsol.h_lim ();
+          const double h_lim = secondary.h_lim ();
           if (h_[c] <= h_lim)
             {
               // Sedondary domain not activated.
@@ -283,9 +283,9 @@ SoilWater::tick_after (const Geometry& geo,
             continue;
           K_edge += 0.5 * (K_old[to] + K (to));
 
-          const Mobsol& mobsol = soil.mobile_solute (to);
-          daisy_assert (!mobsol.full ());
-          const double h_lim = mobsol.h_lim ();
+          const Secondary& secondary = soil.secondary_domain (to);
+          daisy_assert (!secondary.none ());
+          const double h_lim = secondary.h_lim ();
           K_lim += soil.K (to, h_lim, h_ice (to), soil_heat.T (to));
         }
       
@@ -299,9 +299,9 @@ SoilWater::tick_after (const Geometry& geo,
             continue;
           K_edge += 0.5 * (K_old[from] + K (from));
 
-          const Mobsol& mobsol = soil.mobile_solute (from);
-          daisy_assert (!mobsol.full ());
-          const double h_lim = mobsol.h_lim ();
+          const Secondary& secondary = soil.secondary_domain (from);
+          daisy_assert (!secondary.none ());
+          const double h_lim = secondary.h_lim ();
           K_lim += soil.K (from, h_lim, h_ice (from), soil_heat.T (from));
         }
       

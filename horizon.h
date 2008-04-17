@@ -36,7 +36,7 @@ class Treelog;
 class Block;
 class Syntax;
 class AttributeList;
-class Mobsol;
+class Secondary;
 
 class Horizon : public ModelLogable
 {
@@ -56,7 +56,7 @@ public:
   double anisotropy () const;
   double heat_conductivity (double Theta, double Ice) const; // [erg/cm/h/dg C]
   double heat_capacity (double Theta, double Ice) const; // [erg/cm^3/dg C]
-  const Mobsol& mobile_solute () const;
+  const Secondary& secondary_domain () const;
   
   // Texture.
 public:

@@ -28,21 +28,6 @@
 #include "alist.h"
 #include "librarian.h"
 #include "block.h"
-#include "mactrans.h"
-
-void
-MovementSolute::tertiary_transport (const Geometry& geo,
-                                    const Soil& soil,
-                                    const SoilWater& soil_water,
-                                    const Mactrans& tertiary,
-                                    const std::map<size_t, double>& J_forced,
-                                    const std::map<size_t, double>& C_border,
-                                    Chemical& solute, 
-                                    const double dt,
-                                    const Scope& scope, Treelog& msg)
-{ 
-  
-}
 
 void 
 MovementSolute::secondary_flow (const Geometry& geo, 
@@ -459,11 +444,13 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
         }
     }
 
+#if 0
   // Tertiary transport.
   if (tertiary.get ())
     tertiary_transport (geometry (), soil, soil_water, *tertiary, 
                         J_tertiary, C_border, chemical, dt, scope, msg);
-    
+#endif
+
   // Secondary transport activated.
   secondary_transport (geometry (), soil, soil_water, J_secondary, C_border,
                        chemical, S_extra, dt, scope, msg);
@@ -553,23 +540,13 @@ MovementSolute::check_solute (Treelog& msg) const
       if (!matrix_solid->check (geometry (), msg))
         ok = false;
   }
-  // Tertiary.
-  if (tertiary.get ())
-    {
-        Treelog::Open nest (msg, "tertiary: '" + tertiary->library_id () + "'");
-        if (!tertiary->check (geometry (), msg))
-          ok = false;
-    }
   return ok;
 }
 
 MovementSolute::MovementSolute (Block& al)
   : Movement (al),
     matrix_solute (Librarian::build_vector<Transport> (al, "matrix_solute")),
-    matrix_solid (Librarian::build_item<Transport> (al, "matrix_solid")),
-    tertiary (al.check ("tertiary")
-              ? Librarian::build_item<Mactrans> (al, "tertiary")
-              : NULL)
+    matrix_solid (Librarian::build_item<Transport> (al, "matrix_solid"))
 { }
 
 
@@ -595,9 +572,6 @@ If none succeeds, the simulation ends.");
                      Syntax::Const, Syntax::Singleton, "\
 Matrix solute transport model used for fully sorbed constituents.");
   alist.add ("matrix_solid", Transport::none_model ());
-  syntax.add_object ("tertiary", Transport::component, 
-                     Syntax::OptionalConst, Syntax::Singleton, "\
-Matrix solute transport model used for tertiary domain (macropores).");
 }
 
 // movement_solute.C ends here.

@@ -247,9 +247,9 @@ void
 Soil::set_porosity (size_t i, double Theta)
 { horizon_[i]->hydraulic->set_porosity (Theta); }
 
-const Mobsol& 
-Soil::mobile_solute (size_t cell) const
-{ return horizon_[cell]->mobile_solute ();}
+const Secondary& 
+Soil::secondary_domain (size_t cell) const
+{ return horizon_[cell]->secondary_domain ();}
 
 double 
 Soil::tortuosity_factor (size_t i, double Theta) const

@@ -35,7 +35,7 @@ class Groundwater;
 class Syntax;
 class Block;
 class Treelog;
-class Mobsol;
+class Secondary;
 
 class Soil
 {
@@ -61,7 +61,7 @@ public:
   double dispersivity (size_t) const;
   double dispersivity_transversal (size_t) const;  
   void set_porosity (size_t i, double Theta);
-  const Mobsol& mobile_solute (size_t cell) const;
+  const Secondary& secondary_domain (size_t cell) const;
   
   // Texture.
   double tortuosity_factor (size_t i, double Theta) const;

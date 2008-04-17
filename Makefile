@@ -443,7 +443,7 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = mobsol.C heatrect.C unit.C \
+COMPONENTS = secondary.C heatrect.C unit.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C scope.C \
 	ABAeffect.C transport.C uzrect.C bound.C volume.C uz1d.C \
 	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C\
@@ -965,8 +965,8 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h \
   librarian.h block.h syntax.h treelog.h plf.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h
-mobsol${OBJ}: mobsol.C mobsol.h model.h symbol.h alist.h block.h syntax.h \
-  treelog.h plf.h librarian.h assertion.h
+secondary${OBJ}: secondary.C secondary.h model.h symbol.h alist.h block.h \
+  syntax.h treelog.h plf.h librarian.h assertion.h
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h librarian.h
 unit${OBJ}: unit.C unit.h model.h symbol.h alist.h check.h treelog.h \
@@ -1087,7 +1087,7 @@ condition${OBJ}: condition.C condition.h model.h symbol.h alist.h block.h \
 horizon${OBJ}: horizon.C horizon.h model.h symbol.h alist.h library.h block.h \
   syntax.h treelog.h plf.h horheat.h hydraulic.h mathlib.h assertion.h \
   tortuosity.h texture.h nitrification.h log.h time.h border.h \
-  check_range.h check.h vcheck.h librarian.h mobsol.h
+  check_range.h check.h vcheck.h librarian.h secondary.h
 uzmodel${OBJ}: uzmodel.C uzmodel.h model.h symbol.h alist.h block.h syntax.h \
   treelog.h plf.h librarian.h
 hydraulic${OBJ}: hydraulic.C hydraulic.h model.h symbol.h alist.h syntax.h \
@@ -1192,7 +1192,7 @@ surface${OBJ}: surface.C surface.h uzmodel.h model.h symbol.h alist.h \
   ridge.h check.h
 soil_water${OBJ}: soil_water.C soil_water.h geometry.h syntax.h treelog.h \
   symbol.h mathlib.h assertion.h soil.h soil_heat.h groundwater.h model.h \
-  alist.h log.h time.h border.h submodel.h block.h plf.h mobsol.h
+  alist.h log.h time.h border.h submodel.h block.h plf.h secondary.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h block.h syntax.h treelog.h symbol.h \
   plf.h alist.h geometry.h mathlib.h assertion.h soil.h soil_water.h \
   surface.h uzmodel.h model.h movement.h weather.h im.h log.h time.h \
@@ -1215,7 +1215,7 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
 movement_solute${OBJ}: movement_solute.C movement_solute.h movement.h model.h \
   symbol.h alist.h memutils.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil_water.h transport.h chemical.h adsorption.h \
-  librarian.h
+  librarian.h block.h plf.h mactrans.h
 scope_exchange${OBJ}: scope_exchange.C scope_exchange.h model.h symbol.h \
   alist.h scope.h memutils.h block.h syntax.h treelog.h plf.h assertion.h \
   librarian.h
@@ -1913,7 +1913,7 @@ chemical_std${OBJ}: chemical_std.C chemical.h model.h symbol.h alist.h \
   organic_matter.h soil_heat.h soil_water.h soil.h geometry.h syntax.h \
   treelog.h mathlib.h assertion.h abiotic.h adsorption.h chemistry.h \
   log.h time.h border.h block.h plf.h check.h librarian.h number.h \
-  scope_soil.h scope.h vcheck.h memutils.h submodeler.h mobsol.h
+  scope_soil.h scope.h vcheck.h memutils.h submodeler.h secondary.h
 hydraulic_M_BaC_Bimodal${OBJ}: hydraulic_M_BaC_Bimodal.C hydraulic.h model.h \
   symbol.h alist.h syntax.h treelog.h block.h plf.h check.h mathlib.h \
   assertion.h librarian.h

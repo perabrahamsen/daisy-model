@@ -41,7 +41,7 @@
 #include "vcheck.h"
 #include "memutils.h"
 #include "submodeler.h"
-#include "mobsol.h"
+#include "secondary.h"
 #include <sstream>
 
 struct ChemicalStandard : public Chemical
@@ -104,9 +104,9 @@ struct ChemicalStandard : public Chemical
 
   // Soil state and log.
   std::vector<double> C_avg_;   // Concentration in soil solution [g/cm^3]
-  std::vector<double> C_secondary_;   // Mobile conc. in soil solution [g/cm^3]
-  std::vector<double> C_primary_; // Immobile conc. in soil solution [g/cm^3]
-  std::vector<double> M_primary_; // Immobile conc. in soil [g/cm^3]
+  std::vector<double> C_secondary_;   // Conc. in secondary domain [g/cm^3]
+  std::vector<double> C_primary_; // Conc. in primary domain [g/cm^3]
+  std::vector<double> M_primary_; // Content in primary domain [g/cm^3]
   std::vector<double> M_total_;	// Concentration in soil [g/cm^3]
   std::vector<double> M_error; // Accumulated error [g/cm^3]
   std::vector<double> S_secondary_;  // Secondary domain source term.
@@ -679,16 +679,16 @@ ChemicalStandard::tick_soil (const Geometry& geo,
       const double M_prim = M_primary (c);
       const double M_sec = M_tot - M_prim;
       if (Theta_sec_new < 1e-6)
-        // Move all to immobile.
+        // Move all to primary domain.
         {
           S_exchange[c] = M_sec / dt;
           continue;
         }
       
       // Find alpha.
-      const Mobsol& mobsol = soil.mobile_solute (c);
-      daisy_assert (!mobsol.full ());
-      const double alpha = mobsol.alpha ();
+      const Secondary& secondary = soil.secondary_domain (c);
+      daisy_assert (!secondary.none ());
+      const double alpha = secondary.alpha ();
 
       // The exchange rate based on concentration gradient.
       const double C_prim = C_primary (c);
@@ -1460,13 +1460,13 @@ infiltration..");
   Geometry::add_layer (syntax, Syntax::OptionalState, "C", "g/cm^3",
 		       "Concentration in water.");
   Geometry::add_layer (syntax, Syntax::OptionalState, "C_secondary", "g/cm^3",
-		       "Concentration in mobile water.");
+		       "Concentration in secondary domain.");
   Geometry::add_layer (syntax, Syntax::LogOnly, "C_primary", "g/cm^3",
-		       "Concentration in immobile water.");
+		       "Concentration in primary domain.");
   Geometry::add_layer (syntax, Syntax::OptionalState, "M", "g/cm^3", 
 		       "Total mass per volume water, soil, and air.");
   Geometry::add_layer (syntax, Syntax::LogOnly, "M_primary", "g/cm^3", 
-		       "Immobile mass per volume water, soil, and air.");
+		       "Primary domain mass per volume water, soil, and air.");
   Geometry::add_layer (syntax, Syntax::OptionalConst,
 		       "Ms", Syntax::Fraction (), "Mass in dry soil.\n\
 This include all matter in both soil and water, relative to the\n\

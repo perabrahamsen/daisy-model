@@ -40,10 +40,6 @@ class SoilWater
 {
   friend class UZRect2x1;
 
-  // Types.
-public:
-  enum mobile_solute_t { mobile, immobile, mixed };
-
   // Content.
 private:
   std::vector<double> h_;

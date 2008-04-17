@@ -557,7 +557,7 @@ ParserFile::Implementation::add_derived (Library& lib)
       && looking_at ('"'))
     atts.add ("description", get_string ());
   // Add separate attributes for this object.
-  Treelog::Open nest (msg, "Defining '" + name + "'");
+  Treelog::Open nest (msg, "Defining " + lib.name () + " '" + name + "'");
   load_list (syntax, atts);
   // Add new object to library.
   lib.add_derived (name, syntax, atts, super);

@@ -37,7 +37,7 @@
 #include "check_range.h"
 #include "vcheck.h"
 #include "librarian.h"
-#include "mobsol.h"
+#include "secondary.h"
 #include <vector>
 #include <map>
 
@@ -60,7 +60,7 @@ struct Horizon::Implementation
   typedef std::map<symbol, symbol> symbol_map;
   const symbol_map dimensions;
   const std::auto_ptr<Nitrification> nitrification;
-  const std::auto_ptr<Mobsol> mobsol;
+  const std::auto_ptr<Secondary> secondary;
   HorHeat hor_heat;
   
   // Create and Detroy.
@@ -130,7 +130,7 @@ Horizon::Implementation::Implementation (Block& al)
     attributes (get_attributes (al.alist_sequence ("attributes"))),
     dimensions (get_dimensions (al.alist_sequence ("attributes"))),
     nitrification (Librarian::build_item<Nitrification> (al, "Nitrification")),
-    mobsol (Librarian::build_item<Mobsol> (al, "mobile_solute")),
+    secondary (Librarian::build_item<Secondary> (al, "secondary_domain")),
     hor_heat (al.alist ("HorHeat"))
 { }
 
@@ -201,9 +201,9 @@ double
 Horizon::heat_capacity (double Theta, double Ice) const
 { return impl->hor_heat.heat_capacity (Theta, Ice); }
 
-const Mobsol& 
-Horizon::mobile_solute () const
-{ return *impl->mobsol;}
+const Secondary& 
+Horizon::secondary_domain () const
+{ return *impl->secondary;}
 
 bool
 Horizon::has_attribute (const symbol name) const
@@ -356,9 +356,9 @@ this horizon.");
 
   alist.add ("Nitrification", nitrification_alist);
   
-  syntax.add_object ("mobile_solute", Mobsol::component,
-                     "Mobile/immobile solute movement.");
-  alist.add ("mobile_solute", Mobsol::full_model ());
+  syntax.add_object ("secondary_domain", Secondary::component,
+                     "Secondary matrix domain for solute movement.");
+  alist.add ("secondary_domain", Secondary::none_model ());
 
 
   syntax.add_submodule ("HorHeat", alist, Syntax::State, 
