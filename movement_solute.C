@@ -28,6 +28,7 @@
 #include "alist.h"
 #include "librarian.h"
 #include "block.h"
+#include <sstream>
 
 void 
 MovementSolute::secondary_flow (const Geometry& geo, 
@@ -342,25 +343,15 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
 }
 
 void
-MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
-                        const double J_above, Chemical& chemical, 
-                        const bool flux_below, 
-                        const double dt,
-                        const Scope& scope, Treelog& msg)
+MovementSolute::divide_top_incomming (const Geometry& geo, 
+                                      const SoilWater& soil_water, 
+                                      const double J_above,
+                                      std::map<size_t, double>& J_primary,
+                                      std::map<size_t, double>& J_secondary,
+                                      std::map<size_t, double>& J_tertiary)
 {
-  const size_t cell_size = geometry ().cell_size ();
-
-  // Source term transfered from secondary to primary domain.
-  std::vector<double> S_extra (cell_size, 0.0);
-
-  // Divide incomming flux according to water.
-  daisy_assert (J_above <= 0.0);
-  std::map<size_t, double> J_tertiary;
-  std::map<size_t, double> J_secondary; 
-  std::map<size_t, double> J_primary;
-
   const std::vector<size_t>& edge_above 
-    = geometry ().cell_edges (Geometry::cell_above);
+    = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
   double total_water_in = 0.0;
 
@@ -368,11 +359,11 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
   for (size_t i = 0; i < edge_above_size; i++)
     {
       const size_t edge = edge_above[i];
-      const int cell = geometry ().edge_other (edge, Geometry::cell_above);
-      daisy_assert (geometry ().cell_is_internal (cell));
-      const double area = geometry ().edge_area (edge);
+      const int cell = geo.edge_other (edge, Geometry::cell_above);
+      daisy_assert (geo.cell_is_internal (cell));
+      const double area = geo.edge_area (edge);
       const double in_sign 
-        = geometry ().cell_is_internal (geometry ().edge_to (edge)) 
+        = geo.cell_is_internal (geo.edge_to (edge)) 
         ? 1.0
         : -1.0;
       daisy_assert (in_sign < 0);
@@ -414,18 +405,118 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
     }
 
   // Scale with incomming solute.
-  if (std::isnormal (total_water_in))
+  daisy_assert (std::isnormal (total_water_in));
+  double scale = -J_above / total_water_in;
+  for (size_t i = 0; i < edge_above_size; i++)
     {
-      const double scale = -J_above / total_water_in;
+      const size_t edge = edge_above[i];
+
+      J_tertiary[edge] *= scale;
+      J_secondary[edge] *= scale;
+      J_primary[edge] *= scale;
+    }
+}
+
+void
+MovementSolute::divide_top_outgoing (const Geometry& geo, 
+                                     const Chemical& chemical,
+                                     const double J_above,
+                                     std::map<size_t, double>& J_primary,
+                                     std::map<size_t, double>& J_secondary,
+                                     std::map<size_t, double>& J_tertiary)
+{
+  const std::vector<size_t>& edge_above 
+    = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+  double total_amount = 0.0;    // [g/cm]
+
+  // Find total content in primary domain in cells connected to border.
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      const int cell = geo.edge_other (edge, Geometry::cell_above);
+      daisy_assert (geo.cell_is_internal (cell));
+      const double area = geo.edge_area (edge);
+      const double in_sign 
+        = geo.cell_is_internal (geo.edge_to (edge)) 
+        ? 1.0
+        : -1.0;
+      daisy_assert (in_sign < 0);
+
+      // No flux out of tertiary or secondary domains.
+      J_tertiary[edge] = 0.0;
+      J_secondary[edge] = 0.0;
+
+      // Find content 
+      const double amount = chemical.M_primary (cell) * area;
+      total_amount += amount;              // [g/cm]
+      J_primary[edge] = amount  * in_sign; // [g/cm]
+    }
+
+  // Scale with incomming solute.
+  if (std::isnormal (total_amount))
+    {
+      // [cm^-1 h^-1] = [g/cm^2/h] / [g/cm]
+      const double scale = -J_above / total_amount;
       for (size_t i = 0; i < edge_above_size; i++)
         {
           const size_t edge = edge_above[i];
-          
-          J_tertiary[edge] *= scale;
-          J_secondary[edge] *= scale;
+          // [g/cm^3/h] = [g/cm] * [cm^-1 h^-1]
           J_primary[edge] *= scale;
         }
     }
+}
+
+void
+MovementSolute::zero_top (const Geometry& geo, 
+                          std::map<size_t, double>& J_primary,
+                          std::map<size_t, double>& J_secondary,
+                          std::map<size_t, double>& J_tertiary)
+{
+  const std::vector<size_t>& edge_above 
+    = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+
+  // Clear all.
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+
+      // No flux out of any domains.
+      J_tertiary[edge] = 0.0;
+      J_secondary[edge] = 0.0;
+      J_primary[edge] = 0.0;
+    }
+}
+
+void
+MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
+                        const double J_above, Chemical& chemical, 
+                        const bool flux_below, 
+                        const double dt,
+                        const Scope& scope, Treelog& msg)
+{
+  const size_t cell_size = geometry ().cell_size ();
+
+  // Source term transfered from secondary to primary domain.
+  std::vector<double> S_extra (cell_size, 0.0);
+
+  // Divide top solute flux according to water.
+  std::map<size_t, double> J_tertiary;
+  std::map<size_t, double> J_secondary; 
+  std::map<size_t, double> J_primary;
+
+  if (J_above > 0.0)
+    // Outgoing, divide according to content in primary domain only.
+    divide_top_outgoing (geometry (), chemical, J_above, 
+                         J_primary, J_secondary, J_tertiary);
+  else if (J_above < 0.0)
+    // Incomming, divide according to all incomming water.
+    divide_top_incomming (geometry (), soil_water, J_above, 
+                          J_primary, J_secondary, J_tertiary);
+  else
+    // No flux.
+    zero_top (geometry (), J_primary, J_secondary, J_tertiary);
 
   // We set a fixed concentration below lower boundary, if specified.
   std::map<size_t, double> C_border;

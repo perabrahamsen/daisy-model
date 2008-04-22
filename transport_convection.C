@@ -193,7 +193,11 @@ TransportConvection::flow (const Geometry& geo,
 
       // Interpolate Theta.
       for (size_t c = 0; c < cell_size; c++)
-        Theta[c] = time_left * Theta_old[c] + (1.0 - time_left) * Theta_new[c];
+        {
+          const double time_spend = dt - time_left;
+          Theta[c] = (time_left * Theta_old[c] + time_spend * Theta_new[c])
+            / dt;
+        }
 
       // Update C.
       for (size_t c = 0; c < cell_size; c++)

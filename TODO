@@ -1,12 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* secondary flow
+* Få transport Hansen til at virke på BGJ opsætning.
 
-** 1D
-
-*** re-enable tertiary transport
+* Eksempel på litter lag til BGJ
 
 * tertiary
+
+** IMvec 
+
+modelled over IM
+
+** biopore_std.C
 
 ** macro classes
 
@@ -35,13 +39,12 @@ parameters:
 parameters:
 
   diameter [um]
-  secondary_domain [flag]
-  std::vector<double> xplus [cm]*
+  std::vector<double> xplus [cm]
 
 state variables:
   std::vector<double> h_bottom [cm] -> [cm]
   map<chemical,concentration> solute [g/cm^3]
-  
+    
 ** tick
 
 *** phase 1: extract water
@@ -57,6 +60,12 @@ for each cell
        if biopore.active (z, x)
        biopore.add_water (sink_macro Ø , z, d)
 
+
+* secondary flow
+
+** 1D
+
+*** re-enable tertiary transport
 
 
 * Frame

@@ -27,9 +27,10 @@
 
 class Transport;
 
-struct MovementSolute : public Movement
+class MovementSolute : public Movement
 {
   // Solute.
+private:
   const auto_vector<Transport*> matrix_solute;
   const std::auto_ptr<Transport> matrix_solid;
   static void secondary_flow (const Geometry& geo, 
@@ -61,6 +62,22 @@ struct MovementSolute : public Movement
                                  const std::vector<double>& S_extra,
                                  const double dt,
                                  const Scope& scope, Treelog& msg);
+  static void divide_top_incomming (const Geometry& geo, 
+                                    const SoilWater& soil_water, 
+                                    const double J_above,
+                                    std::map<size_t, double>& J_primary,
+                                      std::map<size_t, double>& J_secondary,
+                                    std::map<size_t, double>& J_tertiary);
+  static void divide_top_outgoing (const Geometry& geo, 
+                                   const Chemical& chemical,
+                                   const double J_above,
+                                   std::map<size_t, double>& J_primary,
+                                   std::map<size_t, double>& J_secondary,
+                                   std::map<size_t, double>& J_tertiary);
+  static void zero_top (const Geometry& geo, 
+                        std::map<size_t, double>& J_primary,
+                        std::map<size_t, double>& J_secondary,
+                        std::map<size_t, double>& J_tertiary);
   void solute (const Soil& soil, const SoilWater& soil_water,
                double J_above, Chemical&, const bool flux_below, 
 	       double dt, const Scope&, Treelog&);
@@ -69,8 +86,10 @@ struct MovementSolute : public Movement
 		double diffusion_coefficient, double dt, Treelog& msg);
 
   // Create.
+protected:
   bool check_solute (Treelog&) const;
   MovementSolute (Block& al);
+public:
   static void load_solute  (Syntax& syntax, AttributeList& alist, 
                             const AttributeList& prefered_solute);
 };

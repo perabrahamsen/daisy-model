@@ -102,7 +102,7 @@ Secondary::none_model ()
   return alist;
 }
 
-// "active" model.
+// "pressure" model.
 
 struct SecondaryPressure : public Secondary
 {

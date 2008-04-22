@@ -84,7 +84,7 @@ TransportHansen::flow (const Geometry& geo_base,
   double J_in = J_forced.begin ()->second;
   daisy_assert (C_border.size () < 2);
   daisy_assert (C_border.size () == 0 || C_border.begin ()->first == size);
-  const double C_below = C_border.begin () == C_border.end ()
+  const double C_below = (C_border.begin () == C_border.end ())
     ? -42.42e42
     : C_border.begin ()->second;
 
@@ -126,7 +126,7 @@ TransportHansen::flow (const Geometry& geo_base,
     const double q = q_primary[size];
       
     // Theta middled in time and space.
-    const double Theta = (Theta_begin[size - 1] + Theta_end[size  - 1]) / 2.0;
+    const double Theta = (Theta_end[size - 1] + Theta_begin[size  - 1]) / 2.0;
     // From equation 7-39:
     D[size] = (lambda * fabs (-q / Theta)
 	       + soil.tortuosity_factor (size-1, Theta) 
@@ -155,14 +155,9 @@ TransportHansen::flow (const Geometry& geo_base,
 
   double C_top = 0.0;
   double S_top = 0.0;
-#ifdef DISABLE_MIXING
-  daisy_assert (J_in <= 0.0);
-#endif
+
   if (std::isnormal (J_in))
     {
-#ifdef DISABLE_MIXING
-      daisy_assert (J_in < 0.0);
-#endif
       if (q_primary[0] < 0.0)
 	// Normal condition, stuff is in solute.
 	if (J_in < 0.0)
@@ -203,9 +198,9 @@ TransportHansen::flow (const Geometry& geo_base,
       std::vector<double> Theta_new (size);
       for (unsigned int j = 0; j < size; j++)
 	{
-	  const double Theta_ratio = (Theta_begin[j] - Theta_end[j]) / dt;
-	  Theta_new[j] = Theta_end[j] + Theta_ratio * t;
-	  Theta_old[j] = Theta_end[j] + Theta_ratio * old_t;
+	  const double Theta_ratio = (Theta_end[j] - Theta_begin[j]) / dt;
+	  Theta_new[j] = Theta_begin[j] + Theta_ratio * t;
+	  Theta_old[j] = Theta_begin[j] + Theta_ratio * old_t;
 	}
 
       for (unsigned int j = 1; j < size; j++)

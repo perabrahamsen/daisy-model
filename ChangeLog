@@ -1,6 +1,20 @@
+2008-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transport_Hansen.C (TransportHansen::flow): Bug fix.
+
+	* movement_solute.C, movement_solute.h (divide_top_incomming)
+	(divide_top_outgoing, zero_top): New utilities.
+	(MovementSolute::solute): Call it.
+	* movement_solute.C (MovementSolute::solute): Call them.
+
 2008-04-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* biopore.C, biopore.h: New component.
+
+	* parser_file.C (add_derived): Specify library name in messages.
+
 	* mobsol.h, mobsol.C: Renamed component to 'secondary'.
+	* secondary.h, secondary.C: Renamed component from 'mobsol'.
 	* Makefile (COMPONENTS): Ditto.
 	* all: Updated callers.
 	
