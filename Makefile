@@ -965,6 +965,9 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h \
   librarian.h block.h syntax.h treelog.h plf.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h
+biopore${OBJ}: biopore.C biopore.h model.h symbol.h alist.h number.h block.h \
+  syntax.h treelog.h plf.h librarian.h scope_multi.h scope.h scope_id.h \
+  units.h check.h geometry.h mathlib.h assertion.h
 secondary${OBJ}: secondary.C secondary.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h librarian.h assertion.h
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h alist.h block.h \
@@ -1215,7 +1218,7 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
 movement_solute${OBJ}: movement_solute.C movement_solute.h movement.h model.h \
   symbol.h alist.h memutils.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil_water.h transport.h chemical.h adsorption.h \
-  librarian.h block.h plf.h mactrans.h
+  librarian.h block.h plf.h
 scope_exchange${OBJ}: scope_exchange.C scope_exchange.h model.h symbol.h \
   alist.h scope.h memutils.h block.h syntax.h treelog.h plf.h assertion.h \
   librarian.h
