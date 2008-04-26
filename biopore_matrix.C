@@ -1,4 +1,4 @@
-// biopore_std.C --- Static vertical biopores with a capacity.
+// biopore_matrix.C --- Static vertical biopores with a capacity.
 // 
 // Copyright 2008 Per Abrahamsen and KU.
 //
@@ -27,9 +27,9 @@
 #include "librarian.h"
 #include "submodeler.h"
 
-// The 'default' model.
+// The 'matrix' model.
 
-struct BioporeStandard : public Biopore
+struct BioporeMatrix : public Biopore
 {
   // Parameters.
   /* const */ std::vector<double> xplus; // [cm]
@@ -40,10 +40,10 @@ struct BioporeStandard : public Biopore
   std::auto_ptr<IMvec> solute;  // [g/cm^3]
 
   // Create and Destroy.
-  BioporeStandard (Block& al);
+  BioporeMatrix (Block& al);
 };
 
-BioporeStandard::BioporeStandard (Block& al)
+BioporeMatrix::BioporeMatrix (Block& al)
   : Biopore (al),
     xplus (al.check ("xplus") 
            ? al.number_sequence ("xplus") 
@@ -57,12 +57,12 @@ BioporeStandard::BioporeStandard (Block& al)
             : NULL)
 { }
 
-static struct BioporeStandardSyntax
+static struct BioporeMatrixSyntax
 {
   static Model& make (Block& al)
-  { return *new BioporeStandard (al); }
+  { return *new BioporeMatrix (al); }
 
-  BioporeStandardSyntax ()
+  BioporeMatrixSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
@@ -82,8 +82,8 @@ By default, use intervals as specified by the geometry.");
     IMvec::add_syntax (syntax, alist, Syntax::OptionalState, "solute", C_unit,
                        "Chemical concentration in biopore intervals.");
 
-    Librarian::add_type (Biopore::component, "default", alist, syntax, &make);
+    Librarian::add_type (Biopore::component, "matrix", alist, syntax, &make);
   }
-} BioporeStandard_syntax;
+} BioporeMatrix_syntax;
 
 // biopore_std.C ends here.

@@ -1,7 +1,13 @@
 2008-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* biopore_drain.C: New model.
+	* Makefile (MODELS): Added it.
+
 	* tertiary_biopores.C: New model.
 	* Makefile (MODELS): Added it.
+
+	* biopore_matrix.C: Renamed from 'biopore_matrix.C'.
+	* Makefile (MODELS): Adjusted.
 
 2008-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 

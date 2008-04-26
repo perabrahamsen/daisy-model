@@ -373,8 +373,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = tertiary_biopores.C \
-	biopore_std.C transport_Mollerup.C transport_Hansen.C \
+MODELS = biopore_drain.C tertiary_biopores.C \
+	biopore_matrix.C transport_Mollerup.C transport_Hansen.C \
 	movement_1D.C groundwater_aquitard.C \
 	heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \
 	transport_convection.C \
@@ -966,6 +966,8 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h \
   librarian.h block.h syntax.h treelog.h plf.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h
+tertiary${OBJ}: tertiary.C tertiary.h model.h symbol.h alist.h block.h \
+  syntax.h treelog.h plf.h librarian.h
 biopore${OBJ}: biopore.C biopore.h model.h symbol.h alist.h number.h block.h \
   syntax.h treelog.h plf.h librarian.h scope_multi.h scope.h scope_id.h \
   units.h check.h geometry.h mathlib.h assertion.h
@@ -1204,9 +1206,6 @@ soil_heat${OBJ}: soil_heat.C soil_heat.h block.h syntax.h treelog.h symbol.h \
 snow${OBJ}: snow.C snow.h alist.h symbol.h syntax.h treelog.h log.h time.h \
   border.h model.h geometry.h mathlib.h assertion.h soil.h soil_water.h \
   soil_heat.h movement.h submodel.h
-im${OBJ}: im.C im.h symbol.h syntax.h treelog.h chemical.h model.h alist.h \
-  units.h am.h log.h time.h border.h block.h plf.h check.h submodel.h \
-  assertion.h
 harvest${OBJ}: harvest.C harvest.h time.h symbol.h block.h syntax.h treelog.h \
   plf.h log.h border.h model.h alist.h submodel.h
 field${OBJ}: field.C field.h border.h symbol.h column.h model.h alist.h log.h \
@@ -1271,6 +1270,10 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   parser.h path.h assertion.h librarian.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h border.h model.h \
   symbol.h alist.h library.h syntax.h treelog.h assertion.h
+imvec${OBJ}: imvec.C imvec.h symbol.h syntax.h treelog.h assertion.h log.h \
+  time.h border.h model.h alist.h chemical.h check.h block.h plf.h
+im${OBJ}: im.C im.h symbol.h syntax.h treelog.h chemical.h model.h alist.h \
+  units.h am.h log.h time.h border.h block.h plf.h check.h assertion.h
 frame${OBJ}: frame.C frame.h syntax.h treelog.h symbol.h alist.h
 bdconv${OBJ}: bdconv.C bdconv.h units.h symbol.h geometry.h syntax.h \
   treelog.h mathlib.h assertion.h soil.h volume.h model.h alist.h
@@ -1365,6 +1368,15 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+biopore_drain${OBJ}: biopore_drain.C biopore.h model.h symbol.h alist.h \
+  number.h block.h syntax.h treelog.h plf.h vcheck.h librarian.h \
+  submodeler.h assertion.h
+tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
+  alist.h biopore.h number.h memutils.h librarian.h block.h syntax.h \
+  treelog.h plf.h check.h
+biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
+  number.h imvec.h syntax.h treelog.h block.h plf.h vcheck.h librarian.h \
+  submodeler.h assertion.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
   alist.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h soil.h solver.h log.h time.h border.h \
