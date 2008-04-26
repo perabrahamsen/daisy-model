@@ -86,4 +86,4 @@ By default, use intervals as specified by the geometry.");
   }
 } BioporeMatrix_syntax;
 
-// biopore_std.C ends here.
+// biopore_matrix.C ends here.
