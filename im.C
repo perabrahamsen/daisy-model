@@ -1,4 +1,4 @@
-// im.C
+// im.C -- Inorganic matter.  Track chemicals.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -31,7 +31,6 @@
 #include "alist.h"
 #include "syntax.h"
 #include "check.h"
-#include "submodel.h"
 #include "assertion.h"
 #include <cmath>
 

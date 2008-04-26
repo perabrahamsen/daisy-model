@@ -373,7 +373,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = transport_Mollerup.C transport_Hansen.C \
+MODELS = tertiary_biopores.C \
+	biopore_std.C transport_Mollerup.C transport_Hansen.C \
 	movement_1D.C groundwater_aquitard.C \
 	heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \
 	transport_convection.C \
@@ -443,7 +444,7 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = biopore.C secondary.C heatrect.C unit.C \
+COMPONENTS = tertiary.C biopore.C secondary.C heatrect.C unit.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C scope.C \
 	ABAeffect.C transport.C uzrect.C bound.C volume.C uz1d.C \
 	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C\
@@ -466,7 +467,7 @@ SUBMODELS = toplevel.C timestep.C geometry_rect.C doe.C \
 	harvesting.C canopy_simple.C canopy_std.C root_system.C \
 	ridge.C soil.C surface.C soil_water.C \
 	soil_heat.C \
-	snow.C im.C harvest.C field.C \
+	snow.C harvest.C field.C \
 	bioincorporation.C 
 
 # Special or intermediate models with their own interface.
@@ -479,7 +480,7 @@ SPECIALS = movement_solute.C scope_exchange.C photo_Farquhar.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = frame.C \
+OTHER = imvec.C im.C frame.C \
 	bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
 	intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \

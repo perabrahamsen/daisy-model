@@ -394,7 +394,7 @@ where all macropores is assumed to start at the top.");
 	      "Macropore sink term.");
   syntax.add ("pond_max", "mm", Check::non_negative (), Syntax::Const, "\
 Maximum height of ponding before spilling into macropores.\n\
-After macropores are activated pond will havethis height.");
+After macropores are activated pond will have this height.");
   alist.add ("pond_max", default_pond_max);
 
 }

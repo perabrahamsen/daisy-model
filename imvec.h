@@ -25,8 +25,12 @@
 #define IMVEC_H
 
 #include "symbol.h"
-#include <map.h>
-#include <vector.h>
+#include "syntax.h"
+#include <map>
+#include <vector>
+
+class Log;
+class Block;
 
 class IMvec                     // [g/cm^3]
 {
@@ -38,7 +42,7 @@ private:
   // Accessors.
 public:
   const std::vector<double>& get_value (symbol chem) const;
-  void set_value (symbol chem, symbol dim, const std::vector<double>& value);
+  void set_value (symbol chem, const std::vector<double>& value);
 
   // Iterate.
 public:
@@ -74,10 +78,12 @@ public:
 			  const char *const key,
 			  const symbol dimension,
 			  const char *const description);
-  explicit IMvec (Block&, const char* key);
-  explicit IMvec ();
-  IMvec (const IMvec& im);
+  explicit IMvec (Block&, const char*);
   ~IMvec ();
+private:
+  IMvec& operator=(const IMvec&);
+  explicit IMvec (const IMvec& im);
+  explicit IMvec ();
 };
 
 #endif // IMVEC_H

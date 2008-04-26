@@ -57,9 +57,10 @@ protected:
 public:
   bool initialize (const Geometry&, const Scope& parent_scope, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
-protected:
   static void load_base (Syntax& syntax, AttributeList& alist);
+protected:
   explicit Biopore (Block& al);
+public:
   virtual ~Biopore ();
 };
 

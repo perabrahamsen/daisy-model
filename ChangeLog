@@ -1,3 +1,19 @@
+2008-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* tertiary_biopores.C: New model.
+	* Makefile (MODELS): Added it.
+
+2008-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* tertiary.C, tertiary.h: New component.
+	* Makefile (COMPONENTS): Added it.
+
+	* biopore_std.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* imvec.C, imvec.h: New utility.
+	* Makefile (OTHER): Added it.
+
 2008-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* transport_Hansen.C (TransportHansen::flow): Bug fix.

@@ -22,6 +22,10 @@
 
 #include "biopore.h"
 #include "imvec.h"
+#include "block.h"
+#include "vcheck.h"
+#include "librarian.h"
+#include "submodeler.h"
 
 // The 'default' model.
 
@@ -40,7 +44,8 @@ struct BioporeStandard : public Biopore
 };
 
 BioporeStandard::BioporeStandard (Block& al)
-  : xplus (al.check ("xplus") 
+  : Biopore (al),
+    xplus (al.check ("xplus") 
            ? al.number_sequence ("xplus") 
            : std::vector<double> ()),
     diameter (al.number ("diameter")),
@@ -48,8 +53,37 @@ BioporeStandard::BioporeStandard (Block& al)
               ? al.number_sequence ("h_bottom") 
               : std::vector<double> ()),
     solute (al.check ("solute")
-            ? Librarian::build_item<IMvec> (al, "solute")
+            ? new IMvec (al, "solute")
             : NULL)
 { }
+
+static struct BioporeStandardSyntax
+{
+  static Model& make (Block& al)
+  { return *new BioporeStandard (al); }
+
+  BioporeStandardSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Biopores that ends in the matrix.");
+    Biopore::load_base (syntax, alist);
+
+    syntax.add ("xplus", "cm", Syntax::OptionalConst, Syntax::Sequence,
+		"Right side of each biopore interval.\n\
+Water and chemical content is tracked individually for each interval.\n\
+By default, use intervals as specified by the geometry.");
+    syntax.add_check ("xplus", VCheck::increasing ());
+    syntax.add ("diameter", "cm", Syntax::Const, "Biopore diameter.");
+    syntax.add ("h_bottom", "cm", Syntax::OptionalConst, Syntax::Sequence,
+		"Pressure at the bottom of the biopores in each interval.");
+
+    static const symbol C_unit ("g/cm^3");
+    IMvec::add_syntax (syntax, alist, Syntax::OptionalState, "solute", C_unit,
+                       "Chemical concentration in biopore intervals.");
+
+    Librarian::add_type (Biopore::component, "default", alist, syntax, &make);
+  }
+} BioporeStandard_syntax;
 
 // biopore_std.C ends here.
