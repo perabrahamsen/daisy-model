@@ -25,17 +25,38 @@
 #include "vcheck.h"
 #include "librarian.h"
 #include "submodeler.h"
+#include "check.h"
 
 // The 'drain' model.
 
 struct BioporeDrain : public Biopore
 {
+  // Parameters.
+  /* const */ double pipe_position;   // [cm]
+  // Simulation.
+  bool to_drain () const 
+  { return true; }
+  double air_bottom (size_t) const    // Lowest point with air [cm]
+  { return pipe_position; }
+  void add_water (size_t, double)
+  { }
+
   // Create and Destroy.
+  bool initialize (const Geometry& geo, const Scope& scope, const double pipe,
+                   Treelog& msg)
+  {
+    if (pipe_position > 0)
+      // Pipe height not specified here, use value from column.
+      pipe_position = pipe;
+
+    return initialize_base (geo, scope, msg); 
+  }
   BioporeDrain (Block& al);
 };
 
 BioporeDrain::BioporeDrain (Block& al)
-  : Biopore (al)
+  : Biopore (al),
+    pipe_position (al.number ("pipe_position", 42.42e42))
 { }
 
 static struct BioporeDrainSyntax
@@ -50,6 +71,9 @@ static struct BioporeDrainSyntax
     alist.add ("description", "Biopores that ends in the drain pipes.");
     Biopore::load_base (syntax, alist);
 
+    syntax.add ("pipe_position", "cm", Check::negative (), Syntax::Const,
+                "Height pipes are placed in the soil (a negative number).\n\
+By default, use the height specified for pipes in the column.");
     Librarian::add_type (Biopore::component, "drain", alist, syntax, &make);
   }
 } BioporeDrain_syntax;

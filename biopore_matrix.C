@@ -38,11 +38,32 @@ struct BioporeMatrix : public Biopore
   // State.
   std::vector<double> h_bottom; // [cm]
   std::auto_ptr<IMvec> solute;  // [g/cm^3]
+  
+  // Utilities.
+  std::vector<size_t> column;
+  std::vector<double> added_water; // [cm^3]
+
+  // Simulation.
+  bool to_drain () const 
+  { return false; }
+  double air_bottom (const size_t c) const // Lowest point with air [cm]
+  { return height_end + h_bottom[column[c]]; }
+  void add_water (size_t c, double amount /* [cm^3] */)
+  { added_water[column[c]] += amount; }
 
   // Create and Destroy.
+  bool initialize (const Geometry& geo, const Scope& scope, double,
+                   Treelog& msg);
   BioporeMatrix (Block& al);
 };
 
+bool 
+BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
+                           Treelog& msg)
+{ 
+  // Initialize xplus, h_bottom, solute?, column
+  return initialize_base (geo, scope, msg); 
+}
 BioporeMatrix::BioporeMatrix (Block& al)
   : Biopore (al),
     xplus (al.check ("xplus") 

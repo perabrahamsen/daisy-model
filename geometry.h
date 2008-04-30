@@ -1,4 +1,3 @@
-
 // geometry.h -- Abstract interface to geometric information.
 // 
 // Copyright 2006 Per Abrahamsen and KVL.

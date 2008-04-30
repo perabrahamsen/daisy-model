@@ -48,14 +48,22 @@ protected:
   // Utilities.
 protected:
   std::vector<double> density_cell;   // Density based on cell number [m^-2]
-
-  // Utilities.
-protected:
   static symbol x_symbol ();
 
-  // Create and Destroy.
+  // Interface.
 public:
-  bool initialize (const Geometry&, const Scope& parent_scope, Treelog& msg);
+  virtual bool to_drain () const = 0;
+  virtual double air_bottom (size_t c) const = 0; // Lowest point with air [cm]
+  double density (size_t c) const                 // [m^-2]
+  { return density_cell[c]; }
+  virtual void add_water (size_t c, double amount /* [cm^3] */) = 0;
+
+  // Create and Destroy.
+protected:
+  bool initialize_base (const Geometry&, const Scope&, Treelog&);
+public:
+  virtual bool initialize (const Geometry&, const Scope&, double pipe_height,
+                           Treelog&) = 0;
   bool check (const Geometry&, Treelog& msg) const;
   static void load_base (Syntax& syntax, AttributeList& alist);
 protected:

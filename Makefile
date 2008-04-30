@@ -1370,10 +1370,11 @@ submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
 version${OBJ}: version.C
 biopore_drain${OBJ}: biopore_drain.C biopore.h model.h symbol.h alist.h \
   number.h block.h syntax.h treelog.h plf.h vcheck.h librarian.h \
-  submodeler.h assertion.h
+  submodeler.h assertion.h check.h
 tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   alist.h biopore.h number.h memutils.h librarian.h block.h syntax.h \
-  treelog.h plf.h check.h
+  treelog.h plf.h check.h geometry.h mathlib.h assertion.h soil.h \
+  soil_water.h
 biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
   number.h imvec.h syntax.h treelog.h block.h plf.h vcheck.h librarian.h \
   submodeler.h assertion.h

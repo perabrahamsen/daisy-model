@@ -49,8 +49,8 @@ Biopore::x_symbol ()
 }
 
 bool
-Biopore::initialize (const Geometry& geo, const Scope& parent_scope, 
-                     Treelog& msg)
+Biopore::initialize_base (const Geometry& geo, const Scope& parent_scope, 
+                          Treelog& msg)
 { 
   if (!density_expr->initialize (msg))
     return false;
