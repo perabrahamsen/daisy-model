@@ -661,8 +661,8 @@ Soil::initialize (Block& block, Geometry& geo,
   for (size_t c = 0; c < cell_size; c++)
     {
       for (size_t i = 0; i < impl->zones.size (); i++)
-        if (impl->zones[i]->volume->contain_point (geo.z (c), 
-                                                  geo.x (c), geo.y (c)))
+        if (impl->zones[i]->volume->contain_point (geo.cell_z (c), 
+                                                  geo.cell_x (c), geo.cell_y (c)))
           {
             daisy_assert (horizon_[c] == NULL);
             horizon_[c] = impl->zones[i]->horizon.get ();
@@ -683,7 +683,7 @@ Soil::initialize (Block& block, Geometry& geo,
             // Already defined by a zone.
             continue;
 
-          const double z = geo.z (i);
+          const double z = geo.cell_z (i);
           if (last > z && z >= next)
             { 
               daisy_assert (horizon_[i] == NULL);
@@ -696,7 +696,7 @@ Soil::initialize (Block& block, Geometry& geo,
     {
       std::ostringstream tmp;
       tmp << "cell[" << i << "] of " << cell_size
-          << " z = " << geo.z (i) << ", last = " << last;
+          << " z = " << geo.cell_z (i) << ", last = " << last;
       Treelog::Open nest (block.msg (), tmp.str ());
       daisy_assert (horizon_[i] != NULL);
     }

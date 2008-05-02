@@ -72,7 +72,7 @@ HeatrectLinear::solve (const GeometryRect& geo,
   plf.add (geo.top (), T_top);
 
   for (size_t c = 0; c < cell_size; c++)
-    T[c] = plf (geo.z (c));
+    T[c] = plf (geo.cell_z (c));
 }
 
 void 

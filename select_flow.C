@@ -193,7 +193,7 @@ struct SelectFlowTop : public SelectFlow
     if (!geo.cell_is_internal (outside))
       return false;
     daisy_assert (geo.cell_is_internal (inside));
-    return geo.z (outside) > geo.z (inside);
+    return geo.cell_z (outside) > geo.cell_z (inside);
   }
 
   // Create and Destroy.
@@ -252,7 +252,7 @@ struct SelectFlowBottom : public SelectFlow
     if (!geo.cell_is_internal (outside))
       return false;
     daisy_assert (geo.cell_is_internal (inside));
-    return geo.z (outside) < geo.z (inside);
+    return geo.cell_z (outside) < geo.cell_z (inside);
   }
 
   // Create and Destroy.
@@ -311,7 +311,7 @@ struct SelectFlowLeft : public SelectFlow
     if (!geo.cell_is_internal (outside))
       return false;
     daisy_assert (geo.cell_is_internal (inside));
-    return geo.x (outside) < geo.x (inside);
+    return geo.cell_x (outside) < geo.cell_x (inside);
   }
 
   // Create and Destroy.
@@ -345,7 +345,7 @@ struct SelectFlowRight : public SelectFlow
     if (!geo.cell_is_internal (outside))
       return false;
     daisy_assert (geo.cell_is_internal (inside));
-    return geo.x (outside) > geo.x (inside);
+    return geo.cell_x (outside) > geo.cell_x (inside);
   }
 
   // Create and Destroy.
@@ -379,7 +379,7 @@ struct SelectFlowFront : public SelectFlow
     if (!geo.cell_is_internal (outside))
       return false;
     daisy_assert (geo.cell_is_internal (inside));
-    return geo.y (outside) < geo.y (inside);
+    return geo.cell_y (outside) < geo.cell_y (inside);
   }
 
   // Create and Destroy.
@@ -413,7 +413,7 @@ struct SelectFlowBack : public SelectFlow
     if (!geo.cell_is_internal (outside))
       return false;
     daisy_assert (geo.cell_is_internal (inside));
-    return geo.y (outside) < geo.y (inside);
+    return geo.cell_y (outside) < geo.cell_y (inside);
   }
 
   // Create and Destroy.

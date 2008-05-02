@@ -475,8 +475,8 @@ TransportMollerup::diffusion_xz_zx (const GeometryRect& geo,
           if (A_is_border || B_is_border)
             magnitude *= 2.0;
 
-          const double dcz = geo.z (to) - geo.z (from);
-          const double dcx = geo.x (to) - geo.x (from);
+          const double dcz = geo.cell_z (to) - geo.cell_z (from);
+          const double dcx = geo.cell_x (to) - geo.cell_x (from);
           const double length = geo.edge_length (e);
           daisy_assert (approximate (fabs (dcz + dcx), length));
           const double sign =  length / (dcz + dcx);
@@ -986,8 +986,8 @@ TransportMollerup::fluxes (const GeometryRect& geo,
             if (A_is_border || B_is_border)
               magnitude *= 2.0;
 
-            const double dcz = geo.z (to) - geo.z (from);
-            const double dcx = geo.x (to) - geo.x (from);
+            const double dcz = geo.cell_z (to) - geo.cell_z (from);
+            const double dcx = geo.cell_x (to) - geo.cell_x (from);
             const double length = geo.edge_length (e);
             daisy_assert (approximate (fabs (dcz + dcx), length));
             //const double sign =  length / (dcz + dcx);
@@ -1153,8 +1153,8 @@ TransportMollerup::fluxes (const GeometryRect& geo,
             if (A_is_border || B_is_border)
               magnitude *= 2.0;
 
-            const double dcz = geo.z (to) - geo.z (from);
-            const double dcx = geo.x (to) - geo.x (from);
+            const double dcz = geo.cell_z (to) - geo.cell_z (from);
+            const double dcx = geo.cell_x (to) - geo.cell_x (from);
             const double length = geo.edge_length (e);
             daisy_assert (approximate (fabs (dcz + dcx), length));
             //const double sign =  length / (dcz + dcx);

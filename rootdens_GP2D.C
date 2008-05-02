@@ -198,8 +198,8 @@ Rootdens_GP2D::set_density (const Geometry& geo,
   // Fill Density.
   for (size_t cell = 0; cell < cell_size; cell++)
     {
-      const double z = -geo.z (cell); // Positive below ground. [cm]
-      double x = geo.x (cell) - row_position; // Rel. pos to row.
+      const double z = -geo.cell_z (cell); // Positive below ground. [cm]
+      double x = geo.cell_x (cell) - row_position; // Rel. pos to row.
 
       const double row_center = row_distance / 2.0; // Row center. [cm]
 

@@ -56,13 +56,13 @@ Geometry::cell_name (int n) const
       switch (dimensions ())
         {
         case 1:
-          tmp << z (n);
+          tmp << cell_z (n);
           break;
         case 2:
-          tmp << "(" << z (n) << " " << x (n) << ")";
+          tmp << "(" << cell_z (n) << " " << cell_x (n) << ")";
           break;
         case 3:
-          tmp << "(" << z (n) << " " << x (n) << " " << y (n) << ")";
+          tmp << "(" << cell_z (n) << " " << cell_x (n) << " " << cell_y (n) << ")";
           break;
         default:
           daisy_panic ("Only 1, 2 and 3 dimensional geometries supported");
@@ -97,7 +97,7 @@ double
 Geometry::z_safe (int n) const
 {
   if (n >= 0)
-    return z (n);
+    return cell_z (n);
   switch (n)
     {
     case cell_above:
@@ -113,7 +113,7 @@ double
 Geometry::x_safe (int n) const
 {
   if (n >= 0)
-    return x (n);
+    return cell_x (n);
   switch (n)
     {
     case cell_right:
@@ -133,7 +133,7 @@ double
 Geometry::y_safe (int n) const
 {
   if (n >= 0)
-    return y (n);
+    return cell_y (n);
   switch (n)
     {
     case cell_back:
@@ -180,7 +180,7 @@ Geometry::node_center_in_volume (int c, const Volume& volume) const
 {
   if (!cell_is_internal (c))
     return false;
-  return volume.contain_point (z (c), x (c), y (c));
+  return volume.contain_point (cell_z (c), cell_x (c), cell_y (c));
 }
 
 size_t 
@@ -481,6 +481,22 @@ Geometry::total_soil (const std::vector<double>& v,
     }
 
   return sum;
+}
+
+double
+Geometry::total_soil (const std::vector<double>& v, const Volume& volume) const
+{
+  const size_t cell_size = this->cell_size ();
+  daisy_assert (v.size () == cell_size);
+
+  double amount = 0.0;
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      const double f = fraction_in_volume (i, volume);
+      if (f > 0.0)
+        amount += f * cell_volume (i) * v[i];
+    }
+  return amount;
 }
 
 double 

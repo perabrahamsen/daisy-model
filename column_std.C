@@ -513,7 +513,7 @@ ColumnStandard::soil_water_content (double from, double to) const
 {
   daisy_assert (to <= from);
   daisy_assert (to <= 0.0);
-  daisy_assert (to > geometry.z (soil->size () - 1));
+  daisy_assert (to > geometry.cell_z (soil->size () - 1));
   return soil_water->content_surface (geometry, from, to);
 }
 

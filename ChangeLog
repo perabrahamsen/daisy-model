@@ -1,3 +1,11 @@
+2008-05-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* volume_box.h, volume_box.C: Gave it a public interface.
+	* Makefile (MODELS, SPECIALS): Moved 'volume_box.C'.
+
+	* geometry.C, geometry.h (Geometry::total_soil): New variant with
+	'Volume' argument.
+
 2008-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* biopore_drain.C: New model.

@@ -62,12 +62,12 @@ public:
   inline bool cell_is_internal (int cell) const
   { return cell >= 0; }
   std::string cell_name (int) const; // For array logging.
-  virtual double z (size_t) const = 0; // Cell center depth [cm]
+  virtual double cell_z (size_t) const = 0; // Cell center depth [cm]
   double z_safe (int) const;    // Same, handles cell_top and cell_bottom.
-  virtual double x (size_t) const 
+  virtual double cell_x (size_t) const 
   { return 0.5; }
   double x_safe (int) const;    // Same, handles cell_left and cell_right.
-  virtual double y (size_t) const 
+  virtual double cell_y (size_t) const 
   { return 0.5; }
   double y_safe (int) const;    // Same, handles cell_front and cell_back.
   virtual double cell_volume (size_t) const = 0; // Cell volume [cm^3]
@@ -204,7 +204,9 @@ public:
              double from, double middle, double to, 
              std::vector<double>& change, double dt) const;
   double total_soil (const std::vector<double>& v) const;
-  double total_soil (const std::vector<double>& v, double from, double to) const;
+  double total_soil (const std::vector<double>& v, 
+                     double from, double to) const;
+  double total_soil (const std::vector<double>& v, const Volume&) const;
   double total_surface (const std::vector<double>& v) const;
   double total_surface (const std::vector<double>& v, 
                         const double from, const double to) const;
@@ -218,6 +220,7 @@ public:
   void initialize_layer (std::vector<double>& value, 
 			 const AttributeList& al, 
 			 const std::string& name, Treelog&) const;
+  virtual void fill_xplus (std::vector<double>&) const = 0;
 
   // Creation.
 public:

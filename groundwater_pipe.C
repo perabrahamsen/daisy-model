@@ -140,7 +140,7 @@ GroundwaterPipe::tick (const Geometry& geo,
       if (h >= 0)
         continue;
       // as low as possible.
-      const double z = geo.z (i);
+      const double z = geo.cell_z (i);
       if (approximate (z, lowest))
         {
           const double new_height = z + h;
@@ -238,7 +238,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Geometry& geo,
     
   for (size_t i = 0; i < cell_size; i++)
     {
-      const double z = geo.z (i);
+      const double z = geo.cell_z (i);
 
       // No contribution from cells above the groundwater table.
       if (z >= height)
@@ -272,7 +272,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Geometry& geo,
   // Distribution of drain flow among numeric soil layers
   const double a = Flow / (Ka*Ha + Kb*Hb);
   for (size_t i = 0; i < cell_size; i++)
-    if (geo.z (i) < height)
+    if (geo.cell_z (i) < height)
       S[i] = a * K_to_pipes (i, soil, soil_heat);
 
   daisy_assert (std::isfinite (Flow));
@@ -340,7 +340,7 @@ GroundwaterPipe::check (const Geometry& geo, const Scope& scope,
   
   // Check that we have a volume below the pipes.
   for (size_t i = 0; i < geo.cell_size (); i++)
-    if (geo.z (i) < pipe_position - 1e-10)
+    if (geo.cell_z (i) < pipe_position - 1e-10)
       goto found_cell_center_below_pipe;
 
   msg.error ("Insufficient soil defined below the pipe drains");

@@ -832,7 +832,7 @@ ChemicalStandard::decompose (const Geometry& geo,
       const double conc_factor
 	= this->decompose_conc_factor (C_primary_[c]);
       const double depth_factor
-	= this->decompose_depth_factor (geo.z (c));
+	= this->decompose_depth_factor (geo.cell_z (c));
       const double rate
 	= decompose_rate * heat_factor * water_factor * CO2_factor
 	* conc_factor * depth_factor;

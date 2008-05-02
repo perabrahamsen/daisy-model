@@ -136,8 +136,8 @@ UZRect2x1::tick (const GeometryRect& geo, std::vector<size_t>&,
           daisy_assert (geo.edge_to (edge) == to);
           daisy_assert (col == 0 
                         || col == cell_columns
-                        || approximate (geo.z (cells[col-1]),
-                                        geo.z (cells[col])));
+                        || approximate (geo.cell_z (cells[col-1]),
+                                        geo.cell_z (cells[col])));
           edges.push_back (edge);
           from = to;
         }
@@ -208,7 +208,7 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
 
       // Pressure at the last cell is equal to the water above it.
       for (size_t i = last + 1; i <= bottom_cell; i++)
-        h_old[i] = h[i] = groundwater.table () - geo.z (i);
+        h_old[i] = h[i] = groundwater.table () - geo.cell_z (i);
     }
 
   // Calculate matrix flow next.

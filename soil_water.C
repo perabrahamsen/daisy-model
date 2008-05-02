@@ -406,7 +406,7 @@ SoilWater::MaxExfiltration (const Geometry& geo,
         const double area = geo.edge_area (e);
         total_area += area;
         sum += (soil.K (n, h (n), h_ice (n), T) / soil.Cw2 (n, h (n))) 
-          * ((Theta (n) - soil.Theta_res (n)) / geo.z (n))
+          * ((Theta (n) - soil.Theta_res (n)) / geo.cell_z (n))
           * area;
       }
   daisy_assert (approximate (total_area, geo.surface_area ()));
@@ -419,7 +419,7 @@ SoilWater::MaxExfiltration (const Geometry& geo, const size_t edge,
 {
   const size_t n = geo.edge_other (edge, Geometry::cell_above);
   return - (soil.K (n, h (n), h_ice (n), T) / soil.Cw2 (n, h (n))) 
-    * ((Theta (n) - soil.Theta_res (n)) / geo.z (n));
+    * ((Theta (n) - soil.Theta_res (n)) / geo.cell_z (n));
 }
 
 double
@@ -620,7 +620,7 @@ SoilWater::initialize (const AttributeList& al, const Geometry& geo,
 	  
 	  for (size_t i = 0; i < cell_size; i++)
 	    {
-	      h_.push_back (std::max (-100.0, table - geo.z (i)));
+	      h_.push_back (std::max (-100.0, table - geo.cell_z (i)));
 	      Theta_.push_back (soil.Theta (i, h_[i], h_ice_[i]));
 	    }
 	}

@@ -83,7 +83,7 @@ Rootdens_AP::set_density (const Geometry& geo,
   const size_t size = geo.cell_size ();
   for (size_t i = 0; i < size; i++)
     {
-      const double d = -geo.z (i);
+      const double d = -geo.cell_z (i);
       const double f_top = geo.fraction_in_z_interval (i, 0.0, -Depth);
       const double f_tip = geo.fraction_in_z_interval (i, -Depth, -d_m);
       Density[i] = L0 * exp (- a * d) * f_top + tip (d) * f_tip;
@@ -95,14 +95,14 @@ Rootdens_AP::set_density (const Geometry& geo,
   for (; i == 0 || -geo.zplus (i-1) < Depth; i++)
     {
       daisy_assert (i < geo.size ());
-      Density[i] = L0 * exp (a * geo.z (i));
+      Density[i] = L0 * exp (a * geo.cell_z (i));
     }
   // Linear decrease downto Depth + q;
   for (; i == 0 || -geo.zplus (i-1) < d_m; i++)
     {
       daisy_assert (i < geo.size ());
       // BUG: Should this be "+="? pa 2006-04-20.
-      Density[i] += tip (-geo.z (i));
+      Density[i] += tip (-geo.cell_z (i));
     }
   // No roots below.
   for (; i < geo.size (); i++)

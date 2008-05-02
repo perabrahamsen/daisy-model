@@ -114,7 +114,7 @@ ReactionDenit::tick (const Geometry& geo,
       const double Theta_fraction = Theta / Theta_sat;
       const double NO3 = soil_NO3.C_primary (i) * Theta;
       const double T = soil_heat.T (i);
-      const double height = geo.z (i);
+      const double height = geo.cell_z (i);
       const double T_factor = (heat_factor.size () < 1)
 	? Abiotic::f_T2 (T)
 	: heat_factor (T);

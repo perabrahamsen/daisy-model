@@ -186,7 +186,7 @@ MovementRect::surface_snow_T (const Soil& soil,
     = soil.heat_conductivity (0, soil_water.Theta (0),
                               soil_water.X_ice (0)) 
     * 1e-7 * 100.0 / 3600.0; // [erg/cm/h/dg C] -> [W/m/dg C]
-  const double Z = -geo->z (0) / 100.0; // [cm] -> [m]
+  const double Z = -geo->cell_z (0) / 100.0; // [cm] -> [m]
   const double T_soil = geo->content_at (soil_heat, &SoilHeat::T, Z); // [dg C]
 
   return (K_soil / Z * T_soil + K_snow / dZs * T_snow) 

@@ -211,7 +211,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	T (cell) = forced_T;
       else 
 	T (cell) = soil_heat.T (cell); 
-      h_lysimeter (cell) = geo.zplus (cell) - geo.z (cell);
+      h_lysimeter (cell) = geo.zplus (cell) - geo.cell_z (cell);
     }
 
   // Remember old value.
@@ -747,7 +747,7 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
             const double K_cell = K (cell);
             const double K_edge = K_cell;
             const double dz = geo.edge_length (edge);
-            daisy_assert (approximate (dz, -geo.z (cell)));
+            daisy_assert (approximate (dz, -geo.cell_z (cell)));
             double q_in_avail = h_top / ddt;
             const double q_in_pot = K_edge * (h_top - h (cell) + dz) / dz;
             // Decide type.
@@ -817,7 +817,7 @@ UZRectMollerup::drain (const GeometryRect& geo,
       // Guestimate pressure in cell from surrounding cells.
       const std::vector<size_t>& edges = geo.cell_edges (cell);
       const size_t edge_size = edges.size ();
-      const double z_drain = geo.z (cell);      
+      const double z_drain = geo.cell_z (cell);      
       double h_sum = h (cell);
 
       for (size_t i = 0; i < edge_size; i++)
@@ -826,7 +826,7 @@ UZRectMollerup::drain (const GeometryRect& geo,
 	  if (!geo.edge_is_internal (edge))
 	    continue;
 	  const size_t other = geo.edge_other (edge, cell);
-	  const double z_other = geo.z (other);	// Compensate for z difference.
+	  const double z_other = geo.cell_z (other);	// Compensate for z difference.
 	  h_sum += h (other) + (z_other - z_drain);  
 	}
 

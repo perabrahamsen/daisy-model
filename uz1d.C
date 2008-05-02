@@ -61,7 +61,7 @@ SMM1D::update (const std::vector<double>& h,
       const int to = geo.edge_to (edge);
       daisy_assert (!geo.cell_is_internal (from)
                     || !geo.cell_is_internal (to)
-                    || approximate (geo.z (from), geo.z (to)));
+                    || approximate (geo.cell_z (from), geo.cell_z (to)));
       soil_water.set_flux (edge, q[i]);
     }
 }
@@ -79,7 +79,7 @@ calculate_edge_distance (const GeometryRect& geo,
     {
       const size_t cell = cells[i];
       daisy_assert (cell < cell_size);
-      const double next_x = geo.x (cell);
+      const double next_x = geo.cell_x (cell);
       const double dist = next_x - prev_x;
       daisy_assert (dist > 0.0);
       result.push_back (dist);

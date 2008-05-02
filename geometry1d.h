@@ -67,6 +67,8 @@ public:
   size_t interval_plus (double z) const;
   size_t interval_border (double z) const;
 
+  void fill_xplus (std::vector<double>&) const;
+
   // Creation.
 private:
   void build_edges ();

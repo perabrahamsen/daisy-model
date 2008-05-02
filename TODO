@@ -4,56 +4,17 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * tertiary
 
-** biopore_std.C
+** biopore matrix
 
-** macro classes
+tick
 
-parameters:
-  auto_vector<Biopore>;          // List of biopore classes
-  const double pressure_initiate;// Pressure needed to init pref.flow [cm]
-  const double pressure_end;	 // Pressure after pref.flow has been init [cm]
-  const double pond_max;	 // Pond height before activating pref.flow [mm]
+** tertiary biopores
 
-** Biopore
+release water
 
-*** Base
+** column 
 
-parameters:
-
-  density (x): [cm -> m^-2]
-  const double height_start;	// Height macropores start [cm]
-  height_end [cm]
-
-*** Drain
-
-*** Bottomless
-
-*** default
-
-parameters:
-
-  diameter [um]
-  std::vector<double> xplus [cm]
-
-state variables:
-  std::vector<double> h_bottom [cm] -> [cm]
-  map<chemical,concentration> solute [g/cm^3]
-    
-** tick
-
-*** phase 1: extract water
-
-for each cell
-  if h > pressure initiate
-     sink_macro = Theta (pressure_initiate) - Theta (pressure_end)
-     double total_density = 0.0;
-     for each biopore
-       if biopore.active (z, x)
-          density += biopore.density (x);
-     for each biopore
-       if biopore.active (z, x)
-       biopore.add_water (sink_macro Ø , z, d)
-
+add tertiary (list)
 
 * secondary flow
 

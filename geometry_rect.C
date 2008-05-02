@@ -76,6 +76,10 @@ double
 GeometryRect::xminus (size_t n) const
 { return (n < cell_rows_) ? 0.0 : xplus (n-cell_rows_); }
 
+void 
+GeometryRect::fill_xplus (std::vector<double>& result) const
+{ result = xplus_; }
+
 bool 
 GeometryRect::check (Treelog&) const
 {
@@ -313,8 +317,8 @@ GeometryRect::GeometryRect (Block& al)
         const double se_x = corner_x (corners[2]);
         const double sw_z = corner_z (corners[3]);
         const double sw_x = corner_x (corners[3]);
-        const double z = this->z (cell);
-        const double x = this->x (cell);
+        const double z = this->cell_z (cell);
+        const double x = this->cell_x (cell);
         daisy_assert (z < nw_z);
         daisy_assert (z < ne_z);
         daisy_assert (z > se_z);

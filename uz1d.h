@@ -53,7 +53,7 @@ public:
   double center (const size_t index) const
   { 
     const size_t cell = cells[index];
-    return geo.x (cell);
+    return geo.cell_x (cell);
   }
   size_t edge_previous (const size_t i) const
   { return i; }

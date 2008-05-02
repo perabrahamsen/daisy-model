@@ -40,6 +40,8 @@ struct BioporeDrain : public Biopore
   { return pipe_position; }
   void add_water (size_t, double)
   { }
+  void tick ()
+  { }
 
   // Create and Destroy.
   bool initialize (const Geometry& geo, const Scope& scope, const double pipe,

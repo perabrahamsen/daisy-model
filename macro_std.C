@@ -125,7 +125,7 @@ MacroStandard::tick (const Geometry1D& geo,
   daisy_assert (q_p.size () == geo.edge_size ());
 
   // Check for macropores outside our soil.
-  if (height_start < geo.z (last))
+  if (height_start < geo.cell_z (last))
     return;
   const double soil_end = geo.zplus (geo.cell_size () - 1);
 

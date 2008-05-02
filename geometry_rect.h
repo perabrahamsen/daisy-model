@@ -55,7 +55,7 @@ public:
   { return column * cell_rows () + row; }
   inline double zminus (size_t n) const // Cell top [cm].
   { return (n % cell_rows_ == 0) ? 0.0 : zplus (n-1U); }
-  inline double x (size_t n) const // Cell horizontal center [cm]
+  inline double cell_x (size_t n) const // Cell horizontal center [cm]
   { return x_[n]; }
   inline double dx (size_t n) const // Horizontal width of cell [cm]
   { return dx_[n]; }
@@ -123,6 +123,9 @@ public:
   { return xplus_[cell_size () - 1]; }  
   inline double bottom () const // Bottom of deepest cell [cm]
   { return zplus_[cell_rows_ - 1]; }
+
+  // Utilities.
+  void fill_xplus (std::vector<double>&) const;
 
   // Creation.
 public:

@@ -149,9 +149,9 @@ TransportHansen::flow (const Geometry& geo_base,
 	alpha[j] = 0.0;
     }
 
-  const double dz_top = 0 - geo.z (0);
-  // Or: - 2.0 * geo.z (0)
-  // Or: geo.z (0) - geo.z(1)
+  const double dz_top = 0 - geo.cell_z (0);
+  // Or: - 2.0 * geo.cell_z (0)
+  // Or: geo.cell_z (0) - geo.cell_z(1)
 
   double C_top = 0.0;
   double S_top = 0.0;
@@ -206,9 +206,9 @@ TransportHansen::flow (const Geometry& geo_base,
       for (unsigned int j = 1; j < size; j++)
 	{
 	  const double dz_minus	// Size of layer above current cell.
-	    = geo.z (j-1) - geo.z (j);
+	    = geo.cell_z (j-1) - geo.cell_z (j);
 	  const double dz_plus	// Size of layer below current cell.
-	    = (j == size - 1) ? dz_minus : (geo.z (j) - geo.z (j+1));
+	    = (j == size - 1) ? dz_minus : (geo.cell_z (j) - geo.cell_z (j+1));
 
 	  const double dz = geo.dz (j); // Size of current cell.
 	  double q_minus = q_primary[j]; // Flow to above.
@@ -253,7 +253,7 @@ TransportHansen::flow (const Geometry& geo_base,
 	// Size of layer above current cell.
 	const double dz_minus = dz_top;
 	// Size of layer below current cell.
-	const double dz_plus = geo.z (0) - geo.z (1);
+	const double dz_plus = geo.cell_z (0) - geo.cell_z (1);
 
 	// Size of current cell.
 	const double dz = geo.dz (0);

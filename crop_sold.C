@@ -1463,7 +1463,7 @@ CropSold::PotentialWaterUptake (const double h_x,
 	  S[i] = 0.0;
 	  continue;
 	}
-      const double h = h_x - (1 + Rxylem) * geo.z (i);
+      const double h = h_x - (1 + Rxylem) * geo.cell_z (i);
       const double uptake
 	= std::max (2 * M_PI * L[i] * (soil_water.Theta_ice (soil, i, h) 
 				  / soil_water.Theta_ice (soil, i, 0.0))
@@ -1589,8 +1589,8 @@ CropSold::RootDensity (const Geometry& geo)
   std::vector<double>& d = var.RootSys.Density;
   
   for (size_t i = 0; i < geo.cell_size (); i++)
-    if (i == 0 || -geo.z(i) < RootSys.Depth)
-      d[i] = L0 * exp (a * geo.z (i));
+    if (i == 0 || -geo.cell_z(i) < RootSys.Depth)
+      d[i] = L0 * exp (a * geo.cell_z (i));
     else
       d[i] = 0.0;
 }

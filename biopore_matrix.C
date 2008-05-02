@@ -26,6 +26,9 @@
 #include "vcheck.h"
 #include "librarian.h"
 #include "submodeler.h"
+#include "geometry.h"
+#include "volume_box.h"
+#include <sstream>
 
 // The 'matrix' model.
 
@@ -42,6 +45,7 @@ struct BioporeMatrix : public Biopore
   // Utilities.
   std::vector<size_t> column;
   std::vector<double> added_water; // [cm^3]
+  std::vector<double> density_column; // [m^-2]
 
   // Simulation.
   bool to_drain () const 
@@ -50,6 +54,7 @@ struct BioporeMatrix : public Biopore
   { return height_end + h_bottom[column[c]]; }
   void add_water (size_t c, double amount /* [cm^3] */)
   { added_water[column[c]] += amount; }
+  void tick ();
 
   // Create and Destroy.
   bool initialize (const Geometry& geo, const Scope& scope, double,
@@ -57,12 +62,83 @@ struct BioporeMatrix : public Biopore
   BioporeMatrix (Block& al);
 };
 
+void
+BioporeMatrix::tick ()
+{ 
+  const size_t column_size = xplus.size ();
+  for (size_t i = 0; i < column_size; i++)
+    {
+      
+    }
+}
+
 bool 
 BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
                            Treelog& msg)
 { 
-  // Initialize xplus, h_bottom, solute?, column
-  return initialize_base (geo, scope, msg); 
+  bool ok = true;
+
+  // xplus.
+  if (xplus.size () == 0)
+    geo.fill_xplus (xplus);
+  const size_t column_size = xplus.size ();
+  daisy_assert (column_size > 0);
+
+  // h_bottom.
+  if (h_bottom.size () == 0)
+    h_bottom.insert (h_bottom.end (), column_size, 0.0);
+
+  if (h_bottom.size () != column_size)
+    {
+      msg.error ("Number of elements in 'h_bottom' does not match 'xplus'");
+      ok = false;
+    }
+
+  // column.
+  daisy_assert (column.size () == 0);
+  const size_t cell_size = geo.cell_size ();
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double x = geo.cell_x (c);
+      for (size_t i = 0; i < column_size; i++)
+        if (x < xplus[i])
+          {
+            column.push_back (i);
+            goto found;
+          }
+      column.push_back (0U);
+      {
+        std::ostringstream tmp;
+        tmp << "cell[" << c << "].x = " << x << ", > xplus[" << column_size - 1 
+            << "] = " << xplus[column_size-1];
+        msg.error (tmp.str ());
+      }
+      ok = false;
+    found:
+      ;
+    }
+
+  // added_water.
+  added_water.insert (added_water.end (), column_size, 0.0);
+  daisy_assert (added_water.size () == column_size);
+
+  // density_column.
+  double xminus = 0;
+  for (size_t i = 0; i < column_size; i++)
+    {
+      VolumeBox square ("square", height_end, height_start, xminus, xplus[i]);
+      const double volume = square.volume ();
+      daisy_assert (volume > 0.0);
+      const double content = geo.total_soil (density_cell, square);
+      const double density = content / volume;
+      density_column.push_back (density);
+      xminus = xplus[i];
+    }
+  // base.
+  if (!initialize_base (geo, scope, msg))
+    ok = false;
+
+  return ok;
 }
 BioporeMatrix::BioporeMatrix (Block& al)
   : Biopore (al),

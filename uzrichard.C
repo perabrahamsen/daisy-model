@@ -169,7 +169,7 @@ UZRichard::richard (Treelog& msg,
     }
   
   // For lysimeter bottom.
-  const double h_lim = geo.zplus (last) - geo.z (last);
+  const double h_lim = geo.zplus (last) - geo.cell_z (last);
   daisy_assert (h_lim < 0.0);
 
   // Check when we last switched top.
@@ -223,7 +223,7 @@ UZRichard::richard (Treelog& msg,
       Theta_previous = Theta;
 
       if (!flux && top_type != Surface::soil)
-	h[0] = h_top - geo.z (first) + top_water;
+	h[0] = h_top - geo.cell_z (first) + top_water;
 
       // Bottom flux.
       double q_bottom = 42.42e42;
@@ -272,14 +272,14 @@ UZRichard::richard (Treelog& msg,
 	      // const double Cw2 = max (1e-5, soil.Cw2 (first + i, h[i]));
 	      const double Cw2 = soil.Cw2 (first + i, h[i]);
 	      const double dz = geo.dz (first + i);
-	      const double z = geo.z (first + i);
+	      const double z = geo.cell_z (first + i);
 
 	      if (i == 0)
 		{
 		  if (flux)
 		    {
 		      // Calculate upper boundary.
-		      const double dz_plus = z - geo.z (first + i + 1);
+		      const double dz_plus = z - geo.cell_z (first + i + 1);
 
 		      b[i] = Cw2 + (ddt / dz) * (Kplus[i] / dz_plus);
 		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]
@@ -294,8 +294,8 @@ UZRichard::richard (Treelog& msg,
 	      else if (i == 1 && !flux)
 		{
 		  // Calculate upper boundary.
-		  const double dz_plus = z - geo.z (first + i + 1);
-		  const double dz_minus = geo.z (first + i - 1) - z;
+		  const double dz_plus = z - geo.cell_z (first + i + 1);
+		  const double dz_minus = geo.cell_z (first + i - 1) - z;
 
 		  double h_above;
 		  if (top_type == Surface::soil)
@@ -309,7 +309,7 @@ UZRichard::richard (Treelog& msg,
 		      h_above = h[0];
                       daisy_assert (approximate (h_above, 
                                                  h_top
-                                                 - geo.z (first)
+                                                 - geo.cell_z (first)
                                                  + top_water));
 		    }
 		  b[i] = Cw2
@@ -324,11 +324,11 @@ UZRichard::richard (Treelog& msg,
 	      else if (i == size - 1)
 		{
 		  // Calculate lower boundary
-		  const double dz_minus = geo.z (first + i - 1) - z;
+		  const double dz_minus = geo.cell_z (first + i - 1) - z;
 
 		  if (bottom_type == Groundwater::pressure)
 		    {
-		      const double dz_plus = z - geo.z (first + i + 1);
+		      const double dz_plus = z - geo.cell_z (first + i + 1);
 		      //const double bottom_pressure = h[i + 1];
 		      const double bottom_pressure = h_old[first + i + 1];
 		      b[i] = Cw2 + (ddt / dz) * (  Kplus[i - 1] / dz_minus
@@ -365,8 +365,8 @@ UZRichard::richard (Treelog& msg,
 	      else
 		{
 		  // Calculate intermediate cells.
-		  const double dz_minus = geo.z (first + i - 1) - z;
-		  const double dz_plus = z - geo.z (first + i + 1);
+		  const double dz_minus = geo.cell_z (first + i - 1) - z;
+		  const double dz_plus = z - geo.cell_z (first + i + 1);
 
 		  a[i] = - (ddt / dz) * (Kplus[i - 1] / dz_minus);
 		  b[i] = Cw2 + (ddt / dz) * (  Kplus[i - 1] / dz_minus
@@ -661,8 +661,8 @@ UZRichard::q_darcy (const GeometryVert& geo,
 {
   // Find an unsaturated area.
   // Start looking 3/4 towards the bottom.
-  const double start_pos = geo.z (first) 
-    + (geo.z (last) - geo.z (first)) * 3.0 / 4.0;
+  const double start_pos = geo.cell_z (first) 
+    + (geo.cell_z (last) - geo.cell_z (first)) * 3.0 / 4.0;
   int start = first; 
   while (start < last && geo.zplus (start + 1) > start_pos)
     start++;
@@ -699,7 +699,7 @@ calculating flow with pressure top.\n";
   // Use Darcy equation to find flux here.
   q[start + 1] = -Kplus[start - first] 
     * (  (  (h[start - first] - h[start + 1 - first])
-	  / (geo.z (start) - geo.z (start + 1)))
+	  / (geo.cell_z (start) - geo.cell_z (start + 1)))
        + 1);
   // Use mass preservation to find flux below and above.
   for (int i = start + 1; i <= last; i++)

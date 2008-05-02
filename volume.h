@@ -52,6 +52,7 @@ private:
   virtual void limit_top (double) = 0;
   virtual void limit_bottom (double) = 0;
 public:
+  virtual double volume () const = 0;
   virtual double height (const double low, const double high) const = 0;
   virtual double width (const double low, const double high) const = 0;
   virtual double depth (const double low, const double high) const = 0;

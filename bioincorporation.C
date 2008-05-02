@@ -233,7 +233,7 @@ Bioincorporation::Implementation::initialize (const Geometry& geo,
 { 
   // Calculate distribution density for all cells.
   for (size_t i = 0; i < geo.cell_size (); i++)
-    density.push_back (distribution (geo.z (i)));
+    density.push_back (distribution (geo.cell_z (i)));
 
   C_added.insert (C_added.end (), soil.size (), 0.0);
   N_added.insert (N_added.end (), soil.size (), 0.0);

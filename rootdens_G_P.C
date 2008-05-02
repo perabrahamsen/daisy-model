@@ -193,7 +193,7 @@ Rootdens_G_P::set_density  (const Geometry& geo,
   for (size_t i = 0; i < size; i++)
     {
       const double f = geo.fraction_in_z_interval (i, 0.0, -Depth);
-      const double d = -geo.z (i);
+      const double d = -geo.cell_z (i);
       if (f > 0.01)
         Density[i] = f * (extra + L0 * exp (- a * d));
       else
@@ -204,7 +204,7 @@ Rootdens_G_P::set_density  (const Geometry& geo,
   for (; i == 0 || -geo.zplus (i-1) < Depth; i++)
     {
       daisy_assert (i < geo.size ());
-      Density[i] = extra + L0 * exp (a * geo.z (i));
+      Density[i] = extra + L0 * exp (a * geo.cell_z (i));
     }
 
   for (; i < geo.size (); i++)

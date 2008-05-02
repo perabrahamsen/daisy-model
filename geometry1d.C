@@ -98,6 +98,13 @@ Geometry1D::interval_border (double z) const
 }
 
 void 
+Geometry1D::fill_xplus (std::vector<double>& result) const
+{ 
+  result.clear ();
+  result.push_back (right ()); 
+}
+
+void 
 Geometry1D::build_edges ()
 {
   // Distance from surface to first cell center.
@@ -105,10 +112,10 @@ Geometry1D::build_edges ()
 
   // Distance between internal cell centers.
   for (int c = 1; c < cell_size (); c++)
-    edge_length_.push_back (z (c-1) - z (c));
+    edge_length_.push_back (cell_z (c-1) - cell_z (c));
 
   // Distance from last cell center to bottom.
-  edge_length_.push_back (z (cell_size () - 1) - zplus (cell_size () - 1));
+  edge_length_.push_back (cell_z (cell_size () - 1) - zplus (cell_size () - 1));
 
   // Check result.
   daisy_assert (edge_length_.size () == edge_size ());

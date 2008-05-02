@@ -632,8 +632,8 @@ OrganicStandard::Initialization::
   const double k = M_LN2 / al.number ("dist");
   std::vector<double> density (cell_size, 0.0);
   for (size_t i = 0; i < soil.size (); i++)
-    if (geo.z (i) > depth)
-      density[i] = k * exp (k * geo.z (i));
+    if (geo.cell_z (i) > depth)
+      density[i] = k * exp (k * geo.cell_z (i));
 
   geo.add_surface (per_lay, density, 
                    root * kg_per_ha_per_y_to_g_per_cm2_per_h);
@@ -1298,7 +1298,7 @@ OrganicStandard::mix (const Geometry& geo, const Soil& soil,
   // Reset tillage age.
   for (size_t i = 0; i < tillage_age.size (); i++)
     {
-      const double z = geo.z (i);
+      const double z = geo.cell_z (i);
       if (z > to && z < from)
 	tillage_age[i] = 0.0;
     }
@@ -2200,7 +2200,7 @@ OrganicStandard::top_summary (const Geometry& geo,
   double volume = 0.0;
   for (size_t lay = 0; lay < geo.cell_size (); lay++)
     {
-      if (geo.z (lay) < init.end)
+      if (geo.cell_z (lay) < init.end)
         continue;
       
       const double v = geo.cell_volume (lay);
@@ -2340,7 +2340,7 @@ OrganicStandard::initialize (const AttributeList& al,
     {
       const double limit = std::min (-100.0, soil.MaxRootingHeight ());
       for (size_t lay = 0; lay < cell_size; lay++)
-        active_.push_back (geo.z (lay) >= limit);
+        active_.push_back (geo.cell_z (lay) >= limit);
     }
   daisy_assert (active_.size () == cell_size);
 
@@ -2455,7 +2455,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
   // Initialize rest from humus.
   {
     for (size_t lay = 0; lay < cell_size; lay++)
-      if (geo.z (lay) < first_humus)
+      if (geo.cell_z (lay) < first_humus)
         total_C[lay] = soil.humus_C (lay);
   }
   // Partitioning.
@@ -2481,7 +2481,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
           ? init.find_total_input (lay)
           : total_input_from_am (init.T, init.h, lay);
       
-        const bool top_soil = geo.z (lay) > init.end;
+        const bool top_soil = geo.cell_z (lay) > init.end;
         const double background_mineralization = 
           (top_soil && init.background_mineralization > -1e10)
           ? (init.background_mineralization 

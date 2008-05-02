@@ -193,8 +193,8 @@ Movement1D::tick_water (const Geometry1D& geo,
       // Pressure at the last cell is equal to the water above it.
       for (size_t i = last + 1; i < soil.size (); i++)
         {
-          h_old[i] = groundwater.table () - geo.z (i);
-          h[i] = groundwater.table () - geo.z (i);
+          h_old[i] = groundwater.table () - geo.cell_z (i);
+          h[i] = groundwater.table () - geo.cell_z (i);
         }
     }
 
@@ -420,7 +420,7 @@ Movement1D::surface_snow_T (const Soil& soil,
     = soil.heat_conductivity (0, soil_water.Theta (0),
                               soil_water.X_ice (0)) 
     * 1e-7 * 100.0 / 3600.0; // [erg/cm/h/dg C] -> [W/m/dg C]
-  const double Z = -geo->z (0) / 100.0; // [cm] -> [m]
+  const double Z = -geo->cell_z (0) / 100.0; // [cm] -> [m]
   const double T_soil = soil_heat.T (0); // [dg C]
 
   return (K_soil / Z * T_soil + K_snow / dZs * T_snow) 
@@ -499,12 +499,12 @@ Movement1D::solve_heat (const Geometry1D& geo,
       // Calculate distances.
       const double dz_next 
         = (i == size - 1)
-        ? geo.z (i) - geo.z (prev)
-        : geo.z (next) - geo.z (i);
+        ? geo.cell_z (i) - geo.cell_z (prev)
+        : geo.cell_z (next) - geo.cell_z (i);
       const double dz_prev 
         = (i == 0)
-        ? geo.z (i) - 0.0
-        : geo.z (i) - geo.z (prev);
+        ? geo.cell_z (i) - 0.0
+        : geo.cell_z (i) - geo.cell_z (prev);
       const double dz_both = dz_prev + dz_next;
 
       // Calculate temperature differences.
@@ -538,8 +538,8 @@ Movement1D::solve_heat (const Geometry1D& geo,
       const double x2 = dT_next / dz_next - dT_prev/ dz_prev;
       if (i == 0)
         d[i] = T[i] * capacity_cell / dt
-          + conductivity_cell / geo.z (1) * (x2 + T_top_new / geo.z (0))
-          + Cx * (T[1] - T_top + T_top_new) / (2.0 * geo.z (1));
+          + conductivity_cell / geo.cell_z (1) * (x2 + T_top_new / geo.cell_z (0))
+          + Cx * (T[1] - T_top + T_top_new) / (2.0 * geo.cell_z (1));
       else
         d[i] = T[i] * capacity_cell / dt + (conductivity_cell / dz_both) * x2
           + Cx * dT_both / dz_both / 2.0;

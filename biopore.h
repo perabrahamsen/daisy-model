@@ -57,6 +57,7 @@ public:
   double density (size_t c) const                 // [m^-2]
   { return density_cell[c]; }
   virtual void add_water (size_t c, double amount /* [cm^3] */) = 0;
+  virtual void tick () = 0;
 
   // Create and Destroy.
 protected:

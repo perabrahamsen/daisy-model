@@ -390,7 +390,7 @@ MODELS = biopore_drain.C tertiary_biopores.C \
 	groundwater_extern.C \
 	transport_none.C uzrect_Mollerup.C groundwater_flux.C \
 	ABAeffect_exp.C rubiscoNdist_uniform.C \
-	uzrect_2x1.C select_flow.C volume_box.C \
+	uzrect_2x1.C select_flow.C \
 	select_volume.C uz1d_none.C condition_walltime.C uz1d_richard.C \
 	rubiscoNdist_DPF.C raddist_DPF.C raddist_std.C difrad_DPF.C \
         difrad_weather.C number_lisp.C condition_extern.C condition_boolean.C \
@@ -472,7 +472,7 @@ SUBMODELS = toplevel.C timestep.C geometry_rect.C doe.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = movement_solute.C scope_exchange.C photo_Farquhar.C \
+SPECIALS = volume_box.C movement_solute.C scope_exchange.C photo_Farquhar.C \
 	scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C \
@@ -1215,6 +1215,8 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
   symbol.h syntax.h treelog.h log.h time.h border.h model.h geometry.h \
   mathlib.h assertion.h soil.h am.h im.h submodel.h plf.h aom.h om.h \
   check.h vcheck.h
+volume_box${OBJ}: volume_box.C volume_box.h volume.h model.h symbol.h alist.h \
+  syntax.h treelog.h bound.h border.h mathlib.h assertion.h librarian.h
 movement_solute${OBJ}: movement_solute.C movement_solute.h movement.h model.h \
   symbol.h alist.h memutils.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil_water.h transport.h chemical.h adsorption.h \
@@ -1377,7 +1379,7 @@ tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   soil_water.h
 biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
   number.h imvec.h syntax.h treelog.h block.h plf.h vcheck.h librarian.h \
-  submodeler.h assertion.h
+  submodeler.h assertion.h geometry.h mathlib.h volume_box.h volume.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
   alist.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h soil.h solver.h log.h time.h border.h \
@@ -1525,8 +1527,6 @@ uzrect_2x1${OBJ}: uzrect_2x1.C uzrect.h model.h symbol.h alist.h uzmodel.h \
 select_flow${OBJ}: select_flow.C select_value.h select.h destination.h \
   symbol.h model.h alist.h units.h volume.h block.h syntax.h treelog.h \
   plf.h border.h geometry.h mathlib.h assertion.h librarian.h
-volume_box${OBJ}: volume_box.C volume.h model.h symbol.h alist.h syntax.h \
-  treelog.h bound.h border.h mathlib.h assertion.h librarian.h
 select_volume${OBJ}: select_volume.C select_value.h select.h destination.h \
   symbol.h model.h alist.h units.h volume.h bdconv.h block.h syntax.h \
   treelog.h plf.h geometry.h mathlib.h assertion.h soil.h vegetation.h \

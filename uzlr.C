@@ -94,7 +94,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       // flux top between the first cell (with a forced pressure) and
       // the second cell, and then continue calculating with a flux
       // top from the second cell.
-      const double dz = geo.z (first) - geo.z (first+1);
+      const double dz = geo.cell_z (first) - geo.cell_z (first+1);
       const double dh = (h_old[first] - h_old[first+1]);
       const double K = std::min (soil.K (first, h_old[first], h_ice[first],
                                          soil_heat.T (first)),
@@ -118,7 +118,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 
       if (top_type == Surface::forced_pressure)
 	{
-	  const double dz = 0.0 - geo.z (first);
+	  const double dz = 0.0 - geo.cell_z (first);
 	  const double dh = top.h_top (geo, top_edge) - h_old[first];
 	  q_up = q[first] = -K_sat * (dh/dz + 1.0);
 	}
@@ -133,7 +133,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
   // Intermediate cells.
   for (int i = first; i <= last; i++)
     {
-      const double z = geo.z (i);
+      const double z = geo.cell_z (i);
       const double dz = geo.dz (i);
       const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
       const double Theta_res = soil.Theta_res (i);
@@ -160,7 +160,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       if (use_darcy && i < first + 5 && z > z_top)
 	// Dry earth, near top.  Use darcy to move water up.
 	{
-	  const double dist = z - geo.z (i+1);
+	  const double dist = z - geo.cell_z (i+1);
 	  q[i+1] = std::max (K_new * ((h_old[i+1] - h_new) / dist - 1.0), 0.0);
 
 	  if (Theta_new + q[i+1] * dt / dz > Theta_sat)

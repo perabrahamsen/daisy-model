@@ -67,7 +67,7 @@ Biopore::initialize_base (const Geometry& geo, const Scope& parent_scope,
 
   for (size_t c = 0; c < cell_size; c++)
     {
-      own_scope.set_number (x_symbol (), geo.x (c));
+      own_scope.set_number (x_symbol (), geo.cell_x (c));
       if (!density_expr->tick_value (value, Units::cm (), scope, msg))
         return false;
       density_cell.push_back (value);

@@ -1073,8 +1073,8 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
       // Calculate density.
       std::vector<double> density (geo.cell_size (), 0.0);
       for (size_t i = 0; i < geo.cell_size (); i++)
-        if (geo.z (i) > depth)
-          density[i] = k * exp (k * geo.z (i));
+        if (geo.cell_z (i) > depth)
+          density[i] = k * exp (k * geo.cell_z (i));
 
       // Add it.
       impl->add_surface (geo, C, N, density);

@@ -39,7 +39,7 @@ public:
   // Accessors.
   inline double zplus (size_t n) const
   { return zplus_[n]; }
-  inline double z (size_t n) const
+  inline double cell_z (size_t n) const
   { return z_[n]; }
   inline double dz (size_t n) const
   { return dz_[n]; }

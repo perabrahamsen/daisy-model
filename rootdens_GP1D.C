@@ -183,7 +183,7 @@ Rootdens_GP1D::set_density (const Geometry& geo,
   for (size_t cell = 0; cell < cell_size; cell++)
     {
       // TODO: Using cell average would be better than cell center.
-      const double z = -geo.z (cell); // Positive below ground. [cm]
+      const double z = -geo.cell_z (cell); // Positive below ground. [cm]
       Density[cell] = L0 * std::exp (-a * z);
     }
 
