@@ -27,6 +27,9 @@
 #include "librarian.h"
 #include "submodeler.h"
 #include "geometry.h"
+#include "soil.h"
+#include "soil_water.h"
+#include "secondary.h"
 #include "volume_box.h"
 #include <sstream>
 
@@ -37,15 +40,18 @@ struct BioporeMatrix : public Biopore
   // Parameters.
   /* const */ std::vector<double> xplus; // [cm]
   const double diameter;        // [mm]
-  
+  const double R_primary;       // [h/cm]
+  const double R_secondary;     // [h/cm]
+
   // State.
   std::vector<double> h_bottom; // [cm]
   std::auto_ptr<IMvec> solute;  // [g/cm^3]
   
   // Utilities.
+  /* const */ double dy;                    // [cm]
   std::vector<size_t> column;
   std::vector<double> added_water; // [cm^3]
-  std::vector<double> density_column; // [m^-2]
+  std::vector<double> density_column; // [cm^-2]
 
   // Simulation.
   bool to_drain () const 
@@ -54,21 +60,92 @@ struct BioporeMatrix : public Biopore
   { return height_end + h_bottom[column[c]]; }
   void add_water (size_t c, double amount /* [cm^3] */)
   { added_water[column[c]] += amount; }
-  void tick ();
+  void extract_water (const size_t c, const double volume /* [cm^3] */ ,
+                      const double Theta /* [cm^3/cm^3] */,
+                      const double dt /* [h] */,
+                      std::vector<double>& S_drain /* [cm^3/cm^3/h] */,
+                      std::vector<double>& S_matrix);
+  void update_water ();
+  void release_water (const Geometry& geo, const Soil& soil, 
+                      const SoilWater& soil_water,
+                      const double dt /* [h] */,
+                      std::vector<double>& S_matrix);
 
   // Create and Destroy.
   bool initialize (const Geometry& geo, const Scope& scope, double,
                    Treelog& msg);
+  bool check (const Geometry& geo, Treelog& msg) const
+  { return check_base (geo, msg); }
   BioporeMatrix (Block& al);
 };
 
+void 
+BioporeMatrix::extract_water (const size_t c, const double volume /* [cm^3] */ ,
+                              const double Theta /* [cm^3/cm^3] */,
+                              const double dt /* [h] */,
+                              std::vector<double>& /* [cm^3/cm^3/h] */,
+                              std::vector<double>& S_matrix)
+{
+  S_matrix[c] += Theta / dt;
+  added_water[column[c]] += Theta * volume;
+}
+
+void 
+BioporeMatrix::release_water (const Geometry& geo, const Soil& soil, 
+                              const SoilWater& soil_water,
+                              const double dt /* [h] */,
+                              std::vector<double>& S_matrix)
+{
+  const size_t cell_size = geo.cell_size ();
+  for (size_t c = 0; c < cell_size; c++)
+    { 
+      if (density (c) < 1e-42)
+        // No biopores of this class in this cell.
+        continue;
+
+      const double cell_z = geo.cell_z (c); // [cm]
+      if (cell_z > height_start || cell_z < height_end)
+        // Outside interval.
+        continue;
+
+      const double h_matrix = soil_water.h (c); // [cm]
+      const double h_biopore =  air_bottom (c) - cell_z; // [cm]
+      if (h_biopore < h_matrix + 1e-5)
+        // Pressure in biopore not significantly above pressure in matrix.
+        continue;
+      const double dh = h_biopore - h_matrix; // [cm]
+
+      // Find resistance.
+      const Secondary& secondary = soil.secondary_domain (c);
+      const bool use_primary = secondary.none ();
+      const double R = use_primary ? R_primary : R_secondary; // [h/cm]
+      
+      // Find sink
+      const double S = dh / R; // [h^-1]
+      S_matrix[c] -= S;
+      const double volume = geo.cell_volume (c); // [cm^3]
+      added_water[column[c]] -= S * volume * dt; // [cm^3]
+    }
+}
+
 void
-BioporeMatrix::tick ()
+BioporeMatrix::update_water ()
 { 
   const size_t column_size = xplus.size ();
+  double xminus = 0.0;
   for (size_t i = 0; i < column_size; i++)
     {
-      
+      const double density = density_column[i]; // [cm^-2]
+      const double radius = diameter * 0.5;     // [cm]
+      const double area = M_PI * radius * radius;  // [cm^2]
+      const double soil_fraction = density * area; // []
+      const double water_volume = added_water[i];  // [cm^3]
+      const double soil_volume = water_volume / soil_fraction; // [cm^3]
+      const double dx = xplus[i] - xminus;                     // [cm]
+      const double dz = soil_volume / (dx * dy);               // [cm]
+      h_bottom[i] += dz;                                          // [cm]
+      added_water[i] = 0.0;                                    // [cm^3]
+      xminus = xplus[i];                                       // [cm]
     }
 }
 
@@ -93,6 +170,9 @@ BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
       msg.error ("Number of elements in 'h_bottom' does not match 'xplus'");
       ok = false;
     }
+
+  // dy.
+  dy = geo.back () - geo.front ();
 
   // column.
   daisy_assert (column.size () == 0);
@@ -130,7 +210,8 @@ BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
       const double volume = square.volume ();
       daisy_assert (volume > 0.0);
       const double content = geo.total_soil (density_cell, square);
-      const double density = content / volume;
+      static const double m2_per_cm2 = 0.01 * 0.01;
+      const double density = m2_per_cm2 * content / volume;
       density_column.push_back (density);
       xminus = xplus[i];
     }
@@ -146,6 +227,8 @@ BioporeMatrix::BioporeMatrix (Block& al)
            ? al.number_sequence ("xplus") 
            : std::vector<double> ()),
     diameter (al.number ("diameter")),
+    R_primary (al.number ("R_primary")),
+    R_secondary (al.number ("R_secondary", R_primary)),
     h_bottom (al.check ("h_bottom") 
               ? al.number_sequence ("h_bottom") 
               : std::vector<double> ()),
@@ -172,7 +255,12 @@ Water and chemical content is tracked individually for each interval.\n\
 By default, use intervals as specified by the geometry.");
     syntax.add_check ("xplus", VCheck::increasing ());
     syntax.add ("diameter", "cm", Syntax::Const, "Biopore diameter.");
-    syntax.add ("h_bottom", "cm", Syntax::OptionalConst, Syntax::Sequence,
+    syntax.add ("R_primary", "h/cm", Syntax::Const, "\
+Resistance for water moving from biopore to primary domain.");
+    syntax.add ("R_secondary", "h/cm", Syntax::OptionalConst, "\
+Resistance for water moving from macropore to secondary domain.\n\
+If not specified, this will be identical to 'R_primary'.");
+    syntax.add ("h_bottom", "cm", Syntax::OptionalState, Syntax::Sequence,
 		"Pressure at the bottom of the biopores in each interval.");
 
     static const symbol C_unit ("g/cm^3");

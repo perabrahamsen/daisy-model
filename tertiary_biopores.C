@@ -45,8 +45,8 @@ struct TertiaryBiopores : public Tertiary
                       std::vector<double>& S_matrix);
   void release_water (const Geometry&, const Soil&, const SoilWater&,
                       const double dt,
-                      std::vector<double>& S_drain,
                       std::vector<double>& S_matrix);
+  void update_water ();
   void tick (const Geometry&, const Soil&, const SoilWater&,
              const double dt,
              std::vector<double>& S_drain,
@@ -93,6 +93,10 @@ TertiaryBiopores::extract_water (const Geometry& geo, const Soil& soil,
                 lowest_pore = air_bottom;
             }
             
+          if (total_density < 1e-42)
+            // No biopores.
+            continue;
+
           // We empty the matrix to 'pressure_end', but only if there
           // are pores with air sufficently deep.
           const double pore_pressure = lowest_pore - cell_z;
@@ -104,43 +108,37 @@ TertiaryBiopores::extract_water (const Geometry& geo, const Soil& soil,
             // Ignore trivial pressure difference.
             continue;
 
-          // Find corresponding sink.
+          // Find corresponding loss.
           const double h_ice = soil_water.h_ice (c);
-          const double sink = soil.Theta (c, h, h_ice)
+          const double loss = soil.Theta (c, h, h_ice) 
             - soil.Theta (c, end, h_ice);
           
-          if (sink < 1e-5)
-            // Ignore trivial sinks.
+          if (loss < 1e-5)
+            // Ignore trivial losss.
             continue;
 
-          // Find total amount of water removed.
-          const double water = sink * geo.cell_volume (c);
+          const double volume = geo.cell_volume (c); // [cm^3]
 
           // Distribute to biopore classes.
-          double total_share = 0.0;
-          double total_S = 0.0;
           for (size_t b = 0; b < classes.size (); b++)
             {
               Biopore& biopore = *classes[b];
               const double air_bottom = biopore.air_bottom (c);
 
-              if (air_bottom < cell_z)
-                // Active pore class.
-                {
-                  const double fraction = biopore.density (c) / total_density;
-                  const double share = water * fraction;
-                  biopore.add_water (c, share);
-                  const double S = fraction * sink / dt;
-                  total_share += share;
-                  if (biopore.to_drain ())
-                    S_drain[c] += S;
-                  else 
-                    S_matrix[c] += S;
-                  total_S += S;
-                }
+              if (air_bottom > cell_z - 1e-5)
+                // Biopore is filled.
+                continue;
+
+              const double density = biopore.density (c);
+              if (density < 1e-42)
+                // No biopores of this class in this cell.
+                continue;
+
+              // Extract it.
+              const double fraction = density / total_density;
+              biopore.extract_water (c, volume, fraction * loss,
+                                     dt, S_drain, S_matrix);
             }
-          daisy_approximate (total_share, water);
-          daisy_approximate (total_S * dt, sink);
         }
     }
 }
@@ -149,16 +147,17 @@ void
 TertiaryBiopores::release_water (const Geometry& geo, const Soil& soil,
                                  const SoilWater& soil_water,
                                  const double dt,
-                                 std::vector<double>& S_drain,
                                  std::vector<double>& S_matrix)
 {
-  const size_t cell_size = geo.cell_size ();
+  for (size_t b = 0; b < classes.size (); b++)
+    classes[b]->release_water (geo, soil, soil_water, dt, S_matrix);
+}
 
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      const double h = soil_water.h (c);
-
-    }
+void
+TertiaryBiopores::update_water ()
+{
+  for (size_t b = 0; b < classes.size (); b++)
+    classes[b]->update_water ();
 }
 
 void
@@ -169,9 +168,9 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
                         std::vector<double>& S_matrix)
 {
   extract_water (geo, soil, soil_water, dt, S_drain, S_matrix);
-  for (size_t b = 0; b < classes.size (); b++)
-    classes[b]->tick ();
-  release_water (geo, soil, soil_water, dt, S_drain, S_matrix);
+  update_water ();
+  release_water (geo, soil, soil_water, dt, S_matrix);
+  update_water ();
 }
 
 bool 

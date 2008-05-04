@@ -33,14 +33,21 @@ struct BioporeDrain : public Biopore
 {
   // Parameters.
   /* const */ double pipe_position;   // [cm]
+
   // Simulation.
-  bool to_drain () const 
-  { return true; }
   double air_bottom (size_t) const    // Lowest point with air [cm]
   { return pipe_position; }
-  void add_water (size_t, double)
+  void extract_water (size_t c, const double volume /* [cm^3] */ ,
+                      const double Theta /* [cm^3/cm^3 */,
+                      const double dt /* [h] */,
+                      std::vector<double>& S_drain /* [cm^3/cm^3/h */,
+                      std::vector<double>& S_matrix);
+  void release_water (const Geometry&, const Soil&, 
+                      const SoilWater&,
+                      const double /* [h] */,
+                      std::vector<double>&)
   { }
-  void tick ()
+  void update_water ()
   { }
 
   // Create and Destroy.
@@ -53,8 +60,18 @@ struct BioporeDrain : public Biopore
 
     return initialize_base (geo, scope, msg); 
   }
+  bool check (const Geometry& geo, Treelog& msg) const
+  { return check_base (geo, msg); }
   BioporeDrain (Block& al);
 };
+
+void 
+BioporeDrain::extract_water (size_t c, const double /* [cm^3] */ ,
+                             const double Theta /* [cm^3/cm^3] */,
+                             const double dt /* [h] */,
+                             std::vector<double>& S_drain /* [cm^3/cm^3/h] */,
+                             std::vector<double>& )
+{ S_drain[c] += Theta / dt; }
 
 BioporeDrain::BioporeDrain (Block& al)
   : Biopore (al),

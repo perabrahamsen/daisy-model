@@ -26,10 +26,13 @@
 #include "symbol.h"
 #include "number.h"
 #include <memory>
+#include <vector>
 
 class Block;
 class AttributeList;
 class Geometry;
+class Soil;
+class SoilWater;
 
 class Biopore : public Model
 {
@@ -52,12 +55,19 @@ protected:
 
   // Interface.
 public:
-  virtual bool to_drain () const = 0;
   virtual double air_bottom (size_t c) const = 0; // Lowest point with air [cm]
   double density (size_t c) const                 // [m^-2]
   { return density_cell[c]; }
-  virtual void add_water (size_t c, double amount /* [cm^3] */) = 0;
-  virtual void tick () = 0;
+  virtual void extract_water (size_t c, const double volume /* [cm^3] */ ,
+                              const double Theta /* [cm^3/cm^3] */,
+                              const double dt /* [h] */,
+                              std::vector<double>& S_drain /* [cm^3/cm^3/h] */,
+                              std::vector<double>& S_matrix) = 0;
+  virtual void release_water (const Geometry& geo, const Soil& soil, 
+                              const SoilWater& soil_water,
+                              const double dt /* [h] */,
+                              std::vector<double>& S_matrix) = 0;
+  virtual void update_water () = 0;
 
   // Create and Destroy.
 protected:
@@ -65,7 +75,8 @@ protected:
 public:
   virtual bool initialize (const Geometry&, const Scope&, double pipe_height,
                            Treelog&) = 0;
-  bool check (const Geometry&, Treelog& msg) const;
+  bool check_base (const Geometry&, Treelog& msg) const;
+  virtual bool check (const Geometry&, Treelog& msg) const = 0;
   static void load_base (Syntax& syntax, AttributeList& alist);
 protected:
   explicit Biopore (Block& al);

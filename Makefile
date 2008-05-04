@@ -1379,7 +1379,8 @@ tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   soil_water.h
 biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
   number.h imvec.h syntax.h treelog.h block.h plf.h vcheck.h librarian.h \
-  submodeler.h assertion.h geometry.h mathlib.h volume_box.h volume.h
+  submodeler.h assertion.h geometry.h mathlib.h soil.h soil_water.h \
+  secondary.h volume_box.h volume.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
   alist.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h soil.h solver.h log.h time.h border.h \

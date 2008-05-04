@@ -64,21 +64,28 @@ Biopore::initialize_base (const Geometry& geo, const Scope& parent_scope,
   const size_t cell_size = geo.cell_size ();
   density_cell.reserve (cell_size);
   double value = -42.42e42;
-
+  bool ok = true;
   for (size_t c = 0; c < cell_size; c++)
     {
-      own_scope.set_number (x_symbol (), geo.cell_x (c));
-      if (!density_expr->tick_value (value, Units::cm (), scope, msg))
-        return false;
-      density_cell.push_back (value);
+      const double cell_z = geo.cell_z (c);
+      if (cell_z > height_start || cell_z < height_end)
+        // Outside z interval.
+        density_cell.push_back (0.0);
+      else
+        {
+          own_scope.set_number (x_symbol (), geo.cell_x (c));
+          if (!density_expr->tick_value (value, Units::cm (), scope, msg))
+            ok = false;
+          density_cell.push_back (value);
+        }
     }
   daisy_assert (density_cell.size () == cell_size);
 
-  return true;
+  return ok;
 }
 
 bool 
-Biopore::check (const Geometry& geo, Treelog& msg) const
+Biopore::check_base (const Geometry& geo, Treelog& msg) const
 {
   bool ok = true;
   if (geo.cell_size () != density_cell.size ())
