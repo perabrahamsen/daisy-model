@@ -49,6 +49,8 @@ struct BioporeDrain : public Biopore
   { }
   void update_water ()
   { }
+  void output (Log&) const
+  { }
 
   // Create and Destroy.
   bool initialize (const Geometry& geo, const Scope& scope, const double pipe,

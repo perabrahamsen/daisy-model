@@ -33,12 +33,12 @@ class AttributeList;
 class Geometry;
 class Soil;
 class SoilWater;
+class Log;
 
-class Biopore : public Model
+class Biopore : public ModelAListed
 {
   // Identity.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
 
@@ -68,6 +68,7 @@ public:
                               const double dt /* [h] */,
                               std::vector<double>& S_matrix) = 0;
   virtual void update_water () = 0;
+  virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 protected:

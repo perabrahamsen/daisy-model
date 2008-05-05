@@ -37,7 +37,7 @@ Tertiary::library_id () const
 }
 
 Tertiary::Tertiary (Block& al)
-  : name (al.identifier ("type"))
+  : ModelAListed (al.alist ())
 { }
 
 Tertiary::~Tertiary ()

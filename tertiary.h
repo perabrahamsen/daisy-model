@@ -25,16 +25,26 @@
 
 class Block;
 class Geometry;
+class Soil;
+class SoilWater;
 class Scope;
 class Treelog;
+class Log;
 
-class Tertiary : public Model
+class Tertiary : public ModelAListed
 {
   // Identity.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
+
+  // Simulation.
+public:
+  virtual void tick (const Geometry&, const Soil&, const SoilWater&,
+                     const double dt,
+                     std::vector<double>& S_drain,
+                     std::vector<double>& S_matrix) = 0;
+  virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 public:

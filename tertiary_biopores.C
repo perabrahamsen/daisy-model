@@ -29,6 +29,7 @@
 #include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "log.h"
 
 struct TertiaryBiopores : public Tertiary
 {
@@ -51,6 +52,7 @@ struct TertiaryBiopores : public Tertiary
              const double dt,
              std::vector<double>& S_drain,
              std::vector<double>& S_matrix);
+  void output (Log&) const;
   
   // Create and Destroy.
 public:
@@ -171,6 +173,12 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
   update_water ();
   release_water (geo, soil, soil_water, dt, S_matrix);
   update_water ();
+}
+
+void 
+TertiaryBiopores::output (Log& log) const
+{
+  output_list (classes, "classes", log, Biopore::component);
 }
 
 bool 

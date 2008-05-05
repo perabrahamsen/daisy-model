@@ -109,7 +109,7 @@ Root density [m^-2] as a function of 'x' [cm].");
 }
 
 Biopore::Biopore (Block& al)
-  : name (al.identifier ("type")),
+  : ModelAListed (al.alist ()),
     density_expr (Librarian::build_item<Number> (al, "density")),
     height_start (al.number ("height_start")),
     height_end (al.number ("height_end"))

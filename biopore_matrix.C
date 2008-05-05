@@ -31,6 +31,7 @@
 #include "soil_water.h"
 #include "secondary.h"
 #include "volume_box.h"
+#include "log.h"
 #include <sstream>
 
 // The 'matrix' model.
@@ -65,11 +66,12 @@ struct BioporeMatrix : public Biopore
                       const double dt /* [h] */,
                       std::vector<double>& S_drain /* [cm^3/cm^3/h] */,
                       std::vector<double>& S_matrix);
-  void update_water ();
   void release_water (const Geometry& geo, const Soil& soil, 
                       const SoilWater& soil_water,
                       const double dt /* [h] */,
                       std::vector<double>& S_matrix);
+  void update_water ();
+  void output (Log&) const;
 
   // Create and Destroy.
   bool initialize (const Geometry& geo, const Scope& scope, double,
@@ -147,6 +149,13 @@ BioporeMatrix::update_water ()
       added_water[i] = 0.0;                                    // [cm^3]
       xminus = xplus[i];                                       // [cm]
     }
+}
+
+void
+BioporeMatrix::output (Log& log) const
+{
+  output_variable (h_bottom, log);
+  output_submodule (*solute, "solute", log);
 }
 
 bool 
