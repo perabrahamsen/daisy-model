@@ -53,6 +53,7 @@ public:
   virtual bool check (const Geometry&, Treelog&) const = 0;
 protected:
   explicit Tertiary (Block& al);
+public:
   virtual ~Tertiary ();
 };
 

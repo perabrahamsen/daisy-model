@@ -177,9 +177,7 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
 
 void 
 TertiaryBiopores::output (Log& log) const
-{
-  output_list (classes, "classes", log, Biopore::component);
-}
+{ output_list (classes, "classes", log, Biopore::component); }
 
 bool 
 TertiaryBiopores::initialize (const Geometry& geo, 

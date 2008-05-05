@@ -27,6 +27,7 @@
 #include "symbol.h"
 #include <vector>
 #include <string>
+#include <memory>
 
 class Column;
 class AttributeList;
@@ -46,7 +47,7 @@ class Field : public Border
 { 
   // Top secret internal state.
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
 
 public:
   // Restrict operations to selected columns.
@@ -140,7 +141,7 @@ public:
   bool check_x_border (double, Treelog&) const;
   bool check_y_border (double, Treelog&) const;
 
-  void initialize (Block&, const Output&, const Time&, const Weather*,
+  bool initialize (Block&, const Output&, const Time&, const Weather*,
 		   const Scope&);
   Field (Block&, const std::string& key);
   virtual ~Field ();

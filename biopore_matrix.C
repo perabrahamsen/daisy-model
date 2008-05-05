@@ -123,8 +123,8 @@ BioporeMatrix::release_water (const Geometry& geo, const Soil& soil,
       const double R = use_primary ? R_primary : R_secondary; // [h/cm]
       
       // Find sink
-      const double S = dh / R; // [h^-1]
-      S_matrix[c] -= S;
+      const double S = dh / R; // [cm^2 h^-1]
+      S_matrix[c] -= S;        // BUG: [h^-1] -= [cm^2 h^-1]
       const double volume = geo.cell_volume (c); // [cm^3]
       added_water[column[c]] -= S * volume * dt; // [cm^3]
     }
@@ -163,6 +163,10 @@ BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
                            Treelog& msg)
 { 
   bool ok = true;
+
+  // base.
+  if (!initialize_base (geo, scope, msg))
+    ok = false;
 
   // xplus.
   if (xplus.size () == 0)
@@ -224,9 +228,6 @@ BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
       density_column.push_back (density);
       xminus = xplus[i];
     }
-  // base.
-  if (!initialize_base (geo, scope, msg))
-    ok = false;
 
   return ok;
 }

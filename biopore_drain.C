@@ -56,11 +56,16 @@ struct BioporeDrain : public Biopore
   bool initialize (const Geometry& geo, const Scope& scope, const double pipe,
                    Treelog& msg)
   {
+    bool ok = initialize_base (geo, scope, msg); 
     if (pipe_position > 0)
       // Pipe height not specified here, use value from column.
       pipe_position = pipe;
-
-    return initialize_base (geo, scope, msg); 
+    if (pipe_position > 0)
+      {
+        msg.error ("Unknown pipe position");
+        ok = false;
+      }
+    return ok;
   }
   bool check (const Geometry& geo, Treelog& msg) const
   { return check_base (geo, msg); }

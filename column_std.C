@@ -36,6 +36,7 @@
 #include "weather.h"
 #include "chemistry.h"
 #include "chemical.h"
+#include "tertiary.h"
 #include "organic_matter.h"
 #include "im.h"
 #include "am.h"
@@ -68,6 +69,7 @@ struct ColumnStandard : public Column
   std::auto_ptr<SoilWater> soil_water;
   std::auto_ptr<SoilHeat> soil_heat;
   std::auto_ptr<Chemistry> chemistry;
+  auto_vector<Tertiary*> tertiary;
   std::auto_ptr<OrganicMatter> organic_matter;
   double second_year_utilization_;
 
@@ -162,7 +164,7 @@ public:
   // Create and Destroy.
   static Movement* build_vertical (Block& al);
   ColumnStandard (Block& al);
-  void initialize (Block&, const Output&, const Time&, const Weather*,
+  bool initialize (Block&, const Output&, const Time&, const Weather*,
 		   const Scope& scope);
   ~ColumnStandard ();
 };
@@ -609,6 +611,19 @@ ColumnStandard::tick (const Time& time, const double dt,
                        bioclimate->canopy_leak_rate (dt), 
                        surface.runoff_rate (dt), dt, msg);
 
+  // Tertiary transport.
+  {
+    const size_t cell_size = geometry.cell_size ();
+    std::vector<double> S_drain (cell_size, 0.0);
+    std::vector<double> S_matrix (cell_size, 0.0);
+    for (size_t i = 0; i < tertiary.size (); i++)
+      tertiary[i]->tick (geometry, *soil, *soil_water, dt, S_drain, S_matrix);
+    soil_water->drain (S_drain);
+    const size_t edge_size = geometry.edge_size ();
+    const std::vector<double> q_tertiary (edge_size, 0.0);
+    soil_water->set_tertiary (S_matrix, q_tertiary);
+  }
+
   // Turnover.
   organic_matter->tick (geometry, *soil_water, *soil_heat, 
                         *chemistry, dt, msg);
@@ -702,6 +717,12 @@ ColumnStandard::check (bool require_weather,
 			   scope, msg))
       ok = false;
   }
+  for (size_t i = 0; i < tertiary.size (); i++)
+    {
+      Treelog::Open nest (msg, "Tertiary", i, tertiary[i]->name);
+      if (!tertiary[i]->check (geometry, msg))
+        ok = false;
+    }
   {
     Treelog::Open nest (msg, "Vegetation");
     if (!vegetation->check (msg))
@@ -777,6 +798,7 @@ ColumnStandard::output (Log& log) const
   output_submodule (*soil_water, "SoilWater", log);
   output_submodule (*soil_heat, "SoilHeat", log);
   output_derived (chemistry, "Chemistry", log);
+  output_list (tertiary, "tertiary", log, Tertiary::component);
   output_derived (vegetation, "Vegetation", log);
   output_derived (organic_matter, "OrganicMatter", log);
   output_value (second_year_utilization_, "second_year_utilization", log);
@@ -824,6 +846,7 @@ ColumnStandard::ColumnStandard (Block& al)
     soil_water (submodel<SoilWater> (al, "SoilWater")),
     soil_heat (submodel<SoilHeat> (al, "SoilHeat")),
     chemistry (Librarian::build_item<Chemistry> (al, "Chemistry")),
+    tertiary (Librarian::Librarian::build_vector<Tertiary> (al, "Tertiary")),
     organic_matter (Librarian::build_item<OrganicMatter> 
                     (al, "OrganicMatter")),
     second_year_utilization_ (al.number ("second_year_utilization")),
@@ -839,13 +862,14 @@ ColumnStandard::ColumnStandard (Block& al)
     first_year_utilization (0.0)
 { }
 
-void 
+bool
 ColumnStandard::initialize (Block& block, 
                             const Output& output,
                             const Time& time, 
 			    const Weather* global_weather,
 			    const Scope& parent_scope)
 {
+  bool ok = true;
   Treelog& msg = block.msg ();
   Treelog::Open nest (msg, name);
   extern_scope = scopesel->lookup (output, msg); 
@@ -877,9 +901,12 @@ ColumnStandard::initialize (Block& block,
 
   // Bioclimate and heat depends on weather.
   if (weather.get () && !weather->initialize (time, msg))
-    return;
+    return false;
   if (!global_weather && !weather.get ())
-    return;
+    {
+      msg.error ("No weather specified");
+      return false;
+    }
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
   bioclimate->initialize (block, my_weather);
   soil_heat->initialize (alist.alist ("SoilHeat"), geometry, 
@@ -893,6 +920,17 @@ ColumnStandard::initialize (Block& block,
   chemistry->initialize (alist.alist ("Chemistry"),
                          geometry, *soil, *soil_water, *soil_heat, msg);
   
+  // Tertiary transport depends on nothing.
+  const double pipe_position = groundwater->is_pipe ()
+    ? groundwater->pipe_height ()
+    : 42.42e42;
+  for (size_t i = 0; i < tertiary.size (); i++)
+    {
+      Treelog::Open nest (msg, "Tertiary", i, tertiary[i]->name);
+      if (!tertiary[i]->initialize (geometry, scope, pipe_position, msg))
+        ok = false;
+    }
+  
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
   organic_matter->initialize (alist.alist ("OrganicMatter"), 
@@ -901,6 +939,8 @@ ColumnStandard::initialize (Block& block,
   
   // Soil conductivity and capacity logs.
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
+
+  return ok;
 }
 
 ColumnStandard::~ColumnStandard ()
@@ -975,6 +1015,10 @@ the simulation.  If unspecified, used global weather.");
                        Syntax::State, Syntax::Singleton,
                        "Chemical compounds in the system.");
     alist.add ("Chemistry", Chemistry::default_model ());
+    syntax.add_object ("Tertiary", Tertiary::component, 
+                       Syntax::State, Syntax::Sequence, "\
+List of tertiary (that is, non-matrix) transport methods.");
+    alist.add ("Tertiary", std::vector<const AttributeList*> ());
     syntax.add ("harvest_DM", "g/m^2/h", Syntax::LogOnly, 
                 "Amount of DM removed by harvest this hour.");
     syntax.add ("harvest_N", "g/m^2/h", Syntax::LogOnly, 

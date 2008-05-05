@@ -122,7 +122,7 @@ public:
   bool check_z_border (double, Treelog& err) const;
   bool check_x_border (double, Treelog& err) const;
   bool check_y_border (double, Treelog& err) const;
-  void initialize (Block&, const Output&, const Time&, const Weather*, 
+  bool initialize (Block&, const Output&, const Time&, const Weather*, 
 		   const Scope&);
   Implementation (Block& parent, const std::string& key);
   ~Implementation ();
@@ -760,15 +760,18 @@ Field::Implementation::check_y_border (const double value, Treelog& err) const
   return ok;
 }
 
-void 
+bool
 Field::Implementation::initialize (Block& block, const Output& output,
                                    const Time& time, const Weather* weather,
 				   const Scope& scope)
 {
+  bool ok = true;
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    (*i)->initialize (block, output, time, weather, scope);
+    if (!(*i)->initialize (block, output, time, weather, scope))
+      ok = false;
+  return ok;
 }
 
 Field::Implementation::Implementation (Block& parent, 
@@ -786,72 +789,72 @@ Field::Implementation::~Implementation ()
 Field::Restrict::Restrict (Field& f, symbol name)
   : field (f)
 { 
-  field.impl.restrict (name); 
+  field.impl->restrict (name); 
 }
 
 Field::Restrict::~Restrict ()
-{ field.impl.unrestrict (); }
+{ field.impl->unrestrict (); }
 
 void 
 Field::sow (Metalib& metalib, const AttributeList& crop, const double row_width,
             const Time& time, const double dt, Treelog& msg)
-{ impl.sow (metalib, crop, row_width, time, dt, msg); }
+{ impl->sow (metalib, crop, row_width, time, dt, msg); }
 
 void 
 Field::ridge (const AttributeList& al)
-{ impl.ridge (al); }
+{ impl->ridge (al); }
 
 void 
 Field::irrigate_overhead (double water, double temp, const IM& im, double dt,
 			  Treelog& msg)
-{ impl.irrigate_overhead (water, temp, im, dt, msg); }
+{ impl->irrigate_overhead (water, temp, im, dt, msg); }
 
 void 
 Field::irrigate_surface (double water, double temp, const IM& im, double dt,
 			 Treelog& msg)
-{ impl.irrigate_surface (water, temp, im, dt, msg); }
+{ impl->irrigate_surface (water, temp, im, dt, msg); }
 
 void 
 Field::irrigate_overhead (double water, const IM& im, double dt, Treelog& msg)
-{ impl.irrigate_overhead (water, im, dt, msg); }
+{ impl->irrigate_overhead (water, im, dt, msg); }
 
 void 
 Field::irrigate_surface (double water, const IM& im, double dt, Treelog& msg)
-{ impl.irrigate_surface (water, im, dt, msg); }
+{ impl->irrigate_surface (water, im, dt, msg); }
 
 void 
 Field::irrigate_subsoil (double water, const IM& im, 
                          double from, double to, double dt, Treelog& msg)
-{ impl.irrigate_subsoil (water, im, from, to, dt, msg); }
+{ impl->irrigate_subsoil (water, im, from, to, dt, msg); }
 
 void 
 Field::irrigate_subsoil (double water, const IM& im, 
                          const Volume& volume, double dt, Treelog& msg)
-{ impl.irrigate_subsoil (water, im, volume, dt, msg); }
+{ impl->irrigate_subsoil (water, im, volume, dt, msg); }
 
 void 
 Field::fertilize (const AttributeList& al, 
                   const double from, const double to, const double dt,
 		  Treelog& msg)
-{ impl.fertilize (al, from, to, dt, msg); }
+{ impl->fertilize (al, from, to, dt, msg); }
 
 void 
 Field::fertilize (const AttributeList& al, 
                   const Volume& volume, const double dt,
 		  Treelog& msg)
-{ impl.fertilize (al, volume, dt, msg); }
+{ impl->fertilize (al, volume, dt, msg); }
 
 void 
 Field::fertilize (const AttributeList& al, const double dt, Treelog& msg)
-{ impl.fertilize (al, dt, msg); }
+{ impl->fertilize (al, dt, msg); }
 
 void 
 Field::clear_second_year_utilization ()
-{ impl.clear_second_year_utilization (); }
+{ impl->clear_second_year_utilization (); }
 
 void
 Field::emerge (symbol name, Treelog& msg)
-{ impl.emerge (name, msg); }
+{ impl->emerge (name, msg); }
 
 void
 Field::harvest (const Time& time, const double dt, const symbol name,
@@ -861,7 +864,7 @@ Field::harvest (const Time& time, const double dt, const symbol name,
 		const double sorg_harvest,
                 const bool combine,
 		std::vector<const Harvest*>& total, Treelog& msg)
-{ impl.harvest (time, dt, name,
+{ impl->harvest (time, dt, name,
 		stub_length,
 		stem_harvest, leaf_harvest, sorg_harvest, combine, 
                 total, msg); }
@@ -872,7 +875,7 @@ Field::pluck (const Time& time, const double dt, const symbol name,
               const double leaf_harvest, 
               const double sorg_harvest,
               std::vector<const Harvest*>& total, Treelog& msg)
-{ impl.pluck (time, dt, name,
+{ impl->pluck (time, dt, name,
               stem_harvest, leaf_harvest, sorg_harvest, 
               total, msg); }
 
@@ -880,141 +883,141 @@ void
 Field::mix (const double from, const double to, 
             const double penetration, 
             const Time& time, const double dt, Treelog& msg)
-{ impl.mix (from, to, penetration, time, dt, msg); }
+{ impl->mix (from, to, penetration, time, dt, msg); }
 
 void 
 Field::swap (const double from, const double middle, const double to, 
              const Time& time, const double dt, Treelog& msg)
-{ impl.swap (from, middle, to, time, dt, msg); }
+{ impl->swap (from, middle, to, time, dt, msg); }
 
 void 
 Field::set_porosity (double at, double Theta)
-{ impl.set_porosity (at, Theta); }
+{ impl->set_porosity (at, Theta); }
 
 void 
 Field::set_heat_source (double at, double value)
-{ impl.set_heat_source (at, value); }
+{ impl->set_heat_source (at, value); }
 
 void 
 Field::spray (const symbol chemical, 
               const double amount, const double dt,
               Treelog& msg) // [g/ha]
-{ impl.spray (chemical, amount, dt, msg); }
+{ impl->spray (chemical, amount, dt, msg); }
 
 void 
 Field::set_surface_detention_capacity (double height) // [mm]
-{ impl.set_surface_detention_capacity (height); }
+{ impl->set_surface_detention_capacity (height); }
 
 double 
 Field::daily_air_temperature () const  // [dg C]
-{ return impl.daily_air_temperature (); }
+{ return impl->daily_air_temperature (); }
 
 double 
 Field::daily_precipitation () const  // [dg C]
-{ return impl.daily_precipitation (); }
+{ return impl->daily_precipitation (); }
 
 double 
 Field::daily_global_radiation () const  // [dg C]
-{ return impl.daily_global_radiation (); }
+{ return impl->daily_global_radiation (); }
 
 double 
 Field::soil_temperature (double height) const  // [cm -> dg C]
-{ return impl.soil_temperature (height); }
+{ return impl->soil_temperature (height); }
 
 double 
 Field::soil_water_potential (double height) const // [cm -> cm]
-{ return impl.soil_water_potential (height); }
+{ return impl->soil_water_potential (height); }
 
 double 
 Field::soil_water_content (double from, double to) const // [cm]
-{ return impl.soil_water_content (from, to); }
+{ return impl->soil_water_content (from, to); }
 
 double
 Field::soil_inorganic_nitrogen (double from, double to) const // [kg N/ha]
-{ return impl.soil_inorganic_nitrogen (from, to); }
+{ return impl->soil_inorganic_nitrogen (from, to); }
 
 double
 Field::second_year_utilization () const // [kg N/ha]
-{ return impl.second_year_utilization (); }
+{ return impl->second_year_utilization (); }
 
 double 
 Field::crop_ds (const symbol crop) const
-{ return impl.crop_ds (crop); } 
+{ return impl->crop_ds (crop); } 
 
 double 
 Field::crop_dm (const symbol crop, const double height) const
-{ return impl.crop_dm (crop, height); } 
+{ return impl->crop_dm (crop, height); } 
 
 double 
 Field::crop_sorg_dm (const symbol crop) const
-{ return impl.crop_sorg_dm (crop); } 
+{ return impl->crop_sorg_dm (crop); } 
 
 std::string
 Field::crop_names () const
-{ return impl.crop_names (); } 
+{ return impl->crop_names (); } 
 
 void
 Field::clear ()
-{ impl.clear (); }
+{ impl->clear (); }
 
 void
 Field::tick_all (const Time& time, const double dt, const Weather* weather, 
                  const Scope& scope, Treelog& msg)
-{ impl.tick_all (time, dt, weather, scope, msg); }
+{ impl->tick_all (time, dt, weather, scope, msg); }
 
 void
 Field::tick_one (const size_t col,
                  const Time& time, const double dt, const Weather* weather, 
                  const Scope& scope, Treelog& msg)
-{ impl.tick_one (col, time, dt, weather, scope, msg); }
+{ impl->tick_one (col, time, dt, weather, scope, msg); }
 
 void 
 Field::output (Log& log) const
-{ impl.output (log); }
+{ impl->output (log); }
 
 const Column* 
 Field::find (symbol name) const
-{ return impl.find (name); }
+{ return impl->find (name); }
 
 Column* 
 Field::find (unsigned int pos) const
-{ return impl.columns [pos]; }
+{ return impl->columns [pos]; }
 
 unsigned int 
 Field::size () const
-{ return impl.columns.size (); }
+{ return impl->columns.size (); }
 
 bool 
 Field::check (bool require_weather, const Time& from, const Time& to, 
 	      const Scope& scope, Treelog& err) const
-{ return impl.check (require_weather, from, to, scope, err); }
+{ return impl->check (require_weather, from, to, scope, err); }
 
 bool 
 Field::check_am (const AttributeList& am, Treelog& err) const
-{ return impl.check_am (am, err); }
+{ return impl->check_am (am, err); }
 
 bool
 Field::check_z_border (const double value, Treelog& err) const
-{ return impl.check_z_border (value, err); }
+{ return impl->check_z_border (value, err); }
 
 bool
 Field::check_x_border (const double value, Treelog& err) const
-{ return impl.check_x_border (value, err); }
+{ return impl->check_x_border (value, err); }
 
 bool
 Field::check_y_border (const double value, Treelog& err) const
-{ return impl.check_y_border (value, err); }
+{ return impl->check_y_border (value, err); }
 
-void 
+bool
 Field::initialize (Block& block, const Output& output,
                    const Time& time, const Weather* weather, const Scope& scope)
-{ impl.initialize (block, output, time, weather, scope); }
+{ return impl->initialize (block, output, time, weather, scope); }
 
 Field::Field (Block& parent, const std::string& key)
-  : impl (*new Implementation (parent, key))
+  : impl (new Implementation (parent, key))
 { }
 
 Field::~Field ()
-{ delete &impl; }
+{ }
 
 // field.C ends here.

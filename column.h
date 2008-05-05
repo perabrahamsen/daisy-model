@@ -157,7 +157,7 @@ protected:
   explicit Column (Block&);
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  virtual void initialize (Block&, const Output&, const Time&,
+  virtual bool initialize (Block&, const Output&, const Time&,
                            const Weather*, const Scope&) = 0;
 
   ~Column ();
