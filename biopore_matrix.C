@@ -32,6 +32,7 @@
 #include "secondary.h"
 #include "volume_box.h"
 #include "log.h"
+#include "check.h"
 #include <sstream>
 
 // The 'matrix' model.
@@ -98,10 +99,13 @@ BioporeMatrix::release_water (const Geometry& geo, const Soil& soil,
                               const double dt /* [h] */,
                               std::vector<double>& S_matrix)
 {
+  const double circumference = M_PI * diameter; // [cm]
+
   const size_t cell_size = geo.cell_size ();
   for (size_t c = 0; c < cell_size; c++)
     { 
-      if (density (c) < 1e-42)
+      const double dens = density (c); // [cm^-2]
+      if (dens < 1e-42)
         // No biopores of this class in this cell.
         continue;
 
@@ -120,10 +124,12 @@ BioporeMatrix::release_water (const Geometry& geo, const Soil& soil,
       // Find resistance.
       const Secondary& secondary = soil.secondary_domain (c);
       const bool use_primary = secondary.none ();
-      const double R = use_primary ? R_primary : R_secondary; // [h/cm]
+      const double R = use_primary ? R_primary : R_secondary; // [h]
       
       // Find sink
-      const double S = dh / R; // [cm^2 h^-1]
+      const double wall_per_area = circumference * dens; // [cm^-1]
+      
+      const double S = dh * wall_per_area / R; // [h^-1]
       S_matrix[c] -= S;        // BUG: [h^-1] -= [cm^2 h^-1]
       const double volume = geo.cell_volume (c); // [cm^3]
       added_water[column[c]] -= S * volume * dt; // [cm^3]
@@ -259,16 +265,19 @@ static struct BioporeMatrixSyntax
     alist.add ("description", "Biopores that ends in the matrix.");
     Biopore::load_base (syntax, alist);
 
-    syntax.add ("xplus", "cm", Syntax::OptionalConst, Syntax::Sequence,
+    syntax.add ("xplus", "cm", Check::positive (), 
+                Syntax::OptionalConst, Syntax::Sequence,
 		"Right side of each biopore interval.\n\
 Water and chemical content is tracked individually for each interval.\n\
 By default, use intervals as specified by the geometry.");
     syntax.add_check ("xplus", VCheck::increasing ());
-    syntax.add ("diameter", "cm", Syntax::Const, "Biopore diameter.");
-    syntax.add ("R_primary", "h/cm", Syntax::Const, "\
-Resistance for water moving from biopore to primary domain.");
-    syntax.add ("R_secondary", "h/cm", Syntax::OptionalConst, "\
-Resistance for water moving from macropore to secondary domain.\n\
+    syntax.add ("diameter", "cm", Check::positive (),
+                Syntax::Const, "Biopore diameter.");
+    syntax.add ("R_primary", "h", Check::positive (), Syntax::Const, "\
+Resistance for water moving from biopore through wall to primary domain.");
+    syntax.add ("R_secondary", "h", Check::positive (), 
+                Syntax::OptionalConst, "\
+Resistance for water moving from biopore through wall to secondary domain.\n\
 If not specified, this will be identical to 'R_primary'.");
     syntax.add ("h_bottom", "cm", Syntax::OptionalState, Syntax::Sequence,
 		"Pressure at the bottom of the biopores in each interval.");

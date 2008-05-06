@@ -1380,7 +1380,7 @@ tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
 biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
   number.h imvec.h syntax.h treelog.h block.h plf.h vcheck.h librarian.h \
   submodeler.h assertion.h geometry.h mathlib.h soil.h soil_water.h \
-  secondary.h volume_box.h volume.h log.h time.h border.h
+  secondary.h volume_box.h volume.h log.h time.h border.h check.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
   alist.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h soil.h solver.h log.h time.h border.h \
@@ -1800,9 +1800,9 @@ column_std${OBJ}: column_std.C column.h model.h symbol.h alist.h library.h \
   surface.h uzmodel.h soil_heat.h macro.h syntax.h treelog.h movement.h \
   groundwater.h geometry.h mathlib.h assertion.h soil.h soil_water.h \
   vegetation.h bioclimate.h weather.h im.h chemistry.h chemical.h \
-  organic_matter.h am.h dom.h plf.h time.h units.h log.h border.h \
-  submodeler.h block.h memutils.h librarian.h scope_multi.h scope.h \
-  scopesel.h
+  tertiary.h organic_matter.h am.h dom.h plf.h time.h units.h log.h \
+  border.h submodeler.h block.h memutils.h librarian.h scope_multi.h \
+  scope.h scopesel.h
 weather_simple${OBJ}: weather_simple.C weather_old.h weather.h model.h \
   symbol.h alist.h im.h syntax.h treelog.h block.h plf.h time.h log.h \
   border.h mathlib.h assertion.h librarian.h
