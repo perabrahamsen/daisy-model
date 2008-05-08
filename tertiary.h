@@ -43,7 +43,7 @@ public:
   virtual void tick (const Geometry&, const Soil&, const SoilWater&,
                      const double dt,
                      std::vector<double>& S_drain,
-                     std::vector<double>& S_matrix) = 0;
+                     std::vector<double>& S_matrix, Treelog& msg) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

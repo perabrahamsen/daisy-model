@@ -59,18 +59,28 @@ struct BioporeMatrix : public Biopore
   bool to_drain () const 
   { return false; }
   double air_bottom (const size_t c) const // Lowest point with air [cm]
-  { return height_end + h_bottom[column[c]]; }
+  { 
+    daisy_assert (c < column.size ());
+    const size_t col = column[c];
+    daisy_assert (col < h_bottom.size ());
+    return height_end + h_bottom[col]; 
+  }
   void add_water (size_t c, double amount /* [cm^3] */)
-  { added_water[column[c]] += amount; }
+  {
+    daisy_assert (c < column.size ());
+    const size_t col = column[c];
+    daisy_assert (col < added_water.size ());
+    added_water[col] += amount; 
+  }
   void extract_water (const size_t c, const double volume /* [cm^3] */ ,
                       const double Theta /* [cm^3/cm^3] */,
                       const double dt /* [h] */,
                       std::vector<double>& S_drain /* [cm^3/cm^3/h] */,
-                      std::vector<double>& S_matrix);
+                      std::vector<double>& S_matrix, Treelog&);
   void release_water (const Geometry& geo, const Soil& soil, 
                       const SoilWater& soil_water,
                       const double dt /* [h] */,
-                      std::vector<double>& S_matrix);
+                      std::vector<double>& S_matrix, Treelog&);
   void update_water ();
   void output (Log&) const;
 
@@ -87,20 +97,29 @@ BioporeMatrix::extract_water (const size_t c, const double volume /* [cm^3] */ ,
                               const double Theta /* [cm^3/cm^3] */,
                               const double dt /* [h] */,
                               std::vector<double>& /* [cm^3/cm^3/h] */,
-                              std::vector<double>& S_matrix)
+                              std::vector<double>& S_matrix, Treelog& msg)
 {
+  std::ostringstream tmp;
+  tmp << "Extracting " << Theta << " [] water over " << dt
+      << " hours from cell " << c;
+  msg.message (tmp.str ());
+
+  daisy_assert (c < S_matrix.size ());
   S_matrix[c] += Theta / dt;
-  added_water[column[c]] += Theta * volume;
+  daisy_assert (c < column.size ());
+  const size_t col = column[c];
+  daisy_assert (col < h_bottom.size ());
+  added_water[col] += Theta * volume;
 }
 
 void 
 BioporeMatrix::release_water (const Geometry& geo, const Soil& soil, 
                               const SoilWater& soil_water,
                               const double dt /* [h] */,
-                              std::vector<double>& S_matrix)
+                              std::vector<double>& S_matrix, Treelog&)
 {
   const double circumference = M_PI * diameter; // [cm]
-
+  
   const size_t cell_size = geo.cell_size ();
   for (size_t c = 0; c < cell_size; c++)
     { 
@@ -120,6 +139,7 @@ BioporeMatrix::release_water (const Geometry& geo, const Soil& soil,
         // Pressure in biopore not significantly above pressure in matrix.
         continue;
       const double dh = h_biopore - h_matrix; // [cm]
+      daisy_assert (dh > 0.0);
 
       // Find resistance.
       const Secondary& secondary = soil.secondary_domain (c);
@@ -130,7 +150,12 @@ BioporeMatrix::release_water (const Geometry& geo, const Soil& soil,
       const double wall_per_area = circumference * dens; // [cm^-1]
       
       const double S = dh * wall_per_area / R; // [h^-1]
-      S_matrix[c] -= S;        // BUG: [h^-1] -= [cm^2 h^-1]
+
+      std::ostringstream tmp;
+      tmp << "Releasing " << S * dt << " [] water over " << dt
+          << " hours in cell " << c;
+
+      S_matrix[c] -= S;
       const double volume = geo.cell_volume (c); // [cm^3]
       added_water[column[c]] -= S * volume * dt; // [cm^3]
     }
@@ -140,6 +165,7 @@ void
 BioporeMatrix::update_water ()
 { 
   const size_t column_size = xplus.size ();
+  daisy_assert (added_water.size () == xplus.size ());
   double xminus = 0.0;
   for (size_t i = 0; i < column_size; i++)
     {
@@ -216,6 +242,7 @@ BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
     found:
       ;
     }
+  daisy_assert (column.size () == cell_size);
 
   // added_water.
   added_water.insert (added_water.end (), column_size, 0.0);

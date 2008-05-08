@@ -26,6 +26,7 @@
 #include "librarian.h"
 #include "submodeler.h"
 #include "check.h"
+#include <sstream>
 
 // The 'drain' model.
 
@@ -41,11 +42,11 @@ struct BioporeDrain : public Biopore
                       const double Theta /* [cm^3/cm^3 */,
                       const double dt /* [h] */,
                       std::vector<double>& S_drain /* [cm^3/cm^3/h */,
-                      std::vector<double>& S_matrix);
+                      std::vector<double>& S_matrix, Treelog& msg);
   void release_water (const Geometry&, const Soil&, 
                       const SoilWater&,
                       const double /* [h] */,
-                      std::vector<double>&)
+                      std::vector<double>&, Treelog& msg)
   { }
   void update_water ()
   { }
@@ -77,8 +78,15 @@ BioporeDrain::extract_water (size_t c, const double /* [cm^3] */ ,
                              const double Theta /* [cm^3/cm^3] */,
                              const double dt /* [h] */,
                              std::vector<double>& S_drain /* [cm^3/cm^3/h] */,
-                             std::vector<double>& )
-{ S_drain[c] += Theta / dt; }
+                             std::vector<double>&, Treelog& msg)
+{ 
+  std::ostringstream tmp;
+  tmp << "Draining " << Theta << " [] water over " << dt
+      << " hours in cell " << c;
+  msg.message (tmp.str ());
+  
+  S_drain[c] += Theta / dt; 
+}
 
 BioporeDrain::BioporeDrain (Block& al)
   : Biopore (al),

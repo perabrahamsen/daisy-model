@@ -62,11 +62,11 @@ public:
                               const double Theta /* [cm^3/cm^3] */,
                               const double dt /* [h] */,
                               std::vector<double>& S_drain /* [cm^3/cm^3/h] */,
-                              std::vector<double>& S_matrix) = 0;
+                              std::vector<double>& S_matrix, Treelog& msg) = 0;
   virtual void release_water (const Geometry& geo, const Soil& soil, 
                               const SoilWater& soil_water,
                               const double dt /* [h] */,
-                              std::vector<double>& S_matrix) = 0;
+                              std::vector<double>& S_matrix, Treelog& msg) = 0;
   virtual void update_water () = 0;
   virtual void output (Log&) const = 0;
 

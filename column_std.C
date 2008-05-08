@@ -617,7 +617,11 @@ ColumnStandard::tick (const Time& time, const double dt,
     std::vector<double> S_drain (cell_size, 0.0);
     std::vector<double> S_matrix (cell_size, 0.0);
     for (size_t i = 0; i < tertiary.size (); i++)
-      tertiary[i]->tick (geometry, *soil, *soil_water, dt, S_drain, S_matrix);
+      {
+        Treelog::Open nest (msg, "Tertiary", i, tertiary[i]->name);
+        tertiary[i]->tick (geometry, *soil, *soil_water, dt, S_drain, S_matrix,
+                           msg);
+      }
     soil_water->drain (S_drain);
     const size_t edge_size = geometry.edge_size ();
     const std::vector<double> q_tertiary (edge_size, 0.0);

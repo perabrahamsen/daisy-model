@@ -43,15 +43,15 @@ struct TertiaryBiopores : public Tertiary
   void extract_water (const Geometry&, const Soil&, const SoilWater&,
                       const double dt,
                       std::vector<double>& S_drain,
-                      std::vector<double>& S_matrix);
+                      std::vector<double>& S_matrix, Treelog& msg);
   void release_water (const Geometry&, const Soil&, const SoilWater&,
                       const double dt,
-                      std::vector<double>& S_matrix);
+                      std::vector<double>& S_matrix, Treelog& msg);
   void update_water ();
   void tick (const Geometry&, const Soil&, const SoilWater&,
              const double dt,
              std::vector<double>& S_drain,
-             std::vector<double>& S_matrix);
+             std::vector<double>& S_matrix, Treelog& msg);
   void output (Log&) const;
   
   // Create and Destroy.
@@ -67,7 +67,8 @@ TertiaryBiopores::extract_water (const Geometry& geo, const Soil& soil,
                                  const SoilWater& soil_water,
                                  const double dt,
                                  std::vector<double>& S_drain,
-                                 std::vector<double>& S_matrix)
+                                 std::vector<double>& S_matrix,
+                                 Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
 
@@ -139,7 +140,7 @@ TertiaryBiopores::extract_water (const Geometry& geo, const Soil& soil,
               // Extract it.
               const double fraction = density / total_density;
               biopore.extract_water (c, volume, fraction * loss,
-                                     dt, S_drain, S_matrix);
+                                     dt, S_drain, S_matrix, msg);
             }
         }
     }
@@ -149,10 +150,10 @@ void
 TertiaryBiopores::release_water (const Geometry& geo, const Soil& soil,
                                  const SoilWater& soil_water,
                                  const double dt,
-                                 std::vector<double>& S_matrix)
+                                 std::vector<double>& S_matrix, Treelog& msg)
 {
   for (size_t b = 0; b < classes.size (); b++)
-    classes[b]->release_water (geo, soil, soil_water, dt, S_matrix);
+    classes[b]->release_water (geo, soil, soil_water, dt, S_matrix, msg);
 }
 
 void
@@ -167,11 +168,12 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
                         const SoilWater& soil_water,
                         const double dt,
                         std::vector<double>& S_drain,
-                        std::vector<double>& S_matrix)
+                        std::vector<double>& S_matrix,
+                        Treelog& msg)
 {
-  extract_water (geo, soil, soil_water, dt, S_drain, S_matrix);
+  extract_water (geo, soil, soil_water, dt, S_drain, S_matrix, msg);
   update_water ();
-  release_water (geo, soil, soil_water, dt, S_matrix);
+  release_water (geo, soil, soil_water, dt, S_matrix, msg);
   update_water ();
 }
 
