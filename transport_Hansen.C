@@ -315,7 +315,7 @@ TransportHansen::flow (const Geometry& geo_base,
   J[0] = J_in - S_top * geo.dz (0);
   for (unsigned int i = 0; i < size; i++)
     {
-      daisy_assert (M[i] >= 0.0);
+      // daisy_assert (M[i] >= 0.0);
       J[i + 1] = (((M[i] - M_prev[i]) / dt) - S[i]) * geo.dz (i) + J[i];
     }
 }

@@ -41,7 +41,7 @@ struct BioporeMatrix : public Biopore
 {
   // Parameters.
   /* const */ std::vector<double> xplus; // [cm]
-  const double diameter;        // [mm]
+  const double diameter;        // [cm]
   const double R_primary;       // [h/cm]
   const double R_secondary;     // [h/cm]
 
@@ -222,6 +222,9 @@ BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
   daisy_assert (added_water.size () == column_size);
 
   // density_column.
+  if (density_cell.size () != cell_size)
+    return false;
+
   double xminus = 0;
   for (size_t i = 0; i < column_size; i++)
     {
