@@ -33,7 +33,7 @@
   ;; Extern input
   (scope name "Lower_boundary_input")
   ;; Daisy use solute NO3 concentration in lower boundary given by: 
-  (SoilNO3 (C_below "NO3 conc. groundwater"))
+  (Chemistry multi (combine (N (trace NH4 (NO3(C_below "NO3 conc. groundwater"))))))
   ;; Daisy use groundwater table from OpenMI with the pipe model below:
   (Groundwater pipe (pressure_table extern 
 				    (value "GroundWaterTable")

@@ -32,8 +32,8 @@ Amount of water running of the surface.")
    (flux_bottom (tag "NO3 flux")
 		(description "\
 Amount of NO3-N leaving Daisy through the soil bottom.")
-		(path column "${column}" Chemistry "*" trace NO3 J)
-		(spec chemical default J)
+		(path column "${column}" Chemistry "*" trace NO3 J_matrix)
+		(spec chemical default J_matrix)
 		(handle sum)
 		(negate true)) ; positive flux downwards
    (interval (tag "NO3 drain")
