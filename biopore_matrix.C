@@ -116,7 +116,7 @@ void
 BioporeMatrix::release_water (const Geometry& geo, const Soil& soil, 
                               const SoilWater& soil_water,
                               const double dt /* [h] */,
-                              std::vector<double>& S_matrix, Treelog&)
+                              std::vector<double>& S_matrix, Treelog& msg)
 {
   const double circumference = M_PI * diameter; // [cm]
   
@@ -133,8 +133,11 @@ BioporeMatrix::release_water (const Geometry& geo, const Soil& soil,
         // Outside interval.
         continue;
 
-      const double h_matrix = soil_water.h (c); // [cm]
       const double h_biopore =  air_bottom (c) - cell_z; // [cm]
+      if (h_biopore < 1e-1)
+        // No water significant water in biopore.
+        continue;
+      const double h_matrix = soil_water.h (c); // [cm]
       if (h_biopore < h_matrix + 1e-5)
         // Pressure in biopore not significantly above pressure in matrix.
         continue;
@@ -153,7 +156,12 @@ BioporeMatrix::release_water (const Geometry& geo, const Soil& soil,
 
       std::ostringstream tmp;
       tmp << "Releasing " << S * dt << " [] water over " << dt
-          << " hours in cell " << c;
+          << " hours in cell " << c
+          << "\nz = " << cell_z << ", h_matrix = " << h_matrix 
+          << ", h_biopore = " << h_biopore << ", dh = " << dh
+          << "\ncircumference = " << circumference << ", dens = " << dens
+          << ", wall/area = " << wall_per_area << ", R = " << R;
+      msg.message (tmp.str ());
 
       S_matrix[c] -= S;
       const double volume = geo.cell_volume (c); // [cm^3]
