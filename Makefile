@@ -373,7 +373,7 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = biopore_drain.C tertiary_biopores.C \
+MODELS = tertiary_instant.C biopore_drain.C tertiary_biopores.C \
 	biopore_matrix.C transport_Mollerup.C transport_Hansen.C \
 	movement_1D.C groundwater_aquitard.C \
 	heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \

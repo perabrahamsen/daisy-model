@@ -1,3 +1,8 @@
+2008-05-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* tertiary_instant.C: New model.
+	* Makefile (MODELS): Added it.
+
 2008-05-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* volume_box.h, volume_box.C: Gave it a public interface.
