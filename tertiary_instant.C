@@ -24,6 +24,7 @@
 #include "geometry_vert.h"
 #include "plf.h"
 #include "check.h"
+#include "vcheck.h"
 #include "librarian.h"
 #include "block.h"
 
