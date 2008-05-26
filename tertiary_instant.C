@@ -53,15 +53,29 @@ public:
   TertiaryInstant (Block& al);
 };
 
+
 void
-TertiaryInstant::tick (const Geometry& geo, const Soil& soil,
+TertiaryInstant::tick (const Geometry& geometry, const Soil& soil,
                        const SoilWater& soil_water,
                        const double dt,
                        std::vector<double>& S_drain,
                        std::vector<double>& S_matrix,
                        Treelog& msg)
 {
-  // TODO
+#if 0
+  const GeometryVert& geo = dynamic_cast<const GeometryVert&> (geometry);
+  const size_t column_size = geo.column_size ();
+  const size_t row_size = geo.row_size ();
+
+  for (size_tt col = 0; col < column_size; col++)
+    {
+      // row_start and row_end should be set in initialize
+      
+      
+      
+      
+    }
+#endif
 }
 
 void 
@@ -86,7 +100,7 @@ TertiaryInstant::check (const Geometry& geo, Treelog& msg) const
   if (!dynamic_cast<const GeometryVert*> (&geo))
     {
       msg.error ("\
-This tertiary water transport model only works with 'vertical' geometries");
+This tertiary water transport model only works with vertical grid geometries");
       ok = false;
     }
 
