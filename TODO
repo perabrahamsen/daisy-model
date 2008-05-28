@@ -1,5 +1,15 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* TertiaryOld
+
+** kun en "column tertiary"
+
+** Tertiary::tick -> tick_water
+
+** TertiaryOld macro + mactrans
+
+** TertiaryOld skal skabes hvis 1D med ler.
+
 * Øvre rand
 
 Fordel q_top mellem primary or tertiary
@@ -14,8 +24,6 @@ hvis h_top > macro_trigger
 
   fordel mellem klasser?  
 
-
-* Eksempel på litter lag til BGJ
 
 * tertiary
 
