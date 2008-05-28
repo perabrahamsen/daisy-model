@@ -535,11 +535,10 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
         }
     }
 
-#if 0
   // Tertiary transport.
-  if (tertiary.get ())
-    tertiary_transport (geometry (), soil, soil_water, *tertiary, 
-                        J_tertiary, C_border, chemical, dt, scope, msg);
+#if 0
+  tertiary_transport (geometry (), soil, soil_water,
+                      J_tertiary, C_border, chemical, dt, scope, msg);
 #endif
 
   // Secondary transport activated.

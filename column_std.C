@@ -611,6 +611,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                        bioclimate->canopy_leak_rate (dt), 
                        surface.runoff_rate (dt), dt, msg);
 
+#if 1
   // Tertiary transport.
   {
     const size_t cell_size = geometry.cell_size ();
@@ -627,6 +628,7 @@ ColumnStandard::tick (const Time& time, const double dt,
     const std::vector<double> q_tertiary (edge_size, 0.0);
     soil_water->set_tertiary (S_matrix, q_tertiary);
   }
+#endif
 
   // Turnover.
   organic_matter->tick (geometry, *soil_water, *soil_heat, 

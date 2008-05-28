@@ -68,7 +68,7 @@ struct Movement1D : public MovementSolute
 
   // Solute.
   std::auto_ptr<Mactrans> mactrans; // Solute transport model in macropores.
-
+  
   // Heat.
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
   double T_bottom;		// [dg C]
@@ -249,6 +249,7 @@ Movement1D::tick_water (const Geometry1D& geo,
     }
   throw "Water matrix transport failed"; 
 }
+
 
 #if 0
 void 

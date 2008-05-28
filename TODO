@@ -4,6 +4,17 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 Fordel q_top mellem primary or tertiary
 
+hvis h_top > macro_trigger
+
+  h_pot = h_top - h_macro_trigger
+
+  h_cap = find macro capacity
+
+  h_tert = min (h_pot, h_cap)
+
+  fordel mellem klasser?  
+
+
 * Eksempel på litter lag til BGJ
 
 * tertiary

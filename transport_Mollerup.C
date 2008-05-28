@@ -564,7 +564,7 @@ TransportMollerup::Neumann_impl (const size_t cell,
                                     const double q, 
                                     ublas::banded_matrix<double>& B_mat)
 {
-  daisy_assert (q * in_sign <= 0.0);
+  // daisy_assert (q * in_sign <= 0.0);
   B_mat (cell, cell) = q * area * in_sign; 
   // q * in_sign pos for flux into domain  
 }
