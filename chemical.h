@@ -83,6 +83,9 @@ public:
   virtual void set_secondary (const Soil& soil, const SoilWater& soil_water,
                               const std::vector<double>& C,
                               const std::vector<double>& J) = 0;
+  virtual void set_tertiary (const std::vector<double>& S_p, 
+                             const std::vector<double>& J_p) = 0;
+
   // Sink.
 public:
   virtual void clear () = 0;

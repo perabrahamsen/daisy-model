@@ -25,6 +25,7 @@
 #include "transport.h"
 #include "chemical.h"
 #include "adsorption.h"
+#include "tertiary.h"
 #include "alist.h"
 #include "librarian.h"
 #include "block.h"
@@ -492,7 +493,7 @@ MovementSolute::zero_top (const Geometry& geo,
 void
 MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
                         const double J_above, Chemical& chemical, 
-                        const bool flux_below, 
+                        Tertiary& tertiary,
                         const double dt,
                         const Scope& scope, Treelog& msg)
 {
@@ -536,10 +537,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
     }
 
   // Tertiary transport.
-#if 0
-  tertiary_transport (geometry (), soil, soil_water,
-                      J_tertiary, C_border, chemical, dt, scope, msg);
-#endif
+  tertiary.solute (geometry (), soil_water, J_tertiary, dt, chemical, msg);
 
   // Secondary transport activated.
   secondary_transport (geometry (), soil, soil_water, J_secondary, C_border,

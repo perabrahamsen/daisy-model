@@ -35,6 +35,7 @@ class Adsorption;
 class Surface;
 class Groundwater;
 class Weather;
+class Tertiary;
 class Time;
 class Treelog;
 class Block;
@@ -60,7 +61,7 @@ public:
                      Groundwater&, const Time&, const Weather&, 
                      double dt, Treelog&) = 0;
   virtual void solute (const Soil&, const SoilWater&, 
-                       const double J_above, Chemical&, const bool flux_below, 
+                       const double J_above, Chemical&, Tertiary&,
 		       double dt, const Scope&, Treelog&) = 0;
   virtual void element (const Soil&, const SoilWater&, 
                         DOE&, double diffusion_coefficient, 
@@ -91,7 +92,8 @@ public:
   // Create and Destroy.
 public:
   virtual bool check (Treelog& err) const = 0;
-  virtual void initialize (const Soil&, const Groundwater&, Treelog& msg) = 0;
+  virtual void initialize (const Soil&, const Groundwater&, 
+                           bool has_macropores, Treelog& msg) = 0;
   static const AttributeList& default_model ();
   static void load_vertical (Syntax& syntax, AttributeList& alist);
   static Movement* build_vertical (Block& al);

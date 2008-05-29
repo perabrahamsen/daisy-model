@@ -35,6 +35,7 @@ class SoilHeat;
 class OrganicMatter;
 class Movement;
 class Chemical;
+class Tertiary;
 class Volume;
 class Treelog;
 class Syntax;
@@ -96,8 +97,7 @@ public:
                           double R_mixing /* [h/mm] */,
                           const Soil&, const SoilWater&, const SoilHeat&, 
 			  Movement&, const OrganicMatter&, Chemistry&, 
-			  const bool flux_below, 
-                          double dt, const Scope&, Treelog&) = 0;
+			  Tertiary&, double dt, const Scope&, Treelog&) = 0;
   virtual void clear () = 0;
   virtual void output (Log&) const;
 

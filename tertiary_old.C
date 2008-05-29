@@ -24,6 +24,7 @@
 #include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "chemical.h"
 #include "macro.h"
 #include "mactrans.h"
 #include "librarian.h"
@@ -35,6 +36,10 @@ struct TertiaryOld : public Tertiary
   std::auto_ptr<Macro> macro;   // Water transport model in macropores.
   std::auto_ptr<Mactrans> mactrans; // Solute transport model in macropores.
 
+  // Identity.
+  bool has_macropores ()
+  { return macro.get () && !macro->none (); }
+
   // Simulation.
   void tick_water (const Geometry&, const Soil&, const SoilWater&,
                    const double dt,
@@ -43,6 +48,9 @@ struct TertiaryOld : public Tertiary
                    std::vector<double>& S_matrix, 
                    std::vector<double>& q_tertiary, 
                    Treelog& msg);
+  void solute (const Geometry&, const SoilWater&, 
+               const std::map<size_t, double>& J_tertiary,
+               const double dt, Chemical&, Treelog&);
   void output (Log&) const;
   
   // Create and Destroy.
@@ -87,6 +95,46 @@ TertiaryOld::tick_water (const Geometry& geometry, const Soil& soil,
   // Calculate and update.
   macro->tick (geo, soil, 0, soil.size () - 1, surface, 
                h_ice, h, Theta, S_sum, S_p, q_p, dt, msg);
+}
+
+void
+TertiaryOld::solute (const Geometry& geometry, const SoilWater& soil_water, 
+                     const std::map<size_t, double>& J_tertiary,
+                     const double dt,
+                     Chemical& solute, Treelog& msg)
+{
+  const Geometry1D& geo = dynamic_cast<const Geometry1D&> (geometry);
+
+  // Cells.
+  const size_t cell_size = geo.cell_size ();
+  std::vector<double> M (cell_size);
+  std::vector<double> C (cell_size);
+  std::vector<double> S (cell_size);
+  std::vector<double> S_p (cell_size, 0.0);
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      M[c] = solute.M_total (c);
+      C[c] = solute.C_secondary (c);
+      S[c] = solute.S_secondary (c) + solute.S_primary (c);
+    }
+  
+  // Edges.
+  const size_t edge_size = geo.edge_size ();
+  std::vector<double> J_p (edge_size, 0.0);
+  
+  // Forced flux:
+  for (std::map<size_t, double>::const_iterator i = J_tertiary.begin ();
+       i != J_tertiary.end ();
+       i++)
+    {
+      const size_t e = (*i).first;
+      const double flux = (*i).second;
+      J_p[e] = flux;
+    }
+
+  mactrans->tick (geo, soil_water, M, C, S, S_p, J_p, dt, msg);
+
+  solute.set_tertiary (S_p, J_p);
 }
 
 void 

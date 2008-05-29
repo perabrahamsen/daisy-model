@@ -21,6 +21,8 @@
 #define BUILD_DLL
 
 #include "tertiary.h"
+#include "geometry.h"
+#include "soil_water.h"
 #include "block.h"
 #include "alist.h"
 #include "librarian.h"
@@ -34,6 +36,22 @@ Tertiary::library_id () const
 {
   static const symbol id (component);
   return id;
+}
+
+void
+Tertiary::tick (const Geometry& geo, const Soil& soil, const double dt, 
+                SoilWater& soil_water, Surface& surface, Treelog& msg)
+{
+  Treelog::Open nest (msg, component + std::string (":") + name);
+  const size_t cell_size = geo.cell_size ();
+  std::vector<double> S_drain (cell_size, 0.0);
+  std::vector<double> S_matrix (cell_size, 0.0);
+  const size_t edge_size = geo.edge_size ();
+  std::vector<double> q_tertiary (edge_size, 0.0);
+  this->tick_water (geo, soil, soil_water, dt, surface,
+                    S_drain, S_matrix, q_tertiary, msg);
+  soil_water.drain (S_drain);
+  soil_water.set_tertiary (S_matrix, q_tertiary);
 }
 
 Tertiary::Tertiary (Block& al)
@@ -50,6 +68,10 @@ Transport of water and solute outside the matrix.");
 
 class TertiaryNone : public Tertiary
 {
+  // Identity.
+  bool has_macropores ()
+  { return false; }
+
   // Simulation.
   void tick_water (const Geometry&, const Soil&, const SoilWater&,
                    const double /* dt */,
@@ -58,6 +80,11 @@ class TertiaryNone : public Tertiary
                    std::vector<double>& /* S_matrix */,
                    std::vector<double>& /* q_tertiary */, 
                    Treelog&)
+  { }
+  void solute (const Geometry&, const SoilWater&, 
+               const std::map<size_t, double>& J_tertiary,
+               const double /* dt */,
+               Chemical&, Treelog&)
   { }
   void output (Log&) const
   { }

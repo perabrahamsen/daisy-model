@@ -120,6 +120,7 @@ struct Movement1D : public MovementSolute
   // Create.
   bool check (Treelog& err) const;
   void initialize (const Soil& soil, const Groundwater& groundwater,
+                   bool has_macropores, 
 		   Treelog&);
   Movement1D (Block& al);
   ~Movement1D ();
@@ -634,7 +635,7 @@ Movement1D::check (Treelog& msg) const
 
 void 
 Movement1D::initialize (const Soil& soil, const Groundwater& groundwater,
-			Treelog& msg)
+			bool has_macropores, Treelog& msg)
 {
   Treelog::Open nest (msg, "Movement: " + name.name ());
 
@@ -665,9 +666,9 @@ Movement1D::initialize (const Soil& soil, const Groundwater& groundwater,
     }
 
   // Let 'macro' choose the default method to average K values in 'uz'.
-  const bool has_macropores = (macro.get () && !macro->none ());
+  const bool has_own_macropores = (macro.get () && !macro->none ());
   for (size_t i = 0; i < matrix_water.size (); i++)
-    matrix_water[i]->has_macropores (has_macropores);
+    matrix_water[i]->has_macropores (has_macropores || has_own_macropores);
 }
 
 Movement1D::Movement1D (Block& al)

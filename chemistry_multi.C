@@ -79,7 +79,7 @@ struct ChemistryMulti : public Chemistry
   void tick_soil (const Geometry& geo, double ponding /* [mm] */,
                   double R_mixing /* [h/mm] */, 
                   const Soil&, const SoilWater&, const SoilHeat&, Movement&,
-                  const OrganicMatter&, Chemistry&, const bool flux_below, 
+                  const OrganicMatter&, Chemistry&, Tertiary&, 
 		  double dt, const Scope&, Treelog&);
   void clear ();
   void output (Log&) const;
@@ -307,7 +307,7 @@ ChemistryMulti::tick_soil (const Geometry& geo, const double ponding,
 			   const Soil& soil, const SoilWater& soil_water,
 			   const SoilHeat& soil_heat, Movement& movement,
 			   const OrganicMatter& organic_matter,
-			   Chemistry& chemistry, const bool flux_below, 
+			   Chemistry& chemistry, Tertiary& tertiary, 
 			   const double dt, const Scope& scope, Treelog& msg)
 { 
   Treelog::Open nest (msg, "Chemistry: " + name + ": tick soil");
@@ -315,8 +315,7 @@ ChemistryMulti::tick_soil (const Geometry& geo, const double ponding,
   for (size_t c = 0; c < combine.size (); c++)
     combine[c]->tick_soil (geo, ponding, R_mixing, 
 			   soil, soil_water, soil_heat, movement, 
-			   organic_matter, chemistry, 
-			   flux_below, dt, scope, msg);
+			   organic_matter, chemistry, tertiary, dt, scope, msg);
 }
 
 void

@@ -1,5 +1,8 @@
 2008-05-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* tertiary_old.C: New model.
+	* Makefile (MODELS): Added it.
+
 	* condition_time.C: Fix timestep for "*ly" models.
 
 2008-05-23  Per Abrahamsen  <abraham@dina.kvl.dk>

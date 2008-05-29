@@ -79,7 +79,7 @@ private:
                         std::map<size_t, double>& J_secondary,
                         std::map<size_t, double>& J_tertiary);
   void solute (const Soil& soil, const SoilWater& soil_water,
-               double J_above, Chemical&, const bool flux_below, 
+               double J_above, Chemical&, Tertiary&, 
 	       double dt, const Scope&, Treelog&);
   void element (const Soil& soil, const SoilWater& soil_water,
                 DOE& element, 

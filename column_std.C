@@ -596,19 +596,7 @@ ColumnStandard::tick (const Time& time, const double dt,
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
 
 #if 1
-  // Tertiary transport.
-  {
-    Treelog::Open nest (msg, "Tertiary");
-    const size_t cell_size = geometry.cell_size ();
-    std::vector<double> S_drain (cell_size, 0.0);
-    std::vector<double> S_matrix (cell_size, 0.0);
-    const size_t edge_size = geometry.edge_size ();
-    std::vector<double> q_tertiary (edge_size, 0.0);
-    tertiary->tick_water (geometry, *soil, *soil_water, dt, surface,
-                          S_drain, S_matrix, q_tertiary, msg);
-    soil_water->drain (S_drain);
-    soil_water->set_tertiary (S_matrix, q_tertiary);
-  }
+  tertiary->tick (geometry, *soil, dt, *soil_water, surface, msg);
 #else
   movement->macro_tick (*soil, *soil_water, surface, dt, msg);
 #endif
@@ -636,7 +624,6 @@ ColumnStandard::tick (const Time& time, const double dt,
   groundwater->tick (geometry, *soil, *soil_water, 
                      surface.ponding () * 0.1, 
                      *soil_heat, time, scope, msg);
-  const bool flux_below = groundwater->bottom_type () != Groundwater::pressure;
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, my_weather, dt, msg);
   soil_heat->tick (geometry, *soil, *soil_water, *movement, 
@@ -647,7 +634,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                         surface.ponding (), surface.mixing_resistance (),
                         *soil, *soil_water, *soil_heat, 
                         *movement, *organic_matter, *chemistry,
-			flux_below, dt, scope, msg);
+			*tertiary, dt, scope, msg);
   organic_matter->transport (*soil, *soil_water, *soil_heat, msg);
   const std::vector<DOM*>& dom = organic_matter->fetch_dom ();
   for (size_t i = 0; i < dom.size (); i++)
@@ -887,19 +874,17 @@ ColumnStandard::initialize (Block& block,
 
   groundwater->initialize (geometry, time, scope, msg);
 
-  if (alist.check ("Movement"))
-    {
-      AttributeList move_alist (alist.alist ("Movement"));
-      const AttributeList& water_alist = alist.alist ("SoilWater");
-      if (water_alist.check ("macro")
-          && !move_alist.check ("macro"))
-        move_alist.add ("macro", water_alist.alist ("macro"));
-      movement->initialize (*soil, *groundwater, msg);
-    }
-  else
-    {
-      movement->initialize (*soil, *groundwater, msg);
-    }
+  // Tertiary transport depends on groundwater and soil.
+  const double pipe_position = groundwater->is_pipe ()
+    ? groundwater->pipe_height ()
+    : 42.42e42;
+  if (!tertiary->initialize (geometry, *soil, scope, pipe_position, msg))
+    ok = false;
+  
+  // Movement depends on soil, groundwater, and tertiary.
+  movement->initialize (*soil, *groundwater,  tertiary->has_macropores (),
+                        msg);
+
   surface.initialize (geometry);
 
   // Bioclimate and heat depends on weather.
@@ -922,13 +907,6 @@ ColumnStandard::initialize (Block& block,
   // Solutes depends on water and heat.
   chemistry->initialize (alist.alist ("Chemistry"),
                          geometry, *soil, *soil_water, *soil_heat, msg);
-  
-  // Tertiary transport depends on nothing.
-  const double pipe_position = groundwater->is_pipe ()
-    ? groundwater->pipe_height ()
-    : 42.42e42;
-  if (!tertiary->initialize (geometry, *soil, scope, pipe_position, msg))
-    ok = false;
   
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();

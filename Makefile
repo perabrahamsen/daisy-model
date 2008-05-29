@@ -967,8 +967,9 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h \
   librarian.h block.h syntax.h treelog.h plf.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h
-tertiary${OBJ}: tertiary.C tertiary.h model.h symbol.h alist.h block.h \
-  syntax.h treelog.h plf.h librarian.h
+tertiary${OBJ}: tertiary.C tertiary.h model.h symbol.h alist.h geometry.h \
+  syntax.h treelog.h mathlib.h assertion.h soil_water.h block.h plf.h \
+  librarian.h
 biopore${OBJ}: biopore.C biopore.h model.h symbol.h alist.h number.h block.h \
   syntax.h treelog.h plf.h librarian.h scope_multi.h scope.h scope_id.h \
   units.h check.h geometry.h mathlib.h assertion.h
@@ -1220,7 +1221,7 @@ volume_box${OBJ}: volume_box.C volume_box.h volume.h model.h symbol.h alist.h \
   syntax.h treelog.h bound.h border.h mathlib.h assertion.h librarian.h
 movement_solute${OBJ}: movement_solute.C movement_solute.h movement.h model.h \
   symbol.h alist.h memutils.h geometry.h syntax.h treelog.h mathlib.h \
-  assertion.h soil_water.h transport.h chemical.h adsorption.h \
+  assertion.h soil_water.h transport.h chemical.h adsorption.h tertiary.h \
   librarian.h block.h plf.h
 scope_exchange${OBJ}: scope_exchange.C scope_exchange.h model.h symbol.h \
   alist.h scope.h memutils.h block.h syntax.h treelog.h plf.h assertion.h \
@@ -1373,8 +1374,8 @@ submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
 version${OBJ}: version.C
 tertiary_old${OBJ}: tertiary_old.C tertiary.h model.h symbol.h alist.h \
   geometry1d.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
-  assertion.h soil.h soil_water.h macro.h mactrans.h librarian.h block.h \
-  plf.h
+  assertion.h soil.h soil_water.h chemical.h macro.h mactrans.h \
+  librarian.h block.h plf.h
 tertiary_instant${OBJ}: tertiary_instant.C tertiary.h model.h symbol.h \
   alist.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h plf.h check.h vcheck.h librarian.h block.h

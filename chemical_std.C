@@ -154,6 +154,8 @@ struct ChemicalStandard : public Chemical
   void set_secondary (const Soil& soil, const SoilWater& soil_water,
                       const std::vector<double>& C,
                       const std::vector<double>& J);
+  void set_tertiary (const std::vector<double>& S_p, 
+                     const std::vector<double>& J_p);
 
   // Sink.
   void clear ();
@@ -369,6 +371,18 @@ ChemicalStandard::set_secondary (const Soil& soil, const SoilWater& soil_water,
     J_matrix[e] = J_primary[e] + J_secondary[e];
 
 }
+
+void 
+ChemicalStandard::set_tertiary (const std::vector<double>& S_p, 
+                                const std::vector<double>& J_p)
+{
+  daisy_assert (S_tertiary_.size () == S_p.size ());
+  S_tertiary_ = S_p;
+  add_to_source_secondary (S_p);
+  daisy_assert (J_tertiary.size () == J_p.size ());
+  J_tertiary = J_p;
+}
+
 
 void
 ChemicalStandard::clear ()

@@ -38,6 +38,10 @@ struct TertiaryInstant : public Tertiary
   const double pressure_end;	 // Pressure after pref.flow has been init [cm]
   const double pond_max;	 // Pond height before activating pref.flow [mm]
 
+  // Identity.
+  bool has_macropores ()
+  { return true; }
+
   // Simulation.
   void tick_water (const Geometry&, const Soil&, const SoilWater&,
                    const double dt,
@@ -46,6 +50,11 @@ struct TertiaryInstant : public Tertiary
                    std::vector<double>& S_matrix,
                    std::vector<double>& q_tertiary, 
                    Treelog& msg);
+  void solute (const Geometry&, const SoilWater&, 
+               const std::map<size_t, double>& J_tertiary,
+               const double /* dt */,
+               Chemical&, Treelog&)
+  { }
   void output (Log&) const;
   
   // Create and Destroy.
