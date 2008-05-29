@@ -662,7 +662,7 @@ static struct ConditionHourlySyntax
 static struct ConditionSecondlySyntax
 {
   static Model& make (Block& al)
-  { return *new ConditionEnd (al, "h", &Time::second); }
+  { return *new ConditionEnd (al, "s", &Time::second); }
 
   ConditionSecondlySyntax ()
   {
@@ -678,7 +678,7 @@ static struct ConditionSecondlySyntax
 static struct ConditionMinutelySyntax
 {
   static Model& make (Block& al)
-  { return *new ConditionEnd (al, "h", &Time::minute); }
+  { return *new ConditionEnd (al, "min", &Time::minute); }
 
   ConditionMinutelySyntax ()
   {
@@ -694,7 +694,7 @@ static struct ConditionMinutelySyntax
 static struct ConditionDailySyntax
 {
   static Model& make (Block& al)
-  { return *new ConditionEnd (al, "h", &Time::mday); }
+  { return *new ConditionEnd (al, "d", &Time::mday); }
 
   ConditionDailySyntax ()
   {
@@ -710,7 +710,7 @@ static struct ConditionDailySyntax
 static struct ConditionWeeklySyntax
 {
   static Model& make (Block& al)
-  { return *new ConditionEnd (al, "h", &Time::week); }
+  { return *new ConditionEnd (al, "w", &Time::week); }
 
   ConditionWeeklySyntax ()
   {
@@ -726,7 +726,7 @@ static struct ConditionWeeklySyntax
 static struct ConditionMonthlySyntax
 {
   static Model& make (Block& al)
-  { return *new ConditionEnd (al, "h", &Time::month); }
+  { return *new ConditionEnd (al, "m", &Time::month); }
 
   ConditionMonthlySyntax ()
   {
@@ -742,7 +742,7 @@ static struct ConditionMonthlySyntax
 static struct ConditionYearlySyntax
 {
   static Model& make (Block& al)
-  { return *new ConditionEnd (al, "h", &Time::year); }
+  { return *new ConditionEnd (al, "y", &Time::year); }
 
   ConditionYearlySyntax ()
   {

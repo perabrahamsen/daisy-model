@@ -39,15 +39,18 @@ struct TertiaryInstant : public Tertiary
   const double pond_max;	 // Pond height before activating pref.flow [mm]
 
   // Simulation.
-  void tick (const Geometry&, const Soil&, const SoilWater&,
-             const double dt,
-             std::vector<double>& S_drain,
-             std::vector<double>& S_matrix, Treelog& msg);
+  void tick_water (const Geometry&, const Soil&, const SoilWater&,
+                   const double dt,
+                   Surface& surface,
+                   std::vector<double>& S_drain,
+                   std::vector<double>& S_matrix,
+                   std::vector<double>& q_tertiary, 
+                   Treelog& msg);
   void output (Log&) const;
   
   // Create and Destroy.
 public:
-  bool initialize (const Geometry&, const Scope& parent_scope, 
+  bool initialize (const Geometry&, const Soil&, const Scope& parent_scope, 
                    const double pipe_position, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
   TertiaryInstant (Block& al);
@@ -55,12 +58,14 @@ public:
 
 
 void
-TertiaryInstant::tick (const Geometry& geometry, const Soil& soil,
-                       const SoilWater& soil_water,
-                       const double dt,
-                       std::vector<double>& S_drain,
-                       std::vector<double>& S_matrix,
-                       Treelog& msg)
+TertiaryInstant::tick_water (const Geometry& geometry, const Soil& soil,
+                             const SoilWater& soil_water,
+                             const double dt,
+                             Surface& surface,
+                             std::vector<double>& S_drain,
+                             std::vector<double>& S_matrix,
+                             std::vector<double>& q_tertiary, 
+                             Treelog& msg)
 {
 #if 0
   const GeometryVert& geo = dynamic_cast<const GeometryVert&> (geometry);
@@ -83,7 +88,7 @@ TertiaryInstant::output (Log&) const
 { }
 
 bool 
-TertiaryInstant::initialize (const Geometry& geo, 
+TertiaryInstant::initialize (const Geometry& geo, const Soil&, 
                              const Scope& scope, const double pipe_position, 
                              Treelog& msg)
 { 

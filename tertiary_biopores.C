@@ -48,15 +48,17 @@ struct TertiaryBiopores : public Tertiary
                       const double dt,
                       std::vector<double>& S_matrix, Treelog& msg);
   void update_water ();
-  void tick (const Geometry&, const Soil&, const SoilWater&,
-             const double dt,
-             std::vector<double>& S_drain,
-             std::vector<double>& S_matrix, Treelog& msg);
+  void tick_water (const Geometry&, const Soil&, const SoilWater&,
+                   const double dt,
+                   Surface& surface,
+                   std::vector<double>& S_drain,
+                   std::vector<double>& S_matrix, 
+                   std::vector<double>& q_tertiary, Treelog& msg);
   void output (Log&) const;
   
   // Create and Destroy.
 public:
-  bool initialize (const Geometry&, const Scope& parent_scope, 
+  bool initialize (const Geometry&, const Soil&, const Scope& parent_scope, 
                    const double pipe_position, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
   TertiaryBiopores (Block& al);
@@ -164,12 +166,14 @@ TertiaryBiopores::update_water ()
 }
 
 void
-TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
-                        const SoilWater& soil_water,
-                        const double dt,
-                        std::vector<double>& S_drain,
-                        std::vector<double>& S_matrix,
-                        Treelog& msg)
+TertiaryBiopores::tick_water (const Geometry& geo, const Soil& soil,
+                              const SoilWater& soil_water,
+                              const double dt,
+                              Surface& surface,
+                              std::vector<double>& S_drain,
+                              std::vector<double>& S_matrix,
+                              std::vector<double>& /* q_tertiary */, 
+                              Treelog& msg)
 {
   extract_water (geo, soil, soil_water, dt, S_drain, S_matrix, msg);
   update_water ();
@@ -182,10 +186,11 @@ TertiaryBiopores::output (Log& log) const
 { output_list (classes, "classes", log, Biopore::component); }
 
 bool 
-TertiaryBiopores::initialize (const Geometry& geo, 
+TertiaryBiopores::initialize (const Geometry& geo, const Soil&, 
                               const Scope& scope, const double pipe_position, 
                               Treelog& msg)
 { 
+  Treelog::Open nest (msg, component + std::string (": ") + name);
   bool ok = true;
   for (size_t b = 0; b < classes.size (); b++)
     {

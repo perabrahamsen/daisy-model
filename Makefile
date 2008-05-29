@@ -373,7 +373,8 @@ NOLINK = -c
 # These are all models of some component.
 # 
 LATER = 
-MODELS = tertiary_instant.C biopore_drain.C tertiary_biopores.C \
+MODELS = tertiary_old.C \
+	tertiary_instant.C biopore_drain.C tertiary_biopores.C \
 	biopore_matrix.C transport_Mollerup.C transport_Hansen.C \
 	movement_1D.C groundwater_aquitard.C \
 	heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \
@@ -1370,6 +1371,13 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+tertiary_old${OBJ}: tertiary_old.C tertiary.h model.h symbol.h alist.h \
+  geometry1d.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
+  assertion.h soil.h soil_water.h macro.h mactrans.h librarian.h block.h \
+  plf.h
+tertiary_instant${OBJ}: tertiary_instant.C tertiary.h model.h symbol.h \
+  alist.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
+  assertion.h plf.h check.h vcheck.h librarian.h block.h
 biopore_drain${OBJ}: biopore_drain.C biopore.h model.h symbol.h alist.h \
   number.h block.h syntax.h treelog.h plf.h vcheck.h librarian.h \
   submodeler.h assertion.h check.h

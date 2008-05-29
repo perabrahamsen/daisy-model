@@ -27,6 +27,7 @@ class Block;
 class Geometry;
 class Soil;
 class SoilWater;
+class Surface;
 class Scope;
 class Treelog;
 class Log;
@@ -40,15 +41,18 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Geometry&, const Soil&, const SoilWater&,
-                     const double dt,
-                     std::vector<double>& S_drain,
-                     std::vector<double>& S_matrix, Treelog& msg) = 0;
+  virtual void tick_water (const Geometry&, const Soil&, const SoilWater&,
+                           const double dt,
+                           Surface& surface,
+                           std::vector<double>& S_drain,
+                           std::vector<double>& S_matrix, 
+                           std::vector<double>& q_tertiary, Treelog& msg) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 public:
-  virtual bool initialize (const Geometry&, const Scope&, 
+  static const AttributeList& none_model ();
+  virtual bool initialize (const Geometry&, const Soil&, const Scope&, 
                            const double pipe_position, Treelog&) = 0;
   virtual bool check (const Geometry&, Treelog&) const = 0;
 protected:
