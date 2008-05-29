@@ -51,7 +51,6 @@ struct MovementRect : public MovementSolute
 
   // Water.
   const auto_vector<UZRect*> matrix_water;
-  void macro_tick (const Soil&, SoilWater&, Surface&, double dt, Treelog&);
 
   // Management.
   void ridge (Surface&, const Soil&, const SoilWater&, const AttributeList&);
@@ -114,11 +113,6 @@ struct MovementRect::Point
       x (al.number ("x"))
   { }
 };
-
-void
-MovementRect::macro_tick (const Soil&, SoilWater&, Surface&, 
-                          const double /* dt */, Treelog&)
-{ }
 
 void
 MovementRect::ridge (Surface&, const Soil&, const SoilWater&, 

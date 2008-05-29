@@ -55,8 +55,6 @@ public:
 
   // Simulation.
 public:
-  virtual void macro_tick (const Soil&, SoilWater&, Surface&, 
-                           const double dt, Treelog&) = 0;
   virtual void tick (const Soil&, SoilWater&, const SoilHeat&, Surface&,
                      Groundwater&, const Time&, const Weather&, 
                      double dt, Treelog&) = 0;

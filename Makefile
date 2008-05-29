@@ -1401,9 +1401,9 @@ transport_Hansen${OBJ}: transport_Hansen.C transport.h model.h symbol.h \
 movement_1D${OBJ}: movement_1D.C movement_solute.h movement.h model.h \
   symbol.h alist.h memutils.h geometry1d.h geometry_vert.h geometry.h \
   syntax.h treelog.h mathlib.h assertion.h soil.h soil_water.h \
-  soil_heat.h macro.h groundwater.h surface.h uzmodel.h weather.h im.h \
-  chemical.h doe.h transport.h mactrans.h adsorption.h log.h time.h \
-  border.h submodeler.h block.h plf.h librarian.h
+  soil_heat.h groundwater.h surface.h uzmodel.h weather.h im.h chemical.h \
+  doe.h transport.h adsorption.h log.h time.h border.h submodeler.h \
+  block.h plf.h librarian.h
 groundwater_aquitard${OBJ}: groundwater_aquitard.C groundwater.h model.h \
   symbol.h alist.h syntax.h treelog.h block.h plf.h librarian.h check.h \
   assertion.h depth.h geometry.h mathlib.h soil_water.h log.h time.h \

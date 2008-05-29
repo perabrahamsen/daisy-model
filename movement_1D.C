@@ -24,14 +24,12 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
-#include "macro.h"
 #include "groundwater.h"
 #include "surface.h"
 #include "weather.h"
 #include "chemical.h"
 #include "doe.h"
 #include "transport.h"
-#include "mactrans.h"
 #include "adsorption.h"
 #include "log.h"
 #include "submodeler.h"
@@ -50,9 +48,6 @@ struct Movement1D : public MovementSolute
 
   // Water.
   const auto_vector<UZmodel*> matrix_water;
-  std::auto_ptr<Macro> macro;
-  void macro_tick (const Soil&, SoilWater&,
-                   Surface&, const double dt, Treelog&);
   void tick_water (const Geometry1D& geo,
                    const Soil& soil, const SoilHeat& soil_heat, 
                    Surface& surface, Groundwater& groundwater,
@@ -66,9 +61,6 @@ struct Movement1D : public MovementSolute
                    std::vector<double>& q_p,
                    double dt, Treelog& msg);
 
-  // Solute.
-  std::auto_ptr<Mactrans> mactrans; // Solute transport model in macropores.
-  
   // Heat.
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
   double T_bottom;		// [dg C]
@@ -130,39 +122,6 @@ struct Movement1D : public MovementSolute
 Geometry& 
 Movement1D::geometry () const
 { return *geo; }
-
-void 
-Movement1D::macro_tick (const Soil& soil, SoilWater& soil_water,
-                        Surface& surface, const double dt, Treelog& msg)
-{ 
-  if (!macro.get ())			// No macropores.
-    return;
-
-  // Edges.
-  const size_t edge_size = geo->edge_size ();
-  std::vector<double> q_p (edge_size, 0.0);
-
-  // Cells.
-  const size_t cell_size = geo->cell_size ();
-  std::vector<double> S_p (cell_size, 0.0);
-  std::vector<double> h_ice (cell_size);
-  std::vector<double> h (cell_size);
-  std::vector<double> Theta (cell_size);
-  std::vector<double> S_sum (cell_size);
-  
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      h_ice[c] = soil_water.h_ice (c);
-      h[c] = soil_water.h (c);
-      Theta[c] = soil_water.Theta (c);
-      S_sum[c] = soil_water.S_sum (c);
-    }
-
-  // Calculate and update.
-  macro->tick (*geo, soil, 0, soil.size () - 1, surface, 
-               h_ice, h, Theta, S_sum, S_p, q_p, dt, msg);
-  soil_water.set_tertiary (S_p, q_p);
-}
 
 void 
 Movement1D::tick_water (const Geometry1D& geo,
@@ -251,163 +210,6 @@ Movement1D::tick_water (const Geometry1D& geo,
   throw "Water matrix transport failed"; 
 }
 
-
-#if 0
-void 
-Movement1D::solute (const Soil& soil, 
-                    const SoilWater& soil_water, 
-                    const double J_in, Chemical& solute, 
-		    const bool flux_below, 
-                    const double dt,
-		    const Scope& scope,
-                    Treelog& msg)
-{ 
-  Treelog::Open nest (msg, "Solute: " + solute.name);
-
-  const size_t cell_size = geo->cell_size ();
-  const size_t edge_size = geo->edge_size ();
-
-  // Content.
-  std::vector<double> M (cell_size);
-  std::vector<double> C (cell_size);
-  std::vector<double> S (cell_size);
-  std::vector<double> S_p (cell_size);
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      M[c] = solute.M (c);
-      C[c] = solute.C (c);
-      S[c] = solute.S (c);
-      S_p[c] = solute.S_p (c);
-    }
-  
-  // Fluxes.
-  std::vector<double> J (edge_size, 0.0);
-  std::vector<double> J_p (edge_size, 0.0);
-
-  // Upper border.
-  if (soil_water.q_p (0) < 0.0)
-    {
-      if (soil_water.q (0) >= 0.0)
-        {
-          if (soil_water.q (0) > 1.0e-10)
-            {
-              std::ostringstream tmp;
-              tmp << "BUG: q_p[0] = " << soil_water.q_p (0) 
-                  << " and q[0] = " << soil_water.q (0);
-              msg.error (tmp.str ());
-            }
-          J[0] = J_in;
-          J_p[0] = J_in;
-        }
-      else
-        {
-          const double macro_fraction
-            = soil_water.q_p (0) / (soil_water.q_p (0) + soil_water.q (0));
-	  J_p[0] = J_in * macro_fraction;
-          J[0] = J_in - J_p[0];
-        }
-    }
-  else
-    J[0] = J_in;
-  
-  // Flow.
-  if (solute.adsorption ().full ())
-    transport_solid->tick (msg, *geo, soil, soil_water, solute.adsorption (),
-			   solute.diffusion_coefficient (),
-			   M, C, S, J, solute.C_below (), dt);
-  else
-    flow (soil, soil_water, solute.adsorption (), solute.name, 
-	  M, C, S, S_p, J, J_p, 
-	  solute.C_below (), solute.diffusion_coefficient (),
-	  dt, msg);
-  
-  for (size_t c = 0; c < cell_size; c++)
-    solute.set_content (c, M[c], C[c]);
-
-  for (size_t e = 0; e < edge_size; e++)
-    {
-      solute.set_matrix_flux (e, J[e]);
-      solute.set_macro_flux (e, J_p[e]);
-    }
-}
-
-void 
-Movement1D::element (const Soil& soil, 
-                     const SoilWater& soil_water, 
-                     DOE& element,
-                     const double diffusion_coefficient,
-                     const double dt,
-                     Treelog& msg)
-{
-  element.tick (geo->cell_size (), soil_water, dt);
-  static const symbol DOM_name ("DOM");
-  flow (soil, soil_water, Adsorption::none (), DOM_name, element.M, element.C, 
-        element.S, element.S_p, element.J, element.J_p, 0.0, 
-	diffusion_coefficient, dt, msg);
-}
-
-void 
-Movement1D::flow (const Soil& soil, const SoilWater& soil_water, 
-                  const Adsorption& adsorption, const symbol name,
-                  std::vector<double>& M, 
-                  std::vector<double>& C, 
-                  std::vector<double>& S, 
-                  std::vector<double>& S_p, 
-                  std::vector<double>& J, 
-                  std::vector<double>& J_p, 
-		  const double C_below,
-                  double diffusion_coefficient,
-                  const double dt,
-                  Treelog& msg) const
-{
-  const double old_content = geo->total_surface (M);
-
-  mactrans->tick (*geo, soil_water, M, C, S, S_p, J_p, dt, msg);
-
-  for (size_t m = 0; m < matrix_solute.size (); m++)
-    {
-      Treelog::Open nest (msg, matrix_solute[m]->name);
-
-      try
-        {
-          matrix_solute[m]->tick (msg, *geo, soil, soil_water, adsorption,
-				  diffusion_coefficient, 
-                                  M, C, S, J, C_below, dt);
-          if (m > 0)
-            msg.message ("Reserve model succeeded");
-          goto done;
-        }
-      catch (const char* error)
-        {
-          msg.warning (std::string ("Transport problem: ") + error);
-        }
-      catch (const std::string& error)
-        {
-          msg.warning (std::string ("Transport trouble: ") + error);
-        }
-    }
-  throw "Water matrix transport failed"; 
- done:
-  const double new_content = geo->total_surface (M);
-  const double delta_content = new_content - old_content;
-  const double source = geo->total_surface (S) * dt;
-  const double in = -J[0] * dt;	// No preferential transport, it is 
-  const double out = -J[geo->edge_size () - 1] * dt; // included in S.
-  const double expected = source + in - out;
-  if (!approximate (delta_content, expected)
-      && new_content < fabs (expected) * 1e10
-      )
-    {
-      std::ostringstream tmp;
-      tmp << __FILE__ << ":" << __LINE__ << ": " << name
-          << ": mass balance new - old != source + in - out\n"
-          << new_content << " - " << old_content << " != " 
-          << source << " + " << in << " - " << out << " (error "
-          << (delta_content - expected) << ")";
-      msg.error (tmp.str ());
-    }
-}
-#endif
 
 double 
 Movement1D::surface_snow_T (const Soil& soil,
@@ -639,46 +441,14 @@ Movement1D::initialize (const Soil& soil, const Groundwater& groundwater,
 {
   Treelog::Open nest (msg, "Movement: " + name.name ());
 
-  const size_t cell_size = geo->cell_size ();
-
-  // Macropores.
-  if (macro.get ())
-    /* Already got them. */;
-  else if (soil.humus (0) + soil.clay (0) > 0.05)
-    // More than 5% clay (and humus) in first horizon.
-    {
-      // Find first non-clay layer.
-      size_t lay = 1;
-      while (lay < cell_size && soil.humus (lay) + soil.clay (lay) > 0.05)
-        lay++;
-
-      // Don't go below 1.5 m.
-      double height = std::max (geo->zplus (lay-1), -150.0);
-
-      // Don't go below drain pipes.
-      if (groundwater.is_pipe ())
-        height = std::max (height, groundwater.pipe_height ());
-
-      // Add them.
-      macro = Macro::create (height);
-
-      msg.debug ("Adding macropores");
-    }
-
-  // Let 'macro' choose the default method to average K values in 'uz'.
-  const bool has_own_macropores = (macro.get () && !macro->none ());
   for (size_t i = 0; i < matrix_water.size (); i++)
-    matrix_water[i]->has_macropores (has_macropores || has_own_macropores);
+    matrix_water[i]->has_macropores (has_macropores);
 }
 
 Movement1D::Movement1D (Block& al)
   : MovementSolute (al),
     geo (submodel<Geometry1D> (al, "Geometry")),
     matrix_water (Librarian::build_vector<UZmodel> (al, "matrix_water")),
-    macro (al.check ("macro")
-	   ? Librarian::build_item<Macro> (al, "macro")
-	   : NULL), 
-    mactrans  (Librarian::build_item<Mactrans> (al, "mactrans")),
     T_bottom (-42.42e42)
 { }
 
@@ -703,14 +473,6 @@ If none succeeds, the simulation ends.");
   AttributeList vertical_reserve (UZmodel::reserve_model ());
   vertical_models.push_back (&vertical_reserve);
   alist.add ("matrix_water", vertical_models);
-  syntax.add_object ("macro", Macro::component,
-                     Syntax::OptionalState, Syntax::Singleton,
-                     "Preferential flow model.\n\
-By default, preferential flow is enabled if and only if the combined\n\
-amount of humus and clay in the top horizon is above 5%.");
-  syntax.add_object ("mactrans", Mactrans::component, 
-                     "Solute transport model in macropores.");
-  alist.add ("mactrans", Mactrans::default_model ());
 }
 
 const AttributeList& 
