@@ -6,6 +6,54 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.30
+
+** Primary, secondary and tertiary transport
+
+New nomenclature. Intra-aggregate pores constitute the primary domain,
+and inter-aggregate pores the secondary domain.  Both the primary and
+secondary domain are dominated by cabalitory forces.  Pores large
+enough for the cabalitory forces to become insignificant constitute
+the tertiary domain.  The primary and secondary domain together also
+constitute the soil matrix.
+
+In practice, this means we can use Richard's Equation for the soil
+matrix.  The convection-dispertion equation assumes equilibrium
+between pore sizes, which we doesn't believe is a good assumption
+betweeb the primary and secondary domains.  Therefore, transport in
+each of those domains are considered seperate, with an exchange rate
+between them.
+
+For the tertiary domain we cannot even use Richard's Equation.
+
+** Secondary
+
+A new horizon parameter "secondary_domain" is used for enabling solute
+transport in the secondary domain.  The default is that no secondary
+domain exists.
+
+** Tertiary
+
+The old macropore transport parameters have been moved to 
+
+  (Tertiary old)
+
+This must be specified to get what used to be "default" behavior, that
+is macropore flow for horizons with more than 5% clay.  You can also
+specify the old macropore model directly, like this:
+
+  (Tertiary old (macro none))
+
+which has the same effect as 
+
+  (Tertiary none)
+
+The 'macro' parameter used to be located under SoilWater under the
+same name, and was then moved to 'Movement'.
+
+The 'old' tertiary model only works with the 'vertical' movement
+model, therefore 'none' is the default for now.
+
 * 4.29
 
 ** Bug fix: Soil MaxRootingDepth was mostly ignored.
