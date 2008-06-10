@@ -1,0 +1,315 @@
+;;; test-prd.dai -- Partial Rootzone Drying example.
+
+(description "Simulation demonstrating Partial Rootzone Drying in Daisy.")
+
+;; Use standard parameterizations.
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "fertilizer.dai")
+(input file "log.dai")
+
+;; We start by defining two different ways to calculate ABA
+;; production, both based on the same data set.
+(defABAproduction "Fulai Liu root" root
+  "ABA production per root as function of water potential.
+Based on data collected by Fulai Liu, 2007."
+  ;; 'h' is the soil potential in [cm]. This function converts 'h'
+  ;; into ABA production from roots in that volume of soil.
+  (expr (plf h
+	     (range "ng/mm/h")
+	     (domain "MPa")
+	     (points (-1.00 6.00)
+		     (-0.35 1.25)
+		     (-0.00 0.15)))))
+
+(defABAproduction "Fulai Liu uptake" uptake
+  "ABA concentration in water uptake as function of water potential.
+Based on data collected by Fulai Liu, 2007."
+  ;; 'h' is the soil potential in [cm].  This function converts 'h'
+  ;; into an ABA concentration in water from that volume of soil.
+  (expr (* 26.625 [ng/cm^3] (exp (* -4.2816 [MPa^-1] (convert h [MPa]))))))
+
+;; We then define parameters for Farquhar and Ball.
+(defphotosynthesis Potato FC_C3 
+  "Farquhar parameters for potatoes."
+  ;; This is the main calibration effect for unlimited production.
+  (Xn 6e-3 [mol/mol/s])
+  ;; This is yhe main calibration parameter for water stress effect.
+  (ABAeffect ABA-exp (k 0.0152 [cm^3/ng]))
+  ;; Intended for avoiding excessive growth for early crops in cold climate.
+  (TempEff (0 1) (100 1)))
+
+;; We readjust 
+(defcrop "Potato; Folva; ABA" "Potato; Folva"
+  "The Folva Potato calibrated for FertOrgaNic adjusted for SAFIR"
+  ;; Farquhar-Ball takes care of N stress.
+  (enable_N_stress false)
+  ;; ABA production in roots is affected by soil water potential.
+  (Root (ABAprod "Fulai Liu uptake"))
+  ;; Stomata conductivity is affected by ABA.
+  (LeafPhot Potato))
+
+;; Weather data.
+(weather default "dk-jyndevad.dwf")
+
+;; Soil for the Danish 2005 FertOrgaNic experiment.
+(defhorizon "Jyn_15h" ISSS4
+  (clay 0.036)
+  (silt 0.047)
+  (fine_sand 0.220)
+  (coarse_sand 0.674)
+  (humus 0.023)
+  (C_per_N 14.8)
+  (dry_bulk_density 1.52)  
+  (hydraulic M_vG
+             (K_sat 125.0)
+             (Theta_sat 0.438)
+             (Theta_res 0.061)
+             (alpha 0.056)
+             (n 1.760)
+             (l 0.5)))
+
+(defhorizon "KarJyn_B" ISSS4
+  (clay 0.044)
+  (silt 0.013)
+  (fine_sand 0.166)
+  (coarse_sand 0.766)
+  (humus 0.011)
+  (C_per_N 16.9)
+  (dry_bulk_density 1.51) 
+  (hydraulic M_vG
+             (K_sat 110.8)
+             (Theta_sat 0.430)
+             (Theta_res 0.043)
+             (alpha 0.069)
+             (n 1.870)
+             (l 0.5)))
+
+(defhorizon "KarJyn_C" default
+    (clay 0.043)
+    (silt 0.008)
+    (sand 0.946)
+    (humus 0.003)
+    (C_per_N 13.3)
+    (dry_bulk_density 1.58))
+
+;; Geometry - The x-axes.
+;;
+;; We assume the drip poins are one meter apart.  This means that the
+;; left dripper is at 0 [cm], the right dripper is 1 [m], and the
+;; tuber at 50 [cm].  
+
+;; Adding it up.
+(defcolumn KarJyn2005 default
+  (Soil (MaxRootingDepth 35.00)
+        (border -10 -13 -23 -25 -50 -65 -75 -150 [cm])
+        (horizons ( -35.00 "Jyn_15h")
+                  ( -60.00 "KarJyn_B")
+                  (-350.00 "KarJyn_C"))) 
+  (Movement rectangle
+            (Geometry (xplus 10 20 30 40 50 60 70 80 90 100 [cm])
+                      (zplus -2.5 -5 -10 -11 -12 -13 -16 -19 -23 -24 -25 -28 -31 -35 -40 -45 -50 -53 -56 -60 -61 -63 -65 -68 -71 -75 -85 -95 -106 -117 -128 -139 -150 -160 -170 -180 -190 -200 -210 -220 -230 -240 -250 -260 -270 -280 -290 -300 -310 -320 -330 -340 -350)))
+  (Groundwater deep)
+  (OrganicMatter original
+                 (init (input 2900 [kg C/ha/y])
+                       (end -35 [cm])
+                       (root 800 [kg C/ha/y])
+                       (background_mineralization 60 [kg N/ha/y]))))
+
+;; Use it.
+(column KarJyn2005)
+
+;; Simulation period.
+(time 2004 12 1 1)
+(stop 2005 9 1 1)
+
+;; Management.
+
+(defam jynd2005_slurry slurry
+  (description "Parameters provided by OE in Jyndevad, 2005")
+  (dry_matter_fraction 0.025)
+  (total_N_fraction 0.196)
+  (total_C_fraction 0.400)
+  (NH4_fraction 0.77))
+
+(defaction "DK 2005 PRD" activity
+  ;; Virtual experiment with PRD based on FertOrgaNic treatment 3.
+  (wait (mm_dd 12 2))
+  (plowing)
+  (wait (mm_dd 4  7))
+  (fertilize (jynd2005_slurry (weight 12.73))(from 0)(to -10))
+  (wait (mm_dd 4  8))
+  (seed_bed_preparation)
+  (wait (mm_dd 4 11))
+  (sow "Potato; Folva; ABA")
+  (wait (mm_dd  5 28))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm]) (to -10 [cm])
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  5 29))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  5 30))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6  1))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6  3))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6  9))
+  (irrigate_subsoil 2.667 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 10))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 11))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 17))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 21))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 22))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 24))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 25))
+  (irrigate_subsoil 2.667 [mm/h] (hours 2) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 27))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 28))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 29))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 30))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  7  1))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  7  3))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))   
+  (wait (mm_dd  7  5))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7  7))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
+  (wait (mm_dd  7  9))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
+  (wait (mm_dd  7 11))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 12))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 13))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 14))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 15))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 18))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 20))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 22))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
+  (wait (mm_dd  7 25))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 28))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l]))) 
+  (wait (mm_dd  8  1))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  8  5))
+  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
+                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))                                  
+  (wait (mm_dd 8 15))
+  (harvest "Potato; Folva; ABA" (stem 0.00)(leaf 0.00)(sorg 1.00)))
+
+(manager "DK 2005 PRD")
+
+;; Some additional log files.
+
+(deflog "ABAExtraction" crop
+  "ABA extraction in all soil intervals."
+  (where "ABAExtraction.dlf")
+  (when hourly)
+  (entries ;;Year Month MDay Hour
+           (array (tag "ABA")
+		  (dimension "ng/cm^3/h")
+		  (path column "${column}" 
+			Vegetation crops crops "${crop}" Root ABAExtraction)
+		  (spec fixed RootSystem ABAExtraction))))
+
+(deflog "H2OExtraction" crop
+  "H2O extraction in all soil intervals."
+  (where "H2OExtraction.dlf")
+  (when hourly)
+  (entries ;;Year Month MDay Hour
+           (array (tag "H2O")
+		  (dimension "cm^3/cm^3/h")
+		  (path column "${column}" 
+			Vegetation crops crops "${crop}" Root H2OExtraction)
+		  (spec fixed RootSystem H2OExtraction))))
+
+(deflog "ABACrop" crop
+  "ABA relevant information from crop."
+  (where "ABACrop.dlf")
+  (when hourly)
+  (entries ;;Year Month MDay Hour
+           (number (tag "ABAConc")
+		   (dimension "ng/cm^3")
+		   (path column "${column}" 
+			 Vegetation crops crops "${crop}" Root ABAConc)
+		   (spec fixed RootSystem ABAConc))
+	   (number (tag "H2OUpt")
+		   (dimension "mm/h")
+		   (path column "${column}" 
+			 Vegetation crops crops "${crop}" Root H2OUpt)
+		   (spec fixed RootSystem H2OUpt)
+		   (handle sum))
+	   (number (tag "Stress")
+		   (path column "${column}" Vegetation crops crops "${crop}"
+                         Root water_stress)
+		   (spec fixed RootSystem water_stress)
+		   (handle max))))
+
+;; Create these log files.
+(output harvest
+        (ABACrop (crop "Potato; Folva; ABA") 
+		 (when (crop_ds_after "Potato; Folva; ABA" 0.0)))
+	(ABAExtraction (crop "Potato; Folva; ABA")
+		       (when (crop_ds_after "Potato; Folva; ABA" 0.0)))
+	(H2OExtraction (crop "Potato; Folva; ABA") 
+		       (when (crop_ds_after "Potato; Folva; ABA" 0.0)))
+	("Root Density" (crop "Potato; Folva; ABA") 
+	                (when (crop_ds_after "Potato; Folva; ABA" 0.0)))
+	("Soil Water Potential" 
+         (when (crop_ds_after "Potato; Folva; ABA" 0.0)))
+	("Field water")
+        ("Crop Production" 
+	 (crop "Potato; Folva; ABA")
+         (where "sbarley.dlf")))
+
+;;; test-aba.dai ends here.

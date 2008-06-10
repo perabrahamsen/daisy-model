@@ -1,7 +1,6 @@
 ;;; test-aba.dai -- Sample file demonstrating ABA support in Daisy.
 
 (description "Simulation demonstrating ABA in Daisy.")
-(path "." "C:/Programmer/Daisy/daisy-src/lib/" )
 
 ;; Use standard parameterizations.
 (input file "tillage.dai")

@@ -3,7 +3,7 @@ LIBS 	= cz-sample.dai cz-management.dai \
 	  sk-sample.dai sk-management.dai sk-soil.dai it-sample.dai\
 	  it-management.dai it-soil.dai dk-soil.dai log-sample.dai \
 	  init-soil.dai pedo-soil.dai irrigation.dai dk-management.dai
-SETUPS  = test-aba.dai OpenMI_simple.dai OpenMI_management.dai \
+SETUPS  = test-prd.dai test-aba.dai OpenMI_simple.dai OpenMI_management.dai \
 	heat-properties.dai batch.dai sample.dai test.dai DrainDrying.dai 
 DATA = dk-foulum.dwf dk-jyndevad.dwf cz-valecov.dwf pl-jadwisin.dwf \
 	sk-bratislava.dwf it-bologna.dwf taastrup.dwf example.gwt it-cer.gwt
