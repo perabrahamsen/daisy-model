@@ -39,11 +39,13 @@ Based on data collected by Fulai Liu, 2007."
   ;; Intended for avoiding excessive growth for early crops in cold climate.
   (TempEff (0 1) (100 1)))
 
-;; We readjust 
+;; We readjust our FertOrgaNic Folva for ABA.
 (defcrop "Potato; Folva; ABA" "Potato; Folva"
-  "The Folva Potato calibrated for FertOrgaNic adjusted for SAFIR"
+  "The Folva Potato calibrated for FertOrgaNic adjusted for ABA"
   ;; Farquhar-Ball takes care of N stress.
   (enable_N_stress false)
+  ;; ABA takes care of water stress.
+  (water_stress_effect none)
   ;; ABA production in roots is affected by soil water potential.
   (Root (ABAprod "Fulai Liu uptake"))
   ;; Stomata conductivity is affected by ABA.
@@ -97,18 +99,50 @@ Based on data collected by Fulai Liu, 2007."
 ;;
 ;; We assume the drip poins are one meter apart.  This means that the
 ;; left dripper is at 0 [cm], the right dripper is 1 [m], and the
-;; tuber at 50 [cm].  
+;; tuber at 50 [cm].  The drip line is placed 10 [cm] below soil
+;; surface.  We inject the water in a box volume 5 [cm] around the
+;; drip point.
+
+(defvolume left box 
+  "The left drip point."
+  (top finite -5 [cm])
+  (bottom finite -15 [cm])
+  (left finite 0 [cm])
+  (right finite 5 [cm]))
+
+(defvolume right box 
+  "The left drip point."
+  (top finite -5 [cm])
+  (bottom finite -15 [cm])
+  (left finite 0 [cm])
+  (right finite 5 [cm]))
+
+;; We rereadjust our Folva ABA for this geometry
+(defcrop "Potato; Folva; PRD" "Potato; Folva; ABA" 
+  "The Folva Potato calibrated for FertOrgaNic adjusted for PRD"
+  (Root (rootdens GP2D                  ;Gerwitz&Page extended to 2D.
+                  (row_position 50 [cm]) ;Center of row.
+                  (row_distance 1 [m]))  ;Distance between rows.
+        ;; Max horizontal root distance from plant.
+        (MaxWidth 1.5 [m])))
+;; Use it.
+(defcrop "Potato; Exp" "Potato; Folva; PRD")
 
 ;; Adding it up.
 (defcolumn KarJyn2005 default
   (Soil (MaxRootingDepth 35.00)
-        (border -10 -13 -23 -25 -50 -65 -75 -150 [cm])
         (horizons ( -35.00 "Jyn_15h")
                   ( -60.00 "KarJyn_B")
-                  (-350.00 "KarJyn_C"))) 
+                  (-200.00 "KarJyn_C"))) 
+  ;; This enable the 2D version of Daisy.
   (Movement rectangle
-            (Geometry (xplus 10 20 30 40 50 60 70 80 90 100 [cm])
-                      (zplus -2.5 -5 -10 -11 -12 -13 -16 -19 -23 -24 -25 -28 -31 -35 -40 -45 -50 -53 -56 -60 -61 -63 -65 -68 -71 -75 -85 -95 -106 -117 -128 -139 -150 -160 -170 -180 -190 -200 -210 -220 -230 -240 -250 -260 -270 -280 -290 -300 -310 -320 -330 -340 -350)))
+            ;; The soil is divided in a 2D rectangular grid.  'zplus'
+            ;; and 'xplus' specifies the grid lines.
+            (Geometry (zplus -2.5 -5 -10 -15 -20 -25 -30 -35 -40 -45
+                             -50 -55 -60 -65 -70 -80 -90 -100 -110
+                             -120 -130 -140 -150 -160 -170 -180 -190
+                             -200 [cm])
+                      (xplus 5 10 15 20 30 40 50 60 70 80 85 90 95 100 [cm])))
   (Groundwater deep)
   (OrganicMatter original
                  (init (input 2900 [kg C/ha/y])
@@ -141,111 +175,116 @@ Based on data collected by Fulai Liu, 2007."
   (wait (mm_dd 4  8))
   (seed_bed_preparation)
   (wait (mm_dd 4 11))
-  (sow "Potato; Folva; ABA")
+  (sow "Potato; Exp" (row_width 1 [m]))
+  ;; Watering left side.
   (wait (mm_dd  5 28))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm]) (to -10 [cm])
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  5 29))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  5 30))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6  1))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6  3))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6  9))
-  (irrigate_subsoil 2.667 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 10))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 11))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  ;; Watering right side.
   (wait (mm_dd  6 17))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 21))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 22))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 24))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 25))
-  (irrigate_subsoil 2.667 [mm/h] (hours 2) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 2) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  ;; Watering left side.
   (wait (mm_dd  6 27))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 28))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 29))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 30))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  7  1))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  7  3))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))   
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))   
   (wait (mm_dd  7  5))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7  7))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
   (wait (mm_dd  7  9))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
+  ;; Watering right side.
   (wait (mm_dd  7 11))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 12))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 13))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 14))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 15))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 18))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 20))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 22))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
+  ;; Watering left side.
   (wait (mm_dd  7 25))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 28))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l]))) 
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l]))) 
   (wait (mm_dd  8  1))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  8  5))
-  (irrigate_subsoil 2.133 [mm/h] (hours 1) (from -5.0 [cm])(to -10 [cm])
-                          (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))                                  
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd 8 15))
-  (harvest "Potato; Folva; ABA" (stem 0.00)(leaf 0.00)(sorg 1.00)))
+  (harvest "Potato; Exp" (stem 0.00)(leaf 0.00)(sorg 1.00)))
 
 (manager "DK 2005 PRD")
 
@@ -295,21 +334,157 @@ Based on data collected by Fulai Liu, 2007."
 		   (spec fixed RootSystem water_stress)
 		   (handle max))))
 
+(deflog "Root form GP2D" crop
+  (where "rootform_gp2d.dlf")
+  (when daily)
+  (entries ;; Year Month MDay
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Prod WRoot)
+                   (spec fixed Production WRoot))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Phenology DS)
+                   (spec phenology default DS))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root Depth)
+                   (spec fixed RootSystem Depth))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" a_z)
+                   (spec rootdens GP2D a_z))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" a_x)
+                   (spec rootdens GP2D a_x))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" L00)
+                   (spec rootdens GP2D L00))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" k)
+                   (spec rootdens GP2D k))
+	   (interval (path column "${column}" Vegetation crops crops "${crop}" 
+			   Root Density)
+		     (spec fixed RootSystem Density)
+		     (tag "0-1 m")
+		     (from  0 [cm])
+		     (to -100 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "0,0 cm")
+		    (z 0 [cm])
+		    (x 0 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-10,0 cm")
+		    (z -10 [cm])
+		    (x 0 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-50,0 cm")
+		    (z -50 [cm])
+		    (x 0 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "0,40 cm")
+		    (z 0 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-10,40 cm")
+		    (z -10 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-50,40 cm")
+		    (z -50 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "0,50 cm")
+		    (z 0 [cm])
+		    (x 50 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-10,50 cm")
+		    (z -10 [cm])
+		    (x 50 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-50,50 cm")
+		    (z -50 [cm])
+		    (x 50 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "0,60 cm")
+		    (z 0 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-10,60 cm")
+		    (z -10 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-50,60 cm")
+		    (z -50 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-10,* cm")
+		    (z -10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "*,0 cm")
+		    (x 0 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "0,* cm")
+		    (z 0 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "*,40 cm")
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-50,* cm")
+		    (z -50 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "*,50 cm")
+		    (x 50 [cm]))))
+
 ;; Create these log files.
 (output harvest
-        (ABACrop (crop "Potato; Folva; ABA") 
-		 (when (crop_ds_after "Potato; Folva; ABA" 0.0)))
-	(ABAExtraction (crop "Potato; Folva; ABA")
-		       (when (crop_ds_after "Potato; Folva; ABA" 0.0)))
-	(H2OExtraction (crop "Potato; Folva; ABA") 
-		       (when (crop_ds_after "Potato; Folva; ABA" 0.0)))
-	("Root Density" (crop "Potato; Folva; ABA") 
-	                (when (crop_ds_after "Potato; Folva; ABA" 0.0)))
+        (ABACrop (crop "Potato; Exp") 
+		 (when (crop_ds_after "Potato; Exp" 0.0)))
+	(ABAExtraction (crop "Potato; Exp")
+		       (when (crop_ds_after "Potato; Exp" 0.0)))
+	(H2OExtraction (crop "Potato; Exp") 
+		       (when (crop_ds_after "Potato; Exp" 0.0)))
+        ("Root form GP2D" (crop "Potato; Exp") 
+                          (when (crop_ds_after "Potato; Exp" 0.0)))
+	("Root Density" (crop "Potato; Exp") 
+	                (when (crop_ds_after "Potato; Exp" 0.0)))
 	("Soil Water Potential" 
-         (when (crop_ds_after "Potato; Folva; ABA" 0.0)))
+         (when (crop_ds_after "Potato; Exp" 0.0)))
 	("Field water")
         ("Crop Production" 
 	 (crop "Potato; Folva; ABA")
          (where "sbarley.dlf")))
 
-;;; test-aba.dai ends here.
+;;; test-prd.dai ends here.
