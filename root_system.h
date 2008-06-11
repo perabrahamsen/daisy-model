@@ -50,6 +50,7 @@ private:
   const double PenPar2;		// Penetration rate parameter, threshold
   const PLF PenClayFac;		// Clay influence on penetration, factor.
   const double MaxPen;		// Max penetration depth
+  const double MaxWidth;        // Max horizontal distance from plant
   const double Rad;		// Root radius [cm]
   const double h_wp;		// Matrix potential at wilting
   const double MxNH4Up;		// Max NH4 uptake per unit root length

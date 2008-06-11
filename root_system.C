@@ -393,7 +393,8 @@ RootSystem::tick_daily (const Geometry& geo, const Soil& soil,
 void
 RootSystem::set_density (const Geometry& geo, const double SoilLimit,
 			 const double WRoot, const double DS, Treelog& msg)
-{ rootdens->set_density (geo, SoilLimit, PotRtDpt, PotRtDpt,
+{ rootdens->set_density (geo, SoilLimit, PotRtDpt, 
+                         PotRtDpt * (MaxWidth / MaxPen),
 			 WRoot, DS, Density, msg); }
 
 void
@@ -507,6 +508,8 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("MaxPen", "cm", Check::positive (), Syntax::Const,
 	    "Maximum penetration depth.");
   alist.add ("MaxPen", 100.0);
+  syntax.add ("MaxWidth", "cm", Check::positive (), Syntax::OptionalConst,
+              "Maximum horizontal distance of roots from plant.");
   syntax.add ("Rad", "cm", Check::positive (), Syntax::Const,
 	    "Root radius.");
   alist.add ("Rad", 0.005);
@@ -598,6 +601,7 @@ RootSystem::RootSystem (Block& al)
     PenPar2 (al.number ("PenPar2")),
     PenClayFac (al.plf ("PenClayFac")),
     MaxPen (al.number ("MaxPen")),
+    MaxWidth (al.number ("MaxWidth", MaxPen)),
     Rad (al.number ("Rad")),
     h_wp (al.number ("h_wp")),
     MxNH4Up (al.number ("MxNH4Up")),
