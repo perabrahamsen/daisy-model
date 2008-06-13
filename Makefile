@@ -899,6 +899,11 @@ setupnosvn:
 	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
 
+
+tmp:
+	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
+
 upload:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	./libdeps/googlecode_upload.py -p daisy-model \

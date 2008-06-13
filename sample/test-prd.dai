@@ -103,19 +103,28 @@ Based on data collected by Fulai Liu, 2007."
 ;; surface.  We inject the water in a box volume 5 [cm] around the
 ;; drip point.
 
-(defvolume left box 
-  "The left drip point."
+(defvolume drip-depth box
+  "The depth of the drip point."
   (top finite -5 [cm])
-  (bottom finite -15 [cm])
+  (bottom finite -15 [cm]))
+
+(defvolume left-drip drip-depth
+  "The left drip point."
   (left finite 0 [cm])
   (right finite 5 [cm]))
 
-(defvolume right box 
-  "The left drip point."
-  (top finite -5 [cm])
-  (bottom finite -15 [cm])
-  (left finite 0 [cm])
-  (right finite 5 [cm]))
+(defvolume right-drip drip-depth
+  "The right drip point."
+  (left finite 95 [cm])
+  (right finite 100 [cm]))
+
+(defvolume left-side box 
+  "The left side of the root zone."
+  (right finite 50 [cm]))
+
+(defvolume right-side box 
+  "The right side of the root zone."
+  (left finite 50 [cm]))
 
 ;; We rereadjust our Folva ABA for this geometry
 (defcrop "Potato; Folva; PRD" "Potato; Folva; ABA" 
@@ -178,110 +187,110 @@ Based on data collected by Fulai Liu, 2007."
   (sow "Potato; Exp" (row_width 1 [m]))
   ;; Watering left side.
   (wait (mm_dd  5 28))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  5 29))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  5 30))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6  1))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6  3))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6  9))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 10))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 11))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   ;; Watering right side.
   (wait (mm_dd  6 17))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 21))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 22))
-  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 24))
-  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 25))
-  (irrigate_subsoil 2 [mm/h] (hours 2) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 2) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   ;; Watering left side.
   (wait (mm_dd  6 27))
-  (irrigate_subsoil 2.133 [mm/h] (hours 3) (volume left)
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 28))
-  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 29))
-  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  6 30))
-  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  7  1))
-  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd  7  3))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))   
   (wait (mm_dd  7  5))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7  7))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
   (wait (mm_dd  7  9))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
   ;; Watering right side.
   (wait (mm_dd  7 11))
-  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 12))
-  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 13))
-  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 14))
-  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 15))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 18))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 20))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 22))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
   ;; Watering left side.
   (wait (mm_dd  7 25))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  7 28))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l]))) 
   (wait (mm_dd  8  1))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
   (wait (mm_dd  8  5))
-  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left)
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
                     (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
   (wait (mm_dd 8 15))
   (harvest "Potato; Exp" (stem 0.00)(leaf 0.00)(sorg 1.00)))
@@ -468,6 +477,47 @@ Based on data collected by Fulai Liu, 2007."
 		    (tag "*,50 cm")
 		    (x 50 [cm]))))
 
+(deflog "Root zone water" crop
+  "Water status of each side of the root zone."
+  (when hourly)
+  (where "root_zone_water.dlf")
+  (entries (interval (tag "ABA")
+                     (description "\
+ABA in incomming water.")
+                     (path column "${column}" 
+                           Vegetation crops crops "${crop}" Root ABAExtraction)
+                     (spec fixed RootSystem ABAExtraction))
+           (interval (tag "Uptake")
+                     (description "\
+Water uptake from the root zone.")
+                     (path column "${column}" 
+                           Vegetation crops crops "${crop}" Root H2OExtraction)
+                     (spec fixed RootSystem H2OExtraction)
+                     (dimension "mm/h"))
+           (interval (tag "Actual")
+                     (description "\
+Actual water content of the root zone.")
+                     (path column "${column}" SoilWater Theta)
+                     (spec fixed SoilWater Theta)
+                     (dimension "mm")
+                     (min_root_density 0.1 [cm/cm^3]))
+           (water_interval (tag "FC")
+                           (h 2 [pF])
+                           (description "\
+Root zone water content at field capacity.")
+                           (path column "${column}" SoilWater Theta)
+                           (spec fixed SoilWater Theta)
+                           (dimension "mm")
+                           (min_root_density 0.1 [cm/cm^3]))
+           (water_interval (tag "WP")
+                           (h -15000.0 [cm])
+                           (description "\
+Root zone water content at wilting point.")
+                           (path column "${column}" SoilWater Theta)
+                           (spec fixed SoilWater Theta)
+                           (dimension "mm")
+                           (min_root_density 0.1 [cm/cm^3]))))
+
 ;; Create these log files.
 (output harvest
         (ABACrop (crop "Potato; Exp") 
@@ -477,7 +527,15 @@ Based on data collected by Fulai Liu, 2007."
 	(H2OExtraction (crop "Potato; Exp") 
 		       (when (crop_ds_after "Potato; Exp" 0.0)))
         ("Root form GP2D" (crop "Potato; Exp") 
-                          (when (crop_ds_after "Potato; Exp" 0.0)))
+         (when (crop_ds_after "Potato; Exp" 0.0)))
+        ("Root zone water" (crop "Potato; Exp") 
+                           (when (crop_ds_after "Potato; Exp" 0.0))
+                           (volume left-side)
+                           (where "prd_left.dlf"))
+        ("Root zone water" (crop "Potato; Exp") 
+                           (when (crop_ds_after "Potato; Exp" 0.0))
+                           (volume right-side)
+                           (where "prd_right.dlf"))
 	("Root Density" (crop "Potato; Exp") 
 	                (when (crop_ds_after "Potato; Exp" 0.0)))
 	("Soil Water Potential" 
@@ -486,5 +544,8 @@ Based on data collected by Fulai Liu, 2007."
         ("Crop Production" 
 	 (crop "Potato; Folva; ABA")
          (where "sbarley.dlf")))
+
+;; Let us know it is not dead.
+(print_time periodic)
 
 ;;; test-prd.dai ends here.
