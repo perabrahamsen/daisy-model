@@ -1,0 +1,1687 @@
+2008-06-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.31 released.
+
+2008-06-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.31 released.
+
+2008-06-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C, root_system.h (MaxWidth): New parameter.
+
+2008-05-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.30 released.
+
+2008-05-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* tertiary_old.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* condition_time.C: Fix timestep for "*ly" models.
+
+2008-05-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* tertiary_instant.C: New model.
+	* Makefile (MODELS): Added it.
+
+2008-05-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* volume_box.h, volume_box.C: Gave it a public interface.
+	* Makefile (MODELS, SPECIALS): Moved 'volume_box.C'.
+
+	* geometry.C, geometry.h (Geometry::total_soil): New variant with
+	'Volume' argument.
+
+2008-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* biopore_drain.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* tertiary_biopores.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* biopore_matrix.C: Renamed from 'biopore_matrix.C'.
+	* Makefile (MODELS): Adjusted.
+
+2008-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* tertiary.C, tertiary.h: New component.
+	* Makefile (COMPONENTS): Added it.
+
+	* biopore_std.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* imvec.C, imvec.h: New utility.
+	* Makefile (OTHER): Added it.
+
+2008-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transport_Hansen.C (TransportHansen::flow): Bug fix.
+
+	* movement_solute.C, movement_solute.h (divide_top_incomming)
+	(divide_top_outgoing, zero_top): New utilities.
+	(MovementSolute::solute): Call it.
+	* movement_solute.C (MovementSolute::solute): Call them.
+
+2008-04-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* biopore.C, biopore.h: New component.
+
+	* parser_file.C (add_derived): Specify library name in messages.
+
+	* mobsol.h, mobsol.C: Renamed component to 'secondary'.
+	* secondary.h, secondary.C: Renamed component from 'mobsol'.
+	* Makefile (COMPONENTS): Ditto.
+	* all: Updated callers.
+	
+2008-04-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemical_std.C: Obey 'Mobsol::alpha'.
+	* all: Don't pass 'dt' for solute source terms.
+
+2008-04-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* movement_solute.C, movement_solute.h: New intermeditate model.
+
+2008-04-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C, geometry.h, geometry1d.C, geometry1d.h, geometry_rect.C
+	* geometry_rect.h (edge_area, edge_area_per_length): Moved to Geometry.
+
+	* treelog.C (Open::Open): Added new variant for entries in model
+	lists.
+	* gnuplot_multi.C (GnuplotMulti::initialize): Use it.
+	(GnuplotMulti::plot): Ditto.
+	* program_batch.C (struct ProgramBatch): Ditto.
+	* program_gnuplot.C (ProgramGnuplot::run): Ditto.
+
+	* geometry.h (Geometry::edge_area_per_length): New virtual member.
+
+	* msoltranrect.h, msoltranrect.C, msoltranrect_none.C,
+	* msoltranrect_convection.C: Use 'Geometry' instead of 'GeometryRect'.
+	* msoltranrect_cd.C: Ditto, and cast to 'GeometryRect' internally.
+
+2008-04-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* msoltranrect_convection.C (ddt): New log variable.
+	(MsoltranrectConvection::flow): Small timesteps.
+
+2008-03-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* msoltranrect_convection.C (MsoltranrectConvection::flow): 
+	* msoltranrect_Mollerup.C (MsoltranrectMollerup::flow): 
+	* msoltranrect_none.C (MsoltranrectNone::flow):
+	All calculation on solute (C).
+	* msoltranrect.C (Msoltranrect::solute, Msoltranrect::element): 
+	Update callers.
+
+2008-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (REMOVE, MODELS): Removed 'msoltranrect_2x1.C'. 
+
+2008-03-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (OTHER): Added it.
+
+	* frame.C, frame.h: New utility.
+
+2008-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.29 released.
+
+2008-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Obey 'MaxRootingDepth'.
+
+	* syntax.C, syntax.h (Syntax::order_index): Renamed from 'order'
+	to avoid name conflict.
+	* program_document.C, traverse.C, printer_file.C: Update callers.
+
+	* lexer_table.C: Fix comment.
+
+2008-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_file.C (SourceFile::add_entry): Removed duplicate
+	definition of 'total'.
+
+2008-03-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.28 released.
+
+2008-03-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-std.dai (chemical): Give default value to 'chemical' for
+	the sake of the reference manual.
+
+	* program_document.C (ProgramDocument::own_entries): New
+	'new_only' parameter.
+	(ProgramDocument::print_model): Use it.
+
+2008-03-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* library.h (doc_fun): Changed parameter type.
+	* log_select.C (LogSelect::document_entries): Update.
+	* program_document.C (ProgramDocument::print_model): Update.
+
+	* rootdens_GP1D.C, rootdens_G_P.C (Rootdens::create_uniform): Made
+	the later default for 1D.
+
+	* rootdens.C (Rootdens::load_base): Call 'Model::load_model'.
+
+2008-03-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* model.h, model.C (Model::load_model): New utility.
+	* alist.C, alist.h (AttributeList::add_strings): New convenience
+	function.
+	* format_LaTeX.C (FormatLaTeX::alist_description): Use it.
+
+	* model.h (ModelLogable, ModelAListed): New base classes.
+	* all: Use them.
+
+2008-03-13  Mikkel Mollerup  <mmo@life.ku.dk>
+
+	* soil_water.h, soil_water.C, chemical.h, chemical_std.C: Prepare
+	for mobile/immobile solute support.  
+	* column_std.C: Update caller.
+	
+2008-03-12  Mikkel Mollerup  <mmo@life.ku.dk>
+
+	* Makefile (COMPONENTS): Added it.
+	* mobsol.C, mobsol.h: New component.
+	* horizon.h, horizon.C, soil.h, soil.C: Support it.
+	
+2008-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_sow.C (plant): New alias.
+	(row_width): New parameter.
+	* column_std.C, column.h, field.C, field.h (sow): Take row width
+	argument. 
+	* vegetation.h, vegetation_permanent.C, vegetation_crops.C (sow): Ditto.
+	* crop_std.C, crop_simple.C, crop_sold.C, crop_old.C:
+	* crop.h, root_system.C, root_system.h (initialize): Ditto.
+	* rootdens_GP2D.C, rootdens_GP1D.C, rootdens_AP.C, rootdens_PLF.C:
+	* rootdens_PLF, rootdens.h (initalize): New function.
+
+2008-03-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* program_document.C (ProgramDocument::print_model)
+	(ProgramDocument::print_model, ProgramDocument::print_fixed): Use
+	'Format::alist_description'.
+
+2008-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* format.C, format.h, format_LaTeX.C, format_LaTeX.h
+	(format_type): New virtual member function.
+	* format_LaTeX.C (FormatLaTeX::formatp, FormatLaTeX::raw): Use it.
+	* format.C, format.h (Format::alist_discription): New virtual
+	member function.
+
+2008-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.27 released.
+
+2008-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (Implementation::initialize): New function.
+	(ParserFile::load_nested): Call it.
+	(Implementation::add_derived, Implementation::load_derived)
+	(Implementation::load_list):  Use 'Treelog::Open'.
+	* toplevel.C (Toplevel::parse_system_file): Don't use 'Treelog::Open'.
+
+2008-02-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_time.C (every): New model.
+	* harvesting.C (Harvesting::harvest): Renamed from 'operator ()'.
+	* crop_std.C: Update caller.
+	* submodeler.h (submodel_value): New template.
+	* timestep.C (Timestep::null): New function.
+	* time.C (Time::null): New function.
+
+2008-02-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_time.C (mm_dd, before_mm_dd, after_mm_dd): Take
+	'minute' and 'second' parameters.
+	* vcheck.C, vcheck.h (valid_hour, valid_minute): New static member
+	functions.
+
+	* chemical_std.C (surface_decompose): New log variable.
+	(surface_decompose_rate, surface_decompose_halftime): New paramaters.
+	* lib/log.dai ("Surface Chemicals"): Use it.
+	* lib/log-std.dai ("Field chemical"): Use it.
+
+	* chemical_std.C (ChemicalStandard::water_turnover_factor): Moved.
+	* abiotic.C, abiotic.h (Abiotic::f_h): To here.
+	* organic_std.C (OrganicStandard::water_turnover_factor): Use it.
+
+2008-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.26 released.
+
+2008-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_crop.C (crop_dm_sorg_over): New condition.
+	* field.C, field.h, column_std.C, column.h (crop_sorg_dm): New
+	member function. 
+	* vegevegetation_crops.C, vegetation_permanent.C:
+	vegetation.h: (SOrg_DM_by_name): New virtual member function.
+	* crop_simple.C, crop_old.C, crop_sold.C, crop_std.C:
+	* crop.h (SOrg_DM): New virtual member function.
+	
+	* crop_std.C (CropStandard::DM): Take 'sorg_height' into account.
+	
+	* harvesting.C (Harvesting::operator ()): Only harvest as much
+	dead leaves as you harvest live leaves.
+
+	* vegetation.C, vegetation.h (Vegetation::all_crops): New symbol.
+	* action_crop.C (Annual::doIt, Perennial::harvest): 
+	* action_harvest.C (ActionEmerge::doIt, ActionHarvest::doIt)
+	(ActionPluck::doIt, ActionPluckSyntax::ActionPluckSyntax)
+	(ActionEmergeSyntax::ActionEmergeSyntax, struct ActionHarvest): 
+	* action_markvand.C (ActionMarkvand::doIt): 
+	* vegetation_crops.C (VegetationCrops::DM_by_name)
+	(VegetationCrops::emerge, VegetationCrops::harvest)
+	(VegetationCrops::pluck, VegetationCrops::cleanup_canopy): Use it.
+
+2008-02-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* assertion.C: Make sure iostream is initialized.
+
+	* action_harvest.C (cut, pluck): New actions.
+	* field.C, field.h, column.h, column_std.C:
+	* vegetation.h, vegetation_crops.C, vegetation_permanent.C:
+	* crops.h, crops.C, crop_std.C (pluck): New member funciton.
+
+	* harvesting.C, harvesting.h (Harvesting::operator ()): Take new
+	sorg_harvest argument.
+	* crops_std.C (harvest): Update calller.
+
+2008-02-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* dlf.C (DLF::finish): Don't print 'Toplevel' description.
+
+2008-02-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater.C, groundwater.h, groundwater_pipe.C
+	(set_original_bottom): New function.
+	(set_Z_aquitard): Removed.
+	* soil.C (Soil::initialize): Update caller.
+	(Soil::initialize_aquitard): Return original bottom instead of new
+	Z aquitard.
+
+2008-02-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.25 released.
+
+2008-02-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C, surface.h (Surface::update_pond_average): Export it.
+	* movement_rect.C (MovementRect::tick): 
+	* movement_1D.C (Movement1D::tick_water): 
+	* macro_std.C (MacroStandard::tick): Call it.
+
+2008-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* production.C (Production::tick): Prevent negative mass.
+	* crop_old.C (CropOld::NetProduction): Ditto.
+
+	* Version 4.24 released.
+
+2008-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C, soil_water.h (MaxExfiltration): New version that
+	takes ekstra 'edge' parameter.
+	* surface.C: Allow different q_top for different parts of the surface. 
+	* surface.h, surface.C (initialize): New function.
+	* column_std.C (ColumnStandard::initialize): Call it.
+
+	* ABAprod_soil.C: Changed root density symbol from 'l' to 'L'.
+	
+2008-02-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C, soil_water.h (K) Initialize and export.
+	* geometry.h, geometry_rect.h (edge_other): Moved to 'geometry.h'.
+	* groundwater_extern.C, groundwater_flux.C, groundwater_file.C:
+	* groundwater_fixed.C, groundwater_deep.C, groundwater_lysimeter.C:
+	* groundwater_pipe.C, groundwater_static.C:
+	* groundwater.h (q_bottom): Take edge parameter.
+	* groundwater_aquitard.C: New model.
+	* Makefile (MODELS): Add it.
+	* uzrichard.C (UZRichard::richard): Update caller.
+	* uzlr.C (UZlr::tick): Ditto.
+
+2008-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.23 released.
+
+2008-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* dlf.C, dlf.h (DLF::parameter): New function.
+	* log_table.C (parameter_names): New parameter.
+
+2008-02-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-std.dai ("Soil chemical"): Take tillage into account.
+	* chemical_std.C (surface_tillage): New parameter.
+	* lib/log.dai ("Surface Chemicals"): Log it.
+	* chemical_std.C, chemical.h (mix): 
+	* chemistry_std.C, chemistry_multi.C, chemistry.h (mix):
+	* column_std.C (mix): Support 'penetration' parameter.
+
+2008-02-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil.C (zones): New parameter.
+
+2008-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrect_2x1.C (UZRect2x1::load_syntax): Bug fix: 'UZModel' -> 'UZ1D'. 
+
+	* action_irrigate.C (volume): New parameter for the
+	'irrigate_subsoil' model.
+	* aom.C, aom.h (AOM::penetrate): 
+	* am.C, am.h (AM::mix): 
+	* om.C, om.h (OM::mix): 
+	* organic_std.C (OrganicStandard::fertilize): 
+	* organic_none.C (OrganicNone::fertilize): 
+	* organic_matter.h (fertilize): 
+	* column_std.C, column.h (ColumnStandard::irrigate_subsoil)
+	(ColumnStandard::fertilize): 
+	* chemical_std.C (ChemicalStandard::incorporate): 
+	* chemical.h (Chemical::incorporate): 
+	* chemistry_multi.C (ChemistryMulti::incorporate): 
+	* chemistry_std.C (ChemistryStandard::incorporate): 
+	* chemistry.C, chemistry.h (Chemistry::incorporate): 
+	* soil_water.C, soil_water.h (SoilWater::incorporate): 
+	* geometry.C, geometry.h (Geometry::add_soil):
+	(Geometry::mix, Geometry::extract_soil): 
+	(Geometry::add_surface): Add versions taking 'Volume' argument.
+
+	* volume.C, volume.h (Volume::density): New member function.
+
+2008-01-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_array.C: Handle dry bulk density for [ppm] log.
+
+2008-01-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bdconv.C, bdconv.h: Extracted from select_volume.C.
+	* Makefile (OTHER): Added.
+	* select_volume.C: Use it.
+
+	* msoltranrect_convection.C: Renamed from "msoltranrect_forward.C".
+	* Makefile (MODELS): Update.
+
+2008-01-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzlr.C (UZlr::tick): Bug fix.
+	* uzrichard.C (debug): New parameter.
+
+2008-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* scope_block.C (ScopeBlock::ScopeBlock): Don't pass block to
+	avoid infinite loop when expanding "where" or "type" in block.C.
+
+	* lib/log-std.dai ("Field chemical", "Soil chemical"): New log models.
+
+	* macro_std.C (MacroStandard::check_alist): Bug fix,
+	distribution (height_end) should be 1.0, not 0.0.
+
+	* Version 4.22 released.
+
+2008-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* heat_rect.C, heat_rect.h: Removed.
+	* Makefile (SUBMODELS): Removed.
+
+2008-01-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* heatrect.C, heatrect.h: New component.
+	* Makefile (COMPONENTS): Add it.
+	* heatrect_Mollerup.C: Renamed from 'heat_rect.C' and 'heat_rect.h'.
+	* Makefile (MODELS): Add it.
+	* heatrect_linear.C, heatrect_none.C: New models.
+	* Makefile (MODELS): Add it.
+	* movement_rect.C: Update caller.
+
+2008-01-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+	
+	* assertion.h (daisy_non_negative): Renamed from 'assert_non_negative'.
+	* all: Update callers.
+	* assertion.h, assertion.C (daisy_approximate, daisy_balance):
+	New macros.
+	* assertion.C: Implement them.
+	
+	* mathlib.C, newlib.h (balance): New function.
+
+	* unit.C, unit.h: New component.
+	* Makefile (COMPONENTS): Add it.
+
+2008-01-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* msoltranrect_forward.C: New model.
+	* Makefile (MODELS): Add it.
+
+	* aom.C (AOM::full_C, AOM::full_N): Take surface area into account.
+
+2008-01-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* msoltranrect_Mollerup.C: Use 'solver.h'.
+
+2008-01-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (MODELS, REMOVE): Remove adsorption_none.C and
+	adsorption_full.C.
+	* adsorption.C: Add code here.
+
+	* adsorption.C, adsorption.h (AdsorptionLinear): New class.
+	* adsorption_linear.C (AdsorptionLinearOld): Renamed.
+
+	* chemical.h, chemical_std.C: Restored 'adsorption' parameter.
+	* movement_1D.C, movement_rect.C: Use it.
+
+2007-12-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C (nitrogen_uptake): Handle negative PotNUpt request.
+
+2007-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/test-aba.dai: New setup.
+	* sample/Makefile (SETUPS): Add it.
+
+2007-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* number_arit.C (NumberSqr::dimension): Multiply operand dimension
+	with itself.
+	(NumberOperand::dimension): If dimension is "none", leave it alone.
+
+	* ABAprod_soil.C: Renamed from ABAprod_expr.C
+	* ABAprod_uptake.C: Renamed from ABAprod_soil.C
+	* Makefile (MODELS, REMOVE): Update.
+
+	* crop_std.C (tick): Enable ABA from roots.
+	* vegetation.h, vegetation_crops.C, vegetation_permanent.C:
+	* crop.h, crop_old.C, crop_sold.C, crop_simple.C, crop_std.C:
+	* root_system.C, root_system.h (check): New function.
+	(initialize): Take 'Treelog&' argument.
+	* column_std.C (initialize, check): Update caller.
+
+2007-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* ABAprod.C, ABAprod.h: New component.
+	* ABAprod_root.C, ABAprod_soil.C, ABAprod_expr.C: New model.
+	* Makefile (COMPONENTS, MODELS): Add them.
+	* root_system.h, root_system.C (ABAExtraction):  New log variable.
+	(ABAConc): New state variable.
+	(ABAprod): New parameter.
+
+2007-12-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* run_Qt.h (stop): Made it a slot.
+	* vis_Qt.h (VisQtMain::stop_program): New signal.
+	* vis_Qt.C (VisQtMain::closeEvent): Emit it.
+	* ui_Qt_run.C (run_program): Connect them.
+
+2007-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solver.C: Made it a component.
+	* Makefile (COMPONENTS): Added ít.
+	(OTHER): Remove it.
+	* solver_ublas.C, solver_cxsparse.C, solver_none.C: New models.
+	(MODELS): Added them.
+
+	* daisy.C (Daisy::run): Call 'msg.flush' when 'force_print'.
+
+2007-12-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solver.C, solver.h: New utility.
+	* Makefile (OTHER): Add it
+	* uzrect_Mollerup.C: Use it.
+
+2007-12-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* ui.h, ui.C, ui_Qt_run.C (failure): New virtual member function.
+	* toplevel.C, toplevel.h (failure_interface): New member function.
+	* toplevel.C (~Toplevel): Call it.
+
+	* path.C (open_file): Treat file names starting with "\" as
+	absolute outside unix.
+
+	* chemical_std.C (incorporate): Unit fix.
+
+	* iterative.h: Ported to GCC 3.3.
+
+	* Makefile: Ported to Linux.
+
+	* action_crop.C, action_fertilize.C, action_table.C: Add unit to
+	empty solute for irrigation.
+
+2007-11-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* heat_rect.C, heat_rect.h: New submodel.
+
+2007-11-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat.h, soil_heat.C: Updated interface.
+	* movement_1D.C: Update caller.
+
+	* soil_water.C (SoilWater::freeze): Changed interface.
+
+	* geometry.C, geometry.h (cell_pseudo_number, cell_edges): Moved here.
+	* geometry_rect.C, geometry_rect.h (cell_pseudo_number)
+	(cell_edges): From here. 
+
+	* geometry.C, geometry.h (build_cell_edges): New function.
+	* geometry1d.C, geometry_rect.C: Use it.
+	
+2007-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C, solute.h: Merged into chemical.
+	* Makefile (SPECIALS): Removed.
+	* chemical.h, chemical_std.C: Incorporated solute.
+	* all: Updated.
+
+2007-11-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vcheck.C (VCheck::unique): Handle objects.
+
+	* vcheck.h, vcheck.C (check): Take 'Metalib' parameter.
+	* all: Updated callers.
+	* vcheck.h, vcheck.C (InLibrary): New member class.
+	* chemical.h (check_library): New function.
+
+	* action_spray.C (doIt): Better message.
+
+	* im.h, im.C: Rewritten.
+	* action_table.C, action_crop.C, acrion_extern.C, acrion_irrigate.C:
+	* column_std.C, weather.C, weather_old.C, weather_std.C: Update caller.
+
+2007-11-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemistry_multi.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* pedo.C, pedo.h, pedo_arit.C, pedo_const.C: Removed component.
+	* Makefile (MODELS, COMPONENTS): Ditto.
+	* equil.h, equil.C, equil_langmuir.C, equil_linear.C:
+	* equil_goal.C: Update callers.
+	* transform_equil.C: Update caller.
+	
+2007-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_nit.C: New model.
+	* Makefile (MODELS): Add it.
+
+2007-11-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_std.C, reaction.h (tick): Extra parameters.
+	* chemistry_std.C (tick_soil): Update caller.
+	* reaction_denit.C: New model.
+	* Makefile (MODELS): Add it.
+
+	* abiotic.C, abiotic.h: New utility.
+	* Makefile (OTHER): Add it.
+	* chemical_std.C, nitrification.C, nitrification_soil.C:
+	* nitrification_solute.C, denitrification.C, organic_std.C: Use it.
+	
+2007-11-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C (initial): New parameter
+	(Solute::default_initialize): Use it.
+	* all: Update callers and implementers.
+
+	* number_arit.C (NumberProduct::dimension): Use 'Units::multiply'.
+
+2007-11-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_adsorption.C: New model.
+	* Makefile (MODELS): Added.
+
+2007-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* scope_soil.h, scope_soil.C: New utility.
+	* Makefile (OTHER): Added.
+
+2007-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_equil.C: New model.
+	* Makefile (MODELS): Added.
+
+2007-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* element.h, element.C: New component.
+	* Makefile (COMPONENTS): Added.
+
+	* element.h, element.C: Renamed to doe.h and doe.C.
+	* Makefile (SUBMODELS): Changed.
+
+2007-11-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemical_std.C (ChemicalStandard::heat_turnover_factor): Fix T_max.
+	* denitrification.C (f_T): Ditto.
+	* nitrification.C (Nitrification::f_T): Ditto.
+	* organic_std.C (OrganicStandard::heat_turnover_factor): Ditto.
+
+2007-11-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* output.C, output.h (log_time_columns): New paramater.
+	* log_table.C: Use it.
+
+	* select_content.C (z, x, y): New parameters.
+
+	* geometry.h (contain_x, contain_y): New virtual member functions.
+	* geometry_1D.C, geometry_rect.C: Implement them.
+	
+	* select_volume.C (min_root_crop): Renamed from 'crop'.
+
+2007-10-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rootdens_GP2D.C: New model.
+
+2007-10-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnuplot_base.C: New parameter 'device' to specify output device.
+
+2007-10-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rootdens_GP1D.C: New model.
+	* Makefile (MODELS): Added it.
+
+2007-09-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Made 'Path' a class.
+
+2007-09-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.21 released.
+
+2007-09-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* number_plf.C: New model.
+	* Makefile (MODELS): Added it.
+
+2007-08-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (load_list): Made user specified dimension optional. 
+
+2007-08-29  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* rubiscoNdist_forced.C: New model. 
+
+2007-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.20 released.
+
+2007-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_extern.C (extern_fertigation): New model.
+
+2007-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.19 released.
+
+2007-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select* (output_array): Take vegetation parameter.
+	* log.C, log.h (open_geo): Take vegetation paramater.
+	* column_std.C (output): Use it.
+
+	* select_volume.C (min_root_density, crop): New parameters.
+
+2007-08-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_volume.C (water_interval, water_volume): New models.
+
+2007-08-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_with.C (done): Done when all actions are done.
+	* action_lisp.C (ActionProgn::done): Ditto.
+
+2007-08-20  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* cdaisy.C, cdaisy.h (daisy_column_get_description): New function.
+	
+2007-08-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* cdaisy.C, cdaisy.h (daisy_column_location_size)
+	(daisy_column_location_x, daisy_column_location_y): New functions.
+
+2007-08-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column.C, column.h (location): New parameter.
+
+2007-07-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* depth.C (DepthExtern): New model.
+
+2007-07-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.18 released.
+
+2007-07-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile: Upgraded to Qt 4.3.0.
+
+2007-07-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_extern.C (initial_table): New parameter.
+
+2007-07-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_extern.C: New model.
+	* Makefile (MODELS): Add it.
+
+	* all: Made all actions and conditions take "Scope" argument.
+	
+2007-07-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.17 released.
+
+2007-07-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (daisyw.exe): Link GUIOBJECTS directly.
+
+2007-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.16 released.
+
+	* cropNdist renamed to rubiscoNdist.
+	
+2007-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* fetch.C (width): Fixed problem with small negative numbers.
+
+	* scope_exchange.h: New interface.
+
+	* number_arit.C (NumberPLF): New model.
+
+2007-05-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.15 released.
+
+2007-05-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C (MxNO3Up): Changed default value from 2.5e-8 to
+	2.5e-7.
+
+2007-05-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.14 released.
+
+2007-05-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* txt/Makefile (tutorial.dvi, tutorial.pdf, exercises.pdf) 
+	(exercises.dvi): Added dependencies on other documents.
+
+	* toplevel.C, toplevel.h (parse_system_file): New member function.
+	* toplevel.C (parse_file): Use it.
+	* ui_Qt_run.C (attach): Ditto.
+
+	* toplevel.C (get_daisy_home): New function.
+	(initialize_once): Use it.
+	(install_directory): New parameter.
+
+	* setup.nsi: Added start menu links to tutorial and exercises
+	documentation, and added a sample setup file to the desktop.
+
+2007-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.13 released.
+
+2007-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-Qt.dai: New log parameterization file.
+	* lib/Makefile (TEXT): Added it.
+
+2007-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* run.C, run.h: New base.
+	* Makefile (OTHER): Add it.
+
+2007-04-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* ui_Qt.C: New special model.
+
+	* ui.C, ui.h: New component.
+	* Makefile (COMPONENTS): Add it.
+
+2007-04-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* treelog_text.h, treelog_text.C: New utility.
+	* Makefile (OTHER): Add it.
+
+	* treelog_store.h, treelog_store.C: New utility.
+	* Makefile (OTHER): Add it.
+
+	* treelog_stream.h, treelog_stream.C: No longer used.
+	* Makefile (OTHER): Removed it.
+
+	* treelog_dual.h, treelog_dual.C: No longer used.
+	* Makefile (OTHER): Removed it.
+
+2007-03-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* intrinsics.C, intrinsics.h: New utility.
+	* Makefile (OTHER): Added it.
+	* metalib.C, librarian.C: Use it.
+	
+2007-03-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.C, log.h (metalib, initialize_common): New functions.
+	* output.C (initialize): Update caller.
+
+	* syntax.C (add_object): Renamed from 'add'.
+	* all: Update callers.
+	
+	* Version 4.12 released.
+
+	* lib/log.dai: Updated log parameterizations for new chemistry.
+
+2007-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction.h, reaction.C, reaction_std.C: Renamed from chemistry.
+	* chemistry.h, chemistry.C, chemistry_std.C: Now models.
+	* soil_chemical.h, soil_chemical.C: Merged into chemical.
+	* soil_chemicals.h, soil_chemicals.C: Merged into chemistry.
+	* chemicals.h, chemicals.C: Merged into chemistry.
+	* Makefile (COMPONENTS, MODELS): Updated.
+
+2007-03-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* metalib.C, metalib.h: New utility..
+	* Makefile (OTHER): Added it.
+
+2007-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* model.C, model.h: New file.
+	* Makefile (OTHER): Added.
+	* all: Use it.
+
+2007-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* boolean_extern.C, number_extern.C: Removed.
+	
+	* groundwater_extern.C: New model.
+	* scopesel.C, scopesel.h: New component.
+	* condition_extern.C: Use it.
+	* Makefile (COMPONENTS, MODELS): Add them.
+
+	* scope_multi.C: Made it a model.
+	* Makefile (OTHER): Removed.
+	(SPECIALS): Added.
+
+2007-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* scope_exchange.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* scope.h, scope.C: Made it a library.
+	* scope_id.h, scope_id.C: Made it a model.
+	* Makefile (OTHER): Removed.
+	(COMPONENTS, SPECIALS): Added.
+
+2007-03-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* msoltranrect_none.C: New model.
+
+	* msoltranrect_Mollerup.C: New model.
+	* Makefile (MODELS): Added it.
+
+2007-03-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_extern.h, log_extern.C: Export interface.
+	* output.C, output.h: Made LogExtern a member.
+
+2007-03-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.11 released.
+
+2007-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* cdaisy.h, cdaisy.C: Support 'Toplevel'.
+	* cmain.c: Use it.
+	
+	* Makefile (OTHER, REMOVE): Removed options.C and options.h.
+
+2007-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* output.C, output.h: New utility submodel.
+	* Makefile (OTHER): Add it.
+
+	* toplevel.C, toplevel.h: New submodel.
+	* Makefile (SUBMODEL): Add it.
+	* main.C (main): Use it.
+
+2007-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* scope.C (identifier, has_identifier): New virtual members.
+	* scope_block.C, scope_block.h: Define them.
+	* block.C, log_extern.C: Use them.
+
+	* scope_block.C, scope_block.h: New utility.
+	* Makefile (OTHER): Add it.
+	* block.C, log_extern.C: Use it.
+	
+2007-03-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+	
+	* scope_id.C, scope_id.h: New utility.
+	* Makefile (OTHER): Add it.
+	* xysource_loop.C, select.C: Use it.
+
+	* scope.h (all_numbers): New abstract member.
+	* scope.C (ScopeNull): Implement it.
+	* block.C (ScopeBlock): Implement it.
+	* number_lisp.C (NumberLet): Implement it.
+	* select.C (ScopeX): Implement it.
+	* log_extern.C (LogExtern): Implement it.
+
+	* select.h (type): New virtual member function.
+
+	* cdaisy.C, cdaisy.h (daisy_scope_extern_size)
+	(daisy_scope_extern_get): New functions.
+	(daisy_scope_find_extern): Removed.
+	* log_extern.C (extern_scope_size, extern_scope_get): New functions.
+	(find_extern_scope): Removed.
+
+2007-02-27  Mikkel Mollerup  <mmo@life.ku.dk>
+
+	* groundwater_flux.C: New model.
+
+2007-02-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C: Replaced 'lake' with 'forced_pressure'.
+
+2007-02-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.h (cell_volume): Renamed from 'volume'.
+
+2007-02-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* time.C (output): Log 'minute' and 'second'.
+
+2007-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry_rect.h (corner_size, corner_rows, corner_columns): 
+	(corner_index, corner_z, corner_x):
+	(cell_corners, edge_corners): New and data members.
+	* geometry_rect.C (GeometryRect::GeometryRect): Initialized.
+
+2007-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.h (edge_center_z, edge_center_x, edge_center_y): New
+	member functions.
+	* geometry1d.h (edge_center_z): Implement.
+	* geometry_rect.h, geometry_rect.C (edge_center_x, edge_center_y):
+	Implement. 
+
+2007-01-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* main.C: Not using namespace std.
+
+2007-01-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C, root_system.h (tick_daily): New parameters.
+	* phenology_std.C, phenology_TSum.C, phenology.h (tick_daily): Ditto.
+	* crop_std.C (tick): Update caller.
+	* production.C, production.h (root_growth, leaf_growth)
+	(tick_daily): New functions.
+	* crop_std.C (tick): Use them.
+
+2007-01-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crpn.C (content): Fix partisioning under stress.
+
+2006-12-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* harvesting.C (tick): Use 'Timestep' to simplify calculation.
+
+	* time.h, time.C: Support minutes and seconds.
+	* log_table.C (common_done): Use it.
+
+2006-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* timestep.C: New submodel.
+	* Makefile (SUBMODELS): Added it.
+
+2006-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.h (output_lazy): New macro.
+	* column_std.C (output): Use it.
+	* bioincorporation.C (output): Ditto.
+
+	* assertion.C (notreached): New assertion.
+	* All: Use it.
+
+	* All: Removed timestep.h.
+
+2006-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* alist.C: Better panic messages.
+
+	* mathlib.h (pow, sqrt, log, acos, asin): Removed "safe" versions.
+
+2006-12-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* msoltranrect.h, msoltranrect.C: New component.
+	* Makefile (COMPONENTS): Added it.
+	* msoltranrect_2x1.C: New model.
+	* Makefile (MODELS): Added it.
+
+2006-12-05  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* photo_FCC4.C (class PhotoFCC4): New model.
+	* Makefile (MODELS): Added it.
+
+2006-11-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrect_Mollerup.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* uzrect.C: New component.
+	* Makefile (COMPONENTS): Added it.
+	* uzrect_2x1.C: New model.
+	* Makefile (MODELS): Use it.
+	* movement_rect.C: Use it.
+
+2006-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* librarian.h (BuildBase): New helper class.
+	* librarian.C: New file.
+	* Makefile (OTHER): Add it.
+	(HEADONLY): Remove it.
+
+2006-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (check): 'pressure_table' may not be
+	initialized.
+
+2006-11-20  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* ABAeffect_exp.C (default_model): New model.
+	* Makefile (MODELS): 
+	
+	* ABAeffect.C, ABAeffect.h: New component. 
+	* Makefile (COMPONENTS): Added it.
+	
+	* cropNdist_uniform.C: New model.
+	* Makefile (MODELS): Added it.
+
+2006-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_std.C (Initialization): Use 'add_surface'.
+	* bioincorporation.C (add): Ditto.
+
+	* weather.h (reletive_humidity): New pure virtual.
+	* weather_old.C, weather_std.C: Implement it.
+	* weather.h (has_relative_humidity): New virtual function.
+	* weather.C, weather_std.C: Implement it.
+	
+2006-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log, select: Rewrote so they use a 'Volume' object to limit
+	logging rather than a top and a bottom height.
+
+
+2006-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bound.C: New component.
+
+2006-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.10 released.
+
+2006-11-09  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* photo_GL.C, photo.h (assimilate): New members in function call.
+
+	* crop_std.C, crop_sold.C, crop_old.C, crop_simple.C, crop.h (tick): 
+	Modified to include different types of radiation. 
+
+	* bioclimate_std.C (struct BioclimateStandard)
+	(total_PAR_, sun_PAR_, sun_LAI_fraction_): New members.
+
+	* bioclimate_std.C (raddist, difrad): New data members.  
+	(sun_PAR, sun_LAI_fraction): New member functions.
+	(load_syntax): Added "raddist" and "difrad".
+
+	* bioclimate.h (sun_PAR, sun_LAI_fraction): New virtual member 
+	functions.
+
+2006-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (multiply): Multiple with [cm^3] added.
+
+	* volume_box.C: New model.
+	* Makefile (MODELS): Use it.
+
+2006-11-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* volume.C, volume.h: New component.
+	* Makefile (COMPONENTS): Added it.
+
+	* select_volume.C: New model.
+	* Makefile (MODELS): Added it.
+
+2006-11-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uz1d_none.C: New model.
+	* Makefile (MODELS): Added it.
+
+2006-10-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_walltime.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* bioclimate_std.C (load_syntax): Fix type of 'difrad'.
+
+2006-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uz1d_richard.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* uz1d.C, uz1d.h: New component.
+	* Makefile (COMPONENTS): Added it.
+
+2006-10-13  Birgitte Gjettermann  <bgj@kvl.dk>
+	
+	* cropNdist_DPF.C (struct cropNdistDPF): New model.
+	* Makefile (MODELS): Added it.
+
+2006-10-12  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* cropNdist.C, cropNdist.h: New component  
+	* Makefile (COMPONENTS): Added it.
+
+2006-10-03  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* raddist_DPF.C: New model.
+	* Makefile (MODELS): Added it. 
+
+2006-10-02  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* raddist_std.C:New model. 
+	* Makefile (MODELS): Added it.
+
+	* raddist.C, raddist.h: New component.
+	* Makefile (COMPONENTS):Added it.
+
+2006-10-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (Parskip): New helper class.
+	(add_derived, load_list): Use it.
+
+2006-09-28  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* difrad_DPF.C: New model.
+	* Makefile (MODELS): Added it.
+
+2006-09-27  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* weather.C, weather.h (sin_solar_elevation_angle): New function.
+	(HourlyExtraterrestrialRadiation): Use it.
+
+	* difrad_weather.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* difrad.C, difrad.h: New component.
+	* Makefile (COMPONENTS): Added it.
+
+2006-09-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_extern.C (numbers): Made it logable.
+	* log.h, log.C, daisy.C: Made logs logable.
+	
+2006-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* printer_file.C (print_alist): Don't treat alist sequences
+	specially. 
+
+	* parser_file.C (load_list): Don't skip parenteses twice at start
+	of alist sequence.
+
+2006-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* number_lisp.C: New model.
+	* Makefile (MODELS): Added it.
+
+2006-09-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all (Condition::match, Action::done): Takes Treelog arguments.
+
+	* condition_extern.C: New model.
+	* condition_boolean.C: New model.
+	* boolean_extern.C: New model.
+	* Makefile (MODELS): Added them.
+
+2006-09-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* boolean_number.C: New models.
+	* boolean_string.C: Split from 'boolean.C'.
+	* Makefile (MODELS): Added them.
+
+	* number_extern.C: New model.
+	* Makefile (MODELS): Added.
+	* scope_multi.C: New utility.
+	* Makefile (OTHER): Added.
+
+2006-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Made a lot of dimensions symbols instead of std::strings.
+
+2006-09-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (standard_conversions): New SoilHeat convertions.
+
+2006-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all:  Moved soil heat back to column.
+
+	* weather.C (T_normal): Include hour.
+
+2006-08-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.09 released.
+
+2006-08-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_flux.C (output_array): Add warning if there are no edges.
+
+	* geometry.C (edge_cross_z): Include top of the centers, so you
+	won't get excluded if you choose the center of a node.
+
+2006-08-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C (load_syntax): Changed dimension of sinks to match
+	'log.dai'. 
+
+	* soil_water.C (K): New log variable.
+	* soil_water.h, soil_water.C (tick_after): New member function.
+	* column_std.C (initialize): Call it.
+	* lib/log.dai ("Soil Water Conductivity (log10)"): Use it.
+
+	* select_utils.h, select_utils.C: New utility.
+	* Makefile (OTHER): Added it.
+	* select_interval.C: Use it.
+
+2006-08-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/potato.dai ("Potato; FertOrgaNic"): New base parameterization.
+	("Potato; Agria", "Potato; Folva", "Potato; Triada"): New
+	parameterizations.
+	(Potato): Changed default to Folva.
+
+2006-08-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (MODELS): Removed 'select_date.C'.
+	* select.C, select.h (output_time): Removed.
+	* log.h(output): Removed "const Time&" argument.
+	* log_select.h, log_select.h (output): Ditto.
+	* log_harvest.C (output): Ditto.
+	* log_all.C, log_all.h (output): Ditto.
+	* log_alist.C, log_alist.h (output): Ditto.
+
+2006-07-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.08 released.
+
+2006-07-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (add_derived): Shorthand for defining 'const'
+	numbers and integers. 
+	(load_derived): Shorthand for specifying 'const' numbers and
+	integers. 
+
+2006-07-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (get_time): Removed unused function.
+
+2006-07-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.07 released.
+
+2006-07-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_table.C: New "Emerging" column.
+	* action_harvest.C: Added "emerge" action.
+	* field.h, field.C (emerge): New operation.
+	* column.h, column_std.C (emerge): Ditto.
+	* vegetation.h, vegetation_permanent.C
+	* vegetation_crops.C (emerge): Ditto.
+	* crop_sold.C, crop_old.C, crop_std.C, crop_simple.C:
+	* crop.h (emerge): Ditto.
+
+2006-07-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C, parser_file.h, parser.h (check): New virtual
+	member function.
+	(load_list): Use it.
+
+2006-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.06 released.
+
+2006-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/log-sample.dai ("Sample water content"): Fixed spec.
+
+	* parser_file.C (load_list): Handle fixed size object sequences.
+	(load_list): Handle sequence valued variables.
+
+2006-07-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (load_derived): Handle '$' variables.
+
+2006-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai, lib/log-std.dai: Cleaned up specs.
+
+	* Version 4.05 released.
+
+2006-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C (initialize_layer): Don't assume array is large
+	enough to hold all cells.
+
+2006-06-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.04 released.
+
+2006-06-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_file.C, source_file.h (default_hour): New parameter.
+
+2006-06-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select.C (check_path): Complain if fixed components are found in
+	the spec.
+
+	* lib/log-std.dai ("Field nitrogen"): Simplify 'spec' entries.
+
+	* Version 4.03 released.
+
+2006-06-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_std.C (load): Bug fix.  Stored values in wrong time steps.
+
+2006-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry_vert.h, geometry_vert.C: New interface.
+	* Makefile (SPECIALS): Add it.
+	* geometry_rect.h, geometry_rect.C:
+	* geometry1d.h, geometry1d.C: Derive from it.
+	* uzmodel.h, uzlr.C, uznone.C, uzrichard.C: Use it.
+	
+2006-05-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (WaterDistribution): Handle pond/snow
+	interaction directly.
+
+2006-05-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat_rect.C, soil_heat_rect.h: New submodel.
+	* soil_water_rect.C, soil_water_rect.h: New submodel.
+	* Makefile (SUBMODELS): Add them.
+
+2006-05-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.h: Removed unnecessary pure virtuals.
+	* soil_heat1d.C, grounwater_pipe.C: Take 'SoilWater1D' arguments.
+	
+	* chemical_std.C, chemical.h (active_grounwater): Removed flag.
+	* soil_chemical.C: Update caller.
+
+	* soil_water1d.h, soil_water1d.C: Don't hide implementation in
+	'Implementation' struct.
+
+	* column_std.C, column.h: Removed functions for communication with
+	external model.
+	* geometry.h, geometry1d.C (cell_at): New function.
+	* soil.h (horizon): New function.
+	* column_std.C, column.h (horizon_at): New function.
+	* number_soil.C: Rewrote to use new function.
+
+2006-05-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* movement_rect.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* movement.h, movement_1D.C: Rewrote.
+	* column_std.C: Now define both 'default' and 'generic' columns,
+	where the later takes a 'Movement' parameter instead of
+	'SoilHeat', 'SoilWater' and 'Groundwater'.
+
+2006-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_rect.C, column_inorganic.C, column_r2d2.C:
+	* column_base.C, column_base.h: Removed files. 
+	* Makefile: Update.
+
+	* column_std.C: Included base.
+
+	* organic_none.C: New model.
+
+	* organic_matter.C: Made it a component.
+	* Makefile (COMPONENTS): Added it.
+	* organic_std.C: Moved model here.
+	* Makefile (MODELS): Added it.
+
+2006-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry_rect.C, geometry_rect.h: New submodel.
+	* Makefile (SUBMODELS): Add it.
+	* column_rect.C: New model.
+	* Makefile (MODELS): Add it.
+
+2006-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat.h, soil_heat1d.C (T_surface_snow): New virtual member
+	function. 
+	* snow.C (tick): Use it.
+
+	* bioclimate_std.C (WaterDistribution): Removed "node 0 is top"
+	assumption. 
+	* column_std.C (tick): Ditto.
+	* soil_chemicals.C (mixture): Ditto.
+	* surface.C (albedo): Ditto.
+
+	* select_content.C (output_array): Removed 1D assumptions.
+	* select_interval.C: Ditto.
+
+2006-04-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* adadsorption.h, adsadsorption.C, adsorption_full.C (full): New
+	virtual member function with default implementation.
+
+	* bioincorporation.C: Removed 1D assumption.
+
+	* lib/chemistry.dai (solid): Removed transport.
+
+	* organic_matter.C (mix): Reset tillage age based on z, not zplus.
+	(top_summary, initialize): Removed 1D assumptions.
+
+	* organic_matter.C (active): New function.
+	(active_size): Removed.
+	* column_std.C (tick): Update caller.
+	* denitrification.C (tick) Change argument.
+	(initialize): New function.
+	* column_std.C (initialize): Update caller.
+	* om.C (initialize): New function.
+	(grow): Removed.
+	* all: Updated callers.
+
+2006-04-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil.C, soil.h (MaxRootingHeight): Renamed from 'MaxRootingDepth'
+
+2006-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* element.h, element.C: Extracted from 'dom.C'.
+	* Makefile (SUBMODELS): Added.
+
+2006-04-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soltrans1d.C, soltrans1d.h: New submodel.
+	* Makefile (SUBMODELS): Added it.
+	* column_base.C: Use it.
+	* column_base.C, column_base.h (tick_base_soil_chemicals): New
+	function. 
+	* column_std.C, column_inorganic.C: Update derived.
+	* solute.C: Remove transport.
+
+	* all: Changed 'Geometry::size' to 'Geometry::node_size'.
+
+	* select_flux.h, select_flux.C: New interface.
+	* Makefile (SPECIALS): Add it.
+	* select_flux_top.C, select_flux_bottom.C: Use it.
+	
+2006-04-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry1d.h, geometry1d.C, geometry.h (fraction_in_z_interval)
+	(edge_cross_z): New virtual member functions.
+
+	* soil_water.h, soil_water.C: Made most stuff virtual.
+	* soil_water1d.h, soil_water1d.C: New special.
+	* Makefile (SUBMODELS): Added it.
+	* column_base.h, column_base.C: Use it.
+	* groundwater.h, uzmodel.h, macro.h: Use it.
+
+2006-04-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.h, geometry1d.h, geometry1d.C: Use size_t instead of
+	unsigned int. 
+	* soil.h, soil.C, soil_water.h, soil_water.C: Ditto.
+
+2006-04-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rootdens_AP.C, rootdens_G_P.C (set_density): 
+	* crop_std.C, crop_simple.C (tick): Generic geometry.
+	* crop_old.C, crop_sold.C (Emergence, RootPenetration)
+	(NetProduction): Ditto 
+
+	* rootdens_AP.C (set_density): Fix bug where tip density just
+	grew. 
+
+2006-04-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry1d.C (check_border): New function.
+
+2006-04-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat1d.C (soil_heat_submodel): Fix name of submodel.
+
+2006-04-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_old.C: Ditto.
+
+	* geometry.h, geometry.C: Made it an almost pure base.
+	* geometry1d.h, geometry1d.C: New submodel.
+	* Makefile (SUBMODELS): Added it.
+	* column_base.C, column_base.h: Use it.
+	* ridge.C: Only works with Geometry1D.
+	* root_system.C (potential_water_uptake): Avoid using Geometry::dz.
+	
+	* crop_std.C (tick): First parameter of 'Phenology::emergence' is
+	pressure, not depth.
+
+2006-04-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_r2d2.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* All: Split Soil and Geometry abstractions.
+	
+2006-04-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.02 released.
+
+	* Bug fixes.
+
+2006-04-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* partition.C (load_syntax): Typo.
+
+	* bioincorporation.C (tick): Change assertion to warning.
+
+2006-04-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.01 released.
+
+2006-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (SUBMODELS): Added it.
+
+	* soil_heat1d.C: New submodel.
+
+2006-03-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat.C, soil_heat.h (capacity, capacity_apparent): New
+	public members. 
+	* soil_heat.C (capacity, C_apparent): Removed log variables.
+	(solve, calculate_freezing_rate): Update callers.
+
+2006-03-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* movement.h, movement.C: New component.
+	* Makefile (COMPONENTS): Added it. 
+	* movement_1D.C: New model.
+	* Makefile (MODELS): Added it.
+
+2006-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/heat-properties.dai: New file.
+	* sample/Makefile (SETUPS): Added.
+
+	* parser_file.C (get_string): Support '\t' escape.
+
+	* number_soil.C (soil_heat_capacity, soil_heat_conductivity): New
+	models.
+
+2006-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (TempScale, TempOffset): New parameters.
+
+2006-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.00 released.
+
+2006-01-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_expr.C (load): Fix logic error.
+
+2006-01-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* boolean.C (BooleanOrSyntax): Typo.
+
+2006-01-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_file.C, source_file.h (handle): New parameter.
+
+2006-01-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* treelog.C (warning, error): Suffix message.
+
+2006-01-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* treelog.C (error, warning): Prefix message.
+
+2006-01-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* integer.C, integer.h: New component.
+	* Makefile (COMPONENTS): Add it.
+	* integer_arit.C: New model.
+	* Makefile (MODELS): Add it.
+
+2006-01-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_content.C: Use linear interpolation between node points.
+
+2005-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (tick): Check that CAI is larger than 0 before
+	calculating assimilate production by photosynthesis.  Needed to
+	make the code survive a cut that leaves no CAI.
+
+2005-12-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* number_source.C (source_average): New model.
+

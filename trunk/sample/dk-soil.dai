@@ -1,0 +1,122 @@
+;;  Examles of specific Danish Soils 
+(defhorizon "Askov Ap" default
+  "Askov 10 & 30 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.113)  (silt 0.277) (fine_sand 0.348) (coarse_sand 0.236)
+  (humus 0.026) (C_per_N 11)
+  (hydraulic M_vG (Theta_res 0.0)(Theta_sat 0.392)
+             (alpha 0.0385)(n 1.211)(K_sat 7.52 [cm/h])))
+
+(defhorizon "Askov B" default
+  "Askov 50 & 70 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.235)  (silt 0.253) (fine_sand 0.364) (coarse_sand 0.143)
+  (humus 0.005) (C_per_N 11)
+  (hydraulic M_vG (Theta_res 0.0)(Theta_sat 0.445)
+             (alpha 0.2605)(n 1.135)(K_sat 14.5[cm/h])))
+
+(defhorizon "Askov C" default
+  "Askov 90 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.244)  (silt 0.283) (fine_sand 0.357) (coarse_sand 0.111)
+  (humus 0.005) (C_per_N 11)
+  (hydraulic M_vG (Theta_res 0.000)(Theta_sat 0.401)
+             (alpha 0.057)(n 1.131)(K_sat 5.0 [cm/h])))
+
+(defcolumn Askov default
+  "This is a JB6 soil with free drainage macropores."
+  (Groundwater deep)
+  (Soil (MaxRootingDepth 100.00 [cm])
+        (dispersivity  4.00)
+        (horizons (  -27.00 "Askov Ap")
+                  (  -80.00 "Askov B")
+                  ( -250.00 "Askov C"))))
+
+(defhorizon "Jyndevad Ap" default
+  "Jyndevad 10 & 30 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.038)  (silt 0.072) (fine_sand 0.183) (coarse_sand 0.684)
+  (humus 0.023) (C_per_N 13)
+  (hydraulic M_vG (Theta_res 0.055)(Theta_sat 0.432)
+             (alpha 0.0630)(n 1.641)(K_sat 21.7[cm/h])))
+
+(defhorizon "Jyndevad C" default
+  "Jyndevad 50 & 90 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.028)  (silt 0.023) (fine_sand 0.096) (coarse_sand 0.849)
+  (humus 0.004) (C_per_N 13)
+  (hydraulic M_vG (Theta_res 0.055)(Theta_sat 0.432)
+             (alpha 0.0630)(n 1.641)(K_sat 21.7[cm/h])))
+
+(defcolumn Jyndevad default
+  (description "This is a JB1 soil with free drainage")
+  (Groundwater deep)
+  (Soil (MaxRootingDepth 60 [cm])
+        (horizons (  -30.00 "Jyndevad Ap")
+                  ( -250.00 "Jyndevad C"))))
+
+(defhorizon "Foulum AP" default
+  "Provided by DJF as part if the FertOrgaNic project."
+    (clay 0.115)
+    (silt 0.110)
+    (fine_sand 0.420)
+    (coarse_sand 0.332)
+    (humus 0.023)
+    (C_per_N 11.2)
+    (dry_bulk_density 1.45)  
+    (hydraulic M_vG
+        (K_sat 2.995)
+        (Theta_sat 0.46)
+        (Theta_res 0.00)
+        (alpha 0.05334)
+        (n 1.2870)))
+
+(defhorizon "Foulum B" default
+  "Provided by DJF as part if the FertOrgaNic project."
+    (clay 0.149)
+    (silt 0.101)
+    (fine_sand 0.435)
+    (coarse_sand 0.310)
+    (humus 0.005)
+    (C_per_N 11.3)
+    (dry_bulk_density 1.45) 
+    (hydraulic M_vG
+        (K_sat 1.796)
+        (Theta_sat 0.386)
+        (Theta_res 0.000)
+        (alpha 0.0398)
+        (n 1.2585)))
+
+(defhorizon "Foulum C" default
+  "Provided by DJF as part if the FertOrgaNic project."
+    (clay 0.164)
+    (silt 0.106)
+    (fine_sand 0.419)
+    (coarse_sand 0.310)
+    (humus 0.002)
+    (C_per_N 9.1)
+    (dry_bulk_density 1.55) 
+    (hydraulic M_vG
+        (K_sat 1.038)
+        (Theta_sat 0.345)
+        (Theta_res 0.00)
+        (alpha 0.0283)
+        (n 1.2200)))
+
+(defcolumn Foulum default
+  "Provided by DJF as part if the FertOrgaNic project."
+  (Soil (MaxRootingDepth 100.00)
+        (horizons (  -30.00 "Foulum AP")
+                  (  -90.00 "Foulum B")	
+                  ( -150.00 "Foulum C")))
+  (OrganicMatter original
+                 (init (input 4411 [kg C/ha/y])
+                 (end -18 [cm])
+                 (root 911 [kg C/ha/y]))))
+
+;;; dk-soil.dai ends here

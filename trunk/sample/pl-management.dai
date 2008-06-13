@@ -1,0 +1,122 @@
+;; pl-management.dai -- Sample Polish management from FertOrgaNic project.
+
+;; Contact: Plant Breeding and Acclimatisation Institute, Department
+;; of Agronomy, Jadwisin, 05-140 Serock, Poland; e-mail:
+;; w.mazurczyk@ihar.edu.pl.
+
+;;; Fertilizers.
+
+(defam cattleJad_manure04 organic	; cto organic instead of manure when using João's values
+;(defam cattleJad_manure04 manure
+  (description "Swieciennica04.")
+  (dry_matter_fraction 0.243)
+  ;(total_N_fraction 0.0181)
+  ;(total_C_fraction 0.221)
+  ;;cto 13/2-06
+  (total_N_fraction 0.01895)
+  (total_C_fraction 0.235)
+  (NH4_fraction 0.077)
+  (NO3_fraction 0.0217)
+  ;(volatilization  1.00 []);;From database
+  (volatilization  0.15 []) ;;20/2-06 cto after Søren, Per
+  ;;cto 13/2-06
+  ;;cto 13/6 test of João's values
+  (om ;;AOM1 "fra AOM-Min-pl cow FYM 4 nyt nulpkt.xls"
+      ((initial_fraction 0.088 [])
+       (C_per_N 14.4 [(g C/cm^3)/(g N/cm^3)])
+       (turnover_rate 2.5e-3 [h^-1])
+       (efficiency 0.40 0.40 [])
+       (fractions 0.0 1.0 0.0 []))
+      ;;AOM2 
+      ((initial_fraction 0.63 [])
+       ;(C_per_N 100 [(g C/cm^3)/(g N/cm^3)])
+       (turnover_rate 7.23e-5 [h^-1])
+       (efficiency 0.40 0.40 [])
+       (fractions 0.0 1.0 0.0 []))
+      ;;AOM3
+      ((turnover_rate 1.0 [h^-1])
+       (C_per_N 11 [(g C/cm^3)/(g N/cm^3)])
+       (efficiency 1.0 [])
+       (fractions 0.0 0.0 1.0 [])))
+ ;;cto 13/6 test of João's values
+  )
+
+;;; Warmup.
+
+(defaction Maize_99 activity
+  (wait_mm_dd 4 20) (fertilize (AmmoniumNitrate (weight 70 [kg N/ha])))
+  (seed_bed_preparation)
+  (sow "Maize")
+  (wait (or (crop_ds_after "Maize" 2.0) (mm_dd 9 25))) 
+  (harvest "Maize"
+	   (stub 8 [cm]) (stem 1.00 []) (leaf 1.00 []))
+  (wait_mm_dd 9 27)(stubble_cultivation)
+  )
+
+(defaction Potato_00 activity
+  (wait_mm_dd 10 23) 
+  (fertilize ("cattleJad_manure04" (weight 25 [Mg w.w./ha])))
+  (plowing)
+  (wait_mm_dd 4 15) 
+  (fertilize (AmmoniumNitrate (weight 90 [kg N/ha])))
+  (wait_mm_dd 4 19)
+  (seed_bed_preparation)
+  (sow "Potato; Triada")
+  (wait (or (crop_ds_after "Potato; IHAR 2004" 2.0 []) ;Ripe
+            (mm_dd 9 10)))
+  (harvest "Potato; IHAR 2004"(stem 0.00 []) (leaf 0.00 []))
+  (wait_mm_dd 9 23)  )
+
+
+
+;; Spring Wheat Torka 2001
+(defaction SWheat_01 activity
+  (wait_mm_dd 11 12)(plowing)
+  (wait_mm_dd 4 03) 
+  (fertilize (AmmoniumNitrate (weight 20 [kg N/ha])))
+  (wait_mm_dd 4 06)  
+  (seed_bed_preparation)
+  (sow "Spring Wheat")
+  (wait (or (crop_ds_after "Spring Wheat" 2.0) (mm_dd 8 12))) 
+  (harvest "Spring Wheat"
+	   (stub 8 [cm]) (stem 0.00 []) (leaf 0.00 []))
+  (stubble_cultivation)
+  )
+
+;; Winter Wheat Zyta 2002
+(defaction WWheat_02 activity
+  (wait_mm_dd 9 20) (fertilize (AmmoniumNitrate (weight 24 [kg N/ha])))
+  (wait_mm_dd 9 28)
+  (seed_bed_preparation)  (sow "Winter Wheat")
+  (wait_mm_dd 5 21)   (fertilize (AmmoniumNitrate (weight 46 [kg N/ha])))
+  (wait (or (crop_ds_after "Winter Wheat" 2.0) (mm_dd 8 03))) 
+  (harvest "Winter Wheat"
+	   (stub 8 [cm]) (stem 0.00 []) (leaf 0.00 []))
+  (stubble_cultivation)
+  
+  )
+
+;; Spring Wheat Ismena 2003
+(defaction SWheat_03 activity
+  (wait_mm_dd 11 06)(plowing)
+  (wait_mm_dd 4 10) 
+  (fertilize (AmmoniumNitrate (weight 20 [kg N/ha])))
+  (wait_mm_dd 4 12)
+  (seed_bed_preparation)
+    ;7/2-06 cto; Because Spring wheat else don't give any yield
+  (sow ("Spring Wheat" (Canopy (SpLAIfac (0.0 100) (1.0 100)))))
+  ;;(sow "Spring Wheat")
+  (wait_mm_dd 4 29) 
+  (fertilize (AmmoniumNitrate (weight 68 [kg N/ha])))
+  (wait (or (crop_ds_after "Spring Wheat" 2.0) (mm_dd 8 10))) 
+  (harvest "Spring Wheat"
+	   (stub 8 [cm]) (stem 0.00 []) (leaf 0.00 []))
+  (stubble_cultivation)
+  )
+
+;; WarmUp period Rotation setup for potato field 2003
+(defaction "WP1 PL 2004 warmup" activity
+  Maize_99 Potato_00 SWheat_01 WWheat_02 SWheat_03 
+  )
+
+;; pl-management.dai ends here.

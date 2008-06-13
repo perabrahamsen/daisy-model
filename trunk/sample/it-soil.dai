@@ -1,0 +1,59 @@
+;;; it-soil.dai -- Examples of specific Italian soil.
+;;
+;; This is from the CER institute, near Bologna.
+;; The original parameterization was by 
+;;  "A. Battilani" <battilani@consorziocer.it>
+;; Some modification has been made by Per Abrahamsen <abraham@dina.kvl.dk>.
+;;
+;; Permission for redistribution is granted as long as the original
+;; author is mentioned.
+
+;;Dati Marsili appezzamento 21 del 1997 Rotazione corretta 
+;;SOIL CHARACTERISTICS: MarsiliWarmUp97
+
+(defhorizon "WP1 IT CER 2005 L50" default
+  (C_per_N 10.2)
+  (dry_bulk_density 1.2 [g/cm^3])
+  (clay 0.190 [])
+  (silt 0.502 [])
+  (sand 0.308 [])
+  (humus 0.0121 [])                     ;)
+  ;;PTF Van Genuchten Mualem
+  (hydraulic M_vG
+             (K_sat 1.96 [cm/h]) 
+             (Theta_res 0.01[cm^3 H2O/cm^3])
+             (Theta_sat 0.500[cm^3 H2O/cm^3])
+             (alpha 0.0623[cm^-1])
+             (n 1.306)))
+
+(defhorizon "WP1 IT CER 2005 L100" default
+  (C_per_N  10.4)
+  (dry_bulk_density 1.35 [g/cm^3])
+  (clay 0.160 [])
+  (silt 0.357 [])
+  (sand 0.483 [])
+  (humus 0.0079 [])                     ;)
+  ;;PTF Van Genuchten Mualem
+  (hydraulic M_vG
+             (K_sat 1.239 [cm/h])
+             (Theta_res 0.01[cm^3 H2O/cm^3])
+             (Theta_sat 0.450[cm^3 H2O/cm^3])
+             (alpha 0.0636[cm^-1])
+             (n 1.327)))
+
+;;Defcolumn per falda fissa (possibile dinamica) e RZ=40
+;; root groundwater 2 layer column
+(defcolumn "WP1 IT CER 2005" default
+  (Soil (MaxRootingDepth 100 [cm])
+        (border -20 -30 -50 -60 -100 -150 [cm])
+        (horizons (-30 [cm] "WP1 IT CER 2005 L50")
+                  ;; Only top 100 cm known.
+                  (-300 [cm] "WP1 IT CER 2005 L100")))
+  (OrganicMatter original 
+                 (init (input 3281 [kg C/ha/y])
+                       (end -30 [cm])
+                       (root 775 [kg C/ha/y])
+                       (background_mineralization 65[kg N/ha/y])))
+  (Groundwater (file "it-cer.gwt")))
+
+;;; it-soil.dai ends here

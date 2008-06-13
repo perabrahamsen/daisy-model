@@ -1,0 +1,3086 @@
+;;; log.dai --- standard log files
+
+(input file "log-std.dai")
+
+;; We don't want an initial line just because times are not fluxes.
+(defselect Year number 
+  (path time year)
+  (interesting_content false))
+
+(defselect Month number 
+  (path time month)
+  (interesting_content false))
+
+(defselect MDay number 
+  (path time mday)
+  (interesting_content false))
+
+(defselect Hour number 
+  (path time hour)
+  (interesting_content false))
+ 
+(defselect Week number 
+  (path time week)
+  (interesting_content false))
+ 
+(defselect YDay number 
+  (path time yday)
+  (interesting_content false))
+ 
+(defselect WDay number 
+  (path time wday)
+  (interesting_content false))
+
+(deflog "Total Soil Content" column
+  "Information about the water, carbon and nitrogen content of the soil."
+  (where "${colfid}soil_content.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (interval (path column "${column}" SoilWater Theta)
+                     (spec fixed SoilWater Theta)
+                     (tag "Water")
+                     (dimension "mm"))
+           (interval (tag "NH4")
+                     (path column "${column}" Chemistry "*" trace NH4 M)
+                     (spec chemical default M)
+                     (dimension "kg N/ha"))
+           (interval (tag "NO3")
+                     (path column "${column}" Chemistry "*" trace NO3 M)
+                     (spec chemical default M)
+                     (dimension "kg N/ha"))
+           (interval (tag "ORG_N")
+                     (path column "${column}" OrganicMatter "*" total_N)
+                     (spec organic default total_N)
+                     (dimension "kg N/ha"))
+           (interval (tag "ORG_C")
+                     (path column "${column}" OrganicMatter "*" total_C)
+                     (spec organic default total_C)
+                     (dimension "kg C/ha"))
+           (interval (tag "SOM_N")
+                     (path column "${column}" OrganicMatter "*" som "*" N)
+                     (spec fixed SOM N)
+                     (dimension "kg N/ha"))
+           (interval (tag "SOM_C")
+                     (path column "${column}" OrganicMatter "*" som "*" C)
+                     (spec fixed SOM C)
+                     (dimension "kg C/ha"))
+           (interval (tag "SMB_N")
+                     (path column "${column}" OrganicMatter "*" smb "*" N)
+                     (spec fixed SMB N)
+                     (dimension "kg N/ha"))
+           (interval (tag "SMB_C")
+                     (path column "${column}" OrganicMatter "*" smb "*" C)
+                     (spec fixed SMB C)
+                     (dimension "kg C/ha"))
+           (interval (tag "AOM_N")
+                     (path column "${column}" OrganicMatter "*" am "*" om "*" N)
+                     (spec fixed AOM N)
+                     (dimension "kg N/ha"))
+           (interval (tag "AOM_C")
+                     (path column "${column}" OrganicMatter "*" am "*" om "*" C)
+                     (spec fixed AOM C)
+                     (dimension "kg C/ha"))
+           (interval (tag "BUFFER_N")
+                     (path column "${column}" OrganicMatter "*" buffer N)
+                     (spec organic default buffer N)
+                     (dimension "kg N/ha"))
+           (interval (tag "BUFFER_C")
+                     (path column "${column}" OrganicMatter "*" buffer C)
+                     (spec organic default buffer C)
+                     (dimension "kg C/ha"))))
+
+(deflog "Soil N Residuals" column
+  "Added N from crop residual in all numeric soil layers."
+  (where "${colfid}soil_N_res.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" residuals_N_soil)
+                  (handle sum)
+                  (factor 1e5)      ;g/cm^2 -> kg/ha
+                  (dimension "kg N/ha/cm/&"))))
+
+(deflog "Soil C Residuals" column
+  "Added C from crop residual in all numeric soil layers."
+  (where "${colfid}soil_C_res.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" residuals_C_soil)
+                  (handle sum)
+                  (factor 1e5)      ;g/cm^2 -> kg/ha
+                  (dimension "kg C/ha/cm/&"))))
+
+(deflog "NO3 Root Uptake" column
+  (where "${colfid}no3_uptake.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+   (array (path column "${column}" Chemistry "*" trace NO3 S_root)
+	  (spec chemical default S_root)
+          (tag "NO3-Root")
+	  (negate true)
+          (handle sum)
+          (dimension "kg N/ha/cm/&"))))
+
+(deflog "NH4 Root Uptake" column
+  (where "${colfid}nh4_uptake.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+   (array (path column "${column}" Chemistry "*" trace NH4 S_root)
+	  (spec chemical default S_root)
+          (tag "NH4-Root")
+	  (negate true)
+          (handle sum)
+          (dimension "kg N/ha/cm/&"))))
+
+(deflog "Soil NO3 Concentration" column
+  "Amount of nitrate in all numeric soil layers.
+This include both the nitrogen and oxygen atoms of the nitrate."
+  (where "${colfid}soil_NO3.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace NO3 C)
+                  (dimension "mg/l")
+                  (factor 4.43e6))))     ;g NO3-N/cm³ -> mg NO3/l
+
+
+(deflog "Soil NO3-N Concentration" column
+  "Amount of nitrate nitrogen in all numeric soil layers.
+This include only nitrogen atoms of the nitrate."
+  (where "${colfid}soil_NO3-N.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace NO3 C)
+                  (spec chemical default C)
+                  (dimension "mg/l"))))
+
+(deflog "Soil NH4-N Concentration" column
+  "Amount of dissolved ammonium nitrogen in all numeric soil layers.
+This include only nitrogen atoms of the ammonium."
+  (where "${colfid}soil_NH4-N_conc.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace NH4 C)
+                  (spec chemical default C)
+                  (dimension "mg/l"))))
+
+(deflog "Soil NH4-N Content" column
+  "Total amount of ammonium nitrogen in all numeric soil layers.
+This include only nitrogen atoms of the ammonium."
+  (where "${colfid}soil_NH4-N_content.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace NH4 M)
+                  (spec chemical default M))))
+
+(deflog "Soil Temperature" column
+  "Temperature in all numeric soil layers."
+  (where "${colfid}soil_temperature.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" SoilHeat T)
+                  (spec fixed SoilHeat T)
+                  (dimension "dg C"))))
+
+(deflog "Soil Water Potential" column
+  "Water potential in all numeric soil layers, in cm."
+  (where "${colfid}soil_water_potential.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" SoilWater h)
+                  (spec fixed SoilWater h)
+                  (dimension "cm"))))
+
+(deflog "Soil Water Potential (pF)" column
+  "Water potential in all numeric soil layers, in pF."
+  (where "${colfid}soil_water_pF.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (pF (path column "${column}" SoilWater h)
+               (spec fixed SoilWater h))))
+
+(deflog "Soil Water Sink" column
+  "The water sink in all numeric soil layers.
+The water sink is an aggregate of root uptake, preferential flow,
+flow to drain pipes, and subsoil irrigation."
+  (where "${colfid}soil_water_sink.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" SoilWater S_sum)
+                  (spec fixed SoilWater S_sum)
+                  (handle sum)
+                  (dimension "cm^3/cm^3/&"))))
+
+(deflog "Soil Hydraulic Conductivity (log10)" column
+  (when daily)
+  (where "${colfid}soil_hydraulic_conductivity.dlf")
+  (entries (array (path column "${column}" SoilWater K)
+                  (expr (dim (log10 x) [log10 cm/h]))
+                  (spec fixed SoilWater K))))
+
+
+(deflog "Soil Heat Conductivity" column
+  (when daily)
+  (where "${colfid}soil_heat_conductivity.dlf")
+  (entries (array (path column "${column}" SoilHeat conductivity)
+                  (dimension [W/m/K])
+                  (spec fixed SoilHeat conductivity))))
+
+(deflog "Soil Heat Capacity" column
+  (when daily)
+  (where "${colfid}soil_heat_capacity.dlf")
+  (entries (array (path column "${column}" SoilHeat capacity)
+                  (dimension [kJ/m^3/K])
+                  (spec fixed SoilHeat capacity))))
+
+(deflog "Preferential Water Flux" column
+  "The preferential water flux between all numeric soil layers."
+  (where "${colfid}pref_water_flux.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" SoilWater q_p)
+                  (factor -10)          ;cm->mm
+                  (dimension "mm/&"))))
+
+(deflog "Matrix Water Flux" column
+  "The matrix water flux between all numeric soil layers."
+  (where "${colfid}matrix_water_flux.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" SoilWater q)
+                  (factor -10)          ;cm->mm
+                  (handle sum)
+                  (dimension "mm/&"))))
+
+(deflog "Preferential NO3 Transport" column
+  "The preferential nitrogen transport between all numeric soil layers."
+  (where "${colfid}pref_NO3.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace NO3 J_tertiary)
+                  (spec chemical default J_tertiary)
+                  (tag "NO3-J_tertiary")
+                  (handle sum)
+                  (dimension "kg N/ha/&"))))
+
+(deflog "Preferential NH4 Transport" column
+  "The preferential ammonium transport between all numeric soil layers."
+  (where "${colfid}pref_NH4.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace NH4 J_tertiary)
+                  (spec chemical default J_tertiary)
+                  (tag "NH4-J_tertiary")
+                  (handle sum)
+                  (dimension "kg N/ha/&"))))
+
+(defsummary "Evapotranspiration" simple
+  "Summary of evapotranspiration."
+  (precision 1)
+  (fetch ("RefEvapotranspiration"
+          (name "Evapotranspiration, reference, dry"))
+         ("Potential Evapotranspiration"
+          (name "Evapotranspiration, potential, wet"))
+         ("Actual Evapotranspiration"
+          (name "Evapotranspiration, actual"))
+         ("Evaporation from snow")
+         ("Evaporation from canopy")
+         ("Evaporation from litter")
+         ("Evaporation from ponded water")
+         ("Evaporation of soil water")
+         ("Actual transpiration" (name "Transpiration")))
+  (print_sum false))
+
+(deflog "Surface Water Balance" column
+  "Enough information to create a water balance for the soil surface."
+  (summary "Evapotranspiration")
+  (where "${colfid}surface_water_balance.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (number (path weather "*" rain)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path weather "*" snow)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" irrigation_overhead)
+                   (tag "Overhead Irrigation")
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" irrigation_surface)
+                   (tag "Surface Irrigation")
+                  (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" pet "*" reference_evapotranspiration)
+                   (tag "RefEvapotranspiration")
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" total_ep)
+                   (tag "Potential Evapotranspiration")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" total_ea)
+                   (tag "Actual Evapotranspiration")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" crop_ea)
+                   (tag "Actual transpiration")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" canopy_ea)
+                   (tag "Evaporation from canopy")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" snow_ea)
+                   (tag "Evaporation from snow")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" litter_ea)
+                   (tag "Evaporation from litter")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" pond_ea)
+                   (tag "Evaporation from ponded water")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" soil_ea)
+                   (tag "Evaporation of soil water")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (flux_top (path column "${column}" SoilWater q)
+                     (tag "Matrix Infiltration")
+                     (handle sum)
+                     (dimension "mm/&")
+                     (factor -10))      ;cm -> mm
+           (flux_top (path column "${column}" SoilWater q_p)
+                     (tag "Macropore Infiltration")
+                     (handle sum)
+                     (dimension "mm/&")
+                     (factor -10))      ;cm -> mm
+           (number (path column "${column}" Surface pond)
+                   (tag "Surface Ponding")            
+                   (dimension "mm"))
+           (number (path column "${column}" Surface runoff)
+                   (tag "Surface Runoff")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" canopy_water_storage)
+                   (tag "Interception Storage")            
+                   (dimension "mm"))
+           (number (path column "${column}" Bioclimate "*" Snow Ssnow)
+                   (tag "Snow Storage")
+                   (dimension "mm"))
+           (number (path column "${column}" Bioclimate "*" production_stress))))
+
+(deflog "Ridge" column
+  "All information about the Ridge subsystem."
+  (where "${colfid}ridge.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (number (path column "${column}" Surface ridge Theta_pre)
+                   (dimension "cm^3/cm^3"))
+           (number (path column "${column}" Surface ridge Theta)
+                   (dimension "cm^3/cm^3"))
+           (number (path column "${column}" Surface ridge h)
+                   (dimension "cm"))
+           (number (path column "${column}" Surface ridge z_pond)
+                   (dimension "cm"))
+           (number (path column "${column}" Surface ridge x_pond))
+           (number (path column "${column}" Surface ridge internal_ponding)
+                   (dimension "cm"))
+           (number (path column "${column}" Surface ridge R_bottom)
+                   (dimension "h"))
+           (number (path column "${column}" Surface ridge R_wall)
+                   (dimension "h"))
+           (number (path column "${column}" Surface ridge I_bottom)
+                   (handle sum)
+                   (dimension "cm/&"))
+           (number (path column "${column}" Surface ridge I_wall)
+                   (handle sum)
+                   (dimension "cm/&"))
+           (number (path column "${column}" Surface ridge I)
+                   (handle sum)
+                   (dimension "cm/&"))))
+
+(defsummary "Total Water Balance" simple
+  "Water balance for the complete system.
+
+Root Extraction only summarizes water removed from the soil in the
+interval being logged, so it will be different from Transpiration if
+you do not log the entire root zone.
+
+Surface Leak will be different from Matrix infiltration, only if you
+do not log from the top of the soil (The 'from' parameter not equal to
+zero).
+
+Tillage can be different from zero iff you do not log the entire
+plowing layer.
+
+Note that negative deltas means the amount of water increases."
+  (precision 1)
+  (fetch (rain (name "Rain"))
+	 (snow (name "Snow"))
+	 ("Surface Irrigation")
+	 ("Overhead Irrigation")
+	 ("Subsoil Irrigation")
+	 ("Evapotranspiration" (factor -1.0))
+	 ("Surface Matrix Leak" (factor -1.0))
+	 ("Surface Macropore Leak" (factor -1.0))
+	 ("Matrix Infiltration")
+	 ("Macropore Infiltration")
+	 ("Matrix Percolation" (factor -1.0))
+	 ("Macropore Percolation" (factor -1.0))
+	 ("Drain flow" (factor -1.0))
+	 ("Soil Water Content" (name "Soil Water") (factor -1.0))
+	 ("Surface Ponding" (name "Ponding") (factor -1.0))
+	 ("Surface Runoff" (factor -1.0))
+	 ("Interception Storage" (name "Stored on leafs") (factor -1.0))
+	 ("Snow Storage" (name "Snow Pack") (factor -1.0))
+         ("Transpiration")
+         ("Root Extraction" (factor -1.0))
+         ("Tillage")
+         )
+  (sum_name "Balance"))
+
+(deflog "Root Zone Water Balance" column
+  "Enough information to create a water balance for the root zone."
+  (where "${colfid}root_zone_water_balance.dlf")
+  (when hourly)
+  (summary "Total Water Balance")
+  (entries ;; Year Month MDay Hour
+           (number (path weather "*" rain)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path weather "*" snow)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" irrigation_overhead)
+                   (tag "Overhead Irrigation")
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" irrigation_surface)
+                   (tag "Surface Irrigation")
+                   (handle sum)
+                   (dimension "mm/&"))
+           (interval (path column "${column}" SoilWater S_incorp)
+                     (tag "Subsoil Irrigation")
+                     (handle sum)
+                     (dimension "mm/&")
+                     (factor -10))
+           (number (path column "${column}" Bioclimate "*" irrigation_total)
+                   (tag "Total Irrigation")
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" pet "*" reference_evapotranspiration)
+                   (tag "Ref. Evapotranspiration")
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" total_ep)
+                   (tag "Pot. Evapotranspiration")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" total_ea)
+                   (tag "Evapotranspiration")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" crop_ea)
+                   (tag "Transpiration")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" soil_ea)
+                   (tag "Evaporation of soil water")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (index (path column "${column}" SoilWater q)
+                  (index 0)
+                  (tag "Surface Matrix Leak")
+                  (handle sum)
+                  (dimension "mm/&")
+                  (factor -10))      ;cm -> mm
+           (index (path column "${column}" SoilWater q_p)
+                  (index 0)
+                  (tag "Surface Macropore Leak")
+                  (handle sum)
+                  (dimension "mm/&")
+                  (factor -10))      ;cm -> mm
+           (flux_top (path column "${column}" SoilWater q)
+                     (tag "Matrix Infiltration")
+                     (handle sum)
+                     (dimension "mm/&")
+                     (factor -10))      ;cm -> mm
+           (flux_top (path column "${column}" SoilWater q_p)
+                     (tag "Macropore Infiltration")
+                     (handle sum)
+                     (dimension "mm/&")
+                     (factor -10))      ;cm -> mm
+           (flux_bottom (path column "${column}" SoilWater q)
+                        (tag "Matrix Percolation")
+                        (handle sum)
+                        (dimension "mm/&")
+                        (factor -10))   ;cm -> mm
+           (flux_bottom (path column "${column}" SoilWater q_p)
+                        (tag "Macropore Percolation")
+                        (handle sum)
+                        (dimension "mm/&")
+                        (factor -10))   ;cm -> mm
+           (interval (path column "${column}" SoilWater S_drain)
+                     (tag "Drain flow")
+                     (handle sum)
+                     (dimension "mm/&")
+                     (factor 10))
+           (interval (path column "${column}" SoilWater S_root)
+                     (tag "Root Extraction")
+                     (handle sum)
+                     (dimension "mm/&")
+                     (factor 10))
+           (interval (path column "${column}" SoilWater S_ice)
+                     (tag "Soil Water Freezing")
+                     (handle sum)
+                     (dimension "mm/&")
+                     (factor 10))
+           (interval (path column "${column}" SoilWater tillage)
+                     (tag "Tillage")
+                     (handle sum)
+                     (dimension "mm/&")
+                     (factor 10))
+           (interval (path column "${column}" SoilWater Theta)
+                     (tag "Soil Water Content")
+                     (dimension "mm")
+                     (factor 10))     ;cm -> mm
+           (number (path column "${column}" Surface pond)
+                   (tag "Surface Ponding")            
+                   (dimension "mm"))
+           (number (path column "${column}" Surface runoff)
+                   (tag "Surface Runoff")            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" canopy_water_storage)
+                   (tag "Interception Storage")            
+                   (dimension "mm"))
+           (number (path column "${column}" Bioclimate "*" Snow Ssnow)
+                   (tag "Snow Storage")
+                   (dimension "mm"))))
+
+
+
+
+(defsummary "Nitrogen Balance" simple
+  "Total system mass balance for nitrogen.
+
+Surface Leak will be different from Matrix infiltration, only if you
+do not log from the top of the soil (The 'from' parameter not equal to
+zero).
+
+Tillage can be different from zero iff you do not log the entire
+plowing layer.
+
+Note that a negative delta content means that the amount increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch ("NH4-Fertilizer-Surface")
+         ("NH4-Incorp")
+         ("NH4-Deposit")
+         ("NH4-Surface" (factor -1.0))
+	 ("NH4-Runoff" (factor -1.0))
+         ("NH4-Surface-Matrix" (factor -1.0))
+         ("NH4-Surface-Macro" (factor -1.0))
+         ("NH4-In-Matrix")
+         ("NH4-In-Macro")
+         ("NH4-Leak-Matrix" (factor -1.0))
+         ("NH4-Leak-Macro" (factor -1.0))
+         ("NH4-Drain" (factor -1.0))
+         ("N2O-Nit" (name "Loss during nitrification") (factor -1.0))
+         ("NH4-Total" (name "NH4-Soil") (factor -1.0))
+         ("NH4-Tillage")
+         ("NO3-Fertilizer-Surface")
+         ("NO3-Incorp")
+         ("NO3-Deposit")
+         ("NO3-Surface" (factor -1.0))
+         ("NO3-Runoff" (factor -1.0))
+         ("NO3-Surface-Matrix" (factor -1.0))
+         ("NO3-Surface-Macro" (factor -1.0))
+         ("NO3-In-Matrix")
+         ("NO3-In-Macro")
+         ("NO3-Leak-Matrix" (factor -1.0))
+         ("NO3-Leak-Macro" (factor -1.0))
+         ("NO3-Drain" (factor -1.0))
+         ("Denit" (name "Denitrification") (factor -1.0))
+         ("NO3-Total" (name "NO3-Soil") (factor -1.0))
+         ("NO3-Tillage")
+         (Fixated)
+         ("Org_N-Fertilizer")
+         ("Seed_N")
+         ("Harvest_N" (factor -1.0))
+         ("AOM" (factor -1.0))
+         ("SOM" (factor -1.0))
+         ("SMB" (factor -1.0))
+         ("Buffer" (factor -1.0))
+         ("AOM-Surface" (factor -1.0))
+         ("Bioinc_N-Surface" (factor -1.0))
+         ("Bioinc_N-Soil")
+         ("Residuals_N_root" (factor -1.0))
+         ("Residuals_N_soil")
+         ("Tillage_Org_N_top")
+         ("Tillage_Org_N_soil")
+         ("Crop" (factor -1.0))
+         ("Dead leaves" (factor -1.0))
+	 ("NO3-Crop" (name "NO3 Root uptake (full)"))
+	 ("NO3-Root" (name "NO3 Root uptake (interval)") (factor -1.0))
+	 ("NH4-Crop" (name "NH4 Root uptake (full)"))
+	 ("NH4-Root" (name "NH4 Root uptake (interval)") (factor -1.0))))
+
+
+
+(defsummary "Crop Nitrogen Balance" simple
+  "Total system mass balance for nitrogen i crops.
+
+Note that a negative delta content means that the amount increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch (Fixated)
+         ("NO3-Crop")
+	 ("NH4-Crop")
+         ("Seed_N")
+         ("Harvest_N" (factor -1.0))
+         ("Residuals_N_root" (factor -1.0))
+         ("Residuals_N_top" (factor -1.0))
+         ("Crop" (factor -1.0))
+         ("Dead leaves" (factor -1.0))))
+
+
+	 
+(defsummary "Organic Nitrogen Balance" simple
+  "Total system mass balance for organic bound nitrogen.
+
+Note that a negative delta content means that the amount increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch (Fixated)
+         ("NO3-Crop")
+	 ("NH4-Crop")
+         ("Org_N-Fertilizer")
+         ("Seed_N")
+         ("NO3-immobilization" (name "Immobilization"))
+         ("NH4-mineralization" (name "Mineralization") (factor -1.0))
+         ("Harvest_N" (factor -1.0))
+         ("AOM" (factor -1.0))
+         ("SOM" (factor -1.0))
+         ("SMB" (factor -1.0))
+         ("AOM-Surface" (factor -1.0))
+         ("Bioinc_N-Surface" (factor -1.0))
+         ("Bioinc_N-Soil")
+         ("Residuals_N_root" (factor -1.0))
+         ("Residuals_N_soil")
+         ("Tillage_Org_N_top")
+         ("Tillage_Org_N_soil")
+         ("Crop" (factor -1.0))
+         ("Dead leaves" (factor -1.0))))
+
+
+	 
+(defsummary "NO3 Soil Balance" simple
+  "Mass balance for NO3 in soil.
+
+Tillage can be different from zero iff you do not log the entire
+plowing layer.
+
+Note that a negative delta Content means that the amount of NO3 in the
+soil increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch ("NO3-Incorp" (name "Incorporated"))
+	 ("NO3-In-Matrix" (name "Matrix input"))
+	 ("NO3-In-Macro" (name "Macropores input"))
+	 ("NO3-Leak-Matrix" (name "Matrix leak") (factor -1.0))
+	 ("NO3-Leak-Macro" (name "Macropores leak") (factor -1.0))
+	 ("NO3-Drain" (name "Drain pipes leak") (factor -1.0))
+	 ("NO3-Root" (name "Root uptake") (factor -1.0))
+	 ("NO3-Nit" (name "Nitrification"))
+	 ("Denit" (name Denitrification) (factor -1.0))
+	 ("NO3-immobilization" (name "Immobilization") (factor -1.0))
+         ("NO3-Tillage" (name "Tillage"))
+	 ("NO3-Total" (name "Content") (factor -1.0))))
+
+(defsummary "NH4 Soil Balance" simple
+  "Mass balance for NH4 in soil.
+
+Tillage can be different from zero iff you do not log the entire
+plowing layer.
+
+Note that a negative delta Content means that the amount of NH4 in the
+soil increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch ("NH4-Incorp" (name "Incorporated"))
+	 ("NH4-In-Matrix" (name "Matrix input"))
+	 ("NH4-In-Macro" (name "Macropores input"))
+	 ("NH4-Leak-Matrix" (name "Matrix leak") (factor -1.0))
+	 ("NH4-Leak-Macro" (name "Macropores leak") (factor -1.0))
+	 ("NH4-Drain" (name "Drain pipes leak") (factor -1.0))
+	 ("NH4-Root" (name "Root uptake") (factor -1.0))
+	 ("NH4-Nit" (name "Nitrification") (factor -1.0))
+	 ("NH4-mineralization" (name "Mineralization"))
+         ("NH4-Tillage" (name "Tillage"))
+	 ("NH4-Total" (name "Content") (factor -1.0))))
+
+(deflog "N Balance" crop
+  "Enough information to create a balance for the soil nitrogen."
+  (where "${colfid}N_balance.dlf")
+  (summary "NH4 Soil Balance" "NO3 Soil Balance" "Organic Nitrogen Balance"
+           "Crop Nitrogen Balance" "Nitrogen Balance")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (number (path column "${column}" Chemistry "*" trace NH4 spray)
+		   (spec chemical default spray)
+                   (handle sum)
+                   (tag "NH4-Fertilizer-Surface")
+                   (dimension "kg N/ha/&"))
+           (number (path column "${column}"
+			 Chemistry "*" trace NH4 canopy_dissipate)
+                   (spec chemical default canopy_dissipate)
+                   (handle sum)
+                   (tag "NH4-Volatilization")
+                   (dimension "kg N/ha/&"))
+           (number (path column "${column}" Chemistry "*" trace NH4 deposit)
+		   (spec chemical default deposit)
+                   (handle sum)
+                   (tag "NH4-Deposit")
+                   (dimension "kg N/ha/&"))
+           (interval (path column "${column}" 
+			   Chemistry "*" trace NH4 S_external)
+		     (spec chemical default S_external)
+                     (tag "NH4-Incorp")
+		     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}" Chemistry "*" trace NH4 top_storage)
+		   (spec chemical default top_storage)
+                   (tag "NH4-Surface")
+                   (dimension "kg N/ha"))
+           (number (path column "${column}" Chemistry "*" trace NH4 top_loss)
+		   (spec chemical default top_loss)
+                   (handle sum)
+                   (tag "NH4-Runoff")
+                   (dimension "kg N/ha/&"))
+           (index (path column "${column}" Chemistry "*" trace NH4 J_matrix)
+		  (spec chemical default J_matrix)
+                  (index 0)
+                  (tag "NH4-Surface-Matrix")
+                  (negate true)
+                  (handle sum)
+                  (dimension "kg N/ha/&"))
+           (index (path column "${column}" Chemistry "*" trace NH4 J_tertiary)
+		  (spec chemical default J_tertiary)
+                  (index 0)
+                  (tag "NH4-Surface-Macro")
+                  (negate true)
+                  (handle sum)
+                  (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" Chemistry "*" trace NH4 J_matrix)
+		     (spec chemical default J_matrix)
+                     (tag "NH4-In-Matrix")
+		     (negate true)
+		     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" Chemistry "*" trace NH4 J_tertiary)
+		     (spec chemical default J_tertiary)
+                     (tag "NH4-In-Macro")
+		     (negate true)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NH4 J_matrix)
+			(spec chemical default J_matrix)
+			(negate true)
+                        (handle sum)
+                        (tag "NH4-Leak-Matrix")
+                        (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NH4 J_tertiary)
+			(spec chemical default J_tertiary)
+			(negate true)
+                        (handle sum)
+                        (tag "NH4-Leak-Macro")
+                        (dimension "kg N/ha/&"))
+           (interval (path column "${column}" Chemistry "*" trace NH4 S_drain)
+		     (spec chemical default S_drain)
+                     (tag "NH4-Drain")
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}" 
+			 Vegetation crops crops "*" Root NH4Upt)
+                   (tag "NH4-Crop")
+                   (handle sum)
+                   (dimension "kg N/ha/&")
+                   (factor 10.0))       ;g/m^2 -> kg N/ha
+           (interval (path column "${column}"
+			   Chemistry "*" trace NH4 S_root)
+		     (spec chemical default S_root)
+                     (tag "NH4-Root")
+		     (negate true)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction nitrification NH4)
+                     (handle sum)
+                     (tag "NH4-Nit")
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+           (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction nitrification NO3)
+                     (handle sum)
+                     (tag "NO3-Nit")
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+           (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction nitrification N2O)
+                     (handle sum)
+                     (tag "N2O-Nit")
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+           (interval (path column "${column}" OrganicMatter "*" NH4_source)
+                     (tag "NH4-mineralization")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+           (interval (path column "${column}" Chemistry "*" trace NH4 M)
+		     (spec chemical default M)
+                     (tag "NH4-Total")
+                     (dimension "kg N/ha"))
+           (interval (path column "${column}"
+			   Chemistry "*" trace NH4 tillage)
+		     (spec chemical default tillage)
+                     (handle sum)
+                     (tag "NH4-Tillage")
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}" Chemistry "*" trace NO3 spray)
+		   (spec chemical default spray)
+                   (handle sum)
+                   (tag "NO3-Fertilizer-Surface")
+                   (dimension "kg N/ha/&"))
+           (number (path column "${column}" Chemistry "*" trace NO3 deposit)
+		   (spec chemical default deposit)
+                   (handle sum)
+                   (tag "NO3-Deposit")
+                   (dimension "kg N/ha/&"))
+           (number (path column "${column}" Chemistry "*" trace NO3 top_storage)
+		   (spec chemical default top_storage)
+                   (tag "NO3-Surface")
+                   (dimension "kg N/ha"))
+           (number (path column "${column}" Chemistry "*" trace NO3 top_loss)
+		   (spec chemical default top_loss)
+                   (handle sum)
+                   (tag "NO3-Runoff")
+                   (dimension "kg N/ha/&"))
+           (index (path column "${column}" Chemistry "*" trace NO3 J_matrix)
+		  (spec chemical default J_matrix)
+                  (index 0)
+                  (tag "NO3-Surface-Matrix")
+		  (negate true)
+                  (handle sum)
+                  (dimension "kg N/ha/&"))
+           (index (path column "${column}" Chemistry "*" trace NO3 J_tertiary)
+		     (spec chemical default J_tertiary)
+                  (index 0)
+                  (tag "NO3-Surface-Macro")
+                  (handle sum)
+		  (negate true)
+                  (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" Chemistry "*" trace NO3 J_matrix)
+		     (spec chemical default J_matrix)
+                     (handle sum)
+                     (tag "NO3-In-Matrix")
+		     (negate true)
+                     (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" Chemistry "*" trace NO3 J_tertiary)
+		     (spec chemical default J_tertiary)
+                     (handle sum)
+		     (negate true)
+                     (tag "NO3-In-Macro")
+                     (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NO3 J_matrix)
+			(spec chemical default J_matrix)
+			(tag "NO3-Leak-Matrix")
+			(negate true)
+			(handle sum)
+			(dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NO3 J_tertiary)
+			(spec chemical default J_tertiary)
+                        (tag "NO3-Leak-Macro")
+			(negate true)
+			(handle sum)
+                        (dimension "kg N/ha/&"))
+           (interval (path column "${column}" Chemistry "*" trace NO3 S_drain)
+		     (spec chemical default S_drain)
+                     (tag "NO3-Drain")
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}" 
+			   Chemistry "*" trace NO3 S_external)
+		     (spec chemical default S_external)
+                     (tag "NO3-Incorp")
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Root NO3Upt)
+                   (tag "NO3-Crop")
+                   (handle sum)
+                   (dimension "kg N/ha/&")
+                   (factor 10.0))       ;g/m^2 -> kg N/ha
+           (interval (path column "${column}" Chemistry "*" trace NO3 S_root)
+		     (spec chemical default S_root)
+                     (tag "NO3-Root")
+		     (negate true)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification converted)
+                     (tag "Denit")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+           (interval (path column "${column}" OrganicMatter "*" NO3_source)
+                     (tag "NO3-immobilization")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (factor -1e5))      ;g/cm^2 -> kg N/ha
+           (interval (tag "NO3-Total")
+                     (path column "${column}" Chemistry "*" trace NO3 M)
+		     (spec chemical default M)
+                     (dimension "kg N/ha"))
+           (interval (tag "NO3-Tillage")
+                     (path column "${column}" Chemistry "*" trace NO3 tillage)
+		     (spec chemical default tillage)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}"
+			 Vegetation crops crops "*" CrpN Fixated)
+                   (handle sum)
+                   (dimension "kg N/ha/&")
+                   (factor 10.0))
+           (number (path column "${column}" OrganicMatter "*" fertilized_N)
+                   (handle sum)
+                   (tag "Org_N-Fertilizer")
+                   (factor 1e5)         ;g/cm^2 -> kg/ha
+                   (dimension "kg N/ha/&"))
+           (number (path column "${column}" seed_N)
+                   (handle sum)
+                   (tag "Seed_N")
+                   (dimension "kg N/ha/&"))
+           (number (path column "${column}" harvest_N)
+                   (handle sum)
+                   (tag "Harvest_N")
+                   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg N/ha/&"))
+           (number (path column "${column}" residuals_N_top)
+                   (handle sum)
+                   (tag "Residuals_N_top")
+                   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg N/ha/&"))
+           (number (path column "${column}" residuals_N_root)
+                   (handle sum)
+                   (tag "Residuals_N_root")
+                   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg N/ha/&"))
+           (interval (path column "${column}" residuals_N_soil)
+                     (handle sum)
+                     (tag "Residuals_N_soil")
+                     (factor 1e5)      ;g/cm^2 -> kg/ha
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}" OrganicMatter "*" tillage_N_top)
+                   (handle sum)
+                   (tag "Tillage_Org_N_top")
+                   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg N/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" tillage_N_soil)
+                     (handle sum)
+                     (tag "Tillage_Org_N_soil")
+                     (factor 1e5)      ;g/cm^2 -> kg/ha
+                     (dimension "kg N/ha/&"))
+           (number (path column "${column}" OrganicMatter "*" Bioincorporation
+                         N_removed)
+                   (tag "Bioinc_N-Surface")
+                   (handle sum)
+                   (dimension "kg N/ha/&")
+                   (factor 10))         ;g/m^2 -> kg/ha
+           (interval (path column "${column}"
+			   OrganicMatter "*" Bioincorporation 
+                           N_added)
+                     (tag "Bioinc_N-Soil")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (tag "AOM")
+                     (path column "${column}" OrganicMatter "*" am "*" om "*" N)
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (tag "SOM")
+                     (path column "${column}" OrganicMatter "*" som "*" N)
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (tag "SMB")
+                     (path column "${column}" OrganicMatter "*" smb "*" N)
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (tag "Buffer")
+                     (path column "${column}" OrganicMatter "*" buffer N)
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (tag "AOM-Surface")
+                   (path column "${column}"
+			 OrganicMatter "*" am "*" om "*" top_N)
+                   (dimension "kg N/ha")
+                   (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (tag "Crop")
+                   (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NCrop)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (tag "Dead leaves")
+                   (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NDead)
+                   (dimension "kg N/ha")
+                   (factor 10.0))))
+
+(deflog "Denitrification" column
+  "Detailed information about denitrification."
+  (where "${colfid}denit.dlf")
+  (summary (simple (print_sum false)
+		   (fetch ("CO2 production")
+			  ("CO2 production from fast pools")
+			  ("Denitrification")
+			  ("Denitrification from fast pools")
+			  ("Redox denitrification")
+			  ("Potential denitrification")
+			  ("Potential denitrification from fast pools")
+                          ("N2O from Nitrification"))))
+  (when hourly)
+  (entries (interval (path column "${column}" OrganicMatter "*" CO2)
+                     (tag "CO2 production")
+                     (dimension "kg CO2-C/ha/&")
+                     (handle sum)
+                     (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
+           (interval (path column "${column}" OrganicMatter "*" CO2_fast)
+                     (tag "CO2 production from fast pools") 
+                     (dimension "kg CO2-C/ha/&")
+                     (handle sum)
+                     (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
+	   (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification converted)
+                     (tag "Denitrification")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+	   (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification converted_fast)
+                     (tag "Denitrification from fast pools")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+	   (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification converted_redox)
+                     (tag "Redox denitrification")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+	   (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification potential)
+                     (tag "Potential denitrification")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+	   (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction denitrification potential_fast)
+                     (tag "Potential denitrification from fast pools")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+           (interval (path column "${column}" Chemistry "*"
+			   combine "N" reaction nitrification N2O)
+                     (handle sum)
+                     (tag "N2O from Nitrification")
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+           ))
+
+(deflog "Soil Heat Balance" column
+  "All available information about the soil heat subsystem."
+  (where "${colfid}soil_heat_balance.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (number (path weather "*" hourly_air_temperature)
+                   (tag "T_air")
+                   (dimension "dg C"))
+           (number (path column "${column}" SoilHeat T_top)
+                   (tag "T_top")
+                   (dimension "dg C"))
+           (index (path column "${column}" SoilHeat T)
+                  (tag "T_0")
+                  (index 0)
+                  (dimension "dg C"))
+           (index (path column "${column}" SoilHeat T)
+                  (tag "T_1")
+                  (index 1)
+                  (dimension "dg C"))
+           (index (path column "${column}" SoilHeat T)
+                  (tag "T_2")
+                  (index 2)
+                  (dimension "dg C"))
+           (index (path column "${column}" SoilHeat T_freezing)
+                  (tag "T_freezing")
+                  (index 0)
+                  (dimension "dg C"))
+           (index (path column "${column}" SoilHeat T_thawing)
+                  (tag "T_thawing")
+                  (index 0)
+                  (dimension "dg C"))
+           (index (path column "${column}" SoilHeat state)
+                  (tag "state0")
+                  (index 0))
+           (index (path column "${column}" SoilHeat state)
+                  (tag "state1")
+                  (index 1))
+           (index (path column "${column}" SoilHeat capacity)
+                  (tag "capacity")
+                  (index 0)
+                  (dimension "erg/cm^3/dg C"))
+           (index (path column "${column}" SoilHeat C_apparent)
+                  (tag "C_apparent")
+                  (index 0)
+                  (dimension "erg/cm^3/dg C"))
+           (index (path column "${column}" SoilWater X_ice)
+                  (tag "Ice_0")
+                  (index 0)
+                  (dimension "cm^3/cm^3"))
+           (index (path column "${column}" SoilWater X_ice)
+                  (tag "Ice_1")
+                  (index 1)
+                  (dimension "cm^3/cm^3"))
+           (index (path column "${column}" SoilWater X_ice)
+                  (tag "Ice_2")
+                  (index 3)
+                  (dimension "cm^3/cm^3"))
+           (index (path column "${column}" SoilWater X_ice_buffer)
+                  (tag "Ice_buffer_0")
+                  (index 0)
+                  (dimension "cm^3/cm^3"))
+           (index (path column "${column}" SoilWater X_ice_buffer)
+                  (tag "Ice_buffer_1")
+                  (index 1)
+                  (dimension "cm^3/cm^3"))
+           (index (path column "${column}" SoilWater X_ice_buffer)
+                  (tag "Ice_buffer_2")
+                  (index 3)
+                  (dimension "cm^3/cm^3"))
+           (index (path column "${column}" SoilWater Theta)
+                  (tag "Theta_0")
+                  (index 0)
+                  (dimension "cm^3/cm^3"))
+           (index (path column "${column}" SoilWater Theta)
+                  (tag "Theta_1")
+                  (index 1)
+                  (dimension "cm^3/cm^3"))
+           (index (path column "${column}" SoilWater Theta)
+                  (tag "Theta_2")
+                  (index 2)
+                  (dimension "cm^3/cm^3"))
+           (index (path column "${column}" SoilWater h)
+                  (tag "h_0")
+                  (index 0)
+                  (dimension "cm"))
+           (index (path column "${column}" SoilWater h)
+                  (tag "h_1")
+                  (index 1)
+                  (dimension "cm"))
+           (index (path column "${column}" SoilWater h)
+                  (tag "h_2")
+                  (index 2)
+                  (dimension "cm"))
+           (index (path column "${column}" SoilWater S_ice)
+                  (tag "S_ice_0")
+                  (index 0)
+                  (handle sum)
+                  (dimension "cm^3/cm^3/&")
+                  (factor -1.0))
+           (index (path column "${column}" SoilWater S_ice)
+                  (tag "S_ice_1")
+                  (index 1)
+                  (handle sum)
+                  (dimension "cm^3/cm^3/&")
+                  (factor -1.0))
+           (index (path column "${column}" SoilWater S_ice)
+                  (tag "S_ice_2")
+                  (index 2)
+                  (handle sum)
+                  (dimension "cm^3/cm^3/&")
+                  (factor -1.0))
+           (index (path column "${column}" SoilWater q)
+                  (tag "qw_0")
+                  (index 0)
+                  (dimension "mm/&")
+                  (factor 10))
+           (index (path column "${column}" SoilWater q)
+                  (tag "qw_1")
+                  (index 1)
+                  (dimension "mm/&")
+                  (factor 10))
+           (index (path column "${column}" SoilWater q)
+                  (tag "qw_2")
+                  (index 2)
+                  (dimension "mm/&")
+                  (factor 10))
+           (index (path column "${column}" SoilWater q)
+                  (tag "qw_3")
+                  (index 3)
+                  (dimension "mm/&")
+                  (factor 10))
+           (index (path column "${column}" SoilHeat q)
+                  (tag "qh_0")
+                  (index 0)
+                  (dimension "W/m^2")
+                  (factor 2.7777777777777776e-07))
+           (index (path column "${column}" SoilHeat q)
+                  (tag "qh_1")
+                  (index 1)
+                  (dimension "W/m^2")
+                  (factor 2.7777777777777776e-07))
+           (index (path column "${column}" SoilHeat q)
+                  (tag "qh_2")
+                  (index 2)
+                  (dimension "W/m^2")
+                  (factor 2.7777777777777776e-07))
+           (index (path column "${column}" SoilHeat q)
+                  (tag "qh_3")
+                  (index 3)
+                  (dimension "W/m^2")
+                  (factor 2.7777777777777776e-07))))
+
+(deflog "Snow" column
+  "All available information about the snow subsystem."
+  (where "${colfid}snow.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (number (path column "${column}" Bioclimate "*" Snow EvapSnowPack)
+                   (tag "Evaporation from snowpack")
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" Snow q_s)
+                   (tag "Percolation from snowpack")
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" Snow Ssnow)
+                   (tag "Snowpack content")
+                   (dimension "mm"))
+           (number (path column "${column}" Bioclimate "*" Snow Swater)
+                   (tag "Snowpack liquid water content")
+                   (dimension "mm"))
+           (number (path column "${column}" Bioclimate "*" Snow age)
+                   (dimension "h"))
+           (number (path column "${column}" Bioclimate "*" Snow dZs)
+                   (tag "Snow Depth")
+                   (dimension "mm")
+                   (factor 1000))))
+
+(deflog "Surface Chemicals" chemical
+  "Summary information about a specific chemical on the soil surface.
+Use like (\"Surface Chemicals\" (chemical Atrazine)) to log the 
+content of 'Atrazine' on the soil.  If you don't specify chemical, the 
+sum of all chemicals will be logged."
+  (where "${colfid}surface_chemicals.dlf")
+  (summary (balance (precision 3)
+                    (input spray deposit)
+                    (output canopy_harvest canopy_dissipate
+			    surface_decompose 
+                            surface_runoff surface_out surface_tillage)
+                    (content snow_storage canopy_storage surface_storage)))
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         spray)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default spray))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         deposit)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default deposit))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         snow_in)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default snow_in))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         snow_storage)
+                   (handle current)
+                   (dimension "g/ha")
+                   (spec chemical default snow_storage))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         snow_out)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default snow_out))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_in)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default canopy_in))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_storage)
+                   (handle current)
+                   (dimension "g/ha")
+                   (spec chemical default canopy_storage))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_dissipate)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default canopy_dissipate))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_harvest)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default canopy_harvest))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         canopy_out)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default canopy_out))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_in)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_in))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_storage)
+                   (handle current)
+                   (dimension "g/ha")
+                   (spec chemical default surface_storage))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_out)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_out))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_tillage)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_tillage))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_runoff)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_runoff))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_decompose)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_decompose))))
+
+(deflog "Soil Chemicals" chemical
+  "Summary information about chemicals in the soil."
+  (where "${colfid}soil_chemical.dlf")
+  (summary (balance (precision 3)
+                    (input "In" "External" "Transform")
+                    (output "Decompose" "Leak-Matrix" "Leak-Macro" "Drain" 
+                            "Uptake")
+                    (content "Content")))
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (flux_top (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" J_matrix)
+                     (tag "In")
+                     (handle sum)
+                     (negate true)
+                     (dimension "g/ha/&")
+                     (spec chemical default J_matrix))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_matrix)
+                        (tag "Leak-Matrix")
+                        (negate true)
+                        (handle sum)
+                        (dimension "g/ha/&")
+                        (spec chemical default J_matrix))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${chemical}" J_tertiary)
+                        (tag "Leak-Macro")
+                        (negate true)
+                        (handle sum)
+                        (dimension "g/ha/&")
+                        (spec chemical default J_tertiary))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_drain)
+                     (tag "Drain")
+                     (negate true)
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_external)
+                     (tag "External")
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_external))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_root)
+                     (tag "Uptake")
+                     (handle sum)
+		     (negate true)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_root))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_decompose)
+                     (tag "Decompose")
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_decompose))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" S_transform)
+                     (tag "Transform")
+                     (handle sum)
+                     (dimension "g/ha/&")
+                     (spec chemical default S_transform))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${chemical}" M)
+                     (tag "Content")
+                     (dimension "g/ha")
+                     (spec chemical default M))))
+
+;; We need two new log models.
+(deflog "Chemical Content" chemical
+  "Amount of chemicals in each numeric soil layer."
+  (where "${colfid}chemical_content.dlf")
+  (when hourly)
+  (entries Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*"
+                        trace "${chemical}" M)
+                  (handle current)
+                  (dimension "ug/m^3")
+                  (spec chemical default M))))
+
+(deflog "Chemical Concentration" chemical
+  "Concentration in water of chemicals in each numeric soil layer.  "
+  (where "${colfid}chemical_conc.dlf")
+  (when hourly)
+  (entries  Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace "${chemical}" C)
+                  (handle current)
+                  (dimension "ng/l")
+                  (spec chemical default C))))
+
+(deflog reaction column 
+  "A log table for a specific reaction."
+  (declare reaction String
+	   "Name of reaction to log.  Use \"*\" to log all reactions.")
+  (reaction "*"))
+
+(deflog "Chemistry" reaction
+  (where "${colfid}chemistry.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" combine "*"
+                        reaction "${reaction}" S_AB)
+                  (handle sum)
+                  (spec reaction default S_AB))))
+
+(deflog "Weather" column
+  (where "${colfid}weather.dlf")
+  (when daily)
+  (entries ;; Year Month MDay
+           (number (handle sum)
+                   (path weather "*" precipitation)
+                   (dimension "mm/&"))
+           (number (handle sum)
+                   (path weather "*" rain)
+                   (dimension "mm/&"))
+           (number (handle sum)
+                   (path weather "*" snow)
+                   (dimension "mm/&"))
+           (number (handle sum)
+                   (path weather "*" reference_evapotranspiration)
+                   (tag "RefEvap-file")
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" 
+                         pet "*" reference_evapotranspiration)
+                   (tag "RefEvap-used")
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path weather "*" daily_global_radiation)
+                   (dimension "W/m^2"))
+           (number (path weather "*" hourly_global_radiation)
+                   (tag "Mim GR")
+                   (handle min)
+                   (dimension "W/m^2"))
+           (number (path weather "*" hourly_global_radiation)
+                   (tag "Average GR")
+                   (handle average)
+                   (dimension "W/m^2"))
+           (number (path weather "*" hourly_global_radiation)
+                   (tag "Max GR")
+                   (handle max)
+                   (dimension "W/m^2"))
+           (number (path weather "*" daily_air_temperature)
+                   (dimension "dg C"))
+           (number (path weather "*" daily_min_air_temperature)
+                   (dimension "dg C"))
+           (number (path weather "*" daily_max_air_temperature)
+                   (dimension "dg C"))
+           (number (path weather "*" hourly_air_temperature)
+                   (tag "Avg T")
+                   (handle average)
+                   (dimension "dg C"))
+           (number (path weather "*" hourly_air_temperature)
+                   (tag "Min T")
+                   (handle min)
+                   (dimension "dg C"))
+           (number (path weather "*" hourly_air_temperature)
+                   (tag "Max T")
+                   (handle max)
+                   (dimension "dg C"))           ))
+
+(deflog "Crop Photosynthesis" crop
+  (where "${colfid}crop_phot.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NetPhotosynthesis)
+		   (spec fixed Production NetPhotosynthesis)
+                   (handle sum))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod RootRespiration)
+		   (spec fixed Production RootRespiration)
+                   (handle sum))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CanopyAss)
+		   (spec fixed Production CanopyAss)
+                   (handle sum))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod PotCanopyAss)
+		   (spec fixed Production PotCanopyAss)
+                   (handle sum))
+           (number (path column "${column}" OrganicMatter "*" Bioincorporation CO2)
+		   (spec fixed Bioincorporation CO2)
+                   (tag "Bioinc_CO2")
+                   (handle sum)) 
+           (interval (path column "${column}" OrganicMatter "*" CO2)
+		     (spec organic default CO2)
+                     (tag "OM_CO2")
+                     (dimension "g CO2/m^2/&")
+                     (handle sum))
+           ))
+
+(deflog "Crop Production" crop
+  (where "${colfid}crop_prod.dlf")
+  (when (hour 12))                      ;When the stress is highest.
+  (entries ;; Year Month MDay
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Devel "*" DS)
+                   (dimension "none")
+                   (factor 1.0))        ;Development stage [-1:2]
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Devel "*" day_length)
+                   (dimension "h")
+                   (factor 1.0))        ;Light hours previous day.
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy Height)
+                   (dimension "cm"))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy CAI)
+                   (tag "Crop AI")
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy LeafAI)
+                   (tag "Leaf AI")
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy StemAI)
+                   (tag "Stem AI")
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy SOrgAI)
+                   (tag "SOrg AI")
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Root Depth)
+                   (dimension "cm")
+                   (factor 1.0))        ;cm [-inf:0]
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod WLeaf)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod WDead)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod WStem)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod WSOrg)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod WRoot)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         CrpN AccFixated)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NLeaf)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NStem)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NSOrg)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NRoot)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NDead)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Root water_stress))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Root water_stress_days))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         CrpN nitrogen_stress))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         CrpN nitrogen_stress_days))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Harvest cut_stress))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CLeaf)
+                   (dimension "Mg C/ha")
+                   (factor 0.01))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CDead)
+                   (dimension "Mg C/ha")
+                   (factor 0.01))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CStem)
+                   (dimension "Mg C/ha")
+                   (factor 0.01))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CSOrg)
+                   (dimension "Mg C/ha")
+                   (factor 0.01))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CRoot)
+                   (dimension "Mg C/ha")
+                   (factor 0.01))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CH2OPool)
+                   (dimension "Mg C/ha")
+                   (factor 0.004))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod C_Loss)
+                   (dimension "Mg C/ha")
+                   (factor 0.01))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod AccNetPhotosynthesis)
+                   (dimension "Mg CO2-C/ha")
+                   (factor 0.00272727))
+;           (number (path column "${column}" Vegetation crops crops "${crop}"
+;                         Prod GrowthRespiration)
+;                   (dimension "g CH2O/m^2/&")
+;                      (handle sum)
+;                   (factor 1.0))
+;           (number (path column "${column}" Vegetation crops crops "${crop}"
+;                         Prod MaintRespiration)
+;                   (dimension "g CH2O/m^2/&")
+;                      (handle sum)
+;                   (factor 1.0))
+;           (number (path column; "${column}" Vegetation crops crops "${crop}"
+;                         Prod NetPhotosynthesis)
+;                   (dimension "g CH2O/m^2/&")
+;                      (handle sum)
+;                   (factor 1.0))
+           ))
+
+(deflog "Forced LAI" crop
+  (where "${colfid}forced_lai.dlf")
+  (when (hour 12))                      ;When the stress is highest.
+  (entries ;; Year Month MDay
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Devel "*" DS)
+                   (dimension "none")
+                   (factor 1.0))        ;Development stage [-1:2]
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy Height)
+                   (dimension "cm"))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy CAI)
+                   (tag "Used CAI")
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy SimCAI)
+                   (tag "Simulated CAI")
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy ForcedCAI)
+                   (tag "Forced CAI")
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod WLeaf)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))))
+
+(deflog "Simple Crop Production" crop
+  (where "${colfid}simple_crop_prod.dlf")
+  (when (hour 12))
+  (entries ;; Year Month MDay
+           (number (path column "${column}"
+			 Vegetation crops crops "${crop}" T_sum)
+                   (dimension "dg C d")
+                   (factor 1.0))        ;Temperature sum
+           (number (path column "${column}"
+			 Vegetation crops crops "${crop}" day)
+                   (dimension "d")
+                   (factor 1.0))        ;Temperature sum
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Canopy CAI)
+                   (tag "Crop AI")
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Root Depth)
+                   (dimension "cm")
+                   (factor 1.0))        ;cm [-inf:0]
+           (number (path column "${column}"
+			 Vegetation crops crops "${crop}" N_actual)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (path column "${column}"
+			 Vegetation crops crops "${crop}" N_demand)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root water_stress))))
+
+(deflog "Old Crop Production" column
+  (where "${colfid}old_crop_prod.dlf")
+  (when daily)
+  (entries ;; Year Month MDay
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Phenology DS)
+                   (dimension "none")
+                   (factor 1.0))        ;Development stage [-1:2]
+           (number (path column "${column}" Vegetation crops crops "*"
+                         Phenology day_length)
+                   (dimension "h")
+                   (factor 1.0))        ;Light hours previous day.
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Canopy LAI)
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "${column}" Vegetation crops crops "*"
+                         RootSys Depth)
+                   (dimension "cm")
+                   (factor 1.0))        ;cm [-inf:0]
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Prod WLeaf)
+                   (dimension "Mg DM/ha") ;Actually stem + leaf + grain
+                   (factor 0.01))
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Prod WSOrg)
+                   (dimension "Mg DM/ha") ;Beet & Potatoes only
+                   (factor 0.01))
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Prod WRoot)
+                   (dimension "Mg DM/ha")
+                   (factor 0.01))
+           (number (path column "${column}"
+			 Vegetation crops crops "*" CrpAux Fixated)
+                   (handle sum)
+                   (accumulate true)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (path column "${column}"
+			 Vegetation crops crops "*" Prod NCrop)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           ))
+
+(deflog "Vegetation" column
+  (where "${colfid}vegetation.dlf")
+  (when daily)
+  (entries ;; Year Month MDay
+           (number (path column "${column}" Vegetation crops LAI)
+                   (dimension "m2/m2"))
+           (number (path column "${column}" Vegetation crops height)
+                   (dimension "cm"))
+           (number (path column "${column}" Vegetation crops cover)
+                   (dimension "0-1"))
+           (number (path column "${column}" Vegetation crops ACExt)
+                   (dimension "ACExt"))
+           (number (path column "${column}" Vegetation crops ACRef)
+                   (dimension "ACRef"))
+           (number (path column "${column}" Vegetation crops ARExt)
+                   (dimension "ARExt"))
+           (number (path column "${column}" Vegetation crops EpFactor)
+                   (dimension "EpFactor"))
+           (number (path column "${column}" Vegetation crops albedo)
+                   (dimension "albedo"))
+           (number (path column "${column}"
+			 Vegetation crops interception_capacity)
+                   (dimension "mm"))))
+
+(deflog "Permanent Vegetation" column
+  (where "${colfid}vegetation.dlf")
+  (when daily)
+  (entries ;; Year Month MDay
+           (number (path column "${column}" Vegetation "*" LAI)
+                   (dimension "m2/m2"))
+           (number (path column "${column}" Vegetation "*" N_demand)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (path column "${column}" Vegetation "*" N_actual)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (path column "${column}" Vegetation "*" N_uptake)
+                   (handle sum)
+                   (dimension "kg N/ha/&")
+                   (factor 10.0))
+           (number (path column "${column}" Vegetation "*" N_litter)
+                   (dimension "kg N/ha/&")
+                   (handle sum)
+                   (factor 10.0))))
+
+(deflog "Root Density" crop
+  (where "${colfid}rootdens.dlf")
+  (when daily)
+  (entries ;; Year Month MDay
+           (array (path column "${column}" Vegetation crops crops "${crop}" 
+                        Root Density)
+                  (dimension "cm/cm^3"))))
+
+(deflog "Root form parameter" crop
+  (where "${colfid}rootform.dlf")
+  (when daily)
+  (entries ;; Year Month MDay
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Prod WRoot)
+                   (spec fixed Production WRoot))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Phenology DS)
+                   (spec phenology default DS))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root Depth)
+                   (spec fixed RootSystem Depth))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" a)
+                   (spec rootdens GP1D a))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" L0)
+                   (spec rootdens GP1D L0))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" k)
+                   (spec rootdens GP1D k))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "10 cm")
+		    (height -10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "50 cm")
+		    (height -50 [cm]))
+	   (interval (path column "${column}" Vegetation crops crops "${crop}" 
+			   Root Density)
+		     (spec fixed RootSystem Density)
+		     (tag "0-1 m")
+		     (from  0 [cm])
+		     (to -100 [cm]))))
+
+(deflog "Bioclimate" column
+  (where "${colfid}bioclimate.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (number (path weather "*" daily_air_temperature)
+                   (dimension "dg C"))
+           (number (path weather "*" hourly_air_temperature)
+                   (dimension "dg C"))
+           (number (path weather "*" hourly_global_radiation)
+                   (dimension "W/m2"))
+           (number (path weather "*" daily_global_radiation)
+                   (dimension "W/m2"))
+           (number (path column "${column}" Bioclimate "*" 
+                         pet "*" reference_evapotranspiration)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path weather "*" rain)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path weather "*" snow)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" total_ep)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" total_ea)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" irrigation_overhead)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*"
+                         irrigation_overhead_temperature)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" irrigation_surface)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*"
+                         irrigation_surface_temperature)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" canopy_ep)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" canopy_ea)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" canopy_water_storage)
+                   (dimension "mm"))
+           (number (path column "${column}" Bioclimate "*"
+                         canopy_water_storage_temperature)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" canopy_water_in)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" canopy_water_out)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" litter_ep)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" litter_ea)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" litter_water_storage)
+                   (dimension "mm"))
+           (number (path column "${column}" Bioclimate "*"
+                         litter_water_storage_temperature)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" litter_water_in)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" litter_water_out)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" canopy_water_bypass)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" snow_ep)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" snow_ea)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" snow_water_in)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" Snow Ssnow)
+                   (tag "snow_water_storage")
+                   (dimension "mm"))
+           (number (path column "${column}" Bioclimate "*"
+                         snow_water_in_temperature)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" snow_water_out)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*"
+                         snow_water_out_temperature)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" pond_ep)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" pond_ea)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" pond_water_in)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Surface pond)
+                   (tag "pond_water_storage")
+                   (dimension "mm"))
+           (number (path column "${column}" Surface runoff)
+                   (tag "pond_water_runoff")
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*"
+                         pond_water_in_temperature)
+                   (dimension "dg C"))
+           (flux_top (path column "${column}" SoilWater q)
+                     (tag "soil_water_in")
+                     (handle sum)
+                     (dimension "mm/&")
+                     (factor -10))      ;cm -> mm
+           (number (path column "${column}" Bioclimate "*" soil_ep)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" soil_ea)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" crop_ep)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (path column "${column}" Bioclimate "*" crop_ea)
+                   (handle sum)
+                   (dimension "mm/&"))))
+
+(deflog "PMSW" column
+  (where "${colfid}pmsw.tab")
+  (when hourly)
+  (print_dimension false)
+  (print_tags false)
+  (entries ;; Year Month MDay Hour
+           (number (path column "${column}" Bioclimate "*" svat PMSW netrad_brunt)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_a)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_astab)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_aa)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_aastab1)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_aastab2)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_as)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_ac)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW tskin)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW tcan)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW tleaf)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW e_c)
+                   (dimension "Pa"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW e_sl)
+                   (dimension "Pa"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW tskin_star)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW tcan_star)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW tleaf_star)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW e_c_star)
+                   (dimension "Pa"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW e_sl_star)
+                   (dimension "Pa"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW ha)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW hl)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW hs)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW lea)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW lel)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW ha_star)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW hl_star)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW hs_star)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW lea_star)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW lel_star)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW gflux)
+                   (dimension "W/m**2"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW dtcta)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW dtltc)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW dtstc)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW dtcta_star)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW dtltc_star)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW dtstc_star)
+                   (dimension "dg C"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW f_1)
+                   (dimension "NA"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW f_2)
+                   (dimension "NA"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW f_3)
+                   (dimension "NA"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW f_4)
+                   (dimension "NA"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW f_temp)
+                   (dimension "NA"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW f_def)
+                   (dimension "NA"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW f_theta)
+                   (dimension "NA"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW f_etep)
+                   (dimension "NA"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_sc_1)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_sc_2)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_sc_js)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_sc_min)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW r_sc_star)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW rcmin_star)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW pstress)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW ustar_raa)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW ustar_raastab1)
+                   (dimension "s/m"))
+           (number (path column "${column}" Bioclimate "*" svat PMSW ustar_raastab2)
+                   (dimension "s/m"))))
+
+(deflog "Groundwater" column
+  (where "${colfid}groundwater.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (number (path column "${column}" Groundwater "*" height)
+                   (tag "column")
+                   (dimension "cm"))
+           (number (path column "${column}" Groundwater "*" h_aquifer)
+                   (dimension "cm"))
+           (number (path column "${column}" Groundwater "*" DeepPercolation)
+                   (handle sum)
+                   (dimension "mm/&")
+                   (factor 10))
+           (number (path column "${column}" Groundwater "*" DrainFlow)
+                   (handle sum)
+                   (dimension "mm/&")
+                   (factor 10))
+           (interval (path column "${column}"
+			   Chemistry "*" trace NH4 S_drain)
+                     (tag "NH4-Drain")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (factor -1e5))      ;g/cm^2 -> kg N/ha
+           (flux_bottom (path column "${column}" 
+			      Chemistry "*" trace NH4 J_matrix)
+			(spec chemical default J_matrix)
+                        (tag "NH4-Perc-Matrix")
+                        (handle sum)
+                        (dimension "kg N/ha/&"))
+           (interval (path column "${column}" Chemistry "*" trace NO3 S_drain)
+		     (spec chemical default S_drain)
+                     (tag "NO3-Drain")
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" Chemistry "*" trace NO3 J_matrix)
+			(spec chemical default J_matrix)
+                        (tag "NO3-Perc-Matrix")
+                        (handle sum)
+                        (dimension "kg N/ha/&"))))
+
+(deflog Bioincorporation column
+  (where "${colfid}bioincorporation.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (interval (path column "${column}" OrganicMatter "*" am 
+                           "bio/incorporation" om "*" N)
+                     (tag "SOIL_N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am 
+                           "bio/incorporation" om "*" C) 
+                     (tag "SOIL_C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" am "*" om "*" top_N)
+                   (tag "TOP_N")
+                   (dimension "kg N/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" am "*" om "*" top_C)
+                   (tag "TOP_C")
+                   (dimension "kg C/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" Bioincorporation
+                         N_removed)
+                   (tag "REMOVED_N")
+                   (handle sum)
+                   (dimension "kg N/ha/&")
+                   (factor 10))         ;g/m^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" Bioincorporation 
+                         C_removed)
+                   (tag "REMOVED_C")
+                   (handle sum)
+                   (dimension "kg C/ha/&")
+                   (factor 10))         ;g/m^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" Bioincorporation CO2)
+                   (tag "CO2")
+                   (handle sum)
+                   (dimension "kg C/ha/&")
+                   (factor 10))         ;g/m^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" Bioincorporation 
+                           N_added)
+                     (tag "ADDED_N")
+                     (handle sum)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" Bioincorporation 
+                           C_added)
+                     (tag "ADDED_C")
+                     (handle sum)
+                     (dimension "kg C/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" Bioincorporation speed)
+                   (tag "Speed")
+                   (handle sum)
+                   (dimension "kg DM/ha/&")
+                   (factor 4.2))        ;g DM/m^2 -> kg C/ha
+           ))
+
+(deflog aom column
+  "A log table for a specific AOM."
+  (declare aom String
+	   "Name of added organic matter to log.
+Use \"*\" to log all added organic matter matter.")
+  (aom "*"))
+
+(deflog AOM aom
+  "Log content of specific added organic matter, such as fertilizer."
+  (where "${colfid}aom.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "*" N)
+                     (tag "SOIL_N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "*" C) 
+                     (tag "SOIL_C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "*" top_N)
+                   (tag "TOP_N")
+                   (dimension "kg N/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "*" top_C)
+                   (tag "TOP_C")
+                   (dimension "kg C/ha")
+                   (factor 1e5))))      ;g/cm^2 -> kg/ha
+
+(deflog "AOM Pools" aom
+  "Log content of all pools in specific added organic matter."
+  (where "${colfid}aom-pools.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "0" N)
+                     (tag "SOIL1-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "0" C) 
+                     (tag "SOIL1-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "0" top_N)
+                   (tag "TOP1-N")
+                   (dimension "kg N/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "0" top_C)
+                   (tag "TOP1-C")
+                   (dimension "kg C/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "1" N)
+                     (tag "SOIL2-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "1" C) 
+                     (tag "SOIL2-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "1" top_N)
+                   (tag "TOP2-N")
+                   (dimension "kg N/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "1" top_C)
+                   (tag "TOP2-C")
+                   (dimension "kg C/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "2" N)
+                     (tag "SOIL3-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "${aom}" om "2" C) 
+                     (tag "SOIL3-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "2" top_N)
+                   (tag "TOP3-N")
+                   (dimension "kg N/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" am "${aom}" om "2" top_C)
+                   (tag "TOP3-C")
+                   (dimension "kg C/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           ))
+
+(deflog "Organic Matter" column
+  "Information about all organic matter pools."
+  (where "${colfid}organic-matter.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (interval (path column "${column}" OrganicMatter "*" som "0" N)
+                     (tag "SOM1-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" som "0" C)
+                     (tag "SOM1-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" som "1" N)
+                     (tag "SOM2-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" som "1" C)
+                     (tag "SOM2-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" som "2" N)
+                     (tag "SOM3-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" som "2" C)
+                     (tag "SOM3-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" smb "0" N)
+                     (tag "SMB1-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" smb "0" C)
+                     (tag "SMB1-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" smb "1" N)
+                     (tag "SMB2-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" smb "1" C)
+                     (tag "SMB2-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "*" om "0" N)
+                     (tag "AOM1-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "*" om "0" C)
+                     (tag "AOM1-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "*" om "1" N)
+                     (tag "AOM2-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "*" om "1" C)
+                     (tag "AOM2-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "*" om "2" N)
+                     (tag "AOM3-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "*" om "2" C)
+                     (tag "AOM3-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" buffer N)
+                     (tag "BUFFER-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" buffer C)
+                     (tag "BUFFER-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           ))
+
+(deflog "DOM Pools" column
+  "Information about Disolved Organic Matter pools."
+  (where "${colfid}dom.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (interval (path column "${column}" OrganicMatter "*" dom "0" N M)
+                     (tag "D1-N")
+                     (spec fixed DOM-Element M)
+                     (dimension "kg N/ha"))
+           (interval (path column "${column}" OrganicMatter "*" dom "0" N S)
+                     (tag "D1-N-S-sum")
+                     (spec fixed DOM-Element S)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" dom "0" N S_p)
+                     (tag "D1-N-S-pref")
+                     (spec fixed DOM-Element S_p)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" dom "0" N S_drain)
+                     (tag "D1-N-S-drain")
+                     (spec fixed DOM-Element S_drain)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" OrganicMatter "*" dom "0" N J_matrix)
+                     (tag "D1-N-J-mat-in")
+                     (spec fixed DOM-Element J_matrix)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" OrganicMatter "*" dom "0" N J_tertiary)
+                     (tag "D1-N-J-pref-in")
+                     (spec fixed DOM-Element J_tertiary)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" OrganicMatter "*" dom "0" N J_matrix)
+                        (tag "D1-N-J-mat-out")
+                        (spec fixed DOM-Element J_matrix)
+                        (handle sum)
+                        (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" OrganicMatter "*" dom "0" N J_tertiary)
+                        (tag "D1-N-J-pref-out")
+                        (spec fixed DOM-Element J_tertiary)
+                        (handle sum)
+                        (dimension "kg N/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" dom "0" C M)
+                     (tag "D1-C")
+                     (spec fixed DOM-Element M)
+                     (dimension "kg C/ha"))
+           (interval (path column "${column}" OrganicMatter "*" dom "0" C S)
+                     (tag "D1-C-S-sum")
+                     (spec fixed DOM-Element S)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" dom "0" C S_p)
+                     (tag "D1-C-S-pref")
+                     (spec fixed DOM-Element S_p)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" dom "0" C S_drain)
+                     (tag "D1-C-S-drain")
+                     (spec fixed DOM-Element S_drain)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (flux_top (path column "${column}" OrganicMatter "*" dom "0" C J_matrix)
+                     (tag "D1-C-J-mat-in")
+                     (spec fixed DOM-Element J_matrix)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (flux_top (path column "${column}" OrganicMatter "*" dom "0" C J_tertiary)
+                     (tag "D1-C-J-pref-in")
+                     (spec fixed DOM-Element J_tertiary)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (flux_bottom (path column "${column}" OrganicMatter "*" dom "0" C J_matrix)
+                        (tag "D1-C-J-mat-out")
+                        (spec fixed DOM-Element J_matrix)
+                        (handle sum)
+                        (dimension "kg C/ha/&"))
+           (flux_bottom (path column "${column}" OrganicMatter "*" dom "0" C J_tertiary)
+                        (tag "D1-C-J-pref-out")
+                        (spec fixed DOM-Element J_tertiary)
+                        (handle sum)
+                        (dimension "kg C/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" dom "1" N M)
+                     (tag "D2-N")
+                     (spec fixed DOM-Element M)
+                     (dimension "kg N/ha"))
+           (interval (path column "${column}" OrganicMatter "*" dom "1" N S)
+                     (tag "D2-N-S-sum")
+                     (spec fixed DOM-Element S)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" dom "1" N S_p)
+                     (tag "D2-N-S-pref")
+                     (spec fixed DOM-Element S_p)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" dom "1" N S_drain)
+                     (tag "D2-N-S-drain")
+                     (spec fixed DOM-Element S_drain)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" OrganicMatter "*" dom "1" N J_matrix)
+                     (tag "D2-N-J-mat-in")
+                     (spec fixed DOM-Element J_matrix)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}" OrganicMatter "*" dom "1" N J_tertiary)
+                     (tag "D2-N-J-pref-in")
+                     (spec fixed DOM-Element J_tertiary)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" OrganicMatter "*" dom "1" N J_matrix)
+                        (tag "D2-N-J-mat-out")
+                        (spec fixed DOM-Element J_matrix)
+                        (handle sum)
+                        (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}" OrganicMatter "*" dom "1" N J_tertiary)
+                        (tag "D2-N-J-pref-out")
+                        (spec fixed DOM-Element J_tertiary)
+                        (handle sum)
+                        (dimension "kg N/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" dom "1" C M)
+                     (tag "D2-C")
+                     (spec fixed DOM-Element M)
+                     (dimension "kg C/ha"))
+           (interval (path column "${column}" OrganicMatter "*" dom "1" C S)
+                     (tag "D2-C-S-sum")
+                     (spec fixed DOM-Element S)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" dom "1" C S_p)
+                     (tag "D2-C-S-pref")
+                     (spec fixed DOM-Element S_p)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" dom "1" C S_drain)
+                     (tag "D2-C-S-drain")
+                     (spec fixed DOM-Element S_drain)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (flux_top (path column "${column}" OrganicMatter "*" dom "1" C J_matrix)
+                     (tag "D2-C-J-mat-in")
+                     (spec fixed DOM-Element J_matrix)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (flux_top (path column "${column}" OrganicMatter "*" dom "1" C J_tertiary)
+                     (tag "D2-C-J-pref-in")
+                     (spec fixed DOM-Element J_tertiary)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (flux_bottom (path column "${column}" OrganicMatter "*" dom "1" C J_matrix)
+                        (tag "D2-C-J-mat-out")
+                        (spec fixed DOM-Element J_matrix)
+                        (handle sum)
+                        (dimension "kg C/ha/&"))
+           (flux_bottom (path column "${column}" OrganicMatter "*" dom "1" C J_tertiary)
+                        (tag "D2-C-J-pref-out")
+                        (spec fixed DOM-Element J_tertiary)
+                        (handle sum)
+                        (dimension "kg C/ha/&"))
+           ))
+
+(deflog pool column
+  "A log table for a specific organic matter pool."
+  (declare pool String
+	   "Name of pool to log.  Use \"*\" to log all pools.")
+  (pool "*"))
+
+(defsummary "DOM Pool N Balance"  balance
+  (precision 3)
+  (input "N-J-mat-in" "N-J-pref-in" "N-S-SOM")
+  (output "N-J-mat-out" "N-J-pref-out" "N-S-drain")
+  (content N))
+
+(defsummary "DOM Pool C Balance"  balance
+  (precision 3)
+  (input "C-J-mat-in" "C-J-pref-in" "C-S-SOM")
+  (output "C-J-mat-out" "C-J-pref-out" "C-S-drain")
+  (content C))
+
+(deflog "DOM Pool" pool
+  "Information about a Disolved Organic Matter pool."
+  (where "${colfid}dom-pool.dlf")
+  (summary "DOM Pool N Balance" "DOM Pool C Balance")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (interval (path column "${column}" 
+			   OrganicMatter "*" dom "${pool}" N M)
+                     (tag "N")
+                     (spec fixed DOM-Element M)
+                     (dimension "kg N/ha"))
+           (interval (path column "${column}" 
+			   OrganicMatter "*" dom "${pool}" N S)
+                     (tag "N-S-sum")
+                     (spec fixed DOM-Element S)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}"
+			   OrganicMatter "*" dom "${pool}" N S_p)
+                     (tag "N-S-pref")
+                     (spec fixed DOM-Element S_p)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}"
+			   OrganicMatter "*" dom "${pool}" N S_drain)
+                     (tag "N-S-drain")
+                     (spec fixed DOM-Element S_drain)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (interval (path column "${column}"
+			   OrganicMatter "*" domsorp "*" S_N)
+                     (tag "N-S-SOM")
+                     (spec domsorp default S_N)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}"
+			   OrganicMatter "*" dom "${pool}" N J_matrix)
+                     (tag "N-J-mat-in")
+                     (spec fixed DOM-Element J_matrix)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}"
+			   OrganicMatter "*" dom "${pool}" N J_tertiary)
+                     (tag "N-J-pref-in")
+                     (spec fixed DOM-Element J_tertiary)
+                     (handle sum)
+                     (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}"
+			      OrganicMatter "*" dom "${pool}" N J_matrix)
+                        (tag "N-J-mat-out")
+                        (spec fixed DOM-Element J_matrix)
+                        (handle sum)
+			(negate true)
+                        (dimension "kg N/ha/&"))
+           (flux_bottom (path column "${column}"
+			      OrganicMatter "*" dom "${pool}" N J_tertiary)
+                        (tag "N-J-pref-out")
+                        (spec fixed DOM-Element J_tertiary)
+                        (handle sum)
+			(negate true)
+                        (dimension "kg N/ha/&"))
+           (interval (path column "${column}"
+			   OrganicMatter "*" dom "${pool}" C M)
+                     (tag "C")
+                     (spec fixed DOM-Element M)
+                     (dimension "kg C/ha"))
+           (interval (path column "${column}"
+			   OrganicMatter "*" dom "${pool}" C S)
+                     (tag "C-S-sum")
+                     (spec fixed DOM-Element S)
+		     (negate true)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (interval (path column "${column}"
+			   OrganicMatter "*" dom "${pool}" C S_p)
+                     (tag "C-S-pref")
+                     (spec fixed DOM-Element S_p)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (interval (path column "${column}"
+			   OrganicMatter "*" dom "${pool}" C S_drain)
+                     (tag "C-S-drain")
+                     (spec fixed DOM-Element S_drain)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (interval (path column "${column}"
+			   OrganicMatter "*" domsorp "*" S_C)
+                     (tag "C-S-SOM")
+                     (spec domsorp default S_C)
+                     (handle sum)
+		     (negate true)
+                     (dimension "kg C/ha/&"))
+           (flux_top (path column "${column}"
+			   OrganicMatter "*" dom "${pool}" C J_matrix)
+                     (tag "C-J-mat-in")
+                     (spec fixed DOM-Element J_matrix)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (flux_top (path column "${column}"
+			   OrganicMatter "*" dom "${pool}" C J_tertiary)
+                     (tag "C-J-pref-in")
+                     (spec fixed DOM-Element J_tertiary)
+                     (handle sum)
+                     (dimension "kg C/ha/&"))
+           (flux_bottom (path column "${column}"
+			      OrganicMatter "*" dom "${pool}" C J_matrix)
+                        (tag "C-J-mat-out")
+                        (spec fixed DOM-Element J_matrix)
+                        (handle sum)
+			(negate true)
+                        (dimension "kg C/ha/&"))
+           (flux_bottom (path column "${column}"
+			      OrganicMatter "*" dom "${pool}" C J_tertiary)
+                        (tag "C-J-pref-out")
+                        (spec fixed DOM-Element J_tertiary)
+                        (handle sum)
+			(negate true)
+                        (dimension "kg C/ha/&"))
+           ))
+
+(deflog "DOM-N" pool
+  "Information about nitrogen in disolved organic matter pools."
+  (where "${colfid}dom-N.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" OrganicMatter "*" dom "${pool}" N M)
+                  (tag "N")
+                  (spec fixed DOM-Element M))))
+
+(deflog "DOM-C" pool
+  "Information about carbon in disolved organic matter pools."
+  (where "${colfid}dom-C.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" OrganicMatter "*" dom "${pool}" C M)
+                  (tag "C")
+                  (spec fixed DOM-Element M))))
+
+(deflog "Hourly Groundwater" column
+  (where "${colfid}hourly_groundwater.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (number (path column "${column}" Groundwater "*" height)
+                   (tag "column")
+                   (dimension "cm"))
+           (number (path column "${column}" Groundwater "*" DeepPercolation)
+                   (handle sum)
+                   (dimension "cm/&"))
+           (number (path column "${column}" Groundwater "*" DrainFlow)
+                   (handle sum)
+                   (dimension "cm/&"))
+           (number (path column "${column}" Groundwater "*" EqDrnFlow)
+                   (handle sum)
+                   (dimension "cm/&"))
+           (interval (path column "${column}" SoilWater Theta)
+                     (dimension "cm"))))
+
+(deflog "Drain Sink" column
+  (where "${colfid}drain_sink.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Groundwater pipe S)
+                  (handle sum)
+                  (dimension "cm^3/cm^3/&"))))
+
+(deflog "Drain Sink Water" column
+  (where "${colfid}drain_sink_water.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" SoilWater S_drain)
+                  (handle sum)
+                  (dimension "g/cm^3/&"))))
+
+(deflog "Drain Sink NO3" column
+  (where "${colfid}drain_sink_NO3.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace NO3 S_drain)
+		  (spec chemical default S_drain)
+                  (handle sum)
+		  (negate true)
+                  (dimension "g/cm^3/&"))))
+
+(deflog "Drain Sink NH4" column
+  (where "${colfid}drain_sink_NH4.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" Chemistry "*" trace NH4 S_drain)
+		     (spec chemical default S_drain)
+                  (handle sum)
+		  (negate true)
+                  (dimension "cm^3/cm^3/&"))))
+
+(deflog "Soil Water Content" column
+  (where "${colfid}soil_water_content.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "${column}" SoilWater Theta)
+                  (dimension "cm^3/cm^3"))))
+
+
+(deflog "Fertilizer" column
+  (description "Track applied fertilizer.")
+  (where "${colfid}fertilizer_monthly.dlf")
+  (when monthly)
+  (entries ;; Year Month
+           (number (path column "${column}" Chemistry "*" trace NO3 spray)
+		   (spec chemistry default spray)
+                   (handle sum)
+                   (tag "Surface-NO3")
+                   (dimension "kg N/ha/&"))
+           (interval (path column "${column}"
+			   Chemistry "*" trace NO3 S_external)
+		     (spec chemistry default S_external)
+		     (handle sum)
+		     (tag "Surface-NO3")
+		     (dimension "kg N/ha/&"))
+           (number (path column "${column}" Chemistry "*" trace NH4 spray)
+		   (spec chemistry default spray)
+                   (handle sum)
+                   (tag "Surface-NH4")
+                   (dimension "kg N/ha/&"))
+           (interval (path column "${column}"
+			   Chemistry "*" trace NH4 S_external)
+		     (spec chemistry default S_external)
+		     (handle sum)
+		     (tag "Soil NH4")
+		     (dimension "kg N/ha/&"))
+           (number (path column "${column}" OrganicMatter "*" fertilized_N)
+                   (handle sum)
+                   (tag "Org_N")
+                   (factor 1e5)         ;g/cm^2 -> kg/ha
+                   (dimension "kg N/ha/&"))
+           (number (path column "${column}" OrganicMatter "*" fertilized_C)
+                   (handle sum)
+                   (tag "Org_C")
+                   (factor 1e5)         ;g/cm^2 -> kg/ha
+                   (dimension "kg C/ha/&"))
+           (number (path column "${column}" applied_DM)
+                   (handle sum)
+                   (tag "WetWeight")
+                   (dimension "ton ww/ha/&"))
+           (number (path column "${column}" first_year_utilization)
+                   (handle sum)
+                   (tag "1stYear")
+                   (dimension "kg N/ha/&"))
+           (number (path column "${column}" second_year_utilization)
+                   (tag "2ndYear")
+                   (dimension "kg N/ha"))
+           (number (path column "${column}" Chemistry "*" trace NH4
+			 canopy_dissipate)
+                   (spec chemical default canopy_dissipate)
+                   (handle sum)
+                   (tag "NH4-Volatilization")
+                   (dimension "kg N/ha/&"))))
+
+(deflog "Fertilizer Yearly" "Fertilizer"
+  (where "${colfid}fertilizer_yearly.dlf")
+  (when (and (month 3)
+             (mday 31)
+             (hour 23))))
+
+
+(defsummary "Crop Carbon Balance" simple
+  "Carbon balance for the crops.
+
+Warning: This balance is not finished.
+
+Note that negative deltas means the amount of water increases."
+  (precision 3)
+  (fetch (Seed_C  (name "Seed"))
+         (CLeaf (name "Leaves") (factor -1))
+         (CDead (name "Dead leaves still on crop") (factor -1))
+         (CStem (name "Stem") (factor -1))
+         (CSOrg (name "Storage organ") (factor -1))
+         (CRoot (name "Roots") (factor -1))
+         (CH2OPool (name "Assimilate") (factor -1))
+         ;; (C_Loss (name "Lost leaves and roots") (factor -1))
+         (NetPhotosynthesis (name "Netto photosynthesis"))
+         ;;(GrowthRespiration (name "Crop growth respiration") (factor -1))
+         ;;(MaintRespiration (name "Crop maintenance respiration")(factor -1))
+         (Harvest_C (name "Removed by harvest") (factor -1))
+         ("Residuals_C_root" (name "Root residuals") (factor -1))
+         ("Residuals_C_top" (name "Surface residuals") (factor -1)))
+  (sum_name "Balance"))
+
+(defsummary "Litter Carbon Balance" simple
+  "Carbon balance for the litter system.
+
+Note that negative deltas means the amount of carbon increases."
+  (precision 3)
+  (fetch ("Residuals_C_top" (name "Surface residuals"))
+         ("Bioinc_C-Surface" (name "Bioincorporated from surface") (factor -1))
+         ("Fertilizer_C" (name "Fertilization"))
+         (tillage_C_top (name "Removed from surface by tillage"))
+         (Surface_C (name "Litter") (factor -1)))
+  (sum_name "Balance"))
+
+(defsummary "Soil Carbon Balance" simple
+  "Carbon balance for the soil.
+
+Note that negative deltas means the amount of carbon increases."
+  (precision 3)
+  (fetch ("Bioinc_C-Soil" (name "Bioincorporated to soil"))
+         ("Residuals_C_soil" (name "Dead roots added to soil"))
+         (tillage_C_soil (name "Added to soil by tillage"))
+         ("SMB-CO2-total" (name "Soil biomass respiration") (factor -1))
+         (Soil_C (name "Soil content") (factor -1)))
+  (sum_name "Balance"))
+
+(defsummary "Total Carbon Balance" simple
+  "Carbon balance for the complete system.
+
+Warning: This balance is not finished.
+
+Note that negative deltas means the amount of carbon increases."
+  (precision 3)
+  (fetch (Soil_C (name "Soil content") (factor -1))
+         (Surface_C (name "Litter") (factor -1))
+         ("SMB-CO2-total" (name "Soil biomass respiration") (factor -1))
+         ("Bioinc_C-Surface" (name "Bioincorporated from surface") (factor -1))
+         ("Bioinc_C-Soil" (name "Bioincorporated to soil"))
+         ;; ("Bioinc_CO2" (name "Bioincorporation respiration") (factor -1))
+         (Seed_C (name "Seed"))
+         (CLeaf (name "Leaves") (factor -1))
+         (CDead (name "Dead leaves still on crop") (factor -1))
+         (CStem (name "Stem") (factor -1))
+         (CSOrg (name "Storage organ") (factor -1))
+         (CRoot (name "Roots") (factor -1))
+         (CH2OPool (name "Assimilate") (factor -1))
+         (NetPhotosynthesis (name "Netto photosynthesis"))
+         ;;(GrowthRespiration (name "Crop growth respiration") (factor -1))
+         ;;(MaintRespiration (name "Crop maintenance respiration") (factor -1))
+         (Harvest_C (name "Removed by harvest") (factor -1))
+         ("Residuals_C_root" (name "Dead roots lost by crop") (factor -1))
+         ("Residuals_C_soil" (name "Dead roots added to soil"))
+         ("Fertilizer_C" (name "Fertilization"))
+         (tillage_C_top (name "Removed from surface by tillage"))
+         (tillage_C_soil (name "Added to soil by tillage")))
+  (sum_name "Balance"))
+
+(defsummary "C Input" simple
+  "This summary provides the information needed by the OrganicMatter init
+submodel.  The amount printed under 'Total C Input' corresponds to the
+'input' parameter, and the amount under 'Roots' corresponds to the
+'root' parameter."
+  (fetch ("Fertilizer_C" (name "Fertilizer"))
+         ("Residuals_C_top" (name "Residuals"))
+         ("Residuals_C_root" (name "Roots"))
+         ("Bioinc_CO2" (factor -1.0)))
+  (sum_name "Total C input")
+  (period "y")
+  (precision 0))
+
+(deflog "Carbon Balance" crop
+  (where "${colfid}C_Bal.dlf")
+  (when hourly)
+  (summary "Total Carbon Balance" "Crop Carbon Balance" 
+           "Litter Carbon Balance" "Soil Carbon Balance" "C Input")
+  (entries ;; Year Month MDay Hour
+           (interval (path column "${column}" OrganicMatter "*" total_C)
+                     (tag "Soil_C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" som "*" C)
+                     (tag "SOM_C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" smb "*" C)
+                     (tag "SMB_C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" am "*" om "*" C)
+                     (tag "AOM_C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" buffer C)
+                     (tag "BUFFER_C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" CO2)
+                     (tag "SMB-CO2-total") 
+                     (dimension "kg C/ha/&")
+                     (handle sum)
+                     (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2-C/ha
+           (number (path column "${column}" OrganicMatter "*" am "*" om "*" top_C)
+                   (tag "Surface_C")
+                   (dimension "kg C/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" Bioincorporation
+                         C_removed)
+                   (tag "Bioinc_C-Surface")
+                   (handle sum)
+                   (dimension "kg C/ha/&")
+                   (factor 10))         ;g/m^2 -> kg/ha
+           (interval (path column "${column}" OrganicMatter "*" Bioincorporation
+                           C_added)
+                     (tag "Bioinc_C-Soil")
+                     (handle sum)
+                     (dimension "kg C/ha/&")
+                     (factor 1e5))        ;g/cm^2 -> kg/ha
+           (number (path column "${column}" OrganicMatter "*" Bioincorporation CO2)
+                   (tag "Bioinc_CO2")
+                       (handle sum)
+                   (dimension "kg C/ha/&")
+                   (factor 10))         ;g/m^2 -> kg/ha
+           (number (path column "${column}" seed_C)
+                   (handle sum)
+                   (tag "Seed_C")
+                   (dimension "kg C/ha/&"))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CLeaf)
+                   (dimension "kg C/ha")
+                   (factor 10))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CDead)
+                   (dimension "kg C/ha")
+                   (factor 10))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CStem)
+                   (dimension "kg C/ha")
+                   (factor 10))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CSOrg)
+                   (dimension "kg C/ha")
+                   (factor 10))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CRoot)
+                   (dimension "kg C/ha")
+                   (factor 10))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod CH2OPool)
+                   (dimension "kg C/ha")
+                   (factor 4))          ;g CH2O/m^2 -> kg C/ha
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod C_Loss)
+                   (dimension "kg C/ha/&")
+                   (handle sum)
+                   (factor 10))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod NetPhotosynthesis)
+                   (dimension "kg C/ha/&")
+                   (handle sum)
+                   (factor 2.727272727))        ;g CO2/m^2 -> kg C/ha
+           (number (path column "${column}" OrganicMatter "*" fertilized_C)
+                   (handle sum)
+                   (tag "Fertilizer_C")
+                   (factor 1e5)         ;g/cm^2 -> kg/ha
+                   (dimension "kg C/ha/&"))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod GrowthRespiration)
+                   (dimension "kg C/ha/&")
+                   (handle sum)
+                   (factor 4))        ;g CH2O/m^2 -> kg C/ha
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         Prod MaintRespiration)
+                   (dimension "kg C/ha/&")
+                   (handle sum)
+                   (factor 4))        ;g CH2O/m^2 -> kg C/ha
+           (number (path column "${column}" harvest_C)
+                   (handle sum)
+                   (tag "Harvest_C")
+                   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg C/ha/&"))
+           (number (path column "${column}" residuals_C_top)
+                   (handle sum)
+                   (tag "Residuals_C_top")
+                   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg C/ha/&"))
+           (number (path column "${column}" residuals_C_root)
+                   (handle sum)
+                   (tag "Residuals_C_root")
+                   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg C/ha/&"))
+           (interval (path column "${column}" residuals_C_soil)
+                     (handle sum)
+                     (tag "Residuals_C_soil")
+                     (factor 1e5)      ;g/cm^2 -> kg/ha
+                     (dimension "kg C/ha/&"))
+           (number (path column "${column}" OrganicMatter "*" tillage_C_top)
+                   (handle sum)
+                   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg C/ha/&"))
+           (interval (path column "${column}" OrganicMatter "*" tillage_C_soil)
+                     (handle sum)
+                     (factor 1e5)      ;g/cm^2 -> kg/ha
+                     (dimension "kg C/ha/&"))
+           ))
+
+(deflog "Harvest" harvest)
+
+;;; log.dai ends here

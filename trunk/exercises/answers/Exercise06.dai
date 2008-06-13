@@ -1,0 +1,164 @@
+;;  Setting "working directory"
+;;  Daisy writes a Daisy.log-file during execution. 
+;;  This log-file contains any error messages
+;;  If the working directory is set correctly the log-file will be found here
+(directory "C:/DaisySim/Exercise/06")
+;;  Setting search path for library-files 
+(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
+
+;; Including external library-files
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "fertilizer.dai")
+(input file "log.dai")
+
+;; Weather data
+(weather default "Taastrup6201.dwf")
+
+;;  Description that will occur in all output files
+(description "Arable Farm Rotation; Soil: Fine sandy loam; Weather: Taastrup")
+
+;;  Defining soil horizons of a fine sandy loam
+(defhorizon "Ap F.S.L." default
+    (dry_bulk_density 1.53 [g/cm^3]) 
+    (clay 0.113 [])
+    (silt 0.277 [])
+    (sand 0.584 [])
+    (humus 0.026 [])
+    (C_per_N 11.0 [g C/g N])
+;   (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
+;                    (Theta_sat 0.403 [cm^3 H2O/cm^3])
+;                    (alpha 0.0385 [cm^-1])
+;                    (n 1.211 [])
+;                    (K_sat 7.52 [cm/h]))
+;    (description "Data from O.H. Jacobsen (1989)")
+)
+(defhorizon "B F.S.L." default
+    (dry_bulk_density 1.51 [g/cm^3]) 
+    (clay 0.235 [])
+    (silt 0.253 [])
+    (sand 0.507 [])
+    (humus 0.005 [])
+    (C_per_N 11.0 [g C/g N])
+;    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
+;                    (Theta_sat 0.421 [cm^3 H2O/cm^3])
+;                    (alpha 0.2605 [cm^-1])
+;                    (n 1.135 [])
+;                    (K_sat 14.5 [cm/h]))
+;    (description "Data from O.H. Jacobsen (1989)")
+)
+(defhorizon "C F.S.L." default
+    (dry_bulk_density 1.57 [g/cm^3]) 
+    (clay 0.244 [])
+    (silt 0.283 [])
+    (sand 0.471 [])
+    (humus 0.002 [])
+    (C_per_N  11.0)    ; note that the dimention is omittet
+;    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
+;                    (Theta_sat 0.401 [cm^3 H2O/cm^3])
+;                    (alpha 0.0570 [cm^-1])
+;                    (n 1.131 [])
+;                    (K_sat 1.65 [cm/h]))
+;    (description "Data from O.H. Jacobsen (1989)")
+)
+
+;;  Parameterisation of column (Fine sandy loam)
+(defcolumn "Fine sandy loam" default
+     (Soil
+          (MaxRootingDepth 100 [cm])
+          (horizons (  -30 [cm] "Ap F.S.L.")
+                    (  -80 [cm] "B F.S.L.")
+                    ( -220 [cm] "C F.S.L.")))
+     (OrganicMatter (init (input 3000 [kg C/ha/y])))
+     (Groundwater pipe (pipe_position -1.1 [m])(L 18 [m])(h_aquifer 2.00 [m])
+          (Z_aquitard 2.00 [m])(K_aquitard 0.0015 [cm/h]))
+)
+
+;; Spring Barley setup.
+(defaction sbarley_A_F_R activity
+  (wait_mm_dd 3 20)(plowing)
+  (wait_mm_dd 4 05)(fertilize (N25S (weight 121 [kg N/ha])))
+    (seed_bed_preparation)(sow "Spring Barley")
+  (wait (or (crop_ds_after "Spring Barley" 2.0)(mm_dd 09 1)))
+    (harvest "Spring Barley" (stub 8 [cm]))
+)
+;; Winter Barley setup.
+(defaction wbarley_A_F_R activity
+  (wait_mm_dd 9 01)(plowing)
+  (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Barley")
+  (wait_mm_dd 3 25)(fertilize (N25S (weight 60 [kg N/ha])))
+  (wait_mm_dd 4 25)(fertilize (N25S (weight 81 [kg N/ha])))
+  (wait (or (crop_ds_after "Winter Barley" 2.0)(mm_dd 8 9)))
+    (harvest "Winter Barley" (stub 8 [cm]))
+)
+;; Winter Rape setup.
+(defaction wrape_A_F_R activity
+  (wait_mm_dd 8 15)(plowing)
+  (wait_mm_dd 8 20)(fertilize (N25S (weight 25 [kg N/ha])))
+  (seed_bed_preparation)(sow "Winter Rape")
+  (wait_mm_dd 3 05)(fertilize (N25S (weight 130 [kg N/ha])))
+  (wait (or (crop_ds_after "Winter Rape" 2.0)(mm_dd 8 9)))
+    (harvest "Winter Rape" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+;; Winter Wheat setup.
+(defaction wwheat_A_F_R_1 activity
+  (wait_mm_dd 9 01)(plowing)
+  (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Wheat")
+  (wait_mm_dd 4 05)(fertilize (N25S (weight 55 [kg N/ha])))
+  (wait_mm_dd 5 05)(fertilize (N25S (weight 74 [kg N/ha]))) 
+  (wait (or (crop_ds_after "Winter Wheat" 2.0)(mm_dd 9 1)))
+    (harvest "Winter Wheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+;; Winter Wheat setup.
+(defaction wwheat_A_F_R_2 activity
+  (wait_mm_dd 9 01)(plowing)
+  (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Wheat")
+  (wait_mm_dd 4 05)(fertilize (N25S (weight  60 [kg N/ha])))
+  (wait_mm_dd 5 05)(fertilize (N25S (weight 101 [kg N/ha])))
+  (wait (or (crop_ds_after "Winter Wheat" 2.0)(mm_dd 9 1)))
+    (harvest "Winter Wheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+;; Arable Farm Rotation
+(defaction A_F_R activity
+  sbarley_A_F_R
+  wbarley_A_F_R
+  wrape_A_F_R
+  wwheat_A_F_R_1
+  wwheat_A_F_R_2
+)
+;;  Selecting column
+(column "Fine sandy loam")
+
+;; Start of simulation.
+(time 1994 1 1)
+
+;; Selecting management
+(manager activity
+  A_F_R
+  (wait_mm_dd 12 31) stop
+)
+
+;; Selecting output files
+(output Harvest
+        "Crop Production"
+;;      Water balance 0-100 cm  
+        ("Root Zone Water Balance" (to -100 [cm])(when daily)
+          (where "Daily_WB.dlf"))
+          
+;; OBS !!!!  the to statement has been removed             
+;;      Monthly water balance down to the top of the aquitard
+        ("Root Zone Water Balance" (when monthly)  
+          (where "Monthly_WB.dlf"))  
+;;      Nitrogen balance 0-100 cm  
+        ("N Balance" (to -100 [cm])(when daily)
+          (where "Daily_NB.dlf"))  
+ ;;      Monthly nitrigen balance down to the top of the aquitard
+       ("N Balance" (when monthly)  
+          (where "Monthly_NB.dlf"))  
+;;      Soil profile data
+        ("Groundwater" (when daily))       
+        ("Soil Water Content" (when daily))
+        ("Soil Water Potential"(when daily))
+        ("Soil NO3 Concentration"(when daily))
+)
+

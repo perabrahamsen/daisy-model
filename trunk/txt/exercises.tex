@@ -1,0 +1,1133 @@
+\documentclass[a4paper,11pt,twoside]{article}
+\usepackage{a4}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{hyperref}
+%\usepackage{times}
+% Boxed listings.
+\usepackage{boxedminipage}
+\renewcommand{\figurename}{Box}
+
+% Larger pages.
+\addtolength{\textwidth}{4cm}
+\addtolength{\hoffset}{-2cm}
+\addtolength{\oddsidemargin}{1cm}
+\addtolength{\evensidemargin}{-1cm}
+
+% Per section figure and table numbering.
+\makeatletter
+\@addtoreset{table}{section}
+\renewcommand\thetable{\thesection.\@arabic\c@table}
+\@addtoreset{figure}{section}
+\renewcommand\thefigure{\thesection.\@arabic\c@figure}
+% Boldface, left adjusted captions.
+\long\def\@makecaption#1#2{%
+   \vskip\abovecaptionskip
+   \setbox\@tempboxa\hbox{{\bf#1:} #2}%
+   \ifdim \wd\@tempboxa >\hsize
+     {\bf #1:} #2\par
+   \else
+     \global \@minipagefalse
+     \hb@xt@\hsize{\box\@tempboxa\hfil}%
+   \fi
+  \vskip\belowcaptionskip}
+\makeatother
+
+\bibliographystyle{apalike}
+\input{macro}
+
+% External references.
+\usepackage{xr}
+\externaldocument[tut-]{tutorial}
+\externaldocument[ref-]{reference}
+
+% Constant references.
+\newcommand{\daisytut}{\textit{\Daisy{} Tutorial}}
+\newcommand{\daisyref}{\textit{\Daisy{} Program Reference Manual}}
+
+% Easy of edit more important than ease of reading.
+\sloppy
+
+\begin{document}
+
+\section*{General introduction to the application of the \Daisy{} model}
+
+Søren Hansen\\
+The Royal Veterinary and Agricultural University\\
+Department of Agricultural Sciences\\
+Laboratory for Agrohydrology and Bioclimatology\\
+\\
+Updated by Per Abrahamsen, \today{}.
+
+\begin{abstract}
+  This introduction to the application of the \Daisy{} model comprises
+  minor 12 exercises.  Exercise~\ref{ex:intro} illustrates how to set
+  up a simple simulation using minimum information on the simulated
+  system and how to extract simulation results.
+  Exercises~\ref{ex:hydraulic}~\&~\ref{ex:retc} are dealing with soil
+  hydraulic properties and discretization of the soil profile.
+  Exercise~\ref{ex:irrigation} is introducing irrigation.
+  Exercise~\ref{ex:groundwater} is dealing with tile drains and the
+  calibration of the interface to the groundwater.
+  Exercise~\ref{ex:rotation}~\&~\ref{ex:organic} are introducing the
+  simulation of rotations and the use of organic fertilizers.
+  Exercise~\ref{ex:warmup} is illustrating the importance of
+  introducing a ``warm-up'' period. In Exercise~\ref{ex:mit} the
+  MIT-model (Mineralization-Immobilization Turnover) is calibrated.
+  Exercise~\ref{ex:weather} builds a \Daisy{} weather file.  In
+  Exercise~\ref{ex:defam} an organic fertilizer is parameterised.  In
+  Exercise~\ref{ex:croppar} a crop is parameterised.
+  
+  A technical description of the \Daisy{} model is given
+  by \cite{daisy-ems} and \cite{daisy-new}.
+\end{abstract}
+
+\tableofcontents
+
+\section*{Introduction}
+
+In order to run a \daisy{} simulation the model needs
+parameterisation. The required information is parsed on to the model
+through setup-files (or \texttt{.dai} files), which are written in a special
+input-language. \Daisy{} stores information in an internal database.
+The information parsed on to the model need not occur in any special
+order. The \daisy{} code contains a partial parameterisation, i.e.\ a
+number of parameters is given default values at initialisation.
+However, it is always possible to overwrite the default
+parameterisation. Information on soil horizons is stored in the
+internal database by the \texttt{horizon}--component:
+\begin{verbatim}
+  (defhorizon "Ap JB6" FAO3
+    "An optional description."
+    ;; More parameters
+    (clay 15.5 [%]))
+\end{verbatim}
+where \texttt{defhorizon} is short for define horizon. Other similar
+expressions are \texttt{defcolumn} (defining a soil column including
+the soil surface and the bioclimate above it), \texttt{defcrop}
+(defining crop growth parameters), \texttt{defam} (defining added
+matter, e.g.\ fertilizers), \texttt{defaction} (defining an action
+list of management actions), and \texttt{deflog} (defining
+output-variables). \texttt{"\textit{Ap JB6}"} is the name which the
+parameterisation will have in the internal database and which later
+can be referred to when one wants to retrieve the stored information.
+The \texttt{FAO3} keyword retrieves the structure of the internal
+database and, hence, it specifies the type of information that now can
+be expected and it also includes default values given to any of the
+parameters of the horizon. Alternatively, the name of an existing
+element in the database (a previously defined horizon) could be stated
+instead of the expression \texttt{FAO3}\footnote{\texttt{(defhorizon "Ap
+    Askov" "Ap JB6" (humus 1.5 [\%]))} this statement overwrites the
+  humus content but retains all other information stored in ``Ap
+  JP6''.}.  The expression ``\texttt{(clay 15.5 [\%])}\ldots'' refers
+to an attribute list (an attribute list is an unordered set of
+(\textit{name, value}) pairs), which contains the parameters to be
+added or changed as compared to the selected database element (default
+or a previously defined horizon). In the present example the component
+``horizon'' has a member ``clay'' of type ``number'' and furthermore
+the value 15.5 is assigned to this member.  The square brackets after
+the number (15.5) is used to give the dimension of the number. In the
+present example the clay content is given as percent. If the brackets
+are left out, \daisy{} will use a default dimension, which may not be
+what you think.  So don't leave out the dimension.
+
+It is noted that parentheses are used to group information e.g.
+\texttt{(clay 0.155 [])}. Similarly all the information defined by the
+defhorizon statement and stored under the name ``\texttt{Ap JB6}'' are
+embedded in parentheses. Parentheses are the main structural element
+of the \daisy{} language syntax.
+
+Furthermore it is noted that the name ``\texttt{Ap JB6}'' is imbedded
+in quotations marks. Names may always be imbedded in quotation marks,
+but it is only necessary if the name contains special symbols
+including white spaces. The only special symbol, which can be used
+without the use of quotation marks, is the underscore.
+
+Comments, which are ignored by the parser, can be included in
+\daisy{}-setup-files by use of semicolons (;). The parser ignores any
+text occurring after a semicolon until end-of-line. The only exception
+is when the semicolon is imbedded in quotation marks, i.e.\ is a part
+of a name.
+
+A comprehensive description of the \daisy{} input-language is given in
+\daisyref{}~\cite{daisy-ref}.
+
+\section{Writing a \Daisy{} Setup File}
+\label{ex:intro}
+
+The objective of this exercise is to illustrate how to write a
+\daisy{}-setup-file, run a simple simulation, and extract simulation
+results.
+
+When writing a \daisy{}-setup-file it is practical first to define
+computational environment and the external library-files, which is
+going to be used by the simulation, as shown in box~\ref{box:header}.
+
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{\Daisy{}-setup-file header}
+    \label{box:header}
+\begin{verbatim}
+;; Setting "working directory", note that `/' is used and not `\'
+(directory "C:/DaisySim/Exercise/01")
+;; Setting search path for library-files
+(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
+
+;; Including external library-files
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "fertilizer.dai")
+(input file "log.dai")
+
+;; Weather data
+(weather default "Taastrup6201.dwf")
+
+;; Description that will occur in all output files
+(description "Spring Barley; Soil: Fine sandy loam; Weather: Taastrup")
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+
+It is noted that first the working directory is set. The reason is
+that the \daisy{} code writes a log-file (\texttt{daisy.log}), where
+all messages from the simulation, including error messages, is stored.
+Hence if the working directory is set correctly then this log file
+will occur in the selected directory.
+
+The external library-files are written in the same \daisy{}
+input-language as the \daisy{}-setup-file. In fact any information,
+which is supplied by the \daisy{}-setup-file, could be moved to an
+external file, which then could be included by the input file
+statement. On the other hand any information supplied by the external
+library-files could also be written directly to the
+\daisy{}-setup-file. The use of external library-files is just a
+convenient way of organising ones data. There is only one hard rule
+that must be obeyed and that is that any information that is used must
+be defined before any reference is made to it.
+
+Weather data are driving variables in the simulation and is supplied
+to the model through a special file written in a special format (daisy
+weather format or \texttt{dwf}). This format shall be explained later.
+
+Basic soil horizon information is given in table~\ref{tab:basic}. This
+information is transferred to the internal library of the model using
+defhorizon as shown in box~\ref{box:horizon}. 
+
+\begin{table}[!htbp]
+  %\centering
+  \caption{Basic soil horizon parameters.}
+  \label{tab:basic}
+  \begin{tabular}{llllllllllllll}\hline
+    Depth    & Dry bulk density & Humus & Clay     & Silt  & Sand \\
+    cm       & g/cm$^{3}$       &       & <2$\mu$m &      & >50$\mu$m\\\hline
+    00 -- 30 & 1.53             & 0.026 & 0.113    & 0.277 & 0.584 \\
+    30 -- 80 & 1.51             & 0.005 & 0.235    & 0.253 & 0.507 \\
+    80 --    & 1.57             & 0.002 & 0.244    & 0.283 & 0.471 \\\hline
+  \end{tabular}
+\end{table}
+
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{Defining a horizon.}
+    \label{box:horizon}
+\begin{verbatim}
+;;  Defining a soil horizon
+(defhorizon "Ap F.S.L." FAO3
+  "Data from Jacobsen, 1989"
+  (dry_bulk_density 1.53 [g/cm^3])
+  (clay 11.3 [%])
+  (silt 27.7 [%])
+  (sand 58.4 [%])
+  (humus 2.6 [%])
+  (C_per_N 11.0 [g C/g N]))
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+
+Using \texttt{defhorizon} many more parameters can be defined, see
+\daisyref{}~\cite{daisy-ref}. When these parameters are not supplied
+by the \texttt{defhorizon}-statements then the model uses either
+predefined default values or pedotransfer functions to estimate the
+missing parameters. E.g., turnover rates of organic matter have been
+assigned default values, soil thermal properties are estimated by a
+modified de Vries model~\cite{daisy-new}, and soil hydraulic
+properties are estimated by the \textsc{hypres} pedotransfer function
+\cite{hypres}.
+
+Based on horizon information a column can now be build. In principle
+the column comprises the bioclimate (upper boundary, exchange with the
+atmosphere), the soil profile itself, and a groundwater condition
+(lower boundary, exchange with the groundwater). However the
+bioclimate component is fully parameterised by defaults, and hence it
+is not necessary to include it in the setup. A column parameterisation
+based on minimum requirements is shown in box~\ref{box:column}.
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{Defining a column.}
+    \label{box:column}
+\begin{verbatim}
+;;  Parameterisation of column (Fine sandy loam)
+(defcolumn "Fine sandy loam" default
+     (Soil (MaxRootingDepth 100 [cm])
+           (horizons (  -30 [cm] "Ap F.S.L.")
+                     (  -80 [cm] "B F.S.L.")
+                     ( -400 [cm] "C F.S.L.")))
+     (OrganicMatter (init (input 3000 [kg C/ha/y])))
+     (Groundwater deep))
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+Firstly, it is noticed, that the column is given the name
+\texttt{"Fine sandy loam"}, secondly, that the parameterisation
+comprises two sections, a soil section and a groundwater section, as
+the bioclimate section is omitted. The soil section contains
+information on the maximum rooting depth in the soil and the soil
+horizons of the profile. The A-horizon extends down to 30 cm depth,
+the B-horizon is found in the interval 30-80 cm and C-horizon starts
+at 80 cm depth and continues down to at least 400 cm depth, where the
+calculations stop. 
+
+The organic matter section gives information used in initialization of
+the MIT-model
+(\textit{M}ineralization-\textit{I}mmobilization-\textit{T}urnover
+model).  The figure 3000 kg C/ha/y indicated the average annual input
+of organic carbon in the soil in the decade before the start of the
+simulation.  The carbon input comprises carbon in organic fertilizer,
+plant residuals, and rhizodeposition.  The model contains a procedure
+that automatically parameterize the MIT-model based on this
+information. 
+
+The groundwater section tells that the position of the groundwater
+table is located deep below the 400 cm limit of the calculations. This
+means that a free drainage can be selected for the soil water dynamics
+calculations. Again, when only this minimum information is supplied
+then the model makes extensive use of default parameterisation.
+
+The next step is to define a list of actions performed in order to
+grow spring barley; in this case the list is named
+\texttt{SBarley\_management}, box~\ref{box:sbarley}. 
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{Spring barley management.}
+    \label{box:sbarley}
+\begin{verbatim}
+;; Defining an action list related to management  
+(defaction SBarley_management activity
+  (description "Management plan for spring barley.")
+  (wait_mm_dd 3 20)
+  (plowing)
+  (wait_mm_dd 4 15)
+  (seed_bed_preparation) 
+  (sow "Spring Barley")
+  (wait_mm_dd 4 20) 
+  (fertilize (N25S (weight 95 [kg N/ha]))) 
+  (wait (or (crop_ds_after "Spring Barley" 2.0) ;Ripe
+            (mm_dd 9 1))) 
+  (harvest "Spring Barley"
+           (stub 8 [cm])
+           (stem 0.70 [])
+           (leaf 0.70 [])))
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+It is noted that the action list comprises of activities viz.\ to wait,
+to plow, to make a seedbed preparation, to sow, to fertilize and to
+harvest. The two tillage operations, \texttt{plowing} and
+\texttt{seed\_bed\_preparation}, are in fact lists of primitive
+actions found in the library ``\texttt{tillage.dai}''. The command sow
+takes one parameter, which is the name of crop that is to be sown; in
+this case the name is \texttt{"Spring Barley"}. \texttt{"Spring
+  Barley"} is the name of a list of crop parameters, which is found in
+the library ``\texttt{crop.dai}'', or in fact the parameter list is
+found in a file which is included (input file) in the
+\texttt{crop.dai}-file. The command fertilize takes up to arguments.
+The first argument comprises, a name, which in the present case is
+N25S, and an attribute list.  However, only the weight parameter,
+\texttt{(weight 95 [kg N/ha])}, is given here, the remaining of the
+required parameters are to be found in the library file
+``fertilizer.dai''.  The first argument of command harvest is the name
+of the crop to be harvested, and then follows a list of attributes
+specifying the stubble length (here 8 cm) and the fraction of straw
+\texttt{(stem 0.70 [])} and leaf \texttt{(leaf 0.70 [])} removed from
+the field at harvest. Defaults are in this case that the stubble
+length is 0 cm and that all straw and leaf are removed.
+
+Wait statements are used in order to govern the timing of the other
+management actions. Two types of wait statements are used in the
+present action list. The first statement tells the model to wait until
+a certain day in the year defined by month number and day number in
+the month, e.g.\ \texttt{(wait\_mm\_dd 3 20)}. The second type waits
+until a certain condition becomes true. The or-statement becomes true
+when one of its conditions becomes true. The \texttt{crop\_ds\_after}
+statement takes two arguments; the first is the name of the considered
+crop and the second is a boundary development state. If the
+development stage of the crop is greater or equal to the boundary
+development stage then the statement is true. The crop development
+stage is 0 at emergence, 1 at flowering, and 2 at maturing. Hence the
+statement gets true when the spring barley is ripe. The second
+condition of the or-statement becomes true when the date is 1$^{st}$
+of September \texttt{(mm\_dd 9 1)}.
+
+Now everything is ready so we can actually begin a simulation. As
+shown in box~\ref{box:activation} we activate a column, a stating date
+and an agricultural management practice.
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{Activate simulation.}
+    \label{box:activation}
+\begin{verbatim}
+;;  Selecting a previously defined column.
+(column ``Fine sandy loam'')
+
+;; Selecting the of the beginning of the simulation.
+(time 1993 1 1)
+
+;; Selecting the agricultural management and the end of simulation
+(manager activity
+   SBarley_management
+   (wait_mm_dd 1 1) 
+   stop)
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+However, we have not selected any output. This is done with the output
+statement as shown in box~\ref{box:output}. In the present case we
+only make use of predefined output logs that can be found in the
+external library file ``\texttt{log.dai}''.
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{Select output files.}
+    \label{box:output}
+\begin{verbatim}
+(output Harvest
+        "Crop Production"
+;;      Water balance of the upper 100 cm  
+        ("Root Zone Water Balance" (to -100 [cm])(when daily)
+          (where "Daily_WB.dlf"))  
+        ("Root Zone Water Balance" (to -100 [cm])(when monthly)  
+          (where "Monthly_WB.dlf"))  
+;;      Nitrogen balance of the upper 100 cm  
+        ("N Balance" (to -100 [cm])(when daily)
+          (where "Daily_NB.dlf"))  
+        ("N Balance" (to -100 [cm])(when monthly)  
+          (where "Monthly_NB.dlf"))  
+;;      Soil profile data
+        ("Soil Water Content" (when daily))
+        ("Soil Water Potential"(when daily))
+        ("Soil NO3 Concentration"(when daily)))
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+When \texttt{Harvest} is selected then the harvested yields are
+written to the output-file ``\texttt{Harvest.dlf}''. The extension
+\texttt{.dlf} indicates that the file is written in
+\daisy{}-log-format, which is a format that easily can be opened in a
+spreadsheet. Furthermore it indicates that the output can be inspected
+by use of the \daisy{} output-viewer (\texttt{ShowDaisyOutput.exe}).
+However, the only exception from the latter is the
+\texttt{Harvest.dlf}-file; all other output files can be viewed by the
+output-viewer. Furthermore \texttt{"Crop Production"} is selected. In
+this case daily (default) values of variables pertaining to crop
+production is written to ``\texttt{crop\_prod.dlf}''. It is noted that
+the water and nitrogen balances is of the upper 100 cm (the command:
+\texttt{(to -100 [cm])}) and that both the output frequency daily and
+monthly is selected (the when-command) and that the different output
+frequencies are written to different output-files (the
+where--command). In addition some profile data are selected as
+daily-values.
+
+Fill in the necessary information in the \daisy{}-setup-file
+\texttt{Exercise01.dai} and run a simulation by dragging and dropping
+the setup-file at the \daisy{} executeable. Inspect the created
+output-files by use of the output-viewer and an
+\textsc{excel}-spreadsheet.  Construct a water balance, a mineral
+nitrogen balance, an ammonium balance and a nitrate balance.
+
+\section{Setting Hydraulic Properties }
+\label{ex:hydraulic}
+
+The objective of this exercise is to utilize measured soil hydraulic
+properties, e.g.\ the soil water retention curve and the hydraulic
+conductivity curve. Based on measurements soil water retention and
+unsaturated hydraulic conductivity table~\ref{tab:M-vG} has been
+prepared.
+\begin{table}[!htbp]
+  %\centering
+  \caption{Mualem-van Genuchten parameters of soil hydraulic
+    properties based on data from~\cite{jyndevad}. Parameter fitting
+    is done by using the \textsc{retc} software~\cite{retc}}.
+  \label{tab:M-vG}
+  \begin{tabular}{llllll}\hline
+    Depth  & $\theta_{s}$ & $\theta_{r}$ & $\alpha$  & $n$   & $K_{s}$\\
+    cm     &              &              & cm$^{-1}$ &       & cm/h \\\hline
+    00--30 & 0.403        & 0.000        & 0.0385    & 1.211 & 7.52\\
+    30--80 & 0.421        & 0.000        & 0.2605    & 1.135 & 14.5\\
+    80--   & 0.401        & 0.000        & 0.0570    & 1.131 & 1.65\\\hline
+  \end{tabular}
+\end{table}
+
+The soil hydraulic properties are a part of the soil horizon. The
+\daisy{} code is able to use a number of different descriptions or
+models of soil hydraulic properties~\cite{daisy-ref}. The soil hydraulic
+properties parameters are written to the \daisy{}-setup-file in the
+\texttt{defhorizon} section as illustrated in box~\ref{box:hydraulic}.
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{Hydraulic parameters}
+    \label{box:hydraulic}
+\begin{verbatim}
+(defhorizon "Ap F.S.L." FAO3
+  (description "Data from O.H. Jacobsen (1989)")
+  ;; Insert other parameters here.
+  (hydraulic M_vG 
+             (Theta_res 0.0 [%])
+             (Theta_sat 40.3 [%])
+             (alpha 0.0385 [cm^-1])
+             (n 1.211 [])
+             (K_sat 7.52 [cm/h])))
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+
+\texttt{M\_vG} is the name of the selected hydraulic model (Mualem-van
+Genuchten model) and the following attribute list is the
+parameterisation of this model.
+
+Compare the water and nitrogen balance results obtained with the
+parameterised Mualem--van Genuchhten model with the corresponding
+results obtained with the pedotransfer function.
+
+\section{Calculating Hydraulic Properties}
+\label{ex:retc}
+
+Measured basic soil data for a coarse sandy soil is shown in
+table~\ref{tab:texture} through table~\ref{tab:conductivity}. Use the
+\textsc{retc} software to estimate the necessary parameters in order
+to build a parameterisation of this soil.
+
+\begin{table}[!htbp]
+  %\centering
+  \caption{Basic soil horizon parameters of a coarse sandy
+    soil~\cite{jyndevad}.}
+  \label{tab:texture}
+  \begin{tabular}{llllll}\hline
+    Depth  & Dry bulk density & Humus & Clay     & Silt  & Sand\\
+    cm     & g/cm$^{3}$       &       & <2$\mu$m &       & >50$\mu$m\\\hline
+    00--30 & 1.49             & 0.023 & 0.039    & 0.072 & 0.866\\
+    30--   & 1.49             & 0.004 & 0.029    & 0.023 & 0.944\\\hline
+  \end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+  %\centering
+  \caption{Soil water retention data~\cite{jyndevad}.}
+  \label{tab:retention}
+  \begin{tabular}{lllllllll}\hline
+    Depth & Porosity & pF & pF & pF & pF & pF & pF & pF\\
+    cm &  & 1.0 & 1.2 & 1.7 & 2.0 & 2.2 & 2.7 & 4.2\\\hline
+    00--30 & 0.427 & 0.375 & 0.364 & 0.211 & 0.168 & 0.149 & 0.119 & 0.050\\
+    30--& 0.436 & 0.369 & 0.343 & 0.097 & 0.073 & 0.059 & 0.045 & 0.020\\\hline
+  \end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+  %\centering
+  \caption{Soil hydraulic conductivity data [cm/h]~\cite{jyndevad}.}
+  \label{tab:conductivity}
+  \begin{tabular}{llrrrr}                              \hline
+    Depth  & Saturation & pF    & pF   & pF   & pF   \\
+    cm     & \%         & 1.0   & 1.2  & 1.4  & 1.7  \\\hline
+    00--30 & 21.7       & 10.03 & 7.18 & 3.95 & 0.032\\
+    30--   & 39.5       &  4.59 & 2.93 & 0.15 & 0.002\\\hline
+  \end{tabular}
+\end{table}
+
+So far we have used the default discretization in our simulations.
+Introduce your own discretization and run a simulation. It is hard
+rule that numeric layers may not cross horizon boundaries. It is a
+rule of thump that the size of a numeric layer should not exceed twice
+the dispercivity of the soil (the dispercivity is a member of the soil
+as defined within the column and its default value is 5 cm). The
+numeric layers are defined by their lower boundary (zplus) starting
+from the top. An example of a discretization is shown in
+box~\ref{box:discretization}.
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{Discretization}
+    \label{box:discretization}
+\begin{verbatim}
+(defcolumn "Coarse sand" default
+  ;; Insert other parameters here.
+  (Soil (MaxRootingDepth 50 [cm])
+        (dispercivity 5 [cm]) 
+        (horizons (  -30 [cm] "Ap C.S")
+                  ( -320 [cm] "C C.S")))
+  (Movement vertical
+    (Geometry (zplus -2 -4 -7 -10 -13 -19 -22 -25 -27 -30 -35 -40 -45 -50
+                     -55 -60 -65 -70 -75 -80 -85 -90 -95 -100 -120 -130
+                     -140 -150 -160 -170 -180 --190 -200 -210 --220 -230 
+                     -240 -250 -260 -270 -280 -290 -300 -310 -320 [cm])))
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+In box~\ref{box:discretization} the specification of the dispercivity
+might as well be omitted as it only specifies the default value.
+
+Does the crop in this example experience water stress?
+
+\section{Irrigation}
+\label{ex:irrigation}
+
+The objective of this exercise is to introduce irrigation in the
+management practice.
+
+Develop an irrigation strategy for the spring barley grown on a coarse
+sandy soil (exercise~\ref{ex:retc}). The \daisytut{}
+section~\ref{tut-sec:irrigation} describes how this can be done, and
+further information can be obtained from the \daisyref{}.
+
+\section{Groundwater}
+\label{ex:groundwater}
+
+The objective of this exercise is to introduce tile drains and the
+calibration of the interface to the groundwater.
+
+How tile drains can be introduced in the simulation is described in
+\daisytut{}, section~\ref{tut-sec:groundwater}. The soil and the
+management are characterised as in exercise~\ref{ex:hydraulic}.  We
+know the distance between the drainpipes are 18 m (default value) and
+that the pipes are located at 110 cm depth (default value.  Assume
+further that an aquitard of thickness 2 m (default value) is located
+at 2.20 -- 4.20 m depth and that the aquitard is overlaying an aquifer,
+which is characterised by a pressure potential of 200 cm at the top of
+the aquifer (the interface between the aquitard and the aquifer).
+Measurement shows that approximately 2/3 of the net precipitation in
+1993 was lost through the drainpipes.  Calibrate the hydraulic
+conductivity of the aquitard so that the simulated value matches the
+measured value.
+
+In the present case the lowest soil horizon ends at 2.2 m depth (i.e.\
+the top of the aquitard).  The new lower boundary condition is
+introduced by entering 
+\begin{verbatim}
+  (Groundwater pipe (K_aquitard 0.01 [cm/h]))
+\end{verbatim}
+instead of 
+\begin{verbatim}
+  (Groundwater deep)
+\end{verbatim}
+The numerical value assigned to \texttt{K\_aquitard} is the value used
+for the calibration. 
+
+\section{Rotations}
+\label{ex:rotation}
+
+The objective of this exercise is to introduce the simulation of a
+crop rotation.
+
+Assume the same setup for the column as in exercise~\ref{ex:groundwater}.
+
+A common crop rotation that is used at arable farms as well pig farms
+are: spring barley, winter barley, winter rape, winter wheat and
+winter wheat. A suggestion for management practices typical for Danish
+conditions pertaining to this rotation is shown in
+table~\ref{tab:rotation}.
+\begin{table}[!htbp]
+  %\centering
+  \caption{Management practices of the rotation: spring
+    barley, winter barley, winter rape, winter wheat and winter wheat.
+    Typical dates for the field operations are given parentheses.}
+  \label{tab:rotation}
+  \begin{tabular}{lccccc}
+    \hline
+    Activity & S. Barley & W. Barley & W. Rape   & W. Wheat  & W. Wheat\\
+    \hline
+    Plowing  & Spring    & Autumn    & Autumn    & Autumn    & Autumn\\
+             & (Mar. 20) & (Sep. 01) & (Aug. 15) & (Sep. 01) & (Sep. 01)\\
+    \hline
+    Seedbed preparation
+             & Spring    & Autumn    & Autumn    & Autumn    & Autumn\\
+    \& sowing& (Apr. 05) & (Sep. 10) & (Aug. 20) & (Sep. 10) & (Sep. 10)\\
+    \hline
+    Harvest  & Ripe      & Ripe      & Ripe      & Ripe      & Ripe\\
+    Straw removal & Yes  & Yes       & No        & No        & No\\
+    \hline
+    Fertilization 
+          & 121 kg N/ha & 60 kg N/ha & 25 kg N/ha & 55 kg N/ha & 60 kg N/ha\\
+    & (Apr. 05) & (Mar. 25) & (Aug. 20) & (Apr. 05) & (Apr. 05)\\
+    & & 81 kg N/ha & 130 kg N/ha & 74 kg N/ha & 101 kg N/ha\\
+    & & (Apr. 25)  & (Mar. 05)   & (May 05)   & (May 05)\\
+    \hline
+  \end{tabular}
+\end{table}
+
+It is recommended to build the management practices for each crop
+individually as in exercise~\ref{ex:intro} for the spring barley. Note
+that winter wheat following a winter rape and winter wheat following a
+winter wheat are not identical. When a management practice for each of
+the individual crops has been build then the crop rotation can be
+build as illustrated in box~\ref{box:rotation}.
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{Rotation.}
+    \label{box:rotation}
+\begin{verbatim}
+;; Spring Barley setup for an arable farm rotation.
+(defaction sbarley_A_F_R activity
+  (wait_mm_dd 3 20)(plowing)
+  (wait_mm_dd 4 05)(fertilize (N25S (weight 121 [kg N/ha])))
+  (seed_bed_preparation)(sow "Spring Barley")
+  (wait (or (crop_ds_after "Spring Barley" 2.0)(mm_dd 08 30)))
+  (harvest "Spring Barley" (stub 8 [cm])(stem 1.0 [])(leaf 1.0 [])))
+
+;; Winter Barley setup for an arable farm rotation.
+(defaction wbarley_A_F_R activity
+  ;; Insert management actions here.
+)
+
+;; Winter Rape setup for an arable farm rotation.
+(defaction wrape_A_F_R activity
+  ;; Insert management actions here.
+)
+
+;; Winter Wheat setup for an arable farm rotation (after a rape).
+
+(defaction wwheat_A_F_R_1 activity
+  ;; Insert management actions here.
+)
+
+;; Winter Wheat setup for an arable farm rotation (after a cereal).
+(defaction wwheat_A_F_R_2 activity
+  ;; Insert management actions here.
+)
+
+;; Building an arable farm rotation.
+(defaction ArableFarmRotation activity
+  sbarley_A_F_R wbarley_A_F_R wrape_A_F_R wwheat_A_F_R_1 wwheat_A_F_R_2)
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+
+Simulate the suggested arable farm rotation (only mineral fertilizer)
+begining the simulation period January 1$^{st}$ 1994.  While running
+the simulation, try to guess when the simulation will end, i.e.\ the
+year the second winter wheat is harvested.  Does the simulation run
+over time?  If so, check that you always harvest the last crop before
+sowing the next.
+
+\section{Organic Fertilizer}
+\label{ex:organic}
+
+The objective of this exercise is to introduce the use of organic
+fertilizer in the simulation of a rotation.
+
+Modify the setup of exercise~\ref{ex:rotation} in order to simulate a
+pig farm rotation where the main source of fertilizer is pig slurry.
+The fertilization practice is shown in table~\ref{tab:pig-farm}.
+
+\begin{table}[!htbp]
+  %\centering
+  \caption{Fertilization practices of the pig farm rotation:
+spring barley, winter barley, winter rape, winter wheat and winter
+wheat. Typical dates for the fertilization are given parentheses.
+Ammonium loss during application is given in squared brackets.}
+  \label{tab:pig-farm}
+  \begin{tabular}{lccccc}
+    \hline
+    Activity & S. Barley & W. Barley & W. Rape & W. Wheat & W. Wheat\\
+    \hline
+    Plowing & Spring & Autumn & Autumn & Autumn & Autumn\\
+    & (Mar. 05) & (Sep. 01) & (Aug. 15) & (Sep. 01) & (Sep. 01)\\
+    \hline
+    Fertilization & 30 T.w.w./ha & 18 T.w.w./ha & 20 T.w.w./ha & 18
+    T.w.w./ha & 18 T.w.w./ha\\
+    (pig slurry) & (Mar. 05) & (Apr. 20) & (Aug. 15) & (Apr. 20) &
+    (Apr. 20) \\
+    & [5\%] & [10\%] & [5\%] & [10\%] & [10\%]\\
+    & & & 20 T.w.w./ha & & \\
+    & & & (Mar. 20) & & \\
+    & & & [10\%] & & \\
+    \hline
+    Fertilization & & 68 kg N/ha & 24 kg N/ha & 63 kg N/ha & 95 kg N/ha \\
+    \multicolumn{2}{l}{(mineral fertilizer)} 
+    & (Mar. 25) & (Mar. 05) & (May 05) & (Apr. 05)\\
+    \hline
+  \end{tabular}
+\end{table}
+
+The present version of the \daisy{} model has a deficiency in the way
+it treats organic fertilizers that are surface broadcasted. The
+mineral part of the organic fertilizer will eventually enter the soil
+and can subsequently be utilized by the plants, but the organic part
+will stay at the surface until the next soil tillage operation, and
+while staying at the surface no turnover takes place. To compensate
+for this it is recommended to incorporate the applied organic
+fertilizer into the upper few centimetres of the soil.
+Box~\ref{box:fertilizer} shows how this can be modelled. For further
+information see \daisyref{} and \daisytut{}.
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{Defining an organic fertilizer.}
+    \label{box:fertilizer}
+\begin{verbatim}
+;; Defining a pig slurry where 5% of the ammonium content is lost at 
+;; pplication (defam = defining added matter)
+(defam "Slurry_Vol05%" pig_slurry 
+  ;; Other parameters.
+)
+
+;; Spring Barley setup for a pig farm rotation.
+(defaction sbarley_P_F_R activity
+  (wait_mm_dd 3 05)
+  (fertilize ("Slurry_Vol05%" (weight 30 [Mg w.w./ha]))(to --5 [cm]))
+  (plowing)
+  (wait_mm_dd 4 05)
+  (seed_bed_preparation)
+  (sow "Spring Barley")
+  (wait (or (crop_ds_after "Spring Barley" 2.0)(mm_dd 08 30)))
+  (harvest "Spring Barley" (stub 8 [cm])(stem 1.0 [])(leaf 1.0 [])))
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+Box~\ref{box:fertilizer} indicates that a pig slurry (name:
+\texttt{pig\_slurry}) already has been defined (see
+``\texttt{fertilizer.dai}''). How the volatilization is set can be
+found in \daisyref{}.  Look up ``volatilization'' in the index.
+
+When inspecting the simulation results please notice the temporal
+development in soil microbial biomass pools. Does this development
+look reasonable?
+
+\section{Warm-Up Period}
+\label{ex:warmup}
+
+The objective of this exercise is to introduce a warm-up period, the
+purpose of which is to make the simulation less sensitive to the
+initial conditions.
+
+Repeat the simulation of exercise~\ref{ex:organic} with the
+modification that a warm-up period is inserted in front of the
+simulation (1994--1998). It is a rule of thump to select one rotation
+or at least 4 years of simulation as a warm-up period. Hence in the
+present case the simulation should begin January 1$^{st}$ 1989. Be
+sure to repeat the rotation; an example can be found in
+section~\ref{tut-sec:rotations} of \daisytut{}.
+
+Did the warm-up period improve the credibility of the simulation?
+
+\section{The MIT Model}
+\label{ex:mit}
+
+The objective of this exercise is to calibrate the MIT-model
+(Mineralization-Immobilization Turnover).
+
+In box~\ref{box:column} organic matter section was introduced. The
+total carbon content of the soil is calculated from the humus
+contentwhich was defined in the horizon section
+(box~\ref{box:horizon}).  The MIT model comproses several organic
+matter pools and the toal carbon content is distributed among these
+pools by the initialization procedure that makes use of anual input of
+organic carbon.  This, in combination with a warm-up period, will
+often give a reasonable initializatin and hence a reasonable
+N-mineralization.  However this can be fine tuned by introducing the
+\texttt{background\_mineralization} init parameter, like this:
+\begin{verbatim}
+       (OrganicMatter (init (input 3000 [kg C/ha/y])
+                            (background_mineralization 30 [kg N/ha/y])))
+\end{verbatim}
+Daisy will then attempt to initialize the organic matter pools so the
+total mineralization is 30 kg N/ha/y higher than the amount of organic
+bound nitrogen added to the system together with the 3000 kg C/ha/y we
+specified above.  In other words, at the time we start the simulation
+the amount of organic bound nitrogen in the soil is expected to
+decrease (be released) at a rate of 30 kg N/ha/y.
+
+In certain cases the model may not be able to initialize itself, and
+it may be necessary to park some of the soil organic carbon  in an
+inactive pool.  This is done be entreing the following parameter in
+the \texttt{defhorizon} section
+\begin{verbatim}
+  (SOM_fractions -1 -1 xxx)
+\end{verbatim}
+where \emph{xxx} is the inactive fraction of the soil organic carbon.
+
+A way to estimate the N mineralization level of the system is to grow
+an unfertilized plot and measure the nitrogen content of the crop at
+harvest. Consider the agro-ecosystem of exercise~\ref{ex:warmup} and
+assume that in 1993 and 1994 an unfertilized plot were grown with
+winter wheat. The above ground part of the crop was harvested in the
+two years and the biomass was analyzed for its N content. The
+harvested nitrogen was 102 kg N/ha and 60 kg N/ha in 1993 and 1994,
+respectively. Use this information to calibrate the MIT model by
+modifying the background mineralization parameter, and if necessary,
+the \texttt{SOM\_fractions} parameter.
+
+\section{Building a Weather File}
+\label{ex:weather}
+
+The objective of this exercise is to build a weather file.
+
+The \daisy{} weather-file is written in the \daisy{} weather format
+(extension \texttt{dwf}). In front the weather data is a header as
+shown in Box~\ref{box:weather}
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{Beginning of weather file.}
+    \label{box:weather}
+\begin{verbatim}
+dwf-0.0 
+Station: Taastrup
+Elevation: 30 m
+Longitude: 12 dgEast
+Latitude: 55 dgNorth
+TimeZone: 15 dgEast
+Surface: reference
+ScreenHeight: 2 m
+Begin: 1962-04-01
+End: 2001-10-07
+NH4WetDep: 0.9 ppm 
+NH4DryDep: 2.2 kgN/year
+NO3WetDep: 0.6 ppm
+NO3DryDep: 1.1 kgN/year
+TAverage: 7.8 dgC
+TAmplitude: 8.5 dgC
+MaxTDay: 209 yday
+Timestep: 24 hours
+PrecipCorrect: 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0
+--------------------------------------------------------------
+Year Month Day  GlobRad AirTemp Precip 
+year month mday W/m^2  dgC     mm/d
+1962 4     1    120.4   2.8     0.0
+1962 4     2    130.7   4.4     5.3
+1962 4     3    39.1    6.8     2.9
+... more climate data here ...
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+The first line in the header tells \daisy{} that the present file is
+written in the \daisy{} weather format version 0.0 (the only version
+implemented so far). Then follows a number of keywords:
+\texttt{Station}, \texttt{Elevation}, \texttt{Longitude},
+\texttt{Latitude}, and \texttt{TimeZone}; defining name and location
+of the weather station where the data were measured. \texttt{Surface}:
+reference refers to the surface above which the weather data was
+measured (reference is short grass common for most weather stations).
+\texttt{ScreenHeight} gives the height at which air temperature (and
+humidity and wind speed if measured) was recorded. \texttt{Begin} and
+\texttt{End} defines the date of the fist and last record in the
+dataset. \texttt{NH4WetDep}, \texttt{NH4DryDep}, \texttt{NO3WetDep},
+and \texttt{NO3DryDep} define deposition parameters at the location.
+\texttt{TAverage}, \texttt{TAmplitude}, and \texttt{MaxTDay} define
+the thermal regime of locality (annual average air temperature, the
+amplitude of the annual air temperature cycle, and the day of the year
+when maximum air temperature is expected on average). The
+\texttt{Timestep} keyword tells the model basic time-step of the data,
+in the present case we are dealing with daily values.
+\texttt{PrecipCorrect} gives twelve correction factors used to correct
+the precipitation month by month. In the present case the
+precipitation is measured at the soil surface, hence no correction is
+needed for the aerodynamic effect. The next three lines form the
+header for the actual weather data, which in the present example are
+written in a TAB separated format.
+
+The present example shows a minimum weather data required. However,
+\daisy{} can make use of more detailed data (see \daisyref{}).
+
+Build a \daisy{} weather file based on the data in the spreadsheet
+\texttt{ÅrslevWeatherDat.xls}. Årslev is a locality located at the
+center of Funen. The precipitation is measured at 1.5 m height and the
+shelter category is B. The surface of weather station is short grass
+and the screen height is 2 m.  The precipitation correction is found
+in table~\ref{tab:precip}
+\begin{table}[!htbp]
+  %\centering
+  \caption{Correction of point precipitation as function of shelter
+    categories [per cent], \cite{percor}.}
+  \label{tab:precip}
+  \begin{tabular}{llllllllllllll}\hline
+    Shelter & J & F & M & A & M & J & J & A & S & O & N & D & Year\\\hline
+    A & 29 & 30 & 26 & 19 & 11 & 9 & 8 & 8 & 9 & 10 & 17 & 26 & 16\\
+    B & 41 & 42 & 35 & 24 & 13 & 11 & 10 & 10 & 11 & 14 & 23 & 37 & 21\\
+    C & 53 & 53 & 45 & 29 & 16 & 13 & 12 & 12 & 13 & 17 & 29 & 48 & 27\\\hline
+  \end{tabular}
+\end{table}
+
+\section{A New Organic Fertilizer Parameterization}
+\label{ex:defam}
+
+The objective of this exercise is to introduce a new organic
+fertilizer in fertilizer library.
+
+The composition of a mixed slurry is: dry matter content 4.8\%; carbon
+content 36\% (dry matter basis); nitrogen content 10.5 \% (dry matter
+basis); ammonium content 8.5\% (dry matter basis); and nitrate contend
+0.0\% (dry matter basis).  A batch experiment has shown that the
+mineralization of the mixed slurry approximately can be described by
+splitting the organic matter into two pools and assume first order
+degradation kinetics for the pools. The resistant pool constituted
+79\% of the C with a half-life of 150 days and the more easy
+decomposable pool constituted 21\% of the C with a half-life of 15
+days. From previous experience it was suggested that the C/N of the
+easy decomposable pool should be around 5.
+
+Include the mixed slurry in the fertilizer library. Help on how to
+write a new parameterization of a new organic fertilizer can be found
+in the \daisyref{}, section~\ref{ref-model:am-organic}
+and~\ref{ref-fixed:AOM}. 
+
+Compare the results obtained with the new mixed slurry with the
+results obtained in exercise~\ref{ex:warmup}.
+
+\section{Crop Parameterization}
+\label{ex:croppar}
+
+The objective of this exercise is to parameterize a maize crop.
+
+The maize parameters found in the crop-file
+``\texttt{PioneerMaize.dai}'' are mainly based on \cite{vries-maize}.
+However, the measured data of LAI, and leaf, stem, and cob weight from
+1998 found in the spreadsheet ``\texttt{MaizeProd.xls}'' are from a
+silage maize. Define a new maize by assuming that the silage maize
+parameters partly resembles the Pioneer Maize parameters. Calibrate
+selected parameters making use of the measured data. When a new
+slightly different parameterization is defined it recommended not
+copying parameter settings and making changes, but instead to derive
+the new parameterization from the existing one. This makes it easy to
+see where the parameterizations differ.
+
+The main elements of a crop definition are shown in box~\ref{box:cropdef}. 
+\begin{figure}[!htbp]
+  \begin{boxedminipage}{\textwidth}
+    \caption{Crop definition.}
+    \label{box:cropdef}
+\begin{verbatim}
+(defcrop "Pioneer Maize (WS)" default
+  ;; Phenological development :
+  ;; Emergence   DS = 0
+  ;; Flowering   DS = 1
+  ;; Maturity    DS = 2    
+  (Devel default
+    ;; Temperature sum calculated from sowing to emergence.
+    (EmrTSum  350)
+    ;; Development rate [d^-1] in the vegetative period 
+    (DSRate1  0.0265)
+    ;; Effect of temperature on development rate in the veg. period 
+    (TempEff1 (8. 0.00) (10. 0.30) (15. 0.75) (25. 1.00) (35.  1.20))
+    ;; Effect of photoperiod on development rate in the veg. period 
+    (PhotEff1 (0. 0.90) (12. 1.00) (14. 0.95) (16. 0.90) (24.  0.90))
+    ;; Development rate [d^-1] in the reproductive period 
+    (DSRate2  0.017)
+    ;; Effect of temperature on development rate in the rep. period 
+    (TempEff2 (8. 0.00) (10. 0.30) (15. 0.75) (25. 1.00) (35.  1.20)))
+  (LeafPhot 
+    ;; Insert parameters here.
+  )
+  (Canopy
+    ;; Insert parameters here.
+  )
+  (Root 
+    ;; Insert parameters here.
+  )
+  (Partit
+    ;; Insert parameters here.
+  )
+  (Prod 
+    ;; Insert parameters here.
+  )
+  (CrpN 
+    ;; Insert parameters here.
+  )
+  (Harvest 
+    ;; Insert parameters here.
+  ))
+\end{verbatim}
+  \end{boxedminipage}
+\end{figure}
+The crop definition comprises a number of subsections: \texttt{Devel}
+contains parameters pertaining to the phenological development of the
+crop; \texttt{LeafPhot} parameters govern the leaf photosynthesis;
+\texttt{Canopy} parameters are describing LAI development and
+distribution; \texttt{Root} contains root penetration and root
+distribution parameters; \texttt{Partit} governs the partition of
+assimilates; \texttt{Prod} are dealing with respiration and production
+parameters; \texttt{CrpN} parameters are controlling the plant
+relations; and \texttt{Harvest} parameters are dealing with the
+harvest itself as well as the fate of plant residuals. All crop
+parameters are defined in \daisyref. When consulting the manual it is
+noticed that more than one crop model is implemented in the \daisy{}
+code. However, in this case we use the standard crop model, which is
+the default crop model. This crop model resembles the \textsc{sucros}
+model~\cite{sucros}.
+
+Parameters can be given in two ways: 1. as a single value (e.g.
+\texttt{DSRate1}); 2. as a piecewise linear function (e.g.
+\texttt{TempEff1}). The piecewise linear function is defined by a
+number of points (\textit{x,y}) on the considered curve. In the
+example, \texttt{TempEff1}, \textit{x} equals temperature and \textit{y} equals
+temperature effect. In the crop definition it is common to make a
+parameter a function of the development stage (DS). The only exception
+is the subsection \texttt{Devel}, where the parameters governing the
+DS are defined.  Notice that \texttt{Devel} requires the keyword
+default because more that one model describing the development is
+implemented.
+
+We have no information on roots, plant nitrogen dynamics or plant
+residues. Hence, in the calibration we need not consider the
+\texttt{Root}, \texttt{CrpN} (the nitrogen supply is ample so we need
+not consider N-stress), and \texttt{Harvest} sections. We have no
+reason to believe that the present maize variety should differ from
+the pioneer maize in respect to respiration, hence we may want to keep
+these parameters without change (keeping the
+\texttt{Prod}--parameters). The relevant \texttt{Canopy}-parameters in
+this context are pertaining to the leaf area. The specific leaf area
+(LAI per unit leaf weight) can be calculated directly from measured
+data (it is noticed that the value is not constant during the growth
+period, however the model can take this into account, see
+\daisyref{}).
+
+If we want to change the development rate of the maize in the vegetative period this can be done by writing:
+\begin{verbatim}
+  (defcrop "Exercise 12 Maize" "Pioneer Maize (WS)" 
+    (Devel original  
+      (DSRate1  0.0160)))
+\end{verbatim}
+The keyword original retains the original parameterization, hence only
+the \texttt{DSRate1} is changed.
+ 
+
+In this way the selected parameters can be changed one by one in order
+to fit the data. We may have to do quite a number of simulations when
+calibrating the model. In order to save time it is possible to make
+use of the checkpoint facility (see \daisytut{}). By using this
+facility it is possible to write a checkpoint at a predefined time and
+then later continue the simulation from that point in time.  In the
+present example we run the warm-up period and then make a checkpoint
+just before the sowing of the maize (e.g.\ \texttt{(checkpoint (when
+  (at yyyy mm dd hh)))}). The checkpoint is to be inserted among the
+log files in the output section. Another facility which also often is
+helpful is the \texttt{(activate\_output (after yyyy mm dd hh))},
+which is used to suppress output during warm-up periods.
+
+Use the calibrated setup of exercise~\ref{ex:mit} and assume that the
+maize is sow the year after the second year winter wheat. 50 ton
+w.w./ha was surface broadcasted and plowed in 27. April 1998. Maize
+was sown 4.  May and 142 kg N/ha in ammonium nitrate was applied the
+same day. The Maize was harvested for silage 3. November, however it
+was not ripe at that date.
+
+In the calibration procedure it is advisable to begin with the DS\@.
+We have no information of when the different growth stages of the
+maize occurred. But we have information on the onset of growth of the
+cobs and we can use this in order to calibrate the development rate in
+the vegetative period. We have no information that makes it possible
+do a similar calibration for the reproductive period.
+
+It is recommended that when the DS is calibrated we should continue
+looking at the \texttt{Canopy}-parameters and afterwards at the
+\texttt{LeafPhot}-parameters and \texttt{Partit}-parameters.
+
+\nocite{daisy-tut,daisy-def,daisy-fertilizer}
+
+\bibliography{daisy}
+
+\end{document}

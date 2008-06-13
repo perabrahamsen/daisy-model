@@ -1,0 +1,12 @@
+<guiComposition version="1.0">
+  <models>
+    <model omi="C:\Programmer\Daisy\daisy-src\OpenMI\Unit_test\DaisyData\DaisySimple.omi" rect_x="30" rect_y="30" rect_width="100" rect_height="51" />
+    <model omi="org.OpenMI.Tools.GUI.Trigger" rect_x="213" rect_y="30" rect_width="100" rect_height="51" />
+  </models>
+  <links>
+    <uilink model_providing="C:\Programmer\Daisy\daisy-src\sample\OpenMI_simple.dai" model_accepting="org.OpenMI.Tools.GUI.Trigger">
+      <link id="2" source_elementset="Gaaseroed" source_quantity="Matrix percolation" target_elementset="TriggerElementID" target_quantity="TriggerQuantityID" />
+    </uilink>
+  </links>
+  <runproperties listenedeventtypes="11111111111" triggerinvoke="4/1/1988 1:00:00 AM" runinsamethread="0" showeventsinlistbox="1" logfilename="CompositionRun.log" />
+</guiComposition>

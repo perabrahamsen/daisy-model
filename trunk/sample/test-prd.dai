@@ -1,0 +1,551 @@
+;;; test-prd.dai -- Partial Rootzone Drying example.
+
+(description "Simulation demonstrating Partial Rootzone Drying in Daisy.")
+
+;; Use standard parameterizations.
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "fertilizer.dai")
+(input file "log.dai")
+
+;; We start by defining two different ways to calculate ABA
+;; production, both based on the same data set.
+(defABAproduction "Fulai Liu root" root
+  "ABA production per root as function of water potential.
+Based on data collected by Fulai Liu, 2007."
+  ;; 'h' is the soil potential in [cm]. This function converts 'h'
+  ;; into ABA production from roots in that volume of soil.
+  (expr (plf h
+	     (range "ng/mm/h")
+	     (domain "MPa")
+	     (points (-1.00 6.00)
+		     (-0.35 1.25)
+		     (-0.00 0.15)))))
+
+(defABAproduction "Fulai Liu uptake" uptake
+  "ABA concentration in water uptake as function of water potential.
+Based on data collected by Fulai Liu, 2007."
+  ;; 'h' is the soil potential in [cm].  This function converts 'h'
+  ;; into an ABA concentration in water from that volume of soil.
+  (expr (* 26.625 [ng/cm^3] (exp (* -4.2816 [MPa^-1] (convert h [MPa]))))))
+
+;; We then define parameters for Farquhar and Ball.
+(defphotosynthesis Potato FC_C3 
+  "Farquhar parameters for potatoes."
+  ;; This is the main calibration effect for unlimited production.
+  (Xn 6e-3 [mol/mol/s])
+  ;; This is yhe main calibration parameter for water stress effect.
+  (ABAeffect ABA-exp (k 0.0152 [cm^3/ng]))
+  ;; Intended for avoiding excessive growth for early crops in cold climate.
+  (TempEff (0 1) (100 1)))
+
+;; We readjust our FertOrgaNic Folva for ABA.
+(defcrop "Potato; Folva; ABA" "Potato; Folva"
+  "The Folva Potato calibrated for FertOrgaNic adjusted for ABA"
+  ;; Farquhar-Ball takes care of N stress.
+  (enable_N_stress false)
+  ;; ABA takes care of water stress.
+  (water_stress_effect none)
+  ;; ABA production in roots is affected by soil water potential.
+  (Root (ABAprod "Fulai Liu uptake"))
+  ;; Stomata conductivity is affected by ABA.
+  (LeafPhot Potato))
+
+;; Weather data.
+(weather default "dk-jyndevad.dwf")
+
+;; Soil for the Danish 2005 FertOrgaNic experiment.
+(defhorizon "Jyn_15h" ISSS4
+  (clay 0.036)
+  (silt 0.047)
+  (fine_sand 0.220)
+  (coarse_sand 0.674)
+  (humus 0.023)
+  (C_per_N 14.8)
+  (dry_bulk_density 1.52)  
+  (hydraulic M_vG
+             (K_sat 125.0)
+             (Theta_sat 0.438)
+             (Theta_res 0.061)
+             (alpha 0.056)
+             (n 1.760)
+             (l 0.5)))
+
+(defhorizon "KarJyn_B" ISSS4
+  (clay 0.044)
+  (silt 0.013)
+  (fine_sand 0.166)
+  (coarse_sand 0.766)
+  (humus 0.011)
+  (C_per_N 16.9)
+  (dry_bulk_density 1.51) 
+  (hydraulic M_vG
+             (K_sat 110.8)
+             (Theta_sat 0.430)
+             (Theta_res 0.043)
+             (alpha 0.069)
+             (n 1.870)
+             (l 0.5)))
+
+(defhorizon "KarJyn_C" default
+    (clay 0.043)
+    (silt 0.008)
+    (sand 0.946)
+    (humus 0.003)
+    (C_per_N 13.3)
+    (dry_bulk_density 1.58))
+
+;; Geometry - The x-axes.
+;;
+;; We assume the drip poins are one meter apart.  This means that the
+;; left dripper is at 0 [cm], the right dripper is 1 [m], and the
+;; tuber at 50 [cm].  The drip line is placed 10 [cm] below soil
+;; surface.  We inject the water in a box volume 5 [cm] around the
+;; drip point.
+
+(defvolume drip-depth box
+  "The depth of the drip point."
+  (top finite -5 [cm])
+  (bottom finite -15 [cm]))
+
+(defvolume left-drip drip-depth
+  "The left drip point."
+  (left finite 0 [cm])
+  (right finite 5 [cm]))
+
+(defvolume right-drip drip-depth
+  "The right drip point."
+  (left finite 95 [cm])
+  (right finite 100 [cm]))
+
+(defvolume left-side box 
+  "The left side of the root zone."
+  (right finite 50 [cm]))
+
+(defvolume right-side box 
+  "The right side of the root zone."
+  (left finite 50 [cm]))
+
+;; We rereadjust our Folva ABA for this geometry
+(defcrop "Potato; Folva; PRD" "Potato; Folva; ABA" 
+  "The Folva Potato calibrated for FertOrgaNic adjusted for PRD"
+  (Root (rootdens GP2D                  ;Gerwitz&Page extended to 2D.
+                  (row_position 50 [cm]) ;Center of row.
+                  (row_distance 1 [m]))  ;Distance between rows.
+        ;; Max horizontal root distance from plant.
+        (MaxWidth 1.5 [m])))
+;; Use it.
+(defcrop "Potato; Exp" "Potato; Folva; PRD")
+
+;; Adding it up.
+(defcolumn KarJyn2005 default
+  (Soil (MaxRootingDepth 35.00)
+        (horizons ( -35.00 "Jyn_15h")
+                  ( -60.00 "KarJyn_B")
+                  (-200.00 "KarJyn_C"))) 
+  ;; This enable the 2D version of Daisy.
+  (Movement rectangle
+            ;; The soil is divided in a 2D rectangular grid.  'zplus'
+            ;; and 'xplus' specifies the grid lines.
+            (Geometry (zplus -2.5 -5 -10 -15 -20 -25 -30 -35 -40 -45
+                             -50 -55 -60 -65 -70 -80 -90 -100 -110
+                             -120 -130 -140 -150 -160 -170 -180 -190
+                             -200 [cm])
+                      (xplus 5 10 15 20 30 40 50 60 70 80 85 90 95 100 [cm])))
+  (Groundwater deep)
+  (OrganicMatter original
+                 (init (input 2900 [kg C/ha/y])
+                       (end -35 [cm])
+                       (root 800 [kg C/ha/y])
+                       (background_mineralization 60 [kg N/ha/y]))))
+
+;; Use it.
+(column KarJyn2005)
+
+;; Simulation period.
+(time 2004 12 1 1)
+(stop 2005 9 1 1)
+
+;; Management.
+
+(defam jynd2005_slurry slurry
+  (description "Parameters provided by OE in Jyndevad, 2005")
+  (dry_matter_fraction 0.025)
+  (total_N_fraction 0.196)
+  (total_C_fraction 0.400)
+  (NH4_fraction 0.77))
+
+(defaction "DK 2005 PRD" activity
+  ;; Virtual experiment with PRD based on FertOrgaNic treatment 3.
+  (wait (mm_dd 12 2))
+  (plowing)
+  (wait (mm_dd 4  7))
+  (fertilize (jynd2005_slurry (weight 12.73))(from 0)(to -10))
+  (wait (mm_dd 4  8))
+  (seed_bed_preparation)
+  (wait (mm_dd 4 11))
+  (sow "Potato; Exp" (row_width 1 [m]))
+  ;; Watering left side.
+  (wait (mm_dd  5 28))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  5 29))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  5 30))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6  1))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6  3))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6  9))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 10))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 11))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  ;; Watering right side.
+  (wait (mm_dd  6 17))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 21))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 22))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 24))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 25))
+  (irrigate_subsoil 2 [mm/h] (hours 2) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  ;; Watering left side.
+  (wait (mm_dd  6 27))
+  (irrigate_subsoil 2.133 [mm/h] (hours 3) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 28))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 29))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  6 30))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  7  1))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd  7  3))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))   
+  (wait (mm_dd  7  5))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7  7))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
+  (wait (mm_dd  7  9))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
+  ;; Watering right side.
+  (wait (mm_dd  7 11))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 12))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 13))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 14))
+  (irrigate_subsoil 2 [mm/h] (hours 3) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 15))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 18))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 20))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 22))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume right-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))  
+  ;; Watering left side.
+  (wait (mm_dd  7 25))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  7 28))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l]))) 
+  (wait (mm_dd  8  1))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))        
+  (wait (mm_dd  8  5))
+  (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
+                    (solute (NH4 0 [mg N/l])(NO3 0 [mg N/l])))
+  (wait (mm_dd 8 15))
+  (harvest "Potato; Exp" (stem 0.00)(leaf 0.00)(sorg 1.00)))
+
+(manager "DK 2005 PRD")
+
+;; Some additional log files.
+
+(deflog "ABAExtraction" crop
+  "ABA extraction in all soil intervals."
+  (where "ABAExtraction.dlf")
+  (when hourly)
+  (entries ;;Year Month MDay Hour
+           (array (tag "ABA")
+		  (dimension "ng/cm^3/h")
+		  (path column "${column}" 
+			Vegetation crops crops "${crop}" Root ABAExtraction)
+		  (spec fixed RootSystem ABAExtraction))))
+
+(deflog "H2OExtraction" crop
+  "H2O extraction in all soil intervals."
+  (where "H2OExtraction.dlf")
+  (when hourly)
+  (entries ;;Year Month MDay Hour
+           (array (tag "H2O")
+		  (dimension "cm^3/cm^3/h")
+		  (path column "${column}" 
+			Vegetation crops crops "${crop}" Root H2OExtraction)
+		  (spec fixed RootSystem H2OExtraction))))
+
+(deflog "ABACrop" crop
+  "ABA relevant information from crop."
+  (where "ABACrop.dlf")
+  (when hourly)
+  (entries ;;Year Month MDay Hour
+           (number (tag "ABAConc")
+		   (dimension "ng/cm^3")
+		   (path column "${column}" 
+			 Vegetation crops crops "${crop}" Root ABAConc)
+		   (spec fixed RootSystem ABAConc))
+	   (number (tag "H2OUpt")
+		   (dimension "mm/h")
+		   (path column "${column}" 
+			 Vegetation crops crops "${crop}" Root H2OUpt)
+		   (spec fixed RootSystem H2OUpt)
+		   (handle sum))
+	   (number (tag "Stress")
+		   (path column "${column}" Vegetation crops crops "${crop}"
+                         Root water_stress)
+		   (spec fixed RootSystem water_stress)
+		   (handle max))))
+
+(deflog "Root form GP2D" crop
+  (where "rootform_gp2d.dlf")
+  (when daily)
+  (entries ;; Year Month MDay
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Prod WRoot)
+                   (spec fixed Production WRoot))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Phenology DS)
+                   (spec phenology default DS))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root Depth)
+                   (spec fixed RootSystem Depth))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" a_z)
+                   (spec rootdens GP2D a_z))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" a_x)
+                   (spec rootdens GP2D a_x))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" L00)
+                   (spec rootdens GP2D L00))
+           (number (path column "${column}" Vegetation crops crops "${crop}" 
+                         Root rootdens "*" k)
+                   (spec rootdens GP2D k))
+	   (interval (path column "${column}" Vegetation crops crops "${crop}" 
+			   Root Density)
+		     (spec fixed RootSystem Density)
+		     (tag "0-1 m")
+		     (from  0 [cm])
+		     (to -100 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "0,0 cm")
+		    (z 0 [cm])
+		    (x 0 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-10,0 cm")
+		    (z -10 [cm])
+		    (x 0 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-50,0 cm")
+		    (z -50 [cm])
+		    (x 0 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "0,40 cm")
+		    (z 0 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-10,40 cm")
+		    (z -10 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-50,40 cm")
+		    (z -50 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "0,50 cm")
+		    (z 0 [cm])
+		    (x 50 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-10,50 cm")
+		    (z -10 [cm])
+		    (x 50 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-50,50 cm")
+		    (z -50 [cm])
+		    (x 50 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "0,60 cm")
+		    (z 0 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-10,60 cm")
+		    (z -10 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-50,60 cm")
+		    (z -50 [cm])
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-10,* cm")
+		    (z -10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "*,0 cm")
+		    (x 0 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "0,* cm")
+		    (z 0 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "*,40 cm")
+		    (x 10 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "-50,* cm")
+		    (z -50 [cm]))
+	   (content (path column "${column}" Vegetation crops crops "${crop}" 
+			  Root Density)
+		    (spec fixed RootSystem Density)
+		    (tag "*,50 cm")
+		    (x 50 [cm]))))
+
+(deflog "Root zone water" crop
+  "Water status of each side of the root zone."
+  (when hourly)
+  (where "root_zone_water.dlf")
+  (entries (interval (tag "ABA")
+                     (description "\
+ABA in incomming water.")
+                     (path column "${column}" 
+                           Vegetation crops crops "${crop}" Root ABAExtraction)
+                     (spec fixed RootSystem ABAExtraction))
+           (interval (tag "Uptake")
+                     (description "\
+Water uptake from the root zone.")
+                     (path column "${column}" 
+                           Vegetation crops crops "${crop}" Root H2OExtraction)
+                     (spec fixed RootSystem H2OExtraction)
+                     (dimension "mm/h"))
+           (interval (tag "Actual")
+                     (description "\
+Actual water content of the root zone.")
+                     (path column "${column}" SoilWater Theta)
+                     (spec fixed SoilWater Theta)
+                     (dimension "mm")
+                     (min_root_density 0.1 [cm/cm^3]))
+           (water_interval (tag "FC")
+                           (h 2 [pF])
+                           (description "\
+Root zone water content at field capacity.")
+                           (path column "${column}" SoilWater Theta)
+                           (spec fixed SoilWater Theta)
+                           (dimension "mm")
+                           (min_root_density 0.1 [cm/cm^3]))
+           (water_interval (tag "WP")
+                           (h -15000.0 [cm])
+                           (description "\
+Root zone water content at wilting point.")
+                           (path column "${column}" SoilWater Theta)
+                           (spec fixed SoilWater Theta)
+                           (dimension "mm")
+                           (min_root_density 0.1 [cm/cm^3]))))
+
+;; Create these log files.
+(output harvest
+        (ABACrop (crop "Potato; Exp") 
+		 (when (crop_ds_after "Potato; Exp" 0.0)))
+	(ABAExtraction (crop "Potato; Exp")
+		       (when (crop_ds_after "Potato; Exp" 0.0)))
+	(H2OExtraction (crop "Potato; Exp") 
+		       (when (crop_ds_after "Potato; Exp" 0.0)))
+        ("Root form GP2D" (crop "Potato; Exp") 
+         (when (crop_ds_after "Potato; Exp" 0.0)))
+        ("Root zone water" (crop "Potato; Exp") 
+                           (when (crop_ds_after "Potato; Exp" 0.0))
+                           (volume left-side)
+                           (where "prd_left.dlf"))
+        ("Root zone water" (crop "Potato; Exp") 
+                           (when (crop_ds_after "Potato; Exp" 0.0))
+                           (volume right-side)
+                           (where "prd_right.dlf"))
+	("Root Density" (crop "Potato; Exp") 
+	                (when (crop_ds_after "Potato; Exp" 0.0)))
+	("Soil Water Potential" 
+         (when (crop_ds_after "Potato; Exp" 0.0)))
+	("Field water")
+        ("Crop Production" 
+	 (crop "Potato; Folva; ABA")
+         (where "sbarley.dlf")))
+
+;; Let us know it is not dead.
+(print_time periodic)
+
+;;; test-prd.dai ends here.
