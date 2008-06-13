@@ -2,6 +2,10 @@
 
 	* Version 4.31 released.
 
+2008-06-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.31 released.
+
 2008-06-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* root_system.C, root_system.h (MaxWidth): New parameter.
