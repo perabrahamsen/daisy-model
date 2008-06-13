@@ -6,6 +6,15 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.31
+
+** New 'MaxWidth' root system parameter.
+
+The parameter is similar to the MaxPen parameter, but denote the
+maximal horizontal distance of root from the tuber, rather than the
+maximal vertical distance.  The parameter is ignored unless you also
+select a 2D root model.
+
 * 4.30
 
 ** Primary, secondary and tertiary transport
