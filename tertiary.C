@@ -38,6 +38,32 @@ Tertiary::library_id () const
   return id;
 }
 
+Tertiary::Content::Content ()
+{ }
+
+Tertiary::Content::~Content ()
+{ }
+
+Tertiary::State& 
+Tertiary::State::operator= (const State& other)
+{
+  daisy_assert (this != &other);
+  content = other.content->clone (); 
+  return *this;
+}
+
+Tertiary::State::State (const Tertiary::State& other)
+{
+  daisy_assert (this != &other);
+  content = other.content->clone ();
+}
+
+Tertiary::State::State (std::auto_ptr<Content> other)
+{ content = other; }
+
+Tertiary::State::~State ()
+{ }
+
 void
 Tertiary::tick (const Geometry& geo, const Soil& soil, const double dt, 
                 SoilWater& soil_water, Surface& surface, Treelog& msg)

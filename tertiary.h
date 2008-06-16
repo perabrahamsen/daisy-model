@@ -41,6 +41,35 @@ public:
   static const char *const component;
   symbol library_id () const;
   virtual bool has_macropores () = 0;
+
+  // Extractable state.
+private:
+  class Content
+  // This class is intended for derived classes to store state in.
+  {
+  private:                      // Disable
+    Content& operator= (const Content&);
+    Content (const Content&);
+  public:
+    virtual std::auto_ptr<Content> clone () const = 0;
+    Content ();
+    virtual ~Content ();
+  };
+public:
+  class State
+  // This class is the user interface to state management.
+  {
+    std::auto_ptr<Content> content;
+    State ();                   // Disable.
+  public:
+    State& operator= (const State&);
+    State (const State&);
+    State (std::auto_ptr<Content>);
+    ~State ();
+  };
+  const State& get_state () const;
+  void set_state (State&);
+
   // Simulation.
 public:
   void tick (const Geometry&, const Soil&, const double dt, 
