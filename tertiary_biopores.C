@@ -51,13 +51,21 @@ struct TertiaryBiopores : public Tertiary
   void release_water (const Geometry&, const Soil&, const SoilWater&,
                       const double dt,
                       std::vector<double>& S_matrix, Treelog& msg);
-  void update_water ();
+  void update_water_content ();
   void tick_water (const Geometry&, const Soil&, const SoilWater&,
                    const double dt,
                    Surface& surface,
                    std::vector<double>& S_drain,
                    std::vector<double>& S_matrix, 
                    std::vector<double>& q_tertiary, Treelog& msg);
+  void update_water (const Geometry&, const Soil&, 
+                     const std::vector<double>& h_matrix,
+                     const double dt,
+                     std::vector<double>& S_drain,
+                     std::vector<double>& S_matrix, 
+                     std::vector<double>& q_tertiary, 
+                     Treelog& msg)
+  { }
   void solute (const Geometry&, const SoilWater&,
                const std::map<size_t, double>& J_tertiary,
                const double /* dt */,
@@ -168,7 +176,7 @@ TertiaryBiopores::release_water (const Geometry& geo, const Soil& soil,
 }
 
 void
-TertiaryBiopores::update_water ()
+TertiaryBiopores::update_water_content ()
 {
   for (size_t b = 0; b < classes.size (); b++)
     classes[b]->update_water ();
@@ -185,9 +193,9 @@ TertiaryBiopores::tick_water (const Geometry& geo, const Soil& soil,
                               Treelog& msg)
 {
   extract_water (geo, soil, soil_water, dt, S_drain, S_matrix, msg);
-  update_water ();
+  update_water_content ();
   release_water (geo, soil, soil_water, dt, S_matrix, msg);
-  update_water ();
+  update_water_content ();
 }
 
 void 

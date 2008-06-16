@@ -43,6 +43,7 @@ class Syntax;
 class AttributeList;
 class Log;
 class Scope;
+class Tertiary;
 
 class Movement : public ModelLogable
 {
@@ -56,7 +57,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Soil&, SoilWater&, const SoilHeat&, Surface&,
-                     Groundwater&, const Time&, const Weather&, 
+                     Groundwater&, const Time&, const Weather&, Tertiary&,
                      double dt, Treelog&) = 0;
   virtual void solute (const Soil&, const SoilWater&, 
                        const double J_above, Chemical&, Tertiary&,

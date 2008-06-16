@@ -34,6 +34,7 @@ struct Groundwater;
 struct Treelog;
 class Block;
 class AttributeList;
+class Tertiary;
 
 class UZRect : public Model
 {
@@ -49,7 +50,7 @@ public:
   virtual void tick (const GeometryRect&, std::vector<size_t>& drain_cell, 
 		     const Soil&, SoilWater&, 
                      const SoilHeat&, const Surface&, const Groundwater&, 
-                     double dt, Treelog&) = 0;
+                     Tertiary&, double dt, Treelog&) = 0;
 
   // Create and Destroy.
 public:

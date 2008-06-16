@@ -39,6 +39,7 @@
 #include "mathlib.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "tertiary.h"
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -72,7 +73,8 @@ struct UZRectMollerup : public UZRect
   // Interface.
   void tick (const GeometryRect&, std::vector<size_t>& drain_cell,
 	     const Soil&, SoilWater&, const SoilHeat&, 
-             const Surface&, const Groundwater&, double dt, Treelog&);
+             const Surface&, const Groundwater&, Tertiary& tertiary, 
+             double dt, Treelog&);
   void output (Log&) const;
   
   // Internal functions.
@@ -157,8 +159,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 		      const Soil& soil, 
                       SoilWater& soil_water, const SoilHeat& soil_heat,
                       const Surface& surface, const Groundwater& groundwater,
-                      const double dt,
-                      Treelog& msg)
+                      Tertiary&,
+                      const double dt, Treelog& msg)
 
 {
   const size_t edge_size = geo.edge_size (); // number of edges 

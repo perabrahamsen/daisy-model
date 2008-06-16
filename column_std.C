@@ -595,11 +595,8 @@ ColumnStandard::tick (const Time& time, const double dt,
 
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
 
-#if 1
+  // Macropores before everything else.
   tertiary->tick (geometry, *soil, dt, *soil_water, surface, msg);
-#else
-  movement->macro_tick (*soil, *soil_water, surface, dt, msg);
-#endif
 
   // Early calculation.
   bioclimate->tick (time, surface, my_weather, 
@@ -625,7 +622,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                      surface.ponding () * 0.1, 
                      *soil_heat, time, scope, msg);
   movement->tick (*soil, *soil_water, *soil_heat,
-                  surface, *groundwater, time, my_weather, dt, msg);
+                  surface, *groundwater, time, my_weather, *tertiary, dt, msg);
   soil_heat->tick (geometry, *soil, *soil_water, *movement, 
 		   surface, dt, msg);
   soil_water->tick_after (geometry, *soil, *soil_heat, false, msg);

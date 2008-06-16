@@ -81,7 +81,7 @@ struct MovementRect : public MovementSolute
   // Simulation.
   void tick (const Soil& soil, SoilWater& soil_water, const SoilHeat& soil_heat,
              Surface& surface, Groundwater& groundwater, const Time&,
-             const Weather&, double dt, Treelog& msg);
+             const Weather&, Tertiary& tertiary, double dt, Treelog& msg);
   void output (Log&) const;
 
   // Create.
@@ -210,7 +210,8 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
                     const SoilHeat& soil_heat,
                     Surface& surface, Groundwater& groundwater, 
                     const Time& time,
-                    const Weather& weather, const double dt, Treelog& msg) 
+                    const Weather& weather, Tertiary& tertiary, 
+                    const double dt, Treelog& msg) 
 {
   T_bottom = bottom_heat (time, weather);
 
@@ -227,7 +228,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       try
         {
           matrix_water[i]->tick (*geo, drain_cell, soil, soil_water, soil_heat,
-                                 surface, groundwater, dt, msg);
+                                 surface, groundwater, tertiary, dt, msg);
 	  obey_surface = matrix_water[i]->obey_surface ();
           goto update_borders;
         }

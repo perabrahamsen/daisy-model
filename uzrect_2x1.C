@@ -44,7 +44,7 @@ struct UZRect2x1 : public UZRect
   void tick (const GeometryRect&, std::vector<size_t>& drain_cell,
 	     const Soil&, SoilWater&, 
              const SoilHeat&, const Surface&, const Groundwater&, 
-             double dt, Treelog&);
+             Tertiary& tertiary, double dt, Treelog&);
 
   // Internal function.
   void water_column (const GeometryRect&, const Soil& soil,
@@ -74,7 +74,7 @@ UZRect2x1::tick (const GeometryRect& geo, std::vector<size_t>&,
 		 const Soil& soil, 
                  SoilWater& soil_water, const SoilHeat& soil_heat,
                  const Surface& surface, const Groundwater& groundwater, 
-                 const double dt, Treelog& msg)
+                 Tertiary&, const double dt, Treelog& msg)
 {
   const size_t cell_rows = geo.cell_rows ();
   const size_t cell_columns = geo.cell_columns ();

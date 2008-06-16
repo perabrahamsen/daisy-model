@@ -105,7 +105,7 @@ struct Movement1D : public MovementSolute
   // Simulation.
   void tick (const Soil& soil, SoilWater& soil_water, const SoilHeat& soil_heat,
              Surface& surface, Groundwater& groundwater,
-             const Time& time, const Weather& weather, double dt, 
+             const Time& time, const Weather& weather, Tertiary&, double dt, 
              Treelog& msg);
   void output (Log&) const;
 
@@ -383,7 +383,7 @@ void
 Movement1D::tick (const Soil& soil, SoilWater& soil_water, 
 		  const SoilHeat& soil_heat,
                   Surface& surface, Groundwater& groundwater,
-                  const Time& time, const Weather& weather, 
+                  const Time& time, const Weather& weather, Tertiary&,
                   const double dt, Treelog& msg) 
 {
   const size_t edge_size = geo->edge_size ();

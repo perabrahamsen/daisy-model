@@ -80,8 +80,17 @@ private:
                            Surface& surface,
                            std::vector<double>& S_drain,
                            std::vector<double>& S_matrix, 
-                           std::vector<double>& q_tertiary, Treelog& msg) = 0;
+                           std::vector<double>& q_tertiary,
+                           Treelog& msg) = 0;
+
 public:
+  virtual void update_water (const Geometry&, const Soil&, 
+                             const std::vector<double>& h_matrix,
+                             const double dt,
+                             std::vector<double>& S_drain,
+                             std::vector<double>& S_matrix, 
+                             std::vector<double>& q_tertiary, 
+                             Treelog& msg) = 0;
   virtual void solute (const Geometry&, const SoilWater&, 
                        const std::map<size_t, double>& J_tertiary,
                        const double dt,
