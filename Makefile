@@ -1526,7 +1526,8 @@ transport_none${OBJ}: transport_none.C transport.h model.h symbol.h alist.h \
 uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h model.h symbol.h alist.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil.h soil_water.h soil_heat.h groundwater.h surface.h \
-  uzmodel.h solver.h log.h time.h border.h block.h plf.h librarian.h
+  uzmodel.h solver.h log.h time.h border.h block.h plf.h librarian.h \
+  tertiary.h
 groundwater_flux${OBJ}: groundwater_flux.C groundwater.h model.h symbol.h \
   alist.h syntax.h treelog.h block.h plf.h check.h librarian.h
 ABAeffect_exp${OBJ}: ABAeffect_exp.C ABAeffect.h model.h symbol.h alist.h \
