@@ -37,13 +37,25 @@ struct TertiaryBiopores : public Tertiary
   const auto_vector<Biopore*> classes; // List of biopore classes.
   const double pressure_initiate;// Pressure needed to init pref.flow [cm]
   const double pressure_end;	 // Pressure after pref.flow has been init [cm]
-  const double pond_max;	 // Pond height before activating pref.flow [mm]
+  const double pond_max;	 // Pond height before activating pref.flow [mm]  
+  // State.
+  std::vector<bool> active;      // Biopore activity 
 
   // Identity.
   bool has_macropores ()
   { return true; }
 
   // Simulation.
+  
+  // Matrix sink
+  double matrix_biopores_matrix (size_t c, const Geometry& geo, 
+                                const Soil& soil, 
+                                double K_xx, double h) const;
+  // Matrix sink
+  double matrix_biopores_drain (size_t c, const Geometry& geo, 
+                               const Soil& soil,  
+                               double K_xx, double h) const;
+  
   void extract_water (const Geometry&, const Soil&, const SoilWater&,
                       const double dt,
                       std::vector<double>& S_drain,
@@ -80,6 +92,35 @@ public:
   bool check (const Geometry&, Treelog& msg) const;
   TertiaryBiopores (Block& al);
 };
+
+
+double 
+TertiaryBiopores::matrix_biopores_matrix (size_t c, const Geometry& geo, 
+                                          const Soil& soil, 
+                                          double K_xx, double h) const
+{
+  double sum = 0.0;
+  for (size_t b = 0; b < classes.size (); b++)
+    {
+      const Biopore& biopore = *classes[b];
+      sum += biopore.matrix_biopore_matrix(c, geo, soil, active[c], K_xx, h);
+    }
+  return sum;
+}
+
+double 
+TertiaryBiopores::matrix_biopores_drain (size_t c, const Geometry& geo, 
+                                         const Soil& soil,  
+                                         double K_xx, double h) const
+{
+  double sum = 0.0;
+  for (size_t b = 0; b < classes.size (); b++)
+    {
+      const Biopore& biopore = *classes[b];
+      sum += biopore.matrix_biopore_drain(c, geo, soil, active[c], K_xx, h);
+    }
+  return sum;
+}
 
 void
 TertiaryBiopores::extract_water (const Geometry& geo, const Soil& soil,
@@ -200,7 +241,10 @@ TertiaryBiopores::tick_water (const Geometry& geo, const Soil& soil,
 
 void 
 TertiaryBiopores::output (Log& log) const
-{ output_list (classes, "classes", log, Biopore::component); }
+{ output_list (classes, "classes", log, Biopore::component); 
+// TODO output active  
+}
+
 
 bool 
 TertiaryBiopores::initialize (const Geometry& geo, const Soil&, 
@@ -215,6 +259,9 @@ TertiaryBiopores::initialize (const Geometry& geo, const Soil&,
       if (!classes[b]->initialize (geo, scope, pipe_position, msg))
         ok = false;
     }
+  const size_t cell_size = geo.cell_size ();
+  while (active.size () < cell_size)
+    active.push_back (false);
   return ok;
 }
 
@@ -236,7 +283,10 @@ TertiaryBiopores::TertiaryBiopores (Block& al)
     classes (Librarian::build_vector<Biopore> (al, "classes")),
     pressure_initiate (al.number ("pressure_initiate")),
     pressure_end (al.number ("pressure_end")),
-    pond_max (al.number ("pond_max"))
+    pond_max (al.number ("pond_max")),
+    active (al.check ("active")
+            ? al.flag_sequence ("active")
+            : std::vector<bool> ())
 { }
 
 static struct TertiaryBioporesSyntax
@@ -263,7 +313,8 @@ static struct TertiaryBioporesSyntax
 Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
     alist.add ("pond_max", 0.5);
-
+    syntax.add ("active", Syntax::Boolean, Syntax::OptionalState,
+                Syntax::Sequence, "Active biopores in cells.");
     Librarian::add_type (Tertiary::component, "biopores", alist, syntax, &make);
   }
 } TertiaryBiopores_syntax;

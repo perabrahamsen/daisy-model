@@ -41,10 +41,9 @@ struct BioporeMatrix : public Biopore
 {
   // Parameters.
   /* const */ std::vector<double> xplus; // [cm]
-  const double diameter;        // [cm]
   const double R_primary;       // [h/cm]
   const double R_secondary;     // [h/cm]
-
+  
   // State.
   std::vector<double> h_bottom; // [cm]
   std::auto_ptr<IMvec> solute;  // [g/cm^3]
@@ -55,8 +54,15 @@ struct BioporeMatrix : public Biopore
   std::vector<double> added_water; // [cm^3]
   std::vector<double> density_column; // [cm^-2]
 
-  double find_S (size_t c, const Geometry& geo, const Soil& soil, 
-                 bool active, double K_xx, double h) const;
+  double matrix_biopore_matrix (size_t c, const Geometry& geo, 
+                                const Soil& soil, bool active, 
+                                double K_xx, double h) const;
+  
+  double matrix_biopore_drain (size_t c, const Geometry& geo, 
+                               const Soil& soil, bool active, 
+                               double K_xx, double h) const
+  {return 0.0;}
+
 
   // Simulation.
   bool to_drain () const 
@@ -75,15 +81,15 @@ struct BioporeMatrix : public Biopore
     daisy_assert (col < added_water.size ());
     added_water[col] += amount; 
   }
-  void extract_water (const size_t c, const double volume /* [cm^3] */ ,
-                      const double Theta /* [cm^3/cm^3] */,
+  void extract_water (size_t c, const double volume /* [cm^3] */ ,
+                      const double Theta /* [cm^3/cm^3 */,
                       const double dt /* [h] */,
-                      std::vector<double>& S_drain /* [cm^3/cm^3/h] */,
-                      std::vector<double>& S_matrix, Treelog&);
-  void release_water (const Geometry& geo, const Soil& soil, 
-                      const SoilWater& soil_water,
-                      const double dt /* [h] */,
-                      std::vector<double>& S_matrix, Treelog&);
+                      std::vector<double>& S_drain /* [cm^3/cm^3/h */,
+                      std::vector<double>& S_matrix, Treelog& msg);
+  void release_water (const Geometry&, const Soil&, 
+                      const SoilWater&,
+                      const double /* [h] */,
+                      std::vector<double>&, Treelog& msg);
   void update_water ();
   void output (Log&) const;
 
@@ -96,8 +102,9 @@ struct BioporeMatrix : public Biopore
 };
 
 double 
-BioporeMatrix::find_S (size_t c, const Geometry& geo, const Soil& soil, 
-                       bool active, double K_xx, double h) const
+BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo, 
+                                      const Soil& soil, bool active, 
+                                      double K_xx, double h) const
 {
   const Secondary& secondary = soil.secondary_domain (c);
   const bool use_primary = secondary.none ();
@@ -106,7 +113,15 @@ BioporeMatrix::find_S (size_t c, const Geometry& geo, const Soil& soil,
   const double M_c = density_column[col];
   const double r_c = diameter / 2.0;
   const double h_3 = air_bottom (c) - geo.cell_z (c);
-  return calculate_S (active, K_xx, R_wall, M_c,  r_c,  h,  h_3);
+  
+  double S; 
+  if (h_3>0.0 && h_3>h)
+    S = biopore_to_matrix (R_wall, M_c, r_c, h, h_3);
+  else if (active && h>h_3)
+    S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3);
+  else 
+    S = 0.0;
+  return S;
 }
   
 
@@ -293,12 +308,12 @@ BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
 
   return ok;
 }
+
 BioporeMatrix::BioporeMatrix (Block& al)
   : Biopore (al),
     xplus (al.check ("xplus") 
            ? al.number_sequence ("xplus") 
            : std::vector<double> ()),
-    diameter (al.number ("diameter")),
     R_primary (al.number ("R_primary")),
     R_secondary (al.number ("R_secondary", R_primary)),
     h_bottom (al.check ("h_bottom") 
@@ -327,9 +342,7 @@ static struct BioporeMatrixSyntax
 Water and chemical content is tracked individually for each interval.\n\
 By default, use intervals as specified by the geometry.");
     syntax.add_check ("xplus", VCheck::increasing ());
-    syntax.add ("diameter", "cm", Check::positive (),
-                Syntax::Const, "Biopore diameter.");
-    syntax.add ("R_primary", "h", Check::positive (), Syntax::Const, "\
+      syntax.add ("R_primary", "h", Check::positive (), Syntax::Const, "\
 Resistance for water moving from biopore through wall to primary domain.");
     syntax.add ("R_secondary", "h", Check::positive (), 
                 Syntax::OptionalConst, "\

@@ -25,6 +25,7 @@
 #include "librarian.h"
 #include "submodeler.h"
 #include "check.h"
+#include "geometry.h"
 #include <sstream>
 
 // The 'drain' model.
@@ -38,9 +39,15 @@ struct BioporeDrain : public Biopore
   double air_bottom (size_t) const    // Lowest point with air [cm]
   { return pipe_position; }
   
-  double find_S (size_t c, const Geometry& geo, const Soil& soil, 
-                 bool active, double K_xx, double h) const;
-
+  double matrix_biopore_drain (size_t c, const Geometry& geo, 
+                               const Soil& soil, bool active, 
+                               double K_xx, double h) const;
+  
+  double matrix_biopore_matrix (size_t c, const Geometry& geo, 
+                                const Soil& soil, bool active, 
+                                double K_xx, double h) const
+  {return 0.0;}
+    
   void extract_water (size_t c, const double volume /* [cm^3] */ ,
                       const double Theta /* [cm^3/cm^3 */,
                       const double dt /* [h] */,
@@ -76,19 +83,21 @@ struct BioporeDrain : public Biopore
   BioporeDrain (Block& al);
 };
 
-
 double 
-BioporeDrain::find_S (size_t c, const Geometry& geo, const Soil& soil, 
-                       bool active, double K_xx, double h) const
+BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo, 
+                                    const Soil& soil, bool active, 
+                                    double K_xx, double h) const
 {
-  const Secondary& secondary = soil.secondary_domain (c);
-  const bool use_primary = secondary.none ();
-  const double R_wall = use_primary ? R_primary : R_secondary; // [h]  
-  const size_t col = column[c];
-  const double M_c = density_column[col];
+  const double M_c = density_cell[c];
   const double r_c = diameter / 2.0;
   const double h_3 = air_bottom (c) - geo.cell_z (c);
-  return calculate_S (active, K_xx, R_wall, M_c,  r_c,  h,  h_3);
+
+  double S;
+  if (active && h>h_3)
+    S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3);
+  else 
+    S = 0.0;
+  return S;
 }
 
 
