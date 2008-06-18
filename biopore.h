@@ -53,6 +53,14 @@ protected:
   std::vector<double> density_cell;   // Density based on cell number [m^-2]
   static symbol x_symbol ();
 
+  static double calculate_S (bool active, double K_xx, double R_wall,
+                        double M_c, double r_c, double h, double h_3);
+  
+  virtual double find_S (size_t c, const Geometry& geo, const Soil& soil, 
+                         bool active, double K_xx, double h) const=0;
+
+
+
   // Interface.
 public:
   virtual double air_bottom (size_t c) const = 0; // Lowest point with air [cm]

@@ -47,6 +47,27 @@ Biopore::x_symbol ()
   static const symbol x ("x");
   return x;
 }
+ 
+double 
+Biopore::calculate_S (bool active, double K_xx, double R_wall,
+                 double M_c, double r_c, double h, double h_3)
+{
+  double S;      //Sink in matrix domain 
+    
+  if (h_3>0.0 && h_3>h)      //water to matrix from macropores 
+    S = - 4*M_PI*M_c*(h-h_3) / 
+        (R_wall*log(M_PI*M_c*r_c*r_c));
+  else if (active && h>h_3)  //water to macropores from matrix
+    S = - 4*M_PI*M_c*K_xx*(h-h_3) / 
+      (log(M_PI*M_c*r_c*r_c));
+  else
+    S = 0.0;                 // no exchange 
+  
+  return S;
+}
+
+     
+
 
 bool
 Biopore::initialize_base (const Geometry& geo, const Scope& parent_scope, 

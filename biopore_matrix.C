@@ -55,6 +55,9 @@ struct BioporeMatrix : public Biopore
   std::vector<double> added_water; // [cm^3]
   std::vector<double> density_column; // [cm^-2]
 
+  double find_S (size_t c, const Geometry& geo, const Soil& soil, 
+                 bool active, double K_xx, double h) const;
+
   // Simulation.
   bool to_drain () const 
   { return false; }
@@ -91,6 +94,21 @@ struct BioporeMatrix : public Biopore
   { return check_base (geo, msg); }
   BioporeMatrix (Block& al);
 };
+
+double 
+BioporeMatrix::find_S (size_t c, const Geometry& geo, const Soil& soil, 
+                       bool active, double K_xx, double h) const
+{
+  const Secondary& secondary = soil.secondary_domain (c);
+  const bool use_primary = secondary.none ();
+  const double R_wall = use_primary ? R_primary : R_secondary; // [h]  
+  const size_t col = column[c];
+  const double M_c = density_column[col];
+  const double r_c = diameter / 2.0;
+  const double h_3 = air_bottom (c) - geo.cell_z (c);
+  return calculate_S (active, K_xx, R_wall, M_c,  r_c,  h,  h_3);
+}
+  
 
 void 
 BioporeMatrix::extract_water (const size_t c, const double volume /* [cm^3] */ ,

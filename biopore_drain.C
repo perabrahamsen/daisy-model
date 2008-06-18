@@ -5,7 +5,6 @@
 // This file is part of Daisy.
 // 
 // Daisy is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation; either version 2.1 of the License, or
 // (at your option) any later version.
 // 
@@ -38,6 +37,10 @@ struct BioporeDrain : public Biopore
   // Simulation.
   double air_bottom (size_t) const    // Lowest point with air [cm]
   { return pipe_position; }
+  
+  double find_S (size_t c, const Geometry& geo, const Soil& soil, 
+                 bool active, double K_xx, double h) const;
+
   void extract_water (size_t c, const double volume /* [cm^3] */ ,
                       const double Theta /* [cm^3/cm^3 */,
                       const double dt /* [h] */,
@@ -72,6 +75,22 @@ struct BioporeDrain : public Biopore
   { return check_base (geo, msg); }
   BioporeDrain (Block& al);
 };
+
+
+double 
+BioporeDrain::find_S (size_t c, const Geometry& geo, const Soil& soil, 
+                       bool active, double K_xx, double h) const
+{
+  const Secondary& secondary = soil.secondary_domain (c);
+  const bool use_primary = secondary.none ();
+  const double R_wall = use_primary ? R_primary : R_secondary; // [h]  
+  const size_t col = column[c];
+  const double M_c = density_column[col];
+  const double r_c = diameter / 2.0;
+  const double h_3 = air_bottom (c) - geo.cell_z (c);
+  return calculate_S (active, K_xx, R_wall, M_c,  r_c,  h,  h_3);
+}
+
 
 void 
 BioporeDrain::extract_water (size_t c, const double /* [cm^3] */ ,
