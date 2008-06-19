@@ -74,6 +74,8 @@ public:
   virtual double air_bottom (size_t c) const = 0; // Lowest point with air [cm]
   double density (size_t c) const                 // [m^-2]
   { return density_cell[c]; }
+  
+  virtual void add_water (size_t c, double amount /* [cm^3] */) = 0;
   virtual void extract_water (size_t c, const double volume /* [cm^3] */ ,
                               const double Theta /* [cm^3/cm^3] */,
                               const double dt /* [h] */,

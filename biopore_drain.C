@@ -58,6 +58,10 @@ struct BioporeDrain : public Biopore
                       const double /* [h] */,
                       std::vector<double>&, Treelog& msg)
   { }
+  
+  void add_water (size_t c, double amount /* [cm^3] */)
+  { }
+
   void update_water ()
   { }
   void output (Log&) const

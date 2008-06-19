@@ -29,6 +29,7 @@
 #include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "soil_heat.h"
 #include "log.h"
 
 struct TertiaryBiopores : public Tertiary
@@ -55,6 +56,18 @@ struct TertiaryBiopores : public Tertiary
   double matrix_biopores_drain (size_t c, const Geometry& geo, 
                                const Soil& soil,  
                                double K_xx, double h) const;
+  
+  void matrix_sink (const Geometry& geo, const Soil& soil,  
+                    const SoilHeat& soil_heat, 
+                    const std::vector<double>& h,
+                    std::vector<double>& S_matrix,
+                    std::vector<double>& S_drain) const;
+  
+  void update_biopores (const Geometry& geo, 
+                        const Soil& soil,  
+                        const SoilHeat& soil_heat, 
+                        const std::vector<double>& h,
+                        const double dt);
   
   void extract_water (const Geometry&, const Soil&, const SoilWater&,
                       const double dt,
@@ -122,6 +135,59 @@ TertiaryBiopores::matrix_biopores_drain (size_t c, const Geometry& geo,
   return sum;
 }
 
+
+void 
+TertiaryBiopores::matrix_sink (const Geometry& geo, 
+                               const Soil& soil,  
+                               const SoilHeat& soil_heat, 
+                               const std::vector<double>& h,
+                               std::vector<double>& S_matrix,
+                               std::vector<double>& S_drain) const
+{
+  const size_t cell_size = geo.cell_size ();
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double h_cond = std::min(pressure_initiate, h[c]);
+      const double T = soil_heat.T (c);
+      const double h_ice = 0.0;    //ice ignored 
+      const double K_zz = soil.K (c, h_cond, h_ice, T);
+      const double K_xx = K_zz * soil.anisotropy (c);
+      S_matrix[c] =  matrix_biopores_matrix (c, geo, soil, K_xx, h[c]);
+      S_drain[c] =  matrix_biopores_drain (c, geo, soil, K_xx, h[c]); 
+    }
+}
+ 
+void 
+TertiaryBiopores::update_biopores(const Geometry& geo, 
+                                  const Soil& soil,  
+                                  const SoilHeat& soil_heat, 
+                                  const std::vector<double>& h,
+                                  const double dt) 
+{
+  const size_t cell_size = geo.cell_size ();
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double vol = geo.cell_volume (c);
+      const double h_cond = std::min(pressure_initiate, h[c]);
+      const double T = soil_heat.T (c);
+      const double h_ice = 0.0;    //ice ignored 
+      const double K_zz = soil.K (c, h_cond, h_ice, T);
+      const double K_xx = K_zz * soil.anisotropy (c);
+     
+      for (size_t b = 0; b < classes.size (); b++)
+        {
+          Biopore& biopore = *classes[b];
+          const double S 
+            = biopore.matrix_biopore_matrix(c, geo, soil, 
+                                            active[c], K_xx, h[c])
+            + biopore.matrix_biopore_drain(c, geo, soil,
+                                           active[c], K_xx, h[c]);
+          biopore.add_water (c, -S * dt * vol);
+        }
+    }
+}
+
+ 
 void
 TertiaryBiopores::extract_water (const Geometry& geo, const Soil& soil,
                                  const SoilWater& soil_water,
