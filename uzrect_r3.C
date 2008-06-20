@@ -156,11 +156,11 @@ static double anisotropy_factor (const Geometry& geo, size_t edge,
 
 void 
 UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
-		      const Soil& soil, 
-                      SoilWater& soil_water, const SoilHeat& soil_heat,
-                      const Surface& surface, const Groundwater& groundwater,
-                      Tertiary& tertiary, 
-                      const double dt, Treelog& msg)
+                const Soil& soil, 
+                SoilWater& soil_water, const SoilHeat& soil_heat,
+                const Surface& surface, const Groundwater& groundwater,
+                Tertiary& tertiary, 
+                const double dt, Treelog& msg)
 
 {
   const size_t edge_size = geo.edge_size (); // number of edges 
@@ -175,6 +175,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   ublas::vector<double> h_ice (cell_size); // 
   ublas::vector<double> S (cell_size); // sink term
   ublas::vector<double> S_vol (cell_size); // sink term
+  ublas::vector<double> S_macro (cell.size);  // sink term
   std::vector<double> S_drain (cell_size, 0.0); // drain flow
   ublas::vector<double> T (cell_size); // temperature 
   ublas::vector<double> K (cell_size); // hydraulic conductivity
@@ -333,6 +334,39 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  for (size_t c = 0; c < cell_size; c++)
 	    Cw (c, c) = soil.Cw2 (c, h[c]);
 	  
+          //Initialize sink to macropores         
+          ublas::vector<double> S_macro;
+          
+          Tertiary::State h3_conv = tertiary.get_state ();
+          do
+            {
+              tertiary.update_biopores(const Geometry& geo, 
+                                       const Soil& soil,  
+                                       const SoilHeat& soil_heat, 
+                                       const std::vector<double>& h,
+                                       const double dt); 
+
+            }
+          while (!tertiary.converge (h3_conv))
+          
+            matrix
+             
+          
+          for (size_t cell = 0; cell != cell_size ; ++cell) 
+            {				
+              S_macro (cell) = S_something (cell) * geo.cell_volume (cell);
+            }
+          
+          
+
+
+
+
+         
+
+          
+
+
 	  //Initialize sum matrix
 	  Solver::Matrix summat (cell_size);  
 	  summat = diff + Dm_mat;
