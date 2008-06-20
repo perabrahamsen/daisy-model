@@ -41,26 +41,34 @@ struct TertiaryBiopores : public Tertiary
   const double pond_max;	 // Pond height before activating pref.flow [mm]  
   // State.
   std::vector<bool> active;      // Biopore activity 
+  struct ContentBiopores : public Content
+  {
+    std::vector<double> air_bottom;
+    std::auto_ptr<Content> clone () const
+    { return new ContentBiopores (air_bottom); }
+    ContentBiopores (const std::vector<double>& h_air)
+      : air_bottom (h_air)
+    { }
+  }
+  State get_state () const;
+  void set_state (const State&);
 
   // Identity.
   bool has_macropores ()
   { return true; }
 
-  // Simulation.
-  
-  void update_active (const std::vector<double>& h);
 
-  void get_state ();
-  void set_state ();
+  // Simulation.
+  void update_active (const std::vector<double>& h);
 
   // Matrix sink
   double matrix_biopores_matrix (size_t c, const Geometry& geo, 
-                                const Soil& soil, 
-                                double K_xx, double h) const;
+                                 const Soil& soil, 
+                                 double K_xx, double h) const;
   // Matrix sink
   double matrix_biopores_drain (size_t c, const Geometry& geo, 
-                               const Soil& soil,  
-                               double K_xx, double h) const;
+                                const Soil& soil,  
+                                double K_xx, double h) const;
   
   void matrix_sink (const Geometry& geo, const Soil& soil,  
                     const SoilHeat& soil_heat, 
@@ -110,26 +118,6 @@ public:
   bool check (const Geometry&, Treelog& msg) const;
   TertiaryBiopores (Block& al);
 };
-
-
-State& get_state () const;
-  virtual void set_state (State&);
-
-
-S 
-TertiaryBiopores::get_state ()
-{
-  
-}
-
-
-void 
-TertiaryBiopores::set_state ()
-{
-
-}
-
-
 
 void
 TertiaryBiopores::update_active (const std::vector<double>& h)

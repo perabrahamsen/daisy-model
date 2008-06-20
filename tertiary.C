@@ -58,11 +58,35 @@ Tertiary::State::State (const Tertiary::State& other)
   content = other.content->clone ();
 }
 
-Tertiary::State::State (std::auto_ptr<Content> other)
-{ content = other; }
+Tertiary::State::State (const std::auto_ptr<Content> other)
+{ 
+  daisy_assert (content != other);
+  content = other->clone (); 
+}
 
 Tertiary::State::~State ()
 { }
+
+Tertiary::State 
+Tertiary::get_state () const
+// By default, we have no state.
+{
+  struct ContentNone : public Content
+  {
+    std::auto_ptr<Content> clone () const
+    { return new ContentNone (); }
+  };
+  
+  return State (new ContentNone ());
+}
+
+void
+Tertiary::set_state (const State&)
+{ }
+
+bool 
+Tertiary::converge (const State&)
+{ return true; }
 
 void
 Tertiary::tick (const Geometry& geo, const Soil& soil, const double dt, 

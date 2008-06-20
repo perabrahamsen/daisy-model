@@ -1,12 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Tertiary 
+
+
+
 * Tetiary::tick_water
 
 Public version der tager h[cell] som argument.
 
 Surface skal flyttes ud.
-
-* Skriv brev til DMU
 
 * Prøv TertiaryInstant igen...
 
@@ -23,7 +25,6 @@ hvis h_top > macro_trigger
   h_tert = min (h_pot, h_cap)
 
   fordel mellem klasser?  
-
 
 * tertiary
 

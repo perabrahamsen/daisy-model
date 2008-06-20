@@ -67,11 +67,13 @@ public:
     State (std::auto_ptr<Content>);
     ~State ();
   };
-  virtual const State& get_state () const;
-  virtual void set_state (State&);
+  virtual State get_state () const;
+  virtual void set_state (const State&);
+  virtual bool converge (const State& old); // Are current and old state close?
 
   // Simulation.
 public:
+  // - For use by Column.
   void tick (const Geometry&, const Soil&, const double dt, 
              SoilWater&, Surface&, Treelog&);
 private:
@@ -84,6 +86,7 @@ private:
                            Treelog& msg) = 0;
 
 public:
+  // - For use inside Richard's Equation.
   virtual void update_water (const Geometry&, const Soil&, 
                              const std::vector<double>& h_matrix,
                              const double dt,
@@ -91,10 +94,18 @@ public:
                              std::vector<double>& S_matrix, 
                              std::vector<double>& q_tertiary, 
                              Treelog& msg) = 0;
+  virtual void update_active (const Geometry&, const Soil&, 
+                              const std::vector<double>& h_matrix,
+                              Treelog& msg)
+  { }
+
+  // - For use in Movement::solute
   virtual void solute (const Geometry&, const SoilWater&, 
                        const std::map<size_t, double>& J_tertiary,
                        const double dt,
                        Chemical&, Treelog&) = 0;
+
+  // - Output
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
