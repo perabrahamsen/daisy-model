@@ -48,6 +48,11 @@ struct TertiaryBiopores : public Tertiary
 
   // Simulation.
   
+  void update_active (const std::vector<double>& h);
+
+  void get_state ();
+  void set_state ();
+
   // Matrix sink
   double matrix_biopores_matrix (size_t c, const Geometry& geo, 
                                 const Soil& soil, 
@@ -106,6 +111,43 @@ public:
   TertiaryBiopores (Block& al);
 };
 
+
+State& get_state () const;
+  virtual void set_state (State&);
+
+
+S 
+TertiaryBiopores::get_state ()
+{
+  
+}
+
+
+void 
+TertiaryBiopores::set_state ()
+{
+
+}
+
+
+
+void
+TertiaryBiopores::update_active (const std::vector<double>& h)
+{
+  for (size_t c = 0; c < active.size (); c++)
+    {
+      if (active[c])    // Biopore is active 
+        {
+          if (h[c] < pressure_end)
+            active[c] = false;
+        }
+      else              // Biopore is not active 
+        {
+          if (h[c] > pressure_initiate)
+            active[c] = true;
+        }
+    }
+}
 
 double 
 TertiaryBiopores::matrix_biopores_matrix (size_t c, const Geometry& geo, 

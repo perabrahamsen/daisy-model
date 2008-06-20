@@ -67,8 +67,8 @@ public:
     State (std::auto_ptr<Content>);
     ~State ();
   };
-  const State& get_state () const;
-  void set_state (State&);
+  virtual const State& get_state () const;
+  virtual void set_state (State&);
 
   // Simulation.
 public:
