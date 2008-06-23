@@ -31,6 +31,7 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 #include "log.h"
+#include "anystate.h"
 
 struct TertiaryBiopores : public Tertiary
 {
@@ -41,20 +42,20 @@ struct TertiaryBiopores : public Tertiary
   const double pond_max;	 // Pond height before activating pref.flow [mm]  
   // State.
   std::vector<bool> active;      // Biopore activity 
-  struct ContentBiopores : public Content
+  struct ContentBiopores : public Anystate::Content
   {
-    std::vector<Biopore::State> states;
-    std::auto_ptr<Content> clone () const
+    std::vector<Anystate> states;
+    std::auto_ptr<Anystate::Content> clone () const
     { 
-      std::auto_ptr<Content> copy (new ContentBiopores (states)); 
+      std::auto_ptr<Anystate::Content> copy (new ContentBiopores (states)); 
       return copy;
     }
-    ContentBiopores (const std::vector<Biopore::State>& s)
+    ContentBiopores (const std::vector<Anystate>& s)
       : states (s)
     { }
   };
-  State get_state () const;
-  void set_state (const State&);
+  Anystate get_state () const;
+  void set_state (const Anystate&);
 
   // Identity.
   bool has_macropores ()
@@ -122,21 +123,21 @@ public:
   TertiaryBiopores (Block& al);
 };
 
-Tertiary::State 
+Anystate
 TertiaryBiopores::get_state () const
 {
-  std::vector<Biopore::State> biopore_state;
+  std::vector<Anystate> biopore_state;
   for (size_t b = 0; b < classes.size (); b++)
     {
       const Biopore& biopore = *classes[b];
       biopore_state.push_back (biopore.get_state ());
     }
-  std::auto_ptr<Content> copy (new ContentBiopores (biopore_state));
-  return State (copy);
+  std::auto_ptr<Anystate::Content> copy (new ContentBiopores (biopore_state));
+  return Anystate (copy);
 }
  
 void 
-TertiaryBiopores::set_state (const State& state)
+TertiaryBiopores::set_state (const Anystate& state)
 {
   
 }

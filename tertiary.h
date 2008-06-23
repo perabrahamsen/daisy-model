@@ -34,6 +34,7 @@ class Chemical;
 class Scope;
 class Treelog;
 class Log;
+class Anystate;
 
 class Tertiary : public ModelAListed
 {
@@ -43,37 +44,9 @@ public:
   symbol library_id () const;
   virtual bool has_macropores () = 0;
 
-  // Extractable state.
-protected:
-  class Content
-  // This class is intended for derived classes to store state in.
-  {
-  private:                      // Disable
-    Content& operator= (const Content&);
-    Content (const Content&);
-  public:
-    virtual std::auto_ptr<Content> clone () const = 0;
-    Content ();
-    virtual ~Content ();
-  };
-public:
-  class State
-  // This class is the user interface to state management.
-  {
-    std::auto_ptr<Content> content;
-  public:
-    const Content& inspect () const;
-  private:
-    State ();                   // Disable.
-  public:
-    State& operator= (const State&);
-    State (const State&);
-    State (std::auto_ptr<Content>);
-    ~State ();
-  };
-  virtual State get_state () const;
-  virtual void set_state (const State&);
-  virtual bool converge (const State& old); // Are current and old state close?
+  virtual Anystate get_state () const;
+  virtual void set_state (const Anystate&);
+  virtual bool converge (const Anystate& old); // Are current, old state close?
 
   // Simulation.
 public:

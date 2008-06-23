@@ -26,6 +26,7 @@
 #include "block.h"
 #include "alist.h"
 #include "librarian.h"
+#include "anystate.h"
 
 // The 'tertiary' component.
 
@@ -38,62 +39,16 @@ Tertiary::library_id () const
   return id;
 }
 
-Tertiary::Content::Content ()
-{ }
-
-Tertiary::Content::~Content ()
-{ }
-
-const Tertiary::Content& 
-Tertiary::State::inspect () const
-{ return *content; }
-
-Tertiary::State& 
-Tertiary::State::operator= (const State& other)
-{
-  daisy_assert (this != &other);
-  content = other.content->clone (); 
-  return *this;
-}
-
-Tertiary::State::State (const Tertiary::State& other)
-{
-  daisy_assert (this != &other);
-  content = other.content->clone ();
-}
-
-Tertiary::State::State (const std::auto_ptr<Content> other)
-{ 
-  daisy_assert (content.get () != other.get ());
-  content = other->clone (); 
-}
-
-Tertiary::State::~State ()
-{ }
-
-Tertiary::State 
+Anystate
 Tertiary::get_state () const
-// By default, we have no state.
-{
-  struct ContentNone : public Content
-  {
-    std::auto_ptr<Content> clone () const
-    { 
-      std::auto_ptr<Content> copy (new ContentNone ());
-      return copy; 
-    }
-  };
-  
-  std::auto_ptr<Content> copy (new ContentNone ());
-  return State (copy);
-}
+{ return Anystate::none (); }
 
 void
-Tertiary::set_state (const State&)
+Tertiary::set_state (const Anystate&)
 { }
 
 bool 
-Tertiary::converge (const State&)
+Tertiary::converge (const Anystate&)
 { return true; }
 
 void

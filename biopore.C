@@ -29,6 +29,7 @@
 #include "units.h"
 #include "check.h"
 #include "geometry.h"
+#include "anystate.h"
 
 // biopore component.
 
@@ -41,62 +42,16 @@ Biopore::library_id () const
   return id;
 }
 
-Biopore::Content::Content ()
-{ }
-
-Biopore::Content::~Content ()
-{ }
-
-const Biopore::Content& 
-Biopore::State::inspect () const
-{ return *content; }
-
-Biopore::State& 
-Biopore::State::operator= (const State& other)
-{
-  daisy_assert (this != &other);
-  content = other.content->clone (); 
-  return *this;
-}
-
-Biopore::State::State (const Biopore::State& other)
-{
-  daisy_assert (this != &other);
-  content = other.content->clone ();
-}
-
-Biopore::State::State (const std::auto_ptr<Content> other)
-{ 
-  daisy_assert (content.get () != other.get ());
-  content = other->clone (); 
-}
-
-Biopore::State::~State ()
-{ }
-
-Biopore::State 
+Anystate 
 Biopore::get_state () const
-// By default, we have no state.
-{
-  struct ContentNone : public Content
-  {
-    std::auto_ptr<Content> clone () const
-    { 
-      std::auto_ptr<Content> copy (new ContentNone ());
-      return copy; 
-    }
-  };
-  
-  std::auto_ptr<Content> copy (new ContentNone ());
-  return State (copy);
-}
+{ return Anystate::none (); }
 
 void
-Biopore::set_state (const State&)
+Biopore::set_state (const Anystate&)
 { }
 
 bool 
-Biopore::converge (const State&)
+Biopore::converge (const Anystate&)
 { return true; }
 
 

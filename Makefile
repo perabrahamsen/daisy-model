@@ -481,7 +481,7 @@ SPECIALS = volume_box.C movement_solute.C scope_exchange.C photo_Farquhar.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = imvec.C im.C frame.C \
+OTHER = anystate.C imvec.C im.C frame.C \
 	bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
 	intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \

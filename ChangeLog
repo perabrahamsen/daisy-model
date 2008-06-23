@@ -1,6 +1,6 @@
-2008-06-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+2008-06-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 4.31 released.
+	* anystate.C: New utility.
 
 2008-06-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
