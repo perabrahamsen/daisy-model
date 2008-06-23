@@ -33,6 +33,7 @@
 #include "volume_box.h"
 #include "log.h"
 #include "check.h"
+#include "anystate.h"
 #include <sstream>
 
 // The 'matrix' model.
@@ -47,6 +48,21 @@ struct BioporeMatrix : public Biopore
   // State.
   std::vector<double> h_bottom; // [cm]
   std::auto_ptr<IMvec> solute;  // [g/cm^3]
+  struct MyContent : public Anystate::Content
+  {
+    std::vector<double> h_bottom;
+    std::auto_ptr<Anystate::Content> clone () const
+    { 
+      std::auto_ptr<Anystate::Content> copy (new MyContent (h_bottom)); 
+      return copy;
+    }
+    MyContent (const std::vector<double> (h))
+      : h_bottom (h)
+    { }
+  };
+  Anystate get_state () const;
+  void set_state (const Anystate&);
+  bool converge (const Anystate&, double max_abs, double max_rel) const;
   
   // Utilities.
   /* const */ double dy;                    // [cm]
@@ -91,6 +107,39 @@ struct BioporeMatrix : public Biopore
   { return check_base (geo, msg); }
   BioporeMatrix (Block& al);
 };
+
+Anystate
+BioporeMatrix::get_state () const
+{
+  std::auto_ptr<Anystate::Content> copy (new MyContent (h_bottom));
+  return Anystate (copy);
+}
+ 
+void 
+BioporeMatrix::set_state (const Anystate& state)
+{
+  const MyContent& content = static_cast<const MyContent&> (state.inspect ());
+  h_bottom = content.h_bottom;
+}
+
+bool 
+BioporeMatrix::converge (const Anystate& state, 
+                         const double max_abs, const double max_rel) const
+{ 
+  const MyContent& content = static_cast<const MyContent&> (state.inspect ());
+  const size_t h_size = h_bottom.size ();
+  daisy_assert (h_size == content.h_bottom.size ());
+  for (size_t i = 0; i < h_size; i++)
+    if (   fabs (h_bottom[i] - content.h_bottom[i]) > max_abs
+        && (   iszero (content.h_bottom[i])
+            || iszero (h_bottom[i])
+            || (  fabs ((h_bottom[i] - content.h_bottom[i]) 
+                        / content.h_bottom[i])
+		> max_rel)))
+      return false;
+
+  return true; 
+}
 
 double 
 BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo, 

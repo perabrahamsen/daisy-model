@@ -41,7 +41,8 @@ struct TertiaryOld : public Tertiary
   { return macro.get () && !macro->none (); }
 
   // Simulation.
-  void tick_water (const Geometry&, const Soil&, const SoilWater&,
+  void tick_water (const Geometry&, const Soil&, const SoilWater&, 
+                   const SoilHeat&, 
                    const double dt,
                    Surface& surface,
                    std::vector<double>& S_drain,
@@ -64,7 +65,7 @@ public:
 
 void
 TertiaryOld::tick_water (const Geometry& geometry, const Soil& soil,
-                         const SoilWater& soil_water,
+                         const SoilWater& soil_water, const SoilHeat&,
                          const double dt,
                          Surface& surface,
                          std::vector<double>& /* S_drain */,

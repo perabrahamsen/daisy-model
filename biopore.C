@@ -51,7 +51,7 @@ Biopore::set_state (const Anystate&)
 { }
 
 bool 
-Biopore::converge (const Anystate&)
+Biopore::converge (const Anystate&, const double, const double) const
 { return true; }
 
 
@@ -78,10 +78,6 @@ Biopore::biopore_to_matrix (double R_wall, double M_c, double r_c,
   return 4*M_PI*M_c*(h-h_3) / 
     (R_wall*log(M_PI*M_c*r_c*r_c));
 }
-
-
-
-
 
 bool
 Biopore::initialize_base (const Geometry& geo, const Scope& parent_scope, 

@@ -51,17 +51,25 @@ bool
 Tertiary::converge (const Anystate&)
 { return true; }
 
+bool
+Tertiary::use_small_timesteps ()
+{ return false; }
+
 void
-Tertiary::tick (const Geometry& geo, const Soil& soil, const double dt, 
+Tertiary::tick (const Geometry& geo, const Soil& soil, 
+                const SoilHeat& soil_heat, const double dt, 
                 SoilWater& soil_water, Surface& surface, Treelog& msg)
 {
+  if (use_small_timesteps ())
+    // Handle in Richard's Equation.
+    return;
   Treelog::Open nest (msg, component + std::string (":") + name);
   const size_t cell_size = geo.cell_size ();
   std::vector<double> S_drain (cell_size, 0.0);
   std::vector<double> S_matrix (cell_size, 0.0);
   const size_t edge_size = geo.edge_size ();
   std::vector<double> q_tertiary (edge_size, 0.0);
-  this->tick_water (geo, soil, soil_water, dt, surface,
+  this->tick_water (geo, soil, soil_water, soil_heat, dt, surface,
                     S_drain, S_matrix, q_tertiary, msg);
   soil_water.drain (S_drain);
   soil_water.set_tertiary (S_matrix, q_tertiary);
@@ -75,12 +83,17 @@ Tertiary::matrix_sink (const Geometry& geo, const Soil& soil,
                        std::vector<double>& S_drain) const
 { }
 
-void 
-Tertiary::update_biopores (const Geometry& geo, 
-                           const Soil& soil,  
-                           const SoilHeat& soil_heat, 
-                           const std::vector<double>& h,
-                           const double dt)
+bool 
+Tertiary::find_implicit_water (const Anystate& old_state, 
+                               const Geometry& geo, 
+                               const Soil& soil,  
+                               const SoilHeat& soil_heat, 
+                               const std::vector<double>& h,
+                               const double dt)
+{ throw "Implicit tertiary water solution not supported"; }
+
+void
+Tertiary::update_active (const std::vector<double>& h_matrix)
 { }
 
 Tertiary::Tertiary (Block& al)
@@ -106,8 +119,8 @@ class TertiaryNone : public Tertiary
   { return false; }
 
   // Simulation.
-  void tick_water (const Geometry&, const Soil&, const SoilWater&,
-                   const double /* dt */,
+  void tick_water (const Geometry&, const Soil&, const SoilWater&, 
+                   const SoilHeat&, const double /* dt */,
                    Surface& /* surface */,
                    std::vector<double>& /* S_drain */,
                    std::vector<double>& /* S_matrix */,

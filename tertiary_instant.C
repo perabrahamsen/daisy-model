@@ -1,4 +1,4 @@
-// biopore_instant.C --- Instant movement in vertical geometry.
+// tertiary_instant.C --- Instant movement in vertical geometry.
 // 
 // Copyright 2008 Per Abrahamsen and KU.
 //
@@ -43,8 +43,8 @@ struct TertiaryInstant : public Tertiary
   { return true; }
 
   // Simulation.
-  void tick_water (const Geometry&, const Soil&, const SoilWater&,
-                   const double dt,
+  void tick_water (const Geometry&, const Soil&, const SoilWater&, 
+                   const SoilHeat&, const double dt,
                    Surface& surface,
                    std::vector<double>& S_drain,
                    std::vector<double>& S_matrix,
@@ -68,7 +68,7 @@ public:
 
 void
 TertiaryInstant::tick_water (const Geometry& geometry, const Soil& soil,
-                             const SoilWater& soil_water,
+                             const SoilWater& soil_water, const SoilHeat&,
                              const double dt,
                              Surface& surface,
                              std::vector<double>& S_drain,

@@ -40,6 +40,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "tertiary.h"
+#include "anystate.h"
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -245,6 +246,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
       h_previous = h;
       Theta_previous = Theta;
+      const Anystate h3_previous = tertiary.get_state ();
 
       if (debug == 5)
 	{
@@ -334,25 +336,19 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  for (size_t c = 0; c < cell_size; c++)
 	    Cw (c, c) = soil.Cw2 (c, h[c]);
 	  
-          Tertiary::State h3_conv = tertiary.get_state ();
-          const int max_iterations_macro = max_iterations;
-          int iterations_used_macro = 0;
-          do
-            {
-              iterations_used_macro++;
-              tertiary.update_biopores(geo, soil, soil_heat, h, ddt); 
-            }
-          while (!tertiary.converge (h3_conv) 
-                 && iterations_used_macro <= max_iterations_macro);
-                     
-           std::vector<double> h_std (cell_size);
+          std::vector<double> h_std (cell_size);
           //ublas vector -> std vector 
           std::copy(h.begin (), h.end (), h_std.begin ());
+
+          if (!tertiary.find_implicit_water (h3_previous, 
+                                             geo, soil, soil_heat, h_std, ddt))
+            throw "We need smaller timesteps";
+                     
                           
           std::vector<double> S_matrix (cell_size);
           std::vector<double> S_drain (cell_size);
           
-          tertiary.matrix_sink (geo, soil, soil_heat, h, 
+          tertiary.matrix_sink (geo, soil, soil_heat, h_std, 
                                 S_matrix, S_drain);
           
           ublas::vector<double> S_macro (cell_size);
@@ -421,6 +417,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  ddt /= time_step_reduction;
 	  h = h_previous;
 	  Theta = Theta_previous;
+          tertiary.set_state (h3_previous);
 	}
       else
 	{

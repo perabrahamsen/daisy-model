@@ -50,11 +50,15 @@ public:
 
   // Simulation.
 public:
+  virtual bool use_small_timesteps ();
+
+public:
   // - For use by Column.
-  void tick (const Geometry&, const Soil&, const double dt, 
+  void tick (const Geometry&, const Soil&, const SoilHeat&, const double dt, 
              SoilWater&, Surface&, Treelog&);
 private:
-  virtual void tick_water (const Geometry&, const Soil&, const SoilWater&,
+  virtual void tick_water (const Geometry&, const Soil&, 
+                           const SoilWater&, const SoilHeat&,
                            const double dt,
                            Surface& surface,
                            std::vector<double>& S_drain,
@@ -69,15 +73,13 @@ public:
                             const std::vector<double>& h,
                             std::vector<double>& S_matrix,
                             std::vector<double>& S_drain) const;
-  
-  virtual void update_biopores (const Geometry& geo, 
-                                const Soil& soil,  
-                                const SoilHeat& soil_heat, 
-                                const std::vector<double>& h,
-                                const double dt);
-
-  virtual void update_active (const std::vector<double>& h_matrix)
-  { }
+  virtual bool find_implicit_water (const Anystate& old_state, 
+                                    const Geometry& geo, 
+                                    const Soil& soil,  
+                                    const SoilHeat& soil_heat, 
+                                    const std::vector<double>& h,
+                                    const double dt);
+  virtual void update_active (const std::vector<double>& h_matrix);
 
   // - For use in Movement::solute
   virtual void solute (const Geometry&, const SoilWater&, 

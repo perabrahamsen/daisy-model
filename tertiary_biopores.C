@@ -39,7 +39,8 @@ struct TertiaryBiopores : public Tertiary
   const auto_vector<Biopore*> classes; // List of biopore classes.
   const double pressure_initiate;// Pressure needed to init pref.flow [cm]
   const double pressure_end;	 // Pressure after pref.flow has been init [cm]
-  const double pond_max;	 // Pond height before activating pref.flow [mm]  
+  const double pond_max;	 // Pond height before activating pref.flow [mm]
+  const bool use_small_timesteps_; // True, iff we want to calculate S in R.E.
 
   // Identity.
   bool has_macropores ()
@@ -47,30 +48,34 @@ struct TertiaryBiopores : public Tertiary
 
   // State.
   std::vector<bool> active;      // Biopore activity 
-  struct ContentBiopores : public Anystate::Content
+  struct MyContent : public Anystate::Content
   {
     std::vector<Anystate> states;
     std::auto_ptr<Anystate::Content> clone () const
     { 
-      std::auto_ptr<Anystate::Content> copy (new ContentBiopores (states)); 
+      std::auto_ptr<Anystate::Content> copy (new MyContent (states)); 
       return copy;
     }
-    ContentBiopores (const std::vector<Anystate>& s)
+    MyContent (const std::vector<Anystate>& s)
       : states (s)
     { }
   };
   Anystate get_state () const;
   void set_state (const Anystate&);
+  bool converge (const Anystate&);
 
   // Simulation.
+  bool use_small_timesteps ()
+  { return use_small_timesteps_; }
+
   // - For use by column.
-  void tick_water (const Geometry&, const Soil&, const SoilWater&,
+  void tick_water (const Geometry&, const Soil&, 
+                   const SoilWater&, const SoilHeat&,
                    const double dt,
                    Surface& surface,
                    std::vector<double>& S_drain,
                    std::vector<double>& S_matrix, 
-                   std::vector<double>& q_tertiary, Treelog& msg)
-  { /* TODO */ }
+                   std::vector<double>& q_tertiary, Treelog& msg);
 
   // - For use in Richard's Equation.
   double matrix_biopores_matrix (size_t c, const Geometry& geo, // Matrix 
@@ -91,8 +96,13 @@ struct TertiaryBiopores : public Tertiary
                         const SoilHeat& soil_heat, 
                         const std::vector<double>& h,
                         const double dt);
-  
   void update_water ();
+  bool find_implicit_water (const Anystate& old_state, 
+                            const Geometry& geo, 
+                            const Soil& soil,  
+                            const SoilHeat& soil_heat, 
+                            const std::vector<double>& h,
+                            const double dt);
   void update_active (const std::vector<double>& h);
 
   // - For use in Movement::solute.
@@ -116,20 +126,72 @@ public:
 Anystate
 TertiaryBiopores::get_state () const
 {
+  const size_t classes_size = classes.size ();
   std::vector<Anystate> biopore_state;
-  for (size_t b = 0; b < classes.size (); b++)
+  for (size_t b = 0; b < classes_size; b++)
     {
       const Biopore& biopore = *classes[b];
       biopore_state.push_back (biopore.get_state ());
     }
-  std::auto_ptr<Anystate::Content> copy (new ContentBiopores (biopore_state));
+  std::auto_ptr<Anystate::Content> copy (new MyContent (biopore_state));
   return Anystate (copy);
 }
  
 void 
 TertiaryBiopores::set_state (const Anystate& state)
 {
-  
+  const MyContent& content = static_cast<const MyContent&> (state.inspect ());
+  const size_t classes_size = classes.size ();
+  daisy_assert (classes_size == content.states.size ());
+  for (size_t b = 0; b < classes_size; b++)
+    {
+      Biopore& biopore = *classes[b];
+      biopore.set_state (content.states[b]);
+    }
+}
+
+bool 
+TertiaryBiopores::converge (const Anystate& state)
+{  
+  const double max_abs = 0.02;
+  const double max_rel = 0.001;
+
+  const MyContent& content = static_cast<const MyContent&> (state.inspect ());
+  const size_t classes_size = classes.size ();
+  daisy_assert (classes_size == content.states.size ());
+  for (size_t b = 0; b < classes_size; b++)
+    {
+      Biopore& biopore = *classes[b];
+      if (!biopore.converge (content.states[b], max_abs, max_rel))
+        return false;
+    }
+  return true;
+}
+
+void 
+TertiaryBiopores::tick_water (const Geometry& geo, const Soil& soil, 
+                              const SoilWater& soil_water, 
+                              const SoilHeat& soil_heat,
+                              const double dt,
+                              Surface& surface,
+                              std::vector<double>& S_drain,
+                              std::vector<double>& S_matrix, 
+                              std::vector<double>& q_tertiary, Treelog& msg)
+{ 
+  // TODO: surface
+  // TODO: q_tertiary
+  Anystate old_state = get_state ();
+
+  std::vector<double> h;
+  const size_t cell_size = geo.cell_size ();
+  for (size_t c = 0; c < cell_size; c++)
+    h.push_back (soil_water.h (c));
+
+  update_active (h);
+  if (find_implicit_water (old_state, geo, soil, soil_heat, h, dt))
+    matrix_sink (geo, soil, soil_heat, h, S_matrix, S_drain);
+  else
+    msg.warning ("State did not converge, ignoring tertiary transport");
 }
 
 double 
@@ -219,6 +281,33 @@ TertiaryBiopores::update_water ()
     classes[b]->update_water ();
 }
 
+bool
+TertiaryBiopores::find_implicit_water (const Anystate& old_state, 
+                                       const Geometry& geo, 
+                                       const Soil& soil,  
+                                       const SoilHeat& soil_heat, 
+                                       const std::vector<double>& h,
+                                       const double dt)
+{
+  const int max_iter = 12;
+  for (int iter = 0; iter < max_iter; iter++)
+    {
+      const Anystate new_state = get_state ();
+      // Find added water with "new water content".
+      update_biopores (geo, soil, soil_heat, h, dt);
+      // Reset water content to begining of timestep.
+      set_state (old_state);
+      // Add water to get new state.
+      update_water ();
+      // Check if they converge.
+      if (converge (new_state))
+        // If so, we are finished.
+        return true;
+    }
+  set_state (old_state);
+  return false;
+}
+
 void
 TertiaryBiopores::update_active (const std::vector<double>& h)
 {
@@ -283,6 +372,7 @@ TertiaryBiopores::TertiaryBiopores (Block& al)
     pressure_initiate (al.number ("pressure_initiate")),
     pressure_end (al.number ("pressure_end")),
     pond_max (al.number ("pond_max")),
+    use_small_timesteps_ (al.flag ("use_small_timesteps")),
     active (al.check ("active")
             ? al.flag_sequence ("active")
             : std::vector<bool> ())
@@ -312,6 +402,9 @@ static struct TertiaryBioporesSyntax
 Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
     alist.add ("pond_max", 0.5);
+    syntax.add ("use_small_timesteps", Syntax::Boolean, Syntax::Const,
+                "True iff the sink is allowed to change within a timestep.");
+    alist.add ("use_small_timesteps", true);
     syntax.add ("active", Syntax::Boolean, Syntax::OptionalState,
                 Syntax::Sequence, "Active biopores in cells.");
     Librarian::add_type (Tertiary::component, "biopores", alist, syntax, &make);

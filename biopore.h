@@ -45,7 +45,7 @@ public:
 
   virtual Anystate get_state () const;
   virtual void set_state (const Anystate&);
-  virtual bool converge (const Anystate& old); // Are current, old state close?
+  virtual bool converge (const Anystate&, double max_abs, double max_rel) const;
 
   // Parameters.
 protected:
@@ -64,22 +64,16 @@ protected:
   
   static double biopore_to_matrix (double R_wall, double M_c, 
                                    double r_c, double h, double h_3);
-public:
-  // Matrix sink
-  virtual double matrix_biopore_matrix (size_t c, const Geometry& geo, 
-                                        const Soil& soil, bool active, 
-                                        double K_xx, double h) const=0;
-  // Matrix sink
-  virtual double matrix_biopore_drain (size_t c, const Geometry& geo, 
-                                       const Soil& soil, bool active, 
-                                       double K_xx, double h) const=0;
-
   // Interface.
 public:
-  virtual double air_bottom (size_t c) const = 0; // Lowest point with air [cm]
-  double density (size_t c) const                 // [m^-2]
-  { return density_cell[c]; }
-  
+  virtual double matrix_biopore_matrix (size_t c, // Matrix sink.
+                                        const Geometry& geo, 
+                                        const Soil& soil, bool active, 
+                                        double K_xx, double h) const=0;
+  virtual double matrix_biopore_drain (size_t c, // Matrix sink.
+                                       const Geometry& geo, 
+                                       const Soil& soil, bool active, 
+                                       double K_xx, double h) const=0;
   virtual void add_water (size_t c, double amount /* [cm^3] */) = 0;
   virtual void update_water () = 0;
   virtual void output (Log&) const = 0;
@@ -87,10 +81,10 @@ public:
   // Create and Destroy.
 protected:
   bool initialize_base (const Geometry&, const Scope&, Treelog&);
+  bool check_base (const Geometry&, Treelog& msg) const;
 public:
   virtual bool initialize (const Geometry&, const Scope&, double pipe_height,
                            Treelog&) = 0;
-  bool check_base (const Geometry&, Treelog& msg) const;
   virtual bool check (const Geometry&, Treelog& msg) const = 0;
   static void load_base (Syntax& syntax, AttributeList& alist);
 protected:
