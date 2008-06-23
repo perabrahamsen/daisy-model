@@ -81,15 +81,6 @@ public:
   { return density_cell[c]; }
   
   virtual void add_water (size_t c, double amount /* [cm^3] */) = 0;
-  virtual void extract_water (size_t c, const double volume /* [cm^3] */ ,
-                              const double Theta /* [cm^3/cm^3] */,
-                              const double dt /* [h] */,
-                              std::vector<double>& S_drain /* [cm^3/cm^3/h] */,
-                              std::vector<double>& S_matrix, Treelog& msg) = 0;
-  virtual void release_water (const Geometry& geo, const Soil& soil, 
-                              const SoilWater& soil_water,
-                              const double dt /* [h] */,
-                              std::vector<double>& S_matrix, Treelog& msg) = 0;
   virtual void update_water () = 0;
   virtual void output (Log&) const = 0;
 

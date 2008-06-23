@@ -48,20 +48,8 @@ struct BioporeDrain : public Biopore
                                 double K_xx, double h) const
   {return 0.0;}
     
-  void extract_water (size_t c, const double volume /* [cm^3] */ ,
-                      const double Theta /* [cm^3/cm^3 */,
-                      const double dt /* [h] */,
-                      std::vector<double>& S_drain /* [cm^3/cm^3/h */,
-                      std::vector<double>& S_matrix, Treelog& msg);
-  void release_water (const Geometry&, const Soil&, 
-                      const SoilWater&,
-                      const double /* [h] */,
-                      std::vector<double>&, Treelog& msg)
-  { }
-  
   void add_water (size_t c, double amount /* [cm^3] */)
   { }
-
   void update_water ()
   { }
   void output (Log&) const
@@ -102,22 +90,6 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
   else 
     S = 0.0;
   return S;
-}
-
-
-void 
-BioporeDrain::extract_water (size_t c, const double /* [cm^3] */ ,
-                             const double Theta /* [cm^3/cm^3] */,
-                             const double dt /* [h] */,
-                             std::vector<double>& S_drain /* [cm^3/cm^3/h] */,
-                             std::vector<double>&, Treelog& msg)
-{ 
-  std::ostringstream tmp;
-  tmp << "Draining " << Theta << " [] water over " << dt
-      << " hours in cell " << c;
-  msg.message (tmp.str ());
-  
-  S_drain[c] += Theta / dt; 
 }
 
 BioporeDrain::BioporeDrain (Block& al)

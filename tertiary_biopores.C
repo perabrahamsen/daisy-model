@@ -86,13 +86,6 @@ struct TertiaryBiopores : public Tertiary
                         const std::vector<double>& h,
                         const double dt);
   
-  void extract_water (const Geometry&, const Soil&, const SoilWater&,
-                      const double dt,
-                      std::vector<double>& S_drain,
-                      std::vector<double>& S_matrix, Treelog& msg);
-  void release_water (const Geometry&, const Soil&, const SoilWater&,
-                      const double dt,
-                      std::vector<double>& S_matrix, Treelog& msg);
   void update_water_content ();
   void tick_water (const Geometry&, const Soil&, const SoilWater&,
                    const double dt,
@@ -240,101 +233,6 @@ TertiaryBiopores::update_biopores(const Geometry& geo,
     }
 }
 
- 
-void
-TertiaryBiopores::extract_water (const Geometry& geo, const Soil& soil,
-                                 const SoilWater& soil_water,
-                                 const double dt,
-                                 std::vector<double>& S_drain,
-                                 std::vector<double>& S_matrix,
-                                 Treelog& msg)
-{
-  const size_t cell_size = geo.cell_size ();
-
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      const double h = soil_water.h (c);
-
-      if (h > pressure_initiate)
-        {
-          // Find total density for active pores, and deepest air filled pore.
-          const double cell_z = geo.cell_z (c);
-          double total_density = 0.0;  // Total density of all active pores.
-          double lowest_pore = cell_z; // Lowest unsaturated pore bottom.
-          for (size_t b = 0; b < classes.size (); b++)
-            {
-              const Biopore& biopore = *classes[b];
-              const double air_bottom = biopore.air_bottom (c);
-
-              if (air_bottom < cell_z)
-                // Active pore class.
-                total_density += biopore.density (c);
-
-              if (air_bottom < lowest_pore)
-                // This is the lowest until now.
-                lowest_pore = air_bottom;
-            }
-            
-          if (total_density < 1e-42)
-            // No biopores.
-            continue;
-
-          // We empty the matrix to 'pressure_end', but only if there
-          // are pores with air sufficently deep.
-          const double pore_pressure = lowest_pore - cell_z;
-          const double end = pore_pressure > pressure_end
-            ? pore_pressure
-            : pressure_end;
-
-          if (end > h - 1e-5)
-            // Ignore trivial pressure difference.
-            continue;
-
-          // Find corresponding loss.
-          const double h_ice = soil_water.h_ice (c);
-          const double loss = soil.Theta (c, h, h_ice) 
-            - soil.Theta (c, end, h_ice);
-          
-          if (loss < 1e-5)
-            // Ignore trivial losss.
-            continue;
-
-          const double volume = geo.cell_volume (c); // [cm^3]
-
-          // Distribute to biopore classes.
-          for (size_t b = 0; b < classes.size (); b++)
-            {
-              Biopore& biopore = *classes[b];
-              const double air_bottom = biopore.air_bottom (c);
-
-              if (air_bottom > cell_z - 1e-5)
-                // Biopore is filled.
-                continue;
-
-              const double density = biopore.density (c);
-              if (density < 1e-42)
-                // No biopores of this class in this cell.
-                continue;
-
-              // Extract it.
-              const double fraction = density / total_density;
-              biopore.extract_water (c, volume, fraction * loss,
-                                     dt, S_drain, S_matrix, msg);
-            }
-        }
-    }
-}
-
-void
-TertiaryBiopores::release_water (const Geometry& geo, const Soil& soil,
-                                 const SoilWater& soil_water,
-                                 const double dt,
-                                 std::vector<double>& S_matrix, Treelog& msg)
-{
-  for (size_t b = 0; b < classes.size (); b++)
-    classes[b]->release_water (geo, soil, soil_water, dt, S_matrix, msg);
-}
-
 void
 TertiaryBiopores::update_water_content ()
 {
@@ -352,10 +250,12 @@ TertiaryBiopores::tick_water (const Geometry& geo, const Soil& soil,
                               std::vector<double>& /* q_tertiary */, 
                               Treelog& msg)
 {
+#if 0
   extract_water (geo, soil, soil_water, dt, S_drain, S_matrix, msg);
   update_water_content ();
   release_water (geo, soil, soil_water, dt, S_matrix, msg);
   update_water_content ();
+#endif
 }
 
 void 

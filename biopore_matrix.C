@@ -81,15 +81,6 @@ struct BioporeMatrix : public Biopore
     daisy_assert (col < added_water.size ());
     added_water[col] += amount; 
   }
-  void extract_water (size_t c, const double volume /* [cm^3] */ ,
-                      const double Theta /* [cm^3/cm^3 */,
-                      const double dt /* [h] */,
-                      std::vector<double>& S_drain /* [cm^3/cm^3/h */,
-                      std::vector<double>& S_matrix, Treelog& msg);
-  void release_water (const Geometry&, const Soil&, 
-                      const SoilWater&,
-                      const double /* [h] */,
-                      std::vector<double>&, Treelog& msg);
   void update_water ();
   void output (Log&) const;
 
@@ -122,84 +113,6 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
   else 
     S = 0.0;
   return S;
-}
-  
-
-void 
-BioporeMatrix::extract_water (const size_t c, const double volume /* [cm^3] */ ,
-                              const double Theta /* [cm^3/cm^3] */,
-                              const double dt /* [h] */,
-                              std::vector<double>& /* [cm^3/cm^3/h] */,
-                              std::vector<double>& S_matrix, Treelog& msg)
-{
-  std::ostringstream tmp;
-  tmp << "Extracting " << Theta << " [] water over " << dt
-      << " hours from cell " << c;
-  msg.message (tmp.str ());
-
-  daisy_assert (c < S_matrix.size ());
-  S_matrix[c] += Theta / dt;
-  daisy_assert (c < column.size ());
-  const size_t col = column[c];
-  daisy_assert (col < h_bottom.size ());
-  added_water[col] += Theta * volume;
-}
-
-void 
-BioporeMatrix::release_water (const Geometry& geo, const Soil& soil, 
-                              const SoilWater& soil_water,
-                              const double dt /* [h] */,
-                              std::vector<double>& S_matrix, Treelog& msg)
-{
-  const double circumference = M_PI * diameter; // [cm]
-  
-  const size_t cell_size = geo.cell_size ();
-  for (size_t c = 0; c < cell_size; c++)
-    { 
-      const double dens = density (c); // [cm^-2]
-      if (dens < 1e-42)
-        // No biopores of this class in this cell.
-        continue;
-
-      const double cell_z = geo.cell_z (c); // [cm]
-      if (cell_z > height_start || cell_z < height_end)
-        // Outside interval.
-        continue;
-
-      const double h_biopore =  air_bottom (c) - cell_z; // [cm]
-      if (h_biopore < 1e-1)
-        // No water significant water in biopore.
-        continue;
-      const double h_matrix = soil_water.h (c); // [cm]
-      if (h_biopore < h_matrix + 1e-5)
-        // Pressure in biopore not significantly above pressure in matrix.
-        continue;
-      const double dh = h_biopore - h_matrix; // [cm]
-      daisy_assert (dh > 0.0);
-
-      // Find resistance.
-      const Secondary& secondary = soil.secondary_domain (c);
-      const bool use_primary = secondary.none ();
-      const double R = use_primary ? R_primary : R_secondary; // [h]
-      
-      // Find sink
-      const double wall_per_area = circumference * dens; // [cm^-1]
-      
-      const double S = dh * wall_per_area / R; // [h^-1]
-
-      std::ostringstream tmp;
-      tmp << "Releasing " << S * dt << " [] water over " << dt
-          << " hours in cell " << c
-          << "\nz = " << cell_z << ", h_matrix = " << h_matrix 
-          << ", h_biopore = " << h_biopore << ", dh = " << dh
-          << "\ncircumference = " << circumference << ", dens = " << dens
-          << ", wall/area = " << wall_per_area << ", R = " << R;
-      msg.message (tmp.str ());
-
-      S_matrix[c] -= S;
-      const double volume = geo.cell_volume (c); // [cm^3]
-      added_water[column[c]] -= S * volume * dt; // [cm^3]
-    }
 }
 
 void

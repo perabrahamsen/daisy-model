@@ -87,6 +87,10 @@ Tertiary::Tertiary (Block& al)
   : ModelAListed (al.alist ())
 { }
 
+Tertiary::Tertiary (const symbol n)
+  : ModelAListed (n)
+{ }
+
 Tertiary::~Tertiary ()
 { }
 
