@@ -44,6 +44,10 @@ Tertiary::Content::Content ()
 Tertiary::Content::~Content ()
 { }
 
+const Tertiary::Content& 
+Tertiary::State::inspect () const
+{ return *content; }
+
 Tertiary::State& 
 Tertiary::State::operator= (const State& other)
 {
@@ -60,7 +64,7 @@ Tertiary::State::State (const Tertiary::State& other)
 
 Tertiary::State::State (const std::auto_ptr<Content> other)
 { 
-  daisy_assert (content != other);
+  daisy_assert (content.get () != other.get ());
   content = other->clone (); 
 }
 
@@ -74,10 +78,14 @@ Tertiary::get_state () const
   struct ContentNone : public Content
   {
     std::auto_ptr<Content> clone () const
-    { return new ContentNone (); }
+    { 
+      std::auto_ptr<Content> copy (new ContentNone ());
+      return copy; 
+    }
   };
   
-  return State (new ContentNone ());
+  std::auto_ptr<Content> copy (new ContentNone ());
+  return State (copy);
 }
 
 void
@@ -103,6 +111,22 @@ Tertiary::tick (const Geometry& geo, const Soil& soil, const double dt,
   soil_water.drain (S_drain);
   soil_water.set_tertiary (S_matrix, q_tertiary);
 }
+
+void 
+Tertiary::matrix_sink (const Geometry& geo, const Soil& soil,  
+                       const SoilHeat& soil_heat, 
+                       const std::vector<double>& h,
+                       std::vector<double>& S_matrix,
+                       std::vector<double>& S_drain) const
+{ }
+
+void 
+Tertiary::update_biopores (const Geometry& geo, 
+                           const Soil& soil,  
+                           const SoilHeat& soil_heat, 
+                           const std::vector<double>& h,
+                           const double dt)
+{ }
 
 Tertiary::Tertiary (Block& al)
   : ModelAListed (al.alist ())

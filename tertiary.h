@@ -28,6 +28,7 @@ class Block;
 class Geometry;
 class Soil;
 class SoilWater;
+class SoilHeat;
 class Surface;
 class Chemical;
 class Scope;
@@ -43,7 +44,7 @@ public:
   virtual bool has_macropores () = 0;
 
   // Extractable state.
-private:
+protected:
   class Content
   // This class is intended for derived classes to store state in.
   {
@@ -60,6 +61,9 @@ public:
   // This class is the user interface to state management.
   {
     std::auto_ptr<Content> content;
+  public:
+    const Content& inspect () const;
+  private:
     State ();                   // Disable.
   public:
     State& operator= (const State&);
@@ -106,9 +110,7 @@ public:
                              std::vector<double>& S_matrix, 
                              std::vector<double>& q_tertiary, 
                              Treelog& msg) = 0;
-  virtual void update_active (const Geometry&, const Soil&, 
-                              const std::vector<double>& h_matrix,
-                              Treelog& msg)
+  virtual void update_active (const std::vector<double>& h_matrix)
   { }
 
   // - For use in Movement::solute

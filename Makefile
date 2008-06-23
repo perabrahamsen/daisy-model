@@ -372,8 +372,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-LATER = 
-MODELS = uzrect_r3.C tertiary_old.C \
+LATER = uzrect_r3.C 
+MODELS = tertiary_old.C \
 	tertiary_instant.C biopore_drain.C tertiary_biopores.C \
 	biopore_matrix.C transport_Mollerup.C transport_Hansen.C \
 	movement_1D.C groundwater_aquitard.C \
@@ -1386,11 +1386,11 @@ tertiary_instant${OBJ}: tertiary_instant.C tertiary.h model.h symbol.h \
   assertion.h plf.h check.h vcheck.h librarian.h block.h
 biopore_drain${OBJ}: biopore_drain.C biopore.h model.h symbol.h alist.h \
   number.h block.h syntax.h treelog.h plf.h vcheck.h librarian.h \
-  submodeler.h assertion.h check.h
+  submodeler.h assertion.h check.h geometry.h mathlib.h
 tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   alist.h biopore.h number.h memutils.h librarian.h block.h syntax.h \
   treelog.h plf.h check.h geometry.h mathlib.h assertion.h soil.h \
-  soil_water.h log.h time.h border.h
+  soil_water.h soil_heat.h log.h time.h border.h
 biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
   number.h imvec.h syntax.h treelog.h block.h plf.h vcheck.h librarian.h \
   submodeler.h assertion.h geometry.h mathlib.h soil.h soil_water.h \

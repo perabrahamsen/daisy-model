@@ -43,13 +43,16 @@ struct TertiaryBiopores : public Tertiary
   std::vector<bool> active;      // Biopore activity 
   struct ContentBiopores : public Content
   {
-    std::vector<double> air_bottom;
+    std::vector<Biopore::State> states;
     std::auto_ptr<Content> clone () const
-    { return new ContentBiopores (air_bottom); }
-    ContentBiopores (const std::vector<double>& h_air)
-      : air_bottom (h_air)
+    { 
+      std::auto_ptr<Content> copy (new ContentBiopores (states)); 
+      return copy;
+    }
+    ContentBiopores (const std::vector<Biopore::State>& s)
+      : states (s)
     { }
-  }
+  };
   State get_state () const;
   void set_state (const State&);
 
@@ -118,6 +121,25 @@ public:
   bool check (const Geometry&, Treelog& msg) const;
   TertiaryBiopores (Block& al);
 };
+
+Tertiary::State 
+TertiaryBiopores::get_state () const
+{
+  std::vector<Biopore::State> biopore_state;
+  for (size_t b = 0; b < classes.size (); b++)
+    {
+      const Biopore& biopore = *classes[b];
+      biopore_state.push_back (biopore.get_state ());
+    }
+  std::auto_ptr<Content> copy (new ContentBiopores (biopore_state));
+  return State (copy);
+}
+ 
+void 
+TertiaryBiopores::set_state (const State& state)
+{
+  
+}
 
 void
 TertiaryBiopores::update_active (const std::vector<double>& h)
