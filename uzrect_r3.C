@@ -175,7 +175,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   ublas::vector<double> h_ice (cell_size); // 
   ublas::vector<double> S (cell_size); // sink term
   ublas::vector<double> S_vol (cell_size); // sink term
-  ublas::vector<double> S_macro (cell.size);  // sink term
+  ublas::vector<double> S_macro (cell_size);  // sink term
   std::vector<double> S_drain (cell_size, 0.0); // drain flow
   ublas::vector<double> T (cell_size); // temperature 
   ublas::vector<double> K (cell_size); // hydraulic conductivity
@@ -334,46 +334,43 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  for (size_t c = 0; c < cell_size; c++)
 	    Cw (c, c) = soil.Cw2 (c, h[c]);
 	  
-          //Initialize sink to macropores         
-          ublas::vector<double> S_macro;
-          
           Tertiary::State h3_conv = tertiary.get_state ();
+          const int max_iterations_macro = max_iterations;
+          int iterations_used_macro = 0;
           do
             {
-              tertiary.update_biopores(const Geometry& geo, 
-                                       const Soil& soil,  
-                                       const SoilHeat& soil_heat, 
-                                       const std::vector<double>& h,
-                                       const double dt); 
-
+              iterations_used_macro++;
+              tertiary.update_biopores(geo, soil, soil_heat, h, ddt); 
             }
-          while (!tertiary.converge (h3_conv))
+          while (!tertiary.converge (h3_conv) 
+                 && iterations_used_macro <= max_iterations_macro);
+                     
+           std::vector<double> h_std (cell_size);
+          //ublas vector -> std vector 
+          std::copy(h.begin (), h.end (), h_std.begin ());
+                          
+          std::vector<double> S_matrix (cell_size);
+          std::vector<double> S_drain (cell_size);
           
-            matrix
-             
+          tertiary.matrix_sink (geo, soil, soil_heat, h, 
+                                S_matrix, S_drain);
           
+          ublas::vector<double> S_macro (cell_size);
+
           for (size_t cell = 0; cell != cell_size ; ++cell) 
             {				
-              S_macro (cell) = S_something (cell) * geo.cell_volume (cell);
+              S_macro (cell) = (S_matrix[cell]  + S_drain[cell]) 
+                * geo.cell_volume (cell);
             }
           
-          
-
-
-
-
-         
-
-          
-
-
+                              
 	  //Initialize sum matrix
 	  Solver::Matrix summat (cell_size);  
 	  summat = diff + Dm_mat;
 
 	  //Initialize sum vector
 	  ublas::vector<double> sumvec (cell_size);  
-	  sumvec = grav + B + Gm + Dm_vec - S_vol; 
+	  sumvec = grav + B + Gm + Dm_vec - S_vol - S_macro; 
 
 	  // QCw is shorthand for Qmatrix * Cw
 	  Solver::Matrix Q_Cw (cell_size);
