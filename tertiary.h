@@ -98,11 +98,13 @@ public:
   // Create and Destroy.
 public:
   static const AttributeList& none_model ();
+  static Tertiary& none ();
   virtual bool initialize (const Geometry&, const Soil&, const Scope&, 
                            const double pipe_position, Treelog&) = 0;
   virtual bool check (const Geometry&, Treelog&) const = 0;
 protected:
   explicit Tertiary (Block& al);
+  explicit Tertiary (const symbol name);
 public:
   virtual ~Tertiary ();
 };

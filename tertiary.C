@@ -136,6 +136,9 @@ public:
   TertiaryNone (Block& al)
     : Tertiary (al)
   { }
+  TertiaryNone (const symbol n)
+    : Tertiary (n)
+  { }
 };
 
 static struct TertiaryNoneSyntax
@@ -160,6 +163,13 @@ Tertiary::none_model ()
     alist.add ("type", "none");
 
   return alist;
+}
+
+Tertiary&
+Tertiary::none ()
+{
+  static TertiaryNone none (symbol ("none"));
+  return none;
 }
 
 // tertiary.C ends here.
