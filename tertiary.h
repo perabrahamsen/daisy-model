@@ -76,15 +76,6 @@ public:
                                 const std::vector<double>& h,
                                 const double dt);
 
-#if 0
-  virtual void update_water (const Geometry&, const Soil&, 
-                             const std::vector<double>& h_matrix,
-                             const double dt,
-                             std::vector<double>& S_drain,
-                             std::vector<double>& S_matrix, 
-                             std::vector<double>& q_tertiary, 
-                             Treelog& msg) = 0;
-#endif
   virtual void update_active (const std::vector<double>& h_matrix)
   { }
 

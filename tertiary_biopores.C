@@ -40,6 +40,11 @@ struct TertiaryBiopores : public Tertiary
   const double pressure_initiate;// Pressure needed to init pref.flow [cm]
   const double pressure_end;	 // Pressure after pref.flow has been init [cm]
   const double pond_max;	 // Pond height before activating pref.flow [mm]  
+
+  // Identity.
+  bool has_macropores ()
+  { return true; }
+
   // State.
   std::vector<bool> active;      // Biopore activity 
   struct ContentBiopores : public Anystate::Content
@@ -57,20 +62,22 @@ struct TertiaryBiopores : public Tertiary
   Anystate get_state () const;
   void set_state (const Anystate&);
 
-  // Identity.
-  bool has_macropores ()
-  { return true; }
-
   // Simulation.
-  void update_active (const std::vector<double>& h);
+  // - For use by column.
+  void tick_water (const Geometry&, const Soil&, const SoilWater&,
+                   const double dt,
+                   Surface& surface,
+                   std::vector<double>& S_drain,
+                   std::vector<double>& S_matrix, 
+                   std::vector<double>& q_tertiary, Treelog& msg)
+  { /* TODO */ }
 
-  // Matrix sink
-  double matrix_biopores_matrix (size_t c, const Geometry& geo, 
-                                 const Soil& soil, 
+  // - For use in Richard's Equation.
+  double matrix_biopores_matrix (size_t c, const Geometry& geo, // Matrix 
+                                 const Soil& soil,              // sink term.
                                  double K_xx, double h) const;
-  // Matrix sink
-  double matrix_biopores_drain (size_t c, const Geometry& geo, 
-                                const Soil& soil,  
+  double matrix_biopores_drain (size_t c, const Geometry& geo, // Matrix
+                                const Soil& soil,              // sink term.
                                 double K_xx, double h) const;
   
   void matrix_sink (const Geometry& geo, const Soil& soil,  
@@ -85,26 +92,17 @@ struct TertiaryBiopores : public Tertiary
                         const std::vector<double>& h,
                         const double dt);
   
-  void update_water_content ();
-  void tick_water (const Geometry&, const Soil&, const SoilWater&,
-                   const double dt,
-                   Surface& surface,
-                   std::vector<double>& S_drain,
-                   std::vector<double>& S_matrix, 
-                   std::vector<double>& q_tertiary, Treelog& msg);
-  void update_water (const Geometry&, const Soil&, 
-                     const std::vector<double>& h_matrix,
-                     const double dt,
-                     std::vector<double>& S_drain,
-                     std::vector<double>& S_matrix, 
-                     std::vector<double>& q_tertiary, 
-                     Treelog& msg)
-  { }
+  void update_water ();
+  void update_active (const std::vector<double>& h);
+
+  // - For use in Movement::solute.
   void solute (const Geometry&, const SoilWater&,
                const std::map<size_t, double>& J_tertiary,
                const double /* dt */,
                Chemical&, Treelog&)
-  { }
+  { /* TODO */ }
+
+  // - Output.
   void output (Log&) const;
   
   // Create and Destroy.
@@ -132,24 +130,6 @@ void
 TertiaryBiopores::set_state (const Anystate& state)
 {
   
-}
-
-void
-TertiaryBiopores::update_active (const std::vector<double>& h)
-{
-  for (size_t c = 0; c < active.size (); c++)
-    {
-      if (active[c])    // Biopore is active 
-        {
-          if (h[c] < pressure_end)
-            active[c] = false;
-        }
-      else              // Biopore is not active 
-        {
-          if (h[c] > pressure_initiate)
-            active[c] = true;
-        }
-    }
 }
 
 double 
@@ -203,11 +183,11 @@ TertiaryBiopores::matrix_sink (const Geometry& geo,
 }
  
 void 
-TertiaryBiopores::update_biopores(const Geometry& geo, 
-                                  const Soil& soil,  
-                                  const SoilHeat& soil_heat, 
-                                  const std::vector<double>& h,
-                                  const double dt) 
+TertiaryBiopores::update_biopores (const Geometry& geo, 
+                                   const Soil& soil,  
+                                   const SoilHeat& soil_heat, 
+                                   const std::vector<double>& h,
+                                   const double dt) 
 {
   const size_t cell_size = geo.cell_size ();
   for (size_t c = 0; c < cell_size; c++)
@@ -233,34 +213,35 @@ TertiaryBiopores::update_biopores(const Geometry& geo,
 }
 
 void
-TertiaryBiopores::update_water_content ()
+TertiaryBiopores::update_water ()
 {
   for (size_t b = 0; b < classes.size (); b++)
     classes[b]->update_water ();
 }
 
 void
-TertiaryBiopores::tick_water (const Geometry& geo, const Soil& soil,
-                              const SoilWater& soil_water,
-                              const double dt,
-                              Surface& surface,
-                              std::vector<double>& S_drain,
-                              std::vector<double>& S_matrix,
-                              std::vector<double>& /* q_tertiary */, 
-                              Treelog& msg)
+TertiaryBiopores::update_active (const std::vector<double>& h)
 {
-#if 0
-  extract_water (geo, soil, soil_water, dt, S_drain, S_matrix, msg);
-  update_water_content ();
-  release_water (geo, soil, soil_water, dt, S_matrix, msg);
-  update_water_content ();
-#endif
+  for (size_t c = 0; c < active.size (); c++)
+    {
+      if (active[c])    // Biopore is active 
+        {
+          if (h[c] < pressure_end)
+            active[c] = false;
+        }
+      else              // Biopore is not active 
+        {
+          if (h[c] > pressure_initiate)
+            active[c] = true;
+        }
+    }
 }
 
 void 
 TertiaryBiopores::output (Log& log) const
-{ output_list (classes, "classes", log, Biopore::component); 
-// TODO output active  
+{
+  output_list (classes, "classes", log, Biopore::component); 
+  // TODO: output_variable (active, log);
 }
 
 
