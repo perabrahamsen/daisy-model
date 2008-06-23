@@ -61,7 +61,6 @@ struct TertiaryBiopores : public Tertiary
   bool has_macropores ()
   { return true; }
 
-
   // Simulation.
   void update_active (const std::vector<double>& h);
 
