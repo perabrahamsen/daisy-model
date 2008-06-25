@@ -55,8 +55,8 @@ public:
   // Infiltration.
 protected:
   typedef std::map<size_t, double> q_top_map; // We keep track of each
-  pond_map q_top;                             // top edge.
-  virtual double q_top_max (size_t e);        // Max flux.
+  q_top_map q_top;                             // top edge.
+  virtual double capacity (const Geometry&, size_t e);        // Max flux.
 
 public:
   // - For use by Column.

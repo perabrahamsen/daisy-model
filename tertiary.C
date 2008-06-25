@@ -27,6 +27,7 @@
 #include "alist.h"
 #include "librarian.h"
 #include "anystate.h"
+#include "surface.h"
 
 // The 'tertiary' component.
 
@@ -56,7 +57,7 @@ Tertiary::use_small_timesteps ()
 { return false; }
 
 double
-Tertiary::q_top_max (const size_t)
+Tertiary::capacity (const Geometry&, const size_t)
 { return 0.0; }
 
 void
@@ -74,12 +75,13 @@ Tertiary::tick (const Geometry& geo, const Soil& soil,
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       
-      const double max_surface = in_sign * surface.q_top (edge);
-      const double flux_in = std::min (capacity (edge), max_surface);
+      const double max_surface = in_sign * surface.q_top (geo, edge);
+      const double flux_in = std::min (capacity (geo, edge), max_surface);
       q_top[edge] = in_sign * flux_in;
+#if 0
       surface.accept_top (double amount, const Geometry&, size_t edge, 
                           double dt, Treelog&);
-
+#endif
     }
 
   if (use_small_timesteps ())
