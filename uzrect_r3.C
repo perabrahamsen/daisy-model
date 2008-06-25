@@ -180,7 +180,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   std::vector<double> S_drain (cell_size, 0.0); // matrix-> macro -> drain flow 
   std::vector<double> S_drain_sum (cell_size, 0.0); // For large timestep
   std::vector<double> S_matrix (cell_size, 0.0);  // matrix -> macro 
-  std::vector<double> S_matrix_sum (cell_size, 0,0); // for large timestep
+  std::vector<double> S_matrix_sum (cell_size, 0.0); // for large timestep
   ublas::vector<double> T (cell_size); // temperature 
   ublas::vector<double> K (cell_size); // hydraulic conductivity
   ublas::vector<double> Kold (cell_size); // old hydraulic conductivity
@@ -438,8 +438,11 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
           Darcy (geo, Kedge, h, dq);
 
           // update macropore flow components 
-          S_drain_sum += S_drain * ddt/dt;
-          S_matrix_sum += S_matrix * ddt/dt;
+          for (int c = 0; c < cell_size; c++)
+            {
+              S_drain_sum[c] += S_drain[c] * ddt/dt;
+              S_matrix_sum[c] += S_matrix[c] * ddt/dt;
+            }
 
 
 	  // Update remaining_water.
