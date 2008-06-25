@@ -52,6 +52,12 @@ public:
 public:
   virtual bool use_small_timesteps ();
 
+  // Infiltration.
+protected:
+  typedef std::map<size_t, double> q_top_map; // We keep track of each
+  pond_map q_top;                             // top edge.
+  virtual double q_top_max (size_t e);        // Max flux.
+
 public:
   // - For use by Column.
   void tick (const Geometry&, const Soil&, const SoilHeat&, const double dt, 

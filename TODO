@@ -2,13 +2,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Tertiary 
 
-
-
-* Tetiary::tick_water
-
-Public version der tager h[cell] som argument.
-
 Surface skal flyttes ud.
+
+1. Find capacity
 
 * Prøv TertiaryInstant igen...
 
