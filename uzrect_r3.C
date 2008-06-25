@@ -177,7 +177,10 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   ublas::vector<double> S (cell_size); // sink term
   ublas::vector<double> S_vol (cell_size); // sink term
   ublas::vector<double> S_macro (cell_size);  // sink term
-  std::vector<double> S_drain (cell_size, 0.0); // drain flow
+  std::vector<double> S_drain (cell_size, 0.0); // matrix-> macro -> drain flow 
+  std::vector<double> S_drain_sum (cell_size, 0.0); // For large timestep
+  std::vector<double> S_matrix (cell_size, 0.0);  // matrix -> macro 
+  std::vector<double> S_matrix_sum (cell_size, 0,0); // for large timestep
   ublas::vector<double> T (cell_size); // temperature 
   ublas::vector<double> K (cell_size); // hydraulic conductivity
   ublas::vector<double> Kold (cell_size); // old hydraulic conductivity
@@ -342,23 +345,20 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
           if (!tertiary.find_implicit_water (h3_previous, 
                                              geo, soil, soil_heat, h_std, ddt))
-            throw "We need smaller timesteps";
-                     
+            {  //We need smaller timesteps
+              iterations_used = max_iterations + 1;
+              break;
+            }
                           
-          std::vector<double> S_matrix (cell_size);
-          std::vector<double> S_drain (cell_size);
-          
           tertiary.matrix_sink (geo, soil, soil_heat, h_std, 
                                 S_matrix, S_drain);
-          
-          ublas::vector<double> S_macro (cell_size);
+      
 
           for (size_t cell = 0; cell != cell_size ; ++cell) 
             {				
-              S_macro (cell) = (S_matrix[cell]  + S_drain[cell]) 
+              S_macro (cell) = (S_matrix[cell] + S_drain[cell]) 
                 * geo.cell_volume (cell);
             }
-          
                               
 	  //Initialize sum matrix
 	  Solver::Matrix summat (cell_size);  
@@ -437,6 +437,11 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg);
           Darcy (geo, Kedge, h, dq);
 
+          // update macropore flow components 
+          S_drain_sum += S_drain * ddt/dt;
+          S_matrix_sum += S_matrix * ddt/dt;
+
+
 	  // Update remaining_water.
 	  for (size_t i = 0; i < edge_above.size (); i++)
 	    {
@@ -456,6 +461,10 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
 	  // Contribution to large time step.
 	  q += dq * ddt / dt;
+
+
+          
+
 
 	  time_left -= ddt;
 	  iterations_with_this_time_step++;
@@ -522,6 +531,13 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   // Make it official.
   for (size_t cell = 0; cell != cell_size; ++cell) 
     soil_water.set_content (cell, h (cell), Theta (cell));
+  
+  std::vector<double> zerovector (cell_size, 0.0);   
+  soil_water.set_tertiary (S_matrix_sum, zerovector);
+  // what is qp?
+  // what about mp fluxes to drains?
+
+
   for (size_t edge = 0; edge != edge_size; ++edge) 
     soil_water.set_flux (edge, q[edge]);
   soil_water.drain (S_drain);
