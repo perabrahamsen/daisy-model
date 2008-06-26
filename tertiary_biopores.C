@@ -66,7 +66,7 @@ struct TertiaryBiopores : public Tertiary
   bool converge (const Anystate&);
 
   // Infiltration.
-  double capacity (const Geometry&, size_t e);        // Max flux.
+  double capacity (const Geometry&, size_t e, const double dt); // Max flux.
   void infiltrate (const Geometry&, size_t e, double amount); // Add it.
 
   // Simulation.
@@ -170,7 +170,7 @@ TertiaryBiopores::converge (const Anystate& state)
 }
 
 double
-TertiaryBiopores::capacity (const Geometry& geo, size_t e)
+TertiaryBiopores::capacity (const Geometry& geo, size_t e, const double dt)
 { return 0.0; }
 
 void
@@ -191,7 +191,8 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
   // Infiltration.
   const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
-  
+
+  // Find flux.
   for (size_t i = 0; i < edge_above_size; i++)
     {
       const size_t edge = edge_above[i];
@@ -200,6 +201,18 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
       
       const double max_surface = in_sign * surface.q_top (geo, edge);
       const double flux_in = std::min (capacity (geo, edge), max_surface);
+      q_tertiary[edge] = in_sign * flux_in;
+      surface.accept_top (in_sign * flux_in, geo, edge, dt, msg);
+      infiltrate (geo, edge, flux_in);
+    }
+  
+  // Apply flux. 
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      const double in_sign 
+        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+      const double flux_in = q_tertiary[edge] * in_sign;
       surface.accept_top (in_sign * flux_in, geo, edge, dt, msg);
       infiltrate (geo, edge, flux_in);
     }
