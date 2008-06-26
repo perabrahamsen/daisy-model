@@ -68,8 +68,12 @@ protected:
 
   // Interface.
 public:
-  virtual double capacity (const Geometry&, size_t e, const double dt) 
+  double density (const size_t c)
+  { return density_cell[c]; }
+  virtual double capacity (const Geometry&, size_t e, double dt) 
     /* [cm] */ const = 0;
+  virtual void infiltrate (const Geometry&, size_t e,
+                           double amount /* [cm] */) = 0;
   virtual double matrix_biopore_matrix (size_t c, // Matrix sink.
                                         const Geometry& geo, 
                                         const Soil& soil, bool active, 

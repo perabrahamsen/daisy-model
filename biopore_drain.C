@@ -41,6 +41,9 @@ struct BioporeDrain : public Biopore
   
   double capacity (const Geometry& geo, size_t e, const double dt) const
   { return max_infiltration_rate (geo, e) * dt; }
+  void infiltrate (const Geometry&, size_t, double /* [cm] */)
+  { }
+
   double matrix_biopore_drain (size_t c, const Geometry& geo, 
                                const Soil& soil, bool active, 
                                double K_xx, double h) const;

@@ -66,8 +66,8 @@ struct TertiaryBiopores : public Tertiary
   bool converge (const Anystate&);
 
   // Infiltration.
-  double capacity (const Geometry&, size_t e, const double dt); // Max flux.
-  void infiltrate (const Geometry&, size_t e, double amount); // Add it.
+  double capacity (const Geometry&, size_t e, double dt); // Max flux.
+  void infiltrate (const Geometry&, size_t e, double amount, double dt);
 
   // Simulation.
   bool use_small_timesteps ()
@@ -180,9 +180,84 @@ TertiaryBiopores::capacity (const Geometry& geo, size_t e, const double dt)
 }
 
 void
-TertiaryBiopores::infiltrate (const Geometry& geo, size_t e, double amount)
+TertiaryBiopores::infiltrate (const Geometry& geo, const size_t e, 
+                              double amount, const double dt)
 {
-  // TODO
+  const size_t cell = geo.edge_other (e, Geometry::cell_above);
+  daisy_assert (cell < geo.cell_size ());
+
+  // Find total macropore density.
+  double total_density = 0.0;
+  const size_t classes_size = classes.size ();
+  for (size_t b = 0; b < classes_size; b++)
+    total_density += classes[b]->density (cell);
+  
+  // We divide the water relative to the biopore density.  However,
+  // some biopores may not be able to contain their share of the
+  // water.  If so, they are filled to capacity, and the remaining
+  // water is redistributed to the remaining classes.  We implement
+  // this in two steps.
+  std::vector<Biopore*> remaining = classes;
+
+  // Step one. Distribute to all biopore classes that are limited by
+  // capacity.  We have to try this repeatedly, as when we remove one
+  // biopore class from consideration, the remaining classes will have
+  // to pick up a larger share.
+ retry:
+
+  // Check that there is something to do.
+  if (total_density <= 0 || amount <= 0.0)
+    return;
+
+  for (std::vector<Biopore*>::iterator i = remaining.begin ();
+       i != remaining.end ();
+       i++)
+    {
+      Biopore& biopore = *(*i);
+      const double density = biopore.density (cell);
+      if (!std::isnormal (density))
+        // No macropores here.
+        continue;
+
+      daisy_assert (total_density > 0.0);
+      const double share = amount * density / total_density;
+      const double capacity = biopore.capacity (geo, e, dt);
+      if (capacity <= share)
+        {
+          // Insuffient space, fill it up.  
+          biopore.infiltrate (geo, e, capacity);
+          amount -= capacity;
+
+          // Now remove the biopore class for consideration.
+          total_density -= density;
+          remaining.erase (i);
+          // We have to try again 
+          goto retry;
+        }
+    }
+
+  // Step two.  Distribute to remaining biopore classes relative to
+  // density.  We know they have the capacity.
+
+  // Check that there is something to do.
+  if (total_density <= 0 || amount <= 0.0)
+    return;
+
+  for (std::vector<Biopore*>::iterator i = remaining.begin ();
+       i != remaining.end ();
+       i++)
+    {
+      Biopore& biopore = *(*i);
+      const double density = biopore.density (cell);
+      if (!std::isnormal (density))
+        // No macropores here.
+        continue;
+
+      // Infiltrate according to relative density.
+      daisy_assert (total_density > 0.0);
+      const double share = amount * density / total_density;
+      biopore.infiltrate (geo, e, share);
+    }
 }
 
 void
@@ -210,8 +285,6 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
       const double max_surface = in_sign * surface.q_top (geo, edge);
       const double flux_in = std::min (capacity (geo, edge, dt), max_surface);
       q_tertiary[edge] = in_sign * flux_in;
-      surface.accept_top (in_sign * flux_in, geo, edge, dt, msg);
-      infiltrate (geo, edge, flux_in);
     }
   
   // Apply flux. 
@@ -222,7 +295,7 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       const double flux_in = q_tertiary[edge] * in_sign;
       surface.accept_top (in_sign * flux_in, geo, edge, dt, msg);
-      infiltrate (geo, edge, flux_in);
+      infiltrate (geo, edge, flux_in * dt, dt);
     }
 
   // Update soil water.
