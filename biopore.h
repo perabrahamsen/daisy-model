@@ -68,7 +68,7 @@ protected:
 
   // Interface.
 public:
-  double density (const size_t c)
+  double density (const size_t c) const
   { return density_cell[c]; }
   virtual double capacity (const Geometry&, size_t e, double dt) 
     /* [cm] */ const = 0;

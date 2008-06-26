@@ -63,20 +63,31 @@ Biopore::x_symbol ()
 }
 
 double
-Biopore::max_infiltration_rate (const Geometry&, size_t e) const // [cm/h]
+Biopore::max_infiltration_rate (const Geometry& geo, size_t e) const // [cm/h]
 {
+  const size_t cell = geo.edge_other (e, Geometry::cell_above);
+  daisy_assert (cell < geo.cell_size ());
+
   // Based on Poiseuille equation.
-  //   delta P = 128 my L Q / (pi d^4)
-  //     <=> Q = delta P pi d^4 / (128 my L)
+  //   delta P = 8 my L Q / (pi r^4)
+  //     <=> Q = delta P pi r^4 / (8 my L)
   // We assume delta P = L
-  //      => Q = pi d^4 / (128 my)
+  //      => Q = pi r^4 / (8 my)
   // Where 
-  //        Q [cm/h]   Infiltration rate
-  //  delta P [cm]     Pressure drop.
-  //        L [cm]     Length op cylinder.
-  //       my [g/cm/h] Dynamic viscosity.
-  //        d [cm]     Diameter.
+  //        Q [cm^3/h]    Infiltration rate
+  //  delta P [cm]        Pressure drop.
+  //        L [cm]        Length op cylinder.
+  //       my [cm^3/cm/h] Dynamic viscosity.
+  //        r [cm]        Biopore radius.
+  //        M [cm^-2]     Macropore density.
   //     
+  const double my = 1.0020 * 100.0 * 3600.0; // [g/cm/h] At 20 dg C. 
+  const double M = density (cell);           // [cm^-2]
+  const double r = diameter * 0.5;           // [cm]
+  const double r4 = r * r * r * r;           // [cm^4]
+  const double Q = M_PI * r4 / (8 * my);     // [cm^2 h]
+  const double q = Q * M;                    // [h]
+  // Wrong unit.
   return 0.0;
 }
 double 

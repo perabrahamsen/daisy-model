@@ -102,14 +102,6 @@ class TertiaryNone : public Tertiary
   void tick (const Geometry&, const Soil&, const SoilHeat&,
              const double dt, SoilWater&, Surface&, Treelog&)
   { }
-  void update_water (const Geometry&, const Soil&, 
-                     const std::vector<double>& h_matrix,
-                     const double dt,
-                     std::vector<double>& S_drain,
-                     std::vector<double>& S_matrix, 
-                     std::vector<double>& q_tertiary, 
-                     Treelog& msg)
-  { }
   void solute (const Geometry&, const SoilWater&, 
                const std::map<size_t, double>& J_tertiary,
                const double /* dt */,
