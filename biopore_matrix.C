@@ -70,19 +70,6 @@ struct BioporeMatrix : public Biopore
   std::vector<double> added_water; // [cm^3]
   std::vector<double> density_column; // [cm^-2]
 
-  double matrix_biopore_matrix (size_t c, const Geometry& geo, 
-                                const Soil& soil, bool active, 
-                                double K_xx, double h) const;
-  
-  double matrix_biopore_drain (size_t c, const Geometry& geo, 
-                               const Soil& soil, bool active, 
-                               double K_xx, double h) const
-  {return 0.0;}
-
-
-  // Simulation.
-  bool to_drain () const 
-  { return false; }
   double air_bottom (const size_t c) const // Lowest point with air [cm]
   { 
     daisy_assert (c < column.size ());
@@ -90,6 +77,17 @@ struct BioporeMatrix : public Biopore
     daisy_assert (col < h_bottom.size ());
     return height_end + h_bottom[col]; 
   }
+
+  // Simulation.
+  double capacity (const Geometry& geo, size_t e, const double dt /* [h] */)
+    /* [cm] */ const;
+  double matrix_biopore_matrix (size_t c, const Geometry& geo, 
+                                const Soil& soil, bool active, 
+                                double K_xx, double h) const;
+  double matrix_biopore_drain (size_t c, const Geometry& geo, 
+                               const Soil& soil, bool active, 
+                               double K_xx, double h) const
+  {return 0.0;}
   void add_water (size_t c, double amount /* [cm^3] */)
   {
     daisy_assert (c < column.size ());
@@ -139,6 +137,29 @@ BioporeMatrix::converge (const Anystate& state,
       return false;
 
   return true; 
+}
+
+double 
+BioporeMatrix::capacity (const Geometry& geo, size_t e, const double dt) const 
+{
+  // Maximum based on infiltration rate.
+  const double max_infiltration // [cm/h]
+    = max_infiltration_rate (geo, e) * dt; 
+
+  // Maximum based on capacity left.
+  const size_t cell = geo.edge_other (e, Geometry::cell_above);
+  daisy_assert (cell < geo.cell_size ());
+  daisy_assert (cell < column.size ());
+  const size_t col = column[cell];
+  daisy_assert (col < density_column.size ());
+  const double density = density_column[col]; // [cm^-2]
+  const double radius = diameter / 2.0;       // [cm]
+  const double area = radius * radius * M_PI; // [cm^2]
+  const double height = -air_bottom (cell);   // [cm];
+  const double max_capacity = height * area / density; // [cm]
+
+  // Choose the lower limit;
+  return std::min (max_infiltration, max_capacity);
 }
 
 double 

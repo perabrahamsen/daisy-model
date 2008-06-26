@@ -171,11 +171,19 @@ TertiaryBiopores::converge (const Anystate& state)
 
 double
 TertiaryBiopores::capacity (const Geometry& geo, size_t e, const double dt)
-{ return 0.0; }
+{
+  double sum = 0.0; 
+  const size_t classes_size = classes.size ();
+  for (size_t b = 0; b < classes_size; b++)
+    sum += classes[b]->capacity (geo, e, dt);
+  return sum;
+}
 
 void
 TertiaryBiopores::infiltrate (const Geometry& geo, size_t e, double amount)
-{ }
+{
+  // TODO
+}
 
 void
 TertiaryBiopores::tick (const Geometry& geo, const Soil& soil, 

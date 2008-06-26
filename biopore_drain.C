@@ -39,6 +39,8 @@ struct BioporeDrain : public Biopore
   double air_bottom (size_t) const    // Lowest point with air [cm]
   { return pipe_position; }
   
+  double capacity (const Geometry& geo, size_t e, const double dt) const
+  { return max_infiltration_rate (geo, e) * dt; }
   double matrix_biopore_drain (size_t c, const Geometry& geo, 
                                const Soil& soil, bool active, 
                                double K_xx, double h) const;

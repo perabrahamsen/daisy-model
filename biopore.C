@@ -63,7 +63,7 @@ Biopore::x_symbol ()
 }
 
 double
-Biopore::max_infiltration_rate () // [cm/h]
+Biopore::max_infiltration_rate (const Geometry&, size_t e) const // [cm/h]
 {
   // Based on Poiseuille equation.
   //   delta P = 128 my L Q / (pi d^4)
