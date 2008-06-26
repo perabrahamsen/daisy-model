@@ -64,6 +64,8 @@ protected:
   
   static double biopore_to_matrix (double R_wall, double M_c, 
                                    double r_c, double h, double h_3);
+  double max_infiltration_rate (); // [cm/h]
+
   // Interface.
 public:
   virtual double matrix_biopore_matrix (size_t c, // Matrix sink.

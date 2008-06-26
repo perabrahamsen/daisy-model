@@ -71,10 +71,14 @@ Biopore::max_infiltration_rate () // [cm/h]
   // We assume delta P = L
   //      => Q = pi d^4 / (128 my)
   // Where 
-  //        Q: Infiltration rate.
-  //  delta P: Pressure drop.
-  //        L: Length op cylinder.
+  //        Q [cm/h]   Infiltration rate
+  //  delta P [cm]     Pressure drop.
+  //        L [cm]     Length op cylinder.
+  //       my [g/cm/h] Dynamic viscosity.
+  //        d [cm]     Diameter.
   //     
+  return 0.0;
+}
 double 
 Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c, 
                             double h, double h_3)

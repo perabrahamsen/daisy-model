@@ -171,7 +171,7 @@ TertiaryBiopores::converge (const Anystate& state)
 
 double
 TertiaryBiopores::capacity (const Geometry& geo, size_t e)
-{ }
+{ return 0.0; }
 
 void
 TertiaryBiopores::infiltrate (const Geometry& geo, size_t e, double amount)

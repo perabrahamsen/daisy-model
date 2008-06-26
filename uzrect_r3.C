@@ -535,8 +535,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   for (size_t cell = 0; cell != cell_size; ++cell) 
     soil_water.set_content (cell, h (cell), Theta (cell));
   
-  std::vector<double> zerovector (cell_size, 0.0);   
-  soil_water.set_tertiary (S_matrix_sum, zerovector);
+  soil_water.set_tertiary_sink (S_matrix_sum);
   // what is qp?
   // what about mp fluxes to drains?
 
