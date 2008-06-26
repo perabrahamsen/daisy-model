@@ -203,16 +203,13 @@ TertiaryBiopores::infiltrate (const Geometry& geo, const size_t e,
   // capacity.  We have to try this repeatedly, as when we remove one
   // biopore class from consideration, the remaining classes will have
   // to pick up a larger share.
- retry:
-
-  // Check that there is something to do.
-  if (total_density <= 0 || amount <= 0.0)
-    return;
-
-  for (std::vector<Biopore*>::iterator i = remaining.begin ();
-       i != remaining.end ();
-       i++)
+  std::vector<Biopore*>::iterator i = remaining.begin ();
+  while (i != remaining.end ())
     {
+      // Check that there is something to do.
+      if (total_density <= 0 || amount <= 0.0)
+        return;
+
       Biopore& biopore = *(*i);
       const double density = biopore.density (cell);
       if (!std::isnormal (density))
@@ -226,14 +223,16 @@ TertiaryBiopores::infiltrate (const Geometry& geo, const size_t e,
         {
           // Insuffient space, fill it up.  
           biopore.infiltrate (geo, e, capacity);
-          amount -= capacity;
 
           // Now remove the biopore class for consideration.
+          amount -= capacity;
           total_density -= density;
           remaining.erase (i);
-          // We have to try again 
-          goto retry;
+          i = remaining.begin (); // Retry with new values.
         }
+      else
+        // Sufficient capacity, handle in next loop.
+        i++;
     }
 
   // Step two.  Distribute to remaining biopore classes relative to
