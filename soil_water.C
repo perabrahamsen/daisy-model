@@ -119,14 +119,18 @@ SoilWater::set_matrix (const std::vector<double>& h,
 }
 
 void 
-SoilWater::set_tertiary (const std::vector<double>& S_p, 
-                         const std::vector<double>& q_p)
+SoilWater::set_tertiary_sink (const std::vector<double>& S_p)
 {
   const size_t cell_size = S_p.size ();
   daisy_assert (S_sum_.size () == cell_size);
   for (size_t c = 0; c < cell_size; c++)
     S_sum_[c] += S_p[c];
   S_p_ = S_p;
+}
+
+void 
+SoilWater::set_tertiary_flux (const std::vector<double>& q_p)
+{
   q_tertiary_ = q_p;
 }
 

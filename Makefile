@@ -372,9 +372,9 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some component.
 # 
-LATER = 
+LATER = tertiary_instant.C 
 MODELS = uzrect_r3.C tertiary_old.C \
-	tertiary_instant.C biopore_drain.C tertiary_biopores.C \
+	biopore_drain.C tertiary_biopores.C \
 	biopore_matrix.C transport_Mollerup.C transport_Hansen.C \
 	movement_1D.C groundwater_aquitard.C \
 	heatrect_Mollerup.C heatrect_linear.C heatrect_none.C \

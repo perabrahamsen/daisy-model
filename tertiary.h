@@ -52,25 +52,10 @@ public:
 public:
   virtual bool use_small_timesteps ();
 
-  // Infiltration.
-protected:
-  typedef std::map<size_t, double> q_top_map; // We keep track of each
-  q_top_map q_top;                             // top edge.
-  virtual double capacity (const Geometry&, size_t e);        // Max flux.
-
 public:
   // - For use by Column.
-  void tick (const Geometry&, const Soil&, const SoilHeat&, const double dt, 
-             SoilWater&, Surface&, Treelog&);
-private:
-  virtual void tick_water (const Geometry&, const Soil&, 
-                           const SoilWater&, const SoilHeat&,
-                           const double dt,
-                           Surface& surface,
-                           std::vector<double>& S_drain,
-                           std::vector<double>& S_matrix, 
-                           std::vector<double>& q_tertiary,
-                           Treelog& msg) = 0;
+  virtual void tick (const Geometry&, const Soil&, const SoilHeat&,
+                     const double dt, SoilWater&, Surface&, Treelog&) = 0;
 
 public:
   // - For use inside Richard's Equation.

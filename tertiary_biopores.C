@@ -32,6 +32,7 @@
 #include "soil_heat.h"
 #include "log.h"
 #include "anystate.h"
+#include "surface.h"
 
 struct TertiaryBiopores : public Tertiary
 {
@@ -64,18 +65,18 @@ struct TertiaryBiopores : public Tertiary
   void set_state (const Anystate&);
   bool converge (const Anystate&);
 
+  // Infiltration.
+  double capacity (const Geometry&, size_t e);        // Max flux.
+  void infiltrate (const Geometry&, size_t e, double amount); // Add it.
+
   // Simulation.
   bool use_small_timesteps ()
   { return use_small_timesteps_; }
 
   // - For use by column.
-  void tick_water (const Geometry&, const Soil&, 
-                   const SoilWater&, const SoilHeat&,
-                   const double dt,
-                   Surface& surface,
-                   std::vector<double>& S_drain,
-                   std::vector<double>& S_matrix, 
-                   std::vector<double>& q_tertiary, Treelog& msg);
+  void tick (const Geometry& geo, const Soil& soil, 
+             const SoilHeat& soil_heat, const double dt, 
+             SoilWater& soil_water, Surface& surface, Treelog& msg);
 
   // - For use in Richard's Equation.
   double matrix_biopores_matrix (size_t c, const Geometry& geo, // Matrix 
@@ -168,30 +169,67 @@ TertiaryBiopores::converge (const Anystate& state)
   return true;
 }
 
-void 
-TertiaryBiopores::tick_water (const Geometry& geo, const Soil& soil, 
-                              const SoilWater& soil_water, 
-                              const SoilHeat& soil_heat,
-                              const double dt,
-                              Surface& surface,
-                              std::vector<double>& S_drain,
-                              std::vector<double>& S_matrix, 
-                              std::vector<double>& q_tertiary, Treelog& msg)
-{ 
-  // TODO: surface
-  // TODO: q_tertiary
-  Anystate old_state = get_state ();
+double
+TertiaryBiopores::capacity (const Geometry& geo, size_t e)
+{ }
 
-  std::vector<double> h;
+void
+TertiaryBiopores::infiltrate (const Geometry& geo, size_t e, double amount)
+{ }
+
+void
+TertiaryBiopores::tick (const Geometry& geo, const Soil& soil, 
+                        const SoilHeat& soil_heat, const double dt, 
+                        SoilWater& soil_water, Surface& surface, Treelog& msg)
+{
+  Treelog::Open nest (msg, component + std::string (":") + name);
+
+  // Flux.
+  const size_t edge_size = geo.edge_size ();
+  std::vector<double> q_tertiary (edge_size, 0.0);
+
+  // Infiltration.
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+  
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      const double in_sign 
+        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+      
+      const double max_surface = in_sign * surface.q_top (geo, edge);
+      const double flux_in = std::min (capacity (geo, edge), max_surface);
+      surface.accept_top (in_sign * flux_in, geo, edge, dt, msg);
+      infiltrate (geo, edge, flux_in);
+    }
+
+  // Update soil water.
+  soil_water.set_tertiary_flux (q_tertiary);
+
+  // Soil matrix exchange.
   const size_t cell_size = geo.cell_size ();
-  for (size_t c = 0; c < cell_size; c++)
-    h.push_back (soil_water.h (c));
+  std::vector<double> S_drain (cell_size, 0.0);
+  std::vector<double> S_matrix (cell_size, 0.0);
 
-  update_active (h);
-  if (find_implicit_water (old_state, geo, soil, soil_heat, h, dt))
-    matrix_sink (geo, soil, soil_heat, h, S_matrix, S_drain);
-  else
-    msg.warning ("State did not converge, ignoring tertiary transport");
+  if (!use_small_timesteps ())
+    {
+      // Handle in Richard's Equation.
+      Anystate old_state = get_state ();
+
+      std::vector<double> h;
+      const size_t cell_size = geo.cell_size ();
+      for (size_t c = 0; c < cell_size; c++)
+        h.push_back (soil_water.h (c));
+      
+      update_active (h);
+      if (find_implicit_water (old_state, geo, soil, soil_heat, h, dt))
+        matrix_sink (geo, soil, soil_heat, h, S_matrix, S_drain);
+      else
+        msg.warning ("State did not converge, ignoring tertiary transport");
+    }
+
+  soil_water.drain (S_drain);
 }
 
 double 

@@ -29,6 +29,7 @@
 #include "mactrans.h"
 #include "librarian.h"
 #include "block.h"
+#include "surface.h"
 
 struct TertiaryOld : public Tertiary
 {
@@ -41,6 +42,9 @@ struct TertiaryOld : public Tertiary
   { return macro.get () && !macro->none (); }
 
   // Simulation.
+  void tick (const Geometry& geo, const Soil& soil, 
+             const SoilHeat& soil_heat, const double dt, 
+             SoilWater& soil_water, Surface& surface, Treelog& msg);
   void tick_water (const Geometry&, const Soil&, const SoilWater&, 
                    const SoilHeat&, 
                    const double dt,
@@ -62,6 +66,23 @@ public:
   TertiaryOld (Block& al);
 };
 
+void
+TertiaryOld::tick (const Geometry& geo, const Soil& soil, 
+                   const SoilHeat& soil_heat, const double dt, 
+                   SoilWater& soil_water, Surface& surface, Treelog& msg)
+{
+  Treelog::Open nest (msg, component + std::string (":") + name);
+  const size_t cell_size = geo.cell_size ();
+  std::vector<double> S_drain (cell_size, 0.0);
+  std::vector<double> S_matrix (cell_size, 0.0);
+  const size_t edge_size = geo.edge_size ();
+  std::vector<double> q_tertiary (edge_size, 0.0);
+  this->tick_water (geo, soil, soil_water, soil_heat, dt, surface,
+                    S_drain, S_matrix, q_tertiary, msg);
+  soil_water.drain (S_drain);
+  soil_water.set_tertiary_sink (S_matrix);
+  soil_water.set_tertiary_flux (q_tertiary);
+}
 
 void
 TertiaryOld::tick_water (const Geometry& geometry, const Soil& soil,
