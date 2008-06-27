@@ -6,6 +6,15 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.32
+
+** The "Tertiary" parameter moved to "Movement".
+
+It now default to "old" for 1D simulations, which mean that macropores
+will be enabled if clay + humus is higher than 5%.
+
+The default is "none" for 2D simulations.
+
 * 4.31
 
 ** New 'MaxWidth' root system parameter.

@@ -24,6 +24,7 @@
 
 #include "model.h"
 #include <vector>
+#include <memory>
 
 class Geometry;
 class Soil;
@@ -35,7 +36,6 @@ class Adsorption;
 class Surface;
 class Groundwater;
 class Weather;
-class Tertiary;
 class Time;
 class Treelog;
 class Block;
@@ -54,13 +54,20 @@ public:
 
   virtual Geometry& geometry () const = 0;
 
+  // Tertiary transport.
+protected:
+  std::auto_ptr<Tertiary> tertiary;
+public:
+  void tick_tertiary (const Geometry&, const Soil&, const SoilHeat&,
+                      const double dt, SoilWater&, Surface&, Treelog&);
+
   // Simulation.
 public:
   virtual void tick (const Soil&, SoilWater&, const SoilHeat&, Surface&,
-                     Groundwater&, const Time&, const Weather&, Tertiary&,
+                     Groundwater&, const Time&, const Weather&, 
                      double dt, Treelog&) = 0;
   virtual void solute (const Soil&, const SoilWater&, 
-                       const double J_above, Chemical&, Tertiary&,
+                       const double J_above, Chemical&,
 		       double dt, const Scope&, Treelog&) = 0;
   virtual void element (const Soil&, const SoilWater&, 
                         DOE&, double diffusion_coefficient, 
@@ -77,8 +84,7 @@ public:
 		     const double dt, Treelog&) const = 0;
   virtual void ridge (Surface&, const Soil&, const SoilWater&, 
                       const AttributeList&) = 0;
-
-  virtual void output (Log&) const = 0;
+  void output (Log&) const;
 
   // Heat.
   virtual double surface_snow_T (const Soil&, const SoilWater&, const SoilHeat&,
@@ -89,11 +95,16 @@ public:
   virtual double bottom_T () const = 0;
 
   // Create and Destroy.
+private:
+  virtual bool check_derived (Treelog& err) const = 0;
+  virtual void initialize_derived (const Soil&, const Groundwater&, 
+                                   bool has_macropores, Treelog& msg) = 0;
 public:
-  virtual bool check (Treelog& err) const = 0;
-  virtual void initialize (const Soil&, const Groundwater&, 
-                           bool has_macropores, Treelog& msg) = 0;
+  bool check (Treelog& err) const;
+  bool initialize (const Soil&, const Groundwater&, const Scope& scope,
+                   Treelog& msg);
   static const AttributeList& default_model ();
+  static void load_base (Syntax& syntax, AttributeList&);
   static void load_vertical (Syntax& syntax, AttributeList& alist);
   static Movement* build_vertical (Block& al);
 protected:

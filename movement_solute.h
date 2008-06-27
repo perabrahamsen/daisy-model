@@ -79,7 +79,7 @@ private:
                         std::map<size_t, double>& J_secondary,
                         std::map<size_t, double>& J_tertiary);
   void solute (const Soil& soil, const SoilWater& soil_water,
-               double J_above, Chemical&, Tertiary&, 
+               double J_above, Chemical&, 
 	       double dt, const Scope&, Treelog&);
   void element (const Soil& soil, const SoilWater& soil_water,
                 DOE& element, 
@@ -87,7 +87,7 @@ private:
 
   // Create.
 protected:
-  bool check_solute (Treelog&) const;
+  bool check_derived (Treelog&) const;
   MovementSolute (Block& al);
 public:
   static void load_solute  (Syntax& syntax, AttributeList& alist, 

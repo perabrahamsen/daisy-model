@@ -38,6 +38,10 @@ Mactrans::Mactrans (Block& al)
   : name (al.identifier ("type"))
 { }
 
+Mactrans::Mactrans (const symbol n)
+  : name (n)
+{ }
+
 Mactrans::~Mactrans ()
 { }
 

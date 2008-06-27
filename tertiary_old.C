@@ -64,6 +64,8 @@ public:
                    const double pipe_position, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
   TertiaryOld (Block& al);
+  TertiaryOld (symbol name);
+  static void load_syntax (Syntax&, AttributeList&);
 };
 
 void
@@ -182,7 +184,7 @@ This tertiary water transport model only works with the 'vertical' movement mode
   bool ok = true;
 
   if (macro.get ())
-    /* Already got them. */;
+    msg.debug ("User specified macropores");
   else if (soil.humus (0) + soil.clay (0) > 0.05)
     // More than 5% clay (and humus) in first horizon.
     {
@@ -203,6 +205,8 @@ This tertiary water transport model only works with the 'vertical' movement mode
 
       msg.debug ("Adding macropores");
     }
+  else
+    msg.debug ("No macropores");
 
   return ok;
 }
@@ -230,19 +234,15 @@ TertiaryOld::TertiaryOld (Block& al)
     mactrans  (Librarian::build_item<Mactrans> (al, "mactrans"))
 { }
 
-static struct TertiaryOldSyntax
+TertiaryOld::TertiaryOld (const symbol name)
+  : Tertiary (name),
+    macro (NULL), 
+    mactrans (Mactrans::create_default ())
+{ }
+
+void 
+TertiaryOld::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  static Model& make (Block& al)
-  { return *new TertiaryOld (al); }
-
-  TertiaryOldSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Tertiary water and solute movement based on the obsolete 'macro'\n\
-and 'mactrans' components.  Provided for backward compatibility.");
-
   syntax.add_object ("macro", Macro::component,
                      Syntax::OptionalState, Syntax::Singleton,
                      "Preferential flow model.\n\
@@ -251,9 +251,36 @@ amount of humus and clay in the top horizon is above 5%.");
   syntax.add_object ("mactrans", Mactrans::component, 
                      "Solute transport model in macropores.");
   alist.add ("mactrans", Mactrans::default_model ());
+}
 
+static struct TertiaryOldSyntax
+{
+  static Model& make (Block& al)
+  { return *new TertiaryOld (al); }
+
+  TertiaryOldSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    TertiaryOld::load_syntax (syntax, alist);
+    alist.add ("description", "\
+Tertiary water and solute movement based on the obsolete 'macro'\n\
+and 'mactrans' components.  Provided for backward compatibility.");
     Librarian::add_type (Tertiary::component, "old", alist, syntax, &make);
   }
 } TertiaryOld_syntax;
+
+const AttributeList&
+Tertiary::old_model ()
+{
+  static AttributeList alist;
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      TertiaryOld::load_syntax (dummy, alist);
+      alist.add ("type", "old");
+    }
+  return alist;
+}
 
 // tertiary_old.C ends here.

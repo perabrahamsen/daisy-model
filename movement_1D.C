@@ -36,6 +36,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "transport.h"
+#include "tertiary.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]
@@ -97,7 +98,6 @@ struct Movement1D : public MovementSolute
 	     std::vector<double>& T,
 	     const double dt, Treelog&) const;
 
-
   // Management.
   void ridge (Surface& surface, const Soil& soil, const SoilWater& soil_water,
               const AttributeList& al);
@@ -105,15 +105,13 @@ struct Movement1D : public MovementSolute
   // Simulation.
   void tick (const Soil& soil, SoilWater& soil_water, const SoilHeat& soil_heat,
              Surface& surface, Groundwater& groundwater,
-             const Time& time, const Weather& weather, Tertiary&, double dt, 
+             const Time& time, const Weather& weather, double dt, 
              Treelog& msg);
-  void output (Log&) const;
 
   // Create.
-  bool check (Treelog& err) const;
-  void initialize (const Soil& soil, const Groundwater& groundwater,
-                   bool has_macropores, 
-		   Treelog&);
+  void initialize_derived (const Soil& soil, const Groundwater& groundwater,
+                           bool has_macropores, 
+                           Treelog&);
   Movement1D (Block& al);
   ~Movement1D ();
 };
@@ -383,7 +381,7 @@ void
 Movement1D::tick (const Soil& soil, SoilWater& soil_water, 
 		  const SoilHeat& soil_heat,
                   Surface& surface, Groundwater& groundwater,
-                  const Time& time, const Weather& weather, Tertiary&,
+                  const Time& time, const Weather& weather, 
                   const double dt, Treelog& msg) 
 {
   const size_t edge_size = geo->edge_size ();
@@ -428,16 +426,9 @@ Movement1D::tick (const Soil& soil, SoilWater& soil_water,
 }
 
 void 
-Movement1D::output (Log&) const
-{ }
-
-bool
-Movement1D::check (Treelog& msg) const
-{ return check_solute (msg); }
-
-void 
-Movement1D::initialize (const Soil& soil, const Groundwater& groundwater,
-			bool has_macropores, Treelog& msg)
+Movement1D::initialize_derived (const Soil& soil,
+                                const Groundwater& groundwater,
+                                bool has_macropores, Treelog& msg)
 {
   Treelog::Open nest (msg, "Movement: " + name.name ());
 
@@ -459,6 +450,8 @@ void
 Movement::load_vertical (Syntax& syntax, AttributeList& alist)
 {
   MovementSolute::load_solute (syntax, alist, Transport::vertical_model ());
+  alist.add ("Tertiary", Tertiary::old_model ());
+
   syntax.add_submodule ("Geometry", alist, Syntax::State,
                         "Discretization of the soil.",
                         Geometry1D::load_syntax);

@@ -36,7 +36,6 @@
 #include "weather.h"
 #include "chemistry.h"
 #include "chemical.h"
-#include "tertiary.h"
 #include "organic_matter.h"
 #include "im.h"
 #include "am.h"
@@ -69,7 +68,6 @@ struct ColumnStandard : public Column
   std::auto_ptr<SoilWater> soil_water;
   std::auto_ptr<SoilHeat> soil_heat;
   std::auto_ptr<Chemistry> chemistry;
-  std::auto_ptr<Tertiary> tertiary;
   std::auto_ptr<OrganicMatter> organic_matter;
   double second_year_utilization_;
 
@@ -596,7 +594,8 @@ ColumnStandard::tick (const Time& time, const double dt,
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
 
   // Macropores before everything else.
-  tertiary->tick (geometry, *soil, *soil_heat, dt, *soil_water, surface, msg);
+  movement->tick_tertiary (geometry, *soil, *soil_heat, dt,
+                           *soil_water, surface, msg);
 
   // Early calculation.
   bioclimate->tick (time, surface, my_weather, 
@@ -623,9 +622,6 @@ ColumnStandard::tick (const Time& time, const double dt,
                      *soil_heat, time, scope, msg);
   movement->tick (*soil, *soil_water, *soil_heat,
                   surface, *groundwater, time, my_weather, 
-                  (tertiary->use_small_timesteps () 
-                   ? *tertiary
-                   : Tertiary::none ()), 
                   dt, msg);
   soil_heat->tick (geometry, *soil, *soil_water, *movement, 
 		   surface, dt, msg);
@@ -634,8 +630,7 @@ ColumnStandard::tick (const Time& time, const double dt,
   chemistry->tick_soil (geometry, 
                         surface.ponding (), surface.mixing_resistance (),
                         *soil, *soil_water, *soil_heat, 
-                        *movement, *organic_matter, *chemistry,
-			*tertiary, dt, scope, msg);
+                        *movement, *organic_matter, *chemistry, dt, scope, msg);
   organic_matter->transport (*soil, *soil_water, *soil_heat, msg);
   const std::vector<DOM*>& dom = organic_matter->fetch_dom ();
   for (size_t i = 0; i < dom.size (); i++)
@@ -707,11 +702,6 @@ ColumnStandard::check (bool require_weather,
     Treelog::Open nest (msg, "Chemistry");
     if (!chemistry->check (geometry, *soil, *soil_water, *soil_heat, *chemistry,
 			   scope, msg))
-      ok = false;
-  }
-  {
-    Treelog::Open nest (msg, "Tertiary");
-    if (!tertiary->check (geometry, msg))
       ok = false;
   }
   {
@@ -789,7 +779,6 @@ ColumnStandard::output (Log& log) const
   output_submodule (*soil_water, "SoilWater", log);
   output_submodule (*soil_heat, "SoilHeat", log);
   output_derived (chemistry, "Chemistry", log);
-  output_derived (tertiary, "Tertiary", log);
   output_derived (vegetation, "Vegetation", log);
   output_derived (organic_matter, "OrganicMatter", log);
   output_value (second_year_utilization_, "second_year_utilization", log);
@@ -837,7 +826,6 @@ ColumnStandard::ColumnStandard (Block& al)
     soil_water (submodel<SoilWater> (al, "SoilWater")),
     soil_heat (submodel<SoilHeat> (al, "SoilHeat")),
     chemistry (Librarian::build_item<Chemistry> (al, "Chemistry")),
-    tertiary (Librarian::build_item<Tertiary> (al, "Tertiary")),
     organic_matter (Librarian::build_item<OrganicMatter> 
                     (al, "OrganicMatter")),
     second_year_utilization_ (al.number ("second_year_utilization")),
@@ -875,16 +863,8 @@ ColumnStandard::initialize (Block& block,
 
   groundwater->initialize (geometry, time, scope, msg);
 
-  // Tertiary transport depends on groundwater and soil.
-  const double pipe_position = groundwater->is_pipe ()
-    ? groundwater->pipe_height ()
-    : 42.42e42;
-  if (!tertiary->initialize (geometry, *soil, scope, pipe_position, msg))
-    ok = false;
-  
-  // Movement depends on soil, groundwater, and tertiary.
-  movement->initialize (*soil, *groundwater,  tertiary->has_macropores (),
-                        msg);
+  // Movement depends on soil and groundwater
+  movement->initialize (*soil, *groundwater,  scope, msg);
 
   surface.initialize (geometry);
 
@@ -993,9 +973,6 @@ the simulation.  If unspecified, used global weather.");
                        Syntax::State, Syntax::Singleton,
                        "Chemical compounds in the system.");
     alist.add ("Chemistry", Chemistry::default_model ());
-    syntax.add_object ("Tertiary", Tertiary::component, "\
-Tertiary (that is, non-matrix) transport method.");
-    alist.add ("Tertiary", Tertiary::none_model ());
     syntax.add ("harvest_DM", "g/m^2/h", Syntax::LogOnly, 
                 "Amount of DM removed by harvest this hour.");
     syntax.add ("harvest_N", "g/m^2/h", Syntax::LogOnly, 

@@ -36,6 +36,7 @@
 #include "check.h"
 #include "alist.h"
 #include "submodeler.h"
+#include "tertiary.h"
 #include "librarian.h"
 
 struct MovementRect : public MovementSolute
@@ -81,13 +82,11 @@ struct MovementRect : public MovementSolute
   // Simulation.
   void tick (const Soil& soil, SoilWater& soil_water, const SoilHeat& soil_heat,
              Surface& surface, Groundwater& groundwater, const Time&,
-             const Weather&, Tertiary& tertiary, double dt, Treelog& msg);
-  void output (Log&) const;
+             const Weather&, double dt, Treelog& msg);
 
   // Create.
-  bool check (Treelog&) const;
-  void initialize (const Soil&, const Groundwater&, 
-                   bool has_macropores, Treelog&);
+  void initialize_derived (const Soil&, const Groundwater&, 
+                           bool has_macropores, Treelog&);
   MovementRect (Block& al);
   ~MovementRect ();
 };
@@ -210,7 +209,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
                     const SoilHeat& soil_heat,
                     Surface& surface, Groundwater& groundwater, 
                     const Time& time,
-                    const Weather& weather, Tertiary& tertiary, 
+                    const Weather& weather, 
                     const double dt, Treelog& msg) 
 {
   T_bottom = bottom_heat (time, weather);
@@ -228,7 +227,11 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       try
         {
           matrix_water[i]->tick (*geo, drain_cell, soil, soil_water, soil_heat,
-                                 surface, groundwater, tertiary, dt, msg);
+                                 surface, groundwater, 
+                                 (tertiary->use_small_timesteps () 
+                                  ? *tertiary
+                                  : Tertiary::none ()),
+                                 dt, msg);
 	  obey_surface = matrix_water[i]->obey_surface ();
           goto update_borders;
         }
@@ -266,21 +269,8 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
 }
 
 void 
-MovementRect::output (Log&) const
-{ }
-
-bool
-MovementRect::check (Treelog& msg) const
-{
-  bool ok = true; 
-  if (!check_solute (msg))
-    ok = false;
-  return ok;
-}
-
-void 
-MovementRect::initialize (const Soil&, const Groundwater&, 
-                          const bool has_macropores, Treelog&)
+MovementRect::initialize_derived (const Soil&, const Groundwater&, 
+                                  const bool has_macropores, Treelog&)
 {
   for (size_t i = 0; i < matrix_water.size (); i++)
     matrix_water[i]->has_macropores (has_macropores);
@@ -328,6 +318,8 @@ static struct MovementRectSyntax
     MovementSolute::load_solute (syntax, alist, 
                                  Transport::reserve_model ());
 #endif //!HAS_MOLLERUP
+    alist.add ("Tertiary", Tertiary::none_model ());
+
     alist.add ("description", 
                "Two dimensional movement in a rectangular grid.");
     syntax.add_submodule ("Geometry", alist, Syntax::Const,

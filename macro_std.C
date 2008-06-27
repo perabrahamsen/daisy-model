@@ -431,3 +431,5 @@ static struct MacroStandardSyntax
     Librarian::add_type (Macro::component, "default", alist, syntax, &make);
   }
 } MacroStandard_syntax;
+
+// macro_std.C ends here.

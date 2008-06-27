@@ -138,17 +138,6 @@ static struct TertiaryNoneSyntax
   }
 } TertiaryNone_syntax;
 
-const AttributeList& 
-Tertiary::none_model ()
-{
-  static AttributeList alist;
-
-  if (!alist.check ("type"))
-    alist.add ("type", "none");
-
-  return alist;
-}
-
 Tertiary&
 Tertiary::none ()
 {
@@ -156,4 +145,12 @@ Tertiary::none ()
   return none;
 }
 
+const AttributeList&
+Tertiary::none_model ()
+{
+  static AttributeList alist;
+  if (!alist.check ("type"))
+    alist.add ("type", "none");
+  return alist;
+}
 // tertiary.C ends here.

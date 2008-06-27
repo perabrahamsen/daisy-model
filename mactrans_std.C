@@ -44,9 +44,16 @@ struct MactransStandard : public Mactrans
   MactransStandard (Block& al)
     : Mactrans (al)
     { }
+  MactransStandard (const symbol n)
+    : Mactrans (n)
+    { }
   ~MactransStandard ()
     { }
 };
+
+std::auto_ptr<Mactrans> 
+Mactrans::create_default ()
+{ return std::auto_ptr<Mactrans> (new MactransStandard (symbol ("default"))); }
 
 void 
 MactransStandard::tick (const Geometry1D& geo, const SoilWater& soil_water,
@@ -212,3 +219,5 @@ static struct MactransStandardSyntax
       Librarian::add_type (Mactrans::component, "default", alist, syntax, &make);
     }
 } MactransStandard_syntax;
+
+// mactrans_std.C ends here.

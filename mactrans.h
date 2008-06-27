@@ -26,6 +26,7 @@
 #include "model.h"
 #include "symbol.h"
 #include <vector>
+#include <memory>
 
 class Geometry;
 class Geometry1D;
@@ -57,9 +58,11 @@ public:
   virtual bool check (const Geometry&, Treelog&) const = 0;
 protected:
   Mactrans (Block& al);
+  Mactrans (const symbol name);
 public:
   ~Mactrans ();
   static const AttributeList& default_model ();
+  static std::auto_ptr<Mactrans> create_default ();
 };
 
 #endif // MACTRANS_H

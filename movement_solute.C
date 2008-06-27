@@ -493,7 +493,6 @@ MovementSolute::zero_top (const Geometry& geo,
 void
 MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
                         const double J_above, Chemical& chemical, 
-                        Tertiary& tertiary,
                         const double dt,
                         const Scope& scope, Treelog& msg)
 {
@@ -537,7 +536,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
     }
 
   // Tertiary transport.
-  tertiary.solute (geometry (), soil_water, J_tertiary, dt, chemical, msg);
+  tertiary->solute (geometry (), soil_water, J_tertiary, dt, chemical, msg);
 
   // Secondary transport activated.
   secondary_transport (geometry (), soil, soil_water, J_secondary, C_border,
@@ -610,7 +609,7 @@ MovementSolute::element (const Soil& soil, const SoilWater& soil_water,
 }
 
 bool
-MovementSolute::check_solute (Treelog& msg) const
+MovementSolute::check_derived (Treelog& msg) const
 {
   bool ok = true; 
   // Primary domain
@@ -642,6 +641,9 @@ void
 MovementSolute::load_solute (Syntax& syntax, AttributeList& alist, 
                              const AttributeList& prefered_solute)
 {
+  // Tertiary.
+  load_base (syntax, alist);
+
   syntax.add_object ("matrix_solute", Transport::component, 
                      Syntax::State, Syntax::Sequence,
                      "Matrix solute transport models.\n\
