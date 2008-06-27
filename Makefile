@@ -974,10 +974,10 @@ ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h \
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h
 tertiary${OBJ}: tertiary.C tertiary.h model.h symbol.h alist.h geometry.h \
   syntax.h treelog.h mathlib.h assertion.h soil_water.h block.h plf.h \
-  librarian.h
+  librarian.h anystate.h
 biopore${OBJ}: biopore.C biopore.h model.h symbol.h alist.h number.h block.h \
   syntax.h treelog.h plf.h librarian.h scope_multi.h scope.h scope_id.h \
-  units.h check.h geometry.h mathlib.h assertion.h
+  units.h check.h geometry.h mathlib.h assertion.h anystate.h
 secondary${OBJ}: secondary.C secondary.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h librarian.h assertion.h
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h alist.h block.h \
@@ -1279,6 +1279,7 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   parser.h path.h assertion.h librarian.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h border.h model.h \
   symbol.h alist.h library.h syntax.h treelog.h assertion.h
+anystate${OBJ}: anystate.C anystate.h assertion.h
 imvec${OBJ}: imvec.C imvec.h symbol.h syntax.h treelog.h assertion.h log.h \
   time.h border.h model.h alist.h chemical.h check.h block.h plf.h
 im${OBJ}: im.C im.h symbol.h syntax.h treelog.h chemical.h model.h alist.h \
@@ -1377,24 +1378,28 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+uzrect_r3${OBJ}: uzrect_r3.C uzrect.h model.h symbol.h alist.h \
+  geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
+  assertion.h soil.h soil_water.h soil_heat.h groundwater.h surface.h \
+  uzmodel.h solver.h log.h time.h border.h block.h plf.h librarian.h \
+  tertiary.h anystate.h
 tertiary_old${OBJ}: tertiary_old.C tertiary.h model.h symbol.h alist.h \
   geometry1d.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil.h soil_water.h chemical.h macro.h mactrans.h \
-  librarian.h block.h plf.h
-tertiary_instant${OBJ}: tertiary_instant.C tertiary.h model.h symbol.h \
-  alist.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
-  assertion.h plf.h check.h vcheck.h librarian.h block.h
+  librarian.h block.h plf.h surface.h uzmodel.h
 biopore_drain${OBJ}: biopore_drain.C biopore.h model.h symbol.h alist.h \
   number.h block.h syntax.h treelog.h plf.h vcheck.h librarian.h \
   submodeler.h assertion.h check.h geometry.h mathlib.h
 tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   alist.h biopore.h number.h memutils.h librarian.h block.h syntax.h \
   treelog.h plf.h check.h geometry.h mathlib.h assertion.h soil.h \
-  soil_water.h soil_heat.h log.h time.h border.h
+  soil_water.h soil_heat.h log.h time.h border.h anystate.h surface.h \
+  uzmodel.h
 biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
   number.h imvec.h syntax.h treelog.h block.h plf.h vcheck.h librarian.h \
   submodeler.h assertion.h geometry.h mathlib.h soil.h soil_water.h \
-  secondary.h volume_box.h volume.h log.h time.h border.h check.h
+  secondary.h volume_box.h volume.h log.h time.h border.h check.h \
+  anystate.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
   alist.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h soil.h solver.h log.h time.h border.h \
