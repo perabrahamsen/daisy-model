@@ -1022,7 +1022,8 @@ difrad${OBJ}: difrad.C difrad.h model.h symbol.h alist.h block.h syntax.h \
 organic_matter${OBJ}: organic_matter.C organic_matter.h model.h symbol.h \
   alist.h block.h syntax.h treelog.h plf.h librarian.h
 movement${OBJ}: movement.C movement.h model.h symbol.h alist.h block.h \
-  syntax.h treelog.h plf.h librarian.h
+  syntax.h treelog.h plf.h librarian.h tertiary.h groundwater.h log.h \
+  time.h border.h
 integer${OBJ}: integer.C integer.h model.h symbol.h alist.h boolean.h \
   submodeler.h block.h syntax.h treelog.h plf.h assertion.h memutils.h \
   librarian.h
@@ -1413,7 +1414,7 @@ movement_1D${OBJ}: movement_1D.C movement_solute.h movement.h model.h \
   syntax.h treelog.h mathlib.h assertion.h soil.h soil_water.h \
   soil_heat.h groundwater.h surface.h uzmodel.h weather.h im.h chemical.h \
   doe.h transport.h adsorption.h log.h time.h border.h submodeler.h \
-  block.h plf.h librarian.h
+  block.h plf.h librarian.h tertiary.h
 groundwater_aquitard${OBJ}: groundwater_aquitard.C groundwater.h model.h \
   symbol.h alist.h syntax.h treelog.h block.h plf.h librarian.h check.h \
   assertion.h depth.h geometry.h mathlib.h soil_water.h log.h time.h \
@@ -1450,7 +1451,7 @@ movement_rect${OBJ}: movement_rect.C movement_solute.h movement.h model.h \
   syntax.h treelog.h mathlib.h assertion.h heatrect.h soil.h soil_water.h \
   soil_heat.h transport.h chemical.h groundwater.h surface.h uzmodel.h \
   weather.h im.h uzrect.h adsorption.h log.h time.h border.h check.h \
-  submodeler.h block.h plf.h librarian.h
+  submodeler.h block.h plf.h tertiary.h librarian.h
 chemistry_multi${OBJ}: chemistry_multi.C chemistry.h model.h symbol.h alist.h \
   chemical.h log.h time.h border.h block.h syntax.h treelog.h plf.h \
   assertion.h memutils.h librarian.h vcheck.h
@@ -1820,9 +1821,9 @@ column_std${OBJ}: column_std.C column.h model.h symbol.h alist.h library.h \
   surface.h uzmodel.h soil_heat.h macro.h syntax.h treelog.h movement.h \
   groundwater.h geometry.h mathlib.h assertion.h soil.h soil_water.h \
   vegetation.h bioclimate.h weather.h im.h chemistry.h chemical.h \
-  tertiary.h organic_matter.h am.h dom.h plf.h time.h units.h log.h \
-  border.h submodeler.h block.h memutils.h librarian.h scope_multi.h \
-  scope.h scopesel.h
+  organic_matter.h am.h dom.h plf.h time.h units.h log.h border.h \
+  submodeler.h block.h memutils.h librarian.h scope_multi.h scope.h \
+  scopesel.h
 weather_simple${OBJ}: weather_simple.C weather_old.h weather.h model.h \
   symbol.h alist.h im.h syntax.h treelog.h block.h plf.h time.h log.h \
   border.h mathlib.h assertion.h librarian.h
