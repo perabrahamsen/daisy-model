@@ -69,26 +69,27 @@ Biopore::max_infiltration_rate (const Geometry& geo, size_t e) const // [cm/h]
   daisy_assert (cell < geo.cell_size ());
 
   // Based on Poiseuille equation.
-  //   delta P = 8 my L Q / (pi r^4)
-  //     <=> Q = delta P pi r^4 / (8 my L)
-  // We assume delta P = L
-  //      => Q = pi r^4 / (8 my)
-  // Where 
+  // Q = pi r^4 rho g L / ( 8 L mu)
+  //
   //        Q [cm^3/h]    Infiltration rate
   //  delta P [cm]        Pressure drop.
   //        L [cm]        Length op cylinder.
-  //       my [cm^3/cm/h] Dynamic viscosity.
+  //       mu [cm^3/cm/h] Dynamic viscosity.
   //        r [cm]        Biopore radius.
   //        M [cm^-2]     Macropore density.
   //     
-  const double my = 1.0020 * 100.0 * 3600.0; // [g/cm/h] At 20 dg C. 
-  const double M = density (cell);           // [cm^-2]
-  const double r = diameter * 0.5;           // [cm]
-  const double r4 = r * r * r * r;           // [cm^4]
-  const double Q = M_PI * r4 / (8 * my);     // [cm^2 h]
-  const double q = Q * M;                    // [h]
-  // Wrong unit.
-  return 0.0;
+
+  const double rho = 1.0;   // [g/cm^3]
+  const double g = 9.81;      // [m/s^2]
+  const double g1 = g * 100.0 / (3600.0 * 3600.0);      // [cm/h^2]
+  const double mu = 1.0020 / (100.0 * 3600.0);          // [g/cm/h] At 20 dg C. 
+  const double M = density (cell);                      // [cm^-2]
+  const double r = diameter * 0.5;                      // [cm]
+  const double r4 = r * r * r * r;                      // [cm^4]
+  const double Q = M_PI * r4 * rho * g1 / (8 * mu);     // [cm^3/h]
+  const double q = Q * M;                               // [cm/h]
+ 
+  return q;
 }
 double 
 Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c, 
