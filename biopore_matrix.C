@@ -135,7 +135,7 @@ BioporeMatrix::converge (const Anystate& state,
             || iszero (h_bottom[i])
             || (  fabs ((h_bottom[i] - content.h_bottom[i]) 
                         / content.h_bottom[i])
-		> max_rel)))
+                > max_rel)))
       return false;
 
   return true; 
@@ -177,9 +177,13 @@ BioporeMatrix::infiltrate (const Geometry& geo, const size_t e,
 
 double 
 BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo, 
-                                      const Soil& soil, bool active, 
-                                      double K_xx, double h) const
+                                      const Soil& soil, const bool active, 
+                                      const double K_xx, const double h) const
 {
+  if (!std::isnormal (density (c)))
+    // No biopores here.
+    return 0.0;
+
   const Secondary& secondary = soil.secondary_domain (c);
   const bool use_primary = secondary.none ();
   const double R_wall = use_primary ? R_primary : R_secondary; // [h]  
@@ -187,9 +191,9 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
   const double M_c = density_column[col];
   const double r_c = diameter / 2.0;
   const double h_3 = air_bottom (c) - geo.cell_z (c);
-  
+
   double S; 
-  if (h_3>0.0 && h_3>h)
+  if (h_bottom[col] > 0.0 && h_3>0.0 && h_3>h)
     S = biopore_to_matrix (R_wall, M_c, r_c, h, h_3);
   else if (active && h>h_3)
     S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3);
@@ -214,7 +218,7 @@ BioporeMatrix::update_water ()
       const double soil_volume = water_volume / soil_fraction; // [cm^3]
       const double dx = xplus[i] - xminus;                     // [cm]
       const double dz = soil_volume / (dx * dy);               // [cm]
-      h_bottom[i] += dz;                                          // [cm]
+      h_bottom[i] += dz;                                       // [cm]
       added_water[i] = 0.0;                                    // [cm^3]
       xminus = xplus[i];                                       // [cm]
     }
@@ -289,7 +293,7 @@ BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
   if (density_cell.size () != cell_size)
     return false;
 
-  double xminus = 0;
+  double xminus = 0.0;
   for (size_t i = 0; i < column_size; i++)
     {
       VolumeBox square ("square", height_end, height_start, xminus, xplus[i]);
@@ -334,7 +338,7 @@ static struct BioporeMatrixSyntax
 
     syntax.add ("xplus", "cm", Check::positive (), 
                 Syntax::OptionalConst, Syntax::Sequence,
-		"Right side of each biopore interval.\n\
+                "Right side of each biopore interval.\n\
 Water and chemical content is tracked individually for each interval.\n\
 By default, use intervals as specified by the geometry.");
     syntax.add_check ("xplus", VCheck::increasing ());
@@ -345,7 +349,7 @@ Resistance for water moving from biopore through wall to primary domain.");
 Resistance for water moving from biopore through wall to secondary domain.\n\
 If not specified, this will be identical to 'R_primary'.");
     syntax.add ("h_bottom", "cm", Syntax::OptionalState, Syntax::Sequence,
-		"Pressure at the bottom of the biopores in each interval.");
+                "Pressure at the bottom of the biopores in each interval.");
 
     static const symbol C_unit ("g/cm^3");
     IMvec::add_syntax (syntax, alist, Syntax::OptionalState, "solute", C_unit,

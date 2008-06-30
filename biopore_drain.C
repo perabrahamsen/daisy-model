@@ -86,6 +86,9 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
                                     double K_xx, double h) const
 {
   const double M_c = density_cell[c];
+  if (!std::isnormal (M_c))
+    // No biopores here.
+    return 0.0;
   const double r_c = diameter / 2.0;
   const double h_3 = air_bottom (c) - geo.cell_z (c);
 

@@ -439,6 +439,8 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
   return false;
 }
 
+#include <sstream>
+
 void
 TertiaryBiopores::update_active (const std::vector<double>& h)
 {
@@ -452,7 +454,12 @@ TertiaryBiopores::update_active (const std::vector<double>& h)
       else              // Biopore is not active 
         {
           if (h[c] > pressure_initiate)
-            active[c] = true;
+            {
+              active[c] = true;
+              std::ostringstream tmp;
+              tmp << "h[" << c << "] > " << pressure_initiate;
+              Assertion::message (tmp.str ());
+            }
         }
     }
 }
@@ -474,7 +481,7 @@ TertiaryBiopores::initialize (const Geometry& geo, const Soil&,
   bool ok = true;
   for (size_t b = 0; b < classes.size (); b++)
     {
-      Treelog::Open (msg, "classes", b, classes[b]->name);
+      Treelog::Open nest2 (msg, "classes", b, classes[b]->name);
       if (!classes[b]->initialize (geo, scope, pipe_position, msg))
         ok = false;
     }
