@@ -78,7 +78,14 @@ GeometryRect::xminus (size_t n) const
 
 void 
 GeometryRect::fill_xplus (std::vector<double>& result) const
-{ result = xplus_; }
+{ 
+  const size_t row = 0;
+  daisy_assert (cell_rows () > row);
+
+  result.clear ();
+  for (size_t col = 0; col < cell_columns (); col++)
+    result.push_back (xplus (cell_index (row, col))); 
+}
 
 bool 
 GeometryRect::check (Treelog&) const

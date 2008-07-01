@@ -53,3 +53,5 @@ GeometryVert::GeometryVert (Block& al)
 
 GeometryVert::~GeometryVert ()
 { }
+
+// geometry_vert.C ends here.

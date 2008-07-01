@@ -296,6 +296,7 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
       surface.accept_top (in_sign * flux_in, geo, edge, dt, msg);
       infiltrate (geo, edge, flux_in * dt, dt);
     }
+  update_water ();
 
   // Update soil water.
   soil_water.set_tertiary_flux (q_tertiary);

@@ -33,13 +33,25 @@ class Treelog;
 
 class Geometry1D : public GeometryVert
 {
+  // Cell operations.
 public:
-  // Accessors.
+  inline double zminus (size_t n) const
+  { return (n == 0) ? 0.0 : zplus (n-1U); }
+  inline double cell_volume (size_t n) const
+  { return dz (n) * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
+  size_t cell_at (double z, double x, double y) const ;
+  double fraction_in_z_interval (size_t n, double from, double to) const;
+  double fraction_in_volume (size_t n, const Volume& volume) const;
+  bool contain_x (size_t n, double x) const;
+  bool contain_y (size_t n, double y) const;
+  size_t interval_plus (double z) const;
+  size_t interval_border (double z) const;
+
+  // Edge operations.
+public:
   inline size_t edge_size () const
   { return cell_size () + 1; }
   std::string edge_name (const size_t) const;
-  inline int dimensions () const // Number of non-trivial dimensions.
-  { return 1; }
   inline int edge_from (size_t e) const // Cell where edge originates.
   { return e == cell_size () ? cell_below : static_cast<int> (e); }
   inline int edge_to (size_t e) const // Cell where edge leads.
@@ -50,22 +62,15 @@ public:
   { return 1.0; }
   inline double edge_cos_angle (size_t) const // Vertical
   { return 0.0; }
+
+  // Operations on whole volume.
+public:
+  inline int dimensions () const // Number of non-trivial dimensions.
+  { return 1; }
   inline double surface_area () const // Total surface area.
   { return 1.0; }
-  inline double zminus (size_t n) const
-  { return (n == 0) ? 0.0 : zplus (n-1U); }
-  inline double cell_volume (size_t n) const
-  { return dz (n) * 1.0 /* [cm] */ * 1.0 /* [cm] */; }
   inline double bottom () const // Bottom of deepest cell. [cm]
   { return zplus (cell_size () - 1); }
-  size_t cell_at (double z, double x, double y) const ;
-  double fraction_in_z_interval (size_t i, double from, double to) const;
-  double fraction_in_volume (size_t n, const Volume& volume) const;
-  bool contain_x (size_t i, double x) const;
-  bool contain_y (size_t i, double y) const;
-
-  size_t interval_plus (double z) const;
-  size_t interval_border (double z) const;
 
   void fill_xplus (std::vector<double>&) const;
 
