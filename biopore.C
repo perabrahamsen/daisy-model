@@ -73,7 +73,7 @@ Biopore::max_infiltration_rate (const Geometry& geo, size_t e) const // [cm/h]
   // Q = pi r^4 rho g L / ( 8 L mu)
   //
   //        Q [cm^3/h]    Infiltration rate
-  //  delta P [cm]        Pressure drop.
+  // delta P [cm]        Pressure drop.
   //        L [cm]        Length op cylinder.
   //       mu [cm^3/cm/h] Dynamic viscosity.
   //        r [cm]        Biopore radius.
@@ -89,7 +89,7 @@ Biopore::max_infiltration_rate (const Geometry& geo, size_t e) const // [cm/h]
   const double r4 = r * r * r * r;                      // [cm^4]
   const double Q = M_PI * r4 * rho * g1 / (8 * mu);     // [cm^3/h]
   const double q = Q * M;                               // [cm/h]
- 
+  
   return q;
 }
 double 
