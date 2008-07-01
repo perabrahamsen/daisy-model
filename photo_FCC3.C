@@ -42,7 +42,7 @@ class PhotoFCC3 : public PhotoFarquhar
 {
   // Parameters.
 private:
-  const PLF& TempEff;	// Temperature effect, photosynthesis   
+  const PLF& TempEff;   // Temperature effect, photosynthesis   
   const double S;     // Electron transport temperature response parametre 
   const double H;     // Curvature parameter of Jm
   const double Ko25;  // Michaelis-Menten constant of Rubisco for O2 at 25 degrees
@@ -64,8 +64,8 @@ public:
   double V_m (const double Vm_25m, double T) const;
   double J_m (const double vmax25, const double T) const;
   void CxModel (const double CO2_atm, double& pn, double& ci, 
-		const double Q, const double gsw, const double T,
-		const double vmax, const double rd, Treelog& msg)const;
+                const double Q, const double gsw, const double T,
+                const double vmax, const double rd, Treelog& msg)const;
   double respiration_rate(const double Vm_25, const double Tl) const;
 
   // Create and Destroy.
@@ -121,10 +121,10 @@ PhotoFCC3::J_m (const double vmax25, const double T/*[degree C]*/) const
 
 void 
 PhotoFCC3::CxModel (const double CO2_atm, double& pn, double& ci, 
-		    const double PAR /*[mol/m²leaf/s]*/, 
-		    const double gsw /*[mol/m²leaf/s]*/, const double T, 
-		    const double vmax25 /*[mol/m² leaf/s]*/, 
-		    const double rd /*[mol/m² leaf/s]*/, Treelog& msg) const  
+                    const double PAR /*[mol/m²leaf/s]*/, 
+                    const double gsw /*[mol/m²leaf/s]*/, const double T, 
+                    const double vmax25 /*[mol/m² leaf/s]*/, 
+                    const double rd /*[mol/m² leaf/s]*/, Treelog& msg) const  
 {
   // Updating temperature dependent parameters:
   const double Vm = V_m(vmax25, T); //[mol/m² leaf/s]
@@ -138,70 +138,143 @@ PhotoFCC3::CxModel (const double CO2_atm, double& pn, double& ci,
   const double Kcl = Kc *(1.+ O2_atm/Ko); //[Pa]
   daisy_assert (gbw > 0.0);
   daisy_assert (gsw > 0.0);
-  double rbw = 1./gbw; // leaf boundary resistance to water vapor, [m²leaf*s/mol]
-  double rsw = 1./gsw; // stomatal resistance to water [m²leaf*s/mol]
+  const double rbw = 1./gbw; // leaf boundary resistance to water vapor, [m²leaf*s/mol]
+  const double rsw = 1./gsw; // stomatal resistance to water [m²leaf*s/mol]
+
+  //Total conductance of CO2
+  const double gtc = 1./(1.4*rbw+1.6*rsw);   //[mol/m² leaf/s]
   
-  //Newton Raphsons solution to 'net'photosynthesis and stomatal conductance.
-  const int maxiter = 150;
-  int aiter; 
-  double lastci, newci;
+  const double Ile = PAR * alfa; // PAR effectively absorbed by PSII [mol/m² leaf/s]
+  const double J 
+    = first_root_of_square_equation(theta, -(Ile+Jm), Ile*Jm); // [mol/m² leaf/s]
 
-  if (std::isnormal (ci)) 
-    lastci = ci;
-  else 
-    lastci = CO2_atm;
-  newci = 0.;
-  aiter = 0;
+  // We now have two equations with two unknowns.
+  //   p = find_p (ci)
+  //   ci = find_ci (p)
+  // By substitution, we get
+  //   find_ci (find_p (ci)) - ci = 0
+  // This can be solved with Newton-Raphson.
 
-  while(std::abs(newci - lastci) > 0.01)
+  struct Solve_ci
+  {
+    const double Gamma, Vm, Jm, Ko, Kc, Kcl;
+    const double gtc, rbw, rsw,Ile, beta, J, rd, CO2_atm, Ptot;
+    
+    const double find_wc (const double ci)
+    {// Gross CO2 uptake limited by Rubisco
+      daisy_assert ((ci + Kcl) > 0.0); 
+      const double wc = Vm * ( ci - Gamma)/( ci + Kcl);//Rubisco limited,[mol/m²leaf/s]
+     return wc;
+    }
+    const double find_we (const double ci)
+    { // Gross CO2 uptake limited by RuBP
+      daisy_assert ((ci + 2.0 * Gamma) > 0.0);
+      const double we = J * (ci - Gamma)/(ci + 2. * Gamma);//[mol/m² leaf/s]
+      return we; 
+    }
+    const double find_p (const double ci) //[mol/m² leaf/s]
     {
-      if (aiter > maxiter)
-	{
-	  std::ostringstream tmp;
-	  tmp << "Bug: total iterations in C3 model exceed " << maxiter;
-	  msg.error (tmp.str ());
-	  break;
-	}
-      // Gross CO2 uptake limited by Rubisco
-      daisy_assert ((ci + Kcl)>0.0); 
-      const double wc = Vm*(ci-Gamma)/(ci+Kcl); // Rubisco limited, [mol/m² leaf/s]
-      const double Ile = PAR * alfa;            // PAR effectively absorbed by PSII [mol/m² leaf/s]
-      const double J = first_root_of_square_equation(theta, -(Ile+Jm), Ile*Jm); // [mol/m² leaf/s]
-
-      // Gross CO2 uptake limited by RuBP
-      daisy_assert ((ci + 2.0 * Gamma)> 0.0);
-      const double we = J * (ci-Gamma)/(ci + 2.* Gamma);//[mol/m² leaf/s]
+       // Gross CO2 uptake limited by Rubisco and RuBP.
       daisy_assert (Gamma >= 0.0);
       daisy_assert (ci >= 0.0);
+      const double we = find_we(ci); //[mol/m² leaf/s]
+      const double wc = find_wc(ci); //[mol/m² leaf/s]
       daisy_assert(((wc+we)*(we+wc)-(4.*beta*we*wc)) >= 0.0);
       daisy_assert ((beta)> 0.0);
-      const double p = first_root_of_square_equation(beta, -(wc+we), we*wc);//[mol/m² leaf/s]
-      // Net CO2 uptake
-      pn = p - rd; // [mol/m² leaf/s] 
-      
-      //Total conductance of CO2
-      const double gtc = 1./(1.4*rbw+1.6*rsw);   //[mol/m² leaf/s]
-      newci = ((gtc * CO2_atm /Ptot)-pn)/gtc*Ptot;//[Pa]
-      // newci = CO2_atm - (pn/gtc) * Ptot; //[Pa]
+      const double p 
+	= first_root_of_square_equation(beta, -(wc+we), we*wc);//[mol/m² leaf/s]
+      return p;
+    }
 
+    const double find_p_derived (const double ci) // [mol/m² leaf/s]
+    { 
+      const double we = find_we(ci); //[mol/m² leaf/s]
+      const double wc = find_wc(ci); //[mol/m² leaf/s]
+      // The derivative of p with regard to ci; p'(ci).
       double dp;
       if (wc < we) 
-	dp = Vm * (Kcl+Gamma)/((ci+Kcl)*(ci+Kcl));//[mol/m² leaf/s/Pa]
+        dp = Vm * (Kcl+Gamma)/((ci+Kcl)*(ci+Kcl));//[mol/m² leaf/s/Pa]
       else 
-	dp = 3.0 * J *(Gamma/((ci+2. * Gamma)*(ci+2.* Gamma))); //[mol/m² leaf/s/Pa]
+        dp = 3.0 * J *(Gamma/((ci+2. * Gamma)*(ci+2.* Gamma))); //[mol/m² leaf/s/Pa]
+      return dp;
+    }
+    
+    const double find_ci (const double p) // [Pa]
+    { 
+      // Net CO2 uptake
+      const double pn = p - rd; // [mol/m² leaf/s] 
+      return CO2_atm - (pn/gtc) * Ptot; 
+    }
+    const double find_ci_derived ()
+    { return - Ptot / gtc; }
+    const double function (const double ci)
+    { return find_ci (find_p (ci)) - ci; }
+    const double derived (const double ci)
+    { return find_ci_derived () * find_p_derived (ci)  - 1.0; }
 
-      const double dcc = -(Ptot/gtc)*dp; // [unitless]
-      newci = ci-(newci-ci)/(dcc-1.);    // Newtons next iteration, [Pa]
-      lastci = ci; 
-      if (newci > 0.) 
-	ci = newci;
-      else 
+    double next_value (const double prev_value)
+    { return prev_value - function (prev_value) / derived (prev_value); }
+
+    double solve (const double initial_guess)
+    {
+      //Newton Raphson's solution.
+      const int maxiter = 150;
+      int iter = 0;
+      double new_guess = initial_guess;
+      double last_guess;
+      do
 	{
-	  ci = 0.5 * CO2_atm;
-	  newci = ci;
+	  if (iter > maxiter)
+	    throw "Too many iterations in Newton-Raphson";
+	  iter++;
+	  last_guess = new_guess;
+	  //std::ostringstream tmp;
+	  //tmp << "Value of new_guess = " << new_guess << " iter = " << iter ;
+	  //Assertion::message (tmp.str ());
+	  new_guess = next_value (last_guess);
+	  if (!(new_guess > 0.)) 
+	    new_guess = 0.5 * CO2_atm;
 	}
-      aiter = 1 + aiter;
-    }  
+      while (std::abs(new_guess - last_guess) > 0.01);
+
+      return new_guess;
+    }
+
+    Solve_ci (const double Gamma_, const double Vm_, const double Jm_, 
+	      const double Ko_, const double Kc_, const double Kcl_, 
+	      const double gtc_, const double rbw_, const double rsw_, 
+	      const double Ile_, const double beta_, const double J_, 
+	      const double rd_, const double CO2_atm_, const double Ptot_)
+      : Gamma (Gamma_),
+	Vm (Vm_),
+	Jm (Jm_),
+	Ko (Ko_),
+	Kc (Kc_),
+	Kcl (Kcl_),
+	//gbw (gbw_),
+	//gsw (gsw_),
+	gtc (gtc_),
+	rbw (rbw_),
+        rsw (rsw_),
+	Ile (Ile_),
+	beta (beta_),
+	J (J_),
+	rd (rd_),
+	CO2_atm (CO2_atm_),
+	Ptot (Ptot_)
+    { }
+  };
+
+  Solve_ci solve_ci (Gamma, Vm, Jm, Ko, Kc, Kcl, gtc, rbw, rsw, Ile, beta, J, 
+		     rd, CO2_atm, Ptot);
+
+  if (!std::isnormal (ci)) 
+    ci =0.5 * CO2_atm;
+      
+  daisy_assert (ci >= 0.0);
+  ci = solve_ci.solve (ci);
+  
+  pn = solve_ci.find_p(ci)-rd; 
 }
 
 double
@@ -228,7 +301,7 @@ static struct Photo_FCC3Syntax
     alist.add ("description", "Photosynthesis for C3 crops described by Faquhar et al. (1980).");
 
     syntax.add ("TempEff","dg C", Syntax::None (), Check::non_negative (),Syntax::Const,
-		"Temperature factor for assimilate production.");
+                "Temperature factor for assimilate production.");
 
 
     syntax.add ("Kc25", "Pa", Check::positive (), Syntax::Const,
