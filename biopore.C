@@ -30,6 +30,7 @@
 #include "check.h"
 #include "geometry.h"
 #include "anystate.h"
+#include <sstream>
 
 // biopore component.
 
@@ -95,8 +96,10 @@ double
 Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c, 
                             double h, double h_3)
 {
-  return - 4*M_PI*M_c*K_xx*(h-h_3) / 
+  const double S = - 4*M_PI*M_c*K_xx*(h-h_3) / 
     (log(M_PI*M_c*r_c*r_c));
+  daisy_assert (S >= 0.0);
+  return S;
 }
 
 
@@ -104,8 +107,10 @@ double
 Biopore::biopore_to_matrix (double R_wall, double M_c, double r_c,
                             double h, double h_3)
 {
-  return 4*M_PI*M_c*(h-h_3) / 
+  const double S = 4*M_PI*M_c*(h-h_3) / 
     (R_wall*log(M_PI*M_c*r_c*r_c));
+  daisy_assert (S >= 0.0);
+  return S;
 }
 
 bool

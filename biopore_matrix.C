@@ -136,7 +136,13 @@ BioporeMatrix::converge (const Anystate& state,
             || (  fabs ((h_bottom[i] - content.h_bottom[i]) 
                         / content.h_bottom[i])
                 > max_rel)))
-      return false;
+      {
+        std::ostringstream tmp;
+        tmp << "column " << i << " old = " << content.h_bottom[i] 
+            << " new = " << h_bottom[i] ;
+        Assertion::message (tmp.str ());
+        return false;
+      }
 
   return true; 
 }
@@ -194,7 +200,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
 
   double S; 
   if (h_bottom[col] > 0.0 && h_3>0.0 && h_3>h)
-    S = biopore_to_matrix (R_wall, M_c, r_c, h, h_3);
+    S = -biopore_to_matrix (R_wall, M_c, r_c, h, h_3);
   else if (active && h>h_3)
     S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3);
   else 

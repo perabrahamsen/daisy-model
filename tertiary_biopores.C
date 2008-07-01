@@ -33,6 +33,7 @@
 #include "log.h"
 #include "anystate.h"
 #include "surface.h"
+#include <sstream>
 
 struct TertiaryBiopores : public Tertiary
 {
@@ -301,28 +302,53 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
   // Update soil water.
   soil_water.set_tertiary_flux (q_tertiary);
 
+  // We might want to handle matrix interaction is small timesteps.
+  if (use_small_timesteps ())
+    return;
+  
   // Soil matrix exchange.
   const size_t cell_size = geo.cell_size ();
   std::vector<double> S_drain (cell_size, 0.0);
   std::vector<double> S_matrix (cell_size, 0.0);
 
-  if (!use_small_timesteps ())
-    {
-      // Handle in Richard's Equation.
-      Anystate old_state = get_state ();
+  // Keep original state.
+  Anystate old_state = get_state ();
 
-      std::vector<double> h;
-      const size_t cell_size = geo.cell_size ();
-      for (size_t c = 0; c < cell_size; c++)
-        h.push_back (soil_water.h (c));
+  // Find matrix state.
+  std::vector<double> h;
+  for (size_t c = 0; c < cell_size; c++)
+    h.push_back (soil_water.h (c));
+  update_active (h);
       
-      update_active (h);
-      if (find_implicit_water (old_state, geo, soil, soil_heat, h, dt))
-        matrix_sink (geo, soil, soil_heat, h, S_matrix, S_drain);
-      else
-        msg.warning ("State did not converge, ignoring tertiary transport");
+  // Find an implicit solution.
+  const double min_dt = 0.00001;
+  double ddt = dt;
+  while (!find_implicit_water (old_state, geo, soil, soil_heat, h, dt))
+    {
+      ddt *= 0.5;
+      if (dt < min_dt)
+        {
+          msg.warning ("Can't find solution for tertiary transport.");
+          return;
+        }
     }
-
+  
+  // Find sink from solution.
+  matrix_sink (geo, soil, soil_heat, h, S_matrix, S_drain);
+  
+  // Scale with timestep.
+  if (ddt < 0.99 * dt)
+    {
+      for (size_t c = 0; c < cell_size; c++)
+        {
+          S_drain[c] *= ddt / dt;
+          S_matrix[c] *= ddt / dt;
+        }
+      std::ostringstream tmp;
+      tmp << "Using timestep " << ddt << " for tertiary transport";
+      msg.message (tmp.str ());
+    }
+  
   soil_water.drain (S_drain);
 }
 
@@ -401,7 +427,7 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
                                             active[c], K_xx, h[c])
             + biopore.matrix_biopore_drain(c, geo, soil,
                                            active[c], K_xx, h[c]);
-          biopore.add_water (c, -S * dt * vol);
+          biopore.add_water (c, S * dt * vol);
         }
     }
 }
@@ -439,8 +465,6 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
   set_state (old_state);
   return false;
 }
-
-#include <sstream>
 
 void
 TertiaryBiopores::update_active (const std::vector<double>& h)
