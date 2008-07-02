@@ -127,7 +127,7 @@ public:
   void set_matrix (const std::vector<double>& h,
                    const std::vector<double>& Theta,
                    const std::vector<double>& q);
-  void set_tertiary_sink (const std::vector<double>& S_p);
+  void add_tertiary_sink (const std::vector<double>& S_p);
   void set_tertiary_flux (const std::vector<double>& q_p);
 
   // Simulation.

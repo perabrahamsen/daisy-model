@@ -323,8 +323,11 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
   // Find an implicit solution.
   const double min_dt = 0.00001;
   double ddt = dt;
-  while (!find_implicit_water (old_state, geo, soil, soil_heat, h, dt))
+  for (;;)
     {
+      if (find_implicit_water (old_state, geo, soil, soil_heat, h, ddt))
+        // Succes!
+        break;
       ddt *= 0.5;
       if (dt < min_dt)
         {
@@ -337,7 +340,8 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
   matrix_sink (geo, soil, soil_heat, h, S_matrix, S_drain);
   
   // Scale with timestep.
-  if (ddt < 0.99 * dt)
+  const double scale = ddt / dt;
+  if (!approximate (scale, 1.0))
     {
       for (size_t c = 0; c < cell_size; c++)
         {
@@ -348,7 +352,10 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
       tmp << "Using timestep " << ddt << " for tertiary transport";
       msg.message (tmp.str ());
     }
-  
+
+  // Make it official.
+  soil_water.add_tertiary_sink (S_matrix);
+  soil_water.add_tertiary_sink (S_drain);
   soil_water.drain (S_drain);
 }
 

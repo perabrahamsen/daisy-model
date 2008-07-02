@@ -40,6 +40,7 @@ SoilWater::clear ()
   fill (S_drain_.begin (), S_drain_.end (), 0.0);
   fill (S_root_.begin (), S_root_.end (), 0.0);
   fill (S_incorp_.begin (), S_incorp_.end (), 0.0);
+  fill (S_p_.begin (), S_p_.end (), 0.0);
   fill (tillage_.begin (), tillage_.end (), 0.0);
   fill (S_ice_.begin (), S_ice_.end (), 0.0);
 }
@@ -119,13 +120,15 @@ SoilWater::set_matrix (const std::vector<double>& h,
 }
 
 void 
-SoilWater::set_tertiary_sink (const std::vector<double>& S_p)
+SoilWater::add_tertiary_sink (const std::vector<double>& S_p)
 {
   const size_t cell_size = S_p.size ();
   daisy_assert (S_sum_.size () == cell_size);
   for (size_t c = 0; c < cell_size; c++)
-    S_sum_[c] += S_p[c];
-  S_p_ = S_p;
+    {
+      S_sum_[c] += S_p[c];
+      S_p_[c] += S_p[c];
+    }
 }
 
 void 

@@ -136,13 +136,7 @@ BioporeMatrix::converge (const Anystate& state,
             || (  fabs ((h_bottom[i] - content.h_bottom[i]) 
                         / content.h_bottom[i])
                 > max_rel)))
-      {
-        std::ostringstream tmp;
-        tmp << "column " << i << " old = " << content.h_bottom[i] 
-            << " new = " << h_bottom[i] ;
-        Assertion::message (tmp.str ());
-        return false;
-      }
+      return false;
 
   return true; 
 }

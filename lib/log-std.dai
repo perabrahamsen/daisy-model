@@ -165,9 +165,8 @@ the litter layer.")
 (defsummary "Soil water balance" balance
   "Water balance for the soil."
   (precision 1)
-  (input "Matrix infiltration" "Macropore infiltration" "Subsoil irrigation" 
-         "Tillage")
-  (output "Matrix percolation" "Macropore percolation" "Drain flow"
+  (input "Matrix infiltration" "Subsoil irrigation" "Tillage")
+  (output "Matrix percolation" "Tertiary" "Drain flow"
           "Root extraction" "Freezing")
   (content "Soil water"))
 
@@ -186,30 +185,6 @@ This is the normal infiltration channel.")
                      (handle sum)
                      (negate true)
                      (dimension "mm/&"))
-           (flux_top (tag "Macropore infiltration")
-                     (description "\
-Amount of water entering the soil through preferential flow.
-
-Preferential flow can occur if the soil has macropores, and the
-water pressure in an area with macropores is above a given threshold.
-If the macropores that are activated within the soil interval is not
-included in this number.")
-                     (path column "${column}" SoilWater q_p)
-                     (spec fixed SoilWater q_p)
-                     (handle sum)
-                     (negate true)
-                     (dimension "mm/&"))
-           (interval (tag "Subsoil irrigation")
-                     (description "\
-Amount of water incorporated directly into the soil.
-
-This include both subsoil irrigation and any water in fertilizer
-directly incorporated into the soil.")
-                     (path column "${column}" SoilWater S_incorp)
-                     (spec fixed SoilWater S_incorp)
-                     (handle sum)
-                     (negate true)
-                     (dimension "mm/&"))
            (flux_bottom (tag "Matrix percolation")
                      (description "\
 Amount of water leaving the soil through the matrix system.
@@ -220,21 +195,26 @@ This is the normal percolation channel.")
                         (handle sum)
                         (negate true)
                         (dimension "mm/&"))
-           (flux_bottom (tag "Macropore percolation")
+           (interval (tag "Subsoil irrigation")
                      (description "\
-Amount of water leaving the soil interval through macropores.
+mount of water incorporated directly into the soil.
 
-Water that leaves the macropores within the soil interval will not be
-included in this number.  
+his include both subsoil irrigation and any water in fertilizer
+irectly incorporated into the soil.")
+                     (path column "${column}" SoilWater S_incorp)
+                     (spec fixed SoilWater S_incorp)
+                     (handle sum)
+                     (negate true)
+                     (dimension "mm/&"))
+           (interval (tag "Tertiary")
+                     (description "\
+Net amount of water leaving the soil matrix to the biopores.
 
-This means that macropore flow that is purely internal to the soil
-interval will not be logged.  This is the common case if you are
-logging the entire interval of the soil where there are macropores.")
-                        (path column "${column}" SoilWater q_p)
-                        (spec fixed SoilWater q_p)
-                        (handle sum)
-                        (negate true)
-                        (dimension "mm/&"))
+This may be zero if the same amount of water enters and leaves the interval.")
+                     (path column "${column}" SoilWater S_p)
+                     (spec fixed SoilWater S_p)
+                     (handle sum)
+                     (dimension "mm/&"))
            (interval (tag "Drain flow")
                      (description "\
 Water in the soil interval that flows to the drain pipes.
