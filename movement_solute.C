@@ -355,6 +355,7 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
     = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
   double total_water_in = 0.0;
+  double total_area = 0.0;
 
   // Find incomming water in all domain.
   for (size_t i = 0; i < edge_above_size; i++)
@@ -363,6 +364,7 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
       const int cell = geo.edge_other (edge, Geometry::cell_above);
       daisy_assert (geo.cell_is_internal (cell));
       const double area = geo.edge_area (edge);
+      total_area += area;
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) 
         ? 1.0
@@ -404,17 +406,35 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
       else
         J_primary[edge] = 0.0;
     }
+  daisy_approximate (total_area, geo.surface_area ());
 
-  // Scale with incomming solute.
-  daisy_assert (std::isnormal (total_water_in));
-  double scale = -J_above / total_water_in;
-  for (size_t i = 0; i < edge_above_size; i++)
+  if (std::isnormal (total_water_in))
+    // Scale with incomming solute.
     {
-      const size_t edge = edge_above[i];
-
-      J_tertiary[edge] *= scale;
-      J_secondary[edge] *= scale;
-      J_primary[edge] *= scale;
+      double scale = -J_above / total_water_in;
+      for (size_t i = 0; i < edge_above_size; i++)
+        {
+          const size_t edge = edge_above[i];
+          
+          J_tertiary[edge] *= scale;
+          J_secondary[edge] *= scale;
+          J_primary[edge] *= scale;
+        }
+    }
+  else
+    // Scale with incomming solute.
+    {
+      for (size_t i = 0; i < edge_above_size; i++)
+        {
+          const size_t edge = edge_above[i];
+          const double area = geo.edge_area (edge);
+          const double in_sign 
+            = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+          
+          J_tertiary[edge] = 0.0;
+          J_secondary[edge] = 0.0;
+          J_primary[edge] = J_above * in_sign * area / total_area;
+        }
     }
 }
 

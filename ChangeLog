@@ -1,3 +1,11 @@
+2008-07-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.33 released.
+
+2008-07-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (COMPONENTS): Added 'stomatacon.C'.
+
 2008-06-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.32 released.
