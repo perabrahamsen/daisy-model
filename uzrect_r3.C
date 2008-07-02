@@ -199,6 +199,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   ublas::vector<double> q;	// Accumulated flux
   q = ublas::zero_vector<double> (edge_size);
   ublas::vector<double> dq (edge_size); // Flux in small timestep.
+  dq = ublas::zero_vector<double> (edge_size);
 
   //Make Qmat area diagonal matrix 
   //Note: This only needs to be calculated once... 

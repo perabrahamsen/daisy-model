@@ -102,6 +102,7 @@ SoilWater::set_content (const size_t i, const double h, const double Theta)
 void
 SoilWater::set_flux (const size_t i, const double q)
 {
+  daisy_assert (std::isfinite (q));
   daisy_assert (i < q_matrix_.size ());
   q_matrix_[i] = q;
 }
@@ -112,10 +113,20 @@ SoilWater::set_matrix (const std::vector<double>& h,
                        const std::vector<double>& q)
 {
   daisy_assert (h_.size () == h.size ());
-  h_ = h;
   daisy_assert (Theta_.size () == Theta.size ());
-  Theta_ = Theta;
+  for (size_t c = 0; c < h.size (); c++)
+    {
+      daisy_assert (std::isfinite (h[c]));
+      daisy_assert (std::isfinite (Theta[c]));
+      daisy_assert (Theta[c] >= 0.0);
+    }
+
   daisy_assert (q_matrix_.size () == q.size ());
+  for (size_t e = 0; e < q.size (); e++)
+    daisy_assert (std::isfinite (q[e]));
+
+  h_ = h;
+  Theta_ = Theta;
   q_matrix_ = q;
 }
 
@@ -316,8 +327,10 @@ SoilWater::tick_after (const Geometry& geo,
       daisy_assert (K_edge > 0.0);
       
       // BUGLET:  We use in effect arithmetic average here for K.
+      daisy_assert (std::isnormal (K_edge));
       // This may not have been what was used for calculating q matrix.
       const double K_factor = K_lim / K_edge;
+      daisy_assert (std::isfinite (K_edge));
       if (K_factor < 0.99999)
         {
           q_primary_[e] = q_matrix_[e] * K_factor;

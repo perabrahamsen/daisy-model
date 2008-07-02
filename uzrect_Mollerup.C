@@ -194,6 +194,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   ublas::vector<double> q;	// Accumulated flux
   q = ublas::zero_vector<double> (edge_size);
   ublas::vector<double> dq (edge_size); // Flux in small timestep.
+  dq = ublas::zero_vector<double> (edge_size);
 
   //Make Qmat area diagonal matrix 
   //Note: This only needs to be calculated once... 
@@ -417,6 +418,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	      const double out_sign = (cell == geo.edge_from (edge))
 		? 1.0 : -1.0;
 	      remaining_water[i] += out_sign * dq (edge) * ddt;
+              daisy_assert (std::isfinite (dq (edge)));
 	    }
 
 	  if (debug == 5)
@@ -427,7 +429,14 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	    }
 
 	  // Contribution to large time step.
+          daisy_assert (std::isnormal (dt));
+          daisy_assert (std::isnormal (ddt));
 	  q += dq * ddt / dt;
+          for (size_t e = 0; e < edge_size; e++)
+            {
+              daisy_assert (std::isfinite (dq (e)));
+              daisy_assert (std::isfinite (q (e)));
+            }
 
 	  time_left -= ddt;
 	  iterations_with_this_time_step++;
@@ -495,7 +504,10 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   for (size_t cell = 0; cell != cell_size; ++cell) 
     soil_water.set_content (cell, h (cell), Theta (cell));
   for (size_t edge = 0; edge != edge_size; ++edge) 
-    soil_water.set_flux (edge, q[edge]);
+    {
+      daisy_assert (std::isfinite (q[edge]));
+      soil_water.set_flux (edge, q[edge]);
+    }
   soil_water.drain (S_drain);
 
   // End of large time step.
@@ -534,6 +546,7 @@ UZRectMollerup::Neumann (const size_t edge, const size_t cell,
 {
   B (cell) = flux * area;
   dq (edge) = in_sign * flux;
+  daisy_assert (std::isfinite (dq (edge)));
 }
 
 void 
@@ -565,6 +578,7 @@ UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
   dq (edge) = in_sign * (K_area_per_length * h_old 
                       + Dm_vec_val + Gm_val) / area;
 
+  daisy_assert (std::isfinite (dq (edge)));
 }
 
 void 
@@ -927,6 +941,8 @@ UZRectMollerup::Darcy (const GeometryRect& geo,
           const double dh = h (to) - h (from);
           const double dq_diff = -(K / length) * dh;   
           const double dq_grav = -K * sin_angle; 
+          daisy_assert (std::isfinite (dq_diff));
+          daisy_assert (std::isfinite (dq_grav));
           dq (e) = dq_diff + dq_grav;
 	} 
     }
