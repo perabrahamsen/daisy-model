@@ -30,6 +30,7 @@
 class PLF;
 class RubiscoNdist;
 class ABAEffect;
+class StomataCon;
 class Treelog;
 class CanopyStandard;
 class Phenology;
@@ -56,6 +57,7 @@ protected:
   const double gbw;   // Leaf boundary conductance of water 
   std::auto_ptr<RubiscoNdist> rubiscoNdist;// Crop N distribution model.
   std::auto_ptr<ABAEffect> ABAeffect;// ABA-xylem effect on photosynthesis.
+  std::auto_ptr<StomataCon> Stomatacon;// Stomata conductance.
 
   // Log variable.
   std::vector<double> ci_vector; // Stomata CO2 pressure

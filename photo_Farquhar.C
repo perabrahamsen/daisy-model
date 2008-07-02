@@ -26,6 +26,7 @@
 #include "block.h"
 #include "rubiscoNdist.h"
 #include "ABAeffect.h"
+#include "stomatacon.h"
 #include "bioclimate.h"
 #include "canopy_std.h"
 #include "phenology.h"
@@ -50,7 +51,8 @@ PhotoFarquhar::PhotoFarquhar (Block& al)
     b (al.number("b")),
     gbw (al.number("gbw")),
     rubiscoNdist (Librarian::build_item<RubiscoNdist> (al, "N-dist")),
-    ABAeffect (Librarian::build_item<ABAEffect> (al, "ABAeffect"))
+    ABAeffect (Librarian::build_item<ABAEffect> (al, "ABAeffect")),
+    Stomatacon (Librarian::build_item<StomataCon> (al, "Stomatacon"))
 { }
 
 PhotoFarquhar::~PhotoFarquhar ()
@@ -109,8 +111,9 @@ PhotoFarquhar:: Sat_vapor_pressure (const double T /*[degree C]*/) const
 double
 PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, double rel_hum /*[unitless]*/, 
 			 double LA, double fraction, double gbw/*[mol/m2 leaf/s]*/, 
-			 const double Ta, const double Tl, Treelog&) 
+			 const double Ta, const double Tl, Treelog& msg) 
 {
+
   const double wsf = ABA_effect; //water stress function []
   const double intercept = b * LA * fraction; //min conductance 
   daisy_assert (gbw >0.0);
@@ -120,6 +123,7 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
   const double cs = CO2_atm - (1.4 * pn * Ptot * rbw); //[Pa] 
   daisy_assert (cs > 0.0);
 
+  //Net photosynthesis
   double pz; //[mol/m²leaf/s]
   if(pn <= 0.) 
     pz = 1.0e-12;
@@ -138,22 +142,25 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
   const double bb = intercept + (1./rbw)-(wsf * m * pz * Ptot/(cs-Gamma));//[mol/m2/s]
   const double cc = (- wa /(wi * rbw)) - intercept;//[mol/m2/s]
   daisy_assert (aa > 0.0);
-  double hs = second_root_of_square_equation(aa, bb, cc); 
- 
+  // Relative humidity at leaf surface?
+  double hs = second_root_of_square_equation(aa, bb, cc); //[]
   if(hs > 1.)
     hs = 1.0;
 
-  double gsw; //stomatal conductance
+  const double Ds = wi * (1 - hs) * Ptot; 
+
+  //stomatal conductance
+  double gsw; 
   if(pn <= 0.0)
     gsw = intercept;//[mol/m²leaf/s]
   else 
-    {
-      daisy_assert (cs > Gamma);
-      gsw = wsf * (m*hs*pz*Ptot) /(cs-Gamma) + intercept;//[mol/m²leaf/s]  
-    }
-  daisy_assert (gsw >= 0.0);
+    gsw = Stomatacon->stomata_con (wsf /*[]*/, m /*[]*/, hs /*[]*/,
+                                   pz /*[mol/m²leaf/s]*/, Ptot /*[Pa]*/, 
+                                   cs /*[Pa]*/, Gamma /*[Pa]*/, 
+                                   intercept /*[mol/m²leaf/s]*/, 
+                                   CO2_atm /*[Pa]*/, Ds/*[Pa]*/, msg);//[mol/m²leaf/s] 
 
-  return gsw;//conductance[mol/m²leaf/s]
+  return gsw; //stomatal conductance [mol/m²leaf/s]
 }
 
 double
@@ -268,6 +275,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 
 	  // Photosynthetic effect of Xylem ABA.
 	  ABA_effect = ABAeffect->ABA_effect(ABA_xylem, msg);//[unitless]
+
 
 	  // leaf respiration
 	  const double rd = respiration_rate(vmax25, Tl);
@@ -462,6 +470,10 @@ PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_object ("ABAeffect", ABAEffect::component, 
 		     "The effect of xylem ABA on stomata conductivity.");
   alist.add ("ABAeffect", ABAEffect::default_model ());
+
+  syntax.add_object ("Stomatacon", StomataCon::component, 
+		     "Stomata conductance of water vapor.");
+  alist.add ("Stomatacon", StomataCon::default_model ());
 
 }
 
