@@ -336,17 +336,43 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
         }
     }
   
-  // Find sink from solution.
+  // Limit sink.
   matrix_sink (geo, soil, soil_heat, h, S_matrix, S_drain);
-  
-  // Scale with timestep.
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double Theta_loss = (S_drain[c] + S_matrix[c]) * ddt;
+      if (Theta_loss <= 0.01)
+        // Less than one percent, deal with it.
+        continue;
+      const double Theta = soil_water.Theta (c);
+      const double h_ice = soil_water.h_ice (c);
+      const double Theta_min = soil.Theta (c, pressure_end, h_ice);
+      const double allowed_loss = Theta - Theta_min;
+      daisy_assert (allowed_loss > 0.0);
+      if (Theta_loss < allowed_loss + 0.01)
+        // Less than one percent above allowed loss, deal with it.
+        continue;
+      
+      // Scale down ddt so our loss does not exceed the allowed.
+      const double factor = Theta_loss / allowed_loss;
+      ddt *= factor;
+    }
+
+  // Update tertiary state with new ddt.
+  set_state (old_state);
+  if (!find_implicit_water (old_state, geo, soil, soil_heat, h, ddt))
+    // Making timestep shorter should not prevent us from finding a solution.
+    daisy_notreached ();
+  matrix_sink (geo, soil, soil_heat, h, S_matrix, S_drain);
+
+  // Scale sink with timestep.
   const double scale = ddt / dt;
   if (!approximate (scale, 1.0))
     {
       for (size_t c = 0; c < cell_size; c++)
         {
-          S_drain[c] *= ddt / dt;
-          S_matrix[c] *= ddt / dt;
+          S_drain[c] *= scale;
+          S_matrix[c] *= scale;
         }
       std::ostringstream tmp;
       tmp << "Using timestep " << ddt << " for tertiary transport";

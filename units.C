@@ -528,6 +528,7 @@ Units::standard_conversions ()
   add ("MPa^-1", "cm^-1", 1e-4);
   add ("ng/mm/h", "g/cm/h", 1e-8);
   add ("ng/cm^3", "g/cm^3", 1e-9);
+  add ("m^-2", "cm^-2", 1e-4);
 
   // Weather.
   add ("dgWest", "dgEast", -1.0);

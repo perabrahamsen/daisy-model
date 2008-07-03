@@ -98,7 +98,16 @@ Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c,
 {
   const double S = - 4*M_PI*M_c*K_xx*(h-h_3) / 
     (log(M_PI*M_c*r_c*r_c));
-  daisy_assert (S >= 0.0);
+  daisy_assert (std::isfinite (S));
+  if (S < 0.0)
+    {
+      std::ostringstream tmp;
+      tmp << "Bug: S = " << S << " (should be positive), M_c = " << M_c
+          << ", r_c = " << r_c << ", K_xx = " << K_xx << ", h = " << h << ", h_3 = " << h_3 << ", pi M_c r_c^2 = " << M_PI*M_c*r_c*r_c;
+      Assertion::error (tmp.str ());
+      return 0.0;
+    }
+    
   return S;
 }
 
@@ -120,12 +129,12 @@ Biopore::initialize_base (const Geometry& geo, const Scope& parent_scope,
   if (!density_expr->initialize (msg))
     return false;
 
-  static const symbol per_square_meter ("m^-2");
+  static const symbol per_square_centimeter ("cm^-2");
 
   ScopeID own_scope (x_symbol (), Units::cm ());
   ScopeMulti scope (own_scope, parent_scope);
   
-  if (!density_expr->check_dim (scope, per_square_meter, msg))
+  if (!density_expr->check_dim (scope, per_square_centimeter, msg))
     return false;
 
   const size_t cell_size = geo.cell_size ();
@@ -141,7 +150,7 @@ Biopore::initialize_base (const Geometry& geo, const Scope& parent_scope,
       else
         {
           own_scope.set_number (x_symbol (), geo.cell_x (c));
-          if (!density_expr->tick_value (value, per_square_meter, scope, msg))
+          if (!density_expr->tick_value (value, per_square_centimeter, scope, msg))
             ok = false;
           density_cell.push_back (value);
         }
@@ -155,10 +164,27 @@ bool
 Biopore::check_base (const Geometry& geo, Treelog& msg) const
 {
   bool ok = true;
-  if (geo.cell_size () != density_cell.size ())
+  const size_t cell_size = geo.cell_size ();
+
+  if (cell_size != density_cell.size ())
     {
       msg.error ("Initialization of cell density failed");
       ok = false;
+    }
+
+  const double radius = diameter * 0.5;
+  const double area = M_PI * radius * radius;
+  for (size_t c = 0; c < cell_size && ok; c++)
+    {
+      if (density_cell[c] * area >= 0.5)
+        {
+          std::ostringstream tmp;
+          tmp << "Biopore domain occupies " << density_cell[c] * area * 100.0
+              << "% of available space in cell @ " << geo.cell_name (c) 
+              << ".  Maximum allowed is 50%";
+          msg.error (tmp.str ());
+          ok = false;
+        }
     }
   return ok;
 }
@@ -168,7 +194,7 @@ Biopore::load_base (Syntax& syntax, AttributeList&)
 {
   syntax.add_object ("density", Number::component, 
                        Syntax::Const, Syntax::Singleton, "\
-Root density [m^-2] as a function of 'x' [cm].");
+Root density [cm^-2] as a function of 'x' [cm].");
   syntax.add ("height_start", "cm", Check::non_positive (), Syntax::Const, 
 	      "Biopores starts at this depth (a negative number).");
   syntax.add ("height_end", "cm", Check::non_positive (), Syntax::Const, 
