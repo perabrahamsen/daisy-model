@@ -485,7 +485,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 				    canopy, *development, msg)
             * min_light_fraction;
         }
-
+      daisy_assert (std::isfinite (Ass));
       production.PotCanopyAss = Ass;
       if (root_system->production_stress >= 0.0)
 	Ass *= (1.0 - root_system->production_stress);
@@ -502,6 +502,7 @@ CropStandard::tick (const Time& time, const double relative_humidity,
 
   const double T_soil_3 = geo.content_at (soil_heat, &SoilHeat::T,
                                           -root_system->Depth/3.0);
+  daisy_assert (std::isfinite (T_soil_3));
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
 		   root_system->Density, geo, DS, 
 		   canopy.CAImRat, nitrogen, nitrogen_stress, partition, 

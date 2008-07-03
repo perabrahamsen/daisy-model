@@ -171,25 +171,34 @@ Production::tick (const double AirT, const double SoilT,
     }
 
   // Photosyntheses.
+  daisy_assert (std::isfinite (CanopyAss));
   CH2OPool += CanopyAss * dt;
   double NetAss = CanopyAss;    // [g CH2O/m^2/h]
 
   // Mantenance respiration.
   double RMLeaf                 // [g CH2O/m^2/h]
     = maintenance_respiration (r_Leaf, WLeaf, AirT);
+  daisy_assert (std::isfinite (RMLeaf));
   const double RMStem           // [g CH2O/m^2/h]
     = maintenance_respiration (r_Stem, WStem, AirT);
+  daisy_assert (std::isfinite (RMStem));
   const double RMSOrg           // [g CH2O/m^2/h]
     = maintenance_respiration (r_SOrg, WSOrg, AirT);
+  daisy_assert (std::isfinite (RMSOrg));
   const double RMRoot           // [g CH2O/m^2/h]
     = maintenance_respiration (r_Root, WRoot, SoilT);
+  daisy_assert (std::isfinite (RMRoot));
 
   // Water stress stops leaf respiration.
+  daisy_assert (std::isfinite (PotCanopyAss));
+  daisy_assert (std::isfinite (CanopyAss));
   RMLeaf = std::max (0.0, RMLeaf - PotCanopyAss + CanopyAss);
+  daisy_assert (std::isfinite (RMLeaf));
   const double RM =             // [g CH2O/m^2/h]
     RMLeaf + RMStem + RMSOrg + RMRoot + ReMobilResp;
   Respiration += RM;
   MaintRespiration = RM;
+  daisy_assert (std::isfinite (RM));
   NetAss -= RM;
 
   double LeafMResp = RMLeaf;     // [g CH2O/m^2/h]
@@ -252,6 +261,7 @@ Production::tick (const double AirT, const double SoilT,
               <<  " kg C/ha/h";
           msg.error (tmp.str ());
         }
+      daisy_assert (std::isfinite (GrowthRespiration));
       NetAss -= GrowthRespiration;
       Respiration += GrowthRespiration;
       LeafGResp = LeafGrowthRespCoef * f_Leaf * AssG;
@@ -334,6 +344,7 @@ Production::tick (const double AirT, const double SoilT,
 	  CH2OPool = 0.0;
 	}
     }
+  daisy_assert (std::isfinite (NetAss));
   NetPhotosynthesis = molWeightCO2 / molWeightCH2O * NetAss;
   AccNetPhotosynthesis += NetPhotosynthesis * dt;
 
@@ -469,6 +480,7 @@ Production::tick (const double AirT, const double SoilT,
     = (old_CCrop + dt * (NetPhotosynthesis *  12./44. - C_Loss) - CCrop) * 10;
   static double accum = 0.0;
   accum += error;
+  daisy_assert (std::isfinite (NetPhotosynthesis));
   if (!approximate (old_CCrop + dt * (NetPhotosynthesis *  12./44 - C_Loss),
                     CCrop)
       || error > 0.00001 /* 0.001 g/ha */)
