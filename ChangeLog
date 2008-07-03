@@ -1,3 +1,14 @@
+2008-07-03  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* sample/dk-soil.dai ("Jyndevad Ap")
+	("Jyndevad C"): Corrected hydraulic data
+
+2008-07-02  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* stomatacon.h, stomatacon.C: New components. 
+	* stomatacon_Leuning.C, stomatacon_BB.C, stomatacon_SHA.C: New models. 
+	* photo_Farquhar.C (GSTModel): Use it.
+
 2008-07-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.33 released.
