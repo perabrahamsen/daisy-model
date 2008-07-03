@@ -41,8 +41,8 @@ hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
 2030. Statens Planteavlsforsøg."
   (clay 0.038)  (silt 0.072) (fine_sand 0.183) (coarse_sand 0.684)
   (humus 0.023) (C_per_N 13)
-  (hydraulic M_vG (Theta_res 0.055)(Theta_sat 0.432)
-             (alpha 0.0630)(n 1.641)(K_sat 21.7[cm/h])))
+  (hydraulic M_vG (Theta_res 0.061) (Theta_sat 0.439) 
+  	(alpha 0.057) (n 1.754) (K_sat 24.3 [cm/h])))
 
 (defhorizon "Jyndevad C" default
   "Jyndevad 50 & 90 cm soil. Data from O.H. Jacobsen (1989): Umættet
@@ -50,8 +50,8 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
 2030. Statens Planteavlsforsøg."
   (clay 0.028)  (silt 0.023) (fine_sand 0.096) (coarse_sand 0.849)
   (humus 0.004) (C_per_N 13)
-  (hydraulic M_vG (Theta_res 0.055)(Theta_sat 0.432)
-             (alpha 0.0630)(n 1.641)(K_sat 21.7[cm/h])))
+  (hydraulic M_vG (Theta_res 0.030)(Theta_sat 0.418)
+  	(alpha 0.054)(n 2.816)(K_sat 92.52 [cm/h])))
 
 (defcolumn Jyndevad default
   (description "This is a JB1 soil with free drainage")
