@@ -100,7 +100,7 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double Rn,
                               reference_evapotranspiration_dry);
 
   reference_evapotranspiration_wet
-    = FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
+    = FAO::RefPenmanMonteithWet (Rn, G, Temp, VaporPressure, U2,
                               AtmPressure)
     * 3600;
   potential_evapotranspiration_wet

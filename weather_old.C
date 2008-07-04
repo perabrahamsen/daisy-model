@@ -55,13 +55,13 @@ struct WeatherOld::Implementation
 void 
 WeatherOld::tick (const Time& time, Treelog& out)
 {
-  Weather::tick (time, out);
+  WeatherBase::tick (time, out);
   impl.time = time;
 }
 
 void
 WeatherOld::output (Log& log) const
-{ Weather::output (log); }
+{ WeatherBase::output (log); }
 
 double
 WeatherOld::hourly_global_radiation () const
@@ -131,13 +131,13 @@ WeatherOld::wind () const
 { return 3.0; }
 
 WeatherOld::WeatherOld (Block& al)
-  : Weather (al),
+  : WeatherBase (al),
     impl (*new Implementation (al))
 { 
-  latitude = al.number ("Latitude");
-  longitude = al.number ("Longitude");
+  latitude_ = al.number ("Latitude");
+  longitude_ = al.number ("Longitude");
   elevation_ = al.number ("Elevation");
-  timezone = al.number ("TimeZone");
+  timezone_ = al.number ("TimeZone");
   screen_height_ = al.number ("ScreenHeight");
   T_average = al.number ("average");
   T_amplitude = al.number ("amplitude");
@@ -171,7 +171,7 @@ check_alist (const AttributeList& al, Treelog& err)
 void
 WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  Weather::load_syntax (syntax, alist);
+  WeatherBase::load_base (syntax, alist);
   syntax.add_check (check_alist);
   // Where in the world are we?
   syntax.add ("Latitude", "dg North", Syntax::Const,

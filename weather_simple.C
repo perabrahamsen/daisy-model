@@ -65,7 +65,7 @@ WeatherSimple::tick (const Time& t, Treelog& o)
   WeatherOld::tick (t, o);
   time = t;
   WeatherOld::distribute (Precipitation ());
-  Weather::tick_after (time, o);
+  WeatherBase::tick_after (time, o);
 }
 
 double

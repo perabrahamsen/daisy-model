@@ -23,9 +23,9 @@
 #ifndef WEATHER_OLD_H
 #define WEATHER_OLD_H
 
-#include "weather.h"
+#include "weather_base.h"
 
-class WeatherOld : public Weather
+class WeatherOld : public WeatherBase
 {
   // Content.
 private:

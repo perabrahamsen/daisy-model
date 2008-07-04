@@ -25,7 +25,6 @@
 
 #include "model.h"
 #include "im.h"
-#include "symbol.h"
 
 class Time;
 class Treelog;
@@ -33,56 +32,30 @@ class Block;
 
 class Weather : public ModelLogable
 {
-  // Units.
-public:
-  static const symbol dry_deposit_unit;
-
   // Content.
 public: 
   static const char *const component;
   symbol library_id () const;
   
+  // Units.
+public:
+  static const symbol dry_deposit_unit;
+
   // Location.
-protected:
-  /* const */ double latitude;
-  /* const */ double longitude;
-  /* const */ double elevation_;
-  /* const */ double timezone;
 public:
   enum surface_t { reference, field };
-protected:
-  /* const */ surface_t surface_;
-  /* const */ double screen_height_;
-public:
-  surface_t surface () const 
-  { return surface_; }
-  double elevation () const; // [m]
-  double screen_height () const; // [m]
-
-  // Deposit.
-protected:
-  /* const */ IM DryDeposit;
-  /* const */ IM WetDeposit;
-
-  // Temperature.
-protected:
-  /* const */ double T_average;
-  /* const */ double T_amplitude;
-  /* const */ double max_Ta_yday;
-
-  // State
-private:
-  double day_length_;
-  double day_cycle_;
-  double hourly_cloudiness_;
-  double daily_cloudiness_;
-  IM deposit_;
+  virtual double latitude () const = 0;
+  virtual double longitude () const = 0; 
+  virtual double elevation () const = 0; // [m]
+  virtual double timezone () const = 0;
+  virtual double screen_height () const = 0; // [m]
+  virtual surface_t surface () const = 0;
 
   // Simulation.
 public:
-  virtual void tick (const Time& time, Treelog&);
-  void tick_after (const Time& time, Treelog&);
-  virtual void output (Log&) const;
+  virtual void tick (const Time& time, Treelog&) = 0;
+  virtual void tick_after (const Time& time, Treelog&) = 0;
+  virtual void output (Log&) const = 0;
 
   // Communication with Bioclimate.
 public:
@@ -97,65 +70,54 @@ public:
   virtual double daily_precipitation () const = 0; // [mm/d]
   virtual double rain () const = 0;	// [mm/h]
   virtual double snow () const = 0;	// [mm/h]
-  IM deposit () const; // [g [stuff] /cm²/h]
-  double hourly_cloudiness () const // [0-1]
-  { return hourly_cloudiness_; }
-  double daily_cloudiness () const // [0-1]
-  { return daily_cloudiness_; }
+  virtual IM deposit () const = 0; // [g [stuff] /cm²/h]
+  virtual double hourly_cloudiness () const = 0; // [0-1]
+  virtual double daily_cloudiness () const = 0; // [0-1]
   virtual double vapor_pressure () const = 0; // [Pa]
   virtual double relative_humidity () const = 0; // []
   virtual double wind () const = 0;	// [m/s]
-  double CO2 () const; //[Pa]
+  virtual double CO2 () const = 0; //[Pa]
 
   // Initializing bioclimate.
 public:
-  virtual bool has_reference_evapotranspiration () const;
-  virtual bool has_vapor_pressure () const;
-  virtual bool has_wind () const;
-  virtual bool has_min_max_temperature () const;
-  virtual bool has_diffuse_radiation () const;
-  virtual bool has_relative_humidity () const;
+  virtual bool has_reference_evapotranspiration () const = 0;
+  virtual bool has_vapor_pressure () const = 0;
+  virtual bool has_wind () const = 0;
+  virtual bool has_min_max_temperature () const = 0;
+  virtual bool has_diffuse_radiation () const = 0;
+  virtual bool has_relative_humidity () const = 0;
 
   // Light distribution.
 public:
-  double day_length () const	// [h]
-    { return day_length_; }
-  double day_cycle () const	// Sum over a day is 1.0.
-    { return day_cycle_; }
-
-public:
-  double day_cycle (const Time&) const;	// Sum over a day is 1.0.
-private:
-  double day_length (const Time&) const;
+  virtual double day_length () const = 0; // [h]
+  virtual double day_cycle () const = 0; // Sum over a day is 1.0.
+  virtual double day_cycle (const Time&) const = 0; // Sum over a day is 1.0.
+  virtual double day_length (const Time&) const = 0;
 
   // Communication with SoilHeat.
 public:
-  double T_normal (const Time&, double delay = 0.0) const;
+  virtual double T_normal (const Time&, double delay = 0.0) const = 0;
 
   // OrganicMatter initialization.
 public:
-  double average_temperature () const;
+  virtual double average_temperature () const = 0;
 
   // Astronomic utilities.
 public:
-  static double SolarDeclination (const Time& time); // [rad]
-  static double RelativeSunEarthDistance (const Time& time);
-  static double SunsetHourAngle (double Dec, double Lat); // [rad]
-  double ExtraterrestrialRadiation (const Time& time) const; // [W/m2]
-  double HourlyExtraterrestrialRadiation (const Time& time) const; // [W/m2]
-  double sin_solar_elevation_angle (const Time& time) const; // []
+  virtual double ExtraterrestrialRadiation (const Time& time) const = 0; // [W/m2]
+  virtual double HourlyExtraterrestrialRadiation (const Time& time) const = 0; // [W/m2]
+  virtual double sin_solar_elevation_angle (const Time& time) const = 0; // []
 
   // Create and Destroy.
 private:
   Weather (const Weather&);
 public:
-  virtual bool initialize (const Time& time, Treelog& err);
+  virtual bool initialize (const Time& time, Treelog& err) = 0;
 protected:
   Weather (Block&);
 public:
-  virtual bool check (const Time& from, const Time& to, Treelog& err) const;
-  static void load_syntax (Syntax&, AttributeList&);
-  ~Weather ();
+  virtual bool check (const Time& from, const Time& to, Treelog&) const = 0;
+  virtual ~Weather ();
 };
 
 #endif // WEATHER_H

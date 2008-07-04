@@ -181,7 +181,7 @@ Biopore::check_base (const Geometry& geo, Treelog& msg) const
           std::ostringstream tmp;
           tmp << "Biopore domain occupies " << density_cell[c] * area * 100.0
               << "% of available space in cell @ " << geo.cell_name (c) 
-              << ".  Maximum allowed is 50%";
+              << ", which is just silly";
           msg.error (tmp.str ());
           ok = false;
         }

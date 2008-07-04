@@ -210,17 +210,24 @@ BioporeMatrix::update_water ()
   double xminus = 0.0;
   for (size_t i = 0; i < column_size; i++)
     {
+      const double water_volume = added_water[i];  // [cm^3]
+      if (water_volume < 1e-100)
+        continue;
       const double density = density_column[i]; // [cm^-2]
       const double radius = diameter * 0.5;     // [cm]
       const double area = M_PI * radius * radius;  // [cm^2]
       const double soil_fraction = density * area; // []
-      const double water_volume = added_water[i];  // [cm^3]
       const double soil_volume = water_volume / soil_fraction; // [cm^3]
       const double dx = xplus[i] - xminus;                     // [cm]
       const double dz = soil_volume / (dx * dy);               // [cm]
       h_bottom[i] += dz;                                       // [cm]
       added_water[i] = 0.0;                                    // [cm^3]
       xminus = xplus[i];                                       // [cm]
+      std::ostringstream tmp;
+      tmp << "Adding " << dz << " [cm] to column " << i 
+          << " which contain " << soil_fraction * 100 << "% biopores and "
+          << water_volume << " [cm^3] water";
+      Assertion::message (tmp.str ());
     }
 }
 
@@ -300,8 +307,7 @@ BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
       const double volume = square.volume ();
       daisy_assert (volume > 0.0);
       const double content = geo.total_soil (density_cell, square);
-      static const double m2_per_cm2 = 0.01 * 0.01;
-      const double density = m2_per_cm2 * content / volume;
+      const double density = content / volume;
       density_column.push_back (density);
       xminus = xplus[i];
     }

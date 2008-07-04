@@ -21,7 +21,7 @@
 
 #define BUILD_DLL
 
-#include "weather.h"
+#include "weather_base.h"
 #include "chemical.h"
 #include "alist.h"
 #include "fao.h"
@@ -42,7 +42,7 @@
 #include <numeric>
 #include <set>
 
-struct WeatherStandard : public Weather
+struct WeatherStandard : public WeatherBase
 {
   Path& path;
 
@@ -212,7 +212,7 @@ struct WeatherStandard : public Weather
   // Simulation.
   void tick (const Time& time, Treelog&);
   void output (Log& log) const
-  { Weather::output (log); }
+  { WeatherBase::output (log); }
   void read_line ();
   void read_new_day (const Time&, Treelog&);
 
@@ -406,10 +406,10 @@ WeatherStandard::find_map (const Time& time) const
 
 WeatherStandard::keyword_description_type 
 WeatherStandard::keyword_description[] =
-  { { "Latitude", "dgNorth", &WeatherStandard::latitude, -90, 90, true },
-    { "Longitude", "dgEast", &WeatherStandard::longitude, -360, 360, true },
+  { { "Latitude", "dgNorth", &WeatherStandard::latitude_, -90, 90, true },
+    { "Longitude", "dgEast", &WeatherStandard::longitude_, -360, 360, true },
     { "Elevation", "m", &WeatherStandard::elevation_, 0, 10000, true },
-    { "TimeZone", "dgEast", &WeatherStandard::timezone, -360, 360, true },
+    { "TimeZone", "dgEast", &WeatherStandard::timezone_, -360, 360, true },
     { "ScreenHeight", "m", &WeatherStandard::screen_height_, 0, 100, true },
     { "TAverage", "dgC", &WeatherStandard::T_average, -10, 40, true },
     { "TAmplitude", "dgC", &WeatherStandard::T_amplitude, 0, 100, true },
@@ -483,7 +483,7 @@ WeatherStandard::tick (const Time& time, Treelog& msg)
 {
   Treelog::Open nest (msg, "Weather: " + name);
 
-  Weather::tick (time, msg);
+  WeatherBase::tick (time, msg);
 
   hour = time.hour ();
   
@@ -516,7 +516,7 @@ WeatherStandard::tick (const Time& time, Treelog& msg)
   daisy_assert (snow_fraction >= 0 && snow_fraction <= 1);
   daisy_assert (approximate (rain_fraction + snow_fraction, 1.0));
 
-  Weather::tick_after (time, msg);
+  WeatherBase::tick_after (time, msg);
 }
 
 void 
@@ -1265,7 +1265,7 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (),
 }
 
 WeatherStandard::WeatherStandard (Block& al)
-  : Weather (al),
+  : WeatherBase (al),
     path (al.path ()),
     T_rain (al.number ("T_rain")),
     T_snow (al.number ("T_snow")),
@@ -1388,11 +1388,11 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 	  ok = false;
 	}
     }
-  if (latitude < -66 || latitude > 66)
+  if (latitude () < -66 || latitude () > 66)
     {
       std::ostringstream tmp;
       tmp << "Researching arctic agriculture? (latitude = " << 
-	latitude << ")";
+	latitude () << ")";
       err.error (tmp.str ());
     }
   return ok;
@@ -1408,7 +1408,7 @@ static struct WeatherStandardSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Read a Daisy Weather File.");
-    Weather::load_syntax (syntax, alist);
+    WeatherBase::load_base (syntax, alist);
 
     syntax.add ("where", Syntax::String, Syntax::Const,
 		"File to read weather data from.");
